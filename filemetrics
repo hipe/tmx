@@ -3,6 +3,7 @@ require 'hipe-core/struct/table'
 require 'hipe-core/interfacey'
 require 'open3'
 require 'ostruct'
+require 'ruby-debug' # @todo
 
 
 class Hipe::FileMetrics
@@ -96,12 +97,19 @@ class Hipe::FileMetrics
     responds_to "help", "this page", :aliases=>['-h','--help','-?']
   end
 
+  def add_quotes_to_filepaths filepaths
+    filepaths.each{|x| x.replace("\"#{x}\"") if x.index(' ') }
+    nil
+  end
+
   def lc path, opts
     return build_find_files_command(path,opts) if opts.find
     filepaths = find_all_paths([path], opts) or return error
+    add_quotes_to_filepaths filepaths
     return filepaths * "\n" if opts.list
     branch = linecount_branch_node_one_level('files', filepaths) or
       return error
+    return branch unless !branch.respond_to?(:valid?) || branch.valid?
     branch.sort_by!{|node| node.stats.ratio_of_max}
     table = Hipe::Table.make do
       label %|summary of linecounts for #{branch.name}|
