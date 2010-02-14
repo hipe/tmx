@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 require 'hipe-core/struct/table'
 require 'hipe-core/interfacey'
-require 'open3'
+require 'open4'
 require 'ostruct'
 require 'ruby-debug' # @todo
 
@@ -19,14 +19,13 @@ class Hipe::FileMetrics
 
     default_request "help"
 
-    responds_to("lc").desc <<-desc
+    responds_to("lc") do
+      describe <<-desc
         shows the linecount of each file, longest first. Show
         percentages of max for each file.   will go recursively
         into directories.
 
         desc
-
-    responds_to("lc") do
 
       opts.on('-n','--name NAME', :many=>true).
         desc <<-desc
@@ -62,27 +61,18 @@ class Hipe::FileMetrics
       opts.on('--list',
                 'just list the resulting files that match the query.')
 
-      # opts.on('-e','--[no-]table', :default=>'yes').desc <<-desc
-      #           whether or not to render the results in an ascii table,
-      #           with a title header and columns headers. (default: yes)
-      #           desc
-
-
       opts.on('-h','--help','this screen',&help)
 
       required('path', "the file or directory to search.")
 
     end
 
-    cmd = responds_to("dirs")
-
-    cmd.desc <<-desc
-      experimental report.  all folders one level under <path>,
-      for each of them report number of files and total sloc,
-      and show them in order of total sloc and percent of max
-    desc
-
-    cmd.define do
+    cmd = responds_to("dirs") do
+      describe <<-desc
+        experimental report.  all folders one level under <path>,
+        for each of them report number of files and total sloc,
+        and show them in order of total sloc and percent of max
+      desc
       opts.on('-n','--name PATTERN', 'multiple names patterns', :many=>true)
       opts.on('-e','--exclude-dir DIR', :many=>true, :default=>'.*').
         desc <<-desc
@@ -94,13 +84,25 @@ class Hipe::FileMetrics
       required('path')
     end
 
+    responds_to("ext") do
+      describe(["just report on the number of files with ",
+        "different extensions, ordered by frequency of extension"])
+      opts.on("--git", "be aware of git commit objects,",
+                        "report them in their own category")
+      opts.on("--each","for files with out extensions, show each name")
+      opts.on("--one","by default, extensions that occur only once",
+                       "are showed in a sparate list. Use this flag ",
+                       "to include them in the main table."
+      )
+      optional("path", "the folder to look in", :default=>'.')
+      opts.on('-h','this screen', &help)
+    end
+
+
     responds_to "help", "this page", :aliases=>['-h','--help','-?']
   end
 
-  def add_quotes_to_filepaths filepaths
-    filepaths.each{|x| x.replace("\"#{x}\"") if x.index(' ') }
-    nil
-  end
+  # command processing frontends:
 
   def lc path, opts
     return build_find_files_command(path,opts) if opts.find
@@ -120,6 +122,83 @@ class Hipe::FileMetrics
     end
     table.render(:ascii)
   end
+
+
+  def dirs path, opts
+    file_exists(path) or return error
+    find_command = build_find_dirs_command(path, opts)
+    return find_command if opts.find
+    files = system_lines(find_command) or return error
+    return (files * "\n") if opts.list
+    do_dirs path, files, opts
+  end
+
+  class SpecialPattern
+    attr_reader :name
+    def initialize name, re
+      @name = name
+      @re = re
+    end
+    def match(basename)
+      @re =~ basename
+    end
+  end
+
+  def ext path, opts
+    @pats = []
+    @pats.push SpecialPattern.new('git object',/^[0-9a-f]{38,40}$/)if opts.git
+    puts(cmd = "find \"#{path}\" -type f -not \\( -type d -prune \\)")
+    stdin, stdout, stderr, pid = Open4.popen4(cmd);
+    # i don't know if i'm supposed to wait here @todo
+    lines = stderr.read.split("\n");
+    counts = Hash.new do |h,k|
+      o = OpenStruct.new(:count=>0, :extension=>k, :name=>k)
+      h[k] = o
+    end
+    lines.each do |line|
+      basename = File.basename(line)
+      ext_name = File.extname(basename)
+      use_name = if (''==ext_name)
+        name = (p=@pats.detect{|p| p.match(basename)}) ? p.name : nil
+        name.nil? ? ( opts.each ? basename : '' ) : name
+      else
+        ext_name
+      end
+      counts[use_name].count += 1
+    end
+    branch = Hipe::Stats[Hipe::DataNode::Branch.new do |me|
+      me.name = "extensions summary"
+      me.list = counts.values
+    end]
+    rows = branch.sort_by!{|x| x.count}
+    singles = nil
+    unless opts.one
+      orig = rows; rows = []; singles = []
+      orig.each{|x| (x.count==1 ? singles : rows).push x}
+      singles.sort!{|x,y| x.extension <=> y.extension }
+    end
+    table = Hipe::Table.make do
+      label %|occurences of extensions in #{path}|
+      field(:extension)      {|x| x.extension=='' ? '[none]' : x.extension }
+      field(:num_files)      {|x| x.stats.count                            }
+      field(:percent_of_max) {|x| x.stats.percent_of_max('%5.01f')         }
+      list rows
+    end
+    s = table.render(:ascii)
+    if singles
+      s << "\noccured only once: (#{singles.map(&:extension) * ', '})"
+    end
+    s
+  end
+
+  ## implementations
+
+
+  def add_quotes_to_filepaths filepaths
+    filepaths.each{|x| x.replace("\"#{x}\"") if x.index(' ') }
+    nil
+  end
+
 
   def find_all_paths paths, opts
     result = []
@@ -208,15 +287,6 @@ class Hipe::FileMetrics
     ands.push ' -maxdepth 1 -type d'
     qry = ands * ' -a'
     %|find #{path} #{qry}|
-  end
-
-  def dirs path, opts
-    file_exists(path) or return error
-    find_command = build_find_dirs_command(path, opts)
-    return find_command if opts.find
-    files = system_lines(find_command) or return error
-    return (files * "\n") if opts.list
-    do_dirs path, files, opts
   end
 
   def file_exists path
@@ -321,7 +391,11 @@ module Hipe::Stats
         required_that it.respond_to?(:name)
         required_that it.respond_to?(:count) || it.respond_to?(:list)
       end
-      raise StatsError.new(err.message) if err
+      if err
+        debugger
+        raise StatsError.new(err.message) if err
+      end
+
 
       @node = node
       @cache = StatsCache.new
@@ -462,7 +536,13 @@ module Hipe::ShapeAssert
   #
   class ShapeAssertFail < RuntimeError; end
   class MakeDefinitionFail < ShapeAssertFail; end
-  class MatchDefinitionFail < ShapeAssertFail; end
+  class MatchDefinitionFail < ShapeAssertFail
+    attr_reader :thing
+    def initialize msg, thing
+      super(msg)
+      @thing = thing
+    end
+  end
 
   #
   # raises MatchDefinitionFail if the thing doesn't match the description
@@ -489,7 +569,7 @@ module Hipe::ShapeAssert
       meth = rec[0]
       args = rec.slice(1,rec.size).map{|x| x.inspect} * ', '
       msg = %|to be a #{defin.desc} it must #{meth}(#{args})|
-      return MatchDefinitionFail.new msg
+      return MatchDefinitionFail.new msg, thing
     end
     return nil
   end
