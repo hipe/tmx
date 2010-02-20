@@ -227,7 +227,7 @@ class Hipe::FileMetrics
 
   # @todo make this more robust
   def system_lines cmd
-    sin, sout, serr = Open3.popen3 cmd
+    pid, sin, sout, serr = Open4.popen4 cmd
     out, err = [sout.read.strip, serr.read.strip]
     return error(%|error running system command: "#{err}"|) unless err == ""
     out.split("\n")
