@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+#!/usr/bin/ruby
+
+$LOAD_PATH.unshift File.join(File.dirname(__FILE__), '..', 'lib')
+require 'assess'
+require 'assess/commands'
+
+Hipe::Assess::Commands.invoke ARGV
