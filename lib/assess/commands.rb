@@ -1,6 +1,7 @@
 #
 # this is based entirely off of chris wanstrath's rip
 #
+require 'json' # only for rescue
 
 module Hipe
   module Assess
@@ -22,6 +23,10 @@ module Hipe
 
         @io.flush
         nil
+      end
+
+      def print *a
+        @io.print a
       end
 
       def abort msg
@@ -69,12 +74,16 @@ module Hipe
         use_command = find_command command
         begin
           send(use_command, opts, *args)
-        rescue Never => e
+        rescue UserFail,
+          Errno::ENOENT,
+          # ArgumentError,
+          JSON::ParserError => e
           if opts[:error]
             raise e
           else
             ui.puts "#{app}: #{command} failed"
-            ui.puts "-> #{e.message}"
+            ui.puts "#{e.message}"
+            return help(nil, command)
           end
         end
       end
@@ -89,6 +98,10 @@ module Hipe
       end
 
     private
+
+      def controller(env = nil)
+        @controller ||= Controller.new(env)
+      end
 
       def ui
         @ui ||= begin
