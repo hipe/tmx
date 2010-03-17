@@ -1,3 +1,6 @@
+#
+# using chris wanstrath's pattern from rip
+#
 module Hipe
   module Assess
     module Commands
@@ -26,25 +29,36 @@ module Hipe
 
       end
 
-      o "#{app} schema (analyze | protomodel | model) ENTITY_NAME [INFILE]"
+      o "#{app} schema (analyze | protomodel | dm) ENTITY_NAME [INFILE]"
       x 'Analyze patterns on json data, mebbe guess at a schema.'
-      x 'Maybe generate a datamapper model'
+      x 'Maybe generate a datamapper model.'
 
-      def schema opts, sub_cmd, entity_name=nil, file=nil
-        sin = file ? File.open(file, 'r') : $stdin
+      def schema opts, sub_cmd=nil, entity_name=nil, file=nil
+        return help(nil,'schema') if opts[:h]
+        sin = input_from_stdin_or_filename(file) or return
         require 'assess/proto/json-schema-guess.rb'
         case sub_cmd
         when 'analyze'
           JsonSchemaGuess.analyze sin, ui
         when 'protomodel'
           JsonSchemaGuess.protomodel sin, ui, entity_name
-        when 'model'
-          JsonSchemaGuess.model sin, ui, entity_name
+        when 'dm'
+          sexp = _generate_datamapper_model_sexp_from_json sin, entity_name
+          ui.puts sexp.my_to_ruby
         else
           ui.puts("Need 'report' or 'model'.  \"#{sub_cmd}\" "<<
             "is not a valid sub-command.")
           return help nil, 'schema'
         end
+      end
+
+      def _generate_datamapper_model_sexp_from_json sin, entity_name
+        require 'assess/proto/json-schema-guess.rb'
+        require 'assess/code-adapter/data-mapper'
+        metrics = JsonSchemaGuess.entity_metrics sin
+        proto = JsonSchemaGuess.protomodel_from_metrics metrics, entity_name
+        sexp = DataMapper.generate_model_module_sexp_from_protomodel proto
+        sexp
       end
 
       x 'Import domain info from json.'

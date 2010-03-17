@@ -1,0 +1,689 @@
+[
+  {
+    "linkies": [
+      {
+        "href": "http://www.cs.cmu.edu/afs/cs.cmu.edu/project/link/pub/www/papers/ps/tr91-196.ps",
+        "content": "Postscript"
+      },
+      {
+        "href": "http://www.cs.cmu.edu/afs/cs.cmu.edu/project/link/pub/www/papers/ps/tr91-196.pdf",
+        "content": "PDF"
+      },
+      {
+        "href": "http://www.cs.cmu.edu/afs/cs.cmu.edu/project/link/pub/www/papers/abs/tr91-196.html",
+        "content": "Abstract"
+      }
+    ],
+    "authesque": "Daniel Sleator and Davy Temperley. 1991.",
+    "section": "Papers By Us",
+    "descesque": "Parsing English with a Link Grammar. Carnegie Mellon University Computer Science technical report CMU-CS-91-196, October 1991."
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www.cs.cmu.edu/afs/cs.cmu.edu/project/link/pub/www/papers/ps/LG-IWPT93.ps",
+        "content": "Postscript"
+      },
+      {
+        "href": "http://www.cs.cmu.edu/afs/cs.cmu.edu/project/link/pub/www/papers/ps/LG-IWPT93.pdf",
+        "content": "PDF"
+      },
+      {
+        "href": "basics.html",
+        "content": "Abstract and Introduction"
+      }
+    ],
+    "authesque": "Daniel Sleator and Davy Temperley. 1993.",
+    "section": "Papers By Us",
+    "descesque": "Parsing English with a Link Grammar. <I>Third International Workshop on Parsing Technologies</I>. (This is a shorter but more up-to-date version of the technical report above.  It contains a better introduction to link grammars, and gives a more detailed description of the relationship between link grammar and other formalisms.)"
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www.cs.cmu.edu/afs/cs.cmu.edu/project/link/pub/www/papers/ps/gram3gram.ps",
+        "content": "Postscript"
+      },
+      {
+        "href": "http://www.cs.cmu.edu/afs/cs.cmu.edu/project/link/pub/www/papers/ps/gram3gram.pdf",
+        "content": "PDF"
+      },
+      {
+        "href": "http://www.cs.cmu.edu/afs/cs.cmu.edu/project/link/pub/www/papers/abs/gram3gram.html",
+        "content": "Abstract"
+      }
+    ],
+    "authesque": "John Lafferty, Daniel Sleator, and Davy Temperley. 1992.",
+    "section": "Papers By Us",
+    "descesque": "Grammatical Trigrams: A Probabilistic Model of Link Grammar. <I>Proceedings of the AAAI Conference on Probabilistic Approaches to Natural Language</I>, October, 1992.  (This paper introduces a statistical language model based on link grammars.)"
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www.cs.cmu.edu/afs/cs.cmu.edu/project/link/pub/www/papers/ps/tr95-125.ps",
+        "content": "Postscript"
+      },
+      {
+        "href": "http://www.cs.cmu.edu/afs/cs.cmu.edu/project/link/pub/www/papers/ps/tr95-125.pdf",
+        "content": "PDF"
+      },
+      {
+        "href": "http://www.cs.cmu.edu/afs/cs.cmu.edu/project/link/pub/www/papers/abs/tr95-125.html",
+        "content": "Abstract"
+      }
+    ],
+    "authesque": "Dennis Grinberg, John Lafferty and Daniel Sleator. 1995.",
+    "section": "Papers By Us",
+    "descesque": "A robust parsing algorithm for link grammars.  Carnegie Mellon University Computer Science technical report CMU-CS-95-125, and <I> Proceedings of the Fourth International Workshop on Parsing Technologies</I>, Prague, September, 1995.  (This paper describes the modifications of the parsing algorithm used to allow null links.)"
+  },
+  {
+    "linkies": [
+      {
+        "href": "ahmed-abstract.html",
+        "content": "[Abstract]"
+      }
+    ],
+    "authesque": "Mehreen Ahmed. 2002.",
+    "section": "Papers By Others",
+    "descesque": "A Note on Phrase Structure Analysis and Design Implication for ICALL. <i>Computer Assisted Language Learning,</i> 15, 4, Oct, 422-433."
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www.sciences.univ-nantes.fr/irin/taln2003/articles/eval2.pdf",
+        "content": "[PDF]"
+      }
+    ],
+    "authesque": "Sophie Aubin. 2003.",
+    "section": "Papers By Others",
+    "descesque": "Evaluation comparative de deux analyseurs produisant des relations syntaxiques (Comparative evaluation of two analyzers producing syncactic relations).  <i>Traitement Automatique des Langues Naturelles 2003 </i>."
+  },
+  {
+    "linkies": [
+      {
+        "href": "aubin.pdf",
+        "content": "[PDF]"
+      }
+    ],
+    "authesque": "Sophie Aubin, Adeline Nazarenko, and Claire Nedellec. 2006.",
+    "section": "Papers By Others",
+    "descesque": "Adapting a general parser to a sublanguage. Proceedings of the International Conference RANLP'05."
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www-lipn.univ-paris13.fr/~bechet/",
+        "content": "[Postscript]"
+      }
+    ],
+    "authesque": "Denis Bechet. 2003.",
+    "section": "Papers By Others",
+    "descesque": "K-valued link grammars are learnable from strings. <I>Proccedings of the 8th conference on Formal Grammar (FGVienna)</I>, Vienna, Austria, August 2003."
+  },
+  {
+    "linkies": [
+
+    ],
+    "authesque": "Tom Brehony & Kevin Ryan. 1994.",
+    "section": "Papers By Others",
+    "descesque": "Francophone Stylistic Grammar Checking (FSGC) Using Link Grammars. In <i>Computer Assisted Language Learning</i>,  7, 3, 257-269. "
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www.foo.be/docs/tpj/issues/vol5_3/tpj0503-0010.html",
+        "content": "[View online]"
+      }
+    ],
+    "authesque": "Dan Brien. 2000.",
+    "section": "Papers By Others",
+    "descesque": "Parsing Natural Language with Lingua::Link Parser. In <i>The Perl Journal</i>, issue 19."
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www.comp.mq.edu.au/~richards/papers/INAP2001.pdf",
+        "content": "[Postscript]"
+      }
+    ],
+    "authesque": "K. Boettger, R. Schwitter, D. Richards, O. Aguilera, and D. Molla. 2001.",
+    "section": "Papers By Others",
+    "descesque": "Reconciling Use Cases via Controlled Language and Graphical        Models. <i>INAP-2001, The Proceedings of the 14th International        Conference on Applications of Prolog</i>, 20-22 October, 2001,        University of Tokyo, Japan, 186-195."
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www.clsp.jhu.edu/publications/pubs/eurospeech.pdf",
+        "content": "[PDF]"
+      }
+    ],
+    "authesque": "Rosenfeld, A. Stolcke, & D. Wu. 1997.",
+    "section": "Papers By Others",
+    "descesque": "Structure and Performance of a Dependency Language Model. <i>Eurospeech 97</i>."
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www.isi.edu/~timc/papers/chklovski-learner.ps",
+        "content": "[Postscript]"
+      }
+    ],
+    "authesque": "T. Chklovksi. 2003.",
+    "section": "Papers By Others",
+    "descesque": "Learner: A System for Acquiring Commonsense Knowledge by Analogy. <i>Proceedings of the International Conference on Knowledge Capture.</i>"
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://csdl.computer.org/comp/proceedings/ictai/2003/2038/00/20380467abs.htm",
+        "content": "[Abstract]"
+      }
+    ],
+    "authesque": "Jing Ding, Daniel Berleant, Jun Xu, & Andy W. Fulmer. 2003.",
+    "section": "Papers By Others",
+    "descesque": "Extracting Biochemical Interactions from MEDLINE Using a Link Grammar Parser. <I>15th IEEE International Conference on Tools with Artificial Intelligence (ICTAI'03). </I>"
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www.sys.virginia.edu/sieds03/proceed2003/proceedings/C102.pdf",
+        "content": "[PDF]"
+      }
+    ],
+    "authesque": "Beling, Matthias Blume, & Jeff Robinson. 2003.",
+    "section": "Papers By Others",
+    "descesque": "The Quantification of Unstructured Information and its Use in Predictive Modeling. <i>Proceedings of the 2003 Systems and Information Engineering Design Symposium.</i>"
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www.geocities.com/raakerkar/raadrdcollegejournal.pdf",
+        "content": "[PDF]"
+      }
+    ],
+    "authesque": "D. Rajesh Duthie & Rajendra Akerkar. 2002.",
+    "section": "Papers By Others",
+    "descesque": "Knowledge Representation in KRIS Using Link Grammar Parser."
+  },
+  {
+    "linkies": [
+      {
+        "href": "elliot-abstract.html",
+        "content": "[Abstract]"
+      }
+    ],
+    "authesque": "R. Elliott, J. R. W. Glauert, J. R. Kennaway, and I. Marshall. 2002.",
+    "section": "Papers By Others",
+    "descesque": "The development of language processing support for the ViSiCAST project. <i>Proceedings of the Fourth International ACM Conference on Assistive Technologies</i>, 101-8."
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www.fed.cuhk.edu.hk/ceric/lang/199900000004/0100.htm",
+        "content": "[View  on web]"
+      }
+    ],
+    "authesque": "Z. Feng. 1999.",
+    "section": "Papers By Others",
+    "descesque": "Review on Link Grammar.  (In Chinese.) <I>Applied Linguistics (Yuyen Wenzi Yunyong)</I> 4, 100-102."
+  },
+  {
+    "linkies": [
+
+    ],
+    "authesque": "E. Fong and D. Wu. 1995.",
+    "section": "Papers By Others",
+    "descesque": "Learning Restricted Probabilistic Link Grammars. <I>IJCAII Workshop on New Approaches to Learning for Natural Language Processing</I>, August, 1995, Montreal, Canada, pp 49-56."
+  },
+  {
+    "linkies": [
+
+    ],
+    "authesque": "Andrew J. Hunt. 1993.",
+    "section": "Papers By Others",
+    "descesque": "Utilising Prosody to Perform Syntatic Disambiguation. In <I>Proc. Eurospeech 1993</I>, pages 1339-1342."
+  },
+  {
+    "linkies": [
+
+    ],
+    "authesque": "Andrew J. Hunt. 1994.",
+    "section": "Papers By Others",
+    "descesque": "A Generalized Model for Utilising Prosodic information in Continuous Speech Recognition.  In <I>Proc. ICASSP</I>, 1994, pages 169-172, 1994."
+  },
+  {
+    "linkies": [
+
+    ],
+    "authesque": "Andrew J. Hunt. 1994.",
+    "section": "Papers By Others",
+    "descesque": "Improving Speech Understanding Through Integration of Prosody and Syntax.   In <I>Proc. 7th Aust. Joint Conf. on Artificial Intelligence</I>, pages 442-449, Armidale, Australia."
+  },
+  {
+    "linkies": [
+
+    ],
+    "authesque": "Andrew J. Hunt. 1994.",
+    "section": "Papers By Others",
+    "descesque": "A Prosodic Recognition Module Based on Linear Discrimant Analysis.  In <I>Proc. Intl. Conf. on Spoken Language Processing</I>, 1994, pages 1119-1122, Yokohama, Japan, 1994."
+  },
+  {
+    "linkies": [
+
+    ],
+    "authesque": "Andrew J. Hunt. 1995.",
+    "section": "Papers By Others",
+    "descesque": "Syntactic Influence on Prosodic Phrasing in the Framework of the Link Grammar.  In <I>Proc. Eurospeech 1995</I>."
+  },
+  {
+    "linkies": [
+
+    ],
+    "authesque": "Andrew J. Hunt. 1995.",
+    "section": "Papers By Others",
+    "descesque": "Using Multivariate Statistical Techniques to Train Prosody-Syntax Models for Resolving Syntatic Ambiguity.  In <I>ATR 1995 Intl. Wrkp. on Computational Modeling of Prosody for Spontaneous Speech Processing</I>, April 12-14, 1995, Kyoto, Japan."
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www-valoria.univ-ubs.fr/antoine/articles/03_TALN.html",
+        "content": "[View on web]"
+      }
+    ],
+    "authesque": "Antoine Jean-Yves, Goulian Jerme, & Villaneau Jeanne. 2003.",
+    "section": "Papers By Others",
+    "descesque": "Quand le TAL robuste s'attaque au langage parle: Analyse incrementale pour la comprehension de la parole spontanee. <i>Traitement Automatique des Langues Naturelles 2003 </i>."
+  },
+  {
+    "linkies": [
+      {
+        "href": "www.pcs.usp.br/~jkinoshi/art/sbia.ps ",
+        "content": "[Postscript]"
+      }
+    ],
+    "authesque": "J. Kinoshita. 1998.",
+    "section": "Papers By Others",
+    "descesque": "A Transfer Dictionary for Words and Bigrams. 14th Brazilian Symposium on Artificial Intelligence, SBIA'98, Porto Alegre,               Brazil 1998. Lecture Notes in Artificial Intelligence,               1515. Ed. Flavio M. De Oliveira. pgs. 73-82."
+  },
+  {
+    "linkies": [
+      {
+        "href": "kwok-abstract.html",
+        "content": "[Abstract]"
+      }
+    ],
+    "authesque": "Cody C. T. Kwok, Oren Etzioni, & Daniel S. Weld. 2001.",
+    "section": "Papers By Others",
+    "descesque": "Scaling question answering to the Web. <i>Proceedings of the Tenth International Conference on World Wide Web,</i> 150-161."
+  },
+  {
+    "linkies": [
+      {
+        "href": "apex.sjtu.edu.cn/docs/kcap01.pdf",
+        "content": "[PDF]"
+      }
+    ],
+    "authesque": "Jianming Li, Lei Zhang and Yong Yu. 2001.",
+    "section": "Papers By Others",
+    "descesque": "Learning to Generate Semantic Annotation for Domain Specific Sentences. <i>Workshop on Knowledge Markup and Semantic Annotation at the 1st International Conference on Knowledge Capture (K-CAP 2001) </i>, October, 2001, Victoria, B.C., Canada."
+  },
+  {
+    "linkies": [
+
+    ],
+    "authesque": "Carol Liu.  Towards A Link Grammar for Chinese.",
+    "section": "Papers By Others",
+    "descesque": "Submitted for publication in <I> Computer Processing of Chinese and Oriental Languages - the Journal of the Chinese Language Computer Society</I>."
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://csdl.computer.org/comp/proceedings/ride/2003/2303/00/23030016abs.htm",
+        "content": "[Abstract]"
+      }
+    ],
+    "authesque": "N. Balakrishnan, & K. R. Ramakrishnan. 2003.",
+    "section": "Papers By Others",
+    "descesque": "Event Information Extraction Using Link Grammar.  <I>13th International WorkShop on Research Issues in Data Engineering: Multi-lingual Information Management (RIDE'03)</I>."
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://acl.ldc.upenn.edu/W/W95/W95-0102.pdf",
+        "content": "[PDF]"
+      }
+    ],
+    "authesque": "Carl de Marcken. 1996.",
+    "section": "Papers By Others",
+    "descesque": "Lexical Heads, Phrase Structure, and the Induction of Grammar. In <I>1996 Workshop on Very Large Corpora.</I>"
+  },
+  {
+    "linkies": [
+
+    ],
+    "authesque": "Solomon Marcus, Gheorghe Paun, & Carlos Martin-Vide. 1998.",
+    "section": "Papers By Others",
+    "descesque": "Contextual Grammars as Generative Models of Natural Languages. <i>Computational Linguistics</i>, 24/2, 245-274. "
+  },
+  {
+    "linkies": [
+
+    ],
+    "authesque": "Carlos Martin-Vide & Gheorghe Paun. 1998.",
+    "section": "Papers By Others",
+    "descesque": "Structured Contextual Grammars.  <i>Grammars</i>, 1/1, 33-55."
+  },
+  {
+    "linkies": [
+      {
+        "href": "mierzwa-abstract.html",
+        "content": "[Abstract]"
+      }
+    ],
+    "authesque": "Jaroslaw Mierzwa. 2002.",
+    "section": "Papers By Others",
+    "descesque": "(In Polish.) <i>The Formal Model of Computer Decomposition of Natural Language Sentences into Groups of Words for Computer Inference Purposes.</i> Politechnika Wroclawska (Poland), Dissertation, available from UMI, Ann Arbor, MI. Order No. C809051."
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www.ifi.unizh.ch/CL/CLpublications.html",
+        "content": "[Postscript]"
+      }
+    ],
+    "authesque": "Diego Molla and Michael Hess. 2002.",
+    "section": "Papers By Others",
+    "descesque": "Dealing with ambiguities in an answer extraction system. In <i>Proc. of ATALA Workshop on Representation and Treatment of Ambiguity in Natural Language Processing</i>. Paris."
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www.dcs.shef.ac.uk/~katerina/EACL03-eval/eacl-doc/Molla.pdf",
+        "content": "[Postscript]"
+      }
+    ],
+    "authesque": "Diego Molla & Ben Hutchinson. 2003.",
+    "section": "Papers By Others",
+    "descesque": "Intrinsic versus Extrinsic Evaluations of Parsing Systems. <i>EACL-03</i>."
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www.ifi.unizh.ch/CL/CLpublications.html",
+        "content": "[Postscript]"
+      }
+    ],
+    "authesque": "D. Molla, R. Schwitter, M. Hess, & R. Fournier. 2002.",
+    "section": "Papers By Others",
+    "descesque": "ExtrAns, an Answer Extraction System. T.A.L., special issue on Information Retrieval oriented Natural Language Processing, pp. 495-522."
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www.ifi.unizh.ch/CL/CLpublications.html",
+        "content": "[Postscript]"
+      }
+    ],
+    "authesque": "Diego Molla, Gerold Schneider, Rolf Schwitter and Michael Hess.\n2002.\nAnswer Extraction Using a Dependency Grammar in ExtrAns.",
+    "section": "Papers By Others",
+    "descesque": "In <i>Traitement Automatique de Langues (T.A.L.), </i> Special Issue on Dependency Grammar, pp. 145-178."
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://springerlink.metapress.com/app/home/contribution.asp?wasp=2888ced08f9b4936abb1d7e884895193&referrer=parent&backto=issue,19,31;journal,377,2184;linkingpublicationresults,1:105633,1",
+        "content": "[Abstract]"
+      }
+    ],
+    "authesque": "Erwan Moreau. 2004.",
+    "section": "Papers By Others",
+    "descesque": "Partial learning using link grammars data. In <i>Proceedings of ICGI 2004</i>."
+  },
+  {
+    "linkies": [
+      {
+        "href": "nakamura-abstract.html",
+        "content": "[Abstract]"
+      }
+    ],
+    "authesque": "Yuichi Nakamura & Takeo Kanade. 1997.",
+    "section": "Papers By Others",
+    "descesque": "Semantic analysis for video contents extraction: Spotting by association in news video. <i>Proceedings of the Fifth ACM International Conference on Multimedia,</i> 393-401."
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www.d.umn.edu/~tpederse/Pubs/aaai95-pub.ps.gz",
+        "content": "[Postscript]"
+      }
+    ],
+    "authesque": "Ted Pedersen & Weidong Chen. 1995.",
+    "section": "Papers By Others",
+    "descesque": "Lexical Acquisition via Constraint Solving. In <i>Working Notes of the AAAI Spring Symposium on Representation and Acquisition of Lexical Knowledge,</i>, pp. 118-122."
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www.tucs.fi/research/publications/insight.php?id=inpPyGiPaKoBoJaSa04a&table=inproceeding",
+        "content": "[Abstract]"
+      }
+    ],
+    "authesque": "Jorma Boberg, Jouni Jrvinen, & Tapio Salakoski. 2004.",
+    "section": "Papers By Others",
+    "descesque": "Analysis of Link Grammar on Biomedical Dependency Corpus Targeted at Protein-Protein Interactions.  In <i>Proceedings of the International Workshop on Natural Language Processing in Biomedicine and its Applications</i>."
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www.ifi.unizh.ch/CL/CLpublications.html",
+        "content": "[Postscript]"
+      }
+    ],
+    "authesque": "Schwitter. 2002.",
+    "section": "Papers By Others",
+    "descesque": "Towards Answer Extraction: An application to Technical Domains. ECAI-2002, Lyon, 21-26 July, 2002. In: F. van Harmelen (ed.), <i>ECAI 2002: Proceedings of the 15th European Conference on Artificial Intelligence</i>, IOS Press, Amsterdam."
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www.ifi.unizh.ch/CL/CLpublications.html",
+        "content": "[Postscript]"
+      }
+    ],
+    "authesque": "Dowdall, Gerold Schneider, and Rachel Fournier. 2002.",
+    "section": "Papers By Others",
+    "descesque": "Answer Extraction in Technical Domains. CICLing-2002, Mexico City, 17-23 February, 2002. Available from Springer Verlag: <i>Computational Linguistics and Intelligent Text Processing</i>. Lecture Notes in Computer Science. Vol. 2276., pg. 360-369."
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www.ifi.unizh.ch/cl/study/lizarbeiten/lizgerold.pdf",
+        "content": "[PDF]"
+      }
+    ],
+    "authesque": "Gerold Schneider. 1998.",
+    "section": "Papers By Others",
+    "descesque": "A Linguistic Comparison Constituency, Dependency, and Link Grammar. Master's Thesis, University of Zurich."
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www.cs.umass.edu/~chirag/papers/chirag_icon03.pdf",
+        "content": "[PDF]"
+      }
+    ],
+    "authesque": "Chirag Shah and Pushpak Bhattacharyya. 2003.",
+    "section": "Papers By Others",
+    "descesque": "Improving Document Vectors Representation using Semantic Links and Attributes. <i>International Conference on Natural Language Processing (ICON)</i>, Mysore, India, December 2003."
+  },
+  {
+    "linkies": [
+
+    ],
+    "authesque": "Richard Sutcliffe, Tom Brehony, and Annette McElligott. 1995.",
+    "section": "Papers By Others",
+    "descesque": "The grammatical analysis of technical texts using a link parser. In <I>PACLING-II</I>, April 1995."
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www.csis.ul.ie/staff/richard.sutcliffe/papers.htm",
+        "content": "[Postscript]"
+      }
+    ],
+    "authesque": "Richard Sutcliffe and Annette McElligott. 1995.",
+    "section": "Papers By Others",
+    "descesque": "Using the Link Parser of Sleator and Temperley to Analyse a Software Manual Corpus. In R. F. E. Sutcliffe, H.-D. Koch, & A. McElligott (Eds.) <i>Industrial Parsing of Software Manuals</i> (pp. 89-102). Amsterdam, The Netherlands: Rodopi."
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www.cdm.lcs.mit.edu/projects/text/amia03c.pdf",
+        "content": "[PDF]"
+      }
+    ],
+    "authesque": "P. Szolovits. 2003.",
+    "section": "Papers By Others",
+    "descesque": "Adding a Medical Lexicon to an English Parser. Proc. AMIA 2003 Annual Symposium."
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www-2.cs.cmu.edu/~pvenable/publications.html",
+        "content": "[Postscript]"
+      }
+    ],
+    "authesque": "Peter Venable. 2001.",
+    "section": "Papers By Others",
+    "descesque": "Lynx: Building a Statistical Parser from a Rule-Based Parser. In <I>Proceedings of the NAACL.</I>"
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www-2.cs.cmu.edu/~pvenable/thesis/summary.html",
+        "content": "[Summary]"
+      }
+    ],
+    "authesque": "Peter Venable. 2004.",
+    "section": "Papers By Others",
+    "descesque": "<i>Modeling Syntax for Parsing and Translation.</i> PhD Thesis, Carnegie-Mellon University."
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://portal.acm.org/citation.cfm?id=967596",
+        "content": "[Abstract]"
+      }
+    ],
+    "authesque": "Ying-Hong Wang & Chih-Hao Lin. 2004.",
+    "section": "Papers By Others",
+    "descesque": "A multimedia database supports English distance learning. <i>Information Sciences--Informatics and Computer Science</i>, 158, 189-208."
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://link.springer.de/link/service/series/0558/bibs/2120/21200044.htm",
+        "content": "[Abstract]"
+      },
+      {
+        "href": "http://link.springer.de/link/service/series/0558/papers/2120/21200044.pdf",
+        "content": "[Full text (PDF)]"
+      }
+    ],
+    "authesque": "Lei Zhang and Yong Yu. 2001.",
+    "section": "Papers By Others",
+    "descesque": "Learning to Generate CGs from Domain Specific  Sentences. In <i>The Proceedings of the 9th International Conference on  Conceptual Structures</i>, LNAI 2120, July 30-August 3, 2001,  Stanford, CA, USA."
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www.chrisjordan.ca/research/LGInterface.tar",
+        "content": "[Download]"
+      },
+      {
+        "href": "http://www.chrisjordan.ca/research/LGdocs",
+        "content": "[Documentation]"
+      }
+    ],
+    "authesque": "Java Native Code Interface for the Link Grammar API, by Chris Jordan.",
+    "section": "Software Resources Using the Link Grammar Parser",
+    "descesque": ""
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www.cpan.org/authors/id/D/DB/DBRIAN/Lingua-LinkParser-1.09.tar.gz",
+        "content": "[Download]"
+      },
+      {
+        "href": "http://www.cpan.org/authors/id/D/DB/DBRIAN/Lingua-LinkParser-1.09.readme",
+        "content": "[Documentation]"
+      }
+    ],
+    "authesque": "Perl module for the link grammar parser, by Dan Brian.",
+    "section": "Software Resources Using the Link Grammar Parser",
+    "descesque": ""
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www.viettrans.org/LinkGrammar/link41a.NET.zip",
+        "content": "[Download]"
+      }
+    ],
+    "authesque": "A version of the parser for the C#.NET platform, by Thanh Bui.",
+    "section": "Software Resources Using the Link Grammar Parser",
+    "descesque": ""
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www.eturner.net/linkgrammar-wn/",
+        "content": "[Download]"
+      }
+    ],
+    "authesque": "A lexical expansion of the Link Grammar Parser using WordNet, by\nElliot Turner.",
+    "section": "Software Resources Using the Link Grammar Parser",
+    "descesque": ""
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://sz.ru/parser/",
+        "content": "[Try online]"
+      }
+    ],
+    "authesque": "A link grammar for Russian, by Sergey Protasov.",
+    "section": "Software Resources Using the Link Grammar Parser",
+    "descesque": ""
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www.fen.bilkent.edu.tr/~aykutlu/ceviri.htm",
+        "content": "[Download here]"
+      }
+    ],
+    "authesque": "An English-to-Turkish translator, by Aykutlu Dane.",
+    "section": "Software Resources Using the Link Grammar Parser",
+    "descesque": ""
+  },
+  {
+    "linkies": [
+      {
+        "href": "http://www.abisource.com",
+        "content": "[AbiWord Website]"
+      },
+      {
+        "href": "/link/index.html",
+        "content": "Link Grammar front page"
+      },
+      {
+        "href": "mailto:sleator@cs.cmu.edu",
+        "content": "Daniel Sleator"
+      }
+    ],
+    "authesque": "AbiWord, the open-source word processor, now uses Link\nGrammar for grammar-checking (as of version 2.4).",
+    "section": "Software Resources Using the Link Grammar Parser",
+    "descesque": ""
+  }
+]

@@ -201,6 +201,39 @@ module Hipe
           ui.puts "  #{command}" << ' ' * (offset - command.size) << help.to_s
         end
       end
+
+      def caller_method_name idx
+        caller[idx].match(/`([^']+)'\Z/)[1]
+      end
+
+      #
+      # on fail shows help and returns false
+      # @return false or IO handle
+      #
+      def input_from_stdin_or_filename file
+        sin = false
+        if $stdin.tty?
+          if file
+            sin = File.open(file,'r')
+          else
+            call_name = caller_method_name(1)
+            me = "#{app} #{call_name}"
+            ui.puts "#{me}: STDIN was tty and no filename provided."
+            help nil, call_name
+          end
+        else
+          if file
+            call_name = caller_method_name(1)
+            me = "#{app} #{call_name}"
+            ui.puts("#{me}: STDIN was not tty and "<<
+              "filename was provided.")
+            help nil, call_name
+          else
+            sin = $stdin
+          end
+        end
+        sin
+      end
     end
   end
 end

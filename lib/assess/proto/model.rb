@@ -1,7 +1,8 @@
 require 'ruby-debug'
-require 'assess/proto/uber-alles-array' # associative array
+require 'assess/uber-alles-array' # associative array
 require 'assess/proto/type'
 require 'assess/strict-attr-accessors'
+require 'assess/code-builder'
 
 module Hipe
   module Assess
@@ -16,7 +17,8 @@ module Hipe
         end
         def create_and_add_table table_name
           table = Table.new table_name
-          @tables.push table
+          table.model = self
+          @tables.push_with_key table, table.name
           table
         end
         def my_to_json ui
@@ -33,6 +35,7 @@ module Hipe
 
       class Table
         extend UberAllesArray, StrictAttrAccessors
+        include CodeBuilder::AdapterInstanceMethods
         string_attr_accessor :name
         attr_reader :table_id, :columns
         def initialize(name)
@@ -41,9 +44,18 @@ module Hipe
           @columns = AssArr.new
           @association_ids = []
         end
+        def class_name_guess
+          titleize(camelize(name))
+        end
+        def model= model
+          @model_id = model.model_id
+        end
+        def model
+          Model.all[@model_id]
+        end
         def create_and_add_data_column name, type
           column = DataColumn.new name, type
-          @columns.push column
+          @columns.push_with_key column, column.name
         end
         def add_association assoc
           @association_ids.push assoc.association_id
@@ -142,11 +154,15 @@ module Hipe
             assoc
           end
         end
-        def my_to_json(buffer, from_table)
-          to_table = case true
-          when from_table.table_id == @left_table_id then right_table
-          when from_table.table_id == @right_table_id then left_table
+        def other_table this_table
+          other_table = case true
+          when this_table.table_id == @left_table_id then right_table
+          when this_table.table_id == @right_table_id then left_table
           else fail("association not associated with table!?"); end
+          other_table
+        end
+        def my_to_json buffer, from_table
+          to_table = other_table from_table
           fake = {
             :type => type.to_sym.to_json,
             :table => to_table.name

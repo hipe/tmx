@@ -5,6 +5,7 @@ require 'assess/controller'
 
 module Hipe
   module Assess
+    RootDir = File.expand_path('../../', __FILE__)
     class UserFail < RuntimeError; end
     class AppFail  < RuntimeError; end
 
