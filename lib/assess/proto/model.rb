@@ -1,7 +1,7 @@
 require 'ruby-debug'
-require 'assess/uber-alles-array' # associative array
+require 'assess/util/uber-alles-array' # associative array
 require 'assess/proto/type'
-require 'assess/strict-attr-accessors'
+require 'assess/util/strict-attr-accessors'
 require 'assess/code-builder'
 
 module Hipe

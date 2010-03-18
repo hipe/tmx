@@ -1,5 +1,5 @@
 require 'assess/code-builder'
-require 'assess/uber-alles-array.rb'
+require 'assess/util/uber-alles-array.rb'
 
 module Hipe
   module Assess
@@ -14,7 +14,7 @@ module Hipe
 
 
       class ModelModuleSexp < CodeBuilder::ModuleSexp
-        include CodeBuilder::RegistersConstants
+        include CodeBuilder::RegistersConstants # deprecated
         attr_reader :node_id
         def self.build(name,&block)
           thing = super(name)
@@ -54,7 +54,7 @@ module Hipe
         def dm_add_property name, type
           fail('nah') unless name.kind_of?(::Symbol)
           fail('sorry') unless DmTypes.include?(type)
-          block.push(
+          scope.block!.push(
            s(:call, nil, :property,
              s(:arglist, s(:lit, name), s(:const, type))
             )
@@ -71,7 +71,7 @@ module Hipe
 
         def dm_add_belongs_to name_sym
           assert_type :name_sym, name_sym, Symbol
-          block.push(
+          scope.block!.push(
             s(:call, nil, :belongs_to, s(:arglist, s(:lit, name_sym)))
           )
           nil
@@ -79,7 +79,7 @@ module Hipe
 
         def dm_add_has_n table_name_sym
           assert_type :table_name_sym, table_name_sym, Symbol
-          block.push(
+          scope.block!.push(
             s(:call,
              nil,
              :has,
@@ -92,7 +92,7 @@ module Hipe
         def dm_add_has_n_thru assoc_name_sym, thru_table_name_sym
           assert_type :assoc_name_sym, assoc_name_sym, Symbol
           assert_type :thru_table_name_sym, thru_table_name_sym, Symbol
-          block.push(
+          scope.block!.push(
             s(:call,
              nil,
              :has,

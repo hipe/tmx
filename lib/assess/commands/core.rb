@@ -4,12 +4,17 @@
 module Hipe
   module Assess
     module Commands
-      x 'Prints the current version and exits.'
+      x 'Prints the current version(s) and exits.'
       def version(options = {}, *args)
-        ui.puts "#{app} #{Assess::Version}"
+        ui.puts "#{app} version #{Assess::Version}"
+
+        require 'assess/code-adapter/framework-common/app-info'
+        app_info = FrameworkCommon::AppInfo.active_app_info
+
+        ui.puts "your app: #{app_info.name} version #{app_info.version}"
       end
 
-      x 'See if u can connect to db.'
+      x 'Can you connect?'
       def db opts={}, *args
         response = controller.db_check
         if :ok == response[:status]
@@ -17,11 +22,6 @@ module Hipe
         else
           ui.puts "failed to connect: #{response[:message]}"
         end
-      end
-
-      x 'Init current directory for ramaze web app.'
-      def ramaze opts={}, *args
-
       end
 
       x 'List domains.'
@@ -44,21 +44,12 @@ module Hipe
           JsonSchemaGuess.protomodel sin, ui, entity_name
         when 'dm'
           sexp = _generate_datamapper_model_sexp_from_json sin, entity_name
-          ui.puts sexp.my_to_ruby
+          ui.puts sexp.to_ruby
         else
           ui.puts("Need 'report' or 'model'.  \"#{sub_cmd}\" "<<
             "is not a valid sub-command.")
           return help nil, 'schema'
         end
-      end
-
-      def _generate_datamapper_model_sexp_from_json sin, entity_name
-        require 'assess/proto/json-schema-guess.rb'
-        require 'assess/code-adapter/data-mapper'
-        metrics = JsonSchemaGuess.entity_metrics sin
-        proto = JsonSchemaGuess.protomodel_from_metrics metrics, entity_name
-        sexp = DataMapper.generate_model_module_sexp_from_protomodel proto
-        sexp
       end
 
       x 'Import domain info from json.'
@@ -71,6 +62,16 @@ module Hipe
         debugger
         'x'
 
+      end
+
+    protected
+      def _generate_datamapper_model_sexp_from_json sin, entity_name
+        require 'assess/proto/json-schema-guess.rb'
+        require 'assess/code-adapter/data-mapper'
+        metrics = JsonSchemaGuess.entity_metrics sin
+        proto = JsonSchemaGuess.protomodel_from_metrics metrics, entity_name
+        sexp = DataMapper.generate_model_module_sexp_from_protomodel proto
+        sexp
       end
     end
   end

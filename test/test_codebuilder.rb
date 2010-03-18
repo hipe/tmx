@@ -13,7 +13,7 @@ module Hipe
         cls = CodeBuilder.build_class('Foo::Bar', 'Foo::Bar::Baz') do |cls|
           cls.add_include 'DataMapper::Resource'
         end
-        ruby = cls.my_to_ruby
+        ruby = cls.to_ruby
 
         target = <<-HERE.gsub(/^ {8}/,'').strip
         class Foo::Bar < Foo::Bar::Baz
@@ -26,13 +26,13 @@ module Hipe
 
       def test_build_another_class
         cls = CodeBuilder.build_class('Foo') do |cls|
-          cls.block.push(
+          cls.scope.block!.push(
            s(:call, nil, :property,
              s(:arglist, s(:lit, :some_prop), s(:const, :Text))
             )
           )
         end
-        ruby = cls.my_to_ruby
+        ruby = cls.to_ruby
         target = <<-HERE.gsub(/^ {8}/, '').strip
         class Foo
           property(:some_prop, Text)
@@ -46,11 +46,11 @@ module Hipe
         outfile = RootDir + '/test/writable-temp/genned-model.rb'
         FileUtils.rm(outfile) if File.exist? outfile
         instream = File.open(infile,'r')
-        sexp = Commands._generate_datamapper_model_sexp_from_json(
+        sexp = Commands.send(:_generate_datamapper_model_sexp_from_json,
           instream, 'resource'
         )
         outstream = File.open(outfile,'w+')
-        outstream.puts sexp.my_to_ruby
+        outstream.puts sexp.to_ruby
         outstream.close
         do_something_with_this_file outfile
       end

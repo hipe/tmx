@@ -6,38 +6,6 @@ require 'json' # only for rescue
 module Hipe
   module Assess
 
-    class UI
-      def initialize io = nil, verbose = false
-        @io = io
-        @verbose = verbose
-      end
-
-      def puts(*args)
-        return unless @io
-
-        if args.empty?
-          @io.puts ""
-        else
-          args.each { |msg| @io.puts(msg) }
-        end
-
-        @io.flush
-        nil
-      end
-
-      def print *a
-        @io.print a
-      end
-
-      def abort msg
-        @io && Kernel.abort("#{app}: #{msg}")
-      end
-
-      def vputs *args
-        puts(*args) if @verbose
-      end
-    end
-
     class Never; end
 
     module Commands
@@ -46,8 +14,14 @@ module Hipe
       @usage = {}
 
       def help(options = {}, command = nil, *args)
+        # start experiment
+        command ||= caller_method_name(1)
+        # end experiment
         command = command.to_s
-        if !command.empty? && respond_to?(command)
+        if !command.empty? &&
+            ( respond_to?(command) ||
+              (@private_hack && @private_hack[command.to_sym])
+            )
           ui.puts(
             "Usage: %s" % (@usage[command] || "#{app} #{command.downcase}")
           )
@@ -64,7 +38,7 @@ module Hipe
         command, opts, args = parse_args argv
 
         if command.nil?
-          if ([:v, :version].include?(opts.keys))
+          if ([:v, :version] & opts.keys).any?
             command = :version
           else
             command = :help
@@ -76,12 +50,18 @@ module Hipe
           send(use_command, opts, *args)
         rescue UserFail,
           Errno::ENOENT,
-          # ArgumentError,
+          UserFail,
+          ArgumentError,
           JSON::ParserError => e
           if opts[:error]
             raise e
           else
-            ui.puts "#{app}: #{command} failed"
+            say_command = command
+            if e.kind_of?(ArgumentError)
+              say_command = trace_row_method_name(e.backtrace[0])
+            end
+            bn = Assess.class_basename(e.class)
+            ui.puts "#{app}: #{say_command} failed (#{bn})"
             ui.puts "#{e.message}"
             return help(nil, command)
           end
@@ -98,6 +78,11 @@ module Hipe
       end
 
     private
+
+      def this_command
+        soft = caller_method_name(1).gsub('_',' ')
+        "#{app} #{soft}"
+      end
 
       def controller(env = nil)
         @controller ||= Controller.new(env)
@@ -129,6 +114,10 @@ module Hipe
       end
 
       def method_added(method)
+        if @next_help || @next_usage
+          @private_hack ||= {}
+          @private_hack[method] = true
+        end
         @help[method.to_s] = @next_help if @next_help
         @usage[method.to_s] = @next_usage if @next_usage
         @next_help = nil
@@ -149,14 +138,52 @@ module Hipe
         end
       end
 
+      #
+      # experimental. might not belong here.
+      #
+      module CommonOptionInstanceMethods
+
+        def expand_dry_run_opt!
+          m = class << self; self end
+          is_dry = self[:d] ? true : false
+          m.send(:define_method, :dry_run?){is_dry}
+          self
+        end
+
+        def expand_backup_opt!
+          case self[:i]
+          when ''; backup = :none
+          when nil; backup = :yes
+          else
+            backup = :with_extension
+            extension = self[:i]
+          end
+          # we make it like a mini openstruct
+          m = class << self; self end
+          # this should always be set but we do it this way to be safe
+          if backup
+            m.send(:define_method, :backup){backup}
+            m.send(:define_method, :extension){extension} if extension
+            do_backup = [:yes, :with_extension].include?(backup)
+            m.send(:define_method, :backup?){do_backup}
+            m.send(:define_method, :dry_run?){do_dry_run}
+          end
+          self
+        end
+
+      end
+
+
       def parse_args argv
         options = argv.select { |piece| piece =~ /^-/ }
         argv   -= options
         command = argv.shift
         opts = Hash[* options.map do |flag|
-          key, value = flag.split('=')
+          # key, value = flag.split('=')  # no good for detecting -i=''
+          key,value = flag.match(/\A([^=]+)(?:=(.*))?\Z/).captures
           [key.sub(/^--?/, '').intern, value.nil? ? true : value ]
         end.flatten ]
+        opts.extend CommonOptionInstanceMethods
         [ command, opts, argv ]
       end
 
@@ -203,7 +230,11 @@ module Hipe
       end
 
       def caller_method_name idx
-        caller[idx].match(/`([^']+)'\Z/)[1]
+        trace_row_method_name(caller[idx])
+      end
+
+      def trace_row_method_name row
+        row.match(/`([^']+)'\Z/)[1]
       end
 
       #
@@ -234,9 +265,25 @@ module Hipe
         end
         sin
       end
-    end
-  end
-end
+
+      def sub_command_dispatch subcommands, opts, args
+        meth = caller_method_name(1)
+        sub_command = args.shift
+        sub_meth = "#{meth}_#{sub_command}"
+        if subcommands.include?(sub_command)
+          send(sub_meth, opts, *args)
+        else
+          soft_name = meth.gsub(/_/, ' ')
+          ui.puts("#{app} #{soft_name}: expecting sub-command " <<
+            subcommands.map(&:inspect).join(' or ')<<'.')
+          ui.puts("Had #{sub_command.inspect}.")
+          help(nil, meth)
+          :bad_sub_command # not sure about this
+        end
+      end
+    end # Commands
+  end # Assess
+end # Hipe
 
 # load lib/assess/commands/*.rb
 if File.exists? dir = File.join(File.dirname(__FILE__), 'commands')
