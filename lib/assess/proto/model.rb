@@ -21,11 +21,11 @@ module Hipe
           @tables.push_with_key table, table.name
           table
         end
-        def my_to_json ui
+        def jsonesque ui
           ui.print '['
           last = @tables.size - 1
           @tables.each_with_index do |table, idx|
-            table.my_to_json(ui)
+            table.jsonesque(ui)
             ui.print(",\n") unless idx==last
           end
           ui.puts ']'
@@ -35,7 +35,7 @@ module Hipe
 
       class Table
         extend UberAllesArray, StrictAttrAccessors
-        include CodeBuilder::AdapterInstanceMethods
+        include CommonInstanceMethods
         string_attr_accessor :name
         attr_reader :table_id, :columns
         def initialize(name)
@@ -66,7 +66,7 @@ module Hipe
             Association.all[id]
           end
         end
-        def my_to_json ui
+        def jsonesque ui
           str = "{\n  \"type\":\"table\",\n"
           str << "  \"name\":#{name.to_json},\n"
           assoc_to_json(str)
@@ -78,7 +78,7 @@ module Hipe
         def columns_to_json s
           ss = []
           @columns.each do |col|
-            col.my_to_json(sss='')
+            col.jsonesque(sss='')
             ss.push "#{col.name.to_json}:#{sss}"
           end
           s << ",\n  \"columns\":["
@@ -99,7 +99,7 @@ module Hipe
           ss = []
           collection = send(name)
           collection.each do |item|
-            item.my_to_json(sss='', self)
+            item.jsonesque(sss='', self)
             ss << sss
           end
           if ss.any?
@@ -122,7 +122,7 @@ module Hipe
           self.type = type
           @column_id = self.class.register(self)
         end
-        def my_to_json(buffer)
+        def jsonesque(buffer)
           fake = {:type => type}
           buffer << fake.to_json
         end
@@ -161,7 +161,7 @@ module Hipe
           else fail("association not associated with table!?"); end
           other_table
         end
-        def my_to_json buffer, from_table
+        def jsonesque buffer, from_table
           to_table = other_table from_table
           fake = {
             :type => type.to_sym.to_json,

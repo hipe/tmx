@@ -1,3 +1,5 @@
+require File.dirname(__FILE__)+'/core.rb'
+
 module Hipe
   module Assess
     module CodeBuilder
@@ -8,114 +10,6 @@ module Hipe
       # is supposed to make it easier and more readable to alter
       # dynamically a parse tree
       #
-
-
-      #
-      # any nodes that want to can register themselves with this
-      # (typically in the constructor) so that other nodes can refer to them
-      # by id.  (note that garbage collection will not reclaim these nodes
-      # unless they assume responsibility for nilling this out somehow)
-      #
-      Nodes = Array.new
-      class << Nodes
-        def register obj
-          id = length
-          self[id] = obj
-          id
-        end
-      end
-
-      def module_name_sexp str
-        str = str.to_s
-        if str.nil?
-          nil
-        elsif str.include?(':')
-          parser.process str
-        else
-          str.to_sym
-        end
-      end
-
-
-      #
-      # a grab bag of the typical useful stuff
-      #
-      module AdapterInstanceMethods
-        def camelize underscores
-          underscores.gsub(/_([a-z]?)/){$1.upcase}
-        end
-        def titleize str
-          str.gsub(/\A(.?)/){$1.upcase}
-        end
-        def underscore str
-          str.gsub(/([a-z])(?=[A-Z])/){ "#{$1.downcase}_" }.downcase
-        end
-        def assert_type param_name, thing, type
-          unless thing.kind_of? type
-            meth = method_name_from_call_stack_item caller[0]
-            msg = ("#{meth} - #{param_name} must be #{type}, had"<<
-              " #{thing.class}")
-            fail(msg)
-          end
-          nil
-        end
-        MethodNameRe = /`([^']+)'\Z/
-        def method_name_from_call_stack_item row
-          MethodNameRe.match(row)[0]
-        end
-        def class_basename kls
-          Assess.class_basename kls
-        end
-        def flail *args
-          raise UserFail.new(*args)
-        end
-      end
-
-      module BracketExtender
-        def [] item
-          unless item.kind_of?(Sexp)
-            msg = "Can't turn #{item}:#{item.class} into a #{self}"
-            fail(msg)
-          end
-          item.extend self unless item.kind_of? self
-          item
-        end
-      end
-
-      #
-      # For the specialized sexp classes/modules that either we define or
-      # that adapter libraries define
-      #
-      module CommonSexpInstanceMethods
-        extend BracketExtender
-        include AdapterInstanceMethods
-        def to_ruby
-          other = Marshal.load(Marshal.dump(self))
-          ruby = CodeBuilder.ruby2ruby.process other
-          ruby
-        end
-        def find_all_with_index &block
-          founds = []
-          each_with_index do |node, idx|
-            if block.call(node)
-              founds.push [node, idx]
-            end
-          end
-          founds
-        end
-        # just for debugging
-        def meta
-          class << self; self end
-        end
-        # this seems to be just a pita, that we inheirit from Sexp
-        def method_missing meth, *args
-          raise NoMethodError.new("undefined method `#{meth}' for "<<
-            "\"#{self}\":#{self.class}")
-        end
-        def has_node? sexp
-          !! detect { |x| x == sexp }
-        end
-      end
 
       module ScopeHavingSexp
         include CommonSexpInstanceMethods
@@ -143,6 +37,9 @@ module Hipe
       end
 
       module BlockAutovivifyingSexp
+        #
+        # don't include this module, call the below
+        #
         def self.has_block_at_index(mod, idx)
           if mod.instance_methods.include? "block_index"
             fail("uh-oh")
@@ -152,7 +49,13 @@ module Hipe
         end
 
         def block!
-          if block_index >= length
+          if :self == block_index
+            if :block == first
+              block = self
+            else
+              debugger; "your so clevr"
+            end
+          elsif block_index >= length
             block = s(:block)
             self[block_index] = block # careful!
             block
@@ -169,6 +72,11 @@ module Hipe
       end
 
       module ModuleAutovivifyingSexp
+        #
+        # This thing will add new module sexps to itself, so typicially
+        # it should only be in a block.  (A scope can also have modules
+        # under it but as soon as you want more than one you need a block.)
+        #
         include CommonSexpInstanceMethods
 
         def module! name_sym
@@ -178,7 +86,7 @@ module Hipe
           case them.size
           when 0;
             result = CodeBuilder.build_module(name_sym)
-            block.push result
+            push result
           when 1;
             result, _ = them.first
             ModuleySexp[result] unless result.kind_of?(ModuleySexp)
@@ -228,6 +136,7 @@ module Hipe
         include CommonSexpInstanceMethods
         include ClassAutovivifyingSexp
         ScopeHavingSexp.has_scope_at_index(self, 2)
+        def module_name_symbol; self[1] end
       end
 
       #
@@ -245,6 +154,13 @@ module Hipe
       module BlockeySexp
         extend BracketExtender
         include CommonSexpInstanceMethods
+        include ModuleAutovivifyingSexp
+        def each_class &block
+          each_node_of_type(:class) do |node, idx|
+            ClassySexp[node] unless node.kind_of?(ClassySexp)
+            block.call(node,idx)
+          end
+        end
       end
 
       #
@@ -256,14 +172,18 @@ module Hipe
         ScopeHavingSexp.has_scope_at_index(self, 3)
 
         def add_include str
-          call = s(:call, nil, :include,
-            s(:arglist, CodeBuilder.module_name_sexp(str))
-          )
-          scope.block!.push call
-          nil
+          include_or_extend :include, str
         end
+
+        def add_extend str
+          include_or_extend :extend, str
+        end
+
         def name_sym
           self[1]
+        end
+        def class_name_underscored
+          underscore(name_sym)
         end
         def parent_class_string
           spot = self[2]
@@ -297,6 +217,16 @@ module Hipe
             fail("don't want to deal with this")
           end
           result
+        end
+
+      private
+        def include_or_extend which, str
+          name_sexp = CodeBuilder.module_name_sexp(str)
+          call = s(:call, nil, which,
+            s(:arglist, CodeBuilder.module_name_sexp(str))
+          )
+          scope.block!.push call
+          nil
         end
       end
 

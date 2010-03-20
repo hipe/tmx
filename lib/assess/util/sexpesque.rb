@@ -9,44 +9,76 @@ module Hipe
       def initialize *args
         super(args)
       end
+
       def self.[](*args)
         self.new(*args)
       end
+
       def pretty_print qq
         qq.group(1, 's[', ']') do
           qq.seplist(self) {|v| qq.pp v }
         end
       end
 
-      # this assumes name-value pairs!
-      def my_to_json_as_list indent
-        child_indent = increment_indent(indent)
-        str = ''
-        my_to_json_children(str, 0..size-1, child_indent)
-        str
+      def jsonesque
+        JSON.pretty_generate(jsonable_struct)
       end
 
-      def my_to_json indent=''
-        unless self[0].kind_of?(Symbol)
-          return my_to_json_as_list(indent)
-        end
-        str = "#{self[0].to_json}: "
-        child_indent = increment_indent(indent)
-        if size == 2
-          item = self[1]
-          if item.respond_to?(:my_to_json)
-            str << item.my_to_json(indent)
-          else
-            str << item.to_json
+      def hash_like?
+        res = hash_entry_like? && size == 2 ||
+          (all_hash_entry_like? && unique_names?)
+        res
+      end
+
+      def hash_entry_like?
+        first.kind_of?(Symbol)
+      end
+
+      def all_hash_entry_like?
+        res = size == 1 ||
+        ! self[1..-1].detect{|x|!x.kind_of?(Sexpesque)||!x.hash_entry_like?}
+        res
+      end
+
+      def unique_names?
+        res = size == 1 || size == 2 ||
+        (self[1..-1].map(&:first).uniq.size == size - 1)
+        res
+      end
+
+      def jsonable_value
+        if size == 1
+          nil
+        elsif size == 2
+          (self[1].respond_to?(:jsonable_struct) ?
+            self[1].jsonable_struct : self[1])
+        elsif hash_like?
+          h = {} # we tried # @todo 1.9
+          self[1..-1].each do |x|
+            unless x.respond_to?(:first)
+              debugger; 'x'
+            end
+            h[x.first] = x.respond_to?(:jsonable_value) ?
+              x.jsonable_value : x.to_json
           end
+          h
         else
-          my_to_json_children(str, (1..size-1), child_indent)
+          self[1..-1] # the pretty tree is broken below here
         end
-        str
+      end
+
+      def jsonable_struct
+        if hash_like?
+          {first => jsonable_value}
+        else
+          debugger
+          self.hash_like?
+          self # pretty tree broken below this node
+        end
       end
 
       def [](mixed)
-        if mixed.kind_of?(Fixnum)
+        if mixed.kind_of?(Fixnum) || mixed.kind_of?(Range)
           super(mixed)
         else
           find_node(mixed)
@@ -72,30 +104,6 @@ module Hipe
         find_all { |node| node.kind_of?(Sexpesque) && node.first == name }
       end
 
-    private
-
-      def increment_indent(indent)
-        "#{indent} "
-      end
-
-      def my_to_json_children str, range, indent
-        str << "{"
-        final = size-1
-        child_indent = increment_indent(indent)
-        range.each do |idx|
-          item = self[idx]
-          if item.respond_to?(:my_to_json)
-            str << "\n#{indent}" << item.my_to_json(child_indent)
-          else
-            str << item.to_json
-          end
-          if idx == final
-          else
-            str << ','
-          end
-        end
-        str << '}'
-      end
     end
   end
 end

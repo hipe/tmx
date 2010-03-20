@@ -1,14 +1,19 @@
 require 'assess/util/strict-attr-accessors'
 require 'assess/util/sexpesque'
+require 'assess/code-builder'
+
 module Hipe
   module Assess
     module FrameworkCommon
       class WishyWashyPath
         extend UberAllesArray, StrictAttrAccessors
+        include CommonInstanceMethods
+
         attr_reader :path_id
         attr_accessor :might_have_extension
         boolean_attr_accessor :might_be_folder, :might_be_plural
-        def initialize
+        def initialize(name)
+          @name_sym = name.to_sym
           @relative_to_id = nil
           @path_id = self.class.register(self)
           @might_be_plural = false
@@ -111,15 +116,24 @@ module Hipe
           other = resolve pretty_path
           other ? other : pretty_path
         end
+        def s; Sexpesque; end
         def summary
-          s = Sexpesque
-          arr = s.new
-          arr.push s[:path, pretty_path_resolved]
-          arr.push s[:exists, exists? ? :yes : :no  ]
-          arr
+          s[ @name_sym || :path_summary,
+            s[:path, pretty_path_resolved],
+            s[:exists, exists? ]
+          ]
         end
         def exists?
           File.exist?(absolute_path_resolved)
+        end
+        def single_file?
+          resolved = absolute_path_resolved
+          flail("model does not exist") unless File.exist?(resolved)
+          if File.directory?(resolved)
+            false
+          else
+            true
+          end
         end
         def path
           unless exists?

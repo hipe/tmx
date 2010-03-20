@@ -17,7 +17,7 @@ module Hipe
 
       # @todo
       def app_info
-        @app_info ||= AppInfo.active_app_info
+        AppInfo.current
       end
       def controller_summary
         s = Sexpesque
@@ -29,12 +29,13 @@ module Hipe
         end
       end
       def hello_world ui, opts
-        file = CodeBuilder::FileSexp.build(app_info.hello_world_path)
+        file = CodeBuilder.build_file(app_info.hello_world_path)
         return file.prune_backups ui, opts if opts[:prune]
         if ! file.simple_requires.include? 'ramaze'
           file.add_require_at_top 'ramaze'
         end
-        cls = file.module!(:Whatever).class!(:Bar, 'Ramaze::Controller')
+        cls = file.block!.module!(:HelloWorld).class!(
+          :Bar, 'Ramaze::Controller')
         write_it = false
         if cls.instance_method? :index
           ui.puts("#{file.path} already has #{cls.name_sym}#index")

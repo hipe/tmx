@@ -196,7 +196,7 @@ module Hipe
       def protomodel sin, sout, entity_name
         metrics = self.entity_metrics sin
         model = protomodel_from_metrics metrics, entity_name
-        model.my_to_json(sout)
+        model.jsonesque(sout)
         nil
       end
 

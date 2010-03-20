@@ -1,14 +1,14 @@
 #
 # this is based entirely off of chris wanstrath's rip
 #
-require 'json' # only for rescue
+require 'json' # only for rescu_e
 
 module Hipe
   module Assess
-
-    class Never; end
-
     module Commands
+      include CommonInstanceMethods
+      protected(*CommonInstanceMethods.instance_methods)
+
       extend self
       @help = {}
       @usage = {}
@@ -16,6 +16,7 @@ module Hipe
       def help(options = {}, command = nil, *args)
         # start experiment
         command ||= caller_method_name(1)
+        command = nil if 'send'==command # @todo fixme
         # end experiment
         command = command.to_s
         if !command.empty? &&
@@ -51,7 +52,7 @@ module Hipe
         rescue UserFail,
           Errno::ENOENT,
           UserFail,
-          ArgumentError,
+          # ArgumentError,
           JSON::ParserError => e
           if opts[:error]
             raise e
@@ -69,12 +70,13 @@ module Hipe
       end
 
       def load_plugin(file)
-        begin
+        # @todo
+        #begin
           require file
-        rescue Exception => e
-          ui.puts "#{app}: plugin not loaded (#{file})"
-          ui.puts "-> #{e.message}", ''
-        end
+        # rescue Exception => e
+        #   ui.puts "#{app}: plugin not loaded (#{file})"
+        #   ui.puts "-> #{e.message}", ''
+        # end
       end
 
     private
@@ -139,14 +141,15 @@ module Hipe
       end
 
       #
-      # experimental. might not belong here.
+      # experimental. some of this might not belong here.
       #
       module CommonOptionInstanceMethods
+        include CommonInstanceMethods
 
         def expand_dry_run_opt!
           m = class << self; self end
           is_dry = self[:d] ? true : false
-          m.send(:define_method, :dry_run?){is_dry}
+          def! :dry_run?, is_dry
           self
         end
 
@@ -162,15 +165,13 @@ module Hipe
           m = class << self; self end
           # this should always be set but we do it this way to be safe
           if backup
-            m.send(:define_method, :backup){backup}
-            m.send(:define_method, :extension){extension} if extension
+            def! :backup, backup
+            def!(:extension, extension) if extension
             do_backup = [:yes, :with_extension].include?(backup)
-            m.send(:define_method, :backup?){do_backup}
-            m.send(:define_method, :dry_run?){do_dry_run}
+            def! :backup?, do_backup
           end
           self
         end
-
       end
 
 
@@ -194,7 +195,7 @@ module Hipe
             %w( help version invoke load_plugin ).include?(method)
         end
 
-        show_help nil, commands.sort
+        show_help nil, sort_commands(commands)
 
         ui.puts
         ui.puts "For more information on a command use:"
@@ -204,6 +205,10 @@ module Hipe
         ui.puts "Options: "
         ui.puts "  -h, --help     show this help message and exit"
         ui.puts "  -v, --version  show the current version and exit"
+      end
+
+      def sort_commands(commands)
+        commands
       end
 
       def show_help(command, commands = commands)
@@ -274,8 +279,9 @@ module Hipe
           send(sub_meth, opts, *args)
         else
           soft_name = meth.gsub(/_/, ' ')
+          self.oxford_comma(['a','b'])
           ui.puts("#{app} #{soft_name}: expecting sub-command " <<
-            subcommands.map(&:inspect).join(' or ')<<'.')
+            oxford_comma(subcommands.map(&:inspect),' or ') << ".")
           ui.puts("Had #{sub_command.inspect}.")
           help(nil, meth)
           :bad_sub_command # not sure about this

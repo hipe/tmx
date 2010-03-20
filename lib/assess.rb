@@ -1,6 +1,6 @@
 require 'ruby-debug'
 require 'assess/version'
-require 'assess/controller'
+require 'assess/common-instance-methods'
 
 module Hipe
   module Assess
@@ -22,7 +22,12 @@ module Hipe
         nil
       end
 
-      def print *a; @io.print a end
+      # for datamapper
+      def write(*a)
+        @io ? @io.write(*a) : $stdout.write(*a)
+      end
+
+      def print *a; @io.print(*a) end
 
       def abort(msg); @io && Kernel.abort("#{app}: #{msg}") end
 
@@ -41,6 +46,42 @@ module Hipe
     end
     @ui = UI.new $stdout
 
+
+    module Openesque
+      def self.[] m
+        m.extend self
+        m
+      end
+      def def! name, value
+        fail("no") if respond_to? name
+        meta.send(:define_method, name){value}
+        self
+      end
+    private
+      def meta
+        class << self; self end
+      end
+    end
+
+    module HashExtra
+
+      def self.[] item;
+        item.extend self
+        item
+      end
+
+      def values_at *indices
+        indices.collect {|key| self[key]}
+      end
+
+      def slice *indices
+        result = HashExtra[Hash.new]
+        indices.each do |key|
+          result[key] = self[key] if has_key?(key)
+        end
+        result
+      end
+    end
   end
 end
 

@@ -5,50 +5,22 @@ module Hipe
 
       class FileSexp < Sexp
         undef_method :method_missing # too much pita
-        include ModuleAutovivifyingSexp, BlockeySexp
+        include CommonSexpInstanceMethods
+        BlockAutovivifyingSexp.has_block_at_index(self,:self)
         extend StrictAttrAccessors
         string_attr_accessor :path
-        class << self
 
-          def build path
-            if File.exist? path
-              ruby = File.read(path)
-              if ruby.strip != ""
-                sexp = CodeBuilder.parser.process(ruby)
-                sexp = file_sexp_to_block_sexp sexp
-                thing = new()
-                thing.path = path
-                thing.replace sexp
-              else
-                thing = new(:block)
-                thing.path = path
-              end
-            else
-              thing = new(:block)
-              thing.path = path
-            end
-            fail("we always want our file nodes to be blocks(?)") unless
-              thing.first == :block
-            BlockeySexp[thing] unless thing.kind_of?(BlockeySexp)
-            thing
+        def self.build path
+          ruby = nil
+          if (!File.exist?(path) || ""==(ruby=File.read(path)).strip)
+            thing = self.new()
+          else
+            sexp = CodeBuilder.parser.process(ruby)
+            thing = self.new(*sexp)
           end
-
-          def file_sexp_to_block_sexp sexp
-            case sexp.first
-            when :block
-              return sexp
-            when :call
-              result = s(:block, sexp)
-              BlockeySexp[result]
-              return result
-            else
-              msg = ("this is probably ok but we should check it:"<<
-                " #{sexp.first.inspect}. be sure you can still to_ruby"<<
-                "on the result.")
-              fail(msg)
-            end
-          end
-
+          thing.path = path
+          thing.enhance!
+          thing
         end
 
         def exists?
@@ -66,7 +38,8 @@ module Hipe
         #
         def simple_requires
           founds = []
-          block.find_nodes(:call).each do |node|
+          no("huh?") unless self.first == :block
+          find_nodes(:call).each do |node|
             # s(:call, nil, :include, s(:arglist, s(:str, "foo"))),
             next unless node[2] == :require
             next unless node[3].first == :arglist && node[3].length == 2
@@ -123,12 +96,6 @@ module Hipe
 
       private
 
-        def block
-          fail("our file sexp got corrupted somehow?") unless first == :block
-          self
-        end
-
-        #
         # with a file named "foo.rb", make names like foo.bak1.rb,
         # foo.bak2.rb ... etc.
         #

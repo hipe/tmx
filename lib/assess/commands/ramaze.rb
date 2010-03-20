@@ -4,12 +4,12 @@ module Hipe
   module Assess
     module Commands
 
-      RamazeSubCommands = %w(summary controller)
-      o "#{app} ramaze (#{RamazeSubCommands.join('|')}) [OPTIONS] [ARGUMENTS]"
+      RamazeSubs = %w(summary controller)
+      o "#{app} ramaze (#{RamazeSubs.join('|')}) [OPTIONS] [ARGUMENTS]"
       x 'Maybe init current directory for ramaze web app.'
       x '"-h" after a sub-command might work if you are lucky.'
       def ramaze opts={}, *args
-        sub_command_dispatch RamazeSubCommands, opts, args
+        sub_command_dispatch RamazeSubs, opts, args
       end
 
     private
@@ -19,7 +19,7 @@ module Hipe
       def ramaze_summary opts, *args
         return help if opts[:h]
         thing = Ramaze.app_info.summary
-        ui.puts thing.my_to_json
+        ui.puts thing.jsonesque
       end
 
       RamazeSubCmd2 = %w(summary update hello)
@@ -33,7 +33,7 @@ module Hipe
       x "List known controllers."
       def ramaze_controller_summary opts, *args
         return help if opts[:h]
-        ui.puts Ramaze.controller_summary.my_to_json
+        ui.puts Ramaze.controller_summary.jsonesque
       end
 
       o "#{app} ramaze controller hello [prune]"
@@ -55,7 +55,8 @@ module Hipe
           ui.puts("#{this_command}: -i must take an argument")
           return help
         end
-        opts.expand_backup_opt!.expand_dry_run_opt!
+        opts.expand_backup_opt!
+        opts.expand_dry_run_opt!
         Ramaze.hello_world ui, opts
       end
     end
