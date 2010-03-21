@@ -23,8 +23,9 @@ module Hipe
             ( respond_to?(command) ||
               (@private_hack && @private_hack[command.to_sym])
             )
+          cmd_pretty = command.gsub('_',' ').downcase
           ui.puts(
-            "Usage: %s" % (@usage[command] || "#{app} #{command.downcase}")
+            "Usage: %s" % (@usage[command] || "#{app} #{cmd_pretty}")
           )
           if @help[command]
             ui.puts
@@ -207,19 +208,29 @@ module Hipe
         ui.puts "  -v, --version  show the current version and exit"
       end
 
+      def subcommand_help subs, opts, args, meth
+        prefix = meth.gsub('_',' ')
+        commands_pretty = subs.map{|x| "#{meth} #{x}" }
+        show_help(prefix, commands_pretty)
+      end
+
       def sort_commands(commands)
         commands
       end
 
-      def show_help(command, commands = commands)
-        subcommand = command.to_s.empty? ? nil : "#{command} "
+      def show_help(command, commands_pretty = commands)
+        subcommand = command.to_s.empty? ? nil :
+          "#{command.upcase}_"
         ui.puts "Usage: #{app} #{subcommand}COMMAND [options]", ""
         ui.puts "Commands available:"
 
         show_command_table begin
-          commands.zip begin
-            commands.map { |c| @help[c].first unless @help[c].nil? }
-          end
+          commands_pretty.zip(
+            commands_pretty.map do |c|
+              _c = c.gsub(' ','_')
+              @help[_c].first unless @help[_c].nil?
+            end
+          )
         end
       end
 
@@ -238,6 +249,10 @@ module Hipe
         trace_row_method_name(caller[idx])
       end
 
+      def pretty(str)
+        str.gsub('_', ' ')
+      end
+
       def trace_row_method_name row
         row.match(/`([^']+)'\Z/)[1]
       end
@@ -253,14 +268,16 @@ module Hipe
             sin = File.open(file,'r')
           else
             call_name = caller_method_name(1)
-            me = "#{app} #{call_name}"
+            pretty = pretty(call_name)
+            me = "#{app} #{pretty}"
             ui.puts "#{me}: STDIN was tty and no filename provided."
             help nil, call_name
           end
         else
           if file
             call_name = caller_method_name(1)
-            me = "#{app} #{call_name}"
+            pretty = pretty(call_name)
+            me = "#{app} #{pretty}"
             ui.puts("#{me}: STDIN was not tty and "<<
               "filename was provided.")
             help nil, call_name
@@ -271,20 +288,26 @@ module Hipe
         sin
       end
 
-      def sub_command_dispatch subcommands, opts, args
+      def subcommand_dispatch subcommands, opts, args
         meth = caller_method_name(1)
-        sub_command = args.shift
-        sub_meth = "#{meth}_#{sub_command}"
-        if subcommands.include?(sub_command)
+        if ! args.any? && opts[:h]
+          opts[:h] = false; # stop propagation ?
+          return subcommand_help subcommands, opts, args, meth
+        end
+        subcommand = args.shift
+        sub_meth = "#{meth}_#{subcommand}"
+        if subcommands.include?(subcommand)
           send(sub_meth, opts, *args)
         else
-          soft_name = meth.gsub(/_/, ' ')
-          self.oxford_comma(['a','b'])
-          ui.puts("#{app} #{soft_name}: expecting sub-command " <<
+          my_name = "#{app} #{pretty(meth)}"
+          if subcommand
+            ui.puts("#{my_name}: Unrecognized command #{subcommand.inspect}.")
+          end
+          ui.puts("#{my_name}: expecting sub-command " <<
             oxford_comma(subcommands.map(&:inspect),' or ') << ".")
-          ui.puts("Had #{sub_command.inspect}.")
+          ui.puts("  Try -h for more information.")
           help(nil, meth)
-          :bad_sub_command # not sure about this
+          :bad_subcommand # not sure about this
         end
       end
     end # Commands

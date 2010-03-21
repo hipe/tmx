@@ -137,6 +137,55 @@ module Hipe
         include ClassAutovivifyingSexp
         ScopeHavingSexp.has_scope_at_index(self, 2)
         def module_name_symbol; self[1] end
+
+        class << self
+
+          These2 = [:class, :module]
+          def module_tree_for_module_node(sexp)
+            thing = TokenTree.new(sexp[1])
+            thing.def! :sexp, sexp
+            sexp.scope.block!.each do |node|
+              if node.kind_of?(Sexp) && These2.include?(node.first)
+                child = module_tree_for_module_node node
+                thing.add_child(child)
+              end
+            end
+            thing
+          end
+
+          #
+          # precondition: deep_enhance!d
+          # make a token tree with a nil token
+          # that has children that are token trees for
+          # each child (at this level) that is a class or module.
+          # (unless sexp is itself already a module then just
+          # call the instance method)
+          #
+          These3 = [:class, :module, :block]
+          def module_tree(sexp)
+            require 'assess/util/token-tree'
+            if sexp.first == :module
+              module_tree_for_module_node(sexp)
+            else
+              res = TokenTree.new(nil)
+              sexp.each_with_index do |node, idx|
+                if node.kind_of?(Sexp) && These3.include?(node.first)
+                  if node.first == :module
+                    res.add_child module_tree_for_module_node(node)
+                  else
+                    res.add_child module_tree(node)
+                  end
+                end
+              end
+              res
+            end
+          end
+        end
+
+        def module_tree
+          ModuleySexp.module_tree_for_module_node(self)
+        end
+
       end
 
       #

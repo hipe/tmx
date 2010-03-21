@@ -5,7 +5,6 @@ module Hipe
     module FrameworkCommon
       class AppInfo
         include CommonInstanceMethods
-        @all = []
 
         module MyClassMethods
           def new_with_defaults
@@ -19,7 +18,8 @@ module Hipe
             @app_info ||= new_with_defaults
           end
 
-          attr_reader :all
+          def all; @all ||= [] end
+
         end
         extend MyClassMethods
 

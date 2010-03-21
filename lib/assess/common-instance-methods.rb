@@ -37,6 +37,10 @@ module Hipe
       def class_basename kls
         Assess.class_basename kls.to_s
       end
+      def string_to_constant str
+        klass = str.split(/::/).inject(Object) { |k, n| k.const_get n }
+        klass
+      end
       def flail *args
         raise UserFail.new(*args)
       end

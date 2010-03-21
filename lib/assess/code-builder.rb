@@ -2,7 +2,7 @@ require 'ruby2ruby'
 require 'ruby_parser'
 require 'assess'
 require 'assess/util/uber-alles-array'
-require 'assess/code-builder/support'
+require 'assess/code-builder/sexp-support'
 require 'assess/code-builder/sexps'
 
 module Hipe

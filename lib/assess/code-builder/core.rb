@@ -1,5 +1,3 @@
-require File.dirname(__FILE__)+'/adapter-instance-methods.rb'
-
 module Hipe
   module Assess
     module CodeBuilder
@@ -126,7 +124,7 @@ module Hipe
           when :block;  BlockeySexp[self]
           when :class;  ClassySexp[self]
           when :call, :arglist, :colon2, :const, :lit, :hash,
-               :lasgn, :str, :if, :lvar
+               :lasgn, :str, :if, :lvar, :defs, :self, :args, :iter
           else
             puts "\n\n\n#{self[0].inspect}\n\n\n"
             debugger

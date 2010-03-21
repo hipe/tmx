@@ -6,6 +6,8 @@ module Hipe
       # The idea here is to wrap our orm-specific stuff with a common
       # interface that may one day be able to be used for other orms.
       #
+      # It remains to be seen how fruitful this idea is.
+      #
       # This should only be constructed with the orm manager.
       #
       # For now all it does is a ridiculously expensive hack to figure
@@ -39,28 +41,39 @@ module Hipe
         attr_reader :app_info
 
         #
-        # expensive and silly but fun
+        # expensive and silly fun (see previous more strict version
+        # in 56c57).  The policy is only that each class of the data model
+        # all exist under the same module (not the root namespace).  We don't
+        # care if other non model classes and modules are defined in this
+        # same module.
         #
+        # We need to figure out what module the models are defined in,
+        # without relying on configuration files to determine this.
+        # (the model *is* the data.)
+        #
+        # So we need eventually to look at DataMapper::Module.descendants
+        # and cross-reference it with the modules and classes defined here.
+        #
+        #
+        #
+        ColonColon = /::/
         def deduce_model_module
-          file = model_file_sexp
-          @model_file_sexp = nil # don't want it in dumps
-          target = s(:call,nil,:include,
-            s(:arglist, s(:colon2, s(:const, :DataMapper), :Resource))
-          )
-          found = file.deep_find_first target
-          if ! found
-            CodeBuilder::CommonSexpInstanceMethods[target]
-            fail("failed to find #{target.to_ruby} in "<<
-              app_info.model.path
-            )
+          file = pop_model_file_sexp
+          them = file.module_tree.flatten.map{|a|a.map(&:to_s)*'::'}
+          these = ::DataMapper::Model.descendants.map(&:to_s)
+          ridonk = these & them
+          if ! ridonk.any?
+            return flail("sorry, couldn't find any DataMapper Resources" <<
+            "in #{app_info.model.pretty_path}")
           end
-          mod = found.find_parent(:module)
-          if (found2 = mod.find_parent(:module))
-            debugger; 'no problem but we need to deal with it.'
+          if ridonk.map{|x| x.scan(ColonColon).size }.uniq.size != 1
+            return flail("sorry, it appears that all model classess "<<
+            "are not on the same level.")
           end
-          module_name_string = mod.module_name_symbol.to_s
-          mod = CodeBuilder.const_get_deep(module_name_string)
-          mod
+          toks = ridonk.first.split(ColonColon)
+          toks.pop
+          module_str = toks.join('::')
+          string_to_constant(module_str)
         end
 
         def load_and_enhance_model_classes_from_module mod
@@ -76,6 +89,8 @@ module Hipe
         end
         # note ::DataMapper::Model.descendants.to_ary would give a superset of
 
+        # know what you are doing if you remove deep_enhance! from here
+        # know what you are doing if you use deep_enhance! anywhere else
         def model_file_sexp
           @model_file_sexp ||= begin
             flail("no") unless app_info.model.single_file?
@@ -87,6 +102,13 @@ module Hipe
             file
           end
           file
+        end
+
+        # if u don't want to leave it hanging around in dumps, etc
+        def pop_model_file_sexp
+          res = model_file_sexp
+          @model_file_sexp = nil
+          res
         end
 
         # def model_class_sexps

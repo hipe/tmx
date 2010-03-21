@@ -46,7 +46,7 @@ module Hipe
           DrunkenMerge.new(self).merge_json ui, sin, opts
         end
         def db_check opts, *args
-          s[
+          Sexpesque[
             :db_check,
             app_info.model.summary,
             app_info.database_summary
@@ -61,8 +61,6 @@ module Hipe
       private
 
         attr_reader :app_info
-
-        def s; Sexpesque end
 
         def setup?; @setup end
 
