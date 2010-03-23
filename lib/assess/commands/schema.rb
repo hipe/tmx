@@ -1,6 +1,9 @@
 module Hipe
   module Assess
     module Commands
+
+      listing_index 200
+
       SchemaSubs = %w(analyze protomodel datamapper destroy check)
 
       o "#{app} schema ( #{SchemaSubs.join('|')} ) [OPTS] [ARGS]"

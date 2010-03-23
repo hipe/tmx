@@ -1,5 +1,4 @@
 require 'assess/util/strict-attr-accessors'
-require File.dirname(__FILE__)+'/file-sexp.rb'
 module Hipe
   module Assess
     module CodeBuilder

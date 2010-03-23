@@ -1,5 +1,3 @@
-require File.dirname(__FILE__)+'/core.rb'
-
 module Hipe
   module Assess
     module CodeBuilder
@@ -53,7 +51,14 @@ module Hipe
             if :block == first
               block = self
             else
-              debugger; "your so clevr"
+              if has_parent? # @todo this is a common pattern. unprune
+                debugger; "your so clevr"
+              elsif 0 == size
+                push(:block) # kind of crazy
+                block = self
+              else
+                debugger; 'you can do it'
+              end
             end
           elsif block_index >= length
             block = s(:block)

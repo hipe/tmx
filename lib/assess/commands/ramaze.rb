@@ -4,9 +4,11 @@ module Hipe
   module Assess
     module Commands
 
+      listing_index 600
+
       RamazeSubs = %w(summary controller)
-      o "#{app} ramaze (#{RamazeSubs.join('|')}) [OPTIONS] [ARGUMENTS]"
-      x 'Maybe init current directory for ramaze web app. (-h)'
+      o "#{app} web (#{RamazeSubs.join('|')}) [OPTIONS] [ARGUMENTS]"
+      x 'Add and edit files for a ramaze web app. (-h)'
       def web opts={}, *args
         subcommand_dispatch RamazeSubs, opts, args
       end
@@ -21,9 +23,9 @@ module Hipe
         ui.puts thing.jsonesque
       end
 
-      RamazeSubCmd2 = %w(summary update hello)
+      RamazeSubCmd2 = %w(summary hello merge)
       o "#{app} web controller (#{RamazeSubCmd2.join('|')}) [OPTS] [ARGS]"
-      x "Do some stuff with controllers."
+      x "Do some stuff with controllers. (-h)"
       def web_controller opts, *args
         subcommand_dispatch(RamazeSubCmd2, opts, args)
       end
@@ -35,28 +37,48 @@ module Hipe
         ui.puts Ramaze.controller_summary.jsonesque
       end
 
-      o "#{app} web controller hello [prune]"
+      o "#{app} web controller hello [OPTS]"
       x "Make a hello world controller."
+      x "  This is the minimal ramaze app, to test if it works."
       x
       x "Options:"
-      x "  -d       dry run -- don't actually do anything."
-      x "  -i=STR   files are edited in-place always. The default is to "
-      x "           make a backup copy with a datestamp.  If you pass the"
-      x "           empty string as an argument, no backup will be made."
+      x "  -d, --dry    dry run -- don't actually do anything."
+      x "  -i=STR       files are edited in-place always. The default is to "
+      x "               make a backup copy with a datestamp.  If you pass the"
+      x "               empty string as an argument, no backup will be made."
+      x "  -p, --prune  remove backup files that you have generated."
       def web_controller_hello opts, prune=nil
         return help if opts[:h]
-        unless [nil,'prune'].include?(prune)
-          ui.puts("#{this_command}: expecting \"prune\" not #{prune.inspect}")
-          return help
+        return help unless opts.valid? do
+          opts.parse!('-i=STR',     :backup_extension)
+          opts.parse!('-d, --dry',  :dry_run?)
+          opts.parse!('-p, --prune',:prune?)
         end
-        opts[:prune] = true if prune # hackish
-        if true==opts[:i]
-          ui.puts("#{this_command}: -i must take an argument")
-          return help
-        end
-        opts.expand_backup_opt!
-        opts.expand_dry_run_opt!
         Ramaze.hello_world ui, opts
+      end
+
+      o "#{app} web controller merge [OPTS] MODEL_NAME"
+      x "Make or merge-in the necessary files and code (-h)"
+      x "  for the model and/or app."
+      x
+      x "Options:"
+      x "  -d, --dry    dry run -- don't actually do anything"
+      x "                 (this will still use writable-temp)"
+      x "  -p, --prune  delete all the files that exist and"
+      x "                 are identical to what would have been "
+      x "                 (was) generated."
+      def web_controller_merge opts, model_name=nil
+        return help if opts[:h]
+        unless model_name
+          ui.puts "#{this_command}: please provide MODEL_NAME"
+          return help
+        end
+        return help unless opts.valid? do
+          opts.parse!('-d, --dry',        :dry_run?)
+          opts.parse!('-p, --prune',      :prune?)
+          opts.parse!('-m, --code-merge', :code_merge?)
+        end
+        Ramaze.controller_merge ui, opts, model_name
       end
     end
   end

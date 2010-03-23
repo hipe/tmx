@@ -19,17 +19,24 @@ module Hipe
       def app_info
         AppInfo.current
       end
+
       def controller_summary
         s = Sexpesque
         summary = s[:controllers]
         if ! app_info.controller.exists?
           summary.push(:none)
         else
-          debugger; 'x'
+          summary.push app_info.controller.summary
         end
       end
+
+      def controller_merge *a
+        require 'assess/code-adapter/ramaze/controller-merge'
+        ControllerMerge.controller_merge(*a)
+      end
+
       def hello_world ui, opts
-        file = CodeBuilder.build_file(app_info.hello_world_path)
+        file = CodeBuilder.create_or_get_file(app_info.hello_world_path)
         return file.prune_backups ui, opts if opts[:prune]
         if ! file.simple_requires.include? 'ramaze'
           file.add_require_at_top 'ramaze'
@@ -54,7 +61,7 @@ module Hipe
         end
 
         if write_it
-          file.write(ui,  opts)
+          file.write_ruby(ui,  opts)
         else
           ui.puts "#{file.path} Nothing to write."
         end

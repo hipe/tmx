@@ -6,5 +6,4 @@ $LOAD_PATH.unshift(root) unless $LOAD_PATH.include?(root)
 
 require 'assess'
 require 'assess/commands'
-
 Hipe::Assess::Commands.invoke ARGV

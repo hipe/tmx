@@ -5,6 +5,8 @@ module Hipe
   module Assess
     module Commands
 
+      listing_index 100
+
       x 'Can you connect?'
       def db opts={}, *args
         if args.any?
@@ -25,6 +27,8 @@ module Hipe
         ui.puts "your app: #{app_info.name} version #{app_info.version}"
       end
 
+      listing_index 400
+
       DataSubs = %w(merge)
       o "#{app} data (#{DataSubs.join('|')}) OPTS ARGS"
       x 'Do data-related stuff. (-h)'
@@ -36,7 +40,8 @@ module Hipe
     private
 
       o "#{app} data merge MODEL_NAME [JSON_FILE_NAME]"
-      x 'Import data from json file or stdin'
+      x 'Import data from json file or json from STDIN.'
+      x 'Your schema must fit the data.'
       def data_merge opts, model_name=nil, json_file = nil
         return help if opts[:h]
         require 'assess/code-adapter/framework-common'

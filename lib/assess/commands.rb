@@ -6,14 +6,16 @@ require 'json' # only for rescu_e
 module Hipe
   module Assess
     module Commands
-      include CommonInstanceMethods
+      include CommonInstanceMethods # @todo if u remove this this depencency
+                                    # this will be very resusable
       protected(*CommonInstanceMethods.instance_methods)
 
       extend self
       @help = {}
       @usage = {}
 
-      def help(options = {}, command = nil, *args)
+      def help(opts = {}, command = nil, *args)
+        opts ||= {}
         # start experiment
         command ||= caller_method_name(1)
         command = nil if 'send'==command # @todo fixme
@@ -37,7 +39,7 @@ module Hipe
       end
 
       def invoke argv
-        command, opts, args = parse_args argv
+        command, opts, args = OptParseLite.parse_args(argv, self)
 
         if command.nil?
           if ([:v, :version] & opts.keys).any?
@@ -82,8 +84,8 @@ module Hipe
 
     private
 
-      def this_command
-        soft = caller_method_name(1).gsub('_',' ')
+      def this_command idx=1
+        soft = caller_method_name(idx).gsub('_',' ')
         "#{app} #{soft}"
       end
 
@@ -107,6 +109,38 @@ module Hipe
         end
       end
 
+      def listing_index int=nil
+        @listing_index ||= []
+        if int.nil?
+          @listing_index
+        else
+          idx = @listing_index.index{|x| x[:index] == int}
+          if idx
+            @current_list = @listing_index[:list]
+          else
+            if ! @listing_index.any?
+              idx = 0
+            else
+              idx = @listing_index.index{|x| x[:index] > int}
+              if ! idx
+                idx = @listing_index.length
+              end
+            end
+            thing = {:index => int, :list => []}
+            @listing_index.insert(idx, thing)
+            @current_list = thing[:list]
+          end
+          nil
+        end
+      end
+
+      def current_list
+        @current_list ||= begin
+          listing_index(-1)
+          @current_list
+        end
+      end
+
       def o usage
         @next_usage = usage
       end
@@ -117,6 +151,7 @@ module Hipe
       end
 
       def method_added(method)
+        current_list.push method
         if @next_help || @next_usage
           @private_hack ||= {}
           @private_hack[method] = true
@@ -141,54 +176,6 @@ module Hipe
         end
       end
 
-      #
-      # experimental. some of this might not belong here.
-      #
-      module CommonOptionInstanceMethods
-        include CommonInstanceMethods
-
-        def expand_dry_run_opt!
-          m = class << self; self end
-          is_dry = self[:d] ? true : false
-          def! :dry_run?, is_dry
-          self
-        end
-
-        def expand_backup_opt!
-          case self[:i]
-          when ''; backup = :none
-          when nil; backup = :yes
-          else
-            backup = :with_extension
-            extension = self[:i]
-          end
-          # we make it like a mini openstruct
-          m = class << self; self end
-          # this should always be set but we do it this way to be safe
-          if backup
-            def! :backup, backup
-            def!(:extension, extension) if extension
-            do_backup = [:yes, :with_extension].include?(backup)
-            def! :backup?, do_backup
-          end
-          self
-        end
-      end
-
-
-      def parse_args argv
-        options = argv.select { |piece| piece =~ /^-/ }
-        argv   -= options
-        command = argv.shift
-        opts = Hash[* options.map do |flag|
-          # key, value = flag.split('=')  # no good for detecting -i=''
-          key,value = flag.match(/\A([^=]+)(?:=(.*))?\Z/).captures
-          [key.sub(/^--?/, '').intern, value.nil? ? true : value ]
-        end.flatten ]
-        opts.extend CommonOptionInstanceMethods
-        [ command, opts, argv ]
-      end
-
       def show_general_help
         # chris does the below better somehow
         commands = public_instance_methods.reject do |method|
@@ -201,8 +188,8 @@ module Hipe
         ui.puts
         ui.puts "For more information on a command use:"
         ui.puts "  #{app} help COMMAND"
+        ui.puts "or try the -h option on a sub-command"
         ui.puts
-
         ui.puts "Options: "
         ui.puts "  -h, --help     show this help message and exit"
         ui.puts "  -v, --version  show the current version and exit"
@@ -210,12 +197,24 @@ module Hipe
 
       def subcommand_help subs, opts, args, meth
         prefix = meth.gsub('_',' ')
-        commands_pretty = subs.map{|x| "#{meth} #{x}" }
+        commands_pretty = subs.map{|x| "#{prefix} #{x}" }
         show_help(prefix, commands_pretty)
       end
 
-      def sort_commands(commands)
-        commands
+      def sort_commands commands
+        map = command_sort_map
+        commands.sort do |a,b|
+          map[a.to_sym] <=> map[b.to_sym]
+        end
+      end
+
+       # you will get a caching problem depending on when you call it
+      def command_sort_map
+        # because method_added() calls current_list() we assume @listing_index
+        @command_sort_map ||= begin
+          ordered = @listing_index.map{|x| x[:list]}.flatten
+          Hash[ * ordered.zip((0..ordered.length-1).to_a).flatten ]
+        end
       end
 
       def show_help(command, commands_pretty = commands)
