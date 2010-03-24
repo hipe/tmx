@@ -6,6 +6,39 @@ module Hipe
     module JsonSchemaGuess
       extend self
 
+      def analyze sin, sout
+        metrics = entity_metrics sin
+        sout.puts JSON.pretty_generate(metrics.guy_summary)
+      end
+
+      def protomodel sin, sout, entity_name
+        metrics = self.entity_metrics sin
+        model = protomodel_from_metrics metrics, entity_name
+        model.jsonesque sout
+        nil
+      end
+
+      def entity_metrics sin
+        json_str = sin.read
+        structo = JSON.parse json_str
+        metrics = EntityMetrics.new
+        structo.each do |row|
+          row.each do |(k,v)|
+            metrics[k].eat v
+          end
+        end
+        metrics
+      end
+
+      def protomodel_from_metrics metrics, entity_name
+        model = Proto::Model.new
+        new_prototable_from_entity_metrics(
+          model, metrics, entity_name)
+        model
+      end
+
+    private
+
       class FieldMetrics
         attr_reader :name, :distinct,:type_guess, :many
         alias_method :many?, :many
@@ -134,11 +167,6 @@ module Hipe
         end
       end
 
-      def analyze sin, sout
-        metrics = self.entity_metrics sin
-        sout.puts JSON.pretty_generate( metrics.guy_summary )
-      end
-
       def new_single_column_prototable model, field, table_name
         table = model.create_and_add_table table_name
         table.create_and_add_data_column field.name, field.type_guess.to_sym
@@ -184,32 +212,6 @@ module Hipe
             field.name, field.type_guess.to_sym
           )
         end
-      end
-
-      def protomodel_from_metrics metrics, entity_name
-        model = Proto::Model.new
-        new_prototable_from_entity_metrics(
-          model, metrics, entity_name)
-        model
-      end
-
-      def protomodel sin, sout, entity_name
-        metrics = self.entity_metrics sin
-        model = protomodel_from_metrics metrics, entity_name
-        model.jsonesque(sout)
-        nil
-      end
-
-      def entity_metrics sin
-        json_str = sin.read
-        structo = JSON.parse json_str
-        metrics = EntityMetrics.new
-        structo.each do |row|
-          row.each do |(k,v)|
-            metrics[k].eat v
-          end
-        end
-        metrics
       end
     end
   end
