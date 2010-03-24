@@ -5,6 +5,8 @@ module Hipe
   module Assess
     module Commands
 
+      enable_closest_match!
+
       listing_index 100
 
       x 'Can you connect?'

@@ -150,6 +150,17 @@ module Hipe
         @next_help.push help
       end
 
+      def enable_closest_match!
+        if @closest_match_enabled == false
+          fail("can't turn short commands on when they are off")
+        end
+        @closest_match_enabled = true
+      end
+
+      def closest_match_enabled?
+        @closest_match_enabled
+      end
+
       def method_added(method)
         current_list.push method
         if @next_help || @next_usage
@@ -287,6 +298,41 @@ module Hipe
         sin
       end
 
+      def messages
+        @messages ||= {}
+      end
+
+      def set_message(name, value)
+        messages[name] = value
+      end
+
+      def message? name
+        messages.has_key? name
+      end
+
+      def pop_message name
+        messages.delete(name)
+      end
+
+      # if found unambiguous, execute it
+      def attempt_closest_match(cmds, cmd, meth, opts, args)
+        return false if cmd.nil? # when user didn't provide a sub
+        return false unless closest_match_enabled?
+        re = Regexp.new('\A'+Regexp.escape(cmd))
+        found = cmds.grep(re)
+        case found.size
+        when 0; return false
+        when 1
+          sub = found.first
+          sub_meth = meth ? "#{meth}_#{sub}" : sub
+          send(sub_meth, opts, *args)
+        else
+          set_message(:ambig,("Did you mean "<<
+            oxford_comma(found.map(&:inspect),' or ')<<'?'))
+          return false
+        end
+      end
+
       def subcommand_dispatch subcommands, opts, args
         meth = caller_method_name(1)
         if ! args.any? && opts[:h]
@@ -297,10 +343,14 @@ module Hipe
         sub_meth = "#{meth}_#{subcommand}"
         if subcommands.include?(subcommand)
           send(sub_meth, opts, *args)
+        elsif attempt_closest_match(subcommands, subcommand, meth, opts, args)
+          # it handled it
         else
           my_name = "#{app} #{pretty(meth)}"
           if subcommand
-            ui.puts("#{my_name}: Unrecognized command #{subcommand.inspect}.")
+            adj = message?(:ambig) ? 'Ambiguous' : 'Unrecognized'
+            ui.puts("#{my_name}: #{adj} command #{subcommand.inspect}.")
+            ui.puts("#{my_name}: #{pop_message(:ambig)}") if message?(:ambig)
           end
           ui.puts("#{my_name}: expecting sub-command " <<
             oxford_comma(subcommands.map(&:inspect),' or ') << ".")
