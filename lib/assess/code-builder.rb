@@ -24,17 +24,17 @@ module Hipe
         parser.process ruby
       end
 
-      def create_or_get_file name
+      def create_or_get_file_sexp name
         FileSexp.create_or_get_from_path(name)
+      end
+
+      def get_file_sexp path
+        FileSexp.get_from_path(path)
       end
 
       def create_or_get_folder path
         require 'assess/code-builder/folder'
         Folder.create_or_get path
-      end
-
-      def file_sexp_from_path path
-        FileSexp.get_from_path(path)
       end
 
       def build_module name, &block

@@ -59,7 +59,8 @@ module Hipe
         ColonColon = /::/
         def deduce_model_module
           file = pop_model_file_sexp
-          them = file.module_tree.flatten.map{|a|a.map(&:to_s)*'::'}
+          them = file.module_tree.token_tree_flatten.
+            map{|a|a.map(&:to_s)*'::'}
           these = ::DataMapper::Model.descendants.map(&:to_s)
           ridonk = these & them
           if ! ridonk.any?
@@ -94,7 +95,7 @@ module Hipe
         def model_file_sexp
           @model_file_sexp ||= begin
             flail("no") unless app_info.model.single_file?
-            file = CodeBuilder.build_file app_info.model.path
+            file = CodeBuilder.get_file_sexp app_info.model.path
             if !(file.is_module? || file.is_block?)
               flail("not sure if this file has a structure we like.")
             end

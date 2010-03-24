@@ -64,7 +64,7 @@ module Hipe
           include TokenTree::LeafNode
           include Pathy
           def initialize token, parent
-            init_token_tree token, parent
+            token_tree_init token, parent
             set_path token, parent
           end
           def dir?; false; end
@@ -115,7 +115,7 @@ module Hipe
           end
           alias_method :target_path, :path
           def to_sexp
-            CodeBuilder::file_sexp_from_path source.path
+            CodeBuilder.get_file_sexp source.path
           end
           def destroy_self!
             # no references to self to nullify
@@ -167,7 +167,7 @@ module Hipe
             # FileUtils.mkdir(use_path)
             set_path path, parent
           end
-          init_token_tree path, parent
+          token_tree_init path, parent
           yield(self) if block_given?
           if no_read?
             @children = []

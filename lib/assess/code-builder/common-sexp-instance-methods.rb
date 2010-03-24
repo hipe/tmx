@@ -108,13 +108,17 @@ module Hipe
         def deep_find_first_node &block
           deep_enhance! unless deep_enhanced?
           found = nil
-          each do |node|
-            next unless node.kind_of?(Array) # catch errors
-            if yield node
-              found = node
-              break
-            elsif (found = node.deep_find_first_node(&block))
-              break
+          if yield self
+            found = self
+          else
+            each do |node|
+              next unless node.kind_of?(Array) # catch errors
+              if yield node
+                found = node
+                break
+              elsif (found = node.deep_find_first_node(&block))
+                break
+              end
             end
           end
           found
@@ -123,6 +127,7 @@ module Hipe
         def deep_find_all &block
           deep_enhance! unless deep_enhanced?
           founds = []
+          founds.push(self) if yield(self)
           each do |node|
             next unless node.kind_of?(Array) # catch errors
             if yield node
@@ -266,6 +271,18 @@ module Hipe
           found
         end
 
+        def add_child child
+          deep_enhance! unless deep_enhanced?
+          if registered?
+            if child.has_parent?
+              debugger("we need to implement this. easy.");'x'
+            end
+            child.parent = self
+          end
+          push child
+          nil
+        end
+
         #
         # if we need to return replaced child we can, but we have to consider
         # if and when to destroy it
@@ -291,11 +308,14 @@ module Hipe
           self
         end
 
+        def registered?; @registered end
+
         def register!
           if respond_to?(:node_id)
             fail("make sure you don't register more than once!")
           end
           node_id = CodeBuilder::Nodes.register(self)
+          @registered = true
           def! :node_id, node_id
         end
 
@@ -327,7 +347,7 @@ module Hipe
           if parent.nil?
             enhance_sexp_node!
           end
-          register!
+          register! unless registered?
           if parent
             self.parent = parent
           else

@@ -10,15 +10,11 @@ module Hipe
 
         class DmModelModuleSexp < CodeBuilder::ModuleSexp
           include CodeBuilder::RegistersConstants # deprecated
-          attr_reader :node_id
-          def self.build(name,&block)
+
+          def self.build(name)
             thing = super(name)
-            thing.my_initialize
-            yield(thing) if block_given?
+            thing.deep_enhance!
             thing
-          end
-          def my_initialize
-            @node_id = CodeBuilder::Nodes.register(self)
           end
         end
 
@@ -45,10 +41,7 @@ module Hipe
           end
           def my_initialize
             @node_id = CodeBuilder::Nodes.register(self)
-            add_include 'DataMapper::Resource'
-            add_extend  'ModelClassMethods'
-            add_include 'ModelInstanceMethods'
-            dm_add_property :id, :Serial
+            add_include 'ModelCommon'
           end
           def table_name_guess
             underscore(self.constant_basename_symbol.to_s)
@@ -58,7 +51,10 @@ module Hipe
             fail('sorry') unless DmTypes.include?(type)
             scope.block!.push(
              s(:call, nil, :property,
-               s(:arglist, s(:lit, name), s(:const, type))
+               s(:arglist,
+                 s(:lit, name),
+                 s(:const, type),
+                 s(:hash, s(:lit, :required), s(:true)))
               )
             )
           end

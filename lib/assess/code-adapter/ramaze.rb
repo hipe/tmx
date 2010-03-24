@@ -36,7 +36,7 @@ module Hipe
       end
 
       def hello_world ui, opts
-        file = CodeBuilder.create_or_get_file(app_info.hello_world_path)
+        file = CodeBuilder.create_or_get_file_sexp(app_info.hello_world_path)
         return file.prune_backups ui, opts if opts[:prune]
         if ! file.simple_requires.include? 'ramaze'
           file.add_require_at_top 'ramaze'

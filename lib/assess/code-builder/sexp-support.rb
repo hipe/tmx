@@ -147,8 +147,9 @@ module Hipe
 
           These2 = [:class, :module]
           def module_tree_for_module_node(sexp)
+            require 'assess/util/token-tree'
             thing = TokenTree.new(sexp[1])
-            thing.def! :sexp, sexp
+            thing.please_def! :sexp, sexp
             sexp.scope.block!.each do |node|
               if node.kind_of?(Sexp) && These2.include?(node.first)
                 child = module_tree_for_module_node node
@@ -324,20 +325,20 @@ module Hipe
         end
       end
       Symbols = {
-        :module   => { :module => CodeBuilder::ModuleySexp },
+        :module   => { :module => CodeBuilder::ModuleySexp,:value_index => 1},
         :scope    => { :module => CodeBuilder::ScopeySexp  },
         :block    => { :module => CodeBuilder::BlockeySexp },
-        :class    => { :module => CodeBuilder::ClassySexp  },
+        :class    => { :module => CodeBuilder::ClassySexp, :value_index => 1},
         :arglist  => true,
         :args     => true,
         :array    => true,
         :attrasgn => true,
         :call     => { :value_index => 2 },
-        :class    => { :value_index => 1 },
         :colon2   => true,
         :const    => true,
         :defn     => true,
         :defs     => true,
+        :false    => true,
         :iasgn    => true,
         :if       => true,
         :iter     => true,
@@ -346,7 +347,8 @@ module Hipe
         :lvar     => true,
         :hash     => true,
         :self     => true,
-        :str      => true
+        :str      => true,
+        :true     => true
       }
     end
   end

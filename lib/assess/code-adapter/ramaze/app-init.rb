@@ -13,11 +13,9 @@ module Hipe
       private
 
         def tmpdir
-          @tmpdir ||= begin
-            CodeBuilder.create_or_get_folder(
-              FrameworkCommon.tmpdir_for('ramaze')
-            )
-          end
+          @tmpdir ||= CodeBuilder.create_or_get_folder(
+            FrameworkCommon.tmpdir_for('ramaze')
+          )
         end
 
         def my_prototype_dir opts
@@ -49,6 +47,7 @@ module Hipe
 
         def mess_with_model dir
           dir.at_path('model').destroy!
+          dir.at_path('config.ru').destroy! # we will want it later
         end
 
         def mess_with_controller dir

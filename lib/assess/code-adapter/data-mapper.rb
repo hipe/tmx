@@ -23,6 +23,14 @@ module Hipe
         require File.dirname(__FILE__)+'/data-mapper/orm-manager.rb'
         OrmManager.singleton_for_app_info(app_info)
       end
+
+      def proto name
+        File.join(RootDir,'lib/assess/code-adapter/data-mapper/proto',name)
+      end
+
+      def snippets
+        CodeBuilder.get_file_sexp(proto('snippets.rb'))
+      end
     end
   end
 end

@@ -10,7 +10,7 @@ module Hipe
       module LeafNode
         def has_children?; false end
         attr_reader :token, :token_tree_id
-        def init_token_tree tok, parent=nil
+        def token_tree_init tok, parent=nil
           @token_tree_id = self.class.all.length
           self.class.all[@token_tree_id] = self
           @token = tok
@@ -156,7 +156,11 @@ module Hipe
       include BranchNode
 
       def initialize tok
-        initialize_token_tree tok
+        token_tree_init tok
+      end
+
+      def please_def! name, value
+        def! name, value
       end
 
     private
