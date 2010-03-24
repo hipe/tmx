@@ -323,6 +323,31 @@ module Hipe
           nil
         end
       end
+      Symbols = {
+        :module   => { :module => CodeBuilder::ModuleySexp },
+        :scope    => { :module => CodeBuilder::ScopeySexp  },
+        :block    => { :module => CodeBuilder::BlockeySexp },
+        :class    => { :module => CodeBuilder::ClassySexp  },
+        :arglist  => true,
+        :args     => true,
+        :array    => true,
+        :attrasgn => true,
+        :call     => { :value_index => 2 },
+        :class    => { :value_index => 1 },
+        :colon2   => true,
+        :const    => true,
+        :defn     => true,
+        :defs     => true,
+        :iasgn    => true,
+        :if       => true,
+        :iter     => true,
+        :lasgn    => true,
+        :lit      => true,
+        :lvar     => true,
+        :hash     => true,
+        :self     => true,
+        :str      => true
+      }
     end
   end
 end

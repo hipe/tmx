@@ -15,9 +15,29 @@ module Hipe
             end
           end
         end
-
-        SexpTriggers = [:replace_node]
-
+        class UnparsedFile
+          class << self
+            def all; Folder.all end
+            def get_from_path(path)
+              new{|it| it.init_from_path(path)}
+            end
+          end
+          attr_reader :path, :filesystem_node_id
+          def initialize(&block)
+            @filesystem_node_id = self.class.all.length
+            self.class.all[filesystem_node_id] = self
+            yield(self)
+          end
+          def init_from_path path
+            @path = path
+          end
+          def get_file_contents
+            if ! File.exist?(path)
+              fail("can't get file contents for nonexistant file: #{path}")
+            end
+            File.read(path)
+          end
+        end
         class FileStub
           class << self
             def all; Folder.all end
@@ -26,12 +46,18 @@ module Hipe
               sexp.send(meth,*args)
             end
             def convert_filestub_to_sexp obj
-              path = obj.respond_to?(:source) ? obj.source.path : obj.path
-              sexp = CodeBuilder::FileSexp.get_from_path path
-              if obj.has_parent?
-                obj.parent.replace_child(obj, sexp)
+              if obj.has_existing_sexp?
+                sexp = obj.existing_sexp
+              else
+                source_path = obj.source_path
+                sexp = CodeBuilder::FileSexp.get_from_path source_path
+                sexp.path = obj.target_path
+                if obj.has_parent?
+                  obj.parent.replace_child(obj, sexp)
+                end
+                obj.destroy_self!
+                obj.existing_sexp = sexp
               end
-              obj.destroy_self!
               sexp
             end
           end
@@ -43,19 +69,36 @@ module Hipe
           end
           def dir?; false; end
           def is_stub?; true end
+          SexpTriggers = [:replace_node, :codepath, :codepath_all]
           SexpTriggers.each do |meth|
             define_method(meth) do |*a|
               self.class.convert_to_sexp_and_call(self,meth,a)
             end
           end
+          def has_existing_sexp?
+            !! @existing_sexp
+          end
+          def existing_sexp
+            @existing_sexp
+          end
+          def existing_sexp= mixed
+            fail("no") unless mixed
+            @existing_sexp = mixed
+          end
           def to_sexp
-            CodeBuilder::file_sexp_from_path path
+            has_existing_sexp? ? existing_sexp : CodeBuilder::file_sexp_from_path(path)
           end
           def get_file_contents
             if ! File.exist?(path)
-              fail("can't get stub for nonexistant file: #{path}")
+              fail("can't get file contents for nonexistant file: #{path}")
             end
             File.read(path)
+          end
+          def destroy_self!
+            self.class.all[token_tree_id] = :destroyed
+          end
+          def source_path
+            path
           end
         end
         class IntermediateFileCopy < FileStub
@@ -67,6 +110,10 @@ module Hipe
           def source
             Folder.all[@source_node_id]
           end
+          def source_path
+            source.path
+          end
+          alias_method :target_path, :path
           def to_sexp
             CodeBuilder::file_sexp_from_path source.path
           end
@@ -75,6 +122,11 @@ module Hipe
           end
           def get_source_file_contents
             source.get_file_contents
+          end
+          def replace_content_with_path path
+            source = UnparsedFile.get_from_path path
+            self.source.destroy!
+            @source_node_id = source.filesystem_node_id
           end
         end
       end
@@ -85,8 +137,8 @@ module Hipe
         @all = []
         class << self
           attr_reader :all
-          def get_or_create path
-            new path
+          def create_or_get path
+            new(path){|f| f.create!}
           end
           def from_existing_folder path
             flail("folder doesn't exist or is not directory") unless
@@ -124,6 +176,11 @@ module Hipe
         def no_read!
           @read = false
           @is_stub = false
+        end
+        def create!
+          if ! File.exist?(path)
+            FileUtils.mkdir_p(path,{:verbose=>1})
+          end
         end
         def destory_children!
           unless is_stub?
@@ -204,13 +261,13 @@ module Hipe
         end
         def execute_write_request ui, opts
           unless opts[:col1]
-            longest = deep_children.map{|c|c.path.length}.
+            longest = deep_leaf_children.map{|c|c.path.length}.
               inject { |m,len| m > len ? m : len }
             opts[:col1] = longest
             opts[:col2] ||= 6
             opts[:col3] ||= 6
           end
-          deep_children.each do |child|
+          deep_leaf_children.each do |child|
             child.execute_write_request ui, opts
           end
           prune_child_directories(ui, opts) if opts.prune?
@@ -266,3 +323,5 @@ module Hipe
     end
   end
 end
+# @todo everybody should get filesystem_node_id
+#

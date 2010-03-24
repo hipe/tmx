@@ -93,6 +93,10 @@ module Hipe
           {}
         end
       end
+      Scalars = [NilClass, TrueClass, FalseClass, Fixnum, Float, String]
+      def is_scalar? mixed
+        Scalars.detect{|cls| mixed.kind_of?(cls)}
+      end
     end
   end
 end

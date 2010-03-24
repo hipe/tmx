@@ -7,12 +7,6 @@ module Hipe
         include CommonInstanceMethods
         extend self
 
-        Scalars = [NilClass, TrueClass, FalseClass, Fixnum, Float, String]
-
-        def is_scalar? mixed
-          Scalars.detect{|cls| mixed.kind_of?(cls)}
-        end
-
         def my_get_type mixed
           if is_scalar? mixed then :scalar
           elsif mixed.kind_of?(Hash) then :hash

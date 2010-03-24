@@ -1,5 +1,6 @@
 require 'assess/util/sexpesque'
 require 'assess/code-builder'
+require 'assess/util/persistent-node'
 module Hipe
   module Assess
     module FrameworkCommon
@@ -25,7 +26,7 @@ module Hipe
 
 
         attr_reader :app_root, :model, :controller, :server_executable,
-                    :active_db_path, :app_info_id
+                    :active_db_path, :app_info_id, :persistent
 
         def initialize
           @app_info_id = self.class.all.length
@@ -51,6 +52,9 @@ module Hipe
           server_executable.relative_path = './start.rb'
           active_db_path.relative_to = app_root
           active_db_path.relative_path = './db'
+          @persistent = PersistentNode.create_or_get(
+            File.join(app_root.pretty_path,'.assess.json')
+          )
         end
 
         # @todo

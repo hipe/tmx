@@ -17,6 +17,12 @@ module Hipe
           self.parent = parent if parent
           nil
         end
+        def replace_token mixed
+          old = token
+          fail("no!") unless [Symbol, String].include?(mixed.class)
+          @token = mixed
+          old
+        end
         def destroy!
           if has_parent?
             parent.child_destroy_notify(self)
@@ -103,11 +109,11 @@ module Hipe
             get_child(path)
           end
         end
-        def deep_children
+        def deep_leaf_children
           arr = []
           children.each do |child|
             if child.branch?
-              arr.concat child.deep_children
+              arr.concat child.deep_leaf_children
             else
               arr.push child
             end

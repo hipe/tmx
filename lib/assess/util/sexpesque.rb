@@ -85,7 +85,31 @@ module Hipe
         end
       end
 
-      # thanks ryan
+      def []=(key,mixed)
+        if mixed.kind_of?(Fixnum)
+          super(mixed)
+        else
+          if idx = first_index(key)
+            self[idx][2..-1] = nil
+            self[idx][1] = mixed
+          else
+            self.push self.class[key,*mixed]
+          end
+          nil
+        end
+      end
+
+      def first_index name
+        found = nil
+        each_with_index do |item, idx|
+          if item.kind_of?(Array) && item.first == name
+            found = idx
+            break
+          end
+        end
+        found
+      end
+
       def find_node name
         matches = find_nodes name
 
@@ -99,11 +123,9 @@ module Hipe
         end
       end
 
-      # thanks ryan
       def find_nodes name
-        find_all { |node| node.kind_of?(Sexpesque) && node.first == name }
+        find_all { |node| node.kind_of?(Array) && node.first == name }
       end
-
     end
   end
 end

@@ -19,7 +19,6 @@ module Hipe
         end
 
 
-
         #
         # get this -- of course we can't serialize our singleton parent
         # accessor methods, nor do we want to serialize that extra
@@ -55,27 +54,13 @@ module Hipe
             "\"#{self}\":#{self.class}")
         end
 
-
-        #
-        # basic reflection
-        #
-
         def is_module?
           self[0] == :module
         end
+
         def is_block?
           self[0] == :block
         end
-
-        #
-        # end basic reflection
-        #
-
-
-
-        #
-        # iterators and searchers
-        #
 
         def find_all_with_index &block
           founds = []
@@ -96,7 +81,13 @@ module Hipe
         def has_node? sexp
           !! detect { |x| x == sexp }
         end
-        def deep_find_first sexp
+
+        # must match sexp exactly
+        # @todo refactor this into next
+        def deep_find_first sexp=nil, &block
+          if sexp.nil?
+            return deep_find_first_node(&block)
+          end
           deep_enhance! unless deep_enhanced?
           found = nil
           each do |node|
@@ -111,6 +102,36 @@ module Hipe
             end
           end
           found
+        end
+
+        # see above
+        def deep_find_first_node &block
+          deep_enhance! unless deep_enhanced?
+          found = nil
+          each do |node|
+            next unless node.kind_of?(Array) # catch errors
+            if yield node
+              found = node
+              break
+            elsif (found = node.deep_find_first_node(&block))
+              break
+            end
+          end
+          found
+        end
+
+        def deep_find_all &block
+          deep_enhance! unless deep_enhanced?
+          founds = []
+          each do |node|
+            next unless node.kind_of?(Array) # catch errors
+            if yield node
+              founds.push node
+            elsif (childs_found = node.deep_find_all(&block)).any?
+              founds.concat childs_found
+            end
+          end
+          founds
         end
 
         #
@@ -128,15 +149,78 @@ module Hipe
            nil
         end
 
-        #
-        # end interators and searchers
-        #
+        CodepathRe = RegexpExtra[
+          re = %r{ \A
+            ([a-z]+)         # the symbol name
+            (?::             # we dont want the colon
+              (              # optionally a value like a class name
+                (?: [^/\\] | \\/ )+ # the only escape sequence is fwd slash
+              )
+            )?
+            / ?              # eat any trailing separator slash
+          }x
+        ]
 
+        def codepath path
+          orig_path = path.dup
+          symbol, value, value_index = codepath_parse path
+          if path.empty?
+            node = deep_find_first_node do |node|
+              node[0] == symbol && (
+                value_index.nil? ||
+                node[value_index] == value
+              )
+            end
+            return node
+          else
+            all = codepath_all(orig_path)
+            case all.size
+            when 0; nil
+            when 1: all.first
+            else fail("matched too many with #{path} - use codepath_all")
+            end
+          end
+        end
 
+        def codepath_all path
+          symbol, value, value_index = codepath_parse path
+          founds = deep_find_all do |node|
+            node[0] == symbol &&  (
+              value_index.nil? ||
+              node[value_index] == value
+            )
+          end
+          if path.empty?
+            founds
+          else
+            next_founds = []
+            founds.each do |node|
+              child_path = path.dup
+              next_founds.concat node.codepath_all(child_path)
+            end
+            next_founds
+          end
+        end
 
-        #
-        # parent-related methods
-        #
+        def codepath_parse path
+          caps = CodepathRe.parse!(path) or
+            fail("invalid codepath: #{path.inspect}")
+          symbol = caps[0].to_sym
+          meta = Symbols[symbol] or
+            fail("unrecognized symbol: #{symbol.inspect}")
+          value_index = value = nil
+          if caps[1]
+            if :str == symbol
+              value = caps[1].gsub('\\/','/').gsub('\\\\','\\')
+              value_index = 1
+            else
+              true != meta && (value_index = meta[:value_index]) or
+                fail("no value_index defined for #{symbol.inspect}")
+              value = caps[1].intern
+            end
+          end
+          [symbol, value, value_index]
+        end
 
         def parent= parent
           fail("sexp node already has parent") if respond_to? :parent
@@ -146,7 +230,7 @@ module Hipe
           meta.send(:define_method, :parent){Nodes[parent_id]}
           nil
         end
-        def nil_parent!
+        def nillify_parent!
           fail("Can't nil-out parent when parent does not exist") unless
             has_parent?
           meta.send(:define_method, :parent_id){nil}
@@ -165,9 +249,7 @@ module Hipe
           end
         end
 
-        #
         # barf on child not found
-        #
         def index_of_child child
           found = nil
           node_id = child.node_id
@@ -195,15 +277,19 @@ module Hipe
           nil
         end
 
-        #
-        # end parent methods
-        #
-        #
+        def destroy!
+          remove
+          Nodes[node_id] = :removed
+        end
 
-
-        #
-        # enhancements
-        #
+        def remove
+          fail("can't remove if doesn't have parent") unless has_parent?
+          idx = parent.index_of_child(self)
+          fail("huh?") unless idx
+          parent[idx,1] = nil
+          nillify_parent!
+          self
+        end
 
         def register!
           if respond_to?(:node_id)
@@ -213,22 +299,20 @@ module Hipe
           def! :node_id, node_id
         end
 
-        #
-        # @todo this will break on some node types
-        #
+        # @fixme all nodetypes
         def enhance_sexp_node!
           return unless any?
-          case self[0]
-          when :module; ModuleySexp[self]
-          when :scope;  ScopeySexp[self]
-          when :block;  BlockeySexp[self]
-          when :class;  ClassySexp[self]
-          when :call, :arglist, :colon2, :const, :lit, :hash,
-               :lasgn, :str, :if, :lvar, :defs, :self, :args, :iter
+          symbol = self[0]
+          meta = Symbols[symbol]
+          resp = nil
+          if meta
+            if meta.kind_of?(Hash) && klass=meta[:module]
+              meta[:module].send(:[], self) # enhance self with module
+            end
           else
-            puts "\n\n\n#{self[0].inspect}\n\n\n"
-            debugger
-            fail("implement for #{self[0]}")
+            puts("add thing for #{symbol.inspect} "<< cute_stack(caller[0]) <<
+            " but actually at #{File.basename(__FILE__)}:#{__LINE__}")
+            exit # don't hate
           end
         end
 
@@ -259,12 +343,6 @@ module Hipe
           @deep_enhanced = true
           mine
         end
-
-        #
-        # end enhancements
-        #
-
-
       end
     end
   end

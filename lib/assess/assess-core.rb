@@ -1,6 +1,6 @@
 module Hipe
   module Assess
-    RootDir = File.expand_path('../../', __FILE__)
+    RootDir = File.expand_path('../../..', __FILE__)
     class UserFail < RuntimeError; end
     class AppFail  < RuntimeError; end
 
@@ -37,10 +37,6 @@ module Hipe
       ClassBasenameRe = /([^:]+)$/
       def class_basename kls
         ClassBasenameRe.match(kls.to_s)[1]
-      end
-
-      def writable_temp!
-        CodeBuilder.writable_directory!(File.join(RootDir, '/writable-temp'))
       end
 
     end

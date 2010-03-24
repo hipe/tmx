@@ -21,7 +21,7 @@ module Hipe
           do_before_counts
           main_model = orm.abstract_model_interface.main_model
           data.each do |hash|
-            res = get_or_create_from_hash(main_model, nil, hash)
+            res = create_or_get_from_hash(main_model, nil, hash)
             res.save if res.id.nil?
           end
           summary = do_after_counts(ui)
@@ -31,22 +31,22 @@ module Hipe
 
       private
 
-        def get_or_create_from_mixed(model, key, value)
+        def create_or_get_from_mixed(model, key, value)
           mixed_response = nil
           case my_get_type(value)
             when :scalar
-              mixed_response = get_or_create_from_scalar(model, key, value)
+              mixed_response = create_or_get_from_scalar(model, key, value)
             when :array
-              mixed_response = get_or_create_from_array(model, key, value)
+              mixed_response = create_or_get_from_array(model, key, value)
             when :hash
-              mixed_response = get_or_create_from_hash(model, key, value)
+              mixed_response = create_or_get_from_hash(model, key, value)
             else; fail("no way #{my_get_type(value)}")
           end
           fail("no way, never") unless mixed_response
           mixed_response
         end
 
-        def get_or_create_from_scalar(model, key, value)
+        def create_or_get_from_scalar(model, key, value)
           if (! model.properties.named?(key))
             fail("can't get or create from scalar without "<<
             "a column name that is a model property name: #{key}")
@@ -62,21 +62,21 @@ module Hipe
         end
 
         # col name is ignored?
-        def get_or_create_from_array(model, col_name, arr)
+        def create_or_get_from_array(model, col_name, arr)
           list = Array.new(arr.size)
           arr.each_with_index do |mixed, idx|
-            res = get_or_create_from_mixed(model, false, mixed)
+            res = create_or_get_from_mixed(model, false, mixed)
             list[idx] = res
           end
           list
         end
 
-        def get_or_create_from_hash(model, col_name, hash)
+        def create_or_get_from_hash(model, col_name, hash)
           assert_type(:hash, hash, Hash)
           local_props_strs = model.local_properties
           strange_cols = hash.keys - local_props_strs
           local_values = HashExtra[hash].slice(*local_props_strs)
-          strange_values = get_or_create_strange_resultset(
+          strange_values = create_or_get_strange_resultset(
             model, strange_cols, hash)
           my_resource = nil
           matching_with_local = local_values.any? ?
@@ -158,12 +158,12 @@ module Hipe
           end
         end
 
-        def get_or_create_strange_resultset model, cols, hash
+        def create_or_get_strange_resultset model, cols, hash
           response = StrangeResultset.new
           cols.each do |col_name|
             strange_model, collection_name =
                model.guess_pair_for_column(col_name)
-            response[collection_name] = get_or_create_from_mixed(
+            response[collection_name] = create_or_get_from_mixed(
              strange_model, col_name, hash[col_name]
             )
           end

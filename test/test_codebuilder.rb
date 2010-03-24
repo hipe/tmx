@@ -7,7 +7,6 @@ require 'assess/code-builder'
 
 module Hipe
   module Assess
-    WritableDir = RootDir + '/test/writable-temp'
     class CodeBuilderTestCase < MiniTest::Unit::TestCase
       def test_build_basic_class
         cls = CodeBuilder.build_class('Foo::Bar', 'Foo::Bar::Baz') do |cls|

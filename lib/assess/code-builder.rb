@@ -1,5 +1,6 @@
 require 'ruby2ruby'
 require 'ruby_parser'
+require 'tmpdir'
 require 'assess'
 require 'assess/util/uber-alles-array'
 me = File.dirname(__FILE__) + '/code-builder'
@@ -27,6 +28,11 @@ module Hipe
         FileSexp.create_or_get_from_path(name)
       end
 
+      def create_or_get_folder path
+        require 'assess/code-builder/folder'
+        Folder.create_or_get path
+      end
+
       def file_sexp_from_path path
         FileSexp.get_from_path(path)
       end
@@ -39,9 +45,8 @@ module Hipe
         ClassSexp.build(name, extends, &block)
       end
 
-      def writable_directory! path
-        require 'assess/code-builder/folder'
-        dir_cache[path] ||= Folder.get_or_create(path)
+      def tmpdir
+        @tmpdir ||= Dir.mktmpdir('hipe-assess')
       end
 
       def to_sexp mixed
