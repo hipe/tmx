@@ -24,7 +24,7 @@ module Hipe
         return help if opts[:h]
         sin = input_from_stdin_or_filename(file) or return
         require 'assess/proto/json-schema-guess.rb'
-        JsonSchemaGuess.analyze sin, ui
+        JsonSchemaGuess.process_analyze_request sin, ui
       end
 
       o "#{app} schema protomodel [-s] ENTITY_NAME [JSON_FILE]"
@@ -40,7 +40,7 @@ module Hipe
         )
         sin = input_from_stdin_or_filename(file) or return
         require 'assess/proto/json-schema-guess.rb'
-        JsonSchemaGuess.protomodel sin, ui, entity_name
+        JsonSchemaGuess.process_protomodel_request sin, ui, entity_name
       end
 
       InvalidEntCharsRe = /[^_a-z0-9]/
@@ -82,20 +82,8 @@ module Hipe
         sexp = DataMapper.schema_builder.model_sexp_from_protomodel(
           proto, app_name
         )
-        # sexp = ridiculous_hook_hack(sexp)
         ui.puts sexp.to_ruby
       end
-
-      # def ridiculous_hook_hack(module_sexp)
-      #   ruby = ("hooks = File.dirname(__FILE__)+'/model-hooks.rb';"<<
-      #     "require(hooks) if File.exist?(hooks)"
-      #   )
-      #   block = CodeBuilder::BlockeySexp[CodeBuilder.parse(ruby)]
-      #   # ruby parser turns __FILE__ into "(string)"
-      #   block[1][2][1][3][1] = s(:const, :__FILE__)
-      #   block.push module_sexp
-      #   block
-      # end
 
       o "#{app} schema destroy"
       x ("Clobber your database and rebuild your schema from the model."<<

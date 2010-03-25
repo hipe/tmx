@@ -14,69 +14,6 @@ module Hipe
         self.new(*args)
       end
 
-      def pretty_print qq
-        qq.group(1, 's[', ']') do
-          qq.seplist(self) {|v| qq.pp v }
-        end
-      end
-
-      def jsonesque
-        JSON.pretty_generate(jsonable_struct)
-      end
-
-      def hash_like?
-        res = hash_entry_like? && size == 2 ||
-          (all_hash_entry_like? && unique_names?)
-        res
-      end
-
-      def hash_entry_like?
-        first.kind_of?(Symbol)
-      end
-
-      def all_hash_entry_like?
-        res = size == 1 ||
-        ! self[1..-1].detect{|x|!x.kind_of?(Sexpesque)||!x.hash_entry_like?}
-        res
-      end
-
-      def unique_names?
-        res = size == 1 || size == 2 ||
-        (self[1..-1].map(&:first).uniq.size == size - 1)
-        res
-      end
-
-      def jsonable_value
-        if size == 1
-          nil
-        elsif size == 2
-          (self[1].respond_to?(:jsonable_struct) ?
-            self[1].jsonable_struct : self[1])
-        elsif hash_like?
-          h = {} # we tried # @todo 1.9
-          self[1..-1].each do |x|
-            unless x.respond_to?(:first)
-              debugger; 'x'
-            end
-            h[x.first] = x.respond_to?(:jsonable_value) ?
-              x.jsonable_value : x.to_json
-          end
-          h
-        else
-          self[1..-1] # the pretty tree is broken below here
-        end
-      end
-
-      def jsonable_struct
-        if hash_like?
-          {first => jsonable_value}
-        else
-          debugger
-          self.hash_like?
-          self # pretty tree broken below this node
-        end
-      end
-
       def [](mixed)
         if mixed.kind_of?(Fixnum) || mixed.kind_of?(Range)
           super(mixed)
@@ -97,6 +34,109 @@ module Hipe
           end
           nil
         end
+      end
+
+      def jsonesque
+        JSON.pretty_generate(jsonesque_struct)
+      end
+
+      class << self
+        def hash_rhs mixed
+          if mixed.kind_of?(Sexpesque)
+            mixed.hash_rhs
+          else
+            debugger;'x'
+          end
+        end
+
+        def hash mixed
+          return false unless mixed.kind_of?(Sexpesque)
+          return false unless mixed.first_element_is_keylike?
+          mixed.hash
+        end
+
+        def jsonesque_struct mixed
+          mixed.respond_to?(:jsonesque_struct)? mixed.jsonesque_struct : mixed
+        end
+      end
+
+      def hash
+        fail("not first_element_is_keylike?") unless first_element_is_keylike?
+        first
+      end
+
+      def hash_rhs
+        if first_element_is_keylike?
+          if noninitial_children_have_unique_keys?
+            hash_for_these_ones(1..size-1)
+          elsif looks_like_a_hash_key_value_pair?
+            self.class.jsonesque_struct self[1]
+          else
+            debugger; 'i hate u'
+          end
+        else
+          debugger; 'what'
+        end
+      end
+
+      KeyLike = [String,Symbol]
+      def first_element_is_keylike?
+        KeyLike.include? first.class
+      end
+
+    private
+
+      def jsonesque_struct
+        if first_element_is_keylike? && noninitial_children_have_unique_keys?
+          hash_with_one_element_whose_value_is_hash
+        elsif all_children_have_unique_keys?
+          straight_up_hash
+        elsif all_children_have_keys?
+          squozen_hash
+        else
+          never
+        end
+      end
+
+      def looks_like_a_hash_key_value_pair?
+        first_element_is_keylike? && size == 2
+      end
+
+      def noninitial_children_have_unique_keys?
+        return true if size < 2
+        these_children_have_unique_keys?(1..size-1)
+      end
+
+      def all_children_have_unique_keys?
+        these_children_have_unique_keys?(0..size-1)
+      end
+
+      def all_children_have_keys?
+        any?{|v| false == self.class.hash(v) }
+      end
+
+      def these_children_have_unique_keys? range
+        keys = {}
+        key = nil
+        self[range].each do |mixed|
+          return false unless (key = self.class.hash(mixed))
+          return false if keys.has_key?(key)
+          keys[key] = true
+        end
+        true
+      end
+
+      def hash_with_one_element_whose_value_is_hash
+        hashtable = hash_for_these_ones(1..size-1)
+        {hash => hashtable}
+      end
+
+      def hash_for_these_ones range
+        h = {}
+        self[range].each do |mixed|
+          h[self.class.hash(mixed)] = self.class.hash_rhs(mixed)
+        end
+        h
       end
 
       def first_index name

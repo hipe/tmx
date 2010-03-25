@@ -28,6 +28,7 @@ module Hipe
         else
           summary.push app_info.controller.summary
         end
+        summary
       end
 
       def controller_merge *a

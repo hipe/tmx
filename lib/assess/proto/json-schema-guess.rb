@@ -1,20 +1,27 @@
 require 'json'
 require 'assess/proto/model'
+require 'assess/util/sexpesque'
 
 module Hipe
   module Assess
     module JsonSchemaGuess
       extend self
 
-      def analyze sin, sout
-        metrics = entity_metrics sin
-        sout.puts JSON.pretty_generate(metrics.guy_summary)
+      def process_analyze_request sin, sout
+        summary = analyze sin
+        sout.write summary.jsonesque
       end
 
-      def protomodel sin, sout, entity_name
+      def analyze sin
+        metrics = entity_metrics sin
+        summary = metrics.entity_summary
+        summary
+      end
+
+      def process_protomodel_request sin, sout, entity_name
         metrics = self.entity_metrics sin
         model = protomodel_from_metrics metrics, entity_name
-        model.jsonesque sout
+        sout.write model.jsonesque
         nil
       end
 
@@ -23,8 +30,8 @@ module Hipe
         structo = JSON.parse json_str
         metrics = EntityMetrics.new
         structo.each do |row|
-          row.each do |(k,v)|
-            metrics[k].eat v
+          row.each do |(field,value)|
+            metrics[field].eat value
           end
         end
         metrics
@@ -39,85 +46,18 @@ module Hipe
 
     private
 
+      def s; Sexpesque; end
+
       class FieldMetrics
-        attr_reader :name, :distinct,:type_guess, :many
+        attr_reader :name, :counts, :type_guess, :many
         alias_method :many?, :many
         def initialize name
           @name = name
-          @distinct = Hash.new{|h,k| h[k] = 0}
+          @counts = Hash.new{|h,k| h[k] = 0}
           @many = false
           @type_guess = nil
         end
 
-        def summary
-          x = {}
-          if distinct.size != 0
-            x.merge!(
-              :max_repeat_times => max_repeat,
-              :distinct => distinct.size,
-              :most_popular_summary => most_popular_summary,
-              :type_guess => @type_guess.nil? ? nil : @type_guess.to_sym
-            )
-          end
-          if many
-            x[:child] = many_guy.guy_summary
-          end
-          x
-        end
-        def distinct_flip
-          thing = []
-          distinct.each do |(k,v)|
-            thing.push [v, k]
-          end
-          thing.sort!{|a,b| b[0] <=> a[0] }
-          thing
-        end
-        MaxLineWidthSorta = 300
-        TruncateAmt = 70
-        MaxWhatever = 3
-        def truncate(str,len)
-          if str.length <= len
-            str
-          else
-            '..' + str[-1 * len .. -1]
-            # str[0..len-3] + '..'
-          end
-        end
-        def repeats
-          distinct_flip.select do |(count, value)|
-            count > 1
-          end
-        end
-        def non_empty_repeats
-          repeats.reject do |(count, value)|
-            value.empty?
-          end
-        end
-        def most_popular_summary
-          flip = distinct_flip
-          tots = 0
-          sub_flip = []
-          ct = 0
-          while(flip.any?)
-            str = truncate(flip.first[1],TruncateAmt)
-            ct += 1
-            break if str.length + tots > MaxLineWidthSorta
-            break if ct > MaxWhatever
-            poppers = flip.shift
-            poppers[1] = str
-            tots += str.length
-            sub_flip.push sprintf("%s=>'%s'",poppers[0],poppers[1])
-          end
-          sub_flip
-        end
-        def max_repeat
-          distinct.values.max
-        end
-        def many_guy
-          @many_guy ||= begin
-            EntityMetrics.new
-          end
-        end
         def eat value
           if value.kind_of?(Hash)
             @many = true
@@ -130,8 +70,119 @@ module Hipe
               eat v
             end
           else
-            @distinct[value] += 1
+            @counts[value] += 1
             deal_with_type value
+          end
+        end
+
+        def field_summary
+          resp = s[:field_summary]
+          if counts.any?
+            resp.push s[:nonblank_sample_size, nonblank_sample_size]
+            resp.push s[:percent_nonblank, "%%%02.2f" % [percent_nonblank]]
+            resp.push s[:width,
+              "%d distinct nonblank values" % [num_distinct_nonblank_values] ]
+            resp.push s[:height_factor,
+              ( "%%%02.2f of nonblank values are of values that repeat" %
+              [height_factor] )
+            ]
+            resp.push s[:num_distinct_repeated_nonblank_values,
+              num_distinct_repeated_nonblank_values
+            ]
+            resp.push s[:type_guess, type_guess.to_sym]
+            resp.push s[:most_popular_values, most_popular_summary_lines]
+          elsif ! many?
+            resp.push s[:nonblank_sample_size, 0]
+          end
+          if many?
+            resp.push s[:child, many_guy.entity_summary]
+          end
+          resp
+        end
+      private
+        def s; Sexpesque; end
+        Blank = /\A[[:space:]]*\Z/
+        def blanks_exist?
+          counts.keys.any?{|value| Blank =~ value}
+        end
+        def percent_nonblank
+          tots = 0
+          nonblanks = 0
+          counts.each do |(value, count)|
+            tots += count
+            nonblanks += count if Blank !~ value
+          end
+          resp = (tots == 0) ? :Nan : (nonblanks.to_f/tots.to_f * 100)
+          resp
+        end
+        # what percent of nonblank values are values that repeat?
+        def height_factor
+          tots = 0
+          these = 0
+          counts.each do |(value, count)|
+            next if Blank =~ value
+            tots += count
+            these += count if count > 1
+          end
+          resp = (tots == 0) ? :Nan : (these.to_f / tots.to_f * 100)
+          resp
+        end
+        def nonblank_sample_size
+          count = 0
+          counts.each do |(value, count2)|
+            next if Blank =~ value
+            count += count2
+          end
+          count
+        end
+        AGobletOfData = 300
+        DefaultTruncateAmt = 70
+        MaxTopRows = 3
+        def truncate(str,len=DefaultTruncateAmt)
+          if str.length <= len
+            str
+          else
+            '..' + str[-1 * len .. -1]
+            # str[0..len-3] + '..'
+          end
+        end
+        def num_distinct_nonblank_values
+          counts.keys.count{|value| Blank !~ value}
+        end
+        def num_distinct_repeated_nonblank_values
+          counts.map.count{|(v,c)| Blank !~ v && c > 1 }
+        end
+        def repeat_pairs
+          counts.select do |(value, count)|
+            count > 1
+          end
+        end
+        def nonblank_repeat_pairs
+          repeat_pairs.reject do |(value, count)|
+            Blank =~ value
+          end
+        end
+        def most_popular_summary_lines
+          sorted = counts.sort{|a,b| b[1] <=> a[1]}
+          top_lines = []
+          num_rows = 0
+          tot_str_len = 0
+          sorted.each do |(value, count)|
+            str = truncate(value)
+            tot_str_len += str.length
+            break if tot_str_len > AGobletOfData
+            top_lines.push sprintf("%s times => '%s'",count,str)
+            num_rows += 1
+            break if num_rows >= MaxTopRows
+          end
+          top_lines
+        end
+        def max_repeat
+          counts.values.max
+        end
+        def many_guy
+          @many_guy ||= begin
+            EntityMetrics.new
           end
         end
         def deal_with_type value
@@ -154,17 +205,25 @@ module Hipe
         end
       end
 
-      class EntityMetrics < Hash
+      class EntityMetrics
+        attr_reader :order
         def initialize
-          super{|h,k| h[k] = FieldMetrics.new(k) }
+          @hash = Hash.new{|h,k| h[k] = FieldMetrics.new(k) }
+          @order = []
         end
-        def guy_summary
-          Hash[ * self.to_enum.map{|k,v|
-            [ k,
-              v.summary
-            ]
-          }.flatten ]
+
+        def [](field)
+          @order.push(field) unless @hash.has_key?(field)
+          @hash[field]
         end
+
+        def entity_summary
+          s[:fields_summary, * @order.map{ |field|
+            s[field.intern, @hash[field].field_summary]
+          }]
+        end
+      private
+        def s; Sexpesque end
       end
 
       def new_single_column_prototable model, field, table_name
@@ -182,7 +241,8 @@ module Hipe
       end
 
       def new_prototable_or_column model, table, field
-        if field.non_empty_repeats.any? || field.many # this is the key
+         # this is the key
+        if field.height_factor > 0 || field.many
           if field.many?
             # this field is definately another table
             metrics = field.many_guy
