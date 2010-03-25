@@ -10,7 +10,7 @@ module Hipe
       #
       # This should only be constructed with the orm manager.
       #
-      # For now all it does is a ridiculously expensive hack to figure
+      # For now it does a ridiculously expensive hack to figure
       # out which module the modules exist in, when we don't know beforehand
       # what module it is.
       #
@@ -36,9 +36,38 @@ module Hipe
           nil
         end
 
+        def join_model_for mixed_model1, mixed_model2
+          model1 = deduce_model mixed_model1
+          model2 = deduce_model mixed_model2
+          hact = [model1.name_str, model2.name_str].sort.join('_').to_sym
+          if model[hact]
+            resp = model[hact]
+          else
+            fail("Can't deduce join model for #{model1} and #{model2}")
+          end
+          resp
+        end
+
       private
 
         attr_reader :app_info
+
+        def deduce_model mixed
+          case mixed
+          when ::DataMapper::Model
+            resp = mixed
+          when String
+            resp = model[mixed.intern]
+          when Symbol
+            resp = model[mixed]
+          else
+            resp = nil
+          end
+          if resp.nil?
+            fail("Can't deduce model from #{mixed.inspect}")
+          end
+          resp
+        end
 
         #
         # expensive and silly fun (see previous more strict version
@@ -78,6 +107,7 @@ module Hipe
         end
 
         def load_and_enhance_model_classes_from_module mod
+          maybe_hack_association_classes
           @model = {}
           mod.constants.each do |const|
             cls = mod.const_get(const)
@@ -89,6 +119,12 @@ module Hipe
           nil
         end
         # note ::DataMapper::Model.descendants.to_ary would give a superset of
+
+        def maybe_hack_association_classes
+          unless DmAssociationExtra.hacked?
+            DmAssociationExtra.hack!
+          end
+        end
 
         # know what you are doing if you remove deep_enhance! from here
         # know what you are doing if you use deep_enhance! anywhere else

@@ -1,6 +1,26 @@
 module Hipe
   module Assess
     module DataMapper
+      module DmAssociationExtra
+        include CommonInstanceMethods
+        extend self
+        @hacked = false
+        def hacked?; @hacked end
+        def hack!
+          return if hacked?
+          # creates shorrtype() => :dm_many_to_one, :dm_many_to_many
+          %w(ManyToOne ManyToMany).map do |n|
+            ::DataMapper::Associations.const_get(n)
+          end.each do |ass|
+            rel = ass.const_get('Relationship')
+            unless rel.respond_to?(:shorttype)
+              type = ('dm_'+underscore(class_basename(ass))).to_sym
+              class<<rel; self end.send(:define_method,:shorttype){type}
+            end
+          end
+          @hacked = true
+        end
+      end
 
       module DmResourceExtra
         include CommonInstanceMethods
@@ -20,11 +40,23 @@ module Hipe
           nil
         end
 
+        # depending on the relationship we are either adding to
+        # collection or non-destructively setting it
+        #
         def add_this_strange_resource mixed
           assert_type('mixed', mixed, ::DataMapper::Resource)
           name_sym = mixed.class.name_sym
-          coll = self.send(name_sym)
-          coll.push(mixed)
+          rel = relationships[name_sym]
+          case rel.class.shorttype
+          when :dm_many_to_one
+            unless self.send(name_sym).nil?
+              fail("won't set property when it already exists: #{name_sym}")
+            end
+            self.send("#{name_sym}=", mixed)
+          when :dm_many_to_many
+            collec = self.send(name_sym)
+            collec.push(mixed)
+          end
           nil
         end
 
@@ -37,8 +69,6 @@ module Hipe
       end
 
       module DmModelExtra
-        include CommonInstanceMethods
-
         #
         # The enhancements created here are for ad-hoc needs of
         # the orm-manager when doing data-merges and schema migrations,
@@ -47,11 +77,33 @@ module Hipe
         #
         # This module should only be referred to in one place.
         #
+        include CommonInstanceMethods
+        @initials_to_model = {}
+        @model_to_initials = {}
+        class << self
+          def [] obj
+            obj.extend self unless obj.kind_of? self
+            obj.init_dm_model_class_enhancement
+            obj
+          end
+          attr_accessor :initials_to_model, :model_to_initials
 
-        def self.[] obj
-          obj.extend self unless obj.kind_of? self
-          obj.init_dm_model_class_enhancement
-          obj
+        end
+
+        def initials
+          @initials ||= begin
+            attempt_base = class_basename(self).scan(/[A-Z]/).join.downcase
+            attempt = attempt_base
+            incr = 2
+            while thing = DmModelExtra.initials_to_model[attempt]
+              fail('huh?') if thing == self
+              attempt = "#{attempt}#{incr}"
+              incr += 1
+            end
+            DmModelExtra.initials_to_model[attempt] = self
+            DmModelExtra.model_to_initials[self] = attempt
+            attempt
+          end
         end
 
         def name_sym
@@ -74,11 +126,17 @@ module Hipe
         def guess_pair_for_column col_name
           @pair_guesses_for_column[col_name] ||= begin
             names = guess_relevant_relationship_names(col_name)
-            fail("need more logic if names > 2") if names.size > 2
-            fail("what happened? no relevant names found")  if names.size == 0
-            fail("probably ok but check this") if names.size == 1
-            foreign_table_name = names.first # hackerdom
-            foreign = foreign_model_for_relationship(names[0])
+            case names.size
+            when 0
+              fail("what happened? no relevant names found")
+            when 1
+              foreign_table_name = names.first
+            when 2
+              foreign_table_name = names.first # hackerdom
+            else
+              fail("need more logic if names > 2")
+            end
+            foreign = foreign_model_for_relationship(foreign_table_name)
             [foreign, foreign_table_name]
           end
         end
@@ -98,13 +156,15 @@ module Hipe
         end
 
         def foreign_model_for_relationship relationship
-          m2m = relationships[relationship]
-          unless m2m.kind_of?(
-            ::DataMapper::Associations::ManyToMany::Relationship
-          )
-            debugger; 'straight forward but work it out'
+          rel = relationships[relationship]
+          case rel.class.shorttype
+          when :dm_many_to_many
+            foreign = rel.via.parent_model
+          when :dm_many_to_one
+            foreign = rel.target_model
+          else
+            debugger; 'what is this strange new relationship?'
           end
-          foreign =  m2m.via.parent_model
           foreign
         end
 

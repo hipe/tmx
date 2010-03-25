@@ -8,13 +8,25 @@ module Hipe
         include OrmCommon::Util
         include OrmCommon::Counts
 
-        def initialize orm
-          def! :orm, orm
+        class << self
+          def process_merge_json_request orm, ui, sin, opts
+            new(orm).process_merge_json_request(ui, sin, opts)
+            nil
+          end
+          private :new
         end
 
-        def merge_json ui, sin, opts
+        def process_merge_json_request ui, sin, opts
           data = JSON.parse(sin.read)
-          merge_mixed_data ui, data, opts
+          ::DataMapper.repository do
+            merge_mixed_data ui, data, opts
+          end
+        end
+
+      private
+
+        def initialize orm
+          def! :orm, orm
         end
 
         def merge_mixed_data ui, data, opts
@@ -28,10 +40,7 @@ module Hipe
           ui.puts summary.jsonesque
         end
 
-
-      private
-
-        def create_or_get_from_mixed(model, key, value)
+        def create_or_get_from_mixed model, key, value
           mixed_response = nil
           case my_get_type(value)
             when :scalar
@@ -46,7 +55,7 @@ module Hipe
           mixed_response
         end
 
-        def create_or_get_from_scalar(model, key, value)
+        def create_or_get_from_scalar model, key, value
           if (! model.properties.named?(key))
             fail("can't get or create from scalar without "<<
             "a column name that is a model property name: #{key}")
@@ -62,7 +71,7 @@ module Hipe
         end
 
         # col name is ignored?
-        def create_or_get_from_array(model, col_name, arr)
+        def create_or_get_from_array model, col_name, arr
           list = Array.new(arr.size)
           arr.each_with_index do |mixed, idx|
             res = create_or_get_from_mixed(model, false, mixed)
@@ -71,40 +80,74 @@ module Hipe
           list
         end
 
-        def create_or_get_from_hash(model, col_name, hash)
+        def create_or_get_from_hash model, col_name, hash
+          res = nil
           assert_type(:hash, hash, Hash)
           local_props_strs = model.local_properties
           strange_cols = hash.keys - local_props_strs
-          local_values = HashExtra[hash].slice(*local_props_strs)
-          strange_values = create_or_get_strange_resultset(
-            model, strange_cols, hash)
-          my_resource = nil
-          matching_with_local = local_values.any? ?
-            model.all(local_values) : nil
-          matching_with_local_ids = matching_with_local ?
-            matching_with_local.map{|x| x.id} : nil
-          if strange_values.any_new_resources?
-            increment_created(model)
-            my_resource = DmResourceExtra[model.new(local_values)]
-            my_resource.add_this_strange_data(strange_values)
-          else
-            if strange_values.any?
-              matching = resources_from_strange_hash(model, strange_values)
-              if matching_with_local
-                matching.reject{|x| ! matching_with_local_ids.include?(x.id) }
-              end
-              if ! matching.any?
-                debugger; 'x'
-              end
-              my_resource = matching.first
+          local_h = HashExtra[hash].slice(*local_props_strs)
+          strange_h_query = hash.slice(*strange_cols)
+          strange_h = create_or_get_strange_resultset(model, strange_h_query)
+          via_local = local_h.any? ? model.all(local_h) : nil
+          if strange_h.any_new_resources?
+            res = new_from_local_and_strange(model, local_h, strange_h)
+          elsif strange_h.any?
+            via_strange = resources_from_strange_hash(model, strange_h)
+            if via_local
+              these = HashExtra[Hash[*(via_local.map{|x|[x.id, x]}).flatten]]
+              both = via_local.map(&:id) & via_strange.map(&:id)
+              found = these.slice(*both).
+                map.sort{|a,b| a[0]<=>b[0]}.map{|x|x[1]}
             else
-              debugger; 'x'
+              found = via_strange.dup
             end
+            if found.any?
+              res = found.first # yeah i know
+            else
+              res = new_from_local_and_strange(model, local_h, strange_h)
+            end
+          else
+            debugger;
+            'this algorithm apparently hinges on having something strange'
+            'but no problem u can just build it from local values, right?'
           end
-          if (! my_resource)
+          if (! res)
             debugger; 'x'
           end
-          my_resource
+          res
+        end
+
+        def new_from_local_and_strange model, local_h, strange_h
+          # @todo almost certainly not necessary but why not
+          assert_strange_is_resources_deepesque strange_h
+          increment_created(model)
+          res = DmResourceExtra[model.new(local_h)]
+          res.add_this_strange_data(strange_h)
+          res
+        end
+
+        def assert_strange_is_resources_deepesque strange_h
+          no = []
+          strange_h.each do |(col, mixed)|
+            case mixed
+            when ::DataMapper::Resource # ok
+            when Array
+              mixed.each_with_index do |val, idx|
+                case val
+                when ::DataMapper::Resource #ok
+                else no.push "#{col}[#{idx}]"
+                end
+              end
+            else
+              no.push col
+            end
+          end
+          if no.any?
+            debugger
+            fail("the following structpaths were neither DM resources "<<
+            "nor arrays thereof:"<<oxford_comma(no))
+          end
+          nil
         end
 
         def arrayify mixed
@@ -116,27 +159,110 @@ module Hipe
           end
         end
 
+        def resources_from_strange_hash model, strange_hash
+          uber = map_field_names_to_relationship_shorttypes(
+            model, strange_hash)
+          case uber.uber_relationship
+          when :all_many_to_one
+            resp = strange_all_many_to_one(model, strange_hash)
+          when :all_many_to_many
+            resp = strange_all_many_to_many(model, strange_hash)
+          when :mixed_relationship_crap
+            resp = strange_mixed_relationship_crap(model, strange_hash, uber)
+          else
+            fail('implement this')
+          end
+          resp
+        end
+
+        def strange_all_many_to_one model, strange_hash
+          collection = model.all(strange_hash)
+          resp = collection
+          resp
+        end
+
         # @todo ridiculous
-        def resources_from_strange_hash(model, strange_hash)
+        def strange_all_many_to_many model, strange_hash
           annoying_finds = {}
-          model_we_want = model.name_sym
           strange_hash.each do |(col,mixed)|
-            arr = arrayify(mixed)
             annoying_finds[col] = []
-            arr.each do |res|
-              assert_type('mixed',res,::DataMapper::Resource)
-              join_name =
-                [res.model.name_str, model.name_str].sort.join('_').to_sym
-              join_model = orm.models[join_name]
-              founds = join_model.all(res.class.name_sym => mixed)
-              annoying_finds[col].concat(
-                founds.map{|x| x.send(model_we_want).id}
-              )
+            if mixed.kind_of?(Array) && 0 == mixed.size
+              # special case (?) query the target table for all rows that
+              # have 0 associated rows. this is bad and wrong
+              join_model = orm.join_model_for(model, col)
+              sql = <<-SQL
+                select #{model.initials}.id
+                from #{model.name_str} #{model.initials}
+                left join #{join_model.name_str} #{join_model.initials}
+                on #{join_model.initials}.#{model.name_str}_id =
+                  #{model.initials}.id
+                where #{join_model.initials}.id is null
+              SQL
+              ids = repository(:default).adapter.select(sql)
+              annoying_finds[col].concat ids
+            else
+              arr = arrayify(mixed)
+              arr.each do |res|
+                assert_type('mixed',res,::DataMapper::Resource)
+                join_model = orm.join_model_for(res.model, model)
+                founds = join_model.all(res.class.name_sym => mixed)
+                annoying_finds[col].concat(
+                  founds.map{|x| x.send(model.name_sym).id}
+                )
+              end
             end
           end
           ridiculous = annoying_finds.values.flatten.uniq
           resources = ridiculous.map{|id| model.get(id)}
           resources
+        end
+
+        def strange_mixed_relationship_crap model, strange_hash, pat
+          hate = pat.values - [:dm_many_to_many, :dm_many_to_one]
+          fail("no: "<<oxford_comma(hate)) if hate.any?
+          subhashes = Hash.new{|h,k| h[k] = Hash.new}
+          pat.each do |(field, reltype)|
+            subhashes[reltype][field] = strange_hash[field]
+          end
+          these = strange_all_many_to_many(model, subhashes[:dm_many_to_many])
+          thems = strange_all_many_to_one( model, subhashes[:dm_many_to_one])
+          these2 = Hash[*(these.map{|x|[x.id, x]}).flatten]
+          thems2 = Hash[*(thems.map{|x|[x.id, x]}).flatten]
+          common = these2.keys & thems2.keys
+          wow = HashExtra[these2].slice(*common).values
+        end
+
+        module UberRelationshipForStrangeMap
+          def uber_relationship
+            rel_pat_uniq = values.uniq
+            if rel_pat_uniq == [:dm_many_to_one]
+              :all_many_to_one
+            elsif rel_pat_uniq == [:dm_many_to_many]
+              :all_many_to_many
+            elsif rel_pat_uniq.size > 1
+              :mixed_relationship_crap
+            else
+              debugger; 'how many damn uber relationships do you need?'
+              fail('sigh')
+            end
+          end
+        end
+
+        def map_field_names_to_relationship_shorttypes model, strange_hash
+          these = strange_hash.keys        # strings
+          them = model.relationships.keys  # strings
+          if (missing = these - them).any?
+            fail("field names must correspond to relationship names."<<
+            "don't have relationships for: "<<oxford_comma(missing))
+          end
+          resp = {}
+          these.each do |rel_name_str|
+            rel = model.relationships[rel_name_str]
+            short = rel.class.shorttype
+            resp[rel_name_str] = short
+          end
+          resp.extend UberRelationshipForStrangeMap
+          resp
         end
 
         class StrangeResultset < Hash
@@ -158,13 +284,12 @@ module Hipe
           end
         end
 
-        def create_or_get_strange_resultset model, cols, hash
+        def create_or_get_strange_resultset model, strange_h
           response = StrangeResultset.new
-          cols.each do |col_name|
-            strange_model, collection_name =
-               model.guess_pair_for_column(col_name)
+          strange_h.each do |(col,val)|
+            model2, collection_name = model.guess_pair_for_column(col)
             response[collection_name] = create_or_get_from_mixed(
-             strange_model, col_name, hash[col_name]
+              model2, col, val
             )
           end
           response

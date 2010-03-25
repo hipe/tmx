@@ -321,7 +321,7 @@ module Hipe
         re = Regexp.new('\A'+Regexp.escape(cmd))
         found = cmds.grep(re)
         case found.size
-        when 0; return false
+        when 0; return :unresolved
         when 1
           sub = found.first
           sub_meth = meth ? "#{meth}_#{sub}" : sub
@@ -329,7 +329,7 @@ module Hipe
         else
           set_message(:ambig,("Did you mean "<<
             oxford_comma(found.map(&:inspect),' or ')<<'?'))
-          return false
+          return :unresolved
         end
       end
 
@@ -343,8 +343,13 @@ module Hipe
         sub_meth = "#{meth}_#{subcommand}"
         if subcommands.include?(subcommand)
           send(sub_meth, opts, *args)
-        elsif attempt_closest_match(subcommands, subcommand, meth, opts, args)
+        elsif (:unresolved !=
+          (resp =
+            attempt_closest_match(subcommands, subcommand, meth, opts, args)
+          )
+        )
           # it handled it
+          resp
         else
           my_name = "#{app} #{pretty(meth)}"
           if subcommand

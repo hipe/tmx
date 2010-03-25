@@ -39,11 +39,14 @@ module Hipe
         def models
           abstract_model_interface.model
         end
+        def join_model_for *a
+          abstract_model_interface.join_model_for(*a)
+        end
         def merge_json_data ui, sin, opts
           setup!(ui) unless setup?
           abstract_model_interface.main_model_name = opts.model_name
           require File.dirname(__FILE__)+'/drunken-merge.rb'
-          DrunkenMerge.new(self).merge_json ui, sin, opts
+          DrunkenMerge.process_merge_json_request self, ui, sin, opts
         end
         def db_check opts, *args
           Sexpesque[

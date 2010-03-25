@@ -8,6 +8,14 @@ module Hipe
   module Assess
     module Proto
 
+      module JsonesqueToSummary
+        def summary
+          jsonesque(str = StringIO.new)
+          str.seek(0)
+          str.read
+        end
+      end
+
       class Model
         extend UberAllesArray
         attr_reader :model_id, :tables
@@ -21,16 +29,22 @@ module Hipe
           @tables.push_with_key table, table.name
           table
         end
-        def jsonesque ui
-          ui.print '['
+        def jsonesque
+          jsonesque_write_to(str = StringIO.new)
+          str.seek(0)
+          str.read
+        end
+        def jsonesque_write_to out
+          out.print '['
           last = @tables.size - 1
           @tables.each_with_index do |table, idx|
-            table.jsonesque(ui)
-            ui.print(",\n") unless idx==last
+            table.jsonesque_write_to(out)
+            out.print(",\n") unless idx==last
           end
-          ui.puts ']'
+          out.puts ']'
           nil
         end
+        include JsonesqueToSummary
       end
 
       class Table
@@ -66,19 +80,26 @@ module Hipe
             Association.all[id]
           end
         end
-        def jsonesque ui
+        def jsonesque
+          jsonesque_write_to(str = StringIO.new)
+          str.seek(0)
+          str.read
+        end
+        def jsonesque_write_to out
           str = "{\n  \"type\":\"table\",\n"
           str << "  \"name\":#{name.to_json},\n"
           assoc_to_json(str)
           columns_to_json(str)
           str << "\n}"
-          ui.print str
+          out.print str
           nil
         end
+        include JsonesqueToSummary
+
         def columns_to_json s
           ss = []
           @columns.each do |col|
-            col.jsonesque(sss='')
+            col.jsonesque_write_to(sss='')
             ss.push "#{col.name.to_json}:#{sss}"
           end
           s << ",\n  \"columns\":["
@@ -99,7 +120,7 @@ module Hipe
           ss = []
           collection = send(name)
           collection.each do |item|
-            item.jsonesque(sss='', self)
+            item.jsonesque_write_to(sss='', self)
             ss << sss
           end
           if ss.any?
@@ -122,14 +143,15 @@ module Hipe
           self.type = type
           @column_id = self.class.register(self)
         end
-        def jsonesque(buffer)
+        def jsonesque_write_to(io)
           fake = {:type => type}
-          buffer << fake.to_json
+          io << fake.to_json
         end
+        include JsonesqueToSummary
       end
 
       class Association
-        Types = [:many_to_many]
+        Types = [:many_to_many, :belongs_to, :has_many]
         attr_accessor :type, :association_id
         extend UberAllesArray
         def initialize type, left, right
@@ -149,9 +171,18 @@ module Hipe
         class << self
           def associate type, left_table, right_table
             assoc = Association.new(type, left_table, right_table)
-            left_table.add_association assoc
-            right_table.add_association assoc
-            assoc
+            case type
+            when :many_to_many
+              left_table.add_association assoc
+              right_table.add_association assoc
+            when :belongs_to
+              left_table.add_association assoc
+              assoc2 = Association.new(:has_many, right_table, left_table)
+              right_table.add_association assoc2
+            else
+              fail("no: #{type.inspect}")
+            end
+            nil
           end
         end
         def other_table this_table
@@ -161,15 +192,12 @@ module Hipe
           else fail("association not associated with table!?"); end
           other_table
         end
-        def jsonesque buffer, from_table
+        def jsonesque_write_to io, from_table
           to_table = other_table from_table
-          fake = {
-            :type => type.to_sym.to_json,
-            :table => to_table.name
-          }
-          buffer << fake.to_json
+          io << %{{"type":"#{type.to_sym}","table":"#{to_table.name}"}}
           nil
         end
+        include JsonesqueToSummary
       end
     end
   end

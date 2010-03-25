@@ -4,7 +4,6 @@ require 'assess/util/uber-alles-array.rb'
 module Hipe
   module Assess
     module DataMapper
-      module DmAssocs; end # populated after we include dm-core
 
       DmTypes = [ :Serial, :String, :DateTime, :Text ]
       ProtoTypesToNativeTypes = {

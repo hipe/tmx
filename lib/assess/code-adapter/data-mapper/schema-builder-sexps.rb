@@ -62,6 +62,12 @@ module Hipe
           def dm_add_association prototable, assoc
             case assoc.type
             when :many_to_many; dm_add_many_to_many(prototable, assoc)
+            when :belongs_to
+              foreign = assoc.other_table(prototable).name.to_sym
+              dm_add_belongs_to foreign
+            when :has_many
+              foreign = assoc.other_table(prototable).name.to_sym
+              dm_add_has_n foreign
             else fail("no: #{assoc.type}")
             end
             nil
