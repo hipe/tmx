@@ -15,14 +15,34 @@ module Hipe
           enhance opts, controller
           [ command, opts, argv ]
         end
+        def display_doc_proc ui, &block
+          opts = enhance({},nil).documenting!
+          block.call(opts)
+          opts.flush_documentation!(ui)
+        end
       private
         def enhance(opts, controller)
           opts.extend(self)
           opts.controller = controller
+          opts
         end
       end
 
-      attr_accessor :controller
+      attr_accessor :controller, :ui, :doc_matrix
+
+      def documenting!
+        self.doc_matrix = []
+        @documenting = true;
+        self
+      end
+
+      def documenting?; @documenting end
+
+      def flush_documentation! ui
+        dm = doc_matrix
+        w = dm.map{|x|x[0]}.compact.map(&:length).inject(0){|m,v| m>v ? m : v}
+        dm.each {|(left, right)| ui.puts("  %-#{w}s  %s" % [left, right] )}
+      end
 
       def valid? &block
         yield(self) if block_given?
@@ -36,6 +56,34 @@ module Hipe
         end
         is_valid
       end
+
+      def parse! str, make_method, *args
+        opts = args.last.kind_of?(Hash) ? args.pop : {}
+        if documenting?
+          doc_matrix.push [str, args.shift]
+          doc_matrix.concat args.map{|x| [nil, x]}
+          if opts.has_key?(:default)
+            doc_matrix.last[1] = [doc_matrix.last[1],
+            "(default: #{opts[:default].inspect})"].compact * ' '
+          end
+          nil
+        else
+          opt = parse_parse(str)
+          ok = true
+          if (found = (opt.names & keys)).any?
+            ok = process_found_switches(opt, found, make_method, opts)
+          elsif opts.has_key?(:default)
+            def! make_method, opts[:default]
+          else
+            def! make_method, nil
+          end
+          ok
+        end
+      end
+
+      alias_method :on, :parse!
+
+    private
 
       def bad_args_hack
         (keys - handled).map do |sym|
@@ -60,19 +108,6 @@ module Hipe
         else
           @handled
         end
-      end
-
-      def parse! str, make_method, opts={}
-        opt = self.parse_parse(str)
-        ok = true
-        if (found = (opt.names & keys)).any?
-          ok = process_found_switches(opt, found, make_method, opts)
-        elsif opts.has_key?(:default)
-          def! make_method, opts[:default]
-        else
-          def! make_method, nil
-        end
-        ok
       end
 
       def process_found_switches opt, found, make_method, opts
@@ -108,7 +143,6 @@ module Hipe
         end
         ok
       end
-
 
       def add_error msg
         @errors ||= []
