@@ -6,6 +6,43 @@ module Hipe
   module Assess
     module FrameworkCommon
       class WishyWashyPath
+        #
+        # The point of a wishy-washy path is to represent the relevant
+        # nodes in the filesystem in an abstract way so that the actual
+        # filepath isn't determined until runtime.
+        #
+        # These facilities are provided to this end:
+        # 1) paths can be represented as relative to other paths in
+        #    the usual way.
+        # 2) Depending on how it is constructed, a wishy-washy path can
+        #    indicate that it might represent a file or a folder, to
+        #    be determined at runtime. (use path.might_be_folder = true)
+        # 3) Depending on if the path.might_be_plural=true option is used,
+        #    the path can indicate that it may or may not have an 's' after it
+        # 4) with the might_have_extension='.rb' option, it indicates that
+        #    the actual path may or may not use the extension.
+        #
+        # So, something like this:
+        #
+        #   root_path = WishyWashyPath.new{|p| p.absolute_path = './app'} # sic
+        #   cont_path = WishyWashyPath.new do |p|
+        #     p.relative_to = root_path
+        #     p.relative_path = './controller'
+        #     p.might_be_plural = true
+        #     p.might_be_folder = true
+        #     p.might_have_extension = '.rb'
+        #   end
+        #
+        #  Now, if any of the following paths exist the path object when
+        #  'resolved' will find it (in some undefined order):
+        #
+        #  ./app/controller/
+        #  ./app/controller
+        #  ./app/controllers
+        #  ./app/controllers/
+        #  ./app/controller.rb
+        #  ./app/controllers.rb
+        #
         extend UberAllesArray, StrictAttrAccessors
         include CommonInstanceMethods
 
@@ -18,6 +55,7 @@ module Hipe
           @might_be_plural = false
           @might_be_folder = true
           @might_have_extension = nil
+          yield self if block_given?
           clear
         end
         def clear
