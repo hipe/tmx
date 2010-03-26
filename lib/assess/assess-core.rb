@@ -39,6 +39,10 @@ module Hipe
         ClassBasenameRe.match(kls.to_s)[1]
       end
 
+      def version
+        File.read(File.join(RootDir,'VERSION'))
+      end
+
     end
     @ui = UI.new $stdout
 

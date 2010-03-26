@@ -21,7 +21,7 @@ module Hipe
 
       x 'Prints the current version(s) and exits.'
       def version(options = {}, *args)
-        ui.puts "#{app} version #{Assess::Version}"
+        ui.puts "#{app} version #{Assess.version}"
 
         require 'assess/code-adapter/framework-common/app-info'
         app_info = FrameworkCommon::AppInfo.current
