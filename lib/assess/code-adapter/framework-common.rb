@@ -66,8 +66,10 @@ module Hipe
             "the safeword (\"#{SafeWord}\") in it in the right place: "<<
             " #{path}")
           end
-          if Dir[File.join(path,'/*')].any?
-            ui.puts("removing contents of exsiting tmpdir (#{me})")
+          if (filez = Dir[File.join(path,'/*')]).any?
+            these = truncate(oxford_comma(filez.map{|x|File.basename(x)}))
+            these[0,0] = "  \n" if these.length > 40
+            ui.puts("removing contents of exsiting tmpdir (#{me}): #{these}")
             FileUtils.remove_entry_secure(path)
             FileUtils.mkdir(path,:verbose => true)
           else

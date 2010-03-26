@@ -28,6 +28,10 @@ module Hipe
       def fileize mixed
         mixed.to_s.gsub('_','-')
       end
+      def truncate str, len=80, ellipsis='...'
+        return str unless str.kind_of?(String) && str.length > len
+        str[0..len-ellipsis.length] << ellipsis
+      end
       def assert_type param_name, thing, type
         unless thing.kind_of? type
           meth = method_name_from_call_stack_item caller[0]

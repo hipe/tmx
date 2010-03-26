@@ -1,4 +1,3 @@
-require 'ruby-debug'
 require 'assess/util/uber-alles-array' # associative array
 require 'assess/proto/type'
 require 'assess/util/strict-attr-accessors'

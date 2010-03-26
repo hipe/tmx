@@ -1,9 +1,4 @@
-require 'minitest/autorun'
-require 'ruby-debug'
 require File.expand_path('./support.rb',File.dirname(__FILE__))
-root = File.expand_path('../lib', File.dirname(__FILE__))
-$LOAD_PATH.unshift(root) unless $LOAD_PATH.include?(root)
-require 'assess'
 require 'assess/code-builder'
 
 module Hipe

@@ -98,6 +98,8 @@ module Hipe
           straight_up_hash
         elsif all_children_have_keys?
           squozen_hash
+        elsif first_element_is_keylike?
+          hash_with_one_element_whose_remainder_is_pruned_struct
         else
           never
         end
@@ -117,7 +119,7 @@ module Hipe
       end
 
       def all_children_have_keys?
-        any?{|v| false == self.class.hash(v) }
+        ! any?{|v| false == self.class.hash(v) }
       end
 
       def these_children_have_unique_keys? range
@@ -134,6 +136,27 @@ module Hipe
       def hash_with_one_element_whose_value_is_hash
         hashtable = hash_for_these_ones(1..size-1)
         {hash => hashtable}
+      end
+
+      def hash_with_one_element_whose_remainder_is_pruned_struct
+        resp = {hash => pruned_struct_for(1..size-1)}
+        resp
+      end
+
+      def pruned_struct_for range
+        them = self[range]
+        if them.size == 0
+          nil
+        elsif them.size == 1
+          them[0]
+        else
+          them
+        end
+      end
+
+      def squozen_hash
+        hashtable = hash_for_these_ones(0..size-1)
+        hashtable
       end
 
       def straight_up_hash
