@@ -16,7 +16,8 @@ module Hipe
           proto.tables.each do |prototable|
             dm_build_entity_class mod, prototable
           end
-          mod
+          file = add_requires(mod)
+          file
         end
 
         def dm_build_join_class class_name, left_table_name, right_table_name
@@ -28,6 +29,14 @@ module Hipe
         end
 
       private
+
+        def add_requires mod
+          block = CodeBuilder::BlockeySexp[s(:block)].deep_enhance!
+          block.insert_node_at(1, mod)
+          block.insert_code_at(1, 'require "dm-core"')
+          block.insert_code_at(2, 'require "dm-timestamps"')
+          block
+        end
 
         def dm_build_entity_class mod, prototable
           class_name = prototable.class_name_guess.to_sym

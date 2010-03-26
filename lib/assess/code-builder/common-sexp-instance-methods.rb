@@ -227,6 +227,16 @@ module Hipe
           [symbol, value, value_index]
         end
 
+        def insert_code_at idx, mixed
+          sexp = derive_sexp(mixed)
+          self.insert(idx, sexp)
+          sexp.parent = self
+          sexp
+        end
+
+          # careful this is a hacky shortcut
+        alias_method :insert_node_at, :insert_code_at
+
         def parent= parent
           fail("sexp node already has parent") if respond_to? :parent
           fail("parent must have node_id") unless parent.respond_to? :node_id
@@ -339,7 +349,7 @@ module Hipe
         attr_reader :deep_enhanced
         alias_method :deep_enhanced?, :deep_enhanced
 
-        def deep_enhance! parent=nil
+        def deep_enhance_with_count! parent=nil
           if instance_variable_defined?('@deep_enhanced')
             fail("check deep_enhanced? if you're not sure. "<<
               "we definately don't want to repeat this.")
@@ -358,10 +368,29 @@ module Hipe
             next unless node.kind_of?(Sexp)
             CommonSexpInstanceMethods[node]
             node.enhance_sexp_node!
-            mine += node.deep_enhance!(self)
+            mine += node.deep_enhance_with_count!(self)
           end
           @deep_enhanced = true
           mine
+        end
+
+        def deep_enhance! *a
+          deep_enhance_with_count!(*a)
+          self
+        end
+
+      private
+        def derive_sexp mixed
+          case mixed
+          when Sexp; return mixed
+          when String;
+            sexp = CodeBuilder.parse(mixed)
+            CommonSexpInstanceMethods[sexp]
+            sexp.enhance_sexp_node!
+            return sexp
+          else
+            fail("huh?")
+          end
         end
       end
     end

@@ -42,10 +42,11 @@ module Hipe
           class << self
             def all; Folder.all end
             def convert_to_sexp_and_call obj, meth, args
-              sexp = convert_filestub_to_sexp(obj)
+              sexp = derive_sexp_from_filestub(obj)
               sexp.send(meth,*args)
             end
-            def convert_filestub_to_sexp obj
+          private
+            def derive_sexp_from_filestub obj
               if obj.has_existing_sexp?
                 sexp = obj.existing_sexp
               else
@@ -69,7 +70,8 @@ module Hipe
           end
           def dir?; false; end
           def is_stub?; true end
-          SexpTriggers = [:replace_node, :codepath, :codepath_all]
+          SexpTriggers = [:replace_node, :codepath, :codepath_all,
+            :insert_code_at]
           SexpTriggers.each do |meth|
             define_method(meth) do |*a|
               self.class.convert_to_sexp_and_call(self,meth,a)
@@ -86,7 +88,8 @@ module Hipe
             @existing_sexp = mixed
           end
           def to_sexp
-            has_existing_sexp? ? existing_sexp : CodeBuilder::file_sexp_from_path(path)
+            has_existing_sexp? ? existing_sexp :
+              CodeBuilder::file_sexp_from_path(path)
           end
           def get_file_contents
             if ! File.exist?(path)
