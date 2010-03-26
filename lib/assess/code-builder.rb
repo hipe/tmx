@@ -46,7 +46,11 @@ module Hipe
       end
 
       def tmpdir
-        @tmpdir ||= Dir.mktmpdir('hipe-assess')
+        @tmpdir ||= new_tmpdir
+      end
+
+      def new_tmpdir
+        Dir.mktmpdir('hipe-assess')
       end
 
       def to_sexp mixed
@@ -63,10 +67,6 @@ module Hipe
           fail("Can't figure out how to get sexp from #{mixed.inspect}")
         end
       end
-
-      @dir_cache = {}
-    private
-      attr_reader :dir_cache
     end
   end
 end

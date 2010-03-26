@@ -22,6 +22,11 @@ module Hipe
         end
       end
 
+      # careful!
+      def has_key? mixed
+        first_index mixed
+      end
+
       def []=(key,mixed)
         if mixed.kind_of?(Fixnum)
           super(mixed)
@@ -30,7 +35,7 @@ module Hipe
             self[idx][2..-1] = nil
             self[idx][1] = mixed
           else
-            self.push self.class[key,*mixed]
+            self.push self.class[key,mixed]
           end
           nil
         end
@@ -71,8 +76,8 @@ module Hipe
             hash_for_these_ones(1..size-1)
           elsif looks_like_a_hash_key_value_pair?
             self.class.jsonesque_struct self[1]
-          else
-            debugger; 'i hate u'
+          else # we are probably a named array like s[:messages, 'foo','bar']
+            self[1..size-1]
           end
         else
           debugger; 'what'
@@ -129,6 +134,10 @@ module Hipe
       def hash_with_one_element_whose_value_is_hash
         hashtable = hash_for_these_ones(1..size-1)
         {hash => hashtable}
+      end
+
+      def straight_up_hash
+        hash_for_these_ones(0..size-1)
       end
 
       def hash_for_these_ones range

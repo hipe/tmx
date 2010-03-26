@@ -17,7 +17,7 @@ module Hipe
     protected
 
       o "#{app} schema analyze [JSON_FILE]"
-      x ('Show statistics and type guesses for each field in the data. '<<
+      x( 'Show statistics and type guesses for each field in the data. '<<
         ' (step 1)')
       x "This will inform the guesses it makes when guessing a schema."
       def schema_analyze opts, file=nil
@@ -28,7 +28,7 @@ module Hipe
       end
 
       o "#{app} schema protomodel [-s] ENTITY_NAME [JSON_FILE]"
-      x ("See the non-orm specific schema guess based on the input data."<<
+      x( "See the non-orm specific schema guess based on the input data."<<
         '(step 2)')
       x "It guesses table names from column names, but needs to know a name"
       x "  to use for the main table that holds this type of entity."
@@ -67,7 +67,7 @@ module Hipe
       end
 
       o "#{app} schema datamapper ENTITY_NAME APP_NAME [JSON_FILE]"
-      x ("Output to stdout the orm-specfic ruby code for the datamodel." <<
+      x( "Output to stdout the orm-specfic ruby code for the datamodel." <<
         " (step 3)")
       x "(in this case datamappper.)"
       def schema_datamapper opts, entity_name=nil, app_name=nil, file=nil
@@ -86,7 +86,7 @@ module Hipe
       end
 
       o "#{app} schema destroy"
-      x ("Clobber your database and rebuild your schema from the model."<<
+      x( "Clobber your database and rebuild your schema from the model."<<
         ' (step 4)')
       x "This requires that your datamodel exist (in files), of course."
       def schema_destroy opts, *a
@@ -96,7 +96,7 @@ module Hipe
       end
 
       # o "#{app} schema check"
-      x ("Check if db schema is a superset of the datamodel schema "<<
+      x( "Check if db schema is a superset of the datamodel schema "<<
         '(not implemented)')
       def schema_check *a
         ui.puts("Sorry, check is not yet implemented!")

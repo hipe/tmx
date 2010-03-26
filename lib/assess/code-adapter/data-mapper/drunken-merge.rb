@@ -213,7 +213,7 @@ module Hipe
             end
           end
           ridiculous = annoying_finds.values.flatten.uniq
-          resources = ridiculous.map{|id| model.get(id)}
+          resources = model.all(:id => ridiculous)
           resources
         end
 

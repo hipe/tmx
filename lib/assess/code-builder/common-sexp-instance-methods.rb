@@ -48,7 +48,7 @@ module Hipe
           sexp
         end
 
-        # this to us is just a pita we inheirited from Sexp
+        # small pita inheirited from Sexp
         def method_missing meth, *args
           raise NoMethodError.new("undefined method `#{meth}' for "<<
             "\"#{self}\":#{self.class}")
@@ -308,7 +308,7 @@ module Hipe
           self
         end
 
-        def registered?; @registered end
+        def registered?; instance_variable_defined?('@registered') end
 
         def register!
           if respond_to?(:node_id)
@@ -340,7 +340,7 @@ module Hipe
         alias_method :deep_enhanced?, :deep_enhanced
 
         def deep_enhance! parent=nil
-          if @deep_enhanced
+          if instance_variable_defined?('@deep_enhanced')
             fail("check deep_enhanced? if you're not sure. "<<
               "we definately don't want to repeat this.")
           end

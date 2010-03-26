@@ -6,16 +6,75 @@ require 'assess/code-adapter/framework-common/app-info'
 module Hipe
   module Assess
     module FrameworkCommon
+      extend CommonInstanceMethods
       class << self
         def dispatch_migrate ui, opts
-          AppInfo.current.orm_manager.migrate ui, opts
+          AppInfo.current.orm_manager.process_migrate_request ui, opts
         end
         def dispatch_merge_data ui, sin, opts
-          AppInfo.current.orm_manager.merge_json_data ui, sin, opts
+          AppInfo.current.orm_manager.process_merge_data_request ui, sin, opts
         end
         def dispatch_db_check opts, *args
           AppInfo.current.orm_manager.db_check opts, *args
         end
+
+        SafeWord = 'ok-to-erase'
+        SafeRe = Regexp.new(Regexp.escape(SafeWord)+'/[^/]+\Z')
+
+        # erase anything in any previous tmpdir with that name
+        # should write what it does to ui
+        def empty_tmpdir_for! name
+          aip = AppInfo.current.persistent
+          if path = aip.tmpdirs[name]
+            emtpy_tmpdir_from_persistent path, name
+          else
+            path = File.join(CodeBuilder.new_tmpdir,SafeWord,name)
+            make_tmpdir_from_nonexistant_path path, name
+            aip.tmpdirs[name] = path
+          end
+          path
+        end
+      private
+        def emtpy_tmpdir_from_persistent path, name
+          if File.exist?(path)
+            rm_contents_of_existing_tmpdir path, name
+          else
+            make_tmpdir_from_nonexistant_path path, name
+          end
+          path
+        end
+        def me
+          humanize(underscore(class_basename(self)))
+        end
+        def ui; Cmd.ui end
+        def ui_puts_once msg
+          @putted ||= {}
+          return if @putted[msg]
+          @putted[msg] = true
+          ui.puts(msg)
+        end
+        def make_tmpdir_from_nonexistant_path path, name
+          fail("huh?") if File.exist?(path)
+          ui.print("new #{name} tmpdir by #{me} - ")
+          FileUtils.mkdir_p(path, :verbose=>true)
+          nil
+        end
+        def rm_contents_of_existing_tmpdir path, name
+          fail('huh?') if ! File.directory?(path)
+          if SafeRe !~ path
+            fail("i'm not comfortable erasing this path, it doesn't have "<<
+            "the safeword (\"#{SafeWord}\") in it in the right place: "<<
+            " #{path}")
+          end
+          if Dir[File.join(path,'/*')].any?
+            ui.puts("removing contents of exsiting tmpdir (#{me})")
+            FileUtils.remove_entry_secure(path)
+            FileUtils.mkdir(path,:verbose => true)
+          else
+            ui_puts_once("tmpdir already empty (#{me}): #{path}")
+          end
+        end
+      public
         def tmpdir_for name
           @tmpdir_for ||= {}
           @tmpdir_for[name] ||= begin

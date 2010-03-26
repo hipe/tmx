@@ -254,7 +254,7 @@ module Hipe
         # this is the key
         hf = field.height_factor
         if :Nan==hf && !field.many?
-          debugger; 'wtf? step into this one'
+          debugger; puts('wtf? step into this one')
           field.height_factor
         end
         if field.many? || hf > 0

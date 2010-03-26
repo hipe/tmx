@@ -14,11 +14,11 @@ module Hipe
         boolean_attr_accessor :might_be_folder, :might_be_plural
         def initialize(name)
           @name_sym = name.to_sym
-          @relative_to_id = nil
           @path_id = self.class.register(self)
           @might_be_plural = false
           @might_be_folder = true
           @might_have_extension = nil
+          clear
         end
         def clear
           @relative_to_id = nil
@@ -67,7 +67,7 @@ module Hipe
           relative_path.gsub(SansRe,'')
         end
         def relative_path= str
-          if @abolute_path
+          if @absolute_path
             fail("won't relative path when absolute is set. clear first.")
           end
           unless @relative_to_id

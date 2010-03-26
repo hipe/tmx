@@ -30,7 +30,7 @@ module Hipe
           @app_info = app_info
         end
         private :initialize
-        def migrate ui, opts
+        def process_migrate_request ui, opts
           setup!(ui) unless setup?
           models.each do |(k,table)|
             table.auto_migrate!
@@ -42,7 +42,7 @@ module Hipe
         def join_model_for *a
           abstract_model_interface.join_model_for(*a)
         end
-        def merge_json_data ui, sin, opts
+        def process_merge_data_request ui, sin, opts
           setup!(ui) unless setup?
           abstract_model_interface.main_model_name = opts.model_name
           require File.dirname(__FILE__)+'/drunken-merge.rb'

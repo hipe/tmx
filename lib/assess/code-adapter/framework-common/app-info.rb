@@ -7,12 +7,7 @@ module Hipe
       class AppInfo
         include CommonInstanceMethods
 
-        module MyClassMethods
-          def new_with_defaults
-            info = new
-            info.init_with_defaults!
-            info
-          end
+        class << self
 
           # @todo
           def current
@@ -21,9 +16,15 @@ module Hipe
 
           def all; @all ||= [] end
 
-        end
-        extend MyClassMethods
+        private
 
+          def new_with_defaults
+            info = new
+            info.init_with_defaults!
+            info
+          end
+
+        end
 
         attr_reader :app_root, :model, :controller, :server_executable,
                     :active_db_path, :app_info_id, :persistent
@@ -52,9 +53,19 @@ module Hipe
           server_executable.relative_path = './start.rb'
           active_db_path.relative_to = app_root
           active_db_path.relative_path = './db'
-          @persistent = PersistentNode.create_or_get(
-            File.join(app_root.pretty_path,'.assess.json')
-          )
+          @persistent = begin
+            path = File.join(app_root.pretty_path,'.assess.json')
+            if PersistentNode.exist?(path)
+              p = PersistentNode.get(path)
+            else
+              p = PersistentNode.create(path)
+            end
+            p.def!(:tmpdirs) do
+              self["tmpdirs"] ||= {}
+              self["tmpdirs"][1] # this is suck
+            end
+            p
+          end
         end
 
         # @todo

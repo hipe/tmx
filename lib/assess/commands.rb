@@ -13,6 +13,7 @@ module Hipe
       extend self
       @help = {}
       @usage = {}
+      @next_help = @next_usage = @closest_match_enabled = @last_ui_pushed= nil
 
       def help(opts = {}, command = nil, *args)
         opts ||= {}
@@ -84,6 +85,56 @@ module Hipe
 
     private
 
+      def ui
+        @ui ||= begin
+          parent_module.ui
+        end
+      end
+
+      def ui= value
+        @ui = value
+      end
+
+      def ui_pop_read
+        fail("stack empty") unless ui_stack.any?
+        it = ui_pop
+        unless it.kind_of?(StringIO)
+          fail("we have no idea what we're doing")
+        end
+        it.seek(0)
+        it.read
+      end
+
+      def ui_push name=:test, value=StringIO.new
+        return if @last_ui_pushed == name
+        this_one = {:name=>name, :value=>value}
+        ui_stack.push this_one
+        @ui = value
+        nil
+      end
+
+      def ui_pop name=nil
+        if name
+          last_name = ui_stack.any? ? ui_stack.last[:name] : :empty_stack
+          if last_name != name
+            fail("not on top: #{name}. had #{last_name}")
+          end
+        end
+        whatever = ui_stack.pop
+        @ui = ui_stack.any? ? ui_stack.last[:value] : nil
+        whatever ? whatever[:value] : nil
+      end
+
+      def ui_stack
+        @ui_stack ||= begin
+          if @ui
+            [{:name=>:anonymous, :value=>@ui}]
+          else
+            []
+          end
+        end
+      end
+
       def this_command idx=1
         soft = caller_method_name(idx).gsub('_',' ')
         "#{app} #{soft}"
@@ -91,12 +142,6 @@ module Hipe
 
       def controller(env = nil)
         @controller ||= Controller.new(env)
-      end
-
-      def ui
-        @ui ||= begin
-          parent_module.ui
-        end
       end
 
       def app
@@ -191,7 +236,7 @@ module Hipe
         # chris does the below better somehow
         commands = public_instance_methods.reject do |method|
             method =~ /-/ ||
-            %w( help version invoke load_plugin ).include?(method)
+            %w( help version invoke load_plugin call ).include?(method)
         end
 
         show_help nil, sort_commands(commands)
@@ -335,7 +380,8 @@ module Hipe
 
       def subcommand_dispatch subcommands, opts, args
         meth = caller_method_name(1)
-        if ! args.any? && opts[:h]
+        # if ! args.any? && opts[:h]
+        if ! args.any?
           opts[:h] = false; # stop propagation ?
           return subcommand_help subcommands, opts, args, meth
         end
@@ -365,6 +411,14 @@ module Hipe
         end
       end
     end # Commands
+    module Cmd
+      extend self
+      %w(ui ui_push ui_pop_read).each do |meth|
+        define_method(meth) do |*args,&block|
+          Commands.send(meth,*args,&block)
+        end
+      end
+    end
   end # Assess
 end # Hipe
 

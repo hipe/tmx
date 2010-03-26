@@ -54,7 +54,7 @@ module Hipe
         end
 
       private
-        attr_reader :app_info
+        def app_info; @app_info end # avoid warnings
         def s; Sexpesque; end
       end
     end

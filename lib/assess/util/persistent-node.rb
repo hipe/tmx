@@ -4,25 +4,36 @@ module Hipe
   module Assess
     class PersistentNode < Sexpesque
       class << self
-        def create_or_get path
-          if File.exist? path
-            json = File.read(path)
-            struct = JSON.parse(json)
-            thing = new(*struct)
-            thing.init_persistent_node(path, true, json)
-            thing
-          else
-            thing = new()
-            thing.init_persistent_node(path, false)
-            thing
-          end
+        # block is called only when create, not get; and must exist
+        def exist? path
+          File.exist? path
+        end
+        def get path
+          fail("can't get if doesn't exist: #{path}") unless File.exist?(path)
+          json = File.read(path)
+          struct = JSON.parse(json)
+          thing = new(*struct)
+          thing.persistent_node_init(path, true, json)
+          thing
+        end
+        def create path
+          fail("can't create if exists: #{path}") if File.exist?(path)
+          thing = new()
+          thing.persistent_node_init(path, false)
+          thing
         end
       end
-      def init_persistent_node(path, existed, json=nil)
+      def persistent_node_init(path, existed, json=nil)
         @before_json = json || JSON.pretty_generate(self)
         @existed = existed
         @path = path
         Kernel.at_exit{ finalize }
+      end
+      def def! name, &block
+        fail("no") unless block
+        fail("no") if respond_to?(name)
+        class << self; self end.send(:define_method, name, &block)
+        nil
       end
     private
       def finalize
