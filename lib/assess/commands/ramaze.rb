@@ -42,18 +42,11 @@ module Hipe
       x "  This is the minimal ramaze app, to test if it works."
       x
       x "Options:"
-      x "  -d, --dry    dry run -- don't actually do anything."
-      x "  -i=STR       files are edited in-place always. The default is to "
-      x "               make a backup copy with a datestamp.  If you pass the"
-      x "               empty string as an argument, no backup will be made."
-      x "  -p, --prune  remove backup files that you have generated."
+      x FileBackupOptions
+
       def web_controller_hello opts, prune=nil
         return help if opts[:h]
-        return help unless opts.valid? do
-          opts.parse!('-i=STR',     :backup_extension)
-          opts.parse!('-d, --dry',  :dry_run?)
-          opts.parse!('-p, --prune',:prune?)
-        end
+        return help unless opts.valid?(&FileBackupOptions)
         Ramaze.hello_world ui, opts
       end
 
@@ -63,7 +56,6 @@ module Hipe
       x
       x "Options:"
       x "  -d, --dry    dry run -- don't actually do anything"
-      x "                 (this will still use writable-temp)"
       x "  -p, --prune  delete all the files that exist and"
       x "                 are identical to what would have been "
       x "                 (was) generated."

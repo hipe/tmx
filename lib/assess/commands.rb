@@ -2,6 +2,9 @@
 # this is based entirely off of chris wanstrath's rip
 #
 require 'json' # only for rescu_e
+me = File.expand_path('../command-support/',__FILE__)
+require me + '/opt-parse-lite.rb'
+require me + '/common-option-sets.rb'
 
 module Hipe
   module Assess
@@ -13,6 +16,7 @@ module Hipe
       extend self
       @help = {}
       @usage = {}
+      @doc_proc = {}
       @next_help = @next_usage = @closest_match_enabled = @last_ui_pushed= nil
 
       def help(opts = {}, command = nil, *args)
@@ -32,7 +36,13 @@ module Hipe
           )
           if @help[command]
             ui.puts
-            ui.puts(*@help[command])
+            @help[command].each do |mixed|
+              if mixed.kind_of?(Proc)
+                OptParseLite.display_doc_proc(ui, &mixed)
+              else
+                ui.puts(mixed)
+              end
+            end
           end
         else
           show_general_help
@@ -55,8 +65,7 @@ module Hipe
           send(use_command, opts, *args)
         rescue UserFail,
           Errno::ENOENT,
-          UserFail,
-          # ArgumentError,
+          # ArgumentError,  # @todo restore once we get %95 coverage
           JSON::ParserError => e
           if opts[:error]
             raise e
@@ -66,15 +75,16 @@ module Hipe
               say_command = trace_row_method_name(e.backtrace[0])
             end
             bn = Assess.class_basename(e.class)
-            ui.puts "#{app}: #{say_command} failed (#{bn})"
+            ui.puts "#{app}: #{say_command} failed (#{bn}):"
             ui.puts "#{e.message}"
-            return help(nil, command)
+            return help(nil, command) unless
+              e.respond_to?(:show_help?) && ! e.show_help?
           end
         end
       end
 
       def load_plugin(file)
-        # @todo
+        # @todo restore
         #begin
           require file
         # rescue Exception => e

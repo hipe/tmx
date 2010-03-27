@@ -41,11 +41,11 @@ module Hipe
       def flush_documentation! ui
         dm = doc_matrix
         w = dm.map{|x|x[0]}.compact.map(&:length).inject(0){|m,v| m>v ? m : v}
-        dm.each {|(left, right)| ui.puts("  %-#{w}s  %s" % [left, right] )}
+        dm.each{|(l,r,x)| ui.puts(x ? x : ("  %-#{w}s  %s" % [l,r] )) }
       end
 
       def valid? &block
-        yield(self) if block_given?
+        yield self if block_given?
         is_valid = (@errors.nil? || !@errors.any?)
         if (bads = bad_args_hack).any?
           is_valid = false
@@ -55,6 +55,11 @@ module Hipe
             oxford_comma(bads.map(&:inspect)))
         end
         is_valid
+      end
+
+      def x str = ''
+        return unless documenting?
+        doc_matrix.push([nil,nil,str])
       end
 
       def parse! str, make_method, *args
@@ -74,9 +79,14 @@ module Hipe
             ok = process_found_switches(opt, found, make_method, opts)
           elsif opts.has_key?(:default)
             def! make_method, opts[:default]
+            self[make_method] = opts[:default]
+            handled make_method
           else
             def! make_method, nil
+            self[make_method] = nil
+            handled make_method
           end
+          yield() if block_given? && ok
           ok
         end
       end
@@ -111,11 +121,12 @@ module Hipe
       end
 
       def process_found_switches opt, found, make_method, opts
+        fail('no') unless found.any?
         ok = true
         handled(*found)
         if found.size > 1
           add_error("Can't handle multiple arguments for #{opt.name}")
-          ok =false
+          ok = false
         else
           used_name = found.first
           value = self[used_name]
@@ -203,4 +214,3 @@ module Hipe
     end
   end
 end
-
