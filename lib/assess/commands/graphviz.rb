@@ -15,27 +15,48 @@ module Hipe
       x '                     location (recommended - make the borg' <<
                               ' stronger).'
       x
-      x 'Debugging Commands (as options):'
       x( GraphVizOpts = lambda{|o|
 
+          TestedFormatTypes = %w(png)
+
+          o.x 'Assess Options:'
+
+          o.x FileBackupOptions
+
+          o.on('--[no-]bt',:many_to_one?,
+            'skip belongs to (covered by has many)',
+            :default => false
+          )
+
+          # o.on('--[no-]join', :joins?,
+          #   'for what appear to be join tables, whether',
+          #   'or not to show them individually', :default => false)
+
+          o.x
+          o.x 'Debugging Commands (as options):'
           o.on('-s, --struct',  :struct?,
             'just show the generated ruby datastructures',
             'and exit (just for debugging)')
           o.on('-j, --json', :json?, 'as above but json')
           o.on('-t, --dot',  :dot?,  'as above but dotfile')
           o.on('-c, --cmd',  :cmd?,
-                        'as above but show the generated dot command.')
+                        'as above but show the generated dot command')
 
           o.x
-          o.x 'Output Image Options:'
+          o.x 'GraphViz (dot) Options:'
+          o.on('-v',:verbose?, 'Enable verbose mode')
           o.on('-T=EXT', :fmt,
                 'a tested subset of output formats supported by GraphViz',
                 :default => 'png'
           ) do
-            if 'png' != o.fmt
-              flail("only 'png' format is supported for now "<<
-              " not #{o.fmt.inspect}.\nIt might work but we "<<
-              "just need to need to write test for new formats.\n"
+            if ! TestedFormatTypes.include?(o.fmt)
+              is, the, s = TestedFormatTypes.size == 1 ?
+                ['is','The only currently s', ''] : ['are', 'S', 's']
+              flail(
+              "#{o.fmt.inspect} is an unknown or untested format type."<<
+              "\nIt might work but we need to write tests for new formats."<<
+              "\n#{the}upported format type#{s} #{is}: "<<
+               Common.oxford_comma(TestedFormatTypes)
               ){ no_help!.here! }
             end
           end
@@ -49,42 +70,48 @@ module Hipe
               name
             end
           )
-          o.x FileBackupOptions
 
-          o.on('--[no-]bt',:many_to_one?,
-            'skip belongs to (covered by has many)',
-            :default => false
-          )
+          Beige = '#ffeecc'
+          LtBlu = "#58faf4"
+          Perri = "#58ACFA"
+          Violt = "#AC58FA"
+          Darck = "#1C1C1C"
+          Feint = "#999999"
+          Neutr = "#696969"
+          Grrey = "#444444"
+          Slate = "#045FB4"
+          # old font color "#775500"
+          # old color '#ddaa66'
 
-          # o.on('--[no-]join', :joins?,
-          #   'for what appear to be join tables, whether',
-          #   'or not to show them individually', :default => false)
           o.x
-
-          o.x 'GraphViz Options:'
-          o.on('-v',:verbose?, 'Enable verbose mode')
+          o.x 'ruby-graphviz Options:'
           o.x
+          o.on('--rankdir',         :g_rankdir   ,:default=>'LR')
           o.x '  Global Node Options:'
-          o.on('--color=ARG',       :n_color     ,:default => '#ddaa66')
           o.on('--style=ARG',       :n_style     ,:default => 'filled')
           o.on('--shape=ARG',       :n_shape     ,:default => "box" )
           o.on('--penwidth=ARG',    :n_penwidth  ,:default => "1" )
           o.on('--fontname=ARG',    :n_fontname  ,:default => "Trebuchet MS")
           o.on('--fontsize=ARG',    :n_fontsize  ,:default => "8" )
-          o.on('--fillcolor=ARG',   :n_fillcolor ,:default => "#ffeecc" )
-          o.on('--fontcolor=ARG',   :n_fontcolor ,:default => "#775500" )
-          o.on('--margin=ARG',      :n_margin    ,:default => "0.0" )
+          o.on('--margin=ARG',      :n_margin    ,:default => "0.25" )
+          o.on('--color=ARG',       :n_color     ,:default => Grrey)
+          o.on('--fillcolor=ARG',   :n_fillcolor ,:default => Perri )
+          o.on('--fontcolor=ARG',   :n_fontcolor ,:default => Darck )
+
           o.x
           o.x '  Global Edge Options:'
-          o.on('--e-color=ARG',     :e_color      ,:default => "#999999" )
+          o.on('--e-color=ARG',     :e_color      ,:default => Feint)
           o.on('--e-weight=ARG',    :e_weight     ,:default => "1" )
           o.on('--e-fontsize=ARG',  :e_fontsize   ,:default => "6" )
-          o.on('--e-fontcolor=ARG', :e_fontcolor  ,:default => "#444444" )
+          o.on('--e-fontcolor=ARG', :e_fontcolor  ,:default => Grrey)
           o.on('--e-fontname=ARG',  :e_fontname   ,:default => "Verdana" )
           o.on('--e-dir=ARG',       :e_dir        ,:default => "forward" )
-          o.on('--e-arrowsize=ARG', :e_arrowsize  ,:default => "0.5" )
-          o.on('--otm-color=ARG',   :otm_color    ,:default => "red")
-          o.on('--oto-color=ARG',   :oto_color    ,:default => "blue")
+          o.on('--e-arrowsize=ARG', :e_arrowsize  ,:default => "0.7" )
+          o.on('--mtm-color=ARG',   :mtm_color    ,:default => Slate)
+          o.on('--mto-color=ARG',   :mto_color    ,:default => "pink")
+          o.on('--otm-color=ARG',   :otm_color    ,:default => Neutr )
+          o.on('--oto-color=ARG',   :oto_color    ,:default => "red")
+
         })
 
       def graphviz opts, model_file=nil

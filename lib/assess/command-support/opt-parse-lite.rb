@@ -170,7 +170,7 @@ module Hipe
               "(#{value.inspect})")
               ok = false
             else
-              getter_unless_defined make_method, used_name
+              getter_unless_defined used_name, make_method
             end
           end
         end

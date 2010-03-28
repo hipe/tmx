@@ -9,7 +9,6 @@ module Hipe::Assess
     include Open2Str
     def generate out, opts, graph
       gv = GraphViz.new(:your_awesome_datamodel, :type=>:digraph)
-      gv[:rankdir] = "LR" # no idea
       alter_gv_with_opts(gv, opts)
       models gv, graph
       edges gv, graph, opts
@@ -26,12 +25,12 @@ module Hipe::Assess
   private
     def models gv, graph
       graph.models.each do |m|
-        label_rows = ["= #{m.name} ="]
+        label_rows = [humanize(m.name)]
         m.properties.each do |p|
           next if p.name == 'id'
           label_rows << "#{p.name} : #{p.type}"
         end
-        label = ('{ '<< (label_rows*' | ') <<'  }')
+        label = (label_rows*' | ')
         node = gv.add_node(m.name)
         node.shape = 'record'
         node.label = label
@@ -52,21 +51,22 @@ module Hipe::Assess
           when :one_to_one
             e = gv.add_edge(node, to_node)
             e.color = opts.oto_color
-            e.label = " has_one"
+            e.label = "has one"
           when :one_to_many
             e = gv.add_edge(node, to_node)
             e.color = opts.otm_color
-            e.label = " has_many"
+            e.label = "has many"
           when :many_to_one
             if opts.many_to_one?
               e = gv.add_edge(node, to_node)
-              e.color = opts.e_color
-              e.label = " belongs_to"
+              e.color = opts.mto_color
+              e.label = "belongs to"
             end
           when :many_to_many
             e = gv.add_edge(node, to_node)
-            e.color = opts.e_color
-            e.label = " many_to_many"
+            e.dir = 'both'
+            e.color = opts.mtm_color
+            e.label = "many to many"
           else
             flail("Sorry, we still need to implement this type: "<<
               "#{rel.type.inspect}"){ no_help!.here! }
@@ -151,10 +151,15 @@ module Hipe::Assess
     end
     def alter_gv_with_opts gv, opts
       ks = opts.keys - [:joins?, :struct?]
-      re = /\A(?:(n)|(e))-(.+)\Z/
+      re = /\A(?:(n)|(e)|(g))_(.+)\Z/
       ks.each do |k|
         next unless md = re.match(k.to_s)
-        gv.send(md[2] ? :edge : :node)[md[3].intern] = opts[k]
+        n,e,g,key = md.captures
+        if g
+          gv[key.to_sym] = opts[k]
+        else
+          gv.send(n ? :node : :edge)[key.intern] = opts[k]
+        end
       end
     end
     def post_process_tempfile out, opts, cmd
