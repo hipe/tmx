@@ -273,7 +273,7 @@ module Hipe
           deep_leaf_children.each do |child|
             child.execute_write_request ui, opts
           end
-          prune_child_directories(ui, opts) if opts.prune?
+          prune_child_directories(ui, opts) if opts.prune_generated?
           nil
         end
       private

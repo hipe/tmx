@@ -1,2 +1,4 @@
 .assess.json
 coverage/
+pkg/
+*.gemspec

@@ -67,7 +67,7 @@ module Hipe
         end
         return help unless opts.valid? do
           opts.parse!('-d, --dry',        :dry_run?)
-          opts.parse!('-p, --prune',      :prune?)
+          opts.parse!('-p, --prune',      :prune_generated?)
           opts.parse!('-m, --code-merge', :code_merge?)
         end
         Ramaze.controller_merge ui, opts, model_name

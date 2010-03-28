@@ -1,3 +1,4 @@
+require 'set'
 module Hipe
   module Assess
     module Proto
@@ -18,7 +19,7 @@ module Hipe
         module Type
           def self.extended foo
             unless foo.instance_variable_defined?('@can_be_represented_with')
-              the_set = Set.new([foo]) # every type can represent itself
+              the_set = ::Set.new([foo]) # every type can represent itself
               foo.instance_variable_set('@can_be_represented_with',the_set)
             end
           end

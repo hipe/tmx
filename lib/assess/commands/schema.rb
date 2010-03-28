@@ -52,8 +52,9 @@ module Hipe
           describe_entity_name_policy
           false
         elsif(/s\Z/ =~ entity_name && !opts[:s])
-          ui.puts "Invalid #{soft_name}.  Use singular not pluaral."
-          ui.puts "(Or to force it to take this name, use '-s')"
+          ui.puts "Invalid #{soft_name} - looks plural. "<<
+            " Use singular not plural"
+          ui.puts "or to force it to take this name, use '-s'."
           describe_entity_name_policy
           false
         else

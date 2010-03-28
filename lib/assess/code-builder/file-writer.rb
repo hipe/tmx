@@ -1,4 +1,5 @@
-require File.dirname(__FILE__) + '/file-backup'
+require 'assess/code-builder/file-backup'
+
 module Hipe
   module Assess
     module CodeBuilder
@@ -24,7 +25,7 @@ module Hipe
           len1 = contents.length
           a, b, c = opts.values_at(:col1, :col2, :col3)
           path_str = "%-#{a}s" % path
-          if opts.prune?
+          if opts.prune_generated?
             prune_same ui, opts, path, path_str, contents
           elsif File.exist?(path)
             if opts.code_merge?

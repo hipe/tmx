@@ -20,6 +20,11 @@ module Hipe
           block.call(opts)
           opts.flush_documentation!(ui)
         end
+        def build_doc_matrix &block
+          opts = enhance({},nil).documenting!
+          block.call(opts)
+          opts.flush_doc_matrix!
+        end
       private
         def enhance(opts, controller)
           opts.extend(self)
@@ -44,25 +49,39 @@ module Hipe
         dm.each{|(l,r,x)| ui.puts(x ? x : ("  %-#{w}s  %s" % [l,r] )) }
       end
 
+      def flush_doc_matrix!
+        self.doc_matrix ||= []
+        resp = doc_matrix
+        self.doc_matrix = []
+        resp
+      end
+
       def valid? &block
         yield self if block_given?
-        is_valid = (@errors.nil? || !@errors.any?)
+        is_valid = ! errors.any?
         if (bads = bad_args_hack).any?
           is_valid = false
-          my_name = controller.send(:this_command, 3) # aggregious @fixme
           s = bads.length > 1 ? 's' : ''
-          controller.send(:ui).puts("#{my_name}: unrecognized option#{s} "<<
+          Cmd.ui.puts("#{Cmd.soft_name}: unrecognized option#{s} "<<
             oxford_comma(bads.map(&:inspect)))
         end
         is_valid
       end
 
-      def x str = ''
-        return unless documenting?
-        doc_matrix.push([nil,nil,str])
+      def x mixed = ''
+        if mixed.kind_of?(Proc)
+          if documenting?
+            matrix = OptParseLite.build_doc_matrix(&mixed)
+            doc_matrix.concat matrix
+          else
+            mixed.call(self)
+          end
+        elsif documenting?
+          doc_matrix.push([nil,nil,mixed])
+        end
       end
 
-      def parse! str, make_method, *args
+      def parse! str, make_method, *args, &block
         opts = args.last.kind_of?(Hash) ? args.pop : {}
         if documenting?
           doc_matrix.push [str, args.shift]
@@ -70,6 +89,8 @@ module Hipe
           if opts.has_key?(:default)
             doc_matrix.last[1] = [doc_matrix.last[1],
             "(default: #{opts[:default].inspect})"].compact * ' '
+            # let subsequent options see defaults of previous options
+            def! make_method, opts[:default]
           end
           nil
         else
@@ -90,6 +111,7 @@ module Hipe
           ok
         end
       end
+
 
       alias_method :on, :parse!
 
@@ -133,14 +155,14 @@ module Hipe
           if opt.noable
             re = Regexp.new('^'+Regexp.escape(opt.noable))
             value = re !~ (used_name.to_s)
-            def! make_method, value
+            getter_unless_defined used_name, make_method
           elsif value==true
             if opt.required?
               add_error("#{opt.name.inspect} missing required value "<<
               "#{opt.argument_name}")
               ok = false
             else
-              def! make_method, value
+              getter_unless_defined used_name, make_method
             end
           else
             if ! opt.takes_argument?
@@ -148,7 +170,7 @@ module Hipe
               "(#{value.inspect})")
               ok = false
             else
-              def! make_method, value
+              getter_unless_defined make_method, used_name
             end
           end
         end
@@ -156,12 +178,13 @@ module Hipe
       end
 
       def add_error msg
-        @errors ||= []
-        @errors.push msg
-        # this is so aggregious @fixme
-        my_name = controller.send(:this_command, 4)
-        controller.send(:ui).puts "#{my_name}: #{msg}"
+        errors.push msg
+        Cmd.ui.puts "#{Cmd.soft_name}: #{msg}"
         nil
+      end
+
+      def errors
+        @errors ||= []
       end
 
       class OptParseParse < Struct.new(:names, :takes_argument, :required,
@@ -181,7 +204,7 @@ module Hipe
           caps = nil
           pp_fail("#{str.inspect}") unless caps = ShortOrLong.parse!(opt)
           names.push(caps[0] || caps[2])
-          long.push "--#{caps[1]}" if caps[2]
+          long.push "--#{caps[2]}" if caps[2]
           short.push "-#{caps[0]}" if caps[0]
           if caps[1]
             pp_fail("huh?") if noable

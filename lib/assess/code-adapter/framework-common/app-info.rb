@@ -74,7 +74,7 @@ module Hipe
         end
 
         def name
-          "(unknown)"
+          "(current app)"
         end
 
         def has_model?
@@ -85,6 +85,8 @@ module Hipe
           require File.dirname(__FILE__)+'/proto-orm-manager.rb'
           ProtoOrmManager.singleton(self) # will flip back around
         end
+
+        alias_method :orm, :orm_manager
 
         def load_orm_manager_for_model
           orm_name_sym = guess_orm_from_model

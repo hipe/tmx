@@ -20,18 +20,21 @@ module Hipe
         attr_reader :model
         # set by set! below:
         def initialize app_info
+          @model_loaded = false
           @app_info = app_info
-          mod = deduce_model_module
-          load_and_enhance_model_classes_from_module mod
+        end
+
+        def model_loaded?
+          @model_loaded
         end
 
         def main_model_name= name
           name = name.intern
           flail("expecting #{name} to be in data model. Had: "<<
-            oxford_comma(@model.keys)
-          ) unless @model.has_key?(name)
+            oxford_comma( model.keys)
+          ) unless model.has_key?(name)
           def!(:main_model_name, name)
-          main_model = @model[name]
+          main_model = model[name]
           def!(:main_model, main_model)
           nil
         end
@@ -48,9 +51,26 @@ module Hipe
           resp
         end
 
+        def load_model_with_sexp_reflection
+          mod = deduce_model_module
+          load_and_enhance_model_classes_from_module mod
+          @model_loaded = true
+        end
+
+        # see http://gist.github.com/344323 for loading multiple files
+        def load_model
+          fail("let's avoid reloading the model until we have to") if model_loaded?
+          fail("can't handle multi-file models yet!") unless app.model.single_file?
+          path = app.model.pretty_path_resolved
+          fail("model not found: #{path}") unless File.exist?(path)
+          require path
+          @model_loaded = true
+          nil
+        end
+
       private
 
-        attr_reader :app_info
+        def app; @app_info end
 
         def deduce_model mixed
           case mixed
@@ -94,7 +114,7 @@ module Hipe
           ridonk = these & them
           if ! ridonk.any?
             return flail("sorry, couldn't find any DataMapper Resources" <<
-            "in #{app_info.model.pretty_path}")
+            "in #{app.model.pretty_path}")
           end
           if ridonk.map{|x| x.scan(ColonColon).size }.uniq.size != 1
             return flail("sorry, it appears that all model classess "<<
@@ -128,10 +148,13 @@ module Hipe
 
         # know what you are doing if you remove deep_enhance! from here
         # know what you are doing if you use deep_enhance! anywhere else
+        # this is akin to but more "advanced" then load_model
         def model_file_sexp
           @model_file_sexp ||= begin
-            flail("no") unless app_info.model.single_file?
-            file = CodeBuilder.get_file_sexp app_info.model.path
+            flail("no") unless app.model.single_file?
+            flail("we need to implement this for multi-file models") unless
+              app.model.single_file?
+            file = CodeBuilder.get_file_sexp app.model.path
             if !(file.is_module? || file.is_block?)
               flail("not sure if this file has a structure we like.")
             end

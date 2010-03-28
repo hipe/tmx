@@ -1,5 +1,25 @@
 module Hipe
   module Assess
+    module Const
+      #
+      # these used to be defined closer to where they are used
+      # but we had problems with modules that wanted to include
+      # CommonInstanceMethods but needed to keep their internal
+      # namespace clear
+      #
+
+      Scalars = [NilClass, TrueClass, FalseClass, Fixnum, Float, String]
+      StackRow = /\A([^:]+):([^:]+)(?::in `([^']+)')?\Z/
+      MethodName = /`([^']+)'\Z/
+
+      #
+      # split on any dot that has one or more not dots after it till the end
+      # "foo.tgz" => ['foo','tgz']  "foo.tar.gz"=>['foo.tar','gz']
+      #    "foo"=>["foo"]
+      #
+      ExtRe = /\.(?=[^\.]+$)/
+
+    end
     module CommonInstanceMethods
       #
       # a grab bag of the typical useful stuff
@@ -18,6 +38,11 @@ module Hipe
       end
       def underscore mixed
         mixed.to_s.gsub(/([a-z])(?=[A-Z])/){ "#{$1.downcase}_" }.downcase
+      end
+      def underscore_lossy mixed
+        s = mixed.dup # underscore(mixed)
+        s.gsub!(/[\(\)'"]/, '').gsub!(/[^_a-z0-9]/,'_')
+        s
       end
       def humanize underscore
         underscore.to_s.gsub(/_/, ' ')
@@ -41,9 +66,8 @@ module Hipe
         end
         nil
       end
-      MethodNameRe = /`([^']+)'\Z/
       def method_name_from_call_stack_item row
-        MethodNameRe.match(row)[0]
+        Cont::MethodName.match(row)[0]
       end
       def class_basename kls
         Assess.class_basename kls.to_s
@@ -52,8 +76,8 @@ module Hipe
         klass = str.split(/::/).inject(Object) { |k, n| k.const_get n }
         klass
       end
-      def flail *args
-        raise UserFail.new(*args)
+      def flail *args, &block
+        raise UserFail.new(*args, &block)
       end
       def def! name, value
         if respond_to?(name)
@@ -85,21 +109,33 @@ module Hipe
         else
           row = mixed
         end
-        p = parse_stack_row(row)
+        p = trace_parse(row)
         ("when you were trying to #{humanize(p[:meth])} in "<<
         "#{p[:bn]}:#{p[:ln]}")
       end
-      StackRow = /\A([^:]+):([^:]+):in `([^']+)'\Z/
-      def parse_stack_row str
-        if md = StackRow.match(str)
-          {:path=>md[1], :bn=>File.basename(md[1]), :ln=>md[2], :meth=>md[3]}
+      def trace_parse str
+        if md = Const::StackRow.match(str)
+          path, line, method = md.captures
+          bn = File.basename(path)
+          h = {:path=>path, :line=>line, :method=>method, :basename=>bn}
+          {:method=>:meth,:basename=>:bn,:line=>:ln}.each{|(a,b)| h[b] = h[a]}
+          h
         else
           {}
         end
       end
-      Scalars = [NilClass, TrueClass, FalseClass, Fixnum, Float, String]
       def is_scalar? mixed
-        Scalars.detect{|cls| mixed.kind_of?(cls)}
+        Const::Scalars.detect{|cls| mixed.kind_of?(cls)}
+      end
+    end
+    Common = CommonInstanceMethods[Object.new]
+    module CommonModuleMethods
+      include CommonInstanceMethods
+      def const_accessor *a
+        a.each do |k|
+          const_name = titleize(camelize(k))
+          meta.send(:define_method, k){const_get(const_name)}
+        end
       end
     end
   end

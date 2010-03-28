@@ -6,7 +6,7 @@ module Hipe
         include CommonInstanceMethods
         def controller_merge ui, opts, model_name
           if (!Ramaze.app_info.server_executable.exists? ||
-            opts.prune?
+            opts.prune_generated?
           )
             require 'assess/code-adapter/ramaze/app-init.rb'
             AppInit::app_init(ui, opts)

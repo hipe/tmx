@@ -16,7 +16,6 @@ module Hipe
       extend self
       @help = {}
       @usage = {}
-      @doc_proc = {}
       @next_help = @next_usage = @closest_match_enabled = @last_ui_pushed= nil
 
       def help(opts = {}, command = nil, *args)
@@ -34,16 +33,7 @@ module Hipe
           ui.puts(
             "Usage: %s" % (@usage[command] || "#{app} #{cmd_pretty}")
           )
-          if @help[command]
-            ui.puts
-            @help[command].each do |mixed|
-              if mixed.kind_of?(Proc)
-                OptParseLite.display_doc_proc(ui, &mixed)
-              else
-                ui.puts(mixed)
-              end
-            end
-          end
+          show_command_help(ui, @help[command]) if @help[command]
         else
           show_general_help
         end
@@ -146,7 +136,9 @@ module Hipe
       end
 
       def this_command idx=1
-        soft = caller_method_name(idx).gsub('_',' ')
+        soft =
+          (idx.kind_of?(String) ? idx : caller_method_name(idx) ).
+        gsub('_',' ')
         "#{app} #{soft}"
       end
 
@@ -261,6 +253,21 @@ module Hipe
         ui.puts "  -v, --version  show the current version and exit"
       end
 
+      def short_help
+        ui.puts "#{this_command(2)}: Try -h for more info."
+      end
+
+      def show_command_help ui, lines
+        ui.puts
+        lines.each do |mixed|
+          if mixed.kind_of?(Proc)
+            OptParseLite.display_doc_proc(ui, &mixed)
+          else
+            ui.puts(mixed)
+          end
+        end
+      end
+
       def subcommand_help subs, opts, args, meth
         prefix = meth.gsub('_',' ')
         commands_pretty = subs.map{|x| "#{prefix} #{x}" }
@@ -270,6 +277,15 @@ module Hipe
       def sort_commands commands
         map = command_sort_map
         commands.sort do |a,b|
+          a_sym = a.to_sym
+          b_sym = b.to_sym
+          [a_sym, b_sym].each do |x|
+            unless map[x]
+              fail("why isn't this command in the sort map? "<<
+              "did you forget to make it private? did you forget "<<
+              "to use 'x \"syntax\"' on it?  #{x.inspect}")
+            end
+          end
           map[a.to_sym] <=> map[b.to_sym]
         end
       end
@@ -278,7 +294,7 @@ module Hipe
       def command_sort_map
         # because method_added() calls current_list() we assume @listing_index
         @command_sort_map ||= begin
-          ordered = @listing_index.map{|x| x[:list]}.flatten
+          ordered = listing_index.map{|x| x[:list]}.flatten
           Hash[ * ordered.zip((0..ordered.length-1).to_a).flatten ]
         end
       end
@@ -422,10 +438,25 @@ module Hipe
       end
     end # Commands
     module Cmd
+      #
+      # For the commands module to work it can't have any public
+      # support methods.  It has many private support methods, some
+      # of which are accessible here.
+      #
       extend self
-      %w(ui ui_push ui_pop_read).each do |meth|
+      %w(ui ui_push ui_pop_read this_command).each do |meth|
         define_method(meth) do |*args,&block|
           Commands.send(meth,*args,&block)
+        end
+      end
+      def commands
+        Commands.send(:instance_variable_get,'@usage').keys
+      end
+      def soft_name
+        @soft_name ||= begin # if we need to we can not cache this
+          thing =            # this is not infallible depending on cmd names
+          (caller.map{|x|Common.trace_parse(x)[:meth]} & commands).first
+          this_command(thing)
         end
       end
     end

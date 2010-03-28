@@ -11,6 +11,10 @@ module Hipe
         # nodes in the filesystem in an abstract way so that the actual
         # filepath isn't determined until runtime.
         #
+        # After building this i realized we probably should have subclassed
+        # Pathname, because the concerns are similar.  But all things being
+        # equal I don't know how much of a gain that would be at this point.
+        #
         # These facilities are provided to this end:
         # 1) paths can be represented as relative to other paths in
         #    the usual way.
@@ -24,7 +28,7 @@ module Hipe
         #
         # So, something like this:
         #
-        #   root_path = WishyWashyPath.new{|p| p.absolute_path = './app'} # sic
+        #   root_path = WishyWashyPath.new{|p| p.absolute_path = './app'} #sic
         #   cont_path = WishyWashyPath.new do |p|
         #     p.relative_to = root_path
         #     p.relative_path = './controller'
@@ -42,6 +46,16 @@ module Hipe
         #  ./app/controllers/
         #  ./app/controller.rb
         #  ./app/controllers.rb
+        #
+        #  You can get the resolved path of a pretty path with
+        #        p.pretty_path_resolved
+        #        p.absolute_path_resolved
+        #
+        #  pretty_path tries to use './' when possible
+        #
+        #  If none of the permutations is a path that exists on the
+        # filesystem, one of them will still be returned (which one is
+        # undefined) . use exists? to see if the path exists.
         #
         extend UberAllesArray, StrictAttrAccessors
         include CommonInstanceMethods

@@ -44,6 +44,7 @@ module Hipe
         end
         def process_merge_data_request ui, sin, opts
           setup!(ui) unless setup?
+          abstract_model_interface.load_model_with_sexp_reflection
           abstract_model_interface.main_model_name = opts.model_name
           require File.dirname(__FILE__)+'/drunken-merge.rb'
           DrunkenMerge.process_merge_json_request self, ui, sin, opts
