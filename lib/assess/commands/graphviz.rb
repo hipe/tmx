@@ -17,7 +17,7 @@ module Hipe
       x
       x( GraphVizOpts = lambda{|o|
 
-          TestedFormatTypes = %w(png)
+          TestedFormatTypes = %w(png svg)
 
           o.x 'Assess Options:'
 
