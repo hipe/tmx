@@ -20,7 +20,7 @@ begin
     gem.add_dependency 'sexp_processor', '~> 3.0.3'
     gem.add_dependency 'haml', '~> 2.2.22'
     gem.add_dependency 'ramaze', '~> 2010.03'
-    gem.add_dependency 'ruby-graphviz' '~> 0.9.10'
+    gem.add_dependency 'ruby-graphviz', '~> 0.9.10'
 
     gem.add_development_dependency 'minitest', '~> 1.5.0'
   end
