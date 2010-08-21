@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby
+require 'rubygems'
+gem 'hipe-core'
 require 'hipe-core/struct/table'
 require 'hipe-core/interfacey'
 require 'open4'
 require 'ostruct'
-require 'ruby-debug' # @todo
-
 
 class Hipe::FileMetrics
   include Hipe::Interfacey::Service
@@ -252,8 +252,8 @@ class Hipe::FileMetrics
     return DataNode::Branch.new if files.size == 0
     lines = system_lines(%{wc -l #{files * ' '} | sort -g}) or return error
     case lines.size
-      when 0 : return error("not expecting zero lines from wc")
-      when 1 :
+      when 0; return error("not expecting zero lines from wc")
+      when 1;
         md = /^(\d+) (.+)$/.match(lines.last) or
           return error(%|regex fail against wc results: "#{lines.last}"|)
         wc_total = md[1]
@@ -392,7 +392,6 @@ module Hipe::Stats
         required_that it.respond_to?(:count) || it.respond_to?(:list)
       end
       if err
-        debugger
         raise StatsError.new(err.message) if err
       end
 
@@ -595,9 +594,9 @@ module Hipe::ShapeAssert
     # pass (almost) every message along to target, but record each one.
     # we might eventually make recording proxies for calls like .class()
     #
-    keep_these = ['__send__', '__id__','debugger']
-    (instance_methods - keep_these).each do |name|
-      undef_method name.to_sym
+    keep_these = [:__send__, :__id__, :debugger, :object_id]
+    (instance_methods.map(&:to_sym) - keep_these).each do |name|
+      undef_method name
     end
     attr_accessor :recordings, :target
     def initialize mixed
