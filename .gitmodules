@@ -1,0 +1,3 @@
+[submodule "hipe-tinyscript"]
+	path = hipe-tinyscript
+	url = git@hipeland.org:hipe-tinyscript
