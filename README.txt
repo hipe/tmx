@@ -1,22 +1,27 @@
 filemetrics
 
-This is a wrapper around the unix utilities 'find' and 'wc' (wordcount)
-that finds all files in a tree matching a certain pattern
-(e.g. '*.rb', '*.php', '*.js',  or some boolean combination thereof)
-and can either:
+This is a collection of tools that makes reports using the unix utilities
+"find" and "wc" (wordcount) to show statistical information about files
+in terms of the number of lines of code, and other things involving
+the number and distribution of files in terms of their extensions, etc.
+
+It can do things like:
+
   - show you a list of the filenames, from longest to shortest file,
-      with their repsective linecounts and what percentage of the
-      maximum linecount that file is,
-  or:
-  - for each folder in PATH match the files in the filename query and
+    with their respective linecounts and what percentage of the
+    maximum linecount that file is,
+
+  - for each folder in PATH, match the files in the filename query and
     show summary information like above for each folder.
 
+  - show the numbers of files of the different extension types
 
-I have only used this twice, but the second time I needed it I was glad
-it was there.  Both times I used it was when I was looking at a new library
-and trying to find example code (e.g. of unit tests or of jquery plugins)
-and I wanted to find either the longest or the shortest such example
-to learn from.
+
+I find it useful when I am perusing a new library of code, and I want
+to get a general sense for the composition and distribution of files.
+Sometimes it is helpful to find the longest (or shortest) of a certain
+type of file to use as a learning aide.
 
 It can also be fun to see the statistical spread of how long or short
-your files tend to be in one of your projects.
+your files tend to be in one of your projects; possibly for use in an
+aide in refactoring -- zeroing in on the longest and shortest files.
