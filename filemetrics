@@ -11,7 +11,7 @@ require here + '/hipe-tinyscript/core' unless Hipe.const_defined? :Tinyscript
 require here + '/hipe-tinyscript/support' unless Hipe::Tinyscript.const_defined? :Support
 require here + '/support'
 
-# require 'ruby-debug'; puts Hipe::Tinyscript::Colorize.colorize("foo", :blink, :bright, :red);
+require 'ruby-debug'; puts Hipe::Tinyscript::Colorize.colorize("foo", :blink, :bright, :red);
 
 module Hipe::FileMetrics
   VERSION = '0.3.0'
@@ -63,7 +63,7 @@ module Hipe::FileMetrics
       begin
         execute_no_catch
       rescue SoftError => e
-        err e.message
+        err e.ui_message
         :errors
       end
     end
@@ -103,17 +103,17 @@ module Hipe::FileMetrics
       case lines.size
       when 0; raise SoftError.new("not expecting zero lines from wc")
       when 1;
-        md = /^(\d+) (.+)$/.match(lines.last) or
-          raise SoftError.new("regex fail against wc results: #{lines.last.inspect}")
+        md = /^ *(\d+) (.+)$/.match(lines.last) or
+          raise SoftError.new("regex fail against wc results: #{lines.last.inspect}"){ |e| e.show_origin! }
         wc_total = md[1]
       else
         md = /^ *(\d+) total$/.match(x=lines.pop) or
-          raise SoftError.new(%|regex fail against wc results: "#{x}"|)
+          raise SoftError.new(%|regex fail against wc results: "#{x}"|){ |e| e.show_origin! }
         wc_total = md[1].to_i
       end
       leaves = lines.map do |wc_line|
         md = wc_line.match(%r{(\d+)\s+(.+)$}) or
-          raise SoftError("Failed to match against #{wc_line.inspect}")
+          raise SoftError("Failed to match against #{wc_line.inspect}"){ |e| e.show_origin! }
         Hipe::DataNode::Leaf.new do |me|
           me.count = md[1].to_i
           me.name = md[2]
@@ -127,7 +127,22 @@ module Hipe::FileMetrics
     end
   end
 
-  class SoftError < RuntimeError; end
+  class SoftError < RuntimeError
+    include Hipe::Tinyscript::Support::Stringy
+    def initialize(*a, &b)
+      super(*a)
+      yield self if block_given?
+    end
+    attr_reader :show_origin
+    alias_method :show_origin?, :show_origin
+    def show_origin!; @show_origin = true end
+    def ui_message
+      [message, show_origin? ? "from #{from_where}" : nil].compact.join(' ')
+    end
+    def from_where
+      parts = parse_backtrace_line(backtrace[0]) and "#{File.basename(parts[:path])}:#{parts[:line]}"
+    end
+  end
 
   class App < Hipe::Tinyscript::App
     description <<-desc
