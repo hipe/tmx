@@ -3,8 +3,6 @@
 # defined here: Hipe::Stats, Hipe::DataNode, Hipe::ShapeAssert
 # they may be put into their own files but will always be accessible heres
 
-require 'ostruct'
-
 module Hipe
   module DataNode
     #
