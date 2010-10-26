@@ -76,7 +76,6 @@ module Hipe::FileMetrics
       cmd.render
     end
     def linecount_data_node label, files
-      # if sort is not available on the system, consider doing it w/ ruby
       root = Hipe::DataNode::Branch.new do |n|
         n.name = label
         n[:num_lines_total] = nil
@@ -98,11 +97,44 @@ module Hipe::FileMetrics
       if problems.any?
         err problems.map{ |reason, file| colorize("#{reason}? ", :red) << file }
       end
-      straight_linecount root, read_ok
+      if ! @param[:no_blank] && ! @param[:no_comment]
+        straight_linecount root, read_ok
+      else
+        filtered_linecount root, read_ok
+      end
       root.extend Hipe::Stats::Calculator # do this after children have been added
+      root.num_lines_total or root.num_lines_total = root.stats.count
       root
     end
+    def filtered_linecount node, paths
+      (chain = [
+        @param[:no_blank]   ? %s(grep -v '^[ \t]*$') : nil,
+        @param[:no_comment] ? %s(grep -v '^[\t ]*#') : nil,
+        'wc -l'
+      ].compact).size > 1 or fail("nevar") # careful. we want at least one grep above
+      node.children ||= []
+      paths.each do |path|
+        cmd = ["cat #{escape_path(path)}", *chain].join(' | ')
+        lines = baktix(cmd){ |b| b.announce = @param[:command] }
+        case lines.size
+        when 0 ; err(colorize('err: ', :red) << "no lines returned from " << colorize(cmd, :green))
+        when 1 ;
+          line = lines.first
+          if /\A[[:space:]]*(\d+)[[:space:]]*\z/ =~ line
+            node.children.push Hipe::DataNode::Leaf.new{ |n|
+              n.name = path
+              n.count = $1.to_i
+            }
+          else
+            err(colorize('err: ', :red) << "failed to match digit from " << colorize(line, :green))
+          end
+        else err(colorize('err: ', :red) << "too many lines returned from " << colorize(cmd, :green))
+        end
+      end
+      nil
+    end
     def straight_linecount node, paths
+      # if sort is not available on the system, consider doing it w/ ruby
       paths_escaped = paths.map{ |p| escape_path(p) }
       lines = baktix("wc -l #{paths_escaped * ' '} | sort -g")
       case lines.size
@@ -150,15 +182,15 @@ module Hipe::FileMetrics
       into directories.
       desc
 
-    # parameter :no_comment, '-C', "don't count lines with ruby-style comments."
-    # parameter :no_blank,   '-B', "don't count blank lines."
+    parameter :no_comment, '-C', "don't count lines with ruby-style comments."
+    parameter :no_blank,   '-B', "don't count blank lines."
 
     def execute_no_catch
       @param[:name] ||= []
       @param[:exclude_dir].first == '[]' and @param[:exclude_dir].shift
-      @param.key?(:command) && out(files_find_command)
-      @param.key?(:list) && baktix(files_find_command){ |bt| bt.announce; bt.out{ |line| out line } }
-      @param.key?(:no_report) || render_report(baktix(files_find_command){|b| b.announce = false })
+      @param[:command] && out(files_find_command)
+      @param[:list] && baktix(files_find_command){ |bt| bt.announce; bt.out{ |line| out line } }
+      @param[:no_report] || render_report(baktix(files_find_command){|b| b.announce = false })
       nil
     end
 
@@ -192,9 +224,9 @@ module Hipe::FileMetrics
     def execute_no_catch
       @param[:name] ||= []
       @param[:exclude_dir].first == '[]' and @param[:exclude_dir].shift
-      @param.key?(:command) && out(dirs_find_command)
-      @param.key?(:list) && out(baktix(dirs_find_command))
-      @param.key?(:no_report) || render_report(param(:paths), baktix(dirs_find_command))
+      @param[:command] && out(dirs_find_command)
+      @param[:list] && out(baktix(dirs_find_command))
+      @param[:no_report] || render_report(param(:paths), baktix(dirs_find_command))
       nil
     end
     def on_success; end # no 'done.' evar
