@@ -1,6 +1,6 @@
 # support classes used in filemetrics, not dependant on it! maybe they will have broader use
 
-# defined here: Hipe::Stats, Hipe::DataNode, Hipe::ShapeAssert
+# defined here: Hipe::Stats, Hipe::DataNode, Hipe::ShapeGrammar
 # they may be put into their own files but will always be accessible heres
 
 module Hipe
@@ -10,12 +10,12 @@ module Hipe
     # they should not have a lot of heavy method implementations,
     # they just hold data
     #
-    class Branch < Struct.new(:children, :name);
+    class Branch < Hipe::Tinyscript::Support::EpeenStruct.new(:children, :name)
       undef :count
       def initialize *args, &block
         super(*args)
         yield self if block_given?
-        self.children = [] unless self.children
+        self.children = [] unless children
       end
       def sort_by!(&block)
         children.sort! do |x,y|
@@ -25,7 +25,7 @@ module Hipe
         end
       end
     end
-    class Leaf < Struct.new(:name, :count);
+    class Leaf <  Hipe::Tinyscript::Support::EpeenStruct.new(:name, :count)
       def initialize *args, &block
         super(*args)
         yield self
@@ -33,81 +33,153 @@ module Hipe
     end
   end
 
-  module ShapeAssert
-    #
-    # attempt at a really lightweight structural/interface assertion thing
-    # inspired by bacon
-    #
-    class ShapeAssertFail     < RuntimeError;     end
-    class MakeDefinitionFail  < ShapeAssertFail;  end
-    class MatchDefinitionFail < ShapeAssertFail
-      attr_reader :metadata
-      def initialize msg, metadata=nil
-        super msg
-        @metadata = metadata
+  module FileMetrics
+
+    module PathTools
+      def escape_path path
+        (path =~ / |\$|'/) ? Shellwords.shellescape(path) : path
       end
     end
 
-    #
-    # raises MatchDefinitionFail if the thing doesn't match the description
-    # raises MakeDefinitionFail if there is something wrong with the definition
-    # @return nil
-    #
-    def self.against thing, &block
-      fail = fails(thing, &block) and raise fail
+    class FindCommand
+      include PathTools
+      def initialize
+        @extra = ''
+        yield self
+        fail('need at least one search path') unless @paths && @paths.any?
+      end
+      attr_accessor :extra
+      ivars = [:paths, :skip_dirs, :names]
+      attr_writer(*ivars)
+      ivars.each do |ivar|
+        define_method(ivar) do |*a|
+          case a.size ;
+          when 0 ; instance_variable_get("@#{ivar}")
+          when 1 ; instance_variable_set("@#{ivar}", a.first.kind_of?(Array) ? a.first : [a.first])
+          else     instance_variable_set("@#{ivar}", a)
+          end
+        end
+      end
+      def render
+        cmd = "find " << @paths.map{ |p| escape_path(p) }.join(' ')
+        if @skip_dirs && @skip_dirs.any?
+          paths = @skip_dirs.map{ |p| escape_path(p) }
+          cmd << ' -not \( -type d \( -mindepth 1 -a '
+          cmd << paths.map{ |p| " -name '#{p}'" }.join(' -o')
+          cmd << " \\) -prune \\)#{@extra}"
+        end
+        if @names && @names.any?
+          paths = @names.map{ |p| escape_path(p) }
+          cmd << ' \(' << paths.map{ |p| " -name '#{p}'" }.join(' -o') << ' \)'
+        end
+        cmd
+      end
     end
+  end
 
-    def self.fails thing, &block
-      defin = Definition.new
-      proxy = RecordingProxy.new thing
-      fail = catch(:fail) do
-        defin.instance_exec(proxy, &block)
+  class ShapeGrammar
+    # experimental DSL-like thing for asserting things about an object and reporting
+    # on their failure, inspired a bit by bacon
+
+    class Fail < RuntimeError
+      def initialize grammar, recording
+        super(recording.sentence.map do |pred|
+          "#{grammar.desc} #{pred[0]}(#{pred[1].map(&:inspect).join(', ')}) was not true."
+        end.join('  '))
+      end
+    end
+    class << self
+      def create
+        g = new and yield g
+        g
+      end
+    end
+    attr_reader :desc
+    def as desc
+      @desc = desc
+    end
+    def assert target
+      unless match target
+        raise get_error(target)
+      end
+    end
+    def define *extra, &block
+      @extra = extra
+      @block = block
+      self
+    end
+    def get_error target
+      rec = RecordingGrammar.new(self, target, @extra, @block)
+      if catch(:assertion_fail_during_recording) do
+        rec.run_block
+        false
+      end then
+        Fail.new(self, rec)
+      else
         nil
       end
-      if fail
-        rec = proxy.recordings.last
-        meth = rec[0]
-        args = rec.slice(1,rec.size).map{|x| x.inspect} * ', '
-        msg = %|to be a #{defin.desc} it must #{meth}(#{args})|
-        return MatchDefinitionFail.new msg, thing
-      end
-      return nil
     end
-
-    class Definition
-      attr_reader :desc
-      def to_be_a desc
-        raise MakeDefinitionFail.new(
-         %|let's stick to strings not #{desc.inspect} for descriptions|
-        ) unless desc.kind_of? String
-        raise MakeDefinitionFail.new(
-         %|won't clobber existing description'|
-        ) if @desc
-        @desc = desc
-      end
-      def required_that mixed
-        throw(:fail,'fail') unless mixed
+    def match target
+      catch(:assertion_fail) do
+        target.instance_exec(self, &@block)
+        true
       end
     end
-
+    def must b
+      throw(:assertion_fail, false) unless b
+    end
+    class RecordingGrammar
+      def initialize grammar, target, extra, block
+        @block = block
+        @extra = extra
+        @grammar = grammar
+        @sentence = []
+        @target = target
+      end
+      attr_reader :sentence
+      def must bool
+        bool ? @sentence.clear : throw(:assertion_fail_during_recording, true)
+        nil
+      end
+      def run_block
+        @proxy = RecordingProxy.new(@target, @sentence)
+        @proxy.instance_exec(self, *@extra, &@block)
+        nil
+      end
+    end
     class RecordingProxy
-      #
-      # pass (almost) every message along to target, but record each one.
-      # we might eventually make recording proxies for calls like .class()
-      #
-      keep_these = [:__send__, :__id__, :debugger, :object_id]
-      (instance_methods.map(&:to_sym) - keep_these).each do |name|
-        undef_method name
+      KeepThese = %w(__send__ __id__ debugger inspect instance_exec pretty_print puts) # @todo get rid of puts!
+      (public_instance_methods.map(&:to_sym) - KeepThese.map(&:to_sym)).each do |meth|
+        undef_method meth.to_sym
       end
-      attr_accessor :recordings, :target
-      def initialize mixed
-        @target = mixed
-        @recordings = []
+      def initialize target, sentence
+        @sentence = sentence
+        @target = target
       end
-      def method_missing name, *args
-        @recordings.push [name, *args]
-        @target.send(name, *args)
+      def method_missing meth, *a, &b
+        @sentence.push [meth, a, b]
+        @target.send(meth, *a, &b)
       end
+      def __target__
+        @target
+      end
+    end
+  end
+
+  class SoftError < RuntimeError
+    include Hipe::Tinyscript::Support::Stringy
+    def initialize(*a, &b)
+      super(*a)
+      yield self if block_given?
+    end
+    attr_reader :show_origin
+    alias_method :show_origin?, :show_origin
+    def show_origin!; @show_origin = true end
+    def ui_message
+      [message, show_origin? ? "from #{from_where}" : nil].compact.join(' ')
+    end
+    def from_where
+      parts = parse_backtrace_line(backtrace[0]) and "#{File.basename(parts[:path])}:#{parts[:line]}"
     end
   end
 
@@ -115,7 +187,7 @@ module Hipe
     #
     # Enhance a DataNode::Branch-like with statistics about its nodes
     #
-    # Objects that extend Stats should respond to "count" or "children", those
+    # Objects that extend Stats::Calculator should respond to "count" or "children".
     # those that respond to "children" should yield objects that respond to "count"
     # or "children"... and so on.
     #
@@ -129,41 +201,44 @@ module Hipe
     #
     #
 
-    # common pattern
-    def self.[] obj; obj.extend self; obj  end
-    def self.extended obj;  obj.init_stats end
-
-    def init_stats
-      class << self
-        attr_reader :stats
-      end
-      @stats ||= Calculator.new self
-    end
-
     class StatsError < RuntimeError; end
 
-    class Calculator
+    module Calculator
+      class << self
+        def extended obj; obj.init_stats; end
+      end
+      def init_stats
+        @stats ||= NodeCalculator.new self
+      end
+      attr_reader :stats
+    end
+
+    class NodeCalculator
       #
-      # A stats calculator object holds a handle to a data node and
+      # A stats calculator object that holds a handle to a data node and
       # calculates and caches statistical operations on the node.
       #
 
-      attr_accessor :parent
+      class << self
+        def calculatable_node_grammar
+          @cng ||= Hipe::ShapeGrammar.create do |it|
+            it.as "calculatable node"
+          end.define do |it|
+            it.must respond_to?(:name)
+            it.must( respond_to?(:count) || respond_to?(:children) )
+          end
+        end
+      end
+
       def initialize node
-        err = Hipe::ShapeAssert.fails(node) do |it|
-          to_be_a "calculatable node"
-          required_that it.respond_to?(:name)
-          required_that it.respond_to?(:count) || it.respond_to?(:children)
-        end
-        if err
-          raise StatsError.new(err.message) if err
-        end
+        @sing = class << self; self end
+        self.class.calculatable_node_grammar.assert(node)
         @node = node
         @cache = {}
-        if @node.respond_to? :children
+        if @node.respond_to?(:children) && ! @node.children.nil?
           @node.children.each do |child|
-            Hipe::Stats[child]
-            child.stats.parent = self
+            child.extend Calculator
+            child.stats.set_parent self
           end
         end
       end
@@ -173,7 +248,7 @@ module Hipe
           if @node.respond_to? :count
             @node.count
           elsif @node.respond_to? :children
-            @node.children.map{|child| child.stats.count}.reduce(:+)
+            @node.children.map{ |child| child.stats.count }.reduce(:+)
           else
             raise StatsError.new(%|can't determine count for "#{@node.name}"|)
           end
@@ -207,10 +282,15 @@ module Hipe
         result = count.to_f / parent.max.to_f
         result
       end
+      def parent; nil end # memoized
       def percent_of_max
         ratio_of_max * 100
       end
-    end # Calculator
+      def set_parent calc
+        @sing.send(:define_method, :parent){ calc } # memoize!
+      end
+    private
+    end
 
     #
     # map line numbers to their percentile rating(s), array must be sorted

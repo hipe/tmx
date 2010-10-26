@@ -14,50 +14,45 @@ require here + '/support'
 require 'ruby-debug'; puts Hipe::Tinyscript::Colorize.colorize("foo", :blink, :bright, :red);
 
 module Hipe::FileMetrics
+
   VERSION = '0.3.0'
 
-  module PathTools
-    def escape_path path
-      (path =~ / |\$|'/) ? Shellwords.shellescape(path) : path
-    end
-  end
-
-  class FindCommand
-    include PathTools
-    def initialize
-      @extra = ''
-      yield self
-      fail('need at least one search path') unless @paths && @paths.any?
-    end
-    attr_accessor :extra
-    ivars = [:paths, :skip_dirs, :names]
-    attr_writer(*ivars)
-    ivars.each do |ivar|
-      define_method(ivar) do |*a|
-        case a.size ;
-        when 0 ; instance_variable_get("@#{ivar}")
-        when 1 ; instance_variable_set("@#{ivar}", a.first.kind_of?(Array) ? a.first : [a.first])
-        else     instance_variable_set("@#{ivar}", a)
-        end
-      end
-    end
-    def render
-      cmd = "find " << @paths.map{ |p| escape_path(p) }.join(' ')
-      if @skip_dirs && @skip_dirs.any?
-        paths = @skip_dirs.map{ |p| escape_path(p) }
-        cmd << ' -not \( -type d \( -mindepth 1 -a '
-        cmd << paths.map{ |p| " -name '#{p}'" }.join(' -o')
-        cmd << " \\) -prune \\)#{@extra}"
-      end
-      if @names && @names.any?
-        paths = @names.map{ |p| escape_path(p) }
-        cmd << ' \(' << paths.map{ |p| " -name '#{p}'" }.join(' -o') << ' \)'
-      end
-      cmd
-    end
-  end
+  SoftError = Hipe::SoftError # include just this thing
 
   class MyCommand < Hipe::Tinyscript::Command
+
+    # these are parameters shared by all of the beautiful children
+
+    parameter '-D', '--exclude-dir DIR', :many=>true, :default=>['.*'], :desc=><<-desc
+      folders whose basename match this pattern will not be
+      descended into.  It can be specified multiple times
+      with multiple patterns to narrow the search.
+      If not provided, the default is to skip folders whose
+      name starts with a '.' (period).  To include such
+      dirs, specify "--exclude-dirs=[]" the first time you
+      use this option in the command.  (it has the effect
+      of clearing the "blacklist" of directories to skip)
+
+    desc
+
+    parameter '-n', '--name NAME', :many=>true, :desc=> <<-desc
+      e.g. --name='*.rb'.  When present, this limits the
+      files analyzed to the ones whose basename matches
+      this pattern. It can be specified multiple times to
+      add multiple filename patterns, which will broaden
+      the search.  You should use single quotes to avoid
+      shell expansion.
+
+      When PATH is a file, this option is ignored.
+
+    desc
+
+    parameter '-g', '--command', 'show the generated find command we would have used.'
+
+    parameter '-l', '--list', 'list the resulting files that match the query.'
+
+    parameter '-R', '--no-report', "don't actually run the whole report."
+
     include PathTools
     def execute
       begin
@@ -80,9 +75,13 @@ module Hipe::FileMetrics
       end
       cmd.render
     end
-    def linecount_branch_node_one_level label, files
+    def linecount_data_node label, files
       # if sort is not available on the system, consider doing it w/ ruby
-      return Hipe::DataNode::Branch.new{ |b| b.name = label } if files.size == 0
+      root = Hipe::DataNode::Branch.new do |n|
+        n.name = label
+        n[:num_lines_total] = nil
+      end
+      return root if files.size == 0
       read_ok = []
       problems = []
       files.each do |f|
@@ -99,7 +98,13 @@ module Hipe::FileMetrics
       if problems.any?
         err problems.map{ |reason, file| colorize("#{reason}? ", :red) << file }
       end
-      lines = baktix("wc -l #{read_ok * ' '} | sort -g")
+      straight_linecount root, read_ok
+      root.extend Hipe::Stats::Calculator # do this after children have been added
+      root
+    end
+    def straight_linecount node, paths
+      paths_escaped = paths.map{ |p| escape_path(p) }
+      lines = baktix("wc -l #{paths_escaped * ' '} | sort -g")
       case lines.size
       when 0; raise SoftError.new("not expecting zero lines from wc")
       when 1;
@@ -111,38 +116,21 @@ module Hipe::FileMetrics
           raise SoftError.new(%|regex fail against wc results: "#{x}"|){ |e| e.show_origin! }
         wc_total = md[1].to_i
       end
-      leaves = lines.map do |wc_line|
-        md = wc_line.match(%r{(\d+)\s+(.+)$}) or
+      node.num_lines_total = wc_total
+      node.children = lines.map do |wc_line|
+        md = wc_line.match(/\A *(\d+) *(.+)\z/) or
           raise SoftError("Failed to match against #{wc_line.inspect}"){ |e| e.show_origin! }
         Hipe::DataNode::Leaf.new do |me|
-          me.count = md[1].to_i
           me.name = md[2]
+          me.count = md[1].to_i
         end
       end
-      branch = Hipe::DataNode::Branch.new do |b|
-        b.name = label
-        b.children = leaves
-      end
-      Hipe::Stats[branch]
+      node
     end
   end
 
-  class SoftError < RuntimeError
-    include Hipe::Tinyscript::Support::Stringy
-    def initialize(*a, &b)
-      super(*a)
-      yield self if block_given?
-    end
-    attr_reader :show_origin
-    alias_method :show_origin?, :show_origin
-    def show_origin!; @show_origin = true end
-    def ui_message
-      [message, show_origin? ? "from #{from_where}" : nil].compact.join(' ')
-    end
-    def from_where
-      parts = parse_backtrace_line(backtrace[0]) and "#{File.basename(parts[:path])}:#{parts[:line]}"
-    end
-  end
+  PathOpts = { :positional => true, :required => false, :syntaxy_name => 'path',
+               :default => ['.'], :desc => "Search for files in these folders." }
 
   class App < Hipe::Tinyscript::App
     description <<-desc
@@ -154,44 +142,16 @@ module Hipe::FileMetrics
   end
 
   class Lc < MyCommand
+    parameter :paths, PathOpts.merge(:desc => 'path(s) to search for files in')
+
     description <<-desc
       shows the linecount of each file, longest first. Show
       percentages of max for each file.   will go recursively
       into directories.
       desc
 
-    parameter '-n', '--name NAME', :many=>true, :desc=> <<-desc
-      e.g. --name='*.rb'.  When present, this limits the
-      files analyzed to the ones whose basename matches
-      this pattern. It can be specified multiple times to
-      add multiple filename patterns, which will broaden
-      the search.  You should use single quotes to avoid
-      shell expansion.
-
-      When PATH is a file, this option is ignored.
-
-    desc
-
-    parameter '-D', '--exclude-dir DIR', :many=>true, :default=>['.*'], :desc=><<-desc
-      folders whose basename match this pattern will not be
-      descended into.  It can be specified multiple times
-      with multiple patterns to narrow the search.
-      If not provided, the default is to skip folders whose
-      name starts with a '.' (period).  To include such
-      dirs, specify "--exclude-dirs=[]" the first time you
-      use this option in the command.  (it has the effect
-      of clearing the "blacklist" of directories to skip)
-
-    desc
-
-    parameter '-c', '--command', 'show the generated find command we would have used.'
-
-    parameter '-l', '--list', 'list the resulting files that match the query.'
-
-    parameter '-R', '--no-report', "don't actually run the whole report. (useful only for the 2 above)"
-
-    parameter :paths, :syntaxy_name => 'path', :positional=> 1, :required => false, :default => ['.'],
-      :glob => 1, :desc => "the file or directory(s) to search."
+    # parameter :no_comment, '-C', "don't count lines with ruby-style comments."
+    # parameter :no_blank,   '-B', "don't count blank lines."
 
     def execute_no_catch
       @param[:name] ||= []
@@ -203,19 +163,20 @@ module Hipe::FileMetrics
     end
 
     def render_report filepaths
-      branch = linecount_branch_node_one_level('files', filepaths)
-      branch.sort_by!{ |node| node.stats.ratio_of_max }
-      matrix = branch.children.map do |node|
-        [ '%d' % node.stats.count,
-          '%5.01f%' % node.stats.percent_of_max,
-          node.name
+      node = linecount_data_node('files', filepaths)
+      node.sort_by!{ |n| n.stats.ratio_of_max }
+      matrix = node.children.map do |n|
+        [ '%d' % n.stats.count,
+          '%5.01f%' % n.stats.percent_of_max,
+          n.name
         ]
       end
       tableize(matrix) do |t|
-        out "summary of linecounts for #{branch.name}"
+        out "summary of linecounts for #{node.name}"
         fmt = "%#{t.width(0)}s %#{t.width(1)}s %-#{t.width(2)}s"
         t.rows{ |*row| out fmt % row  }
       end
+      out "total: #{node.num_lines_total || 0}"
     end
   end
 
@@ -225,42 +186,37 @@ module Hipe::FileMetrics
       for each of them report number of files and total sloc,
       and show them in order of total sloc and percent of max
     desc
-    parameter '-n', '--name PATTERN', 'multiple name patterns', :many => true
-    parameter '-D', '--exclude-dir DIR', :many => true, :default => ['.*'], :desc =>
-      "folders to skip."
-    parameter '-c', '--command', 'show the find command'
-    parameter '-l', '--list', 'list the matching folders'
-    parameter '-R', '--no-report', "don't actually run the report (useful for above options)"
-    parameter :path, :required => false, :positional => true, :default => '.'
+
+    parameter :path, :default => '.', :desc => 'search in this folder', :positional => true
+
     def execute_no_catch
       @param[:name] ||= []
-      File.exist?(param(:path)) or return err("file does not exist: #{param(:path)}")
       @param[:exclude_dir].first == '[]' and @param[:exclude_dir].shift
       @param.key?(:command) && out(dirs_find_command)
       @param.key?(:list) && out(baktix(dirs_find_command))
-      @param.key?(:no_report) || render_report(param(:path), baktix(dirs_find_command))
+      @param.key?(:no_report) || render_report(param(:paths), baktix(dirs_find_command))
       nil
     end
     def on_success; end # no 'done.' evar
   private
     def dirs_find_command
       cmd = FindCommand.new do |find|
-        find.paths param(:path)
+        find.paths [param(:path)] # always sic
         find.skip_dirs @param[:exclude_dir]
         find.extra = ' -a -maxdepth 1 -type d'
       end
       cmd.render
     end
-    def render_report path, folders
+    def render_report paths, folders
       root_list = folders.map do |folder|
         list = baktix(files_find_command(folder))
-        linecount_branch_node_one_level(File.basename(folder), list)
+        linecount_data_node(File.basename(folder), list)
       end
       root = Hipe::DataNode::Branch.new do |me|
         me.name = "folders summary"
         me.children = root_list
+        me.extend Hipe::Stats::Calculator
       end
-      Hipe::Stats[root]
       root.sort_by!{ |child| child.stats.count }
       fieldset = Hipe::Tinyscript::Support::Fieldset.new do |fs|
         fs.field(:folder_name)     { |x| x.name }
@@ -282,8 +238,6 @@ module Hipe::FileMetrics
   class Ext < MyCommand
     description "just report on the number of files with different extensions,
       ordered by frequency of extension"
-    parameter '-D', '--exclude-dir DIR', :many => true, :default => ['.*'], :desc =>
-      "folders to skip."
     parameter '--[no-]git', 'be aware of git commit objects,',
                       'glob them in to one category', :default => true
     # parameter '-e', '--each', 'for files with out extensions, show each name'
@@ -291,10 +245,9 @@ module Hipe::FileMetrics
                       'are globbed together. Use this flag ',
                       'to include them in the main table.', :default => false
 
-    parameter :path, :positional => true, :required => false,
-      :desc => "the folder to look in", :default => '.'
+    parameter :paths, PathOpts
 
-    def execute
+    def execute_no_catch
       @param[:exclude_dir].shift if @param[:exclude_dir].first == '[]'
       @pats = []
       @pats.push [/^[0-9a-f]{38,40}$/, 'git object'] if @param[:git]
@@ -302,14 +255,13 @@ module Hipe::FileMetrics
         h[k] = Hipe::Tinyscript::Support::EpeenStruct[{ :count => 0, :extension => k, :name => k }]
       end
       cmd = FindCommand.new do |find|
-        find.paths [param(:path)]
+        find.paths param(:paths)
         find.skip_dirs @param[:exclude_dir]
         find.names @param[:name]
         find.extra = ' -not -type d'
       end
       cmd_str = cmd.render
       baktix(cmd.render) do |bt|
-        bt.announce = 1 # sure just to see it
         bt.out do |line|
           pn = Pathname.new(line.chomp!)
           ext = pn.extname.to_s
@@ -320,8 +272,8 @@ module Hipe::FileMetrics
       root = Hipe::DataNode::Branch.new do |me|
         me.name = "extensions summary"
         me.children = counts.values
+        me.extend Hipe::Stats::Calculator
       end
-      Hipe::Stats[root]
       rows = root.sort_by!{ |node| node.count }
       if ! @param[:one]
         singles = []; multis = []
@@ -336,7 +288,7 @@ module Hipe::FileMetrics
       end
       matrix = rows.map{ |r| fields.map{ |f| f.render(r) } }
       tableize(matrix) do |t|
-        out "occurences of extensions in #{@param[:path].inspect}:"
+        out "occurences of extensions in #{@param[:paths].map(&:inspect).join(', ')}:"
         t.rows.unshift fields.map(&:titleize)
         fmt = fields.map{ |f| f.printf_format(t.width(f.index)) }.join(' | ')
         t.rows{ |*row| out fmt % row }
