@@ -226,7 +226,7 @@ module Hipe::FileMetrics
       @param[:exclude_dir].first == '[]' and @param[:exclude_dir].shift
       @param[:command] && out(dirs_find_command)
       @param[:list] && out(baktix(dirs_find_command))
-      @param[:no_report] || render_report(param(:paths), baktix(dirs_find_command))
+      @param[:no_report] || render_report(param(:path), baktix(dirs_find_command))
       nil
     end
     def on_success; end # no 'done.' evar
@@ -239,7 +239,7 @@ module Hipe::FileMetrics
       end
       cmd.render
     end
-    def render_report paths, folders
+    def render_report path, folders
       root_list = folders.map do |folder|
         list = baktix(files_find_command(folder))
         linecount_data_node(File.basename(folder), list)
