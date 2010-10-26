@@ -1,3 +1,1 @@
-gem 'hipe-core'
-gem 'open4'
-gem 'ostruct'
+# none for now! all in hipe-tinyscript
