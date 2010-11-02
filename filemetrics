@@ -11,7 +11,7 @@ require here + '/hipe-tinyscript/core' unless Hipe.const_defined? :Tinyscript
 require here + '/hipe-tinyscript/support' unless Hipe::Tinyscript.const_defined? :Support
 require here + '/support'
 
-require 'ruby-debug'; puts Hipe::Tinyscript::Colorize.colorize("foo", :blink, :bright, :red);
+# require 'ruby-debug'; puts Hipe::Tinyscript::Colorize.colorize("foo", :blink, :bright, :red);
 
 module Hipe::FileMetrics
 

@@ -148,7 +148,7 @@ module Hipe
       end
     end
     class RecordingProxy
-      KeepThese = %w(__send__ __id__ debugger inspect instance_exec pretty_print puts) # @todo get rid of puts!
+      KeepThese = %w(__send__ __id__ debugger inspect instance_exec object_id pretty_print puts) # @todo get rid of puts!
       (public_instance_methods.map(&:to_sym) - KeepThese.map(&:to_sym)).each do |meth|
         undef_method meth.to_sym
       end
