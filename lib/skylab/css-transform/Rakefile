@@ -1,0 +1,7 @@
+require 'bundler'
+Bundler::GemHelper.install_tasks
+
+desc "meh"
+task :default do 
+  puts "there is no default taks for this thing yet."
+end
