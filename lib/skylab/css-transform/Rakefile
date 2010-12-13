@@ -1,7 +1,12 @@
 require 'bundler'
 Bundler::GemHelper.install_tasks
+require 'rspec/core/rake_task'
 
-desc "meh"
-task :default do 
-  puts "there is no default taks for this thing yet."
+desc "Generate HTML report for failing examples"
+RSpec::Core::RakeTask.new('all_examples') do |t|
+  t.pattern = 'test/**/*_spec.rb'
+  t.rspec_opts = ["--format", 'documentation']
+  t.fail_on_error = false
 end
+
+task :default => :all_examples
