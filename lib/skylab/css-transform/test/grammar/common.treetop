@@ -6,7 +6,7 @@ module Hipe
           quoted_string / word
         end
         rule word
-          [^\t\n\r ]+ {
+          [^,;\t\n\r ]+ {
             def value
               text_value
             end
@@ -28,6 +28,9 @@ module Hipe
               elements[1].text_value
             end
           }
+        end
+        rule end_of_phrase
+          [ \t]* ( ',' [ \t]* comment_to_eol? [\n\r]*  /  comment_to_eol / [\n\r] )
         end
         rule space
           (white / comment_to_eol)+

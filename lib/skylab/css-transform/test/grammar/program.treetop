@@ -4,7 +4,7 @@ module Hipe
       grammar Program
         include Common
         rule itt_phrase
-          'blah' space folder:quoted_string_or_word space 'blah' {
+          [Ii] "n" (space "the")? space "folder" space folder:quoted_string_or_word end_of_phrase {
             def tree
               [:in_the_folder, {:the_word => folder.value} ]
             end
