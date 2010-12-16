@@ -1,3 +1,5 @@
+$:.unshift(File.dirname(File.dirname(__FILE__))+'/vendor/lib/treetop/lib')
+require 'rubygems'
 require 'treetop'
 require 'stringio'
 
@@ -50,3 +52,5 @@ module Hipe::CssConvert
     end
   end
 end
+
+require File.dirname(__FILE__)+'/css-convert/runtime.rb'
