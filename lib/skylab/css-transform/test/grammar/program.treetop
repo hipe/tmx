@@ -1,0 +1,51 @@
+module Hipe
+  module CssConvert
+    module Grammar
+      grammar Program
+        rule itt_phrase
+          'blah' space folder:quoted_string_or_word space 'blah' {
+            def tree
+              [:in_the_folder, {:the_word => folder.value} ]
+            end
+          }
+        end
+        rule quoted_string_or_word
+          quoted_string / word
+        end
+        rule word
+          [^\t\n\r ]+ {
+            def value
+              text_value
+            end
+          }
+        end
+        rule quoted_string
+          single_quoted_string / double_quoted_string
+        end
+        rule double_quoted_string
+          '"' (!'"' . / '\"')* '"' {
+            def value
+              elements[1].text_value
+            end
+          }
+        end
+        rule single_quoted_string
+          "'" (!"'" . / "\'")* "'" {
+            def value
+              elements[1].text_value
+            end
+          }
+        end
+        rule space
+          (white / comment_to_eol)+
+        end
+        rule comment_to_eol
+          '#' (!"\n" .)*
+        end
+        rule white
+          [ \t\n\r]
+        end
+      end
+    end
+  end
+end
