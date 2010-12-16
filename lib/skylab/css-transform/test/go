@@ -1,7 +1,8 @@
 #!/usr/bin/env ruby
 
 require File.dirname(__FILE__)+'/../lib/css-convert'
-require File.dirname(__FILE__) + '/grammar/program.rb'
+# require File.dirname(__FILE__) + '/grammar/program.rb'
+Treetop.load File.dirname(__FILE__) + '/grammar/program'
 
 p = Hipe::CssConvert::Grammar::ProgramParser.new
 input = $stdin.tty? ? ARGV.join(" ") : $stdin.read.chomp
