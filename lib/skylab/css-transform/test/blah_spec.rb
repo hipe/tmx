@@ -1,15 +1,4 @@
-require File.expand_path('../../lib/css-convert', __FILE__)
-require 'fileutils'
-require 'stringio'
-
-module Hipe::CssConvert::ExampleHelperMethods
-  def new_cli
-    Hipe::CssConvert.cli.buffered!
-  end
-  def fixture tail
-    File.join('spec/fixtorros', tail)
-  end
-end
+require File.dirname(__FILE__) + '/testlib.rb'
 
 module BlahSpec
   describe Hipe::CssConvert::Cli do
