@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'treetop', '>= 1.4.9'
 
-  s.rubyforge_project = "css-convert"
+  # s.rubyforge_project = "css-convert"
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
