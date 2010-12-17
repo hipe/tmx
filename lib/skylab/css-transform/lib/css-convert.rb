@@ -55,6 +55,21 @@ module Hipe::CssConvert
       end
     end
   end
+  module Grammars
+    class << self
+      #
+      # if we've compiled the grammar ourselves, load that else let treetop do it.
+      # (Surprised this isn't builtin to treetop!)
+      #
+      def load str
+        if File.exist?("#{str}.rb")
+          require str
+        else
+          ::Treetop.load(str)
+        end
+      end
+    end
+  end
 end
 
 require Hipe::CssConvert::ROOT+'/runtime.rb'
