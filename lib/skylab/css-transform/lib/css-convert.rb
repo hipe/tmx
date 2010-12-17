@@ -1,5 +1,8 @@
-$:.unshift(File.dirname(File.dirname(__FILE__))+'/vendor/lib/treetop/lib')
 require 'rubygems'
+
+$:.unshift(File.dirname(File.dirname(__FILE__))+'/vendor/lib/treetop/lib') 
+  # use treetop in vendor/lib, not the one in rubygems/rvm/gemspec/whatever, in case etc.. @todo
+
 require 'treetop'
 require 'stringio'
 
@@ -54,5 +57,6 @@ module Hipe::CssConvert
   end
 end
 
-require File.dirname(__FILE__)+'/css-convert/runtime.rb'
-require File.dirname(__FILE__)+'/css-convert/node-classes.rb'
+require Hipe::CssConvert::ROOT+'/runtime.rb'
+require Hipe::CssConvert::ROOT+'/sexpie.rb'
+require Hipe::CssConvert::ROOT+'/node-classes.rb'
