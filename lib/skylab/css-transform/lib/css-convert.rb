@@ -13,6 +13,7 @@ module Hipe;
   end
 end
 module Hipe::CssConvert
+  ROOT = File.dirname(__FILE__)+'/css-convert'
   class << self
     def cli
       Cli.new
