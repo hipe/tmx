@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+
+require File.dirname(__FILE__)+'/../lib/css-convert'
+p = Hipe::CssConvert.css_parser
+input = $stdin.tty? ? ARGV.join(" ") : $stdin.read.chomp
+# puts input.inspect
+resp = p.parse(input)
+# puts "response: "+resp.inspect
+puts "num terminal failures: #{p.terminal_failures.size}"
+if resp.nil?
+  puts "got failure:"
+  puts p.failure_reason
+else
+  puts "got result: "
+  require 'pp'
+  PP.pp resp
+end
