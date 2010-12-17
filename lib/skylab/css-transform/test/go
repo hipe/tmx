@@ -2,17 +2,18 @@
 
 require File.dirname(__FILE__)+'/../lib/css-convert'
 require File.dirname(__FILE__) + '/grammar/program-wrapper.rb'
+require 'pp'
 
 p = Hipe::CssConvert::Grammar::ProgramParser.new
 input = $stdin.tty? ? ARGV.join(" ") : $stdin.read.chomp
 puts "input:    "+input.inspect
 resp = p.parse(input)
-puts "response: "+resp.inspect
+# puts "response: "+resp.inspect
 puts "num terminal failures: #{p.terminal_failures.size}"
 if resp.nil?
   puts "got failure:"
   puts p.failure_reason
 else
   puts "got result: "
-  puts resp.tree.inspect
+  PP.pp resp.tree
 end
