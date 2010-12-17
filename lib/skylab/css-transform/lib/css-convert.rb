@@ -54,3 +54,4 @@ module Hipe::CssConvert
 end
 
 require File.dirname(__FILE__)+'/css-convert/runtime.rb'
+require File.dirname(__FILE__)+'/css-convert/node-classes.rb'

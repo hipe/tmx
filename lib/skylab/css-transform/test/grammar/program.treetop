@@ -3,10 +3,70 @@ module Hipe
     module Grammar
       grammar Program
         include Common
-        rule itt_phrase
-          [Ii] "n" (space "the")? space "folder" space folder:quoted_string_or_word end_of_phrase {
+        rule statement
+          merge_statement
+        end
+        rule merge_statement
+          itf:in_the_folder? sif:styles_in_files styles_under? merge_list '.' {
             def tree
-              [:in_the_folder, {:the_word => folder.value} ]
+              [:merge_statement, {
+                :in_the_folder => itf.tree,
+                :styles_in_file => sif.tree,
+                :styles_under => ( elements[2].respond_to?(:tree) ? elements[2].tree : false ),
+                :merge_list => merge_list.tree
+              }]
+            end
+          }
+        end
+        rule in_the_folder
+          [Ii] "n" (space "the")? space "folder" space folder:literal phrase_end {
+            def tree
+              [:in_the_folder, {:path => folder.value} ]
+            end
+          }
+        end
+        rule styles_in_files
+          "for styles in " left:literal " on the left" ","? " and styles in " right:literal " on the right" phrase_end {
+            def tree
+              [:for_styles_in_files, { :left => left.value, :right => right.value} ]
+            end
+          }
+        end
+        rule styles_under
+          "for styles under " left:literal " on the left" ','? " and styles under " right:literal " on the right" phrase_end {
+            def tree
+              [:styles_under, { :left => left.value, :right => right.value} ]
+            end
+          }
+        end
+        rule merge_list
+          "merge the styles in the left over the styles on the right where" space applies_list {
+            def tree
+              applies_list.tree
+            end
+          }
+        end
+        rule applies_list
+          list:( pairing aesthetic_sep )* oneof:( pairing / catchall_pairing ) {
+            def tree
+              list.elements.map{ |x| x.pairing.tree } + [ oneof.tree ]
+            end
+          }
+        end
+        rule aesthetic_sep
+          [ \t]* ( ',' / comment_to_eol / [\n] ) space*
+        end
+        rule pairing
+          space* left:literal space+ "applies to" space+ right:quoted_string {
+            def tree
+              [:pairing, {:left => left.value, :right => right.value} ]
+            end
+          }
+        end
+        rule catchall_pairing
+          space* left:literal space+ "applies to" space+ "everything else" {
+            def tree
+              [:catchall_pairing, {:left => left.value} ]
             end
           }
         end
