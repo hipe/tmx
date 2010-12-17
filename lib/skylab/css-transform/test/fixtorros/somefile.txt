@@ -1,4 +1,4 @@
-in the folder "test/fixtorros"
+In the folder "test/fixtorros"
 for styles in "documentation.css" on the left, and styles in "pygments.css" on the right,
 for styles under ".highlight" on the left, and styles under ".pre" on the right,
 merge the styles in the left over the styles on the right where
