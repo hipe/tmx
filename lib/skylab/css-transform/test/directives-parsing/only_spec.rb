@@ -14,4 +14,14 @@ describe 'directives parsing' do
     [['.keyword','.k'],['.default','.nc'],['.keyword','.p'],['.keyword', nil]].should ==
       ls[0..3].map{|x| [x[:left], x[:right]]}
   end
+
+  it "should parse with a minimal set of directives", :minimal => true do
+    tree = parse_directives_in_file(fixture_path('002-minitessimal.txt'))
+    tree[:in_the_folder].should == false
+    tree[:styles_under].should == false
+    ["red.css", "blue.css"].should == tree[:styles_in_files].children(:left, :right)
+    md = tree[:merge_list]
+    md.size.should == 1
+    md.first.node_type.should == :catchall_pairing
+  end
 end

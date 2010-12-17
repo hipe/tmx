@@ -7,12 +7,12 @@ module Hipe
           merge_statement
         end
         rule merge_statement
-          itf:in_the_folder? sif:styles_in_files styles_under? merge_list '.' space* {
+          itf:in_the_folder? sif:styles_in_files su:styles_under? merge_list '.' space* {
             def tree
               S[:merge_statement, {
-                :in_the_folder => itf.tree,
+                :in_the_folder => itf.respond_to?(:tree) && itf.tree,
                 :styles_in_files => sif.tree,
-                :styles_under => ( elements[2].respond_to?(:tree) ? elements[2].tree : false ),
+                :styles_under => su.respond_to?(:tree) && su.tree,
                 :merge_list => merge_list.tree
               }]
             end
@@ -26,7 +26,7 @@ module Hipe
           }
         end
         rule styles_in_files
-          "for styles in " left:literal " on the left" ","? " and styles in " right:literal " on the right" phrase_end {
+          [Ff] "or styles in " left:literal " on the left" ","? " and styles in " right:literal " on the right" phrase_end {
             def tree
               S[:for_styles_in_files, { :left => left.value, :right => right.value} ]
             end
