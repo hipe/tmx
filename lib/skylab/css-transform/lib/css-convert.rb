@@ -21,6 +21,9 @@ module Hipe::CssConvert
     def cli
       Cli.new
     end
+    def css_parser
+      CssParser.new
+    end
   end
   class Cli
     def initialize
@@ -75,3 +78,4 @@ end
 require Hipe::CssConvert::ROOT+'/runtime.rb'
 require Hipe::CssConvert::ROOT+'/sexpie.rb'
 require Hipe::CssConvert::ROOT+'/node-classes.rb'
+require Hipe::CssConvert::ROOT+'/css-parser.rb'
