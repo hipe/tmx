@@ -1,0 +1,55 @@
+module Hipe
+module CssConvert
+module CssParsing
+grammar CssFile
+  include Common
+  rule css_file
+    ( style_block / directive )* space
+  end
+  rule directive
+    # this will have to change! @todo
+    space '@import ' [^;]+ ';'
+  end
+  rule style_block
+    space selectors space '{' space assignment* '}'
+  end
+  rule selectors
+    selector ( space ',' space selector )*
+  end
+  rule selector
+    element_selector ( space element_selector )*
+  end
+  rule element_selector
+    (( element_name class_selector? ) / class_selector ) pseudoclass_selector?
+  end
+  rule assignment
+    assignment_name space ':' space assignment_value space ';' space
+  end
+  rule assignment_value
+    [^;]+
+  end
+  rule element_name
+    [a-z]+
+  end
+  rule class_selector
+    [-_a-zA-z] [-_a-zA-Z0-9]*
+  end
+  rule pseudoclass_selector
+    ':' [a-z]+
+  end
+  rule assignment_name
+    [-a-z]+
+  end
+  rule c_style_comment
+    '/*' ( [^*] /  !'/' '*' )* '*/'
+  end
+  rule space
+    ( c_style_comment / white )*
+  end
+  rule white
+    [ \t\n\r]+
+  end
+end
+end
+end
+end
