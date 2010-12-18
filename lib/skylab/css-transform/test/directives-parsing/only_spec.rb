@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/../testlib.rb' unless Object.const_defined? 'Hipe__CssConvert__Testlib'
 
-describe 'directives parsing' do
+describe 'When parsing directives' do
   it "should parse platonic ideal" do
     tree = parse_directives_in_file(fixture_path('001-platonic-ideal.txt'))
     tree.node_type.should == :merge_statement

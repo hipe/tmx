@@ -4,50 +4,110 @@ module CssParsing
 grammar CssFile
   include Common
   rule css_file
-    ( style_block / directive )* space
+    things:( style_block / directive )* space <CssFile> {
+      def tree
+        CustomTree::Aggregate[:css_file, * (things.elements.map(&:tree) + [space.tree])]
+      end
+    }
   end
   rule directive
     # this will have to change! @todo
-    space '@import ' [^;]+ ';'
+    space '@import ' [^;]+ ';' <Directive> {
+      def tree
+        :directive
+      end
+    }
   end
   rule style_block
-    space selectors space '{' space assignment* '}'
+    space selectors space '{' space assignment* '}' <StyleBlock> {
+      def tree
+        :style_block
+      end
+    }
   end
   rule selectors
-    selector ( space ',' space selector )*
+    selector ( space ',' space selector )* <Selectors> {
+      def tree
+         :selectors
+      end
+    }
   end
   rule selector
-    element_selector ( space element_selector )*
+    element_selector ( space element_selector )* <Selector> {
+      def tree
+        :selector
+      end
+    }
   end
   rule element_selector
-    (( element_name class_selector? ) / class_selector ) pseudoclass_selector?
+    (( element_name class_selector? ) / class_selector ) pseudoclass_selector? <ElementSelector> {
+      def tree
+        :element_selector
+      end
+    }
   end
   rule assignment
-    assignment_name space ':' space assignment_value space ';' space
+    assignment_name space ':' space assignment_value space ';' space <Assignment> {
+      def tree
+        :assignment
+      end
+    }
   end
   rule assignment_value
-    [^;]+
+    [^;]+ <AssignmentValue> {
+      def tree
+        :assgnmt_val
+      end
+    }
   end
   rule element_name
-    [a-z]+
+    [a-z]+ <ElementName> {
+      def tree
+        :el_name_val
+      end
+    }
   end
   rule class_selector
-    [-_a-zA-z] [-_a-zA-Z0-9]*
+    [-_a-zA-z] [-_a-zA-Z0-9]* <ClassSelector> {
+      def tree
+        :cls_sel_val
+      end
+    }
   end
   rule pseudoclass_selector
-    ':' [a-z]+
+    ':' [a-z]+ <PseudoclassSelector> {
+      def tree
+        :pseudo_val
+      end
+    }
   end
   rule assignment_name
-    [-a-z]+
+    [-a-z]+ <AssignmentName> {
+      def tree
+        :assignment_name
+      end
+    }
   end
   rule c_style_comment
-    '/*' ( [^*] /  !'/' '*' )* '*/'
+    '/*' ( [^*] / '*' !'/' )* '*/' <CStyleComment> {
+      def tree
+        CustomTree::Whitesque[:c_style_comment, text_value]
+      end
+    }
   end
   rule space
-    ( c_style_comment / white )*
+    ( c_style_comment / white )* <Space> {
+      def tree
+        CustomTree::Aggregate[:space, * elements.map(&:tree) ]
+      end
+    }
   end
   rule white
-    [ \t\n\r]+
+    [ \t\n\r]+ <White> {
+      def tree
+        CustomTree::Whitesque[:white, elements.first.text_value]
+      end
+    }
   end
 end
 end

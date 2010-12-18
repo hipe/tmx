@@ -1,6 +1,22 @@
 module Hipe::CssConvert
   module CssParsing
+    class DifferentSexpie < ::Array
+      class << self
+        def [] (*a)
+          if a.first.kind_of?(Symbol)
+            new(a)
+          end
+        end
+        def initialize args
+          super(*args)
+        end
+      end
+    end
+  end
+  module CssParsing
     here = File.dirname(__FILE__)+'/css-parsing'
+    S = ::Hipe::CssConvert::CssParsing::DifferentSexpie
+    require "#{here}/node-classes.rb"
     Grammars.load "#{here}/common"
     Grammars.load "#{here}/css-file"
   end
