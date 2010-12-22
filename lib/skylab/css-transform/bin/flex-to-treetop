@@ -1,0 +1,91 @@
+#!/usr/bin/env ruby
+require 'optparse'
+
+module Hipe; end
+
+module Hipe::FlexToTreetop
+  VERSION = '0.0.0'
+
+  class << self
+    def cli
+      Cli.new
+    end
+  end
+  class Cli
+    def initialize
+      @err = $stderr
+      @out = $stout
+      @in =  $stdin
+      @conf = {}
+    end
+    def run argv
+      catch(:done) do
+        begin
+          option_parser.parse!(argv)
+          if @in.tty?
+            err help_string
+          else
+            _run
+          end
+        rescue ::OptionParser::InvalidOption => e
+          err e.message
+          err option_parser.to_s
+        end
+      end
+    end
+  private
+    def err *a
+      @err.puts(*a)
+    end
+    def help_string
+      option_parser.to_s
+    end
+    def out *a
+      @out.puts(*a)
+    end
+    def option_parser
+      @option_parser and return @option_parser
+      o = OptionParser.new
+      o.banner = "Usage: cat somefile.flex | #{program_name} [options]"
+
+      o.on('-h', '--help', 'Show this message') do
+        err help_string
+        throw :done
+      end
+
+      o.on('-v', '--version', 'Show Version') do
+        err "#{program_name} version #{VERSION}"
+        throw :done
+      end
+      @option_parser = o
+    end
+
+    def program_name
+      File.basename($PROGRAM_NAME)
+    end
+    def _run
+      FlexToTreetop.new(@in, @out, @err, @config).run
+    end
+  end
+  class FlexToTreetop
+    def initialize instream, outstream, errstream, config
+      @in = instream; @out = outstream; @err = errstream; @conf = config
+    end
+    def run
+      puts "Sure why not"
+    end
+  end
+end
+
+Hipe::FlexToTreetop::DATA = DATA.read
+
+if File.basename(__FILE__) == File.basename($PROGRAM_NAME)
+  Hipe::FlexToTreetop.cli.run(ARGV)
+end
+
+__END__
+
+whootly hottily
+
+
+
