@@ -10,10 +10,8 @@ require 'ruby-debug'
 
 the_bnf = <<-HERE
 
-Foobie ::= "A" "B" | "C"
-
 NameStartChar ::= ":" | [A-Z] | "_" | [a-z] | [#xC0-#xD6] | [#xD8-#xF6] |
-                  [#xF8-#x2FF] | [#x370-#x37D] "bazzle" | [#x37F-#x1FFF] |
+                  [#xF8-#x2FF] | [#x370-#x37D] | [#x37F-#x1FFF] |
                   [#x200C-#x200D] | [#x2070-#x218F] | [#x2C00-#x2FEF] |
                   [#x3001-#xD7FF] | [#xF900-#xFDCF] | [#xFDF0-#xFFFD] |
                   [#x10000-#xEFFFF]
@@ -35,6 +33,11 @@ HERE
 module Hipe; end
 module Hipe::BnfToTreetop
   class << self; def instance; BnfToTreetop.new end end
+  class Config < Hash
+    def initialize h
+      super(h)
+    end
+  end
   class BnfToTreetop
     def initialize
       @tree = [:rules]
@@ -42,6 +45,11 @@ module Hipe::BnfToTreetop
       @out = $stdout
       @err = $stderr
       @expecting = []
+      @config = Config.new(
+        :rule_prefix        => 'xml_',
+        :uncamelize         => true,
+        :literalize_unicode => true
+      )
     end
     def push sexp
       @stack.last.push sexp
@@ -87,7 +95,7 @@ module Hipe::BnfToTreetop
         end
       end
       # PP.pp @tree
-      Nodes::Rules.new(@tree, @out, @err).to_treetop
+      Nodes::Rules.new(@tree, @out, @err){ |x| x.config = @config }.to_treetop
     end
     def white!
       @s.skip(/[ \t\n\r\f]+/) || true
@@ -211,14 +219,16 @@ module Hipe::BnfToTreetop
     end
     class Node
       include Helpers
-      def initialize tree, out, err
+      def initialize tree, out, err, config=nil
         @tree = tree; @out = out; @err = err
+        yield(self) if block_given?
+        @config ||= (config || Config.new)
       end
-      attr_accessor :tree
+      attr_accessor :tree, :config
     end
     class Rules < Node
       def to_treetop
-        stupid = Rule.new(nil, @out, @err)
+        stupid = Rule.new(nil, @out, @err, @config)
         @tree[1..-1].each_with_index do |tree, idx|
           @out.write("\n") unless idx == 0
           stupid.tree = tree
@@ -230,15 +240,18 @@ module Hipe::BnfToTreetop
     class Rule < Node
       def initialize *a
         super(*a)
-        @rhs = Rhs.new(nil, @out, @err)
+        @rhs = Rhs.new(nil, @out, @err, @config)
       end
       def to_treetop
         @rhs.tree = @tree[2]
-        @out.puts "  rule #{uncamelize(@tree[1][1])}"
+        @out.puts "  rule #{rule_name}"
         @out.write "    "
         @rhs.to_treetop
         @out.write "\n  end"
         nil
+      end
+      def rule_name
+        @config[:uncamelize] ? uncamelize(@tree[1][1]) : @tree[1][1]
       end
     end
     class Rhs < Node
@@ -249,7 +262,8 @@ module Hipe::BnfToTreetop
       end
       def _character_class s, idx
         @out.write(' ') unless idx == 0
-        @out.write literalize_unicode(s[1]) # careful!
+        val = @config[:literalize_unicode] ? literalize_unicode(s[1]) : s[1]
+        @out.write val
       end
       def _kleene s, idx
         @out.write(s[1])
@@ -260,7 +274,7 @@ module Hipe::BnfToTreetop
       end
       def _or _, __
         @out.write(' ')
-        @out.write('|')
+        @out.write('/')
       end
       def _parenthesized_group s, idx
         @out.write(' ') unless idx == 0
@@ -270,11 +284,12 @@ module Hipe::BnfToTreetop
       end
       def _rule_name s, idx
         @out.write(' ') unless idx == 0
-        @out.write uncamelize(s[1])
+        @out.write(@config[:uncamelize] ? uncamelize(s[1]) : s[1])
       end
       def _unicodepoint_literal s, idx
         @out.write(' ') unless idx == 0
-        @out.write literalize_unicode(s[1]).inspect # careful!
+        val = @config[:literalize_unicode] ? literalize_unicode(s[1]) : s[1]
+        @out.write val.inspect # careful!
       end
     end
   end
