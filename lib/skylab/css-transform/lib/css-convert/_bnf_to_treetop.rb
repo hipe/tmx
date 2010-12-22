@@ -42,7 +42,6 @@ module Hipe::BnfToTreetop
       @out = $stdout
       @err = $stderr
       @expecting = []
-      @literalize_unicode = true
     end
     def push sexp
       @stack.last.push sexp
@@ -87,11 +86,8 @@ module Hipe::BnfToTreetop
           rule_name!; white!; equals_thingy!; white!; rule_rhs!; white!
         end
       end
-      PP.pp @tree
-    end
-    def literalize_unicode str
-      str
-      # str.gsub(/#x([a-zA-Z0-9]+)/){ "fix this: #{$1}"}
+      # PP.pp @tree
+      Nodes::Rules.new(@tree, @out, @err).to_treetop
     end
     def white!
       @s.skip(/[ \t\n\r\f]+/) || true
@@ -117,6 +113,8 @@ module Hipe::BnfToTreetop
       push sexp
       @stack.push sexp
       rhs!
+      @stack.pop # pop the rhs
+      @stack.pop # pop the rule!!
     end
     def rhs!
       got = one_of_or_fail {
@@ -171,9 +169,6 @@ module Hipe::BnfToTreetop
     def _character_class!
       @expecting << :character_class
       if found = @s.scan(/\[(?:[^\]]|\\\])+\]/)
-        if @literalize_unicode
-          found = literalize_unicode(found)
-        end
         [:character_class, found]
       end
     end
@@ -201,10 +196,85 @@ module Hipe::BnfToTreetop
     def _unicodepoint_literal!
       @expecting << :unicodepoint_literal
       if found = @s.scan(/#x([a-zA-Z0-9]+)/)
-        if @literalize_unicode
-          found = literalize_unicode(found)
-        end
         [:unicodepoint_literal, found]
+      end
+    end
+  end
+  module Nodes
+    module Helpers
+      def literalize_unicode str
+        str.gsub(/#x([a-zA-Z0-9]+)/){ [$1.hex].pack('U*') }
+      end
+      def uncamelize str
+        str.gsub(/([a-z])([A-Z])/){ "#{$1}_#{$2}" }.downcase
+      end
+    end
+    class Node
+      include Helpers
+      def initialize tree, out, err
+        @tree = tree; @out = out; @err = err
+      end
+      attr_accessor :tree
+    end
+    class Rules < Node
+      def to_treetop
+        stupid = Rule.new(nil, @out, @err)
+        @tree[1..-1].each_with_index do |tree, idx|
+          @out.write("\n") unless idx == 0
+          stupid.tree = tree
+          stupid.to_treetop
+        end
+        nil
+      end
+    end
+    class Rule < Node
+      def initialize *a
+        super(*a)
+        @rhs = Rhs.new(nil, @out, @err)
+      end
+      def to_treetop
+        @rhs.tree = @tree[2]
+        @out.puts "  rule #{uncamelize(@tree[1][1])}"
+        @out.write "    "
+        @rhs.to_treetop
+        @out.write "\n  end"
+        nil
+      end
+    end
+    class Rhs < Node
+      def to_treetop node=@tree
+        node[1..-1].each_with_index do |_sexp, idx|
+          send("_#{_sexp.first}", _sexp, idx)
+        end
+      end
+      def _character_class s, idx
+        @out.write(' ') unless idx == 0
+        @out.write literalize_unicode(s[1]) # careful!
+      end
+      def _kleene s, idx
+        @out.write(s[1])
+      end
+      def _nonempty_quoted_string s, idx
+        @out.write(' ') unless idx == 0
+        @out.write s[1] # careful!
+      end
+      def _or _, __
+        @out.write(' ')
+        @out.write('|')
+      end
+      def _parenthesized_group s, idx
+        @out.write(' ') unless idx == 0
+        @out.write '('
+        to_treetop s
+        @out.write ')'
+      end
+      def _rule_name s, idx
+        @out.write(' ') unless idx == 0
+        @out.write uncamelize(s[1])
+      end
+      def _unicodepoint_literal s, idx
+        @out.write(' ') unless idx == 0
+        @out.write literalize_unicode(s[1]).inspect # careful!
       end
     end
   end
