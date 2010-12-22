@@ -34,8 +34,8 @@ module Hipe; end
 module Hipe::BnfToTreetop
   class << self; def instance; BnfToTreetop.new end end
   class Config < Hash
-    def initialize h
-      super(h)
+    def initialize h=nil
+      h.nil? or replace(h)
     end
   end
   class BnfToTreetop
@@ -251,7 +251,11 @@ module Hipe::BnfToTreetop
         nil
       end
       def rule_name
-        @config[:uncamelize] ? uncamelize(@tree[1][1]) : @tree[1][1]
+        val = @config[:uncamelize] ? uncamelize(@tree[1][1]) : @tree[1][1]
+        if @config[:rule_prefix]
+          val = "#{@config[:rule_prefix]}#{val}"
+        end
+        val
       end
     end
     class Rhs < Node
@@ -284,7 +288,11 @@ module Hipe::BnfToTreetop
       end
       def _rule_name s, idx
         @out.write(' ') unless idx == 0
-        @out.write(@config[:uncamelize] ? uncamelize(s[1]) : s[1])
+        val = @config[:uncamelize] ? uncamelize(s[1]) : s[1]
+        if (@config[:rule_prefix])
+          val = "#{@config[:rule_prefix]}#{val}"
+        end
+        @out.write(val)
       end
       def _unicodepoint_literal s, idx
         @out.write(' ') unless idx == 0
