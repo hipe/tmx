@@ -1,38 +1,26 @@
 #!/usr/bin/env ruby -w
 
 require 'strscan'
-require 'ruby-debug'
+require 'optparse'
 
-# per http://www.w3.org/TR/REC-xml/
-
-# yes we did
-
-
-the_bnf = <<-HERE
-
-NameStartChar ::= ":" | [A-Z] | "_" | [a-z] | [#xC0-#xD6] | [#xD8-#xF6] |
-                  [#xF8-#x2FF] | [#x370-#x37D] | [#x37F-#x1FFF] |
-                  [#x200C-#x200D] | [#x2070-#x218F] | [#x2C00-#x2FEF] |
-                  [#x3001-#xD7FF] | [#xF900-#xFDCF] | [#xFDF0-#xFFFD] |
-                  [#x10000-#xEFFFF]
-
-NameChar  ::=     NameStartChar  | "-" | "." | [0-9] | #xB7 |
-                  [#x0300-#x036F] | [#x203F-#x2040]
-
-Name      ::=     NameStartChar (NameChar)*
-
-Names     ::=     Name (#x20 Name)*
-Nmtoken   ::=     (NameChar)+
-Nmtokens  ::=     Nmtoken (#x20 Nmtoken)*
-
-
-HERE
-
-
+# require 'ruby-debug'
 
 module Hipe; end
 module Hipe::BnfToTreetop
-  class << self; def instance; BnfToTreetop.new end end
+  class << self
+    def cli
+      CliAgent.new
+    end
+  end
+  class CliAgent
+    def initialize
+      
+    end
+    def run argv
+      
+      puts "OK"
+    end
+  end
   class Config < Hash
     def initialize h=nil
       h.nil? or replace(h)
@@ -46,7 +34,7 @@ module Hipe::BnfToTreetop
       @err = $stderr
       @expecting = []
       @config = Config.new(
-        :rule_prefix        => 'xml_',
+        :rule_prefix        => nil,
         :uncamelize         => true,
         :literalize_unicode => true
       )
@@ -303,4 +291,4 @@ module Hipe::BnfToTreetop
   end
 end
 
-Hipe::BnfToTreetop.instance.run(the_bnf)
+Hipe::BnfToTreetop.cli.run(ARGV)
