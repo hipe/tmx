@@ -299,7 +299,7 @@ grammar FlexFile
     [A-Za-z_] [-a-zA-Z0-9_]*
   end
   rule name_definition_definition
-    [^\n]+
+    pattern
   end
   rule start_declaration
     '%' 'option' [ \t]+ 'case-insensitive'
