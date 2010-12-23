@@ -8,6 +8,13 @@ require 'treetop'
 # Test with:
 # bundle exec bin/flex-to-treetop test/fixtures/flex/ideal.flex
 
+# The structure of this file is ridiculous because we're trying to keep it all
+# in one file as a standalone thing.  It is, in sequence:
+#   1) a Cli class to parse commands 2) FlexToTreetop that is the main agent
+#   3) Pull in the treetop-generated parser (by one of a variety of ways)
+#   4) Subclass it (MyFlexFileParser < FlexFileParser) 5) run this file
+#   6) The treetop grammar in put inline after the __END__ for novelty points.
+
 module Hipe; end
 
 module Hipe::FlexToTreetop
@@ -148,11 +155,11 @@ module Hipe::FlexToTreetop
       o.banner = "Usage: #{program_name} [options] <flexfile>"
 
       o.on('-g', '--grammar',
-        'Show the grammar as it appears in this file'
+       '(debugging) Show the flex treetop grammar as it appears in this file.'
       ) { self.action = :grammar }
 
       o.on('-t[=<dir>]', '--tempdir[=<dir>]',
-        'Write/Read grammar from the filesystem'
+        '(debugging) Write/Read flex treetop grammar from the filesystem.'
       ) { }
 
       o.on('-c', '--clear',
@@ -272,7 +279,7 @@ module Hipe
 module FlexToTreetop
 grammar FlexFile
   rule file
-    definitions spacey* '%%' rules
+    definitions spacey* '%%' spacey* rules spacey*
   end
   rule definitions
     spacey* (definition_declaration (decl_sep definition_declaration)* )?
@@ -293,7 +300,16 @@ grammar FlexFile
     '%' 'option' [ \t]+ 'case-insensitive'
   end
   rule rules
-    .+
+    rool (decl_sep rool)*
+  end
+  rule rool
+    pattern [ \t]+ action
+  end
+  rule pattern
+    [^ ]+
+  end
+  rule action
+    [^\n]+
   end
   rule comment
     '/*' ( [^*] / '*' !'/' )* '*/'
