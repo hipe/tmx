@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 module Hipe::CssConvert
   module CssParsing
     class DifferentSexpie < ::Array
@@ -18,6 +20,7 @@ module Hipe::CssConvert
     S = ::Hipe::CssConvert::CssParsing::DifferentSexpie
     require "#{here}/node-classes.rb"
     Grammars.load "#{here}/common"
+    Grammars.load "#{here}/xml-subset"
     Grammars.load "#{here}/css-file"
   end
   class CssParser < CssParsing::CssFileParser
@@ -40,7 +43,7 @@ module Hipe::CssConvert
     def my_input_excerpt
       slicey = input[index...failure_index]
       all_lines = slicey.split("\n", -1)
-      these_lines = all_lines.slice([0, -1 * my_num_lines_context].max, all_lines.size)
+      these_lines = all_lines.slice(-1 * [all_lines.size, my_num_lines_context].min, all_lines.size)
       numbers = failure_line.downto([1, failure_line - my_num_lines_context + 1].max).to_a.reverse
       w = numbers.last.to_s.size # greatest line number as string, how many chars wide?
       ":\n" + numbers.zip(these_lines).map{ |no, line| ("%#{w}i" % no) + ": #{line}" }.join("\n")
