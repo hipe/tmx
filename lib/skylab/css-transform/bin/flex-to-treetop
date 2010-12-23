@@ -1,11 +1,12 @@
 #!/usr/bin/env ruby
-
 require 'optparse'
 require 'pp'
 require 'rubygems'
-require 'ruby-debug'
+# require 'ruby-debug'; puts "\e[1;5;33mruby-debug\e[0m"
 require 'treetop'
 
+# Test with:
+# bundle exec bin/flex-to-treetop test/fixtures/flex/ideal.flex
 
 module Hipe; end
 
@@ -14,7 +15,7 @@ module Hipe::FlexToTreetop
 
   class << self
     def cli
-      Cli.new
+      @cli ||= Cli.new
     end
   end
   class Cli
@@ -24,66 +25,171 @@ module Hipe::FlexToTreetop
       @in =  $stdin
       @conf = {}
     end
-    def run argv
-      catch(:done) do
-        begin
-          option_parser.parse!(argv)
-          if @in.tty?
-            if argv.size != 1
-              usage "expecting <flexfile> had: (#{argv.join(' ')})"
-            else
-              if ! File.exist?(infile = argv.shift)
-                usage "<flexfile> not found: #{infile}"
-              else
-                infh = File.open(infile, 'r')
-                _run(infh)
-              end
-            end
-          else
-            if argv.size != 0
-              usage "reading STDIN as <flexfile>, had: (#{argv.join(' ')})"
-            else
-              _run(@in)
-            end
-          end
-        rescue ::OptionParser::InvalidOption => e
-          usage e.message
-        end
-      end
+    def out *a
+      @out.puts(*a)
     end
-  private
     def err *a
       @err.puts(*a)
     end
+    def run argv
+      begin
+        option_parser.parse!(argv)
+        if @actions
+          if ! @in.tty?
+            usage "can't read from STDIN when doing "+
+              @actions.map(&:to_s).join(' ')
+          else
+            resp = nil
+            @actions.each{ |meth| resp = send(meth) }
+            resp
+          end
+        elsif @in.tty?
+          if @tempfile_loaded && argv.empty? # allowed for parse checks
+            err 'No file arguments present.  Done.'
+          elsif argv.size != 1
+            usage "expecting <flexfile> had: (#{argv.join(' ')})"
+          else
+            if ! File.exist?(infile = argv.shift)
+              usage "<flexfile> not found: #{infile}"
+            else
+              infh = File.open(infile, 'r')
+              _run(infh)
+            end
+          end
+        else
+          if argv.size != 0
+            usage "reading STDIN as <flexfile>, had: (#{argv.join(' ')})"
+          else
+            _run(@in)
+          end
+        end
+      rescue ::OptionParser::InvalidOption => e
+        usage e.message
+      end
+    end
+    # we have to parse it ourselves because OptionParser doesn't allow partial
+    def parse_tempfile_option argv
+      have = argv.each_with_index.map do |v,i|
+        (m = /^(?:-t(.*)|--tempdir(?:=(.+))?)$/.match(v) ) ?
+          [m.captures,i] : nil
+      end.compact
+      case have.size
+        when 0 ; return
+        when 1 ;
+        else   ; return fatal("cannot process more than one --tempdir option")
+      end
+      pair = have.first
+      argv[pair[1]] = nil # probably not necessary
+      pair.first.detect{ |x| x } || ""
+    end
+    def process_tempfile_option argv
+      tempdir = parse_tempfile_option(argv) or return
+      clear = false
+      argv.each_with_index do |v, idx|
+        if ['-c', '--clear'].include?(v)
+          clear = true
+          argv[idx] = nil
+        end
+      end
+      argv.compact!
+      if "" == tempdir
+        require 'tmpdir'
+        tempdir = Dir.tmpdir
+      end
+      treetop_path = File.join(tempdir, 'flex-to-treetop.treetop')
+      parser_path  = File.join(tempdir, 'flex-to-treetop.rb')
+      if clear
+        require 'fileutils'
+        [treetop_path, parser_path].each do |path|
+          if File.exist?(path)
+            FileUtils.rm(path, :verbose => true)
+          end
+        end
+      end
+      if File.exist?(parser_path)
+        err "Using parser from filesystem: #{parser_path}"
+      else
+        if ! File.exist?(treetop_path)
+          @err.write "Writing grammar file: #{treetop_path}"
+          if ! File.directory?(File.dirname(treetop_path))
+            return fatal("\nNot a directory: #{File.dirname(treetop_path)}")
+          end
+          b = nil
+          File.open(treetop_path, 'w+'){ |fh| b = fh.write(TreetopGrammar) }
+          @err.puts " (wrote #{b} bytes.)"
+        end
+        if "" == %x{which tt}
+          return fatal(
+            "`tt` command not found! Is treetop gem installed and in PATH?"
+          )
+        end
+        @err.puts("executing: " + (cmd = "tt #{treetop_path}"))
+        res = %x{#{cmd}}
+        if "" != res then @err.puts(res) end
+      end
+      if File.exist? parser_path
+        require parser_path
+      else
+        err "Parser file not found: #{parser_path}"
+      end
+      @tempfile_loaded = true
+    end
+  private
+    def fatal msg
+      err msg
+      exit(1)
+    end
     def help_string
       option_parser.to_s
-    end
-    def out *a
-      @out.puts(*a)
     end
     def option_parser
       @option_parser and return @option_parser
       o = OptionParser.new
       o.banner = "Usage: #{program_name} [options] <flexfile>"
 
-      o.on('-h', '--help', 'Show this message') do
-        err help_string
-        throw :done
-      end
+      o.on('-g', '--grammar',
+        'Show the grammar as it appears in this file'
+      ) { self.action = :grammar }
 
-      o.on('-v', '--version', 'Show Version') do
-        err "#{program_name} version #{VERSION}"
-        throw :done
-      end
+      o.on('-t[=<dir>]', '--tempdir[=<dir>]',
+        'Write/Read grammar from the filesystem'
+      ) { }
+
+      o.on('-c', '--clear',
+        "If using --tempdir, clear existing files first."
+      ) { }
+
+      o.on('-h', '--help', 'Show this message') { self.action = :help }
+      o.on('-v', '--version', 'Show Version') { self.action = :version }
+
       @option_parser = o
     end
 
     def program_name
       File.basename($PROGRAM_NAME)
     end
+
+    def action= name
+      @actions ||= []
+      @actions.push name
+    end
+
+    def grammar
+      out TreetopGrammar
+    end
+
+    def version
+      err "#{program_name} version #{VERSION}"
+    end
+
+    def help
+      err help_string
+    end
+
     def _run in_io
       FlexToTreetop.new(in_io, @out, @err, @config).run
     end
+
     def usage msg
       err msg
       err help_string
@@ -100,7 +206,8 @@ module Hipe::FlexToTreetop
       @in.close
       resp = p.parse(whole_file)
       if resp.nil?
-        @err.puts p.failure_reason
+        rsn = p.failure_reason || "Got nil from parse without reason!"
+        @err.puts rsn
       else
         PP.pp resp
       end
@@ -112,8 +219,18 @@ module Hipe::FlexToTreetop
   end
 end
 
-# run the string defined after __END__ below thru treetop
-::Treetop.load_from_string DATA.read
+run = File.basename(__FILE__) == File.basename($PROGRAM_NAME)
+cli = Hipe::FlexToTreetop.cli if run
+
+Hipe::FlexToTreetop::TreetopGrammar = DATA.read
+
+if run && ! cli.process_tempfile_option(ARGV)
+  ::Treetop.load_from_string Hipe::FlexToTreetop::TreetopGrammar
+end
+
+if ! Hipe::FlexToTreetop.const_defined?(:FlexFileParser)
+  Hipe::FlexToTreetop.cli.err "Hipe::FlexToTreetop::FlexFileParser not found!"
+else
 
 module Hipe::FlexToTreetop
   class MyFlexFileParser < FlexFileParser # gen'd by treetop, see FlexFile
@@ -146,26 +263,25 @@ module Hipe::FlexToTreetop
   end
 end
 
-if File.basename(__FILE__) == File.basename($PROGRAM_NAME)
-  Hipe::FlexToTreetop.cli.run(ARGV)
 end
 
-__END__
+if run then Hipe::FlexToTreetop.cli.run(ARGV) end
 
+__END__
 module Hipe
 module FlexToTreetop
 grammar FlexFile
   rule file
-    definitions '%%' rules
+    definitions spacey* '%%' rules
   end
   rule definitions
-    anyspace? (definition_declaration ( &{ debugger; x=1; x } sepspace definition_declaration)*)?
+    spacey* (definition_declaration (decl_sep definition_declaration)* )?
   end
   rule definition_declaration
     name_definition / start_declaration
   end
   rule name_definition
-    name_definition_name spc name_definition_definition
+    name_definition_name [ \t]+ name_definition_definition
   end
   rule name_definition_name
     [A-Za-z_] [-a-zA-Z0-9_]*
@@ -179,20 +295,18 @@ grammar FlexFile
   rule rules
     .+
   end
-  rule anyspace
-    (white / comment)+
-  end
-  rule sepspace
-    anyspace? "\n" &{ debugger; x = 1; x }
-  end
   rule comment
     '/*' ( [^*] / '*' !'/' )* '*/'
   end
-  rule white
-    [ \n\r\t\f]+
+  rule spacey
+    comment / [ \t\n\f\r]
   end
-  rule spc
-    [ \t]+
+  rule decl_sep
+    ( [ \t] / comment )* newline spacey*
+  end
+  # http://en.wikipedia.org/wiki/Newline (near OSX)
+  rule newline
+    "\n" / "\r\n"
   end
 end
 end
