@@ -1,5 +1,11 @@
 #!/usr/bin/env ruby
+
 require 'optparse'
+require 'pp'
+require 'rubygems'
+require 'ruby-debug'
+require 'treetop'
+
 
 module Hipe; end
 
@@ -14,7 +20,7 @@ module Hipe::FlexToTreetop
   class Cli
     def initialize
       @err = $stderr
-      @out = $stout
+      @out = $stdout
       @in =  $stdin
       @conf = {}
     end
@@ -23,13 +29,25 @@ module Hipe::FlexToTreetop
         begin
           option_parser.parse!(argv)
           if @in.tty?
-            err help_string
+            if argv.size != 1
+              usage "expecting <flexfile> had: (#{argv.join(' ')})"
+            else
+              if ! File.exist?(infile = argv.shift)
+                usage "<flexfile> not found: #{infile}"
+              else
+                infh = File.open(infile, 'r')
+                _run(infh)
+              end
+            end
           else
-            _run
+            if argv.size != 0
+              usage "reading STDIN as <flexfile>, had: (#{argv.join(' ')})"
+            else
+              _run(@in)
+            end
           end
         rescue ::OptionParser::InvalidOption => e
-          err e.message
-          err option_parser.to_s
+          usage e.message
         end
       end
     end
@@ -46,7 +64,7 @@ module Hipe::FlexToTreetop
     def option_parser
       @option_parser and return @option_parser
       o = OptionParser.new
-      o.banner = "Usage: cat somefile.flex | #{program_name} [options]"
+      o.banner = "Usage: #{program_name} [options] <flexfile>"
 
       o.on('-h', '--help', 'Show this message') do
         err help_string
@@ -63,21 +81,70 @@ module Hipe::FlexToTreetop
     def program_name
       File.basename($PROGRAM_NAME)
     end
-    def _run
-      FlexToTreetop.new(@in, @out, @err, @config).run
+    def _run in_io
+      FlexToTreetop.new(in_io, @out, @err, @config).run
+    end
+    def usage msg
+      err msg
+      err help_string
     end
   end
   class FlexToTreetop
+    @@loaded = false
     def initialize instream, outstream, errstream, config
       @in = instream; @out = outstream; @err = errstream; @conf = config
     end
     def run
-      puts "Sure why not"
+      p = parser
+      whole_file = @in.read
+      @in.close
+      resp = p.parse(whole_file)
+      if resp.nil?
+        @err.puts p.failure_reason
+      else
+        PP.pp resp
+      end
+    end
+  private
+    def parser
+      @parser ||= MyFlexFileParser.new
     end
   end
 end
 
-Hipe::FlexToTreetop::DATA = DATA.read
+# run the string defined after __END__ below thru treetop
+::Treetop.load_from_string DATA.read
+
+module Hipe::FlexToTreetop
+  class MyFlexFileParser < FlexFileParser # gen'd by treetop, see FlexFile
+
+    # CompiledParser#failure_reason overridden for less context
+    def failure_reason
+      return nil unless (tf = terminal_failures) && tf.size > 0
+      "Expected " +
+        ( tf.size == 1 ?
+          tf[0].expected_string.inspect :
+          "one of #{tf.map{|f| f.expected_string.inspect}.uniq*', '}"
+        ) + " at line #{failure_line}, column #{failure_column} " +
+        "(byte #{failure_index+1}) after#{my_input_excerpt}"
+    end
+
+    def num_lines_ctx; 4 end
+
+    def my_input_excerpt
+      num = num_lines_ctx
+      slicey = input[index...failure_index]
+      all_lines = slicey.split("\n", -1)
+      lines = all_lines.slice(-1 * [all_lines.size, num].min, all_lines.size)
+      nums = failure_line.downto(
+        [1, failure_line - num + 1].max).to_a.reverse
+      w = nums.last.to_s.size # greatest line no as string, how wide?
+      ":\n" + nums.zip(lines).map do |no, line|
+        ("%#{w}i" % no) + ": #{line}"
+      end.join("\n")
+    end
+  end
+end
 
 if File.basename(__FILE__) == File.basename($PROGRAM_NAME)
   Hipe::FlexToTreetop.cli.run(ARGV)
@@ -85,7 +152,48 @@ end
 
 __END__
 
-whootly hottily
-
-
-
+module Hipe
+module FlexToTreetop
+grammar FlexFile
+  rule file
+    definitions '%%' rules
+  end
+  rule definitions
+    anyspace? (definition_declaration ( &{ debugger; x=1; x } sepspace definition_declaration)*)?
+  end
+  rule definition_declaration
+    name_definition / start_declaration
+  end
+  rule name_definition
+    name_definition_name spc name_definition_definition
+  end
+  rule name_definition_name
+    [A-Za-z_] [-a-zA-Z0-9_]*
+  end
+  rule name_definition_definition
+    [^\n]+
+  end
+  rule start_declaration
+    '%' 'option' [ \t]+ 'case-insensitive'
+  end
+  rule rules
+    .+
+  end
+  rule anyspace
+    (white / comment)+
+  end
+  rule sepspace
+    anyspace? "\n" &{ debugger; x = 1; x }
+  end
+  rule comment
+    '/*' ( [^*] / '*' !'/' )* '*/'
+  end
+  rule white
+    [ \n\r\t\f]+
+  end
+  rule spc
+    [ \t]+
+  end
+end
+end
+end
