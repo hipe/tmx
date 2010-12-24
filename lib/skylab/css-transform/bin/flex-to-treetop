@@ -29,7 +29,7 @@ class Hipe::FlexToTreetop::Sexpesque < Array
       new(name, *rest)
     end
     def hashy name, hash
-      new(name, hash)
+      new(name, hash).extend(Hashy)
     end
     def node_name n=nil
       n.nil? ? @node_name : (@node_name = n)
@@ -40,6 +40,13 @@ class Hipe::FlexToTreetop::Sexpesque < Array
   end
   def initialize name, *rest
     super([name, *rest])
+  end
+  module Hashy
+    def self.extended obj
+      class << obj
+        alias_method :children, :last
+      end
+    end
   end
 end
 
@@ -145,7 +152,9 @@ module Hipe::FlexToTreetop
   class FileSexp < Sexpesque
     node_name :file
     def translate context
-       context.out.puts("hi i am a file")
+      # children[:definitions].each{ |cx| cx.translate(context) }
+      context.builder << "# skipping definitions for now!!!"
+      context.builder << "# skipping rules for now!!!"
     end
   end
   class PatternChoiceSexp < Sexpesque
@@ -166,12 +175,30 @@ module Hipe::FlexToTreetop
       @cli ||= Cli.new
     end
   end
-  
+  class ProgressiveOutputAdapter
+    def initialize stream
+      @out = stream
+    end
+    def <<(*a)
+      @out.write(*a)
+      self
+    end
+  end
+  class MyRubyBuilder < ::Treetop::Compiler::RubyBuilder
+    def initialize out
+      super()
+      @out = out
+    end
+    def progressive_output!
+      @ruby = ProgressiveOutputAdapter.new(@out)
+    end
+  end
   class TranslationContext < Hash
     def initialize out, err
       @out = out; @err = err
+      @builder = MyRubyBuilder.new(@out)
     end
-    attr_reader :out, :err
+    attr_reader :out, :err, :builder
     def set_boolean name, val
       self[name] = val
       unless respond_to?("#{name}?")
@@ -182,7 +209,7 @@ module Hipe::FlexToTreetop
       @sc ||= class << self; self end
     end
   end
-  
+
   class Cli
     def initialize
       @err = $stderr
@@ -309,9 +336,10 @@ module Hipe::FlexToTreetop
     end
     def option_parser
       @option_parser and return @option_parser
-      
+
       @context.set_boolean(:show_sexp, false)
-      
+      @context.set_boolean(:progressive_output, true)
+
       o = OptionParser.new
       o.banner = "Usage: #{program_name} [options] <flexfile>"
 
@@ -326,7 +354,7 @@ module Hipe::FlexToTreetop
       o.on('-c', '--clear',
         "If using --tempdir, clear existing files first."
       ) { }
-      
+
       o.on('-s', '--sexp',
         "(debugging) Show sexp of parsed flex file and exit"
       ) { @context.set_boolean(:show_sexp, true) }
@@ -359,6 +387,7 @@ module Hipe::FlexToTreetop
     end
 
     def _run in_io
+      @context.builder.progressive_output! if @context.progressive_output?
       FlexToTreetop.new(in_io, @out, @err, @context).run
     end
 
