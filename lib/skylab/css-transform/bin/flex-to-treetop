@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 require 'optparse'
 require 'pp'
+require 'strscan'
 require 'rubygems'
 # require 'ruby-debug'; puts "\e[1;5;33mruby-debug\e[0m"
 require 'treetop'
@@ -216,7 +217,7 @@ module Hipe::FlexToTreetop
         rsn = p.failure_reason || "Got nil from parse without reason!"
         @err.puts rsn
       else
-        PP.pp resp
+        PP.pp resp.sexp
       end
     end
   private
@@ -269,7 +270,132 @@ module Hipe::FlexToTreetop
     end
   end
 end
+end
 
+class Hipe::FlexToTreetop::Sexpesque < Array
+  class << self
+    def traditional name, *rest
+      new(name, *rest)
+    end
+    def hashy name, hash
+      new(name, hash)
+    end
+    def node_name n=nil
+      n.nil? ? @node_name : (@node_name = n)
+    end
+    def list list
+      traditional(node_name, *list)
+    end
+  end
+  def initialize name, *rest
+    super([name, *rest])
+  end
+end
+
+module Hipe::FlexToTreetop::CommonNodey
+  Sexpesque = ::Hipe::FlexToTreetop::Sexpesque
+  def at(str); ats(str).first end
+  def ats path
+    path = at_compile(path) if path.kind_of?(String)
+    here = path.first
+    cx = (here == '*') ? elements : (elements[here] ? [elements[here]] : [])
+    if path.size > 1 && cx.any?
+      child_path = path[1..-1]
+      cx = cx.map do |c|
+        if ! c.respond_to?(:ats)
+          c.extend(::Hipe::FlexToTreetop::CommonNodey)
+        end
+        c.ats(child_path)
+      end.flatten
+    end
+    cx
+  end
+  def at_compile str
+    res = []
+    s = StringScanner.new(str)
+    begin
+      if s.scan(/\*/)
+        res.push '*'
+      elsif s.scan(/\[/)
+        d = s.scan(/\d+/) or fail("expecting digit had #{s.rest.inspect}")
+        s.scan(/\]/) or fail("expecting ']' had #{s.rest.inspect}")
+        res.push d.to_i
+      else
+        fail("expecting '*' or '[' near #{s.rest.inspect}")
+      end
+    end until s.eos?
+    res
+  end
+  def sexp_at str
+    # (n = at(str)) ? n.sexp : nil
+    n = at(str)
+    n or return nil
+    n.respond_to?(:sexp) and return n.sexp
+    n.text_value == '' and return nil
+    debugger; 'where is sexp for n'
+  end
+  def sexps_at str
+    ats(str).map(&:sexp)
+  end
+  def composite_sexp my_name, *children
+    with_names = {}
+    children.each do |name|
+      got = send(name)
+      sexp =
+        if got.respond_to?(:sexp)
+          got.sexp
+        else
+          debugger; 'why does "got" have no sexp'
+          :no
+        end
+      with_names[name] = sexp
+    end
+    return Sexpesque.hashy(my_name, with_names)
+  end
+  def list_sexp *foos
+    foos.compact!
+    foos # yeah, that's all this does
+  end
+  def auto_sexp *a
+    name = a.any? ? a.shift : guess_node_name
+    Sexpesque.traditional(name, text_value)
+  end
+  def guess_node_name
+    m = singleton_class.ancestors.first.to_s.match(/([^:0-9]+)\d+$/)
+    if m
+      m[1].gsub(/([a-z])([A-Z])/){ "#{$1}_#{$2}" }.downcase.intern
+    else
+      debugger; 'x'
+    end
+  end
+  def singleton_class
+    @sc ||= class << self; self end
+  end
+end
+
+module Hipe::FlexToTreetop
+  class CommonNode < ::Treetop::Runtime::SyntaxNode
+    include CommonNodey
+  end
+  module AutoNodey
+    include CommonNodey
+    def sexp; auto_sexp end
+  end
+  class AutoNode < CommonNode
+    include AutoNodey
+  end
+  class FileNode < CommonNode; end
+  class DefinitionsNode < CommonNode; end
+  class NameDefinitionNode < CommonNode; end
+  class StartDeclarationNode < CommonNode; end
+  class RoolNode < CommonNode; end
+
+  class PatternChoiceSexp < Sexpesque
+    node_name :pattern_choice
+  end
+  class PatternSequenceSexp < Sexpesque
+    node_name :pattern_sequence
+  end
 end
 
 if run then Hipe::FlexToTreetop.cli.run(ARGV) end
@@ -284,76 +410,129 @@ module Hipe
 module FlexToTreetop
 grammar FlexFile
   rule file
-    definitions spacey* '%%' spacey* rules spacey*
+    definitions spacey* '%%' spacey* rules spacey*  <FileNode>
+    { def sexp; composite_sexp :file, :definitions, :rules end }
   end
   rule definitions
-    spacey* (definition_declaration (decl_sep definition_declaration)* )?
+    spacey*  ( definition_declaration (decl_sep definition_declaration)*  )?
+    <DefinitionsNode> {
+      def sexp
+        list_sexp(sexp_at('[1][0]'), * sexps_at('[1][1]*[1]'))
+      end
+    }
   end
   rule definition_declaration
     name_definition / start_declaration
   end
   rule name_definition
     name_definition_name [ \t]+ name_definition_definition
+    <NameDefinitionNode>
+    { def sexp
+        composite_sexp(
+          :name_definition, :name_definition_name, :name_definition_definition
+        )
+      end
+    }
   end
   rule name_definition_name
-    [A-Za-z_] [-a-zA-Z0-9_]*
+    [A-Za-z_] [-a-zA-Z0-9_]* {
+      def sexp
+        text_value
+      end
+    }
   end
   rule name_definition_definition
     pattern
   end
   rule start_declaration
     '%' 'option' [ \t]+ 'case-insensitive'
+     <StartDeclarationNode> {
+      def sexp
+        Sexpesque.hashy( :start_declaration,
+          :declaration_type  => 'option',
+          :declaration_value => 'case-insensitive'
+        )
+      end
+    }
   end
   rule rules
-    rool (decl_sep rool)*
+    rool (decl_sep rool)* <CommonNode> {
+      def sexp
+        list_sexp(sexp_at('[0]'), *sexps_at('[1]*[1]'))
+      end
+    }
   end
   rule rool
-    pattern [ \t]+ action
+    pattern [ \t]+ action <RoolNode> {
+      def sexp
+        :rool_wat
+      end
+    }
   end
   rule pattern
-    pattern_part pattern_part* ( '|' pattern )*
+    pattern_part pattern_part* ( '|' pattern )* <CommonNode> {
+      def sexp
+        seq = list_sexp(sexp_at('[0]'), * sexps_at('[1]*'))
+        choice = sexps_at('[2]*[1]')
+        seq_or_pat = seq.size == 1 ? seq.first : PatternSequenceSexp.list(seq)
+        if choice.any?
+          PatternChoiceSexp.list( [seq_or_pat] + choice )
+        else
+          seq_or_pat
+        end
+      end
+    }
   end
   rule pattern_part
-    ( character_class / string / use_definition / backslashes / dot / literal_char / parenthesized_group ) range?
+    ( character_class / string / use_definition / backslashes /
+        dot / literal_char / parenthesized_group ) range?
+    <CommonNode> {
+      def sexp
+        h = {}
+        first = sexp_at('[0]')
+        range = sexp_at('[1]') and h[:range] = range
+        Sexpesque.traditional(:pattern_part, first, h)
+      end
+    }
   end
   rule parenthesized_group
-    '(' pattern ')'
+    '(' pattern ')' <AutoNode> { }
   end
   rule character_class
-    '[' (!']' . / '\]')* ']'
+    '[' (!']' . / '\]')* ']' <AutoNode> { }
   end
   rule string
-    '"' (!'"' . / '\"')* '"'
+    '"' (!'"' . / '\"')* '"' <AutoNode> { }
   end
   rule use_definition
-    '{' name_definition_name '}'
+    '{' name_definition_name '}' <AutoNode> { }
   end
   rule backslashes
     hex / octal / '\\0' / backslash_other
   end
   rule hex
-    '\\x' [0-9A-Za-z]+
+    '\\x' [0-9A-Za-z]+ <AutoNode> { }
   end
   rule octal
-    '\\' [1-9] [0-9]*
+    '\\' [1-9] [0-9]* <AutoNode> { }
   end
   rule action
-    [^\n]+
+    [^\n]+ <AutoNode> { }
   end
   rule backslash_other
-    '\\' [^ \t\n\r\f]
+    '\\' [^ \t\n\r\f] <AutoNode> { }
   end
   rule dot
-    '.'
+    '.' <AutoNode> { }
   end
   rule literal_char
-    [^\\|/\[\](){} \t\n\r\f]
+    [^\\|/\[\](){} \t\n\r\f] <AutoNode> { }
   end
   rule range
-    '*' / '+' / '?' / ( '{' [0-9]+ ( ',' [0-9]* )? '}' )
+    ( '*' / '+' / '?' / ( '{' [0-9]+ ( ',' [0-9]* )? '}' ) ) <AutoNodey> { }
   end
   rule comment
-    '/*' ( [^*] / '*' !'/' )* '*/'
+    '/*' ( [^*] / '*' !'/' )* '*/' <AutoNode> { }
   end
   rule spacey
     comment / [ \t\n\f\r]
