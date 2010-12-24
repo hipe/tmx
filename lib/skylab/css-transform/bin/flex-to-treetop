@@ -90,7 +90,7 @@ module Hipe::FlexToTreetop::CommonNodey
     n or return nil
     n.respond_to?(:sexp) and return n.sexp
     n.text_value == '' and return nil
-    debugger; 'where is sexp for n'
+    fail("where is sexp for n")
   end
   def sexps_at str
     ats(str).map(&:sexp)
@@ -103,8 +103,7 @@ module Hipe::FlexToTreetop::CommonNodey
         if got.respond_to?(:sexp)
           got.sexp
         else
-          debugger; 'why does "got" have no sexp'
-          :no
+          fail('why does "got" have no sexp')
         end
       with_names[name] = sexp
     end
@@ -120,14 +119,14 @@ module Hipe::FlexToTreetop::CommonNodey
   end
   def auto_sexp *a
     name = a.any? ? a.shift : guess_node_name
-    Sexpesque.traditional(name, text_value)
+    ::Hipe::FlexToTreetop::AutoSexp.traditional(name, text_value)
   end
   def guess_node_name
     m = singleton_class.ancestors.first.to_s.match(/([^:0-9]+)\d+$/)
     if m
       m[1].gsub(/([a-z])([A-Z])/){ "#{$1}_#{$2}" }.downcase.intern
     else
-      debugger; 'x'
+      fail("what happen")
     end
   end
   def singleton_class
@@ -152,9 +151,51 @@ module Hipe::FlexToTreetop
   class FileSexp < Sexpesque
     node_name :file
     def translate context
-      # children[:definitions].each{ |cx| cx.translate(context) }
-      context.builder << "# skipping definitions for now!!!"
+      children[:definitions].each{ |cx| cx.translate(context) }
       context.builder << "# skipping rules for now!!!"
+    end
+  end
+  class StartDeclarationSexp < Sexpesque
+    node_name :start_declaration
+    def translate ctx
+      case children[:declaration_value]
+      when 'case-insensitive' ; ctx.case_insensitive!
+      else
+        ctx.builder <<
+          "# declaration ignored: #{children[:declaration_value].inspect}"
+      end
+    end
+  end
+  class RuleBuilder
+    def initialize ctx
+      @ctx = ctx
+      @builder = ctx.builder
+    end
+    attr_accessor :rule_name
+    attr_accessor :pattern_like
+    def write
+      @builder.rule_declaration(@ctx.flex_name_to_rule_name(rule_name)) do
+        @builder.write "".indent(@builder.level)
+        pattern_like.translate(@ctx)
+        @builder.newline
+      end
+    end
+  end
+  module RuleWriter
+    def write_rule ctx
+      meth = RuleBuilder.new(ctx)
+      yield meth
+      meth.write
+    end
+  end
+  class NameDefinitionSexp < Sexpesque
+    include RuleWriter
+    node_name :name_definition
+    def translate ctx
+      write_rule(ctx) do |m|
+        m.rule_name = children[:name_definition_name]
+        m.pattern_like = children[:name_definition_definition]
+      end
     end
   end
   class PatternChoiceSexp < Sexpesque
@@ -162,9 +203,30 @@ module Hipe::FlexToTreetop
   end
   class PatternSequenceSexp < Sexpesque
     node_name :pattern_sequence
+    def translate ctx
+      (1..(last = size-1)).each do |idx|
+        self[idx].translate(ctx)
+        ctx.builder.write(' ') if idx != last
+      end
+    end
+  end
+  class PatternPartSexp < Sexpesque
+    node_name :pattern_part
+    def translate ctx
+      self[1].translate(ctx)
+      self[2] and self[2][:range].translate(ctx)
+    end
   end
   class UseDefinitionSexp < Sexpesque
     node_name :use_definition
+    def translate ctx
+      ctx.builder.write ctx.flex_name_to_rule_name(self[1])
+    end
+  end
+  class AutoSexp < Sexpesque
+    def translate ctx
+      ctx.builder.write(self[1])
+    end
   end
 end
 
@@ -184,7 +246,7 @@ module Hipe::FlexToTreetop
       self
     end
   end
-  class MyRubyBuilder < ::Treetop::Compiler::RubyBuilder
+  class TreetopBuilder < ::Treetop::Compiler::RubyBuilder
     def initialize out
       super()
       @out = out
@@ -192,11 +254,21 @@ module Hipe::FlexToTreetop
     def progressive_output!
       @ruby = ProgressiveOutputAdapter.new(@out)
     end
+    def rule_declaration name, &block
+      self << "rule #{name}"
+      indented(&block)
+      self << "end"
+    end
+    def write *a
+      @ruby.<<(*a)
+    end
   end
   class TranslationContext < Hash
     def initialize out, err
       @out = out; @err = err
-      @builder = MyRubyBuilder.new(@out)
+      @builder = TreetopBuilder.new(@out)
+      set_boolean(:case_insensitive, false)
+      make_boolean_setter(:case_insensitive)
     end
     attr_reader :out, :err, :builder
     def set_boolean name, val
@@ -205,8 +277,15 @@ module Hipe::FlexToTreetop
         singleton_class.send(:define_method, "#{name}?"){ self[name] }
       end
     end
+    def make_boolean_setter name
+      singleton_class.send(:define_method, "#{name}!"){ self[name] = true }
+    end
     def singleton_class
       @sc ||= class << self; self end
+    end
+    ### abstractable above
+    def flex_name_to_rule_name flex_name
+      flex_name # @todo prefixes, whatever
     end
   end
 
@@ -498,7 +577,7 @@ grammar FlexFile
     <CommonNode> {
       def sexp
         composite_sexp(
-          :name_definition, :name_definition_name, :name_definition_definition
+          NameDefinitionSexp, :name_definition_name, :name_definition_definition
         )
       end
     }
@@ -517,7 +596,7 @@ grammar FlexFile
     '%' 'option' [ \t]+ 'case-insensitive'
      <CommonNode> {
       def sexp
-        Sexpesque.hashy( :start_declaration,
+        StartDeclarationSexp.hashy( :start_declaration,
           :declaration_type  => 'option',
           :declaration_value => 'case-insensitive'
         )
@@ -557,10 +636,9 @@ grammar FlexFile
         dot / literal_char / parenthesized_group ) range?
     <CommonNode> {
       def sexp
-        h = nil
-        first = sexp_at('[0]')
-        range = sexp_at('[1]') and h = {:range => range}
-        Sexpesque.traditional(:pattern_part, first, h)
+        els = [sexp_at('[0]')]
+        range = sexp_at('[1]') and els.push(:range => range)
+        PatternPartSexp.traditional(:pattern_part, *els)
       end
     }
   end
