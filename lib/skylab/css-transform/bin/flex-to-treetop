@@ -11,15 +11,145 @@ require 'treetop'
 
 # The structure of this file is ridiculous because we're trying to keep it all
 # in one file as a standalone thing.  It is, in sequence:
+#   0) Sexpesque and CommonNode* and AutoNode* abstraction candidates
 #   1) a Cli class to parse commands 2) FlexToTreetop that is the main agent
 #   3) Pull in the treetop-generated parser (by one of a variety of ways)
 #   4) Subclass it (MyFlexFileParser < FlexFileParser) 5) run this file
 #   6) The treetop grammar in put inline after the __END__ for novelty points.
 
-module Hipe; end
+module Hipe
+  module FlexToTreetop
+    VERSION = '0.0.0'
+  end
+end
+
+class Hipe::FlexToTreetop::Sexpesque < Array
+  class << self
+    def traditional name, *rest
+      new(name, *rest)
+    end
+    def hashy name, hash
+      new(name, hash)
+    end
+    def node_name n=nil
+      n.nil? ? @node_name : (@node_name = n)
+    end
+    def list list
+      traditional(node_name, *list)
+    end
+  end
+  def initialize name, *rest
+    super([name, *rest])
+  end
+end
+
+module Hipe::FlexToTreetop::CommonNodey
+  Sexpesque = ::Hipe::FlexToTreetop::Sexpesque
+  def at(str); ats(str).first end
+  def ats path
+    path = at_compile(path) if path.kind_of?(String)
+    here = path.first
+    cx = (here == '*') ? elements : (elements[here] ? [elements[here]] : [])
+    if path.size > 1 && cx.any?
+      child_path = path[1..-1]
+      cx = cx.map do |c|
+        if ! c.respond_to?(:ats)
+          c.extend(::Hipe::FlexToTreetop::CommonNodey)
+        end
+        c.ats(child_path)
+      end.flatten
+    end
+    cx
+  end
+  def at_compile str
+    res = []
+    s = StringScanner.new(str)
+    begin
+      if s.scan(/\*/)
+        res.push '*'
+      elsif s.scan(/\[/)
+        d = s.scan(/\d+/) or fail("expecting digit had #{s.rest.inspect}")
+        s.scan(/\]/) or fail("expecting ']' had #{s.rest.inspect}")
+        res.push d.to_i
+      else
+        fail("expecting '*' or '[' near #{s.rest.inspect}")
+      end
+    end until s.eos?
+    res
+  end
+  def sexp_at str
+    # (n = at(str)) ? n.sexp : nil
+    n = at(str)
+    n or return nil
+    n.respond_to?(:sexp) and return n.sexp
+    n.text_value == '' and return nil
+    debugger; 'where is sexp for n'
+  end
+  def sexps_at str
+    ats(str).map(&:sexp)
+  end
+  def composite_sexp my_name, *children
+    with_names = {}
+    children.each do |name|
+      got = send(name)
+      sexp =
+        if got.respond_to?(:sexp)
+          got.sexp
+        else
+          debugger; 'why does "got" have no sexp'
+          :no
+        end
+      with_names[name] = sexp
+    end
+    return Sexpesque.hashy(my_name, with_names)
+  end
+  def list_sexp *foos
+    foos.compact!
+    foos # yeah, that's all this does
+  end
+  def auto_sexp *a
+    name = a.any? ? a.shift : guess_node_name
+    Sexpesque.traditional(name, text_value)
+  end
+  def guess_node_name
+    m = singleton_class.ancestors.first.to_s.match(/([^:0-9]+)\d+$/)
+    if m
+      m[1].gsub(/([a-z])([A-Z])/){ "#{$1}_#{$2}" }.downcase.intern
+    else
+      debugger; 'x'
+    end
+  end
+  def singleton_class
+    @sc ||= class << self; self end
+  end
+end
 
 module Hipe::FlexToTreetop
-  VERSION = '0.0.0'
+  class CommonNode < ::Treetop::Runtime::SyntaxNode
+    include CommonNodey
+  end
+  module AutoNodey
+    include CommonNodey
+    def sexp; auto_sexp end
+  end
+  class AutoNode < CommonNode
+    include AutoNodey
+  end
+end
+
+module Hipe::FlexToTreetop
+  class PatternChoiceSexp < Sexpesque
+    node_name :pattern_choice
+  end
+  class PatternSequenceSexp < Sexpesque
+    node_name :pattern_sequence
+  end
+  class UseDefinitionSexp < Sexpesque
+    node_name :use_definition
+  end
+end
+
+module Hipe::FlexToTreetop
 
   class << self
     def cli
@@ -270,129 +400,6 @@ module Hipe::FlexToTreetop
     end
   end
 end
-end
-
-class Hipe::FlexToTreetop::Sexpesque < Array
-  class << self
-    def traditional name, *rest
-      new(name, *rest)
-    end
-    def hashy name, hash
-      new(name, hash)
-    end
-    def node_name n=nil
-      n.nil? ? @node_name : (@node_name = n)
-    end
-    def list list
-      traditional(node_name, *list)
-    end
-  end
-  def initialize name, *rest
-    super([name, *rest])
-  end
-end
-
-module Hipe::FlexToTreetop::CommonNodey
-  Sexpesque = ::Hipe::FlexToTreetop::Sexpesque
-  def at(str); ats(str).first end
-  def ats path
-    path = at_compile(path) if path.kind_of?(String)
-    here = path.first
-    cx = (here == '*') ? elements : (elements[here] ? [elements[here]] : [])
-    if path.size > 1 && cx.any?
-      child_path = path[1..-1]
-      cx = cx.map do |c|
-        if ! c.respond_to?(:ats)
-          c.extend(::Hipe::FlexToTreetop::CommonNodey)
-        end
-        c.ats(child_path)
-      end.flatten
-    end
-    cx
-  end
-  def at_compile str
-    res = []
-    s = StringScanner.new(str)
-    begin
-      if s.scan(/\*/)
-        res.push '*'
-      elsif s.scan(/\[/)
-        d = s.scan(/\d+/) or fail("expecting digit had #{s.rest.inspect}")
-        s.scan(/\]/) or fail("expecting ']' had #{s.rest.inspect}")
-        res.push d.to_i
-      else
-        fail("expecting '*' or '[' near #{s.rest.inspect}")
-      end
-    end until s.eos?
-    res
-  end
-  def sexp_at str
-    # (n = at(str)) ? n.sexp : nil
-    n = at(str)
-    n or return nil
-    n.respond_to?(:sexp) and return n.sexp
-    n.text_value == '' and return nil
-    debugger; 'where is sexp for n'
-  end
-  def sexps_at str
-    ats(str).map(&:sexp)
-  end
-  def composite_sexp my_name, *children
-    with_names = {}
-    children.each do |name|
-      got = send(name)
-      sexp =
-        if got.respond_to?(:sexp)
-          got.sexp
-        else
-          debugger; 'why does "got" have no sexp'
-          :no
-        end
-      with_names[name] = sexp
-    end
-    return Sexpesque.hashy(my_name, with_names)
-  end
-  def list_sexp *foos
-    foos.compact!
-    foos # yeah, that's all this does
-  end
-  def auto_sexp *a
-    name = a.any? ? a.shift : guess_node_name
-    Sexpesque.traditional(name, text_value)
-  end
-  def guess_node_name
-    m = singleton_class.ancestors.first.to_s.match(/([^:0-9]+)\d+$/)
-    if m
-      m[1].gsub(/([a-z])([A-Z])/){ "#{$1}_#{$2}" }.downcase.intern
-    else
-      debugger; 'x'
-    end
-  end
-  def singleton_class
-    @sc ||= class << self; self end
-  end
-end
-
-module Hipe::FlexToTreetop
-  class CommonNode < ::Treetop::Runtime::SyntaxNode
-    include CommonNodey
-  end
-  module AutoNodey
-    include CommonNodey
-    def sexp; auto_sexp end
-  end
-  class AutoNode < CommonNode
-    include AutoNodey
-  end
-  class PatternChoiceSexp < Sexpesque
-    node_name :pattern_choice
-  end
-  class PatternSequenceSexp < Sexpesque
-    node_name :pattern_sequence
-  end
-  class UseDefinitionSexp < Sexpesque
-    node_name :use_definition
-  end
 end
 
 if run then Hipe::FlexToTreetop.cli.run(ARGV) end
