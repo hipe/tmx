@@ -384,12 +384,6 @@ module Hipe::FlexToTreetop
   class AutoNode < CommonNode
     include AutoNodey
   end
-  class FileNode < CommonNode; end
-  class DefinitionsNode < CommonNode; end
-  class NameDefinitionNode < CommonNode; end
-  class StartDeclarationNode < CommonNode; end
-  class RoolNode < CommonNode; end
-
   class PatternChoiceSexp < Sexpesque
     node_name :pattern_choice
   end
@@ -410,12 +404,12 @@ module Hipe
 module FlexToTreetop
 grammar FlexFile
   rule file
-    definitions spacey* '%%' spacey* rules spacey*  <FileNode>
+    definitions spacey* '%%' spacey* rules spacey*  <CommonNode>
     { def sexp; composite_sexp :file, :definitions, :rules end }
   end
   rule definitions
     spacey*  ( definition_declaration (decl_sep definition_declaration)*  )?
-    <DefinitionsNode> {
+    <CommonNode> {
       def sexp
         list_sexp(sexp_at('[1][0]'), * sexps_at('[1][1]*[1]'))
       end
@@ -426,8 +420,8 @@ grammar FlexFile
   end
   rule name_definition
     name_definition_name [ \t]+ name_definition_definition
-    <NameDefinitionNode>
-    { def sexp
+    <CommonNode> {
+      def sexp
         composite_sexp(
           :name_definition, :name_definition_name, :name_definition_definition
         )
@@ -446,7 +440,7 @@ grammar FlexFile
   end
   rule start_declaration
     '%' 'option' [ \t]+ 'case-insensitive'
-     <StartDeclarationNode> {
+     <CommonNode> {
       def sexp
         Sexpesque.hashy( :start_declaration,
           :declaration_type  => 'option',
@@ -463,9 +457,9 @@ grammar FlexFile
     }
   end
   rule rool
-    pattern [ \t]+ action <RoolNode> {
+    pattern [ \t]+ action <CommonNode> {
       def sexp
-        :rool_wat
+        composite_sexp(:rule, :pattern, :action)
       end
     }
   end
