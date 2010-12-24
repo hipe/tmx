@@ -390,6 +390,9 @@ module Hipe::FlexToTreetop
   class PatternSequenceSexp < Sexpesque
     node_name :pattern_sequence
   end
+  class UseDefinitionSexp < Sexpesque
+    node_name :use_definition
+  end
 end
 
 if run then Hipe::FlexToTreetop.cli.run(ARGV) end
@@ -482,9 +485,9 @@ grammar FlexFile
         dot / literal_char / parenthesized_group ) range?
     <CommonNode> {
       def sexp
-        h = {}
+        h = nil
         first = sexp_at('[0]')
-        range = sexp_at('[1]') and h[:range] = range
+        range = sexp_at('[1]') and h = {:range => range}
         Sexpesque.traditional(:pattern_part, first, h)
       end
     }
@@ -499,7 +502,11 @@ grammar FlexFile
     '"' (!'"' . / '\"')* '"' <AutoNode> { }
   end
   rule use_definition
-    '{' name_definition_name '}' <AutoNode> { }
+    '{' name_definition_name '}' <CommonNode> {
+      def sexp
+        UseDefinitionSexp.traditional(:use_definition, elements[1].text_value)
+      end
+    }
   end
   rule backslashes
     hex / octal / '\\0' / backslash_other
