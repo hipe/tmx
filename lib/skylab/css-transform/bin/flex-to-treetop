@@ -6,8 +6,8 @@ require 'rubygems'
 # require 'ruby-debug'; puts "\e[1;5;33mruby-debug\e[0m"
 require 'treetop'
 
-# Test with:
-# bundle exec bin/flex-to-treetop test/fixtures/flex/ideal.flex
+# Test sexp generation with:
+# bundle exec bin/flex-to-treetop -s -c -t./tmp test/fixtures/flex/ideal.flex
 
 # The structure of this file is ridiculous because we're trying to keep it all
 # in one file as a standalone thing.  It is, in sequence:
@@ -101,7 +101,11 @@ module Hipe::FlexToTreetop::CommonNodey
         end
       with_names[name] = sexp
     end
-    return Sexpesque.hashy(my_name, with_names)
+    if my_name.kind_of? Class
+      my_name.hashy(my_name.node_name, with_names)
+    else
+      Sexpesque.hashy(my_name, with_names)
+    end
   end
   def list_sexp *foos
     foos.compact!
@@ -138,6 +142,12 @@ module Hipe::FlexToTreetop
 end
 
 module Hipe::FlexToTreetop
+  class FileSexp < Sexpesque
+    node_name :file
+    def translate context
+       context.out.puts("hi i am a file")
+    end
+  end
   class PatternChoiceSexp < Sexpesque
     node_name :pattern_choice
   end
@@ -156,12 +166,29 @@ module Hipe::FlexToTreetop
       @cli ||= Cli.new
     end
   end
+  
+  class TranslationContext < Hash
+    def initialize out, err
+      @out = out; @err = err
+    end
+    attr_reader :out, :err
+    def set_boolean name, val
+      self[name] = val
+      unless respond_to?("#{name}?")
+        singleton_class.send(:define_method, "#{name}?"){ self[name] }
+      end
+    end
+    def singleton_class
+      @sc ||= class << self; self end
+    end
+  end
+  
   class Cli
     def initialize
       @err = $stderr
       @out = $stdout
       @in =  $stdin
-      @conf = {}
+      @context = TranslationContext.new(@out, @err)
     end
     def out *a
       @out.puts(*a)
@@ -282,6 +309,9 @@ module Hipe::FlexToTreetop
     end
     def option_parser
       @option_parser and return @option_parser
+      
+      @context.set_boolean(:show_sexp, false)
+      
       o = OptionParser.new
       o.banner = "Usage: #{program_name} [options] <flexfile>"
 
@@ -296,6 +326,10 @@ module Hipe::FlexToTreetop
       o.on('-c', '--clear',
         "If using --tempdir, clear existing files first."
       ) { }
+      
+      o.on('-s', '--sexp',
+        "(debugging) Show sexp of parsed flex file and exit"
+      ) { @context.set_boolean(:show_sexp, true) }
 
       o.on('-h', '--help', 'Show this message') { self.action = :help }
       o.on('-v', '--version', 'Show Version') { self.action = :version }
@@ -325,7 +359,7 @@ module Hipe::FlexToTreetop
     end
 
     def _run in_io
-      FlexToTreetop.new(in_io, @out, @err, @config).run
+      FlexToTreetop.new(in_io, @out, @err, @context).run
     end
 
     def usage msg
@@ -335,8 +369,8 @@ module Hipe::FlexToTreetop
   end
   class FlexToTreetop
     @@loaded = false
-    def initialize instream, outstream, errstream, config
-      @in = instream; @out = outstream; @err = errstream; @conf = config
+    def initialize instream, outstream, errstream, context
+      @in = instream; @out = outstream; @err = errstream; @context = context
     end
     def run
       p = parser
@@ -346,8 +380,10 @@ module Hipe::FlexToTreetop
       if resp.nil?
         rsn = p.failure_reason || "Got nil from parse without reason!"
         @err.puts rsn
+      elsif @context.show_sexp?
+        PP.pp(resp.sexp, @out)
       else
-        PP.pp resp.sexp
+        resp.sexp.translate @context
       end
     end
   private
@@ -415,7 +451,7 @@ module FlexToTreetop
 grammar FlexFile
   rule file
     definitions spacey* '%%' spacey* rules spacey*  <CommonNode>
-    { def sexp; composite_sexp :file, :definitions, :rules end }
+    { def sexp; composite_sexp FileSexp, :definitions, :rules end }
   end
   rule definitions
     spacey*  ( definition_declaration (decl_sep definition_declaration)*  )?
