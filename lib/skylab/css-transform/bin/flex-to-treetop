@@ -148,24 +148,6 @@ module Hipe::FlexToTreetop
 end
 
 module Hipe::FlexToTreetop
-  class FileSexp < Sexpesque
-    node_name :file
-    def translate context
-      children[:definitions].each{ |cx| cx.translate(context) }
-      context.builder << "# skipping rules for now!!!"
-    end
-  end
-  class StartDeclarationSexp < Sexpesque
-    node_name :start_declaration
-    def translate ctx
-      case children[:declaration_value]
-      when 'case-insensitive' ; ctx.case_insensitive!
-      else
-        ctx.builder <<
-          "# declaration ignored: #{children[:declaration_value].inspect}"
-      end
-    end
-  end
   class RuleBuilder
     def initialize ctx
       @ctx = ctx
@@ -188,6 +170,61 @@ module Hipe::FlexToTreetop
       meth.write
     end
   end
+  class FileSexp < Sexpesque
+    node_name :file
+    def translate ctx
+      nest = [lambda {
+        # children[:definitions].each{ |c| c.translate(ctx) }
+        ctx.builder << "# skipping rules for now!!!"
+      }]
+      if ctx.key?(:grammar)
+        parts = ctx[:grammar].split('::')
+        gname = parts.pop
+        nest.push lambda{
+          ctx.builder.grammar_declaration(gname, & nest.pop)
+        }
+        while mod = parts.pop
+          nest.push lambda{
+            mymod = mod
+            lambda {
+              ctx.builder.module_declaration(mymod, & nest.pop)
+            }
+          }.call
+        end
+      end
+      nest.pop.call
+    end
+  end
+  class StartDeclarationSexp < Sexpesque
+    node_name :start_declaration
+    def translate ctx
+      case children[:declaration_value]
+      when 'case-insensitive' ; ctx.case_insensitive!
+      else
+        ctx.builder <<
+          "# declaration ignored: #{children[:declaration_value].inspect}"
+      end
+    end
+  end
+  class ExplicitRangeSexp < Sexpesque
+    node_name :explicit_range
+    def self.bounded min, max
+      min == '0' ? new('..', max) : new(min, '..', max)
+    end
+    def self.unbounded min
+      new min, '..'
+    end
+    def self.exactly int
+      new int
+    end
+    def initialize *parts
+      @parts = parts
+    end
+    def translate ctx
+      ctx.builder.write " #{@parts.join('')}"
+    end
+  end
+
   class NameDefinitionSexp < Sexpesque
     include RuleWriter
     node_name :name_definition
@@ -200,6 +237,12 @@ module Hipe::FlexToTreetop
   end
   class PatternChoiceSexp < Sexpesque
     node_name :pattern_choice
+    def translate ctx
+      (1..(last = size-1)).each do |idx|
+        self[idx].translate(ctx)
+        ctx.builder.write(' / ') if idx != last
+      end
+    end
   end
   class PatternSequenceSexp < Sexpesque
     node_name :pattern_sequence
@@ -221,6 +264,12 @@ module Hipe::FlexToTreetop
     node_name :use_definition
     def translate ctx
       ctx.builder.write ctx.flex_name_to_rule_name(self[1])
+    end
+  end
+  class LiteralCharSexp < Sexpesque
+    node_name :literal_char
+    def translate ctx
+      ctx.builder.write self[1].inspect # careful! sloppy
     end
   end
   class AutoSexp < Sexpesque
@@ -256,6 +305,11 @@ module Hipe::FlexToTreetop
     end
     def rule_declaration name, &block
       self << "rule #{name}"
+      indented(&block)
+      self << "end"
+    end
+    def grammar_declaration(name, &block)
+      self << "grammar #{name}"
       indented(&block)
       self << "end"
     end
@@ -422,21 +476,26 @@ module Hipe::FlexToTreetop
       o = OptionParser.new
       o.banner = "Usage: #{program_name} [options] <flexfile>"
 
-      o.on('-g', '--grammar',
-       '(debugging) Show the flex treetop grammar as it appears in this file.'
+      o.on('-g=<grammar>', '--grammar=<grammar>',
+      "Also output grammar declaration (or \"Mod1::Mod2::Grammar\")"
+      ) { |g| @context[:grammar] = g }
+
+      o.on('-s', '--sexp',
+        "(development) Show sexp of parsed flex file and exit"
+      ) { @context.set_boolean(:show_sexp, true) }
+
+      o.on('--flex-tt',
+       '(development) Write the flex treetop grammar to stdout.'
       ) { self.action = :grammar }
 
       o.on('-t[=<dir>]', '--tempdir[=<dir>]',
-        '(debugging) Write/Read flex treetop grammar from the filesystem.'
+        '(development) Write/Read flex treetop grammar from/to the filesystem.'
       ) { }
 
       o.on('-c', '--clear',
-        "If using --tempdir, clear existing files first."
+        "(development) If using --tempdir, clear existing files first."
       ) { }
 
-      o.on('-s', '--sexp',
-        "(debugging) Show sexp of parsed flex file and exit"
-      ) { @context.set_boolean(:show_sexp, true) }
 
       o.on('-h', '--help', 'Show this message') { self.action = :help }
       o.on('-v', '--version', 'Show Version') { self.action = :version }
@@ -677,10 +736,32 @@ grammar FlexFile
     '.' <AutoNode> { }
   end
   rule literal_char
-    [^\\|/\[\](){} \t\n\r\f] <AutoNode> { }
+    [^\\|/\[\](){} \t\n\r\f] <CommonNode> {
+      def sexp
+        LiteralCharSexp.traditional(:literal_char, text_value)
+      end
+    }
   end
   rule range
-    ( '*' / '+' / '?' / ( '{' [0-9]+ ( ',' [0-9]* )? '}' ) ) <AutoNodey> { }
+    shorthand_range / explicit_range
+  end
+  rule shorthand_range
+    ( '*' / '+' / '?' ) <AutoNodey> { }
+  end
+  rule explicit_range
+    '{' [0-9]+ ( ',' [0-9]* )? '}' <CommonNode> {
+      def sexp
+        if elements[2].elements.nil?
+          ExplicitRangeSexp.exactly(elements[1].text_value)
+        elsif "," == elements[2].text_value
+          ExplicitRangeSexp.unbounded(elements[1].text_value)
+        else
+          ExplicitRangeSexp.bounded(elements[1].text_value,
+            elements[2].elements[1].text_value
+          )
+        end
+      end
+    }
   end
   rule comment
     '/*' ( [^*] / '*' !'/' )* '*/' <AutoNode> { }
