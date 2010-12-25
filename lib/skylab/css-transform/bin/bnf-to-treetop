@@ -1,9 +1,11 @@
 #!/usr/bin/env ruby -w
-
 require 'strscan'
 require 'optparse'
 
-# require 'ruby-debug'
+# require 'ruby-debug'; $stderr.puts "\e[1;5;33mruby-debug\e[0m"
+
+# Test with:
+# bundle exec bin/bnf-to-treetop test/bnf-to-treetop/fixtures/xml-names.bnf
 
 module Hipe; end
 module Hipe::BnfToTreetop
@@ -14,12 +16,21 @@ module Hipe::BnfToTreetop
   end
   class CliAgent
     def initialize
-      
+      @out = $stdout
+      @err = $stderr
     end
     def run argv
-      
-      puts "OK"
+      if argv.size != 1 then return @err.puts(usage) end
+      if /^-/ =~ argv.first then return @err.puts(usage) end
+      if ! File.exist?(argv.first)
+        @err.puts "file not found: #{argv.first}"
+        return @err.puts(usage)
+      end
+      content = File.read(argv.first)
+      BnfToTreetop.new.run(content)
     end
+    def usage; "usage: #{program_name} <bnf_file>" end
+    def program_name; File.basename($PROGRAM_NAME) end
   end
   class Config < Hash
     def initialize h=nil
