@@ -302,7 +302,7 @@ module Hipe::FlexToTreetop
       ctx.builder.write ctx.flex_name_to_rule_name(self[1])
     end
   end
-  class LiteralCharSexp < Sexpesque # :literal_char
+  class LiteralCharsSexp < Sexpesque # :literal_chars
     terminal!
     def translate ctx
       ctx.builder.write self[1].inspect # careful! put lit chars in dbl "'s
@@ -783,7 +783,7 @@ grammar FlexFile
   end
   rule pattern_part
     ( character_class / string / use_definition / backslashes /
-        dot / literal_char / parenthesized_group ) range?
+        dot / literal_chars / parenthesized_group ) range?
     <CommonNode> {
       def sexp
         els = [sexp_at('[0]')]
@@ -831,8 +831,8 @@ grammar FlexFile
   rule dot
     '.' <AutoNode> { }
   end
-  rule literal_char
-    [^\\|/\[\](){} \t\n\r\f'"] <AutoNode> {def sexp_class; LiteralCharSexp end }
+  rule literal_chars
+    [^\\|/\[\](){} \t\n\r\f'"]+ <AutoNode> {def sexp_class; LiteralCharsSexp end }
   end
   rule range
     shorthand_range / explicit_range
