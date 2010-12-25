@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env ruby -w
 require 'optparse'
 require 'pp'
 require 'strscan'
@@ -8,6 +8,9 @@ require 'treetop'
 
 # Test sexp generation with:
 # bundle exec bin/flex-to-treetop -s -c -t./tmp test/fixtures/flex/ideal.flex
+
+# Test grammar generation with:
+# bundle exec bin/flex-to-treetop -g"Foo::Bar" test/fixtures/flex/mini.flex -t./tmp -c
 
 # The structure of this file is ridiculous because we're trying to keep it all
 # in one file as a standalone thing.  It is, in sequence:
@@ -23,28 +26,60 @@ module Hipe
   end
 end
 
-class Hipe::FlexToTreetop::Sexpesque < Array
+class Hipe::FlexToTreetop::Sexpesque < Array # class Sexpesque
   class << self
+    def add_hook(whenn, &what)
+      @hooks ||= Hash.new{ |h,k| h[k] = [] }
+      @hooks[whenn].push(what)
+    end
+    def guess_node_name
+      m = to_s.match(/([^:]+)Sexp$/) and
+        m[1].gsub(/([a-z])([A-Z])/){ "#{$1}_#{$2}" }.downcase.intern
+    end
+    def hooks_for(whenn)
+      instance_variable_defined?('@hooks') ? @hooks[whenn] : []
+    end
+    def from_syntax_node name, node
+      new(name, node).extend SyntaxNodeHaver
+    end
     def traditional name, *rest
       new(name, *rest)
     end
     def hashy name, hash
-      new(name, hash).extend(Hashy)
+      new(name, hash).extend Hashy
     end
-    def node_name n=nil
-      n.nil? ? @node_name : (@node_name = n)
+    attr_writer :node_name
+    def node_name *a
+      a.any? ? (@node_name = a.first) :
+      (instance_variable_defined?('@node_name') ? @node_name :
+        (@node_name = guess_node_name))
     end
     def list list
       traditional(node_name, *list)
     end
+    def terminal!
+      add_hook(:post_init){ |me| me.stringify_syntax_node! }
+    end
   end
   def initialize name, *rest
-    super([name, *rest])
+    super [name, *rest]
+    self.class.hooks_for(:post_init).each{ |h| h.call(self) }
+  end
+  def stringify_syntax_node!
+    self[1] = self[1].text_value
+    @syntax_node = nil
+  end
+  module SyntaxNodeHaver
+    def syntax_node
+      instance_variable_defined?('@syntax_node') ? @syntax_node : last
+    end
   end
   module Hashy
-    def self.extended obj
-      class << obj
-        alias_method :children, :last
+    class << self
+      def extended obj
+        class << obj
+          alias_method :children, :last
+        end
       end
     end
   end
@@ -60,9 +95,8 @@ module Hipe::FlexToTreetop::CommonNodey
     if path.size > 1 && cx.any?
       child_path = path[1..-1]
       cx = cx.map do |c|
-        if ! c.respond_to?(:ats)
-          c.extend(::Hipe::FlexToTreetop::CommonNodey)
-        end
+        c.extend(::Hipe::FlexToTreetop::CommonNodey) unless
+          c.respond_to?(:ats)
         c.ats(child_path)
       end.flatten
     end
@@ -117,9 +151,12 @@ module Hipe::FlexToTreetop::CommonNodey
     foos.compact!
     foos # yeah, that's all this does
   end
-  def auto_sexp *a
-    name = a.any? ? a.shift : guess_node_name
-    ::Hipe::FlexToTreetop::AutoSexp.traditional(name, text_value)
+  def auto_sexp
+    if respond_to?(:sexp_class)
+      sexp_class.from_syntax_node(sexp_class.node_name, self)
+    else
+      ::Hipe::FlexToTreetop::AutoSexp.traditional(guess_node_name, text_value)
+    end
   end
   def guess_node_name
     m = singleton_class.ancestors.first.to_s.match(/([^:0-9]+)\d+$/)
@@ -174,7 +211,7 @@ module Hipe::FlexToTreetop
     node_name :file
     def translate ctx
       nest = [lambda {
-        # children[:definitions].each{ |c| c.translate(ctx) }
+        children[:definitions].each{ |c| c.translate(ctx) }
         ctx.builder << "# skipping rules for now!!!"
       }]
       if ctx.key?(:grammar)
@@ -208,14 +245,16 @@ module Hipe::FlexToTreetop
   end
   class ExplicitRangeSexp < Sexpesque
     node_name :explicit_range
-    def self.bounded min, max
-      min == '0' ? new('..', max) : new(min, '..', max)
-    end
-    def self.unbounded min
-      new min, '..'
-    end
-    def self.exactly int
-      new int
+    class << self
+      def bounded min, max
+        min == '0' ? new('..', max) : new(min, '..', max)
+      end
+      def unbounded min
+        new min, '..'
+      end
+      def exactly int
+        new int
+      end
     end
     def initialize *parts
       @parts = parts
@@ -224,7 +263,6 @@ module Hipe::FlexToTreetop
       ctx.builder.write " #{@parts.join('')}"
     end
   end
-
   class NameDefinitionSexp < Sexpesque
     include RuleWriter
     node_name :name_definition
@@ -268,13 +306,55 @@ module Hipe::FlexToTreetop
   end
   class LiteralCharSexp < Sexpesque
     node_name :literal_char
+    terminal!
     def translate ctx
-      ctx.builder.write self[1].inspect # careful! sloppy
+      ctx.builder.write "OHAI_LIT_CHAR"
+      # ctx.builder.write self[1].inspect # careful! sloppy
+    end
+  end
+  class CharClassSexp < Sexpesque
+    node_name :char_class
+    def translate ctx
+      ctx.builder.write "CHAR_CLASS_BITCH"
+    end
+  end
+  class HexSexp < Sexpesque
+    node_name :hex_sexp
+    terminal!
+    def translate ctx
+      ctx.builder.write "OHAI_HEX_SEXP"
+    end
+  end
+  class OctalSexp < Sexpesque
+    node_name :octal_sexp
+    terminal!
+    def translate ctx
+      ctx.builder.write "OHAI_OCTAL_SEXP"
+    end
+  end
+  class AsciiNullSexp < Sexpesque
+    node_name :ascii_null
+    terminal!
+    def translate ctx
+      ctx.builder.write "OHAI_NULL_SEXP"
+    end
+  end
+  class BackslashOtherSexp < Sexpesque
+    node_name :backslash_other
+    terminal!
+    def translate ctx
+    ctx.builder.write "OHAI_BS_OTHER"
     end
   end
   class AutoSexp < Sexpesque
     def translate ctx
-      ctx.builder.write(self[1])
+      ctx.builder.write self[1]
+    end
+  end
+  class ActionSexp < Sexpesque
+    node_name :action
+    def translate ctx
+      ctx.builder.write "OHAI ACTION"
     end
   end
 end
@@ -359,7 +439,7 @@ module Hipe::FlexToTreetop
     def run argv
       begin
         option_parser.parse!(argv)
-        if @actions
+        if instance_variable_defined?('@actions')
           if ! @in.tty?
             usage "can't read from STDIN when doing "+
               @actions.map(&:to_s).join(' ')
@@ -432,7 +512,7 @@ module Hipe::FlexToTreetop
         end
       end
       if File.exist?(parser_path)
-        err "Using parser from filesystem: #{parser_path}"
+        err "using #{parser_path}"
       else
         if ! File.exist?(treetop_path)
           @err.write "Writing grammar file: #{treetop_path}"
@@ -468,7 +548,7 @@ module Hipe::FlexToTreetop
       option_parser.to_s
     end
     def option_parser
-      @option_parser and return @option_parser
+      instance_variable_defined?('@option_parser') and return @option_parser
 
       @context.set_boolean(:show_sexp, false)
       @context.set_boolean(:progressive_output, true)
@@ -636,7 +716,8 @@ grammar FlexFile
     <CommonNode> {
       def sexp
         composite_sexp(
-          NameDefinitionSexp, :name_definition_name, :name_definition_definition
+          NameDefinitionSexp, :name_definition_name,
+            :name_definition_definition
         )
       end
     }
@@ -705,7 +786,9 @@ grammar FlexFile
     '(' pattern ')' <AutoNode> { }
   end
   rule character_class
-    '[' (!']' . / '\]')* ']' <AutoNode> { }
+    '[' (!']' . / '\]')* ']' <AutoNode> {
+      def sexp_class; CharClassSexp end
+    }
   end
   rule string
     '"' (!'"' . / '\"')* '"' <AutoNode> { }
@@ -718,29 +801,28 @@ grammar FlexFile
     }
   end
   rule backslashes
-    hex / octal / '\\0' / backslash_other
+    hex / octal / null / backslash_other
   end
   rule hex
-    '\\x' [0-9A-Za-z]+ <AutoNode> { }
+    '\\x' [0-9A-Za-z]+ <AutoNode> { def sexp_class; HexSexp end }
   end
   rule octal
-    '\\' [1-9] [0-9]* <AutoNode> { }
+    '\\' [1-9] [0-9]* <AutoNode> { def sexp_class; OctalSexp end }
   end
-  rule action
-    [^\n]+ <AutoNode> { }
+  rule null
+    '\\0' <AutoNode> { def sexp_class; AsciiNullSexp end }
   end
   rule backslash_other
-    '\\' [^ \t\n\r\f] <AutoNode> { }
+    '\\' [^ \t\n\r\f] <AutoNode> { def sexp_class; BackslashOtherSexp end }
+  end
+  rule action
+    [^\n]+ <AutoNode> { def sexp_class; ActionSexp end }
   end
   rule dot
     '.' <AutoNode> { }
   end
   rule literal_char
-    [^\\|/\[\](){} \t\n\r\f] <CommonNode> {
-      def sexp
-        LiteralCharSexp.traditional(:literal_char, text_value)
-      end
-    }
+    [^\\|/\[\](){} \t\n\r\f] <AutoNode> {def sexp_class; LiteralCharSexp end }
   end
   rule range
     shorthand_range / explicit_range
@@ -764,7 +846,9 @@ grammar FlexFile
     }
   end
   rule comment
-    '/*' ( [^*] / '*' !'/' )* '*/' <AutoNode> { }
+    '/*' ( [^*] / '*' !'/' )* '*/' <AutoNode> {
+      def sexp_class; CommentSexp end
+    }
   end
   rule spacey
     comment / [ \t\n\f\r]
