@@ -312,7 +312,18 @@ module Hipe::FlexToTreetop
   class CharClassSexp < Sexpesque # :char_class
     terminal! # no guarantee this will stay this way!
     def translate ctx
-      ctx.builder.write my_text_value
+      ctx.builder.write( ctx.case_insensitive? ?
+        hack(my_text_value) : my_text_value )
+    end
+    def hack txt
+      s = StringScanner.new(txt)
+      out = ''
+      while found = s.scan_until(/[a-z]-[a-z]|[A-Z]-[A-Z]/)
+        repl = (/[a-z]/ =~ s.matched) ? s.matched.upcase : s.matched.downcase
+        s.scan(/#{repl}/) # whether or not it's there scan over it. careful!
+        out.concat("#{found}#{repl}")
+      end
+      "#{out}#{s.rest}"
     end
   end
   class HexSexp < Sexpesque # :hex
