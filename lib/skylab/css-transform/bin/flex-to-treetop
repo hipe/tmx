@@ -207,8 +207,7 @@ module Hipe::FlexToTreetop
       meth.write
     end
   end
-  class FileSexp < Sexpesque
-    node_name :file
+  class FileSexp < Sexpesque # :file
     def translate ctx
       nest = [lambda {
         children[:definitions].each{ |c| c.translate(ctx) }
@@ -232,8 +231,7 @@ module Hipe::FlexToTreetop
       nest.pop.call
     end
   end
-  class StartDeclarationSexp < Sexpesque
-    node_name :start_declaration
+  class StartDeclarationSexp < Sexpesque # :start_declaration
     def translate ctx
       case children[:declaration_value]
       when 'case-insensitive' ; ctx.case_insensitive!
@@ -243,8 +241,7 @@ module Hipe::FlexToTreetop
       end
     end
   end
-  class ExplicitRangeSexp < Sexpesque
-    node_name :explicit_range
+  class ExplicitRangeSexp < Sexpesque # :explicit_range
     class << self
       def bounded min, max
         min == '0' ? new('..', max) : new(min, '..', max)
@@ -263,9 +260,8 @@ module Hipe::FlexToTreetop
       ctx.builder.write " #{@parts.join('')}"
     end
   end
-  class NameDefinitionSexp < Sexpesque
+  class NameDefinitionSexp < Sexpesque # :name_definition
     include RuleWriter
-    node_name :name_definition
     def translate ctx
       write_rule(ctx) do |m|
         m.rule_name = children[:name_definition_name]
@@ -273,8 +269,7 @@ module Hipe::FlexToTreetop
       end
     end
   end
-  class PatternChoiceSexp < Sexpesque
-    node_name :pattern_choice
+  class PatternChoiceSexp < Sexpesque # :pattern_choice
     def translate ctx
       (1..(last = size-1)).each do |idx|
         self[idx].translate(ctx)
@@ -282,8 +277,7 @@ module Hipe::FlexToTreetop
       end
     end
   end
-  class PatternSequenceSexp < Sexpesque
-    node_name :pattern_sequence
+  class PatternSequenceSexp < Sexpesque # :pattern_sequence
     def translate ctx
       (1..(last = size-1)).each do |idx|
         self[idx].translate(ctx)
@@ -291,57 +285,49 @@ module Hipe::FlexToTreetop
       end
     end
   end
-  class PatternPartSexp < Sexpesque
-    node_name :pattern_part
+  class PatternPartSexp < Sexpesque # :pattern_part
     def translate ctx
       self[1].translate(ctx)
       self[2] and self[2][:range].translate(ctx)
     end
   end
-  class UseDefinitionSexp < Sexpesque
-    node_name :use_definition
+  class UseDefinitionSexp < Sexpesque # :use_definition
     def translate ctx
       ctx.builder.write ctx.flex_name_to_rule_name(self[1])
     end
   end
-  class LiteralCharSexp < Sexpesque
-    node_name :literal_char
+  class LiteralCharSexp < Sexpesque # :literal_char
     terminal!
     def translate ctx
       ctx.builder.write "OHAI_LIT_CHAR"
       # ctx.builder.write self[1].inspect # careful! sloppy
     end
   end
-  class CharClassSexp < Sexpesque
-    node_name :char_class
+  class CharClassSexp < Sexpesque # :char_class
     terminal!
     def translate ctx
       ctx.builder.write "CHAR_CLASS_BITCH"
     end
   end
-  class HexSexp < Sexpesque
-    node_name :hex_sexp
+  class HexSexp < Sexpesque # :hex
     terminal!
     def translate ctx
       ctx.builder.write "OHAI_HEX_SEXP"
     end
   end
-  class OctalSexp < Sexpesque
-    node_name :octal_sexp
+  class OctalSexp < Sexpesque # :octal
     terminal!
     def translate ctx
       ctx.builder.write "OHAI_OCTAL_SEXP"
     end
   end
-  class AsciiNullSexp < Sexpesque
-    node_name :ascii_null
+  class AsciiNullSexp < Sexpesque # :ascii_null
     terminal!
     def translate ctx
       ctx.builder.write "OHAI_NULL_SEXP"
     end
   end
-  class BackslashOtherSexp < Sexpesque
-    node_name :backslash_other
+  class BackslashOtherSexp < Sexpesque # :backslash_other
     terminal!
     def translate ctx
     ctx.builder.write "OHAI_BS_OTHER"
@@ -352,8 +338,7 @@ module Hipe::FlexToTreetop
       ctx.builder.write self[1]
     end
   end
-  class ActionSexp < Sexpesque
-    node_name :action
+  class ActionSexp < Sexpesque # :action
     terminal!
     def translate ctx
       ctx.builder.write "OHAI ACTION"
