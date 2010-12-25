@@ -1,0 +1,40 @@
+#!/usr/bin/env ruby -w
+require 'optparse'
+require 'pp'
+require 'strscan'
+require 'rubygems'
+# require 'ruby-debug'; $stderr.puts "\e[1;5;33mruby-debug\e[0m"
+require 'treetop'
+
+module Hipe; end
+module Hipe::YaccToTreetop
+  class << self
+    def cli
+      @cli ||= Cli.new
+    end
+  end
+  class Context < Hash
+    def initialize
+      @out = $stdout
+      @err = $stderr
+    end
+    attr_reader :out, :err
+  end
+  class Cli
+    def run argv
+      @c = Context.new
+      @c.out.puts "ohai(out)"
+      @c.err.puts "ohai(err)"
+    end
+  end
+end
+
+::Hipe::YaccToTreetop.cli.run(ARGV) if $PROGRAM_NAME == __FILE__
+
+__END__
+# The treetop grammar below is derived from parts of
+#   http://dinosaur.compilertools.net/yacc/index.html
+# and parts of a YACC-like grammar presented at
+#   http://www.w3.org/TR/css3-selectors/
+# It is not likely to parse all YACC grammars, just those
+# necessary for this project
