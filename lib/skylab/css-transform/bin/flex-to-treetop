@@ -123,8 +123,7 @@ module Hipe::FlexToTreetop::CommonNodey
   end
   def sexp_at str
     # (n = at(str)) ? n.sexp : nil
-    n = at(str)
-    n or return nil
+    n = at(str) or return nil
     n.respond_to?(:sexp) and return n.sexp
     n.text_value == '' and return nil
     fail("where is sexp for n")
@@ -216,8 +215,14 @@ module Hipe::FlexToTreetop
   class FileSexp < Sexpesque # :file
     def translate ctx
       nest = [lambda {
-        children[:definitions].each{ |c| c.translate(ctx) }
-        ctx.builder << "# skipping rules for now!!!"
+        if children[:definitions].any?
+          ctx.builder << "# from flex name definitions"
+          children[:definitions].each{ |c| c.translate(ctx) }
+        end
+        if children[:rules].any?
+          ctx.builder << "# flex rules"
+          children[:rules].each{ |c| c.translate(ctx) }
+        end
       }]
       if ctx.key?(:grammar)
         parts = ctx[:grammar].split('::')
@@ -275,6 +280,27 @@ module Hipe::FlexToTreetop
       end
     end
   end
+  class RuleSexp < Sexpesque # :rule
+    include RuleWriter
+    def translate ctx
+      action_string = children[:action].my_text_value
+      if md = /\Areturn ([a-zA-Z_]+);\Z/.match(action_string)
+        from_constant(ctx, md[1])
+      elsif md = %r{\A/\*([a-zA-Z0-9 ]+)\*/\Z}.match(action_string)
+        from_constant(ctx, md[1].gsub(' ','_')) # extreme hack!
+      else
+        ctx.err.write "Can't deduce a treetop rule name from: "
+        ctx.err.write action_string.inspect
+        ctx.err.puts "  Skipping."
+      end
+    end
+    def from_constant ctx, const
+      write_rule(ctx) do |m|
+        m.rule_name = const
+        m.pattern_like = children[:pattern]
+      end
+    end
+  end
   class PatternChoiceSexp < Sexpesque # :pattern_choice
     def translate ctx
       (1..(last = size-1)).each do |idx|
@@ -312,9 +338,9 @@ module Hipe::FlexToTreetop
     terminal! # no guarantee this will stay this way!
     def translate ctx
       ctx.builder.write( ctx.case_insensitive? ?
-        hack(my_text_value) : my_text_value )
+        case_insensitive_hack(my_text_value) : my_text_value )
     end
-    def hack txt
+    def case_insensitive_hack txt
       s = StringScanner.new(txt)
       out = ''
       while found = s.scan_until(/[a-z]-[a-z]|[A-Z]-[A-Z]/)
@@ -351,10 +377,7 @@ module Hipe::FlexToTreetop
     end
   end
   class ActionSexp < Sexpesque # :action
-    terminal!
-    def translate ctx
-      ctx.builder.write "OHAI ACTION"
-    end
+    terminal! # these are hacked, not used conventionally
   end
   class AutoSexp < Sexpesque
     def translate ctx
@@ -370,7 +393,6 @@ module Hipe::FlexToTreetop
 end
 
 module Hipe::FlexToTreetop
-
   class << self
     def cli
       @cli ||= Cli.new
@@ -535,8 +557,7 @@ module Hipe::FlexToTreetop
         end
         if "" == %x{which tt}
           return fatal(
-            "`tt` command not found! Is treetop gem installed and in PATH?"
-          )
+            "`tt` command not found! Is treetop gem installed and in PATH?")
         end
         @err.puts("executing: " + (cmd = "tt #{treetop_path}"))
         res = %x{#{cmd}}
@@ -763,7 +784,7 @@ grammar FlexFile
   rule rool
     pattern [ \t]+ action <CommonNode> {
       def sexp
-        composite_sexp(:rule, :pattern, :action)
+        composite_sexp(RuleSexp, :pattern, :action)
       end
     }
   end
