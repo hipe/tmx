@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby -w
 require 'optparse'
 require 'pp'
-require 'rubygems'
+# require 'rubygems'
 # require 'ruby-debug'; $stderr.puts "\e[1;5;33mruby-debug\e[0m"
-require 'treetop'
+# require 'treetop'
 
 module Hipe; end
 module Hipe::YaccToTreetop
@@ -27,15 +27,20 @@ module Hipe::YaccToTreetop
       begin
         option_parser.parse!(argv)
         @queue.push :_run
+        @argv = argv
         catch(:early_exit){ @queue.each{ |meth| send meth } }
       rescue OptionParser::InvalidOption => e
-        @c.err.puts e.message
-        @c.err.puts usage
+        error e.message
       end
     end
+    Codes = {:bold=>1,:dark_red=>31,:green=>32,:yellow=>33,:blue=>34,
+      :purple=>35,:cyan=>36,:white=>37,:red=>38}
+    def color(s, *a); "\e[#{a.map{|x|Codes[x]}.compact*';'}m#{s}\e[0m" end
   private
     def program_name; File.basename($PROGRAM_NAME) end
-    def usage; "usage: #{program_name} [opts] <yaccfile>" end
+    def usage
+      color('usage:', :bold, :green) << " #{program_name} [opts] <yaccfile>"
+    end
     def option_parser
       @op ||= OptionParser.new do |o|
         o.banner = usage
@@ -47,16 +52,49 @@ module Hipe::YaccToTreetop
         ){ @queue.push :version }
       end
     end
+    def error msg
+      @c.err.puts msg
+      @c.err.puts usage
+      @c.err.puts invite
+    end
+    def agent
+      @ag ||= Translator.new(@c)
+    end
     def help
       @c.err.puts option_parser.to_s
       throw :early_exit
     end
+    def invite
+      color("#{program_name} -h", :bold, :green) << " for help"
+    end
     def version
       @c.err.puts "#{program_name} #{VERSION}"
     end
-    def _run
-      @c.out.puts "running haha ya right"
+    def treetop_grammar
+      @c.err.puts agent.yacc_treetop_grammar
     end
+    def _run
+      @argv.size > 1 and return error("too many args. expecting 1 <yaccfile>")
+      @argv.size == 0 and return error("missing <yaccfile> argument.")
+      @argv.first == '-' and return
+      File.exist?(@argv.first) or return error("not found: #{@argv.first}")
+      @c.out.puts "running haha ya right #{@argv.first}"
+    end
+  end
+  class Translator
+    @yttg = nil
+    class << self
+      def yacc_treetop_grammar
+        @yttg ||= DATA.read
+      end
+    end
+    def initialize ctx
+      @c = ctx
+    end
+    def yacc_treetop_grammar
+      self.class.yacc_treetop_grammar
+    end
+  private
   end
 end
 
