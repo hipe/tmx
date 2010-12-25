@@ -1,13 +1,13 @@
 #!/usr/bin/env ruby -w
 require 'optparse'
 require 'pp'
-require 'strscan'
 require 'rubygems'
 # require 'ruby-debug'; $stderr.puts "\e[1;5;33mruby-debug\e[0m"
 require 'treetop'
 
 module Hipe; end
 module Hipe::YaccToTreetop
+  VERSION = '0.0.0'
   class << self
     def cli
       @cli ||= Cli.new
@@ -23,8 +23,39 @@ module Hipe::YaccToTreetop
   class Cli
     def run argv
       @c = Context.new
-      @c.out.puts "ohai(out)"
-      @c.err.puts "ohai(err)"
+      @queue = []
+      begin
+        option_parser.parse!(argv)
+        @queue.push :_run
+        catch(:early_exit){ @queue.each{ |meth| send meth } }
+      rescue OptionParser::InvalidOption => e
+        @c.err.puts e.message
+        @c.err.puts usage
+      end
+    end
+  private
+    def program_name; File.basename($PROGRAM_NAME) end
+    def usage; "usage: #{program_name} [opts] <yaccfile>" end
+    def option_parser
+      @op ||= OptionParser.new do |o|
+        o.banner = usage
+        o.on('--tt-grammar',
+          '(debugging) Output the treetop grammar (grammar) to stdout'
+        ){ @queue.push :treetop_grammar }
+        o.on('-h', '--help', 'Shows this screen'){ @queue.push :help }
+        o.on('-v', '--version', 'Display version information'
+        ){ @queue.push :version }
+      end
+    end
+    def help
+      @c.err.puts option_parser.to_s
+      throw :early_exit
+    end
+    def version
+      @c.err.puts "#{program_name} #{VERSION}"
+    end
+    def _run
+      @c.out.puts "running haha ya right"
     end
   end
 end
