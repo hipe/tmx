@@ -305,8 +305,7 @@ module Hipe::FlexToTreetop
   class LiteralCharSexp < Sexpesque # :literal_char
     terminal!
     def translate ctx
-      ctx.builder.write "OHAI_LIT_CHAR"
-      # ctx.builder.write self[1].inspect # careful! sloppy
+      ctx.builder.write self[1].inspect # careful! put lit chars in dbl "'s
     end
   end
   class CharClassSexp < Sexpesque # :char_class
@@ -347,7 +346,8 @@ module Hipe::FlexToTreetop
   class BackslashOtherSexp < Sexpesque # :backslash_other
     terminal!
     def translate ctx
-      ctx.builder.write my_text_value.inspect # carful!
+      # byte per byte output the thing exactly as it is, but wrapped in quotes
+      ctx.builder.write "\"#{my_text_value}\""
     end
   end
   class ActionSexp < Sexpesque # :action
@@ -701,7 +701,7 @@ __END__
 # The 'pattern' rule below is a subset of the grammar grammar described at
 #   http://flex.sourceforge.net/manual/Patterns.html.
 #   Note that not all constructs are supported, only those necessary
-#   to parse the target flex input files.
+#   to parse the target flex input files for this project.
 
 module Hipe
 module FlexToTreetop
@@ -832,7 +832,7 @@ grammar FlexFile
     '.' <AutoNode> { }
   end
   rule literal_char
-    [^\\|/\[\](){} \t\n\r\f] <AutoNode> {def sexp_class; LiteralCharSexp end }
+    [^\\|/\[\](){} \t\n\r\f'"] <AutoNode> {def sexp_class; LiteralCharSexp end }
   end
   rule range
     shorthand_range / explicit_range
