@@ -162,7 +162,8 @@ module Hipe::FileMetrics
   end
 
   PathOpts = { :positional => true, :required => false, :syntaxy_name => 'path',
-               :default => ['.'], :desc => "Search for files in these folders." }
+               :default => ['.'], :desc => "Search for files in these folders.",
+               :glob => true }
 
   class App < Hipe::Tinyscript::App
     description <<-desc
