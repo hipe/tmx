@@ -3,7 +3,7 @@ require 'optparse'
 require 'pp'
 require 'strscan'
 require 'rubygems'
-# require 'ruby-debug'; puts "\e[1;5;33mruby-debug\e[0m"
+# require 'ruby-debug'; $stderr.puts "\e[1;5;33mruby-debug\e[0m"
 require 'treetop'
 
 # Test sexp generation with:
@@ -58,16 +58,19 @@ class Hipe::FlexToTreetop::Sexpesque < Array # class Sexpesque
       traditional(node_name, *list)
     end
     def terminal!
-      add_hook(:post_init){ |me| me.stringify_syntax_node! }
+      add_hook(:post_init){ |me| me.stringify_terminal_syntax_node! }
     end
   end
   def initialize name, *rest
     super [name, *rest]
     self.class.hooks_for(:post_init).each{ |h| h.call(self) }
   end
-  def stringify_syntax_node!
+  def stringify_terminal_syntax_node!
     self[1] = self[1].text_value
     @syntax_node = nil
+    class << self
+      alias_method :my_text_value, :last
+    end
   end
   module SyntaxNodeHaver
     def syntax_node
@@ -154,6 +157,9 @@ module Hipe::FlexToTreetop::CommonNodey
   def auto_sexp
     if respond_to?(:sexp_class)
       sexp_class.from_syntax_node(sexp_class.node_name, self)
+    elsif ! elements.nil? && elements.index{ |n| n.respond_to?(:sexp) }
+      cx = elements.map{ |n| n.respond_to?(:sexp) ? n.sexp : n.text_value }
+      ::Hipe::FlexToTreetop::AutoSexp.traditional(guess_node_name, *cx)
     else
       ::Hipe::FlexToTreetop::AutoSexp.traditional(guess_node_name, text_value)
     end
@@ -304,9 +310,9 @@ module Hipe::FlexToTreetop
     end
   end
   class CharClassSexp < Sexpesque # :char_class
-    terminal!
+    terminal! # no guarantee this will stay this way!
     def translate ctx
-      ctx.builder.write "CHAR_CLASS_BITCH"
+      ctx.builder.write my_text_value
     end
   end
   class HexSexp < Sexpesque # :hex
@@ -330,18 +336,24 @@ module Hipe::FlexToTreetop
   class BackslashOtherSexp < Sexpesque # :backslash_other
     terminal!
     def translate ctx
-    ctx.builder.write "OHAI_BS_OTHER"
-    end
-  end
-  class AutoSexp < Sexpesque
-    def translate ctx
-      ctx.builder.write self[1]
+      ctx.builder.write my_text_value.inspect # carful!
     end
   end
   class ActionSexp < Sexpesque # :action
     terminal!
     def translate ctx
       ctx.builder.write "OHAI ACTION"
+    end
+  end
+  class AutoSexp < Sexpesque
+    def translate ctx
+      self[1..size-1].each do |c|
+        if c.respond_to?(:translate)
+          c.translate(ctx)
+        else
+          ctx.builder.write c
+        end
+      end
     end
   end
 end
