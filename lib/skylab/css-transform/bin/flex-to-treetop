@@ -314,6 +314,7 @@ module Hipe::FlexToTreetop
   end
   class CharClassSexp < Sexpesque
     node_name :char_class
+    terminal!
     def translate ctx
       ctx.builder.write "CHAR_CLASS_BITCH"
     end
@@ -353,6 +354,7 @@ module Hipe::FlexToTreetop
   end
   class ActionSexp < Sexpesque
     node_name :action
+    terminal!
     def translate ctx
       ctx.builder.write "OHAI ACTION"
     end
