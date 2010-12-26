@@ -9,71 +9,134 @@ module Hipe; end
 module Hipe::YaccToTreetop
   VERSION = '0.0.0'
   class << self
-    def cli
-      @cli ||= Cli.new
-    end
+    def cli; @cli ||= Cli.new end
   end
-  class Context < Hash
-    def initialize
-      @out = $stdout
-      @err = $stderr
-    end
-    attr_reader :out, :err
-  end
-  class Cli
+
+  class CliBase # experimental keep low level cli away from business logic
     def run argv
-      @c = Context.new
+      @argv = argv
+      @c = build_context
       @queue = []
       begin
         option_parser.parse!(argv)
-        @queue.push :_run
-        @argv = argv
+        @queue.push default_action
         catch(:early_exit){ @queue.each{ |meth| send meth } }
-      rescue OptionParser::InvalidOption => e
+      rescue OptionParser::ParseError => e
         error e.message
       end
     end
+  protected
     Codes = {:bold=>1,:dark_red=>31,:green=>32,:yellow=>33,:blue=>34,
       :purple=>35,:cyan=>36,:white=>37,:red=>38}
     def color(s, *a); "\e[#{a.map{|x|Codes[x]}.compact*';'}m#{s}\e[0m" end
-  private
-    def program_name; File.basename($PROGRAM_NAME) end
-    def usage
-      color('usage:', :bold, :green) << " #{program_name} [opts] <yaccfile>"
-    end
-    def option_parser
-      @op ||= OptionParser.new do |o|
-        o.banner = usage
-        o.on('--tt-grammar',
-          '(debugging) Output the treetop grammar (grammar) to stdout'
-        ){ @queue.push :treetop_grammar }
-        o.on('-h', '--help', 'Shows this screen'){ @queue.push :help }
-        o.on('-v', '--version', 'Display version information'
-        ){ @queue.push :version }
-      end
-    end
+    def em(s); color(s, :bold, :green) end
+
     def error msg
       @c.err.puts msg
       @c.err.puts usage
       @c.err.puts invite
     end
-    def agent
-      @ag ||= Translator.new(@c)
-    end
-    def help
-      @c.err.puts option_parser.to_s
+    def fatal msg
+      @c.err.puts msg
       throw :early_exit
     end
     def invite
-      color("#{program_name} -h", :bold, :green) << " for help"
+      em("#{program_name} -h") << " for help"
     end
-    def version
-      @c.err.puts "#{program_name} #{VERSION}"
+    def run_help
+      @c.err.puts option_parser.to_s
+      throw :early_exit
     end
-    def treetop_grammar
-      @c.err.puts agent.yacc_treetop_grammar
+    def run_version
+      @c.err.puts "#{program_name} #{version_string}"
     end
-    def _run
+    def usage
+      "#{em('usage:')} #{usage_syntax_string}"
+    end
+  end
+
+  class ExecutionContext < Hash
+    def initialize
+      @out = $stdout
+      @err = $stderr
+    end
+    attr_reader :out, :err
+    attr_accessor :in
+  end
+
+  class Cli < CliBase
+  private
+    def build_context;        ExecutionContext.new                         end
+    def default_action;       :run_translate                               end
+    def program_name;         File.basename($PROGRAM_NAME)                 end
+    def usage_syntax_string; "#{program_name} [opts] <yaccfile>"           end
+    def version_string;       VERSION                                      end
+
+
+    def option_parser
+      @op ||= OptionParser.new do |o|
+        o.banner = usage
+        o.on('--tt-grammar',
+          '(debugging) Output the treetop grammar (grammar) to stdout'
+        ){ @queue.push :run_treetop_grammar }
+        o.on('-t<dir>', '--tempdir=<dir>',
+          '(debugging) Read/write treetop grammar from/to tempdir'
+        ){ |td| @queue.push :run_tempdir; @tempdir = td }
+        o.on('-c', '--clear',
+          '(debugging) rewrite grammars in tempdir (use with -t)'){
+            @c[:clear_tempdir]=1 }
+        o.on('-h', '--help', 'Shows this screen'){ @queue.push :run_help }
+        o.on('-v', '--version', 'Display version information'
+        ){ @queue.push :run_version }
+      end
+    end
+    def agent
+      @ag ||= Translator.new(@c)
+    end
+    def run_treetop_grammar
+      @c.err.puts agent.yacc_treetop_grammar_text
+    end
+    def clear_tempdir
+      require 'fileutils'
+      [@treetop_path, @parser_path].each do |path|
+        File.exist?(path) && FileUtils.rm(path, :verbose => true)
+      end
+    end
+    def run_tempdir
+      @treetop_path = File.join(@tempdir, 'yacc-to-treetop.treetop')
+      @parser_path = File.join(@tempdir, 'yacc-to-treetop.rb')
+      @c.has_key?(:clear_tempdir) and clear_tempdir
+      File.exist?(@parser_path) ? @c.out.puts("Using #{@parser_path}") :
+        write_yacc_treetop_parser
+      throw :early_exit
+    end
+    def write_yacc_treetop_parser
+      File.exist?(@treetop_path) or write_yacc_treetop_grammar_file
+      "" != %x{which tt} or return fatal(
+        "`tt` command not found! Is treetop gem installed and in PATH?")
+      @c.err.puts(em('executing: ') + (cmd = "tt #{@treetop_path}"))
+      require 'open3'
+      out, err = Open3.popen3(cmd){ |_, sout, serr| [sout.read, serr.read] }
+      if err.any?
+        @c.out.puts color('error: ', :bold, :red) << "when compiling: #{cmd}:"
+        @c.out.puts
+        @c.out.puts err
+        return fatal("#{program_name} exiting.")
+      end
+      out.any? and return fatal("unexpected output from tt: #{out.inspect}")
+    end
+    def write_yacc_treetop_grammar_file
+      @c.err.write "Writing treetop file: #{@treetop_path}"
+      File.directory?(File.dirname(@treetop_path)) or
+        return fatal(
+          "\nMust exist and be a directory: #{File.dirname(@treetop_path)}")
+      num_bytes = nil
+      File.open(@treetop_path, 'w+') do |fh|
+        num_bytes = fh.write agent.yacc_treetop_grammar_text
+      end
+      @c.err.puts " (wrote #{num_bytes} bytes.)"
+    end
+    def run_translate
       @argv.size > 1 and return error("too many args. expecting 1 <yaccfile>")
       @argv.size == 0 and return error("missing <yaccfile> argument.")
       @argv.first == '-' and return
@@ -81,18 +144,19 @@ module Hipe::YaccToTreetop
       @c.out.puts "running haha ya right #{@argv.first}"
     end
   end
+
   class Translator
     @yttg = nil
     class << self
-      def yacc_treetop_grammar
+      def yacc_treetop_grammar_text
         @yttg ||= DATA.read
       end
     end
     def initialize ctx
       @c = ctx
     end
-    def yacc_treetop_grammar
-      self.class.yacc_treetop_grammar
+    def yacc_treetop_grammar_text
+      self.class.yacc_treetop_grammar_text
     end
   private
   end
