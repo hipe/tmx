@@ -1,9 +1,10 @@
 #!/usr/bin/env ruby -w
 require 'optparse'
 require 'pp'
-# require 'rubygems'
+require 'rubygems'
+require 'treetop'
 # require 'ruby-debug'; $stderr.puts "\e[1;5;33mruby-debug\e[0m"
-# require 'treetop'
+
 
 module Hipe; end
 module Hipe::YaccToTreetop
@@ -16,6 +17,7 @@ module Hipe::YaccToTreetop
     def run argv
       @argv = argv
       @c = build_context
+      @exit_ok = nil
       @queue = []
       begin
         option_parser.parse!(argv)
@@ -45,10 +47,11 @@ module Hipe::YaccToTreetop
     end
     def run_help
       @c.err.puts option_parser.to_s
-      throw :early_exit
+      @exit_ok = true
     end
     def run_version
       @c.err.puts "#{program_name} #{version_string}"
+      @exit_ok = true
     end
     def usage
       "#{em('usage:')} #{usage_syntax_string}"
@@ -69,7 +72,7 @@ module Hipe::YaccToTreetop
     def build_context;        ExecutionContext.new                         end
     def default_action;       :run_translate                               end
     def program_name;         File.basename($PROGRAM_NAME)                 end
-    def usage_syntax_string; "#{program_name} [opts] <yaccfile>"           end
+    def usage_syntax_string; "#{program_name} [opts] {<yaccfile>|\"-\"}"   end
     def version_string;       VERSION                                      end
 
 
@@ -77,13 +80,13 @@ module Hipe::YaccToTreetop
       @op ||= OptionParser.new do |o|
         o.banner = usage
         o.on('--tt-grammar',
-          '(debugging) Output the treetop grammar (grammar) to stdout'
+          '(development) Output the treetop grammar (grammar) to stdout'
         ){ @queue.push :run_treetop_grammar }
         o.on('-t<dir>', '--tempdir=<dir>',
-          '(debugging) Read/write treetop grammar from/to tempdir'
+          '(development) Read/write treetop grammar from/to tempdir'
         ){ |td| @queue.push :run_tempdir; @tempdir = td }
         o.on('-c', '--clear',
-          '(debugging) rewrite grammars in tempdir (use with -t)'){
+          '(development) rewrite grammars in tempdir (use with -t)'){
             @c[:clear_tempdir]=1 }
         o.on('-h', '--help', 'Shows this screen'){ @queue.push :run_help }
         o.on('-v', '--version', 'Display version information'
@@ -95,6 +98,7 @@ module Hipe::YaccToTreetop
     end
     def run_treetop_grammar
       @c.err.puts agent.yacc_treetop_grammar_text
+      @exit_ok = true
     end
     def clear_tempdir
       require 'fileutils'
@@ -108,7 +112,7 @@ module Hipe::YaccToTreetop
       @c.has_key?(:clear_tempdir) and clear_tempdir
       File.exist?(@parser_path) ? @c.out.puts("Using #{@parser_path}") :
         write_yacc_treetop_parser
-      throw :early_exit
+      @c[:treetop_parser_path] = @parser_path
     end
     def write_yacc_treetop_parser
       File.exist?(@treetop_path) or write_yacc_treetop_grammar_file
@@ -137,15 +141,44 @@ module Hipe::YaccToTreetop
       @c.err.puts " (wrote #{num_bytes} bytes.)"
     end
     def run_translate
+      @argv.size == 0 and @exit_ok and return
       @argv.size > 1 and return error("too many args. expecting 1 <yaccfile>")
       @argv.size == 0 and return error("missing <yaccfile> argument.")
       @argv.first == '-' and return
-      File.exist?(@argv.first) or return error("not found: #{@argv.first}")
-      @c.out.puts "running haha ya right #{@argv.first}"
+      File.exist?(@argv.first) or
+        return error("<yaccfile> not found: #{@argv.first.inspect}")
+      @c.in = File.open(@argv.first, 'r') # stream left open here!
+      Translator.new(@c).run
+    end
+  end
+  module Grammars; end
+
+  module TreetopParserExtlib
+    def my_failure_reason
+      return nil unless (tf = terminal_failures) && tf.size > 0
+      "Expected " +
+        ( tf.size == 1 ?
+          tf[0].expected_string.inspect :
+          "one of #{tf.map{|f| f.expected_string.inspect}.uniq*', '}"
+        ) + " at line #{failure_line}, column #{failure_column} " +
+        "(byte #{failure_index+1}) #{my_input_excerpt}"
+    end
+
+    def num_context_lines; 4 end
+
+    def my_input_excerpt
+      0 == failure_index and return "at:\n1: #{input.match(/.*/)[0]}"
+      all = input[index...failure_index].split("\n", -1)
+      lines = all.slice(-1 * [all.size, num_context_lines].min, all.size)
+      nos = failure_line.downto(
+        [1, failure_line - num_context_lines + 1].max).to_a.reverse
+      w = nos.last.to_s.size # width of greatest line number as string
+      "after:\n"<<(nos.zip(lines){|no, s| ("%#{w}i" % no) + ": #{s}" } * "\n")
     end
   end
 
   class Translator
+    class Fatal < ::RuntimeError; end
     @yttg = nil
     class << self
       def yacc_treetop_grammar_text
@@ -158,7 +191,77 @@ module Hipe::YaccToTreetop
     def yacc_treetop_grammar_text
       self.class.yacc_treetop_grammar_text
     end
+    def run
+      begin
+        _run
+      rescue Fatal => e
+        @c.in.close if @c.in && ! @c.in.closed?
+        @c.err.puts(e.message) unless e.message == ""
+      end
+    end
   private
+    def _run
+      p = parser or return
+      whole_file = @c.in.read
+      @c.in.close
+      resp = p.parse(whole_file)
+      if resp.nil?
+        rsn = p.failure_reason || "Got nil from parse without reason!"
+        @c.err.puts rsn
+      else
+        PP.pp resp
+      end
+    end
+    def parse_stack_item str
+      if md = /\A([^:]+):(\d+)(?::in `([^']+)')?\Z/.match(str)
+        {:file => md[1], :line => md[2], :method => md[3] }
+      end
+    end
+    def fatal msg=nil
+      yield(@c) if block_given?
+      msg.nil? or @c.err.puts(msg)
+      h = parse_stack_item(caller[0]) and
+        @c.err.puts '(from ' << [("#{h[:method]}" if h[:method]),
+          ("line #{h[:line]}" if h[:line]) ].compact.join(' ') << ') '
+      # this is subject to change but for now we just raise empty one
+      raise Fatal.new("")
+    end
+    def parser
+      instance_variable_defined?('@parser') and return @parser
+      (klass = parser_class) ? (@parser = klass.new) : false
+    end
+    def parser_class
+      self.class.const_defined?(:MyParser) and return MyParser
+      cls = generated_parser_class or return false
+      self.class.const_set(:MyParser, Class.new(cls))
+      MyParser.class_eval do
+        include TreetopParserExtlib
+        alias_method :failure_reason, :my_failure_reason
+      end
+      MyParser
+    end
+    def generated_parser_class
+      Grammars.const_defined?(:Yacc3wFileParser) and
+        return Grammars::Yacc3wFileParser
+      if @c.key?(:treetop_parser_path)
+        load(@c[:treetop_parser_path]) # throws LoadError
+        Grammars.const_defined?(:Yacc3wFileParser) or return fatal do |c|
+          c.err.puts "couldn't find Yacc3wFileParser in "<<
+            @c[:treetop_parser_path]
+        end
+      else
+        r = ::Treetop.load_from_string(yacc_treetop_grammar_text)
+        r.to_s =~ /Yacc3wFileParser$/ or return fatal do |c|
+          c.err.puts "expected Yacc3wFileParser, had #{r}"
+        end
+      end
+      Grammars::Yacc3wFileParser
+    end
+  end
+end
+
+module Hipe::YaccToTreetop::Grammars::Yacc3wFile
+  class Fizzle
   end
 end
 
@@ -171,3 +274,15 @@ __END__
 #   http://www.w3.org/TR/css3-selectors/
 # It is not likely to parse all YACC grammars, just those
 # necessary for this project
+
+module Hipe
+module YaccToTreetop
+module Grammars
+grammar Yacc3wFile
+  rule foo
+    "fooz"
+  end
+end
+end
+end
+end
