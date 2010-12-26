@@ -263,13 +263,44 @@ module Hipe::YaccToTreetop
 end
 
 module Hipe::YaccToTreetop
+  class Sexpesque < Array
+    class << self
+      def build name, *childs
+        new([name, *childs])
+      end
+    end
+  end
   module Standardy
+    @modules = Hash.new do |h,k| h[k] =
+      k.split('::').inject(Object){ |m,n| m.const_get n }
+    end
+    class << self
+      attr_reader :modules
+    end
+    def build_sexp(name, *childs)
+      (sexp_class || sexp_class_guess(name)).build(name, *childs)
+    end
     def sexp
       if elements.nil?
-        [guess_node_name, text_value]
+        build_sexp(sexp_node_name, text_value)
       else
-        [guess_node_name, * sexp_tail_recursive(self)]
+        build_sexp(sexp_node_name, * sexp_tail_recursive(self))
       end
+    end
+    def sexp_class
+      nil # ovverride in the grammar or syntax node if necessary
+    end
+    def sexp_class_guess(name)
+      mod = Standardy.modules[ self.singleton_class.ancestors[0].to_s.
+        match(/\A(.+)::[^:]+::[^:]+\Z/)[1] ]
+      cls = name.to_s.gsub(/([a-z])_([a-z])/){ "#{$1.upcase}$2" }.
+        capitalize << "Sexp"
+      mod.const_defined?(cls) and return mod.const_get(cls)
+      mod.const_defined?(:MySexp) and return mod.const_get(:MySexp)
+      return Sexpesque
+    end
+    def sexp_node_name
+      guess_node_name
     end
     def sexp_tail_recursive element
       sexps = []
@@ -300,6 +331,18 @@ module Hipe::YaccToTreetop
   end
 end
 
+module Hipe::YaccToTreetop
+  module Grammars
+    class MySexp < Sexpesque; end
+    class FileSexp < MySexp
+    end
+    class CCommentSexp < MySexp
+    end
+  end
+end
+
+
+
 ::Hipe::YaccToTreetop.cli.run(ARGV) if $PROGRAM_NAME == __FILE__
 
 __END__
@@ -321,7 +364,7 @@ grammar Yacc3wFile
     white / c_comment+ <Standardy> { }
   end
   rule rool
-    [^;]+ ';' <Standard> { }
+    [^;]+ ';' <Standard> { def sexp_node_name; :rule end }
   end
   rule c_comment
     '/*'
