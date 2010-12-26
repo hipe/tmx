@@ -173,7 +173,8 @@ module Hipe::YaccToTreetop
       nos = failure_line.downto(
         [1, failure_line - num_context_lines + 1].max).to_a.reverse
       w = nos.last.to_s.size # width of greatest line number as string
-      "after:\n"<<(nos.zip(lines){|no, s| ("%#{w}i" % no) + ": #{s}" } * "\n")
+      "after:\n" <<
+        (nos.zip(lines).map{|no, s| ("%#{w}i" % no) + ": #{s}" } * "\n")
     end
   end
 
@@ -209,7 +210,8 @@ module Hipe::YaccToTreetop
         rsn = p.failure_reason || "Got nil from parse without reason!"
         @c.err.puts rsn
       else
-        PP.pp resp
+        sexp = resp.sexp
+        PP.pp sexp
       end
     end
     def parse_stack_item str
@@ -260,8 +262,41 @@ module Hipe::YaccToTreetop
   end
 end
 
-module Hipe::YaccToTreetop::Grammars::Yacc3wFile
-  class Fizzle
+module Hipe::YaccToTreetop
+  module Standardy
+    def sexp
+      if elements.nil?
+        [guess_node_name, text_value]
+      else
+        [guess_node_name, * sexp_tail_recursive(self)]
+      end
+    end
+    def sexp_tail_recursive element
+      sexps = []
+      element.elements.each do |el|
+        if el.respond_to?(:sexp)
+          sexps.push el.sexp
+        elsif el.elements.nil?
+          sexps.push el.text_value
+        else
+          sexps.concat sexp_tail_recursive(el) # flatten it!
+        end
+      end
+      if sexps.any? && sexps.index{|x| ! x.kind_of?(String)}.nil?
+        sexps = [ sexps * '' ]
+      end
+      sexps
+    end
+    def guess_node_name
+      m = singleton_class.ancestors.first.to_s.match(/([^:0-9]+)\d+$/)
+      m[1].gsub(/([a-z])([A-Z])/){ "#{$1}_#{$2}" }.downcase.intern if m
+    end
+    def singleton_class
+      @sc ||= class << self; self end
+    end
+  end
+  class Standard < ::Treetop::Runtime::SyntaxNode
+    include Standardy
   end
 end
 
@@ -279,8 +314,25 @@ module Hipe
 module YaccToTreetop
 module Grammars
 grammar Yacc3wFile
-  rule foo
-    "fooz"
+  rule file
+    space? (rool space?)+ space? <Standard> { }
+  end
+  rule space
+    white / c_comment+ <Standardy> { }
+  end
+  rule rool
+    [^;]+ ';' <Standard> { }
+  end
+  rule c_comment
+    '/*'
+    (
+      !'*/'
+      (. / "\n")
+    )*
+    '*/' <Standard> { }
+  end
+  rule white
+    [ \t\n\r\f]+ <Standard> { }
   end
 end
 end
