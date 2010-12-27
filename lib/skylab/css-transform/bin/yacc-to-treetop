@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby -w
 require 'optparse'
 require 'pp'
+require 'strscan'
 require 'rubygems'
 require 'treetop'
 # require 'ruby-debug'; $stderr.puts "\e[1;5;33mruby-debug\e[0m"
@@ -265,7 +266,65 @@ module Hipe::YaccToTreetop
 end
 
 module Hipe::YaccToTreetop
+  class SexpSelectorCompiler
+    class << self
+      def instance; @instance ||= new end
+    end
+    def initialize
+      @selector_cache = Hash.new do |h,k|
+        h[k] = nodes_selector_compile(k, true)
+        h[k].freeze
+      end
+    end
+    def compiled str
+      @selector_cache[str]
+    end
+    def nodes_selector_compile str, freeze = false
+      str.split(',', -1).map do |part|
+        toks = node_selector_compile(part)
+        freeze and toks.freeze
+        toks
+      end
+    end
+    def node_selector_compile str
+      res = []
+      s = StringScanner.new(str)
+      begin
+        if s.scan(/\*/); res.push '*'
+        elsif s.scan(/\[/)
+          d = s.scan(/\d+/) or fail("expecting digit had #{s.rest.inspect}")
+          s.scan(/\]/) or fail("expecting ']' had #{s.rest.inspect}")
+          res.push d.to_i
+        else; fail("expecting '*' or '[' near #{s.rest.inspect}")
+        end
+      end until s.eos?
+      res
+    end
+  end
+  module ElementsSelector
+    def elements_at str
+      elements_at_recursive self, SexpSelectorCompiler.instance.compiled(str)
+    end
+    def elements_at_recursive node, parsed
+      elements.nil? and return Array.new(parsed.size)
+      parsed.map do |part|
+        elements_at_part_recursive(node, part)
+      end
+    end
+    def elements_at_part_recursive node, parsed
+      cx = parsed.first == '*' ? node.elements : node.elements[parsed.first]
+      cx.nil? and return nil
+      if parsed.size > 1
+        child_path = parsed[1..-1]
+        cx = cx.map do |c|
+          elements_at_part_recursive(c, child_path)
+        end
+      end
+      cx
+    end
+  end
   class Sexpesque < Array
+    alias_method :node_name, :first
     class << self
       def build name, *childs
         new([name, *childs])
@@ -273,6 +332,8 @@ module Hipe::YaccToTreetop
     end
   end
   module Standardy
+    include ElementsSelector
+
     @modules = Hash.new do |h,k| h[k] =
       k.split('::').inject(Object){ |m,n| m.const_get n }
     end
@@ -283,6 +344,9 @@ module Hipe::YaccToTreetop
       (sexp_class || sexp_class_guess(name)).build(name, *childs)
     end
     def sexp
+      standard_sexp
+    end
+    def standard_sexp
       if elements.nil?
         build_sexp(sexp_node_name, text_value)
       else
@@ -304,11 +368,13 @@ module Hipe::YaccToTreetop
     def sexp_node_name
       guess_node_name
     end
-    def sexp_tail_recursive element
+    def sexp_tail_recursive node
       sexps = []
-      element.elements.each do |el|
+      cx = node.respond_to?(:_) ? node.elements_at(_) : node.elements
+      cx.each do |el|
         if el.respond_to?(:sexp)
-          sexps.push el.sexp
+          s = el.sexp
+          s.nil? or sexps.push s # careful! this changes structure of things
         elsif el.elements.nil?
           sexps.push el.text_value
         else
@@ -364,7 +430,15 @@ grammar Yacc3wSpec
     space? (rool space?)+ space? <Standard> { }
   end
   rule space
-    ( white / c_comment )+ <Standard> { }
+    ( white / c_comment )+ <Standard> {
+      def sexp
+        case (sexp = standard_sexp).size
+          when 1; nil
+          when 2; sexp[1]
+          else; sexp
+        end
+      end
+    }
   end
   rule rool
     rule_name space? ':' space? rule_body space? ';' <Standard> {
@@ -378,10 +452,10 @@ grammar Yacc3wSpec
     [^;]* <Standard> { }
   end
   rule c_comment
-    '/*' ( !'*/' ( . / "\n" ) )* '*/' <Standard> { }
+    '/*' ( !'*/' ( . / "\n" ) )* '*/' <Standard> { def _; '[1]' end }
   end
   rule white
-    [ \t\n\r\f]+ <Standard> { }
+    [ \t\n\r\f]+ <Standard> { def sexp; nil end }
   end
 end
 end
