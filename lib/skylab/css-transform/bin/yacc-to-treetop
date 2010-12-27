@@ -375,7 +375,9 @@ module Hipe::YaccToTreetop
       cx = node.respond_to?(:sexp_selector) ?
         node.elements_at(node.sexp_selector) : node.elements
       cx.each do |el|
-        if el.respond_to?(:sexp)
+        if el.nil?
+          # always ignored, changes structure
+        elsif el.respond_to?(:sexp)
           s = el.sexp
           s.nil? or sexps.push s # careful! this changes structure of things
         elsif el.elements.nil?
