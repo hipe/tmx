@@ -70,6 +70,12 @@ module Hipe::YaccToTreetop
     end
     attr_reader :out, :err
     attr_accessor :in
+    def builder
+      @builder ||= TreetopBuilder.new(self)
+    end
+    def yacc_name_to_rule_name name
+      name # @todo
+    end
   end
 
   class Cli < CliBase
@@ -84,6 +90,10 @@ module Hipe::YaccToTreetop
     def option_parser
       @op ||= OptionParser.new do |o|
         o.banner = usage
+        @c[:progressive] = true # always on for now
+        o.on('-g=<grammar>', '--grammar=<grammar>',
+        "Also output grammar declaration (or \"Mod1::Mod2::Grammar\")"
+        ) { |g| @c[:grammar] = g }
         o.on('--tt-grammar',
           '(development) Output the treetop grammar (grammar) to stdout'
         ){ @queue.push :run_treetop_grammar }
@@ -222,7 +232,9 @@ module Hipe::YaccToTreetop
         sexp = resp.sexp
         @c.key?(:dump_sexp) and PP.pp(sexp, @c.out)
         @c.key?(:exit_after_dump) and return
-        @c.out.puts "pretending to translate"
+        @c.key?(:progressive) and @c.builder.progressive_output!
+        sexp.translate(@c)
+        @c.key?(:progressive) or @c.out.write(@c.builder.ruby)
       end
     end
     def parse_stack_item str
@@ -423,12 +435,85 @@ module Hipe::YaccToTreetop
   end
 end
 
+## here is the abstractable code for generating treetop grammars
+# (adapted from predecessor)
+module Hipe::YaccToTreetop
+
+  class TreetopBuilder < ::Treetop::Compiler::RubyBuilder
+    class ProgressiveOutputAdapter
+      def initialize out; @out = out end
+      def <<(*a); @out.write(*a); self end
+    end
+    class RuleBuild
+      def self.run(builder, &block)
+        block.call(me = new(builder))
+        me.write
+      end
+      def initialize builder, &block
+        @builder = builder
+        @ctx = builder.context
+      end
+      attr_accessor :rule_name
+      attr_accessor :pattern_like
+      def write
+        @builder.rule_declaration(@ctx.yacc_name_to_rule_name(rule_name)) do
+          @builder.write "".indent(@builder.level)
+          pattern_like.translate(@ctx)
+          @builder.newline
+        end
+      end
+    end
+    def initialize ctx
+      super()
+      @ctx = ctx
+    end
+    def write_rule(&block)
+      RuleBuild.run(self, &block)
+    end
+    def progressive_output!
+      @ruby = ProgressiveOutputAdapter.new(@ctx.out)
+    end
+    def rule_declaration name, &block
+      self << "rule #{name}"
+      indented(&block)
+      self << "end"
+    end
+    def grammar_declaration(name, &block)
+      self << "grammar #{name}"
+      indented(&block)
+      self << "end"
+    end
+    def write *a
+      @ruby.<<(*a)
+    end
+  end
+end
+## end abstractable
+
+
 module Hipe::YaccToTreetop
   module Grammars
     class MySexp < Sexpesque; end
     class SpecSexp < MySexp
-    end
-    class CCommentSexp < MySexp
+      def translate c
+        @ctx = c
+        @nest = [ lambda{ go_rules } ]
+        @ctx.key?(:grammar) and go_grammar
+        @nest.pop.call
+      end
+      def go_grammar
+        parts = @ctx[:grammar].split('::')
+        gname = parts.pop
+        @nest.push lambda{@ctx.builder.grammar_declaration(gname, &@nest.pop)}
+        while mod = parts.pop
+          @nest.push lambda{ |mymod| lambda {
+            @ctx.builder.module_declaration(mymod, &@nest.pop)
+          } }.call(mod)
+        end
+      end
+      def go_rules
+        @ctx.builder << "i am so inside this thing"
+      end
     end
   end
 end
