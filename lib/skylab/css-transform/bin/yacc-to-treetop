@@ -6,7 +6,7 @@ require 'rubygems'
 require 'treetop'
 # require 'ruby-debug'; $stderr.puts "\e[1;5;33mruby-debug\e[0m"
 
-# test case 1: ./bin/yacc-to-treetop test/fixtures/yaccw3/selectors.yaccw3
+# test case 1: ./bin/yacc-to-treetop test/fixtures/yaccw3/selectors.yaccw3c
 
 
 module Hipe; end
@@ -443,7 +443,7 @@ grammar Yacc3wSpec
     }
   end
   rule rool
-    rule_name space? ':' space? rule_body space? ';' <Standard> {
+    rule_name space? ':' space? pattern space? ';' <Standard> {
       def sexp_node_name; :rule                  end
       def sexp_selector;  '[0],[1],[3],[4],[5]'  end
     }
@@ -451,8 +451,27 @@ grammar Yacc3wSpec
   rule rule_name
     [a-zA-Z._] [a-zA-Z._0-9]* <Standard> { }
   end
-  rule rule_body
-    [^;]* <Standard> { }
+  rule pattern
+    choice / sequence / space? <Standardy> { }
+  end
+  rule choice
+    ( sequence ) space? '|' space? pattern (space? '|' space? pattern)*
+    <Standard> { }
+  end
+  rule sequence
+    pattern_part ( space+ pattern_part )* <Standard> { }
+  end
+  rule pattern_part
+    ( rule_name / literal / w3c_grouping ) w3c_range?
+  end
+  rule literal
+    "'" ( '\\' ( [nr'\\tbf] / [0-9] 3..3 ) / [^'] ) "'" <Standard> { }
+  end
+  rule w3c_range
+    '*' / '+' / '?' <Standard> { }
+  end
+  rule w3c_grouping
+    '[' space?   pattern space? ']' <Standard> { }
   end
   rule c_comment
     '/*' ( !'*/' ( . / "\n" ) )* '*/' <Standard> {
