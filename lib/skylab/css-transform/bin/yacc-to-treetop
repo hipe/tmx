@@ -6,7 +6,7 @@ require 'rubygems'
 require 'treetop'
 # require 'ruby-debug'; $stderr.puts "\e[1;5;33mruby-debug\e[0m"
 
-# test case 1: ./bin/yacc-to-treetop test/fixtures/yaccw3/selectors.yaccw3c
+# test case 1: ./bin/yacc-to-treetop test/fixtures/yaccw3c/selectors.yaccw3c
 # test case 2: ./bin/yacc-to-treetop test/fixtures/yaccw3c/050.get-sequences.yaccw3c
 
 
@@ -397,6 +397,16 @@ module Hipe::YaccToTreetop
       m = singleton_class.ancestors.first.to_s.match(/([^:]*[^:0-9])\d+$/)
       m[1].gsub(/([a-zA-Z])([A-Z])/){ "#{$1}_#{$2}" }.downcase.intern if m
     end
+  # alternate version below, does last not first. keep it lying around for now
+  # extreme haxie: find the last ancestor that has the same containing
+  # module as the first.  deduce rule used by using this module name.
+  # def guess_node_name
+  #   m = singleton_class.ancestors.first.to_s.match(/(\A.+[^:])::[^:]+\z/) or
+  #     return nil
+  #   idx = singleton_class.ancestors.index{ |x| 0 != x.to_s.index(m[1]) }
+  #   m = singleton_class.ancestors[idx-1].to_s.match(/([^:]*[^:0-9])\d+$/)
+  #   m[1].gsub(/([a-zA-Z])([A-Z])/){ "#{$1}_#{$2}" }.downcase.intern if m
+  # end
     def singleton_class
       @sc ||= class << self; self end
     end
