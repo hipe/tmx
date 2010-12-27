@@ -409,7 +409,7 @@ end
 module Hipe::YaccToTreetop
   module Grammars
     class MySexp < Sexpesque; end
-    class FileSexp < MySexp
+    class SpecSexp < MySexp
     end
     class CCommentSexp < MySexp
     end
@@ -433,7 +433,7 @@ module Hipe
 module YaccToTreetop
 module Grammars
 grammar Yacc3wSpec
-  rule file
+  rule spec
     space? (rool space?)+ space? <Standard> { }
   end
   rule space
