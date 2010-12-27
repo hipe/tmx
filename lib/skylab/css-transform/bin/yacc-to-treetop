@@ -479,7 +479,9 @@ grammar Yacc3wSpec
     ( '*' / '+' / '?' ) <Standardy> { }
   end
   rule w3c_grouping
-    '[' space?   pattern space? ']' <Standard> { }
+    '[' space? pattern space? ']' <Standard> {
+      def sexp_selector;     '[1],[2],[3]'     end
+    }
   end
   rule c_comment
     '/*' ( !'*/' ( . / "\n" ) )* '*/' <Standard> {
