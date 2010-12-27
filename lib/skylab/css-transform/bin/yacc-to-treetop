@@ -5,6 +5,8 @@ require 'rubygems'
 require 'treetop'
 # require 'ruby-debug'; $stderr.puts "\e[1;5;33mruby-debug\e[0m"
 
+# test case 1: ./bin/yacc-to-treetop test/fixtures/yaccw3/selectors.yaccw3
+
 
 module Hipe; end
 module Hipe::YaccToTreetop
@@ -243,21 +245,21 @@ module Hipe::YaccToTreetop
       MyParser
     end
     def generated_parser_class
-      Grammars.const_defined?(:Yacc3wFileParser) and
-        return Grammars::Yacc3wFileParser
+      Grammars.const_defined?(:Yacc3wSpecParser) and
+        return Grammars::Yacc3wSpecParser
       if @c.key?(:treetop_parser_path)
         load(@c[:treetop_parser_path]) # throws LoadError
-        Grammars.const_defined?(:Yacc3wFileParser) or return fatal do |c|
-          c.err.puts "couldn't find Yacc3wFileParser in "<<
+        Grammars.const_defined?(:Yacc3wSpecParser) or return fatal do |c|
+          c.err.puts "couldn't find Yacc3wSpecParser in "<<
             @c[:treetop_parser_path]
         end
       else
         r = ::Treetop.load_from_string(yacc_treetop_grammar_text)
-        r.to_s =~ /Yacc3wFileParser$/ or return fatal do |c|
-          c.err.puts "expected Yacc3wFileParser, had #{r}"
+        r.to_s =~ /Yacc3wSpecParser$/ or return fatal do |c|
+          c.err.puts "expected Yacc3wSpecParser, had #{r}"
         end
       end
-      Grammars::Yacc3wFileParser
+      Grammars::Yacc3wSpecParser
     end
   end
 end
@@ -293,8 +295,8 @@ module Hipe::YaccToTreetop
     def sexp_class_guess(name)
       mod = Standardy.modules[ self.singleton_class.ancestors[0].to_s.
         match(/\A(.+)::[^:]+::[^:]+\Z/)[1] ]
-      cls = name.to_s.gsub(/([a-z])_([a-z])/){ "#{$1.upcase}$2" }.
-        capitalize << "Sexp"
+      cls = name.to_s.gsub(/([a-z])_([a-z])/){ "#{$1}#{$2.upcase}" }.
+        sub(/^([a-z])/){ $1.upcase } << "Sexp"
       mod.const_defined?(cls) and return mod.const_get(cls)
       mod.const_defined?(:MySexp) and return mod.const_get(:MySexp)
       return Sexpesque
@@ -320,7 +322,7 @@ module Hipe::YaccToTreetop
     end
     def guess_node_name
       m = singleton_class.ancestors.first.to_s.match(/([^:0-9]+)\d+$/)
-      m[1].gsub(/([a-z])([A-Z])/){ "#{$1}_#{$2}" }.downcase.intern if m
+      m[1].gsub(/([a-zA-Z])([A-Z])/){ "#{$1}_#{$2}" }.downcase.intern if m
     end
     def singleton_class
       @sc ||= class << self; self end
@@ -350,29 +352,33 @@ __END__
 #   http://dinosaur.compilertools.net/yacc/index.html
 # and parts of a YACC-like grammar presented at
 #   http://www.w3.org/TR/css3-selectors/
-# It is not likely to parse all YACC grammars, just those
-# necessary for this project
+# It is not going to parse all YACC grammars, just those
+# necessary for this project. (e.g. it only parses the 'rules'
+# section, not the declarations or programs section.)
 
 module Hipe
 module YaccToTreetop
 module Grammars
-grammar Yacc3wFile
+grammar Yacc3wSpec
   rule file
     space? (rool space?)+ space? <Standard> { }
   end
   rule space
-    white / c_comment+ <Standardy> { }
+    ( white / c_comment )+ <Standard> { }
   end
   rule rool
-    [^;]+ ';' <Standard> { def sexp_node_name; :rule end }
+    rule_name space? ':' space? rule_body space? ';' <Standard> {
+      def sexp_node_name; :rule end
+    }
+  end
+  rule rule_name
+    [a-zA-Z._] [a-zA-Z._0-9]* <Standard> { }
+  end
+  rule rule_body
+    [^;]* <Standard> { }
   end
   rule c_comment
-    '/*'
-    (
-      !'*/'
-      (. / "\n")
-    )*
-    '*/' <Standard> { }
+    '/*' ( !'*/' ( . / "\n" ) )* '*/' <Standard> { }
   end
   rule white
     [ \t\n\r\f]+ <Standard> { }
