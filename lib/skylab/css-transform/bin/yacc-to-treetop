@@ -476,7 +476,7 @@ grammar Yacc3wSpec
     "'" ( '\\' ( [nr'\\tbf] / [0-9] 3..3 ) / [^'] ) "'" <Standard> { }
   end
   rule w3c_range
-    '*' / '+' / '?' <Standard> { }
+    ( '*' / '+' / '?' ) <Standardy> { }
   end
   rule w3c_grouping
     '[' space?   pattern space? ']' <Standard> { }
