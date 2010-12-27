@@ -7,7 +7,7 @@ require 'treetop'
 # require 'ruby-debug'; $stderr.puts "\e[1;5;33mruby-debug\e[0m"
 
 # test case 1: ./bin/yacc-to-treetop test/fixtures/yaccw3c/selectors.yaccw3c
-# test case 2: ./bin/yacc-to-treetop test/fixtures/yaccw3c/050.get-sequences.yaccw3c
+# test case 2: ./bin/yacc-to-treetop test/fixtures/yaccw3c/050.sequences.y3
 # test case 3: ./bin/yacc-to-treetop test/fixtures/yaccw3c/060.choice-parse.y3
 
 
