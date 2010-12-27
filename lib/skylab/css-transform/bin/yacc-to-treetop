@@ -370,13 +370,15 @@ module Hipe::YaccToTreetop
     end
     def sexp_tail_recursive node
       sexps = []
-      cx = node.respond_to?(:_) ? node.elements_at(_) : node.elements
+      cx = node.respond_to?(:sexp_selector) ?
+        node.elements_at(node.sexp_selector) : node.elements
       cx.each do |el|
         if el.respond_to?(:sexp)
           s = el.sexp
           s.nil? or sexps.push s # careful! this changes structure of things
         elsif el.elements.nil?
-          sexps.push el.text_value
+          t = el.text_value
+          t == "" or sexps.push t # ditto here, changes structure
         else
           sexps.concat sexp_tail_recursive(el) # flatten it!
         end
@@ -434,7 +436,7 @@ grammar Yacc3wSpec
       def sexp
         case (sexp = standard_sexp).size
           when 1; nil
-          when 2; sexp[1]
+          when 2; sexp[1] == '' ? nil : sexp[1]
           else; sexp
         end
       end
@@ -443,7 +445,7 @@ grammar Yacc3wSpec
   rule rool
     rule_name space? ':' space? rule_body space? ';' <Standard> {
       def sexp_node_name; :rule                  end
-      def _;              '[0],[1],[3],[4],[5]'  end
+      def sexp_selector;  '[0],[1],[3],[4],[5]'  end
     }
   end
   rule rule_name
@@ -453,7 +455,9 @@ grammar Yacc3wSpec
     [^;]* <Standard> { }
   end
   rule c_comment
-    '/*' ( !'*/' ( . / "\n" ) )* '*/' <Standard> { def _; '[1]' end }
+    '/*' ( !'*/' ( . / "\n" ) )* '*/' <Standard> {
+      def sexp_selector;  '[1]'                   end
+    }
   end
   rule white
     [ \t\n\r\f]+ <Standard> { def sexp; nil end }
