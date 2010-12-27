@@ -8,7 +8,7 @@ require 'treetop'
 
 # test case 1: ./bin/yacc-to-treetop test/fixtures/yaccw3c/selectors.yaccw3c
 # test case 2: ./bin/yacc-to-treetop test/fixtures/yaccw3c/050.get-sequences.yaccw3c
-# test case 2: ./bin/yacc-to-treetop test/fixtures/yaccw3c/060.choice-parse.y
+# test case 3: ./bin/yacc-to-treetop test/fixtures/yaccw3c/060.choice-parse.y3
 
 
 module Hipe; end
@@ -471,8 +471,11 @@ grammar Yacc3wSpec
     choice / sequence / space? <Standardy> { }
   end
   rule choice
-    choice_part space? '|' space? choice_part ( space? '|' space? choice_part )*
+    choice_part space? pipe space? choice_part ( space? pipe space? choice_part )*
     <Standard> { }
+  end
+  rule pipe
+    '|' <Standard> { def sexp; end }
   end
   rule choice_part
     sequence / space+
