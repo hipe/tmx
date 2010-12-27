@@ -442,7 +442,8 @@ grammar Yacc3wSpec
   end
   rule rool
     rule_name space? ':' space? rule_body space? ';' <Standard> {
-      def sexp_node_name; :rule end
+      def sexp_node_name; :rule                  end
+      def _;              '[0],[1],[3],[4],[5]'  end
     }
   end
   rule rule_name
