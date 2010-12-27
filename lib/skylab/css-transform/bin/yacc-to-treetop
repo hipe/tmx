@@ -389,7 +389,7 @@ module Hipe::YaccToTreetop
       sexps
     end
     def guess_node_name
-      m = singleton_class.ancestors.first.to_s.match(/([^:0-9]+)\d+$/)
+      m = singleton_class.ancestors.first.to_s.match(/([^:]*[^:0-9])\d+$/)
       m[1].gsub(/([a-zA-Z])([A-Z])/){ "#{$1}_#{$2}" }.downcase.intern if m
     end
     def singleton_class
@@ -455,8 +455,11 @@ grammar Yacc3wSpec
     choice / sequence / space? <Standardy> { }
   end
   rule choice
-    ( sequence ) space? '|' space? pattern (space? '|' space? pattern)*
+    choice_part space? '|' space? choice_part ( space? '|' space? choice_part )*
     <Standard> { }
+  end
+  rule choice_part
+    sequence / space+
   end
   rule sequence
     pattern_part ( space+ pattern_part )* <Standard> { }
