@@ -312,15 +312,17 @@ module Hipe::YaccToTreetop
       end
     end
     def elements_at_part_recursive node, parsed
-      cx = parsed.first == '*' ? node.elements : node.elements[parsed.first]
-      cx.nil? and return nil
-      if parsed.size > 1
-        child_path = parsed[1..-1]
-        cx = cx.map do |c|
-          elements_at_part_recursive(c, child_path)
+      mix = parsed.first == '*' ? node.elements : node.elements[parsed.first]
+      mix.nil? and return nil
+      parsed.size == 1 and return mix
+      child_path = parsed[1..-1]
+      if parsed.first == '*'
+        mix.map do |ch|
+          ch.elements.nil? ? nil : elements_at_part_recursive(ch, child_path)
         end
+      else
+        mix.elements.nil? ? nil : elements_at_part_recursive(mix, child_path)
       end
-      cx
     end
   end
   class Sexpesque < Array
