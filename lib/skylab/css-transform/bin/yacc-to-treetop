@@ -8,6 +8,7 @@ require 'treetop'
 
 # test case 1: ./bin/yacc-to-treetop test/fixtures/yaccw3c/selectors.yaccw3c
 # test case 2: ./bin/yacc-to-treetop test/fixtures/yaccw3c/050.get-sequences.yaccw3c
+# test case 2: ./bin/yacc-to-treetop test/fixtures/yaccw3c/060.choice-parse.y
 
 
 module Hipe; end
