@@ -113,7 +113,7 @@ module Hipe::YaccToTreetop
       @treetop_path = File.join(@tempdir, 'yacc-to-treetop.treetop')
       @parser_path = File.join(@tempdir, 'yacc-to-treetop.rb')
       @c.has_key?(:clear_tempdir) and clear_tempdir
-      File.exist?(@parser_path) ? @c.out.puts("Using #{@parser_path}") :
+      File.exist?(@parser_path) ? @c.err.puts("Using #{@parser_path}") :
         write_yacc_treetop_parser
       @c[:treetop_parser_path] = @parser_path
     end
