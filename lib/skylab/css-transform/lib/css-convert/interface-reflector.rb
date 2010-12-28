@@ -12,6 +12,7 @@ end
 module Hipe::CssConvert::InterfaceReflector
   module InstanceMethods
     def build_cli_option_parser
+      require 'optparse'
       OptionParser.new do |o|
         o.banner = usage
         self.class.interface.parameters.each do |p|
