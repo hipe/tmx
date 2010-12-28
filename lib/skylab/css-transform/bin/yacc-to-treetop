@@ -35,8 +35,9 @@ module Hipe::YaccToTreetop
     Codes = {:bold=>1,:dark_red=>31,:green=>32,:yellow=>33,:blue=>34,
       :purple=>35,:cyan=>36,:white=>37,:red=>38}
     def color(s, *a); "\e[#{a.map{|x|Codes[x]}.compact*';'}m#{s}\e[0m" end
-    def em(s); color(s, :bold, :green) end
-
+    def em(s); style(s, :em) end
+    Styles = { :error => [:bold, :red], :em => [:bold, :green] }
+    def style(s, style); color(s, *Styles[style]) end
     def error msg
       @c.err.puts msg
       @c.err.puts usage
@@ -144,7 +145,7 @@ module Hipe::YaccToTreetop
       require 'open3'
       out, err = Open3.popen3(cmd){ |_, sout, serr| [sout.read, serr.read] }
       if err.any?
-        @c.out.puts color('error: ', :bold, :red) << "when compiling: #{cmd}:"
+        @c.out.puts style('error: ', :error) << "when compiling: #{cmd}:"
         @c.out.puts
         @c.out.puts err
         return fatal("#{program_name} exiting.")

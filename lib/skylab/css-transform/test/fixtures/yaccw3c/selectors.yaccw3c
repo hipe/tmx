@@ -1,3 +1,4 @@
+no never
 /*
 from http://www.w3.org/TR/css3-selectors/#YACC
 The grammar below defines the syntax of Selectors. It is globally LL(1) and can be locally LL(2) (but note that most UAs should not use it directly, since it doesn't express the parsing conventions). The format of the productions is optimized for human consumption and some shorthand notations beyond Yacc (see [YACC]) are used:
