@@ -493,6 +493,29 @@ module Hipe::YaccToTreetop
       @ruby.<<(*a)
     end
   end
+  MyInspectKey = ::PP::PPMethods::InspectKey
+  class PpRhs < ::PP
+    def pp_rhs node
+      id = node.__id__
+      if Thread.current[MyInspectKey].include? id
+        group { node.pretty_print_cycle self } # just to be safe!
+        return
+      end
+      begin
+        Thread.current[MyInspectKey] << id
+        group { node.pretty_print_rhs self }
+      ensure
+        Thread.current[MyInspectKey].pop unless PP.sharing_detection
+      end
+    end
+    def break
+      flush
+      @output << @newline
+      @output << @genspace.call(@indent)
+      @output_width = @indent
+      @buffer_width = 0
+    end
+  end
 end
 ## end abstractable
 
@@ -506,6 +529,18 @@ module Hipe::YaccToTreetop
         PP.pp(self, s)
         s.rewind
         c.builder << "Help, fixme: #{s.read}"
+      end
+      # debugging and development only!! @todo
+      def pretty_print_rhs q
+        q.group(1, 'pprhs![', ']') {
+          q.seplist(self) { |v|
+            if v.respond_to?(:pretty_print_rhs)
+              q.pp_rhs(v)
+            else
+              q.pp(v) # usually symbols & strings
+            end
+          }
+        }
       end
     end
     class SpecSexp < MySexp
@@ -531,12 +566,23 @@ module Hipe::YaccToTreetop
     end
     class SpaceSexp < MySexp
       def translate c
-        self[1..-1].each{ |ch| ch.translate(c) }
+        self[1..-1].each { |ch| ch.translate(c) }
+      end
+      def pretty_print_rhs q
+        self[1..-1].each { |ch| q.pp_rhs(ch) }
       end
     end
     class CCommentSexp < MySexp
       def translate c
-        c.builder << ('# ' << self[1].strip.gsub("\n", "\n# "))
+        c.builder << unindented_ruby_comment_block
+      end
+      def pretty_print_rhs q
+        q.text "#ohai comment"
+        q.break
+      end
+    private
+      def unindented_ruby_comment_block
+        "# #{self[1].strip.gsub("\n", "\n# ")}"
       end
     end
     class RuleSexp < MySexp
@@ -545,35 +591,47 @@ module Hipe::YaccToTreetop
         b = c.builder
         use_name = with(:rule_name){ |ch| c.yacc_name_to_rule_name(ch[1]) }
         b.rule_declaration(use_name) do
-          # b.write "".indent(b.level)
-          until_end{ |ch| ch.translate(c) }
-          # b.newline
+          q = PpRhs.new(c.out, width=c[:width] || 79)
+          q.guard_inspect_key do # very very unlikely to be necessary but meh
+            b.write "".indent(b.level)
+            q.nest(b.level) do
+              until_end { |ch| q.pp_rhs(ch) }
+            end
+          end
+          q.flush
+          b.newline
         end
       end
     end
     class SequenceSexp < MySexp
-      def translate c
-        c.builder << "i am sequence"
+      def pretty_print_rhs q
+        q.breakable
+        q.text "you know you want this sequence"
       end
     end
     class ChoiceSexp < MySexp
-      def translate c
-        c.builder << "i am a choice"
+      def pretty_print_rhs q
+        q.breakable
+        q.text "i am a choice"
       end
     end
     class RuleName < MySexp
       def translate c
         c.builder << "i am a rule name"
       end
+      def pretty_print_rhs q
+        q.breakable
+        q.text "rulio:#{self[1]}"
+      end
     end
     class W3cRangeSexp < MySexp
-      def translate c
-        c.builder << "i am a range"
+      def pretty_print_rhs q
+        q.text "range: #{self[1]}"
       end
     end
     class W3cGroupingSexp < MySexp
-      def translate c
-        c.builder << "i am a grouping"
+      def pretty_print_rhs q
+        q.text "you know you want this grouping"
       end
     end
   end
