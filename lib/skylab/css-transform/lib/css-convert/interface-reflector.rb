@@ -15,14 +15,14 @@ module Hipe::CssConvert::InterfaceReflector
       require 'optparse'
       OptionParser.new do |o|
         o.banner = usage
-        self.class.interface.parameters.each do |p|
-          next unless p.cli?
+        self.class.interface.parameters.select{ |p| p.cli? and p.option? }.
+        each do |p|
           o.on( * p.cli_definition_array ){ |v| dispatch_option(p, v) }
         end
       end
     end
     def dispatch_option parameter, value
-      args = parameter.argument? ? [value] : []
+      args = parameter.takes_argument? ? [value] : []
       send("on_#{parameter.intern}", *args)
     end
   end
@@ -38,10 +38,8 @@ module Hipe::CssConvert::InterfaceReflector
     def initialize
       @parsed = false
     end
-    def each &b
-      @parsed or parse!
-      super(&b)
-    end
+    def each &b;        @parsed or parse!;         super(&b)     end
+    def select &b;      @parsed or parse!;         super(&b)     end
   private
     def parse!
       each_index do |idx|
@@ -58,15 +56,24 @@ module Hipe::CssConvert::InterfaceReflector
       @intern = intern
       block_given? and yield self
     end
-    def cli?                ;  !@cli_definition_array.nil?                 end
+    def cli?                ;   instance_variable_defined?('@is_cli')      end
+    def cli!                ;   @is_cli = true;                            end
     def noable!             ;   @noable = true;                            end
     def argument_required!  ;   @argument = :required                      end
     def argument_optional!  ;   @argument = :optional                      end
+    def takes_argument?     ;   instance_variable_defined?('@argument')    end
+    def option!             ;   @option   = true                           end
+    def required!           ;   @required = true                           end
+    def optional?           ;  !required?                                  end
+    def argument?           ;  !option?                                    end
 
     attr_reader   :intern
-    attr_accessor :cli_definition_array
+    attr_accessor :cli_definition_array, :cli_syntax_label, :cli_label
     attr_reader   :argument
-    alias_method  :argument?, :argument
+    attr_reader   :option
+    alias_method  :option?, :option
+    attr_reader   :required
+    alias_method  :required?, :required
   end
 end
 
@@ -79,7 +86,10 @@ module Hipe::CssConvert::InterfaceReflector
     end
     attr_reader :parameters
     def on *a
-      @parameters.push UnparsedParameterDefinition.new(a)
+      @parameters.push UnparsedOptionDefinition.new(a)
+    end
+    def arg *a
+      @parameters.push UnparsedArgumentDefinition.new(a)
     end
   end
   class RequestParser
@@ -87,21 +97,42 @@ module Hipe::CssConvert::InterfaceReflector
       def initialize(arr)
         @arr = arr
       end
+    end
+    class UnparsedOptionDefinition < UnparsedParameterDefinition
       def parse
         found = @arr.detect{ |x| x.kind_of?(String) && 0 == x.index('--') }
-        found or fail("Cannot ascertain intern name from #{@arr.inspect}")
+        found or fail("Must have --long option name in: #{@arr.inspect}")
         md = %r{\A--(\[no-\])?([^=\[ ]+)
-          (?:  \[[ =](<?[^>]+>?)?\]
-            |   [ =] (<?[^>]+>?)?
+          (?:  \[[ =](<?[^ >]+>?)?\]
+            |   [ =] (<?[^ >]+>?)?
           )?
         \Z}x.match(found)
         md or fail("regexp match failure with: #{@arr.inspect}")
         intern = md[2].gsub('-','_').intern
         Parameter.new(intern) do |p|
+          p.cli!; p.option!
+          p.cli_syntax_label = @arr.first
           md[1].nil? or p.noable!
           md[3].nil? or p.argument_optional!
           md[4].nil? or p.argument_required!
           p.cli_definition_array = @arr
+        end
+      end
+    end
+    class UnparsedArgumentDefinition < UnparsedParameterDefinition
+      def parse
+        md = %r{\A (
+            \[  ( <? ([a-z0-9][-_a-z0-9]*) >?  ) \]
+          |     ( <? ([a-z0-9][-_a-z0-9]*) >?  )
+        ) \Z}ix.match(@arr.first)
+        md or fail("expecting \"foo\" or \"[foo]\", not "<<
+          " #{@arr.first.inspect}")
+        intern = (md[3] || md[5]).gsub('-','_').intern
+        Parameter.new(intern) do |p|
+          p.cli!; p.cli_syntax_label = md[1]
+          p.cli_label = (md[2] || md[4])
+          p.argument_required! # always true for arguments
+          md[2].nil? and p.required!
         end
       end
     end
@@ -157,6 +188,19 @@ module Hipe::CssConvert::InterfaceReflector
     end
     def program_name
       File.basename($PROGRAM_NAME)
+    end
+    def usage_syntax_string
+      [program_name,options_syntax_string,arguments_syntax_string].compact*' '
+    end
+    def options_syntax_string
+      s = self.class.interface.parameters.select{ |p| p.cli? && p.option? }.
+      map{ |p| "[#{p.cli_syntax_label}]" }.join(' ')
+      s unless s.empty?
+    end
+    def arguments_syntax_string
+      s = self.class.interface.parameters.select{ |p| p.cli? && p.argument? }.
+      map(&:cli_syntax_label).join(' ')
+      s unless s.empty?
     end
     def usage
       "#{em('usage:')} #{usage_syntax_string}"
