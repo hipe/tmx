@@ -8,29 +8,41 @@ module Hipe::CssConvert
           '(debugging) Show sexp of parsed directives file.')
         o.on('-v', '--version', 'Display version information.')
         o.on('-h', '--help',    'Display help screen.'        )
-
-        o.arg('<first-req>', 'A file with directives in it.')
-        o.arg('<sec-req>', 'Another arg')
-        o.arg('[<third-req>]', 'Another arg')
-        o.arg('[<fourth-req>]', 'Another arg')
-        # o.arg('[<fifth-req>]', 'Another arg')
-        # o.arg('<sixth-req>', 'Another arg')
+        o.arg('<directives-file>', 'A file with directives in it.')
       end
     end
+  protected
+    def default_action; :run_convert           end
     def build_context
-      ExecutionContext.new
+      c = ExecutionContext.new
+      c[:tmpdir] = ROOT + '/tmp'
+      c
     end
-    def version_string
+    def on_version
       require ROOT + '/version'
-      VERSION
+      @c.err.puts "#{program_name} #{VERSION}"
+      @exit_ok = true
     end
     def on_directives
-      @exit_ok = true
       @c[:show_parsed_directives] = true
     end
     def run_convert
-      @exit_ok and return
-      @c.out.puts "ok whatever: #{@c.inspect}"
+      sexp = parse_directives_in_file(@c[:directives_file]) or return
+      if @c[:show_parsed_directives]
+        require 'pp'
+        PP.pp(sexp, @c.err)
+        return
+      end
+      @c.out.puts "ok whatever"
+    end
+    def parse_directives_in_file path
+      require ROOT + '/directives-parser'
+      begin
+        DirectivesParser.new(@c).parse_file(path)
+      rescue DirectivesParser::RuntimeError => e
+        return error(style('error: ', :error) << e.message)
+      end
     end
   end
 end
+
