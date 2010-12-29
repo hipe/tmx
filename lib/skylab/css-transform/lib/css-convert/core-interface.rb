@@ -9,10 +9,10 @@ module Hipe::CssConvert
         o.on('-v', '--version', 'Display version information.')
         o.on('-h', '--help',    'Display help screen.'        )
 
-        o.arg('[<first-req>]', 'A file with directives in it.')
-        o.arg('[<sec-req>]', 'Another arg')
-        o.arg('<third-req>', 'Another arg')
-        # o.arg('[<fourth-req>]', 'Another arg')
+        o.arg('<first-req>', 'A file with directives in it.')
+        o.arg('<sec-req>', 'Another arg')
+        o.arg('[<third-req>]', 'Another arg')
+        o.arg('[<fourth-req>]', 'Another arg')
         # o.arg('[<fifth-req>]', 'Another arg')
         # o.arg('<sixth-req>', 'Another arg')
       end
