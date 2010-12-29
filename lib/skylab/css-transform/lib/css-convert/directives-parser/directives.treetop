@@ -1,7 +1,7 @@
 module Hipe
   module CssConvert
     module Grammar
-      grammar Program
+      grammar Directives
         include Common
         rule statement
           merge_statement
