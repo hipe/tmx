@@ -28,6 +28,11 @@ module Hipe::CssConvert::InterfaceReflector
       args = parameter.takes_argument? ? [value] : []
       send("on_#{parameter.intern}", *args)
     end
+    def oxford_comma items, last_glue = ' and ', rest_glue = ', '
+      items.zip( items.size < 2 ? [] :
+          ( [last_glue] + Array.new(items.size - 2, rest_glue) ).reverse
+      ).flatten.join
+    end
   end
   module ClassMethods
     def interface
@@ -153,11 +158,12 @@ module Hipe::CssConvert::InterfaceReflector
       @queue = []
       begin
         cli_option_parser.parse!(argv)
-        @queue.push default_action
-        catch(:early_exit){ @queue.each{ |meth| send meth } }
       rescue OptionParser::ParseError => e
-        error e.message
+        return error(e.message)
       end
+      @queue.push default_action
+      parse_args or return
+      catch(:early_exit){ @queue.each{ |meth| send meth } }
     end
     attr_accessor :c
     alias_method :execution_context, :c
@@ -172,6 +178,7 @@ module Hipe::CssConvert::InterfaceReflector
       @c.err.puts msg
       @c.err.puts usage
       @c.err.puts invite
+      false
     end
     def cli_option_parser
       @cli_option_parser ||= build_cli_option_parser
@@ -179,6 +186,22 @@ module Hipe::CssConvert::InterfaceReflector
     def fatal msg
       @c.err.puts msg
       throw :early_exit
+    end
+    def parse_args
+      unexpected = missing = nil
+      a = self.class.interface.parameters.select{|p| p.cli? and p.argument? }
+      while @argv.any?
+        a.empty? and unexpected = @argv and break
+        dir = ( a.first.required? || a.last.optional? ) ? :shift : :pop
+        @c[a.send(dir).intern] = @argv.send(dir)
+      end
+      (missing = a.select(&:required?)).any? or missing = nil
+      unexpected || missing and @exit_ok and return false
+      unexpected and return error("unexpected arg#{'s' if @argv.size > 1}:" <<
+        oxford_comma(@argv.map(&:inspect)))
+      missing and return error("expecting: "<<
+        oxford_comma(missing.map(&:cli_label)))
+      true
     end
     def invite
       em("#{program_name} -h") << " for help"
