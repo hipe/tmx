@@ -3,6 +3,5 @@ module Hipe::CssConvert
 
   class CommandLineInterface < CoreInterface
     include InterfaceReflector::CliInstanceMethods
-    def default_action;      :run_convert                               end
   end
 end
