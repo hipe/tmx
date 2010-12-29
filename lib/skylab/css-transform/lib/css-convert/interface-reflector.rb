@@ -15,9 +15,12 @@ module Hipe::CssConvert::InterfaceReflector
       require 'optparse'
       OptionParser.new do |o|
         o.banner = usage
-        self.class.interface.parameters.select{ |p| p.cli? and p.option? }.
-        each do |p|
-          o.on( * p.cli_definition_array ){ |v| dispatch_option(p, v) }
+        a = self.class.interface.parameters.select{ |p| p.cli? and p.option? }
+        if a.any?
+          o.separator(em("options:"))
+          a.each do |p|
+            o.on( * p.cli_definition_array ){ |v| dispatch_option(p, v) }
+          end
         end
       end
     end
@@ -74,6 +77,7 @@ module Hipe::CssConvert::InterfaceReflector
     alias_method  :option?, :option
     attr_reader   :required
     alias_method  :required?, :required
+    attr_accessor :desc
   end
 end
 
@@ -133,6 +137,7 @@ module Hipe::CssConvert::InterfaceReflector
           p.cli_label = (md[2] || md[4])
           p.argument_required! # always true for arguments
           md[2].nil? and p.required!
+          p.desc = @arr[1..-1] if @arr.size > 1
         end
       end
     end
@@ -179,7 +184,18 @@ module Hipe::CssConvert::InterfaceReflector
       em("#{program_name} -h") << " for help"
     end
     def on_help
-      @c.err.puts cli_option_parser.to_s
+      args = self.class.interface.parameters.select{|p| p.cli? && p.argument?}
+      if args.empty? ; ophack = cli_option_parser else
+        ophack = cli_option_parser.dup
+        ophack.separator(em("arguments:"))
+        args.each do |p|
+          ophack.on('--'+p.intern.to_s, * (p.desc || []))
+          sw = ophack.instance_variable_get('@stack').last.list.last
+          sw.short[0] = p.cli_label
+          sw.long.clear
+        end
+      end
+      @c.err.puts ophack.to_s
       @exit_ok = true
     end
     def on_version
