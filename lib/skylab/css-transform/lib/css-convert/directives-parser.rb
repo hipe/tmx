@@ -1,3 +1,15 @@
+require Hipe::CssConvert::ROOT + '/treetop-tools'
+
+module Hipe
+  module CssConvert
+    module Grammar
+      module Directives
+        S = ::Hipe::CssConvert::TreetopTools::Sexpesque
+      end
+    end
+  end
+end
+
 class Hipe::CssConvert::DirectivesParser
   ROOT = ::Hipe::CssConvert::ROOT
   class RuntimeError < ::RuntimeError; end
@@ -26,13 +38,7 @@ class Hipe::CssConvert::DirectivesParser
       @c.err.puts rsn
       nil
     else
-      [:fake, :sexp]
-      # sexp = resp.sexp
-      # @c.key?(:dump_sexp) and PP.pp(sexp, @c.out)
-      # @c.key?(:exit_after_dump) and return
-      # @c.key?(:progressive) and @c.builder.progressive_output!
-      # sexp.translate(@c)
-      # @c.key?(:progressive) or @c.out.write(@c.builder.ruby)
+      resp.tree
     end
   end
 private
@@ -41,7 +47,6 @@ private
   end
   def parser_class
     @parser_class ||= begin
-      require ROOT + '/treetop-tools'
       self.class.require_local_treetop
       Hipe::CssConvert::TreetopTools.load_parser_class do |o|
         o.root_dir ROOT

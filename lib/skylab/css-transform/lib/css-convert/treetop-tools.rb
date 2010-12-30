@@ -7,6 +7,15 @@ module Hipe::CssConvert::TreetopTools
     end
   end
   class RuntimeError < ::RuntimeError; end
+  class Sexpesque < Array
+    alias_method :node_name, :first
+    class << self
+      def build name, *childs
+        new([name, *childs])
+      end
+      alias_method :[], :build
+    end
+  end
   class ParserClassLoader
     def initialize &b
       @ui = nil

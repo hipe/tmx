@@ -38,17 +38,16 @@ module Hipe::CssConvert
         PP.pp(sexp, @c.err)
         @c[:show_parsed_directives_and_exit] and return
       end
-      @c.out.puts "ok whatever"
+      require ROOT + '/directives-runner'
+      DirectivesRunner.new(@c).run(sexp)
     end
     def parse_directives_in_file path
       require ROOT + '/directives-parser'
-      sexp =
       begin
         DirectivesParser.new(@c).parse_file(path)
       rescue DirectivesParser::RuntimeError, TreetopTools::RuntimeError => e
         return error(style('error: ', :error) << e.message)
       end
-      @c.out.puts("wow, got: #{sexp.inspect}")
     end
   end
 end
