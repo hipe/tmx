@@ -676,8 +676,6 @@ end
 run = File.basename(__FILE__) == File.basename($PROGRAM_NAME)
 cli = Hipe::FlexToTreetop.cli if run
 
-Hipe::FlexToTreetop::TreetopGrammar = DATA.read
-
 if run && ! cli.process_tempfile_option(ARGV)
   ::Treetop.load_from_string Hipe::FlexToTreetop::TreetopGrammar
 end
@@ -720,7 +718,7 @@ end
 
 if run then Hipe::FlexToTreetop.cli.run(ARGV) end
 
-__END__
+Hipe::FlexToTreetop::TreetopGrammar = <<-END_OF_GRAMMAR
 # The 'pattern' rule below is a subset of the grammar grammar described at
 #   http://flex.sourceforge.net/manual/Patterns.html.
 #   Note that not all constructs are supported, only those necessary
@@ -896,3 +894,4 @@ grammar FlexFile
 end
 end
 end
+END_OF_GRAMMAR
