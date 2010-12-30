@@ -219,8 +219,9 @@ module Hipe::YaccToTreetop
       begin
         _run
       rescue Fatal => e
-        @c.in.close if @c.in && ! @c.in.closed?
         @c.err.puts(e.message) unless e.message == ""
+      ensure
+        @c.in.close if @c.in && ! @c.in.closed?
       end
     end
   private
