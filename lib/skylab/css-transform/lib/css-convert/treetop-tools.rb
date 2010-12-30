@@ -15,6 +15,14 @@ module Hipe::CssConvert::TreetopTools
       end
       alias_method :[], :build
     end
+    alias_method :fetch, :[]
+    def [] mixed
+      mixed.kind_of?(::Symbol) ? super(1)[mixed] : super(mixed)
+    end
+    # "children_slice"
+    def cx_slice *syms
+      syms.map { |x| fetch(1)[x] }
+    end
   end
   class ParserClassLoader
     def initialize &b
