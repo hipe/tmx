@@ -5,8 +5,9 @@ module Hipe::CssConvert
     def self.build_interface
       InterfaceReflector::RequestParser.new do |o|
         o.on('-f', '--force', 'overwrite existing generated grammars')
-        o.on('-d', '--directives',
-          '(debugging) Show sexp of parsed directives file. (twice exits)')
+        o.on('-d', '--dump={d|c}',
+          '(debugging) Show sexp of directives (d) or css (c).',
+          'Twice will exit after dump (e.g. "-dd -dd")')
         o.on('-v', '--version', 'Display version information.')
         o.on('-h', '--help',    'Display help screen.'        )
         o.arg('<directives-file>', 'A file with directives in it.')
@@ -27,16 +28,30 @@ module Hipe::CssConvert
       @c.err.puts "#{program_name} #{VERSION}"
       @exit_ok = true
     end
-    def on_directives
-      @c[ @c.key?(:show_parsed_directives) ?
-        :show_parsed_directives_and_exit : :show_parsed_directives ] = true
+    Dumpable = {
+      'directives' => lambda {
+        @c[ @c.key?(:dump_directives) ?
+          :dump_directives_and_exit : :dump_directives ] = true          
+      },
+      'css' => lambda {
+        @c[ @c.key?(:dump_css) ? :dump_css_and_exit : :dump_css ] = true          
+      }
+    }
+    def on_dump char
+      m = /\A#{Regexp.escape(char)}/
+      found = Dumpable.keys.detect { |str| m =~ str }
+      ! found and return error(
+        "need one of (#{Dumpable.keys.map(&:inspect).join(', ')}), not:"<<
+        " #{char.inspect}")
+      instance_eval(& Dumpable[found])
+      true
     end
     def run_convert
       sexp = parse_directives_in_file(@c[:directives_file]) or return
-      if @c[:show_parsed_directives]
+      if @c[:dump_directives]
         require 'pp'
         PP.pp(sexp, @c.err)
-        @c[:show_parsed_directives_and_exit] and return
+        @c[:dump_directives_and_exit] and return
       end
       require ROOT + '/directives-runner'
       DirectivesRunner.new(@c).run(sexp)
