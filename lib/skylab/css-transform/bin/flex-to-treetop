@@ -7,10 +7,13 @@ require 'rubygems'
 require 'treetop'
 
 # Test sexp generation with:
-# bundle exec bin/flex-to-treetop -s -c -t./tmp test/fixtures/flex/ideal.flex
+# bundle exec bin/flex-to-treetop -s -c -t./tmp lib/css-convert/css-parser/tokens.flex
 
 # Test grammar generation with:
 # bundle exec bin/flex-to-treetop -g"Foo::Bar" test/fixtures/flex/mini.flex -t./tmp -c
+
+# The big one:
+# ./bin/flex-to-treetop -g "Foo::Bar::Baz" -t./tmp lib/css-convert/css-parser/tokens.flex
 
 # The structure of this file is ridiculous because we're trying to keep it all
 # in one file as a standalone thing.  It is, in sequence:
