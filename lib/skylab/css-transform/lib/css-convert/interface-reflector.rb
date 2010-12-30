@@ -26,7 +26,11 @@ module Hipe::CssConvert::InterfaceReflector
     end
     def dispatch_option parameter, value
       args = parameter.takes_argument? ? [value] : []
-      send("on_#{parameter.intern}", *args)
+      send("on_#{parameter.intern}", *args) or
+        handle_failed_option(parameter, value)
+    end
+    def handle_failed_option param, value
+      @options_ok = false
     end
     def oxford_comma items, last_glue = ' and ', rest_glue = ', '
       items.zip( items.size < 2 ? [] :
@@ -156,13 +160,12 @@ module Hipe::CssConvert::InterfaceReflector
       @c = build_context
       @exit_ok = nil
       @queue = []
-      begin
-        cli_option_parser.parse!(argv)
-      rescue OptionParser::ParseError => e
-        return error(e.message)
+      if ! (parse_opts and parse_args)
+        @c.err.puts usage
+        @c.err.puts invite
+        return
       end
       @queue.push default_action
-      parse_args or return
       catch(:early_exit){ @queue.each{ |meth| send meth } }
     end
     attr_accessor :c
@@ -176,8 +179,6 @@ module Hipe::CssConvert::InterfaceReflector
     def style(s, style); color(s, *Styles[style]) end
     def error msg
       @c.err.puts msg
-      @c.err.puts usage
-      @c.err.puts invite
       false
     end
     def cli_option_parser
@@ -186,6 +187,15 @@ module Hipe::CssConvert::InterfaceReflector
     def fatal msg
       @c.err.puts msg
       throw :early_exit
+    end
+    def parse_opts
+      @options_ok = true
+      begin
+        cli_option_parser.parse!(@argv)
+      rescue OptionParser::ParseError => e
+        return error(e.message)
+      end
+      @options_ok
     end
     def parse_args
       unexpected = missing = nil
