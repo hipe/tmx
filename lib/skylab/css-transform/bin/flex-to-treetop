@@ -411,12 +411,12 @@ module Hipe::FlexToTreetop
     end
   end
   class TreetopBuilder < ::Treetop::Compiler::RubyBuilder
-    def initialize out
+    def initialize ctx
       super()
-      @out = out
+      @c = ctx
     end
     def progressive_output!
-      @ruby = ProgressiveOutputAdapter.new(@out)
+      @ruby = ProgressiveOutputAdapter.new(@c.out)
     end
     def rule_declaration name, &block
       self << "rule #{name}"
@@ -432,14 +432,15 @@ module Hipe::FlexToTreetop
       @ruby.<<(*a)
     end
   end
-  class TranslationContext < Hash
-    def initialize out, err
-      @out = out; @err = err
-      @builder = TreetopBuilder.new(@out)
+  class ExecutionContext < Hash
+    def initialize ins, out, err
+      @in = ins; @out = out; @err = err
+      @builder = TreetopBuilder.new(self)
       set_boolean(:case_insensitive, false)
       make_boolean_setter(:case_insensitive)
     end
     attr_reader :out, :err, :builder
+    attr_accessor :in
     def set_boolean name, val
       self[name] = val
       unless respond_to?("#{name}?")
@@ -460,22 +461,19 @@ module Hipe::FlexToTreetop
 
   class Cli
     def initialize
-      @err = $stderr
-      @out = $stdout
-      @in =  $stdin
-      @context = TranslationContext.new(@out, @err)
+      @context = ExecutionContext.new($stdin, $stdout, $stderr)
     end
     def out *a
-      @out.puts(*a)
+      @context.out.puts(*a)
     end
     def err *a
-      @err.puts(*a)
+      @context.err.puts(*a)
     end
     def run argv
       begin
         option_parser.parse!(argv)
         if instance_variable_defined?('@actions')
-          if ! @in.tty?
+          if ! @context.in.tty?
             usage "can't read from STDIN when doing "+
               @actions.map(&:to_s).join(' ')
           else
@@ -483,7 +481,7 @@ module Hipe::FlexToTreetop
             @actions.each{ |meth| resp = send(meth) }
             resp
           end
-        elsif @in.tty?
+        elsif @context.in.tty?
           if @tempfile_loaded && argv.empty? # allowed for parse checks
             err 'No file arguments present.  Done.'
           elsif argv.size != 1
@@ -493,14 +491,15 @@ module Hipe::FlexToTreetop
               usage "<flexfile> not found: #{infile}"
             else
               infh = File.open(infile, 'r')
-              _run(infh)
+              @context.in = infh
+              _run
             end
           end
         else
           if argv.size != 0
             usage "reading STDIN as <flexfile>, had: (#{argv.join(' ')})"
           else
-            _run(@in)
+            _run
           end
         end
       rescue ::OptionParser::InvalidOption => e
@@ -550,21 +549,21 @@ module Hipe::FlexToTreetop
         err "using #{parser_path}"
       else
         if ! File.exist?(treetop_path)
-          @err.write "Writing grammar file: #{treetop_path}"
+          @context.err.write "Writing grammar file: #{treetop_path}"
           if ! File.directory?(File.dirname(treetop_path))
             return fatal("\nNot a directory: #{File.dirname(treetop_path)}")
           end
           b = nil
           File.open(treetop_path, 'w+'){ |fh| b = fh.write(TreetopGrammar) }
-          @err.puts " (wrote #{b} bytes.)"
+          @context.err.puts " (wrote #{b} bytes.)"
         end
         if "" == %x{which tt}
           return fatal(
             "`tt` command not found! Is treetop gem installed and in PATH?")
         end
-        @err.puts("executing: " + (cmd = "tt #{treetop_path}"))
+        @context.err.puts("executing: " + (cmd = "tt #{treetop_path}"))
         res = %x{#{cmd}}
-        if "" != res then @err.puts(res) end
+        if "" != res then @context.err.puts(res) end
       end
       if File.exist? parser_path
         require parser_path
@@ -638,9 +637,9 @@ module Hipe::FlexToTreetop
       err help_string
     end
 
-    def _run in_io
+    def _run
       @context.builder.progressive_output! if @context.progressive_output?
-      FlexToTreetop.new(in_io, @out, @err, @context).run
+      FlexToTreetop.new(@context).run
     end
 
     def usage msg
@@ -650,21 +649,21 @@ module Hipe::FlexToTreetop
   end
   class FlexToTreetop
     @@loaded = false
-    def initialize instream, outstream, errstream, context
-      @in = instream; @out = outstream; @err = errstream; @context = context
+    def initialize context
+      @c = context
     end
     def run
       p = parser
-      whole_file = @in.read
-      @in.close
+      whole_file = @c.in.read
+      @c.in.close
       resp = p.parse(whole_file)
       if resp.nil?
         rsn = p.failure_reason || "Got nil from parse without reason!"
-        @err.puts rsn
-      elsif @context.show_sexp?
-        PP.pp(resp.sexp, @out)
+        @c.err.puts rsn
+      elsif @c.show_sexp?
+        PP.pp(resp.sexp, @c.err)
       else
-        resp.sexp.translate @context
+        resp.sexp.translate @c
       end
     end
   private
