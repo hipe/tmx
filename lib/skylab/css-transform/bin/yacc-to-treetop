@@ -205,7 +205,7 @@ module Hipe::YaccToTreetop
     @yttg = nil
     class << self
       def yacc_treetop_grammar_text
-        @yttg ||= DATA.read
+        GrammarText
       end
     end
     def initialize ctx=nil
@@ -741,11 +741,7 @@ module Hipe::YaccToTreetop
   end
 end
 
-
-
-::Hipe::YaccToTreetop.cli.run(ARGV) if $PROGRAM_NAME == __FILE__
-
-__END__
+::Hipe::YaccToTreetop::GrammarText = <<-'TREETOP_GRAMMAR'
 # The treetop grammar below is derived from parts of
 #   http://dinosaur.compilertools.net/yacc/index.html
 # and parts of a YACC-like grammar presented at
@@ -825,3 +821,6 @@ end
 end
 end
 end
+TREETOP_GRAMMAR
+
+::Hipe::YaccToTreetop.cli.run(ARGV) if $PROGRAM_NAME == __FILE__
