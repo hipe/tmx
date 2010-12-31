@@ -22,9 +22,9 @@ module Hipe::CssConvert
         p = @sexp[:in_the_folder][:path]
         [left, right].each { |x| x.replace("#{p}/#{x}") }
       end
-      # lp = css_parser.parse_file(left)
+      lp = css_parser.parse_file(left)
       # rp = css_parser.parse_file(right)
-      @c.out.puts("skipping this for now in directives runner")
+      # @c.out.puts("skipping this for now in directives runner")
     end
   private
     def css_parser
