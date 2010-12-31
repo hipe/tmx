@@ -252,7 +252,7 @@ module Hipe::YaccToTreetop
       o = merge_opts(opts, @c, TranslateDefaults)
       if File.exist?(to_path)
         unless o[:force]
-          @c.err.puts "exists: #{shortpath(to_path)}. skipping"
+          @c.err.puts "using: #{shortpath(to_path)}"
           return :exists
         end
         s = nil; File.open(to_path) { |fh| s = fh.gets }
