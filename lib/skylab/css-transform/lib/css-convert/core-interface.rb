@@ -14,27 +14,26 @@ module Hipe::CssConvert
       end
     end
   protected
-    def default_action; :run_convert           end
+    def default_action;  :run_convert                        end
+    def on_force;        @c[:force_overwrite] = true         end
     def build_context
       c = ExecutionContext.new
       c[:tmpdir_relative] = "../../tmp"
       c
     end
-    def on_force
-      @c[:force_overwrite] = true
-    end
-    def on_version
+    def _on_version
       require ROOT + '/version'
       @c.err.puts "#{program_name} #{VERSION}"
+      @c[:verbose] = true
       @exit_ok = true
     end
     Dumpable = {
       'directives' => lambda {
         @c[ @c.key?(:dump_directives) ?
-          :dump_directives_and_exit : :dump_directives ] = true          
+          :dump_directives_and_exit : :dump_directives ] = true
       },
       'css' => lambda {
-        @c[ @c.key?(:dump_css) ? :dump_css_and_exit : :dump_css ] = true          
+        @c[ @c.key?(:dump_css) ? :dump_css_and_exit : :dump_css ] = true
       }
     }
     def on_dump char
