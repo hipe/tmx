@@ -5,7 +5,7 @@ require 'optparse'
 # require 'ruby-debug'; $stderr.puts "\e[1;5;33mruby-debug\e[0m"
 
 # Test with:
-# bundle exec bin/bnf-to-treetop test/bnf-to-treetop/fixtures/xml-names.bnf
+# ./bin/bnf-to-treetop test/fixtures/bnf/xml-names.bnf
 
 module Hipe; end
 module Hipe::BnfToTreetop
