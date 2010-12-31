@@ -6,26 +6,253 @@ require 'rubygems'
 # require 'ruby-debug'; $stderr.puts "\e[1;5;33mruby-debug\e[0m"
 require 'treetop'
 
-# Test sexp generation with:
-# bundle exec bin/flex-to-treetop -s -c -t./tmp lib/css-convert/css-parser/tokens.flex
-
-# Test grammar generation with:
-# bundle exec bin/flex-to-treetop -g"Foo::Bar" test/fixtures/flex/mini.flex -t./tmp -c
-
-# The big one:
-# ./bin/flex-to-treetop -g "Foo::Bar::Baz" -t./tmp lib/css-convert/css-parser/tokens.flex
-
-# The structure of this file is ridiculous because we're trying to keep it all
-# in one file as a standalone thing.  It is, in sequence:
-#   0) Sexpesque and CommonNode* and AutoNode* abstraction candidates
-#   1) a Cli class to parse commands 2) FlexToTreetop that is the main agent
-#   3) Pull in the treetop-generated parser (by one of a variety of ways)
-#   4) Subclass it (MyFlexFileParser < FlexFileParser) 5) run this file
-#   6) The treetop grammar in put inline after the __END__ for novelty points.
+# test case 1: test/fixtures/flex/mini.flex
+# test case 2: lib/css-convert/css-parser/tokens.flex
 
 module Hipe
   module FlexToTreetop
     VERSION = '0.0.0'
+  end
+end
+
+module Hipe::FlexToTreetop
+  class CliBase
+    def run argv
+      @c = build_execution_context
+      @argv = argv
+      @queue = []
+      begin
+        option_parser.parse!(@argv)
+      rescue ::OptionParser::InvalidOption => e
+        usage e.message
+        return
+      end
+      @queue.empty? and @queue.push(default_action)
+      @queue.each{ |m| send(m) }
+    end
+  protected
+    def fatal msg
+      @c.err.puts msg
+      exit(1)
+    end
+    def help_string
+      option_parser.to_s
+    end
+    def on_help
+      @exit_ok = true
+      @c.err.puts help_string
+    end
+    def option_parser
+      @option_parser ||= build_option_parser
+    end
+    def program_name
+      File.basename($PROGRAM_NAME)
+    end
+    def usage msg
+      @c.err.puts msg
+      @c.err.puts help_string
+      nil
+    end
+  end
+
+  class ExecutionContext < Hash
+    def initialize ins, out, err
+      @in = ins; @out = out; @err = err
+      @builder = TreetopBuilder.new(self)
+      set_boolean(:case_insensitive, false)
+      make_boolean_setter(:case_insensitive)
+    end
+    attr_reader :out, :err, :builder
+    attr_accessor :in
+    def set_boolean name, val
+      self[name] = val
+      unless respond_to?("#{name}?")
+        singleton_class.send(:define_method, "#{name}?"){ self[name] }
+      end
+    end
+    def make_boolean_setter name
+      singleton_class.send(:define_method, "#{name}!"){ self[name] = true }
+    end
+    def singleton_class
+      @sc ||= class << self; self end
+    end
+    ### abstractable above
+    def flex_name_to_rule_name flex_name
+      flex_name # @todo prefixes, whatever
+    end
+  end
+
+  class Cli < CliBase
+    def build_option_parser
+      @c.set_boolean(:show_sexp, false)
+      @c.set_boolean(:progressive_output, true)
+
+      o = OptionParser.new
+      o.banner = "Usage: #{program_name} [options] <flexfile>"
+
+      o.on('-g=<grammar>', '--grammar=<grammar>',
+      "Also output grammar declaration (or \"Mod1::Mod2::Grammar\")"
+      ) { |g| @c[:grammar] = g }
+
+      o.on('-s', '--sexp',
+        "(development) Show sexp of parsed flex file and exit"
+      ) { @c.set_boolean(:show_sexp, true) }
+
+      o.on('--flex-tt',
+       '(development) Write the flex treetop grammar to stdout.'
+      ) { @queue.push :on_grammar }
+
+      o.on('-t[=<dir>]', '--tempdir[=<dir>]',
+        '(development) Write/Read flex treetop grammar ' <<
+          'from/to the filesystem.'
+      ) { |d| @c[:use_parser_dir] = d; @no_file_ok = true }
+
+      o.on('-c', '--clear',
+        "(development) If using --tempdir, clear existing files first."
+      ) { @c[:clear_generated_files] = true }
+
+      o.on('-h', '--help', 'Show this message') { @queue.push :on_help }
+      o.on('-v', '--version', 'Show Version') { @queue.push :on_version }
+      o
+    end
+
+    def build_execution_context
+      ExecutionContext.new($stdin, $stdout, $stderr)
+    end
+
+    def default_action; :run_translate end
+
+    def on_grammar
+      @exit_ok = true
+      @c.out.puts TreetopGrammar
+    end
+
+    def on_version
+      @exit_ok = true
+      @c.err.puts "#{program_name} version #{VERSION}"
+    end
+
+    def run_translate
+      resolve_input or return
+      @c.builder.progressive_output! if @c.progressive_output?
+      FlexToTreetop.new(@c).run
+    end
+
+    def resolve_input
+      if @c.in.tty?
+        @c.in = nil
+        if @exit_ok and @argv.empty?
+          @c.err.puts 'No file arguments present.  Done.'
+        elsif @argv.size != 1
+          if @no_file_ok && @argv.size == 0
+            true
+          else
+            usage "expecting: <flexfile> had: (#{@argv.join(' ')})"
+          end
+        elsif ! File.exist?(infile = @argv.shift)
+          usage "<flexfile> not found: #{infile}"
+        else
+          @c.in = File.open(infile, 'r')
+        end
+      else
+        if @argv.size != 0
+          usage("reading STDIN as <flexfile>, had: (#{argv.join(' ')})")
+        else
+          true # leave @c.in as $stdin
+        end
+      end
+    end
+  end
+
+  class FlexToTreetop
+    def initialize context
+      @c = context
+    end
+    def run
+      @exit_ok = false
+      @c.key?(:use_parser_dir) and (use_parser_dir or return)
+      ! @c.in and @exit_ok and return
+      p = parser
+      whole_file = @c.in.read
+      @c.in.close
+      resp = p.parse(whole_file)
+      if resp.nil?
+        rsn = p.failure_reason || "Got nil from parse without reason!"
+        @c.err.puts rsn
+      elsif @c.show_sexp?
+        PP.pp(resp.sexp, @c.err)
+      else
+        resp.sexp.translate @c
+      end
+    end
+  private
+    def clear_generated_files
+      [@gpath, @ppath].each do |path|
+        File.exist?(path) and file_utils.rm(path, :verbose => true)
+      end
+    end
+    def file_utils
+      @file_utils ||= begin
+        require 'fileutils'
+        o = Object.new
+        class << o
+          include FileUtils
+          public :rm
+        end
+        o.instance_variable_set('@fileutils_output', @c.err)
+        o
+      end
+    end
+    def parser
+      @parser ||= parser_class.new
+    end
+    def parser_class
+      @parser_class ||= begin
+        if ! Hipe::FlexToTreetop.const_defined?(:FlexFileParser)
+          ::Treetop.load_from_string Hipe::FlexToTreetop::TreetopGrammar
+        end
+        c = Class.new FlexFileParser
+        c.class_eval(&ParserExtlib)
+        c
+      end
+    end
+    def write_grammar_file
+      @exit_ok = true
+      b = nil
+      File.open(@gpath, 'w+'){ |fh| b = fh.write(TreetopGrammar) }
+      b
+    end
+    def use_parser_dir
+      dir = (@c[:use_parser_dir] != "") ? @c[:use_parser_dir] : begin
+        require 'tmpdir'
+        Dir.tmpdir
+      end
+      File.directory?(dir) or raise RuntimeError.new("not a dir: #{dir}")
+      @gpath = File.join(dir, 'flex-to-treetop.treetop')
+      @ppath = File.join(dir, 'flex-to-treetop.rb')
+      @c[:clear_generated_files] and clear_generated_files
+      if File.exist?(@ppath)
+        @c.err.puts "using: #{@ppath}"
+      else
+        recompile
+      end
+      require @ppath
+    end
+    def recompile
+      @exit_ok = true
+      s = []
+      File.exist?(@gpath) or begin
+        b = write_grammar_file
+        s.push "wrote #{@gpath} (#{b} bytes)."
+      end
+      s.push "writing #{@ppath}."
+      @c.err.puts s.join(' ')
+      begin
+        Treetop::Compiler::GrammarCompiler.new.compile(@gpath, @ppath)
+      rescue ::RuntimeError => e
+        raise RuntimeError.new(e.message)
+      end
+    end
   end
 end
 
@@ -432,293 +659,38 @@ module Hipe::FlexToTreetop
       @ruby.<<(*a)
     end
   end
-  class ExecutionContext < Hash
-    def initialize ins, out, err
-      @in = ins; @out = out; @err = err
-      @builder = TreetopBuilder.new(self)
-      set_boolean(:case_insensitive, false)
-      make_boolean_setter(:case_insensitive)
-    end
-    attr_reader :out, :err, :builder
-    attr_accessor :in
-    def set_boolean name, val
-      self[name] = val
-      unless respond_to?("#{name}?")
-        singleton_class.send(:define_method, "#{name}?"){ self[name] }
-      end
-    end
-    def make_boolean_setter name
-      singleton_class.send(:define_method, "#{name}!"){ self[name] = true }
-    end
-    def singleton_class
-      @sc ||= class << self; self end
-    end
-    ### abstractable above
-    def flex_name_to_rule_name flex_name
-      flex_name # @todo prefixes, whatever
-    end
+end
+
+
+Hipe::FlexToTreetop::ParserExtlib = lambda do
+  # CompiledParser#failure_reason overridden for less context
+  def failure_reason
+    return nil unless (tf = terminal_failures) && tf.size > 0
+    "Expected " +
+      ( tf.size == 1 ?
+        tf[0].expected_string.inspect :
+        "one of #{tf.map{|f| f.expected_string.inspect}.uniq*', '}"
+      ) + " at line #{failure_line}, column #{failure_column} " +
+      "(byte #{failure_index+1}) after#{my_input_excerpt}"
   end
 
-  class Cli
-    def initialize
-      @context = ExecutionContext.new($stdin, $stdout, $stderr)
-    end
-    def out *a
-      @context.out.puts(*a)
-    end
-    def err *a
-      @context.err.puts(*a)
-    end
-    def run argv
-      begin
-        option_parser.parse!(argv)
-        if instance_variable_defined?('@actions')
-          if ! @context.in.tty?
-            usage "can't read from STDIN when doing "+
-              @actions.map(&:to_s).join(' ')
-          else
-            resp = nil
-            @actions.each{ |meth| resp = send(meth) }
-            resp
-          end
-        elsif @context.in.tty?
-          if @tempfile_loaded && argv.empty? # allowed for parse checks
-            err 'No file arguments present.  Done.'
-          elsif argv.size != 1
-            usage "expecting <flexfile> had: (#{argv.join(' ')})"
-          else
-            if ! File.exist?(infile = argv.shift)
-              usage "<flexfile> not found: #{infile}"
-            else
-              infh = File.open(infile, 'r')
-              @context.in = infh
-              _run
-            end
-          end
-        else
-          if argv.size != 0
-            usage "reading STDIN as <flexfile>, had: (#{argv.join(' ')})"
-          else
-            _run
-          end
-        end
-      rescue ::OptionParser::InvalidOption => e
-        usage e.message
-      end
-    end
-    # we have to parse it ourselves because OptionParser doesn't allow partial
-    def parse_tempfile_option argv
-      have = argv.each_with_index.map do |v,i|
-        (m = /^(?:-t(.*)|--tempdir(?:=(.+))?)$/.match(v) ) ?
-          [m.captures,i] : nil
-      end.compact
-      case have.size
-        when 0 ; return
-        when 1 ;
-        else   ; return fatal("cannot process more than one --tempdir option")
-      end
-      pair = have.first
-      argv[pair[1]] = nil # probably not necessary
-      pair.first.detect{ |x| x } || ""
-    end
-    def process_tempfile_option argv
-      tempdir = parse_tempfile_option(argv) or return
-      clear = false
-      argv.each_with_index do |v, idx|
-        if ['-c', '--clear'].include?(v)
-          clear = true
-          argv[idx] = nil
-        end
-      end
-      argv.compact!
-      if "" == tempdir
-        require 'tmpdir'
-        tempdir = Dir.tmpdir
-      end
-      treetop_path = File.join(tempdir, 'flex-to-treetop.treetop')
-      parser_path  = File.join(tempdir, 'flex-to-treetop.rb')
-      if clear
-        require 'fileutils'
-        [treetop_path, parser_path].each do |path|
-          if File.exist?(path)
-            FileUtils.rm(path, :verbose => true)
-          end
-        end
-      end
-      if File.exist?(parser_path)
-        err "using #{parser_path}"
-      else
-        if ! File.exist?(treetop_path)
-          @context.err.write "Writing grammar file: #{treetop_path}"
-          if ! File.directory?(File.dirname(treetop_path))
-            return fatal("\nNot a directory: #{File.dirname(treetop_path)}")
-          end
-          b = nil
-          File.open(treetop_path, 'w+'){ |fh| b = fh.write(TreetopGrammar) }
-          @context.err.puts " (wrote #{b} bytes.)"
-        end
-        if "" == %x{which tt}
-          return fatal(
-            "`tt` command not found! Is treetop gem installed and in PATH?")
-        end
-        @context.err.puts("executing: " + (cmd = "tt #{treetop_path}"))
-        res = %x{#{cmd}}
-        if "" != res then @context.err.puts(res) end
-      end
-      if File.exist? parser_path
-        require parser_path
-      else
-        err "Parser file not found: #{parser_path}"
-      end
-      @tempfile_loaded = true
-    end
-  private
-    def fatal msg
-      err msg
-      exit(1)
-    end
-    def help_string
-      option_parser.to_s
-    end
-    def option_parser
-      instance_variable_defined?('@option_parser') and return @option_parser
+  def num_lines_ctx; 4 end
 
-      @context.set_boolean(:show_sexp, false)
-      @context.set_boolean(:progressive_output, true)
-
-      o = OptionParser.new
-      o.banner = "Usage: #{program_name} [options] <flexfile>"
-
-      o.on('-g=<grammar>', '--grammar=<grammar>',
-      "Also output grammar declaration (or \"Mod1::Mod2::Grammar\")"
-      ) { |g| @context[:grammar] = g }
-
-      o.on('-s', '--sexp',
-        "(development) Show sexp of parsed flex file and exit"
-      ) { @context.set_boolean(:show_sexp, true) }
-
-      o.on('--flex-tt',
-       '(development) Write the flex treetop grammar to stdout.'
-      ) { self.action = :grammar }
-
-      o.on('-t[=<dir>]', '--tempdir[=<dir>]',
-        '(development) Write/Read flex treetop grammar from/to the filesystem.'
-      ) { }
-
-      o.on('-c', '--clear',
-        "(development) If using --tempdir, clear existing files first."
-      ) { }
-
-
-      o.on('-h', '--help', 'Show this message') { self.action = :help }
-      o.on('-v', '--version', 'Show Version') { self.action = :version }
-
-      @option_parser = o
-    end
-
-    def program_name
-      File.basename($PROGRAM_NAME)
-    end
-
-    def action= name
-      @actions ||= []
-      @actions.push name
-    end
-
-    def grammar
-      out TreetopGrammar
-    end
-
-    def version
-      err "#{program_name} version #{VERSION}"
-    end
-
-    def help
-      err help_string
-    end
-
-    def _run
-      @context.builder.progressive_output! if @context.progressive_output?
-      FlexToTreetop.new(@context).run
-    end
-
-    def usage msg
-      err msg
-      err help_string
-    end
-  end
-  class FlexToTreetop
-    @@loaded = false
-    def initialize context
-      @c = context
-    end
-    def run
-      p = parser
-      whole_file = @c.in.read
-      @c.in.close
-      resp = p.parse(whole_file)
-      if resp.nil?
-        rsn = p.failure_reason || "Got nil from parse without reason!"
-        @c.err.puts rsn
-      elsif @c.show_sexp?
-        PP.pp(resp.sexp, @c.err)
-      else
-        resp.sexp.translate @c
-      end
-    end
-  private
-    def parser
-      @parser ||= MyFlexFileParser.new
-    end
+  def my_input_excerpt
+    num = num_lines_ctx
+    slicey = input[index...failure_index]
+    all_lines = slicey.split("\n", -1)
+    lines = all_lines.slice(-1 * [all_lines.size, num].min, all_lines.size)
+    nums = failure_line.downto(
+      [1, failure_line - num + 1].max).to_a.reverse
+    w = nums.last.to_s.size # greatest line no as string, how wide?
+    ":\n" + nums.zip(lines).map do |no, line|
+      ("%#{w}i" % no) + ": #{line}"
+    end.join("\n")
   end
 end
 
-run = File.basename(__FILE__) == File.basename($PROGRAM_NAME)
-cli = Hipe::FlexToTreetop.cli if run
-
-if run && ! cli.process_tempfile_option(ARGV)
-  ::Treetop.load_from_string Hipe::FlexToTreetop::TreetopGrammar
-end
-
-if ! Hipe::FlexToTreetop.const_defined?(:FlexFileParser)
-  Hipe::FlexToTreetop.cli.err "Hipe::FlexToTreetop::FlexFileParser not found!"
-else
-
-module Hipe::FlexToTreetop
-  class MyFlexFileParser < FlexFileParser # gen'd by treetop, see FlexFile
-
-    # CompiledParser#failure_reason overridden for less context
-    def failure_reason
-      return nil unless (tf = terminal_failures) && tf.size > 0
-      "Expected " +
-        ( tf.size == 1 ?
-          tf[0].expected_string.inspect :
-          "one of #{tf.map{|f| f.expected_string.inspect}.uniq*', '}"
-        ) + " at line #{failure_line}, column #{failure_column} " +
-        "(byte #{failure_index+1}) after#{my_input_excerpt}"
-    end
-
-    def num_lines_ctx; 4 end
-
-    def my_input_excerpt
-      num = num_lines_ctx
-      slicey = input[index...failure_index]
-      all_lines = slicey.split("\n", -1)
-      lines = all_lines.slice(-1 * [all_lines.size, num].min, all_lines.size)
-      nums = failure_line.downto(
-        [1, failure_line - num + 1].max).to_a.reverse
-      w = nums.last.to_s.size # greatest line no as string, how wide?
-      ":\n" + nums.zip(lines).map do |no, line|
-        ("%#{w}i" % no) + ": #{line}"
-      end.join("\n")
-    end
-  end
-end
-end
-
-if run then Hipe::FlexToTreetop.cli.run(ARGV) end
-
-Hipe::FlexToTreetop::TreetopGrammar = <<-END_OF_GRAMMAR
+Hipe::FlexToTreetop::TreetopGrammar = <<'GRAMMAR'
 # The 'pattern' rule below is a subset of the grammar grammar described at
 #   http://flex.sourceforge.net/manual/Patterns.html.
 #   Note that not all constructs are supported, only those necessary
@@ -894,4 +866,6 @@ grammar FlexFile
 end
 end
 end
-END_OF_GRAMMAR
+GRAMMAR
+
+__FILE__ == $PROGRAM_NAME and Hipe::FlexToTreetop.cli.run(ARGV)
