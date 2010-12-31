@@ -135,7 +135,7 @@ module Hipe::FlexToTreetop
     def run_translate
       resolve_input or return
       @c.builder.progressive_output! if @c.progressive_output?
-      FlexToTreetop.new(@c).run
+      Translator.new(@c).run
     end
 
     def resolve_input
@@ -164,7 +164,7 @@ module Hipe::FlexToTreetop
     end
   end
 
-  class FlexToTreetop
+  class Translator
     def initialize context=nil
       @c = context || begin
         ec = ExecutionContext.new(nil, $stdout, $stderr)
