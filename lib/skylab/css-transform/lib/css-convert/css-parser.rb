@@ -10,37 +10,36 @@ module Hipe::CssConvert
     end
   private
     def build_treetop_parser
-      fo = @c[:force_overwrite]
+      f = @c[:force_overwrite]
+      v = @c[:verbose]
       parsers = "#{ROOT}/#{@c[:tmpdir_relative]}"
       toks = "#{parsers}/css-tokens.treetop.rb"
       sels = "#{parsers}/css-selectors.treetop.rb"
-      (fo or ! File.exist?(toks)) and (build_tokens_parser(toks) or return)
-      puts "put selectors yacc grammar thing here"
+      f || v || !File.exist?(toks) and build_tokens_parser(toks)   || return
+      f || v || !File.exist?(sels) and build_selector_parser(sels) || return
     end
     def build_tokens_parser path
-      ftt = flex_to_treetop::FlexToTreetop.new
-      ftt.execution_context.err = @c.err
+      ftt = flex_to_treetop::Translator.new(@c.merge(:root => ROOT))
       ftt.execution_context[:grammar] = "Hipe::CssParser::Tokens"
-      ftt.translate(ROOT + '/css-parser/tokens.flex', path)
+      opts = { :force => @c[:force_overwrite] }
+      ftt.translate(ROOT + '/css-parser/tokens.flex', path, opts)
       true
+    end
+    def build_selector_parser path
+      ytt = yacc_to_treetop::Translator.new(@c.merge(:root => ROOT))
+      ytt.execution_context[:grammar] = "Hipe::CssParser::Selectors"
+      opts = { :force => @c[:force_overwrite] }
+      ytt.translate(ROOT + '/css-parser/selectors.yaccw3c', path, opts)
     end
     def flex_to_treetop
       ::Hipe.const_defined?(:FlexToTreetop) or
         load(ROOT + '/../../bin/flex-to-treetop') # kind of awful but meh
       ::Hipe::FlexToTreetop
     end
+    def yacc_to_treetop
+      ::Hipe.const_defined?(:YaccToTreetop) or
+        load(ROOT + '/../../bin/yacc-to-treetop') # kind of awful but meh
+      ::Hipe::YaccToTreetop
+    end
   end
-  #
-  #
-  # module CssParsing
-  #   here = File.dirname(__FILE__)+'/css-parsing'
-  #   S = ::Hipe::CssConvert::CssParsing::DifferentSexpie
-  #   require "#{here}/node-classes.rb"
-  #   Grammars.load "#{here}/common"
-  #   Grammars.load "#{here}/xml-subset"
-  #   Grammars.load "#{here}/css-file"
-  # end
-  # class CssParser < CssParsing::CssFileParser
-  #
-  # end
 end
