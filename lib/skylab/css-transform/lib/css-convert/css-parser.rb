@@ -18,12 +18,26 @@ module Hipe::CssConvert
       }
     }
     Parsers = [
-      { :use     => :FlexToTreetop,
-        :read    => 'tokens.flex',
-        :write   => 'css-tokens.treetop.rb',
+      { :on      => true,
+        :use     => :FlexToTreetop,
+        :read    => 'css2.1.flex',
+        :write   => 'css-2.1-tokens.treetop.rb',
         :grammar => 'Hipe::CssParser::Tokens'
       },
-      { :use     => :YaccToTreetop,
+      { :on      => true,
+        :use     => :YaccToTreetop,
+        :read    => 'css2.1.yacc3wc',
+        :write   => 'css-2.1-document.treetop.rb',
+        :grammar => 'Hipe::CssParser::CssDocument'
+      },
+      { :on      => nil,
+        :use     => :FlexToTreetop,
+        :read    => 'tokens.flex',
+        :write   => 'css-tokensXXX.treetop.rb',
+        :grammar => 'Hipe::CssParser::TokensXXX'
+      },
+      { :on      => nil,
+        :use     => :YaccToTreetop,
         :read    => 'selectors.yaccw3c',
         :write   => 'css-selectors.treetob.rb',
         :grammar => 'Hipe::CssParser::Selectors'
@@ -34,7 +48,7 @@ module Hipe::CssConvert
       v = @c[:verbose]
       parsers = "#{ROOT}/#{@c[:tmpdir_relative]}"
       Parsers.each do |p|
-        p.key?(:on) and ! p[:on] and continue
+        p.key?(:on) and ! p[:on] and next
         output = "#{parsers}/#{p[:write]}"
         if (f || v || ! File.exist?(output))
           build_parser_parser(p, output) or return
