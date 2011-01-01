@@ -222,7 +222,7 @@ module Hipe::FlexToTreetop
       o[:grammar] and @c[:grammar] = o[:grammar]
       if File.exist?(output_grammar_path)
         unless o[:force]
-          @c.err.puts "exists: #{shortpath(output_grammar_path)}. skipping"
+          @c.err.puts "using: #{shortpath(output_grammar_path)}."
           return :exists
         end
         s = nil; File.open(output_grammar_path, 'r'){ |fh| s = fh.gets }
@@ -594,8 +594,13 @@ module Hipe::FlexToTreetop
   end
   class RuleSexp < Sexpesque # :rule
     include RuleWriter
+
+    # this is pure hacksville to deduce meaning from actions as they are
+    # usually expressed in the w3c specs with flex files -- which is always
+    # just to return the constant corresponding to the token
     def translate ctx
       action_string = children[:action].my_text_value
+      /\A\{(.+)\}\Z/ =~ action_string and action_string = $1
       if md = /\Areturn ([a-zA-Z_]+);\Z/.match(action_string)
         from_constant(ctx, md[1])
       elsif md = %r{\A/\*([a-zA-Z0-9 ]+)\*/\Z}.match(action_string)
