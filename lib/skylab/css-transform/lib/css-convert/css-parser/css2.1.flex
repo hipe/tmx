@@ -61,7 +61,7 @@ Z		z|\\0{0,4}(5a|7a)(\r\n|[ \t\r\n\f])?|\\z
 "|="			{return DASHMATCH;}
 
 {string}		{return STRING;}
-{badstring}             {return BAD_STRING);}
+{badstring}             {return BAD_STRING;}
 
 {ident}			{return IDENT;}
 
