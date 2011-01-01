@@ -21,6 +21,7 @@ module Hipe::FlexToTreetop
       @c = build_execution_context
       @argv = argv
       @queue = []
+      @exit_ok = false
       begin
         option_parser.parse!(@argv)
       rescue ::OptionParser::InvalidOption => e
@@ -870,7 +871,7 @@ grammar FlexFile
     '(' pattern ')' <AutoNode> { }
   end
   rule character_class
-    '[' (!']' . / '\]')* ']' <AutoNode> {
+    '[' ( '\]' / !']' . )* ']' <AutoNode> {
       def sexp_class; CharClassSexp end
     }
   end
