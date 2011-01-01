@@ -215,9 +215,10 @@ module Hipe::FlexToTreetop
         resp.sexp.translate @c
       end
     end
-    TranslateDefaults = { :verbose => true, :force => false }
+    TranslateDefaults = { :verbose => true, :force => false, :grammar => nil }
     def translate flex_path, output_grammar_path, opts={}
       o = merge_opts(opts, @c, TranslateDefaults)
+      o[:grammar] and @c[:grammar] = o[:grammar]
       if File.exist?(output_grammar_path)
         unless o[:force]
           @c.err.puts "exists: #{shortpath(output_grammar_path)}. skipping"
