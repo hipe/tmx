@@ -6,42 +6,52 @@ module Hipe::CssConvert
     end
     def parse_file path
       whole_string = File.read(path)
-      @parser ||= build_treetop_parser
+      @parser ||= build_big_parser
     end
   private
-    def build_treetop_parser
+    ParserParsers = {
+      :FlexToTreetop => {
+        :path => '../../bin/flex-to-treetop'
+      },
+      :YaccToTreetop => {
+        :path => '../../bin/yacc-to-treetop'
+      }
+    }
+    Parsers = [
+      { :use     => :FlexToTreetop,
+        :read    => 'tokens.flex',
+        :write   => 'css-tokens.treetop.rb',
+        :grammar => 'Hipe::CssParser::Tokens'
+      },
+      { :use     => :YaccToTreetop,
+        :read    => 'selectors.yaccw3c',
+        :write   => 'css-selectors.treetob.rb',
+        :grammar => 'Hipe::CssParser::Selectors'
+      }
+    ]
+    def build_big_parser
       f = @c[:force_overwrite]
       v = @c[:verbose]
       parsers = "#{ROOT}/#{@c[:tmpdir_relative]}"
-      docu = "#{parsers}/css2.1.yacc3wc"
-      toks = "#{parsers}/css-tokens.treetop.rb"
-      sels = "#{parsers}/css-selectors.treetop.rb"
-      f || v || !File.exist?(toks) and build_tokens_parser(toks)   || return
-      f || v || !File.exist?(sels) and build_selector_parser(sels) || return
+      Parsers.each do |p|
+        p.key?(:on) and ! p[:on] and continue
+        output = "#{parsers}/#{p[:write]}"
+        if (f || v || ! File.exist?(output))
+          build_parser_parser(p, output) or return
+        end
+      end
     end
-    def build_tokens_parser path
-      flex_to_treetop::Translator.new(@c.merge(:root => ROOT)).
-        translate(ROOT + '/css-parser/tokens.flex', path,
+    def build_parser_parser p, output
+      parser_parser_module(p[:use])::Translator.new(@c.merge(:root => ROOT)).
+        translate("#{ROOT}/css-parser/#{p[:read]}", output,
           :force   => @c[:force_overwrite],
-          :grammar => "Hipe::CssParser::Tokens"
+          :grammar => p[:grammar]
         )
     end
-    def build_selector_parser path
-      yacc_to_treetop::Translator.new(@c.merge(:root => ROOT)).
-        translate(ROOT + '/css-parser/selectors.yaccw3c', path,
-          :force   => @c[:force_overwrite],
-          :grammar => "Hipe::CssParser::Selectors"
-        )
-    end
-    def flex_to_treetop
-      ::Hipe.const_defined?(:FlexToTreetop) or
-        load(ROOT + '/../../bin/flex-to-treetop') # kind of awful but meh
-      ::Hipe::FlexToTreetop
-    end
-    def yacc_to_treetop
-      ::Hipe.const_defined?(:YaccToTreetop) or
-        load(ROOT + '/../../bin/yacc-to-treetop') # kind of awful but meh
-      ::Hipe::YaccToTreetop
+    def parser_parser_module mod
+      ::Hipe.const_defined?(mod) or
+        load("#{ROOT}/#{ParserParsers[mod][:path]}")
+      ::Hipe.const_get(mod)
     end
   end
 end
