@@ -96,7 +96,7 @@ Z		z|\\0{0,4}(5a|7a)(\r\n|[ \t\r\n\f])?|\\z
 
 {U}{R}{L}"("{w}{string}{w}")"	{return URI;}
 {U}{R}{L}"("{w}{url}{w}")"	{return URI;}
-{baduri}                        {return BAD_URI);}
+{baduri}                        {return BAD_URI;}
 
 {ident}"("		{return FUNCTION;}
 
