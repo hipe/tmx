@@ -1,12 +1,9 @@
-require 'rubygems'
 require 'fileutils'
-require 'ruby-debug'
 require 'json'
 
+module Skylab::Face::ExternalDependencies
 
-
-class Skylab::Face::Cli
-  class << self
+  module DefinerMethods
     def external_dependencies *a
       case a.length
       when 0 ; @external_dependencies
@@ -19,10 +16,20 @@ class Skylab::Face::Cli
       end
     end
   end
-  def external_dependencies
-    @external_dependencies ||= begin
-      interface.external_dependencies.for_run(self)
+
+  module InstanceMethods
+    def external_dependencies
+      @external_dependencies ||= begin
+        interface.external_dependencies.for_run(self)
+      end
     end
+  end
+end
+
+module Skylab::Face
+  class Command::Namespace
+    extend ExternalDependencies::DefinerMethods
+    include ExternalDependencies::InstanceMethods
   end
 end
 
