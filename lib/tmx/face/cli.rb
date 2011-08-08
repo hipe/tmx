@@ -153,7 +153,7 @@ module Skylab::Face
         #   option_definitions.reject! { |a,_| '-h' == a.first }
       end
       def namespace name, &block
-        command_definitions.push [Namespace, [name], block]
+        command_definitions.push Namespace.add_definition([Namespace, [name], block])
       end
       def on *a, &b
         block_given? or raise ArgumentError.new("block required")
@@ -271,6 +271,19 @@ module Skylab::Face
     class Namespace
       extend TreeDefiner, Colors
       include Treeish, Nodeish, Colors
+      @definitions ||= []
+      class << self
+        def add_definition arr
+          @definitions.push arr
+          arr
+        end
+        def namespaces
+          @definitions.each_with_index do |defn, idx|
+            defn.kind_of?(Class) or @definitions[idx] = defn[0].build(*defn[1], &defn[2])
+          end
+          @definitions
+        end
+      end
       alias_method :interface, :class
       def init_for_run parent, name_as_used
         @name_as_used = name_as_used
@@ -284,6 +297,7 @@ module Skylab::Face
       end
       alias_method :inspect, :name
       def self.build name, &block
+        name.kind_of?(Symbol) or return name
         name = name.to_s
         Class.new(self).class_eval do
           self.namespace_name = name
