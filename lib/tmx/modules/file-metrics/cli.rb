@@ -66,7 +66,7 @@ module Skylab::Tmx::Modules::FileMetrics
       end
 
       def line_count opts, *paths
-        require "#{File.dirname(__FILE__)}/api"
+        require "#{File.dirname(__FILE__)}/api/line-count"
         Api::LineCount.run(paths, opts, self)
       end
     end
