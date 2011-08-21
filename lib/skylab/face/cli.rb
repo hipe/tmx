@@ -153,7 +153,8 @@ module Skylab::Face
         #   option_definitions.reject! { |a,_| '-h' == a.first }
       end
       def namespace name, &block
-        command_definitions.push Namespace.add_definition([Namespace, [name], block])
+        def_block = name.kind_of?(Array) ? name : [Namespace, [name], block]
+        command_definitions.push Namespace.add_definition(def_block)
       end
       def on *a, &b
         block_given? or raise ArgumentError.new("block required")
