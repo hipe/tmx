@@ -4,7 +4,7 @@ require 'ruby-debug'
 
 payload = lambda do
 
-  dir = "#{`pwd`.strip}/bin"
+  dir = File.expand_path('../bin', __FILE__)
   File.directory?(dir) or return {
     :message => "not a directory, won't add to PATH: #{dir}"
   }
