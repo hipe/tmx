@@ -43,8 +43,8 @@ module Skylab::Tmx::Modules::Cli
         end
       end
       on.different do |src, dest, file|
-        src = pretty_path(src)
-        dest = pretty_path(dest)
+        # src = pretty_path(src)
+        # dest = pretty_path(dest)
         if @opts[:force]
           FileUtils.cp(src, dest, :verbose => true, :noop => @opts[:dry_run])
           true
