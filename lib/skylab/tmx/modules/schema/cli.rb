@@ -1,5 +1,4 @@
-require File.expand_path('../../../face/cli/external-dependencies', __FILE__)
-require 'ruby-debug'
+require 'skylab/face/cli/external-dependencies'
 
 module Skylab::Tmx::Modules::Schema
   class Cli < Skylab::Face::Cli

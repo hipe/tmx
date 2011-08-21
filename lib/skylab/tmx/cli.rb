@@ -1,5 +1,8 @@
-o = File.dirname(__FILE__)
-require o + '/face/cli.rb'
+mylib = File.expand_path('../../..', __FILE__)
+
+$:.include?(mylib) or $:.unshift(mylib) # etc
+
+require 'skylab/face/cli'
 
 module Skylab; end
 
