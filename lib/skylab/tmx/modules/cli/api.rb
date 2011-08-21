@@ -3,16 +3,24 @@ require 'fileutils'
 _ = "#{File.dirname(__FILE__)}/"
 require "#{_}copy-files"
 require "#{_}diffland"
-require "#{_}pretty-path"
+require 'skylab/face/path-tools'
 
 module Skylab::Tmx::Modules::Cli
-  Files = %w(cli.rb cli/external-dependencies.rb)
-  LocalFilesDir = File.expand_path('../../../face', __FILE__)
+  SkylabFolder = 'skylab'
+  SkylabFiles = %w(
+    code-molester/yaml-file.rb
+    face/cli/external-dependencies.rb
+    face/cli/interactive.rb
+    face/cli.rb
+    face/path-tools.rb
+    face/request.rb
+  )
+  LocalFilesDir = File.expand_path("../../../../../#{SkylabFolder}", __FILE__)
 
   module Api; end
 
   module PushPullInstanceMethods
-    include Skylab::Face::Colors, CopyFiles, PrettyPath
+    include Skylab::Face::Colors, CopyFiles, Skylab::Face::PathTools
     def initialize *a
       @ui, @path, @opts = a
     end
@@ -28,6 +36,7 @@ module Skylab::Tmx::Modules::Cli
       on.missing_destination do |src, dst|
         if File.directory?(dir = File.dirname(dst))
           FileUtils.cp(src, dst, :noop => @opts[:dry_run], :verbose => true)
+          true
         else
           @ui.err.puts "#{ohno("skipping: ")} destination directory doesn't exist: #{dir}"
           true
@@ -38,6 +47,7 @@ module Skylab::Tmx::Modules::Cli
         dest = pretty_path(dest)
         if @opts[:force]
           FileUtils.cp(src, dest, :verbose => true, :noop => @opts[:dry_run])
+          true
         else
           diff_cmd = "diff -u #{dest} #{src}"
           @ui.err.puts "#{yelo('changed:')} \"#{file}\". (Use -F option to clobber #{dest}.)"
@@ -50,14 +60,17 @@ module Skylab::Tmx::Modules::Cli
         true
       end
     end
+    # normalize and deducde a folder that exists that ends with "/skylab"
     def _dir label
-      dir = /\A(.+)\/#{Regexp.escape(Files.first)}\z/ =~ @path ? $1 : @path
-      File.directory?(dir) or return @err.puts("#{label} must be directory: #{dir}")
-      dir
+      path = (@path =~ %r{\A(.*[^/])/?}) ? $1 : @path # strip trailing slash
+      (%r{\A(.*)/#{SkylabFolder}\Z} =~ path) and path = $1
+      path = File.join(path, SkylabFolder)
+      File.directory?(path) or return @err.puts("#{label} must be directory: #{path}")
+      path
     end
     def _run src, dst, msg
       @ui.err.puts msg
-      files = Files
+      files = SkylabFiles
       if @opts[:pattern]
         re = /#{@opts[:pattern].sub(/\A\/(.+)\/\z/){ "#{$1}" }}/
         (files = files.grep(re)).empty? and
@@ -77,8 +90,8 @@ module Skylab::Tmx::Modules::Cli
     include PushPullInstanceMethods
     extend PushPullClassMethods
     def run
-      dir = _dir('Source') or return
-      _run dir, LocalFilesDir, "Pull from #{pretty_path(dir)} into #{pretty_path(LocalFilesDir)}."
+      remote_dir = _dir('Source') or return
+      _run remote_dir, LocalFilesDir, "Pull from #{pretty_path(remote_dir)} into #{pretty_path(LocalFilesDir)}."
     end
   end
 
@@ -86,8 +99,8 @@ module Skylab::Tmx::Modules::Cli
     include PushPullInstanceMethods
     extend PushPullClassMethods
     def run
-      dir = _dir('Destination') or return
-      _run LocalFilesDir, dir, "push from #{pretty_path(LocalFilesDir)} to #{pretty_path(dir)}"
+      remote_dir = _dir('Destination') or return
+      _run LocalFilesDir, remote_dir, "push from #{pretty_path(LocalFilesDir)} to #{pretty_path(remote_dir)}"
     end
   end
 end
