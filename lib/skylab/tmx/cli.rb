@@ -14,7 +14,7 @@ module Skylab::Tmx
 
   class Cli < Face::Cli
 
-    version { require "#{File.dirname(__FILE__)}/version"; VERSION }
+    version { File.read(File.expand_path('../../../../VERSION', __FILE__)) }
 
     Dir["#{File.dirname(__FILE__)}/modules/*/cli.rb"].each do |cli_path|
       len = Face::Command::Namespace.namespaces.length
