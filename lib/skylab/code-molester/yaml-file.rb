@@ -100,6 +100,14 @@ module Skylab::CodeMolester
         end
         opts[:buffer]
       end
+      def to_primitive
+        leaf? and return @value
+        hash = {}
+        @ordered_keys.each do |key|
+          hash[key] = @children_hash[key].to_primitive
+        end
+        hash
+      end
     private
       def _change_to_tree!
         @value.nil? or fail("won't change node to tree when a value is present!")
