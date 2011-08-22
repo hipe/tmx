@@ -80,8 +80,12 @@ module Skylab::Face
 
     def parse argv
       req = { }
-      req.send(:instance_variable_set, '@method_parameters', argv)
-      class << req; attr_accessor :method_parameters end
+      class << req
+        attr_accessor :command
+        attr_accessor :method_parameters
+      end
+      req.method_parameters = argv
+      req.command = self
       begin
         build_option_parser(req).parse! argv
         req
