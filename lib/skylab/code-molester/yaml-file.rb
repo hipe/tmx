@@ -1,4 +1,4 @@
-require 'yaml'
+require 'psych'
 require File.expand_path('../../face/path-tools', __FILE__)
 module Skylab; end
 
@@ -10,6 +10,8 @@ module Skylab::CodeMolester
       # because of some facepalming decisions of how yaml trees are represented in psych, this.
       # this has some facepalming vulnerabilities of its own
       def init_from_psych_tree psych
+        psych.kind_of?(Psych::Nodes::Mapping) or
+          fail("needed Psych::Nodes::Mapping, had: #{psych.class}")
         tree? or _change_to_tree!
         key = nil
         i = -1 ; length = psych.children.length ; while (i+=1) < length
