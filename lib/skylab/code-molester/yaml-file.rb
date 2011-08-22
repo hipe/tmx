@@ -1,4 +1,5 @@
 require 'psych'
+require 'yaml'
 require File.expand_path('../../face/path-tools', __FILE__)
 module Skylab; end
 
