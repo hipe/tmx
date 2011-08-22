@@ -44,11 +44,11 @@ module Skylab::CodeMolester
     end
     def valid?
       if @last_parser_error
-        @last_validation_error = @last_parse_error.to_s
+        @invalid_reason = @last_parse_error.to_s
         return false
       end
       true # for now
     end
-    attr_reader :last_validation_error
+    attr_reader :invalid_reason
   end
 end
