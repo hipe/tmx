@@ -4,6 +4,7 @@ GEM
     archive-tar-minitar (0.5.2)
     columnize (0.3.4)
     git (1.2.5)
+    highline (1.6.2)
     jeweler (1.6.4)
       bundler (~> 1.0)
       git (>= 1.2.5)
@@ -27,6 +28,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  highline
   jeweler
   rake (~> 0.9.2)
   rdoc (~> 3.9.2)

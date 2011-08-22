@@ -1,5 +1,7 @@
 source :rubygems
 
+gem 'highline'
+
 group :development do
   gem 'jeweler'
   gem 'rake', '~> 0.9.2'
