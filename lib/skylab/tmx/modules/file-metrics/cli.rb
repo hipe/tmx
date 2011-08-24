@@ -66,8 +66,24 @@ module Skylab::Tmx::Modules::FileMetrics
       end
 
       def line_count opts, *paths
-        require "#{File.dirname(__FILE__)}/api/line-count"
+        require File.expand_path('../api/line-count', __FILE__)
         Api::LineCount.run(paths, opts, self)
+      end
+
+      o :"dirs" do |op, req|
+        syntax "#{invocation_string} [opts] [<path>]"
+        op.banner = <<-DESC.gsub(/^ +/, '')
+          Experimental report.  With all folders one level under <path>,
+          for each of them report number of files and total sloc,
+          and show them in order of total sloc and percent of max
+        DESC
+        SharedParameters.call(op, req)
+      end
+
+      def dirs opts, path=nil
+        opts[:path] = path || '.'
+        require File.expand_path('../api/dirs', __FILE__)
+        Api::Dirs.run(self, opts)
       end
     end
   end
