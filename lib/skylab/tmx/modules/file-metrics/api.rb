@@ -44,9 +44,10 @@ module Skylab::Tmx::Modules::FileMetrics
    class SystemInterfaceError < RuntimeError; end
   end
   class Count
-    def initialize name=nil, count=nil
+    def initialize name=nil, count=nil, fields=nil
       name and set_field(:name, name)
       count and set_field(:count, count)
+      fields and fields.each { |k,v| set_field(k, v) }
     end
     attr_reader   :children # might be nil
     attr_writer   :total # only use this carefully!
