@@ -1,6 +1,7 @@
 require 'optparse'
+require 'ruby-debug'
 
-# an ultralight command-line parser (384 lines)
+# an ultralight command-line parser (407 lines)
 # that wraps around OptParse (can do anything it does)
 # with colors
 # with flexible command-like options ('officious' like -v, -h)
@@ -11,6 +12,7 @@ module Skylab; end
 module Skylab::Face; end
 
 module Skylab::Face::Colors
+  extend self
   def bold str ; style str, :bright, :green end
   def hi   str ; style str, :green          end
   def ohno str ; style str, :red            end
@@ -96,10 +98,11 @@ module Skylab::Face
       end
     end
 
+    NoUsageRe = /\A#{Regexp.escape(Skylab::Face::Colors.hi('usage:'))} /
+
     def summary
-      build_option_parser({}).to_s.
-        sub(/\A#{Regexp.escape(hi('usage:'))} /, '').
-        split("\n").select{ |s| ! s.strip.empty? }
+      build_option_parser({}).to_s =~ /\A[\n]*([^\n]*)(\n+[^\n])?/
+      [ "#{$1}#{ ' [..]' if $2 }".sub(NoUsageRe, '') ]
     end
 
     def syntax *args
