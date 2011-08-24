@@ -16,12 +16,7 @@ module Skylab::Tmx::Modules::FileMetrics
       files = self.files
       @opts[:show_files_list] and @ui.err.puts(files)
       @opts[:show_report] or return true
-      count =
-      if @opts[:count_blank_lines] && @opts[:count_comment_lines]
-        linecount_using_wc files
-      else
-        fail("pending implementation @todo")
-      end
+      count = count_lines files
       if count.no_children?
         @ui.err.puts "no files found."
       else
@@ -61,6 +56,26 @@ module Skylab::Tmx::Modules::FileMetrics
       cmd = build_find_command
       @opts[:show_commands] and @ui.err.puts(cmd)
       `#{cmd}`.split("\n")
+    end
+
+    def count_lines files
+      (_filters =
+      [ (%s{grep -v '^[ \t]*$'} unless @opts[:count_blank_lines]),
+        (%s{grep -v '^[ \t]*#'} unless @opts[:count_comment_lines])
+      ].compact).empty? and return linecount_using_wc(files)
+      cmd_tail = "#{_filters.join(' | ')} | wc -l"
+      count = Count.new('.') # count.add_child(Count.new($2, $1.to_i))
+      files.each do |file|
+        cmd = "cat #{escape_path(file)} | #{cmd_tail}"
+        @opts[:show_commands] and @ui.err.puts(cmd)
+        _ = %x{#{cmd}}
+        if _ =~ /\A[[:space:]]*(\d+)[[:space:]]*\z/
+          count.add_child(Count.new(file, $1.to_i))
+        else
+          count.add_child(Count.new(file, 0, :notice => "(parse failed: #{_})"))
+        end
+      end
+      count
     end
 
     def linecount_using_wc files
@@ -110,7 +125,8 @@ module Skylab::Tmx::Modules::FileMetrics
               _count.send(field).to_s
             end
           end
-        end,
+        end +
+        [['TODAL:', count.total.to_s]],
         out
       )
     end
