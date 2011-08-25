@@ -65,7 +65,7 @@ module Skylab::Tmx::Modules::Cli
       path = (@path =~ %r{\A(.*[^/])/?}) ? $1 : @path # strip trailing slash
       (%r{\A(.*)/#{SkylabFolder}\Z} =~ path) and path = $1
       path = File.join(path, SkylabFolder)
-      File.directory?(path) or return @err.puts("#{label} must be directory: #{path}")
+      File.directory?(path) or return @ui.err.puts("#{label} must be directory: #{path}")
       path
     end
     def _run src, dst, msg
