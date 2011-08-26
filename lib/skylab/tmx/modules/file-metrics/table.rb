@@ -1,8 +1,6 @@
 module Skylab
   module Tmx
     module Modules
-      module FileMetrics
-      end
     end
   end
 end
