@@ -14,6 +14,7 @@ module Skylab::Face
         success
       end
       def check
+        interpolated? or interpolate! or return false
         if File.exist?(target)
           if File.exist?(symlink)
             if File.lstat(symlink).symlink?

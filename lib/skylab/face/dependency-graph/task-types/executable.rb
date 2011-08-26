@@ -6,6 +6,7 @@ module Skylab::Face
       include Open2
       attribute :executable
       def check
+        interpolated? or interpolate! or return false
         if '' == (path = open2("which #{@executable}").strip)
           @ui.err.puts("#{hi_name}: #{ohno('not in PATH:')} #{@executable}")
           false

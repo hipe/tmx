@@ -5,6 +5,7 @@ module Skylab::Face
       include Open2
       include PathTools
       attribute :unzip_tarball
+      attribute :unzips_to, :required => false
       def slake
         interpolated? or interpolate! or return false
         slake_deps or return false
@@ -12,13 +13,18 @@ module Skylab::Face
         execute
       end
       def check
+        interpolated? or interpolate! or return false
         if File.directory?(expected_unzipped_dir_path)
           @ui.err.puts("#{hi_name}: ok: is directory: #{expected_unzipped_dir_path}")
           true
         end
       end
       def expected_unzipped_dir_path
-        @unzip_tarball.sub(TarballExtension, '')
+        if @unzips_to
+          File.join(build_dir, @unzips_to)
+        else
+          @unzip_tarball.sub(TarballExtension, '')
+        end
       end
       def execute
         unless File.exist?(@unzip_tarball)
@@ -32,7 +38,7 @@ module Skylab::Face
         end
         @ui.err.puts("#{hi_name}: read #{bytes} bytes in #{seconds} seconds.")
         check and return true
-        @ui.err.put("#{hi_name}: #{ohno('error: ')}: failed to unzip?")
+        @ui.err.puts("#{hi_name}: #{ohno('error: ')}: failed to unzip?")
         false
       end
     end

@@ -21,6 +21,7 @@ module Skylab::Face
         false
       end
       def check
+        interpolated? or interpolate! or return false
         if File.exist?(@move_to)
           @ui.err.puts("#{hi_name}: exists: #{@move_to}")
           true

@@ -7,6 +7,7 @@ module Skylab::Face
       attribute :tarball_to
       attribute :from
       attribute :get
+      attribute :stem, :required => false
       def slake
         interpolated? or interpolate! or return false
         if File.exist?(@tarball_to)
@@ -34,7 +35,7 @@ module Skylab::Face
         File.basename(@get)
       end
       def interpolate_stem
-        interpolate_basename.sub(TarballExtension, '')
+        @stem || interpolate_basename.sub(TarballExtension, '')
       end
       def blu_name
         style("  #{name}", :cyan)
