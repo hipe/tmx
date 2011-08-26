@@ -35,7 +35,8 @@
       "name"   : "tomcat",
       "target" : {
         "executable file" : "/usr/local/tomcat/bin/startup.sh",
-        "else"            : "symlink"
+        "else"            : "symlink",
+        "enabled"         : false
       },
       "version" : {
         "version from"    : "/usr/local/tomcat/bin/version.sh",
