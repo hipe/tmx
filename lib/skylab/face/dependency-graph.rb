@@ -19,22 +19,26 @@ module Skylab::Face
     attr_reader :name
     def run
       node = self.node('target') or return
+      if node.disabled?
+        @ui.err.puts "#{hi('---> skip:')} #{blu @name} (target disabled)"
+        return true
+      end
       ok =
       if @request[:check_only]
-        @ui.err.puts "#{bold('---> checking:')} #{BLU(@name)}"
+        @ui.err.puts "#{bold('---> checking:')} #{BLU @name}"
         if _ = node.check
           node?('version') and node('version').run
           _
         end
       else
-        @ui.err.puts "#{bold('---> installing/checking:')} #{BLU(@name)}"
+        @ui.err.puts "#{bold('---> installing/checking:')} #{BLU @name}"
         node.slake
       end
       if ok
-        @ui.err.puts "#{bold('---> installed:')} #{BLU(@name)}"
+        @ui.err.puts "#{bold('---> installed:')} #{BLU @name}"
         ok
       else
-        @ui.err.puts "#{ohno('---> dependency not met:')} #{BLU(@name)}"
+        @ui.err.puts "#{ohno('---> dependency not met:')} #{BLU @name}"
       end
     end
     def node? name
@@ -81,6 +85,9 @@ module Skylab::Face
     end
     def BLU s
       style s, :bright, :cyan
+    end
+    def blu s
+      style s, :cyan
     end
   end
 end
