@@ -1,0 +1,30 @@
+{
+  "external dependencies" : [
+    {
+      "name"   : "tomcat",
+      "target" : {
+        "executable file" : "/usr/local/tomcat/bin/startup.sh",
+        "else"            : "symlink"
+      },
+      "symlink" : {
+        "symlink"         : "/usr/local/tomcat",
+        "target"          : "/usr/local/{stem}",
+        "else"            : "move"
+      },
+      "move" : {
+        "move to"         : "/usr/local/{stem}",
+        "from"            : "{build_dir}/{stem}",
+        "else"            : "unzip"
+      },
+      "unzip" : {
+        "unzip tarball"   : "{build_dir}/{basename}",
+        "else"            : "download"
+      },
+      "download"          : {
+        "tarball to"      : "{build_dir}/{basename}",
+        "from"            : "http://apache.opensourceresources.org/tomcat/tomcat-6/v6.0.33/bin",
+        "get"             : "apache-tomcat-6.0.33.tar.gz"
+      }
+    }
+  ]
+}
