@@ -13,6 +13,15 @@ module Skylab::Face
           dead_end
         end
       end
+      def check
+        interpolated? or interpolate! or return false
+        if File.exist?(@executable_file)
+          execute
+        else
+          @ui.err.puts("#{hi_name}: not installed, executable not foound: #{@executable_file}.")
+          false
+        end
+      end
     protected
       def execute
         stat = File::Stat.new(@executable_file)
