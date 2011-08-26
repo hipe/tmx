@@ -93,13 +93,14 @@ module Skylab::Face::ExternalDependencies
       end
     end
     def default_build_dir
-      @request[:build_dir] || '~/build'
+      @ui.request[:build_dir] || '~/build'
     end
     def check req
-     _run :check, req
+      req[:check_only] = true
+      _run :check, req
     end
     def install req
-      @request = req
+      @ui.request = req
       File.exist?(build_dir) or
         return @ui.err.puts <<-HERE.gsub(/\n?^ +/, ' ').strip
           #{yelo('no:')} Build dir does not exist.  We don't want to create it explicitly.
@@ -108,6 +109,7 @@ module Skylab::Face::ExternalDependencies
       _run :install, req
     end
     def _run meth, req
+      @ui.request ||= req
       dependencies.each { |dep| dep.send(meth, req) }
       if dependencies.any? || @used_dependency_graph
         descr = [ ("#{dependencies.length} dependencies" if dependencies.any?),
@@ -145,7 +147,6 @@ module Skylab::Face::ExternalDependencies
         when Hash;
           if node.key?('target')
             require File.expand_path('../../dependency-graph', __FILE__)
-            @ui.request ||= @request # hiccup
             @ui.request[:build_dir] ||= build_dir
             Skylab::Face::DependencyGraph.run(@ui, node, prefix)
             @used_dependency_graph = true
