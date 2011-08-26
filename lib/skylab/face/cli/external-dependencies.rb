@@ -1,18 +1,22 @@
 require 'fileutils'
 require 'json'
+require File.expand_path('../../path-tools', __FILE__)
 
 module Skylab::Face::ExternalDependencies
 
   module DefinerMethods
-    def external_dependencies *a
-      case a.length
-      when 0 ; @external_dependencies
-      when 1;
-        @external_dependencies ||= Skylab::Face::ExternalDependencies::Definition.new(self)
-        @external_dependencies.add_path a.first
-        nil
+    def external_dependencies *a, &b
+      a.any? && b and raise ArgumentError.new("Cannot take both args and block.")
+      a.empty? && b.nil? and return @external_dependencies
+      @external_dependencies ||= Skylab::Face::ExternalDependencies::Definition.new(self)
+      if a.any?
+        case a.length;
+        when 1 ; @external_dependencies.add_path a.first
+        else   ; raise ArgumentError.new("can only take 1 path")
+        end
       else
-        raise ArgumentError.new("can only support 1 path")
+        data = instance_exec(&b)
+        @external_dependencies.add_data data
       end
     end
   end
@@ -55,6 +59,14 @@ module Skylab::Face::ExternalDependencies
     def add_path path
       @path and fail("multiple paths not yet implemented.")
       @path = path
+      @initted_ui ||= _init_ui
+    end
+    def add_data data
+      @config and fail("multiple datas not yet implemented.")
+      @config = data
+      @initted_ui ||= _init_ui
+    end
+    def _init_ui
       @app_class.class_eval do
         namespace(:install) do
           o { |o| o.banner = "check if external dependencies are installed" }
@@ -70,26 +82,39 @@ module Skylab::Face::ExternalDependencies
     end
     def build_dir
       @build_dir ||= begin
-        dir = config.key?('build directory') ?
-          config['build directory'] : './build'
-        '/' == dir[0, 1] or
-          dir = File.expand_path(File.join(File.dirname(@path), dir))
-        beautify_path dir
+        _dir = config.key?('build directory') ? config['build directory'] : default_build_dir
+        _dir.sub!(%r{\A~/}, "#{ENV['HOME']}/")
+        unless '/' == _dir[0, 1]
+          if @path
+            _dir = File.expand_path(File.join(File.dirname(@path), _dir))
+          end
+        end
+        beautify_path _dir
       end
     end
+    def default_build_dir
+      @ui.request[:build_dir] || '~/build'
+    end
     def check req
-      _ :check, req
+      req[:check_only] = true
+      _run :check, req
     end
     def install req
+      @ui.request = req
       File.exist?(build_dir) or
-        return @ui.err.puts("#{yelo('no:')} " <<
-          "build dir does not exist, please create: #{build_dir}" )
-      _ :install, req
+        return @ui.err.puts <<-HERE.gsub(/\n?^ +/, ' ').strip
+          #{yelo('no:')} Build dir does not exist.  We don't want to create it explicitly.
+          Please create: #{build_dir}
+        HERE
+      _run :install, req
     end
-    def _ meth, req
+    def _run meth, req
+      @ui.request ||= req
       dependencies.each { |dep| dep.send(meth, req) }
-      if dependencies.any?
-        @ui.err.puts "(done checking #{dependencies.length} dependencies.)"
+      if dependencies.any? || @used_dependency_graph
+        descr = [ ("#{dependencies.length} dependencies" if dependencies.any?),
+                  ("dependency graph" if @used_dependency_graph) ].compact.join(' and ')
+        @ui.err.puts "(done checking #{descr}.)"
       else
         @ui.err.puts "(no dependencies in #{@path})"
       end
@@ -103,6 +128,7 @@ module Skylab::Face::ExternalDependencies
     end
     def dependencies
       @dependencies || begin
+        @used_dependency_graph = false
         @dependencies = []
         load_deps_in_array config['external dependencies']
         @dependencies
@@ -114,10 +140,19 @@ module Skylab::Face::ExternalDependencies
     end
 
   private
+
     def load_deps_in_array ary, prefix = nil
       ary.each do |node|
         case node
-        when Hash;   load_deps_in_hash   node, prefix
+        when Hash;
+          if node.key?('target')
+            require File.expand_path('../../dependency-graph', __FILE__)
+            @ui.request[:build_dir] ||= build_dir
+            Skylab::Face::DependencyGraph.run(@ui, node, prefix)
+            @used_dependency_graph = true
+          else
+            load_deps_in_hash node, prefix
+          end
         when String; load_deps_in_string node, prefix
         else
           fail("unexpected node class in dependencies: #{node.class}")
@@ -138,9 +173,14 @@ module Skylab::Face::ExternalDependencies
     end
   end
 
-
+  # this class is deprecated in favor of DependencyGraph::Task subclasses.
+  # will be refactored into that one day maybe
   class Dependency
     include Skylab::Face::Colors
+    include Skylab::Face::PathTools
+
+    alias_method :_, :escape_path
+
     def initialize group, mixed
       @group = group
       @ui = group.ui
@@ -161,6 +201,11 @@ module Skylab::Face::ExternalDependencies
     def build_path
       File.join(build_dir, @tail)
     end
+    def unzipped_path_guess
+      if /(?:\.tar\.gz|\.tgz)\z/ =~ @tail
+        File.join(build_dir, @tail.sub(/(?:\.tar\.gz|\.tgz)\z/, ''))
+      end
+    end
     def url
       File.join( * [@head, @tail].compact )
     end
@@ -177,7 +222,14 @@ module Skylab::Face::ExternalDependencies
       if File.exists?(build_path) && 0 != File.size(build_path)
         @ui.err.puts "#{yelo('exists:')} #{build_path}"
       else
-        @group.add_to_system_job_queue "wget -O #{build_path} #{url}"
+        @group.add_to_system_job_queue "wget -O #{_ build_path} #{url}"
+      end
+      if unzippy = unzipped_path_guess
+        if File.exists?(unzippy)
+          @ui.err.puts "#{yelo('exists:')} #{unzippy}"
+        else
+          @group.add_to_system_job_queue "cd #{_ build_dir}; tar -xzvf #{_ @tail}"
+        end
       end
     end
   end

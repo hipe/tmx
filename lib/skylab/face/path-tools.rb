@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'shellwords'
 
 module Skylab; end
 
@@ -8,6 +9,9 @@ module Skylab::Face
     HomeDirRe = %r{\A#{Regexp.escape(ENV['HOME'])}/}
     def pretty_path path
       path.sub(/\A#{Regexp.escape(FileUtils.pwd)}\//, './').sub(HomeDirRe, '~/')
+    end
+    def escape_path path
+      (path =~ / |\$|'/) ? Shellwords.shellescape(path) : path
     end
   end
 end

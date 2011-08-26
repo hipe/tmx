@@ -1,7 +1,7 @@
 require 'optparse'
 require 'ruby-debug'
 
-# an ultralight command-line parser (407 lines)
+# an ultralight command-line parser (410 lines)
 # that wraps around OptParse (can do anything it does)
 # with colors
 # with flexible command-like options ('officious' like -v, -h)
@@ -300,6 +300,7 @@ module Skylab::Face
         @err = @parent.err
       end
       attr_reader :out, :err
+      attr_accessor :request
       def name
         interface.namespace_name
       end
@@ -358,6 +359,7 @@ class Skylab::Face::Cli
     @err = $stderr
   end
   attr_reader :out, :err
+  attr_accessor :request
   alias_method :interface, :class
   def argument_error e, cmd
     e.backtrace[0,2].detect { |s| s.match(/\A[^:]+/)[0] == __FILE__ } or raise e
