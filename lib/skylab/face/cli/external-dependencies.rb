@@ -15,7 +15,7 @@ module Skylab::Face::ExternalDependencies
         else   ; raise ArgumentError.new("can only take 1 path")
         end
       else
-        data = b.call
+        data = instance_exec(&b)
         @external_dependencies.add_data data
       end
     end
@@ -82,7 +82,7 @@ module Skylab::Face::ExternalDependencies
     end
     def build_dir
       @build_dir ||= begin
-        _dir = config.key?('build directory') ? config['build directory'] : './build'
+        _dir = config.key?('build directory') ? config['build directory'] : default_build_dir
         _dir.sub!(%r{\A~/}, "#{ENV['HOME']}/")
         unless '/' == _dir[0, 1]
           if @path
@@ -92,19 +92,27 @@ module Skylab::Face::ExternalDependencies
         beautify_path _dir
       end
     end
+    def default_build_dir
+      @request[:build_dir] || '~/build'
+    end
     def check req
-      _ :check, req
+     _run :check, req
     end
     def install req
+      @request = req
       File.exist?(build_dir) or
-        return @ui.err.puts("#{yelo('no:')} " <<
-          "build dir does not exist, please create: #{build_dir}" )
-      _ :install, req
+        return @ui.err.puts <<-HERE.gsub(/\n?^ +/, ' ').strip
+          #{yelo('no:')} Build dir does not exist.  We don't want to create it explicitly.
+          Please create: #{build_dir}
+        HERE
+      _run :install, req
     end
-    def _ meth, req
+    def _run meth, req
       dependencies.each { |dep| dep.send(meth, req) }
-      if dependencies.any?
-        @ui.err.puts "(done checking #{dependencies.length} dependencies.)"
+      if dependencies.any? || @used_dependency_graph
+        descr = [ ("#{dependencies.length} dependencies" if dependencies.any?),
+                  ("dependency graph" if @used_dependency_graph) ].compact.join(' and ')
+        @ui.err.puts "(done checking #{descr}.)"
       else
         @ui.err.puts "(no dependencies in #{@path})"
       end
@@ -118,6 +126,7 @@ module Skylab::Face::ExternalDependencies
     end
     def dependencies
       @dependencies || begin
+        @used_dependency_graph = false
         @dependencies = []
         load_deps_in_array config['external dependencies']
         @dependencies
@@ -129,10 +138,20 @@ module Skylab::Face::ExternalDependencies
     end
 
   private
+
     def load_deps_in_array ary, prefix = nil
       ary.each do |node|
         case node
-        when Hash;   load_deps_in_hash   node, prefix
+        when Hash;
+          if node.key?('target')
+            require File.expand_path('../../dependency-graph', __FILE__)
+            @ui.request ||= @request # hiccup
+            @ui.request[:build_dir] ||= build_dir
+            Skylab::Face::DependencyGraph.run(@ui, node, prefix)
+            @used_dependency_graph = true
+          else
+            load_deps_in_hash node, prefix
+          end
         when String; load_deps_in_string node, prefix
         else
           fail("unexpected node class in dependencies: #{node.class}")
@@ -153,6 +172,8 @@ module Skylab::Face::ExternalDependencies
     end
   end
 
+  # this class is deprecated in favor of DependencyGraph::Task subclasses.
+  # will be refactored into that one day maybe
   class Dependency
     include Skylab::Face::Colors
     include Skylab::Face::PathTools
