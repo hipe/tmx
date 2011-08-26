@@ -1,6 +1,18 @@
 {
   "external dependencies" : [
     {
+      "name" : "java",
+      "target" : {
+        "version from"     : "java -version",
+        "must be in range" : "1.5+",
+        "parse with"       : "/java version \"([^\"]+)\"/",
+        "presupposes"      : "java"
+      },
+      "java" : {
+        "executable"       : "java"
+      }
+    },
+    {
       "name"   : "tomcat",
       "target" : {
         "executable file" : "/usr/local/tomcat/bin/startup.sh",
