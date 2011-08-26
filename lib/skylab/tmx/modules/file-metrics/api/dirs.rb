@@ -37,6 +37,10 @@ module Skylab::Tmx::Modules::FileMetrics
         count.add_child _folder_count
       end
       total = count.total.to_f
+      if count.children.nil?
+        @ui.err.puts "(no children)"
+        return
+      end
       count.sort_children_by! { |c| -1 * c.total }
       max = count.children.map(&:total).max.to_f
       count.children.each do |o|
