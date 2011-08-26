@@ -25,8 +25,15 @@ module Skylab::Face
           on.instance_eval(&b)
         end
       end
-      on._out.nil? and on.out { |s| $stdout.write(s) ; $stdout.flush }
-      on._err.nil? and on.err { |s| $stderr.write(s) ; $stderr.flush }
+      if sout.nil? and serr.nil? and b.nil?
+        require 'stringio'
+        omnibuffer = StringIO.new
+        on.out { |s| omnibuffer.write(s) }
+        on.err { |s| omnibuffer.write(s) }
+      else
+        on._out.nil? and on.out { |s| $stdout.write(s) ; $stdout.flush }
+        on._err.nil? and on.err { |s| $stderr.write(s) ; $stderr.flush }
+      end
       bytes = 0
       time = Time.now
       Open3.popen3(cmd) do |sin, _sout, _serr|
@@ -55,6 +62,7 @@ module Skylab::Face
           open.empty? and break
         end
       end
+      omnibuffer and omnibuffer.rewind and return omnibuffer.read
       [bytes, Time.now - time]
     end
   end
