@@ -61,9 +61,10 @@ module Skylab::Face
 
       def uninterpolated
         self.class.attributes.keys.map do |k|
-          str = self.send(k)
-          names = str.scan(/\{[_a-z0-9]+\}/).map{|s| /\A\{(.*)\}\z/.match(s)[1]}
-          names.any? ? [k, names] : nil
+          if (str = self.send(k)).kind_of?(String)
+            names = str.scan(/\{[_a-z0-9]+\}/).map{|s| /\A\{(.*)\}\z/.match(s)[1]}
+            names.any? ? [k, names] : nil
+          end
         end.compact
       end
       attr_reader :interpolated
