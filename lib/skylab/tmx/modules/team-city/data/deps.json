@@ -6,6 +6,10 @@
         "executable file" : "/usr/local/tomcat/bin/startup.sh",
         "else"            : "symlink"
       },
+      "version" : {
+        "version from"    : "/usr/local/tomcat/bin/version.sh",
+        "parse with"      : "/^Server version: +(.+)$/"
+      },
       "symlink" : {
         "symlink"         : "/usr/local/tomcat",
         "target"          : "/usr/local/{stem}",
