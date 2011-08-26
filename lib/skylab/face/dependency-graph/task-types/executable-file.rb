@@ -18,7 +18,7 @@ module Skylab::Face
         if File.exist?(@executable_file)
           execute
         else
-          @ui.err.puts("#{hi_name}: not installed, executable not foound: #{@executable_file}.")
+          @ui.err.puts("#{hi_name}: not installed, executable not found: #{@executable_file}.")
           false
         end
       end

@@ -34,7 +34,7 @@ module Skylab::Face
         @ui.err.puts "#{bold('---> installed:')} #{BLU(@name)}"
         ok
       else
-        @ui.err.puts "#{bold('---> not installed:')} #{BLUE(@name)}"
+        @ui.err.puts "#{ohno('---> dependency not met:')} #{BLU(@name)}"
       end
     end
     def node? name
@@ -50,6 +50,7 @@ module Skylab::Face
       node
     end
     IdentifyingKeys = [
+      'executable',
       'executable file',
       'move to',
       'symlink',
