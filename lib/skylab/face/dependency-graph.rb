@@ -12,19 +12,33 @@ module Skylab::Face
     end
     def initialize(*a)
       @ui, @nodes, @prefix = a
+      @request = @ui.request
       @name = @nodes['name'].kind_of?(String) ? @nodes['name'] : 'dependency graph'
     end
     attr_reader :ui
     attr_reader :name
     def run
       node = self.node('target') or return
-      @ui.err.puts "#{bold('---> installing/checking:')} #{BLU(@name)}"
-      if ok = node.slake
+      ok =
+      if @request[:check_only]
+        @ui.err.puts "#{bold('---> checking:')} #{BLU(@name)}"
+        if _ = node.check
+          node?('version') and node('version').run
+          _
+        end
+      else
+        @ui.err.puts "#{bold('---> installing/checking:')} #{BLU(@name)}"
+        node.slake
+      end
+      if ok
         @ui.err.puts "#{bold('---> installed:')} #{BLU(@name)}"
         ok
       else
         @ui.err.puts "#{bold('---> not installed:')} #{BLUE(@name)}"
       end
+    end
+    def node? name
+      @nodes.key? name
     end
     def node name
       @nodes.key?(name) or return failed(
@@ -40,7 +54,8 @@ module Skylab::Face
       'move to',
       'symlink',
       'tarball to',
-      'unzip tarball'
+      'unzip tarball',
+      'version from'
     ]
   protected
     def build_node node
