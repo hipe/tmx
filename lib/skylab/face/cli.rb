@@ -35,10 +35,12 @@ module Skylab::Face
 
     def initialize name, *rest, &block
       rest.any? and
-        raise ArgumentError.new("too many args for command: #{rest.inspect}")
+        @aliases = rest.map(&:to_s)
       @parser_definition = block # nil ok
       @intern = name.to_sym
     end
+
+    attr_reader :aliases
 
     class << self
       alias_method :build, :new
@@ -126,6 +128,7 @@ module Skylab::Face
         nil
       end
       def invocation_string
+        name = @aliases.nil? ? self.name : "{#{[self.name, *@aliases].join('|')}}"
         "#{@parent.invocation_string} #{name}"
       end
       def parent= parent
@@ -214,8 +217,10 @@ module Skylab::Face
         matcher = Regexp.new(/\A#{Regexp.escape(given)}/)
         found = []
         interface.command_tree.each do |cmd|
-          given == cmd.name and found = [cmd] and break
-          matcher.match(cmd.name) and found.push(cmd)
+          (cmd.aliases ? ([cmd.name] + cmd.aliases) : [cmd.name]).each do |cmd_name|
+            given == cmd_name and found = [cmd] and break 2
+            matcher.match(cmd.name) and found.push(cmd) and break
+          end
         end
         case found.size
         when 0 ; unrecognized_command given
