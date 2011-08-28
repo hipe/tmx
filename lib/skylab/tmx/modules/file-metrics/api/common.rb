@@ -11,7 +11,18 @@ module Skylab::Tmx::Modules::FileMetrics
    class SystemInterfaceError <   RuntimeError; end
   end
 
-  module CommonCommandMethods
+
+  module Api::CommonModuleMethods
+    def run(*a) ; new(*a).run ; end
+  end
+
+  module Api::CommonInstanceMethods
+
+    include PathTools
+
+    def initialize *a
+      @ui, @req = a
+    end
 
     def count_lines files, label=nil
       (_filters =
@@ -60,29 +71,24 @@ module Skylab::Tmx::Modules::FileMetrics
       end
       count
     end
-
-    def tableize count, out
-      return unless count.any_children?
-      Table.render(
-        [count.children.first.fields.map do |f|
-          f = case f
-          when :count ; 'Lines'
-          else f
-          end
-          f.to_s.split('_').map(&:capitalize).join(' ')
-        end] +
-        count.children.map do |_count|
-          _count.fields.map do |field|
-            case field
-            when :total_share, :max_share
-              "%0.2f%%" % (_count.send(field) * 100)
-            else
-              _count.send(field).to_s
-            end
-          end
-        end + count.summary_rows,
-        out
-      )
+    def _render_table count, out, labels, filters
+      unless count.children?
+        out.puts "(table has no rows)"
+        return false
+      end
+      labels[:_default] ||= lambda { |f| f.to_s.split('_').map(&:capitalize).join(' ') }
+      header_row = count.children.first.fields.map do |f|
+        v = labels.key?(f) ? labels[f] : labels[:_default]
+        v.kind_of?(Proc) ? v.call(f) : v
+      end
+      rows = count.children.map do |_count|
+        _count.fields.map do |field|
+          v = _count.send(field)
+          filters.key?(field) ? filters[field].call(v) : v.to_s
+        end
+      end
+      rows = [header_row] + rows + count.summary_rows
+      Table.render rows, out
     end
   end
 end
