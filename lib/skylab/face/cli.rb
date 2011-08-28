@@ -296,6 +296,7 @@ module Skylab::Face
           end
           @definitions
         end
+        attr_reader :aliases # not implemented yet
       end
       alias_method :interface, :class
       def init_for_run parent, name_as_used
