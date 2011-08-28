@@ -17,10 +17,7 @@ module Skylab::Tmx::Modules::FileMetrics
     attr_writer   :total # only use this carefully!
 
     # children
-    def no_children?
-      @children.nil? or ! @children.any?
-    end
-    def any_children?
+    def children?
       @children and @children.any?
     end
     def add_child child
@@ -80,7 +77,7 @@ module Skylab::Tmx::Modules::FileMetrics
     def total
       if @total
         @total # this should only be used very carefully!
-      elsif no_children?
+      elsif ! children?
         @count
       else
         @children.map(&:total).inject(:+)
@@ -93,7 +90,7 @@ module Skylab::Tmx::Modules::FileMetrics
     end
     def lines lines=nil
       lines ||= []
-      if any_children?
+      if children?
         @children.each { |c| c.lines(lines) }
       else
         lines.push fields.map{ |f| "#{f}: #{send(f).inspect}" }.join(' ')
