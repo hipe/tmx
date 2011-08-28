@@ -1,6 +1,6 @@
 module Skylab::Tmx::Modules::FileMetrics
   class Cli < Skylab::Face::Cli
-    namespace :"file-metrics" do
+    namespace( :"file-metrics", :"fm" ) do
       SharedParameters = lambda do |op, req|
 
         req[:exclude_dirs] = ['.*']
