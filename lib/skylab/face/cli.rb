@@ -1,12 +1,13 @@
 require 'optparse'
 require 'ruby-debug'
 
-# an ultralight command-line parser (410 lines)
+# an ultralight command-line parser (414 lines)
 # that wraps around OptParse (can do anything it does)
 # with colors
 # with flexible command-like options ('officious' like -v, -h)
 # with commands with arguments based off of method signatures
 # with subcommands, (namespaces) arbitrarily deeply nested
+# with aliases for commands and namespaces
 
 module Skylab; end
 module Skylab::Face; end
@@ -128,7 +129,7 @@ module Skylab::Face
         nil
       end
       def invocation_string
-        name = @aliases.nil? ? self.name : "{#{[self.name, *@aliases].join('|')}}"
+        name = aliases.nil? ? self.name : "{#{[self.name, *aliases].join('|')}}"
         "#{@parent.invocation_string} #{name}"
       end
       def parent= parent
@@ -162,8 +163,8 @@ module Skylab::Face
         # If you want to remove it, try:
         #   option_definitions.reject! { |a,_| '-h' == a.first }
       end
-      def namespace name, &block
-        def_block = name.kind_of?(Array) ? name : [Namespace, [name], block]
+      def namespace name, *aliases, &block
+        def_block = name.kind_of?(Array) ? name : [Namespace, [name, *aliases], block]
         command_definitions.push Namespace.add_definition(def_block)
       end
       def on *a, &b
@@ -284,21 +285,8 @@ module Skylab::Face
     class Namespace
       extend TreeDefiner, Colors
       include Treeish, Nodeish, Colors
-      @definitions ||= []
-      class << self
-        def add_definition arr
-          @definitions.push arr
-          arr
-        end
-        def namespaces
-          @definitions.each_with_index do |defn, idx|
-            defn.kind_of?(Class) or @definitions[idx] = defn[0].build(*defn[1], &defn[2])
-          end
-          @definitions
-        end
-        attr_reader :aliases # not implemented yet
-      end
       alias_method :interface, :class
+      def aliases ; interface.aliases end
       def init_for_run parent, name_as_used
         @name_as_used = name_as_used
         @parent = parent
@@ -311,20 +299,26 @@ module Skylab::Face
         interface.namespace_name
       end
       alias_method :inspect, :name
-      def self.build name, &block
-        name.kind_of?(Symbol) or return name
-        name = name.to_s
-        Class.new(self).class_eval do
-          self.namespace_name = name
-          x = class << self; self end
-          x.send(:define_method, :inspect) { "#<#{name}:Namespace>" }
-          x.send(:alias_method, :to_s, :inspect)
-          class_eval(&block)
-          self
-        end
-      end
-
+      @definitions ||= []
       class << self
+        def add_definition arr
+          @definitions.push arr
+          arr
+        end
+        attr_accessor :aliases
+        def build name, *aliases, &block
+          name.kind_of?(Symbol) or return name
+          name = name.to_s
+          Class.new(self).class_eval do
+            self.namespace_name = name
+            self.aliases = aliases.any? ? aliases.map(&:to_s) : nil
+            x = class << self; self end
+            x.send(:define_method, :inspect) { "#<#{name}:Namespace>" }
+            x.send(:alias_method, :to_s, :inspect)
+            class_eval(&block)
+            self
+          end
+        end
         def for_run parent, name_as_used
           namespace_runner = new
           namespace_runner.init_for_run parent, name_as_used
@@ -340,6 +334,12 @@ module Skylab::Face
           @namespace_name = ns_name.to_s
         end
         attr_reader :namespace_name
+        def namespaces
+          @definitions.each_with_index do |defn, idx|
+            defn.kind_of?(Class) or @definitions[idx] = defn[0].build(*defn[1], &defn[2])
+          end
+          @definitions
+        end
         def parent= parent
           @parent and fail("won't overwrite parent")
           @parent = parent
