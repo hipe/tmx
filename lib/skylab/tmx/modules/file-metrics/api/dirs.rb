@@ -1,4 +1,4 @@
-require File.expand_path('../../api', __FILE__)
+require File.expand_path('../common', __FILE__)
 
 module Skylab::Tmx::Modules::FileMetrics
   class Api::Dirs
