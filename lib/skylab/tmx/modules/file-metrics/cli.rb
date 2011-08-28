@@ -37,9 +37,12 @@ module Skylab::Tmx::Modules::FileMetrics
           req[:include_names].push pattern
         end
 
-        op.on('-c', '--commands',
-          'show the generated {find|wc} commands we (would) use') {
-            req[:show_commands] = true }
+        req[:verbose] = false
+        op.on('-v', '--verbose',
+          'e.g. show the generated {find|wc} commands we (would) use, etc') do
+          req[:verbose] = true
+          req[:show_commands] = true
+        end
 
         op.on('-l', '--list', 'list the resulting files that match the query (before running reports)') {
           req[:show_files_list] = true }
@@ -49,7 +52,7 @@ module Skylab::Tmx::Modules::FileMetrics
           req[:show_report] = false }
       end
 
-      o :"line-count" do |op, req|
+      o :"line-count", :"lc", :"sloc" do |op, req|
         syntax "#{invocation_string} [opts] [PATH [PATH [...]]]"
         op.banner = "
           Shows the linecount of each file, longest first. Show
@@ -66,8 +69,10 @@ module Skylab::Tmx::Modules::FileMetrics
       end
 
       def line_count opts, *paths
+        paths.empty? and paths.push('.')
+        opts[:paths] = paths
         require File.expand_path('../api/line-count', __FILE__)
-        Api::LineCount.run(paths, opts, self)
+        Api::LineCount.run(self, opts)
       end
 
       o :"dirs" do |op, req|
@@ -84,6 +89,40 @@ module Skylab::Tmx::Modules::FileMetrics
         opts[:path] = path || '.'
         require File.expand_path('../api/dirs', __FILE__)
         Api::Dirs.run(self, opts)
+      end
+
+
+      o :"ext" do |op, req|
+
+        syntax "#{invocation_string} [opts] [<path> [<path> [..]]]"
+
+        op.banner = <<-DESC.gsub(/^ +/, '')
+          #{hi 'description:'} just report on the number of files with different extensions,
+          ordered by frequency of extension
+          #{usage_string}
+          #{hi 'options:'}
+        DESC
+
+        SharedParameters.call(op, req)
+
+        req[:git] = true
+        op.on('--[no-]git-aware', "be aware of git commit objects,",
+          "glob them in to one category (default: #{req[:git]})"
+        ) { |x| req[:git] = x }
+
+        req[:group_singles] = true
+        op.on('--[no-]group-singles', "by default, extensions that occur only once",
+          "are globbed together. Use this flag ",
+          "to include them in the main table. (default: #{req[:group_singles]})"
+        ) { |x| req[:group_singles] = x }
+
+      end
+
+      def ext opts, *paths
+        paths.empty? and paths.push('.')
+        opts[:paths] = paths
+        require File.expand_path('../api/ext', __FILE__)
+        Api::Ext.run(self, opts)
       end
     end
   end

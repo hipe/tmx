@@ -1,16 +1,11 @@
 require File.expand_path('../common', __FILE__)
 
 module Skylab::Tmx::Modules::FileMetrics
-  class Api::Dirs
-    include PathTools
-    include CommonCommandMethods
 
-    def self.run(ui, req)
-      new(ui, req).run
-    end
-    def initialize *a
-      @ui, @req = a
-    end
+  class Api::Dirs
+    extend Api::CommonModuleMethods
+    include Api::CommonInstanceMethods
+
     def run
       count = Count.new("folders summary")
       find_cmd = build_find_dirs_command
@@ -52,7 +47,7 @@ module Skylab::Tmx::Modules::FileMetrics
       count.display_summary_for(:name) { "Total:" }
       count.display_total_for(:num_files) { |d| "%d" % d }
       count.display_total_for(:num_lines) { |d| "%d" % d }
-      tableize count, @ui.err
+      render_table count, @ui.err
     end
   private
     def build_find_dirs_command
@@ -70,6 +65,17 @@ module Skylab::Tmx::Modules::FileMetrics
         f.names = @req[:include_names]
         f.extra = '-not -type d'
       end
+    end
+    def render_table count, out
+      labels = {
+        :count => 'Lines'
+      }
+      percent = lambda { |v| "%0.2f%%" % (v * 100) }
+      filters = {
+        :total_share => percent,
+        :max_share   => percent
+      }
+      _render_table count, out, labels, filters
     end
   end
 end

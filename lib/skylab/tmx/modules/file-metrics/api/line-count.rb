@@ -3,21 +3,16 @@ require File.expand_path('../common.rb', __FILE__)
 module Skylab::Tmx::Modules::FileMetrics
 
   class Api::LineCount
-    include PathTools, CommonCommandMethods
-    def self.run paths, opts, ui
-      new(paths, opts, ui).run
-    end
-    def initialize paths, opts, ui
-      @paths, @req, @ui = [paths, opts, ui]
-      # do defaults, normalization now, once in case we want to re-run for some awful reason
-      @paths.empty? and @paths.push('.')
-    end
+    extend Api::CommonModuleMethods
+    include Api::CommonInstanceMethods
+
     def run
+      @paths = @req[:paths]
       files = self.files
       @req[:show_files_list] and @ui.err.puts(files)
       @req[:show_report] or return true
       count = count_lines files
-      if count.no_children?
+      if ! count.children?
         @ui.err.puts "no files found."
       else
         total = count.total.to_f
@@ -28,7 +23,7 @@ module Skylab::Tmx::Modules::FileMetrics
           c.set_field(:max_share, c.total.to_f / max)
         end
         count.display_total_for(:count) { |num| "total: %d" % num }
-        tableize count, @ui.err
+        render_table count, @ui.err
       end
     end
   protected
@@ -61,5 +56,16 @@ module Skylab::Tmx::Modules::FileMetrics
       `#{cmd}`.split("\n")
     end
 
+    def render_table count, out
+      labels = {
+        :count => 'Lines'
+      }
+      percent = lambda { |v| "%0.2f%%" % (v * 100) }
+      filters = {
+        :total_share => percent,
+        :max_share   => percent
+      }
+      _render_table count, out, labels, filters
+    end
   end
 end
