@@ -44,7 +44,7 @@ module Skylab::CodeMolester
     end
     def valid?
       if @last_parser_error
-        @invalid_reason = @last_parse_error.to_s
+        @invalid_reason = @last_parser_error.to_s
         return false
       end
       true # for now
