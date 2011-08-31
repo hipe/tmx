@@ -1,7 +1,7 @@
 require 'optparse'
 require 'ruby-debug'
 
-# an ultralight command-line parser (414 lines)
+# an ultralight command-line parser (417 lines)
 # that wraps around OptParse (can do anything it does)
 # with colors
 # with flexible command-like options ('officious' like -v, -h)
@@ -217,10 +217,12 @@ module Skylab::Face
         given = argv.first
         matcher = Regexp.new(/\A#{Regexp.escape(given)}/)
         found = []
-        interface.command_tree.each do |cmd|
-          (cmd.aliases ? ([cmd.name] + cmd.aliases) : [cmd.name]).each do |cmd_name|
-            given == cmd_name and found = [cmd] and break 2
-            matcher.match(cmd.name) and found.push(cmd) and break
+        catch :break_two do
+          interface.command_tree.each do |cmd|
+            (cmd.aliases ? ([cmd.name] + cmd.aliases) : [cmd.name]).each do |cmd_name|
+              given == cmd_name and found = [cmd] and throw(:break_two)
+              matcher.match(cmd.name) and ! found.map(&:name).include?(cmd.name) and found.push(cmd)
+            end
           end
         end
         case found.size
