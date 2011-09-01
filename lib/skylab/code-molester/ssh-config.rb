@@ -32,8 +32,8 @@ module Skylab::CodeMolester
       scn.skip(/[[:space:]]+/)
       loop do
       ok = scn.scan(/Host  */) or return _fail("expected: \"Host\" had: #{scn.peek(20).inspect}")
-        host = { :type => :host }
         name = scn.scan(/[-a-zA-Z0-9_]+/) or return _fail("expected a valid name, had: #{scn.peek(20).inspect}")
+        host = { :type => :host, :name => name }
         scn.skip(/[ \t]+/)
         while line = scn.scan(/\n? +[A-Za-z]+ +[^\n]+/)
           name, value = line.strip.split(/ +/)
