@@ -108,6 +108,7 @@ module Skylab::CodeMolester
         end
         hash
       end
+      alias_method :data, :to_primitive # experimental
     private
       def _change_to_tree!
         @value.nil? or fail("won't change node to tree when a value is present!")
