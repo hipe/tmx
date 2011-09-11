@@ -20,12 +20,12 @@ module Skylab::Face
         else
           @ui.err.puts version.split("\n").map { |s| "  #{hi('version')}: #{s}" }
         end
-        @ui.err.puts "#{hi_name}: #{@version_from}"
+        @ui.err.puts "#{me}: #{@version_from}"
       end
 
       def check_presuppositions
         @presupposes or return true
-        @graph.node(@presupposes).check
+        parent_graph.node(@presupposes).check
       end
 
       def check
@@ -50,10 +50,10 @@ module Skylab::Face
         if RegexpRegexp =~ str
           regex_body, modifiers = [$1, $2]
           ModifierRe =~ modifiers or
-            fail("bad modifiers #{modifiers.inspect}, need #{ModifierRe.source}")
+            _fail("bad modifiers #{modifiers.inspect}, need #{ModifierRe.source}")
           Regexp.new(regex_body, modifiers)
         else
-          fail("Failed to parse regexp: #{str.inspect}.  Needed #{RegexpRegexp.source}")
+          _fail("Failed to parse regexp: #{str.inspect}.  Needed #{RegexpRegexp.source}")
         end
       end
 
@@ -75,7 +75,7 @@ module Skylab::Face
       end
 
       def build_version_range
-        @must_be_in_range or fail(<<-HERE.gsub(/\n */,' ').strip
+        @must_be_in_range or _fail(<<-HERE.gsub(/\n */,' ').strip
           Do not use "version from" as a target without a "must be in range" assertion.
         HERE
         )

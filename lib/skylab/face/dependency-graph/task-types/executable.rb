@@ -8,10 +8,10 @@ module Skylab::Face
       def check
         interpolated? or interpolate! or return false
         if '' == (path = open2("which #{@executable}").strip)
-          @ui.err.puts("#{hi_name}: #{ohno('not in PATH:')} #{@executable}")
+          @ui.err.puts("#{me}: #{ohno('not in PATH:')} #{@executable}")
           false
         else
-          @ui.err.puts("#{hi_name}: #{path}")
+          @ui.err.puts("#{me}: #{path}")
           true
         end
       end

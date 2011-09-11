@@ -8,7 +8,7 @@ module Skylab::Face
         if File.exist?(@executable_file)
           execute
         elsif deps?
-          slake_deps and execute
+          slake_else and execute
         else
           dead_end
         end
@@ -18,7 +18,7 @@ module Skylab::Face
         if File.exist?(@executable_file)
           execute
         else
-          @ui.err.puts("#{hi_name}: not installed, executable not found: #{@executable_file}.")
+          @ui.err.puts("#{me}: not installed, executable not found: #{@executable_file}.")
           false
         end
       end
@@ -26,10 +26,10 @@ module Skylab::Face
       def execute
         stat = File::Stat.new(@executable_file)
         if stat.executable?
-          @ui.err.puts("#{hi_name}: ok, executable: #{@executable_file}")
+          @ui.err.puts("#{me}: ok, executable: #{@executable_file}")
           true
         else
-          @ui.err.puts("#{hi_name}: #{ohno('error:')} exists but is not executable: #{@executable_file}.")
+          @ui.err.puts("#{me}: #{ohno('error:')} exists but is not executable: #{@executable_file}.")
           false
         end
       end

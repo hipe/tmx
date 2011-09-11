@@ -9,21 +9,21 @@ module Skylab::Face
       def initialize(*a)
         super(*a)
         @fileutils_output = @ui.err
-        @fileutils_label = "#{hi_name}: "
+        @fileutils_label = "#{me}: "
       end
       def slake
         interpolated? or interpolate! or return false
         check and return true
         deps? or return dead_end
-        slake_deps or return false
+        slake_else or return false
         check and return true
-        @ui.err.puts("#{hi_name}: #{ohno('error:')} move to: source file not found: #{@from}")
+        @ui.err.puts("#{me}: #{ohno('error:')} move to: source file not found: #{@from}")
         false
       end
       def check
         interpolated? or interpolate! or return false
         if File.exist?(@move_to)
-          @ui.err.puts("#{hi_name}: exists: #{@move_to}")
+          @ui.err.puts("#{me}: exists: #{@move_to}")
           true
         elsif File.exist?(@from)
           mv(@from, @move_to, :verbose => true)
@@ -31,6 +31,9 @@ module Skylab::Face
         else
           false
         end
+      end
+      def interpolate_stem
+        need_else.interpolate_stem
       end
     end
   end
