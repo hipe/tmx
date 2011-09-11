@@ -15,7 +15,7 @@ module Skylab::Face
             and it has no \"else\" node to satisfy unresolved variable names
           HERE
           )
-          (node = @graph.node(@else)) or return interpolation_fail(keys, "because else node not found (see above)")
+          (node = parent_graph.node(@else)) or return interpolation_fail(keys, "because else node not found (see above)")
           node.interpolate! or return interpolation_fail(keys, "(because of above errors)")
           (keys = uninterpolatable_keys).any? and return interpolation_fail(keys, "after interpolating upstream")
         end
@@ -26,17 +26,17 @@ module Skylab::Face
             name_as_key = Interpolation.to_key(name)
             if idx = interpolated_via_methods.index(name_as_key)
               interpolated_value = send("interpolate_#{name}")
-              @ui.request[name_as_key] = interpolated_value # ick careful
+              request[name_as_key] = interpolated_value # ick careful
               interpolated_via_methods[idx] = nil
             else
-              interpolated_value =  @ui.request[name_as_key]
+              interpolated_value =  request[name_as_key]
             end
             value.gsub!("{#{name}}", interpolated_value)
           end
           send("#{attrib}=", value)
         end
         interpolated_via_methods.compact.each do |sym|
-          @ui.request[sym] = send("interpolate_#{sym}") # ick, easier just to do them all
+          request[sym] = send("interpolate_#{sym}") # ick, easier just to do them all
         end
         @interpolated = true
       end
@@ -48,7 +48,7 @@ module Skylab::Face
 
       def uninterpolatable_keys
         still_need = []
-        have_keys = @ui.request.keys + interpolated_via_methods
+        have_keys = request.keys + interpolated_via_methods
         uninterpolated.each do |var, names|
           still_need.concat( names.map{ |s| Interpolation.to_key(s) } - have_keys )
         end
