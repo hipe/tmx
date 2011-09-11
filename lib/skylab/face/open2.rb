@@ -66,4 +66,21 @@ module Skylab::Face
       [bytes, Time.now - time]
     end
   end
+
+  module Open2
+    class Tee
+      def initialize hash
+        @children = hash
+      end
+      attr_reader :children
+      def [] name
+        @children[name]
+      end
+      %w(write flush).each do |name|
+        define_method(name) do |*a|
+          @children.values.map { |c| c.send(name, *a) }
+        end
+      end
+    end
+  end
 end
