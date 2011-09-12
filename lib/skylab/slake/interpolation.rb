@@ -1,5 +1,5 @@
-module Skylab::Face
-  class DependencyGraph
+module Skylab
+  module Slake
     module Interpolation
       class << self
         def to_key name
