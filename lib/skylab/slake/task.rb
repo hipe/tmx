@@ -1,10 +1,11 @@
+require File.expand_path('../../face/cli', __FILE__) # Colors
 require File.expand_path('../interpolation', __FILE__)
 require File.expand_path('../attribute-definer', __FILE__)
 
-module Skylab::Face
-  class DependencyGraph
+module Skylab
+  module Slake
     class Task
-      include Colors
+      include Face::Colors
       include Interpolation
       extend AttributeDefiner
       TarballExtension = /(?:\.tar\.gz|\.tgz)\z/
@@ -61,12 +62,6 @@ module Skylab::Face
           " to help with #{task_type_name.inspect}.")
         false
       end
-      def build_dir
-        @build_dir ||= begin
-          request[:build_dir] or fail("request does not specify :build_dir")
-        end
-      end
-      alias_method :interpolate_build_dir, :build_dir
       def nope message
         @ui.err.puts("#{me}: #{ohno('failed:')} #{message}")
         false
