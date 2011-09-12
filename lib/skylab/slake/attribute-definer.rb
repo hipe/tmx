@@ -1,5 +1,5 @@
-module Skylab::Face
-  class DependencyGraph
+module Skylab
+  module Slake
     module AttributeDefiner
       def attribute sym, opts={}
         @attributes ||= (dup_parent_attributes || {})
