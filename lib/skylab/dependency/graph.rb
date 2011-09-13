@@ -20,7 +20,7 @@ module Skylab::Dependency
         data['external dependencies'].each do |dependency_data|
           case dependency_data
           when String
-            $stdout.puts "skpping for now: #{dependency_data}"
+            list.push Task.build_task({'get' => dependency_data}, nil)
           when Hash
             if dependency_data.key?('target') # assumes it is a graph
               graph = new
@@ -136,5 +136,4 @@ module Skylab::Dependency
       end
     end
   end
-  class SpecificationError < ::RuntimeError; end
 end
