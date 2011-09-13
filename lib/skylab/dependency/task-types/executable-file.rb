@@ -1,10 +1,10 @@
 require File.expand_path('../../task', __FILE__)
-module Skylab::Face
-  class DependencyGraph
+
+module Skylab
+  module Dependency
     class TaskTypes::ExecutableFile < Task
       attribute :executable_file
       def slake
-        interpolated? or interpolate! or return false
         if File.exist?(@executable_file)
           execute
         elsif deps?
@@ -14,11 +14,10 @@ module Skylab::Face
         end
       end
       def check
-        interpolated? or interpolate! or return false
         if File.exist?(@executable_file)
           execute
         else
-          @ui.err.puts("#{me}: not installed, executable not found: #{@executable_file}.")
+          ui.err.puts("#{me}: not installed, executable not found: #{@executable_file}.")
           false
         end
       end
@@ -26,10 +25,10 @@ module Skylab::Face
       def execute
         stat = File::Stat.new(@executable_file)
         if stat.executable?
-          @ui.err.puts("#{me}: ok, executable: #{@executable_file}")
+          ui.err.puts("#{me}: ok, executable: #{@executable_file}")
           true
         else
-          @ui.err.puts("#{me}: #{ohno('error:')} exists but is not executable: #{@executable_file}.")
+          ui.err.puts("#{me}: #{ohno('error:')} exists but is not executable: #{@executable_file}.")
           false
         end
       end

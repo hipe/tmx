@@ -9,23 +9,16 @@ module Skylab
       include Interpolation
       extend AttributeDefiner
       TarballExtension = /(?:\.tar\.gz|\.tgz)\z/
-      class << self
-        def build data, graph
-          task = new(graph)
-          task.update_attributes(data)
-          task.valid? or return false
-          task
-        end
+      def initialize
+        # Keep this one empty, force arugment errors on arguments.
+        # State no explicity logic for initialization
+        # With subclasses it's ok to override
       end
-
       attribute :enabled, :required => false
 
-      def initialize graph
-        class << self; self end.send(:define_method, 'parent_graph') { graph }
-        @ui = parent_graph.ui
-      end
       attr_accessor :else
       alias_method :deps?, :else
+      attr_accessor :ui
       def update_attributes data
         data.each do |k, v|
           send("#{k.gsub(' ','_')}=", v)
@@ -46,7 +39,12 @@ module Skylab
       def task_type_name
         self.class.to_s.match(/([^:]+)\z/)[1].gsub(/([a-z])([A-Z])/){ "#{$1} #{$2}" }.downcase
       end
-      alias_method :name, :task_type_name # experimental
+      def name= name
+        @name = name
+      end
+      def name
+        @name || task_type_name
+      end
       def me
         "  #{hi name}" # highlight the name, whatever that means to the Colors module
       end
@@ -73,45 +71,6 @@ module Skylab
         node
       end
       def _fail msg # same as class method
-        raise SpecificationError.new(msg)
-      end
-    end
-  end
-end
-
-class Skylab::Face::DependencyGraph
-  class Task
-    IdentifyingKeys = [
-      'ad hoc',
-      'build tarball',
-      'configure make make install',
-      'get',
-      'executable',
-      'executable file',
-      'move to',
-      'symlink',
-      'tarball to',
-      'unzip tarball',
-      'version from'
-    ]
-    class << self
-      def build_task data, graph
-        found = IdentifyingKeys & data.keys
-        ['get', 'tarball to'] == found and found.shift # sorry
-        case found.length
-        when 0
-          _fail("Needed one had zero of " <<
-            "(#{IdentifyingKeys.join(', ')}) among (#{data.keys.join(', ')})")
-        when 1
-          identifier = found.first
-          require File.expand_path("../task-types/#{identifier.gsub(' ','-')}", __FILE__)
-          klass = identifier.capitalize.gsub(/ ([a-z])/){ $1.upcase }.to_sym
-          TaskTypes.const_get(klass).build(data, graph)
-        else
-          _fail("Ambiguous, mutually exclusive keys: (#{found.join(', ')})")
-        end
-      end
-      def _fail msg
         raise SpecificationError.new(msg)
       end
     end

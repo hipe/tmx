@@ -1,6 +1,4 @@
 {
-  "build directory" : "~/build",
-
   "external dependencies" : [
     {
       "from" : "http://downloads.sourceforge.net/project/schemaspy/schemaspy/SchemaSpy%205.0.0",

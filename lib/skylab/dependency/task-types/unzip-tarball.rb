@@ -1,23 +1,21 @@
 require File.expand_path('../../task', __FILE__)
-module Skylab::Face
-  class DependencyGraph
+require 'skylab/face/open2'
+
+module Skylab
+  module Dependency
     class TaskTypes::UnzipTarball < Task
-      include Open2
-      include PathTools
+      include ::Skylab::Face::Open2
+      include ::Skylab::Face::PathTools
       attribute :unzip_tarball
       attribute :unzips_to, :required => false
       def slake
-        _defaults!
-        interpolated? or interpolate! or return false
         slake_else or return false
         check and return true
         execute
       end
       def check
-        _defaults!
-        interpolated? or interpolate! or return false
         if File.directory?(expected_unzipped_dir_path)
-          @ui.err.puts("#{me}: ok: is directory: #{expected_unzipped_dir_path}")
+          ui.err.puts("#{me}: ok: is directory: #{expected_unzipped_dir_path}")
           true
         end
       end
@@ -25,7 +23,7 @@ module Skylab::Face
         if 0 < File.stat(path).size
           true
         else
-          @ui.err.puts("#{me}: cannot unzip, file is zero size: #{path}")
+          ui.err.puts("#{me}: cannot unzip, file is zero size: #{path}")
           false
         end
       end
@@ -38,22 +36,26 @@ module Skylab::Face
       end
       def execute
         unless File.exist?(@unzip_tarball)
-          @ui.err.puts("#{me}: #{ohno('error:')} tarball not found: #{@unzip_tarball}")
+          ui.err.puts("#{me}: #{ohno('error:')} tarball not found: #{@unzip_tarball}")
           return false
         end
         check_size(@unzip_tarball) or return
         cmd = "cd #{escape_path build_dir}; tar -xzvf #{escape_path File.basename(@unzip_tarball)}"
         bytes, seconds = open2(cmd) do |on|
-          on.out { |s| @ui.err.write("#{me}: (out): #{s}") }
-          on.err { |s| @ui.err.write(s) }
+          on.out { |s| ui.err.write("#{me}: (out): #{s}") }
+          on.err { |s| ui.err.write(s) }
         end
-        @ui.err.puts("#{me}: read #{bytes} bytes in #{seconds} seconds.")
+        ui.err.puts("#{me}: read #{bytes} bytes in #{seconds} seconds.")
         check and return true
-        @ui.err.puts("#{me}: #{ohno('error: ')}: failed to unzip?")
+        ui.err.puts("#{me}: #{ohno('error: ')}: failed to unzip?")
         false
       end
       def interpolate_stem
         need_else.interpolate_stem
+      end
+      def before_slake_or_check
+        _defaults!
+        interpolated? or interpolate! or return false
       end
       def _defaults!
         @did_defaults and return

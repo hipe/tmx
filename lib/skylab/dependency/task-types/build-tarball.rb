@@ -1,10 +1,10 @@
 require File.expand_path('../../task', __FILE__)
 require 'pathname'
 
-module Skylab::Face
-  class DependencyGraph
-    class TaskTypes::BuildTarball < self
-      attribute :derpa
+module Skylab
+  module Dependency
+    class TaskTypes::BuildTarball < Graph
+      attribute :build_tarball
       def initialize_child_graph data
         data.key?('build tarball') or return failed("missing required key: 'build tarball' in data")
         pathname = Pathname.new(data['build tarball'])

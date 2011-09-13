@@ -1,6 +1,7 @@
-module Skylab;  end
-module Skylab::Face
-  class DependencyGraph::VersionRange
+module Skylab; end
+
+module Skylab::Dependency
+  class VersionRange
     class << self
       alias_method :build, :new
     end

@@ -1,5 +1,7 @@
-require File.expand_path('../../dependency-graph/primordial', __FILE__)
 require File.expand_path('../../path-tools', __FILE__)
+
+$:.include?(skylab_dir = File.expand_path('../../../..', __FILE__)) or $:.unshift(skylab_dir)
+require 'skylab/dependency/primordial'
 
 module Skylab::Face
 
@@ -10,7 +12,7 @@ module Skylab::Face
         (a.empty? && b.nil?) and return @external_dependencies
         @external_dependencies ||= begin
           self.class_eval(&CommandDefinitionsBlock)
-          DependencyGraph::Primordial.new
+          Skylab::Dependency::Primordial.new
         end
         @external_dependencies.merge_in!(*a, &b)
         @external_dependencies
