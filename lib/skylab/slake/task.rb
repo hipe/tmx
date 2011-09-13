@@ -4,6 +4,7 @@ require File.expand_path('../attribute-definer', __FILE__)
 
 module Skylab
   module Slake
+    class SpecificationError < ::RuntimeError; end
     class Task
       include Face::Colors
       include Interpolation
@@ -31,8 +32,7 @@ module Skylab
         if (missing = self.class.attributes.each.select do |k, v|
           v[:required] && instance_variable_get("@#{k}").nil?
         end).any?
-          @ui.err.puts("#{task_type_name} is missing required #{missing.map(&:inspect).join(' and ')} field(s).")
-          return false
+          return _fail("#{task_type_name} is missing required #{ missing.map{ |x| x.first.to_s.inspect }.join(' and ') } field(s).")
         end
         true
       end
@@ -56,12 +56,12 @@ module Skylab
         dep.slake
       end
       def dead_end
-        @ui.err.puts("#{ohno('dead end:')} Sorry, there are no supporting tasks "<<
+        ui.err.puts("#{ohno('dead end:')} Sorry, there are no supporting tasks "<<
           " to help with #{task_type_name.inspect}.")
         false
       end
       def nope message
-        @ui.err.puts("#{me}: #{ohno('failed:')} #{message}")
+        ui.err.puts("#{me}: #{ohno('failed:')} #{message}")
         false
       end
     protected
