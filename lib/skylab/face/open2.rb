@@ -7,6 +7,7 @@ module Skylab::Face
   #
 
   module Open2
+    extend self
     class Handler
       [:out, :err].each do |out|
         define_method(out) { |&b| instance_variable_set("@_#{out}", b) }
