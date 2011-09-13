@@ -1,0 +1,91 @@
+require File.expand_path('../../task', __FILE__)
+require 'skylab/face/open2'
+require 'skylab/face/path-tools'
+
+module Skylab
+  module Dependency
+    class TaskTypes::Get < Task
+      include ::Skylab::Face::Open2
+      include ::Skylab::Face::PathTools
+      attribute :from
+      attribute :get
+
+      def check
+        results = pairs.map do |from_url, to_file|
+          bytes = _bytes(to_file)
+          case bytes
+          when nil
+            ui.err.puts "#{me}: would get: #{from_url}"
+            false
+          when 0
+            ui.err.puts "#{me}: had zero byte file (strange): (#{pretty_path to_file}). Would overwrite."
+            false
+          else
+            ui.err.puts "#{me}: exists (remove/move to download again): #{pretty_path to_file} (#{bytes} bytes)"
+            true
+          end
+        end
+        ! results.index { |b| ! b }
+      end
+
+      def slake
+        do_these = []
+        pairs.each do |from_url, to_file|
+          bytes = _bytes(to_file)
+          case bytes
+          when nil
+            do_these.push [from_url, to_file]
+          when 0
+            ui.err.puts "#{me} had zero byte file (strange), overwriting: #{pretty_path to_file}"
+            do_these.push [from_url, to_file]
+          else
+            ui.err.puts "#{me} skipping, exists (erase/move to re-download): #{pretty_path to_file}"
+          end
+        end
+        results = []
+        do_these.each do |from_url, to_file|
+          res = self.class.curl_or_wget(ui, from_url, to_file, :prefix => "#{blu_name}: ", :dry_run => @request[:dry_run])
+          results.push res
+        end
+        ! results.index { |b| ! b }
+      end
+
+    protected
+
+      def pairs
+        get_these = @get.kind_of?(Array)?  @get : [@get]
+        get_these.map do |tail|
+          [File.join(@from, tail), File.join(build_dir, tail)]
+        end
+      end
+
+      def _bytes path
+        File.stat(path).size if File.exist?(path)
+      end
+
+      class << self
+        def curl_or_wget ui, from_url, to_file, opts={}
+          _ = opts[:prefix] || ''
+          # cmd = "wget -O #{::Skylab::Face::PathTools.escape_path to_file} #{from_url}"
+          cmd = "curl -OL h #{from_url} > #{::Skylab::Face::PathTools.escape_path to_file}"
+          ui.err.puts "#{_}executing: #{cmd}"
+          bytes, seconds =
+          if opts[:dry_run]
+            [0, 0.0]
+          else
+            ::Skylab::Face::Open2.open2(cmd) do |on|
+              on.out { |s| ui.err.write("#{_}(out): #{s}") }
+              on.err { |s| ui.err.write(s) }
+            end
+          end
+          ui.err.puts("#{_}read #{bytes} bytes in #{seconds} seconds.")
+          true # what does success mean to you
+        end
+      end
+
+      def blu_name
+        style("  #{name}", :cyan)
+      end
+    end
+  end
+end
