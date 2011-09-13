@@ -1,13 +1,14 @@
 require File.expand_path('../../task', __FILE__)
 require 'skylab/face/open2'
 require 'skylab/face/path-tools'
+require 'pathname'
 
 module Skylab
   module Dependency
     class TaskTypes::Get < Task
       include ::Skylab::Face::Open2
       include ::Skylab::Face::PathTools
-      attribute :from
+      attribute :from, :required => false
       attribute :get
 
       def check
@@ -53,6 +54,9 @@ module Skylab
     protected
 
       def pairs
+        if @from.nil?
+          Pathname.new(@get).tap { |pn| @from = pn.dirname.to_s; @get = pn.basename.to_s }
+        end
         get_these = @get.kind_of?(Array)?  @get : [@get]
         get_these.map do |tail|
           [File.join(@from, tail), File.join(build_dir, tail)]
