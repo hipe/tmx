@@ -36,6 +36,8 @@ module Skylab::Face
         HERE
         op.on('-c', '--check',
           "Only check to see if the dependencies are there.") { req[:check] = true }
+        op.on('-n', '--dry-run',
+          "Perform a dry run only (where available).") { req[:dry_run] = true }
         req[:build_dir] =  File.join(ENV['HOME'] || '~', '/build')
         op.on('--build-dir DIR',
           "Specifies build directory. (default: #{pretty_path(req[:build_dir])})") { |bd| req[:build_dir] = bd }
