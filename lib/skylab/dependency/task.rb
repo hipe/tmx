@@ -1,6 +1,7 @@
 require 'skylab/slake/task'
 
 module Skylab::Dependency
+  class SpecificationError < ::Skylab::Slake::SpecificationError; end
   module TaskTypes
     # loaded as necessary by logic in this file
   end
@@ -45,6 +46,9 @@ module Skylab::Dependency
       def _fail msg
         raise SpecificationError.new(msg)
       end
+    end
+    def _fail msg
+      raise SpecificationError.new(msg)
     end
     # it's important we do do some class-specific initialization so that we can have readable
     # child class initialize methods who rely on this and e.g. the parent and ui and etc.
