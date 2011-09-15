@@ -56,26 +56,33 @@ module Skylab::Dependency
       parent_graph and self.parent_graph = parent_graph
       update_attributes data
     end
-    def parent_graph= parent_graph
-      class << self ; self end.send(:define_method, :parent_graph) { parent_graph }
-      @has_parent = true
-      parent_graph
-    end
+    alias_method :task_initialize, :initialize
+
     def ui
       @ui || parent_graph.ui
     end
     def request
       @request || parent_graph.request
     end
-    def before_check_or_slake
-      interpolated? or interpolate! or return false
-      true
+    def task_init
+      @task_initted ||= begin
+        @task_init_ok = _task_init
+        true
+      end
+      @task_init_ok
+    end
+    def _task_init
+      _defaults!
+      interpolated? or interpolate! or false
+    end
+    def _defaults!
     end
     def run ui, req
       @ui = ui
       @request = req
-      ok =
-      if @request[:check]
+      if ! task_init
+        false
+      elsif @request[:check]
         check
       else
         slake
@@ -85,6 +92,15 @@ module Skylab::Dependency
       @build_dir ||= begin
         request[:build_dir] or fail("request does not specify :build_dir")
       end
+    end
+    def interpolate_build_dir
+      build_dir
+    end
+    def BLU s
+      style s, :bright, :cyan
+    end
+    def blu s
+      style s, :cyan
     end
   end
 end
