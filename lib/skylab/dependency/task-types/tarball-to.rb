@@ -7,11 +7,21 @@ module Skylab
       attribute :from, :required => false
       attribute :get
       attribute :stem, :required => false
-      def slake
-        check_exists_nonzero and return true
-        @get.kind_of?(String) or _fail("'get' must be string, had: #{get}")
-        curl_or_wget_files or return false
-        wrap_up
+      TarballExtension = /\.tar\.gz\z/
+      def interpolate_basename
+        File.basename(@get)
+      end
+      def interpolate_stem
+        @stem || self.class.stem(@get)
+      end
+    protected
+      def pairs
+        [[File.join(@from, @get), File.join(build_dir, @get)]]
+      end
+      class << self
+        def stem filename
+          filename.sub(TarballExtension, '')
+        end
       end
     end
   end

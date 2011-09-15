@@ -45,7 +45,7 @@ module Skylab
         end
         results = []
         do_these.each do |from_url, to_file|
-          res = self.class.curl_or_wget(ui, from_url, to_file, :prefix => "#{blu_name}: ", :dry_run => @request[:dry_run])
+          res = self.class.curl_or_wget(ui, from_url, to_file, :prefix => "#{blu_name}: ", :dry_run => request[:dry_run])
           results.push res
         end
         ! results.index { |b| ! b }
