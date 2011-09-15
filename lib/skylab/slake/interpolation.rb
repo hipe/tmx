@@ -1,33 +1,25 @@
 module Skylab
   module Slake
     module Interpolation
-      class << self
-        def to_key name
-          name.gsub(' ', '_').intern
-        end
-      end
       def interpolate!
         keys = uninterpolatable_keys
         interpolated_via_methods = self.interpolated_via_methods.dup
+        unused_interpolated_via_methods = interpolated_via_methods.dup
         if keys.any?
-          @else or return interpolation_fail(keys, <<-HERE.gsub(/\A */, '').gsub(/\n */, ' ')
-            because there are no defined method(s) (e.g. #{keys.map{|k| "interpolate_#{k}".inspect}.join(', ')})
-            and it has no \"else\" node to satisfy unresolved variable names
-          HERE
-          )
-          (node = parent_graph.node(@else)) or return interpolation_fail(keys, "because else node not found (see above)")
-          node.interpolate! or return interpolation_fail(keys, "(because of above errors)")
-          (keys = uninterpolatable_keys).any? and return interpolation_fail(keys, "after interpolating upstream")
+          @else or return _interpolation_fail_undefined(keys)
+          (node = parent_graph.node(@else)) or return _interpolation_fail(keys, "because else node not found (see above)")
+          node.interpolate! or return _interpolation_fail(keys, "(because of above errors)")
+          (keys = uninterpolatable_keys).any? and return _interpolation_fail(keys, "after interpolating upstream")
         end
         uninterpolated.each do |attrib, names|
           value = send(attrib)
-          value.kind_of?(String) or return interpolation_fail([attrib], "because it was not a string (had: #{value.inspect})")
+          value.kind_of?(String) or return _interpolation_fail([attrib], "because it was not a string (had: #{value.inspect})")
           names.each do |name|
             name_as_key = Interpolation.to_key(name)
             if idx = interpolated_via_methods.index(name_as_key)
               interpolated_value = send("interpolate_#{name}")
-              request[name_as_key] = interpolated_value # ick careful
-              interpolated_via_methods[idx] = nil
+              request[name_as_key] ||= interpolated_value # ick careful
+              unused_interpolated_via_methods[idx] = nil
             else
               interpolated_value =  request[name_as_key]
             end
@@ -35,15 +27,23 @@ module Skylab
           end
           send("#{attrib}=", value)
         end
-        interpolated_via_methods.compact.each do |sym|
-          request[sym] = send("interpolate_#{sym}") # ick, easier just to do them all
+        unused_interpolated_via_methods.compact.each do |sym|
+          request[sym] ||= send("interpolate_#{sym}") # ick, easier just to do them all
         end
         @interpolated = true
       end
 
-      def interpolation_fail(things, because)
+      def _interpolation_fail(things, because)
         @ui.err.puts "Failed to interpolate (#{things.map(&:inspect).join(', ')}) of #{task_type_name.inspect} #{because}"
         false
+      end
+
+      def _interpolation_fail_undefined things
+        _interpolation_fail(things, <<-HERE.gsub(/\A */, '').gsub(/\n */, ' ')
+          because there are no defined method(s) (e.g. #{keys.map{|k| "interpolate_#{k}".inspect}.join(', ')})
+          and it has no \"else\" node to satisfy unresolved variable names
+        HERE
+        )
       end
 
       def uninterpolatable_keys
@@ -69,6 +69,11 @@ module Skylab
       end
       attr_reader :interpolated
       alias_method :interpolated?, :interpolated
+      class << self
+        def to_key name
+          name.gsub(' ', '_').intern
+        end
+      end
     end
   end
 end
