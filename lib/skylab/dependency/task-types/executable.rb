@@ -1,17 +1,18 @@
 require File.expand_path('../../task', __FILE__)
 require 'stringio'
-module Skylab::Face
-  class DependencyGraph
+require 'skylab/face/open2'
+
+module Skylab
+  module Dependency
     class TaskTypes::Executable < Task
-      include Open2
+      include ::Skylab::Face::Open2
       attribute :executable
       def check
-        interpolated? or interpolate! or return false
         if '' == (path = open2("which #{@executable}").strip)
-          @ui.err.puts("#{hi_name}: #{ohno('not in PATH:')} #{@executable}")
+          ui.err.puts("#{me}: #{ohno('not in PATH:')} #{@executable}")
           false
         else
-          @ui.err.puts("#{hi_name}: #{path}")
+          ui.err.puts("#{me}: #{path}")
           true
         end
       end

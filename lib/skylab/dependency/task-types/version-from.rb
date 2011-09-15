@@ -1,9 +1,11 @@
 require File.expand_path('../../task', __FILE__)
 require File.expand_path('../../version-range', __FILE__)
 require 'stringio'
+require 'skylab/face/open2'
 
-module Skylab::Face
-  class DependencyGraph
+
+module Skylab
+  module Dependency
     class TaskTypes::VersionFrom < Task
 
       attribute :version_from
@@ -11,21 +13,22 @@ module Skylab::Face
       attribute :must_be_in_range, :required => false
       attribute :presupposes, :required => false # experimental, must be pushed up if stays
 
-      include Open2
+      include ::Skylab::Face::Open2
 
-      def run
+      def run *a
+        @ui, @req = a
         version, used_regex = parse_version_string
         if used_regex
-          @ui.err.puts "  #{hi('version:')} #{version}"
+          ui.err.puts "  #{hi('version:')} #{version}"
         else
-          @ui.err.puts version.split("\n").map { |s| "  #{hi('version')}: #{s}" }
+          ui.err.puts version.split("\n").map { |s| "  #{hi('version')}: #{s}" }
         end
-        @ui.err.puts "#{hi_name}: #{@version_from}"
+        ui.err.puts "#{me}: #{@version_from}"
       end
 
       def check_presuppositions
         @presupposes or return true
-        @graph.node(@presupposes).check
+        parent_graph.node(@presupposes).check
       end
 
       def check
@@ -33,10 +36,10 @@ module Skylab::Face
         version_range = build_version_range
         version_string = get_version_string
         if version_range.match(version_string)
-          @ui.err.puts("  #{hi 'version ok'}: version #{version_string} is in range #{version_range}")
+          ui.err.puts("  #{hi 'version ok'}: version #{version_string} is in range #{version_range}")
           true
         else
-          @ui.err.puts("  #{ohno 'version mismatch'}: needed #{version_range} had #{version_string}")
+          ui.err.puts("  #{ohno 'version mismatch'}: needed #{version_range} had #{version_string}")
           false
         end
       end
@@ -50,10 +53,10 @@ module Skylab::Face
         if RegexpRegexp =~ str
           regex_body, modifiers = [$1, $2]
           ModifierRe =~ modifiers or
-            fail("bad modifiers #{modifiers.inspect}, need #{ModifierRe.source}")
+            _fail("bad modifiers #{modifiers.inspect}, need #{ModifierRe.source}")
           Regexp.new(regex_body, modifiers)
         else
-          fail("Failed to parse regexp: #{str.inspect}.  Needed #{RegexpRegexp.source}")
+          _fail("Failed to parse regexp: #{str.inspect}.  Needed #{RegexpRegexp.source}")
         end
       end
 
@@ -75,7 +78,7 @@ module Skylab::Face
       end
 
       def build_version_range
-        @must_be_in_range or fail(<<-HERE.gsub(/\n */,' ').strip
+        @must_be_in_range or _fail(<<-HERE.gsub(/\n */,' ').strip
           Do not use "version from" as a target without a "must be in range" assertion.
         HERE
         )

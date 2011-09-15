@@ -1,3 +1,13 @@
+# this file *must* operate standalone, independent of the rest of the system
+# (It is used in reporting of specs.  Avoid cyclic dependencies.)
+
+module Skylab
+  module Face
+    class Cli
+    end
+  end
+end
+
 class Skylab::Face::Cli
   module Tableize
     extend self

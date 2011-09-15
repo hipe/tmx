@@ -1,0 +1,12 @@
+{
+  "external dependencies" : [
+    {
+      "name" : "test1",
+      "target" : "get a file",
+      "get a file" : {
+        "from" : "localhost:1324",
+        "get" : "some-file.txt"
+      }
+    }
+  ]
+}

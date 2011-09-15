@@ -7,6 +7,7 @@ module Skylab::Face
   #
 
   module Open2
+    extend self
     class Handler
       [:out, :err].each do |out|
         define_method(out) { |&b| instance_variable_set("@_#{out}", b) }
@@ -64,6 +65,23 @@ module Skylab::Face
       end
       omnibuffer and omnibuffer.rewind and return omnibuffer.read
       [bytes, Time.now - time]
+    end
+  end
+
+  module Open2
+    class Tee
+      def initialize hash
+        @children = hash
+      end
+      attr_reader :children
+      def [] name
+        @children[name]
+      end
+      %w(write flush).each do |name|
+        define_method(name) do |*a|
+          @children.values.map { |c| c.send(name, *a) }
+        end
+      end
     end
   end
 end
