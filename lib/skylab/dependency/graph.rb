@@ -1,13 +1,28 @@
 skylab_dir = File.expand_path('../../..', __FILE__)
 $:.include?(skylab_dir) or $:.unshift(skylab_dir)
 
+require 'json'
 require File.expand_path('../task', __FILE__)
 
 module Skylab::Dependency
   class List < Array
+    include Skylab::Face::Colors
     def run ui, req
-      # not sure what we want here with this list we have
-      map { |task_or_graph| task_or_graph.run(ui, req) }
+      results = []
+      last_node = last_index = nil
+      begin
+        # not sure what we want here with this list we have
+        each_with_index do |task_or_graph, index|
+          last_index = index
+          last_node = task_or_graph
+          results.push task_or_graph.run(ui, req)
+        end
+      rescue Interrupt => e
+        ui.err.puts("\nReceived INT signal while processing item " <<
+          "#{last_index + 1}/#{size}: #{hi last_node.name}.  Exiting early.  Goodbye!")
+        last_node.undo
+      end
+      results
     end
   end
   class Graph < Task
@@ -40,8 +55,6 @@ module Skylab::Dependency
     def initialize
       # override parent, we want no args
     end
-    attr_reader :ui # override parent, graphs maintain their own ui attribute
-    attr_reader :request # same as above
     def node_data= data
       @nodes = data
     end
@@ -50,7 +63,7 @@ module Skylab::Dependency
     end
     def node name
       @nodes.key?(name) or return failed(
-        "No such node #{name.inspect}. (Have: #{@node.keys.join(', ')})")
+        "No such node #{name.inspect}. (Have: #{@nodes.keys.join(', ')})")
       case (data = @nodes[name])
       when String
         ReferenceResolution.new(self, @nodes, name, data).resolve
@@ -68,6 +81,11 @@ module Skylab::Dependency
     def node? name
       @nodes.key? name
     end
+    def undo
+      node, ret = target_node
+      node or return super
+      node.undo
+    end
   protected
     def failed msg
       ui.err.puts msg
@@ -77,7 +95,7 @@ module Skylab::Dependency
       node, ret = target_node
       node or return ret
       ui.err.puts "#{bold('---> checking:')} #{BLU name}"
-      if ok = node.before_check_or_slake
+      if ok = node.task_init
         if ok = node.check
           node?('version') and node('version').run
         end
@@ -88,17 +106,17 @@ module Skylab::Dependency
       node, ret = target_node
       node or return ret
       ui.err.puts "#{bold('---> installing/checking:')} #{BLU name}"
-      ok = node.before_check_or_slake and ok = node.slake
+      ok = node.task_init and ok = node.slake
       after_run_slake_or_check ok
     end
     def after_run_slake_or_check ok
       if ok
-        @ui.err.puts "#{bold('---> installed:')} #{BLU name}"
+        ui.err.puts "#{bold('---> installed:')} #{BLU name}"
       else
-        @ui.err.puts "#{ohno('---> dependency not met:')} #{BLU name}"
+        ui.err.puts "#{ohno('---> dependency not met:')} #{BLU name}"
       end
       ok
-    end    
+    end
     def target_node
       node = self.node('target') or return [nil, nil]
       if node.disabled?
@@ -106,12 +124,6 @@ module Skylab::Dependency
         return [nil, true]
       end
       [node, nil]
-    end
-    def BLU s
-      style s, :bright, :cyan
-    end
-    def blu s
-      style s, :cyan
     end
   end
   class ReferenceResolution
