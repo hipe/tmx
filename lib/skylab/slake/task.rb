@@ -18,7 +18,6 @@ module Skylab
       attribute :enabled, :required => false
 
       attr_accessor :else
-      alias_method :deps?, :else
       attr_accessor :ui
       def update_attributes data
         data.each do |k, v|
@@ -45,15 +44,21 @@ module Skylab
       def name
         @name || task_type_name
       end
+      def long_name
+        @name ? "#{@name} : #{task_type_name}" : task_type_name
+      end
       def me
         "  #{hi name}" # highlight the name, whatever that means to the Colors module
       end
+      def parent_graph= parent_graph
+        class << self ; self end.send(:define_method, :parent_graph) { parent_graph }
+        @has_parent = true
+        parent_graph
+      end
+      attr_reader :has_parent
+      alias_method :has_parent?, :has_parent
       def request
         parent_graph.request
-      end
-      def slake_else
-        dep = parent_graph.node(@else) or return
-        dep.slake
       end
       def dead_end
         ui.err.puts("#{ohno('dead end:')} Sorry, there are no supporting tasks "<<
@@ -64,10 +69,28 @@ module Skylab
         ui.err.puts("#{me}: #{ohno('failed:')} #{message}")
         false
       end
+      def undo
+        a = b = true
+        if @else
+          dep = parent_graph.node(@else)
+          a = dep.undo
+        end
+        if respond_to?(:_undo)
+          b = _undo
+        end
+        a && b
+      end
+      def _undo
+        ui.err.puts "(No undo defined for #{hi long_name}.)"
+      end
     protected
-      def need_else
-        @else or return _fail("needed @else node!")
-        node = parent_graph.node(@else) or return _fail("node not defined: #{@else.inspect}")
+      def fallback?
+        ! @else.nil?
+      end
+      def fallback
+        @else or return _fail("fallback task needed for #{long_name.inspect} but no \"else\" node provided.")
+        node = parent_graph.node(@else) or return _fail("node referred to but not defined: #{@else.inspect}")
+        node.task_init or return _fail("failed to initialize task.") # wrote to ui hopefully
         node
       end
       def _fail msg # same as class method
