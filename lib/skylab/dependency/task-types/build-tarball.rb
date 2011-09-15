@@ -4,10 +4,16 @@ require 'pathname'
 module Skylab
   module Dependency
     class TaskTypes::BuildTarball < Graph
+
       attribute :build_tarball
-      def initialize_child_graph data
-        data.key?('build tarball') or return failed("missing required key: 'build tarball' in data")
-        pathname = Pathname.new(data['build tarball'])
+
+      def initialize a, b
+        task_initialize a, b # skip up to grandparent!
+      end
+
+      def _task_init
+        @interplated or interpolate! or return false
+        pathname = Pathname.new(build_tarball)
         dirname, basename = [pathname.dirname.to_s, pathname.basename.to_s]
         @nodes = {
           "name" => "build tarball",
@@ -26,7 +32,7 @@ module Skylab
             "get"           => basename
           }
         }
-        self
+        true
       end
     end
   end
