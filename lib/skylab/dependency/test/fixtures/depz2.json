@@ -1,0 +1,39 @@
+{
+  "external dependencies" : [
+    {
+      "name" : "nerpus",
+      "target" : {
+        "version from"     : "gem --version",
+        "must be in range" : "1.5+",
+        "parse with"       : "/^(.+)$/",
+        "presupposes"      : "tha gem executable"
+      },
+      "tha gem executable" : {
+        "executable"       : "gem"
+      }
+    },
+    {
+      "name" : "mginy",
+      "target" : {
+        "move to"         : "{build_dir}/local/{stem}",
+        "from"            : "{build_dir}/{stem}",
+        "else"            : ["unzip", "makedir p"]
+      },
+      "makedir p" : {
+        "mkdir p"         : "{build_dir}/local",
+        "maxdepth"        : 1
+      },
+      "unzip" : {
+        "unzip tarball"   : "{build_dir}/{basename}",
+        "unzips to"       : "{stem}",
+        "else"            : "download"
+      },
+      "download" : {
+        "tarball to"      : "{build_dir}/{basename}",
+        "from"            : "http://localhost:1324",
+        "get"             : "mginy-0.0.1.tar.gz",
+        "stem"            : "mginy"
+      }
+    }
+  ]
+}
