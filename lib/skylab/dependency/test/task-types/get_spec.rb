@@ -10,7 +10,7 @@ module Skylab::Dependency
       end
       FileUtils.mkdir(build_dir, :verbose => true)
       Test::Support::StaticFileServer.start_unless_running
-      graph = Graph.from_file(File.join(Test::Support::FIXTURES_DIR, 'deps1.json'))
+      graph = Graph.from_file(File.join(Test::Support::FIXTURES_DIR, 'depz1.json'))
       ui1 = Test::Support::UiTee.new
       ui2 = Test::Support::UiTee.new
       graph.run(ui1, { :build_dir => build_dir })
