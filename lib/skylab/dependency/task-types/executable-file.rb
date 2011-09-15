@@ -7,8 +7,8 @@ module Skylab
       def slake
         if File.exist?(@executable_file)
           execute
-        elsif deps?
-          slake_else and execute
+        elsif fallback?
+          fallback.slake and execute
         else
           dead_end
         end

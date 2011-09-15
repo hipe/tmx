@@ -9,7 +9,7 @@ module Skylab
       attribute :unzip_tarball
       attribute :unzips_to, :required => false
       def slake
-        slake_else or return false
+        fallback.slake or return false
         check and return true
         execute
       end
@@ -51,11 +51,7 @@ module Skylab
         false
       end
       def interpolate_stem
-        need_else.interpolate_stem
-      end
-      def before_slake_or_check
-        _defaults!
-        interpolated? or interpolate! or return false
+        fallback.interpolate_stem
       end
       def _defaults!
         @did_defaults and return

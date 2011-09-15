@@ -8,13 +8,13 @@ module Skylab
       def slake
         stay, success = execute
         stay or return success
-        deps? or return dead_end
-        slake_else or return false
+        fallback? or return dead_end
+        fallback.slake or return false
         _, success = execute
         success
       end
       def interpolate_stem
-        need_else.interpolate_stem
+        fallback.interpolate_stem
       end
       def check
         lstat = File.lstat(symlink) rescue Errno::ENOENT

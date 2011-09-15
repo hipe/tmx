@@ -13,7 +13,7 @@ module Skylab
       attribute :configure_make_make_install
       attribute :prefix
       def slake
-        slake_else or return false
+        fallback.slake or return false
         execute false
       end
       def check
