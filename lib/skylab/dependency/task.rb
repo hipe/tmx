@@ -14,6 +14,7 @@ module Skylab::Dependency
       'get',
       'executable',
       'executable file',
+      'mkdir p',
       'move to',
       'symlink',
       'tarball to',
@@ -72,8 +73,16 @@ module Skylab::Dependency
       @task_init_ok
     end
     def _task_init
-      _defaults!
+      defaults!
       interpolated? or interpolate! or false
+    end
+    def defaults!
+      ret = @did_defaults
+      @did_defaults ||= begin
+        _defaults!
+        true
+      end
+      ret ? nil : true
     end
     def _defaults!
     end

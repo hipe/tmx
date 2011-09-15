@@ -10,20 +10,22 @@ module Skylab
       attribute :unzips_to, :required => false
       def slake
         fallback.slake or return false
-        check and return true
+        check(false) and return true
         execute
       end
-      def check
+      def check verbose = true
         if File.directory?(expected_unzipped_dir_path)
-          ui.err.puts("#{me}: ok: is directory: #{expected_unzipped_dir_path}")
+          ui.err.puts("#{me}: ok: is directory: #{pretty_path expected_unzipped_dir_path}")
           true
+        else
+          verbose and ui.err.puts("#{me}: expected unzipped dir path not found: #{pretty_path expected_unzipped_dir_path}")
         end
       end
       def check_size path
         if 0 < File.stat(path).size
           true
         else
-          ui.err.puts("#{me}: cannot unzip, file is zero size: #{path}")
+          ui.err.puts("#{me}: cannot unzip, file is zero size: #{pretty_path path}")
           false
         end
       end
@@ -36,11 +38,12 @@ module Skylab
       end
       def execute
         unless File.exist?(@unzip_tarball)
-          ui.err.puts("#{me}: #{ohno('error:')} tarball not found: #{@unzip_tarball}")
+          ui.err.puts("#{me}: #{ohno('error:')} tarball not found: #{pretty_path @unzip_tarball}")
           return false
         end
         check_size(@unzip_tarball) or return
         cmd = "cd #{escape_path build_dir}; tar -xzvf #{escape_path File.basename(@unzip_tarball)}"
+        ui.err.puts("#{me}: #{cmd}")
         bytes, seconds = open2(cmd) do |on|
           on.out { |s| ui.err.write("#{me}: (out): #{s}") }
           on.err { |s| ui.err.write(s) }
@@ -54,11 +57,9 @@ module Skylab
         fallback.interpolate_stem
       end
       def _defaults!
-        @did_defaults and return
         if true == @unzip_tarball
           @unzip_tarball = '{build_dir}/{basename}'
         end
-        @did_defaults = true
       end
     end
   end
