@@ -4,7 +4,8 @@ require File.expand_path('../attribute-definer', __FILE__)
 
 module Skylab
   module Slake
-    class SpecificationError < ::RuntimeError; end
+    class RuntimeError < ::RuntimeError; end
+    class SpecificationError < RuntimeError; end
     class Task
       include Face::Colors
       include Interpolation
@@ -89,12 +90,36 @@ module Skylab
       end
       def fallback
         @else or return _fail("fallback task needed for #{long_name.inspect} but no \"else\" node provided.")
-        node = parent_graph.node(@else) or return _fail("node referred to but not defined: #{@else.inspect}")
-        node.task_init or return _fail("failed to initialize task.") # wrote to ui hopefully
-        node
+        deps = (@else.kind_of?(Array) ? @else : [@else]).map do |node_name|
+          node = parent_graph.node(node_name) or _fail("node referred to but not defined: #{node_name.inspect}")
+          node.task_init or _fail("failed to initialize task.")
+          node
+        end
+        deps.size == 1 ? deps.first : Aggregate.new(deps)
       end
-      def _fail msg # same as class method
+      def _fail msg # this must throw!
         raise SpecificationError.new(msg)
+      end
+    end
+    class Aggregate < Array
+      def initialize arr
+        did = {}
+        sing = class << self; self end
+        arr.each_with_index do |x, i|
+          push x
+          x.interpolated_via_methods.each do |intern|
+            did[intern] ||= begin
+              sing.send(:define_method, "interpolate_#{intern}") { x.send("interpolate_#{intern}") }
+              true
+            end
+          end
+        end
+      end
+      def slake
+        ! map(&:slake).index { |v| ! v }
+      end
+      def check
+        ! map(&:check).index { |v| ! v }
       end
     end
   end
