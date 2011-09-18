@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+#
+#
+#
+require 'fileutils'
+
+done = File.read('./done.list').split("\n")
+
+puts "Done: #{done.inspect}"
+
+list = File.read('./list.list').split("\n");
+
+these = list - done;
+
+def do_this name
+  md = /\A(.+)\.git\z/.match(name)
+  md or return puts "# what happened here? #{name}"
+  stem = md[1]
+  FileUtils.cd(name, :verbose => true) do
+    cmd = "git push git@botnoise.org:#{name} master"
+    puts cmd
+  end
+  `echo "#{name}" >> done.list`
+end
+
+these.each { |this| do_this this }
+
+puts '# done.'
+
