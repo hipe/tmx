@@ -1,29 +1,41 @@
 #!/usr/bin/env ruby
 #
-#
-#
+
 require 'fileutils'
+require 'optparse'
 
-done = File.read('./done.list').split("\n")
-
-puts "Done: #{done.inspect}"
-
-list = File.read('./list.list').split("\n");
-
-these = list - done;
-
-def do_this name
-  md = /\A(.+)\.git\z/.match(name)
-  md or return puts "# what happened here? #{name}"
-  stem = md[1]
-  FileUtils.cd(name, :verbose => true) do
-    cmd = "git push git@botnoise.org:#{name} master"
-    puts cmd
+module GitRepoAdmin
+  module Push
+    class Cli
+      def run argv
+        argv = argv.dup
+        req = {}
+        ui = Struct.new(:out, :err).new($stdout, $stderr)
+        op = OptionParser.new do |o|
+          o.banner = "usage: #{File.basename $PROGRAM_NAME}"
+          o.on('-n', '--dry-run', 'Dry run.') { req[:dry_run] = true }
+        end
+        begin
+          op.parse!(argv)
+        rescue OptionParser::ParseError => e
+          ui.err.puts "#{e}"
+          ui.err.puts "#{op}"
+          return false
+        end
+        Api.new(ui, req).run
+      end
+    end
+    class Api
+      def initialize *a
+        @ui, @req = a
+      end
+      attr_reader :req, :ui
+      def run
+        ui.err.puts "ok sure"
+      end
+    end
   end
-  `echo "#{name}" >> done.list`
 end
 
-these.each { |this| do_this this }
-
-puts '# done.'
+GitRepoAdmin::Push::Cli.new.run(ARGV)
 
