@@ -3,20 +3,24 @@
 
 require 'fileutils'
 require 'optparse'
+require 'json'
+require 'ruby-debug'
 
-module GitRepoAdmin
+module TmxGit
+  DefaultUi = Struct.new(:out, :err).new($stdout, $stderr)
   module Push
     class Cli
       def run argv
         argv = argv.dup
         req = {}
-        ui = Struct.new(:out, :err).new($stdout, $stderr)
+        ui = DefaultUi
         op = OptionParser.new do |o|
           o.banner = "usage: #{File.basename $PROGRAM_NAME}"
           o.on('-n', '--dry-run', 'Dry run.') { req[:dry_run] = true }
         end
         begin
           op.parse!(argv)
+          req[:paths] = argv.empty? ? ['.'] : argv
         rescue OptionParser::ParseError => e
           ui.err.puts "#{e}"
           ui.err.puts "#{op}"
@@ -31,11 +35,190 @@ module GitRepoAdmin
       end
       attr_reader :req, :ui
       def run
-        ui.err.puts "ok sure"
+        init_manifest or return false
+        @manifest.repositories.each do |repo|
+          repo.journal do
+            increment_some_count
+          end
+        end
+      end
+    protected
+      def init_manifest
+        dir = @req[:paths].first
+        File.directory?(dir) or dir = File.dirname(dir)
+        File.directory?(dir) or return _err("not a directory, can't make manifest: #{dir}")
+        ok = nil
+        begin
+          @manifest =
+          if File.exist?(p = File.join(dir, Manifest::BASENAME))
+            Manifest.reconstitute p
+          else
+            Manifest.create p, ui
+          end
+          @manifest.ui = ui
+          ok = true
+        rescue Manifest::RuntimeError => e
+          _err e
+          ok = false
+        end
+        ok
+      end
+      def _err msg
+        ui.err.puts "#{msg}"
+        false
+      end
+    end
+    class Manifest
+      BASENAME = 'manifest.json.list'
+      class RuntimeError < ::RuntimeError; end
+      class << self
+        def reconstitute path
+          man = new
+          man.path = path
+          man.repos_dir = File.dirname(path)
+          repositories = []
+          File.open(path, 'r') do |fh|
+            while line = fh.gets
+              repo = Repo.new(:manifest => man)
+              repo.update_attributes JSON.parse(line)
+              repositories.push repo
+            end
+          end
+          man.repositories = repositories
+          man
+        end
+        def create path, ui
+          man = new
+          man.ui = ui # ick
+          man.path = path
+          man.repos_dir = File.dirname(path)
+          man.init
+          man
+        end
+      end
+      attr_accessor :path
+      attr_accessor :records
+      attr_accessor :repositories
+      attr_accessor :repos_dir
+      attr_accessor :ui
+      def init
+        repositories = Dir[File.join(repos_dir, '*.git')]
+        repositories.empty? and _fail("No repositories ending in '*.git' found in #{repos_dir}!")
+        self.repositories = repositories.map { |path| Repo.new(:path => path, :manifest => self) }
+        write_new_file
+        nil
+      end
+      def update id, json_string
+        json_string.include?("\n") and
+          _fail("Fow now this ghetto format can't take newlines in json strings: #{json_string}")
+        str = "{\"id\":#{id.to_json}"
+        finder = /\A#{Regexp.escape(str)}/
+        first_half_lines = []
+        second_half_lines = []
+        File.open(path, 'r') do |fh|
+          while line = fh.gets and finder !~ line do
+            first_half_lines.push line.strip
+          end
+          finder !~ line and _fail("line not found with regex: #{finder}")
+          while line = fh.gets do
+            second_half_lines.push line.strip
+          end
+        end
+        all_lines = first_half_lines + [json_string] + second_half_lines
+        all_content = all_lines.join("\n")
+        ret = nil
+        File.open(path, 'w') { |fh| ret = fh.write(all_content) }
+        ui.err.puts "updated manifest for #{id}"
+        ret
+      end
+      def write_new_file
+        if File.exist?(path)
+          _fail("won't clobber existing file: #{path}")
+        end
+        lines = []
+        safety_check = {}
+        repositories.each do |repo|
+          if safety_check.key?(repo.id)
+            _fail("multiple keys found: #{repo.id}")
+          else
+            safety_check[repo.id] = true
+          end
+          lines.push repo.to_json
+        end
+        bytes = 0
+        File.open(path, 'w') do |fh|
+          lines.each do |line|
+            bytes += line.size
+            fh.puts line
+          end
+        end
+        ui.err.puts "Wrote #{path} (#{bytes} bytes)"
+        true
+      end
+      def _fail msg
+        raise self.class::RuntimeError.new(msg)
+      end
+    end
+    class Repo
+      ATTRS = {:path => { :stored => false }, :id => {:stored => true }, :count => { :stored => true } }
+      def initialize hash
+        update_attributes hash
+      end
+      attr_reader :path
+      attr_reader :id
+      def update_attributes hash
+        hash = hash.dup
+        manifest = hash.delete(:manifest)
+        manifest and self.manifest = manifest
+        hash.each do |k, v|
+          ATTRS.key?(k.intern) or _fail("invalid attribute name: #{k.inspect}")
+          send("#{k}=", v)
+        end
+      end
+      def path= path
+        @id = File.basename(path)
+        @path = path
+      end
+      def id= id
+        if manifest?
+          @path = File.join(manifest.repos_dir, id)
+        end
+        @id = id
+      end
+      def to_json
+        hash = {}
+        ATTRS.each do |k, v|
+          v[:stored] or next
+          unless (v = self.send(k)).nil?
+            hash[k] = v
+          end
+        end
+        hash.to_json
+      end
+      def increment_some_count
+        @count ||= 0
+        @count += 1
+      end
+      attr_accessor :count
+
+      def journal &block
+        manifest? or _fail("cannot journal a block without a manifest defined.")
+        instance_eval(&block)
+        manifest.update id, to_json
+      end
+      def manifest= manifest
+        class << self; self end.send(:define_method, :manifest) { manifest }
+        manifest
+      end
+      def manifest?
+        respond_to?(:manifest)
+      end
+      def _fail msg
+        raise Manifest::RuntimeError.new(msg)
       end
     end
   end
 end
 
-GitRepoAdmin::Push::Cli.new.run(ARGV)
+TmxGit::Push::Cli.new.run(ARGV)
 
