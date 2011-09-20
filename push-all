@@ -107,6 +107,10 @@ module TmxGit
         ui = DefaultUi
         op = OptionParser.new do |o|
           o.banner = "usage: #{File.basename $PROGRAM_NAME}"
+          o.on('-f', '--failed', 'Only try ones that failed before (implies --retry).') do
+            req[:failed] = true; req[:retry] = true
+          end
+          o.on('--retry', 'Retry ones that failed.') { req[:retry] = true }
           o.on('-n', '--dry-run', 'Dry run.') { req[:dry_run] = true }
           o.on('-H', '--host URL', "Remote git server to push to (e.g. \"git@mysite.org\") (required!)") do |x|
             req[:host] = x
@@ -389,7 +393,8 @@ module TmxGit
         resp = { :push => false }
         if skip
           _info "Skipping (\"skip\":true)."
-          resp[:push] = false
+        elsif req[:failed] && last_push_attempt_succeeded
+          _info "Skipping (last attempt succeeded)."
         elsif last_push_attempt_at.nil?
           _info "No record of ever having pushed, pushing."
           resp[:push] = true
