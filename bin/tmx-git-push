@@ -7,8 +7,6 @@ require 'json'
 require 'open3'
 require 'stringio'
 require 'time'
-require 'ruby-debug'
-
 
 module TmxGit
   PUSH_THRESHOLD_SECONDS = 24 * 60 * 60
@@ -35,23 +33,24 @@ module TmxGit
     class << self
       def natural seconds
         sec_i = seconds.to_i
-        use = any = nil
+        unit = any = nil
         UNITS.each do |u|
           if 0 < (any = sec_i / PER[u])
-            use = u
+            unit = u
             break
           end
         end
-        use or return "#{seconds} seconds"
-        ss = ["#{any} #{use}#{s any}"]
-        if use != UNITS.last
-          _rem = sec_i % PER[use]
-          _use = UNITS[UNITS.index(use) + 1]
-          if 0 < (_any = _rem / PER[_use])
-            ss.push "#{_any} #{_use}#{s _any}"
-          end
+        unit or return "#{seconds} seconds"
+        ss = ["#{any} #{unit}#{s any}"]
+        about = nil
+        if unit != UNITS.last
+          _unit = UNITS[UNITS.index(unit) + 1]
+          _rem = sec_i % PER[unit]
+          _any = _rem / PER[_unit]
+          _rem % PER[_unit] > 0 and about = "about "
+          _any > 0 and ss.push "#{_any} #{_unit}#{s _any}"
         end
-        "about #{ss.join(' ')}"
+        "#{about}#{ss.join(' ')}"
       end
       def s int
         1 == int ? '' : 's'
@@ -60,20 +59,17 @@ module TmxGit
   end
   module Open2
     def open2 cmd, opts = {}
-      newline_replace = nil
+      filter = prefix = nil
       if opts[:prefix]
-
-
-      end
-
-      newline_search = newline_replace = nil
-      if opts[:prefix]
-        newline_search = /\n(?=.)/ # a newline that isn't at the end
-        newline_replace = "\n#{opts[:prefix]}"
+        prefix = opts[:prefix]
+        filter = lambda do |str|
+          str.gsub!(/(?<=\n)(?=.)/, prefix) # newlines followed by something, put it in between
+        end
+        newline_replace = opts[:prefix]
       end
       streams = {
-        :out => { :buffer => StringIO.new, :stream => ui.out, :touched => false},
-        :err => { :buffer => StringIO.new, :stream => ui.err, :touched => false}
+        :out => { :buffer => StringIO.new, :stream => ui.out, :trailing => false, :during => false },
+        :err => { :buffer => StringIO.new, :stream => ui.err, :trailing => false, :during => false }
       }
       Open3.popen3(cmd) do |sin, sout, serr|
         streams[:out][:in] = sout
@@ -87,12 +83,13 @@ module TmxGit
               begin
                 str = o[:in].readpartial(4096)
                 o[:in].closed? and closed = true
-                o[:touched] ||= begin
-                  newline_search and o[:stream].write(newline_replace[1..-1]) # omg sorry
-                  true
-                end
                 if str && ! str.empty?
-                  use_string = newline_search ? str.gsub(newline_search, newline_replace) : str
+                  use_string = filter ? filter[str] : str
+                  if prefix
+                    o[:during] ||= (o[:trailing] = true) # output prefix at beginning of output always
+                    o[:trailing] and use_string = "#{prefix}#{use_string}"
+                    o[:trailing] = /\n\z/ =~ str # careful
+                  end
                   o[:stream].write(use_string)
                   o[:buffer].write(str)
                 end
@@ -144,12 +141,17 @@ module TmxGit
           o.on('-f', '--failed', 'Only try ones that failed before (implies --retry).') do
             req[:failed] = true; req[:retry] = true
           end
-          o.on('--retry', 'Retry ones that failed.') { req[:retry] = true }
+          o.on('-r', '--retry', 'Retry ones that failed before.') { req[:retry] = true }
           o.on('-n', '--dry-run', 'Dry run.') { req[:dry_run] = true }
           o.on('-H', '--host URL', "Remote git server to push to (e.g. \"git@mysite.org\") (required!)") do |x|
             req[:host] = x
           end
-          o.on('--update', 'Update manifest with any new repository folders found.') { req[:update] = true }
+          req[:push_threshold_seconds] = PUSH_THRESHOLD_SECONDS
+          o.on('-t', '--threshold <SECONDS>',
+            "How long do we wait after a successful push to try and push again?",
+            "(default: #{TimeHelper.natural req[:push_threshold_seconds]})"
+          )
+          o.on('-u', '--update', 'Update manifest with any new repository folders found.') { req[:update] = true }
           o.on('--prune-attr ATTR', '(internal use!)') do |v|
             req[:_prune] ||= []
             req[:_prune].push v
@@ -191,8 +193,8 @@ module TmxGit
           ui.err.puts "#{hi repo.id} (#{cnt}/#{reps.length}):"
           repo.push
         end
-        _info "looked at or pushed #{cnt} repos."
         _show_summary
+        _info "Done looking at or pushing #{cnt} repos."
         true
       end
     protected
@@ -295,8 +297,8 @@ module TmxGit
         have = find_repository_directories
         new = have - had
         old = had - have
-        new.empty? and _info("no new repositories to add to the manifest.")
-        old.any? and _warn("repos in manifest are not found on disk: (#{old.join(', ')})")
+        new.empty? and _info("found no new repositories to add.")
+        old.any? and _warn("has repos that were not found on disk: (#{old.join(', ')})")
         if new.any?
           _info("#{yelo 'adding:'} (#{new.join(', ')}) to manifest.")
           repositories.concat new.map { |p| Repo.new(:path => p, :manifest => self) }
@@ -440,7 +442,7 @@ module TmxGit
           elsif req && req[:_prune] && req[:_prune].include?(k.to_s)
             pruned.push k
           else
-            _fail("invalid attribute name: #{k.inspect} (you could --prune-attr it if you are careful!)")
+            _fail("invalid name: #{k.inspect} (you could --prune-attr it if you are careful!)")
           end
         end
         if pruned.any?
@@ -490,7 +492,7 @@ module TmxGit
         elsif last_push_attempt_at.nil?
           _info "No record of ever having pushed, pushing."
           resp[:push] = true
-        elsif (t = Time.now - last_push_attempt_at) > PUSH_THRESHOLD_SECONDS
+        elsif (t = Time.now - last_push_attempt_at) > push_threshold_seconds
           _info "Pushed #{_time t} ago.  Pushing again."
           resp[:push] = true
         elsif last_push_attempt_succeeded
@@ -503,6 +505,9 @@ module TmxGit
         end
         resp[:push] and _push
         resp
+      end
+      def push_threshold_seconds
+        req[:push_threshold_seconds] || PUSH_THRESHOLD_SECONDS
       end
       def _push
         (host = req[:host]) or _invalid("can't push without a host")
@@ -524,12 +529,12 @@ module TmxGit
             _report(:out => out, :err => err, :cmd => cmd)
             journal
           elsif 0 == err.index(url)
-            debugger; 1==1
             self.last_push_attempt_succeeded = true
+            manifest.report(path, :successfully_pushed)
             journal
           elsif 0 == err.index("Everything up-to-date")
-            debugger; 1==1
             self.last_push_attempt_succeeded = true
+            manifest.report(path, :everything_up_to_date)
             journal
           else
             _report(:out => out, :err => err, :cmd => cmd) or
@@ -546,14 +551,14 @@ module TmxGit
           when /non-fast-forward updates were rejected/
             manifest.report(path, :non_fast_forward_updates_were_rejected)
           else
-            debugger
+            manifest.report(path, :unknown_issue) # @todo
           end
-        elsif ! (out.nil? || out.empty?)
+        elsif ! (err.nil? || err.empty?)
           case err
           when /^W access for [^ ]+ DENIED/
             manifest.report(path, :write_access_denied)
           else
-            debugger
+            manifest.report(path, :unknown_issue) # @todo
           end
         end
       end
