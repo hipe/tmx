@@ -149,6 +149,7 @@ module TmxGit
           o.on('-H', '--host URL', "Remote git server to push to (e.g. \"git@mysite.org\") (required!)") do |x|
             req[:host] = x
           end
+          o.on('--update', 'Update manifest with any new repository folders found.') { req[:update] = true }
           o.on('--prune-attr ATTR', '(internal use!)') do |v|
             req[:_prune] ||= []
             req[:_prune].push v
@@ -203,7 +204,9 @@ module TmxGit
         begin
           @manifest =
           if File.exist?(p = File.join(dir, Manifest::BASENAME))
-            Manifest.reconstitute p, ui, @req
+            m = Manifest.reconstitute p, ui, @req
+            @req[:update] and m.update
+            m
           else
             Manifest.create p, ui, @req
           end
@@ -215,6 +218,7 @@ module TmxGit
         ok
       end
       def _show_summary
+        sync_report_data = @manifest.sync_report_data
         ks = sync_report_data.keys.map(&:to_s).sort.map(&:to_sym)
         ks.each do |k|
           _info "#{k.to_s.gsub('_', ' ')}: (#{sync_report_data[k].join(', ')})"
@@ -242,6 +246,7 @@ module TmxGit
     end
     class Manifest
       include SyncReport
+      include Colors
       BASENAME = 'manifest.json.list'
       class RuntimeError < ::RuntimeError; end
       class << self
@@ -278,13 +283,33 @@ module TmxGit
       attr_accessor :req
       attr_accessor :ui
       def _create
-        repositories = Dir[File.join(repos_dir, '*.git')]
-        repositories.concat find_non_bare_repository_directories
+        repositories = find_repository_directories
         repositories.sort!
         repositories.empty? and _fail("No repositories ending in '*.git' found in #{repos_dir}!")
         self.repositories = repositories.map { |path| Repo.new(:path => path, :manifest => self) }
         write_new_file
         nil
+      end
+      def update
+        had = repositories.map(&:path)
+        have = find_repository_directories
+        new = have - had
+        old = had - have
+        new.empty? and _info("no new repositories to add to the manifest.")
+        old.any? and _warn("repos in manifest are not found on disk: (#{old.join(', ')})")
+        if new.any?
+          _info("#{yelo 'adding:'} (#{new.join(', ')}) to manifest.")
+          repositories.concat new.map { |p| Repo.new(:path => p, :manifest => self) }
+          repositories.sort_by!(&:path)
+          write_new_file true
+        end
+        [old.size, new.size]
+      end
+      def find_repository_directories
+        find_bare_repository_directories + find_non_bare_repository_directories
+      end
+      def find_bare_repository_directories
+        Dir[File.join(repos_dir, '*.git')]
       end
       def find_non_bare_repository_directories
         Dir[File.join(repos_dir, '*')].select do |path|
@@ -295,7 +320,7 @@ module TmxGit
         @repos_dir ||= File.dirname(path)
         @path = path
       end
-      def update id, json_string
+      def update_record id, json_string
         json_string.include?("\n") and
           _fail("Fow now this ghetto format can't take newlines in json strings: #{json_string}")
         str = "\"id\":#{id.to_json}"
@@ -347,8 +372,8 @@ module TmxGit
       def _derp h, ks
         ks.map{ |k| "#{k.inspect} : #{h[k].inspect}" }.join(', ')
       end
-      def write_new_file
-        if File.exist?(path)
+      def write_new_file clobber=false
+        if File.exist?(path) and ! clobber
           _fail("won't clobber existing file: #{path}")
         end
         lines = []
@@ -362,7 +387,7 @@ module TmxGit
           lines.push repo.to_json
         end
         bytes = 0
-        File.open(path, 'w') do |fh|
+        File.open(path, clobber ? 'w+' : 'w') do |fh|
           lines.each do |line|
             bytes += line.size
             fh.puts line
@@ -374,8 +399,14 @@ module TmxGit
       def _fail msg
         raise self.class::RuntimeError.new(msg)
       end
+      def _warn msg
+        ui.err.puts "#{prefix}#{yelo 'warning:'} #{msg}"
+      end
       def _info msg
-        ui.err.puts "manifest #{msg}"
+        ui.err.puts "#{prefix}#{msg}"
+      end
+      def prefix
+        'manifest '
       end
     end
     class Repo
@@ -537,6 +568,7 @@ module TmxGit
         if list.empty?
           _notice 'No branches! Skipping.'
           manifest.report(path, :no_branches)
+          false
         else
           _notice "Please indicate branch to sync among: (#{list.join(', ')}).  Skipping."
         end
@@ -554,7 +586,7 @@ module TmxGit
       def journal &block
         manifest? or _fail("cannot journal a block without a manifest defined.")
         block and instance_eval(&block)
-        manifest.update id, to_json
+        manifest.update_record id, to_json
       end
       def manifest= manifest
         class << self; self end.send(:define_method, :manifest) { manifest }
