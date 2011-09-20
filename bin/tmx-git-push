@@ -59,10 +59,21 @@ module TmxGit
     end
   end
   module Open2
-    def open2 cmd
+    def open2 cmd, opts = {}
+      newline_replace = nil
+      if opts[:prefix]
+
+
+      end
+
+      newline_search = newline_replace = nil
+      if opts[:prefix]
+        newline_search = /\n(?=.)/ # a newline that isn't at the end
+        newline_replace = "\n#{opts[:prefix]}"
+      end
       streams = {
-        :out => { :buffer => StringIO.new, :stream => ui.out },
-        :err => { :buffer => StringIO.new, :stream => ui.err }
+        :out => { :buffer => StringIO.new, :stream => ui.out, :touched => false},
+        :err => { :buffer => StringIO.new, :stream => ui.err, :touched => false}
       }
       Open3.popen3(cmd) do |sin, sout, serr|
         streams[:out][:in] = sout
@@ -76,8 +87,15 @@ module TmxGit
               begin
                 str = o[:in].readpartial(4096)
                 o[:in].closed? and closed = true
-                o[:stream].write(str)
-                o[:buffer].write(str)
+                o[:touched] ||= begin
+                  newline_search and o[:stream].write(newline_replace[1..-1]) # omg sorry
+                  true
+                end
+                if str && ! str.empty?
+                  use_string = newline_search ? str.gsub(newline_search, newline_replace) : str
+                  o[:stream].write(use_string)
+                  o[:buffer].write(str)
+                end
               rescue EOFError => e
                 closed = true
               end
@@ -101,12 +119,28 @@ module TmxGit
   module Push
     class InvalidRequestError < RuntimeError; end
     class Cli
+      include Colors
+      attr_reader :ui
+      def program_name
+        File.basename $PROGRAM_NAME
+      end
+      def usage_line
+        "#{hi 'usage:'} #{program_name} [opts] [<repo-dir> [<repo-dir> [..]]]"
+      end
+      def invite_line
+        "Try #{hi "#{program_name} -h"} for help."
+      end
       def run argv
         argv = argv.dup
         req = {}
-        ui = DefaultUi
+        @ui = ui = DefaultUi
         op = OptionParser.new do |o|
-          o.banner = "usage: #{File.basename $PROGRAM_NAME}"
+          o.banner = <<-HERE.gsub(/^  */,'')
+            #{hi 'description:'} Pushes many git repos at once (possibly for use in replication).
+            #{usage_line}
+            #{hi 'options:'}
+          HERE
+          o.on('-h', '--help', 'This screen.') { ui.err.puts(o.to_s); exit(0) }
           o.on('-f', '--failed', 'Only try ones that failed before (implies --retry).') do
             req[:failed] = true; req[:retry] = true
           end
@@ -124,18 +158,20 @@ module TmxGit
           op.parse!(argv)
           req[:paths] = argv.empty? ? ['.'] : argv
         rescue OptionParser::ParseError => e
-          ui.err.puts "#{e}"
-          ui.err.puts "#{op}"
-          return false
+          return invite_help(e)
         end
         begin
           Api.new(ui, req).push
         rescue InvalidRequestError => e
-          ui.err.puts "#{e}"
-          ui.err.puts "#{op}"
-          return false
+          return invite_help(e)
         end
         true
+      end
+      def invite_help e
+        ui.err.puts e.to_s
+        ui.err.puts usage_line
+        ui.err.puts invite_line
+        false
       end
     end
     class Api
@@ -155,6 +191,8 @@ module TmxGit
           repo.push
         end
         _info "looked at or pushed #{cnt} repos."
+        _show_summary
+        true
       end
     protected
       def init_manifest
@@ -176,6 +214,12 @@ module TmxGit
         end
         ok
       end
+      def _show_summary
+        ks = sync_report_data.keys.map(&:to_s).sort.map(&:to_sym)
+        ks.each do |k|
+          _info "#{k.to_s.gsub('_', ' ')}: (#{sync_report_data[k].join(', ')})"
+        end
+      end
       def _err msg
         ui.err.puts "#{me}: #{ohno('error:')} #{msg}"
         false
@@ -187,7 +231,17 @@ module TmxGit
         'git push'
       end
     end
+    module SyncReport
+      def report path, status_symbol
+        sync_report_data[status_symbol].push path
+        true
+      end
+      def sync_report_data
+        @sync_report_data ||= Hash.new { |h, k| h[k] = [] }
+      end
+    end
     class Manifest
+      include SyncReport
       BASENAME = 'manifest.json.list'
       class RuntimeError < ::RuntimeError; end
       class << self
@@ -225,10 +279,17 @@ module TmxGit
       attr_accessor :ui
       def _create
         repositories = Dir[File.join(repos_dir, '*.git')]
+        repositories.concat find_non_bare_repository_directories
+        repositories.sort!
         repositories.empty? and _fail("No repositories ending in '*.git' found in #{repos_dir}!")
         self.repositories = repositories.map { |path| Repo.new(:path => path, :manifest => self) }
         write_new_file
         nil
+      end
+      def find_non_bare_repository_directories
+        Dir[File.join(repos_dir, '*')].select do |path|
+          File.directory?(File.join(path, '.git'))
+        end
       end
       def path= path
         @repos_dir ||= File.dirname(path)
@@ -425,19 +486,43 @@ module TmxGit
           _info "(dry run, skipped)"
           # journal
         else
-          out, err = open2(cmd)
+          out, err = open2(cmd, :prefix => '  > ')
           self.last_push_attempt_at = Time.now
           if "" != out
+            self.last_push_attempt_succeeded = false
+            _report(:out => out, :err => err, :cmd => cmd)
+            journal
+          elsif 0 == err.index(url)
             debugger; 1==1
-          end
-          if 0 == err.index(url)
             self.last_push_attempt_succeeded = true
             journal
           elsif 0 == err.index("Everything up-to-date")
+            debugger; 1==1
             self.last_push_attempt_succeeded = true
             journal
           else
+            _report(:out => out, :err => err, :cmd => cmd) or
+              _notice("Don't know what to do about the above.  Skipping.")
             self.last_push_attempt_succeeded = false
+            # do not journal (save) it for now, easier for development
+          end
+        end
+      end
+      def _report info
+        out = info[:out] ; err = info[:err]
+        if ! (out.nil? || out.empty?)
+          case out
+          when /non-fast-forward updates were rejected/
+            manifest.report(path, :non_fast_forward_updates_were_rejected)
+          else
+            debugger
+          end
+        elsif ! (out.nil? || out.empty?)
+          case err
+          when /^W access for [^ ]+ DENIED/
+            manifest.report(path, :write_access_denied)
+          else
+            debugger
           end
         end
       end
@@ -446,16 +531,19 @@ module TmxGit
         req[:branch] and return [req[:branch]]
         @branches.kind_of?(Array) and return @branches
         list = `cd #{path} ; git branch`.strip.split("\n")
-        list.map! { |s| s.gsub(/^\* /, '') }
+        list.map! { |s| s.strip.gsub(/^\* /, '') }
         '*' == @branches and return list
         MASTER == list and return list
         if list.empty?
-          _info "#{yelo 'notice'}: No branches!  Skipping."
-          false
+          _notice 'No branches! Skipping.'
+          manifest.report(path, :no_branches)
         else
-          _info "#{yelo 'notice'}: please indicate branch to sync among: (#{list.join(', ')}).  Skipping."
-          false
+          _notice "Please indicate branch to sync among: (#{list.join(', ')}).  Skipping."
         end
+      end
+      def _notice msg
+        _info "#{yelo 'notice'}: #{msg}"
+        false
       end
       def _info msg
         ui.err.puts "  #{ARROW_GLYPH}#{msg}"
