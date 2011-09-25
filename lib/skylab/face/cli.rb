@@ -1,5 +1,4 @@
 require 'optparse'
-require 'ruby-debug'
 
 # an ultralight command-line parser (417 lines)
 # that wraps around OptParse (can do anything it does)
@@ -164,6 +163,7 @@ module Skylab::Face
         #   option_definitions.reject! { |a,_| '-h' == a.first }
       end
       def namespace name, *aliases, &block
+        name.nil? and raise ArgumentError.new("First argument must be a namespace name symbol or or a definition array.")
         def_block = name.kind_of?(Array) ? name : [Namespace, [name, *aliases], block]
         command_definitions.push Namespace.add_definition(def_block)
       end
@@ -301,7 +301,7 @@ module Skylab::Face
         interface.namespace_name
       end
       alias_method :inspect, :name
-      @definitions ||= []
+      @num_built_definitions = (@definitions ||= []).length
       class << self
         def add_definition arr
           @definitions.push arr
@@ -337,9 +337,9 @@ module Skylab::Face
         end
         attr_reader :namespace_name
         def namespaces
-          @definitions.each_with_index do |defn, idx|
+          (@num_built_definitions < @definitions.length) and @definitions.each_with_index do |defn, idx|
             defn.kind_of?(Class) or @definitions[idx] = defn[0].build(*defn[1], &defn[2])
-          end
+          end and @num_built_definitions = @definitions.length
           @definitions
         end
         def parent= parent
@@ -415,3 +415,4 @@ class Skylab::Face::Cli
     end
   end
 end
+
