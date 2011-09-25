@@ -19,7 +19,9 @@ module Skylab::Tmx
     Dir["#{File.dirname(__FILE__)}/modules/*/cli.rb"].each do |cli_path|
       len = Face::Command::Namespace.namespaces.length
       require cli_path
-      namespace Face::Command::Namespace.namespaces[len]
+      built = Face::Command::Namespace.namespaces[len] or fail("Must add a namespace, did not: #{cli_path}")
+      namespace built
     end
   end
 end
+
