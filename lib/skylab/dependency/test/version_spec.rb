@@ -39,7 +39,7 @@ module Skylab::Dependency
       sexp.to_s.should eq("abc-3.5.7-def")
       ver.bump!(:patch)
       sexp.to_s.should eq("abc-3.5.8-def")
-      lambda { ver.bump!(:not_there) }.should raise_error(ArgumentError, "no such node: :not_there")
+      lambda { ver.bump!(:not_there) }.should raise_error(::Skylab::CodeMolester::Sexp::RuntimeError, "no such node: :not_there")
     end
     include Test::Support # UiTee (again)
     def _parse str
