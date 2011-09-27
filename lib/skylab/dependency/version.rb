@@ -32,18 +32,21 @@ module Skylab
         end
       end
       def initialize str
-        md = REGEX.match(str) or raise ArgumentError.new("invalid version string: #{str.inspect}")
+        replace str
+      end
+      def replace str
+        clear
+        md = REGEX.match(str) or _sexp_fail("invalid version string: #{str.inspect}")
         push :version
         concat [[:major, md[1].to_i], [:separator, '.'], [:minor, md[2].to_i]]
         md[3] and concat([[:separator, '.'], [:patch, md[3].to_i]])
       end
       def bump! which
-        node = detect(which)
-        unless node
-          raise ArgumentError.new("no such node: #{which.inspect}") # this is not guaranteed to stay this kind of exception
-        end
+        node = detect(which) or _sexp_fail("no such node: #{which.inspect}")
         node[1] += 1
       end
+      def has_minor_version? ; !! detect(:minor) end
+      def has_patch_version? ; !! detect(:patch) end
     end
   end
 end
