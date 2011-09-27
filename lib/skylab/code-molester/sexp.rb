@@ -3,6 +3,7 @@ module Skylab
   module CodeMolester
     # thanks to zenspider
     class Sexp < Array
+      class RuntimeError < ::RuntimeError; end
       # this name for this method is experimental.  the name may change.
       def detect *a, &b
         (b or 1 != a.size or ! a.first.kind_of?(Symbol)) and return super
@@ -22,6 +23,9 @@ module Skylab
             node.to_s
           end
         end.join('')
+      end
+      def _sexp_fail msg
+        raise RuntimeError.new(msg)
       end
     end
   end
