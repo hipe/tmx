@@ -56,3 +56,4 @@ module Skylab::Dependency
     end
   end
 end
+

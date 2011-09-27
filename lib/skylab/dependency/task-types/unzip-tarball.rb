@@ -15,17 +15,17 @@ module Skylab
       end
       def check verbose = true
         if File.directory?(expected_unzipped_dir_path)
-          ui.err.puts("#{me}: ok: is directory: #{pretty_path expected_unzipped_dir_path}")
+          _info "ok: is directory: #{pretty_path expected_unzipped_dir_path}"
           true
         else
-          verbose and ui.err.puts("#{me}: expected unzipped dir path not found: #{pretty_path expected_unzipped_dir_path}")
+          verbose and _info("expected unzipped dir path not found: #{pretty_path expected_unzipped_dir_path}")
         end
       end
       def check_size path
         if 0 < File.stat(path).size
           true
         else
-          ui.err.puts("#{me}: cannot unzip, file is zero size: #{pretty_path path}")
+          _info "#{me}: cannot unzip, file is zero size: #{pretty_path path}"
           false
         end
       end
@@ -38,20 +38,18 @@ module Skylab
       end
       def execute
         unless File.exist?(@unzip_tarball)
-          ui.err.puts("#{me}: #{ohno('error:')} tarball not found: #{pretty_path @unzip_tarball}")
-          return false
+          return _err("tarball not found: #{pretty_path @unzip_tarball}")
         end
         check_size(@unzip_tarball) or return
         cmd = "cd #{escape_path build_dir}; tar -xzvf #{escape_path File.basename(@unzip_tarball)}"
-        ui.err.puts("#{me}: #{cmd}")
+        _info cmd
         bytes, seconds = open2(cmd) do |on|
           on.out { |s| ui.err.write("#{me}: (out): #{s}") }
           on.err { |s| ui.err.write(s) }
         end
-        ui.err.puts("#{me}: read #{bytes} bytes in #{seconds} seconds.")
+        _info "read #{bytes} bytes in #{seconds} seconds."
         check and return true
-        ui.err.puts("#{me}: #{ohno('error: ')}: failed to unzip?")
-        false
+        _err "failed to unzip?"
       end
       def interpolate_stem
         fallback.interpolate_stem
@@ -64,3 +62,4 @@ module Skylab
     end
   end
 end
+

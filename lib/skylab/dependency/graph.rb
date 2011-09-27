@@ -102,6 +102,24 @@ module Skylab::Dependency
       end
       after_run_slake_or_check ok
     end
+    def update_check
+      node = _checking_for_updates or return false
+      node.update_check
+    end
+    def update_slake
+      node = _checking_for_updates or return false
+      node.update_slake
+    end
+    def _checking_for_updates
+      ui.err.puts "#{bold '---> checking for updates:'} #{BLU name}"
+      node, ret = target_node
+      if ! node
+        _skip("no updates to perform for #{blu name} because no target_node " <<
+          "found and update_{check|slake} not defined for task type.")
+        return false
+      end
+      node
+    end
     def slake
       node, ret = target_node
       node or return ret
@@ -118,6 +136,10 @@ module Skylab::Dependency
       ok
     end
     def target_node
+      if @nodes.nil?
+        _skip "can't get target node of #{blu name}: there are no child nodes defined."
+        return [nil, false]
+      end
       node = self.node('target') or return [nil, nil]
       if node.disabled?
         ui.err.puts "#{hi('---> skip:')} #{blu name} (target disabled)"

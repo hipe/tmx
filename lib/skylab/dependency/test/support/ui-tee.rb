@@ -29,6 +29,14 @@ module Skylab::Dependency
         self.out = out || Tee.new(:stream => $stdout, :buffer => MyStringIO.new)
         self.err = err || Tee.new(:stream => $stderr, :buffer => MyStringIO.new)
       end
+      %w(out err).each do |stream|
+        define_method("#{stream}_string") do
+          buffer = send(stream)[:buffer]
+          buffer.rewind
+          buffer.read
+        end
+      end
     end
   end
 end
+

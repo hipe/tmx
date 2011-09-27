@@ -51,6 +51,14 @@ module Skylab::Dependency
     def _fail msg
       raise SpecificationError.new(msg)
     end
+    def _err msg
+      ui.err.puts "#{me}: #{ohno('error:')} #{msg}"
+      false
+    end
+    def _info msg
+      ui.err.puts "#{me}: #{msg}"
+      true
+    end
     # it's important we do do some class-specific initialization so that we can have readable
     # child class initialize methods who rely on this and e.g. the parent and ui and etc.
     def initialize data, parent_graph
@@ -92,10 +100,24 @@ module Skylab::Dependency
       if ! task_init
         false
       elsif @request[:check]
-        check
+        if @request[:update]
+          update_check
+        else
+          check
+        end
       else
-        slake
+        if @request[:update]
+          update_slake
+        else
+          slake
+        end
       end
+    end
+    def update_check
+      _skip "no update_check defined for #{blu name}"
+    end
+    def update_slake
+      _skip "no update_slake defined for #{blue name}"
     end
     def build_dir
       @build_dir ||= begin
@@ -111,5 +133,10 @@ module Skylab::Dependency
     def blu s
       style s, :cyan
     end
+    def _skip msg
+      ui.err.puts "#{hi '---> skip:'} #{blu name}: #{msg}"
+      false
+    end
   end
 end
+

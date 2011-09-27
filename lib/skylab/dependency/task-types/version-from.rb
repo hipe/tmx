@@ -23,7 +23,7 @@ module Skylab
         else
           ui.err.puts version.split("\n").map { |s| "  #{hi('version')}: #{s}" }
         end
-        ui.err.puts "#{me}: #{@version_from}"
+        _info @version_from
       end
 
       def check_presuppositions
@@ -87,3 +87,4 @@ module Skylab
     end
   end
 end
+

@@ -17,7 +17,7 @@ module Skylab
         if File.exist?(@executable_file)
           execute
         else
-          ui.err.puts("#{me}: not installed, executable not found: #{@executable_file}.")
+          _info "not installed, executable not found: #{@executable_file}."
           false
         end
       end
@@ -25,13 +25,12 @@ module Skylab
       def execute
         stat = File::Stat.new(@executable_file)
         if stat.executable?
-          ui.err.puts("#{me}: ok, executable: #{@executable_file}")
-          true
+          _info "ok, executable: #{@executable_file}"
         else
-          ui.err.puts("#{me}: #{ohno('error:')} exists but is not executable: #{@executable_file}.")
-          false
+          _err "exists but is not executable: #{@executable_file}."
         end
       end
     end
   end
 end
+

@@ -16,13 +16,13 @@ module Skylab
           bytes = _bytes(to_file)
           case bytes
           when nil
-            ui.err.puts "#{me}: would get: #{from_url}"
+            _info "would get: #{from_url}"
             false
           when 0
-            ui.err.puts "#{me}: had zero byte file (strange): (#{pretty_path to_file}). Would overwrite."
+            _info "had zero byte file (strange): (#{pretty_path to_file}). Would overwrite."
             false
           else
-            ui.err.puts "#{me}: exists (remove/move to download again): #{pretty_path to_file} (#{bytes} bytes)"
+            _info "exists (remove/move to download again): #{pretty_path to_file} (#{bytes} bytes)"
             true
           end
         end
@@ -37,10 +37,10 @@ module Skylab
           when nil
             do_these.push [from_url, to_file]
           when 0
-            ui.err.puts "#{me} had zero byte file (strange), overwriting: #{pretty_path to_file}"
+            _info "had zero byte file (strange), overwriting: #{pretty_path to_file}"
             do_these.push [from_url, to_file]
           else
-            ui.err.puts "#{me} skipping, exists (erase/move to re-download): #{pretty_path to_file}"
+            _info "skipping, exists (erase/move to re-download): #{pretty_path to_file}"
           end
         end
         results = []
@@ -93,3 +93,4 @@ module Skylab
     end
   end
 end
+
