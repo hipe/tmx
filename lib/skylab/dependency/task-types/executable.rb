@@ -9,13 +9,13 @@ module Skylab
       attribute :executable
       def check
         if '' == (path = open2("which #{@executable}").strip)
-          ui.err.puts("#{me}: #{ohno('not in PATH:')} #{@executable}")
+          _info "#{ohno('not in PATH:')} #{@executable}"
           false
         else
-          ui.err.puts("#{me}: #{path}")
-          true
+          _info path
         end
       end
     end
   end
 end
+

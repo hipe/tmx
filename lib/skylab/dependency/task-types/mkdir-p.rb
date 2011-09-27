@@ -35,12 +35,12 @@ module Skylab
             current_depth += 1
           end while ! File.directory?(dir) and ! ['.','/'].include?(dir) and current_depth <= @maxdepth
           if current_depth > @maxdepth
-            ui.err.puts("#{me} won't mkdir more than #{@maxdepth} levels deep " <<
+            _info("won't mkdir more than #{@maxdepth} levels deep " <<
               "(#{pretty_path @mkdir_p} requires #{current_depth} levels)")
             @ok = false
             false
           else
-            ui.err.puts "#{me} doesn't exist, can create #{pretty_path @mkdir_p}"
+            _info "doesn't exist, can create #{pretty_path @mkdir_p}"
             false
           end
         end
@@ -59,3 +59,4 @@ module Skylab
     end
   end
 end
+

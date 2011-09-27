@@ -16,7 +16,7 @@ module Skylab
       end
       def slake
         if File.exist?(@move_to)
-          ui.err.puts "#{me}: desintation exists (move/rename to re-run): #{@move_to}"
+          _info "desintation exists (move/rename to re-run): #{@move_to}"
           true
         else
           if ! File.exist?(@from) and fallback?
@@ -27,13 +27,13 @@ module Skylab
       end
       def check
         if ! File.exist?(@from)
-          ui.err.puts "#{me}: source file not found: #{@from}"
+          _info "source file not found: #{@from}"
           false
         elsif File.exist?(@move_to)
-          ui.err.puts "#{me}: exists: #{@move_to}"
+          _info "exists: #{@move_to}"
           true
         else
-          ui.err.puts "#{me}: does not exist: #{@move_to}"
+          _info "does not exist: #{@move_to}"
           false
         end
       end
@@ -43,7 +43,7 @@ module Skylab
           mv(@from, @move_to, :verbose => true, :noop => noop)
           true
         else
-          ui.err.puts "#{me}: FAILED: source file not found: #{@from}"
+          _info "FAILED: source file not found: #{@from}"
           false
         end
       end
@@ -52,11 +52,11 @@ module Skylab
           if ! File.exist?(@from)
             mv(@move_to, @from, :verbose => true)
           else
-            ui.err.puts "#{me}: can't undo: exists: #{pretty_path @from}"
+            _info "can't undo: exists: #{pretty_path @from}"
             false
           end
         else
-          ui.err.puts "#{me}: nothing to undo: does not exist: #{@move_to}"
+          _info "nothing to undo: does not exist: #{@move_to}"
           false
         end
       end
@@ -66,3 +66,4 @@ module Skylab
     end
   end
 end
+
