@@ -1,0 +1,13 @@
+{
+  "external dependencies" : [
+    {
+      "name" : "xpdf",
+      "target" : "_xpdf",
+      "wip" : true,
+      "_xpdf" : {
+        "build tarball" : "ftp://ftp.foolabs.com/pub/xpdf/xpdf-3.03.tar.gz"
+      }
+    }
+  ]
+}
+
