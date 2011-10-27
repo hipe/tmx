@@ -5,6 +5,7 @@ require 'fileutils'
 require 'optparse'
 require 'json'
 require 'open3'
+require 'ruby-debug'
 require 'stringio'
 require 'time'
 
@@ -564,7 +565,29 @@ module TmxGit
         push_branches = _which_branches_to_push or return false
         push_branches.each { |b| _push_branch b, url }
       end
+      def exists?
+        _check_repo_exists false
+      end
+      def _check_repo_exists verbose=true
+        case true
+        when File.directory?(path)
+          true # we could do more but meh
+        when File.exist?(path)
+          if verbose
+            _warn("is not a folder, skipping.")
+            manifest.report(path, :not_a_folder)
+          end
+          false
+        else
+          if verbose
+            _warn("does not exist, skipping.")
+            manifest.report(path, :not_found)
+          end
+          false
+        end
+      end
       def _push_branch push_branch, url
+        _check_repo_exists or return
         cmd = "cd #{path} ; git push #{url} #{push_branch}"
         _info cmd
         if req[:dry_run]
@@ -613,6 +636,7 @@ module TmxGit
       end
       MASTER = ['master']
       def _which_branches_to_push
+        _check_repo_exists or return false
         @branches.kind_of?(Array) and return @branches
         list = `cd #{path} ; git branch`.strip.split("\n")
         list.map! { |s| s.strip.gsub(/^\* /, '') }
@@ -629,6 +653,10 @@ module TmxGit
       end
       def _notice msg
         _info "#{yelo 'notice'}: #{msg}"
+        false
+      end
+      def _warn msg
+        _info "#{ohno 'warning:'} #{msg}"
         false
       end
       def _info msg
