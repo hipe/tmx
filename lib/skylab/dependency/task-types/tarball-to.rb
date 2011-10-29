@@ -7,7 +7,7 @@ module Skylab
       attribute :from, :required => false
       attribute :get
       attribute :stem, :required => false
-      TarballExtension = /\.tar\.gz\z/
+      TarballExtension = /\.tar\.(?:gz|bz2)\z/
       def interpolate_basename
         File.basename(@get)
       end
