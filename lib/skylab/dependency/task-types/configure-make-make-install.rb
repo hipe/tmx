@@ -1,4 +1,5 @@
 require File.expand_path('../../task', __FILE__)
+require File.expand_path('../tarball-to', __FILE__)
 require 'pathname'
 require 'stringio'
 require 'skylab/face/open2'
@@ -10,6 +11,7 @@ module Skylab
     class TaskTypes::ConfigureMakeMakeInstall < Task
       include ::Skylab::Face::Open2
       include ::Skylab::Face::PathTools
+      TarballExtension = TaskTypes::TarballTo::TarballExtension
       attribute :configure_make_make_install
       attribute :prefix
       def slake
@@ -23,7 +25,7 @@ module Skylab
         @just_checking = just_checking
         Pathname.new(@configure_make_make_install).tap do |p|
           dirname, basename = [p.dirname.to_s, p.basename.to_s]
-          @dir = File.join(dirname, basename.sub(/\.tar\.gz\z/,''))
+          @dir = File.join(dirname, basename.sub(TarballExtension,''))
         end
         File.directory?(@dir) or return nope("not a directory: #{@dir}")
         configure and make and make_install

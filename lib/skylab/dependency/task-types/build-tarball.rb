@@ -42,7 +42,8 @@ module Skylab
       def update_check slake=false
         require File.expand_path('../../check-update', __FILE__)
         old_url = Version.parse_string_with_version(build_tarball, :ui => ui)
-        if new_url = CheckUpdate.new(build_tarball).run(ui)
+        cu = CheckUpdate.new(build_tarball)
+        if new_url = cu.run(ui)
           old_ver = old_url.detect(:version).to_s
           new_ver = new_url.detect(:version).to_s
           msg = "#{yelo 'OHAI:'} found version #{bold new_ver} that is newer than what is on record: #{bold old_ver}"
@@ -56,13 +57,14 @@ module Skylab
           end
         else
           old_v = old_url ? old_url.detect(:version).to_s : nil
+          note = "(looked for #{cu.versions_not_found.join(', ')})"
           if slake
             v = old_v ? " of #{old_v}" : nil
-            _info "No updates found.  Attemping normal install#{v}.."
+            _info "No updates found #{note}. Attemping normal install#{v}.."
             self.slake
           else
             if old_v
-              _info "Nothing newer than #{old_v} found."
+              _info "Nothing newer than #{old_v} found #{note}."
             else
               _info "Failed to determine version from url."
             end

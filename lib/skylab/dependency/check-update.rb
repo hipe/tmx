@@ -5,11 +5,14 @@ module Skylab
   module Dependency
     class CheckUpdate
       def initialize path
+        @versions_not_found = []
         @path = path
       end
       attr_reader :ui
+      attr_reader :versions_not_found
 
       def run ui
+        @versions_not_found.clear
         @ui = ui
         url = Version.parse_string_with_version(@path, :ui => ui) or return false
         version = url.detect(:version)
@@ -29,6 +32,7 @@ module Skylab
             found = version.to_s
           else
             _info(response_code_header)
+            @versions_not_found.push version.to_s
             break
           end
         end

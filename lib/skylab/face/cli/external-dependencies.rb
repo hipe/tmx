@@ -40,6 +40,7 @@ module Skylab::Face
           'Where available, search for and install the most recent tarball using simple heuristics with the release numbers.',
           'Where available, when used in conjuction with --check this will only search not install.'
            ) { req[:update] = true }
+        op.on('-v', '--verbose', 'Be verbose.') { req[:verbose] = true }
         op.on('-n', '--dry-run',
           "Perform a dry run only (where available).") { req[:dry_run] = true }
         req[:build_dir] =  File.join(ENV['HOME'] || '~', '/build')
