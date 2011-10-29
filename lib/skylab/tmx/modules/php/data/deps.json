@@ -1,0 +1,12 @@
+{
+  "external dependencies" : [
+    {
+      "name" : "php",
+      "target" : "_php",
+      "_php" : {
+        "build tarball" : "http://us.php.net/distributions/php-5.3.8.tar.bz2"
+      }
+    }
+  ]
+}
+
