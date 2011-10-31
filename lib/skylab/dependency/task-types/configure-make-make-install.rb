@@ -71,7 +71,13 @@ module Skylab
         end
       end
       def _command cmd
-        ui.err.puts "#{me}: #{cmd}"
+        ui.err.write "#{me}: #{cmd}"
+        if request[:dry_run]
+          ui.err.puts " (#{yelo 'skipped'} per dry run, faking success)"
+          return true
+        else
+          ui.err.puts
+        end
         # multiplex two output streams into a total of four things
         out = ::Skylab::Face::Open2::Tee.new(:out => ui.out, :buffer => StringIO.new)
         err = ::Skylab::Face::Open2::Tee.new(:err => ui.err, :buffer => StringIO.new)
