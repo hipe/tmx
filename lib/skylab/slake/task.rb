@@ -10,7 +10,6 @@ module Skylab
       include Face::Colors
       include Interpolation
       extend AttributeDefiner
-      TarballExtension = /(?:\.tar\.gz|\.tgz)\z/
       def initialize
         # Keep this one empty, force arugment errors on arguments.
         # State no explicity logic for initialization

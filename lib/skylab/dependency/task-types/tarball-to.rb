@@ -7,7 +7,9 @@ module Skylab
       attribute :from, :required => false
       attribute :get
       attribute :stem, :required => false
-      TarballExtension = /\.tar\.(?:gz|bz2)\z/
+      module Constants
+        TARBALL_EXTENSION = /(?:\.tar\.(?:gz|bz2)|\.tgz)\z/
+      end
       def interpolate_basename
         File.basename(@get)
       end
@@ -19,8 +21,9 @@ module Skylab
         [[File.join(@from, @get), File.join(build_dir, @get)]]
       end
       class << self
+        include Constants
         def stem filename
-          filename.sub(TarballExtension, '')
+          filename.sub(TARBALL_EXTENSION, '')
         end
       end
     end
