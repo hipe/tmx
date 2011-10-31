@@ -11,7 +11,7 @@ module Skylab
     class TaskTypes::ConfigureMakeMakeInstall < Task
       include ::Skylab::Face::Open2
       include ::Skylab::Face::PathTools
-      TarballExtension = TaskTypes::TarballTo::TarballExtension
+      include TaskTypes::TarballTo::Constants
       attribute :configure_make_make_install
       attribute :prefix
       def slake
@@ -25,7 +25,7 @@ module Skylab
         @just_checking = just_checking
         Pathname.new(@configure_make_make_install).tap do |p|
           dirname, basename = [p.dirname.to_s, p.basename.to_s]
-          @dir = File.join(dirname, basename.sub(TarballExtension,''))
+          @dir = File.join(dirname, basename.sub(self.class::TARBALL_EXTENSION,''))
         end
         File.directory?(@dir) or return nope("not a directory: #{@dir}")
         configure and make and make_install
