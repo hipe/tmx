@@ -1,4 +1,5 @@
 require File.expand_path('../../task', __FILE__)
+require File.expand_path('../tarball-to', __FILE__)
 require 'skylab/face/open2'
 
 module Skylab
@@ -8,17 +9,22 @@ module Skylab
       include ::Skylab::Face::PathTools
       attribute :unzip_tarball
       attribute :unzips_to, :required => false
+      include TaskTypes::TarballTo::Constants
       def slake
         fallback.slake or return false
         check(false) and return true
         execute
       end
       def check verbose = true
+        _directory_exists? and return true
+        verbose and _info("expected unzipped dir path not found: #{pretty_path expected_unzipped_dir_path}")
+      end
+      def _directory_exists?
         if File.directory?(expected_unzipped_dir_path)
-          _info "ok: is directory: #{pretty_path expected_unzipped_dir_path}"
+          _info "exists, assuming unzipped already #{yelo '(careful!)'}: #{expected_unzipped_dir_path}. Skipping."
           true
         else
-          verbose and _info("expected unzipped dir path not found: #{pretty_path expected_unzipped_dir_path}")
+          false
         end
       end
       def check_size path
@@ -33,10 +39,11 @@ module Skylab
         if @unzips_to
           File.join(build_dir, @unzips_to)
         else
-          @unzip_tarball.sub(TarballExtension, '')
+          @unzip_tarball.sub(TARBALL_EXTENSION, '')
         end
       end
       def execute
+        _directory_exists? and return true
         unless File.exist?(@unzip_tarball)
           return _err("tarball not found: #{pretty_path @unzip_tarball}")
         end
