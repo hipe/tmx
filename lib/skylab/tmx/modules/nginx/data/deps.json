@@ -7,7 +7,7 @@
       "target" : "nginx",
 
       "nginx" : {
-        "build tarball" : "http://nginx.org/download/nginx-1.1.2.tar.gz",
+        "build tarball" : "http://nginx.org/download/nginx-1.1.8.tar.gz",
         "requires" : "pcre"
       },
 
