@@ -46,6 +46,7 @@ module Skylab::Face
         req[:build_dir] =  File.join(ENV['HOME'] || '~', '/build')
         op.on('--build-dir DIR',
           "Specifies build directory. (default: #{pretty_path(req[:build_dir])})") { |bd| req[:build_dir] = bd }
+        op.on('--view-tree', "(debugging feature)") { req[:view_tree] = true }
       end
       def install req, *names
         req[:names] = names

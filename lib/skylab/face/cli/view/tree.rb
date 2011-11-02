@@ -2,7 +2,7 @@
 
 module Skylab
   module Face
-    module Cli
+    class Cli
       # declare these again if necessary.  They are just containers here.
     end
   end
@@ -16,9 +16,11 @@ module Skylab::Face::Cli::View
         @pipe        = ' │'
         @last_branch = ' └'
         @blank       = '  '
+        @name_accessor = :name
         opts.each { |k, v| send("#{k}=", v) }
       end
       attr_accessor :branch, :pipe, :last_branch, :empty
+      attr_accessor :name_accessor
       def traverse(root, &block)
         @level = 0
         @block = block
@@ -26,7 +28,7 @@ module Skylab::Face::Cli::View
         _traverse root
       end
       def _traverse root, meta={}
-        @block.call root, self, meta
+        @block.call root, meta
         sum = 1
         if root.children and root.children.any?
           _push meta
@@ -75,15 +77,17 @@ module Skylab::Face::Cli::View
       end
     end
     class << self
-      def view_tree root, out=nil
-        if out.nil?
+      def view_tree root, opts={}, &block
+        unless out = opts.delete(:out)
           require 'stringio'
           out = StringIO.new
           return_string = true
         end
-        sum = Locus.new.traverse(root) do |node, locus, meta|
-          out.puts "#{locus.prefix(meta)}#{node.name}"
+        loc = Locus.new opts
+        block ||= lambda do |node, meta|
+          out.puts "#{loc.prefix(meta)}#{node.send(loc.name_accessor)}"
         end
+        sum = loc.traverse(root, &block)
         if return_string
           out.rewind
           out.read
