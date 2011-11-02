@@ -14,8 +14,20 @@ module Skylab
       include TaskTypes::TarballTo::Constants
       attribute :configure_make_make_install
       attribute :prefix
+      attribute :inherit_attributes, :required => false # experimental here, will probably be pushed up
+      attribute :configure_with, :required => false
+      attribute :basename, :required => false
+      alias_method :interpolate_basename, :basename
+      def initialize data, parent_graph
+        super data, parent_graph
+        @inherit_attributes and @inherit_attributes.each do |attr|
+          attr.gsub!(' ', '_')
+          send("#{attr}=", parent_graph.send(attr))
+        end
+      end
       def slake
         fallback.slake or return false
+        dependencies_slake or return false
         execute false
       end
       def check
@@ -32,15 +44,27 @@ module Skylab
       end
       def configure
         ( ok = check_configure or @just_checking ) and return ok
+        configure_with and return _configure_with
         _command "cd #{escape_path @dir}; ./configure --prefix=#{escape_path prefix}"
       end
+      def _configure_with
+        _command "cd #{escape_path @dir}; source #{escape_path __configure_with}"
+      end
+      def __configure_with
+        File.expand_path(configure_with, File.dirname(_closest_parent_list.path))
+      end
+      def _makefile
+        @makefile ||= File.join(@dir, 'Makefile')
+      end
       def check_configure
-        makefile = File.join(@dir, 'Makefile')
-        if File.exist? makefile
-          ui.err.puts "#{me}: exists, assuming configure'd: " <<
-            "#{pretty_path makefile} (rename/rm it to re-configure)."
+        if File.exist? _makefile
+          ui.err.puts "#{_prefix}#{me}: exists, assuming configure'd: " <<
+            "#{pretty_path _makefile} (rename/rm it to re-configure)."
           true
         else
+          if @just_checking
+            ui.err.puts "#{_prefix}#{me}: #{ohno 'nope:'} makefile not found: #{pretty_path _makefile}"
+          end
           false
         end
       end
@@ -71,7 +95,7 @@ module Skylab
         end
       end
       def _command cmd
-        ui.err.write "#{me}: #{cmd}"
+        ui.err.write "#{_prefix}#{me}: #{cmd}"
         if request[:dry_run]
           ui.err.puts " (#{yelo 'skipped'} per dry run, faking success)"
           return true

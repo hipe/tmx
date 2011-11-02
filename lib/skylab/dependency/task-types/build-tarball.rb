@@ -6,40 +6,46 @@ module Skylab
     class TaskTypes::BuildTarball < Graph
 
       attribute :build_tarball
+      attribute :configure_with, :required => false
 
       def initialize a, b
-        task_initialize a, b # skip up to grandparent!
+        task_orig_initialize a, b # skip up to grandparent!
       end
 
       def _task_init
-        @interplated or interpolate! or return false
+        @interpolated or interpolate! or return false
         pathname = Pathname.new(build_tarball)
-        dirname, basename = [pathname.dirname.to_s, pathname.basename.to_s]
+        dirname, @basename = [pathname.dirname.to_s, pathname.basename.to_s]
+        puts "OK: #{@basename.to_s}"
         @nodes = {
           "name" => "build tarball",
           "target" => {
             "configure make make install" => "{build_dir}/{basename}",
             "prefix" => "/usr/local",
-            "else" => "unzip"
+            "else" => "unzip",
+            "basename" => @basename
           },
           "unzip" => {
             "unzip tarball" => "{build_dir}/{basename}",
-            "else"          => "download"
+            "else"          => "download",
+            "basename"      => @basename
           },
           "download" => {
             "tarball to"    => "{build_dir}/{basename}",
             "from"          => dirname,
-            "get"           => basename
+            "get"           => @basename
           }
         }
         true
       end
 
       def update_slake
+        dependencies_update_slake or return false
         update_check true
       end
 
       def update_check slake=false
+        slake or dependencies_update_check or return false
         require File.expand_path('../../check-update', __FILE__)
         old_url = Version.parse_string_with_version(build_tarball, :ui => ui)
         cu = CheckUpdate.new(build_tarball)
