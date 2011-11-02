@@ -40,7 +40,7 @@ module Skylab
             _info "had zero byte file (strange), overwriting: #{pretty_path to_file}"
             do_these.push [from_url, to_file]
           else
-            _info "skipping, exists (erase/move to re-download): #{pretty_path to_file}"
+            _info "skipping b/c exists (erase/move to re-download): #{pretty_path to_file}"
           end
         end
         results = []

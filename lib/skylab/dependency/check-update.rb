@@ -40,8 +40,9 @@ module Skylab
         version.replace found
         url
       end
+
       def _info msg
-        @ui.err.puts "---> #{msg}"
+        @ui.err.puts msg
       end
     end
   end
