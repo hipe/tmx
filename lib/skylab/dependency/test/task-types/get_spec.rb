@@ -16,7 +16,7 @@ module Skylab::Dependency
       ui1.out[:buffer].to_str.should eq('')
       ui2.out[:buffer].to_str.should eq('')
       ui1.err[:buffer].to_str.should match(/read 419 bytes/)
-      ui2.err[:buffer].to_str.should match(/skipping, exists/)
+      ui2.err[:buffer].to_str.should match(%r{skipping b/c exists})
     end
   end
 end

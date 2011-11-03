@@ -7,9 +7,10 @@ module Skylab::Slake
       task = Task.new
       task.has_parent?.should eq(nil)
       task.respond_to?(:parent_graph).should eq(false)
-      task.parent_graph = FakeParent
+      task.meet_parent_graph FakeParent
       task.has_parent?.should eq(true)
       task.parent_graph.should eq(FakeParent)
+      task.children.should eq(nil)
     end
   end
 end

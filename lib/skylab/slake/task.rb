@@ -50,10 +50,15 @@ module Skylab
       def me
         "  #{hi name}" # highlight the name, whatever that means to the Colors module
       end
-      def parent_graph= parent_graph
+      def meet_parent_graph parent_graph
+        @has_parent and fail("can't add multiple parents")
         class << self ; self end.send(:define_method, :parent_graph) { parent_graph }
+        @parent_accessor = :parent_graph
         @has_parent = true
-        parent_graph
+        self
+      end
+      def children
+        # for subclasses to implement where useful
       end
       attr_reader :has_parent
       alias_method :has_parent?, :has_parent
@@ -66,7 +71,7 @@ module Skylab
         false
       end
       def nope message
-        ui.err.puts("#{me}: #{ohno('failed:')} #{message}")
+        ui.err.puts("#{_prefix}#{me}: #{ohno('nope:')} #{message}")
         false
       end
       def undo
@@ -90,9 +95,7 @@ module Skylab
       def fallback
         @else or return _fail("fallback task needed for #{long_name.inspect} but no \"else\" node provided.")
         deps = (@else.kind_of?(Array) ? @else : [@else]).map do |node_name|
-          node = parent_graph.node(node_name) or _fail("node referred to but not defined: #{node_name.inspect}")
-          node.task_init or _fail("failed to initialize task.")
-          node
+          parent_graph.node(node_name) or _fail("node referred to but not defined: #{node_name.inspect}")
         end
         deps.size == 1 ? deps.first : Aggregate.new(deps)
       end

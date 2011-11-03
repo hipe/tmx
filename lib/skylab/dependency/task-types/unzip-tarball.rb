@@ -9,6 +9,8 @@ module Skylab
       include ::Skylab::Face::PathTools
       attribute :unzip_tarball
       attribute :unzips_to, :required => false
+      attribute :basename, :required => false
+      alias_method :interpolate_basename, :basename
       include TaskTypes::TarballTo::Constants
       def slake
         fallback.slake or return false
@@ -21,7 +23,7 @@ module Skylab
       end
       def _directory_exists?
         if File.directory?(expected_unzipped_dir_path)
-          _info "exists, assuming unzipped already #{yelo '(careful!)'}: #{expected_unzipped_dir_path}. Skipping."
+          _info "skipping b/c exists (assuming unzipped already #{yelo 'careful!'}): #{expected_unzipped_dir_path}"
           true
         else
           false
@@ -50,12 +52,18 @@ module Skylab
         check_size(@unzip_tarball) or return
         cmd = "cd #{escape_path build_dir}; tar -xzvf #{escape_path File.basename(@unzip_tarball)}"
         _info cmd
-        bytes, seconds = open2(cmd) do |on|
-          on.out { |s| ui.err.write("#{me}: (out): #{s}") }
-          on.err { |s| ui.err.write(s) }
+        if request[:dry_run]
+          _info "(#{yelo 'skipping'} per dry run.  careful, faking success!)"
+          bytes, seconds = [0, 0.0]
+        else
+          bytes, seconds = open2(cmd) do |on|
+            on.out { |s| ui.err.write("#{me}: (out): #{s}") }
+            on.err { |s| ui.err.write(s) }
+          end
         end
         _info "read #{bytes} bytes in #{seconds} seconds."
         check and return true
+        request[:dry_run] and return true
         _err "failed to unzip?"
       end
       def interpolate_stem

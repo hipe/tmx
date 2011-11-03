@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# note i had to do the first half as normal user and the second half as root
+
+# Installing ruby-build
+# per https://github.com/sstephenson/ruby-build
+cd
+echo "tmx cloning repo.."
+if [ -d ruby-build ] ; then
+  echo "exists, skipping: ruby-build"
+else
+  git clone git://github.com/sstephenson/ruby-build.git
+fi
+cd ruby-build
+echo "tmx installing ruby.."
+./install.sh
+# rbenv install 1.9.2-p290
+ruby-build 1.9.2-p290 ~/.rbenv/versions/1.9.2-p290
+echo "tmx bootstrapping script finished trying to install ruby."
+
