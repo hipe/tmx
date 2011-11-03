@@ -21,6 +21,7 @@ module Skylab
       def initialize data, parent_graph
         super data, parent_graph
         @inherit_attributes and @inherit_attributes.each do |attr|
+          data.key?(attr) and next
           attr.gsub!(' ', '_')
           send("#{attr}=", parent_graph.send(attr))
         end
@@ -107,7 +108,13 @@ module Skylab
         err = ::Skylab::Face::Open2::Tee.new(:err => ui.err, :buffer => StringIO.new)
         open2(cmd, out, err)
         err[:buffer].rewind ; s = err[:buffer].read
-        "" != (s) and return nope("expecing empty string from stderr output, had: #{s.inspect}")
+        if "" != (s)
+          ui.err.puts "#{_prefix}#{me}: #{ohno 'nope:'} expecting empty string from stderr output, assuming build failed. had:"
+          ui.err.puts "<snip>"
+          ui.err.puts s
+          ui.err.puts "</snip>"
+          return false
+        end
         true
       end
     end
