@@ -79,19 +79,8 @@ module Skylab::Dependency
       @nodes
     end
     def children
-      @nodes.map do |k, v|
-        case v
-        when String ; # either a property or a reference.  if reference, meh
-        when Hash
-          if 1 == Task.identifying_keys_in(v.keys).size
-            node(k)
-          end
-        else
-          if Task.looks_like_task?(v)
-            v
-          end
-        end
-      end.compact
+      respond_to?(:_expanded_children) or require File.expand_path('../graph/children', __FILE__)
+      _inflate_children
     end
     def node name
       @nodes.key?(name) or return failed(
@@ -120,14 +109,13 @@ module Skylab::Dependency
       node.undo
     end
     def _closest_parent_list
-      _ = _parent_list and return _
-      super
+      :parent_list == @parent_accessor ? parent_list : super
     end
-  protected
     def failed msg
       ui.err.puts msg
       false
     end
+  protected
     def check
       node, ret = target_node
       node or return ret
@@ -196,13 +184,21 @@ module Skylab::Dependency
     def _resolve name
       if @visited.include?(name)
         @graph.failed("Circular reference? #{(@visited + [name]).join(' -> ')}")
-      else
+      elsif @nodes.key? name
         val = @nodes[name]
         if String === val
-          _resolve val
+          if @nodes.key? val
+            _resolve val
+          else
+            @graph.failed("no node found for #{name.inspect}")
+          end
         else
           @graph.node(name)
         end
+      elsif %r{\A(?:https?|ftp)://} =~ name
+        Task.build_task({ 'build tarball' => name }, @graph)
+      else
+        @graph.failed("nope: #{name.inspect}")
       end
     end
   end
