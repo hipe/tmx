@@ -16,14 +16,14 @@ module Skylab
         @interpolated or interpolate! or return false
         pathname = Pathname.new(build_tarball)
         dirname, @basename = [pathname.dirname.to_s, pathname.basename.to_s]
-        puts "OK: #{@basename.to_s}"
         @nodes = {
           "name" => "build tarball",
           "target" => {
             "configure make make install" => "{build_dir}/{basename}",
             "prefix" => "/usr/local",
             "else" => "unzip",
-            "basename" => @basename
+            "basename" => @basename,
+            "inherit attributes" => ["configure with"]
           },
           "unzip" => {
             "unzip tarball" => "{build_dir}/{basename}",
