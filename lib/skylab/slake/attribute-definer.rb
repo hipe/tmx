@@ -2,37 +2,27 @@ module Skylab
   module Slake
     module AttributeDefiner
       def attribute sym, opts={}
-        @attributes ||= (dup_parent_attributes || {})
-        @attributes[sym] ||= begin
+        attributes[sym] ||= begin
           attr_accessor sym
           { :required => true }
         end
-        @attributes[sym].merge!(opts)
+        attr_meta = @attributes[sym].merge!(opts)
+        attr_meta.key?(:default) and _attribute_defaults[sym] = attr_meta[:default]
+        attr_meta
       end
       def attributes
-        unless @attributes
-          @did_dup_parent_attributes ||= begin
-            @attributes = dup_parent_attributes
-            true
-          end
-        end
-        @attributes
+        @attributes ||= _dup_closest_parent_attribute(:attributes) || {}
       end
-      def dup_parent_attributes
-        idx = 1
-        parent_attributes = nil
-        loop do
-          case ancestors[idx]
-          when NilClass
-            break 2
-          when Class
-            parent_attributes = ancestors[idx].respond_to?(:attributes) ? ancestors[idx].attributes : nil
-            break 2
-          end
-          idx += 1
-        end
-        parent_attributes ? parent_attributes.dup : {}
+      def _attribute_defaults
+        @_attribute_defaults ||= _dup_closest_parent_attribute(:_attribute_defaults) || {}
+      end
+      def _dup_closest_parent_attribute attrib
+        ( p = _closest_parent_to_respond_to(attrib) and p.send(attrib).dup ) or nil
+      end
+      def _closest_parent_to_respond_to method
+        ancestors.detect { |a| a.kind_of?(Class) and a.respond_to?(method) }
       end
     end
   end
 end
+
