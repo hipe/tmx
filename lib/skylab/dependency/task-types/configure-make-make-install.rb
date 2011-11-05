@@ -14,18 +14,10 @@ module Skylab
       include TaskTypes::TarballTo::Constants
       attribute :configure_make_make_install
       attribute :prefix
-      attribute :inherit_attributes, :required => false # experimental here, will probably be pushed up
       attribute :configure_with, :required => false
       attribute :basename, :required => false
       alias_method :interpolate_basename, :basename
-      def initialize data, parent_graph
-        super data, parent_graph
-        @inherit_attributes and @inherit_attributes.each do |attr|
-          data.key?(attr) and next
-          attr.gsub!(' ', '_')
-          send("#{attr}=", parent_graph.send(attr))
-        end
-      end
+     end
       def slake
         fallback.slake or return false
         dependencies_slake or return false

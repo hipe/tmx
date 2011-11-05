@@ -16,6 +16,7 @@ module Skylab
         # With subclasses it's ok to override
       end
       attribute :enabled, :required => false
+      attribute :inherit_attributes, :required => false
 
       attr_accessor :else
       attr_accessor :ui
@@ -56,6 +57,13 @@ module Skylab
         @parent_accessor = :parent_graph
         @has_parent = true
         self
+      end
+      def _inherit_attributes_from_parent_graph! my_data
+        @inherit_attributes and @inherit_attributes.each do |attr|
+          my_data.key?(attr) and next
+          attr.gsub!(' ', '_')
+          send("#{attr}=", parent_graph.send(attr))
+        end
       end
       def children
         # for subclasses to implement where useful
