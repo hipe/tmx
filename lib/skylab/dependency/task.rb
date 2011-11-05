@@ -87,7 +87,10 @@ module Skylab::Dependency
     # it's important we do do some class-specific initialization so that we can have readable
     # child class initialize methods who rely on this and e.g. the parent and ui and etc.
     def initialize data, parent_graph
-      parent_graph and meet_parent_graph(parent_graph)
+      if parent_graph
+        meet_parent_graph parent_graph
+        _inherit_attributes_from_parent_graph! data
+      end
       update_attributes data
     end
     alias_method :task_orig_initialize, :initialize
