@@ -7,6 +7,9 @@ module Skylab::Dependency
   end
   class Task < Skylab::Slake::Task
     attribute :requires, :required => false
+    attribute :show_info, :required => false, :default => true
+    attribute :inherit_attributes, :reqiured => false, :default => ['show info']
+
     IdentifyingKeys = [ # we could of course generate these but we leave it explicit for now
       'ad hoc',
       'build tarball',
@@ -64,7 +67,7 @@ module Skylab::Dependency
       false
     end
     def _info msg
-      ui.err.puts "#{_prefix}#{me}: #{msg}"
+      @show_info and ui.err.puts "#{_prefix}#{me}: #{msg}"
       true
     end
     def _prefix
@@ -87,9 +90,14 @@ module Skylab::Dependency
     # it's important we do do some class-specific initialization so that we can have readable
     # child class initialize methods who rely on this and e.g. the parent and ui and etc.
     def initialize data, parent_graph
+      data = Hash[ * data.map{ |k, v| [k.gsub(' ', '_').intern, v] }.flatten(1) ]
+      _defaults = Hash[ * (self.class.defaults.keys - data.keys).map { |k| [k, self.class.defaults[k]] }.flatten(1) ]
+      update_attributes _defaults
       if parent_graph
         meet_parent_graph parent_graph
+        data.key?(:inherit_attributes) and update_attributes(:inherit_attributes => data[:inherit_attributes])
         _inherit_attributes_from_parent_graph! data
+        data.delete(:inherit_attributes)
       end
       update_attributes data
     end
@@ -141,26 +149,34 @@ module Skylab::Dependency
     def _closest_parent_list
       parent_graph and parent_graph._closest_parent_list
     end
+
+    MutexOpts = [:check, :update, :view_tree, :view_bash]
     def run ui, req
       @ui = ui
       @request = req
-      if ! task_init
-        false
-      elsif @request[:check]
+      task_init or return false
+      1 < (ks = (req.keys & MutexOpts)).size && (ks2 = (ks - [:check, :update])).any? and return _mutex_fail(ks, ks2)
+      (a = (ks2 or ks)).any? and return case a.first
+        when :view_tree ; _view_tree
+        when :view_bash ; _view_bash
+      end
+      if @request[:check]
         if @request[:update]
           update_check
         else
           check
         end
-      elsif @request[:view_tree]
-        _view_tree
+      elsif @request[:update]
+        update_slake
       else
-        if @request[:update]
-          update_slake
-        else
-          slake
-        end
+        slake
       end
+    end
+    def _mutex_fail ks, ks2
+      ks.length > ks2.length and ks2.push('("check" and or "update")')
+      ks2.map! { |e| e.kind_of?(String) ? e : "\"#{e.to_s.gsub('_', ' ')}\"" }
+      _err "#{ks2.join(' and ')} are mutually exclusive.  Please use only one."
+      false
     end
     def _view_tree
       require 'skylab/face/cli/view/tree'
@@ -169,6 +185,11 @@ module Skylab::Dependency
       loc.traverse(self) do |node, meta|
         ui.out.puts "#{loc.prefix(meta)}#{node.styled_name(:color => color)} (#{node.object_id.to_s(16)})"
       end
+    end
+    def _view_bash
+      @request[:dry_run] = true
+      @show_info = false
+      slake
     end
     def update_check
       _skip "no update_check defined for #{blu name}"

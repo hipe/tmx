@@ -20,9 +20,10 @@ module Skylab
 
       attr_accessor :else
       attr_accessor :ui
+      # assumes symbol keys!
       def update_attributes data
         data.each do |k, v|
-          send("#{k.gsub(' ','_')}=", v)
+          send("#{k}=", v)
         end
       end
       def disabled?
@@ -60,8 +61,8 @@ module Skylab
       end
       def _inherit_attributes_from_parent_graph! my_data
         @inherit_attributes and @inherit_attributes.each do |attr|
+          attr = attr.gsub(' ', '_').intern
           my_data.key?(attr) and next
-          attr.gsub!(' ', '_')
           send("#{attr}=", parent_graph.send(attr))
         end
       end

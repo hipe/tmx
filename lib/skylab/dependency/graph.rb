@@ -119,7 +119,7 @@ module Skylab::Dependency
     def check
       node, ret = target_node
       node or return ret
-      ui.err.puts "#{bold('---> checking:')} #{styled_name}"
+      @show_info and ui.err.puts("#{bold("#{_prefix}checking:")} #{styled_name}")
       if ok = node.check
         node?('version') and node('version').run
       end
@@ -134,7 +134,7 @@ module Skylab::Dependency
       node.update_slake
     end
     def _checking_for_updates
-      ui.err.puts "#{bold '---> checking for updates:'} #{styled_name}"
+      @show_info and ui.err.puts("#{bold "#{_prefix} checking for updates:"} #{styled_name}")
       node, ret = target_node
       if ! node
         _skip("no updates to perform for #{styled_name(:strong => false)} because no target_node " <<
@@ -146,16 +146,16 @@ module Skylab::Dependency
     def slake
       node, ret = target_node
       node or return ret
-      ui.err.puts "#{bold('---> installing/checking:')} #{styled_name}"
+      @show_info and ui.err.puts("#{bold("#{_prefix}installing/checking:")} #{styled_name}")
       dependencies_slake or return false
       ok = node.slake
       after_run_slake_or_check ok
     end
     def after_run_slake_or_check ok
       if ok
-        ui.err.puts "#{bold('---> installed:')} #{styled_name}"
+        @show_info and ui.err.puts("#{bold("#{_prefix}installed:")} #{styled_name}")
       else
-        ui.err.puts "#{ohno('---> dependency not met:')} #{styled_name}"
+        @show_info and ui.err.puts("#{ohno("#{_prefix}dependency not met:")} #{styled_name}")
       end
       ok
     end
@@ -166,7 +166,7 @@ module Skylab::Dependency
       end
       node = self.node('target') or return [nil, nil]
       if node.disabled?
-        ui.err.puts "#{hi('---> skip:')} #{style_name(:strong => false)} (target disabled)"
+        @show_info and ui.err.puts("#{hi("#{_prefix}skip:")} #{style_name(:strong => false)} (target disabled)")
         return [nil, true]
       end
       [node, nil]

@@ -23,7 +23,7 @@ module Skylab
             "prefix" => "/usr/local",
             "else" => "unzip",
             "basename" => @basename,
-            "inherit attributes" => ["configure with"]
+            "inherit attributes" => ["configure with", "show info"]
           },
           "unzip" => {
             "unzip tarball" => "{build_dir}/{basename}",

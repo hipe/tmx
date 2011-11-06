@@ -17,7 +17,6 @@ module Skylab
       attribute :configure_with, :required => false
       attribute :basename, :required => false
       alias_method :interpolate_basename, :basename
-     end
       def slake
         fallback.slake or return false
         dependencies_slake or return false
@@ -51,12 +50,12 @@ module Skylab
       end
       def check_configure
         if File.exist? _makefile
-          ui.err.puts "#{_prefix}#{me}: exists, assuming configure'd: " <<
-            "#{pretty_path _makefile} (rename/rm it to re-configure)."
+          _info("exists, assuming configure'd: " <<
+            "#{pretty_path _makefile} (rename/rm it to re-configure).")
           true
         else
           if @just_checking
-            ui.err.puts "#{_prefix}#{me}: #{ohno 'nope:'} makefile not found: #{pretty_path _makefile}"
+            _info "#{ohno 'nope:'} makefile not found: #{pretty_path _makefile}"
           end
           false
         end
@@ -67,7 +66,7 @@ module Skylab
       end
       def check_make
         if (found = Dir[File.join(@dir, '*.o')]).any?
-          ui.err.puts "#{me}: exists, assuming make'd: #{pretty_path found.first}"
+          _info "exists, assuming make'd: #{pretty_path found.first}"
           true
         else
           false
@@ -81,19 +80,19 @@ module Skylab
         stem = File.basename(@dir).match(/\A(.*[^-\.\d])[-\.\d]+\z/)[1]
         dot_a = File.join(prefix, "lib/lib#{stem}.a") # e.g. /usr/local/lib/libpcre.a
         if File.exist?(dot_a)
-          ui.err.puts "#{me}: exists, assuming make install'd: #{dot_a}"
+          _info "exists, assuming make install'd: #{dot_a}"
           true
         else
           false
         end
       end
       def _command cmd
-        ui.err.write "#{_prefix}#{me}: #{cmd}"
+        @show_info and ui.err.write "#{_prefix}#{me}: #{cmd}"
         if request[:dry_run]
-          ui.err.puts " (#{yelo 'skipped'} per dry run, faking success)"
+          @show_info and ui.err.puts " (#{yelo 'skipped'} per dry run, faking success)"
           return true
         else
-          ui.err.puts
+          @show_info and ui.err.puts
         end
         # multiplex two output streams into a total of four things
         out = ::Skylab::Face::Open2::Tee.new(:out => ui.out, :buffer => StringIO.new)
@@ -101,7 +100,7 @@ module Skylab
         open2(cmd, out, err)
         err[:buffer].rewind ; s = err[:buffer].read
         if "" != (s)
-          ui.err.puts "#{_prefix}#{me}: #{ohno 'nope:'} expecting empty string from stderr output, assuming build failed. had:"
+          _info "#{ohno 'nope:'} expecting empty string from stderr output, assuming build failed. had:"
           ui.err.puts "<snip>"
           ui.err.puts s
           ui.err.puts "</snip>"
