@@ -8,7 +8,8 @@ module Skylab
       attribute :get
       attribute :stem, :required => false
       module Constants
-        TARBALL_EXTENSION = /(?:\.tar\.(?:gz|bz2)|\.tgz)\z/
+        TARBALL_EXT = /\.tar\.(?:gz|bz2)|\.tgz/
+        TARBALL_EXTENSION = /(?:#{TARBALL_EXT.source})\z/
       end
       def interpolate_basename
         File.basename(@get)

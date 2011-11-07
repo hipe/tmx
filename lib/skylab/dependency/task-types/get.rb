@@ -40,12 +40,12 @@ module Skylab
             _info "had zero byte file (strange), overwriting: #{pretty_path to_file}"
             do_these.push [from_url, to_file]
           else
-            _info "skipping b/c exists (erase/move to re-download): #{pretty_path to_file}"
+            _info "#{skp 'assuming'} already downloaded b/c exists (erase/move to re-download): #{pretty_path to_file}"
           end
         end
         results = []
         do_these.each do |from_url, to_file|
-          res = self.class.curl_or_wget(ui, from_url, to_file, :prefix => "#{blu_name}: ", :dry_run => request[:dry_run])
+          res = curl_or_wget(from_url, to_file)
           results.push res
         end
         ! results.index { |b| ! b }
@@ -67,30 +67,24 @@ module Skylab
         File.stat(path).size if File.exist?(path)
       end
 
-      class << self
-        def curl_or_wget ui, from_url, to_file, opts={}
-          _ = opts[:prefix] || ''
+        def curl_or_wget from_url, to_file
           # cmd = "wget -O #{::Skylab::Face::PathTools.escape_path to_file} #{from_url}"
           cmd = "curl -OL h #{from_url} > #{::Skylab::Face::PathTools.escape_path to_file}"
-          ui.err.puts "#{_}executing: #{cmd}"
+          _show_bash cmd
           bytes, seconds =
-          if opts[:dry_run]
+          if request[:dry_run]
             [0, 0.0]
           else
             ::Skylab::Face::Open2.open2(cmd) do |on|
-              on.out { |s| ui.err.write("#{_}(out): #{s}") }
+              on.out { |s| _info "#{_}(out): #{s}" }
               on.err { |s| ui.err.write(s) }
             end
           end
-          ui.err.puts("#{_}read #{bytes} bytes in #{seconds} seconds.")
+          _info "read #{bytes} bytes in #{seconds} seconds."
           true # what does success mean to you
         end
       end
 
-      def blu_name
-        style("  #{name}", :cyan)
-      end
-    end
   end
 end
 

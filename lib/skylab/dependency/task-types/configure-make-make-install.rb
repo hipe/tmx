@@ -16,7 +16,6 @@ module Skylab
       attribute :prefix
       attribute :configure_with, :required => false
       attribute :basename, :required => false
-      alias_method :interpolate_basename, :basename
       def slake
         fallback.slake or return false
         dependencies_slake or return false
@@ -29,9 +28,10 @@ module Skylab
         @just_checking = just_checking
         Pathname.new(@configure_make_make_install).tap do |p|
           dirname, basename = [p.dirname.to_s, p.basename.to_s]
-          @dir = File.join(dirname, basename.sub(self.class::TARBALL_EXTENSION,''))
+          basename = get_dir_basename(basename) or return false
+          @dir = File.join(dirname, basename)
         end
-        File.directory?(@dir) or return nope("not a directory: #{@dir}")
+        (File.directory?(@dir) or request[:view_bash]) or return nope("not a directory: #{@dir}")
         configure and make and make_install
       end
       def configure
@@ -50,7 +50,7 @@ module Skylab
       end
       def check_configure
         if File.exist? _makefile
-          _info("exists, assuming configure'd: " <<
+          _info("#{skp 'assuming'} configure'd b/c exists: " <<
             "#{pretty_path _makefile} (rename/rm it to re-configure).")
           true
         else
@@ -66,7 +66,7 @@ module Skylab
       end
       def check_make
         if (found = Dir[File.join(@dir, '*.o')]).any?
-          _info "exists, assuming make'd: #{pretty_path found.first}"
+          _info "#{skp 'assuming'} make'd b/c exists: #{pretty_path found.first}"
           true
         else
           false
@@ -76,23 +76,39 @@ module Skylab
         ( ok = check_install or @just_checking ) and return ok
         _command "cd #{escape_path @dir}; make install"
       end
+      def get_stem
+        @stem and return @stem
+        md = File.basename(@dir).match(/\A(.*[^-\.\d])[-\.\d]+\z/)
+        md or return _err("@stem not set and couldn't infer stem from #{@dir.inspect}")
+        md[1]
+      end
+      URL_TO_BASENAME = /\A(.+)#{TARBALL_EXT}(?:\?.+)?\z/
+      def get_dir_basename part
+        @dir_basename and return @dir_basename
+        md = URL_TO_BASENAME.match(part)
+        md or return _err("@dir_basename not set and failed to infer basename from #{part.inspect}")
+        md[1]
+      end
       def check_install
-        stem = File.basename(@dir).match(/\A(.*[^-\.\d])[-\.\d]+\z/)[1]
+        stem = get_stem or return
         dot_a = File.join(prefix, "lib/lib#{stem}.a") # e.g. /usr/local/lib/libpcre.a
         if File.exist?(dot_a)
-          _info "exists, assuming make install'd: #{dot_a}"
+          _info "#{skp 'assuming'} make install'd b/c existsc: #{dot_a}"
           true
         else
           false
         end
       end
       def _command cmd
-        @show_info and ui.err.write "#{_prefix}#{me}: #{cmd}"
         if request[:dry_run]
-          @show_info and ui.err.puts " (#{yelo 'skipped'} per dry run, faking success)"
+          if request[:view_bash]
+            _show_bash cmd
+          else
+            _info "#{cmd} (#{yelo 'skipped'} per dry run, faking success)"
+          end
           return true
         else
-          @show_info and ui.err.puts
+          _show_bash cmd
         end
         # multiplex two output streams into a total of four things
         out = ::Skylab::Face::Open2::Tee.new(:out => ui.out, :buffer => StringIO.new)

@@ -1,5 +1,4 @@
 require File.expand_path('../../attribute-definer', __FILE__)
-require File.expand_path('../support', __FILE__)
 require 'set'
 
 module Skylab::Slake

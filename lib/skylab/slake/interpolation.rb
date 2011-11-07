@@ -18,11 +18,14 @@ module Skylab
             name_as_key = Interpolation.to_key(name)
             if idx = interpolated_via_methods.index(name_as_key)
               interpolated_value = send("interpolate_#{name}")
+              interpolated_value.nil? and fail("#{self.name} did a bad thing and returned nil for inpterpolate_#{name}")
               request[name_as_key] ||= interpolated_value # ick careful
               unused_interpolated_via_methods[idx] = nil
             else
-              interpolated_value =  request[name_as_key]
+              interpolated_value = request[name_as_key]
+              interpolated_value.nil? and fail("wtf for interpoalted valued #{name_as_key.inspect} this was last straw")
             end
+            interpolated_value.nil? and return _interpolation_fail([attrib], "because interpolated value was nil")
             value.gsub!("{#{name}}", interpolated_value)
           end
           send("#{attrib}=", value)
@@ -34,7 +37,7 @@ module Skylab
       end
 
       def _interpolation_fail(things, because)
-        @ui.err.puts "Failed to interpolate (#{things.map(&:inspect).join(', ')}) of #{task_type_name.inspect} #{because}"
+        ui.err.puts "Failed to interpolate (#{things.map(&:inspect).join(', ')}) of #{task_type_name.inspect} #{because}"
         false
       end
 

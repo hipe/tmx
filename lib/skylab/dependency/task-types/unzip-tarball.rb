@@ -10,7 +10,6 @@ module Skylab
       attribute :unzip_tarball
       attribute :unzips_to, :required => false
       attribute :basename, :required => false
-      alias_method :interpolate_basename, :basename
       include TaskTypes::TarballTo::Constants
       def slake
         fallback.slake or return false

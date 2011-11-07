@@ -1,4 +1,5 @@
 require 'skylab/slake/task'
+require File.expand_path('../node-methods', __FILE__)
 
 module Skylab::Dependency
   class SpecificationError < ::Skylab::Slake::SpecificationError; end
@@ -9,6 +10,8 @@ module Skylab::Dependency
     attribute :requires, :required => false
     attribute :show_info, :required => false, :default => true
     attribute :inherit_attributes, :reqiured => false, :default => ['show info']
+
+    include NodeMethods
 
     IdentifyingKeys = [ # we could of course generate these but we leave it explicit for now
       'ad hoc',
@@ -45,9 +48,9 @@ module Skylab::Dependency
           _fail("Ambiguous, mutually exclusive keys: (#{found.join(', ')})")
         end
       end
-      def build_specific_task data, parent_graph
+      def build_specific_task data, parent
         self == ::Skylab::Dependency::Task and fail("This is not to be called directly, but only from task subclasses")
-        task = new(data, parent_graph)
+        task = new(data, parent)
         task.task_init or return false # experimental, not guaranteed to happen here
         task.valid? or return false
         task
@@ -59,6 +62,7 @@ module Skylab::Dependency
         t.respond_to?(:name) and t.respond_to?(:children)
       end
     end
+    def node_type ; :task end
     def _fail msg
       raise SpecificationError.new(msg)
     end
@@ -87,22 +91,25 @@ module Skylab::Dependency
     def _parent
       send @parent_accessor
     end
-    # it's important we do do some class-specific initialization so that we can have readable
-    # child class initialize methods who rely on this and e.g. the parent and ui and etc.
-    def initialize data, parent_graph
-      data = Hash[ * data.map{ |k, v| [k.gsub(' ', '_').intern, v] }.flatten(1) ]
-      _defaults = Hash[ * (self.class.defaults.keys - data.keys).map { |k| [k, self.class.defaults[k]] }.flatten(1) ]
-      update_attributes _defaults
-      if parent_graph
-        meet_parent_graph parent_graph
-        data.key?(:inherit_attributes) and update_attributes(:inherit_attributes => data[:inherit_attributes])
-        _inherit_attributes_from_parent_graph! data
-        data.delete(:inherit_attributes)
-      end
-      update_attributes data
+    PERMITTED_PARENTS = {
+      :list  => [],
+      :graph => [:list, :graph],
+      :task  => [:graph]
+    }
+    def meet_parent parent, data
+      @has_parent and fail("can't add multiple parents")
+      @has_parent = true
+      PERMITTED_PARENTS[node_type].include?(parent.node_type) or fail("nope")
+      @parent_accessor = case parent.node_type
+                         when :graph ; :parent_graph
+                         when :list  ; :parent_list
+                         else        ; fail("nope: #{parent.node_type.inspect}") ; end
+      class << self ; self end.send(:define_method, @parent_accessor) { parent }
+      data.key?(:inherit_attributes) and update_attributes(:inherit_attributes => data[:inherit_attributes])
+      _inherit_attributes_from_parent! data
+      data.delete(:inherit_attributes)
+      self
     end
-    alias_method :task_orig_initialize, :initialize
-
     def styled_name opts=nil
       style = if opts
         if    false == opts[:color]  then :_no_color
@@ -155,6 +162,7 @@ module Skylab::Dependency
       @ui = ui
       @request = req
       task_init or return false
+      @request[:name] and return _run_filtered
       1 < (ks = (req.keys & MutexOpts)).size && (ks2 = (ks - [:check, :update])).any? and return _mutex_fail(ks, ks2)
       (a = (ks2 or ks)).any? and return case a.first
         when :view_tree ; _view_tree
@@ -191,6 +199,13 @@ module Skylab::Dependency
       @show_info = false
       slake
     end
+    def _show_bash cmd
+      if request[:view_bash]
+        ui.out.puts cmd
+      else
+        _info cmd
+      end
+    end
     def update_check
       _skip "no update_check defined for #{blu name}"
     end
@@ -218,12 +233,17 @@ module Skylab::Dependency
     def interpolate_build_dir
       build_dir
     end
+    # BEGIN styles (abbreviated b/c of frequency of use)
     def BLU s
       style s, :bright, :cyan
     end
     def blu s
       style s, :cyan
     end
+    def skp s
+      style s, :bright, :white
+    end
+    # end
     def _no_color x ; x end
     def _skip msg
       ui.err.puts "#{hi '---> skip:'} #{blu name}: #{msg}"

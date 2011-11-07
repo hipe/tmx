@@ -8,10 +8,6 @@ module Skylab
       attribute :build_tarball
       attribute :configure_with, :required => false
 
-      def initialize a, b
-        task_orig_initialize a, b # skip up to grandparent!
-      end
-
       def _task_init
         @interpolated or interpolate! or return false
         pathname = Pathname.new(build_tarball)
