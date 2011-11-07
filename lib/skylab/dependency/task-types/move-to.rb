@@ -40,7 +40,7 @@ module Skylab
       def execute
         if File.exist?(@from)
           noop = request[:dry_run] ? true : false
-          mv(@from, @move_to, :verbose => true, :noop => noop)
+          mv(@from, @move_to, :verbose => true, :noop => noop) # _show_bash
           true
         else
           _info "FAILED: source file not found: #{@from}"

@@ -53,7 +53,7 @@ module Skylab
               [false, false]
             end
           else
-            _info "ln -s #{target} #{symlink}"
+            _show_bash "ln -s #{target} #{symlink}"
             if 0 == (r = File.symlink(target, symlink))
               [false, true]
             else

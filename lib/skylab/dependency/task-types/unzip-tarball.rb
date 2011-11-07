@@ -23,7 +23,7 @@ module Skylab
       end
       def _directory_exists?
         if File.directory?(expected_unzipped_dir_path)
-          _info "skipping b/c exists (assuming unzipped already #{yelo 'careful!'}): #{expected_unzipped_dir_path}"
+          _info "#{skp 'assuming'} unzipped already (#{yelo 'careful'} no checksums used): #{pretty_path expected_unzipped_dir_path}"
           true
         else
           false
@@ -51,7 +51,7 @@ module Skylab
         end
         check_size(@unzip_tarball) or return
         cmd = "cd #{escape_path build_dir}; tar -xzvf #{escape_path File.basename(@unzip_tarball)}"
-        _info cmd
+        _show_bash cmd
         if request[:dry_run]
           _info "(#{yelo 'skipping'} per dry run.  careful, faking success!)"
           bytes, seconds = [0, 0.0]
