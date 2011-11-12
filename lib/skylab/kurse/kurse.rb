@@ -18,12 +18,27 @@ module Skylab::Kurse
       @singleton ||= new($stdout, $stderr)
     end
   end
-  class ProgressBar
-    def initialize(ui = nil, &b)
-      ui ||= DefaultUi.singleton
-      @out, @err = [ui.out, ui.err]
+  module Common
+    def _recalculate attr
+      instance_variable_set "@#{attr}", nil
+      send attr
     end
-    attr_reader :out, :err
+  end
+  class ProgressBar
+    include Common
+    def initialize(ui = nil, &b)
+      @ui ||= DefaultUi.singleton
+      @out, @err = [@ui.out, @ui.err]
+      @nc = Ncurses
+      @unit = 'sec'
+      presenter_class = case :ugly
+        when :ncurses ; NcursesBar ;
+        when :ugly    ; Ugly       ;
+        else          ; fail("nope")
+      end
+      @presenter = presenter_class.new(self)
+    end
+    attr_reader :out, :err, :ui
     def run
       _init_state
       _render_frame
@@ -43,18 +58,14 @@ module Skylab::Kurse
       @current_units = 1.3
       @end_units = 2.2
       _recalculate :span_of_units_at_end
-      @fps = 18
+      @fps = 3
       _divide_by_zero_check
-      @animation_duration_seconds = 2.0
+      @animation_duration_seconds = 3.0
       _recalculate :minimum_frame_delay_seconds
       _recalculate :number_of_frames
       _recalculate :last_frame_index
-      _recalculate :waypoints
       @current_frame_index = 0
-    end
-    def _recalculate attr
-      instance_variable_set "@#{attr}", nil
-      send attr
+      @presenter.init_state
     end
     def number_of_frames
       @number_of_frames ||= [(@animation_duration_seconds * @fps).floor + 1, 2].max
@@ -62,22 +73,13 @@ module Skylab::Kurse
     def last_frame_index
       @last_frame_index ||= @number_of_frames - 1
     end
-    # be careful, this could hog memory, remember iit's fps * duration_of_animation
-    def waypoints
-      @waypoints ||= begin
-        divisor = (@number_of_frames - 1).to_f
-        (0 .. @number_of_frames).map do |frame_index|
-          { :frame_index => frame_index, :ratio => (frame_index.to_f / divisor) }
-        end
-      end
-    end
     def _advance_state
       @done and return nil
       @current_frame_index += 1
       if @current_frame_index >= @last_frame_index
         @done = true
       end
-      ratio = @waypoints[@current_frame_index][:ratio]
+      ratio = @presenter.waypoints[@current_frame_index][:ratio]
       @current_units = @start_units + (ratio * @span_of_units_at_end)
     end
     def _divide_by_zero_check
@@ -103,10 +105,7 @@ module Skylab::Kurse
     end
     def _render_frame
       @t1f = Time.now.to_f
-      @err.puts sprintf('%6s', formatted_percent) # blit
-    end
-    def formatted_percent
-      sprintf('%.2f', ratio * 100)
+      @presenter.render_frame
     end
     def elapsed_animation_seconds
       Time.now.to_f - @t0f
@@ -120,6 +119,31 @@ module Skylab::Kurse
       else
         # video lag ! you could throttle fips if you wanted to be insane
       end
+    end
+  end
+  class Ugly
+    include Common
+    def initialize progress_bar
+      @data = progress_bar
+      @err = progress_bar.ui.err
+    end
+    def init_state
+      _recalculate :waypoints
+    end
+    # be careful, this could hog memory, remember iit's fps * duration_of_animation
+    def waypoints
+      @waypoints ||= begin
+        divisor = (@data.number_of_frames - 1).to_f
+        (0 .. @data.number_of_frames).map do |frame_index|
+          { :frame_index => frame_index, :ratio => (frame_index.to_f / divisor) }
+        end
+      end
+    end
+    def render_frame
+      @err.puts sprintf('%7s', _formatted_percent) # blit
+    end
+    def _formatted_percent
+      sprintf('%.2f%', @data.ratio * 100)
     end
   end
 end
