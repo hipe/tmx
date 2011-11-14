@@ -26,19 +26,26 @@ module Skylab::Kurse
   end
   class ProgressBar
     include Common
-    def initialize(ui = nil, &b)
-      @ui ||= DefaultUi.singleton
+    def initialize(ui = nil, opts=nil, &b)
+      if opts.nil? and ui.kind_of?(Hash)
+        opts = ui ; ui = nil
+      end
+      opts and opts.each { |k, v| send("#{k}=", v) }
+      @ui ||= (ui || DefaultUi.singelton)
+      @unit ||= 'sec'
+      @presenter ||= :ncurses
       @out, @err = [@ui.out, @ui.err]
       @nc = Ncurses
-      @unit = 'sec'
-      presenter_class = case :ugly
+      presenter_class = case @presenter
         when :ncurses ; NcursesBar ;
         when :ugly    ; Ugly       ;
-        else          ; fail("nope")
+        else          ; fail("no: #{@presenter.inspect}")
       end
-      @presenter = presenter_class.new(self)
+      @_presenter = presenter_class.new(self)
     end
     attr_reader :out, :err, :ui
+    attr_accessor :presenter
+    attr_accessor :unit
     def run
       _init_state
       _render_frame
@@ -65,7 +72,7 @@ module Skylab::Kurse
       _recalculate :number_of_frames
       _recalculate :last_frame_index
       @current_frame_index = 0
-      @presenter.init_state
+      @_presenter.init_state
     end
     def number_of_frames
       @number_of_frames ||= [(@animation_duration_seconds * @fps).floor + 1, 2].max
@@ -144,6 +151,42 @@ module Skylab::Kurse
     end
     def _formatted_percent
       sprintf('%.2f%', @data.ratio * 100)
+    end
+  end
+  class NcursesBar < Ugly
+    def initialize(*a)
+      super(*a)
+      @nc = Ncurses
+    end
+    BAR_COLOR_PAIR = 1 # our internal name for color pair
+    BAR_HEIGHT = 1
+    LABEL_WIDTH = 15 # 'xxx% (xx.x uni)'
+    def init_state
+      super
+      @scr = @nc.initscr
+      _resized
+      @bar = Ncurses::WINDOW.new(@box[:height], @box[:width], @box[:y], @box[:x])
+      _init_color
+      @bar.move(@box[:y], @box[:x])
+    end
+    def _init_color
+      @nc.start_color
+      @nc.init_pair(BAR_COLOR_PAIR, @nc::COLOR_WHITE, @nc::COLOR_BLUE)
+      @bar.bkgd(@nc.COLOR_PAIR(BAR_COLOR_PAIR))
+    end
+    def _resized
+      @y, @x = @nc.getyx(@scr, y=[], x=[]) || [y.first, x.first]
+      @box ||= {}
+      @box.clear
+      @box.merge!( :y => @y+1, :x => 0, :height => BAR_HEIGHT, :width => @nc.COLS )
+      @label_x = [@box[:x].to_f + (@box[:width].to_f / 2) - (LABEL_WIDTH.to_f / 2), 0].max.to_i
+    end
+    def render_frame
+      _new_width = [(@box[:width] * @data.ratio).ceil, 1].max
+      @bar.wresize(@box[:height], _new_width)
+      @bar.mvaddstr(0, @label_x, "ohai :#{_formatted_percent} --> #{_new_width}")
+      @bar.noutrefresh
+      @nc.doupdate
     end
   end
 end
