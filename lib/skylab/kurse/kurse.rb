@@ -41,21 +41,20 @@ module Skylab::Kurse
   class ProgressBar
     include Common
     extend AttributeDefiner
-    def initialize(ui = nil, opts=nil, &b)
-      if opts.nil? and ui.kind_of?(Hash)
-        opts = ui ; ui = nil
-      end
+    def initialize(opts=nil, &b)
       opts and opts.each { |k, v| send("#{k}=", v) }
-      @animation_duration_seconds ||= 3.0
-      @fps ||= 12
-      @ui ||= (ui || DefaultUi.singleton)
-      @start_units ||= 1.3
-      @current_units ||= @start_units
-      @end_units ||= 2.2
-      @unit ||= 'sec'
-      @presenter ||= :ncurses
-      @out, @err = [@ui.out, @ui.err]
-      @nc = Ncurses
+      @animation_duration_seconds ||= 1.6
+      @fps                        ||= 12
+      @presenter                  ||= :ncurses
+      @ui                         ||= (ui || DefaultUi.singleton)
+      # units related:
+      @unit                       ||= 'foo'
+      @start_units                ||= 1.3
+      @current_units              ||= @start_units
+      @end_units                  ||= 2.2
+      # internal attributes
+      @out, @err                  = [@ui.out, @ui.err]
+      @nc                         = Ncurses
       presenter_class = case @presenter
         when :ncurses ; NcursesBar ;
         when :ugly    ; Ugly       ;
@@ -66,18 +65,19 @@ module Skylab::Kurse
     float :animation_duration_seconds
     float :current_units
     float :end_units
-    float :fps
     attr_reader :err
+    float :fps
     attr_reader :out
     attr_reader :presenter
     def presenter= mixed
       @presenter = mixed.kind_of?(String) ? mixed.intern : mixed
     end
+    attr_reader :_presenter
     float :start_units
     attr_reader :ui
     attr_accessor :unit
     def run
-      _init_state
+      _start!
       _render_frame
       _wait
       loop do
@@ -86,8 +86,10 @@ module Skylab::Kurse
         @done and break
         _wait
       end
+      _end!
+      true
     end
-    def _init_state
+    def _start!
       @done = false
       @t0 = @t1 = Time.now
       @t0f = @t0.to_f
@@ -97,7 +99,7 @@ module Skylab::Kurse
       _recalculate :number_of_frames
       _recalculate :last_frame_index
       @current_frame_index = 0
-      @_presenter.init_state
+      @_presenter.on_start
     end
     def number_of_frames
       @number_of_frames ||= [(@animation_duration_seconds * @fps).floor + 1, 2].max
@@ -133,7 +135,7 @@ module Skylab::Kurse
       @current_units - @start_units
     end
     def ratio
-      span_of_units_so_far / @span_of_units_at_end
+      span_of_units_so_far / span_of_units_at_end
     end
     def _render_frame
       @t1f = Time.now.to_f
@@ -152,6 +154,9 @@ module Skylab::Kurse
         # video lag ! you could throttle fips if you wanted to be insane
       end
     end
+    def _end!
+      @_presenter.on_end
+    end
   end
   class Ugly
     include Common
@@ -159,7 +164,7 @@ module Skylab::Kurse
       @data = progress_bar
       @err = progress_bar.ui.err
     end
-    def init_state
+    def on_start
       _recalculate :waypoints
     end
     # be careful, this could hog memory, remember iit's fps * duration_of_animation
@@ -180,6 +185,8 @@ module Skylab::Kurse
     def _formatted_percent
       '%.2f%' % [@data.ratio * 100]
     end
+    def on_end
+    end
   end
   class NcursesBar < Ugly
     def initialize(*a)
@@ -190,13 +197,22 @@ module Skylab::Kurse
     BACK_COLOR_PAIR = 2
     BAR_HEIGHT = 1
     LABEL_WIDTH = 15 # 'xxx% (xx.x uni)'
-    def init_state
+    attr_reader :scr
+    def on_start
       super
       @scr = @nc.initscr
+      # @nc.cbreak # @todo what is this
+      @_previous_cursor = @nc.curs_set(0) # don't show cursor
       _resized
       @bar = Ncurses::WINDOW.new(@box[:height], @box[:width], @box[:y], @box[:x])
       _init_color
       @bar.move(@box[:y], @box[:x])
+    end
+    def on_end
+      @nc.curs_set(@_previous_cursor || 1) # show cursor again
+      @scr.clear
+      @scr.refresh
+      @nc.endwin # without this you end up with it messing up your who-hahs
     end
     def _init_color
       @nc.start_color
