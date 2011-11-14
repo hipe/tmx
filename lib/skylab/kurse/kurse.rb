@@ -46,6 +46,8 @@ module Skylab::Kurse
         opts = ui ; ui = nil
       end
       opts and opts.each { |k, v| send("#{k}=", v) }
+      @animation_duration_seconds ||= 3.0
+      @fps ||= 12
       @ui ||= (ui || DefaultUi.singleton)
       @start_units ||= 1.3
       @current_units ||= @start_units
@@ -61,8 +63,10 @@ module Skylab::Kurse
       end
       @_presenter = presenter_class.new(self)
     end
+    float :animation_duration_seconds
     float :current_units
     float :end_units
+    float :fps
     attr_reader :err
     attr_reader :out
     attr_reader :presenter
@@ -88,9 +92,7 @@ module Skylab::Kurse
       @t0 = @t1 = Time.now
       @t0f = @t0.to_f
       _recalculate :span_of_units_at_end
-      @fps = 3
       _divide_by_zero_check
-      @animation_duration_seconds = 3.0
       _recalculate :minimum_frame_delay_seconds
       _recalculate :number_of_frames
       _recalculate :last_frame_index
@@ -172,8 +174,11 @@ module Skylab::Kurse
     def render_frame
       @err.puts sprintf('%7s', _formatted_percent) # blit
     end
+    def _formatted_amount
+      '%.1f %s' % [@data.current_units, @data.unit]
+    end
     def _formatted_percent
-      sprintf('%.2f%', @data.ratio * 100)
+      '%.2f%' % [@data.ratio * 100]
     end
   end
   class NcursesBar < Ugly
@@ -182,6 +187,7 @@ module Skylab::Kurse
       @nc = Ncurses
     end
     BAR_COLOR_PAIR = 1 # our internal name for color pair
+    BACK_COLOR_PAIR = 2
     BAR_HEIGHT = 1
     LABEL_WIDTH = 15 # 'xxx% (xx.x uni)'
     def init_state
@@ -195,7 +201,9 @@ module Skylab::Kurse
     def _init_color
       @nc.start_color
       @nc.init_pair(BAR_COLOR_PAIR, @nc::COLOR_WHITE, @nc::COLOR_BLUE)
+      @nc.init_pair(BACK_COLOR_PAIR, @nc::COLOR_WHITE, @nc::COLOR_BLACK)
       @bar.bkgd(@nc.COLOR_PAIR(BAR_COLOR_PAIR))
+      @nc.bkgd(@nc.COLOR_PAIR(BACK_COLOR_PAIR))
     end
     def _resized
       @y, @x = @nc.getyx(@scr, y=[], x=[]) || [y.first, x.first]
@@ -207,9 +215,10 @@ module Skylab::Kurse
     def render_frame
       _new_width = [(@box[:width] * @data.ratio).ceil, 1].max
       @bar.wresize(@box[:height], _new_width)
-      @bar.mvaddstr(0, @label_x, "ohai :#{_formatted_percent} --> #{_new_width}")
       @bar.noutrefresh
-      @nc.doupdate
+      @nc.mvaddstr(@box[:y], @label_x, "#{_formatted_percent} (#{_formatted_amount})")
+      @nc.refresh
+      # @nc.doupdate
     end
   end
 end
