@@ -31,7 +31,7 @@ module Skylab::Kurse
         opts = ui ; ui = nil
       end
       opts and opts.each { |k, v| send("#{k}=", v) }
-      @ui ||= (ui || DefaultUi.singelton)
+      @ui ||= (ui || DefaultUi.singleton)
       @unit ||= 'sec'
       @presenter ||= :ncurses
       @out, @err = [@ui.out, @ui.err]
@@ -44,7 +44,10 @@ module Skylab::Kurse
       @_presenter = presenter_class.new(self)
     end
     attr_reader :out, :err, :ui
-    attr_accessor :presenter
+    attr_reader :presenter
+    def presenter= mixed
+      @presenter = mixed.kind_of?(String) ? mixed.intern : mixed
+    end
     attr_accessor :unit
     def run
       _init_state
@@ -86,7 +89,7 @@ module Skylab::Kurse
       if @current_frame_index >= @last_frame_index
         @done = true
       end
-      ratio = @presenter.waypoints[@current_frame_index][:ratio]
+      ratio = @_presenter.waypoints[@current_frame_index][:ratio]
       @current_units = @start_units + (ratio * @span_of_units_at_end)
     end
     def _divide_by_zero_check
@@ -112,7 +115,7 @@ module Skylab::Kurse
     end
     def _render_frame
       @t1f = Time.now.to_f
-      @presenter.render_frame
+      @_presenter.render_frame
     end
     def elapsed_animation_seconds
       Time.now.to_f - @t0f
@@ -193,6 +196,16 @@ end
 
 if __FILE__ == $PROGRAM_NAME
   include Skylab
-  Kurse.run_progress_bar
+  opts = {}; idx = 0; last = (argv = ARGV.dup).length - 1
+  while idx <= last
+    if md = /\A--([-a-z0-9]{2,})(?:=(.*))?\z/.match(argv[idx])
+      opts[md[1].gsub('-', '_').intern] = md[3] || (md[2] ? md[2].gsub(/\\(?=")/, '') : nil)
+      argv[idx] = nil
+    end
+    idx += 1
+  end
+  argv.compact!
+  argv.any? and fail("unparsable argument(s): #{argv.map(&:inspect).join(' ')}")
+  Kurse.run_progress_bar opts
 end
 
