@@ -24,14 +24,32 @@ module Skylab::Kurse
       send attr
     end
   end
+  module AttributeDefiner
+   def float *names
+      names.each do |attr|
+        attr_reader attr
+        define_method("#{attr}=") do |mixed|
+          case mixed
+          when String
+            /\A-?\d+(?:\.\d+)?\z/ =~ mixed or fail("For #{attr}, invalid float: #{mixed.inspect}")
+          end
+          instance_variable_set("@#{attr}", mixed.to_f)
+        end
+      end
+    end
+  end
   class ProgressBar
     include Common
+    extend AttributeDefiner
     def initialize(ui = nil, opts=nil, &b)
       if opts.nil? and ui.kind_of?(Hash)
         opts = ui ; ui = nil
       end
       opts and opts.each { |k, v| send("#{k}=", v) }
       @ui ||= (ui || DefaultUi.singleton)
+      @start_units ||= 1.3
+      @current_units ||= @start_units
+      @end_units ||= 2.2
       @unit ||= 'sec'
       @presenter ||= :ncurses
       @out, @err = [@ui.out, @ui.err]
@@ -43,11 +61,16 @@ module Skylab::Kurse
       end
       @_presenter = presenter_class.new(self)
     end
-    attr_reader :out, :err, :ui
+    float :current_units
+    float :end_units
+    attr_reader :err
+    attr_reader :out
     attr_reader :presenter
     def presenter= mixed
       @presenter = mixed.kind_of?(String) ? mixed.intern : mixed
     end
+    float :start_units
+    attr_reader :ui
     attr_accessor :unit
     def run
       _init_state
@@ -64,9 +87,6 @@ module Skylab::Kurse
       @done = false
       @t0 = @t1 = Time.now
       @t0f = @t0.to_f
-      @start_units = 1.3
-      @current_units = 1.3
-      @end_units = 2.2
       _recalculate :span_of_units_at_end
       @fps = 3
       _divide_by_zero_check
