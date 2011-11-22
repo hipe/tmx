@@ -49,7 +49,7 @@ module Skylab
       def slake
         check and return true # silent ok
         ! @ok and return false
-        Maker.new(ui.err, "#{me}: ").mkdir_p(@mkdir_p, :verbose => true)
+        Maker.new(ui.err, "#{me}: ").mkdir_p(@mkdir_p, :verbose => true, :noop => request[:dry_run]) # _show_bash @todo
         true
       end
 

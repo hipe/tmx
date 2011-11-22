@@ -1,4 +1,5 @@
 require 'skylab/slake/task'
+require File.expand_path('../node-methods', __FILE__)
 
 module Skylab::Dependency
   class SpecificationError < ::Skylab::Slake::SpecificationError; end
@@ -7,6 +8,11 @@ module Skylab::Dependency
   end
   class Task < Skylab::Slake::Task
     attribute :requires, :required => false
+    attribute :show_info, :required => false, :default => true
+    attribute :inherit_attributes, :reqiured => false, :default => ['show info']
+
+    include NodeMethods
+
     IdentifyingKeys = [ # we could of course generate these but we leave it explicit for now
       'ad hoc',
       'build tarball',
@@ -42,11 +48,11 @@ module Skylab::Dependency
           _fail("Ambiguous, mutually exclusive keys: (#{found.join(', ')})")
         end
       end
-      def build_specific_task data, parent_graph
+      def build_specific_task data, parent
         self == ::Skylab::Dependency::Task and fail("This is not to be called directly, but only from task subclasses")
-        task = new(data, parent_graph)
+        task = new(data, parent)
+        task.required_attributes_present? or return false
         task.task_init or return false # experimental, not guaranteed to happen here
-        task.valid? or return false
         task
       end
       def _fail msg
@@ -56,6 +62,7 @@ module Skylab::Dependency
         t.respond_to?(:name) and t.respond_to?(:children)
       end
     end
+    def node_type ; :task end
     def _fail msg
       raise SpecificationError.new(msg)
     end
@@ -64,7 +71,15 @@ module Skylab::Dependency
       false
     end
     def _info msg
-      ui.err.puts "#{_prefix}#{me}: #{msg}"
+      @show_info and ui.err.puts "#{_prefix}#{me}: #{msg}"
+      true
+    end
+    def _pretending msg, path=nil
+      if @show_info
+        _msg = "#{yelo 'pretending'} #{msg} for dry run"
+        path and (_msg << ": #{pretty_path path}")
+        _info _msg
+      end
       true
     end
     def _prefix
@@ -84,14 +99,25 @@ module Skylab::Dependency
     def _parent
       send @parent_accessor
     end
-    # it's important we do do some class-specific initialization so that we can have readable
-    # child class initialize methods who rely on this and e.g. the parent and ui and etc.
-    def initialize data, parent_graph
-      parent_graph and meet_parent_graph(parent_graph)
-      update_attributes data
+    PERMITTED_PARENTS = {
+      :list  => [],
+      :graph => [:list, :graph],
+      :task  => [:graph]
+    }
+    def meet_parent parent, data
+      @has_parent and fail("can't add multiple parents")
+      @has_parent = true
+      PERMITTED_PARENTS[node_type].include?(parent.node_type) or fail("nope")
+      @parent_accessor = case parent.node_type
+                         when :graph ; :parent_graph
+                         when :list  ; :parent_list
+                         else        ; fail("nope: #{parent.node_type.inspect}") ; end
+      class << self ; self end.send(:define_method, @parent_accessor) { parent }
+      data.key?(:inherit_attributes) and update_attributes(:inherit_attributes => data[:inherit_attributes])
+      _inherit_attributes_from_parent! data
+      data.delete(:inherit_attributes)
+      self
     end
-    alias_method :task_orig_initialize, :initialize
-
     def styled_name opts=nil
       style = if opts
         if    false == opts[:color]  then :_no_color
@@ -120,6 +146,7 @@ module Skylab::Dependency
       end
       @task_init_ok
     end
+    attr_accessor :task_initted, :task_init_ok # debugging only
     def _task_init
       defaults!
       interpolated? or interpolate! or false
@@ -138,33 +165,57 @@ module Skylab::Dependency
     def _closest_parent_list
       parent_graph and parent_graph._closest_parent_list
     end
+
+    MutexOpts = [:check, :update, :view_tree, :view_bash]
     def run ui, req
       @ui = ui
       @request = req
-      if ! task_init
-        false
-      elsif @request[:check]
+      task_init or return false
+      @request[:name] and return _run_filtered
+      1 < (ks = (req.keys & MutexOpts)).size && (ks2 = (ks - [:check, :update])).any? and return _mutex_fail(ks, ks2)
+      (a = (ks2 or ks)).any? and return case a.first
+        when :view_tree ; _view_tree
+        when :view_bash ; _view_bash
+      end
+      if @request[:check]
         if @request[:update]
           update_check
         else
           check
         end
-      elsif @request[:view_tree]
-        _view_tree
+      elsif @request[:update]
+        update_slake
       else
-        if @request[:update]
-          update_slake
-        else
-          slake
-        end
+        slake
       end
     end
+    def _mutex_fail ks, ks2
+      ks.length > ks2.length and ks2.push('("check" and or "update")')
+      ks2.map! { |e| e.kind_of?(String) ? e : "\"#{e.to_s.gsub('_', ' ')}\"" }
+      _err "#{ks2.join(' and ')} are mutually exclusive.  Please use only one."
+      false
+    end
+    def dry_run?            ; request[:dry_run]            end
+    def optimistic_dry_run? ; request[:optimistic_dry_run] end
     def _view_tree
       require 'skylab/face/cli/view/tree'
       loc = Skylab::Face::Cli::View::Tree::Locus.new
       color = ui.out.tty?
       loc.traverse(self) do |node, meta|
         ui.out.puts "#{loc.prefix(meta)}#{node.styled_name(:color => color)} (#{node.object_id.to_s(16)})"
+      end
+    end
+    def _view_bash
+      @request[:dry_run] = true
+      @request[:optimistic_dry_run] = true
+      @show_info = false
+      slake
+    end
+    def _show_bash cmd
+      if request[:view_bash]
+        ui.out.puts cmd
+      else
+        _info cmd
       end
     end
     def update_check
@@ -194,12 +245,17 @@ module Skylab::Dependency
     def interpolate_build_dir
       build_dir
     end
+    # BEGIN styles (abbreviated b/c of frequency of use)
     def BLU s
       style s, :bright, :cyan
     end
     def blu s
       style s, :cyan
     end
+    def skp s
+      style s, :bright, :white
+    end
+    # end
     def _no_color x ; x end
     def _skip msg
       ui.err.puts "#{hi '---> skip:'} #{blu name}: #{msg}"

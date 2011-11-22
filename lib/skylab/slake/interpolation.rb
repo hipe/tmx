@@ -1,76 +1,125 @@
+require 'strscan'
+
 module Skylab
   module Slake
     module Interpolation
       def interpolate!
-        keys = uninterpolatable_keys
-        interpolated_via_methods = self.interpolated_via_methods.dup
-        unused_interpolated_via_methods = interpolated_via_methods.dup
-        if keys.any?
-          @else or return _interpolation_fail_undefined(keys)
-          (node = parent_graph.node(@else)) or return _interpolation_fail(keys, "because else node not found (see above)")
-          node.interpolate! or return _interpolation_fail(keys, "(because of above errors)")
-          (keys = uninterpolatable_keys).any? and return _interpolation_fail(keys, "after interpolating upstream")
-        end
-        uninterpolated.each do |attrib, names|
-          value = send(attrib)
-          value.kind_of?(String) or return _interpolation_fail([attrib], "because it was not a string (had: #{value.inspect})")
-          names.each do |name|
-            name_as_key = Interpolation.to_key(name)
-            if idx = interpolated_via_methods.index(name_as_key)
-              interpolated_value = send("interpolate_#{name}")
-              request[name_as_key] ||= interpolated_value # ick careful
-              unused_interpolated_via_methods[idx] = nil
+        ok = Interpolation.new(self).interpolate!
+        ok and @interpolated = true
+        ok
+      end
+      attr_reader :interpolated
+      alias_method :interpolated?, :interpolated
+    end
+    class Interpolation::Interpolation
+      def initialize host
+        @host = lambda{ host } # always have clean dumps (temp debuggin)
+      end
+      def host ; @host[] end
+      def interpolate!
+        @interpolate_me = _parsed_interpolatable_attribute_values
+        @found_strategy = { }
+        @missing_strategy = Hash.new { |h, k| h[k] = [] }
+        _determine_strategies! or return false
+        _resolve_graph!
+      end
+      def _determine_strategies!
+        @interpolate_me.each do |o|
+          o[:placeholders].each do |oo|
+            if @found_strategy.key?(oo[:name])
+              oo[:strategy] = @found_strategy[oo[:name]]
             else
-              interpolated_value =  request[name_as_key]
+              if host.respond_to?(m1 = "interpolate_#{oo[:name]}")
+                oo[:strategy] = :interpolating_method
+              elsif host.respond_to?(oo[:name]) and ! host.send(oo[:name]).nil?
+                oo[:strategy] = :getter_method
+              elsif host.fallback? and fb = host.fallback
+                if fb.respond_to?(m1)
+                  oo[:strategy] = :fallback_interpolating_method
+                  oo[:_fb] = fb
+                elsif fb.respond_to?(oo[:name])
+                  oo[:strategy] = :fallback_getter_method
+                  oo[:_fb] = fb
+                end
+              end
+              if oo[:strategy]
+                @found_strategy[oo[:name]] = oo[:strategy]
+              else
+                fail_meta = oo.dup
+                fail_meta[:_interp] = m1
+                fail_meta[:_fb] = fb
+                fail_meta[:_orig_string] = o[:orig_string]
+                @missing_strategy[oo[:name]].push fail_meta
+              end
             end
-            value.gsub!("{#{name}}", interpolated_value)
           end
-          send("#{attrib}=", value)
         end
-        unused_interpolated_via_methods.compact.each do |sym|
-          request[sym] ||= send("interpolate_#{sym}") # ick, easier just to do them all
-        end
-        @interpolated = true
+        @missing_strategy.any? and return _err(_explain_missing_strategy)
+        true
       end
-
-      def _interpolation_fail(things, because)
-        @ui.err.puts "Failed to interpolate (#{things.map(&:inspect).join(', ')}) of #{task_type_name.inspect} #{because}"
-        false
-      end
-
-      def _interpolation_fail_undefined things
-        _interpolation_fail(things, <<-HERE.gsub(/\A */, '').gsub(/\n */, ' ')
-          because there are no defined method(s) (e.g. #{keys.map{|k| "interpolate_#{k}".inspect}.join(', ')})
-          and it has no \"else\" node to satisfy unresolved variable names
-        HERE
+      def _explain_missing_strategy
+        _err(
+          "#{@missing_strategy.keys.map(&:inspect).join(', ')} could not be interpolated" <<
+          " in #{@missing_strategy.values.map { |a| a.map { |o| o[:_orig_string].inspect } }.flatten(1).uniq.join(', ')}. " <<
+          @missing_strategy.map { |k, v|
+            f = v.first
+            "The #{host.name.inspect} task node has no #{k.inspect} getter nor defines a #{v.first[:_interp].inspect} method" <<
+              ( f[:_fb] ? " and ditto for its ('else') node #{f[:_fb].name.inspect}." : " and had no 'else' node." )
+          }.join(' ')
         )
       end
-
-      def uninterpolatable_keys
-        still_need = []
-        have_keys = request.keys + interpolated_via_methods
-        uninterpolated.each do |var, names|
-          still_need.concat( names.map{ |s| Interpolation.to_key(s) } - have_keys )
+      def _resolve_graph!
+        host = self.host
+        @interpolate_me.each do |o|
+          scn = StringScanner.new o[:orig_string]
+          cheap_ast = []
+          loop do
+            scn.eos? and break
+            cheap_ast.push scn.scan %r@([^{]|{(?![- a-z]))*@
+            scn.eos? and break
+            cheap_ast.push (scn.scan %r@{[_ a-z]+}@).match(%r@\A{(.+)}\z@)[1].intern
+          end
+          interpolated = cheap_ast.each_with_index.map do |m, idx|
+            if idx % 2 == 0
+              m
+            else
+              oo = o[:placeholders].shift or fail("logix whoopsie")
+              oo[:name].intern == m       or fail("logix whoopsie")
+              case oo[:strategy]
+                when :interpolating_method          ; src = host;     meth = "interpolate_#{oo[:name]}"
+                when :getter_method                 ; src = host;     meth = oo[:name]
+                when :fallback_interpolating_method ; src = oo[:_fb]; meth = "interpolate_#{oo[:name]}"
+                when :fallback_getter_method        ; src = oo[:_fb]; meth = oo[:name]
+                else                                ; fail("logix whoopsie")
+              end
+              _ = src.send(meth)
+              _.nil? and fail("#{src.name}##{meth} returned nil (unacceptable as a placeholder value).")
+              _
+            end
+          end.join('')
+          host.send("#{o[:getter]}=", interpolated)
         end
-        still_need.uniq
+        @interpolate_me.length # return any trueish
       end
 
-      def interpolated_via_methods
-        methods.grep(/\Ainterpolate_./).map{ |x| /\Ainterpolate_(.+)\z/.match(x)[1].intern }
+      def _err msg
+        host._fail "Interpolation Fail: #{msg}"
+        false # above should raise exception so this should never get here
       end
 
-      def uninterpolated
-        self.class.attributes.keys.map do |k|
-          if (str = self.send(k)).kind_of?(String)
-            names = str.scan(/\{[_a-z0-9]+\}/).map{|s| /\A\{(.*)\}\z/.match(s)[1]}
-            names.any? ? [k, names] : nil
+      def _parsed_interpolatable_attribute_values
+        host = self.host
+        host.class.attributes.keys.map do |k|
+          if (str = host.send(k)).kind_of?(String)
+            names = str.scan(/\{[ _a-z0-9]+\}/).map{|s| /\A\{(.*)\}\z/.match(s)[1]}
+            { :getter => k, :orig_string => str, :placeholders => names.map { |n| { :name => n } } } if names.any?
           end
         end.compact
       end
       attr_reader :interpolated
       alias_method :interpolated?, :interpolated
       class << self
-        def to_key name
+        def intern name
           name.gsub(' ', '_').intern
         end
       end

@@ -19,4 +19,3 @@ module Skylab
     end
   end
 end
-

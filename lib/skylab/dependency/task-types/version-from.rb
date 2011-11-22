@@ -36,7 +36,7 @@ module Skylab
         version_range = build_version_range
         version_string = get_version_string
         if version_range.match(version_string)
-          ui.err.puts("  #{hi 'version ok'}: version #{version_string} is in range #{version_range}")
+          _info "#{hi 'version ok'}: version #{version_string} is in range #{version_range}"
           true
         else
           ui.err.puts("  #{ohno 'version mismatch'}: needed #{version_range} had #{version_string}")

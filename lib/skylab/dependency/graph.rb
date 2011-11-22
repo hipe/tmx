@@ -7,14 +7,17 @@ require File.expand_path('../task', __FILE__)
 module Skylab::Dependency
   class List < Array
     include Skylab::Face::Colors
+    include NodeMethods
+
     attr_accessor :path # the path of the json file that defines this list
-    def initialize opts=nil
-      super()
-      opts and opts.each { |k, v| send("#{k}=", v) }
-      @_child_prefix ||= '**>>' # some super ugly defaults so you notice
-      @_indent_with  ||= '**'
-    end
-    attr_accessor :_child_prefix, :_indent_with
+
+    extend Skylab::Slake::AttributeDefiner
+    attribute :show_info, :default => true
+    attribute :_child_prefix, :default => '**>>' # super ugly so you notice it
+    attribute :_indent_with, :default => '**'    # ditto
+
+    def node_type ; :list end
+
     def run ui, req
       results = []
       last_node = last_index = nil
@@ -41,19 +44,22 @@ module Skylab::Dependency
         dep_list
       end
       def from_data data
-        list = List.new(:_child_prefix => '--->', :_indent_with => '--')
-        data['external dependencies'].each do |dependency_data|
+        data = { "_child_prefix" => '---> ', "_indent_with" => '--' }.merge(data)
+        ed = data.delete('external dependencies') or fail("\"external dependencies\" must be present in data.")
+        list = List.new(data, nil) # no parent!
+        ed.each do |dependency_data|
           case dependency_data
           when String
-            list.push Task.build_task({'get' => dependency_data}, nil).meet_parent_list(list)
+            list.push Task.build_task( { 'build tarball' => dependency_data }, list )
           when Hash
-            if dependency_data.key?('target') # assumes it is a graph
-              graph = new
-              dependency_data.key?('name') and graph.name = dependency_data['name']
+            if dependency_data.key?('target') # assumes it is a graph.
+              _data = {} # empty ass data for graph for now
+              dependency_data.key?('name') and _data['name'] = dependency_data.delete('name') # ick
+              graph = new(_data, list) # Graph.new (only place!)
               graph.node_data = dependency_data
-              list.push graph.meet_parent_list(list)
+              list.push graph
             else # assume it is a task
-              list.push Task.build_task(dependency_data, nil).meet_parent_list(list)
+              list.push Task.build_task(dependency_data, list)
             end
           else
             raise SpecificationError.new("no: #{dependency_data.inspect}")
@@ -62,16 +68,7 @@ module Skylab::Dependency
         list
       end
     end
-    def initialize
-      # override parent, we want no args
-    end
-    def meet_parent_list list
-      @has_parent and fail("can't assign multiple parents")
-      class << self ; self end.send(:define_method, :parent_list) { list }
-      @has_parent = true
-      @parent_accessor = :parent_list
-      self
-    end
+    def node_type ; :graph end
     def node_data= data
       @nodes = data
     end
@@ -85,11 +82,14 @@ module Skylab::Dependency
     def node name
       @nodes.key?(name) or return failed(
         "No such node #{name.inspect}. (Have: #{@nodes.keys.join(', ')})")
-      case (data = @nodes[name])
+      result = case (data = @nodes[name])
       when String
         ReferenceResolution.new(self, @nodes, name, data).resolve
       when Hash
         begin
+          if ! data.key?('name') and 'target' != name # ick, experimental
+            data['name'] = name
+          end
           node = Task.build_task(data, self)
         rescue SpecificationError => e
           return failed(e.message)
@@ -99,6 +99,10 @@ module Skylab::Dependency
       else
         data # use whatever is there per caching above
       end
+      unless result.task_init_ok
+        fail("fix this, task must always be initted at this point.")
+      end
+      result
     end
     def node? name
       @nodes.key? name
@@ -115,11 +119,16 @@ module Skylab::Dependency
       ui.err.puts msg
       false
     end
+    def _run_filtered
+      node = self.node(_ = request.delete(:name)) or return false # stop the recursion
+      _info "running filtered subset: #{_.inspect}"
+      node.run(ui, request) # pass the same args again
+    end
   protected
     def check
       node, ret = target_node
       node or return ret
-      ui.err.puts "#{bold('---> checking:')} #{styled_name}"
+      @show_info and ui.err.puts("#{grph 'checking'}#{styled_name}")
       if ok = node.check
         node?('version') and node('version').run
       end
@@ -134,7 +143,7 @@ module Skylab::Dependency
       node.update_slake
     end
     def _checking_for_updates
-      ui.err.puts "#{bold '---> checking for updates:'} #{styled_name}"
+      @show_info and ui.err.puts("#{grph 'checking for updates'}#{styled_name}")
       node, ret = target_node
       if ! node
         _skip("no updates to perform for #{styled_name(:strong => false)} because no target_node " <<
@@ -146,16 +155,16 @@ module Skylab::Dependency
     def slake
       node, ret = target_node
       node or return ret
-      ui.err.puts "#{bold('---> installing/checking:')} #{styled_name}"
+      @show_info and ui.err.puts("#{grph 'installing/checking'}#{styled_name}")
       dependencies_slake or return false
       ok = node.slake
       after_run_slake_or_check ok
     end
     def after_run_slake_or_check ok
       if ok
-        ui.err.puts "#{bold('---> installed:')} #{styled_name}"
+        @show_info and ui.err.puts("#{grph 'installed'}#{styled_name}")
       else
-        ui.err.puts "#{ohno('---> dependency not met:')} #{styled_name}"
+        @show_info and ui.err.puts("#{ohno("#{_prefix}dependency not met:")} #{styled_name}")
       end
       ok
     end
@@ -166,10 +175,14 @@ module Skylab::Dependency
       end
       node = self.node('target') or return [nil, nil]
       if node.disabled?
-        ui.err.puts "#{hi('---> skip:')} #{style_name(:strong => false)} (target disabled)"
+        @show_info and ui.err.puts("#{hi("#{_prefix}skip:")} #{styled_name(:strong => false)} (target disabled)")
         return [nil, true]
       end
       [node, nil]
+    end
+    # a styled prefix just used by graphs for now
+    def grph str
+      "#{_prefix}#{bold str}: "
     end
   end
   class ReferenceResolution
@@ -195,7 +208,7 @@ module Skylab::Dependency
         else
           @graph.node(name)
         end
-      elsif %r{\A(?:https?|ftp)://} =~ name
+      elsif %r{\A(?:https?|ftp)://} =~ name # a bit hacked for now
         Task.build_task({ 'build tarball' => name }, @graph)
       else
         @graph.failed("nope: #{name.inspect}")

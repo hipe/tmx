@@ -5,13 +5,11 @@ module Skylab
     class TaskTypes::TarballTo < TaskTypes::Get
       attribute :tarball_to
       attribute :from, :required => false
-      attribute :get
       attribute :stem, :required => false
+      attribute :basename, :required => false
       module Constants
-        TARBALL_EXTENSION = /(?:\.tar\.(?:gz|bz2)|\.tgz)\z/
-      end
-      def interpolate_basename
-        File.basename(@get)
+        TARBALL_EXT = /\.tar\.(?:gz|bz2)|\.tgz/
+        TARBALL_EXTENSION = /(?:#{TARBALL_EXT.source})\z/
       end
       def interpolate_stem
         @stem || self.class.stem(@get)
