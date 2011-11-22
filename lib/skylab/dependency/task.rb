@@ -166,16 +166,16 @@ module Skylab::Dependency
       parent_graph and parent_graph._closest_parent_list
     end
 
-    MutexOpts = [:check, :update, :view_tree, :view_bash]
+    MUTEX_OPTS = [:check, :update, :view_tree, :view_bash]
     def run ui, req
       @ui = ui
       @request = req
       task_init or return false
       @request[:name] and return _run_filtered
-      1 < (ks = (req.keys & MutexOpts)).size && (ks2 = (ks - [:check, :update])).any? and return _mutex_fail(ks, ks2)
-      (a = (ks2 or ks)).any? and return case a.first
-        when :view_tree ; _view_tree
-        when :view_bash ; _view_bash
+      1 < (ks = (req.keys & MUTEX_OPTS)).size && (ks2 = (ks - [:check, :update])).any? and return _mutex_fail(ks, ks2)
+      (a = (ks2 or ks)).any? and case a.first
+        when :view_tree ; return _view_tree
+        when :view_bash ; return _view_bash
       end
       if @request[:check]
         if @request[:update]
