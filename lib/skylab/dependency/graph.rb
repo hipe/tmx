@@ -82,7 +82,7 @@ module Skylab::Dependency
     def node name
       @nodes.key?(name) or return failed(
         "No such node #{name.inspect}. (Have: #{@nodes.keys.join(', ')})")
-      case (data = @nodes[name])
+      result = case (data = @nodes[name])
       when String
         ReferenceResolution.new(self, @nodes, name, data).resolve
       when Hash
@@ -99,6 +99,10 @@ module Skylab::Dependency
       else
         data # use whatever is there per caching above
       end
+      unless result.task_init_ok
+        fail("fix this, task must always be initted at this point.")
+      end
+      result
     end
     def node? name
       @nodes.key? name
@@ -171,7 +175,7 @@ module Skylab::Dependency
       end
       node = self.node('target') or return [nil, nil]
       if node.disabled?
-        @show_info and ui.err.puts("#{hi("#{_prefix}skip:")} #{style_name(:strong => false)} (target disabled)")
+        @show_info and ui.err.puts("#{hi("#{_prefix}skip:")} #{styled_name(:strong => false)} (target disabled)")
         return [nil, true]
       end
       [node, nil]
