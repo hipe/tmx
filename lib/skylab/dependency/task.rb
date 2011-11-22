@@ -51,8 +51,8 @@ module Skylab::Dependency
       def build_specific_task data, parent
         self == ::Skylab::Dependency::Task and fail("This is not to be called directly, but only from task subclasses")
         task = new(data, parent)
+        task.required_attributes_present? or return false
         task.task_init or return false # experimental, not guaranteed to happen here
-        task.valid? or return false
         task
       end
       def _fail msg
@@ -72,6 +72,14 @@ module Skylab::Dependency
     end
     def _info msg
       @show_info and ui.err.puts "#{_prefix}#{me}: #{msg}"
+      true
+    end
+    def _pretending msg, path=nil
+      if @show_info
+        _msg = "#{yelo 'pretending'} #{msg} for dry run"
+        path and (_msg << ": #{pretty_path path}")
+        _info _msg
+      end
       true
     end
     def _prefix
@@ -138,6 +146,7 @@ module Skylab::Dependency
       end
       @task_init_ok
     end
+    attr_accessor :task_initted, :task_init_ok # debugging only
     def _task_init
       defaults!
       interpolated? or interpolate! or false
@@ -186,6 +195,8 @@ module Skylab::Dependency
       _err "#{ks2.join(' and ')} are mutually exclusive.  Please use only one."
       false
     end
+    def dry_run?            ; request[:dry_run]            end
+    def optimistic_dry_run? ; request[:optimistic_dry_run] end
     def _view_tree
       require 'skylab/face/cli/view/tree'
       loc = Skylab::Face::Cli::View::Tree::Locus.new
@@ -196,6 +207,7 @@ module Skylab::Dependency
     end
     def _view_bash
       @request[:dry_run] = true
+      @request[:optimistic_dry_run] = true
       @show_info = false
       slake
     end

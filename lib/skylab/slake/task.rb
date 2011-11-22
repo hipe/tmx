@@ -23,7 +23,7 @@ module Skylab
       def disabled?
         ! (@enabled.nil? || @enabled)
       end
-      def valid?
+      def required_attributes_present?
         if (missing = self.class.attributes.each.select do |k, v|
           v[:required] && instance_variable_get("@#{k}").nil?
         end).any?
@@ -85,7 +85,6 @@ module Skylab
       def _undo
         ui.err.puts "(No undo defined for #{hi long_name}.)"
       end
-    protected
       def fallback?
         ! @else.nil?
       end
