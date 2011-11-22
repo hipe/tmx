@@ -1,6 +1,6 @@
 require File.expand_path('../../task', __FILE__)
 require File.expand_path('../tarball-to', __FILE__)
-require 'skylab/face/open2'
+require'skylab/face/open2'
 
 module Skylab
   module Dependency
@@ -11,48 +11,26 @@ module Skylab
       attribute :unzips_to, :required => false
       attribute :basename, :required => false
       include TaskTypes::TarballTo::Constants
-      def slake
-        fallback.slake or return false
-        check(false) and return true
-        execute
-      end
-      def check verbose = true
-        _directory_exists? and return true
-        verbose and _info("expected unzipped dir path not found: #{pretty_path expected_unzipped_dir_path}")
-      end
-      def _directory_exists?
-        if File.directory?(expected_unzipped_dir_path)
+      def check
+        if File.directory? expected_unzipped_dir_path
           _info "#{skp 'assuming'} unzipped already (#{yelo 'careful'} no checksums used): #{pretty_path expected_unzipped_dir_path}"
           true
         else
           false
         end
       end
-      def check_size path
-        if 0 < File.stat(path).size
-          true
-        else
-          _info "#{me}: cannot unzip, file is zero size: #{pretty_path path}"
-          false
-        end
-      end
-      def expected_unzipped_dir_path
-        if @unzips_to
-          File.join(build_dir, @unzips_to)
-        else
-          @unzip_tarball.sub(TARBALL_EXTENSION, '')
-        end
+      def slake
+        check and return true # short circuit further work (common)
+        fallback.slake or return false
+        execute
       end
       def execute
-        _directory_exists? and return true
-        unless File.exist?(@unzip_tarball)
-          return _err("tarball not found: #{pretty_path @unzip_tarball}")
-        end
-        check_size(@unzip_tarball) or return
+        check_source or return false
+        check_size(@unzip_tarball) or return false
         cmd = "cd #{escape_path build_dir}; tar -xzvf #{escape_path File.basename(@unzip_tarball)}"
         _show_bash cmd
-        if request[:dry_run]
-          _info "(#{yelo 'skipping'} per dry run.  careful, faking success!)"
+        if dry_run?
+          _pretending "above."
           bytes, seconds = [0, 0.0]
         else
           bytes, seconds = open2(cmd) do |on|
@@ -61,12 +39,52 @@ module Skylab
           end
         end
         _info "read #{bytes} bytes in #{seconds} seconds."
-        check and return true
-        request[:dry_run] and return true
-        _err "failed to unzip?"
+        if File.directory?(expected_unzipped_dir_path)
+          true
+        elsif optimistic_dry_run?
+          true
+        else
+          _err "expected unzipped directory did not exist: #{pretty_path expected_unzipped_dir_path}"
+          false
+        end
       end
       def interpolate_stem
         fallback.interpolate_stem
+      end
+      def check_source
+        if File.exist? @unzip_tarball
+          true
+        elsif optimistic_dry_run?
+          _pretending "exists", @unzip_tarball
+          true
+        else
+          _err("tarball not found: #{pretty_path @unzip_tarball}")
+        end
+      end
+      def check_size path
+        if File.exist? path
+          if 0 < File.stat(path).size
+            true
+          elsif optimistic_dry_run?
+            _pretending "file has nonzero size", path
+            true
+          else
+            _info "cannot unzip, file is zero size: #{pretty_path path}"
+            false
+          end
+        elsif optimistic_dry_run?
+          _pretending "file exists and has nonzero size", path
+          true
+        else
+          _err "file not found: #{path}"
+        end
+      end
+      def expected_unzipped_dir_path
+        if @unzips_to
+          File.join(build_dir, @unzips_to)
+        else
+          @unzip_tarball.sub(TARBALL_EXTENSION, '')
+        end
       end
       def _defaults!
         if true == @unzip_tarball

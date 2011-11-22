@@ -11,6 +11,10 @@ module Skylab
       attribute :from, :required => false
       attribute :get
 
+      def interpolate_basename
+        File.dirname get # for children, leave this as accessor
+      end
+
       def check
         results = pairs.map do |from_url, to_file|
           bytes = _bytes(to_file)
@@ -72,7 +76,7 @@ module Skylab
           cmd = "curl -OL h #{from_url} > #{::Skylab::Face::PathTools.escape_path to_file}"
           _show_bash cmd
           bytes, seconds =
-          if request[:dry_run]
+          if dry_run?
             [0, 0.0]
           else
             ::Skylab::Face::Open2.open2(cmd) do |on|

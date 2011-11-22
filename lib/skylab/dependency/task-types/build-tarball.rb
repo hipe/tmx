@@ -11,28 +11,34 @@ module Skylab
       def _task_init
         @interpolated or interpolate! or return false
         pathname = Pathname.new(build_tarball)
-        dirname, @basename = [pathname.dirname.to_s, pathname.basename.to_s]
+        dirname, basename_with_get_args = [pathname.dirname.to_s, pathname.basename.to_s]
+        @basename = /\A([^?]+)/.match(basename_with_get_args)[1]
         @nodes = {
           "name" => "build tarball",
           "target" => {
             "configure make make install" => "{build_dir}/{basename}",
             "prefix" => "/usr/local",
             "else" => "unzip",
-            "basename" => @basename,
-            "inherit attributes" => ["configure with", "show info"]
+            "inherit attributes" => ['configure with', 'basename', 'show info']
           },
           "unzip" => {
             "unzip tarball" => "{build_dir}/{basename}",
             "else"          => "download",
-            "basename"      => @basename
+            "inherit attributes" => ['basename', 'show info']
           },
           "download" => {
             "tarball to"    => "{build_dir}/{basename}",
             "from"          => dirname,
-            "get"           => @basename
+            "get"           => basename_with_get_args,
+            'inherit attributes' => ['basename', 'show info']
           }
         }
         true
+      end
+
+      # children tasks reach up to this parent
+      def basename
+        @basename or fail("wtf")
       end
 
       def update_slake

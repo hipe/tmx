@@ -31,7 +31,13 @@ module Skylab
           basename = get_dir_basename(basename) or return false
           @dir = File.join(dirname, basename)
         end
-        (File.directory?(@dir) or request[:view_bash]) or return nope("not a directory: #{@dir}")
+        if ! File.directory? @dir
+          if dry_run?
+            _pretending "directory exists", @dir
+          else
+            return nope("not a directory: #{@dir}")
+          end
+        end
         configure and make and make_install
       end
       def configure
@@ -78,7 +84,7 @@ module Skylab
       end
       def get_stem
         @stem and return @stem
-        md = File.basename(@dir).match(/\A(.*[^-\.\d])[-\.\d]+\z/)
+        md = File.basename(@dir).match(/\A(?:lib)?(.*[^-\.\d])[-\.\d]+\z/)
         md or return _err("@stem not set and couldn't infer stem from #{@dir.inspect}")
         md[1]
       end
@@ -93,14 +99,14 @@ module Skylab
         stem = get_stem or return
         dot_a = File.join(prefix, "lib/lib#{stem}.a") # e.g. /usr/local/lib/libpcre.a
         if File.exist?(dot_a)
-          _info "#{skp 'assuming'} make install'd b/c existsc: #{dot_a}"
+          _info "#{skp 'assuming'} make install'd b/c exists: #{dot_a}"
           true
         else
           false
         end
       end
       def _command cmd
-        if request[:dry_run]
+        if dry_run?
           if request[:view_bash]
             _show_bash cmd
           else

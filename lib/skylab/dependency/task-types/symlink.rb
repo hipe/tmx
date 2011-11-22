@@ -54,7 +54,10 @@ module Skylab
             end
           else
             _show_bash "ln -s #{target} #{symlink}"
-            if 0 == (r = File.symlink(target, symlink))
+            if dry_run?
+              optimistic_dry_run? or _pretending "success from above"
+              [false, true]
+            elsif 0 == (r = File.symlink(target, symlink))
               [false, true]
             else
               _info "Unexpected status from symlink command: #{r.inspect}"
