@@ -58,6 +58,7 @@ module Skylab::Kurse
       presenter_class = case @presenter
         when :ncurses ; NcursesBar ;
         when :ugly    ; Ugly       ;
+        when :cr      ; Cr         ;
         else          ; fail("no: #{@presenter.inspect}")
       end
       @_presenter = presenter_class.new(self)
@@ -180,10 +181,10 @@ module Skylab::Kurse
       @err.puts sprintf('%7s', _formatted_percent) # blit
     end
     def _formatted_amount
-      '%.1f %s' % [@data.current_units, @data.unit]
+      '%4.1f %s' % [@data.current_units, @data.unit]
     end
     def _formatted_percent
-      '%.2f%' % [@data.ratio * 100]
+      '%6.2f%' % [@data.ratio * 100]
     end
     def on_end
     end
@@ -235,6 +236,33 @@ module Skylab::Kurse
       @nc.mvaddstr(@box[:y], @label_x, "#{_formatted_percent} (#{_formatted_amount})")
       @nc.refresh
       # @nc.doupdate
+    end
+  end
+  class Cr < Ugly
+    def on_start
+      super
+      @screen_width = 80
+      @max_arrow_length = @screen_width - 18  # 'ddd.dd% (12.3 sec)'
+      @max_stem_length = [@max_arrow_length - HEAD.length, 0].max
+      @prev_length = 0
+    end
+    def _formatted_info
+      "#{_formatted_percent} (#{_formatted_amount})"
+    end
+    HEAD = '>'
+    TAIL = '|'
+    STEM = '-'
+    BLANK = ' '
+    def _arrow
+      length = [@max_arrow_length, (@data.ratio * @max_arrow_length).round].min
+      stem_length = [length - HEAD.length, 0].max
+      stem_length == @max_stem_length ? "#{STEM * stem_length}" : "#{STEM * stem_length}#{HEAD}"
+    end
+    def render_frame
+      arrow = _arrow
+      info = _formatted_info
+      rest = "#{BLANK * [@screen_width - info.length - arrow.length - HEAD.length, 0].max}#{TAIL}"
+      @err.write "#{"\r" * @screen_width}#{info}#{arrow}#{rest}"
     end
   end
 end
