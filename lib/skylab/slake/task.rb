@@ -16,18 +16,14 @@ module Skylab
         # With subclasses it's ok to override
       end
       attribute :enabled, :required => false
+      attribute :inherit_attributes, :required => false
 
       attr_accessor :else
       attr_accessor :ui
-      def update_attributes data
-        data.each do |k, v|
-          send("#{k.gsub(' ','_')}=", v)
-        end
-      end
       def disabled?
         ! (@enabled.nil? || @enabled)
       end
-      def valid?
+      def required_attributes_present?
         if (missing = self.class.attributes.each.select do |k, v|
           v[:required] && instance_variable_get("@#{k}").nil?
         end).any?
@@ -48,14 +44,15 @@ module Skylab
         @name ? "#{@name} : #{task_type_name}" : task_type_name
       end
       def me
-        "  #{hi name}" # highlight the name, whatever that means to the Colors module
+        "#{hi name}" # highlight the name, whatever that means to the Colors module
       end
-      def meet_parent_graph parent_graph
-        @has_parent and fail("can't add multiple parents")
-        class << self ; self end.send(:define_method, :parent_graph) { parent_graph }
-        @parent_accessor = :parent_graph
-        @has_parent = true
-        self
+      def _inherit_attributes_from_parent! my_data
+        @inherit_attributes and @inherit_attributes.each do |attr|
+          attr = attr.gsub(' ', '_').intern
+          my_data.key?(attr) and next
+          # if we allow children to inherit nil-valued attributes from parents, they will incorrectly overwrite defaults (?)
+          (v = _parent.send(attr)).nil? or send("#{attr}=", v)
+        end
       end
       def children
         # for subclasses to implement where useful
@@ -88,7 +85,6 @@ module Skylab
       def _undo
         ui.err.puts "(No undo defined for #{hi long_name}.)"
       end
-    protected
       def fallback?
         ! @else.nil?
       end

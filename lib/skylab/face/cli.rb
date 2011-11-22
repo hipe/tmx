@@ -17,7 +17,7 @@ module Skylab::Face::Colors
   def hi   str ; style str, :green          end
   def ohno str ; style str, :red            end
   def yelo str ; style str, :yellow         end
-  Styles = { :bright => 1, :red => 31, :yellow => 33, :green => 32, :cyan => 36 }
+  Styles = { :bright => 1, :red => 31, :green => 32, :yellow => 33, :cyan => 36, :white => 37 }
   Esc = "\e"  # "\u001b" ok in 1.9.2
   def style str, *styles
     nums = styles.map{ |o| o.kind_of?(Integer) ? o : Styles[o] }.compact

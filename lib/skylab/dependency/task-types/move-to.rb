@@ -11,8 +11,8 @@ module Skylab
       attribute :from
       def initialize(*a)
         super(*a)
-        @fileutils_output = ui.err
-        @fileutils_label = "#{me}: "
+        @fileutils_output = request[:view_bash] ? ui.out : ui.err
+        @fileutils_label =  request[:view_bash] ? '' : _prefix
       end
       def slake
         if File.exist?(@move_to)
@@ -26,21 +26,35 @@ module Skylab
         end
       end
       def check
-        if ! File.exist?(@from)
-          _info "source file not found: #{@from}"
-          false
-        elsif File.exist?(@move_to)
-          _info "exists: #{@move_to}"
-          true
+        _src = File.exist? @from
+        _dst = File.exist? @move_to
+        if dry_run?
+          if ! _src
+            _pretending "exists", @file
+          end
+          if _dst
+            _info "exists: #{@move_to}"
+            true
+          else
+            _info "does not exist: #{@move_to}"
+            false
+          end
         else
-          _info "does not exist: #{@move_to}"
-          false
+          if ! _src
+            _info "source file not found: #{@from}"
+            false
+          elsif _dst
+            _info "exists: #{@move_to}"
+            true
+          else
+            _info "does not exist: #{@move_to}"
+            false
+          end
         end
       end
       def execute
-        if File.exist?(@from)
-          noop = request[:dry_run] ? true : false
-          mv(@from, @move_to, :verbose => true, :noop => noop)
+        if File.exist?(@from) or dry_run?
+          mv(@from, @move_to, :verbose => true, :noop => dry_run?) # _show_bash
           true
         else
           _info "FAILED: source file not found: #{@from}"
