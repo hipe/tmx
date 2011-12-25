@@ -35,7 +35,7 @@ module Skylab::Dependency
         op.on('--build-dir DIR',
           "Specifies build directory. (default: #{pretty_path(req[:build_dir])})") { |bd| req[:build_dir] = bd }
         op.on('--name NAME', "only run the child node with the given NAME (debugging)") { |nm| req[:name] = nm }
-        op.on('--view-tree', "(debugging feature)") { req[:view_tree] = true }
+        op.on('-t', '--view-tree', "(debugging feature)") { req[:view_tree] = true }
         op.on('-b', '--view-bash', "Supress all output except the bash commands that would be executed (experimental).") { req[:view_bash] = true }
       end
       def install req, *names
