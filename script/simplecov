@@ -1,0 +1,41 @@
+#!/usr/bin/env ruby -w
+
+module Skylab
+  class SimpleCov
+    ROOT = File.expand_path('../..', __FILE__)
+    def initialize argv
+      @argv = argv
+    end
+    def _load_bundler
+      ENV['BUNDLE_GEMFILE'] ||= "#{ROOT}/Gemfile"
+      require 'bundler/setup'
+    end
+    def program_name ; $PROGRAM_NAME end
+    def run
+      @argv.empty? and return usage
+      run_downstream
+    end
+    def run_downstream
+      _load_bundler
+      _without_warning { require 'rspec/core' }
+      _without_warning { require 'simplecov' }
+      ::SimpleCov.start
+      $VERBOSE = false # simplecov barfs at exit otherwise
+      ::RSpec::Core::Runner.run(@argv, $stderr, $stdout)
+    end
+    def usage ; puts "usage: #{usage_string}" end
+    def usage_string ; "#{program_name} [args to rcov]" end
+    def _without_warning
+      prev = $VERBOSE
+      $VERBOSE = false
+      begin
+        yield
+      ensure
+        $VERBOSE = prev
+      end
+    end
+  end
+end
+
+Skylab::SimpleCov.new(ARGV).run
+

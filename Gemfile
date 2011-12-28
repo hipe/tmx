@@ -15,4 +15,5 @@ group :development do
   else
     gem 'ruby-debug'
   end
+  gem 'simplecov'
 end
