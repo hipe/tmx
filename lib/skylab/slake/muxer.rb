@@ -43,7 +43,7 @@ module Skylab::Slake::Muxer
   end
   module InstanceMethods
     def emit type, data=nil
-      event_cloud = self.class.event_cloud
+      event_cloud = self._find_event_cloud
       tag = event_cloud[type] or raise RuntimeError.new("undeclared event type: #{type.inspect}")
       event = nil
       blocks = [event_listeners[tag.name], * tag.ancestors.map { |tag_name| event_listeners[tag_name] }].compact.flatten
@@ -51,6 +51,11 @@ module Skylab::Slake::Muxer
         block.call(event ||= Event.new(tag, data))
       end
       blocks.count
+    end
+    # sucks for now
+    def _find_event_cloud
+      singleton_class.instance_variable_defined?('@event_cloud') and return singleton_class.event_cloud
+      self.class.event_cloud
     end
     def event_listeners
       @event_listeners ||= EventListeners.new
