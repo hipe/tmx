@@ -1,8 +1,8 @@
 require File.expand_path('../../version', __FILE__)
-require File.expand_path('../support/ui-tee', __FILE__)
+require File.expand_path('../test-support/ui-tee', __FILE__)
 
 module Skylab::Dependency
-  include Test::Support # UiTee
+  include TestSupport # UiTee
 
   describe Version do
 
@@ -42,7 +42,7 @@ module Skylab::Dependency
       sexp.to_s.should eq("abc-3.5.8-def")
       lambda { ver.bump!(:not_there) }.should raise_error(::Skylab::CodeMolester::Sexp::RuntimeError, "no such node: :not_there")
     end
-    include Test::Support # UiTee (again)
+    include TestSupport # UiTee (again)
     def _parse str
       ui = UiTee.new
       sexp = Version::parse_string_with_version(str) do |o|
