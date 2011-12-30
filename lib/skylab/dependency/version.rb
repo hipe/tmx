@@ -1,6 +1,7 @@
 $:.include?(_skylab = File.expand_path('../../..', __FILE__)) or $:.unshift(_skylab)
 
 require 'skylab/code-molester/sexp'
+require 'skylab/slake/muxer'
 
 module Skylab
   module Dependency
@@ -10,25 +11,22 @@ module Skylab
       SPLITTER   = /\A(.*[^\.\d])?(#{REGEX.source})\z/
 
       class << self
-        def parse_string_with_version string, opts={}
-          @ui = opts[:ui] || Struct.new(:out, :err).new($stdout, $stderr)
+        def parse_string_with_version string
+          emitter = block_given? ? Parse.new : Parse::Singleton.loud
+          block_given? and yield(emitter)
           require 'strscan'
           sexp = CodeMolester::Sexp.new
           sexp.push(:version_string)
           s = StringScanner.new(string)
-          capture = s.scan_until(REGEX) or return _err(
+          capture = s.scan_until(REGEX) or return emitter.error(
             "version pattern not matched anywhere in string: #{string.inspect}")
-          s.rest =~ REGEX and return _err(
+          s.rest =~ REGEX and return emitter.error(
             "multiple version strings matched in string: #{string.inspect}")
           md = SPLITTER.match(capture)
           md[1] and sexp.push([:string, md[1]])
           sexp.push new(md[2])
           s.eos? or sexp.push([:string, s.rest])
           sexp
-        end
-        def _err str
-          @ui.err.puts("#{self} ERROR: #{str}")
-          false
         end
       end
       def initialize str
@@ -51,4 +49,28 @@ module Skylab
   end
 end
 
+
+class Skylab::Dependency::Version < Skylab::CodeMolester::Sexp
+  class Parse
+    extend Skylab::Slake::Muxer
+    emits :informational, :error => :informational
+    def error msg
+      emit :error, msg
+      false
+    end
+    def initialize
+      yield self if block_given?
+    end
+  end
+end
+
+class Skylab::Dependency::Version::Parse
+  module Singleton
+    def self.loud
+      @loud ||= Skylab::Dependency::Version::Parse.new do |o|
+        o.on_informational { |e| $stderr.puts "#{Skylab::Dependency::Version}:#{e.tag}: #{e.message}" }
+      end
+    end
+  end
+end
 
