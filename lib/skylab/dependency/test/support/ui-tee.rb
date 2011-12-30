@@ -24,11 +24,13 @@ module Skylab::Dependency
         end
       end
     end
-    class UiTee < Struct.new(:out, :err)
-      def initialize out=nil, err=nil
-        self.out = out || Tee.new(:stream => $stdout, :buffer => MyStringIO.new)
-        self.err = err || Tee.new(:stream => $stderr, :buffer => MyStringIO.new)
+    class UiTee
+      def initialize opts=nil
+        opts and opts.each { |k, v| send("#{k}=", v) }
+        @out ||= (@silent ? Tee.new(:buffer => MyStringIO.new) : Tee.new(:stream => $stdout, :buffer => MyStringIO.new))
+        @err ||= (@silent ? Tee.new(:buffer => MyStringIO.new) : Tee.new(:stream => $stderr, :buffer => MyStringIO.new))
       end
+      attr_accessor :err, :out, :silent
       %w(out err).each do |stream|
         define_method("#{stream}_string") do
           buffer = send(stream)[:buffer]
