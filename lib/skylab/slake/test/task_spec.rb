@@ -2,12 +2,14 @@ require File.expand_path('../../task', __FILE__)
 
 describe ::Skylab::Slake::Task do
 
+  include ::Skylab::Slake
+
   it "descends from Rake::Task (fyi)" do
-    ::Skylab::Slake::Task.new.should be_kind_of(::Rake::Task)
+    Task.new.should be_kind_of(::Rake::Task)
   end
 
   it "defines settable/gettable attributes in the class" do
-    klass = Class.new(::Skylab::Slake::Task).class_eval do
+    klass = Class.new(Task).class_eval do
       attribute :some_val
       self
     end
@@ -30,6 +32,12 @@ describe ::Skylab::Slake::Task do
       t.invoke
       t.touched.should eql(true)
     end
+    it "can define its slake() method with a lambda (how it is executed is undefined)" do
+      touched = false
+      t = Task.new(:slake => ->(){ touched = true })
+      t.invoke
+      touched.should eql(true)
+    end
   end
 
   describe "can define attributes as being interpolated" do
@@ -47,5 +55,33 @@ describe ::Skylab::Slake::Task do
     end
   end
 
+  describe "when it comes to parents, it" do
+    FakeParent = Class.new.class_eval do
+      self
+    end.new
+
+    let(:task) { ::Skylab::Slake::Task.new }
+    it "has no parent by default (of course!)" do
+      task.parent?.should eql(false)
+      task.parent.should eql(nil)
+    end
+    it "can be given a parent" do
+      task.parent = FakeParent
+      task.parent?.should eql(true)
+      task.parent.should eql(FakeParent)
+    end
+  end
+
+  describe "with regards to its name, rake parent stringifies all names so" do
+    it "a minimal Task object has \"\" for a name" do
+      Task.new.name.should eql('')
+    end
+    it "if you set it explicitly to nil it will still be \"\"" do
+      Task.new(:name => nil).name.should eql('')
+    end
+    it "and will call to_s on whatever name you give it (like false)" do
+      Task.new(:name => false).name.should eql('false')
+    end
+  end
 end
 

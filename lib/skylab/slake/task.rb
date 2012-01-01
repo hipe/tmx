@@ -1,11 +1,13 @@
 require 'rake'
 
 module Skylab ; end
+
 module Skylab::Slake
 
   root = File.expand_path('..', __FILE__)
   require "#{root}/attribute-definer"
   require "#{root}/interpolate"
+  require "#{root}/parenthood"
 
 
   module TaskClassMethods
@@ -18,11 +20,16 @@ module Skylab::Slake
     extend AttributeDefiner
     extend Interpolate
     extend TaskClassMethods
+    include Parenthood
     def execute args=nil
-      @actions.empty? and respond_to?(:slake) and @actions.push( ->(me) { me.slake } )
+      if @actions.empty?
+        respond_to?(:slake) and @actions.push( ->(me) { me.slake } )
+        @slake and @actions.push( ->(me) { @slake.call } )
+      end
       super
     end
     def initialize opts=nil
+      init_parenthood
       block_given? and yield self
       opts and opts.each { |k, v| send("#{k}=", v) }
       super(name, Rake.application)
@@ -38,8 +45,12 @@ module Skylab::Slake
       end
     end
     def name
-      self.class.task_type_name
+      instance_variable_defined?('@name') and return @name
+      self.class != Task and return self.class.task_type_name
+      nil
     end
+    attr_writer :name
+    attr_writer :slake
   end
 end
 
