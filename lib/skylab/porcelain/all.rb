@@ -138,9 +138,6 @@ module Skylab::Porcelain
   ParseOptionsKnob    = EventKnob.new(:syntax, :help_flagged)
   SyntaxEventKnob     = EventKnob.new(:syntax)
   class Action
-    def self.nameize sym
-      sym.to_s.gsub('_', '-').intern
-    end
     def argument_syntax
       if ! @argument_syntax.respond_to?(:parse_arguments)
         @argument_syntax = ArgumentSyntax.parse_syntax(@argument_syntax.to_s)
@@ -156,8 +153,9 @@ module Skylab::Porcelain
     def eventized_help(&block)
       option_syntax.eventized_option_help(&block)
     end
-    def initialize opts
+    def initialize opts={}, &block
       @argument_syntax = @name = @option_syntax = nil
+      block and opts.merge!(self.class.definition(&block))
       opts.each { |k, v| send("#{k}=", v) }
     end
     attr_reader :method_name
@@ -183,6 +181,22 @@ module Skylab::Porcelain
     end
     def syntax
       [name, option_syntax.to_s, argument_syntax.to_s].compact.join(' ')
+    end
+  end
+  class << Action
+    def definition &block
+      Class.new.class_eval do
+        extend ClientModuleMethods
+        def self.method_added method_name
+          @current_definition ||= {}
+          @current_definition[:method_name] = method_name
+        end
+        class_eval(&block)
+        self
+      end.instance_variable_get('@current_definition')
+    end
+    def nameize sym
+      sym.to_s.gsub('_', '-').intern
     end
   end
   class OptionSyntax < Array
@@ -241,7 +255,9 @@ module Skylab::Porcelain
     end
     def to_s
       0 == count and return nil
-      '[optz]'
+      build_parser({}).instance_variable_get('@stack')[2].list.map do |switch| # ick
+        "[#{[(switch.short.first || switch.long.first), switch.arg].compact.join('')}]"
+      end.join(' ')
     end
   end
   class ArgumentSyntax < Array
@@ -449,7 +465,7 @@ module Skylab::Porcelain
         "Try #{e13b invocation_name} #{render_actions} #{e13b "-h"}.")
       emit(:usage, "#{header 'usage:'} #{e13b "#{invocation_name} #{act.syntax}"}")
       act.eventized_help do |o|
-        o.on_header { |s| emit(:help, header(s)) }
+        o.on_header { |s| emit(:help, header(s.strip)) }
         o.on_two_col { |a, b| emit(:help, "#{e13b a}#{b}") }
         o.on_default { |line| emit(:help, line) }
       end

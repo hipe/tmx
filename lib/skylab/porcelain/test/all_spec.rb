@@ -300,9 +300,26 @@ module Skylab::Porcelain::Test
         end
       end
     end
+    describe "provides rendering" do
+      let (:action) do
+        Porcelain::Action.new do
+          option_syntax do |ctx|
+            on('-a', '--apple', "an apple")
+            on('-p', '--pear[=foo]',  "a pear")
+            on('--bananna=<type>', "a bananna")
+          end
+          argument_syntax '<foo> [<bar>]'
+          def whatever_is_clever foo, bar=nil; end
+        end
+      end
+      describe "of syntax" do
+       it "that is more detailed than optparse's" do
+         action.syntax.should eql('whatever-is-clever [-a] [-p[=foo]] [--bananna=<type>] <foo> [<bar>]')
+        end
+      end
+    end
   end
   describe 'Pending' do
-    it "shows short in syntax"
     it "explicates arguments"
     it "fuzzy matches"
   end
