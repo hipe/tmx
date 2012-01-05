@@ -13,7 +13,7 @@ module Skylab::Porcelain::Test
       to_s.match x
     end
   end
-  describe Porcelain do
+  describe "The #{Skylab::Porcelain} module" do
     describe "extended by a class allows that" do
       let(:klass) do
         Class.new.class_eval do
@@ -46,7 +46,7 @@ module Skylab::Porcelain::Test
         child_class.actions.map(&:name).should eql([:help, :foo, :bar, :'she-bang'])
       end
     end
-    describe "A DSL" do
+    describe "DSL" do
       let(:klass) do
         Class.new.class_eval do
           extend Porcelain
@@ -59,22 +59,22 @@ module Skylab::Porcelain::Test
       it "is used for defining option and argument syntax" do
         klass.actions[:bar].argument_syntax.to_s.should eql('<foo>')
       end
-      describe "Argument Syntax" do
-        it "lets you inspect the number of parameters" do
+      describe 'provides an argument syntax in which' do
+        it "you can inspect the number of parameters (like nonternimal symbols)" do
           klass.actions[:bar].argument_syntax.count.should eql(1)
         end
         def _ str
           __(str).first
         end
         def __ str
-           Porcelain::ArgumentSyntax.parse(str)
+           Porcelain::ArgumentSyntax.parse_syntax(str)
         end
-        describe "required parameter (a [1..1] ranged parameter)" do
+        describe "a required parameter (a [1..1] ranged parameter)" do
           let(:parameter) {  _ '<foo>' }
           it("knows it is required") { parameter.required?.should eql(true) }
           it("unparses correctly") { parameter.to_s.should eql('<foo>') }
         end
-        describe "optional parameter (a [0..1] ranged parameter)" do
+        describe "an optional parameter (a [0..1] ranged parameter)" do
           let(:parameter) { _ '[<foo>]' }
           it("knows it is not required") { parameter.required?.should eql(false) }
           it("unparses like so") { parameter.to_s.should eql('[<foo>]') }
@@ -142,18 +142,85 @@ module Skylab::Porcelain::Test
               lambda{ __('<a> [<b>] [<c>] <d> [<d> [..]]') }.should raise_exception(/optionals cannot occur in the middle/i)
             end
           end
-        end
+        end # optional
+        describe "a syntax for arguments of" do
+          let(:knob) { lambda { |k| k.on_all { |e| stderr.puts e } } }
+          describe "zero-length" do
+            let(:syntax) { Porcelain::ArgumentSyntax.parse_syntax('') }
+            it "against the zero-length args emits no errors and returns true" do
+              syntax.parse_arguments(argv = [], &knob).should eql(true)
+              stderr.to_s.should eql('')
+              argv.should eql([])
+            end
+            it "against a nonzero-length args emits an error and returns false" do
+              syntax.parse_arguments(argv = %w(alpha beta), &knob).should eql(false)
+              stderr.to_s.should match(/unexpected argument/i)
+              argv.should eql(%w(alpha beta))
+            end
+          end
+          describe "zero-or-one-length" do
+            let(:syntax) { Porcelain::ArgumentSyntax.parse_syntax('[<foo>]') }
+            it "against the zero-length args emits no errors and returns true" do
+              syntax.parse_arguments(argv = [], &knob).should eql(true)
+              stderr.to_s.should eql('')
+              argv.should eql([])
+            end
+            it "against one-length args emits no errors and returns true" do
+              syntax.parse_arguments(argv = ['first'], &knob).should eql(true)
+              stderr.to_s.should eql('')
+              argv.should eql(['first'])
+            end
+          end
+          describe "zero-to-many length" do
+            let(:syntax) { Porcelain::ArgumentSyntax.parse_syntax('[<foo> [..]]') }
+            it "against the zero-length args emits no errors and returns true" do
+              syntax.parse_arguments(argv = [], &knob).should eql(true)
+              stderr.to_s.should eql('')
+              argv.should eql([])
+            end
+            it "against one-length args emits no errors and returns true" do
+              syntax.parse_arguments(argv = ['first'], &knob).should eql(true)
+              stderr.to_s.should eql('')
+              argv.should eql(['first'])
+            end
+            it "against many-length args emits no errors and returns true" do
+              syntax.parse_arguments(argv = ['first', 'second'], &knob).should eql(true)
+              stderr.to_s.should eql('')
+              argv.should eql(['first', 'second'])
+            end
+          end
+          describe "a required, an optional, then a glob" do
+            let(:syntax) { Porcelain::ArgumentSyntax.parse_syntax('<foo> [<bar>] [<baz> [..]]') }
+            it "against the zero-length args emits an error and returns false" do
+              syntax.parse_arguments(argv = [], &knob).should eql(false)
+              stderr.to_s.should match(/expecting.+<foo>/)
+              argv.should eql([])
+            end
+            it "against one is ok" do
+              syntax.parse_arguments(argv = ['one'], &knob).should eql(true)
+              stderr.to_s.should eql('')
+              argv.should eql(['one'])
+            end
+            it "againt five is ok" do
+              syntax.parse_arguments(argv = %w(one two three four five), &knob).should eql(true)
+              stderr.to_s.should eql('')
+              argv.should eql(%w(one two three four five))
+            end
+           end # n length
+        end # of
+      end # ArgumentSyntax
+    end # DSL
+    include Porcelain::Styles # unstylize
+    let(:debug_ui) { false }
+    let(:stderr) { StringIo.new }
+    let(:instance) do
+      klass.new do |app|
+        app.on_all { |e| stderr.puts unstylize(e) ; debug_ui and $stderr.puts(e) }
       end
     end
     describe "invocation happens with a call to invoke() (pass it ARGV) that" do
-      include Porcelain::Styles # unstylize
       Porcelain::Runtime.send(:define_method, :invocation_name) { 'yourapp' }
       let(:expecting_foo_bar) { /expecting \{help\|foo\|bar\}/i }
-      let(:instance) do
-        klass.new do |app|
-          app.on_all { |e| stderr.puts unstylize(e) ; false and $stderr.puts(e) }
-        end
-      end
       let(:klass) do
         Class.new.class_eval do
           extend Porcelain
@@ -164,7 +231,6 @@ module Skylab::Porcelain::Test
           self
         end
       end
-      let(:stderr) { StringIo.new }
       it "with empty argv it complains, lists available actions and invites to more help" do
         instance.invoke []
         stderr.should match(expecting_foo_bar)
@@ -183,6 +249,43 @@ module Skylab::Porcelain::Test
       it "with -h (or help) followed by an action name, you get action-specific help" do
         instance.invoke ['-h', 'foo']
         stderr.should match(/syntax: yourapp foo/)
+      end
+    end
+    describe "when invoking an actions with no syntaxes defined (just public methods)" do
+      let(:klass) do
+        Class.new.class_eval do
+          extend Porcelain
+          attr_reader :argv ; private :argv
+          def initialize &b
+            @argv = @touched = nil
+            init_porcelain(&b)
+          end
+          def takes_no_arguments
+            @touched = true
+          end
+          attr_reader :touched ; private :touched
+          self
+        end
+      end
+      it "if no args are given it will enumerate the available actions (methods)" do
+        instance.invoke []
+        stderr.should match(/expecting.+takes-no-arguments/i)
+      end
+      describe "with one such action whose methods take no arguments" do
+        it "if you pass it no arguments, it is called" do
+          instance.invoke %w(takes-no-arguments)
+          instance.send(:touched).should eql(true)
+          stderr.to_s.should eql('')
+        end
+        it("if you pass it some arguments, it reports a syntax error and shows usage and invites for help", :wip=>true) do
+          # singleton_class.let(:debug_ui) { true }
+          instance.invoke(%w(takes-no-arguments first-arg)).should eql(false)
+          stderr.to_s.tap do |it|
+            it.should match(/unexpected argument[: ]+"first-arg"/i)
+            it.should match(/usage: yourapp takes-no-arguments/i)
+            it.should match(/try .* for help/i)
+          end
+        end
       end
     end
   end

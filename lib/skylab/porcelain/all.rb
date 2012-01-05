@@ -91,43 +91,67 @@ module Skylab::Porcelain
       detect { |a| a.name == sym }
     end
   end
+  class EventKnob < Hash
+    class << self
+      alias_method :orig_new, :new
+    end
+    def self.new *event_names
+      event_names.map!(&:intern)
+      Class.new(self).class_eval do
+        singleton_class.send(:define_method, :inspect) { "EventKnob(#{event_names.join(' ')})" }
+        singleton_class.send(:define_method, :event_names) { @event_names ||= event_names }
+        def self.new(*a)
+          orig_new(*a)
+        end
+        [:unhandled, :all, *event_names].each do |e|
+          define_method("on_#{e}") do |&b|
+            b or raise ArgumentError.new("on_#{e}() requires a block")
+            self[e] = b
+          end
+        end
+        event_names.each do |e|
+          define_method("emit_#{e}") do |*a|
+            (self[e] || self[:all] || (self[:unhandled] ||= _build_default_unhandled)).call(*a)
+          end
+        end
+        self
+      end
+    end
+    def _build_default_unhandled
+      ->(*a) { $stderr.puts("(unhandled event:) #{a.first}", *a[1..-1]) }
+    end
+    def to_proc
+      this = self
+      lambda do |eh|
+        this.class.event_names.each do |en|
+          eh.send("on_#{en}") { |*e| this.send("emit_#{en}", *e) }
+        end
+      end
+    end
+  end
+  SyntaxEventKnob = EventKnob.new(:syntax)
   class Action
     def self.nameize sym
       sym.to_s.gsub('_', '-').intern
     end
     def argument_syntax
-      NilClass === @argument_syntax and @argument_syntax = ''
-      String === @argument_syntax and @argument_syntax = ArgumentSyntax.parse(@argument_syntax)
+      if ! @argument_syntax.respond_to?(:parse_arguments)
+        @argument_syntax = ArgumentSyntax.parse_syntax(@argument_syntax.to_s)
+      end
       @argument_syntax
     end
     attr_writer :argument_syntax
     def duplicate
       Action.new( :argument_syntax => argument_syntax.to_s,
                   :method_name     => method_name,
-                  :option_syntax   => option_syntax.to_blocks)
+                  :option_syntax   => option_syntax.duplicate)
     end
     def help
-      yield(o = Class.new(Hash).class_eval do
-        %w(syntax).each do |m|
-          define_method("on_#{m}") { |&block| self[m] = block }
-          define_method("emit_#{m}") { |*a| (self[m] || default).call(*a) }
-        end
-        def default ; @default ||= ->(*a) { $stderr.puts(*a) } end
-        self
-      end.new)
-      parts = [name]
-      parts.push( @option_syntax ? '[generated opts]' : '[generic opts]' )
-      if @argument_syntax
-        parts.push @argument_syntax.to_s
-      elsif @method
-        parts.push '[deduced args]'
-      else
-        parts.push '[arguments]'
-      end
-      o.emit_syntax parts.join(' ')
+      yield( o = SyntaxEventKnob.new )
+      o.emit_syntax [name, option_syntax.to_s, argument_syntax.to_s].compact.join(' ')
     end
     def initialize opts
-      @name = nil
+      @argument_syntax = @name = @option_syntax = nil
       opts.each { |k, v| send("#{k}=", v) }
     end
     attr_reader :method_name
@@ -137,19 +161,49 @@ module Skylab::Porcelain
       sym
     end
     attr_accessor :name
+    def option_syntax
+      unless @option_syntax.respond_to?(:parse_options)
+        @option_syntax = OptionSyntax.build(@option_syntax)
+      end
+      @option_syntax
+    end
     attr_writer :option_syntax
-    def parse argv
-      @option_syntax and begin
-        puts "(pretending to optparse)"
+    def parse_both argv
+      yield( o = SyntaxEventKnob.new )
+      false == (opts = option_syntax.parse_options(argv, & o.to_proc)) and return
+      argument_syntax.parse_arguments(argv, & o.to_proc) or return
+      opts and argv.push(opts)
+      argv
+    end
+  end
+  class OptionSyntax < Array
+    def self.build mixed
+      syntax = new
+      case mixed
+      when NilClass # noop
+      when Array
+        no = mixed.detect { |o| ! o.kind_of?(Proc) } and
+          raise RuntimeError.new("expected array of procs, found #{no.class}")
+        syntax.concat mixed
+      when Proc ; syntax.push mixed
+      else raise RuntimeError.new("expecting array or nil had #{mixed.class}")
       end
-      @argument_syntax and begin
-        puts "(pretending to argparse #{@argument_syntax})"
-      end
-      return argv
+      syntax
+    end
+    alias_method :duplicate, :dup # only as long as it's stateless
+    def parse_options *x
+      empty? and return nil
+      yield( o = SyntaxEventKnob.new )
+      o.emit_syntax("flougger")
+      {}
+    end
+    def to_s
+      0 == count and return nil
+      '[fake opts!]'
     end
   end
   class ArgumentSyntax < Array
-    def self.parse str
+    def self.parse_syntax str
       p = StringScanner.new(str)
       syntax = new
       until p.eos?
@@ -161,7 +215,11 @@ module Skylab::Porcelain
       end
       syntax.validate
     end
+    def parse_arguments argv, &block
+      ArgumentParse[self, argv, &block]
+    end
     def to_s
+      0 == count and return nil
       join(' ')
     end
     def validate
@@ -173,6 +231,36 @@ module Skylab::Porcelain
       /\AOo/ =~ signature and raise RuntimeError.new("optionals cannot occur at the beginning (had: #{signature})")
       /oO+o/ =~ signature and raise RuntimeError.new("optionals cannot occur in the middle (had: #{signature})")
       self
+    end
+    ArgumentParse = lambda do |syntax, argv, &block|
+      # (i blame Davis Frank for inspiring me to experiment with writing this like this)
+      block[o = SyntaxEventKnob.new]
+      tokens = ArrayAsTokens.new(argv)
+      symbols = ArrayAsTokens.new(syntax)
+      nope = lambda { |msg| o.emit_syntax(msg) ; false }
+      while tokens.any?
+        symbol = symbols.current or return nope["unexpected argument: #{tokens.current.inspect}"]
+        tokens.advance
+        symbol.glob? or symbols.advance
+      end
+      symbols.current and symbols.current.required? and return nope["expecting #{symbols.current}"]
+      true
+    end
+  end
+  class ArgumentSyntax::ArrayAsTokens
+    def initialize arr
+      @current = 0
+      @length = arr.count
+      @arr = arr
+    end
+    def advance
+      @current += 1
+    end
+    def any?
+      @current < @length
+    end
+    def current
+      @arr[@current]
     end
   end
   class Parameter
@@ -205,13 +293,15 @@ module Skylab::Porcelain
   # .. below is invocation mechanics
   module ClientInstanceMethods
     attr_reader :handlers
-    def initialize
+    def init_porcelain
       @handlers = {}
-      yield self
+      yield self if block_given?
+      @handlers[:all] ||= lambda { |e| $stderr.puts e }
     end
+    alias_method :initialize, :init_porcelain
     def invoke argv
       @runtime = Runtime.new(argv, self)
-      (method, args = @runtime.parse) or return nil
+      (method, args = @runtime.parse_argv) or return method
       send(method, *args)
     end
     # for now we work around any dependencies on emitters
@@ -260,13 +350,13 @@ module Skylab::Porcelain
     def invocation_name
       File.basename $PROGRAM_NAME
     end
-    def parse
+    def parse_argv
       @argv.empty? and return invite("Expecting #{render_actions}.")
       %w(-h --help).include?(@argv.first) and @argv[0] = 'help'
       sym = @argv.shift.intern # fuzzy match later
       action = actions.detect { |a| a.name == sym } or
         return invite("Invalid action: #{e13b sym}.\n Expecting #{render_actions}.")
-      argv = action.parse(@argv) { |o| o.on_error { |e| emit(:usage, e) } } or
+      argv = action.parse_both(@argv) { |o| o.on_syntax { |e| emit(:usage, e) } } or
         return emit(:ui, "Try #{e13b "#{invocation_name} #{action.name} -h"} for help.") && nil
       [action.method_name, argv]
     end
@@ -278,29 +368,36 @@ module Skylab::Porcelain
   module Officious ; end
 
   module Officious::Help
-    include Styles
     extend ::Skylab::Porcelain
-    option_syntax do |ctx|
-      on('-a', "whatever") { ctx[:whatver] = 'x' }
-      on('-b foo', "nutever") { |v| ctx[:n]  = v }
-    end
     argument_syntax '[<action>]'
     def help action=nil
-      action and return help_action action
-      @runtime.emit(:ui, "#{header 'usage:'} #{@runtime.invocation_name} #{@runtime.render_actions} [opts] [args]")
-      @runtime.emit(:ui, "For help on a particular subcommand, try #{e13b "#{@runtime.invocation_name} <subcommand> -h"}.")
+      Plumbing.new(@runtime, action).run
+    end
+  end
+  class Officious::Help::Plumbing
+    include Styles
+    def initialize runtime, action
+      @action = action
+      @runtime = runtime
+    end
+    %w(actions emit invocation_name render_actions).each do |method| # delegates
+      define_method(method) { |*a, &b| @runtime.send(method, *a, &b) }
+    end
+    def run
+      @action and return help_action @action
+      emit(:ui, "#{header 'usage:'} #{invocation_name} #{render_actions} [opts] [args]")
+      emit(:ui, "For help on a particular subcommand, try #{e13b "#{invocation_name} <subcommand> -h"}.")
     end
     def help_action action
       action == '-h' and action = 'help'
-      act = self.class.actions[action.intern]
+      act = actions[action.intern]
       act ||= actions.include?(action) && Action.new(:name => action, :method => method(action))
-      act or return @runtime.emit(:error, "No such action #{e13b "\"#{action}\""}.  " <<
-        "Try #{e13b @runtime.invocation_name} #{@runtime.render_actions} #{e13b "-h"}.")
+      act or return emit(:error, "No such action #{e13b "\"#{action}\""}.  " <<
+        "Try #{e13b invocation_name} #{render_actions} #{e13b "-h"}.")
       act.help do |o|
-        o.on_syntax { |e| @runtime.emit(:payload, "#{header 'syntax:'} #{e13b "#{@runtime.invocation_name} #{e}"}") }
+        o.on_syntax { |e| emit(:payload, "#{header 'syntax:'} #{e13b "#{invocation_name} #{e}"}") }
       end
     end
-    private :help_action
   end
 end
 
