@@ -386,9 +386,26 @@ module Skylab::Porcelain
     def emit type, event
       (@handlers[type] || @handlers[:all] || @handlers[:default]).call event
     end
+    def find_action str
+      sym = str.intern
+      if exact = actions.detect { |a| sym == a.name }
+        return exact
+      elsif @fuzzy_match
+        matcher = /\A#{Regexp.escape str}/
+        found = actions.select { |a| matcher =~ a.name.to_s }
+        case found.size
+        when 0 ; # fallthru
+        when 1 ; return found.first
+        else
+          return invite("Ambiguous action #{e13b str}. Did you mean #{found.map{ |a| e13b(a.name) }.join(' or ')}?")
+        end
+      end
+      invite("Invalid action: #{e13b str}", "Expecting #{render_actions}")
+    end
     def initialize argv, client
       @argv = argv.dup
       @client = client
+      @fuzzy_match = true
       @handlers = client.handlers
     end
     def invite *msgs
@@ -402,9 +419,7 @@ module Skylab::Porcelain
     def parse_argv
       @argv.empty? and return invite("Expecting #{render_actions}.")
       %w(-h --help).include?(@argv.first) and @argv[0] = 'help'
-      sym = @argv.shift.intern # fuzzy match later
-      action = actions.detect { |a| a.name == sym } or
-        return invite("Invalid action: #{e13b sym}", "Expecting #{render_actions}")
+      action = find_action(@argv.shift) or return action
       argv = catch(:option_action) do
         action.parse_both(@argv) { |o| o.on_syntax { |e| emit(:syntax, e) } }
       end

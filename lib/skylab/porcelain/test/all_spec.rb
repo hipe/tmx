@@ -263,6 +263,21 @@ module Skylab::Porcelain::Test
         instance.invoke ['-h', 'foo']
         stderr.should match(/usage: yourapp foo/)
       end
+      describe "does fuzzy matching on the action name", {focus:true} do
+        let(:klass) do
+          Class.new.class_eval do
+            extend Porcelain
+            def pliny ; end
+            def plone ; end
+            self
+          end
+        end
+        it "by default" do
+          instance.invoke %w(pl)
+          stderr.to_s.should match(/ambiguous action[ "]+pl/i)
+          stderr.to_s.should match(/did you mean pliny or plone/i)
+        end
+      end
     end
     describe "when invoking an actions with no syntaxes defined (just public methods)" do
       let(:klass) do
@@ -343,7 +358,6 @@ module Skylab::Porcelain::Test
   end
   describe 'Pending' do
     it "explicates arguments"
-    it "fuzzy matches"
   end
 end
 
