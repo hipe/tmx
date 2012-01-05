@@ -263,7 +263,7 @@ module Skylab::Porcelain::Test
         instance.invoke ['-h', 'foo']
         stderr.should match(/usage: yourapp foo/)
       end
-      describe "does fuzzy matching on the action name", {focus:true} do
+      describe "does fuzzy matching on the action name" do
         let(:klass) do
           Class.new.class_eval do
             extend Porcelain
@@ -274,8 +274,24 @@ module Skylab::Porcelain::Test
         end
         it "by default" do
           instance.invoke %w(pl)
-          stderr.to_s.should match(/ambiguous action[ "]+pl/i)
+          stderr.to_s.should match(/ambiguous action[ ":]+pl/i)
           stderr.to_s.should match(/did you mean pliny or plone/i)
+        end
+        describe "but by using the config" do
+          let(:klass) do
+            Class.new.class_eval do
+              extend Porcelain
+              porcelain { fuzzy_match false }
+              def pliny ; end
+              def plone ; end
+              self
+            end
+          end
+          it "it can be turned off" do
+            instance.invoke %w(pl)
+            stderr.to_s.should match(/invalid action[ :"]+pl/i)
+            stderr.to_s.should match(/expecting.+pliny\|plone/i)
+          end
         end
       end
     end

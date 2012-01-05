@@ -15,7 +15,7 @@ module Skylab::Porcelain
       @current_definition[:argument_syntax] = str
     end
     def init_dsl
-      @current_definition = nil
+      @current_definition = @runtime_config_blocks = nil
     end
     def method_added method_name
       if @current_definition
@@ -28,7 +28,10 @@ module Skylab::Porcelain
       @current_definition ||= {}
       @current_definition[:option_syntax] = block
     end
-  end
+    def porcelain &block
+      (@runtime_config_blocks ||= []).push block
+    end
+ end
   module ClientModuleMethods
     include Dsl
     def self.extended mod
@@ -193,13 +196,10 @@ module Skylab::Porcelain
   end
   class OptionSyntax < Array
     def self.build mixed
-      syntax = new
       case mixed
-      when NilClass # noop
-      when Proc ; syntax.push mixed
-      else raise RuntimeError.new("expecting array or nil had #{mixed.class}")
+      when NilClass ; new
+      when Proc     ; new.push mixed
       end
-      syntax
     end
     def build_parser context, option_parser = nil
       option_parser ||= OptionParser.new.tap do |op|
@@ -402,11 +402,14 @@ module Skylab::Porcelain
       end
       invite("Invalid action: #{e13b str}", "Expecting #{render_actions}")
     end
+    attr_writer :fuzzy_match
+    alias_method :fuzzy_match, :fuzzy_match= # careful
     def initialize argv, client
       @argv = argv.dup
       @client = client
       @fuzzy_match = true
       @handlers = client.handlers
+      (a = @client.class.instance_variable_get('@runtime_config_blocks')) and a.each { |b| instance_eval(&b) }
     end
     def invite *msgs
       msgs.each { |msg| emit(:validation_error_meta, msg) }
