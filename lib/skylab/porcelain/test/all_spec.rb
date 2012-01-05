@@ -301,8 +301,8 @@ module Skylab::Porcelain::Test
       end
     end
     describe "provides rendering" do
-      let (:action) do
-        Porcelain::Action.new do
+      let (:definition_block) do
+        lambda do |_|
           option_syntax do |ctx|
             on('-a', '--apple', "an apple")
             on('-p', '--pear[=foo]',  "a pear")
@@ -312,9 +312,31 @@ module Skylab::Porcelain::Test
           def whatever_is_clever foo, bar=nil; end
         end
       end
+      let (:action) do
+        this = self
+        Porcelain::Action.new do
+          class_eval(&this.definition_block)
+        end
+      end
+      let (:klass) do
+        this = self
+        Class.new.class_eval do
+          extend Porcelain
+          class_eval(&this.definition_block)
+          self
+        end
+      end
       describe "of syntax" do
        it "that is more detailed than optparse's" do
          action.syntax.should eql('whatever-is-clever [-a] [-p[=foo]] [--bananna=<type>] <foo> [<bar>]')
+        end
+      end
+      describe "of help screens" do
+        it "will use optparse's rendering of help screen for the options" do
+          instance.invoke(%w(whatever-is-clever -h))
+          help_screen = stderr
+          help_screen.should match(/usage: yourapp whatever-is-clever/i)
+          help_screen.should match(/-a, --apple +an apple/)
         end
       end
     end
