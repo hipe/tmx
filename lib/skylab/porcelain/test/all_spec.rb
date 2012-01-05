@@ -233,7 +233,7 @@ module Skylab::Porcelain::Test
     end
     describe "invocation happens with a call to invoke() (pass it ARGV) that" do
       Porcelain::Runtime.send(:define_method, :invocation_name) { 'yourapp' }
-      let(:expecting_foo_bar) { /expecting \{help\|foo\|bar\}/i }
+      let(:expecting_foo_bar) { /expecting \{(?:help\|)?foo\|bar\}/i }
       let(:klass) do
         Class.new.class_eval do
           extend Porcelain
@@ -256,7 +256,7 @@ module Skylab::Porcelain::Test
       end
       it "with -h or --help as the first argument, you get help (listing of avaiable commands)" do
         instance.invoke ['-h']
-        stderr.should match(/usage: yourapp \{help\|foo\|bar\}/i)
+        stderr.should match(/usage: yourapp \{(?:help\|)?foo\|bar\}/i)
         stderr.should match(/for help on a particular subcommand/i)
       end
       it "with -h (or help) followed by an action name, you get action-specific help" do
@@ -371,9 +371,6 @@ module Skylab::Porcelain::Test
         end
       end
     end
-  end
-  describe 'Pending' do
-    it "explicates arguments"
   end
 end
 

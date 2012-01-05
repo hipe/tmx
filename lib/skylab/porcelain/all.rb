@@ -10,6 +10,10 @@ module Skylab::Porcelain
     mod.send(:include, Officious::Help) unless mod.ancestors.include?(Officious::Help)
   end
   module Dsl
+    def action &block
+      @current_definition ||= {}
+      (@current_definition[:config_blocks] ||= []).push block
+    end
     def argument_syntax str
       @current_definition ||= {}
       @current_definition[:argument_syntax] = str
@@ -31,7 +35,7 @@ module Skylab::Porcelain
     def porcelain &block
       (@runtime_config_blocks ||= []).push block
     end
- end
+  end
   module ClientModuleMethods
     include Dsl
     def self.extended mod
@@ -90,6 +94,14 @@ module Skylab::Porcelain
       @cache.key?(sym) and return @cache[sym]
       detect { |a| a.name == sym }
     end
+    def visible
+      me = self
+      self.class.new(@cache) do |yielder|
+        me.each do |a|
+          yielder.yield(a) if a.visible?
+        end
+      end
+    end
   end
   class EventKnob < Hash
     class << self
@@ -140,16 +152,21 @@ module Skylab::Porcelain
       @argument_syntax
     end
     attr_writer :argument_syntax
+    def config_blocks= arr
+      arr.each { |b| instance_eval(&b) }
+    end
     def duplicate
       Action.new( :argument_syntax => argument_syntax.to_s, # !
                   :method_name     => method_name,
-                  :option_syntax   => option_syntax.duplicate)
+                  :option_syntax   => option_syntax.duplicate,
+                  :visible         => visible)
     end
     def eventized_help(&block)
       option_syntax.eventized_option_help(&block)
     end
     def initialize opts={}, &block
       @argument_syntax = @name = @option_syntax = nil
+      @visible = true
       block and opts.merge!(self.class.definition(&block))
       opts.each { |k, v| send("#{k}=", v) }
     end
@@ -177,6 +194,12 @@ module Skylab::Porcelain
     def syntax
       [name, option_syntax.to_s, argument_syntax.to_s].compact.join(' ')
     end
+    def visible *a
+      0 == a.length and return @visible
+      @visible = a.first
+    end
+    alias_method :visible?, :visible
+    attr_writer :visible
   end
   class << Action
     def definition &block
@@ -216,7 +239,7 @@ module Skylab::Porcelain
       empty? and return
       yield(knob = EventizedHelpKnob.new)
       renderer = r = ::OptionParser.new
-      lucky_matcher = /\A(#{Regexp.escape(r.summary_indent)}.{#{r.summary_width}}[ ])(.+)\z/
+      lucky_matcher = /\A(#{Regexp.escape(r.summary_indent)}.{1,#{r.summary_width}})[ ]*(.*)\z/
       renderer.banner = ''
       renderer.separator ' options:'
       build_parser({}, renderer)
@@ -435,7 +458,7 @@ module Skylab::Porcelain
       [action.method_name, argv]
     end
     def render_actions
-      "{#{actions.map{ |a| e13b(a.name) }.join('|')}}"
+      "{#{actions.visible.map{ |a| e13b(a.name) }.join('|')}}"
     end
   end
 
@@ -444,6 +467,7 @@ module Skylab::Porcelain
   module Officious::Help
     extend ::Skylab::Porcelain
     argument_syntax '[<action>]'
+    action { visible false }
     def help action=nil
       Plumbing.new(@runtime, action).run
     end
