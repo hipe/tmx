@@ -1,3 +1,4 @@
+require 'optparse'
 require 'strscan'
 
 module Skylab ; end
@@ -44,12 +45,13 @@ module Skylab::Porcelain
     end
     def _actions_cache
       instance_variable_defined?('@_actions_cache') and return @_actions_cache
-      if anc = ancestors[(ancestors.first == self ? 1 : 0)..-1].detect { |a| a.respond_to?(:_actions_cache) }
-        anc.actions.each { }  # refresh the cache with all latest defined methods (ick!)
-        @_actions_cache = anc._actions_cache.duplicate
-      else
-        @_actions_cache = ActionsCache.new.initiate
-      end
+      ancestors = self.ancestors[(self.ancestors.first == self ? 1 : 0)..-1] # singleton class does not have self as first
+      klass = ancestors.detect { |a| a.class == ::Class and a.respond_to?(:_actions_cache) }
+      mods = ancestors.select { |a| a.class == ::Module and a.respond_to?(:_actions_cache) }
+      klass and mods -= klass.ancestors # wow it's if we are implementing ruby in ruby, how stupid
+      @_actions_cache = ActionsCache.new.initiate
+      [*mods, *[klass].compact].each { |anc| @_actions_cache.merge_in_duplicates_no_clobber! anc.actions }
+      @_actions_cache
     end
   end
   class ActionsCache
@@ -79,6 +81,9 @@ module Skylab::Porcelain
     end
     def key? key
       @hash.key? key
+    end
+    def merge_in_duplicates_no_clobber! actions
+      actions.each { |a| @hash.key?(a.name) or cache(a.duplicate) }
     end
   end
   class ActionEnumerator < Enumerator
@@ -129,7 +134,9 @@ module Skylab::Porcelain
       end
     end
   end
-  SyntaxEventKnob = EventKnob.new(:syntax)
+  EventizedHelpKnob   = EventKnob.new(:default, :header, :two_col)
+  ParseOptionsKnob    = EventKnob.new(:syntax, :help_flagged)
+  SyntaxEventKnob     = EventKnob.new(:syntax)
   class Action
     def self.nameize sym
       sym.to_s.gsub('_', '-').intern
@@ -142,13 +149,12 @@ module Skylab::Porcelain
     end
     attr_writer :argument_syntax
     def duplicate
-      Action.new( :argument_syntax => argument_syntax.to_s,
+      Action.new( :argument_syntax => argument_syntax.to_s, # !
                   :method_name     => method_name,
                   :option_syntax   => option_syntax.duplicate)
     end
-    def help
-      yield( o = SyntaxEventKnob.new )
-      o.emit_syntax [name, option_syntax.to_s, argument_syntax.to_s].compact.join(' ')
+    def eventized_help(&block)
+      option_syntax.eventized_option_help(&block)
     end
     def initialize opts
       @argument_syntax = @name = @option_syntax = nil
@@ -175,6 +181,9 @@ module Skylab::Porcelain
       opts and argv.push(opts)
       argv
     end
+    def syntax
+      [name, option_syntax.to_s, argument_syntax.to_s].compact.join(' ')
+    end
   end
   class OptionSyntax < Array
     def self.build mixed
@@ -190,16 +199,49 @@ module Skylab::Porcelain
       end
       syntax
     end
+    def build_parser context, option_parser = nil
+      option_parser ||= OptionParser.new.tap do |op|
+        op.base.long['help'] = ::OptionParser::Switch::NoArgument.new do
+          throw :option_action, ->(rt, act) { rt.client.help(act) ; nil }
+        end
+      end
+      each { |b| option_parser.instance_exec(context, &b) }
+      option_parser
+    end
     alias_method :duplicate, :dup # only as long as it's stateless
-    def parse_options *x
+    HEADER = /\A +[^:]+:\z/
+    def eventized_option_help(&block)
+      empty? and return
+      yield(knob = EventizedHelpKnob.new)
+      renderer = r = ::OptionParser.new
+      lucky_matcher = /\A(#{Regexp.escape(r.summary_indent)}.{#{r.summary_width}}[ ])(.+)\z/
+      renderer.banner = ''
+      renderer.separator ' options:'
+      build_parser({}, renderer)
+      renderer.to_s.split("\n").each do |line|
+        case line
+        when ''            ;
+        when lucky_matcher ; knob.emit_two_col($1, $2)
+        when HEADER        ; knob.emit_header(line)
+        else               ; knob.emit_default(line)
+        end
+      end
+    end
+    def parse_options argv
       empty? and return nil
-      yield( o = SyntaxEventKnob.new )
-      o.emit_syntax("flougger")
-      {}
+      yield( knob = ParseOptionsKnob.new )
+      option_parser = build_parser(context = {})
+      begin
+        option_parser.parse! argv
+      rescue ::OptionParser::ParseError => e
+        knob.emit_syntax e
+        context = false
+      end
+      context
     end
     def to_s
       0 == count and return nil
-      '[fake opts!]'
+      '[optz]'
     end
   end
   class ArgumentSyntax < Array
@@ -243,7 +285,7 @@ module Skylab::Porcelain
         tokens.advance
         symbol.glob? or symbols.advance
       end
-      symbols.current and symbols.current.required? and return nope["expecting #{symbols.current}"]
+      symbols.current and symbols.current.required? and return nope["expecting: #{Styles::e13b symbols.current}"]
       true
     end
   end
@@ -293,10 +335,16 @@ module Skylab::Porcelain
   # .. below is invocation mechanics
   module ClientInstanceMethods
     attr_reader :handlers
-    def init_porcelain
+    def init_porcelain &block
       @handlers = {}
-      yield self if block_given?
-      @handlers[:all] ||= lambda { |e| $stderr.puts e }
+      if block_given?
+        if block.arity >= 1
+          yield self
+        else
+          instance_eval(&block)
+        end
+      end
+      @handlers[:default] ||= lambda { |e| $stderr.puts "(unhandled:) #{e}" }
     end
     alias_method :initialize, :init_porcelain
     def invoke argv
@@ -304,14 +352,16 @@ module Skylab::Porcelain
       (method, args = @runtime.parse_argv) or return method
       send(method, *args)
     end
-    # for now we work around any dependencies on emitters
+    # for now we work around any dependencies on an emitter pattern by requiring
+    # that the client subscribe to all events if she wants any
     def on_all &block
       @handlers[:all] = block
     end
   end
 
   module Styles
-    _list = [nil, :string, * Array.new(30), :green]
+    extend self
+    _list = [nil, :strong, * Array.new(30), :green]
     MAP = Hash[ * _list.each_with_index.map { |sym, idx| [sym, idx] if sym }.compact.flatten ]
     def e13b str   ; stylize str, :green          end
     def header str ; stylize str, :strong, :green end
@@ -328,22 +378,17 @@ module Skylab::Porcelain
     def actions
       @client.class.actions
     end
+    attr_reader :client
     def emit type, event
-      if @handlers[type]
-        @handlers[type].call event
-      elsif @handlers[:all]
-        @handlers[:all].call event
-      else
-        $stderr.puts e
-      end
+      (@handlers[type] || @handlers[:all] || @handlers[:default]).call event
     end
     def initialize argv, client
       @argv = argv.dup
       @client = client
       @handlers = client.handlers
     end
-    def invite msg=nil
-      msg and emit(:usage, msg)
+    def invite *msgs
+      msgs.each { |msg| emit(:validation_error_meta, msg) }
       emit(:ui, "Try #{e13b "#{invocation_name} -h"} for help.")
       nil
     end
@@ -355,9 +400,16 @@ module Skylab::Porcelain
       %w(-h --help).include?(@argv.first) and @argv[0] = 'help'
       sym = @argv.shift.intern # fuzzy match later
       action = actions.detect { |a| a.name == sym } or
-        return invite("Invalid action: #{e13b sym}.\n Expecting #{render_actions}.")
-      argv = action.parse_both(@argv) { |o| o.on_syntax { |e| emit(:usage, e) } } or
-        return emit(:ui, "Try #{e13b "#{invocation_name} #{action.name} -h"} for help.") && nil
+        return invite("Invalid action: #{e13b sym}", "Expecting #{render_actions}")
+      argv = catch(:option_action) do
+        action.parse_both(@argv) { |o| o.on_syntax { |e| emit(:syntax, e) } }
+      end
+      argv.kind_of?(Proc) and return argv.call(self, action) # option_action
+      argv or begin
+        emit(:usage, "usage: #{e13b "#{invocation_name} #{action.syntax}"}")
+        emit(:ui, "Try #{e13b "#{invocation_name} #{action.name} -h"} for help.")
+        return false
+      end
       [action.method_name, argv]
     end
     def render_actions
@@ -389,13 +441,17 @@ module Skylab::Porcelain
       emit(:ui, "For help on a particular subcommand, try #{e13b "#{invocation_name} <subcommand> -h"}.")
     end
     def help_action action
-      action == '-h' and action = 'help'
-      act = actions[action.intern]
-      act ||= actions.include?(action) && Action.new(:name => action, :method => method(action))
+      act = !(String === action) ? action : begin
+        action == '-h' and action = 'help'
+        act = actions[action.intern]
+      end
       act or return emit(:error, "No such action #{e13b "\"#{action}\""}.  " <<
         "Try #{e13b invocation_name} #{render_actions} #{e13b "-h"}.")
-      act.help do |o|
-        o.on_syntax { |e| emit(:payload, "#{header 'syntax:'} #{e13b "#{invocation_name} #{e}"}") }
+      emit(:usage, "#{header 'usage:'} #{e13b "#{invocation_name} #{act.syntax}"}")
+      act.eventized_help do |o|
+        o.on_header { |s| emit(:help, header(s)) }
+        o.on_two_col { |a, b| emit(:help, "#{e13b a}#{b}") }
+        o.on_default { |line| emit(:help, line) }
       end
     end
   end

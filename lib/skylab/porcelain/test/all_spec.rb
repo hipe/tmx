@@ -45,6 +45,19 @@ module Skylab::Porcelain::Test
       it "any child class of the class will also have this property and inherit the list of actions from its parent" do
         child_class.actions.map(&:name).should eql([:help, :foo, :bar, :'she-bang'])
       end
+      describe "all modules in the ancestor chain" do
+        let(:module_a)  {          Module.new.module_eval        { extend Porcelain ; def act_a ; end ; self } }
+        let(:module_b)  { o=self ; Module.new.module_eval        { extend Porcelain ; def act_b ; end ; include o.module_a ; self } }
+        let(:module_c)  {          Module.new.module_eval        { extend Porcelain ; def act_c ; end ; self } }
+        let(:module_d)  {          Module.new.module_eval        { extend Porcelain ; def act_d ; end ; self } }
+        let(:class_e)   { o=self ; Class.new.class_eval          { extend Porcelain ; def act_e ; end ; include o.module_b, o.module_c ; self } }
+        let(:class_f)   { o=self ; Class.new(class_e).class_eval { extend Porcelain ; def act_f ; end ; include o.module_d ; self } }
+        it "get their actions inherited, in a particular order of precedence" do
+          ('a'..'f').map { |l| "#{(respond_to?("module_#{l}") ? :module : :class)}_#{l}" }.
+                     each { |n| send(n).singleton_class.send(:define_method, :to_s) { n } }
+          class_f.actions.map{ |a| a.name.to_s }.should eql(%w(help act-d act-a act-b act-c act-e act-f))
+        end
+      end
     end
     describe "DSL" do
       let(:klass) do
@@ -248,7 +261,7 @@ module Skylab::Porcelain::Test
       end
       it "with -h (or help) followed by an action name, you get action-specific help" do
         instance.invoke ['-h', 'foo']
-        stderr.should match(/syntax: yourapp foo/)
+        stderr.should match(/usage: yourapp foo/)
       end
     end
     describe "when invoking an actions with no syntaxes defined (just public methods)" do
@@ -277,8 +290,7 @@ module Skylab::Porcelain::Test
           instance.send(:touched).should eql(true)
           stderr.to_s.should eql('')
         end
-        it("if you pass it some arguments, it reports a syntax error and shows usage and invites for help", :wip=>true) do
-          # singleton_class.let(:debug_ui) { true }
+        it "if you pass it some arguments, it reports a syntax error and shows usage and invites for help" do
           instance.invoke(%w(takes-no-arguments first-arg)).should eql(false)
           stderr.to_s.tap do |it|
             it.should match(/unexpected argument[: ]+"first-arg"/i)
@@ -288,6 +300,11 @@ module Skylab::Porcelain::Test
         end
       end
     end
+  end
+  describe 'Pending' do
+    it "shows short in syntax"
+    it "explicates arguments"
+    it "fuzzy matches"
   end
 end
 
