@@ -63,14 +63,6 @@ module Skylab::Porcelain
       @hash[action.method_name] = action.name
       @hash[action.name] = action
     end
-    def duplicate
-      self.class.new.tap do |other|
-        other.instance_variable_set('@order', @order.dup)
-        other.instance_variable_set('@hash', Hash[ * @hash.map{ |k, v|
-          [ k , v.kind_of?(Symbol) ? v : v.duplicate ]
-        }.flatten ] )
-      end
-    end
     def each &block
       @order.each { |k| block.call(@hash[k]) }
     end
@@ -204,10 +196,6 @@ module Skylab::Porcelain
       syntax = new
       case mixed
       when NilClass # noop
-      when Array
-        no = mixed.detect { |o| ! o.kind_of?(Proc) } and
-          raise RuntimeError.new("expected array of procs, found #{no.class}")
-        syntax.concat mixed
       when Proc ; syntax.push mixed
       else raise RuntimeError.new("expecting array or nil had #{mixed.class}")
       end
