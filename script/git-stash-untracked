@@ -1,0 +1,79 @@
+#!/usr/bin/env ruby -w
+
+require 'fileutils'
+require 'open3'
+require 'pathname'
+
+
+require File.expand_path('../../lib/skylab/porcelain/all', __FILE__)
+
+module Skylab::GitStashUntracked
+  class Porcelain
+    extend ::Skylab::Porcelain
+    option_syntax do |ctx|
+      on('-n', '--dry-run', "Dry run.") { ctx[:dry_run] = true }
+      ctx[:stashes] = '../Stashes'
+      on('-s', '--stashes <dir>', "where to put the files (default:#{ctx[:stashes]})") { |v| ctx[:stashes] = v }
+    end
+    argument_syntax "<name>"
+    def save name, opts
+      Plumbing::Save.new(@runtime, opts.merge(:name => name)).invoke
+    end
+  end
+  module Plumbing ; end
+  class Plumbing::Save
+    include FileUtils
+    COMMAND = 'git ls-files -o --exclude-standard'
+    attr_accessor :dry_run
+    def each_file
+      emit :info, COMMAND
+      Open3.popen3(COMMAND) do |_, sout, serr|
+        loop do
+          "" == (e = serr.read) or return emit(:error, e)
+          line = sout.gets or break
+          yield line.strip
+        end
+      end
+    end
+    def failed msg
+      emit(:error, "failed: #{msg}")
+      false
+    end
+    def fu_output_message msg
+      emit(:info, "#{msg}")
+    end
+    def invoke 
+      @quiet = {}
+      b = prepare_destination_directory or return b
+      each_file { |file| move_file file }
+    end
+    def prepare_destination_directory
+      @dest_dir = Pathname.new(File.join(@stashes, @name))
+      if @dest_dir.exist?
+        (d = Dir["#{@dest_dir}/*"]).any? and return failed("destination dir must be empty: #{d.join(' ')}")
+      elsif !  @dest_dir.dirname.exist?
+        return failed("must exist: #{@dest_dir.dirname}")
+      else
+        mkdir_p(@dest_dir, :verbose => true, :noop => @dry_run)
+      end
+      true
+    end
+    def emit a,b ; @runtime.emit(a, b) end
+    def initialize runtime, request
+      request.each { |k, v| send("#{k}=", v) }
+      @runtime = runtime
+    end
+    def move_file file
+      dest = @dest_dir.join(file)
+      dest.dirname.exist? or (@quiet[dest.dirname.to_s] ||= mkdir_p(dest.dirname, :verbose => true, :noop => @dry_run))
+      move(file, dest, :verbose => true, :noop => @dry_run)
+    end
+    attr_accessor :name
+    attr_accessor :stashes
+  end
+end
+
+if __FILE__ == $PROGRAM_NAME
+  ::Skylab::GitStashUntracked::Porcelain.new{ on_all { |e| $stderr.puts e } }.invoke(ARGV)
+end
+
