@@ -381,9 +381,9 @@ module Skylab::Porcelain
     alias_method :initialize, :init_porcelain
     def invoke argv
       @runtime = Runtime.new(argv, self)
-      (method, args = @runtime.parse_argv) or return method
-      res = send(method, *args)
-      false == res and @runtime.invite(self.class.actions[method])
+      (method_name, args = @runtime.parse_argv) or return method_name
+      res = send(method_name, *args)
+      false == res and @runtime.invite(self.class.actions[method_name])
       res
     end
     # for now we work around any dependencies on an emitter pattern by requiring
