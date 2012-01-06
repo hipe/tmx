@@ -20,15 +20,37 @@ module Skylab::TestSupport
   end
   class TempDir < ::Pathname
     include FileUtils
+    def initialize *a, &b
+      super(*a, &b)
+      @verbose = false
+      @noop = false # no setter for now! b/c it introduces some issues
+    end
+    def touch_r files
+      files.each do |file|
+        dest_file = dest_dir = nil
+        dest_path = join(file)
+        if %r{/\z} =~ dest_path.to_s
+          dest_dir = dest_path
+        else
+          dest_dir = dest_path.dirname
+          dest_file = dest_path
+        end
+        dest_dir.exist? or  mkdir_p(dest_dir, :verbose => @verbose, :noop => @noop)
+        dest_file and touch(dest_file, :verbose => @verbose, :noop => @noop)
+      end
+      self
+    end
     def prepare
       to_s =~ /\Atmp/ or return fail("we are being extra cautious")
       if exist?
         remove_entry_secure(to_s)
       elsif ! dirname.exist?
-        mkdir_p dirname, :verbose => true
+        mkdir_p dirname, :verbose => @verbose, :noop => @noop
       end
       mkdir to_s
+      self
     end
+    attr_accessor :verbose
   end
 end
 
@@ -46,3 +68,4 @@ module Skylab
     end
   end
 end
+

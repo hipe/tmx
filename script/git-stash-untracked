@@ -11,14 +11,15 @@ module Skylab::GitStashUntracked
   class Porcelain
     extend ::Skylab::Porcelain
 
-    SHARED_SYNTAX = lambda do |ctx|
-      on('-n', '--dry-run', "Dry run.") { ctx[:dry_run] = true }
+    DRY_RUN = ->(ctx) { on('-n', '--dry-run', "Dry run.") { ctx[:dry_run] = true } }
+    STASHES = ->(ctx) do
       ctx[:stashes] = '../Stashes'
-      on('-s', '--stashes <dir>', "where to put the files (default:#{ctx[:stashes]})") { |v| ctx[:stashes] = v }
+      on('-s', '--stashes <dir>', "where to put the files (default: #{ctx[:stashes]})") { |v| ctx[:stashes] = v }
     end
 
     option_syntax do |ctx|
-      instance_exec(ctx, &SHARED_SYNTAX)
+      instance_exec ctx, &DRY_RUN
+      instance_exec ctx, &STASHES
     end
     argument_syntax "<name>"
     def save name, opts
@@ -26,7 +27,15 @@ module Skylab::GitStashUntracked
     end
 
     option_syntax do |ctx|
-      instance_exec(ctx, &SHARED_SYNTAX)
+      instance_exec ctx, &STASHES
+    end
+    def list opts
+      Plumbing::List.new(@runtime, opts).invoke
+    end
+
+    option_syntax do |ctx|
+      instance_exec ctx, &DRY_RUN
+      instance_exec ctx, &STASHES
     end
     argument_syntax '<name>'
     def pop name, opts
@@ -80,6 +89,17 @@ module Skylab::GitStashUntracked
       true
     end
   end
+  class Plumbing::List < Plumbing
+    def invoke
+      collection.validate_existence or return false
+      count = 0
+      collection.each_stash do |stash|
+        count += 1
+        emit :payload, stash.name
+      end
+      count
+    end
+  end
   class Plumbing::Pop < Plumbing
     def invoke
       emit :info, "OK whatever"
@@ -87,6 +107,14 @@ module Skylab::GitStashUntracked
   end
   class Collection
     @cache = {}
+    def each_stash
+      @path.exist? or raise RuntimeError.new("no such directory: #{@path}")
+      Dir.new(@path.to_s).each do |name|
+        name[0,1] == '.' and next
+        yield stash(name)
+      end
+      nil
+    end
     def initialize path, opts, &block
       @cache = {}
       @emit = block
@@ -95,6 +123,11 @@ module Skylab::GitStashUntracked
     end
     def stash name
       @cache[name] ||= Stash.new(@path, name, @opts, &@emit)
+    end
+    def validate_existence
+      @path.exist? and return true
+      @emit[:error, "Stashes dir does not exist: #{@path}"]
+      false
     end
   end
   class << Collection
@@ -116,16 +149,19 @@ module Skylab::GitStashUntracked
       @dirpathname = dirpathname
       @emit = emit
       @quiet = {}
-      @stash_name = stash_name
+      @name = stash_name.to_s
       opts.each { |k, v| send("#{k}=", v) }
     end
+    attr_reader :name
     def stash_file file
       @valid or validate_for_writing or return false
       dest = pathname.join(file)
       dest.dirname.exist? or (@quiet[dest.dirname.to_s] ||= mkdir_p(dest.dirname, :verbose => true, :noop => @dry_run))
       move(file, dest, :verbose => true, :noop => @dry_run)
     end
-    def pathname ; @pathname ||= @dirpathname.join(@stash_name) end
+    def pathname
+      @pathname ||= @dirpathname.join(@name)
+    end
     def validate_for_writing
       if pathname.exist?
         (d = Dir["#{pathname}/*"]).any? and

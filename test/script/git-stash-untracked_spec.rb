@@ -22,6 +22,11 @@ module ::Skylab::GitStashUntracked::Tests
         GitStashUntracked::Porcelain.new { on_all { |e| stderr.puts e } }
       end
       let :cmd_spy do '' end
+      let :runtime_stub do
+        o = Object.new
+        o.stub(:emit) { |a, b| stderr.puts b.to_s }
+        o
+      end
       let :stderr do
         TestSupport::MyStringIo.new
       end
@@ -33,7 +38,7 @@ module ::Skylab::GitStashUntracked::Tests
           stderr.to_s.should match(/nerpus\/herpus/)
         end
       end
-      describe "save", {focus:true} do
+      describe "save" do
         it "which moves the untracked files to a stash dir" do
           TMPDIR.prepare
           stub_popen3("lippy\ndippy/doopy\ndippy/floopy")
@@ -47,6 +52,25 @@ module ::Skylab::GitStashUntracked::Tests
             mv dippy/floopy tmp/gsu/foo/dippy/floopy
           HERE
           stderr.to_s.should eql(str)
+        end
+      end
+      describe "list" do
+        it "which lists the known stashes (just a basic directory listing)" do
+          TMPDIR.prepare.touch_r %w(
+            stashes/alpha/herpus/derpus.txt
+            stashes/alpha/flerpus/nerpus.txt
+            stashes/alpha/empty_dir/
+            stashes/beta/whatever.txt
+          )
+          GitStashUntracked::Plumbing::List.new(runtime_stub, :stashes => TMPDIR.join('stashes')).invoke.should_not eql(false)
+          target = <<-HERE.unindent
+            alpha
+            beta
+          HERE
+          stderr.to_s.should eql(target)
+          stderr.truncate(0) ; stderr.rewind
+          app.invoke ['list', '-s', "#{TMPDIR}/stashes"] # same thing but invoked though the porcelain
+          stderr.to_s.should eql(target)
         end
       end
       describe "pop" do
