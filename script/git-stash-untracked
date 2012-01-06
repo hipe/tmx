@@ -10,66 +10,134 @@ require File.expand_path('../../lib/skylab/porcelain/all', __FILE__)
 module Skylab::GitStashUntracked
   class Porcelain
     extend ::Skylab::Porcelain
-    option_syntax do |ctx|
+
+    SHARED_SYNTAX = lambda do |ctx|
       on('-n', '--dry-run', "Dry run.") { ctx[:dry_run] = true }
       ctx[:stashes] = '../Stashes'
       on('-s', '--stashes <dir>', "where to put the files (default:#{ctx[:stashes]})") { |v| ctx[:stashes] = v }
+    end
+
+    option_syntax do |ctx|
+      instance_exec(ctx, &SHARED_SYNTAX)
     end
     argument_syntax "<name>"
     def save name, opts
       Plumbing::Save.new(@runtime, opts.merge(:name => name)).invoke
     end
-  end
-  module Plumbing ; end
-  class Plumbing::Save
-    include FileUtils
-    COMMAND = 'git ls-files -o --exclude-standard'
-    attr_accessor :dry_run
-    def each_file
-      emit :info, COMMAND
-      Open3.popen3(COMMAND) do |_, sout, serr|
-        loop do
-          "" == (e = serr.read) or return emit(:error, e)
-          line = sout.gets or break
-          yield line.strip
-        end
-      end
+
+    option_syntax do |ctx|
+      instance_exec(ctx, &SHARED_SYNTAX)
     end
+    argument_syntax '<name>'
+    def pop name, opts
+      Plumbing::Pop.new(@runtime, opts.merge(:name => name)).invoke
+    end
+
+    def status
+      num = Plumbing::Save.new(@runtime).each_file { |fn| @runtime.emit(:payload, fn) }
+      0 == num and @runtime.emit(:info, "# (no untracked files)")
+      true
+    end
+  end
+  class Plumbing
+    def collection
+      Collection.cache[stashes] ||= Collection.new(stashes, :dry_run => @dry_run) { |*a| emit(*a) }
+    end
+    attr_accessor :dry_run
+    def emit a,b ; @runtime.emit(a, b) end
     def failed msg
       emit(:error, "failed: #{msg}")
       false
     end
-    def fu_output_message msg
-      emit(:info, "#{msg}")
-    end
-    def invoke 
-      @quiet = {}
-      b = prepare_destination_directory or return b
-      each_file { |file| move_file file }
-    end
-    def prepare_destination_directory
-      @dest_dir = Pathname.new(File.join(@stashes, @name))
-      if @dest_dir.exist?
-        (d = Dir["#{@dest_dir}/*"]).any? and return failed("destination dir must be empty: #{d.join(' ')}")
-      elsif !  @dest_dir.dirname.exist?
-        return failed("must exist: #{@dest_dir.dirname}")
-      else
-        mkdir_p(@dest_dir, :verbose => true, :noop => @dry_run)
-      end
-      true
-    end
-    def emit a,b ; @runtime.emit(a, b) end
-    def initialize runtime, request
+    def initialize runtime, request={}
+      @dry_run = false
       request.each { |k, v| send("#{k}=", v) }
       @runtime = runtime
     end
-    def move_file file
-      dest = @dest_dir.join(file)
+    attr_accessor :name
+    attr_accessor :stashes
+  end
+  class Plumbing::Save < Plumbing
+    COMMAND = 'git ls-files -o --exclude-standard'
+    def each_file
+      count = 0
+      emit :info, "# #{COMMAND}"
+      Open3.popen3(COMMAND) do |_, sout, serr|
+        loop do
+          "" == (e = serr.read) or return emit(:error, e)
+          line = sout.gets or break
+          count += 1
+          yield line.strip
+        end
+      end
+      count
+    end
+    def invoke
+      stash = collection.stash(@name).validate_for_writing or return stash
+      none = true
+      each_file { |file| stash.stash_file file; none = false }
+      none and emit(:info, "no files to stash!")
+      true
+    end
+  end
+  class Plumbing::Pop < Plumbing
+    def invoke
+      emit :info, "OK whatever"
+    end
+  end
+  class Collection
+    @cache = {}
+    def initialize path, opts, &block
+      @cache = {}
+      @emit = block
+      @opts = opts
+      @path = Pathname.new(path)
+    end
+    def stash name
+      @cache[name] ||= Stash.new(@path, name, @opts, &@emit)
+    end
+  end
+  class << Collection
+    attr_reader :cache
+  end
+  class Stash
+    include FileUtils
+    attr_accessor :dry_run
+    def failed msg
+      @emit[:error, "Couldn't stash. #{msg}"]
+      false
+    end
+    def fu_output_message msg
+      @emit[:info, "#{msg}"]
+    end
+    def initialize dirpathname, stash_name, opts, &emit
+      @dry_run = false
+      @valid = false
+      @dirpathname = dirpathname
+      @emit = emit
+      @quiet = {}
+      @stash_name = stash_name
+      opts.each { |k, v| send("#{k}=", v) }
+    end
+    def stash_file file
+      @valid or validate_for_writing or return false
+      dest = pathname.join(file)
       dest.dirname.exist? or (@quiet[dest.dirname.to_s] ||= mkdir_p(dest.dirname, :verbose => true, :noop => @dry_run))
       move(file, dest, :verbose => true, :noop => @dry_run)
     end
-    attr_accessor :name
-    attr_accessor :stashes
+    def pathname ; @pathname ||= @dirpathname.join(@stash_name) end
+    def validate_for_writing
+      if pathname.exist?
+        (d = Dir["#{pathname}/*"]).any? and
+          return failed("Destination dir must be empty (\"stash\" already exists?).  Found files:\n#{d.join("\n")}")
+      elsif ! @dirpathname.exist?
+        return failed("Stashes directory must exist: #{@dirpathname}")
+      else
+        # a directory needs to be made, but make it when there are files to move
+      end
+      @valid = true
+      self
+    end
   end
 end
 
