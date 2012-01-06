@@ -186,8 +186,13 @@ module Skylab::Porcelain
     attr_writer :option_syntax
     def parse_both argv
       yield( o = SyntaxEventKnob.new )
+      argument_syntax = self.argument_syntax
       false == (opts = option_syntax.parse_options(argv, & o.to_proc)) and return
       argument_syntax.parse_arguments(argv, & o.to_proc) or return
+      # experimental sugar to avoid the client having to do their own parsing in this scenario, apparently not necessary in 1.9!
+      # if opts && argument_syntax.any? && ! argument_syntax.last.glob? && argv.length < argument_syntax.length
+      #  argv.concat Array.new(argument_syntax.length - argv.length) # but still it is so dodgy!
+      # end
       opts and argv.push(opts)
       argv
     end
@@ -253,7 +258,7 @@ module Skylab::Porcelain
       end
     end
     def parse_options argv
-      empty? and return nil
+      empty? and ! Officious::Help::SWITCHES.include?(argv.first) and return nil
       yield( knob = ParseOptionsKnob.new )
       option_parser = build_parser(context = {})
       begin
@@ -377,7 +382,9 @@ module Skylab::Porcelain
     def invoke argv
       @runtime = Runtime.new(argv, self)
       (method, args = @runtime.parse_argv) or return method
-      send(method, *args)
+      res = send(method, *args)
+      false == res and @runtime.invite(self.class.actions[method])
+      res
     end
     # for now we work around any dependencies on an emitter pattern by requiring
     # that the client subscribe to all events if she wants any
@@ -435,8 +442,13 @@ module Skylab::Porcelain
       (a = @client.class.instance_variable_get('@runtime_config_blocks')) and a.each { |b| instance_eval(&b) }
     end
     def invite *msgs
+      action = msgs.shift if msgs.any? && ! msgs.first.kind_of?(String)
       msgs.each { |msg| emit(:validation_error_meta, msg) }
-      emit(:ui, "Try #{e13b "#{invocation_name} -h"} for help.")
+      if action
+        emit(:ui, "Try #{e13b "#{invocation_name} #{action.name} -h"} for help.")
+      else
+        emit(:ui, "Try #{e13b "#{invocation_name} -h"} for help.")
+      end
       nil
     end
     def invocation_name
@@ -444,7 +456,7 @@ module Skylab::Porcelain
     end
     def parse_argv
       @argv.empty? and return invite("Expecting #{render_actions}.")
-      %w(-h --help).include?(@argv.first) and @argv[0] = 'help'
+      Officious::Help::SWITCHES.include?(@argv.first) and @argv[0] = 'help' # might bite one day
       action = find_action(@argv.shift) or return action
       argv = catch(:option_action) do
         action.parse_both(@argv) { |o| o.on_syntax { |e| emit(:syntax, e) } }
@@ -452,7 +464,7 @@ module Skylab::Porcelain
       argv.kind_of?(Proc) and return argv.call(self, action) # option_action
       argv or begin
         emit(:usage, "usage: #{e13b "#{invocation_name} #{action.syntax}"}")
-        emit(:ui, "Try #{e13b "#{invocation_name} #{action.name} -h"} for help.")
+        invite action
         return false
       end
       [action.method_name, argv]
@@ -465,6 +477,7 @@ module Skylab::Porcelain
   module Officious ; end
 
   module Officious::Help
+    SWITCHES = %w(-h --help)
     extend ::Skylab::Porcelain
     argument_syntax '[<action>]'
     action { visible false }
