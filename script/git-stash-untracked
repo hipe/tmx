@@ -128,7 +128,7 @@ module Skylab::GitStashUntracked
       super(*a, &b)
     end
     def invoke
-      (@stash = collection.stash(name)).validate_existence or return false
+      @stash = collection.stash(name).validate_existence or return false
       (@patch.nil? and @stat.nil?) and @stat = true
       @color.nil? or @stash.color = color
       @stat and @stash.each_stat_line(&method(:emit))
@@ -140,7 +140,8 @@ module Skylab::GitStashUntracked
   end
   class Plumbing::Pop < Plumbing
     def invoke
-      emit :info, "OK whatever"
+      @stash = collection.stash(name).validate_existence or return false
+      @stash.pop(&method(:emit))
     end
   end
   class Collection
@@ -185,6 +186,16 @@ module Skylab::GitStashUntracked
       @emit[:error, msg.to_s]
       false
     end
+    def filenames
+      Enumerator.new do |o|
+        Open3.popen3("cd #{pathname}; find . -type f") do |_, sout, serr|
+          '' != (s = serr.read) and fail("uh-oh: #{s}")
+          while s = sout.gets
+            o << %r{^\./(.*)$}.match(s)[1]
+          end
+        end
+      end
+    end
     def fu_output_message msg
       @emit[:info, "#{msg}"]
     end
@@ -208,8 +219,31 @@ module Skylab::GitStashUntracked
     def pathname
       @pathname ||= @dirpathname.join(@name)
     end
+    def pop &emit
+      filenames = self.filenames.map { |f| Pathname.new(f) }
+      if (existed = filenames.select(&:exist?)).any?
+        emit[:error, "Can't pop, destination file(s) exist:"]
+        existed.each { |p| emit[:error, p.to_s] }
+        return false
+      end
+      filenames.each do |path|
+        path.dirname.directory? or mkdir_p(path.dirname, :verbose => true, :noop => @dry_run)
+        mv(pathname.join(path), path, :verbose => true, :noop => @dry_run) # always verbose when popping
+      end
+      @dry_run or _prune
+      true
+    end
+    def _prune
+      stack = []
+      Open3.popen3("find #{pathname} -type d") do |_, sout, serr|
+        while s = sout.gets do stack.push(s.strip) end
+      end
+      while s = stack.pop
+        rmdir(s, :verbose => true)
+      end
+    end
     def validate_existence
-      pathname.exist? and return true
+      pathname.exist? and return self
       failed("Stash does not exist: #{name}")
     end
     def validate_for_writing

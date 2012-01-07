@@ -121,7 +121,31 @@ module ::Skylab::GitStashUntracked::Tests
         end
       end
       describe "pop" do
-        it "which moves the stashed files back"
+        it "which moves the stashed files back" do
+          TMPDIR.prepare.touch_r %w(
+            stashes/dingle/one-dir/one-file.txt
+            stashes/dingle/two-dir/three-dir/three-file.txt
+            stashes/dingle/four-dir-never-see/fifth-dir-empty/
+            stashes/dingle/two-file.txt
+            stashes/beta/whatever.txt
+            working-dir/
+          )
+          working_dir = TMPDIR.join('working-dir')
+          stashes_abspath = TMPDIR.join('stashes').expand_path.to_s
+          FileUtils.cd(working_dir.to_s) do
+            app.invoke %w(pop dingle -s).push(stashes_abspath)
+          end
+          got = `cd #{working_dir} ; find . -mindepth 1`
+          expected = <<-HERE.unindent
+            ./one-dir
+            ./one-dir/one-file.txt
+            ./two-dir
+            ./two-dir/three-dir
+            ./two-dir/three-dir/three-file.txt
+            ./two-file.txt
+          HERE
+          got.should eql(expected)
+        end
       end
     end
   end
