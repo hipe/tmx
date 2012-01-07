@@ -58,8 +58,6 @@ module ::Skylab::GitStashUntracked::Tests
         it "which lists the known stashes (just a basic directory listing)" do
           TMPDIR.prepare.touch_r %w(
             stashes/alpha/herpus/derpus.txt
-            stashes/alpha/flerpus/nerpus.txt
-            stashes/alpha/empty_dir/
             stashes/beta/whatever.txt
           )
           GitStashUntracked::Plumbing::List.new(runtime_stub, :stashes => TMPDIR.join('stashes')).invoke.should_not eql(false)
@@ -72,6 +70,42 @@ module ::Skylab::GitStashUntracked::Tests
           app.invoke ['list', '-s', "#{TMPDIR}/stashes"] # same thing but invoked though the porcelain
           stderr.to_s.should eql(target)
         end
+      end
+      describe "show" do
+        it "by default does --stat format", {focus: true} do
+          TMPDIR.prepare.patch(<<-HERE.unindent)
+            --- /dev/null
+            +++ b/stashes/derp/flip.txt
+            @@ -0,0 +1,2 @@
+            +one 
+            +two
+            diff --git a/flop/floop.tx b/flop/floop.tx
+            --- /dev/null
+            +++ b/stashes/derp/flop/floop.tx
+            @@ -0,0 +1,4 @@
+            +one two
+            +trhee
+            +foour
+            +
+          HERE
+          app.invoke %w(show derp -s).push(TMPDIR.join('stashes').to_s)
+          target = (<<-HERE.unindent)
+            --- /dev/null
+            +++ b/flip.txt
+            @@ -0,0 +1,2
+            +one 
+            +two
+            --- /dev/null
+            +++ b/flop/floop.tx
+            @@ -0,0 +1,4
+            +one two
+            +trhee
+            +foour
+            +
+          HERE
+          stderr.to_s.should eql(target)
+        end
+        it "can also support --patch format"
       end
       describe "pop" do
         it "which moves the stashed files back"

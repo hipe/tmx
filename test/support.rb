@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'open3'
 require 'pathname'
 require 'stringio'
 
@@ -20,10 +21,31 @@ module Skylab::TestSupport
   end
   class TempDir < ::Pathname
     include FileUtils
-    def initialize *a, &b
-      super(*a, &b)
+    def emit type, msg
+      $stderr.puts msg
+    end
+    def fu_output_message msg
+      emit :info, msg
+    end
+    def initialize path, opts=nil
+      super path
       @verbose = false
       @noop = false # no setter for now! b/c it introduces some issues
+      opts and opts.each { |k, v| send("#{k}=", v) }
+    end
+    def patch str
+      cd(to_s) do
+        Open3.popen3('patch -p1') do |sin, sout, serr|
+          sin.write str
+          sin.close
+          "" != (s = serr.read) and raise("patch failed(?): #{s.inspect}")
+          if @verbose
+            while s = sout.gets
+              emit :info, s.strip
+            end
+          end
+        end
+      end
     end
     def touch_r files
       files.each do |file|

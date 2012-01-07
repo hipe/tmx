@@ -34,6 +34,14 @@ module Skylab::GitStashUntracked
     end
 
     option_syntax do |ctx|
+      instance_exec ctx, &STASHES
+    end
+    argument_syntax '<name>'
+    def show name, opts
+      Plumbing::Show.new(@runtime, opts.merge(:name => name)).invoke
+    end
+
+    option_syntax do |ctx|
       instance_exec ctx, &DRY_RUN
       instance_exec ctx, &STASHES
     end
@@ -100,6 +108,14 @@ module Skylab::GitStashUntracked
       count
     end
   end
+  class Plumbing::Show < Plumbing
+    attr_accessor :format
+    def invoke
+      @format ||= :stat
+      (stash = collection.stash(name)).validate_existence or return false
+      stash.each_show_line(@format, &method(:emit))
+    end
+  end
   class Plumbing::Pop < Plumbing
     def invoke
       emit :info, "OK whatever"
@@ -136,6 +152,9 @@ module Skylab::GitStashUntracked
   class Stash
     include FileUtils
     attr_accessor :dry_run
+    def each_show_line format, &emit
+      PatchMaker[pathname, &emit]
+    end
     def failed msg
       @emit[:error, "Couldn't stash. #{msg}"]
       false
@@ -162,6 +181,10 @@ module Skylab::GitStashUntracked
     def pathname
       @pathname ||= @dirpathname.join(@name)
     end
+    def validate_existence
+      pathname.exist? and return true
+      failed("stash does not exist: #{name}")
+    end
     def validate_for_writing
       if pathname.exist?
         (d = Dir["#{pathname}/*"]).any? and
@@ -173,6 +196,31 @@ module Skylab::GitStashUntracked
       end
       @valid = true
       self
+    end
+  end
+  module PatchMaker ; end
+  class << PatchMaker
+    include FileUtils
+    def [] (path, &emit)
+      File.directory?(path) or raise("not a directory: #{path}")
+      each_path = ->(path) do
+        emit[:payload, '--- /dev/null']
+        emit[:payload, "+++ #{path.sub(/^\./, 'b')}"]
+        lines = File.read(path).split("\n", -1)
+        if '' == lines.last
+          lines.pop
+        else
+          # ...
+        end
+        emit[:payload, "@@ -0,0 +1,#{lines.count}"]
+        lines.each { |line| emit[:payload, "+#{line}"] }
+      end
+      cd(path) do
+        Open3.popen3('find . -type f') do |_, sout, serr|
+          '' != (s = serr.read) and raise("nope: #{s}")
+          while s = sout.gets do each_path[s.strip] end
+        end
+      end
     end
   end
 end
