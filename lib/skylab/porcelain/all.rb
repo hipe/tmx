@@ -395,7 +395,7 @@ module Skylab::Porcelain
 
   module Styles
     extend self
-    _list = [nil, :strong, * Array.new(30), :green]
+    _list = [nil, :strong, * Array.new(29), :red, :green, * Array.new(3), :cyan]
     MAP = Hash[ * _list.each_with_index.map { |sym, idx| [sym, idx] if sym }.compact.flatten ]
     def e13b str   ; stylize str, :green          end
     def header str ; stylize str, :strong, :green end
