@@ -61,18 +61,18 @@ module ::Skylab::GitStashUntracked::Tests
             stashes/beta/whatever.txt
           )
           GitStashUntracked::Plumbing::List.new(runtime_stub, :stashes => TMPDIR.join('stashes')).invoke.should_not eql(false)
-          target = <<-HERE.unindent
+          expected = <<-HERE.unindent
             alpha
             beta
           HERE
-          stderr.to_s.should eql(target)
+          stderr.to_s.should eql(expected)
           stderr.truncate(0) ; stderr.rewind
           app.invoke ['list', '-s', "#{TMPDIR}/stashes"] # same thing but invoked though the porcelain
-          stderr.to_s.should eql(target)
+          stderr.to_s.should eql(expected)
         end
       end
       describe "show" do
-        it "by default does --stat format", {focus: true} do
+        def with_this_stash
           TMPDIR.prepare.patch(<<-HERE.unindent)
             --- /dev/null
             +++ b/stashes/derp/flip.txt
@@ -88,8 +88,22 @@ module ::Skylab::GitStashUntracked::Tests
             +foour
             +
           HERE
+        end
+        include ::Skylab::Porcelain::Styles # unstylize
+        it "by default does the --stat format", do
+          with_this_stash
           app.invoke %w(show derp -s).push(TMPDIR.join('stashes').to_s)
-          target = (<<-HERE.unindent)
+          expected = <<-HERE.unindent
+            flip.txt      | 2 ++
+            flop/floop.tx | 4 ++++
+            2 files changed, 6 insertions(+), 0 deletions(-)
+          HERE
+          unstylize(stderr.to_s).should eql(expected)
+        end
+        it "it can also do the --patch format" do
+          with_this_stash
+          app.invoke %w(show derp --patch -s).push(TMPDIR.join('stashes').to_s)
+          expected = (<<-HERE.unindent)
             --- /dev/null
             +++ b/flip.txt
             @@ -0,0 +1,2 @@
@@ -103,9 +117,8 @@ module ::Skylab::GitStashUntracked::Tests
             +foour
             +
           HERE
-          Porcelain::Styles.unstylize(stderr.to_s).should eql(target)
+          unstylize(stderr.to_s).should eql(expected)
         end
-        it "can also support --patch format"
       end
       describe "pop" do
         it "which moves the stashed files back"

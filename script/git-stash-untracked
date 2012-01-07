@@ -14,10 +14,11 @@ module Skylab::GitStashUntracked
     DRY_RUN = ->(ctx) { on('-n', '--dry-run', "Dry run.") { ctx[:dry_run] = true } }
     STASHES = ->(ctx) do
       ctx[:stashes] = '../Stashes'
-      on('-s', '--stashes <dir>', "where to put the files (default: #{ctx[:stashes]})") { |v| ctx[:stashes] = v }
+      on('-s', '--stashes <dir>', "Where the stashed files live (default: #{ctx[:stashes]}).") { |v| ctx[:stashes] = v }
     end
 
     option_syntax do |ctx|
+      separator " description: move all untracked files to another folder (usu. outside of the project.)"
       instance_exec ctx, &DRY_RUN
       instance_exec ctx, &STASHES
     end
@@ -27,6 +28,7 @@ module Skylab::GitStashUntracked
     end
 
     option_syntax do |ctx|
+      separator " description: lists the \"stashes\" (just a directory listing)."
       instance_exec ctx, &STASHES
     end
     def list opts
@@ -34,8 +36,11 @@ module Skylab::GitStashUntracked
     end
 
     option_syntax do |ctx|
+      separator " description: In the spirit of `git stash show`, reports on contents of stashes."
       ctx[:color] = true
       on('--no-color', "No color.") { ctx[:color] = false }
+      on('--stat', "Show diffstat format (default) (can be used with --patch).") { ctx[:stat] = true }
+      on('-p', '-u', '--patch', "Generate patch (can be used with --stat).") { ctx[:patch] = true }
       instance_exec ctx, &STASHES
     end
     argument_syntax '<name>'
@@ -44,6 +49,7 @@ module Skylab::GitStashUntracked
     end
 
     option_syntax do |ctx|
+      separator " description: Attempts to put the files back if there are no collisions."
       instance_exec ctx, &DRY_RUN
       instance_exec ctx, &STASHES
     end
@@ -52,7 +58,11 @@ module Skylab::GitStashUntracked
       Plumbing::Pop.new(@runtime, opts.merge(:name => name)).invoke
     end
 
-    def status
+    option_syntax do |_|
+      separator " description: Shows the files that would be stashed."
+    end
+
+    def status _
       num = Plumbing::Save.new(@runtime).each_file { |fn| @runtime.emit(:payload, fn) }
       0 == num and @runtime.emit(:info, "# (no untracked files)")
       true
@@ -113,12 +123,20 @@ module Skylab::GitStashUntracked
   class Plumbing::Show < Plumbing
     attr_accessor :color
     attr_accessor :format
-    def invoke
-      @format ||= :stat
-      (stash = collection.stash(name)).validate_existence or return false
-      @color.nil? or stash.color = color
-      stash.each_show_line(@format, &method(:emit))
+    def initialize(*a, &b)
+      @patch = @stat = nil
+      super(*a, &b)
     end
+    def invoke
+      (@stash = collection.stash(name)).validate_existence or return false
+      (@patch.nil? and @stat.nil?) and @stat = true
+      @color.nil? or @stash.color = color
+      @stat and @stash.each_stat_line(&method(:emit))
+      @patch and @stash.each_patch_line(&method(:emit))
+      true
+    end
+    attr_accessor :patch
+    attr_accessor :stat
   end
   class Plumbing::Pop < Plumbing
     def invoke
@@ -157,8 +175,11 @@ module Skylab::GitStashUntracked
     include FileUtils
     attr_accessor :color
     attr_accessor :dry_run
-    def each_show_line format, &emit
-      PatchMaker[pathname, &(@color ? ColorizedPatch[emit] : emit)]
+    def each_patch_line &emit
+      PatchMaker.call(pathname, &(@color ? ColorizedPatch[emit] : emit))
+    end
+    def each_stat_line &emit
+      StatMaker.call(pathname, :color => @color, &emit)
     end
     def failed msg
       @emit[:error, msg.to_s]
@@ -207,7 +228,7 @@ module Skylab::GitStashUntracked
   module PatchMaker ; end
   class << PatchMaker
     include FileUtils
-    def [] (path, &emit)
+    def call(path, &emit)
       File.directory?(path) or raise("not a directory: #{path}")
       each_path = ->(file) do
         emit[:payload, '--- /dev/null']
@@ -229,7 +250,6 @@ module Skylab::GitStashUntracked
       end
     end
   end
-
   extend ::Skylab::Porcelain::Styles
   PATCH_STYLES = [
     ->(s) { stylize(s, :strong, :red) },
@@ -245,12 +265,92 @@ module Skylab::GitStashUntracked
     (-)               |
     ( )
   }x
+  PATCH_LINE_TYPES = [
+    :file_info,
+    :chunk_numbers,
+    :add,
+    :remove,
+    :context
+  ]
   ColorizedPatch = ->(lamb) do
     ->(type, line) do
       lamb[type, PATCH_STYLES[PATCH_LINE.match(line).captures.each_with_index.detect{ |s, i| ! s.nil? }[1]][line]]
     end
   end
+  class StatMaker
+    include ::Skylab::Porcelain::Styles
+    def _calculate
+      filecount = Struct.new(:name, :insertions, :deletions, :combined)
+      files = []
+      PatchMaker.call(@path) do |type, line|
+        md = PATCH_LINE.match(line)
+        type = PATCH_LINE_TYPES[md.captures.each_with_index.detect{ |s, i| ! s.nil? }[1]]
+        case type
+        when :file_info
+          if md = /^(?:(---)|(\+\+\+)) (.+)/.match(line)
+            if md[1]
+              '/dev/null' == md[3] or fail("hack failed: #{md[3].inspect}")
+            else
+              md2 = /^b\/(.+)$/.match(md[3]) or fail("hack failed: #{md[3].inspect}")
+              files.push filecount.new(md2[1], 0, 0, 0)
+            end
+          end # else ignored some kinds of fileinfo
+        when :chunk_numbers
+          md = /^@@ -\d+,(\d+) \+\d+,(\d+) @@$/.match(line) or fail("failed to match chunk: #{line.inspect}")
+          files.last.deletions += md[1].to_i
+          files.last.insertions += md[2].to_i
+        when :add, :remove, :context # ignored
+        else fail("unhandled line pattern or type (line type: #{type.inspect})")
+        end
+      end
+      files
+    end
+    attr_accessor :color
+    def initialize path, opts, &emit
+      @color = true
+      @emit = emit
+      @path = path
+      opts.each { |k, v| send("#{k}=", v) }
+    end
+    def _render files
+      name_max = combined_max = 0
+      plusminus_width = 40
+      total_inserts = total_deletes = 0
+      files.each do |f|
+        total_inserts += f.insertions
+        total_deletes += f.deletions
+        f.combined = f.insertions + f.deletions
+        f.name.length > name_max and name_max = f.name.length
+        f.combined > combined_max and combined_max = f.combined
+      end
+      plusminus_width > combined_max and plusminus_width = combined_max # do not scale down with small numbers
+      col2width = combined_max.to_s.length
+      format = "%-#{name_max}s | %#{col2width}s %s"
+      combined_max == 0  and combined_max = 1 # avoid divide by zero, won't matter at this point to change it
+      files.each do |f|
+        num_pluses = (f.insertions.to_f / combined_max * plusminus_width).ceil # have at least 1 plus if nonzero
+        num_minuses = (f.deletions.to_f / combined_max * plusminus_width).ceil
+        pluses =  '+' * num_pluses
+        minuses = '-' * num_minuses
+        if @color
+          '' == pluses  or pluses = stylize(pluses, :green)
+          '' == minuses or minuses = stylize(minuses, :red)
+        end
+        @emit[:payload, (format % [f.name, f.combined, "#{pluses}#{minuses}"])]
+      end
+      @emit[:payload, ("%s files changed, %d insertions(+), %d deletions(-)" % [files.count, total_inserts, total_deletes])]
+    end
+    def run
+      _render _calculate
+    end
+  end
+  class << StatMaker
+    def call(path, opts, &emit)
+      StatMaker.new(path, opts, &emit).run
+    end
+  end
 end
+
 
 if __FILE__ == $PROGRAM_NAME
   ::Skylab::GitStashUntracked::Porcelain.new{ on_all { |e| $stderr.puts e } }.invoke(ARGV)
