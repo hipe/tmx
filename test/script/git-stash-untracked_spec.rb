@@ -92,18 +92,18 @@ module ::Skylab::GitStashUntracked::Tests
           target = (<<-HERE.unindent)
             --- /dev/null
             +++ b/flip.txt
-            @@ -0,0 +1,2
+            @@ -0,0 +1,2 @@
             +one 
             +two
             --- /dev/null
             +++ b/flop/floop.tx
-            @@ -0,0 +1,4
+            @@ -0,0 +1,4 @@
             +one two
             +trhee
             +foour
             +
           HERE
-          stderr.to_s.should eql(target)
+          Porcelain::Styles.unstylize(stderr.to_s).should eql(target)
         end
         it "can also support --patch format"
       end

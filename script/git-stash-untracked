@@ -34,6 +34,8 @@ module Skylab::GitStashUntracked
     end
 
     option_syntax do |ctx|
+      ctx[:color] = true
+      on('--no-color', "No color.") { ctx[:color] = false }
       instance_exec ctx, &STASHES
     end
     argument_syntax '<name>'
@@ -109,10 +111,12 @@ module Skylab::GitStashUntracked
     end
   end
   class Plumbing::Show < Plumbing
+    attr_accessor :color
     attr_accessor :format
     def invoke
       @format ||= :stat
       (stash = collection.stash(name)).validate_existence or return false
+      @color.nil? or stash.color = color
       stash.each_show_line(@format, &method(:emit))
     end
   end
@@ -151,18 +155,20 @@ module Skylab::GitStashUntracked
   end
   class Stash
     include FileUtils
+    attr_accessor :color
     attr_accessor :dry_run
     def each_show_line format, &emit
-      PatchMaker[pathname, &emit]
+      PatchMaker[pathname, &(@color ? ColorizedPatch[emit] : emit)]
     end
     def failed msg
-      @emit[:error, "Couldn't stash. #{msg}"]
+      @emit[:error, msg.to_s]
       false
     end
     def fu_output_message msg
       @emit[:info, "#{msg}"]
     end
     def initialize dirpathname, stash_name, opts, &emit
+      @color = true
       @dry_run = false
       @valid = false
       @dirpathname = dirpathname
@@ -183,7 +189,7 @@ module Skylab::GitStashUntracked
     end
     def validate_existence
       pathname.exist? and return true
-      failed("stash does not exist: #{name}")
+      failed("Stash does not exist: #{name}")
     end
     def validate_for_writing
       if pathname.exist?
@@ -203,16 +209,16 @@ module Skylab::GitStashUntracked
     include FileUtils
     def [] (path, &emit)
       File.directory?(path) or raise("not a directory: #{path}")
-      each_path = ->(path) do
+      each_path = ->(file) do
         emit[:payload, '--- /dev/null']
-        emit[:payload, "+++ #{path.sub(/^\./, 'b')}"]
-        lines = File.read(path).split("\n", -1)
+        emit[:payload, "+++ #{file.sub(/^\./, 'b')}"]
+        lines = File.read(file).split("\n", -1)
         if '' == lines.last
           lines.pop
         else
           # ...
         end
-        emit[:payload, "@@ -0,0 +1,#{lines.count}"]
+        emit[:payload, "@@ -0,0 +1,#{lines.count} @@"]
         lines.each { |line| emit[:payload, "+#{line}"] }
       end
       cd(path) do
@@ -221,6 +227,27 @@ module Skylab::GitStashUntracked
           while s = sout.gets do each_path[s.strip] end
         end
       end
+    end
+  end
+
+  extend ::Skylab::Porcelain::Styles
+  PATCH_STYLES = [
+    ->(s) { stylize(s, :strong, :red) },
+    ->(s) { s.sub(/(@@[^@]+@@)/) { stylize($1, :cyan) } },
+    ->(s) { stylize(s, :green) },
+    ->(s) { stylize(s, :red) },
+    ->(s) { s }
+  ]
+  PATCH_LINE = %r{\A
+    (--|\+\+|[^- @+]) |
+    (@)               |
+    (\+)              |
+    (-)               |
+    ( )
+  }x
+  ColorizedPatch = ->(lamb) do
+    ->(type, line) do
+      lamb[type, PATCH_STYLES[PATCH_LINE.match(line).captures.each_with_index.detect{ |s, i| ! s.nil? }[1]][line]]
     end
   end
 end
