@@ -239,20 +239,23 @@ module Skylab::Porcelain
       option_parser
     end
     alias_method :duplicate, :dup # only as long as it's stateless
-    HEADER = /\A +[^:]+:\z/
+    HEADER = /\A +[^:]+:/
     def eventized_option_help(&block)
       empty? and return
       yield(knob = EventizedHelpKnob.new)
       renderer = r = ::OptionParser.new
       lucky_matcher = /\A(#{Regexp.escape(r.summary_indent)}.{1,#{r.summary_width}})[ ]*(.*)\z/
       renderer.banner = ''
-      renderer.separator ' options:'
       build_parser({}, renderer)
-      renderer.to_s.split("\n").each do |line|
+      lines = renderer.to_s.split("\n")
+      once = false
+      lines.each do |line|
         case line
-        when ''            ;
-        when lucky_matcher ; knob.emit_two_col($1, $2)
-        when HEADER        ; knob.emit_header(line)
+        when ''            ; # we might emit this after all
+        when lucky_matcher ;
+                           ; once ||= (knob.emit_header('options') || true)
+                           ; knob.emit_two_col($1, $2)
+        when HEADER        ; knob.emit_header(*line.strip.split(':', 2))
         else               ; knob.emit_default(line)
         end
       end
@@ -271,7 +274,7 @@ module Skylab::Porcelain
     end
     def to_s
       0 == count and return nil
-      build_parser({}).instance_variable_get('@stack')[2].list.map do |switch| # ick
+      build_parser({}).instance_variable_get('@stack')[2].list.select{ |s| s.kind_of?(::OptionParser::Switch) }.map do |switch| # ick
         "[#{[(switch.short.first || switch.long.first), switch.arg].compact.join('')}]"
       end.join(' ')
     end
@@ -508,7 +511,7 @@ module Skylab::Porcelain
         "Try #{e13b invocation_name} #{render_actions} #{e13b "-h"}.")
       emit(:usage, "#{header 'usage:'} #{e13b "#{invocation_name} #{act.syntax}"}")
       act.eventized_help do |o|
-        o.on_header { |s| emit(:help, header(s.strip)) }
+        o.on_header { |name, content=nil| emit(:help, "#{header("#{name}:")}#{content}") }
         o.on_two_col { |a, b| emit(:help, "#{e13b a}#{b}") }
         o.on_default { |line| emit(:help, line) }
       end
