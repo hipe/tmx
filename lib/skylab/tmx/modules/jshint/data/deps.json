@@ -1,0 +1,12 @@
+{
+  "external dependencies" : [
+    {
+      "name" : "jshint",
+      "target" : "jshint",
+      "jshint" : {
+        "with git clone" : "https://github.com/jshint/jshint.git"
+      }
+    }
+  ]
+}
+
