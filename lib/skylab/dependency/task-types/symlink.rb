@@ -13,9 +13,6 @@ module Skylab
         _, success = execute
         success
       end
-      def interpolate_stem
-        fallback.interpolate_stem
-      end
       def check
         lstat = File.lstat(symlink) rescue Errno::ENOENT
         if lstat == Errno::ENOENT

@@ -74,9 +74,6 @@ module Skylab
           false
         end
       end
-      def interpolate_stem
-        fallback.interpolate_stem
-      end
     end
   end
 end
