@@ -11,7 +11,7 @@ module Skylab
       attribute :from, :required => false
       attribute :get
 
-      def interpolate_basename
+      def basename
         File.dirname get # for children, leave this as accessor
       end
 
