@@ -48,9 +48,6 @@ module Skylab
           false
         end
       end
-      def interpolate_stem
-        fallback.interpolate_stem
-      end
       def check_source
         if File.exist? @unzip_tarball
           true
