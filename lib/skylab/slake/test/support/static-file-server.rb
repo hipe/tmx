@@ -3,7 +3,7 @@ require 'adsf'
 require 'fileutils'
 require File.expand_path('../constants', __FILE__)
 
-module Skylab::Dependency::TestSupport::StaticFileServer
+module Skylab::Slake::TestSupport::StaticFileServer
   class << self
     def start_unless_running ui=nil
       ui ||= Struct.new(:out, :err).new($stdout, $stderr)
@@ -11,7 +11,7 @@ module Skylab::Dependency::TestSupport::StaticFileServer
     end
   end
   class Server # private
-    include ::Skylab::Dependency::TestSupport::Constants
+    include ::Skylab::Slake::TestSupport::Constants
     def initialize ui
       @ui = ui
       @port = 1324
@@ -109,5 +109,5 @@ module Skylab::Dependency::TestSupport::StaticFileServer
 end
 
 if $PROGRAM_NAME == __FILE__
-  Skylab::Dependency::TestSupport::StaticFileServer.start_unless_running
+  Skylab::Slake::TestSupport::StaticFileServer.start_unless_running
 end
