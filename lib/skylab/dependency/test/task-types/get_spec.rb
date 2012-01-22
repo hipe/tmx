@@ -1,9 +1,14 @@
-require File.expand_path('../helper', __FILE__)
 require File.expand_path('../../../graph', __FILE__)
 
-module Skylab::Dependency
-  include Test::Support
-  describe Graph do
+require File.expand_path('../common-support', __FILE__)
+
+
+Module.new.module_eval do
+
+  include ::Skylab::Dependency::TestSupport::Constants
+
+  describe ::Skylab::Dependency::Graph do
+
     it "should work" do
       File.exist?(TEST_BUILD_DIR) and FileUtils.rm_rf(TEST_BUILD_DIR, :verbose => true)
       FileUtils.mkdir(TEST_BUILD_DIR, :verbose => true)
@@ -20,3 +25,4 @@ module Skylab::Dependency
     end
   end
 end
+
