@@ -1,32 +1,33 @@
 require File.expand_path('../../version', __FILE__)
-require File.expand_path('../support/ui-tee', __FILE__)
+require File.expand_path('../test-support/ui-tee', __FILE__)
 
 module Skylab::Dependency
-  include Test::Support # UiTee
+  include TestSupport # UiTee
 
   describe Version do
 
-    it "should parse the minimal case" do
+    it "parses the minimal case" do
       _parse "1.2"
     end
-    it "should parse minimal case with patch version" do
+    it "parses the minimal case with patch version" do
       _parse "1.2.3"
     end
-    it "should parse abc1.23.45" do
+    it "parses abc1.23.45" do
       _parse "abc1.23.45"
     end
-    it "should parse 12.345.67abc" do
+    it "parses 12.345.67abc" do
       _parse "12.345.67abc"
     end
-    it "should whine with ambiguity" do
-      ui = UiTee.new
+    it "whines on ambiguity" do
+      ui = UiTee.new(:silent => true)
       str = "abc1.2.3def4.5"
-      sexp = Version::parse_string_with_version(str, :ui => ui)
+      sexp = Version.parse_string_with_version(str) do |o|
+        o.on_error { |e| ui.err.puts e.message }
+      end
       sexp.should eq(false)
-      ui.out_string.should eq("")
-      ui.err_string.strip.should eq("Skylab::Dependency::Version ERROR: multiple version strings matched in string: \"abc1.2.3def4.5\"")
+      ui.err_string.strip.should eq("multiple version strings matched in string: \"abc1.2.3def4.5\"")
     end
-    it "should allow bumps" do
+    it "allows version bumps" do
       sexp = Version::parse_string_with_version("abc-1.4.7-def")
       ver = sexp.detect(:version)
       ver.class.should eq(Version)
@@ -41,13 +42,14 @@ module Skylab::Dependency
       sexp.to_s.should eq("abc-3.5.8-def")
       lambda { ver.bump!(:not_there) }.should raise_error(::Skylab::CodeMolester::Sexp::RuntimeError, "no such node: :not_there")
     end
-    include Test::Support # UiTee (again)
+    include TestSupport # UiTee (again)
     def _parse str
       ui = UiTee.new
-      sexp = Version::parse_string_with_version(str, :ui => ui)
+      sexp = Version::parse_string_with_version(str) do |o|
+        o.on_informational { |e| ui.err.puts("#{e.type}: #{e.message}") }
+      end
       sexp.to_s.should eq(str)
       ui.err_string.should eq("")
-      ui.out_string.should eq("")
     end
   end
 end

@@ -1,0 +1,392 @@
+#!/usr/bin/env ruby -w
+
+require 'fileutils'
+require 'open3'
+require 'pathname'
+
+
+require File.expand_path('../../lib/skylab/porcelain/all', __FILE__)
+
+module Skylab::GitStashUntracked
+  class Porcelain
+    extend ::Skylab::Porcelain
+
+    DRY_RUN = ->(ctx) { on('-n', '--dry-run', "Dry run.") { ctx[:dry_run] = true } }
+    STASHES = ->(ctx) do
+      ctx[:stashes] = '../Stashes'
+      on('-s', '--stashes <dir>', "Where the stashed files live (default: #{ctx[:stashes]}).") { |v| ctx[:stashes] = v }
+    end
+
+    option_syntax do |ctx|
+      separator " description: move all untracked files to another folder (usu. outside of the project.)"
+      instance_exec ctx, &DRY_RUN
+      instance_exec ctx, &STASHES
+    end
+    argument_syntax "<name>"
+    def save name, opts
+      Plumbing::Save.new(@runtime, opts.merge(:name => name)).invoke
+    end
+
+    option_syntax do |ctx|
+      separator " description: lists the \"stashes\" (just a directory listing)."
+      instance_exec ctx, &STASHES
+    end
+    def list opts
+      Plumbing::List.new(@runtime, opts).invoke
+    end
+
+    option_syntax do |ctx|
+      separator " description: In the spirit of `git stash show`, reports on contents of stashes."
+      ctx[:color] = true
+      on('--no-color', "No color.") { ctx[:color] = false }
+      on('--stat', "Show diffstat format (default) (can be used with --patch).") { ctx[:stat] = true }
+      on('-p', '-u', '--patch', "Generate patch (can be used with --stat).") { ctx[:patch] = true }
+      instance_exec ctx, &STASHES
+    end
+    argument_syntax '<name>'
+    def show name, opts
+      Plumbing::Show.new(@runtime, opts.merge(:name => name)).invoke
+    end
+
+    option_syntax do |ctx|
+      separator " description: Attempts to put the files back if there are no collisions."
+      instance_exec ctx, &DRY_RUN
+      instance_exec ctx, &STASHES
+    end
+    argument_syntax '<name>'
+    def pop name, opts
+      Plumbing::Pop.new(@runtime, opts.merge(:name => name)).invoke
+    end
+
+    option_syntax do |_|
+      separator " description: Shows the files that would be stashed."
+    end
+
+    def status _
+      num = Plumbing::Save.new(@runtime).each_file { |fn| @runtime.emit(:payload, fn) }
+      0 == num and @runtime.emit(:info, "# (no untracked files)")
+      true
+    end
+  end
+  class Plumbing
+    def collection
+      Collection.cache[stashes] ||= Collection.new(stashes, :dry_run => @dry_run) { |*a| emit(*a) }
+    end
+    attr_accessor :dry_run
+    def emit a,b ; @runtime.emit(a, b) end
+    def failed msg
+      emit(:error, "failed: #{msg}")
+      false
+    end
+    def initialize runtime, request={}
+      @dry_run = false
+      request.each { |k, v| send("#{k}=", v) }
+      @runtime = runtime
+    end
+    attr_accessor :name
+    attr_accessor :stashes
+  end
+  class Plumbing::Save < Plumbing
+    COMMAND = 'git ls-files -o --exclude-standard'
+    def each_file
+      count = 0
+      emit :info, "# #{COMMAND}"
+      Open3.popen3(COMMAND) do |_, sout, serr|
+        loop do
+          "" == (e = serr.read) or return emit(:error, e)
+          line = sout.gets or break
+          count += 1
+          yield line.strip
+        end
+      end
+      count
+    end
+    def invoke
+      stash = collection.stash(@name).validate_for_writing or return stash
+      none = true
+      each_file { |file| stash.stash_file file; none = false }
+      none and emit(:info, "no files to stash!")
+      true
+    end
+  end
+  class Plumbing::List < Plumbing
+    def invoke
+      collection.validate_existence or return false
+      count = 0
+      collection.each_stash do |stash|
+        count += 1
+        emit :payload, stash.name
+      end
+      count
+    end
+  end
+  class Plumbing::Show < Plumbing
+    attr_accessor :color
+    attr_accessor :format
+    def initialize(*a, &b)
+      @patch = @stat = nil
+      super(*a, &b)
+    end
+    def invoke
+      @stash = collection.stash(name).validate_existence or return false
+      (@patch.nil? and @stat.nil?) and @stat = true
+      @color.nil? or @stash.color = color
+      @stat and @stash.each_stat_line(&method(:emit))
+      @patch and @stash.each_patch_line(&method(:emit))
+      true
+    end
+    attr_accessor :patch
+    attr_accessor :stat
+  end
+  class Plumbing::Pop < Plumbing
+    def invoke
+      @stash = collection.stash(name).validate_existence or return false
+      @stash.pop(&method(:emit))
+    end
+  end
+  class Collection
+    @cache = {}
+    def each_stash
+      @path.exist? or raise RuntimeError.new("no such directory: #{@path}")
+      Dir.new(@path.to_s).each do |name|
+        name[0,1] == '.' and next
+        yield stash(name)
+      end
+      nil
+    end
+    def initialize path, opts, &block
+      @cache = {}
+      @emit = block
+      @opts = opts
+      @path = Pathname.new(path)
+    end
+    def stash name
+      @cache[name] ||= Stash.new(@path, name, @opts, &@emit)
+    end
+    def validate_existence
+      @path.exist? and return true
+      @emit[:error, "Stashes dir does not exist: #{@path}"]
+      false
+    end
+  end
+  class << Collection
+    attr_reader :cache
+  end
+  class Stash
+    include FileUtils
+    attr_accessor :color
+    attr_accessor :dry_run
+    def each_patch_line &emit
+      PatchMaker.call(pathname, &(@color ? ColorizedPatch[emit] : emit))
+    end
+    def each_stat_line &emit
+      StatMaker.call(pathname, :color => @color, &emit)
+    end
+    def failed msg
+      @emit[:error, msg.to_s]
+      false
+    end
+    def filenames
+      Enumerator.new do |o|
+        Open3.popen3("cd #{pathname}; find . -type f") do |_, sout, serr|
+          '' != (s = serr.read) and fail("uh-oh: #{s}")
+          while s = sout.gets
+            o << %r{^\./(.*)$}.match(s)[1]
+          end
+        end
+      end
+    end
+    def fu_output_message msg
+      @emit[:info, "#{msg}"]
+    end
+    def initialize dirpathname, stash_name, opts, &emit
+      @color = true
+      @dry_run = false
+      @valid = false
+      @dirpathname = dirpathname
+      @emit = emit
+      @quiet = {}
+      @name = stash_name.to_s
+      opts.each { |k, v| send("#{k}=", v) }
+    end
+    attr_reader :name
+    def stash_file file
+      @valid or validate_for_writing or return false
+      dest = pathname.join(file)
+      dest.dirname.exist? or (@quiet[dest.dirname.to_s] ||= mkdir_p(dest.dirname, :verbose => true, :noop => @dry_run))
+      move(file, dest, :verbose => true, :noop => @dry_run)
+    end
+    def pathname
+      @pathname ||= @dirpathname.join(@name)
+    end
+    def pop &emit
+      filenames = self.filenames.map { |f| Pathname.new(f) }
+      if (existed = filenames.select(&:exist?)).any?
+        emit[:error, "Can't pop, destination file(s) exist:"]
+        existed.each { |p| emit[:error, p.to_s] }
+        return false
+      end
+      filenames.each do |path|
+        path.dirname.directory? or mkdir_p(path.dirname, :verbose => true, :noop => @dry_run)
+        mv(pathname.join(path), path, :verbose => true, :noop => @dry_run) # always verbose when popping
+      end
+      @dry_run or _prune
+      true
+    end
+    def _prune
+      stack = []
+      Open3.popen3("find #{pathname} -type d") do |_, sout, serr|
+        while s = sout.gets do stack.push(s.strip) end
+      end
+      while s = stack.pop
+        rmdir(s, :verbose => true)
+      end
+    end
+    def validate_existence
+      pathname.exist? and return self
+      failed("Stash does not exist: #{name}")
+    end
+    def validate_for_writing
+      if pathname.exist?
+        (d = Dir["#{pathname}/*"]).any? and
+          return failed("Destination dir must be empty (\"stash\" already exists?).  Found files:\n#{d.join("\n")}")
+      elsif ! @dirpathname.exist?
+        return failed("Stashes directory must exist: #{@dirpathname}")
+      else
+        # a directory needs to be made, but make it when there are files to move
+      end
+      @valid = true
+      self
+    end
+  end
+  module PatchMaker ; end
+  class << PatchMaker
+    include FileUtils
+    def call(path, &emit)
+      File.directory?(path) or raise("not a directory: #{path}")
+      each_path = ->(file) do
+        emit[:payload, '--- /dev/null']
+        emit[:payload, "+++ #{file.sub(/^\./, 'b')}"]
+        lines = File.read(file).split("\n", -1)
+        if '' == lines.last
+          lines.pop
+        else
+          # ...
+        end
+        emit[:payload, "@@ -0,0 +1,#{lines.count} @@"]
+        lines.each { |line| emit[:payload, "+#{line}"] }
+      end
+      cd(path) do
+        Open3.popen3('find . -type f') do |_, sout, serr|
+          '' != (s = serr.read) and raise("nope: #{s}")
+          while s = sout.gets do each_path[s.strip] end
+        end
+      end
+    end
+  end
+  extend ::Skylab::Porcelain::Styles
+  PATCH_STYLES = [
+    ->(s) { stylize(s, :strong, :red) },
+    ->(s) { s.sub(/(@@[^@]+@@)/) { stylize($1, :cyan) } },
+    ->(s) { stylize(s, :green) },
+    ->(s) { stylize(s, :red) },
+    ->(s) { s }
+  ]
+  PATCH_LINE = %r{\A
+    (--|\+\+|[^- @+]) |
+    (@)               |
+    (\+)              |
+    (-)               |
+    ( )
+  }x
+  PATCH_LINE_TYPES = [
+    :file_info,
+    :chunk_numbers,
+    :add,
+    :remove,
+    :context
+  ]
+  ColorizedPatch = ->(lamb) do
+    ->(type, line) do
+      lamb[type, PATCH_STYLES[PATCH_LINE.match(line).captures.each_with_index.detect{ |s, i| ! s.nil? }[1]][line]]
+    end
+  end
+  class StatMaker
+    include ::Skylab::Porcelain::Styles
+    def _calculate
+      filecount = Struct.new(:name, :insertions, :deletions, :combined)
+      files = []
+      PatchMaker.call(@path) do |type, line|
+        md = PATCH_LINE.match(line)
+        type = PATCH_LINE_TYPES[md.captures.each_with_index.detect{ |s, i| ! s.nil? }[1]]
+        case type
+        when :file_info
+          if md = /^(?:(---)|(\+\+\+)) (.+)/.match(line)
+            if md[1]
+              '/dev/null' == md[3] or fail("hack failed: #{md[3].inspect}")
+            else
+              md2 = /^b\/(.+)$/.match(md[3]) or fail("hack failed: #{md[3].inspect}")
+              files.push filecount.new(md2[1], 0, 0, 0)
+            end
+          end # else ignored some kinds of fileinfo
+        when :chunk_numbers
+          md = /^@@ -\d+,(\d+) \+\d+,(\d+) @@$/.match(line) or fail("failed to match chunk: #{line.inspect}")
+          files.last.deletions += md[1].to_i
+          files.last.insertions += md[2].to_i
+        when :add, :remove, :context # ignored
+        else fail("unhandled line pattern or type (line type: #{type.inspect})")
+        end
+      end
+      files
+    end
+    attr_accessor :color
+    def initialize path, opts, &emit
+      @color = true
+      @emit = emit
+      @path = path
+      opts.each { |k, v| send("#{k}=", v) }
+    end
+    def _render files
+      name_max = combined_max = 0
+      plusminus_width = 40
+      total_inserts = total_deletes = 0
+      files.each do |f|
+        total_inserts += f.insertions
+        total_deletes += f.deletions
+        f.combined = f.insertions + f.deletions
+        f.name.length > name_max and name_max = f.name.length
+        f.combined > combined_max and combined_max = f.combined
+      end
+      plusminus_width > combined_max and plusminus_width = combined_max # do not scale down with small numbers
+      col2width = combined_max.to_s.length
+      format = "%-#{name_max}s | %#{col2width}s %s"
+      combined_max == 0  and combined_max = 1 # avoid divide by zero, won't matter at this point to change it
+      files.each do |f|
+        num_pluses = (f.insertions.to_f / combined_max * plusminus_width).ceil # have at least 1 plus if nonzero
+        num_minuses = (f.deletions.to_f / combined_max * plusminus_width).ceil
+        pluses =  '+' * num_pluses
+        minuses = '-' * num_minuses
+        if @color
+          '' == pluses  or pluses = stylize(pluses, :green)
+          '' == minuses or minuses = stylize(minuses, :red)
+        end
+        @emit[:payload, (format % [f.name, f.combined, "#{pluses}#{minuses}"])]
+      end
+      @emit[:payload, ("%s files changed, %d insertions(+), %d deletions(-)" % [files.count, total_inserts, total_deletes])]
+    end
+    def run
+      _render _calculate
+    end
+  end
+  class << StatMaker
+    def call(path, opts, &emit)
+      StatMaker.new(path, opts, &emit).run
+    end
+  end
+end
+
+
+if __FILE__ == $PROGRAM_NAME
+  ::Skylab::GitStashUntracked::Porcelain.new{ on_all { |e| $stderr.puts e } }.invoke(ARGV)
+end
+
