@@ -11,8 +11,12 @@ module Skylab::Dependency::TestNamespace
 
   BUILD_DIR = Class.new(Pathname).class_eval do
     include FileUtils
+    def initialize(*)
+      @verbose = false
+      super
+    end
     def fu_output_message msg
-      $stderr.puts "BUILD_DIR #{msg}"
+      @verbose and $stderr.puts("BUILD_DIR #{msg}")
     end
     def prepare
       if directory?
@@ -27,6 +31,7 @@ module Skylab::Dependency::TestNamespace
       end
       true
     end
+    attr_accessor :verbose
     self
   end.new(TEMP_DIR.join('build-dependency'))
 
