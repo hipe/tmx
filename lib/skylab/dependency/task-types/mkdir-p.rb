@@ -1,58 +1,38 @@
 require File.expand_path('../../task', __FILE__)
-require 'skylab/face/path-tools'
-require 'fileutils'
 
 module Skylab::Dependency
   class TaskTypes::MkdirP < Task
-
-    class Maker
-      # we need a dedicated class for this because the host object has its own mkdir_p
-      # which is different
-      include FileUtils
-      def initialize stream, prefix
-        @fileutils_output = stream
-        @fileutils_label = prefix
-      end
-      public :mkdir_p
-    end
-
-    include ::Skylab::Face::PathTools
     include FileUtils
-    attribute :mkdir_p
-    attribute :maxdepth
-
-    def check
-      @ok = true
-      if File.exist?(@mkdir_p)
-        true
-      else
-        dir = @mkdir_p
-        current_depth = 0
-        begin
-          dir = File.dirname(dir)
-          current_depth += 1
-        end while ! File.directory?(dir) and ! ['.','/'].include?(dir) and current_depth <= @maxdepth
-        if current_depth > @maxdepth
-          _info("won't mkdir more than #{@maxdepth} levels deep " <<
-            "(#{pretty_path @mkdir_p} requires #{current_depth} levels)")
-          @ok = false
-          false
-        else
-          _info "doesn't exist, can create #{pretty_path @mkdir_p}"
-          false
-        end
+    alias_method :fu_mkdir_p, :mkdir_p
+    attribute :dry_run, :boolean => true, :from_context => true, :default => false
+    attribute :max_depth, :from_context => true, :default => 1
+    attribute :mkdir_p, :required => true
+    attribute :verbose, :boolean => true, :from_context => true, :default => true
+    emits :all, :info => :all
+    def execute args
+      @context ||= (args[:context] || {})
+      valid? or fail(invalid_reason)
+      if File.directory?(dir = Pathname.new(mkdir_p))
+        emit :info, "directory exists: #{dir}"
+        return true
       end
-    end
-
-    def slake
-      check and return true # silent ok
-      ! @ok and return false
-      Maker.new(ui.err, "#{me}: ").mkdir_p(@mkdir_p, :verbose => true, :noop => request[:dry_run]) # _show_bash @todo
+      current_depth = 0
+      max_depth = self.max_depth
+      begin
+        dir = dir.dirname
+        current_depth += 1
+      end while ! dir.directory? and ! %w(. /).include?(dir.to_s) and current_depth <= max_depth
+      if current_depth > max_depth
+        emit(:info, "won't mkdir more than #{max_depth} levels deep " <<
+          "(#{pretty_path mkdir_p} requires at least #{current_depth} levels)"
+        )
+        return false
+      end
+      fu_mkdir_p mkdir_p, :noop => dry_run?, :verbose => verbose?
       true
     end
-
-    def _defaults!
-      @maxdepth ||= 1
+    def fu_output_message msg
+      emit :info, msg
     end
   end
 end
