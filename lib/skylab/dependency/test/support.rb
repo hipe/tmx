@@ -1,3 +1,5 @@
+require 'stringio'
+
 require File.expand_path('../../../../skylab', __FILE__)
 
 module Skylab
@@ -47,6 +49,12 @@ module Skylab::Dependency::TestNamespace
   end.new
 
   FIXTURES_DIR = Pathname.new(File.expand_path('../fixtures', __FILE__))
+
+  class MyStringIO < StringIO
+    def to_s
+      rewind ; read
+    end
+  end
 
   module CustomExpectationMatchers
     def be_including foo
