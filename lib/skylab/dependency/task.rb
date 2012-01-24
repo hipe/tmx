@@ -1,6 +1,7 @@
 require 'skylab/slake/task'
 require 'skylab/slake/muxer'
 require 'skylab/face/path-tools'
+require 'skylab/porcelain/tite-color'
 
 module Skylab::Dependency
 
@@ -15,6 +16,10 @@ module Skylab::Dependency
 
     extend ::Skylab::Slake::Muxer # child classes decide what to emit
     include ::Skylab::Face::PathTools
+    include ::Skylab::Porcelain::TiteColor
+
+    def hi str ; stylize str, :strong, :green end
+    def no str ; stylize str, :strong, :red   end
 
     def initialize(*)
       super

@@ -1,5 +1,6 @@
 require 'optparse'
 require 'strscan'
+require File.expand_path('../tite-color', __FILE__)
 
 module Skylab ; end
 
@@ -397,17 +398,10 @@ module Skylab::Porcelain
   end
 
   module Styles
+    include TiteColor
     extend self
-    _list = [nil, :strong, * Array.new(29), :red, :green, * Array.new(3), :cyan]
-    MAP = Hash[ * _list.each_with_index.map { |sym, idx| [sym, idx] if sym }.compact.flatten ]
     def e13b str   ; stylize str, :green          end
     def header str ; stylize str, :strong, :green end
-    def stylize str, *styles
-      "\e[#{styles.map{ |s| MAP[s] }.compact.join(';')}m#{str}\e[0m"
-    end
-    def unstylize str
-      str.to_s.gsub(/\e\[\d+(?:;\d+)*m/, '')
-    end
   end
 
   class Runtime
