@@ -25,7 +25,16 @@ module Skylab::Dependency
       end
       handler
     end
-    attr_accessor :document_root
+    attr_reader :document_root
+    def document_root= root
+      case root
+      when NilClass ; @document_root = nil
+      when String   ; @document_root = Pathname.new(root)
+      when Pathname ; @document_root = root
+      else            raise ArgumentError.new("Bad type for document_root: #{root.class}")
+      end
+      root
+    end
     alias_method :_emit, :emit
     def emit type, message
       _emit type, "#{message_prefix}#{message}"
@@ -35,7 +44,7 @@ module Skylab::Dependency
     end
     def initialize opts=nil
       block_given? and yield(self)
-      event_listeners[:all] ||= lambda { |e| $stderr.puts e }
+      event_listeners[:all] ||= [lambda { |e| $stderr.puts e }]
       case opts
       when String, Pathname ; opts = { :document_root => opts }
       end
@@ -43,7 +52,7 @@ module Skylab::Dependency
       @port ||= DEFAULT_PORT
     end
     def message_prefix
-      @message_prefix ||= "#{name} "
+      @message_prefix ||= '' # default behavior is for clients to prefix/format the messages
     end
     def name
       @name || self.class.to_s
@@ -74,7 +83,8 @@ module Skylab::Dependency
           use Rack::CommonLogger
           use Rack::ShowExceptions
           use Rack::Lint
-          use Adsf::Rack::IndexFileFinder, :root => docroot
+          use Adsf::Rack::IndexFileFinder, :root => docroot.to_s
+          root
           run Rack::File.new(docroot)
         end.to_app
       end
