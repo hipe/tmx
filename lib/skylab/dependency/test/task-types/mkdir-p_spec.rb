@@ -5,11 +5,20 @@ module Skylab::Dependency::TestNamespace
   include ::Skylab::Dependency
   describe TaskTypes::MkdirP do
     subject { TaskTypes::MkdirP }
+    let(:all) do
+      lambda do |t|
+        t.on_all do |e|
+          stderr << e.to_s
+        end
+      end
+    end
     it "builds an empty object" do
       subject.new.should be_kind_of(TaskTypes::MkdirP)
     end
     context "as empty" do
-      subject { TaskTypes::MkdirP.new }
+      subject do
+        TaskTypes::MkdirP.new(&all)
+      end
       it "whines about required arg missing if you try to run it" do
         lambda { subject.invoke }.should(
           raise_exception(RuntimeError, /missing required attributes?: .*mkdir_p/)
@@ -19,7 +28,7 @@ module Skylab::Dependency::TestNamespace
     context "when the required parameters are present" do
       let(:dir_arg) { "#{BUILD_DIR}/foo/bar" }
       subject do
-        TaskTypes::MkdirP.new( :mkdir_p => dir_arg )
+        TaskTypes::MkdirP.new( :mkdir_p => dir_arg, &all)
       end
       context "with regards to dry_run" do
         before { subject.context = context }
@@ -34,7 +43,6 @@ module Skylab::Dependency::TestNamespace
             let (:stderr) { "" }
             before do
               BUILD_DIR.prepare
-              subject.event_listeners[:all] = lambda { |e| stderr << e.to_s }
             end
             context "a two-element do-hah" do
               context "with default max_depth" do
@@ -45,7 +53,7 @@ module Skylab::Dependency::TestNamespace
               end
               context "with max_depth increased to two" do
                 subject do
-                  TaskTypes::MkdirP.new(:mkdir_p => dir_arg, :max_depth => 2)
+                  TaskTypes::MkdirP.new(:mkdir_p => dir_arg, :max_depth => 2, &all)
                 end
                 it "will go becuase it is equal to max depth" do
                   subject.invoke
