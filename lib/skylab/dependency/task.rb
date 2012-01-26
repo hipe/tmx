@@ -23,7 +23,7 @@ module Skylab::Dependency
 
     def initialize(*)
       super
-      event_listeners[:all] ||= lambda { |e| $stdout.puts e }
+      event_listeners[:all] ||= [lambda { |e| $stdout.puts e }]
     end
 
     def valid?

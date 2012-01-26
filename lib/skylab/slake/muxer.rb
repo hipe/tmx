@@ -24,6 +24,9 @@ module Skylab::Slake
 end
 
 module Skylab::Slake::Muxer
+
+  COMMON_LEVELS = [:debug, :info, :notice, :warn, :error, :fatal]
+
   class Event
     def initialize tag, data
       @tag = tag
