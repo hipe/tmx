@@ -6,7 +6,13 @@ GEM
     archive-tar-minitar (0.5.2)
     columnize (0.3.4)
     diff-lcs (1.1.2)
+    ffi (1.0.11)
     git (1.2.5)
+    guard (1.0.0)
+      ffi (>= 0.5.0)
+      thor (~> 0.14.6)
+    guard-rspec (0.6.0)
+      guard (>= 0.10.0)
     highline (1.6.2)
     jeweler (1.6.4)
       bundler (~> 1.0)
@@ -36,16 +42,20 @@ GEM
       ruby-debug-base19 (>= 0.11.19)
     ruby_core_source (0.1.5)
       archive-tar-minitar (>= 0.5.2)
+    ruby_gntp (0.3.4)
     simplecov (0.5.4)
       multi_json (~> 1.0.3)
       simplecov-html (~> 0.5.3)
     simplecov-html (0.5.3)
+    thor (0.14.6)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   adsf
+  guard
+  guard-rspec
   highline
   jeweler
   rack
@@ -53,4 +63,5 @@ DEPENDENCIES
   rdoc (~> 3.9.2)
   rspec (~> 2.6)
   ruby-debug19
+  ruby_gntp
   simplecov

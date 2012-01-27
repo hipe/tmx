@@ -4,6 +4,8 @@ gem 'highline'
 
 group :development do
   gem 'adsf'
+  gem 'guard'
+  gem 'guard-rspec'
   gem 'jeweler'
   gem 'rack'
   gem 'rake', '~> 0.9.2'
@@ -15,5 +17,7 @@ group :development do
   else
     gem 'ruby-debug'
   end
+  gem 'ruby_gntp'
   gem 'simplecov'
 end
+
