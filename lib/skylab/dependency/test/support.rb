@@ -54,7 +54,8 @@ module Skylab::Dependency::TestNamespace
       define_method(method) { |*a, &b| @server.send(method, *a, &b) }
     end
     def initialize
-      self.log_level = :info
+      yield(self) if block_given?
+      @log_level or self.log_level = :info
     end
     LEVELS = ::Skylab::Slake::Muxer::COMMON_LEVELS
     attr_reader :log_level
@@ -77,7 +78,7 @@ module Skylab::Dependency::TestNamespace
       @server.start_unless_running
     end
     self
-  end.new
+  end.new { |s| s.log_level = :warn }
 
   FIXTURES_DIR = Pathname.new(File.expand_path('../fixtures', __FILE__))
 
