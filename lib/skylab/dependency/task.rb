@@ -9,6 +9,7 @@ module Skylab::Dependency
     meta_attribute :boolean
     meta_attribute :default
     meta_attribute :from_context
+    meta_attribute :pathname
     meta_attribute :required
 
     attr_accessor  :context
@@ -59,6 +60,12 @@ module Skylab::Dependency
           return @context[name]
         end
         send "#{name}_before_from_context"
+      end
+    end
+    def on_pathname_attribute name, meta
+      define_method("#{name}=") do |v|
+        instance_variable_set("@#{name}", v ? Pathname.new(v) : v)
+        v
       end
     end
   end
