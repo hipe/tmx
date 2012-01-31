@@ -1,27 +1,29 @@
 # encoding: utf-8
 
-require File.expand_path('../../../../cli/view/tree', __FILE__)
+require File.expand_path('../../tree', __FILE__)
 
-module Skylab::Face::Cli::View
-  module ForTesting
-    module ArrayExtension
-      class << self
-        def extend_to el
-          el.extend self
-          el.children and el.children.each do |_el|
-            extend_to _el
-          end
-          el
+module Skylab::Porcelain::TestNamespace
+  module ArrayExtension
+    class << self
+      def extend_to el
+        el.extend self
+        el.children and el.children.each do |_el|
+          extend_to _el
         end
-        alias_method :[], :extend_to
+        el
       end
-      def name     ; self[:name] end
-      def children ; self[:children] end
+      alias_method :[], :extend_to
     end
+    def name     ; self[:name] end
+    def children ; self[:children] end
   end
+end
+
+module Skylab::Porcelain::TestNamespace
+  include Skylab::Porcelain
   describe Tree do
     it "should work" do
-      foo = ForTesting::ArrayExtension[
+      foo = ArrayExtension[
         { :name => "document",
           :children => [
             { :name => "head" },
