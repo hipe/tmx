@@ -2,7 +2,7 @@ require 'stringio'
 require File.expand_path('../../all', __FILE__)
 
 
-module Skylab::Porcelain::Test
+module Skylab::Porcelain::TestNamespace
   Porcelain = ::Skylab::Porcelain
   class StringIo < ::StringIO
     def to_s
@@ -11,6 +11,16 @@ module Skylab::Porcelain::Test
     end
     def match x
       to_s.match x
+    end
+  end
+  SHARED_SETUP = lambda do |_|
+    include Porcelain::Styles # unstylize
+    let(:debug_ui) { false }
+    let(:stderr) { StringIo.new }
+    let(:instance) do
+      klass.new do |app|
+        app.on_all { |e| stderr.puts unstylize(e) ; debug_ui and $stderr.puts(e) }
+      end
     end
   end
   describe "The #{Skylab::Porcelain} module" do
@@ -223,14 +233,7 @@ module Skylab::Porcelain::Test
         end # of
       end # ArgumentSyntax
     end # DSL
-    include Porcelain::Styles # unstylize
-    let(:debug_ui) { false }
-    let(:stderr) { StringIo.new }
-    let(:instance) do
-      klass.new do |app|
-        app.on_all { |e| stderr.puts unstylize(e) ; debug_ui and $stderr.puts(e) }
-      end
-    end
+    module_eval &SHARED_SETUP
     describe "invocation happens with a call to invoke() (pass it ARGV) that" do
       Porcelain::Runtime.send(:define_method, :invocation_name) { 'yourapp' }
       let(:expecting_foo_bar) { /expecting \{(?:help\|)?foo\|bar\}/i }
@@ -369,6 +372,47 @@ module Skylab::Porcelain::Test
           help_screen.should match(/usage: yourapp whatever-is-clever/i)
           help_screen.should match(/-a, --apple +an apple/)
         end
+      end
+    end
+  end
+end
+
+# the below gets its own file when the implemenation does
+
+module ::Skylab::Porcelain::TestNamespace
+  include ::Skylab
+  describe Porcelain::Namespace do
+    context "Porcelain itself" do
+      subject { Porcelain }
+      it { should respond_to(:namespaces) }
+    end
+    context "the result of a call to #namespaces" do
+      subject { Porcelain.namespaces }
+      it { should be_kind_of(Array) }
+    end
+    context "a porcelain-ized module" do
+      let(:klass) do
+        Class.new.module_eval do
+          extend Porcelain
+          def buckle ; end
+          namespace :'whiz-bang' do
+            def cuckle
+              :yes
+            end
+          end
+          def duckle ; end
+          self
+        end
+      end
+      instance_eval(&SHARED_SETUP)
+      it "lists the namespace inline as another action" do
+        klass.actions.sort_by{ |x| x.name.to_s }.map(&:name).should eql([:buckle, :duckle, :help, :'whiz-bang'])
+      end
+      let(:debug_ui) { true }
+      it "calls the child command", {focus:true} do
+        instance.instance_variable_get('@touched').should eql(nil)
+        r = instance.invoke(['wh', 'cu'])
+        r.should eql(:yes)
       end
     end
   end

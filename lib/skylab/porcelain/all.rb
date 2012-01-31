@@ -61,6 +61,9 @@ module Skylab::Porcelain
       [*mods, *[klass].compact].each { |anc| @_actions_cache.merge_in_duplicates_no_clobber! anc.actions }
       @_actions_cache
     end
+    def namespace name, &block
+      _actions_cache.cache NamespaceAction.new(name, &block)
+    end
   end
   class ActionsCache
     def [] k
@@ -68,7 +71,7 @@ module Skylab::Porcelain
     end
     def cache action
       @hash.key?(action.name) or @order.push action.name
-      @hash[action.method_name] = action.name
+      @hash[action.method_name] = action.name if action.respond_to?(:method_name)
       @hash[action.name] = action
     end
     def each &block
@@ -178,6 +181,7 @@ module Skylab::Porcelain
       sym
     end
     attr_accessor :name
+    def namespace? ; false end
     def option_syntax
       unless @option_syntax.respond_to?(:parse_options)
         @option_syntax = OptionSyntax.build(@option_syntax)
@@ -187,8 +191,8 @@ module Skylab::Porcelain
     attr_writer :option_syntax
     def parse_both argv
       yield( o = SyntaxEventKnob.new )
-      argument_syntax = self.argument_syntax
       false == (opts = option_syntax.parse_options(argv, & o.to_proc)) and return
+      argument_syntax = self.argument_syntax
       argument_syntax.parse_arguments(argv, & o.to_proc) or return
       # experimental sugar to avoid the client having to do their own parsing in this scenario, apparently not necessary in 1.9!
       # if opts && argument_syntax.any? && ! argument_syntax.last.glob? && argv.length < argument_syntax.length
@@ -282,8 +286,14 @@ module Skylab::Porcelain
   end
   class ArgumentSyntax < Array
     def self.parse_syntax str
+      new._parse_syntax(str).validate
+    end
+    def parse_arguments argv, &block
+      ArgumentParse[self, argv, &block]
+    end
+    def _parse_syntax str
       p = StringScanner.new(str)
-      syntax = new
+      syntax = self
       until p.eos?
         p.skip(/ /)
         matched = p.scan(Parameter::REGEX) or
@@ -291,10 +301,7 @@ module Skylab::Porcelain
         matchdata = Parameter::REGEX.match(matched)
         syntax.push Parameter.new(:matchdata => matchdata)
       end
-      syntax.validate
-    end
-    def parse_arguments argv, &block
-      ArgumentParse[self, argv, &block]
+      syntax
     end
     def to_s
       0 == count and return nil
@@ -383,11 +390,15 @@ module Skylab::Porcelain
       @handlers[:default] ||= lambda { |e| $stderr.puts "(unhandled:) #{e}" }
     end
     alias_method :initialize, :init_porcelain
-    def invoke argv
-      @runtime = Runtime.new(argv, self)
-      (method_name, args = @runtime.parse_argv) or return method_name
-      res = send(method_name, *args)
-      false == res and @runtime.invite(self.class.actions[method_name])
+    def invoke argv, runtime=nil
+      @runtime = (runtime || Runtime.new(argv, self))
+      (action, args = @runtime.parse_argv) or return action
+      if action.namespace?
+        res = action.invoke(args, @runtime)
+      else
+        res = send(action.method_name, *args)
+        false == res and @runtime.invite(action)
+      end
       res
     end
     # for now we work around any dependencies on an emitter pattern by requiring
@@ -404,12 +415,8 @@ module Skylab::Porcelain
     def header str ; stylize str, :strong, :green end
   end
 
-  class Runtime
+  module Namespace
     include Styles
-    def actions
-      @client.class.actions
-    end
-    attr_reader :client
     def emit type, event
       (@handlers[type] || @handlers[:all] || @handlers[:default]).call event
     end
@@ -431,13 +438,6 @@ module Skylab::Porcelain
     end
     attr_writer :fuzzy_match
     alias_method :fuzzy_match, :fuzzy_match= # careful
-    def initialize argv, client
-      @argv = argv.dup
-      @client = client
-      @fuzzy_match = true
-      @handlers = client.handlers
-      (a = @client.class.instance_variable_get('@runtime_config_blocks')) and a.each { |b| instance_eval(&b) }
-    end
     def invite *msgs
       action = msgs.shift if msgs.any? && ! msgs.first.kind_of?(String)
       msgs.each { |msg| emit(:validation_error_meta, msg) }
@@ -448,9 +448,7 @@ module Skylab::Porcelain
       end
       nil
     end
-    def invocation_name
-      File.basename $PROGRAM_NAME
-    end
+    def namespace? ; true end
     def parse_argv
       @argv.empty? and return invite("Expecting #{render_actions}.")
       Officious::Help::SWITCHES.include?(@argv.first) and @argv[0] = 'help' # might bite one day
@@ -464,10 +462,36 @@ module Skylab::Porcelain
         invite action
         return false
       end
-      [action.method_name, argv]
+      [action, argv]
     end
     def render_actions
       "{#{actions.visible.map{ |a| e13b(a.name) }.join('|')}}"
+    end
+  end
+
+  class Runtime
+    include Namespace
+    def actions
+      @client.class.actions
+    end
+    attr_reader :client
+    def initialize argv, client
+      @argv = argv.dup
+      @client = client
+      @fuzzy_match = true
+      @handlers = client.handlers
+      @invocation_stack = nil
+      (a = @client.class.instance_variable_get('@runtime_config_blocks')) and a.each { |b| instance_eval(&b) }
+    end
+    def invocation_name
+      @invocation_stack ? @invocation_stack.join(' ') : File.basename($PROGRAM_NAME)
+    end
+    def push argv, action, invoker
+      @invocation_stack ||= [invocation_name]
+      @invocation_stack.push action.name.to_s
+      @argv = argv
+      @client = invoker # handlers kept from original client!!!
+      self
     end
   end
 
@@ -509,6 +533,70 @@ module Skylab::Porcelain
         o.on_two_col { |a, b| emit(:help, "#{e13b a}#{b}") }
         o.on_default { |line| emit(:help, line) }
       end
+    end
+  end
+end
+
+module Skylab::Porcelain
+  class << self
+    def namespaces
+      @namespaces ||= []
+    end
+  end
+  class NsOptionSyntax
+    def initialize ns_action
+      @ns_action = ns_action
+    end
+    def parse_options args
+      {}
+    end
+    def to_s
+      nil # important
+    end
+  end
+  class NsArgumentSyntax < ArgumentSyntax
+    def initialize ns_action
+      @ns_action = ns_action
+      _parse_syntax '<action> [<arg> [..]]'
+    end
+    def to_s
+      @ns_action.render_actions
+    end
+  end
+  class NamespaceAction < Action
+    include Namespace
+    def actions
+      client_class.actions
+    end
+    def client_class
+      @client_class ||= begin
+        _name = name
+        Class.new.class_eval do
+          __name = to_s.sub(/^#<Class/, "#<#{_name}")
+          singleton_class.send(:define_method, :to_s) { __name }
+          extend ::Skylab::Porcelain
+          self
+        end
+      end
+      if block = @block # in future we might re-open namespaces
+        @block = nil
+        @client_class.class_eval(&block)
+      end
+      @client_class
+    end
+    def initialize name, &block
+      @block = nil
+      super()
+      @argument_syntax = NsArgumentSyntax.new(self)
+      @option_syntax = NsOptionSyntax.new(self)
+      @name = name
+      @block = block
+    end
+    def invoke argv, runtime
+      argv.last.kind_of?(Hash) and argv.pop # for now don't nest these
+      _invoker = client_class.new
+      runtime.push(argv, self, _invoker)
+      _invoker.invoke(argv, runtime)
     end
   end
 end
