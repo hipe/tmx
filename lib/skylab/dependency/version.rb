@@ -1,5 +1,4 @@
-$:.include?(_skylab = File.expand_path('../../..', __FILE__)) or $:.unshift(_skylab)
-
+require File.expand_path('../../../skylab', __FILE__)
 require 'skylab/code-molester/sexp'
 require 'skylab/slake/muxer'
 

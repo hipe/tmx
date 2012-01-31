@@ -21,7 +21,9 @@ module Skylab::Slake
       end
       (b = change_request.keys - self.meta_attributes.keys).any? and
         raise RuntimeError.new("meta attributes must first be declared: #{b.map(&:inspect) * ', '}")
-      if ! current_meta
+      if current_meta
+        current_meta.merge! change_request
+      else
         attr_accessor sym
         current_meta = attributes[sym] = change_request
       end

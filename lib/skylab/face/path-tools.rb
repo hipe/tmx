@@ -16,7 +16,7 @@ module Skylab::Face
       path.sub(/\A#{Regexp.escape(FileUtils.pwd)}\//, './').sub(HomeDirRe, '~/')
     end
     def escape_path path
-      (path =~ / |\$|'/) ? Shellwords.shellescape(path) : path
+      (path.to_s =~ / |\$|'/) ? Shellwords.shellescape(path) : path.to_s
     end
   end
 end

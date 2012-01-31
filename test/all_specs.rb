@@ -1,13 +1,23 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env ruby -w
 
-require 'ruby-debug'
+require 'optparse'
+dry_run = false
+OptionParser.new do |op|
+  op.separator "Description: runs all known tests in this package."
+  op.on('-h', '--help', "This screen.") { $stderr.puts op ; exit }
+  op.on('-n', '--dry-run', "Do not run tests, just list.") { dry_run = true }
+end.parse!(ARGV)
+
+
 gemroot = File.expand_path('../..', __FILE__)
 
 Subgem = Struct.new(:name, :path, :spec_subdir, :spec_paths)
 names = []
 subgems = Hash.new { |h, k| names.push(k) ; h[k] = Subgem.new(k, nil, nil, []) }
 
-Dir["#{gemroot}/lib/skylab/*"].each do |dirpath|
+subgem_paths = [* Dir["#{gemroot}/lib/skylab/*"], '.']
+
+subgem_paths.each do |dirpath|
   subgem = subgems[File.basename(dirpath)]
   subgem.path = dirpath
   if File.exist?(p = "#{subgem.path}/test")
@@ -40,6 +50,32 @@ else
   $stderr.puts("\nNo specs found!")
 end
 
-require 'rspec/autorun'
-files.each { |file| require file }
-$stderr.puts "Done loading the above #{files.count} spec files.\n\n"
+
+module Skylab ; end
+
+module Skylab::Tests
+  class Plumbing
+    attr_accessor :dry_run
+    def initialize opts
+      opts.each { |k, v| send("#{k}=", v) }
+    end
+    def invoke
+      if @dry_run
+        $stderr.puts "# skipping above per dry run."
+      else
+        run_tests
+      end
+    end
+    def run_tests
+      require 'rspec/autorun'
+      test_files.each { |file| require file }
+      $stderr.puts "Done loading the above #{files.count} spec files.\n\n"
+    end
+    attr_accessor :test_files
+  end
+end
+
+if __FILE__ == $PROGRAM_NAME
+  Skylab::Tests::Plumbing.new(dry_run: dry_run, test_files: files).invoke
+end
+

@@ -1,0 +1,13 @@
+guard('rspec',
+  :all_on_start => false,
+  :cli => '-fd',
+  :spec_paths => [
+    'lib/skylab/dependency/test',
+  ]
+) do
+  watch(%r{^lib/skylab/[^/]+/test/.+_spec\.rb$})
+  watch(%r{^lib/skylab/dependency/task-types/(.+)\.rb$}) do |m|
+    "lib/skylab/dependency/test/task-types/#{m[1]}_spec.rb"
+  end
+end
+
