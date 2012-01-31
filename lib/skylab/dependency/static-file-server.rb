@@ -84,7 +84,6 @@ module Skylab::Dependency
           use Rack::ShowExceptions
           use Rack::Lint
           use Adsf::Rack::IndexFileFinder, :root => docroot.to_s
-          root
           run Rack::File.new(docroot)
         end.to_app
       end
