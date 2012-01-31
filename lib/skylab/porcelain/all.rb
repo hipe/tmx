@@ -149,6 +149,9 @@ module Skylab::Porcelain
   ParseOptionsKnob    = EventKnob.new(:syntax, :help_flagged)
   SyntaxEventKnob     = EventKnob.new(:syntax)
   class Action
+    def aliases # not used by this library yet - used by other libraries
+      @aliases ||= []
+    end
     def argument_syntax
       if ! @argument_syntax.respond_to?(:parse_arguments)
         @argument_syntax = ArgumentSyntax.parse_syntax(@argument_syntax.to_s)
@@ -578,13 +581,17 @@ module Skylab::Porcelain
           self
         end
       end
-      if block = @block # in future we might re-open namespaces
+      if block = @block # in future we might re-open namespaces, also see parent
         @block = nil
         @client_class.class_eval(&block)
       end
       @client_class
     end
+    def for_run ui, invokation_name # compat
+      client_class.new
+    end
     def initialize name, &block
+      ::Skylab::Porcelain.namespaces.push self
       @block = nil
       super()
       @argument_syntax = NsArgumentSyntax.new(self)
@@ -597,6 +604,9 @@ module Skylab::Porcelain
       _invoker = client_class.new
       runtime.push(argv, self, _invoker)
       _invoker.invoke(argv, runtime)
+    end
+    def summary
+      ["child commands: #{render_actions}"]
     end
   end
 end
