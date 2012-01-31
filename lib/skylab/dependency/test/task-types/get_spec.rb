@@ -3,13 +3,6 @@ require 'skylab/dependency/task-types/get'
 
 module Skylab::Dependency::TestNamespace
 
-  ::RSpec.configure do |c|
-    c.before(:suite) do
-      FILE_SERVER.log_level = :warn
-    end
-  end
-
-
   include ::Skylab::Dependency
   describe TaskTypes::Get do
     include ::Skylab::Porcelain::TiteColor # unstylize
