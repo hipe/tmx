@@ -1,8 +1,16 @@
-require 'stringio'
+require File.expand_path('../../my-string-io', __FILE__)
 
 require File.expand_path('../../../../skylab', __FILE__)
 
 require 'skylab/slake/muxer'
+
+unless String.instance_methods(false).include?(:deindent) # eww
+  class String
+    def deindent
+      gsub(%r{^#{Regexp.escape match(/\A([[:space:]]*)/)[1]}}, '').strip
+    end
+  end
+end
 
 module Skylab
   module Dependency
@@ -15,6 +23,7 @@ module Skylab::Dependency::TestNamespace
 
   BUILD_DIR = Class.new(Pathname).class_eval do
     include FileUtils
+    public :cp
     def initialize(*)
       @verbose = false
       super
@@ -22,6 +31,7 @@ module Skylab::Dependency::TestNamespace
     def fu_output_message msg
       @verbose and $stderr.puts("BUILD_DIR #{msg}")
     end
+    public :mkdir
     def prepare
       if directory?
         fu_output_message("removing self #{self}")
@@ -70,12 +80,6 @@ module Skylab::Dependency::TestNamespace
   end.new
 
   FIXTURES_DIR = Pathname.new(File.expand_path('../fixtures', __FILE__))
-
-  class MyStringIO < StringIO
-    def to_s
-      rewind ; read
-    end
-  end
 
   module CustomExpectationMatchers
     def be_including foo
