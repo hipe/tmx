@@ -199,6 +199,7 @@ module Skylab::Dependency
     def optimistic_dry_run? ; request[:optimistic_dry_run] end
     def _view_tree
       require 'skylab/face/cli/view/tree'
+      raise "refactor me (below has moved)"
       loc = Skylab::Face::Cli::View::Tree::Locus.new
       color = ui.out.tty?
       loc.traverse(self) do |node, meta|
