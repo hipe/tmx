@@ -20,7 +20,7 @@ module Skylab::Porcelain
       @current_definition[:argument_syntax] = str
     end
     def init_dsl
-      @current_definition = @runtime_config_blocks = nil
+      @current_definition = @porcelain_configure = nil
     end
     def method_added method_name
       if @current_definition
@@ -34,9 +34,40 @@ module Skylab::Porcelain
       @current_definition[:option_syntax] = block
     end
     def porcelain &block
-      (@runtime_config_blocks ||= []).push block
+      @porcelain_configure ||= Configure.new
+      block ? @porcelain_configure.push(block) : @porcelain_configure
     end
   end
+  class Configure < Array
+    def blacklist *ele
+      (@blacklist ||= Blacklist.new)
+      ele.empty? and return @blacklist
+      @blacklist.concat(ele)
+    end
+    def configure
+      if count > @last
+        self[@last..count].each { |b| instance_eval(&b) }
+        @last = count
+      end
+      self
+    end
+    def fuzzy_match bool
+      @runtime.push ->(runtime) { runtime.fuzzy_match = bool }
+    end
+    def initialize
+      @runtime = []
+      @last = 0
+    end
+    def runtime runtime
+      @runtime.each { |b| b.call(runtime) }
+    end
+  end
+  class Blacklist < Array
+    def include? sym
+      detect { |o| o =~ sym }
+    end
+  end
+
   module ClientModuleMethods
     include Dsl
     def self.extended mod
@@ -44,9 +75,11 @@ module Skylab::Porcelain
     end
     def actions
       cache = _actions_cache
+      blacklist = porcelain.blacklist
       ActionEnumerator.new(cache) do |yielder|
         cache.each { |act| yielder << act }
         public_instance_methods(false).select { |m| ! cache.key?(m) }.each do |method_name|
+          next if blacklist.include?(method_name)
           yielder << cache.cache(Action.new(:method_name => method_name))
         end
       end
@@ -528,8 +561,8 @@ module Skylab::Porcelain
       @fuzzy_match = true
       @handlers = client.handlers
       @invocation_stack = nil
-      (a = @client.class.instance_variable_get('@runtime_config_blocks')) and a.each { |b| instance_eval(&b) }
-    end
+      @client.class.porcelain.configure.runtime self
+   end
     def invocation_name
       invocation_stack.join(' ')
     end
