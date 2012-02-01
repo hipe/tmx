@@ -8,7 +8,7 @@ module Skylab::Slake
     def emits *nodes
       event_cloud = self.event_cloud
       events = event_cloud.merge_definition! *nodes
-      these = instance_methods.map(&:intern)
+      these = instance_methods(false).map(&:intern) # almost pointless
       event_cloud.flatten(events).each do |tag|
         unless these.include?(m = "on_#{tag.name}".intern)
           define_method(m) do |&block|
