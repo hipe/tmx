@@ -77,6 +77,10 @@ end
 
 module Skylab::Porcelain
   class << Tree
+    def from_paths paths
+      require File.expand_path('../tree/node', __FILE__)
+      Tree::Node.from_paths paths
+    end
     def view_tree root, opts={}, &block
       unless out = opts.delete(:out)
         require 'stringio'
