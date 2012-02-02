@@ -27,7 +27,7 @@ module Skylab::Porcelain::Tree
     def _traverse root, meta={}
       @block.call root, meta
       sum = 1
-      if root.children and root.children.any?
+      if root.children?
         _push meta
         last = root.children.length - 1
         root.children.each_with_index do |child, idx|

@@ -111,13 +111,15 @@ module Skylab::Porcelain
     def documenting_client
       @documenting_client ||= @client_class.new
     end
+    OUT = [:out, :payload]
     def for_run ui, invokation_name # @compat
       @documenting_client = @client_class.new do |o|
         o.runtime.invocation_stack.push @name
-        o.on_all do |e|
-          _use = [:out, :payload].include?(e.type) ? :out : :err
-          ui.send(_use).puts e.to_s
-        end
+        on_all = ->(e) {
+          ui.send(OUT.include?(e.type) ? :out : :err).puts e.to_s
+        }
+        o.handlers[:all] = on_all # for now the old way, too
+        o.on_all(&on_all)
       end
     end
     def initialize name, client_class
