@@ -62,10 +62,21 @@ module Skylab::Dependency
         send "#{name}_before_from_context"
       end
     end
-    def on_pathname_attribute name, meta
-      define_method("#{name}=") do |v|
-        instance_variable_set("@#{name}", v ? Pathname.new(v) : v)
-        v
+    def _mutex_fail ks, ks2
+      ks.length > ks2.length and ks2.push('("check" and or "update")')
+      ks2.map! { |e| e.kind_of?(String) ? e : "\"#{e.to_s.gsub('_', ' ')}\"" }
+      _err "#{ks2.join(' and ')} are mutually exclusive.  Please use only one."
+      false
+    end
+    def dry_run?            ; request[:dry_run]            end
+    def optimistic_dry_run? ; request[:optimistic_dry_run] end
+    def _view_tree
+      require 'skylab/face/cli/view/tree'
+      raise "refactor me (below has moved)"
+      loc = Skylab::Face::Cli::View::Tree::Locus.new
+      color = ui.out.tty?
+      loc.traverse(self) do |node, meta|
+        ui.out.puts "#{loc.prefix(meta)}#{node.styled_name(:color => color)} (#{node.object_id.to_s(16)})"
       end
     end
   end

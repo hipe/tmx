@@ -8,7 +8,7 @@ module Skylab::Slake
     def emits *nodes
       event_cloud = self.event_cloud
       events = event_cloud.merge_definition! *nodes
-      these = instance_methods.map(&:intern)
+      these = instance_methods(false).map(&:intern) # almost pointless
       event_cloud.flatten(events).each do |tag|
         unless these.include?(m = "on_#{tag.name}".intern)
           define_method(m) do |&block|
@@ -30,13 +30,14 @@ module Skylab::Slake::Muxer
   class Event
     def initialize tag, data
       @tag = tag
-      @message = data.to_s
+      @data = data
     end
+    attr_reader :data
     alias_method :event_id, :object_id
-    attr_reader :message
-    def to_s
-      @message or super
+    def message
+      @data.to_s
     end
+    alias_method :to_s, :message
     def type
       @tag.name
     end
