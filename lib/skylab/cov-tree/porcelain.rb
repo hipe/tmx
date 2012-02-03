@@ -14,7 +14,18 @@ module Skylab::CovTree
     end
     def tree path=nil, ctx
       require File.expand_path('../plumbing/tree', __FILE__)
-      Plumbing::Tree.new(path, ctx) { |o| o.on_all { |e| emit(e.type, e) } }.run
+      Plumbing::Tree.new(path, ctx) do |o|
+        thru = ->(e) { emit(e.type, e) }
+        o.on_error &thru
+        o.on_payload &thru
+        o.on_line_meta do |e|
+          emit(:payload, "#{e.data[:prefix]}#{_render_node(e.data[:node])}")
+        end
+      end.run
+    end
+  private
+    def _render_node node
+      "#{node.key}"
     end
   end
 end

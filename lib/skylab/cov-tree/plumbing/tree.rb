@@ -1,17 +1,13 @@
+require File.expand_path('../../node', __FILE__)
 require 'pathname'
-require 'skylab/porcelain/tree'
 
 module ::Skylab::CovTree
   class Plumbing::Tree
     extend ::Skylab::Slake::Muxer
-    emits :all, :info => :all, :error => :all, :payload => :all
-
-    TEST_DIR_NAMES = %w(test spec features)
-    GLOBS = {
-      'features' => '*.feature',
-      'spec' => '*_spec.rb',
-      'test' => '*_spec.rb'
-    }
+    emits :all,
+      :payload => :all,   # for lines
+      :line_meta => :all, # for lines of tree
+      :error => :all
 
     def initialize path, ctx
       @path = Pathname.new(path || '.')
@@ -42,25 +38,47 @@ module ::Skylab::CovTree
       @path.join(found)
     end
     def test_file_globs
-      test_dir = self.test_dir or return false
+      @test_dir = test_dir or return false
       glob = GLOBS[@_dirname] or fail("nope: #{@_dirname}")
-      [test_dir.join('**').join(glob)]
+      [@test_dir.join('**').join(glob)]
     end
     def test_file_paths
       globs = test_file_globs or return
       globs.reduce([]){ |m, glob| m.concat(Dir[glob]) }
     end
-    def tree
-      st = tree_struct or return false
+    def code_file_paths
+      re = %r{^#{Regexp.escape @test_dir.to_s}/}
+      files = Dir["#{@test_dir.dirname}/**/*.rb"]
+      files.select { |f| re !~ f }
     end
-    def tree_struct
-      paths = test_file_paths or return false
-      tree = ::Skylab::Porcelain::Tree.from_paths paths
+    def tree
+      require 'pp'
+      tests = test_tree_struct or return false
+      tests = tests.find(@test_dir)
+      codes = code_tree_struct or return false
+      codes = codes.find(@test_dir.dirname)
+      # tell the tests tree that it follows the codes tree's structure by aliasing it
+      tests.aliases = [codes.slug]
+      both = Node.combine([codes, tests],
+                          keymaker: ->(n) { [n.slug, *(n.aliases? ? n.aliases : [])].last }, # use the last alias as the comparison key
+                          labelmaker: ->(n) { n.type })
+      PP.pp(both)
+      exit(1)
       loc = ::Skylab::Porcelain::Tree::Locus.new
-      loc.traverse(tree) do |node, meta|
-        $stdout.puts "#{loc.prefix(meta)}#{node.key}#{'/' if node.children?}"
+      loc.traverse(tests) do |node, meta|
+        meta[:prefix] = loc.prefix(meta)
+        meta[:node] = node
+        emit(:line_meta, meta)
       end
       true
+    end
+    def test_tree_struct
+      test_files = test_file_paths or return false
+      Node.from_paths(test_files){ |node| node[:type] = :test }
+    end
+    def code_tree_struct
+      code_files = code_file_paths or return false
+      Node.from_paths(code_files){ |node| node[:type] = :code }
     end
   end
 end
