@@ -2,6 +2,7 @@ require File.expand_path('../../node', __FILE__)
 require 'pathname'
 
 module ::Skylab::CovTree
+  module Plumbing ; end
   class Plumbing::Tree
     extend ::Skylab::Slake::Muxer
     emits :all,
@@ -60,12 +61,10 @@ module ::Skylab::CovTree
       # tell the tests tree that it follows the codes tree's structure by aliasing it
       tests.aliases = [codes.slug]
       both = Node.combine([codes, tests],
-                          keymaker: ->(n) { [n.slug, *(n.aliases? ? n.aliases : [])].last }, # use the last alias as the comparison key
-                          labelmaker: ->(n) { n.type })
-      PP.pp(both)
-      exit(1)
+        keymaker: ->(n) { [n.slug, *(n.aliases? ? n.aliases : [])].last } # use the last alias as the comparison key
+      )
       loc = ::Skylab::Porcelain::Tree::Locus.new
-      loc.traverse(tests) do |node, meta|
+      loc.traverse(both) do |node, meta|
         meta[:prefix] = loc.prefix(meta)
         meta[:node] = node
         emit(:line_meta, meta)
