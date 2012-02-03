@@ -62,6 +62,11 @@ module Skylab::Dependency
         send "#{name}_before_from_context"
       end
     end
+    def on_pathname_attribute name, meta
+      define_method("#{name}=") do |p|
+        instance_variable_set("@#{name}", p ? Pathname.new(p) : p)
+      end
+    end
     def _mutex_fail ks, ks2
       ks.length > ks2.length and ks2.push('("check" and or "update")')
       ks2.map! { |e| e.kind_of?(String) ? e : "\"#{e.to_s.gsub('_', ' ')}\"" }
