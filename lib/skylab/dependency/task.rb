@@ -63,8 +63,13 @@ module Skylab::Dependency
       end
     end
     def on_pathname_attribute name, meta
-      define_method("#{name}=") do |p|
-        instance_variable_set("@#{name}", p ? Pathname.new(p) : p)
+      before = "#{name}_before_pathname"
+      alias_method before, name
+      define_method(name) do
+        if pn = send(before) and ! pn.kind_of?(Pathname)
+          instance_variable_set("@#{name}", pn = Pathname.new(pn))
+        end
+        pn
       end
     end
     def _mutex_fail ks, ks2

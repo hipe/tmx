@@ -2,26 +2,22 @@ require File.expand_path('../get', __FILE__)
 
 module Skylab::Dependency
   class TaskTypes::TarballTo < TaskTypes::Get
-    attribute :tarball_to
-    attribute :from, :required => false
-    attribute :stem, :required => false
-    attribute :basename, :required => false
+    attribute :build_dir, :required => true, :pathname => true, :from_context => true
+    attribute :from, :required => true # override parent
+    attribute :tarball_to, :required => true
+
+    attribute :get, :required => false # actually see if we can ..
+    emits :all, :shell => :all, :info => :all, :error => :all
+
     module Constants
       TARBALL_EXT = /\.tar\.(?:gz|bz2)|\.tgz/
       TARBALL_EXTENSION = /(?:#{TARBALL_EXT.source})\z/
     end
-    def interpolate_stem
-      @stem || self.class.stem(@get)
-    end
   protected
     def pairs
-      [[File.join(@from, @get), File.join(build_dir, @get)]]
-    end
-    class << self
-      include Constants
-      def stem filename
-        filename.sub(TARBALL_EXTENSION, '')
-      end
+      md = %r{(^[^/]+:/{2,3}[^/]+)/(.+)$}.match(@from) or
+        raise("Failed to hack-parse as url: #{@from}")
+      [[@from, build_dir.join(Pathname.new(md[2]))]]
     end
   end
 end
