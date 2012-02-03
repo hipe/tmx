@@ -27,10 +27,13 @@ module Skylab::Slake::Muxer
   class Event
     def initialize tag, data
       @tag = tag
-      @message = data.to_s
+      @data = data
     end
+    attr_reader :data
     alias_method :event_id, :object_id
-    attr_reader :message
+    def message
+      @data.to_s
+    end
     alias_method :to_s, :message
     def type
       @tag.name
