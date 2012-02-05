@@ -19,6 +19,10 @@ module Skylab::Porcelain
       @current_definition ||= {}
       @current_definition[:argument_syntax] = str
     end
+    def desc *a
+      @current_definition ||= {}
+      (@current_definition[:desc] ||= []).push a # nothing fancy yet
+    end
     def init_dsl
       @current_definition = @porcelain_configure = nil
     end
@@ -102,7 +106,7 @@ module Skylab::Porcelain
       @documenting_client = client_class.new do |o|
         o.runtime.invocation_stack.push name
         on_all = ->(e) {
-          ui.send(OUTLIKE_TAGS.include?(e.type) ? :out : :err).puts e.to_s
+          ui.send((e.respond_to?(:type) and OUTLIKE_TAGS.include?(e.type)) ? :out : :err).puts e.to_s
         }
         o.handlers[:all] = on_all # for now the old way, too
         o.on_all(&on_all)
@@ -209,7 +213,7 @@ module Skylab::Porcelain
       end
     end
   end
-  EventizedHelpKnob   = EventKnob.new(:default, :header, :two_col)
+  EventizedHelpKnob   = EventKnob.new(:default, :header, :separator_recommended, :two_col)
   ParseOptionsKnob    = EventKnob.new(:syntax, :help_flagged)
   SyntaxEventKnob     = EventKnob.new(:syntax)
   class Action
@@ -223,17 +227,57 @@ module Skylab::Porcelain
     def config_blocks= arr
       arr.each { |b| instance_eval(&b) }
     end
+    attr_writer :desc
+    def description_lines
+      @description_lines and return @description_lines
+      @desc or return nil
+      @description_lines = @desc.flatten(2).reduce([]) do |m, line|
+        if line.index("\n")
+          m.concat(line.gsub(%r{^#{Regexp.escape line.match(/\A([[:space:]]*)/)[1]}}, '').strip.split("\n"))
+        else
+          m.push line
+        end
+      end
+    end
     def duplicate
       Action.new( :argument_syntax => argument_syntax.to_s, # !
                   :method_name     => method_name,
                   :option_syntax   => option_syntax.duplicate,
                   :visible         => visible)
     end
-    def eventized_help(&block)
-      option_syntax.eventized_option_help(&block)
+    HELP_PAGE_HEADER = /\A +[^:]+:/ # subject to change
+    def help_page_events
+      (description_lines or option_syntax.any?) or return
+      yield(knob = EventizedHelpKnob.new)
+      renderer = r = ::OptionParser.new # we could expose this but it is one use only
+      two_col_hail_mary =
+        /\A(#{Regexp.escape(r.summary_indent)}.{1,#{r.summary_width}})[ ]*(.*)\z/
+      renderer.banner = ''
+      help_page_desc_lines(0..-1) { |line| r.separator(line) }
+      option_syntax.help_page_data(renderer)
+      b = false
+      renderer.to_s.split("\n").each do |line|
+        case line
+        when ''                ;  # we might emit this after all
+        when two_col_hail_mary ; knob.emit_two_col($1, $2)
+        when HELP_PAGE_HEADER  ; knob.emit_separator_recommended if (b or b ||= true)
+                               ; knob.emit_header(*line.strip.split(':', 2))
+        else                   ; knob.emit_default(line)
+        end
+      end
     end
+
+    def help_page_desc_lines range
+      (queue = description_lines and queue.any? and queue = queue.dup) or return
+      if 0 == range.begin and HELP_PAGE_HEADER !~ queue.first
+        queue[0] = " description: #{queue.first}"
+      end
+      queue[range].each { |l| yield(l) }
+      nil
+    end
+
     def initialize opts={}, &block
-      @argument_syntax = @name = @option_syntax = nil
+      @argument_syntax = @desc = @description_lines = @name = @option_syntax = nil
       @visible = true
       block and opts.merge!(self.class.definition(&block))
       opts.each { |k, v| send("#{k}=", v) }
@@ -309,26 +353,11 @@ module Skylab::Porcelain
       option_parser
     end
     alias_method :duplicate, :dup # only as long as it's stateless
-    HEADER = /\A +[^:]+:/
-    def eventized_option_help(&block)
-      empty? and return
-      yield(knob = EventizedHelpKnob.new)
-      renderer = r = ::OptionParser.new
-      lucky_matcher = /\A(#{Regexp.escape(r.summary_indent)}.{1,#{r.summary_width}})[ ]*(.*)\z/
-      renderer.banner = ''
+    def help_page_data renderer
+      any? or return
+      renderer.separator ' options:'
       build_parser({}, renderer)
-      lines = renderer.to_s.split("\n")
-      once = false
-      lines.each do |line|
-        case line
-        when ''            ; # we might emit this after all
-        when lucky_matcher ;
-                           ; once ||= (knob.emit_header('options') || true)
-                           ; knob.emit_two_col($1, $2)
-        when HEADER        ; knob.emit_header(*line.strip.split(':', 2))
-        else               ; knob.emit_default(line)
-        end
-      end
+      nil
     end
     def parse_options argv
       empty? and ! Officious::Help::SWITCHES.include?(argv.first) and return nil
@@ -608,7 +637,9 @@ module Skylab::Porcelain
       act or return emit(:error, "No such action #{e13b "\"#{action}\""}.  " <<
         "Try #{e13b invocation_name} #{render_actions} #{e13b "-h"}.")
       emit(:usage, "#{header 'usage:'} #{e13b "#{invocation_name} #{act.syntax}"}")
-      act.eventized_help do |o|
+
+      act.help_page_events do |o|
+        o.on_separator_recommended { emit(:help, "\n") }
         o.on_header { |name, content=nil| emit(:help, "#{header("#{name}:")}#{content}") }
         o.on_two_col { |a, b| emit(:help, "#{e13b a}#{b}") }
         o.on_default { |line| emit(:help, line) }
