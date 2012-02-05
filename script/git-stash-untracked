@@ -385,8 +385,8 @@ module Skylab::GitStashUntracked
   end
 end
 
-
-if __FILE__ == $PROGRAM_NAME
+# in some cases write a ruby script at ~/bin/g-s-u that simply loads this file
+if File.basename(__FILE__) == File.basename($PROGRAM_NAME)
   ::Skylab::GitStashUntracked::Porcelain.new{ on_all { |e| $stderr.puts e } }.invoke(ARGV)
 end
 
