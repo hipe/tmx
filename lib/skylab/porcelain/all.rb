@@ -35,31 +35,20 @@ module Skylab::Porcelain
     end
     def porcelain &block
       @porcelain_configure ||= Configure.new
-      block ? @porcelain_configure.push(block) : @porcelain_configure
+      block_given? ? @porcelain_configure.instance_eval(&block) : @porcelain_configure
     end
   end
-  class Configure < Array
+  class Configure
     def blacklist *ele
       (@blacklist ||= Blacklist.new)
       ele.empty? and return @blacklist
       @blacklist.concat(ele)
     end
-    def configure
-      if count > @last
-        self[@last..count].each { |b| instance_eval(&b) }
-        @last = count
-      end
-      self
-    end
-    def fuzzy_match bool
-      @runtime.push ->(runtime) { runtime.fuzzy_match = bool }
+    def fuzzy_match *a
+      case a.size ; when 0 ; @fuzzy_match ; when 1 ; @fuzzy_match = a.first ; else fail('no') end
     end
     def initialize
-      @runtime = []
-      @last = 0
-    end
-    def runtime runtime
-      @runtime.each { |b| b.call(runtime) }
+      @fuzzy_match = true
     end
   end
   class Blacklist < Array
@@ -104,23 +93,30 @@ module Skylab::Porcelain
       _actions_cache.cache action
     end
   end
-  class ClientClassToNamespaceAdapter
-    def aliases # @compat
+  OUTLIKE_TAGS = [:out, :payload]
+  module LegacyNamespaceMethods
+    def aliases
       @aliases ||= []
     end
-    def documenting_client
-      @documenting_client ||= @client_class.new
-    end
-    OUT = [:out, :payload]
-    def for_run ui, invokation_name # @compat
-      @documenting_client = @client_class.new do |o|
-        o.runtime.invocation_stack.push @name
+    def for_run ui, _ # @compat
+      @documenting_client = client_class.new do |o|
+        o.runtime.invocation_stack.push name
         on_all = ->(e) {
-          ui.send(OUT.include?(e.type) ? :out : :err).puts e.to_s
+          ui.send(OUTLIKE_TAGS.include?(e.type) ? :out : :err).puts e.to_s
         }
         o.handlers[:all] = on_all # for now the old way, too
         o.on_all(&on_all)
       end
+    end
+    def summary
+      ["child commands: #{render_actions}"]
+    end
+  end
+  class ClientClassToNamespaceAdapter
+    include LegacyNamespaceMethods
+    attr_reader :client_class
+    def documenting_client
+      @documenting_client ||= @client_class.new
     end
     def initialize name, client_class
       @name = name
@@ -128,8 +124,8 @@ module Skylab::Porcelain
       ::Skylab::Porcelain.namespaces.push self
     end
     attr_reader :name
-    def summary
-      ["child commands: #{documenting_client.runtime.render_actions}"]
+    def render_actions
+      documenting_client.runtime.render_actions
     end
   end
   class ActionsCache
@@ -137,7 +133,7 @@ module Skylab::Porcelain
       @hash[k].kind_of?(Symbol) ? @hash[@hash[k]] : @hash[k]
     end
     def cache action
-      name = action.respond_to?(:porcelain_runtime) ? action.porcelain_runtime.invocation_name : action.name
+      name = action.name
       @hash.key?(name) or @order.push name
       @hash[action.method_name] = name if action.respond_to?(:method_name)
       @hash[name] = action
@@ -242,6 +238,7 @@ module Skylab::Porcelain
       block and opts.merge!(self.class.definition(&block))
       opts.each { |k, v| send("#{k}=", v) }
     end
+    alias_method :action_initialize, :initialize
     attr_reader :method_name
     def method_name= sym
       @method_name = sym
@@ -448,7 +445,7 @@ module Skylab::Porcelain
     attr_reader :handlers
     def init_porcelain &block
       @handlers = {}
-      if block_given?
+      if block # not block_given?
         if block.arity >= 1
           yield self
         else
@@ -506,7 +503,7 @@ module Skylab::Porcelain
       sym = str.intern
       if exact = actions.detect { |a| sym == a.name }
         return exact
-      elsif @fuzzy_match
+      elsif client_class.porcelain.fuzzy_match
         matcher = /\A#{Regexp.escape str}/
         found = actions.select { |a| matcher =~ a.name.to_s }
         case found.size
@@ -518,8 +515,6 @@ module Skylab::Porcelain
       end
       invite("Invalid action: #{e13b str}", "Expecting #{render_actions}")
     end
-    attr_writer :fuzzy_match
-    alias_method :fuzzy_match, :fuzzy_match= # careful
     def invite *msgs
       action = msgs.shift if msgs.any? && ! msgs.first.kind_of?(String)
       msgs.each { |msg| emit(:validation_error_meta, msg) }
@@ -555,16 +550,17 @@ module Skylab::Porcelain
   class Runtime
     include Namespace
     def actions
-      @client.class.actions
+      client_class.actions
     end
     attr_reader :client
     def initialize client
       @client = client
-      @fuzzy_match = true
       @handlers = client.handlers
       @invocation_stack = nil
-      @client.class.porcelain.configure.runtime self
-   end
+    end
+    def client_class
+      @client.class
+    end
     def invocation_name
       invocation_stack.join(' ')
     end
@@ -649,6 +645,8 @@ module Skylab::Porcelain
   end
   class NamespaceAction < Action
     include Namespace
+    include ClientInstanceMethods # for this running itself from inside oldschool Face things
+    include LegacyNamespaceMethods
     def actions
       client_class.actions
     end
@@ -671,13 +669,14 @@ module Skylab::Porcelain
     def initialize name, &block
       ::Skylab::Porcelain.namespaces.push self
       @block = nil
-      super()
+      action_initialize
       @argument_syntax = NsArgumentSyntax.new(self)
       @option_syntax = NsOptionSyntax.new(self)
       @name = name
       @block = block
     end
-    def invoke argv, runtime
+    def invoke argv, runtime=nil
+      runtime ||= Runtime.new(self)
       argv.last.kind_of?(Hash) and argv.pop # for now don't nest these
       _invoker = client_class.new
       runtime.push(argv, self, _invoker)
