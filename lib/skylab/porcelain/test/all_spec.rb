@@ -308,9 +308,6 @@ module Skylab::Porcelain::TestNamespace
           subject.join("\n").should eql(%w(aa bb cc dd ee ff).join("\n"))
         end
       end
-      context "for now it can be hacked.." do
-        it "..to render argument desrcriptions like so"
-      end
     end
     describe "invocation happens with a call to invoke() (pass it ARGV) that" do
       Porcelain::Runtime.send(:define_method, :invocation_name) { 'yourapp' }
