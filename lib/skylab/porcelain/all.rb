@@ -19,6 +19,10 @@ module Skylab::Porcelain
       @current_definition ||= {}
       @current_definition[:argument_syntax] = str
     end
+    def desc *a
+      @current_definition ||= {}
+      (@current_definition[:desc] ||= []).push a # nothing fancy yet
+    end
     def init_dsl
       @current_definition = @porcelain_configure = nil
     end
@@ -223,6 +227,18 @@ module Skylab::Porcelain
     def config_blocks= arr
       arr.each { |b| instance_eval(&b) }
     end
+    attr_writer :desc
+    def description_lines
+      @description_lines and return @description_lines
+      @desc or return nil
+      @description_lines = @desc.flatten(2).reduce([]) do |m, line|
+        if line.index("\n")
+          m.concat(line.gsub(%r{^#{Regexp.escape line.match(/\A([[:space:]]*)/)[1]}}, '').strip.split("\n"))
+        else
+          m.push line
+        end
+      end
+    end
     def duplicate
       Action.new( :argument_syntax => argument_syntax.to_s, # !
                   :method_name     => method_name,
@@ -233,7 +249,7 @@ module Skylab::Porcelain
       option_syntax.eventized_option_help(&block)
     end
     def initialize opts={}, &block
-      @argument_syntax = @name = @option_syntax = nil
+      @argument_syntax = @desc = @description_lines = @name = @option_syntax = nil
       @visible = true
       block and opts.merge!(self.class.definition(&block))
       opts.each { |k, v| send("#{k}=", v) }
