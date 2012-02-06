@@ -1,3 +1,4 @@
+[#041] 2012-02-24 muxer: custom event classes
 [#040] 2012-02-04 porcelain: actions have descriptions
 [#038] 2012-02-04 add script to show fake ticket numbers
 [#037] 2012-01-31 move tree renderer to porcelain
