@@ -20,6 +20,13 @@ module Skylab::Slake
     def event_cloud
       @event_cloud ||= SemanticTagCloud.new
     end
+    def muxer_event_class klass
+      @_muxer_event_class = klass
+    end
+    attr_writer :_muxer_event_class
+    def _muxer_event_class
+      @_muxer_event_class ||= Event
+    end
   end
 end
 
@@ -55,7 +62,7 @@ module Skylab::Slake::Muxer
       event = nil
       blocks = [event_listeners[tag.name], * tag.ancestors.map { |tag_name| event_listeners[tag_name] }].compact.flatten
       blocks.each do |block|
-        block.call(event ||= Event.new(tag, data))
+        block.call(event ||= muxer_build_event(tag, data))
       end
       blocks.count
     end
@@ -66,6 +73,9 @@ module Skylab::Slake::Muxer
     end
     def event_listeners
       @event_listeners ||= EventListeners.new
+    end
+    def muxer_build_event tag, data
+      self.class._muxer_event_class.new(tag, data)
     end
   end
   class SemanticTagCloud < Hash
