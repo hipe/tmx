@@ -7,10 +7,9 @@ module Skylab::Dependency::TestNamespace
 
   describe TaskTypes::TarballTo do
 
-    include ::Skylab::Porcelain::TiteColor # unstylize
+    module_eval &DESCRIBE_BLOCK_COMMON_SETUP
 
     let(:context) { { :build_dir => BUILD_DIR.to_s } }
-    let(:fingers) { Hash.new { |h, k| h[k] = [] } }
 
     subject do
       TaskTypes::TarballTo.new(build_args) do |o|

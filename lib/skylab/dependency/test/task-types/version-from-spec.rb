@@ -4,7 +4,7 @@ require 'skylab/dependency/task-types/version-from'
 module Skylab::Dependency::TestNamespace
   include ::Skylab::Dependency
   describe TaskTypes::VersionFrom do
-    include ::Skylab::Porcelain::TiteColor # unstylize
+    module_eval &DESCRIBE_BLOCK_COMMON_SETUP
     let(:klass) { TaskTypes::VersionFrom }
     let(:log) { MyStringIO.new }
     let(:must_be_in_range) { nil }

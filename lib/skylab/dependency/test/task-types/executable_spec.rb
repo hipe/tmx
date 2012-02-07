@@ -5,12 +5,11 @@ module Skylab::Dependency::TestNamespace
 
   include ::Skylab::Dependency
   describe TaskTypes::Executable do
-    include ::Skylab::Porcelain::TiteColor # unstylize
+    module_eval &DESCRIBE_BLOCK_COMMON_SETUP
     let(:context) { { } }
     let(:build_args) { {
       :executable => executable
     } }
-    let(:fingers) { Hash.new { |h, k| h[k] = [] } }
 
     subject do
       TaskTypes::Executable.new(build_args) do |o|
