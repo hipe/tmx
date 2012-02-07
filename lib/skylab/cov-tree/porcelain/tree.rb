@@ -1,7 +1,17 @@
+require 'set'
+
 module Skylab::CovTree
   class Porcelain::Tree
-    SIDES = [:test, :code]
     include ::Skylab::Porcelain::TiteColor
+
+    @sides = [:test, :code] # order matters, left one gets the "plus"
+
+    @colors = {
+      [:test, :code].to_set => :green,
+      [:test].to_set        => :cyan,
+      [:code].to_set        => :red
+    }
+
     def controller_class
       require ROOT.join('plumbing/tree').to_s
       Plumbing::Tree
@@ -33,17 +43,19 @@ module Skylab::CovTree
     end
     def _prerender_tree_line d
       n = d[:node]
-      t, c = self.class::SIDES.map { |s| (Array === n.type) ? n.type.include?(s) : (s == n.type) }
-      _indicator = "[#{t ? '+':' '}|#{c ? '-':' '}]"
-      if (color = (t ? (c ? :green : :cyan) : (c ? :red : nil )))
-        _indicator = send(color, _indicator)
-      end
-      _slug = n.slug
-      _slug.kind_of?(Array) and _slug = _slug.join(', ')
-      ["#{d[:prefix]}#{_slug}", _indicator]
+      a, b = self.class.sides.map { |s| n.types.include?(s) }
+      indicator = "[#{a ? '+':' '}|#{b ? '-':' '}]"
+      color = self.class.color(n.types) and indicator = send(color, indicator)
+      slug = n.slug
+      slug.kind_of?(Array) and slug = slug.join(', ')
+      ["#{d[:prefix]}#{slug}", indicator] # careful!  escape codes have width
     end
   end
   class << Porcelain::Tree
+    attr_reader :colors
+    def color types
+      @colors[types.to_set] # nil ok
+    end
     def error msg
       @emitter.emit(:error, msg)
       false
@@ -62,6 +74,7 @@ module Skylab::CovTree
       end
       klass.new params
     end
+    attr_reader :sides
   end
 end
 

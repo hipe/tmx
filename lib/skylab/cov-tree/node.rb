@@ -8,6 +8,9 @@ module Skylab::CovTree
     def type
       self[:type] or fail("node did not have a type!")
     end
+    def types
+      Array === type ? type : [type]
+    end
     def aliases?
       !! aliases
     end
