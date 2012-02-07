@@ -2,31 +2,24 @@ require File.expand_path('../../task', __FILE__)
 
 module Skylab::Dependency
   class TaskTypes::ExecutableFile < Task
-    attribute :executable_file
-    def slake
-      if File.exist?(@executable_file)
-        execute
-      elsif fallback?
-        fallback.slake and execute
-      else
-        dead_end
+    attribute :executable_file, :required => true, :pathname => true
+    emits :all, :info => :all
+
+    def execute args
+      @context ||= (args[:context] || {})
+      valid? or fail(invalid_reason)
+      # used to have @inrequisite
+      if ! @executable_file.exist?
+        emit(:info, "executable does not exist: #{@executable_file}")
+        return false
       end
-    end
-    def check
-      if File.exist?(@executable_file)
-        execute
-      else
-        _info "not installed, executable not found: #{@executable_file}."
-        false
-      end
-    end
-  protected
-    def execute
-      stat = File::Stat.new(@executable_file)
+      stat = File::Stat.new(@executable_file.to_s)
       if stat.executable?
-        _info "ok, executable: #{@executable_file}"
+        emit(:info, "ok, executable: #{@executable_file}")
+        true
       else
-        _err "exists but is not executable: #{@executable_file}."
+        emit(:info, "exists but is not executable: #{@executable_file}.")
+        false
       end
     end
   end
