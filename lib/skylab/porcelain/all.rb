@@ -443,7 +443,7 @@ module Skylab::Porcelain
     end
   end
   class Parameter
-    NAME = %r{<([_a-z]+)>}
+    NAME = %r{<([-_a-z]+)>}
     REGEX = %r{
            #{NAME.source} [ ]* ( \[ (?: <\1> [ ]* \[ \.\.\.? \] | \.\.\.? ) \] )?
       | \[ #{NAME.source} [ ]* ( \[ (?: <\3> [ ]* \[ \.\.\.? \] | \.\.\.? ) \] )? \]

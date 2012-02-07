@@ -1,3 +1,5 @@
+require File.expand_path('../tree', __FILE__)
+
 module Skylab::CovTree
   class Porcelain::Rerun < Porcelain::Tree
 
