@@ -6,17 +6,12 @@ module Skylab::Issue
     include ::Skylab::Face::PathTools
     def add message, opts
       _update_attributes opts
-      @emitter or fail("emitter not set.")
-      @manifest or fail("manifest not set.")
-      @manifest.emitter = @emitter # ick threads
       res = nil
-      begin
-        @manifest.path_resolved? or return false
-        @manifest.message_valid?(message) or return false
+      with_manifest do |m|
+        m.path_resolved? or return false
+        m.message_valid?(message) or return false
         emit :info, "pretending to add issue: #{message.inspect} to manifest: #{pretty_path @manifest.path}"
         res = true
-      ensure
-        @manifest and @manifest.emitter = nil
       end
       res
     end
@@ -29,8 +24,25 @@ module Skylab::Issue
       _update_attributes opts
     end
     attr_accessor :manifest
+    def numbers &block
+      with_manifest do |m|
+        m.numbers(&block)
+      end
+    end
     def _update_attributes opts
       opts.each { |k, v| send("#{k}=", v) }
+    end
+    def with_manifest
+      res = nil
+      @emitter or fail("emitter not set.")
+      @manifest or fail("manifest not set.")
+      @manifest.emitter = @emitter # ick threads
+      begin
+        res = yield(manifest)
+      ensure
+        @manifest and @manifest.emitter = nil
+      end
+      res
     end
   end
 end
