@@ -8,6 +8,6 @@ module Skylab
     # (intented only to be used for testing, for finding e.g. a common tempdir.)
     #
 
-  $:.include?(ROOT.join('lib')) or $:.unshift(ROOT.join('lib'))
+  $:.include?(_ = ROOT.join('lib').to_s) or $:.unshift(_)
 end
 

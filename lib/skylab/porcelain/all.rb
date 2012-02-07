@@ -19,6 +19,10 @@ module Skylab::Porcelain
       @current_definition ||= {}
       @current_definition[:argument_syntax] = str
     end
+    def desc *a
+      @current_definition ||= {}
+      (@current_definition[:desc] ||= []).push a # nothing fancy yet
+    end
     def init_dsl
       @current_definition = @porcelain_configure = nil
     end
@@ -35,31 +39,20 @@ module Skylab::Porcelain
     end
     def porcelain &block
       @porcelain_configure ||= Configure.new
-      block ? @porcelain_configure.push(block) : @porcelain_configure
+      block_given? ? @porcelain_configure.instance_eval(&block) : @porcelain_configure
     end
   end
-  class Configure < Array
+  class Configure
     def blacklist *ele
       (@blacklist ||= Blacklist.new)
       ele.empty? and return @blacklist
       @blacklist.concat(ele)
     end
-    def configure
-      if count > @last
-        self[@last..count].each { |b| instance_eval(&b) }
-        @last = count
-      end
-      self
-    end
-    def fuzzy_match bool
-      @runtime.push ->(runtime) { runtime.fuzzy_match = bool }
+    def fuzzy_match *a
+      case a.size ; when 0 ; @fuzzy_match ; when 1 ; @fuzzy_match = a.first ; else fail('no') end
     end
     def initialize
-      @runtime = []
-      @last = 0
-    end
-    def runtime runtime
-      @runtime.each { |b| b.call(runtime) }
+      @fuzzy_match = true
     end
   end
   class Blacklist < Array
@@ -104,23 +97,30 @@ module Skylab::Porcelain
       _actions_cache.cache action
     end
   end
-  class ClientClassToNamespaceAdapter
-    def aliases # @compat
+  OUTLIKE_TAGS = [:out, :payload]
+  module LegacyNamespaceMethods
+    def aliases
       @aliases ||= []
     end
-    def documenting_client
-      @documenting_client ||= @client_class.new
-    end
-    OUT = [:out, :payload]
-    def for_run ui, invokation_name # @compat
-      @documenting_client = @client_class.new do |o|
-        o.runtime.invocation_stack.push @name
+    def for_run ui, _ # @compat
+      @documenting_client = client_class.new do |o|
+        o.runtime.invocation_stack.push name
         on_all = ->(e) {
-          ui.send(OUT.include?(e.type) ? :out : :err).puts e.to_s
+          ui.send((e.respond_to?(:type) and OUTLIKE_TAGS.include?(e.type)) ? :out : :err).puts e.to_s
         }
         o.handlers[:all] = on_all # for now the old way, too
         o.on_all(&on_all)
       end
+    end
+    def summary
+      ["child commands: #{render_actions}"]
+    end
+  end
+  class ClientClassToNamespaceAdapter
+    include LegacyNamespaceMethods
+    attr_reader :client_class
+    def documenting_client
+      @documenting_client ||= @client_class.new
     end
     def initialize name, client_class
       @name = name
@@ -128,8 +128,8 @@ module Skylab::Porcelain
       ::Skylab::Porcelain.namespaces.push self
     end
     attr_reader :name
-    def summary
-      ["child commands: #{documenting_client.runtime.render_actions}"]
+    def render_actions
+      documenting_client.runtime.render_actions
     end
   end
   class ActionsCache
@@ -137,7 +137,7 @@ module Skylab::Porcelain
       @hash[k].kind_of?(Symbol) ? @hash[@hash[k]] : @hash[k]
     end
     def cache action
-      name = action.respond_to?(:porcelain_runtime) ? action.porcelain_runtime.invocation_name : action.name
+      name = action.name
       @hash.key?(name) or @order.push name
       @hash[action.method_name] = name if action.respond_to?(:method_name)
       @hash[name] = action
@@ -213,7 +213,7 @@ module Skylab::Porcelain
       end
     end
   end
-  EventizedHelpKnob   = EventKnob.new(:default, :header, :two_col)
+  EventizedHelpKnob   = EventKnob.new(:default, :header, :separator_recommended, :two_col)
   ParseOptionsKnob    = EventKnob.new(:syntax, :help_flagged)
   SyntaxEventKnob     = EventKnob.new(:syntax)
   class Action
@@ -227,21 +227,62 @@ module Skylab::Porcelain
     def config_blocks= arr
       arr.each { |b| instance_eval(&b) }
     end
+    attr_writer :desc
+    def description_lines
+      @description_lines and return @description_lines
+      @desc or return nil
+      @description_lines = @desc.flatten(2).reduce([]) do |m, line|
+        if line.index("\n")
+          m.concat(line.gsub(%r{^#{Regexp.escape line.match(/\A([[:space:]]*)/)[1]}}, '').strip.split("\n"))
+        else
+          m.push line
+        end
+      end
+    end
     def duplicate
       Action.new( :argument_syntax => argument_syntax.to_s, # !
                   :method_name     => method_name,
                   :option_syntax   => option_syntax.duplicate,
                   :visible         => visible)
     end
-    def eventized_help(&block)
-      option_syntax.eventized_option_help(&block)
+    HELP_PAGE_HEADER = /\A +[^:]+:/ # subject to change
+    def help_page_events
+      (description_lines or option_syntax.any?) or return
+      yield(knob = EventizedHelpKnob.new)
+      renderer = r = ::OptionParser.new # we could expose this but it is one use only
+      two_col_hail_mary =
+        /\A(#{Regexp.escape(r.summary_indent)}.{1,#{r.summary_width}})[ ]*(.*)\z/
+      renderer.banner = ''
+      help_page_desc_lines(0..-1) { |line| r.separator(line) }
+      option_syntax.help_page_data(renderer)
+      b = false
+      renderer.to_s.split("\n").each do |line|
+        case line
+        when ''                ;  # we might emit this after all
+        when two_col_hail_mary ; knob.emit_two_col($1, $2)
+        when HELP_PAGE_HEADER  ; knob.emit_separator_recommended if (b or b ||= true)
+                               ; knob.emit_header(*line.strip.split(':', 2))
+        else                   ; knob.emit_default(line)
+        end
+      end
     end
+
+    def help_page_desc_lines range
+      (queue = description_lines and queue.any? and queue = queue.dup) or return
+      if 0 == range.begin and HELP_PAGE_HEADER !~ queue.first
+        queue[0] = " description: #{queue.first}"
+      end
+      queue[range].each { |l| yield(l) }
+      nil
+    end
+
     def initialize opts={}, &block
-      @argument_syntax = @name = @option_syntax = nil
+      @argument_syntax = @desc = @description_lines = @name = @option_syntax = nil
       @visible = true
       block and opts.merge!(self.class.definition(&block))
       opts.each { |k, v| send("#{k}=", v) }
     end
+    alias_method :action_initialize, :initialize
     attr_reader :method_name
     def method_name= sym
       @method_name = sym
@@ -312,26 +353,11 @@ module Skylab::Porcelain
       option_parser
     end
     alias_method :duplicate, :dup # only as long as it's stateless
-    HEADER = /\A +[^:]+:/
-    def eventized_option_help(&block)
-      empty? and return
-      yield(knob = EventizedHelpKnob.new)
-      renderer = r = ::OptionParser.new
-      lucky_matcher = /\A(#{Regexp.escape(r.summary_indent)}.{1,#{r.summary_width}})[ ]*(.*)\z/
-      renderer.banner = ''
+    def help_page_data renderer
+      any? or return
+      renderer.separator ' options:'
       build_parser({}, renderer)
-      lines = renderer.to_s.split("\n")
-      once = false
-      lines.each do |line|
-        case line
-        when ''            ; # we might emit this after all
-        when lucky_matcher ;
-                           ; once ||= (knob.emit_header('options') || true)
-                           ; knob.emit_two_col($1, $2)
-        when HEADER        ; knob.emit_header(*line.strip.split(':', 2))
-        else               ; knob.emit_default(line)
-        end
-      end
+      nil
     end
     def parse_options argv
       empty? and ! Officious::Help::SWITCHES.include?(argv.first) and return nil
@@ -448,7 +474,7 @@ module Skylab::Porcelain
     attr_reader :handlers
     def init_porcelain &block
       @handlers = {}
-      if block_given?
+      if block # not block_given?
         if block.arity >= 1
           yield self
         else
@@ -506,7 +532,7 @@ module Skylab::Porcelain
       sym = str.intern
       if exact = actions.detect { |a| sym == a.name }
         return exact
-      elsif @fuzzy_match
+      elsif client_class.porcelain.fuzzy_match
         matcher = /\A#{Regexp.escape str}/
         found = actions.select { |a| matcher =~ a.name.to_s }
         case found.size
@@ -518,8 +544,6 @@ module Skylab::Porcelain
       end
       invite("Invalid action: #{e13b str}", "Expecting #{render_actions}")
     end
-    attr_writer :fuzzy_match
-    alias_method :fuzzy_match, :fuzzy_match= # careful
     def invite *msgs
       action = msgs.shift if msgs.any? && ! msgs.first.kind_of?(String)
       msgs.each { |msg| emit(:validation_error_meta, msg) }
@@ -555,16 +579,17 @@ module Skylab::Porcelain
   class Runtime
     include Namespace
     def actions
-      @client.class.actions
+      client_class.actions
     end
     attr_reader :client
     def initialize client
       @client = client
-      @fuzzy_match = true
       @handlers = client.handlers
       @invocation_stack = nil
-      @client.class.porcelain.configure.runtime self
-   end
+    end
+    def client_class
+      @client.class
+    end
     def invocation_name
       invocation_stack.join(' ')
     end
@@ -612,7 +637,9 @@ module Skylab::Porcelain
       act or return emit(:error, "No such action #{e13b "\"#{action}\""}.  " <<
         "Try #{e13b invocation_name} #{render_actions} #{e13b "-h"}.")
       emit(:usage, "#{header 'usage:'} #{e13b "#{invocation_name} #{act.syntax}"}")
-      act.eventized_help do |o|
+
+      act.help_page_events do |o|
+        o.on_separator_recommended { emit(:help, "\n") }
         o.on_header { |name, content=nil| emit(:help, "#{header("#{name}:")}#{content}") }
         o.on_two_col { |a, b| emit(:help, "#{e13b a}#{b}") }
         o.on_default { |line| emit(:help, line) }
@@ -649,6 +676,8 @@ module Skylab::Porcelain
   end
   class NamespaceAction < Action
     include Namespace
+    include ClientInstanceMethods # for this running itself from inside oldschool Face things
+    include LegacyNamespaceMethods
     def actions
       client_class.actions
     end
@@ -671,13 +700,14 @@ module Skylab::Porcelain
     def initialize name, &block
       ::Skylab::Porcelain.namespaces.push self
       @block = nil
-      super()
+      action_initialize
       @argument_syntax = NsArgumentSyntax.new(self)
       @option_syntax = NsOptionSyntax.new(self)
       @name = name
       @block = block
     end
-    def invoke argv, runtime
+    def invoke argv, runtime=nil
+      runtime ||= Runtime.new(self)
       argv.last.kind_of?(Hash) and argv.pop # for now don't nest these
       _invoker = client_class.new
       runtime.push(argv, self, _invoker)

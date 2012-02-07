@@ -234,6 +234,81 @@ module Skylab::Porcelain::TestNamespace
       end # ArgumentSyntax
     end # DSL
     module_eval &SHARED_SETUP
+    context "the result of description_lines when there is.." do
+      let(:klass) do
+        me = self
+        Class.new.class_eval do
+          extend Porcelain
+          class_eval(& me.desc)
+          def foo *a
+          end
+          self
+        end
+      end
+      let (:action) { klass.actions[:foo] }
+      subject { klass.actions[:foo].description_lines }
+      context "no desc" do
+        let(:desc) { ->(_) { } }
+        it "is nil" do
+          subject.should eql(nil)
+        end
+      end
+      context "one desc" do
+        let(:desc) { ->(_) {
+          desc "beep"
+        } }
+        it "is an array of length one" do
+          subject.size.should eql(1)
+          subject.should eql(['beep'])
+        end
+        it "(the result array instance is persistent)" do
+          id = subject.object_id
+          subject.object_id.should eql(id)
+        end
+      end
+      context "two individual desc args" do
+        let(:desc) { ->(_) {
+          desc "deep", "beep"
+        } }
+        it "is those two args" do
+          subject.should eql(['deep', 'beep'])
+        end
+      end
+      context "desc args as a single array" do
+        let(:desc) { ->(_) {
+          desc %w(a b c)
+        } }
+        it "is the same as individual elements" do
+          subject.should eql(['a','b','c'])
+        end
+      end
+      context "given a multiline string (e.g. a <<-HEREDOC)" do
+        let(:desc) { ->(_) {
+          desc <<-HERE
+            la gente esta muy loca:
+              all day
+              all night
+          HERE
+        } }
+        it "turns it into single lines while smartly deindenting it" do
+          subject.should eql(['la gente esta muy loca:',
+            '  all day', '  all night'
+          ])
+        end
+      end
+      context "given multiple calls to it (disjoint even)" do
+        let(:desc) { ->(_) {
+          desc 'aa'
+          argument_syntax '<foo>'
+          desc 'bb', 'cc'
+          option_syntax { }
+          desc "dd\nee", "ff"
+        } }
+        it "is the same as if it were called all at once" do
+          subject.join("\n").should eql(%w(aa bb cc dd ee ff).join("\n"))
+        end
+      end
+    end
     describe "invocation happens with a call to invoke() (pass it ARGV) that" do
       Porcelain::Runtime.send(:define_method, :invocation_name) { 'yourapp' }
       let(:expecting_foo_bar) { /expecting \{(?:help\|)?foo\|bar\}/i }
@@ -409,7 +484,7 @@ module ::Skylab::Porcelain::TestNamespace
         klass.actions.sort_by{ |x| x.name.to_s }.map(&:name).should eql([:buckle, :duckle, :help, :'whiz-bang'])
       end
       let(:debug_ui) { true }
-      it "calls the child command", {focus:true} do
+      it "calls the child command" do
         instance.instance_variable_get('@touched').should eql(nil)
         r = instance.invoke(['wh', 'cu'])
         r.should eql(:yes)
