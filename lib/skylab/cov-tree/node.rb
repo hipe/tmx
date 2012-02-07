@@ -1,6 +1,4 @@
-require File.expand_path('../../../skylab', __FILE__)
 require 'skylab/porcelain/tree/node'
-require File.expand_path('../constants', __FILE__)
 
 module Skylab::CovTree
   class Node < ::Skylab::Porcelain::Tree::Node

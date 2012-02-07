@@ -10,10 +10,18 @@ module ::Skylab::CovTree
       :line_meta => :all, # for lines of tree
       :error => :all
 
-    def initialize path, ctx
-      @path = Pathname.new(path || '.')
-      @ctx = ctx
+    def error msg
+      emit(:error, msg)
+      false
+    end
+    def initialize params
       yield self
+      params.each { |k, v| send("#{k}=", v) }
+      @path or self.path = '.'
+    end
+    def invoke
+      @list and return list
+      tree
     end
     def list
       test_file_paths.tap do |paths|
@@ -22,9 +30,9 @@ module ::Skylab::CovTree
         return paths.count
       end
     end
-    def run
-      @ctx[:list] and return list
-      tree
+    attr_writer :list
+    def path= path
+      @path = path ? Pathname.new(path) : path
     end
     def test_dir
       if found = TEST_DIR_NAMES.detect{ |s| s == @path.basename.to_s } and @path.exist?
@@ -52,8 +60,7 @@ module ::Skylab::CovTree
       files = Dir["#{@test_dir.dirname}/**/*.rb"]
       files.select { |f| re !~ f }
     end
-    def tree
-      require 'pp'
+    def tree_to_render
       tests = test_tree_struct or return false
       tests = tests.find(@test_dir)
       codes = code_tree_struct or return false
@@ -63,6 +70,10 @@ module ::Skylab::CovTree
       both = Node.combine([codes, tests],
         keymaker: ->(n) { [n.slug, *(n.aliases? ? n.aliases : [])].last } # use the last alias as the comparison key
       )
+      both
+    end
+    def tree
+      both = tree_to_render or return both
       loc = ::Skylab::Porcelain::Tree::Locus.new
       loc.traverse(both) do |node, meta|
         meta[:prefix] = loc.prefix(meta)

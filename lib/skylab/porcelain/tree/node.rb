@@ -130,7 +130,8 @@ module Skylab::Porcelain
     attr_reader :keys
   end
   class << Tree::Node
-    def combine nodes, lambdii
+    def combine nodes, lambdii=nil
+      lambdii ||= { keymaker: ->(n) { n.key } }
       keymaker = lambdii[:keymaker] or fail("keymaker lambda is required")
       # map each node with its key, in both a hash and an array
       array = nodes.map { |node| [keymaker.call(node), node] }

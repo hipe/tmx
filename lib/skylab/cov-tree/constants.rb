@@ -3,6 +3,8 @@ require 'strscan'
 module Skylab
   module CovTree
 
+    ROOT = File.expand_path('..', __FILE__)
+
     TEST_DIR_NAMES = %w(test spec features)
 
     GLOBS = {
