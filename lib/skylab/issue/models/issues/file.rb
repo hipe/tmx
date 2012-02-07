@@ -1,7 +1,15 @@
 module Skylab::Issue
   class Models::Issues::File
+    def clear
+      if @fh
+        @fh.close # might throw...
+      end
+      @fh = nil
+      self
+    end
     def each_line &b
       _file.each_line(&b)
+      clear
     end
     def _file
       @fh ||= begin

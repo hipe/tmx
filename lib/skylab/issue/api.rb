@@ -2,6 +2,7 @@ require File.expand_path('../../../skylab', __FILE__)
 
 module Skylab::Issue
 
+  DATE_FORMAT = '%Y-%m-%d'
   ISSUES_FILE_NAME = 'doc/issues.md'
   ROOT = File.expand_path('..', __FILE__) # consider @autoload
 

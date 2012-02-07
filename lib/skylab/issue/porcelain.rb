@@ -14,7 +14,7 @@ module Skylab::Issue
     desc '   <message>                        a one line description of the issue'
 
     option_syntax do |ctx|
-      on('-n', '--dry-run', "don't actually do it")
+      on('-n', '--dry-run', "don't actually do it") { ctx[:dry_run] = true }
     end
 
     def add message, ctx
