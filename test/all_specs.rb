@@ -1,13 +1,25 @@
+#!/usr/bin/env ruby
 #!/usr/bin/env ruby -w
+#
+run_mode = if __FILE__ == $PROGRAM_NAME
+  :self
+elsif %r{/rspec$} =~ $PROGRAM_NAME # ick
+  :rspec
+else
+  :none
+end
 
 require 'optparse'
 dry_run = false
-OptionParser.new do |op|
+op = OptionParser.new do |op|
   op.separator "Description: runs all known tests in this package."
   op.on('-h', '--help', "This screen.") { $stderr.puts op ; exit }
   op.on('-n', '--dry-run', "Do not run tests, just list.") { dry_run = true }
-end.parse!(ARGV)
+end
 
+if :self == run_mode
+  op.parse!(ARGV)
+end
 
 gemroot = File.expand_path('../..', __FILE__)
 
@@ -56,26 +68,38 @@ module Skylab ; end
 module Skylab::Tests
   class Plumbing
     attr_accessor :dry_run
+    def emit _, str
+      $stderr.puts str
+    end
     def initialize opts
       opts.each { |k, v| send("#{k}=", v) }
     end
     def invoke
       if @dry_run
-        $stderr.puts "# skipping above per dry run."
+        emit(:info, "# skipping above per dry run.")
       else
         run_tests
       end
     end
+    def load_test_files
+      test_files.each { |file| require file }
+      emit(:info, "Done loading the above #{test_files.count} spec files.\n\n")
+    end
     def run_tests
       require 'rspec/autorun'
-      test_files.each { |file| require file }
-      $stderr.puts "Done loading the above #{files.count} spec files.\n\n"
+      load_test_files
     end
     attr_accessor :test_files
   end
 end
 
-if __FILE__ == $PROGRAM_NAME
-  Skylab::Tests::Plumbing.new(dry_run: dry_run, test_files: files).invoke
-end
+#23456
+    include Skylab::Tests
+      runner = Plumbing.new(dry_run: dry_run, test_files: files)
+      case run_mode
+      when :self  ; runner.invoke
+      when :rspec ; runner.load_test_files
+      when :none  ;
+      else        ; fail("nope: #{run_mode.inspect}")
+      end
 
