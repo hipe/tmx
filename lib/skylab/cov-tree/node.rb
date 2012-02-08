@@ -1,6 +1,4 @@
-require File.expand_path('../../../skylab', __FILE__)
 require 'skylab/porcelain/tree/node'
-require File.expand_path('../constants', __FILE__)
 
 module Skylab::CovTree
   class Node < ::Skylab::Porcelain::Tree::Node
@@ -9,6 +7,9 @@ module Skylab::CovTree
     end
     def type
       self[:type] or fail("node did not have a type!")
+    end
+    def types
+      Array === type ? type : [type]
     end
     def aliases?
       !! aliases

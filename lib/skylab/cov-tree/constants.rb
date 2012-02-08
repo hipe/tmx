@@ -1,7 +1,11 @@
+require File.expand_path('../../../skylab', __FILE__)
+
 require 'strscan'
 
 module Skylab
   module CovTree
+
+    ROOT = Pathname.new(File.expand_path('..', __FILE__))
 
     TEST_DIR_NAMES = %w(test spec features)
 

@@ -24,7 +24,11 @@ module Skylab::Slake
       if current_meta
         current_meta.merge! change_request
       else
-        attr_accessor sym
+        @_im ||= instance_methods # think of all the side-effects this has:
+          # it takes a snapshot of all instance methods all the way up the chain only the
+          # first time you declare an attribute on a given module
+        @_im.include?(sym) or attr_reader sym
+        @_im.include?(:"#{sym}=") or attr_writer sym
         current_meta = attributes[sym] = change_request
       end
       change_request.each do |k, v|

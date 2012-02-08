@@ -37,6 +37,19 @@ module Skylab::Porcelain
         child._find path_arr, create, &block
       end
     end
+    def longest_common_base_path
+      children? or return nil
+      case children.size
+      when 0
+        nil # should be covered by above but whatever
+      when 1
+        downstream = children.first.longest_common_base_path
+        downstream ||= []
+        downstream.unshift children.first.key
+      else
+        key ? [] : nil # sorry i do not understand this.  arrived at via tests
+      end
+    end
     def initialize hash=nil
       hash and hash.each { |k, v| self[k] = v }
       yield(self) if block_given?
@@ -117,7 +130,8 @@ module Skylab::Porcelain
     attr_reader :keys
   end
   class << Tree::Node
-    def combine nodes, lambdii
+    def combine nodes, lambdii=nil
+      lambdii ||= { keymaker: ->(n) { n.key } }
       keymaker = lambdii[:keymaker] or fail("keymaker lambda is required")
       # map each node with its key, in both a hash and an array
       array = nodes.map { |node| [keymaker.call(node), node] }
@@ -145,7 +159,7 @@ module Skylab::Porcelain
     end
     def from_paths paths, &block
       paths.reduce(new(&block)) do |node, path|
-        node.find!(path.split(Tree::SEPARATOR), &block)
+        node.find!(path.to_s.split(Tree::SEPARATOR), &block)
         node
       end
     end

@@ -1,59 +1,57 @@
-require File.expand_path('../../../skylab', __FILE__)
-
-require 'skylab/slake/muxer'
+require File.expand_path('../api', __FILE__)
 require 'skylab/porcelain/tite-color'
 
 module Skylab::CovTree
   class Porcelain
     extend ::Skylab::Porcelain
     extend ::Skylab::Slake::Muxer
-    emits :all, :info => :all, :error => :all, :payload => :all
-    porcelain { blacklist /^on_.*/ }
+
+    emits :all,
+      :info => :all,
+      :error => :all,
+      :payload => :all
+
+    porcelain { blacklist /^on_.*/ } # hack so that our event knobs don't appear as actions
+
+
+    desc "see crude unit test coverage with a left-right-middle filetree diff"
+    desc "  * test files with corresponding application files appear as green."
+    desc "  * application files with no corresponding test files appear as red."
+
     argument_syntax '[<path>]'
+
     option_syntax do |ctx|
       on('-l', '--list', "shows a list of matched test files and returns.") { ctx[:list] = true }
     end
+
     def tree path=nil, ctx
-      self.class::Tree.new(self).run(path, ctx)
+      api.invoke_porcelain(:tree, ctx.merge(
+        :emitter => self,
+        :path => path
+      ))
     end
-  end
-  class Porcelain::Tree
-    include ::Skylab::Porcelain::TiteColor
-    def emit(*a)
-      @emitter.emit(*a)
+
+
+
+    desc "see a left-middle-right filetree diff of rerun list vs. all tests."
+    desc "  * tests that failed (that appeared in your rerun list) appear as red."
+    desc "  * test that do not appear (that presumably passed *) appear as green."
+    desc "  * note this does not take into account @wip tags etc"
+
+    argument_syntax '<rerun-file>'
+
+    desc " arguments: "
+
+    desc "        <rerun-file>                a cucumber-like rerun.txt file"
+
+    def rerun path
+      api.invoke_porcelain(:rerun, :emitter => self, :rerun => path)
     end
-    def initialize emitter
-      @emitter = emitter
-    end
-    def run path, ctx
-      require File.expand_path('../plumbing/tree', __FILE__)
-      a = []
-      r = Plumbing::Tree.new(path, ctx) do |o|
-        thru = ->(e) { emit(e.type, e) }
-        o.on_error &thru
-        o.on_payload &thru
-        o.on_line_meta { |e| a << e }
-      end.run
-      a.any? and return _render_tree_lines a
-      r
-    end
-    def _render_tree_lines events
-      _matrix = events.map { |e| _prerender_tree_line e.data }
-      max = _matrix.map{ |a| a.first.length }.max
-      fmt = "%-#{max}s  %s"
-      _matrix.each { |a| emit(:payload, fmt % a) }
-      true
-    end
-    def _prerender_tree_line d
-      n = d[:node]
-      t, c = [:test, :code].map { |s| (Array === n.type) ? n.type.include?(s) : (s == n.type) }
-      _indicator = "[#{t ? '+':' '}|#{c ? '-':' '}]"
-      if (color = (t ? (c ? :green : :cyan) : (c ? :red : nil )))
-        _indicator = send(color, _indicator)
-      end
-      _slug = n.slug
-      _slug.kind_of?(Array) and _slug = _slug.join(', ')
-      ["#{d[:prefix]}#{_slug}", _indicator]
+
+  protected
+
+    def api
+      ::Skylab::CovTree.api
     end
   end
 end

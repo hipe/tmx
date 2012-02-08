@@ -1,3 +1,6 @@
+[#044] 2012-02-07 issue: add issue show
+[#043] 2012-02-06 porcelain tree: common base path
+[#042] 2012-02-06 cov: add --rerun
 [#041] 2012-02-24 muxer: custom event classes
 [#040] 2012-02-04 porcelain: actions have descriptions
 [#038] 2012-02-04 add script to show fake ticket numbers
