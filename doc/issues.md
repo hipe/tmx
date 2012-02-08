@@ -1,3 +1,4 @@
+[#047] 2012-02-07 all: mark all closed issues as closed
 [#046] 2012-02-07 issue: add verbose/debug mode, put such output there
 [#045] 2012-02-07 all: get *all* tests green, modifying scripts if necessary
 [#044] 2012-02-07 issue: add issue show
