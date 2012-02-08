@@ -19,8 +19,23 @@ module Skylab::TestSupport
       read
     end
   end
+  # The reason for the below hacky thing is this: it used to be that Pathname
+  # either didn't include FileUtils or didn't define mkdir().  Now that
+  # it does, because ancestor chains are immutable, if you subclass
+  # Pathname you can't override its definition of mkdir() by including
+  # FileUtils anymore.  The point of it is that in TempDir below, we
+  # want to use the mkdir() defined in FileUtils and not the one in
+  # Pathname!
+  #
+  module MyFileUtils
+    include ::FileUtils
+    alias_method :_fileutils_mkdir, :mkdir
+    def mkdir(*a)
+      _fileutils_mkdir(*a)
+    end
+  end
   class TempDir < ::Pathname
-    include FileUtils
+    include MyFileUtils
     def emit type, msg
       $stderr.puts msg
     end

@@ -1,6 +1,6 @@
 [#047] 2012-02-07 @closed all: mark all closed issues as closed
 [#046] 2012-02-07 @open issue: add verbose/debug mode, put such output there
-[#045] 2012-02-07 @open all: get *all* tests green, modifying scripts if necessary
+[#045] 2012-02-07 @closed all: get *all* tests green, modifying scripts if necessary
 [#044] 2012-02-07 @closed issue: add issue show
 [#043] 2012-02-06 @closed porcelain tree: common base path
 [#042] 2012-02-06 @closed cov: add --rerun
