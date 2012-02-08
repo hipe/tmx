@@ -5,10 +5,9 @@ module Skylab::Dependency::TestNamespace
 
   include ::Skylab::Dependency
   describe TaskTypes::Get do
-    include ::Skylab::Porcelain::TiteColor # unstylize
+    module_eval &DESCRIBE_BLOCK_COMMON_SETUP
     let(:build_dir) { BUILD_DIR }
     let(:context) { { :build_dir => build_dir } }
-    let(:fingers) { Hash.new { |h, k| h[k] = [] } }
     let(:host) { Pathname.new('http://localhost:1324/') }
     let(:klass) { TaskTypes::Get }
     let(:log) { MyStringIO.new }

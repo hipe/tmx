@@ -1,10 +1,14 @@
 require 'skylab/slake/muxer'
 require 'skylab/slake/attribute-definer'
 
+
 module Skylab::Issue
+  require ROOT.join('porcelain/yamlizer').to_s
+
   class Api::Action
     extend ::Skylab::Slake::Muxer
     extend ::Skylab::Slake::AttributeDefiner
+    include Porcelain::Yamlizer
 
     meta_attribute :required
 
@@ -18,6 +22,13 @@ module Skylab::Issue
       @params = context
       instance_eval(&events)
     end
+    def internalize_params!
+      valid? or return failed(invalid_reason)
+      @internalized_param_keys = (a = [])
+      @params.each { |k, v| a.push(k) ; self.send("#{k}=", v) }
+      @params = nil
+      true
+    end
     def invoke
       execute # (maybe one day a slake- (rake-) like pattern)
     end
@@ -27,9 +38,12 @@ module Skylab::Issue
         require "#{ROOT}/models/issues"
         Models::Issues.new(
           :emitter => self,
-          :manifest => @api.issues_manifest(@params[:issues_file_name])
+          :manifest => @api.issues_manifest(issues_file_name)
         )
       end
+    end
+    def issues_file_name
+      @issues_file_name || ISSUES_FILE_NAME
     end
     def muxer_build_event type, data
       ev = Api::MyEvent.new(type, data)
@@ -38,7 +52,7 @@ module Skylab::Issue
     end
     def valid?
       _required = self.class.attributes.to_a.select{ |k, v| v[:required] }.map(&:first)
-      if (nope = _required.select{ |k| @params[k].nil? }).any?
+      if (nope = _required.select{ |k| @params[k].nil? and send(k).nil? }).any?
         @invalid_reason = "missing required parameter#{'s' if nope.size != 1}: #{nope.join(', ')}"
         return false
       end

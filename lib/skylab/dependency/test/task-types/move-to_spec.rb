@@ -5,8 +5,8 @@ module Skylab::Dependency::TestNamespace
 
   include ::Skylab::Dependency
   describe TaskTypes::MoveTo do
-    include ::Skylab::Porcelain::TiteColor # unstylize
-    let(:fingers) { Hash.new { |h, k| h[k] = [] } }
+
+    module_eval &DESCRIBE_BLOCK_COMMON_SETUP
     let(:context) { { } }
     let(:build_args) { { :move_to => move_to, :from => from } }
     subject do

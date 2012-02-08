@@ -5,8 +5,7 @@ module Skylab::Dependency::TestNamespace
 
   include ::Skylab::Dependency
   describe TaskTypes::UnzipTarball do
-    include ::Skylab::Porcelain::TiteColor # unstylize
-    let(:fingers) { Hash.new { |h, k| h[k] = [] } }
+    module_eval &DESCRIBE_BLOCK_COMMON_SETUP
     subject do
       TaskTypes::UnzipTarball.new(build_args) do |o|
         o.on_all { |e| fingers[e.type].push unstylize(e.to_s) }

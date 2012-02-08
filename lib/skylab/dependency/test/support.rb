@@ -19,6 +19,11 @@ end
 
 module Skylab::Dependency::TestNamespace
 
+  DESCRIBE_BLOCK_COMMON_SETUP = ->(_) do
+    include ::Skylab::Porcelain::TiteColor
+    let(:fingers) { Hash.new { |h, k| h[k] = [] } }
+  end
+
   TEMP_DIR = ::Skylab::ROOT.join('tmp')
 
   BUILD_DIR = Class.new(Pathname).class_eval do

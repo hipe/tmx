@@ -4,7 +4,7 @@ module Skylab::Issue
 
   DATE_FORMAT = '%Y-%m-%d'
   ISSUES_FILE_NAME = 'doc/issues.md'
-  ROOT = File.expand_path('..', __FILE__) # consider @autoload
+  ROOT = Pathname.new(File.expand_path('..', __FILE__)) # consider @autoload
 
   class Api
     def initialize &events
@@ -24,6 +24,8 @@ module Skylab::Issue
     end
     # getters for *persistent* models *objects* (think daemons):
     def issues_manifest pathname
+      (pathname and ! pathname.empty?) or raise ArgumentError(
+        "pathanme must be a non-empty string (had #{pathname.inspect})")
       @issues_manifest[pathname] ||= begin
         require "#{ROOT}/models/issues/manifest"
         Models::Issues::Manifest.new(pathname)

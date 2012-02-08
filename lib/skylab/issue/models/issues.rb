@@ -22,6 +22,12 @@ module Skylab::Issue
       @emitter.emit t, m
     end
     attr_accessor :emitter
+    def find hash
+      require File.expand_path('../issues/search', __FILE__)
+      filter = Search.build(emitter, hash) or return filter
+      with_manifest { |m| m.issues_flyweight }.
+        filter { |outp, inp| filter.include?(inp) and outp << inp }
+    end
     def initialize opts
       _update_attributes opts
     end
