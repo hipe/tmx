@@ -1,4 +1,5 @@
 require 'skylab/face/path-tools'
+require File.expand_path('../my-enumerator', __FILE__)
 
 module Skylab::Issue
   class Models::Issues::Manifest
@@ -81,7 +82,9 @@ module Skylab::Issue
     end
 
     def initialize basename
-      @basename = Pathname.new(basename)
+      (!basename or basename.empty?) and
+        raise ArgumentError.new("basename cannot be empty (had: #{basename.inspect}).")
+      @basename = Pathname.new(basename.to_s)
       @basename.absolute? and
         fail("#{self.class} for now must be build w/ relative pathnames, not #{basename}")
       @dirname = Pathname.new('.').expand_path
@@ -94,7 +97,7 @@ module Skylab::Issue
         issue_flyweight = Models::Issue.build_flyweight
         self.file
       end
-      Enumerator.new do |yielder|
+      Models::Issues::MyEnumerator.new do |yielder|
         if file
           file.each_line do |line|
             issue_flyweight.line = line

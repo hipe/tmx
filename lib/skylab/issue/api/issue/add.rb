@@ -2,6 +2,7 @@ module Skylab::Issue
   class Api::Issue::Add < Api::Action
 
     attribute :dry_run
+    alias_method :dry_run?, :dry_run # @todo
     attribute :issues_file_name, :required => true
     attribute :message,          :required => true
 
@@ -10,9 +11,8 @@ module Skylab::Issue
     muxer_event_class Api::MyEvent
 
     def execute
-      @params[:issues_file_name] ||= ISSUES_FILE_NAME
-      valid? or return failed(invalid_reason)
-      issues.add(@params[:message], :dry_run => @params[:dry_run])
+      internalize_params! or return false
+      issues.add(message, :dry_run => dry_run?)
     end
   end
 end

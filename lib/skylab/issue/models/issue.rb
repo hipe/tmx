@@ -1,5 +1,8 @@
 module Skylab::Issue
   class Models::Issue
+    def date
+      _parsed[:rest][1,10] # @todo!
+    end
     def identifier
       _parsed[:identifier]
     end
@@ -7,6 +10,9 @@ module Skylab::Issue
     def line= line
       @_parsed = nil
       @line = line.strip
+    end
+    def message
+      _parsed[:rest][12..-1] # @todo!
     end
     REGEX  = %r{\A\[#(\d+)\](.*)\z}
     REGEX_ = [:identifier, :rest]

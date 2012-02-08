@@ -24,6 +24,18 @@ module Skylab::Issue
 
 
 
+
+    desc "show an issue given its identifier"
+
+    argument_syntax '<identifier>'
+
+    def show identifier
+      api.invoke [:issue, :show], {:identifier => identifier}
+    end
+
+
+
+
     desc "emit all known issue numbers in descending order to stdout"
     desc "one number per line, with any leading zeros per the file."
     desc "(more of a plumbing than porcelain feature!)"
