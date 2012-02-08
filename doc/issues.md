@@ -1,3 +1,5 @@
+[#046] 2012-02-07 issue: add verbose/debug mode, put such output there
+[#045] 2012-02-07 all: get *all* tests green, modifying scripts if necessary
 [#044] 2012-02-07 issue: add issue show
 [#043] 2012-02-06 porcelain tree: common base path
 [#042] 2012-02-06 cov: add --rerun
