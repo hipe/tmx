@@ -5,7 +5,8 @@ module Skylab::Issue
       @valid = true
       emitter.respond_to?(:emit) or raise ArgumentError.new('nope')
       @emitter = emitter
-      @criteria_keys = []
+      @or = []
+      @index = {}
       query.each { |k, v| send("#{k}=", v ) }
     end
     def emit a, b
@@ -24,19 +25,17 @@ module Skylab::Issue
       unless (extra = "#{md[1]}#{md[3]}").empty?
         emit :info, "(ignoring #{extra.inspect} in search criteria.)"
       end
-      @criteria_keys.push :identifier
-      target_integer = md[2].to_i
-      @identifier_filter = ->(issue) { target_integer == issue.identifier.to_i }
+      @identifier = md[2].to_i
+      @index[:identifier] ||= begin
+        @or[idx = @or.length] = ->(issue) { issue.identifier.to_i == @identifier }
+        idx
+      end
       v
     end
     attr_reader :identifer
-    def _include_identifier? issue
-      @identifier_filter[issue]
-    end
     def include? issue
-      @criteria_keys.empty? and return false
-      @criteria_keys.detect { |k| ! send("_include_#{k}?", issue) } and return false
-      true
+      @or.empty? and @or.push(->(i) { true })
+      @or.detect { |node| node.call(issue) }
     end
     def valid?
       @valid

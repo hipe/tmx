@@ -1,3 +1,4 @@
+[#050] 2012-02-11 issue: change implementation of search to take lambdas
 [#048] 2012-02-10 @open show should list (for now)
 [#047] 2012-02-07 @closed all: mark all closed issues as closed
 [#046] 2012-02-07 @open issue: add verbose/debug mode, put such output there
