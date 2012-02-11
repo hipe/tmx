@@ -5,6 +5,9 @@ require 'skylab/face/path-tools'
 module Skylab::Issue
   class Models::Issues
     include ::Skylab::Face::PathTools
+    o = File.expand_path('..', __FILE__)
+    require "#{o}/issues/manifest"
+
     def add message, opts
       _update_attributes opts
       with_manifest do |m|
@@ -24,9 +27,16 @@ module Skylab::Issue
     attr_accessor :emitter
     def find hash
       require File.expand_path('../issues/search', __FILE__)
-      filter = Search.build(emitter, hash) or return filter
-      with_manifest { |m| m.issues_flyweight }.
-        filter { |outp, inp| filter.include?(inp) and outp << inp }
+      search = Search.build(emitter, hash) or return search
+      enum = MyEnumerator.new do |y|
+        with_manifest do |mani|
+          mani.issues_flyweight.filter do |outp, inp|
+            search.include?(inp) and outp << inp
+          end.each { |o| y << o }
+        end
+      end
+      enum.search = search
+      enum
     end
     def initialize opts
       _update_attributes opts

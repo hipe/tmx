@@ -25,12 +25,18 @@ module Skylab::Issue
 
 
 
-    desc "show an issue given its identifier"
+    desc "show the details of issue(s)"
 
-    argument_syntax '<identifier>'
+    option_syntax do |ctx|
+      on('-l', '--last <num>', '--limit <num>',
+         "shows the last N issues") { |n| ctx[:last] = n }
+    end
 
-    def show identifier
-      api.invoke [:issue, :show], {:identifier => identifier}
+    argument_syntax '[<identifier>]'
+
+    def show identifier=nil, ctx
+      ctx[:identifier] = identifier
+      api.invoke [:issue, :show], ctx
     end
 
 
