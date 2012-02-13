@@ -1,25 +1,28 @@
 module Skylab::CodeMolester::Config
   grammar FileNode
     rule file
-      line more_lines:( "\n" line)*
-      <ItemBranchy>
-      {
-        def item_enumerator
+      item more_items:( "\n" item)*
+      <ItemBranchy> {
+        def content_item_enumerator
           Enumerator.new do |y|
-            y << line
-            more_lines.elements.each { |e| y << e.line }
+            y << item if item.content_item?
+            more_items.elements.each { |e| y << e.item if e.item.content_item? }
           end
         end
-        def lines
-          item_enumerator.map { |i| i }
+        def content_items
+          content_item_enumerator.map { |i| i }
         end
       }
     end
-    rule line
-      assignment_line / section_line / whitespace_line
+    rule item
+      assignment_line / section / whitespace_line
     end
     rule comment
-      '#' [ \t]* body:[^\n]*
+      '#' [ \t]* body:[^\n]* {
+        def content_item?
+          false
+        end
+      }
     end
     rule assignment_line
       [ \t]*
@@ -27,9 +30,9 @@ module Skylab::CodeMolester::Config
       [ \t]* '=' [ \t]*
       assignment_value:( [ \t]* ( ![ \t#\n] . )+ )*
       [ \t]*
-      comment:comment?
-      {
+      comment:comment?  {
         def assignment_name ; assignment_name_node.text_value               end
+        def content_item?   ; true                                          end
         alias_method :item_name, :assignment_name
         def item_value      ; assignment_value.text_value                   end # etc
         def nt_name         ; :assignment_line                              end
@@ -38,7 +41,17 @@ module Skylab::CodeMolester::Config
     rule whitespace_line
       [ \t]* comment?
       {
-        def nt_name ; :whitespace_line end
+        def content_item?   ; false                                         end
+        def nt_name         ; :whitespace_line                              end
+      }
+    end
+    rule section
+      section_line
+      child_items:( "\n" item:( assignment_line / whitespace_line ) )*
+      <ItemBranchy> {
+        def content_item?   ; true                                          end
+        def nt_name         ; :section                                      end
+        def section_name    ; section_line.section_name                     end
       }
     end
     rule section_line

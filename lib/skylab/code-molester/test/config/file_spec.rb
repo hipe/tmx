@@ -18,17 +18,17 @@ describe ::Skylab::CodeMolester::Config::File do
       it "is valid (because an empty file is)" do
         subject.valid?.should eql(true)
       end
-      it "has one line (for even an empty file has one line)" do
-        subject.lines.count.should eql(1)
-        line = subject.lines.first
-        line.text_value.should eql('')
+      it "has no content items" do
+        subject.content_items.size.should eql(0)
+        subject.content.should eql('')
       end
     end
     context "when input is bunch of blank lines" do
       let(:input_string) { "\n  \n\t\n" }
       it "it is valid" do
+        subject = self.subject
         subject.invalid_reason.should eql(nil)
-        subject.lines.size.should eql(4)
+        subject.content_items.size.should eql(0)
         subject.text_value.should eql(input_string)
       end
     end
@@ -36,15 +36,15 @@ describe ::Skylab::CodeMolester::Config::File do
       let(:input_string) { "      # ha-blah" }
       it "it is valid" do
         subject.invalid_reason.should eql(nil)
-        subject.lines.size.should eql(1)
-        subject.lines.first.nt_name.should eql(:whitespace_line)
+        subject.content_items.size.should eql(0)
+        subject.content_tree.elements.first.nt_name.should eql(:whitespace_line)
       end
     end
     context "when input is one assigmnent line" do
       before(:each) do
         subject.invalid_reason.should eql(nil)
-        subject.lines.size.should eql(1)
-        @line = subject.lines.first
+        subject.content_items.size.should eql(1)
+        @line = subject.content_items.first
         @line.nt_name.should eql(:assignment_line)
       end
       def name
@@ -57,11 +57,11 @@ describe ::Skylab::CodeMolester::Config::File do
         @line.comment.body.text_value
       end
       context("as the ideal, general case") do
-       let(:input_string) { "foo=bar" }
-       it "parses" do
-         name.should eql('foo')
-         value.should eql('bar')
-       end
+        let(:input_string) { "foo=bar" }
+        it "parses" do
+          name.should eql('foo')
+          value.should eql('bar')
+        end
       end
       context("that has spaces and a comment") do
         let(:input_string) { "  foo= bar baz #boffo" }
@@ -90,8 +90,8 @@ describe ::Skylab::CodeMolester::Config::File do
     context "when input is a valid section line" do
       before(:each) do
         subject.invalid_reason.should eql(nil)
-        (ll = subject.lines).count.should eql(1)
-        (line = ll.first).nt_name.should eql(:section_line)
+        (ll = subject.content_items).count.should eql(1)
+        (line = ll.first).nt_name.should eql(:section)
         @line = line
       end
       def section_name

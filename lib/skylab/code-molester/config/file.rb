@@ -16,9 +16,7 @@ module Skylab::CodeMolester
     include Config::FileNode::ItemBranchy
 
     alias_method :pathname_children, :children
-    def children
-      _parse_tree.select { |o| o.content? }
-    end
+
     def content= str
       @valid = nil
       @content_tree = nil
@@ -27,7 +25,7 @@ module Skylab::CodeMolester
     def content_tree # @api private
       valid? ? @content_tree : false
     end
-    %w(item_enumerator lines).each do |n| # @delegator
+    %w(content_item_enumerator content_items).each do |n| # @delegator
       define_method(n) do
         valid? or return false
         content_tree.send(n)

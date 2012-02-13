@@ -4,7 +4,7 @@ module Skylab::CodeMolester::Config::FileNode
       true
     end
     def [] name
-      o = item_enumerator.detect { |i| name == i.item_name }
+      o = content_item_enumerator.detect { |i| name == i.item_name }
       if o.respond_to?(:branch?) and o.branch?
         o
       elsif o.respond_to?(:item_value)
