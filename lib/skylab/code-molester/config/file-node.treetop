@@ -9,7 +9,7 @@ module Skylab::CodeMolester::Config
       }
     end
     rule line
-      assignment_line / whitespace_line
+      assignment_line / section_line / whitespace_line
     end
     rule comment
       '#' [ \t]* body:[^\n]*
@@ -22,14 +22,23 @@ module Skylab::CodeMolester::Config
       [ \t]*
       comment:comment?
       {
-        def assignment_name ; assignment_name_node.text_value end
-        def nt_name         ; :assignment_line     end
+        def assignment_name ; assignment_name_node.text_value               end
+        def nt_name         ; :assignment_line                              end
       }
     end
     rule whitespace_line
       [ \t]* comment?
       {
         def nt_name ; :whitespace_line end
+      }
+    end
+    rule section_line
+      [ \t]* '[' [ \t]*
+      name_node:[-_a-z0-9a\.]+
+      [ \t]* ']' [ \t]* comment:comment?
+      {
+        def nt_name         ; :section_line                                 end
+        def section_name    ; name_node.text_value                          end
       }
     end
   end

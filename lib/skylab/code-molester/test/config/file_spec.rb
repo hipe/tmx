@@ -41,7 +41,7 @@ describe ::Skylab::CodeMolester::Config::File do
       end
     end
     context "when input is one assigmnent line" do
-      def ok
+      before(:each) do
         subject.invalid_reason.should eql(nil)
         subject.lines.size.should eql(1)
         @line = subject.lines.first
@@ -59,7 +59,6 @@ describe ::Skylab::CodeMolester::Config::File do
       context("as the ideal, general case") do
        let(:input_string) { "foo=bar" }
        it "parses" do
-         ok
          name.should eql('foo')
          value.should eql('bar')
        end
@@ -67,7 +66,6 @@ describe ::Skylab::CodeMolester::Config::File do
       context("that has spaces and a comment") do
         let(:input_string) { "  foo= bar baz #boffo" }
         it "will parse it, stripping leading and trailing whitespace, and revealing the comment" do
-          ok
           name.should eql('foo')
           value.should eql('bar baz')
           comment.should eql('boffo')
@@ -76,7 +74,6 @@ describe ::Skylab::CodeMolester::Config::File do
       context("that has no value at all") do
         let(:input_string) { "\t  foo_bar  =" }
         it "will have the empty string as a value" do
-          ok
           name.should eql('foo_bar')
           value.should eql('')
         end
@@ -84,13 +81,45 @@ describe ::Skylab::CodeMolester::Config::File do
       context("that has no value, but trailing whitespace") do
         let(:input_string) { " fooBar09   = \t#some comment\t " }
         it "still works" do
-          ok
           name.should eql('fooBar09')
           value.should eql('')
           comment.should eql("some comment\t ")
         end
       end
+    end # assignment line
+    context "when input is a valid section line" do
+      before(:each) do
+        subject.invalid_reason.should eql(nil)
+        (ll = subject.lines).count.should eql(1)
+        (line = ll.first).nt_name.should eql(:section_line)
+        @line = line
+      end
+      def section_name
+        @line.section_name
+      end
+      context "in the ideal, general case" do
+        let(:input_string) { "[foo]" }
+        it "works" do
+          section_name.should eql('foo')
+        end
+      end
+      context "with lots of spaces and tabs everywhere" do
+        let(:input_string) { "  \t [\t 09foo.bar ]   \t" }
+        it "works" do
+          section_name.should eql('09foo.bar')
+        end
+      end
+    end
+  end # validity / parsing
+  context "With regards to rendering parse errors" do
+    context "if you had slashes (which are invalid) in a section name, e.g." do
+      let(:input_string) { "[foo/bar]" }
+      it "will cause this parse error", {focus:true} do
+        rsn = subject.invalid_reason
+        subject.valid?.should eql(false)
+      end
     end
   end
-end
+  context "As for setting values"
+end # describe
 
