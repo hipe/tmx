@@ -1,18 +1,16 @@
 module Skylab::CodeMolester::Config::FileNode
-  if false
-  class Node < Treetop::Runtime::SyntaxNode
-    # jdef eval(env={})
-      # :hello
-      # tail.elements.inject(head.eval(env)) do |value, element|
-      #   element.operator.apply(value, element.operand.eval(env))
-      # end
-    # end
-  end
-  class Whitespace < Node
-    def content_node?
-      false
+  module ItemBranchy
+    def branch?
+      true
     end
-  end
+    def [] name
+      o = item_enumerator.detect { |i| name == i.item_name }
+      if o.respond_to?(:branch?) and o.branch?
+        o
+      else
+        o.item_value
+      end
+    end
   end
 end
 

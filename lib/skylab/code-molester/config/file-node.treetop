@@ -2,9 +2,16 @@ module Skylab::CodeMolester::Config
   grammar FileNode
     rule file
       line more_lines:( "\n" line)*
+      <ItemBranchy>
       {
         def lines
           [line, * more_lines.elements.map { |e| e.line } ]
+        end
+        def item_enumerator
+          Enumerator.new do |y|
+            y << line
+            more_lines.elements.each { |e| y << e.line }
+          end
         end
       }
     end
@@ -23,6 +30,8 @@ module Skylab::CodeMolester::Config
       comment:comment?
       {
         def assignment_name ; assignment_name_node.text_value               end
+        alias_method :item_name, :assignment_name
+        def item_value      ; assignment_value.text_value                   end # etc
         def nt_name         ; :assignment_line                              end
       }
     end

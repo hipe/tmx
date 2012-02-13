@@ -135,6 +135,21 @@ describe ::Skylab::CodeMolester::Config::File do
       end
     end
   end
-  context "As for setting values"
+  context "As for getting values" do
+    let(:config) do
+      klass.new(
+        :path     => path,
+        :content  => content
+      )
+    end
+    context "with a file with one value" do
+      let(:content) { 'foo = bar' }
+      it "can get it", {focus:true} do
+        config['foo'].should eql('bar')
+      end
+    end
+  end
+  context "As for setting values" do
+  end
 end # describe
 

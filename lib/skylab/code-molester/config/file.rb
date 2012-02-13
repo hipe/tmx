@@ -1,15 +1,20 @@
-require 'pathname'
+require File.expand_path('..', __FILE__)
 require 'treetop'
 require 'skylab/face/path-tools'
 require 'skylab/slake/muxer'
-dir = File.expand_path('../..', __FILE__)
-require "#{dir}/config"
-require "#{dir}/parse-failure-porcelain"
 
 module Skylab::CodeMolester
+  module Config
+    require DIR.join('../parse-failure-porcelain')
+    require "#{DIR}/file-node-classes"
+  end
+
   class Config::File < Pathname
     extend ::Skylab::Slake::Muxer
     emits :all, :info => :all, :error => :all
+
+    include Config::FileNode::ItemBranchy
+
     alias_method :pathname_children, :children
     def children
       _parse_tree.select { |o| o.content? }
@@ -22,18 +27,22 @@ module Skylab::CodeMolester
     def content_tree # @api private
       valid? ? @content_tree : false
     end
+    %w(item_enumerator lines).each do |n| # @delegator
+      define_method(n) do
+        valid? or return false
+        content_tree.send(n)
+      end
+    end
     def initialize(*a, &b)
       @valid = @invalid_reason = nil
       b and b.call(self)
+      a.last.kind_of?(Hash) and
+        a.pop.each { |k, v| :path == k ? (a.unshift(v.to_s)) : send("#{k}=", v) }
       super(*a)
     end
     def invalid_reason
       @valid.nil? and valid?
       @invalid_reason
-    end
-    def lines
-      valid? or return false
-      content_tree.lines
     end
     def pretty
       ::Skylab::Face::PathTools.pretty_path(to_s)
@@ -64,10 +73,7 @@ module Skylab::CodeMolester
   class << Config::File
     def parser_class
       @parser_class ||= begin
-        dir = File.expand_path('..', __FILE__)
-        require "#{dir}/file-node-classes"
-        pc = Treetop.load "#{dir}/file-node"
-        pc
+        Treetop.load "#{Config::DIR}/file-node"
       end
     end
     def parser
