@@ -16,4 +16,5 @@ group :development do
     gem 'ruby-debug'
   end
   gem 'simplecov'
+  gem 'treetop'
 end

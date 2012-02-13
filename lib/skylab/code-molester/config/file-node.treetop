@@ -1,0 +1,19 @@
+module Skylab::CodeMolester::Config
+  grammar FileNode
+    rule file
+      line more_lines:( "\n" line)*
+      {
+        def lines
+          [line, * more_lines.elements.map { |e| e.line } ]
+        end
+      }
+    end
+    rule line
+      (whitespace_line)
+    end
+    rule whitespace_line
+      [ \t]*
+    end
+  end
+end
+
