@@ -2,7 +2,9 @@ require 'pathname'
 require 'treetop'
 require 'skylab/face/path-tools'
 require 'skylab/slake/muxer'
-require File.expand_path('..', __FILE__)
+dir = File.expand_path('../..', __FILE__)
+require "#{dir}/config"
+require "#{dir}/parse-failure-porcelain"
 
 module Skylab::CodeMolester
   class Config::File < Pathname
@@ -53,7 +55,7 @@ module Skylab::CodeMolester
           @invalid_reason = nil
         else
           @valid = false
-          @invalid_reason = self.class.render_failure_message(p)
+          @invalid_reason = ParseFailurePorcelain.new(p)
         end
       end
       @valid
@@ -70,10 +72,6 @@ module Skylab::CodeMolester
     end
     def parser
       @parser ||= parser_class.new
-    end
-    def render_failure_message parser
-      a = parser.terminal_failures
-      "#{to_s} Parse Failure: Expecting #{a.map { |o| [o.index, o.expected_string].inspect }.join(', ')}"
     end
   end
 end

@@ -112,11 +112,26 @@ describe ::Skylab::CodeMolester::Config::File do
     end
   end # validity / parsing
   context "With regards to rendering parse errors" do
-    context "if you had slashes (which are invalid) in a section name, e.g." do
-      let(:input_string) { "[foo/bar]" }
-      it "will cause this parse error", {focus:true} do
-        rsn = subject.invalid_reason
-        subject.valid?.should eql(false)
+    before(:each) do
+      subject.valid?.should eql(false)
+    end
+    let(:invalid_reason) { subject.invalid_reason.to_s }
+    context "if you had an invalid section name on e.g. the third line" do
+      let(:input_string) { "foo=bar\n#ok\n[foo/bar]\n# one more line" }
+      it "it will report line number and context and expecting" do
+        invalid_reason.should eql('Expecting "]" at the end of "[foo/" at line 3')
+      end
+    end
+    context "if you had something invalid at the very first character" do
+      let(:input_string) { '{' }
+      it "will do the same as above" do
+        invalid_reason.should eql('Expecting "[", "#" or "\n" at beginning of line at line 1')
+      end
+    end
+    context "if you had something invalid as the very last character" do
+      let(:input_string) { "\n\n# foo\n  }" }
+      it "will do the same as above"  do
+        invalid_reason.should eql('Expecting "[", "#" or "\n" at the end of "  }" at line 4')
       end
     end
   end
