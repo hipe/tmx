@@ -25,7 +25,10 @@ module Skylab::CodeMolester
       b and b.call(self)
       super(*a)
     end
-    attr_reader :invalid_reason
+    def invalid_reason
+      @valid.nil? and valid?
+      @invalid_reason
+    end
     def lines
       valid? or return false
       content_tree.lines

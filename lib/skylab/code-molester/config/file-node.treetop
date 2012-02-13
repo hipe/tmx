@@ -9,10 +9,28 @@ module Skylab::CodeMolester::Config
       }
     end
     rule line
-      (whitespace_line)
+      assignment_line / whitespace_line
+    end
+    rule comment
+      '#' [ \t]* body:[^\n]*
+    end
+    rule assignment_line
+      [ \t]*
+      assignment_name_node:[_a-zA-Z0-9]+
+      [ \t]* '=' [ \t]*
+      assignment_value:( [ \t]* ( ![ \t#\n] . )+ )*
+      [ \t]*
+      comment:comment?
+      {
+        def assignment_name ; assignment_name_node.text_value end
+        def nt_name         ; :assignment_line     end
+      }
     end
     rule whitespace_line
-      [ \t]*
+      [ \t]* comment?
+      {
+        def nt_name ; :whitespace_line end
+      }
     end
   end
 end
