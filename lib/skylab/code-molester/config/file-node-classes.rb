@@ -7,8 +7,10 @@ module Skylab::CodeMolester::Config::FileNode
       o = item_enumerator.detect { |i| name == i.item_name }
       if o.respond_to?(:branch?) and o.branch?
         o
-      else
+      elsif o.respond_to?(:item_value)
         o.item_value
+      else
+        o
       end
     end
   end

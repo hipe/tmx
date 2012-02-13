@@ -144,9 +144,21 @@ describe ::Skylab::CodeMolester::Config::File do
     end
     context "with a file with one value" do
       let(:content) { 'foo = bar' }
-      it "can get it", {focus:true} do
+      it "can get it" do
         config['foo'].should eql('bar')
       end
+      it "we don't do magic conversion to symbols for you" do
+        config[:foo].should eql(nil)
+      end
+      it "will get nil if it asks for a name that isn't there" do
+        config['fo'].should eql(nil)
+      end
+    end
+    context "with a file with one section" do
+      let(:context) { "foo = bar\n [bizzo]\nfoo = biz\n[bazzo]foo = buz" }
+      #  it "does some magic hackery" do
+
+      # end
     end
   end
   context "As for setting values" do

@@ -4,14 +4,14 @@ module Skylab::CodeMolester::Config
       line more_lines:( "\n" line)*
       <ItemBranchy>
       {
-        def lines
-          [line, * more_lines.elements.map { |e| e.line } ]
-        end
         def item_enumerator
           Enumerator.new do |y|
             y << line
             more_lines.elements.each { |e| y << e.line }
           end
+        end
+        def lines
+          item_enumerator.map { |i| i }
         end
       }
     end
