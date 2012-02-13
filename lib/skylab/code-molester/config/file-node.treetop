@@ -1,24 +1,26 @@
 module Skylab::CodeMolester::Config
   grammar FileNode
     rule file
-      item more_items:( "\n" item)*
+      unsectioned:( unsectioned_item more_uitems:( "\n" unsectioned_item )* )?
+      sections:section*
       <ItemBranchy> {
         def content_item_enumerator
           Enumerator.new do |y|
-            y << item if item.content_item?
-            more_items.elements.each { |e| y << e.item if e.item.content_item? }
+            content_filter = ->(n){ n.content_item? and y << n }
+            if unsectioned
+              content_filter[unsectioned.unsectioned_item]
+              unsectioned.more_uitems.elements.each { |o| content_filter[o.unsectioned_item] }
+            end
+            sections.elements.each { |s| y << s }
           end
-        end
-        def content_items
-          content_item_enumerator.map { |i| i }
         end
       }
     end
-    rule item
-      assignment_line / section / whitespace_line
+    rule unsectioned_item
+      assignment_line / whitespace_line
     end
     rule comment
-      '#' [ \t]* body:[^\n]* {
+      '#' [ \t]* body:( ![\n] . )* {
         def content_item?
           false
         end
@@ -33,9 +35,9 @@ module Skylab::CodeMolester::Config
       comment:comment?  {
         def assignment_name ; assignment_name_node.text_value               end
         def content_item?   ; true                                          end
-        alias_method :item_name, :assignment_name
         def item_value      ; assignment_value.text_value                   end # etc
         def nt_name         ; :assignment_line                              end
+        alias_method :item_name, :assignment_name
       }
     end
     rule whitespace_line
@@ -48,10 +50,18 @@ module Skylab::CodeMolester::Config
     rule section
       section_line
       child_items:( "\n" item:( assignment_line / whitespace_line ) )*
-      <ItemBranchy> {
+      <Section> {
         def content_item?   ; true                                          end
         def nt_name         ; :section                                      end
         def section_name    ; section_line.section_name                     end
+        alias_method :item_name, :section_name
+        def content_item_enumerator
+          Enumerator.new do |y|
+            child_items.elements.each do |i|
+              y << i.item if i.item.content_item?
+            end
+          end
+        end
       }
     end
     rule section_line

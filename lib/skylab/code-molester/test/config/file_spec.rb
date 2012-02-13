@@ -9,8 +9,18 @@ describe ::Skylab::CodeMolester::Config::File do
     input_string and o.content = input_string
     o
   end
+  let(:config) do
+    klass.new(
+      :path     => path,
+      :content  => content
+    )
+  end
   let(:path) { TMPDIR.join('whatever') }
   let(:input_string) { }
+  def parses_ok
+    config.invalid_reason.should eql(nil)
+    config.valid?.should eql(true)
+  end
   it { should respond_to(:valid?) }
   it { should respond_to(:invalid_reason) }
   context "with regards to validity/parsing" do
@@ -37,7 +47,7 @@ describe ::Skylab::CodeMolester::Config::File do
       it "it is valid" do
         subject.invalid_reason.should eql(nil)
         subject.content_items.size.should eql(0)
-        subject.content_tree.elements.first.nt_name.should eql(:whitespace_line)
+        subject.content.should eql("      # ha-blah")
       end
     end
     context "when input is one assigmnent line" do
@@ -125,23 +135,36 @@ describe ::Skylab::CodeMolester::Config::File do
     context "if you had something invalid at the very first character" do
       let(:input_string) { '{' }
       it "will do the same as above" do
-        invalid_reason.should eql('Expecting "[", "#" or "\n" at beginning of line at line 1')
+        invalid_reason.should eql('Expecting "#", "\n" or "[" at beginning of line at line 1')
       end
     end
     context "if you had something invalid as the very last character" do
       let(:input_string) { "\n\n# foo\n  }" }
       it "will do the same as above"  do
-        invalid_reason.should eql('Expecting "[", "#" or "\n" at the end of "  }" at line 4')
+        invalid_reason.should eql('Expecting "#", "\n" or "[" at the end of "  }" at line 4')
       end
     end
   end
-  context "As for getting values" do
-    let(:config) do
-      klass.new(
-        :path     => path,
-        :content  => content
-      )
+  context "Basic overall grammar check:" do
+    context "grammar check: many values" do
+      let(:content) {"a=b\nc=d\ne=f"}
+      specify { parses_ok }
     end
+    context "grammar check: one section" do
+      let(:content) {'[nerp]'}
+      specify { parses_ok }
+    end
+    context "grammar check: two sections" do
+      let(:content) { "[nerp]\n[derp]" }
+      specify { parses_ok }
+    end
+    context "grammar check: blearg" do
+      let(:content) { "foo = bar\n [bizzo]\nfoo = biz\n[bazzo]\nfoo = buz" }
+      # let(:content) { "[bizzo]\nfoo=biz\n[bazzo]\nfoo=buz" }
+      specify { parses_ok }
+    end
+  end
+  context "As for getting values" do
     context "with a file with one value" do
       let(:content) { 'foo = bar' }
       it "can get it" do
@@ -154,11 +177,19 @@ describe ::Skylab::CodeMolester::Config::File do
         config['fo'].should eql(nil)
       end
     end
-    context "with a file with one section" do
-      let(:context) { "foo = bar\n [bizzo]\nfoo = biz\n[bazzo]foo = buz" }
-      #  it "does some magic hackery" do
-
-      # end
+    context "with a file with some sections" do
+      let(:content) { "foo = bar\n [bizzo]\nfoo = biz\n[bazzo]\nfoo = buz" }
+      specify { parses_ok }
+      context "when you use [] to get a section that exists" do
+        let(:subject) { config['bizzo'] }
+        specify { subject.should be_kind_of(::Skylab::CodeMolester::Config::FileNode::Section) }
+        specify { subject.section_name.should eql('bizzo') }
+        context "when you use [] to get a child value that exists" do
+          it "works" do
+            subject['foo'].should eql('biz')
+          end
+        end
+      end
     end
   end
   context "As for setting values" do
