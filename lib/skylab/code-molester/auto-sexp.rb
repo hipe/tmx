@@ -33,7 +33,6 @@ module Skylab::CodeMolester::AutoSexp
     def eles
     end
     def nt
-      :terminal
     end
     self
   end.new
@@ -62,6 +61,7 @@ module Skylab::CodeMolester::AutoSexp
     end
     def sexp
       h = sexp_helper
+      h.nt.nil? and return text_value # hack
       s = self.class.build_sexp(h.nt)
       if h.eles.nil?
         s.push text_value
@@ -75,6 +75,8 @@ module Skylab::CodeMolester::AutoSexp
             s[ele.index] = self.class.build_sexp(ele.name, el.text_value)
           when :nonterminal
             s[ele.index] = _sexp_reduce(el, ele.name || ele.method)
+          else
+            fail("nope: #{ele}")
           end
         end
       end
@@ -82,11 +84,17 @@ module Skylab::CodeMolester::AutoSexp
     end
     REDUCE = lambda do |sexp, node|
       if node.terminal?
-        # avoid these somewhow?
-        sexp.push(node.text_value)
+        # i don't love this
+        if String === sexp.last
+          sexp.last.concat node.text_value
+        else
+          sexp.push(node.text_value)
+        end
       elsif node.respond_to?(:sexp)
         sp = node.sexp
-        if sexp.symbol_name == sp.symbol_name
+        if String === sp
+          sexp.push sp
+        elsif sexp.symbol_name == sp.symbol_name
           sexp.concat sp[1..-1]
         else
           sexp.push sp
