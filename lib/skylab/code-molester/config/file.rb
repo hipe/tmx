@@ -7,7 +7,7 @@ module Skylab::CodeMolester
   module Config
     require DIR.join('../parse-failure-porcelain')
     require DIR.join('../sexp')
-    require "#{DIR}/file-node-classes"
+    require "#{DIR}/node"
   end
 
   class Config::File < Pathname
@@ -73,9 +73,9 @@ module Skylab::CodeMolester
   class << Config::File
     def parser_class
       @parser_class ||= begin
-        # require "#{Config::DIR}/file-node"
-        # Config::FileNodeParser
-        Treetop.load "#{Config::DIR}/file-node"
+        # require "#{Config::DIR}/file-parser" # if etc ..
+        Treetop.load "#{Config::DIR}/file-parser"
+        # result is Config::FileParser
       end
     end
     def parser

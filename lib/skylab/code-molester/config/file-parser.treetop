@@ -1,5 +1,5 @@
-module Skylab::CodeMolester::Config
-  grammar FileNode
+module Skylab::CodeMolester
+  grammar Config
     rule file
        n_1_nosecs:(
               n_1:unsectioned_item
