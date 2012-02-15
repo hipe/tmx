@@ -6,6 +6,8 @@ module ::Skylab
   module CodeMolester
     module TestSupport
     end
+    module TestNamespace
+    end
   end
 end
 
