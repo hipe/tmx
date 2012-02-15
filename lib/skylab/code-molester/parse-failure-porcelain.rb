@@ -4,6 +4,10 @@ require 'stringio'
 # isolation from the rest of the library (however, its test suite
 # is currently part of its parent module.)
 
+# This thing was stupid.  I basically wanted to customize treetop Parser#failure_reason
+# but ended up not really adding anything to it.
+#
+
 module Skylab ; end
 
 module Skylab::CodeMolester

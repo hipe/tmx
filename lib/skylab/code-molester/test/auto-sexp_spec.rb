@@ -11,13 +11,11 @@ module Skylab::CodeMolester
 end
 
 describe ::Skylab::CodeMolester::AutoSexp do
-  let(:parser_class) do
-    Treetop.load_from_string grammar
-  end
-  let(:parser) do
-    parser_class.new
-  end
-  let(:subject) { parser.parse(input).sexp }
+  let(:parser_class) { Treetop.load_from_string grammar }
+  let(:parser) { parser_class.new }
+  let(:parse_result) { parser.parse(input) }
+  let(:sexp) { parse_result.sexp }
+  let(:subject) { parse_result.sexp }
   context "With a grammar for first names" do
     let(:grammar) do
       <<-HERE.deindent
@@ -118,6 +116,70 @@ describe ::Skylab::CodeMolester::AutoSexp do
         let(:input) { "joe bob" }
         let(:expected) { [:person_name, [:first, "joe"], [:last, " ", "bob"] ] }
         specify { should eql(expected) }
+      end
+    end
+  end
+  context "When you want custom sexp classes" do
+    require File.expand_path('../../sexp', __FILE__)
+    module Skylab::CodeMolester::TestNamespace
+      class MySexp < Skylab::CodeMolester::Sexp
+      end
+      class Bread < MySexp
+        MySexp[:top_slice] = self
+        MySexp[:bottom_slice] = self
+        def calories
+          "#{unparse} has 100 calories"
+        end
+      end
+      module Sandwich
+        class MyNode < ::Treetop::Runtime::SyntaxNode
+          extend ::Skylab::CodeMolester::AutoSexp
+          sexp_factory_class MySexp
+        end
+      end
+    end
+    let(:grammar) do
+      <<-HERE.deindent
+        module Skylab::CodeMolester::TestNamespace
+          grammar Sandwich
+            rule sandwich
+              t_1_top_slice:bread
+              ' '
+              n_2_items:items
+              ' '
+              t_3_bottom_slice:bread
+              <MyNode>
+            end
+            rule bread
+              'rye' / 'white' / '7 grain'
+            end
+            rule items
+              t_1_item:item
+              n_2_more_items:( ' ' n_1_item:item )*
+              <MyNode>
+            end
+            rule item
+              'lettuce' / 'tomato'
+              <MyNode>
+            end
+          end
+        end
+      HERE
+    end
+    context "(this tree is ANNOYING)" do
+      let(:input) { 'rye lettuce tomato rye' }
+      let(:expected) { [:sandwich, [:top_slice, "rye"], [:items, [:item, "lettuce"], [:more_items, " tomato"]], [:bottom_slice, "rye"]] }
+      specify { should eql(expected) }
+    end
+    context "you register them as above and everything just works magically" do
+      let(:input) { '7 grain lettuce tomato 7 grain' }
+      context "a sexp node with whose label you registered a custom class, e.g. Bread" do
+        let(:subject) { sexp.detect(:top_slice).class }
+        specify { should eql(Skylab::CodeMolester::TestNamespace::Bread) }
+      end
+      context 'calling the custom method ("calories") on your custom sexp class' do
+        let(:subject) { sexp.detect(:top_slice).calories }
+        specify { should eql("7 grain has 100 calories") }
       end
     end
   end
