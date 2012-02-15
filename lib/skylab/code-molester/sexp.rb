@@ -9,6 +9,10 @@ module Skylab
         (b or 1 != a.size or ! a.first.kind_of?(Symbol)) and return super
         self[1..-1].detect { |n| n.kind_of?(Array) and n.first == a.first }
       end
+      def select *a, &b
+        (b or 1 != a.size or ! a.first.kind_of?(Symbol)) and return super
+        self[1..-1].select { |n| n.kind_of?(Array) and n.first == a.first }
+      end
       def to_s
         # although for now we are discouraging this structure, we allow for the possibility of pure-list nodes
         use_these = first.kind_of?(Symbol) ? self[1..-1] : self
@@ -26,6 +30,14 @@ module Skylab
       end
       def _sexp_fail msg
         raise RuntimeError.new(msg)
+      end
+      def symbol_name
+        first.kind_of?(Symbol) ? first : false
+      end
+    end
+    class << Sexp
+      def [] *a
+        new.concat([*a])
       end
     end
   end

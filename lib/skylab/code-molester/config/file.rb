@@ -6,14 +6,13 @@ require 'skylab/slake/muxer'
 module Skylab::CodeMolester
   module Config
     require DIR.join('../parse-failure-porcelain')
+    require DIR.join('../sexp')
     require "#{DIR}/file-node-classes"
   end
 
   class Config::File < Pathname
     extend ::Skylab::Slake::Muxer
     emits :all, :info => :all, :error => :all
-
-    include Config::FileNode::ItemBranchy
 
     alias_method :pathname_children, :children
 
@@ -25,10 +24,10 @@ module Skylab::CodeMolester
     def content_tree # @api private
       valid? ? @content_tree : false
     end
-    %w(content_item_enumerator content_items).each do |n| # @delegator
-      define_method(n) do
+    %w(content_items []).each do |n| # @delegator
+      define_method(n) do |*a|
         valid? or return false
-        content_tree.send(n)
+        @content_tree.send(n, *a)
       end
     end
     def initialize(*a, &b)
@@ -45,10 +44,10 @@ module Skylab::CodeMolester
     def pretty
       ::Skylab::Face::PathTools.pretty_path(to_s)
     end
-    def text_value
-      valid? ? @content_tree.text_value : @content_string
+    def unparse
+      valid? ? @content_tree.unparse : @content_string
     end
-    alias_method :content, :text_value
+    alias_method :content, :unparse
     def write
       fail("reimplement me")
     end
@@ -56,7 +55,9 @@ module Skylab::CodeMolester
       if @valid.nil?
         @content_string.nil? and @content_string = ''
         p = self.class.parser
-        if @content_tree = p.parse(@content_string) # nil ok
+        @content_tree = nil
+        if expensive = p.parse(@content_string) # nil ok
+          @content_tree = expensive.sexp
           @content_string = nil
           @valid = true
           @invalid_reason = nil
@@ -71,6 +72,8 @@ module Skylab::CodeMolester
   class << Config::File
     def parser_class
       @parser_class ||= begin
+        # require "#{Config::DIR}/file-node"
+        # Config::FileNodeParser
         Treetop.load "#{Config::DIR}/file-node"
       end
     end

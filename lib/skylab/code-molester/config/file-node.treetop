@@ -1,77 +1,48 @@
 module Skylab::CodeMolester::Config
   grammar FileNode
     rule file
-      unsectioned:( unsectioned_item more_uitems:( "\n" unsectioned_item )* )?
-      sections:section*
-      <ItemBranchy> {
-        def content_item_enumerator
-          Enumerator.new do |y|
-            content_filter = ->(n){ n.content_item? and y << n }
-            if unsectioned
-              content_filter[unsectioned.unsectioned_item]
-              unsectioned.more_uitems.elements.each { |o| content_filter[o.unsectioned_item] }
-            end
-            sections.elements.each { |s| y << s }
-          end
-        end
-      }
+       n_1_nosecs:(
+              n_1:unsectioned_item
+              n_2:(
+              w_1:"\n"
+         n_2_item:unsectioned_item
+              )*
+       )?
+     n_2_sections:section* <Node>
     end
     rule unsectioned_item
       assignment_line / whitespace_line
     end
     rule comment
-      '#' [ \t]* body:( ![\n] . )* {
-        def content_item?
-          false
-        end
-      }
+              w_1:('#' [ \t]*)
+         t_2_body:( ![\n] . )* <Node>
     end
     rule assignment_line
-      [ \t]*
-      assignment_name_node:[_a-zA-Z0-9]+
-      [ \t]* '=' [ \t]*
-      assignment_value:( [ \t]* ( ![ \t#\n] . )+ )*
-      [ \t]*
-      comment:comment?  {
-        def assignment_name ; assignment_name_node.text_value               end
-        def content_item?   ; true                                          end
-        def item_value      ; assignment_value.text_value                   end # etc
-        def nt_name         ; :assignment_line                              end
-        alias_method :item_name, :assignment_name
-      }
+              w_1:[ \t]*
+         t_2_name:[_a-zA-Z0-9]+
+              w_3:( [ \t]* '=' [ \t]* )
+        t_4_value:( [ \t]* ( ![ \t#\n] . )+ )*
+              w_5:[ \t]*
+      n_6_comment:comment? <Node>
     end
     rule whitespace_line
-      [ \t]* comment?
-      {
-        def content_item?   ; false                                         end
-        def nt_name         ; :whitespace_line                              end
-      }
+              w_1:[ \t]*
+      n_2_comment:comment? <Node>
     end
     rule section
-      section_line
-      child_items:( "\n" item:( assignment_line / whitespace_line ) )*
-      <Section> {
-        def content_item?   ; true                                          end
-        def nt_name         ; :section                                      end
-        def section_name    ; section_line.section_name                     end
-        alias_method :item_name, :section_name
-        def content_item_enumerator
-          Enumerator.new do |y|
-            child_items.elements.each do |i|
-              y << i.item if i.item.content_item?
-            end
-          end
-        end
-      }
+       n_1_header:section_line
+        n_2_items:(
+              w_1:"\n"
+              n_2:( assignment_line / whitespace_line )
+        )* <Node>
     end
     rule section_line
-      [ \t]* '[' [ \t]*
-      name_node:[-_a-z0-9a\.]+
-      [ \t]* ']' [ \t]* comment:comment?
-      {
-        def nt_name         ; :section_line                                 end
-        def section_name    ; name_node.text_value                          end
-      }
+              w_1:( [ \t]* '[' [ \t]* )
+         t_2_name:[-_a-z0-9a\.]+
+              n_3:(
+              w_1:( [ \t]* ']' [ \t]* )
+      n_2_comment:comment?
+               ) <Node>
     end
   end
 end

@@ -21,6 +21,16 @@ describe ::Skylab::CodeMolester::Config::File do
     config.invalid_reason.should eql(nil)
     config.valid?.should eql(true)
   end
+  def unparses_ok
+    t = config.content_tree
+    unp = t.unparse
+    par = content
+    unp.should eql(par)
+  end
+  def parses_and_unparses_ok
+    parses_ok
+    unparses_ok
+  end
   it { should respond_to(:valid?) }
   it { should respond_to(:invalid_reason) }
   context "with regards to validity/parsing" do
@@ -29,6 +39,7 @@ describe ::Skylab::CodeMolester::Config::File do
         subject.valid?.should eql(true)
       end
       it "has no content items" do
+        subject = self.subject
         subject.content_items.size.should eql(0)
         subject.content.should eql('')
       end
@@ -39,7 +50,7 @@ describe ::Skylab::CodeMolester::Config::File do
         subject = self.subject
         subject.invalid_reason.should eql(nil)
         subject.content_items.size.should eql(0)
-        subject.text_value.should eql(input_string)
+        subject.unparse.should eql(input_string)
       end
     end
     context "when input is one comment" do
@@ -55,16 +66,16 @@ describe ::Skylab::CodeMolester::Config::File do
         subject.invalid_reason.should eql(nil)
         subject.content_items.size.should eql(1)
         @line = subject.content_items.first
-        @line.nt_name.should eql(:assignment_line)
+        @line.symbol_name.should eql(:assignment_line)
       end
       def name
-        @line.assignment_name
+        @line.detect(:name).last
       end
       def value
-        @line.assignment_value.text_value
+        @line.detect(:value).last
       end
       def comment
-        @line.comment.body.text_value
+        @line.detect(:comment).detect(:body).unparse
       end
       context("as the ideal, general case") do
         let(:input_string) { "foo=bar" }
@@ -101,11 +112,11 @@ describe ::Skylab::CodeMolester::Config::File do
       before(:each) do
         subject.invalid_reason.should eql(nil)
         (ll = subject.content_items).count.should eql(1)
-        (line = ll.first).nt_name.should eql(:section)
+        (line = ll.first).symbol_name.should eql(:section)
         @line = line
       end
       def section_name
-        @line.section_name
+        @line.detect(:header).detect(:section_line).detect(:name).last
       end
       context "in the ideal, general case" do
         let(:input_string) { "[foo]" }
@@ -148,20 +159,19 @@ describe ::Skylab::CodeMolester::Config::File do
   context "Basic overall grammar check:" do
     context "grammar check: many values" do
       let(:content) {"a=b\nc=d\ne=f"}
-      specify { parses_ok }
+      specify { parses_and_unparses_ok }
     end
     context "grammar check: one section" do
       let(:content) {'[nerp]'}
-      specify { parses_ok }
+      specify { parses_and_unparses_ok }
     end
     context "grammar check: two sections" do
       let(:content) { "[nerp]\n[derp]" }
-      specify { parses_ok }
+      specify { parses_and_unparses_ok }
     end
     context "grammar check: blearg" do
       let(:content) { "foo = bar\n [bizzo]\nfoo = biz\n[bazzo]\nfoo = buz" }
-      # let(:content) { "[bizzo]\nfoo=biz\n[bazzo]\nfoo=buz" }
-      specify { parses_ok }
+      specify { parses_and_unparses_ok }
     end
   end
   context "As for getting values" do
@@ -170,8 +180,11 @@ describe ::Skylab::CodeMolester::Config::File do
       it "can get it" do
         config['foo'].should eql('bar')
       end
-      it "we don't do magic conversion to symbols for you" do
-        config[:foo].should eql(nil)
+      context "if you use a symbol for a key" do
+        it "we don't do magic conversion for you, in fact it throws for now" do
+          lambda { config[:foo] }.should raise_exception(
+            TypeError, /can't convert Symbol into Integer/)
+        end
       end
       it "will get nil if it asks for a name that isn't there" do
         config['fo'].should eql(nil)
@@ -182,11 +195,12 @@ describe ::Skylab::CodeMolester::Config::File do
       specify { parses_ok }
       context "when you use [] to get a section that exists" do
         let(:subject) { config['bizzo'] }
-        specify { subject.should be_kind_of(::Skylab::CodeMolester::Config::FileNode::Section) }
+        specify { subject.should be_kind_of(::Skylab::CodeMolester::Config::Section) }
         specify { subject.section_name.should eql('bizzo') }
         context "when you use [] to get a child value that exists" do
           it "works" do
-            subject['foo'].should eql('biz')
+            o = subject['foo']
+            o.should eql('biz')
           end
         end
       end
