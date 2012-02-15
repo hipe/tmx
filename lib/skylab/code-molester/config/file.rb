@@ -24,12 +24,13 @@ module Skylab::CodeMolester
     def content_tree # @api private
       valid? ? @content_tree : false
     end
-    %w(content_items []).each do |n| # @delegator
+    %w(content_items [] set_value).each do |n| # @delegator
       define_method(n) do |*a|
         valid? or return false
         @content_tree.send(n, *a)
       end
     end
+    alias_method :[]=, :set_value
     def initialize(*a, &b)
       @valid = @invalid_reason = nil
       b and b.call(self)

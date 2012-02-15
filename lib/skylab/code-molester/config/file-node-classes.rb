@@ -18,6 +18,7 @@ module Skylab::CodeMolester::Config
       end
     end
   end
+  S = Sexp
   MAP = Hash.new(Sexp)
   class << Sexp
     def for name, *a
@@ -25,6 +26,7 @@ module Skylab::CodeMolester::Config
       sexp.concat [name, *a]
       sexp
     end
+    alias_method :[], :for
   end
   class ContentItemBranch < Sexp
     def [] name
@@ -42,6 +44,13 @@ module Skylab::CodeMolester::Config
     def item_leaf?
       false
     end
+    def set_value name, value
+      if i = content_items.detect { |i| name == i.item_name }
+        _update_value i, value
+      else
+        _create_value name, value
+      end
+    end
   end
   class FileSexp < ContentItemBranch
     MAP[:file] = self
@@ -52,6 +61,11 @@ module Skylab::CodeMolester::Config
       b2 = b.content_items
       [*a2, *b2]
       # [*self[1].content_items, *self[2].content_items]
+    end
+    def _create_value name, value
+      # the section gets created here
+      sec = detect(:nosecs) or sec = Nosecs[:nosecs]
+      AssignmentLine.create(name, value, sec)
     end
   end
   class Nosecs < ContentItemBranch
@@ -89,6 +103,16 @@ module Skylab::CodeMolester::Config
     end
     def item_name
       self[2][1]
+    end
+  end
+  class << AssignmentLine
+    def create name, value, parent
+      # use the whitespace formatting of the previous item if you can
+      tmpl = parent.select(:assignment_line).last || [nil, '  ', nil, ' = ', nil]
+      o = self[:assignment_line, tmpl[1], S[:name, name.to_s], tmpl[3], S[:value, value.to_s]]
+      parent.push o
+      parent.push "\n"
+      o
     end
   end
 end
