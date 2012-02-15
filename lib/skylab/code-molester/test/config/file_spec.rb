@@ -216,44 +216,51 @@ describe ::Skylab::CodeMolester::Config::File do
     context "if you start with a config file that doesn't exist" do
       let(:path) { TMPDIR.join("my-config.conf") }
       let(:config) { klass.new(:path => path) }
+      def is_valid
+        config.valid?.should eql(true)
+        config.content_tree.should be_kind_of(Array)
+      end
       it "It knows it doesn't exist, and reports having the empty string as content" do
         config.exist?.should eql(false)
         config.content.should eql('')
       end
       it "It sees itself as valid, and will even show you a parse tree" do
-        config.valid?.should eql(true)
-        config.content_tree.should be_kind_of(Array)
+        is_valid
       end
       context "if you set its content explicitly with a string" do
         let (:want_content) do
           <<-HERE.deindent
-            times = fun
-            [work]
-              times = funner
+            who = hah
+              boo = bah
             [play]
-              times = funnest
+              times = fun
+            [work]
+              times = funner # good times here
           HERE
         end
         before(:each) do
           config.content = want_content
         end
         it "lets you access the values even tho the file hasn't been written yet" do
-          config['times'].should eql('fun')
+          config['boo'].should eql('bah')
           config['work']['times'].should eql('funner')
-          config['play']['times'].should eql('funnest')
+          config['play']['times'].should eql('fun')
           config['nope'].should eql(nil)
           config['work']['nope'].should eql(nil)
         end
         context "lets you add new values" do
-          it "to the root node" do
+          it "to the root node (note the inherited whitespace)" do
             config['new_item'] = 'new value'
-            config.content.split("\n")[0,2].join("\n").should eql(<<-HERE.deindent)
-              times = fun
-              new_item = new value
+            config.content.split("\n")[0,3].join("\n").should eql(<<-HERE.deindent)
+              who = hah
+                boo = bah
+                new_item = new value
             HERE
           end
-          it "to existing child nodes"
-          it "it lets you crate new empty sections"
+          it "to existing child nodes (note the unparsing of one section only!)", {wip:true} do
+            config['work']['nerpus'] = 'derpus'
+          end
+          it "it lets you create new empty sections"
         end
       end
     end
