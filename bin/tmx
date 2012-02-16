@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 
 require File.expand_path('../../lib/skylab/tmx/cli.rb', __FILE__)
-require 'ruby-debug' if ENV['RUBY_DEBUG'] # i'm so sick of mentally git ignoring this line
 
 Skylab::Tmx::Cli.new.run ARGV
