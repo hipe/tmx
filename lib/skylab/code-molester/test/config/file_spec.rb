@@ -190,6 +190,48 @@ describe ::Skylab::CodeMolester::Config::File do
         config['fo'].should_not eql(nil)
       end
     end
+    context "HOWEVER with the 'value_items' pseudoclass", {focus:true} do
+      let(:content) { "foo = bar\nbiff = baz\n[allo]" }
+      it "you can see its keys like a hash" do
+        config.value_items.keys.should eql(%w(foo biff))
+      end
+      it "you can iterate over its values like a sexp" do
+        ks = %w(biff foo)
+        vs = %w(baz bar)
+        config.value_items.each do |item|
+          item.key.should   eql(ks.pop)
+          item.value.should eql(vs.pop)
+        end
+      end
+      it "you can iterate over its values like a hash" do
+        ks = %w(biff foo)
+        vs = %w(baz bar)
+        config.value_items.each do |k, v|
+          k.should eql(ks.pop)
+          v.should eql(vs.pop)
+        end
+      end
+      it "you can access its values like a hash (note this returns values not nodes)" do
+        config.value_items['foo'].should eql('bar')
+      end
+      it "accessing values that don't exist will not create bs" do
+        config.value_items['baz'].should eql(nil)
+      end
+      it "you can set existing values" do
+        config.value_items['foo'] = 'blamo'
+        config.value_items['foo'].should eql('blamo')
+        config.content.split("\n").first.should eql("foo = blamo")
+      end
+      it "you can create new values" do
+        config['bleuth'] = 'michael'
+        config.content.should eql(<<-HERE.deindent)
+          foo = bar
+          biff = baz
+          bleuth = michael
+          [allo]
+        HERE
+      end
+    end
     context "with a file with some sections" do
       let(:content) { "foo = bar\n [bizzo]\nfoo = biz\n[bazzo]\nfoo = buz" }
       specify { parses_ok }
