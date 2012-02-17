@@ -6,19 +6,28 @@ module Skylab::CodeMolester::Config
     # (the test below cannot simply test for Fixnum-based key b/c it also must take ranges)
     def [] name
       String === name or return super
-      i = content_items.detect { |i| name == i.item_name }
-      if i and i.item_leaf?
-        i.item_value
+      if ( i = content_items.detect { |ii| name == ii.item_name } )
+        if i.item_leaf?
+          i.item_value
+        else
+          i
+        end
       else
-        i
+        _no_value name
       end
     end
     def []= k, v
       String === k or return super
       set_value k, v
+      v
     end
     def item_leaf?
       false
+    end
+    def key? name
+      !! content_items.detect { |ii| name == ii.item_name }
+    end
+    def _no_value name
     end
     def set_value name, value
       if i = content_items.detect { |i| name == i.item_name }
@@ -43,6 +52,10 @@ module Skylab::CodeMolester::Config
       # is less hacky to just assume it is there.  "Should" be there for all such valid trees.
       sec = detect(:nosecs) or fail("Invalid file sexp: child not found: nosecs")
       AssignmentLine.create(name, value, sec)
+      nil
+    end
+    def _no_value name
+      Section.create name, detect(:sections)
     end
   end
   class Nosecs < ContentItemBranch
@@ -75,6 +88,23 @@ module Skylab::CodeMolester::Config
     end
     alias_method :section_name, :item_name
   end
+  class << Section
+    def create name, parent
+      if tmpl = parent.last(:section)
+        sl = tmpl.detect(:header).detect(:section_line)
+        s0 = sl[1]
+        s1 = sl[3][1]
+      else
+        s0 = '['
+        s1 = ']'
+      end
+      sect = S[:section, S[:header, S[:section_line, s0, S[:name, name.to_s], S[:n_3, s1]]],
+        S[:items, "\n"]]
+      parent.push "\n" # this probably breaks syntax, let's see if it's ok
+      parent.push sect
+      sect
+    end
+  end
   class AssignmentLine < Sexp
     Sexp[:assignment_line] = self
     NAME = 2
@@ -95,15 +125,17 @@ module Skylab::CodeMolester::Config
     def create name, value, parent
       # use the whitespace formatting of the previous item if you can
       if tmpl = parent.select(:assignment_line).last
-        # cmnt = tmpl.detect(:comment) or fail("expecting comment nodes to exist for all assignment lines.")
-        $stderr.puts "NOTICE: do the newline hack here @todo #{__FILE__}#{__LINE__}"
+        # anything?
       else
         tmpl = [nil, default_indent, nil, ' = ', nil]
       end
-      o = self[:assignment_line, tmpl[1], S[:name, name.to_s], tmpl[3], S[:value, value.to_s]]
-      parent.push o
-      parent.push "\n"
-      o
+      al = self[:assignment_line, tmpl[1], S[:name, name.to_s], tmpl[3], S[:value, value.to_s]]
+      if parent.size > 1 and parent.last.respond_to?(:symbol_name) and :assignment_line == parent.last.symbol_name
+        parent.push "\n" # this is so bad
+      end
+      parent.push al
+      parent.push "\n" # per the grammar
+      nil
     end
     attr_accessor :default_indent
   end

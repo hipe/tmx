@@ -10,6 +10,11 @@ module Skylab
         (b or 1 != a.size or !(Symbol === a.first)) and return super
         self[1..-1].detect { |n| Array === n and n.first == a.first }
       end
+      def last *a
+        0 == a.size and return super
+        i = (size-1).downto(1).detect { |i| Array === self[i] and self[i].first == a.first }
+        self[i] if i
+      end
       def select *a, &b
         (b or 1 != a.size or !(Symbol === a.first)) and return super
         self[1..-1].select { |n| Array === n and n.first == a.first }

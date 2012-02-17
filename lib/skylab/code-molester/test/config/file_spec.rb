@@ -186,8 +186,8 @@ describe ::Skylab::CodeMolester::Config::File do
             TypeError, /can't convert Symbol into Integer/)
         end
       end
-      it "will get nil if it asks for a name that isn't there" do
-        config['fo'].should eql(nil)
+      it "COUNTERITUITIVELY will not get nil if it asks for a name that isn't there" do
+        config['fo'].should_not eql(nil)
       end
     end
     context "with a file with some sections" do
@@ -245,7 +245,9 @@ describe ::Skylab::CodeMolester::Config::File do
           config['boo'].should eql('bah')
           config['work']['times'].should eql('funner')
           config['play']['times'].should eql('fun')
-          config['nope'].should eql(nil)
+          config.key?('nope').should eql(false)
+          config['nope'].should_not eql(nil)
+          config['work'].key?('nope').should eql(false)
           config['work']['nope'].should eql(nil)
         end
         context "lets you add new values" do
@@ -257,10 +259,24 @@ describe ::Skylab::CodeMolester::Config::File do
                 new_item = new value
             HERE
           end
-          it "to existing child nodes (note the unparsing of one section only!)", {wip:true} do
+          it "to existing child nodes (note the unparsing of one section only!)" do
             config['work']['nerpus'] = 'derpus'
+            config['work'].unparse.strip.should eql(<<-HERE.deindent)
+              [work]
+                times = funner # good times here
+                nerpus = derpus
+            HERE
           end
-          it "it lets you create new empty sections"
+          it "lets you create a section by assigning something to it" do
+            config['goal']['dream'] = 'deadline'
+            have = config.content.to_s.split("\n")[-4,4].join("\n")
+            have.should eql(<<-HERE.deindent)
+              [work]
+                times = funner # good times here
+              [goal]
+                dream = deadline
+            HERE
+          end
         end
       end
     end
