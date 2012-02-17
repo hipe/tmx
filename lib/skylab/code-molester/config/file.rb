@@ -24,7 +24,7 @@ module Skylab::CodeMolester
     def content_tree # @api private
       valid? ? @content_tree : false
     end
-    %w([] content_items key? set_value).each do |n| # @delegator
+    %w([] content_items key? set_value value_items).each do |n| # @delegator
       define_method(n) do |*a|
         valid? or return false
         @content_tree.send(n, *a)

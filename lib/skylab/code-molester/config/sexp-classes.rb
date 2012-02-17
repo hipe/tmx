@@ -1,6 +1,31 @@
 module Skylab::CodeMolester::Config
   class Sexp < ::Skylab::CodeMolester::Sexp ; end
   S = Sexp
+  class ValuesPseudohash < ::Enumerator
+    def [] key
+      d = detect { |o| key == o.key } or return nil
+      d.value
+    end
+    def []= key, value
+      @local_root.set_value(key, value)
+    end
+    def initialize local_root, &b
+      @local_root = local_root
+      super(&b)
+    end
+    def each &b
+      if 2 == b.arity
+        super do |el|
+          b.call(el.key, el.value)
+        end
+      else
+        super
+      end
+    end
+    def keys
+      map { |v| v.key }
+    end
+  end
   class ContentItemBranch < Sexp
     # note that for now this is hard-coded to assume string and not symbol keys!
     # (the test below cannot simply test for Fixnum-based key b/c it also must take ranges)
@@ -36,9 +61,18 @@ module Skylab::CodeMolester::Config
         _create_value name, value
       end
     end
+    def value_items
+      this = _assignments_sexp
+      ValuesPseudohash.new(self) do |y|
+        this.select(:assignment_line).each { |a| y << a }
+      end
+    end
   end
   class FileSexp < ContentItemBranch
     Sexp[:file] = self
+    def _assignments_sexp
+      self[1]
+    end
     def content_items
       a = self[1]
       a2 = a.content_items
@@ -56,6 +90,9 @@ module Skylab::CodeMolester::Config
     end
     def _no_value name
       Section.create name, detect(:sections)
+    end
+    def _update_value assmt, value
+      assmt.set_item_value value
     end
   end
   class Nosecs < ContentItemBranch
@@ -117,8 +154,13 @@ module Skylab::CodeMolester::Config
     def item_value
       self[VALUE][1]
     end
+    alias_method :value, :item_value # compat
     def item_name
       self[NAME][1]
+    end
+    alias_method :key, :item_name # compat
+    def set_item_value value
+      self[VALUE][1] = value.to_s
     end
   end
   class << AssignmentLine
