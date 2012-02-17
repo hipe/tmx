@@ -5,7 +5,6 @@ require 'fileutils'
 require 'optparse'
 require 'json'
 require 'open3'
-require 'ruby-debug'
 require 'stringio'
 require 'time'
 

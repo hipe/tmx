@@ -1,6 +1,5 @@
 require File.expand_path('../helper', __FILE__)
 require File.expand_path('../../graph', __FILE__)
-require 'ruby-debug'
 
 module Skylab
   module Dependency
