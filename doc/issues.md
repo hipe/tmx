@@ -1,5 +1,6 @@
 [#060] 2012-02-18 tmx: merge issues
 [#058] @closed muxer: rename things
+[#057] @open porcelain: events
 [#056] 2011-07-19 @open permute
 [#055] 2012-02-18 @open code molester: file services (write)
 [#054] 2012-02-17 @close code molester: make values accessor
