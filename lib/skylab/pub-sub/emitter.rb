@@ -18,7 +18,13 @@ module Skylab::PubSub
       end
     end
     def event_cloud
-      @event_cloud ||= SemanticTagCloud.new
+      @event_cloud ||= begin
+        if (k = ancestors[self == ancestors.first ? 1 : 0]).respond_to?(:event_cloud)
+          SemanticTagCloud.new(k.event_cloud)
+        else
+          SemanticTagCloud.new
+        end
+      end
     end
   end
 end
@@ -83,6 +89,12 @@ module Skylab::PubSub::Emitter
       visit[tag]
       found
     end
+    def _deep_copy_init other
+      @order = other.instance_variable_get('@order').dup
+      @order.each do |k|
+        self[k] = other[k].duplicate
+      end
+    end
     def describe
       @order.map { |key| self[key].describe }.join("\n")
     end
@@ -95,8 +107,12 @@ module Skylab::PubSub::Emitter
       end
       order.map { |k| self[k] }
     end
-    def initialize
-      @order = []
+    def initialize other=nil
+      if other
+        _deep_copy_init other
+      else
+        @order = []
+      end
     end
     def merge_definition! *nodes
       resulting_tags = []
@@ -131,6 +147,9 @@ module Skylab::PubSub::Emitter
     end
   end
   class Tag
+    def duplicate
+      self.class.new(@name, :ancestors => @ancestors.dup, :children => @children.dup)
+    end
     def initialize name, opts=nil
       name.kind_of?(Symbol) or raise ArgumentError.new("need symbol had #{name.class}")
       @name = name
