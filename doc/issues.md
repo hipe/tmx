@@ -1,6 +1,11 @@
 [#060] 2012-02-18 tmx: merge issues
 [#058] @closed muxer: rename things
+[#054] 2012-02-17 @close code molester: make values accessor
+[#053] 2012-02-14 @closed code molester: pure refactor: deepening
+[#052] 2012-02-11 @closed code molester: for fun write a config parser
+[#051] 2012-02-11 @open set program name explicitly, streams
 [#050] 2012-02-11 issue: change implementation of search to take lambdas
+[#049] 2012-02-11 @open add "bleed" feature
 [#048] 2012-02-10 @open show should list (for now)
 [#047] 2012-02-07 @closed all: mark all closed issues as closed
 [#046] 2012-02-07 @open issue: add verbose/debug mode, put such output there
