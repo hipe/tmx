@@ -2,7 +2,7 @@
 [#061] 2012-02-18 @closed pub-sub: fix issue with deep trees
 [#060] 2012-02-18 @closed tmx: merge issues
 [#058] 2012-02-18 @closed muxer: rename things
-[#057] 2012-02-18 @open porcelain: events
+[#057] 2012-02-18 @closed porcelain: events
 [#056] 2011-07-19 @open permute
 [#055] 2012-02-18 @open code molester: file services (write)
 [#054] 2012-02-17 @closed code molester: make values accessor
