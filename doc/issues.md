@@ -1,3 +1,4 @@
+[#062] 2012-02-18 @open pub-sub: touch events
 [#061] 2012-02-18 pub-sub: @closed fix issue with deep trees
 [#060] 2012-02-18 tmx: merge issues
 [#058] @closed muxer: rename things
