@@ -1,3 +1,4 @@
+[#061] 2012-02-18 pub-sub: @closed fix issue with deep trees
 [#060] 2012-02-18 tmx: merge issues
 [#059] 2012-02-18 @open pub-sub: no redundant events per listener
 [#058] @closed muxer: rename things
