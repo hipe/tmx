@@ -12,7 +12,11 @@ module Skylab::CodeMolester
 
   class Config::File < Pathname
     extend ::Skylab::Slake::Muxer
-    emits :all, :info => :all, :error => :all
+    emits :all,
+          :error     => :all,
+          :info      => :all,
+          :info_head => :all,
+          :info_tail => :all
 
     alias_method :pathname_children, :children
 
@@ -31,6 +35,10 @@ module Skylab::CodeMolester
       end
     end
     alias_method :[]=, :set_value
+    def error msg
+      emit(:error, msg)
+      false
+    end
     def initialize(*a, &b)
       @valid = @invalid_reason = nil
       b and b.call(self)
@@ -49,8 +57,46 @@ module Skylab::CodeMolester
       valid? ? @content_tree.unparse : @content_string
     end
     alias_method :content, :unparse
+
+    # the below is wayy to porcelain-y to be here, but is just
+    # a quick and dirty until we figure out a sane evented API for it
+    # (because we certainly have the tools at this point)
+    #
     def write
-      fail("reimplement me")
+      if valid?
+        content = self.content
+        if content == ''
+          emit(:info, "For now, won't write empty files.")
+          return nil
+        end
+      else
+        return error("Won't write #{pretty} - #{invalid_reason}")
+      end
+      if exist?
+        if content == read
+          emit(:info, "No change: #{pretty}")
+          return nil
+        else
+          # backup - @todo FileServices
+          emit(:info_head, "Rewriting #{pretty}")
+          do_write = true
+        end
+      elsif dirname.exist?
+        emit(:info_head, "Writing #{pretty}")
+        do_write = true
+      else
+        return error("Won't write #{pretty}, parent directory not found.")
+      end
+      if do_write
+        if exist? and (! writable?)
+          emit(:info_tail, " .. not writable!")
+          return error("Couldn't write #{to_s} - file was not writable")
+        end
+        bytes = nil
+        File.open(to_s, 'w+') { |fh| bytes = fh.write(content) }
+        emit(:info_tail, " .. done.")
+      end
+      bytes
     end
     def valid?
       if @valid.nil?
