@@ -11,6 +11,10 @@ module Skylab::GitStashUntracked
   class Porcelain
     extend ::Skylab::Porcelain
 
+    porcelain do
+      emits :payload => :all
+    end
+
     DRY_RUN = ->(ctx) { on('-n', '--dry-run', "Dry run.") { ctx[:dry_run] = true } }
     STASHES = ->(ctx) do
       ctx[:stashes] = '../Stashes'
