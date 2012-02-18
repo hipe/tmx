@@ -1,10 +1,10 @@
-require File.expand_path('../../muxer', __FILE__)
-require File.expand_path('../support', __FILE__)
+require File.expand_path('../../emitter', __FILE__)
+require File.expand_path('../test-support', __FILE__)
 
-describe Skylab::Slake::Muxer do
+describe Skylab::PubSub::Emitter do
   let(:klass) do
     Class.new.class_eval do
-      extend Skylab::Slake::Muxer
+      extend Skylab::PubSub::Emitter
       emits :informational, :error => :informational, :info => :informational
       self
     end
