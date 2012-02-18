@@ -40,7 +40,7 @@ describe Skylab::PubSub::Emitter do
     the_child_msg.should eql("info: foo")
     the_parent_msg.should eql("info: foo")
   end
-  it "but the listener can check the event-id of the event if it wants to, it will be the same event", {focus:true} do
+  it "but the listener can check the event-id of the event if it wants to, it will be the same event" do
     id_one = id_two = nil
     emitter.on_informational { |e| id_one = e.event_id }
     emitter.on_info          { |e| id_two = e.event_id }
@@ -48,6 +48,42 @@ describe Skylab::PubSub::Emitter do
     id_one.should_not eql(nil)
     id_one.should eql(id_two)
     id_two.should be_kind_of(Fixnum)
+  end
+  context "also, you can use the touch/touched? facility" do
+    it "by explicitly touching and checking for touched?" do
+      emitter.tap do |e|
+        c = Struct.new(:a, :i, :e).new(0, 0, 0)
+        e.on_informational { |e| if ! e.touched? then e.touch ; c.a += 1  end }
+        e.on_info { |e| c.i += 1 ; e.touch }
+        e.on_error { |e| c.e += 1 }
+        e.emit(:informational)
+        c.values.should eql([1, 0, 0])
+        e.emit(:info)
+        c.values.should eql([1, 1, 0])
+        e.emit(:error)
+        c.values.should eql([2, 1, 1])
+      end
+    end
+    context "touch will happen automatically when a message is accessed" do
+      it "without touch check" do
+        emitter.tap do |e|
+          lines = []
+          e.on_informational { |e| lines << "inform:#{e}" }
+          e.on_info          { |e| lines << "info:#{e}" }
+          e.emit(:info, "A")
+          lines.should eql(%w(info:A inform:A))
+        end
+      end
+      it "with touch check" do
+        emitter.tap do |e|
+          lines = []
+          e.on_informational { |e| lines << "inform:#{e}" unless e.touched? }
+          e.on_info          { |e| lines << "info:#{e}"   unless e.touched? }
+          e.emit(:info, "A")
+          lines.should eql(%w(info:A))
+        end
+      end
+    end
   end
   context "graphs" do
     let(:klass) do
