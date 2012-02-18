@@ -31,6 +31,7 @@ module Skylab::Slake::Muxer
     end
     alias_method :event_id, :object_id
     attr_reader :message
+    alias_method :to_s, :message
     def type
       @tag.name
     end
