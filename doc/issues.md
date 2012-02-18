@@ -1,3 +1,4 @@
+[#063] 2012-02-18 @open gsu: fix it to use new porcelain
 [#062] 2012-02-18 @closed pub-sub: touch events
 [#061] 2012-02-18 @closed pub-sub: fix issue with deep trees
 [#060] 2012-02-18 @closed tmx: merge issues
