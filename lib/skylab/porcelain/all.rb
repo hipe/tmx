@@ -1,8 +1,8 @@
 require 'optparse'
 require 'strscan'
 require File.expand_path('../tite-color', __FILE__)
-
-module Skylab ; end
+require File.expand_path('../../../skylab', __FILE__)
+require 'skylab/pub-sub/emitter'
 
 module Skylab::Porcelain
   def self.extended mod
@@ -20,7 +20,11 @@ module Skylab::Porcelain
       @current_definition[:argument_syntax] = str
     end
     def init_dsl
-      @current_definition = @runtime_config_blocks = nil
+      @porcelain_config_blocks = Hash.new { |h, k| h[k] = [] }
+      @current_definition = nil
+    end
+    def emits *a
+      porcelain { self.singleton_class.emits(*a) }
     end
     def method_added method_name
       if @current_definition
@@ -34,7 +38,7 @@ module Skylab::Porcelain
       @current_definition[:option_syntax] = block
     end
     def porcelain &block
-      (@runtime_config_blocks ||= []).push block
+      @porcelain_config_blocks[:runtime_class].push block
     end
   end
   module ClientModuleMethods
@@ -370,30 +374,21 @@ module Skylab::Porcelain
 
   # .. below is invocation mechanics
   module ClientInstanceMethods
-    attr_reader :handlers
     def init_porcelain &block
-      @handlers = {}
-      if block_given?
-        if block.arity >= 1
-          yield self
-        else
-          instance_eval(&block)
-        end
-      end
-      @handlers[:default] ||= lambda { |e| $stderr.puts "(unhandled:) #{e}" }
+      @runtime_event_subscriptions = block
     end
     alias_method :initialize, :init_porcelain
     def invoke argv
-      @runtime = Runtime.new(argv, self)
+      bs = self.class.instance_variable_get('@porcelain_config_blocks')
+      if @runtime_event_subscriptions
+        es = @runtime_event_subscriptions
+        bs[:runtime_instance] << -> { es.call(self) }
+      end
+      @runtime = Runtime.new(argv, self, bs)
       (method_name, args = @runtime.parse_argv) or return method_name
       res = send(method_name, *args)
       false == res and @runtime.invite(self.class.actions[method_name])
       res
-    end
-    # for now we work around any dependencies on an emitter pattern by requiring
-    # that the client subscribe to all events if she wants any
-    def on_all &block
-      @handlers[:all] = block
     end
   end
 
@@ -406,41 +401,52 @@ module Skylab::Porcelain
 
   class Runtime
     include Styles
+    extend ::Skylab::PubSub::Emitter
+    emits({
+      :error         => :all,
+      :info          => :all,
+      :help          => :info,
+      :ui            => :info,
+      :usage         => :info,
+      :syntax        => :info,
+      :runtime_issue => :error
+    })
     def actions
       @client.class.actions
     end
     attr_reader :client
-    def emit type, event
-      (@handlers[type] || @handlers[:all] || @handlers[:default]).call event
-    end
     def find_action str
       sym = str.intern
       if exact = actions.detect { |a| sym == a.name }
         return exact
-      elsif @fuzzy_match
+      elsif self.singleton_class.fuzzy_match
         matcher = /\A#{Regexp.escape str}/
         found = actions.select { |a| matcher =~ a.name.to_s }
         case found.size
         when 0 ; # fallthru
         when 1 ; return found.first
         else
-          return invite("Ambiguous action #{e13b str}. Did you mean #{found.map{ |a| e13b(a.name) }.join(' or ')}?")
+          return issue("Ambiguous action #{e13b str}. Did you mean #{found.map{ |a| e13b(a.name) }.join(' or ')}?")
         end
       end
-      invite("Invalid action: #{e13b str}", "Expecting #{render_actions}")
+      issue("Invalid action: #{e13b str}", "Expecting #{render_actions}")
     end
-    attr_writer :fuzzy_match
-    alias_method :fuzzy_match, :fuzzy_match= # careful
-    def initialize argv, client
+    def initialize argv, client, bs = nil
       @argv = argv.dup
       @client = client
-      @fuzzy_match = true
-      @handlers = client.handlers
-      (a = @client.class.instance_variable_get('@runtime_config_blocks')) and a.each { |b| instance_eval(&b) }
+      bs and bs = bs.dup
+      if bs and defs = bs.delete(:runtime_class)
+        defs.each { |b| singleton_class.instance_exec(&b) }
+      end
+      if bs and defs = bs.delete(:runtime_instance)
+        defs.each { |b| instance_exec(&b) }
+      end
+      bs.any? and fail("no: #{bs.keys}")
+      unless event_listeners[:all]
+        on_all { |e| e.touched? or $stderr.puts(" * #{invocation_name}: #{e}") }
+      end
     end
-    def invite *msgs
-      action = msgs.shift if msgs.any? && ! msgs.first.kind_of?(String)
-      msgs.each { |msg| emit(:validation_error_meta, msg) }
+    def invite action=nil
       if action
         emit(:ui, "Try #{e13b "#{invocation_name} #{action.name} -h"} for help.")
       else
@@ -448,11 +454,16 @@ module Skylab::Porcelain
       end
       nil
     end
+    def issue *msgs
+      # action = msgs.shift if msgs.any? && ! msgs.first.kind_of?(String)
+      msgs.each { |msg| emit(:runtime_issue, msg) }
+      invite
+    end
     def invocation_name
       File.basename $PROGRAM_NAME
     end
     def parse_argv
-      @argv.empty? and return invite("Expecting #{render_actions}.")
+      @argv.empty? and return issue("Expecting #{render_actions}.")
       Officious::Help::SWITCHES.include?(@argv.first) and @argv[0] = 'help' # might bite one day
       action = find_action(@argv.shift) or return action
       argv = catch(:option_action) do
@@ -460,14 +471,22 @@ module Skylab::Porcelain
       end
       argv.kind_of?(Proc) and return argv.call(self, action) # option_action
       argv or begin
-        emit(:usage, "usage: #{e13b "#{invocation_name} #{action.syntax}"}")
-        invite action
+        emit(:runtime_issue, "usage: #{e13b "#{invocation_name} #{action.syntax}"}")
+        issue action
         return false
       end
       [action.method_name, argv]
     end
     def render_actions
       "{#{actions.visible.map{ |a| e13b(a.name) }.join('|')}}"
+    end
+  end
+
+  class << Runtime
+    def fuzzy_match *a
+      case a.size ; when 1 ; @fuzzy_match = a.first
+                    when 0 ; @fuzzy_match.nil? ? true : @fuzzy_match
+                    else   ; raise ArgumentError.new('no') ; end
     end
   end
 
