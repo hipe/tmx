@@ -18,15 +18,24 @@ module Skylab::Tmx::Modules::Bleed
         api.invoke([:init], ctx)
       end
 
+      o do |o, c|
+        o.banner = "The path to bleeding edgeness"
+      end
+      def path c
+        api.invoke([:path], c)
+      end
+
     protected
 
       def api
         @api ||= begin
           require File.expand_path('../api', __FILE__)
           ::Skylab::Tmx::Bleed::Api.build do |o|
-            o.on_info  { |e| err.puts "tmx: bleed: #{e}" }
-            o.on_error { |e| err.puts "tmx: bleed: error: #{e}" }
-            o.on_out   { |e| out.puts "tmx: bleed: #{e}" }
+            o.on_info_head { |e| err.write "tmx: bleed: #{e}" }
+            o.on_info_tail { |e| err.puts e.to_s }
+            o.on_info      { |e| err.puts "tmx: bleed: #{e}" }
+            o.on_error     { |e| err.puts "tmx: bleed: error: #{e}" }
+            o.on_out       { |e| out.puts "tmx: bleed: #{e}" }
           end
         end
       end

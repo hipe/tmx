@@ -1,7 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'ruby-debug'
-
 payload = lambda do
 
   dir = File.expand_path('../bin', __FILE__)

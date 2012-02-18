@@ -1,7 +1,24 @@
 #!/usr/bin/env bash
 
-dir="$( cd "$( dirname "$0" )" && pwd )"
-tmp="$dir/.__tmp.sh"
-ruby "$dir/../._repath.rb" 1> "$tmp"
-source "$tmp"
-rm "$tmp"
+tmx_bleed_load () {
+  dir="$( cd "$( dirname "$0" )" && pwd )"
+  tmp="$dir/.__tmp.sh"
+  ruby "$dir/../._repath.rb" 1> "$tmp"
+  echo "NOTE THIS WON'T WORK THIS WAY"
+  source "$tmp"
+  rm "$tmp"
+}
+
+# ugly way to specify (tmx-bleed || tmx bleed [load])
+if ( [ 0 == "$#" ] ||
+     ( [ "bleed" == "$1" ] &&
+       ( [ 1 == "$#" ] ||
+         ( [ 2 == "$#" ] && [ "load" == "$2" ] )
+       )
+     )
+   ) ; then
+  tmx_bleed_load
+else
+  tmx-ruby "$@"
+fi
+
