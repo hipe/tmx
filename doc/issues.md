@@ -1,11 +1,11 @@
-[#062] 2012-02-18 @open pub-sub: touch events
-[#061] 2012-02-18 pub-sub: @closed fix issue with deep trees
-[#060] 2012-02-18 tmx: merge issues
-[#058] @closed muxer: rename things
-[#057] @open porcelain: events
+[#062] 2012-02-18 @closed pub-sub: touch events
+[#061] 2012-02-18 @closed pub-sub: fix issue with deep trees
+[#060] 2012-02-18 @closed tmx: merge issues
+[#058] 2012-02-18 @closed muxer: rename things
+[#057] 2012-02-18 @open porcelain: events
 [#056] 2011-07-19 @open permute
 [#055] 2012-02-18 @open code molester: file services (write)
-[#054] 2012-02-17 @close code molester: make values accessor
+[#054] 2012-02-17 @closed code molester: make values accessor
 [#053] 2012-02-14 @closed code molester: pure refactor: deepening
 [#052] 2012-02-11 @closed code molester: for fun write a config parser
 [#051] 2012-02-11 @open set program name explicitly, streams
