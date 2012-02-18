@@ -25,13 +25,23 @@ end
 
 module Skylab::PubSub::Emitter
   class Event
+    attr_reader :data
     def initialize tag, data
+      @data = data
       @tag = tag
-      @message = data.to_s
+      @touched = false
     end
     alias_method :event_id, :object_id
-    attr_reader :message
+    def message
+      @touched = true
+      @data.to_s
+    end
     alias_method :to_s, :message
+    def touch
+      @touched = true
+    end
+    attr_accessor :touched # set this to false only if you are trying to be clever
+    alias_method :touched?, :touched
     def type
       @tag.name
     end
