@@ -1,7 +1,7 @@
 module Skylab ; end
 
-module Skylab::Slake
-  module Muxer
+module Skylab::PubSub
+  module Emitter
     def self.extended mod
       mod.send(:include, InstanceMethods)
     end
@@ -23,7 +23,7 @@ module Skylab::Slake
   end
 end
 
-module Skylab::Slake::Muxer
+module Skylab::PubSub::Emitter
   class Event
     def initialize tag, data
       @tag = tag
