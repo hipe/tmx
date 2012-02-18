@@ -44,14 +44,13 @@ module Skylab::PubSub::Emitter
   end
   module InstanceMethods
     def emit type, data=nil
-      event_cloud = self._find_event_cloud
-      tag = event_cloud[type] or raise RuntimeError.new("undeclared event type: #{type.inspect}")
+      cloud = _find_event_cloud
+      tag = cloud[type] or fail("undeclared event type: #{type.inspect}")
+      el = event_listeners
       event = nil
-      blocks = [event_listeners[tag.name], * tag.ancestors.map { |tag_name| event_listeners[tag_name] }].compact.flatten
-      blocks.each do |block|
-        block.call(event ||= Event.new(tag, data))
-      end
-      blocks.count
+      cloud.ancestor_names(tag).map{ |n| el[n] }.compact.flatten.tap do |a|
+        a.each { |b| b.call(event ||= Event.new(tag, data)) }
+      end.count
     end
     # sucks for now
     def _find_event_cloud
@@ -63,6 +62,17 @@ module Skylab::PubSub::Emitter
     end
   end
   class SemanticTagCloud < Hash
+    def ancestor_names tag
+      seen  = {}
+      found = []
+      visit = ->(t) do
+        seen[t.name] = t
+        found.push t.name
+        ( t.ancestors - found ).each { |s| seen[s] or visit[self[s]] } # !
+      end
+      visit[tag]
+      found
+    end
     def describe
       @order.map { |key| self[key].describe }.join("\n")
     end
