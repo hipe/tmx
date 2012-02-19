@@ -1,4 +1,5 @@
-[#065] 2012-02-18 @open: porcelain: default args
+[#066] 2012-02-18 @open: porcelain: namespace native and compat
+[#065] 2012-02-18 @closed: porcelain: default args
 [#064] 2012-02-18 @closed: we must deep copy tag cloud!
 [#063] 2012-02-18 @closed gsu: fix it to use new porcelain
 [#062] 2012-02-18 @closed pub-sub: touch events
