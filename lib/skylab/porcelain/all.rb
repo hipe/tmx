@@ -372,24 +372,33 @@ module Skylab::Porcelain
     end
   end
 
+  class PorcelainKnob < Struct.new(:runtime, :runtime_event_subscriptions)
+  end
+
   # .. below is invocation mechanics
   module ClientInstanceMethods
     def init_porcelain &block
-      @runtime_event_subscriptions = block
+      @porcelain ||= PorcelainKnob.new
+      @porcelain.runtime = nil
+      @porcelain.runtime_event_subscriptions = block
     end
     alias_method :initialize, :init_porcelain
     def invoke argv
       bs = self.class.instance_variable_get('@porcelain_config_blocks')
-      if @runtime_event_subscriptions
-        es = @runtime_event_subscriptions
+      if @porcelain.runtime_event_subscriptions
+        es = @porcelain.runtime_event_subscriptions
         bs[:runtime_instance] << -> { es.call(self) }
       end
-      @runtime = Runtime.new(argv, self, bs)
-      (method_name, args = @runtime.parse_argv) or return method_name
+      (runtime = @porcelain.runtime = Runtime.new(argv, self, bs))
+      (method_name, args = runtime.parse_argv) or return method_name
       res = send(method_name, *args)
-      false == res and @runtime.invite(self.class.actions[method_name])
+      false == res and runtime.invite(self.class.actions[method_name])
       res
     end
+    def porcelain_runtime
+      @porcelain.runtime
+    end
+    alias_method :runtime, :porcelain_runtime
   end
 
   module Styles
@@ -414,8 +423,21 @@ module Skylab::Porcelain
     def actions
       @client.class.actions
     end
+    def argv_empty
+      if @defaulted or ! (default = singleton_class.default)
+        argv_empty_final
+      else
+        @defaulted = true
+        default.map(&:to_s)
+      end
+    end
+    def argv_empty_final
+      issue("Expecting #{render_actions}.")
+      nil
+    end
     attr_reader :client
-    def find_action str
+    def find_action
+      str = @argv.shift
       sym = str.intern
       if exact = actions.detect { |a| sym == a.name }
         return exact
@@ -426,10 +448,12 @@ module Skylab::Porcelain
         when 0 ; # fallthru
         when 1 ; return found.first
         else
-          return issue("Ambiguous action #{e13b str}. Did you mean #{found.map{ |a| e13b(a.name) }.join(' or ')}?")
+          issue("Ambiguous action #{e13b str}. Did you mean #{found.map{ |a| e13b(a.name) }.join(' or ')}?")
+          return :not_found
         end
       end
       issue("Invalid action: #{e13b str}", "Expecting #{render_actions}")
+      :not_found
     end
     def initialize argv, client, bs = nil
       @argv = argv.dup
@@ -463,17 +487,30 @@ module Skylab::Porcelain
       File.basename $PROGRAM_NAME
     end
     def parse_argv
-      @argv.empty? and return issue("Expecting #{render_actions}.")
-      Officious::Help::SWITCHES.include?(@argv.first) and @argv[0] = 'help' # might bite one day
-      action = find_action(@argv.shift) or return action
-      argv = catch(:option_action) do
-        action.parse_both(@argv) { |o| o.on_syntax { |e| emit(:syntax, e) } }
-      end
-      argv.kind_of?(Proc) and return argv.call(self, action) # option_action
-      argv or begin
-        emit(:runtime_issue, "usage: #{e13b "#{invocation_name} #{action.syntax}"}")
-        issue action
-        return false
+      @defaulted = false
+      action = argv = nil
+      loop do
+        if @argv.empty?
+          defaults = argv_empty or return defaults
+          @argv.concat defaults
+        end
+        Officious::Help::SWITCHES.include?(@argv.first) and @argv[0] = 'help' # might bite one day
+        case action = find_action
+        when :not_found  ; return false
+        when :parse_argv ; next
+        else
+          action or fail("find_action returned unexpected value: #{action.inspect}")
+        end
+        argv = catch(:option_action) do
+          action.parse_both(@argv) { |o| o.on_syntax { |e| emit(:syntax, e) } }
+        end
+        argv.kind_of?(Proc) and return argv.call(self, action) # option_action
+        argv or begin
+          emit(:runtime_issue, "usage: #{e13b "#{invocation_name} #{action.syntax}"}")
+          issue action
+          return false
+        end
+        break
       end
       [action.method_name, argv]
     end
@@ -483,10 +520,16 @@ module Skylab::Porcelain
   end
 
   class << Runtime
+    def default *a
+      case a.size ; when 0 ; @default
+                    else   ; @default = (1 == a.size && Array === a.first) ? a.first : a
+                    end
+    end
     def fuzzy_match *a
-      case a.size ; when 1 ; @fuzzy_match = a.first
-                    when 0 ; @fuzzy_match.nil? ? true : @fuzzy_match
-                    else   ; raise ArgumentError.new('no') ; end
+      case a.size ; when 0 ; @fuzzy_match.nil? ? true : @fuzzy_match
+                    when 1 ; @fuzzy_match = a.first
+                    else   ; raise ArgumentError.new('no')
+                    end
     end
   end
 
@@ -498,7 +541,7 @@ module Skylab::Porcelain
     argument_syntax '[<action>]'
     action { visible false }
     def help action=nil
-      Plumbing.new(@runtime, action).run
+      Plumbing.new(runtime, action).run
     end
   end
   class Officious::Help::Plumbing
