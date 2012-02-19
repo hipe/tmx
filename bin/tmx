@@ -1,5 +1,10 @@
 #!/usr/bin/env ruby
 
-require File.expand_path('../../lib/skylab/tmx/cli.rb', __FILE__)
+require File.expand_path('../../lib/skylab/tmx/cli', __FILE__)
 
-Skylab::Tmx::Cli.new.run ARGV
+Skylab::Tmx::Cli.new(
+  program_name: 'tmx',
+  out: $stdout,
+  err: $stderr
+).run(ARGV) # see previous version (@todo during:#100.100)
+
