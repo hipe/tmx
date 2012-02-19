@@ -1,19 +1,19 @@
 load File.expand_path('../../../script/git-stash-untracked', __FILE__)
 
-require File.expand_path('../../support', __FILE__)
+require File.expand_path('../../test-support', __FILE__)
 
 module ::Skylab::GitStashUntracked::Tests
   include ::Skylab
   TestSupport = ::Skylab::TestSupport
-  TMPDIR = TestSupport.tempdir('tmp/gsu', 1)
+  TMPDIR = TestSupport.tmpdir('tmp/gsu', 1)
   describe ::Skylab::GitStashUntracked do
     describe "has an action called" do
       def stub_popen3 str
         me = self
         Open3.stub(:popen3) do |cmd, block|
           me.cmd_spy.replace cmd
-          serr = TestSupport::MyStringIo.new('')
-          sout = TestSupport::MyStringIo.new(str)
+          serr = TestSupport::MyStringIO.new('')
+          sout = TestSupport::MyStringIO.new(str)
           block.call(nil, sout, serr)
         end
       end
@@ -28,7 +28,7 @@ module ::Skylab::GitStashUntracked::Tests
         o
       end
       let :stderr do
-        TestSupport::MyStringIo.new
+        TestSupport::MyStringIO.new
       end
       describe "status" do
         it "which lists untracked files" do
@@ -90,7 +90,7 @@ module ::Skylab::GitStashUntracked::Tests
           HERE
         end
         include ::Skylab::Porcelain::Styles # unstylize
-        it "by default does the --stat format", do
+        it "by default does the --stat format", {focus:true} do
           with_this_stash
           app.invoke %w(show derp -s).push(TMPDIR.join('stashes').to_s)
           expected = <<-HERE.unindent

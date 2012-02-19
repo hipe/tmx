@@ -24,7 +24,7 @@ module Skylab::Porcelain
       @current_definition = nil
     end
     def emits *a
-      porcelain { self.singleton_class.emits(*a) }
+      porcelain { emits(*a) }
     end
     def method_added method_name
       if @current_definition

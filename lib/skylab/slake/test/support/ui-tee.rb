@@ -1,14 +1,11 @@
-require 'stringio'
+require File.expand_path('../../../../test-support/test-support', __FILE__)
 
-module Skylab ; end
-module Skylab::Dependency ; end
-module Skylab::Dependency::TestSupport
-  class MyStringIO < StringIO
-    def to_str
-      rewind
-      read
-    end
-  end
+module Skylab::Slake
+end
+
+module Skylab::Slake::TestSupport
+  include ::Skylab::TestSupport
+
   class Tee < Hash
     def initialize hash
       hash.each do |k, v|
