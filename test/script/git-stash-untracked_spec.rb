@@ -19,7 +19,7 @@ module ::Skylab::GitStashUntracked::Tests
       end
       let :app do
         stderr = self.stderr
-        GitStashUntracked::Porcelain.new { on_all { |e| stderr.puts e } }
+        GitStashUntracked::Porcelain.new { |o| o.on_all { |e| stderr.puts e } }
       end
       let :cmd_spy do '' end
       let :runtime_stub do
