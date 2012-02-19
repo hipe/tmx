@@ -11,7 +11,7 @@ describe Skylab::PubSub::Emitter do
   end
   let(:emitter) { klass.new }
   it "describes its tag graph" do
-    emitter.class.event_cloud.describe.should eql(<<-HERE.deindent)
+    emitter.class.event_cloud.describe.should eql(<<-HERE.unindent.strip)
       informational
       error -> informational
       info -> informational
