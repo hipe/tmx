@@ -6,6 +6,14 @@ module Skylab::Porcelain::TestSupport
   Porcelain = ::Skylab::Porcelain
 
   describe "The #{Skylab::Porcelain} module" do
+    include Porcelain::Styles # unstylize
+    let(:debug_ui) { false }
+    let(:stderr) { MyStringIO.new }
+    let(:instance) do
+      klass.new do |o|
+        o.on_all { |e| stderr.puts unstylize(e) ; debug_ui and $stderr.puts(e) }
+      end
+    end
     describe "extended by a class allows that" do
       let(:klass) do
         Class.new.class_eval do
@@ -211,18 +219,10 @@ module Skylab::Porcelain::TestSupport
               stderr.to_s.should eql('')
               argv.should eql(%w(one two three four five))
             end
-           end # n length
+          end # n length
         end # of
       end # ArgumentSyntax
     end # DSL
-    include Porcelain::Styles # unstylize
-    let(:debug_ui) { false }
-    let(:stderr) { MyStringIO.new }
-    let(:instance) do
-      klass.new do |app|
-        app.on_all { |e| stderr.puts unstylize(e) ; debug_ui and $stderr.puts(e) }
-      end
-    end
     describe "invocation happens with a call to invoke() (pass it ARGV) that" do
       Porcelain::Runtime.send(:define_method, :invocation_name) { 'yourapp' }
       let(:expecting_foo_bar) { /expecting \{(?:help\|)?foo\|bar\}/i }
@@ -360,6 +360,66 @@ module Skylab::Porcelain::TestSupport
           help_screen = stderr
           help_screen.should match(/usage: yourapp whatever-is-clever/i)
           help_screen.should match(/-a, --apple +an apple/)
+        end
+      end
+    end # provides rendering
+    context "allows you to specify default actions (actually argvs), for e.g.:" do
+      let(:debug_ui) { false }
+      context 'with an app with actions "foo" and "bar"' do
+        let(:klass) do
+          ohai = body
+          Class.new.class_eval do
+            extend ::Skylab::Porcelain
+            class_eval(&ohai)
+            def foo
+              runtime.emit(:info, "I am foo.")
+            end
+            def bar
+              runtime.emit(:info, "I am bar.")
+            end
+            self
+          end
+        end
+        let(:subject) do
+          instance.invoke argv
+          stderr.match(/\A[^\n]+/)[0]
+        end
+        context "that does not specify a default argv" do
+          let(:body) { ->(_) { } }
+          context "against an argv with no arguments" do
+            let(:argv) { [] }
+            context "you get response whose first line" do
+              specify { should match(/expecting .*foo.*bar/i) }
+            end
+          end
+        end
+        context "that specifies a default of :foo" do
+          let(:body) { ->(_) { porcelain { default :foo } } }
+          context 'against an argv with no arguments' do
+            let(:argv) { [] }
+            context "it will run foo" do
+              specify { should match(/^I am foo\.$/) }
+            end
+          end
+          context "against an argv with [bar]" do
+            let(:argv) { ['bar'] }
+            context "it does this" do
+              specify { should match(/^I am bar\.$/) }
+            end
+          end
+          context "against an argv with [baz]" do
+            let(:argv) { ['baz'] }
+            context "it does this" do
+              specify { should match(/Invalid action\: baz/i) }
+            end
+          end
+        end
+        context "that specifies a multi-argument default" do
+          let(:body) { ->(_) { porcelain { default %w(foo -x) } } }
+          context "it works" do
+            let(:argv) { [] }
+            specify { should match(/unexpected argument.+-x/i) }
+          end
         end
       end
     end
