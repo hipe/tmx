@@ -81,12 +81,13 @@ module Skylab::PubSub::Emitter
     def ancestor_names tag
       seen  = {}
       found = []
-      visit = ->(t) do
-        seen[t.name] = t
+      visit = ->(k) do
+        t = self[k] or t = merge_definition!(k).first
+        seen[t.name] = true
         found.push t.name
-        ( t.ancestors - found ).each { |s| seen[s] or visit[self[s]] } # !
+        ( t.ancestors - found ).each { |s| seen[s] or visit[s] } # !
       end
-      visit[tag]
+      visit[tag.name]
       found
     end
     def _deep_copy_init other
