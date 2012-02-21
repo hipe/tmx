@@ -10,14 +10,14 @@ describe Skylab::PubSub::Emitter do
     end
   end
   let(:emitter) { klass.new }
-  it "describes its tag graph" do
+  it 'describes its tag graph' do
     emitter.class.event_cloud.describe.should eql(<<-HERE.unindent.strip)
       informational
       error -> informational
       info -> informational
     HERE
   end
-  it "notifies subscribers of its child events" do
+  it 'notifies subscribers of its child events' do
     the_msg = nil
     emitter.on_error do |event|
       the_msg = event.message
@@ -25,22 +25,22 @@ describe Skylab::PubSub::Emitter do
     emitter.emit(:error, 'yes')
     the_msg.should eql('yes')
   end
-  it "notifies subscribers of parent events about child events" do
+  it 'notifies subscribers of parent events about child events' do
     the_msg = nil
     emitter.on_informational { |e| the_msg = "#{e.type}: #{e.message}" }
     emitter.emit(:error, 'yes')
     the_msg.should eql('error: yes')
   end
-  it "will double-notify a single subscriber if it subscribes to multiple facets of it" do
+  it 'will double-notify a single subscriber if it subscribes to multiple facets of it' do
     the_child_msg = nil
     the_parent_msg = nil
     emitter.on_informational { |e| the_parent_msg = "#{e.type}: #{e.message}" }
     emitter.on_info          { |e| the_child_msg  = "#{e.type}: #{e.message}" }
-    emitter.emit(:info, "foo")
-    the_child_msg.should eql("info: foo")
-    the_parent_msg.should eql("info: foo")
+    emitter.emit(:info, 'foo')
+    the_child_msg.should eql('info: foo')
+    the_parent_msg.should eql('info: foo')
   end
-  it "but the listener can check the event-id of the event if it wants to, it will be the same event" do
+  it 'but the listener can check the event-id of the event if it wants to, it will be the same event' do
     id_one = id_two = nil
     emitter.on_informational { |e| id_one = e.event_id }
     emitter.on_info          { |e| id_two = e.event_id }
@@ -49,8 +49,8 @@ describe Skylab::PubSub::Emitter do
     id_one.should eql(id_two)
     id_two.should be_kind_of(Fixnum)
   end
-  context "also, you can use the touch/touched? facility" do
-    it "by explicitly touching and checking for touched?" do
+  context 'also, you can use the touch/touched? facility' do
+    it 'by explicitly touching and checking for touched?' do
       emitter.tap do |e|
         c = Struct.new(:a, :i, :e).new(0, 0, 0)
         e.on_informational { |e| if ! e.touched? then e.touch ; c.a += 1  end }
@@ -64,8 +64,8 @@ describe Skylab::PubSub::Emitter do
         c.values.should eql([2, 1, 1])
       end
     end
-    context "touch will happen automatically when a message is accessed" do
-      it "without touch check" do
+    context 'touch will happen automatically when a message is accessed' do
+      it 'without touch check' do
         emitter.tap do |e|
           lines = []
           e.on_informational { |e| lines << "inform:#{e}" }
@@ -74,7 +74,7 @@ describe Skylab::PubSub::Emitter do
           lines.should eql(%w(info:A inform:A))
         end
       end
-      it "with touch check" do
+      it 'with touch check' do
         emitter.tap do |e|
           lines = []
           e.on_informational { |e| lines << "inform:#{e}" unless e.touched? }
@@ -85,7 +85,7 @@ describe Skylab::PubSub::Emitter do
       end
     end
   end
-  context "graphs" do
+  context 'graphs' do
     let(:klass) do
       kg = klass_graph
       Class.new.class_eval do
@@ -94,14 +94,14 @@ describe Skylab::PubSub::Emitter do
         self
       end
     end
-    context "deep tree" do
+    context 'deep tree' do
       let(:klass_graph){[
         :all,
         :error => :all,
         :info => :all,
         :hello => :info
       ]}
-      it "works" do
+      it 'works' do
         emitter.tap do |e|
           touched = 0
           e.on_all { |e| touched += 1 }
@@ -110,7 +110,7 @@ describe Skylab::PubSub::Emitter do
         end
       end
     end
-    context "simple circular" do
+    context 'simple circular' do
       let(:klass_graph) {[{
         :father => :son,
         :ghost  => :father,
@@ -129,9 +129,9 @@ describe Skylab::PubSub::Emitter do
         @counts.keys.map(&:to_s).sort.join(' ').should eql('father ghost son')
         @counts.values.count{ |v| 1 == v }.should eql(3)
       end
-      it ("works a") { same(:father) }
-      it ("works b") { same(:son) }
-      it ("works c") { same(:ghost) }
+      it ('works a') { same(:father) }
+      it ('works b') { same(:son) }
+      it ('works c') { same(:ghost) }
     end
   end
 end
