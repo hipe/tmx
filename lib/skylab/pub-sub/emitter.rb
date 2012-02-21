@@ -13,6 +13,7 @@ module Skylab::PubSub
         unless these.include?(m = "on_#{tag.name}".intern)
           define_method(m) do |&block|
             event_listeners.add_listener tag.name, block
+            self
           end
         end
       end
@@ -54,6 +55,9 @@ module Skylab::PubSub::Emitter
   end
   class EventListeners < Hash
     def add_listener name, block
+      block.respond_to?(:call) or
+        raise ArgumentError.new("no block given. " <<
+          "Your \"block\" argument to add_listener (a #{block.class}) did not respond to \"call\"")
       self[name] ||= []
       self[name].push block
     end

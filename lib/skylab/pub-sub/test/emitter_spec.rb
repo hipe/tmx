@@ -10,6 +10,67 @@ describe Skylab::PubSub::Emitter do
     end
   end
   let(:emitter) { klass.new }
+  context 'when extended by a class' do
+    let(:inside) { ->(_) { } }
+    let(:klass) do
+      o = self
+      Class.new.class_eval do
+        extend Skylab::PubSub::Emitter
+        def self.to_s ; 'Foo' end
+        class_eval(& o.inside)
+        self
+      end
+    end
+    subject { klass }
+    context 'gives your class an "emits" method which:' do
+      specify { should be_respond_to(:emits) }
+      it 'when called with an event graph, adds those types to the types associated with the class' do
+        klass.event_cloud.size.should eql(0)
+        klass.emits :scream => :sound, :yell => :sound
+        klass.event_cloud.size.should eql(3)
+      end
+      context "Let's learn about emits() with a story about a class named Foo." do
+        context 'At first, the Foo class of course does not have a method called "on_bar", it:' do
+          specify { should_not be_public_method_defined(:on_bar) }
+        end
+        context 'Once it declares that it emits an event of type :bar' do
+          let(:inside) { ->(_) { emits :bar } }
+          context 'then gets a method called "on_bar":, i.e. it:' do
+            specify { should be_public_method_defined(:on_bar) }
+          end
+          context 'then with objects of class Foo you can then call on_bar.' do
+            let(:instance) { klass.new }
+            context 'It expects you to call on_bar with a block, not doing so:' do
+              subject { ->() { instance.on_bar } }
+              specify { should raise_exception(ArgumentError, /no block given/i) }
+            end
+            context 'When you call "on_bar" with a block,' do
+              let(:touch_me) { { touched: :was_not_touched } }
+              let(:instance) do
+                o = klass.new
+                o.on_bar { touch_me[:touched] = :it_was_touched }
+                o
+              end
+              context '(the well-formed call to on_bar will return your same instance again, for chaining:)' do
+                let(:instance) { klass.new }
+                let(:_see) { ->(o) { "#<#{o.class}:0x%x>" % [o.object_id]  } }
+                subject { _see[instance.on_bar{ || }] }
+                specify { should eql( _see[(instance)] ) }
+              end
+              context  'the handler block will not have been called at first. Out of the box the canary:' do
+                subject { touch_me[:touched] }
+                specify { should eql(:was_not_touched) }
+                context 'but if you then emit one such event with a call to "emit(:bar)", the canary:' do
+                  before { instance.emit(:bar) }
+                  specify { should eql(:it_was_touched) }
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
   it 'describes its tag graph' do
     emitter.class.event_cloud.describe.should eql(<<-HERE.unindent.strip)
       informational
@@ -49,7 +110,7 @@ describe Skylab::PubSub::Emitter do
     id_one.should eql(id_two)
     id_two.should be_kind_of(Fixnum)
   end
-  context 'also, you can use the touch/touched? facility' do
+  context "You can use the touch/touched? facility on event objects to track whether you've seen them" do
     it 'by explicitly touching and checking for touched?' do
       emitter.tap do |e|
         c = Struct.new(:a, :i, :e).new(0, 0, 0)
@@ -64,7 +125,7 @@ describe Skylab::PubSub::Emitter do
         c.values.should eql([2, 1, 1])
       end
     end
-    context 'touch will happen automatically when a message is accessed' do
+    context 'A touch will happen automatically when a message is accessed ("to_s" is aliases to "message")' do
       it 'without touch check' do
         emitter.tap do |e|
           lines = []
@@ -85,7 +146,7 @@ describe Skylab::PubSub::Emitter do
       end
     end
   end
-  context 'graphs' do
+  context "Let's play with some different types of event-type graphs." do
     let(:klass) do
       kg = klass_graph
       Class.new.class_eval do
@@ -94,14 +155,14 @@ describe Skylab::PubSub::Emitter do
         self
       end
     end
-    context 'deep tree' do
+    context 'With an event-type tree three levels deep and two wide,' do
       let(:klass_graph){[
         :all,
         :error => :all,
         :info => :all,
         :hello => :info
       ]}
-      it 'works' do
+      it 'triggering an event on a deepest child will trigger the root event' do
         emitter.tap do |e|
           touched = 0
           e.on_all { |e| touched += 1 }
@@ -110,7 +171,7 @@ describe Skylab::PubSub::Emitter do
         end
       end
     end
-    context 'simple circular' do
+    context "With an event type tree that is a simple circular directed graph (a triangle)," do
       let(:klass_graph) {[{
         :father => :son,
         :ghost  => :father,
@@ -129,9 +190,9 @@ describe Skylab::PubSub::Emitter do
         @counts.keys.map(&:to_s).sort.join(' ').should eql('father ghost son')
         @counts.values.count{ |v| 1 == v }.should eql(3)
       end
-      it ('works a') { same(:father) }
-      it ('works b') { same(:son) }
-      it ('works c') { same(:ghost) }
+      it ('an emit to this one emits to all three') { same(:father) }
+      it ('an emit to this one emits to all three') { same(:son) }
+      it ('an emit to this one emits to all three') { same(:ghost) }
     end
   end
 end
