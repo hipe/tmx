@@ -1,3 +1,4 @@
+[#067] 2012-02-20 @open: emitter can emit arbitrary number of arguments
 [#066] 2012-02-18 @open: porcelain: namespace native and compat
 [#065] 2012-02-18 @closed: porcelain: default args
 [#064] 2012-02-18 @closed: we must deep copy tag cloud!
@@ -5,6 +6,7 @@
 [#062] 2012-02-18 @closed pub-sub: touch events
 [#061] 2012-02-18 @closed pub-sub: fix issue with deep trees
 [#060] 2012-02-18 @closed tmx: merge issues
+[#059] 2012-02-18 @open pub-sub: no redundant events per listener
 [#058] 2012-02-18 @closed muxer: rename things
 [#057] 2012-02-18 @closed porcelain: events
 [#056] 2011-07-19 @open permute
