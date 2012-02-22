@@ -9,7 +9,11 @@ describe Skylab::PubSub::Emitter do
       self
     end
   end
+  let(:instance) { klass.new }
   let(:emitter) { klass.new }
+  def _see o
+    "#<#{o.class}:0x%x>" % [o.object_id]
+  end
   context 'when extended by a class' do
     let(:inside) { ->(_) { } }
     let(:klass) do
@@ -39,7 +43,6 @@ describe Skylab::PubSub::Emitter do
             specify { should be_public_method_defined(:on_bar) }
           end
           context 'then with objects of class Foo you can then call on_bar.' do
-            let(:instance) { klass.new }
             context 'It expects you to call on_bar with a block, not doing so:' do
               subject { ->() { instance.on_bar } }
               specify { should raise_exception(ArgumentError, /no block given/i) }
@@ -53,9 +56,8 @@ describe Skylab::PubSub::Emitter do
               end
               context '(the well-formed call to on_bar will return your same instance again, for chaining:)' do
                 let(:instance) { klass.new }
-                let(:_see) { ->(o) { "#<#{o.class}:0x%x>" % [o.object_id]  } }
-                subject { _see[instance.on_bar{ || }] }
-                specify { should eql( _see[(instance)] ) }
+                subject { _see(instance.on_bar{ || }) }
+                specify { should eql(_see instance) }
               end
               context  'the handler block will not have been called at first. Out of the box the canary:' do
                 subject { touch_me[:touched] }
@@ -110,12 +112,95 @@ describe Skylab::PubSub::Emitter do
     id_one.should eql(id_two)
     id_two.should be_kind_of(Fixnum)
   end
-  context "You can use the touch/touched? facility on event objects to track whether you've seen them" do
+  context 'With regards to the parameters passed to your event handlers' do
+    let(:emits) { ->(_) { } }
+    let(:klass) do
+      o = self
+      Class.new.class_eval do
+        extend ::Skylab::PubSub::Emitter
+        class_eval(& o.emits)
+        self
+      end
+    end
+    context 'with a simple emit interface of one event type' do
+      let(:emits) { ->(_) { emits :bar } }
+      let(:canary) { { } }
+      context "when you emit a :bar type event with zero arguments" do
+        context 'if your event handler takes a variable number of arguments, emitting such an event' do
+          let(:instance) do
+            klass.new.on_bar { |*a| canary[:args] = a } # expects chaining-style return value
+          end
+          subject { canary[:args] }
+          context 'with zero payload arguments passes zero to your handlers.' do
+            before  { instance.emit(:bar) }
+            specify { should eql([]) }
+          end
+          context 'with one payload argument passes one to your handlers.' do
+            before  { instance.emit(:bar, 'foo') }
+            specify { should eql(['foo']) }
+          end
+          context 'with two payload arguments passes two to your handlers.' do
+            before  { instance.emit(:bar, 'one', 2) }
+            specify { should eql(['one', 2]) }
+          end
+        end
+        context 'if your event handler takes exactly one argument, emitting such an event' do
+          let(:instance) do
+            klass.new.on_bar { |one| canary[:arg] = one } # expects chaining-style return value
+          end
+          subject { canary[:arg] }
+          context 'with zero payload arguments passes one event object to your handlers.' do
+            before  { instance.emit(:bar) }
+            specify { should be_kind_of(::Skylab::PubSub::Event) }
+            context "whose payload" do
+              subject { canary[:arg].payload }
+              specify { should eql([]) }
+            end
+          end
+          context 'with one payload argument passes one to your handlers.' do
+            before  { instance.emit(:bar, 'foo') }
+            specify { should be_kind_of(::Skylab::PubSub::Event) }
+            context "whose payload" do
+              subject { canary[:arg].payload }
+              specify { should eql(['foo']) }
+            end
+          end
+          context 'with two payload arguments passes two to your handlers.' do
+            before  { instance.emit(:bar, 'foo', 'baz') }
+            specify { should be_kind_of(::Skylab::PubSub::Event) }
+            context "whose payload" do
+              subject { canary[:arg].payload }
+              specify { should eql(['foo', 'baz']) }
+            end
+          end
+        end
+        context 'if your event handler takes exactly two arguments, emitting such an event' do
+          let(:instance) do
+            klass.new.on_bar { |a, b| canary[:args] = [a, b] } # expects chaining-style return value
+          end
+          subject { canary[:args] }
+          context 'with zero payload arguments passes two nils to your handlers.' do
+            before  { instance.emit(:bar) }
+            specify { should eql([nil, nil]) }
+          end
+          context 'with one payload "foo" argument passes to following to your handlers:' do
+            before  { instance.emit(:bar, 'foo') }
+            specify { should eql(['foo', nil]) }
+          end
+          context 'with two payload arguments passes two to your handlers.' do
+            before  { instance.emit(:bar, 'one', 2) }
+            specify { should eql(['one', 2]) }
+          end
+        end
+      end
+    end
+  end
+  context "You can use the touch!/touched? facility on event objects to track whether you've seen them" do
     it 'by explicitly touching and checking for touched?' do
       emitter.tap do |e|
         c = Struct.new(:a, :i, :e).new(0, 0, 0)
-        e.on_informational { |e| if ! e.touched? then e.touch ; c.a += 1  end }
-        e.on_info { |e| c.i += 1 ; e.touch }
+        e.on_informational { |e| if ! e.touched? then e.touch! ; c.a += 1  end }
+        e.on_info { |e| c.i += 1 ; e.touch! }
         e.on_error { |e| c.e += 1 }
         e.emit(:informational)
         c.values.should eql([1, 0, 0])

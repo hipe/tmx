@@ -30,27 +30,24 @@ module Skylab::PubSub
   end
 end
 
-module Skylab::PubSub::Emitter
-  class Event
-    attr_reader :data
-    def initialize tag, data
-      @data = data
-      @tag = tag
-      @touched = false
+module Skylab::PubSub
+  class Event < Struct.new(:payload, :tag, :touched)
+    def initialize tag, payload
+      Array === payload or raise ArgumentError.new("need arrays here for now!")
+      super(payload, tag, false)
     end
     alias_method :event_id, :object_id
     def message
-      @touched = true
-      @data.to_s
+      self.touched = true
+      payload.map(&:to_s).join(' ')
     end
     alias_method :to_s, :message
-    def touch
-      @touched = true
+    def touch!
+      self.touched = true
     end
-    attr_accessor :touched # set this to false only if you are trying to be clever
     alias_method :touched?, :touched
     def type
-      @tag.name
+      tag.name
     end
   end
   class EventListeners < Hash
@@ -63,13 +60,20 @@ module Skylab::PubSub::Emitter
     end
   end
   module InstanceMethods
-    def emit type, data=nil
+    def emit type, *payload
       cloud = _find_event_cloud
       tag = cloud[type] or fail("undeclared event type: #{type.inspect}")
       el = event_listeners
       event = nil
       cloud.ancestor_names(tag).map{ |n| el[n] }.compact.flatten.tap do |a|
-        a.each { |b| b.call(event ||= Event.new(tag, data)) }
+        a.each do |b|
+          event ||= Event.new(tag, payload)
+          if 1 == b.arity
+            b.call(event)
+          else
+            b.call(*event.payload)
+          end
+        end
       end.count
     end
     # sucks for now
