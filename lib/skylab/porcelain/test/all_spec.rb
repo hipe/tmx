@@ -8,10 +8,11 @@ module Skylab::Porcelain::TestSupport
   describe "The #{Skylab::Porcelain} module" do
     include Porcelain::Styles # unstylize
     let(:debug_ui) { false }
-    let(:stderr) { MyStringIO.new }
+    let(:_stderr) { MyStringIO.new }
+    let(:stderr) { _stderr.to_s }
     let(:instance) do
       klass.new do |o|
-        o.on_all { |e| stderr.puts unstylize(e) ; debug_ui and $stderr.puts("DBG-->#{e}<--") }
+        o.on_all { |e| _stderr.puts unstylize(e) ; debug_ui and $stderr.puts("DBG-->#{e}<--") }
       end
     end
     describe "extended by a class allows that" do
@@ -159,17 +160,17 @@ module Skylab::Porcelain::TestSupport
           end
         end # optional
         describe "a syntax for arguments of" do
-          let(:knob) { lambda { |k| k.on_all { |e| stderr.puts e } } }
+          let(:knob) { lambda { |k| k.on_all { |e| _stderr.puts e } } }
           describe "zero-length" do
             let(:syntax) { Porcelain::ArgumentSyntax.parse_syntax('') }
             it "against the zero-length args emits no errors and returns true" do
               syntax.parse_arguments(argv = [], &knob).should eql(true)
-              stderr.to_s.should eql('')
+              stderr.should eql('')
               argv.should eql([])
             end
             it "against a nonzero-length args emits an error and returns false" do
               syntax.parse_arguments(argv = %w(alpha beta), &knob).should eql(false)
-              stderr.to_s.should match(/unexpected argument/i)
+              stderr.should match(/unexpected argument/i)
               argv.should eql(%w(alpha beta))
             end
           end
@@ -177,12 +178,12 @@ module Skylab::Porcelain::TestSupport
             let(:syntax) { Porcelain::ArgumentSyntax.parse_syntax('[<foo>]') }
             it "against the zero-length args emits no errors and returns true" do
               syntax.parse_arguments(argv = [], &knob).should eql(true)
-              stderr.to_s.should eql('')
+              stderr.should eql('')
               argv.should eql([])
             end
             it "against one-length args emits no errors and returns true" do
               syntax.parse_arguments(argv = ['first'], &knob).should eql(true)
-              stderr.to_s.should eql('')
+              stderr.should eql('')
               argv.should eql(['first'])
             end
           end
@@ -190,17 +191,17 @@ module Skylab::Porcelain::TestSupport
             let(:syntax) { Porcelain::ArgumentSyntax.parse_syntax('[<foo> [..]]') }
             it "against the zero-length args emits no errors and returns true" do
               syntax.parse_arguments(argv = [], &knob).should eql(true)
-              stderr.to_s.should eql('')
+              stderr.should eql('')
               argv.should eql([])
             end
             it "against one-length args emits no errors and returns true" do
               syntax.parse_arguments(argv = ['first'], &knob).should eql(true)
-              stderr.to_s.should eql('')
+              stderr.should eql('')
               argv.should eql(['first'])
             end
             it "against many-length args emits no errors and returns true" do
               syntax.parse_arguments(argv = ['first', 'second'], &knob).should eql(true)
-              stderr.to_s.should eql('')
+              stderr.should eql('')
               argv.should eql(['first', 'second'])
             end
           end
@@ -208,17 +209,17 @@ module Skylab::Porcelain::TestSupport
             let(:syntax) { Porcelain::ArgumentSyntax.parse_syntax('<foo> [<bar>] [<baz> [..]]') }
             it "against the zero-length args emits an error and returns false" do
               syntax.parse_arguments(argv = [], &knob).should eql(false)
-              stderr.to_s.should match(/expecting.+<foo>/)
+              stderr.should match(/expecting.+<foo>/)
               argv.should eql([])
             end
             it "against one is ok" do
               syntax.parse_arguments(argv = ['one'], &knob).should eql(true)
-              stderr.to_s.should eql('')
+              stderr.should eql('')
               argv.should eql(['one'])
             end
             it "againt five is ok" do
               syntax.parse_arguments(argv = %w(one two three four five), &knob).should eql(true)
-              stderr.to_s.should eql('')
+              stderr.should eql('')
               argv.should eql(%w(one two three four five))
             end
           end # n length
@@ -270,8 +271,8 @@ module Skylab::Porcelain::TestSupport
         end
         it "by default" do
           instance.invoke %w(pl)
-          stderr.to_s.should match(/ambiguous action[ ":]+pl/i)
-          stderr.to_s.should match(/did you mean pliny or plone/i)
+          stderr.should match(/ambiguous action[ ":]+pl/i)
+          stderr.should match(/did you mean pliny or plone/i)
         end
         describe "but by using the config" do
           let(:klass) do
@@ -285,8 +286,8 @@ module Skylab::Porcelain::TestSupport
           end
           it "it can be turned off" do
             instance.invoke %w(pl)
-            stderr.to_s.should match(/invalid action[ :"]+pl/i)
-            stderr.to_s.should match(/expecting.+pliny\|plone/i)
+            stderr.should match(/invalid action[ :"]+pl/i)
+            stderr.should match(/expecting.+pliny\|plone/i)
           end
         end
       end
@@ -316,12 +317,12 @@ module Skylab::Porcelain::TestSupport
         it "if you pass it no arguments, it is called" do
           instance.invoke %w(takes-no-arguments)
           instance.send(:touched).should eql(true)
-          stderr.to_s.should eql('')
+          stderr.should eql('')
         end
         it "if you pass it some arguments, it reports a syntax error and shows usage and invites for help" do
           i = instance
           i.invoke(%w(takes-no-arguments first-arg)).should eql(false)
-          s = stderr.to_s.split("\n")
+          s = stderr.split("\n")
           s.shift.should match(/unexpected argument[: ]+"first-arg"/i)
           s.shift.should match(/usage: yourapp takes-no-arguments/i)
           s.shift.should match(/try .* for help/i)
