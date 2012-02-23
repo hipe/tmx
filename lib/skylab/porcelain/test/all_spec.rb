@@ -11,7 +11,7 @@ module Skylab::Porcelain::TestSupport
     let(:stderr) { MyStringIO.new }
     let(:instance) do
       klass.new do |o|
-        o.on_all { |e| stderr.puts unstylize(e) ; debug_ui and $stderr.puts(e) }
+        o.on_all { |e| stderr.puts unstylize(e) ; debug_ui and $stderr.puts("DBG-->#{e}<--") }
       end
     end
     describe "extended by a class allows that" do
@@ -20,6 +20,7 @@ module Skylab::Porcelain::TestSupport
           extend Porcelain
           def foo ; end
           def bar ; end
+          def self.to_s ; "WhoHah" end
         private
           def baz ; end
           self
@@ -28,6 +29,7 @@ module Skylab::Porcelain::TestSupport
       let(:child_class) do
         Class.new(klass).class_eval do
           def she_bang ; end
+          def self.to_s ; "BooHah" end
           self
         end
       end
@@ -224,11 +226,13 @@ module Skylab::Porcelain::TestSupport
       end # ArgumentSyntax
     end # DSL
     describe "invocation happens with a call to invoke() (pass it ARGV) that" do
-      Porcelain::Runtime.send(:define_method, :invocation_name) { 'yourapp' }
       let(:expecting_foo_bar) { /expecting \{(?:help\|)?foo\|bar\}/i }
       let(:klass) do
         Class.new.class_eval do
           extend Porcelain
+          porcelain do
+            invocation_name 'yourapp'
+          end
           def foo ; end
           def bar ; end
         private
@@ -291,10 +295,11 @@ module Skylab::Porcelain::TestSupport
       let(:klass) do
         Class.new.class_eval do
           extend Porcelain
+          porcelain.invocation_name 'yourapp'
           attr_reader :argv ; private :argv
           def initialize &b
             @argv = @touched = nil
-            init_porcelain(&b)
+            porcelain_init(&b)
           end
           def takes_no_arguments
             @touched = true
@@ -314,17 +319,18 @@ module Skylab::Porcelain::TestSupport
           stderr.to_s.should eql('')
         end
         it "if you pass it some arguments, it reports a syntax error and shows usage and invites for help" do
-          instance.invoke(%w(takes-no-arguments first-arg)).should eql(false)
-          stderr.to_s.tap do |it|
-            it.should match(/unexpected argument[: ]+"first-arg"/i)
-            it.should match(/usage: yourapp takes-no-arguments/i)
-            it.should match(/try .* for help/i)
-          end
+          i = instance
+          i.invoke(%w(takes-no-arguments first-arg)).should eql(false)
+          s = stderr.to_s.split("\n")
+          s.shift.should match(/unexpected argument[: ]+"first-arg"/i)
+          s.shift.should match(/usage: yourapp takes-no-arguments/i)
+          s.shift.should match(/try .* for help/i)
+          s.size.should eql(0)
         end
       end
     end
     describe "provides rendering" do
-      let (:definition_block) do
+      let(:definition_block) do
         lambda do |_|
           option_syntax do |ctx|
             on('-a', '--apple', "an apple")
@@ -335,24 +341,24 @@ module Skylab::Porcelain::TestSupport
           def whatever_is_clever foo, bar=nil; end
         end
       end
-      let (:action) do
-        this = self
+      let(:action) do
+        o = self
         Porcelain::Action.new do
-          class_eval(&this.definition_block)
+          module_eval(& o.definition_block)
         end
       end
-      let (:klass) do
+      let(:klass) do
         this = self
         Class.new.class_eval do
           extend Porcelain
+          porcelain.invocation_name 'yourapp'
           class_eval(&this.definition_block)
           self
         end
       end
-      describe "of syntax" do
-       it "that is more detailed than optparse's" do
-         action.syntax.should eql('whatever-is-clever [-a] [-p[=foo]] [--bananna=<type>] <foo> [<bar>]')
-        end
+      describe "of syntax that provides more detail than optparse:" do
+        subject { action.syntax }
+        specify { should eql('whatever-is-clever [-a] [-p[=foo]] [--bananna=<type>] <foo> [<bar>]') }
       end
       describe "of help screens" do
         it "will use optparse's rendering of help screen for the options" do
@@ -364,13 +370,12 @@ module Skylab::Porcelain::TestSupport
       end
     end # provides rendering
     context "allows you to specify default actions (actually argvs), for e.g.:" do
-      let(:debug_ui) { false }
       context 'with an app with actions "foo" and "bar"' do
         let(:klass) do
-          ohai = body
+          o = self
           Class.new.class_eval do
             extend ::Skylab::Porcelain
-            class_eval(&ohai)
+            class_eval(& o.body)
             def foo
               runtime.emit(:info, "I am foo.")
             end
@@ -420,6 +425,39 @@ module Skylab::Porcelain::TestSupport
             let(:argv) { [] }
             specify { should match(/unexpected argument.+-x/i) }
           end
+        end
+      end
+    end
+    context "With regards to Namespaces.." do
+      context "Porcelain itself" do
+        subject { Porcelain }
+        it { should respond_to(:namespaces) }
+      end
+      context "the result of a call to #namespaces" do
+        subject { Porcelain.namespaces }
+        it { should be_kind_of(Array) }
+      end
+      context "a porcelain-ized module" do
+        let(:debug_ui) { true }
+        let(:klass) do
+          Class.new.module_eval do
+            extend Porcelain
+            def buckle ; end
+            namespace :'whiz-bang' do
+              def cuckle
+                :yes_cuckle
+              end
+            end
+            def duckle ; end
+            self
+          end
+        end
+        it "lists the namespace inline as another action" do
+          klass.actions.visible.map{ |n| n.name.to_s }.should eql(%w(whiz-bang buckle duckle))
+        end
+        it "calls the child command" do
+          r = instance.invoke(['wh', 'cu'])
+          r.should eql(:yes_cuckle)
         end
       end
     end
