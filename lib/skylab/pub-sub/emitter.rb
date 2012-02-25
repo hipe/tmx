@@ -7,7 +7,7 @@ module Skylab::PubSub
     end
     def emits *nodes
       event_cloud = self.event_cloud
-      events = event_cloud.merge_definition! *nodes
+      events = event_cloud.merge_definition!(*nodes)
       these = instance_methods.map(&:intern)
       event_cloud.flatten(events).each do |tag|
         unless these.include?(m = "on_#{tag.name}".intern)
