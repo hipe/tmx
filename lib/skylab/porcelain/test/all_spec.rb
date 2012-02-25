@@ -508,7 +508,7 @@ module Skylab::Porcelain::TestSupport
               let(:argv) { %w(more) }
               specify { should match(/expecting.*action/i) }
             end
-            context "more -h", {f:true} do
+            context "more -h" do
               let(:argv) { %w(more -h) }
               specify { should match(/^usage.*wahoo.*more.*tingle.*opts.*args/i) }
             end
@@ -532,6 +532,68 @@ module Skylab::Porcelain::TestSupport
                 specify { should eql(:yes_tingle) }
               end
             end
+          end
+        end
+      end
+    end
+    context "when you don't explicitly tell it the args syntax" do
+      let(:klass) do
+        o = self
+        Class.new.class_eval do
+          extend ::Skylab::Porcelain
+          porcelain.invocation_name = "doipus"
+          module_eval(& o.body)
+          self
+        end
+      end
+      let(:subject) do
+        @return = instance.invoke argv
+        stderr.match(/\A[^\n]+/)[0]
+      end
+      context "basic one arg def" do
+        let(:body) do
+          lambda do |_|
+            def foo first
+              runtime.emit(:info, "i am foo with: #{first}.")
+              :ok_foo
+            end
+          end
+        end
+        context "foo -h" do
+          let(:argv) { %w(foo -h) }
+          specify { should match(/usage: doipus foo <arg1>/i) }
+        end
+        context "foo" do
+          let(:argv) { %w(foo) }
+          specify { should match(/expecting.*arg1/i) }
+        end
+        context "foo bizzie" do
+          let(:argv) { %w(foo bizzie) }
+          specify { should match(/i am foo with: bizzie\./i) }
+        end
+        context "foo biz baz" do
+          let(:argv) { %w(foo biz baz) }
+          specify { should match(/unexpected argument.*baz/i) }
+        end
+      end
+      context "trailing optional" do
+        let(:body) do
+          lambda do |_|
+            def foo first, second=nil
+              runtime.emit(:info, "i am foo with: #{first}, #{second}.")
+              :ok_foo
+            end
+          end
+        end
+        context "foo -h" do
+          let(:argv) { %w(foo -h) }
+          specify { should be_include('foo <arg1> [<arg> [<arg>[...]]]') }
+        end
+        context "foo biz baz boz" do
+          let(:argv) { %w(foo biz baz boz) }
+          it "will still throw an argument error" do
+            lambda { instance.invoke(argv) }.
+              should raise_exception(ArgumentError, /wrong number of arguments \(3 for 2\)/)
           end
         end
       end
