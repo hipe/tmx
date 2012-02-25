@@ -7,7 +7,7 @@ module Skylab::Porcelain::TestSupport
 
   describe "The #{Skylab::Porcelain} module" do
     include Porcelain::Styles # unstylize
-    let(:debug_ui) { false }
+    let(:debug_ui) { }
     let(:_stderr) { MyStringIO.new }
     let(:stderr) { _stderr.to_s }
     let(:instance) do
@@ -258,7 +258,7 @@ module Skylab::Porcelain::TestSupport
       end
       it "with -h (or help) followed by an action name, you get action-specific help" do
         instance.invoke ['-h', 'foo']
-        stderr.should match(/usage: yourapp foo/)
+        stderr.should match(/usage: yourapp foo/i)
       end
       describe "does fuzzy matching on the action name" do
         let(:klass) do
@@ -438,27 +438,101 @@ module Skylab::Porcelain::TestSupport
         subject { Porcelain.namespaces }
         it { should be_kind_of(Array) }
       end
-      context "a porcelain-ized module" do
-        let(:debug_ui) { true }
-        let(:klass) do
-          Class.new.module_eval do
-            extend Porcelain
-            def buckle ; end
-            namespace :'whiz-bang' do
-              def cuckle
-                :yes_cuckle
+      context "if you try to use both an external class and an inline namespace definition"
+      context "if you try to use neither external class nor internal namespace defnition"
+
+      let(:klass_with_inline_namespace) do
+        Class.new.module_eval do
+          extend Porcelain
+          porcelain.invocation_name = 'wahoo'
+          namespace :'more' do
+            def tingle
+              runtime.emit(:info, "yes sure tingle inline")
+              :yes_tingle
+            end
+          end
+          def duckle ; end
+          self
+        end
+      end
+      let(:klass_with_external_namespace) do
+        cls = Class.new.class_eval do
+          extend Porcelain
+          def tingle
+            runtime.emit(:info, "yes sure tingle external")
+            :yes_tingle
+          end
+          self
+        end
+        Class.new.class_eval do
+          extend Porcelain
+          porcelain.invocation_name = 'wahoo'
+          namespace :'more', cls
+          def duckle ; end
+          self
+        end
+      end
+      [ { :name => 'an external class',
+          :var  => :klass_with_external_namespace
+        },
+        { :name => 'an inline namespace definition',
+          :var  => :klass_with_inline_namespace
+        }
+      ].each do |o|
+
+        name, var = %w(name var).map { |k| o[k.intern] }
+
+        context "when you have <<#{name}>>.." do
+
+          let(:klass) { send(var) }
+
+          context "stdout response" do
+
+            before { @result = instance.invoke argv }
+
+            subject { stderr.split("\n").first }
+
+            context "[]" do
+              let(:argv) { [] }
+              specify { should match(/expecting.*more.*duckle/i) }
+            end
+            context "-h" do
+              let(:argv) { %w(-h) }
+              specify { should match(/^usage: wahoo \{ *more *\| *duckle *\}/) }
+            end
+            context "foo" do
+              let(:argv) { %w(foo) }
+              specify { should match(/invalid action: foo/i) }
+            end
+            context "more" do
+              let(:argv) { %w(more) }
+              specify { should match(/expecting.*action/i) }
+            end
+            context "more -h", {f:true} do
+              let(:argv) { %w(more -h) }
+              specify { should match(/^usage.*wahoo.*more.*tingle.*opts.*args/i) }
+            end
+            context "more wang" do
+              let(:argv) { %w(more wang) }
+              specify { should match(/invalid action: wang/i) }
+            end
+            context "more tingle foo" do
+              let(:argv) { %w(more tingle foo) }
+              specify { should match(/unexpected argument.*foo/i) }
+            end
+            context "more tingle -h" do
+              let(:argv) { %w(more tingle -h) }
+              specify { should match(/^usage: wahoo more tingle/i) }
+            end
+            context "more tingle" do
+              let(:argv) {%w(more tingle)}
+              specify { should match(/^yes sure tingle (?:inline|external)/) }
+              context "result" do
+                subject { @result }
+                specify { should eql(:yes_tingle) }
               end
             end
-            def duckle ; end
-            self
           end
-        end
-        it "lists the namespace inline as another action" do
-          klass.actions.visible.map{ |n| n.name.to_s }.should eql(%w(whiz-bang buckle duckle))
-        end
-        it "calls the child command" do
-          r = instance.invoke(['wh', 'cu'])
-          r.should eql(:yes_cuckle)
         end
       end
     end
