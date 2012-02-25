@@ -7,12 +7,13 @@ module Skylab::PubSub
     end
     def emits *nodes
       event_cloud = self.event_cloud
-      events = event_cloud.merge_definition! *nodes
+      events = event_cloud.merge_definition!(*nodes)
       these = instance_methods.map(&:intern)
       event_cloud.flatten(events).each do |tag|
         unless these.include?(m = "on_#{tag.name}".intern)
           define_method(m) do |&block|
             event_listeners.add_listener tag.name, block
+            self
           end
         end
       end
@@ -29,43 +30,50 @@ module Skylab::PubSub
   end
 end
 
-module Skylab::PubSub::Emitter
-  class Event
-    attr_reader :data
-    def initialize tag, data
-      @data = data
-      @tag = tag
-      @touched = false
+module Skylab::PubSub
+  class Event < Struct.new(:payload, :tag, :touched)
+    def initialize tag, payload
+      Array === payload or raise ArgumentError.new("need arrays here for now!")
+      super(payload, tag, false)
     end
     alias_method :event_id, :object_id
     def message
-      @touched = true
-      @data.to_s
+      self.touched = true
+      payload.map(&:to_s).join(' ')
     end
     alias_method :to_s, :message
-    def touch
-      @touched = true
+    def touch!
+      self.touched = true
     end
-    attr_accessor :touched # set this to false only if you are trying to be clever
     alias_method :touched?, :touched
     def type
-      @tag.name
+      tag.name
     end
   end
   class EventListeners < Hash
     def add_listener name, block
+      block.respond_to?(:call) or
+        raise ArgumentError.new("no block given. " <<
+          "Your \"block\" argument to add_listener (a #{block.class}) did not respond to \"call\"")
       self[name] ||= []
       self[name].push block
     end
   end
   module InstanceMethods
-    def emit type, data=nil
+    def emit type, *payload
       cloud = _find_event_cloud
       tag = cloud[type] or fail("undeclared event type: #{type.inspect}")
       el = event_listeners
       event = nil
       cloud.ancestor_names(tag).map{ |n| el[n] }.compact.flatten.tap do |a|
-        a.each { |b| b.call(event ||= Event.new(tag, data)) }
+        a.each do |b|
+          event ||= Event.new(tag, payload)
+          if 1 == b.arity
+            b.call(event)
+          else
+            b.call(*event.payload)
+          end
+        end
       end.count
     end
     # sucks for now
@@ -81,12 +89,13 @@ module Skylab::PubSub::Emitter
     def ancestor_names tag
       seen  = {}
       found = []
-      visit = ->(t) do
-        seen[t.name] = t
+      visit = ->(k) do
+        t = self[k] or t = merge_definition!(k).first
+        seen[t.name] = true
         found.push t.name
-        ( t.ancestors - found ).each { |s| seen[s] or visit[self[s]] } # !
+        ( t.ancestors - found ).each { |s| seen[s] or visit[s] } # !
       end
-      visit[tag]
+      visit[tag.name]
       found
     end
     def _deep_copy_init other

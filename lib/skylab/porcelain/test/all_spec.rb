@@ -7,11 +7,12 @@ module Skylab::Porcelain::TestSupport
 
   describe "The #{Skylab::Porcelain} module" do
     include Porcelain::Styles # unstylize
-    let(:debug_ui) { false }
-    let(:stderr) { MyStringIO.new }
+    let(:debug_ui) { }
+    let(:_stderr) { MyStringIO.new }
+    let(:stderr) { _stderr.to_s }
     let(:instance) do
       klass.new do |o|
-        o.on_all { |e| stderr.puts unstylize(e) ; debug_ui and $stderr.puts(e) }
+        o.on_all { |e| _stderr.puts unstylize(e) ; debug_ui and $stderr.puts("DBG-->#{e}<--") }
       end
     end
     describe "extended by a class allows that" do
@@ -20,6 +21,7 @@ module Skylab::Porcelain::TestSupport
           extend Porcelain
           def foo ; end
           def bar ; end
+          def self.to_s ; "WhoHah" end
         private
           def baz ; end
           self
@@ -28,6 +30,7 @@ module Skylab::Porcelain::TestSupport
       let(:child_class) do
         Class.new(klass).class_eval do
           def she_bang ; end
+          def self.to_s ; "BooHah" end
           self
         end
       end
@@ -157,17 +160,17 @@ module Skylab::Porcelain::TestSupport
           end
         end # optional
         describe "a syntax for arguments of" do
-          let(:knob) { lambda { |k| k.on_all { |e| stderr.puts e } } }
+          let(:knob) { lambda { |k| k.on_all { |e| _stderr.puts e } } }
           describe "zero-length" do
             let(:syntax) { Porcelain::ArgumentSyntax.parse_syntax('') }
             it "against the zero-length args emits no errors and returns true" do
               syntax.parse_arguments(argv = [], &knob).should eql(true)
-              stderr.to_s.should eql('')
+              stderr.should eql('')
               argv.should eql([])
             end
             it "against a nonzero-length args emits an error and returns false" do
               syntax.parse_arguments(argv = %w(alpha beta), &knob).should eql(false)
-              stderr.to_s.should match(/unexpected argument/i)
+              stderr.should match(/unexpected argument/i)
               argv.should eql(%w(alpha beta))
             end
           end
@@ -175,12 +178,12 @@ module Skylab::Porcelain::TestSupport
             let(:syntax) { Porcelain::ArgumentSyntax.parse_syntax('[<foo>]') }
             it "against the zero-length args emits no errors and returns true" do
               syntax.parse_arguments(argv = [], &knob).should eql(true)
-              stderr.to_s.should eql('')
+              stderr.should eql('')
               argv.should eql([])
             end
             it "against one-length args emits no errors and returns true" do
               syntax.parse_arguments(argv = ['first'], &knob).should eql(true)
-              stderr.to_s.should eql('')
+              stderr.should eql('')
               argv.should eql(['first'])
             end
           end
@@ -188,17 +191,17 @@ module Skylab::Porcelain::TestSupport
             let(:syntax) { Porcelain::ArgumentSyntax.parse_syntax('[<foo> [..]]') }
             it "against the zero-length args emits no errors and returns true" do
               syntax.parse_arguments(argv = [], &knob).should eql(true)
-              stderr.to_s.should eql('')
+              stderr.should eql('')
               argv.should eql([])
             end
             it "against one-length args emits no errors and returns true" do
               syntax.parse_arguments(argv = ['first'], &knob).should eql(true)
-              stderr.to_s.should eql('')
+              stderr.should eql('')
               argv.should eql(['first'])
             end
             it "against many-length args emits no errors and returns true" do
               syntax.parse_arguments(argv = ['first', 'second'], &knob).should eql(true)
-              stderr.to_s.should eql('')
+              stderr.should eql('')
               argv.should eql(['first', 'second'])
             end
           end
@@ -206,17 +209,17 @@ module Skylab::Porcelain::TestSupport
             let(:syntax) { Porcelain::ArgumentSyntax.parse_syntax('<foo> [<bar>] [<baz> [..]]') }
             it "against the zero-length args emits an error and returns false" do
               syntax.parse_arguments(argv = [], &knob).should eql(false)
-              stderr.to_s.should match(/expecting.+<foo>/)
+              stderr.should match(/expecting.+<foo>/)
               argv.should eql([])
             end
             it "against one is ok" do
               syntax.parse_arguments(argv = ['one'], &knob).should eql(true)
-              stderr.to_s.should eql('')
+              stderr.should eql('')
               argv.should eql(['one'])
             end
             it "againt five is ok" do
               syntax.parse_arguments(argv = %w(one two three four five), &knob).should eql(true)
-              stderr.to_s.should eql('')
+              stderr.should eql('')
               argv.should eql(%w(one two three four five))
             end
           end # n length
@@ -224,11 +227,13 @@ module Skylab::Porcelain::TestSupport
       end # ArgumentSyntax
     end # DSL
     describe "invocation happens with a call to invoke() (pass it ARGV) that" do
-      Porcelain::Runtime.send(:define_method, :invocation_name) { 'yourapp' }
       let(:expecting_foo_bar) { /expecting \{(?:help\|)?foo\|bar\}/i }
       let(:klass) do
         Class.new.class_eval do
           extend Porcelain
+          porcelain do
+            invocation_name 'yourapp'
+          end
           def foo ; end
           def bar ; end
         private
@@ -253,7 +258,7 @@ module Skylab::Porcelain::TestSupport
       end
       it "with -h (or help) followed by an action name, you get action-specific help" do
         instance.invoke ['-h', 'foo']
-        stderr.should match(/usage: yourapp foo/)
+        stderr.should match(/usage: yourapp foo/i)
       end
       describe "does fuzzy matching on the action name" do
         let(:klass) do
@@ -266,8 +271,8 @@ module Skylab::Porcelain::TestSupport
         end
         it "by default" do
           instance.invoke %w(pl)
-          stderr.to_s.should match(/ambiguous action[ ":]+pl/i)
-          stderr.to_s.should match(/did you mean pliny or plone/i)
+          stderr.should match(/ambiguous action[ ":]+pl/i)
+          stderr.should match(/did you mean pliny or plone/i)
         end
         describe "but by using the config" do
           let(:klass) do
@@ -281,8 +286,8 @@ module Skylab::Porcelain::TestSupport
           end
           it "it can be turned off" do
             instance.invoke %w(pl)
-            stderr.to_s.should match(/invalid action[ :"]+pl/i)
-            stderr.to_s.should match(/expecting.+pliny\|plone/i)
+            stderr.should match(/invalid action[ :"]+pl/i)
+            stderr.should match(/expecting.+pliny\|plone/i)
           end
         end
       end
@@ -291,10 +296,11 @@ module Skylab::Porcelain::TestSupport
       let(:klass) do
         Class.new.class_eval do
           extend Porcelain
+          porcelain.invocation_name 'yourapp'
           attr_reader :argv ; private :argv
           def initialize &b
             @argv = @touched = nil
-            init_porcelain(&b)
+            porcelain_init(&b)
           end
           def takes_no_arguments
             @touched = true
@@ -311,20 +317,21 @@ module Skylab::Porcelain::TestSupport
         it "if you pass it no arguments, it is called" do
           instance.invoke %w(takes-no-arguments)
           instance.send(:touched).should eql(true)
-          stderr.to_s.should eql('')
+          stderr.should eql('')
         end
         it "if you pass it some arguments, it reports a syntax error and shows usage and invites for help" do
-          instance.invoke(%w(takes-no-arguments first-arg)).should eql(false)
-          stderr.to_s.tap do |it|
-            it.should match(/unexpected argument[: ]+"first-arg"/i)
-            it.should match(/usage: yourapp takes-no-arguments/i)
-            it.should match(/try .* for help/i)
-          end
+          i = instance
+          i.invoke(%w(takes-no-arguments first-arg)).should eql(false)
+          s = stderr.split("\n")
+          s.shift.should match(/unexpected argument[: ]+"first-arg"/i)
+          s.shift.should match(/usage: yourapp takes-no-arguments/i)
+          s.shift.should match(/try .* for help/i)
+          s.size.should eql(0)
         end
       end
     end
     describe "provides rendering" do
-      let (:definition_block) do
+      let(:definition_block) do
         lambda do |_|
           option_syntax do |ctx|
             on('-a', '--apple', "an apple")
@@ -335,24 +342,24 @@ module Skylab::Porcelain::TestSupport
           def whatever_is_clever foo, bar=nil; end
         end
       end
-      let (:action) do
-        this = self
+      let(:action) do
+        o = self
         Porcelain::Action.new do
-          class_eval(&this.definition_block)
+          module_eval(& o.definition_block)
         end
       end
-      let (:klass) do
+      let(:klass) do
         this = self
         Class.new.class_eval do
           extend Porcelain
+          porcelain.invocation_name 'yourapp'
           class_eval(&this.definition_block)
           self
         end
       end
-      describe "of syntax" do
-       it "that is more detailed than optparse's" do
-         action.syntax.should eql('whatever-is-clever [-a] [-p[=foo]] [--bananna=<type>] <foo> [<bar>]')
-        end
+      describe "of syntax that provides more detail than optparse:" do
+        subject { action.syntax }
+        specify { should eql('whatever-is-clever [-a] [-p[=foo]] [--bananna=<type>] <foo> [<bar>]') }
       end
       describe "of help screens" do
         it "will use optparse's rendering of help screen for the options" do
@@ -364,13 +371,12 @@ module Skylab::Porcelain::TestSupport
       end
     end # provides rendering
     context "allows you to specify default actions (actually argvs), for e.g.:" do
-      let(:debug_ui) { false }
       context 'with an app with actions "foo" and "bar"' do
         let(:klass) do
-          ohai = body
+          o = self
           Class.new.class_eval do
             extend ::Skylab::Porcelain
-            class_eval(&ohai)
+            class_eval(& o.body)
             def foo
               runtime.emit(:info, "I am foo.")
             end
@@ -419,6 +425,175 @@ module Skylab::Porcelain::TestSupport
           context "it works" do
             let(:argv) { [] }
             specify { should match(/unexpected argument.+-x/i) }
+          end
+        end
+      end
+    end
+    context "With regards to Namespaces.." do
+      context "Porcelain itself" do
+        subject { Porcelain }
+        it { should respond_to(:namespaces) }
+      end
+      context "the result of a call to #namespaces" do
+        subject { Porcelain.namespaces }
+        it { should be_kind_of(Array) }
+      end
+      context "if you try to use both an external class and an inline namespace definition"
+      context "if you try to use neither external class nor internal namespace defnition"
+
+      let(:klass_with_inline_namespace) do
+        Class.new.module_eval do
+          extend Porcelain
+          porcelain.invocation_name = 'wahoo'
+          namespace :'more' do
+            def tingle
+              runtime.emit(:info, "yes sure tingle inline")
+              :yes_tingle
+            end
+          end
+          def duckle ; end
+          self
+        end
+      end
+      let(:klass_with_external_namespace) do
+        cls = Class.new.class_eval do
+          extend Porcelain
+          def tingle
+            runtime.emit(:info, "yes sure tingle external")
+            :yes_tingle
+          end
+          self
+        end
+        Class.new.class_eval do
+          extend Porcelain
+          porcelain.invocation_name = 'wahoo'
+          namespace :'more', cls
+          def duckle ; end
+          self
+        end
+      end
+      [ { :name => 'an external class',
+          :var  => :klass_with_external_namespace
+        },
+        { :name => 'an inline namespace definition',
+          :var  => :klass_with_inline_namespace
+        }
+      ].each do |o|
+
+        name, var = %w(name var).map { |k| o[k.intern] }
+
+        context "when you have <<#{name}>>.." do
+
+          let(:klass) { send(var) }
+
+          context "stdout response" do
+
+            before { @result = instance.invoke argv }
+
+            subject { stderr.split("\n").first }
+
+            context "[]" do
+              let(:argv) { [] }
+              specify { should match(/expecting.*more.*duckle/i) }
+            end
+            context "-h" do
+              let(:argv) { %w(-h) }
+              specify { should match(/^usage: wahoo \{ *more *\| *duckle *\}/) }
+            end
+            context "foo" do
+              let(:argv) { %w(foo) }
+              specify { should match(/invalid action: foo/i) }
+            end
+            context "more" do
+              let(:argv) { %w(more) }
+              specify { should match(/expecting.*action/i) }
+            end
+            context "more -h" do
+              let(:argv) { %w(more -h) }
+              specify { should match(/^usage.*wahoo.*more.*tingle.*opts.*args/i) }
+            end
+            context "more wang" do
+              let(:argv) { %w(more wang) }
+              specify { should match(/invalid action: wang/i) }
+            end
+            context "more tingle foo" do
+              let(:argv) { %w(more tingle foo) }
+              specify { should match(/unexpected argument.*foo/i) }
+            end
+            context "more tingle -h" do
+              let(:argv) { %w(more tingle -h) }
+              specify { should match(/^usage: wahoo more tingle/i) }
+            end
+            context "more tingle" do
+              let(:argv) {%w(more tingle)}
+              specify { should match(/^yes sure tingle (?:inline|external)/) }
+              context "result" do
+                subject { @result }
+                specify { should eql(:yes_tingle) }
+              end
+            end
+          end
+        end
+      end
+    end
+    context "when you don't explicitly tell it the args syntax" do
+      let(:klass) do
+        o = self
+        Class.new.class_eval do
+          extend ::Skylab::Porcelain
+          porcelain.invocation_name = "doipus"
+          module_eval(& o.body)
+          self
+        end
+      end
+      let(:subject) do
+        @return = instance.invoke argv
+        stderr.match(/\A[^\n]+/)[0]
+      end
+      context "basic one arg def" do
+        let(:body) do
+          lambda do |_|
+            def foo first
+              runtime.emit(:info, "i am foo with: #{first}.")
+              :ok_foo
+            end
+          end
+        end
+        context "foo -h" do
+          let(:argv) { %w(foo -h) }
+          specify { should match(/usage: doipus foo <arg1>/i) }
+        end
+        context "foo" do
+          let(:argv) { %w(foo) }
+          specify { should match(/expecting.*arg1/i) }
+        end
+        context "foo bizzie" do
+          let(:argv) { %w(foo bizzie) }
+          specify { should match(/i am foo with: bizzie\./i) }
+        end
+        context "foo biz baz" do
+          let(:argv) { %w(foo biz baz) }
+          specify { should match(/unexpected argument.*baz/i) }
+        end
+      end
+      context "trailing optional" do
+        let(:body) do
+          lambda do |_|
+            def foo first, second=nil
+              runtime.emit(:info, "i am foo with: #{first}, #{second}.")
+              :ok_foo
+            end
+          end
+        end
+        context "foo -h" do
+          let(:argv) { %w(foo -h) }
+          specify { should be_include('foo <arg1> [<arg> [<arg>[...]]]') }
+        end
+        context "foo biz baz boz" do
+          let(:argv) { %w(foo biz baz boz) }
+          it "will still throw an argument error" do
+            lambda { instance.invoke(argv) }.
+              should raise_exception(ArgumentError, /wrong number of arguments \(3 for 2\)/)
           end
         end
       end
