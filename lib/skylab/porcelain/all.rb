@@ -94,7 +94,7 @@ module Skylab::Porcelain
     def method_added method_name
       if defn = @porcelain.action!
         defn.method_name = method_name
-        _actions_cache.cache Action.new(defn)
+        _actions_cache.cache Action.new(defn, instance_method(method_name))
       end
     end
     def namespace name, *params, &block
@@ -118,7 +118,9 @@ module Skylab::Porcelain
       ActionEnumerator.new(cache) do |yielder|
         cache.each { |act| yielder << act }
         public_instance_methods(false).select { |m| ! cache.key?(m) }.each do |method_name|
-          yielder << cache.cache(Action.new(:method_name => method_name))
+          yielder << cache.cache(Action.new(
+            :method_name => method_name, :unbound_method => instance_method(method_name)
+          ))
         end
       end
     end
@@ -210,24 +212,39 @@ module Skylab::Porcelain
   ParseOptsSubs = Subscriptions.new(:syntax, :help_flagged, :push) # hack'd
   ParseSubs     = Subscriptions.new(:push, :syntax)
 
-  class Action < Struct.new(:aliases, :argument_syntax, :method_name, :name, :option_syntax, :visible)
+  class Action < Struct.new(:aliases, :argument_syntax,
+    :argument_syntax_inferred, :method_name, :name, :option_syntax,
+    :unbound_method, :visible
+  )
     extend Structuralist
     def argument_syntax
       (as = super).respond_to?(:parse_arguments) ? as :
-        (self.argument_syntax = ArgumentSyntax.parse_syntax(as || ''))
+        (self.argument_syntax = ArgumentSyntax.parse_syntax(as || _argument_syntax_inferred))
     end
+    def _argument_syntax_inferred
+      self.argument_syntax_inferred = true
+      arr = []
+      if 0 > (a = unbound_method.arity)
+        arr.push '[<arg> [..]]'
+        a = (a * -1 - 1)
+      end
+      arr[0, 0] = (0...a).map { |i| "<arg#{i + 1}>" }
+      arr * ' '
+    end
+    alias_method :argument_syntax_inferred?, :argument_syntax_inferred
     def duplicate
       Action.new( :aliases         => (aliases ? aliases.dup : aliases),
                   :argument_syntax => argument_syntax.to_s, # !
                   :method_name     => method_name,
                   :option_syntax   => option_syntax.duplicate,
+                  :unbound_method  => unbound_method, # sketchy / experimental
                   :visible         => visible)
     end
     def help(&block)
       option_syntax.help(&block)
     end
-    def initialize params=nil, &block
-      super(nil, nil, nil, nil, nil, true)
+    def initialize params=nil, unbound = nil, &block
+      super(nil, nil, false, nil, nil, nil, unbound, true)
       ActionDef === params and params = params.to_hash
       block and params2 = self.class.define(&block).to_hash
       params && params2 and (params.merge!(params2))
@@ -408,7 +425,7 @@ module Skylab::Porcelain
     end
   end
   class Parameter
-    NAME = %r{<([_a-z]+)>}
+    NAME = %r{<([-_a-z][-_a-z0-9]*)>}
     REGEX = %r{
            #{NAME.source} [ ]* ( \[ (?: <\1> [ ]* \[ \.\.\.? \] | \.\.\.? ) \] )?
       | \[ #{NAME.source} [ ]* ( \[ (?: <\3> [ ]* \[ \.\.\.? \] | \.\.\.? ) \] )? \]
