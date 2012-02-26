@@ -148,7 +148,7 @@ module Skylab::Face
       def command_tree
         @command_tree ||= begin
           defined = command_definitions.map { |cls, a, b| cls.build(*a, &b) }
-          defined_m = defined.map(&:method_symbol).compact
+          defined_m = defined.map{ |a| a.method_symbol if a.respond_to?(:method_symbol) }.compact
           implied_m = public_instance_methods(false).map(&:intern) - defined_m
           implied = implied_m.map { |m| Command.new(m) }
           Treeish[ defined + implied ]
@@ -163,8 +163,19 @@ module Skylab::Face
         #   option_definitions.reject! { |a,_| '-h' == a.first }
       end
       def namespace name, *aliases, &block
-        name.nil? and raise ArgumentError.new("First argument must be a namespace name symbol or or a definition array.")
-        def_block = name.kind_of?(Array) ? name : [Namespace, [name, *aliases], block]
+        name or raise ArgumentError.new("First argument must be a namespace name symbol or or a definition array.")
+        def_block = if Array === name
+          aliases.any? and raise ArgumentError.new("when first arg is array it must be the only argument.")
+          block and raise ArgumentError.new("unexpected block here")
+          name
+        else
+          if 1 == aliases.size and Module === aliases.first
+            block and raise ArgumentError.new("unexpected block here")
+            [aliases.first, [name], nil]
+          else
+            [Namespace, [name, *aliases], block] # 'name' takes on a variety of forms here
+          end
+        end
         command_definitions.push Namespace.add_definition(def_block)
       end
       def on *a, &b
@@ -206,7 +217,7 @@ module Skylab::Face
       end
       def command_tree
         @command_tree ||= begin
-          interface.command_tree.map { |c| c.parent = self; c } # careful
+          interface.command_tree.map { |c| c.parent = self if c.respond_to?(:parent=); c } # careful
         end
       end
       def expecting
@@ -317,7 +328,7 @@ module Skylab::Face
             x = class << self; self end
             x.send(:define_method, :inspect) { "#<#{name}:Namespace>" }
             x.send(:alias_method, :to_s, :inspect)
-            class_eval(&block)
+            class_eval(&block) if block
             self
           end
         end
@@ -381,12 +392,13 @@ class Skylab::Face::Cli
   end
   alias_method :invocation_string, :program_name
   def run argv
-    argv.empty?        and return empty_argv
+    argv.empty? and return empty_argv
     runner = self
     begin
       argv.first =~ /^-/ and return runner.run_opts(argv)
       cmd = runner.find_command(argv)
     end while (cmd and cmd.respond_to?(:find_command) and runner = cmd)
+    cmd.respond_to?(:invoke) and return cmd.invoke(argv) # compat
     cmd and req = cmd.parse(argv) and
     begin
       runner.send(cmd.method_symbol, req, * req.method_parameters)
