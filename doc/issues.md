@@ -1,3 +1,4 @@
+[#069] 2012-02-25 @open: porcelain: compat w/ face cli
 [#068] 2012-02-24 @open: porcelain: without syntax uses method sig
 [#067] 2012-02-20 @open: emitter can emit arbitrary number of arguments
 [#066] 2012-02-18 @open: porcelain: namespace native and compat
