@@ -1,3 +1,7 @@
+[#074] 2012-02-26 @open: porcelain: get tree into stable from 026 branch
+[#073] 2012-02-26 @open: git-viz: histree: (file tree with most recents)
+[#072] 2012-02-26 @open: borrow
+[#071] 2012-02-26 @open: fsm: passes with some specs
 [#070] 2012-02-25 @open: face cli: compat back / fwds with porcelain
 [#069] 2012-02-25 @open: porcelain: compat w/ face cli
 [#068] 2012-02-24 @open: porcelain: without syntax uses method sig
