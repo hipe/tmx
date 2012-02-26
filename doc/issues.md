@@ -1,4 +1,4 @@
-[#074] 2012-02-26 @open: porcelain: get tree into stable from 026 branch
+[#074] 2012-02-26 @closed: porcelain: get tree into stable from 026 branch
 [#073] 2012-02-26 @open: git-viz: histree: (file tree with most recents)
 [#072] 2012-02-26 @open: borrow
 [#071] 2012-02-26 @open: fsm: passes with some specs
