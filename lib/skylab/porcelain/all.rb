@@ -44,7 +44,7 @@ module Skylab::Porcelain
     end
   end
   class PorcelainModuleKnob < Struct.new(:client_module, :default,
-    :frame_settings, :runtime_instance_settings
+    :description, :frame_settings, :runtime, :runtime_instance_settings
   )
     extend Structuralist
     def action
@@ -63,19 +63,37 @@ module Skylab::Porcelain
       frame_settings.push(->(_){ self.default= defaults })
     end
     alias_method :default, :default= # !
+    def description *a
+      (0 == a.size) ? super : (super() or self.description = []).concat(a.flatten) # gesundheit
+    end
+    alias_method :desc, :description
     def fuzzy_match= b
       frame_settings.push(->(_){ self.fuzzy_match = b })
     end
     alias_method :fuzzy_match, :fuzzy_match= # !
     def initialize client_module
       @action = nil
-      super(client_module, nil, [], [])
+      super(client_module, nil, nil, [], RuntimeModuleKnob.new, [])
     end
     def invocation_name= s
       runtime_instance_settings.push(->(_){ self.invocation_slug = s })
       s
     end
     alias_method :invocation_name, :invocation_name= # !
+    def runtime &block
+      rt = super(& nil)
+      rt.instance_eval(&block) if block
+      rt
+    end
+  end
+  class RuntimeModuleKnob < Struct.new(:definition_blocks)
+    def initialize
+      super([])
+    end
+    def emits *a
+      definition_blocks.push( ->(_) { emits(*a) } )
+      self
+    end
   end
   module Dsl
     # (This module is for wiring only.  Must be kept light outside and in.)
@@ -87,9 +105,6 @@ module Skylab::Porcelain
     end
     def porcelain_dsl_init
       @porcelain ||= PorcelainModuleKnob.new(self) # already set iff this is a subclass
-    end
-    def emits *a
-      porcelain { emits(*a) }
     end
     def method_added method_name
       if defn = @porcelain.action!
@@ -527,7 +542,7 @@ module Skylab::Porcelain
       "{#{actions_provider.actions.visible.map{ |a| e13b(a.name) }.join('|')}}"
     end
     def render_usage action
-      "#{header 'USAGE:'} #{e13b "#{invocation(0..-2)} #{action.syntax}"}"
+      "#{header 'usage:'} #{e13b "#{invocation(0..-2)} #{action.syntax}"}"
     end
     # @return [invoker, method, args] or false/nil
     def resolve
@@ -649,13 +664,11 @@ module Skylab::Porcelain
       :syntax        => :info,
       :runtime_issue => :error
     })
-    # def actions
-    #   stack.above.actions_provider.actions
-    # end
     %w(invocation render_actions resolve).each do |m| # @delegates
       define_method(m) { |*a, &b| stack.send(m, *a, &b) }
     end
     def initialize argv, client_instance, instance_defn, module_defn
+      module_defn.runtime.definition_blocks.each { |b| singleton_class.module_eval(&b) }
       module_defn.runtime_instance_settings.each { |b| instance_eval(&b) }
       (b = instance_defn.runtime_instance_settings) and b.call(self)
       @invocation_slug ||= File.basename($PROGRAM_NAME)
@@ -758,6 +771,14 @@ module Skylab::Porcelain
         end
       end
     end
+    def for_run ui, slug # compat
+      o = @external_module.porcelain.build_client_instance nil
+      o.porcelain.runtime_instance_settings = ->(p) do
+        p.invocation_slug = slug
+        p.on_all { |e| $stderr.puts e.to_s }
+      end
+      o
+    end
     def initialize name, *params, &block
       mod = params.shift if Module === params.first
       case params.size
@@ -818,6 +839,12 @@ module Skylab::Porcelain
       # the grammar for namespaces takes no options and does not change argv
       yield(ParseSubs.new).event_listeners[:push].last.call(@frame)
       :never_see
+    end
+    def summary
+      case @mode
+      when :external    ;  @external_module.porcelain.desc
+      else              ;  fail("implement me")
+      end
     end
   end
 end
