@@ -249,7 +249,7 @@ module Skylab::Porcelain
     alias_method :argument_syntax_inferred?, :argument_syntax_inferred
     def duplicate
       Action.new( :aliases         => (aliases ? aliases.dup : aliases),
-                  :argument_syntax => argument_syntax.to_s, # !
+                  :argument_syntax => argument_syntax.to_str, # !
                   :method_name     => method_name,
                   :option_syntax   => option_syntax.duplicate,
                   :unbound_method  => unbound_method, # sketchy / experimental
@@ -292,7 +292,7 @@ module Skylab::Porcelain
       ba.each { |b| instance_eval(&b) }
     end
     def syntax
-      [name, option_syntax.to_s, argument_syntax.to_s].compact.join(' ')
+      [name, option_syntax.to_str, argument_syntax.to_str].compact.join(' ')
     end
     def to_hash
       duplicate._to_hash
@@ -368,7 +368,7 @@ module Skylab::Porcelain
       end
       context
     end
-    def to_s
+    def to_str
       0 == count and return nil
       build_parser({}).instance_variable_get('@stack')[2].list.select{ |s| s.kind_of?(::OptionParser::Switch) }.map do |switch| # ick
         "[#{[(switch.short.first || switch.long.first), switch.arg].compact.join('')}]"
@@ -384,7 +384,7 @@ module Skylab::Porcelain
       until p.eos?
         p.skip(/ /)
         matched = p.scan(Parameter::REGEX) or
-          raise RuntimeError.new("failed to parse: #{p.rest.inspect}#{" (after #{last.to_s.inspect})" if any?}")
+          raise RuntimeError.new("failed to parse: #{p.rest.inspect}#{" (after #{last.to_str.inspect})" if any?}")
         matchdata = Parameter::REGEX.match(matched)
         push Parameter.new(:matchdata => matchdata)
       end
@@ -393,7 +393,7 @@ module Skylab::Porcelain
     def parse_arguments argv, &block
       ArgumentParse[self, argv, &block]
     end
-    def to_s
+    def to_str
       0 == count and return nil
       join(' ')
     end
@@ -414,12 +414,18 @@ module Skylab::Porcelain
       tokens = ArrayAsTokens.new(argv)
       symbols = ArrayAsTokens.new(syntax)
       nope = lambda { |msg| o.emit(:syntax, msg) ; false }
+      touched = false
       while tokens.any?
         symbol = symbols.current or return nope["unexpected argument: #{tokens.current.inspect}"]
         tokens.advance
-        symbol.glob? or symbols.advance
+        if symbol.glob?
+          touched = true
+        else
+          symbols.advance
+        end
       end
-      symbols.current and symbols.current.required? and return nope["expecting: #{Styles::e13b symbols.current}"]
+      (s = symbols.current) and s.required? and (!s.glob? or !touched) and
+        return nope["expecting: #{Styles::e13b s.to_str}"]
       true
     end
   end
@@ -460,7 +466,7 @@ module Skylab::Porcelain
       end
     end
     def required? ; @min > 0 ; end
-    def to_s
+    def to_str
       ellipses = @max.nil? ? " [<#{@name}>[...]]" : ''
       required? ? "<#{@name}>#{ellipses}" : "[<#{@name}>#{ellipses}]"
     end
@@ -512,7 +518,7 @@ module Skylab::Porcelain
     end
     def argv_empty
       if default? and ! defaulted?
-        argv.concat default.map(&:to_s)
+        argv[0, 0] = default.map(&:to_s)
         self.defaulted = true #!
       else
         argv_empty_final
@@ -534,6 +540,7 @@ module Skylab::Porcelain
       )
       nil
     end
+    alias_method :no_command, :argv_empty # for now!
     def on_help_switch
       argv[0] = 'help' # might bite one day
     end
@@ -552,7 +559,7 @@ module Skylab::Porcelain
       loop do
         argv.empty? and (b = argv_empty or return b)
         Officious::Help::SWITCHES.include?(argv.first) and (on_help_switch or return)
-        /^-/ =~ argv.first and no_command
+        /^-/ =~ argv.first and (b = no_command or return b)
         resolve_action or return false
         wtf = catch(:option_action) do
           action.parse(argv) do |o|
@@ -734,7 +741,7 @@ module Skylab::Porcelain
     def parse_options args
       nil # a namespace never parses options, only a one-token name
     end
-    def to_s
+    def to_str
       nil # important
     end
   end

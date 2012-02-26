@@ -73,7 +73,7 @@ module Skylab::Porcelain::TestSupport
         end
       end
       it "is used for defining option and argument syntax" do
-        klass.actions[:bar].argument_syntax.to_s.should eql('<foo>')
+        klass.actions[:bar].argument_syntax.to_str.should eql('<foo>')
       end
       describe 'provides an argument syntax in which' do
         it "you can inspect the number of parameters (like nonternimal symbols)" do
@@ -88,31 +88,31 @@ module Skylab::Porcelain::TestSupport
         describe "a required parameter (a [1..1] ranged parameter)" do
           let(:parameter) {  _ '<foo>' }
           it("knows it is required") { parameter.required?.should eql(true) }
-          it("unparses correctly") { parameter.to_s.should eql('<foo>') }
+          it("unparses correctly") { parameter.to_str.should eql('<foo>') }
         end
         describe "an optional parameter (a [0..1] ranged parameter)" do
           let(:parameter) { _ '[<foo>]' }
           it("knows it is not required") { parameter.required?.should eql(false) }
-          it("unparses like so") { parameter.to_s.should eql('[<foo>]') }
+          it("unparses like so") { parameter.to_str.should eql('[<foo>]') }
         end
         describe "a [1..] ranged parameter" do
           let(:parameter) { _ '<foo>[<foo>[...]]' }
           it("knows it is required") { parameter.required?.should eql(true) }
-          it("unparses like so") { parameter.to_s.should eql('<foo> [<foo>[...]]') }
+          it("unparses like so") { parameter.to_str.should eql('<foo> [<foo>[...]]') }
           context do
             let(:parameter) { _ '<foo> [..]' }
             it("can also be notated this way") { parameter.required?.should eql(true) }
-            it("but unparses the same as above") { parameter.to_s.should eql('<foo> [<foo>[...]]') }
+            it("but unparses the same as above") { parameter.to_str.should eql('<foo> [<foo>[...]]') }
           end
         end
         describe "a [0..] ranged parameter" do
           let(:parameter) { _ '[<foo> [<foo> [...]]]' }
           it("knows it is not required") { parameter.required?.should eql(false) }
-          it("unparses like so") { parameter.to_s.should eql('[<foo> [<foo>[...]]]') }
+          it("unparses like so") { parameter.to_str.should eql('[<foo> [<foo>[...]]]') }
           context do
             let(:parameter) { _ '[<foo> [..]]' }
             it("can also be notated in this way") { parameter.required?.should eql(false) }
-            it("but unparses the same as above") { parameter.to_s.should eql('[<foo> [<foo>[...]]]') }
+            it("but unparses the same as above") { parameter.to_str.should eql('[<foo> [<foo>[...]]]') }
           end
         end
         describe "glob" do
