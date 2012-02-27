@@ -18,7 +18,6 @@ module Skylab::Porcelain
   end
   module Structuralist
     def attr_accessor_oldschool name
-      method_defined?(name) or fail("#{name.inspect} must be defined in parent.")
       define_method(name) do |*a|
         case a.size ; when 0 ; super()
                       when 1 ; send("#{name}=", a.first)
@@ -26,8 +25,27 @@ module Skylab::Porcelain
         end
       end
     end
+    def list_accessor_oldschool name
+      define_method(name) do |*a|
+        val = super()
+        0 == a.size and return val
+        (val or self.send("#{name}=", [])).concat a.flatten
+      end
+    end
   end
-  class ActionDef < Struct.new(:argument_syntax, :method_name, :option_syntax, :settings)
+  module Aliasist
+    extend Structuralist
+    list_accessor_oldschool :aliases
+  end
+  module Descriptionist
+    extend Structuralist
+    list_accessor_oldschool :description
+    alias_method :desc, :description
+  end
+  class ActionDef < Struct.new(:aliases, :argument_syntax, :description,
+    :method_name, :option_syntax, :settings
+  )
+    include Descriptionist, Aliasist
     def argument_syntax= str
       argument_syntax and fail("won't clobber existing argument syntax")
       super(str)
@@ -43,10 +61,11 @@ module Skylab::Porcelain
       Hash[* members.map { |m| [m, send(m)] }.flatten(1) ]
     end
   end
-  class PorcelainModuleKnob < Struct.new(:client_module, :default,
+  class PorcelainModuleKnob < Struct.new(:aliases, :client_module, :default,
     :description, :frame_settings, :runtime, :runtime_instance_settings
   )
     extend Structuralist
+    include Descriptionist, Aliasist
     def action
       @action ||= ActionDef.new
     end
@@ -63,17 +82,13 @@ module Skylab::Porcelain
       frame_settings.push(->(_){ self.default= defaults })
     end
     alias_method :default, :default= # !
-    def description *a
-      (0 == a.size) ? super : (super() or self.description = []).concat(a.flatten) # gesundheit
-    end
-    alias_method :desc, :description
     def fuzzy_match= b
       frame_settings.push(->(_){ self.fuzzy_match = b })
     end
     alias_method :fuzzy_match, :fuzzy_match= # !
     def initialize client_module
       @action = nil
-      super(client_module, nil, nil, [], RuntimeModuleKnob.new, [])
+      super(nil, client_module, nil, nil, [], RuntimeModuleKnob.new, [])
     end
     def invocation_name= s
       runtime_instance_settings.push(->(_){ self.invocation_slug = s })
@@ -228,10 +243,11 @@ module Skylab::Porcelain
   ParseSubs     = Subscriptions.new(:push, :syntax)
 
   class Action < Struct.new(:aliases, :argument_syntax,
-    :argument_syntax_inferred, :method_name, :name, :option_syntax,
+    :argument_syntax_inferred, :description, :method_name, :name, :option_syntax,
     :unbound_method, :visible
   )
     extend Structuralist
+    include Descriptionist, Aliasist # namespace objects use aliases in themselves explicitly below
     def argument_syntax
       (as = super).respond_to?(:parse_arguments) ? as :
         (self.argument_syntax = ArgumentSyntax.parse_syntax(as || _argument_syntax_inferred))
@@ -243,23 +259,36 @@ module Skylab::Porcelain
         arr.push '[<arg> [..]]'
         a = (a * -1 - 1)
       end
+      if option_syntax.any?
+        a = [0, a - 1].max
+      end
       arr[0, 0] = (0...a).map { |i| "<arg#{i + 1}>" }
       arr * ' '
     end
     alias_method :argument_syntax_inferred?, :argument_syntax_inferred
     def duplicate
-      Action.new( :aliases         => (aliases ? aliases.dup : aliases),
+      Action.new( :aliases         => (aliases     ? aliases.dup     : nil),
                   :argument_syntax => argument_syntax.to_str, # !
+                  :description     => (description ? description.dup : nil),
                   :method_name     => method_name,
                   :option_syntax   => option_syntax.duplicate,
                   :unbound_method  => unbound_method, # sketchy / experimental
                   :visible         => visible)
     end
     def help(&block)
+      if description
+        yield(o = HelpSubs.new)
+        if 1 == description.size
+          o.emit(:header, 'description', description.first)
+        else
+          o.emit(:header, 'description')
+          description.each { |s| o.emit(:default, s) }
+        end
+      end
       option_syntax.help(&block)
     end
     def initialize params=nil, unbound = nil, &block
-      super(nil, nil, false, nil, nil, nil, unbound, true)
+      super(nil, nil, false, nil, nil, nil, nil, unbound, true)
       ActionDef === params and params = params.to_hash
       block and params2 = self.class.define(&block).to_hash
       params && params2 and (params.merge!(params2))
@@ -279,7 +308,7 @@ module Skylab::Porcelain
     end
     def parse argv
       yield(o = ParseSubs.new)
-      false == (opts = option_syntax.parse_options(argv, & o.to_proc)) and return
+      false == (opts = option_syntax.parse_options(argv, & o.to_proc)) and return false # !
       b = argument_syntax.parse_arguments(argv, & o.to_proc) or return b
       # experimental sugar to avoid the client having to do their own parsing in this scenario, apparently not necessary in 1.9!
       # if opts && argument_syntax.any? && ! argument_syntax.last.glob? && argv.length < argument_syntax.length
@@ -363,7 +392,7 @@ module Skylab::Porcelain
       begin
         option_parser.parse! argv
       rescue ::OptionParser::ParseError => e
-        knob.emit_syntax e
+        knob.emit(:syntax, e)
         context = false
       end
       context
@@ -586,13 +615,13 @@ module Skylab::Porcelain
     end
     def resolve_action
       self.action = nil
-      sym = (self.invocation_slug = (argv.shift or fail('no'))).intern
-      if exact = actions_provider.actions.detect { |a| sym == a.name }
+      sym = (self.invocation_slug = str = (argv.shift or fail('no'))).intern
+      if exact = actions_provider.actions.detect { |a| sym == a.name or a.aliases && a.aliases.include?(str) }
         self.action = exact
         true
       elsif fuzzy_match?
         re = /\A#{Regexp.escape invocation_slug}/
-        case (found = actions_provider.actions.select { |a| re =~ a.name.to_s }).size
+        case (found = actions_provider.actions.select { |a| re =~ a.name.to_s or a.aliases && a.aliases.grep(re) }).size
         when 0
           action_invalid
         when 1
@@ -720,7 +749,7 @@ module Skylab::Porcelain
         "Try #{e13b invocation} #{render_actions} #{e13b "-h"}.")
       emit(:usage, frame.render_usage(o))
       o.help do |x|
-        x.on_header { |name, content=nil| emit(:help, "#{header("#{name}:")}#{content}") }
+        x.on_header { |name, content| emit(:help, "#{header("#{name}:")}#{ " #{content}" if content}") }
         x.on_two_col { |a, b| emit(:help, "#{e13b a}#{b}") }
         x.on_default { |line| emit(:help, line) }
       end
@@ -812,6 +841,7 @@ module Skylab::Porcelain
       super(params, & nil) # explicitly avoid bubbling up the block
       case @mode
       when :external
+        mod.porcelain.aliases and aliases(* mod.porcelain.aliases)
       when :inline
         class << self
           # we want all this on the sing. class because this object is not a subclass but an instance
