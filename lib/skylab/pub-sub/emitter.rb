@@ -7,50 +7,74 @@ module Skylab::PubSub
     end
     def emits *nodes
       event_cloud = self.event_cloud
-      events = event_cloud.merge_definition! *nodes
+      events = event_cloud.merge_definition!(*nodes)
       these = instance_methods.map(&:intern)
       event_cloud.flatten(events).each do |tag|
         unless these.include?(m = "on_#{tag.name}".intern)
           define_method(m) do |&block|
             event_listeners.add_listener tag.name, block
+            self
           end
         end
       end
     end
     def event_cloud
-      @event_cloud ||= SemanticTagCloud.new
+      @event_cloud ||= begin
+        if (k = ancestors[self == ancestors.first ? 1 : 0]).respond_to?(:event_cloud)
+          SemanticTagCloud.new(k.event_cloud)
+        else
+          SemanticTagCloud.new
+        end
+      end
     end
   end
 end
 
-module Skylab::PubSub::Emitter
-  class Event
-    def initialize tag, data
-      @tag = tag
-      @message = data.to_s
+module Skylab::PubSub
+  class Event < Struct.new(:payload, :tag, :touched)
+    def initialize tag, payload
+      Array === payload or raise ArgumentError.new("need arrays here for now!")
+      super(payload, tag, false)
     end
     alias_method :event_id, :object_id
-    attr_reader :message
+    def message
+      self.touched = true
+      payload.map(&:to_s).join(' ')
+    end
+    alias_method :to_s, :message
+    def touch!
+      self.touched = true
+    end
+    alias_method :touched?, :touched
     def type
-      @tag.name
+      tag.name
     end
   end
   class EventListeners < Hash
     def add_listener name, block
+      block.respond_to?(:call) or
+        raise ArgumentError.new("no block given. " <<
+          "Your \"block\" argument to add_listener (a #{block.class}) did not respond to \"call\"")
       self[name] ||= []
       self[name].push block
     end
   end
   module InstanceMethods
-    def emit type, data=nil
-      event_cloud = self._find_event_cloud
-      tag = event_cloud[type] or raise RuntimeError.new("undeclared event type: #{type.inspect}")
+    def emit type, *payload
+      cloud = _find_event_cloud
+      tag = cloud[type] or fail("undeclared event type: #{type.inspect}")
+      el = event_listeners
       event = nil
-      blocks = [event_listeners[tag.name], * tag.ancestors.map { |tag_name| event_listeners[tag_name] }].compact.flatten
-      blocks.each do |block|
-        block.call(event ||= Event.new(tag, data))
-      end
-      blocks.count
+      cloud.ancestor_names(tag).map{ |n| el[n] }.compact.flatten.tap do |a|
+        a.each do |b|
+          event ||= Event.new(tag, payload)
+          if 1 == b.arity
+            b.call(event)
+          else
+            b.call(*event.payload)
+          end
+        end
+      end.count
     end
     # sucks for now
     def _find_event_cloud
@@ -62,6 +86,24 @@ module Skylab::PubSub::Emitter
     end
   end
   class SemanticTagCloud < Hash
+    def ancestor_names tag
+      seen  = {}
+      found = []
+      visit = ->(k) do
+        t = self[k] or t = merge_definition!(k).first
+        seen[t.name] = true
+        found.push t.name
+        ( t.ancestors - found ).each { |s| seen[s] or visit[s] } # !
+      end
+      visit[tag.name]
+      found
+    end
+    def _deep_copy_init other
+      @order = other.instance_variable_get('@order').dup
+      @order.each do |k|
+        self[k] = other[k].duplicate
+      end
+    end
     def describe
       @order.map { |key| self[key].describe }.join("\n")
     end
@@ -74,8 +116,12 @@ module Skylab::PubSub::Emitter
       end
       order.map { |k| self[k] }
     end
-    def initialize
-      @order = []
+    def initialize other=nil
+      if other
+        _deep_copy_init other
+      else
+        @order = []
+      end
     end
     def merge_definition! *nodes
       resulting_tags = []
@@ -110,6 +156,9 @@ module Skylab::PubSub::Emitter
     end
   end
   class Tag
+    def duplicate
+      self.class.new(@name, :ancestors => @ancestors.dup, :children => @children.dup)
+    end
     def initialize name, opts=nil
       name.kind_of?(Symbol) or raise ArgumentError.new("need symbol had #{name.class}")
       @name = name

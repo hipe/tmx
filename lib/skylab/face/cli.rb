@@ -148,7 +148,7 @@ module Skylab::Face
       def command_tree
         @command_tree ||= begin
           defined = command_definitions.map { |cls, a, b| cls.build(*a, &b) }
-          defined_m = defined.map(&:method_symbol).compact
+          defined_m = defined.map{ |a| a.method_symbol if a.respond_to?(:method_symbol) }.compact
           implied_m = public_instance_methods(false).map(&:intern) - defined_m
           implied = implied_m.map { |m| Command.new(m) }
           Treeish[ defined + implied ]
@@ -206,7 +206,7 @@ module Skylab::Face
       end
       def command_tree
         @command_tree ||= begin
-          interface.command_tree.map { |c| c.parent = self; c } # careful
+          interface.command_tree.map { |c| c.parent = self if c.respond_to?(:parent=); c } # careful
         end
       end
       def expecting
@@ -387,6 +387,7 @@ class Skylab::Face::Cli
       argv.first =~ /^-/ and return runner.run_opts(argv)
       cmd = runner.find_command(argv)
     end while (cmd and cmd.respond_to?(:find_command) and runner = cmd)
+    cmd.respond_to?(:invoke) and return cmd.invoke(argv) # compat
     cmd and req = cmd.parse(argv) and
     begin
       runner.send(cmd.method_symbol, req, * req.method_parameters)
