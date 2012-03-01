@@ -1,0 +1,8 @@
+digraph {
+node [label="\N", style="filled", fillcolor="#b5d5fb", fontname="Futura", penwidth="1.1566", shape="Mrecord"];
+
+0.1 [label="Get useful dumps\nfrom grit", penwidth="2.5"];
+0.2 [label="Render them"];
+0.2 -> 0.1;
+}
+
