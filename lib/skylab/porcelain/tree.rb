@@ -76,12 +76,32 @@ module Skylab::Porcelain::Tree
 end
 
 module Skylab::Porcelain
+  class Tree::TextLine < Struct.new(:prefix, :name)
+    def clear!
+      self.prefix = self.name = nil
+      self
+    end
+    def to_s
+      "#{prefix}#{name}"
+    end
+    def update! prefix, name
+      self.prefix = prefix
+      self.name = name
+      self
+    end
+  end
   class << Tree
     def from_paths paths
       require File.expand_path('../tree/node', __FILE__)
       Tree::Node.from_paths paths
     end
-    def view_tree root, opts={}, &block
+    def text opts=nil, &block
+      fly = TextLine.new # can be turned into an option if needed to
+      Locus.new( * [opts].compact ).traverse(self) do |node, meta|
+        block.call(fly.clear!.update!(prefix(meta), node.send(name_accessor)))
+      end # returns recursive count of leaf nodes
+    end
+    def text root, opts={}, &block
       unless out = opts.delete(:out)
         require 'stringio'
         out = StringIO.new

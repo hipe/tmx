@@ -25,7 +25,7 @@ module Skylab::Porcelain
       slug = path_arr.shift
       unless child = children[slug]
         if create
-          child = self.class.new({:slug => slug}, &block) # @add_parent
+          child = self.class.build({:slug => slug}, &block) # @add_parent
           children[child.key] = child # let child choose its key!
         else
           return nil
@@ -93,6 +93,12 @@ module Skylab::Porcelain
       end
       nil
     end
+    def text opts=nil, &block
+      fly = TextLine.new # can be turned into an option if needed to
+      Locus.new( * [opts].compact ).traverse(self) do |node, meta|
+        block.call(fly.clear!.update!(prefix(meta), node.send(name_accessor)))
+      end # returns recursive count of leaf nodes
+    end
     def to_paths
       _paths(arr=[], nil)
       arr
@@ -130,6 +136,7 @@ module Skylab::Porcelain
     attr_reader :keys
   end
   class << Tree::Node
+    alias_method :build, :new
     def combine nodes, lambdii=nil
       lambdii ||= { keymaker: ->(n) { n.key } }
       keymaker = lambdii[:keymaker] or fail("keymaker lambda is required")

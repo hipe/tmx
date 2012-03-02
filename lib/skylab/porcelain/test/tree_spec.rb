@@ -22,8 +22,8 @@ end
 
 module Skylab::Porcelain::TestNamespace
   include Skylab::Porcelain
-  describe Tree do
-    it "renders a pretty tree" do
+  describe "With #{Tree}" do
+    context "when calling Tree.render on this arbitrary object" do
       foo = ArrayExtension[
         { :name => "document",
           :children => [
@@ -53,8 +53,7 @@ module Skylab::Porcelain::TestNamespace
           ]
         }
       ]
-      output = subject.view_tree foo
-      DERP = <<-HERE.gsub(/^        /, '')
+      derp = <<-HERE.gsub(/^        /, '')
         document
          ├head
          ├body
@@ -69,7 +68,11 @@ module Skylab::Porcelain::TestNamespace
          │   └sub4
          └foot
       HERE
-      output.should == DERP # use this form with --diff option
+      subject { Tree.text foo }
+      it "it works" do
+        subject.should eql(derp)
+        # puts derp
+      end
     end
   end
 end
