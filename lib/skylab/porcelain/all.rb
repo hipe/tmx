@@ -299,6 +299,10 @@ module Skylab::Porcelain
       self.name ||= self.class.nameize(sym)
       super(sym)
     end
+    def name_syntax
+      aliases or return name
+      "{#{ [name, *aliases] * '|' }}"
+    end
     def namespace?
       false
     end
@@ -321,7 +325,7 @@ module Skylab::Porcelain
       ba.each { |b| instance_eval(&b) }
     end
     def syntax
-      [name, option_syntax.to_str, argument_syntax.to_str].compact.join(' ')
+      [name_syntax, option_syntax.to_str, argument_syntax.to_str].compact.join(' ')
     end
     def to_hash
       duplicate._to_hash
