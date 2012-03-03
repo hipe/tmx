@@ -93,11 +93,9 @@ module Skylab::Porcelain
       end
       nil
     end
-    def text opts=nil, &block
-      fly = TextLine.new # can be turned into an option if needed to
-      Locus.new( * [opts].compact ).traverse(self) do |node, meta|
-        block.call(fly.clear!.update!(prefix(meta), node.send(name_accessor)))
-      end # returns recursive count of leaf nodes
+    def text opts={}, &block
+      opts = { node_name: :key }.merge opts
+      Tree.text(self, opts, &block)
     end
     def to_paths
       _paths(arr=[], nil)

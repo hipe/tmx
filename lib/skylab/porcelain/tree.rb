@@ -7,17 +7,18 @@ module Skylab
 end
 
 module Skylab::Porcelain::Tree
-  class Locus
-    def initialize opts={}
-      @branch      = ' ├'
-      @pipe        = ' │'
-      @last_branch = ' └'
-      @blank       = '  '
-      @name_accessor = :name
-      opts.each { |k, v| send("#{k}=", v) }
+  class Locus < Struct.new(:blank, :crook, :node_name, :pipe, :tee)
+    attr_accessor :branch
+    attr_accessor :empty
+    def initialize opts=nil
+      super('  ', ' └', nil, ' │', ' ├')
+      opts and opts.each { |k, v| send("#{k}=", v) }
+      self.node_name ||= :name
+      if Symbol === self.node_name
+        name_accessor = self.node_name
+        self.node_name = ->(n) { n.send(name_accessor) }
+      end
     end
-    attr_accessor :branch, :pipe, :last_branch, :empty
-    attr_accessor :name_accessor
     def traverse(root, &block)
       @level = 0
       @block = block
@@ -51,26 +52,11 @@ module Skylab::Porcelain::Tree
     end
     def prefix meta
       meta[:level].nil? and return ''
-      mine = case true
-             when (meta[:is_last]) ; @last_branch
-             else                  ; @branch
-             end
-      leader = @prefix_stack.join('')
-      "#{leader}#{mine}"
+      "#{@prefix_stack * ''}#{meta[:is_last] ? crook : tee}"
     end
     def parent_prefix meta
       meta[:level].nil? and return ''
-      if meta[:is_first]
-        if meta[:is_last]
-          @blank
-        else
-          @pipe
-        end
-      elsif meta[:is_last]
-        @blank
-      else
-        @pipe
-      end
+      meta[:is_last] ? blank : pipe
     end
   end
 end
@@ -95,28 +81,18 @@ module Skylab::Porcelain
       require File.expand_path('../tree/node', __FILE__)
       Tree::Node.from_paths paths
     end
-    def text opts=nil, &block
-      fly = TextLine.new # can be turned into an option if needed to
-      Locus.new( * [opts].compact ).traverse(self) do |node, meta|
-        block.call(fly.clear!.update!(prefix(meta), node.send(name_accessor)))
-      end # returns recursive count of leaf nodes
-    end
-    def text root, opts={}, &block
-      unless out = opts.delete(:out)
-        require 'stringio'
-        out = StringIO.new
-        return_string = true
+    def text root, opts=nil, &block
+      fly = Tree::TextLine.new # flyweighting can be turned into an option if needed to
+      loc = Tree::Locus.new( * [opts].compact )
+      enum = Enumerator.new do |y|
+        loc.traverse(root) do |node, meta|
+          y << fly.clear!.update!(loc.prefix(meta), loc.node_name[node])
+        end
       end
-      loc = Tree::Locus.new opts
-      block ||= lambda do |node, meta|
-        out.puts "#{loc.prefix(meta)}#{node.send(loc.name_accessor)}"
-      end
-      sum = loc.traverse(root, &block)
-      if return_string
-        out.rewind
-        out.read
+      if block_given?
+        enum.each(&block)
       else
-        sum
+        StringIO.new.tap { |o| enum.each { |s| o.puts(s) } }.string
       end
     end
   end

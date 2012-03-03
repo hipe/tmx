@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 require File.expand_path('../../tree', __FILE__)
+require File.expand_path('../test-support', __FILE__)
 
 module Skylab::Porcelain::TestNamespace
   module ArrayExtension
@@ -71,7 +72,35 @@ module Skylab::Porcelain::TestNamespace
       subject { Tree.text foo }
       it "it works" do
         subject.should eql(derp)
-        # puts derp
+      end
+    end
+    context "when calling Tree#render" do
+      let(:tree) do
+        Tree.from_paths(%w(
+          one/two/three
+          two/two
+          one/two/four
+          bill
+          three/two/three
+          three/two/four
+        ))
+      end
+      it "it works", {f:true} do
+        tgt = <<-HERE.gsub(/^        /, '') #!
+
+         ├one
+         │ └two
+         │   ├three
+         │   └four
+         ├two
+         │ └two
+         ├bill
+         └three
+           └two
+             ├three
+             └four
+        HERE
+        tree.text.should eql(tgt)
       end
     end
   end
