@@ -25,7 +25,7 @@ module Skylab::Porcelain
       slug = path_arr.shift
       unless child = children[slug]
         if create
-          child = self.class.new({:slug => slug}, &block) # @add_parent
+          child = self.class.build({:slug => slug}, &block) # @add_parent
           children[child.key] = child # let child choose its key!
         else
           return nil
@@ -93,6 +93,10 @@ module Skylab::Porcelain
       end
       nil
     end
+    def text opts={}, &block
+      opts = { node_name: :key }.merge opts
+      Tree.text(self, opts, &block)
+    end
     def to_paths
       _paths(arr=[], nil)
       arr
@@ -130,6 +134,7 @@ module Skylab::Porcelain
     attr_reader :keys
   end
   class << Tree::Node
+    alias_method :build, :new
     def combine nodes, lambdii=nil
       lambdii ||= { keymaker: ->(n) { n.key } }
       keymaker = lambdii[:keymaker] or fail("keymaker lambda is required")
