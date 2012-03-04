@@ -1,8 +1,11 @@
 module Skylab::GitViz
   class Cli::HistTree < Cli::Action
     def invoke req
-      o = api.invoke req
-      emit :info, "ok this thing make a view of it: #{o}"
+      tree = api.invoke(req) or return tree
+      tree.text do |row|
+        emit :payload, row.to_s
+      end
+      true
     end
   end
 end

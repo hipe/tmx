@@ -8,13 +8,22 @@ module Skylab::GitViz
     end
     def initialize runtime
       super(runtime)
+      @vcs_name = :git
     end
     def invoke req
       meth = runtime.stack.top.action.name.to_s
       require ROOT.join("api/#{meth}").to_s
-      k = self.class.const_get(meth.gsub(/(?:^|-)([a-z])/) { $1.upcase })
+      k = self.class.const_get(camelize meth)
       k.new(self, req).invoke
     end
+    define_method(:root) { ROOT }
+    def vcs
+      @vcs ||= begin
+        require ROOT.join("api/vcs-adapter/#{vcs_name}")
+        self.class::VcsAdapter.const_get(camelize vcs_name).new(self)
+      end
+    end
+    attr_reader :vcs_name
     @instance = Hash.new do |h, k|
       if h.key? k.object_id
         h[k.object_id]
@@ -26,6 +35,14 @@ module Skylab::GitViz
   class << Api
     attr_reader :instance
   end
+  module Api::Model
+  end
+  module Api::InstanceMethods
+    def camelize s
+      s.to_s.gsub(/(?:^|-)([a-z])/) { $1.upcase }
+    end
+  end
+  Api.send(:include, Api::InstanceMethods)
 end
 
 require File.expand_path('../api/action', __FILE__)

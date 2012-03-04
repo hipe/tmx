@@ -1,5 +1,3 @@
-require File.expand_path('../../api', __FILE__)
-
 module Skylab::GitViz
   class Cli::Action
     def api

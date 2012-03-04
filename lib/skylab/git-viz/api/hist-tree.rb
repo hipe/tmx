@@ -1,8 +1,9 @@
 module Skylab::GitViz
   class Api::HistTree < Api::Action
+    attribute :path, :pathname => true, :default => '.'
     def invoke
-      emit :info, "i have a runtime: #{api.runtime.class}"
-      Struct.new(:one, :two).new('alpha', 'beta')
+      require api.root.join('api/model/file-tree')
+      Api::Model::FileTree.build_tree(api, self)
     end
   end
 end

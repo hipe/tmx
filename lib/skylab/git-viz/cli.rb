@@ -1,12 +1,16 @@
+require File.expand_path('../api', __FILE__)
 # (requires at bottom!)
 
 module Skylab::GitViz
   class Cli
+    include Api::InstanceMethods
+
     ROOT = Pathname.new('..').expand_path(__FILE__)
     extend ::Skylab::Porcelain
 
     porcelain do
       desc 'fun data viz reports on a git project.'
+      emits :payload => :all
       aliases 'gv'
     end
 
@@ -26,7 +30,7 @@ module Skylab::GitViz
     def porcelain_dispatch *a
       meth = runtime.stack.top.action.name
       require self.class::ROOT.join("cli/#{meth}").to_s
-      self.class.const_get(meth.to_s.gsub(/(?:^|-)([a-z])/) { $1.upcase }).new(runtime).invoke(*a)
+      self.class.const_get(camelize meth).new(runtime).invoke(*a)
     end
   end
 end
