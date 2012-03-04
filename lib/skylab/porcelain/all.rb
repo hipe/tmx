@@ -82,6 +82,9 @@ module Skylab::Porcelain
       frame_settings.push(->(_){ self.default= defaults })
     end
     alias_method :default, :default= # !
+    def emits(*a)
+      runtime.definition_blocks.push(->(_) { emits(*a) })
+    end
     def fuzzy_match= b
       frame_settings.push(->(_){ self.fuzzy_match = b })
     end
@@ -95,19 +98,10 @@ module Skylab::Porcelain
       s
     end
     alias_method :invocation_name, :invocation_name= # !
-    def runtime &block
-      rt = super(& nil)
-      rt.instance_eval(&block) if block
-      rt
-    end
   end
   class RuntimeModuleKnob < Struct.new(:definition_blocks)
     def initialize
       super([])
-    end
-    def emits *a
-      definition_blocks.push( ->(_) { emits(*a) } )
-      self
     end
   end
   module Dsl
