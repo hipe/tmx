@@ -12,8 +12,8 @@ module Skylab::GitViz
     end
     def invoke req
       meth = runtime.stack.top.action.name.to_s
-      require ROOT.join("api/#{meth}").to_s
-      k = self.class.const_get(camelize meth)
+      require ROOT.join("api/actions/#{meth}").to_s
+      k = Api::Actions.const_get(camelize meth)
       k.new(self, req).invoke
     end
     define_method(:root) { ROOT }
