@@ -29,9 +29,12 @@ module Skylab::GitViz
 
     def porcelain_dispatch *a
       meth = runtime.stack.top.action.name
-      require self.class::ROOT.join("cli/#{meth}").to_s
-      self.class.const_get(camelize meth).new(runtime).invoke(*a)
+      require self.class::ROOT.join("cli/actions/#{meth}").to_s
+      Cli::Actions::const_get(camelize meth).new(runtime).invoke(*a)
     end
+  end
+
+  module Cli::Actions
   end
 end
 

@@ -35,6 +35,8 @@ module Skylab::GitViz
   class << Api
     attr_reader :instance
   end
+  module Api::Actions
+  end
   module Api::Model
   end
   module Api::InstanceMethods
