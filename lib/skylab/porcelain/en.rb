@@ -15,23 +15,23 @@ if __FILE__ == $PROGRAM_NAME
   describe "oxford_commma" do
     include Skylab::Porcelain::En
     let(:subject) { oxford_comma arr }
-    context (a = %w()) do
+    context(a = %w()) do
       let(:arr) { a }
       specify { should eql('') }
     end
-    context (b = %w(eenie)) do
+    context(b = %w(eenie)) do
       let(:arr) { b }
       specify { should eql('eenie') }
     end
-    context (c = %w(eenie meenie)) do
+    context(c = %w(eenie meenie)) do
       let(:arr) { c }
       specify { should eql('eenie or meenie') }
     end
-    context (d = %w(eenie meenie miney)) do
+    context(d = %w(eenie meenie miney)) do
       let(:arr) { d }
       specify { should eql('eenie, meenie or miney') }
     end
-    context (e = %w(eenie meenie miney moe)) do
+    context(e = %w(eenie meenie miney moe)) do
       let(:arr) { e }
       specify { should eql('eenie, meenie, miney or moe') }
     end
