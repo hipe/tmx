@@ -19,6 +19,14 @@ module Skylab::Asib
     def hdr(s) ; stylize(s, :strong, :green)   end
     alias_method :pre, :em
   end
+  class ActionEnumerator < Enumerator
+    def filter &b
+      self.class.new { |y| each { |*a| b.call(y, *a) } }
+    end
+    def visible
+      filter { |y, a| y << a if a.visible? }
+    end
+  end
   class Runtime
     include Styles
     include Skylab::Porcelain::En
@@ -45,9 +53,7 @@ module Skylab::Asib
     end
     def initialize
       actions = self.class.to_s.match(/^(.+)::[^:]+$/)[1].split('::').push('Actions').reduce(Object) { |m, o| m.const_get(o) }
-      @actions = Enumerator.new do |y|
-        actions.constants.each { |k| y << actions.const_get(k) }
-      end
+      @actions = ActionEnumerator.new { |y| actions.constants.each { |k| y << actions.const_get(k) } }
     end
     def invoke argv
       argv = argv.dup
@@ -176,6 +182,7 @@ module Skylab::Asib
       @desc = []
       @name = self.to_s.match(/^.+::([^:]+)$/)[1].gsub(/(?<=[a-z])([A-Z])/) { "-#{$1}" }.downcase
       @option_syntax = OptionSyntax.new
+      @visible = true
     end
     def aliases *a
       a.any? ? @aliases.concat(a) : @aliases
@@ -215,6 +222,8 @@ module Skylab::Asib
     def syntax
       [name, option_syntax.to_str, argument_syntax.to_str].compact.join(' ')
     end
+    attr_accessor :visible
+    alias_method :visible?, :visible
   end
 
   module ActionInstanceMethods
@@ -256,8 +265,10 @@ module Skylab::Asib
 
     desc "displays this screen."
 
+    self.visible = false
+
     def action_syntax
-      "{#{ runtime.actions.map { |a| pre a.name } * '|' }}"
+      "{#{ runtime.actions.visible.map { |a| pre a.name } * '|' }}"
     end
 
     def action_help action_name
@@ -271,7 +282,7 @@ module Skylab::Asib
     def execute action_name=nil
       action_name and return action_help(action_name)
       emit :payload, "#{hdr 'usage:'} #{runtime.program_name} #{action_syntax} [opts] [args]"
-      tbl = runtime.actions.map { |action|  [action.name, action.summary] }
+      tbl = runtime.actions.visible.map { |action|  [action.name, action.summary] }
       emit :payload, (tbl.empty? ? "(no actions)" : "#{hdr 'actions:'}")
       width = tbl.reduce(0) { |m, o| o[0].length > m ? o[0].length : m }
       fmt = "  #{em "%#{width}s"}  %s"
