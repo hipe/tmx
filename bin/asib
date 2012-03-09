@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+
+require 'pathname'
+
+class Cli
+  def command
+    "FIXME"
+  end
+  def emit _, s
+    $stderr.puts s
+  end
+  attr_accessor :file
+  def invoke argv
+    argv.size == 1 or return usage
+    self.file = Pathname.new(argv.first)
+    file.exist? or return usage("not found: #{file}")
+    emit :payload, command
+  end
+  def program_name
+    $PROGRAM_NAME
+  end
+  def usage s=nil
+    s and emit(:info, s)
+    emit :info, "usage: #{program_name} <FILE>"
+    nil
+  end
+end
+
+Cli.new.invoke(ARGV)
