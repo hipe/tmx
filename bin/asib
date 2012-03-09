@@ -1,8 +1,11 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env ruby -w
 
+require File.expand_path('../../lib/skylab', __FILE__)
+
+require 'skylab/pub-sub/emitter'
+require 'skylab/porcelain/tite-color'
+require 'skylab/porcelain/en'
 require 'optparse'
-
-require File.expand_path('../../lib/skylab/pub-sub/emitter', __FILE__)
 
 
 module Skylab::Asib
@@ -10,7 +13,15 @@ module Skylab::Asib
     extend Skylab::PubSub::Emitter
     emits :error, :ambiguous => :error, :not_found => :error, :not_provided => :error
   end
+  module Styles
+    include Skylab::Porcelain::TiteColor
+    def em(s)  ; stylize(s, :green         )   end
+    def hdr(s) ; stylize(s, :strong, :green)   end
+    alias_method :pre, :em
+  end
   class Runtime
+    include Styles
+    include Skylab::Porcelain::En
     attr_reader :actions
     def emit _, s
       $stderr.puts s
@@ -25,11 +36,11 @@ module Skylab::Asib
           kls.names.detect { |n| matcher =~ n } and (found ||= []).push(kls)
         end
       end
-      found or exp = "expecting {#{actions.map(&:name) * '|'}}"
+      found or exp = "expecting {#{actions.map{ |a| em a.name } * '|'}}"
       token or return e.emit(:not_provided, exp)
       found or return e.emit(:not_found, "invalid command #{token.inspect}. #{exp}")
       found.size > 1 and return e.emit(:ambiguous, "ambiguous comand #{token.inspect}. " <<
-        "did you mean #{oxford_comma found.map { |k| "\"#{k.name}\"" }}?")
+        "did you mean #{oxford_comma found.map { |k| "#{pre k.name}" }}?")
       found.first
     end
     def initialize
@@ -48,8 +59,8 @@ module Skylab::Asib
     end
     def usage s=nil
       s and emit(:info, s)
-      emit :info, "usage: #{program_name} <action> [opts] [args]"
-      emit :info, "try #{program_name} -h for help"
+      emit :info, "#{hdr 'usage:'} #{program_name} <action> [opts] [args]"
+      emit :info, "try #{pre "#{program_name} -h"} for help"
       nil
     end
   end
@@ -109,13 +120,14 @@ module Skylab::Asib
   end
 
   class OptionSyntax < Struct.new(:definitions)
+    include Styles
     def any?
       definitions.any?
     end
     def help e
       _ = {}
       OptionParser.new do |o|
-        o.banner = 'options:'
+        o.banner = "#{hdr 'options:'}"
         definitions.each { |d| o.instance_exec(_, &d) }
         e.emit(:help, o.to_s) # you could of course..
       end
@@ -157,6 +169,7 @@ module Skylab::Asib
   end
 
   module ActionModuleMethods
+    include Styles
     def action_module_init
       @aliases = []
       @argument_syntax = ArgumentSyntax.new(self)
@@ -180,11 +193,11 @@ module Skylab::Asib
       mod.action_module_init
     end
     def help e
-      e.emit(:help, "usage: #{e.program_name} #{syntax}")
+      e.emit(:help, "#{hdr 'usage:'} #{e.program_name} #{syntax}")
       case desc.size
       when 0 ;
-      when 1 ; e.emit(:help, "description: #{desc.first}")
-      else   ; e.emit(:help, "description:") ; desc.each { |s| e.emit(:help, s) }
+      when 1 ; e.emit(:help, "#{hdr 'description:'} #{desc.first}")
+      else   ; e.emit(:help, "#{hdr 'description:'}") ; desc.each { |s| e.emit(:help, s) }
       end
       option_syntax.any? and option_syntax.help(e)
       nil
@@ -205,6 +218,7 @@ module Skylab::Asib
   end
 
   module ActionInstanceMethods
+    include Styles
     alias_method :action, :class
     def emit _, s
       @runtime.emit _, s
@@ -225,7 +239,7 @@ module Skylab::Asib
     attr_reader :runtime
     def usage s = nil
       emit(:error, s) if s
-      emit :usage, "usage: #{runtime.program_name} #{action.syntax}"
+      emit :usage, "#{hdr 'usage:'} #{runtime.program_name} #{action.syntax}"
       emit :usage, "try #{runtime.program_name} #{action.name} -h for help."
       nil
     end
@@ -236,8 +250,15 @@ module Skylab::Asib
 
   class Actions::Help
     extend Action
+    include Styles
+
     aliases '-h'
+
     desc "displays this screen."
+
+    def action_syntax
+      "{#{ runtime.actions.map { |a| pre a.name } * '|' }}"
+    end
 
     def action_help action_name
       runtime.find(action_name) do |o|
@@ -249,18 +270,25 @@ module Skylab::Asib
 
     def execute action_name=nil
       action_name and return action_help(action_name)
-      emit :payload, "usage: #{runtime.program_name} <action> [opts] [args]"
+      emit :payload, "#{hdr 'usage:'} #{runtime.program_name} #{action_syntax} [opts] [args]"
       tbl = runtime.actions.map { |action|  [action.name, action.summary] }
-      emit :payload, (tbl.empty? ? "(no actions)" : "actions:")
+      emit :payload, (tbl.empty? ? "(no actions)" : "#{hdr 'actions:'}")
       width = tbl.reduce(0) { |m, o| o[0].length > m ? o[0].length : m }
-      fmt = "  %#{width}s  %s"
+      fmt = "  #{em "%#{width}s"}  %s"
       fmt2 = "  #{' ' * width}  %s"
       tbl.each do |row|
         runtime.emit :payload, (fmt % [row[0], row[1][0]])
         row[1].size > 1 and row[1][1..1].each { |s| runtime.emit(:payload, fmt2 % [s]) }
       end
-      tbl.empty? or emit(:payload, "try #{runtime.program_name} <action> -h for help on a command.")
+      tbl.empty? or emit(:payload, "try #{pre "#{runtime.program_name} <action> -h"} for help on a command.")
       nil
+    end
+  end
+
+  class Actions::Neor
+    extend Action
+    def execute
+      emit :info, "ok, sure"
     end
   end
 
