@@ -2,28 +2,109 @@
 
 require 'pathname'
 
-class Cli
-  def command
-    "FIXME"
+module Skylab
+end
+
+module Skylab::Asib
+  class Runtime
+    attr_reader :actions
+    def emit _, s
+      $stderr.puts s
+    end
+    def initialize
+      actions = self.class.to_s.match(/^(.+)::[^:]+$/)[1].split('::').push('Actions').reduce(Object) { |m, o| m.const_get(o) }
+      @actions = Enumerator.new do |y|
+        actions.constants.each { |k| y << actions.const_get(k) }
+      end
+    end
+    def invoke argv, &b
+      found = nil
+      if have = argv.shift
+        matcher = /^#{Regexp.escape(have)}/
+        actions.each do |kls|
+          kls.name == have and found = [kls] and break;
+          kls.names.detect { |n| matcher =~ n } and (found ||= []).push(kls)
+        end
+      end
+      found or return usage("#{"invalid command #{have.inspect}. " if have}" <<
+        "expecting {#{actions.map(&:name) * '|'}}")
+      found.size > 1 and return("ambiguous comand #{have.inspect}. " <<
+        "did you mean #{oxford_comma found.map { |k| "\"#{k.name}\"" }}?")
+      found.first.new(self).invoke(argv)
+    end
+    def program_name
+      File.basename($PROGRAM_NAME)
+    end
+    def usage s=nil
+      s and emit(:info, s)
+      emit :info, "usage: #{program_name} <action> [opts] [args]"
+      emit :info, "try #{program_name} -h for help"
+      nil
+    end
   end
-  def emit _, s
-    $stderr.puts s
+
+  module Actions
   end
-  attr_accessor :file
-  def invoke argv
-    argv.size == 1 or return usage
-    self.file = Pathname.new(argv.first)
-    file.exist? or return usage("not found: #{file}")
-    emit :payload, command
+
+  module Action
+    def self.extended mod
+      mod.send(:include, ActionInstanceMethods)
+      mod.send(:extend, ActionModuleMethods)
+    end
   end
-  def program_name
-    $PROGRAM_NAME
+
+  module ActionModuleMethods
+    def action_module_init
+      @aliases = []
+      @name = self.to_s.match(/^.+::([^:]+)$/)[1].gsub(/(?<=[a-z])([A-Z])/) { "-#{$1}" }.downcase
+    end
+    def aliases *a
+      a.any? ? @aliases.concat(a) : @aliases
+    end
+    def self.extended mod
+      mod.action_module_init
+    end
+    attr_reader :name
+    def names
+      [name, * @aliases]
+    end
   end
-  def usage s=nil
-    s and emit(:info, s)
-    emit :info, "usage: #{program_name} <FILE>"
-    nil
+
+  module ActionInstanceMethods
+    def emit _, s
+      @runtime.emit _, s
+    end
+    def initialize runtime
+      @runtime = runtime
+    end
+    attr_reader :runtime
+  end
+
+  class Cli < Runtime
+  end
+
+  class Actions::Help
+    extend Action
+    aliases '-h'
+    def invoke argv
+      emit :info, "YES: "
+    end
+  end
+
+  class Actions::Foo
+    extend Action
+  end
+
+  class Actions::Bar
+    extend Action
+    def invoke argv
+      argv.size == 1 or return usage
+      self.file = Pathname.new(argv.first)
+      file.exist? or return usage("not found: #{file}")
+      emit :payload, command
+    end
   end
 end
 
-Cli.new.invoke(ARGV)
+::Skylab::Asib::Cli.new.invoke(ARGV)
+
