@@ -1,18 +1,10 @@
-require 'stringio'
+require File.expand_path('../test-support', __FILE__)
 require File.expand_path('../../all', __FILE__)
 
 
-module Skylab::Porcelain::Test
+module Skylab::Porcelain::TestSupport
   Porcelain = ::Skylab::Porcelain
-  class StringIo < ::StringIO
-    def to_s
-      rewind
-      read
-    end
-    def match x
-      to_s.match x
-    end
-  end
+
   describe "The #{Skylab::Porcelain} module" do
     describe "extended by a class allows that" do
       let(:klass) do
@@ -225,7 +217,7 @@ module Skylab::Porcelain::Test
     end # DSL
     include Porcelain::Styles # unstylize
     let(:debug_ui) { false }
-    let(:stderr) { StringIo.new }
+    let(:stderr) { MyStringIO.new }
     let(:instance) do
       klass.new do |app|
         app.on_all { |e| stderr.puts unstylize(e) ; debug_ui and $stderr.puts(e) }
