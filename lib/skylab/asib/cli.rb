@@ -1,7 +1,4 @@
-#!/usr/bin/env ruby -w
-
-require File.expand_path('../../lib/skylab', __FILE__)
-
+require  File.expand_path('../..', __FILE__)
 require 'skylab/pub-sub/emitter'
 require 'skylab/porcelain/tite-color'
 require 'skylab/porcelain/en'
@@ -392,6 +389,4 @@ require 'skylab/test-support/test-support' # ick just for deindent
     end
   end
 end
-
-::Skylab::Asib::Cli.new.invoke(ARGV)
 
