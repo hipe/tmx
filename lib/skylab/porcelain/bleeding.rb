@@ -4,8 +4,7 @@ require 'skylab/porcelain/tite-color'
 require 'skylab/porcelain/en'
 require 'optparse'
 
-
-module Skylab::Asib
+module Skylab::Porcelain::Bleeding
   class OnFind
     extend Skylab::PubSub::Emitter
     emits :error, :ambiguous => :error, :not_found => :error, :not_provided => :error
@@ -27,6 +26,10 @@ module Skylab::Asib
   class Runtime
     include Styles
     include Skylab::Porcelain::En
+    def action_modules
+      [ self.class.to_s.match(/^(.+)::[^:]+$/)[1].split('::').push('Actions').reduce(Object) { |m, o| m.const_get(o) },
+        OfficiousActions ]
+    end
     attr_reader :actions
     def emit _, s
       $stderr.puts s
@@ -49,8 +52,10 @@ module Skylab::Asib
       found.first
     end
     def initialize
-      actions = self.class.to_s.match(/^(.+)::[^:]+$/)[1].split('::').push('Actions').reduce(Object) { |m, o| m.const_get(o) }
-      @actions = ActionEnumerator.new { |y| actions.constants.each { |k| y << actions.const_get(k) } }
+      @actions = ActionEnumerator.new do |y|
+        action_modules.each { |m| m.constants.each { |k| y << m.const_get(k) } }
+        # there is an anticpated issue above with fuzzy matching actions that have same name in different module
+      end
     end
     def invoke argv
       argv = argv.dup
@@ -66,9 +71,6 @@ module Skylab::Asib
       emit :info, "try #{pre "#{program_name} -h"} for help"
       nil
     end
-  end
-
-  module Actions
   end
 
   module Action
@@ -251,10 +253,10 @@ module Skylab::Asib
     end
   end
 
-  class Cli < Runtime
+  module OfficiousActions
   end
 
-  class Actions::Help
+  class OfficiousActions::Help
     extend Action
     include Styles
 
@@ -290,102 +292,6 @@ module Skylab::Asib
       end
       tbl.empty? or emit(:payload, "try #{pre "#{runtime.program_name} <action> -h"} for help on a command.")
       nil
-    end
-  end
-
-  #### "app"
-
-require 'skylab/slake/attribute-definer'
-require 'skylab/face/path-tools'
-require 'stringio' # whaetver
-require 'skylab/test-support/test-support' # ick just for deindent
-
-  #### "model" and utility classes and support
-
-  class MyPathname < Pathname
-    def pretty
-      Skylab::Face::PathTools.pretty_path to_s
-    end
-  end
-
-
-  #### "action" base class
-
-  class MyAction
-    extend Action
-    extend ::Skylab::Slake::AttributeDefiner
-
-    def self.inherited cls
-      cls.action_module_init
-    end
-
-    meta_attribute :boolean
-    def self.on_boolean_attribute name, _
-      alias_method "#{name}?", name
-    end
-
-    meta_attribute :default
-
-    meta_attribute :pathname
-    def self.on_pathname_attribute name, _
-      alias_method "#{name}_before_pathname=", "#{name}="
-      define_method("#{name}=") do |path|
-        send("#{name}_before_pathname=", MyPathname.new(path.to_s))
-      end
-    end
-
-    def initialize *a
-      action_init(*a)
-      self.class.attributes.select { |k, v| v.key?(:default) }.each do |k, v|
-        send("#{k}=", v[:default].respond_to?(:call) ? v[:default].call : v[:default])
-      end
-    end
-
-    def skip m
-      emit(:info, "#{m}, skipping")
-      nil
-    end
-
-    def update_attributes! req
-      req.each { |k, v| send("#{k}=", v) }
-    end
-  end
-
-
-  #### "actions"
-
-  class Actions::Put < MyAction
-    desc "put the file"
-    desc "(see config-make)"
-    def execute path
-      emit :info, "ok, sure: #{path}"
-    end
-  end
-
-  class Actions::ConfigMake < MyAction
-
-    desc "write the config file"
-
-    attribute :dest, :pathname => true, :default => ->() { "#{ENV['HOME']}/.asibrc" }
-    attribute :dry_run, :boolean => true, :default => false
-    alias_method :dry?, :dry_run?
-
-    option_syntax do |h|
-      on('-n', '--dry-run', "dry run.") { h[:dry_run] = true }
-    end
-
-    def execute opts
-      update_attributes! opts
-      dest.exist? and return skip("already exists: #{dest.pretty}")
-      dest.open('w+') do |fh|
-        content = <<-HERE.unindent
-          host = yourhost
-          document_root = /path/to/your/doc/root
-        HERE
-        b = dry? ? nil : fh.write(content)
-        emit :info, "wrote #{dest.pretty} (#{b} bytes)"
-      end
-      true
     end
   end
 end
