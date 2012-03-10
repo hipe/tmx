@@ -296,24 +296,99 @@ module Skylab::Asib
     end
   end
 
-  class Actions::Neor
-    extend Action
-    def execute
-      emit :info, "ok, sure"
+  #### "app"
+
+require 'skylab/slake/attribute-definer'
+require 'skylab/face/path-tools'
+require 'stringio' # whaetver
+require 'skylab/test-support/test-support' # ick just for deindent
+
+  #### "model" and utility classes and support
+
+  class MyPathname < Pathname
+    def pretty
+      Skylab::Face::PathTools.pretty_path to_s
     end
   end
 
-  class Actions::New
-    extend Action
-    desc "create a new empty file."
 
-    option_syntax do |r|
-      on("-x <foo>", "ohai sure whateer") { |d| r[:x] = d }
-      on("--foo-bar", "Foo Bar")
+  #### "action" base class
+
+  class MyAction
+    extend Action
+    extend ::Skylab::Slake::AttributeDefiner
+
+    def self.inherited cls
+      cls.action_module_init
     end
 
-    def execute one, two=nil, opts
-      emit :info, "one: #{one.inspect} two: #{two.inspect} opts: #{opts.inspect}"
+    meta_attribute :boolean
+    def self.on_boolean_attribute name, _
+      alias_method "#{name}?", name
+    end
+
+    meta_attribute :default
+
+    meta_attribute :pathname
+    def self.on_pathname_attribute name, _
+      alias_method "#{name}_before_pathname=", "#{name}="
+      define_method("#{name}=") do |path|
+        send("#{name}_before_pathname=", MyPathname.new(path.to_s))
+      end
+    end
+
+    def initialize *a
+      action_init(*a)
+      self.class.attributes.select { |k, v| v.key?(:default) }.each do |k, v|
+        send("#{k}=", v[:default].respond_to?(:call) ? v[:default].call : v[:default])
+      end
+    end
+
+    def skip m
+      emit(:info, "#{m}, skipping")
+      nil
+    end
+
+    def update_attributes! req
+      req.each { |k, v| send("#{k}=", v) }
+    end
+  end
+
+
+  #### "actions"
+
+  class Actions::Put < MyAction
+    desc "put the file"
+    desc "(see config-make)"
+    def execute path
+      emit :info, "ok, sure: #{path}"
+    end
+  end
+
+  class Actions::ConfigMake < MyAction
+
+    desc "write the config file"
+
+    attribute :dest, :pathname => true, :default => ->() { "#{ENV['HOME']}/.asibrc" }
+    attribute :dry_run, :boolean => true, :default => false
+    alias_method :dry?, :dry_run?
+
+    option_syntax do |h|
+      on('-n', '--dry-run', "dry run.") { h[:dry_run] = true }
+    end
+
+    def execute opts
+      update_attributes! opts
+      dest.exist? and return skip("already exists: #{dest.pretty}")
+      dest.open('w+') do |fh|
+        content = <<-HERE.unindent
+          host = yourhost
+          document_root = /path/to/your/doc/root
+        HERE
+        b = dry? ? nil : fh.write(content)
+        emit :info, "wrote #{dest.pretty} (#{b} bytes)"
+      end
+      true
     end
   end
 end
