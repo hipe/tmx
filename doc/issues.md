@@ -1,3 +1,4 @@
+[#078] 2012-03-09 @open: porcelain: bleeding
 [#077] 2012-03-08 @open: asib: put
 [#076] 2012-03-02 @open: porcelain: simply and reveal tree rendering
 [#075] 2012-02-16 @closed: porcelain: aliases, descs for namesp, acts
