@@ -1,3 +1,4 @@
+[#079] 2012-03-10 @open: porcelain: bleeding namespaces
 [#078] 2012-03-09 @open: porcelain: bleeding
 [#077] 2012-03-08 @open: asib: put
 [#076] 2012-03-02 @open: porcelain: simply and reveal tree rendering
