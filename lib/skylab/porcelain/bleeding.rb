@@ -5,11 +5,8 @@ require 'skylab/porcelain/en'
 require 'optparse'
 
 module Skylab::Porcelain::Bleeding
-  class OnFind
-    extend Skylab::PubSub::Emitter
-    emits :error, :ambiguous => :error, :not_found => :error, :not_provided => :error
-  end
   module Styles
+    include Skylab::Porcelain::En
     include Skylab::Porcelain::TiteColor
     def em(s)  ; stylize(s, :green         )   end
     def hdr(s) ; stylize(s, :strong, :green)   end
@@ -23,16 +20,67 @@ module Skylab::Porcelain::Bleeding
       filter { |y, a| y << a if a.visible? }
     end
   end
-  class Runtime
+  module ActionInstanceMethods
     include Styles
-    include Skylab::Porcelain::En
-    def action_modules
-      [ self.class.to_s.match(/^(.+)::[^:]+$/)[1].split('::').push('Actions').reduce(Object) { |m, o| m.const_get(o) },
-        OfficiousActions ]
+    alias_method :action, :class
+    def action_init runtime
+      @runtime = runtime
     end
-    attr_reader :actions
     def emit _, s
-      $stderr.puts s
+      @runtime.emit _, s
+    end
+    def execution_method
+      method :execute
+    end
+    def help o={}
+      emit(:help, o[:message]) if o[:message]
+      help_usage o
+      help_desc if o[:full]
+      help_list if o[:full]
+      help_invite o
+      nil
+    end
+    def help_desc
+      desc = self.class.desc
+      case desc.size
+      when 0 ;
+      when 1 ; emit(:help, "#{hdr 'description:'} #{desc.first}")
+      else   ; emit(:help, "#{hdr 'description:'}") ; desc.each { |s| emit(:help, s) }
+      end
+    end
+    def help_invite o
+      emit(:help, "try #{pre "#{program_name} #{action.name} -h"} for help") unless o[:full]
+    end
+    def help_list
+      action.option_syntax.any? and action.option_syntax.help(runtime)
+    end
+    def help_usage o
+      emit :help, "#{hdr 'usage:'} #{program_name} #{action.syntax}"
+    end
+    alias_method :initialize, :action_init
+    def program_name # @delegate
+      runtime.program_name
+    end
+    def resolve! argv
+      args = []
+      ok = action.option_syntax.parse!(argv, args, self) or return (help unless ok.nil?)
+      meth = action.argument_syntax.parse!(argv, args, self) or return help
+      [meth, args]
+    end
+    attr_reader :runtime
+  end
+  class OnFind
+    extend Skylab::PubSub::Emitter
+    emits :error, :ambiguous => :error, :not_found => :error, :not_provided => :error
+  end
+  module NamespaceInstanceMethods
+    include ActionInstanceMethods
+    attr_reader :actions
+    def action_modules
+      [ actions_module, OfficiousActions ]
+    end
+    def action_syntax
+      "{#{ actions.visible.map { |a| pre a.name } * '|' }}"
     end
     def find token
       yield(e = OnFind.new)
@@ -44,42 +92,50 @@ module Skylab::Porcelain::Bleeding
           kls.names.detect { |n| matcher =~ n } and (found ||= []).push(kls)
         end
       end
-      found or exp = "expecting {#{actions.map{ |a| em a.name } * '|'}}"
+      found or exp = "expecting #{action_syntax}"
       token or return e.emit(:not_provided, exp)
       found or return e.emit(:not_found, "invalid command #{token.inspect}. #{exp}")
       found.size > 1 and return e.emit(:ambiguous, "ambiguous comand #{token.inspect}. " <<
         "did you mean #{oxford_comma found.map { |k| "#{pre k.name}" }}?")
       found.first
     end
-    def initialize
+    def help_invite o
+      a, b = if o[:full] then ['<action>',   " on a particular action."]
+                         else ['[<action>]'] end
+      emit :help, "try #{pre "#{program_name} #{a} -h"} for help#{b}"
+    end
+    def help_list
+      tbl = actions.visible.map { |action|  [action.name, action.summary] }
+      emit :help, (tbl.empty? ? "(no actions)" : "#{hdr 'actions:'}")
+      width = tbl.reduce(0) { |m, o| o[0].length > m ? o[0].length : m }
+      fmt = "  #{em "%#{width}s"}  %s"
+      fmt2 = "  #{' ' * width}  %s"
+      tbl.each do |row|
+        emit :help, (fmt % [row[0], row[1][0]])
+        row[1].size > 1 and row[1][1..1].each { |s| emit(:help, fmt2 % [s]) }
+      end
+    end
+    def help_usage o
+      action_syntax = (false == o[:action_syntax]) ? '<action>' : self.action_syntax
+      emit :help, "#{hdr 'usage:'} #{program_name} #{action_syntax} [opts] [args]"
+    end
+    def namespace_init
       @actions = ActionEnumerator.new do |y|
         action_modules.each { |m| m.constants.each { |k| y << m.const_get(k) } }
         # there is an anticpated issue above with fuzzy matching actions that have same name in different module
       end
     end
-    def invoke argv
-      argv = argv.dup
-      2 == argv.size and '-h' == argv.last and argv.reverse! # the alternative is uglier
-      find(argv.shift) { |o| o.on_error { |s| return usage(s.message) } }.new(self).invoke(argv)
-    end
     def program_name
-      File.basename($PROGRAM_NAME)
+      "#{runtime.program_name} #{actions_module.name}" #!
     end
-    def usage s=nil
-      s and emit(:info, s)
-      emit :info, "#{hdr 'usage:'} #{program_name} <action> [opts] [args]"
-      emit :info, "try #{pre "#{program_name} -h"} for help"
-      nil
-    end
-  end
-
-  module Action
-    def self.extended mod
-      mod.send(:include, ActionInstanceMethods)
-      mod.send(:extend, ActionModuleMethods)
+    def resolve! argv
+      2 == argv.size and '-h' == argv.last and argv.reverse! # the alternative is uglier, but @todo
+      action = find(argv.shift){ |o| o.on_error { |s| return help(message: s.message, action_syntax: false) } }
+      transaction = action.build self
+      huh = transaction.resolve! argv
+      huh
     end
   end
-
   class ArgumentSyntax
     def [] idx
       string.split(' ')[idx] or "<arg#{idx + 1}>"  # @hack
@@ -92,72 +148,73 @@ module Skylab::Porcelain::Bleeding
       @action = action
       @string = nil
     end
-    def parse! argv, args, action
-      meth = action.execution_method
+    def parse! argv, args, transaction
+      meth = transaction.execution_method
       parameters = meth.parameters
-      action.class.option_syntax.any? and parameters.pop # ick
+      transaction.action.option_syntax.any? and parameters.pop # ick
       count = Hash.new { |h, k| h[k] = 0 }
       parameters.each { |p| count[p.first] += 1 }
-      error = ->(msg) { action.runtime.emit(:syntax_error, msg) ; false }
+      error = ->(msg) { transaction.runtime.emit(:syntax_error, msg) ; false }
       requireds = ->(i) { parameters.select{ |p| :req == p.first }[i].last }
       min_arity = count[:req]
-      max_arity = count.values.reduce(:+)
+      max_arity = count.values.reduce(:+) if count[:rest].zero?
       argv.size < min_arity and return error["missing argument: #{requireds[argv.size]}"]
-      argv.size > max_arity and return error["unexpected argument: #{argv[max_arity]}"]
+      argv.size > max_arity and return error["unexpected argument: #{argv[max_arity]}"] if max_arity
       args[0, 0] = argv
       argv.clear
       meth
     end
     def string
       @string and return @string
-      params = action.execution_method.parameters
+      params = action.parameters
       action.option_syntax.any? and params.pop
       params.map do |p|
         a, b = case p.first
-               when :req ;
-               when :opt ; ['[', ']']
-               else      ; fail
+               when :req  ;
+               when :opt  ; %w([ ])
+               when :rest ; %w([ [..]])
+               else       ; fail
                end
         "#{a}<#{p.last}>#{b}"
       end.join(' ')
     end
-    alias_method :to_str, :string
+    def to_str
+      string # !
+    end
   end
-
   class OptionSyntax < Struct.new(:definitions)
     include Styles
     def any?
       definitions.any?
+    end
+    def define &b
+      definitions.push b
     end
     def help e
       _ = {}
       OptionParser.new do |o|
         o.banner = "#{hdr 'options:'}"
         definitions.each { |d| o.instance_exec(_, &d) }
-        e.emit(:help, o.to_s) # you could of course..
+        e.emit(:help, o.to_s)
       end
-      nil
     end
     def initialize
       self.definitions = []
     end
-    def define &b
-      definitions.push b
-    end
-    def parse! argv, args, action
+    def parse! argv, args, transaction
       definitions.empty? and return true
       args.push(req = {})
       ret = true
       begin
         OptionParser.new do |o|
           o.on('-h', '--help') do
-            action.class.help(action.runtime)
+            transaction.help(full: true)
             ret = nil
           end
           definitions.each { |d| o.instance_exec(req, &d) }
         end.parse!(argv)
       rescue OptionParser::ParseError => e
-        action.runtime.emit :optparse_parse_error, e
+        transaction.runtime.emit :optparse_parse_error, e
         ret = false
       end
       ret
@@ -172,7 +229,6 @@ module Skylab::Porcelain::Bleeding
       end
     end
   end
-
   module ActionModuleMethods
     include Styles
     def action_module_init
@@ -189,24 +245,14 @@ module Skylab::Porcelain::Bleeding
     def argument_syntax s=nil
       s ? @argument_syntax.define(s) : @argument_syntax
     end
+    def build runtime
+      new runtime
+    end
     def desc *a
       a.any? ? @desc.concat(a) : @desc
     end
-    def execution_method
-      instance_method(:execute)
-    end
     def self.extended mod
       mod.action_module_init
-    end
-    def help e
-      e.emit(:help, "#{hdr 'usage:'} #{e.program_name} #{syntax}")
-      case desc.size
-      when 0 ;
-      when 1 ; e.emit(:help, "#{hdr 'description:'} #{desc.first}")
-      else   ; e.emit(:help, "#{hdr 'description:'}") ; desc.each { |s| e.emit(:help, s) }
-      end
-      option_syntax.any? and option_syntax.help(e)
-      nil
     end
     attr_reader :name
     def names
@@ -215,83 +261,107 @@ module Skylab::Porcelain::Bleeding
     def option_syntax &b
       b ? @option_syntax.define(&b) : @option_syntax
     end
+    def parameters
+      instance_method(:execute).parameters
+    end
     def summary
-      @desc[0..2]
+      desc[0..2]
     end
     def syntax
       [name, option_syntax.to_str, argument_syntax.to_str].compact.join(' ')
     end
-    attr_accessor :visible
+    def visible *a
+      case a.size ; when 0 ; @visible ; when 1 ; @visible = a.first ; else fail end
+    end
+    attr_writer :visible
     alias_method :visible?, :visible
   end
-
-  module ActionInstanceMethods
-    include Styles
-    alias_method :action, :class
-    def emit _, s
-      @runtime.emit _, s
-    end
-    def execution_method
-      method(:execute)
-    end
-    def initialize runtime
-      @runtime = runtime
-    end
-    alias_method :action_init, :initialize
-    def invoke argv, &b
-      args = []
-      x = action.option_syntax.parse!(argv, args, self) or return( x.nil? ? nil : usage )
-      meth = action.argument_syntax.parse!(argv, args, self) or return usage
-      meth.call(*args, &b)
-    end
-    attr_reader :runtime
-    def usage s = nil
-      emit(:error, s) if s
-      emit :usage, "#{hdr 'usage:'} #{runtime.program_name} #{action.syntax}"
-      emit :usage, "try #{runtime.program_name} #{action.name} -h for help."
-      nil
+  module Action
+    def self.extended mod
+      mod.send :include, ActionInstanceMethods
+      mod.send :extend, ActionModuleMethods
     end
   end
-
+  module Namespace
+    def self.extended mod
+      mod.send :extend, NamespaceModuleMethods
+    end
+  end
+  module NamespaceModuleMethods
+    include ActionModuleMethods
+    def self.extended mod
+      mod.namespace_module_init
+    end
+    def build runtime
+      NamespaceAction.new(self, runtime)
+    end
+    alias_method :namespace_module_init, :action_module_init
+    def parameters
+      arr = NamespaceAction.parameters
+      arr
+    end
+    alias_method :action_module_summary, :summary
+    def summary
+      desc.any? and return action_module_summary
+      aa = build(nil).actions.visible.to_a
+      ["child action#{'s' if aa.size != 1}: {#{build(nil).actions.visible.map{ |a| "#{pre a.name}" }.join('|')}}"]
+    end
+  end
+  class NamespaceAction
+    extend Action
+    include NamespaceInstanceMethods
+    attr_reader :actions_module
+    def initialize namespace, runtime
+      action_init runtime
+      @actions_module = namespace
+      namespace_init
+    end
+  end
+  class Runtime
+    extend NamespaceModuleMethods
+    include NamespaceInstanceMethods
+    def actions_module
+      self.class.to_s.match(/^(.+)::[^:]+$/)[1].split('::').push('Actions').reduce(Object) { |m, o| m.const_get(o) }
+    end
+    def emit _, s
+      $stderr.puts s
+    end
+    alias_method :initialize, :namespace_init
+    def invoke argv
+      argv = argv.dup
+      (callable, args = resolve!(argv)) or return callable
+      callable.receiver.send(callable.name, *args)
+    end
+    def program_name
+      File.basename($PROGRAM_NAME)
+    end
+    def self.inherited mod
+      mod.namespace_module_init
+    end
+  end
   module OfficiousActions
   end
-
   class OfficiousActions::Help
     extend Action
-    include Styles
 
     aliases '-h'
 
     desc "displays this screen."
 
-    self.visible = false
-
-    def action_syntax
-      "{#{ runtime.actions.visible.map { |a| pre a.name } * '|' }}"
-    end
+    visible false
 
     def action_help action_name
-      runtime.find(action_name) do |o|
+      action = runtime.find(action_name) do |o|
         o.on_error do |e|
           return emit(:error, e.message)
         end
-      end.help(runtime)
+      end
+      action.build(runtime).help(full: true)
+      nil
     end
 
     def execute action_name=nil
-      action_name and return action_help(action_name)
-      emit :payload, "#{hdr 'usage:'} #{runtime.program_name} #{action_syntax} [opts] [args]"
-      tbl = runtime.actions.visible.map { |action|  [action.name, action.summary] }
-      emit :payload, (tbl.empty? ? "(no actions)" : "#{hdr 'actions:'}")
-      width = tbl.reduce(0) { |m, o| o[0].length > m ? o[0].length : m }
-      fmt = "  #{em "%#{width}s"}  %s"
-      fmt2 = "  #{' ' * width}  %s"
-      tbl.each do |row|
-        runtime.emit :payload, (fmt % [row[0], row[1][0]])
-        row[1].size > 1 and row[1][1..1].each { |s| runtime.emit(:payload, fmt2 % [s]) }
-      end
-      tbl.empty? or emit(:payload, "try #{pre "#{runtime.program_name} <action> -h"} for help on a command.")
-      nil
+      action_name ? action_help(action_name) : runtime.help(full: true)
     end
   end
 end
