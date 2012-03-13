@@ -6,17 +6,13 @@ require 'stringio' # whaetver
 require 'skylab/test-support/test-support' # ick just for deindent
 
 module Skylab::Asib
-  include Skylab::Porcelain::Bleeding
-  Action = Action; #!
+  Bleeding = Skylab::Porcelain::Bleeding
 
-  class Cli < Runtime
+  class Cli < Bleeding::Runtime
   end
 
   module Actions
   end
-
-
-  #### "model" and utility classes and support
 
   class MyPathname < Pathname
     def pretty
@@ -24,11 +20,8 @@ module Skylab::Asib
     end
   end
 
-
-  #### "action" base class
-
   class MyAction
-    extend Action
+    extend Bleeding::Action
     extend ::Skylab::Slake::AttributeDefiner
 
     def self.inherited cls
@@ -69,6 +62,8 @@ module Skylab::Asib
 
 
   #### "actions"
+  #
+  module Actions; end
 
   class Actions::Put < MyAction
     desc "put the file"
@@ -78,13 +73,18 @@ module Skylab::Asib
     end
   end
 
-  class Actions::ConfigMake < MyAction
+  module Actions::Config
+    extend Bleeding::Namespace
+    desc "manage the config file"
+    summary { ["config file stuff (child actions: #{action_syntax})"] }
+  end
+
+  class Actions::Config::Generate < MyAction
 
     desc "write the config file"
 
     attribute :dest, :pathname => true, :default => ->() { "#{ENV['HOME']}/.asibrc" }
     attribute :dry_run, :boolean => true, :default => false
-    alias_method :dry?, :dry_run?
 
     option_syntax do |h|
       on('-n', '--dry-run', "dry run.") { h[:dry_run] = true }
@@ -92,15 +92,20 @@ module Skylab::Asib
 
     def execute opts
       update_attributes! opts
-      dest.exist? and return skip("already exists: #{dest.pretty}")
-      dest.open('w+') do |fh|
-        content = <<-HERE.unindent
-          host = yourhost
-          document_root = /path/to/your/doc/root
-        HERE
-        b = dry? ? nil : fh.write(content)
-        emit :info, "wrote #{dest.pretty} (#{b} bytes)"
+      content = <<-HERE.unindent
+        host = yourhost
+        document_root = /path/to/your/doc/root
+      HERE
+      if dest.exist?
+        if content == dest.read
+          return skip("no change: #{dest.pretty}")
+        else
+          return skip("exists, won't overwrite: #{dest.pretty}")
+        end
       end
+      bytes = 0
+      dest.open('w+') { |fh| bytes = fh.write(content) } unless dry_run?
+      emit :info, "wrote #{dest.pretty} (#{bytes} bytes)"
       true
     end
   end
