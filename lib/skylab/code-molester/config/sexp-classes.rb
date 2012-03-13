@@ -55,8 +55,8 @@ module Skylab::CodeMolester::Config
     def _no_value name
     end
     def set_value name, value
-      if i = content_items.detect { |i| name == i.item_name }
-        _update_value i, value
+      if item = content_items.detect { |i| name == i.item_name }
+        _update_value item, value
       else
         _create_value name, value
       end
@@ -137,7 +137,7 @@ module Skylab::CodeMolester::Config
       end
       sect = S[:section, S[:header, S[:section_line, s0, S[:name, name.to_s], S[:n_3, s1]]],
         S[:items, "\n"]]
-      parent.push "\n" # this probably breaks syntax, let's see if it's ok
+      # parent.push "\n" # this probably breaks syntax, let's see if it's ok # SEE TESTS
       parent.push sect
       sect
     end

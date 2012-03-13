@@ -224,7 +224,7 @@ describe ::Skylab::CodeMolester::Config::File do
       end
       it "you can create new values" do
         config['bleuth'] = 'michael'
-        config.content.should eql(<<-HERE.deindent)
+        config.content.should eql(<<-HERE.unindent.strip)
           foo = bar
           biff = baz
           bleuth = michael
@@ -271,7 +271,7 @@ describe ::Skylab::CodeMolester::Config::File do
       end
       context "if you set its content explicitly with a string" do
         let (:want_content) do
-          <<-HERE.deindent
+          <<-HERE.unindent
             who = hah
               boo = bah
             [play]
@@ -295,7 +295,7 @@ describe ::Skylab::CodeMolester::Config::File do
         context "lets you add new values" do
           it "to the root node (note the inherited whitespace)" do
             config['new_item'] = 'new value'
-            config.content.split("\n")[0,3].join("\n").should eql(<<-HERE.deindent)
+            config.content.split("\n")[0,3].join("\n").should eql(<<-HERE.unindent.strip)
               who = hah
                 boo = bah
                 new_item = new value
@@ -303,20 +303,20 @@ describe ::Skylab::CodeMolester::Config::File do
           end
           it "to existing child nodes (note the unparsing of one section only!)" do
             config['work']['nerpus'] = 'derpus'
-            config['work'].unparse.strip.should eql(<<-HERE.deindent)
+            config['work'].unparse.strip.should eql(<<-HERE.unindent.strip)
               [work]
                 times = funner # good times here
                 nerpus = derpus
             HERE
           end
-          it "lets you create a section by assigning something to it" do
+          it "lets you create a section by assigning something to it", {f:true} do
+            last_part = ->(s) { s.match(/good times here(.+)\z/m)[1] }
+            last_part[config.content].should eql("\n")
             config['goal']['dream'] = 'deadline'
-            have = config.content.to_s.split("\n")[-4,4].join("\n")
-            have.should eql(<<-HERE.deindent)
-              [work]
-                times = funner # good times here
-              [goal]
-                dream = deadline
+            last_part[config.content].should eql(<<-HERE.gsub(/^(  ){6}/, ''))
+
+            [goal]
+              dream = deadline
             HERE
           end
         end

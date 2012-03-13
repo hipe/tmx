@@ -1,6 +1,3 @@
-class String
-  def deindent
-    gsub(%r{^#{Regexp.escape match(/\A([[:space:]]*)/)[1]}}, '').strip
-  end
-end
+require File.expand_path('../../..', __FILE__)
+require 'skylab/test-support/test-support'
 

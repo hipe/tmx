@@ -1,7 +1,7 @@
 $:.include?(_skylab = File.expand_path('../../..', __FILE__)) or $:.unshift(_skylab)
 
 require 'skylab/code-molester/sexp'
-require 'skylab/slake/muxer'
+require 'skylab/pub-sub/emitter'
 
 module Skylab
   module Dependency
@@ -52,7 +52,7 @@ end
 
 class Skylab::Dependency::Version < Skylab::CodeMolester::Sexp
   class Parse
-    extend Skylab::Slake::Muxer
+    extend Skylab::PubSub::Emitter
     emits :informational, :error => :informational
     def error msg
       emit :error, msg

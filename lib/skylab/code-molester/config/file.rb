@@ -1,7 +1,9 @@
 require File.expand_path('..', __FILE__)
+prev = $VERBOSE ; $VERBOSE = false
 require 'treetop'
+$VERBOSE = prev # treetop is naughty (@todo etc?)
 require 'skylab/face/path-tools'
-require 'skylab/slake/muxer'
+require 'skylab/pub-sub/emitter'
 
 module Skylab::CodeMolester
   module Config
@@ -11,7 +13,7 @@ module Skylab::CodeMolester
   end
 
   class Config::File < Pathname
-    extend ::Skylab::Slake::Muxer
+    extend ::Skylab::PubSub::Emitter
     emits :all, :info => :all, :error => :all
 
     alias_method :pathname_children, :children
