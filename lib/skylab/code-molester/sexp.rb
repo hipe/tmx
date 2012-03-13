@@ -12,8 +12,8 @@ module Skylab
       end
       def last *a
         0 == a.size and return super
-        i = (size-1).downto(1).detect { |i| Array === self[i] and self[i].first == a.first }
-        self[i] if i
+        ii = (size-1).downto(1).detect { |i| Array === self[i] and self[i].first == a.first }
+        self[ii] if ii
       end
       def select *a, &b
         (b or 1 != a.size or !(Symbol === a.first)) and return super
