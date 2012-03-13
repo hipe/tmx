@@ -12,8 +12,8 @@ module ::Skylab::GitStashUntracked::Tests
         me = self
         Open3.stub(:popen3) do |cmd, block|
           me.cmd_spy.replace cmd
-          serr = TestSupport::MyStringIO.new('')
-          sout = TestSupport::MyStringIO.new(str)
+          serr = StringIO.new('')
+          sout = StringIO.new(str)
           block.call(nil, sout, serr)
         end
       end
@@ -28,14 +28,14 @@ module ::Skylab::GitStashUntracked::Tests
         o
       end
       let :stderr do
-        TestSupport::MyStringIO.new
+        StringIO.new
       end
       describe "status" do
         it "which lists untracked files" do
           stub_popen3("derpus\nnerpus/herpus")
           app.invoke %w(status)
           cmd_spy.should eql("git ls-files -o --exclude-standard")
-          stderr.to_s.should match(/nerpus\/herpus/)
+          stderr.string.should match(/nerpus\/herpus/)
         end
       end
       describe "save" do
@@ -51,7 +51,7 @@ module ::Skylab::GitStashUntracked::Tests
             mv dippy/doopy tmp/gsu/foo/dippy/doopy
             mv dippy/floopy tmp/gsu/foo/dippy/floopy
           HERE
-          stderr.to_s.should eql(str)
+          stderr.string.should eql(str)
         end
       end
       describe "list" do
@@ -65,10 +65,10 @@ module ::Skylab::GitStashUntracked::Tests
             alpha
             beta
           HERE
-          stderr.to_s.should eql(expected)
+          stderr.string.should eql(expected)
           stderr.truncate(0) ; stderr.rewind
           app.invoke ['list', '-s', "#{TMPDIR}/stashes"] # same thing but invoked though the porcelain
-          stderr.to_s.should eql(expected)
+          stderr.string.should eql(expected)
         end
       end
       describe "show" do
@@ -98,7 +98,7 @@ module ::Skylab::GitStashUntracked::Tests
             flop/floop.tx | 4 ++++
             2 files changed, 6 insertions(+), 0 deletions(-)
           HERE
-          unstylize(stderr.to_s).should eql(expected)
+          unstylize(stderr.string).should eql(expected)
         end
         it "it can also do the --patch format" do
           with_this_stash
@@ -117,7 +117,7 @@ module ::Skylab::GitStashUntracked::Tests
             +foour
             +
           HERE
-          unstylize(stderr.to_s).should eql(expected)
+          unstylize(stderr.string).should eql(expected)
         end
       end
       describe "pop" do

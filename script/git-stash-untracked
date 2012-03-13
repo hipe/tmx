@@ -2,10 +2,8 @@
 
 require 'fileutils'
 require 'open3'
-require 'pathname'
-
-
-require File.expand_path('../../lib/skylab/porcelain/all', __FILE__)
+require File.expand_path('../../lib/skylab', __FILE__)
+require 'skylab/porcelain/all'
 
 module Skylab::GitStashUntracked
   class Porcelain
@@ -391,6 +389,6 @@ end
 
 # in some cases write a ruby script at ~/bin/g-s-u that simply loads this file
 if File.basename(__FILE__) == File.basename($PROGRAM_NAME)
-  ::Skylab::GitStashUntracked::Porcelain.new{ on_all { |e| $stderr.puts e } }.invoke(ARGV)
+  ::Skylab::GitStashUntracked::Porcelain.new{ |o| o.on_all { |e| $stderr.puts e } }.invoke(ARGV)
 end
 
