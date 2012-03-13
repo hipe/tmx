@@ -2,9 +2,6 @@ module Skylab ; end
 
 module Skylab::PubSub
   module Emitter
-    def self.extended mod
-      mod.send(:include, InstanceMethods)
-    end
     def emits *nodes
       event_cloud = self.event_cloud
       events = event_cloud.merge_definition!(*nodes)
@@ -25,6 +22,18 @@ module Skylab::PubSub
         else
           SemanticTagCloud.new
         end
+      end
+    end
+  end
+  class << Emitter
+    def extended mod
+      mod.send(:include, InstanceMethods)
+    end
+    def new *a
+      Class.new.class_eval do
+        extend Emitter
+        emits(*a)
+        self
       end
     end
   end
