@@ -18,7 +18,7 @@ describe ::Skylab::CodeMolester::AutoSexp do
   let(:subject) { parse_result.sexp }
   context "With a grammar for first names" do
     let(:grammar) do
-      <<-HERE.deindent
+      <<-HERE.unindent
         module Skylab::CodeMolester::TestNamespace
           grammar PersonName
             rule person_name
@@ -46,7 +46,7 @@ describe ::Skylab::CodeMolester::AutoSexp do
   end
   context "With a grammar for first and last names" do
     let(:grammar) do
-      <<-HERE.deindent
+      <<-HERE.unindent
         module Skylab::CodeMolester::TestNamespace
           grammar PersonName
             rule person_name
@@ -82,7 +82,7 @@ describe ::Skylab::CodeMolester::AutoSexp do
   end
   context "With a grammar for first and last names broken up differently" do
     let(:grammar) do
-      <<-HERE.deindent
+      <<-HERE.unindent
         module Skylab::CodeMolester::TestNamespace
           grammar PersonName
             rule person_name
@@ -139,7 +139,7 @@ describe ::Skylab::CodeMolester::AutoSexp do
       end
     end
     let(:grammar) do
-      <<-HERE.deindent
+      <<-HERE.unindent
         module Skylab::CodeMolester::TestNamespace
           grammar Sandwich
             rule sandwich

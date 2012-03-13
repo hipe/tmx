@@ -1,25 +1,11 @@
 require 'fileutils'
 require 'open3'
-require 'pathname'
 require 'stringio'
 
-class ::String
-  def unindent
-    gsub %r{^#{Regexp.escape match(/\A[ ]*/)[0]}}, ''
-  end
-end
-
-
-module Skylab ; end
+require File.expand_path('../test-support', __FILE__)
 
 module Skylab::TestSupport
-  class MyStringIo < StringIO
-    def to_s
-      rewind
-      read
-    end
-  end
-  class TempDir < ::Pathname
+  class Tmpdir < ::Pathname
     include FileUtils
     def emit type, msg
       $stderr.puts msg
@@ -78,7 +64,7 @@ end
 
 module Skylab
   class << TestSupport
-    def tempdir path, requisite_level
+    def tmpdir path, requisite_level
       requisite_level >= 1 or raise("requisite level must always be one or above")
       pn = Pathname.new(path)
       re = Regexp.new("\\A#{requisite_level.times.map{ |_| '[^/]+' }.join('/')}")
@@ -86,7 +72,7 @@ module Skylab
       if ! File.exist?(md[0])
         raise("prerequisite folder for tempdir must exist: #{md[0]}")
       end
-      TestSupport::TempDir.new(path)
+      TestSupport::Tmpdir.new(path)
     end
   end
 end
