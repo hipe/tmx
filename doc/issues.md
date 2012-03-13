@@ -1,4 +1,5 @@
-[#080] 2012-03-10 @open: gsu: fix
+[#081] 2012-03-14 @open: code-molester: integrate
+[#080] 2012-03-13 @closed: gsu: fix
 [#079] 2012-03-10 @closed: porcelain: bleeding namespaces
 [#078] 2012-03-09 @closed: porcelain: bleeding (usable)
 [#077] 2012-03-08 @open: asib: put
