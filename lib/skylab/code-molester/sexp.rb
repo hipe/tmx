@@ -1,31 +1,54 @@
 # this file must have no implied dependencies, i.e. is standalone
+require 'stringio'
+
 module Skylab
   module CodeMolester
     # thanks to zenspider
     class Sexp < Array
-      class RuntimeError < ::RuntimeError; end
       # this name for this method is experimental.  the name may change.
       def detect *a, &b
-        (b or 1 != a.size or ! a.first.kind_of?(Symbol)) and return super
-        self[1..-1].detect { |n| n.kind_of?(Array) and n.first == a.first }
+        (b or 1 != a.size or !(Symbol === a.first)) and return super
+        self[1..-1].detect { |n| Array === n and n.first == a.first }
       end
-      def to_s
-        # although for now we are discouraging this structure, we allow for the possibility of pure-list nodes
-        use_these = first.kind_of?(Symbol) ? self[1..-1] : self
-        use_these.map do |node|
-          case node
-          when Sexp
-            node.to_s
-          when Array
-            _use_these = node.first.kind_of?(Symbol) ? node[1..-1] : node
-            _use_these.map(&:to_s).join('')
+      def last *a
+        0 == a.size and return super
+        i = (size-1).downto(1).detect { |i| Array === self[i] and self[i].first == a.first }
+        self[i] if i
+      end
+      def select *a, &b
+        (b or 1 != a.size or !(Symbol === a.first)) and return super
+        self[1..-1].select { |n| Array === n and n.first == a.first }
+      end
+      def symbol_name
+        Symbol === first ? first : false
+      end
+      def unparse sio=nil
+        unless sio
+          sio = StringIO.new
+          ret = true
+        end
+        self[1..-1].each do |child|
+          if child.respond_to?(:unparse)
+            child.unparse(sio)
           else
-            node.to_s
+            sio.write child.to_s
           end
-        end.join('')
+        end
+        if ret
+          sio.rewind
+          sio.read
+        end
       end
-      def _sexp_fail msg
-        raise RuntimeError.new(msg)
+    end
+    class << Sexp
+      def [] *a
+        ((@factory and a.any?) ? factory[a.first] : self).new.concat([*a])
+      end
+      def []= symbol_name, sexp_klass
+        factory[symbol_name] = sexp_klass
+      end
+      def factory
+        @factory ||= Hash.new(self)
       end
     end
   end
