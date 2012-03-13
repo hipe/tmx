@@ -5,6 +5,11 @@ require 'skylab/porcelain/en'
 require 'optparse'
 
 module Skylab::Porcelain::Bleeding
+  module DelegatesTo
+    def delegates_to fulfiller, *methods
+      methods.each { |m| define_method(m) { |*a, &b| send(fulfiller).send(m, *a, &b) } }
+    end
+  end
   module Styles
     include Skylab::Porcelain::En
     include Skylab::Porcelain::TiteColor
@@ -20,15 +25,13 @@ module Skylab::Porcelain::Bleeding
       filter { |y, a| y << a if a.visible? }
     end
   end
-  module ActionInstanceMethods
+  module ActionInstanceMethods ; extend DelegatesTo
     include Styles
     alias_method :action, :class
     def action_init runtime
       @runtime = runtime
     end
-    def desc
-      action.desc # @delegates
-    end
+    delegates_to :action, :desc
     def emit _, s
       @runtime.emit _, s
     end
@@ -60,9 +63,7 @@ module Skylab::Porcelain::Bleeding
       emit :help, "#{hdr 'usage:'} #{program_name} #{action.syntax}"
     end
     alias_method :initialize, :action_init
-    def program_name # @delegate
-      runtime.program_name
-    end
+    delegates_to :runtime, :program_name
     def resolve! argv
       args = []
       ok = action.option_syntax.parse!(argv, args, self) or return (help unless ok.nil?)
@@ -75,14 +76,9 @@ module Skylab::Porcelain::Bleeding
     extend Skylab::PubSub::Emitter
     emits :error, :ambiguous => :error, :not_found => :error, :not_provided => :error
   end
-  module NamespaceInstanceMethods
+  module NamespaceInstanceMethods ; extend DelegatesTo
     include ActionInstanceMethods
-    def actions # @delegates
-      action.actions
-    end
-    def action_syntax
-      action.action_syntax # @delegates
-    end
+    delegates_to :action, :action_syntax, :actions
     def find token
       yield(e = OnFind.new)
       found = nil
@@ -313,8 +309,7 @@ module Skylab::Porcelain::Bleeding
       end
     end
     def parameters
-      arr = NamespaceAction.parameters
-      arr
+      NamespaceAction.parameters
     end
     alias_method :action_module_summary, :summary
     def summary &b
@@ -323,19 +318,12 @@ module Skylab::Porcelain::Bleeding
       ["child action#{'s' if aa.size != 1}: {#{build(nil).actions.visible.map{ |a| "#{pre a.name}" }.join('|')}}"]
     end
   end
-  class NamespaceAction
+  class NamespaceAction ; extend DelegatesTo
     extend Action
     include NamespaceInstanceMethods
-    def action_syntax
-      actions_module.action_syntax # @delegates
-    end
-    def actions
-      actions_module.actions # @delegates
-    end
+    delegates_to :actions_module, :action_syntax, :actions
     attr_reader :actions_module
-    def desc
-      actions_module.desc # @delegates
-    end
+    delegates_to :actions_module, :desc
     def initialize namespace, runtime
       action_init runtime
       @actions_module = namespace
