@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
 require 'ncurses'
-require 'ruby-debug'
 
 module Skylab; end
 
