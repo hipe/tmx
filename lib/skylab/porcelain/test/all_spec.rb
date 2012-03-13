@@ -8,8 +8,8 @@ module Skylab::Porcelain::TestSupport
   describe "The #{Skylab::Porcelain} module" do
     include Porcelain::Styles # unstylize
     let(:debug_ui) { }
-    let(:_stderr) { MyStringIO.new }
-    let(:stderr) { _stderr.to_s }
+    let(:_stderr) { StringIO.new }
+    let(:stderr) { _stderr.string }
     let(:instance) do
       klass.new do |o|
         o.on_all { |e| _stderr.puts unstylize(e) ; debug_ui and $stderr.puts("DBG-->#{e}<--") }
