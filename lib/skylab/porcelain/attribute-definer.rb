@@ -42,9 +42,25 @@ module Skylab::Porcelain
     def default_meta_attributes
       @default_meta_attributes ||= _parent_dup(:default_meta_attributes) { { } }
     end
-    def meta_attribute *a
+    def import_meta_attributes mod
+      block_given? and raise ArgumentError.new("blocks not supported when importing meta attributes.")
+      mod.meta_attributes.each do |k, meta|
+        meta_attributes[k] = meta # clobbers!
+      end
+    end
+    def meta_attribute *a, &b
+      b && a.count != 1 and raise ArgumentError.new("with block form, only pass 1 meta_attribute, not #{a.count}")
       a.each do |attr_sym|
-        meta_attributes[attr_sym] ||= AttributeMeta.new(attr_sym)
+        case attr_sym
+        when Symbol ; meta_attributes[attr_sym] ||= AttributeMeta.new(attr_sym)
+        when Module ; import_meta_attributes(attr_sym, &b)
+        else        ; fail("unspported type for meta attribute: #{attr_sym.class}")
+        end
+      end
+      if b
+        singleton_class.send(:define_method, ("on_#{a.last}_attribute")) do |*aa|
+          instance_exec(* aa[0..(b.arity < 0 ? [aa.length - 1, 0].max : b.arity - 1)], &b) # as many or as few args
+        end
       end
       nil
     end
