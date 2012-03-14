@@ -1,4 +1,5 @@
-[#081] 2012-03-14 @open: code-molester: integrate
+[#082] 2012-03-14 @open: code-molester: improve section handling
+[#081] 2012-03-14 @closed: code-molester: integrate
 [#080] 2012-03-13 @closed: gsu: fix
 [#079] 2012-03-10 @closed: porcelain: bleeding namespaces
 [#078] 2012-03-09 @closed: porcelain: bleeding (usable)
