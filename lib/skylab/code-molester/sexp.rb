@@ -42,7 +42,7 @@ module Skylab
     end
     class << Sexp
       def [] *a
-        ((@factory and a.any?) ? factory[a.first] : self).new.concat([*a])
+        (((@factory ||= nil) and a.any?) ? factory[a.first] : self).new.concat([*a])
       end
       def []= symbol_name, sexp_klass
         factory[symbol_name] = sexp_klass

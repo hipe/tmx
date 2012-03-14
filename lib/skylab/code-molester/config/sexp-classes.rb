@@ -7,10 +7,10 @@ module Skylab::CodeMolester::Config
       d.value
     end
     def []= key, value
-      @local_root.set_value(key, value)
+      root.set_value(key, value)
     end
-    def initialize local_root, &b
-      @local_root = local_root
+    def initialize root, &b
+      self.root = root
       super(&b)
     end
     def each &b
@@ -24,6 +24,18 @@ module Skylab::CodeMolester::Config
     end
     def keys
       map { |v| v.key }
+    end
+    attr_accessor :root
+  end
+  class SectionsPseudohash < ValuesPseudohash
+    def [] key
+      detect { |i| key == i.item_name }
+    end
+    def []= key, value
+      Hash === value or raise ArgumentError.new("Every assignment to an entire section must be a Hash, had #{value.class}")
+      sec = self[key] || Section.create(key, root)
+      value.each { |k, v| sec[k] = v }
+      value
     end
   end
   class ContentItemBranch < Sexp
@@ -55,16 +67,17 @@ module Skylab::CodeMolester::Config
     def _no_value name
     end
     def set_value name, value
-      if item = content_items.detect { |i| name == i.item_name }
+      if Hash === value
+        sections[name] = value
+      elsif item = content_items.detect { |i| name == i.item_name }
         _update_value item, value
       else
         _create_value name, value
       end
     end
     def value_items
-      this = _assignments_sexp
       ValuesPseudohash.new(self) do |y|
-        this.select(:assignment_line).each { |a| y << a }
+        _assignments_sexp.select(:assignment_line).each { |a| y << a }
       end
     end
   end
@@ -88,8 +101,8 @@ module Skylab::CodeMolester::Config
       AssignmentLine.create(name, value, sec)
       nil
     end
-    def _no_value name
-      Section.create name, detect(:sections)
+    def sections
+      detect(:sections).enumerator
     end
     def _update_value assmt, value
       assmt.set_item_value value
@@ -103,9 +116,12 @@ module Skylab::CodeMolester::Config
   end
   class Sections < Sexp
     Sexp[:sections] = self
-    def content_items
-      select(:section)
+    def enumerator
+      SectionsPseudohash.new(self) do |y|
+        select(:section).each { |s| y << s }
+      end
     end
+    alias_method :content_items, :enumerator
   end
   class Section < ContentItemBranch
     Sexp[:section] = self
