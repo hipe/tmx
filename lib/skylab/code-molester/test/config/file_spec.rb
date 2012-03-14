@@ -186,8 +186,9 @@ describe ::Skylab::CodeMolester::Config::File do
             TypeError, /can't convert Symbol into Integer/)
         end
       end
-      it "COUNTERITUITIVELY will not get nil if it asks for a name that isn't there" do
-        config['fo'].should_not eql(nil)
+      it "will get nil if it asks for a name that isn't there" do
+        # this used to be wonky when we hacked session assignment differently
+        config['fo'].should eql(nil)
       end
     end
     context "HOWEVER with the 'value_items' pseudoclass", {focus:true} do
@@ -288,7 +289,7 @@ describe ::Skylab::CodeMolester::Config::File do
           config['work']['times'].should eql('funner')
           config['play']['times'].should eql('fun')
           config.key?('nope').should eql(false)
-          config['nope'].should_not eql(nil)
+          config['nope'].should eql(nil)
           config['work'].key?('nope').should eql(false)
           config['work']['nope'].should eql(nil)
         end
@@ -309,9 +310,10 @@ describe ::Skylab::CodeMolester::Config::File do
                 nerpus = derpus
             HERE
           end
-          it "lets you create a section by assigning something to it", {f:true} do
+          it "lets you create a section by assigning a hash to it", {f:true} do
             last_part = ->(s) { s.match(/good times here(.+)\z/m)[1] }
             last_part[config.content].should eql("\n")
+            config['goal'] ||= {}
             config['goal']['dream'] = 'deadline'
             last_part[config.content].should eql(<<-HERE.gsub(/^(  ){6}/, ''))
 

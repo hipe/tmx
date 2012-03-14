@@ -26,7 +26,7 @@ module Skylab::CodeMolester
     def content_tree # @api private
       valid? ? @content_tree : false
     end
-    %w([] content_items key? set_value value_items).each do |n| # @delegator
+    %w([] content_items key? set_value sections value_items).each do |n| # @delegator
       define_method(n) do |*a|
         valid? or return false
         @content_tree.send(n, *a)
@@ -34,7 +34,7 @@ module Skylab::CodeMolester
     end
     alias_method :[]=, :set_value
     def initialize(*a, &b)
-      @valid = @invalid_reason = nil
+      @content_string = @invalid_reason = @valid = nil
       b and b.call(self)
       a.last.kind_of?(Hash) and
         a.pop.each { |k, v| :path == k ? (a.unshift(v.to_s)) : send("#{k}=", v) }
@@ -44,6 +44,7 @@ module Skylab::CodeMolester
       @valid.nil? and valid?
       @invalid_reason
     end
+    alias_method :path, :to_s
     def pretty
       ::Skylab::Face::PathTools.pretty_path(to_s)
     end
