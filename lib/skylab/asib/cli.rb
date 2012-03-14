@@ -1,9 +1,9 @@
 require File.expand_path('../..', __FILE__)
+require 'skylab/code-molester/config/file'
+require 'skylab/face/path-tools'
 require 'skylab/porcelain/bleeding'
 require 'skylab/slake/attribute-definer'
-require 'skylab/face/path-tools'
-require 'stringio' # whaetver
-require 'skylab/test-support/test-support' # ick just for deindent
+require 'skylab/test-support/test-support' # ick just for unindent
 
 module Skylab::Asib
   Bleeding = Skylab::Porcelain::Bleeding
@@ -20,9 +20,44 @@ module Skylab::Asib
     end
   end
 
+  CONF_PATH = ->() { "#{ENV['HOME']}/.asibrc" }
+
+  class Config < Skylab::CodeMolester::Config::File
+    extend Skylab::Slake::AttributeDefiner
+
+
+
+  end
+
+  module ConfigMethods
+    attr_reader :config
+    def config?
+      @config ||= build_config { |o| o.on_all { |s| emit(:stderr, s) } }
+      !! @config
+    end
+    OnLoadConfig = Skylab::PubSub::Emitter.new(:all, :error => :all)
+    def build_config
+      yield(on = OnLoadConfig.new)
+      conf = Skylab::CodeMolester::Config::File.new(:path => CONF_PATH.call)
+      unless conf.exist?
+        on.emit(:error, "Config file not found. Expecting #{conf.pretty}. Try #{pre "#{runtime.program_name} config generate"}")
+        return false
+      end
+      if ! conf.valid?
+        on.emit(:error, "issue with #{conf.pretty}: #{conf.invalid_reason}")
+        return false
+      end
+      conf
+    end
+    def config_init
+      @config = nil
+    end
+  end
+
   class MyAction
     extend Bleeding::Action
     extend ::Skylab::Slake::AttributeDefiner
+    include ConfigMethods
 
     def self.inherited cls
       cls.action_module_init
@@ -45,6 +80,7 @@ module Skylab::Asib
 
     def initialize *a
       action_init(*a)
+      config_init
       self.class.attributes.select { |k, v| v.key?(:default) }.each do |k, v|
         send("#{k}=", v[:default].respond_to?(:call) ? v[:default].call : v[:default])
       end
@@ -66,10 +102,15 @@ module Skylab::Asib
   module Actions; end
 
   class Actions::Put < MyAction
-    desc "put the file"
-    desc "(see config-make)"
+    desc "put files to remote server (see config-make)"
+    option_syntax do |h|
+      on('-n', '--dry-run', "Dry run.") { h[:dry_run] = true }
+    end
     def execute path
-      emit :info, "ok, sure: #{path}"
+      config? or return false
+
+
+      emit :info, "ok, sure: #{config.path}"
     end
   end
 
@@ -83,7 +124,7 @@ module Skylab::Asib
 
     desc "write the config file"
 
-    attribute :dest, :pathname => true, :default => ->() { "#{ENV['HOME']}/.asibrc" }
+    attribute :dest, :pathname => true, :default => CONF_PATH
     attribute :dry_run, :boolean => true, :default => false
 
     option_syntax do |h|
