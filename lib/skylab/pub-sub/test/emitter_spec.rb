@@ -4,7 +4,7 @@ require File.expand_path('../test-support', __FILE__)
 describe Skylab::PubSub::Emitter do
   let(:klass) do
     Class.new.class_eval do
-      extend GSkylab::PubSub::Emitter
+      extend Skylab::PubSub::Emitter
       emits :informational, :error => :informational, :info => :informational
       self
     end
