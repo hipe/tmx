@@ -1,4 +1,6 @@
-[#084] 2012-03-14 @open: integrate all stable into porcelain stable
+[#086] 2012-03-14 @open: porcelain: meta attrib modules
+[#085] 2012-03-14 @open: tanman: correct event handling so tan can detect errors
+[#084] 2012-03-14 @closed: integrate all stable into porcelain stable
 [#083] 2012-03-14 @closed: attrib-definer: new home
 [#082] 2012-03-14 @closed: code-molester: improve section handling
 [#081] 2012-03-14 @closed: code-molester: integrate
@@ -6,7 +8,7 @@
 [#079] 2012-03-10 @closed: porcelain: bleeding namespaces
 [#078] 2012-03-09 @closed: porcelain: bleeding (usable)
 [#077] 2012-03-08 @open: asib: put
-[#076] 2012-03-02 @open: porcelain: simply and reveal tree rendering
+[#076] 2012-03-02 @closed: porcelain: simply and reveal tree rendering
 [#075] 2012-02-16 @closed: porcelain: aliases, descs for namesp, acts
 [#074] 2012-02-26 @closed: porcelain: get tree into stable from 026 branch
 [#073] 2012-02-26 @open: git-viz: histree: (file tree with most recents)
