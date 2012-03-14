@@ -163,8 +163,19 @@ module Skylab::Face
         #   option_definitions.reject! { |a,_| '-h' == a.first }
       end
       def namespace name, *aliases, &block
-        name.nil? and raise ArgumentError.new("First argument must be a namespace name symbol or or a definition array.")
-        def_block = name.kind_of?(Array) ? name : [Namespace, [name, *aliases], block]
+        name or raise ArgumentError.new("First argument must be a namespace name symbol or or a definition array.")
+        def_block = if Array === name
+          aliases.any? and raise ArgumentError.new("when first arg is array it must be the only argument.")
+          block and raise ArgumentError.new("unexpected block here")
+          name
+        else
+          if 1 == aliases.size and Module === aliases.first
+            block and raise ArgumentError.new("unexpected block here")
+            [aliases.first, [name], nil]
+          else
+            [Namespace, [name, *aliases], block] # 'name' takes on a variety of forms here
+          end
+        end
         command_definitions.push Namespace.add_definition(def_block)
       end
       def on *a, &b
@@ -317,7 +328,7 @@ module Skylab::Face
             x = class << self; self end
             x.send(:define_method, :inspect) { "#<#{name}:Namespace>" }
             x.send(:alias_method, :to_s, :inspect)
-            class_eval(&block)
+            class_eval(&block) if block
             self
           end
         end
@@ -381,7 +392,7 @@ class Skylab::Face::Cli
   end
   alias_method :invocation_string, :program_name
   def run argv
-    argv.empty?        and return empty_argv
+    argv.empty? and return empty_argv
     runner = self
     begin
       argv.first =~ /^-/ and return runner.run_opts(argv)
