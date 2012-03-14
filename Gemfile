@@ -15,5 +15,6 @@ group :development do
   gem 'ruby-debug', :platforms => :ruby_18
   gem 'ruby_gntp'
   gem 'simplecov'
+  gem 'treetop'
 end
 

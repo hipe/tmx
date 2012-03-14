@@ -9,22 +9,23 @@ module Skylab
       REGEX_FULL = /\A#{REGEX.source}\z/
       SPLITTER   = /\A(.*[^\.\d])?(#{REGEX.source})\z/
 
+      S = ->(*a) { CodeMolester::Sexp.new(a) }
+
       class << self
         def parse_string_with_version string
           emitter = block_given? ? Parse.new : Parse::Singleton.loud
           block_given? and yield(emitter)
           require 'strscan'
-          sexp = CodeMolester::Sexp.new
-          sexp.push(:version_string)
+          sexp = S[:version_string]
           s = StringScanner.new(string)
           capture = s.scan_until(REGEX) or return emitter.error(
             "version pattern not matched anywhere in string: #{string.inspect}")
           s.rest =~ REGEX and return emitter.error(
             "multiple version strings matched in string: #{string.inspect}")
           md = SPLITTER.match(capture)
-          md[1] and sexp.push([:string, md[1]])
+          md[1] and sexp.push(S[:string, md[1]])
           sexp.push new(md[2])
-          s.eos? or sexp.push([:string, s.rest])
+          s.eos? or sexp.push(S[:string, s.rest])
           sexp
         end
       end
@@ -33,13 +34,13 @@ module Skylab
       end
       def replace str
         clear
-        md = REGEX.match(str) or _sexp_fail("invalid version string: #{str.inspect}")
+        md = REGEX.match(str) or fail("invalid version string: #{str.inspect}")
         push :version
-        concat [[:major, md[1].to_i], [:separator, '.'], [:minor, md[2].to_i]]
-        md[3] and concat([[:separator, '.'], [:patch, md[3].to_i]])
+        concat [ S[:major, md[1].to_i], S[:separator, '.'], S[:minor, md[2].to_i] ]
+        md[3] and concat( [ S[:separator, '.'], S[:patch, md[3].to_i] ] )
       end
       def bump! which
-        node = detect(which) or _sexp_fail("no such node: #{which.inspect}")
+        node = detect(which) or fail("no such node: #{which.inspect}")
         node[1] += 1
       end
       def has_minor_version? ; !! detect(:minor) end

@@ -373,11 +373,13 @@ class Skylab::Face::Cli
   include Face::Command::Nodeish
   include Face::Command::Treeish
 
-  def initialize
-    @out = $stdout
-    @err = $stderr
+  def initialize opts=nil, &events
+    opts and opts.each { |k, v| send("#{k}=", v) }
+    @out ||= $stdout
+    @err ||= $stderr
+    events and @err.puts("(notice: ignoring event handlers for now)")
   end
-  attr_reader :out, :err
+  attr_accessor :out, :err
   attr_accessor :request
   alias_method :interface, :class
   def argument_error e, cmd
@@ -390,6 +392,7 @@ class Skylab::Face::Cli
   def program_name
     @program_name ||= File.basename($PROGRAM_NAME)
   end
+  attr_writer :program_name
   alias_method :invocation_string, :program_name
   def run argv
     argv.empty? and return empty_argv

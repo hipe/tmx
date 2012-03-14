@@ -1,7 +1,4 @@
-mylib = File.expand_path('../../..', __FILE__)
-
-$:.include?(mylib) or $:.unshift(mylib) # etc
-
+require File.expand_path('../..', __FILE__)
 require 'skylab/face/cli'
 require 'skylab/porcelain/all'
 
