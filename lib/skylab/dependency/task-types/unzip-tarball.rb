@@ -1,96 +1,74 @@
 require File.expand_path('../../task', __FILE__)
+require File.expand_path('../../version', __FILE__)
 require File.expand_path('../tarball-to', __FILE__)
-require'skylab/face/open2'
+require 'skylab/face/open2'
+module Skylab::Dependency
+  class TaskTypes::UnzipTarball < Task
+    include ::Skylab::Face::Open2
+    include ::Skylab::Face::PathTools
+    include TaskTypes::TarballTo::Constants
 
-module Skylab
-  module Dependency
-    class TaskTypes::UnzipTarball < Task
-      include ::Skylab::Face::Open2
-      include ::Skylab::Face::PathTools
-      attribute :unzip_tarball
-      attribute :unzips_to, :required => false
-      attribute :basename, :required => false
-      include TaskTypes::TarballTo::Constants
-      def check
-        if File.directory? expected_unzipped_dir_path
-          _info "#{skp 'assuming'} unzipped already (#{yelo 'careful'} no checksums used): #{pretty_path expected_unzipped_dir_path}"
-          true
-        else
-          false
+    attribute :unzip_tarball, :required => true, :pathname => true
+    attribute :build_dir, :from_context => true, :pathname => true, :required => true
+    attribute :output_dir
+
+    emits :all,
+      :info => :all, :error => :all,
+      :shell => :all, :out => :all, :err => :all
+
+    SIGNIFICANT_SECONDS = 1.0
+    VERSION_REGEX = /-#{Version::REGEX.source}/
+
+    def execute args
+      @context ||= (args[:context] || {})
+      valid? or fail(invalid_reason)
+      unless @unzip_tarball.exist?
+        # if optomistic dry run
+        emit(:error, "tarball not found: #{@unzip_tarball}")
+        return false
+      end
+      if 0 == @unzip_tarball.stat.size
+        emit(:error, "tarball is zero length: #{@unzip_tarball}")
+        return false
+      end
+      if unzipped_dir_path.exist?
+        emit(:info, "exists, won't tar extract: #{pretty_path unzipped_dir_path}")
+        return true
+      end
+      _execute
+    end
+    def _execute
+      cmd = "cd #{escape_path build_dir}; tar -xzvf #{escape_path @unzip_tarball.basename}"
+      emit(:shell, cmd)
+      err = StringIO.new
+      bytes, seconds =  open2(cmd) do |on|
+        on.out { |s| emit(:out, s) }
+        on.err { |s| emit(:err, s) ; err.write(s) }
+      end
+      if no = err.string.split("\n").grep(/unrecognized archive format/i).first
+        emit(:error, "Failed to unzip: #{no}")
+        return false
+      end
+      if seconds >= SIGNIFICANT_SECONDS
+        emit(:info, "read #{bytes} bytes in #{seconds} seconds.")
+      end
+      true
+    end
+    def initialize(*)
+      @strips_version_number = true # unimplemented as a full settable attribute
+      super
+    end
+    def unzipped_dir_basename
+      @unzipped_dir_basename ||= begin
+        str = unzip_tarball.basename.to_s.gsub(TARBALL_EXTENSION, '')
+        if @strips_version_number
+          str.gsub!(VERSION_REGEX, '')
         end
+        str
       end
-      def slake
-        check and return true # short circuit further work (common)
-        fallback.slake or return false
-        execute
-      end
-      def execute
-        check_source or return false
-        check_size(@unzip_tarball) or return false
-        cmd = "cd #{escape_path build_dir}; tar -xzvf #{escape_path File.basename(@unzip_tarball)}"
-        _show_bash cmd
-        if dry_run?
-          _pretending "above."
-          bytes, seconds = [0, 0.0]
-        else
-          bytes, seconds = open2(cmd) do |on|
-            on.out { |s| ui.err.write("#{me}: (out): #{s}") }
-            on.err { |s| ui.err.write(s) }
-          end
-        end
-        _info "read #{bytes} bytes in #{seconds} seconds."
-        if File.directory?(expected_unzipped_dir_path)
-          true
-        elsif optimistic_dry_run?
-          true
-        else
-          _err "expected unzipped directory did not exist: #{pretty_path expected_unzipped_dir_path}"
-          false
-        end
-      end
-      def interpolate_stem
-        fallback.interpolate_stem
-      end
-      def check_source
-        if File.exist? @unzip_tarball
-          true
-        elsif optimistic_dry_run?
-          _pretending "exists", @unzip_tarball
-          true
-        else
-          _err("tarball not found: #{pretty_path @unzip_tarball}")
-        end
-      end
-      def check_size path
-        if File.exist? path
-          if 0 < File.stat(path).size
-            true
-          elsif optimistic_dry_run?
-            _pretending "file has nonzero size", path
-            true
-          else
-            _info "cannot unzip, file is zero size: #{pretty_path path}"
-            false
-          end
-        elsif optimistic_dry_run?
-          _pretending "file exists and has nonzero size", path
-          true
-        else
-          _err "file not found: #{path}"
-        end
-      end
-      def expected_unzipped_dir_path
-        if @unzips_to
-          File.join(build_dir, @unzips_to)
-        else
-          @unzip_tarball.sub(TARBALL_EXTENSION, '')
-        end
-      end
-      def _defaults!
-        if true == @unzip_tarball
-          @unzip_tarball = '{build_dir}/{basename}'
-        end
-      end
+    end
+    def unzipped_dir_path
+      @unzipped_dir_path ||= build_dir.join(unzipped_dir_basename)
     end
   end
 end

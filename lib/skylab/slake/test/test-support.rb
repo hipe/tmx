@@ -1,6 +1,2 @@
-class String
-  def deindent
-    gsub(%r{^#{Regexp.escape match(/\A([[:space:]]*)/)[1]}}, '').strip
-  end
-end
+require File.expand_path('../../../test-support/test-support', __FILE__)
 

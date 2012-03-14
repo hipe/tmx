@@ -83,7 +83,7 @@ module Skylab::GitStashUntracked
     def initialize runtime, request={}
       @dry_run = false
       request.each { |k, v| send("#{k}=", v) }
-      @runtime = runtime
+      @runtime = runtime or fail("where is runtime?")
     end
     attr_accessor :name
     attr_accessor :stashes
@@ -267,16 +267,20 @@ module Skylab::GitStashUntracked
     def call(path, &emit)
       File.directory?(path) or raise("not a directory: #{path}")
       each_path = ->(file) do
-        emit[:payload, '--- /dev/null']
-        emit[:payload, "+++ #{file.sub(/^\./, 'b')}"]
-        lines = File.read(file).split("\n", -1)
-        if '' == lines.last
-          lines.pop
-        else
-          # ...
+        begin
+          lines = File.read(file).split("\n", -1)
+          emit[:payload, '--- /dev/null']
+          emit[:payload, "+++ #{file.sub(/^\./, 'b')}"]
+          if '' == lines.last
+            lines.pop
+          else
+            # ...
+          end
+          emit[:payload, "@@ -0,0 +1,#{lines.count} @@"]
+          lines.each { |line| emit[:payload, "+#{line}"] }
+        rescue ArgumentError => e
+          emit[:error, "failed to hack a diff for file. binary file? (#{path})"]
         end
-        emit[:payload, "@@ -0,0 +1,#{lines.count} @@"]
-        lines.each { |line| emit[:payload, "+#{line}"] }
       end
       cd(path) do
         Open3.popen3('find . -type f') do |_, sout, serr|

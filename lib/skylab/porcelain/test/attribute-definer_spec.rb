@@ -1,12 +1,11 @@
 require File.expand_path('../../attribute-definer', __FILE__)
 require 'set'
 
-include ::Skylab::Slake
-describe ::Skylab::Slake::AttributeDefiner do
+describe Skylab::Porcelain::AttributeDefiner do
   module Helper
     def one_such_class &block
       Class.new.class_eval do
-        extend ::Skylab::Slake::AttributeDefiner
+        extend ::Skylab::Porcelain::AttributeDefiner
         instance_eval &block
         self
       end
@@ -45,6 +44,24 @@ describe ::Skylab::Slake::AttributeDefiner do
     end
     it "inherits the reflection" do
       klass_b.attributes.keys.to_set.should eql([:foo, :bar].to_set)
+    end
+  end
+  describe "class inheritance with regards to metaproperties", {focus:true} do
+    let(:klass_a) do
+      one_such_class do
+        meta_attribute :fooish
+        attribute :foo, :fooish => true
+      end
+    end
+    let(:klass_b) do
+      Class.new(klass_a).class_eval do
+        attribute :foo, :fooish => false
+        self
+      end
+    end
+    it "child classes must be able to override metaproperties" do
+      klass_b.attributes[:foo][:fooish].should eql(false)
+      klass_a.attributes[:foo][:fooish].should eql(true)
     end
   end
   describe "with meta attributes" do
