@@ -1,4 +1,4 @@
-require File.expand_path('../../../../test-support/test-support', __FILE__)
+require File.expand_path('../../test-support', __FILE__)
 
 module Skylab::Slake
 end

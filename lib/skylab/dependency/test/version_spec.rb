@@ -1,8 +1,10 @@
 require File.expand_path('../../version', __FILE__)
-require File.expand_path('../test-support/ui-tee', __FILE__)
+require 'skylab/slake/test/support/ui-tee'
+require File.expand_path('../support', __FILE__)
 
-module Skylab::Dependency
-  include TestSupport # UiTee
+module Skylab::Dependency::TestSupport
+  include ::Skylab::Slake::TestSupport # UiTee
+  include ::Skylab::Dependency
 
   describe Version do
 

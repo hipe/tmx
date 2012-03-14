@@ -1,6 +1,6 @@
 module Skylab ; end
 
-module Skylab::Slake
+module Skylab::Porcelain
   module AttributeDefiner
     def attribute sym, meta_attributes=nil
       change_request = {}
@@ -21,8 +21,14 @@ module Skylab::Slake
       end
       (b = change_request.keys - self.meta_attributes.keys).any? and
         raise RuntimeError.new("meta attributes must first be declared: #{b.map(&:inspect) * ', '}")
-      if ! current_meta
-        attr_accessor sym
+      if current_meta
+        current_meta.merge! change_request
+      else
+        @_im ||= instance_methods # think of all the side-effects this has:
+          # it takes a snapshot of all instance methods all the way up the chain only the
+          # first time you declare an attribute on a given module
+        @_im.include?(sym) or attr_reader sym
+        @_im.include?(:"#{sym}=") or attr_writer sym
         current_meta = attributes[sym] = change_request
       end
       change_request.each do |k, v|
@@ -66,7 +72,7 @@ module Skylab::Slake
   end
 end
 
-module Skylab::Slake::AttributeDefiner
+module Skylab::Porcelain::AttributeDefiner
   class AttributeMeta
     def initialize name_sym
       @name = name_sym
