@@ -1,11 +1,34 @@
-[#061] 2012-02-18 pub-sub: @closed fix issue with deep trees
-[#060] 2012-02-18 tmx: merge issues
+[#084] 2012-03-14 @open: integrate all stable into porcelain stable
+[#083] 2012-03-14 @closed: attrib-definer: new home
+[#082] 2012-03-14 @closed: code-molester: improve section handling
+[#081] 2012-03-14 @closed: code-molester: integrate
+[#080] 2012-03-13 @closed: gsu: fix
+[#079] 2012-03-10 @closed: porcelain: bleeding namespaces
+[#078] 2012-03-09 @closed: porcelain: bleeding (usable)
+[#077] 2012-03-08 @open: asib: put
+[#076] 2012-03-02 @open: porcelain: simply and reveal tree rendering
+[#075] 2012-02-16 @closed: porcelain: aliases, descs for namesp, acts
+[#074] 2012-02-26 @closed: porcelain: get tree into stable from 026 branch
+[#073] 2012-02-26 @open: git-viz: histree: (file tree with most recents)
+[#072] 2012-02-26 @open: borrow
+[#071] 2012-02-26 @open: fsm: passes with some specs
+[#070] 2012-02-25 @open: face cli: compat back / fwds with porcelain
+[#069] 2012-02-25 @open: porcelain: compat w/ face cli
+[#068] 2012-02-24 @open: porcelain: without syntax uses method sig
+[#067] 2012-02-20 @open: emitter can emit arbitrary number of arguments
+[#066] 2012-02-18 @open: porcelain: namespace native and compat
+[#065] 2012-02-18 @closed: porcelain: default args
+[#064] 2012-02-18 @closed: we must deep copy tag cloud!
+[#063] 2012-02-18 @closed gsu: fix it to use new porcelain
+[#062] 2012-02-18 @closed pub-sub: touch events
+[#061] 2012-02-18 @closed pub-sub: fix issue with deep trees
+[#060] 2012-02-18 @closed tmx: merge issues
 [#059] 2012-02-18 @open pub-sub: no redundant events per listener
-[#058] @closed muxer: rename things
-[#057] @open porcelain: events
+[#058] 2012-02-18 @closed muxer: rename things
+[#057] 2012-02-18 @closed porcelain: events
 [#056] 2011-07-19 @open permute
 [#055] 2012-02-18 @open code molester: file services (write)
-[#054] 2012-02-17 @close code molester: make values accessor
+[#054] 2012-02-17 @closed code molester: make values accessor
 [#053] 2012-02-14 @closed code molester: pure refactor: deepening
 [#052] 2012-02-11 @closed code molester: for fun write a config parser
 [#051] 2012-02-11 @open set program name explicitly, streams
