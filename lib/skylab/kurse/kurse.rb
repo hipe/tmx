@@ -24,7 +24,7 @@ module Skylab::Kurse
       send attr
     end
   end
-  module AttributeDefiner
+  module MyAttributeDefiner # @todo etc
    def float *names
       names.each do |attr|
         attr_reader attr
@@ -40,7 +40,7 @@ module Skylab::Kurse
   end
   class ProgressBar
     include Common
-    extend AttributeDefiner
+    extend MyAttributeDefiner
     def initialize(opts=nil, &b)
       opts and opts.each { |k, v| send("#{k}=", v) }
       @animation_duration_seconds ||= 1.6

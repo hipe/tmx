@@ -1,5 +1,5 @@
 require 'skylab/slake/muxer'
-require 'skylab/slake/attribute-definer'
+require 'skylab/porcelain/attribute-definer'
 
 
 module Skylab::Issue
@@ -7,7 +7,7 @@ module Skylab::Issue
 
   class Api::Action
     extend ::Skylab::Slake::Muxer
-    extend ::Skylab::Slake::AttributeDefiner
+    extend ::Skylab::Porcelain::AttributeDefiner
     include Porcelain::Yamlizer
 
     meta_attribute :required
