@@ -1,4 +1,5 @@
-[#082] 2012-03-14 @open: code-molester: improve section handling
+[#083] 2012-03-14 @open: attrib-definer: new home
+[#082] 2012-03-14 @closed: code-molester: improve section handling
 [#081] 2012-03-14 @closed: code-molester: integrate
 [#080] 2012-03-13 @closed: gsu: fix
 [#079] 2012-03-10 @closed: porcelain: bleeding namespaces
