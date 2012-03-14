@@ -1,4 +1,5 @@
-[#083] 2012-03-14 @open: attrib-definer: new home
+[#084] 2012-03-14 @open: integrate all stable into porcelain stable
+[#083] 2012-03-14 @closed: attrib-definer: new home
 [#082] 2012-03-14 @closed: code-molester: improve section handling
 [#081] 2012-03-14 @closed: code-molester: integrate
 [#080] 2012-03-13 @closed: gsu: fix
