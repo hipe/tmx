@@ -1,11 +1,11 @@
 require 'rake'
+require 'skylab/porcelain/attribute-definer'
 
 module Skylab ; end
 
 module Skylab::Slake
 
   root = File.expand_path('..', __FILE__)
-  require "#{root}/attribute-definer"
   require "#{root}/interpolate"
   require "#{root}/parenthood"
 
@@ -17,7 +17,7 @@ module Skylab::Slake
   end
 
   class Task < Rake::Task
-    extend AttributeDefiner
+    extend Skylab::Porcelain::AttributeDefiner
     extend Interpolate
     extend TaskClassMethods
     include Parenthood

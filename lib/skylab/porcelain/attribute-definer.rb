@@ -1,6 +1,6 @@
 module Skylab ; end
 
-module Skylab::Slake
+module Skylab::Porcelain
   module AttributeDefiner
     def attribute sym, meta_attributes=nil
       change_request = {}
@@ -72,7 +72,7 @@ module Skylab::Slake
   end
 end
 
-module Skylab::Slake::AttributeDefiner
+module Skylab::Porcelain::AttributeDefiner
   class AttributeMeta
     def initialize name_sym
       @name = name_sym
