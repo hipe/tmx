@@ -252,6 +252,9 @@ module Skylab::Porcelain::Bleeding
     def names
       [name, * @aliases]
     end
+    def inherited cls
+      cls.action_module_init
+    end
     def option_syntax &b
       b ? @option_syntax.define(&b) : @option_syntax
     end
