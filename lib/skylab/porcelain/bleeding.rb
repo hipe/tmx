@@ -25,6 +25,8 @@ module Skylab::Porcelain::Bleeding
       filter { |y, a| y << a if a.visible? }
     end
   end
+  EVENT_GRAPH = { :error => :all, :ambiguous => :error, :not_found => :error, :not_provided => :error,
+    :syntax_error => :error, :optparse_parse_error => :error, :help => :all } # didactic
   module ActionInstanceMethods ; extend DelegatesTo
     include Styles
     alias_method :action, :class
@@ -40,6 +42,7 @@ module Skylab::Porcelain::Bleeding
     end
     def help o={}
       emit(:help, o[:message]) if o[:message]
+      if o[:invite_only] then help_invite(o) ; return nil end
       help_usage o
       help_desc if o[:full]
       help_list if o[:full]
@@ -72,10 +75,7 @@ module Skylab::Porcelain::Bleeding
     end
     attr_reader :runtime
   end
-  class OnFind
-    extend Skylab::PubSub::Emitter
-    emits :error, :ambiguous => :error, :not_found => :error, :not_provided => :error
-  end
+  OnFind = Skylab::PubSub::Emitter.new(:error, :ambiguous => :error, :not_found => :error, :not_provided => :error)
   module NamespaceInstanceMethods ; extend DelegatesTo
     include ActionInstanceMethods
     delegates_to :action, :action_syntax, :actions

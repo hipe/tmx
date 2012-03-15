@@ -47,7 +47,7 @@ module Skylab::Porcelain
       block_given? and raise ArgumentError.new("blocks not supported when importing meta attributes.")
       mod.meta_attributes.each do |k, meta|
         respond_to?(meta.hook_name) || meta_attributes.key?(k) and fail("implement me: decide clobber behavior")
-        singleton_class.send(:define_method, meta.hook_name, & meta.hook)
+        singleton_class.send(:define_method, meta.hook_name, & meta.hook) if meta.hook
         meta_attributes[k] = meta
       end
     end
