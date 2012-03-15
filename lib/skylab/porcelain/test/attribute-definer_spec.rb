@@ -11,6 +11,7 @@ describe Skylab::Porcelain::AttributeDefiner do
       end
     end
   end
+  Porcelain = Skylab::Porcelain
   include Helper
   extend Helper
   it "creates getter/setters on classes" do
@@ -107,6 +108,63 @@ describe Skylab::Porcelain::AttributeDefiner do
         obj.wankers = 'derp'
         obj.wankers.should eql('A:derp:B')
       end
+    end
+  end
+  describe "lets you import meta attribute definitions from modules" do
+    let(:defining_module) do
+      Module.new.module_eval do
+        class << self ; def to_s ; 'defining_module' end end
+        extend Porcelain::AttributeDefiner
+        meta_attribute :regex do |name, meta|
+          alias_method(after = "#{name}_after_regex=", "#{name}=")
+          define_method("#{name}=") do |str|
+            if meta[:regex] =~ str
+              send(after, str)
+            else
+              emit(:error, "#{str.inspect} did not match regex: /#{meta[:regex].source}/")
+              str
+            end
+          end
+        end
+        self
+      end
+    end
+    let(:importing_class) do
+      ctx = self
+      Class.new.class_eval do
+        class << self ; def to_s ; 'importing_class' end end
+        extend Porcelain::AttributeDefiner
+        meta_attribute ctx.defining_module
+        self
+      end
+    end
+    let(:stdout) { [] }
+    let(:child_class) do
+      ctx = self
+      Class.new(importing_class).class_eval do
+        attribute :first_name, :regex => /^[A-Z]/
+        define_method(:emit) { |_, s| ctx.stdout.push s }
+        self
+      end
+    end
+    it "which transfers the same MetaAttribute object to child (should be ok)" do
+      importing_class.meta_attributes[:regex].should be_kind_of(Porcelain::AttributeDefiner::MetaAttribute)
+      importing_class.meta_attributes[:regex].object_id.should eql(defining_module.meta_attributes[:regex].object_id)
+    end
+    it "also it transfers the attribute definition hook from the module" do
+      defining_module.should respond_to(:on_regex_attribute)
+      importing_class.should respond_to(:on_regex_attribute)
+    end
+    it "and which will work e.g. from an object of a child class", {f:true} do
+      o = child_class.new
+      o.first_name.should be_nil
+      o.first_name = "Billford Brimley"
+      o.first_name.should eql("Billford Brimley")
+      stdout.size.should be_zero
+      o.first_name = "toff tofferson"
+      stdout.size.should eql(1)
+      stdout.last.should eql('"toff tofferson" did not match regex: /^[A-Z]/')
+      o.first_name.should eql("Billford Brimley")
     end
   end
 end
