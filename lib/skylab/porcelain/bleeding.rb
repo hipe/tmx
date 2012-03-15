@@ -34,8 +34,8 @@ module Skylab::Porcelain::Bleeding
       @runtime = runtime
     end
     delegates_to :action, :desc
-    def emit _, s
-      @runtime.emit _, s
+    def emit _, *a
+      @runtime.emit _, *a
     end
     def execution_method
       method :execute
