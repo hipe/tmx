@@ -115,19 +115,19 @@ describe ::Skylab::CodeMolester::Config::File do
         (line = ll.first).symbol_name.should eql(:section)
         @line = line
       end
-      def section_name
+      def section_name_node
         @line.detect(:header).detect(:section_line).detect(:name).last
       end
       context "in the ideal, general case" do
         let(:input_string) { "[foo]" }
         it "works" do
-          section_name.should eql('foo')
+          section_name_node.should eql('foo')
         end
       end
       context "with lots of spaces and tabs everywhere" do
         let(:input_string) { "  \t [\t 09foo.bar ]   \t" }
         it "works" do
-          section_name.should eql('09foo.bar')
+          section_name_node.should eql('09foo.bar ') # (per the grammar .. but meh idc)
         end
       end
     end
@@ -138,9 +138,9 @@ describe ::Skylab::CodeMolester::Config::File do
     end
     let(:invalid_reason) { subject.invalid_reason.to_s }
     context "if you had an invalid section name on e.g. the third line" do
-      let(:input_string) { "foo=bar\n#ok\n[foo/bar]\n# one more line" }
+      let(:input_string) { "foo=bar\n#ok\n[foo/bar]]\n# one more line" }
       it "it will report line number and context and expecting" do
-        invalid_reason.should eql('Expecting "]" at the end of "[foo/" at line 3')
+        invalid_reason.should match(%r{^expecting.+at the end of "\[foo/bar\]\]" at line 3}i)
       end
     end
     context "if you had something invalid at the very first character" do
@@ -310,7 +310,7 @@ describe ::Skylab::CodeMolester::Config::File do
                 nerpus = derpus
             HERE
           end
-          it "lets you create a section by assigning a hash to it", {f:true} do
+          it "lets you create a section by assigning a hash to it" do
             last_part = ->(s) { s.match(/good times here(.+)\z/m)[1] }
             last_part[config.content].should eql("\n")
             config['goal'] ||= {}
