@@ -3,6 +3,7 @@
 require File.expand_path('../..', __FILE__)
 
 require 'skylab/pub-sub/emitter'
+require 'stringio'
 
 module Skylab::Porcelain
 end
@@ -13,14 +14,21 @@ module Skylab::Porcelain::Table
   end
 
   class << ::Skylab::Porcelain
-    def Table row_enumerator
-      yield(e = OnTable.new)
+    def table row_enumerator
+      e = OnTable.new
+      if block_given?
+        yield e
+      else
+        ret = StringIO.new
+        e.on_all { |ev| ret.puts ev }
+      end
       cache = []
       row_enumerator.each do |row|
       end
       if cache.size.zero?
         e.emit(:empty, '(empty)')
       end
+      ret.string if ret
     end
   end
 end
