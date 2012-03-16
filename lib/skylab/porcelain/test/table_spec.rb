@@ -20,6 +20,14 @@ module Skylab::Porcelain::TestSupport
       it "you can also just get a string back" do
         Porcelain.table([]).should eql("(empty)\n")
       end
+      it "renders a 2 x 2 table", {f:true} do
+        data = [ %w(eenie meenie),
+                 %w(minie moe) ]
+        Porcelain.table(data).should eql(<<-HERE.unindent)
+          eenie meenie
+          minie    moe
+        HERE
+      end
     end
   end
 end
