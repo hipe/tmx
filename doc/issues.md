@@ -1,5 +1,6 @@
-[#086] 2012-03-14 @open: porcelain: meta attrib modules
-[#085] 2012-03-14 @open: tanman: correct event handling so tan can detect errors
+[#087] 2012-03-15 @open: tanman: remote: list
+[#086] 2012-03-14 @closed: porcelain: meta attrib modules
+[#085] 2012-03-14 @closed: tanman: correct event handling so tan can detect errors
 [#084] 2012-03-14 @closed: integrate all stable into porcelain stable
 [#083] 2012-03-14 @closed: attrib-definer: new home
 [#082] 2012-03-14 @closed: code-molester: improve section handling
