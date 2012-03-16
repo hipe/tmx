@@ -10,7 +10,7 @@ module Skylab::TanMan
   PubSub = Skylab::PubSub
 
   CONF_PATH = ->() { "#{ENV['HOME']}/.tanrc" }
-  MY_GRAPH = { :info => :all }
+  MY_GRAPH = { :info => :all, :out => :all }
   ROOT = Skylab::Face::MyPathname.new(File.expand_path('..', __FILE__))
 
   class Cli < Bleeding::Runtime
@@ -161,5 +161,23 @@ module Skylab::TanMan
       config.add_remote(name, host) or help(invite_only: true)
     end
   end
+
+  class Actions::Remote::List < MyAction
+    desc "list the remotes."
+    def execute
+      config or return help
+      require 'skylab/porcelain/table'
+      Porcelain.table(Enumerator.new do |y|
+        config.remotes.each do |r|
+          y << Enumerator.new do |yy|
+            yy << r.name
+            yy << r.url
+          end
+        end
+      end, :separator => '  ' ) {|o| o.on_all { |e| emit(:out, e) } }
+      true
+    end
+  end
 end
+
 
