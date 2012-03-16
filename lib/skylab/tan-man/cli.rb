@@ -105,11 +105,6 @@ module Skylab::TanMan
     extend Bleeding::Action
     extend Bleeding::DelegatesTo
 
-    extend Porcelain::AttributeDefiner
-    meta_attribute MetaAttributes::Regex
-    meta_attribute MetaAttributes::Required
-    include MetaAttributes::Required::InstanceMethods
-
     extend PubSub::Emitter
     emits Bleeding::EVENT_GRAPH.merge(MY_GRAPH)
 
@@ -118,6 +113,17 @@ module Skylab::TanMan
       @config and return @config
       require ROOT.join('models/config').to_s
       @config = Models::Config.new(self, CONF_PATH).init
+    end
+
+    # loudly
+    def config?
+      config and return true
+      error "sorry, failed to load config file subsystem :("
+    end
+
+    def error msg
+      emit :error, msg
+      false
     end
 
     def format_error event
@@ -139,6 +145,12 @@ module Skylab::TanMan
       on_all   { |e| runtime.emit(e.type, *e.payload) }
     end
 
+    VERBS = { is: ['exist', 'is', 'are'], no: ['no '] }
+    def s a, v=nil # just one tiny hard to read hack
+      v.nil? and return( 1 == a.size ? '' : 's' )
+      VERBS[v][case a.count ; when 0 ; 0 ; when 1 ; 1 ; else 2 ; end]
+    end
+
     delegates_to :runtime, :stdout
 
     def valid?
@@ -157,7 +169,7 @@ module Skylab::TanMan
   class Actions::Remote::Add < MyAction
     desc "add the remote."
     def execute name, host
-      config or return help
+      config? or return
       config.add_remote(name, host) or help(invite_only: true)
     end
   end
@@ -165,7 +177,7 @@ module Skylab::TanMan
   class Actions::Remote::List < MyAction
     desc "list the remotes."
     def execute
-      config or return help
+      config? or return
       require 'skylab/porcelain/table'
       Porcelain.table(Enumerator.new do |y|
         config.remotes.each do |r|
@@ -176,6 +188,20 @@ module Skylab::TanMan
         end
       end, :separator => '  ' ) {|o| o.on_all { |e| emit(:out, e) } }
       true
+    end
+  end
+
+  class Actions::Remote::Rm < MyAction
+    desc "remove the remote."
+    def execute remote_name
+      config? or return
+      unless remote = config.remotes.detect { |r| remote_name == r.name }
+        a = config.remotes.map { |r| "#{pre r.name}" }
+        b = error "couldn't find a remote named #{remote_name.inspect}"
+        emit :info, "#{s a, :no}known remote#{s a} #{s a, :is} #{oxford_comma(a, ' and ')}".strip << '.'
+        return b
+      end
+      !! config.remotes.remove(remote)
     end
   end
 end
