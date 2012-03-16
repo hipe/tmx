@@ -1,3 +1,4 @@
+[#088] 2012-03-15 @open: porcelain: table
 [#087] 2012-03-15 @open: tanman: remote: list
 [#086] 2012-03-14 @closed: porcelain: meta attrib modules
 [#085] 2012-03-14 @closed: tanman: correct event handling so tan can detect errors
