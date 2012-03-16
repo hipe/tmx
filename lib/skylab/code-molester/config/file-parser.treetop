@@ -38,7 +38,7 @@ module Skylab::CodeMolester
     end
     rule section_line
               w_1:( [ \t]* '[' [ \t]* )
-         t_2_name:[-_a-z0-9a\.]+
+         t_2_name:( !( [\n] / ']' ) . )+
               n_3:(
               w_1:( [ \t]* ']' [ \t]* )
       n_2_comment:comment?
