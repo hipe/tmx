@@ -89,7 +89,9 @@ module Skylab::TanMan
 
   class Models::Remote::MyEnumerator < ::Enumerator
     Remote = Models::Remote
+    extend Bleeding::DelegatesTo
     attr_reader :config
+    delegates_to :config, :emit, :error
     def initialize(config)
       block_given? and raise ArgumentError.new("this enumerator creates its own block.")
       @config = config
@@ -106,6 +108,15 @@ module Skylab::TanMan
       parent = config.bridge.content_tree.detect(:sections)
       sexp = CodeMolester::Config::Section.create('', parent)
       remote.bind(sexp) ? self : false
+    end
+    def remove remote
+      section_name = remote.sexp.section_name
+      found = config.bridge.sections.detect { |s| section_name == s.section_name }
+      found or return error("expected section not found: [#{section_name}]")
+      if config.bridge.content_tree.detect(:sections).remove(found)
+        emit(:info, "removed remote #{remote.name}.")
+        config.write_hook
+      end
     end
   end
 end
