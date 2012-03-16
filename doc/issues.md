@@ -1,5 +1,6 @@
-[#088] 2012-03-15 @open: porcelain: table
-[#087] 2012-03-15 @open: tanman: remote: list
+[#089] 2012-03-15 @open: tanman: remote: remove
+[#088] 2012-03-15 @closed: porcelain: table
+[#087] 2012-03-15 @closed: tanman: remote: list
 [#086] 2012-03-14 @closed: porcelain: meta attrib modules
 [#085] 2012-03-14 @closed: tanman: correct event handling so tan can detect errors
 [#084] 2012-03-14 @closed: integrate all stable into porcelain stable
