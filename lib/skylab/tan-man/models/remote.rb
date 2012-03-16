@@ -65,6 +65,9 @@ module Skylab::TanMan
       str
     end
     attribute :url, :regex => URL_RE, :required => true, :bound => true
+    def url_read
+      sexp['url']
+    end
     def url_write str
       sexp['url'] = str
       true
