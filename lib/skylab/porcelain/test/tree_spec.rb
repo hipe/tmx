@@ -1,7 +1,6 @@
 # encoding: utf-8
 
 require File.expand_path('../../tree', __FILE__)
-require File.expand_path('../test-support', __FILE__)
 
 module Skylab::Porcelain::TestNamespace
   module ArrayExtension
@@ -23,8 +22,8 @@ end
 
 module Skylab::Porcelain::TestNamespace
   include Skylab::Porcelain
-  describe "With #{Tree}" do
-    context "when calling Tree.render on this arbitrary object" do
+  describe Tree do
+    it "renders a pretty tree" do
       foo = ArrayExtension[
         { :name => "document",
           :children => [
@@ -54,7 +53,8 @@ module Skylab::Porcelain::TestNamespace
           ]
         }
       ]
-      derp = <<-HERE.gsub(/^        /, '')
+      output = subject.text foo
+      DERP = <<-HERE.gsub(/^        /, '')
         document
          ├head
          ├body
@@ -69,39 +69,7 @@ module Skylab::Porcelain::TestNamespace
          │   └sub4
          └foot
       HERE
-      subject { Tree.text foo }
-      it "it works" do
-        subject.should eql(derp)
-      end
-    end
-    context "when calling Tree#render" do
-      let(:tree) do
-        Tree.from_paths(%w(
-          one/two/three
-          two/two
-          one/two/four
-          bill
-          three/two/three
-          three/two/four
-        ))
-      end
-      it "it works", {f:true} do
-        tgt = <<-HERE.gsub(/^        /, '') #!
-
-         ├one
-         │ └two
-         │   ├three
-         │   └four
-         ├two
-         │ └two
-         ├bill
-         └three
-           └two
-             ├three
-             └four
-        HERE
-        tree.text.should eql(tgt)
-      end
+      output.should == DERP # use this form with --diff option
     end
   end
 end

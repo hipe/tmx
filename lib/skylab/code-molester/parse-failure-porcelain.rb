@@ -1,4 +1,5 @@
 require 'stringio'
+require 'strscan'
 
 # this is intended to be an independant class that is safe to use in
 # isolation from the rest of the library (however, its test suite

@@ -1,0 +1,15 @@
+DERP = %w(dependency slake)
+
+guard('rspec',
+  :all_on_start => false,
+  :cli => '-fd',
+  :spec_paths => DERP.map { |x| "lib/skylab/#{x}/test" }
+) do
+  watch(%r{^lib/skylab/[^/]+/test/.+_spec\.rb$})
+  DERP.each do |x|
+    watch(%r{^lib/skylab/#{x}/task-types/(.+)\.rb$}) do |m|
+      "lib/skylab/#{x}/test/task-types/#{m[1]}_spec.rb"
+    end
+  end
+end
+

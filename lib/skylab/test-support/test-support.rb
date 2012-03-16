@@ -7,14 +7,6 @@ class String
 end
 
 module Skylab::TestSupport
-  class MyStringIO < ::StringIO
-    def to_s
-      rewind
-      read
-    end
-    def match x
-      to_s.match x
-    end
-  end
+  # future-proof
 end
 

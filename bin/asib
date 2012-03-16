@@ -1,6 +1,0 @@
-#!/usr/bin/env ruby -w
-
-require File.expand_path('../../lib/skylab/asib/cli', __FILE__)
-
-Skylab::Asib::Cli.new.invoke(ARGV)
-

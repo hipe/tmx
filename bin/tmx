@@ -3,3 +3,4 @@
 require File.expand_path('../../lib/skylab/tmx/cli.rb', __FILE__)
 
 Skylab::Tmx::Cli.new.run ARGV
+

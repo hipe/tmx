@@ -115,19 +115,19 @@ describe ::Skylab::CodeMolester::Config::File do
         (line = ll.first).symbol_name.should eql(:section)
         @line = line
       end
-      def section_name
+      def section_name_node
         @line.detect(:header).detect(:section_line).detect(:name).last
       end
       context "in the ideal, general case" do
         let(:input_string) { "[foo]" }
         it "works" do
-          section_name.should eql('foo')
+          section_name_node.should eql('foo')
         end
       end
       context "with lots of spaces and tabs everywhere" do
         let(:input_string) { "  \t [\t 09foo.bar ]   \t" }
         it "works" do
-          section_name.should eql('09foo.bar')
+          section_name_node.should eql('09foo.bar ') # (per the grammar .. but meh idc)
         end
       end
     end
@@ -138,9 +138,9 @@ describe ::Skylab::CodeMolester::Config::File do
     end
     let(:invalid_reason) { subject.invalid_reason.to_s }
     context "if you had an invalid section name on e.g. the third line" do
-      let(:input_string) { "foo=bar\n#ok\n[foo/bar]\n# one more line" }
+      let(:input_string) { "foo=bar\n#ok\n[foo/bar]]\n# one more line" }
       it "it will report line number and context and expecting" do
-        invalid_reason.should eql('Expecting "]" at the end of "[foo/" at line 3')
+        invalid_reason.should match(%r{^expecting.+at the end of "\[foo/bar\]\]" at line 3}i)
       end
     end
     context "if you had something invalid at the very first character" do
@@ -186,8 +186,9 @@ describe ::Skylab::CodeMolester::Config::File do
             TypeError, /can't convert Symbol into Integer/)
         end
       end
-      it "COUNTERITUITIVELY will not get nil if it asks for a name that isn't there" do
-        config['fo'].should_not eql(nil)
+      it "will get nil if it asks for a name that isn't there" do
+        # this used to be wonky when we hacked session assignment differently
+        config['fo'].should eql(nil)
       end
     end
     context "HOWEVER with the 'value_items' pseudoclass", {focus:true} do
@@ -224,7 +225,7 @@ describe ::Skylab::CodeMolester::Config::File do
       end
       it "you can create new values" do
         config['bleuth'] = 'michael'
-        config.content.should eql(<<-HERE.deindent)
+        config.content.should eql(<<-HERE.unindent.strip)
           foo = bar
           biff = baz
           bleuth = michael
@@ -271,7 +272,7 @@ describe ::Skylab::CodeMolester::Config::File do
       end
       context "if you set its content explicitly with a string" do
         let (:want_content) do
-          <<-HERE.deindent
+          <<-HERE.unindent
             who = hah
               boo = bah
             [play]
@@ -288,14 +289,14 @@ describe ::Skylab::CodeMolester::Config::File do
           config['work']['times'].should eql('funner')
           config['play']['times'].should eql('fun')
           config.key?('nope').should eql(false)
-          config['nope'].should_not eql(nil)
+          config['nope'].should eql(nil)
           config['work'].key?('nope').should eql(false)
           config['work']['nope'].should eql(nil)
         end
         context "lets you add new values" do
           it "to the root node (note the inherited whitespace)" do
             config['new_item'] = 'new value'
-            config.content.split("\n")[0,3].join("\n").should eql(<<-HERE.deindent)
+            config.content.split("\n")[0,3].join("\n").should eql(<<-HERE.unindent.strip)
               who = hah
                 boo = bah
                 new_item = new value
@@ -303,20 +304,21 @@ describe ::Skylab::CodeMolester::Config::File do
           end
           it "to existing child nodes (note the unparsing of one section only!)" do
             config['work']['nerpus'] = 'derpus'
-            config['work'].unparse.strip.should eql(<<-HERE.deindent)
+            config['work'].unparse.strip.should eql(<<-HERE.unindent.strip)
               [work]
                 times = funner # good times here
                 nerpus = derpus
             HERE
           end
-          it "lets you create a section by assigning something to it" do
+          it "lets you create a section by assigning a hash to it" do
+            last_part = ->(s) { s.match(/good times here(.+)\z/m)[1] }
+            last_part[config.content].should eql("\n")
+            config['goal'] ||= {}
             config['goal']['dream'] = 'deadline'
-            have = config.content.to_s.split("\n")[-4,4].join("\n")
-            have.should eql(<<-HERE.deindent)
-              [work]
-                times = funner # good times here
-              [goal]
-                dream = deadline
+            last_part[config.content].should eql(<<-HERE.gsub(/^(  ){6}/, ''))
+
+            [goal]
+              dream = deadline
             HERE
           end
         end

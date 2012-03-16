@@ -280,5 +280,28 @@ describe Skylab::PubSub::Emitter do
       it ('an emit to this one emits to all three') { same(:ghost) }
     end
   end
+  context "has a shorthand" do
+    let(:normal_class) do
+      Class.new.class_eval do
+        extend Skylab::PubSub::Emitter
+        emits :one
+        self
+      end
+    end
+    let(:shorthand_class) do
+      Skylab::PubSub::Emitter.new(:all, :error => :all)
+    end
+    it 'which works', {f:true} do
+      e = normal_class.new
+      s = nil
+      e.on_one { |x| s = x.to_s }
+      e.emit(:one, 'sone')
+      s.should eql('sone')
+      e = shorthand_class.new
+      e.on_all { |e| s = e.to_s }
+      e.emit(:error, 'serr')
+      s.should eql('serr')
+    end
+  end
 end
 

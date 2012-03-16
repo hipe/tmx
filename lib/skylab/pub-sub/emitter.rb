@@ -2,9 +2,9 @@ module Skylab ; end
 
 module Skylab::PubSub
   module Emitter
-    def self.extended mod
-      mod.send(:include, InstanceMethods)
-    end
+
+    COMMON_LEVELS = [:debug, :info, :notice, :warn, :error, :fatal]
+
     def emits *nodes
       event_cloud = self.event_cloud
       events = event_cloud.merge_definition!(*nodes)
@@ -18,6 +18,10 @@ module Skylab::PubSub
         end
       end
     end
+    def event_class= klass
+      defind_method(:build_event) { |type, payload| klass.new(type, payload) }
+    end
+    alias_method :event_class, :'event_class=' #!
     def event_cloud
       @event_cloud ||= begin
         if (k = ancestors[self == ancestors.first ? 1 : 0]).respond_to?(:event_cloud)
@@ -25,6 +29,18 @@ module Skylab::PubSub
         else
           SemanticTagCloud.new
         end
+      end
+    end
+  end
+  class << Emitter
+    def extended mod
+      mod.send(:include, InstanceMethods)
+    end
+    def new *a
+      Class.new.class_eval do
+        extend Emitter
+        emits(*a)
+        self
       end
     end
   end
@@ -60,6 +76,9 @@ module Skylab::PubSub
     end
   end
   module InstanceMethods
+    def build_event tag, payload
+      Event.new tag, payload
+    end
     def emit type, *payload
       cloud = _find_event_cloud
       tag = cloud[type] or fail("undeclared event type: #{type.inspect}")
@@ -67,7 +86,7 @@ module Skylab::PubSub
       event = nil
       cloud.ancestor_names(tag).map{ |n| el[n] }.compact.flatten.tap do |a|
         a.each do |b|
-          event ||= Event.new(tag, payload)
+          event ||= build_event(tag, payload)
           if 1 == b.arity
             b.call(event)
           else
@@ -76,13 +95,13 @@ module Skylab::PubSub
         end
       end.count
     end
+    def event_listeners
+      @event_listeners ||= EventListeners.new
+    end
     # sucks for now
     def _find_event_cloud
       singleton_class.instance_variable_defined?('@event_cloud') and return singleton_class.event_cloud
       self.class.event_cloud
-    end
-    def event_listeners
-      @event_listeners ||= EventListeners.new
     end
   end
   class SemanticTagCloud < Hash

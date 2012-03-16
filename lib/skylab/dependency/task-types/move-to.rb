@@ -2,81 +2,55 @@ require File.expand_path('../../task', __FILE__)
 require 'skylab/face/path-tools'
 require 'fileutils'
 
-module Skylab
-  module Dependency
-    class TaskTypes::MoveTo < Task
-      include Skylab::Face::PathTools
-      include FileUtils
-      attribute :move_to
-      attribute :from
-      def initialize(*a)
-        super(*a)
-        @fileutils_output = request[:view_bash] ? ui.out : ui.err
-        @fileutils_label =  request[:view_bash] ? '' : _prefix
+module Skylab::Dependency
+  class TaskTypes::MoveTo < Task
+    include Skylab::Face::PathTools
+    include FileUtils
+
+    attribute :move_to, :required => true
+    attribute :from, :required => true
+
+    emits :all, :error => :all, :shell => :all
+
+    def fu_output_message msg
+      if md = /\Amv ([^ ]+) ([^ ]+)\z/.match(msg) # ''cosmetic shell''
+        msg = "mv #{pretty_path md[1]} #{pretty_path md[2]}"
       end
-      def slake
-        if File.exist?(@move_to)
-          _info "desintation exists (move/rename to re-run): #{@move_to}"
-          true
-        else
-          if ! File.exist?(@from) and fallback?
-            fallback.slake or return false
-          end
-          execute
-        end
+      emit(:shell, msg)
+    end
+
+    def from= p
+      _set_path :from, p
+    end
+
+    def execute args
+      @context ||= (args[:context] || {})
+      valid? or fail(invalid_reason)
+      if ! from.exist?
+        emit(:error, "file not found: #{pretty_path from}")
+        return false
       end
-      def check
-        _src = File.exist? @from
-        _dst = File.exist? @move_to
-        if dry_run?
-          if ! _src
-            _pretending "exists", @file
-          end
-          if _dst
-            _info "exists: #{@move_to}"
-            true
-          else
-            _info "does not exist: #{@move_to}"
-            false
-          end
-        else
-          if ! _src
-            _info "source file not found: #{@from}"
-            false
-          elsif _dst
-            _info "exists: #{@move_to}"
-            true
-          else
-            _info "does not exist: #{@move_to}"
-            false
-          end
-        end
+      if move_to.exist?
+        emit(:error, "file exists: #{pretty_path move_to}")
+        return false
       end
-      def execute
-        if File.exist?(@from) or dry_run?
-          mv(@from, @move_to, :verbose => true, :noop => dry_run?) # _show_bash
-          true
-        else
-          _info "FAILED: source file not found: #{@from}"
-          false
-        end
-      end
-      def _undo
-        if File.exist?(@move_to)
-          if ! File.exist?(@from)
-            mv(@move_to, @from, :verbose => true)
-          else
-            _info "can't undo: exists: #{pretty_path @from}"
-            false
-          end
-        else
-          _info "nothing to undo: does not exist: #{@move_to}"
-          false
-        end
-      end
-      def interpolate_stem
-        fallback.interpolate_stem
-      end
+      status = mv from, move_to, :verbose => true
+      0 == status
+    end
+
+    def move_to= p
+      _set_path :move_to, p
+    end
+
+    def _set_path name, path
+      val = case path
+            when NilClass ; nil
+            when String   ; Pathname.new(path)
+            when Pathname ; path
+            else          ; raise ArgumentError.new("no: #{path}")
+            end
+      instance_variable_set("@#{name}", val)
+      path
     end
   end
 end
