@@ -88,7 +88,7 @@ module Skylab::Porcelain::Table
     klass.send(:alias_method, :numeric?, :float?)
   end
 
-  class Column::ViewModel < Struct.new(:align, :index, :inferred_type, :max_width_seen, :printf_format)
+  class Column::ViewModel < Struct.new(:align, :index, :max_width_seen, :printf_format, :type_stats)
     def align_left?
       align and return :left == align
       :left == (inferred_type || Column::STRING).align
@@ -98,18 +98,32 @@ module Skylab::Porcelain::Table
       @cel_renderer = (inferred_type || STRING).build_cel_renderer(self)
     end
     def initialize index, opts = nil
-      @cel_renderer = nil
-      super(nil, index, nil, 0, nil)
+      @cel_renderer = @inferred_type = nil
+      super(nil, index, 0, nil, nil)
+      self.type_stats = Hash.new { |h, k| h[k] = 0 }
       opts and opts.each { |k, v| send("#{k}=", v) }
+    end
+    def inferred_type
+      @inferred_type ||= infer_type
+    end
+    def infer_type
+      Column::TYPES[infer_type_name] || Column::STRING
+    end
+    def infer_type_name
+      type_stats.empty? and return :string
+      type_stats.reduce { |m, o| o.last > m.last ? o : m }.first
     end
     def render_cel str
       cel_renderer.call(str)
     end
     def see val
       val.length > max_width_seen and self.max_width_seen = val.length
-      unless Column::BLANK.match?(val) # never let blank values sway your type inference
-        self.inferred_type ||= Column::TIGHTEST
-        self.inferred_type = inferred_type.ancestor until inferred_type.match?(val)
+      if Column::BLANK.match?(val)
+        type_stats[:blank] += 1
+      else
+        type = Column::TIGHTEST
+        type = type.ancestor until type.match?(val)
+        type_stats[type.name] += 1
       end
     end
   end
