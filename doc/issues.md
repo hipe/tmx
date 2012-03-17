@@ -1,3 +1,4 @@
+[#090] 2012-03-16 @open: porcelain: table: column type inference
 [#089] 2012-03-15 @open: tanman: remote: remove
 [#088] 2012-03-15 @closed: porcelain: table
 [#087] 2012-03-15 @closed: tanman: remote: list
