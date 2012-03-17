@@ -74,13 +74,36 @@ module Skylab::Porcelain::TestSupport
       end
       context 'when you have floating-point like doo-hahs, something magic happens' do
         let(:row_enum) do
-          [['1', '2'],
-           ['34','56'],
+          [['-1.1122', 'blah'],
+           ['1', '2'],
+           ['34.5','56'],
            ['1.348', '-3.14'],
-           ['1234.5678', '0']]
+           ['1234.567891', '0']]
         end
-        it 'makes the decimal points line up', {wip:true} do
-          puts "OK:\n#{rendered_table}"
+        it 'makes the decimal points line up!!!!!', {f:true} do
+          rendered_table.should eql(<<-HERE.gsub(/^(?:  ){6}/, ''))
+              -1.1122    blah
+               1            2
+              34.5         56
+               1.348    -3.14
+            1234.567891     0
+          HERE
+        end
+      end
+      context "and when you have a mish-mash of different things", {f:true} do
+        let(:row_enum) do
+          [['0123',  '0123',    '01233', '3.1415'],
+           ['',      'meeper',  'eff',   '3.14'],
+           ['012',   '01.2',    'ef',    '23.1415'],
+           ['01',    '01',      'e',     '0']]
+        end
+        it "it uses the most frequently occuring type -- the mode" do
+          rendered_table.should eql(<<-HERE.unindent)
+            0123   0123 01233  3.1415
+                 meeper eff    3.14  
+             012   01.2 ef    23.1415
+              01     01 e      0     
+          HERE
         end
       end
     end

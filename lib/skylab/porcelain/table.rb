@@ -65,18 +65,28 @@ module Skylab::Porcelain::Table
       :blank   => (BLANK    = Type.new(:blank,   :ancestors => :string,  :regex => /\A[[:space:]]*\z/ ))
     }
     TIGHTEST = INTEGER
+    FLOAT_DETAIL_RE = /\A(-?\d+)((?:\.\d+)?)\z/
   end
 
   Column::STRING.renderer do |col|
-    fmt = "%#{'-' if col.align_left?}#{col.max_width_seen}s"
+    fmt = "%#{'-' if col.align_left?}#{col.max_width_seen[:full]}s"
     ->(str) { fmt % [str] }
   end
 
   Column::INTEGER.renderer = Column::STRING.renderer
 
   Column::FLOAT.renderer do |col|
-    fmt = "%#{'-' if true or col.align_left?}#{col.max_width_seen}s"
-    ->(str) { fmt % [str] }
+    int_max = col.max_width_seen[:integer_part]
+    flt_max = col.max_width_seen[:fractional_part]
+    fmt = "%#{int_max}s%-#{flt_max}s"
+    fallback_renderer = Column::STRING.build_cel_renderer(col)
+    ->(str) do
+      if md = Column::FLOAT_DETAIL_RE.match(str)
+        fmt % md.captures
+      else
+        fallback_renderer.call(str)
+      end
+    end
   end
 
   Column::Type.tap do |klass|
@@ -99,8 +109,9 @@ module Skylab::Porcelain::Table
     end
     def initialize index, opts = nil
       @cel_renderer = @inferred_type = nil
-      super(nil, index, 0, nil, nil)
+      super(nil, index, nil, nil, nil)
       self.type_stats = Hash.new { |h, k| h[k] = 0 }
+      self.max_width_seen = Hash.new { |h, k| h[k] = 0 }
       opts and opts.each { |k, v| send("#{k}=", v) }
     end
     def inferred_type
@@ -117,13 +128,18 @@ module Skylab::Porcelain::Table
       cel_renderer.call(str)
     end
     def see val
-      val.length > max_width_seen and self.max_width_seen = val.length
+      val.length > max_width_seen[:full] and max_width_seen[:full] = val.length
       if Column::BLANK.match?(val)
         type_stats[:blank] += 1
       else
         type = Column::TIGHTEST
         type = type.ancestor until type.match?(val)
         type_stats[type.name] += 1
+        if :float == type.name
+          md = Column::FLOAT_DETAIL_RE.match(val)
+          md[1].length > max_width_seen[:integer_part] and max_width_seen[:integer_part] = md[1].length
+          md[2].length > max_width_seen[:fractional_part] and max_width_seen[:fractional_part] = md[2].length
+        end
       end
     end
   end
