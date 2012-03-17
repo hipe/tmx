@@ -302,7 +302,9 @@ module Skylab::Porcelain::Bleeding
     end
     attr_reader :actions
     def build runtime
-      NamespaceAction.new(self, runtime)
+      NamespaceAction.new(self, runtime).tap do |ns|
+        ns.singleton_class.send(:include, self) # *very* experimental. add instance methods to the ns action
+     end
     end
     def namespace_module_init
       action_module_init
