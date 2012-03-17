@@ -27,7 +27,7 @@ module Skylab::TanMan
       @bridge = CodeMolester::Config::File.new(:path => path_proc.call)
     end
     def init
-      stdout = runtime.runtime.runtime.stdout # @todo FIXME
+      stdout = runtime.stdout # sucky
       bridge.on_write do |o|
         o.on_error { |e| emit(:error, *e.payload) ; return false }
         o.on_before_edit { |e| stdout.write(e) }

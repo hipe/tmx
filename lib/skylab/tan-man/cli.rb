@@ -13,17 +13,6 @@ module Skylab::TanMan
   MY_GRAPH = { :info => :all, :out => :all }
   ROOT = Skylab::Face::MyPathname.new(File.expand_path('..', __FILE__))
 
-  class Cli < Bleeding::Runtime
-    extend PubSub::Emitter
-    emits Bleeding::EVENT_GRAPH.merge(MY_GRAPH)
-    def initialize
-      super
-      @stdout = $stdout
-      on_all { |e| @stdout.puts e.payload.first }
-    end
-    attr_reader :stdout
-  end
-
   module Actions
   end
 
@@ -31,6 +20,43 @@ module Skylab::TanMan
   end
 
   module MetaAttributes
+  end
+
+  module ConfigMethods
+    def config
+      @config and return @config
+      require ROOT.join('models/config').to_s
+      @config = Models::Config.new(self, CONF_PATH).init
+    end
+
+    # loudly
+    def config?
+      config and return true
+      error "sorry, failed to load config file subsystem :("
+    end
+  end
+
+  module MyActionInstanceMethods
+    extend Bleeding::DelegatesTo
+
+    delegates_to :runtime, :config, :config?
+
+    def error msg
+      emit :error, msg
+      false
+    end
+  end
+
+  VERBS = { is: ['exist', 'is', 'are'], no: ['no '] }
+  module MyActionInstanceMethods
+    def s a, v=nil # just one tiny hard to read hack
+      v.nil? and return( 1 == a.size ? '' : 's' )
+      VERBS[v][case a.count ; when 0 ; 0 ; when 1 ; 1 ; else 2 ; end]
+    end
+  end
+
+  module MyNamespaceInstanceMethods
+    include MyActionInstanceMethods
   end
   class << MetaAttributes
     def all
@@ -101,6 +127,20 @@ module Skylab::TanMan
     end
   end
 
+  class Cli < Bleeding::Runtime
+    extend PubSub::Emitter
+    emits Bleeding::EVENT_GRAPH.merge(MY_GRAPH)
+    include ConfigMethods
+
+    def initialize
+      super
+      @config = nil
+      @stdout = $stdout
+      on_all { |e| @stdout.puts e.payload.first }
+    end
+    attr_reader :stdout
+  end
+
   class MyAction
     extend Bleeding::Action
     extend Bleeding::DelegatesTo
@@ -108,22 +148,12 @@ module Skylab::TanMan
     extend PubSub::Emitter
     emits Bleeding::EVENT_GRAPH.merge(MY_GRAPH)
 
-    # might get promoted to runtime
-    def config
-      @config and return @config
-      require ROOT.join('models/config').to_s
-      @config = Models::Config.new(self, CONF_PATH).init
-    end
+    include MyActionInstanceMethods
 
-    # loudly
-    def config?
-      config and return true
-      error "sorry, failed to load config file subsystem :("
-    end
-
-    def error msg
-      emit :error, msg
-      false
+    def api
+      @api and return @api
+      require File.expand_path('../api/binding', __FILE__)
+      @api = Api::Binding.new(self)
     end
 
     def format_error event
@@ -138,19 +168,14 @@ module Skylab::TanMan
     end
 
     def initialize runtime
-      super
-      @config = nil
+      @api = nil
       @invalid_reasons = []
+      @runtime = runtime
       on_error { |e| @invalid_reasons.push(format_error(e)) }
       on_all   { |e| runtime.emit(e.type, *e.payload) }
     end
 
-    VERBS = { is: ['exist', 'is', 'are'], no: ['no '] }
-    def s a, v=nil # just one tiny hard to read hack
-      v.nil? and return( 1 == a.size ? '' : 's' )
-      VERBS[v][case a.count ; when 0 ; 0 ; when 1 ; 1 ; else 2 ; end]
-    end
-
+    attr_reader :runtime
     delegates_to :runtime, :stdout
 
     def valid?
@@ -162,6 +187,7 @@ module Skylab::TanMan
 
   module Actions::Remote
     extend Bleeding::Namespace
+    include MyNamespaceInstanceMethods
     desc "manage remotes."
     summary { ["#{action_syntax} remotes"] }
   end
@@ -202,6 +228,17 @@ module Skylab::TanMan
         return b
       end
       !! config.remotes.remove(remote)
+    end
+  end
+
+  class Actions::Push < MyAction
+    desc "push any single file anywhere in the world."
+    desc "(scp wrapper)"
+    option_syntax do |h|
+      on('-n', '--dry-run', 'dry run.') { h[:dry_run] = true }
+    end
+    def execute remote_name, file, opts
+      api.invoke(:push, opts.merge(remote: remote_name, file:file))
     end
   end
 end
