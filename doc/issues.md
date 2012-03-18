@@ -1,5 +1,6 @@
-[#090] 2012-03-16 @open: porcelain: table: column type inference
-[#089] 2012-03-15 @open: tanman: remote: remove
+[#091] 2012-03-17 @open: tanman: local .tan
+[#090] 2012-03-16 @closed: porcelain: table: column type inference
+[#089] 2012-03-15 @closed: tanman: remote: remove
 [#088] 2012-03-15 @closed: porcelain: table
 [#087] 2012-03-15 @closed: tanman: remote: list
 [#086] 2012-03-14 @closed: porcelain: meta attrib modules
