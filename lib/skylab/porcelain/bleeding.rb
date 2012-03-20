@@ -226,6 +226,7 @@ module Skylab::Porcelain::Bleeding
   module ActionModuleMethods
     include Styles
     def action_module_init
+      @actions_module_proc = nil
       @aliases = []
       @argument_syntax = ArgumentSyntax.new(self)
       @desc = nil
@@ -360,8 +361,15 @@ module Skylab::Porcelain::Bleeding
     end
   end
   class << Runtime
-    def actions_module
-      to_s.match(/^(.+)::[^:]+$/)[1].split('::').push('Actions').reduce(Object) { |m, o| m.const_get(o) }
+    def actions_module *a, &b
+      if a.size.nonzero? || b
+        a.size > 1 || (a.size > 0 && b) and raise ArgumentError.new('no')
+        @actions_module_proc = b || ->(){ a.first }
+      else
+        (@actions_module_proc ||= ->() do
+          to_s.match(/^(.+)::[^:]+$/)[1].split('::').push('Actions').reduce(Object) { |m, o| m.const_get(o) }
+        end).call
+      end
     end
   end
   module OfficiousActions
