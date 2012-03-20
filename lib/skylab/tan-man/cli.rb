@@ -8,8 +8,8 @@ module Skylab::TanMan
   Bleeding = Skylab::Porcelain::Bleeding
   Porcelain = Skylab::Porcelain
   PubSub = Skylab::PubSub
+  TanMan = Skylab::TanMan
 
-  CONF_PATH = ->() { "#{ENV['HOME']}/.tanrc" }
   MY_GRAPH = { :info => :all, :out => :all }
   ROOT = Skylab::Face::MyPathname.new(File.expand_path('..', __FILE__))
 
@@ -26,7 +26,7 @@ module Skylab::TanMan
     def config
       @config and return @config
       require ROOT.join('models/config').to_s
-      @config = Models::Config.new(self, CONF_PATH).init
+      @config = Models::Config.new(self, TanMan.conf_path).init
     end
 
     # loudly
@@ -97,6 +97,19 @@ module Skylab::TanMan
     end
   end
 
+  module MetaAttributes::Proc extend Porcelain::AttributeDefiner
+    meta_attribute :proc do |name, _|
+      alias_method(get_proc = "#{name}_proc", name)
+      define_method(name) do |&block|
+        if block
+          self.send("#{name}=", block)
+        else
+          send(get_proc)
+        end
+      end
+    end
+  end
+
   module MetaAttributes::Regex extend Porcelain::AttributeDefiner
     meta_attribute :on_regex_fail
     meta_attribute :regex do |name, meta|
@@ -127,6 +140,13 @@ module Skylab::TanMan
     end
   end
 
+  class << self
+    extend Porcelain::AttributeDefiner
+    meta_attribute(*MetaAttributes[:proc])
+    attribute :conf_path, :proc => true
+  end
+  conf_path { "#{ENV['HOME']}/.tanrc" }
+
   class Cli < Bleeding::Runtime
     extend PubSub::Emitter
     emits Bleeding::EVENT_GRAPH.merge(MY_GRAPH)
@@ -136,9 +156,13 @@ module Skylab::TanMan
       super
       @config = nil
       @stdout = $stdout
-      on_all { |e| @stdout.puts e.payload.first }
+      if block_given?
+        yield self
+      else
+        on_all { |e| stdout.puts e.payload.first }
+      end
     end
-    attr_reader :stdout
+    attr_accessor :stdout
   end
 
   class MyAction
@@ -242,5 +266,4 @@ module Skylab::TanMan
     end
   end
 end
-
 
