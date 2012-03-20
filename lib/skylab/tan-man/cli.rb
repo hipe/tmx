@@ -44,6 +44,8 @@ module Skylab::TanMan
     emits Bleeding::EVENT_GRAPH.merge(MY_GRAPH)
     include ConfigMethods
 
+    actions_module { self::Actions }
+
     def initialize
       super
       @config = nil
@@ -101,17 +103,17 @@ module Skylab::TanMan
     end
   end
 
-  module Actions
+  module Cli::Actions
   end
 
-  module Actions::Remote
+  module Cli::Actions::Remote
     extend Bleeding::Namespace
     include MyNamespaceInstanceMethods
     desc "manage remotes."
     summary { ["#{action_syntax} remotes"] }
   end
 
-  class Actions::Remote::Add < MyAction
+  class Cli::Actions::Remote::Add < MyAction
     desc "add the remote."
     def execute name, host
       config? or return
@@ -119,7 +121,7 @@ module Skylab::TanMan
     end
   end
 
-  class Actions::Remote::List < MyAction
+  class Cli::Actions::Remote::List < MyAction
     desc "list the remotes."
     def execute
       config? or return
@@ -136,7 +138,7 @@ module Skylab::TanMan
     end
   end
 
-  class Actions::Remote::Rm < MyAction
+  class Cli::Actions::Remote::Rm < MyAction
     desc "remove the remote."
     def execute remote_name
       config? or return
@@ -150,7 +152,7 @@ module Skylab::TanMan
     end
   end
 
-  class Actions::Push < MyAction
+  class Cli::Actions::Push < MyAction
     desc "push any single file anywhere in the world."
     desc "(scp wrapper)"
     option_syntax do |h|
