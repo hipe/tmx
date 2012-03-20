@@ -40,6 +40,10 @@ module Skylab::PubSub
       Class.new.class_eval do
         extend Emitter
         emits(*a)
+        def error msg # convenience for this common use case (experimental!)
+          emit(:error, msg)
+          false
+        end
         self
       end
     end
@@ -49,17 +53,19 @@ end
 module Skylab::PubSub
   class Event < Struct.new(:payload, :tag, :touched)
     def initialize tag, payload
-      Array === payload or raise ArgumentError.new("need arrays here for now!")
+      # Array === payload or raise ArgumentError.new("need arrays here for now!")
       super(payload, tag, false)
     end
     alias_method :event_id, :object_id
     def message
-      self.touched = true
       payload.map(&:to_s).join(' ')
+    end
+    def message= str
+      payload[0] = str # use this very cautiously
     end
     alias_method :to_s, :message
     def touch!
-      self.touched = true
+      tap { |me| me.touched = true }
     end
     alias_method :touched?, :touched
     def type
@@ -76,17 +82,43 @@ module Skylab::PubSub
     end
   end
   module InstanceMethods
-    def build_event tag, payload
-      Event.new tag, payload
+    def build_event tag, payload, &block
+      if block
+        if 1 == block.arity
+          block.call(Event.new(tag))
+        else
+          Hash === (h = block.call) or fail("for now only payload hashes are "<<
+            "supported as a return type of your event definition block (experimental).")
+          Event.new(tag, h).tap do |e|
+            sc = e.singleton_class
+            h.keys.each do |k|
+              sc.send(:define_method, k) { self.payload[k] }
+              sc.send(:define_method, "#{k}=") { |v| self.payload[k] = v }
+            end
+          end
+        end
+      else
+        Event.new tag, payload
+      end
     end
-    def emit type, *payload
+    def emit type, *payload, &block
+      event = nil
+      if payload.size.zero? and type.respond_to?(:type) and type.respond_to?(:payload)
+        event = type
+        type = event.type
+        payload = nil
+      end
+      if block
+        payload.nil? and fail("you cannot re-emit an event and also provide a constructor block.")
+        payload.size.nonzero? and fail("when constructor block is provided you cannot also provide event payload.")
+        payload = nil
+      end
       cloud = _find_event_cloud
       tag = cloud[type] or fail("undeclared event type: #{type.inspect}")
       el = event_listeners
-      event = nil
       cloud.ancestor_names(tag).map{ |n| el[n] }.compact.flatten.tap do |a|
         a.each do |b|
-          event ||= build_event(tag, payload)
+          event ||= build_event(tag, payload, &block)
           if 1 == b.arity
             b.call(event)
           else
