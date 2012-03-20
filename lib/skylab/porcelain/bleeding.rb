@@ -117,6 +117,7 @@ module Skylab::Porcelain::Bleeding
       emit :help, "#{hdr 'usage:'} #{program_name} #{action_syntax} [opts] [args]"
     end
     def namespace_init
+      @program_name ||= nil # !
     end
     def program_name
       "#{runtime.program_name} #{actions_module.name}" #!
@@ -351,8 +352,9 @@ module Skylab::Porcelain::Bleeding
       callable.receiver.send(callable.name, *args)
     end
     def program_name
-      File.basename($PROGRAM_NAME)
+      @program_name || File.basename($PROGRAM_NAME)
     end
+    attr_writer :program_name
     def self.inherited mod
       mod.namespace_module_init
     end

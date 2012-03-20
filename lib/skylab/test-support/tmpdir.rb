@@ -49,7 +49,7 @@ module Skylab::TestSupport
       self
     end
     def prepare
-      to_s =~ /\Atmp/ or return fail("we are being extra cautious")
+      %r{(?:^|/)tmp(?:/|$)} =~ to_s or return fail("we are being extra cautious")
       if exist?
         remove_entry_secure(to_s)
       elsif ! dirname.exist?
@@ -59,6 +59,9 @@ module Skylab::TestSupport
       self
     end
     attr_accessor :verbose
+    def verbose!
+      tap { |o| o.verbose = true }
+    end
   end
 end
 
