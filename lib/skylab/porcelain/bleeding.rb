@@ -336,6 +336,7 @@ module Skylab::Porcelain::Bleeding
       @actions_module = namespace
       namespace_init
     end
+    delegates_to :actions_module, :name
   end
   class Runtime
     extend NamespaceModuleMethods
