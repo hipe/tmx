@@ -1,25 +1,44 @@
 module Skylab::TanMan
-  module Api
-    module Actions
-    end
+
+  module Api::Actions
   end
 
   require File.expand_path('../action', __FILE__)
 
   class Api::Binding
     extend Bleeding::DelegatesTo
-    delegates_to :emitter, :emit
-    attr_reader :emitter
-    delegates_to :emitter, :error
-    def initialize emitter
-      @emitter = emitter
+
+    def config
+      @config and return @config
+      require ROOT.join('models/config').to_s
+      @config = Models::Config.new(self, TanMan.conf_path).init
     end
-    def invoke action, args
-      /\A[-a-z]+\z/ =~ action or fail("invalid action name: #{action.inspect}")
-      require File.expand_path("../actions/#{action}", __FILE__)
-      mod = Api::Actions.const_get(action.to_s.gsub(/(?:^|-)([a-z])/){ $1.upcase })
-      mod.call(self, args)
+    def config?
+      config and return true
+      error "sorry, failed to load config file subsystem :("
     end
+    delegates_to :runtime, :emit, :error
+    def initialize runtime
+      @config = nil
+      @runtime = runtime
+    end
+    def invoke action=nil, args=nil
+      if args.nil? && Hash === action
+        args = action
+        action = nil
+      end
+      Symbol === action and action = [action]
+      action ||= runtime.full_action_name_parts
+      require ROOT.join('api/actions', *action).to_s
+      modul = action.reduce(Api::Actions) do |mod, name|
+        /\A[-a-z]+\z/ =~ name or fail("invalid action name part: #{action.inspect}")
+        mod.const_get name.to_s.gsub(/(?:^|-)([a-z])/){ $1.upcase }
+      end
+      modul.call(self, args)
+    end
+    delegates_to :runtime, :program_name
+    attr_reader :runtime
+    delegates_to :runtime, :stdout
   end
 end
 

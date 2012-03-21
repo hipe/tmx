@@ -10,13 +10,17 @@ module Skylab::TanMan
   PubSub = Skylab::PubSub
   TanMan = Skylab::TanMan
 
-  MY_GRAPH = { :info => :all, :out => :all }
+  MY_EVENT_GRAPH = { :info => :all, :out => :all }
   ROOT = Skylab::Face::MyPathname.new(File.expand_path('..', __FILE__))
+  VERBS = { is: ['exist', 'is', 'are'], no: ['no '] }
 
-  module Models
+  module Api
   end
 
   module MetaAttributes
+  end
+
+  module Models
   end
 
   class << MetaAttributes
@@ -108,5 +112,82 @@ module Skylab::TanMan
   end
   conf_path { "#{ENV['HOME']}/.tanrc" }
 
+
+  module MyActionInstanceMethods
+    # (note: the question of what should be in a cli action and what
+    #  should be in an api action is an area of active exploration.)
+    #
+
+
+    extend Bleeding::DelegatesTo
+
+    def add_invalid_reason str
+      (@invalid_reasons ||= []).push str
+    end
+
+    def error msg
+      add_invalid_reason msg
+      emit :error, msg
+      false
+    end
+    def skip msg
+      emit :skip, msg
+      nil
+    end
+
+    def format_error event
+      event.tap do |e|
+        if runtime.runtime
+          subj, verb, obj = [runtime.runtime.program_name, action.name, runtime.actions_module.name]
+        else
+          subj, verb = [runtime.program_name, action.name]
+        end
+        e.message = "#{subj} failed to #{verb}#{" #{obj}" if obj}: #{e.message}"
+      end
+    end
+
+    # experimental, might get pushed up to porcelain @todo
+    def full_action_name_parts
+      a = [action.name]
+      root_id = root_runtime.object_id
+      current = self
+      until root_id == current.runtime.object_id
+        current = current.runtime
+        a.push current.name
+      end
+      a.reverse
+    end
+
+    def invalid_reasons?
+      @invalid_reasons && @invalid_reasons.size.nonzero?
+    end
+
+    def invalid_reasons_count
+      @invalid_reasons ? @invalid_reasons.count : 0
+    end
+
+    def my_action_init
+      @invalid_reasons ||= nil
+    end
+
+    def s a, v=nil # just one tiny hard to read hack
+      v.nil? and return( 1 == a.size ? '' : 's' )
+      VERBS[v][case a.count ; when 0 ; 0 ; when 1 ; 1 ; else 2 ; end]
+    end
+
+    def root_runtime
+      runtime ? ( runtime.respond_to?(:root_runtime) ? runtime.root_runtime : runtime ) : self
+    end
+
+    attr_reader :runtime
+
+    def valid?
+      invalid_reasons? and return false
+      required_ok? # more hooking required
+      ! invalid_reasons?
+    end
+
+    delegates_to :runtime, :stdout
+  end
 end
 
