@@ -226,15 +226,16 @@ module Skylab::Porcelain::Bleeding
   module ActionModuleMethods
     include Styles
     def action_module_init
+      @action_name = self.to_s.match(/^.+::([^:]+)$/)[1].gsub(/(?<=[a-z])([A-Z])/) { "-#{$1}" }.downcase
       @actions_module_proc = nil
       @aliases = []
       @argument_syntax = ArgumentSyntax.new(self)
       @desc = nil
-      @name = self.to_s.match(/^.+::([^:]+)$/)[1].gsub(/(?<=[a-z])([A-Z])/) { "-#{$1}" }.downcase
       @option_syntax = OptionSyntax.new
       @summary = nil
       @visible = true
     end
+    attr_reader :action_name
     def aliases *a
       a.any? ? @aliases.concat(a) : @aliases
     end
@@ -250,7 +251,9 @@ module Skylab::Porcelain::Bleeding
     def self.extended mod
       mod.action_module_init
     end
-    attr_reader :name
+    def name
+      action_name # allows more flexibility than an alias
+    end
     def names
       [name, * @aliases]
     end
