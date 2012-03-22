@@ -18,7 +18,7 @@ module Skylab::TanMan::TestSupport
       before do
         self.debug = false
         TMPDIR.verbose!.prepare
-        TanMan.conf_path { TMPDIR.join('tanrc') }
+        TanMan::Api.global_conf_path { TMPDIR.join('tanrc') }
       end
       it 'can get added' do
         input 'remote add bing bong'

@@ -5,14 +5,21 @@ require 'skylab/porcelain/bleeding'
 require 'skylab/pub-sub/emitter'
 
 module Skylab::TanMan
+  Face = Skylab::Face
   Bleeding = Skylab::Porcelain::Bleeding
   Porcelain = Skylab::Porcelain
   PubSub = Skylab::PubSub
   TanMan = Skylab::TanMan
 
-  MY_EVENT_GRAPH = { :info => :all, :out => :all }
-  ROOT = Skylab::Face::MyPathname.new(File.expand_path('..', __FILE__))
+  MY_EVENT_GRAPH = { :info => :all, :out => :all, :no_config_dir => :error, :skip => :info }
+  EVENT_GRAPH = Bleeding::EVENT_GRAPH.merge(MY_EVENT_GRAPH)
+
+  ROOT = Face::MyPathname.new(File.expand_path('..', __FILE__))
   VERBS = { is: ['exist', 'is', 'are'], no: ['no '] }
+
+  LOCAL_CONF_DIRNAME = '.tanman'
+  LOCAL_CONF_CONFIG_NAME = 'config'
+
 
   module Api
   end
@@ -45,8 +52,8 @@ module Skylab::TanMan
     meta_attribute :default
   end
   module MetaAttributes::Default::InstanceMethods
-    def set_defaults!
-      self.class.attributes.select { |k, v| v.key?(:default) }.each do |k, v|
+    def set_defaults_if_nil!
+      self.class.attributes.select { |k, v| v.key?(:default) and send(k).nil? }.each do |k, v|
         send("#{k}=", v[:default].respond_to?(:call) ? v[:default].call : v[:default])
       end
     end
@@ -56,7 +63,7 @@ module Skylab::TanMan
     meta_attribute :pathname do |name, _|
       alias_method(after = "#{name}_after_pathname=", "#{name}=")
       define_method("#{name}=") do |path|
-        send(after, path ? MyPathname.new(path.to_s) : path)
+        send(after, path ? Face::MyPathname.new(path.to_s) : path)
         path
       end
     end
@@ -105,12 +112,12 @@ module Skylab::TanMan
     end
   end
 
-  class << self
+  class << Api
     extend Porcelain::AttributeDefiner
     meta_attribute(*MetaAttributes[:proc])
-    attribute :conf_path, :proc => true
+    attribute :global_conf_path, :proc => true
   end
-  conf_path { "#{ENV['HOME']}/.tanrc" }
+  Api.global_conf_path { "#{ENV['HOME']}/.tanrc" }
 
 
   module MyActionInstanceMethods
@@ -187,7 +194,45 @@ module Skylab::TanMan
       ! invalid_reasons?
     end
 
+    delegates_to :root_runtime, :singletons
+
     delegates_to :runtime, :stdout
+  end
+
+  class Api::Singletons
+    def config
+      @config and return @config
+      require ROOT.join('models/config')
+      @confg = Models::Config::Singleton.new
+    end
+    def initialize
+      @config = nil
+    end
+  end
+
+  @api = nil
+  class << self
+    def api
+      @api and return @api
+      require_relative 'api/runtime'
+      @api = Api::RootRuntime.new
+    end
+  end
+
+  class Api::Event < PubSub::Event
+    # this is all very experimental and subject to change!
+    def json_data
+      if Array === payload
+        [tag.name, *payload]
+      elsif Hash === payload
+        [tag.name, [payload]]
+      else
+        [tag.name]
+      end
+    end
+    def to_json *a
+      json_data.to_json(*a)
+    end
   end
 end
 

@@ -8,12 +8,14 @@ module Skylab::TanMan
 
   class Cli < Bleeding::Runtime
     extend PubSub::Emitter
-    emits Bleeding::EVENT_GRAPH.merge(MY_EVENT_GRAPH)
+    emits EVENT_GRAPH
 
     actions_module { self::Actions }
 
     def initialize
       super
+      @config = nil
+      @singletons = Api::Singletons.new
       @stdout = $stdout
       if block_given?
         yield self
@@ -29,9 +31,13 @@ module Skylab::TanMan
     extend Bleeding::DelegatesTo
     extend PubSub::Emitter
 
-    emits Bleeding::EVENT_GRAPH.merge(MY_EVENT_GRAPH)
+    emits EVENT_GRAPH
 
     include MyActionInstanceMethods
+
+    alias_method :action_class, :class
+
+    delegates_to :action_class, :action_name
 
     def api
       @api and return @api
@@ -41,11 +47,18 @@ module Skylab::TanMan
 
     def initialize runtime
       @api = nil
-      my_action_init
       @runtime = runtime
+      my_action_init
+      on_no_config_dir do |e|
+        error "couldn't find #{e.touch!.dirname} in this or any parent directory: #{e.from.pretty}"
+        emit(:info, "(try #{pre "#{runtime.root_runtime.program_name} #{Cli::Actions::Init.syntax}"} to create it)")
+      end
+      on_info  { |e| e.message = "#{runtime.program_name} #{action_name}: #{e.message}" }
       on_error { |e| add_invalid_reason( format_error e ) }
-      on_all   { |e| runtime.emit(e) }
+      on_all   { |e| runtime.emit(e) unless e.touched? }
     end
+
+    alias_method :on_no_action_name, :full_action_name_parts
 
     attr_reader :runtime
     delegates_to :runtime, :stdout
@@ -54,6 +67,13 @@ module Skylab::TanMan
   module Cli::Actions
   end
 
+  class Cli::Actions::Init < Cli::Action
+    desc "create the #{LOCAL_CONF_DIRNAME} directory"
+    option_syntax { |h| on('-n', '--dry-run', 'dry run.') { h[:dry_run] = true } }
+    def execute path=nil, opts
+      api.invoke opts.merge(path: path, local_conf_dirname: LOCAL_CONF_DIRNAME)
+    end
+  end
   module Cli::Actions::Remote
     extend Bleeding::Namespace
     include MyNamespaceInstanceMethods
