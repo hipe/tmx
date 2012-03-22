@@ -37,6 +37,10 @@ module Skylab::TestSupport
         end
       end
     end
+    alias_method :fileutils_touch, :touch
+    def touch file
+      fileutils_touch(join(file), :verbose => @verbose, :noop => @noop)
+    end
     def touch_r files
       files.each do |file|
         dest_file = dest_dir = nil
@@ -48,7 +52,7 @@ module Skylab::TestSupport
           dest_file = dest_path
         end
         dest_dir.exist? or  mkdir_p(dest_dir, :verbose => @verbose, :noop => @noop)
-        dest_file and touch(dest_file, :verbose => @verbose, :noop => @noop)
+        dest_file and fileutils_touch(dest_file, :verbose => @verbose, :noop => @noop)
       end
       self
     end
