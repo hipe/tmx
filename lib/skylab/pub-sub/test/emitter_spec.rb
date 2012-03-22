@@ -310,5 +310,15 @@ describe Skylab::PubSub::Emitter do
       s.should eql('serr')
     end
   end
+  context "Will graphs defined in a parent class descend to child?", {f:true} do
+    let(:child_class) { Class.new(klass) }
+    it "YES" do
+      ok = nil
+      o = child_class.new
+      o.on_informational { |e| ok = e }
+      o.emit(:info, "wankers")
+      ok.message.should eql('wankers')
+    end
+  end
 end
 

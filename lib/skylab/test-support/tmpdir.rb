@@ -19,6 +19,10 @@ module Skylab::TestSupport
       @noop = false # no setter for now! b/c it introduces some issues
       opts and opts.each { |k, v| send("#{k}=", v) }
     end
+    alias_method :fileutils_mkdir, :mkdir # the name 'fu_mkdir' is already used by FileUtils!
+    def mkdir path_end, *a
+      fileutils_mkdir(join(path_end), *a)
+    end
     def patch str
       cd(to_s) do
         Open3.popen3('patch -p1') do |sin, sout, serr|
@@ -55,7 +59,7 @@ module Skylab::TestSupport
       elsif ! dirname.exist?
         mkdir_p dirname, :verbose => @verbose, :noop => @noop
       end
-      mkdir to_s
+      fileutils_mkdir to_s
       self
     end
     attr_accessor :verbose
