@@ -8,17 +8,15 @@ module Skylab::TanMan
 
     meta_attribute(*MetaAttributes[:boolean, :default, :pathname, :required, :regex])
 
-    emits :all, :error => :all, :info => :all, :skip => :info # etc
+    emits Bleeding::EVENT_GRAPH.merge(MY_EVENT_GRAPH)
+    event_class Api::Event
 
     delegates_to :class, :action_name
-
-    delegates_to :runtime, :config, :config?
 
     def initialize runtime
       my_action_init
       @runtime = runtime
       on_error { |e| add_invalid_reason e }
-      on_info { |e| e.message = "#{runtime.program_name} #{action_name}: #{e.message}" }
       on_all { |e| self.runtime.emit(e) }
     end
 
@@ -43,10 +41,8 @@ module Skylab::TanMan
 
     def call runtime, request
       new(runtime).tap do |transaction|
-        if request
-          transaction.update_attributes!(request) or return false
-        end
-        # transaction.set_defaults_if_nil!
+        runtime.set_transaction_attributes(transaction, request) or return false
+        transaction.set_defaults_if_nil!
         transaction.valid? or return false
         return transaction.invoke
       end

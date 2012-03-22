@@ -3,6 +3,7 @@ require 'skylab/test-support/tmpdir'
 require 'shellwords'
 
 module Skylab::TanMan::TestSupport
+  TanMan = Skylab::TanMan
   include Skylab::TestSupport
   TMPDIR = Tmpdir.new(Skylab::ROOT.join('tmp/tanman'))
   attr_accessor :debug
