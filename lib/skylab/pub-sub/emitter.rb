@@ -19,7 +19,7 @@ module Skylab::PubSub
       end
     end
     def event_class= klass
-      defind_method(:build_event) { |type, payload| klass.new(type, payload) }
+      define_method(:event_class) { klass }
     end
     alias_method :event_class, :'event_class=' #!
     def event_cloud
@@ -85,11 +85,11 @@ module Skylab::PubSub
     def build_event tag, payload, &block
       if block
         if 1 == block.arity
-          block.call(Event.new(tag))
+          block.call(construct_event(tag))
         else
           Hash === (h = block.call) or fail("for now only payload hashes are "<<
             "supported as a return type of your event definition block (experimental).")
-          Event.new(tag, h).tap do |e|
+          construct_event(tag, h).tap do |e|
             sc = e.singleton_class
             h.keys.each do |k|
               sc.send(:define_method, k) { self.payload[k] }
@@ -98,8 +98,11 @@ module Skylab::PubSub
           end
         end
       else
-        Event.new tag, payload
+        construct_event tag, payload
       end
+    end
+    def construct_event tag, payload=nil
+      event_class.new(tag, payload)
     end
     def emit type, *payload, &block
       event = nil
@@ -114,7 +117,7 @@ module Skylab::PubSub
         payload = nil
       end
       cloud = _find_event_cloud
-      tag = cloud[type] or fail("undeclared event type: #{type.inspect}")
+      tag = cloud[type] or fail("undeclared event type #{type.inspect} for #{self.class}")
       el = event_listeners
       cloud.ancestor_names(tag).map{ |n| el[n] }.compact.flatten.tap do |a|
         a.each do |b|
@@ -126,6 +129,9 @@ module Skylab::PubSub
           end
         end
       end.count
+    end
+    def event_class
+      Event
     end
     def event_listeners
       @event_listeners ||= EventListeners.new
