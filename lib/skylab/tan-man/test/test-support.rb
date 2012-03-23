@@ -7,6 +7,9 @@ module Skylab::TanMan::TestSupport
   include Skylab::TestSupport
   TMPDIR = Tmpdir.new(Skylab::ROOT.join('tmp/tanman'))
   attr_accessor :debug
+  def api
+    TanMan.api
+  end
   def debug!
     tap { |o| o.debug = true }
   end
