@@ -26,17 +26,20 @@ module Skylab::TanMan
       const.call(self, args)
     end
     def set_transaction_attributes transaction, attributes
+      attributes or return true
       transaction.update_attributes!(attributes)
     end
   end
 
   class Api::Binding
     extend Bleeding::DelegatesTo
-    delegates_to :runtime, :config, :emit, :error
     include Api::InvocationMethods
-    def initialize runtime
+
+    delegates_to :runtime, :config, :emit, :error
+    def initialize runtime, opts=nil
       @config = nil
       @runtime = runtime
+      opts and opts.each { |k, v| send("#{k}=", v) }
     end
     def invalid msg
       raise RuntimeError.new(msg)
@@ -45,7 +48,7 @@ module Skylab::TanMan
     delegates_to :runtime, :root_runtime
     attr_reader :runtime
     delegates_to :root_runtime, :singletons
-    delegates_to :runtime, :stdout
+    delegates_to :runtime, :stdout, :text_styler
   end
 end
 

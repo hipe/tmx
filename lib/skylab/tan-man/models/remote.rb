@@ -1,5 +1,10 @@
+require_relative 'model'
+
 module Skylab::TanMan
   class Models::Remote < Models::Model
+    Api::Autoloader.init(self)
+
+    extend Bleeding::DelegatesTo
 
     NAME_RE = /^[^"]+$/
     URL_RE = /^[^ ]+$/
@@ -57,6 +62,12 @@ module Skylab::TanMan
     end
     attribute :name, :regex => NAME_RE, :required => true, :bound => true
 
+    delegates_to :enumerator, :resource # will fail when etc
+
+    def resource_label
+      resource.label if resource
+    end
+
     def url
       bound? ? url_read : @url
     end
@@ -84,39 +95,6 @@ module Skylab::TanMan
     def unbound config, name, url
       r = new(config, :config => config, :name => name, :url => url)
       r.valid? ? r : false
-    end
-  end
-
-  class Models::Remote::MyEnumerator < ::Enumerator
-    Remote = Models::Remote
-    extend Bleeding::DelegatesTo
-    attr_reader :config
-    delegates_to :config, :emit, :error
-    def initialize(config)
-      block_given? and raise ArgumentError.new("this enumerator creates its own block.")
-      @config = config
-      super() do |y|
-        config.bridge.sections.each do |sec|
-          if Remote::SECTION_NAME_RE =~ sec.section_name and rem = Remote.bound(self, sec)
-            y << rem
-          end
-        end
-      end
-    end
-    def push remote
-      remote.bound? and fail("won't push bound remote")
-      parent = config.bridge.content_tree.detect(:sections)
-      sexp = CodeMolester::Config::Section.create('', parent)
-      remote.bind(sexp) ? self : false
-    end
-    def remove remote
-      section_name = remote.sexp.section_name
-      found = config.bridge.sections.detect { |s| section_name == s.section_name }
-      found or return error("expected section not found: [#{section_name}]")
-      if config.bridge.content_tree.detect(:sections).remove(found)
-        emit(:info, "removed remote #{remote.name}.")
-        config.write_hook
-      end
     end
   end
 end
