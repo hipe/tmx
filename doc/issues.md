@@ -1,5 +1,6 @@
-[#092] 2012-03-19 @open: tanman: refactor into api, test all
-[#091] 2012-03-17 @open: tanman: local .tan
+[#093] 2012-03-28 @open: tanman: status
+[#092] 2012-03-19 @closed: tanman: refactor into api, test all
+[#091] 2012-03-17 @closed: tanman: local .tan
 [#090] 2012-03-16 @closed: porcelain: table: column type inference
 [#089] 2012-03-15 @closed: tanman: remote: remove
 [#088] 2012-03-15 @closed: porcelain: table
