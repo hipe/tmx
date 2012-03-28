@@ -1,11 +1,10 @@
-require 'fileutils'
 require 'open3'
 require 'stringio'
-
 require File.expand_path('../test-support', __FILE__)
+require 'skylab/face/path-tools'
 
 module Skylab::TestSupport
-  class Tmpdir < ::Pathname
+  class Tmpdir < Skylab::Face::MyPathname
     include FileUtils
     def emit type, msg
       $stderr.puts msg
