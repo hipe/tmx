@@ -2,14 +2,16 @@
 
 require 'fileutils'
 require 'open3'
-require 'pathname'
-
-
-require File.expand_path('../../lib/skylab/porcelain/all', __FILE__)
+require File.expand_path('../../lib/skylab', __FILE__)
+require 'skylab/porcelain/all'
 
 module Skylab::GitStashUntracked
   class Porcelain
     extend ::Skylab::Porcelain
+
+    porcelain do
+      emits :payload => :all
+    end
 
     DRY_RUN = ->(ctx) { on('-n', '--dry-run', "Dry run.") { ctx[:dry_run] = true } }
     STASHES = ->(ctx) do
@@ -24,7 +26,7 @@ module Skylab::GitStashUntracked
     end
     argument_syntax "<name>"
     def save name, opts
-      Plumbing::Save.new(@runtime, opts.merge(:name => name)).invoke
+      Plumbing::Save.new(runtime, opts.merge(:name => name)).invoke
     end
 
     option_syntax do |ctx|
@@ -32,7 +34,7 @@ module Skylab::GitStashUntracked
       instance_exec ctx, &STASHES
     end
     def list opts
-      Plumbing::List.new(@runtime, opts).invoke
+      Plumbing::List.new(runtime, opts).invoke
     end
 
     option_syntax do |ctx|
@@ -45,7 +47,7 @@ module Skylab::GitStashUntracked
     end
     argument_syntax '<name>'
     def show name, opts
-      Plumbing::Show.new(@runtime, opts.merge(:name => name)).invoke
+      Plumbing::Show.new(runtime, opts.merge(:name => name)).invoke
     end
 
     option_syntax do |ctx|
@@ -55,7 +57,7 @@ module Skylab::GitStashUntracked
     end
     argument_syntax '<name>'
     def pop name, opts
-      Plumbing::Pop.new(@runtime, opts.merge(:name => name)).invoke
+      Plumbing::Pop.new(runtime, opts.merge(:name => name)).invoke
     end
 
     option_syntax do |_|
@@ -63,8 +65,8 @@ module Skylab::GitStashUntracked
     end
 
     def status _
-      num = Plumbing::Save.new(@runtime).each_file { |fn| @runtime.emit(:payload, fn) }
-      0 == num and @runtime.emit(:info, "# (no untracked files)")
+      num = Plumbing::Save.new(runtime).each_file { |fn| runtime.emit(:payload, fn) }
+      0 == num and runtime.emit(:info, "# (no untracked files)")
       true
     end
   end
@@ -81,7 +83,7 @@ module Skylab::GitStashUntracked
     def initialize runtime, request={}
       @dry_run = false
       request.each { |k, v| send("#{k}=", v) }
-      @runtime = runtime
+      @runtime = runtime or fail("where is runtime?")
     end
     attr_accessor :name
     attr_accessor :stashes
@@ -265,16 +267,20 @@ module Skylab::GitStashUntracked
     def call(path, &emit)
       File.directory?(path) or raise("not a directory: #{path}")
       each_path = ->(file) do
-        emit[:payload, '--- /dev/null']
-        emit[:payload, "+++ #{file.sub(/^\./, 'b')}"]
-        lines = File.read(file).split("\n", -1)
-        if '' == lines.last
-          lines.pop
-        else
-          # ...
+        begin
+          lines = File.read(file).split("\n", -1)
+          emit[:payload, '--- /dev/null']
+          emit[:payload, "+++ #{file.sub(/^\./, 'b')}"]
+          if '' == lines.last
+            lines.pop
+          else
+            # ...
+          end
+          emit[:payload, "@@ -0,0 +1,#{lines.count} @@"]
+          lines.each { |line| emit[:payload, "+#{line}"] }
+        rescue ArgumentError => e
+          emit[:error, "failed to hack a diff for file. binary file? (#{path})"]
         end
-        emit[:payload, "@@ -0,0 +1,#{lines.count} @@"]
-        lines.each { |line| emit[:payload, "+#{line}"] }
       end
       cd(path) do
         Open3.popen3('find . -type f') do |_, sout, serr|
@@ -387,6 +393,6 @@ end
 
 # in some cases write a ruby script at ~/bin/g-s-u that simply loads this file
 if File.basename(__FILE__) == File.basename($PROGRAM_NAME)
-  ::Skylab::GitStashUntracked::Porcelain.new{ on_all { |e| $stderr.puts e } }.invoke(ARGV)
+  ::Skylab::GitStashUntracked::Porcelain.new{ |o| o.on_all { |e| $stderr.puts e } }.invoke(ARGV)
 end
 

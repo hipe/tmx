@@ -1,25 +1,25 @@
 load File.expand_path('../../../script/git-stash-untracked', __FILE__)
 
-require File.expand_path('../../support', __FILE__)
+require File.expand_path('../../test-support', __FILE__)
 
 module ::Skylab::GitStashUntracked::Tests
   include ::Skylab
   TestSupport = ::Skylab::TestSupport
-  TMPDIR = TestSupport.tempdir('tmp/gsu', 1)
+  TMPDIR = TestSupport.tmpdir('tmp/gsu', 1)
   describe ::Skylab::GitStashUntracked do
     describe "has an action called" do
       def stub_popen3 str
         me = self
         Open3.stub(:popen3) do |cmd, block|
           me.cmd_spy.replace cmd
-          serr = TestSupport::MyStringIo.new('')
-          sout = TestSupport::MyStringIo.new(str)
+          serr = StringIO.new('')
+          sout = StringIO.new(str)
           block.call(nil, sout, serr)
         end
       end
       let :app do
         stderr = self.stderr
-        GitStashUntracked::Porcelain.new { on_all { |e| stderr.puts e } }
+        GitStashUntracked::Porcelain.new { |o| o.on_all { |e| stderr.puts e } }
       end
       let :cmd_spy do '' end
       let :runtime_stub do
@@ -28,14 +28,14 @@ module ::Skylab::GitStashUntracked::Tests
         o
       end
       let :stderr do
-        TestSupport::MyStringIo.new
+        StringIO.new
       end
       describe "status" do
         it "which lists untracked files" do
           stub_popen3("derpus\nnerpus/herpus")
           app.invoke %w(status)
           cmd_spy.should eql("git ls-files -o --exclude-standard")
-          stderr.to_s.should match(/nerpus\/herpus/)
+          stderr.string.should match(/nerpus\/herpus/)
         end
       end
       describe "save" do
@@ -51,7 +51,7 @@ module ::Skylab::GitStashUntracked::Tests
             mv dippy/doopy tmp/gsu/foo/dippy/doopy
             mv dippy/floopy tmp/gsu/foo/dippy/floopy
           HERE
-          stderr.to_s.should eql(str)
+          stderr.string.should eql(str)
         end
       end
       describe "list" do
@@ -65,10 +65,10 @@ module ::Skylab::GitStashUntracked::Tests
             alpha
             beta
           HERE
-          stderr.to_s.should eql(expected)
+          stderr.string.should eql(expected)
           stderr.truncate(0) ; stderr.rewind
           app.invoke ['list', '-s', "#{TMPDIR}/stashes"] # same thing but invoked though the porcelain
-          stderr.to_s.should eql(expected)
+          stderr.string.should eql(expected)
         end
       end
       describe "show" do
@@ -90,7 +90,7 @@ module ::Skylab::GitStashUntracked::Tests
           HERE
         end
         include ::Skylab::Porcelain::Styles # unstylize
-        it "by default does the --stat format", do
+        it "by default does the --stat format", {focus:true} do
           with_this_stash
           app.invoke %w(show derp -s).push(TMPDIR.join('stashes').to_s)
           expected = <<-HERE.unindent
@@ -98,7 +98,7 @@ module ::Skylab::GitStashUntracked::Tests
             flop/floop.tx | 4 ++++
             2 files changed, 6 insertions(+), 0 deletions(-)
           HERE
-          unstylize(stderr.to_s).should eql(expected)
+          unstylize(stderr.string).should eql(expected)
         end
         it "it can also do the --patch format" do
           with_this_stash
@@ -117,7 +117,7 @@ module ::Skylab::GitStashUntracked::Tests
             +foour
             +
           HERE
-          unstylize(stderr.to_s).should eql(expected)
+          unstylize(stderr.string).should eql(expected)
         end
       end
       describe "pop" do

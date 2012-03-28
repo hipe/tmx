@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby -w
+
+require File.expand_path('../../lib/skylab/tan-man/cli', __FILE__)
+
+Skylab::TanMan::Cli.new.invoke(ARGV)
+
