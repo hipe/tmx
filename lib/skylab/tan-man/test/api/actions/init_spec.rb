@@ -7,10 +7,7 @@ module Skylab::TanMan::TestSupport
     context "when you invoke a nonexistant action" do
       it "it gives you a list-like result whose first event is an error with a message" do
         events = api.invoke(:'not-an-action')
-        events.first.tap do |e|
-          e.tag.name.should eql(:error)
-          e.message.should match(/not an action: not-an-action/)
-        end
+        lone_error(events, /not an action: not-an-action/)
       end
     end
     context "as for init" do
@@ -31,7 +28,6 @@ module Skylab::TanMan::TestSupport
       context "with regards to working or not working" do
         before do
           TMPDIR.verbose!.prepare
-          TanMan::Api.global_conf_path { TMPDIR.join('tanrc') }
         end
         context "when the folder isn't initted" do
           it "works (with json formatting)" do
@@ -39,16 +35,16 @@ module Skylab::TanMan::TestSupport
             events.success?.should eql(true)
             event = events.json_data.first
             event[0].should eql(:info)
-            event[1].should match(%r{mkdir.+tanman/\.tanman})
+            event[1].should match(%r{mkdir.+tanman/local-conf.d})
             events = JSON.parse(JSON.pretty_generate(events))
             event = events.first
             event[0].should eql('info')
-            event[1].should match(%r{mkdir.+tanman/\.tanman})
+            event[1].should match(%r{mkdir.+tanman/local-conf.d})
           end
         end
         context "when the folder already initted" do
+          before { prepare_local_conf_dir }
           it "will gracefully give a notice" do
-            TMPDIR.mkdir('.tanman')
             events = api.invoke(:init, path: TMPDIR)
             events.size.should be_gte(1)
             events.success?.should eql(true)

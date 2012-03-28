@@ -14,16 +14,18 @@ module Skylab::TanMan
 
     def initialize
       super
-      @config = nil
       @singletons = Api::Singletons.new
+      @stderr = $stderr
       @stdout = $stdout
       if block_given?
         yield self
       else
-        on_all { |e| stdout.puts e.message }
+        on_out { |e| stdout.puts(e.touch!.message) }
+        on_all { |e| stderr.puts(e.touch!.message) unless e.touched? }
       end
     end
-    attr_accessor :stdout
+    attr_reader :singletons
+    attr_accessor :stderr, :stdout
   end
 
   class Cli::Action
@@ -62,16 +64,20 @@ module Skylab::TanMan
 
     attr_reader :runtime
     delegates_to :runtime, :stdout
+
+    def text_styler
+      runtime # @todo
+    end
   end
 
   module Cli::Actions
   end
 
   class Cli::Actions::Init < Cli::Action
-    desc "create the #{LOCAL_CONF_DIRNAME} directory"
+    desc "create the #{Api.local_conf_dirname} directory"
     option_syntax { |h| on('-n', '--dry-run', 'dry run.') { h[:dry_run] = true } }
     def execute path=nil, opts
-      api.invoke opts.merge(path: path, local_conf_dirname: LOCAL_CONF_DIRNAME)
+      api.invoke opts.merge(path: path, local_conf_dirname: Api.local_conf_dirname)
     end
   end
   module Cli::Actions::Remote
@@ -82,26 +88,51 @@ module Skylab::TanMan
   end
 
   class Cli::Actions::Remote::Add < Cli::Action
+    option_syntax do |h|
+      on('-g', '--global', "add it to the global config file.") { h[:global] = true }
+    end
     desc "add the remote."
-    def execute name, host
-      api.invoke name: name, host: host
+    def execute name, host, opts
+      args = opts.merge(name: name, host: host)
+      args[:resource] = args.delete(:global) ? :global : :local
+      b = api.invoke(args)
+      b == false and help(invite_only: true)
+      b
     end
   end
 
   class Cli::Actions::Remote::List < Cli::Action
     desc "list the remotes."
-    def execute
+    option_syntax do |h|
+      on('-v', '--verbose', "show more fields.") { h[:verbose] = true }
+    end
+    def execute opts
       require 'skylab/porcelain/table'
-      table = api.invoke or return false
-      Porcelain.table(table, separator: '  '){ |o| o.on_all { |e| emit(:out, e) } }
+      table = api.invoke(opts) or return false
+      Porcelain.table(table, separator: '  ') do |o|
+        o.field(:resource_label).format { |x| "(resource: #{x})" }
+        o.on_empty do |e|
+          e.touch!
+          n = table.num_resources_seen
+          emit(:info, "no remotes found in #{n} config file#{s n}")
+        end
+        o.on_all { |e| emit(:out, e) unless e.touched? }
+      end
       true
     end
   end
 
   class Cli::Actions::Remote::Rm < Cli::Action
     desc "remove the remote."
-    def execute remote_name
-      api.invoke remote_name: remote_name
+    option_syntax do |h|
+      on('-r', '--resource NAME', "which config file (e.g. global, local) (default: first found)") do |v|
+        h[:resource_name] = v
+      end
+    end
+    def execute remote_name, opts
+      b = api.invoke opts.merge(remote_name: remote_name)
+      b == false and help(invite_only: true)
+      b
     end
   end
 

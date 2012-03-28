@@ -4,9 +4,10 @@ module Skylab::TanMan
   class Api::Actions::Remote::Add < Api::Action
     attribute :host, required: true
     attribute :name, required: true
+    attribute :resource, default: :local, mutex_boolean_set: [:local, :global]
     def execute
-      config? or return
-      config.add_remote(name, host) or help(invite_only: true)
+      config.ready? or return
+      config.add_remote(name, host, resource)
     end
   end
 end

@@ -3,10 +3,10 @@ require 'fileutils'
 module Skylab::TanMan
   class Api::Actions::Init < Api::Action
     include ::FileUtils
-    attribute :dry_run, :boolean => true
-    attribute :local_conf_dirname, :required => true, :default => ->() { LOCAL_CONF_DIRNAME }
-    attribute :path, :pathname => true, :required => true, :default => ->(){ FileUtils.pwd }
-    emits :all, :error => :all, :info => :all, :skip => :info # etc
+    attribute :dry_run, boolean: true
+    attribute :local_conf_dirname, required: true, default: Api.local_conf_dirname
+    attribute :path, pathname: true, required: true, default: ->{ FileUtils.pwd }
+    emits :all, error: :all, info: :all, skip: :info # etc
     def dir
       @dir ||= path.join(local_conf_dirname)
     end

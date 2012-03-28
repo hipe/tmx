@@ -32,7 +32,8 @@ module Skylab::CodeMolester
     end
     alias_method :[]=, :set_value
     def initialize(*a, &b)
-      @content_string = @invalid_reason = @on_read = @on_write = @valid = nil
+
+      @content_string = @on_read = @on_write = @valid = nil
       b and b.call(self)
       a.last.kind_of?(Hash) and
         a.pop.each { |k, v| :path == k ? (a.unshift(v.to_s)) : send("#{k}=", v) }
@@ -52,16 +53,17 @@ module Skylab::CodeMolester
     def pretty
       ::Skylab::Face::PathTools.pretty_path(to_s)
     end
-    class OnRead < Skylab::PubSub::Emitter.new(:all, :error => :all, :notice => :all)
-      def error s ; emit(:error, s) ; false end
-    end
+    OnRead = Skylab::PubSub::Emitter.new(:all, :error => :all, :invalid => :error)
     alias_method :pathname_read, :read
     def read
       e = OnRead.new
       if block_given? then yield(e) else on_read.call(e) end
-      cntnt = super
+      cntnt = super(&nil)
       self.content = cntnt
-      valid? or return e.error(invalid_reason)
+      unless valid?
+        e.emit(:invalid, invalid_reason)
+        return false
+      end
       self
     end
     def unparse
@@ -69,7 +71,8 @@ module Skylab::CodeMolester
     end
     alias_method :content, :unparse
     class OnWrite < Skylab::PubSub::Emitter.new(:all, :error => :all, :notice => :all,
-      :before_edit => :notice, :after_edit => :notice, :before_create => :notice, :after_create => :notice)
+      :before_edit => :notice, :after_edit => :notice, :before_create => :notice, :after_create => :notice,
+      :no_change => :notice)
       def error msg
         emit :error, msg
         false
@@ -80,16 +83,20 @@ module Skylab::CodeMolester
       if block_given? then yield(e) else on_write.call(e) end
       bytes = nil
       if exist?
-        e.emit(:before_edit, "updating #{pretty}")
-        writable? or return e.error("cannot edit, file is not writable: #{pretty}")
-        open('w') { |fh| bytes = fh.write(content) }
-        e.emit(:after_edit, "updated #{pretty} (#{bytes} bytes)", bytes)
+        if pathname_read == content
+          e.emit(:no_change, "no change: #{pretty}")
+        else
+          e.emit(:before_edit) { { message: "updating #{pretty}", resource: self } }
+          writable? or return e.error("cannot edit, file is not writable: #{pretty}")
+          open('w') { |fh| bytes = fh.write(content) }
+          e.emit(:after_edit) { { message: "updated #{pretty} (#{bytes} bytes)", bytes: bytes } }
+        end
       else
-        e.emit(:before_create, "creating #{pretty}")
+        e.emit(:before_create) { { message: "creating #{pretty}", resource: self } }
         dirname.exist? or return e.error("parent directory does not exist, cannot write #{pretty}")
         dirname.writable? or return e.error("parent direcory is not writable, cannot write #{pretty}")
         open('w+') { |fh| bytes = fh.write(content) }
-        e.emit(:after_create, "created #{pretty} (#{bytes} bytes)", bytes)
+        e.emit(:after_create) { { message: "created #{pretty} (#{bytes} bytes)", bytes: bytes } }
       end
       bytes
     end

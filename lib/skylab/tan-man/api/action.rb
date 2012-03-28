@@ -5,8 +5,9 @@ module Skylab::TanMan
     extend Porcelain::AttributeDefiner
 
     include MyActionInstanceMethods
+    include Api::AdaptiveStyle
 
-    meta_attribute(*MetaAttributes[:boolean, :default, :pathname, :required, :regex])
+    meta_attribute(*MetaAttributes[:boolean, :default, :mutex_boolean_set,:pathname, :required, :regex])
 
     emits Bleeding::EVENT_GRAPH.merge(MY_EVENT_GRAPH)
     event_class Api::Event
@@ -26,6 +27,8 @@ module Skylab::TanMan
 
     attr_reader :runtime
 
+    delegates_to :runtime, :text_styler
+
     def update_attributes! h
       c0 = invalid_reasons_count
       h.each { |k, v| send("#{k}=", v) }
@@ -40,12 +43,11 @@ module Skylab::TanMan
     end
 
     def call runtime, request
-      new(runtime).tap do |transaction|
-        runtime.set_transaction_attributes(transaction, request) or return false
-        transaction.set_defaults_if_nil!
-        transaction.valid? or return false
-        return transaction.invoke
-      end
+      o = new(runtime)
+      runtime.set_transaction_attributes(o, request) or return false
+      o.set_defaults_if_nil!
+      o.valid? or return false
+      o.invoke
     end
   end
 end
