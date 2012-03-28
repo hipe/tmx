@@ -1,11 +1,10 @@
-require 'fileutils'
 require 'open3'
 require 'stringio'
-
 require File.expand_path('../test-support', __FILE__)
+require 'skylab/face/path-tools'
 
 module Skylab::TestSupport
-  class Tmpdir < ::Pathname
+  class Tmpdir < Skylab::Face::MyPathname
     include FileUtils
     def emit type, msg
       $stderr.puts msg
@@ -18,6 +17,10 @@ module Skylab::TestSupport
       @verbose = false
       @noop = false # no setter for now! b/c it introduces some issues
       opts and opts.each { |k, v| send("#{k}=", v) }
+    end
+    alias_method :fileutils_mkdir, :mkdir # the name 'fu_mkdir' is already used by FileUtils!
+    def mkdir path_end, *a
+      fileutils_mkdir(join(path_end), *a)
     end
     def patch str
       cd(to_s) do
@@ -33,6 +36,10 @@ module Skylab::TestSupport
         end
       end
     end
+    alias_method :fileutils_touch, :touch
+    def touch file
+      fileutils_touch(join(file), :verbose => @verbose, :noop => @noop)
+    end
     def touch_r files
       files.each do |file|
         dest_file = dest_dir = nil
@@ -44,7 +51,7 @@ module Skylab::TestSupport
           dest_file = dest_path
         end
         dest_dir.exist? or  mkdir_p(dest_dir, :verbose => @verbose, :noop => @noop)
-        dest_file and touch(dest_file, :verbose => @verbose, :noop => @noop)
+        dest_file and fileutils_touch(dest_file, :verbose => @verbose, :noop => @noop)
       end
       self
     end
@@ -55,7 +62,7 @@ module Skylab::TestSupport
       elsif ! dirname.exist?
         mkdir_p dirname, :verbose => @verbose, :noop => @noop
       end
-      mkdir to_s
+      fileutils_mkdir to_s
       self
     end
     attr_accessor :verbose

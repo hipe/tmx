@@ -5,20 +5,19 @@ module Skylab::TanMan
     extend Porcelain::AttributeDefiner
 
     include MyActionInstanceMethods
+    include Api::AdaptiveStyle
 
-    meta_attribute(*MetaAttributes[:boolean, :default, :pathname, :required, :regex])
+    meta_attribute(*MetaAttributes[:boolean, :default, :mutex_boolean_set,:pathname, :required, :regex])
 
-    emits :all, :error => :all, :info => :all, :skip => :info # etc
+    emits Bleeding::EVENT_GRAPH.merge(MY_EVENT_GRAPH)
+    event_class Api::Event
 
     delegates_to :class, :action_name
-
-    delegates_to :runtime, :config, :config?
 
     def initialize runtime
       my_action_init
       @runtime = runtime
       on_error { |e| add_invalid_reason e }
-      on_info { |e| e.message = "#{runtime.program_name} #{action_name}: #{e.message}" }
       on_all { |e| self.runtime.emit(e) }
     end
 
@@ -27,6 +26,8 @@ module Skylab::TanMan
     end
 
     attr_reader :runtime
+
+    delegates_to :runtime, :text_styler
 
     def update_attributes! h
       c0 = invalid_reasons_count
@@ -42,14 +43,11 @@ module Skylab::TanMan
     end
 
     def call runtime, request
-      new(runtime).tap do |transaction|
-        if request
-          transaction.update_attributes!(request) or return false
-        end
-        # transaction.set_defaults_if_nil!
-        transaction.valid? or return false
-        return transaction.invoke
-      end
+      o = new(runtime)
+      runtime.set_transaction_attributes(o, request) or return false
+      o.set_defaults_if_nil!
+      o.valid? or return false
+      o.invoke
     end
   end
 end

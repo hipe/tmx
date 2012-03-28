@@ -1,7 +1,8 @@
 require 'skylab/porcelain/bleeding' # just for delegates_to - ick?
 module Skylab::CodeMolester::Config
+  Bleeding = Skylab::Porcelain::Bleeding # do this only in one place
   class Sexp < ::Skylab::CodeMolester::Sexp
-    extend Skylab::Porcelain::Bleeding::DelegatesTo
+    extend Bleeding::DelegatesTo
     def build_comment_line line
       line = "# #{line.gsub(/[[:space:]#]+/, ' ').strip}\n" # could be improved
       S[:whitespace_line, '', S[:comment, line]]
@@ -35,6 +36,7 @@ module Skylab::CodeMolester::Config
     attr_accessor :root
   end
   class SectionsPseudohash < ValuesPseudohash
+    extend Bleeding::DelegatesTo
     def [] key
       detect { |i| key == i.item_name }
     end
@@ -44,6 +46,7 @@ module Skylab::CodeMolester::Config
       value.each { |k, v| sec[k] = v }
       value
     end
+    delegates_to :root, :remove
   end
   class ContentItemBranch < Sexp
     # note that for now this is hard-coded to assume string and not symbol keys!

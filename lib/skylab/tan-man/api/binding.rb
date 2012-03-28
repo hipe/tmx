@@ -5,40 +5,50 @@ module Skylab::TanMan
 
   require File.expand_path('../action', __FILE__)
 
-  class Api::Binding
-    extend Bleeding::DelegatesTo
-
-    def config
-      @config and return @config
-      require ROOT.join('models/config').to_s
-      @config = Models::Config.new(self, TanMan.conf_path).init
-    end
-    def config?
-      config and return true
-      error "sorry, failed to load config file subsystem :("
-    end
-    delegates_to :runtime, :emit, :error
-    def initialize runtime
-      @config = nil
-      @runtime = runtime
-    end
+  module Api::InvocationMethods
     def invoke action=nil, args=nil
       if args.nil? && Hash === action
         args = action
         action = nil
       end
-      Symbol === action and action = [action]
-      action ||= runtime.full_action_name_parts
-      require ROOT.join('api/actions', *action).to_s
-      modul = action.reduce(Api::Actions) do |mod, name|
-        /\A[-a-z]+\z/ =~ name or fail("invalid action name part: #{action.inspect}")
+      action ||= runtime.on_no_action_name
+      parts = (Array === action ? action : [action]).map do |part|
+        part = part.to_s
+        /\A[-a-z]+\z/ =~ part or return invalid("invalid action name part: #{part}")
+        part
+      end
+      path = ROOT.join('api/actions', *parts[0..-2], "#{parts.last}.rb")
+      path.exist? or return invalid("not an action: #{parts.join('/')}")
+      require path.to_s
+      const = parts.reduce(Api::Actions) do |mod, name|
         mod.const_get name.to_s.gsub(/(?:^|-)([a-z])/){ $1.upcase }
       end
-      modul.call(self, args)
+      const.call(self, args)
+    end
+    def set_transaction_attributes transaction, attributes
+      attributes or return true
+      transaction.update_attributes!(attributes)
+    end
+  end
+
+  class Api::Binding
+    extend Bleeding::DelegatesTo
+    include Api::InvocationMethods
+
+    delegates_to :runtime, :config, :emit, :error
+    def initialize runtime, opts=nil
+      @config = nil
+      @runtime = runtime
+      opts and opts.each { |k, v| send("#{k}=", v) }
+    end
+    def invalid msg
+      raise RuntimeError.new(msg)
     end
     delegates_to :runtime, :program_name
+    delegates_to :runtime, :root_runtime
     attr_reader :runtime
-    delegates_to :runtime, :stdout
+    delegates_to :root_runtime, :singletons
+    delegates_to :runtime, :stdout, :text_styler
   end
 end
 

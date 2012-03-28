@@ -3,15 +3,10 @@ module Skylab::TanMan
   end
   class Api::Actions::Remote::Rm < Api::Action
     attribute :remote_name, required: true
+    attribute :resource_name, mutex_boolean_set: [:local, :global]
     def execute
-      config? or return
-      unless remote = config.remotes.detect { |r| remote_name == r.name }
-        a = config.remotes.map { |r| "#{pre r.name}" }
-        b = error "couldn't find a remote named #{remote_name.inspect}"
-        emit :info, "#{s a, :no}known remote#{s a} #{s a, :is} #{oxford_comma(a, ' and ')}".strip << '.'
-        return b
-      end
-      !! config.remotes.remove(remote)
+      config.ready? or return
+      config.remove_remote(remote_name, resource_name) or false
     end
   end
 end

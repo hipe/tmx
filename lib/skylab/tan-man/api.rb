@@ -5,14 +5,16 @@ require 'skylab/porcelain/bleeding'
 require 'skylab/pub-sub/emitter'
 
 module Skylab::TanMan
+  Face = Skylab::Face
   Bleeding = Skylab::Porcelain::Bleeding
   Porcelain = Skylab::Porcelain
   PubSub = Skylab::PubSub
   TanMan = Skylab::TanMan
 
-  MY_EVENT_GRAPH = { :info => :all, :out => :all }
-  ROOT = Skylab::Face::MyPathname.new(File.expand_path('..', __FILE__))
-  VERBS = { is: ['exist', 'is', 'are'], no: ['no '] }
+  MY_EVENT_GRAPH = { :info => :all, :out => :all, :no_config_dir => :error, :skip => :info }
+  EVENT_GRAPH = Bleeding::EVENT_GRAPH.merge(MY_EVENT_GRAPH)
+
+  ROOT = Face::MyPathname.new(File.expand_path('..', __FILE__))
 
   module Api
   end
@@ -45,9 +47,30 @@ module Skylab::TanMan
     meta_attribute :default
   end
   module MetaAttributes::Default::InstanceMethods
-    def set_defaults!
-      self.class.attributes.select { |k, v| v.key?(:default) }.each do |k, v|
-        send("#{k}=", v[:default].respond_to?(:call) ? v[:default].call : v[:default])
+    def set_defaults_if_nil!
+      attribute_definer.attributes.select { |k, v| v.key?(:default) and send(k).nil? }.each do |k, h|
+        (val = h[:default]).respond_to?(:call) and ! h[:proc] and val = val.call
+        send("#{k}=", val)
+      end
+    end
+  end
+
+  module MetaAttributes::MutexBooleanSet extend Porcelain::AttributeDefiner
+    meta_attribute :mutex_boolean_set do |name, h|
+      set = h[:mutex_boolean_set]
+      alias_method(after = "#{name}_after_mutex_boolean_set=", "#{name}=")
+      define_method("#{name}=") do |value|
+        intern = String === value ? value.intern : value # always normalize strings for now, you cannot use them
+        if set.include?(intern)
+          send(after, intern)
+        else
+          error("#{name} cannot be #{value.inspect}.  It must be "<<
+            "#{Porcelain::En.oxford_comma(set.map { |o| o.to_s.inspect })}")
+          value
+        end
+      end
+      set.each do |intern|
+        define_method("#{intern}?") { intern == send(name) }
       end
     end
   end
@@ -56,7 +79,7 @@ module Skylab::TanMan
     meta_attribute :pathname do |name, _|
       alias_method(after = "#{name}_after_pathname=", "#{name}=")
       define_method("#{name}=") do |path|
-        send(after, path ? MyPathname.new(path.to_s) : path)
+        send(after, path ? Face::MyPathname.new(path.to_s) : path)
         path
       end
     end
@@ -90,13 +113,13 @@ module Skylab::TanMan
     end
   end
 
+  # @todo this requires a 'pre' formatter
   module MetaAttributes::Required extend Porcelain::AttributeDefiner
     meta_attribute :required
   end
   module MetaAttributes::Required::InstanceMethods
-    include Bleeding::Styles
     def required_ok?
-      if (a = self.class.attributes.map.select { |k, h| h[:required] && send(k).nil? }).size.nonzero?
+      if (a = attribute_definer.attributes.map.select { |k, h| h[:required] && send(k).nil? }).size.nonzero?
         error( "missing required attribute#{'s' if a.size != 1}: " <<
           "#{oxford_comma(a.map { |o| "#{pre o.first}" }, ' and ')}")
       else
@@ -105,24 +128,90 @@ module Skylab::TanMan
     end
   end
 
-  class << self
-    extend Porcelain::AttributeDefiner
-    meta_attribute(*MetaAttributes[:proc])
-    attribute :conf_path, :proc => true
+  module AttributeReflection
+    # once this settles down it will get pushed up @todo
   end
-  conf_path { "#{ENV['HOME']}/.tanrc" }
+  module AttributeReflection::InstanceMethods
+    def attributes
+      AttributeReflection::InstanceAttributeIterator.new(self)
+    end
+    def attribute_definer # @todo there is a hack you have to do if you are doing metaclass hacking
+      self.class
+    end
+  end
+  class AttributeReflection::InstanceAttributeIterator < ::Enumerator
+    def initialize obj
+      super() do |y|
+        attrs = obj.class.attributes
+        attrs.each do |k, h|
+          y << [k, obj.send(k)] # VERY experimental interface
+        end
+      end
+    end
+    def to_h
+      Hash[to_a]
+    end
+  end
 
+  class << Api
+    extend Porcelain::AttributeDefiner
+    meta_attribute(*MetaAttributes[:default, :proc])
+    include AttributeReflection::InstanceMethods
+    alias_method :attribute_definer, :singleton_class # @todo
+    attribute :global_conf_path, proc: true, default: ->{ "#{ENV['HOME']}/.tanman-config" }
+    attribute :local_conf_config_name, default: 'config'
+    attribute :local_conf_dirname, default: '.tanman'
+    attribute :local_conf_maxdepth, default: nil # @todo, with all of these etc
+    attribute :local_conf_startpath, proc: true, default: ->{ Face::MyPathname.pwd }
+  end
+  Api.set_defaults_if_nil!
+
+  VERBS = { is:   ['exist', 'is', 'are'],
+            no:   ['no ', 'the only '],
+            this: ['these', 'this', 'these'] }
+  module GlobalStyle
+    def oxford_comma *a
+      Porcelain::En.oxford_comma(*a)
+    end
+    def s a, v=nil # just one tiny hard to read hack
+      count = Numeric === a ? a : a.count
+      v.nil? and return( 1 == count ? '' : 's' )
+      VERBS[v][case count ; when 0 ; 0 ; when 1 ; 1 ; else 2 ; end]
+    end
+  end
+
+  module Api::AdaptiveStyle
+    include GlobalStyle
+    def pre str
+      runtime.text_styler.pre str # ick not sure
+    end
+  end
+
+  module Api::UniversalStyle
+    def pre str
+      "\"#{str}\""
+    end
+  end
 
   module MyActionInstanceMethods
     # (note: the question of what should be in a cli action and what
-    #  should be in an api action is an area of active exploration.)
+    #  should be in an api action and what should be a model controller
+    #  action is an area of active exploration.)
     #
 
-
     extend Bleeding::DelegatesTo
+    include AttributeReflection::InstanceMethods
+    include GlobalStyle
 
     def add_invalid_reason str
       (@invalid_reasons ||= []).push str
+    end
+
+    def config
+      @config ||= begin
+        require_relative 'models/config'
+        Models::Config::Controller.new(self)
+      end
     end
 
     def error msg
@@ -167,12 +256,8 @@ module Skylab::TanMan
     end
 
     def my_action_init
+      @config = nil
       @invalid_reasons ||= nil
-    end
-
-    def s a, v=nil # just one tiny hard to read hack
-      v.nil? and return( 1 == a.size ? '' : 's' )
-      VERBS[v][case a.count ; when 0 ; 0 ; when 1 ; 1 ; else 2 ; end]
     end
 
     def root_runtime
@@ -187,7 +272,67 @@ module Skylab::TanMan
       ! invalid_reasons?
     end
 
+    delegates_to :root_runtime, :singletons
+
     delegates_to :runtime, :stdout
+  end
+
+  class Api::Singletons
+    def clear_cache!
+      @config.clear_cache! if @config
+    end
+    def config
+      @config ||= begin
+        require_relative 'models/config'
+        Models::Config::Singleton.new
+      end
+    end
+    def initialize
+      @config = nil
+    end
+  end
+
+  @api = nil
+  class << self
+    def api
+      @api and return @api
+      require_relative 'api/runtime'
+      @api = Api::RootRuntime.new
+    end
+  end
+
+  module Api::Autoloader
+    # experimental: const_missing hax can suck, but we want to avoid the overhead of
+    # loading things like code-molester's config file parser unless we need it
+    def self.init mod
+      here = %r{^(.+)\.rb:\d+:in `}.match(caller[0])[1]
+      mod.singleton_class.send(:alias_method, :orig_const_missing, :const_missing)
+      mod.singleton_class.send(:define_method, :const_missing) do |const|
+        stem = const.to_s.gsub(/(?<=^|([a-z]))([A-Z])/) { "#{'-' if $1}#{$2.downcase}" }
+        require "#{here}/#{stem}"
+        const_get const
+      end
+    end
+  end
+
+  class Api::Event < PubSub::Event
+    # this is all very experimental and subject to change!
+
+    def is? sym
+      sym == tag.name or tag.ancestors.include?(sym)
+    end
+    def json_data
+      if Array === payload
+        [tag.name, *payload]
+      elsif Hash === payload
+        [tag.name, payload]
+      else
+        [tag.name]
+      end
+    end
+    def to_json *a
+      json_data.to_json(*a)
+    end
   end
 end
 
