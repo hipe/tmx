@@ -3,6 +3,7 @@ end
 
 module Skylab::Porcelain
   module En
+    extend self
     def oxford_comma a, ult = ' or ', sep = ', '
       (hsh = Hash.new(sep))[a.length - 1] = ult
       [a.first, * (1..(a.length-1)).map { |i| [ hsh[i], a[i] ] }.flatten].join

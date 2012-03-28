@@ -98,7 +98,9 @@ module Skylab::Porcelain::Table
     klass.send(:alias_method, :numeric?, :float?)
   end
 
-  class Column::ViewModel < Struct.new(:align, :index, :max_width_seen, :printf_format, :type_stats)
+  class Column::ViewModel < Struct.new(:align, :index, :max_width_seen, :printf_format, :type_stats,
+    :field_name, :formatter
+  )
     def align_left?
       align and return :left == align
       :left == (inferred_type || Column::STRING).align
@@ -106,6 +108,13 @@ module Skylab::Porcelain::Table
     def cel_renderer
       @cel_renderer and return @cel_renderer
       @cel_renderer = (inferred_type || STRING).build_cel_renderer(self)
+    end
+    def format &b
+      1 == b.arity or raise ArgumentError.new("formatter blocks must always take exactly one argument")
+      self.formatter = b
+    end
+    def _format_cel str
+      formatter ? formatter.call(str) : str.to_s
     end
     def initialize index, opts = nil
       @cel_renderer = @inferred_type = nil
@@ -168,7 +177,18 @@ module Skylab::Porcelain::Table
     end
     class OnTable < Struct.new(:head, :tail, :separator)
       extend ::Skylab::PubSub::Emitter
-        emits(:all, :info => :all, :empty => :info, :row => :all)
+      emits(:all, :info => :all, :empty => :info, :row => :all, :row_count => :data)
+
+      def field name
+        @fields[name] ||= Column::ViewModel.new(nil, field_name: name)
+      end
+      attr_reader :fields
+      def format_cel field_name, cel_value
+        fields[field_name] ? fields[field_name]._format_cel(cel_value) : cel_value
+      end
+      def initialize
+        @fields = {}
+      end
     end
     def table row_enumerator, opts=nil
       o = OnTable.new
@@ -183,10 +203,14 @@ module Skylab::Porcelain::Table
       row_enumerator.each do |col_enumerator|
         cache.push(row_cache = [])
         col_enumerator.each_with_index do |col, idx|
+          if Array === col && 2 == col.count
+            col = o.format_cel(*col)
+          end
           cols[idx].see(col)
           row_cache.push col
         end
       end
+      o.emit(:row_count) { { row_count: cache.size } }
       if cache.size.zero? then o.emit(:empty, '(empty)') else
         arr = cols.ordered.to_a # cache the results, it won't change
         cache.each do |row|

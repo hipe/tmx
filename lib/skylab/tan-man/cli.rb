@@ -1,154 +1,45 @@
-require File.expand_path('../..', __FILE__)
-require 'skylab/face/path-tools'
-require 'skylab/porcelain/attribute-definer'
-require 'skylab/porcelain/bleeding'
-require 'skylab/pub-sub/emitter'
+require File.expand_path('../api', __FILE__)
 
 module Skylab::TanMan
-  Bleeding = Skylab::Porcelain::Bleeding
-  Porcelain = Skylab::Porcelain
-  PubSub = Skylab::PubSub
-
-  CONF_PATH = ->() { "#{ENV['HOME']}/.tanrc" }
-  MY_GRAPH = { :info => :all, :out => :all }
-  ROOT = Skylab::Face::MyPathname.new(File.expand_path('..', __FILE__))
-
-  module Actions
-  end
-
-  module Models
-  end
-
-  module MetaAttributes
-  end
-
-  module ConfigMethods
-    def config
-      @config and return @config
-      require ROOT.join('models/config').to_s
-      @config = Models::Config.new(self, CONF_PATH).init
-    end
-
-    # loudly
-    def config?
-      config and return true
-      error "sorry, failed to load config file subsystem :("
-    end
-  end
-
-  module MyActionInstanceMethods
-    extend Bleeding::DelegatesTo
-
-    delegates_to :runtime, :config, :config?
-
-    def error msg
-      emit :error, msg
-      false
-    end
-  end
-
-  VERBS = { is: ['exist', 'is', 'are'], no: ['no '] }
-  module MyActionInstanceMethods
-    def s a, v=nil # just one tiny hard to read hack
-      v.nil? and return( 1 == a.size ? '' : 's' )
-      VERBS[v][case a.count ; when 0 ; 0 ; when 1 ; 1 ; else 2 ; end]
-    end
-  end
 
   module MyNamespaceInstanceMethods
     include MyActionInstanceMethods
   end
-  class << MetaAttributes
-    def all
-      constants.map { |k| const_get(k) }
-    end
-    def [](*a)
-      a.map do |k|
-        konst = k.to_s.gsub(/(?:^|([a-z])_)([a-z])/) { "#{$1}#{$2.upcase}" }.intern
-        const_get konst
-      end
-    end
-  end
-
-  module MetaAttributes::Boolean extend Porcelain::AttributeDefiner
-    meta_attribute :boolean do |name, meta|
-      alias_method "#{name}?", name
-    end
-  end
-
-  module MetaAttributes::Default extend Porcelain::AttributeDefiner
-    meta_attribute :default
-  end
-  module MetaAttributes::Default::InstanceMethods
-    def set_defaults!
-      self.class.attributes.select { |k, v| v.key?(:default) }.each do |k, v|
-        send("#{k}=", v[:default].respond_to?(:call) ? v[:default].call : v[:default])
-      end
-    end
-  end
-
-  module MetaAttributes::Pathname extend Porcelain::AttributeDefiner
-    meta_attribute :pathname do |name, _|
-      alias_method(after = "#{name}_after_pathname=", "#{name}=")
-      define_method("#{name}=") do |path|
-        send(after, path ? MyPathname.new(path.to_s) : path)
-        path
-      end
-    end
-  end
-
-  module MetaAttributes::Regex extend Porcelain::AttributeDefiner
-    meta_attribute :on_regex_fail
-    meta_attribute :regex do |name, meta|
-      alias_method(after = "#{name}_after_regex=", "#{name}=")
-      define_method("#{name}=") do |str|
-        if (re = meta[:regex]) =~ str
-          send(after, str)
-        else
-          error(meta[:on_regex_fail] || "#{str.inspect} did not match pattern for #{name}: /#{re.source}/")
-          str
-        end
-      end
-    end
-  end
-
-  module MetaAttributes::Required extend Porcelain::AttributeDefiner
-    meta_attribute :required
-  end
-  module MetaAttributes::Required::InstanceMethods
-    include Bleeding::Styles
-    def required_ok?
-      if (a = self.class.attributes.map.select { |k, h| h[:required] && send(k).nil? }).size.nonzero?
-        error( "missing required attribute#{'s' if a.size != 1}: " <<
-          "#{oxford_comma(a.map { |o| "#{pre o.first}" }, ' and ')}")
-      else
-        true
-      end
-    end
-  end
 
   class Cli < Bleeding::Runtime
     extend PubSub::Emitter
-    emits Bleeding::EVENT_GRAPH.merge(MY_GRAPH)
-    include ConfigMethods
+    emits EVENT_GRAPH
+
+    actions_module { self::Actions }
 
     def initialize
       super
-      @config = nil
+      @singletons = Api::Singletons.new
+      @stderr = $stderr
       @stdout = $stdout
-      on_all { |e| @stdout.puts e.payload.first }
+      if block_given?
+        yield self
+      else
+        on_out { |e| stdout.puts(e.touch!.message) }
+        on_all { |e| stderr.puts(e.touch!.message) unless e.touched? }
+      end
     end
-    attr_reader :stdout
+    attr_reader :singletons
+    attr_accessor :stderr, :stdout
   end
 
-  class MyAction
+  class Cli::Action
     extend Bleeding::Action
     extend Bleeding::DelegatesTo
-
     extend PubSub::Emitter
-    emits Bleeding::EVENT_GRAPH.merge(MY_GRAPH)
+
+    emits EVENT_GRAPH
 
     include MyActionInstanceMethods
+
+    alias_method :action_class, :class
+
+    delegates_to :action_class, :action_name
 
     def api
       @api and return @api
@@ -156,91 +47,104 @@ module Skylab::TanMan
       @api = Api::Binding.new(self)
     end
 
-    def format_error event
-      event.tap do |e|
-        if runtime.runtime
-          subj, verb, obj = [runtime.runtime.program_name, action.name, runtime.actions_module.name]
-        else
-          subj, verb = [runtime.program_name, action.name]
-        end
-        e.payload[0] = "#{subj} failed to #{verb}#{" #{obj}" if obj}: #{e.message}"
-      end
-    end
-
     def initialize runtime
       @api = nil
-      @invalid_reasons = []
       @runtime = runtime
-      on_error { |e| @invalid_reasons.push(format_error(e)) }
-      on_all   { |e| runtime.emit(e.type, *e.payload) }
+      my_action_init
+      on_no_config_dir do |e|
+        error "couldn't find #{e.touch!.dirname} in this or any parent directory: #{e.from.pretty}"
+        emit(:info, "(try #{pre "#{runtime.root_runtime.program_name} #{Cli::Actions::Init.syntax}"} to create it)")
+      end
+      on_info  { |e| e.message = "#{runtime.program_name} #{action_name}: #{e.message}" }
+      on_error { |e| add_invalid_reason( format_error e ) }
+      on_all   { |e| runtime.emit(e) unless e.touched? }
     end
+
+    alias_method :on_no_action_name, :full_action_name_parts
 
     attr_reader :runtime
     delegates_to :runtime, :stdout
 
-    def valid?
-      @invalid_reasons.size.nonzero? and return false
-      required_ok?
-      @invalid_reasons.size.zero?
+    def text_styler
+      runtime # @todo
     end
   end
 
-  module Actions::Remote
+  module Cli::Actions
+  end
+
+  class Cli::Actions::Init < Cli::Action
+    desc "create the #{Api.local_conf_dirname} directory"
+    option_syntax { |h| on('-n', '--dry-run', 'dry run.') { h[:dry_run] = true } }
+    def execute path=nil, opts
+      api.invoke opts.merge(path: path, local_conf_dirname: Api.local_conf_dirname)
+    end
+  end
+  module Cli::Actions::Remote
     extend Bleeding::Namespace
     include MyNamespaceInstanceMethods
     desc "manage remotes."
     summary { ["#{action_syntax} remotes"] }
   end
 
-  class Actions::Remote::Add < MyAction
+  class Cli::Actions::Remote::Add < Cli::Action
+    option_syntax do |h|
+      on('-g', '--global', "add it to the global config file.") { h[:global] = true }
+    end
     desc "add the remote."
-    def execute name, host
-      config? or return
-      config.add_remote(name, host) or help(invite_only: true)
+    def execute name, host, opts
+      args = opts.merge(name: name, host: host)
+      args[:resource] = args.delete(:global) ? :global : :local
+      b = api.invoke(args)
+      b == false and help(invite_only: true)
+      b
     end
   end
 
-  class Actions::Remote::List < MyAction
+  class Cli::Actions::Remote::List < Cli::Action
     desc "list the remotes."
-    def execute
-      config? or return
+    option_syntax do |h|
+      on('-v', '--verbose', "show more fields.") { h[:verbose] = true }
+    end
+    def execute opts
       require 'skylab/porcelain/table'
-      Porcelain.table(Enumerator.new do |y|
-        config.remotes.each do |r|
-          y << Enumerator.new do |yy|
-            yy << r.name
-            yy << r.url
-          end
+      table = api.invoke(opts) or return false
+      Porcelain.table(table, separator: '  ') do |o|
+        o.field(:resource_label).format { |x| "(resource: #{x})" }
+        o.on_empty do |e|
+          e.touch!
+          n = table.num_resources_seen
+          emit(:info, "no remotes found in #{n} config file#{s n}")
         end
-      end, :separator => '  ' ) {|o| o.on_all { |e| emit(:out, e) } }
+        o.on_all { |e| emit(:out, e) unless e.touched? }
+      end
       true
     end
   end
 
-  class Actions::Remote::Rm < MyAction
+  class Cli::Actions::Remote::Rm < Cli::Action
     desc "remove the remote."
-    def execute remote_name
-      config? or return
-      unless remote = config.remotes.detect { |r| remote_name == r.name }
-        a = config.remotes.map { |r| "#{pre r.name}" }
-        b = error "couldn't find a remote named #{remote_name.inspect}"
-        emit :info, "#{s a, :no}known remote#{s a} #{s a, :is} #{oxford_comma(a, ' and ')}".strip << '.'
-        return b
+    option_syntax do |h|
+      on('-r', '--resource NAME', "which config file (e.g. global, local) (default: first found)") do |v|
+        h[:resource_name] = v
       end
-      !! config.remotes.remove(remote)
+    end
+    def execute remote_name, opts
+      b = api.invoke opts.merge(remote_name: remote_name)
+      b == false and help(invite_only: true)
+      b
     end
   end
 
-  class Actions::Push < MyAction
+  class Cli::Actions::Push < Cli::Action
     desc "push any single file anywhere in the world."
     desc "(scp wrapper)"
     option_syntax do |h|
       on('-n', '--dry-run', 'dry run.') { h[:dry_run] = true }
     end
     def execute remote_name, file, opts
-      api.invoke(:push, opts.merge(remote: remote_name, file:file))
+      api.invoke opts.merge(remote: remote_name, file:file)
     end
   end
 end
-
 

@@ -21,6 +21,9 @@ module Skylab::Face
     end
   end
   class MyPathname < Pathname
+    def join *a
+      self.class.new(super(*a)) # awful! waiting for patch for ruby maybe?
+    end
     def pretty
       PathTools.pretty_path to_s
     end

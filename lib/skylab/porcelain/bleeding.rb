@@ -117,6 +117,7 @@ module Skylab::Porcelain::Bleeding
       emit :help, "#{hdr 'usage:'} #{program_name} #{action_syntax} [opts] [args]"
     end
     def namespace_init
+      @program_name ||= nil # !
     end
     def program_name
       "#{runtime.program_name} #{actions_module.name}" #!
@@ -225,14 +226,16 @@ module Skylab::Porcelain::Bleeding
   module ActionModuleMethods
     include Styles
     def action_module_init
+      @action_name = self.to_s.match(/^.+::([^:]+)$/)[1].gsub(/(?<=[a-z])([A-Z])/) { "-#{$1}" }.downcase
+      @actions_module_proc = nil
       @aliases = []
       @argument_syntax = ArgumentSyntax.new(self)
       @desc = nil
-      @name = self.to_s.match(/^.+::([^:]+)$/)[1].gsub(/(?<=[a-z])([A-Z])/) { "-#{$1}" }.downcase
       @option_syntax = OptionSyntax.new
       @summary = nil
       @visible = true
     end
+    attr_reader :action_name
     def aliases *a
       a.any? ? @aliases.concat(a) : @aliases
     end
@@ -248,7 +251,9 @@ module Skylab::Porcelain::Bleeding
     def self.extended mod
       mod.action_module_init
     end
-    attr_reader :name
+    def name
+      action_name # allows more flexibility than an alias
+    end
     def names
       [name, * @aliases]
     end
@@ -334,6 +339,7 @@ module Skylab::Porcelain::Bleeding
       @actions_module = namespace
       namespace_init
     end
+    delegates_to :actions_module, :name
   end
   class Runtime
     extend NamespaceModuleMethods
@@ -351,15 +357,23 @@ module Skylab::Porcelain::Bleeding
       callable.receiver.send(callable.name, *args)
     end
     def program_name
-      File.basename($PROGRAM_NAME)
+      @program_name || File.basename($PROGRAM_NAME)
     end
+    attr_writer :program_name
     def self.inherited mod
       mod.namespace_module_init
     end
   end
   class << Runtime
-    def actions_module
-      to_s.match(/^(.+)::[^:]+$/)[1].split('::').push('Actions').reduce(Object) { |m, o| m.const_get(o) }
+    def actions_module *a, &b
+      if a.size.nonzero? || b
+        a.size > 1 || (a.size > 0 && b) and raise ArgumentError.new('no')
+        @actions_module_proc = b || ->(){ a.first }
+      else
+        (@actions_module_proc ||= ->() do
+          to_s.match(/^(.+)::[^:]+$/)[1].split('::').push('Actions').reduce(Object) { |m, o| m.const_get(o) }
+        end).call
+      end
     end
   end
   module OfficiousActions

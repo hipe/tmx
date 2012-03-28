@@ -210,10 +210,10 @@ describe Skylab::PubSub::Emitter do
         c.values.should eql([2, 1, 1])
       end
     end
-    context 'A touch will happen automatically when a message is accessed ("to_s" is aliases to "message")' do
+    context 'A touch will NOT happen automatically when a message is accessed ("to_s" is aliases to "message")' do
+      let (:lines) { [] }
       it 'without touch check' do
         emitter.tap do |e|
-          lines = []
           e.on_informational { |e| lines << "inform:#{e}" }
           e.on_info          { |e| lines << "info:#{e}" }
           e.emit(:info, "A")
@@ -222,9 +222,16 @@ describe Skylab::PubSub::Emitter do
       end
       it 'with touch check' do
         emitter.tap do |e|
-          lines = []
           e.on_informational { |e| lines << "inform:#{e}" unless e.touched? }
           e.on_info          { |e| lines << "info:#{e}"   unless e.touched? }
+          e.emit(:info, "A")
+          lines.should eql(%w(info:A inform:A))
+        end
+      end
+      it 'but with an explicit touch' do
+        emitter.tap do |e|
+          e.on_informational { |e| lines << "inform:#{e.touch!}" unless e.touched? }
+          e.on_info          { |e| lines << "info:#{e.touch!}"   unless e.touched? }
           e.emit(:info, "A")
           lines.should eql(%w(info:A))
         end
@@ -291,7 +298,7 @@ describe Skylab::PubSub::Emitter do
     let(:shorthand_class) do
       Skylab::PubSub::Emitter.new(:all, :error => :all)
     end
-    it 'which works', {f:true} do
+    it 'which works' do
       e = normal_class.new
       s = nil
       e.on_one { |x| s = x.to_s }
@@ -301,6 +308,16 @@ describe Skylab::PubSub::Emitter do
       e.on_all { |e| s = e.to_s }
       e.emit(:error, 'serr')
       s.should eql('serr')
+    end
+  end
+  context "Will graphs defined in a parent class descend to child?", {f:true} do
+    let(:child_class) { Class.new(klass) }
+    it "YES" do
+      ok = nil
+      o = child_class.new
+      o.on_informational { |e| ok = e }
+      o.emit(:info, "wankers")
+      ok.message.should eql('wankers')
     end
   end
 end
