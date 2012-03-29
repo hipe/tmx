@@ -15,7 +15,14 @@ module Skylab::TanMan
     end
     attr_accessor :local
     protected :'local='
-    def ready? e
+    class OnReady < PubSub::Emitter.new(:all,
+      not_ready: :all, no_config_dir: :not_ready
+    )
+      attr_accessor :on_read_global
+      attr_accessor :on_read_local
+    end
+    def ready? &b
+      e = OnReady.new(b)
       local and return true
       maxdepth = Api.local_conf_maxdepth # nil ok, zero means noop
       currdepth = 0

@@ -4,7 +4,7 @@ module Skylab::TanMan
     include Api::AdaptiveStyle
     def add_remote name, url, resource_name
       require_relative '../remote'
-      config_singleton.ready?(self) or return false
+      ready? or return false
       resource = config_singleton.send(resource_name)
       remote = Models::Remote.new.edit(name: name, url: url) { |o| o.on_error { |e| emit(e) } } # experimental pattern
       remote or return false
@@ -32,12 +32,15 @@ module Skylab::TanMan
         o.prepend_comment "created #{Time.now.localtime} by tanman"
       end
     end
-    def on_read_global
-      ->(o) { o.on_invalid { |e| error e } }
-    end
-    alias_method :on_read_local, :on_read_global
     def ready?
-      config_singleton.ready? self
+      config_singleton.ready? do |o|
+        o.on_no_config_dir do |e|
+          emit(:no_config_dir) { e.payload } # this line is critical, and confusing!
+          # we need to re-emit a new event object with the same event type (symbol)
+          # but a different graph @todo after other refactoring decide whether or not this is acceptable.
+        end # !.. up to ..
+        o.on_read_global = o.on_read_local = ->(oo) { oo.on_invalid { |e| error e } }
+      end
     end
     def remotes
       @remotes ||= Models::Config::Remotes.new(config_singleton)
