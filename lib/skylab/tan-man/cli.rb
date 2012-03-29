@@ -23,6 +23,7 @@ module Skylab::TanMan
     def root_runtime ; self end
     attr_reader :singletons
     attr_accessor :stderr, :stdout
+    def text_styler ; self end
   end
 
   class Cli::Action
