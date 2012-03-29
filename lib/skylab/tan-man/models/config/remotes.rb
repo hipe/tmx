@@ -38,7 +38,7 @@ module Skylab::TanMan
           o.on_all { |e| controller.emit(e) unless e.touched? }
         end
       else
-        # all of this slop etc @todo.  we "borrow" controller just to make a pretty message
+        # all of this slop etc @todo{at:.2}.  we "borrow" controller just to make a pretty message
         controller.instance_eval do
           a = remotes.map { |r| "#{pre r.name}" } ; rc = resources_count
           error "couldn't find a remote named #{remote_name.inspect}"

@@ -31,12 +31,13 @@ module Skylab::TanMan
       true
     end
 
-    # @todo abstract or eliminate
+    # @todo{after:.3} abstract or eliminate
     OnEdit = PubSub::Emitter.new(:all, error: :all)
     def edit attrs, &b
       errors_count = 0
       self.error_emitter = OnEdit.new(b, ->(o) { o.on_error { errors_count += 1 } } )
       attrs.each { |k, v| send("#{k}=", v) } # assume events are emitted on errors
+      self.error_emitter = nil
       0 == errors_count ? self : false
     end
 

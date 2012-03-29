@@ -1,7 +1,8 @@
 module Skylab::TanMan
   class Models::Config::Singleton
+    # warning: consider strongly all of the ramifications of calling this
     def clear_cache!
-      @global = @local = nil # @todo this is dodgy as fuck
+      @global = @local = nil
     end
     def global
       @global and return @global
@@ -11,7 +12,7 @@ module Skylab::TanMan
       ) # there is no guarantee that there isn't a sytax error!
     end
     def initialize
-      @global = @local = nil
+      clear_cache!
     end
     attr_accessor :local
     protected :'local='

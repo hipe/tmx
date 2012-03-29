@@ -83,9 +83,7 @@ module Skylab::TanMan
 
     attr_reader :runtime
 
-    def text_styler
-      runtime # @todo
-    end
+    delegates_to :runtime, :text_styler
   end
 
   module Cli::Actions
@@ -101,7 +99,6 @@ module Skylab::TanMan
   module Cli::Actions::Remote
     extend Bleeding::Namespace
     include Api::RuntimeExtensions
-    # include CliActionAndNamespaceInstanceMethods
     desc "manage remotes."
     summary { ["#{action_syntax} remotes"] }
   end

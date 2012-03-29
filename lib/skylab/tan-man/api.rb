@@ -113,7 +113,10 @@ module Skylab::TanMan
     end
   end
 
-  # @todo this requires a 'pre' formatter
+  # @note: this requires that the object define an attribute_definer that responds to attributes()
+  # and it requires an error_emitter and it requires the styler methods: oxford_comma, pre.
+  # A required attribute is considered as not provided IFF it returns nil.
+  #
   module MetaAttributes::Required extend Porcelain::AttributeDefiner
     meta_attribute :required
   end
@@ -129,13 +132,20 @@ module Skylab::TanMan
   end
 
   module AttributeReflection
-    # once this settles down it will get pushed up @todo
+    # once this settles down it will get pushed up @todo{after:.3}
   end
   module AttributeReflection::InstanceMethods
     def attributes
       AttributeReflection::InstanceAttributeIterator.new(self)
     end
-    def attribute_definer # @todo there is a hack you have to do if you are doing metaclass hacking
+
+    # @note: the default attribute definer for a typical object is its ordinary class.
+    # In some cases -- e.g. if you are dealing with a class or module object and want
+    # to use attribute definer for *that* -- you will want to redefine this method
+    # to return the singleton class instead, for reflection to work (which is required
+    # for some kind of meta-attribute setters, etc)
+    #
+    def attribute_definer
       self.class
     end
   end
@@ -157,11 +167,12 @@ module Skylab::TanMan
     extend Porcelain::AttributeDefiner
     meta_attribute(*MetaAttributes[:default, :proc])
     include AttributeReflection::InstanceMethods
-    alias_method :attribute_definer, :singleton_class # @todo
+    alias_method :attribute_definer, :singleton_class # @experimental:
+    # this means that the objects will no longer use their class as the attribute_definer
     attribute :global_conf_path, proc: true, default: ->{ "#{ENV['HOME']}/.tanman-config" }
     attribute :local_conf_config_name, default: 'config'
     attribute :local_conf_dirname, default: '.tanman'
-    attribute :local_conf_maxdepth, default: nil # @todo, with all of these etc
+    attribute :local_conf_maxdepth, default: nil # meaningful (and didactic) nil
     attribute :local_conf_startpath, proc: true, default: ->{ Face::MyPathname.pwd }
   end
   Api.set_defaults_if_nil!

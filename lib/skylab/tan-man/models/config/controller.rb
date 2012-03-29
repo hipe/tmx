@@ -37,7 +37,7 @@ module Skylab::TanMan
         o.on_no_config_dir do |e|
           emit(:no_config_dir) { e.payload } # this line is critical, and confusing!
           # we need to re-emit a new event object with the same event type (symbol)
-          # but a different graph @todo after other refactoring decide whether or not this is acceptable.
+          # but a different graph @todo{after:.3} decide whether or not this is acceptable.
         end # !.. up to ..
         o.on_read_global = o.on_read_local = ->(oo) { oo.on_invalid { |e| error e } }
       end

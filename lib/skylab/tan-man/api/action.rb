@@ -4,7 +4,6 @@ module Skylab::TanMan
     extend PubSub::Emitter
     extend Porcelain::AttributeDefiner
 
-    # include MyActionInstanceMethods
     include Api::RuntimeExtensions
     include AttributeReflection::InstanceMethods
     include Api::AdaptiveStyle
@@ -24,7 +23,6 @@ module Skylab::TanMan
     end
 
     def error msg
-      # add_invalid_reason msg @todo
       emit :error, msg
       false
     end
