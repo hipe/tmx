@@ -192,10 +192,19 @@ module Skylab::TanMan
   end
 
   module Api::AdaptiveStyle
+    # Simply provides convenience methods that are shorthand wrappers
+    # for the below style methods, for whose implementation text_styler()
+    # is relied up.
+    #
+    # Because the including module relies upon the text_styler() for
+    # the implementations and the text_styler() may be a variety of
+    # different implementations based on the root runtime, for e.g.
+    # this is considered to be the implementation for "adaptive style."
+    #
+    extend Bleeding::DelegatesTo
     include GlobalStyle
-    def pre str
-      runtime.text_styler.pre str # ick not sure
-    end
+
+    delegates_to :text_styler, :pre
   end
 
   module Api::UniversalStyle
@@ -205,12 +214,10 @@ module Skylab::TanMan
   end
 
   module Api::RuntimeExtensions
+    extend Bleeding::DelegatesTo
     include GlobalStyle
     def add_invalid_reason mixed
       (@invalid_reasons ||= []).push mixed
-    end
-    def stdout
-      runtime.stdout # yeah
     end
     def root_runtime
       if runtime
@@ -219,6 +226,7 @@ module Skylab::TanMan
         self
       end
     end
+    delegates_to :runtime, :stdout, :text_styler
   end
 
   class Api::Singletons

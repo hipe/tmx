@@ -46,7 +46,21 @@ module Skylab::TanMan
       @remotes ||= Models::Config::Remotes.new(config_singleton)
     end
     def remove_remote remote_name, resource_name
-      remotes.remove(remote_name, resource_name, self)
+      remotes.remove(remote_name, resource_name) do |o|
+        o.on_write = ->(e) { write_resource e.touch!.resource }
+        o.on_all = ->(e) { emit(e) unless e.touched? }
+        o.on_remote_not_found do |e|
+          error "couldn't find a remote named #{e.remote_name.inspect}"
+          a = remotes.map { |r| pre r.name }
+          rc = e.resources_count
+          available = [
+            "#{s a, :no}known remote#{s a} #{s a, :is} #{oxford_comma(a, ' and ')}".strip,
+            " in #{s rc, :this}#{" #{rc}" unless 1==rc} searched config resource#{s rc}."
+          ].join('')
+          e.touch!
+          emit(:info, available)
+        end
+      end
     end
     attr_reader :runtime
     def write_resource resource
@@ -68,6 +82,7 @@ module Skylab::TanMan
         o.on_all { |e| emit(:info, e.message) unless e.touched? }
       end
     end
+    delegates_to :runtime, :text_styler
   end
 end
 

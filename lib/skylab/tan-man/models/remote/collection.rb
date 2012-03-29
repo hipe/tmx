@@ -21,7 +21,7 @@ module Skylab::TanMan
     end
     OnRemove = PubSub::Emitter.new(:all, :error => :all, :info => :all, :write => :all)
     def remove remote, &on_info
-      on_info.call(e = OnRemove.new)
+      e = OnRemove.new(on_info)
       section_name = remote.sexp.section_name
       found = resource.sections.detect { |s| section_name == s.section_name }
       found or return e.error("expected section not found: [#{section_name}]")
