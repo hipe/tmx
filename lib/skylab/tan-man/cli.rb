@@ -2,10 +2,6 @@ require File.expand_path('../api', __FILE__)
 
 module Skylab::TanMan
 
-  module MyNamespaceInstanceMethods
-    include MyActionInstanceMethods
-  end
-
   class Cli < Bleeding::Runtime
     extend PubSub::Emitter
     emits EVENT_GRAPH
@@ -24,6 +20,7 @@ module Skylab::TanMan
         on_all { |e| stderr.puts(e.touch!.message) unless e.touched? }
       end
     end
+    def root_runtime ; self end
     attr_reader :singletons
     attr_accessor :stderr, :stdout
   end
@@ -33,26 +30,48 @@ module Skylab::TanMan
     extend Bleeding::DelegatesTo
     extend PubSub::Emitter
 
-    emits EVENT_GRAPH
+    include Api::RuntimeExtensions
 
-    include MyActionInstanceMethods
+    emits EVENT_GRAPH
 
     alias_method :action_class, :class
 
     delegates_to :action_class, :action_name
 
     def api
-      @api and return @api
-      require File.expand_path('../api/binding', __FILE__)
-      @api = Api::Binding.new(self)
+      @api ||= begin
+        require_relative 'api/binding'
+        Api::Binding.new(self)
+      end
+    end
+
+    def format_error event
+      event.tap do |e|
+        if runtime.runtime
+          subj, verb, obj = [runtime.runtime.program_name, action.name, runtime.actions_module.name]
+        else
+          subj, verb = [runtime.program_name, action.name]
+        end
+        e.message = "#{subj} failed to #{verb}#{" #{obj}" if obj}: #{e.message}"
+      end
+    end
+
+    def full_action_name_parts
+      a = [action.name]
+      root_id = root_runtime.object_id
+      current = self
+      until root_id == current.runtime.object_id
+        current = current.runtime
+        a.push current.name
+      end
+      a.reverse
     end
 
     def initialize runtime
       @api = nil
       @runtime = runtime
-      my_action_init
       on_no_config_dir do |e|
-        error "couldn't find #{e.touch!.dirname} in this or any parent directory: #{e.from.pretty}"
+        emit(:error, "couldn't find #{e.touch!.dirname} in this or any parent directory: #{e.from.pretty}")
         emit(:info, "(try #{pre "#{runtime.root_runtime.program_name} #{Cli::Actions::Init.syntax}"} to create it)")
       end
       on_info  { |e| e.message = "#{runtime.program_name} #{action_name}: #{e.message}" }
@@ -63,7 +82,6 @@ module Skylab::TanMan
     alias_method :on_no_action_name, :full_action_name_parts
 
     attr_reader :runtime
-    delegates_to :runtime, :stdout
 
     def text_styler
       runtime # @todo
@@ -82,7 +100,8 @@ module Skylab::TanMan
   end
   module Cli::Actions::Remote
     extend Bleeding::Namespace
-    include MyNamespaceInstanceMethods
+    include Api::RuntimeExtensions
+    # include CliActionAndNamespaceInstanceMethods
     desc "manage remotes."
     summary { ["#{action_syntax} remotes"] }
   end

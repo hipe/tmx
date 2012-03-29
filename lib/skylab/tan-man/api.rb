@@ -64,7 +64,7 @@ module Skylab::TanMan
         if set.include?(intern)
           send(after, intern)
         else
-          error("#{name} cannot be #{value.inspect}.  It must be "<<
+          error_emitter.error("#{name} cannot be #{value.inspect}.  It must be "<<
             "#{Porcelain::En.oxford_comma(set.map { |o| o.to_s.inspect })}")
           value
         end
@@ -106,7 +106,7 @@ module Skylab::TanMan
         if (re = meta[:regex]) =~ str
           send(after, str)
         else
-          error(meta[:on_regex_fail] || "#{str.inspect} did not match pattern for #{name}: /#{re.source}/")
+          error_emitter.error(meta[:on_regex_fail] || "#{str.inspect} did not match pattern for #{name}: /#{re.source}/")
           str
         end
       end
@@ -120,7 +120,7 @@ module Skylab::TanMan
   module MetaAttributes::Required::InstanceMethods
     def required_ok?
       if (a = attribute_definer.attributes.map.select { |k, h| h[:required] && send(k).nil? }).size.nonzero?
-        error( "missing required attribute#{'s' if a.size != 1}: " <<
+        error_emitter.error( "missing required attribute#{'s' if a.size != 1}: " <<
           "#{oxford_comma(a.map { |o| "#{pre o.first}" }, ' and ')}")
       else
         true
@@ -193,88 +193,21 @@ module Skylab::TanMan
     end
   end
 
-  module MyActionInstanceMethods
-    # (note: the question of what should be in a cli action and what
-    #  should be in an api action and what should be a model controller
-    #  action is an area of active exploration.)
-    #
-
-    extend Bleeding::DelegatesTo
-    include AttributeReflection::InstanceMethods
+  module Api::RuntimeExtensions
     include GlobalStyle
-
-    def add_invalid_reason str
-      (@invalid_reasons ||= []).push str
+    def add_invalid_reason mixed
+      (@invalid_reasons ||= []).push mixed
     end
-
-    def config
-      @config ||= begin
-        require_relative 'models/config'
-        Models::Config::Controller.new(self)
-      end
+    def stdout
+      runtime.stdout # yeah
     end
-
-    def error msg
-      add_invalid_reason msg
-      emit :error, msg
-      false
-    end
-    def skip msg
-      emit :skip, msg
-      nil
-    end
-
-    def format_error event
-      event.tap do |e|
-        if runtime.runtime
-          subj, verb, obj = [runtime.runtime.program_name, action.name, runtime.actions_module.name]
-        else
-          subj, verb = [runtime.program_name, action.name]
-        end
-        e.message = "#{subj} failed to #{verb}#{" #{obj}" if obj}: #{e.message}"
-      end
-    end
-
-    # experimental, might get pushed up to porcelain @todo
-    def full_action_name_parts
-      a = [action.name]
-      root_id = root_runtime.object_id
-      current = self
-      until root_id == current.runtime.object_id
-        current = current.runtime
-        a.push current.name
-      end
-      a.reverse
-    end
-
-    def invalid_reasons?
-      @invalid_reasons && @invalid_reasons.size.nonzero?
-    end
-
-    def invalid_reasons_count
-      @invalid_reasons ? @invalid_reasons.count : 0
-    end
-
-    def my_action_init
-      @config = nil
-      @invalid_reasons ||= nil
-    end
-
     def root_runtime
-      runtime ? ( runtime.respond_to?(:root_runtime) ? runtime.root_runtime : runtime ) : self
+      if runtime
+        runtime.root_runtime
+      else
+        self
+      end
     end
-
-    attr_reader :runtime
-
-    def valid?
-      invalid_reasons? and return false
-      required_ok? # more hooking required
-      ! invalid_reasons?
-    end
-
-    delegates_to :root_runtime, :singletons
-
-    delegates_to :runtime, :stdout
   end
 
   class Api::Singletons

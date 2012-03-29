@@ -2,18 +2,19 @@ module Skylab::TanMan
   class Models::Config::Controller
     extend Bleeding::DelegatesTo
     include Api::AdaptiveStyle
-    def add_remote name, host, resource_name
+    def add_remote name, url, resource_name
       require_relative '../remote'
       config_singleton.ready?(self) or return false
       resource = config_singleton.send(resource_name)
-      r = Models::Remote.unbound(self, name, host) or return false
-      name = r.name # normalization maybe
+      remote = Models::Remote.new.edit(name: name, url: url) { |o| o.on_error { |e| emit(e) } } # experimental pattern
+      remote or return false
+      name = remote.name # normalization maybe
       collection = resource.remotes
-      if r2 = collection.detect { |rr| name == rr.name }
+      if collection.detect { |r| name == r.name }
         emit(:info, "remote #{name.inspect} already exists.")
         true
       else
-        collection.push r
+        collection.push remote
         write_resource resource
       end
     end
@@ -53,12 +54,12 @@ module Skylab::TanMan
       if ! resource.exist?
         load_default_content(resource)
       end
-      stdout = runtime.stdout # sucky
+      out = runtime.stdout # sucky
       resource.write do |o|
         o.on_error { |e| emit(e) ; return false }
-        o.on_before_edit { |e| stdout.write(e.touch!.message) }
-        o.on_before_create { |e| stdout.write(e.touch!.message) }
-        b = ->(e){ stdout.puts(" .. done (#{e.touch!.bytes} bytes.)") }
+        o.on_before_edit { |e| out.write(e.touch!.message) }
+        o.on_before_create { |e| out.write(e.touch!.message) }
+        b = ->(e){ out.puts(" .. done (#{e.touch!.bytes} bytes.)") }
         o.on_after_edit(&b)
         o.on_after_create(&b)
         o.on_all { |e| emit(:info, e.message) unless e.touched? }

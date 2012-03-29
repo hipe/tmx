@@ -4,7 +4,9 @@ module Skylab::TanMan
     extend PubSub::Emitter
     extend Porcelain::AttributeDefiner
 
-    include MyActionInstanceMethods
+    # include MyActionInstanceMethods
+    include Api::RuntimeExtensions
+    include AttributeReflection::InstanceMethods
     include Api::AdaptiveStyle
 
     meta_attribute(*MetaAttributes[:boolean, :default, :mutex_boolean_set,:pathname, :required, :regex])
@@ -14,11 +16,33 @@ module Skylab::TanMan
 
     delegates_to :class, :action_name
 
+    def config
+      @config ||= begin
+        require_relative '../models/config'
+        Models::Config::Controller.new(self)
+      end
+    end
+
+    def error msg
+      # add_invalid_reason msg @todo
+      emit :error, msg
+      false
+    end
+
+    def error_emitter ; self end # meta attributes compat
+
     def initialize runtime
-      my_action_init
       @runtime = runtime
       on_error { |e| add_invalid_reason e }
       on_all { |e| self.runtime.emit(e) }
+    end
+
+    def invalid_reasons?
+      invalid_reasons_count.nonzero?
+    end
+
+    def invalid_reasons_count
+      (@invalid_reasons ||= nil) ? @invalid_reasons.count : 0
     end
 
     def invoke
@@ -27,12 +51,27 @@ module Skylab::TanMan
 
     attr_reader :runtime
 
+    delegates_to :root_runtime, :singletons
+
+    delegates_to :runtime, :stdout
+
     delegates_to :runtime, :text_styler
+
+    def skip msg
+      emit :skip, msg
+      nil
+    end
 
     def update_attributes! h
       c0 = invalid_reasons_count
       h.each { |k, v| send("#{k}=", v) }
       c0 >= invalid_reasons_count
+    end
+
+    def valid?
+      invalid_reasons? and return false
+      required_ok? # more hooking required
+      ! invalid_reasons?
     end
   end
 

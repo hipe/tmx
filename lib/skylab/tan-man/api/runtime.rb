@@ -64,6 +64,7 @@ module Skylab::TanMan
       map(&:json_data)
     end
     attr_accessor :runtime
+    alias_method :root_runtime, :runtime
     def set_transaction_attributes transaction, attributes
       attributes or return true
       if (bad = attributes.keys - transaction.class.attributes.keys).any?
