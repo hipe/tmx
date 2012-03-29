@@ -1,3 +1,4 @@
+[#094] 2012-03-28 @open: tanman: refactor: this shit is a mess (still).
 [#093] 2012-03-28 @open: tanman: status
 [#092] 2012-03-19 @closed: tanman: refactor into api, test all
 [#091] 2012-03-17 @closed: tanman: local .tan
