@@ -28,7 +28,7 @@ module Skylab::TestSupport
     def mkdir path_end, opts=nil
       my_opts = { noop: @noop, verbose: @verbose }
       opts and my_opts.merge(opts)
-      fileutils_mkdir(join(path_end), opts)
+      fileutils_mkdir(join(path_end), my_opts)
     end
     def patch str
       cd(to_s) do
