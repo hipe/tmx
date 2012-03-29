@@ -1,7 +1,8 @@
 module Skylab::TanMan
   class Models::Config::Singleton
+    # warning: consider strongly all of the ramifications of calling this
     def clear_cache!
-      @global = @local = nil # @todo this is dodgy as fuck
+      @global = @local = nil
     end
     def global
       @global and return @global
@@ -11,11 +12,18 @@ module Skylab::TanMan
       ) # there is no guarantee that there isn't a sytax error!
     end
     def initialize
-      @global = @local = nil
+      clear_cache!
     end
     attr_accessor :local
     protected :'local='
-    def ready? e
+    class OnReady < PubSub::Emitter.new(:all,
+      not_ready: :all, no_config_dir: :not_ready
+    )
+      attr_accessor :on_read_global
+      attr_accessor :on_read_local
+    end
+    def ready? &b
+      e = OnReady.new(b)
       local and return true
       maxdepth = Api.local_conf_maxdepth # nil ok, zero means noop
       currdepth = 0

@@ -44,6 +44,10 @@ module Skylab::PubSub
           emit(:error, msg)
           false
         end
+        # experimental interface for default constructor: multiple lambdas
+        def initialize *blocks
+          blocks.each { |b| b.call(self) }
+        end
         self
       end
     end
@@ -57,6 +61,9 @@ module Skylab::PubSub
       super(payload, tag, false)
     end
     alias_method :event_id, :object_id
+    def is? sym
+      sym == tag.name or tag.ancestors.include?(sym)
+    end
     def message
       payload.map(&:to_s).join(' ')
     end
