@@ -63,7 +63,7 @@ module Skylab::Dependency::TestSupport
           subject.invoke(context)
           fingers[:shell].grep(/some-file/).count.should be 1
           fingers[:shell].grep(/another-file/).count.should be 1
-          ohai = Dir.new(BUILD_DIR).map { |x| x }
+          # ohai = Dir.new(BUILD_DIR).map { |x| x }
           build_dir_files.join(' ').should eql('another-file.txt some-file.txt')
         end
       end

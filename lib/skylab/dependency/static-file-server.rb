@@ -1,17 +1,16 @@
 require 'rack'
 require 'adsf'
 require 'fileutils'
-require File.expand_path('../..', __FILE__)
+require_relative('..')
 require 'skylab/pub-sub/emitter'
 
-module Skylab ; end
 
 module Skylab::Dependency
   class StaticFileServer
     DEFAULT_PORT = 1324
     include FileUtils
     extend ::Skylab::PubSub::Emitter
-    emits :all, :info => :all
+    emits :all, :info => :all, :warning => :all
     def determine_rack_handler
       if h = @rack_handler
         handler = Rack::Handler.get(h) or fail(
@@ -42,14 +41,26 @@ module Skylab::Dependency
     def fu_output_message msg # see fileutils.rb
       emit :info, msg
     end
-    def initialize opts=nil
-      block_given? and yield(self)
-      event_listeners[:all] ||= [lambda { |e| $stderr.puts e }]
-      case opts
-      when String, Pathname ; opts = { :document_root => opts }
+    def initialize *args
+      opts = Hash === args.last ? args.pop.dup : {}
+      args.size.nonzero? and opts[:document_root] = args.shift
+      args.size.nonzero? and opts[:log_level] = args.shift
+      args.size.nonzero? and raise ArgumentError.new('no.')
+      opts = {log_level: :info, port: DEFAULT_PORT}.merge(opts)
+      on_all do |e|
+        if $debug or !(l = LEVELS.index(e.type)) or (l >= @log_level_i)
+          $stderr.puts "FILE_SERVER (#{e.type}): #{e}"
+        end
       end
-      opts and opts.each { |k, v| send("#{k}=", v) }
-      @port ||= DEFAULT_PORT
+      opts.each { |k, v| send("#{k}=", v) }
+      yield(self) if block_given?
+    end
+    LEVELS = ::Skylab::PubSub::Emitter::COMMON_LEVELS
+    attr_reader :log_level
+    def log_level= lvl
+      LEVELS.include?(lvl) or fail("no: #{lvl}")
+      @log_level_i = LEVELS.index(@log_level = lvl)
+      lvl
     end
     def message_prefix
       @message_prefix ||= '' # default behavior is for clients to prefix/format the messages
@@ -89,14 +100,16 @@ module Skylab::Dependency
       end
     end
     attr_writer :rack_handler
+    # def run # defined below
     def _run_rack_app handler, app
       pid = Process.pid
       File.open(pid_file, 'w') { |fh| fh.write(pid) }
       emit(:info, "Wrote pid (##{pid}) to file (#{File.basename(pid_file)}) using #{handler}")
-      Signal.trap("SIGINT") do
-        emit(:info, "received SIGINT signal. Sorry, there is no exit (adsf issue?).  Try KILL !?")
-      end
-      handler.run(app, :Port => port)
+      # if you are going to do something like below, a comment would be nice derkus
+      # Signal.trap("SIGINT") do
+      #  emit(:info, "received SIGINT signal. Sorry, there is no exit (adsf issue?).  Try KILL !?")
+      # end
+      res = handler.run(app, :Port => port) # Errno::EADDRINUSE
     end
     def running?
       @pid = nil
@@ -109,7 +122,7 @@ module Skylab::Dependency
       when 0 ; remove_stale_pid_file ; false
       when 1 ; @pid = pid ; true
       else   ; @pid = pid ; warn("why are there multiple lines?") ; true
-    end
+      end
     end
     def remove_stale_pid_file
       emit :info, "removing stale pid file.."
@@ -125,13 +138,14 @@ module Skylab::Dependency
         "and child id: #{pid}")
       pid
     end
-   def start_unless_running
+    def start_unless_running
       if running?
         emit :info, "is (already) running (pid ##{pid} in file #{File.basename(pid_file)})."
         return true
       end
       start
     end
+    alias_method :run, :start_unless_running
     def warn msg
       emit :warning, msg
       false
