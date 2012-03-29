@@ -6,6 +6,11 @@ require 'skylab/face/path-tools'
 module Skylab::TestSupport
   class Tmpdir < Skylab::Face::MyPathname
     include FileUtils
+    def copy pathname, destination_basename = nil
+      source = Skylab::Face::MyPathname.new(pathname.to_s)
+      destination = join(destination_basename || source.basename)
+      cp source.to_s, destination.to_s, verbose: @verbose, noop: @noop
+    end
     def emit type, msg
       $stderr.puts msg
     end
@@ -19,8 +24,11 @@ module Skylab::TestSupport
       opts and opts.each { |k, v| send("#{k}=", v) }
     end
     alias_method :fileutils_mkdir, :mkdir # the name 'fu_mkdir' is already used by FileUtils!
-    def mkdir path_end, *a
-      fileutils_mkdir(join(path_end), *a)
+    # experimental example interface
+    def mkdir path_end, opts=nil
+      my_opts = { noop: @noop, verbose: @verbose }
+      opts and my_opts.merge(opts)
+      fileutils_mkdir(join(path_end), my_opts)
     end
     def patch str
       cd(to_s) do
