@@ -1,3 +1,5 @@
+[#096] 2012-03-30 @open: code-molester: files are not paths
+[#095] 2012-03-29 @open: static fileserver refactor
 [#094] 2012-03-28 @open: tanman: refactor: this shit is a mess (still).
 [#093] 2012-03-28 @open: tanman: status
 [#092] 2012-03-19 @closed: tanman: refactor into api, test all
