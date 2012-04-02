@@ -41,7 +41,7 @@ describe ::Skylab::CodeMolester::Config::File do
       it "has no content items" do
         subject = self.subject
         subject.content_items.size.should eql(0)
-        subject.content.should eql('')
+        subject.string.should eql('')
       end
     end
     context "when input is bunch of blank lines" do
@@ -58,7 +58,7 @@ describe ::Skylab::CodeMolester::Config::File do
       it "it is valid" do
         subject.invalid_reason.should eql(nil)
         subject.content_items.size.should eql(0)
-        subject.content.should eql("      # ha-blah")
+        subject.string.should eql("      # ha-blah")
       end
     end
     context "when input is one assigmnent line" do
@@ -221,11 +221,11 @@ describe ::Skylab::CodeMolester::Config::File do
       it "you can set existing values" do
         config.value_items['foo'] = 'blamo'
         config.value_items['foo'].should eql('blamo')
-        config.content.split("\n").first.should eql("foo = blamo")
+        config.string.split("\n").first.should eql("foo = blamo")
       end
       it "you can create new values" do
         config['bleuth'] = 'michael'
-        config.content.should eql(<<-HERE.unindent.strip)
+        config.string.should eql(<<-HERE.unindent.strip)
           foo = bar
           biff = baz
           bleuth = michael
@@ -265,7 +265,7 @@ describe ::Skylab::CodeMolester::Config::File do
       end
       it "It knows it doesn't exist, and reports having the empty string as content" do
         config.exist?.should eql(false)
-        config.content.should eql('')
+        config.string.should eql('')
       end
       it "It sees itself as valid, and will even show you a parse tree" do
         is_valid
@@ -296,7 +296,7 @@ describe ::Skylab::CodeMolester::Config::File do
         context "lets you add new values" do
           it "to the root node (note the inherited whitespace)" do
             config['new_item'] = 'new value'
-            config.content.split("\n")[0,3].join("\n").should eql(<<-HERE.unindent.strip)
+            config.string.split("\n")[0,3].join("\n").should eql(<<-HERE.unindent.strip)
               who = hah
                 boo = bah
                 new_item = new value
@@ -312,10 +312,10 @@ describe ::Skylab::CodeMolester::Config::File do
           end
           it "lets you create a section by assigning a hash to it" do
             last_part = ->(s) { s.match(/good times here(.+)\z/m)[1] }
-            last_part[config.content].should eql("\n")
+            last_part[config.string].should eql("\n")
             config['goal'] ||= {}
             config['goal']['dream'] = 'deadline'
-            last_part[config.content].should eql(<<-HERE.gsub(/^(  ){6}/, ''))
+            last_part[config.string].should eql(<<-HERE.gsub(/^(  ){6}/, ''))
 
             [goal]
               dream = deadline

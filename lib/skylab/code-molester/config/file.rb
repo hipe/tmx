@@ -69,7 +69,7 @@ module Skylab::CodeMolester
     def unparse
       valid? ? @content_tree.unparse : @content_string
     end
-    alias_method :content, :unparse
+    alias_method :string, :unparse
     class OnWrite < Skylab::PubSub::Emitter.new(:all, :error => :all, :notice => :all,
       :before_edit => :notice, :after_edit => :notice, :before_create => :notice, :after_create => :notice,
       :no_change => :notice)
