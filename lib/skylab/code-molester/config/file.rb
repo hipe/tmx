@@ -17,30 +17,32 @@ module Skylab::CodeMolester
     alias_method :pathname_children, :children
 
     def content= str
-      @valid = nil
-      @content_tree = nil
-      @content_string = str
+      @content = str
+      @state = :unparsed
     end
     def content_tree # @api private
-      valid? ? @content_tree : false
+      valid? ? @content : false
     end
-    %w([] content_items key? set_value sections value_items).each do |n| # @delegator
+    %w([] content_items key? set_value sections value_items).each do |n| # @delegator-like
       define_method(n) do |*a|
-        valid? or return false
-        @content_tree.send(n, *a)
+        if valid?
+          @content.send(n, *a)
+        else
+          false
+        end
       end
     end
     alias_method :[]=, :set_value
     def initialize(*a, &b)
-
-      @content_string = @on_read = @on_write = @valid = nil
+      @content = @on_read = @on_write = nil
+      @state = :initial
       b and b.call(self)
       a.last.kind_of?(Hash) and
         a.pop.each { |k, v| :path == k ? (a.unshift(v.to_s)) : send("#{k}=", v) }
       super(*a)
     end
     def invalid_reason
-      @valid.nil? and valid?
+      valid?
       @invalid_reason
     end
     def on_read &b
@@ -60,28 +62,26 @@ module Skylab::CodeMolester
       if block_given? then yield(e) else on_read.call(e) end
       cntnt = super(&nil)
       self.content = cntnt
-      unless valid?
+      if valid?
+        self
+      else
         e.emit(:invalid, invalid_reason)
-        return false
+        false
       end
-      self
     end
     def unparse
-      valid? ? @content_tree.unparse : @content_string
+      valid? ? @content.unparse : @content
     end
-    alias_method :content, :unparse
+    alias_method :string, :unparse
     class OnWrite < Skylab::PubSub::Emitter.new(:all, :error => :all, :notice => :all,
       :before_edit => :notice, :after_edit => :notice, :before_create => :notice, :after_create => :notice,
       :no_change => :notice)
-      def error msg
-        emit :error, msg
-        false
-      end
     end
     def write
       e = OnWrite.new
       if block_given? then yield(e) else on_write.call(e) end
       bytes = nil
+      content = self.string
       if exist?
         if pathname_read == content
           e.emit(:no_change, "no change: #{pretty}")
@@ -101,21 +101,25 @@ module Skylab::CodeMolester
       bytes
     end
     def valid?
-      if @valid.nil?
-        @content_string.nil? and @content_string = ''
+      # look: two case statements in a row.  first one changes state iff necessary. second one no.
+      case @state
+      when :initial, :unparsed
+        @content.nil? and @content = ''
         p = self.class.parser
-        @content_tree = nil
-        if expensive = p.parse(@content_string) # nil ok
-          @content_tree = expensive.sexp
-          @content_string = nil
-          @valid = true
+        if expensive = p.parse(@content) # nil ok
+          @content = expensive.sexp
+          @state = :valid
           @invalid_reason = nil
         else
-          @valid = false
+          @state = :invalid
           @invalid_reason = ParseFailurePorcelain.new(p)
         end
       end
-      @valid
+      case @state
+      when :valid   ; true
+      when :invalid ; false
+      else          ; fail("unexpected state: #{@state}")
+      end
     end
   end
   MyPathname = Skylab::Face::MyPathname
