@@ -22,7 +22,7 @@ describe ::Skylab::CodeMolester::Config::File do
     config.valid?.should eql(true)
   end
   def unparses_ok
-    t = config.content_tree
+    t = config.sexp
     unp = t.unparse
     par = content
     unp.should eql(par)
@@ -50,7 +50,7 @@ describe ::Skylab::CodeMolester::Config::File do
         subject = self.subject
         subject.invalid_reason.should eql(nil)
         subject.content_items.size.should eql(0)
-        subject.unparse.should eql(input_string)
+        subject.string.should eql(input_string)
       end
     end
     context "when input is one comment" do
@@ -261,7 +261,7 @@ describe ::Skylab::CodeMolester::Config::File do
       let(:config) { klass.new(:path => path) }
       def is_valid
         config.valid?.should eql(true)
-        config.content_tree.should be_kind_of(Array)
+        config.sexp.should be_kind_of(Array)
       end
       it "It knows it doesn't exist, and reports having the empty string as content" do
         config.exist?.should eql(false)

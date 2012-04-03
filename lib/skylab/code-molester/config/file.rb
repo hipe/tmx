@@ -6,57 +6,69 @@ require 'skylab/face/path-tools'
 require 'skylab/pub-sub/emitter'
 
 module Skylab::CodeMolester
+
   module Config
     require DIR.join('../parse-failure-porcelain').to_s
     require DIR.join('../sexp').to_s
     require "#{DIR}/node"
   end
 
-  class Config::File < Pathname
-
-    alias_method :pathname_children, :children
-
-    def content= str
-      @content = str
-      @state = :unparsed
-    end
-    def content_tree # @api private
-      valid? ? @content : false
-    end
-    %w([] content_items key? set_value sections value_items).each do |n| # @delegator-like
-      define_method(n) do |*a|
+  class Config::File
+    def self.delegates_when_valid_to implementor, method_name
+      define_method(method_name) do |*a, &b|
         if valid?
-          @content.send(n, *a)
+          send(implementor).send(method_name, *a, &b)
         else
           false
         end
       end
     end
-    alias_method :[]=, :set_value
-    def initialize(*a, &b)
-      @content = @on_read = @on_write = nil
+    def self.delegates_to_truish_ivar attr, method
+      define_method(method) do |*a, &b|
+        if (o = instance_variable_get(attr))
+          o.send(method, *a, &b)
+        end
+      end
+    end
+    delegates_when_valid_to :sexp, :[]
+    # []= defined below
+    attr_reader :content # @api private!
+    def content= str
+      @content = str
+      @state = :unparsed
+    end
+    delegates_when_valid_to :sexp, :content_items
+    delegates_to_truish_ivar '@pathname', :exist?
+    # [path] [opts]
+    def initialize *args
+      @content = @on_read = @on_write = @pathname = nil
       @state = :initial
-      b and b.call(self)
-      a.last.kind_of?(Hash) and
-        a.pop.each { |k, v| :path == k ? (a.unshift(v.to_s)) : send("#{k}=", v) }
-      super(*a)
+      _args = Hash === args.last ? args.pop.dup : {}
+      args.size.nonzero? and _args[:path] = args.pop
+      args.size.nonzero? and raise ArgumentError.new("syntax: #{self.class}.new([path], [opts])")
+      _args.each { |k, v| send("#{k}=", v) }
+      block_given? and yield self
     end
     def invalid_reason
       valid?
       @invalid_reason
     end
+    delegates_when_valid_to :sexp, :key?
     def on_read &b
       if b then @on_read = b else @on_read end
     end
     def on_write &b
       if b then @on_write = b else @on_write end
     end
-    alias_method :path, :to_s
-    def pretty
-      ::Skylab::Face::PathTools.pretty_path(to_s)
+    def path
+      @pathname.to_s if @pathname
     end
+    def path= mixed
+      @pathname = mixed ? ::Skylab::Face::MyPathname.new(mixed) : mixed
+    end
+    attr_reader :pathname
+    delegates_to_truish_ivar '@pathname', :pretty
     OnRead = Skylab::PubSub::Emitter.new(:all, :error => :all, :invalid => :error)
-    alias_method :pathname_read, :read
     def read
       e = OnRead.new
       if block_given? then yield(e) else on_read.call(e) end
@@ -69,10 +81,17 @@ module Skylab::CodeMolester
         false
       end
     end
-    def unparse
+    delegates_when_valid_to :sexp, :sections
+    delegates_when_valid_to :sexp, :set_value
+    alias_method :[]=, :set_value
+    def sexp # @api private
+      valid? ? @content : false
+    end
+    # def to_s do not define or alias this.  "to_s" is so ambiguous for this class it should not be used.
+    def string
       valid? ? @content.unparse : @content
     end
-    alias_method :string, :unparse
+    delegates_when_valid_to :sexp, :value_items
     class OnWrite < Skylab::PubSub::Emitter.new(:all, :error => :all, :notice => :all,
       :before_edit => :notice, :after_edit => :notice, :before_create => :notice, :after_create => :notice,
       :no_change => :notice)
@@ -83,7 +102,7 @@ module Skylab::CodeMolester
       bytes = nil
       content = self.string
       if exist?
-        if pathname_read == content
+        if pathname.read == content
           e.emit(:no_change, "no change: #{pretty}")
         else
           e.emit(:before_edit) { { message: "updating #{pretty}", resource: self } }
