@@ -154,7 +154,7 @@ describe Skylab::PubSub::Emitter do
             specify { should be_kind_of(::Skylab::PubSub::Event) }
             context "whose payload" do
               subject { canary[:arg].payload }
-              specify { should eql([]) }
+              specify { should eql(nil) }
             end
           end
           context 'with one payload argument passes one to your handlers.' do
