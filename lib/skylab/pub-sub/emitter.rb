@@ -56,17 +56,20 @@ end
 
 module Skylab::PubSub
   class Event < Struct.new(:payload, :tag, :touched)
-    def initialize tag, *payload, &block
-      super(nil, tag, false)
-      1 == payload.size and payload = payload.first
-      payload.respond_to?(:payload) and payload = payload.payload # shallow copy another event's payload
-      if Hash === payload
-        payload.keys.each do |k|
-          singleton_class.send(:define_method, k) { self.payload[k] }
-          singleton_class.send(:define_method, "#{k}=") { |v| self.payload[k] = v }
+    def initialize tag, *payload
+      case payload.size
+      when 0 ; payload = nil
+      when 1 ; payload = payload.first
+        payload.respond_to?(:payload) and payload = payload.payload # shallow copy another event's payload
+        if Hash === payload
+          payload.keys.each do |k|
+            singleton_class.send(:define_method, k) { self.payload[k] }
+            singleton_class.send(:define_method, "#{k}=") { |v| self.payload[k] = v }
+          end
         end
       end
-      self.payload = payload
+      super(payload, tag, false)
+      yield self if block_given?
     end
     alias_method :event_id, :object_id
     def is? sym
