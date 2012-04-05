@@ -56,19 +56,20 @@ end
 
 module Skylab::PubSub
   class Event < Struct.new(:payload, :tag, :touched)
+    def _define_attr_accessors!
+      payload.keys.each do |k|
+        singleton_class.send(:define_method, k) { self.payload[k] }
+        singleton_class.send(:define_method, "#{k}=") { |v| self.payload[k] = v }
+      end
+    end
     def initialize tag, *payload
       case payload.size
       when 0 ; payload = nil
       when 1 ; payload = payload.first
         payload.respond_to?(:payload) and payload = payload.payload # shallow copy another event's payload
-        if Hash === payload
-          payload.keys.each do |k|
-            singleton_class.send(:define_method, k) { self.payload[k] }
-            singleton_class.send(:define_method, "#{k}=") { |v| self.payload[k] = v }
-          end
-        end
       end
       super(payload, tag, false)
+      Hash === payload and _define_attr_accessors!
       yield self if block_given?
     end
     alias_method :event_id, :object_id
@@ -85,6 +86,11 @@ module Skylab::PubSub
     alias_method :touched?, :touched
     def type
       tag.name
+    end
+    def update_attributes! h
+      Hash === payload or self.payload = { message: message }
+      payload.merge! h
+      _define_attr_accessors!
     end
   end
   class EventListeners < Hash

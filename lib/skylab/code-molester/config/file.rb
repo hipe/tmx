@@ -38,6 +38,7 @@ module Skylab::CodeMolester
       @state = :unparsed
     end
     delegates_when_valid_to :sexp, :content_items
+    delegates_to_truish_ivar '@pathname', :dirname
     delegates_to_truish_ivar '@pathname', :exist?
     # [path] [opts]
     def initialize *args
@@ -114,17 +115,17 @@ module Skylab::CodeMolester
         if pathname.read == content
           e.emit(:no_change, "no change: #{pretty}")
         else
-          e.emit(:before_edit) { { message: "updating #{pretty}", resource: self } }
+          e.emit(:before_edit, message: "updating #{pretty}", resource: self)
           writable? or return e.error("cannot edit, file is not writable: #{pretty}")
-          open('w') { |fh| bytes = fh.write(content) }
-          e.emit(:after_edit) { { message: "updated #{pretty} (#{bytes} bytes)", bytes: bytes } }
+          pathname.open('w') { |fh| bytes = fh.write(content) }
+          e.emit(:after_edit, message: "updated #{pretty} (#{bytes} bytes)", bytes: bytes)
         end
       else
-        e.emit(:before_create) { { message: "creating #{pretty}", resource: self } }
+        e.emit(:before_create, message: "creating #{pretty}", resource: self)
         dirname.exist? or return e.error("parent directory does not exist, cannot write #{pretty}")
         dirname.writable? or return e.error("parent direcory is not writable, cannot write #{pretty}")
-        open('w+') { |fh| bytes = fh.write(content) }
-        e.emit(:after_create) { { message: "created #{pretty} (#{bytes} bytes)", bytes: bytes } }
+        pathname.open('w+') { |fh| bytes = fh.write(content) }
+        e.emit(:after_create, message: "created #{pretty} (#{bytes} bytes)", bytes: bytes)
       end
       bytes
     end
@@ -149,6 +150,7 @@ module Skylab::CodeMolester
       else          ; fail("unexpected state: #{@state}")
       end
     end
+    delegates_to_truish_ivar '@pathname', :writable?
   end
   MyPathname = Skylab::Face::MyPathname
   class << Config::File
