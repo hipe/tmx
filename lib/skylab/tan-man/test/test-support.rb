@@ -2,11 +2,58 @@ require 'skylab/test-support/test-support'
 require 'skylab/test-support/tmpdir'
 require 'shellwords'
 
-
 module Skylab::TanMan::TestSupport
   TanMan = Skylab::TanMan
   include Skylab::TestSupport
   TMPDIR = Tmpdir.new(Skylab::ROOT.join('tmp/tanman'))
+  Porcelain = Skylab::Porcelain
+  # the below machinery has been rigged carefully and is a precision insturment
+  class StreamsSpy < Array # that's "streams" plural
+    attr_accessor :debug
+    alias_method :debug?, :debug
+    def debug! ; tap { |o| o.debug = true } end
+    def for name
+      @streams[name]
+    end
+    def initialize
+      @debug = false
+      @streams = Hash.new do |h, k|
+        h[k] = StreamSpy.new(self, k, ->() { debug? } )
+      end
+    end
+    attr_reader :streams
+  end
+  class StreamSpy # that's "stream" singular
+    attr_reader :buffer
+    attr_reader :debug_f
+    def initialize stack, name, debug_f
+      @buffer = StringIO.new
+      @debug_f = debug_f
+      @name = name
+      @stack = stack
+    end
+    def puts string
+      res = buffer.puts(string)
+      line = buffer.string.dup
+      buffer.truncate(0)
+      unstyled = Porcelain::TiteColor.unstylize_if_stylized(line)
+      if debug_f.call
+        $stderr.puts("dbg:#{name}:puts:#{string}#{'(line was colored)' if unstyled}")
+      end
+      stack.push Line.new(name, unstyled || line)
+      res
+    end
+    attr_reader :name
+    attr_reader :stack
+    def write string
+      if debug_f.call
+        $stderr.write("dbg:#{name}:write:-->#{string}<--")
+      end
+      buffer.write(string)
+    end
+  end
+  class Line < Struct.new(:name, :string)
+  end
 
   # this is dodgy but should be ok as long as you accept that:
   # 1) you are assuming meta-attributes work and 2) the below is universe-wide!

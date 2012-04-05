@@ -17,9 +17,7 @@ module Skylab::TanMan
       result = events.invoke(*a)
       if result.respond_to?(:each) # @todo{after:.3}: needs something maybe
         result.each do |item|
-          events.emit(:row) do
-            { row_data: item.to_a }
-          end
+          events.emit(:row, row_data: item.to_a)
         end
       end
       events

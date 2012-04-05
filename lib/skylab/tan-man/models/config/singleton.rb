@@ -16,7 +16,7 @@ module Skylab::TanMan
     end
     attr_accessor :local
     protected :'local='
-    class OnReady < PubSub::Emitter.new(:all,
+    class OnReady < Api::Emitter.new(:all,
       not_ready: :all, no_config_dir: :not_ready
     )
       attr_accessor :on_read_global
@@ -31,9 +31,7 @@ module Skylab::TanMan
       orig = current = Api.local_conf_startpath.call
       local_conf_dirname = Api.local_conf_dirname
       not_found = ->() do
-        e.emit(:no_config_dir) do
-          { :from => orig, :dirname => local_conf_dirname, :message => "local conf dir not found" }
-        end
+        e.emit(:no_config_dir, from: orig, dirname: local_conf_dirname, message: "local conf dir not found")
         false
       end
       until limit_reached.call || (found = current.join(local_conf_dirname)).exist?

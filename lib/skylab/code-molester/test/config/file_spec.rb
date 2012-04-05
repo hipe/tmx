@@ -263,7 +263,7 @@ describe ::Skylab::CodeMolester::Config::File do
         config.valid?.should eql(true)
         config.sexp.should be_kind_of(Array)
       end
-      it "It knows it doesn't exist, and reports having the empty string as content" do
+      it "It knows it doesn't exist, and the string() of it will be the empty string" do
         config.exist?.should eql(false)
         config.string.should eql('')
       end

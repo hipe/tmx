@@ -154,7 +154,7 @@ describe Skylab::PubSub::Emitter do
             specify { should be_kind_of(::Skylab::PubSub::Event) }
             context "whose payload" do
               subject { canary[:arg].payload }
-              specify { should eql([]) }
+              specify { should eql(nil) }
             end
           end
           context 'with one payload argument passes one to your handlers.' do
@@ -162,7 +162,7 @@ describe Skylab::PubSub::Emitter do
             specify { should be_kind_of(::Skylab::PubSub::Event) }
             context "whose payload" do
               subject { canary[:arg].payload }
-              specify { should eql(['foo']) }
+              specify { should eql('foo') }
             end
           end
           context 'with two payload arguments passes two to your handlers.' do
@@ -310,7 +310,7 @@ describe Skylab::PubSub::Emitter do
       s.should eql('serr')
     end
   end
-  context "Will graphs defined in a parent class descend to child?", {f:true} do
+  context "Will graphs defined in a parent class descend to child?" do
     let(:child_class) { Class.new(klass) }
     it "YES" do
       ok = nil
