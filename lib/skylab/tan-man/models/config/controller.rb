@@ -26,7 +26,7 @@ module Skylab::TanMan
     end
     attr_reader :config_singleton
     def load_default_content resource
-      resource.content_tree.tap do |o|
+      resource.sexp.tap do |o|
         o.prepend_comment '' # in reverse
         o.prepend_comment "parts of this file may have been generated and may be overwritten"
         o.prepend_comment "created #{Time.now.localtime} by tanman"
@@ -34,11 +34,7 @@ module Skylab::TanMan
     end
     def ready?
       config_singleton.ready? do |o|
-        o.on_no_config_dir do |e|
-          emit(:no_config_dir) { e.payload } # this line is critical, and confusing!
-          # we need to re-emit a new event object with the same event type (symbol)
-          # but a different graph @todo{after:.3} decide whether or not this is acceptable.
-        end # !.. up to ..
+        o.on_no_config_dir { |e| emit(:no_config_dir, e) } # same payload, new name
         o.on_read_global = o.on_read_local = ->(oo) { oo.on_invalid { |e| error e } }
       end
     end
@@ -64,7 +60,7 @@ module Skylab::TanMan
     end
     attr_reader :runtime
     def write_resource resource
-      if resource.exist? && resource.pathname_read == resource.content
+      if resource.exist? && resource.pathname.read == resource.content
         emit :info, "(config file didn't change.)"
         return true
       end

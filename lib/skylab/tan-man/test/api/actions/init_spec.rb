@@ -27,7 +27,7 @@ module Skylab::TanMan::TestSupport
       end
       context "with regards to working or not working" do
         before do
-          TMPDIR.verbose!.prepare
+          TMPDIR.prepare
         end
         context "when the folder isn't initted" do
           it "works (with json formatting)" do

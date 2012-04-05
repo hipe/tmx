@@ -4,7 +4,9 @@ module Skylab::TanMan
 
   class Cli < Bleeding::Runtime
     extend PubSub::Emitter
+
     emits EVENT_GRAPH
+    event_class Api::Event
 
     actions_module { self::Actions }
 
@@ -34,6 +36,7 @@ module Skylab::TanMan
     include Api::RuntimeExtensions
 
     emits EVENT_GRAPH
+    event_class Api::Event
 
     alias_method :action_class, :class
 

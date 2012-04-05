@@ -274,16 +274,26 @@ module Skylab::TanMan
       sym == tag.name or tag.ancestors.include?(sym)
     end
     def json_data
-      if Array === payload
-        [tag.name, *payload]
-      elsif Hash === payload
-        [tag.name, payload]
-      else
-        [tag.name]
+      case payload
+      when String, Hash ; [tag.name, payload]
+      when Array        ; [tag.name, *payload]
+      else              ; [tag.name] # no payload for you!
       end
+    end
+    def message= msg
+      update_attributes!(message: msg)
     end
     def to_json *a
       json_data.to_json(*a)
+    end
+  end
+
+  Api::Emitter = Object.new
+  class << Api::Emitter
+    def new *a
+      PubSub::Emitter.new(*a).tap do |graph|
+        graph.event_class Api::Event
+      end
     end
   end
 end

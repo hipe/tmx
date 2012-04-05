@@ -3,54 +3,6 @@ require File.expand_path('../test-support', __FILE__)
 require 'skylab/porcelain/tite-color'
 
 module Skylab::TanMan::TestSupport
-  Porcelain = Skylab::Porcelain
-  # the below machinery has been rigged carefully and is a precision insturment
-  class StreamsSpy < Array
-    attr_accessor :debug
-    alias_method :debug?, :debug
-    def debug! ; tap { |o| o.debug = true } end
-    def for name
-      @streams[name]
-    end
-    def initialize
-      @debug = false
-      @streams = Hash.new do |h, k|
-        h[k] = StreamSpy.new(self, k, ->() { debug? } )
-      end
-    end
-    attr_reader :streams
-  end
-  class StreamSpy
-    attr_reader :buffer
-    attr_reader :debug_f
-    def initialize stack, name, debug_f
-      @buffer = StringIO.new
-      @debug_f = debug_f
-      @name = name
-      @stack = stack
-    end
-    def puts string
-      res = buffer.puts(string)
-      line = buffer.string.dup
-      buffer.truncate(0)
-      unstyled = Porcelain::TiteColor.unstylize_if_stylized(line)
-      if debug_f.call
-        $stderr.puts("dbg:#{name}:puts:#{string}#{'(line was colored)' if unstyled}")
-      end
-      stack.push Line.new(name, unstyled || line)
-      res
-    end
-    attr_reader :name
-    attr_reader :stack
-    def write string
-      if debug_f.call
-        $stderr.write("dbg:#{name}:write:-->#{string}<--")
-      end
-      buffer.write(string)
-    end
-  end
-  class Line < Struct.new(:name, :string)
-  end
   describe TanMan do
     include TanMan::TestSupport # prepare_local_conf_dir
     # alpha order. avoid early abstraction.
@@ -92,7 +44,7 @@ module Skylab::TanMan::TestSupport
     attr_accessor :result
     context 'Remotes' do
       before do
-        TMPDIR.verbose!.prepare
+        TMPDIR.prepare
       end
       context 'when there is no local config directory' do
         it 'cannot get added, whines about no directory' do
