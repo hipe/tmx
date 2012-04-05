@@ -3,7 +3,7 @@ module Skylab ; end
 module Skylab::PubSub
   module Emitter
 
-    COMMON_LEVELS = [:debug, :info, :notice, :warn, :error, :fatal]
+    COMMON_LEVELS = [:debug, :info, :notice, :warn, :error, :fatal] # didactic, for elsewhere
 
     def emits *nodes
       event_cloud = self.event_cloud
@@ -56,21 +56,26 @@ end
 
 module Skylab::PubSub
   class Event < Struct.new(:payload, :tag, :touched)
-    def initialize tag, payload
-      # Array === payload or raise ArgumentError.new("need arrays here for now!")
-      super(payload, tag, false)
+    def initialize tag, *payload, &block
+      super(nil, tag, false)
+      1 == payload.size and payload = payload.first
+      payload.respond_to?(:payload) and payload = payload.payload # shallow copy another event's payload
+      if Hash === payload
+        payload.keys.each do |k|
+          singleton_class.send(:define_method, k) { self.payload[k] }
+          singleton_class.send(:define_method, "#{k}=") { |v| self.payload[k] = v }
+        end
+      end
+      self.payload = payload
     end
     alias_method :event_id, :object_id
     def is? sym
-      sym == tag.name or tag.ancestors.include?(sym)
+      tag.is? sym
     end
-    def message
-      payload.map(&:to_s).join(' ')
+    def to_s
+      payload.to_s
     end
-    def message= str
-      payload[0] = str # use this very cautiously
-    end
-    alias_method :to_s, :message
+    alias_method :message, :to_s
     def touch!
       tap { |me| me.touched = true }
     end
@@ -89,52 +94,35 @@ module Skylab::PubSub
     end
   end
   module InstanceMethods
-    def build_event tag, payload, &block
-      if block
-        if 1 == block.arity
-          block.call(construct_event(tag))
-        else
-          Hash === (h = block.call) or fail("for now only payload hashes are "<<
-            "supported as a return type of your event definition block (experimental).")
-          construct_event(tag, h).tap do |e|
-            sc = e.singleton_class
-            h.keys.each do |k|
-              sc.send(:define_method, k) { self.payload[k] }
-              sc.send(:define_method, "#{k}=") { |v| self.payload[k] = v }
-            end
-          end
-        end
+    # syntax:
+    #   build_event <event>                                        # pass thru
+    #   build_event { <tag> | <tag-name> } [ payload_item [..] ]
+    def build_event *args, &block
+      args.size == 0 and raise ArgumentError.new('no')
+      if 1 == args.size and args.first.respond_to?(:type) and args.first.respond_to?(:payload)
+        block and fail("you cannot re-emit an event and also provide a constructor block.")
+        args.first
       else
-        construct_event tag, payload
+        tag = args.shift
+        Symbol === tag and tag = ( event_cloud_definer.event_cloud.lookup_tag(tag) or
+          fail("undeclared event type #{tag.inspect} for #{self.class}") )
+        event_class.new(tag, *args, &block)
       end
     end
-    def construct_event tag, payload=nil
-      event_class.new(tag, payload)
-    end
-    def emit type, *payload, &block
-      event = nil
-      if payload.size.zero? and type.respond_to?(:type) and type.respond_to?(:payload)
-        event = type
-        type = event.type
-        payload = nil
+    def emit *args, &block
+      cloud = event_cloud_definer.event_cloud
+      if 1 == args.size and args.first.respond_to?(:payload)
+        event = args.first
+        tag = event.tag
+        block and raise ArgumentError.new("can't use block when emitting an event object.")
+      else
+        type = args.shift
+        payload = args
+        tag = cloud.lookup_tag(type) or fail("undeclared event type #{type.inspect} for #{self.class}")
       end
-      if block
-        payload.nil? and fail("you cannot re-emit an event and also provide a constructor block.")
-        payload.size.nonzero? and fail("when constructor block is provided you cannot also provide event payload.")
-        payload = nil
-      end
-      cloud = _find_event_cloud
-      tag = cloud[type] or fail("undeclared event type #{type.inspect} for #{self.class}")
-      el = event_listeners
-      cloud.ancestor_names(tag).map{ |n| el[n] }.compact.flatten.tap do |a|
-        a.each do |b|
-          event ||= build_event(tag, payload, &block)
-          if 1 == b.arity
-            b.call(event)
-          else
-            b.call(*event.payload)
-          end
-        end
+      (cloud.all_ancestor_names(tag) & event_listeners.keys).map { |k| event_listeners[k] }.flatten.each do |prok|
+        event ||= build_event(tag, *payload, &block)
+        prok.call(* 1 == prok.arity ? [event] : event.payload )
       end.count
     end
     def event_class
@@ -143,24 +131,26 @@ module Skylab::PubSub
     def event_listeners
       @event_listeners ||= EventListeners.new
     end
-    # sucks for now
-    def _find_event_cloud
-      singleton_class.instance_variable_defined?('@event_cloud') and return singleton_class.event_cloud
-      self.class.event_cloud
+    def event_cloud_definer
+      singleton_class.instance_variable_defined?('@event_cloud') ? singleton_class : self.class
     end
   end
   class SemanticTagCloud < Hash
-    def ancestor_names tag
-      seen  = {}
-      found = []
-      visit = ->(k) do
-        t = self[k] or t = merge_definition!(k).first
-        seen[t.name] = true
-        found.push t.name
-        ( t.ancestors - found ).each { |s| seen[s] or visit[s] } # !
+    def all_ancestors tag
+      Enumerator.new do |y|
+        seen  = {}
+        found = []
+        visit = ->(k) do
+          t = self[k] or t = merge_definition!(k).first
+          seen[t.name] = true
+          y << t
+          ( t.ancestors - found ).each { |s| seen[s] or visit[s] } # !
+        end
+        visit[tag.name]
       end
-      visit[tag.name]
-      found
+    end
+    def all_ancestor_names tag
+      all_ancestors(tag).map(&:name)
     end
     def _deep_copy_init other
       @order = other.instance_variable_get('@order').dup
@@ -187,12 +177,13 @@ module Skylab::PubSub
         @order = []
       end
     end
+    alias_method :lookup_tag, :[] # more readable code
     def merge_definition! *nodes
       resulting_tags = []
       nodes.each do |node|
         case node
         when Symbol
-          resulting_tags.push merge_tag!(Tag.new(node))
+          resulting_tags.push merge_tag!(Tag.new(node, self))
         when Hash
           resulting_tags.concat( node.map { |k, v|
             ancestors = case v
@@ -200,7 +191,7 @@ module Skylab::PubSub
             when Symbol ; [v]
             else        ; raise ArgumentError.new("need Array or Symbol had #{v.class}:#{v}")
             end
-            merge_tag! Tag.new(k, :ancestors => ancestors)
+            merge_tag! Tag.new(k, self, :ancestors => ancestors)
           } )
         else raise ArgumentError.new("need Symbol or Hash had #{node.class}:#{node}")
         end
@@ -209,7 +200,7 @@ module Skylab::PubSub
     end
     def merge_tag! tag
       tag.ancestors.each do |parent|
-        (self[parent] ||= Tag.new(parent)).children |= [tag.name]
+        (self[parent] ||= Tag.new(parent, self)).children |= [tag.name]
       end
       if key?(tag.name)
         self[tag.name].merge!(tag)
@@ -221,10 +212,11 @@ module Skylab::PubSub
   end
   class Tag
     def duplicate
-      self.class.new(@name, :ancestors => @ancestors.dup, :children => @children.dup)
+      self.class.new(@name, cloud, :ancestors => @ancestors.dup, :children => @children.dup)
     end
-    def initialize name, opts=nil
+    def initialize name, cloud, opts=nil
       name.kind_of?(Symbol) or raise ArgumentError.new("need symbol had #{name.class}")
+      @cloud = cloud
       @name = name
       opts and opts.each { |k, v| send("#{k}=", v) }
       @ancestors ||= []
@@ -232,8 +224,12 @@ module Skylab::PubSub
     end
     attr_accessor :ancestors
     attr_accessor :children
+    attr_reader :cloud
     def describe
       [@name.to_s, (@ancestors.join(', ') if @ancestors.any?)].compact.join(' -> ')
+    end
+    def is? tag_name
+      cloud.all_ancestors(self).detect { |t| tag_name == t.name }
     end
     def merge! tag
       tag.name == @name or fail("need same tag name to merge tags (#{@name.inspect} != #{tag.name.inspect})")
