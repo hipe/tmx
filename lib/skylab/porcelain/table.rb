@@ -137,6 +137,8 @@ module Skylab::Porcelain::Table
       cel_renderer.call(str)
     end
     def see val
+      val.nil? and return
+      val = ::Skylab::Porcelain::TiteColor.unstylize(val)
       val.length > max_width_seen[:full] and max_width_seen[:full] = val.length
       if Column::BLANK.match?(val)
         type_stats[:blank] += 1
