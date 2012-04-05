@@ -41,7 +41,7 @@ module Skylab::CodeMolester
     delegates_to_truish_ivar '@pathname', :exist?
     # [path] [opts]
     def initialize *args
-      @content = @on_read = @on_write = @pathname = nil
+      @content = @mtime = @on_read = @on_write = @pathname = nil
       @state = :initial
       _args = Hash === args.last ? args.pop.dup : {}
       args.size.nonzero? and _args[:path] = args.pop
@@ -54,6 +54,15 @@ module Skylab::CodeMolester
       @invalid_reason
     end
     delegates_when_valid_to :sexp, :key?
+    def modified?
+      if pathname.exist?
+        if @mtime
+          pathname.mtime > @mtime
+        else
+          true
+        end
+      end
+    end
     def on_read &b
       if b then @on_read = b else @on_read end
     end
@@ -72,8 +81,8 @@ module Skylab::CodeMolester
     def read
       e = OnRead.new
       if block_given? then yield(e) else on_read.call(e) end
-      cntnt = super(&nil)
-      self.content = cntnt
+      self.content = pathname.read
+      @mtime = pathname.mtime
       if valid?
         self
       else

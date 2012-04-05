@@ -20,6 +20,7 @@ module Skylab::Face
       (path.to_s =~ / |\$|'/) ? Shellwords.shellescape(path) : path.to_s
     end
   end
+  # @todo fix this namespace mess
   class MyPathname < Pathname
     def join *a
       self.class.new(super(*a)) # awful! waiting for patch for ruby maybe?
