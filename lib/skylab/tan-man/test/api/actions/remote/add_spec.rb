@@ -14,14 +14,14 @@ module Skylab::TanMan::TestSupport
         ee = api.invoke(%w(remote add))
         lone_error ee, /missing required attribute.*"host".*"name"/
       end
-      it "returns an error event if it cannot find the local config dir, (undecorated message)", {f:true} do
+      it "returns an error event if it cannot find the local config dir, (undecorated message)" do
         ee = api.invoke(name, name: 'flip', host: 'flap')
         lone_error ee, /local conf dir not found/i
       end
     end
     context "when you have a local config dir" do
       before do
-        api.clear_cache!
+        api.clear
         prepare_local_conf_dir
       end
       it "an invalid remote derps (host with space)" do
