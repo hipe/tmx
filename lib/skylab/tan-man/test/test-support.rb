@@ -64,6 +64,7 @@ module Skylab::TanMan::TestSupport
     c.local_conf_startpath = ->(){ TMPDIR }
     c.global_conf_path = ->() { TMPDIR.join('global-conf-file') } # a more visible name
   end
+
   def api
     TanMan.api
   end
@@ -76,6 +77,25 @@ module Skylab::TanMan::TestSupport
     ee.size.should eql(1)
     ee.should be_success
     ee.first.message.should match(regex)
+  end
+  def output_shift_is *assertions
+    subject = output.first
+    assertions.each do |assertion|
+      case assertion
+      when FalseClass ; result.should_not be_trueish
+      when Regexp     ; subject.string.should match(assertion)
+      when String     ; subject.string.should be_include(assertion)
+      when Symbol     ; subject.name.should eql(assertion)
+      when TrueClass  ; result.should be_trueish
+      else            ; fail("unrecognized assertion class: #{assertion}")
+      end
+    end
+    output.shift # return subject, and change the stack only at the end
+  end
+  def output_shift_only_is *assertions
+    res = output_shift_is(*assertions)
+    output.size.should eql(0)
+    res
   end
   def prepare_local_conf_dir
     TMPDIR.prepare.mkdir(TanMan::Api.local_conf_dirname)

@@ -5,16 +5,16 @@ module Skylab::TanMan
   class Api::RootRuntime
     include Api::UniversalStyle
 
-    def clear_cache!
-      @singletons.clear_cache!
+    def clear
+      @singletons.clear
     end
     def initialize
       @singletons = Api::Singletons.new
     end
-    def invoke *a
+    def invoke *a, &b
       events = Api::ActionEvents.new(self)
       events.debug! if Hash === a.last && a.last.delete(:_debug)
-      result = events.invoke(*a)
+      result = events.invoke(*a, &b)
       if result.respond_to?(:each) # @todo{after:.3}: needs something maybe
         result.each do |item|
           events.emit(:row, row_data: item.to_a)

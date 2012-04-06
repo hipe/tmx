@@ -230,8 +230,8 @@ module Skylab::TanMan
   end
 
   class Api::Singletons
-    def clear_cache!
-      @config.clear_cache! if @config
+    def clear
+      @config.clear if @config
     end
     def config
       @config ||= begin
@@ -269,10 +269,6 @@ module Skylab::TanMan
 
   class Api::Event < PubSub::Event
     # this is all very experimental and subject to change!
-
-    def is? sym
-      sym == tag.name or tag.ancestors.include?(sym)
-    end
     def json_data
       case payload
       when String, Hash ; [tag.name, payload]

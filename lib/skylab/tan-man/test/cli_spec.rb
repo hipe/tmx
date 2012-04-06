@@ -4,8 +4,7 @@ require 'skylab/porcelain/tite-color'
 
 module Skylab::TanMan::TestSupport
   describe TanMan do
-    include TanMan::TestSupport # prepare_local_conf_dir
-    # alpha order. avoid early abstraction.
+    include TanMan::TestSupport
     let :cli do
       spy = output
       TanMan::Cli.new do |o|
@@ -22,25 +21,6 @@ module Skylab::TanMan::TestSupport
       self.result = cli.invoke argv
     end
     let(:output) { StreamsSpy.new }
-    def output_shift_is *assertions
-      subject = output.first
-      assertions.each do |assertion|
-        case assertion
-        when FalseClass ; result.should_not be_trueish
-        when Regexp     ; subject.string.should match(assertion)
-        when String     ; subject.string.should be_include(assertion)
-        when Symbol     ; subject.name.should eql(assertion)
-        when TrueClass  ; result.should be_trueish
-        else            ; fail("unrecognized assertion class: #{assertion}")
-        end
-      end
-      output.shift # return subject, and change the stack only at the end
-    end
-    def output_shift_only_is *assertions
-      res = output_shift_is(*assertions)
-      output.size.should eql(0)
-      res
-    end
     attr_accessor :result
     context 'Remotes' do
       before do
