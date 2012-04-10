@@ -1,28 +1,9 @@
 require File.expand_path('../../cli', __FILE__)
 require File.expand_path('../test-support', __FILE__)
-require 'skylab/porcelain/tite-color'
 
 module Skylab::TanMan::TestSupport
-  describe TanMan do
-    include TanMan::TestSupport
-    let :cli do
-      spy = output
-      TanMan::Cli.new do |o|
-        o.program_name = 'ferp'
-        o.stdout = spy.for(:stdout)
-        o.stderr = spy.for(:stderr)
-        o.on_info { |x| o.stderr.puts x.touch!.message } # similar but not same to default
-        o.on_out  { |x| o.stdout.puts x.touch!.message }
-        o.on_all  { |x| o.stderr.puts(x.touch!.message) unless x.touched? }
-      end
-    end
-    def input str
-      argv = Shellwords.split(str)
-      self.result = cli.invoke argv
-    end
-    let(:output) { StreamsSpy.new }
-    attr_accessor :result
-    context 'Remotes' do
+  describe TanMan, tanman: true do
+    context 'the CLI for remotes' do
       before do
         TMPDIR.prepare
       end
