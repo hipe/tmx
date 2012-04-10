@@ -230,8 +230,8 @@ module Skylab::TanMan
   end
 
   class Api::Singletons
-    def clear_cache!
-      @config.clear_cache! if @config
+    def clear
+      @config.clear if @config
     end
     def config
       @config ||= begin
@@ -269,21 +269,27 @@ module Skylab::TanMan
 
   class Api::Event < PubSub::Event
     # this is all very experimental and subject to change!
-
-    def is? sym
-      sym == tag.name or tag.ancestors.include?(sym)
-    end
     def json_data
-      if Array === payload
-        [tag.name, *payload]
-      elsif Hash === payload
-        [tag.name, payload]
-      else
-        [tag.name]
+      case payload
+      when String, Hash ; [tag.name, payload]
+      when Array        ; [tag.name, *payload]
+      else              ; [tag.name] # no payload for you!
       end
+    end
+    def message= msg
+      update_attributes!(message: msg)
     end
     def to_json *a
       json_data.to_json(*a)
+    end
+  end
+
+  Api::Emitter = Object.new
+  class << Api::Emitter
+    def new *a
+      PubSub::Emitter.new(*a).tap do |graph|
+        graph.event_class Api::Event
+      end
     end
   end
 end

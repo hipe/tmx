@@ -2,8 +2,7 @@ require_relative '../../../../api'
 require_relative '../../../test-support'
 
 module Skylab::TanMan::TestSupport
-  describe "The Remote Rm method of #{TanMan::Api}" do
-    include TanMan::TestSupport
+  describe "The #{TanMan::Api} action Remote Rm", tanman: true do
     it "requires a remote_name, derps on failure" do
       ee = api.invoke([:remote, :rm])
       ee.success?.should eql(false)

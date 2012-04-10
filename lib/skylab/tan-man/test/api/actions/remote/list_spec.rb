@@ -2,9 +2,8 @@ require_relative '../../../../api'
 require_relative '../../../test-support'
 
 module Skylab::TanMan::TestSupport
-  describe "The Remote List method of #{TanMan::Api}" do
-    include TanMan::TestSupport
-    before { api.clear_cache! }
+  describe "The #{TanMan::Api} action Remote List", tanman: true do
+    before { api.clear }
     context "when there are no conf dirs at all" do
       before { TMPDIR.prepare }
       it "returns an error event explaining the situation" do

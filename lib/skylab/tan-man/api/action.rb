@@ -81,6 +81,7 @@ module Skylab::TanMan
 
     def call runtime, request
       o = new(runtime)
+      yield(o) if block_given?
       runtime.set_transaction_attributes(o, request) or return false
       o.set_defaults_if_nil!
       o.valid? or return false
