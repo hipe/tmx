@@ -1,12 +1,16 @@
+require 'skylab/porcelain/tite-color'
 require 'skylab/test-support/test-support'
 require 'skylab/test-support/tmpdir'
 require 'shellwords'
 
 module Skylab::TanMan::TestSupport
-  TanMan = Skylab::TanMan
   include Skylab::TestSupport
-  TMPDIR = Tmpdir.new(Skylab::ROOT.join('tmp/tanman'))
+
   Porcelain = Skylab::Porcelain
+  TanMan = Skylab::TanMan
+
+  TMPDIR = Tmpdir.new(Skylab::ROOT.join('tmp/tanman'))
+
   # the below machinery has been rigged carefully and is a precision insturment
   class StreamsSpy < Array # that's "streams" plural
     attr_accessor :debug
@@ -35,6 +39,7 @@ module Skylab::TanMan::TestSupport
     def puts string
       res = buffer.puts(string)
       line = buffer.string.dup
+      buffer.rewind
       buffer.truncate(0)
       unstyled = Porcelain::TiteColor.unstylize_if_stylized(line)
       if debug_f.call

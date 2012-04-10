@@ -34,7 +34,7 @@ module Skylab::TanMan
     end
     def ready?
       config_singleton.ready? do |o|
-        o.on_no_config_dir { |e| emit(:no_config_dir, e) } # same payload, new name
+        o.on_no_config_dir { |e| emit(:no_config_dir, e) } # same payload, different graph
         o.on_read_global = o.on_read_local = ->(oo) { oo.on_invalid { |e| error e } }
       end
     end

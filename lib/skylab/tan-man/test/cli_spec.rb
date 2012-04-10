@@ -2,8 +2,8 @@ require File.expand_path('../../cli', __FILE__)
 require File.expand_path('../test-support', __FILE__)
 
 module Skylab::TanMan::TestSupport
-  describe TanMan, tanman: true do
-    context 'the CLI for remotes' do
+  describe "The #{TanMan} CLI", tanman: true do
+    context 'for remotes' do
       before do
         TMPDIR.prepare
       end

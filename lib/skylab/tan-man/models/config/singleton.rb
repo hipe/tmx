@@ -4,7 +4,7 @@ module Skylab::TanMan
       global.clear
       local.clear
     end
-    def find_local_path # @api private
+    def find_local_path e # @api private
       maxdepth = Api.local_conf_maxdepth # nil ok, zero means noop
       currdepth = 0
       limit_reached = maxdepth ? ->(){ currdepth >= maxdepth } : ->() { false }
@@ -20,7 +20,12 @@ module Skylab::TanMan
         current = parent
       end
       if found
-        found.join(Api.local_conf_config_name)
+        if found.directory?
+          found.join(Api.local_conf_config_name)
+        else
+          e.emit(:not_a_dir, message: "not a directory: #{found.pretty}", dir: found)
+          false
+        end
       end
     end
     attr_reader :global
@@ -39,7 +44,7 @@ module Skylab::TanMan
     attr_accessor :local
     protected :'local='
     class OnReady < Api::Emitter.new(:all,
-      not_ready: :all, no_config_dir: :not_ready
+      not_ready: :all, no_config_dir: :not_ready, not_a_dir: :no_config_dir
       )
       attr_accessor :on_read_global
       attr_accessor :on_read_local
@@ -62,7 +67,7 @@ module Skylab::TanMan
     end
     def ready_local? e
       if ! local.path
-        local.path = find_local_path
+        local.path = find_local_path(e)
       end
       if local.path # if found then assume exists per above
         if local.modified?

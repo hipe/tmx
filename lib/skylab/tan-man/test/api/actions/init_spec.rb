@@ -2,14 +2,14 @@ require_relative '../../../api'
 require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
-  describe TanMan::Api, tanman: true do
+  describe "The #{TanMan::Api} itself", tanman: true do
     context "when you invoke a nonexistant action" do
       it "it gives you a list-like result whose first event is an error with a message" do
         events = api.invoke(:'not-an-action')
         lone_error(events, /not an action: not-an-action/)
       end
     end
-    context "as for init" do
+    context "the #{TanMan::Api} action Init" do
       context "with some bad args" do
         let(:event) do
           events = api.invoke(:init, these: 'are', invalid: 'args')

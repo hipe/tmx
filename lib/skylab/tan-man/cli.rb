@@ -93,6 +93,28 @@ module Skylab::TanMan
   module Cli::Actions
   end
 
+  class Cli::Actions::Status < Cli::Action
+    desc "show the status of the config director{y|ies} active at the path."
+    def execute path=nil
+      require 'skylab/porcelain/table'
+      path ||= FileUtils.pwd
+      groups = Hash.new { |h, k| h[k] = [] }
+      ee = api.invoke(path: path)
+      ee.each do |e|
+        groups[e.is?(:global) ? :global : (e.is?(:local) ? :local : :other )].push(e)
+      end
+      table = []
+      groups.each do |k, e|
+        table.push [[:header, k], e.first.message]
+        table.concat( e[1..-1].map{ |x| [nil, x.message] } )
+      end
+      Porcelain.table(table, separator: '  ') do |o|
+        o.field(:header).format { |x| hdr x }
+        o.on_all { |e| emit(:out, e) }
+      end
+    end
+  end
+
   class Cli::Actions::Init < Cli::Action
     desc "create the #{Api.local_conf_dirname} directory"
     option_syntax { |h| on('-n', '--dry-run', 'dry run.') { h[:dry_run] = true } }
