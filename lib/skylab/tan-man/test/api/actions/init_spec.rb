@@ -2,8 +2,7 @@ require_relative '../../../api'
 require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
-  describe TanMan::Api do
-    include TanMan::TestSupport
+  describe TanMan::Api, tanman: true do
     context "when you invoke a nonexistant action" do
       it "it gives you a list-like result whose first event is an error with a message" do
         events = api.invoke(:'not-an-action')
