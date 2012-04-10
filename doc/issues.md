@@ -1,7 +1,7 @@
-[#096] 2012-03-30 @open: code-molester: files are not paths
-[#095] 2012-03-29 @open: static fileserver refactor
-[#094] 2012-03-28 @open: tanman: refactor: this shit is a mess (still).
-[#093] 2012-03-28 @open: tanman: status
+[#096] 2012-03-30 @closed: code-molester: files are not paths
+[#095] 2012-03-29 @closed: static fileserver refactor
+[#094] 2012-03-28 @closed: tanman: refactor: this shit is a mess (still).
+[#093] 2012-03-28 @closed: tanman: status
 [#092] 2012-03-19 @closed: tanman: refactor into api, test all
 [#091] 2012-03-17 @closed: tanman: local .tan
 [#090] 2012-03-16 @closed: porcelain: table: column type inference
