@@ -10,7 +10,7 @@ module ::Skylab::GitStashUntracked::Tests
     describe "has an action called" do
       def stub_popen3 str
         me = self
-        Open3.stub(:popen3) do |cmd, block|
+        Open3.stub(:popen3) do |cmd, &block|
           me.cmd_spy.replace cmd
           serr = StringIO.new('')
           sout = StringIO.new(str)
