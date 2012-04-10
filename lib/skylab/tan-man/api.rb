@@ -64,7 +64,7 @@ module Skylab::TanMan
         if set.include?(intern)
           send(after, intern)
         else
-          error("#{name} cannot be #{value.inspect}.  It must be "<<
+          error_emitter.error("#{name} cannot be #{value.inspect}.  It must be "<<
             "#{Porcelain::En.oxford_comma(set.map { |o| o.to_s.inspect })}")
           value
         end
@@ -106,21 +106,24 @@ module Skylab::TanMan
         if (re = meta[:regex]) =~ str
           send(after, str)
         else
-          error(meta[:on_regex_fail] || "#{str.inspect} did not match pattern for #{name}: /#{re.source}/")
+          error_emitter.error(meta[:on_regex_fail] || "#{str.inspect} did not match pattern for #{name}: /#{re.source}/")
           str
         end
       end
     end
   end
 
-  # @todo this requires a 'pre' formatter
+  # @note: this requires that the object define an attribute_definer that responds to attributes()
+  # and it requires an error_emitter and it requires the styler methods: oxford_comma, pre.
+  # A required attribute is considered as not provided IFF it returns nil.
+  #
   module MetaAttributes::Required extend Porcelain::AttributeDefiner
     meta_attribute :required
   end
   module MetaAttributes::Required::InstanceMethods
     def required_ok?
       if (a = attribute_definer.attributes.map.select { |k, h| h[:required] && send(k).nil? }).size.nonzero?
-        error( "missing required attribute#{'s' if a.size != 1}: " <<
+        error_emitter.error( "missing required attribute#{'s' if a.size != 1}: " <<
           "#{oxford_comma(a.map { |o| "#{pre o.first}" }, ' and ')}")
       else
         true
@@ -129,13 +132,20 @@ module Skylab::TanMan
   end
 
   module AttributeReflection
-    # once this settles down it will get pushed up @todo
+    # once this settles down it will get pushed up @todo{after:.3}
   end
   module AttributeReflection::InstanceMethods
     def attributes
       AttributeReflection::InstanceAttributeIterator.new(self)
     end
-    def attribute_definer # @todo there is a hack you have to do if you are doing metaclass hacking
+
+    # @note: the default attribute definer for a typical object is its ordinary class.
+    # In some cases -- e.g. if you are dealing with a class or module object and want
+    # to use attribute definer for *that* -- you will want to redefine this method
+    # to return the singleton class instead, for reflection to work (which is required
+    # for some kind of meta-attribute setters, etc)
+    #
+    def attribute_definer
       self.class
     end
   end
@@ -157,11 +167,12 @@ module Skylab::TanMan
     extend Porcelain::AttributeDefiner
     meta_attribute(*MetaAttributes[:default, :proc])
     include AttributeReflection::InstanceMethods
-    alias_method :attribute_definer, :singleton_class # @todo
+    alias_method :attribute_definer, :singleton_class # @experimental:
+    # this means that the objects will no longer use their class as the attribute_definer
     attribute :global_conf_path, proc: true, default: ->{ "#{ENV['HOME']}/.tanman-config" }
     attribute :local_conf_config_name, default: 'config'
     attribute :local_conf_dirname, default: '.tanman'
-    attribute :local_conf_maxdepth, default: nil # @todo, with all of these etc
+    attribute :local_conf_maxdepth, default: nil # meaningful (and didactic) nil
     attribute :local_conf_startpath, proc: true, default: ->{ Face::MyPathname.pwd }
   end
   Api.set_defaults_if_nil!
@@ -181,10 +192,19 @@ module Skylab::TanMan
   end
 
   module Api::AdaptiveStyle
+    # Simply provides convenience methods that are shorthand wrappers
+    # for the below style methods, for whose implementation text_styler()
+    # is relied up.
+    #
+    # Because the including module relies upon the text_styler() for
+    # the implementations and the text_styler() may be a variety of
+    # different implementations based on the root runtime, for e.g.
+    # this is considered to be the implementation for "adaptive style."
+    #
+    extend Bleeding::DelegatesTo
     include GlobalStyle
-    def pre str
-      runtime.text_styler.pre str # ick not sure
-    end
+
+    delegates_to :text_styler, :pre
   end
 
   module Api::UniversalStyle
@@ -193,93 +213,25 @@ module Skylab::TanMan
     end
   end
 
-  module MyActionInstanceMethods
-    # (note: the question of what should be in a cli action and what
-    #  should be in an api action and what should be a model controller
-    #  action is an area of active exploration.)
-    #
-
+  module Api::RuntimeExtensions
     extend Bleeding::DelegatesTo
-    include AttributeReflection::InstanceMethods
     include GlobalStyle
-
-    def add_invalid_reason str
-      (@invalid_reasons ||= []).push str
+    def add_invalid_reason mixed
+      (@invalid_reasons ||= []).push mixed
     end
-
-    def config
-      @config ||= begin
-        require_relative 'models/config'
-        Models::Config::Controller.new(self)
-      end
-    end
-
-    def error msg
-      add_invalid_reason msg
-      emit :error, msg
-      false
-    end
-    def skip msg
-      emit :skip, msg
-      nil
-    end
-
-    def format_error event
-      event.tap do |e|
-        if runtime.runtime
-          subj, verb, obj = [runtime.runtime.program_name, action.name, runtime.actions_module.name]
-        else
-          subj, verb = [runtime.program_name, action.name]
-        end
-        e.message = "#{subj} failed to #{verb}#{" #{obj}" if obj}: #{e.message}"
-      end
-    end
-
-    # experimental, might get pushed up to porcelain @todo
-    def full_action_name_parts
-      a = [action.name]
-      root_id = root_runtime.object_id
-      current = self
-      until root_id == current.runtime.object_id
-        current = current.runtime
-        a.push current.name
-      end
-      a.reverse
-    end
-
-    def invalid_reasons?
-      @invalid_reasons && @invalid_reasons.size.nonzero?
-    end
-
-    def invalid_reasons_count
-      @invalid_reasons ? @invalid_reasons.count : 0
-    end
-
-    def my_action_init
-      @config = nil
-      @invalid_reasons ||= nil
-    end
-
     def root_runtime
-      runtime ? ( runtime.respond_to?(:root_runtime) ? runtime.root_runtime : runtime ) : self
+      if runtime
+        runtime.root_runtime
+      else
+        self
+      end
     end
-
-    attr_reader :runtime
-
-    def valid?
-      invalid_reasons? and return false
-      required_ok? # more hooking required
-      ! invalid_reasons?
-    end
-
-    delegates_to :root_runtime, :singletons
-
-    delegates_to :runtime, :stdout
+    delegates_to :runtime, :stdout, :text_styler
   end
 
   class Api::Singletons
-    def clear_cache!
-      @config.clear_cache! if @config
+    def clear
+      @config.clear if @config
     end
     def config
       @config ||= begin
@@ -317,21 +269,27 @@ module Skylab::TanMan
 
   class Api::Event < PubSub::Event
     # this is all very experimental and subject to change!
-
-    def is? sym
-      sym == tag.name or tag.ancestors.include?(sym)
-    end
     def json_data
-      if Array === payload
-        [tag.name, *payload]
-      elsif Hash === payload
-        [tag.name, payload]
-      else
-        [tag.name]
+      case payload
+      when String, Hash ; [tag.name, payload]
+      when Array        ; [tag.name, *payload]
+      else              ; [tag.name] # no payload for you!
       end
+    end
+    def message= msg
+      update_attributes!(message: msg)
     end
     def to_json *a
       json_data.to_json(*a)
+    end
+  end
+
+  Api::Emitter = Object.new
+  class << Api::Emitter
+    def new *a
+      PubSub::Emitter.new(*a).tap do |graph|
+        graph.event_class Api::Event
+      end
     end
   end
 end

@@ -38,12 +38,12 @@ module Skylab::Dependency::TestSupport
       context "when the tarball exists" do
         let(:unzip_tarball) { FIXTURES_DIR.join('mginy-0.0.1.tar.gz') }
         before(:each) do
-          # BUILD_DIR.verbose = true
+          # BUILD_DIR.verbose = true e.g.
           BUILD_DIR.prepare
-          BUILD_DIR.cp(unzip_tarball, BUILD_DIR, :verbose => true)
+          BUILD_DIR.copy(unzip_tarball)
         end
         context "when the target directory exists" do
-          before(:each) { BUILD_DIR.mkdir("#{BUILD_DIR}/mginy", :verbose => true) }
+          before(:each) { BUILD_DIR.mkdir("#{BUILD_DIR}/mginy", verbose: false) }
           it "emits a notice, returns true" do
             r = subject.invoke
             r.should eql(true)
@@ -53,7 +53,7 @@ module Skylab::Dependency::TestSupport
         end
         context "when it's not a tarball" do
           let(:unzip_tarball) { FIXTURES_DIR.join('not-a-tarball.tar.gz') }
-          it "returns false, emits original error", {focus:true} do
+          it "returns false, emits original error" do
             r = subject.invoke
             r.should eql(false)
             fingers[:error].size.should eql(1)

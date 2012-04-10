@@ -1,5 +1,6 @@
 require File.expand_path('../../table', __FILE__)
 require File.expand_path('../test-support', __FILE__)
+require 'skylab/porcelain/bleeding'
 
 module Skylab::Porcelain::TestSupport
   include Skylab
@@ -80,7 +81,7 @@ module Skylab::Porcelain::TestSupport
            ['1.348', '-3.14'],
            ['1234.567891', '0']]
         end
-        it 'makes the decimal points line up!!!!!', {f:true} do
+        it 'makes the decimal points line up!!!!!' do
           rendered_table.should eql(<<-HERE.gsub(/^(?:  ){6}/, ''))
               -1.1122    blah
                1            2
@@ -90,7 +91,7 @@ module Skylab::Porcelain::TestSupport
           HERE
         end
       end
-      context "and when you have a mish-mash of different things", {f:true} do
+      context "and when you have a mish-mash of different things" do
         let(:row_enum) do
           [['0123',  '0123',    '01233', '3.1415'],
            ['',      'meeper',  'eff',   '3.14'],
@@ -105,6 +106,22 @@ module Skylab::Porcelain::TestSupport
               01     01 e      0     
           HERE
         end
+      end
+    end
+    context "automatic widths with (ascii escape code) styles" do
+      it 'works' do
+        rows = [
+          [[:header, 'name'], 'hipe'],
+          [[:header, 'favorite fruits'], 'banana'],
+          [nil, 'pear']
+        ]
+        output = []
+        Porcelain.table(rows, :separator => "\t") do |o|
+          o[:header].format { |s| Porcelain::Bleeding::Styles.hdr(s) }
+          o.on_row { |e| output.push Porcelain::TiteColor.unstylize(e.to_s) }
+        end
+        lengths = output.map { |s| s.match(/^[^\t]*/)[0].length }
+        lengths.uniq.size.should eql(1)
       end
     end
   end

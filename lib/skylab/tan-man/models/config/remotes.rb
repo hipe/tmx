@@ -22,7 +22,12 @@ module Skylab::TanMan
       super(&block)
     end
     attr_reader :num_resources_seen
-    def remove remote_name, resource_name, controller
+    class OnRemove < Api::Emitter.new(:all, error: :all, remote_not_found: :error)
+      attr_accessor :on_all
+      attr_accessor :on_write
+    end
+    def remove remote_name, resource_name, &b
+      e = OnRemove.new(b)
       if resource_name
         config_singleton.send(resource_name).tap do |r|
           remotes = r.remotes
@@ -34,19 +39,15 @@ module Skylab::TanMan
       end
       if remote = remotes.detect { |r| remote_name == r.name }
         remote.resource.remotes.remove(remote) do |o|
-          o.on_write { |e| controller.write_resource e.touch!.resource }
-          o.on_all { |e| controller.emit(e) unless e.touched? }
+          o.on_write(& e.on_write)
+          o.on_all(& e.on_all)
         end
       else
-        # all of this slop etc @todo.  we "borrow" controller just to make a pretty message
-        controller.instance_eval do
-          a = remotes.map { |r| "#{pre r.name}" } ; rc = resources_count
-          error "couldn't find a remote named #{remote_name.inspect}"
-          emit(:info, [
-            "#{s a, :no}known remote#{s a} #{s a, :is} #{oxford_comma(a, ' and ')}".strip,
-            " in #{s rc, :this}#{" #{rc}" unless 1==rc} searched config resource#{s rc}."
-          ].join(''))
-        end
+        e.emit(:remote_not_found,
+          remotes:         remotes,
+          remote_name:     remote_name,
+          resources_count: resources_count
+        )
       end
     end
   end

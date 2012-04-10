@@ -6,7 +6,7 @@ module Skylab::TanMan
   require File.expand_path('../action', __FILE__)
 
   module Api::InvocationMethods
-    def invoke action=nil, args=nil
+    def invoke action=nil, args=nil, &block
       if args.nil? && Hash === action
         args = action
         action = nil
@@ -23,7 +23,7 @@ module Skylab::TanMan
       const = parts.reduce(Api::Actions) do |mod, name|
         mod.const_get name.to_s.gsub(/(?:^|-)([a-z])/){ $1.upcase }
       end
-      const.call(self, args)
+      const.call(self, args, &block)
     end
     def set_transaction_attributes transaction, attributes
       attributes or return true

@@ -2,10 +2,9 @@ require_relative '../../../../api'
 require_relative '../../../test-support'
 
 module Skylab::TanMan::TestSupport
-  describe "The Remote Add method of #{TanMan::Api}" do
+  describe "The #{TanMan::Api} action Remote Add", tanman: true do
     let(:name) { [:remote, :add] }
 
-    include TanMan::TestSupport
     context "when there is no local conf directory" do
       before do
         TMPDIR.prepare
@@ -14,14 +13,15 @@ module Skylab::TanMan::TestSupport
         ee = api.invoke(%w(remote add))
         lone_error ee, /missing required attribute.*"host".*"name"/
       end
-      it "returns an error event if it cannot find the local config dir" do
+      it "returns an error event if it cannot find the local config dir, (undecorated message)", {f:true} do
         ee = api.invoke(name, name: 'flip', host: 'flap')
+        ee.success?
         lone_error ee, /local conf dir not found/i
       end
     end
     context "when you have a local config dir" do
       before do
-        api.clear_cache!
+        api.clear
         prepare_local_conf_dir
       end
       it "an invalid remote derps (host with space)" do

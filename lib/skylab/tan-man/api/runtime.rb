@@ -5,21 +5,19 @@ module Skylab::TanMan
   class Api::RootRuntime
     include Api::UniversalStyle
 
-    def clear_cache!
-      @singletons.clear_cache!
+    def clear
+      @singletons.clear
     end
     def initialize
       @singletons = Api::Singletons.new
     end
-    def invoke *a
+    def invoke *a, &b
       events = Api::ActionEvents.new(self)
       events.debug! if Hash === a.last && a.last.delete(:_debug)
-      result = events.invoke(*a)
-      if result.respond_to?(:each) # @todo needs something maybe
+      result = events.invoke(*a, &b)
+      if result.respond_to?(:each) # @todo{after:.3}: needs something maybe
         result.each do |item|
-          events.emit(:row) do
-            { row_data: item.to_a }
-          end
+          events.emit(:row, row_data: item.to_a)
         end
       end
       events
@@ -34,7 +32,6 @@ module Skylab::TanMan
     extend Bleeding::DelegatesTo
     extend PubSub::Emitter
     include Api::InvocationMethods
-    # include Api::AdaptiveStyle @todo
 
     emits EVENT_GRAPH.merge( row: :out )
     event_class Api::Event
@@ -64,6 +61,7 @@ module Skylab::TanMan
       map(&:json_data)
     end
     attr_accessor :runtime
+    alias_method :root_runtime, :runtime
     def set_transaction_attributes transaction, attributes
       attributes or return true
       if (bad = attributes.keys - transaction.class.attributes.keys).any?

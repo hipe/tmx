@@ -31,14 +31,22 @@ module Skylab::TanMan
       true
     end
 
-    attr_accessor :config
+    # @todo{after:.3} abstract or eliminate
+    OnEdit = Api::Emitter.new(:all, error: :all)
+    def edit attrs, &b
+      errors_count = 0
+      self.error_emitter = OnEdit.new(b, ->(o) { o.on_error { errors_count += 1 } } )
+      attrs.each { |k, v| send("#{k}=", v) } # assume events are emitted on errors
+      self.error_emitter = nil
+      0 == errors_count ? self : false
+    end
 
     attr_accessor :enumerator
 
-    def initialize emitter, opts
-      super(emitter)
+    attr_accessor :error_emitter
+
+    def initialize
       @sexp = nil
-      opts.each { |k, v| send("#{k}=", v) }
     end
 
     def name
@@ -88,13 +96,11 @@ module Skylab::TanMan
   end
 
   class << Models::Remote
-    def bound enum, sec
-      r = new(enum, :enumerator => enum, :sexp => sec)
+    def bound enum, section_sexp
+      r = new
+      r.enumerator = enum
+      r.sexp = section_sexp
       r # ! leave invalid doohahs in the file
-    end
-    def unbound config, name, url
-      r = new(config, :config => config, :name => name, :url => url)
-      r.valid? ? r : false
     end
   end
 end

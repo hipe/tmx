@@ -15,18 +15,18 @@ module Skylab::TanMan
     end
     def push remote
       remote.bound? and fail("won't push bound remote")
-      parent = resource.content_tree.detect(:sections)
+      parent = resource.sexp.detect(:sections)
       sexp = CodeMolester::Config::Section.create('', parent)
       remote.bind(sexp) ? self : false
     end
-    OnRemove = PubSub::Emitter.new(:all, :error => :all, :info => :all, :write => :all)
+    OnRemove = Api::Emitter.new(:all, :error => :all, :info => :all, :write => :all)
     def remove remote, &on_info
-      on_info.call(e = OnRemove.new)
+      e = OnRemove.new(on_info)
       section_name = remote.sexp.section_name
       found = resource.sections.detect { |s| section_name == s.section_name }
       found or return e.error("expected section not found: [#{section_name}]")
-      if resource.content_tree.detect(:sections).remove(found)
-        e.emit(:write) { { resource: resource } }
+      if resource.sexp.detect(:sections).remove(found)
+        e.emit(:write, resource: resource)
         e.emit(:info, "removed remote #{remote.name}.")
         true
       end

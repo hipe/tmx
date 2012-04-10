@@ -6,18 +6,39 @@
 
 require File.expand_path('../..', __FILE__)
 
+require 'skylab/code-molester/sexp'
+require 'skylab/porcelain/tite-color'
 require 'skylab/pub-sub/emitter'
-require 'stringio'
 
 module Skylab::Porcelain
+
+
+  module TiteColor
+    Sexp = ::Skylab::CodeMolester::Sexp
+    STYLE_PARSER = %r{\A([^\e]*)\e\[(\d+(?:;\d+)*)m(.*)\z}
+    def parse_styles str
+      out = nil
+      while md = STYLE_PARSER.match(str)
+        out ||= []
+        md[1].length.nonzero? and out.push(Sexp[:string, md[1]])
+        out.push Sexp[:style, * md[2].split(';').map(&:to_i)]
+        str = md[3]
+      end
+      if out and str.length.nonzero?
+        out.push Sexp[:string, str]
+      end
+      out
+    end
+  end
 end
 
 module Skylab::Porcelain::Table
+  TiteColor = ::Skylab::Porcelain::TiteColor
 
   module Column
   end
 
-  class Column::Type < Struct.new(:align, :ancestor_names, :name, :regex, :renderer)
+  class Column::Type < Struct.new(:align, :ancestor_names, :name, :regex, :renderer_factory)
     def ancestor
       ancestor_names.size == 1 or fail("ancestor() accessor can only be " <<
         "used on nodes with one ancestor (\"parent\").  #{name.inspect} " <<
@@ -41,8 +62,8 @@ module Skylab::Porcelain::Table
       end
     end
     def build_cel_renderer col
-      renderer or fail("#{name} did not define a renderer (a build_cel_renderer)")
-      renderer.call col
+      renderer_factory or fail("#{name} did not define a renderer (a build_cel_renderer)")
+      renderer_factory.call col
     end
     def initialize name, args
       super(nil, [], name, nil, nil)
@@ -50,10 +71,6 @@ module Skylab::Porcelain::Table
     end
     def match? str
       regex.match(str)
-    end
-    def renderer &block
-      block_given? or return super
-      self.renderer = block
     end
   end
 
@@ -68,14 +85,25 @@ module Skylab::Porcelain::Table
     FLOAT_DETAIL_RE = /\A(-?\d+)((?:\.\d+)?)\z/
   end
 
-  Column::STRING.renderer do |col|
+  Column::STRING.renderer_factory = ->(col) do
     fmt = "%#{'-' if col.align_left?}#{col.max_width_seen[:full]}s"
-    ->(str) { fmt % [str] }
+    ->(str) do
+      if a = TiteColor.parse_styles(str)
+        if 2 == a.count { |p| :style == p.first } and :style == a.first.first and
+        :style == a.last.first and [0] == a.last[1..-1]
+          "\e[#{a.first[1..-1].join(';')}m#{ fmt % [a[1].last] }\e[0m" # jesus wept
+        else
+          str # whatever you do to "fix" these cases will require overhauling a lot
+        end
+      else
+        fmt % [str]
+      end
+    end
   end
 
-  Column::BLANK.renderer = Column::INTEGER.renderer = Column::STRING.renderer
+  Column::BLANK.renderer_factory = Column::INTEGER.renderer_factory = Column::STRING.renderer_factory
 
-  Column::FLOAT.renderer do |col|
+  Column::FLOAT.renderer_factory = ->(col) do
     int_max = col.max_width_seen[:integer_part]
     flt_max = col.max_width_seen[:fractional_part]
     fmt = "%#{int_max}s%-#{flt_max}s"
@@ -106,8 +134,7 @@ module Skylab::Porcelain::Table
       :left == (inferred_type || Column::STRING).align
     end
     def cel_renderer
-      @cel_renderer and return @cel_renderer
-      @cel_renderer = (inferred_type || STRING).build_cel_renderer(self)
+      @cel_renderer ||= (inferred_type || STRING).build_cel_renderer(self)
     end
     def format &b
       1 == b.arity or raise ArgumentError.new("formatter blocks must always take exactly one argument")
@@ -137,6 +164,8 @@ module Skylab::Porcelain::Table
       cel_renderer.call(str)
     end
     def see val
+      val.nil? and return
+      val = TiteColor.unstylize(val)
       val.length > max_width_seen[:full] and max_width_seen[:full] = val.length
       if Column::BLANK.match?(val)
         type_stats[:blank] += 1
@@ -182,6 +211,7 @@ module Skylab::Porcelain::Table
       def field name
         @fields[name] ||= Column::ViewModel.new(nil, field_name: name)
       end
+      alias_method :[], :field
       attr_reader :fields
       def format_cel field_name, cel_value
         fields[field_name] ? fields[field_name]._format_cel(cel_value) : cel_value
