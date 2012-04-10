@@ -13,6 +13,7 @@ module Skylab::Porcelain::Bleeding
   module Styles
     include Skylab::Porcelain::En
     include Skylab::Porcelain::TiteColor
+    extend self
     def em(s)  ; stylize(s, :green         )   end
     def hdr(s) ; stylize(s, :strong, :green)   end
     alias_method :pre, :em
