@@ -119,7 +119,6 @@ module Skylab::PubSub
       end
     end
     def emit *args, &block
-      cloud = event_cloud_definer.event_cloud
       if 1 == args.size and args.first.respond_to?(:payload)
         event = args.first
         tag = event.tag
@@ -127,9 +126,10 @@ module Skylab::PubSub
       else
         type = args.shift
         payload = args
-        tag = cloud.lookup_tag(type) or fail("undeclared event type #{type.inspect} for #{self.class}")
+        tag = event_cloud_definer.event_cloud.lookup_tag(type) or
+          fail("undeclared event type #{type.inspect} for #{self.class}")
       end
-      (cloud.all_ancestor_names(tag) & event_listeners.keys).map { |k| event_listeners[k] }.flatten.each do |prok|
+      (tag.all_ancestor_names & event_listeners.keys).map { |k| event_listeners[k] }.flatten.each do |prok|
         event ||= build_event(tag, *payload, &block)
         prok.call(* 1 == prok.arity ? [event] : event.payload )
       end.count
@@ -153,13 +153,10 @@ module Skylab::PubSub
           t = self[k] or t = merge_definition!(k).first
           seen[t.name] = true
           y << t
-          ( t.ancestors - found ).each { |s| seen[s] or visit[s] } # !
+          ( t.parent_names - found ).each { |s| seen[s] or visit[s] } # !
         end
         visit[tag.name]
       end
-    end
-    def all_ancestor_names tag
-      all_ancestors(tag).map(&:name)
     end
     def _deep_copy_init other
       @order = other.instance_variable_get('@order').dup
@@ -174,7 +171,7 @@ module Skylab::PubSub
       order = []
       seen = Hash.new { |h, k| order.push k; h[k] = true }
       tags.each do |tag|
-        tag.ancestors.each { |k| seen[k] }
+        tag.parent_names.each { |k| seen[k] }
         seen[tag.name]
       end
       order.map { |k| self[k] }
@@ -195,12 +192,12 @@ module Skylab::PubSub
           resulting_tags.push merge_tag!(Tag.new(node, self))
         when Hash
           resulting_tags.concat( node.map { |k, v|
-            ancestors = case v
+            parent_names = case v
             when Array  ; v
             when Symbol ; [v]
             else        ; raise ArgumentError.new("need Array or Symbol had #{v.class}:#{v}")
             end
-            merge_tag! Tag.new(k, self, :ancestors => ancestors)
+            merge_tag! Tag.new(k, self, :parent_names => parent_names)
           } )
         else raise ArgumentError.new("need Symbol or Hash had #{node.class}:#{node}")
         end
@@ -208,8 +205,8 @@ module Skylab::PubSub
       resulting_tags
     end
     def merge_tag! tag
-      tag.ancestors.each do |parent|
-        (self[parent] ||= Tag.new(parent, self)).children |= [tag.name]
+      tag.parent_names.each do |parent|
+        (self[parent] ||= Tag.new(parent, self)).children_names |= [tag.name]
       end
       if key?(tag.name)
         self[tag.name].merge!(tag)
@@ -220,29 +217,32 @@ module Skylab::PubSub
     end
   end
   class Tag
+    def all_ancestor_names
+      @cloud.all_ancestors(self).map(&:name)
+    end
     def duplicate
-      self.class.new(@name, cloud, :ancestors => @ancestors.dup, :children => @children.dup)
+      self.class.new(@name, cloud, :parent_names => @parent_names.dup, :children_names => @children_names.dup)
     end
     def initialize name, cloud, opts=nil
       name.kind_of?(Symbol) or raise ArgumentError.new("need symbol had #{name.class}")
       @cloud = cloud
       @name = name
       opts and opts.each { |k, v| send("#{k}=", v) }
-      @ancestors ||= []
-      @children = []
+      @parent_names ||= []
+      @children_names = []
     end
-    attr_accessor :ancestors
-    attr_accessor :children
+    attr_accessor :parent_names
+    attr_accessor :children_names
     attr_reader :cloud
     def describe
-      [@name.to_s, (@ancestors.join(', ') if @ancestors.any?)].compact.join(' -> ')
+      [@name.to_s, (@parent_names.join(', ') if @parent_names.any?)].compact.join(' -> ')
     end
     def is? tag_name
       cloud.all_ancestors(self).detect { |t| tag_name == t.name }
     end
     def merge! tag
       tag.name == @name or fail("need same tag name to merge tags (#{@name.inspect} != #{tag.name.inspect})")
-      @ancestors |= tag.ancestors
+      @parent_names |= tag.parent_names
       self
     end
     attr_reader :name
