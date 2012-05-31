@@ -15,7 +15,7 @@ module Skylab::TanMan
           message: "file to push not found: #{file_path.pretty.inspect}")
         return false
       end
-      cmd = "scp push #{file_path} #{remote_path}"
+      cmd = "scp #{file_path} #{remote_path}"
       emit(:info, cmd)
       unless dry_run?
         exec cmd
