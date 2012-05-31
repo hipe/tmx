@@ -3,6 +3,18 @@ module Skylab::TanMan
   # this is a higher level enumerator of all the remotes across all resources
   class Models::Config::Remotes < ::Enumerator
     attr_reader :config_singleton
+    # there is some kind of fun @smell here. What we want is shared controller logic
+    def get name, e
+      detect { |r| name == r.name } or begin
+        e.emit(:remote_not_found,
+          remote_name: name,
+          known_names: (_ = map(&:name).uniq.map{ |n| e.pre n }),
+          message: ("Remote #{name.inspect} not found. " <<
+            "#{e.s _, :no}known remote#{e.s _} #{e.s _, :is} #{e.oxford_comma(_)}.".strip.capitalize)
+        )
+        false
+      end
+    end
     def initialize config_singleton, &block
       @num_resources_seen = 0
       @config_singleton = config_singleton

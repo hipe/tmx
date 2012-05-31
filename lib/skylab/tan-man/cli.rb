@@ -185,7 +185,7 @@ module Skylab::TanMan
       on('-n', '--dry-run', 'dry run.') { h[:dry_run] = true }
     end
     def execute remote_name, file, opts
-      api.invoke opts.merge(remote: remote_name, file:file)
+      api.invoke(opts.merge(remote_name: remote_name, file_path:file))
     end
   end
 end
