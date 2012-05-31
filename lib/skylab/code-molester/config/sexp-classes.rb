@@ -1,5 +1,13 @@
+require 'skylab/porcelain/bleeding' # just for delegates_to - ick?
 module Skylab::CodeMolester::Config
-  class Sexp < ::Skylab::CodeMolester::Sexp ; end
+  Bleeding = Skylab::Porcelain::Bleeding # do this only in one place
+  class Sexp < ::Skylab::CodeMolester::Sexp
+    extend Bleeding::DelegatesTo
+    def build_comment_line line
+      line = "# #{line.gsub(/[[:space:]#]+/, ' ').strip}\n" # could be improved
+      S[:whitespace_line, '', S[:comment, line]]
+    end
+  end
   S = Sexp
   class ValuesPseudohash < ::Enumerator
     def [] key
@@ -28,6 +36,7 @@ module Skylab::CodeMolester::Config
     attr_accessor :root
   end
   class SectionsPseudohash < ValuesPseudohash
+    extend Bleeding::DelegatesTo
     def [] key
       detect { |i| key == i.item_name }
     end
@@ -37,12 +46,14 @@ module Skylab::CodeMolester::Config
       value.each { |k, v| sec[k] = v }
       value
     end
+    delegates_to :root, :remove
   end
   class ContentItemBranch < Sexp
     # note that for now this is hard-coded to assume string and not symbol keys!
     # (the test below cannot simply test for Fixnum-based key b/c it also must take ranges)
-    def [] name
-      String === name or return super
+    def [] *a
+      1 == a.count && String === a.first or return super
+      name = a.first
       if ( i = content_items.detect { |ii| name == ii.item_name } )
         if i.item_leaf?
           i.item_value
@@ -53,10 +64,10 @@ module Skylab::CodeMolester::Config
         _no_value name
       end
     end
-    def []= k, v
-      String === k or return super
-      set_value k, v
-      v
+    def []= *a
+      2 == a.count and String === a.first or return super
+      set_value(*a)
+      a.last
     end
     def item_leaf?
       false
@@ -83,6 +94,8 @@ module Skylab::CodeMolester::Config
   end
   class FileSexp < ContentItemBranch
     Sexp[:file] = self
+    delegates_to :nosecs, :prepend_comment
+    # delegates_to :sections, :append_comment # e.g.
     def _assignments_sexp
       self[1]
     end
@@ -101,6 +114,9 @@ module Skylab::CodeMolester::Config
       AssignmentLine.create(name, value, sec)
       nil
     end
+    def nosecs
+      detect(:nosecs)
+    end
     def sections
       detect(:sections).enumerator
     end
@@ -112,6 +128,11 @@ module Skylab::CodeMolester::Config
     Sexp[:nosecs] = self
     def content_items
       select(:assignment_line)
+    end
+    def prepend_comment line
+      o = build_comment_line(line) or return false
+      self[1,0] = [o] # supreme hackery
+      o
     end
   end
   class Sections < Sexp
@@ -140,6 +161,10 @@ module Skylab::CodeMolester::Config
       self[1][1][2][1]
     end
     alias_method :section_name, :item_name
+    def item_name= str
+      self[1][1][2][1] = str
+    end
+    alias_method :section_name=, :item_name=
   end
   class << Section
     def create name, parent

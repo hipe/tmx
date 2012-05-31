@@ -4,7 +4,7 @@ end
 module Skylab::Porcelain
   module AttributeDefiner
     def attribute sym, meta_attributes=nil
-      change_request = {}
+      change_request = AttributeMeta.new
       meta = attributes[sym]
       if ! meta
         change_request.merge! default_meta_attributes
@@ -25,11 +25,8 @@ module Skylab::Porcelain
       if meta
         meta.merge! change_request
       else
-        @_im ||= instance_methods # think of all the side-effects this has:
-          # it takes a snapshot of all instance methods all the way up the chain only the
-          # first time you declare an attribute on a given module
-        @_im.include?(sym) or attr_reader sym
-        @_im.include?(:"#{sym}=") or attr_writer sym
+        method_defined?(sym) or attr_reader(sym)
+        method_defined?("#{sym}=") or attr_writer(sym)
         meta = attributes[sym] = change_request
       end
       change_request.each do |k, v|
@@ -38,16 +35,19 @@ module Skylab::Porcelain
       nil
     end
     def attributes
-      @attributes ||= _parent_dup_2(:attributes) { { } }
+      @attributes ||= _parent_dup_2(:attributes) { Attributes.new }
     end
     def default_meta_attributes
-      @default_meta_attributes ||= _parent_dup(:default_meta_attributes) { { } }
+      @default_meta_attributes ||= _parent_dup(:default_meta_attributes) { MetaAttributes.new }
     end
     def import_meta_attributes mod
       block_given? and raise ArgumentError.new("blocks not supported when importing meta attributes.")
+      if mod.const_defined?(:InstanceMethods)
+        include mod::InstanceMethods
+      end
       mod.meta_attributes.each do |k, meta|
         respond_to?(meta.hook_name) || meta_attributes.key?(k) and fail("implement me: decide clobber behavior")
-        singleton_class.send(:define_method, meta.hook_name, & meta.hook)
+        singleton_class.send(:define_method, meta.hook_name, & meta.hook) if meta.hook
         meta_attributes[k] = meta
       end
     end
@@ -70,7 +70,7 @@ module Skylab::Porcelain
       nil
     end
     def meta_attributes
-      @meta_attributes ||= _parent_dup_2(:meta_attributes) { {} }
+      @meta_attributes ||= _parent_dup_2(:meta_attributes) { MetaAttributes.new }
     end
     def _parent_dup attr_sym, &default
       if p = _parent_respond_to(attr_sym) and a = p.send(attr_sym)
@@ -94,6 +94,15 @@ module Skylab::Porcelain
 end
 
 module Skylab::Porcelain::AttributeDefiner
+  class Attributes < Hash
+    # future-proof
+  end
+  class AttributeMeta < Hash
+    # future-proof
+  end
+  class MetaAttributes < Hash
+    # future-proof
+  end
   class MetaAttribute
     attr_reader :hook
     def hook= prok
