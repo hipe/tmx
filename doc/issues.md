@@ -17,7 +17,7 @@
 [#080] 2012-03-13 @closed: gsu: fix
 [#079] 2012-03-10 @closed: porcelain: bleeding namespaces
 [#078] 2012-03-09 @closed: porcelain: bleeding (usable)
-[#077] 2012-03-08 @open: asib: put
+[#077] 2012-03-08 @closed: asib: put
 [#076] 2012-03-02 @closed: porcelain: simply and reveal tree rendering
 [#075] 2012-02-16 @closed: porcelain: aliases, descs for namesp, acts
 [#074] 2012-02-26 @closed: porcelain: get tree into stable from 026 branch
