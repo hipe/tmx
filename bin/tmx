@@ -1,6 +1,7 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env bash
 
-require File.expand_path('../../lib/skylab/tmx/cli.rb', __FILE__)
-
-Skylab::Tmx::Cli.new.run ARGV
-
+dir="$( cd "$( dirname "$0" )" && pwd )"
+tmp="$dir/.__tmp.sh"
+ruby "$dir/../._repath.rb" 1> "$tmp"
+source "$tmp"
+rm "$tmp"
