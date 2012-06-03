@@ -41,6 +41,7 @@ module Skylab::Porcelain
     extend Structuralist
     list_accessor_oldschool :description
     alias_method :desc, :description
+    alias_method :description_lines, :description # temporary compat until after 049.500
   end
   class ActionDef < Struct.new(:aliases, :argument_syntax, :description,
     :method_name, :option_syntax, :settings
@@ -111,6 +112,9 @@ module Skylab::Porcelain
     end
     def argument_syntax str
       @porcelain.action.argument_syntax = str
+    end
+    def desc *a
+      @porcelain.action.desc(*a)
     end
     def porcelain_dsl_init
       @porcelain ||= PorcelainModuleKnob.new(self) # already set iff this is a subclass

@@ -5,7 +5,7 @@ require File.expand_path('../../all', __FILE__)
 module Skylab::Porcelain::TestSupport
   Porcelain = ::Skylab::Porcelain
 
-  describe "The #{Skylab::Porcelain} module" do
+  describe "The #{Porcelain} module" do
     include Porcelain::Styles # unstylize
     let(:debug_ui) { }
     let(:_stderr) { StringIO.new }
@@ -70,6 +70,37 @@ module Skylab::Porcelain::TestSupport
           argument_syntax '<foo>'
           def bar foo ; end
           self
+        end
+      end
+      context "allows you to associate a description" do
+        let(:klass) do
+          ohai = self
+          Class.new.class_eval do
+            extend Porcelain
+            module_eval(& ohai.desco)
+            def ferp_derp one ; end
+            self
+          end
+        end
+        context "but when you don't (but note you need something else)" do
+          let(:desco) { ->(_){  argument_syntax '<one>' } }
+          it "the description lines will be nil" do
+            klass.actions[:ferp_derp].description_lines.should eql(nil)
+          end
+        end
+        context "with one line" do
+          let(:desco) { ->(_){
+            desc "ferpie"
+          } }
+          it "gives the one description line" do
+            klass.actions[:ferp_derp].description_lines.should eql(['ferpie'])
+          end
+        end
+        context "with two lines" do
+          let(:desco) { ->(_){  desc "ferpie" ; desc "lerpie" } }
+          it "gives the two description lines" do
+            klass.actions[:ferp_derp].description_lines.should eql(%w(ferpie lerpie))
+          end
         end
       end
       it "is used for defining option and argument syntax" do
