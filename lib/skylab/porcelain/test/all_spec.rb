@@ -48,6 +48,13 @@ module Skylab::Porcelain::TestSupport
       it "any child class of the class will also have this property and inherit the list of actions from its parent" do
         child_class.actions.map(&:name).should eql([:help, :foo, :bar, :'she-bang'])
       end
+      context "a simple ancestor chain of 'parent' module and child class" do
+        let(:parent)    {         Module.new.module_eval         { extend Porcelain ; def act_m ; end ; self } }
+        let(:child)     { o=self ; Class.new.class_eval          { extend Porcelain ; def act_c ; end ; include o.parent ; self } }
+        it "child gets parent actions, order is respected (but it's a smell to depend on this)" do
+          child.actions.map(&:name).should eql([:help, :'act-c', :'act-m'])
+        end
+      end
       describe "all modules in the ancestor chain" do
         let(:module_a)  {          Module.new.module_eval        { extend Porcelain ; def act_a ; end ; self } }
         let(:module_b)  { o=self ; Module.new.module_eval        { extend Porcelain ; def act_b ; end ; include o.module_a ; self } }
@@ -55,10 +62,10 @@ module Skylab::Porcelain::TestSupport
         let(:module_d)  {          Module.new.module_eval        { extend Porcelain ; def act_d ; end ; self } }
         let(:class_e)   { o=self ; Class.new.class_eval          { extend Porcelain ; def act_e ; end ; include o.module_b, o.module_c ; self } }
         let(:class_f)   { o=self ; Class.new(class_e).class_eval { extend Porcelain ; def act_f ; end ; include o.module_d ; self } }
-        it "get their actions inherited, in a particular order of precedence" do
+        it "get their actions inherited, in a particular order: officious, parent class, [..], my actions, modules included after" do
           ('a'..'f').map { |l| "#{(respond_to?("module_#{l}") ? :module : :class)}_#{l}" }.
                      each { |n| send(n).singleton_class.send(:define_method, :to_s) { n } }
-          class_f.actions.map{ |a| a.name.to_s }.should eql(%w(help act-d act-a act-b act-c act-e act-f))
+          class_f.actions.map{ |a| a.name.to_s }.should eql(%w(help act-e act-b act-a act-c act-f act-d))
         end
       end
     end
@@ -327,21 +334,25 @@ module Skylab::Porcelain::TestSupport
       let(:klass) do
         Class.new.class_eval do
           extend Porcelain
+        inactionable
           porcelain.invocation_name 'yourapp'
           attr_reader :argv ; private :argv
           def initialize &b
             @argv = @touched = nil
             porcelain_init(&b)
           end
+        public
           def takes_no_arguments
             @touched = true
           end
-          attr_reader :touched ; private :touched
+        private
+          attr_reader :touched
           self
         end
       end
       it "if no args are given it will enumerate the available actions (methods)" do
         instance.invoke []
+        stderr = self.stderr
         stderr.should match(/expecting.+takes-no-arguments/i)
       end
       describe "with one such action whose methods take no arguments" do
@@ -486,8 +497,8 @@ module Skylab::Porcelain::TestSupport
           self
         end
       end
-      let(:klass_with_external_namespace) do
-        cls = Class.new.class_eval do
+      let(:klass_for_namespace) do
+        Class.new.class_eval do
           extend Porcelain
           def tingle
             runtime.emit(:info, "yes sure tingle external")
@@ -495,12 +506,34 @@ module Skylab::Porcelain::TestSupport
           end
           self
         end
+      end
+      let(:klass_with_external_namespace) do
+        o = self
         Class.new.class_eval do
           extend Porcelain
           porcelain.invocation_name = 'wahoo'
-          namespace :'more', cls
+          namespace :'more', o.klass_for_namespace
           def duckle ; end
           self
+        end
+      end
+      context "(sanity check regression)" do
+        it "namespace class action names look ok" do
+          klass_for_namespace.actions.map(&:name).should eql([:help, :tingle])
+        end
+        it "class with inline namespace action names look ok" do
+          klass_with_inline_namespace.actions.map(&:name).should eql([:help, :more, :duckle])
+        end
+        it "class with external namespace action names look ok" do
+          klass_with_external_namespace.actions.map(&:name).should eql([:help, :more, :duckle])
+        end
+      end
+      context "(class with inline namespace regression)" do
+        it "does", f:true do
+          ns = klass_with_inline_namespace.actions[:more]
+          ns.actions_provider.actions.map(&:name).should(
+            eql([:help, :tingle])
+          )
         end
       end
       [ { :name => 'an external class',
@@ -541,7 +574,9 @@ module Skylab::Porcelain::TestSupport
             end
             context "more -h" do
               let(:argv) { %w(more -h) }
-              specify { should match(/^usage.*wahoo.*more.*tingle.*opts.*args/i) }
+              specify do
+                should match(/^usage.*wahoo.*more.*tingle.*opts.*args/i)
+              end
             end
             context "more wang" do
               let(:argv) { %w(more wang) }
