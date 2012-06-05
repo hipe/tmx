@@ -88,6 +88,10 @@ module Skylab::Porcelain
       frame_settings.push(->(_){ self.default= defaults })
     end
     alias_method :default, :default= # !
+    def default_summary_lines
+      a = client_module.actions.map { |a| Styles::e13b a.name }
+      ["child command#{'s' if a.length != 1}: {#{a * '|'}}"]
+    end
     def emits(*a)
       runtime.definition_blocks.push(->(_) { emits(*a) })
     end
@@ -113,6 +117,9 @@ module Skylab::Porcelain
       s
     end
     alias_method :invocation_name, :invocation_name= # !
+    def summary
+      desc or default_summary_lines
+    end
   end
   class RuntimeModuleKnob < Struct.new(:definition_blocks)
     def initialize
@@ -932,7 +939,7 @@ module Skylab::Porcelain
     end
     def summary
       case @mode
-      when :external    ;  @external_module.porcelain.desc
+      when :external    ;  @external_module.porcelain.summary
       else              ;  fail("implement me")
       end
     end
