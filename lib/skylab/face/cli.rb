@@ -262,6 +262,10 @@ module Skylab::Face
           w = rows.map{ |d| d[:name].length }.inject(0){ |m, l| m > l ? m : l }
           fmt = "%#{w}s  "
           rows.each do |row|
+            if ! row[:lines]
+              @out.puts "#{Indent}#{hi(fmt % row[:name])}.."
+              next
+            end
             @out.puts "#{Indent}#{hi(fmt % row[:name])}#{row[:lines].first}"
             row[:lines][1..-1].each do |line|
               @out.puts "#{Indent}#{fmt % ''}#{line}"
