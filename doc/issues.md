@@ -1,3 +1,4 @@
+[#097] 2012-06-04 @open @project:issues thing that converts @todo's into issues!??
 [#096] 2012-03-30 @closed: code-molester: files are not paths
 [#095] 2012-03-29 @closed: static fileserver refactor
 [#094] 2012-03-28 @closed: tanman: refactor: this shit is a mess (still).
