@@ -154,16 +154,6 @@ module Skylab::CodeMolester
   end
   MyPathname = Skylab::Face::MyPathname
   class << Config::File
-    alias_method :config_file_new, :new
-    # awesomely, subclasses of Pathname retain class identity when doing the getters
-    # but we don't always want that in our weird case (oops @todo delgate instead)
-    def new(*a, &b)
-      if 1 == a.count and String === a.first and b.nil?
-        MyPathname.new(*a, &b)
-      else
-        config_file_new(*a, &b)
-      end
-    end
     def parser_class
       @parser_class ||= begin
         # require "#{Config::DIR}/file-parser" # if etc ..
