@@ -1,5 +1,13 @@
+require 'skylab/porcelain/bleeding' # just for delegates_to - ick?
 module Skylab::CodeMolester::Config
-  class Sexp < ::Skylab::CodeMolester::Sexp ; end
+  Bleeding = Skylab::Porcelain::Bleeding # do this only in one place
+  class Sexp < ::Skylab::CodeMolester::Sexp
+    extend Bleeding::DelegatesTo
+    def build_comment_line line
+      line = "# #{line.gsub(/[[:space:]#]+/, ' ').strip}\n" # could be improved
+      S[:whitespace_line, '', S[:comment, line]]
+    end
+  end
   S = Sexp
   class ValuesPseudohash < ::Enumerator
     def [] key
@@ -7,10 +15,10 @@ module Skylab::CodeMolester::Config
       d.value
     end
     def []= key, value
-      @local_root.set_value(key, value)
+      root.set_value(key, value)
     end
-    def initialize local_root, &b
-      @local_root = local_root
+    def initialize root, &b
+      self.root = root
       super(&b)
     end
     def each &b
@@ -25,12 +33,27 @@ module Skylab::CodeMolester::Config
     def keys
       map { |v| v.key }
     end
+    attr_accessor :root
+  end
+  class SectionsPseudohash < ValuesPseudohash
+    extend Bleeding::DelegatesTo
+    def [] key
+      detect { |i| key == i.item_name }
+    end
+    def []= key, value
+      Hash === value or raise ArgumentError.new("Every assignment to an entire section must be a Hash, had #{value.class}")
+      sec = self[key] || Section.create(key, root)
+      value.each { |k, v| sec[k] = v }
+      value
+    end
+    delegates_to :root, :remove
   end
   class ContentItemBranch < Sexp
     # note that for now this is hard-coded to assume string and not symbol keys!
     # (the test below cannot simply test for Fixnum-based key b/c it also must take ranges)
-    def [] name
-      String === name or return super
+    def [] *a
+      1 == a.count && String === a.first or return super
+      name = a.first
       if ( i = content_items.detect { |ii| name == ii.item_name } )
         if i.item_leaf?
           i.item_value
@@ -41,10 +64,10 @@ module Skylab::CodeMolester::Config
         _no_value name
       end
     end
-    def []= k, v
-      String === k or return super
-      set_value k, v
-      v
+    def []= *a
+      2 == a.count and String === a.first or return super
+      set_value(*a)
+      a.last
     end
     def item_leaf?
       false
@@ -55,21 +78,24 @@ module Skylab::CodeMolester::Config
     def _no_value name
     end
     def set_value name, value
-      if i = content_items.detect { |i| name == i.item_name }
-        _update_value i, value
+      if Hash === value
+        sections[name] = value
+      elsif item = content_items.detect { |i| name == i.item_name }
+        _update_value item, value
       else
         _create_value name, value
       end
     end
     def value_items
-      this = _assignments_sexp
       ValuesPseudohash.new(self) do |y|
-        this.select(:assignment_line).each { |a| y << a }
+        _assignments_sexp.select(:assignment_line).each { |a| y << a }
       end
     end
   end
   class FileSexp < ContentItemBranch
     Sexp[:file] = self
+    delegates_to :nosecs, :prepend_comment
+    # delegates_to :sections, :append_comment # e.g.
     def _assignments_sexp
       self[1]
     end
@@ -88,8 +114,11 @@ module Skylab::CodeMolester::Config
       AssignmentLine.create(name, value, sec)
       nil
     end
-    def _no_value name
-      Section.create name, detect(:sections)
+    def nosecs
+      detect(:nosecs)
+    end
+    def sections
+      detect(:sections).enumerator
     end
     def _update_value assmt, value
       assmt.set_item_value value
@@ -100,12 +129,20 @@ module Skylab::CodeMolester::Config
     def content_items
       select(:assignment_line)
     end
+    def prepend_comment line
+      o = build_comment_line(line) or return false
+      self[1,0] = [o] # supreme hackery
+      o
+    end
   end
   class Sections < Sexp
     Sexp[:sections] = self
-    def content_items
-      select(:section)
+    def enumerator
+      SectionsPseudohash.new(self) do |y|
+        select(:section).each { |s| y << s }
+      end
     end
+    alias_method :content_items, :enumerator
   end
   class Section < ContentItemBranch
     Sexp[:section] = self
@@ -124,6 +161,13 @@ module Skylab::CodeMolester::Config
       self[1][1][2][1]
     end
     alias_method :section_name, :item_name
+    def item_name= str
+      self[1][1][2][1] = str
+    end
+    alias_method :section_name=, :item_name=
+    def _update_value assmt, value # c/p
+      assmt.set_item_value value
+    end
   end
   class << Section
     def create name, parent
@@ -137,7 +181,7 @@ module Skylab::CodeMolester::Config
       end
       sect = S[:section, S[:header, S[:section_line, s0, S[:name, name.to_s], S[:n_3, s1]]],
         S[:items, "\n"]]
-      parent.push "\n" # this probably breaks syntax, let's see if it's ok
+      # parent.push "\n" # this probably breaks syntax, let's see if it's ok # SEE TESTS
       parent.push sect
       sect
     end

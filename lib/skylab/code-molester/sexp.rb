@@ -12,8 +12,16 @@ module Skylab
       end
       def last *a
         0 == a.size and return super
-        i = (size-1).downto(1).detect { |i| Array === self[i] and self[i].first == a.first }
-        self[i] if i
+        ii = (size-1).downto(1).detect { |i| Array === self[i] and self[i].first == a.first }
+        self[ii] if ii
+      end
+      def remove sexp
+        size <= 1 and return fail("cannot remove anything from empty sexp!")
+        oid = sexp.object_id
+        index = (1..(size-1)).detect { |idx| oid == self[idx].object_id }
+        index or return fail("sexp with oid #{oid} was not an immediate child of this sexp.")
+        self[index, 1] = [] # ruby is amazing
+        sexp
       end
       def select *a, &b
         (b or 1 != a.size or !(Symbol === a.first)) and return super
@@ -23,26 +31,20 @@ module Skylab
         Symbol === first ? first : false
       end
       def unparse sio=nil
-        unless sio
-          sio = StringIO.new
-          ret = true
-        end
+        out = sio || StringIO.new
         self[1..-1].each do |child|
           if child.respond_to?(:unparse)
-            child.unparse(sio)
+            child.unparse(out)
           else
-            sio.write child.to_s
+            out.write child.to_s
           end
         end
-        if ret
-          sio.rewind
-          sio.read
-        end
+        out.string unless sio
       end
     end
     class << Sexp
       def [] *a
-        ((@factory and a.any?) ? factory[a.first] : self).new.concat([*a])
+        (((@factory ||= nil) and a.any?) ? factory[a.first] : self).new.concat([*a])
       end
       def []= symbol_name, sexp_klass
         factory[symbol_name] = sexp_klass

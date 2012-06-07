@@ -1,8 +1,10 @@
 require File.expand_path('../../version', __FILE__)
-require File.expand_path('../test-support/ui-tee', __FILE__)
+require 'skylab/slake/test/support/ui-tee'
+require File.expand_path('../support', __FILE__)
 
-module Skylab::Dependency
-  include TestSupport # UiTee
+module Skylab::Dependency::TestSupport
+  include ::Skylab::Slake::TestSupport # UiTee
+  include ::Skylab::Dependency
 
   describe Version do
 
@@ -31,16 +33,16 @@ module Skylab::Dependency
       sexp = Version::parse_string_with_version("abc-1.4.7-def")
       ver = sexp.detect(:version)
       ver.class.should eq(Version)
-      ver.to_s.should eq("1.4.7")
+      ver.unparse.should eq("1.4.7")
       ver.bump!(:major)
-      sexp.to_s.should eq("abc-2.4.7-def")
+      sexp.unparse.should eq("abc-2.4.7-def")
       ver.bump!(:major)
-      sexp.to_s.should eq("abc-3.4.7-def")
+      sexp.unparse.should eq("abc-3.4.7-def")
       ver.bump!(:minor)
-      sexp.to_s.should eq("abc-3.5.7-def")
+      sexp.unparse.should eq("abc-3.5.7-def")
       ver.bump!(:patch)
-      sexp.to_s.should eq("abc-3.5.8-def")
-      lambda { ver.bump!(:not_there) }.should raise_error(::Skylab::CodeMolester::Sexp::RuntimeError, "no such node: :not_there")
+      sexp.unparse.should eq("abc-3.5.8-def")
+      lambda { ver.bump!(:not_there) }.should raise_error(::RuntimeError, "no such node: :not_there")
     end
     include TestSupport # UiTee (again)
     def _parse str
@@ -48,7 +50,7 @@ module Skylab::Dependency
       sexp = Version::parse_string_with_version(str) do |o|
         o.on_informational { |e| ui.err.puts("#{e.type}: #{e.message}") }
       end
-      sexp.to_s.should eq(str)
+      sexp.unparse.should eq(str)
       ui.err_string.should eq("")
     end
   end

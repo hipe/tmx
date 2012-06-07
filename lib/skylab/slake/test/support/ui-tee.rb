@@ -1,14 +1,11 @@
-require 'stringio'
+require File.expand_path('../../test-support', __FILE__)
 
-module Skylab ; end
-module Skylab::Dependency ; end
-module Skylab::Dependency::TestSupport
-  class MyStringIO < StringIO
-    def to_str
-      rewind
-      read
-    end
-  end
+module Skylab::Slake
+end
+
+module Skylab::Slake::TestSupport
+  include ::Skylab::TestSupport
+
   class Tee < Hash
     def initialize hash
       hash.each do |k, v|
@@ -26,15 +23,13 @@ module Skylab::Dependency::TestSupport
   class UiTee
     def initialize opts=nil
       opts and opts.each { |k, v| send("#{k}=", v) }
-      @out ||= (@silent ? Tee.new(:buffer => MyStringIO.new) : Tee.new(:stream => $stdout, :buffer => MyStringIO.new))
-      @err ||= (@silent ? Tee.new(:buffer => MyStringIO.new) : Tee.new(:stream => $stderr, :buffer => MyStringIO.new))
+      @out ||= (@silent ? Tee.new(:buffer => StringIO.new) : Tee.new(:stream => $stdout, :buffer => StringIO.new))
+      @err ||= (@silent ? Tee.new(:buffer => StringIO.new) : Tee.new(:stream => $stderr, :buffer => StringIO.new))
     end
     attr_accessor :err, :out, :silent
     %w(out err).each do |stream|
       define_method("#{stream}_string") do
-        buffer = send(stream)[:buffer]
-        buffer.rewind
-        buffer.read
+        send(stream)[:buffer].string
       end
     end
   end
