@@ -1,3 +1,25 @@
+[#096] 2012-03-30 @closed: code-molester: files are not paths
+[#095] 2012-03-29 @closed: static fileserver refactor
+[#094] 2012-03-28 @closed: tanman: refactor: this shit is a mess (still).
+[#093] 2012-03-28 @closed: tanman: status
+[#092] 2012-03-19 @closed: tanman: refactor into api, test all
+[#091] 2012-03-17 @closed: tanman: local .tan
+[#090] 2012-03-16 @closed: porcelain: table: column type inference
+[#089] 2012-03-15 @closed: tanman: remote: remove
+[#088] 2012-03-15 @closed: porcelain: table
+[#087] 2012-03-15 @closed: tanman: remote: list
+[#086] 2012-03-14 @closed: porcelain: meta attrib modules
+[#085] 2012-03-14 @closed: tanman: correct event handling so tan can detect errors
+[#084] 2012-03-14 @closed: integrate all stable into porcelain stable
+[#083] 2012-03-14 @closed: attrib-definer: new home
+[#082] 2012-03-14 @closed: code-molester: improve section handling
+[#081] 2012-03-14 @closed: code-molester: integrate
+[#080] 2012-03-13 @closed: gsu: fix
+[#079] 2012-03-10 @closed: porcelain: bleeding namespaces
+[#078] 2012-03-09 @closed: porcelain: bleeding (usable)
+[#077] 2012-03-08 @closed: asib: put
+[#076] 2012-03-02 @closed: porcelain: simply and reveal tree rendering
+[#075] 2012-02-16 @closed: porcelain: aliases, descs for namesp, acts
 [#074] 2012-02-26 @closed: porcelain: get tree into stable from 026 branch
 [#073] 2012-02-26 @open: git-viz: histree: (file tree with most recents)
 [#072] 2012-02-26 @open: borrow
