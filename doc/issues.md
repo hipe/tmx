@@ -1,3 +1,5 @@
+[#102] 2021-06-08 @open treemap, ofc!
+[#101] 2021-06-08 @open when doing gem install with rdoc, "stack level too deep"
 [#100.300.XXX] 2012-06-08 (numberspace reserved for porcelain.rb)
 [#100.200.XXX] 2012-06-08 (numberspace reserved for all.rb)
 [#100.100.500] 2012-06-08 @open with face.rb index all features
