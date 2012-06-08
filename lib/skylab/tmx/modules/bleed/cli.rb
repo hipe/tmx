@@ -10,8 +10,9 @@ module Skylab::Tmx::Modules
         op.separator "by invoking a bash script"
       end
       def load ctx
-        $stderr.puts "(ignoring load for now)"
-        # api.invoke([:load], ctx)
+        api.invoke([:load], ctx) do |o|
+          o.on_all { |e| out.puts "#{e.bash} ; " }
+        end
       end
 
       o do |op, ctx|
@@ -19,7 +20,8 @@ module Skylab::Tmx::Modules
       end
       def init ctx
         api.invoke([:init], ctx) do |o|
-          head_and_tails('init: ', o)
+          o.on_head { |e| err.write "tmx-bleed: init: #{e.message}" ; e.touch! }
+          o.on_tail { |e| err.puts e.message ; e.touch! }
           o.on_all  { |e| err.puts "tmx-bleed: init: #{e.message}" unless e.touched? }
         end
       end

@@ -8,7 +8,7 @@ module Skylab::Tmx::Modules::Bleed::Api
       path = contract_tilde(::Skylab::ROOT.to_s)
       config['bleed'] ||= {} # create the section called [bleed]
       config['bleed']['path'] = path
-      write_config
+      config_write
     end
   end
 end
