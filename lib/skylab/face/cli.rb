@@ -1,11 +1,12 @@
 require 'optparse'
 
-# an ultralight command-line parser (417 lines)
+# an ultralight command-line parser (430 lines)
 # that wraps around OptParse (can do anything it does)
 # with colors
 # with flexible command-like options ('officious' like -v, -h)
 # with commands with arguments based off of method signatures
 # with subcommands, (namespaces) arbitrarily deeply nested
+# with default commands within those namespaces
 # with aliases for commands and namespaces
 
 module Skylab; end
@@ -140,7 +141,7 @@ module Skylab::Face
         @err.puts usage_string
         invite
       end
-      alias_method :empty_argv, :usage
+      # alias_method :empty_argv, :usage
     end
     include Nodeish
 
@@ -153,6 +154,9 @@ module Skylab::Face
           implied = implied_m.map { |m| Command.new(m) }
           Treeish[ defined + implied ]
         end
+      end
+      def default_action *a
+        a.any? ? (@default_action = (a*'').to_sym) : @default_action
       end
       # this is nutty: for classes that extend this module, this is
       # something that is triggered when they are subclasses
@@ -220,6 +224,12 @@ module Skylab::Face
           interface.command_tree.map { |c| c.parent = self if c.respond_to?(:parent=); c } # careful
         end
       end
+      def default_action
+        self.class.default_action
+      end
+      def empty_argv
+        default_action ? find_command([default_action]) : usage
+      end
       def expecting
         interface.command_tree.map(&:name) * '|'
       end
@@ -252,6 +262,10 @@ module Skylab::Face
           w = rows.map{ |d| d[:name].length }.inject(0){ |m, l| m > l ? m : l }
           fmt = "%#{w}s  "
           rows.each do |row|
+            if ! row[:lines]
+              @out.puts "#{Indent}#{hi(fmt % row[:name])}.."
+              next
+            end
             @out.puts "#{Indent}#{hi(fmt % row[:name])}#{row[:lines].first}"
             row[:lines][1..-1].each do |line|
               @out.puts "#{Indent}#{fmt % ''}#{line}"
@@ -357,7 +371,10 @@ module Skylab::Face
           @parent and fail("won't overwrite parent")
           @parent = parent
         end
-        def summary
+        def summary *a
+          a.any? ? (@summary = a) : (@summary || summary_of_commands)
+        end
+        def summary_of_commands
           a = command_tree.map { |c| hi(c.name) }
           ["child command#{'s' if a.length != 1}: {#{a * '|'}}"]
         end

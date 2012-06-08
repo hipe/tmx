@@ -1,10 +1,8 @@
 #!/usr/bin/env ruby
 
-require 'ruby-debug'
-
 payload = lambda do
 
-  dir = File.expand_path('../bin', __FILE__)
+  dir = File.expand_path('../../bin', __FILE__)
   File.directory?(dir) or return {
     :message => "not a directory, won't add to PATH: #{dir}"
   }
@@ -32,6 +30,7 @@ payload = lambda do
 
 end.call
 
-payload[:message] and $stdout.puts "echo #{payload[:message].inspect}"
-payload[:new_path] and $stdout.puts "export PATH=\"#{payload[:new_path]}\""
+payload[:message] and $stdout.puts "echo #{payload[:message].inspect} ; "
+payload[:new_path] and $stdout.puts "export PATH=\"#{payload[:new_path]}\" ; "
 $stdout.puts(payload[:success] ? "echo 'hack done.'" : "echo 'hack failed.'")
+

@@ -165,6 +165,9 @@ module Skylab::CodeMolester::Config
       self[1][1][2][1] = str
     end
     alias_method :section_name=, :item_name=
+    def _update_value assmt, value # c/p
+      assmt.set_item_value value
+    end
   end
   class << Section
     def create name, parent

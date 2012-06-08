@@ -6,13 +6,14 @@ module Skylab::CovTree
     extend ::Skylab::Porcelain
     extend ::Skylab::PubSub::Emitter
 
+  inactionable
+
     emits :all,
       :info => :all,
       :error => :all,
       :payload => :all
 
-    porcelain { blacklist /^on_.*/ } # hack so that our event knobs don't appear as actions
-
+  public
 
     desc "see crude unit test coverage with a left-right-middle filetree diff"
     desc "  * test files with corresponding application files appear as green."
