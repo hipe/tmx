@@ -30,7 +30,7 @@ module Skylab::TanMan
             message: "#{sing.local.pathname.dirname.pretty}/", pathname: sing.local.pathname)
         end
       end
-      ee.each { |e| emit(e) } # experiment: can an api call merely emit events?
+      ee
     end
   end
 end
