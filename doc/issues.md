@@ -47,7 +47,7 @@
 [#052] 2012-02-11 @closed code molester: for fun write a config parser
 [#051] 2012-02-11 @open set program name explicitly, streams
 [#050] 2012-02-11 issue: change implementation of search to take lambdas
-[#049] 2012-02-11 @open add "bleed" feature
+[#049] 2012-02-11 @closed add "bleed" feature @closed:2012-06-08 haha
 [#048] 2012-02-10 @open show should list (for now)
 [#047] 2012-02-07 @closed all: mark all closed issues as closed
 [#046] 2012-02-07 @open issue: add verbose/debug mode, put such output there
