@@ -12,6 +12,7 @@ module Skylab::Tmx
 
     version { File.read(File.expand_path('../../../../VERSION', __FILE__)) }
 
+    # @todo: @after:#100 unhack the below rediculous mess
     face_namespaces = ::Skylab::Face::Command::Namespace.namespaces
     porc_namespaces = ::Skylab::Porcelain.namespaces
     both = [face_namespaces, porc_namespaces]
