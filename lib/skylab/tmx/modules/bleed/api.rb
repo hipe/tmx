@@ -1,4 +1,5 @@
 require 'pathname'
+require 'skylab/tmx/model/config'
 
 module Skylab::Tmx::Modules::Bleed
   API_ROOT = Pathname.new('../api').expand_path(__FILE__)

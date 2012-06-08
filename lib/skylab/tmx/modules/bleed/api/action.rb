@@ -1,5 +1,3 @@
-require 'skylab/tmx/model/config'
-
 module Skylab::Tmx::Modules::Bleed::Api
   module MyPathTools
     def contract_tilde path
