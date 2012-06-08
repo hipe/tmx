@@ -30,6 +30,7 @@ module Skylab::Face::Colors
 end
 
 module Skylab::Face
+  # @todo:#100.100.400 rename to 'Action'
   class Command
 
     include Colors

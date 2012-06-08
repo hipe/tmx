@@ -1,3 +1,11 @@
+[#100.300.XXX] 2012-06-08 (numberspace reserved for porcelain.rb)
+[#100.200.XXX] 2012-06-08 (numberspace reserved for all.rb)
+[#100.100.500] 2012-06-08 @open with face.rb index all features
+[#100.100.400] 2012-06-08 @open with face.rb rename stuff, unify names
+[#100.100.300] 2012-06-08 @open with face.rb, eliminate unused code
+[#100.100.100] 2012-06-08 @open with face.rb, get to 95% test coverage
+[#100] 2012-06-08 @open integrate porcelain and face and bleeding
+[#099] 2012-06-08 @open how in the hell did we break 'bin/tmx'
 [#098] 2012-06-06 @open "ignoring event handlers for now"
 [#097] 2012-06-04 @open @project:issues thing that converts @todo's into issues!??
 [#096] 2012-03-30 @closed: code-molester: files are not paths
@@ -26,11 +34,11 @@
 [#073] 2012-02-26 @open: git-viz: histree: (file tree with most recents)
 [#072] 2012-02-26 @open: borrow
 [#071] 2012-02-26 @open: fsm: passes with some specs
-[#070] 2012-02-25 @open: face cli: compat back / fwds with porcelain
-[#069] 2012-02-25 @open: porcelain: compat w/ face cli
-[#068] 2012-02-24 @open: porcelain: without syntax uses method sig
-[#067] 2012-02-20 @open: emitter can emit arbitrary number of arguments
-[#066] 2012-02-18 @open: porcelain: namespace native and compat
+[#070] 2012-02-25 @closed: face cli: compat back / fwds with porcelain
+[#069] 2012-02-25 @closed: porcelain: compat w/ face cli
+[#068] 2012-02-24 @closed: porcelain: without syntax uses method sig
+[#067] 2012-02-20 @closed: emitter can emit arbitrary number of arguments
+[#066] 2012-02-18 @closed: porcelain: namespace native and compat
 [#065] 2012-02-18 @closed: porcelain: default args
 [#064] 2012-02-18 @closed: we must deep copy tag cloud!
 [#063] 2012-02-18 @closed gsu: fix it to use new porcelain
@@ -45,7 +53,7 @@
 [#054] 2012-02-17 @closed code molester: make values accessor
 [#053] 2012-02-14 @closed code molester: pure refactor: deepening
 [#052] 2012-02-11 @closed code molester: for fun write a config parser
-[#051] 2012-02-11 @open set program name explicitly, streams
+[#051] 2012-02-11 @closed set program name explicitly, streams
 [#050] 2012-02-11 issue: change implementation of search to take lambdas
 [#049] 2012-02-11 @closed add "bleed" feature @closed:2012-06-08 haha
 [#048] 2012-02-10 @open show should list (for now)
