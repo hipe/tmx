@@ -89,7 +89,7 @@ module Skylab::Porcelain
     end
     alias_method :default, :default= # !
     def default_summary_lines
-      a = client_module.actions.map { |a| Styles::e13b a.name }
+      a = client_module.actions.map { |o| Styles::e13b o.name }
       ["child command#{'s' if a.length != 1}: {#{a * '|'}}"]
     end
     def emits(*a)
