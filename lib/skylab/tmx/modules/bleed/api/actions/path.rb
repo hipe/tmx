@@ -2,15 +2,10 @@ module Skylab::Tmx::Modules::Bleed::Api
   class Actions::Path < Action
     emits :path # note this is not added to the 'all' network (no touching hacks needed)
     def get_path
-      (o = config['bleed']) or return error("section not found in #{config.pretty}: [bleed]")
-      (path = o['path']) or return error("'path' attribute not found in [bleed] in #{config.pretty}")
-      emit :path, path
+      path = config_get_path and emit(:path, path)
     end
     def invoke
-      config.exist? or return error("#{config.pretty} not found, use 'init' to create.")
-      config.read do |o|
-        o.on_all { |e| emit(:error, "issue reading config file: #{e.type}: #{e.message}") }
-      end or return false
+      config_read or return false
       params[:path] ? set_path : get_path
     end
     def set_path
