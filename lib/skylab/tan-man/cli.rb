@@ -90,6 +90,20 @@ module Skylab::TanMan
     delegates_to :runtime, :text_styler
   end
 
+  class Cli::NamespaceAction < Bleeding::NamespaceAction
+    include Api::RuntimeExtensions
+  end
+
+  module Cli::Namespace
+    include Bleeding::Namespace
+    def build runtime
+      Cli::NamespaceAction.new(self, runtime)
+    end
+    def self.extended mod
+      mod.namespace_module_init
+    end
+  end
+
   module Cli::Actions
   end
 
@@ -122,9 +136,9 @@ module Skylab::TanMan
       api.invoke opts.merge(path: path, local_conf_dirname: Api.local_conf_dirname)
     end
   end
+
   module Cli::Actions::Remote
-    extend Bleeding::Namespace
-    include Api::RuntimeExtensions
+    extend Cli::Namespace
     desc "manage remotes."
     summary { ["#{action_syntax} remotes"] }
   end
