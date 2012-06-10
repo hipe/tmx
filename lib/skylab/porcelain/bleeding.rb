@@ -288,11 +288,6 @@ module Skylab::Porcelain::Bleeding
     end
   end
   module Namespace
-    def self.extended mod
-      mod.send :extend, NamespaceModuleMethods
-    end
-  end
-  module NamespaceModuleMethods
     include ActionModuleMethods
     def self.extended mod
       mod.namespace_module_init
@@ -343,7 +338,7 @@ module Skylab::Porcelain::Bleeding
     delegates_to :actions_module, :name
   end
   class Runtime
-    extend NamespaceModuleMethods
+    extend Namespace
     include NamespaceInstanceMethods
     def actions_module
       action.actions_module
