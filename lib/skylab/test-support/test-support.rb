@@ -7,6 +7,6 @@ class String
 end
 
 module Skylab::TestSupport
-  # future-proof
+  extend Skylab::Autoloader
 end
 

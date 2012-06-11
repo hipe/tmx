@@ -2,7 +2,7 @@ require_relative 'model'
 
 module Skylab::TanMan
   class Models::Remote < Models::Model
-    Api::Autoloader.init(self)
+    Api::Autoloader.init(self) # @todo after:#102
 
     extend Bleeding::DelegatesTo
 

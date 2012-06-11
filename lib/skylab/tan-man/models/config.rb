@@ -1,6 +1,7 @@
 module Skylab::TanMan
   module Models::Config
-    Api::Autoloader.init(self)
+    # @todo: after:#102
+    Api::Autoloader.init self
   end
 end
 

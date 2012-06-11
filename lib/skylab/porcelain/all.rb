@@ -856,17 +856,15 @@ module Skylab::Porcelain
           @porcelain.runtime = @frame.emitter
           self
         when :external
-          @external_module.porcelain.build_client_instance(@frame.emitter)
+          @external_module.porcelain.build_client_instance @frame.emitter # @todo: during:#100.100.400
         end
       end
     end
+    # @todo during:#100.200 for_run <=> build_client_instance
     def for_run ui, slug # compat
-      o = @external_module.porcelain.build_client_instance nil
-      o.porcelain.runtime_instance_settings = ->(p) do
-        p.invocation_slug = slug
-        p.on_all { |e| $stderr.puts e.to_s }
-      end
-      o
+      @external_module.porcelain.build_client_instance(nil,
+        out_stream: ui.out, err_stream: ui.err, invocation_slug: slug
+      )
     end
     def inflate!
       singleton_class.class_eval(&@block)

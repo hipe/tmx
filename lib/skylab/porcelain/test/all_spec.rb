@@ -529,7 +529,7 @@ module Skylab::Porcelain::TestSupport
         end
       end
       context "(class with inline namespace regression)" do
-        it "does", f:true do
+        it "does" do
           ns = klass_with_inline_namespace.actions[:more]
           ns.actions_provider.actions.map(&:name).should(
             eql([:help, :tingle])

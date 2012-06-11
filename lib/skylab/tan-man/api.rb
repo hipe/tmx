@@ -254,6 +254,7 @@ module Skylab::TanMan
   end
 
   module Api::Autoloader
+    # @todo: after:#102
     # experimental: const_missing hax can suck, but we want to avoid the overhead of
     # loading things like code-molester's config file parser unless we need it
     def self.init mod
