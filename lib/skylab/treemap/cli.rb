@@ -5,7 +5,7 @@ module Skylab::Treemap
     extend Skylab::PubSub::Emitter
 
     emits Skylab::Porcelain::Bleeding::EVENT_GRAPH
-    emits payload: :all
+    emits payload: :all, info: :all
 
     desc "experiments with R."
 
@@ -20,9 +20,10 @@ module Skylab::Treemap
       slug   = opts[:invocation_slug] or fail('no an invocation_slug')
       $VERBOSE = true
       rt = new
-      rt.on_payload { |e| stdout.puts e.message }
       rt.on_error   { |e| stderr.puts "#{rt.program_name} error: #{e.message}" }
       rt.on_help    { |e| stderr.puts e.message }
+      rt.on_info    { |e| stderr.puts "#{rt.program_name}: #{e.message}" }
+      rt.on_payload { |e| stdout.puts e.message }
       rt.program_name = slug
       if runtime_instance_settings
         runtime_instance_settings.call rt
