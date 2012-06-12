@@ -1,11 +1,10 @@
-require 'skylab/porcelain/bleeding'
+require_relative 'actions'
 
 module Skylab::Treemap
-  Bleeding = Skylab::Porcelain::Bleeding
-  class CLI < Bleeding::Runtime
+  class CLI < Skylab::Porcelain::Bleeding::Runtime
     extend Skylab::PubSub::Emitter
 
-    emits Bleeding::EVENT_GRAPH
+    emits Skylab::Porcelain::Bleeding::EVENT_GRAPH
     emits payload: :all
 
     desc "experiments with R."
@@ -34,17 +33,6 @@ module Skylab::Treemap
       self
     end
     attr_accessor :runtime_instance_settings
-  end
-  class Action
-    extend Bleeding::Action
-  end
-  module Actions
-  end
-  class Actions::Install < Action
-    URL_BASE = 'http://cran.stat.ucla.edu/'
-    def execute
-      emit :payload, "To install R, please download the package for your OS from #{URL_BASE}"
-    end
   end
 end
 

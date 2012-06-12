@@ -168,7 +168,7 @@ module Skylab::Porcelain::Bleeding
                when :req  ;
                when :opt  ; %w([ ])
                when :rest ; %w([ [..]])
-               else       ; fail
+               else       ; fail("not expecting this token: #{p.first.inspect}")
                end
         "#{a}<#{p.last}>#{b}"
       end.join(' ')

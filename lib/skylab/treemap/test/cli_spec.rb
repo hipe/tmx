@@ -20,7 +20,7 @@ module Skylab::Treemap
         scn.skip_until(/\nactions:\n/) or fail('failed to find "actions:" section')
         names = []
         while line = scn.scan(/^[[:space:]].*\n/) do
-          if md = line.match(/^[[:space:]]+([-a-z]+)[[:space:]]*\z/)
+          if md = line.match(/^[[:space:]]+([-a-z]+)*/) # weak!
             names.push md[1]
           end
         end
