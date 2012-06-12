@@ -11,6 +11,9 @@ module Skylab::Porcelain
     def children?
       !! self[:children]
     end
+    def children_length
+      children? ? children.length : 0
+    end
     def find path_arr
       path_arr.kind_of?(Array) or path_arr = path_arr.to_s.split(Tree::SEPARATOR)
       _find path_arr, false

@@ -30,7 +30,7 @@ module Skylab::Porcelain::Tree
       sum = 1
       if root.children?
         _push meta
-        last = root.children.length - 1
+        last = root.children_length - 1
         root.children.each_with_index do |child, idx|
           sum += _traverse(child, {
             :is_first => (0 == idx),

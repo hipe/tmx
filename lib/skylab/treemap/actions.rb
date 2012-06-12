@@ -65,17 +65,13 @@ module Skylab::Treemap
       true
     end
     def r
-      Skylab::Treemap::R
       @r ||= Skylab::Treemap::R::Bridge.new
     end
-    def set_parameters params
+    def update_parameters! params
       params.each { |k, v| send("#{k}=", v) }
+      self
     end
-    def set_parameters_for_execution params
-      clear!.set_parameters params
-      validate_parameters
-    end
-    def validate_parameters
+    def validate
       ok = true
       validation_errors.each do |k, errs|
         ok = error(%{#{pre attributes[k].label} #{errs.join(' and it ')}})
@@ -107,7 +103,7 @@ module Skylab::Treemap
     end
     def execute path, opts
       require_relative 'actions/render'
-      execute_with_parameters opts.merge(path: path)
+      execute path, opts
     end
   end
 end
