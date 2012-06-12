@@ -81,14 +81,17 @@ module Skylab::Porcelain
       require File.expand_path('../tree/node', __FILE__)
       Tree::Node.from_paths paths
     end
-    def text root, opts=nil, &block
+    def lines root, opts=nil
       fly = Tree::TextLine.new # flyweighting can be turned into an option if needed to
       loc = Tree::Locus.new( * [opts].compact )
-      enum = Enumerator.new do |y|
+      Enumerator.new do |y|
         loc.traverse(root) do |node, meta|
           y << fly.clear!.update!(loc.prefix(meta), loc.node_name[node])
         end
       end
+    end
+    def text root, opts=nil, &block
+      enum = lines(root, opts)
       if block_given?
         enum.each(&block)
       else

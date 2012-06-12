@@ -9,10 +9,24 @@ module Skylab::Treemap
       fh.closed? and fail("pass me an open filehandle please: #{fh.inspect}")
       @index = -1
       @file = fh
+      @peeking = nil
       super() do |y|
         @file.lines.each_with_index do |line, index|
           @index = index
           y << line.chomp
+        end
+      end
+    end
+    def peeking
+      @peeking and return @peeking
+      lines = self
+      @peeking = Enumerator.new do |y|
+        begin
+          loop do
+            y.yield(lines.peek)
+            lines.next
+          end
+        rescue StopIteration
         end
       end
     end
@@ -22,15 +36,9 @@ module Skylab::Treemap
     attribute :path, path: true, required: true
 
     def advance_to_first_line
-      found = false
-      begin
-        loop do
-          (found = (@first_line_re =~ @lines.peek)) ? break : @lines.next
-        end
-      rescue StopIteration
-      end
-      found or error("#{pre attributes[:char].label}" <<
-        " not found at the start of any line in #{path.pretty}.")
+      @lines.peeking.detect { |line| @first_line_re =~ line } or
+        parse_error("#{pre attributes[:char].label}" <<
+          " not found at the start of any line (of #{@lines.index + 1})")
     end
 
     def clear!
@@ -73,8 +81,7 @@ module Skylab::Treemap
       @stack.empty? or fail("for now, won't read_lines unless stack is empty")
       @stack.push Skylab::Treemap::Models::Node.new
       @stack.last.push Skylab::Treemap::Models::Node.new
-      loop do
-        line = begin @lines.next; rescue StopIteration ; break end
+      @lines.peeking.each do |line|
         data = parse_line(line, @lines.index) or break
         node = Skylab::Treemap::Models::Node.new(data)
         case @stack.last.first.indent_length <=> node.indent.length
@@ -95,13 +102,12 @@ module Skylab::Treemap
     end
     def render_debug
       require 'skylab/porcelain/tree'
-      i = 0
-      Skylab::Porcelain::Tree.text(@tree) do |line|
-        i += 1
-        $stderr.puts line
+      empty = true
+      Skylab::Porcelain::Tree.lines(@tree).each do |line|
+        emit :info, line # egads!
+        empty = false
       end
-      0 == i and info("(nothing)")
-      i
+      empty ? (info("(nothing)") and false) : true
     end
     def stack_pop node
       loop do
@@ -121,10 +127,13 @@ module Skylab::Treemap
     def stack_pop_error_indent node, was
       (a = []).push "that of line #{was.last.line_number}"
       if @stack.length > 1
-        a.push "that of line #{@stack.last.last.line_number}"
+        a.push " or that of line #{@stack.last.last.line_number}"
+      end
+      if @stack.length > 2
+        a.push " (etc)"
       end
       parse_error("bad indentation on line #{node.line_number} --" <<
-        " it must be #{a.join(' or ')}")
+        " it must be #{a.join('')}")
     end
   end
 end
