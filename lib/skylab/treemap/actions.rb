@@ -28,9 +28,9 @@ module Skylab::Treemap
       emit :payload, "To install R, please download the package for your OS from #{URL_BASE}"
     end
   end
-  class Actions::Whatever < Action
+  class Actions::Render < Action
     def execute
-      require_relative 'actions/whatever'
+      require_relative 'actions/render'
       execute
     end
   end
