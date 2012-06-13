@@ -33,6 +33,7 @@ module Skylab::Issue
   end
 
   module Models
+    extend Skylab::Autoloader
   end
 end
 

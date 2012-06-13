@@ -4,6 +4,7 @@ require 'skylab/face/path-tools'
 
 module Skylab::Issue
   class Models::Issues
+    extend ::Skylab::Autoloader
     include ::Skylab::Face::PathTools
     o = File.expand_path('..', __FILE__)
     require "#{o}/issues/manifest"
@@ -26,11 +27,10 @@ module Skylab::Issue
     end
     attr_accessor :emitter
     def find hash
-      require File.expand_path('../issues/search', __FILE__)
-      search = Search.build(emitter, hash) or return search
+      search = Models::Issues::Search.build(emitter, hash) or return search
       enum = MyEnumerator.new do |y|
         with_manifest do |mani|
-          mani.issues_flyweight.filter do |outp, inp|
+          mani.build_issues_flyweight.filter do |outp, inp|
             search.include?(inp) and outp << inp
           end.each { |o| y << o }
         end
