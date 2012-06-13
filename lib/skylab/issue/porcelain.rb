@@ -1,9 +1,10 @@
-require File.expand_path('../api', __FILE__)
+require_relative 'api'
 
 module Skylab::Issue
 
   class Porcelain
     extend ::Skylab::Porcelain
+    extend ::Skylab::Autoloader
 
     desc "Add an \"issue\" line to #{ISSUES_FILE_NAME}."
     desc "Lines are added to the top and are sequentially numbered."
