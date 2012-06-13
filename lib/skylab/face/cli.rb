@@ -391,11 +391,11 @@ class Skylab::Face::Cli
   include Face::Command::Nodeish
   include Face::Command::Treeish
 
-  def initialize opts=nil, &events
+  def initialize opts=nil
+    block_given? and raise ArgumentError.new("this crap comes back after #100")
     opts and opts.each { |k, v| send("#{k}=", v) }
     @out ||= $stdout
     @err ||= $stderr
-    events and @err.puts("(notice: ignoring event handlers for now)")
   end
   attr_accessor :out, :err
   attr_accessor :request

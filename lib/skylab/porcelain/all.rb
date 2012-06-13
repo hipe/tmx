@@ -80,8 +80,8 @@ module Skylab::Porcelain
     end
     attr_accessor :actionable
     alias_method :actionable?, :actionable
-    def build_client_instance runtime
-      client_module.new.tap { |o| o.porcelain.runtime = runtime }
+    def build_client_instance runtime, slug
+      client_module.build_client(runtime, slug)
     end
     def default= *defaults
       1 == defaults.size && Array === defaults.first and defaults = defaults.first
@@ -182,6 +182,14 @@ module Skylab::Porcelain
       ActionEnumerator.new(cache) do |yielder|
         cache.each { |act| yielder << act }
       end
+    end
+    def build_client runtime, slug
+      client = new do |rt|
+        rt.invocation_slug = slug
+        client.wire! rt, runtime # it must die, all of it.
+      end
+      client.porcelain.runtime = runtime
+      client
     end
     def extended mod
       fail("implement and test me (probably just call porcelain_dsl_init on the module)")
@@ -692,7 +700,7 @@ module Skylab::Porcelain
   end
 
   class CallFrame < Struct.new(:above, :action, :actions_provider, :argv,
-    :below, :client_instance, :default, :defaulted, :emitter, :fuzzy_match,
+    :below, :get_client_instance, :default, :defaulted, :emitter, :fuzzy_match,
     :invocation_slug
   )
     include ArgvTokenParse
@@ -701,8 +709,9 @@ module Skylab::Porcelain
       super
     end
     def client_instance
-      Proc === (i = super) ? i.call : i
+      @client_instance ||= get_client_instance.call
     end
+    attr_writer :client_instance
     alias_method :defaulted?, :defaulted
     def default?
       !! default
@@ -747,12 +756,13 @@ module Skylab::Porcelain
       :error         => :all,
       :info          => :all,
       :help          => :info,
+      :payload       => :all,
       :ui            => :info,
       :usage         => :info,
       :syntax        => :info,
       :runtime_issue => :error
     })
-    %w(invocation render_actions resolve).each do |m| # @delegates
+    %w(invocation render_actions resolve).each do |m| # @delegates @todo:#100.200.1
       define_method(m) { |*a, &b| stack.send(m, *a, &b) }
     end
     def initialize argv, client_instance, instance_defn, module_defn
@@ -848,23 +858,22 @@ module Skylab::Porcelain
       when :external ; @external_module
       end
     end
-    def _client_instance
-      @_client_instance ||= begin
-        case @mode
-        when :inline
-          instance_variable_defined?('@porcelain') && @porcelain or porcelain_init # this needs some thought!
-          @porcelain.runtime = @frame.emitter
-          self
-        when :external
-          @external_module.porcelain.build_client_instance @frame.emitter # @todo: during:#100.100.400
-        end
+    attr_accessor :client_instance
+    def get_ns_client slug
+      case @mode
+      when :inline
+        (@porcelain ||= nil) or porcelain_init # i want it all to go away
+        @porcelain.runtime = @frame.emitter
+        self
+      when :external
+        @external_module.porcelain.build_client_instance(@frame.emitter, slug) # @todo: during:#100.100.400
+      else
+        fail('no')
       end
     end
     # @todo during:#100.200 for_run <=> build_client_instance
     def for_run ui, slug # compat
-      @external_module.porcelain.build_client_instance(nil,
-        out_stream: ui.out, err_stream: ui.err, invocation_slug: slug
-      )
+      @external_module.porcelain.build_client_instance(ui, slug)
     end
     def inflate!
       singleton_class.class_eval(&@block)
@@ -920,11 +929,12 @@ module Skylab::Porcelain
     attr_reader :frame
     def parse argv
       inflate! if @block
+      slug = argv.first
       @frame = CallFrame.new(
         :argv => argv,
         :action => self,
-        :client_instance => ->{ _client_instance },
-        :invocation_slug => argv.first,
+        :get_client_instance => ->(){ get_ns_client(slug) },
+        :invocation_slug => slug,
         :actions_provider => actions_provider
       )
       if :inline == @mode
