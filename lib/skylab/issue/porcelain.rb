@@ -25,6 +25,8 @@ module Skylab::Issue
 
     desc "show the details of issue(s)"
 
+    action.alias 'list'
+
     option_syntax do |ctx|
       on('-l', '--last <num>', '--limit <num>',
          "shows the last N issues") { |n| ctx[:last] = n }

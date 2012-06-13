@@ -37,6 +37,9 @@ module Skylab::Porcelain
   module Aliasist
     extend Structuralist
     list_accessor_oldschool :aliases
+    def alias name
+      aliases name
+    end
   end
   module Descriptionist
     extend Structuralist
