@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+# this is a little example of a oneliner that amusingly does something a
+# bit similar to git-stash
+
+# lives have been destroyed with scripts like these, so be sure you know
+# what you are doing
+
+
+git ls-files -m| ruby -lne 'p = "#{$_.gsub("/", "__")}.patch" ; c="git diff #{$_} > #{p}" ; puts c ; `#{c}`'
+
