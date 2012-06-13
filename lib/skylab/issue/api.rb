@@ -7,8 +7,8 @@ module Skylab::Issue
   ROOT = Pathname.new(File.expand_path('..', __FILE__)) # consider @autoload
 
   class Api
-    def initialize &events
-      @events = events
+    def initialize &action_conf
+      @action_conf = action_conf
       @issues_manifest = {}
     end
     def invoke path, context
@@ -19,8 +19,7 @@ module Skylab::Issue
       klass = path.reduce(self.class) do |m, s|
         m.const_get(s.to_s.gsub(/(?:^|-)([a-z])/) { $1.upcase })
       end
-      _events = @events
-      klass.new(self, context){ instance_eval(& _events) }.invoke
+      klass.new(self, context, &@action_conf).invoke
     end
     # getters for *persistent* models *objects* (think daemons):
     def issues_manifest pathname

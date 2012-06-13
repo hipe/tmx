@@ -20,7 +20,7 @@ module Skylab::Issue
     def initialize api, context, &events
       @api = api
       @params = context
-      instance_eval(&events)
+      events.call(self)
     end
     def internalize_params!
       valid? or return failed(invalid_reason)
@@ -88,6 +88,9 @@ module Skylab::Issue
   end
 
   class Api::MyEvent < ::Skylab::PubSub::Event
+    def message= msg
+      self.payload = msg # for now ..
+    end
     attr_accessor :minsky_frame
     # silly fun
     def noun

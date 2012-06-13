@@ -18,11 +18,7 @@ module Skylab::Treemap
         program_name: 'tmx',
         out: out_stream,
         err: err_stream
-      ) do
-        on_info    { |e| err_stream.puts e }
-        on_error   { |e| err_stream.puts e }
-        on_payload { |e| out_stream.puts e }
-      end
+      )
     end
   end
 end

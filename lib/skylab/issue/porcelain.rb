@@ -23,8 +23,6 @@ module Skylab::Issue
     end
 
 
-
-
     desc "show the details of issue(s)"
 
     option_syntax do |ctx|
@@ -50,28 +48,29 @@ module Skylab::Issue
       api.invoke [:issue, :number, :list], {}
     end
 
-
   protected
 
+    # this nonsense wires your custom root client to the big deal parent
+    def wire! runtime, parent
+      runtime.on_error { |e| parent.emit(:error, e.touch!) }
+      runtime.on_info  { |e| parent.emit(:info, e.touch!) }
+      runtime.on_all   { |e| parent.emit(e.type, e) unless e.touched? }
+    end
+
     def api
-      @api and return @api
-      handlers = @handlers or fail("fixme for ui handling")
-      [:all] == (keys = (handlers.keys - [:default])) or fail("algo has changed for compat!")
-      @api = Api.new do
-        on_payload do |e|
-          e.handled!
-          handlers[:all].call(e)
+      # this BS wires your action instances to your custom centralzied
+      @api ||= Api.new do |action|
+        action.on_payload { |e| runtime.emit(:payload, e) }
+        action.on_error do |e|
+          e.message = "failed to #{e.verb} #{e.noun} - #{e.message}"
+          runtime.emit(:error, e)
         end
-        on_error do |e|
-          e.handled!.message = "failed to #{e.verb} #{e.noun} - #{e.message}"
-          handlers[:all].call(e)
-        end
-        on_all do |e|
-          unless e.handled?
+        action.on_info do |e|
+          unless e.touched?
             md = %r{\A\((.+)\)\z}.match(e.message) and e.message = md[1]
             e.message = "while #{e.verb.progressive} #{e.noun}, #{e.message}"
             md and e.message = "(#{e.message})" # so ridiculous
-            handlers[:all].call(e)
+            runtime.emit(:info, e)
           end
         end
       end
