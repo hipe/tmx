@@ -1,11 +1,76 @@
-#!/usr/bin/env bash
+#!/usr/bin/env ruby -w
 
-# this is a little example of a oneliner that amusingly does something a
-# bit similar to git-stash
+require 'optparse'
+module Skylab
+  class QuiltModified
+    def description
+      emit(:help, "description: reads a list of files from stdin, outputs a particular thing..")
+    end
+    def execute argv
+      @stdin = $stdin
+      parse(argv) or return
+      $stdin.each_line do |line|
+        line.chomp!
+        "git diff #{line} > #{line.gsub('/', '__')}.patch".tap do |cmd|
+           emit(:out, cmd)
+        end
+      end
+    end
+    def optparse
+      @optparse ||= OptionParser.new do |o|
+        o.banner = 'options:'
+        o.on('-h', '--help', "this screen.") { help }
+      end
+    end
+    def usage
+      emit(:help, "usage: #{program_name} [opts] < git ls-files -m")
+    end
+    def validate
+      @stdin.tty? and return usage_error("expecting input from standard in")
+      true
+    end
+    def info msg
+      emit :info, msg
+    end
+    def emit type, msg
+      (:out == type ? $stdout : $stderr).puts msg
+    end
+    def help
+      usage
+      description
+      emit(:help, optparse.to_s)
+      @done = true
+    end
+    def initialize
+      @done = false
+      @params = {}
+    end
+    def invite
+      emit(:help, %{Use "#{program_name} -h" for help.})
+    end
+    def parse argv
+      begin
+        optparse.parse!(argv)
+      rescue OptionParser::ParseError => e
+        return usage_error("#{e}")
+      end
+      (@done or ! parse_argv(argv) or ! validate) and return false
+      true
+    end
+    def parse_argv argv
+      if argv.empty? then true else usage_error("had #{argv.size} expecting 0 arguments.") end
+    end
+    def program_name
+      File.basename($PROGRAM_NAME)
+    end
+    def usage_error msg=nil
+      emit(:help, "#{program_name}: #{msg}") if msg
+      usage
+      invite
+      false
+    end
+  end
+end
 
-# lives have been destroyed with scripts like these, so be sure you know
-# what you are doing
-
-
-git ls-files -m| ruby -lne 'p = "#{$_.gsub("/", "__")}.patch" ; c="git diff #{$_} > #{p}" ; puts c ; `#{c}`'
+Skylab::QuiltModified.new.execute(ARGV)
 
