@@ -253,21 +253,6 @@ module Skylab::TanMan
     end
   end
 
-  module Api::Autoloader
-    # @todo: after:#102
-    # experimental: const_missing hax can suck, but we want to avoid the overhead of
-    # loading things like code-molester's config file parser unless we need it
-    def self.init mod
-      here = %r{^(.+)\.rb:\d+:in `}.match(caller[0])[1]
-      mod.singleton_class.send(:alias_method, :orig_const_missing, :const_missing)
-      mod.singleton_class.send(:define_method, :const_missing) do |const|
-        stem = const.to_s.gsub(/(?<=^|([a-z]))([A-Z])/) { "#{'-' if $1}#{$2.downcase}" }
-        require "#{here}/#{stem}"
-        const_get const
-      end
-    end
-  end
-
   class Api::Event < PubSub::Event
     # this is all very experimental and subject to change!
     def json_data
