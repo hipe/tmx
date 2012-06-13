@@ -3,12 +3,10 @@ require 'skylab/porcelain/attribute-definer'
 
 
 module Skylab::Issue
-  require ROOT.join('porcelain/yamlizer').to_s
 
   class Api::Action
     extend ::Skylab::PubSub::Emitter
     extend ::Skylab::Porcelain::AttributeDefiner
-    include Porcelain::Yamlizer
 
     meta_attribute :required
 

@@ -25,13 +25,11 @@ module Skylab::Issue
     FIELDS = [:identifier, :date, :message]
 
     def paint items
-      fields = FIELDS
-      ct = 0
-      items.each do |item|
-        ct += 1
-        emit :payload, my_yamlize(item, fields)
+      @yamlize ||= Porcelain::Yamlizer.new(FIELDS) do |o|
+        o.on_line { |e| emit(:payload, e) }
       end
-      case ct
+      items.while_counting.each { |item| @yamlize[item] }
+      case (ct = items.last_count)
       when 0 ; emit(:info, "found no issues #{items.search.adjp}")
       when 1 ;
       else   ; emit(:info, "found #{ct} issues #{items.search.adjp}")
