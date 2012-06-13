@@ -26,11 +26,10 @@ module Skylab::Issue
 
     def paint items
       fields = FIELDS
-      ct = 0
-      items.each do |item|
-        ct += 1
+      items.while_counting.each do |item|
         emit :payload, my_yamlize(item, fields)
       end
+      ct = items.last_count
       case ct
       when 0 ; emit(:info, "found no issues #{items.search.adjp}")
       when 1 ;
