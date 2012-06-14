@@ -8,7 +8,9 @@ module Skylab::Issue
     emits :all,
       :error   => :all,
       :info    => :all,
-      :payload => :all
+      :payload => :all,
+      :error_with_manifest_line => :error
+
 
     event_class Api::MyEvent
 
@@ -26,9 +28,15 @@ module Skylab::Issue
 
     def paint items
       @yamlize ||= Porcelain::Yamlizer.new(FIELDS) do |o|
-        o.on_line { |e| emit(:payload, e) }
+        o.on_line         { |e| emit(:payload, e) }
       end
-      items.while_counting.each { |item| @yamlize[item] }
+      items.while_counting.each do |item|
+        if item.valid?
+          @yamlize[item]
+        else
+          emit(:error_with_manifest_line, message: 'this is my message')
+        end
+      end
       case (ct = items.last_count)
       when 0 ; emit(:info, "found no issues #{items.search.adjp}")
       when 1 ;

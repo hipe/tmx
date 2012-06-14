@@ -53,8 +53,9 @@ module Skylab::Issue
 
   protected
 
-    # this nonsense wires your custom root client to the big deal parent
+    # this nonsense wires your evil foreign (frame) runtime to the big deal parent
     def wire! runtime, parent
+      runtime.event_class = Api::MyEvent
       runtime.on_error { |e| parent.emit(:error, e.touch!) }
       runtime.on_info  { |e| parent.emit(:info, e.touch!) }
       runtime.on_all   { |e| parent.emit(e.type, e) unless e.touched? }

@@ -1,4 +1,4 @@
-require File.expand_path('../../../skylab', __FILE__)
+require_relative '../../skylab'
 
 module Skylab::Issue
 
