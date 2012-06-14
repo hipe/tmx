@@ -19,8 +19,7 @@ module Skylab::Issue
     end
 
     def add message, ctx
-      ctx[:message] = message
-      api.invoke self, [:issue, :add], ctx
+      api.action(:issue, :add).wire!(&wire).invoke(ctx.merge( message: message ))
     end
 
 
@@ -55,8 +54,6 @@ module Skylab::Issue
     end
 
 
-
-
     desc "emit all known issue numbers in descending order to stdout"
     desc "one number per line, with any leading zeros per the file."
     desc "(more of a plumbing than porcelain feature!)"
@@ -76,8 +73,12 @@ module Skylab::Issue
     end
 
     def api
-      # this BS wires your action instances to your custom centralzied
-      @api ||= Api.new do |action|
+      @api ||= Api.new
+    end
+
+    def wire action=nil
+      action or return ->(a) { wire(a) }
+
         action.on_payload { |e| runtime.emit(:payload, e) }
         action.on_error do |e|
           e.message = "failed to #{e.verb} #{e.noun} - #{e.message}"
@@ -91,7 +92,6 @@ module Skylab::Issue
             runtime.emit(:info, e)
           end
         end
-      end
     end
   end
 end

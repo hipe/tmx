@@ -38,7 +38,7 @@ module Skylab::Issue
       File.open(tmpnew.to_s, 'w+') do |fh|
         fh.puts line
         # reopen the file if it was opened previous (or is open currently! careful)
-        file.clear.lines.each { |l| fh.puts l }
+        file.clear!.lines.each { |l| fh.puts l }
       end
       if tmpold.exist?
         rm(tmpold.to_s, :verbose => true)
@@ -60,7 +60,7 @@ module Skylab::Issue
     end
 
     def greatest_issue_integer
-      greatest = build_issues_flyweight.reduce(-1) do |m, issue|
+      greatest = build_issues_flyweight.valid.reduce(-1) do |m, issue|
         m > issue.identifier.to_i ? m : issue.identifier.to_i
       end
       greatest
