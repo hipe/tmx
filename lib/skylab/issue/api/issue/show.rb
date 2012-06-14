@@ -34,7 +34,7 @@ module Skylab::Issue
         if item.valid?
           @yamlize[item]
         else
-          emit(:error_with_manifest_line, message: 'this is my message')
+          emit(:error_with_manifest_line, item.invalid_info)
         end
       end
       case (ct = items.last_count)

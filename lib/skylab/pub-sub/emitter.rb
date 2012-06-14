@@ -56,8 +56,8 @@ end
 
 module Skylab::PubSub
   class Event < Struct.new(:payload, :tag, :touched)
-    def _define_attr_accessors!
-      payload.keys.each do |k|
+    def _define_attr_accessors!(*keys)
+      (keys.any? ? keys : payload.keys).each do |k|
         singleton_class.send(:define_method, k) { self.payload[k] }
         singleton_class.send(:define_method, "#{k}=") { |v| self.payload[k] = v }
       end

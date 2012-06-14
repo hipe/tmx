@@ -20,7 +20,7 @@ module Skylab::Issue
 
     def add message, ctx
       ctx[:message] = message
-      api.invoke [:issue, :add], ctx
+      api.invoke self, [:issue, :add], ctx
     end
 
 
@@ -37,7 +37,21 @@ module Skylab::Issue
 
     def show identifier=nil, ctx
       ctx[:identifier] = identifier
-      api.invoke [:issue, :show], ctx
+      api.invoke(self, [:issue, :show], ctx) do |action|
+        action.default_wiring!
+        runtime = action.client.runtime
+        action.on_error_with_manifest_line do |e|
+          runtime.emit(:info, '---')
+          runtime.emit(:error, "error on line #{e.line_number}-->#{e.line}<--")
+           e.message = "failed to parse line #{e.line_number} because " <<
+                "#{e.invalid_reason.to_s.gsub('_', ' ')} " <<
+                "(in #{e.pathname.basename})" # this gets decorated haha
+          # @todo: for:#102.901.3.2.2 : wiring should happen between
+          # the events that an api-level action emits and the events
+          # of the parent client of the action invocation, or something
+          # all.rb does this confusing thing by having non-configurable core clients
+         end
+       end
     end
 
 
@@ -48,7 +62,7 @@ module Skylab::Issue
     desc "(more of a plumbing than porcelain feature!)"
 
     def numbers
-      api.invoke [:issue, :number, :list], {}
+      api.invoke self, [:issue, :number, :list], {}
     end
 
   protected

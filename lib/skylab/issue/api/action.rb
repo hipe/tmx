@@ -10,13 +10,21 @@ module Skylab::Issue
 
     meta_attribute :required
 
+    attr_reader :client
+
+    def default_wiring!
+      @api.action_conf.call(self)
+      self
+    end
+
     def failed msg
       emit(:error, msg) # this might change to raising
       false
     end
 
-    def initialize api, context, &events
+    def initialize api, client, context, &events
       @api = api
+      @client = client
       @params = context
       events.call(self)
     end
