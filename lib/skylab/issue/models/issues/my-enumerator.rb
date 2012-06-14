@@ -26,6 +26,11 @@ class Skylab::Issue::Models::Issues
         end
       end
     end
+    def valid
+      filter do |y, item|
+        y << item if item.valid?
+      end
+    end
     def initialize &b
       b or raise ArgumentError.new("block required? (@todo)")
       me = self

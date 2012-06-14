@@ -12,21 +12,12 @@ module Skylab::Issue
 
     attr_reader :client
 
-    def default_wiring!
-      @api.action_conf.call(self)
-      self
-    end
-
     def failed msg
       emit(:error, msg) # this might change to raising
       false
     end
-
-    def initialize api, client, context, &events
+    def initialize api
       @api = api
-      @client = client
-      @params = context
-      events.call(self)
     end
     def internalize_params!
       valid? or return failed(invalid_reason)
@@ -35,7 +26,8 @@ module Skylab::Issue
       @params = nil
       true
     end
-    def invoke
+    def invoke params
+      @params = params
       execute # (maybe one day a slake- (rake-) like pattern)
     end
     attr_reader :invalid_reason
@@ -63,6 +55,10 @@ module Skylab::Issue
         return false
       end
       true
+    end
+    def wire!
+      yield self
+      self
     end
   end
 
