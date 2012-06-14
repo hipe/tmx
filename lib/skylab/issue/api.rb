@@ -7,6 +7,7 @@ module Skylab::Issue
   ROOT = Pathname.new(File.expand_path('..', __FILE__)) # consider @autoload
 
   class Api
+    extend Skylab::Autoloader
     def initialize &action_conf
       @action_conf = action_conf
       @issues_manifest = {}
