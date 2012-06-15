@@ -11,7 +11,7 @@ module Skylab::Treemap
     def invoke params
       clear!.update_parameters!(params).validate or return
       (path = self.path).exist? or return error("input file not found: #{path.pretty}")
-      @tree = API::IndentationParse.invoke(path, char) { |o|
+      @tree = API::Parse::Indentation.invoke(path, char) { |o|
         o.on_parse_error { |e| emit(:error, e) } } or return
       if show_tree
         render_debug

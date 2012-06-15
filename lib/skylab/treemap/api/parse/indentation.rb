@@ -1,5 +1,5 @@
 module Skylab::Treemap
-  class API::IndentationParse
+  class API::Parse::Indentation
     extend Skylab::PubSub::Emitter
     emits all: :parse_error
 
