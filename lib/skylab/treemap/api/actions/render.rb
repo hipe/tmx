@@ -1,43 +1,12 @@
 require_relative '../../models'
 
 module Skylab::Treemap
-  class FileLinesEnumerator < Enumerator
-    def close_if_open
-      @file.closed? ? nil : (@file.close || true)
-    end
-    attr_reader :index
-    def initialize fh, &blk
-      blk and raise ArgumentError("not today.  not today.")
-      fh.closed? and fail("pass me an open filehandle please: #{fh.inspect}")
-      @index = -1
-      @file = fh
-      @peeking = nil
-      super() do |y|
-        @file.lines.each_with_index do |line, index|
-          @index = index
-          y << line.chomp
-        end
-      end
-    end
-    def peeking
-      @peeking and return @peeking
-      lines = self
-      @peeking = Enumerator.new do |y|
-        begin
-          loop do
-            y.yield(lines.peek)
-            lines.next
-          end
-        rescue StopIteration
-        end
-      end
-    end
-  end
   class API::Actions::Render < API::Action
     emits payload: :all, info: :all, error: :all
 
     attribute :char, required: true, regex: [/^.$/, 'must be a single character']
     attribute :path, path: true, required: true
+    attribute :show_tree
 
     def advance_to_first_line
       @lines.peeking.detect { |line| @first_line_re =~ line } or
@@ -60,13 +29,16 @@ module Skylab::Treemap
     def invoke params
       clear!.update_parameters!(params).validate or return false
       (path = self.path).exist? or return error("input file not found: #{path.pretty}")
-      @lines = FileLinesEnumerator.new(path.open('r'))
+      @lines = API::FileLinesEnumerator.new(path.open('r'))
       @first_line_re = /\A[[:space:]]*#{Regexp.escape(char)} /
       @line_re = /\A(?<indent>[[:space:]]*#{Regexp.escape(char)} )(?<line_content>.*)\z/
       advance_to_first_line or return false
       read_lines or return false
-      render_debug
-      emit(:payload, "wow! you're great.")
+      if show_tree
+        render_debug
+      else
+        emit(:payload, "wow, you're great")
+      end
     end
 
     def parse_error msg

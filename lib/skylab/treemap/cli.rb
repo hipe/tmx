@@ -48,6 +48,7 @@ module Skylab::Treemap
     option_syntax do |o|
       o[:char] = '+'
       on('-c', '--char <CHAR>', %{use CHAR (default: #{o[:char]})}) { |v| o[:char] = v }
+      on('--tree', 'show the text-based structure in a tree (debugging)') { o[:show_tree] = true }
     end
     def execute path, opts
       api.action(:render).wire!(&wire).invoke(opts.merge(path: path))
