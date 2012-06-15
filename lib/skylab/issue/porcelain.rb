@@ -64,6 +64,17 @@ module Skylab::Issue
       api.action(:issue, :number, :list).wire!(&wire).invoke
     end
 
+
+    desc "a report of the @todo's in a codebase"
+
+    argument_syntax '<path> [<path> [..]]'
+
+    # @todo we wanted to call this todo_report but there was that one bug
+    def todo *paths       # args interface will change
+      api.action(:todo, :report).wire!(&wire).invoke(paths: paths)
+    end
+
+
   protected
 
     # this nonsense wires your evil foreign (frame) runtime to the big deal parent
