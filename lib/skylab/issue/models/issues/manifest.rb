@@ -38,7 +38,7 @@ module Skylab::Issue
       File.open(tmpnew.to_s, 'w+') do |fh|
         fh.puts line
         # reopen the file if it was opened previous (or is open currently! careful)
-        file.clear.lines.each { |l| fh.puts l }
+        file.clear!.lines.each { |l| fh.puts l }
       end
       if tmpold.exist?
         rm(tmpold.to_s, :verbose => true)
@@ -60,7 +60,7 @@ module Skylab::Issue
     end
 
     def greatest_issue_integer
-      greatest = build_issues_flyweight.reduce(-1) do |m, issue|
+      greatest = build_issues_flyweight.valid.reduce(-1) do |m, issue|
         m > issue.identifier.to_i ? m : issue.identifier.to_i
       end
       greatest
@@ -70,7 +70,7 @@ module Skylab::Issue
       @emitter.emit(type, msg)
     end ; protected :emit
 
-    attr_accessor :emitter # this is the single worst architecture smell to date here
+    attr_accessor :emitter # this is the single worst architecture smell to date here @todo
 
     def error msg
       emit(:error, msg) ; false
@@ -108,16 +108,6 @@ module Skylab::Issue
       /\n/ =~ message and return error("Message cannot contain newlines.")
       /\\n/ =~ message and return error("Message cannot contain (escaped or unescaped) newlines.")
       true
-    end
-
-    def numbers &b
-      num = 0
-      # each_issue_flyweight { |issue| b.call issue.identifier }
-      build_issues_flyweight.each do |issue|
-        num += 1
-        b.call issue.identifier
-      end
-      num
     end
 
     attr_reader :path
