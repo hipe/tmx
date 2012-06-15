@@ -7,6 +7,7 @@ module Skylab::Issue
   class Porcelain
     extend ::Skylab::Porcelain
     extend ::Skylab::Autoloader
+    include Skylab::Porcelain::En
 
     desc "Add an \"issue\" line to #{ISSUES_FILE_NAME}."
     desc "Lines are added to the top and are sequentially numbered."
@@ -77,13 +78,17 @@ module Skylab::Issue
         "the filename patterns to search, can be specified",
         "multiple times to broaden the search (default: '#{d[:names] * "', '"}')"
         ) { |n| (o[:names] ||= []).push n }
+      on('--cmd', 'just show the internal grep / find command',
+         'that would be used (debugging).') { o[:show_command] = true }
     end
 
     argument_syntax '<path> [<path> [..]]'
 
     # @todo we wanted to call this todo_report but there was that one bug
     def todo *paths, opts       # args interface will change
-      api.action(:todo, :report).wire!(&wire).invoke(opts.merge(paths: paths))
+      action = api.action(:todo, :report).wire!(&wire)
+      action.on_number_found { |e| runtime.emit(:info, "(found #{e.count} item#{s e.count})") }
+      action.invoke(opts.merge(paths: paths))
     end
 
 
