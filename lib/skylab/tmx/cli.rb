@@ -17,7 +17,10 @@ module Skylab::Tmx
     porc_namespaces = ::Skylab::Porcelain.namespaces
     both = [face_namespaces, porc_namespaces]
 
+    skip = %r{(jshint|nginx|php|schema|team-city|xpdf)/cli\.rb$}
+
     Dir["#{File.dirname(__FILE__)}/modules/*/cli.rb"].each do |cli_path|
+      skip.match(cli_path) and next
       f1, p1 = both.map(&:length)
       require cli_path
       f2, p2 = both.map(&:length)

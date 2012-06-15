@@ -1,4 +1,4 @@
-require File.expand_path('../action', __FILE__)
+require_relative 'action'
 
 module Skylab::Issue
   module Api::Issue

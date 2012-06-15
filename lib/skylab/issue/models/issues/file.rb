@@ -1,15 +1,11 @@
 module Skylab::Issue
   class Models::Issues::File
-    def clear
+    def clear!
       if @fh
         @fh.close # might throw...
       end
       @fh = nil
       self
-    end
-    def each_line &b
-      _file.each_line(&b)
-      clear
     end
     def _file
       @fh ||= begin
@@ -22,6 +18,11 @@ module Skylab::Issue
     end
     # from stack overflow #3024372, thank you molf
     # def tail ; ... end
+    def lines
+      Enumerator.new do |y|
+        _file.each_line { |l| y << l.chomp }
+      end
+    end
   end
 end
 
