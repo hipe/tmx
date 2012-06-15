@@ -69,7 +69,7 @@ class Skylab::Issue::Models::Issues
       @spy.values.each { |e| e[:yield].call(item) }
     end
 
-    def while_counting
+    def with_count!
       (@spy ||= {}).key?(:counting) and fail("figure this out .. (@todo)")
       count = nil
       @spy[:counting] = {
