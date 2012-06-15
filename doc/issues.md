@@ -1,7 +1,8 @@
 [#102] 2021-06-08 @open treemap, ofc!
 [#101] 2021-06-08 @open when doing gem install with rdoc, "stack level too deep"
 [#100.300.XXX] 2012-06-08 (numberspace reserved for porcelain.rb)
-[#100.200.XXX] 2012-06-08 (numberspace reserved for all.rb)
+[#100.200.001] 2012-06-12 all.rb: fix @delegates tags
+[#100.901.3.2.2] 2012-06-12 towards an event wiring pattern
 [#100.100.500] 2012-06-08 @open with face.rb index all features
 [#100.100.400] 2012-06-08 @open with face.rb rename stuff, unify names
 [#100.100.300] 2012-06-08 @open with face.rb, eliminate unused code
