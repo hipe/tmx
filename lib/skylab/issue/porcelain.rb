@@ -1,5 +1,7 @@
 require_relative 'api'
 
+# @todo: add a feature that is a report of the todos
+
 module Skylab::Issue
 
   class Porcelain
@@ -19,8 +21,7 @@ module Skylab::Issue
     end
 
     def add message, ctx
-      ctx[:message] = message
-      api.invoke self, [:issue, :add], ctx
+      api.action(:issue, :add).wire!(&wire).invoke(ctx.merge( message: message ))
     end
 
 
@@ -29,6 +30,7 @@ module Skylab::Issue
     action.alias 'list'
 
     option_syntax do |ctx|
+      # @todo we would love to have -1, -2 etc
       on('-l', '--last <num>', '--limit <num>',
          "shows the last N issues") { |n| ctx[:last] = n }
     end
@@ -36,33 +38,30 @@ module Skylab::Issue
     argument_syntax '[<identifier>]'
 
     def show identifier=nil, ctx
-      ctx[:identifier] = identifier
-      api.invoke(self, [:issue, :show], ctx) do |action|
-        action.default_wiring!
-        runtime = action.client.runtime
-        action.on_error_with_manifest_line do |e|
-          runtime.emit(:info, '---')
-          runtime.emit(:error, "error on line #{e.line_number}-->#{e.line}<--")
-           e.message = "failed to parse line #{e.line_number} because " <<
-                "#{e.invalid_reason.to_s.gsub('_', ' ')} " <<
-                "(in #{e.pathname.basename})" # this gets decorated haha
-          # @todo: for:#102.901.3.2.2 : wiring should happen between
-          # the events that an api-level action emits and the events
-          # of the parent client of the action invocation, or something
-          # all.rb does this confusing thing by having non-configurable core clients
-         end
-       end
+      action = api.action(:issue, :show).wire!(&wire)
+      client = runtime # this is a part we don't like
+      # @todo: for:#102.901.3.2.2 : wiring should happen between
+      # the api action objects and the "client" (interface) instance that
+      # invoked the api action.
+      # all.rb does this confusing thing by having non-configurable core clients
+      action.on_error_with_manifest_line do |e|
+        client.emit(:info, '---')
+        client.emit(:error, "error on line #{e.line_number}-->#{e.line}<--")
+        e.message = "failed to parse line #{e.line_number} because " <<
+            "#{e.invalid_reason.to_s.gsub('_', ' ')} " <<
+            "(in #{e.pathname.basename})" # this gets decorated haha
+      end
+      action.invoke({ identifier: identifier }.merge!(ctx))
     end
-
-
 
 
     desc "emit all known issue numbers in descending order to stdout"
     desc "one number per line, with any leading zeros per the file."
     desc "(more of a plumbing than porcelain feature!)"
 
+    # @todo: bug with "tmx issue number -h"
     def numbers
-      api.invoke self, [:issue, :number, :list], {}
+      api.action(:issue, :number, :list).wire!(&wire).invoke
     end
 
   protected
@@ -76,20 +75,25 @@ module Skylab::Issue
     end
 
     def api
-      # this BS wires your action instances to your custom centralzied
-      @api ||= Api.new do |action|
-        action.on_payload { |e| runtime.emit(:payload, e) }
-        action.on_error do |e|
-          e.message = "failed to #{e.verb} #{e.noun} - #{e.message}"
-          runtime.emit(:error, e)
-        end
-        action.on_info do |e|
-          unless e.touched?
-            md = %r{\A\((.+)\)\z}.match(e.message) and e.message = md[1]
-            e.message = "while #{e.verb.progressive} #{e.noun}, #{e.message}"
-            md and e.message = "(#{e.message})" # so ridiculous
-            runtime.emit(:info, e)
-          end
+      @api ||= Api.new
+    end
+
+    def wire
+      @wire ||= ->(action) { wire_action(action) }
+    end
+
+    def wire_action action
+      action.on_payload { |e| runtime.emit(:payload, e) }
+      action.on_error do |e|
+        e.message = "failed to #{e.verb} #{e.noun} - #{e.message}"
+        runtime.emit(:error, e)
+      end
+      action.on_info do |e|
+        unless e.touched?
+          md = %r{\A\((.+)\)\z}.match(e.message) and e.message = md[1]
+          e.message = "while #{e.verb.progressive} #{e.noun}, #{e.message}"
+          md and e.message = "(#{e.message})" # so ridiculous
+          runtime.emit(:info, e)
         end
       end
     end

@@ -1,17 +1,22 @@
 module Skylab::Issue
   class Api::Issue::Number::List < Api::Action
 
-    attribute :issues_file_name, :required => true
+    attribute :issues_file_name, required: true
 
-    emits :all, :error => :all, :info => :all, :payload => :all
+    emits :all, error: :all, info: :all, payload: :all
 
     event_class Api::MyEvent
 
     def execute
-      @params[:issues_file_name] ||= ISSUES_FILE_NAME
-      valid? or return failed(invalid_reason)
-      num = issues.numbers { |num| emit(:payload, num) }
-      emit(:info, "(#{num} issues found.)")
+      params! or return
+      issues.with_manifest do |manifest|
+        all = manifest.build_issues_flyweight.with_count!
+        valid = all.valid.with_count!
+        valid.each do |issue|
+          emit(:payload, issue.identifier)
+        end
+        info "found #{valid.last_count} valid of #{all.last_count} total issues."
+      end
       true
     end
   end

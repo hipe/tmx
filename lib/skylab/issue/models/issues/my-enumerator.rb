@@ -26,6 +26,11 @@ class Skylab::Issue::Models::Issues
         end
       end
     end
+    def valid
+      filter do |y, item|
+        y << item if item.valid?
+      end
+    end
     def initialize &b
       b or raise ArgumentError.new("block required? (@todo)")
       me = self
@@ -64,7 +69,7 @@ class Skylab::Issue::Models::Issues
       @spy.values.each { |e| e[:yield].call(item) }
     end
 
-    def while_counting
+    def with_count!
       (@spy ||= {}).key?(:counting) and fail("figure this out .. (@todo)")
       count = nil
       @spy[:counting] = {
