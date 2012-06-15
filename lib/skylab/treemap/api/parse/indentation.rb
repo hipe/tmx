@@ -1,7 +1,9 @@
 module Skylab::Treemap
   class API::Parse::Indentation
     extend Skylab::PubSub::Emitter
-    emits all: :parse_error
+    emits parse_error: :all
+
+    include Bleeding::Styles # smell
 
     def self.invoke(*a, &b)
       new(*a, &b).invoke
@@ -12,6 +14,8 @@ module Skylab::Treemap
         parse_error("#{pre attributes[:char].label}" <<
           " not found at the start of any line (of #{@lines.index + 1})")
     end
+
+    attr_reader :attributes
 
     attr_reader :char
 
@@ -26,7 +30,8 @@ module Skylab::Treemap
       self
     end
 
-    def initialize path, char
+    def initialize attributes, path, char
+      @attributes = attributes
       @path = path
       @char = char
       yield self

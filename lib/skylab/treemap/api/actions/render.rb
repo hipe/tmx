@@ -11,12 +11,16 @@ module Skylab::Treemap
     def invoke params
       clear!.update_parameters!(params).validate or return
       (path = self.path).exist? or return error("input file not found: #{path.pretty}")
-      @tree = API::Parse::Indentation.invoke(path, char) { |o|
+      @tree = API::Parse::Indentation.invoke(attributes, path, char) { |o|
         o.on_parse_error { |e| emit(:error, e) } } or return
       if show_tree
         render_debug
-      else
-        emit(:payload, "wow, you're great")
+        return
+      end
+      API::Render::CSV.invoke(@tree) do |o|
+        o.on_payload { |e| emit(:payload, e) }
+        o.on_error   { |e| emit(:error, e) }
+        o.on_info    { |e| emit(:info, e) }
       end
     end
 
