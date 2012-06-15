@@ -67,11 +67,26 @@ module Skylab::Issue
 
     desc "a report of the @todo's in a codebase"
 
+    option_syntax do |o|
+      # @todo: all.rb calls this thing three times on a call to -h:
+      # 1) parse_options 2) render_usage and 3) help_action
+
+      d = Api::Todo::Report.attributes.with(:default)
+
+      on('--pattern <PATTERN>',
+        "the todo pattern to use (default: '#{d[:pattern]}')"
+        ) { |p| o[:pattern] = p }
+      on('--name <NAME>',
+        "the filename patterns to search, can be specified",
+        "multiple times to broaden the search (default: '#{d[:names] * "', '"}')"
+        ) { |n| (o[:names] ||= []).push n }
+    end
+
     argument_syntax '<path> [<path> [..]]'
 
     # @todo we wanted to call this todo_report but there was that one bug
-    def todo *paths       # args interface will change
-      api.action(:todo, :report).wire!(&wire).invoke(paths: paths)
+    def todo *paths, opts       # args interface will change
+      api.action(:todo, :report).wire!(&wire).invoke(opts.merge(paths: paths))
     end
 
 

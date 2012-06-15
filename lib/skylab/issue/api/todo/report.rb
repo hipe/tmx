@@ -4,7 +4,9 @@ module Skylab::Issue
   class Todo::Report < Api::Action
     emits :all, error: :all, info: :all, payload: :all
 
+    attribute :names, required: true, default: ['*.rb']
     attribute :paths, required: true
+    attribute :pattern, required: true, default: '@todo\>'
 
     def execute
       params! or return
@@ -27,6 +29,10 @@ module Skylab::Issue
     end
     attr_reader :string
     alias_method :to_s, :string
+  end
+
+  class Todo::SystemCommand
+    # find lib/skylab/issue -name '*.rb' -exec grep --line-number '@todo\>' {} +
   end
 
   class Todo::TodoEnumerator < Enumerator
