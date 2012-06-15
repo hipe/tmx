@@ -430,10 +430,8 @@ module Skylab::Porcelain
     def help(&block)
       empty? and return
       yield(knob = HelpSubs.new)
-      renderer = r = ::OptionParser.new
+      renderer = r = option_parser
       lucky_matcher = /\A(#{Regexp.escape(r.summary_indent)}.{1,#{r.summary_width}})[ ]*(.*)\z/
-      renderer.banner = ''
-      build_parser({}, renderer)
       lines = renderer.to_s.split("\n")
       once = false
       lines.each do |line|
@@ -447,12 +445,33 @@ module Skylab::Porcelain
         end
       end
     end
+    def option_parser
+      @option_parser ||= begin
+        op = build_parser(@context = {})
+        @rebuild = @context.any?
+        op
+      end
+    end
+    def option_parser_parse! argv
+      if @option_parser
+        if @rebuild
+          @option_parser = nil
+        else
+          @context.clear
+        end
+      end
+      option_parser.parse! argv
+      if @rebuild
+        @context
+      else
+        @context.dup
+      end
+    end
     def parse_options argv
       empty? and ! Officious::Help::SWITCHES.include?(argv.first) and return nil
       yield(knob = ParseOptsSubs.new)
-      option_parser = build_parser(context = {})
       begin
-        option_parser.parse! argv
+        context = option_parser_parse! argv
       rescue ::OptionParser::ParseError => e
         knob.emit(:syntax, e)
         context = false
@@ -461,7 +480,7 @@ module Skylab::Porcelain
     end
     def to_str
       0 == count and return nil
-      build_parser({}).instance_variable_get('@stack')[2].list.select{ |s| s.kind_of?(::OptionParser::Switch) }.map do |switch| # ick
+      option_parser.instance_variable_get('@stack')[2].list.select{ |s| s.kind_of?(::OptionParser::Switch) }.map do |switch| # ick
         "[#{[(switch.short.first || switch.long.first), switch.arg].compact.join('')}]"
       end.join(' ')
     end

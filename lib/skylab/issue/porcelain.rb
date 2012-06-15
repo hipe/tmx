@@ -68,9 +68,6 @@ module Skylab::Issue
     desc "a report of the @todo's in a codebase"
 
     option_syntax do |o|
-      # @todo: all.rb calls this thing three times on a call to -h:
-      # 1) parse_options 2) render_usage and 3) help_action
-
       d = Api::Todo::Report.attributes.with(:default)
 
       on('--pattern <PATTERN>',

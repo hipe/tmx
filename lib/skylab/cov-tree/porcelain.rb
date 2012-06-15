@@ -54,6 +54,15 @@ module Skylab::CovTree
     def api
       ::Skylab::CovTree.api
     end
+
+    # the gui client runtime that you have, map your events to the parent events.
+    def wire! my_runtime, parent
+      my_runtime.tap do |o|
+        o.on_payload { |e| parent.emit(:payload, e.touch!) }
+        o.on_error   { |e| parent.emit(:error,   e.touch!) }
+        o.on_all     { |e| parent.emit(:info,    e) unless e.touched? }
+      end
+    end
   end
 end
 
