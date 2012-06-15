@@ -17,6 +17,8 @@ module Skylab::Treemap
 
     attribute_meta_class MyAttributeMeta
 
+    meta_attribute :default
+
     meta_attribute :path do |name, _|
       require 'skylab/face/path-tools'
       alias_method("#{name}_after_path=", "#{name}=")
@@ -75,6 +77,11 @@ module Skylab::Treemap
         ok = error(%{#{pre attributes[k].label} #{errs.join(' and it ')}})
       end
       ok or return false # avoid superflous messages below
+      attributes.with(:default).each do |k, v|
+        if send(k).nil?
+          send("#{k}=", v)
+        end
+      end
       if (a = attributes.select{ |n, m| m[:required] and ! send(n) }).any?
         ok = error("missing required attribute#{s a}: " <<
           "#{oxford_comma(a.map { |o| pre attributes[o.first].label }) }")
