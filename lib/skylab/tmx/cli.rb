@@ -17,7 +17,10 @@ module Skylab::Tmx
     porc_namespaces = ::Skylab::Porcelain.namespaces
     both = [face_namespaces, porc_namespaces]
 
+    skip = %r{(jshint|nginx|php|schema|team-city|xpdf)/cli\.rb$}
+
     Dir["#{File.dirname(__FILE__)}/modules/*/cli.rb"].each do |cli_path|
+      skip.match(cli_path) and next
       f1, p1 = both.map(&:length)
       require cli_path
       f2, p2 = both.map(&:length)
@@ -29,6 +32,29 @@ module Skylab::Tmx
         fail("Must add a namespace, did not: #{cli_path}")
       end
       namespace _last_added_namespace
+    end
+
+    # @todo during #100.100
+    def emit type, e
+      if @map[type]
+        @map[type].call.puts e.to_s
+      else
+        @err.puts "BERKS: ->#{type.inspect}<->#{e.to_s}<-"
+      end
+    end
+
+    def initialize *a
+      block_given? and raise ArgumentError.new("this crap gets settled in #100")
+      # temp hack (see emit above)
+      outs = ->{ out }
+      errs = ->{ err }
+      @map = {
+        payload: outs,
+        help:    errs,
+        info:    errs,
+        error:   errs
+      }
+      super
     end
   end
 end

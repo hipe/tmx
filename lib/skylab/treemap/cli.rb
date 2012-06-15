@@ -5,31 +5,26 @@ module Skylab::Treemap
     extend Skylab::PubSub::Emitter
 
     emits Skylab::Porcelain::Bleeding::EVENT_GRAPH
-    emits payload: :all
+    emits payload: :all, info: :all
 
     desc "experiments with R."
 
-    def porcelain # @todo:not here
+    def porcelain # @todo after:#100.200: not here
       self.class
     end
   end
   class << CLI
-    def build_client_instance _, opts=nil
-      stdout = opts[:out_stream] or fail('need an out_stream')
-      stderr = opts[:err_stream] or fail('need an err_stream')
-      slug   = opts[:invocation_slug] or fail('no an invocation_slug')
-      $VERBOSE = true
-      rt = new
-      rt.on_payload { |e| stdout.puts e.message }
-      rt.on_error   { |e| stderr.puts "#{rt.program_name} error: #{e.message}" }
-      rt.on_help    { |e| stderr.puts e.message }
-      rt.program_name = slug
-      if runtime_instance_settings
-        runtime_instance_settings.call rt
+    def build_client_instance runtime, slug
+      new.tap do |c|
+        c.program_name = slug
+        c.on_error   { |e| runtime.emit(:error, e) }
+        c.on_help    { |e| runtime.emit(:help,  e) }
+        c.on_info    { |e| runtime.emit(:info, e) }
+        c.on_payload { |e| runtime.emit(:payload, e) }
+        runtime_instance_settings and runtime_instance_settings[c] # @todo
       end
-      rt
     end
-    def porcelain # @todo:not here
+    def porcelain # @todo after:#100.200: not here
       self
     end
     attr_accessor :runtime_instance_settings

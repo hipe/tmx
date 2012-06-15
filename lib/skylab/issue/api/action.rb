@@ -3,60 +3,69 @@ require 'skylab/porcelain/attribute-definer'
 
 
 module Skylab::Issue
-  require ROOT.join('porcelain/yamlizer').to_s
 
   class Api::Action
     extend ::Skylab::PubSub::Emitter
     extend ::Skylab::Porcelain::AttributeDefiner
-    include Porcelain::Yamlizer
 
+    meta_attribute :default
     meta_attribute :required
+
+
+    attribute :issues_file_name, default: ISSUES_FILE_NAME
+
+    attr_reader :client
 
     def failed msg
       emit(:error, msg) # this might change to raising
       false
     end
-
-    def initialize api, context, &events
+    def initialize api
       @api = api
-      @params = context
-      instance_eval(&events)
     end
-    def internalize_params!
-      valid? or return failed(invalid_reason)
-      @internalized_param_keys = (a = [])
-      @params.each { |k, v| a.push(k) ; self.send("#{k}=", v) }
-      @params = nil
-      true
+    def info msg
+      emit(:info, msg)
     end
-    def invoke
+    def invoke params=nil
+      @params = params || {}
       execute # (maybe one day a slake- (rake-) like pattern)
     end
     attr_reader :invalid_reason
     def issues
       @issues ||= begin
-        require "#{ROOT}/models/issues"
         Models::Issues.new(
           :emitter => self,
           :manifest => @api.issues_manifest(issues_file_name)
         )
       end
     end
-    def issues_file_name
-      @issues_file_name || ISSUES_FILE_NAME
-    end
     def build_event type, data
       ev = Api::MyEvent.new(type, data)
       ev.minsky_frame = self
       ev
     end
-    def valid?
-      _required = self.class.attributes.to_a.select{ |k, v| v[:required] }.map(&:first)
-      if (nope = _required.select{ |k| @params[k].nil? and send(k).nil? }).any?
-        @invalid_reason = "missing required parameter#{'s' if nope.size != 1}: #{nope.join(', ')}"
-        return false
+    def params
+      Hash[* @params_keys.map{ |k| [k, send(k)] }.flatten(1) ]
+    end
+    def params!
+      self.class.attributes.tap do |attrs|
+        attrs.each { |k, m| m.key?(:default) && ! @params.key?(k) and @params[k] = m[:default] }
+        if (a = attrs.select{ |k, m| m[:required] && @params[k].nil? }.keys).any?
+          return params_invalid("missing required parameter#{'s' if a.size != 1}: #{a.join(', ')}")
+        end
       end
+      @params_keys = @params.keys # for later reflection
+      @params.each { |k, v| send("#{k}=", v) }
+      @params = nil
       true
+    end
+    def params_invalid rsn
+      @invalid_reason = rsn
+      false
+    end
+    def wire!
+      yield self
+      self
     end
   end
 
@@ -85,17 +94,6 @@ module Skylab::Issue
   class NounStem < String
     class << self   ; alias_method :[], :new end
     def plural      ; "#{self}s"             end # fine for now
-  end
-
-  class Api::MyEvent < ::Skylab::PubSub::Event
-    attr_accessor :minsky_frame
-    # silly fun
-    def noun
-      @minsky_frame.class.inflected_noun
-    end
-    def verb
-      @minsky_frame.class.verb_stem
-    end
   end
 
 end

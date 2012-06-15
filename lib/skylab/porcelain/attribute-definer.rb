@@ -4,7 +4,7 @@ end
 module Skylab::Porcelain
   module AttributeDefiner
     def attribute sym, meta_attributes=nil
-      change_request = AttributeMeta.new
+      change_request = _attribute_meta_class.new sym
       meta = attributes[sym]
       if ! meta
         change_request.merge! default_meta_attributes
@@ -33,6 +33,12 @@ module Skylab::Porcelain
         respond_to?(m = "on_#{k}_attribute") and send(m, sym, meta)
       end
       nil
+    end
+    def _attribute_meta_class
+      AttributeMeta
+    end
+    def attribute_meta_class klass
+      singleton_class.send(:define_method, :_attribute_meta_class) { klass }
     end
     def attributes
       @attributes ||= _parent_dup_2(:attributes) { Attributes.new }
@@ -72,6 +78,7 @@ module Skylab::Porcelain
     def meta_attributes
       @meta_attributes ||= _parent_dup_2(:meta_attributes) { MetaAttributes.new }
     end
+    # @todo: clean up this redundancy @after:#100
     def _parent_dup attr_sym, &default
       if p = _parent_respond_to(attr_sym) and a = p.send(attr_sym)
         a.dup
@@ -81,7 +88,7 @@ module Skylab::Porcelain
     end
     def _parent_dup_2 attr_sym, &default
       if p = _parent_respond_to(attr_sym) and a = p.send(attr_sym)
-         Hash[ * a.map{ |k, v| [k, v.dup] }.flatten(1) ]
+        a.duplicate
       else
         default.call
       end
@@ -94,14 +101,35 @@ module Skylab::Porcelain
 end
 
 module Skylab::Porcelain::AttributeDefiner
+  module CommonHashInstanceMethods
+    def duplicate
+      self.class[ * map{ |k, v| [k, v.dup] }.flatten(1) ]
+    end
+  end
   class Attributes < Hash
-    # future-proof
+    include CommonHashInstanceMethods
+
+    # For the attributes that have a key? of `metattribute` return a new hash
+    # of the values of the metaattributes
+    #
+    # e.g. for an attribute set that looks like:
+    #
+    #   Foo.attributes #=> { age: { default: 1 }, sex: { default: :banana }, location: {} }
+    #
+    # you get:
+    #
+    #   Foo.attributes.with(:default) #=> { age: 1, sex: :banana }
+    #
+    def with metaattribute
+      Hash[* map { |k, m| [k, m[metaattribute]] if m.key?(metaattribute) }.compact.flatten(1) ]
+    end
   end
   class AttributeMeta < Hash
-    # future-proof
+    def initialize _ # ignore the attribute name for this one!
+    end
   end
   class MetaAttributes < Hash
-    # future-proof
+    include CommonHashInstanceMethods
   end
   class MetaAttribute
     attr_reader :hook
