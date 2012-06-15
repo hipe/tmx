@@ -1,5 +1,7 @@
 require_relative 'api'
 
+# @todo: add a feature that is a report of the todos
+
 module Skylab::Issue
 
   class Porcelain
@@ -28,6 +30,7 @@ module Skylab::Issue
     action.alias 'list'
 
     option_syntax do |ctx|
+      # @todo we would love to have -1, -2 etc
       on('-l', '--last <num>', '--limit <num>',
          "shows the last N issues") { |n| ctx[:last] = n }
     end
@@ -56,6 +59,7 @@ module Skylab::Issue
     desc "one number per line, with any leading zeros per the file."
     desc "(more of a plumbing than porcelain feature!)"
 
+    # @todo: bug with "tmx issue number -h"
     def numbers
       api.action(:issue, :number, :list).wire!(&wire).invoke
     end
@@ -74,22 +78,24 @@ module Skylab::Issue
       @api ||= Api.new
     end
 
-    def wire action=nil
-      action or return ->(a) { wire(a) }
+    def wire
+      @wire ||= ->(action) { wire_action(action) }
+    end
 
-        action.on_payload { |e| runtime.emit(:payload, e) }
-        action.on_error do |e|
-          e.message = "failed to #{e.verb} #{e.noun} - #{e.message}"
-          runtime.emit(:error, e)
+    def wire_action action
+      action.on_payload { |e| runtime.emit(:payload, e) }
+      action.on_error do |e|
+        e.message = "failed to #{e.verb} #{e.noun} - #{e.message}"
+        runtime.emit(:error, e)
+      end
+      action.on_info do |e|
+        unless e.touched?
+          md = %r{\A\((.+)\)\z}.match(e.message) and e.message = md[1]
+          e.message = "while #{e.verb.progressive} #{e.noun}, #{e.message}"
+          md and e.message = "(#{e.message})" # so ridiculous
+          runtime.emit(:info, e)
         end
-        action.on_info do |e|
-          unless e.touched?
-            md = %r{\A\((.+)\)\z}.match(e.message) and e.message = md[1]
-            e.message = "while #{e.verb.progressive} #{e.noun}, #{e.message}"
-            md and e.message = "(#{e.message})" # so ridiculous
-            runtime.emit(:info, e)
-          end
-        end
+      end
     end
   end
 end
