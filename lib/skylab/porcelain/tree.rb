@@ -7,16 +7,18 @@ module Skylab
 end
 
 module Skylab::Porcelain::Tree
-  class Locus < Struct.new(:blank, :crook, :node_name, :pipe, :tee)
+  extend Skylab::Autoloader
+
+  class Locus < Struct.new(:blank, :crook, :node_formatter, :pipe, :tee)
     attr_accessor :branch
     attr_accessor :empty
     def initialize opts=nil
       super('  ', ' └', nil, ' │', ' ├')
       opts and opts.each { |k, v| send("#{k}=", v) }
-      self.node_name ||= :name
-      if Symbol === self.node_name
-        name_accessor = self.node_name
-        self.node_name = ->(n) { n.send(name_accessor) }
+      self.node_formatter ||= :name
+      if Symbol === self.node_formatter
+        formatter_method_name = self.node_formatter
+        self.node_formatter = ->(n) { n.send(formatter_method_name) }
       end
     end
     def traverse(root, &block)
@@ -62,31 +64,26 @@ module Skylab::Porcelain::Tree
 end
 
 module Skylab::Porcelain
-  class Tree::TextLine < Struct.new(:prefix, :name)
-    def clear!
-      self.prefix = self.name = nil
+  class Tree::TextLine < Struct.new(:prefix, :node)
+    def reset! prefix, node
+      self.prefix = prefix
+      self.node = node
       self
     end
     def to_s
-      "#{prefix}#{name}"
-    end
-    def update! prefix, name
-      self.prefix = prefix
-      self.name = name
-      self
+      "#{prefix}#{node}"
     end
   end
   class << Tree
     def from_paths paths
-      require File.expand_path('../tree/node', __FILE__)
       Tree::Node.from_paths paths
     end
     def lines root, opts=nil
       fly = Tree::TextLine.new # flyweighting can be turned into an option if needed to
-      loc = Tree::Locus.new( * [opts].compact )
+      loc = Tree::Locus.new(opts)
       Enumerator.new do |y|
         loc.traverse(root) do |node, meta|
-          y << fly.clear!.update!(loc.prefix(meta), loc.node_name[node])
+          y << fly.reset!(loc.prefix(meta), loc.node_formatter.call(node))
         end
       end
     end

@@ -22,24 +22,55 @@ module Skylab::Issue
       end
       enum.on_err { |e| emit(:info, e) }
       enum.each do |todo|
-        payload "#{enum.last_count}: #{todo}"
+        emit(:payload, todo)
       end
       emit(:number_found, count: enum.last_count)
       true
     end
-
-    def payload msg
-      emit(:payload, msg)
-    end
   end
 
   class Todo::Todo
+    def content
+      @rest.nil? and parse!
+      @rest
+    end
+    def dup
+      self.class.new.set!(@string)
+    end
+    def initialize
+      set! nil
+    end
+    def line
+      @line.nil? and parse!
+      @line
+    end
+    REGEX = /\A(?<path>[^:]+):(?<line>\d+):(?<rest>.*)$/
+    def parse!
+      if @string and md = REGEX.match(@string)
+        @line = md[:line].to_i
+        @path = md[:path]
+        @rest = md[:rest]
+      else
+        @line = @path = @rest = false
+      end
+    end
+    def path
+      @path.nil? and parse!
+      @path
+    end
     def set! string
+      @line = @path = @rest = nil
       @string = string
       self
     end
     attr_reader :string
     alias_method :to_s, :string
+    def valid?
+      if ! (@line && @path) and @string
+        parse!
+      end
+      (@line && @path)
+    end
   end
 
   class Todo::SystemCommand < Struct.new(:paths, :names, :pattern)

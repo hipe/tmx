@@ -15,20 +15,22 @@ module Skylab::Porcelain
       children? ? children.length : 0
     end
     def find path_arr
-      path_arr.kind_of?(Array) or path_arr = path_arr.to_s.split(Tree::SEPARATOR)
+      path_arr = path_arr.kind_of?(Array) ? path_arr.dup : path_arr.to_s.split(Tree::SEPARATOR)
       _find path_arr, false
     end
     def find! path_arr, &block
-      path_arr.kind_of?(Array) or path_arr = path_arr.to_s.split(Tree::SEPARATOR)
+      path_arr = path_arr.kind_of?(Array) ? path_arr.dup : path_arr.to_s.split(Tree::SEPARATOR)
       _find path_arr, true, &block
     end
     def _find path_arr, create, &block
       path_arr.empty? and return self
-      path_arr = path_arr.dup
       slug = path_arr.shift
+      if slug.kind_of?(Integer) # hell breaks loose
+        slug = slug.to_s
+      end
       unless child = children[slug]
         if create
-          child = self.class.build({:slug => slug}, &block) # @add_parent
+          child = self.class.build({:slug => slug, :leaf => path_arr.empty?}, &block) # @add_parent
           children[child.key] = child # let child choose its key!
         else
           return nil
@@ -54,8 +56,11 @@ module Skylab::Porcelain
       end
     end
     def initialize hash=nil
-      hash and hash.each { |k, v| self[k] = v }
-      yield(self) if block_given?
+      if block_given?
+        yield(self, hash)
+      else
+        hash and hash.each { |k, v| self[k] = v }
+      end
     end
     def key
       self[:slug]
@@ -84,6 +89,9 @@ module Skylab::Porcelain
       end
       self
     end
+    def slug
+      self[:slug]
+    end
     def _paths arr, prefix
       is_root =  !(self[:slug] || prefix)
       if ! is_root
@@ -97,7 +105,7 @@ module Skylab::Porcelain
       nil
     end
     def text opts={}, &block
-      opts = { node_name: :key }.merge opts
+      opts = { node_formatter: :key }.merge opts
       Tree.text(self, opts, &block)
     end
     def to_paths
