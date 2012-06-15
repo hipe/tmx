@@ -1,12 +1,11 @@
-require_relative '../../models'
-
 module Skylab::Treemap
-  class API::Actions::Render < API::Action
-    emits payload: :all, info: :all, error: :all
+  class API::IndentationParse
+    extend Skylab::PubSub::Emitter
+    emits all: :parse_error
 
-    attribute :char, required: true, regex: [/^.$/, 'must be a single character']
-    attribute :path, path: true, required: true
-    attribute :show_tree
+    def self.invoke(*a, &b)
+      new(*a, &b).invoke
+    end
 
     def advance_to_first_line
       @lines.peeking.detect { |line| @first_line_re =~ line } or
@@ -14,8 +13,9 @@ module Skylab::Treemap
           " not found at the start of any line (of #{@lines.index + 1})")
     end
 
+    attr_reader :char
+
     def clear!
-      super
       @line_re = @first_line_re = nil
       if instance_variable_defined?('@lines') and @lines
         @lines.close_if_open
@@ -26,23 +26,25 @@ module Skylab::Treemap
       self
     end
 
-    def invoke params
-      clear!.update_parameters!(params).validate or return false
-      (path = self.path).exist? or return error("input file not found: #{path.pretty}")
+    def initialize path, char
+      @path = path
+      @char = char
+      yield self
+    end
+
+    def invoke
+      clear!
       @lines = API::FileLinesEnumerator.new(path.open('r'))
       @first_line_re = /\A[[:space:]]*#{Regexp.escape(char)} /
       @line_re = /\A(?<indent>[[:space:]]*#{Regexp.escape(char)} )(?<line_content>.*)\z/
       advance_to_first_line or return false
       read_lines or return false
-      if show_tree
-        render_debug
-      else
-        emit(:payload, "wow, you're great")
-      end
+      @tree
     end
 
     def parse_error msg
-      error("parse failure: #{msg} (in #{path.pretty})")
+      emit(:parse_error, "parse failure: #{msg} (in #{path.pretty})")
+      false
     end
 
     def parse_line line, index
@@ -52,6 +54,8 @@ module Skylab::Treemap
         result
       end
     end
+
+    attr_reader :path
 
     def read_lines
       @stack.empty? or fail("for now, won't read_lines unless stack is empty")
@@ -76,15 +80,7 @@ module Skylab::Treemap
       @stack = nil
       true
     end
-    def render_debug
-      require 'skylab/porcelain/tree'
-      empty = true
-      Skylab::Porcelain::Tree.lines(@tree).each do |line|
-        emit :info, line # egads!
-        empty = false
-      end
-      empty ? (info("(nothing)") and false) : true
-    end
+
     def stack_pop node
       loop do
         was = @stack.pop
