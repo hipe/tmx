@@ -15,7 +15,7 @@ module Skylab::Issue
     event_class Api::MyEvent
 
     def execute
-      internalize_params! or return false
+      params! or return
       query = {
         identifier: identifier,
         last: last
@@ -30,7 +30,7 @@ module Skylab::Issue
       @yamlize ||= Porcelain::Yamlizer.new(FIELDS) do |o|
         o.on_line         { |e| emit(:payload, e) }
       end
-      items.while_counting.each do |item|
+      items.with_count!.each do |item|
         if item.valid?
           @yamlize[item]
         else
