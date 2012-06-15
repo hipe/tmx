@@ -1,8 +1,6 @@
-require 'skylab/porcelain/bleeding'
 require 'skylab/porcelain/attribute-definer'
 
 module Skylab::Treemap
-  extend Skylab::Autoloader
 
   class MyAttributeMeta < Hash
     def initialize sym
@@ -13,8 +11,8 @@ module Skylab::Treemap
     end
   end
 
-  class Action
-    extend Skylab::Porcelain::Bleeding::Action
+  class API::Action
+    extend Skylab::PubSub::Emitter
     extend Skylab::Porcelain::AttributeDefiner
 
     attribute_meta_class MyAttributeMeta
@@ -84,26 +82,8 @@ module Skylab::Treemap
       ok
     end
     attr_reader :validation_errors
-  end
-  module Actions
-  end
-  class Actions::Install < Action
-    desc "for installing R"
-
-    URL_BASE = 'http://cran.stat.ucla.edu/'
-    def execute
-      emit :payload, "To install R, please download the package for your OS from #{URL_BASE}"
-    end
-  end
-  class Actions::Render < Action
-    desc "render a treemap from a text-based tree structure"
-    option_syntax do |o|
-      o[:char] = '+'
-      on('-c', '--char <CHAR>', %{use CHAR (default: #{o[:char]})}) { |v| o[:char] = v }
-    end
-    def execute path, opts
-      require_relative 'actions/render'
-      execute path, opts
+    def wire!
+      yield self
     end
   end
 end

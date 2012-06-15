@@ -1,3 +1,5 @@
+require_relative '../../models'
+
 module Skylab::Treemap
   class FileLinesEnumerator < Enumerator
     def close_if_open
@@ -31,7 +33,9 @@ module Skylab::Treemap
       end
     end
   end
-  class Actions::Render < Action
+  class API::Actions::Render < API::Action
+    emits payload: :all, info: :all, error: :all
+
     attribute :char, required: true, regex: [/^.$/, 'must be a single character']
     attribute :path, path: true, required: true
 
@@ -53,8 +57,8 @@ module Skylab::Treemap
       self
     end
 
-    def execute path, opts
-      clear!.update_parameters!(opts.merge(path: path)).validate or return false
+    def invoke params
+      clear!.update_parameters!(params).validate or return false
       (path = self.path).exist? or return error("input file not found: #{path.pretty}")
       @lines = FileLinesEnumerator.new(path.open('r'))
       @first_line_re = /\A[[:space:]]*#{Regexp.escape(char)} /
