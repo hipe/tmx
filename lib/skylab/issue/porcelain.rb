@@ -80,6 +80,8 @@ module Skylab::Issue
         ) { |n| (o[:names] ||= []).push n }
       on('--cmd', 'just show the internal grep / find command',
          'that would be used (debugging).') { o[:show_command] = true }
+      on('-t', '--tree', 'experimental tree rendering') { o[:show_tree] = true }
+
     end
 
     argument_syntax '<path> [<path> [..]]'
@@ -88,7 +90,11 @@ module Skylab::Issue
     def todo *paths, opts       # args interface will change
       action = api.action(:todo, :report).wire!(&wire)
       action.on_number_found { |e| runtime.emit(:info, "(found #{e.count} item#{s e.count})") }
+      if tree = opts.delete(:show_tree)
+        tree = Porcelain::Todo::Tree.new(action, runtime)
+      end
       action.invoke(opts.merge(paths: paths))
+      tree and tree.render
     end
 
 
