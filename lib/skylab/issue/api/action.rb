@@ -44,6 +44,9 @@ module Skylab::Issue
       ev.minsky_frame = self
       ev
     end
+    def params
+      Hash[* @params_keys.map{ |k| [k, send(k)] }.flatten(1) ]
+    end
     def params!
       self.class.attributes.tap do |attrs|
         attrs.each { |k, m| m.key?(:default) && ! @params.key?(k) and @params[k] = m[:default] }
@@ -51,6 +54,7 @@ module Skylab::Issue
           return params_invalid("missing required parameter#{'s' if a.size != 1}: #{a.join(', ')}")
         end
       end
+      @params_keys = @params.keys # for later reflection
       @params.each { |k, v| send("#{k}=", v) }
       @params = nil
       true

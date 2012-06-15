@@ -7,6 +7,7 @@ module Skylab::Issue
   class Porcelain
     extend ::Skylab::Porcelain
     extend ::Skylab::Autoloader
+    include Skylab::Porcelain::En
 
     desc "Add an \"issue\" line to #{ISSUES_FILE_NAME}."
     desc "Lines are added to the top and are sequentially numbered."
@@ -63,6 +64,39 @@ module Skylab::Issue
     def numbers
       api.action(:issue, :number, :list).wire!(&wire).invoke
     end
+
+
+    desc "a report of the @todo's in a codebase"
+
+    option_syntax do |o|
+      d = Api::Todo::Report.attributes.with(:default)
+
+      on('--pattern <PATTERN>',
+        "the todo pattern to use (default: '#{d[:pattern]}')"
+        ) { |p| o[:pattern] = p }
+      on('--name <NAME>',
+        "the filename patterns to search, can be specified",
+        "multiple times to broaden the search (default: '#{d[:names] * "', '"}')"
+        ) { |n| (o[:names] ||= []).push n }
+      on('--cmd', 'just show the internal grep / find command',
+         'that would be used (debugging).') { o[:show_command] = true }
+      on('-t', '--tree', 'experimental tree rendering') { o[:show_tree] = true }
+
+    end
+
+    argument_syntax '<path> [<path> [..]]'
+
+    # @todo we wanted to call this todo_report but there was that one bug
+    def todo *paths, opts       # args interface will change
+      action = api.action(:todo, :report).wire!(&wire)
+      action.on_number_found { |e| runtime.emit(:info, "(found #{e.count} item#{s e.count})") }
+      if tree = opts.delete(:show_tree)
+        tree = Porcelain::Todo::Tree.new(action, runtime)
+      end
+      action.invoke(opts.merge(paths: paths))
+      tree and tree.render
+    end
+
 
   protected
 
