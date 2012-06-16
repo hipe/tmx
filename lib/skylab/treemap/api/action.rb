@@ -43,7 +43,8 @@ module Skylab::Treemap
     meta_attribute :required
 
     def add_validation_error name, value, message
-      (validation_errors[name] ||= []).push message
+      message.gsub!('{{value}}') { value.inspect }
+      (validation_errors[name] ||= []).push(message)
     end
 
     def attributes
@@ -65,12 +66,20 @@ module Skylab::Treemap
       true
     end
     def r
+      @r ||= begin
+        require_relative '../r'
+        R::Bridge.new do |o|
+          o.on_info  { |e| emit(:info, e) }
+          o.on_error { |e| emit(:error, e) }
+        end
+      end
       @r ||= Skylab::Treemap::R::Bridge.new
     end
     def update_parameters! params
       params.each { |k, v| send("#{k}=", v) }
       self
     end
+    include Bleeding::Styles # for what used to be in porcelain, u know what u have to do!
     def validate
       ok = true
       validation_errors.each do |k, errs|
