@@ -49,10 +49,22 @@ module Skylab::Treemap
       o[:char] = '+'
       on('-c', '--char <CHAR>', %{use CHAR (default: #{o[:char]})}) { |v| o[:char] = v }
       on('--tree', 'show the text-based structure in a tree (debugging)') { o[:show_tree] = true }
-      on('--csv', 'output the csv to stdout and return (debugging)') { o[:show_csv] = true }
+      on('--csv', 'output the csv to stdout instead of tempfile') { o[:show_csv] = true }
+      on('--r-script', 'output the generated r script') { o[:show_r_script] = true }
+      on('--stop', 'stop execution after the previously indicated step (where avail.)') { o[:stop] = true }
     end
     def execute path, opts
-      api.action(:render).wire!(&wire).invoke(opts.merge(path: path))
+      if opts[:stop] and (order = opts.keys & [:stop, :show_tree, :show_csv, :show_r_script]).any?
+        # shed the ones that come after stop
+        (bad = []).tap{|a| a.push(order.pop) while :stop != order.last }
+        if order.size == 1
+          emit(:info, "warning: no stoppable options came before --stop. ignoring.")
+        else
+          opts[:stop_after] = order[-2]
+        end
+      end
+      opts.delete(:stop)
+      api.action(:render).wire!(&wire).invoke(opts.merge!(path: path))
     end
   end
   class << CLI

@@ -2,22 +2,30 @@ require 'skylab/interface/system'
 
 module Skylab::Treemap
   class R::Bridge
+    extend Skylab::PubSub::Emitter
+    emits :info, :error
+
     include Skylab::Interface::System
     attr_reader :executable_name
     attr_reader :executable_path
     def initialize
       @executable_name = 'R'
+      @ready = nil
+      yield(self) if block_given?
+    end
+    def not_ready msg
+      emit(:error, msg)
       @ready = false
     end
     def ready?
-      @ready and return true
+      if ! @ready.nil? # this may change, or get a reset etc
+        return @ready
+      end
       unless @executable_path = sys.which(executable_name)
-        self.not_ready_reason = %{not in PATH: "#{executable_name}"}
-        return false
+        return not_ready(%{not in PATH: "#{executable_name}"})
       end
       @ready = true
     end
-    attr_accessor :not_ready_reason
   end
 end
 

@@ -5,11 +5,14 @@ module Skylab::Treemap
   class API::Actions::Render < API::Action
     emits payload: :all, info: :all, error: :all
 
-    attribute :char, required: true, regex: [/^.$/, 'must be a single character']
+    attribute :char, required: true, regex: [/^.$/, 'must be a single character (had {{value}})']
     attribute :path, path: true, required: true
     attribute :tempdir_path, default: ->(){ File.join(FileUtils.pwd, '_tmp-r-data') }
     attribute :show_csv
+    attribute :show_r_script
     attribute :show_tree
+    attribute :stop_after
+    attribute :title, default: 'Treemap Tiem'
 
     CSV_OUT_NAME = 'out.csv'
 
@@ -19,12 +22,12 @@ module Skylab::Treemap
 
     def invoke params
       clear!.update_parameters!(params).validate or return
-      (path = self.path).exist? or return error("input file not found: #{path.pretty}")
+      path.exist? or return error("input file not found: #{path.pretty}")
       @tree = API::Parse::Indentation.invoke(attributes, path, char) { |o|
         o.on_parse_error { |e| emit(:error, e) } } or return
       if show_tree
         render_debug
-        return
+        stop_after?(:show_tree) and return
       end
       ok = with_csv_out_stream do |csv_out|
         API::Render::CSV.invoke(@tree) do |o|
@@ -34,7 +37,16 @@ module Skylab::Treemap
         end
       end
       ok or return
+      stop_after?(:show_csv) and return
+      render_treemap or return
+      stop_after?(:show_tree) and return
+      open_treemap or return
       info "done."
+    end
+
+    def open_treemap
+      info "pretending to open treemap"
+      true
     end
 
     def render_debug
@@ -45,6 +57,23 @@ module Skylab::Treemap
         empty = false
       end
       empty ? (info("(nothing)") and false) : true
+    end
+
+    def render_treemap
+      API::Render::Treemap.invoke(r, csv_tmp_path, tempdir) do |o|
+        o.on_info  { |e| emit(:info, e) }
+        o.on_error { |e| emit(:error, e) }
+        o.on_r_script { |e| emit(:payload, e) } if show_r_script
+        o.stop_after_script = stop_after?(:show_r_script)  if show_r_script
+        o.title = title
+      end
+    end
+
+    def stop_after? name
+      if name  == @stop_after
+        emit(:info, "(--stop requested after #{name})")
+        return true
+      end
     end
 
     def tempdir
@@ -67,6 +96,7 @@ module Skylab::Treemap
     end
 
     def with_csv_out_stream &b
+      $stderr.puts "faking write csv" ; return true
       if show_csv
         fake = PutsToEventProxy.new { |line| emit(:payload, line) }
         yield(fake) # ignore results for now
