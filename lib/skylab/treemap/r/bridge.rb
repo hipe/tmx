@@ -7,22 +7,27 @@ module Skylab::Treemap
 
     include Skylab::Interface::System
     attr_reader :executable_name
-    attr_reader :executable_path
+    def executable_path
+      @ready.nil? and ! ready? and return false
+      @executable_path or @ready
+    end
     def initialize
       @executable_name = 'R'
       @ready = nil
       yield(self) if block_given?
     end
     def not_ready msg
-      emit(:error, msg)
       @ready = false
+      @not_ready_reason = msg
+      false
     end
+    attr_reader :not_ready_reason
     def ready?
       if ! @ready.nil? # this may change, or get a reset etc
         return @ready
       end
       unless @executable_path = sys.which(executable_name)
-        return not_ready(%{not in PATH: "#{executable_name}"})
+        return not_ready(%{executable by this name is not in the PATH: "#{executable_name}"})
       end
       @ready = true
     end

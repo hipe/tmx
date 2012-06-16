@@ -14,7 +14,7 @@ module Skylab::Treemap
     attribute :stop_after
     attribute :title, default: 'Treemap Tiem'
 
-    CSV_OUT_NAME = 'out.csv'
+    CSV_OUT_NAME = 'tmp.csv'
 
     def csv_tmp_path
       @csv_tmp_path ||= API::Path.new(tempdir.join(CSV_OUT_NAME).to_s)
@@ -96,22 +96,18 @@ module Skylab::Treemap
     end
 
     def with_csv_out_stream &b
-      $stderr.puts "faking write csv" ; return true
       if show_csv
-        fake = PutsToEventProxy.new { |line| emit(:payload, line) }
-        yield(fake) # ignore results for now
+        yield( PutsToEventProxy.new { |line| emit(:payload, line) } )
       else
         tempdir.ready? or return error("failed to make tempdir: #{tempdir.invalid_reason}: #{tempdir.pretty}")
-        result = nil
-        File.open(csv_tmp_path.to_s, 'w+') do |fh|
-          result = yield(fh)
-        end
+        existed = csv_tmp_path.exist?
+        result = nil ; File.open(csv_tmp_path.to_s, 'w+') { |fh| result = yield(fh) }
         if result
-          emit(:info, "wrote #{csv_tmp_path.pretty} (#{result.num_lines} lines)")
-          true
+          emit(:info, "#{existed ? 'overwrote' : 'wrote'} #{csv_tmp_path.pretty} (#{result.num_lines} lines)")
         else
           emit(:error, "there was an issue in writing #{csv_tmp_path.pretty}.")
         end
+        result
       end
     end
   end
