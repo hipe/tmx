@@ -1,8 +1,6 @@
-module Skylab
-end
-
 module Skylab::Porcelain
   module En
+    extend Skylab::Autoloader
     extend self
     def oxford_comma a, ult = ' and ', sep = ', '
       (hsh = Hash.new(sep))[a.length - 1] = ult
