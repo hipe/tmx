@@ -49,16 +49,20 @@ module Skylab::Porcelain::En::ApiActionInflectionHack
       alias_method :[], :new
     end
   end
-  class << StringAsStem
-    alias_method :[], :new
-  end
 
   class VerbStem < StringAsStem
-    def progressive ; "#{self}ing"           end
+    def progressive
+      "#{self}ing"
+    end
   end
 
   class NounStem < StringAsStem
-    def plural      ; "#{self}s"             end # fine for now
+    def plural
+      "#{self}s" # fine for now
+    end
+    def singular
+      to_s       # but be careful!
+    end
   end
 
   # this is the core of the hack
@@ -84,7 +88,25 @@ module Skylab::Porcelain::En::ApiActionInflectionHack
     end
   end
 
-  class Inflected < Struct.new(:noun)
+  class Inflect
+    # for setting how to inflect things
+    #
+    def noun *a
+      if 0 == a.length then @noun ||= :singular else self.send(:noun=, *a) end
+    end
+    attr_writer :noun
+  end
+
+  class Inflected
+    # for getting the inflected thing
+    #
+    def initialize inflection
+      @inflection = inflection
+    end
+    attr_reader :inflection
+    def noun
+      inflection.stems.noun.send inflection.inflect.noun
+    end
   end
 
   class Inflection
@@ -98,8 +120,12 @@ module Skylab::Porcelain::En::ApiActionInflectionHack
       end
     end
 
+    def inflect
+      @inflect ||= Inflect.new
+    end
+
     def inflected
-      Inflected.new(@klass.inflect_noun stems)
+      @inflected ||= Inflected.new(self)
     end
 
     def stems

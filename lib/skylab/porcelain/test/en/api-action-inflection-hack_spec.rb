@@ -1,4 +1,5 @@
 require_relative '../../core'
+require_relative 'test-support'
 
 Skylab::Porcelain::En::ApiActionInflectionHack # force/test autolaod (mandatory) :(
 
@@ -6,12 +7,10 @@ module Skylab::Porcelain::En
   module TestSupport
     class MyAction
       extend ApiActionInflectionHack
-      def self.inflect_noun stems
-        'list' == stems.verb ? stems.noun.plural : stems.noun
-      end
     end
     module MyWidget # a noun
       class List < MyAction # a verb
+        inflection.inflect.noun :plural
       end
       class Add < MyAction # a verb
       end
@@ -57,7 +56,36 @@ module Skylab::Porcelain::En
         let(:inflection) { MyAction.inflection }
         specify { should eql("my actioning test support") }
       end
-   end
- end
+    end
+  end
+  describe "the industrious action class" do
+    extend TestSupport
+    let(:base_module) { Module.new }
+    klass :MyAwesomeAction do
+      extend ApiActionInflectionHack
+    end
+    klass :Flugelhorn__Show, extends: :MyAwesomeAction do
+      inflection.inflect.noun :plural
+    end
+    klass :Flugelhorn__Edit, extends: :MyAwesomeAction do
+      inflection.inflect.noun :singular
+    end
+    klass :Flugelhorn__TheDerpAction, extends: :MyAwesomeAction
+    let(:subject) do
+      action.inflection.inflected.noun
+    end
+    context "when specified as singular" do
+      let(:action) { Flugelhorn__Edit() }
+      specify { should eql("flugelhorn") }
+    end
+    context "when specified as plural" do
+      let(:action) { Flugelhorn__Show() }
+      specify { should eql("flugelhorns") }
+    end
+    context "when not specified it will use the singular" do
+      let(:action) { Flugelhorn__TheDerpAction() }
+      specify { should eql(action.inflection.stems.noun.singular) }
+    end
+  end
 end
 
