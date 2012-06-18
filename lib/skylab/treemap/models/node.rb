@@ -1,5 +1,7 @@
 module Skylab::Treemap
   class Models::Node
+    extend Skylab::Autoloader
+
     def children
       @children or fail("no")
       Enumerator.new do |y|

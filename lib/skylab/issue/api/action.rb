@@ -1,5 +1,5 @@
 require 'skylab/pub-sub/emitter'
-require 'skylab/porcelain/attribute-definer'
+require 'skylab/porcelain/core'
 
 
 module Skylab::Issue
@@ -7,6 +7,7 @@ module Skylab::Issue
   class Api::Action
     extend ::Skylab::PubSub::Emitter
     extend ::Skylab::Porcelain::AttributeDefiner
+    extend ::Skylab::Porcelain::En::ApiActionInflectionHack
 
     meta_attribute :default
     meta_attribute :required
@@ -15,6 +16,8 @@ module Skylab::Issue
     attribute :issues_file_name, default: ISSUES_FILE_NAME
 
     attr_reader :client
+
+    inflection.inflect.noun :singular
 
     def failed msg
       emit(:error, msg) # this might change to raising
@@ -40,9 +43,7 @@ module Skylab::Issue
       end
     end
     def build_event type, data
-      ev = Api::MyEvent.new(type, data)
-      ev.minsky_frame = self
-      ev
+      Api::MyEvent.new(type, data) { |o| o.inflection = self.class.inflection }
     end
     def params
       Hash[* @params_keys.map{ |k| [k, send(k)] }.flatten(1) ]
@@ -68,33 +69,5 @@ module Skylab::Issue
       self
     end
   end
-
-  # silly fun with inflections, but bad for i18n
-  class << Api::Action
-    def inflected_noun
-      @inflected_noun ||= case verb_stem
-        when 'list' ; noun_stem.plural
-        else        ; noun_stem
-      end
-    end
-    def noun_stem       ;  @noun_stem ||= NounStem[name_pieces[-2]]  end
-    def verb_stem       ;  @verb_stem ||= VerbStem[name_pieces.last] end
-    def name_pieces
-      @name_pieces ||= begin
-        to_s.gsub(/([a-z])([A-Z])/){ "#{$1}-#{$2}" }.downcase.split('::')
-      end
-    end
-  end
-
-  class VerbStem < String
-    class << self   ; alias_method :[], :new end
-    def progressive ; "#{self}ing"           end
-  end
-
-  class NounStem < String
-    class << self   ; alias_method :[], :new end
-    def plural      ; "#{self}s"             end # fine for now
-  end
-
 end
 

@@ -1,39 +1,13 @@
 module Skylab::Treemap
-  class FileLinesEnumerator < Enumerator
-    def close_if_open
-      @file.closed? ? nil : (@file.close || true)
+  class API::Parse::Indentation
+    extend Skylab::PubSub::Emitter
+    emits parse_error: :all
+
+    include Skylab::Porcelain::Bleeding::Styles # smell
+
+    def self.invoke(*a, &b)
+      new(*a, &b).invoke
     end
-    attr_reader :index
-    def initialize fh, &blk
-      blk and raise ArgumentError("not today.  not today.")
-      fh.closed? and fail("pass me an open filehandle please: #{fh.inspect}")
-      @index = -1
-      @file = fh
-      @peeking = nil
-      super() do |y|
-        @file.lines.each_with_index do |line, index|
-          @index = index
-          y << line.chomp
-        end
-      end
-    end
-    def peeking
-      @peeking and return @peeking
-      lines = self
-      @peeking = Enumerator.new do |y|
-        begin
-          loop do
-            y.yield(lines.peek)
-            lines.next
-          end
-        rescue StopIteration
-        end
-      end
-    end
-  end
-  class Actions::Render < Action
-    attribute :char, required: true, regex: [/^.$/, 'must be a single character']
-    attribute :path, path: true, required: true
 
     def advance_to_first_line
       @lines.peeking.detect { |line| @first_line_re =~ line } or
@@ -41,8 +15,11 @@ module Skylab::Treemap
           " not found at the start of any line (of #{@lines.index + 1})")
     end
 
+    attr_reader :attributes
+
+    attr_reader :char
+
     def clear!
-      super
       @line_re = @first_line_re = nil
       if instance_variable_defined?('@lines') and @lines
         @lines.close_if_open
@@ -53,20 +30,26 @@ module Skylab::Treemap
       self
     end
 
-    def execute path, opts
-      clear!.update_parameters!(opts.merge(path: path)).validate or return false
-      (path = self.path).exist? or return error("input file not found: #{path.pretty}")
-      @lines = FileLinesEnumerator.new(path.open('r'))
+    def initialize attributes, path, char
+      @attributes = attributes
+      @path = path
+      @char = char
+      yield self
+    end
+
+    def invoke
+      clear!
+      @lines = API::FileLinesEnumerator.new(path.open('r'))
       @first_line_re = /\A[[:space:]]*#{Regexp.escape(char)} /
       @line_re = /\A(?<indent>[[:space:]]*#{Regexp.escape(char)} )(?<line_content>.*)\z/
       advance_to_first_line or return false
       read_lines or return false
-      render_debug
-      emit(:payload, "wow! you're great.")
+      @tree
     end
 
     def parse_error msg
-      error("parse failure: #{msg} (in #{path.pretty})")
+      emit(:parse_error, "parse failure: #{msg} (in #{path.pretty})")
+      false
     end
 
     def parse_line line, index
@@ -76,6 +59,8 @@ module Skylab::Treemap
         result
       end
     end
+
+    attr_reader :path
 
     def read_lines
       @stack.empty? or fail("for now, won't read_lines unless stack is empty")
@@ -100,15 +85,7 @@ module Skylab::Treemap
       @stack = nil
       true
     end
-    def render_debug
-      require 'skylab/porcelain/tree'
-      empty = true
-      Skylab::Porcelain::Tree.lines(@tree).each do |line|
-        emit :info, line # egads!
-        empty = false
-      end
-      empty ? (info("(nothing)") and false) : true
-    end
+
     def stack_pop node
       loop do
         was = @stack.pop

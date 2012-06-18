@@ -15,7 +15,7 @@ module Skylab::Autoloader
       dir = find_dir(mod, %r{^(.+)\.rb:\d+:in `}.match(caller[0])[1])
       mod.singleton_class.send(:alias_method, :orig_const_missing, :const_missing)
       mod.singleton_class.send(:define_method, :const_missing) do |const|
-        stem = const.to_s.gsub(/(?<=^|([a-z]))([A-Z])/) { "#{'-' if $1}#{$2.downcase}" }
+        stem = const.to_s.gsub(/(?<=^|([a-z]))([A-Z])/) { "#{'-' if $1}#{$2}" }.downcase
         require "#{dir}/#{stem}"
         const_get const
       end

@@ -1,6 +1,8 @@
 module Skylab::Issue
   class Api::Issue::Show < Api::Action
 
+    inflection.inflect.noun :plural
+
     attribute :identifier
     attribute :issues_file_name, :required => true
     attribute :last

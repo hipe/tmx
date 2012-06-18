@@ -12,13 +12,13 @@ module Skylab::Issue
     def to_s # it derps over on payload.to_s without this
       message # ich muss sein
     end
-    attr_accessor :minsky_frame
     # silly fun
+    attr_accessor :inflection
     def noun
-      @minsky_frame.class.inflected_noun
+      inflection.inflected.noun
     end
     def verb
-      @minsky_frame.class.verb_stem
+      inflection.stem.verb
     end
   end
 end

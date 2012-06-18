@@ -1,8 +1,7 @@
-require 'skylab/porcelain/bleeding'
-require 'skylab/porcelain/attribute-definer'
+require 'skylab/porcelain/core'
+require 'skylab/pub-sub/emitter'
 
 module Skylab::Treemap
-  extend Skylab::Autoloader
 
   class MyAttributeMeta < Hash
     def initialize sym
@@ -13,11 +12,15 @@ module Skylab::Treemap
     end
   end
 
-  class Action
-    extend Skylab::Porcelain::Bleeding::Action
+  class API::Action
+    extend Skylab::PubSub::Emitter
     extend Skylab::Porcelain::AttributeDefiner
+    extend Skylab::Porcelain::En::ApiActionInflectionHack
+    inflection.stems.noun = 'treemap'
 
     attribute_meta_class MyAttributeMeta
+
+    meta_attribute :default
 
     meta_attribute :path do |name, _|
       require 'skylab/face/path-tools'
@@ -43,7 +46,8 @@ module Skylab::Treemap
     meta_attribute :required
 
     def add_validation_error name, value, message
-      (validation_errors[name] ||= []).push message
+      message.gsub!('{{value}}') { value.inspect }
+      (validation_errors[name] ||= []).push(message)
     end
 
     def attributes
@@ -56,27 +60,42 @@ module Skylab::Treemap
       self
     end
 
-    def error s
-      emit :error, s
+    def error *a
+      emit(:error, *a)
       false
     end
-    def info s
-      emit :info, s
+
+    def info *a
+      emit(:info, *a)
       true
     end
+
     def r
+      @r ||= begin
+        require_relative '../r'
+        R::Bridge.new do |o|
+          o.on_info  { |e| info e }
+          o.on_error { |e| error e }
+        end
+      end
       @r ||= Skylab::Treemap::R::Bridge.new
     end
     def update_parameters! params
       params.each { |k, v| send("#{k}=", v) }
       self
     end
+    include Skylab::Porcelain::Bleeding::Styles # for what used to be in porcelain, u know what u have to do!
     def validate
       ok = true
       validation_errors.each do |k, errs|
         ok = error(%{#{pre attributes[k].label} #{errs.join(' and it ')}})
       end
       ok or return false # avoid superflous messages below
+      attributes.with(:default).each do |k, v|
+        if send(k).nil?
+          send("#{k}=", v)
+        end
+      end
       if (a = attributes.select{ |n, m| m[:required] and ! send(n) }).any?
         ok = error("missing required attribute#{s a}: " <<
           "#{oxford_comma(a.map { |o| pre attributes[o.first].label }) }")
@@ -84,26 +103,8 @@ module Skylab::Treemap
       ok
     end
     attr_reader :validation_errors
-  end
-  module Actions
-  end
-  class Actions::Install < Action
-    desc "for installing R"
-
-    URL_BASE = 'http://cran.stat.ucla.edu/'
-    def execute
-      emit :payload, "To install R, please download the package for your OS from #{URL_BASE}"
-    end
-  end
-  class Actions::Render < Action
-    desc "render a treemap from a text-based tree structure"
-    option_syntax do |o|
-      o[:char] = '+'
-      on('-c', '--char <CHAR>', %{use CHAR (default: #{o[:char]})}) { |v| o[:char] = v }
-    end
-    def execute path, opts
-      require_relative 'actions/render'
-      execute path, opts
+    def wire!
+      yield self
     end
   end
 end
