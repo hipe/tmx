@@ -6,18 +6,20 @@ module Skylab::Porcelain::En
   module TestSupport
     class MyAction
       extend ApiActionInflectionHack
-      def self.inflect_noun stem
-        'list' == stem.verb ? stem.noun.plural : stem.noun
+      def self.inflect_noun stems
+        'list' == stems.verb ? stems.noun.plural : stems.noun
       end
     end
-    module MyWidget # a nound
-      class List < MyAction# a verb
+    module MyWidget # a noun
+      class List < MyAction # a verb
       end
       class Add < MyAction # a verb
       end
     end
   end
+end
 
+module Skylab::Porcelain::En
   include TestSupport
 
   describe "the class that extends #{ApiActionInflectionHack}" do
@@ -33,7 +35,7 @@ module Skylab::Porcelain::En
         context "e.g. with #{MyWidget::Add}" do
           let(:klass) { MyWidget::Add }
           context "the progressive form of it" do
-            subject { klass.inflection.stem.verb.progressive }
+            subject { klass.inflection.stems.verb.progressive }
             specify { should eql('adding') }
           end
         end
@@ -41,7 +43,7 @@ module Skylab::Porcelain::En
     end
     context("and further assuming that the surround modules of said actions",
       "are named after nouns, and you tell it which verbs deal with single or plural nouns") do
-      subject { "#{inflection.stem.verb.progressive} #{inflection.inflected.noun}" }
+      subject { "#{inflection.stems.verb.progressive} #{inflection.inflected.noun}" }
       context "compare the inflection for LIST:" do
         let(:inflection) { MyWidget::List.inflection }
         specify { should eql("listing my widgets") }
@@ -50,7 +52,12 @@ module Skylab::Porcelain::En
         let(:inflection) { MyWidget::Add.inflection }
         specify { should eql("adding my widget") }
       end
+      context("it's dumb to ask the base class for its inflection",
+        "but let's see what happens") do
+        let(:inflection) { MyAction.inflection }
+        specify { should eql("my actioning test support") }
+      end
    end
-  end
+ end
 end
 

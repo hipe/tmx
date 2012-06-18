@@ -1,4 +1,7 @@
+require_relative '../../skylab'
+
 module Skylab::Treemap
+
   module API
     extend Skylab::Autoloader
   end
