@@ -3,7 +3,7 @@ require 'fileutils'
 
 module Skylab::Treemap
   class API::Actions::Render < API::Action
-    emits payload: :all, info: :all, error: :all, info_line: :all
+    emits :treemap, payload: :all, info: :all, error: :all, info_line: :all
     event_class API::Event
 
     attribute :char, required: true, regex: [/^.$/, 'must be a single character (had {{value}})']
@@ -48,12 +48,8 @@ module Skylab::Treemap
       stop_after?(:show_csv) and return
       render_treemap or return
       stop_after?(:show_tree) and return
-      open_treemap or return
       info "finished."
-    end
-
-    def open_treemap
-      info "pretending to open treemap"
+      emit(:treemap, path: outpath)
       true
     end
 

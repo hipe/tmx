@@ -73,12 +73,14 @@ module Skylab::Treemap
     desc "render a treemap from a text-based tree structure"
     option_syntax do |o|
       o[:char] = '+'
+      o[:exec] = true
       on('-c', '--char <CHAR>', %{use CHAR (default: #{o[:char]})}) { |v| o[:char] = v }
       on('--tree', 'show the text-based structure in a tree (debugging)') { o[:show_tree] = true }
       on('--csv', 'output the csv to stdout instead of tempfile, stop.') { o[:show_csv] = true }
       on('--r-script', 'output to stdout the generated r script, stop.') { o[:show_r_script] = true }
       on('--stop', 'stop execution after the previously indicated step (where avail.)') { o[:stop] = true }
       on('-F', '--force', 'force overwriting of an exiting file') { o[:force] = true }
+      on('--[no-]exec', "the default is to open the file with exec") { |v| o[:exec] = v }
     end
     def execute path, opts
       if opts[:stop] and (order = opts.keys & [:stop, :show_tree, :show_csv, :show_r_script]).any?
@@ -91,7 +93,15 @@ module Skylab::Treemap
         end
       end
       opts.delete(:stop)
-      api.action(:render).wire!(&wire).invoke(opts.merge!(path: path))
+      do_exec = opts.delete(:exec)
+      api.action(:render).wire!(&wire).tap do |action|
+        action.on_treemap do |e|
+          if ! opts[:stop_after] and e.path.exist? and do_exec
+            emit(:info, "calling exec() to open the pdf")
+            exec("open #{e.path}")
+          end
+        end
+      end.invoke(opts.merge!(path: path))
     end
   end
   class << CLI
