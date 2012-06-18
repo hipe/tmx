@@ -1,4 +1,6 @@
 require 'open3'
+require 'stringio'
+require 'strscan'
 
 module Skylab::Treemap
   class API::Render::Treemap
