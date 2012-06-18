@@ -17,9 +17,7 @@ module Skylab::Issue
 
     attr_reader :client
 
-    def self.inflect_noun stem
-      'list' == stem.verb ? stem.noun.plural : stem.noun
-    end
+    inflection.inflect.noun :singular
 
     def failed msg
       emit(:error, msg) # this might change to raising

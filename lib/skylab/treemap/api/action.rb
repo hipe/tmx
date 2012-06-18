@@ -14,6 +14,9 @@ module Skylab::Treemap
   class API::Action
     extend Skylab::PubSub::Emitter
     extend Skylab::Porcelain::AttributeDefiner
+    extend Skylab::Porcelain::En::ApiActionInflectionHack
+    inflection.stems.noun = 'treemap'
+
 
     attribute_meta_class MyAttributeMeta
 

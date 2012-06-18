@@ -1,4 +1,5 @@
 require_relative 'api'
+require 'skylab/porcelain/bleeding'
 
 module Skylab::Treemap
   Bleeding = Skylab::Porcelain::Bleeding
