@@ -3,7 +3,7 @@ require 'open3'
 module Skylab::Treemap
   class API::Render::Treemap
     extend Skylab::PubSub::Emitter
-    emits :info, :error, :r_script
+    emits :r_script, :success, :failure
 
     def self.invoke(*a, &b)
       new(*a, &b).execute
@@ -29,17 +29,22 @@ module Skylab::Treemap
       str.to_s.gsub(DENY_RE, '')
     end
 
-    def error msg
-      emit(:error, "unable to generate trreemap: #{msg}")
-      false
-    end
-
     def execute
       ready? or return
       generate_script! or return
       event_listeners[:r_script] and script.each { |s| emit(:r_script, s ) }
       stop_after_script and return true
-      pipe_the_script
+      pipe_the_script or return
+    end
+
+    def failure msg, pathname=nil
+      emit(:failure, message: msg, pathname: pathname) # nil pathname ok
+      false
+    end
+
+    def success msg, pathname
+      emit(:success, message: msg, pathname: pathname)
+      true
     end
 
     def generate_script!
@@ -59,14 +64,13 @@ module Skylab::Treemap
       self.class.pdf_path_guess
     end
 
-    NUM_BYTES = 4096
     def pipe_the_script
       @script or return false # just to be sure
-      r.ready? or return error("r was not available: #{r.not_ready_reason}")
-      verb = pdf_path_guess.exist? ? 'overwrite' : 'write'
+      r.ready? or return failed("count not find r: #{r.not_ready_reason}")
+      mtime1 = pdf_path_guess.exist? && pdf_path_guess.stat.mtime
       lines = self.build_script_lines_enumerator
-      line = true
       Open3.popen3(r.executable_path, '--vanilla') do |sin, sout, serr|
+        line = true
         loop do
           bytes = select_lines_until(0.3, sout: sout, serr: serr) do |o|
             o.on_sout { |e| $stderr.write "OUT-->#{e}" }
@@ -81,16 +85,37 @@ module Skylab::Treemap
           end
         end
       end # popen3
+      report_result mtime1
+    end
+
+    def report_result mtime1
+      mtime2 = pdf_path_guess.exist? && pdf_path_guess.stat.mtime
+      msg, ok = if mtime1
+        if mtime2
+          if mtime1 == mtime2
+            ["failed to create new file, old file intact (?)", false]
+          else
+            ["overwrote file", true] end
+        else
+          ["was there before and isnt't now!?", false] end
+      elsif mtime2
+        ["wrote new file", true]
+      else
+        ["failed to generate file or generated file not found", false]
+      end
+      send(ok ? :success : :failure, msg, pdf_path_guess)
     end
 
     def ready?
       tempdir.ready? or return
-      csv_path.exist? or return error("csv not found: #{csv_path.pretty}")
+      csv_path.exist? or return failure("couldn't find csv: #{csv_path.pretty}")
       true
     end
 
     attr_reader :script
 
+
+    MAXLEN = 4096
 
     def select_lines_until(timeout_seconds, streams)
       name = Hash[ * streams.map { |k, v| [v.object_id, k] }.flatten(1) ]
@@ -102,18 +127,18 @@ module Skylab::Treemap
         read, _w, _e = IO.select(remaining, nil, nil, timeout_seconds)
         read or break
         read.each do |io|
-          str = done = nil
+          str = eof = nil
           begin
-            str = io.readpartial NUM_BYTES
-            done = io.closed?
+            str = io.readpartial MAXLEN
+            eof = io.closed?
           rescue EOFError => e
-            done = true
+            eof = true
           end
           if str
             bytes += str.length
             e.emit(name[io.object_id], str)
           end
-          if done
+          if eof
             remaining[remaining.index(io)] = nil
             remaining.compact!
           end

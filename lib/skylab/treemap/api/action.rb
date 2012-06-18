@@ -1,4 +1,5 @@
-require 'skylab/porcelain/attribute-definer'
+require 'skylab/porcelain/core'
+require 'skylab/pub-sub/emitter'
 
 module Skylab::Treemap
 
@@ -14,6 +15,8 @@ module Skylab::Treemap
   class API::Action
     extend Skylab::PubSub::Emitter
     extend Skylab::Porcelain::AttributeDefiner
+    extend Skylab::Porcelain::En::ApiActionInflectionHack
+    inflection.stems.noun = 'treemap'
 
     attribute_meta_class MyAttributeMeta
 
@@ -57,20 +60,22 @@ module Skylab::Treemap
       self
     end
 
-    def error s
-      emit :error, s
+    def error *a
+      emit(:error, *a)
       false
     end
-    def info s
-      emit :info, s
+
+    def info *a
+      emit(:info, *a)
       true
     end
+
     def r
       @r ||= begin
         require_relative '../r'
         R::Bridge.new do |o|
-          o.on_info  { |e| emit(:info, e) }
-          o.on_error { |e| emit(:error, e) }
+          o.on_info  { |e| info e }
+          o.on_error { |e| error e }
         end
       end
       @r ||= Skylab::Treemap::R::Bridge.new
@@ -79,7 +84,7 @@ module Skylab::Treemap
       params.each { |k, v| send("#{k}=", v) }
       self
     end
-    include Bleeding::Styles # for what used to be in porcelain, u know what u have to do!
+    include Skylab::Porcelain::Bleeding::Styles # for what used to be in porcelain, u know what u have to do!
     def validate
       ok = true
       validation_errors.each do |k, errs|

@@ -1,12 +1,16 @@
 require_relative 'api'
+require 'skylab/porcelain/bleeding'
 
 module Skylab::Treemap
-  Bleeding = Skylab::Porcelain::Bleeding
-  class CLI < Bleeding::Runtime
+
+  class CLI < Skylab::Porcelain::Bleeding::Runtime
+    Bleeding = Skylab::Porcelain::Bleeding # pls don't ask
+
     extend Skylab::PubSub::Emitter
 
     emits Bleeding::EVENT_GRAPH
     emits payload: :all, info: :all, error: :all
+    event_class API::Event
 
     desc "experiments with R."
 
@@ -14,7 +18,20 @@ module Skylab::Treemap
       @api ||= API::Client.new
     end
 
-    def porcelain # @todo after:#100.200: not here
+    PARENS = %r{\A(?<open>\()(?<message>.*)(?<close>\))\z}
+
+    def format prefix, e
+      msg = e.message
+      parens = msg.match(PARENS) and msg = parens[:message]
+      msg = "#{prefix}: #{msg}"
+      if Hash === e.payload and e.payload[:path]
+        msg = "#{msg}: #{e.path.pretty}"
+      end
+      parens and msg = "#{parens[:open]}#{msg}#{parens[:close]}"
+      msg
+    end
+
+    def porcelain # @todo 100.200 not here
       self.class
     end
 
@@ -25,14 +42,23 @@ module Skylab::Treemap
     end
 
     def wire_action action
-      action.on_all { |e| emit(e) }
+      verb = action.class.inflection.stems.verb
+      inflected = action.class.inflection.inflected
+      action.on_info_line { |e| emit(:info, e) }
+      action.on_payload { |e| emit(e) }
+      action.on_info do |e|
+        emit(:info, format("while #{verb.progressive} #{inflected.noun}", e))
+      end
+      action.on_error do |e|
+        emit(:error, format("couldn't #{verb} #{inflected.noun}", e))
+      end
     end
   end
   module CLI::Actions
   end
   class CLI::Action
-    extend Bleeding::Action
-    extend Bleeding::DelegatesTo
+    extend CLI::Bleeding::Action
+    extend CLI::Bleeding::DelegatesTo
     delegates_to :runtime, :api, :wire
   end
   class CLI::Actions::Install < CLI::Action
@@ -47,11 +73,14 @@ module Skylab::Treemap
     desc "render a treemap from a text-based tree structure"
     option_syntax do |o|
       o[:char] = '+'
+      o[:exec] = true
       on('-c', '--char <CHAR>', %{use CHAR (default: #{o[:char]})}) { |v| o[:char] = v }
       on('--tree', 'show the text-based structure in a tree (debugging)') { o[:show_tree] = true }
-      on('--csv', 'output the csv to stdout instead of tempfile') { o[:show_csv] = true }
-      on('--r-script', 'output the generated r script') { o[:show_r_script] = true }
+      on('--csv', 'output the csv to stdout instead of tempfile, stop.') { o[:show_csv] = true }
+      on('--r-script', 'output to stdout the generated r script, stop.') { o[:show_r_script] = true }
       on('--stop', 'stop execution after the previously indicated step (where avail.)') { o[:stop] = true }
+      on('-F', '--force', 'force overwriting of an exiting file') { o[:force] = true }
+      on('--[no-]exec', "the default is to open the file with exec") { |v| o[:exec] = v }
     end
     def execute path, opts
       if opts[:stop] and (order = opts.keys & [:stop, :show_tree, :show_csv, :show_r_script]).any?
@@ -64,7 +93,15 @@ module Skylab::Treemap
         end
       end
       opts.delete(:stop)
-      api.action(:render).wire!(&wire).invoke(opts.merge!(path: path))
+      do_exec = opts.delete(:exec)
+      api.action(:render).wire!(&wire).tap do |action|
+        action.on_treemap do |e|
+          if ! opts[:stop_after] and e.path.exist? and do_exec
+            emit(:info, "calling exec() to open the pdf")
+            exec("open #{e.path}")
+          end
+        end
+      end.invoke(opts.merge!(path: path))
     end
   end
   class << CLI
@@ -75,10 +112,10 @@ module Skylab::Treemap
         c.on_help    { |e| runtime.emit(:help,  e) }
         c.on_info    { |e| runtime.emit(:info, e) }
         c.on_payload { |e| runtime.emit(:payload, e) }
-        runtime_instance_settings and runtime_instance_settings[c] # @todo
+        runtime_instance_settings and runtime_instance_settings[c] # @todo #100.200
       end
     end
-    def porcelain # @todo after:#100.200: not here
+    def porcelain # @todo #100.200 not here
       self
     end
     attr_accessor :runtime_instance_settings

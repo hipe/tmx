@@ -1,4 +1,7 @@
+require_relative '../../skylab'
+
 module Skylab::Treemap
+
   module API
     extend Skylab::Autoloader
   end
@@ -9,6 +12,18 @@ module Skylab::Treemap
         m.const_get n.to_s.gsub(/(?:^|_)([a-z])/){ $1.upcase }
       end
       klass.new
+    end
+  end
+
+  class API::Event < Skylab::PubSub::Event
+    def initialize tag, *payload
+      if payload.size == 2 and Hash === payload.last
+        h = payload.pop
+        h[:message] = payload.first
+        super(tag, h)
+      else
+        super(tag, *payload)
+      end
     end
   end
 end

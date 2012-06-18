@@ -3,7 +3,7 @@ module Skylab::Treemap
     extend Skylab::PubSub::Emitter
     emits parse_error: :all
 
-    include Bleeding::Styles # smell
+    include Skylab::Porcelain::Bleeding::Styles # smell
 
     def self.invoke(*a, &b)
       new(*a, &b).invoke
