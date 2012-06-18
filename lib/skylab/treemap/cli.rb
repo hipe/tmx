@@ -31,6 +31,12 @@ module Skylab::Treemap
       msg
     end
 
+    def initialize
+      namespace_init
+      yield self if block_given?
+      $stdout.tty? or def self.stylize(s, *a) ; s end # no color
+    end
+
     def porcelain # @todo 100.200 not here
       self.class
     end
@@ -47,10 +53,10 @@ module Skylab::Treemap
       action.on_info_line { |e| emit(:info, e) }
       action.on_payload { |e| emit(e) }
       action.on_info do |e|
-        emit(:info, format("while #{verb.progressive} #{inflected.noun}", e))
+        emit(:info, format("#{em 'o'} while #{verb.progressive} #{inflected.noun}", e))
       end
       action.on_error do |e|
-        emit(:error, format("couldn't #{verb} #{inflected.noun}", e))
+        emit(:error, format("#{stylize 'o', :red} couldn't #{verb} #{inflected.noun}", e))
       end
     end
   end
@@ -97,7 +103,7 @@ module Skylab::Treemap
       api.action(:render).wire!(&wire).tap do |action|
         action.on_treemap do |e|
           if ! opts[:stop_after] and e.path.exist? and do_exec
-            emit(:info, "calling exec() to open the pdf")
+            info("calling exec() to open the pdf")
             exec("open #{e.path}")
           end
         end

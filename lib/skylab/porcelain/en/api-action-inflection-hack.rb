@@ -38,7 +38,7 @@ module Skylab::Porcelain::En::ApiActionInflectionHack
         othr = other.send(prop)
         if othr.respond_to?(:dupe!)
           send(prop).dupe! othr
-        elsif instance_variable_get("@#{prop}").nil?
+        elsif ! instance_variable_defined?("@#{prop}") or instance_variable_get("@#{prop}").nil?
           instance_variable_set("@#{prop}", othr) # copy by reference (or value if it's a final value)
         end
       end

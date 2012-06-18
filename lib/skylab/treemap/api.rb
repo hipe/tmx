@@ -1,4 +1,5 @@
 require_relative '../../skylab'
+require 'skylab/pub-sub/emitter'
 
 module Skylab::Treemap
 
