@@ -14,5 +14,17 @@ module Skylab::Treemap
       klass.new
     end
   end
+
+  class API::Event < Skylab::PubSub::Event
+    def initialize tag, *payload
+      if payload.size == 2 and Hash === payload.last
+        h = payload.pop
+        h[:message] = payload.first
+        super(tag, h)
+      else
+        super(tag, *payload)
+      end
+    end
+  end
 end
 
