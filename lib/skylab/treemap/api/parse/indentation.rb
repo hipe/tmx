@@ -2,8 +2,8 @@ module Skylab::Treemap
   class API::Parse::Indentation
     extend Skylab::PubSub::Emitter
     emits parse_error: :all
-
-    include Skylab::Porcelain::Bleeding::Styles # smell
+    extend DelegatesTo
+    delegates_to :stylus, :pre
 
     def self.invoke(*a, &b)
       new(*a, &b).invoke
@@ -30,10 +30,11 @@ module Skylab::Treemap
       self
     end
 
-    def initialize attributes, path, char
+    def initialize attributes, path, char, stylus
       @attributes = attributes
       @path = path
       @char = char
+      @stylus = stylus
       yield self
     end
 
@@ -112,6 +113,7 @@ module Skylab::Treemap
       parse_error("bad indentation on line #{node.line_number} --" <<
         " it must be #{a.join('')}")
     end
+    attr_reader :stylus
   end
 end
 

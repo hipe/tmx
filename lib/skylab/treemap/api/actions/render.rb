@@ -6,15 +6,19 @@ module Skylab::Treemap
     emits :treemap, payload: :all, info: :all, error: :all, info_line: :all
     event_class API::Event
 
+    ORDER = [:show_tree, :csv, :r_script, :write_outfile, :exec_open_file]
+
+    meta_attribute :stops_after
+    meta_attribute :stop_implied
     attribute :char, required: true, regex: [/^.$/, 'must be a single character (had {{value}})']
+    attribute :csv_stream, enum: [:payload], stops_after: :csv, stop_implied: true
     attribute :force
     attribute :outpath_requires_force, default: true
     attribute :path, path: true, required: true
+    attribute :r_script_stream, :enum => [:payload], stops_after: :r_script, stop_implied: true
     attribute :tempdir_path, default: ->(){ File.join(FileUtils.pwd, '_tmp-r-data') }
-    attribute :show_csv
-    attribute :show_r_script
-    attribute :show_tree
-    attribute :stop_after
+    attribute :show_tree, stops_after: :show_tree
+    attribute :stop_after, enum: ORDER
     attribute :title, default: 'Treemap Tiem'
 
     CSV_OUT_NAME = 'tmp.csv'
@@ -28,10 +32,10 @@ module Skylab::Treemap
     end
 
     def invoke params
-      clear!.update_parameters!(params).validate or return
+      clear!.update_parameters!(params).validate or return false
       path.exist? or return error("couldn't find input file", path: path)
-      outpath.forceless? and return error("outpath exists, won't overwrite without force", path: outpath) # --
-      @tree = API::Parse::Indentation.invoke(attributes, path, char) { |o|
+      outpath.forceless? and return error("outpath exists, won't overwrite without #{param :force}", path: outpath)
+      @tree = API::Parse::Indentation.invoke(attributes, path, char, stylus) { |o|
         o.on_parse_error { |e| error e } } or return
       if show_tree
         render_debug
@@ -45,7 +49,7 @@ module Skylab::Treemap
         end
       end
       ok or return
-      stop_after?(:show_csv) and return
+      stop_after?(:csv) and return
       render_treemap or return
       stop_after?(:show_tree) and return
       info "finished."
@@ -53,10 +57,14 @@ module Skylab::Treemap
       true
     end
 
+    def order
+      ORDER
+    end
+
     def outpath
       @outpath ||= API::Render::Treemap.pdf_path_guess.tap do |o|
         o.forceless = ->() do
-          o.exist? and outpath_requires_force and ! force
+          o.exist? and outpath_requires_force and ! stop_before?(:write_outfile) and ! force
         end
       end
     end
@@ -73,17 +81,31 @@ module Skylab::Treemap
       API::Render::Treemap.invoke(r, csv_tmp_path, tempdir) do |o|
         o.on_success { |e| info("generated treemap: #{e.message}", path: e.pathname) }
         o.on_failure { |e| error("failed to generate treempap: #{e.message}", path: e.pathname) }
-        o.on_r_script { |e| emit(:payload, e) } if show_r_script
-        o.stop_after_script = show_r_script # right now it is always mutually exclusive
+        if :payload == r_script_stream
+          o.on_r_script { |e| emit(:payload, e) }
+          o.stop_after_script = true
+        end
         o.title = title
       end
     end
 
+    # this is "now that we are after X, have we passed a stop?" and not "is there a stop after X?"
     def stop_after? name
-      if name  == @stop_after
-        info "(stopping because --stop requested after #{name})"
-        return true
+      if [0, -1].include? stop_compare(name)
+        info "(stopping because #{param :stop} (stated or implied) after #{param attributes.with(:stops_after).invert[name]})"
+        true
       end
+    end
+
+    # this is "is there a stop anywhere before X?"
+    def stop_before? name
+      -1 == stop_compare(name)
+    end
+
+    def stop_compare name
+      name_index = ORDER.index(name) or raise ArgumentError.new("bad name: #{name}")
+      @stop_after or return nil
+      ORDER.index(@stop_after) <=> name_index
     end
 
     def tempdir
@@ -96,6 +118,18 @@ module Skylab::Treemap
       end
     end
 
+    def validate
+      super or return
+      attributes.with(:stops_after).each do |attrib, event|
+        if send(attrib) and (self.stop_after ||= event) != event
+          inv = attributes.with(:stops_after).invert
+          return error("can't have the (possibly implied) #{param :stop} after both #{param inv[stop_after]}" <<
+            " and #{param attrib}")
+        end
+      end
+      true
+    end
+
     class PutsToEventProxy
       def initialize &b
         @block = b
@@ -106,10 +140,9 @@ module Skylab::Treemap
     end
 
     def with_csv_out_stream &b
-      if show_csv
+      if :payload == csv_stream
         yield( PutsToEventProxy.new { |line| emit(:payload, line) } )
-        # @todo: 102.300.4.2 dynamic modality-aware rendering of options (also near 'force')
-        info "stopping after show_csv -- nothing more to do."
+        stop_after?(:csv) # just to get a message
         return
       else
         tempdir.ready? or return error("failed to make tempdir: #{tempdir.invalid_reason}", path: tempdir)
