@@ -100,7 +100,8 @@ module Skylab::Treemap
       on('--[no-]exec', "the default is to open the file with exec") { |v| o[:exec] = v }
     end
     def execute path, opts
-      if opts[:stop] and (order = opts.keys & [:stop, :show_tree, :show_csv, :show_r_script]).any?
+      action = api.action(:render).wire!(&wire)
+      if opts[:stop] and (order = opts.keys & [:stop, *action.order]).any?
         # shed the ones that come after stop
         (bad = []).tap{|a| a.push(order.pop) while :stop != order.last }
         if order.size == 1
@@ -111,14 +112,13 @@ module Skylab::Treemap
       end
       opts.delete(:stop)
       do_exec = opts.delete(:exec)
-      ok = api.action(:render).wire!(&wire).tap do |action|
-        action.on_treemap do |e|
-          if ! opts[:stop_after] and e.path.exist? and do_exec
-            action.info("calling exec() to open the pdf")
-            exec("open #{e.path}")
-          end
+      action.on_treemap do |e|
+        if do_exec and e.path.exist? and ! action.stop_before?(:exec_open_file)
+          action.info("calling exec() to open the pdf!")
+          exec("open #{e.path}")
         end
-      end.invoke(opts.merge!(path: path))
+      end
+      ok = action.invoke(opts.merge!(path: path))
       ok or help_invite && ok
     end
   end
@@ -147,7 +147,7 @@ module Skylab::Treemap
     attr_reader :active
     def do_stylize= bool
       if @active != (b = !! bool)
-        singleton_class.alias_method(:stylize, b ? :orig_stylize : :plain)
+        singleton_class.send(:alias_method, :stylize, b ? :orig_stylize : :plain)
         @active = b
       end
       bool

@@ -53,10 +53,15 @@ module Skylab::Treemap
       true
     end
 
+    ORDER = [:show_tree, :show_csv, :show_r_script, :write_outfile, :exec_open_file]
+    def order
+      ORDER
+    end
+
     def outpath
       @outpath ||= API::Render::Treemap.pdf_path_guess.tap do |o|
         o.forceless = ->() do
-          o.exist? and outpath_requires_force and ! force
+          o.exist? and outpath_requires_force and ! stop_before?(:write_outfile) and ! force
         end
       end
     end
@@ -79,11 +84,29 @@ module Skylab::Treemap
       end
     end
 
+    alias_method :orig_stop_after=, :stop_after=
+    def stop_after= name
+      order.include?(name) or raise ArgumentError.new("no: #{name}")
+      self.orig_stop_after = name
+    end
+
+    # this is "now that we are after X, have we passed a stop?" and not "is there a stop after X?"
     def stop_after? name
-      if name  == @stop_after
+      if [0, -1].include? stop_compare(name)
         info "(stopping because #{param :stop} requested after #{name})"
-        return true
+        true
       end
+    end
+
+    # this is "is there a stop anywhere before X?"
+    def stop_before? name
+      -1 == stop_compare(name)
+    end
+
+    def stop_compare name
+      name_index = ORDER.index(name) or raise ArgumentError.new("bad name: #{name}")
+      @stop_after or return nil
+      ORDER.index(@stop_after) <=> name_index
     end
 
     def tempdir
@@ -94,6 +117,17 @@ module Skylab::Treemap
           o.on_create { |e| info("created directory", path: e.tempdir) }
         end
       end
+    end
+
+    def validate
+      super or return
+      if show_r_script
+        if (self.stop_after ||= :show_r_script) != :show_r_script
+          return error("unfortunately #{param :show_r_script} implies #{param :stop}, " <<
+                       "which can't appear after anything else when used in conjunction with it.")
+        end
+      end
+      true
     end
 
     class PutsToEventProxy
