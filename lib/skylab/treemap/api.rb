@@ -1,7 +1,9 @@
 require_relative '../../skylab'
 require 'skylab/pub-sub/emitter'
+require 'skylab/porcelain/bleeding'
 
 module Skylab::Treemap
+  DelegatesTo = Skylab::Porcelain::Bleeding::DelegatesTo
 
   module API
     extend Skylab::Autoloader

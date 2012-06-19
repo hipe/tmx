@@ -30,8 +30,8 @@ module Skylab::Treemap
     def invoke params
       clear!.update_parameters!(params).validate or return
       path.exist? or return error("couldn't find input file", path: path)
-      outpath.forceless? and return error("outpath exists, won't overwrite without force", path: outpath) # --
-      @tree = API::Parse::Indentation.invoke(attributes, path, char) { |o|
+      outpath.forceless? and return error("outpath exists, won't overwrite without #{param :force}", path: outpath)
+      @tree = API::Parse::Indentation.invoke(attributes, path, char, stylus) { |o|
         o.on_parse_error { |e| error e } } or return
       if show_tree
         render_debug
@@ -81,7 +81,7 @@ module Skylab::Treemap
 
     def stop_after? name
       if name  == @stop_after
-        info "(stopping because --stop requested after #{name})"
+        info "(stopping because #{param :stop} requested after #{name})"
         return true
       end
     end

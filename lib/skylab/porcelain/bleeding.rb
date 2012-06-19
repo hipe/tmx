@@ -57,7 +57,7 @@ module Skylab::Porcelain::Bleeding
       else   ; emit(:help, "#{hdr 'description:'}") ; desc.each { |s| emit(:help, s) }
       end if desc
     end
-    def help_invite o
+    def help_invite o={}
       emit(:help, "try #{pre "#{program_name} #{action.name} -h"} for help") unless o[:full]
     end
     def help_list
