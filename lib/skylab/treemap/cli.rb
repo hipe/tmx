@@ -1,18 +1,21 @@
 require_relative 'api'
-require 'skylab/porcelain/bleeding'
 
 module Skylab::Treemap
 
   class CLI < Skylab::Porcelain::Bleeding::Runtime
+    desc "experiments with R."
+
     Bleeding = Skylab::Porcelain::Bleeding # pls don't ask
 
+    extend Skylab::Autoloader
+    extend Bleeding::DelegatesTo
     extend Skylab::PubSub::Emitter
 
     emits Bleeding::EVENT_GRAPH
     emits payload: :all, info: :all, error: :all
     event_class API::Event
 
-    desc "experiments with R."
+    delegates_to :stylus, :do_stylize=, :em, :pre
 
     def api
       @api ||= API::Client.new
@@ -33,8 +36,8 @@ module Skylab::Treemap
 
     def initialize
       namespace_init
-      yield self if block_given?
-      $stdout.tty? or def self.stylize(s, *a) ; s end # no color
+      @stylus = Stylus.new
+      yield self
     end
 
     def porcelain # @todo 100.200 not here
@@ -43,9 +46,7 @@ module Skylab::Treemap
 
     actions_module { CLI::Actions }
 
-    def wire
-      @wire ||= ->(action) { wire_action(action) }
-    end
+    attr_reader :stylus
 
     def wire_action action
       verb = action.class.inflection.stems.verb
@@ -65,7 +66,16 @@ module Skylab::Treemap
   class CLI::Action
     extend CLI::Bleeding::Action
     extend CLI::Bleeding::DelegatesTo
-    delegates_to :runtime, :api, :wire
+    delegates_to :runtime, :api
+    def wire
+      @wire ||= ->(action) { wire_action(action) }
+    end
+    def wire_action api_action
+      runtime.wire_action api_action
+      api_action.stylus = runtime.stylus
+      runtime.stylus.wire! self, api_action
+      api_action
+    end
   end
   class CLI::Actions::Install < CLI::Action
     desc "for installing R"
@@ -76,6 +86,7 @@ module Skylab::Treemap
     end
   end
   class CLI::Actions::Render < CLI::Action
+    delegates_to :runtime, :info
     desc "render a treemap from a text-based tree structure"
     option_syntax do |o|
       o[:char] = '+'
@@ -100,31 +111,78 @@ module Skylab::Treemap
       end
       opts.delete(:stop)
       do_exec = opts.delete(:exec)
-      api.action(:render).wire!(&wire).tap do |action|
+      ok = api.action(:render).wire!(&wire).tap do |action|
         action.on_treemap do |e|
           if ! opts[:stop_after] and e.path.exist? and do_exec
-            info("calling exec() to open the pdf")
+            action.info("calling exec() to open the pdf")
             exec("open #{e.path}")
           end
         end
       end.invoke(opts.merge!(path: path))
+      ok or help_invite && ok
     end
   end
   class << CLI
     def build_client_instance runtime, slug
-      new.tap do |c|
+      new do |c|
         c.program_name = slug
         c.on_error   { |e| runtime.emit(:error, e) }
         c.on_help    { |e| runtime.emit(:help,  e) }
         c.on_info    { |e| runtime.emit(:info, e) }
         c.on_payload { |e| runtime.emit(:payload, e) }
-        runtime_instance_settings and runtime_instance_settings[c] # @todo #100.200
+        c.do_stylize = runtime.err.tty?
+        runtime_instance_settings and runtime_instance_settings.call(c) # @todo #100.200
       end
     end
     def porcelain # @todo #100.200 not here
       self
     end
     attr_accessor :runtime_instance_settings
+  end
+  class CLI::Stylus
+    include Skylab::Porcelain::Bleeding::Styles
+    def initialize
+      @active = true
+    end
+    attr_reader :active
+    def do_stylize= bool
+      if @active != (b = !! bool)
+        singleton_class.alias_method(:stylize, b ? :orig_stylize : :plain)
+        @active = b
+      end
+      bool
+    end
+    alias_method :orig_stylize, :stylize
+    def option_syntax= os
+      @option_syntax_options = nil
+      @option_syntax = os
+    end
+    def option_syntax_options
+      @option_syntax_options ||= begin
+        unless @option_syntax.respond_to?(:options)
+          @option_syntax.extend CLI::OptionSyntaxReflection
+        end
+        @option_syntax.options
+      end
+    end
+    def param name
+      s =
+      if option_syntax_options.key?(name)
+        option_syntax_options[name].long_name
+      elsif @attributes.key?(name)
+        @attributes[name].label
+      else
+        name
+      end
+      pre s
+    end
+    def plain(s, *a)
+      s
+    end
+    def wire! cli_action, api_action
+      @attributes = api_action.attributes
+      self.option_syntax = cli_action.class.option_syntax
+    end
   end
 end
 

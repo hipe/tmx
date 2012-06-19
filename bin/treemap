@@ -5,6 +5,7 @@ require_relative '../lib/skylab/treemap/cli'
 Skylab::Treemap::CLI.new do |c|
   stdout = $stdout
   stderr = $stderr
+  c.do_stylize = stderr.tty?
   c.on_error   { |e| stdout.puts e }
   c.on_help    { |e| stderr.puts e }
   c.on_info    { |e| stderr.puts e }
