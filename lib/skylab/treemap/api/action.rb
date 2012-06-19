@@ -24,6 +24,19 @@ module Skylab::Treemap
 
     meta_attribute :default
 
+    meta_attribute :enum do |name, ma|
+      alias_method("#{name}_before_enum=", "#{name}=")
+      define_method("#{name}=") do |val|
+        if ma[:enum].include?(val)
+          send("#{name}_before_enum=", val)
+        else
+          add_validation_error(name, val,
+            "must be #{oxford_comma(ma[:enum].map{|x| pre x}, ' or ')} (had {{value}})")
+          val
+        end
+      end
+    end
+
     meta_attribute :path do |name, _|
       require 'skylab/face/path-tools'
       alias_method("#{name}_after_path=", "#{name}=")
@@ -48,7 +61,7 @@ module Skylab::Treemap
     meta_attribute :required
 
     def add_validation_error name, value, message
-      message.gsub!('{{value}}') { value.inspect }
+      message.gsub!('{{value}}') { bad_value value }
       (validation_errors[name] ||= []).push(message)
     end
 
@@ -84,7 +97,7 @@ module Skylab::Treemap
     end
 
     attr_accessor :stylus
-    delegates_to :stylus, :oxford_comma, :pre, :param, :s
+    delegates_to :stylus, :bad_value, :oxford_comma, :pre, :param, :s
 
     def update_parameters! params
       param_keys, attrib_keys = [params, attributes].map(&:keys)

@@ -26,7 +26,7 @@ module Skylab::Treemap
     def format prefix, e
       msg = e.message
       parens = msg.match(PARENS) and msg = parens[:message]
-      msg = "#{prefix}: #{msg}"
+      msg = "#{prefix} #{msg}"
       if Hash === e.payload and e.payload[:path]
         msg = "#{msg}: #{e.path.pretty}"
       end
@@ -54,10 +54,10 @@ module Skylab::Treemap
       action.on_info_line { |e| emit(:info, e) }
       action.on_payload { |e| emit(e) }
       action.on_info do |e|
-        emit(:info, format("#{em 'o'} while #{verb.progressive} #{inflected.noun}", e))
+        emit(:info, format("#{em 'o'} #{inflected.noun} #{verb.progressive}", e))
       end
       action.on_error do |e|
-        emit(:error, format("#{stylize 'o', :red} couldn't #{verb} #{inflected.noun}", e))
+        emit(:error, format("#{stylize 'o', :red} couldn't #{verb} #{inflected.noun}:", e))
       end
     end
   end
@@ -73,7 +73,7 @@ module Skylab::Treemap
     def wire_action api_action
       runtime.wire_action api_action
       api_action.stylus = runtime.stylus
-      runtime.stylus.wire! self, api_action
+      runtime.stylus.wire! self.class, api_action
       api_action
     end
   end
@@ -86,31 +86,31 @@ module Skylab::Treemap
     end
   end
   class CLI::Actions::Render < CLI::Action
-    delegates_to :runtime, :info
+    delegates_to :runtime, :info, :stylus
+    delegates_to :stylus, :param
     desc "render a treemap from a text-based tree structure"
+    fml = ->(ctx) do
+      ctx.kind_of?(OptionParser) or return []
+      s = CLI::Stylus.new.wire!(self, API::Actions::Render)
+      stop, impl = [:stops_after, :stop_implied].map { |x| s.action_attributes.with(x) }
+      ["(can appear after #{s.and( (stop.keys - impl.keys).map { |k| s.param k } )}) " <<
+        "(implied after #{s.and( impl.keys.map{ |k| s.param k } )})" ]
+    end
     option_syntax do |o|
       o[:char] = '+'
       o[:exec] = true
       on('-c', '--char <CHAR>', %{use CHAR (default: #{o[:char]})}) { |v| o[:char] = v }
       on('--tree', 'show the text-based structure in a tree (debugging)') { o[:show_tree] = true }
-      on('--csv', 'output the csv to stdout instead of tempfile, stop.') { o[:show_csv] = true }
-      on('--r-script', 'output to stdout the generated r script, stop.') { o[:show_r_script] = true }
-      on('--stop', 'stop execution after the previously indicated step (where avail.)') { o[:stop] = true }
+      on('--csv', 'output the csv to stdout instead of tempfile, stop.') { o[:csv_stream] = :payload }
+      on('--r-script', 'output to stdout the generated r script, stop.') { o[:r_script_stream] = :payload }
+      on('--stop', 'stop execution after the previously indicated step', *fml[self]) { o[:stop] = true }
       on('-F', '--force', 'force overwriting of an exiting file') { o[:force] = true }
       on('--[no-]exec', "the default is to open the file with exec") { |v| o[:exec] = v }
     end
+    attr_reader :api_action
     def execute path, opts
-      action = api.action(:render).wire!(&wire)
-      if opts[:stop] and (order = opts.keys & [:stop, *action.order]).any?
-        # shed the ones that come after stop
-        (bad = []).tap{|a| a.push(order.pop) while :stop != order.last }
-        if order.size == 1
-          emit(:info, "warning: no stoppable options came before --stop. ignoring.")
-        else
-          opts[:stop_after] = order[-2]
-        end
-      end
-      opts.delete(:stop)
+      action = @api_action = api.action(:render).wire!(&wire)
+      parse_opts(opts) or return
       do_exec = opts.delete(:exec)
       action.on_treemap do |e|
         if do_exec and e.path.exist? and ! action.stop_before?(:exec_open_file)
@@ -119,7 +119,29 @@ module Skylab::Treemap
         end
       end
       ok = action.invoke(opts.merge!(path: path))
-      ok or help_invite && ok
+      false == ok and help_invite
+      ok
+    end
+    def parse_opts opts
+      opts[:stop] and (parse_opts_stop(opts) or return)
+      true
+    end
+    def parse_opts_stop opts
+      opt_to_event = api_action.attributes.with(:stops_after)
+      event_to_opt = opt_to_event.invert
+      order = api_action.order.map{ |e| event_to_opt[e] }.compact
+      given = (opts.keys & [:stop, *order])
+      given.pop while :stop != given.last
+      if 1 == given.size
+        api_action.error("#{param :stop} must come somewhere after at least one of " <<
+          "#{oxford_comma(order.map{|x| param x}, ' or ')}")
+        help_invite
+        nil
+      else
+        opts[:stop_after] = opt_to_event[given[-2]] or fail('logic error')
+        opts.delete(:stop)
+        true
+      end
     end
   end
   class << CLI
@@ -144,7 +166,12 @@ module Skylab::Treemap
     def initialize
       @active = true
     end
+    attr_reader :action_attributes
     attr_reader :active
+    alias_method :and, :oxford_comma
+    def bad_value value
+      pre value.inspect
+    end
     def do_stylize= bool
       if @active != (b = !! bool)
         singleton_class.send(:alias_method, :stylize, b ? :orig_stylize : :plain)
@@ -165,12 +192,15 @@ module Skylab::Treemap
         @option_syntax.options
       end
     end
+    def or a
+      oxford_comma(a, ' or ')
+    end
     def param name
       s =
       if option_syntax_options.key?(name)
         option_syntax_options[name].long_name
-      elsif @attributes.key?(name)
-        @attributes[name].label
+      elsif action_attributes.key?(name)
+        action_attributes[name].label
       else
         name
       end
@@ -179,9 +209,10 @@ module Skylab::Treemap
     def plain(s, *a)
       s
     end
-    def wire! cli_action, api_action
-      @attributes = api_action.attributes
-      self.option_syntax = cli_action.class.option_syntax
+    def wire! cli_action_meta, api_action_meta
+      @action_attributes = api_action_meta.attributes
+      self.option_syntax = cli_action_meta.option_syntax
+      self
     end
   end
 end
