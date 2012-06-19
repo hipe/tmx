@@ -177,17 +177,13 @@ module Skylab::TanMan
   end
   Api.set_defaults_if_nil!
 
-  VERBS = { is:   ['exist', 'is', 'are'],
-            no:   ['no ', 'the only '],
-            this: ['these', 'this', 'these'] }
   module GlobalStyle
+    # @later this might be stylus pattern
     def oxford_comma *a
       Porcelain::En.oxford_comma(*a)
     end
-    def s a, v=nil # just one tiny hard to read hack
-      count = Numeric === a ? a : a.count
-      v.nil? and return( 1 == count ? '' : 's' )
-      VERBS[v][case count ; when 0 ; 0 ; when 1 ; 1 ; else 2 ; end]
+    def s(*a)
+      Porcelain::En.s(*a)
     end
   end
 
