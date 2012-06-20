@@ -25,7 +25,7 @@ module Skylab::Porcelain
       v.nil? and return( 1 == count ? '' : 's' )
       VERBS[v][case count ; when 0 ; 0 ; when 1 ; 1 ; else 2 ; end]
     end
-    # "#{s a, :no}known person#{s a, :is} #{self.and a}".strip
+    # "#{s a, :no}known person#{s a} #{s a, :is} #{self.and a}".strip
 
   end
 end

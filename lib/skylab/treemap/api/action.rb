@@ -97,7 +97,7 @@ module Skylab::Treemap
     end
 
     attr_accessor :stylus
-    delegates_to :stylus, :bad_value, :oxford_comma, :pre, :param, :s
+    delegates_to :stylus, :and, :bad_value, :or, :oxford_comma, :pre, :param, :s
 
     def update_parameters! params
       param_keys, attrib_keys = [params, attributes].map(&:keys)
@@ -110,6 +110,11 @@ module Skylab::Treemap
     end
 
     def validate
+      attributes.with(:default).each do |k, v|
+        if send(k).nil?
+          send("#{k}=", v)
+        end
+      end
       validation_errors.each do |k, errs|
         if k
           error(%{#{param k} #{errs.join(' and it ')}})
@@ -117,11 +122,6 @@ module Skylab::Treemap
           errs.each { |e| error e }
         end
       end.size > 0 and return false # avoid superflous messages below
-      attributes.with(:default).each do |k, v|
-        if send(k).nil?
-          send("#{k}=", v)
-        end
-      end
       ok = true
       if (a = attributes.select{ |n, m| m[:required] and ! send(n) }).any?
         ok = error("missing required parameter#{s a}: " <<

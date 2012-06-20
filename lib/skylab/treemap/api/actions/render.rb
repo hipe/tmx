@@ -10,6 +10,7 @@ module Skylab::Treemap
 
     meta_attribute :stops_after
     meta_attribute :stop_implied
+    attribute :adapter_name, default: 'r'
     attribute :char, required: true, regex: [/^.$/, 'must be a single character (had {{value}})']
     attribute :csv_stream, enum: [:payload], stops_after: :csv, stop_implied: true
     attribute :force
@@ -22,6 +23,31 @@ module Skylab::Treemap
     attribute :title, default: 'Treemap Tiem'
 
     CSV_OUT_NAME = 'tmp.csv'
+
+    def adapter_class
+      adapters.active_class
+    end
+
+    def adapters
+      @adapters ||= Skylab::Treemap::Adapter::Collection(
+        Skylab::Treemap::Plugins::TreemapRenderAdapters,
+        Skylab::ROOT.join('lib/skylab/treemap/plugins/treemap-render-adapters/'),
+        'client.rb'
+      )
+    end
+
+    remove_method :adapter_name= # we don't want the default implementation (avoid warnings)
+
+    def adapter_name= name
+      found, a = adapters.fuzzy_match_name name
+      err = case found.length
+      when 0 ; "not found. #{s a, :no}known adapter#{s a} #{s a, :is} #{self.and a.map{|x| pre x}}".strip
+      when 1 ; adapters.active_adapter_name = found.first ; nil
+      else   ; "is ambiguous -- did you mean #{self.or found.map{|x| pre x}}?"
+      end
+      err and add_validation_error(:adapter_name, name, "failed to load {{value}}: adapter #{err}")
+      name
+    end
 
     def csv_tmp_path
       @csv_tmp_path ||= API::Path.new(tempdir.join(CSV_OUT_NAME).to_s)
@@ -62,7 +88,7 @@ module Skylab::Treemap
     end
 
     def outpath
-      @outpath ||= API::Render::Treemap.pdf_path_guess.tap do |o|
+      @outpath ||= adapter_class.pdf_path_guess.tap do |o|
         o.forceless = ->() do
           o.exist? and outpath_requires_force and ! stop_before?(:write_outfile) and ! force
         end
@@ -78,7 +104,7 @@ module Skylab::Treemap
     end
 
     def render_treemap
-      API::Render::Treemap.invoke(r, csv_tmp_path, tempdir) do |o|
+      adapter_class.invoke(r, csv_tmp_path, tempdir) do |o|
         o.on_success { |e| info("generated treemap: #{e.message}", path: e.pathname) }
         o.on_failure { |e| error("failed to generate treempap: #{e.message}", path: e.pathname) }
         if :payload == r_script_stream
@@ -117,6 +143,7 @@ module Skylab::Treemap
         end
       end
     end
+
 
     def validate
       super or return

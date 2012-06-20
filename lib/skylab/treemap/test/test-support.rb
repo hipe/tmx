@@ -1,6 +1,6 @@
 require_relative '../../test-support/test-support'
 
-require_relative '../cli' # as the entrypoint for this module
+require_relative '../cli' # as the entrypoint for this module @todo-in-module
 
 module Skylab::Treemap
   module TestSupport

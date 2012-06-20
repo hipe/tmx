@@ -3,6 +3,7 @@ module Skylab::TestSupport
     def self.standard
       require 'stringio'
       new.tap do |spy|
+        spy.tty!
         spy[:buffer] = StringIO.new
       end
     end
@@ -31,6 +32,16 @@ module Skylab::TestSupport
     def string
       self[:buffer].string
     end
+    def tty!
+      @tty = true
+      self
+    end
+    def no_tty!
+      @tty = false
+      self
+    end
+    attr_reader :tty
+    alias_method :tty?, :tty
   end
 end
 
