@@ -1,7 +1,5 @@
-Skylab::Porcelain::En
-
-module Skylab::Porcelain::En
-  module TestSupport
+module Skylab::TestSupport
+  module MetaPit
     def klass(full_name, opts={}, &block)
       opts = opts.dup
       extends = opts.delete(:extends)
