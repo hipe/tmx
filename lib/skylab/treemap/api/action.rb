@@ -85,17 +85,6 @@ module Skylab::Treemap
       true
     end
 
-    def r
-      @r ||= begin
-        require_relative '../r'
-        R::Bridge.new do |o|
-          o.on_info  { |e| info e }
-          o.on_error { |e| error e }
-        end
-      end
-      @r ||= Skylab::Treemap::R::Bridge.new
-    end
-
     attr_accessor :stylus
     delegates_to :stylus, :and, :bad_value, :or, :oxford_comma, :pre, :param, :s
 

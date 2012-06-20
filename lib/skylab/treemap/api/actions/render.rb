@@ -104,7 +104,7 @@ module Skylab::Treemap
     end
 
     def render_treemap
-      adapter_class.invoke(r, csv_tmp_path, tempdir) do |o|
+      adapter_class.invoke(csv_tmp_path, tempdir) do |o|
         o.on_success { |e| info("generated treemap: #{e.message}", path: e.pathname) }
         o.on_failure { |e| error("failed to generate treempap: #{e.message}", path: e.pathname) }
         if :payload == r_script_stream

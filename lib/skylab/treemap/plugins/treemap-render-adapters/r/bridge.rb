@@ -1,6 +1,5 @@
-require 'skylab/interface/system'
+module Skylab::Treemap::Plugins::TreemapRenderAdapters
 
-module Skylab::Treemap
   class R::Bridge
     extend Skylab::PubSub::Emitter
     emits :info, :error

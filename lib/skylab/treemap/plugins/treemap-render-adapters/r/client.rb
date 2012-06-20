@@ -1,31 +1,44 @@
+require 'skylab/interface/system'
+
 module Skylab::Treemap::Plugins::TreemapRenderAdapters
 
   API = Skylab::Treemap::API
 
   module R
+    extend Skylab::Autoloader
   end
 
   class R::Client
     extend Skylab::PubSub::Emitter
     emits :r_script, :success, :failure
 
+
+    include Skylab::Interface::System::SelectLinesUntil
+
     def self.invoke(*a, &b)
       new(*a, &b).execute
     end
-    def initialize r, csv_path, tempdir
+    def initialize csv_path, tempdir
+      @bridge = nil
       @stop_after_script = false
-      @r = r
       @csv_path = csv_path
       @tempdir = tempdir
       yield(self) if block_given?
       @title ||= 'Treemap'
     end
 
-    attr_accessor :csv_path, :r, :tempdir, :stop_after_script, :title
+    attr_accessor :csv_path, :tempdir, :stop_after_script, :title
+
+    def bridge
+      @bridge ||= R::Bridge.new do |o|
+        o.on_info  { |e| info e }
+        o.on_error { |e| error e }
+      end
+    end
 
     def build_script_lines_enumerator
       @script or return false
-      MemoryLinesEnumerator.new(@script)
+      API::MemoryLinesEnumerator.new(@script)
     end
 
     DENY_RE = /[^- a-z0-9]+/i
@@ -70,10 +83,10 @@ module Skylab::Treemap::Plugins::TreemapRenderAdapters
 
     def pipe_the_script
       @script or return false # just to be sure
-      r.ready? or return failed("count not find r: #{r.not_ready_reason}")
+      bridge.ready? or return failed("count not find r: #{bridge.not_ready_reason}")
       mtime1 = pdf_path_guess.exist? && pdf_path_guess.stat.mtime
       lines = self.build_script_lines_enumerator
-      Open3.popen3(r.executable_path, '--vanilla') do |sin, sout, serr|
+      Open3.popen3(bridge.executable_path, '--vanilla') do |sin, sout, serr|
         line = true
         loop do
           bytes = select_lines_until(0.3, sout: sout, serr: serr) do |o|
