@@ -89,24 +89,44 @@ module Skylab::Treemap
     delegates_to :runtime, :info, :stylus
     delegates_to :stylus, :param
     desc "render a treemap from a text-based tree structure"
-    fml = ->(ctx) do
-      ctx.kind_of?(OptionParser) or return []
-      s = CLI::Stylus.new.wire!(self, API::Actions::Render)
-      stop, impl = [:stops_after, :stop_implied].map { |x| s.action_attributes.with(x) }
-      ["(can appear after #{s.and( (stop.keys - impl.keys).map { |k| s.param k } )}) " <<
-        "(implied after #{s.and( impl.keys.map{ |k| s.param k } )})" ]
+
+    context = mores = stylus = nil # doc hax
+    more = ->(which) do
+      context.kind_of?(OptionParser) or return []
+      stylus ||= CLI::Stylus.new.wire!(self, API::Actions::Render)
+      mores[which].respond_to?(:call) and mores[which] = stylus.instance_exec(&mores[which])
+      mores[which]
     end
+    mores = {
+      a: ->() do
+        aa = ['which treemap rendering adapter to use.']
+        a = API::Actions::Render.adapters.names
+        aa << ("(#{s a, :no}known adapter#{s a} #{s a, :is} #{self.and a.map{|x| pre x}})" <<
+          " (default: #{pre action_attributes[:adapter_name][:default]})")
+        aa << "(use in conjunction with #{param :help, :short} for adapter-specific options)"
+        aa
+      end,
+      s: ->() do
+        stop, impl = [:stops_after, :stop_implied].map { |x| action_attributes.with(x) }
+        ["(can appear after #{self.and( (stop.keys - impl.keys).map { |k| param k } )}) " <<
+         "(implied after #{self.and( impl.keys.map{ |k| param k } )})" ]
+      end
+    }
+
     option_syntax do |o|
+      context = self
       o[:char] = '+'
       o[:exec] = true
+      on('-a <NAME>', '--adapter <NAME>', * more[:a]){ |v| o[:adapter_name] = v }
       on('-c', '--char <CHAR>', %{use CHAR (default: #{o[:char]})}) { |v| o[:char] = v }
       on('--tree', 'show the text-based structure in a tree (debugging)') { o[:show_tree] = true }
       on('--csv', 'output the csv to stdout instead of tempfile, stop.') { o[:csv_stream] = :payload }
       on('--r-script', 'output to stdout the generated r script, stop.') { o[:r_script_stream] = :payload }
-      on('--stop', 'stop execution after the previously indicated step', *fml[self]) { o[:stop] = true }
+      on('--stop', 'stop execution after the previously indicated step', * more[:s]) { o[:stop] = true }
       on('-F', '--force', 'force overwriting of an exiting file') { o[:force] = true }
       on('--[no-]exec', "the default is to open the file with exec") { |v| o[:exec] = v }
     end
+
     attr_reader :api_action
     def execute path, opts
       action = @api_action = api.action(:render).wire!(&wire)
@@ -189,16 +209,18 @@ module Skylab::Treemap
         unless @option_syntax.respond_to?(:options)
           @option_syntax.extend CLI::OptionSyntaxReflection
         end
-        @option_syntax.options
+        o = @option_syntax.options.dup # being careful
+        o[:help] ||= CLI::OptionSyntaxReflection::OptionReflection.new(:help, 'help', 'h')
+        o
       end
     end
     def or a
       oxford_comma(a, ' or ')
     end
-    def param name
+    def param name, render_method=nil
       s =
       if option_syntax_options.key?(name)
-        option_syntax_options[name].long_name
+        option_syntax_options[name].send( render_method || :long_name )
       elsif action_attributes.key?(name)
         action_attributes[name].label
       else

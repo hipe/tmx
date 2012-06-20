@@ -29,6 +29,10 @@ module Skylab::Treemap
     end
 
     def adapters
+      self.class.adapters
+    end
+
+    def self.adapters
       @adapters ||= Skylab::Treemap::Adapter::Collection(
         Skylab::Treemap::Plugins::TreemapRenderAdapters,
         Skylab::ROOT.join('lib/skylab/treemap/plugins/treemap-render-adapters/'),
