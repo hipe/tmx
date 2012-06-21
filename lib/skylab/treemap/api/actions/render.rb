@@ -10,18 +10,75 @@ module Skylab::Treemap
 
     meta_attribute :stops_after
     meta_attribute :stop_implied
+    attribute :adapter_name, default: 'r'
     attribute :char, required: true, regex: [/^.$/, 'must be a single character (had {{value}})']
     attribute :csv_stream, enum: [:payload], stops_after: :csv, stop_implied: true
     attribute :force
     attribute :outpath_requires_force, default: true
     attribute :path, path: true, required: true
-    attribute :r_script_stream, :enum => [:payload], stops_after: :r_script, stop_implied: true
     attribute :tempdir_path, default: ->(){ File.join(FileUtils.pwd, '_tmp-r-data') }
     attribute :show_tree, stops_after: :show_tree
     attribute :stop_after, enum: ORDER
     attribute :title, default: 'Treemap Tiem'
 
     CSV_OUT_NAME = 'tmp.csv'
+
+    FailureWiring = Skylab::PubSub::Emitter.new(:failure)
+
+    def activate_adapter! name, &wire
+      e = FailureWiring.new(wire)
+      set_adapter_name(name) do |o|
+        o.on_failure { |_e| e.emit( _e ) }
+      end or return false
+      adapter_instance
+    end
+
+    def adapter_class
+      adapters.active_class
+    end
+
+    def adapter_instance
+      @adapter_instance ||= begin
+        adapter_class or return
+        o = adapter_class.new
+        o.load_attributes(self.singleton_class)
+        o
+      end
+    end
+
+    def adapters
+      self.class.adapters
+    end
+
+    def self.adapters
+      @adapters ||= Skylab::Treemap::Adapter::Collection(
+        Skylab::Treemap::Plugins::TreemapRenderAdapters,
+        Skylab::ROOT.join('lib/skylab/treemap/plugins/treemap-render-adapters/'),
+        'client.rb'
+      )
+    end
+
+    remove_method :adapter_name= # we don't want the default implementation (avoid warnings)
+
+    def adapter_name= name
+      set_adapter_name(name) do |o|
+        o.on_failure { |e| add_validation_error(:adapter_name, name, "failed to load {{value}}: adapter #{e}") }
+      end
+      name
+    end
+
+
+    def set_adapter_name name, &wire
+      e = FailureWiring.new(wire)
+      found, a = adapters.fuzzy_match_name name
+      err = case found.length
+      when 0 ; "not found. #{s a, :no}known adapter#{s a} #{s a, :is} #{self.and a.map{|x| pre x}}".strip
+      when 1 ; adapters.active_adapter_name = found.first ; nil
+      else   ; "is ambiguous -- did you mean #{self.or found.map{|x| pre x}}?"
+      end
+      err and return (e.emit(:failure, "adapter #{pre name} #{err}") and false)
+      adapters.active_adapter_name
+    end
 
     def csv_tmp_path
       @csv_tmp_path ||= API::Path.new(tempdir.join(CSV_OUT_NAME).to_s)
@@ -31,8 +88,8 @@ module Skylab::Treemap
       emit(:info_line, line)
     end
 
-    def invoke params
-      clear!.update_parameters!(params).validate or return false
+    def invoke!
+      validate or return false
       path.exist? or return error("couldn't find input file", path: path)
       outpath.forceless? and return error("outpath exists, won't overwrite without #{param :force}", path: outpath)
       @tree = API::Parse::Indentation.invoke(attributes, path, char, stylus) { |o|
@@ -62,7 +119,7 @@ module Skylab::Treemap
     end
 
     def outpath
-      @outpath ||= API::Render::Treemap.pdf_path_guess.tap do |o|
+      @outpath ||= adapter_class.pdf_path_guess.tap do |o|
         o.forceless = ->() do
           o.exist? and outpath_requires_force and ! stop_before?(:write_outfile) and ! force
         end
@@ -78,7 +135,7 @@ module Skylab::Treemap
     end
 
     def render_treemap
-      API::Render::Treemap.invoke(r, csv_tmp_path, tempdir) do |o|
+      adapter_instance.update_parameters!(csv_tmp_path, tempdir).invoke do |o|
         o.on_success { |e| info("generated treemap: #{e.message}", path: e.pathname) }
         o.on_failure { |e| error("failed to generate treempap: #{e.message}", path: e.pathname) }
         if :payload == r_script_stream
@@ -117,6 +174,7 @@ module Skylab::Treemap
         end
       end
     end
+
 
     def validate
       super or return

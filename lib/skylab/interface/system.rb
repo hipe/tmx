@@ -2,6 +2,7 @@ require 'open3'
 
 module Skylab::Interface
   module System
+    extend Skylab::Autoloader
     # placeholder for etc yadda yadda the big dream, because probably
     # 'Open3' isn't cool anymore!
     def sys

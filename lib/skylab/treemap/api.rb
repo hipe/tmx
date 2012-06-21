@@ -3,6 +3,7 @@ require 'skylab/pub-sub/emitter'
 require 'skylab/porcelain/bleeding'
 
 module Skylab::Treemap
+  extend Skylab::Autoloader
   DelegatesTo = Skylab::Porcelain::Bleeding::DelegatesTo
 
   module API

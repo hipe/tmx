@@ -15,8 +15,11 @@ module Skylab::Autoloader
       dir = find_dir(mod, %r{^(.+)\.rb:\d+:in `}.match(caller[0])[1])
       mod.singleton_class.send(:alias_method, :orig_const_missing, :const_missing)
       mod.singleton_class.send(:define_method, :const_missing) do |const|
-        stem = const.to_s.gsub(/(?<=^|([a-z]))([A-Z])/) { "#{'-' if $1}#{$2}" }.downcase
-        require "#{dir}/#{stem}"
+        path = "#{dir}/#{const.to_s.gsub(/(?<=^|([a-z]))([A-Z])/) { "#{'-' if $1}#{$2}" }.downcase}"
+        (@_autoloader_mutex ||= {})[path] and fail("fix circular autoload dependency in #{path}")
+        @_autoloader_mutex[path] = true
+        require "#{path}"
+        const_defined?(const) or fail("#{self}::#{const} was not defined, must be, in #{path}")
         const_get const
       end
     end

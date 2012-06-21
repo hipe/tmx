@@ -93,9 +93,8 @@ module Skylab::Porcelain
         default.call
       end
     end
-    # we may have to broaden this definition one day!
     def _parent_respond_to method
-      ancestors[1..-1].detect { |a| a.kind_of?(Class) and a.respond_to?(method) }
+      ancestors[(self == ancestors.first ? 1 : 0) ..-1].detect { |a| a.kind_of?(Class) and a.respond_to?(method) }
     end
   end
 end
