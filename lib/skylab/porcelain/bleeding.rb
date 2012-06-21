@@ -275,7 +275,7 @@ module Skylab::Porcelain::Bleeding
     end
     def visible *a
       instance_variable_defined?('@visible') or @visible = true
-      case a.size ; when 0 ; @visible ; when 1 ; @visible = a.first ; else fail end
+      case a.length ; when 0 ; @visible ; when 1 ; @visible = a.first ; else fail end
     end
     attr_writer :visible
     alias_method :visible?, :visible
@@ -299,7 +299,7 @@ module Skylab::Porcelain::Bleeding
     end
     def actions
       @actions ||= ActionEnumerator.new do |y|
-        action_modules.each { |m| m.constants.each { |k| y << m.const_get(k) } }
+        action_modules.each { |m| m.load_actions! if m.respond_to?(:load_actions!) ; m.constants.each { |k| y << m.const_get(k) } }
         # there is an anticpated issue above with fuzzy matching actions that have same name in different module
       end
     end
@@ -351,15 +351,13 @@ module Skylab::Porcelain::Bleeding
   end
   class << Runtime
     def actions_module *a, &b
-      if a.size.nonzero? || b
-        a.size > 1 || (a.size > 0 && b) and raise ArgumentError.new('no')
-        @actions_module_proc = b || ->(){ a.first }
-      else
-        (@actions_module_proc ||= ->() do
-          to_s.match(/^(.+)::[^:]+$/)[1].split('::').push('Actions').reduce(Object) { |m, o| m.const_get(o) }
-        end).call
-      end
+      case a.length
+      when 0 ; if b then @actions_module = b
+             ; else (@actions_module ||= ->(){ const_get('Actions') }).call end
+      when 1 ; if b then fail else mod = a.first ; @actions_module = ->() { mod } end
+      else   ; fail ; end
     end
+    alias_method :actions_module=, :actions_module # !
   end
   module OfficiousActions
   end
