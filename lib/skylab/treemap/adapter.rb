@@ -23,7 +23,7 @@ module Skylab::Treemap
 
     def active_class
       @active_class ||= begin
-        @active_adapter_name or return
+        (@active_adapter_name ||= nil) or return
         if :file_exists == self[@active_adapter_name]
           func = self[@active_adapter_name] = @name_function_prototype.dupe(@active_adapter_name)
           func.client_path.exist? or fail("client path not found: #{func.client_path}")

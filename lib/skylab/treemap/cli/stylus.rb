@@ -2,12 +2,10 @@ module Skylab::Treemap
 
   class CLI::Stylus
     include Skylab::Porcelain::Bleeding::Styles
-    def initialize
-      @active = true
+    def action_attributes
+      @api_action.attributes
     end
-    attr_reader :action_attributes
     attr_reader :active
-    alias_method :and, :oxford_comma
     def bad_value value
       pre value.inspect
     end
@@ -18,42 +16,34 @@ module Skylab::Treemap
       end
       bool
     end
+    def initialize
+      @active = true
+    end
     alias_method :orig_stylize, :stylize
-    def option_syntax= os
-      @option_syntax_options = nil
-      @option_syntax = os
-    end
     def option_syntax_options
-      @option_syntax_options ||= begin
-        unless @option_syntax.respond_to?(:options)
-          @option_syntax.extend CLI::OptionSyntaxReflection
-        end
-        o = @option_syntax.options.dup # being careful
-        o[:help] ||= CLI::OptionSyntaxReflection::OptionReflection.new(:help, 'help', 'h')
-        o
-      end
-    end
-    def or a
-      oxford_comma(a, ' or ')
+      @cli_action.option_syntax.options
     end
     def param name, render_method=nil
       s =
       if option_syntax_options.key?(name)
-        option_syntax_options[name].send( render_method || :long_name )
+        option_syntax_options[name].send(render_method || :long_name)
       elsif action_attributes.key?(name)
         action_attributes[name].label
       else
-        name
+        name.to_s
       end
       pre s
     end
     def plain(s, *a)
       s
     end
-    def wire! cli_action_meta, api_action_meta
-      @action_attributes = api_action_meta.attributes
-      self.option_syntax = cli_action_meta.option_syntax
+    def wire! cli_action, api_action
+      @api_action = api_action
+      @cli_action = cli_action
       self
+    end
+    def value value
+      pre value.inspect
     end
   end
 end

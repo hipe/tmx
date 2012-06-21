@@ -11,14 +11,14 @@ module Skylab::TestSupport
         mod = parts.reduce(base_module) do |mod, part|
           unless mod.const_defined?(part)
             mod.const_set(part, Module.new.tap { |m|
-              _my_name = mod == base_module ? part : "#{mod}::#{part}"
+              _my_name = mod == base_module ? part.to_s : "#{mod}::#{part}"
               m.singleton_class.send(:define_method, :to_s) { _my_name }
             })
           end
           mod.const_get(part)
         end
         mod.const_set(klass_name, Class.new(*[superclass].compact).tap { |k|
-          _my_name = mod == base_module ? full_name : "#{mod}::#{klass_name}"
+          _my_name = mod == base_module ? full_name.to_s : "#{mod}::#{klass_name}"
           k.singleton_class.send(:define_method, :to_s) { _my_name }
           block and k.class_eval(&block)
         })

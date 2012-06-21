@@ -34,6 +34,7 @@ module Skylab::Porcelain::Bleeding
     def action_init runtime
       @runtime = runtime
     end
+    delegates_to :action, :argument_syntax
     delegates_to :action, :desc
     def emit _, *a
       @runtime.emit _, *a
@@ -58,23 +59,27 @@ module Skylab::Porcelain::Bleeding
       end if desc
     end
     def help_invite o={}
-      emit(:help, "try #{pre "#{program_name} #{action.name} -h"} for help") unless o[:full]
+      emit(:help, "try #{pre "#{program_name} #{action.name} -h"}#{o[:for] || ' for help'}") unless o[:full]
     end
     def help_list
-      action.option_syntax.any? and action.option_syntax.help(runtime)
+      option_syntax.any? and option_syntax.help(runtime)
     end
     def help_usage o
-      emit :help, "#{hdr 'usage:'} #{program_name} #{action.syntax}"
+      emit :help, "#{hdr 'usage:'} #{program_name} #{syntax}"
     end
     alias_method :initialize, :action_init
+    delegates_to :action, :option_syntax
     delegates_to :runtime, :program_name
     def resolve! argv
       args = []
-      ok = action.option_syntax.parse!(argv, args, self) or return (help unless ok.nil?)
-      meth = action.argument_syntax.parse!(argv, args, self) or return help
+      ok = option_syntax.parse!(argv, args, self) or return (help unless ok.nil?)
+      meth = argument_syntax.parse!(argv, args, self) or return help
       [meth, args]
     end
     attr_reader :runtime
+    def syntax
+      [action.name, option_syntax.string, argument_syntax.string].compact.join(' ') # duplicated
+    end
   end
   OnFind = Skylab::PubSub::Emitter.new(:error, :ambiguous => :error, :not_found => :error, :not_provided => :error)
   module NamespaceInstanceMethods ; extend DelegatesTo
@@ -124,7 +129,6 @@ module Skylab::Porcelain::Bleeding
       "#{runtime.program_name} #{actions_module.name}" #!
     end
     def resolve! argv
-      2 == argv.size and '-h' == argv.last and argv.reverse! # the alternative is uglier, but @todo
       action = find(argv.shift){ |o| o.on_error { |s| return help(message: s.message, action_syntax: false) } }
       transaction = action.build self
       huh = transaction.resolve! argv
@@ -136,7 +140,7 @@ module Skylab::Porcelain::Bleeding
       string.split(' ')[idx] or "<arg#{idx + 1}>"  # @hack
     end
     attr_reader :action
-    def define s
+    def define! s
       @string = s
     end
     def initialize action
@@ -146,7 +150,7 @@ module Skylab::Porcelain::Bleeding
     def parse! argv, args, transaction
       meth = transaction.execution_method
       parameters = meth.parameters
-      transaction.action.option_syntax.any? and parameters.pop # ick
+      transaction.option_syntax.any? and parameters.pop # ick
       count = Hash.new { |h, k| h[k] = 0 }
       parameters.each { |p| count[p.first] += 1 }
       error = ->(msg) { transaction.runtime.emit(:syntax_error, msg) ; false }
@@ -173,35 +177,40 @@ module Skylab::Porcelain::Bleeding
         "#{a}<#{p.last}>#{b}"
       end.join(' ')
     end
-    def to_str
-      string # !
-    end
   end
-  class OptionSyntax < Struct.new(:definitions)
+  class OptionSyntax < Struct.new(:definitions, :documentor_class, :parser_class)
     include Styles
     def any?
       definitions.any?
     end
-    def define &b
+    def on_definition_added
+      @on_definition_added ||= {}
+    end
+    def define! &b
       definitions.push b
+      on_definition_added.each { |_, l| instance_exec(&l) }
+    end
+    def documentor
+      @documentor ||= documentor_class.new.tap { |d| init_documentor(d) }
     end
     def help e
-      _ = {}
-      OptionParser.new do |o|
-        o.banner = "#{hdr 'options:'}"
-        definitions.each { |d| o.instance_exec(_, &d) }
-        e.emit(:help, o.to_s)
-      end
+      one_big_string = documentor.help { |line| e.emit(:help, line) } and e.emit(:help, one_big_string)
+    end
+    def init_documentor doc
+      on_definition_added[:documentor] ||= ->() { @documentor = nil ; $stderr.puts("NEATO!") }
+      doc.banner = "#{hdr 'options:'}"
+      _ = {} ; definitions.each { |d| doc.instance_exec(_, &d) }
     end
     def initialize
-      self.definitions = []
+      super([], ::OptionParser, ::OptionParser)
+      @documentor = nil
     end
     def parse! argv, args, transaction
       definitions.empty? and return true
       args.push(req = {})
       ret = true
       begin
-        OptionParser.new do |o|
+        parser_class.new do |o|
           o.on('-h', '--help') do
             transaction.help(full: true)
             ret = nil
@@ -210,29 +219,25 @@ module Skylab::Porcelain::Bleeding
         end.parse!(argv)
       rescue OptionParser::ParseError => e
         transaction.runtime.emit :optparse_parse_error, e
-        ret = false
+        ret and ret = false # if ret was already nil, no need to display help again
       end
       ret
     end
-    def to_str
+    def string
       definitions.empty? and return nil
-      _ = {}
-      OptionParser.new do |o|
-        definitions.each { |d| o.instance_exec(_, &d) }
-        return o.instance_variable_get('@stack')[2].instance_variable_get('@list').
-          map { |s| "[#{s.short.first or s.long.first}#{s.arg}]" }.join(' ')
-      end
+      documentor.instance_variable_get('@stack')[2].instance_variable_get('@list'). # less hacky is out of scope
+        map { |s| "[#{s.short.first or s.long.first}#{s.arg}]" if s.respond_to?(:short) }.compact.join(' ')
     end
   end
   module ActionModuleMethods
     include Styles
     def action_module_init
-      @action_name = self.to_s.match(/^.+::([^:]+)$/)[1].gsub(/(?<=[a-z])([A-Z])/) { "-#{$1}" }.downcase
+      @action_name = self.to_s.match(/[^:]+$/)[0].gsub(/(?<=[a-z])([A-Z])/) { "-#{$1}" }.downcase
       @actions_module_proc = nil
       @aliases = []
       @argument_syntax = ArgumentSyntax.new(self)
       @desc = nil
-      @option_syntax = OptionSyntax.new
+      @option_syntax = nil
       @summary = nil
       @visible = true
     end
@@ -241,7 +246,7 @@ module Skylab::Porcelain::Bleeding
       a.any? ? @aliases.concat(a) : @aliases
     end
     def argument_syntax s=nil
-      s ? @argument_syntax.define(s) : @argument_syntax
+      s ? @argument_syntax.define!(s) : @argument_syntax
     end
     def build runtime
       new runtime
@@ -262,7 +267,15 @@ module Skylab::Porcelain::Bleeding
       cls.action_module_init
     end
     def option_syntax &b
-      b ? @option_syntax.define(&b) : @option_syntax
+      @option_syntax ||= option_syntax_class.new
+      b ? @option_syntax.define!(&b) : @option_syntax
+    end
+    def option_syntax_class klass=nil
+      klass or return OptionSyntax
+      redefine = ->(mod, k2) do
+        mod.singleton_class.send(:define_method, :option_syntax_class) { |k3 = nil| k3 ? redefine[self, k3] : k2 }
+      end
+      redefine.call(self, klass)
     end
     def parameters
       instance_method(:execute).parameters
@@ -273,7 +286,7 @@ module Skylab::Porcelain::Bleeding
       elsif desc     ; desc[0..2] end
     end
     def syntax
-      [name, option_syntax.to_str, argument_syntax.to_str].compact.join(' ')
+      [action_name, option_syntax.string, argument_syntax.string].compact.join(' ') # duplicated
     end
     def visible *a
       case a.size ; when 0 ; @visible ; when 1 ; @visible = a.first ; else fail end
