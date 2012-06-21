@@ -99,9 +99,6 @@ module Skylab::TanMan
     def build runtime
       Cli::NamespaceAction.new(self, runtime)
     end
-    def self.extended mod
-      mod.namespace_module_init
-    end
   end
 
   module Cli::Actions

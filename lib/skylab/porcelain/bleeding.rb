@@ -122,9 +122,6 @@ module Skylab::Porcelain::Bleeding
       action_syntax = (false == o[:action_syntax]) ? '<action>' : self.action_syntax
       emit :help, "#{hdr 'usage:'} #{program_name} #{action_syntax} [opts] [args]"
     end
-    def namespace_init
-      @program_name ||= nil # !
-    end
     def program_name
       "#{runtime.program_name} #{actions_module.name}" #!
     end
@@ -231,40 +228,28 @@ module Skylab::Porcelain::Bleeding
   end
   module ActionModuleMethods
     include Styles
-    def action_module_init
-      @action_name = self.to_s.match(/[^:]+$/)[0].gsub(/(?<=[a-z])([A-Z])/) { "-#{$1}" }.downcase
-      @actions_module_proc = nil
-      @aliases = []
-      @argument_syntax = ArgumentSyntax.new(self)
-      @desc = nil
-      @option_syntax = nil
-      @summary = nil
-      @visible = true
+    def action_name
+      @action_name ||= to_s.match(/[^:]+$/)[0].gsub(/(?<=[a-z])([A-Z])/) { "-#{$1}" }.downcase
     end
-    attr_reader :action_name
     def aliases *a
+      @aliases ||= []
       a.any? ? @aliases.concat(a) : @aliases
     end
     def argument_syntax s=nil
+      @argument_syntax ||= ArgumentSyntax.new(self)
       s ? @argument_syntax.define!(s) : @argument_syntax
     end
     def build runtime
       new runtime
     end
     def desc *a
-      a.size.zero? ? @desc : (@desc ||= []).concat(a)
-    end
-    def self.extended mod
-      mod.action_module_init
+      a.size.zero? ? (@desc ||= nil) : (@desc ||= []).concat(a)
     end
     def name
       action_name # allows more flexibility than an alias
     end
     def names
-      [name, * @aliases]
-    end
-    def inherited cls
-      cls.action_module_init
+      [name, *aliases]
     end
     def option_syntax &b
       @option_syntax ||= option_syntax_class.new
@@ -281,14 +266,15 @@ module Skylab::Porcelain::Bleeding
       instance_method(:execute).parameters
     end
     def summary &b
-      if b           ; @summary = b
-      elsif @summary ; instance_eval(&@summary)
-      elsif desc     ; desc[0..2] end
+      if b                     ; @summary = b
+      elsif (@summary ||= nil) ; instance_eval(&@summary)
+      elsif desc               ; desc[0..2] end
     end
     def syntax
       [action_name, option_syntax.string, argument_syntax.string].compact.join(' ') # duplicated
     end
     def visible *a
+      instance_variable_defined?('@visible') or @visible = true
       case a.size ; when 0 ; @visible ; when 1 ; @visible = a.first ; else fail end
     end
     attr_writer :visible
@@ -302,9 +288,6 @@ module Skylab::Porcelain::Bleeding
   end
   module Namespace
     include ActionModuleMethods
-    def self.extended mod
-      mod.namespace_module_init
-    end
     def action_modules
       [ actions_module, OfficiousActions ]
     end
@@ -314,16 +297,14 @@ module Skylab::Porcelain::Bleeding
     def action_syntax
       "{#{ actions.visible.map { |a| pre a.name } * '|' }}"
     end
-    attr_reader :actions
-    def build runtime
-      NamespaceAction.new(self, runtime)
-    end
-    def namespace_module_init
-      action_module_init
-      @actions = ActionEnumerator.new do |y|
+    def actions
+      @actions ||= ActionEnumerator.new do |y|
         action_modules.each { |m| m.constants.each { |k| y << m.const_get(k) } }
         # there is an anticpated issue above with fuzzy matching actions that have same name in different module
       end
+    end
+    def build runtime
+      NamespaceAction.new(self, runtime)
     end
     def parameters
       NamespaceAction.parameters
@@ -344,7 +325,6 @@ module Skylab::Porcelain::Bleeding
     def initialize namespace, runtime
       action_init runtime
       @actions_module = namespace
-      namespace_init
     end
     delegates_to :actions_module, :name
   end
@@ -357,19 +337,17 @@ module Skylab::Porcelain::Bleeding
     def emit _, s
       $stderr.puts s
     end
-    alias_method :initialize, :namespace_init
+    def initialize
+    end
     def invoke argv
       argv = argv.dup
       (callable, args = resolve!(argv)) or return callable
       callable.receiver.send(callable.name, *args)
     end
     def program_name
-      @program_name || File.basename($PROGRAM_NAME)
+      (@program_name ||= nil) || File.basename($PROGRAM_NAME)
     end
     attr_writer :program_name
-    def self.inherited mod
-      mod.namespace_module_init
-    end
   end
   class << Runtime
     def actions_module *a, &b
