@@ -36,7 +36,7 @@ module Skylab::Treemap
 
     def initialize
       namespace_init
-      @stylus = Stylus.new
+      @stylus = Stylus.new # let's have this be the only place this is built
       yield self
     end
 
@@ -73,7 +73,7 @@ module Skylab::Treemap
     def wire_action api_action
       runtime.wire_action api_action
       api_action.stylus = runtime.stylus
-      runtime.stylus.wire! self.class, api_action
+      runtime.stylus.wire! self, api_action
       api_action
     end
   end
@@ -86,30 +86,77 @@ module Skylab::Treemap
     end
   end
   class CLI::Actions::Render < CLI::Action
-    delegates_to :runtime, :info, :stylus
+    delegates_to :runtime, :stylus
     delegates_to :stylus, :param
     desc "render a treemap from a text-based tree structure"
-    fml = ->(ctx) do
-      ctx.kind_of?(OptionParser) or return []
-      s = CLI::Stylus.new.wire!(self, API::Actions::Render)
-      stop, impl = [:stops_after, :stop_implied].map { |x| s.action_attributes.with(x) }
-      ["(can appear after #{s.and( (stop.keys - impl.keys).map { |k| s.param k } )}) " <<
-        "(implied after #{s.and( impl.keys.map{ |k| s.param k } )})" ]
-    end
+
+    option_syntax_class CLI::DynamicOptionSyntax
+
     option_syntax do |o|
       o[:char] = '+'
       o[:exec] = true
-      on('-c', '--char <CHAR>', %{use CHAR (default: #{o[:char]})}) { |v| o[:char] = v }
+      on('-a <NAME>', '--adapter <NAME>', * more(:a)){ |v| o[:adapter_name] = v }
+      on('-c', '--char <CHAR>', "use CHAR (default: {{default}})") { |v| o[:char] = v }
       on('--tree', 'show the text-based structure in a tree (debugging)') { o[:show_tree] = true }
       on('--csv', 'output the csv to stdout instead of tempfile, stop.') { o[:csv_stream] = :payload }
-      on('--r-script', 'output to stdout the generated r script, stop.') { o[:r_script_stream] = :payload }
-      on('--stop', 'stop execution after the previously indicated step', *fml[self]) { o[:stop] = true }
+      on('--stop', 'stop execution after the previously indicated step', * more(:s)) { o[:stop] = true }
       on('-F', '--force', 'force overwriting of an exiting file') { o[:force] = true }
-      on('--[no-]exec', "the default is to open the file with exec") { |v| o[:exec] = v }
+      on('--[no-]exec', "the default is to open the file with exec {{default}}") { |v| o[:exec] = v }
     end
-    attr_reader :api_action
+
+    option_syntax.more[:a] = ->() do
+      aa = ['which treemap rendering adapter to use.']
+      a = cli.api_action.adapters.names
+      aa << ("(#{s a, :no}known adapter#{s a} #{s a, :is} #{self.and a.map{|x| pre x}})" <<
+        " (default: #{pre cli.api_action.attributes[:adapter_name][:default]})")
+      aa << "(to see adapter-specific opts use this in conjunction with #{param :help, :short})"
+      aa
+    end
+
+    option_syntax.more[:s] = ->() do
+      stop, impl = [:stops_after, :stop_implied].map { |x| cli.api_action.attributes.with(x) }
+      ["(can appear after #{self.and( (stop.keys - impl.keys).map { |k| param k } )}) " <<
+       "(implied after #{self.and( impl.keys.map{ |k| param k } )})" ]
+    end
+
+    def option_syntax
+      @option_syntax ||= build_option_syntax
+    end
+
+    def build_option_syntax
+      os = self.class.option_syntax.dupe
+      os.parser_class = CLI::DynamicOptionParser
+      os.documentor_class = CLI::DynamicOptionDocumentor
+      cli_action = self
+      os[:init_documentor] = ->(doc) do
+        doc.cli = cli_action
+        orig_init_documentor doc
+      end
+      os[:parse!] = ->(argv, args, cli) do
+        api = cli.api_action
+        help = options[:help].parse(argv) # a peek
+        name = options[:adapter_name].parse!(argv) # mutate argv
+        if name or ! ( help && 1 == argv.length ) # do not load the plugin iff help appears alone
+          name ||= api.attributes[:adapter_name][:default]
+          adapter = api.activate_adapter!(name) do |o|
+            o.on_failure do |e|
+              api.emit(:info, e)
+              cli.help_invite(:for => ' for more about help with adapters.')
+              return nil
+            end
+          end and adapter.load_options(cli)
+        end
+        orig_parse!(argv, args, cli)
+      end # end parse
+      os
+    end
+
+    def api_action
+      @api_action ||= api.action(:render).clear!.wire!(&wire)
+    end
+
     def execute path, opts
-      action = @api_action = api.action(:render).wire!(&wire)
+      action = api_action
       parse_opts(opts) or return
       do_exec = opts.delete(:exec)
       action.on_treemap do |e|
@@ -118,7 +165,7 @@ module Skylab::Treemap
           exec("open #{e.path}")
         end
       end
-      ok = action.invoke(opts.merge!(path: path))
+      ok = action.update_parameters!(opts.merge!(path: path)).invoke!
       false == ok and help_invite
       ok
     end
@@ -138,7 +185,7 @@ module Skylab::Treemap
         help_invite
         nil
       else
-        opts[:stop_after] = opt_to_event[given[-2]] or fail('logic error')
+        opts[:stop_after] = opt_to_event[given[-2]] or fail('error parsing stop')
         opts.delete(:stop)
         true
       end
@@ -160,60 +207,6 @@ module Skylab::Treemap
       self
     end
     attr_accessor :runtime_instance_settings
-  end
-  class CLI::Stylus
-    include Skylab::Porcelain::Bleeding::Styles
-    def initialize
-      @active = true
-    end
-    attr_reader :action_attributes
-    attr_reader :active
-    alias_method :and, :oxford_comma
-    def bad_value value
-      pre value.inspect
-    end
-    def do_stylize= bool
-      if @active != (b = !! bool)
-        singleton_class.send(:alias_method, :stylize, b ? :orig_stylize : :plain)
-        @active = b
-      end
-      bool
-    end
-    alias_method :orig_stylize, :stylize
-    def option_syntax= os
-      @option_syntax_options = nil
-      @option_syntax = os
-    end
-    def option_syntax_options
-      @option_syntax_options ||= begin
-        unless @option_syntax.respond_to?(:options)
-          @option_syntax.extend CLI::OptionSyntaxReflection
-        end
-        @option_syntax.options
-      end
-    end
-    def or a
-      oxford_comma(a, ' or ')
-    end
-    def param name
-      s =
-      if option_syntax_options.key?(name)
-        option_syntax_options[name].long_name
-      elsif action_attributes.key?(name)
-        action_attributes[name].label
-      else
-        name
-      end
-      pre s
-    end
-    def plain(s, *a)
-      s
-    end
-    def wire! cli_action_meta, api_action_meta
-      @action_attributes = api_action_meta.attributes
-      self.option_syntax = cli_action_meta.option_syntax
-      self
-    end
   end
 end
 

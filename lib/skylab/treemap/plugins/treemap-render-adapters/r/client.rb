@@ -12,18 +12,28 @@ module Skylab::Treemap::Plugins::TreemapRenderAdapters
     extend Skylab::PubSub::Emitter
     emits :r_script, :success, :failure
 
+    def load_attributes o
+      o.attribute :r_script_stream, :enum => [:payload], stops_after: :r_script, stop_implied: true
+    end
+
+    def load_options cli
+      cli.option_syntax.define! do |o|
+        s = cli.stylus
+        separator('')
+        separator(s.hdr 'r-specific options:')
+        on('--r-script', 'output to stdout the generated r script, stop.') { o[:r_script_stream] = :payload }
+      end
+    end
+
 
     include Skylab::Interface::System::SelectLinesUntil
 
-    def self.invoke(*a, &b)
-      new(*a, &b).execute
-    end
-    def initialize csv_path, tempdir
+    def initialize
+      block_given? and raise ArgumentError.new("for now, events are not wired here")
       @bridge = nil
       @stop_after_script = false
-      @csv_path = csv_path
-      @tempdir = tempdir
-      yield(self) if block_given?
+      @csv_path = nil
+      @tempdir = nil
       @title ||= 'Treemap'
     end
 
@@ -74,6 +84,11 @@ module Skylab::Treemap::Plugins::TreemapRenderAdapters
       @script
     end
 
+    def invoke &block
+      block.call self # will need to re-wire if we ever re-run the same client
+      execute
+    end
+
     def self.pdf_path_guess
       @pdf_path_guess ||= API::Path.new(File.join(FileUtils.pwd, 'Rplots.pdf'))
     end
@@ -103,6 +118,12 @@ module Skylab::Treemap::Plugins::TreemapRenderAdapters
         end
       end # popen3
       report_result mtime1
+    end
+
+    def update_parameters! csv_path, tempdir
+      @csv_path = csv_path
+      @tempdir = tempdir
+      self
     end
 
     def report_result mtime1

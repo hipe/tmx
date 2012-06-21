@@ -66,7 +66,7 @@ module Skylab::Treemap
     end
 
     def attributes
-      self.class.attributes
+      singleton_class.attributes
     end
 
     def clear!
