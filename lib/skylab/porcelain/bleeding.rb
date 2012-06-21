@@ -5,6 +5,7 @@ require 'skylab/porcelain/en'
 require 'optparse'
 
 module Skylab::Porcelain::Bleeding
+  extend Skylab::Autoloader
   module DelegatesTo
     def delegates_to fulfiller, *methods
       methods.each { |m| define_method(m) { |*a, &b| send(fulfiller).send(m, *a, &b) } }
