@@ -12,61 +12,9 @@ require 'strscan'
 module Skylab::Autoloader
   # experimental.  const_missing hax can suck, so use this only if it's compelling.
   # a bit of a mess now until things settle down
-  class ThrowingStringScanner < StringScanner
-    %w(scan skip).each do |meth|
-      alias_method("soft_#{meth}", meth)
-      define_method(meth) do |pat|
-        x = super(pat) or throw(:parse_failure, "failed to match #{pat.inspect} near #{(rest[0..10] << '(..)').inspect}")
-      end
-    end
-    # like match? but return what was matched
-    def snoop re
-      idx = match?(re) and peek(idx)
-    end
-  end
   class << self
-    def guess_dir path, cons
-      htap = ThrowingStringScanner.new(path.reverse)
-      snoc = ThrowingStringScanner.new(cons.reverse)
-      p0 = c0 = nil
-      no = catch(:parse_failure) do
-        p0 = htap.soft_skip(%r|br\.|)
-        p0 = htap.scan(%r|[^/]+|)
-        c0 = snoc.scan(%r|[^:]+|).gsub( /([A-Z](?=[a-z]))/ ) { "#{$1}-" }.downcase
-        if p0 == c0
-          if htap.soft_skip(%r|/|) and c0 == htap.snoop(%r|[^/]+|)
-            dir = htap.rest.reverse
-            return dir
-          end
-          dir = "#{htap.rest.reverse}/#{c0.reverse}"
-          return dir
-        end
-
-        snoc.skip(/::/)
-        c1 = snoc.scan(%r|[^:]+|).gsub( /([A-Z](?=[a-z]))/ ) { "#{$1}-" }.downcase
-        if p0 == c1
-           dir = "#{htap.unscan.rest.reverse}/#{c0.reverse}"
-           return dir
-        end
-
-        htap.skip(%r|/|) ; p0 = htap.scan(%r|[^/]+|)
-        if p0 == c0
-          dir = htap.unscan.rest.reverse
-          return dir
-        end
-
-        if p0 == c1
-          dir = "#{htap.unscan.rest.reverse}/#{c0.reverse}"
-          return dir
-        end
-
-      end
-      if no
-        raise(no)
-      end
-    end
     def extended mod
-      dir = mod.dir_path = find_dir(mod, %r{^(.+)\.rb:\d+:in `}.match(caller[0])[1])
+      dir = mod.dir_path = guess_dir(mod, %r{^(.+)\.rb:\d+:in `}.match(caller[0])[1])
       mod.singleton_class.send(:alias_method, :orig_const_missing, :const_missing)
       mod.singleton_class.send(:define_method, :const_missing) do |const|
         path = "#{dir}/#{const.to_s.gsub(/(?<=^|([a-z]))([A-Z])/) { "#{'-' if $1}#{$2}" }.downcase}"
@@ -77,24 +25,56 @@ module Skylab::Autoloader
         const_get const
       end
     end
-    POP = %r{\A(?<dirname>.+)/(?<basename>[-a-z]+)\z}
-    def find_dir mod, caller_path
-      slug = mod.to_s.match(/[^:]+\z/)[0].gsub(/([a-z])([A-Z])/){ "#{$1}-#{$2}" }.downcase
-      File.directory?(p = "#{caller_path}/#{slug}") and return p
-      curr = caller_path
-      while o = POP.match(curr)
-        if o[:basename] == slug
-          oo = POP.match(o[:dirname]) and oo[:basename] == slug and o = oo # allow for foo-bar/foo-bar style paths
-          return o.captures.join('/')
+    def guess_dir cons, path
+      no = catch(:parse_failure) do
+        p = BackwardsTokenizer.new(path.reverse, %r{[^/]+}, %r{/} )
+        c = BackwardsTokenizer.new(cons.reverse, /[^:]+/, /::/) { |s| s.gsub(/([A-Z](?=[a-z]))/){"#{$1}-"}.downcase }
+        if p.next == c.next
+          c.curr == p.peek and return p.rest                              # a/b/b a::b
+          return "#{p.rest}/#{c.current}"                                 # a/b   a::b
         end
-        "#{o[:dirname]}/#{slug}".tap { |path| File.directory?(path) and return path }
-        curr = o[:dirname]
+        p.peek == c.curr and return p.rest                                # a/b/c a::b
+        p.curr == c.peek and return "#{p.rest}/#{p.current}/#{c.current}" # a/b   a::b::c
+        p.peek == c.peek and return "#{p.rest}/#{c.current}"              # a/b/p a::b::q
+        throw(:parse_failure, "failed to infer path for #{cons} from #{path}")
+        nil
       end
-      fail("didn't find #{slug.inspect} in #{caller_path.inspect}")
+      no and raise(no)
     end
   end
   attr_accessor :dir_path
-  def dir ;  @dir ||= begin ; require 'pathname' ; Pathname.new(dir_path) ; end
+  def dir
+    @dir ||= Pathname.new(dir_path)
+  end
+  class ThrowingStringScanner < StringScanner
+    %w(scan skip).each do |meth|
+      alias_method("soft_#{meth}", meth)
+      define_method(meth) do |pat|
+        x = super(pat) or
+          throw(:parse_failure, "failed to match #{pat.inspect} near #{(rest[0..10] << '(..)').inspect}")
+      end
+    end
+    alias_method :strscan_peek, :peek
+    def snoop re ; idx = match?(re) and strscan_peek(idx) end
+  end
+  class SimpleTokenizer < ThrowingStringScanner
+    attr_reader :curr
+    def initialize str, *a, &b
+      super(str)
+      @token_pattern, @separator_pattern = a
+      @filter = b || ->(s){s}
+    end
+    def next
+      @curr = @filter.call(scan @token_pattern)
+      soft_skip @separator_pattern
+      @curr
+    end
+    def peek ; s = snoop(@token_pattern) and @filter.call(s) end
+    alias_method :strscan_rest, :rest
+  end
+  class BackwardsTokenizer < SimpleTokenizer
+    def current ; @curr.reverse  end
+    def rest    ; super.reverse  end
   end
 end
 

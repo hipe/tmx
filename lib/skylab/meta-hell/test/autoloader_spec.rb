@@ -2,10 +2,10 @@ require_relative '../../../skylab'
 
 describe Skylab::Autoloader do
   context "infers a path based on simple heuristics." do
-    let(:subject) { Skylab::Autoloader.guess_dir(path, const) }
+    let(:subject) { Skylab::Autoloader.guess_dir(const, path) }
     def self.with path, const, dir, comment=nil, *a
       describe("The dirpath for #{const} calling from #{path} #{comment}", *a) do
-        let(:path) { path }
+        let(:path) { path.sub(/\.rb$/, '') }
         let(:const) { const }
         it { should eql(dir) }
       end
