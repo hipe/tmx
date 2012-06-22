@@ -9,14 +9,14 @@ module Skylab::Porcelain::Bleeding
     def find token
       action = super or return action
       if action.respond_to?(:stub?) && action.stub?
-        action = self.action.real_actions_module.const_get(action.const)
+        action = self.action.real_action_collection.const_get(action.const)
       end
       action
     end
     def help_list
-      if action.stubs == action.actions_module
-        action.stubs.values.each { |s| action.real_actions_module.const_get(s.const) }
-        action.actions_module = action.real_actions_module
+      if action.stubs == action.action_collection
+        action.stubs.values.each { |s| action.real_action_collection.const_get(s.const) }
+        action.action_collection = action.real_action_collection
       end
       super
     end
@@ -24,13 +24,13 @@ module Skylab::Porcelain::Bleeding
   module Stubs::ModuleMethods
     def actions
       case (@stubs_state ||= :initial)
-      when :initial ; @real_actions_module = actions_module
-                      self.actions_module stubs
+      when :initial ; @real_action_collection = action_collection
+                      self.action_collection stubs
                       @stubs_state = :initialized
       end
       super
     end
-    attr_reader :real_actions_module
+    attr_reader :real_action_collection
     CONST = :ActionStubs
     def stubs
       @stubs ||= begin
@@ -65,7 +65,7 @@ module Skylab::Porcelain::Bleeding
     end
     def load_actions!
       (@loaded ||= nil) and return
-      @mod.real_actions_module.dir.children.each do |child|
+      @mod.real_action_collection.dir.children.each do |child|
         const = child.basename.to_s.sub(/\.rb\z/,'').gsub(/(?:^|-)([a-z])/){ $1.upcase }
         self[const] = Stub.new(const)
       end

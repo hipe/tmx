@@ -18,8 +18,8 @@ module Skylab::Treemap
 
     delegates_to :stylus, :do_stylize=, :em, :pre
 
-    def self.action_modules
-      super + [ * plugin_action_modules ]
+    def self.action_collections
+      super + [ * plugin_action_collections ]
     end
 
     def api
@@ -36,7 +36,6 @@ module Skylab::Treemap
       parens and msg = "#{parens[:open]}#{msg}#{parens[:close]}"
       msg
     end
-
 
     def initialize
       @stylus = Stylus.new # let's have this be the only place this is built
@@ -92,9 +91,9 @@ module Skylab::Treemap
         runtime_instance_settings and runtime_instance_settings.call(c) # @todo #100.200
       end
     end
-    def plugin_action_modules
+    def plugin_action_collections
       return []
-      @plugin_action_modules_cache ||= begin
+      @plugin_action_collections_cache ||= begin
       end
     end
     def porcelain # @todo #100.200 not here

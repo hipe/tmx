@@ -124,7 +124,7 @@ module Skylab::Porcelain::Bleeding
       emit :help, "#{hdr 'usage:'} #{program_name} #{action_syntax} [opts] [args]"
     end
     def program_name
-      "#{runtime.program_name} #{actions_module.name}" #!
+      "#{runtime.program_name} #{action_collection.name}" #!
     end
     def resolve! argv
       action = find(argv.shift){ |o| o.on_error { |s| return help(message: s.message, action_syntax: false) } }
@@ -289,10 +289,10 @@ module Skylab::Porcelain::Bleeding
   end
   module Namespace
     include ActionModuleMethods
-    def action_modules
-      [ actions_module, OfficiousActions ]
+    def action_collections
+      [ action_collection, OfficiousActions ]
     end
-    def actions_module
+    def action_collection
       self
     end
     def action_syntax
@@ -300,7 +300,7 @@ module Skylab::Porcelain::Bleeding
     end
     def actions
       @actions ||= ActionEnumerator.new do |y|
-        action_modules.each { |m| m.load_actions! if m.respond_to?(:load_actions!) ; m.constants.each { |k| y << m.const_get(k) } }
+        action_collections.each { |m| m.load_actions! if m.respond_to?(:load_actions!) ; m.constants.each { |k| y << m.const_get(k) } }
         # there is an anticpated issue above with fuzzy matching actions that have same name in different module
       end
     end
@@ -310,9 +310,9 @@ module Skylab::Porcelain::Bleeding
     def parameters
       NamespaceAction.parameters
     end
-    alias_method :action_module_summary, :summary
+    alias_method :orig_summary, :summary
     def summary &b
-      b || desc || @summary and return action_module_summary(&b)
+      b || desc || @summary and return orig_summary(&b)
       aa = actions.visible.to_a
       ["child action#{'s' if aa.size != 1}: {#{build(nil).actions.visible.map{ |a| "#{pre a.name}" }.join('|')}}"]
     end
@@ -320,20 +320,20 @@ module Skylab::Porcelain::Bleeding
   class NamespaceAction ; extend DelegatesTo
     extend Action
     include NamespaceInstanceMethods
-    delegates_to :actions_module, :action_syntax, :actions
-    attr_reader :actions_module
-    delegates_to :actions_module, :desc
+    delegates_to :action_collection, :action_syntax, :actions
+    attr_reader :action_collection
+    delegates_to :action_collection, :desc
     def initialize namespace, runtime
       action_init runtime
-      @actions_module = namespace
+      @action_collection = namespace
     end
-    delegates_to :actions_module, :name
+    delegates_to :action_collection, :name
   end
   class Runtime
     extend Namespace
     include NamespaceInstanceMethods
-    def actions_module
-      action.actions_module
+    def action_collection
+      action.action_collection
     end
     def emit _, s
       $stderr.puts s
@@ -351,14 +351,14 @@ module Skylab::Porcelain::Bleeding
     attr_writer :program_name
   end
   class << Runtime
-    def actions_module *a, &b
+    def action_collection *a, &b
       case a.length
-      when 0 ; if b then @actions_module = b
-             ; else (@actions_module ||= ->(){ const_get('Actions') }).call end
-      when 1 ; if b then fail else mod = a.first ; @actions_module = ->() { mod } end
+      when 0 ; if b then @action_collection = b
+             ; else (@action_collection ||= ->(){ const_get('Actions') }).call end
+      when 1 ; if b then fail else mod = a.first ; @action_collection = ->() { mod } end
       else   ; fail ; end
     end
-    alias_method :actions_module=, :actions_module # !
+    alias_method :action_collection=, :action_collection # !
   end
   module OfficiousActions
   end
