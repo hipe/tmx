@@ -8,7 +8,7 @@ module Skylab::TanMan
     emits EVENT_GRAPH
     event_class Api::Event
 
-    actions_module { self::Actions }
+    action_collection { self::Actions }
 
     def initialize
       super
@@ -52,7 +52,7 @@ module Skylab::TanMan
     def format_error event
       event.tap do |e|
         if runtime.runtime
-          subj, verb, obj = [runtime.runtime.program_name, action.name, runtime.actions_module.name]
+          subj, verb, obj = [runtime.runtime.program_name, action.name, runtime.action_collection.name]
         else
           subj, verb = [runtime.program_name, action.name]
         end
