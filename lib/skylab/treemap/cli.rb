@@ -10,7 +10,6 @@ module Skylab::Treemap
     extend Skylab::Autoloader
     extend Bleeding::DelegatesTo
     extend Skylab::PubSub::Emitter
-    extend Bleeding::Stubs
 
     emits Bleeding::EVENT_GRAPH
     emits payload: :all, info: :all, error: :all
@@ -63,6 +62,7 @@ module Skylab::Treemap
   end
   module CLI::Actions
     extend Skylab::Autoloader
+    extend CLI::Bleeding::Stubs
   end
 
   class CLI::Action

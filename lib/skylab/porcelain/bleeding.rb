@@ -85,13 +85,13 @@ module Skylab::Porcelain::Bleeding
   OnFind = Skylab::PubSub::Emitter.new(:error, :ambiguous => :error, :not_found => :error, :not_provided => :error)
   module NamespaceInstanceMethods ; extend DelegatesTo
     include ActionInstanceMethods
-    delegates_to :action, :action_syntax, :actions
+    delegates_to :action, :action_syntax, :action_names, :action_helps
     def find token
       yield(e = OnFind.new)
       found = nil
       if token
         matcher = /^#{Regexp.escape(token)}/
-        actions.each do |kls|
+        action_names.each do |kls|
           kls.name == token and found = [kls] and break;
           kls.names.detect { |n| matcher =~ n } and (found ||= []).push(kls)
         end
@@ -109,7 +109,7 @@ module Skylab::Porcelain::Bleeding
       emit :help, "try #{pre "#{program_name} #{a} -h"} for help#{b}"
     end
     def help_list
-      tbl = actions.visible.map { |action|  [action.name, (action.summary || [])] }
+      tbl = action_helps.visible.map { |action|  [action.name, (action.summary || [])] }
       emit :help, (tbl.empty? ? "(no actions)" : "#{hdr 'actions:'}")
       width = tbl.reduce(0) { |m, o| o[0].length > m ? o[0].length : m }
       fmt = "  #{em "%#{width}s"}  %s"
@@ -296,13 +296,23 @@ module Skylab::Porcelain::Bleeding
       self
     end
     def action_syntax
-      "{#{ actions.visible.map { |a| pre a.name } * '|' }}"
+      "{#{ action_names.visible.map { |a| pre a.name } * '|' }}"
     end
-    def actions
-      @actions ||= ActionEnumerator.new do |y|
-        action_collections.each { |m| m.load_actions! if m.respond_to?(:load_actions!) ; m.constants.each { |k| y << m.const_get(k) } }
+    def action_helps  ; enum :action_helps ; end
+    def action_names  ; enum :action_names ; end
         # there is an anticpated issue above with fuzzy matching actions that have same name in different module
-      end
+    def enum method
+      (@enum ||= Hash.new do |hash, meth|
+        hash[meth] = ActionEnumerator.new do |y|
+          action_collections.each do |col|
+            if col != self and col.respond_to?(meth)
+              col.send(meth).each { |x| y << x }
+            else
+              col.constants.each { |k| y << col.const_get(k) } # the default assumption is a module
+            end
+          end
+        end
+      end)[method]
     end
     def build runtime
       NamespaceAction.new(self, runtime)
@@ -313,14 +323,14 @@ module Skylab::Porcelain::Bleeding
     alias_method :orig_summary, :summary
     def summary &b
       b || desc || @summary and return orig_summary(&b)
-      aa = actions.visible.to_a
-      ["child action#{'s' if aa.size != 1}: {#{build(nil).actions.visible.map{ |a| "#{pre a.name}" }.join('|')}}"]
+      aa = action_names.visible.to_a
+      ["child action#{'s' if aa.size != 1}: {#{build(nil).action_names.visible.map{ |a| "#{pre a.name}" }.join('|')}}"]
     end
   end
   class NamespaceAction ; extend DelegatesTo
     extend Action
     include NamespaceInstanceMethods
-    delegates_to :action_collection, :action_syntax, :actions
+    delegates_to :action_collection, :action_syntax, :action_names
     attr_reader :action_collection
     delegates_to :action_collection, :desc
     def initialize namespace, runtime
