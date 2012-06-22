@@ -13,6 +13,7 @@ module Skylab::Treemap
   end
 
   class API::Action
+    extend Skylab::Autoloader
     extend Skylab::PubSub::Emitter
     extend Skylab::Porcelain::AttributeDefiner
     extend Skylab::Porcelain::En::ApiActionInflectionHack
@@ -64,6 +65,8 @@ module Skylab::Treemap
       message.gsub!('{{value}}') { bad_value value }
       (validation_errors[name] ||= []).push(message)
     end
+
+    attr_accessor :api_client
 
     def attributes
       singleton_class.attributes

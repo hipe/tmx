@@ -1,13 +1,41 @@
 module Skylab::Treemap
   module Adapter
     def self.Collection modul, pathname, client_file
-      pairs = pathname.children.map do |p|
+      pathname.children.reduce(Collection.new.initialize!(modul, pathname, client_file)) do |col, p|
         if md = /^[^\.]+$/.match(p.basename.to_s)
-          [md[0], :file_exists]
+          col[md[0]] = Adapter::Mote.new(col, col.name_function_function.dupe(md[0]), :file_exists)
         end
-      end.compact
-      Collection[ pairs].tap { |c| c.initialize!(modul, pathname, client_file) }
+        col
+      end
     end
+  end
+
+  class Adapter::Mote < Struct.new(:name_function, :adapter_state, :client_module)
+    extend Skylab::Porcelain::Bleeding::DelegatesTo
+
+    delegates_to :name_function, :const, :client_const, :client_path
+
+    attr_reader :client_mo
+
+    def initialize collection, name_function, adapter_state
+      @collection = collection
+      super(name_function, :file_exists)
+    end
+
+    def load! &error
+      :file_exists == adapter_state or return client_module
+      client_path.exist? or return error["client path not found: #{client_path}"]
+      plugins_mod = @collection.adapters_module
+      require require_path.to_s
+      client_module = [const, client_const].reduce(plugins_mod) do |mod, const|
+        mod.const_defined?(const) or return error["#{mod}::#{const} not defined in #{client_path}"]
+        mod.const_get(const)
+      end
+      self.adapter_state = :loaded
+      self.client_module = client_module
+    end
+
+    delegates_to :name_function, :require_path
   end
 
   class Adapter::Collection < Hash
@@ -23,21 +51,13 @@ module Skylab::Treemap
 
     def active_class
       @active_class ||= begin
-        (@active_adapter_name ||= nil) or return
-        if :file_exists == self[@active_adapter_name]
-          func = self[@active_adapter_name] = @name_function_prototype.dupe(@active_adapter_name)
-          func.client_path.exist? or fail("client path not found: #{func.client_path}")
-          require func.require_path.to_s
-          @module.const_defined?(func.const) or fail("#{@module}::#{func.const} not defined in #{func.client_path}")
-          plugin_module = @module.const_get(func.const)
-          unless plugin_module.const_defined?(func.client_const)
-            fail("#{plugin_module}::#{func.client_const} not defined in #{func.client_path}")
-          end
-          self[@active_adapter_name] = plugin_module.const_get(func.client_const)
+        if mote = self[(@active_adapter_name ||= nil)]
+          mote.client_module or mote.load! { |e| fail(e) }
         end
-        self[@active_adapter_name]
       end
     end
+
+    attr_reader :adapters_module
 
     def fuzzy_match_name name
       names = self.names
@@ -48,15 +68,16 @@ module Skylab::Treemap
     end
 
     def initialize! modul, pathname, client_file
-      @module = modul
-      @name_function_prototype = Adapter::NameFunction.new(pathname, client_file)
+      @adapters_module = modul
+      @name_function_function = Adapter::NameFunction.new(pathname, client_file)
+      self
     end
 
     def names
       keys
     end
 
-    attr_reader :pathname
+    attr_reader :name_function_function, :pathname
 
   end
   class Adapter::NameFunction < String

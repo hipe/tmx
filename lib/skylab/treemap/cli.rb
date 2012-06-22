@@ -18,8 +18,12 @@ module Skylab::Treemap
 
     delegates_to :stylus, :do_stylize=, :em, :pre
 
+    def self.action_modules
+      super + [ * plugin_action_modules ]
+    end
+
     def api
-      @api ||= API::Client.new
+      API::Client.instance
     end
 
     def format prefix, e
@@ -86,6 +90,11 @@ module Skylab::Treemap
         c.on_payload { |e| runtime.emit(:payload, e) }
         c.do_stylize = runtime.err.tty?
         runtime_instance_settings and runtime_instance_settings.call(c) # @todo #100.200
+      end
+    end
+    def plugin_action_modules
+      return []
+      @plugin_action_modules_cache ||= begin
       end
     end
     def porcelain # @todo #100.200 not here
