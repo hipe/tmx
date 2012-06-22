@@ -7,10 +7,64 @@ module Skylab
 end
 
 
+require 'strscan'
+
 module Skylab::Autoloader
   # experimental.  const_missing hax can suck, so use this only if it's compelling.
   # a bit of a mess now until things settle down
+  class ThrowingStringScanner < StringScanner
+    %w(scan skip).each do |meth|
+      alias_method("soft_#{meth}", meth)
+      define_method(meth) do |pat|
+        x = super(pat) or throw(:parse_failure, "failed to match #{pat.inspect} near #{(rest[0..10] << '(..)').inspect}")
+      end
+    end
+    # like match? but return what was matched
+    def snoop re
+      idx = match?(re) and peek(idx)
+    end
+  end
   class << self
+    def guess_dir path, cons
+      htap = ThrowingStringScanner.new(path.reverse)
+      snoc = ThrowingStringScanner.new(cons.reverse)
+      p0 = c0 = nil
+      no = catch(:parse_failure) do
+        p0 = htap.soft_skip(%r|br\.|)
+        p0 = htap.scan(%r|[^/]+|)
+        c0 = snoc.scan(%r|[^:]+|).gsub( /([A-Z](?=[a-z]))/ ) { "#{$1}-" }.downcase
+        if p0 == c0
+          if htap.soft_skip(%r|/|) and c0 == htap.snoop(%r|[^/]+|)
+            dir = htap.rest.reverse
+            return dir
+          end
+          dir = "#{htap.rest.reverse}/#{c0.reverse}"
+          return dir
+        end
+
+        snoc.skip(/::/)
+        c1 = snoc.scan(%r|[^:]+|).gsub( /([A-Z](?=[a-z]))/ ) { "#{$1}-" }.downcase
+        if p0 == c1
+           dir = "#{htap.unscan.rest.reverse}/#{c0.reverse}"
+           return dir
+        end
+
+        htap.skip(%r|/|) ; p0 = htap.scan(%r|[^/]+|)
+        if p0 == c0
+          dir = htap.unscan.rest.reverse
+          return dir
+        end
+
+        if p0 == c1
+          dir = "#{htap.unscan.rest.reverse}/#{c0.reverse}"
+          return dir
+        end
+
+      end
+      if no
+        raise(no)
+      end
+    end
     def extended mod
       dir = mod.dir_path = find_dir(mod, %r{^(.+)\.rb:\d+:in `}.match(caller[0])[1])
       mod.singleton_class.send(:alias_method, :orig_const_missing, :const_missing)
