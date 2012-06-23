@@ -131,8 +131,6 @@ module Skylab::Porcelain::En::ApiActionInflectionHack
     def stems
       @stems ||= Stems.new(@klass)
     end
-
-    attr_writer :stem
   end
 end
 
