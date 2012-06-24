@@ -1,11 +1,12 @@
 require_relative '../../../skylab'
 
 describe Skylab::Autoloader do
+  include subject.call
   def cleanpath path
     path.sub(/\.rb$/, '')
   end
   context "infers a path based on simple heuristics." do
-    let(:subject) { Skylab::Autoloader.guess_dir(const, path) { |e| fail(e) } }
+    let(:subject) { guess_dir(const, path) { |e| fail(e) } }
     def self.with path, const, dir, comment, *a
       describe("The dirpath for #{const} calling from #{path} #{comment}", *a) do
         let(:path) { cleanpath path }
@@ -26,7 +27,7 @@ describe Skylab::Autoloader do
   end
   context "may fail" do
     let(:subject) do
-      -> {  Skylab::Autoloader.guess_dir(const, path) { |e| fail(e) } }
+      -> { guess_dir(const, path) { |e| fail(e) } }
     end
     def self.bunk path, const, failmsg, *a
       describe("The msg of the exception thrown for #{const} from #{path}", *a) do

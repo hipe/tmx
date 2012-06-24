@@ -1,4 +1,5 @@
 require_relative '../../skylab'
+require 'skylab/meta-hell/autoloader/autovivifying'
 require 'skylab/pub-sub/emitter'
 require 'skylab/porcelain/bleeding'
 require 'singleton'
@@ -8,7 +9,7 @@ module Skylab::Treemap
   DelegatesTo = Skylab::Porcelain::Bleeding::DelegatesTo
 
   module API
-    extend Skylab::Autoloader
+    extend Skylab::MetaHell::Autoloader::Autovivifying
   end
 
   class API::Client
