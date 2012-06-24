@@ -1,4 +1,5 @@
 require_relative 'api'
+require 'skylab/meta-hell/autoloader/autovivifying'
 
 # @todo: add a feature that is a report of the todos
 
@@ -6,7 +7,7 @@ module Skylab::Issue
 
   class Porcelain
     extend ::Skylab::Porcelain
-    extend ::Skylab::Autoloader
+    extend ::Skylab::MetaHell::Autoloader::Autovivifying
     include Skylab::Porcelain::En
 
     desc "Add an \"issue\" line to #{ISSUES_FILE_NAME}."

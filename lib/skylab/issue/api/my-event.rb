@@ -18,7 +18,7 @@ module Skylab::Issue
       inflection.inflected.noun
     end
     def verb
-      inflection.stem.verb
+      inflection.stems.verb
     end
   end
 end

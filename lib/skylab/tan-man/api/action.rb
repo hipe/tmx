@@ -17,7 +17,6 @@ module Skylab::TanMan
 
     def config
       @config ||= begin
-        require_relative '../models/config'
         Models::Config::Controller.new(self)
       end
     end

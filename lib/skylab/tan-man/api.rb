@@ -1,5 +1,6 @@
 require File.expand_path('../..', __FILE__)
 require 'skylab/face/path-tools'
+require 'skylab/meta-hell/autoloader/autovivifying'
 require 'skylab/porcelain/attribute-definer'
 require 'skylab/porcelain/bleeding'
 require 'skylab/pub-sub/emitter'
@@ -23,6 +24,7 @@ module Skylab::TanMan
   end
 
   module Models
+    extend Skylab::MetaHell::Autoloader::Autovivifying
   end
 
   class << MetaAttributes
@@ -231,7 +233,7 @@ module Skylab::TanMan
     end
     def config
       @config ||= begin
-        require_relative 'models/config'
+        # require_relative 'models/config'
         Models::Config::Singleton.new
       end
     end
