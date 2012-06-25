@@ -10,6 +10,7 @@ module Skylab::Treemap
 
   module API
     extend Skylab::MetaHell::Autoloader::Autovivifying
+    PLUGINS_DIR = dir.dirname.join('plugins')
   end
 
   class API::Client
@@ -24,11 +25,7 @@ module Skylab::Treemap
       o
     end
     def adapters
-      @adapters ||= Skylab::Treemap::Adapter::Collection(
-        Skylab::Treemap::Plugins::TreemapRenderAdapters,
-        Skylab::Treemap.dir.join('plugins/treemap-render-adapters'),
-        'client.rb'
-      )
+      @adapters ||= Skylab::Treemap::Adapter::Collection(Skylab::Treemap::Plugins, API::PLUGINS_DIR, 'client.rb')
     end
   end
 
