@@ -14,8 +14,10 @@ describe Skylab::Autoloader::Inflection do
     yerp "Foo", 'foo', "(the atomic case)"
     yerp "FooBar", 'foo-bar', '(two part single token camel case)'
     yerp "FB", 'fb', '(atomic adjacent upcase)'
-    yerp "CSV::API", 'csv/api', '(this is why we do it this way)'
-    yerp "HTTPRequest", "httprequest", "(however it could stand to be smarter)"
+    yerp "CSV::API", 'csv/api', '(this is what acronyms look like)'
+    yerp "HTTPAuth", "http-auth", '(but wait, look at this, magic! TLA at beginning)'
+    yerp 'topSecretNSA', 'top-secret-nsa', '(TLA at end)'
+    yerp 'WillIAm', 'will-i-am', '(ok, really guys?)'
     yerp "Catch22Pickup", 'catch22pickup', '(numbers whatever this might change)'
     yerp "a::b", 'a/b', '(atomic separators case)'
     yerp "Foo::BarBaz:::Biff", 'foo/bar-baz/:biff', '(garbage in garbage out)'
