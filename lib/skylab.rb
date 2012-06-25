@@ -12,14 +12,14 @@ module Skylab
   # a bit of a mess now until things settle down
   module Autoloader
     def self.extended mod ; mod.autoloader_init!(caller[0]) end
-    include module Constants
+    include module Inflection
       EXTNAME = '.rb'
-      self
-    end
+      extend self
+    end # reopened below
     CALLSTACK_RE = /^(?<path_stem>.+)(?=#{Regexp.escape(EXTNAME)}:\d+:in `)/
     def autoloader_init! caller
       self.dir_path ||= begin
-        guess_dir(to_s,  _p = caller.match(CALLSTACK_RE)[:path_stem]) { |e| fail("Autoloader hack failed: #{e}") }
+        guess_dir(to_s, caller.match(CALLSTACK_RE)[:path_stem]) { |e| fail("Autoloader hack failed: #{e}") }
       end
       class << self
         alias_method :const_missing_before_autoloader, :const_missing
@@ -29,16 +29,17 @@ module Skylab
     def dir ; @dir ||= Pathname.new(dir_path) end
     attr_accessor :dir_path
     PATH_RE = %r{\A(?:(?:(?<rest>|.*[^/])/+)?(?<peek>[^/]*)/+)?(?<curr>[^/]*)/*\z}
-    CONS_RE = %r{\A(?:::)?(?:(?:(?<rest>[^:]+(?:::[^:]+)*)::)?(?<peek>[^:]+)::)?(?<curr>[^:]+)\z}
+    CONST_RE = %r{\A(?:(?<rest>(?:(?!=::).)+)::)?(?:::)?(?<curr>[^:]+)\z}
+    CONST_TOKENIZER = ->(s) { ->() {
+      m = CONST_RE.match(s) and (s, x = m.values_at(1..2)) and Inflection.pathify(x)
+    } }
     def guess_dir const, path, &error
-      prest, ppeek, pcurr = PATH_RE.match(path ).values_at(1..3)
-      cpeek, ccurr = CONS_RE.match(const).values_at(2..3).map { |s| s.gsub(/(?<=[a-z])([A-Z])/){"-#{$1}"}.downcase if s }
-      parts = if ppeek == ccurr       ; [prest, ppeek]                  # a::b     a/b/c   # a/b/b a::b
-      elsif pcurr == ccurr            ; [prest, ppeek, pcurr]           # a::b     a/b     # a     a
-      elsif pcurr == cpeek            ; [prest, ppeek, pcurr, ccurr]    # a::b::c  a/b
-      elsif ppeek && ppeek == cpeek   ; [prest, ppeek, ccurr]           # a::b::d  a/b/f
-      end
-      parts ? parts.compact.join('/') : error.call("failed to infer path for #{const} from #{path}")
+      head, *search = PATH_RE.match(path ).values_at(1..3)
+      search.compact!
+      c = CONST_TOKENIZER.call(const) ; t = found = nil ; past = []
+      past.push(t) while t = c.call and ! found = search.index(t)
+      found ? [ * [head].compact, * search[0..found], * past.reverse ].join('/') :
+        error.call("failed to infer path for #{const} from #{path}")
     end
     def handle_const_missing const
       path = "#{dir_path}/#{pathify const}"
@@ -47,19 +48,15 @@ module Skylab
       const_defined?(const) or fail("#{self}::#{const} was not defined, must be, in #{path}")
       const_get const
     end
-    def no_such_file path, const
-      raise LoadError.new("no such file to load -- #{path}")
-    end
-    include module Inflection ; self end # defined below
+    def no_such_file(path, const) ; raise LoadError.new("no such file to load -- #{path}") end
   end
   module Autoloader::Inflection
-    include Autoloader::Constants
     SANITIZE_PATH_RE = %r{#{Regexp.escape(EXTNAME)}\z|(?<=/)/+|(?<=-)-+|[^-/a-z0-9]+}i
     def constantize path
       path.to_s.gsub(SANITIZE_PATH_RE, '').gsub(%r|/+|, '::').gsub(/(?:(?<=\d)|[_-]|\b)([a-z0-9])/) { $1.upcase }
     end
     def pathify const
-      const.to_s.gsub('::', '/').gsub(/(?<=^|([a-z]))([A-Z])/) { "#{'-' if $1}#{$2}" }.downcase
+      const.to_s.gsub('::', '/').gsub(/(?<=[a-z])([A-Z])|(?<=[A-Z])([A-Z][a-z])/) { "-#{$1 || $2}" }.downcase
     end
   end
 end

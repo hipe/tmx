@@ -24,6 +24,8 @@ describe Skylab::Autoloader do
     with "tm/cli", "TM::CLI::Actions", "tm/cli/actions", "(infer one level down, representative case)"
     with "sl/issue/api", "SL::Issue::Models", "sl/issue/models", "(one up and one down)"
     with 'sl/test-support/test-support', 'SL::TestSupport', 'sl/test-support', "(double deuce)"
+    with 'a/b/some-lib/client.rb', "Baz::SomeLib::CSV::Action", 'a/b/some-lib/csv/action', '(deeper)'
+    with "poo/bah", "Poo::Bah::Bizzle::Bazzle::HTTPAuth", 'poo/bah/bizzle/bazzle/http-auth', '(infer 3 deep)'
   end
   context "may fail" do
     let(:subject) do
@@ -37,7 +39,6 @@ describe Skylab::Autoloader do
       end
     end
     bunk "foo", 'Bar', /failed.*infer.*Bar.*foo/
-    bunk "poo/bah", "Poo::Bah::Bizzle::Bazzle", /failed.*Bazzle.*poo\/bah/
   end
 end
 
