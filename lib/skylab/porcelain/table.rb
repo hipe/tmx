@@ -200,7 +200,7 @@ module Skylab::Porcelain::Table
     end
   end
 
-  class << ::Skylab::Porcelain
+  module RenderTable
     def build_table_columns_inferences_aggregator
       Columns::ViewModelAggregator.new
     end
@@ -220,7 +220,7 @@ module Skylab::Porcelain::Table
         @fields = {}
       end
     end
-    def table row_enumerator, opts=nil
+    def render_table row_enumerator, opts=nil
       o = OnTable.new
       opts and opts.each { |k, v| o.send("#{k}=", v) }
       if block_given? then yield(o) else

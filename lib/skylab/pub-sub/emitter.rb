@@ -24,7 +24,7 @@ module Skylab::PubSub
     alias_method :event_class, :'event_class=' #!
     def event_cloud
       @event_cloud ||= begin
-        if (k = ancestors[self == ancestors.first ? 1 : 0]).respond_to?(:event_cloud)
+        if k = ancestors[(self == ancestors.first ? 1 : 0) .. -3].detect { |m| m.kind_of?(::Class) and m.respond_to?(:event_cloud) }
           SemanticTagCloud.new(k.event_cloud)
         else
           SemanticTagCloud.new
