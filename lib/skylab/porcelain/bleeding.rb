@@ -100,7 +100,7 @@ module Skylab::Porcelain::Bleeding
       token or return e.emit(:not_provided, exp)
       found or return e.emit(:not_found, "invalid command #{token.inspect}. #{exp}")
       found.size > 1 and return e.emit(:ambiguous, "ambiguous comand #{token.inspect}. " <<
-        "did you mean #{oxford_comma found.map { |k| "#{pre k.name}" }}?")
+        "did you mean #{self.or found.map { |k| "#{pre k.name}" }}?")
       found.first
     end
     def help_invite o
@@ -176,7 +176,7 @@ module Skylab::Porcelain::Bleeding
       end.join(' ')
     end
   end
-  class OptionSyntax < Struct.new(:definitions, :documentor_class, :parser_class)
+  class OptionSyntax < Struct.new(:definitions, :documentor_class, :parser_class, :help_enabled)
     include Styles
     def any?
       definitions.any?
@@ -204,8 +204,8 @@ module Skylab::Porcelain::Bleeding
       @documentor = nil
     end
     def parse! argv, args, transaction
-      definitions.empty? and return true
-      args.push(req = {})
+      definitions.any? or help_enabled or return true
+      args.push(req = {}) if definitions.any?
       ret = true
       begin
         parser_class.new do |o|
@@ -307,8 +307,10 @@ module Skylab::Porcelain::Bleeding
           action_collections.each do |col|
             if col != self and col.respond_to?(meth)
               col.send(meth).each { |x| y << x }
+            elsif col.respond_to?(:constants)
+              col.constants.each { |k| y << col.const_get(k) }
             else
-              col.constants.each { |k| y << col.const_get(k) } # the default assumption is a module
+              fail("expected action collection to respond to `#{meth}`, `each`, or `constants`: #{col}")
             end
           end
         end

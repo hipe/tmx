@@ -27,7 +27,7 @@ module Skylab::Treemap
         names
       end
       subject { names }
-      specify { should be_include('install') }
+      specify { should be_include('render') }
     end
   end
 end

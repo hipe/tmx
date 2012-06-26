@@ -92,14 +92,34 @@ module Skylab::Treemap
       end
     end
     def plugin_action_collections
-      return []
-      @plugin_action_collections_cache ||= begin
+      @plugin_action_collections ||= begin
+        cache = {}
+        Enumerator.new do |y|
+          API::Client.instance.adapters.with(:cli_actions).each do |adapter|
+            y << CLI::NameWrapper.new(adapter, ->(n) { "#{adapter.name}-#{n}" }, cache)
+          end
+        end
       end
     end
     def porcelain # @todo #100.200 not here
       self
     end
     attr_accessor :runtime_instance_settings
+  end
+end
+
+module Skylab::Treemap
+  class CLI::NameWrapper < Struct.new(:adapter, :prok, :cache)
+    %w(action_names action_helps).each do |method|
+      define_method(method) do
+        Enumerator.new do |y|
+          wrap = cache[adapter.name] ||= Treemap::MetaHell::Proxy.new( :name => prok ).new
+          adapter.cli_action_collection.send(method).each do |act|
+            y << wrap.upstream!(act)
+          end
+        end
+      end
+    end
   end
 end
 

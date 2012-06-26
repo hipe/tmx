@@ -1,11 +1,18 @@
 require 'skylab/interface/system'
+require 'skylab/meta-hell/autoloader/autovivifying'
 
-module Skylab::Treemap::Plugins::TreemapRenderAdapters
+module Skylab::Treemap::Plugins
 
   API = Skylab::Treemap::API
 
   module R
     extend Skylab::Autoloader
+    module CLI
+      module Actions
+        extend Skylab::MetaHell::Autoloader::Autovivifying
+        extend Skylab::Porcelain::Bleeding::Stubs
+      end
+    end
   end
 
   class R::Client

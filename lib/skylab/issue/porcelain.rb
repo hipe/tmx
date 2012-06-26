@@ -72,7 +72,7 @@ module Skylab::Issue
     option_syntax do |o|
       d = Api::Todo::Report.attributes.with(:default)
 
-      on('--pattern <PATTERN>',
+      on('-p', '--pattern <PATTERN>',
         "the todo pattern to use (default: '#{d[:pattern]}')"
         ) { |p| o[:pattern] = p }
       on('--name <NAME>',
