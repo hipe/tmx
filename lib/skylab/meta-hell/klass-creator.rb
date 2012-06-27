@@ -1,5 +1,5 @@
-module Skylab::TestSupport
-  module MetaPit
+module Skylab::MetaHell
+  module KlassCreator
     def klass(full_name, opts={}, &block)
       opts = opts.dup
       extends = opts.delete(:extends)
