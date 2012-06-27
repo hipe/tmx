@@ -86,22 +86,23 @@ module Skylab::Porcelain::Bleeding
   module NamespaceInstanceMethods ; extend DelegatesTo
     include ActionInstanceMethods
     delegates_to :action, :action_syntax, :action_names, :action_helps
-    def find token
-      yield(e = OnFind.new)
-      found = nil
-      if token
-        matcher = /^#{Regexp.escape(token)}/
-        action_names.each do |kls|
-          kls.name == token and found = [kls] and break;
-          kls.names.detect { |n| matcher =~ n } and (found ||= []).push(kls)
+    def find token, &on_find_error
+      e = OnFind.new(on_find_error) ; matched = [] ; action = nil
+      token or return e.emit(:not_provided, "expecting #{action_syntax}")
+      matcher = /^#{Regexp.escape(token)}/
+      action_names.each do |act|
+        first_match = act.names.grep(matcher).reduce do |_first_match, name|
+          name == token and return act # first whole match always wins
+          _first_match # we only want any one of these per action
+        end and begin
+          matched.push(first_match) ; action = act
         end
       end
-      found or exp = "expecting #{action_syntax}"
-      token or return e.emit(:not_provided, exp)
-      found or return e.emit(:not_found, "invalid command #{token.inspect}. #{exp}")
-      found.size > 1 and return e.emit(:ambiguous, "ambiguous comand #{token.inspect}. " <<
-        "did you mean #{self.or found.map { |k| "#{pre k.name}" }}?")
-      found.first
+      case matched.size
+      when 0 ; e.emit(:not_found, "invalid command #{token.inspect}. expecting #{action_syntax}")
+      when 1 ; action # fuzzy match with only one match
+      else   ; e.emit(:ambiguous, "ambiguous comand #{token.inspect}. " <<
+                      "did you mean #{self.or matched.map{|n| "#{pre n}"}}?") end
     end
     def help_invite o
       a, b = if o[:full] then ['<action>',   " on a particular action."]
@@ -247,7 +248,7 @@ module Skylab::Porcelain::Bleeding
       a.size.zero? ? (@desc ||= nil) : (@desc ||= []).concat(a)
     end
     def name
-      action_name # allows more flexibility than an alias
+      action_name # allows more flexibility than an alias_method
     end
     def names
       [name, *aliases]
