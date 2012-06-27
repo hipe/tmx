@@ -134,7 +134,7 @@ module Skylab::Face
         "#{@parent.invocation_string} #{name}"
       end
       def parent= parent
-        @parent and fail("won't overwrite existing parent")
+        (@parent ||= nil) and fail("won't overwrite existing parent")
         @parent = parent
       end
       def usage msg=nil
@@ -194,7 +194,7 @@ module Skylab::Face
         @command_definitions ||= []
       end
       def method_added name
-        if @grab_next_method
+        if (@grab_next_method ||= nil)
           command_definitions.last[1][0] = name.to_sym
           @grab_next_method = false
         end
@@ -202,7 +202,7 @@ module Skylab::Face
       def option_parser *a, &b
         block_given? or raise ArgumentError.new("block required")
         if a.empty?
-          @grab_next_method and fail("can't have two anonymous " <<
+          (@grab_next_method ||= nil) and fail("can't have two anonymous " <<
           "command definitions in a row.")
           @grab_next_method = true
           a = [nil]
@@ -276,7 +276,7 @@ module Skylab::Face
         end
       end
       def option_parser
-        @option_parser.nil? or return @option_parser
+        ! instance_variable_defined?('@option_parser') || @option_parser.nil? or return @option_parser
         op = build_empty_option_parser
         op.banner = usage_string
         if interface.option_definitions.any?
@@ -369,10 +369,11 @@ module Skylab::Face
           @definitions
         end
         def parent= parent
-          @parent and fail("won't overwrite parent")
+          instance_variable_defined?('@parent') && @parent and fail("won't overwrite parent")
           @parent = parent
         end
         def summary *a
+          @summary ||= nil
           a.any? ? (@summary = a) : (@summary || summary_of_commands)
         end
         def summary_of_commands

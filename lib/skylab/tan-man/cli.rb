@@ -1,4 +1,5 @@
 require File.expand_path('../api', __FILE__)
+require 'skylab/porcelain/core'
 
 module Skylab::TanMan
 
@@ -35,7 +36,7 @@ module Skylab::TanMan
 
     include Api::RuntimeExtensions
 
-    emits EVENT_GRAPH
+    emits(:out, EVENT_GRAPH)
     event_class Api::Event
 
     alias_method :action_class, :class
@@ -106,8 +107,8 @@ module Skylab::TanMan
 
   class Cli::Actions::Status < Cli::Action
     desc "show the status of the config director{y|ies} active at the path."
+    include Porcelain::Table::RenderTable
     def execute path=nil
-      require 'skylab/porcelain/table'
       path ||= FileUtils.pwd
       groups = Hash.new { |h, k| h[k] = [] }
       ee = api.invoke(path: path)
@@ -119,7 +120,7 @@ module Skylab::TanMan
         table.push [[:header, k], e.first.message]
         table.concat( e[1..-1].map{ |x| [nil, x.message] } )
       end
-      Porcelain.table(table, separator: '  ') do |o|
+      render_table(table, separator: '  ') do |o|
         o.field(:header).format { |x| hdr x }
         o.on_all { |e| emit(:out, e) }
       end
@@ -159,10 +160,10 @@ module Skylab::TanMan
     option_syntax do |h|
       on('-v', '--verbose', "show more fields.") { h[:verbose] = true }
     end
+    include Porcelain::Table::RenderTable
     def execute opts
-      require 'skylab/porcelain/table'
       table = api.invoke(opts) or return false
-      Porcelain.table(table, separator: '  ') do |o|
+      render_table(table, separator: '  ') do |o|
         o.field(:resource_label).format { |x| "(resource: #{x})" }
         o.on_empty do |e|
           e.touch!
