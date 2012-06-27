@@ -1,5 +1,8 @@
 module Skylab::MetaHell
   module KlassCreator
+    def self.extended mod
+      mod.send(:include, ::Skylab::MetaHell::ModulCreator::InstanceMethods)
+    end
     def klass(full_name, opts={}, &block)
       opts = opts.dup
       extends = opts.delete(:extends)
@@ -8,15 +11,7 @@ module Skylab::MetaHell
         superclass = extends ? send(extends) : nil
         parts = full_name.to_s.split('__')
         klass_name = parts.pop
-        mod = parts.reduce(base_module) do |mod, part|
-          unless mod.const_defined?(part)
-            mod.const_set(part, Module.new.tap { |m|
-              _my_name = mod == base_module ? part.to_s : "#{mod}::#{part}"
-              m.singleton_class.send(:define_method, :to_s) { _my_name }
-            })
-          end
-          mod.const_get(part)
-        end
+        mod = build_module(parts)
         mod.const_set(klass_name, Class.new(*[superclass].compact).tap { |k|
           _my_name = mod == base_module ? full_name.to_s : "#{mod}::#{klass_name}"
           k.singleton_class.send(:define_method, :to_s) { _my_name }

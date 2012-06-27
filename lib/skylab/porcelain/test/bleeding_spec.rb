@@ -1,8 +1,7 @@
 require_relative '../core'
-require_relative 'test-support'
+require_relative 'bleeding/test-support'
 
 module Skylab::Porcelain::Bleeding::TestSupport
-  Bleeding = Skylab::Porcelain::Bleeding
   describe Bleeding::OptionSyntax do
     extend Skylab::MetaHell::KlassCreator
     let(:base_module) { Module.new }

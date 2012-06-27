@@ -59,7 +59,7 @@ module Skylab::Porcelain::En
     end
   end
   describe "the industrious action class" do
-    extend TestSupport
+    extend ::Skylab::MetaHell::KlassCreator
     let(:base_module) { Module.new }
     klass :MyAwesomeAction do
       extend ApiActionInflectionHack
