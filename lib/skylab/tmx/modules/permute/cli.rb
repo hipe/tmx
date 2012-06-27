@@ -1,8 +1,11 @@
 require 'skylab/permute/cli'
 
-module Skylab::Tmx::Modules::Permute
-  class Cli < Skylab::Face::Cli
-    namespace :permute, ::Skylab::Permute::Cli
+module Skylab
+  module Tmx
+    module Permute
+      extend ::Skylab::Porcelain
+      namespace :permute, ::Skylab::Permute::CLI
+    end
   end
 end
 
