@@ -4,7 +4,7 @@ require_relative 'test-support'
 module Skylab::Porcelain::Bleeding::TestSupport
   Bleeding = Skylab::Porcelain::Bleeding
   describe Bleeding::OptionSyntax do
-    extend Skylab::TestSupport::MetaPit
+    extend Skylab::MetaHell::KlassCreator
     let(:base_module) { Module.new }
 
     klass :Alpha do

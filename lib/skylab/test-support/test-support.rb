@@ -1,4 +1,5 @@
 require File.expand_path('../../../skylab', __FILE__)
+require_relative '../meta-hell/core'
 
 class String
   def unindent
