@@ -8,20 +8,35 @@ module Skylab
 end
 
 module Skylab::Porcelain::En::Number
+  def num2ord x
+    return x unless x % 1 == 0 && x > 0 # positive integers only
+    mod = x % (m = 100)
+    if mod >= ARR.length and !(13..19).include?(mod)
+      mod = x % (m = 10)
+    end
+    if mod < ARR.length && ARR[mod].length >= 2
+      [ number( x / m * m), ARR[mod][2] ? ARR[mod][1] : "#{ARR[mod].last}th" ].compact.join(' ')
+    else
+      number(x).sub(/ty$/, 'tie').concat('th')
+    end
+  end
+end
+
+module Skylab::Porcelain::En::Number
   ARR = [
     %w(zero),
-    %w(one first),
-    %w(two twen),
-    %w(three thir),
+    %w(one first x),
+    %w(two second twen),
+    %w(three third thir),
     %w(four for),
     %w(five fif),
     %w(six),
     %w(seven),
     %w(eight eigh),
-    %w(nine),
+    %w(nine nin),
     %w(ten),
     %w(eleven),
-    %w(twelve)
+    %w(twelve twelf)
   ]
   BIG = [nil, nil, nil, 'hundred', 'thousand', nil, nil, 'million', nil, nil, 'billion'] # etc
   def number x
@@ -41,13 +56,21 @@ end
 
 if __FILE__ == $PROGRAM_NAME
   include Skylab::Porcelain::En::Number
-  print = ->(x) { $stderr.puts("#{'%9d' % [x]}:-->#{number(x)}<--") }
-  (0..9).each(&print)
-  (10..19).each(&print)
-  [20, 21, 29].each(&print)
-  [30, 31, 40, 50, 60, 70, 80, 90, 99].each(&print)
-  [100, 101, 200, 203, 300, 399, 827, 998, 999].each(&print)
-  [1000, 1001, 1423, 1900, 1999, 2000, 2001].each(&print)
-  [42388].each(&print)
-  [7000_000_000_000_000_000_000_000].each(&print)
+  method = nil
+  print = ->(x) { $stderr.puts("#{'%9d' % [x]}:-->#{method.call(x)}<--") }
+  [
+    ->(x) { number(x) },
+    ->(x) { num2ord(x) }
+  ].each do |m|
+    method = m
+    (0..9).each(&print)
+    (10..13).each(&print)
+    (14..19).each(&print)
+    [20, 21, 22, 23, 24, 25, 26, 27, 28, 29].each(&print)
+    [30, 31, 40, 50, 60, 70, 80, 90, 99].each(&print)
+    [100, 101, 200, 203, 300, 399, 827, 998, 999].each(&print)
+    [1000, 1001, 1423, 1900, 1999, 2000, 2001].each(&print)
+    [42388].each(&print)
+    [7000_000_000_000_000_000_000_000].each(&print)
+  end
 end
