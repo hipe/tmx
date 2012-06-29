@@ -453,7 +453,7 @@ module Skylab::Porcelain
       end
     end
     def option_parser_parse! argv
-      if @option_parser
+      if (@option_parser ||= nil)
         if @rebuild
           @option_parser = nil
         else

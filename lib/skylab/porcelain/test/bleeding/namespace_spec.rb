@@ -2,30 +2,10 @@ require_relative '../../core'
 require_relative 'test-support'
 
 
-RSpec::Matchers.define(:be_event) do |*a|
-  match do |actual|
-    ok = true
-    checked_count = false
-    a.each do |mixed|
-      case mixed
-      when String ; actual.last.message == mixed or ok = false
-      when Symbol ; actual.last.type == mixed or ok = false
-      when Regexp ; actual.last.message =~ mixed or ok = false
-      else        ; fail("no: #{mixed.inspect}")
-      end
-    end
-    unless checked_count
-      1 == actual.length or ok = false
-    end
-    ok
-  end
-end
-
 module ::Skylab::Porcelain::Bleeding::TestSupport
   class MyAction
     extend Bleeding::Action
   end
-  SimplifiedEvent = Struct.new(:type, :message)
   describe "#{Bleeding::Namespace} resolving names" do
     include Porcelain::TiteColor # unstylize
     extend ::Skylab::MetaHell::ModulCreator

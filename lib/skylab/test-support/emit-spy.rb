@@ -8,6 +8,10 @@ module Skylab::TestSupport
       self.formatter ||= ->(e){ e.to_s }
       self
     end
+    def no_debug!
+      self.do_debug = false
+      self
+    end
     def emit *payload
       do_debug and $stderr.puts(formatter.call(*payload))
       1 == payload.length and payload = payload.first # could become an option
