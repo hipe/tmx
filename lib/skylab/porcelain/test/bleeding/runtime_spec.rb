@@ -38,7 +38,7 @@ module ::Skylab::Porcelain::Bleeding::TestSupport
           end
           class o::Actions::Act2 < o::MyAction
             desc 'fooibles your dooibles'
-            def execute fizzle, bazzle
+            def invoke fizzle, bazzle
               "yerp: #{fizzle.inspect} #{bazzle.inspect}"
             end
           end
@@ -112,14 +112,14 @@ module ::Skylab::Porcelain::Bleeding::TestSupport
           class o::Actions::Pony::Create < o::MyAction
           end
           class o::Actions::Pony::PutDown < o::MyAction
-            def execute oingo=nil, boingo
+            def invoke oingo=nil, boingo
               emit(:ze_payload, "yerp-->#{oingo.inspect}<-->#{boingo.inspect}<--")
               :you_put_down_the_pony
             end
           end
           class o::Actions::Pony::PutUp < o::MyAction
             option_syntax.help_enabled = true
-            def execute
+            def invoke
               emit(:mein_payload, "yoip")
             end
           end
@@ -168,7 +168,6 @@ module ::Skylab::Porcelain::Bleeding::TestSupport
             context "just it does cute sytax thing" do
               before(:all) { _emit_spy.no_debug! ; @subject = emit_spy.stack }
               argv  'pony', 'put-d'
-              it "should use invoke() not execute() as the main doo-hah"
               specify { should be_event(0, :syntax_error, /missing.+argument.+boingo/i) }
               specify { should be_event(1, _USAGE) }
               specify { should be_event(2, /try DORP pony put-down -h for help/i) }

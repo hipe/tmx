@@ -40,9 +40,6 @@ module Skylab::Porcelain::Bleeding
     def emit _, *a
       @runtime.emit _, *a
     end
-    def execution_method
-      method :execute
-    end
     def help o={}
       emit(:help, o[:message]) if o[:message]
       if o[:invite_only] then help_invite(o) ; return nil end
@@ -69,6 +66,9 @@ module Skylab::Porcelain::Bleeding
       emit :help, "#{hdr 'usage:'} #{program_name} #{syntax}"
     end
     alias_method :initialize, :action_init
+    def invocation_method
+      method :invoke
+    end
     delegates_to :action, :option_syntax
     delegates_to :runtime, :program_name
     def resolve! argv
@@ -147,7 +147,7 @@ module Skylab::Porcelain::Bleeding
       @string = nil
     end
     def parse! argv, args, transaction
-      meth = transaction.execution_method
+      meth = transaction.invocation_method
       parameters = meth.parameters
       transaction.option_syntax.any? and parameters.pop # ick
       count = Hash.new { |h, k| h[k] = 0 }
@@ -265,7 +265,7 @@ module Skylab::Porcelain::Bleeding
       redefine.call(self, klass)
     end
     def parameters
-      instance_method(:execute).parameters
+      instance_method(:invoke).parameters
     end
     def summary &b
       if b                     ; @summary = b
@@ -394,7 +394,7 @@ module Skylab::Porcelain::Bleeding
       nil
     end
 
-    def execute action_name=nil
+    def invoke action_name=nil
       action_name ? action_help(action_name) : runtime.help(full: true)
     end
   end
