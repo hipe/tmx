@@ -1,5 +1,5 @@
-require_relative '../core'
-require_relative 'bleeding/test-support'
+require_relative '../../core'
+require_relative '../bleeding/test-support'
 
 module Skylab::Porcelain::Bleeding::TestSupport
   describe Bleeding::OptionSyntax do
