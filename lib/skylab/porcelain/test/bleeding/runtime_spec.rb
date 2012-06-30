@@ -12,6 +12,9 @@ module ::Skylab::Porcelain::Bleeding::TestSupport
   end
   describe "#{Bleeding::Runtime}" do
     include ::Skylab::MetaHell::KlassCreator::InstanceMethods
+    def self.argv *argv
+      let(:argv) { argv }
+    end
     attr_reader :cli_runtime
     let(:_emit_spy) { ::Skylab::TestSupport::EmitSpy.new }
     let(:emit_spy) do
@@ -49,19 +52,19 @@ module ::Skylab::Porcelain::Bleeding::TestSupport
       end
       context "with no args" do
         before(:all) { _emit_spy.no_debug! ; @subject = emit_spy.stack }
-        let(:argv) { [] }
+        argv
         specify { should be_event(0, :help, /expecting.+act1.+act2/i) }
         instance_eval(&should_usage_invite)
       end
       context "with bad args" do
         before(:all) { _emit_spy.no_debug! ; @subject = emit_spy.stack }
-        let(:argv) { ['foo', 'bar'] }
+        argv 'foo', 'bar'
         specify { should be_event(0, :help, /invalid command.+foo.+expecting.+act1.+act2/i) }
         instance_eval(&should_usage_invite)
       end
       context "with bad opts" do
         before(:all) { _emit_spy.no_debug! ; @subject = emit_spy.stack }
-        let(:argv) { ['-x'] }
+        argv '-x'
         specify { should be_event(0, :help, /invalid command "-x"/i) }
       end
       def self.should_show_index
@@ -72,23 +75,23 @@ module ::Skylab::Porcelain::Bleeding::TestSupport
       end
       context "-h" do
         before(:all) { _emit_spy.no_debug! ; @subject = emit_spy.stack }
-        let(:argv) { ['-h'] }
+        argv '-h'
         should_show_index
       end
       context "help" do
         before(:all) { _emit_spy.no_debug! ; @subject = emit_spy.stack }
-        let(:argv) { ['help'] }
+        argv 'help'
         should_show_index
       end
       context "-h <valid action>" do
         before(:all) { _emit_spy.no_debug! ; @subject = emit_spy.stack }
-        let(:argv) { ['-h', 'act2' ] }
+        argv '-h', 'act2'
         specify { should be_event(0, "usage: DORP act2 <fizzle> <bazzle>") }
         specify { should be_event(1, "description: fooibles your dooibles") }
       end
       context "-h <invalid action>" do
         before(:all) { _emit_spy.no_debug! ; @subject = emit_spy.stack }
-        let(:argv) { ['-h', 'whatevr' ] }
+        argv '-h', 'whatevr'
         specify { should be_event(0, /invalid command.+whatevr.+expecting.+act1.+act2/i) }
         specify { should be_event(1, nil) }
       end
@@ -124,7 +127,7 @@ module ::Skylab::Porcelain::Bleeding::TestSupport
       end
       context "just it" do
         before(:all) { _emit_spy.no_debug! ; @subject = emit_spy.stack }
-        let(:argv) { [ 'pony' ] }
+        argv  'pony'
         it "shouldn't actually require an extended module as a namespace, just a plain module @todo"
          specify { should be_event(0, /expecting.+create.+put-down/i) }
       end
@@ -139,24 +142,24 @@ module ::Skylab::Porcelain::Bleeding::TestSupport
         context "with a bad name" do
           context "just it" do
             before(:all) { _emit_spy.no_debug! ; @subject = emit_spy.stack }
-            let(:argv) { [ 'pony', 'nerk' ] }
+            argv  'pony', 'nerk'
             specify { should be_event(0, _INVALID_EXPECTING) }
             it "should be consistent in its use of the term {action|command} @todo"
           end
           context "-h it" do
             before(:all) { _emit_spy.no_debug! ; @subject = emit_spy.stack }
-            let(:argv) { ['pony', '-h', 'nerk'] }
+            argv 'pony', '-h', 'nerk'
             specify { should be_event(0, :error, _INVALID_EXPECTING) }
           end
           context "it -h" do
             before(:all) { _emit_spy.no_debug! ; @subject = emit_spy.stack }
-            let(:argv) { ['pony', 'nerk', '-h'] }
+            argv 'pony', 'nerk', '-h'
             specify { should be_event(0, :help, _INVALID_EXPECTING) }
           end
         end
         context "with an amibiguous name" do
           before(:all) { _emit_spy.no_debug! ; @subject = emit_spy.stack }
-          let(:argv) { ['pony', 'put'] }
+          argv 'pony', 'put'
           specify { should be_event(0, :help, /ambiguous comand .+put.+did you mean put-down or put-up\?/i) }
         end
         context "with a good name" do
@@ -164,7 +167,7 @@ module ::Skylab::Porcelain::Bleeding::TestSupport
             _USAGE = /usage.+DORP pony put-down \[<oingo>\] <boingo>/i
             context "just it does cute sytax thing" do
               before(:all) { _emit_spy.no_debug! ; @subject = emit_spy.stack }
-              let(:argv) { [ 'pony', 'put-d' ] }
+              argv  'pony', 'put-d'
               it "should use invoke() not execute() as the main doo-hah"
               specify { should be_event(0, :syntax_error, /missing.+argument.+boingo/i) }
               specify { should be_event(1, _USAGE) }
@@ -172,13 +175,13 @@ module ::Skylab::Porcelain::Bleeding::TestSupport
             end
             context "-h it" do
               before(:all) { _emit_spy.no_debug! ; @subject = emit_spy.stack }
-              let(:argv) { ['pony', '-h', 'put-d'] }
+              argv 'pony', '-h', 'put-d'
               specify { should be_event(0, :help, _USAGE) }
               specify { should be_event(1, nil) }
             end
             context "it -h out of the box will process it as an arg" do
               before(:all) { _emit_spy.no_debug! ; @subject = emit_spy.stack }
-              let(:argv) { ['pony', 'put-d', '-h'] }
+              argv 'pony', 'put-d', '-h'
               specify { should be_event(0, :ze_payload, 'yerp-->nil<-->"-h"<--') }
               specify { should be_event(1, nil) }
             end
@@ -187,13 +190,13 @@ module ::Skylab::Porcelain::Bleeding::TestSupport
             _TRAILING_SPACE = "usage: DORP pony put-up "
             context "it -h" do
               before(:all) { _emit_spy.no_debug! ; @subject = emit_spy.stack }
-              let(:argv) { ['pony', 'put-up', '-h'] }
+              argv 'pony', 'put-up', '-h'
               it "fix trailing space @todo"
               specify { should be_event(:help, _TRAILING_SPACE) }
             end
             context "-h it" do
-              before(:all) { _emit_spy.debug! ; @subject = emit_spy.stack }
-              let(:argv) { ['pony', '-h', 'put-up'] }
+              before(:all) { _emit_spy.no_debug! ; @subject = emit_spy.stack }
+              argv 'pony', '-h', 'put-up'
               specify { should be_event(:help, _TRAILING_SPACE) }
             end
           end
