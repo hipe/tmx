@@ -5,9 +5,7 @@ module Skylab::MetaHell
     end
     def modul full_name, &block
       let(full_name) do
-        mod = build_module(full_name.to_s.split('__'))
-        mod.module_eval(&block)
-        mod
+        modul(full_name, &block)
       end
     end
   end
@@ -22,6 +20,11 @@ module Skylab::MetaHell
         end
         mod.const_get(part)
       end
+    end
+    def modul full_name, &body
+      mod = build_module(full_name.to_s.split('__'))
+      mod.module_eval(&body)
+      mod
     end
   end
 end

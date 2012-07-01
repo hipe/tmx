@@ -64,7 +64,61 @@ module Skylab::Porcelain::Bleeding::TestSupport
       fails.join('. ')
     end
     description do
-      'emit{{pos}}{{type}}{{msg}}'.gsub(/{{((?:(?!}})[^{])+)}}/) { " #{desc[$1.intern]}" if desc[$1.intern] }.strip
+      'emit{{pos}}{{type}}{{msg}}'.gsub(/{{((?:(?!}})[^{])+)}}/) do
+        " #{desc[$1.intern]}" if desc[$1.intern]
+      end.strip
+    end
+  end
+  last_number = 0
+  BUILD_NAMESPACE_RUNTIME = ->(_) do
+    @base_module = ::Module.new
+    ::Skylab::Porcelain::Bleeding.const_set("Xyzzy#{last_number += 1}", @base_module)
+    @nermsperce = m = modul(:MyActions, &namespace_body)
+    m = modul(:MyActions, &namespace_body)
+    ns = Bleeding::InferredNamespace.new(m)
+    rt = ::Skylab::TestSupport::EmitSpy.new { |e| "#{e.type.inspect}<-->#{e.message.inspect}" } # add debug!
+    # ns.build(rt).object_id == ns.object_id or fail("handle this")
+    [ns, rt]
+  end
+  module ModuleMethods
+    include ::Skylab::MetaHell::KlassCreator
+    def events &specify_body
+      specify(&specify_body)
+      tok = @last_token
+      once = ->(_) do
+        ns, rt = instance_eval(&BUILD_NAMESPACE_RUNTIME)
+        ns.find(tok) { |o| o.on_error { |e| rt.emit(SimplifiedEvent.new(e.type, unstylize(e.message))) } }
+        _use = rt.stack
+        (once = ->(_) { _use }).call(nil)
+      end
+      let(:subject) { instance_eval(&once) }
+    end
+    def namespace &b
+      let(:namespace_body) { b }
+    end
+    def result &specify_body
+      tok = @last_token
+      once = ->(_) do
+        ns, rt = instance_eval(&BUILD_NAMESPACE_RUNTIME)
+        _res = ns.find(tok) { |o| o.on_error { |e| $stderr.puts("EXpecting no events here (xyzzy) #{e}") } }
+        (once = ->(_) { _res }).call(nil)
+      end
+      let(:subject) { instance_eval(&once) }
+      specify do
+        instance_eval(&once) # this must be run before the body of the specify block is evaluated
+        instance_exec(&specify_body)
+      end
+    end
+    def token tok
+      @last_token = tok
+    end
+  end
+  module InstanceMethods
+    include ::Skylab::MetaHell::ModulCreator::InstanceMethods
+    include ::Skylab::Porcelain::TiteColor # unstylize
+    attr_reader :base_module
+    def namespace
+      @nermsperce
     end
   end
 end

@@ -115,7 +115,7 @@ module Skylab::Porcelain::Bleeding
       }))
     end
   end
-  ON_FIND = ::Skylab::PubSub::Emitter.new(:error, :ambiguous => :error, :not_found => :error, :not_provided => :error)
+  ON_FIND = ::Skylab::PubSub::Emitter.new(:error, ambiguous: :error, not_found: :error, not_provided: :error)
   module NamespaceInstanceMethods
     include ActionInstanceMethods
     def find token, &error
