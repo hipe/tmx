@@ -1,47 +1,50 @@
-require  File.expand_path('../..', __FILE__)
+require_relative '..'
+require_relative 'core'
 require 'skylab/pub-sub/emitter'
-require 'skylab/porcelain/tite-color'
-require 'skylab/porcelain/en'
 require 'optparse'
 
 module Skylab::Porcelain::Bleeding
-  extend Skylab::Autoloader
-  module DelegatesTo
-    def delegates_to fulfiller, *methods
-      methods.each { |m| define_method(m) { |*a, &b| send(fulfiller).send(m, *a, &b) } }
-    end
-  end
+  extend ::Skylab::Autoloader
   module Styles
-    include Skylab::Porcelain::En
-    include Skylab::Porcelain::TiteColor
+    include ::Skylab::Porcelain::En
+    include ::Skylab::Porcelain::TiteColor
     extend self
     def em(s)  ; stylize(s, :green         )   end
     def hdr(s) ; stylize(s, :strong, :green)   end
     alias_method :pre, :em
   end
-  class ActionEnumerator < Enumerator
-    def filter &b
-      self.class.new { |y| each { |*a| b.call(y, *a) } }
+  module MetaInstanceMethods
+    def aliases_inferred
+      [reflector.to_s.match(/[^:]+$/)[0].gsub(/(?<=[a-z])([A-Z])/) { "-#{$1}" }.downcase]
     end
-    def visible
-      filter { |y, a| y << a if a.visible? }
+    alias_method :aliases, :aliases_inferred
+    def desc
+      []
+    end
+    def summary
+      if desc
+        desc[0..2]
+      else
+        ['fuct up generated summary'] # @todo
+      end
+    end
+    def visible?
+      true
     end
   end
-  EVENT_GRAPH = { :error => :all, :ambiguous => :error, :not_found => :error, :not_provided => :error,
-    :syntax_error => :error, :optparse_parse_error => :error, :help => :all } # didactic
-  module ActionInstanceMethods ; extend DelegatesTo
+  module ActionInstanceMethods
     include Styles
-    alias_method :action, :class
-    def action_init runtime
-      @runtime = runtime
+    def argument_syntax
+      @argument_syntax ||= ArgumentSyntax.new(self)
     end
-    delegates_to :action, :argument_syntax
-    delegates_to :action, :desc
-    def emit _, *a
-      @runtime.emit _, *a
+    def bound_invocation_method
+      method(:invoke)
     end
-    def execution_method
-      method :execute
+    def emit *a
+      if ! @parent
+        fail("WHERE IS PARENT IN THIS #{self.class}:\n#{self.inspect}")
+      end
+      @parent.emit(*a)
     end
     def help o={}
       emit(:help, o[:message]) if o[:message]
@@ -60,48 +63,77 @@ module Skylab::Porcelain::Bleeding
       end if desc
     end
     def help_invite o={}
-      emit(:help, "try #{pre "#{program_name} #{action.name} -h"}#{o[:for] || ' for help'}") unless o[:full]
+      emit(:help, "try #{pre "#{program_name} -h"}#{o[:for] || ' for help'}") unless o[:full]
     end
     def help_list
-      option_syntax.any? and option_syntax.help(runtime)
+      option_syntax.any? and option_syntax.help(@parent)
     end
     def help_usage o
-      emit :help, "#{hdr 'usage:'} #{program_name} #{syntax}"
+      emit :help, "#{hdr 'usage:'} #{program_name} #{syntax}".strip
     end
-    alias_method :initialize, :action_init
-    delegates_to :action, :option_syntax
-    delegates_to :runtime, :program_name
-    def resolve! argv
+    def option_syntax
+      @option_syntax ||= option_syntax_class.build
+    end
+    def option_syntax_class
+      OptionSyntax
+    end
+    def parameters # @todo:redundant
+      reflector.instance_method(:invoke).parameters # self might be an inferred action documentor, e.g.
+    end
+    def program_name
+      "#{@parent.program_name} #{aliases.first}"
+    end
+    def resolve argv # mutates argv
       args = []
-      ok = option_syntax.parse!(argv, args, self) or return (help unless ok.nil?)
+      ok =   option_syntax.parse!(  argv, args, self) or return (help if false == ok)
       meth = argument_syntax.parse!(argv, args, self) or return help
       [meth, args]
     end
-    attr_reader :runtime
     def syntax
-      [action.name, option_syntax.string, argument_syntax.string].compact.join(' ') # duplicated
+      [option_syntax.string, argument_syntax.string].compact.join(' ') # aliases.first
     end
   end
-  OnFind = Skylab::PubSub::Emitter.new(:error, :ambiguous => :error, :not_found => :error, :not_provided => :error)
-  module NamespaceInstanceMethods ; extend DelegatesTo
+  module ActionKlassInstanceMethods
+    include ActionInstanceMethods, MetaInstanceMethods
+    def _klass ; self.class end
+    alias_method :builder, :_klass
+    alias_method :reflector, :_klass
+  end
+  module ActionModuleMethods
+    def self.extended klass
+      klass.send(:include, ActionKlassInstanceMethods)
+    end
+    def option_syntax
+      option_syntax_class(os = option_syntax_class.build)
+      yield os if block_given?
+      os
+    end
+    def option_syntax_class k=nil
+      k.nil? ? OptionSyntax : instance_exec(k, &(redef = ->(k2) {
+        define_method(:option_syntax_class) { k2 }
+        singleton_class.send(:define_method, :option_syntax_class) { |k3 = nil| k3.nil? ? k2 : instance_exec(k3, &redef) }
+      }))
+    end
+  end
+  ON_FIND = ::Skylab::PubSub::Emitter.new(:error, :ambiguous => :error, :not_found => :error, :not_provided => :error)
+  module NamespaceInstanceMethods
     include ActionInstanceMethods
-    delegates_to :action, :action_syntax, :action_names, :action_helps
-    def find token, &on_find_error
-      e = OnFind.new(on_find_error) ; matched = [] ; action = nil
-      token or return e.emit(:not_provided, "expecting #{action_syntax}")
+    def find token, &error
+      e = ON_FIND.new(error) ; matched = [] ; builder = nil # resolve the match now! (flyweighting)
+      token or return e.emit(:not_provided, "expecting #{syntax}")
       matcher = /^#{Regexp.escape(token)}/
-      action_names.each do |act|
-        first_match = act.names.grep(matcher).reduce do |_first_match, name|
-          name == token and return act # first whole match always wins
+      actions.names.each do |act|
+        first_match = act.aliases.grep(matcher).reduce do |_first_match, name|
+          name == token and return act.builder # first whole match always wins
           _first_match # we only want any one of these per action
         end and begin
-          matched.push(first_match) ; action = act
+          matched.push(first_match) ; builder = act.builder
         end
       end
       case matched.size
-      when 0 ; e.emit(:not_found, "invalid command #{token.inspect}. expecting #{action_syntax}")
-      when 1 ; action # fuzzy match with only one match
-      else   ; e.emit(:ambiguous, "ambiguous comand #{token.inspect}. " <<
+      when 0 ; e.emit(:not_found, "invalid action #{token.inspect}. expecting #{syntax}")
+      when 1 ; builder # fuzzy match with only one match
+      else   ; e.emit(:ambiguous, "ambiguous action #{token.inspect}. " <<
                       "did you mean #{self.or matched.map{|n| "#{pre n}"}}?") end
     end
     def help_invite o
@@ -110,7 +142,7 @@ module Skylab::Porcelain::Bleeding
       emit :help, "try #{pre "#{program_name} #{a} -h"} for help#{b}"
     end
     def help_list
-      tbl = action_helps.visible.map { |action|  [action.name, (action.summary || [])] }
+      tbl = actions.helps.visible.map { |h|  [h.aliases.first, (h.summary || [])] }
       emit :help, (tbl.empty? ? "(no actions)" : "#{hdr 'actions:'}")
       width = tbl.reduce(0) { |m, o| o[0].length > m ? o[0].length : m }
       fmt = "  #{em "%#{width}s"}  %s"
@@ -121,38 +153,70 @@ module Skylab::Porcelain::Bleeding
       end
     end
     def help_usage o
-      action_syntax = (false == o[:action_syntax]) ? '<action>' : self.action_syntax
-      emit :help, "#{hdr 'usage:'} #{program_name} #{action_syntax} [opts] [args]"
+      syntax = (false == o[:syntax]) ? '<action>' : self.syntax
+      emit :help, "#{hdr 'usage:'} #{program_name} #{syntax} [opts] [args]"
     end
-    def program_name
-      "#{runtime.program_name} #{action_collection.name}" #!
+    def resolve argv # mutates argv
+      b = find(argv.shift) { |o| o.on_error { |e| return help(message: e.message, syntax: false) } }
+      b.respond_to?(:build) or (Module == b.class and b = InferredNamespace.new(b))
+      ((o = b.build self).respond_to?(:resolve) ? o : InferredRuntime.new(o, b)).resolve argv
     end
-    def resolve! argv
-      action = find(argv.shift){ |o| o.on_error { |s| return help(message: s.message, action_syntax: false) } }
-      transaction = action.build self
-      huh = transaction.resolve! argv
-      huh
+    def syntax
+      "{#{ actions.names.visible.map { |a| pre a.aliases.first } * '|' }}"
+    end
+  end
+  class Actions < ::Enumerator
+    def self.[](*a) ; build(*a) end
+    def self.build *actionss
+      new do |y|
+        actionss.each do |actions|
+          actions.each do |meta|
+            y << meta
+          end
+        end
+      end
+    end
+    def filter &b
+      self.class.new { |y| each { |*a| b.call(y, *a) } }
+    end
+    def _self ; self end
+    alias_method :helps, :_self # hook for stubbing
+    alias_method :names, :_self # hook for stubbing
+    def visible
+      filter { |y, a| y << a if a.visible? }
+    end
+  end
+  class Constants < Actions
+    def self.build mod
+      flyweight = nil
+      new do |y|
+        mod.constants.each do |const|
+          m = mod.const_get(const)
+          y << (m.respond_to?(:action_meta) ? m.action_meta :
+            (flyweight ||= InferredMeta.new).set!(m))
+        end
+      end
     end
   end
   class ArgumentSyntax
     def [] idx
       string.split(' ')[idx] or "<arg#{idx + 1}>"  # @hack
     end
-    attr_reader :action
     def define! s
       @string = s
     end
-    def initialize action
-      @action = action
+    def initialize syntax # @duck parameters(), option_syntax()
+      @syntax = syntax
       @string = nil
     end
-    def parse! argv, args, transaction
-      meth = transaction.execution_method
+    def parse! argv, args, runtime # @duck bound_invocation_method, option_syntax, emit
+      runtime.object_id == @syntax.object_id or fail("when? @todo")
+      meth = runtime.bound_invocation_method
       parameters = meth.parameters
-      transaction.option_syntax.any? and parameters.pop # ick
+      runtime.option_syntax.any? and parameters.pop # ick
       count = Hash.new { |h, k| h[k] = 0 }
       parameters.each { |p| count[p.first] += 1 }
-      error = ->(msg) { transaction.runtime.emit(:syntax_error, msg) ; false }
+      error = ->(msg) { runtime.emit(:syntax_error, msg) ; false }
       requireds = ->(i) { parameters.select{ |p| :req == p.first }[i].last }
       min_arity = count[:req]
       max_arity = count.values.reduce(:+) if count[:rest].zero?
@@ -164,8 +228,8 @@ module Skylab::Porcelain::Bleeding
     end
     def string
       @string and return @string
-      params = action.parameters
-      action.option_syntax.any? and params.pop
+      params = @syntax.parameters
+      @syntax.option_syntax.any? and params.pop
       params.map do |p|
         a, b = case p.first
                when :req  ;
@@ -179,8 +243,14 @@ module Skylab::Porcelain::Bleeding
   end
   class OptionSyntax < Struct.new(:definitions, :documentor_class, :parser_class, :help_enabled)
     include Styles
+    def self.build
+      new([], ::OptionParser, ::OptionParser)
+    end
     def any?
       definitions.any?
+    end
+    def build
+      self.class.new(definitions.dup, documentor_class, parser_class, help_enabled)
     end
     def on_definition_added
       @on_definition_added ||= {}
@@ -200,24 +270,24 @@ module Skylab::Porcelain::Bleeding
       doc.banner = "#{hdr 'options:'}"
       _ = {} ; definitions.each { |d| doc.instance_exec(_, &d) }
     end
-    def initialize
-      super([], ::OptionParser, ::OptionParser)
+    def initialize *a
       @documentor = nil
+      super(*a)
     end
-    def parse! argv, args, transaction
+    def parse! argv, args, runtime # @duck help, emit
       definitions.any? or help_enabled or return true
       args.push(req = {}) if definitions.any?
       ret = true
       begin
         parser_class.new do |o|
           o.on('-h', '--help') do
-            transaction.help(full: true)
+            runtime.help(full: true)
             ret = nil
           end
           definitions.each { |d| o.instance_exec(req, &d) }
         end.parse!(argv)
       rescue OptionParser::ParseError => e
-        transaction.runtime.emit :optparse_parse_error, e
+        runtime.emit :optparse_parse_error, e
         ret and ret = false # if ret was already nil, no need to display help again
       end
       ret
@@ -228,134 +298,13 @@ module Skylab::Porcelain::Bleeding
         map { |s| "[#{s.short.first or s.long.first}#{s.arg}]" if s.respond_to?(:short) }.compact.join(' ')
     end
   end
-  module ActionModuleMethods
-    include Styles
-    def action_name
-      @action_name ||= to_s.match(/[^:]+$/)[0].gsub(/(?<=[a-z])([A-Z])/) { "-#{$1}" }.downcase
-    end
-    def aliases *a
-      @aliases ||= []
-      a.any? ? @aliases.concat(a) : @aliases
-    end
-    def argument_syntax s=nil
-      @argument_syntax ||= ArgumentSyntax.new(self)
-      s ? @argument_syntax.define!(s) : @argument_syntax
-    end
-    def build runtime
-      new runtime
-    end
-    def desc *a
-      a.size.zero? ? (@desc ||= nil) : (@desc ||= []).concat(a)
-    end
-    def name
-      action_name # allows more flexibility than an alias_method
-    end
-    def names
-      [name, *aliases]
-    end
-    def option_syntax &b
-      @option_syntax ||= option_syntax_class.new
-      b ? @option_syntax.define!(&b) : @option_syntax
-    end
-    def option_syntax_class klass=nil
-      klass or return OptionSyntax
-      redefine = ->(mod, k2) do
-        mod.singleton_class.send(:define_method, :option_syntax_class) { |k3 = nil| k3 ? redefine[self, k3] : k2 }
-      end
-      redefine.call(self, klass)
-    end
-    def parameters
-      instance_method(:execute).parameters
-    end
-    def summary &b
-      if b                     ; @summary = b
-      elsif (@summary ||= nil) ; instance_eval(&@summary)
-      elsif desc               ; desc[0..2] end
-    end
-    def syntax
-      [action_name, option_syntax.string, argument_syntax.string].compact.join(' ') # duplicated
-    end
-    def visible *a
-      instance_variable_defined?('@visible') or @visible = true
-      case a.length ; when 0 ; @visible ; when 1 ; @visible = a.first ; else fail end
-    end
-    attr_writer :visible
-    alias_method :visible?, :visible
-  end
-  module Action
-    def self.extended mod
-      mod.send :include, ActionInstanceMethods
-      mod.send :extend, ActionModuleMethods
-    end
-  end
-  module Namespace
-    include ActionModuleMethods
-    def action_collections
-      [ action_collection, OfficiousActions ]
-    end
-    def action_collection
-      self
-    end
-    def action_syntax
-      "{#{ action_names.visible.map { |a| pre a.name } * '|' }}"
-    end
-    def action_helps  ; enum :action_helps ; end
-    def action_names  ; enum :action_names ; end
-        # there is an anticpated issue above with fuzzy matching actions that have same name in different module
-    def enum method
-      (@enum ||= Hash.new do |hash, meth|
-        hash[meth] = ActionEnumerator.new do |y|
-          action_collections.each do |col|
-            if col != self and col.respond_to?(meth)
-              col.send(meth).each { |x| y << x }
-            elsif col.respond_to?(:constants)
-              col.constants.each { |k| y << col.const_get(k) }
-            else
-              fail("expected action collection to respond to `#{meth}`, `each`, or `constants`: #{col}")
-            end
-          end
-        end
-      end)[method]
-    end
-    def build runtime
-      NamespaceAction.new(self, runtime)
-    end
-    def parameters
-      NamespaceAction.parameters
-    end
-    alias_method :orig_summary, :summary
-    def summary &b
-      b || desc || @summary and return orig_summary(&b)
-      aa = action_names.visible.to_a
-      ["child action#{'s' if aa.size != 1}: {#{build(nil).action_names.visible.map{ |a| "#{pre a.name}" }.join('|')}}"]
-    end
-  end
-  class NamespaceAction ; extend DelegatesTo
-    extend Action
-    include NamespaceInstanceMethods
-    delegates_to :action_collection, :action_syntax, :action_names
-    attr_reader :action_collection
-    delegates_to :action_collection, :desc
-    def initialize namespace, runtime
-      action_init runtime
-      @action_collection = namespace
-    end
-    delegates_to :action_collection, :name
-  end
   class Runtime
-    extend Namespace
-    include NamespaceInstanceMethods
-    def action_collection
-      action.action_collection
-    end
-    def emit _, s
-      $stderr.puts s
-    end
-    def initialize
+    include NamespaceInstanceMethods, MetaInstanceMethods
+    def actions
+      Actions[ Constants[self.class::Actions], Officious.actions ]
     end
     def invoke argv
-      argv = argv.dup
-      (callable, args = resolve!(argv)) or return callable
+      (callable, args = resolve(argv = argv.dup)) or return callable
       callable.receiver.send(callable.name, *args)
     end
     def program_name
@@ -363,40 +312,78 @@ module Skylab::Porcelain::Bleeding
     end
     attr_writer :program_name
   end
-  class << Runtime
-    def action_collection *a, &b
-      case a.length
-      when 0 ; if b then @action_collection = b
-             ; else (@action_collection ||= ->(){ const_get('Actions') }).call end
-      when 1 ; if b then fail else mod = a.first ; @action_collection = ->() { mod } end
-      else   ; fail ; end
+  module Officious
+    def self.actions
+      Constants[self]
     end
-    alias_method :action_collection=, :action_collection # !
   end
-  module OfficiousActions
+  class InferredMeta
+    include MetaInstanceMethods
+    attr_reader :reflector
+    alias_method :builder, :reflector
+    def initialize # @todo make less of these
+    end
+    def set! reflector
+      @reflector = reflector ; self
+    end
   end
-  class OfficiousActions::Help
-    extend Action
-
-    aliases '-h'
-
-    desc "displays this screen."
-
-    visible false
-
-    def action_help action_name
-      action = runtime.find(action_name) do |o|
-        o.on_error do |e|
-          return emit(:error, e.message)
-        end
+  class InferredDocumentor < InferredMeta
+    include ActionInstanceMethods
+    def initialize client, reflector
+      if client.instance_variable_defined?('@parent') and p = client.instance_variable_get('@parent')
+        p.respond_to?(:emit) or raise ArgumentError.new("emitter? #{parent.class}") # @todo: remove
+        @parent = p
+      else
+        fail("InferredDocumentor hack failed! need parent (proper runtime) from #{client.class}")
       end
-      action.build(runtime).help(full: true)
-      nil
+      @parent = p # @todo: rename to "runtime" ?
+      set!(reflector)
     end
-
-    def execute action_name=nil
-      action_name ? action_help(action_name) : runtime.help(full: true)
+  end
+  class InferredRuntime < InferredDocumentor
+    def initialize built, builder
+      @bound_invocation_method = built.method(:invoke)
+      super
+    end
+    attr_reader :bound_invocation_method
+  end
+  class InferredNamespace
+    include NamespaceInstanceMethods, MetaInstanceMethods
+    def actions
+      Actions[ Constants[@modul_with_actions], Officious.actions ]
+    end
+    def build parent
+      @parent = parent ; self
+    end
+    def initialize modul_with_actions
+      @modul_with_actions = modul_with_actions
+    end
+    attr_reader :modul_with_actions
+    alias_method :reflector, :modul_with_actions # for documentation generation
+    alias_method :builder, :modul_with_actions   # for find
+  end
+  class Officious::Help
+    include ActionKlassInstanceMethods
+    def self.action_meta
+      new # use an instance as the action meta, don't defer to InferredMeta
+    end
+    def aliases
+      aliases_inferred + ['-h', '--help']
+    end
+    def builder
+      self # not a class
+    end
+    def build rt
+      @parent = rt ; self # assuming singleton, be careful
+    end
+    def invoke token=nil
+      token or return @parent.help(full: true)
+      b = @parent.find(token) { |o| o.on_error { |e| return emit(:error, e.message) } }
+      b.respond_to?(:build) or (Module == b.class and b = InferredNamespace.new(b)) # @duped
+      ((o = b.build @parent).respond_to?(:help) ? o : InferredDocumentor.new(o, b)).help(full: true)
+    end
+    def visible?
+      false
     end
   end
 end
-

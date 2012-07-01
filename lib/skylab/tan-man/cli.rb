@@ -108,7 +108,7 @@ module Skylab::TanMan
   class Cli::Actions::Status < Cli::Action
     desc "show the status of the config director{y|ies} active at the path."
     include Porcelain::Table::RenderTable
-    def execute path=nil
+    def invoke path=nil
       path ||= FileUtils.pwd
       groups = Hash.new { |h, k| h[k] = [] }
       ee = api.invoke(path: path)
@@ -130,7 +130,7 @@ module Skylab::TanMan
   class Cli::Actions::Init < Cli::Action
     desc "create the #{Api.local_conf_dirname} directory"
     option_syntax { |h| on('-n', '--dry-run', 'dry run.') { h[:dry_run] = true } }
-    def execute path=nil, opts
+    def invoke path=nil, opts
       api.invoke opts.merge(path: path, local_conf_dirname: Api.local_conf_dirname)
     end
   end
@@ -146,7 +146,7 @@ module Skylab::TanMan
       on('-g', '--global', "add it to the global config file.") { h[:global] = true }
     end
     desc "add the remote."
-    def execute name, host, opts
+    def invoke name, host, opts
       args = opts.merge(name: name, host: host)
       args[:resource] = args.delete(:global) ? :global : :local
       b = api.invoke(args)
@@ -161,7 +161,7 @@ module Skylab::TanMan
       on('-v', '--verbose', "show more fields.") { h[:verbose] = true }
     end
     include Porcelain::Table::RenderTable
-    def execute opts
+    def invoke opts
       table = api.invoke(opts) or return false
       render_table(table, separator: '  ') do |o|
         o.field(:resource_label).format { |x| "(resource: #{x})" }
@@ -183,7 +183,7 @@ module Skylab::TanMan
         h[:resource_name] = v
       end
     end
-    def execute remote_name, opts
+    def invoke remote_name, opts
       b = api.invoke opts.merge(remote_name: remote_name)
       b == false and help(invite_only: true)
       b
@@ -196,7 +196,7 @@ module Skylab::TanMan
     option_syntax do |h|
       on('-n', '--dry-run', 'dry run.') { h[:dry_run] = true }
     end
-    def execute remote_name, file, opts
+    def invoke remote_name, file, opts
       api.invoke(opts.merge(remote_name: remote_name, file_path:file))
     end
   end
