@@ -17,11 +17,16 @@ module Skylab::Porcelain::Bleeding::TestSupport
     fails = [] ; desc = {} ; _actual = nil
     match do |actual|
       _actual = actual ; idx = actual.length - 1 ; index_specified = false
-      expected.each do |x|
+      expected.each_with_index do |x, i|
         case x
         when Fixnum
-          desc[:pos] = '%-6s' % [num2ord(x + 1)]
+          desc[:pos] = '%-6s' % [-1 == x ? 'last' : num2ord(x + 1)]
+          -1 == x and x = actual.length - 1
           idx = x ; index_specified = true
+          if actual.length <= idx and expected[i+1]
+            fails.push("expecting event at index #{idx}, had #{actual.length} events")
+            break
+          end
         when NilClass
           desc[:type] = "no more events."
           if actual.length != idx

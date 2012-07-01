@@ -7,7 +7,7 @@ module Skylab::Porcelain::Bleeding::TestSupport
     let(:base_module) { Module.new }
 
     klass :Alpha do
-      extend Bleeding::Action
+      extend Bleeding::ActionModuleMethods
     end
 
     klass :Bravo, extends: :Alpha do
@@ -31,7 +31,7 @@ module Skylab::Porcelain::Bleeding::TestSupport
 
     context "If Alpha changes its option_syntax_class" do
       klass :Alpha do
-        extend Bleeding::Action
+        extend Bleeding::ActionModuleMethods
         option_syntax_class :shenanigans
       end
       assert :Alpha, :shenanigans
@@ -41,7 +41,7 @@ module Skylab::Porcelain::Bleeding::TestSupport
 
     context "If Beta changes its option_syntax_class" do
       klass :Bravo do
-        extend Bleeding::Action
+        extend Bleeding::ActionModuleMethods
         option_syntax_class :foonanie
       end
       assert :Alpha, Bleeding::OptionSyntax

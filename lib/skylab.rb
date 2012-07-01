@@ -56,7 +56,7 @@ module Skylab
       path.to_s.gsub(SANITIZE_PATH_RE, '').gsub(%r|/+|, '::').gsub(/(?:(?<=\d)|[_-]|\b)([a-z0-9])/) { $1.upcase }
     end
     def pathify const
-      const.to_s.gsub('::', '/').gsub(/(?<=[a-z])([A-Z])|(?<=[A-Z])([A-Z][a-z])/) { "-#{$1 || $2}" }.downcase
+      const.to_s.gsub('::', '/').gsub(/(?<=[a-z])([A-Z])|(?<=[A-Z])([A-Z][a-z])/) { "-#{$1 || $2}" }.gsub('_', '-').downcase
     end
   end
 end
