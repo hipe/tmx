@@ -158,8 +158,8 @@ module Skylab::Porcelain::Bleeding
     end
     def resolve argv # mutates argv
       b = find(argv.shift) { |o| o.on_error { |e| return help(message: e.message, syntax: false) } }
-      b.respond_to?(:build) or (Module == b.class and b = InferredNamespace.new(b))
-      ((o = b.build self).respond_to?(:resolve) ? o : InferredRuntime.new(o, b)).resolve argv
+      b.respond_to?(:build) or (Module == b.class and b = NamespaceInferred.new(b))
+      ((o = b.build self).respond_to?(:resolve) ? o : RuntimeInferred.new(o, b)).resolve argv
     end
     def syntax
       "{#{ actions.names.visible.map { |a| pre a.aliases.first } * '|' }}"
@@ -193,7 +193,7 @@ module Skylab::Porcelain::Bleeding
         mod.constants.each do |const|
           m = mod.const_get(const)
           y << (m.respond_to?(:action_meta) ? m.action_meta :
-            (flyweight ||= InferredMeta.new).set!(m))
+            (flyweight ||= MetaInferred.new).set!(m))
         end
       end
     end
@@ -317,7 +317,7 @@ module Skylab::Porcelain::Bleeding
       Constants[self]
     end
   end
-  class InferredMeta
+  class MetaInferred
     include MetaInstanceMethods
     attr_reader :reflector
     alias_method :builder, :reflector
@@ -327,27 +327,27 @@ module Skylab::Porcelain::Bleeding
       @reflector = reflector ; self
     end
   end
-  class InferredDocumentor < InferredMeta
+  class DocumentorInferred < MetaInferred
     include ActionInstanceMethods
     def initialize client, reflector
       if client.instance_variable_defined?('@parent') and p = client.instance_variable_get('@parent')
         p.respond_to?(:emit) or raise ArgumentError.new("emitter? #{parent.class}") # @todo: remove
         @parent = p
       else
-        fail("InferredDocumentor hack failed! need parent (proper runtime) from #{client.class}")
+        fail("DocumentorInferred hack failed! need parent (proper runtime) from #{client.class}")
       end
       @parent = p # @todo: rename to "runtime" ?
       set!(reflector)
     end
   end
-  class InferredRuntime < InferredDocumentor
+  class RuntimeInferred < DocumentorInferred
     def initialize built, builder
       @bound_invocation_method = built.method(:invoke)
       super
     end
     attr_reader :bound_invocation_method
   end
-  class InferredNamespace
+  class NamespaceInferred
     include NamespaceInstanceMethods, MetaInstanceMethods
     def actions
       Actions[ Constants[@modul_with_actions], Officious.actions ]
@@ -365,7 +365,7 @@ module Skylab::Porcelain::Bleeding
   class Officious::Help
     include ActionKlassInstanceMethods
     def self.action_meta
-      new # use an instance as the action meta, don't defer to InferredMeta
+      new # use an instance as the action meta, don't defer to MetaInferred
     end
     def aliases
       aliases_inferred + ['-h', '--help']
@@ -379,8 +379,8 @@ module Skylab::Porcelain::Bleeding
     def invoke token=nil
       token or return @parent.help(full: true)
       b = @parent.find(token) { |o| o.on_error { |e| return emit(:error, e.message) } }
-      b.respond_to?(:build) or (Module == b.class and b = InferredNamespace.new(b)) # @duped
-      ((o = b.build @parent).respond_to?(:help) ? o : InferredDocumentor.new(o, b)).help(full: true)
+      b.respond_to?(:build) or (Module == b.class and b = NamespaceInferred.new(b)) # @duped
+      ((o = b.build @parent).respond_to?(:help) ? o : DocumentorInferred.new(o, b)).help(full: true)
     end
     def visible?
       false

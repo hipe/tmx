@@ -75,7 +75,7 @@ module Skylab::Porcelain::Bleeding::TestSupport
     ::Skylab::Porcelain::Bleeding.const_set("Xyzzy#{last_number += 1}", @base_module)
     @nermsperce = m = modul(:MyActions, &namespace_body)
     m = modul(:MyActions, &namespace_body)
-    ns = Bleeding::InferredNamespace.new(m)
+    ns = Bleeding::NamespaceInferred.new(m)
     rt = ::Skylab::TestSupport::EmitSpy.new { |e| "#{e.type.inspect}<-->#{e.message.inspect}" } # add debug!
     # ns.build(rt).object_id == ns.object_id or fail("handle this")
     [ns, rt]
