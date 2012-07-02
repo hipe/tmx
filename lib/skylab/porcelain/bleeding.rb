@@ -120,9 +120,9 @@ module Skylab::Porcelain::Bleeding
         self.desc
       end))
     end
-    def option_syntax
+    def option_syntax &defn
       option_syntax_class(os = option_syntax_class.build)
-      yield os if block_given?
+      os.define!(&defn) if block_given?
       os
     end
     def option_syntax_class k=nil
@@ -133,6 +133,15 @@ module Skylab::Porcelain::Bleeding
     end
     def _self;   self        end
     alias_method :reflector, :_self
+    def summary &block
+      _use_block = block || ->() { (desc || [])[0..1] }
+      instance_exec(_use_block, &(redef = ->(b2) do
+        singleton_class.send(:define_method, :summary) do |&b3|
+          b3 ? instance_exec(b3, &redef) : instance_exec(&b2)
+        end
+      end))
+      block or summary
+    end
   end
   ON_FIND = ::Skylab::PubSub::Emitter.new(:error, ambiguous: :error, not_found: :error, not_provided: :error)
   module NamespaceInstanceMethods
@@ -189,6 +198,9 @@ module Skylab::Porcelain::Bleeding
     def syntax
       "{#{ actions.names.visible.map { |a| pre a.aliases.first } * '|' }}"
     end
+  end
+  module NamespaceModuleMethods
+    include ActionModuleMethods
   end
   class Actions < ::Enumerator
     def self.[](*a) ; build(*a) end
