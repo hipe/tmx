@@ -19,7 +19,7 @@ module Skylab::Porcelain::Bleeding
     end
     alias_method :aliases, :aliases_inferred
     def desc
-      []
+      @desc ||= (reflector.respond_to?(:desc) ? reflector.desc.dup : [])
     end
     def summary
       if desc
@@ -77,6 +77,7 @@ module Skylab::Porcelain::Bleeding
     def option_syntax_class
       OptionSyntax
     end
+    attr_accessor :parent
     def parameters # @todo:redundant
       reflector.instance_method(:invoke).parameters # self might be an inferred action documentor, e.g.
     end
@@ -103,6 +104,18 @@ module Skylab::Porcelain::Bleeding
     def self.extended klass
       klass.send(:include, ActionKlassInstanceMethods)
     end
+    def build parent
+      new.tap { |o| o.parent = parent }
+    end
+    def desc *a
+      instance_exec(*a, &(redef = ->(*aa) do
+        _desc = aa.flatten ; singleton_class.send(:undef_method, :desc) # so no warnings
+        singleton_class.send(:define_method, :desc) do |*aaa|
+          (aaa.any? or ((@desc ||= nil).nil? and true == (@desc = true))) ? instance_exec(* (_desc + aaa), &redef) : _desc
+        end
+        self.desc
+      end))
+    end
     def option_syntax
       option_syntax_class(os = option_syntax_class.build)
       yield os if block_given?
@@ -118,6 +131,14 @@ module Skylab::Porcelain::Bleeding
   ON_FIND = ::Skylab::PubSub::Emitter.new(:error, ambiguous: :error, not_found: :error, not_provided: :error)
   module NamespaceInstanceMethods
     include ActionInstanceMethods
+    def fetch token, &not_found
+      b = fetch_builder(token, &not_found) or return b
+      (o = b.respond_to?(:build) ? b.build(self) : b.new).respond_to?(:resolve) ? o : RuntimeInferred.new(self, o, b)
+    end
+    def fetch_builder token, &not_found
+      m = find(token) { |o| o.on_error { |e| return (not_found || ->(er) { raise KeyError.new(e.message) } ).call(e) } }
+      (! m.respond_to?(:build) && m.kind_of?(::Module) && ! m.kind_of?(::Class)) ? NamespaceInferred.new(m) : m
+    end
     def find token, &error
       e = ON_FIND.new(error) ; matched = [] ; builder = nil # resolve the match now! (flyweighting)
       token or return e.emit(:not_provided, "expecting #{syntax}")
@@ -157,9 +178,7 @@ module Skylab::Porcelain::Bleeding
       emit :help, "#{hdr 'usage:'} #{program_name} #{syntax} [opts] [args]"
     end
     def resolve argv # mutates argv
-      b = find(argv.shift) { |o| o.on_error { |e| return help(message: e.message, syntax: false) } }
-      b.respond_to?(:build) or (Module == b.class and b = NamespaceInferred.new(b))
-      ((o = b.build self).respond_to?(:resolve) ? o : RuntimeInferred.new(o, b)).resolve argv
+      fetch(argv.shift) { |e| return help(message: e.message, syntax: false) }.resolve(argv)
     end
     def syntax
       "{#{ actions.names.visible.map { |a| pre a.aliases.first } * '|' }}"
@@ -299,7 +318,8 @@ module Skylab::Porcelain::Bleeding
     end
   end
   class Runtime
-    include NamespaceInstanceMethods, MetaInstanceMethods
+    extend ActionModuleMethods
+    include NamespaceInstanceMethods
     def actions
       Actions[ Constants[self.class::Actions], Officious.actions ]
     end
@@ -323,27 +343,21 @@ module Skylab::Porcelain::Bleeding
     alias_method :builder, :reflector
     def initialize # @todo make less of these
     end
-    def set! reflector
+    def set! reflector # geared towards flyweighting
       @reflector = reflector ; self
     end
   end
   class DocumentorInferred < MetaInferred
     include ActionInstanceMethods
-    def initialize client, reflector
-      if client.instance_variable_defined?('@parent') and p = client.instance_variable_get('@parent')
-        p.respond_to?(:emit) or raise ArgumentError.new("emitter? #{parent.class}") # @todo: remove
-        @parent = p
-      else
-        fail("DocumentorInferred hack failed! need parent (proper runtime) from #{client.class}")
-      end
-      @parent = p # @todo: rename to "runtime" ?
+    def initialize parent, reflector
+      (@parent = parent).respond_to?(:emit) or fail("emitter?") # @todo might rename all of these to "runtime"
       set!(reflector)
     end
   end
   class RuntimeInferred < DocumentorInferred
-    def initialize built, builder
+    def initialize parent, built, builder
+      super(parent, builder)
       @bound_invocation_method = built.method(:invoke)
-      super
     end
     attr_reader :bound_invocation_method
   end
@@ -378,9 +392,8 @@ module Skylab::Porcelain::Bleeding
     end
     def invoke token=nil
       token or return @parent.help(full: true)
-      b = @parent.find(token) { |o| o.on_error { |e| return emit(:error, e.message) } }
-      b.respond_to?(:build) or (Module == b.class and b = NamespaceInferred.new(b)) # @duped
-      ((o = b.build @parent).respond_to?(:help) ? o : DocumentorInferred.new(o, b)).help(full: true)
+      o = (b = @parent.fetch_builder(token) { |e| return emit(:error, e.message) }).respond_to?(:build) ? b.build(@parent) : b.new
+      (o.respond_to?(:help) ? o : DocumentorInferred.new(@parent, b)).help(full: true) # 'o' gets thrown away sometimes
     end
     def visible?
       false

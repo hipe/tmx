@@ -11,6 +11,7 @@ module Skylab::MetaHell
   end
   module ModulCreator::InstanceMethods
     def build_module parts
+      base_module or fail("please set base_module")
       parts.reduce(base_module) do |mod, part|
         unless mod.const_defined?(part)
           mod.const_set(part, Module.new.tap { |m|

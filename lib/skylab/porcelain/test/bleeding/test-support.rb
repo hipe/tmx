@@ -1,15 +1,45 @@
 require_relative '../test-support'
-require_relative '../../bleeding'
+require_relative '../../core'
 
 module Skylab::Porcelain::Bleeding::TestSupport
   Bleeding = ::Skylab::Porcelain::Bleeding
   Porcelain = ::Skylab::Porcelain
   SimplifiedEvent = Struct.new(:type, :message) # hack for prettier dumps ick!
 
-  Matcher = Struct.new(:desc, :failmsg, :match)
-
   class ::RSpec::Matchers::DSL::Matcher
     include ::Skylab::Porcelain::En::Number
+  end
+
+  class MyEmitSpy < ::Skylab::TestSupport::EmitSpy
+    def initialize(&formatter)
+      formatter ||= ->(e) { "#{e.type.inspect}<-->#{e.message.inspect}" }
+      super(&formatter)
+    end
+  end
+
+  RSpec::Matchers.define(:be_action) do |expected|
+    actual = nil ; fails = [] ; desc = {}
+    match do |_actual|
+      actual = _actual
+      expected.each do |exp_key, exp|
+        case exp_key
+        when :aliases
+          desc[:aliases] = "whose aliases are #{exp.inspect}"
+          actual.aliases == exp or fails.push("expected aliases of #{exp.inspect}, had #{actual.aliases.inspect}")
+        when :desc
+          desc[:desc] = "whose description lines are #{exp.inspect}"
+          actual.desc == exp or fails.push("expected description lines of #{exp.inspect}, had #{actual.desc.inspect}")
+        else fail("unimplemented: #{exp_val}")
+        end
+      end
+      fails.empty?
+    end
+    failure_message_for_should { |_actual| fails.join('. ') }
+    description do
+      'be an action{{aliases}}{{desc}}'.gsub(/{{((?:(?!}})[^{])+)}}/) do
+        " #{desc[$1.intern]}" if desc[$1.intern]
+      end.strip
+    end
   end
 
   RSpec::Matchers.define(:be_event) do |*expected|
@@ -60,9 +90,7 @@ module Skylab::Porcelain::Bleeding::TestSupport
       index_specified or 1 == actual.length or fails.push("expected 1 event, had #{actual.length}")
       fails.empty?
     end
-    failure_message_for_should do |actual|
-      fails.join('. ')
-    end
+    failure_message_for_should { |__actual| fails.join('. ') }
     description do
       'emit{{pos}}{{type}}{{msg}}'.gsub(/{{((?:(?!}})[^{])+)}}/) do
         " #{desc[$1.intern]}" if desc[$1.intern]
@@ -76,7 +104,7 @@ module Skylab::Porcelain::Bleeding::TestSupport
     @nermsperce = m = modul(:MyActions, &namespace_body)
     m = modul(:MyActions, &namespace_body)
     ns = Bleeding::NamespaceInferred.new(m)
-    rt = ::Skylab::TestSupport::EmitSpy.new { |e| "#{e.type.inspect}<-->#{e.message.inspect}" } # add debug!
+    rt = MyEmitSpy.new
     # ns.build(rt).object_id == ns.object_id or fail("handle this")
     [ns, rt]
   end
@@ -112,9 +140,24 @@ module Skylab::Porcelain::Bleeding::TestSupport
     def token tok
       @last_token = tok
     end
+    def with_action action_token
+      once = ->(_) do
+        send("#{constantize ns_token}__#{constantize action_token}") # call the creator
+        action = Bleeding::NamespaceInferred.new(base_module.const_get(constantize ns_token)).
+          build(MyEmitSpy.new.debug!).fetch(action_token)
+        instance_eval(& (once = ->(_) { action }))
+      end
+      let(:fetch) { instance_eval(&once) }
+      let(:subject) { fetch }
+    end
+    def with_namespace token
+      let(:ns_token) { token }
+    end
   end
   module InstanceMethods
+    include ::Skylab::Autoloader::Inflection # constantize
     include ::Skylab::MetaHell::ModulCreator::InstanceMethods
+    include ::Skylab::MetaHell::KlassCreator::ExtensorInstanceMethods
     include ::Skylab::Porcelain::TiteColor # unstylize
     attr_reader :base_module
     def namespace

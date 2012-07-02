@@ -217,7 +217,7 @@ module ::Skylab::Porcelain::Bleeding::TestSupport
           end
           context "exact match, with a thing with no option syntax but help enabled" do
             _TRAILING_SPACE = "usage: DORP pony put-up"
-            context "it -h" do
+            context "it -h", f:true do
               before(:all) { _emit_spy.no_debug! ; @subject = emit_spy.stack }
               argv 'pony', 'put-up', '-h'
               specify { should be_event(:help, _TRAILING_SPACE) }
