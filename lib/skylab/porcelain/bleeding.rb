@@ -13,14 +13,19 @@ module Skylab::Porcelain::Bleeding
     def hdr(s) ; stylize(s, :strong, :green)   end
     alias_method :pre, :em
   end
-  module MetaInstanceMethods
+  module MetaMethods
     def aliases_inferred
       [reflector.to_s.match(/[^:]+$/)[0].gsub(/(?<=[a-z])([A-Z])/) { "-#{$1}" }.downcase]
     end
     alias_method :aliases, :aliases_inferred
+  end
+  module MetaInstanceMethods
+    include MetaMethods
     def desc
       @desc ||= (reflector.respond_to?(:desc) ? reflector.desc.dup : [])
     end
+    def _klass;  self.class  end
+    alias_method :reflector, :_klass
     def summary
       if desc
         desc[0..2]
@@ -96,11 +101,10 @@ module Skylab::Porcelain::Bleeding
   end
   module ActionKlassInstanceMethods
     include ActionInstanceMethods, MetaInstanceMethods
-    def _klass ; self.class end
     alias_method :builder, :_klass
-    alias_method :reflector, :_klass
   end
   module ActionModuleMethods
+    include MetaMethods
     def self.extended klass
       klass.send(:include, ActionKlassInstanceMethods)
     end
@@ -127,6 +131,8 @@ module Skylab::Porcelain::Bleeding
         singleton_class.send(:define_method, :option_syntax_class) { |k3 = nil| k3.nil? ? k2 : instance_exec(k3, &redef) }
       }))
     end
+    def _self;   self        end
+    alias_method :reflector, :_self
   end
   ON_FIND = ::Skylab::PubSub::Emitter.new(:error, ambiguous: :error, not_found: :error, not_provided: :error)
   module NamespaceInstanceMethods
@@ -377,7 +383,7 @@ module Skylab::Porcelain::Bleeding
     alias_method :builder, :modul_with_actions   # for find
   end
   class Officious::Help
-    include ActionKlassInstanceMethods
+    extend ActionModuleMethods
     def self.action_meta
       new # use an instance as the action meta, don't defer to MetaInferred
     end
