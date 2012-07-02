@@ -2,17 +2,17 @@ require_relative 'binding'
 require 'json'
 
 module Skylab::TanMan
-  class Api::RootRuntime
-    include Api::UniversalStyle
+  class API::RootRuntime
+    include API::UniversalStyle
 
     def clear
       @singletons.clear
     end
     def initialize
-      @singletons = Api::Singletons.new
+      @singletons = API::Singletons.new
     end
     def invoke *a, &b
-      events = Api::ActionEvents.new(self)
+      events = API::ActionEvents.new(self)
       events.debug! if Hash === a.last && a.last.delete(:_debug)
       result = events.invoke(*a, &b)
       if result.respond_to?(:each) # @todo{after:.3}: needs something maybe
@@ -28,13 +28,13 @@ module Skylab::TanMan
     end
   end
 
-  class Api::ActionEvents < Array
+  class API::ActionEvents < Array
     extend Bleeding::DelegatesTo
     extend PubSub::Emitter
-    include Api::InvocationMethods
+    include API::InvocationMethods
 
     emits EVENT_GRAPH.merge( row: :out )
-    event_class Api::Event
+    event_class API::Event
 
     attr_accessor :debug
     alias_method :debug?, :debug
@@ -76,7 +76,7 @@ module Skylab::TanMan
     # This is just a q & d p. o. c !!! many holes below, memory leaks etc
     def stdout
       @stdout ||= begin
-        o = Api::Whatever.new
+        o = API::Whatever.new
         buffer = StringIO.new
         list = self
         o[:write] = ->(str) { buffer.write(str) }
@@ -97,7 +97,7 @@ module Skylab::TanMan
       json_data.to_json(*a) # here only as a sanity check
     end
   end
-  class Api::Whatever
+  class API::Whatever
     class << self
       public :define_method
     end

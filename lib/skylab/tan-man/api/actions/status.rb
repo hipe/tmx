@@ -1,5 +1,5 @@
 module Skylab::TanMan
-  class Api::Actions::Status < Api::Action
+  class API::Actions::Status < API::Action
     attribute :path, pathname: true, required: true
     emits :all, negative: :all, positive: :all, global: :all, local: :all,
       local_positive: [:local, :positive], local_negative: [:local, :negative],

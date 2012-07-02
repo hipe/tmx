@@ -1,11 +1,11 @@
 module Skylab::TanMan
 
-  module Api::Actions
+  module API::Actions
   end
 
   require File.expand_path('../action', __FILE__)
 
-  module Api::InvocationMethods
+  module API::InvocationMethods
     def invoke action=nil, args=nil, &block
       if args.nil? && Hash === action
         args = action
@@ -20,7 +20,7 @@ module Skylab::TanMan
       path = ROOT.join('api/actions', *parts[0..-2], "#{parts.last}.rb")
       path.exist? or return invalid("not an action: #{parts.join('/')}")
       require path.to_s
-      const = parts.reduce(Api::Actions) do |mod, name|
+      const = parts.reduce(API::Actions) do |mod, name|
         mod.const_get name.to_s.gsub(/(?:^|-)([a-z])/){ $1.upcase }
       end
       const.call(self, args, &block)
@@ -31,9 +31,9 @@ module Skylab::TanMan
     end
   end
 
-  class Api::Binding
+  class API::Binding
     extend Bleeding::DelegatesTo
-    include Api::InvocationMethods
+    include API::InvocationMethods
 
     delegates_to :runtime, :config, :emit, :error
     def initialize runtime, opts=nil

@@ -2,7 +2,7 @@ require_relative '../api'
 require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport
-  describe "The #{TanMan::Api} itself", tanman: true do
+  describe "The #{TanMan::API} itself", tanman: true do
     it "is a persistent object" do
       api.should be_trueish
       oid = api.object_id

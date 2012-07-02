@@ -1,7 +1,7 @@
 module Skylab::TanMan
-  module Api::Actions::Remote
+  module API::Actions::Remote
   end
-  class Api::Actions::Remote::List < Api::Action
+  class API::Actions::Remote::List < API::Action
     attribute :verbose, :boolean => true, :default => false
     def execute
       if ! config.ready?

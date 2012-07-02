@@ -1,7 +1,7 @@
 module Skylab::TanMan
   class Models::Config::Controller
     extend Bleeding::DelegatesTo
-    include Api::AdaptiveStyle
+    include API::AdaptiveStyle
     def add_remote name, url, resource_name
       require_relative '../remote'
       ready? or return false

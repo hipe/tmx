@@ -5,11 +5,11 @@ module Skylab::TanMan
       local.clear
     end
     def find_local_path e # @api private
-      maxdepth = Api.local_conf_maxdepth # nil ok, zero means noop
+      maxdepth = API.local_conf_maxdepth # nil ok, zero means noop
       currdepth = 0
       limit_reached = maxdepth ? ->(){ currdepth >= maxdepth } : ->() { false }
-      current = @_orig = Api.local_conf_startpath.call
-      local_conf_dirname = @_local_conf_dirname = Api.local_conf_dirname
+      current = @_orig = API.local_conf_startpath.call
+      local_conf_dirname = @_local_conf_dirname = API.local_conf_dirname
       found = nil
       loop do
         break if limit_reached.call
@@ -21,7 +21,7 @@ module Skylab::TanMan
       end
       if found
         if found.directory?
-          found.join(Api.local_conf_config_name)
+          found.join(API.local_conf_config_name)
         else
           e.emit(:not_a_dir, message: "not a directory: #{found.pretty}", dir: found)
           false
@@ -34,7 +34,7 @@ module Skylab::TanMan
       # nor that they are without syntax errors
       @global = Models::Config::Resource.new(
         label: "global config file",
-        path:  Api.global_conf_path.call
+        path:  API.global_conf_path.call
       )
       @local = Models::Config::Local.new(
         label: "local config file",
@@ -43,7 +43,7 @@ module Skylab::TanMan
     end
     attr_accessor :local
     protected :'local='
-    class OnReady < Api::Emitter.new(:all,
+    class OnReady < API::Emitter.new(:all,
       not_ready: :all, no_config_dir: :not_ready, not_a_dir: :no_config_dir
       )
       attr_accessor :on_read_global

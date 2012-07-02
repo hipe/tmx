@@ -1,5 +1,5 @@
 module Skylab::TanMan
-  class Api::Actions::Push < Api::Action
+  class API::Actions::Push < API::Action
     attribute :dry_run, boolean: true, default: false
     attribute :file_path, required: true, pathname: true
     attribute :remote_name, required: true

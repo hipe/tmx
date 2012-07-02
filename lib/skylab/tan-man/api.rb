@@ -17,7 +17,7 @@ module Skylab::TanMan
 
   ROOT = Face::MyPathname.new(File.expand_path('..', __FILE__))
 
-  module Api
+  module API
   end
 
   module MetaAttributes
@@ -165,7 +165,7 @@ module Skylab::TanMan
     end
   end
 
-  class << Api
+  class << API
     extend Porcelain::AttributeDefiner
     meta_attribute(*MetaAttributes[:default, :proc])
     include AttributeReflection::InstanceMethods
@@ -177,7 +177,7 @@ module Skylab::TanMan
     attribute :local_conf_maxdepth, default: nil # meaningful (and didactic) nil
     attribute :local_conf_startpath, proc: true, default: ->{ Face::MyPathname.pwd }
   end
-  Api.set_defaults_if_nil!
+  API.set_defaults_if_nil!
 
   module GlobalStyle
     # @later this might be stylus pattern
@@ -189,7 +189,7 @@ module Skylab::TanMan
     end
   end
 
-  module Api::AdaptiveStyle
+  module API::AdaptiveStyle
     # Simply provides convenience methods that are shorthand wrappers
     # for the below style methods, for whose implementation text_styler()
     # is relied up.
@@ -205,13 +205,13 @@ module Skylab::TanMan
     delegates_to :text_styler, :pre
   end
 
-  module Api::UniversalStyle
+  module API::UniversalStyle
     def pre str
       "\"#{str}\""
     end
   end
 
-  module Api::RuntimeExtensions
+  module API::RuntimeExtensions
     extend Bleeding::DelegatesTo
     include GlobalStyle
     def add_invalid_reason mixed
@@ -227,7 +227,7 @@ module Skylab::TanMan
     delegates_to :runtime, :stdout, :text_styler
   end
 
-  class Api::Singletons
+  class API::Singletons
     def clear
       @config.clear if @config
     end
@@ -247,11 +247,11 @@ module Skylab::TanMan
     def api
       @api and return @api
       require_relative 'api/runtime'
-      @api = Api::RootRuntime.new
+      @api = API::RootRuntime.new
     end
   end
 
-  class Api::Event < PubSub::Event
+  class API::Event < PubSub::Event
     # this is all very experimental and subject to change!
     def json_data
       case payload
@@ -268,11 +268,11 @@ module Skylab::TanMan
     end
   end
 
-  Api::Emitter = Object.new
-  class << Api::Emitter
+  API::Emitter = Object.new
+  class << API::Emitter
     def new *a
       PubSub::Emitter.new(*a).tap do |graph|
-        graph.event_class Api::Event
+        graph.event_class API::Event
       end
     end
   end

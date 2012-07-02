@@ -19,7 +19,7 @@ module Skylab::TanMan
       sexp = CodeMolester::Config::Section.create('', parent)
       remote.bind(sexp) ? self : false
     end
-    OnRemove = Api::Emitter.new(:all, :error => :all, :info => :all, :write => :all)
+    OnRemove = API::Emitter.new(:all, :error => :all, :info => :all, :write => :all)
     def remove remote, &on_info
       e = OnRemove.new(on_info)
       section_name = remote.sexp.section_name

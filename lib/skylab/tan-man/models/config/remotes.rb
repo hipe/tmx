@@ -34,7 +34,7 @@ module Skylab::TanMan
       super(&block)
     end
     attr_reader :num_resources_seen
-    class OnRemove < Api::Emitter.new(:all, error: :all, remote_not_found: :error)
+    class OnRemove < API::Emitter.new(:all, error: :all, remote_not_found: :error)
       attr_accessor :on_all
       attr_accessor :on_write
     end

@@ -1,17 +1,17 @@
 module Skylab::TanMan
-  class Api::Action
+  class API::Action
     extend Bleeding::DelegatesTo
     extend PubSub::Emitter
     extend Porcelain::AttributeDefiner
 
-    include Api::RuntimeExtensions
+    include API::RuntimeExtensions
     include AttributeReflection::InstanceMethods
-    include Api::AdaptiveStyle
+    include API::AdaptiveStyle
 
     meta_attribute(*MetaAttributes[:boolean, :default, :mutex_boolean_set,:pathname, :required, :regex])
 
     emits Bleeding::EVENT_GRAPH.merge(MY_EVENT_GRAPH)
-    event_class Api::Event
+    event_class API::Event
 
     delegates_to :class, :action_name
 
@@ -72,7 +72,7 @@ module Skylab::TanMan
     end
   end
 
-  class << Api::Action
+  class << API::Action
 
     def action_name
       to_s.match(/[^:]+$/)[0].gsub(/([a-z])([A-Z])/) { "#{$1}-#{$2}" }.downcase

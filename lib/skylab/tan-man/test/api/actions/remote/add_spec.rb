@@ -2,7 +2,7 @@ require_relative '../../../../api'
 require_relative '../../../test-support'
 
 module Skylab::TanMan::TestSupport
-  describe "The #{TanMan::Api} action Remote Add", tanman: true do
+  describe "The #{TanMan::API} action Remote Add", tanman: true do
     let(:name) { [:remote, :add] }
 
     context "when there is no local conf directory" do

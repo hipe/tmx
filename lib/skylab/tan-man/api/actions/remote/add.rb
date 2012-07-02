@@ -1,7 +1,7 @@
 module Skylab::TanMan
-  module Api::Actions::Remote
+  module API::Actions::Remote
   end
-  class Api::Actions::Remote::Add < Api::Action
+  class API::Actions::Remote::Add < API::Action
     attribute :host, required: true
     attribute :name, required: true
     attribute :resource, default: :local, mutex_boolean_set: [:local, :global]

@@ -1,7 +1,7 @@
 module Skylab::TanMan
-  module Api::Actions::Remote
+  module API::Actions::Remote
   end
-  class Api::Actions::Remote::Rm < Api::Action
+  class API::Actions::Remote::Rm < API::Action
     attribute :remote_name, required: true
     attribute :resource_name, mutex_boolean_set: [:local, :global]
     def execute
