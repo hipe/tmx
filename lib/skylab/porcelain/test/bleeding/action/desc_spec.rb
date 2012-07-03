@@ -50,5 +50,31 @@ module Skylab::Porcelain::Bleeding::TestSupport
         base.desc.should eql(['foo', 'bar'])
       end
     end
+    context "(bugfix: be sure that flyweighting doesn't interfere)" do
+      let(:emit_spy) { ::Skylab::TestSupport::EmitSpy.new }
+      klass(:CLI, extends: Bleeding::Runtime) do
+        def initialize rt
+          @rt = rt
+        end
+        def emit(t, s)
+          @rt.emit(SimplifiedEvent.new(t, unstylize(s)))
+        end
+        module self::Actions ; end
+        class self::Action
+          extend Bleeding::ActionModuleMethods
+        end
+        class self::Actions::Ferp < self::Action
+          desc "wing"
+        end
+        class self::Actions::Derp < self::Action
+          desc "ding"
+        end
+      end
+      it "it should not have flyweighting fuck this whole thing up", f:true do
+        send(:CLI).new(emit_spy).invoke(['-h'])
+        emit_spy.stack.map(&:message).grep(/^ *ferp\b/).first.should be_include('wing')
+        emit_spy.stack.map(&:message).grep(/^ *derp\b/).first.should be_include('ding')
+      end
+    end
   end
 end

@@ -5,7 +5,7 @@ module Skylab::TestSupport
     end
     def debug!
       self.do_debug = true
-      self.formatter ||= ->(e){ e.to_s }
+      self.formatter ||= ->(*e){ e = e.first if 1 == e.length ; (e.respond_to?(:string) ? e.string : e.to_s) }
       self
     end
     def no_debug!

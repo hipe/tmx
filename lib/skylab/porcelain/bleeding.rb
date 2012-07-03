@@ -22,7 +22,7 @@ module Skylab::Porcelain::Bleeding
   module MetaInstanceMethods
     include MetaMethods
     def desc
-      @desc ||= (reflector.respond_to?(:desc) ? reflector.desc.dup : [])
+      reflector.respond_to?(:desc) ? reflector.desc.dup : [] # do not mutate, flyweighting!
     end
     def _klass;  self.class  end
     alias_method :reflector, :_klass
@@ -202,35 +202,35 @@ module Skylab::Porcelain::Bleeding
   module NamespaceModuleMethods
     include ActionModuleMethods
   end
-  class Actions < ::Enumerator
-    def self.[](*a) ; build(*a) end
-    def self.build *actionss
-      new do |y|
-        actionss.each do |actions|
-          actions.each do |meta|
-            y << meta
-          end
-        end
+  class ActionEnumerator < ::Enumerator
+    singleton_class.send(:alias_method, :[], :new)
+    def initialize *a, &b
+      @block = if a.length > 0 then
+        block_given? and raise ArgumentError.new("can't have both block and args")
+        init(*a) or raise ArgumentError.new("init() block must return a Proc")
+      else
+        b or raise ArgumentError("block must be given if args are not")
       end
+      super(&@block)
     end
     def filter &b
       self.class.new { |y| each { |*a| b.call(y, *a) } }
     end
-    def _self ; self end
+    def _self   ; self                                                   end
+    def visible ; filter { |y, a| y << a if a.visible? }                 end
+  end
+  class Actions < ActionEnumerator
+    def init *a ; ->(y) { a.each { |e| e.each { |o| y << o } } } end
     alias_method :helps, :_self # hook for stubbing
     alias_method :names, :_self # hook for stubbing
-    def visible
-      filter { |y, a| y << a if a.visible? }
-    end
   end
-  class Constants < Actions
-    def self.build mod
+  class Constants < ActionEnumerator
+    def init mod
       flyweight = nil
-      new do |y|
+      ->(y) do
         mod.constants.each do |const|
-          m = mod.const_get(const)
-          y << (m.respond_to?(:action_meta) ? m.action_meta :
-            (flyweight ||= MetaInferred.new).set!(m))
+          y << ((m = mod.const_get(const)).respond_to?(:action_meta) ?
+            m.action_meta : (flyweight ||= MetaInferred.new).set!(m))
         end
       end
     end
@@ -350,11 +350,6 @@ module Skylab::Porcelain::Bleeding
     end
     attr_writer :program_name
   end
-  module Officious
-    def self.actions
-      Constants[self]
-    end
-  end
   class MetaInferred
     include MetaInstanceMethods
     attr_reader :reflector
@@ -393,6 +388,11 @@ module Skylab::Porcelain::Bleeding
     attr_reader :modul_with_actions
     alias_method :reflector, :modul_with_actions # for documentation generation
     alias_method :builder, :modul_with_actions   # for find
+  end
+  module Officious
+    def self.actions
+      Constants[self]
+    end
   end
   class Officious::Help
     extend ActionModuleMethods

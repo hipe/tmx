@@ -4,7 +4,11 @@ require_relative '../../core'
 module Skylab::Porcelain::Bleeding::TestSupport
   Bleeding = ::Skylab::Porcelain::Bleeding
   Porcelain = ::Skylab::Porcelain
-  SimplifiedEvent = Struct.new(:type, :message) # hack for prettier dumps ick!
+  class SimplifiedEvent < Struct.new(:type, :message) # hack for prettier dumps ick!
+    def string
+      "#{type.inspect} #{message.inspect}"
+    end
+  end
 
   class ::RSpec::Matchers::DSL::Matcher
     include ::Skylab::Porcelain::En::Number
