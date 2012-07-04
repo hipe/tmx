@@ -24,7 +24,7 @@ module Skylab::MetaHell
     end
     def modul full_name, &body
       mod = build_module(full_name.to_s.split('__'))
-      mod.module_eval(&body)
+      mod.module_eval(&body) if block_given?
       mod
     end
   end
