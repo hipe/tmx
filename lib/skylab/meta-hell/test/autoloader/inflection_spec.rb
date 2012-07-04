@@ -36,5 +36,6 @@ describe Skylab::Autoloader::Inflection do
     yerp 'foo-bar/baz/.rb', 'FooBar::Baz::', '(will strip extension names of .rb only)'
     yerp 'yerp/hoopie-doopie.py', 'Yerp::HoopieDoopiepy', '(but only .rb)'
     yerp 'one/////two', 'One::Two', '(corrects multiple slashes)'
+    yerp 'path Here This::Is::This', 'PathHereThisIsThis', '(but what about this BS)'
   end
 end
