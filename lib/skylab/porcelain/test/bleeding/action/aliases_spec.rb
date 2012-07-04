@@ -3,8 +3,8 @@ require_relative '../test-support'
 module Skylab::Porcelain::Bleeding::TestSupport
   describe "This is the deal with aliases with #{Bleeding::ActionModuleMethods} (NOT an inheritable attribute)" do
     extend ModuleMethods ; include InstanceMethods
-    _hack = nil ; _last = 0
-    let(:base_module) { Skylab::Porcelain::Bleeding.const_set("XyzzyD#{_last += 1}", Module.new) }
+    _hack = nil
+    base_module!
     klass(:BaseAction) do
       extend Bleeding::ActionModuleMethods
     end

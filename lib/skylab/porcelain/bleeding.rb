@@ -201,6 +201,9 @@ module Skylab::Porcelain::Bleeding
   end
   module NamespaceModuleMethods
     include ActionModuleMethods
+    def build parent
+      NamespaceInferred.new(self).build(parent)
+    end
   end
   class ActionEnumerator < ::Enumerator
     singleton_class.send(:alias_method, :[], :new)

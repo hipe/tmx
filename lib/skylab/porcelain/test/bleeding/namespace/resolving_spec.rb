@@ -1,5 +1,4 @@
-require_relative '../../core'
-require_relative 'test-support'
+require_relative '../test-support'
 
 
 module ::Skylab::Porcelain::Bleeding::TestSupport
