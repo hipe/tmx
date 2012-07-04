@@ -114,6 +114,12 @@ module Skylab::Porcelain::Bleeding::TestSupport
   end
   module ModuleMethods
     include ::Skylab::MetaHell::KlassCreator
+    include ::Skylab::Autoloader::Inflection
+    def base_module!
+      (const = constantize description) !~ /\A[A-Z][_a-zA-Z0-9]*\z/ and fail("oops: #{const.inspect}")
+      _last = 0
+      let(:base_module) { ::Skylab::Porcelain::Bleeding.const_set("#{const}#{_last += 1}", Module.new) }
+    end
     def events &specify_body
       specify(&specify_body)
       tok = @last_token

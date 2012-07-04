@@ -4,8 +4,8 @@ require_relative '../test-support'
 module Skylab::Porcelain::Bleeding::TestSupport
   describe "So check this shit out with summary, an inheritbale attribute of #{Bleeding::ActionModuleMethods}:" do
     extend ModuleMethods ; include InstanceMethods
-    _hack = nil ; _last = 0
-    let(:base_module) { Skylab::Porcelain::Bleeding.const_set("XyzzyC#{_last += 1}", Module.new) }
+    _hack = nil
+    base_module!
     klass(:Base) do
       extend Bleeding::ActionModuleMethods
       instance_exec(& _hack.desc_block)

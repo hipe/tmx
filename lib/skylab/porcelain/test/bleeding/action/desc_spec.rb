@@ -3,8 +3,7 @@ require_relative '../test-support'
 module Skylab::Porcelain::Bleeding::TestSupport
   describe "desc, an inheritable attribute of #{Bleeding::ActionModuleMethods}" do
     extend ModuleMethods ; include InstanceMethods
-    _last = 0
-    let(:base_module) { Skylab::Porcelain::Bleeding.const_set("XyzzyE#{_last += 1}", Module.new) }
+    base_module!
     klass(:Base) do
       extend Bleeding::ActionModuleMethods
     end

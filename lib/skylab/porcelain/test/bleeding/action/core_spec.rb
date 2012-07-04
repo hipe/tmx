@@ -4,8 +4,7 @@ module Skylab::Porcelain::Bleeding::TestSupport
   describe "#{Bleeding::ActionModuleMethods}" do
     extend ModuleMethods
     include InstanceMethods
-    _last = 0
-    let(:base_module) { Skylab::Porcelain::Bleeding.const_set("XyzzyB#{_last += 1}", Module.new) }
+    base_module!
     with_namespace 'herp-derp'
     context "You can't have an action that is a completely blank slate class because that" do
       with_action 'ferp-merp'
