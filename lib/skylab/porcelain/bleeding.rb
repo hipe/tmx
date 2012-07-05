@@ -18,6 +18,9 @@ module Skylab::Porcelain::Bleeding
       [reflector.to_s.match(/[^:]+$/)[0].gsub(/(?<=[a-z])([A-Z])/) { "-#{$1}" }.downcase]
     end
     alias_method :aliases, :aliases_inferred
+    def syntax
+      [option_syntax.string, argument_syntax.string].compact.join(' ')
+    end
   end
   module MetaInstanceMethods
     include MetaMethods
@@ -38,16 +41,17 @@ module Skylab::Porcelain::Bleeding
     end
   end
   module ActionInstanceMethods
-    include Styles
+    include MetaInstanceMethods, Styles
     def argument_syntax
-      @argument_syntax ||= ArgumentSyntax.new(self)
+      @argument_syntax ||= if reflector.respond_to?(:argument_syntax) then reflector.argument_syntax.dupe
+                           else ArgumentSyntax.new(->{ reflector.instance_method(:invoke).parameters }, ->{ option_syntax.any? }) end
     end
     def bound_invocation_method
       method(:invoke)
     end
     def emit *a
       if ! @parent
-        fail("WHERE IS PARENT IN THIS #{self.class}:\n#{self.inspect}")
+        fail("WHERE IS PARENT IN THIS #{self.class}:\n#{self.inspect}") # @todo
       end
       @parent.emit(*a)
     end
@@ -83,9 +87,7 @@ module Skylab::Porcelain::Bleeding
       OptionSyntax
     end
     attr_accessor :parent
-    def parameters # @todo:redundant
-      reflector.instance_method(:invoke).parameters # self might be an inferred action documentor, e.g.
-    end
+    def parameters ; argument_syntax.parameters end # @delegates_to
     def program_name
       "#{@parent.program_name} #{aliases.first}"
     end
@@ -95,18 +97,18 @@ module Skylab::Porcelain::Bleeding
       meth = argument_syntax.parse!(argv, args, self) or return help
       [meth, args]
     end
-    def syntax
-      [option_syntax.string, argument_syntax.string].compact.join(' ') # aliases.first
-    end
   end
   module ActionKlassInstanceMethods
-    include ActionInstanceMethods, MetaInstanceMethods
+    include ActionInstanceMethods
     alias_method :builder, :_klass
   end
   module ActionModuleMethods
     include MetaMethods
     def self.extended klass
       klass.send(:include, ActionKlassInstanceMethods)
+    end
+    def argument_syntax
+      @argument_syntax ||= ArgumentSyntax.new(->{ instance_method(:invoke).parameters }, ->{ option_syntax.any? })
     end
     def build parent
       new.tap { |o| o.parent = parent }
@@ -163,7 +165,7 @@ module Skylab::Porcelain::Bleeding
           name == token and return act.builder # first whole match always wins
           _first_match # we only want any one of these per action
         end and begin
-          matched.push(first_match) ; builder = act.builder
+          matched.push(first_match) ; builder = act.respond_to?(:builder) ? act.builder : act
         end
       end
       case matched.size
@@ -238,22 +240,18 @@ module Skylab::Porcelain::Bleeding
       end
     end
   end
-  class ArgumentSyntax
+  class ArgumentSyntax < Struct.new(:parameters_block, :takes_options_block)
     def [] idx
       string.split(' ')[idx] or "<arg#{idx + 1}>"  # @hack
     end
     def define! s
       @string = s
     end
-    def initialize syntax # @duck parameters(), option_syntax()
-      @syntax = syntax
-      @string = nil
-    end
-    def parse! argv, args, runtime # @duck bound_invocation_method, option_syntax, emit
-      runtime.object_id == @syntax.object_id or fail("when? @todo")
+    alias_method :dupe, :dup # careful!
+    def parameters ; parameters_block.call end
+    def parse! argv, args, runtime # @duck bound_invocation_method, emit
       meth = runtime.bound_invocation_method
-      parameters = meth.parameters
-      runtime.option_syntax.any? and parameters.pop # ick
+      parameters = takes_options? ? meth.parameters[0..-2] : meth.parameters
       count = Hash.new { |h, k| h[k] = 0 }
       parameters.each { |p| count[p.first] += 1 }
       error = ->(msg) { runtime.emit(:syntax_error, msg) ; false }
@@ -267,10 +265,8 @@ module Skylab::Porcelain::Bleeding
       meth
     end
     def string
-      @string and return @string
-      params = @syntax.parameters
-      @syntax.option_syntax.any? and params.pop
-      params.map do |p|
+      (@string ||= nil) and return @string
+      parameters[0..(takes_options? ? -2 : -1)].map do |p|
         a, b = case p.first
                when :req  ;
                when :opt  ; %w([ ])
@@ -279,6 +275,9 @@ module Skylab::Porcelain::Bleeding
                end
         "#{a}<#{p.last}>#{b}"
       end.join(' ')
+    end
+    def takes_options?
+      takes_options_block.call
     end
   end
   class OptionSyntax < Struct.new(:definitions, :documentor_class, :parser_class, :help_enabled)
@@ -369,6 +368,9 @@ module Skylab::Porcelain::Bleeding
       (@parent = parent).respond_to?(:emit) or fail("emitter?") # @todo might rename all of these to "runtime"
       set!(reflector)
     end
+    def syntax # tricky: we are using this class IFF we don't have options
+      ArgumentSyntax.new(->{ @reflector.instance_method(:invoke).parameters }, -> { false }).string
+    end
   end
   class RuntimeInferred < DocumentorInferred
     def initialize parent, built, builder
@@ -378,7 +380,7 @@ module Skylab::Porcelain::Bleeding
     attr_reader :bound_invocation_method
   end
   class NamespaceInferred
-    include NamespaceInstanceMethods, MetaInstanceMethods
+    include NamespaceInstanceMethods
     def actions
       Actions[ Constants[@modul_with_actions], Officious.actions ]
     end
