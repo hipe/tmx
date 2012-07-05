@@ -177,6 +177,21 @@ module Skylab::Porcelain::Bleeding::TestSupport
     include ::Skylab::MetaHell::KlassCreator::ExtensorInstanceMethods
     include ::Skylab::Porcelain::TiteColor # unstylize
     attr_reader :base_module
+    def build_action_runtime action_token
+      _rt = Bleeding::Runtime.new
+      _rt.program_name = "KUSTOM-RT-FOR-#{action_token.upcase}"
+      _rt.parent = emit_spy
+      once = ->() do
+        akton = send(constantize action_token)
+        a = Bleeding::Actions[ [akton], Bleeding::Officious.actions ]
+        (once = ->{ a }).call
+      end
+      _rt.singleton_class.send(:define_method, :actions) { once.call }
+      _rt.fetch(action_token)
+    end
+    def emit_spy
+      @emit_spy ||= MyEmitSpy.new
+    end
     def namespace
       @nermsperce
     end

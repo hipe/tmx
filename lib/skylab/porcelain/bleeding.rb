@@ -163,7 +163,7 @@ module Skylab::Porcelain::Bleeding
           name == token and return act.builder # first whole match always wins
           _first_match # we only want any one of these per action
         end and begin
-          matched.push(first_match) ; builder = act.builder
+          matched.push(first_match) ; builder = act.respond_to?(:builder) ? act.builder : act
         end
       end
       case matched.size
