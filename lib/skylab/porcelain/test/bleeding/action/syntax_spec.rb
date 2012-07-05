@@ -9,28 +9,37 @@ module Skylab::Porcelain::Bleeding::TestSupport
     context "with regards to inferred syntaxes" do
       klass(:Akton) do
         extend Bleeding::ActionModuleMethods
-        def invoke niggle=nil, naggle
+        def invoke wiggle=nil, waggle
         end
       end
       context "of arguments" do
-        it "via the class"
+        context "via the class" do
+          let(:subject) { klass.argument_syntax.string }
+          specify { should eql('[<wiggle>] <waggle>') }
+        end
         context "via the runtime" do
           let(:subject) { runtime.argument_syntax.string }
-          specify { should eql('[<niggle>] <naggle>') }
+          specify { should eql('[<wiggle>] <waggle>') }
         end
       end
       context "of options" do
-        it "via the class"
+        context "via the class (option syntax is nil b/c that cannot be inferred)" do
+          let(:subject) { klass.option_syntax.string }
+          specify { should be_nil }
+        end
         context "via the runtime (option_syntax is nil b/c that cannot be inferred)" do
           let(:subject) { runtime.option_syntax.string }
           specify { should be_nil }
         end
       end
       context "as a whole" do
-        it "via the class"
+        context "via the class" do
+          let(:subject) { klass.syntax }
+          specify { should eql('[<wiggle>] <waggle>') }
+        end
         context "via the runtime" do
           let(:subject) { runtime.syntax }
-          specify { should eql('[<niggle>] <naggle>') }
+          specify { should eql('[<wiggle>] <waggle>') }
         end
       end
     end
@@ -45,15 +54,21 @@ module Skylab::Porcelain::Bleeding::TestSupport
         end
       end
       context "the syntax of options" do
-        it "via the class"
+        context "via the class" do
+          let(:subject) { klass.option_syntax.string }
+          specify { should eql('[-x] [-p <queue>]') }
+        end
         context "via the runtime" do
           let(:subject) { runtime.option_syntax.string }
           specify { should eql("[-x] [-p <queue>]") }
         end
       end
       context "the syntax feels good on the whole" do
-        it "via the class"
-        context "via the runtime", f:true do
+        context "via the class" do
+          let(:subject) { klass.syntax }
+          specify { should eql('[-x] [-p <queue>] [<zoip>] <voip>') }
+        end
+        context "via the runtime" do
           let(:subject) { runtime.syntax }
           specify { should eql('[-x] [-p <queue>] [<zoip>] <voip>') }
         end
