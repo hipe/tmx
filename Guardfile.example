@@ -49,6 +49,7 @@ module Skylab::Guardfile
     def each_line &b
       (@ram ||= @fh.each_line.map { |l| l }).each(&b)
     end
+    def emit t, m ; @parent.emit(t, m) end
     def rewrite! nodes
       ram = nodes.map(&:line)
       ll = [] ; line = nil
@@ -59,7 +60,11 @@ module Skylab::Guardfile
         ram[0..-2].each { |l| ll.push("#{l}\n") }
         ram.any? and ll.push ram.last
       end
-      @commit and File.open(@fh.path, 'w') { |fh| ll.each { |l| fh.write l } }
+      if @commit
+        x = 0
+        File.open(@fh.path, 'w') { |fh| ll.each { |l| x += 1 ; fh.write l } }
+        emit :info, "(wrote #{x} lines.)"
+      end
       @ram = ram
     end
   end
@@ -110,22 +115,26 @@ module Skylab::Guardfile
       end
     end
   end
-  class CLI::Actions::Check < CLI::Action
+  class CLI::UpdatingAction < CLI::Action
     include CLI::UpdaterInstanceMethods
     def option_syntax o ; end
+  end
+  class CLI::Actions::Check < CLI::UpdatingAction
     def execute opts
       tagged.each { |c| render_tagged c }
     end
   end
-  class CLI::Actions::Update < CLI::Action
-    include CLI::UpdaterInstanceMethods
-    def option_syntax o ; end
+  class CLI::Actions::Update < CLI::UpdatingAction
     def execute opts
       datastore.rewrite! tagged.map(&:last)
       tagged.each { |c| render_tagged c }
     end
   end
-  class CLI::Actions::Prune < CLI::Action
+  class CLI::Actions::Prune < CLI::UpdatingAction
+    def execute opts
+      datastore.rewrite!(tagged.select{ |t| :stale != t.first }.map(&:last))
+      tagged.each { |c| render_tagged c }
+    end
   end
 end
 
@@ -134,5 +143,12 @@ if __FILE__ == $PROGRAM_NAME
 end
 
 __END__
-one
-two
+lib/skylab/code-molester/test
+lib/skylab/dependency/test
+lib/skylab/kurse/test
+lib/skylab/meta-hell/test
+lib/skylab/porcelain/test
+lib/skylab/pub-sub/test
+lib/skylab/slake/test
+lib/skylab/tan-man/test
+lib/skylab/treemap/test

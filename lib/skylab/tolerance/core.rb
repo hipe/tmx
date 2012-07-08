@@ -96,7 +96,7 @@ module Skylab::Tolerance
         o.on('-h', '--help', 'this screen.') { help }
         o.release = 'alpha'
         o.version = '0.0.0'
-        o.separator invitation(true)
+        o.separator invitation(true) if actions?
       end
     end
     def option_syntax? # need to avoid circular dependency bwn option_parser and argument_syntax
