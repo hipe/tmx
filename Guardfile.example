@@ -1,10 +1,14 @@
 #!/usr/bin/env ruby -w
+require 'fileutils'
+require 'open3'
 require 'optparse'
+require 'pathname'
+require 'shellwords'
 
 module Skylab ; end
 module Skylab::Tolerance
   module TiteColor
-    _ = [nil, :strong, * Array.new(29), :red, :green, * Array.new(3), :cyan]
+    _ = [nil, :strong, * Array.new(29), :red, :green, :yellow, :blue, :magenta, :cyan, :white]
     MAP = Hash[ * _.each_with_index.map { |sym, idx| [sym, idx] if sym }.compact.flatten ]
     def stylize str, *styles ; "\e[#{styles.map{ |s| MAP[s] }.compact.join(';')}m#{str}\e[0m" end
   end
@@ -37,7 +41,10 @@ module Skylab::Tolerance
       '' == s ? nil : s
     end
     def argument_parameters
-      method(:execute).parameters[0..(option_syntax? ? -2 : -1)]
+      bound_method.parameters[0..(option_syntax? ? -2 : -1)]
+    end
+    def bound_method
+      method :execute
     end
     def client_class
       self.class
@@ -62,8 +69,7 @@ module Skylab::Tolerance
         action.parent!(self).invoke(argv)
       else
         parse_opts(argv) && parse_args(argv) or return
-        _argv = argv + [(opts if option_syntax?)].compact
-        emit(:info, "OK: #{_argv.inspect}")
+        bound_method.call(* (argv + [(opts if option_syntax?)].compact))
       end
     end
     def resolve argv
@@ -164,40 +170,125 @@ module Skylab::Tolerance
 end
 
 module Skylab::Guardfile
+  module Models
+  end
+  class Models::Cluster < Struct.new(:path)
+    def self.from_datastore data
+      Enumerator.new do |y|
+        data.each_line do |line|
+          y << new(line)
+        end
+      end
+    end
+    def initialize path
+      super path.chomp
+    end
+    alias_method :line, :path
+    alias_method :string, :path
+  end
+  class Models::Cluster::Enumerator < ::Enumerator
+    def from_filesystem pwd
+      self.class.new do |y|
+        pwd = Pathname.new(pwd)
+        Open3.popen3("find #{Shellwords.shellescape pwd.to_s} -type dir -name test -depth 4") do |sin, sout, serr|
+          sout.each_line do |line|
+            pn = Pathname.new(line)
+            pn = pn.relative_path_from(pwd)
+            y << Models::Cluster.new(pn.to_s)
+          end
+          serr.each_line do |line|
+            emit :stderr, line
+          end
+        end
+      end
+    end
+  end
+  class Models::DataFile
+    def initialize parent
+      @commit = true
+      @fh = DATA
+      @parent = parent
+    end
+    def each_line &b
+      (@ram ||= @fh.each_line.map { |l| l }).each(&b)
+    end
+    def rewrite! nodes
+      ram = nodes.map(&:line)
+      ll = [] ; line = nil
+      File.open(@fh.path) do |fh|
+        ll.push(line) while line = fh.gets and "__END__\n" != line
+        line == "__END__\n" or fail("__END__ hack failed")
+        ll.push line
+        ram[0..-2].each { |l| ll.push("#{l}\n") }
+        ram.any? and ll.push ram.last
+      end
+      @commit and File.open(@fh.path, 'w') { |fh| ll.each { |l| fh.write l } }
+      @ram = ram
+    end
+  end
   class CLI < ::Skylab::Tolerance::Runtime
-    def emit _, msg    ; $stderr.puts(msg)   end
-    def option_syntax o ; end
+    def emit _, msg      ; $stderr.puts(msg)  ; end
+    def option_syntax o                       ; end
+    module Actions                            ; end
   end
   class CLI::Action
     include ::Skylab::Tolerance::ActionInstanceMethods
-  end
-  module CLI::Actions
-  end
-  class CLI::Actions::Check < CLI::Action
-    def option_syntax o ; end
-    def execute
-      emit :ok, "ok"
+    def clusters
+      Models::Cluster.from_datastore(datastore)
+    end
+    def datastore
+      @datastore ||= Models::DataFile.new(self)
+    end
+    def pwd
+      FileUtils.pwd
     end
   end
-  class CLI::Actions::CheckList < CLI::Action
+  module CLI::UpdaterInstanceMethods
+    def render_tagged c
+      emit(:info, "#{c.last.path} #{send(c.first, "(#{c.first.to_s})")}")
+    end
+    def tagged
+      # tag the union of existing and new nodes as follows: { new | ok | stale }
+      # then sort them and print them
+      existeds = clusters.to_a
+      existed = Hash[* existeds.map { |c| [c.path, true] }.flatten(1) ]
+      taggeds = []
+      seen = {}
+      clusters.from_filesystem(pwd).each do |c|
+        seen[c.path] = true
+        taggeds.push [existed[c.path] ? :ok : :new, c]
+      end
+      existeds.each { |c| seen[c.path] or taggeds.push([:stale, c]) }
+      taggeds.sort_by { |c| c.last.path }
+    end
+    def new     str ; stylize str, :green               end
+    def ok      str ; stylize str, :blue                end
+    def stale   str ; stylize str, :yellow              end
   end
   class CLI::Actions::List < CLI::Action
-    def option_syntax o
-      o.on('-m', '--miggle', 'nerk') { |x| opts[:nerk] = x }
-    end
-    def execute bing, *bong, opts
-      emit(:info, "FUCK YEAH HERE IN EXECUTE: #{bing.inspect} #{bong.inspect} #{opts.inspect}")
-    end
-  end
-  class CLI::Actions::Cluster < CLI::Action
-    def option_syntax o ; end
-    module Actions
-    end
-  end
-  class CLI::Actions::Cluster::Actions::Add < CLI::Action
     def option_syntax o ; end
     def execute opts
+      clusters.each do |clust|
+        emit(:payload, clust.string)
+      end
     end
+  end
+  class CLI::Actions::Check < CLI::Action
+    include CLI::UpdaterInstanceMethods
+    def option_syntax o ; end
+    def execute opts
+      tagged.each { |c| render_tagged c }
+    end
+  end
+  class CLI::Actions::Update < CLI::Action
+    include CLI::UpdaterInstanceMethods
+    def option_syntax o ; end
+    def execute opts
+      datastore.rewrite! tagged.map(&:last)
+      tagged.each { |c| render_tagged c }
+    end
+  end
+  class CLI::Actions::Prune < CLI::Action
   end
 end
 
@@ -205,19 +296,6 @@ if __FILE__ == $PROGRAM_NAME
   ::Skylab::Guardfile::CLI.new.invoke(ARGV)
 end
 
-if false
-DERP = %w(dependency slake)
-
-guard('rspec',
-  :all_on_start => false,
-  :cli => '-fd',
-  :spec_paths => DERP.map { |x| "lib/skylab/#{x}/test" }
-) do
-  watch(%r{^lib/skylab/[^/]+/test/.+_spec\.rb$})
-  DERP.each do |x|
-    watch(%r{^lib/skylab/#{x}/task-types/(.+)\.rb$}) do |m|
-      "lib/skylab/#{x}/test/task-types/#{m[1]}_spec.rb"
-    end
-  end
-end
-end
+__END__
+one
+two
