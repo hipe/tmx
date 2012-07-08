@@ -2,8 +2,7 @@ require File.expand_path('../../node', __FILE__)
 require 'pathname'
 
 module ::Skylab::CovTree
-  module Plumbing ; end
-  class Plumbing::Tree
+  class API::Actions::Tree
     extend ::Skylab::PubSub::Emitter
     emits :all,
       :payload => :all,   # for lines
@@ -20,7 +19,7 @@ module ::Skylab::CovTree
       @path or self.path = '.'
     end
     def invoke
-      @list and return list
+      (@list ||= nil) and return list
       tree
     end
     def list

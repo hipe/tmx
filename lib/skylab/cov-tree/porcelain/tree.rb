@@ -1,7 +1,7 @@
 require 'set'
 
 module Skylab::CovTree
-  class Porcelain::Tree
+  class CLI::Actions::Tree
     include ::Skylab::Porcelain::TiteColor
 
     @sides = [:test, :code] # order matters, left one gets the "plus"
@@ -14,7 +14,7 @@ module Skylab::CovTree
 
     def controller_class
       require ROOT.join('plumbing/tree').to_s
-      Plumbing::Tree
+      API::Actions::Tree
     end
     def emit(*a)
       @emitter.emit(*a)
@@ -27,8 +27,8 @@ module Skylab::CovTree
       a = []
       r = controller_class.new(@params) do |o|
         thru = ->(e) { emit(e.type, e) }
-        o.on_error &thru
-        o.on_payload &thru
+        o.on_error(&thru)
+        o.on_payload(&thru)
         o.on_line_meta { |e| a << e }
       end.invoke
       a.any? and return _render_tree_lines a
@@ -51,7 +51,7 @@ module Skylab::CovTree
       ["#{d[:prefix]}#{slug}", indicator] # careful!  escape codes have width
     end
   end
-  class << Porcelain::Tree
+  class << CLI::Actions::Tree
     attr_reader :colors
     def color types
       @colors[types.to_set] # nil ok
@@ -68,7 +68,7 @@ module Skylab::CovTree
         params[:path] and
           return error("Sorry, cannot use both \"rerun\" and \"path\" (#{params[:path]}) at the same time")
         require File.expand_path('../rerun', __FILE__)
-        klass = Porcelain::Rerun
+        klass = CLI::Actions::Rerun
       else
         klass = self
       end

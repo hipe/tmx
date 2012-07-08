@@ -1,7 +1,7 @@
 require File.expand_path('../tree', __FILE__)
 
 module Skylab::CovTree
-  class Plumbing::Rerun < Plumbing::Tree
+  class API::Actions::Rerun < API::Actions::Tree
     emits :all,
       :payload => :all,   # for lines
       :line_meta => :all, # for lines of tree

@@ -1,7 +1,7 @@
 require File.expand_path('../tree', __FILE__)
 
 module Skylab::CovTree
-  class Porcelain::Rerun < Porcelain::Tree
+  class CLI::Actions::Rerun < CLI::Actions::Tree
 
     @sides = [:all, :rerun] # left one gets the "plus"
 

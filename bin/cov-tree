@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby -w
+
+require_relative '../lib/skylab/cov-tree/porcelain'
+
+Skylab::CovTree::CLI.new do |p|
+  p.on_all { |e| $stderr.puts "#{e}" }
+end.invoke ARGV

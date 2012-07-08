@@ -1,10 +1,12 @@
 require File.expand_path('../api', __FILE__)
-require 'skylab/porcelain/tite-color'
+require 'skylab/porcelain/all'
 
 module Skylab::CovTree
-  class Porcelain
+  class CLI
     extend ::Skylab::Porcelain
     extend ::Skylab::PubSub::Emitter
+    module Actions
+    end
 
   inactionable
 
