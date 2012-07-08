@@ -787,7 +787,7 @@ module Skylab::Porcelain
     alias_method :orig_event_class, :event_class
     attr_writer :event_class
     def event_class
-      @event_class or orig_event_class
+      (@event_class ||= nil) or orig_event_class
     end
     %w(invocation render_actions resolve).each do |m| # @delegates @todo:#100.200.1
       define_method(m) { |*a, &b| stack.send(m, *a, &b) }
