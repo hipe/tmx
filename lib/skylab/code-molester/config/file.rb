@@ -2,7 +2,7 @@ require File.expand_path('..', __FILE__)
 prev = $VERBOSE ; $VERBOSE = false
 require 'treetop'
 $VERBOSE = prev # treetop is naughty (@todo etc?)
-require 'skylab/face/path-tools'
+require 'skylab/face/core'
 require 'skylab/pub-sub/emitter'
 
 module Skylab::CodeMolester
@@ -153,7 +153,7 @@ module Skylab::CodeMolester
     end
     delegates_to_truish_ivar '@pathname', :writable?
   end
-  MyPathname = Skylab::Face::MyPathname
+  MyPathname = ::Skylab::Face::MyPathname
   class << Config::File
     def parser_class
       @parser_class ||= begin

@@ -1,5 +1,4 @@
 require 'fileutils'
-require 'pathname'
 require 'shellwords'
 
 module Skylab; end
@@ -12,22 +11,36 @@ module Skylab::Face
         Regexp.escape(FileUtils.pwd.sub(/\A\/private\//, '/'))
       }/, '.')
     end
-    HOME_DIR_RE = %r{\A#{Regexp.escape(ENV['HOME'])}/}
+    def home
+      if ! instance_variable_defined?('@home') or @home.nil?
+        @home = ENV['HOME']
+      end
+      @home
+    end
+    def home_re
+      @home_re ||= %r{\A#{Regexp.escape home}(?=/|\z)}
+    end
     def pretty_path path
-      path.sub(/\A#{Regexp.escape(FileUtils.pwd)}\//, './').sub(HOME_DIR_RE, '~/')
+      home = self.home ; pwd = self.pwd
+      both = [home, pwd]
+      if home and pwd and
+        idx = [->{home.index(pwd)}, ->{pwd.index(home)}].index { |p| 0 == p.call } and
+        0 == path.index([home, pwd][idx])
+      then
+        if 0 == idx then pwd = false else home = false end
+      end
+      path = path.sub(home_re, '~') if home
+      path = path.sub(pwd_re,  '.') if pwd
+      path
+    end
+    def pwd
+      FileUtils.pwd
+    end
+    def pwd_re
+      %r{\A#{Regexp.escape pwd}(?=/|\z)}
     end
     def escape_path path
-      (path.to_s =~ / |\$|'/) ? Shellwords.shellescape(path) : path.to_s
-    end
-  end
-  # @todo fix this namespace mess
-  class MyPathname < Pathname
-    def join *a
-      self.class.new(super(*a)) # awful! waiting for patch for ruby maybe?
-    end
-    def pretty
-      PathTools.pretty_path to_s
+      (path.to_s =~ / |\$|'/) ? ::Shellwords.shellescape(path) : path.to_s
     end
   end
 end
-

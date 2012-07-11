@@ -42,7 +42,7 @@ module Skylab::Treemap
       require 'skylab/face/path-tools'
       alias_method("#{name}_after_path=", "#{name}=")
       define_method("#{name}=") do |path|
-        send("#{name}_after_path=", path ? Skylab::Face::MyPathname.new(path.to_s) : path)
+        send("#{name}_after_path=", path ? ::Skylab::Face::MyPathname.new(path.to_s) : path)
         path
       end
     end

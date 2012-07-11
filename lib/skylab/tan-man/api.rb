@@ -1,5 +1,5 @@
 require File.expand_path('../..', __FILE__)
-require 'skylab/face/path-tools'
+require 'skylab/face/core'
 require 'skylab/meta-hell/autoloader/autovivifying'
 require 'skylab/porcelain/attribute-definer'
 require 'skylab/porcelain/bleeding'
@@ -81,7 +81,7 @@ module Skylab::TanMan
     meta_attribute :pathname do |name, _|
       alias_method(after = "#{name}_after_pathname=", "#{name}=")
       define_method("#{name}=") do |path|
-        send(after, path ? Face::MyPathname.new(path.to_s) : path)
+        send(after, path ? ::Skylab::Face::MyPathname.new(path.to_s) : path)
         path
       end
     end
@@ -175,7 +175,7 @@ module Skylab::TanMan
     attribute :local_conf_config_name, default: 'config'
     attribute :local_conf_dirname, default: '.tanman'
     attribute :local_conf_maxdepth, default: nil # meaningful (and didactic) nil
-    attribute :local_conf_startpath, proc: true, default: ->{ Face::MyPathname.pwd }
+    attribute :local_conf_startpath, proc: true, default: ->{ ::Skylab::Face::MyPathname.pwd }
   end
   API.set_defaults_if_nil!
 

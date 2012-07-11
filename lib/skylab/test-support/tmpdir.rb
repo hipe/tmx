@@ -1,13 +1,13 @@
 require 'open3'
 require 'stringio'
 require File.expand_path('../test-support', __FILE__)
-require 'skylab/face/path-tools'
+require 'skylab/face/core'
 
 module Skylab::TestSupport
-  class Tmpdir < Skylab::Face::MyPathname
+  class Tmpdir < ::Skylab::Face::MyPathname
     include FileUtils
     def copy pathname, destination_basename = nil
-      source = Skylab::Face::MyPathname.new(pathname.to_s)
+      source = ::Skylab::Face::MyPathname.new(pathname.to_s)
       destination = join(destination_basename || source.basename)
       cp source.to_s, destination.to_s, verbose: @verbose, noop: @noop
     end
