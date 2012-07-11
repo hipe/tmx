@@ -1,7 +1,7 @@
-require 'skylab/face/path-tools'
+require 'skylab/face/core'
 
 module Skylab::Treemap
-  class API::Path < Skylab::Face::MyPathname
+  class API::Path < ::Skylab::Face::MyPathname
     attr_writer :forceless
     def forceless?
       @forceless.call
