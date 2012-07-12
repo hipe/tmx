@@ -11,7 +11,7 @@ module Skylab::CovTree
     }
 
     def controller_class
-      require ROOT.join('plumbing/tree').to_s
+      require ROOT.join('api/tree').to_s
       API::Actions::Tree
     end
     attr_accessor :do_list

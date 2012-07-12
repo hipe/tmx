@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby -w
 
-require_relative '../lib/skylab/cov-tree/porcelain'
+require_relative '../lib/skylab/cov-tree/cli'
 
 fscking_retarded = ->(p) do
   p.on_all { |e| $stderr.puts e }
