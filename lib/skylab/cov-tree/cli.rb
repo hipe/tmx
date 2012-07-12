@@ -18,10 +18,7 @@ module Skylab::CovTree
 
   inactionable
 
-    emits :all,
-      :info => :all,
-      :error => :all,
-      :payload => :all
+    emits :error, line_meta: :payload
 
   public
 

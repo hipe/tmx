@@ -1,11 +1,20 @@
 #!/usr/bin/env ruby -w
 
-require_relative '../lib/skylab/cov-tree/porcelain'
+require_relative '../lib/skylab/cov-tree/cli'
 
+# @todo all.rb is so hopelessly borked look at this shit
 fscking_retarded = ->(p) do
-  p.on_all { |e| $stderr.puts e }
-end # all.rb is broken
+  p.on_payload { |e| $stdout.puts e }
+  p.on_error   { |e| $stderr.puts e }
+end
 
-pp = Skylab::CovTree::CLI.new(&fscking_retarded)
+fuck_me_twice = ->(p) do
+  fscking_retarded.call(p)
+  p.on_ui do |e|
+    $stderr.tty? and $stderr.puts(e.to_s)
+  end
+end
+
+pp = Skylab::CovTree::CLI.new(&fuck_me_twice)
 fscking_retarded.call pp
 pp.invoke ARGV

@@ -12,7 +12,7 @@ module Skylab::CovTree
     }
 
     def controller_class
-      require ROOT.join('plumbing/rerun').to_s
+      require ROOT.join('api/rerun').to_s
       Plumbing::Rerun
     end
   end
