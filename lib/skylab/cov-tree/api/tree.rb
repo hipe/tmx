@@ -63,6 +63,7 @@ module ::Skylab::CovTree
       end
       codes = code_tree_struct or return false
       if 0 == codes.children_length # ditto above, test nodes w/ no code nodes
+        _hack = true
         codes = Node.new(root: true, slug: '(no code)', type: :code)
       else
         codes = codes.find(@test_dir.dirname.to_s) or fail("truncation hack failed")
@@ -72,6 +73,7 @@ module ::Skylab::CovTree
       both = Node.combine([codes, tests],
         keymaker: ->(n) { [n.slug, *(n.aliases? ? n.aliases : [])].last } # use the last alias as the comparison key
       )
+      both[:slug_dirname] = (_hack ? @test_dir.dirname : @test_dir.dirname.dirname).to_s
       both
     end
     def tree

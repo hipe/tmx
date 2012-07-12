@@ -51,6 +51,10 @@ module Skylab::CovTree
       color = self.class.color(n.types) and indicator = send(color, indicator)
       slug = n.slug
       slug.kind_of?(Array) and slug = slug.join(', ')
+      if n.key?(:slug_dirname)
+        a, b = n.slug.kind_of?(Array) ? ['{', '}'] : ['', '']
+        slug = "#{n[:slug_dirname]}/#{a}#{slug}#{b}"
+      end
       ["#{d[:prefix]}#{slug}", indicator] # careful!  escape codes have width
     end
   end
