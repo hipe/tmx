@@ -3,10 +3,8 @@ require 'skylab/face/core'
 
 module ::Skylab::CovTree
   class API::Actions::Tree < API::Action
-    emits :all,
-      error:     :all,      # not used. haha j/k
-      line_meta: :all,      # lines of tree
-      payload:   :all       # lines
+
+    emits :error, :line_meta, :payload
 
     attr_accessor :do_list
     def error msg
