@@ -30,7 +30,7 @@ module Skylab::Porcelain
       end
       unless child = children[slug]
         if create
-          child = self.class.build({:slug => slug, :leaf => path_arr.empty?}, &block) # @add_parent
+          child = self.class.build({:slug => slug}, &block) # @add_parent
           children[child.key] = child # let child choose its key!
         else
           return nil

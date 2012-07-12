@@ -56,9 +56,13 @@ module ::Skylab::CovTree
     end
     def tree_to_render
       tests = test_tree_struct or return false
-      tests = tests.find(@test_dir)
+      if 0 == tests.children_length # try to future-proof it.  careful!
+        tests = Node.new(root: true, slug: '(empty test dir)', type: :test)
+      else
+        tests = tests.find(@test_dir.to_s) or fail("truncation hack failed")
+      end
       codes = code_tree_struct or return false
-      codes = codes.find(@test_dir.dirname)
+      codes = codes.find(@test_dir.dirname.to_s) or fail("truncation hack failed")
       # tell the tests tree that it follows the codes tree's structure by aliasing it
       tests.aliases = [codes.slug]
       both = Node.combine([codes, tests],
