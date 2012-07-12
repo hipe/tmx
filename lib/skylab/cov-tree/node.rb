@@ -2,9 +2,9 @@ require 'skylab/porcelain/tree/node'
 
 module Skylab::CovTree
   class Node < ::Skylab::Porcelain::Tree::Node
-    def initialize *a
+    def initialize h, &b
       @aliases = nil
-      super(*a)
+      super(h, &b)
     end
     def slug
       self[:slug] or fail("node did no have a slug!")

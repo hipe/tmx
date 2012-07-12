@@ -1,9 +1,7 @@
 require 'set'
 
 module Skylab::CovTree
-  class CLI::Actions::Tree
-    include ::Skylab::Porcelain::TiteColor
-
+  class CLI::Actions::Tree < CLI::Action
     @sides = [:test, :code] # order matters, left one gets the "plus"
 
     @colors = {
@@ -16,16 +14,20 @@ module Skylab::CovTree
       require ROOT.join('plumbing/tree').to_s
       API::Actions::Tree
     end
+    attr_accessor :do_list
     def emit(*a)
       @emitter.emit(*a)
     end
+    attr_writer :emitter
     def initialize params
-      @emitter = params.delete(:emitter) or raise("no emitter")
-      @params = params
+      params.each do |k, v|
+        send("#{k}=", v)
+      end
+      @emitter or fail('no emitter')
     end
     def invoke
       a = []
-      r = controller_class.new(@params) do |o|
+      r = controller_class.new(do_list: do_list, path: path, stylus: self) do |o|
         thru = ->(e) { emit(e.type, e) }
         o.on_error(&thru)
         o.on_payload(&thru)
@@ -35,12 +37,13 @@ module Skylab::CovTree
       r
     end
     def _render_tree_lines events
-      _matrix = events.map { |e| _prerender_tree_line e.data }
+      _matrix = events.map { |e| _prerender_tree_line e.payload }
       max = _matrix.map{ |a| a.first.length }.max
       fmt = "%-#{max}s  %s"
       _matrix.each { |a| emit(:payload, fmt % a) }
       true
     end
+    attr_accessor :path
     def _prerender_tree_line d
       n = d[:node]
       a, b = self.class.sides.map { |s| n.types.include?(s) }
@@ -56,26 +59,15 @@ module Skylab::CovTree
     def color types
       @colors[types.to_set] # nil ok
     end
-    def error msg
-      @emitter.emit(:error, msg)
-      false
-    end
     def factory params
-      @emitter = params[:emitter] or fail("need an emitter")
-      if params[:list] and params[:rerun]
-        return error('Sorry, cannot use both "list" and "rerun" at the same time')
-      elsif params[:rerun]
-        params[:path] and
-          return error("Sorry, cannot use both \"rerun\" and \"path\" (#{params[:path]}) at the same time")
-        require File.expand_path('../rerun', __FILE__)
-        klass = CLI::Actions::Rerun
+      params = params.dup
+      if params.delete(:rerun)
+        require_relative 'rerun'
+        CLI::Actions::Rerun
       else
-        klass = self
-      end
-      klass.new params
+        self
+      end.new params
     end
     attr_reader :sides
   end
 end
-
-

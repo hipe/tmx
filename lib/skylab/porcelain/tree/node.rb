@@ -56,26 +56,25 @@ module Skylab::Porcelain
       end
     end
     def initialize hash=nil
-      if block_given?
-        yield(self, hash)
-      else
-        hash and hash.each { |k, v| self[k] = v }
-      end
+      hash and hash.each { |k, v| self[k] = v }
+      block_given? and yield(self)
     end
     def key
       self[:slug]
     end
-    def merge! node, opts=nil
-      ks = node.keys
-      if opts and opts[:except]
-        ks -= opts[:except]
+    def merge! other, opts=nil
+      ks = other.keys ; except = nil
+      opts and opts.each do |k ,v|
+        case k
+        when :except ; ks -= opts[:except]
+        else raise ArgumentError.new("no. #{k}")
+        end
       end
-      ks.each do |k|
-        val = node[k]
-        if ! self[k]
-          self[k] = (val.respond_to?(:dup) && ! val.kind_of?(Symbol)) ? val.dup : val
-        else
+      ks.zip(other.values_at(* ks)).each do |k, val|
+        if self.key? k
           case val
+          when TrueClass, FalseClass
+            self[k] == other[k] or fail("merge conflict on #{k.inspect}")
           when String, Symbol
             self[k].kind_of?(Array) or self[k] = [self[k]]
             self[k] |= [val]
@@ -83,8 +82,13 @@ module Skylab::Porcelain
             self[k].kind_of?(Array) or self[k] = [self[k]]
             self[k] |= val
           else
-            merge_other!(k, val)
+            fail("implement me -- merge for #{val.class}")
           end
+        else
+          self[k] = case val
+                    when FalseClass, TrueClass, NilClass, Symbol ; val
+                    else val.dup
+                    end
         end
       end
       self
@@ -159,7 +163,7 @@ module Skylab::Porcelain
       when 0
         nil
       when 1
-        combined = array.reduce(new) { |m, n| m.merge!(n[1], :except => [:children] ) }
+        combined = array.reduce(build(root: true)) { |m, n| m.merge!(n[1], :except => [:children] ) }
         order = []
         childs_by_name = array.reduce(Hash.new { |h, k| order.push(k) ; h[k] = [] }) do |m, n|
           n[1].children? and n[1].children.each { |c| m[keymaker.call(c)].push c } ; m
@@ -174,7 +178,7 @@ module Skylab::Porcelain
       end
     end
     def from_paths paths, &block
-      paths.reduce(new(&block)) do |node, path|
+      paths.reduce(new(root: true, &block)) do |node, path|
         node.find!(path.to_s.split(Tree::SEPARATOR), &block)
         node
       end

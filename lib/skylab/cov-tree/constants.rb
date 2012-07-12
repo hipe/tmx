@@ -9,6 +9,8 @@ module Skylab
 
     TEST_DIR_NAMES = %w(test spec features)
 
+    def TEST_DIR_NAMES.string ; "[#{join '|'}]" end
+
     GLOBS = {
       'features' => '*.feature',
       'spec' => '*_spec.rb',

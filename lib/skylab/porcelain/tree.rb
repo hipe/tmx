@@ -1,9 +1,8 @@
 # encoding: utf-8
 
-module Skylab
-  module Porcelain
-    # forward declaration for consistent indentation below
-  end
+require_relative '..'
+
+module Skylab::Porcelain # use as namespace only
 end
 
 module Skylab::Porcelain::Tree

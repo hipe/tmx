@@ -3,10 +3,18 @@ require 'skylab/porcelain/all'
 
 module Skylab::CovTree
   class CLI
-    extend ::Skylab::Porcelain
-    extend ::Skylab::PubSub::Emitter
     module Actions
     end
+  end
+  module CLI::Styles
+    include ::Skylab::Porcelain::En
+    include ::Skylab::Porcelain::TiteColor
+    def pre(s)  ; stylize(s, :green         )   end
+  end
+  class CLI
+    extend ::Skylab::Porcelain
+    extend ::Skylab::PubSub::Emitter
+    include CLI::Styles
 
   inactionable
 
@@ -24,14 +32,12 @@ module Skylab::CovTree
     argument_syntax '[<path>]'
 
     option_syntax do |ctx|
-      on('-l', '--list', "shows a list of matched test files and returns.") { ctx[:list] = true }
+      on('-l', '--list', "shows a list of matched test files and returns.") { ctx[:do_list] = true }
     end
 
-    def tree path=nil, ctx
-      api.invoke_porcelain(:tree, ctx.merge(
-        :emitter => self,
-        :path => path
-      ))
+    def tree path=nil, opts
+      ok = api.invoke_porcelain(:tree, opts.merge(emitter: self, path: path))
+      ok == false ? invite_fuck_me(:tree) : ok
     end
 
 
@@ -48,13 +54,19 @@ module Skylab::CovTree
     desc "        <rerun-file>                a cucumber-like rerun.txt file"
 
     def rerun path
-      api.invoke_porcelain(:rerun, :emitter => self, :rerun => path)
+      ok = api.invoke_porcelain(:rerun, emitter: self, rerun: path)
+      ok == false ? invite_fuck_me(:rerun) : ok
     end
 
   protected
 
     def api
       ::Skylab::CovTree.api
+    end
+
+    def invite_fuck_me token
+      help_frame.invite(help_frame.action) # @todo fuck this shit
+      nil
     end
 
     # the gui client runtime that you have, map your events to the parent events.
@@ -66,5 +78,7 @@ module Skylab::CovTree
       end
     end
   end
+  class CLI::Action
+    include CLI::Styles
+  end
 end
-

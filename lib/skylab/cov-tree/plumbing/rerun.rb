@@ -2,12 +2,8 @@ require File.expand_path('../tree', __FILE__)
 
 module Skylab::CovTree
   class API::Actions::Rerun < API::Actions::Tree
-    emits :all,
-      :payload => :all,   # for lines
-      :line_meta => :all, # for lines of tree
-      :error => :all
 
-    attr_writer :rerun
+   attr_writer :rerun
 
     def tree_to_render
       rerun_ = rerun_file_paths or return false

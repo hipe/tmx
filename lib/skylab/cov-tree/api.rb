@@ -19,5 +19,9 @@ module Skylab::CovTree
       action.invoke
     end
   end
+  class API::Action
+    extend ::Skylab::PubSub::Emitter
+    def pre s ; @stylus.pre s end
+    attr_accessor :stylus
+  end
 end
-

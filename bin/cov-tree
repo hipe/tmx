@@ -2,6 +2,10 @@
 
 require_relative '../lib/skylab/cov-tree/porcelain'
 
-Skylab::CovTree::CLI.new do |p|
-  p.on_all { |e| $stderr.puts "#{e}" }
-end.invoke ARGV
+fscking_retarded = ->(p) do
+  p.on_all { |e| $stderr.puts e }
+end # all.rb is broken
+
+pp = Skylab::CovTree::CLI.new(&fscking_retarded)
+fscking_retarded.call pp
+pp.invoke ARGV

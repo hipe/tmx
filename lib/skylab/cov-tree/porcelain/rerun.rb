@@ -15,9 +15,6 @@ module Skylab::CovTree
       require ROOT.join('plumbing/rerun').to_s
       Plumbing::Rerun
     end
-    def initialize params
-      super
-    end
   end
 end
 

@@ -1,57 +1,54 @@
 require File.expand_path('../../node', __FILE__)
-require 'pathname'
+require 'skylab/face/core'
 
 module ::Skylab::CovTree
-  class API::Actions::Tree
-    extend ::Skylab::PubSub::Emitter
+  class API::Actions::Tree < API::Action
     emits :all,
-      :payload => :all,   # for lines
-      :line_meta => :all, # for lines of tree
-      :error => :all
+      error:     :all,      # not used. haha j/k
+      line_meta: :all,      # lines of tree
+      payload:   :all       # lines
 
+    attr_accessor :do_list
     def error msg
       emit(:error, msg)
       false
     end
     def initialize params
+      @do_list = false
       yield self
       params.each { |k, v| send("#{k}=", v) }
       @path or self.path = '.'
     end
-    def invoke
-      (@list ||= nil) and return list
-      tree
+    def invoke # @todo naming
+      do_list ? list : tree
     end
     def list
-      test_file_paths.tap do |paths|
-        paths or return
-        paths.each { |s| emit(:payload, s) }
-        return paths.count
-      end
+      paths = test_file_paths or return paths
+      paths.each { |s| emit(:payload, s) }
+      paths.count
     end
     attr_writer :list
     def path= path
-      @path = path ? Pathname.new(path) : path
+      @path = path ? ::Skylab::Face::MyPathname.new(path) : path
     end
     def test_dir
-      if found = TEST_DIR_NAMES.detect{ |s| s == @path.basename.to_s } and @path.exist?
-        @_dirname = found
-        return @path
+      if @path.exist? and TEST_DIR_NAMES.include?(pnbn = @path.basename.to_s)
+        @test_dir_basename = pnbn
+        @path.dup
+      elsif pnbn = TEST_DIR_NAMES.detect { |n| @path.join(n).exist? }
+        @test_dir_basename = pnbn
+        @path.join(pnbn)
+      else
+        error("Couldn't find test directory: #{pre @path.join(TEST_DIR_NAMES.string).pretty}")
       end
-      unless found = TEST_DIR_NAMES.detect { |n| @path.join(n).exist? }
-        emit(:error, "Couldn't find test directory: #{@path.join "[#{TEST_DIR_NAMES.join('|')}]"}")
-        return false
-      end
-      @_dirname = found
-      @path.join(found)
     end
     def test_file_globs
-      @test_dir = test_dir or return false
-      glob = GLOBS[@_dirname] or fail("nope: #{@_dirname}")
+      @test_dir = test_dir or return @test_dir
+      glob = GLOBS[@test_dir_basename] or fail("nope: #{@_dirname}")
       [@test_dir.join('**').join(glob)]
     end
     def test_file_paths
-      globs = test_file_globs or return
+      globs = test_file_globs or return globs
       globs.reduce([]){ |m, glob| m.concat(Dir[glob]) }
     end
     def code_file_paths
@@ -83,7 +80,7 @@ module ::Skylab::CovTree
     end
     def test_tree_struct
       test_files = test_file_paths or return false
-      Node.from_paths(test_files){ |node| node[:type] = :test }
+      Node.from_paths(test_files) { |node| node[:type] = :test }
     end
     def code_tree_struct
       code_files = code_file_paths or return false
