@@ -1,7 +1,7 @@
 require 'skylab/porcelain/tree/node'
 
 module Skylab::CovTree
-  class Node < ::Skylab::Porcelain::Tree::Node
+  class Models::Node < ::Skylab::Porcelain::Tree::Node
     def initialize h, &b
       @aliases = nil
       super(h, &b)

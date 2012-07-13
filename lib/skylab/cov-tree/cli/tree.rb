@@ -14,7 +14,6 @@ module Skylab::CovTree
       require ROOT.join('api/tree').to_s
       API::Actions::Tree
     end
-    attr_accessor :do_list
     def emit(*a)
       @emitter.emit(*a)
     end
@@ -27,15 +26,26 @@ module Skylab::CovTree
     end
     def invoke
       a = []
-      r = controller_class.new(do_list: do_list, path: path, stylus: self) do |o|
-        thru = ->(e) { emit(e.type, e) }
-        o.on_error(&thru)
-        o.on_payload(&thru)
-        o.on_line_meta { |e| a << e }
+      r = controller_class.new(list_as: list_as, path: path, stylus: self) do |o|
+        o.on_error { |e| emit(:error, e) }
+        case list_as
+        when :tree
+          o.on_anchor_point { |e| emit(:payload, "#{e.anchor_point.dir.pretty}/") }
+          o.on_test_file    { |e| emit(:payload, "  #{e.test_file.relative_pathname}") }
+        when :list
+          o.on_test_file    { |e| emit(:payload, e.test_file.pathname.pretty.to_s) }
+        end
+        if list_as
+          o.on_number_of_test_files do |e|
+            emit(:info, "(#{e.number} test file#{s e.number} total)")
+          end
+        end
+        o.on_tree_line_meta { |e| a << e }
       end.invoke
       a.any? and return _render_tree_lines a
       r
     end
+    attr_accessor :list_as
     def _render_tree_lines events
       _matrix = events.map { |e| _prerender_tree_line e.payload }
       max = _matrix.map{ |a| a.first.length }.max

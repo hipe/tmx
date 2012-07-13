@@ -4,14 +4,16 @@ require_relative '../lib/skylab/cov-tree/cli'
 
 # @todo all.rb is so hopelessly borked look at this shit
 fscking_retarded = ->(p) do
-  p.on_payload { |e| $stdout.puts e }
   p.on_error   { |e| $stderr.puts e }
+  p.on_info    { |e| $stderr.puts(e) unless e.touched? }
+  p.on_payload { |e| $stdout.puts e }
 end
 
 fuck_me_twice = ->(p) do
   fscking_retarded.call(p)
+  p.on_help { |e| $stderr.puts e.touch!.to_s }
   p.on_ui do |e|
-    $stderr.tty? and $stderr.puts(e.to_s)
+    !e.touched? and $stderr.tty? and $stderr.puts(e.touch!.to_s)
   end
 end
 

@@ -18,7 +18,7 @@ module Skylab::CovTree
 
   inactionable
 
-    emits :error, line_meta: :payload
+    emits :error, :info, :payload
 
   public
 
@@ -29,7 +29,8 @@ module Skylab::CovTree
     argument_syntax '[<path>]'
 
     option_syntax do |ctx|
-      on('-l', '--list', "shows a list of matched test files and returns.") { ctx[:do_list] = true }
+      on('-l', '--list', "show a list of matched test files only.") { ctx[:list_as] = :list }
+      on('-t', '--tree', "show a shallow tree of matched test files only.") { ctx[:list_as] = :tree }
     end
 
     def tree path=nil, opts
