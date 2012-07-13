@@ -31,13 +31,17 @@ module Skylab::Porcelain
       if ! child
         create or return nil
         child = self.class.build(slug: slug, &b) # @add_parent
-        children[child.slug] = child # let child choose its own slug
+        children.set(* child.isomorphic_slugs, child)
       end
       if 0 == path_arr.length
         child
       else
         child._find path_arr, create, &b
       end
+    end
+    def initialize params, &b
+      params.each { |k, v| send("#{k}=", v) }
+      block_given? and yield(self)
     end
     def longest_common_base_path
       [(lone = children.first).slug] + (lone.longest_common_base_path || []) if 1 == children_length
@@ -74,7 +78,7 @@ module Skylab::Porcelain
       self
     end
     def _paths arr, prefix
-      if ! root? || prefix
+      if ! root? || prefix # @todo wtf
         my_path = [prefix, slug, ('' if children?)].compact.join(path_separator)
         arr.push(my_path)
       end
@@ -84,6 +88,14 @@ module Skylab::Porcelain
       end
       nil
     end
+    def slug
+      0 < isomorphic_slugs_length or fail("slug not set")
+      isomorphic_slugs.first
+    end
+    def slug= slug
+      0 == isomorphic_slugs_length or fail("won't clobber slug")
+      isomorphic_slugs[0] = slug
+    end
     def text opts={}, &block
       opts = { node_formatter: :slug }.merge opts
       Tree.text(self, opts, &block)
@@ -92,37 +104,6 @@ module Skylab::Porcelain
       _paths(arr=[], nil)
       arr
     end
-  end
-  class Tree::Children < Array
-    alias_method :array_fetch, :[]
-    def [] key
-      key.kind_of?(Integer) and return array_fetch(key)
-      @keys.key?(key) or return nil
-      array_fetch(@keys[key])
-    end
-    alias_method :array_put, :[]=
-    def []= key, val
-      key.kind_of?(Integer) and return array_put(key, val)
-      if @keys[key]
-        overwrite = true
-        old_val = array_fetch(@keys[key])
-        at_index = @keys[key]
-      else
-        at_index = (@keys[key] = length)
-        overwrite = false
-      end
-      if overwrite and old_val.respond_to?(:aliases?) and old_val.aliases?
-        old_val.aliases.each { |aliaz| @keys.delete(aliaz) }
-      end
-      if val.respond_to?(:aliases?) and val.aliases?
-        val.aliases.each { |aliaz| @keys[aliaz] = at_index }
-      end
-      array_put(at_index, val)
-    end
-    def initialize
-      @keys = {}
-    end
-    attr_reader :keys
   end
   module Tree::Node::ModuleMethods
     include Tree::Node::CommonMethods
@@ -165,23 +146,25 @@ module Skylab::Porcelain
     end
   end
   class Tree::Node
-    extend Tree::Node::ModuleMethods
+    extend  Tree::Node::ModuleMethods
     include Tree::Node::InstanceMethods
-    def initialize hash=nil
-      hash and hash.each { |k, v| self[k] = v }
-      block_given? and yield(self)
-    end
     def children
       self[:children] ||= Tree::Children.new
     end
     def children_length
       self[:children] ? self[:children].length : 0
     end
-    def root?
-      self[:root] # ! self[:slug]
+    def isomorphic_slugs
+      self[:isomorphic_slugs] ||= []
     end
-    def slug
-      self[:slug] or fail(':slug not set')
+    def isomorphic_slugs_length
+      self[:isomorphic_slugs] ? self[:isomorphic_slugs].length : 0
+    end
+    def root= b
+      self[:root] = b
+    end
+    def root?
+      self[:root]
     end
   end
 end
