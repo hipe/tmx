@@ -103,7 +103,7 @@ module ::Skylab::CovTree
       # tell the tests tree that it follows the codes tree's structure by aliasing it
       tests.aliases = [codes.slug]
       both = Models::Node.combine([codes, tests],
-        keymaker: ->(n) { [n.slug, *(n.aliases? ? n.aliases : [])].last } # use the last alias as the comparison key
+        slugmaker: ->(n) { [n.slug, *(n.aliases? ? n.aliases : [])].last } # use the last alias as the comparison key
       )
       both[:slug_dirname] = (_hack ? @test_dir.dirname : @test_dir.dirname.dirname).to_s
       both
