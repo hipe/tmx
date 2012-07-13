@@ -1,9 +1,6 @@
 require File.expand_path('../../tree', __FILE__)
 
 module Skylab::Porcelain
-  module Tree
-    SEPARATOR = '/'
-  end
   class Tree::Node < Hash
     def children
       self[:children] ||= Tree::Children.new
@@ -15,11 +12,11 @@ module Skylab::Porcelain
       children? ? children.length : 0
     end
     def find path_arr
-      path_arr = path_arr.kind_of?(Array) ? path_arr.dup : path_arr.to_s.split(Tree::SEPARATOR)
+      path_arr = path_arr.kind_of?(Array) ? path_arr.dup : path_arr.to_s.split(path_separator)
       _find path_arr, false
     end
     def find! path_arr, &block
-      path_arr = path_arr.kind_of?(Array) ? path_arr.dup : path_arr.to_s.split(Tree::SEPARATOR)
+      path_arr = path_arr.kind_of?(Array) ? path_arr.dup : path_arr.to_s.split(path_separator)
       _find path_arr, true, &block
     end
     def _find path_arr, create, &block
@@ -99,14 +96,17 @@ module Skylab::Porcelain
     def _paths arr, prefix
       is_root =  !(self[:slug] || prefix)
       if ! is_root
-        my_path = [prefix, key,('' if children?)].compact.join(Tree::SEPARATOR)
+        my_path = [prefix, key,('' if children?)].compact.join(separator)
         arr.push(my_path)
       end
       if children?
-        my_prefix = is_root ? nil : [prefix, key].compact.join(Tree::SEPARATOR)
+        my_prefix = is_root ? nil : [prefix, key].compact.join(separator)
         children.each { |node| node._paths(arr, my_prefix) }
       end
       nil
+    end
+    def separator
+      Tree::DEFAULT_PATH_SEPARATOR
     end
     def text opts={}, &block
       opts = { node_formatter: :key }.merge opts
@@ -179,10 +179,9 @@ module Skylab::Porcelain
     end
     def from_paths paths, &block
       paths.reduce(new(root: true, &block)) do |node, path|
-        node.find!(path.to_s.split(Tree::SEPARATOR), &block)
+        node.find!(path.to_s.split(Tree::DEFAULT_PATH_SEPARATOR), &block)
         node
       end
     end
   end
 end
-

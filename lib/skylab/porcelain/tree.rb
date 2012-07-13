@@ -3,6 +3,7 @@ require_relative '..'
 module Skylab::Porcelain
   module Tree
     extend ::Skylab::Autoloader
+    DEFAULT_PATH_SEPARATOR = '/'
   end
   class << Tree
     def from_paths paths
