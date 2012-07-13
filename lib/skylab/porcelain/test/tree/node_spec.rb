@@ -29,7 +29,7 @@ module Skylab::Porcelain::TestNamespace
       subject { tree.longest_common_base_path }
       context "when empty" do
         let(:paths) { %w() }
-        it("nil")   { subject.should eql(nil) }
+        it("nil")   { subject.should be_nil }
       end
       context "when 1x1" do
         let(:paths) { %w(one) }
@@ -45,7 +45,7 @@ module Skylab::Porcelain::TestNamespace
       end
       context "when 2x1 (different)" do
         let(:paths) { %w(one two) }
-        it("nope")  { subject.should eql(nil) }
+        it("nope")  { subject.should be_nil }
       end
       context "when 2x1 (same)" do
         let(:paths) { %w(yup yup) }
@@ -57,7 +57,7 @@ module Skylab::Porcelain::TestNamespace
       end
       context "when 2x2 (none)" do
         let(:paths) { %w(x/a y/a) }
-        it("none")  { subject.should eql(nil) }
+        it("none")  { subject.should be_nil }
       end
       context "when 2x2 (all)" do # actually should become 1x2
         let(:paths) { %w(p/q p/q) }

@@ -13,7 +13,7 @@ module Skylab::Porcelain
     def lines root, opts=nil
       fly = Tree::TextLine.new # flyweighting can be turned into an option if needed to
       loc = Tree::Locus.new(opts)
-      Enumerator.new do |y|
+      ::Enumerator.new do |y|
         node_count = loc.traverse(root) do |node, meta|
           y << fly.reset!(loc.prefix(meta), loc.node_formatter.call(node))
         end
@@ -25,7 +25,7 @@ module Skylab::Porcelain
       if block_given?
         enum.each(&block)
       else
-        StringIO.new.tap { |o| enum.each { |s| o.puts(s) } }.string
+        ::StringIO.new.tap { |o| enum.each { |s| o.puts(s) } }.string
       end
     end
   end
