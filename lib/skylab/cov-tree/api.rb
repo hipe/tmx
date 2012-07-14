@@ -1,4 +1,6 @@
 require File.expand_path('../constants', __FILE__)
+require_relative 'models/core'
+
 require 'skylab/pub-sub/emitter'
 
 module Skylab::CovTree
@@ -21,6 +23,11 @@ module Skylab::CovTree
   end
   class API::Action
     extend ::Skylab::PubSub::Emitter
+    def error msg
+      @last_error_message = msg
+      emit(:error, msg)
+      false
+    end
     def pre s ; @stylus.pre s end
     attr_accessor :stylus
   end
