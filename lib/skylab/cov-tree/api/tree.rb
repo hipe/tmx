@@ -72,7 +72,13 @@ module ::Skylab::CovTree
       TEST_DIR_NAMES
     end
     def tree
-      tree = tree_combined or return tree
+      anchors = self.anchors.to_a
+      case anchors.length
+      when 0 ; return error("Couldn't find test directory: #{pre @path.join(test_dir_names.string).pretty}")
+      when 1 ; anchor = anchors.first # and handled below
+      else   ; fail("multiple anchor points not yet implemented (but soon!)")
+      end
+      tree = anchor.tree_combined
       loc = ::Skylab::Porcelain::Tree::Locus.new
       loc.traverse(tree) do |node, meta|
         meta[:prefix] = loc.prefix(meta)
@@ -81,44 +87,5 @@ module ::Skylab::CovTree
       end
       true
     end
-    def tree_combined
-      tests = tree_of_tests or return false
-      if 0 == tests.children_length # try to future-proof it.  careful!
-        tests = Models::FileNode.new(root: true, slug: '(no tests)', type: :test)
-      else
-        tests = tests.find(@test_dir.to_s) or fail("truncation hack failed")
-      end
-      codes = tree_of_code or return false
-      if 0 == codes.children_length # ditto above, test nodes w/ no code nodes
-        _hack = true
-        codes = Models::FileNode.new(root: true, slug: '(no code)', type: :code)
-      else
-        codes = codes.find(@test_dir.dirname.to_s) or fail("truncation hack failed")
-      end
-      # associate the tests tree and the code tree by telling the test tree etc
-      tests.isomorphic_slugs.push codes.slug
-      combined = Models::FileNode.combine(codes, tests) { |n| n.isomorphic_slugs.last }
-        # then use the above slug as the slug for comparison
-      combined.slug_dirname = (_hack ? @test_dir.dirname : @test_dir.dirname.dirname).to_s
-      combined
-    end
-    def tree_of_code
-      re = %r{^#{Regexp.escape @test_dir.to_s}/}
-      paths = Dir["#{@test_dir.dirname}/**/*.rb"]
-      paths = paths.select { |f| re !~ f }
-      Models::FileNode.from_paths(paths){ |n| n.type = :code }
-    end
-    def tree_of_tests
-      anchors = self.anchors.to_a
-      case anchors.length
-      when 0 ; return error("Couldn't find test directory: #{pre @path.join(test_dir_names.string).pretty}")
-      when 1 ; anchor = anchors.first # and handled below
-      else   ; fail("multiple anchor points not yet implemented (but soon!)")
-      end
-      @test_dir = anchor.dir # temporary!
-      _test_file_paths = anchor.test_files.map { |f| f.pathname.to_s }
-      Models::FileNode.from_paths(_test_file_paths) { |n| n.type = :test }
-    end
   end
 end
-
