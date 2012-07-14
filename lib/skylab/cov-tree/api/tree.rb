@@ -84,13 +84,16 @@ module ::Skylab::CovTree
     end
     def tree
       anchors = self.anchors.to_a
-      0 == anchors.length and
-        return error("Couldn't find test directory: #{pre @path.join(test_dir_names.string).pretty}")
-      1 != anchors.length and fail("still not yet")
-      anchor = anchors.first
-      tree = anchor.tree_combined
+      case anchors.length
+      when 0 ; return error("Couldn't find test directory: #{pre @path.join(test_dir_names.string).pretty}")
+      when 1 ; uber_tree = anchors.first.tree_combined
+      else   ; tt = anchors.map(&:tree_combined)
+             ; need = @path.to_s.split(tt.first.path_separator).first
+             ; tt.each { |t| t.isomorphic_slugs.last == need or t.isomorphic_slugs.push(need) }
+             ; uber_tree = tt.first.class.combine(*tt) { |t| t.isomorphic_slugs.last }
+      end
       loc = ::Skylab::Porcelain::Tree::Locus.new
-      loc.traverse(tree) do |node, meta|
+      loc.traverse(uber_tree) do |node, meta|
         meta[:prefix] = loc.prefix(meta)
         meta[:node] = node
         emit(:tree_line_meta, meta)
