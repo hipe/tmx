@@ -23,14 +23,18 @@ module ::Skylab::CovTree
         end
       end
     end
-    def execute # @todo naming
-      list_as ? list : tree
-    end
     def initialize params
-      @list_as = nil
+      @last_error_message = @list_as = @path = nil
       yield self
       params.each { |k, v| send("#{k}=", v) }
       @path or self.path = '.'
+    end
+    def invoke # @todo naming
+      if @last_error_message
+        false
+      else
+        list_as ? list : tree
+      end
     end
     def list
       num = 0
@@ -50,7 +54,14 @@ module ::Skylab::CovTree
     end
     attr_accessor :list_as
     def path= path
-      @path = path ? Models::MyPathname.new(path) : path
+      if ! path
+        @path = path
+      elsif md = path.match(%r{\A(?<no_trailing>/|.*[^/])/*\z})
+        @path = Models::MyPathname.new(md[:no_trailing])
+      else
+        error("Your path looks funny: #{path.inspect}")
+      end
+      path
     end
     def test_dirs
       ::Enumerator.new do |y|
@@ -73,11 +84,10 @@ module ::Skylab::CovTree
     end
     def tree
       anchors = self.anchors.to_a
-      case anchors.length
-      when 0 ; return error("Couldn't find test directory: #{pre @path.join(test_dir_names.string).pretty}")
-      when 1 ; anchor = anchors.first # and handled below
-      else   ; fail("multiple anchor points not yet implemented (but soon!)")
-      end
+      0 == anchors.length and
+        return error("Couldn't find test directory: #{pre @path.join(test_dir_names.string).pretty}")
+      1 != anchors.length and fail("still not yet")
+      anchor = anchors.first
       tree = anchor.tree_combined
       loc = ::Skylab::Porcelain::Tree::Locus.new
       loc.traverse(tree) do |node, meta|

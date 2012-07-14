@@ -31,6 +31,7 @@ module Skylab::CovTree
     MERGE_ATTRIBUTES = [:root, :types, :isomorphic_slugs]
     def merge_attributes ; MERGE_ATTRIBUTES.dup end
     attr_accessor :root
+    alias_method :root?, :root
     attr_accessor :slug_dirname
     def slug= s
       super(s)

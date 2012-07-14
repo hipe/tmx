@@ -134,7 +134,8 @@ module Skylab::Porcelain
         end
         combined
       else
-        fail("implement me!")
+        fail("do you really want to combine trees that don't have isomorphic root nodes? " <<
+               "(#{slugs.keys.map(&:inspect).join(', ')})")
       end
     end
     def from_paths paths, &node_init_block

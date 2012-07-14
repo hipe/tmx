@@ -28,10 +28,6 @@ module Skylab::CovTree
       emit(:error, msg)
       false
     end
-    def invoke
-      @last_error_message = nil
-      execute
-    end
     def pre s ; @stylus.pre s end
     attr_accessor :stylus
   end
