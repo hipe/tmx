@@ -78,5 +78,21 @@ module Skylab::CovTree
   end
   class CLI::Action
     include CLI::Styles
+    include ::Skylab::Autoloader::Inflection
+    def controller_class # @todo use autoloader instead (requires rearch)
+      const_stem = self.class.to_s.split('::').last
+      require ROOT.join("api/#{pathify const_stem}").to_s
+      API::Actions.const_get const_stem
+    end
+    def emit(*a)
+      @emitter.emit(*a)
+    end
+    attr_writer :emitter
+    def initialize params
+      params.each do |k, v|
+        send("#{k}=", v)
+      end
+      @emitter or fail('no emitter')
+    end
   end
 end

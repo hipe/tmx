@@ -23,11 +23,6 @@ module ::Skylab::CovTree
         end
       end
     end
-    def code_file_paths
-      re = %r{^#{Regexp.escape @test_dir.to_s}/}
-      files = Dir["#{@test_dir.dirname}/**/*.rb"]
-      files.select { |f| re !~ f }
-    end
     def execute # @todo naming
       list_as ? list : tree
     end
@@ -89,30 +84,29 @@ module ::Skylab::CovTree
     def tree_combined
       tests = tree_of_tests or return false
       if 0 == tests.children_length # try to future-proof it.  careful!
-        tests = Models::Node.new(root: true, slug: '(no tests)', type: :test)
+        tests = Models::FileNode.new(root: true, slug: '(no tests)', type: :test)
       else
         tests = tests.find(@test_dir.to_s) or fail("truncation hack failed")
       end
       codes = tree_of_code or return false
       if 0 == codes.children_length # ditto above, test nodes w/ no code nodes
         _hack = true
-        codes = Models::Node.new(root: true, slug: '(no code)', type: :code)
+        codes = Models::FileNode.new(root: true, slug: '(no code)', type: :code)
       else
         codes = codes.find(@test_dir.dirname.to_s) or fail("truncation hack failed")
       end
-      # tell the tests tree that it follows the codes tree's structure by aliasing it
-      tests.aliases = [codes.slug]
-      both = Models::Node.combine([codes, tests],
-        slugmaker: ->(n) { [n.slug, *(n.aliases? ? n.aliases : [])].last } # use the last alias as the comparison key
-      )
-      both[:slug_dirname] = (_hack ? @test_dir.dirname : @test_dir.dirname.dirname).to_s
-      both
+      # associate the tests tree and the code tree by telling the test tree etc
+      tests.isomorphic_slugs.push codes.slug
+      combined = Models::FileNode.combine(codes, tests) { |n| n.isomorphic_slugs.last }
+        # then use the above slug as the slug for comparison
+      combined.slug_dirname = (_hack ? @test_dir.dirname : @test_dir.dirname.dirname).to_s
+      combined
     end
     def tree_of_code
       re = %r{^#{Regexp.escape @test_dir.to_s}/}
       paths = Dir["#{@test_dir.dirname}/**/*.rb"]
       paths = paths.select { |f| re !~ f }
-      Models::Node.from_paths(paths){ |n| n[:type] = :code }
+      Models::FileNode.from_paths(paths){ |n| n.type = :code }
     end
     def tree_of_tests
       anchors = self.anchors.to_a
@@ -123,7 +117,7 @@ module ::Skylab::CovTree
       end
       @test_dir = anchor.dir # temporary!
       _test_file_paths = anchor.test_files.map { |f| f.pathname.to_s }
-      Models::Node.from_paths(_test_file_paths) { |n| n[:type] = :test }
+      Models::FileNode.from_paths(_test_file_paths) { |n| n.type = :test }
     end
   end
 end

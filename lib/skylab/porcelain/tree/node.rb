@@ -12,6 +12,9 @@ module Skylab::Porcelain
     def children?
       0 < children_length
     end
+    def children_length # children may want to override to avoid autovivification
+      children.length
+    end
     def find path, &init_new_node_block
       _find _find_path_normalize(path), false, &init_new_node_block
     end
@@ -43,37 +46,39 @@ module Skylab::Porcelain
       params.each { |k, v| send("#{k}=", v) }
       block_given? and yield(self)
     end
+    def isomorphic_slugs_length # children may want to override to avoid autovivification
+      isomorphic_slugs.length
+    end
+    def leaf?
+      0 == children_length
+    end
     def longest_common_base_path
       [(lone = children.first).slug] + (lone.longest_common_base_path || []) if 1 == children_length
     end
     def merge! other, opts=nil
-      ks = other.keys ; except = nil
-      opts and opts.each do |k ,v|
-        case k
-        when :except ; ks -= opts[:except]
-        else raise ArgumentError.new("no. #{k}")
-        end
-      end
-      ks.zip(other.values_at(* ks)).each do |k, val|
-        if self.key? k
-          case val
-          when TrueClass, FalseClass
-            self[k] == other[k] or fail("merge conflict on #{k.inspect}")
-          when String, Symbol
-            self[k].kind_of?(Array) or self[k] = [self[k]]
-            self[k] |= [val]
-          when Array
-            self[k].kind_of?(Array) or self[k] = [self[k]]
-            self[k] |= val
-          else
-            fail("implement me -- merge for #{val.class}")
-          end
+      attrs = other.merge_attributes
+      opts and { except: ->(v) { attrs -= v } }.tap { |h| opts.each { |k, v| h[k].call(v) } }
+      attrs.each do |attr|
+        mine = send(attr) ; othr = other.send(attr) ; new = nil
+        if mine.nil?
+          new = case othr
+                when FalseClass, TrueClass, NilClass, Symbol ; othr
+                else othr.dup
+                end
         else
-          self[k] = case val
-                    when FalseClass, TrueClass, NilClass, Symbol ; val
-                    else val.dup
-                    end
+          case othr
+          when NilClass # rien
+          when TrueClass, FalseClass
+            mine == othr or fail("merge conflict on #{attr.inspect} (#{mine.inspect} vs. #{othr.inspect})")
+          when String, Symbol, Array
+            _m = Array === mine ? mine : (new = [mine])
+            _v = Array === othr ? othr : [othr]
+            _m.concat(_v - _m) # yes
+          else
+            fail("implement merge for #{othr.class}")
+          end
         end
+        new.nil? or send("#{attr}=", new)
       end
       self
     end
@@ -110,27 +115,22 @@ module Skylab::Porcelain
     def build *a, &b
       new(*a, &b)
     end
-    def combine nodes, lambdii=nil
-      lambdii ||= { slugmaker: ->(n) { n.slug } }
-      slugmaker = lambdii[:slugmaker] or fail("slugmaker lambda is required")
-      # map each node with its key, in both a hash and an array
-      array = nodes.map { |node| [slugmaker.call(node), node] }
-      # map each key with an array of indexes into the above array
-      hash = Hash.new { |h, k| h[k] = [] }
-      array.each_with_index { |arr, idx| hash[arr.first].push idx }
-      # if the hash is a size 1 then all nodes at this level are a match (per slugmaker)
-      case hash.size
-      when 0
-        nil
-      when 1
-        combined = array.reduce(build(root: true)) { |m, n| m.merge!(n[1], :except => [:children] ) }
+    def combine node1, node2, *nodes, &slugmaker
+      nodes[0, 0] = [node1, node2]
+      slugmaker ||= ->(n) { n.slug }
+      pairs = nodes.map { |n| [slugmaker.call(n), n] } # pairs of [slug, node]
+      slugs = Hash.new { |h, k| h[k] = [] } # map each slug to a list of indices into `arr`
+      pairs.each_with_index { |pair, idx| slugs[pair.first].push idx }
+      case slugs.size
+      when 0 ; nil
+      when 1 # when `slugs` is length 1 then associate all nodes at this level
+        combined = pairs.reduce(build(root: true)) { |m, p| m.merge!(p.last, :except => [:children] ) }
         order = []
-        childs_by_name = array.reduce(Hash.new { |h, k| order.push(k) ; h[k] = [] }) do |m, n|
-          n[1].children? and n[1].children.each { |c| m[slugmaker.call(c)].push c } ; m
+        childs_by_slug = pairs.reduce(Hash.new { |h, k| order.push(k) ; h[k] = [] }) do |m, p|
+          p.last.children? and p.last.children.each { |c| m[slugmaker.call(c)].push c } ; m
         end
         order.any? and order.reduce(combined.children) do |m, slug|
-          m[slug] = (1 == (childs = childs_by_name[slug]).size) ? childs.first : combine(childs, lambdii)
-          m
+          m[slug] = (1 == (childs = childs_by_slug[slug]).size) ? childs.first : combine(*childs, &slugmaker) ; m
         end
         combined
       else

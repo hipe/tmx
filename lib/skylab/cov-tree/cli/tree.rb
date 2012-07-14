@@ -2,28 +2,16 @@ require 'set'
 
 module Skylab::CovTree
   class CLI::Actions::Tree < CLI::Action
+
     @sides = [:test, :code] # order matters, left one gets the "plus"
 
     @colors = {
+      [:branch].to_set      => :white,
       [:test, :code].to_set => :green,
       [:test].to_set        => :cyan,
-      [:code].to_set        => :red
+      [:code].to_set        => :red,
     }
 
-    def controller_class
-      require ROOT.join('api/tree').to_s
-      API::Actions::Tree
-    end
-    def emit(*a)
-      @emitter.emit(*a)
-    end
-    attr_writer :emitter
-    def initialize params
-      params.each do |k, v|
-        send("#{k}=", v)
-      end
-      @emitter or fail('no emitter')
-    end
     def invoke
       a = []
       r = controller_class.new(list_as: list_as, path: path, stylus: self) do |o|
@@ -58,12 +46,18 @@ module Skylab::CovTree
       n = d[:node]
       a, b = self.class.sides.map { |s| n.types.include?(s) }
       indicator = "[#{a ? '+':' '}|#{b ? '-':' '}]"
-      color = self.class.color(n.types) and indicator = send(color, indicator)
-      slug = n.slug
-      slug.kind_of?(Array) and slug = slug.join(', ')
-      if n.key?(:slug_dirname)
-        a, b = n.slug.kind_of?(Array) ? ['{', '}'] : ['', '']
-        slug = "#{n[:slug_dirname]}/#{a}#{slug}#{b}"
+      _use_types = n.leaf? ? n.types : [:branch]
+      color = self.class.color(_use_types) and indicator = send(color, indicator)
+      use_slugs = if 2 > n.isomorphic_slugs.length then n.isomorphic_slugs
+                  elsif 1 < n.types.length         then n.isomorphic_slugs
+                  else # n.types size is zero or one, in such cases we only
+                    # want the main slug, not the isomorphic slugs (whose files don't exist)
+                    [n.slug]
+                  end
+      slug = use_slugs.join(', ')
+      if dn = n.slug_dirname
+        a, b = use_slugs.length > 1 ? ['{', '}'] : ['', '']
+        slug = "#{dn}#{n.path_separator}#{a}#{slug}#{b}"
       end
       ["#{d[:prefix]}#{slug}", indicator] # careful!  escape codes have width
     end

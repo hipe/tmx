@@ -5,7 +5,7 @@ require 'strscan'
 module Skylab
   module CovTree
 
-    ROOT = Pathname.new(File.expand_path('..', __FILE__))
+    ROOT = ::Pathname.new(File.expand_path('..', __FILE__))
 
     TEST_DIR_NAMES = %w(test spec features)
 
@@ -18,13 +18,13 @@ module Skylab
     }
 
     def self.glob_to_re glob
-      scn = StringScanner.new(glob)
+      scn = ::StringScanner.new(glob)
       out = []
       until scn.eos?
         if scn.scan(/\*/)
           out.push '(.*)'
         elsif s = scn.scan(/[^\*]+/)
-          out.push "(#{Regexp.escape(s)})"
+          out.push "(#{::Regexp.escape(s)})"
         else
           fail("Unexpected rest of string (don't use '**'): #{scn.rest}")
         end

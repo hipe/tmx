@@ -8,6 +8,9 @@ module Skylab::Porcelain
       @slugs.key?(slug) or return nil
       super @slugs[slug]
     end
+    def []= slug, val
+      Integer === slug ? super : set(slug, val)
+    end
     def set slug, *slugs, new
       idx = killme = nil
       slugs.unshift slug
