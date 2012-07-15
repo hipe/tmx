@@ -32,7 +32,9 @@ describe Skylab::Autoloader::Inflection do
     end
     yerp '', '', '(the empty case)'
     yerp 'a', 'A', '(atomic letter)'
-    yerp 'SomePath/that-is/99times/fun', 'SomePath::ThatIs::99Times::Fun', '(might allow for some invalid const names)'
+    yerp 'SomePath/that-is/99times/fun', 'SomePath::ThatIs::99Times::Fun',
+      '(might allow for some invalid const names)'
+    yerp 'underscores_too', 'UnderscoresToo', '(handles underscores too?)'
     yerp 'foo-bar/baz/.rb', 'FooBar::Baz::', '(will strip extension names of .rb only)'
     yerp 'yerp/hoopie-doopie.py', 'Yerp::HoopieDoopiepy', '(but only .rb)'
     yerp 'one/////two', 'One::Two', '(corrects multiple slashes)'

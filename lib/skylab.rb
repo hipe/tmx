@@ -43,7 +43,8 @@ module Skylab
     end
     def handle_const_missing const
       path = "#{dir_path}/#{pathify const}"
-      fail("circular autoload dependency detected in #{path}") if (@_autoloader_mutex ||= Hash.new{|h, k| h[k] = 1; nil})[path]
+      fail("circular autoload dependency detected in #{path}") if
+        (@_autoloader_mutex ||= Hash.new{|h, k| h[k] = 1; nil})[path]
       File.exist?("#{path}#{EXTNAME}") ? require(path) : no_such_file(path, const)
       const_defined?(const) or fail("#{self}::#{const} was not defined, must be, in #{path}")
       const_get const
@@ -51,13 +52,14 @@ module Skylab
     def no_such_file(path, const) ; raise LoadError.new("no such file to load -- #{path}") end
   end
   module Autoloader::Inflection
-    SANITIZE_PATH_RE = %r{#{Regexp.escape(EXTNAME)}\z|(?<=/)/+|(?<=[- ])[- ]+|[^- /a-z0-9]+}i
+    SANITIZE_PATH_RE = %r{#{Regexp.escape(EXTNAME)}\z|(?<=/)/+|(?<=[-_ ])[-_ ]+|[^-_ /a-z0-9]+}i
     def constantize path
       path.to_s.gsub(SANITIZE_PATH_RE, '').gsub(%r|/+|, '::').
         gsub(/(?<=[-_ ])([A-Z])/){ $1.downcase }.gsub(/(?:(?<=\d)|[-_ ]|\b)([a-z09])/) { $1.upcase }
     end
     def pathify const
-      const.to_s.gsub('::', '/').gsub(/(?<=[a-z])([A-Z])|(?<=[A-Z])([A-Z][a-z])/) { "-#{$1 || $2}" }.gsub('_', '-').downcase
+      const.to_s.gsub('::', '/').gsub(/(?<=[a-z])([A-Z])|(?<=[A-Z])([A-Z][a-z])/) { "-#{$1 || $2}" }.
+        gsub('_', '-').downcase
     end
   end
 end
