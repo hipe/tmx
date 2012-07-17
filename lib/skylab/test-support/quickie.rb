@@ -29,28 +29,42 @@ module Skylab::TestSupport::Quickie
   module CommonMethods
     include TiteStyle
     attr_accessor :descs
-    def initialize p
-      p.each { |k, v| send("#{k}=", v) }
-    end
+    attr_accessor :indent
     def normalize_parameters desc, *rest, &b
       params = { block: b }
       params.merge!(rest.pop) while ::Hash == rest.last.class
-      params[:descs] = rest.unshift(desc)
+      params[:descs] = rest.unshift(desc) if desc
       params
     end
     attr_accessor :stderr
+    def update_attributes! p
+      p.each { |k, v| send("#{k}=", v) }
+    end
   end
-  class ContextModule < ::Module
+  module ContextClass
+    def self.[] params
+      p = params.delete(:parent)
+      c = ::Class.new(* [p].compact)
+      c.send(:extend, ContextClassMethods)
+      c.send(:include, ContextInstanceMethods)
+      c.update_attributes! params
+      c
+    end
+  end
+  module ContextClassMethods
     include CommonMethods
     def block= b
-      module_eval(&b)
+      class_eval(&b)
     end
-    _desc_num = 0
-    NEXT_DESC_NUM = ->{ _desc_num += 1 }
+    def context *rest, &b
+      desc = rest.shift
+      c = ContextClass[normalize_parameters(desc, *rest, indent: indent, parent: self, &b)]
+      example_blocks.push c
+    end
     def describe desc, *rest, &b
-      cmod = self.class.new(normalize_parameters(desc, *rest, stderr: stderr, &b))
-      parent.const_set("Describe#{NEXT_DESC_NUM.call}", cmod)
-      Context.new(context_module: cmod).run
+      c = ContextClass[normalize_parameters(desc, *rest, indent: indent, parent: self, stderr: stderr, &b)]
+      o = c.new
+      o.run
     end
     def example_blocks
       @example_blocks ||= []
@@ -58,59 +72,60 @@ module Skylab::TestSupport::Quickie
     def it d, *rest, &b
       example_blocks.push normalize_parameters(d, *rest, &b)
     end
-    attr_accessor :parent
   end
-  class Context
+  module ContextInstanceMethods
     include CommonMethods
-    attr_reader :descs
-    def context_module= mod
-      @context_module = mod
-      @descs = mod.descs
-      @example_blocks = mod.example_blocks
-      @stderr = mod.stderr or fail('no')
+    attr_writer :block
+    def descs
+      (@descs ||= nil) or self.class.descs
     end
-    attr_reader :context_module
-    def fail! ; @f += 1 end
-    def indent
-      @indent ||= ''
-    end
-    def pass! ; @p += 1 end
-    def run
-      @p = @f = f = e = 0
-      @stderr.puts "#{indent}#{descs.join(' ')}"
-      @example_blocks.each do |tb|
-        before = @f
-        Example.new(tb.merge(parent: self)).run
-        f+= 1 if @f > before
-        e += 1
-      end
-      @stderr.puts "\nFinished in #{Time.now - T1} seconds"
-      @stderr.puts send(f > 0 ? :faild : :passd, "#{e} example#{s e}, #{f} failure#{s f}")
-    end
-  end
-  class Example < Context
-    attr_accessor :block
     def eql expected
       EqualsPredicate.new(expected, self)
     end
+    attr_accessor :exampled
+    def example_blocks ; self.class.example_blocks end
     def fail! msg
-      @stderr.puts "#{indent}  #{faild msg}"
+      stderr.puts "#{indent}  #{faild msg}"
       @failed.call
     end
-    def parent= tc
-      extend tc.context_module
-      @failed = -> { tc.fail! }
-      @passed = -> { tc.pass! }
-      @indent = "#{tc.indent}  "
-      @stderr = tc.stderr
+    attr_writer :failed
+    def indent ; (@indent ||= nil) or self.class.indent end
+    def initialize p=nil
+      p and update_attributes!(p)
     end
     def pass! msg
-      # @stderr.puts "#{indent}  #{msg}"
-      @passed.call
+      # stderr.puts "#{indent}  #{msg}"
+      (@passed ||= nil) and @passed.call
+    end
+    attr_writer :passed
+    def stderr
+      (@stderr ||= nil) or self.class.stderr
     end
     def run
-      @stderr.puts "#{indent}#{title descs.join(' ')}"
+      e = f = 0
+      @exampled = ->() { e += 1 }
+      @failed = -> { f += 1 }
+      _run_children
+      stderr.puts "\nFinished in #{Time.now - T1} seconds"
+      stderr.puts send(f > 0 ? :faild : :passd, "#{e} example#{s e}, #{f} failure#{s f}")
+    end
+    def _run
+      stderr.puts "#{indent}#{title descs.join(' ')}"
       instance_eval(&@block)
+      nil
+    end
+    def _run_children
+      stderr.puts "#{indent}#{descs.join(' ')}"
+      _indent = "#{indent}  "
+      _params = { exampled: @exampled, failed: @failed, indent: "#{indent}  ", stderr: stderr }
+      example_blocks.each do |eb|
+        if ::Class == eb.class
+          eb.new(_params)._run_children
+        else
+          self.class.new(eb.merge(_params))._run
+          @exampled.call
+        end
+      end
     end
   end
   class EqualsPredicate < Struct.new(:expected, :context)
@@ -122,7 +137,7 @@ module Skylab::TestSupport::Quickie
       end
     end
   end
-  RUNTIME = ContextModule.new(parent: self, stderr: $stderr)
+  RUNTIME = ContextClass[stderr: $stderr, indent:'']
   KERNEL_EXTENSION = -> do
     ::Kernel.send(:define_method, :should) do |predicate|
       predicate.match(self)
