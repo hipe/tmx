@@ -1,3 +1,5 @@
+require 'optparse'
+
 module Skylab
   module TestSupport
   end
@@ -30,9 +32,9 @@ module Skylab::TestSupport::Quickie
     include TiteStyle
     attr_accessor :descs
     attr_accessor :indent
-    def normalize_parameters desc, *rest, &b
-      params = { block: b }
-      params.merge!(rest.pop) while ::Hash == rest.last.class
+    def normalize_parameters desc, *rest, params, &b
+      params = params.merge( block: b )
+      ::Hash == rest.last.class and params[:tags] = rest.pop
       params[:descs] = rest.unshift(desc) if desc
       params
     end
@@ -58,11 +60,13 @@ module Skylab::TestSupport::Quickie
     end
     def context *rest, &b
       desc = rest.shift
-      c = ContextClass[normalize_parameters(desc, *rest, indent: indent, parent: self, &b)]
+      c = ContextClass[normalize_parameters(desc, *rest, indent: indent, parent: self,
+                                            tag_filter: tag_filter, &b)]
       example_blocks.push c
     end
     def describe desc, *rest, &b
-      c = ContextClass[normalize_parameters(desc, *rest, indent: indent, parent: self, stderr: stderr, &b)]
+      c = ContextClass[normalize_parameters(desc, *rest, indent: indent, parent: self, stderr: stderr,
+                                            tag_filter: tag_filter, &b)]
       o = c.new
       o.run
     end
@@ -70,12 +74,21 @@ module Skylab::TestSupport::Quickie
       @example_blocks ||= []
     end
     def it d, *rest, &b
-      example_blocks.push normalize_parameters(d, *rest, &b)
+      example_blocks.push normalize_parameters(d, *rest, {}, &b)
     end
+    attr_accessor :tag_filter
+    attr_accessor :tags
   end
   module ContextInstanceMethods
     include CommonMethods
     attr_writer :block
+    ORDER = [:include, :exclude]
+    def describe_run_options
+      a = @run_options_desc.sort_by{ |k, _| ORDER.index(k) || ORDER.length }.map do |k, v|
+        "#{k} #{Hash[* v.flatten].inspect}"
+      end
+      1 == a.length ? " #{a.first}" : ([''] + a).join("\n  ")
+    end
     def descs
       (@descs ||= nil) or self.class.descs
     end
@@ -93,6 +106,35 @@ module Skylab::TestSupport::Quickie
     def initialize p=nil
       p and update_attributes!(p)
     end
+    def parse_opts argv
+      @tag_filter = @tag_filter_desc = nil
+      ors = descs = nil
+      ::OptionParser.new do |o|
+        o.on('-t', '--tag TAG[:VALUE]', '(tries to be like the option in rspec',
+         'but only sees leaf- not branch-level tags at this time.)'
+        ) do |v|
+          md = /\A(?<not>~)?(?<tag>[^:]+)(?::(?<val>.+))?\z/.match(v) or
+            raise ::OptionParser::InvalidArgument
+          _not, tag, val = md.captures.zip([nil, nil, true]).map { |a, b| a || b }
+          ors ||= [] ; descs ||= {} ; tag = tag.intern
+          if _not
+            (descs[:exclude] ||= []).push([tag, val])
+            ors.push ->(tags) { ! (tags and val == tags[tag]) }
+          else
+            (descs[:include] ||= []).push([tag, val])
+            ors.push ->(tags) { tags and val == tags[tag] }
+          end
+        end
+      end.parse!(argv)
+      if ors
+        @run_options_desc = descs
+        @tag_filter = ->(tags) { ors.detect { |l| l.call(tags) } }
+      end
+      true
+    rescue ::OptionParser::ParseError => e
+      stderr.puts "#{e}\ntry #{title "ruby #{$PROGRAM_NAME} -h"} for help"
+      false
+    end
     def pass! msg
       # stderr.puts "#{indent}  #{msg}"
       (@passed ||= nil) and @passed.call
@@ -102,12 +144,15 @@ module Skylab::TestSupport::Quickie
       (@stderr ||= nil) or self.class.stderr
     end
     def run
+      parse_opts(ARGV) or return
+      @tag_filter and stderr.puts("Run options:#{describe_run_options}\n\n")
       e = f = 0
       @exampled = ->() { e += 1 }
       @failed = -> { f += 1 }
       _run_children
+      0 == e and stderr.puts("\nAll examples were filtered out")
       stderr.puts "\nFinished in #{Time.now - T1} seconds"
-      stderr.puts send(f > 0 ? :faild : :passd, "#{e} example#{s e}, #{f} failure#{s f}")
+      stderr.puts send(f > 1 ? :faild : :passd, "#{e} example#{s e}, #{f} failure#{s f}")
     end
     def _run
       stderr.puts "#{indent}#{title descs.join(' ')}"
@@ -117,16 +162,25 @@ module Skylab::TestSupport::Quickie
     def _run_children
       stderr.puts "#{indent}#{descs.join(' ')}"
       _indent = "#{indent}  "
-      _params = { exampled: @exampled, failed: @failed, indent: "#{indent}  ", stderr: stderr }
+      _params = { exampled: @exampled, failed: @failed, indent: "#{indent}  ", stderr: stderr,
+                  tag_filter: tag_filter }
       example_blocks.each do |eb|
         if ::Class == eb.class
           eb.new(_params)._run_children
         else
-          self.class.new(eb.merge(_params))._run
-          @exampled.call
+          ex = self.class.new(eb.merge(_params))
+          if ! tag_filter or tag_filter.call(ex.tags)
+            ex._run
+            @exampled.call
+          end
         end
       end
     end
+    attr_accessor :tags
+    def tag_filter
+      @tag_filter ||= nil or self.class.tag_filter
+    end
+    attr_writer :tag_filter
   end
   class EqualsPredicate < Struct.new(:expected, :context)
     def match actual
