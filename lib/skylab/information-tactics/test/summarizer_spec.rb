@@ -29,19 +29,20 @@ module Skylab::InformationTactics::TestSupport
     context "with some structures" do
       def self.o maxlen, expected, *r
         struct = self.struct
-        it("#{maxlen}, #{struct.inspect} #=> #{expected.inspect}", *r) do
+        it("summarize(#{maxlen}, #{struct.inspect}) #=> #{expected.inspect}", *r) do
           summarize(maxlen, struct).should eql(expected)
         end
       end
-      context "let's snap these fuckers -- for now we don't ellipsify discrete strings" do
-        struct = ['abc', 'def']
+      def self.struct! struct
         singleton_class.send(:define_method, :struct) { struct }
+      end
+      context "let's snap these fuckers -- for now we don't ellipsify discrete strings" do
+        struct! ['abc', 'def']
         o(6, 'abcdef')
         o(5, '')
       end
       context "here is a crap with a dapp and a sapp" do
-        struct = ['#', ['<', '>']]
-        singleton_class.send(:define_method, :struct) { struct }
+        struct! ['#', ['<', '>']]
         o(3, '#<>')
         o(2, '#')
         o(1, '#')
@@ -49,11 +50,25 @@ module Skylab::InformationTactics::TestSupport
         o(-1, '#<>')
       end
       context "but then furk with this berk" do
-        struct = ['#', ['<', ['furk'], '>']]
-        singleton_class.send(:define_method, :struct) { struct }
+        struct! ['#', ['<', ['furk'], '>']]
         o(7, '#<furk>')
         o(6, '#<>')
       end
+      context "more than one doohah" do
+        struct! [['a'], 'b', ['c']]
+        o(2, 'b')
+        o(3, 'abc')
+        o(1, 'b')
+      end
+      context "even if the doohah would fit, it's atomic per level" do
+        struct! [['a'], 'b', ['cd']]
+        o(1, 'b')
+        o(2, 'b')
+        o(3, 'b')
+        o(4, 'abcd')
+      end
+      # context "nerkle with my derkle to herkle your berkle" do
+      # end
     end
   end
 end
