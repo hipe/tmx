@@ -1,4 +1,18 @@
+/*
+
+	Adapted from http://tldp.org/HOWTO/NCURSES-Programming-HOWTO/mouse.html#MOUSETOGETHER
+	Tested on Fedora 11
+
+	Modified to work with ncurses 5.6 CTyler 2009-10-21
+
+	Changes:
+	- Changed wgetch(menu_win) to getch()
+	- Changed BUTTON1_PRESSED to BUTTON1_CLICKED
+
+*/
+
 #include <ncurses.h>
+#include <string.h>
 
 #define WIDTH 30
 #define HEIGHT 10 
@@ -28,6 +42,7 @@ int main()
 	clear();
 	noecho();
 	cbreak();	//Line buffering disabled. pass on everything
+	mousemask(ALL_MOUSE_EVENTS, NULL);
 
 	/* Try to put the window in the middle of screen */
 	startx = (80 - WIDTH) / 2;
@@ -42,16 +57,18 @@ int main()
 	menu_win = newwin(HEIGHT, WIDTH, starty, startx);
 	print_menu(menu_win, 1);
 	/* Get all the mouse events */
-	mousemask(ALL_MOUSE_EVENTS, NULL);
 	
 	while(1)
-	{	c = wgetch(menu_win);
+	{
+		keypad(stdscr, TRUE);
+		c = getch();
 		switch(c)
 		{	case KEY_MOUSE:
 			if(getmouse(&event) == OK)
 			{	/* When the user clicks left mouse button */
-				if(event.bstate & BUTTON1_PRESSED)
-				{	report_choice(event.x + 1, event.y + 1, &choice);
+				if(event.bstate & BUTTON1_CLICKED)
+				{	
+					report_choice(event.x + 1, event.y + 1, &choice);
 					if(choice == -1) //Exit chosen
 						goto end;
 					mvprintw(22, 1, "Choice made is : %d String Chosen is \"%10s\"", choice, choices[choice - 1]);
@@ -104,3 +121,5 @@ void report_choice(int mouse_x, int mouse_y, int *p_choice)
 			break;
 		}
 }
+
+
