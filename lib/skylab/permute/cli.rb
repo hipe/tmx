@@ -2,7 +2,7 @@ require_relative 'api'
 require 'skylab/porcelain/bleeding'
 
 module Skylab::Permute
-  class CLI < Skylab::Porcelain::Bleeding::Runtime
+  class CLI < ::Skylab::Porcelain::Bleeding::Runtime
     desc "minimal permutations generator."
     def self.build_client_instance rt, tok # @compat
      app = new
@@ -13,8 +13,8 @@ module Skylab::Permute
     def self.porcelain ; self end # @compat
   end
   class CLI::Action
-    extend Bleeding::Action
-    extend Skylab::PubSub::Emitter
+    extend ::Skylab::Porcelain::Bleeding::ActionModuleMethods
+    extend ::Skylab::PubSub::Emitter
     def self.build runtime
       action = new(runtime)
       action.on_help { |e| runtime.emit(e.type, e) }
@@ -79,7 +79,7 @@ module Skylab::Permute
       (opt_syn = ->{ op }).call
     end
     define_method(:option_syntax) { opt_syn.call }
-    argument_syntax ''
+    # argument_syntax ''
     def execute set
       API::Actions::Generate.new(set) do |o|
         rows = []
