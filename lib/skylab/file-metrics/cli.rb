@@ -1,7 +1,7 @@
-module Skylab::Tmx::Modules::FileMetrics
-  class Cli < Skylab::Face::Cli
-    namespace( :"file-metrics", :"fm" ) do
-      SharedParameters = lambda do |op, req|
+module Skylab::FileMetrics
+  class CLI < ::Skylab::Face::Cli
+    # lost indent
+      COMMON = lambda do |op, req|
 
         req[:exclude_dirs] = ['.*']
 
@@ -60,19 +60,21 @@ module Skylab::Tmx::Modules::FileMetrics
           into directories.\n#{usage_string}
         ".gsub(/^ +/, '')
 
-        SharedParameters.call(op, req)
+        COMMON.call(op, req)
 
         req[:count_comment_lines] = true
         req[:count_blank_lines]   = true
-        op.on('-C', '--no-comments', "don't count lines with ruby-style comments") { req[:count_comment_lines] = false }
-        op.on('-B', '--no-blank-lines', "don't count blank lines") { req[:count_blank_lines] = false }
+        op.on('-C', '--no-comments',
+          "don't count lines with ruby-style comments") { req[:count_comment_lines] = false }
+        op.on('-B', '--no-blank-lines',
+          "don't count blank lines") { req[:count_blank_lines] = false }
       end
 
       def line_count opts, *paths
         paths.empty? and paths.push('.')
         opts[:paths] = paths
         require File.expand_path('../api/line-count', __FILE__)
-        Api::LineCount.run(self, opts)
+        API::LineCount.run(self, opts)
       end
 
       o :"dirs" do |op, req|
@@ -82,13 +84,13 @@ module Skylab::Tmx::Modules::FileMetrics
           for each of them report number of files and total sloc,
           and show them in order of total sloc and percent of max
         DESC
-        SharedParameters.call(op, req)
+        COMMON.call(op, req)
       end
 
       def dirs opts, path=nil
         opts[:path] = path || '.'
         require File.expand_path('../api/dirs', __FILE__)
-        Api::Dirs.run(self, opts)
+        API::Dirs.run(self, opts)
       end
 
 
@@ -103,7 +105,7 @@ module Skylab::Tmx::Modules::FileMetrics
           #{hi 'options:'}
         DESC
 
-        SharedParameters.call(op, req)
+        COMMON.call(op, req)
 
         req[:git] = true
         op.on('--[no-]git-aware', "be aware of git commit objects,",
@@ -122,8 +124,8 @@ module Skylab::Tmx::Modules::FileMetrics
         paths.empty? and paths.push('.')
         opts[:paths] = paths
         require File.expand_path('../api/ext', __FILE__)
-        Api::Ext.run(self, opts)
+        API::Ext.run(self, opts)
       end
-    end
+    # lost indent
   end
 end

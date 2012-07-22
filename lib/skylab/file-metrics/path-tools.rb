@@ -7,7 +7,7 @@ module Skylab
   end
 end
 
-module Skylab::Tmx::Modules::FileMetrics
+module Skylab::FileMetrics
   module PathTools
     def escape_path path
       (path =~ / |\$|'/) ? Shellwords.shellescape(path) : path

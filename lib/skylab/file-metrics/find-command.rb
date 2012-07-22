@@ -1,6 +1,6 @@
 require File.expand_path('../path-tools', __FILE__)
 
-module Skylab::Tmx::Modules::FileMetrics
+module Skylab::FileMetrics
 
   class FindCommand
     include PathTools

@@ -1,10 +1,10 @@
 require File.expand_path('../common.rb', __FILE__)
 
-module Skylab::Tmx::Modules::FileMetrics
+module Skylab::FileMetrics
 
-  class Api::LineCount
-    extend Api::CommonModuleMethods
-    include Api::CommonInstanceMethods
+  class API::LineCount
+    extend API::CommonModuleMethods
+    include API::CommonInstanceMethods
 
     def run
       @paths = @req[:paths]

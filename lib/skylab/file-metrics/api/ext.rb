@@ -4,11 +4,11 @@ require 'pathname'
 require 'stringio'
 require 'strscan'
 
-module Skylab::Tmx::Modules::FileMetrics
+module Skylab::FileMetrics
 
-  class Api::Ext
-    extend Api::CommonModuleMethods
-    include Api::CommonInstanceMethods
+  class API::Ext
+    extend API::CommonModuleMethods
+    include API::CommonInstanceMethods
     include Skylab::Face::Open2
     GitObjectRe = /\A[0-9a-f]{38,40}\z/
     def run

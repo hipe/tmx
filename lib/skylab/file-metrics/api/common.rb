@@ -4,19 +4,19 @@ require "#{o}/find-command"
 require "#{o}/path-tools"
 require "#{o}/table"
 
-module Skylab::Tmx::Modules::FileMetrics
+module Skylab::FileMetrics
 
-  module Api
+  module API
    class RuntimeError         < ::RuntimeError; end
    class SystemInterfaceError <   RuntimeError; end
   end
 
 
-  module Api::CommonModuleMethods
+  module API::CommonModuleMethods
     def run(*a) ; new(*a).run ; end
   end
 
-  module Api::CommonInstanceMethods
+  module API::CommonInstanceMethods
 
     include PathTools
 

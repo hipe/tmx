@@ -5,7 +5,7 @@ module Skylab
   end
 end
 
-module Skylab::Tmx::Modules::FileMetrics
+module Skylab::FileMetrics
   class Table < Array
     class << self
       def render matrix, out
@@ -18,7 +18,7 @@ module Skylab::Tmx::Modules::FileMetrics
     end
     attr_accessor :sep
     def render out
-      @maxes or @maxes = build_maxes
+      (@maxes ||= nil) or @maxes = build_maxes
       @rows.each do |row|
         out.puts(row.each_with_index.map do |cel, idx|
           "%#{@maxes[idx]}s" % cel

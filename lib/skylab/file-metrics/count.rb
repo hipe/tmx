@@ -5,7 +5,7 @@ module Skylab
   end
 end
 
-module Skylab::Tmx::Modules::FileMetrics
+module Skylab::FileMetrics
 
   class Count
     def initialize name=nil, count=nil, fields=nil
@@ -18,7 +18,7 @@ module Skylab::Tmx::Modules::FileMetrics
 
     # children
     def children?
-      @children and @children.any?
+      (@children ||= nil) and @children.any?
     end
     def add_child child
       @children ||= []
@@ -75,10 +75,10 @@ module Skylab::Tmx::Modules::FileMetrics
 
     # stats
     def total
-      if @total
+      if (@total ||= nil)
         @total # this should only be used very carefully!
       elsif ! children?
-        @count
+        (@count ||= nil)
       else
         @children.map(&:total).inject(:+)
       end

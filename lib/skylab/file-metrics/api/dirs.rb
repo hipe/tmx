@@ -1,10 +1,10 @@
 require File.expand_path('../common', __FILE__)
 
-module Skylab::Tmx::Modules::FileMetrics
+module Skylab::FileMetrics
 
-  class Api::Dirs
-    extend Api::CommonModuleMethods
-    include Api::CommonInstanceMethods
+  class API::Dirs
+    extend API::CommonModuleMethods
+    include API::CommonInstanceMethods
 
     def run
       count = Count.new("folders summary")

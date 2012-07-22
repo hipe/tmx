@@ -449,4 +449,3 @@ class Skylab::Face::Cli
     end
   end
 end
-
