@@ -42,7 +42,8 @@ module Skylab::FileMetrics
         o.set_field(:num_files, o.children ? o.children.size : nil)
         o.set_field(:num_lines, o.total)
         o.set_field(:total_share, o.total.to_f / total)
-        o.set_field(:max_share, o.total.to_f / max)
+        o.set_field(:max_share, p = o.total.to_f / max)
+        o.set_field(:lipstick, p)
       end
       count.display_summary_for(:name) { "Total:" }
       count.display_total_for(:num_files) { |d| "%d" % d }
@@ -72,7 +73,7 @@ module Skylab::FileMetrics
         count:        { label: 'Lines' },
         total_share:  { filter: _percent },
         max_share:    { filter: _percent },
-        # lipstick:     { label: '', filter: ->(x) { x } }
+        lipstick:     { label: '', filter: ->(x) { x } }
       )
     end
   end

@@ -2,6 +2,8 @@ require_relative 'core'
 
 module Skylab::FileMetrics
   class CLI < ::Skylab::Face::Cli
+    extend ::Skylab::Autoloader
+
     # lost indent
       COMMON = lambda do |op, req|
 

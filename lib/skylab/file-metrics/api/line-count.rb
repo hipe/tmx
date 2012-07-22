@@ -21,7 +21,7 @@ module Skylab::FileMetrics
         count.children.each do |c|
           c.set_field(:total_share, c.total.to_f / total)
           c.set_field(:max_share, p = c.total.to_f / max)
-          # c.set_field(:lipstick, p)
+          c.set_field(:lipstick, p)
         end
         count.display_total_for(:count) { |num| "total: %d" % num }
         render_table count, @ui.err
@@ -63,7 +63,7 @@ module Skylab::FileMetrics
         count:        { label: 'Lines' },
         total_share:  { filter: _percent },
         max_share:    { filter: _percent },
-        # lipstick:     { label: '', filter: ->(x) { x } }
+        lipstick:     { label: '', filter: ->(x) { x } }
       )
     end
   end

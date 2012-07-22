@@ -84,7 +84,7 @@ module Skylab::FileMetrics
         end
       end
       rows = [header_row] + rows + count.summary_rows
-      Models::Table.render rows, out
+      Models::Table.new(rows).render(out)
     end
   end
 end

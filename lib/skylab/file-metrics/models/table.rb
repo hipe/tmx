@@ -1,27 +1,26 @@
 module Skylab::FileMetrics
-  class Models::Table < ::Array
-    class << self
-      def render matrix, out
-        new(matrix).render(out)
-      end
-    end
+  class Models::Table
     def initialize rows
       @sep = '  '
       @rows = rows
     end
-    attr_accessor :sep
     def render out
+      CLI::Lipstick.initscr
       (@maxes ||= nil) or @maxes = build_maxes
+      _cels = []
       @rows.each do |row|
-        out.puts(row.each_with_index.map do |cel, idx|
+        _cels.clear
+        row.each_with_index do |cel, idx|
           if ::String === cel
-            "%#{@maxes[idx]}s" % cel
+            _cels.push("%#{@maxes[idx]}s" % cel)
           else
-            cel[:styled].call
+            cel[:render].call(_cels, self)
           end
-        end.join(@sep))
+        end
+        out.puts _cels.join(@sep)
       end
     end
+    attr_accessor :sep
   protected
     def build_maxes
       maxes = []

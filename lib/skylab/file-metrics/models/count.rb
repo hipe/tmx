@@ -54,6 +54,18 @@ module Skylab::FileMetrics
       end
     end
 
+    lipstick = ->(ratio, rows, table) do
+      (lipstick = CLI::Lipstick.build(rows, table.sep,
+        pane_width: ->{ 80 } # a fallback
+      )).call(ratio, rows, nil)
+    end
+    LIPSTICK = ->(*a) { lipstick.call(*a) }
+
+    attr_writer :lipstick
+    def lipstick
+      @_lipstick ||= { chars_length: ->{0}, render: ->(r, t) { LIPSTICK[@lipstick, r, t] } }
+    end
+
     def summary_rows
       children.nil?            || children.empty?            and return []
       @column_summary_cel.nil? || @column_summary_cel.empty? and return []
