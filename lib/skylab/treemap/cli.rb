@@ -66,7 +66,7 @@ module Skylab::Treemap
   end
 
   class CLI::Action
-    extend CLI::Bleeding::Action
+    extend CLI::Bleeding::ActionModuleMethods
     extend CLI::Bleeding::DelegatesTo
     delegates_to :runtime, :api
     def wire
