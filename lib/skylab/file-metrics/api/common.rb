@@ -64,11 +64,14 @@ module Skylab::FileMetrics
       end
       count
     end
-    def _render_table count, out, labels, filters
+    def _render_table count, out, field_meta={}
       unless count.children?
         out.puts "(table has no rows)"
         return false
       end
+      labels = {} ; filters = {}
+      ok = { label: ->(f, v) { labels[f] = v } , filter: ->(f, v) { filters[f] = v } }
+      field_meta.each { |f, m| m.each { |k, v| ok[k] ? ok[k].call(f, v) : fail("no: #{k}") } }
       labels[:_default] ||= lambda { |f| f.to_s.split('_').map(&:capitalize).join(' ') }
       header_row = count.children.first.fields.map do |f|
         v = labels.key?(f) ? labels[f] : labels[:_default]

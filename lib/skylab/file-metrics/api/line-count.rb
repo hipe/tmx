@@ -20,7 +20,8 @@ module Skylab::FileMetrics
         max = count.children.map(&:total).max.to_f
         count.children.each do |c|
           c.set_field(:total_share, c.total.to_f / total)
-          c.set_field(:max_share, c.total.to_f / max)
+          c.set_field(:max_share, p = c.total.to_f / max)
+          # c.set_field(:lipstick, p)
         end
         count.display_total_for(:count) { |num| "total: %d" % num }
         render_table count, @ui.err
@@ -57,15 +58,13 @@ module Skylab::FileMetrics
     end
 
     def render_table count, out
-      labels = {
-        :count => 'Lines'
-      }
-      percent = lambda { |v| "%0.2f%%" % (v * 100) }
-      filters = {
-        :total_share => percent,
-        :max_share   => percent
-      }
-      _render_table count, out, labels, filters
+      _percent = ->(v) { "%0.2f%%" % (v * 100) }
+      _render_table(count, out,
+        count:        { label: 'Lines' },
+        total_share:  { filter: _percent },
+        max_share:    { filter: _percent },
+        # lipstick:     { label: '', filter: ->(x) { x } }
+      )
     end
   end
 end

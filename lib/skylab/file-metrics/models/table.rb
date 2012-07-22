@@ -14,7 +14,11 @@ module Skylab::FileMetrics
       (@maxes ||= nil) or @maxes = build_maxes
       @rows.each do |row|
         out.puts(row.each_with_index.map do |cel, idx|
-          "%#{@maxes[idx]}s" % cel
+          if ::String === cel
+            "%#{@maxes[idx]}s" % cel
+          else
+            cel[:styled].call
+          end
         end.join(@sep))
       end
     end
@@ -23,7 +27,8 @@ module Skylab::FileMetrics
       maxes = []
       @rows.each do |row|
         row.each_with_index do |cel, idx|
-          maxes[idx] = cel.length if maxes[idx].nil? || maxes[idx] < cel.length
+          len = ::String === cel ? cel.length : cel[:chars_length].call
+          maxes[idx] = len if maxes[idx].nil? || maxes[idx] < len
         end
       end
       maxes

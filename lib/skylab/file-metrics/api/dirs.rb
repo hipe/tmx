@@ -67,15 +67,13 @@ module Skylab::FileMetrics
       end
     end
     def render_table count, out
-      labels = {
-        :count => 'Lines'
-      }
-      percent = lambda { |v| "%0.2f%%" % (v * 100) }
-      filters = {
-        :total_share => percent,
-        :max_share   => percent
-      }
-      _render_table count, out, labels, filters
+      _percent = ->(v) { "%0.2f%%" % (v * 100) }
+      _render_table(count, out,
+        count:        { label: 'Lines' },
+        total_share:  { filter: _percent },
+        max_share:    { filter: _percent },
+        # lipstick:     { label: '', filter: ->(x) { x } }
+      )
     end
   end
 end
