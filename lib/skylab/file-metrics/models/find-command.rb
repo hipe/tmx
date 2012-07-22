@@ -1,9 +1,6 @@
-require File.expand_path('../path-tools', __FILE__)
-
-module Skylab::Tmx::Modules::FileMetrics
-
-  class FindCommand
-    include PathTools
+module Skylab::FileMetrics
+  class Models::FindCommand
+    include Common::PathTools
     def initialize; end
     attr_accessor :paths, :skip_dirs, :names, :extra
     def self.build &block

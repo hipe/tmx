@@ -1,10 +1,10 @@
 require File.expand_path('../common.rb', __FILE__)
 
-module Skylab::Tmx::Modules::FileMetrics
+module Skylab::FileMetrics
 
-  class Api::LineCount
-    extend Api::CommonModuleMethods
-    include Api::CommonInstanceMethods
+  class API::LineCount
+    extend API::CommonModuleMethods
+    include API::CommonInstanceMethods
 
     def run
       @paths = @req[:paths]
@@ -20,7 +20,8 @@ module Skylab::Tmx::Modules::FileMetrics
         max = count.children.map(&:total).max.to_f
         count.children.each do |c|
           c.set_field(:total_share, c.total.to_f / total)
-          c.set_field(:max_share, c.total.to_f / max)
+          c.set_field(:max_share, p = c.total.to_f / max)
+          c.set_field(:lipstick, p)
         end
         count.display_total_for(:count) { |num| "total: %d" % num }
         render_table count, @ui.err
@@ -28,7 +29,7 @@ module Skylab::Tmx::Modules::FileMetrics
     end
   protected
     def build_find_command
-      FindCommand.build do |f|
+      Models::FindCommand.build do |f|
         f.paths = @paths
         f.skip_dirs = @req[:exclude_dirs]
         f.names = @req[:include_names]
@@ -57,15 +58,13 @@ module Skylab::Tmx::Modules::FileMetrics
     end
 
     def render_table count, out
-      labels = {
-        :count => 'Lines'
-      }
-      percent = lambda { |v| "%0.2f%%" % (v * 100) }
-      filters = {
-        :total_share => percent,
-        :max_share   => percent
-      }
-      _render_table count, out, labels, filters
+      _percent = ->(v) { "%0.2f%%" % (v * 100) }
+      _render_table(count, out,
+        count:        { label: 'Lines' },
+        total_share:  { filter: _percent },
+        max_share:    { filter: _percent },
+        lipstick:     { label: '', filter: ->(x) { x } }
+      )
     end
   end
 end

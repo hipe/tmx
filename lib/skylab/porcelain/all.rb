@@ -900,7 +900,11 @@ module Skylab::Porcelain
     end
     # @todo during:#100.200 for_run <=> build_client_instance
     def for_run ui, slug # compat
-      @external_module.porcelain.build_client_instance(ui, slug)
+      if @external_module.respond_to?(:porcelain)
+        @external_module.porcelain.build_client_instance(ui, slug)
+      else
+        @external_module.new(out: ui.out, err: ui.err, program_name: slug)
+      end
     end
     def inflate!
       singleton_class.class_eval(&@block)
@@ -932,7 +936,9 @@ module Skylab::Porcelain
       super(params, & nil) # explicitly avoid bubbling up the block
       case @mode
       when :external
-        mod.porcelain.aliases and aliases(* mod.porcelain.aliases)
+        if mod.respond_to?(:porcelain)
+          mod.porcelain.aliases and aliases(* mod.porcelain.aliases)
+        end
       when :inline
         class << self
           # we want all this on the sing. class because this object is not a subclass but an instance
@@ -974,10 +980,15 @@ module Skylab::Porcelain
     end
     def summary
       case @mode
-      when :external    ;  @external_module.porcelain.summary
+      when :external
+        if @external_module.respond_to?(:porcelain)
+          @external_module.porcelain.summary
+        else
+          a = @external_module.command_tree.map(&:name) # watch the world burn
+          ["child commandz: {#{a.join('|')}}"]
+        end
       else              ;  fail("implement me")
       end
     end
   end
 end
-

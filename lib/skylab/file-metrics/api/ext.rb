@@ -4,11 +4,11 @@ require 'pathname'
 require 'stringio'
 require 'strscan'
 
-module Skylab::Tmx::Modules::FileMetrics
+module Skylab::FileMetrics
 
-  class Api::Ext
-    extend Api::CommonModuleMethods
-    include Api::CommonInstanceMethods
+  class API::Ext
+    extend API::CommonModuleMethods
+    include API::CommonInstanceMethods
     include Skylab::Face::Open2
     GitObjectRe = /\A[0-9a-f]{38,40}\z/
     def run
@@ -25,19 +25,19 @@ module Skylab::Tmx::Modules::FileMetrics
         ext.empty? && (ext = ((pat = pats.detect{ |p| p[0] =~ pn.basename.to_s }) ? pat[1] : pn.basename.to_s))
         extension_counts[ext][:count] += 1
       end
-      count = Count.new('Extension Counts')
+      count = Models::Count.new('Extension Counts')
       singles = nil
       extension_counts.values.each do |data|
         if @req[:group_singles] and 1 == data[:count]
           singles ||= []
           singles.push data[:extension]
         else
-          count.add_child Count.new("*``#{data[:extension]}", data[:count])
+          count.add_child Models::Count.new("*``#{data[:extension]}", data[:count])
         end
       end
       if singles
         grouped_singles = true
-        count.add_child Count.new("(assorted)", singles.size)
+        count.add_child Models::Count.new("(assorted)", singles.size)
       end
       if count.children.nil?
         @ui.err.puts "(no extenstions)"
@@ -83,7 +83,7 @@ module Skylab::Tmx::Modules::FileMetrics
     end
 
     def build_find_command
-      FindCommand.build do |f|
+      Models::FindCommand.build do |f|
         f.paths = @req[:paths]
         f.skip_dirs = @req[:exclude_dirs]
         f.names = @req[:include_names]
@@ -98,7 +98,8 @@ module Skylab::Tmx::Modules::FileMetrics
       max = count.children.map(&:count).max.to_f
       count.children.each do |o|
         o.set_field(:total_share, o.count.to_f / total)
-        o.set_field(:max_share, o.count.to_f / max)
+        o.set_field(:max_share, p = o.count.to_f / max)
+        o.set_field(:lipstick, p)
       end
       count.display_summary_for(:name) { "Total:" }
       count.display_total_for(:count) { |d| "%d" % d }
@@ -107,15 +108,13 @@ module Skylab::Tmx::Modules::FileMetrics
 
     def render_table count, out
       count.children? or return
-      labels = {
-        :count => 'Num Files'
-      }
-      percent = lambda { |v| "%0.2f%%" % (v * 100) }
-      filters = {
-        :total_share => percent,
-        :max_share => percent
-      }
-      _render_table count, out, labels, filters
+      _percent = ->(v) { "%0.2f%%" % (v * 100) }
+      _render_table(count, out,
+        count:        { label: 'Num Files' },
+        total_share:  { filter: _percent },
+        max_share:    { filter: _percent },
+        lipstick:     { label: '', filter: ->(x) { x } }
+      )
     end
   end
 end
