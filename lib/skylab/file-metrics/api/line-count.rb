@@ -28,7 +28,7 @@ module Skylab::FileMetrics
     end
   protected
     def build_find_command
-      FindCommand.build do |f|
+      Models::FindCommand.build do |f|
         f.paths = @paths
         f.skip_dirs = @req[:exclude_dirs]
         f.names = @req[:include_names]

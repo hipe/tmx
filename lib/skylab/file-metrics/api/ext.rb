@@ -25,19 +25,19 @@ module Skylab::FileMetrics
         ext.empty? && (ext = ((pat = pats.detect{ |p| p[0] =~ pn.basename.to_s }) ? pat[1] : pn.basename.to_s))
         extension_counts[ext][:count] += 1
       end
-      count = Count.new('Extension Counts')
+      count = Models::Count.new('Extension Counts')
       singles = nil
       extension_counts.values.each do |data|
         if @req[:group_singles] and 1 == data[:count]
           singles ||= []
           singles.push data[:extension]
         else
-          count.add_child Count.new("*``#{data[:extension]}", data[:count])
+          count.add_child Models::Count.new("*``#{data[:extension]}", data[:count])
         end
       end
       if singles
         grouped_singles = true
-        count.add_child Count.new("(assorted)", singles.size)
+        count.add_child Models::Count.new("(assorted)", singles.size)
       end
       if count.children.nil?
         @ui.err.puts "(no extenstions)"
@@ -83,7 +83,7 @@ module Skylab::FileMetrics
     end
 
     def build_find_command
-      FindCommand.build do |f|
+      Models::FindCommand.build do |f|
         f.paths = @req[:paths]
         f.skip_dirs = @req[:exclude_dirs]
         f.names = @req[:include_names]

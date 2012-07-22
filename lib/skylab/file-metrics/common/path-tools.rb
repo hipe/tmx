@@ -1,14 +1,7 @@
 require 'shellwords'
 
-module Skylab
-  module Tmx
-    module Modules
-    end
-  end
-end
-
 module Skylab::FileMetrics
-  module PathTools
+  module Common::PathTools
     def escape_path path
       (path =~ / |\$|'/) ? Shellwords.shellescape(path) : path
     end

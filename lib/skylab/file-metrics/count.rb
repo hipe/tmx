@@ -1,13 +1,5 @@
-module Skylab
-  module Tmx
-    module Modules
-    end
-  end
-end
-
 module Skylab::FileMetrics
-
-  class Count
+  class Models::Count
     def initialize name=nil, count=nil, fields=nil
       name and set_field(:name, name)
       count and set_field(:count, count)

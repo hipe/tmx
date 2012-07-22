@@ -1,12 +1,5 @@
-module Skylab
-  module Tmx
-    module Modules
-    end
-  end
-end
-
 module Skylab::FileMetrics
-  class Table < Array
+  class Models::Table < ::Array
     class << self
       def render matrix, out
         new(matrix).render(out)
