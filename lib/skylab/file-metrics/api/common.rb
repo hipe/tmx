@@ -1,8 +1,3 @@
-o = File.expand_path('../..', __FILE__)
-require "#{o}/count"
-require "#{o}/find-command"
-require "#{o}/table"
-
 module Skylab::FileMetrics
 
   module API
