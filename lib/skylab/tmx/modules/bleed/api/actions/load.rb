@@ -8,12 +8,12 @@ module Skylab::Tmx::Modules::Bleed::Api
       case parts.index(dir)
       when nil
         info "prepending bin folder to the beginning of the PATH."
-        set_env_path ([dir] + parts).join(':')
+        set_env_path(([dir] + parts).join(':'))
       when 0
         info "already at front of path: \"#{dir}\""
       else
         info "rewriting path to have bin folder at the beginning"
-        set_env_path ([dir] + parts.reject{ |x| x == path }).join(':')
+        set_env_path(([dir] + parts.reject{ |x| x == path }).join(':'))
       end
     end
   end
