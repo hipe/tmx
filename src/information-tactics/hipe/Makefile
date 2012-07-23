@@ -1,12 +1,12 @@
-TARGET=hipe
+TARGET=main
 CC=gcc
-RM=rm -f
-CCOPT=
-LIBS=-lncurses
+RM=rm
+OBJ=$(TARGET).o
+LIB=-lncurses
 
-${TARGET}:	${TARGET}.c
-		${CC} ${CCOPTS} ${LIBS} -o ${TARGET} ${TARGET}.c
+$(TARGET) : $(OBJ)
+	$(CC) $(LIB) -o $(TARGET) $(OBJ)
 
 clean:
-		${RM} ${TARGET}
-
+	$(RM) $(OBJ)
+	$(RM) $(TARGET)
