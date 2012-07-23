@@ -1,7 +1,7 @@
 TARGET=main
 CC=gcc
 RM=rm
-OBJS=main.o whatever.o
+OBJS=main.o whatever.o foo/bar-baz.o
 
 $(TARGET) : $(OBJS)
 	$(CC) -o $(TARGET) $(OBJS)
