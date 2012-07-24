@@ -1,12 +1,17 @@
 TARGET=hipe
 CC=gcc
-RM=rm -f
-CCOPT=
-LIBS=-lncurses
+RM=rm
+OBJ=main.o \
+	hipe.d/demo.o \
+	hipe.d/div.o \
+	hipe.d/nkurses.o \
 
-${TARGET}:	${TARGET}.c
-		${CC} ${CCOPTS} ${LIBS} -o ${TARGET} ${TARGET}.c
+
+LIB=-lncurses
+
+$(TARGET) : $(OBJ)
+	$(CC) $(LIB) -o $(TARGET) $(OBJ)
 
 clean:
-		${RM} ${TARGET}
-
+	$(RM) $(OBJ)
+	$(RM) $(TARGET)
