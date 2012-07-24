@@ -1,5 +1,6 @@
 #include "demo.h"
 
+bool hipe_demo_on_mouse(MEVENT *event);
 bool hipe_demo_run(void);
 
 int hipe_demo_main(void) {
@@ -11,22 +12,19 @@ int hipe_demo_main(void) {
 }
 
 bool hipe_demo_run(void) {
-  int c;
-  MEVENT event;
-  while(1) {
-    keypad(stdscr, TRUE);
-    c = getch();
-    switch(c) {
-      case KEY_MOUSE: {
-        if (getmouse(&event) == OK) {
-          if (event.bstate & BUTTON1_CLICKED) {
-            mvprintw(1, 1, "nerk derk is : %d, %d", event.x, event.y);
-            refresh();
-          }
-        }
-      }
+  int c ; MEVENT e ; bool loop = true ;
+  keypad(stdscr, TRUE);
+  while (loop) {
+    switch(c = getch()) {
+      case KEY_MOUSE: getmouse(&e) || (hipe_demo_on_mouse(&e) || (loop = false)) ; break ;
     }
   }
-  //endwin();
+  endwin();
+  return OKAY;
+}
+
+bool hipe_demo_on_mouse(MEVENT *e) {
+  mvprintw(1, 1, hipe_mouse_event_describe(e));
+  refresh();
   return OKAY;
 }
