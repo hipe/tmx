@@ -1,7 +1,12 @@
-TARGET=main
+TARGET=hipe
 CC=gcc
 RM=rm
-OBJ=$(TARGET).o
+OBJ=main.o \
+	hipe.d/demo.o \
+	hipe.d/div.o \
+	hipe.d/nkurses.o \
+
+
 LIB=-lncurses
 
 $(TARGET) : $(OBJ)
