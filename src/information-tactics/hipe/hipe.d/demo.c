@@ -17,6 +17,7 @@ bool hipe_demo_run(void) {
   while (loop) {
     switch(c = getch()) {
       case KEY_MOUSE: getmouse(&e) || (hipe_demo_on_mouse(&e) || (loop = false)) ; break ;
+      default : mvprintw(1, 1, "someshit: %d", c); break ;
     }
   }
   endwin();

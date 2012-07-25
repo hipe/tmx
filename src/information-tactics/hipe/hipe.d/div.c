@@ -1,9 +1,5 @@
 #include "div.h"
 
-/*
-#include <string.h>
-*/
-
 hipe_div *hipe_div_create(int w, int h, int y, int x) {
   hipe_div *d = (hipe_div *) malloc(sizeof(hipe_div));
   d->width = w ; d->height = h ; d->y = y ; d->x = x ;

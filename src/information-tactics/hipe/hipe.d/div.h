@@ -1,5 +1,6 @@
-#include <ncurses.h>
 #include <stdlib.h>
+
+#include "nkurses.h"
 
 typedef struct {
   WINDOW *window;

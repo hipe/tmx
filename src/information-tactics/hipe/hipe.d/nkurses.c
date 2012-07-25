@@ -12,6 +12,6 @@ bool hipe_nkurses_init(void) {
   clear();
   noecho();
   cbreak();
-  mousemask(ALL_MOUSE_EVENTS, NULL);
+  mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
   return OKAY;
 }
