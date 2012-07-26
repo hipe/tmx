@@ -2,13 +2,15 @@
 
 #include "nkurses.h"
 
-typedef struct {
+typedef struct hipe_div hipe_div;
+
+hipe_div *hipe_div_create(int h, int w, int y, int x);
+
+struct hipe_div {
+  void (*draw)(hipe_div *);
   WINDOW *window;
   int width;
   int height;
   int x;
   int y;
-} hipe_div;
-
-hipe_div  *hipe_div_create(int h, int w, int y, int x);
-void       hipe_div_draw(hipe_div *div);
+};
