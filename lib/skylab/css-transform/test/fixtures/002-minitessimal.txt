@@ -1,0 +1,3 @@
+For styles in "red.css" on the left, and styles in "blue.css" on the right,
+merge the styles in the left over the styles on the right where
+  ".whatever" applies to everything else.

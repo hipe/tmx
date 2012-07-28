@@ -1,0 +1,5 @@
+pkg/*
+*.gem
+.bundle
+/vendor/lib/treetop
+/tmp
