@@ -1,16 +1,20 @@
 #!/usr/bin/env ruby -w
 
+require_silently = ->(s) { _ = $VERBOSE ; $VERBOSE = nil ; require(s) ; $VERBOSE = _ }
+
 require 'optparse'
 require 'pp'
 require 'strscan'
 require 'rubygems'
-require 'treetop'
+require_silently['treetop']
 
-# ./bin/y2tt lib/skylab/test/fixtures/yaccw3c/selectors.yaccw3c -g "Ho::Ha::Lol" > tmp.tt
-# test case 2: ./bin/yacc-to-treetop test/fixtures/yaccw3c/050.sequences.y3
-# test case 3: ./bin/yacc-to-treetop test/fixtures/yaccw3c/060.choice-parse.y3
+# test cases:
+#   yacc2treetop lib/skylab/css-convert/css-parser/selectors.yaccw3c -g "Ho::Ha::Lol" > tmp.tt
+#   yacc2treetop lib/skylab/code-molester/test/fixtures/yaccw3c/050.sequences.y3
+#   yacc2treetop lib/skylab/code-molester/test/fixtures/yaccw3c/060.choice-parse.y3
 
-module Skylab; end
+module Skylab ; end
+
 module Skylab::YaccToTreetop
   VERSION = '0.0.0'
   class << self
@@ -570,7 +574,8 @@ module Skylab::YaccToTreetop
       @ruby.<<(*a)
     end
   end
-  MyInspectKey = ::PP::PPMethods::InspectKey
+  # MyInspectKey = ::PP::PPMethods::InspectKey
+  MyInspectKey = :yacc2treetop
   class PpRhs < ::PP
     def initialize(*a)
       @ctx = a.pop
@@ -579,6 +584,7 @@ module Skylab::YaccToTreetop
     attr_accessor :ctx
     alias_method :execution_context, :ctx
     def pp_rhs node
+      Thread.current[MyInspectKey] ||= []
       id = node.__id__
       if Thread.current[MyInspectKey].include? id
         group { node.pretty_print_cycle self } # just to be safe!

@@ -1,13 +1,16 @@
 #!/usr/bin/env ruby -w
 
+require_silently = ->(s) { _ = $VERBOSE ; $VERBOSE = nil ; require(s) ; $VERBOSE = _ }
+
 require 'optparse'
 require 'pp'
 require 'strscan'
 require 'rubygems'
-require 'treetop'
+require_silently['treetop']
 
-# test case 1: lib/skylab/css-convert/test/fixtures/flex/mini.flex
-# test case 2: lib/skylab/css-convert/css-parser/tokens.flex
+# test cases:
+#   flex2treetop lib/skylab/code-molester/test/fixtures/flex/mini.flex
+#   flex2treetop lib/skylab/css-convert/css-parser/tokens.flex
 
 module Skylab
   module FlexToTreetop
@@ -289,7 +292,7 @@ module Skylab::FlexToTreetop
           ::Treetop.load_from_string Skylab::FlexToTreetop::TreetopGrammar
         end
         c = Class.new FlexFileParser
-        c.class_eval(&ParserExtlib)
+        c.class_eval(&PARSER_EXTLIB)
         c
       end
     end
@@ -749,7 +752,7 @@ module Skylab::FlexToTreetop
 end
 
 
-Skylab::FlexToTreetop::ParserExtlib = lambda do
+Skylab::FlexToTreetop::PARSER_EXTLIB = lambda do |_|
   # CompiledParser#failure_reason overridden for less context
   def failure_reason
     return nil unless (tf = terminal_failures) && tf.size > 0

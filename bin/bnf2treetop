@@ -3,10 +3,11 @@
 require 'strscan'
 require 'optparse'
 
-# Test with:
-# ./bin/bnf-to-treetop lib/css-convert/test/fixtures/bnf/xml-names.bnf
+# test cases:
+#   bnf2treetop lib/skylab/code-molester/test/fixtures/xml-names.bnf
 
-module Skylab; end
+module Skylab ; end
+
 module Skylab::BnfToTreetop
   class << self
     def cli

@@ -1,5 +1,3 @@
-# require 'rubygems'; require 'ruby-debug'; $stderr.puts "\e[1;5;33mruby-debug\e[0m"
-
 module Skylab::CssConvert::TreetopTools
   class << self
     def load_parser_class &b
