@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby -w
 
-require File.expand_path('../../lib/css-convert.rb', __FILE__)
+require_relative '../css-convert/core'
 
-Hipe::CssConvert.cli.run(ARGV)
+Skylab::CssConvert.cli.run(ARGV)

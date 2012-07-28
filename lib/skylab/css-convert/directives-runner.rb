@@ -1,4 +1,4 @@
-module Hipe::CssConvert
+module Skylab::CssConvert
   class DirectivesRunner
     def initialize(ctx)
       @c = ctx

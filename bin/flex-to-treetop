@@ -1,21 +1,21 @@
 #!/usr/bin/env ruby -w
+
 require 'optparse'
 require 'pp'
 require 'strscan'
 require 'rubygems'
-# require 'ruby-debug'; $stderr.puts "\e[1;5;33mruby-debug\e[0m"
 require 'treetop'
 
-# test case 1: test/fixtures/flex/mini.flex
-# test case 2: lib/css-convert/css-parser/tokens.flex
+# test case 1: lib/skylab/css-convert/test/fixtures/flex/mini.flex
+# test case 2: lib/skylab/css-convert/css-parser/tokens.flex
 
-module Hipe
+module Skylab
   module FlexToTreetop
     VERSION = '0.0.0'
   end
 end
 
-module Hipe::FlexToTreetop
+module Skylab::FlexToTreetop
   class CliBase
     def run argv
       @c = build_execution_context
@@ -285,8 +285,8 @@ module Hipe::FlexToTreetop
     end
     def parser_class
       @parser_class ||= begin
-        if ! Hipe::FlexToTreetop.const_defined?(:FlexFileParser)
-          ::Treetop.load_from_string Hipe::FlexToTreetop::TreetopGrammar
+        if ! Skylab::FlexToTreetop.const_defined?(:FlexFileParser)
+          ::Treetop.load_from_string Skylab::FlexToTreetop::TreetopGrammar
         end
         c = Class.new FlexFileParser
         c.class_eval(&ParserExtlib)
@@ -338,7 +338,7 @@ module Hipe::FlexToTreetop
   end
 end
 
-class Hipe::FlexToTreetop::Sexpesque < Array # class Sexpesque
+class Skylab::FlexToTreetop::Sexpesque < Array # class Sexpesque
   class << self
     def add_hook(whenn, &what)
       @hooks ||= Hash.new{ |h,k| h[k] = [] }
@@ -400,8 +400,8 @@ class Hipe::FlexToTreetop::Sexpesque < Array # class Sexpesque
   end
 end
 
-module Hipe::FlexToTreetop::CommonNodey
-  Sexpesque = ::Hipe::FlexToTreetop::Sexpesque
+module Skylab::FlexToTreetop::CommonNodey
+  Sexpesque = ::Skylab::FlexToTreetop::Sexpesque
   def at(str); ats(str).first end
   def ats path
     path = at_compile(path) if path.kind_of?(String)
@@ -410,7 +410,7 @@ module Hipe::FlexToTreetop::CommonNodey
     if path.size > 1 && cx.any?
       child_path = path[1..-1]
       cx = cx.map do |c|
-        c.extend(::Hipe::FlexToTreetop::CommonNodey) unless
+        c.extend(::Skylab::FlexToTreetop::CommonNodey) unless
           c.respond_to?(:ats)
         c.ats(child_path)
       end.flatten
@@ -470,9 +470,9 @@ module Hipe::FlexToTreetop::CommonNodey
       sexp_class.from_syntax_node(sexp_class.node_name, self)
     elsif ! elements.nil? && elements.index{ |n| n.respond_to?(:sexp) }
       cx = elements.map{ |n| n.respond_to?(:sexp) ? n.sexp : n.text_value }
-      ::Hipe::FlexToTreetop::AutoSexp.traditional(guess_node_name, *cx)
+      ::Skylab::FlexToTreetop::AutoSexp.traditional(guess_node_name, *cx)
     else
-      ::Hipe::FlexToTreetop::AutoSexp.traditional(guess_node_name, text_value)
+      ::Skylab::FlexToTreetop::AutoSexp.traditional(guess_node_name, text_value)
     end
   end
   def guess_node_name
@@ -488,7 +488,7 @@ module Hipe::FlexToTreetop::CommonNodey
   end
 end
 
-module Hipe::FlexToTreetop
+module Skylab::FlexToTreetop
   class CommonNode < ::Treetop::Runtime::SyntaxNode
     include CommonNodey
   end
@@ -501,7 +501,7 @@ module Hipe::FlexToTreetop
   end
 end
 
-module Hipe::FlexToTreetop
+module Skylab::FlexToTreetop
   class RuleBuilder
     def initialize ctx
       @ctx = ctx
@@ -709,7 +709,7 @@ module Hipe::FlexToTreetop
   end
 end
 
-module Hipe::FlexToTreetop
+module Skylab::FlexToTreetop
   class << self
     def cli
       @cli ||= Cli.new
@@ -749,7 +749,7 @@ module Hipe::FlexToTreetop
 end
 
 
-Hipe::FlexToTreetop::ParserExtlib = lambda do
+Skylab::FlexToTreetop::ParserExtlib = lambda do
   # CompiledParser#failure_reason overridden for less context
   def failure_reason
     return nil unless (tf = terminal_failures) && tf.size > 0
@@ -777,13 +777,13 @@ Hipe::FlexToTreetop::ParserExtlib = lambda do
   end
 end
 
-Hipe::FlexToTreetop::TreetopGrammar = <<'GRAMMAR'
+Skylab::FlexToTreetop::TreetopGrammar = <<'GRAMMAR'
 # The 'pattern' rule below is a subset of the grammar grammar described at
 #   http://flex.sourceforge.net/manual/Patterns.html.
 #   Note that not all constructs are supported, only those necessary
 #   to parse the target flex input files for this project.
 
-module Hipe
+module Skylab
 module FlexToTreetop
 grammar FlexFile
   rule file
@@ -955,4 +955,4 @@ end
 end
 GRAMMAR
 
-__FILE__ == $PROGRAM_NAME and Hipe::FlexToTreetop.cli.run(ARGV)
+__FILE__ == $PROGRAM_NAME and Skylab::FlexToTreetop.cli.run(ARGV)

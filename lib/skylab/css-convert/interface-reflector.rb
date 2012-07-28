@@ -1,4 +1,4 @@
-module Hipe::CssConvert
+module Skylab::CssConvert
   module InterfaceReflector
     class << self
       def extended cls
@@ -9,7 +9,7 @@ module Hipe::CssConvert
   end
 end
 
-module Hipe::CssConvert::InterfaceReflector
+module Skylab::CssConvert::InterfaceReflector
   module InstanceMethods
     def build_cli_option_parser
       require 'optparse'
@@ -45,7 +45,7 @@ module Hipe::CssConvert::InterfaceReflector
   end
 end
 
-module Hipe::CssConvert::InterfaceReflector
+module Skylab::CssConvert::InterfaceReflector
   class ParameterDefinitionSet < Array
     def initialize
       @parsed = false
@@ -62,7 +62,7 @@ module Hipe::CssConvert::InterfaceReflector
   end
 end
 
-module Hipe::CssConvert::InterfaceReflector
+module Skylab::CssConvert::InterfaceReflector
   class Parameter
     def initialize intern
       @intern = intern
@@ -90,7 +90,7 @@ module Hipe::CssConvert::InterfaceReflector
   end
 end
 
-module Hipe::CssConvert::InterfaceReflector
+module Skylab::CssConvert::InterfaceReflector
   class RequestParser
     # an adapter to make it look like an option parser, but it's more
     def initialize
@@ -153,7 +153,7 @@ module Hipe::CssConvert::InterfaceReflector
   end
 end
 
-module Hipe::CssConvert::InterfaceReflector
+module Skylab::CssConvert::InterfaceReflector
   module CliInstanceMethods
     def run argv
       @argv = argv

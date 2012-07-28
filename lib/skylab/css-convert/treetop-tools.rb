@@ -1,6 +1,6 @@
 # require 'rubygems'; require 'ruby-debug'; $stderr.puts "\e[1;5;33mruby-debug\e[0m"
 
-module Hipe::CssConvert::TreetopTools
+module Skylab::CssConvert::TreetopTools
   class << self
     def load_parser_class &b
       ParserClassLoader.new(&b).run

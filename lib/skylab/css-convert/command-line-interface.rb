@@ -1,4 +1,4 @@
-module Hipe::CssConvert
+module Skylab::CssConvert
   require ROOT + '/core-interface'
 
   class CommandLineInterface < CoreInterface

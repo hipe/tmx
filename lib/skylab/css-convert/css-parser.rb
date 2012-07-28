@@ -1,4 +1,4 @@
-module Hipe::CssConvert
+module Skylab::CssConvert
   require ROOT + '/treetop-tools'
   class CssParser
     def initialize(ctx)
@@ -22,25 +22,25 @@ module Hipe::CssConvert
         :use     => :FlexToTreetop,
         :read    => 'css2.1.flex',
         :write   => 'css-2.1-tokens.treetop.rb',
-        :grammar => 'Hipe::CssParser::Tokens'
+        :grammar => 'Skylab::CssParser::Tokens'
       },
       { :on      => true,
         :use     => :YaccToTreetop,
         :read    => 'css2.1.yacc3wc',
         :write   => 'css-2.1-document.treetop.rb',
-        :grammar => 'Hipe::CssParser::CssDocument'
+        :grammar => 'Skylab::CssParser::CssDocument'
       },
       { :on      => nil,
         :use     => :FlexToTreetop,
         :read    => 'tokens.flex',
         :write   => 'css-tokensXXX.treetop.rb',
-        :grammar => 'Hipe::CssParser::TokensXXX'
+        :grammar => 'Skylab::CssParser::TokensXXX'
       },
       { :on      => nil,
         :use     => :YaccToTreetop,
         :read    => 'selectors.yaccw3c',
         :write   => 'css-selectors.treetob.rb',
-        :grammar => 'Hipe::CssParser::Selectors'
+        :grammar => 'Skylab::CssParser::Selectors'
       }
     ]
     def build_big_parser
@@ -63,9 +63,9 @@ module Hipe::CssConvert
         )
     end
     def parser_parser_module mod
-      ::Hipe.const_defined?(mod) or
+      ::Skylab.const_defined?(mod) or
         load("#{ROOT}/#{ParserParsers[mod][:path]}")
-      ::Hipe.const_get(mod)
+      ::Skylab.const_get(mod)
     end
   end
 end

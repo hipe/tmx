@@ -1,4 +1,4 @@
-module Hipe::CssConvert::CssParsing::CustomTree
+module Skylab::CssConvert::CssParsing::CustomTree
   class CustomTree < ::Array
     class << self
       def [] (*a)
@@ -20,7 +20,7 @@ module Hipe::CssConvert::CssParsing::CustomTree
     end
   end
 end
-module Hipe::CssConvert::CssParsing::CssFile
+module Skylab::CssConvert::CssParsing::CssFile
   class MyNode < Treetop::Runtime::SyntaxNode; end
   class CssFile < MyNode; end
   class CStyleComment < MyNode; end

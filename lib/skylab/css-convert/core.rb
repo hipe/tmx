@@ -1,9 +1,5 @@
-# require 'rubygems'; require 'ruby-debug'; $stderr.puts "\e[1;5;33mruby-debug\e[0m"
-
-module Hipe; end
-
-module Hipe::CssConvert
-  ROOT    = File.dirname(__FILE__)+'/css-convert'
+module Skylab::CssConvert
+  ROOT = File.dirname(__FILE__)
   class << self
     def cli
       @cli ||= begin

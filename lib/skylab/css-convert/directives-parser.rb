@@ -1,17 +1,17 @@
-require Hipe::CssConvert::ROOT + '/treetop-tools'
+require Skylab::CssConvert::ROOT + '/treetop-tools'
 
-module Hipe
+module Skylab
   module CssConvert
     module Grammar
       module Directives
-        S = ::Hipe::CssConvert::TreetopTools::Sexpesque
+        S = ::Skylab::CssConvert::TreetopTools::Sexpesque
       end
     end
   end
 end
 
-class Hipe::CssConvert::DirectivesParser
-  ROOT = ::Hipe::CssConvert::ROOT
+class Skylab::CssConvert::DirectivesParser
+  ROOT = ::Skylab::CssConvert::ROOT
   class RuntimeError < ::RuntimeError; end
   class << self
     def require_local_treetop
@@ -48,13 +48,13 @@ private
   def parser_class
     @parser_class ||= begin
       self.class.require_local_treetop
-      Hipe::CssConvert::TreetopTools.load_parser_class do |o|
+      Skylab::CssConvert::TreetopTools.load_parser_class do |o|
         o.root_dir ROOT
         o.generated_grammar_dir @c[:tmpdir_relative]
         o.treetop_grammar 'directives-parser/common.treetop'
         o.treetop_grammar 'directives-parser/directives.treetop'
         o.force_overwrite! if @c[:force_overwrite]
-        o.enhance_parser_with ::Hipe::CssConvert::TreetopTools::ParserExtlib
+        o.enhance_parser_with ::Skylab::CssConvert::TreetopTools::ParserExtlib
         o.use_ui @c
       end
     end

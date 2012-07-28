@@ -1,14 +1,13 @@
 #!/usr/bin/env ruby -w
+
 require 'strscan'
 require 'optparse'
 
-# require 'ruby-debug'; $stderr.puts "\e[1;5;33mruby-debug\e[0m"
-
 # Test with:
-# ./bin/bnf-to-treetop test/fixtures/bnf/xml-names.bnf
+# ./bin/bnf-to-treetop lib/css-convert/test/fixtures/bnf/xml-names.bnf
 
-module Hipe; end
-module Hipe::BnfToTreetop
+module Skylab; end
+module Skylab::BnfToTreetop
   class << self
     def cli
       CliAgent.new
@@ -302,4 +301,4 @@ module Hipe::BnfToTreetop
   end
 end
 
-Hipe::BnfToTreetop.cli.run(ARGV)
+Skylab::BnfToTreetop.cli.run(ARGV)
