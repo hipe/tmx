@@ -1,0 +1,19 @@
+#!/usr/bin/env ruby
+
+require File.dirname(__FILE__)+'/../lib/css-convert'
+require Hipe::CssConvert::ROOT + '/grammar/program-parser.rb'
+require 'pp'
+
+p = Hipe::CssConvert::Grammar::ProgramParser.new
+input = $stdin.tty? ? ARGV.join(" ") : $stdin.read.chomp
+puts "input:    "+input.inspect
+resp = p.parse(input)
+# puts "response: "+resp.inspect
+puts "num terminal failures: #{p.terminal_failures.size}"
+if resp.nil?
+  puts "got failure:"
+  puts p.failure_reason
+else
+  puts "got result: "
+  PP.pp resp.tree
+end

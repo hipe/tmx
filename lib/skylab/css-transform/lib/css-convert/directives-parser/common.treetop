@@ -1,0 +1,47 @@
+module Hipe
+  module CssConvert
+    module Grammar
+      grammar Common
+        rule literal
+          quoted_string / word
+        end
+        rule word
+          [^,;\t\n\r ]+ {
+            def value
+              text_value
+            end
+          }
+        end
+        rule quoted_string
+          single_quoted_string / double_quoted_string
+        end
+        rule double_quoted_string
+          '"' (!'"' . / '\"')* '"' {
+            def value
+              elements[1].text_value
+            end
+          }
+        end
+        rule single_quoted_string
+          "'" (!"'" . / "\'")* "'" {
+            def value
+              elements[1].text_value
+            end
+          }
+        end
+        rule phrase_end
+          [ \t]* ( ',' [ \t]* comment_to_eol? [\n\r]*  /  comment_to_eol / [\n\r] )
+        end
+        rule space
+          (white / comment_to_eol)+
+        end
+        rule comment_to_eol
+          ( '#' / "//" ) (!"\n" .)*
+        end
+        rule white
+          [ \t\n\r]
+        end
+      end
+    end
+  end
+end
