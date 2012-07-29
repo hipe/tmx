@@ -16,15 +16,19 @@ module Skylab::CssConvert
       emit(:error, msg)
       false
     end
-    def resolve_input_string argv=ARGV, stdin=$stdin
+    attr_reader :parser
+    def request_runtime
+      @request_runtime ||= build_request_runtime
+    end
+    def resolve_input argv=ARGV, stdin=$stdin
       if stdin.tty?
         if 1 == argv.length
-          File.read(argv.first)
+          parser.build_file_input_adapter argv.first
         else
-         error("no. expecting <filename> or stdin")
+          error("no. expecting <filename> or stdin")
         end
       elsif argv.empty?
-        stdin.read.chomp
+        parser.build_stream_input_adapter stdin
       else
         error("no. can't have argv and stdin.")
       end
@@ -34,10 +38,10 @@ module Skylab::CssConvert
   class VizTest::Dix
     include VizTest::InstanceMethods
     def invoke
-      parser = CssConvert::DirectivesParser.new(build_request_runtime)
-      input = resolve_input_string or return
+      @parser = CssConvert::DirectivesParser.new(request_runtime)
+      input = resolve_input or return
       # puts "input: #{input.inspect}"
-      result = parser.parse_string(input)
+      result = parser.parse(input)
       # puts "result was: "+result.inspect
       puts "(num terminal failures: #{parser.parser.terminal_failures.length})"
       if result
