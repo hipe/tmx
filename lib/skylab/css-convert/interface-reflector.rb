@@ -1,19 +1,17 @@
 module Skylab::CssConvert
   module InterfaceReflector
-    class << self
-      def extended cls
-        cls.extend ClassMethods
-        cls.send(:include, InstanceMethods)
-      end
+    module Core
+    end
+    module CLI
     end
   end
 end
 
 module Skylab::CssConvert::InterfaceReflector
-  module InstanceMethods
+  module Core::InstanceMethods
     def build_cli_option_parser
       require 'optparse'
-      OptionParser.new do |o|
+      o = ::OptionParser.new
         o.banner = usage
         a = self.class.interface.parameters.select{ |p| p.cli? and p.option? }
         if a.any?
@@ -22,30 +20,39 @@ module Skylab::CssConvert::InterfaceReflector
             o.on( * p.cli_definition_array ){ |v| dispatch_option(p, v) }
           end
         end
-      end
+      o
     end
     def dispatch_option parameter, value
       args = parameter.takes_argument? ? [value] : []
-      send("on_#{parameter.intern}", *args) or
-        handle_failed_option(parameter, value)
-    end
-    def handle_failed_option param, value
-      @options_ok = false
+      send("on_#{parameter.intern}", *args)
+      nil
     end
     def oxford_comma items, last_glue = ' and ', rest_glue = ', '
       items.zip( items.size < 2 ? [] :
           ( [last_glue] + Array.new(items.size - 2, rest_glue) ).reverse
       ).flatten.join
     end
+    def params
+      @params ||= RequestParameters.new
+    end
+    def request_runtime
+      @request_runtime ||= (defaults! && RequestRuntime.new(output_adapter, params))
+    end
+    def stack
+      @stack ||= []
+    end
+    def trace msg
+      $stderr.puts "trace: #{msg}"
+    end
   end
-  module ClassMethods
+  module Core::ModuleMethods
     def interface
       @interface ||= build_interface
     end
+    def invoke *request
+      new.invoke(*request)
+    end
   end
-end
-
-module Skylab::CssConvert::InterfaceReflector
   class ParameterDefinitionSet < Array
     def initialize
       @parsed = false
@@ -60,9 +67,6 @@ module Skylab::CssConvert::InterfaceReflector
       @parsed = true
     end
   end
-end
-
-module Skylab::CssConvert::InterfaceReflector
   class Parameter
     def initialize intern
       @intern = intern
@@ -88,9 +92,8 @@ module Skylab::CssConvert::InterfaceReflector
     alias_method  :required?, :required
     attr_accessor :desc
   end
-end
-
-module Skylab::CssConvert::InterfaceReflector
+  class RequestParameters < Hash # future proof
+  end
   class RequestParser
     # an adapter to make it look like an option parser, but it's more
     def initialize
@@ -151,26 +154,26 @@ module Skylab::CssConvert::InterfaceReflector
       end
     end
   end
-end
-
-module Skylab::CssConvert::InterfaceReflector
-  module CliInstanceMethods
-    def run argv
+  class RequestRuntime < Struct.new(:output_adapter, :params)
+  end
+  module CLI::ModuleMethods
+    include Core::ModuleMethods
+  end
+  module CLI::InstanceMethods
+    include Core::InstanceMethods
+    def invoke argv
       @argv = argv
-      @c = build_context
-      @exit_ok = nil
-      @queue = []
-      if ! (parse_opts and parse_args)
-        @c.err.puts usage
-        @c.err.puts invite
-        return
+      parse_opts && parse_args or stack.empty? && invite
+      stack.empty? and stack.push(default_action)
+      last = nil
+      until stack.empty?
+        if method = stack.pop
+          false == (last = send(method)) and break
+        end
       end
-      @queue.push default_action
-      catch(:early_exit){ @queue.each{ |meth| send meth } }
+      false == last and invite
+      last ? 0 : -1 # old c-style exit codes for the hell of it
     end
-    attr_accessor :c
-    alias_method :execution_context, :c
-  protected
     Codes = {:bold=>1,:dark_red=>31,:green=>32,:yellow=>33,:blue=>34,
       :purple=>35,:cyan=>36,:white=>37,:red=>38}
     def color(s, *a); "\e[#{a.map{|x|Codes[x]}.compact*';'}m#{s}\e[0m" end
@@ -178,24 +181,29 @@ module Skylab::CssConvert::InterfaceReflector
     Styles = { :error => [:bold, :red], :em => [:bold, :green] }
     def style(s, style); color(s, *Styles[style]) end
     def error msg
-      @c.err.puts msg
+      emit(:error, msg)
       false
     end
     def cli_option_parser
       @cli_option_parser ||= build_cli_option_parser
     end
-    def fatal msg
-      @c.err.puts msg
-      throw :early_exit
+    def emit(*a)
+      output_adapter.emit(*a)
+    end
+    def invite
+      emit(:usage, usage)
+      emit(:invite, invitation)
+      stack.push nil # because something happend
+    end
+    def invitation
+      em("#{program_name} -h") << " for help"
     end
     def parse_opts
-      @options_ok = true
-      begin
-        cli_option_parser.parse!(@argv)
-      rescue OptionParser::ParseError => e
-        return error(e.message)
-      end
-      @options_ok
+      before = stack.length
+      cli_option_parser.parse!(@argv)
+      before >= stack.length ? true : nil # nil if something happened
+    rescue OptionParser::ParseError => e
+      error e.message
     end
     def parse_args
       unexpected = missing = nil
@@ -203,18 +211,14 @@ module Skylab::CssConvert::InterfaceReflector
       while @argv.any?
         a.empty? and unexpected = @argv and break
         dir = ( a.first.required? || a.last.optional? ) ? :shift : :pop
-        @c[a.send(dir).intern] = @argv.send(dir)
+        params[a.send(dir).intern] = @argv.send(dir)
       end
       (missing = a.select(&:required?)).any? or missing = nil
-      unexpected || missing and @exit_ok and return false
       unexpected and return error("unexpected arg#{'s' if @argv.size > 1}:" <<
         oxford_comma(@argv.map(&:inspect)))
       missing and return error("expecting: "<<
         oxford_comma(missing.map(&:cli_label)))
       true
-    end
-    def invite
-      em("#{program_name} -h") << " for help"
     end
     def on_help
       args = self.class.interface.parameters.select{|p| p.cli? && p.argument?}
@@ -228,16 +232,17 @@ module Skylab::CssConvert::InterfaceReflector
           sw.long.clear
         end
       end
-      @c.err.puts ophack.to_s
-      @exit_ok = true
+      emit(:help, ophack.to_s)
+      stack.push nil # because something happened
     end
     def on_version
-      @c.err.puts "#{program_name} #{version_string}"
-      @exit_ok = true
+      emit(:payload, "#{program_name} #{version_string}")
+      stack.push nil # because something happened
     end
     def program_name
-      File.basename($PROGRAM_NAME)
+      (@program_name ||= nil) || File.basename($PROGRAM_NAME)
     end
+    attr_writer :program_name
     def usage_syntax_string
       [program_name,options_syntax_string,arguments_syntax_string].compact*' '
     end

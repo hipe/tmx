@@ -1,19 +1,23 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env ruby -w
 
-require File.dirname(__FILE__)+'/../lib/css-convert'
-p = Hipe::CssConvert.css_parser
+require_relative '../../core'
+mod = ::Skylab::CssConvert
+runtime  = mod::CLI.new.request_runtime
+parser = mod::CssParser.new(runtime)
 input = $stdin.tty? ? ARGV.join(" ") : $stdin.read
 puts input.inspect
-resp = p.parse(input)
-# puts "response: "+resp.inspect
-puts "num terminal failures: #{p.terminal_failures.size}"
-if resp.nil?
-  puts "got failure:"
-  puts p.failure_reason
-else
+result = parser.parse_string(input)
+# puts "response: "+result.inspect
+puts "num terminal failures: #{parser.terminal_failures.size}"
+if true
+  puts "SKIPPING REST OF TEST FOR NOW"
+elsif result
   puts "got result: "
   require 'pp'
-  PP.pp resp.tree
+  ::PP.pp result.tree
   puts "unparsed:"
-  puts resp.tree.unparse.inspect
+  puts result.tree.unparse.inspect
+else
+  puts "got failure:"
+  puts parser.failure_reason
 end

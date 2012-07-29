@@ -1,1 +1,4 @@
-Files in this folder are FLEX- and YACC- style grammar specifications that are run through flex-to-treetop and yacc-to-treetop to generate treetop grammars that are for now stored in ./tmp
+Files in this folder are FLEX- and YACC- style grammar specifications that are
+run through flex2treetop and yacc2treetop to generate treetop grammars
+that are for now stored in a tmp directory determined by a configuration
+parameter.

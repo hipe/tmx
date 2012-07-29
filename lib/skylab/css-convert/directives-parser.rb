@@ -1,65 +1,24 @@
-require Skylab::CssConvert::ROOT + '/treetop-tools'
-
-module Skylab
-  module CssConvert
-    module Grammar
-      module Directives
-        S = ::Skylab::CssConvert::TreetopTools::Sexpesque
+module Skylab::CssConvert
+  module Grammar
+    module Directives
+      S = CssConvert::TreetopTools::Sexpesque
+    end
+  end
+  class DirectivesParser
+    include CssConvert::Parser::InstanceMethods
+    ENTITY_NOUN_STEM = 'directives file'
+    def parser_class
+      @parser_class ||= begin
+        CssConvert::TreetopTools.load_parser_class do |o|
+          o.request_runtime = request_runtime
+          o.root_dir CssConvert.dir
+          o.generated_grammar_dir params[:tmpdir_relative]
+          o.treetop_grammar 'directives-parser/common.treetop'
+          o.treetop_grammar 'directives-parser/directives.treetop'
+          o.force_overwrite! if params[:force_overwrite]
+          o.enhance_parser_with CssConvert::TreetopTools::ParserExtlib
+        end
       end
     end
-  end
-end
-
-class Skylab::CssConvert::DirectivesParser
-  ROOT = ::Skylab::CssConvert::ROOT
-  class RuntimeError < ::RuntimeError; end
-  class << self
-    def require_local_treetop
-      Object.const_defined?(:Treetop) and return
-      require 'rubygems' # still use ployglot as found by rubygems
-      $:.unshift(File.dirname(File.dirname(ROOT))+'/vendor/lib/treetop/lib')
-        # use treetop in vendor/lib, not the one in
-        # rubygems/rvm/gemspec/whatever, in case etc.. @todo
-      require 'treetop'
-    end
-  end
-  def initialize ctx
-    @c = ctx
-  end
-  def parse_file path
-    path && File.exist?(path) or
-      return error("directives file not found: #{path.inspect}")
-    parse_string File.read(path)
-  end
-  def parse_string whole_string
-    resp = parser.parse(whole_string)
-    if resp.nil?
-      rsn = parser.failure_reason || "Got nil from parse without reason!"
-      @c.err.puts rsn
-      nil
-    else
-      resp.tree
-    end
-  end
-private
-  def error msg
-    raise RuntimeError.new(msg)
-  end
-  def parser_class
-    @parser_class ||= begin
-      self.class.require_local_treetop
-      Skylab::CssConvert::TreetopTools.load_parser_class do |o|
-        o.root_dir ROOT
-        o.generated_grammar_dir @c[:tmpdir_relative]
-        o.treetop_grammar 'directives-parser/common.treetop'
-        o.treetop_grammar 'directives-parser/directives.treetop'
-        o.force_overwrite! if @c[:force_overwrite]
-        o.enhance_parser_with ::Skylab::CssConvert::TreetopTools::ParserExtlib
-        o.use_ui @c
-      end
-    end
-  end
-  def parser
-    @parser ||= parser_class.new
   end
 end

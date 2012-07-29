@@ -1,4 +1,4 @@
-module Hipe
+module Skylab
   module CssConvert
     module Grammar
       grammar Directives

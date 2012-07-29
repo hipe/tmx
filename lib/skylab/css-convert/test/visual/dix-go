@@ -1,10 +1,9 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env ruby -w
 
-require File.dirname(__FILE__)+'/../lib/css-convert'
-require Hipe::CssConvert::ROOT + '/grammar/program-parser.rb'
+require_relative '../../core'
 require 'pp'
 
-p = Hipe::CssConvert::Grammar::ProgramParser.new
+p = Skylab::CssConvert::Grammar::ProgramParser.new
 input = $stdin.tty? ? ARGV.join(" ") : $stdin.read.chomp
 puts "input:    "+input.inspect
 resp = p.parse(input)

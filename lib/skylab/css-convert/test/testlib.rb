@@ -1,45 +1,57 @@
-require File.expand_path('../../lib/css-convert', __FILE__)
+require_relative '../core'
+require 'skylab/test-support/core'
 
-require 'ruby-debug'
 require 'pp'
 require 'stringio'
 
-Hipe__CssConvert__Testlib = true
-
-module Hipe::CssConvert::ExampleHelperMethods
-  def new_cli
-    Hipe::CssConvert.cli.buffered!
-  end
-  def fixture_path tail
-    File.join('test/fixtures', tail)
-  end
-  def parse_css_in_file path
-    contents = File.read(path)
-    p = Hipe::CssConvert.css_parser
-    resp = p.parse(contents)
-    if resp.nil?
-      p # not sure about this! just for debugging?
-    else
-      resp
+module Skylab::CssConvert::TestSupport
+  CssConvert = ::Skylab::CssConvert
+  class OutputAdapterSpy < CssConvert::CLI::OutputAdapter
+    OUT = 0 ; ERR = 1
+    def debug!
+      @streams.each(&:debug!)
+      self
     end
-  end
-  def parse_directives_in_file path
-    require Hipe::CssConvert::ROOT + '/grammar/program-parser.rb' # wants wrapper
-    p = Hipe::CssConvert::Grammar::ProgramParser.new
-    contents = File.read(path)
-    puts contents if @debuggy
-    resp = p.parse contents
-    if ! resp.nil?
-      resp.tree
-    elsif @debuggy
-      puts "got failure:"
-      puts p.failure_reason
-      nil
+    def err
+      @streams[ERR]
+    end
+    def initialize
+      @streams = 2.times.map { ::Skylab::TestSupport::StreamSpy.standard }
+      super(out, err)
+    end
+    def out
+      @streams[OUT]
     end
   end
 end
 
-module Hipe::CssConvert::SexpesqueStructurePatterns
+module Skylab::CssConvert::TestSupport::InstanceMethods
+  CssConvert = ::Skylab::CssConvert
+  TestSupport = CssConvert::TestSupport
+
+  def build_parser klass
+    klass.new cli_instance.request_runtime
+  end
+  def cli_instance
+    @cli_instance ||= begin
+      o = CssConvert::CLI.new
+      o.output_adapter = TestSupport::OutputAdapterSpy.new
+      o.program_name = 'nerk'
+      o
+    end
+  end
+  def fixture_path tail
+    CssConvert.dir.join('test/fixtures', tail)
+  end
+  def parse_css_in_file pathname
+    build_parser(CssConvert::CssParser).parse_string pathname.read
+  end
+  def parse_directives_in_file pathname
+    build_parser(CssConvert::DirectivesParser).parse_string pathname.read
+  end
+end
+
+module Skylab::CssConvert::SexpesqueStructurePatterns
   def distilled_structure sexp
     a = sexp.map[1...sexp.size].map{ |x|
       case x
@@ -59,7 +71,7 @@ module Hipe::CssConvert::SexpesqueStructurePatterns
 end
 
 RSpec::Matchers.define :match_the_structure_pattern do |expected|
-  extend Hipe::CssConvert::SexpesqueStructurePatterns
+  extend Skylab::CssConvert::SexpesqueStructurePatterns
   match do |actual|
     expected.inspect == distilled_structure(actual).inspect
   end
@@ -73,8 +85,4 @@ RSpec::Matchers.define :match_the_structure_pattern do |expected|
     dif = ::Rspec::Expectations.differ.diff_as_string(act, exp)
     "Sexp did not have the expected structure: #{dif}"
   end
-end
-
-RSpec.configure do |c|
-  c.include Hipe::CssConvert::ExampleHelperMethods
 end

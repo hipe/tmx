@@ -43,7 +43,7 @@ module Skylab
     end
     def handle_const_missing const
       path = "#{dir_path}/#{pathify const}"
-      fail("circular autoload dependency detected in #{path}") if
+      fail("circular autoload dependency detected in #{path} with #{const}") if
         (@_autoloader_mutex ||= Hash.new{|h, k| h[k] = 1; nil})[path]
       File.exist?("#{path}#{EXTNAME}") ? require(path) : no_such_file(path, const)
       const_defined?(const) or fail("#{self}::#{const} was not defined, must be, in #{path}")
