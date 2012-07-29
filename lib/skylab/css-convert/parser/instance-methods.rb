@@ -5,6 +5,7 @@ module Skylab::CssConvert
       self.class.const_get(:ENTITY_NOUN_STEM)
     end
     def parse_file pn
+      String === pn and pn = MyPathname.new(pn)
       pn.exist? or return error("#{entity} not found: #{pn.pretty}")
       pn.directory? and return error("expecing #{entity}, had directory: #{pn.pretty}")
       parse_string pn.read
