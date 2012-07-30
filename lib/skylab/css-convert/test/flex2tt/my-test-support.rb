@@ -28,7 +28,7 @@ module Skylab::FlexToTreetop::MyTestSupport
         err[1].should match(/usage: rspec \[options\] <flexfile>/i) # etc
         listing = err[2..-1]
         listing.length.should be > 0
-        _bad = listing.select { |s| s !~ /\A[[:space:]]+-/ }
+        _bad = listing.select { |s| s !~ /\A[[:space:]]+/ }
         _bad.length.should eql(0)
       end
     end
