@@ -6,15 +6,14 @@ module Skylab::FlexToTreetop::MyTestSupport
     context "has a CLI that" do
       context "with no args" do
         argv
-        an_explanation "of what it's expecting and what it had",
-          /expecting.+flexfile.+had[^a-z]+\z/
+        an_explanation "of what it's expecting", /expecting.+flexfile/i
         more_help
       end
       context "with one nonsensical option" do
         argv '-x'
         an_explanation "that the option is invalid", /invalid option.+x/
         more_help
-      end
+     end
       context "with one giberrsh arg" do
         argv 'not-there.txt'
         an_explanation "that the file is not found",
@@ -26,13 +25,13 @@ module Skylab::FlexToTreetop::MyTestSupport
           argv ::Skylab::ROOT.join(
             'lib/skylab/css-convert/css-parser/tokens.flex').to_s
           it "and writes a treetop grammar to stdout" do
-            # request_runtime_spy.debug!
+            # io_adapter_spy.debug!
             out.length.should be_within(50).of(137)
             out.first.should match(/from flex name definitions/i)
             out[1].should match(/rule ident/)
             out.last.should eql('end')
-            err.length.should eql(1)
-            err.first.should match(/notice.+skipping/i)
+            err.length.should be >= 1
+            err.last.should match(/notice.+skipping/i)
           end
         end
       end

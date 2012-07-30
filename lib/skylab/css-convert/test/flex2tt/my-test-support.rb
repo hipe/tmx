@@ -10,6 +10,7 @@ require_relative '../../..'
 require 'skylab/test-support/core'
 
 module Skylab::FlexToTreetop::MyTestSupport
+  FlexToTreetop = ::Skylab::FlexToTreetop
   module ModuleMethods
     def argv *argv
       [:inspy, :outspy, :errspy].each do |sym|
@@ -33,44 +34,42 @@ module Skylab::FlexToTreetop::MyTestSupport
     end
   end
   module InstanceMethods
-    include ::Skylab::FlexToTreetop
     def client
-      @client ||= ::Skylab::FlexToTreetop.cli
+      @client ||= FlexToTreetop::CLI.new
     end
     def err
       frame[:err].call
     end
     def frame
       @frame ||= nil and return @frame
-      _rt = request_runtime_spy
-      client.singleton_class.send(:define_method, :build_execution_context) do
-        _rt
-      end
+      client.send(:io_adapter=, io_adapter_spy)
       argv = self.argv # can be erased
-      result = client.run(argv)
+      result = client.invoke(argv)
       memoize = ->(lamb) do
         memo = -> { v = lamb.call ; (memo = ->{ v }).call }
         -> { memo.call }
       end
       @frame = {
-        err: memoize[->{ _split(:err) }],
-        out: memoize[->{ _split(:out) }],
+        err: memoize[->{ _split(:errput) }],
+        out: memoize[->{ _split(:output) }],
         result: result
       }
     end
     def out
       frame[:out].call
     end
-    def request_runtime_spy
+    def io_adapter_spy
       @spy ||= begin
-        o = client.build_execution_context
-        o.in = inspy ; o.out = outspy ; o.err = errspy
-        def o.debug! ; %w(in out err).each { |x| send(x).debug! } ; self end
+        o = FlexToTreetop::IO::Adapter.new(inspy, outspy, errspy)
+        def o.debug!
+          input.debug! ; output.debug! ; errput.debug!
+          self
+        end
         o
       end
     end
     def _split name
-      request_runtime_spy.send(name)[:buffer].string.split("\n")
+      io_adapter_spy.send(name)[:buffer].string.split("\n")
     end
   end
 end
