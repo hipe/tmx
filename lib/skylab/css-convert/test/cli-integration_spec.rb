@@ -1,4 +1,4 @@
-require_relative '../testlib'
+require_relative 'test-support'
 require 'skylab/porcelain/core' # TiteColor#unstylize
 
 module Skylab::CssConvert

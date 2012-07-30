@@ -1,4 +1,4 @@
-require_relative '../testlib'
+require_relative 'test-support'
 
 describe 'When parsing directives' do
   include ::Skylab::CssConvert::TestSupport::InstanceMethods
