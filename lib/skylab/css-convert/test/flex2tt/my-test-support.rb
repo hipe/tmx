@@ -24,13 +24,9 @@ module Skylab::FlexToTreetop::MyTestSupport
         err.first.should match(exp)
       end
     end
-    def more_help *a
-      it "shows more help", *a do
-        err[1].should match(/usage: rspec \[options\] <flexfile>/i) # etc
-        listing = err[2..-1]
-        listing.length.should be > 0
-        _bad = listing.select { |s| s !~ /\A[[:space:]]+/ }
-        _bad.length.should eql(0)
+    def an_invite *a
+      it "shows an invite line" do
+        err.last.should eql("use \e[1;32mxyzzy -h\e[0m for more help")
       end
     end
   end
@@ -43,7 +39,11 @@ module Skylab::FlexToTreetop::MyTestSupport
       end
     end
     def cli_client
-      @cli_client ||= FlexToTreetop::CLI.new
+      @cli_client ||= begin
+        o = FlexToTreetop::CLI.new
+        o.send(:program_name=, 'xyzzy')
+        o
+      end
     end
     def err
       frame[:err].call

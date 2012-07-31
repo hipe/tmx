@@ -72,6 +72,7 @@ module Skylab::FlexToTreetop
     end
   protected
     attr_reader :argv
+    def em s ; stylize(s, :strong, :green) end
     def enqueue! method
       queue.push method
     end
@@ -90,6 +91,10 @@ module Skylab::FlexToTreetop
     end
     attr_writer :program_name
     attr_reader :queue
+    MAP = { strong: 1, red: 31, green: 32 }
+    def stylize str, *styles
+      "\e[#{styles.map{ |s| MAP[s] }.compact.join(';')}m#{str}\e[0m"
+    end
     def suppress_normal_output!
       @suppress_normal_output = true
       self
@@ -98,7 +103,8 @@ module Skylab::FlexToTreetop
     alias_method :suppress_normal_output?, :suppress_normal_output
     def usage msg # @todo here is the place to put invites
       emit(:usage, msg)
-      emit(:help, help_string)
+      emit(:help, "use #{em "#{program_name} -h"} for more help")
+      # emit(:help, help_string)
       nil # sic
     end
   end

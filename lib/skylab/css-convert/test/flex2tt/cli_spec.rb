@@ -7,18 +7,28 @@ module Skylab::FlexToTreetop::MyTestSupport
       context "with no args" do
         argv
         an_explanation "of what it's expecting", /expecting.+flexfile/i
-        more_help
+        an_invite
       end
       context "with one nonsensical option" do
         argv '-x'
         an_explanation "that the option is invalid", /invalid option.+x/
-        more_help
-     end
+        an_invite
+      end
+      context "with the -h help flag" do
+        argv '-h'
+        it "displays the help screen" do
+          err[0].should match(/usage: xyzzy \[options\] <flexfile>/i)
+          listing = err[1..-1]
+          listing.length.should be > 0
+          _bad = listing.select { |s| s !~ /\A[[:space:]]+/ }
+          _bad.length.should eql(0)
+        end
+      end
       context "with one giberrsh arg" do
         argv 'not-there.txt'
         an_explanation "that the file is not found",
           /file.+not found.+not-there\.txt/
-        more_help
+        an_invite
       end
       context "reads flexfiles" do
         context "from a file named by ARG1" do
