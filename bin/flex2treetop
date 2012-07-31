@@ -19,8 +19,7 @@ module Skylab::FlexToTreetop
 
   RequestRuntime = Struct.new(:io_adapter, :params)
 
-  module SubClient
-  end
+  module SubClient end
 
   module SubClient::InstanceMethods
     def emit(*a) ; io_adapter.emit(*a) end
@@ -31,9 +30,11 @@ module Skylab::FlexToTreetop
     attr_accessor :request_runtime
   end
 
-  class CLI_Base
+  module CLI end # new() hack defined below
+
+  module CLI::InstanceMethods
     include SubClient::InstanceMethods
-    def initialize ; end
+    def initialize ; end # override parent-child type constructor from s.c.
     def invoke argv
       @argv = argv
       (@queue ||= []).clear
@@ -149,7 +150,10 @@ module Skylab::FlexToTreetop
     end
   end
 
-  class CLI < CLI_Base
+  def CLI.new ; CLI::Client.new end # hack to make it look .. etc.
+
+  class CLI::Client
+    include CLI::InstanceMethods
     def build_option_parser
       o = OptionParser.new
       o.banner = "Usage: #{program_name} [options] #{INFILE}"
