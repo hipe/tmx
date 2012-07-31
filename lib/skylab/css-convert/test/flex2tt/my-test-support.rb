@@ -11,10 +11,11 @@ require 'skylab/test-support/core'
 
 module Skylab::FlexToTreetop::MyTestSupport
   FlexToTreetop = ::Skylab::FlexToTreetop
+  StreamSpy = ::Skylab::TestSupport::StreamSpy
   module ModuleMethods
     def argv *argv
       [:inspy, :outspy, :errspy].each do |sym|
-        let(sym) { ::Skylab::TestSupport::StreamSpy.standard }
+        let(sym) { StreamSpy.standard }
       end
       let(:argv) { argv }
     end
@@ -34,17 +35,24 @@ module Skylab::FlexToTreetop::MyTestSupport
     end
   end
   module InstanceMethods
-    def client
-      @client ||= FlexToTreetop::CLI.new
+    def api_client
+      @api_client ||= begin
+        o = FlexToTreetop::API::Client.new
+        o.request_runtime.io_adapter.info_stream = StreamSpy.standard
+        o
+      end
+    end
+    def cli_client
+      @cli_client ||= FlexToTreetop::CLI.new
     end
     def err
       frame[:err].call
     end
     def frame
       @frame ||= nil and return @frame
-      client.send(:io_adapter=, io_adapter_spy)
+      cli_client.request_runtime.io_adapter = io_adapter_spy
       argv = self.argv # can be erased
-      result = client.invoke(argv)
+      result = cli_client.invoke(argv)
       memoize = ->(lamb) do
         memo = -> { v = lamb.call ; (memo = ->{ v }).call }
         -> { memo.call }
@@ -60,7 +68,7 @@ module Skylab::FlexToTreetop::MyTestSupport
     end
     def io_adapter_spy
       @spy ||= begin
-        o = FlexToTreetop::IO::Adapter.new(inspy, outspy, errspy)
+        o = FlexToTreetop::CLI::IO::Adapter.new(inspy, outspy, errspy)
         def o.debug!
           input.debug! ; output.debug! ; errput.debug!
           self

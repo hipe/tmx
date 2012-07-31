@@ -11,13 +11,22 @@ requiet['treetop']
 #   flex2treetop lib/skylab/code-molester/test/fixtures/flex/mini.flex
 #   flex2treetop lib/skylab/css-convert/css-parser/tokens.flex
 
-module Skylab ; end
+module Skylab end
 
 module Skylab::FlexToTreetop
 
   VERSION = '0.0.1'
 
-  RequestRuntime = Struct.new(:io_adapter, :params)
+  class RequestRuntime < Struct.new(:build_io_adapter, :build_params)
+    members.each do |builder|
+      attr_writer(stem = /(?<=\Abuild_).*/.match(builder.to_s)[0].intern)
+      ivar = "@#{stem}"
+      define_method stem do
+        instance_variable_defined?(ivar) ? instance_variable_get(ivar) :
+          instance_variable_set(ivar, send(builder).call)
+      end
+    end
+  end
 
   module SubClient end
 
@@ -30,11 +39,22 @@ module Skylab::FlexToTreetop
     attr_accessor :request_runtime
   end
 
+  module Client end
+
+  module Client::InstanceMethods
+    include SubClient::InstanceMethods
+    def build_request_runtime
+      request_runtime_class.new(
+        ->{build_io_adapter}, ->{build_request_parameters} )
+    end
+    def initialize ; end # override parent-child type constructor from s.c.
+    def request_runtime ; @request_runtime ||= build_request_runtime end
+  end
+
   module CLI end # new() hack defined below
 
   module CLI::InstanceMethods
-    include SubClient::InstanceMethods
-    def initialize ; end # override parent-child type constructor from s.c.
+    include Client::InstanceMethods
     def invoke argv
       @argv = argv
       (@queue ||= []).clear
@@ -58,10 +78,6 @@ module Skylab::FlexToTreetop
     def help_string
       option_parser.to_s
     end
-    def io_adapter
-      @io_adapter ||= IO::Adapter.new($stdin, $stdout, $stderr)
-    end
-    attr_writer :io_adapter
     def help
       emit(:help, help_string)
       true
@@ -74,13 +90,6 @@ module Skylab::FlexToTreetop
     end
     attr_writer :program_name
     attr_reader :queue
-    def request_runtime
-      @request_runtime ||= request_runtime_class.new(
-        io_adapter, build_request_parameters)
-    end
-    def request_runtime_class
-      RequestRuntime
-    end
     def suppress_normal_output!
       @suppress_normal_output = true
       self
@@ -104,17 +113,47 @@ module Skylab::FlexToTreetop
     end
   end
 
+  module API end # for now houses both library and client concerns
+
+  module API::InstanceMethods
+    include Client::InstanceMethods
+    def invoke meth, params=nil
+      API::Promise.new do
+        response do
+          if ! action_names.include?(meth)
+            error("cannot #{meth}")
+          elsif result = send(meth, *[params].compact)
+            true == result or emit(:payload, result)
+          end
+        end
+      end
+    end
+  protected
+    def action_names # all public methods that we created
+      _a = self.class.ancestors
+      [].tap { |a| m = nil ; a << m until ::Object == (m = _a.shift) }.
+        map { |m| m.public_instance_methods false }.flatten - [:invoke]
+    end
+  end
+
+  class API::Promise < ::BasicObject # thanks Ben Lavender
+    NOT_SET = ::Object.new
+    def initialize &b
+      @block = b
+      @result = NOT_SET
+    end
+    def method_missing *a, &b
+      __result__.send(*a, &b)
+    end
+    def __result__
+      NOT_SET == @result and @result = @block.call
+      @result
+    end
+  end
+
   # -- abstraction barrier ? --
 
   INFILE = '<flexfile>'
-
-  module IO ; end
-  class IO::Adapter < Struct.new(:input, :output, :errput)
-    def emit type, msg
-      send( :payload == type ? :output : :errput ).puts msg
-      nil # return value is undefined
-    end
-  end
 
   REQUEST_PARAMETER_DEFAULTS = {
     case_sensitive:      true,
@@ -126,7 +165,7 @@ module Skylab::FlexToTreetop
     def builder
       @builder ||= begin
         o = TreetopBuilder.new { io_adapter.output }
-        params.progressive_output? and o.progressive_output! # help
+        o.progressive_output! if params.progressive_output? # help
         o
      end
     end
@@ -150,9 +189,59 @@ module Skylab::FlexToTreetop
     end
   end
 
+  class HeadlessClient
+    def version
+      emit(:payload, "#{program_name} version #{VERSION}")
+    end
+  protected
+    def build_request_parameters
+      MyRequestParameters.new.reverse_merge!(REQUEST_PARAMETER_DEFAULTS)
+    end
+    def request_runtime_class ; MyRequestRuntime end
+  end
+
+  def API.invoke method, params=nil
+    API::Client.new.invoke(method, params)
+  end
+
+  class API::Client < HeadlessClient
+    include API::InstanceMethods
+  protected
+    def build_io_adapter
+      API::IO::Adapter.new
+    end
+    def program_name ; "Flex to Treetop" end
+    def response
+      yield
+      if (io = request_runtime.io_adapter).errors.empty?
+        io.payloads.length > 1 ? io.payloads : io.payloads.first # look
+      else
+        raise API::RuntimeError.new(io.errors.join('; '))
+      end
+    end
+  end
+
+  module API::IO end
+  class API::IO::Adapter < ::Struct.new(:payloads, :errors, :info_stream)
+    def initialize
+      super([], [], $stderr)
+    end
+    def emit type, mixed
+      case type
+      when :payload ; payloads << mixed
+      when :error   ; errors   << mixed
+                    ; info_stream.puts("(api #{type} preview): #{mixed}")
+      else          ; info_stream.puts("(api #{type}): #{str}")
+      end
+      nil # undefined
+    end
+  end
+
+  class API::RuntimeError < ::RuntimeError ; end
+
   def CLI.new ; CLI::Client.new end # hack to make it look .. etc.
 
-  class CLI::Client
+  class CLI::Client < HeadlessClient
     include CLI::InstanceMethods
     def build_option_parser
       o = OptionParser.new
@@ -201,19 +290,15 @@ module Skylab::FlexToTreetop
       o
     end
 
-    def build_request_parameters
-      MyRequestParameters.new.reverse_merge!(REQUEST_PARAMETER_DEFAULTS)
+    def build_io_adapter
+      CLI::IO::Adapter.new($stdin, $stdout, $stderr)
     end
-
-    attr_reader :mode # :stream or nil
 
     def default_action ; :translate end
 
     def grammar
       emit(:payload, TREETOP_GRAMMAR)
     end
-
-    def request_runtime_class ; MyRequestRuntime end
 
     def translate
       resolve_input or return
@@ -254,10 +339,14 @@ module Skylab::FlexToTreetop
         end
       end
     end
+  end
 
-    def version
-      emit(:payload, "#{program_name} version #{VERSION}")
-      true
+  module CLI::IO end
+
+  class CLI::IO::Adapter < Struct.new(:input, :output, :errput)
+    def emit type, msg
+      send( :payload == type ? :output : :errput ).puts msg
+      nil # undefined
     end
   end
 
