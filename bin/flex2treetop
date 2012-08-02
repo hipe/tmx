@@ -16,6 +16,9 @@ module Skylab::FlexToTreetop
   FIXTURES = {}
   FIXTURES[:mini]   = 'lib/skylab/code-molester/test/fixtures/flex/mini.flex'
   FIXTURES[:tokens] = 'lib/skylab/css-convert/css-parser/tokens.flex'
+  def self.dir
+    @dir ||= ::Pathname.new(::File.expand_path('..', __FILE__))
+  end
 
   module Parameter end
   module Parameter::Definer end
@@ -38,7 +41,7 @@ module Skylab::FlexToTreetop
         mods = [] ; klass = nil
         a.each do |mod|
           mod.respond_to?(:parameters) or next
-          if Class === mod
+          if ::Class === mod
             ! klass and mods.push(klass = mod)
           else
             ! (klass && klass.ancestors.include?(mod)) and mods.push(mod)
@@ -211,8 +214,10 @@ module Skylab::FlexToTreetop
     end
   end
 
-  module Request end
-  class Request::Runtime < Struct.new(:build_io_adapter, :build_params)
+  module Headless end
+  module Headless::Request end
+  class Headless::Request::Runtime <
+    Struct.new(:build_io_adapter, :build_params)
     members.each do |builder|
       attr_writer(stem = /(?<=\Abuild_).*/.match(builder.to_s)[0].intern)
       ivar = "@#{stem}"
@@ -223,11 +228,11 @@ module Skylab::FlexToTreetop
     end
   end
 
-  module SubClient end
+  module Headless::SubClient end
 
   # params controller
   # implement: and_ em error errors formal_parameters params s
-  module SubClient::InstanceMethods
+  module Headless::SubClient::InstanceMethods
     def emit(*a) ; io_adapter.emit(*a) end
     def error(s) ; emit(:error, s) ; false end
     def initialize(r) ; self.request_runtime = r end
@@ -253,10 +258,9 @@ module Skylab::FlexToTreetop
     end
   end
 
-  module Client end
-
-  module Client::InstanceMethods
-    include SubClient::InstanceMethods
+  module Headless::Client end
+  module Headless::Client::InstanceMethods
+    include Headless::SubClient::InstanceMethods
     def build_request_runtime
       request_runtime_class.new(
         ->{build_io_adapter}, ->{build_params} )
@@ -265,16 +269,15 @@ module Skylab::FlexToTreetop
     def request_runtime ; @request_runtime ||= build_request_runtime end
   end
 
-  module IO end
-  module IO::Adapter end
-  module IO::Adapter::InstanceMethods
+  module Headless::IO end
+  module Headless::IO::Adapter end
+  module Headless::IO::Adapter::InstanceMethods
     def em s ; pen.em s end
   end
 
   module CLI end # new() hack defined below
-
   module CLI::InstanceMethods
-    include Client::InstanceMethods
+    include Headless::Client::InstanceMethods
     def invoke argv
       @argv = argv
       (@queue ||= []).clear
@@ -302,30 +305,67 @@ module Skylab::FlexToTreetop
       emit(:help, help_string)
       true
     end
+    def invite
+      emit(:help, "use #{em "#{program_name} -h"} for more help")
+    end
     def option_parser
       @option_parser ||= build_option_parser
     end
     def program_name
-      (@program_name ||= nil) || File.basename($PROGRAM_NAME)
+      (@program_name ||= nil) || ::File.basename($PROGRAM_NAME)
     end
     attr_writer :program_name
     attr_reader :queue
+    # its location here is experimental. note it may open a filehandle.
+    def resolve_instream
+      stdin = io_adapter.instream.tty? ? :tty : :stdin
+      no_argv = argv.empty? ? :no_argv : :argv
+      opcode =
+      case [stdin, no_argv]
+      when [:tty, :argv], [:tty, :no_argv] ; :argv
+      when [:stdin, :argv]                 ; :ambiguous
+      when [:stdin, :no_argv]              ; :stdin
+      end
+      case opcode
+      when :ambiguous
+        usage("cannot resolve ambiguous instream modality paradigms -- " <<
+          "both STDIN and #{in_file} appear to be present.")
+        nil
+      when :stdin ; io_adapter.instream
+      when :argv
+        in_path = case argv.length
+        when 0 ; suppress_normal_output? ?
+                   info("No #{in_file} argument present. Done.") :
+                   usage("expecting: #{in_file}")
+                 nil
+        when 1 ; argv.shift
+        else   ; usage "expecting: #{in_file} had: (#{argv.join(' ')})"
+        end
+        in_path and begin
+          in_path = ::Pathname.new(in_path)
+          if ! in_path.exist? then usage("#{in_file} not found: #{in_path}")
+          elsif in_path.directory? then usage("#{in_file} is dir: #{in_path}")
+          else io_adapter.instream = in_path.open('r') # ''spot 1''
+          end
+        end
+      end
+    end
     def suppress_normal_output!
       @suppress_normal_output = true
       self
     end
     attr_reader :suppress_normal_output
     alias_method :suppress_normal_output?, :suppress_normal_output
-    def usage msg # @todo here is the place to put invites
+    def usage msg
       emit(:usage, msg)
-      emit(:help, "use #{em "#{program_name} -h"} for more help")
+      invite
       nil # sic
     end
   end
 
   module API end
   module API::InstanceMethods
-    include Client::InstanceMethods
+    include Headless::Client::InstanceMethods
     def invoke meth, params=nil
       API::Promise.new do
         response do
@@ -378,7 +418,7 @@ module Skylab::FlexToTreetop
   module My::Parameter end
   class My::Parameter::Controller
     include Parameter::Controller::InstanceMethods
-    include SubClient::InstanceMethods
+    include Headless::SubClient::InstanceMethods
     def errors_count ; request_runtime.errors_count end
     def formal_parameters
       params.class.parameters
@@ -386,7 +426,7 @@ module Skylab::FlexToTreetop
   end
 
   module My::Request end
-  class My::Request::Runtime < Request::Runtime
+  class My::Request::Runtime < Headless::Request::Runtime
     def builder
       @builder ||= My::TreetopBuilder.new(io_adapter.outstream)
     end
@@ -518,7 +558,7 @@ module Skylab::FlexToTreetop
   class My::API::IO::Adapter < ::Struct.new(
     :payloads, :errors, :info_stream, :instream, :outstream, :pen
   )
-    include IO::Adapter::InstanceMethods
+    include Headless::IO::Adapter::InstanceMethods
     def initialize
       super([], [], $stderr, nil, nil, My::API::IO::Pen.new)
     end
@@ -550,13 +590,13 @@ module Skylab::FlexToTreetop
       ) { |g| params[:grammar] = g }
 
       o.on('-s', '--sexp',
-        "show sexp of parsed flex file",
+        "show sexp of parsed flex file.",
         "suppress normal output. (devel)"
       ) { params.show_sexp! } # sic. suppression is with logic
 
       o.on('--flex-tt',
        'write the flex treetop grammar to stdout.',
-       "suppressed normal output. (devel)"
+       "suppress normal output. (devel)"
       ) { suppress_normal_output!.enqueue!(:grammar) }
 
       o.on('-t[=<dir>]', '--tempdir[=<dir>]',
@@ -585,6 +625,9 @@ module Skylab::FlexToTreetop
       o.on('-v', '--version', 'show version') do
         suppress_normal_output!.enqueue!(:version)
       end
+      o.on('--test', '(shows some visual tests that can be run)') do
+        suppress_normal_output!.enqueue!(:show_tests)
+      end
       o
     end
 
@@ -602,46 +645,22 @@ module Skylab::FlexToTreetop
       emit(:payload, TREETOP_GRAMMAR)
     end
 
+    def show_tests
+      require 'fileutils'
+      pwd = ::Pathname.new(::FileUtils.pwd)
+      FIXTURES.each do |k, path|
+        _p = ::Skylab::FlexToTreetop.dir.join("../#{path}")
+        _p = _p.relative_path_from(pwd)
+        emit(:info, "#{program_name} #{_p}")
+      end
+      true
+    end
+
     def translate
       unless suppress_normal_output?
         resolve_instream or return
       end
       My::Translation.new(request_runtime).invoke
-    end
-
-    # #abstraction-candidate
-    def resolve_instream
-      stdin = io_adapter.instream.tty? ? :tty : :stdin
-      no_argv = argv.empty? ? :no_argv : :argv
-      opcode =
-      case [stdin, no_argv]
-      when [:tty, :argv], [:tty, :no_argv] ; :argv
-      when [:stdin, :argv]                 ; :ambiguous
-      when [:stdin, :no_argv]              ; :stdin
-      end
-      case opcode
-      when :ambiguous
-        usage("cannot resolve ambiguous instream modality paradigms -- " <<
-          "both STDIN and #{in_file} appear to be present.")
-        nil
-      when :stdin ; true # noop. io_adapter.instream is $stdin or the like
-      when :argv
-        in_path = case argv.length
-        when 0 ; suppress_normal_output? ?
-                   info("No #{in_file} argument present. Done.") :
-                   usage("expecting: #{in_file}")
-                 nil
-        when 1 ; argv.shift
-        else   ; usage "expecting: #{in_file} had: (#{argv.join(' ')})"
-        end
-        in_path and begin
-          in_path = ::Pathname.new(in_path)
-          if ! in_path.exist? then usage("#{in_file} not found: #{in_path}")
-          elsif in_path.directory? then usage("#{in_file} is dir: #{in_path}")
-          else io_adapter.instream = in_path.open('r') # closed at ''spot 1''
-          end
-        end
-      end
     end
   end
 
@@ -657,7 +676,7 @@ module Skylab::FlexToTreetop
   class My::CLI::IO::Adapter <
     ::Struct.new(:instream, :outstream, :errstream, :pen)
 
-    include IO::Adapter::InstanceMethods
+    include Headless::IO::Adapter::InstanceMethods
     def emit type, msg
       send( :payload == type ? :outstream : :errstream ).puts msg
       nil # undefined
@@ -665,7 +684,7 @@ module Skylab::FlexToTreetop
   end
 
   class My::Translation
-    include SubClient::InstanceMethods
+    include Headless::SubClient::InstanceMethods
     def instream ; io_adapter.instream end
     def invoke
       p = params
