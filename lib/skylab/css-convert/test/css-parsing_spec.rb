@@ -1,4 +1,4 @@
-require_relative '../testlib'
+require_relative 'test-support'
 
 describe 'With just-a-comment.css' do
   include ::Skylab::CssConvert::TestSupport::InstanceMethods

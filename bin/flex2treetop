@@ -1,342 +1,764 @@
 #!/usr/bin/env ruby -w
 
-require_silently = ->(s) { _ = $VERBOSE ; $VERBOSE = nil ; require(s) ; $VERBOSE = _ }
+requiet = ->(s) { _ = $VERBOSE ; $VERBOSE = nil ; require(s) ; $VERBOSE = _ }
 
 require 'optparse'
-require 'pp'
+require 'pathname'
 require 'strscan'
-require 'rubygems'
-require_silently['treetop']
+requiet['treetop']
 
-# test cases:
-#   flex2treetop lib/skylab/code-molester/test/fixtures/flex/mini.flex
-#   flex2treetop lib/skylab/css-convert/css-parser/tokens.flex
+# visual test cases: provide the below FIXTURES as arg1 from command line.
 
-module Skylab
-  module FlexToTreetop
-    VERSION = '0.0.0'
-  end
-end
-
+module Skylab end
 module Skylab::FlexToTreetop
-  class CliBase
-    def run argv
-      @c = build_execution_context
-      @argv = argv
-      @queue = []
-      @exit_ok = false
-      begin
-        option_parser.parse!(@argv)
-      rescue ::OptionParser::InvalidOption => e
-        usage e.message
+
+  VERSION = '0.0.1'
+  FIXTURES = {}
+  FIXTURES[:mini]   = 'lib/skylab/code-molester/test/fixtures/flex/mini.flex'
+  FIXTURES[:tokens] = 'lib/skylab/css-convert/css-parser/tokens.flex'
+
+  module Parameter end
+  module Parameter::Definer end
+  module Parameter::Definer::ModuleMethods
+    def param name, meta
+      parameters.fetch!(name).merge!(meta)
+    end
+    def parameters &block
+      if block_given?
+        (@parametersf ||= nil) and fail('no')
+        (@parameters ||= nil) and fail('no')
+        @parametersf = block
         return
       end
-      @queue.empty? and @queue.push(default_action)
-      @queue.each{ |m| send(m) }
+      @parameters ||= begin
+        p = Parameter::Set.new(self)
+        a = ancestors
+        nil until ::Object == (m = a.pop)
+        self == a[0] and a.shift
+        mods = [] ; klass = nil
+        a.each do |mod|
+          mod.respond_to?(:parameters) or next
+          if Class === mod
+            ! klass and mods.push(klass = mod)
+          else
+            ! (klass && klass.ancestors.include?(mod)) and mods.push(mod)
+          end
+        end
+        if mods.any?
+          mods.reverse.each { |mod| p.merge!(mod.parameters) }
+        end
+        if (@parametersf ||= nil)
+          @parameters = p # ick
+          instance_exec(&@parametersf)
+          @parametersf = nil
+        end
+        p
+      end
+    end
+  end
+
+  class Parameter::Set < Struct.new(:list)
+    attr_reader :host
+    def [] name
+      (idx = @hash[name]) ? list[idx] : nil
+    end
+    def initialize host
+      super([])
+      @hash = {}
+      @host = host
+    end
+    def fetch! k
+      unless idx = @hash[k]
+        @hash[k] = idx = list.length
+        list[idx] = Parameter::Definition.new(@host, k)
+      end
+      list[idx]
+    end
+    def merge! set
+      set.list.each do |o|
+        fetch!(o.name).merge!(o)
+      end
+      nil
+    end
+  end
+
+  class Parameter::Definition < Hash
+    extend Parameter::Definer::ModuleMethods
+    def define_method name, &block
+      host.send(:define_method, name, &block)
+    end
+    attr_reader :host
+    def initialize host, name
+      self[:name] = name
+      @host = host
+    end
+    def label ; name end
+    def merge! meta
+      meta.each do |k, v| # note meta is either a arg hash or a self.class obj!
+        :name == k and next
+        self[k] == v and next
+        self[k] = v # possibly let the below do some post processing?
+        send("#{k}=", v)
+      end
+    end
+    def name
+      self[:name] # this line of code is the center of the universe
+    end
+    def param_reader
+      name = self.name
+      define_method(name) { self[name] }
+    end
+    def param_writer
+      name = self.name
+      define_method("#{name}=") { |v| self[name] =v }
+    end
+    # -- * --
+    def accessor= _
+      param_reader
+      param_writer
+    end
+    def boolean= no=true
+      name = self.name
+      true == no and no = "not_#{name}"
+      define_method("#{name}!") { self[name] = true }
+      define_method("#{no}!") { self[name] = false }
+      define_method("#{name}?") { self[name] }
+      define_method("#{no}?") { ! self[name] }
+      define_method("#{name}=") { |v| self[name] = v }
+    end
+    def default= v
+      has_default!
+      def self.default_value ; @defaultf.call end
+      @defaultf = ->{v}
+    end
+    def enum= enum
+      self[:enum] = enum
+      param_reader
+      name = self.name
+      define_method("#{name}=") do |v|
+        if (p = _formal_parameters[name]).enum.include?(v)
+          self[name] = v
+        else
+          _client do
+            error("#{v.inspect} is an invalid value for #{em p.label}.")
+          end
+        end
+      end
+    end
+    def pathname= _
+      name = self.name
+      define_method("#{name}=") do |v|
+        v and String === v and v = ::Pathname.new(v) # not sure
+        self[name] = v
+      end
+      param_reader
+    end
+    def reader= _
+      param_reader
+    end
+    # --- * ---
+    param :enum, reader: true
+    param :getter, accessor: true
+    param :has_default, boolean: :does_not_have_default
+    param :internal, boolean: :external
+    param :required, boolean: true
+  end
+
+  module Parameter::Controller end
+
+  module Parameter::Controller::InstanceMethods
+    # and_ em error errors_count formal_parameters params s
+    def defaults request
+      fp = formal_parameters
+      pks = request.keys ; dks = fp.list.select(&:has_default?).map(&:name)
+      request.merge!  Hash[ (dks - pks).map { |k| [k, fp[k].default_value] } ]
+      nil
+    end
+    def missing_required
+      a = formal_parameters.list.select(&:required?).reduce([]) do |m, p|
+        m << p if params[p.name].nil? ; m
+      end.map { |o| em o.label }
+      a.any? and error("missing the required parameter#{s a} #{and_ a}")
+    end
+    def prune_bad_keys request # internal defaults may exist hence ..
+      notpar = intern = nil ; formal = formal_parameters
+      request.keys.each do |k|
+        ok = false
+        if ! (param = formal[k]) then (notpar ||= []).push(k)
+        elsif param.internal?    then (intern ||= []).push(param.label)
+        else ok = true
+        end
+        ok or request.delete(k) # for aggregation of errors (non-atomic)
+      end
+      notpar and notpar.map! { |l| em l }
+      intern and intern.map! { |l| em l }
+      notpar and error("#{and_ notpar} #{s :is} not #{s :a}parameter#{s}")
+      intern and error("#{and_ intern} #{s :is} #{s :an}internal parameter#{s}")
+    end
+    def set! request
+      errors_count_before = errors_count
+      prune_bad_keys(request = request ? request.dup : {})
+      defaults request
+      request.each do |k, v|
+        if ! params.respond_to?(meth = "#{k}=")
+          error("not writable: #{k}")
+        else
+          params.send(meth, v) # not atomic w/ all of above as es muss sein
+        end
+      end
+      missing_required
+      errors_count_before == errors_count
+    end
+  end
+
+  module Request end
+  class Request::Runtime < Struct.new(:build_io_adapter, :build_params)
+    members.each do |builder|
+      attr_writer(stem = /(?<=\Abuild_).*/.match(builder.to_s)[0].intern)
+      ivar = "@#{stem}"
+      define_method stem do
+        instance_variable_defined?(ivar) ? instance_variable_get(ivar) :
+          instance_variable_set(ivar, send(builder).call)
+      end
+    end
+  end
+
+  module SubClient end
+
+  # params controller
+  # implement: and_ em error errors formal_parameters params s
+  module SubClient::InstanceMethods
+    def emit(*a) ; io_adapter.emit(*a) end
+    def error(s) ; emit(:error, s) ; false end
+    def initialize(r) ; self.request_runtime = r end
+    def io_adapter ; request_runtime.io_adapter end
+    def params ; request_runtime.params end
+    attr_accessor :request_runtime
+    # --- * ---
+    def em s ; io_adapter.em s end
+    # --- * ---
+    THE_ENGLISH_LANGUAGE = # @id: 6
+      { a: ['a '], an: ['an '], is: ['is', 'are'], s:[nil, 's'] }
+    def and_ a, last = ' and ', sep = ', '
+      @_coun = ::Fixnum === a ? a : a.length
+      (hsh = Hash.new(sep))[a.length - 1] = last
+      [a.first, * (1..(a.length-1)).map { |i| [ hsh[i], a[i] ] }.flatten].join
+    end
+    def s count=nil, part=nil
+      args = [count, part].compact
+      part = ::Symbol === args.last ? args.pop : :s
+      coun = 1 == args.length ? args.pop : @_coun
+      @_coun = ::Fixnum === coun ? coun : coun.length # gigo
+      THE_ENGLISH_LANGUAGE[part][1 == @_coun ? 0 : 1]
+    end
+  end
+
+  module Client end
+
+  module Client::InstanceMethods
+    include SubClient::InstanceMethods
+    def build_request_runtime
+      request_runtime_class.new(
+        ->{build_io_adapter}, ->{build_params} )
+    end
+    def initialize ; end # override parent-child type constructor from s.c.
+    def request_runtime ; @request_runtime ||= build_request_runtime end
+  end
+
+  module IO end
+  module IO::Adapter end
+  module IO::Adapter::InstanceMethods
+    def em s ; pen.em s end
+  end
+
+  module CLI end # new() hack defined below
+
+  module CLI::InstanceMethods
+    include Client::InstanceMethods
+    def invoke argv
+      @argv = argv
+      (@queue ||= []).clear
+      begin
+        option_parser.parse! argv
+      rescue ::OptionParser::InvalidOption => e
+        return usage(e.message)
+      end
+      queue.empty? and enqueue!(default_action)
+      last = nil
+      until queue.empty?
+        method = queue.shift and (last = send(method) or break)
+      end
+      last
     end
   protected
-    def fatal msg
-      @c.err.puts msg
-      exit(1)
+    attr_reader :argv
+    def enqueue! method
+      queue.push method
     end
     def help_string
       option_parser.to_s
     end
-    def on_help
-      @exit_ok = true
-      @c.err.puts help_string
+    def help
+      emit(:help, help_string)
+      true
     end
     def option_parser
       @option_parser ||= build_option_parser
     end
     def program_name
-      File.basename($PROGRAM_NAME)
+      (@program_name ||= nil) || File.basename($PROGRAM_NAME)
     end
-    def usage msg
-      @c.err.puts msg
-      @c.err.puts help_string
-      nil
-    end
-  end
-
-  module HashBooleanAttrAccessor
-    def boolean_attr_accessor yes, no=nil
-      no ||= "no_#{yes}"
-      define_method("#{yes}!"){ self[yes] = true }
-      define_method("#{no}!"){ self[yes] = false }
-      define_method("#{yes}?"){ self[yes] }
-      define_method("#{no}?"){ ! self[yes] }
-    end
-  end
-
-  class ExecutionContext < Hash
-    extend HashBooleanAttrAccessor
-
-    def initialize ins=nil, out=nil, err=nil
-      @in = ins; @out = out; @err = err
-      @builder = TreetopBuilder.new(self)
-    end
-    attr_reader :builder
-    attr_accessor :in, :out, :err
-    boolean_attr_accessor :case_insensitive, :case_sensitive
-    boolean_attr_accessor :show_sexp, :dont_show_sexp
-    boolean_attr_accessor :progressive_output
-
-    def reverse_merge! *h
-      h.each{ |h0| replace(h0.merge(self)) }
+    attr_writer :program_name
+    attr_reader :queue
+    def suppress_normal_output!
+      @suppress_normal_output = true
       self
     end
-
-    def singleton_class
-      @sc ||= class << self; self end
+    attr_reader :suppress_normal_output
+    alias_method :suppress_normal_output?, :suppress_normal_output
+    def usage msg # @todo here is the place to put invites
+      emit(:usage, msg)
+      emit(:help, "use #{em "#{program_name} -h"} for more help")
+      nil # sic
     end
-    ### abstractable above
-    def flex_name_to_rule_name flex_name
+  end
+
+  module API end
+  module API::InstanceMethods
+    include Client::InstanceMethods
+    def invoke meth, params=nil
+      API::Promise.new do
+        response do
+          if ! action_names.include?(meth)
+            error("cannot #{meth}")
+          elsif result = send(meth, *[params].compact)
+            true == result or emit(:payload, result)
+          end
+        end
+      end
+    end
+  protected
+    def action_names # all public methods that we created
+      _a = self.class.ancestors
+      [].tap { |a| m = nil ; a << m until ::Object == (m = _a.shift) }.
+        map { |m| m.public_instance_methods false }.flatten - [:invoke]
+    end
+    def response
+      yield # caller must handle return value processing of client method
+      if (io = request_runtime.io_adapter).errors.empty?
+        io.payloads.length > 1 ? io.payloads : io.payloads.first # look
+      else
+        raise API::RuntimeError.new(io.errors.join('; '))
+      end
+    end
+  end
+
+  class API::Promise < ::BasicObject # thanks Ben Lavender
+    NOT_SET = ::Object.new
+    def initialize &b
+      @block = b
+      @result = NOT_SET
+    end
+    def method_missing *a, &b
+      __result__.send(*a, &b)
+    end
+    def __result__
+      NOT_SET == @result and @result = @block.call
+      @result
+    end
+  end
+
+
+
+  # -- abstraction barrier ? --
+
+  IN_FILE = '<flexfile>'
+
+  module My end
+  module My::Parameter end
+  class My::Parameter::Controller
+    include Parameter::Controller::InstanceMethods
+    include SubClient::InstanceMethods
+    def errors_count ; request_runtime.errors_count end
+    def formal_parameters
+      params.class.parameters
+    end
+  end
+
+  module My::Request end
+  class My::Request::Runtime < Request::Runtime
+    def builder
+      @builder ||= My::TreetopBuilder.new(io_adapter.outstream)
+    end
+    def errors_count ; io_adapter.errors_count end
+    def parameters
+      @parameters ||= My::Parameter::Controller.new(self)
+    end
+    def translate_name flex_name
       flex_name # @todo prefixes, whatever
     end
   end
 
-  # we keep these outside of the constructor for reasons
-  ExecutionContextDefaults = {
-    :case_sensitive     => true,
-    :show_sexp          => false,
-    :progressive_output => true
-  }
+  module My::Headless end
+  class My::Headless::Client
+    def version
+      emit(:payload, "#{program_name} version #{VERSION}")
+    end
+  protected
+    def in_file ; IN_FILE end
+    def parameters ; request_runtime.parameters end # *very* experimental!
+    def request_runtime_class ; My::Request::Runtime end
+  end
 
-  class Cli < CliBase
+  module My::CLI end
+  module My::CLI::Actions end
+  module My::CLI::Actions::Translate end
+  class My::CLI::Actions::Translate::Parameters < ::Hash
+    extend Parameter::Definer::ModuleMethods
+    param :case_insensitive, boolean: :case_sensitive, default: true
+    param :clear_generated_files, boolean: :dont_clear_generated_files
+    param :filesystem_parser_enabled, boolean: true
+    param :filesystem_parser_dir, pathname: true
+    param :result_state, internal: true, enum: [:exists, :filesystem_touched,
+            :modified, :not_found, :parse_failure, :translated,
+            :translate_failure, :showed_sexp]
+    param :show_sexp, boolean: :dont_show_sexp, default: false
+    param :suppress_normal_output_after_filesystem_parser, boolean: true
+    param :verbose, boolean: true, default: true
+    # -- * --
+    # the /^[a-z]/ namespace is off limits to us for method names here
+    def _client &block
+      @_client.instance_eval(&block)
+    end
+    def _formal_parameters
+      self.class.parameters
+    end
+    def initialize client
+      @_client = client
+    end
+  end
+
+  module My::API end
+
+  def API.invoke method, params=nil # look
+    My::API::Client.new.invoke(method, params)
+  end
+
+  module My::API::Actions end
+  module My::API::Actions::Translate end
+  class My::API::Actions::Translate::Parameters <
+    My::CLI::Actions::Translate::Parameters
+
+    param :force, boolean: true, default: true
+    param :flexfile, pathname: true, required: true
+    param :outfile, pathname: true, required: true
+    param :verb, accessor: true, internal: true
+  end
+
+  AUTOGENERATED_LINE =
+    "# Autogenerated by flex2treetop on {{now}}. Edits may be lost."
+  AUTOGENERATED_RE   = /autogenerated by flex2treetop/i
+
+  class My::API::Client < My::Headless::Client
+    include API::InstanceMethods
+    def translate request=nil
+      parameters.set!(request) or return
+      resolve_io or return params.result_state
+      begin
+        params.result_state = My::Translation.new(request_runtime).invoke
+      ensure
+        io_adapter.outstream.closed? or io_adapter.outstream.close
+        io_adapter.instream.closed? or io_adapter.instream.close
+      end
+      params.result_state
+    end
+  protected
+    def build_io_adapter
+      My::API::IO::Adapter.new
+    end
+    def build_params
+      My::API::Actions::Translate::Parameters.new(self)
+    end
+    def program_name ; "Flex to Treetop" end
+    def resolve_io
+      if ! (p = params).flexfile.exist?
+        error("file not found: #{p.flexfile}")
+        p.result_state = :not_found
+      elsif p.outfile.exist?
+        if p.force?
+          s = nil ; p.outfile.open('r') { |h| s = h.gets }
+          if AUTOGENERATED_RE =~ s
+            p.verb = 'overwritinag'
+          elsif p.outfile.stat.size.zero?
+            emit(:info, "(overwriting empty file: #{p.outfile})")
+            p.verb = 'overwriting'
+          else
+            error("won't overwrite, does not appear generated: #{p.outfile}")
+            p.result_state = :modified
+          end
+        else
+          emit(:info, "exists, won't overwrite without force: #{p.outfile}")
+          p.result_state = :exists
+        end
+      else
+        p.verb = 'creating'
+      end
+      if ! p.result_state
+        io_adapter.instream = params.flexfile.open('r')
+        io_adapter.outstream = params.outfile.open('w')
+      end
+      ! p.result_state
+    end
+  end
+
+  module My::API::IO end
+  class My::API::IO::Pen
+    def em s ; "\"#{s}\"" end
+  end
+  class My::API::IO::Adapter < ::Struct.new(
+    :payloads, :errors, :info_stream, :instream, :outstream, :pen
+  )
+    include IO::Adapter::InstanceMethods
+    def initialize
+      super([], [], $stderr, nil, nil, My::API::IO::Pen.new)
+    end
+    def emit type, mixed
+      case type
+      when :payload ; payloads << mixed
+      when :error   ; errors   << mixed
+                    ; info_stream.puts("(api #{type} preview): #{mixed}")
+      else          ; info_stream.puts("(api #{type}): #{mixed}")
+      end
+      nil # undefined
+    end
+    def errors_count ; errors.length end
+  end
+
+  class API::RuntimeError < ::RuntimeError ; end # reveal
+
+  def CLI.new ; My::CLI::Client.new end # reveal
+
+  class My::CLI::Client < My::Headless::Client
+    include CLI::InstanceMethods
     def build_option_parser
-      o = OptionParser.new
-      o.banner = "Usage: #{program_name} [options] <flexfile>"
+      o = ::OptionParser.new
+      o.banner = "Usage: #{program_name} [options] #{in_file}"
 
       o.on('-g=<grammar>', '--grammar=<grammar>',
-      "Also output grammar declaration (or \"Mod1::Mod2::Grammar\")"
-      ) { |g| @c[:grammar] = g }
+        "nest treetop output in this grammar declaration",
+        "(e.g. \"Mod1::Mod2::Grammar\")."
+      ) { |g| params[:grammar] = g }
 
       o.on('-s', '--sexp',
-        "(development) Show sexp of parsed flex file and exit"
-      ) { @c.show_sexp! }
+        "show sexp of parsed flex file",
+        "suppress normal output. (devel)"
+      ) { params.show_sexp! } # sic. suppression is with logic
 
       o.on('--flex-tt',
-       '(development) Write the flex treetop grammar to stdout.'
-      ) { @queue.push :on_grammar }
+       'write the flex treetop grammar to stdout.',
+       "suppressed normal output. (devel)"
+      ) { suppress_normal_output!.enqueue!(:grammar) }
 
       o.on('-t[=<dir>]', '--tempdir[=<dir>]',
-        '(development) Write/Read flex treetop grammar ' <<
-          'from/to the filesystem.'
-      ) { |d| @c[:use_parser_dir] = d; @no_file_ok = true }
+        '[write, ]read flex treetop grammar',
+        '[from ,] to the filesystem as opposed to in memory. (devel)',
+        'multiple times will supress normal output.',
+        'use --clear (below) to force a rewrite of the file(s).'
+      ) do |v|
+        v and params.filesystem_parser_dir = v
+        if params.filesystem_parser_enabled?
+          params.suppress_normal_output_after_filesystem_parser!
+          suppress_normal_output! # a small smell is here
+        else
+          params.filesystem_parser_enabled!
+        end
+      end
 
       o.on('-c', '--clear',
-        "(development) If using --tempdir, clear existing files first."
-      ) { @c[:clear_generated_files] = true }
+        'if used in conjuction with --tmpdir,',
+        'clear any existing parser files first (devel).'
+      ) { params.clear_generated_files! }
 
-      o.on('-h', '--help', 'Show this message') { @queue.push :on_help }
-      o.on('-v', '--version', 'Show Version') { @queue.push :on_version }
+      o.on('-h', '--help', 'show this message') do
+        suppress_normal_output!.enqueue!(:help)
+      end
+      o.on('-v', '--version', 'show version') do
+        suppress_normal_output!.enqueue!(:version)
+      end
       o
     end
 
-    def build_execution_context
-      ExecutionContext.new($stdin, $stdout, $stderr).
-        reverse_merge!(ExecutionContextDefaults)
+    def build_io_adapter
+      My::CLI::IO::Adapter.new($stdin, $stdout, $stderr, My::CLI::IO::Pen.new)
     end
 
-    def default_action; :run_translate end
-
-    def on_grammar
-      @exit_ok = true
-      @c.out.puts TreetopGrammar
+    def build_params
+      My::CLI::Actions::Translate::Parameters.new(self)
     end
 
-    def on_version
-      @exit_ok = true
-      @c.err.puts "#{program_name} version #{VERSION}"
+    def default_action ; :translate end
+
+    def grammar
+      emit(:payload, TREETOP_GRAMMAR)
     end
 
-    def run_translate
-      resolve_input or return
-      @c.builder.progressive_output! if @c.progressive_output?
-      Translator.new(@c).run
+    def translate
+      unless suppress_normal_output?
+        resolve_instream or return
+      end
+      My::Translation.new(request_runtime).invoke
     end
 
-    def resolve_input
-      if @c.in.tty?
-        @c.in = nil
-        if @exit_ok and @argv.empty?
-          @c.err.puts 'No file arguments present.  Done.'
-        elsif @argv.size != 1
-          if @no_file_ok && @argv.size == 0
-            true
-          else
-            usage "expecting: <flexfile> had: (#{@argv.join(' ')})"
-          end
-        elsif ! File.exist?(infile = @argv.shift)
-          usage "<flexfile> not found: #{infile}"
-        else
-          @c.in = File.open(infile, 'r')
+    # #abstraction-candidate
+    def resolve_instream
+      stdin = io_adapter.instream.tty? ? :tty : :stdin
+      no_argv = argv.empty? ? :no_argv : :argv
+      opcode =
+      case [stdin, no_argv]
+      when [:tty, :argv], [:tty, :no_argv] ; :argv
+      when [:stdin, :argv]                 ; :ambiguous
+      when [:stdin, :no_argv]              ; :stdin
+      end
+      case opcode
+      when :ambiguous
+        usage("cannot resolve ambiguous instream modality paradigms -- " <<
+          "both STDIN and #{in_file} appear to be present.")
+        nil
+      when :stdin ; true # noop. io_adapter.instream is $stdin or the like
+      when :argv
+        in_path = case argv.length
+        when 0 ; suppress_normal_output? ?
+                   info("No #{in_file} argument present. Done.") :
+                   usage("expecting: #{in_file}")
+                 nil
+        when 1 ; argv.shift
+        else   ; usage "expecting: #{in_file} had: (#{argv.join(' ')})"
         end
-      else
-        if @argv.size != 0
-          usage("reading STDIN as <flexfile>, had: (#{argv.join(' ')})")
-        else
-          true # leave @c.in as $stdin
+        in_path and begin
+          in_path = ::Pathname.new(in_path)
+          if ! in_path.exist? then usage("#{in_file} not found: #{in_path}")
+          elsif in_path.directory? then usage("#{in_file} is dir: #{in_path}")
+          else io_adapter.instream = in_path.open('r') # closed at ''spot 1''
+          end
         end
       end
     end
   end
 
-  class Translator
-    def initialize ctx=nil
-      @c = if ctx.nil?
-        ExecutionContext.new($stdin, $stdout, $stderr).
-          reverse_merge!(ExecutionContextDefaults)
-      elsif ctx.kind_of?(ExecutionContext)
-        ctx
-      elsif ctx.kind_of?(Hash)
-        ec = ExecutionContext.new.reverse_merge!(
-          ctx, ExecutionContextDefaults)
-        [:in, :out, :err].each do |m|
-          ctx.respond_to?(m) and ec.send("#{m}=", ctx.send(m))
-        end
-        ec
+  module My::CLI::IO end
+  class My::CLI::IO::Pen
+    def em s ; stylize(s, :strong, :green) end
+    MAP = { strong: 1, red: 31, green: 32 }
+    def stylize str, *styles
+      "\e[#{styles.map{ |s| MAP[s] }.compact.join(';')}m#{str}\e[0m"
+    end
+  end
+
+  class My::CLI::IO::Adapter <
+    ::Struct.new(:instream, :outstream, :errstream, :pen)
+
+    include IO::Adapter::InstanceMethods
+    def emit type, msg
+      send( :payload == type ? :outstream : :errstream ).puts msg
+      nil # undefined
+    end
+  end
+
+  class My::Translation
+    include SubClient::InstanceMethods
+    def instream ; io_adapter.instream end
+    def invoke
+      p = params
+      p.verbose? and emit(:info, "#{p.verb} #{p.outfile} with #{p.flexfile}")
+      p.filesystem_parser_enabled? and (use_filesystem or return)
+      whole_file = instream.read
+      instream.close # ''spot 1''
+      io_adapter.outstream.puts autogenerated_line
+      result = parser.parse(whole_file)
+      if ! result
+        error(parser.failure_reason || "Got nil from parse without reason")
+        :parse_failure
+      elsif p.show_sexp?
+        require 'pp'
+        ::PP.pp(result.sexp, io_adapter.errstream)
+        :showed_sexp
+      elsif result.sexp.translate(request_runtime)
+        :translated
       else
-        ctx # whatever no never dumb
+        :translate_failure
       end
     end
-    def execution_context; @c end
-    def run
-      @exit_ok = false
-      @c.key?(:use_parser_dir) and (use_parser_dir or return)
-      ! @c.in and @exit_ok and return
-      p = parser
-      whole_file = @c.in.read
-      @c.in.close
-      resp = p.parse(whole_file)
-      if resp.nil?
-        rsn = p.failure_reason || "Got nil from parse without reason!"
-        @c.err.puts rsn
-      elsif @c.show_sexp?
-        PP.pp(resp.sexp, @c.err)
-      else
-        resp.sexp.translate @c
-      end
-    end
-    TranslateDefaults = { :verbose => true, :force => false, :grammar => nil }
-    def translate flex_path, output_grammar_path, opts={}
-      o = merge_opts(opts, @c, TranslateDefaults)
-      o[:grammar] and @c[:grammar] = o[:grammar]
-      if File.exist?(output_grammar_path)
-        unless o[:force]
-          @c.err.puts "using: #{shortpath(output_grammar_path)}."
-          return :exists
-        end
-        s = nil; File.open(output_grammar_path, 'r'){ |fh| s = fh.gets }
-        if (! s.nil? && s.chomp != autogenerated_line.chomp)
-          raise RuntimeError.new(
-            "won't overwrite file without augenerated line!")
-        end
-        verb = 'regenerating'
-      else
-        verb = 'creating'
-      end
-      o[:verbose] and @c.err.puts "#{verb} " <<
-        "#{shortpath(output_grammar_path)} with "<<
-          "#{shortpath(flex_path)}"
-      @c.in = File.open(flex_path, 'r')
-      @c.out = File.open(output_grammar_path, 'w')
-      @c.builder.progressive_output!
-      @c.out.puts autogenerated_line
-      ret = nil
-      begin
-        ret = run
-      ensure
-        @c.in.closed? or @c.in.close
-        @c.out.closed? or @c.out.close
-      end
-      ret
-    end
-  private
+  protected
     def autogenerated_line
-      '# Autogenerated by flex-to-treetop.  Edits may be lost.'
-    end
-    def clear_generated_files
-      [@gpath, @ppath].each do |path|
-        File.exist?(path) and file_utils.rm(path, :verbose => true)
+      AUTOGENERATED_LINE.gsub(/\{\{((?:(?!\}\}).)+)\}\}/) do
+        case $1
+        when 'now' ; Time.now.strftime('%Y-%m-%d %I:%M:%S%P %Z')
+        end
       end
     end
-    def file_utils
+    def autogenerated_re ; AUTOGENERATED_RE end
+    def clear_generated_files
+      [f2tt_tt, f2tt_rb].each do |path|
+        path.exist? and file_utils.rm(path.to_s, verbose: true)
+      end
+    end
+    attr_reader :f2tt_tt, :f2tt_rb
+    def file_utils # future-proofed for hacking
       @file_utils ||= begin
         require 'fileutils'
-        o = Object.new
-        class << o
-          include FileUtils
-          public :rm
-        end
-        o.instance_variable_set('@fileutils_output', @c.err)
-        o
+        extend ::FileUtils
+        @fileutils_output = request_runtime.io_adapter.errstream
+        @fileutils_label = "(futils:) "
+        singleton_class.send(:public, :rm)
+        ->{ self }
       end
-    end
-    # given an array of hashes
-    # @return a new hash with only the keys of the last hash and the values
-    # of the first hash found with that key
-    def merge_opts *ox
-      defaults = ox.last
-      Hash[ defaults.keys.map do |k|
-        [ k, ox.detect{ |h| h.key?(k) }[k] ]
-      end ]
+      @file_utils.call
     end
     def parser
       @parser ||= parser_class.new
     end
     def parser_class
       @parser_class ||= begin
-        if ! Skylab::FlexToTreetop.const_defined?(:FlexFileParser)
-          ::Treetop.load_from_string Skylab::FlexToTreetop::TreetopGrammar
+        unless defined?(FlexFileParser)
+          ::Treetop.load_from_string TREETOP_GRAMMAR
         end
-        c = Class.new FlexFileParser
+        c = ::Class.new FlexFileParser
         c.class_eval(&PARSER_EXTLIB)
         c
       end
     end
-    def shortpath path
-      @c.key?(:root) or return path
-      @rootre ||= %r{\A#{Regexp.escape(@c[:root])}/?}
-      path.sub(@rootre, '')
+    def recompile
+      a = []
+      f2tt_tt.exist? or begin
+        bytes = write_grammar_file
+        a.push "wrote #{f2tt_tt} (#{bytes} bytes)."
+      end
+      emit(:info, a.push("writing #{f2tt_rb}.").join(' '))
+      ::Treetop::Compiler::GrammarCompiler.
+        new.compile(f2tt_tt.to_s, f2tt_rb.to_s)
+    end
+    def use_filesystem
+      (p = params).filesystem_parser_dir ||= (require 'tmpdir' ; ::Dir.tmpdir)
+      dirname = p.filesystem_parser_dir # (necessary in its own line)
+      dirname.directory? or return error("not a directory: #{dirname}")
+      @f2tt_tt = dirname.join('flex-to-treetop.treetop')
+      @f2tt_rb = dirname.join('flex-to-treetop.rb')
+      p.clear_generated_files? and clear_generated_files
+      f2tt_rb.exist? ? emit(:info, "using: #{f2tt_rb}") : recompile
+      rb = f2tt_rb.absolute? ? f2tt_rb : f2tt_rb.expand_path
+      require rb.to_s.sub(/\.rb\z/, '') # "bare()" externally
+      if p.suppress_normal_output_after_filesystem_parser?
+        emit(:info, "touched files. nothing more to do.")
+        p.result_state = :filesystem_parsers_touched
+        false # leave
+      else
+        true # stay
+      end
     end
     def write_grammar_file
-      @exit_ok = true
-      b = nil
-      File.open(@gpath, 'w+'){ |fh| b = fh.write(TreetopGrammar) }
-      b
-    end
-    def use_parser_dir
-      dir = (@c[:use_parser_dir] != "") ? @c[:use_parser_dir] : begin
-        require 'tmpdir'
-        Dir.tmpdir
-      end
-      File.directory?(dir) or raise RuntimeError.new("not a dir: #{dir}")
-      @gpath = File.join(dir, 'flex-to-treetop.treetop')
-      @ppath = File.join(dir, 'flex-to-treetop.rb')
-      @c[:clear_generated_files] and clear_generated_files
-      if File.exist?(@ppath)
-        @c.err.puts "using: #{@ppath}"
-      else
-        recompile
-      end
-      require @ppath
-    end
-    def recompile
-      @exit_ok = true
-      s = []
-      File.exist?(@gpath) or begin
-        b = write_grammar_file
-        s.push "wrote #{@gpath} (#{b} bytes)."
-      end
-      s.push "writing #{@ppath}."
-      @c.err.puts s.join(' ')
-      begin
-        Treetop::Compiler::GrammarCompiler.new.compile(@gpath, @ppath)
-      rescue ::RuntimeError => e
-        raise RuntimeError.new(e.message)
-      end
+      bytes = nil
+      f2tt_tt.open('w+') { |fh| bytes = fh.write(TREETOP_GRAMMAR) }
+      bytes
     end
   end
 end
@@ -422,7 +844,7 @@ module Skylab::FlexToTreetop::CommonNodey
   end
   def at_compile str
     res = []
-    s = StringScanner.new(str)
+    s = ::StringScanner.new(str)
     begin
       if s.scan(/\*/)
         res.push '*'
@@ -505,26 +927,25 @@ module Skylab::FlexToTreetop
 end
 
 module Skylab::FlexToTreetop
-  class RuleBuilder
-    def initialize ctx
-      @ctx = ctx
-      @builder = ctx.builder
-    end
-    attr_accessor :rule_name
-    attr_accessor :pattern_like
+  module RuleWriter
+  end
+  class RuleWriter::Rule < Struct.new(
+    :request_runtime, :rule_name, :pattern_like)
+
+    def builder                   ; request_runtime.builder end
+    def translate_name(*a)        ; request_runtime.translate_name(*a) end
     def write
-      @builder.rule_declaration(@ctx.flex_name_to_rule_name(rule_name)) do
-        @builder.write "".indent(@builder.level)
-        pattern_like.translate(@ctx)
-        @builder.newline
+      builder.rule_declaration(translate_name(rule_name)) do
+        builder.write "".indent(builder.level)
+        pattern_like.translate request_runtime
+        builder.newline
       end
     end
   end
-  module RuleWriter
-    def write_rule ctx
-      meth = RuleBuilder.new(ctx)
-      yield meth
-      meth.write
+  module RuleWriter::InstanceMethods
+    def write_rule request_runtime
+      yield( build = RuleWriter::Rule.new(request_runtime) )
+      build.write
     end
   end
   class FileSexp < Sexpesque # :file
@@ -539,8 +960,8 @@ module Skylab::FlexToTreetop
           children[:rules].each{ |c| c.translate(ctx) }
         end
       }]
-      if ctx.key?(:grammar)
-        parts = ctx[:grammar].split('::')
+      if ctx.params.key?(:grammar)
+        parts = ctx.params[:grammar].split('::')
         gname = parts.pop
         nest.push lambda{
           ctx.builder.grammar_declaration(gname, & nest.pop)
@@ -560,7 +981,7 @@ module Skylab::FlexToTreetop
   class StartDeclarationSexp < Sexpesque # :start_declaration
     def translate ctx
       case children[:declaration_value]
-      when 'case-insensitive' ; ctx.case_insensitive!
+      when 'case-insensitive' ; ctx.params.case_insensitive!
       else
         ctx.builder <<
           "# declaration ignored: #{children[:declaration_value].inspect}"
@@ -587,7 +1008,7 @@ module Skylab::FlexToTreetop
     end
   end
   class NameDefinitionSexp < Sexpesque # :name_definition
-    include RuleWriter
+    include RuleWriter::InstanceMethods
     def translate ctx
       write_rule(ctx) do |m|
         m.rule_name = children[:name_definition_name]
@@ -596,7 +1017,7 @@ module Skylab::FlexToTreetop
     end
   end
   class RuleSexp < Sexpesque # :rule
-    include RuleWriter
+    include RuleWriter::InstanceMethods
 
     # this is pure hacksville to deduce meaning from actions as they are
     # usually expressed in the w3c specs with flex files -- which is always
@@ -609,9 +1030,11 @@ module Skylab::FlexToTreetop
       elsif md = %r{\A/\*([a-zA-Z0-9 ]+)\*/\Z}.match(action_string)
         from_constant(ctx, md[1].gsub(' ','_')) # extreme hack!
       else
-        ctx.err.write "notice: Can't deduce a treetop rule name from: "
-        ctx.err.write action_string.inspect
-        ctx.err.puts "  Skipping."
+        ctx.io_adapter.emit(:info,
+          "notice: Can't deduce a treetop rule name from: " <<
+          "#{action_string.inspect}  Skipping."
+        )
+        nil
       end
     end
     def from_constant ctx, const
@@ -645,7 +1068,7 @@ module Skylab::FlexToTreetop
   end
   class UseDefinitionSexp < Sexpesque # :use_definition
     def translate ctx
-      ctx.builder.write ctx.flex_name_to_rule_name(self[1])
+      ctx.builder.write ctx.translate_name(self[1])
     end
   end
   class LiteralCharsSexp < Sexpesque # :literal_chars
@@ -657,7 +1080,7 @@ module Skylab::FlexToTreetop
   class CharClassSexp < Sexpesque # :char_class
     terminal! # no guarantee this will stay this way!
     def translate ctx
-      ctx.builder.write( ctx.case_insensitive? ?
+      ctx.builder.write( ctx.params.case_insensitive? ?
         case_insensitive_hack(my_text_value) : my_text_value )
     end
     def case_insensitive_hack txt
@@ -713,27 +1136,16 @@ module Skylab::FlexToTreetop
 end
 
 module Skylab::FlexToTreetop
-  class << self
-    def cli
-      @cli ||= Cli.new
-    end
-  end
-  class ProgressiveOutputAdapter
-    def initialize stream
-      @out = stream
-    end
+  class ProgressiveOutputAdapter < ::Struct.new(:out)
     def <<(*a)
-      @out.write(*a)
+      out.write(*a)
       self
     end
   end
-  class TreetopBuilder < ::Treetop::Compiler::RubyBuilder
-    def initialize ctx
-      super()
-      @c = ctx
-    end
-    def progressive_output!
-      @ruby = ProgressiveOutputAdapter.new(@c.out)
+  class My::TreetopBuilder < ::Treetop::Compiler::RubyBuilder
+    def initialize outstream
+      super() # nathan sobo reasonably sets @ruby to a ::String here, (@hack?)
+      @ruby = ProgressiveOutputAdapter.new(outstream) # but we need this
     end
     def rule_declaration name, &block
       self << "rule #{name}"
@@ -780,7 +1192,7 @@ Skylab::FlexToTreetop::PARSER_EXTLIB = lambda do |_|
   end
 end
 
-Skylab::FlexToTreetop::TreetopGrammar = <<'GRAMMAR'
+Skylab::FlexToTreetop::TREETOP_GRAMMAR = <<'GRAMMAR'
 # The 'pattern' rule below is a subset of the grammar grammar described at
 #   http://flex.sourceforge.net/manual/Patterns.html.
 #   Note that not all constructs are supported, only those necessary
@@ -958,4 +1370,4 @@ end
 end
 GRAMMAR
 
-__FILE__ == $PROGRAM_NAME and Skylab::FlexToTreetop.cli.run(ARGV)
+__FILE__ == $PROGRAM_NAME and Skylab::FlexToTreetop::CLI.new.invoke(ARGV)
