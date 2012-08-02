@@ -115,7 +115,7 @@ module Skylab::FlexToTreetop::MyTestSupport
     include Headless::InstanceMethods
     def api_client
       @api_client ||= begin
-        o = FlexToTreetop::My::API::Client.new
+        o = FlexToTreetop::API::Client.new
         o.request_runtime.io_adapter.info_stream = StreamSpy.standard
         o
       end
