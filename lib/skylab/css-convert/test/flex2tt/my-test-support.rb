@@ -12,11 +12,30 @@ require 'skylab/test-support/core'
 module Skylab::FlexToTreetop::MyTestSupport
   FlexToTreetop = ::Skylab::FlexToTreetop
   StreamSpy = ::Skylab::TestSupport::StreamSpy
-  module ModuleMethods
+
+  FlexToTreetop.respond_to?(:dir) or begin # for now, futureproofing
+    def FlexToTreetop.dir
+      @dir ||= ::Skylab::ROOT.join('lib/skylab/css-convert')
+    end
+  end
+  module Headless end
+  module Headless::ModuleMethods
+    def fixture name
+      ::Skylab::ROOT.join(FlexToTreetop::FIXTURES[name]).to_s
+    end
+    _tmpdir_f = -> do
+      t = ::Skylab::TestSupport::Tmpdir.new(::Skylab::ROOT.join('tmp/f2tt'))
+      (_tmpdir_f = ->{t}).call
+    end
+    TMPDIR_F = -> { _tmpdir_f.call }
+    def tmpdir
+      TMPDIR_F.call
+    end
+  end
+  module CLI end
+  module CLI::ModuleMethods
+    include Headless::ModuleMethods
     def argv *argv
-      [:inspy, :outspy, :errspy].each do |sym|
-        let(sym) { StreamSpy.standard }
-      end
       let(:argv) { argv }
     end
     def an_explanation msg, exp, *a
@@ -30,12 +49,26 @@ module Skylab::FlexToTreetop::MyTestSupport
       end
     end
   end
-  module InstanceMethods
-    def api_client
-      @api_client ||= begin
-        o = FlexToTreetop::API::Client.new
-        o.request_runtime.io_adapter.info_stream = StreamSpy.standard
-        o
+  module API end
+  module API::ModuleMethods
+    include Headless::ModuleMethods
+  end
+  module Headless::InstanceMethods
+    def fixture(*a) ; self.class.fixture(*a) end
+    def _split name
+      io_adapter_spy.send(name)[:buffer].string.split("\n")
+    end
+    def tmpdir
+      self.class.tmpdir
+    end
+  end
+  module CLI::InstanceMethods
+    include Headless::InstanceMethods
+    [:inspy, :outspy, :errspy].each do |sym|
+      ivar = "@#{sym}"
+      define_method(sym) do
+        instance_variable_defined?(ivar) ? instance_variable_get(ivar) :
+          instance_variable_set(ivar, StreamSpy.standard)
       end
     end
     def cli_client
@@ -58,26 +91,38 @@ module Skylab::FlexToTreetop::MyTestSupport
         -> { memo.call }
       end
       @frame = {
-        err: memoize[->{ _split(:errput) }],
-        out: memoize[->{ _split(:output) }],
+        err: memoize[->{ _split(:errstream) }],
+        out: memoize[->{ _split(:outstream) }],
         result: result
       }
     end
-    def out
-      frame[:out].call
-    end
     def io_adapter_spy
       @spy ||= begin
-        o = FlexToTreetop::CLI::IO::Adapter.new(inspy, outspy, errspy)
+        o = cli_client.build_io_adapter
+        o.instream = inspy ; o.outstream = outspy ; o.errstream = errspy
         def o.debug!
-          input.debug! ; output.debug! ; errput.debug!
+          instream.debug! ; outstream.debug! ; errstream.debug!
           self
         end
         o
       end
     end
-    def _split name
-      io_adapter_spy.send(name)[:buffer].string.split("\n")
+    def out
+      frame[:out].call
+    end
+  end
+  module API::InstanceMethods
+    include Headless::InstanceMethods
+    def api_client
+      @api_client ||= begin
+        o = FlexToTreetop::My::API::Client.new
+        o.request_runtime.io_adapter.info_stream = StreamSpy.standard
+        o
+      end
+    end
+    def info_stream_lines
+      api_client.request_runtime.io_adapter.
+        info_stream[:buffer].string.split("\n")
     end
   end
 end
