@@ -1,7 +1,7 @@
 module Skylab::CssConvert
   module Parser::InstanceMethods
     Parser = CssConvert::Parser
-    include CssConvert::SubClient::InstanceMethods
+    include My::Headless::SubClient::InstanceMethods
     def build_file_input_adapter *a
       a.last.kind_of?(::Hash) or a.push({})
       a.last.key?(:entity) or a.last[:entity] = entity
@@ -31,7 +31,8 @@ module Skylab::CssConvert
     def parse input_adapter
       whole_string = input_adapter.resolve_whole_string or return whole_string
       result = parser.parse(whole_string)
-      result or emit(:error, (parser.failure_reason || "Got nil from parse without reason!"))
+      result or emit(:error,
+        (parser.failure_reason || "Got nil from parse without reason!"))
       result ? result.tree : result
     end
     def parser

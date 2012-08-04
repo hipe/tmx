@@ -63,6 +63,7 @@ module Skylab::FlexToTreetop::MyTestSupport
     end
   end
   module CLI::InstanceMethods
+    include ::Skylab::Headless::CLI::IO::Pen::InstanceMethods # unstylize
     include Headless::InstanceMethods
     [:inspy, :outspy, :errspy].each do |sym|
       ivar = "@#{sym}"
@@ -98,7 +99,7 @@ module Skylab::FlexToTreetop::MyTestSupport
     end
     def io_adapter_spy
       @spy ||= begin
-        o = cli_client.build_io_adapter
+        o = cli_client.send(:build_io_adapter)
         o.instream = inspy ; o.outstream = outspy ; o.errstream = errspy
         def o.debug!
           instream.debug! ; outstream.debug! ; errstream.debug!
@@ -109,6 +110,12 @@ module Skylab::FlexToTreetop::MyTestSupport
     end
     def out
       frame[:out].call
+    end
+    alias_method :pen_unstylize, :unstylize
+    def unstylize str
+      result = pen_unstylize(str)
+      result.should_not be_nil
+      result
     end
   end
   module API::InstanceMethods

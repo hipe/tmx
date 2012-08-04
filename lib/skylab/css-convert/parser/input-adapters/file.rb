@@ -9,13 +9,16 @@ module Skylab::CssConvert
         @state = :pathname
       end
       if :initial == state
-        ::String === upstream or fail("expecting pathname string, had #{upstream.class}")
+        ::String === upstream or
+          fail("expecting pathname string, had #{upstream.class}")
         self.upstream = CssConvert::MyPathname.new(upstream)
         @state = :pathname
       end
       if :pathname == state
-        upstream.exist? or return error("#{entity} not found: #{upstream.pretty}")
-        upstream.directory? and return error("expecing #{entity}, had directory: #{upstream.pretty}")
+        upstream.exist? or
+          return error("#{entity} not found: #{upstream.pretty}")
+        upstream.directory? and
+          return error("expecing #{entity}, had directory: #{upstream.pretty}")
         self.upstream = upstream.open('r')
         self.state = :open
       end
