@@ -12,10 +12,10 @@ module Skylab::CssConvert
         CssConvert::TreetopTools.load_parser_class do |o|
           o.request_runtime = request_runtime
           o.root_dir CssConvert.dir
-          o.generated_grammar_dir params[:tmpdir_relative]
+          o.generated_grammar_dir params.tmpdir_relative
           o.treetop_grammar 'directives-parser/common.treetop'
           o.treetop_grammar 'directives-parser/directives.treetop'
-          o.force_overwrite! if params[:force_overwrite]
+          o.force_overwrite! if params.force_overwrite?
           o.enhance_parser_with CssConvert::TreetopTools::ParserExtlib
         end
       end

@@ -1,6 +1,6 @@
 module Skylab::CssConvert
   class DirectivesRunner
-    include CssConvert::SubClient::InstanceMethods
+    include My::Headless::SubClient::InstanceMethods
     def run directives_sexp
       mod = self.class.to_s.match(/\A(.+[^:])::[^:]+\Z/)[1]
       cls = directives_sexp.node_name.to_s.gsub(/([a-z])_([a-z])/) do
@@ -10,7 +10,7 @@ module Skylab::CssConvert
     end
   end
   class MergeStatement
-    include CssConvert::SubClient::InstanceMethods
+    include My::Headless::SubClient::InstanceMethods
     def initialize request_runtime, sexp
       self.request_runtime = request_runtime
       @sexp = sexp

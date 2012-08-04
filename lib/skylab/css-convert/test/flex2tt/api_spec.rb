@@ -22,11 +22,10 @@ module Skylab::FlexToTreetop::MyTestSupport
         context "with good parameters" do
           before { tmpdir.prepare }
           let(:outfile) { tmpdir.join('out.rb') }
-          it "it makes that badboy!" do
-            p = api_client.invoke(:translate,
+          it "it makes that badboy!", f:true do
+            api_client.invoke(:translate,
               flexfile: fixture(:mini), outfile: outfile
-            )
-            p.should eql(:translated)
+            ).should eql(:translated)
             info.reverse!.pop.should match(
               /creating.+out\.rb with.+mini\.flex/)
             info.pop.should match(/can't deduce a.+rule/i)

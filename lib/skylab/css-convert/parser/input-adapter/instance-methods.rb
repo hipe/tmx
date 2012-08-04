@@ -1,6 +1,6 @@
 module Skylab::CssConvert
   module Parser::InputAdapter::InstanceMethods
-    include CssConvert::SubClient::InstanceMethods
+    include My::Headless::SubClient::InstanceMethods
     def initialize request_runtime, upstream, opts=nil
       self.request_runtime = request_runtime
       self.state = :initial

@@ -3,8 +3,8 @@ module Skylab::Headless
   module Parameter end
   module Parameter::Definer end
   module Parameter::Definer::ModuleMethods
-    def param name, meta
-      parameters.fetch!(name).merge!(meta)
+    def param name, meta=nil, &b
+      parameters.fetch!(name).merge!(meta, &b)
     end
     def parameters &block
       if block_given?
@@ -27,9 +27,7 @@ module Skylab::Headless
             ! (klass && klass.ancestors.include?(mod)) and mods.push(mod)
           end
         end
-        if mods.any?
-          mods.reverse.each { |mod| p.merge!(mod.parameters) }
-        end
+        mods.reverse.each { |mod| p.merge!(mod.parameters) }
         if (@parametersf ||= nil)
           @parameters = p # ick
           instance_exec(&@parametersf)
@@ -39,7 +37,19 @@ module Skylab::Headless
       end
     end
   end
-
+  class Parameter::Definer::Dynamic < ::Hash
+    extend Parameter::Definer::ModuleMethods
+    def initialize &block
+      block.call self
+    end
+  end
+  module Parameter::Definer
+    def self.new &block
+      k = Class.new Parameter::Definer::Dynamic
+      k.class_eval(&block)
+      k
+    end
+  end
   class Parameter::Set < Struct.new(:list)
     attr_reader :host
     def [] name
@@ -75,14 +85,15 @@ module Skylab::Headless
       self[:name] = name
       @host = host
     end
-    def label ; name end
-    def merge! meta
+    def merge! meta=nil, &b
       meta.each do |k, v| # note meta is either a arg hash or a self.class obj!
         :name == k and next
         self[k] == v and next
         self[k] = v # possibly let the below do some post processing?
         send("#{k}=", v)
-      end
+      end if meta
+      block_given? and instance_exec(&b) # *very* experimental
+      nil
     end
     def name
       self[:name] # this line of code is the center of the universe
@@ -109,10 +120,20 @@ module Skylab::Headless
       define_method("#{no}?") { ! self[name] }
       define_method("#{name}=") { |v| self[name] = v }
     end
+    def builder= builder_lambda_method
+      name = self.name
+      define_method(name) do
+        o = super() and return o
+        send("#{name}=", send(builder_lambda_method).call)
+      end
+    end
     def default= v
       has_default!
       def self.default_value ; @defaultf.call end
       @defaultf = ->{v}
+    end
+    def desc *a
+      a.empty? ? self[:desc] : (self[:desc] ||= []).concat(a.flatten)
     end
     def enum= enum
       self[:enum] = enum
@@ -128,6 +149,11 @@ module Skylab::Headless
         end
       end
     end
+    def hook= _
+      name = self.name
+      define_method(name) { |&b| b ? (self[name] = b ; self) : self[name] }
+    end
+    def label ; name.to_s.gsub('_', '-') end
     def pathname= _
       name = self.name
       define_method("#{name}=") do |v|
@@ -139,6 +165,9 @@ module Skylab::Headless
     def reader= _
       param_reader
     end
+    def writer= _
+      param_writer
+    end
     # --- * ---
     param :enum, reader: true
     param :getter, accessor: true
@@ -148,7 +177,6 @@ module Skylab::Headless
   end
 
   module Parameter::Controller end
-
   module Parameter::Controller::InstanceMethods
     # and_ em error errors_count formal_parameters params s
     def defaults request
@@ -180,7 +208,7 @@ module Skylab::Headless
       notpar and error("#{and_ notpar} #{s :is} not #{s :a}parameter#{s}")
       intern and error("#{and_ intern} #{s :is} #{s :an}internal parameter#{s}")
     end
-    def set! request
+    def set! request=nil
       errors_count_before = errors_count
       prune_bad_keys(request = request ? request.dup : {})
       defaults request
@@ -198,21 +226,15 @@ module Skylab::Headless
 
   module Request end
   module Request::Runtime end
-  class Request::Runtime::Minimal < Struct.new(:build_io_adapter, :build_params)
-    members.each do |builder|
-      attr_writer(stem = /(?<=\Abuild_).*/.match(builder.to_s)[0].intern)
-      ivar = "@#{stem}"
-      define_method stem do
-        instance_variable_defined?(ivar) ? instance_variable_get(ivar) :
-          instance_variable_set(ivar, send(builder).call)
-      end
-    end
-    def build_parameter_controller
-      Parameter::Controller::Minimal.new(self)
-    end
-    def parameters
-      @parameters ||= build_parameter_controller
-    end
+  class Request::Runtime::Minimal < Struct.new(
+    :io_adapter_f, :params_f, :parameter_controller_f,
+    :io_adapter,   :params,   :parameter_controller
+  )
+    extend Parameter::Definer::ModuleMethods
+    def errors_count ; io_adapter.errors_count end # *very* experimental here
+    param :io_adapter,           builder: :io_adapter_f
+    param :params,               builder: :params_f
+    param :parameter_controller, builder: :parameter_controller_f
   end
 
   module SubClient end
@@ -233,6 +255,7 @@ module Skylab::Headless
       (hsh = Hash.new(sep))[a.length - 1] = last
       [a.first, * (1..(a.length-1)).map { |i| [ hsh[i], a[i] ] }.flatten].join
     end
+
     def s count=nil, part=nil
       args = [count, part].compact
       part = ::Symbol === args.last ? args.pop : :s
@@ -250,8 +273,16 @@ module Skylab::Headless
   module Client end
   module Client::InstanceMethods
     include SubClient::InstanceMethods
+    def build_parameter_controller
+      Parameter::Controller::Minimal.new(request_runtime)
+    end
+    def build_params
+      params_class.new
+    end
     def build_request_runtime
-      request_runtime_class.new( ->{build_io_adapter}, ->{build_params} )
+      request_runtime_class.new(
+        ->{build_io_adapter}, ->{build_params}, ->{build_parameter_controller}
+      )
     end
     def initialize ; end # override parent-child type constructor from s.c.
     def infer_valid_action_names_from_public_instance_methods
@@ -259,7 +290,9 @@ module Skylab::Headless
       a << m if IGNORE_THIS_CONSTANT !~ m.to_s until ::Object == (m = _a.shift)
       a.map { |_m| _m.public_instance_methods false }.flatten
     end
+    def parameters ; request_runtime.parameter_controller end # *very* experimental!
     def request_runtime ; @request_runtime ||= build_request_runtime end
+    def request_runtime_class ; Request::Runtime::Minimal end
   end
   IGNORE_THIS_CONSTANT = /\A#{to_s}\b/
 
@@ -317,20 +350,51 @@ module Skylab::Headless
       (@queue ||= []).clear
       begin
         option_parser.parse! argv
-      rescue ::OptionParser::InvalidOption => e
-        return usage(e.message)
+      rescue ::OptionParser::ParseError => e
+        usage e.message
+        return exit_status_for(:parse_opts_failed)
       end
-      queue.empty? and enqueue!(default_action)
-      last = nil
+      queue.empty? and enqueue! default_action
+      result = nil
       until queue.empty?
-        method = queue.shift and (last = send(method) or break)
+        if m = queue.first # implementations may use (meaningful) empty opcodes
+          if m.respond_to?(:call)
+            result = m.call or break
+          elsif a = parse_argv_for(m)
+            result = send(m, *a) or break
+          else
+            result = exit_status_for(:parse_argv_failed)
+            break
+          end
+        end
+        queue.shift
       end
-      last
+      result
     end
   protected
     attr_reader :argv
+    def argument_syntax_for m
+      @argument_syntax = # ''hazy''
+      (@argument_syntaxes ||= {})[m] ||= build_argument_syntax_for(m)
+    end
+    def argument_syntax_string
+      (@argument_syntax ||= nil) or argument_syntax_for(default_action)
+      @argument_syntax.string # ''hazy''
+    end
+    def build_argument_syntax_for m
+      CLI::ArgumentSyntax::Inferred.new(method(m).parameters,
+        respond_to?(:formal_paramaters) ? formal_parameters : nil)
+    end
+    def build_io_adapter
+      io_adapter_class.new $stdin, $stdout, $stderr, build_pen
+    end
+    def build_pen
+      pen_class.new
+    end
     def enqueue! method
       queue.push method
+    end
+    def exit_status_for sym
     end
     def help_string
       option_parser.to_s
@@ -339,12 +403,37 @@ module Skylab::Headless
       emit(:help, help_string)
       true
     end
+    def in_file
+      "<#{argument_syntax_for(queue.first).first.label}>"
+    end
     def invite
       emit(:help, "use #{em "#{program_name} -h"} for more help")
+    end
+    def io_adapter_class
+      CLI::IO::Adapter::Minimal
     end
     def option_parser
       @option_parser ||= build_option_parser
     end
+    def option_syntax_string
+      (@option_parser ||= nil) or return nil
+      @option_parser.top.list.map do |s|
+        "[#{s.short.first or s.long.first}#{s.arg}]" if s.respond_to?(:short)
+      end.compact.join(' ') # stolen and improved from Bleeding @todo
+    end
+    def parse_argv_for m
+      argument_syntax_for(m).parse_argv(argv) do |o|
+        o.on_unexpected do |a|
+          usage("unexpected argument#{s a}: #{a[0].inspect}#{
+            " [..]" if a.length > 1}") && nil
+        end
+        o.on_missing do |fragment|
+          fragment = fragment[0..fragment.index{ |p| :req == p[:opt_req_rest] }]
+          usage("expecting: #{em fragment.string}") && nil
+        end
+      end
+    end
+    def pen_class ; CLI::IO::Pen::Minimal end
     def program_name
       (@program_name ||= nil) || ::File.basename($PROGRAM_NAME)
     end
@@ -360,29 +449,30 @@ module Skylab::Headless
       when [:stdin, :argv]                 ; :ambiguous
       when [:stdin, :no_argv]              ; :stdin
       end
+      result = nil
       case opcode
       when :ambiguous
         usage("cannot resolve ambiguous instream modality paradigms -- " <<
           "both STDIN and #{in_file} appear to be present.")
-        nil
-      when :stdin ; io_adapter.instream
+      when :stdin ; result = io_adapter.instream
       when :argv
-        in_path = case argv.length
+        in_path = nil
+        case argv.length
         when 0 ; suppress_normal_output? ?
                    info("No #{in_file} argument present. Done.") :
                    usage("expecting: #{in_file}")
-                 nil
-        when 1 ; argv.shift
-        else   ; usage "expecting: #{in_file} had: (#{argv.join(' ')})"
+        when 1 ; in_path = argv.shift
+        else   ; usage("expecting: #{in_file} had: (#{argv.join(' ')})")
         end
         in_path and begin
           in_path = ::Pathname.new(in_path)
           if ! in_path.exist? then usage("#{in_file} not found: #{in_path}")
           elsif in_path.directory? then usage("#{in_file} is dir: #{in_path}")
-          else io_adapter.instream = in_path.open('r') # ''spot 1''
+          else result = io_adapter.instream = in_path.open('r') # ''spot 1''
           end
         end
       end
+      result
     end
     def suppress_normal_output!
       @suppress_normal_output = true
@@ -390,17 +480,95 @@ module Skylab::Headless
     end
     attr_reader :suppress_normal_output
     alias_method :suppress_normal_output?, :suppress_normal_output
-    def usage msg
-      emit(:usage, msg)
+    def usage msg=nil
+      emit(:usage, msg) if msg
+      emit(:usage, usage_line)
       invite
-      nil # sic
+      nil # return value undefined, but client might override and do otherwise
+    end
+    def usage_line
+      "#{em('usage:')} #{usage_syntax_string}"
+    end
+    def usage_syntax_string
+      [program_name, option_syntax_string, argument_syntax_string].compact * ' '
     end
   end
-  module CLI::Pen end
-  module CLI::Pen::InstanceMethods
-    MAP = { strong: 1, red: 31, green: 32 }
+
+  module CLI::ArgumentSyntax end
+  class CLI::ArgumentSyntax::Inferred < ::Array
+    def initialize method_parameters, formal_parameters
+      formal_parameters ||= {}
+      formal_method_parameters = method_parameters.map do |opt_req_rest, name|
+        p = formal_parameters[name] || Parameter::Definition.new(nil, name)
+        p[:opt_req_rest] ||= opt_req_rest # maybe mutuates class property!
+        p
+      end
+      concat formal_method_parameters
+    end
+    def parse_argv argv, &events
+      hooks = Parameter::Definer.new do
+        param :on_missing, hook: true
+        param :on_unexpected, hook: true
+      end.new(&events)
+      formal = dup
+      actual = argv.dup
+      result = argv
+      while ! actual.empty?
+        if formal.empty?
+          result = hooks.on_unexpected.call(actual)
+          break
+        elsif idx = formal.index { |f| :req == f[:opt_req_rest] }
+          actual.shift # knock these off l to r always
+          formal[idx] = nil # knock the leftmost required off
+          formal.compact!
+        elsif :rest == formal.first[:opt_req_rest]
+          break
+        elsif # assume first is :opt and no required exist
+          formal.shift
+          actual.shift
+        end
+      end
+      if formal.detect { |p| :req == p[:opt_req_rest] }
+        result = hooks.on_missing.call(formal)
+      end
+      result
+    end
+    def string
+      map do |p|
+        case p[:opt_req_rest]
+        when :opt  ; "[<#{p.label}>]"
+        when :req  ; "<#{p.label}>"
+        when :rest ; "[<#{p.label}> [..]]"
+        end
+      end.join(' ')
+    end
+  end
+
+  module CLI::IO end
+  module CLI::IO::Adapter end
+  class CLI::IO::Adapter::Minimal <
+    ::Struct.new(:instream, :outstream, :errstream, :pen)
+    def emit type, msg
+      send( :payload == type ? :outstream : :errstream ).puts msg
+      nil # undefined
+    end
+  end
+
+  module CLI::IO::Pen end
+  module CLI::IO::Pen::InstanceMethods
+    MAP = ::Hash[ [[:strong, 1]].
+      concat [:dark_red, :green, :yellow, :blue, :purple, :cyan, :white, :red].
+        each.with_index.map { |v, i| [v, i+31] } ]
     def stylize str, *styles
       "\e[#{styles.map{ |s| MAP[s] }.compact.join(';')}m#{str}\e[0m"
     end
+    def unstylize str # nil if string is not stylized
+      str.dup.gsub!(/\e\[\d+(?:;\d+)*m/, '')
+    end
+  end
+
+  class CLI::IO::Pen::Minimal
+    include CLI::IO::Pen::InstanceMethods
+    def em s ; stylize(s, :strong, :green) end
   end
 end

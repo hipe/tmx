@@ -17,7 +17,8 @@ module Skylab::FlexToTreetop::MyTestSupport
       context "with the -h help flag" do
         argv '-h'
         it "displays the help screen" do
-          err[0].should match(/usage: xyzzy \[options\] <flexfile>/i)
+          err[0] = unstylize(err[0])
+          err[0].should match(/usage: xyzzy .{24,} <flexfile>/i)
           listing = err[1..-1]
           listing.length.should be > 0
           _bad = listing.select { |s| s !~ /\A[[:space:]]+/ }
@@ -33,7 +34,7 @@ module Skylab::FlexToTreetop::MyTestSupport
       context "reads flexfiles" do
         context "from a file named by ARG1" do
           argv fixture(:tokens)
-          it "and writes a treetop grammar to stdout" do
+          it "and writes a treetop grammar to stdout", f:true do
             # io_adapter_spy.debug!
             out = self.out.reverse # look! (begin)
             out.length.should be_within(50).of(137)

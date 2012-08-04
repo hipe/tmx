@@ -27,7 +27,7 @@ module Skylab::CssConvert::TreetopTools
   class ParserClassLoader < Struct.new(
     :_enhance, :_generated_grammar_dir, :_grammars, :_overwrite, :_root_dir
   )
-    include CssConvert::SubClient::InstanceMethods
+    include CssConvert::My::Headless::SubClient::InstanceMethods
     def initialize &b
       self._enhance = []
       self._grammars = []
