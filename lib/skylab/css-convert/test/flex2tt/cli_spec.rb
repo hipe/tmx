@@ -34,7 +34,7 @@ module Skylab::FlexToTreetop::MyTestSupport
       context "reads flexfiles" do
         context "from a file named by ARG1" do
           argv fixture(:tokens)
-          it "and writes a treetop grammar to stdout", f:true do
+          it "and writes a treetop grammar to stdout" do
             # io_adapter_spy.debug!
             out = self.out.reverse # look! (begin)
             out.length.should be_within(50).of(137)

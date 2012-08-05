@@ -1,8 +1,8 @@
 module Skylab::CssConvert
-  class CssParser
+  class CSS::Parser
     # include CssConvert::SubClient::InstanceMethods
     def initialize(_)
-      $stderr.puts("CssParser is skipping")
+      $stderr.puts("CSS::Parser is skipping")
 
     end
   private

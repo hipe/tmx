@@ -1,5 +1,5 @@
 module Skylab::CssConvert
-  class DirectivesRunner
+  class Directive::Runner
     include My::Headless::SubClient::InstanceMethods
     def run directives_sexp
       mod = self.class.to_s.match(/\A(.+[^:])::[^:]+\Z/)[1]
@@ -27,7 +27,7 @@ module Skylab::CssConvert
     end
   private
     def css_parser
-      @css_parser ||= CssConvert::CssParser.new request_runtime
+      @css_parser ||= CssConvert::CSS::Parser.new request_runtime
     end
   end
 end
