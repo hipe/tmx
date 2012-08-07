@@ -155,8 +155,9 @@ module Skylab::Headless
       def! :pathname= do |_|
         host.respond_to?(:pathname_class) or
           def host.pathname_class ; ::Pathname end
-        host_def("#{name}=") do |v|
-          self[name] = v ? host.pathname_class.new(v.to_s) : v
+        self.writer = true
+        filter_upstream! do |val, valid_f|
+          valid_f.call(val ? host.pathname_class.new(val.to_s) : val)
         end
       end
       def!(:reader=) { |_| host_def(name) { self[name] } }
