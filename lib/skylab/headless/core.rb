@@ -152,6 +152,13 @@ module Skylab::Headless
       def! :hook= do |_|
         host_def(name) { |&b| b ? (self[name] = b) : self[name] }
       end
+      def! :pathname= do |_|
+        host.respond_to?(:pathname_class) or
+          def host.pathname_class ; ::Pathname end
+        host_def("#{name}=") do |v|
+          self[name] = v ? host.pathname_class.new(v.to_s) : v
+        end
+      end
       def!(:reader=) { |_| host_def(name) { self[name] } }
       def! :writer= do |_|
         filter_upstream_last! { |val, _| self[name] = val } # buck stops here
