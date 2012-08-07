@@ -105,18 +105,26 @@ module Skylab::Headless
       nil
     end
 
+    attr_reader :name
+
   protected
 
     # this badboy bears some explanation: so many of these method definitions
     # need the same variables to be in scope that it is tighter to define
-    # them all there in this way.  Also it looks really really weird.
+    # them all here in this way.  Also it looks really really weird.
     def initialize host, name
-      sc = class << self
-        class << self ; alias_method :def, :define_method ; public :def ; end
-        self
+      class << self
+        define_method_f = ->(meth, &b) { define_method(meth, &b) }
+        define_method(:def!) { |meth, &b| define_method_f.call(meth, &b) }
       end
-      sc.def(:def!) { |meth, &b| sc.def(meth, &b) }
       def!(:host_def) { |meth, &b| host.send(:define_method, meth, &b) }
+      upstream_queue = []
+      def!(:filter_upstream_last!) { |&node| upstream_queue.push node }
+      def!(:filter_upstream!) { |&node| upstream_queue.unshift node }
+      upstream_f = ->(host_obj, val, i = 0) do
+        host_obj.instance_exec(val,
+          ->(_val) { upstream_f.call(host_obj, _val, i+1) }, &upstream_queue[i])
+      end
       # -- * --
       def!(:accessor=) { |_| self.reader = self.writer = true } # !!!
       def! :boolean= do |no|
@@ -129,11 +137,26 @@ module Skylab::Headless
       def! :builder= do |builder_f_method_name|
         host_def(name) { self[name] ||= send(builder_f_method_name).call }
       end
+      param = self
+      def! :enum= do |enum|
+        filter_upstream! do |val, valid_f|
+          if enum.include?(val) then valid_f.call(val) else
+            _with_client do
+              error("#{val.inspect} is an invalid value " <<
+                "for #{pen.parameter_label param}")
+            end
+          end
+        end
+      end
       def! :hook= do |_|
         host_def(name) { |&b| b ? (self[name] = b) : self[name] }
       end
       def!(:reader=) { |_| host_def(name) { self[name] } }
-      def!(:writer=) { |_| host_def("#{name}=") { |v| self[name] = v } }
+      def! :writer= do |_|
+        filter_upstream_last! { |val, _| self[name] = val } # buck stops here
+        host_def("#{name}=") { |val| upstream_f.call(self, val) }
+      end
+      @name = name
     end
   end
 
@@ -357,6 +380,15 @@ module Skylab::Headless
     def request_runtime_class ; Request::Runtime::Minimal end
   end
   IGNORE_THIS_CONSTANT = /\A#{to_s}\b/
+
+  module IO end
+  module IO::Pen end
+  module IO::Pen::InstanceMethods
+    def parameter_label parameter
+      parameter.name.to_s # nothing fancy for now, fancier is in stash
+    end
+  end
+  IO::Pen::MINIMAL = Object.new.extend(IO::Pen::InstanceMethods)
 
   module API end
   module API::InstanceMethods
