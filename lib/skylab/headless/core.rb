@@ -118,16 +118,19 @@ module Skylab::Headless
       sc.def(:def!) { |meth, &b| sc.def(meth, &b) }
       def!(:host_def) { |meth, &b| host.send(:define_method, meth, &b) }
       # -- * --
-      def!(:boolean=) do |no|
+      def!(:accessor=) { |_| self.reader = self.writer = true } # !!!
+      def! :boolean= do |no|
         true == no and no = "not_#{name}"
         host_def("#{name}!") { self[name] = true }
         host_def("#{no}!")   { self[name] = false }
         host_def("#{name}?") { self[name] }
         host_def("#{no}?") { ! self[name] }
       end
-      def!(:hook=) do |_|
+      def! :hook= do |_|
         host_def(name) { |&b| b ? (self[name] = b) : self[name] }
       end
+      def!(:reader=) { |_| host_def(name) { self[name] } }
+      def!(:writer=) { |_| host_def("#{name}=") { |v| self[name] = v } }
     end
   end
 
