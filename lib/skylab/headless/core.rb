@@ -152,20 +152,16 @@ module Skylab::Headless
       def! :hook= do |_|
         host_def(name) { |&b| b ? (self[name] = b) : self[name] }
       end
-      def! :pathname= do |_|
-        host.respond_to?(:pathname_class) or
-          def host.pathname_class ; ::Pathname end
-        self.writer = true
-        filter_upstream! do |val, valid_f|
-          valid_f.call(val ? host.pathname_class.new(val.to_s) : val)
-        end
-      end
       def!(:reader=) { |_| host_def(name) { self[name] } }
+      def!(:upstream_passthru_filter) do |&f|
+        upstream_queue.empty? and fail("you probably want a writer first") # tmp
+        filter_upstream! { |val, valid_f| valid_f.call(f.call val) }
+      end
       def! :writer= do |_|
         filter_upstream_last! { |val, _| self[name] = val } # buck stops here
         host_def("#{name}=") { |val| upstream_f.call(self, val) }
       end
-      @name = name
+      @name = name ; @host = host
     end
     # -- * --
     # now we use our own hands to hit ourself with our own dogfood
@@ -176,6 +172,12 @@ module Skylab::Headless
     def default= anything
       has_default!  # defining default_value here is important, and protects us
       def!(:default_value) { anything } # defining it like so is just because
+    end
+    def pathname= _
+      def @host.pathname_class ; ::Pathname end unless
+        @host.respond_to?(:pathname_class)
+      self.writer = true ; host = @host
+      upstream_passthru_filter { |v| v ? host.pathname_class.new(v.to_s) : v }
     end
   end
 
