@@ -126,6 +126,9 @@ module Skylab::Headless
         host_def("#{name}?") { self[name] }
         host_def("#{no}?") { ! self[name] }
       end
+      def! :builder= do |builder_f_method_name|
+        host_def(name) { self[name] ||= send(builder_f_method_name).call }
+      end
       def! :hook= do |_|
         host_def(name) { |&b| b ? (self[name] = b) : self[name] }
       end
