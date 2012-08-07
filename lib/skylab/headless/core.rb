@@ -37,6 +37,12 @@ module Skylab::Headless
       end
     end
   end
+  module Parameter::Definer::InstanceMethods
+    # these are typically for if you are not a Struct or Hash
+  protected
+    def [](k) ; instance_variable_get("@#{k}") end
+    def []=(k, v) ; instance_variable_set("@#{k}", v) end
+  end
   class Parameter::Definer::Dynamic < ::Hash
     extend Parameter::Definer::ModuleMethods
     def initialize &block
@@ -59,11 +65,13 @@ module Skylab::Headless
       super([])
       @hash = {}
       @host = host
+      host.respond_to?(:parameter_definition_class) or
+        def host.parameter_definition_class ; Parameter::Definition end
     end
     def fetch! k
       unless idx = @hash[k]
         @hash[k] = idx = list.length
-        list[idx] = Parameter::Definition.new(@host, k)
+        list[idx] = @host.parameter_definition_class.new(@host, k)
       end
       list[idx]
     end
@@ -72,6 +80,51 @@ module Skylab::Headless
         fetch!(o.name).merge!(o)
       end
       nil
+    end
+  end
+
+  class Parameter::Definition_
+    # Experimentally let a parameter definition be defined as a name (symbol)
+    # and an unordered set of zero or more properties, each defined as a
+    # name-value pair (with Symbols for names, values as as-yes undefined.)
+    # A parameter definition is always created in association with one host
+    # (class or module), but in theory any existing parameter definition
+    # should be able to be deep-copy applied over to to another host, or for
+    # example a child class of a parent class that has parameter definitions.
+    # It is then useful (maybe?) to keep this surface representation of a
+    # parameter definition as a hash as an aid in future such reflection
+    # and re-application (but this may change!)
+
+    include Parameter::Definer::InstanceMethods
+
+    def merge! mixed # might be a Hash, might be a self-class, .. other? ..
+      block_given? and fail('huh?') # .. also it is an override
+      mixed.each do |k, v|
+        self[k] == v and next # do not reprocess sameval properties
+        send("#{k}=", v) # possibly re-process with diffval, possibly newprop
+      end
+      nil
+    end
+
+  protected
+
+    # this badboy bears some explanation: so many of these method definitions
+    # need the same variables to be in scope that it is tighter to define
+    # them all there in this way.  Also it looks really really weird.
+    def initialize host, name
+      sc = class << self
+        class << self ; alias_method :def, :define_method ; public :def ; end
+        self
+      end
+      sc.def(:def!) { |meth, &b| sc.def(meth, &b) }
+      def!(:host_def) { |meth, &b| host.send(:define_method, meth, &b) }
+      def!(:boolean=) do |no|
+        true == no and no = "not_#{name}"
+        host_def("#{name}!") { self[name] = true }
+        host_def("#{no}!")   { self[name] = false }
+        host_def("#{name}?") { self[name] }
+        host_def("#{no}?") { ! self[name] }
+      end
     end
   end
 
