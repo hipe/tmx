@@ -47,16 +47,16 @@ module Skylab::FlexToTreetop
   module CLI::Actions::Translate end
   class CLI::Actions::Translate::Parameters < ::Hash
     extend Headless::Parameter::Definer::ModuleMethods
-    param :case_insensitive, boolean: :case_sensitive, default: true
+    param :case_insensitive, boolean: :case_sensitive, default: true, writer: 1
     param :clear_generated_files, boolean: :dont_clear_generated_files
     param :filesystem_parser_enabled, boolean: true
-    param :filesystem_parser_dir, pathname: true
+    param :filesystem_parser_dir, pathname: true, reader: true
     param :result_state, internal: true, enum: [:exists, :filesystem_touched,
             :modified, :not_found, :parse_failure, :translated,
-            :translate_failure, :showed_sexp]
-    param :show_sexp, boolean: :dont_show_sexp, default: false
+            :translate_failure, :showed_sexp], accessor: true
+    param :show_sexp, boolean: :dont_show_sexp, default: false, writer: true
     param :suppress_normal_output_after_filesystem_parser, boolean: true
-    param :verbose, boolean: true, default: true
+    param :verbose, boolean: true, default: true, writer: true
     # -- * --
     # the /^[a-z]/ namespace is off limits to us for method names here
     def _client &block
@@ -82,9 +82,9 @@ module Skylab::FlexToTreetop
   class API::Actions::Translate::Parameters <
     CLI::Actions::Translate::Parameters
 
-    param :force, boolean: true, default: true
-    param :flexfile, pathname: true, required: true
-    param :outfile, pathname: true, required: true
+    param :force, boolean: true, default: true, writer: true
+    param :flexfile, pathname: true, required: true, reader: true
+    param :outfile, pathname: true, required: true, reader: true
     param :verb, accessor: true, internal: true
   end
 

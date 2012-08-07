@@ -39,7 +39,9 @@ module Skylab::Headless
   module Parameter::Definer::InstanceMethods
     # these are typically for if you are not a Struct or Hash
   protected
-    def [](k) ; instance_variable_get("@#{k}") end
+    def [](k)
+      instance_variable_get("@#{k}")
+    end
     def []=(k, v) ; instance_variable_set("@#{k}", v) end
     def key?(k) ; instance_variable_defined?("@#{k}") end
   end
@@ -66,7 +68,7 @@ module Skylab::Headless
       @hash = {}
       @host = host
       host.respond_to?(:parameter_definition_class) or
-        def host.parameter_definition_class ; Parameter::Definition end
+        def host.parameter_definition_class ; Parameter::Definition_ end
     end
     def fetch! k
       unless idx = @hash[k]
@@ -76,8 +78,8 @@ module Skylab::Headless
       list[idx]
     end
     def merge! set
-      set.list.each do |o|
-        fetch!(o.name).merge!(o)
+      set.list.each do |p|
+        fetch!(p.name).merge!(p)
       end
       nil
     end
@@ -95,14 +97,25 @@ module Skylab::Headless
     # parameter definition as a hash as an aid in future such reflection
     # and re-application (but this may change!)
 
+    unless ancestors.include?(::Hash) # dev only
     include Parameter::Definer::InstanceMethods # let [] and []= access ivars
+    def each &y
+      @property_keys.each { |k| y.call(k, self[k]) }
+    end
+    end
 
-    def merge! mixed # might be a Hash, might be a self-class, can be nil ..
-      block_given? and fail('huh?') # .. also it is an override
-      mixed and  mixed.each do |k, v| # is nil with a param with no hash def
-        self[k] == v && key?(k) and next # do not reprocess sameval properties
+    def merge! mixed, &b # might be a Hash, might be a self-class, can be nil ..
+      # ..if is parameter with no properties. also it might be an override
+      mixed and mixed.each do |k, v| # is nil with a param with no hash def
+        if key? k
+          self[k] == v and next # do not reprocess sameval properties
+        elsif @property_keys # probably temporary while we derk with non-hashes
+          @property_keys.push k
+        end
+        self[k] = v # do this here to kiss. inheritable property, always
         send("#{k}=", v) # possibly re-process with diffval, possibly newprop
       end
+      block_given? and instance_exec(&b)
       nil
     end
 
@@ -114,6 +127,7 @@ module Skylab::Headless
     # need the same variables to be in scope that it is tighter to define
     # them all here in this way.  Also it looks really really weird.
     def initialize host, name
+      @property_keys = [] unless kind_of?(::Hash) # derking with being not hash
       class << self
         define_method_f = ->(meth, &b) { define_method(meth, &b) }
         define_method(:def!) { |meth, &b| define_method_f.call(meth, &b) }
@@ -173,12 +187,17 @@ module Skylab::Headless
       has_default!  # defining default_value here is important, and protects us
       def!(:default_value) { anything } # defining it like so is just because
     end
+    def desc *a # temp during dev.
+      a.empty? ? self[:desc] : (self[:desc] ||= []).concat(a.flatten)
+    end
+    param :internal, boolean: :external, writer: true
     def pathname= _
       def @host.pathname_class ; ::Pathname end unless
         @host.respond_to?(:pathname_class)
       self.writer = true ; host = @host
       upstream_passthru_filter { |v| v ? host.pathname_class.new(v.to_s) : v }
     end
+    param :required, boolean: true, writer: true
   end
 
   class Parameter::Definition < Hash
