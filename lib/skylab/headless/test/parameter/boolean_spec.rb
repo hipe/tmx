@@ -1,24 +1,35 @@
 require_relative 'test-support.rb'
 
-describe "#{::Skylab::Headless::Parameter} boolean: true" do
+describe "If you have an object \"object\" that has a " <<
+  "#{::Skylab::Headless::Parameter} \"foo\" " do
   extend ::Skylab::Headless::Parameter::TestSupport
-  defn do
-    param :finished, boolean: true
-  end
-  frame do
-    it "you get a foo? reader (whose result is nil by default)" do
-      object.finished?.should be_nil
+  context 'and "foo" has the property "boolean: true"' do
+    defn do
+      param :finished, boolean: true
     end
-    it "foo! will set it to true" do
-      object.finished!
-      object.finished?.should eql(true)
-    end
-    it "not_foo! will set it to false" do
-      object.not_finished!
-      object.finished?.should eql(false)
-    end
-    it "foo() however, (plain old reader) is not out of the box defined" do
-      -> { object.finished }.should raise_error(::NoMethodError)
+    frame do
+      it '"object.foo?" is a reader of the (presumably boolean) value ' <<
+        '(note it returns nil out of the box)' do
+        object.finished?.should be_nil
+      end
+      it '"object.foo!" is a DSL-y writer that sets the parameter ' <<
+        'value of "foo" to true' do
+        object.finished!
+        object.finished?.should eql(true)
+      end
+      it '"object.not_foo!" is a DSL-y writer that sets the parameter value ' <<
+        'of "foo" to false' do
+        object.not_finished!
+        object.finished?.should eql(false)
+      end
+      it '"object.foo", however, (a reader) you do not get ' <<
+        'out of the box just like that.' do
+        -> { object.finished }.should raise_error(::NoMethodError)
+      end
+      it '"object.foo = x", however, (the writer) you do not just get ' <<
+        'out of the box just like that just for doing nothing ' do
+        -> { object.finished = true }.should raise_error(::NoMethodError)
+      end
     end
   end
 end
