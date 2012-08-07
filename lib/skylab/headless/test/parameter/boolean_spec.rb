@@ -6,7 +6,7 @@ describe "#{::Skylab::Headless::Parameter} boolean: true" do
     param :finished, boolean: true
   end
   frame do
-    it "you get a foo? reader (and the result is nil by default" do
+    it "you get a foo? reader (whose result is nil by default)" do
       object.finished?.should be_nil
     end
     it "foo! will set it to true" do

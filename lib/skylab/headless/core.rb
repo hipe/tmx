@@ -8,9 +8,8 @@ module Skylab::Headless
     end
     def parameters &block
       if block_given?
-        (@parametersf ||= nil) and fail('no')
-        (@parameters ||= nil) and fail('no')
-        @parametersf = block
+        (@parameters_f ||= nil) || (@parameters ||= nil) and fail('no')
+        @parameters_f = block
         return
       end
       @parameters ||= begin
@@ -28,10 +27,10 @@ module Skylab::Headless
           end
         end
         mods.reverse.each { |mod| p.merge!(mod.parameters) }
-        if (@parametersf ||= nil)
-          @parameters = p # ick
-          instance_exec(&@parametersf)
-          @parametersf = nil
+        if (@parameters_f ||= nil)
+          @parameters = p # prevent inf. recursion, the below call may need this
+          instance_exec(&@parameters_f)
+          @parameters_f = nil
         end
         p
       end
@@ -118,12 +117,16 @@ module Skylab::Headless
       end
       sc.def(:def!) { |meth, &b| sc.def(meth, &b) }
       def!(:host_def) { |meth, &b| host.send(:define_method, meth, &b) }
+      # -- * --
       def!(:boolean=) do |no|
         true == no and no = "not_#{name}"
         host_def("#{name}!") { self[name] = true }
         host_def("#{no}!")   { self[name] = false }
         host_def("#{name}?") { self[name] }
         host_def("#{no}?") { ! self[name] }
+      end
+      def!(:hook=) do |_|
+        host_def(name) { |&b| b ? (self[name] = b) : self[name] }
       end
     end
   end
