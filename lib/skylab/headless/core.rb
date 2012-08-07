@@ -41,6 +41,7 @@ module Skylab::Headless
   protected
     def [](k) ; instance_variable_get("@#{k}") end
     def []=(k, v) ; instance_variable_set("@#{k}", v) end
+    def key?(k) ; instance_variable_defined?("@#{k}") end
   end
   class Parameter::Definer::Dynamic < ::Hash
     extend Parameter::Definer::ModuleMethods
@@ -85,7 +86,7 @@ module Skylab::Headless
   class Parameter::Definition_
     # Experimentally let a parameter definition be defined as a name (symbol)
     # and an unordered set of zero or more properties, each defined as a
-    # name-value pair (with Symbols for names, values as as-yes undefined.)
+    # name-value pair (with Symbols for names, values as as-yet undefined.)
     # A parameter definition is always created in association with one host
     # (class or module), but in theory any existing parameter definition
     # should be able to be deep-copy applied over to to another host, or for
@@ -94,12 +95,12 @@ module Skylab::Headless
     # parameter definition as a hash as an aid in future such reflection
     # and re-application (but this may change!)
 
-    include Parameter::Definer::InstanceMethods
+    include Parameter::Definer::InstanceMethods # let [] and []= access ivars
 
-    def merge! mixed # might be a Hash, might be a self-class, .. other? ..
+    def merge! mixed # might be a Hash, might be a self-class, can be nil ..
       block_given? and fail('huh?') # .. also it is an override
-      mixed.each do |k, v|
-        self[k] == v and next # do not reprocess sameval properties
+      mixed and  mixed.each do |k, v| # is nil with a param with no hash def
+        self[k] == v && key?(k) and next # do not reprocess sameval properties
         send("#{k}=", v) # possibly re-process with diffval, possibly newprop
       end
       nil
@@ -157,6 +158,16 @@ module Skylab::Headless
         host_def("#{name}=") { |val| upstream_f.call(self, val) }
       end
       @name = name
+    end
+    # -- * --
+    # now we use our own hands to hit ourself with our own dogfood
+    extend Parameter::Definer::ModuleMethods
+    def self.parameter_definition_class ; self end # during transition
+
+    param :has_default, boolean: 'does_not_have_default'
+    def default= anything
+      has_default!  # defining default_value here is important, and protects us
+      def!(:default_value) { anything } # defining it like so is just because
     end
   end
 

@@ -30,8 +30,9 @@ module Skylab::Headless
         outspy = ::Skylab::TestSupport::StreamSpy.standard
         object.instance_variable_set('@_outstream', outspy)
         out_f = -> { outspy.string.split("\n") }
-        { object: object, out_f: out_f }
+        { klass: klass, object: object, out_f: out_f }
       end
+      let(:klass) { _frame[:klass] }
       let(:object) { _frame[:object] }
       let(:out) { _frame[:out_f].call }
       instance_exec(&b)
