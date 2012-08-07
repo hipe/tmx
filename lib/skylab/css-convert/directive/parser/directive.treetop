@@ -1,7 +1,7 @@
 module Skylab
   module CssConvert
-    module Grammar
-      grammar Directives
+    module Grammars
+      grammar Directive
         include Common
         rule statement
           merge_statement

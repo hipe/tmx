@@ -1,6 +1,6 @@
 module Skylab
   module CssConvert
-    module Grammar
+    module Grammars
       grammar Common
         rule literal
           quoted_string / word

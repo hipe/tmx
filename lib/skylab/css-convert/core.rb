@@ -46,11 +46,10 @@ module Skylab::CssConvert
   class CLI::Client < My::Headless::Client
     include Headless::CLI::InstanceMethods
     def convert directives_file=nil
-      parameters.set! &&
-      resolve_instream &&
-      (@sexp = parse_directives) &&
-      dump_directives &&
-      CssConvert::DirectivesRunner.new(request_runtime).run(sexp) &&
+      parameters.set! && (i = resolve_instream) &&
+      (d = CssConvert::Directive::Parser.new(request_runtime).parse_stream i) &&
+      dump_directives(d) &&
+      CssConvert::Directive::Runner.new(request_runtime).run(d) &&
       exit_status_for(:ok) or exit_status_for(:error)
     end
   protected
@@ -87,7 +86,7 @@ module Skylab::CssConvert
       queue.last == :convert or enqueue!(:convert) # etc
       true
     end
-    def dump_directives
+    def dump_directives sexp
       params.dump_directives? or return true
       require 'pp'
       ::PP.pp(sexp, request_runtime.io_adapter.errstream)
@@ -99,15 +98,7 @@ module Skylab::CssConvert
     end
     def io_adapter_class ; CLI::IO::Adapter end
     alias_method :p, :params
-    def parse_directives_in_file *a
-      fail("reimplement me")
-    end
-    def parse_directives
-      CssConvert::DirectivesParser.new(request_runtime).
-        parse_stream(io_adapter.instream)
-    end
     def pen_class ; CLI::IO::Pen end
-    attr_reader :sexp
     def trace m
       $stderr.puts "trace: #{m}"
     end

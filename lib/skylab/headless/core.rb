@@ -8,9 +8,8 @@ module Skylab::Headless
     end
     def parameters &block
       if block_given?
-        (@parametersf ||= nil) and fail('no')
-        (@parameters ||= nil) and fail('no')
-        @parametersf = block
+        (@parameters_f ||= nil) || (@parameters ||= nil) and fail('no')
+        @parameters_f = block
         return
       end
       @parameters ||= begin
@@ -28,14 +27,23 @@ module Skylab::Headless
           end
         end
         mods.reverse.each { |mod| p.merge!(mod.parameters) }
-        if (@parametersf ||= nil)
-          @parameters = p # ick
-          instance_exec(&@parametersf)
-          @parametersf = nil
+        if (@parameters_f ||= nil)
+          @parameters = p # prevent inf. recursion, the below call may need this
+          instance_exec(&@parameters_f)
+          @parameters_f = nil
         end
         p
       end
     end
+  end
+  module Parameter::Definer::InstanceMethods
+    # these are typically for if you are not a Struct or Hash
+  protected
+    def [](k)
+      instance_variable_get("@#{k}")
+    end
+    def []=(k, v) ; instance_variable_set("@#{k}", v) end
+    def key?(k) ; instance_variable_defined?("@#{k}") end
   end
   class Parameter::Definer::Dynamic < ::Hash
     extend Parameter::Definer::ModuleMethods
@@ -59,121 +67,139 @@ module Skylab::Headless
       super([])
       @hash = {}
       @host = host
+      host.respond_to?(:parameter_definition_class) or
+        def host.parameter_definition_class ; Parameter::Definition end
     end
     def fetch! k
       unless idx = @hash[k]
         @hash[k] = idx = list.length
-        list[idx] = Parameter::Definition.new(@host, k)
+        list[idx] = @host.parameter_definition_class.new(@host, k)
       end
       list[idx]
     end
     def merge! set
-      set.list.each do |o|
-        fetch!(o.name).merge!(o)
+      set.list.each do |p|
+        fetch!(p.name).merge!(p)
       end
       nil
     end
   end
 
-  class Parameter::Definition < Hash
-    extend Parameter::Definer::ModuleMethods
-    def define_method name, &block
-      host.send(:define_method, name, &block)
+  class Parameter::Definition
+    # Experimentally let a parameter definition be defined as a name (symbol)
+    # and an unordered set of zero or more properties, each defined as a
+    # name-value pair (with Symbols for names, values as as-yet undefined.)
+    # A parameter definition is always created in association with one host
+    # (class or module), but in theory any existing parameter definition
+    # should be able to be deep-copy applied over to to another host, or for
+    # example a child class of a parent class that has parameter definitions.
+    # It is then useful (maybe?) to keep this surface representation of a
+    # parameter definition as a hash as an aid in future such reflection
+    # and re-application (but this may change!)
+
+    unless ancestors.include?(::Hash) # dev only
+    include Parameter::Definer::InstanceMethods # let [] and []= access ivars
+    def each &y
+      @property_keys.each { |k| y.call(k, self[k]) }
     end
-    attr_reader :host
-    def initialize host, name
-      self[:name] = name
-      @host = host
     end
-    def merge! meta=nil, &b
-      meta.each do |k, v| # note meta is either a arg hash or a self.class obj!
-        :name == k and next
-        self[k] == v and next
-        self[k] = v # possibly let the below do some post processing?
-        send("#{k}=", v)
-      end if meta
-      block_given? and instance_exec(&b) # *very* experimental
+
+    def label ; name.to_s.gsub('_', '-') end # temporary
+
+    def merge! mixed, &b # might be a Hash, might be a self-class, can be nil ..
+      # ..if is parameter with no properties. also it might be an override
+      mixed and mixed.each do |k, v| # is nil with a param with no hash def
+        if key? k
+          self[k] == v and next # do not reprocess sameval properties
+        elsif @property_keys # probably temporary while we derk with non-hashes
+          @property_keys.push k
+        end
+        self[k] = v # do this here to kiss. inheritable property, always
+        send("#{k}=", v) # possibly re-process with diffval, possibly newprop
+      end
+      block_given? and instance_exec(&b)
       nil
     end
-    def name
-      self[:name] # this line of code is the center of the universe
-    end
-    def param_reader
-      name = self.name
-      define_method(name) { self[name] }
-    end
-    def param_writer
-      name = self.name
-      define_method("#{name}=") { |v| self[name] =v }
-    end
-    # -- * --
-    def accessor= _
-      param_reader
-      param_writer
-    end
-    def boolean= no=true
-      name = self.name
-      true == no and no = "not_#{name}"
-      define_method("#{name}!") { self[name] = true }
-      define_method("#{no}!") { self[name] = false }
-      define_method("#{name}?") { self[name] }
-      define_method("#{no}?") { ! self[name] }
-      define_method("#{name}=") { |v| self[name] = v }
-    end
-    def builder= builder_lambda_method
-      name = self.name
-      define_method(name) do
-        o = super() and return o
-        send("#{name}=", send(builder_lambda_method).call)
+
+    attr_reader :name
+
+  protected
+
+    # this badboy bears some explanation: so many of these method definitions
+    # need the same variables to be in scope that it is tighter to define
+    # them all here in this way.  Also it looks really really weird.
+    def initialize host, name
+      @property_keys = [] unless kind_of?(::Hash) # derking with being not hash
+      class << self
+        define_method_f = ->(meth, &b) { define_method(meth, &b) }
+        define_method(:def!) { |meth, &b| define_method_f.call(meth, &b) }
       end
-    end
-    def default= v
-      has_default!
-      def self.default_value ; @defaultf.call end
-      @defaultf = ->{v}
-    end
-    def desc *a
-      a.empty? ? self[:desc] : (self[:desc] ||= []).concat(a.flatten)
-    end
-    def enum= enum
-      self[:enum] = enum
-      param_reader
-      name = self.name
-      define_method("#{name}=") do |v|
-        if (p = _formal_parameters[name]).enum.include?(v)
-          self[name] = v
-        else
-          _client do
-            error("#{v.inspect} is an invalid value for #{em p.label}.")
+      def!(:host_def) { |meth, &b| host.send(:define_method, meth, &b) }
+      upstream_queue = []
+      def!(:filter_upstream_last!) { |&node| upstream_queue.push node }
+      def!(:filter_upstream!) { |&node| upstream_queue.unshift node }
+      upstream_f = ->(host_obj, val, i = 0) do
+        host_obj.instance_exec(val,
+          ->(_val) { upstream_f.call(host_obj, _val, i+1) }, &upstream_queue[i])
+      end
+      # -- * --
+      def!(:accessor=) { |_| self.reader = self.writer = true } # !!!
+      def! :boolean= do |no|
+        true == no and no = "not_#{name}"
+        host_def("#{name}!") { self[name] = true }
+        host_def("#{no}!")   { self[name] = false }
+        host_def("#{name}?") { self[name] }
+        host_def("#{no}?") { ! self[name] }
+      end
+      def! :builder= do |builder_f_method_name|
+        host_def(name) { self[name] ||= send(builder_f_method_name).call }
+      end
+      param = self
+      def! :enum= do |enum|
+        filter_upstream! do |val, valid_f|
+          if enum.include?(val) then valid_f.call(val) else
+            _with_client do
+              error("#{val.inspect} is an invalid value " <<
+                "for #{pen.parameter_label param}")
+            end
           end
         end
       end
-    end
-    def hook= _
-      name = self.name
-      define_method(name) { |&b| b ? (self[name] = b ; self) : self[name] }
-    end
-    def label ; name.to_s.gsub('_', '-') end
-    def pathname= _
-      name = self.name
-      define_method("#{name}=") do |v|
-        v and String === v and v = ::Pathname.new(v) # not sure
-        self[name] = v
+      def! :hook= do |_|
+        host_def(name) { |&b| b ? (self[name] = b) : self[name] }
       end
-      param_reader
+      def!(:reader=) { |_| host_def(name) { self[name] } }
+      def!(:upstream_passthru_filter) do |&f|
+        upstream_queue.empty? and fail("you probably want a writer first") # tmp
+        filter_upstream! { |val, valid_f| valid_f.call(f.call val) }
+      end
+      def! :writer= do |_|
+        filter_upstream_last! { |val, _| self[name] = val } # buck stops here
+        host_def("#{name}=") { |val| upstream_f.call(self, val) }
+      end
+      @name = name ; @host = host
     end
-    def reader= _
-      param_reader
+    # -- * --
+    # now we use our own hands to hit ourself with our own dogfood
+    extend Parameter::Definer::ModuleMethods
+    def self.parameter_definition_class ; self end # during transition
+
+    param :has_default, boolean: 'does_not_have_default'
+    def default= anything
+      has_default!  # defining default_value here is important, and protects us
+      def!(:default_value) { anything } # defining it like so is just because
     end
-    def writer= _
-      param_writer
+    def desc *a # temp during dev.
+      a.empty? ? self[:desc] : (self[:desc] ||= []).concat(a.flatten)
     end
-    # --- * ---
-    param :enum, reader: true
-    param :getter, accessor: true
-    param :has_default, boolean: :does_not_have_default
-    param :internal, boolean: :external
-    param :required, boolean: true
+    param :internal, boolean: :external, writer: true
+    def pathname= _
+      def @host.pathname_class ; ::Pathname end unless
+        @host.respond_to?(:pathname_class)
+      self.writer = true ; host = @host
+      upstream_passthru_filter { |v| v ? host.pathname_class.new(v.to_s) : v }
+    end
+    param :required, boolean: true, writer: true
   end
 
   module Parameter::Controller end
@@ -295,6 +321,15 @@ module Skylab::Headless
     def request_runtime_class ; Request::Runtime::Minimal end
   end
   IGNORE_THIS_CONSTANT = /\A#{to_s}\b/
+
+  module IO end
+  module IO::Pen end
+  module IO::Pen::InstanceMethods
+    def parameter_label parameter
+      parameter.name.to_s # nothing fancy for now, fancier is in stash
+    end
+  end
+  IO::Pen::MINIMAL = Object.new.extend(IO::Pen::InstanceMethods)
 
   module API end
   module API::InstanceMethods
@@ -428,7 +463,7 @@ module Skylab::Headless
             " [..]" if a.length > 1}") && nil
         end
         o.on_missing do |fragment|
-          fragment = fragment[0..fragment.index{ |p| :req == p[:opt_req_rest] }]
+          fragment = fragment[0..fragment.index{ |p| :req == p.opt_req_rest }]
           usage("expecting: #{em fragment.string}") && nil
         end
       end
@@ -495,12 +530,17 @@ module Skylab::Headless
   end
 
   module CLI::ArgumentSyntax end
+  module CLI::ArgumentSyntax::ParameterInstanceMethods
+    attr_accessor :opt_req_rest
+  end
+
   class CLI::ArgumentSyntax::Inferred < ::Array
     def initialize method_parameters, formal_parameters
       formal_parameters ||= {}
       formal_method_parameters = method_parameters.map do |opt_req_rest, name|
         p = formal_parameters[name] || Parameter::Definition.new(nil, name)
-        p[:opt_req_rest] ||= opt_req_rest # maybe mutuates class property!
+        p.extend CLI::ArgumentSyntax::ParameterInstanceMethods
+        p.opt_req_rest = opt_req_rest # mutates the parameter!
         p
       end
       concat formal_method_parameters
@@ -517,25 +557,25 @@ module Skylab::Headless
         if formal.empty?
           result = hooks.on_unexpected.call(actual)
           break
-        elsif idx = formal.index { |f| :req == f[:opt_req_rest] }
+        elsif idx = formal.index { |f| :req == f.opt_req_rest }
           actual.shift # knock these off l to r always
           formal[idx] = nil # knock the leftmost required off
           formal.compact!
-        elsif :rest == formal.first[:opt_req_rest]
+        elsif :rest == formal.first.opt_req_rest
           break
         elsif # assume first is :opt and no required exist
           formal.shift
           actual.shift
         end
       end
-      if formal.detect { |p| :req == p[:opt_req_rest] }
+      if formal.detect { |p| :req == p.opt_req_rest }
         result = hooks.on_missing.call(formal)
       end
       result
     end
     def string
       map do |p|
-        case p[:opt_req_rest]
+        case p.opt_req_rest
         when :opt  ; "[<#{p.label}>]"
         when :req  ; "<#{p.label}>"
         when :rest ; "[<#{p.label}> [..]]"

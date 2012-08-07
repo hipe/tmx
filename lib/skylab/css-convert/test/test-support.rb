@@ -32,11 +32,11 @@ module Skylab::CssConvert
     end
 
     def parse_css_in_file pathname
-      build_parser(CssConvert::CssParser).parse_string pathname.read
+      build_parser(CssConvert::CSS::Parser).parse_string pathname.read
     end
 
     def parse_directives_in_file pathname
-      build_parser(CssConvert::DirectivesParser).parse_string pathname.read
+      build_parser(CssConvert::Directive::Parser).parse_string pathname.read
     end
   end
 end
