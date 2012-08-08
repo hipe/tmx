@@ -30,7 +30,7 @@ describe 'If you have an object "object" with a ' <<
         it('"object.foo = :gamma" (an invalid value) will use the host ' <<
            'instance\'s _with_client method to emit an error message') do
           object.color = :orange
-          out.shift.should match(/:orange is an invalid value for color/i)
+          out.shift.should match(/:orange is an invalid value for .*color/i)
           out.size.should eql(0)
         end
       end
