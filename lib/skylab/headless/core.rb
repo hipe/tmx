@@ -155,16 +155,35 @@ module Skylab::Headless
         host_def(name) { self[name] ||= send(builder_f_method_name).call }
       end
       param = self
-      def! :dsl= do |list_or_value|
+      def! :dsl= do |flags| # ( :list | :value ) [ :reader ]
+        flags = [flags] if ::Symbol === flags
+        list_or_value = ([:value, :list] & flags).join('').intern # ick
+        reader = flags.include?(:reader)
         case list_or_value
         when :list
-          host_def("#{name}") do |v, *a|
-            a.unshift(v).each { |_v| upstream_f.call(self, _v) }
-          end
           filter_upstream_last! { |val, _| (self[name] ||= []).push val }
+          host_def(name, & (if reader then
+            ->(*a) do
+              if a.empty? then key?(name) ? self[name] : nil
+              else a.each { |val| upstream_f.call(self, val) } end
+            end
+          else
+            ->(v, *a) { a.unshift(v).each { |_v| upstream_f.call(self, _v) } }
+          end))
         when :value
           filter_upstream_last! { |val, _| self[name] = val } # buck stops here
-          host_def("#{name}") { |v| upstream_f.call(self, v) }
+          host_def(name, &(if reader then
+            ->(*v) do
+              case v.length
+              when 0 ; self[name] # trigger warnings in some implementations
+              when 1 ; upstream_f.call(self, v.first)
+              else   ; raise ::ArgumentError.new(
+                  "wrong number of arguments (#{v.length} for 1)")
+              end
+            end
+          else
+            ->(v) { upstream_f.call(self, v) }
+          end))
         else fail('no')
         end
       end
@@ -202,9 +221,7 @@ module Skylab::Headless
       has_default!  # defining default_value here is important, and protects us
       def!(:default_value) { anything } # defining it like so is just because
     end
-    def desc *a # temp during dev.
-      a.empty? ? self[:desc] : (self[:desc] ||= []).concat(a.flatten)
-    end
+    param :desc, dsl: [:list, :reader]
     param :internal, boolean: :external, writer: true
     def pathname= _
       def @host.pathname_class ; ::Pathname end unless

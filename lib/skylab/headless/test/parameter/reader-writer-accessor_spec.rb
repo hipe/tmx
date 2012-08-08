@@ -1,4 +1,4 @@
-require_relative 'test-support.rb'
+require_relative 'test-support'
 
 describe 'If you have an object "object" that has a ' <<
   "#{::Skylab::Headless::Parameter} \"foo\"" do
