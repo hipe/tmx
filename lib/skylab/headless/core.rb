@@ -83,6 +83,11 @@ module Skylab::Headless
       end
       nil
     end
+    def where(*a)
+      a.empty? or raise ArgumentError.new('queries not yet implemented')
+      raise ArgumentError.new('blocks not yet implemented') if block_given?
+      list.dup
+    end
   end
 
   class Parameter::Definition
@@ -161,6 +166,7 @@ module Skylab::Headless
         reader = flags.include?(:reader)
         case list_or_value
         when :list
+          list!
           filter_upstream_last! { |val, _| (self[name] ||= []).push val }
           host_def(name, & (if reader then
             ->(*a) do
@@ -221,7 +227,8 @@ module Skylab::Headless
       has_default!  # defining default_value here is important, and protects us
       def!(:default_value) { anything } # defining it like so is just because
     end
-    param :desc, dsl: [:list, :reader]
+    param :list, boolean: true, writer: true # define this before below line
+    param :desc, dsl: [:list, :reader]       # define this after above line
     param :internal, boolean: :external, writer: true
     def pathname= _
       def @host.pathname_class ; ::Pathname end unless
@@ -230,6 +237,36 @@ module Skylab::Headless
       upstream_passthru_filter { |v| v ? host.pathname_class.new(v.to_s) : v }
     end
     param :required, boolean: true, writer: true
+  end
+
+  class Parameter::Bound < Struct.new(:parameter, :read_f, :write_f, :label_f)
+    def name ; parameter.name end
+    def label ; label_f.call(parameter)  end
+    def value ; read_f.call end
+    def value=(x) ; write_f.call(x) end
+  end
+
+  module Parameter::Bound::InstanceMethods
+    def bound_parameters(*a, &b)
+      ::Enumerator.new do |y|
+        label_f = ->(p) { pen.parameter_label p }
+        formal_parameters.where(*a, &b).each do |param|
+          if param.list? # the below should fail unless there's a reader,
+            if a = send(param.name) # also, for now it requires ::Array impl.
+              a.length.times do |i|
+                # and note that now it circumvents any upstream filtering
+                y << Parameter::Bound.new(param, ->{ a[i] }, ->(v){ a[i] = v },
+                  ->(p) { pen.parameter_label(p, i) } )
+              end
+            end
+          else
+            # use reader and writer, fail if not there!
+            y << Parameter::Bound.new(param, ->{ send(param.name) },
+              ->(v){ send("#{param.name}=", v) }, label_f)
+          end
+        end
+      end
+    end
   end
 
   module Parameter::Controller end
@@ -622,7 +659,7 @@ module Skylab::Headless
     end
     def string
       map do |p|
-        case p[:opt_req_rest]
+        case p.opt_req_rest
         when :opt  ; "[#{ pen.parameter_label p }]"
         when :req  ; "#{ pen.parameter_label p }"
         when :rest ; "[#{ pen.parameter_label p } [..]]"
