@@ -155,6 +155,19 @@ module Skylab::Headless
         host_def(name) { self[name] ||= send(builder_f_method_name).call }
       end
       param = self
+      def! :dsl= do |list_or_value|
+        case list_or_value
+        when :list
+          host_def("#{name}") do |v, *a|
+            a.unshift(v).each { |_v| upstream_f.call(self, _v) }
+          end
+          filter_upstream_last! { |val, _| (self[name] ||= []).push val }
+        when :value
+          filter_upstream_last! { |val, _| self[name] = val } # buck stops here
+          host_def("#{name}") { |v| upstream_f.call(self, v) }
+        else fail('no')
+        end
+      end
       def! :enum= do |enum|
         filter_upstream! do |val, valid_f|
           if enum.include?(val) then valid_f.call(val) else
@@ -270,9 +283,10 @@ module Skylab::Headless
     def initialize(r) ; self.request_runtime = r end
     def io_adapter ; request_runtime.io_adapter end
     def params ; request_runtime.params end
+    def pen ; io_adapter.pen end
     attr_accessor :request_runtime
     # --- * ---
-    def em s ; io_adapter.pen.em s end
+    def em s ; pen.em s end
     # --- * ---
     THE_ENGLISH_LANGUAGE = # @id: 6
       { a: ['a '], an: ['an '], is: ['is', 'are'], s:[nil, 's'] }
@@ -281,7 +295,6 @@ module Skylab::Headless
       (hsh = Hash.new(sep))[a.length - 1] = last
       [a.first, * (1..(a.length-1)).map { |i| [ hsh[i], a[i] ] }.flatten].join
     end
-
     def s count=nil, part=nil
       args = [count, part].compact
       part = ::Symbol === args.last ? args.pop : :s
@@ -294,6 +307,7 @@ module Skylab::Headless
   class Parameter::Controller::Minimal
     include Parameter::Controller::InstanceMethods
     include SubClient::InstanceMethods
+    def errors_count ; request_runtime.errors_count end # here
   end
 
   module Client end
@@ -325,11 +339,15 @@ module Skylab::Headless
   module IO end
   module IO::Pen end
   module IO::Pen::InstanceMethods
-    def parameter_label parameter
-      parameter.name.to_s # nothing fancy for now, fancier is in stash
+    def em s ; s end
+    def invalid_value s ; s end
+    def parameter_label m, idx=nil
+      idx and idx = "[#{idx}]"
+      stem = ::Symbol === m ? m.inspect : m.name.inspect
+      "#{stem}#{idx}"
     end
   end
-  IO::Pen::MINIMAL = Object.new.extend(IO::Pen::InstanceMethods)
+  IO::Pen::MINIMAL = ::Object.new.extend(IO::Pen::InstanceMethods)
 
   module API end
   module API::InstanceMethods
@@ -377,6 +395,17 @@ module Skylab::Headless
 
   class API::RuntimeError < ::RuntimeError ; end
 
+  module API::IO end
+  module API::IO::Pen end
+  module API::IO::Pen::InstanceMethods
+    include IO::Pen::InstanceMethods
+    def em s ; "\"#{s}\"" end
+    def parameter_label m, idx
+      s = (::Symbol === m) ? m.to_s : m.name.inspect
+      idx ? "#{s}[#{idx}]" : s
+    end
+  end
+
   module CLI end
   module CLI::InstanceMethods
     include Client::InstanceMethods
@@ -417,7 +446,7 @@ module Skylab::Headless
       @argument_syntax.string # ''hazy''
     end
     def build_argument_syntax_for m
-      CLI::ArgumentSyntax::Inferred.new(method(m).parameters,
+      CLI::ArgumentSyntax::Inferred.new(pen, method(m).parameters,
         respond_to?(:formal_paramaters) ? formal_parameters : nil)
     end
     def build_io_adapter
@@ -439,7 +468,7 @@ module Skylab::Headless
       true
     end
     def in_file
-      "<#{argument_syntax_for(queue.first).first.label}>"
+      "#{pen.parameter_label argument_syntax_for(queue.first).first}"
     end
     def invite
       emit(:help, "use #{em "#{program_name} -h"} for more help")
@@ -535,7 +564,8 @@ module Skylab::Headless
   end
 
   class CLI::ArgumentSyntax::Inferred < ::Array
-    def initialize method_parameters, formal_parameters
+    def initialize pen, method_parameters, formal_parameters
+      @pen = pen
       formal_parameters ||= {}
       formal_method_parameters = method_parameters.map do |opt_req_rest, name|
         p = formal_parameters[name] || Parameter::Definition.new(nil, name)
@@ -575,13 +605,15 @@ module Skylab::Headless
     end
     def string
       map do |p|
-        case p.opt_req_rest
-        when :opt  ; "[<#{p.label}>]"
-        when :req  ; "<#{p.label}>"
-        when :rest ; "[<#{p.label}> [..]]"
+        case p[:opt_req_rest]
+        when :opt  ; "[#{ pen.parameter_label p }]"
+        when :req  ; "#{ pen.parameter_label p }"
+        when :rest ; "[#{ pen.parameter_label p } [..]]"
         end
       end.join(' ')
     end
+  protected
+    attr_reader :pen
   end
 
   module CLI::IO end
@@ -596,9 +628,18 @@ module Skylab::Headless
 
   module CLI::IO::Pen end
   module CLI::IO::Pen::InstanceMethods
+    include IO::Pen::InstanceMethods
     MAP = ::Hash[ [[:strong, 1]].
       concat [:dark_red, :green, :yellow, :blue, :purple, :cyan, :white, :red].
         each.with_index.map { |v, i| [v, i+31] } ]
+    def invalid_value mixed
+      stylize(mixed.to_s.inspect, :strong, :dark_red) # may be overkill
+    end
+    def parameter_label m, idx=nil
+      stem = (::Symbol === m ? m.to_s : m.name.to_s).gsub('_', '-')
+      idx and idx = "[#{idx}]"
+      "<#{stem}#{idx}>" # will get build out eventually
+    end
     def stylize str, *styles
       "\e[#{styles.map{ |s| MAP[s] }.compact.join(';')}m#{str}\e[0m"
     end
