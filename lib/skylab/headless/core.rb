@@ -4,11 +4,14 @@ module Skylab::Headless
   module Parameter end
   module Parameter::Definer end
   module Parameter::Definer::ModuleMethods
-    def param name, meta=nil, &b
-      parameters.fetch!(name).merge!(meta, &b)
+    def meta_param name, props=nil, &b
+      parameters.meta_param!(name, props, &b)
+    end
+    def param name, props=nil, &b
+      parameters.fetch!(name).merge!(props, &b)
     end
     def parameters &block
-      if block_given?
+      if block_given? # this "feature" may be removed after benchmarking (@todo)
         (@parameters_f ||= nil) || (@parameters ||= nil) and fail('no')
         @parameters_f = block
         return
@@ -59,30 +62,45 @@ module Skylab::Headless
       k
     end
   end
-  class Parameter::Set < Struct.new(:list)
-    attr_reader :host
+  class Parameter::Set < Struct.new(:list, :host)
     def [] name
-      (idx = @hash[name]) ? list[idx] : nil
+      list[@hash[name]] if @hash.key?(name)
     end
-    def initialize host
-      super([])
-      @hash = {}
-      @host = host
-      host.respond_to?(:parameter_definition_class) or
-        def host.parameter_definition_class ; Parameter::Definition end
+    def all ; list.dup end
+    def fetch! name
+      @hash.key?(name) or list[@hash[name] = list.length] =
+        host.parameter_definition_class.new(host, name)
+      list[@hash[name]]
     end
-    def fetch! k
-      unless idx = @hash[k]
-        @hash[k] = idx = list.length
-        list[idx] = @host.parameter_definition_class.new(@host, k)
-      end
-      list[idx]
+    def meta_param! name, props, &b
+      meta_set.fetch!(name).merge!(props, &b)
     end
     def merge! set
       set.list.each do |p|
         fetch!(p.name).merge!(p)
       end
       nil
+    end
+  protected
+    def initialize host
+      super([], host)
+      @hash = {}
+      host.respond_to?(:parameter_definition_class) or
+        def host.parameter_definition_class
+          Parameter::DEFAULT_DEFINITION_CLASS ; end
+    end
+    def meta_set
+      (@meta_set ||= nil) and return @meta_set
+      # We must make our own procedurally-generated parameter definition class
+      # no matter what lest we create unintentional mutations out of our scope.
+      # If a parameter_definition_class has been indicated explicitly or
+      # otherwise, that's fine, use it as a base class here.
+      host.const_defined?(:ParameterDefinition0) and fail('sanity check')
+      meta_host = ::Class.new(host.parameter_definition_class)
+      host.const_set(:ParameterDefinition0, meta_host)
+      def host.parameter_definition_class ; self::ParameterDefinition0 end
+      host.singleton_class
+      @meta_set = meta_host.parameters
     end
   end
 
@@ -97,6 +115,9 @@ module Skylab::Headless
     # It is then useful (maybe?) to keep this surface representation of a
     # parameter definition as a hash as an aid in future such reflection
     # and re-application (but this may change!)
+
+    Parameter::DEFAULT_DEFINITION_CLASS = self # when the host module doesn't
+                            # specify explicitly a parameter_definition_class
 
     unless ancestors.include?(::Hash) # dev only
     include Parameter::Definer::InstanceMethods # let [] and []= access ivars
