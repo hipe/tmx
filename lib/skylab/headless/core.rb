@@ -1,3 +1,4 @@
+# encoding: UTF-8
 module Skylab end
 module Skylab::Headless
   module Parameter end
@@ -83,11 +84,6 @@ module Skylab::Headless
       end
       nil
     end
-    def where(*a)
-      a.empty? or raise ArgumentError.new('queries not yet implemented')
-      raise ArgumentError.new('blocks not yet implemented') if block_given?
-      list.dup
-    end
   end
 
   class Parameter::Definition
@@ -146,6 +142,12 @@ module Skylab::Headless
       upstream_f = ->(host_obj, val, i = 0) do
         host_obj.instance_exec(val,
           ->(_val) { upstream_f.call(host_obj, _val, i+1) }, &upstream_queue[i])
+      end
+      def!(:apply_upstream_filter) do |host_obj, val, &final_f|
+        mutated = [* upstream_queue[0..-2], ->(v, _) { final_f.call(v) } ]
+        (f = ->(o, v, i=0) do
+          o.instance_exec(v, ->(_v) { f[o, _v, i+1] }, &mutated[i])
+        end).call(host_obj, val)
       end
       # -- * --
       def!(:accessor=) { |_| self.reader = self.writer = true } # !!!
@@ -241,32 +243,77 @@ module Skylab::Headless
 
   class Parameter::Bound < Struct.new(:parameter, :read_f, :write_f, :label_f)
     def name ; parameter.name end
-    def label ; label_f.call(parameter)  end
+    def label ; label_f.call(parameter) end
     def value ; read_f.call end
     def value=(x) ; write_f.call(x) end
   end
 
-  module Parameter::Bound::InstanceMethods
-    def bound_parameters(*a, &b)
-      ::Enumerator.new do |y|
-        label_f = ->(p) { pen.parameter_label p }
-        formal_parameters.where(*a, &b).each do |param|
-          if param.list? # the below should fail unless there's a reader,
-            if a = send(param.name) # also, for now it requires ::Array impl.
-              a.length.times do |i|
-                # and note that now it circumvents any upstream filtering
-                y << Parameter::Bound.new(param, ->{ a[i] }, ->(v){ a[i] = v },
-                  ->(p) { pen.parameter_label(p, i) } )
-              end
-            end
-          else
-            # use reader and writer, fail if not there!
-            y << Parameter::Bound.new(param, ->{ send(param.name) },
-              ->(v){ send("#{param.name}=", v) }, label_f)
-          end
+  class Parameter::Bound::Enumerator < ::Enumerator
+    def initialize host_instance
+      super() { |y| init ; visit(y) }
+      @mixed = host_instance
+      block_given? and raise ArgumentError.new(
+        "i'm not that kind of enumerator (╯°□°）╯︵ ┻━┻") # "I am that kind of enumerator! ｡◕ ‿ ◕｡"
+    end
+    def at *parameter_names
+    end
+  protected
+    def init
+      @mixed &&= begin
+        if ::Hash === @mixed then @mixed.each { |k, v| send("#{k}=", v) }
+        else process_host_instance(@mixed)
         end
+        nil
       end
     end
+    attr_accessor :label_f, :params_f, :read_f, :upstream_f, :write_f
+    attr_writer :visit_f
+    def process_host_instance host_instance
+      f = {}
+      host_instance.instance_exec do
+        f[:params_f] = -> { formal_parameters.list }
+        f[:label_f] = ->(param, i=nil) { pen.parameter_label(param, i) }
+        f[:read_f] = ->(param) do
+          m = method(param.name) # catch these errors here, they are sneaky
+          m.arity <= 0 or fail("You do not have a reader for #{param.name}")
+          m.call
+        end
+        f[:upstream_f] = ->(param, val, &valid_f) do
+          param.apply_upstream_filter(self, val, &valid_f)
+        end
+        f[:write_f] = ->(param, val) do
+          param.apply_upstream_filter(self, val) { |v| self[param.name] = v }
+        end
+      end
+      f.each { |k, v| send("#{k}=", v) }
+    end
+    def visit y
+      params_f.call.each { |p| visit_f.call(y, p) }
+    end
+    def visit_f
+      @visit_f ||= (->(y, param) do
+        # Note that the below implementation for processing list-likes relies
+        # on the lists being implemented as array-like.  Also note that
+        # it might fail variously if there are not readers / writers in place.
+        if param.list?
+          a = read_f.call(param) and a.length.times do |i| # nil iff zero items
+            y << Parameter::Bound.new(param,
+              ->{ a[i] }, # ok iff there is no lazy evaluation
+              ->(val) { upstream_f.call(param, val) { |_val| a[i] = _val } },
+              ->(_) { label_f.call(param, i) })
+          end
+        else
+            y << Parameter::Bound.new(param,
+              ->{ read_f.call(param) },
+              ->(val) { write_f.call(param, val) },
+              label_f)
+        end
+      end)
+    end
+  end
+
+  module Parameter::Bound::InstanceMethods
+    def bound_parameters ; Parameter::Bound::Enumerator.new(self) end
   end
 
   module Parameter::Controller end

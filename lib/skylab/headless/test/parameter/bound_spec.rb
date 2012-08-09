@@ -35,7 +35,9 @@ describe Skylab::Headless::Parameter::Bound do
             p.value = p.value.gsub(/fish/, 'POTATO')
           end
         end
-        object.instance_variable_get('@pet').join.should eql('goldPOTATOllama')
+        o = object.instance_variable_get('@pet')
+        o.should be_kind_of(::Array)
+        o.join.should eql('goldPOTATOllama')
         object.hobby.should eql('spelunk-POTATOing')
       end
     end
