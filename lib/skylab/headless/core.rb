@@ -67,6 +67,10 @@ module Skylab::Headless
       list[@hash[name]] if @hash.key?(name)
     end
     def all ; list.dup end
+    def fetch name
+      if @hash.key?(name) then list[@hash[name]]
+      else raise ::KeyError.new("no such parameter: #{name.inspect}") end
+    end
     def fetch! name
       @hash.key?(name) or list[@hash[name] = list.length] =
         host.parameter_definition_class.new(host, name)
@@ -270,15 +274,50 @@ module Skylab::Headless
   end
 
   class Parameter::Bound::Enumerator < ::Enumerator
+    extend Parameter::Definer::ModuleMethods
+    include Parameter::Definer::InstanceMethods
     def initialize host_instance
       super() { |y| init ; visit(y) }
       @mixed = host_instance
       block_given? and raise ArgumentError.new(
-        "i'm not that kind of enumerator (╯°□°）╯︵ ┻━┻") # "I am that kind of enumerator! ｡◕ ‿ ◕｡"
+        "i'm not that kind of enumerator (╯°□°）╯︵ ┻━┻")
     end
     def at *parameter_names
+      dupe(
+        params_f: ->() do          # Override the default to be more map-like,
+          ::Enumerator.new do |y|  # and use only the desired names.
+            parameter_names.each do |parameter_name| # But still, we lazy eval
+              y << set_f.call.fetch(parameter_name)  # and fail late (for now).
+            end                    # Also override the default visit_f which
+          end                      # flattens list-like parameters.  We do
+        end,                       # not want to flatten it.
+        visit_f: ->(y, param) { y << bound(param) } # Do not flatten it.
+      )                            # Don't do that to anyone.
+    end
+    def where props=nil, &select_f
+      props and props_f = ->(p) { ! props.detect { |k, v| p.send(k) != v } }
+      _filter_f =
+      case [(:props if props_f), (:select if select_f)].compact
+      when [:props, :select] ; ->(p) { props_f.call(p) && select_f.call(p) }
+      when [:props]          ; props_f
+      when [:select]         ; select_f
+      when []                ; ->(param) { true }
+      end
+      dupe(params_f: ->() do
+        ::Enumerator.new do |y|
+          params_f.call.each { |p| _filter_f.call(p) and y << p }
+        end
+      end)
     end
   protected
+    meta_param :inherit, boolean: true, writer: true
+    param :label_f, accessor: true, inherit: true
+    param :params_f, accessor: true, inherit: true
+    param :read_f, accessor: true, inherit: true
+    param :set_f, accessor: true, inherit: true
+    param :upstream_f, accessor: true, inherit: true
+    param :visit_f, accessor: true, inherit: true
+    param :write_f, accessor: true, inherit: true
     def init
       @mixed &&= begin
         if ::Hash === @mixed then @mixed.each { |k, v| send("#{k}=", v) }
@@ -287,12 +326,22 @@ module Skylab::Headless
         nil
       end
     end
-    attr_accessor :label_f, :params_f, :read_f, :upstream_f, :write_f
-    attr_writer :visit_f
+    def bound parameter
+      Parameter::Bound.new(parameter, ->{ read_f.call(parameter) },
+        ->(val) { write_f.call(parameter, val) }, label_f)
+    end
+    def dupe changes
+      init # should be ok to call multiple times
+      self.class.new(Hash[
+        self.class.parameters.all.select(&:inherit?).map do |param|
+          [param.name, send(param.name)]
+        end].merge(changes) )
+    end
     def process_host_instance host_instance
       f = {}
       host_instance.instance_exec do
-        f[:params_f] = -> { formal_parameters.list }
+        f[:set_f] = ->{ formal_parameters }
+        f[:params_f] = -> { formal_parameters.all }
         f[:label_f] = ->(param, i=nil) { pen.parameter_label(param, i) }
         f[:read_f] = ->(param) do
           m = method(param.name) # catch these errors here, they are sneaky
@@ -311,6 +360,8 @@ module Skylab::Headless
     def visit y
       params_f.call.each { |p| visit_f.call(y, p) }
     end
+    # The builtin implementation for visit_f flattens list-like parameters
+    # into each their own bound parameter.
     def visit_f
       @visit_f ||= (->(y, param) do
         # Note that the below implementation for processing list-likes relies
@@ -324,10 +375,7 @@ module Skylab::Headless
               ->(_) { label_f.call(param, i) })
           end
         else
-            y << Parameter::Bound.new(param,
-              ->{ read_f.call(param) },
-              ->(val) { write_f.call(param, val) },
-              label_f)
+          y << bound(param)
         end
       end)
     end
