@@ -294,6 +294,10 @@ module Skylab::Headless
         visit_f: ->(y, param) { y << bound(param) } # Do not flatten it.
       )                            # Don't do that to anyone.
     end
+    def fetch parameter_name
+      init
+      bound set_f.call.fetch(parameter_name)
+    end
     def where props=nil, &select_f
       props and props_f = ->(p) { ! props.detect { |k, v| p.send(k) != v } }
       _filter_f =
@@ -382,7 +386,20 @@ module Skylab::Headless
   end
 
   module Parameter::Bound::InstanceMethods
-    def bound_parameters ; Parameter::Bound::Enumerator.new(self) end
+    def bound_parameters ; Parameter::Bound::Enumerator::Proxy.new(self) end
+  end
+
+  class Parameter::Bound::Enumerator::Proxy
+    # This may be a design smell, but see the commit where this thing first
+    # appeared.  it is kind of a deep problem, and after some thought this
+    # was considered the optimal solution.  suggestions welcome.
+    def initialize host_instance
+      @bridge = Parameter::Bound::Enumerator.new(host_instance)
+    end
+    def [](k) ; @bridge.fetch(k) end # !
+    def at *a, &b ; @bridge.at(*a, &b) end
+    def each *a, &b ; @bridge.each(*a, &b) end
+    def where *a, &b ; @bridge.where(*a, &b) end
   end
 
   module Parameter::Controller end

@@ -82,7 +82,10 @@ describe Skylab::Headless::Parameter::Bound do
         h.name.should eql(:herkemer)
         h.value.should eql('the herkemer')
       end
-      it '"object.bound_parameters[:nerk]" works!'
+      it '"object.beund_parameters[:nerk]" works!' do
+        bp = object.bound_parameters[:noun]
+        bp.value.should eql([:walk, :walk, :run])
+      end
     end
   end
 end
