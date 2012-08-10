@@ -1,13 +1,17 @@
+# encoding: UTF-8
 module Skylab end
 module Skylab::Headless
   module Parameter end
   module Parameter::Definer end
   module Parameter::Definer::ModuleMethods
-    def param name, meta=nil, &b
-      parameters.fetch!(name).merge!(meta, &b)
+    def meta_param name, props=nil, &b
+      parameters.meta_param!(name, props, &b)
+    end
+    def param name, props=nil, &b
+      parameters.fetch!(name).merge!(props, &b)
     end
     def parameters &block
-      if block_given?
+      if block_given? # this "feature" may be removed after benchmarking (@todo)
         (@parameters_f ||= nil) || (@parameters ||= nil) and fail('no')
         @parameters_f = block
         return
@@ -58,30 +62,52 @@ module Skylab::Headless
       k
     end
   end
-  class Parameter::Set < Struct.new(:list)
-    attr_reader :host
+  class Parameter::Set < Struct.new(:list, :host)
     def [] name
-      (idx = @hash[name]) ? list[idx] : nil
+      list[@hash[name]] if @hash.key?(name)
     end
-    def initialize host
-      super([])
-      @hash = {}
-      @host = host
-      host.respond_to?(:parameter_definition_class) or
-        def host.parameter_definition_class ; Parameter::Definition end
+    def all ; list.dup end
+    def fetch name
+      if @hash.key?(name) then list[@hash[name]]
+      else raise ::KeyError.new("no such parameter: #{name.inspect}") end
     end
-    def fetch! k
-      unless idx = @hash[k]
-        @hash[k] = idx = list.length
-        list[idx] = @host.parameter_definition_class.new(@host, k)
-      end
-      list[idx]
+    def fetch! name
+      @hash.key?(name) or list[@hash[name] = list.length] =
+        host.parameter_definition_class.new(host, name)
+      list[@hash[name]]
+    end
+    def meta_param! name, props, &b
+      meta_set.fetch!(name).merge!(props, &b)
     end
     def merge! set
       set.list.each do |p|
         fetch!(p.name).merge!(p)
       end
       nil
+    end
+  protected
+    def initialize host
+      super([], host)
+      @hash = {}
+      host.respond_to?(:parameter_definition_class) or
+        def host.parameter_definition_class
+          Parameter::DEFAULT_DEFINITION_CLASS ; end
+    end
+    def meta_set
+      (@meta_set ||= nil) and return @meta_set
+      # We must make our own procedurally-generated parameter definition class
+      # no matter what lest we create unintentional mutations out of our scope.
+      # If a parameter_definition_class has been indicated explicitly or
+      # otherwise, that's fine, use it as a base class here.
+      host.const_defined?(:ParameterDefinition0) and fail('sanity check')
+      meta_host = ::Class.new(host.parameter_definition_class)
+      host.const_set(:ParameterDefinition0, meta_host)
+      host.singleton_class.class_eval do
+        remove_method :parameter_definition_class # avoid warnings, careful!
+        def parameter_definition_class ; self::ParameterDefinition0 end
+      end
+      host.singleton_class
+      @meta_set = meta_host.parameters
     end
   end
 
@@ -96,6 +122,9 @@ module Skylab::Headless
     # It is then useful (maybe?) to keep this surface representation of a
     # parameter definition as a hash as an aid in future such reflection
     # and re-application (but this may change!)
+
+    Parameter::DEFAULT_DEFINITION_CLASS = self # when the host module doesn't
+                            # specify explicitly a parameter_definition_class
 
     unless ancestors.include?(::Hash) # dev only
     include Parameter::Definer::InstanceMethods # let [] and []= access ivars
@@ -142,6 +171,12 @@ module Skylab::Headless
         host_obj.instance_exec(val,
           ->(_val) { upstream_f.call(host_obj, _val, i+1) }, &upstream_queue[i])
       end
+      def!(:apply_upstream_filter) do |host_obj, val, &final_f|
+        mutated = [* upstream_queue[0..-2], ->(v, _) { final_f.call(v) } ]
+        (f = ->(o, v, i=0) do
+          o.instance_exec(v, ->(_v) { f[o, _v, i+1] }, &mutated[i])
+        end).call(host_obj, val)
+      end
       # -- * --
       def!(:accessor=) { |_| self.reader = self.writer = true } # !!!
       def! :boolean= do |no|
@@ -161,6 +196,7 @@ module Skylab::Headless
         reader = flags.include?(:reader)
         case list_or_value
         when :list
+          list!
           filter_upstream_last! { |val, _| (self[name] ||= []).push val }
           host_def(name, & (if reader then
             ->(*a) do
@@ -221,7 +257,8 @@ module Skylab::Headless
       has_default!  # defining default_value here is important, and protects us
       def!(:default_value) { anything } # defining it like so is just because
     end
-    param :desc, dsl: [:list, :reader]
+    param :list, boolean: true, writer: true # define this before below line
+    param :desc, dsl: [:list, :reader]       # define this after above line
     param :internal, boolean: :external, writer: true
     def pathname= _
       def @host.pathname_class ; ::Pathname end unless
@@ -230,6 +267,142 @@ module Skylab::Headless
       upstream_passthru_filter { |v| v ? host.pathname_class.new(v.to_s) : v }
     end
     param :required, boolean: true, writer: true
+  end
+
+  class Parameter::Bound < Struct.new(:parameter, :read_f, :write_f, :label_f)
+    def name ; parameter.name end
+    def label ; label_f.call(parameter) end
+    def value ; read_f.call end
+    def value=(x) ; write_f.call(x) end
+  end
+
+  class Parameter::Bound::Enumerator < ::Enumerator
+    extend Parameter::Definer::ModuleMethods
+    include Parameter::Definer::InstanceMethods
+    def initialize host_instance
+      super() { |y| init ; visit(y) }
+      @mixed = host_instance
+      block_given? and raise ArgumentError.new(
+        "i'm not that kind of enumerator (╯°□°）╯︵ ┻━┻")
+    end
+    def at *parameter_names
+      dupe(
+        params_f: ->() do          # Override the default to be more map-like,
+          ::Enumerator.new do |y|  # and use only the desired names.
+            parameter_names.each do |parameter_name| # But still, we lazy eval
+              y << set_f.call.fetch(parameter_name)  # and fail late (for now).
+            end                    # Also override the default visit_f which
+          end                      # flattens list-like parameters.  We do
+        end,                       # not want to flatten it.
+        visit_f: ->(y, param) { y << bound(param) } # Do not flatten it.
+      )                            # Don't do that to anyone.
+    end
+    def fetch parameter_name
+      init
+      bound set_f.call.fetch(parameter_name)
+    end
+    def where props=nil, &select_f
+      props and props_f = ->(p) { ! props.detect { |k, v| p.send(k) != v } }
+      _filter_f =
+      case [(:props if props_f), (:select if select_f)].compact
+      when [:props, :select] ; ->(p) { props_f.call(p) && select_f.call(p) }
+      when [:props]          ; props_f
+      when [:select]         ; select_f
+      when []                ; ->(param) { true }
+      end
+      dupe(params_f: ->() do
+        ::Enumerator.new do |y|
+          params_f.call.each { |p| _filter_f.call(p) and y << p }
+        end
+      end)
+    end
+  protected
+    meta_param :inherit, boolean: true, writer: true
+    param :label_f, accessor: true, inherit: true
+    param :params_f, accessor: true, inherit: true
+    param :read_f, accessor: true, inherit: true
+    param :set_f, accessor: true, inherit: true
+    param :upstream_f, accessor: true, inherit: true
+    param :visit_f, writer: true, inherit: true
+    param :write_f, accessor: true, inherit: true
+    def init
+      @mixed &&= begin
+        if ::Hash === @mixed then @mixed.each { |k, v| send("#{k}=", v) }
+        else process_host_instance(@mixed)
+        end
+        nil
+      end
+    end
+    def bound parameter
+      Parameter::Bound.new(parameter, ->{ read_f.call(parameter) },
+        ->(val) { write_f.call(parameter, val) }, label_f)
+    end
+    def dupe changes
+      init # should be ok to call multiple times
+      self.class.new(Hash[
+        self.class.parameters.all.select(&:inherit?).map do |param|
+          [param.name, send(param.name)]
+        end].merge(changes) )
+    end
+    def process_host_instance host_instance
+      f = {}
+      host_instance.instance_exec do
+        f[:set_f] = ->{ formal_parameters }
+        f[:params_f] = -> { formal_parameters.all }
+        f[:label_f] = ->(param, i=nil) { pen.parameter_label(param, i) }
+        f[:read_f] = ->(param) do
+          m = method(param.name) # catch these errors here, they are sneaky
+          m.arity <= 0 or fail("You do not have a reader for #{param.name}")
+          m.call
+        end
+        f[:upstream_f] = ->(param, val, &valid_f) do
+          param.apply_upstream_filter(self, val, &valid_f)
+        end
+        f[:write_f] = ->(param, val) do
+          param.apply_upstream_filter(self, val) { |v| self[param.name] = v }
+        end
+      end
+      f.each { |k, v| send("#{k}=", v) }
+    end
+    def visit y
+      params_f.call.each { |p| visit_f.call(y, p) }
+    end
+    # The builtin implementation for visit_f flattens list-like parameters
+    # into each their own bound parameter.
+    def visit_f
+      @visit_f ||= (->(y, param) do
+        # Note that the below implementation for processing list-likes relies
+        # on the lists being implemented as array-like.  Also note that
+        # it might fail variously if there are not readers / writers in place.
+        if param.list?
+          a = read_f.call(param) and a.length.times do |i| # nil iff zero items
+            y << Parameter::Bound.new(param,
+              ->{ a[i] }, # ok iff there is no lazy evaluation
+              ->(val) { upstream_f.call(param, val) { |_val| a[i] = _val } },
+              ->(_) { label_f.call(param, i) })
+          end
+        else
+          y << bound(param)
+        end
+      end)
+    end
+  end
+
+  module Parameter::Bound::InstanceMethods
+    def bound_parameters ; Parameter::Bound::Enumerator::Proxy.new(self) end
+  end
+
+  class Parameter::Bound::Enumerator::Proxy
+    # This may be a design smell, but see the commit where this thing first
+    # appeared.  it is kind of a deep problem, and after some thought this
+    # was considered the optimal solution.  suggestions welcome.
+    def initialize host_instance
+      @bridge = Parameter::Bound::Enumerator.new(host_instance)
+    end
+    def [](k) ; @bridge.fetch(k) end # !
+    def at *a, &b ; @bridge.at(*a, &b) end
+    def each *a, &b ; @bridge.each(*a, &b) end
+    def where *a, &b ; @bridge.where(*a, &b) end
   end
 
   module Parameter::Controller end
@@ -622,7 +795,7 @@ module Skylab::Headless
     end
     def string
       map do |p|
-        case p[:opt_req_rest]
+        case p.opt_req_rest
         when :opt  ; "[#{ pen.parameter_label p }]"
         when :req  ; "#{ pen.parameter_label p }"
         when :rest ; "[#{ pen.parameter_label p } [..]]"
