@@ -8,16 +8,16 @@ require 'optparse'
 
 module Skylab ; end
 
-module Skylab::BnfToTreetop
+module Skylab::Bnf2Treetop
   class << self
     def cli
       CliAgent.new
     end
   end
   class CliAgent
-    def initialize
-      @out = $stdout
-      @err = $stderr
+    def initialize sout=nil, serr=nil
+      @out = sout || $stdout
+      @err = serr || $stderr
     end
     def run argv
       if argv.size != 1 then return @err.puts(usage) end
@@ -27,22 +27,25 @@ module Skylab::BnfToTreetop
         return @err.puts(usage)
       end
       content = File.read(argv.first)
-      BnfToTreetop.new.run(content)
+      Bnf2Treetop.new(@out, @err).run(content)
     end
     def usage; "usage: #{program_name} <bnf_file>" end
-    def program_name; File.basename($PROGRAM_NAME) end
+    def program_name
+      (@program_name ||= nil) || File.basename($PROGRAM_NAME)
+    end
+    attr_writer :program_name
   end
   class Config < Hash
     def initialize h=nil
       h.nil? or replace(h)
     end
   end
-  class BnfToTreetop
-    def initialize
+  class Bnf2Treetop
+    def initialize out=nil, err=nil
       @tree = [:rules]
       @stack = [@tree]
-      @out = $stdout
-      @err = $stderr
+      @out = out || $stdout
+      @err = err || $stderr
       @expecting = []
       @config = Config.new(
         :rule_prefix        => nil,
@@ -302,4 +305,4 @@ module Skylab::BnfToTreetop
   end
 end
 
-Skylab::BnfToTreetop.cli.run(ARGV)
+$PROGRAM_NAME == __FILE__ and Skylab::Bnf2Treetop.cli.run(ARGV)
