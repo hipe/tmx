@@ -1,6 +1,4 @@
-#!/usr/bin/env ruby -w
-
-require_relative '../lib/skylab/headless/core'
+require_relative '../headless/core'
 
 requiet = ->(s) { _ = $VERBOSE ; $VERBOSE = nil ; require(s) ; $VERBOSE = _ }
 require 'optparse'
@@ -8,7 +6,7 @@ require 'pathname'
 require 'strscan'
 requiet['treetop']
 
-module Skylab::FlexToTreetop
+module Skylab::Flex2Treetop
 
   VERSION = '0.0.1'
   FIXTURES = {}
@@ -240,7 +238,7 @@ module Skylab::FlexToTreetop
       require 'fileutils'
       pwd = ::Pathname.new(::FileUtils.pwd)
       FIXTURES.each do |k, path|
-        _p = ::Skylab::FlexToTreetop.dir.join("../#{path}")
+        _p = ::Skylab::Flex2Treetop.dir.join("../#{path}")
         _p = _p.relative_path_from(pwd)
         emit(:info, "#{program_name} #{_p}")
       end
@@ -354,7 +352,7 @@ module Skylab::FlexToTreetop
   end
 end
 
-class Skylab::FlexToTreetop::Sexpesque < Array # class Sexpesque
+class Skylab::Flex2Treetop::Sexpesque < Array # class Sexpesque
   class << self
     def add_hook(whenn, &what)
       @hooks ||= Hash.new{ |h,k| h[k] = [] }
@@ -416,8 +414,8 @@ class Skylab::FlexToTreetop::Sexpesque < Array # class Sexpesque
   end
 end
 
-module Skylab::FlexToTreetop::CommonNodey
-  Sexpesque = ::Skylab::FlexToTreetop::Sexpesque
+module Skylab::Flex2Treetop::CommonNodey
+  Sexpesque = ::Skylab::Flex2Treetop::Sexpesque
   def at(str); ats(str).first end
   def ats path
     path = at_compile(path) if path.kind_of?(String)
@@ -426,7 +424,7 @@ module Skylab::FlexToTreetop::CommonNodey
     if path.size > 1 && cx.any?
       child_path = path[1..-1]
       cx = cx.map do |c|
-        c.extend(::Skylab::FlexToTreetop::CommonNodey) unless
+        c.extend(::Skylab::Flex2Treetop::CommonNodey) unless
           c.respond_to?(:ats)
         c.ats(child_path)
       end.flatten
@@ -486,9 +484,9 @@ module Skylab::FlexToTreetop::CommonNodey
       sexp_class.from_syntax_node(sexp_class.node_name, self)
     elsif ! elements.nil? && elements.index{ |n| n.respond_to?(:sexp) }
       cx = elements.map{ |n| n.respond_to?(:sexp) ? n.sexp : n.text_value }
-      ::Skylab::FlexToTreetop::AutoSexp.traditional(guess_node_name, *cx)
+      ::Skylab::Flex2Treetop::AutoSexp.traditional(guess_node_name, *cx)
     else
-      ::Skylab::FlexToTreetop::AutoSexp.traditional(guess_node_name, text_value)
+      ::Skylab::Flex2Treetop::AutoSexp.traditional(guess_node_name, text_value)
     end
   end
   def guess_node_name
@@ -504,7 +502,7 @@ module Skylab::FlexToTreetop::CommonNodey
   end
 end
 
-module Skylab::FlexToTreetop
+module Skylab::Flex2Treetop
   class CommonNode < ::Treetop::Runtime::SyntaxNode
     include CommonNodey
   end
@@ -517,7 +515,7 @@ module Skylab::FlexToTreetop
   end
 end
 
-module Skylab::FlexToTreetop
+module Skylab::Flex2Treetop
   module RuleWriter
   end
   class RuleWriter::Rule < Struct.new(
@@ -726,7 +724,7 @@ module Skylab::FlexToTreetop
   end
 end
 
-module Skylab::FlexToTreetop
+module Skylab::Flex2Treetop
   class ProgressiveOutputAdapter < ::Struct.new(:out)
     def <<(*a)
       out.write(*a)
@@ -755,7 +753,7 @@ module Skylab::FlexToTreetop
 end
 
 
-Skylab::FlexToTreetop::PARSER_EXTLIB = lambda do |_|
+Skylab::Flex2Treetop::PARSER_EXTLIB = lambda do |_|
   # CompiledParser#failure_reason overridden for less context
   def failure_reason
     return nil unless (tf = terminal_failures) && tf.size > 0
@@ -783,14 +781,14 @@ Skylab::FlexToTreetop::PARSER_EXTLIB = lambda do |_|
   end
 end
 
-Skylab::FlexToTreetop::TREETOP_GRAMMAR = <<'GRAMMAR'
+Skylab::Flex2Treetop::TREETOP_GRAMMAR = <<'GRAMMAR'
 # The 'pattern' rule below is a subset of the grammar grammar described at
 #   http://flex.sourceforge.net/manual/Patterns.html.
 #   Note that not all constructs are supported, only those necessary
 #   to parse the target flex input files for this project.
 
 module Skylab
-module FlexToTreetop
+module Flex2Treetop
 grammar FlexFile
   rule file
     definitions spacey* '%%' spacey* rules spacey*  <CommonNode>
@@ -960,5 +958,3 @@ end
 end
 end
 GRAMMAR
-
-__FILE__ == $PROGRAM_NAME and Skylab::FlexToTreetop::CLI.new.invoke(ARGV)
