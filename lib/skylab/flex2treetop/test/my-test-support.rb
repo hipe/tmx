@@ -1,27 +1,20 @@
-# we don't use the test-support from the rest of the sub-module because
-# we need to ensure that this library can function indepedantly of the
-# rest of it.  hence the "my-" to avoid confusion and highlight this.
-
-unless defined? ::Skylab::Flex2Treetop
-  load File.expand_path('../../../../../../bin/flex2treetop', __FILE__)
-end
-
-require_relative '../../..'
+require_relative '../core'
+require_relative '../..' # skylab
 require 'skylab/test-support/core'
 
-module Skylab::FlexToTreetop::MyTestSupport
-  FlexToTreetop = ::Skylab::FlexToTreetop
+module Skylab::Flex2Treetop::MyTestSupport
+  Flex2Treetop = ::Skylab::Flex2Treetop
   StreamSpy = ::Skylab::TestSupport::StreamSpy
 
-  FlexToTreetop.respond_to?(:dir) or begin # for now, futureproofing
-    def FlexToTreetop.dir
+  Flex2Treetop.respond_to?(:dir) or begin # for now, futureproofing
+    def Flex2Treetop.dir
       @dir ||= ::Skylab::ROOT.join('lib/skylab/css-convert')
     end
   end
   module Headless end
   module Headless::ModuleMethods
     def fixture name
-      ::Skylab::ROOT.join(FlexToTreetop::FIXTURES[name]).to_s
+      ::Skylab::ROOT.join(Flex2Treetop::FIXTURES[name]).to_s
     end
     _tmpdir_f = -> do
       t = ::Skylab::TestSupport::Tmpdir.new(::Skylab::ROOT.join('tmp/f2tt'))
@@ -74,7 +67,7 @@ module Skylab::FlexToTreetop::MyTestSupport
     end
     def cli_client
       @cli_client ||= begin
-        o = FlexToTreetop::CLI.new
+        o = Flex2Treetop::CLI.new
         o.send(:program_name=, 'xyzzy')
         o
       end
@@ -122,7 +115,7 @@ module Skylab::FlexToTreetop::MyTestSupport
     include Headless::InstanceMethods
     def api_client
       @api_client ||= begin
-        o = FlexToTreetop::API::Client.new
+        o = Flex2Treetop::API::Client.new
         o.request_runtime.io_adapter.info_stream = StreamSpy.standard
         o
       end
