@@ -1,13 +1,14 @@
+# encoding: UTF-8
+require 'skylab/face/core' # MyPathname
 module Skylab::CssConvert::TreetopTools
-  CssConvert = ::Skylab::CssConvert
-  MyPathname = CssConvert::MyPathname
-  class << self
-    def load_parser_class &b
-      ParserClassLoader.new(&b).load
-    end
-  end
-  class MyRuntimeError < ::RuntimeError
-  end
+  module Grammar end # the syntax not the software
+  Headless = ::Skylab::Headless # aesthetics
+  module My end  # for @api-private
+  module Parser end # the software not the syntax
+  My::Pathname = ::Skylab::Face::MyPathname # for bare()
+
+  class RuntimeError < ::RuntimeError ; end
+
   class Sexpesque < Array
     alias_method :node_name, :first
     class << self
@@ -24,159 +25,284 @@ module Skylab::CssConvert::TreetopTools
       ([sym] + syms).map { |x| fetch(1)[x] }
     end
   end
-  class ParserClassLoader < Struct.new(
-    :_enhance, :_generated_grammar_dir, :_grammars, :_overwrite, :_root_dir
-  )
-    include CssConvert::My::Headless::SubClient::InstanceMethods
-    def initialize &b
-      self._enhance = []
-      self._grammars = []
-      self._overwrite = false
-      yield self
-      @request_runtime or fail("be sure to set this")
-    end
-    def compiler
-      @compiler ||= ::Treetop::Compiler::GrammarCompiler.new
-    end
-    def enhance_parser_with mod
-      _enhance.push mod
-    end
-    def file_utils
-      require 'fileutils'
-      ::FileUtils
-    end
-    def force_overwrite!
-      self._overwrite = true
-    end
-    def grammar_module_name_in g
+
+  class Grammar::Reflection < Struct.new(:name, :inpath_f, :outdir_f)
+    def inpath ; inpathname.to_s end
+    def inpathname ; inpath_f.call end
+    def nested_const_names
+      lines = build_lines_enumerator or return false
       require 'strscan'
-      scn = nil
-      mods = []
-      gram = nil
-      File.open(g.inpath, 'r') do |fh|
-        while line = fh.gets
-          scn.nil? ? (scn = StringScanner.new(line)) : (scn.string = line)
-          scn.skip(/[ \t]*(#.*)?\n?/)
-          scn.eos? and next
-          if scn.scan(/module[ \t]+/)
-            mname = scn.scan(/[A-Z][a-zA-Z0-9_]+/) or fail("no: #{scn.rest}")
-            mods.push mname
-          elsif scn.scan(/grammar[ \t]+/)
-            gram = scn.scan(/[A-Z][a-zA-Z0-9_]+/) or fail("no: #{scn.rest}")
-            break
-          else
-            fail("no: #{scn.rest.inspect}")
-          end
-          scn.skip(/[ \t]*(#.*)?\n?/)
-          scn.eos? or fail("huh?: #{scn.rest.inspect}")
+      consts = [] ; scn = nil
+      lines.each do |line|
+        scn ? (scn.string = line) : (scn = ::StringScanner.new line)
+        scn.skip(/[ \t]*(#.*)?\n?/)
+        scn.eos? and next
+        if scn.scan(/module[ \t]+/)
+          consts << (scn.scan(/[A-Z][a-zA-Z0-9_]+/) or fail("no: #{scn.rest}"))
+        elsif scn.scan(/grammar[ \t]+/)
+          consts << (scn.scan(/[A-Z][a-zA-Z0-9_]+/) or fail("no: #{scn.rest}"))
+          break
+        else
+          fail("grammar grammar hack failed: #{scn.rest.inspect}")
         end
+        scn.skip(/[ \t]*(#.*)?\n?/)
+        scn.eos? or fail("grammar grammar hack failed: #{scn.rest.inspect}")
       end
-      mods.push(gram)
+      consts
     end
-    def generated_grammar_dir dir
-      dir or fail("expecting dir had #{dir.inspect}")
-      self._generated_grammar_dir = MyPathname.new(dir)
+    def outpath ; outpathname.to_s end
+    def outpathname
+      outdir_f.call.join("#{name}.rb")
     end
-    def load
-      _outdir.directory? or return fail("must exist and be directory: #{_outdir.pretty}")
-      load_or_generate_grammar_files
-      kk = grammar_module_name_in _grammars.last
-      kk[kk.length - 1] = "#{kk.last}Parser"
-      k = kk.reduce(::Object) { |m, c| m.const_get(c) }
-      _enhance.each { |m| k = subclass(k, m) }
-      k
+  protected
+    def build_lines_enumerator
+      ::Enumerator.new do |y|
+        fh = inpath_f.call.open('r') ; s = nil
+        y << s while s = fh.gets
+        fh.close
+      end
     end
+  end
+
+  # --*-- @abstraction-candidate: this (in some form) will probably go up
+  module DSL end
+  module DSL::IO end
+  module DSL::Client end
+  class DSL::IO::Joystick
+    # A Joystick is the interface (and only the interface) to a DSL.
+    # A user client that wants to create a DSL could subclass Joystick
+    # and use the parameter definer (ahem) DSL to define the (er) DSL with.
+    # Joystick records the client request in the `params` member.
+
+    extend Headless::Parameter::Definer::ModuleMethods
+    include Headless::Parameter::Definer::InstanceMethods::DelegateToParamsIvar
+  protected
+    def initialize ; @params = self.class.build_params end
+    def self.build_params ; params_class.new end
+    def self.build_params_class
+      ::Class.new( ::Struct.new(* parameters.all.map(&:name))).class_eval do
+        include Headless::Parameter::Definer::InstanceMethods::StructAdapter
+        public :known?
+        self
+      end
+    end
+    def self.params_class
+      const_defined?(:Params) or const_set(:Params, build_params_class)
+      self::Params
+    end
+  end
+
+  # other members: joystick, params, errors_count
+  class DSL::Client::Minimal < ::Struct.new(:dsl_f, :events_f)
+    # You, the DSL Client, are the one that runs the client (user)'s
+    # block around your joystick instance, runs the validation etc,
+    # emits any errors, does any normalization, and then comes out at the
+    # other end with a `params` structure that holds the client's
+    # (semi valid) request
+
+    include Headless::Parameter::Controller::InstanceMethods
+    # results in false on validation failure, params struct on success
+    def invoke
+      self.joystick ||= build_joystick
+      dsl_f.call joystick
+      params = set!(nil, joystick.instance_variable_get('@params'))
+      params
+    end
+  protected
+    def absorb! struct
+      struct.members.each do |name|
+        instance_variable_set("@#{name}", struct[name])
+      end
+      true
+    end
+    def build_emitter
+      e = Headless::Parameter::Definer.new do
+        param :on_error, hook: true, writer: true
+        param :on_info,  hook: true, writer: true
+      end.new(& events_f)
+      e.on_error ||= ->(msg) { fail("Couldn't #{verb} #{noun} -- #{msg}") }
+      e.on_info  ||= ->(msg) { $stderr.puts("(⌒▽⌒)☆  #{msg}  ლ(́◉◞౪◟◉‵ლ)") }
+      e
+    end
+    def build_joystick ; joystick_class.new end
+    def emitter ; @emitter ||= build_emitter end
+    def error msg
+      self.errors_count += 1
+      emit(:error, msg)
+      false
+    end
+    def errors_count ; @errors_count ||= 0 end
+    attr_writer :errors_count
+    def emit type, data
+      emitter.send("on_#{type}").call data
+    end
+    def finish!
+      @params ||= joystick.instance_variable_get('@params')
+      true
+    end
+    def formal_parameters ; joystick_class.parameters end
+    attr_accessor :joystick
+    def joystick_class ; self.class::DSL end
+    def noun ; 'grammar' end
+    attr_reader :params
+    def pen ; Headless::IO::Pen::MINIMAL end
+    def verb ; 'load' end
+  end
+  # --*--
+
+  class My::Parameter < Headless::Parameter::Definition
+    param :dir, boolean: true
+    param :exist, enum: [:must], accessor: true
+    def pathname= _
+      super(_)
+      :dir == _ and dir!
+    end
+  end
+
+  class Parser::Load < DSL::Client::Minimal
+    class DSL < DSL::IO::Joystick
+      def self.parameter_definition_class ; My::Parameter end
+      def self.pathname_class ; My::Pathname end
+      param :enhance_parser_with, dsl: :list
+      param :force_overwrite, boolean: true
+      param :generated_grammar_dir, dsl: :value, required: true,
+        pathname: :dir, exist: :must
+      param :root_for_relative_paths, dsl: :value, pathname: :dir
+      param :treetop_grammar, dsl: :list, required: true,
+        pathname: true, exist: :must
+    end
+
+    include Headless::Parameter::Definer::InstanceMethods::IvarsAdapter
+    include Headless::Parameter::Bound::InstanceMethods
+    attr_reader(* DSL.parameters.all.map(&:name))
+
+    def invoke
+      (params = super and absorb!(params)) or return
+      # we want to hold on to the string representation of the path exactly
+      # as the user provided it before we normalize it
+      @grammars = treetop_grammar.each_with_index.map do |pn, i|
+        Grammar::Reflection.new(pn.to_s, ->{ treetop_grammar[i] },
+                                -> { generated_grammar_dir })
+      end
+      normalize_paths_to(:root_for_relative_paths) or return
+      load_or_generate_grammar_files or return
+      (kk = grammars.last.nested_const_names) or return
+      (kk[kk.length - 1] = "#{kk.last}Parser") &&
+      (klass = kk.reduce(::Object) { |m, c| m.const_get(c) }) or return
+      a = enhance_parser_with and a.each { |mod| klass = subclass(klass, mod) }
+      klass
+    end
+  protected
+    def compiler ; @compiler ||= ::Treetop::Compiler::GrammarCompiler.new end
+
+    def file_utils ; require 'fileutils' ; ::FileUtils end
+
+    attr_reader :grammars
+
+    STACK_RE = %r{\A(?<file>[^:]+):(?<line>\d+)(?::in `(?<method>[^']+)')?\z/}
     def load_or_generate_grammar_files
-      summarize _grammars
-      _grammars.each do |g|
-        defined?(::Treetop) or require_treetop
-        (_overwrite || ! g.outpath.exist?) and recompile(g)
+      summarize grammars
+      grammars.each do |g|
+        defined?(::Treetop) or requiet('treetop')
+        if force_overwrite or ! g.outpathname.exist?
+          recompile(g) or return
+        end
         begin
-          require g.outpath.bare
+          require g.outpathname.bare
         rescue ::NameError => e
-          raise MyRuntimeError.new( [e.message,
-          ( (m = parse_stack_item(e.backtrace.first)) ?
-            "in #{File.basename(m[:file])}:#{m[:line]}" :
-            "(#{e.backtrace.first})"
-          ) ].join(' ') )
+          _context = (md = STACK_RE.match e.backtrace[0]) ?
+            "in #{ File.basename(md[:file]) }:#{ md[:line] }" :
+            "(#{ e.backtrace[0] })"
+          raise RuntimeError.new( [e.message, _context].join(' ') )
         end
       end
-      nil
+      true
     end
-    def require_treetop
-      v = $VERBOSE ; $VERBOSE = nil ; require('treetop') ; $VERBOSE = v
+    def mkdir_safe g
+      # don't make any new directories deeper than the amt of dirs in grammar
+      parent = g.outpath.dirname
+      g.name.scan(%r</>).size.times{ parent = parent.dirname }
+      if parent.directory?
+        file_utils.mkdir_p(g.outpath.dirname.to_s, verbose: true)
+        true
+      else
+        error("directory must exist: #{parent.pretty}")
+        false
+      end
+    end
+    def normalize_paths_to param_name
+      root = nil
+      errors_count_before = errors_count
+      arr = bound_parameters.where(exist: :must).to_a # drop 15 items off..
+      arr.each do |p|                                 # of exceptions below
+        p.value or next # not required but must exist if provided
+        tries = nil
+        if ! p.value.absolute? && ! p.value.exist?
+          root ||= begin
+            root = bound_parameters[param_name]
+            ! root.value and return error("#{root.name} must be set in " <<
+              "order to support a relative path like #{p.label}!")
+            ! root.value.absolute? and return error("#{root.name} must " <<
+              "be an absolute path in order to expand paths like #{p.label}")
+            p.name == root.name and next # should be covered by above but j.i.c:
+            root
+          end
+          (tries ||= []).push p.value
+          p.value = root.value.join(p.value) # OH MY GOD SO SEXY and evil
+        end
+        if ! p.value.exist?
+          (tries ||= []).push p.value
+          _context = (tries.length == 2) ? ": #{ tries[0].pretty }" :
+            ", looked in  #{ tries.map(&:pretty).join(', ') }"
+          error("#{ p.label } not found#{ _context }")
+        elsif p.parameter.dir? and ! p.value.directory?
+          error("#{ p.label } is not a directory: #{p.value}")
+        end
+      end
+      errors_count == errors_count_before
+    end
+    def recompile g
+      g.outpathname.dirname.directory? or mkdir_safe(g) or return
+      begin
+        compiler.compile(g.inpath, g.outpath)
+        true
+      rescue ::RuntimeError => e
+        raise RuntimeError.new("when compiling #{g.name}:\n#{e.message}")
+      end
+    end
+    def requiet lib
+      v = $VERBOSE ; $VERBOSE = nil ; require(lib) ; $VERBOSE = v
+      true
     end
     def subclass cls, mod
-      newcls = Class.new(cls)
+      newcls = ::Class.new(cls)
       cls_modname, cls_basename =
         cls.to_s.match(/\A(?:(.*[^:])::)?([^:]+)\Z/).captures
       newcls.class_eval do
         include mod
-        mod.override.each{ |meth| alias_method meth, "my_#{meth}" }
+        mod.override.each { |meth| alias_method meth, "my_#{meth}" }
       end
-      parent_mod = (cls_modname.nil?) ? Object :
-        cls_modname.split('::').inject(Object){ |m,n| m.const_get(n) }
+      parent_mod = (cls_modname.nil?) ? ::Object :
+        cls_modname.split('::').inject(::Object){ |m,n| m.const_get(n) }
       nonum, num = cls_basename.match(/\A(.*[^0-9])([0-9]+)?\Z/).captures
       i = num ? (num.to_i + 1) : 2
       i += 1 while(parent_mod.const_defined?(usename = "#{nonum}#{i}"))
       newconst = parent_mod.const_set(usename, newcls)
       newconst
     end
-    def mkdir_safe g
-      # don't make any new directories deeper than the amt of dirs in grammar
-      parent = g.outpath.dirname
-      g.name.scan(%r{/}).size.times{ parent = parent.dirname }
-      parent.directory? or return fail("directory must exist: #{parent.pretty}")
-      file_utils.mkdir_p(g.outpath.dirname.to_s, verbose: true)
-      true
-    end
-    def _outdir
-      @_outdir ||= _root_dir.join((_generated_grammar_dir or fail('no')).to_s)
-    end
-    def parse_stack_item str
-      if md = /\A([^:]+):(\d+)(?::in `([^']+)')?\Z/.match(str)
-        {:file => md[1], :line => md[2], :method => md[3] }
-      end
-    end
-    def recompile g
-      g.outpath.dirname.directory? or mkdir_safe(g) or return
-      begin
-        compiler.compile(g.inpath.to_s, g.outpath.to_s)
-      rescue ::RuntimeError => e
-        raise MyRuntimeError.new("when compiling #{g.name}:\n#{e.message}")
-      end
-    end
-    def root_dir dir
-      self._root_dir = MyPathname.new(dir.to_s)
-    end
     def summarize gx
       ex = []; cx = []
-      gx.each { |g| ( g.outpath.exist? ? ex : cx ).push g.name }
-      ex.empty? or  emit(:info, "#{_overwrite ? 'overwrit' : 'us'}ing: #{ex.join(', ')}")
-      cx.empty? or  emit(:info, "creating: #{cx.join(', ')}")
+      gx.each { |g| ( g.outpathname.exist? ? ex : cx ).push g.name }
+      ex.empty? or
+        emit(:info,
+                  "#{force_overwrite ? 'overwrit' : 'us'}ing: #{ex.join(', ')}")
+      cx.empty? or emit(:info, "creating: #{cx.join(', ')}")
       gx.empty? and emit(:info, "none.")
-      nil
-    end
-    def treetop_grammar path
-      found = pathname = tries = nil
-      search = [ -> { String === path ? MyPathname.new(path) : path },
-                 -> { pathname.absolute? ? nil : MyPathname.new(CssConvert.dir.join(pathname).to_s) } ]
-      until found or search.empty? or ! (pathname = search.shift.call)
-        if pathname.exist? then found = true else (tries ||= []).push(pathname) end
-      end
-      if found
-        _grammars.push  GrammarMeta.new(path, pathname, ->{ _outdir })
-      else
-        fail("treetop grammar not found: (#{tries.map(&:pretty).join(', ')})")
-      end
+      true
     end
   end
-  class GrammarMeta < Struct.new(:name, :inpath, :outdir)
-    def outpath
-      outdir.call.join("#{name}.rb")
-    end
-  end
-  module ParserExtlib
+  module Parser::Extlib end
+  module Parser::Extlib::InstanceMethods
 
     def self.override; [:failure_reason] end
 
@@ -190,7 +316,7 @@ module Skylab::CssConvert::TreetopTools
         "(byte #{failure_index+1}) #{my_input_excerpt}"
     end
 
-    def num_context_lines; 4 end
+    def num_context_lines ; 4 end
 
     def my_input_excerpt
       0 == failure_index and return "at:\n1: #{input.match(/.*/)[0]}"

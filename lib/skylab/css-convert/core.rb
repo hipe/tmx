@@ -21,6 +21,7 @@ module Skylab::CssConvert
 
   class My::Headless::Params < ::Hash
     extend Headless::Parameter::Definer::ModuleMethods
+    include Headless::Parameter::Definer::InstanceMethods::HashAdapter
     param :directives_file, pathname: true do
       desc 'A file with directives in it.' # (not used yet)
     end
@@ -36,6 +37,7 @@ module Skylab::CssConvert
       emit(:payload, "#{program_name} #{CssConvert::VERSION}") or true
     end
   protected
+    def formal_parameters ; params_class.parameters end
     def params_class ; My::Headless::Params end
   end
 
@@ -46,10 +48,10 @@ module Skylab::CssConvert
   class CLI::Client < My::Headless::Client
     include Headless::CLI::InstanceMethods
     def convert directives_file=nil
-      parameters.set! && (i = resolve_instream) &&
+      parameter_controller.set! && (i = resolve_instream) &&
       (d = CssConvert::Directive::Parser.new(request_runtime).parse_stream i) &&
       dump_directives(d) &&
-      CssConvert::Directive::Runner.new(request_runtime).run(d) &&
+      CssConvert::Directive::Runner.new(request_runtime).invoke(d) &&
       exit_status_for(:ok) or exit_status_for(:error)
     end
   protected
@@ -99,10 +101,6 @@ module Skylab::CssConvert
     def io_adapter_class ; CLI::IO::Adapter end
     alias_method :p, :params
     def pen_class ; CLI::IO::Pen end
-    def trace m
-      $stderr.puts "trace: #{m}"
-    end
-    alias_method :t, :trace
   end
   require 'skylab/pub-sub/core'
   module CLI::IO end

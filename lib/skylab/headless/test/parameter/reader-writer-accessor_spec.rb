@@ -10,8 +10,9 @@ describe 'If you have an object "object" that has a ' <<
     end
     frame do
       it '"object.foo" is a reader, but you don\'t get "object.foo = x"' do
-        object.foo_readonly.should be_nil
+        object.send(:known?, :foo_readonly).should eql(false)
         object.send(:[]=, :foo_readonly, :biz)
+        object.send(:known?, :foo_readonly).should eql(true)
         object.foo_readonly.should eql(:biz)
         -> { object.foo = :baz }.should raise_error(::NoMethodError)
       end
@@ -23,8 +24,9 @@ describe 'If you have an object "object" that has a ' <<
     end
     frame do
       it '"object.foo= x" is a writer but you don\'t get "object.foo"' do
-        object.send(:[], :foo_writeonly).should be_nil
+        object.send(:known?, :foo_writeonly).should eql(false)
         object.foo_writeonly = :blue
+        object.send(:known?, :foo_writeonly).should eql(true)
         object.send(:[], :foo_writeonly).should eql(:blue)
         -> { object.foo_writeonly }.should raise_error(::NoMethodError)
       end
@@ -36,9 +38,10 @@ describe 'If you have an object "object" that has a ' <<
     end
     frame do
       it '"object.foo" is a reader and "object.foo = x" is a writer' <<
-        '(you get both)' do
-        object.foo_accessor.should be_nil
+          '(you get both)' do
+        object.send(:known?, :foo_accessor).should eql(false)
         object.foo_accessor = :blue
+        object.send(:known?, :foo_accessor).should eql(true)
         object.foo_accessor.should eql(:blue)
       end
     end

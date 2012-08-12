@@ -47,6 +47,7 @@ module Skylab::FlexToTreetop
   module CLI::Actions::Translate end
   class CLI::Actions::Translate::Parameters < ::Hash
     extend Headless::Parameter::Definer::ModuleMethods
+    include Headless::Parameter::Definer::InstanceMethods::HashAdapter
     param :case_insensitive, boolean: :case_sensitive, default: true, writer: 1
     param :clear_generated_files, boolean: :dont_clear_generated_files
     param :filesystem_parser_enabled, boolean: true
@@ -94,8 +95,8 @@ module Skylab::FlexToTreetop
 
   class API::Client < My::Headless::Client
     include Headless::API::InstanceMethods
-    def translate request
-      parameters.set!(request) or return
+    def translate request=nil
+      parameter_controller.set!(request) or return
       resolve_io or return params.result_state
       begin
         params.result_state = Translation.new(request_runtime).invoke
@@ -150,7 +151,7 @@ module Skylab::FlexToTreetop
 
   module API::IO end
   class API::IO::Pen
-    def em s ; "\"#{s}\"" end
+    include Headless::API::IO::Pen::InstanceMethods
   end
   class API::IO::Adapter < ::Struct.new(
     :payloads, :errors, :info_stream, :instream, :outstream, :pen

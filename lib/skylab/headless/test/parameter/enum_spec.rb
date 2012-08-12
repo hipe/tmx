@@ -23,7 +23,7 @@ describe 'If you have an object "object" with a ' <<
       end
       frame do
         it '"object.foo = :beta" (a valid value) changes the parameter value' do
-          object.send(:[], :color).should be_nil
+          object.send(:known?, :color).should eql(false)
           object.color = :blue
           object.send(:[], :color).should eql(:blue)
         end

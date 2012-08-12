@@ -15,14 +15,32 @@ module Skylab::CssConvert
         @state = :pathname
       end
       if :pathname == state
-        upstream.exist? or
-          return error("#{entity} not found: #{upstream.pretty}")
-        upstream.directory? and
-          return error("expecing #{entity}, had directory: #{upstream.pretty}")
+        upstream.exist? or return file_not_found
+        upstream.directory? and file_id_dir
         self.upstream = upstream.open('r')
         self.state = :open
       end
       super
+    end
+  protected
+    EVENTS = Headless::Parameter::Definer.new do
+      param :on_file_is_dir,    hook: true, writer: true
+      param :on_file_not_found, hook: true, writer: true
+    end
+    def events
+      @events ||= EVENTS.new(&block)
+    end
+    def file_is_dir
+      (events.on_file_is_dir || ->(pathname, entity) do
+        error("expecting #{entity}, had directory: #{upstream.pretty}")
+      end).call(upstream, entity)
+      nil
+    end
+    def file_not_found
+      (events.on_file_not_found || ->(pathname, entity) do
+        error("#{entity} not found: #{pathname.pretty}")
+      end).call(upstream, entity)
+      nil
     end
   end
 end

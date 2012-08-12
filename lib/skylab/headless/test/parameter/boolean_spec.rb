@@ -9,8 +9,8 @@ describe "If you have an object \"object\" that has a " <<
     end
     frame do
       it '"object.foo?" is a reader of the (presumably boolean) value ' <<
-        '(note it returns nil out of the box)' do
-        object.finished?.should be_nil
+        '(note it used to return nil out of the box, now false)' do
+        object.finished?.should eql(false)
       end
       it '"object.foo!" is a DSL-y writer that sets the parameter ' <<
         'value of "foo" to true' do

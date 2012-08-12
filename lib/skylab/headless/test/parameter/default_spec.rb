@@ -25,7 +25,7 @@ describe 'If you have an object "object" that has a ' <<
       end
       frame do
         it '"foo.has_default?" is false-ish' do
-          foo.has_default?.should eql(nil)
+          foo.has_default?.should eql(false)
         end
         it '"foo.default_value" raises a NoMethodError' do
           -> { foo.default_value }.should raise_error(::NoMethodError)

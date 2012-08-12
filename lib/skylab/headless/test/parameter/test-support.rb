@@ -13,7 +13,7 @@ module Skylab::Headless
     def defn &b
       @klass = ::Class.new.class_exec do
         extend Parameter::Definer::ModuleMethods
-        include Parameter::Definer::InstanceMethods
+        include Parameter::Definer::InstanceMethods::IvarsAdapter
         class_exec(&b)
       protected
         def error msg ; @_outstream.puts msg end

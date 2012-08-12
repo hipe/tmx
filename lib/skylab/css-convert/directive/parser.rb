@@ -7,17 +7,16 @@ module Skylab::CssConvert
   class Directive::Parser
     include CssConvert::Parser::InstanceMethods
     ENTITY_NOUN_STEM = 'directives file'
-    def parser_class
-      @parser_class ||= begin
-        CssConvert::TreetopTools.load_parser_class do |o|
-          o.request_runtime = request_runtime
-          o.root_dir CssConvert.dir
-          o.generated_grammar_dir params.tmpdir_relative
-          o.treetop_grammar 'directive/parser/common.treetop'
-          o.treetop_grammar 'directive/parser/directive.treetop'
-          o.force_overwrite! if params.force_overwrite?
-          o.enhance_parser_with CssConvert::TreetopTools::ParserExtlib
-        end
+  protected
+    def load_parser_class
+      super do |o|
+        o.enhance_parser_with(
+          CssConvert::TreetopTools::Parser::Extlib::InstanceMethods )
+        o.force_overwrite! if params.force_overwrite?
+        o.generated_grammar_dir "#{params.tmpdir_relative}"
+        o.root_for_relative_paths CssConvert.dir
+        o.treetop_grammar 'directive/parser/common.treetop'
+        o.treetop_grammar 'directive/parser/directive.treetop'
       end
     end
   end

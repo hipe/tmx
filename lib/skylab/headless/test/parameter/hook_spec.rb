@@ -10,7 +10,7 @@ describe 'If you have an object "object" that has a ' <<
     end
     frame do
       it '"object.foo" is a reader (whose result is nil by default)' do
-        object.on_error.should be_nil
+        object.send(:known?, :on_error).should eql(false)
       end
       it '"object.foo { .... }" is a writer that sets the parameter ' <<
            'value to that proc (the proc, not the proc\'s result' do

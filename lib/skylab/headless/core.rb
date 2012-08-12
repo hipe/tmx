@@ -40,14 +40,30 @@ module Skylab::Headless
       end
     end
   end
-  module Parameter::Definer::InstanceMethods
-    # these are typically for if you are not a Struct or Hash
-  protected
+  module Parameter::Definer::InstanceMethods end
+  module Parameter::Definer::InstanceMethods::HashAdapter
+    protected
+    def known?(k) ; key?(k) end
+  end
+  module Parameter::Definer::InstanceMethods::StructAdapter
+    protected
+    def known?(k) ; ! self[k].nil? end # caution meet wind
+  end
+  module Parameter::Definer::InstanceMethods::IvarsAdapter
+    protected
     def [](k)
+      instance_variable_defined?("@#{k}") or
+        fail('where are you getting w/o checking')
       instance_variable_get("@#{k}")
     end
-    def []=(k, v) ; instance_variable_set("@#{k}", v) end
-    def key?(k) ; instance_variable_defined?("@#{k}") end
+    def []=(k, v)   ; instance_variable_set("@#{k}", v)   end
+    def known?(k)   ; instance_variable_defined?("@#{k}") end
+  end
+  module Parameter::Definer::InstanceMethods::DelegateToParamsIvar
+    protected
+    def []  (k)     ; @params[k]        end
+    def []= (k, v)  ; @params[k] = v    end
+    def known?(k)   ; @params.known?(k) end
   end
   class Parameter::Definer::Dynamic < ::Hash
     extend Parameter::Definer::ModuleMethods
@@ -119,28 +135,23 @@ module Skylab::Headless
     # (class or module), but in theory any existing parameter definition
     # should be able to be deep-copy applied over to to another host, or for
     # example a child class of a parent class that has parameter definitions.
-    # It is then useful (maybe?) to keep this surface representation of a
-    # parameter definition as a hash as an aid in future such reflection
-    # and re-application (but this may change!)
 
     Parameter::DEFAULT_DEFINITION_CLASS = self # when the host module doesn't
                             # specify explicitly a parameter_definition_class
 
-    unless ancestors.include?(::Hash) # dev only
-    include Parameter::Definer::InstanceMethods # let [] and []= access ivars
+    # -- * -- stuff you need because you're not a hash
+    include Parameter::Definer::InstanceMethods::IvarsAdapter
     def each &y
       @property_keys.each { |k| y.call(k, self[k]) }
     end
-    end
-
-    def label ; name.to_s.gsub('_', '-') end # temporary
+    # -- * --
 
     def merge! mixed, &b # might be a Hash, might be a self-class, can be nil ..
       # ..if is parameter with no properties. also it might be an override
       mixed and mixed.each do |k, v| # is nil with a param with no hash def
-        if key? k
+        if known? k
           self[k] == v and next # do not reprocess sameval properties
-        elsif @property_keys # probably temporary while we derk with non-hashes
+        else
           @property_keys.push k
         end
         self[k] = v # do this here to kiss. inheritable property, always
@@ -158,7 +169,7 @@ module Skylab::Headless
     # need the same variables to be in scope that it is tighter to define
     # them all here in this way.  Also it looks really really weird.
     def initialize host, name
-      @property_keys = [] unless kind_of?(::Hash) # derking with being not hash
+      @property_keys = []
       class << self
         define_method_f = ->(meth, &b) { define_method(meth, &b) }
         define_method(:def!) { |meth, &b| define_method_f.call(meth, &b) }
@@ -183,11 +194,14 @@ module Skylab::Headless
         true == no and no = "not_#{name}"
         host_def("#{name}!") { self[name] = true }
         host_def("#{no}!")   { self[name] = false }
-        host_def("#{name}?") { self[name] }
-        host_def("#{no}?") { ! self[name] }
+        host_def("#{name}?") { known?(name) and self[name] }
+        host_def("#{no}?") { ! known?(name) || ! self[name] }
       end
       def! :builder= do |builder_f_method_name|
-        host_def(name) { self[name] ||= send(builder_f_method_name).call }
+        host_def(name) do
+          known?(name) or self[name] = send(builder_f_method_name).call
+          self[name]
+        end
       end
       param = self
       def! :dsl= do |flags| # ( :list | :value ) [ :reader ]
@@ -197,10 +211,13 @@ module Skylab::Headless
         case list_or_value
         when :list
           list!
-          filter_upstream_last! { |val, _| (self[name] ||= []).push val }
+          filter_upstream_last! do |val, _|
+            known?(name) && self[name] or self[name] = []
+            self[name].push val
+          end
           host_def(name, & (if reader then
             ->(*a) do
-              if a.empty? then key?(name) ? self[name] : nil
+              if a.empty? then known?(name) ? self[name] : nil
               else a.each { |val| upstream_f.call(self, val) } end
             end
           else
@@ -278,7 +295,8 @@ module Skylab::Headless
 
   class Parameter::Bound::Enumerator < ::Enumerator
     extend Parameter::Definer::ModuleMethods
-    include Parameter::Definer::InstanceMethods
+    include Parameter::Definer::InstanceMethods::IvarsAdapter
+    def self.[](param) ; Parameter::Bound::Enumerator::Proxy.new(param) end
     def initialize host_instance
       super() { |y| init ; visit(y) }
       @mixed = host_instance
@@ -301,8 +319,12 @@ module Skylab::Headless
       init
       bound set_f.call.fetch(parameter_name)
     end
-    def where props=nil, &select_f
-      props and props_f = ->(p) { ! props.detect { |k, v| p.send(k) != v } }
+    def where props_h=nil, &select_f
+      props_h and props_f = ->(prop) do
+        ! props_h.detect do |k, v|
+          ! prop.known?(k) || prop[k] != v
+        end
+      end
       _filter_f =
       case [(:props if props_f), (:select if select_f)].compact
       when [:props, :select] ; ->(p) { props_f.call(p) && select_f.call(p) }
@@ -318,6 +340,7 @@ module Skylab::Headless
     end
   protected
     meta_param :inherit, boolean: true, writer: true
+    param :known_f, accessor: true, inherit: true
     param :label_f, accessor: true, inherit: true
     param :params_f, accessor: true, inherit: true
     param :read_f, accessor: true, inherit: true
@@ -334,7 +357,8 @@ module Skylab::Headless
       end
     end
     def bound parameter
-      Parameter::Bound.new(parameter, ->{ read_f.call(parameter) },
+      Parameter::Bound.new(parameter,
+        ->{ read_f.call(parameter) if known_f.call(parameter) },
         ->(val) { write_f.call(parameter, val) }, label_f)
     end
     def dupe changes
@@ -349,6 +373,7 @@ module Skylab::Headless
       host_instance.instance_exec do
         f[:set_f] = ->{ formal_parameters }
         f[:params_f] = -> { formal_parameters.all }
+        f[:known_f] = ->(param) { known? param.name }
         f[:label_f] = ->(param, i=nil) { pen.parameter_label(param, i) }
         f[:read_f] = ->(param) do
           m = method(param.name) # catch these errors here, they are sneaky
@@ -408,15 +433,29 @@ module Skylab::Headless
   module Parameter::Controller end
   module Parameter::Controller::InstanceMethods
     # and_ em error errors_count formal_parameters params s
+    def set! request=nil, params_arg=nil
+      errors_count_before = errors_count
+      prune_bad_keys(request = request ? request.dup : {})
+      defaults request
+      use_params = params_arg || params
+      request.each do |name, value|
+        if use_params.respond_to?(writer = "#{name}=")
+          use_params.send(writer, value) # not atomic with above as es muss sein
+        else
+          error("not writable: #{name}")
+        end
+      end
+      missing_required use_params
+      errors_count_before == errors_count ? use_params : false
+    end
+  protected
     def defaults request
       fp = formal_parameters
-      pks = request.keys ; dks = fp.list.select(&:has_default?).map(&:name)
-      request.merge!  Hash[ (dks - pks).map { |k| [k, fp[k].default_value] } ]
+      rks = request.keys ; dks = fp.all.select(&:has_default?).map(&:name)
+      request.merge!  Hash[ (dks - rks).map { |k| [k, fp[k].default_value] } ]
       nil
     end
-    def errors_count ; request_runtime.errors_count end
-    def formal_parameters ; params.class.parameters end # !
-    def missing_required
+    def missing_required params
       a = formal_parameters.list.select(&:required?).reduce([]) do |m, p|
         m << p if params[p.name].nil? ; m
       end.map { |o| em o.label }
@@ -437,20 +476,6 @@ module Skylab::Headless
       notpar and error("#{and_ notpar} #{s :is} not #{s :a}parameter#{s}")
       intern and error("#{and_ intern} #{s :is} #{s :an}internal parameter#{s}")
     end
-    def set! request=nil
-      errors_count_before = errors_count
-      prune_bad_keys(request = request ? request.dup : {})
-      defaults request
-      request.each do |k, v|
-        if ! params.respond_to?(meth = "#{k}=")
-          error("not writable: #{k}")
-        else
-          params.send(meth, v) # not atomic w/ all of above as es muss sein
-        end
-      end
-      missing_required
-      errors_count_before == errors_count
-    end
   end
 
   module Request end
@@ -460,6 +485,7 @@ module Skylab::Headless
     :io_adapter,   :params,   :parameter_controller
   )
     extend Parameter::Definer::ModuleMethods
+    include Parameter::Definer::InstanceMethods::StructAdapter
     def errors_count ; io_adapter.errors_count end # *very* experimental here
     param :io_adapter,           builder: :io_adapter_f
     param :params,               builder: :params_f
@@ -498,12 +524,13 @@ module Skylab::Headless
     include Parameter::Controller::InstanceMethods
     include SubClient::InstanceMethods
     def errors_count ; request_runtime.errors_count end # here
+    def formal_parameters ; params.class.parameters end
   end
 
   module Client end
   module Client::InstanceMethods
     include SubClient::InstanceMethods
-    def build_parameter_controller
+    def build_parameter_controller # can be broken down further if desired
       Parameter::Controller::Minimal.new(request_runtime)
     end
     def build_params
@@ -520,7 +547,9 @@ module Skylab::Headless
       a << m if IGNORE_THIS_CONSTANT !~ m.to_s until ::Object == (m = _a.shift)
       a.map { |_m| _m.public_instance_methods false }.flatten
     end
-    def parameters ; request_runtime.parameter_controller end # *very* experimental!
+    def parameter_controller
+      @parameter_controller ||= build_parameter_controller
+    end
     def request_runtime ; @request_runtime ||= build_request_runtime end
     def request_runtime_class ; Request::Runtime::Minimal end
   end
@@ -765,6 +794,7 @@ module Skylab::Headless
       end
       concat formal_method_parameters
     end
+    def [](*a) ; super._dupe!(self) end
     def parse_argv argv, &events
       hooks = Parameter::Definer.new do
         param :on_missing, hook: true
@@ -801,6 +831,11 @@ module Skylab::Headless
         when :rest ; "[#{ pen.parameter_label p } [..]]"
         end
       end.join(' ')
+    end
+  # -- * --
+    def _dupe! other
+      @pen = other.pen
+      self
     end
   protected
     attr_reader :pen

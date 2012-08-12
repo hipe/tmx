@@ -13,7 +13,7 @@ describe 'If you have an object "object" that has a ' <<
         ->{ object.comment }.should raise_error(::ArgumentError, /0 for 1/)
       end
       it '"object.foo \'x\'" is a writer that sets the internal value' do
-        object.send(:[], :comment).should eql(nil)
+        object.send(:known?, :comment).should eql(false)
         object.comment 'x'
         object.send(:[], :comment).should eql('x')
       end
@@ -38,16 +38,16 @@ describe 'If you have an object "object" that has a ' <<
     end
     frame do
       it '"object.foo" should not be a reader because it is a writer ' <<
-        '(keep it orthoganal and "simple")' do
+          '(keep it orthoganal and "simple")' do
         -> { object.topping }.should raise_error( ::ArgumentError,
           /wrong number of arguments \(0 for 1\)/ )
       end
       it '(access "foo" internally to see that it starts out as nil ' <<
-        'and not an array)' do
-        object.send(:[], :topping).should be_nil
+          'and not an array)' do
+        object.send(:known?, :topping).should eql(false)
       end
       it '"object.foo "x" adds "x" to the foo list and so on ' <<
-        'in the "overloaded (reader)/writer" way (hence dsl)' do
+          'in the "overloaded (reader)/writer" way (hence dsl)' do
         object.topping :sprinkles
         object.instance_variable_get('@topping').should eql([:sprinkles])
         object.topping :sparkles
@@ -66,8 +66,8 @@ describe 'If you have an object "object" that has a ' <<
         out.first.should match(/left.+invalid.+move/)
       end
       it '"object.foo <valid> ; object.foo <invalid>" now works as ' <<
-        'expected, as a map-reduce' do
-        object.send(:[], :move).should eql(nil)
+          'expected, as a map-reduce' do
+        object.send(:known?, :move).should eql(false)
         object.move :up
         object.move :over
         object.move :sideways
