@@ -1,19 +1,19 @@
 require_relative 'my-test-support'
 
-module Skylab::FlexToTreetop::MyTestSupport
-  describe Skylab::FlexToTreetop do
+module Skylab::Flex2Treetop::MyTestSupport
+  describe Skylab::Flex2Treetop do
     extend API::ModuleMethods ; include API::InstanceMethods
     context "has an API that" do
       context "when you request a nonexistent action" do
         it "raises a runtime error" do
           promise = api_client.invoke(:wiggle)
           -> { promise.__result__ }.should raise_error(
-            FlexToTreetop::API::RuntimeError, /cannot wiggle/i)
+            Flex2Treetop::API::RuntimeError, /cannot wiggle/i)
         end
       end
       context "when you request the 'version' action" do
         it "returns the version string" do
-          promise = FlexToTreetop::API.invoke(:version)
+          promise = Flex2Treetop::API.invoke(:version)
           promise.should be_kind_of(::String)
           promise.should match(/\A[ 0-9a-z]+ \d+(?:\.\d+)*\z/i)
         end
