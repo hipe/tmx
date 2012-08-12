@@ -1,5 +1,0 @@
-#!/usr/bin/env ruby -w
-
-require File.expand_path('../../lib/css-convert.rb', __FILE__)
-
-Hipe::CssConvert.cli.run(ARGV)

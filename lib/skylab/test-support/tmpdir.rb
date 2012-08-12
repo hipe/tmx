@@ -1,6 +1,5 @@
 require 'open3'
 require 'stringio'
-require File.expand_path('../test-support', __FILE__)
 require 'skylab/face/core'
 
 module Skylab::TestSupport
