@@ -1,47 +1,62 @@
 module Skylab::TestSupport
-  class StreamSpy
+  class StreamSpy < ::Struct.new(:tty, :listeners)
+
+    # A StreamSpy is a simple multiplexer that multiplexes out a subset
+    # of the instance methods of the IO module out to an ordered hash of
+    # listeners. StreamSpy is vital for automated testing, when you need
+    # to 'spy' on for e.g. an output stream to ensure that certain data is being
+    # written to it.
+    #
+    # Typically it's used like this:  In places where you are writing to
+    # $stdout (or $stderr), hopefully you have represented it as variable.
+    # At the beginning of your test, point that variable
+    # instead to a StreamSpy that has as its only child member (listener) a
+    # :buffer that is a (e.g.) StringIO.  Then in your test assertion ensure
+    # that the data in the buffer (StringIO) is what you expect.
+    #
+    # (StreamSpy objects with such a configuration are so common that
+    # a convenience method is provided that creates one such StreamSpy
+    # object: `StreamSpy.standard`)
+    #
+    #   @todo example here using etc
+    #
+    # Calling debug! on your StreamSpy is another convenience 'macro'
+    # that simply adds $stderr to the list of child listeners.  This can
+    # be helpful when developing a test, when you want to spy on the spy
+    # as it were, and have it output to $stderr what is being written to it,
+    # in addition to writing to the buffer that you will later check.
+    #
+
     def self.standard
       require 'stringio'
-      new.tap do |spy|
-        spy.tty!
-        spy[:buffer] = StringIO.new
-      end
+      new.tap { |o| o.tty![:buffer] = ::StringIO.new }
     end
-    [:puts, :write].each do |m|
+    [:<<, :puts, :write].each do |m|
       define_method(m) do |*a, &b|
         listeners.each { |l| l.send(m, *a, &b) }
       end
     end
     def [] key
-      @listeners[@key_index[key]]
+      listeners[@hash[key]]
     end
     def []= key, value
-      index = @key_index.include?(key) ?
-        @key_index[key] : (@key_index[key] = @listeners.length)
-      @listeners[index] = value
+      listeners[@hash[key] ||= listeners.length] = value
     end
     def debug!
-      self[:debug] = $stderr # yeah ..
+      self[:debug] = $stderr
       self
     end
-    def initialize
-      @key_index = {}
-      @listeners = []
-    end
-    attr_reader :listeners
-    def string
+    def string # just a convenience macro.  :buffer listener must obv. exist
       self[:buffer].string
     end
-    def tty!
-      @tty = true
-      self
-    end
-    def no_tty!
-      @tty = false
-      self
-    end
-    attr_reader :tty
+    # Mock whether or not this stream is an interactive terminal (see `IO#tty?`)
+    def tty!    ; self.tty = true  ; self end
+    def no_tty! ; self.tty = false ; self end
     alias_method :tty?, :tty
+  protected
+    def initialize
+      super(false, [])
+      @hash = {}
+    end
   end
 end
-
