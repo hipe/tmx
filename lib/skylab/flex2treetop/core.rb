@@ -10,8 +10,9 @@ module Skylab::Flex2Treetop
 
   VERSION = '0.0.1'
   FIXTURES = {}
-  FIXTURES[:mini]   = 'lib/skylab/code-molester/test/fixtures/flex/mini.flex'
-  FIXTURES[:tokens] = 'lib/skylab/css-convert/css/parser/tokens.flex'
+  FIXTURES[:fixthix] = 'lib/skylab/flex2treetop/test/fixtures/fixthis.flex'
+  FIXTURES[:mini]    = 'lib/skylab/flex2treetop/test/fixtures/mini.flex'
+  FIXTURES[:tokens]  = 'lib/skylab/css-convert/css/parser/tokens.flex'
 
   def self.dir
     @dir ||= ::Pathname.new(::File.expand_path('..', __FILE__))
