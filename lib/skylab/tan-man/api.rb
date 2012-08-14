@@ -218,8 +218,8 @@ module Skylab::TanMan
       (@invalid_reasons ||= []).push mixed
     end
     def root_runtime
-      if runtime
-        runtime.root_runtime
+      if parent
+        parent.root_runtime
       else
         self
       end
