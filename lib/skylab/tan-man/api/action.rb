@@ -47,6 +47,7 @@ module Skylab::TanMan
     end
 
     attr_reader :runtime
+    alias_method :parent, :runtime # @todo 100
 
     delegates_to :root_runtime, :singletons
 

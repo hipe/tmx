@@ -3,7 +3,7 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
   # @todo waiting for permute [#056]
-  describe "The #{TanMan::Cli} action Status", tanman: true  do
+  describe "The #{TanMan::CLI} action Status", tanman: true  do
     def prepare_configs *whichs
       TMPDIR.prepare
       whichs.each do |which|

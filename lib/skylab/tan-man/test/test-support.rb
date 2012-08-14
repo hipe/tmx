@@ -63,7 +63,7 @@ module Skylab::TanMan::TestSupport
   # this is dodgy but should be ok as long as you accept that:
   # 1) you are assuming meta-attributes work and 2) the below is universe-wide!
   # 3) the below presents holes that need to be tested manually
-  TanMan::Api.tap do |c|
+  TanMan::API.tap do |c|
     c.local_conf_dirname = 'local-conf.d' # a more visible name
     c.local_conf_maxdepth = 1
     c.local_conf_startpath = ->(){ TMPDIR }
@@ -78,7 +78,7 @@ module Skylab::TanMan::TestSupport
   end
   let :cli do
     spy = output
-    TanMan::Cli.new do |o|
+    TanMan::CLI.new do |o|
       o.program_name = 'ferp'
       o.stdout = spy.for(:stdout)
       o.stderr = spy.for(:stderr)
@@ -123,7 +123,7 @@ module Skylab::TanMan::TestSupport
     res
   end
   def prepare_local_conf_dir
-    TMPDIR.prepare.mkdir(TanMan::Api.local_conf_dirname)
+    TMPDIR.prepare.mkdir(TanMan::API.local_conf_dirname)
   end
   attr_accessor :result
   end
