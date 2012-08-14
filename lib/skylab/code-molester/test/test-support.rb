@@ -1,5 +1,5 @@
 require File.expand_path('../../..', __FILE__)
-require 'skylab/test-support/test-support'
+require 'skylab/test-support/core'
 require 'tmpdir'
 
 module ::Skylab

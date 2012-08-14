@@ -1,4 +1,4 @@
-require File.expand_path('../../../test-support/test-support', __FILE__)
+require File.expand_path('../../../test-support/core', __FILE__)
 
 module Skylab::Porcelain
   module TestSupport

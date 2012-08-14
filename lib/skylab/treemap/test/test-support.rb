@@ -1,4 +1,4 @@
-require_relative '../../test-support/test-support'
+require_relative '../../test-support/core'
 
 require_relative '../cli' # as the entrypoint for this module @todo-in-module
 

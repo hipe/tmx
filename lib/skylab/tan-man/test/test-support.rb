@@ -1,5 +1,5 @@
 require 'skylab/porcelain/tite-color'
-require 'skylab/test-support/test-support'
+require 'skylab/test-support/core'
 require 'skylab/test-support/tmpdir'
 require 'shellwords'
 
