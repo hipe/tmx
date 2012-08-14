@@ -1,6 +1,8 @@
-load File.expand_path('../../../script/git-stash-untracked', __FILE__)
+load File.expand_path('../../../../../script/git-stash-untracked', __FILE__)
 
-require File.expand_path('../../test-support', __FILE__)
+require File.expand_path('../../../test-support/core', __FILE__)
+
+require_relative '../../test-support/tmpdir'
 
 module ::Skylab::GitStashUntracked::Tests
   include ::Skylab
