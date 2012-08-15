@@ -147,7 +147,7 @@ module Skylab::Headless
     # -- * --
 
     def merge! mixed, &b # might be a Hash, might be a self-class, can be nil ..
-      # ..if is parameter with no properties. also it might be an override
+      # ..if is parameter with no properties
       mixed and mixed.each do |k, v| # is nil with a param with no hash def
         if known? k
           self[k] == v and next # do not reprocess sameval properties
@@ -158,6 +158,7 @@ module Skylab::Headless
         send("#{k}=", v) # possibly re-process with diffval, possibly newprop
       end
       block_given? and instance_exec(&b)
+      @has_tail_queue and at_tail
       nil
     end
 
@@ -169,25 +170,40 @@ module Skylab::Headless
     # need the same variables to be in scope that it is tighter to define
     # them all here in this way.  Also it looks really really weird.
     def initialize host, name
+      @has_tail_queue = nil
       @property_keys = []
       class << self
         define_method_f = ->(meth, &b) { define_method(meth, &b) }
         define_method(:def!) { |meth, &b| define_method_f.call(meth, &b) }
       end
-      def!(:host_def) { |meth, &b| host.send(:define_method, meth, &b) }
       upstream_queue = []
-      def!(:filter_upstream_last!) { |&node| upstream_queue.push node }
-      def!(:filter_upstream!) { |&node| upstream_queue.unshift node }
-      upstream_f = ->(host_obj, val, i = 0) do
-        host_obj.instance_exec(val,
-          ->(_val) { upstream_f.call(host_obj, _val, i+1) }, &upstream_queue[i])
-      end
       def!(:apply_upstream_filter) do |host_obj, val, &final_f|
         mutated = [* upstream_queue[0..-2], ->(v, _) { final_f.call(v) } ]
         (f = ->(o, v, i=0) do
           o.instance_exec(v, ->(_v) { f[o, _v, i+1] }, &mutated[i])
         end).call(host_obj, val)
       end
+      upstream_last_mutex = nil
+      def!(:assert_writer) do |msg|
+        upstream_last_mutex or fail("sanity check failed: #{msg}")
+      end
+      tail_queue = nil
+      def!(:at_tail) do
+        begin ; tail_queue.shift.call end until tail_queue.empty?
+        tail_queue = nil
+      end
+      def!(:filter_upstream!) { |&node| upstream_queue.unshift node }
+      upstream_f = ->(host_obj, val, i = 0) do
+        host_obj.instance_exec(val,
+          ->(_val) { upstream_f.call(host_obj, _val, i+1) }, &upstream_queue[i])
+      end
+      def!(:filter_upstream_last!) do |&node|
+        upstream_last_mutex and
+          fail('upstream filter endpoint can only be set once')
+        upstream_queue.push(upstream_last_mutex = node)
+      end
+      def!(:host_def) { |meth, &b| host.send(:define_method, meth, &b) }
+      def!(:on_tail) { |&b| (tail_queue ||= []).push b ; @has_tail_queue = true}
       # -- * --
       def!(:accessor=) { |_| self.reader = self.writer = true } # !!!
       def! :boolean= do |no|
@@ -255,7 +271,7 @@ module Skylab::Headless
       end
       def!(:reader=) { |_| host_def(name) { self[name] } }
       def!(:upstream_passthru_filter) do |&f|
-        upstream_queue.empty? and fail("you probably want a writer first") # tmp
+        on_tail { assert_writer("passthru filter found with no writer!") }
         filter_upstream! { |val, valid_f| valid_f.call(f.call val) }
       end
       def! :writer= do |_|
@@ -276,14 +292,14 @@ module Skylab::Headless
     end
     param :list, boolean: true, writer: true # define this before below line
     param :desc, dsl: [:list, :reader]       # define this after above line
-    param :internal, boolean: :external, writer: true
+    param :internal, boolean: :external, writer: true # @todo
     def pathname= _
-      def @host.pathname_class ; ::Pathname end unless
-        @host.respond_to?(:pathname_class)
-      self.writer = true ; host = @host
+      (host = @host).respond_to?(:pathname_class) or
+        def host.pathname_class ; ::Pathname end
+      on_tail { assert_writer("can't use 'pathname' without a writer") } #sanity
       upstream_passthru_filter { |v| v ? host.pathname_class.new(v.to_s) : v }
     end
-    param :required, boolean: true, writer: true
+    param :required, boolean: true, writer: true # @todo
   end
 
   class Parameter::Bound < Struct.new(:parameter, :read_f, :write_f, :label_f)
