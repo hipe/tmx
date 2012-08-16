@@ -105,8 +105,7 @@ module Skylab::CssConvert::TreetopTools
     def invoke
       self.joystick ||= build_joystick
       dsl_f.call joystick
-      params = set!(nil, joystick.instance_variable_get('@params'))
-      params
+      set!(nil, joystick.instance_variable_get('@params')) # returns params
     end
   protected
     def absorb! struct
@@ -231,23 +230,23 @@ module Skylab::CssConvert::TreetopTools
       end
     end
     def normalize_paths_to param_name
-      root = nil
       errors_count_before = errors_count
-      arr = bound_parameters.where(exist: :must).to_a # drop 15 items off..
-      arr.each do |p|                                 # of exceptions below
-        p.value or next # not required but must exist if provided
-        tries = nil
+      root_f = ->(p) do
+        root = bound_parameters[param_name]
+        ! root.value and return error("#{root.name} must be set in " <<
+          "order to support a relative path like #{p.label}!")
+        ! root.value.absolute? and return error("#{root.name} must " <<
+          "be an absolute path in order to expand paths like #{p.label}")
+        (root_f = ->(_) { root }).call(nil)
+      end
+      arr = bound_parameters.where(exist: :must).to_a
+      arr.each do |p|
+        p.value or next
+        root = tries = nil
         if ! p.value.absolute? && ! p.value.exist?
-          root ||= begin
-            root = bound_parameters[param_name]
-            ! root.value and return error("#{root.name} must be set in " <<
-              "order to support a relative path like #{p.label}!")
-            ! root.value.absolute? and return error("#{root.name} must " <<
-              "be an absolute path in order to expand paths like #{p.label}")
-            p.name == root.name and next # should be covered by above but j.i.c:
-            root
-          end
           (tries ||= []).push p.value
+          root or (root = root_f[p] or return)
+          p.name == root.name and fail('sanity')
           p.value = root.value.join(p.value) # OH MY GOD SO SEXY and evil
         end
         if ! p.value.exist?

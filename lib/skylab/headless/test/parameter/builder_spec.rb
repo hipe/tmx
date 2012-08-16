@@ -16,7 +16,7 @@ describe 'If you have an object "object" that has a ' <<
       end
       context 'when the parameter value is falseish' do
         it '"object.foo" will call the builder proc (lazily) (once) ' <<
-          'to initiate it', f:true do
+          'to initiate it' do
           @num_times.should eql(0)
           object.send(:known?, :roland_808).should be false
           # object.send(:[], :roland_808).should be_nil

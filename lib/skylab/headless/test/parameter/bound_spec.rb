@@ -51,7 +51,7 @@ describe Skylab::Headless::Parameter::Bound do
     inner_defn do
       meta_param :this_one, boolean: true, accessor: true
       param :noun, dsl: [:list, :reader], enum: [:run, :walk], this_one: 1
-      param :path, pathname: true, reader: true, this_one: true
+      param :path, accessor: true, pathname: true, this_one: true
       param :herkemer, accessor: true, this_one: false
       param :derkemer, reader: true
     end
