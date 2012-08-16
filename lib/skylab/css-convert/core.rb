@@ -22,7 +22,7 @@ module Skylab::CssConvert
   class My::Headless::Params < ::Hash
     extend Headless::Parameter::Definer::ModuleMethods
     include Headless::Parameter::Definer::InstanceMethods::HashAdapter
-    param :directives_file, pathname: true do
+    param :directives_file, pathname: true, writer: true do
       desc 'A file with directives in it.' # (not used yet)
     end
     param :dump_directives, boolean: true
