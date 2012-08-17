@@ -1,4 +1,4 @@
-require File.expand_path('../support', __FILE__)
+require File.expand_path('../test-support', __FILE__)
 require File.expand_path('../../../task-types/executable-file', __FILE__)
 
 
