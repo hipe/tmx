@@ -39,7 +39,7 @@ module Skylab::Dependency::TestSupport
         :tarball_to => to,
         :from => 'http://localhost:1324/mginy-0.0.1.tar.gz'
       } }
-      it "must work", wip:true do
+      it "must work" do
         r = subject.invoke
         r.should eql(true)
         # the below is temporary, it is not to spec afaik

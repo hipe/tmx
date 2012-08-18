@@ -7,6 +7,7 @@ module Skylab::Dependency
     include Skylab::Face::PathTools::InstanceMethods
     include FileUtils
 
+    # @todo look below etc
     attribute :move_to, :required => true
     attribute :from, :required => true
 
@@ -27,11 +28,11 @@ module Skylab::Dependency
       @context ||= (args[:context] || {})
       valid? or fail(invalid_reason)
       if ! from.exist?
-        emit(:error, "file not found: #{pretty_path from}")
+        emit(:error, "file not found: #{pretty_path from.to_s}")
         return false
       end
       if move_to.exist?
-        emit(:error, "file exists: #{pretty_path move_to}")
+        emit(:error, "file exists: #{pretty_path move_to.to_s}")
         return false
       end
       status = mv from, move_to, :verbose => true

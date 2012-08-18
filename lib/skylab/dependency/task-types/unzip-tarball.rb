@@ -32,7 +32,7 @@ module Skylab::Dependency
         return false
       end
       if unzipped_dir_path.exist?
-        emit(:info, "exists, won't tar extract: #{pretty_path unzipped_dir_path}")
+        emit(:info, "exists, won't tar extract: #{pretty_path unzipped_dir_path.to_s}")
         return true
       end
       _execute
