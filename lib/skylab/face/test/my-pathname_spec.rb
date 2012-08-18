@@ -2,25 +2,45 @@ require_relative 'test-support'
 
 describe "#{Skylab::Face::MyPathname}#pretty" do
 
-  def self.o input, output, *a
-    msg = (input == output ? 'does not change' : "prettifies to #{output.inspect}")
-    it("#{input.inspect} #{msg}", *a)  do
-      pn = ::Skylab::Face::MyPathname.new(input)
-      if respond_to?(:home)
-        pn.instance_variable_set('@home', home) # nil will be overwritten, not false
+
+  # --*-- enjoy
+  MEMO = { }
+  WITH = ->(name, *v) { v.empty? ? MEMO[name] : (MEMO[name] = v.first) }
+  THESE = [:HOME, :PWD]
+  def self.frame(&b) ; MEMO.clear ; instance_eval(&b) end
+  def self.home(*v) ; WITH.call(:HOME, *v) end
+  def self.pwd(*v) ; WITH.call(:PWD, *v) end
+  def self.exemplifying desc, *tags, &block
+    memo = MEMO.dup
+    before_f = -> do
+      THESE.each { |k| ::Skylab::Face::PathTools::const_get("CLEAR_#{k}").call }
+      memo.each do |k, v|
+        ::Skylab::Face::PathTools::const_get(k).singleton_class.send(
+          :define_method, :call) { v }
       end
-      if respond_to?(:pwd)
-        me = self
-        pn.singleton_class.send(:define_method, :pwd) { me.pwd }
+      (THESE - memo.keys).each do |k|
+        ::Skylab::Face::PathTools::const_get(k).singleton_class.send(
+          :define_method, :call) { } # application code is expected to then not
+                                     # use such undefined values
       end
-      pn.should prettify_to(output)
+    end
+    context(desc, *tags) do
+      before(:all) { before_f.call }
+      instance_exec(&block)
     end
   end
+  def self.o input, expected, *a
+    msg = (input == expected ? 'does not change' : "prettifies to #{expected.inspect}")
+    it("#{input.inspect} #{msg}", *a)  do
+      ::Skylab::Face::MyPathname.new(input).should prettify_to(expected)
+    end
+  end
+  # --*--
 
-  (-> do
-    home = '/home/rms'
-    context "contracts home directories to '~' (home is #{home.inspect})" do
-      let(:home) { home }
+
+  frame do
+    home '/home/rms'
+    exemplifying "contracts home directories to '~' (home is #{home.inspect})" do
       o '/home/rms/foo', '~/foo'
       o '/home/rms/foo/bar.txt', '~/foo/bar.txt'
       o 'home/rms/whatever', 'home/rms/whatever'
@@ -28,12 +48,11 @@ describe "#{Skylab::Face::MyPathname}#pretty" do
       o '/home/rms/', '~/'
       o 'something/home/rms', 'something/home/rms'
     end
-  end).call
+  end
 
-  (-> do
-    pwd = '/usr/local'
-    context "contracts present working directory to '.' (pwd is #{pwd.inspect})" do
-      let(:home) { false } ; let(:pwd) { pwd }
+  frame do
+    pwd '/usr/local'
+    exemplifying "contracts present working directory to '.' (pwd is #{pwd.inspect})" do
       o '/usr/local/foo', './foo'
       o '/usr/local/foo/bar.txt', './foo/bar.txt'
       o 'usr/local/whatever', 'usr/local/whatever'
@@ -41,22 +60,21 @@ describe "#{Skylab::Face::MyPathname}#pretty" do
       o '/usr/local/', './'
       o 'something/usr/local', 'something/usr/local'
     end
-  end).call
+  end
 
-  (-> do
-    home = '/home/rms'
-    context "and if pwd *is* home dir, home dir always wins" do
-      let(:home) { home } ; let(:pwd) { home }
+  frame do
+    home '/home/rms'
+    pwd home
+    exemplifying "and if pwd *is* home dir, home dir always wins" do
       o '/home/rms', '~'
       o '/home/rms/foo', '~/foo'
     end
-  end).call
+  end
 
-  (-> do
-    home = '/a/b/c'
-    pwd  = '/a/b'
-    context "and if home dir (#{home}) is inside pwd (#{pwd}), home dir wins (shortest wins)" do
-      let(:home) { home } ; let(:pwd) { pwd }
+  frame do
+    home '/a/b/c'
+    pwd  '/a/b'
+    exemplifying "and if home dir (#{home}) is inside pwd (#{pwd}), home dir wins (shortest wins)" do
       o '/a/b/c/foo/bar', '~/foo/bar'
       o '/a/b/c/foo',     '~/foo'
       o '/a/b/c/',        '~/'
@@ -66,20 +84,17 @@ describe "#{Skylab::Face::MyPathname}#pretty" do
       o '/a/',            '/a/'
       o 'a/b/c',          'a/b/c'
     end
-  end).call
+  end
 
-  (-> do
-    home = '/home/rms'
-    pwd  = '/home/rms/proj'
-    context "BUT if pwd (#{pwd}) is inside home (#{home}), PWD wins (shortest wins)" do
-      let(:home) { home } ; let(:pwd) { pwd }
+  frame do
+    home '/home/rms'
+    pwd  '/home/rms/proj'
+    exemplifying "BUT if pwd (#{pwd}) is inside home (#{home}), PWD wins (shortest wins)" do
       o '/home/rms/proj/emacs.c', './emacs.c'
       o '/home/rms/proj',         '.'
       o '/home/rms/pro',          '~/pro'
       o '/home/rms',              '~'
       o 'home/rms',               'home/rms'
     end
-  end).call
-
-
+  end
 end
