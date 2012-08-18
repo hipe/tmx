@@ -60,7 +60,7 @@ module Skylab::Dependency
     end
 
     def curl_or_wget from_url, to_file
-      cmd = "curl -o #{escape_path(pretty_path to_file)} #{from_url}"
+      cmd = "curl -o #{escape_path(pretty_path to_file.to_s)} #{from_url}"
       # cmd = "wget -O #{escape_path to_file} #{from_url}"
       emit(:shell, cmd)
       uri = URI.parse(from_url)
