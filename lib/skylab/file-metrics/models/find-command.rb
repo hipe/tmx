@@ -1,6 +1,6 @@
 module Skylab::FileMetrics
   class Models::FindCommand
-    include Common::PathTools
+    include Common::PathTools::InstanceMethods
     def initialize; end
     attr_accessor :paths, :skip_dirs, :names, :extra
     def self.build &block

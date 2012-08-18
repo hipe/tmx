@@ -1,4 +1,4 @@
-require File.expand_path('../support', __FILE__)
+require File.expand_path('../test-support', __FILE__)
 require 'skylab/dependency/task-types/tarball-to'
 
 module Skylab::Dependency::TestSupport
@@ -39,7 +39,7 @@ module Skylab::Dependency::TestSupport
         :tarball_to => to,
         :from => 'http://localhost:1324/mginy-0.0.1.tar.gz'
       } }
-      it "must work" do
+      it "must work", wip:true do
         r = subject.invoke
         r.should eql(true)
         # the below is temporary, it is not to spec afaik

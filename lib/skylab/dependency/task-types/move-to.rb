@@ -4,7 +4,7 @@ require 'fileutils'
 
 module Skylab::Dependency
   class TaskTypes::MoveTo < Task
-    include Skylab::Face::PathTools
+    include Skylab::Face::PathTools::InstanceMethods
     include FileUtils
 
     attribute :move_to, :required => true

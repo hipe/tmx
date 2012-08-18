@@ -10,7 +10,7 @@ module Skylab::Dependency
   module Interface
     CliCommands = lambda do |_|
       o do |op, req|
-        extend ::Skylab::Face::PathTools
+        extend ::Skylab::Face::PathTools::InstanceMethods
         item_name = @parent.name
         syntax "#{invocation_string} [opts] [<name> [<name> [..]]]"
         op.banner = <<-HERE.gsub(/^ +/, '')

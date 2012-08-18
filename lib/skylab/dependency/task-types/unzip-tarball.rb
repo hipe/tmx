@@ -5,7 +5,7 @@ require 'skylab/face/open2'
 module Skylab::Dependency
   class TaskTypes::UnzipTarball < Task
     include ::Skylab::Face::Open2
-    include ::Skylab::Face::PathTools
+    include ::Skylab::Face::PathTools::InstanceMethods
     include TaskTypes::TarballTo::Constants
 
     attribute :unzip_tarball, :required => true, :pathname => true

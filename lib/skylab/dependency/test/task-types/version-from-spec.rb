@@ -1,4 +1,4 @@
-require File.expand_path('../support', __FILE__)
+require File.expand_path('../test-support', __FILE__)
 require 'skylab/dependency/task-types/version-from'
 
 module Skylab::Dependency::TestSupport
@@ -67,14 +67,14 @@ module Skylab::Dependency::TestSupport
       context "when the regex matches" do
         context "and the version matches" do
           let(:version_from) { 'echo "ver 1.2.1"' }
-          it "says that it matches" do
+          it "says that it matches", wip:true do
             subject.invoke(context).should eql(true)
             log.to_s.include?('version 1.2.1 is in range 1.2+').should eql(true)
           end
         end
-        context "and the version does not match"  do
+        context "and the version does not match" do
           let(:version_from) { 'echo "version 0.0.1"' }
-          it "says that is doensn't match" do
+          it "says that is doesn't match", wip:true do
             subject.invoke(context).should eql(false)
             log.to_s.include?('version mismatch: needed 1.2+ had 0.0.1').should eql(true)
           end
@@ -82,7 +82,7 @@ module Skylab::Dependency::TestSupport
       end
       context "when the regex does not match" do
         let(:version_from) { 'echo "version A.B.C"' }
-        it "reports a failure" do
+        it "reports a failure", wip:true do
           subject.invoke(context).should eql(false)
           log.to_s.include?('needed 1.2+ had version A.B.C').should eql(true)
         end

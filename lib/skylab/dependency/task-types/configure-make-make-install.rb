@@ -9,7 +9,7 @@ require 'skylab/face/path-tools'
 module Skylab::Dependency
   class TaskTypes::ConfigureMakeMakeInstall < Task
     include ::Skylab::Face::Open2
-    include ::Skylab::Face::PathTools
+    include ::Skylab::Face::PathTools::InstanceMethods
     include TaskTypes::TarballTo::Constants
     attribute :configure_make_make_install
     attribute :prefix

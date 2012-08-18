@@ -20,7 +20,8 @@ module Skylab::Tmx::Modules::Cli
   module Api; end
 
   module PushPullInstanceMethods
-    include Skylab::Face::Colors, CopyFiles, Skylab::Face::PathTools
+    include Skylab::Face::Colors, CopyFiles,
+      Skylab::Face::PathTools::InstanceMethods
     def initialize *a
       @ui, @path, @opts = a
     end

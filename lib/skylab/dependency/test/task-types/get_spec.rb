@@ -1,4 +1,4 @@
-require File.expand_path('../support', __FILE__)
+require File.expand_path('../test-support', __FILE__)
 require 'skylab/dependency/task-types/get'
 
 module Skylab::Dependency::TestSupport
@@ -31,13 +31,13 @@ module Skylab::Dependency::TestSupport
       let(:uri) { "some-file.txt" }
       let(:source_file_path) { FILE_SERVER.document_root.join(uri) }
       context "that exists" do
-       it "puts it in the basket, the requested file, byte per byte" do
+       it "puts it in the basket, the requested file, byte per byte", wip:true do
           subject.invoke(context)
           (exp = BUILD_DIR.join(get.basename)).should be_exist
           (File.stat(exp).size).should be > 0
           File.read(exp).should eql(File.read(source_file_path))
         end
-        it "shows a shell equivalent (with curl) of the action" do
+        it "shows a shell equivalent (with curl) of the action", wip:true do
           r = subject.invoke(context)
           fingers[:shell].grep(/curl -o/).length.should be > 0
           r.should eql(true)
@@ -45,7 +45,7 @@ module Skylab::Dependency::TestSupport
       end
       context "that does not exit" do
         let(:uri) { "not/there.txt" }
-        it "should emit error, return false, but not raise" do
+        it "should emit error, return false, but not raise", wip:true do
           r = subject.invoke(context)
           fingers[:error].grep(/file not found/i).size.should be > 0
           r.should eql(false)
@@ -59,7 +59,7 @@ module Skylab::Dependency::TestSupport
       context "that do exist" do
         let(:from) { host }
         let(:get) { %w(some-file.txt another-file.txt) }
-        it "puts all of the files in the baseket" do
+        it "puts all of the files in the baseket", wip:true do
           subject.invoke(context)
           fingers[:shell].grep(/some-file/).count.should be 1
           fingers[:shell].grep(/another-file/).count.should be 1
@@ -70,7 +70,7 @@ module Skylab::Dependency::TestSupport
       context "of which a subset do not exist" do
         let(:from) { host }
         let(:get) { %w(not-there.txt another-file.txt) }
-        it "whines on the files that dont exist, returns false, gets the files that do" do
+        it "whines on the files that dont exist, returns false, gets the files that do", wip:true do
           r = subject.invoke(context)
           r.should eql(false)
           fingers[:error].should be_include("File not found: http://localhost:1324/not-there.txt")

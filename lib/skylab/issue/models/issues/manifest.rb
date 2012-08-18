@@ -4,7 +4,7 @@ require File.expand_path('../my-enumerator', __FILE__)
 module Skylab::Issue
   class Models::Issues::Manifest
     include FileUtils
-    include ::Skylab::Face::PathTools
+    include ::Skylab::Face::PathTools::InstanceMethods
 
     ISSUE_NUMBER_DIGITS = 3
     VALID_DATE = /\A\d{4}-\d{2}-\d{2}\z/
