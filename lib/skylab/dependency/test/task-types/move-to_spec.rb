@@ -49,7 +49,7 @@ module Skylab::Dependency::TestSupport
       end
       context "to an unavailable location" do
         let(:move_to) { FIXTURES_DIR.join('another-file.txt') }
-        it "should return false and emit an error" do
+        it "should return false and emit an error", wip:true do
           r = subject.invoke
           r.should eql(false)
           fingers[:error].last.should match(/file exists.*another-file/)
@@ -59,7 +59,7 @@ module Skylab::Dependency::TestSupport
     context "when moving a nonexitant file" do
       let(:from) { "#{FIXTURES_DIR}/not-there" }
       let(:move_to) { "#{BUILD_DIR}/wherever" }
-      it "should return false and emit an error" do
+      it "should return false and emit an error", wip:true do
         r = subject.invoke(context)
         r.should eql(false)
         fingers[:error].last.should match(/file not found.*not-there/)

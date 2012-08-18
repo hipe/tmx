@@ -5,7 +5,7 @@ require 'skylab/face/path-tools'
 module Skylab::Issue
   class Models::Issues
     extend ::Skylab::Autoloader
-    include ::Skylab::Face::PathTools
+    include ::Skylab::Face::PathTools::InstanceMethods
     o = File.expand_path('..', __FILE__)
     require "#{o}/issues/manifest"
 

@@ -28,7 +28,7 @@ module Skylab::Dependency::TestSupport
       let(:context) { { :build_dir => BUILD_DIR } }
       context "when tarball does not exist" do
         let(:unzip_tarball) { "#{FIXTURES_DIR}/not-there.tar.gz" }
-        it "whines (returns false, emits error)" do
+        it "whines (returns false, emits error)", wip:true do
           r = subject.invoke
           r.should eql(false)
           fingers[:error].size.should eql(1)
@@ -42,9 +42,9 @@ module Skylab::Dependency::TestSupport
           BUILD_DIR.prepare
           BUILD_DIR.copy(unzip_tarball)
         end
-        context "when the target directory exists" do
+        context "when the target directery exists" do
           before(:each) { BUILD_DIR.mkdir("#{BUILD_DIR}/mginy", verbose: false) }
-          it "emits a notice, returns true" do
+          it "emits a notice, returns true", wip:true do
             r = subject.invoke
             r.should eql(true)
             fingers[:info].size.should eql(1)
@@ -61,7 +61,7 @@ module Skylab::Dependency::TestSupport
           end
         end
         context "when it is a tarball and the target directory does not exist" do
-          it "returns true, emits shell and tar errstream" do
+          it "returns true, emits shell and tar errstream", wip:true do
             r = subject.invoke
             r.should eql(true)
             fingers[:shell].size.should eql(1)

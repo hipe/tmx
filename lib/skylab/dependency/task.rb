@@ -16,7 +16,7 @@ module Skylab::Dependency
     attr_reader :invalid_reason
 
     extend ::Skylab::PubSub::Emitter # child classes decide what to emit
-    include ::Skylab::Face::PathTools
+    include ::Skylab::Face::PathTools::InstanceMethods
     include ::Skylab::Porcelain::TiteColor
 
     def hi str ; stylize str, :strong, :green end

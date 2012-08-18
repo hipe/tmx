@@ -50,7 +50,7 @@ module Skylab::Flex2Treetop
     param :case_insensitive, boolean: :case_sensitive, default: true, writer: 1
     param :clear_generated_files, boolean: :dont_clear_generated_files
     param :filesystem_parser_enabled, boolean: true
-    param :filesystem_parser_dir, pathname: true, reader: true
+    param :filesystem_parser_dir, pathname: true, accessor: true
     param :result_state, internal: true, enum: [:exists, :filesystem_touched,
             :modified, :not_found, :parse_failure, :translated,
             :translate_failure, :showed_sexp], accessor: true
@@ -83,8 +83,8 @@ module Skylab::Flex2Treetop
     CLI::Actions::Translate::Parameters
 
     param :force, boolean: true, default: true, writer: true
-    param :flexfile, pathname: true, required: true, reader: true
-    param :outfile, pathname: true, required: true, reader: true
+    param :flexfile, pathname: true, required: true, accessor: true
+    param :outfile, pathname: true, required: true, accessor: true
     param :verb, accessor: true, internal: true
   end
 
