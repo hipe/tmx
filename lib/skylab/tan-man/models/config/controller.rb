@@ -78,6 +78,27 @@ module Skylab::TanMan
         o.on_all { |e| emit(:info, e.message) unless e.touched? }
       end
     end
+    def set_value name, value, resource_name
+      ready? or return false
+      name = name.to_s # convert symbols to strings or 'key?' fails!
+      resource = config_singleton.send(resource_name)
+      if resource.key?(name)
+        before = resource[name]
+        if value == before
+          emit(:info, "#{name} already set to #{before.inspect}")
+          true
+        else
+          emit(:info,
+            "changing #{name} from #{before.inspect} to #{value.inspect}")
+          resource[name] = value
+          write_resource resource
+        end
+      else
+        emit(:info, "creating #{name} value: #{value.inspect}")
+        resource[name] = value
+        write_resource resource
+      end
+    end
     delegates_to :runtime, :text_styler
   end
 end

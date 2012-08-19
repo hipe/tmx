@@ -18,6 +18,7 @@ module Skylab::TanMan
   ROOT = Face::MyPathname.new(File.expand_path('..', __FILE__))
 
   module API
+    extend ::Skylab::Autoloader
   end
 
   module MetaAttributes

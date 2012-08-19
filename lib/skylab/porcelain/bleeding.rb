@@ -129,7 +129,9 @@ module Skylab::Porcelain::Bleeding
     end
     def option_syntax_class k=nil
       k.nil? ? OptionSyntax : instance_exec(k, &(redef = ->(k2) {
+        undef_method(:option_syntax_class)
         define_method(:option_syntax_class) { k2 }
+        singleton_class.send(:undef_method, :option_syntax_class)
         singleton_class.send(:define_method, :option_syntax_class) { |k3 = nil| k3.nil? ? k2 : instance_exec(k3, &redef) }
       }))
     end

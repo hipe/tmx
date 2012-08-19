@@ -10,7 +10,6 @@ module Skylab::TanMan
     event_class API::Event
 
     def initialize
-      super
       @singletons = API::Singletons.new
       @stderr = $stderr ; @stdout = $stdout # defaults that might get changed below
       if block_given?
@@ -211,6 +210,13 @@ module Skylab::TanMan
     end
     def invoke remote_name, file, opts
       api.invoke(opts.merge(remote_name: remote_name, file_path:file))
+    end
+  end
+
+  class CLI::Actions::Use < CLI::Action
+    desc 'selects which (dependency graph) file to edit'
+    def invoke path
+      api.invoke(path: path)
     end
   end
 end
