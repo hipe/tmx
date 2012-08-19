@@ -1,17 +1,7 @@
-[#103] 2012-07-03 @idea code molester unwind ( a huge project )
-[#102] 2021-06-08 @open treemap, ofc!
-[#101] 2021-06-08 @open when doing gem install with rdoc, "stack level too deep"
-[#100.300.XXX] 2012-06-08 (numberspace reserved for porcelain.rb)
+[#105] 2012-08-18 #open play with test/all_specs.rb -w
+[#101] 2012-06-08 #open when doing gem install with rdoc, "stack level too deep"
 [#100.200.001] 2012-06-12 all.rb: fix @delegates tags
 [#100.901.3.2.2] 2012-06-12 towards an event wiring pattern
-[#100.100.500] 2012-06-08 @open with face.rb index all features
-[#100.100.400] 2012-06-08 @open with face.rb rename stuff, unify names
-[#100.100.300] 2012-06-08 @open with face.rb, eliminate unused code
-[#100.100.100] 2012-06-08 @open with face.rb, get to 95% test coverage
-[#100] 2012-06-08 @open integrate porcelain and face and bleeding
-[#099] 2012-06-08 @open how in the hell did we break 'bin/tmx'
-[#098] 2012-06-06 @open "ignoring event handlers for now"
-[#097] 2012-06-04 @open @project:issues thing that converts @todo's into issues!??
 [#096] 2012-03-30 @closed: code-molester: files are not paths
 [#095] 2012-03-29 @closed: static fileserver refactor
 [#094] 2012-03-28 @closed: tanman: refactor: this shit is a mess (still).
@@ -35,9 +25,8 @@
 [#076] 2012-03-02 @closed: porcelain: simply and reveal tree rendering
 [#075] 2012-02-16 @closed: porcelain: aliases, descs for namesp, acts
 [#074] 2012-02-26 @closed: porcelain: get tree into stable from 026 branch
-[#073] 2012-02-26 @open: git-viz: histree: (file tree with most recents)
-[#072] 2012-02-26 @open: borrow
-[#071] 2012-02-26 @open: fsm: passes with some specs
+[#072] 2012-02-26 #historic: borrow
+[#071] 2012-02-26 #historic: fsm: passes with some specs
 [#070] 2012-02-25 @closed: face cli: compat back / fwds with porcelain
 [#069] 2012-02-25 @closed: porcelain: compat w/ face cli
 [#068] 2012-02-24 @closed: porcelain: without syntax uses method sig
@@ -49,21 +38,15 @@
 [#062] 2012-02-18 @closed pub-sub: touch events
 [#061] 2012-02-18 @closed pub-sub: fix issue with deep trees
 [#060] 2012-02-18 @closed tmx: merge issues
-[#059] 2012-02-18 @open pub-sub: no redundant events per listener
 [#058] 2012-02-18 @closed muxer: rename things
 [#057] 2012-02-18 @closed porcelain: events
-[#056] 2011-07-19 @open permute
-[#055] 2012-02-18 @open code molester: file services (write)
 [#054] 2012-02-17 @closed code molester: make values accessor
 [#053] 2012-02-14 @closed code molester: pure refactor: deepening
 [#052] 2012-02-11 @closed code molester: for fun write a config parser
 [#051] 2012-02-11 @closed set program name explicitly, streams
 [#050] 2012-02-11 issue: change implementation of search to take lambdas
 [#049] 2012-02-11 @closed add "bleed" feature @closed:2012-06-08 haha
-[#049.2] 2012-07-21 @open how about an "unbleed" too
-[#048] 2012-02-10 @open show should list (for now)
 [#047] 2012-02-07 @closed all: mark all closed issues as closed
-[#046] 2012-02-07 @open issue: add verbose/debug mode, put such output there
 [#045] 2012-02-07 @closed all: get *all* tests green, modifying scripts if necessary
 [#044] 2012-02-07 @closed issue: add issue show
 [#043] 2012-02-06 @closed porcelain tree: common base path
