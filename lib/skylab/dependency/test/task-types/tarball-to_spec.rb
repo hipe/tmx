@@ -27,7 +27,7 @@ module Skylab::Dependency::TestSupport
       end
     end
 
-    context "with good build args (no interpolation)" do
+    context "with good build args (no interpolation)", slow:true do
       before(:all) do
         FILE_SERVER.run
       end

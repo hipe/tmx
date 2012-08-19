@@ -25,7 +25,7 @@ module Skylab::Dependency::TestSupport
         end
       end
     end
-    context "when requesting one file" do
+    context "when requesting one file", slow:true do
       let(:from) { nil }
       let(:get) { Pathname.new File.join(host, uri) }
       let(:uri) { "some-file.txt" }
@@ -52,7 +52,7 @@ module Skylab::Dependency::TestSupport
         end
       end
     end
-    context "when requesting several files" do
+    context "when requesting several files", slow:true do
       def build_dir_files
         Dir.new(BUILD_DIR).entries.select{ |x| x !~ /^\./ }.sort
       end

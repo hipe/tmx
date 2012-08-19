@@ -1,32 +1,20 @@
 # encoding: UTF-8
 require 'skylab/face/core' # MyPathname
-module Skylab::CssConvert::TreetopTools
-  module Grammar end # the syntax not the software
-  Headless = ::Skylab::Headless # aesthetics
-  module My end  # for @api-private
-  module Parser end # the software not the syntax
-  My::Pathname = ::Skylab::Face::MyPathname # for bare()
+require 'skylab/headless/core'
+require 'skylab/meta-hell/core'
 
+module Skylab::TreetopTools
+
+  Headless = ::Skylab::Headless
+
+  extend ::Skylab::MetaHell::Autoloader::Autovivifying
+
+  class Pathname < ::Skylab::Face::MyPathname ; end
   class RuntimeError < ::RuntimeError ; end
 
-  class Sexpesque < Array
-    alias_method :node_name, :first
-    class << self
-      def build name, *childs
-        new([name, *childs])
-      end
-      alias_method :[], :build
-    end
-    alias_method :fetch, :[]
-    def [] mixed
-      mixed.kind_of?(::Symbol) ? super(1)[mixed] : super(mixed)
-    end
-    def children sym, *syms
-      ([sym] + syms).map { |x| fetch(1)[x] }
-    end
-  end
 
-  class Grammar::Reflection < Struct.new(:name, :inpath_f, :outdir_f)
+  module Grammar end
+  class Grammar::Reflection < ::Struct.new(:name, :inpath_f, :outdir_f)
     def inpath ; inpathname.to_s end
     def inpathname ; inpath_f.call end
     def nested_const_names
@@ -149,7 +137,7 @@ module Skylab::CssConvert::TreetopTools
   end
   # --*--
 
-  class My::Parameter < Headless::Parameter::Definition
+  class Parameter < Headless::Parameter::Definition
     param :dir, boolean: true
     param :exist, enum: [:must], accessor: true
     def pathname= _
@@ -160,8 +148,8 @@ module Skylab::CssConvert::TreetopTools
 
   class Parser::Load < DSL::Client::Minimal
     class DSL < DSL::IO::Joystick
-      def self.parameter_definition_class ; My::Parameter end
-      def self.pathname_class ; My::Pathname end
+      def self.parameter_definition_class ; Parameter end
+      def self.pathname_class ; Pathname end
       param :enhance_parser_with, dsl: :list
       param :force_overwrite, boolean: true
       param :generated_grammar_dir, dsl: :value, required: true,
@@ -298,34 +286,6 @@ module Skylab::CssConvert::TreetopTools
       cx.empty? or emit(:info, "creating: #{cx.join(', ')}")
       gx.empty? and emit(:info, "none.")
       true
-    end
-  end
-  module Parser::Extlib end
-  module Parser::Extlib::InstanceMethods
-
-    def self.override; [:failure_reason] end
-
-    def my_failure_reason
-      return nil unless (tf = terminal_failures) && tf.size > 0
-      "Expected " +
-        ( tf.size == 1 ?
-          tf[0].expected_string.inspect :
-          "one of #{tf.map{|f| f.expected_string.inspect}.uniq*', '}"
-        ) + " at line #{failure_line}, column #{failure_column} " +
-        "(byte #{failure_index+1}) #{my_input_excerpt}"
-    end
-
-    def num_context_lines ; 4 end
-
-    def my_input_excerpt
-      0 == failure_index and return "at:\n1: #{input.match(/.*/)[0]}"
-      all = input[index...failure_index].split("\n", -1)
-      lines = all.slice(-1 * [all.size, num_context_lines].min, all.size)
-      nos = failure_line.downto(
-        [1, failure_line - num_context_lines + 1].max).to_a.reverse
-      w = nos.last.to_s.size # width of greatest line number as string
-      "after:\n" <<
-        (nos.zip(lines).map{|no, s| ("%#{w}i" % no) + ": #{s}" } * "\n")
     end
   end
 end
