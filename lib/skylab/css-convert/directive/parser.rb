@@ -1,7 +1,7 @@
 module Skylab::CssConvert
   module Grammars
     module Directive
-      S = CssConvert::TreetopTools::Sexpesque
+      S = CssConvert::Parser::Sexpesque
     end
   end
   class Directive::Parser
@@ -11,7 +11,7 @@ module Skylab::CssConvert
     def load_parser_class
       super do |o|
         o.enhance_parser_with(
-          CssConvert::TreetopTools::Parser::Extlib::InstanceMethods )
+          CssConvert::Parser::Extlib::InstanceMethods )
         o.force_overwrite! if params.force_overwrite?
         o.generated_grammar_dir "#{params.tmpdir_relative}"
         o.root_for_relative_paths CssConvert.dir

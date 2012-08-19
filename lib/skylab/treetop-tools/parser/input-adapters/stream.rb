@@ -1,6 +1,6 @@
-module Skylab::CssConvert
+module Skylab::TreetopTools
   class Parser::InputAdapters::Stream
-    include CssConvert::Parser::InputAdapter::InstanceMethods
+    include Parser::InputAdapter::InstanceMethods
     def resolve_whole_string
       if upstream.closed?
         error("(broken pipe?) input stream was closed.")

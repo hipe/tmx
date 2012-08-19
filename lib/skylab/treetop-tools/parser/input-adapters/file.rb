@@ -1,4 +1,4 @@
-module Skylab::CssConvert
+module Skylab::TreetopTools
   class Parser::InputAdapters::File < Parser::InputAdapters::Stream
     def entity
       (@entity ||= nil) || 'input file'
@@ -11,7 +11,7 @@ module Skylab::CssConvert
       if :initial == state
         ::String === upstream or
           fail("expecting pathname string, had #{upstream.class}")
-        self.upstream = CssConvert::MyPathname.new(upstream)
+        self.upstream = Pathname.new(upstream) # !
         @state = :pathname
       end
       if :pathname == state

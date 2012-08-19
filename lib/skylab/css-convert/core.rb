@@ -25,6 +25,8 @@ module Skylab::CssConvert
     param :directives_file, pathname: true, writer: true do
       desc 'A file with directives in it.' # (not used yet)
     end
+    param :dump_css, boolean: true
+    param :dump_css_and_exit, boolean: true
     param :dump_directives, boolean: true
     param :dump_directives_and_exit, boolean: true
     param :force_overwrite, boolean: true

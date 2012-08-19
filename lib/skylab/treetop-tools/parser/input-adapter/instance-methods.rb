@@ -1,6 +1,6 @@
-module Skylab::CssConvert
+module Skylab::TreetopTools
   module Parser::InputAdapter::InstanceMethods
-    include My::Headless::SubClient::InstanceMethods
+    include ::Skylab::Headless::SubClient::InstanceMethods
     def initialize request_runtime, upstream, opts=nil, &block
       self.block = block
       self.request_runtime = request_runtime
