@@ -24,9 +24,14 @@ module Skylab::TanMan
     attr_reader :stdout # for nerpuses that have to derpus our ferpus
   protected
     def initialize emit_f, sing, errstream
-      @io_adapter = API::Achtung::My_IO_Adapter.new(emit_f)
       @singletons = sing
       @stdout = errstream # see 'sucky' in this submodule
+      # sorry this is so convoluted, this is a jawbreaking gap bridger
+      @request_runtime = request_runtime_class.new(
+        nil, nil, nil,
+        API::Achtung::My_IO_Adapter.new(emit_f,
+                                        Headless::CLI::IO::Pen::MINIMAL)
+      )
     end
     def config ; @config ||= Models::Config::Controller.new(self) end
     def error(msg)
@@ -37,12 +42,19 @@ module Skylab::TanMan
     def errors_count ; @errors_count ||= 0 ; end
     attr_writer :errors_count
     def formal_parameters ; self.class.parameters end
-    def info(m) ; emit(:info, m) ; true end
-    attr_reader :io_adapter
   end
-  class API::Achtung::My_IO_Adapter < ::Struct.new(:emit_f)
+
+  module API::Achtung::InstanceMethods
+  protected
+    def info(m) ; emit(:info, m) ; true end
+  end
+
+  class API::Achtung
+    include API::Achtung::InstanceMethods
+  end
+
+  class API::Achtung::My_IO_Adapter < ::Struct.new(:emit_f, :pen)
     Headless = ::Skylab::Headless
     def emit(type, data) ; emit_f.call(type, data) end
-    def pen ; @pen ||= Headless::IO::Pen::MINIMAL end
   end
 end

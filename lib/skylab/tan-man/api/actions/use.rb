@@ -9,7 +9,10 @@ module Skylab::TanMan
       if '' == path.extname
         tries.push path.class.new("#{path}#{EXTNAME}")
       end
-      if idx = tries.length.times.detect { |x| tries[x].exist? }
+      idx = tries.length.times.detect do |x|
+        tries[x].exist? && ! tries[x].directory?
+      end
+      if idx
         @path = tries[idx]
         info "using #{path}"
       else
@@ -23,8 +26,12 @@ module Skylab::TanMan
     end
     # -- * --
     def create_path
-      if '' == path.extname
-        @path = path.class.new("#{path}.dot")
+      if path.exist?
+        if path.directory?
+          return error("cannot create, is directory: #{path}")
+        else
+          return error("cannot create, already exists: #{path}")
+        end
       end
       bytes = nil
       path.open('w+') do |fh|

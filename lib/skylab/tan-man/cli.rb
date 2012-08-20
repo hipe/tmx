@@ -219,5 +219,12 @@ module Skylab::TanMan
       api.invoke(path: path)
     end
   end
+
+  class CLI::Actions::Tell < CLI::Action
+    desc "there's a lot you can tell about a man from his choice of words"
+    def invoke *word
+      api.invoke(words: word)
+    end
+  end
 end
 

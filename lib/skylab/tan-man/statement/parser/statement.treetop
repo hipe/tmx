@@ -1,0 +1,24 @@
+module Skylab
+  module TanMan
+    grammar Statement
+      rule dependency_statement
+        agent:cluster sep 'depends on' sep target:cluster
+        { def tree ; Sexp::Auto[ self ] end }
+      end
+      rule cluster
+        first:word rest:(sep content:word)*
+        { def tree ; Sexp::Auto[ self ] end }
+      end
+      rule word
+        (
+          !'depends on'
+          [^,;\t\n\r ]
+        )+
+        { def tree ; text_value end }
+      end
+      rule sep
+        [ \t\n\r]+
+      end
+    end
+  end
+end

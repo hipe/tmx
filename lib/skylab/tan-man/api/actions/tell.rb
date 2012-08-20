@@ -1,10 +1,14 @@
 module Skylab::TanMan
   class API::Actions::Tell < API::Achtung
     param :words, accessor: true, list: true, required: true
+
+    include TanMan::Statement::Parser::InstanceMethods
   protected
     def execute
       ready? or return
-      info("OK, here are some words: #{words.inspect}")
+      stmnt = parse_words(words) or return
+      Models::DotFile::Controller.new(request_runtime).invoke(
+                                                   statement: stmnt, path: path)
     end
     # -- * --
     attr_reader :path

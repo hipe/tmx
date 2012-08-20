@@ -1,6 +1,6 @@
 require File.expand_path('../..', __FILE__)
+require_relative 'core'
 require 'skylab/face/core'
-require 'skylab/meta-hell/autoloader/autovivifying'
 require 'skylab/porcelain/attribute-definer'
 require 'skylab/porcelain/bleeding'
 require 'skylab/pub-sub/emitter'
@@ -10,7 +10,6 @@ module Skylab::TanMan
   Bleeding = Skylab::Porcelain::Bleeding
   Porcelain = Skylab::Porcelain
   PubSub = Skylab::PubSub
-  TanMan = Skylab::TanMan
 
   MY_EVENT_GRAPH = { :info => :all, :out => :all, :no_config_dir => :error, :skip => :info }
   EVENT_GRAPH = Bleeding::EVENT_GRAPH.merge(MY_EVENT_GRAPH)

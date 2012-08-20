@@ -2,6 +2,9 @@ module Skylab::TanMan
   class Models::Config::Controller
     extend Bleeding::DelegatesTo
     include API::AdaptiveStyle
+    def [](k) # is ready? and k is string and local is the thing
+      config_singleton.local[k]
+    end
     def add_remote name, url, resource_name
       require_relative '../remote'
       ready? or return false
@@ -25,6 +28,9 @@ module Skylab::TanMan
       @config_singleton = runtime.singletons.config
     end
     attr_reader :config_singleton
+    def known? name, resource_name=:local # is ready? and name is string
+      config_singleton.send(resource_name).key?(name)
+    end
     def load_default_content resource
       resource.sexp.tap do |o|
         o.prepend_comment '' # in reverse
