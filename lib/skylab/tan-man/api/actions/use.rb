@@ -1,5 +1,5 @@
 module Skylab::TanMan
-  class API::Actions::Use < API::Achtung
+  class API::Actions::Use < API::Achtung::SubClient
     param :path, pathname: true, accessor: true
   protected
     EXTNAME = '.dot'

@@ -22,11 +22,19 @@ module Skylab::TanMan
     def root_runtime ; self end
     attr_reader :singletons
     attr_accessor :stderr, :stdout
+    alias_method :infostream, :stderr
     def text_styler ; self end
   end
 
   module CLI::ActionInstanceMethods
     include API::RuntimeExtensions
+    def infostream
+      if parent
+        parent.infostream
+      else
+        fail("where is infostream for #{self.class}")
+      end
+    end
     def runtime
       parent # their api to ours
     end
@@ -84,6 +92,8 @@ module Skylab::TanMan
       end
       a.reverse
     end
+
+    def infostream ; runtime.infostream end
 
     def initialize
       @api = nil

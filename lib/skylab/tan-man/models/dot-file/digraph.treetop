@@ -1,0 +1,12 @@
+module Skylab::TanMan::Models::DotFile
+  grammar DiGraph
+    rule document
+      space t1:'digraph' space t2:'{' space t3:'}' space
+      { def tree ; Sexp::Auto::Lossless[ self ] end }
+    end
+    rule space
+      [ \t\n\r]*
+      { def tree ; text_value end }
+    end
+  end
+end

@@ -41,6 +41,7 @@ module Skylab::TanMan
       @runtime = runtime
       opts and opts.each { |k, v| send("#{k}=", v) }
     end
+    def infostream ; runtime.infostream end
     def invalid msg
       raise RuntimeError.new(msg)
     end

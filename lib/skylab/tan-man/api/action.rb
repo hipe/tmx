@@ -51,6 +51,9 @@ module Skylab::TanMan
 
     delegates_to :root_runtime, :singletons
 
+    def infostream ; runtime.infostream end
+    alias_method :stderr, :infostream # #jawbreak
+
     delegates_to :runtime, :stdout
 
     delegates_to :runtime, :text_styler

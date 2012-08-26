@@ -73,12 +73,12 @@ module Skylab::TanMan
       if ! resource.exist?
         load_default_content(resource)
       end
-      out = runtime.stdout # sucky
+      is = runtime.infostream
       resource.write do |o|
         o.on_error { |e| emit(e) ; return false }
-        o.on_before_edit { |e| out.write(e.touch!.message) }
-        o.on_before_create { |e| out.write(e.touch!.message) }
-        b = ->(e){ out.puts(" .. done (#{e.touch!.bytes} bytes.)") }
+        o.on_before_edit { |e| is.write(e.touch!.message) }
+        o.on_before_create { |e| is.write(e.touch!.message) }
+        b = ->(e){ is.puts(" .. done (#{e.touch!.bytes} bytes.)") }
         o.on_after_edit(&b)
         o.on_after_create(&b)
         o.on_all { |e| emit(:info, e.message) unless e.touched? }

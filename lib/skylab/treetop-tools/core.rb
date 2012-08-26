@@ -17,23 +17,32 @@ module Skylab::TreetopTools
   class Grammar::Reflection < ::Struct.new(:name, :inpath_f, :outdir_f)
     def inpath ; inpathname.to_s end
     def inpathname ; inpath_f.call end
+    NAME_RX = /[A-Z][a-zA-Z0-9_]+/
+    SPACE_RX = /[ \t]*(#.*)?\n?/
     def nested_const_names
+      # this implementation is a shameless & deferential tribute which, if not
+      # obvious at first glance, is intended to symbolize the triumph of
+      # the recursive buck stopping somewhere even if it perhaps doesn't
+      # need to.  (i.e.: yes i know, and i'm considering it.)
       lines = build_lines_enumerator or return false
       require 'strscan'
       consts = [] ; scn = nil
       lines.each do |line|
         scn ? (scn.string = line) : (scn = ::StringScanner.new line)
-        scn.skip(/[ \t]*(#.*)?\n?/)
+        scn.skip SPACE_RX
         scn.eos? and next
         if scn.scan(/module[ \t]+/)
-          consts << (scn.scan(/[A-Z][a-zA-Z0-9_]+/) or fail("no: #{scn.rest}"))
+          consts << (scn.scan(NAME_RX) or fail("no: #{scn.rest}"))
+          while scn.scan(/::/)
+            consts << (scn.scan(NAME_RX) or fail("no: #{scn.rest}"))
+          end
         elsif scn.scan(/grammar[ \t]+/)
-          consts << (scn.scan(/[A-Z][a-zA-Z0-9_]+/) or fail("no: #{scn.rest}"))
+          consts << (scn.scan(NAME_RX) or fail("no: #{scn.rest}"))
           break
         else
           fail("grammar grammar hack failed: #{scn.rest.inspect}")
         end
-        scn.skip(/[ \t]*(#.*)?\n?/)
+        scn.skip SPACE_RX
         scn.eos? or fail("grammar grammar hack failed: #{scn.rest.inspect}")
       end
       consts
@@ -171,7 +180,7 @@ module Skylab::TreetopTools
         Grammar::Reflection.new(pn.to_s, ->{ treetop_grammar[i] },
                                 -> { generated_grammar_dir })
       end
-      normalize_paths_to(:root_for_relative_paths) or return
+      normalize_and_validate_paths_to(:root_for_relative_paths) or return
       load_or_generate_grammar_files or return
       (kk = grammars.last.nested_const_names) or return
       (kk[kk.length - 1] = "#{kk.last}Parser") &&
@@ -217,33 +226,30 @@ module Skylab::TreetopTools
         false
       end
     end
-    def normalize_paths_to param_name
+    def normalize_and_validate_paths_to param_name
       errors_count_before = errors_count
-      root_f = ->(p) do
+      root_f = ->(bp) do
         root = bound_parameters[param_name]
         ! root.value and return error("#{root.name} must be set in " <<
-          "order to support a relative path like #{p.label}!")
+          "order to support a relative path like #{bp.label}!")
         ! root.value.absolute? and return error("#{root.name} must " <<
-          "be an absolute path in order to expand paths like #{p.label}")
+          "be an absolute path in order to expand paths like #{bp.label}")
         (root_f = ->(_) { root }).call(nil)
       end
-      arr = bound_parameters.where(exist: :must).to_a
-      arr.each do |p|
-        p.value or next
-        root = tries = nil
-        if ! p.value.absolute? && ! p.value.exist?
-          (tries ||= []).push p.value
-          root or (root = root_f[p] or return)
-          p.name == root.name and fail('sanity')
-          p.value = root.value.join(p.value) # OH MY GOD SO SEXY and evil
+      pathname_params = bound_parameters.where do |param|
+        param.known?(:pathname) && param[:pathname]
+      end.to_a
+      pathname_params.each do |bp|
+        bp.value or next # if path value wasn't specified, leave brittany alone
+        if ! bp.value.absolute? # expand *all* relative paths
+          bp.value = root_f[bp].value.join(bp.value) # sexy and evil
         end
-        if ! p.value.exist?
-          (tries ||= []).push p.value
-          _context = (tries.length == 2) ? ": #{ tries[0].pretty }" :
-            ", looked in  #{ tries.map(&:pretty).join(', ') }"
-          error("#{ p.label } not found#{ _context }")
-        elsif p.parameter.dir? and ! p.value.directory?
-          error("#{ p.label } is not a directory: #{p.value}")
+        if bp.value.exist?
+          if bp.parameter.dir? and ! bp.value.directory?
+            error("#{ bp.label } is not a directory: #{ p.value.pretty }")
+          end
+        elsif :must == bp.parameter.exist
+          error("#{ bp.label } not found: #{bp.value.pretty}")
         end
       end
       errors_count == errors_count_before
@@ -277,14 +283,14 @@ module Skylab::TreetopTools
       newconst = parent_mod.const_set(usename, newcls)
       newconst
     end
-    def summarize gx
-      ex = []; cx = []
-      gx.each { |g| ( g.outpathname.exist? ? ex : cx ).push g.name }
-      ex.empty? or
-        emit(:info,
-                  "#{force_overwrite ? 'overwrit' : 'us'}ing: #{ex.join(', ')}")
-      cx.empty? or emit(:info, "creating: #{cx.join(', ')}")
-      gx.empty? and emit(:info, "none.")
+    def summarize grammars
+      exists = []; creates = []
+      grammars.each { |g| (g.outpathname.exist? ? exists : creates).push g }
+      exists.empty? or emit(:info, "#{force_overwrite ? 'overwrit' : 'us'
+        }ing: #{exists.map(&:outpath).join(', ')}")
+      creates.empty? or
+        emit(:info, "creating: #{creates.map(&:outpath).join(', ')}")
+      grammars.empty? and emit(:info, "none.")
       true
     end
   end

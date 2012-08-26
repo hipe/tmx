@@ -18,6 +18,10 @@ module Skylab::Headless
   module Parameter::Controller::StructAdapter::InstanceMethods
     include SubClient::InstanceMethods
     include Parameter::Controller::InstanceMethods
+    def invoke params
+      set!(params) or return
+      execute
+    end
   protected
     def error msg
       emit(:error, msg)

@@ -22,7 +22,7 @@ module Skylab::Flex2Treetop::MyTestSupport
         context "with good parameters" do
           before { tmpdir.prepare }
           let(:outfile) { tmpdir.join('out.rb') }
-          it "it makes that badboy!", f:true do
+          it "it makes that badboy!" do
             api_client.invoke(:translate,
               flexfile: fixture(:mini), outfile: outfile
             ).should eql(:translated)

@@ -77,6 +77,10 @@ module Skylab::Flex2Treetop
     API::Client.new.invoke(method, params)
   end
 
+  def API.translate params
+    API::Client.new.invoke(:translate, params)
+  end
+
   module API::Actions end
   module API::Actions::Translate end
   class API::Actions::Translate::Parameters <

@@ -27,14 +27,15 @@ module Skylab::TanMan::TestSupport
         before do
           prepare_local_conf_dir
         end
+        announce = :stderr
         it 'you can add a local remote' do
           input 'remote add bing bong'
-          output_shift_only_is :stdout, %r{^creating .+/tmp/tanman/local-conf\.d.+\d\d bytes\.}, true
+          output_shift_only_is announce, %r{^creating .+/tmp/tanman/local-conf\.d.+\d\d bytes\.}, true
         end
         context 'you can list the remotes' do
           it 'when there are no remotes.' do
             input 'remote list'
-            output_shift_only_is :stderr, 'no remotes found in 0 config files', true
+            output_shift_only_is announce, 'no remotes found in 0 config files', true
           end
           it 'when there is one remote.' do
             input 'remote add nerp derp'
@@ -52,13 +53,13 @@ module Skylab::TanMan::TestSupport
           end
           it 'using a valid name works' do
             input 'remote rm foo'
-            output_shift_is :stdout, %r{updating .*local-conf\.d/config \.\. done \(\d\d+ bytes\.\)}
-            output_shift_only_is :stderr, 'ferp remote rm: removed remote foo', true
+            output_shift_is announce, %r{updating .*local-conf\.d/config \.\. done \(\d\d+ bytes\.\)}
+            output_shift_only_is announce, 'ferp remote rm: removed remote foo', true
           end
           it 'using an invalid name' do
             input 'remote rm fo'
-            output_shift_is :stderr, 'failed to rm remote: couldn\'t find a remote named "fo"'
-            output_shift_only_is :stderr, 'the only known remote is foo in this searched config resource', true
+            output_shift_is announce, 'failed to rm remote: couldn\'t find a remote named "fo"'
+            output_shift_only_is announce, 'the only known remote is foo in this searched config resource', true
           end
         end
       end

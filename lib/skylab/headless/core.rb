@@ -314,8 +314,8 @@ module Skylab::Headless
   module Request end
   module Request::Runtime end
   class Request::Runtime::Minimal < Struct.new(
-    :io_adapter_f, :params_f, :parameter_controller_f,
-    :io_adapter,   :params,   :parameter_controller
+    :io_adapter,   :params,   :parameter_controller,
+    :io_adapter_f, :params_f, :parameter_controller_f
   )
     extend Parameter::Definer::ModuleMethods
     include Parameter::Definer::InstanceMethods::StructAdapter
@@ -364,6 +364,7 @@ module Skylab::Headless
     end
     def build_request_runtime
       request_runtime_class.new(
+        nil, nil, nil,
         ->{build_io_adapter}, ->{build_params}, ->{build_parameter_controller}
       )
     end

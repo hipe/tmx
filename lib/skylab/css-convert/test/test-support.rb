@@ -15,7 +15,8 @@ module Skylab::CssConvert
 
     def cli_instance
       @cli_instance ||= begin
-        a = (o = CssConvert::CLI.new).io_adapter
+        o = CssConvert::CLI.new
+        a = o.io_adapter
         o.send(:program_name=, 'nerk')
         (_streams = %w(outstream errstream)).each do |stream|
           a.send("#{stream}=", ::Skylab::TestSupport::StreamSpy.standard)

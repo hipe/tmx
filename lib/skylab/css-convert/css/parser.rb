@@ -4,30 +4,30 @@ module Skylab::CssConvert
     include CssConvert::Parser::InstanceMethods
     ENTITY_NOUN_STEM = 'css file'
     PARSER_PARSERS = {
-      FlexToTreetop: { path: '../../../bin/flex2treetop' },
-      YaccToTreetop: { path: '../../../bin/yacc2treetop' }
+      Flex2Treetop: { path: '../flex2treetop/core.rb' },  # when you fall down,
+      Yacc2Treetop: { path: '../../../bin/yacc2treetop' } # i will catch you
     }
     PARSERS = [
       { on:       true,
-        use:      :FlexToTreetop,
+        use:      :Flex2Treetop,
         read:     'css2.1.flex',
         write:    'css-2.1-tokens.treetop.rb',
         grammar:  'Skylab::CssParser::Tokens'
       },
       { on:       true,
-        use:      :YaccToTreetop,
+        use:      :Yacc2Treetop,
         read:     'css2.1.yacc3wc',
         write:    'css-2.1-document.treetop.rb',
         grammar:  'Skylab::CssParser::CssDocument'
       },
       { on:       nil,
-        use:      :FlexToTreetop,
+        use:      :Flex2Treetop,
         read:     'tokens.flex',
         write:    'css-tokensXXX.treetop.rb',
         grammar:  'Skylab::CssParser::TokensXXX'
       },
       { on:       nil,
-        use:      :YaccToTreetop,
+        use:      :Yacc2Treetop,
         read:     'selectors.yaccw3c',
         write:    'css-selectors.treetob.rb',
         grammar:  'Skylab::CssParser::Selectors'
@@ -48,7 +48,7 @@ module Skylab::CssConvert
     def build_big_parser
       f = params[:force_overwrite]
       v = params[:verbose]
-      indir  = MyPathname.new(CssConvert.dir.join('css-parser'))
+      indir  = MyPathname.new(CssConvert.dir.join('css/parser'))
       outdir = MyPathname.new(CssConvert.dir.join(params[:tmpdir_relative]))
       PARSERS.each do |parser|
         parser[:on] or next
@@ -57,16 +57,18 @@ module Skylab::CssConvert
           build_parser_parser(parser) or return
         end
       end
+      nil
     end
     alias_method :build_parser, :build_big_parser
     def build_parser_parser parser
-      _klass = parser_parser_module(parser.use)::Translator
-      require 'debugger' ; debugger ; puts "TOLERANCE IS HAPPY"
-      _translator = _klass.new(params)
-      _result = _translator.translate(parser.inpath, parser.outpath,
-        force:   params[:force_overwrite],
-        grammar: params[:gramamr]
-      )
+      _api_mod = parser_parser_module(parser.use)::API
+      _request = {
+        force: params[:force_overwrite],
+        grammar: parser.grammar,
+        inpath: parser.inpath.to_s,
+        outpath: parser.outpath.to_s
+      }
+      _result = _api_mod.translate(_request)
       _result
     end
     def parser_parser_module const

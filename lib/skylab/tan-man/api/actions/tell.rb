@@ -1,5 +1,5 @@
 module Skylab::TanMan
-  class API::Actions::Tell < API::Achtung
+  class API::Actions::Tell < API::Achtung::SubClient
     param :words, accessor: true, list: true, required: true
 
     include TanMan::Statement::Parser::InstanceMethods
@@ -8,7 +8,7 @@ module Skylab::TanMan
       ready? or return
       stmnt = parse_words(words) or return
       Models::DotFile::Controller.new(request_runtime).invoke(
-                                                   statement: stmnt, path: path)
+        statement: stmnt, path: path )
     end
     # -- * --
     attr_reader :path

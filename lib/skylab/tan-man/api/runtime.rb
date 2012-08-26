@@ -89,6 +89,7 @@ module Skylab::TanMan
         o
       end
     end
+    alias_method :infostream, :stdout # somebody tell me what the hell is going
     delegates_to :runtime, :text_styler
     def success?
       ! first_error
