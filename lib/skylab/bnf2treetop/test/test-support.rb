@@ -19,13 +19,13 @@ module Skylab::Bnf2Treetop::TestSupport
       let(:_frame) do
         errstream = ::Skylab::TestSupport::StreamSpy.standard
         outstream = ::Skylab::TestSupport::StreamSpy.standard
-        cli = Bnf2Treetop::CliAgent.new(outstream, errstream)
+        cli = Bnf2Treetop::CLI.new(outstream, errstream)
         cli.program_name = 'bnf2treetop'
         o = ::Struct.new(:debug_f, :err_f, :out_f).new # 'joystick'
         o.debug_f = ->{ outstream.debug!; errstream.debug! }
         collapsed_f = -> do
           oo = ::Struct.new(:err, :out, :result).new
-          oo.result = cli.run argv
+          oo.result = cli.invoke argv
           oo.out = outstream.string.split("\n")
           oo.err = errstream.string.split("\n")
           (collapsed_f = ->{ oo }).call
@@ -38,7 +38,7 @@ module Skylab::Bnf2Treetop::TestSupport
   end
   module CLI::InstanceMethods
     FIXTURES = ::Pathname.new(File.expand_path('../fixtures', __FILE__))
-    USAGE_RE = /\busage: bnf2treetop <bnf_file>\z/i
+    USAGE_RE = /\busage: bnf2treetop <bnf-file>\z/i
 
     def debug! ; _frame.debug_f.call end
     def err    ; _frame.err_f.call   end

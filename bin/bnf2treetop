@@ -2,59 +2,114 @@
 
 require 'strscan'
 require 'optparse'
+require 'pathname'
+require 'stringio'
 
 # unit test:
 # rspec lib/skylab/bnf2treetop/test/cli-integration_spec.rb
 
 module Skylab ; end
-
 module Skylab::Bnf2Treetop
-  class << self
-    def cli
-      CliAgent.new
+
+  Params = ::Struct.new(:literalize_unicode, :rule_prefix, :uncamelize)
+  DEFAULTS = Params.new(true,                nil,          true)
+
+  module Headless end
+  module Headless::Client_InstanceMethods
+  protected
+    def error msg ; emit(:error, msg) ; false end
+    def info msg ; emit(:info, msg) end
+    def or_  list ; oxford_comma(list, ' or ') end
+    def oxford_comma items, last_glue = ' and ', rest_glue = ', '
+      items.zip(
+        items.size < 2 ? [] :
+          ( [last_glue] + ::Array.new(items.size - 2, rest_glue) ).reverse
+      ).flatten.join
     end
   end
-  class CliAgent
-    def initialize sout=nil, serr=nil
-      @out = sout || $stdout
-      @err = serr || $stderr
+
+  module CLI
+    def self.new(*a, &b) ; CLI::Client.new(*a, &b) end
+  end
+
+  class CLI::Client < ::Struct.new(:paystream, :infostream, :upstream)
+    include Headless::Client_InstanceMethods
+    def initialize paystream=$stdout, infostream=$stderr
+      super(paystream, infostream)
     end
-    def run argv
-      if argv.size != 1 then return @err.puts(usage) end
-      if /^-/ =~ argv.first then return @err.puts(usage) end
-      if ! File.exist?(argv.first)
-        @err.puts "file not found: #{argv.first}"
-        return @err.puts(usage)
-      end
-      content = File.read(argv.first)
-      Bnf2Treetop.new(@out, @err).run(content)
+    def invoke argv
+      absorb_argv!(argv) or return
+      resolve_upstream or return
+      Headless::Client.new(self).execute
     end
-    def usage; "usage: #{program_name} <bnf_file>" end
+    def emit type, string
+      (:payload == type ? paystream : infostream).puts string
+    end
+    attr_writer :program_name
+  protected
+    def absorb_argv! argv
+      (argv.length == 1 and /\A-/ !~ argv.first) or return usage
+      @in_pathname = ::Pathname.new(argv.shift)
+      true
+    end
+    attr_reader :in_pathname
     def program_name
       (@program_name ||= nil) || File.basename($PROGRAM_NAME)
     end
-    attr_writer :program_name
-  end
-  class Config < Hash
-    def initialize h=nil
-      h.nil? or replace(h)
+    def resolve_upstream
+      in_pathname.exist? or return usage("file not found: #{in_pathname}")
+      self.upstream = ::StringIO.new(in_pathname.read)
+      true
+    end
+    def usage msg=nil
+      msg and emit(:usage, msg)
+      emit(:usage, "usage: #{program_name} <bnf-file>")
+      false
     end
   end
-  class Bnf2Treetop
-    def initialize out=nil, err=nil
-      @tree = [:rules]
-      @stack = [@tree]
-      @out = out || $stdout
-      @err = err || $stderr
-      @expecting = []
-      @config = Config.new(
-        :rule_prefix        => nil,
-        :uncamelize         => true,
-        :literalize_unicode => true
-      )
+
+  class Headless::Client < ::Struct.new(
+    :literalize_unicode, :rule_prefix, :uncamelize,
+    # --*--
+    :expecting, :tree, :request_runtime, :scn)
+
+    include Headless::Client_InstanceMethods
+
+    def initialize request_runtime
+      super(*DEFAULTS.to_a, [], [:rules], request_runtime)
+      @stack = [tree]
     end
-    def push sexp
-      @stack.last.push sexp
+    def execute
+      self.scn = ::StringScanner.new(request_runtime.upstream.read)
+      request_runtime.upstream.close
+      white!
+      catch(:done) do
+        until scn.eos?
+          new_rule!
+          rule_name!; white!; equals_thingy!; white!; rule_rhs!; white!
+        end
+      end
+      # PP.pp tree
+      params = Params.new
+      Params.members.each { |m| params[m] = send(m) }
+      Nodes::Rules.new(tree, request_runtime.paystream,
+        request_runtime.infostream, params).to_treetop
+    end
+  protected
+    def emit(type, data) ; request_runtime.emit(type, data) end
+    def fail_with_context msg
+      info msg
+      before = scn.string[[0, scn.pos-20].max .. scn.pos].gsub("\n", " ")
+      after = scn.peek(20).gsub("\n", " ")
+      info "at: #{before}#{after}"
+      info "----#{'-' * before.size}^"
+      scn.eos? and info("before end of input)")
+      throw(:done, { status: 1 })
+    end
+    def new_rule!
+      sexp = [:rule]
+      push sexp                 # append sexp to sexp at the top of stack
+      stack.push sexp           # make new sexp be new top of stack
     end
     def one_of_or_fail &block
       reset_expecting!
@@ -62,58 +117,26 @@ module Skylab::Bnf2Treetop
         reset_expecting!
         found
       else
-        msg = report_union_failure
-        fail_with_context(msg)
+        fail_with_context("Expecting #{or_ expecting.map(&:to_s)}")
       end
+    end
+    def push sexp
+      stack.last.push sexp
     end
     def reset_expecting!
-      @expecting.clear
+      expecting.clear
     end
-    def oxford_comma items, last_glue = ' and ', rest_glue = ', '
-      items.zip(
-        items.size < 2 ? [] :
-          ( [last_glue] + Array.new(items.size - 2, rest_glue) ).reverse
-      ).flatten.join
-    end
-    def report_union_failure
-      "Expecting #{oxford_comma(@expecting.map(&:to_s), ' or ')}"
-    end
-    def fail_with_context msg
-      @err.puts msg
-      before = @s.string[[0, @s.pos-20].max .. @s.pos].gsub("\n", " ")
-      after = @s.peek(20).gsub("\n", " ")
-      @err.puts "at: #{before}#{after}"
-      @err.puts "----#{'-' * before.size}^"
-      if (@s.eos?) then @err.puts("(before end of input)") end
-      throw(:done, {:status => 1})
-    end
-    def run input_str
-      @s = StringScanner.new(input_str)
-      white!
-      catch(:done) do
-        until @s.eos?
-          new_rule!
-          rule_name!; white!; equals_thingy!; white!; rule_rhs!; white!
-        end
-      end
-      # PP.pp @tree
-      Nodes::Rules.new(@tree, @out, @err){ |x| x.config = @config }.to_treetop
-    end
+    attr_reader :stack
     def white!
-      @s.skip(/[ \t\n\r\f]+/) || true
-    end
-    def new_rule!
-      sexp = [:rule]
-      push sexp                 # append sexp to sexp at the top of stack
-      @stack.push sexp          # make new sexp be new top of stack
+      scn.skip(/[ \t\n\r\f]+/) || true
     end
     def rule_name!
       n = _rule_name! or fail_with_context("expected Rule Name")
       push n
     end
     def _rule_name!
-      @expecting << :rule_name
-      if str = @s.scan(/[_a-zA-Z][_a-zA-Z0-9]*/) then [:rule_name, str] end
+      expecting << :rule_name
+      if str = scn.scan(/[_a-zA-Z][_a-zA-Z0-9]*/) then [:rule_name, str] end
     end
     def equals_thingy!
       _equals_thingy! or fail_with_context("expected \"::=\"")
@@ -121,10 +144,10 @@ module Skylab::Bnf2Treetop
     def rule_rhs!
       sexp = [:rhs]
       push sexp
-      @stack.push sexp
+      stack.push sexp
       rhs!
-      @stack.pop # pop the rhs
-      @stack.pop # pop the rule!!
+      stack.pop # pop the rhs
+      stack.pop # pop the rule!!
     end
     def rhs!
       got = one_of_or_fail {
@@ -133,15 +156,15 @@ module Skylab::Bnf2Treetop
       }
       push got
       white!
-      if @s.eos?        then return end
-      if @s.check(/\)/) then return end # never processed here
+      if scn.eos?        then return end
+      if scn.check(/\)/) then return end # never processed here
       reset_expecting!
-      @expecting << :end_of_input # maybe not used
+      expecting << :end_of_input # maybe not used
       need_moar = false
       if got = _kleene!
         push got
         white!
-        if @s.eos? then return end
+        if scn.eos? then return end
       end
       if got = _or!
         push got
@@ -153,65 +176,65 @@ module Skylab::Bnf2Treetop
       # this way we don't need to care about use of newlines or really any
       # other whitespace
 
-      noted = @s.pos
+      noted = scn.pos
       if (! need_moar && got = _rule_name! && white! &&
-          _equals_thingy! && @stack[@stack.size-2].first == :rule )
+          _equals_thingy! && stack[stack.size-2].first == :rule )
       then
-        @s.pos = noted # if a symbol name followed by a '::=', rewind, done
+        scn.pos = noted # if a symbol name followed by a '::=', rewind, done
         return
       end
-      @s.pos = noted # rewind no matter what! let other call handle rhs symbol
+      scn.pos = noted # rewind no matter what! let other call handle rhs symbol
       rhs!
     end
     def _parenthesized_group!
-      @expecting << :parenthesized_group
-      if @s.scan(/\(/)
+      expecting << :parenthesized_group
+      if scn.scan(/\(/)
         nu = [:parenthesized_group]
         # push nu sort of up in the air about whether to do this early or late
-        @stack.push nu
+        stack.push nu
         rhs!
         white!
-        one_of_or_fail { @expecting << ')'; @s.scan(/\)/) }
-        have = @stack.pop
+        one_of_or_fail { expecting << ')'; scn.scan(/\)/) }
+        have = stack.pop
         have
       end
     end
     def _character_class!
-      @expecting << :character_class
-      if found = @s.scan(/\[(?:[^\]]|\\\])+\]/)
+      expecting << :character_class
+      if found = scn.scan(/\[(?:[^\]]|\\\])+\]/)
         [:character_class, found]
       end
     end
     def _equals_thingy!
-      @s.skip(/::=/)
+      scn.skip(/::=/)
     end
     def _kleene!
-      @expecting << :kleene
-      if found = @s.scan(/[*+]/)
+      expecting << :kleene
+      if found = scn.scan(/[*+]/)
         [:kleene, found]
       end
     end
     def _nonempty_quoted_string!
-      @expecting << :nonempty_quoted_string
-      if found = @s.scan(/"(?:\\"|[^"])+"/)
+      expecting << :nonempty_quoted_string
+      if found = scn.scan(/"(?:\\"|[^"])+"/)
         [:nonempty_quoted_string, found]
       end
     end
     def _or!
-      @expecting << :or
-      if found = @s.scan(/\|/)
+      expecting << :or
+      if found = scn.scan(/\|/)
         [:or, found]
       end
     end
     def _unicodepoint_literal!
-      @expecting << :unicodepoint_literal
-      if found = @s.scan(/#x([a-zA-Z0-9]+)/)
+      expecting << :unicodepoint_literal
+      if found = scn.scan(/#x([a-zA-Z0-9]+)/)
         [:unicodepoint_literal, found]
       end
     end
   end
   module Nodes
-    module Helpers
+    module Helper_InstanceMethods
       def literalize_unicode str
         str.gsub(/#x([a-zA-Z0-9]+)/){ [$1.hex].pack('U*') }
       end
@@ -219,22 +242,22 @@ module Skylab::Bnf2Treetop
         str.gsub(/([a-z])([A-Z])/){ "#{$1}_#{$2}" }.downcase
       end
     end
-    class Node
-      include Helpers
-      def initialize tree, out, err, config=nil
-        @tree = tree; @out = out; @err = err
+    class Node < ::Struct.new(:tree, :paystream, :infostream, :params)
+      include Helper_InstanceMethods
+      def initialize tree, paystream, infostream, params
+        super(tree, paystream, infostream, params)
         yield(self) if block_given?
-        @config ||= (config || Config.new)
       end
-      attr_accessor :tree, :config
+    protected
+      def write string ; paystream.write(string) end
     end
     class Rules < Node
       def to_treetop
-        stupid = Rule.new(nil, @out, @err, @config)
-        @tree[1..-1].each_with_index do |tree, idx|
-          @out.write("\n") unless idx == 0
-          stupid.tree = tree
-          stupid.to_treetop
+        flyweight = Rule.new(nil, paystream, infostream, params)
+        tree[1..-1].each_with_index do |tree, idx|
+          0 == idx or write("\n")
+          flyweight.tree = tree
+          flyweight.to_treetop
         end
         nil
       end
@@ -242,67 +265,70 @@ module Skylab::Bnf2Treetop
     class Rule < Node
       def initialize *a
         super(*a)
-        @rhs = Rhs.new(nil, @out, @err, @config)
+        @rhs = RHS.new(nil, paystream, infostream, params)
       end
       def to_treetop
-        @rhs.tree = @tree[2]
-        @out.puts "  rule #{rule_name}"
-        @out.write "    "
+        rhs.tree = tree[2]
+        paystream.puts "  rule #{rule_name}"
+        paystream.write '    '
         @rhs.to_treetop
-        @out.write "\n  end"
+        paystream.write "\n  end"
         nil
       end
       def rule_name
-        val = @config[:uncamelize] ? uncamelize(@tree[1][1]) : @tree[1][1]
-        if @config[:rule_prefix]
-          val = "#{@config[:rule_prefix]}#{val}"
-        end
-        val
+        str = tree[1][1]
+        params.uncamelize and str = uncamelize(str)
+        params.rule_prefix and str = "#{params.rule_prefix}#{str}"
+        str
       end
+    protected
+      attr_reader :rhs
     end
-    class Rhs < Node
-      def to_treetop node=@tree
+    class RHS < Node
+      def to_treetop node=tree
         node[1..-1].each_with_index do |_sexp, idx|
           send("_#{_sexp.first}", _sexp, idx)
         end
       end
-      def _character_class s, idx
-        @out.write(' ') unless idx == 0
-        val = @config[:literalize_unicode] ? literalize_unicode(s[1]) : s[1]
-        @out.write val
+      def _character_class sexp, idx
+        0 == idx or write(' ')
+        str = sexp[1]
+        params.literalize_unicode and str = literalize_unicode(str)
+        write str
       end
-      def _kleene s, idx
-        @out.write(s[1])
+      def _kleene sexp, idx
+        write sexp[1]
       end
-      def _nonempty_quoted_string s, idx
-        @out.write(' ') unless idx == 0
-        @out.write s[1] # careful!
+      def _nonempty_quoted_string sexp, idx
+        0 == idx or write(' ')
+        write sexp[1] # careful!
       end
       def _or _, __
-        @out.write(' ')
-        @out.write('/')
+        write(' /')
       end
-      def _parenthesized_group s, idx
-        @out.write(' ') unless idx == 0
-        @out.write '('
-        to_treetop s
-        @out.write ')'
+      def _parenthesized_group sexp, idx
+        0 == idx or write(' ')
+        write '('
+        to_treetop sexp
+        write ')'
       end
-      def _rule_name s, idx
-        @out.write(' ') unless idx == 0
-        val = @config[:uncamelize] ? uncamelize(s[1]) : s[1]
-        if (@config[:rule_prefix])
-          val = "#{@config[:rule_prefix]}#{val}"
-        end
-        @out.write(val)
+      def _rule_name sexp, idx
+        0 == idx or write(' ')
+        str = sexp[1]
+        params.uncamelize and str = uncamelize(str)
+        params.rule_prefix and str = "#{params.rule_prefix}#{str}"
+        write str
       end
-      def _unicodepoint_literal s, idx
-        @out.write(' ') unless idx == 0
-        val = @config[:literalize_unicode] ? literalize_unicode(s[1]) : s[1]
-        @out.write val.inspect # careful!
+      def _unicodepoint_literal sexp, idx
+        0 == idx or write(' ')
+        str = sexp[1]
+        params.literalize_unicode and str = literalize_unicode(str)
+        write str.inspect # careful!
       end
     end
   end
 end
 
-$PROGRAM_NAME == __FILE__ and Skylab::Bnf2Treetop.cli.run(ARGV)
+if $PROGRAM_NAME == __FILE__
+  ::Skylab::Bnf2Treetop::CLI.new.invoke(ARGV)
+end
