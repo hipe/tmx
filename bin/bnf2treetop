@@ -20,7 +20,7 @@ module Skylab::Bnf2Treetop
     P[:literalize_unicode,
        bool: true,
        default: true,
-       desc: 'Output e.g. unicode glyphs (not number codes){{default}}'
+       desc: "Output unicode glyphs as opposed\nto number codes{{default}}"
     ],
     P[:rule_prefix,
        desc: '{{arg_label}} will be prepended as-is to rule names.'
@@ -28,7 +28,8 @@ module Skylab::Bnf2Treetop
     P[:uncamelize,
        bool: true,
        default: true,
-       desc: 'Whether to convert names from camel-case to underscore{{default}}'
+       desc: ['Whether to convert names from camel-case',
+              'to underscore{{default}}']
     ],
     P[:sexp,
        bool: true,
@@ -66,7 +67,22 @@ module Skylab::Bnf2Treetop
     def build_option_parser
       op = ::OptionParser.new
       op.separator em('options:')
-      args = []
+      args = [] ; arg_label = nil
+      desc_f = ->(p) do
+        a = (::Array === p.desc ? p.desc : [p.desc]).reduce([]) do |m, s|
+          m.concat s.split("\n")
+          m
+        end
+        a.map! do |s|
+          s.gsub(/\{\{((?:(?!\}\}).)+)\}\}/) do
+            case $1
+            when 'arg_label' ; arg_label
+            when 'default'   ; " (default: #{p.default})"
+            end
+          end
+        end
+        args.concat a
+      end
       single_letter_taken = ::Hash.new do |h, k|
         args.push "-#{k}"
         h[k] = true
@@ -78,21 +94,13 @@ module Skylab::Bnf2Treetop
         single_letter_taken[name[0, 1]] unless (p.bool and true == p.default)
         label = "#{name.gsub('_', '-')}"
         arg_label = "<#{ name.split('_').last }>"
-        long = if p.bool
+        args.push( if p.bool
                  if true == p.default then  "--[no-]#{ label }"
                  else                       "--#{ label }"
                  end
                else "--#{ label }=#{ arg_label }"
-               end
-        args.push long
-        p.desc and args.push(
-          p.desc.gsub(/\{\{((?:(?!\}\}).)+)\}\}/) do
-            case $1
-            when 'arg_label' ; arg_label
-            when 'default'   ; " (default: #{p.default})"
-            end
-          end
-        )
+               end )
+        p.desc and desc_f.call p
         op.on(*args) { |v| headless_client[p.name] = v }
       end
       op.on('-h', '--help', 'Show this message') { queue.push :help }
