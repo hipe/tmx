@@ -3,6 +3,7 @@ load File.expand_path('../../../../../bin/bnf2treetop', __FILE__)
 require_relative('../..')
 
 require 'skylab/test-support/core'
+require 'skylab/headless/core' # unstylize
 
 module Skylab::Bnf2Treetop::TestSupport
   Bnf2Treetop = ::Skylab::Bnf2Treetop
@@ -15,7 +16,8 @@ module Skylab::Bnf2Treetop::TestSupport
     end
   end
   module CLI::ModuleMethods
-    def invoke *argv
+    def invoke *argv, &output_f
+      ::Hash === argv.last and tags = argv.pop # BE CAREFUL!!!!
       let(:_frame) do
         errstream = ::Skylab::TestSupport::StreamSpy.standard
         outstream = ::Skylab::TestSupport::StreamSpy.standard
@@ -34,18 +36,28 @@ module Skylab::Bnf2Treetop::TestSupport
         o.out_f = ->{ collapsed_f.call.out }
         o
       end
+      output_f and make_an_example_out_of(output_f, * [tags].compact)
+    end
+    def make_an_example_out_of output_f, *a
+      o = ::BasicObject.new
+      labels = []
+      class << o ; self end.send(:define_method, :method_missing) do |m, *a|
+        labels.push "#{m.to_s.gsub('_', ' ')}#{'(..)' unless a.empty?}"
+      end
+      o.instance_eval(&output_f)
+      labels.empty? and labels.push('(none)') # sanity
+      it "outputs #{labels.join(', ')}", *a do
+        instance_eval(&output_f)
+      end
     end
   end
   module CLI::InstanceMethods
+    include ::Skylab::Headless::CLI::IO::Pen::InstanceMethods
+
     FIXTURES = ::Pathname.new(File.expand_path('../fixtures', __FILE__))
-    USAGE_RE = /\busage: bnf2treetop <bnf-file>\z/i
 
     def debug! ; _frame.debug_f.call end
     def err    ; _frame.err_f.call   end
     def out    ; _frame.out_f.call   end
-    def should_see_usage
-      err.shift.should match(USAGE_RE)
-      err.size.should eql(0)
-    end
   end
 end

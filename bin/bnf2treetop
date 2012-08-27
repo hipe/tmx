@@ -5,14 +5,37 @@ require 'optparse'
 require 'pathname'
 require 'stringio'
 
-# unit test:
-# rspec lib/skylab/bnf2treetop/test/cli-integration_spec.rb
+# unit test(s):
+# rspec lib/skylab/bnf2treetop/test
+
+# The implementation of this is a tribute to all the hand-written top-down
+# recursive descent parsers of the world.
 
 module Skylab ; end
 module Skylab::Bnf2Treetop
 
-  Params = ::Struct.new(:literalize_unicode, :rule_prefix, :uncamelize)
-  DEFAULTS = Params.new(true,                nil,          true)
+  Param = ::Struct.new(:name, :default, :bool, :desc)
+  P = ->(n, o=nil) { p = Param.new(n) ; o and o.each { |k, v| p[k] = v } ; p }
+  PARAMS = [
+    P[:literalize_unicode,
+       bool: true,
+       default: true,
+       desc: 'Output e.g. unicode glyphs (not number codes){{default}}'
+    ],
+    P[:rule_prefix,
+       desc: '{{arg_label}} will be prepended as-is to rule names.'
+    ],
+    P[:uncamelize,
+       bool: true,
+       default: true,
+       desc: 'Whether to convert names from camel-case to underscore{{default}}'
+    ],
+    P[:sexp,
+       bool: true,
+       desc: 'Suppress normal output.  show grammar sexp.'
+    ]
+  ]
+  # PARAM = ::Hash[ * PARAMS.map { |p| [p.name, p] }.flatten ]
 
   module Headless end
   module Headless::Client_InstanceMethods
@@ -32,79 +55,167 @@ module Skylab::Bnf2Treetop
     def self.new(*a, &b) ; CLI::Client.new(*a, &b) end
   end
 
-  class CLI::Client < ::Struct.new(:paystream, :infostream, :upstream)
+  module CLI::Client_InstanceMethods
     include Headless::Client_InstanceMethods
-    def initialize paystream=$stdout, infostream=$stderr
-      super(paystream, infostream)
-    end
     def invoke argv
-      absorb_argv!(argv) or return
-      resolve_upstream or return
-      Headless::Client.new(self).execute
+      parse_argv!(argv) and headless_client.execute
+    end
+    attr_writer :program_name
+  protected
+    # the grand experiment revisited
+    def build_option_parser
+      op = ::OptionParser.new
+      op.separator em('options:')
+      args = []
+      single_letter_taken = ::Hash.new do |h, k|
+        args.push "-#{k}"
+        h[k] = true
+      end
+      single_letter_taken['h'] = true
+      formal_parameters.each do |p|
+        args.clear
+        name = p.name.to_s
+        single_letter_taken[name[0, 1]] unless (p.bool and true == p.default)
+        label = "#{name.gsub('_', '-')}"
+        arg_label = "<#{ name.split('_').last }>"
+        long = if p.bool
+                 if true == p.default then  "--[no-]#{ label }"
+                 else                       "--#{ label }"
+                 end
+               else "--#{ label }=#{ arg_label }"
+               end
+        args.push long
+        p.desc and args.push(
+          p.desc.gsub(/\{\{((?:(?!\}\}).)+)\}\}/) do
+            case $1
+            when 'arg_label' ; arg_label
+            when 'default'   ; " (default: #{p.default})"
+            end
+          end
+        )
+        op.on(*args) { |v| headless_client[p.name] = v }
+      end
+      op.on('-h', '--help', 'Show this message') { queue.push :help }
+      op.on('--version', 'Show version') { queue.push :version }
+      op.banner = usage_line
+      op
+    end
+    def help ; infostream.puts option_parser.help end
+    def noop ; end # does nothing, is logically useful
+    def option_parser ; @option_parser ||= build_option_parser end
+    def parse_argv! argv
+      parse_opts!(argv) && parse_args!(argv)
+    end
+    def parse_opts! argv
+      begin
+        option_parser.parse! argv
+      rescue ::OptionParser::ParseError => e
+        usage e.message
+        queue.clear.push :noop # indicates that all necessary action is complete
+      end
+      if queue.empty?
+        true # continue on to parse_args! and execute
+      else
+        begin ; send(queue.shift) end until queue.empty?
+        nil # do not parse_args!, all action is complete
+      end
+    end
+    def program_name
+      (@program_name ||= nil) || File.basename($PROGRAM_NAME)
+    end
+    def queue ; @queue ||= [] end
+    def usage msg=nil
+      msg and emit(:usage, msg)
+      emit(:usage, usage_line)
+      emit(:usage, "#{em "#{program_name} -h"} for help")
+      false
+    end
+    def version ; infostream.puts("#{program_name} #{version_string}") end
+    # --*--
+    CODES = { bold: 1, green: 32 }
+    def stylize str, *a
+      "\e[#{ a.map{ |s| CODES[s] }.compact.join(';') }m#{str}\e[0m"
+    end
+    def em str ; stylize(str, :bold, :green ) end
+  end
+
+  class CLI::Client < ::Struct.new(:paystream, :infostream, :upstream,
+                                   :headless_client)
+    include CLI::Client_InstanceMethods
+    def initialize paystream=$stdout, infostream=$stderr
+      super paystream, infostream, nil, Headless::Client.new(self)
     end
     def emit type, string
       (:payload == type ? paystream : infostream).puts string
     end
-    attr_writer :program_name
   protected
-    def absorb_argv! argv
-      (argv.length == 1 and /\A-/ !~ argv.first) or return usage
-      @in_pathname = ::Pathname.new(argv.shift)
-      true
-    end
+    def formal_parameters ; PARAMS end
     attr_reader :in_pathname
-    def program_name
-      (@program_name ||= nil) || File.basename($PROGRAM_NAME)
-    end
-    def resolve_upstream
-      in_pathname.exist? or return usage("file not found: #{in_pathname}")
-      self.upstream = ::StringIO.new(in_pathname.read)
+    INFILE = '<bnf-file>'
+    def parse_args! argv
+      1 == argv.length or
+        return usage("expecting #{INFILE} had #{argv.length} args")
+      @in_pathname = ::Pathname.new(argv.shift)
+      if '-' == in_pathname.to_s
+        $stdin.tty? and return usage("Expecting STDIN to be a stream.")
+        self.upstream = $stdin
+      else
+        in_pathname.exist? or return usage("file not found: #{in_pathname}")
+        self.upstream = ::StringIO.new(in_pathname.read) # heh heh
+      end
       true
     end
-    def usage msg=nil
-      msg and emit(:usage, msg)
-      emit(:usage, "usage: #{program_name} <bnf-file>")
-      false
+    def usage_line
+      "#{em 'usage'}: #{program_name} [options] { #{INFILE} | - }"
     end
+    def version_string ; '0.0.0' end
   end
 
   class Headless::Client < ::Struct.new(
-    :literalize_unicode, :rule_prefix, :uncamelize,
-    # --*--
-    :expecting, :tree, :request_runtime, :scn)
+    :expecting, :tree, :request_runtime, :scn, * PARAMS.map(&:name)
+  )
 
     include Headless::Client_InstanceMethods
 
     def initialize request_runtime
-      super(*DEFAULTS.to_a, [], [:rules], request_runtime)
+      super([], [:rules], request_runtime)
+      PARAMS.each { |p| p.default.nil? or self[p.name] = p.default }
       @stack = [tree]
     end
     def execute
       self.scn = ::StringScanner.new(request_runtime.upstream.read)
       request_runtime.upstream.close
       white!
-      catch(:done) do
+      ok = catch :stop do
         until scn.eos?
           new_rule!
-          rule_name!; white!; equals_thingy!; white!; rule_rhs!; white!
+          rule_name! ; white! ; equals_thingy! ; white! ; rule_rhs! ; white!
         end
+        true
       end
-      # PP.pp tree
-      params = Params.new
-      Params.members.each { |m| params[m] = send(m) }
-      Nodes::Rules.new(tree, request_runtime.paystream,
-        request_runtime.infostream, params).to_treetop
+      if sexp then
+        require 'pp'
+        PP.pp(tree, request_runtime.paystream)
+        return true
+      end
+      if ok
+        Nodes::Rules.new(tree, self,
+          request_runtime.paystream, request_runtime.infostream).write_treetop
+      end
     end
   protected
     def emit(type, data) ; request_runtime.emit(type, data) end
+    CONTEXT = 20
     def fail_with_context msg
       info msg
-      before = scn.string[[0, scn.pos-20].max .. scn.pos].gsub("\n", " ")
-      after = scn.peek(20).gsub("\n", " ")
-      info "at: #{before}#{after}"
-      info "----#{'-' * before.size}^"
-      scn.eos? and info("before end of input)")
-      throw(:done, { status: 1 })
+      after = scn.peek CONTEXT
+      before = scn.string[ [0, scn.pos - CONTEXT].max ... scn.pos ]
+      clean_f = ->(s) { s.gsub("\n", ' ') }
+      before = clean_f[before] ; after = clean_f[after]
+      info "at: #{ before }#{ after }"
+      info "----#{ '-' * before.length }^"
+      scn.eos? and info("(before end of input)")
+      throw :stop, false
     end
     def new_rule!
       sexp = [:rule]
@@ -242,22 +353,18 @@ module Skylab::Bnf2Treetop
         str.gsub(/([a-z])([A-Z])/){ "#{$1}_#{$2}" }.downcase
       end
     end
-    class Node < ::Struct.new(:tree, :paystream, :infostream, :params)
+    class Node < ::Struct.new(:tree, :params, :paystream, :infostream)
       include Helper_InstanceMethods
-      def initialize tree, paystream, infostream, params
-        super(tree, paystream, infostream, params)
-        yield(self) if block_given?
-      end
     protected
       def write string ; paystream.write(string) end
     end
     class Rules < Node
-      def to_treetop
-        flyweight = Rule.new(nil, paystream, infostream, params)
-        tree[1..-1].each_with_index do |tree, idx|
+      def write_treetop
+        flyweight = Rule.new(nil, params, paystream, infostream)
+        tree[1..-1].each_with_index do |child_tree, idx|
           0 == idx or write("\n")
-          flyweight.tree = tree
-          flyweight.to_treetop
+          flyweight.tree = child_tree
+          flyweight.write_treetop
         end
         nil
       end
@@ -265,15 +372,16 @@ module Skylab::Bnf2Treetop
     class Rule < Node
       def initialize *a
         super(*a)
-        @rhs = RHS.new(nil, paystream, infostream, params)
+        @rhs = RHS.new(nil, params, paystream, infostream)
       end
-      def to_treetop
-        rhs.tree = tree[2]
+      def write_treetop
         paystream.puts "  rule #{rule_name}"
         paystream.write '    '
-        @rhs.to_treetop
+        tree[2] or return false
+        rhs.tree = tree[2]
+        rhs.write_treetop
         paystream.write "\n  end"
-        nil
+        true
       end
       def rule_name
         str = tree[1][1]
@@ -285,7 +393,10 @@ module Skylab::Bnf2Treetop
       attr_reader :rhs
     end
     class RHS < Node
-      def to_treetop node=tree
+      def write_treetop
+        write_expression tree
+      end
+      def write_expression node
         node[1..-1].each_with_index do |_sexp, idx|
           send("_#{_sexp.first}", _sexp, idx)
         end
@@ -309,7 +420,7 @@ module Skylab::Bnf2Treetop
       def _parenthesized_group sexp, idx
         0 == idx or write(' ')
         write '('
-        to_treetop sexp
+        write_expression sexp
         write ')'
       end
       def _rule_name sexp, idx
