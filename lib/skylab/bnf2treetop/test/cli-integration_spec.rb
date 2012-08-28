@@ -1,4 +1,4 @@
-require_relative 'test-support'
+require_relative 'cli/test-support'
 
 describe "#{Skylab::Bnf2Treetop} CLI integration" do
   extend ::Skylab::Bnf2Treetop::TestSupport::CLI

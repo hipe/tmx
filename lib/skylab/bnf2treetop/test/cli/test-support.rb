@@ -1,6 +1,6 @@
-load File.expand_path('../../../../../bin/bnf2treetop', __FILE__)
+load File.expand_path('../../../../../../bin/bnf2treetop', __FILE__)
 
-require_relative('../..')
+require_relative('../../..')
 
 require 'skylab/test-support/core'
 require 'skylab/headless/core' # unstylize
@@ -54,7 +54,7 @@ module Skylab::Bnf2Treetop::TestSupport
   module CLI::InstanceMethods
     include ::Skylab::Headless::CLI::IO::Pen::InstanceMethods
 
-    FIXTURES = ::Pathname.new(File.expand_path('../fixtures', __FILE__))
+    FIXTURES = ::Pathname.new(File.expand_path('../../fixtures', __FILE__))
 
     def debug! ; _frame.debug_f.call end
     def err    ; _frame.err_f.call   end
