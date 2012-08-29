@@ -1,8 +1,4 @@
-require_relative '../../../..' # skylab.rb
-require_relative '../../../io/interceptors/filter'
-require 'stringio'
-require 'skylab/test-support/quickie'
-
+require_relative 'test-support'
 
 module Skylab::Headless::IO::Interceptors::TestSupport
   Headless = ::Skylab::Headless

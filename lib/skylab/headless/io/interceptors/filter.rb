@@ -1,10 +1,11 @@
 module Skylab::Headless
-  module IO ; module Interceptors end end
   class IO::Interceptors::Filter <
     ::Struct.new(:downstream, :handlers, :last_char)
 
     # intercept write-like messages intended for an ::IO, but do something
     # magical with the content. Don't forget to call flush! at the end.
+
+    include Headless::IO::Interceptor::InstanceMethods
 
     def initialize downstream
       @check_for_line_boundaries = nil
