@@ -382,7 +382,9 @@ module Skylab::Headless
   end
   IGNORE_THIS_CONSTANT = /\A#{to_s}\b/
 
-  module IO end
+  module IO
+    extend ::Skylab::MetaHell::Autoloader::Autovivifying
+  end
   module IO::Pen end
   module IO::Pen::InstanceMethods
     def em s ; s end
