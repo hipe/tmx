@@ -17,6 +17,18 @@ module Skylab::Bnf2Treetop
   Param = ::Struct.new(:name, :default, :bool, :desc, :arg_stem)
   P = ->(n, o=nil) { p = Param.new(n) ; o and o.each { |k, v| p[k] = v } ; p }
   PARAMS = [
+    P[:equals_terminal,
+       default: '::=',
+       arg_stem: 'token',
+       desc: ['Use this alternative "equals thingy" when parsing',
+              'the input grammar{{default}}']
+    ],
+    P[:squares,
+       bool: true,
+       desc: ['Use square brackets to indicate optional clauses',
+              '(So then [foo] is shorthand for (foo)?.',
+              'Now can\'t use character classes.)']
+    ],
     P[:literalize_unicode,
        bool: true,
        default: true,
@@ -30,12 +42,6 @@ module Skylab::Bnf2Treetop
        default: true,
        desc: ['Whether to convert names from camel-case',
               'to underscore{{default}}']
-    ],
-    P[:equals_terminal,
-       default: '::=',
-       arg_stem: 'token',
-       desc: ['Indicates what {{arg_label}} the input grammar uses',
-             'as the "equals thingy"{{default}}']
     ],
     P[:sexp,
        bool: true,
@@ -302,10 +308,15 @@ module Skylab::Bnf2Treetop
         _rule_name! || _character_class! || _nonempty_quoted_string! ||
         _unicodepoint_literal! || _parenthesized_group!
       }
-      push got
+      if ::Symbol === got.first
+        push got
+      else
+        got.each { |g| push g }
+      end
       white!
       if scn.eos?        then return end
       if scn.check(/\)/) then return end # never processed here
+      if squares and scn.check(/\]/) then return end
       reset_expecting!
       expecting << :end_of_input # maybe not used
       need_moar = false
@@ -336,18 +347,26 @@ module Skylab::Bnf2Treetop
     end
     def _parenthesized_group!
       expecting << :parenthesized_group
-      if scn.scan(/\(/)
+      if scn.scan(/\(/) or squares && (b = scn.scan(/\[/))
         nu = [:parenthesized_group]
         # push nu sort of up in the air about whether to do this early or late
         stack.push nu
         rhs!
         white!
-        one_of_or_fail { expecting << ')'; scn.scan(/\)/) }
+        if b
+          one_of_or_fail { expecting << ']'; scn.scan(/\]/) }
+        else
+          one_of_or_fail { expecting << ')'; scn.scan(/\)/) }
+        end
         have = stack.pop
+        if b
+          have = [have, [:kleene, '?']] # sketchlund
+        end
         have
       end
     end
     def _character_class!
+      squares and return
       expecting << :character_class
       if found = scn.scan(/\[(?:[^\]]|\\\])+\]/)
         [:character_class, found]
@@ -355,7 +374,7 @@ module Skylab::Bnf2Treetop
     end
     def _kleene!
       expecting << :kleene
-      if found = scn.scan(/[*+]/)
+      if found = scn.scan(/[*+?]/)
         [:kleene, found]
       end
     end

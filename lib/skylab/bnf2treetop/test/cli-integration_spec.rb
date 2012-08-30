@@ -22,7 +22,7 @@ describe "#{Skylab::Bnf2Treetop} CLI integration" do
 
   def options_listing
     unstylize(err.shift).should eql('options:')
-    (6..10).should cover(err.length)
+    (10..15).should cover(err.length)
     err.detect { |s| /\A[[:space:]]/ !~ s }.should eql(nil)
   end
 
