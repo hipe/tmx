@@ -29,6 +29,11 @@ module Skylab::Bnf2Treetop
               '(So then [foo] is shorthand for (foo)?.',
               'Now can\'t use character classes.)']
     ],
+    P[:grammar,
+      arg_stem: 'name',
+      desc: ['Nest the treetop output in this grammar',
+             'declaration (e.g. "Mod1::Mod2::Grammar")']
+    ],
     P[:literalize_unicode,
        bool: true,
        default: true,
@@ -49,6 +54,8 @@ module Skylab::Bnf2Treetop
     ]
   ]
   # PARAM = ::Hash[ * PARAMS.map { |p| [p.name, p] }.flatten ]
+
+  TAB_STR = '  ' # will be used for indenting, creating margins in treetop g.
 
   module Headless end
   module Headless::Client_InstanceMethods
@@ -206,21 +213,23 @@ module Skylab::Bnf2Treetop
   end
 
   class Headless::Client < ::Struct.new(
+    :margin,
     :expecting, :tree, :request_runtime, :scn, * PARAMS.map(&:name)
   )
 
     include Headless::Client_InstanceMethods
-
     def initialize request_runtime
-      super([], [:rules], request_runtime)
+      super(nil, [], [:rules], request_runtime)
+      self.margin = TAB_STR # overwritten on "grammar" parameter
       PARAMS.each { |p| p.default.nil? or self[p.name] = p.default }
       @stack = [tree]
     end
     def execute
-      self.scn = ::StringScanner.new(request_runtime.upstream.read)
-      request_runtime.upstream.close
+      self.scn = ::StringScanner.new(upstream.read)
+      upstream.close
       white!
       ok = catch :stop do
+        grammar and grammar_prepare
         until scn.eos?
           new_rule!
           comments!
@@ -230,16 +239,22 @@ module Skylab::Bnf2Treetop
       end
       if sexp then
         require 'pp'
-        PP.pp(tree, request_runtime.paystream)
+        PP.pp(tree, paystream)
         return true
       end
       if ok
-        Nodes::Rules.new(tree, self,
-          request_runtime.paystream, request_runtime.infostream).write_treetop
+        grammar and grammar_write_treetop_begin
+        Nodes::Rules.new(tree, self, paystream, infostream).write_treetop
+        grammar and grammar_write_treetop_end
       end
     end
   protected
+    # --*--
     def emit(type, data) ; request_runtime.emit(type, data) end
+    def infostream ; request_runtime.infostream end
+    def paystream ; request_runtime.paystream end
+    def upstream ; request_runtime.upstream end
+    # --*--
     CONTEXT = 20
     def fail_with_context msg
       info msg
@@ -273,6 +288,33 @@ module Skylab::Bnf2Treetop
       expecting.clear
     end
     attr_reader :stack
+    # --*--
+    def grammar_prepare
+      @g_money = grammar.split('::').map do |s|
+        /\A[A-Z][a-z0-9_]*\z/ =~ s or begin
+          info "invalid ruby constant name #{s.inspect}, try e.g. 'FooBar_123'"
+          throw :stop, false
+        end
+        s
+      end
+      @g_money.empty? and return (self.grammar = nil) # couches
+    end
+    def grammar_write_treetop_begin
+      mods = @g_money[0..-2] ; g = @g_money[-1] ; indent = 0
+      if mods.any?
+        indent += 1
+        paystream.puts "module #{mods.join('::')}"
+      end
+      paystream.puts "#{TAB_STR * indent}grammar #{g}"
+      @g_level = indent + 1
+      self.margin = TAB_STR * @g_level
+    end
+    def grammar_write_treetop_end
+      until @g_level <= 0
+        @g_level -= 1
+        paystream.write("\n#{TAB_STR * @g_level}end")
+      end
+    end
     # --*--
     def comments!
       loop do
@@ -445,12 +487,13 @@ module Skylab::Bnf2Treetop
         @rhs = RHS.new(nil, params, paystream, infostream)
       end
       def write_treetop
-        paystream.puts "  rule #{rule_name}"
-        paystream.write '    '
+        margin = params.margin
+        paystream.puts "#{margin}rule #{rule_name}"
+        paystream.write "#{margin}#{TAB_STR}"
         tree[2] or return false
         rhs.tree = tree[2]
         rhs.write_treetop
-        paystream.write "\n  end"
+        paystream.write "\n#{margin}end"
         nil
       end
       def rule_name
