@@ -12,7 +12,7 @@ describe "#{::Skylab::Bnf2Treetop::API}" do
     normal = translate(string: 'foo ::= [bar]')
     crazy  = translate(string: 'foo ::= [bar]', squares: true)
     normalize(normal).should eql('rule foo [bar] end')
-    normalize(crazy).should  eql('rule foo (bar)? end')
+    normalize(crazy).should  eql('rule foo bar? end')
   end
   def translate request
     request[:paystream] = ::StringIO.new

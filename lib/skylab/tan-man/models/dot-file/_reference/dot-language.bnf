@@ -1,12 +1,14 @@
 # copied exactly as-is from http://www.graphviz.org/content/dot-language
-graph	:	[ strict ] (graph | digraph) [ ID ] '{' stmt_list '}'
+#   with the following (regular, determinisitc) modifications:
+#   1) what was in boldface is now in single quotes
+graph	:	[ 'strict' ] ('graph' | 'digraph') [ ID ] '{' stmt_list '}'
 stmt_list	:	[ stmt [ ';' ] [ stmt_list ] ]
 stmt	:	node_stmt
 |	edge_stmt
 |	attr_stmt
 |	ID '=' ID
 |	subgraph
-attr_stmt	:	(graph | node | edge) attr_list
+attr_stmt	:	('graph' | 'node' | 'edge') attr_list
 attr_list	:	'[' [ a_list ] ']' [ attr_list ]
 a_list	:	ID [ '=' ID ] [ ',' ] [ a_list ]
 edge_stmt	:	(node_id | subgraph) edgeRHS [ attr_list ]
@@ -15,5 +17,5 @@ node_stmt	:	node_id [ attr_list ]
 node_id	:	ID [ port ]
 port	:	':' ID [ ':' compass_pt ]
 |	':' compass_pt
-subgraph	:	[ subgraph [ ID ] ] '{' stmt_list '}'
-compass_pt	:	(n | ne | e | se | s | sw | w | nw | c | _)
+subgraph	:	[ 'subgraph' [ ID ] ] '{' stmt_list '}'
+compass_pt	:	('n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w' | 'nw' | 'c' | _)

@@ -223,6 +223,7 @@ module Skylab::Bnf2Treetop
       ok = catch :stop do
         until scn.eos?
           new_rule!
+          comments!
           rule_name! ; white! ; equals_thingy! ; white! ; rule_rhs! ; white!
         end
         true
@@ -273,6 +274,16 @@ module Skylab::Bnf2Treetop
     end
     attr_reader :stack
     # --*--
+    def comments!
+      loop do
+        if scn.skip(/[ \t\n\r\f]*#+/)
+          scn.skip_until(/$\r?\n?/) # consider a comment at eof
+        else
+          break
+        end
+      end
+      true
+    end
     def white!
       scn.skip(/[ \t\n\r\f]+/) || true
     end
@@ -351,6 +362,7 @@ module Skylab::Bnf2Treetop
         nu = [:parenthesized_group]
         # push nu sort of up in the air about whether to do this early or late
         stack.push nu
+        white!
         rhs!
         white!
         if b
@@ -360,6 +372,9 @@ module Skylab::Bnf2Treetop
         end
         have = stack.pop
         if b
+          if 2 == have.length # one child in a parenthesized group
+            have = have.last  # ick
+          end
           have = [have, [:kleene, '?']] # sketchlund
         end
         have
@@ -380,7 +395,9 @@ module Skylab::Bnf2Treetop
     end
     def _nonempty_quoted_string!
       expecting << :nonempty_quoted_string
-      if found = scn.scan(/"(?:\\"|[^"])+"/)
+      if found = scn.scan(/'(?:\\'|[^'])+'/)
+        [:nonempty_quoted_string, found]
+      elsif found = scn.scan(/"(?:\\"|[^"])+"/)
         [:nonempty_quoted_string, found]
       end
     end
