@@ -14,7 +14,7 @@ require 'stringio'
 module Skylab ; end
 module Skylab::Bnf2Treetop
 
-  Param = ::Struct.new(:name, :default, :bool, :desc)
+  Param = ::Struct.new(:name, :default, :bool, :desc, :arg_stem)
   P = ->(n, o=nil) { p = Param.new(n) ; o and o.each { |k, v| p[k] = v } ; p }
   PARAMS = [
     P[:literalize_unicode,
@@ -30,6 +30,12 @@ module Skylab::Bnf2Treetop
        default: true,
        desc: ['Whether to convert names from camel-case',
               'to underscore{{default}}']
+    ],
+    P[:equals_terminal,
+       default: '::=',
+       arg_stem: 'token',
+       desc: ['Indicates what {{arg_label}} the input grammar uses',
+             'as the "equals thingy"{{default}}']
     ],
     P[:sexp,
        bool: true,
@@ -93,7 +99,7 @@ module Skylab::Bnf2Treetop
         name = p.name.to_s
         single_letter_taken[name[0, 1]] unless (p.bool and true == p.default)
         label = "#{name.gsub('_', '-')}"
-        arg_label = "<#{ name.split('_').last }>"
+        arg_label = "<#{ (p.arg_stem || name.split('_').last) }>"
         args.push( if p.bool
                  if true == p.default then  "--[no-]#{ label }"
                  else                       "--#{ label }"
@@ -179,6 +185,20 @@ module Skylab::Bnf2Treetop
     def version_string ; '0.0.0' end
   end
 
+  module API
+    def self.translate request
+      request = request.dup
+      rt = API::RequestRuntime.new
+      rt.members.each { |m| rt[m] = request.delete(m) }
+      hc = Headless::Client.new rt
+      request.keys.each { |k| hc[k] = request.delete(k) } # futurized
+      hc.execute
+    end
+  end
+  class API::RequestRuntime < ::Struct.new(:paystream, :infostream, :upstream)
+    def emit t, d ; (:payload == t ? paystream : infostream).puts d end
+  end
+
   class Headless::Client < ::Struct.new(
     :expecting, :tree, :request_runtime, :scn, * PARAMS.map(&:name)
   )
@@ -246,6 +266,7 @@ module Skylab::Bnf2Treetop
       expecting.clear
     end
     attr_reader :stack
+    # --*--
     def white!
       scn.skip(/[ \t\n\r\f]+/) || true
     end
@@ -258,7 +279,15 @@ module Skylab::Bnf2Treetop
       if str = scn.scan(/[_a-zA-Z][_a-zA-Z0-9]*/) then [:rule_name, str] end
     end
     def equals_thingy!
-      _equals_thingy! or fail_with_context("expected \"::=\"")
+      _equals_thingy! or
+        fail_with_context("expected #{equals_terminal.inspect}")
+    end
+    def _equals_thingy!
+      scn.skip equals_terminal_rx
+    end
+    def equals_terminal= x ; @equals_terminal_rx = nil ; super end
+    def equals_terminal_rx
+      @equals_terminal_rx ||= /#{::Regexp.escape equals_terminal}/
     end
     def rule_rhs!
       sexp = [:rhs]
@@ -324,9 +353,6 @@ module Skylab::Bnf2Treetop
         [:character_class, found]
       end
     end
-    def _equals_thingy!
-      scn.skip(/::=/)
-    end
     def _kleene!
       expecting << :kleene
       if found = scn.scan(/[*+]/)
@@ -374,7 +400,7 @@ module Skylab::Bnf2Treetop
           flyweight.tree = child_tree
           flyweight.write_treetop
         end
-        nil
+        true
       end
     end
     class Rule < Node
@@ -389,7 +415,7 @@ module Skylab::Bnf2Treetop
         rhs.tree = tree[2]
         rhs.write_treetop
         paystream.write "\n  end"
-        true
+        nil
       end
       def rule_name
         str = tree[1][1]

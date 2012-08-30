@@ -30,10 +30,16 @@ module Skylab::TestSupport
 
     def self.standard
       require 'stringio'
-      new.tap { |o| o.tty![:buffer] = ::StringIO.new }
+      new( buffer: ::StringIO.new ).tty!
     end
-    def debug!
-      self[:debug] = $stderr
+    def debug! prepend=nil
+      stderr = $stderr
+      self[:debug] = if prepend
+        ::Skylab::Headless::IO::Interceptors::Filter.new(
+          stderr, line_boundary_string: prepend )
+      else
+        stderr
+      end
       self
     end
     def string # just a convenience macro.  :buffer listener must obv. exist

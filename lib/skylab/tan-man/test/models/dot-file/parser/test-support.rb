@@ -1,14 +1,7 @@
 require_relative '../../../../..' # bootstrap-in skylab.rb here :/
 require_relative '../../../../core'
 
-class ::String
-  # note you will still have a trailing newline, for which u could chop
-  def here # aka unindent, deindent
-    gsub(/^#{::Regexp.escape(match(/\A(?<margin>[[:space:]]+)/)[:margin])}/, '')
-  end
-end
-
-# (reference: http://solnic.eu/2011/01/14/custom-rspec-2-matchers.html)
+# (reference: http://solnic.eu/2014/01/14/custom-rspec-2-matchers.html)
 RSpec::Matchers.define :be_sexp do |expected|
   match do |actual|
     not

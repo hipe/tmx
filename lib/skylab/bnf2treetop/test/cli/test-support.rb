@@ -1,8 +1,5 @@
-load File.expand_path('../../../../../../bin/bnf2treetop', __FILE__)
-
-require_relative('../../..')
-
-require 'skylab/test-support/core'
+require_relative '../test-support'
+require 'skylab/test-support/core' # StreamSpy
 require 'skylab/headless/core' # unstylize
 
 module Skylab::Bnf2Treetop::TestSupport
