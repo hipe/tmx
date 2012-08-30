@@ -91,8 +91,13 @@ module Skylab::TanMan
 
   protected
 
+    # --*--
+    # action instance spawns instance of model controller #pattern
     def config ; @config ||= Models::Config::Controller.new(self) end
-      # action instance spawns instance of model controller #pattern
+    def dot_files
+      @dot_files ||= Models::DotFiles::Controller.new(request_runtime, config)
+    end
+    # --*--
 
     def error msg                                         # common pattern
       emit(:error, msg)
