@@ -14,7 +14,7 @@ require 'stringio'
 module Skylab ; end
 module Skylab::Bnf2Treetop
 
-  Param = ::Struct.new(:name, :default, :bool, :desc, :arg_stem)
+  Param = ::Struct.new(:name, :arg_stem, :bool, :default, :list, :desc)
   P = ->(n, o=nil) { p = Param.new(n) ; o and o.each { |k, v| p[k] = v } ; p }
   PARAMS = [
     P[:equals_terminal,
@@ -27,12 +27,18 @@ module Skylab::Bnf2Treetop
        bool: true,
        desc: ['Use square brackets to indicate optional clauses',
               '(So then [foo] is shorthand for (foo)?.',
-              'Now can\'t use character classes.)']
+              'Now you can\'t use character classes.)']
     ],
     P[:grammar,
       arg_stem: 'name',
       desc: ['Nest the treetop output in this grammar',
              'declaration (e.g. "Mod1::Mod2::Grammar")']
+    ],
+    P[:include,
+      arg_stem: 'module',
+      list: true,
+      desc: ['The treetop output grammar will include',
+             'this (these) modules']
     ],
     P[:literalize_unicode,
        bool: true,
@@ -53,7 +59,7 @@ module Skylab::Bnf2Treetop
        desc: 'Suppress normal output.  show grammar sexp.'
     ]
   ]
-  # PARAM = ::Hash[ * PARAMS.map { |p| [p.name, p] }.flatten ]
+  PARAM = ::Hash[ * PARAMS.map { |p| [p.name, p] }.flatten ]
 
   TAB_STR = '  ' # will be used for indenting, creating margins in treetop g.
 
@@ -220,13 +226,13 @@ module Skylab::Bnf2Treetop
 
   class Headless::Client < ::Struct.new(
     :margin, # --*--
-    :expecting, :formal_parameters, :invocation_parameters,
+    :expecting, :invocation_parameters,
     :tree, :request_runtime, :scn, * PARAMS.map(&:name)
   )
 
     include Headless::Client_InstanceMethods
     def initialize request_runtime
-      super(nil, [], PARAMS, nil, [:rules], request_runtime)
+      super(nil, [], nil, [:rules], request_runtime)
       self.margin = TAB_STR # overwritten on "grammar" parameter
       PARAMS.each { |p| p.default.nil? or self[p.name] = p.default }
       @stack = [tree]
@@ -234,10 +240,12 @@ module Skylab::Bnf2Treetop
     def execute
       self.scn = ::StringScanner.new(upstream.read)
       upstream.close
-      modeline! or return # this does a lot, have a look!
+      modeline! or return
+      absorb! or return
       space!
       ok = catch :stop do
         grammar and grammar_prepare
+        include and include_prepare
         until scn.eos?
           new_rule!
           rule_name! ; white! ; equals_thingy! ; white! ; rule_rhs! ; white!
@@ -252,6 +260,7 @@ module Skylab::Bnf2Treetop
       end
       if ok
         grammar and grammar_write_treetop_begin
+        include and include_write
         Nodes::Rules.new(tree, self, paystream, infostream).write_treetop
         grammar and grammar_write_treetop_end
       end
@@ -259,10 +268,28 @@ module Skylab::Bnf2Treetop
   protected
     # --*--
     def emit(type, data) ; request_runtime.emit(type, data) end
+    def formal_parameters ; PARAMS end
     def infostream ; request_runtime.infostream end
     def paystream ; request_runtime.paystream end
     def upstream ; request_runtime.upstream end
     # --*--
+    def absorb!
+      [modeline_parameters, invocation_parameters].compact.each do |params|
+        params.each do |name, value|
+          if PARAM[name].list
+            self[name] ||= []
+            if ::Array === value
+              self[name].concat(value)
+            else
+              self[name].push value
+            end
+          else
+            self[name] = value
+          end
+        end
+      end
+      true
+    end
     CONTEXT = 20
     def fail_with_context msg
       info msg
@@ -299,13 +326,10 @@ module Skylab::Bnf2Treetop
           end
         end
       end
-      [modelines, invocation_parameters].compact.each do |params|
-        params.each do |name, value|
-          self[name] = value
-        end
-      end
+      @modeline_parameters = modelines
       true
     end
+    attr_reader :modeline_parameters
     # An attempt at a faithful re-implementation of vim's modeline syntax.
     # (See vim's ":help modeline" --  we are using "The second form".)
     def modeline_parse!
@@ -363,9 +387,12 @@ module Skylab::Bnf2Treetop
     end
     attr_reader :stack
     # --*--
+    const_rx = '[A-Z][A-Za-z0-9_]*'
+    CONST_RX = /\A#{const_rx}\z/
+    CONSTANT_RX = /\A(?:::)?#{const_rx}(?:::#{const_rx})*\z/
     def grammar_prepare
       @g_money = grammar.split('::').map do |s|
-        /\A[A-Z][A-Za-z0-9_]*\z/ =~ s or begin
+        CONST_RX =~ s or begin
           info "invalid ruby constant name #{s.inspect}, try e.g. 'FooBar_123'"
           throw :stop, false
         end
@@ -387,6 +414,17 @@ module Skylab::Bnf2Treetop
       until @g_level <= 0
         @g_level -= 1
         paystream.write("\n#{TAB_STR * @g_level}end")
+      end
+    end
+    def include_prepare
+      if nope = include.detect { |x| CONSTANT_RX !~ x }
+        info "your include term looks funny: #{nope.inspect}"
+        throw :stop, false
+      end
+    end
+    def include_write
+      include.each do |s|
+        paystream.puts "#{margin}include #{s}"
       end
     end
     # --*--

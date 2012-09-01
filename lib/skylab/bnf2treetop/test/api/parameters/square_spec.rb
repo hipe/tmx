@@ -8,7 +8,4 @@ describe "#{::Skylab::Bnf2Treetop::API} parameter \"square\"" do
     normalize(normal).should eql('rule foo [bar] end')
     normalize(crazy).should  eql('rule foo bar? end')
   end
-  def normalize str
-    str.gsub(/[[:space:]]+/, ' ').strip
-  end
 end
