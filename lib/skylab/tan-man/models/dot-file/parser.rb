@@ -13,7 +13,7 @@ module Skylab::TanMan
           o.force_overwrite!
           o.generated_grammar_dir '../../../../../tmp'
           o.root_for_relative_paths ::File.expand_path('..', __FILE__)
-          o.treetop_grammar 'digraph.treetop'
+          o.treetop_grammar 'dot-language.treetop'
         end,
         ->(o) do
            o.on_info { |e| info "#{em '*'} #{e}" }
