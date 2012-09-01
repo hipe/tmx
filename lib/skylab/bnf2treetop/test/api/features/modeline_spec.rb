@@ -7,14 +7,12 @@ describe "#{::Skylab::Bnf2Treetop::API} feature \"modeline\"" do
       # bnf2treetop: set s e=\':\' g="Foo::BarBiff::Baz":
       foo : bar
     HERE
-    out = translate(string: here, grammar:'Floo::FliffFlaff::Flazz')
+    translate(string: here, grammar:'Floo::FliffFlaff::Flazz')
     info.shift.should be_include(
       'squares equals_terminal=":" grammar="Foo::BarBiff::Baz"'
     )
     info.shift.should be_include('overridden')
     info.length.should eql(0)
-    scn = ::StringScanner.new(out)
-    first = scn.scan_until(/$/)
-    first.should eql('module Floo::FliffFlaff')
+    out.shift.should eql('module Floo::FliffFlaff')
   end
 end

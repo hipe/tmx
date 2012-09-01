@@ -235,13 +235,13 @@ module Skylab::Bnf2Treetop
       self.scn = ::StringScanner.new(upstream.read)
       upstream.close
       modeline! or return # this does a lot, have a look!
-      white!
+      space!
       ok = catch :stop do
         grammar and grammar_prepare
         until scn.eos?
           new_rule!
-          comments!
           rule_name! ; white! ; equals_thingy! ; white! ; rule_rhs! ; white!
+          space!
         end
         true
       end
@@ -392,9 +392,17 @@ module Skylab::Bnf2Treetop
     # --*--
     COMMENT_BEGIN_RX = /[[:space:]]*#+/
     EOL_RX = /$\r?\n?/
-    def comments!
+    def space!
       loop do
+        white!
         if scn.skip COMMENT_BEGIN_RX
+          if _ = scn.scan(/[ \t]*\(output[ \t]+
+              (?: '(?:\\'|(?!>').)*' | "(?:\\"|(?!>").)*" )
+            [ \t]*\) /x)
+            md = _.match(/\A[ \t]*\(output[ \t]+
+              (?: '(?<_>(?:\\'|(?!>').)*)' | "(?<_>(?:\\"|(?!>").)*)" ) /x )
+            paystream.puts("# #{md[:_]}") # just a q & d p.o.c
+          end
           scn.skip_until EOL_RX
         else
           break
