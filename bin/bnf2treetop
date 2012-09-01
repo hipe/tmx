@@ -14,7 +14,7 @@ require 'stringio'
 module Skylab ; end
 module Skylab::Bnf2Treetop
 
-  Param = ::Struct.new(:name, :default, :bool, :desc, :arg_stem)
+  Param = ::Struct.new(:name, :arg_stem, :bool, :default, :list, :desc)
   P = ->(n, o=nil) { p = Param.new(n) ; o and o.each { |k, v| p[k] = v } ; p }
   PARAMS = [
     P[:equals_terminal,
@@ -27,12 +27,18 @@ module Skylab::Bnf2Treetop
        bool: true,
        desc: ['Use square brackets to indicate optional clauses',
               '(So then [foo] is shorthand for (foo)?.',
-              'Now can\'t use character classes.)']
+              'Now you can\'t use character classes.)']
     ],
     P[:grammar,
       arg_stem: 'name',
       desc: ['Nest the treetop output in this grammar',
              'declaration (e.g. "Mod1::Mod2::Grammar")']
+    ],
+    P[:include,
+      arg_stem: 'module',
+      list: true,
+      desc: ['The treetop output grammar will include',
+             'this (these) modules']
     ],
     P[:literalize_unicode,
        bool: true,
@@ -53,7 +59,7 @@ module Skylab::Bnf2Treetop
        desc: 'Suppress normal output.  show grammar sexp.'
     ]
   ]
-  # PARAM = ::Hash[ * PARAMS.map { |p| [p.name, p] }.flatten ]
+  PARAM = ::Hash[ * PARAMS.map { |p| [p.name, p] }.flatten ]
 
   TAB_STR = '  ' # will be used for indenting, creating margins in treetop g.
 
@@ -69,6 +75,7 @@ module Skylab::Bnf2Treetop
           ( [last_glue] + ::Array.new(items.size - 2, rest_glue) ).reverse
       ).flatten.join
     end
+    def s_ a ; a.length == 1 ? '' : 's' end
   end
 
   module CLI
@@ -120,7 +127,7 @@ module Skylab::Bnf2Treetop
                else "--#{ label }=#{ arg_label }"
                end )
         p.desc and desc_f.call p
-        op.on(*args) { |v| headless_client[p.name] = v }
+        op.on(*args) { |v| invocation_parameters.push([p.name, v]) }
       end
       op.on('-h', '--help', 'Show this message') { queue.push :help }
       op.on('--version', 'Show version') { queue.push :version }
@@ -128,10 +135,14 @@ module Skylab::Bnf2Treetop
       op
     end
     def help ; infostream.puts option_parser.help end
+    def invocation_parameters; @invocation_parameters ||= [] end
     def noop ; end # does nothing, is logically useful
     def option_parser ; @option_parser ||= build_option_parser end
     def parse_argv! argv
-      parse_opts!(argv) && parse_args!(argv)
+      parse_opts!(argv) && parse_args!(argv) or return
+      headless_client.invocation_parameters = invocation_parameters
+      @invocation_parameters = nil
+      true
     end
     def parse_opts! argv
       begin
@@ -199,12 +210,13 @@ module Skylab::Bnf2Treetop
   end
 
   module API
-    def self.translate request
-      request = request.dup
-      rt = API::RequestRuntime.new
-      rt.members.each { |m| rt[m] = request.delete(m) }
+    def self.translate request_h
+      request_h = request_h.dup
+      rt = API::RequestRuntime.new( * # request can hold both kinds of params
+        API::RequestRuntime.members.map { |m| request_h.delete(m) }
+      )
       hc = Headless::Client.new rt
-      request.keys.each { |k| hc[k] = request.delete(k) } # futurized
+      hc.invocation_parameters = request_h.map { |k, v| [k.intern, v] }
       hc.execute
     end
   end
@@ -213,13 +225,14 @@ module Skylab::Bnf2Treetop
   end
 
   class Headless::Client < ::Struct.new(
-    :margin,
-    :expecting, :tree, :request_runtime, :scn, * PARAMS.map(&:name)
+    :margin, # --*--
+    :expecting, :invocation_parameters,
+    :tree, :request_runtime, :scn, * PARAMS.map(&:name)
   )
 
     include Headless::Client_InstanceMethods
     def initialize request_runtime
-      super(nil, [], [:rules], request_runtime)
+      super(nil, [], nil, [:rules], request_runtime)
       self.margin = TAB_STR # overwritten on "grammar" parameter
       PARAMS.each { |p| p.default.nil? or self[p.name] = p.default }
       @stack = [tree]
@@ -227,13 +240,16 @@ module Skylab::Bnf2Treetop
     def execute
       self.scn = ::StringScanner.new(upstream.read)
       upstream.close
-      white!
+      modeline! or return
+      absorb! or return
+      space!
       ok = catch :stop do
         grammar and grammar_prepare
+        include and include_prepare
         until scn.eos?
           new_rule!
-          comments!
           rule_name! ; white! ; equals_thingy! ; white! ; rule_rhs! ; white!
+          space!
         end
         true
       end
@@ -244,6 +260,7 @@ module Skylab::Bnf2Treetop
       end
       if ok
         grammar and grammar_write_treetop_begin
+        include and include_write
         Nodes::Rules.new(tree, self, paystream, infostream).write_treetop
         grammar and grammar_write_treetop_end
       end
@@ -251,10 +268,28 @@ module Skylab::Bnf2Treetop
   protected
     # --*--
     def emit(type, data) ; request_runtime.emit(type, data) end
+    def formal_parameters ; PARAMS end
     def infostream ; request_runtime.infostream end
     def paystream ; request_runtime.paystream end
     def upstream ; request_runtime.upstream end
     # --*--
+    def absorb!
+      [modeline_parameters, invocation_parameters].compact.each do |params|
+        params.each do |name, value|
+          if PARAM[name].list
+            self[name] ||= []
+            if ::Array === value
+              self[name].concat(value)
+            else
+              self[name].push value
+            end
+          else
+            self[name] = value
+          end
+        end
+      end
+      true
+    end
     CONTEXT = 20
     def fail_with_context msg
       info msg
@@ -267,6 +302,69 @@ module Skylab::Bnf2Treetop
       scn.eos? and info("(before end of input)")
       throw :stop, false
     end
+    # Don't advance scan pointer, just check if the first line has a modeline
+    # and if it does, process it immediately
+    # and then (ick) invocation_parameters
+    def modeline!
+      (modelines = modeline_parse!) == false and return false
+      if modelines
+        list_f = ->(a) do
+          a.map do |n, v|
+            true == v ? n : "#{ n }=#{ /[ \t=:]/ =~ v ? v.inspect : v }"
+          end.join(' ')
+        end
+        info "(using file's modeline parameters: #{ list_f[modelines] })"
+        begin # this is all porcelain, grouped only for semantics
+          order = [ ]
+          values = (modelines + invocation_parameters).reduce(
+            ::Hash.new { |h, k| order.push k ; h[k] = [] }
+          ) { |m, pair| m[pair.first].push pair.last ; m }
+          a = order.select{|k| 1 < values[k].length}.map{|k| [k, values[k][1]]}
+          if ! a.empty?
+            info( "(modeline parameter#{s_ a} overridden by #{
+              }invocation parameter#{s_ a}: #{ list_f[a] })" )
+          end
+        end
+      end
+      @modeline_parameters = modelines
+      true
+    end
+    attr_reader :modeline_parameters
+    # An attempt at a faithful re-implementation of vim's modeline syntax.
+    # (See vim's ":help modeline" --  we are using "The second form".)
+    def modeline_parse!
+      line = self.scn.check_until(EOL_RX) or return # peek first line
+      scn = ::StringScanner.new(line) # sure why not
+      scn.skip(COMMENT_BEGIN_RX) or return # first line is not a comment
+      scn.skip_until(/[ \t]bnf2treetop:[ \t]*set?[ \t]/) or return
+      fail_f = ->(msg) do
+        error("failed to parse modeline: #{msg} at #{scn.peek(10).inspect}")
+      end
+      sexp = []
+      loop do
+        scn.skip(/[ \t]+/)
+        scn.skip(/:/) and break
+        name = scn.scan(/[_a-z]+/) or
+          return fail_f["expecing ':' or option name"]
+        sexp.push([name])
+        if scn.skip(/=/)
+          if (q = scn.scan(/['"]/))
+            content = scn.scan(/(?:\\#{q}|[^#{q}])*/) or fail('sanity')
+            scn.skip(/#{q}/) or return fail_f["expecting #{q.inspect}"]
+          else
+            content = scn.scan(/[^ \t:]+/) # failed match ok, means nillify
+          end
+          sexp.last.push content # should always be putting it in the [1] spot
+        end
+      end
+      sexp.map do |name, *a|
+        matcher = /\A#{ ::Regexp.escape name }#{ '\z' if 1 < name.length }/
+        fp = formal_parameters.detect { |_fp| _fp.name.to_s =~ matcher } or
+          return error("No such parameter #{name.inspect} (in modeline)")
+        [fp.name, a.empty? ? true : a.first]
+      end
+    end
+
     def new_rule!
       sexp = [:rule]
       push sexp                 # append sexp to sexp at the top of stack
@@ -289,9 +387,12 @@ module Skylab::Bnf2Treetop
     end
     attr_reader :stack
     # --*--
+    const_rx = '[A-Z][A-Za-z0-9_]*'
+    CONST_RX = /\A#{const_rx}\z/
+    CONSTANT_RX = /\A(?:::)?#{const_rx}(?:::#{const_rx})*\z/
     def grammar_prepare
       @g_money = grammar.split('::').map do |s|
-        /\A[A-Z][a-z0-9_]*\z/ =~ s or begin
+        CONST_RX =~ s or begin
           info "invalid ruby constant name #{s.inspect}, try e.g. 'FooBar_123'"
           throw :stop, false
         end
@@ -315,11 +416,32 @@ module Skylab::Bnf2Treetop
         paystream.write("\n#{TAB_STR * @g_level}end")
       end
     end
+    def include_prepare
+      if nope = include.detect { |x| CONSTANT_RX !~ x }
+        info "your include term looks funny: #{nope.inspect}"
+        throw :stop, false
+      end
+    end
+    def include_write
+      include.each do |s|
+        paystream.puts "#{margin}include #{s}"
+      end
+    end
     # --*--
-    def comments!
+    COMMENT_BEGIN_RX = /[[:space:]]*#+/
+    EOL_RX = /$\r?\n?/
+    def space!
       loop do
-        if scn.skip(/[ \t\n\r\f]*#+/)
-          scn.skip_until(/$\r?\n?/) # consider a comment at eof
+        white!
+        if scn.skip COMMENT_BEGIN_RX
+          if _ = scn.scan(/[ \t]*\(output[ \t]+
+              (?: '(?:\\'|(?!>').)*' | "(?:\\"|(?!>").)*" )
+            [ \t]*\) /x)
+            md = _.match(/\A[ \t]*\(output[ \t]+
+              (?: '(?<_>(?:\\'|(?!>').)*)' | "(?<_>(?:\\"|(?!>").)*)" ) /x )
+            paystream.puts("# #{md[:_]}") # just a q & d p.o.c
+          end
+          scn.skip_until EOL_RX
         else
           break
         end
