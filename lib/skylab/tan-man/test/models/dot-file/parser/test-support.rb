@@ -5,10 +5,10 @@ require_relative '../../../../core'
 RSpec::Matchers.define :be_sexp do |expected|
   match do |actual|
     not
-    if /Sexp\z/ !~ (_ = actual.class.to_s.split('::').last) then
-      @message = "expected Sexp had #{_}"
+    if /\ASexps\z/ !~ (_ = actual.class.to_s.split('::')[-2]) then
+      @message = "expected containing module to be Sexps,  had #{_}"
     elsif (_ = actual.class.nt_name) != expected
-      @message = "expected #{expected} had #{_}"
+      @message = "expected nt_name to be #{expected.inspect} had #{_.inspect}"
     end
   end
   failure_message_for_should do |actual|

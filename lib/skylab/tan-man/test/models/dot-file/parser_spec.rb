@@ -5,7 +5,7 @@ describe "#{Skylab::TanMan::Models::DotFile::Parser}" do
   context 'parsing an empty digraph' do
     def self.it_parses(*tags)
       it 'yields a digraph document sexp', *tags do
-        sexp.should be_sexp(:document)
+        sexp.should be_sexp(:graph)
       end
     end
     def self.it_unparses(*tags)

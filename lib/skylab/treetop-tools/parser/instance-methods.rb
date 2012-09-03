@@ -30,10 +30,12 @@ module Skylab::TreetopTools
     def entity_noun_stem
       self.class.const_get(:ENTITY_NOUN_STEM)
     end
+    attr_reader :input_adapter
     def parse input_adapter
+      @input_adapter = input_adapter
       string = input_adapter.resolve_whole_string or return
       parser = self.parser or return
-      result = parser.parse(string)
+      result = parser.parse string
       if result
         result.tree
       else
@@ -47,8 +49,11 @@ module Skylab::TreetopTools
       @parser_class ||= load_parser_class
     end
     def parser_failure
-      error(parser.failure_reason || 'Got nil from parser without a reason!')
+      error(parser_failure_reason || 'Got nil from parser without a reason!')
       false
+    end
+    def parser_failure_reason
+      parser.failure_reason
     end
   end
 end

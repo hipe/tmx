@@ -4,23 +4,34 @@ module Skylab::TreetopTools
       (@entity ||= nil) || 'input file'
     end
     attr_writer :entity
+    attr_reader :pathname
     def resolve_whole_string
-      if upstream.respond_to?(:pretty)
-        @state = :pathname
-      end
+      # If necessary, turn the 'upstream' from a pathspec (String or Pathname)
+      # into an open stream (setting @pathname), and emit errors if not.
+
       if :initial == state
-        ::String === upstream or
-          fail("expecting pathname string, had #{upstream.class}")
-        self.upstream = Pathname.new(upstream) # !
-        @state = :pathname
+        # normalize pathname based on whether it is a a string, a customized
+        # pathname, or a ::Pathname.  (sorry this is a bit ugly/cautious now.)
+        @pathname =
+          if upstream.respond_to?(:pretty)
+            upstream
+          elsif ::Pathname === upstream
+            Pathname.new(upstream.to_s) # !
+          elsif ::String === upstream
+            Pathname.new(upstream) # !
+          else
+            fail("expecting pathname string, had #{upstream.class}")
+          end
+        self.upstream = nil
+        self.state = :pathname
       end
       if :pathname == state
-        upstream.exist? or return file_not_found
-        upstream.directory? and file_id_dir
-        self.upstream = upstream.open('r')
+        pathname.exist? or return file_not_found
+        pathname.directory? and return file_is_dir
+        self.upstream = pathname.open('r')
         self.state = :open
       end
-      super
+      super # or we might later decide to handle broken pipes here
     end
   protected
     EVENTS = Headless::Parameter::Definer.new do
@@ -33,7 +44,7 @@ module Skylab::TreetopTools
     def file_is_dir
       (events.on_file_is_dir || ->(pathname, entity) do
         error("expecting #{entity}, had directory: #{upstream.pretty}")
-      end).call(upstream, entity)
+      end).call(pathname, entity)
       nil
     end
     def file_not_found
