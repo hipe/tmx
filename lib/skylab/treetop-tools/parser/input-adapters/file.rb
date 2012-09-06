@@ -1,9 +1,6 @@
 module Skylab::TreetopTools
   class Parser::InputAdapters::File < Parser::InputAdapters::Stream
-    def entity
-      (@entity ||= nil) || 'input file'
-    end
-    attr_writer :entity
+    def default_entity_noun_stem ; 'input file' end
     attr_reader :pathname
     def resolve_whole_string
       # If necessary, turn the 'upstream' from a pathspec (String or Pathname)
@@ -44,13 +41,13 @@ module Skylab::TreetopTools
     def file_is_dir
       (events.on_file_is_dir || ->(pathname, entity) do
         error("expecting #{entity}, had directory: #{upstream.pretty}")
-      end).call(pathname, entity)
+      end).call(pathname, entity_noun_stem)
       nil
     end
     def file_not_found
       (events.on_file_not_found || ->(pathname, entity) do
         error("#{entity} not found: #{pathname.pretty}")
-      end).call(upstream, entity)
+      end).call(upstream, entity_noun_stem)
       nil
     end
   end

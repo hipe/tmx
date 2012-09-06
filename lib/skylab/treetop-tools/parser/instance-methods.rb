@@ -14,8 +14,9 @@ module Skylab::TreetopTools
     end
   protected
     def build_file_input_adapter *a, &b
-      a.last.kind_of?(::Hash) or a.push({})
-      a.last.key?(:entity) or a.last[:entity] = entity_noun_stem
+      if ::Hash === a.last ; opts = a.last else a.push( opts = {} ) end
+      opts.key?(:entity_noun_stem) or
+        a.last[:entity_noun_stem] = entity_noun_stem
       Parser::InputAdapters::File.new(request_runtime, *a, &b)
     end
     def build_stream_input_adapter *a
@@ -37,7 +38,7 @@ module Skylab::TreetopTools
       parser = self.parser or return
       result = parser.parse string
       if result
-        result.tree
+        parser_result result
       else
         parser_failure
       end
@@ -54,6 +55,9 @@ module Skylab::TreetopTools
     end
     def parser_failure_reason
       parser.failure_reason
+    end
+    def parser_result result
+      result.tree
     end
   end
 end
