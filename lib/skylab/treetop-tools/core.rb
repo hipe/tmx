@@ -248,8 +248,8 @@ module Skylab::TreetopTools
           if bp.parameter.dir? and ! bp.value.directory?
             error("#{ bp.label } is not a directory: #{ p.value.pretty }")
           end
-        elsif :must == bp.parameter.exist
-          error("#{ bp.label } not found: #{bp.value.pretty}")
+        elsif bp.parameter.known?(:exist) and :must == bp.parameter.exist
+          error("#{ bp.label } not found: #{ bp.value.pretty }")
         end
       end
       errors_count == errors_count_before

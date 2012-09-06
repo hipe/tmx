@@ -8,7 +8,8 @@ module Skylab::TanMan
     def self.[] syntax_node
       a = syntax_node.singleton_class.ancestors
       if ::Treetop::Runtime::SyntaxNode == a.first # ick sorry
-        fail("sanity -- you let an alternation node thru")
+        return # hm
+        # fail("sanity -- you let an alternation node thru")
       end
       consts = a.first.to_s.split('::')
       user_mod = consts[0..-3].reduce(::Object) { |k, c| k.const_get c }
@@ -29,6 +30,13 @@ module Skylab::TanMan
     include Sexp::Inflection::InstanceMethods # symbolize
     def [] syntax_node
       i = Sexp::Auto::Inference[ syntax_node ]
+      if ! i
+        text = syntax_node.text_value
+        if /\A[ \t\r\n]*\z/ =~ text
+          return text
+        end
+        fail('what the hell am i doing')
+      end
       if ! eval("defined? i.sexps_module::#{i.sexp_const}") # 2 reasons
         klass = build_class i
         klass.nt_const = i.nt_const
@@ -159,7 +167,7 @@ module Skylab::TanMan
         case child
         when ::NilClass ; child.to_s
         when ::String   ; child
-        else            ; fail('implement me')
+        else            ; child.unparse
         end
       end.join('')
     end

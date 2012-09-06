@@ -11,7 +11,7 @@ module Skylab::TanMan
     def load_parser_class
       ::Skylab::TreetopTools::Parser::Load.new(
         ->(o) do
-          # o.force_overwrite!
+          o.force_overwrite!
           o.generated_grammar_dir '../../../../../tmp'
           o.root_for_relative_paths ::File.expand_path('..', __FILE__)
           o.treetop_grammar 'dot-language-hand-made.treetop'
@@ -49,8 +49,12 @@ module Skylab::TanMan
       }"
     end
     def in_file
-      "In #{ input_adapter.pathname.pretty }:#{
-        parser.failure_line }:#{ parser.failure_column }"
+      line_col = "#{ parser.failure_line }:#{ parser.failure_column }"
+      if input_adapter.respond_to? :pathname
+        "In #{ input_adapter.pathname.pretty }:#{ line_col }"
+      else
+        "In #{ input_adapter.entity_noun_stem }:#{ line_col }"
+      end
     end
     def parser_failure_reason
       [ in_file, expecting, * excerpt_lines ].compact.join("\n")

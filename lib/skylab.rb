@@ -43,7 +43,7 @@ module Skylab
         alias_method :const_missing, :handle_const_missing
       end
     end
-    def dir ; @dir ||= ::Pathname.new(dir_path) end
+    def dir_pathname ; @dir_pathname ||= ::Pathname.new(dir_path) end
     attr_accessor :dir_path
     CONST_RE = %r{\A(?:(?<rest>(?:(?!=::).)+)::)?(?:::)?(?<curr>[^:]+)\z}
     CONST_TOKENIZER = ->(str) do # returns a lambda that makes a closure around
