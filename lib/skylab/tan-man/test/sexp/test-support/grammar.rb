@@ -77,14 +77,8 @@ module ::Skylab::TanMan::Sexp::TestSupport
       op
     end
 
-    TAIL_CONST_RX =
-      /\A#{::Skylab::TanMan::Sexp::TestSupport::Grammars}::Grammar(.+)\z/
     def dir
-      @dir ||= begin
-        tail_const = TAIL_CONST_RX.match(self.class.to_s)[1]
-        tail_path = ::Skylab::Autoloader::Inflection.pathify(tail_const)
-        Grammars.dir_pathname.join tail_path
-      end
+      @dir ||= Grammars.dir_pathname.join tail_path
     end
 
     def execute
@@ -102,7 +96,7 @@ module ::Skylab::TanMan::Sexp::TestSupport
       ::Skylab::TreetopTools::Parser::Load.new(
         ->(o) do
           o.force_overwrite!
-          o.generated_grammar_dir tmpdir
+          o.generated_grammar_dir tmpdir_prepared
           o.root_for_relative_paths dir
           o.treetop_grammar 'g1.treetop'
         end,
@@ -145,16 +139,32 @@ module ::Skylab::TanMan::Sexp::TestSupport
       end
     end
 
-    tmpdir = nil
-    TMPDIR_F = -> do
-      unless tmpdir
-        tmpdir = ::Skylab::TestSupport::Tmpdir.new(
-          ::Skylab::ROOT.join('tmp/tan-man').to_s  )
-        tmpdir.exist? or tmpdir.prepare
+    TAIL_CONST_RX =
+      /\A#{::Skylab::TanMan::Sexp::TestSupport::Grammars}::Grammar(.+)\z/
+    def tail_path
+      @tail_path ||= begin
+        _tail_const = TAIL_CONST_RX.match(self.class.to_s)[1]
+        ::Skylab::Autoloader::Inflection.pathify _tail_const
       end
-      tmpdir
     end
-    def tmpdir ; TMPDIR_F.call end
+
+    parent_tmpdir_prepared = nil
+    TMPDIR_F = -> do
+      unless parent_tmpdir_prepared
+        parent_tmpdir_prepared = ::Skylab::TestSupport::Tmpdir.new(
+          ::Skylab::ROOT.join('tmp/tan-man').to_s  )
+        parent_tmpdir_prepared.prepare # erase and rewrite anew each runtime
+      end
+      parent_tmpdir_prepared
+    end
+
+    def tmpdir_prepared
+      @tmpdir_prepared ||= begin
+        t = TMPDIR_F.call.join tail_path
+        t.exist? or t.prepare # because parent gets rewritten once per runtime
+        t
+      end
+    end
 
     def usage_line
       "#{em 'usage:'} #{program_name} [opts] #{PATHSPEC_SYNTAX}"

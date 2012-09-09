@@ -1,0 +1,72 @@
+module Skylab::TanMan::Sexp::TestSupport::Grammars::Namespace50
+  grammar NerpZerp50
+    rule graph
+      s? ('strict' s)? ('graph' / 'digraph') (s id)? s? '{' s? stmt_list s? '}' s?
+      {
+        def tree
+          ::Skylab::TanMan::Sexp::Auto::Lossless::Recursive[ self ]
+        end
+      }
+    end
+    rule id
+      id_nominal / id_numeric / id_double_quoted_string
+    end
+    rule id_nominal
+      [_a-zA-Z] [_a-zA-Z0-9]*
+      { def tree ; text_value end }
+      # sad: / [#xC8-#x179]
+    end
+    rule id_numeric
+      ('-' !'>')? ( '.' [0-9]+ / [0-9]+ ( '.' [0-9]* )? )
+      { def tree ; text_value end }
+    end
+    rule id_double_quoted_string
+      '"' content:( ('\"' / !'"' .)* ) '"'
+      { def tree ; content.text_value.gsub('\\"', '"') end }
+    end
+    # this part is incorrect for the time being
+    rule edgeop
+      '->'
+    end
+    rule s
+      [ \t\n\r]+
+    end
+    rule stmt_list
+      (stmt ';'? stmt_list?)?
+    end
+    rule stmt
+      # node_stmt / edge_stmt / attr_stmt / id '=' id / subgraph
+      edge_stmt / node_stmt  / attr_stmt / id '=' id / subgraph
+    end
+    rule attr_stmt
+      ('graph' / 'node' / 'edge') attr_list
+    end
+    rule attr_list
+      '[' a_list? ']' attr_list?
+    end
+    rule a_list
+      id ('=' id)? ','? a_list?
+    end
+    rule edge_stmt
+      (node_id / subgraph) edge_rhs attr_list?
+    end
+    rule edge_rhs
+      s* edgeop s* (node_id / subgraph) edge_rhs?
+    end
+    rule node_stmt
+      node_id attr_list?
+    end
+    rule node_id
+      id port?
+    end
+    rule port
+      ':' id (':' compass_pt)? / ':' compass_pt
+    end
+    rule subgraph
+      ('subgraph' id?)? '{' stmt_list '}'
+    end
+    rule compass_pt
+      ('n' / 'ne' / 'e' / 'se' / 's' / 'sw' / 'w' / 'nw' / 'c' / _)
+    end
+  end
+end

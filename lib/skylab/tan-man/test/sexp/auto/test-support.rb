@@ -10,10 +10,10 @@ module ::Skylab::TanMan::Sexp::Auto::TestSupport
   module ModuleMethods
     def it_should_unparse_losslessly *tags
       it("should unparse losslessly", *tags) do
-        _result = client.parse_file input_path
-        _str_a = input_pathname.read
-        _str_b = _result.unparse
-        _str_a.should eql(_str_b)
+        str_expected = input_pathname.read
+        result = client.parse_file input_path
+        str_actual = result.unparse
+        str_actual.should eql(str_expected)
       end
     end
     def using_input input_pathpart, *tags, &b
@@ -25,7 +25,7 @@ module ::Skylab::TanMan::Sexp::Auto::TestSupport
     def using_grammar grammar_pathpart, *tags, &b
       context("using grammar #{grammar_pathpart}", *tags) do
         grammars = ::Skylab::TanMan::Sexp::TestSupport::Grammars
-        pn = grammars.dir_pathname.join(grammar_pathpart)
+        pn = grammars.dir_pathname.join grammar_pathpart
         let(:input_pathname) { pn.join("fixtures/#{input_pathpart}") }
         let(:client) do
           const = "Grammar#{grammar_pathpart}".intern

@@ -182,9 +182,9 @@ module Skylab::TreetopTools
       end
       normalize_and_validate_paths_to(:root_for_relative_paths) or return
       load_or_generate_grammar_files or return
-      (kk = grammars.last.nested_const_names) or return
-      (kk[kk.length - 1] = "#{kk.last}Parser") &&
-      (klass = kk.reduce(::Object) { |m, c| m.const_get(c) }) or return
+      a = grammars.last.nested_const_names or return
+      a[a.length - 1] = "#{a.last}Parser"
+      klass = a.reduce(::Object) { |m, c| m.const_get c } or return
       a = enhance_parser_with and a.each { |mod| klass = subclass(klass, mod) }
       klass
     end
