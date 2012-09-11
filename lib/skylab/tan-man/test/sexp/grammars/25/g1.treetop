@@ -1,5 +1,5 @@
 module Skylab::TanMan::Sexp::TestSupport::Grammars::Namespace25
-  grammar NerpZerp26
+  grammar NerpZerp25
     rule graph
       s? 'graph' s? '{' s? stmt_list s? '}' s?
       {
