@@ -95,13 +95,13 @@ module ::Skylab::TanMan::Sexp::TestSupport
     def load_parser_class
       ::Skylab::TreetopTools::Parser::Load.new(
         ->(o) do
-          o.force_overwrite!
+          # o.force_overwrite!
           o.generated_grammar_dir tmpdir_prepared
           o.root_for_relative_paths dir
           o.treetop_grammar 'g1.treetop'
         end,
         ->(o) do
-          o.on_info { |e| info "(loading parser #{e})" }
+          o.on_info { |e| info "      (loading parser #{e})" }
           o.on_error { |e| fail("failed to load grammar: #{e}") }
         end
       ).invoke

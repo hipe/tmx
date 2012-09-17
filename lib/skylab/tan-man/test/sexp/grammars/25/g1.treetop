@@ -12,7 +12,7 @@ module Skylab::TanMan::Sexp::TestSupport::Grammars::Namespace25
       [ \t\n\r]+
     end
     rule stmt_list
-      (s? stmt s? ';'? stmt_list?)?
+      (s? head:stmt s? ';'? tail:stmt_list?)?
     end
     rule stmt
       nerp_stmt / zerp_stmt

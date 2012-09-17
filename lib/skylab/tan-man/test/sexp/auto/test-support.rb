@@ -8,12 +8,23 @@ module ::Skylab::TanMan::Sexp::Auto::TestSupport
     end
   end
   module ModuleMethods
-    def it_should_unparse_losslessly *tags
-      it("should unparse losslessly", *tags) do
+    def it_unparses_losslessly *tags
+      it("unparses losslessly", *tags) do
         str_expected = input_pathname.read
         result = client.parse_file input_path
         str_actual = result.unparse
         str_actual.should eql(str_expected)
+      end
+    end
+    def it_yields_the_stmts *items
+      tags = ::Hash === items.last ? [items.pop] : [ ]
+      it "yields the #{items.length} items", *tags do
+        result = client.parse_file input_path
+        a = result.stmt_list.stmts
+        a.length.should eql(items.length)
+        a.each_with_index do |x, i|
+          a[i].to_s.should eql(items[i])
+        end
       end
     end
     def using_input input_pathpart, *tags, &b
