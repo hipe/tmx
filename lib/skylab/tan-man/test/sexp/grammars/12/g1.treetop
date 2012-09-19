@@ -1,0 +1,21 @@
+module Skylab::TanMan::Sexp::TestSupport::Grammars::Namespace12
+  grammar DoopieFloopie12
+    rule document
+      content:(head:stmt tail:(';' content:stmt)* )? "\n"
+      {
+        def tree
+          ::Skylab::TanMan::Sexp::Auto::Lossless::Recursive[ self ]
+        end
+      }
+    end
+    rule stmt
+      head:expr tail:(',' content:expr)*
+    end
+    rule expr
+      ('a'+ / 'b'+) [0-9]*
+      {
+        def tree ; text_value end
+      }
+    end
+  end
+end

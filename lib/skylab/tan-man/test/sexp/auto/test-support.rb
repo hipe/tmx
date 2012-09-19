@@ -5,6 +5,9 @@ module ::Skylab::TanMan::Sexp::Auto::TestSupport
     mod.module_eval do
       extend ModuleMethods
       include InstanceMethods
+      let :result do
+        client.parse_file input_path
+      end
     end
   end
   module ModuleMethods
