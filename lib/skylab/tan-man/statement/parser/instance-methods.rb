@@ -11,7 +11,7 @@ module Skylab::TanMan
         ->(o) do
           # o.force_overwrite!
           o.generated_grammar_dir '../../../tmp'
-          o.root_for_relative_paths TanMan.dir
+          o.root_for_relative_paths TanMan.dir_path
           o.treetop_grammar 'statement/parser/statement.treetop'
         end,
         ->(o) do

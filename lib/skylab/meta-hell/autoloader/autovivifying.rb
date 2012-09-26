@@ -17,8 +17,8 @@ module Skylab::MetaHell
     alias_method :autoloader_no_such_file, :no_such_file
     def no_such_file path, const
       File.directory?(path) or return autoloader_no_such_file(path, const)
-      _md = path.match(%r{(?<=^#{Regexp.escape(dir.to_s)}/).+}) or
-        fail("sanity check: expecting #{dir} to be at head of #{path}")
+      _md = path.match(%r{(?<=^#{Regexp.escape(dir_pathname.to_s)}/).+}) or
+        fail("sanity check: expecting #{dir_pathname} to be at head of #{path}")
       constantize(_md[0]).downcase == const.to_s.downcase or
         fail("sanity check: does #{_md[0]} isomorph #{const}?")
       const_set(const, AutovivifiedModel.new(path).

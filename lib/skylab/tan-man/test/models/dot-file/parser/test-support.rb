@@ -1,4 +1,3 @@
-require_relative '../../../../..' # bootstrap-in skylab.rb here :/
 require_relative '../../../../core'
 
 # (reference: http://solnic.eu/2014/01/14/custom-rspec-2-matchers.html)

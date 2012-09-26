@@ -14,7 +14,7 @@ module Skylab::CssConvert
           CssConvert::Parser::Extlib::InstanceMethods )
         o.force_overwrite! if params.force_overwrite?
         o.generated_grammar_dir "#{params.tmpdir_relative}"
-        o.root_for_relative_paths CssConvert.dir
+        o.root_for_relative_paths CssConvert.dir_pathname
         o.treetop_grammar 'directive/parser/common.treetop'
         o.treetop_grammar 'directive/parser/directive.treetop'
       end

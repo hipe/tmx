@@ -172,7 +172,7 @@ module Skylab::CssConvert
   class CLI::Client
     include CLI::VisualTest::InstanceMethods
   end
-  FIXTURES_DIR = CssConvert.dir.join('test/fixtures')
+  FIXTURES_DIR = CssConvert.dir_pathname.join('test/fixtures')
   VISUAL_TESTS = o = []
   test = ::Struct.new(:name, :value, :method)
   o << test.new('color test', 'see what the CLI colors look like.', :color_test)

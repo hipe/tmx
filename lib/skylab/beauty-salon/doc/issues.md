@@ -1,3 +1,4 @@
+[#005] #open 2012-09-02 #feature (:convert => 'this') (to: 'this')
 [#004] #open 2012-08-19 #feature be able to break up long lines #tricky
 [#003] #open 2012-08-19 #feature as an excercise of a model transformation (..)
 [#002] #open 2012-08-19 #feature be able to rename a symbol (following conventions)

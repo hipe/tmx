@@ -52,8 +52,10 @@ module Skylab::Headless
   module Parameter::Definer::InstanceMethods::IvarsAdapter
     protected
     def [](k)
-      instance_variable_defined?("@#{k}") or
-        fail('where are you getting w/o checking')
+      unless instance_variable_defined?("@#{k}")
+        fail("getting without checking -- ivar not defined: @#{
+          k} in a #{self.class}")
+      end
       instance_variable_get("@#{k}")
     end
     def []=(k, v)   ; instance_variable_set("@#{k}", v)   end
