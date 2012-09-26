@@ -33,7 +33,10 @@ module Skylab::TanMan::Sexp::TestSupport::Grammars::Namespace50
     end
     rule stmt_list
       # (stmt ';'? stmt_list?)?
-      (stmt ( (';' / s) stmt_list )? s? ';'?)?
+      (head:stmt tail:(stmt_separator content:stmt_list)? stmt_separator?)?
+    end
+    rule stmt_separator
+      s? ';' s? / s
     end
     rule stmt
       # node_stmt / edge_stmt / attr_stmt / id '=' id / subgraph
