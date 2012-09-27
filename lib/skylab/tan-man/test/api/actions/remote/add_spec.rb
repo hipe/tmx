@@ -5,9 +5,11 @@ module Skylab::TanMan::TestSupport
   describe "The #{TanMan::API} action Remote Add", tanman: true do
     let(:name) { [:remote, :add] }
 
+    include Tmpdir_InstanceMethods
+
     context "when there is no local conf directory" do
       before do
-        TMPDIR.prepare
+        prepare_submodule_tmpdir
       end
       it "requires certain args, derps on failure" do
         ee = api.invoke(%w(remote add))
@@ -30,7 +32,8 @@ module Skylab::TanMan::TestSupport
       end
       it "adding a valid local remote works (confirmed with a second api call)" do
         ee = api.invoke(name, name: 'flip', host: 'flap')
-        lone_success ee, %r{\bcreating.*tanman/local-conf\.d/config.*\.\..*\(\d{2,} bytes\b}
+        lone_success ee,
+          %r{\bcreating.*#{TMPDIR_STEM}/local-conf\.d/config.*\.\..*\(\d{2,} bytes\b}
         (ee = api.invoke([:remote, :list])).should be_success
         ee.size.should eql(1)
         (h = ee.first.payload).should be_kind_of(Hash)
@@ -38,7 +41,8 @@ module Skylab::TanMan::TestSupport
       end
       it "you can add a valid global remote (confirmed with seconds api call un-jsonized)" do
         ee = api.invoke(name, name: 'fliz', host: 'flaz', resource: 'global')
-        lone_success ee, %r{\bcreating.*tanman/global-conf-file.*\(\d{2,} bytes\b}
+        lone_success ee,
+          %r{\bcreating.*#{TMPDIR_STEM}/global-conf-file.*\(\d{2,} bytes\b}
         (ee = api.invoke([:remote, :list])).should be_success
         rows = JSON.parse(ee.to_json)
         rows.size.should eql(1)

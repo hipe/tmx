@@ -8,16 +8,18 @@ module Skylab::Flex2Treetop::MyTestSupport
 
   Flex2Treetop.respond_to?(:dir) or begin # for now, futureproofing
     def Flex2Treetop.dir
-      @dir ||= ::Skylab::ROOT.join('lib/skylab/css-convert')
+      @dir ||= ::Skylab::ROOT_PATHNAME.join('lib/skylab/css-convert')
     end
   end
   module Headless end
   module Headless::ModuleMethods
     def fixture name
-      ::Skylab::ROOT.join(Flex2Treetop::FIXTURES[name]).to_s
+      ::Skylab::ROOT_PATHNAME.join(Flex2Treetop::FIXTURES[name]).to_s
     end
     _tmpdir_f = -> do
-      t = ::Skylab::TestSupport::Tmpdir.new(::Skylab::ROOT.join('tmp/f2tt'))
+      t = ::Skylab::TestSupport::Tmpdir.new(
+        ::Skylab::TMPDIR_PATHNAME.join('f2tt')
+      )
       (_tmpdir_f = ->{t}).call
     end
     TMPDIR_F = -> { _tmpdir_f.call }

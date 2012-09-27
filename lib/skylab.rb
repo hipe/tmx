@@ -3,7 +3,8 @@ $:.include?(o = File.expand_path('..', __FILE__)) or $:.unshift(o)
 require 'pathname'
 
 module Skylab
-  ROOT = Pathname.new('../..').expand_path(__FILE__)
+  ROOT_PATHNAME = ::Pathname.new('../..').expand_path(__FILE__)
+  TMPDIR_PATHNAME = ROOT_PATHNAME.join('tmp')
 end
 
 module Skylab

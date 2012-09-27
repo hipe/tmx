@@ -9,7 +9,8 @@ module Skylab::TanMan::TestSupport
   Porcelain = Skylab::Porcelain
   TanMan = Skylab::TanMan
 
-  TMPDIR = Tmpdir.new(Skylab::ROOT.join('tmp/tanman'))
+  TMPDIR_STEM = 'tan-man'
+  TMPDIR = Tmpdir.new(::Skylab::TMPDIR_PATHNAME.join(TMPDIR_STEM).to_s)
 
   # the below machinery has been rigged carefully and is a precision insturment
   class StreamsSpy < Array # that's "streams" plural
@@ -73,6 +74,7 @@ end
 
 module Skylab::TanMan::TestSupport
   shared_context tanman: true do
+  include ::Skylab::TanMan::TestSupport::Tmpdir_InstanceMethods
   def api
     TanMan.api
   end
@@ -123,9 +125,38 @@ module Skylab::TanMan::TestSupport
     res
   end
   def prepare_local_conf_dir
-    TMPDIR.prepare.mkdir(TanMan::API.local_conf_dirname)
+    prepare_submodule_tmpdir.mkdir(TanMan::API.local_conf_dirname)
   end
   attr_accessor :result
+  end
+end
+
+module Skylab::TanMan::TestSupport
+  module Tmpdir_InstanceMethods
+    MEMO = ::Class.new.class_eval do
+      execute_f = -> { TMPDIR.prepare }
+      get_f = ->{ _memo = execute_f.call ; (get_f = ->{ _memo }).call }
+      define_method(:get) { get_f.call }
+      define_method(:execute) { execute_f.call }
+      self
+    end.new
+    def prepare_submodule_tmpdir
+      MEMO.execute
+    end
+    def prepared_submodule_tmpdir
+      MEMO.get
+    end
+  end
+  module InstanceMethods
+    extend Tmpdir_InstanceMethods
+    my_before_all_f = -> do
+      prepared_submodule_tmpdir
+      my_before_all_f = ->{ }
+    end
+    MY_BEFORE_ALL_F = ->{ my_before_all_f.call }
+    def _my_before_all
+      MY_BEFORE_ALL_F.call
+    end
   end
 end
 

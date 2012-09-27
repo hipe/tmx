@@ -30,9 +30,9 @@ module ::Skylab::TanMan::Sexp::Auto::TestSupport
         end
       end
     end
-    def using_input input_pathpart, *tags, &b
-      context("using input #{input_pathpart}", *tags) do
-        let(:input_pathpart) { input_pathpart }
+    def using_input input_path_stem, *tags, &b
+      context("using input #{input_path_stem}", *tags) do
+        let(:input_path_stem) { input_path_stem }
         instance_eval(&b)
       end
     end
@@ -40,7 +40,7 @@ module ::Skylab::TanMan::Sexp::Auto::TestSupport
       context("using grammar #{grammar_pathpart}", *tags) do
         grammars = ::Skylab::TanMan::Sexp::TestSupport::Grammars
         pn = grammars.dir_pathname.join grammar_pathpart
-        let(:input_pathname) { pn.join("fixtures/#{input_pathpart}") }
+        let(:input_pathname) { pn.join("fixtures/#{input_path_stem}") }
         let(:client) do
           const = "Grammar#{grammar_pathpart}".intern
           grammars.constants.include?(const) or

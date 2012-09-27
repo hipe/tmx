@@ -1,5 +1,6 @@
 require 'optparse'
 require 'stringio'
+require_relative '../../test-support'
 
 module ::Skylab::TanMan::Sexp::TestSupport
   module CLI_Client_InstanceMethods
@@ -52,6 +53,7 @@ module ::Skylab::TanMan::Sexp::TestSupport
   class Grammar < ::Struct.new(:upstream, :paystream, :infostream)
     include TanMan::Models::DotFile::Parser::InstanceMethods # parsing porcelain
     include CLI_Client_InstanceMethods
+    include TanMan::TestSupport::Tmpdir_InstanceMethods # prepared_submodule_tmpdir
 
     def initialize i=$stdin, o=$stdout, e=$stderr
       @stdin = i ; self.paystream = o ; self.infostream = e
@@ -65,6 +67,16 @@ module ::Skylab::TanMan::Sexp::TestSupport
     end
 
   protected
+
+    NUM_RX = /\A(.+[^0-9])\d+\z/
+
+    def anchor_module_head
+      _md = NUM_RX.match(self.class.to_s) or fail("failed to infer#{
+        } anchor_module_head from this class name, expecting it to end with#{
+        } a digit: #{self.class}. (Implement your own thing up the chain.)")
+      _md[1]
+    end
+
     PATHSPEC_SYNTAX = '[ - | <filename> ]'
 
     def build_option_parser
@@ -77,8 +89,8 @@ module ::Skylab::TanMan::Sexp::TestSupport
       op
     end
 
-    def dir
-      @dir ||= Grammars.dir_pathname.join tail_path
+    def anchor_dir_pathname
+      @anchor_dir_pathname ||= Grammars.dir_pathname.join stem_path
     end
 
     def execute
@@ -92,19 +104,27 @@ module ::Skylab::TanMan::Sexp::TestSupport
       end
     end
 
+    def force_overwrite?
+      false # in flux -- sometimes we blow away the tmpdir once
+    end
+
     def load_parser_class
       ::Skylab::TreetopTools::Parser::Load.new(
         ->(o) do
-          # o.force_overwrite!
+          force_overwrite? and o.force_overwrite!
           o.generated_grammar_dir tmpdir_prepared
-          o.root_for_relative_paths dir
-          o.treetop_grammar 'g1.treetop'
+          o.root_for_relative_paths anchor_dir_pathname
+          grammars o
         end,
         ->(o) do
           o.on_info { |e| info "      (loading parser #{e})" }
           o.on_error { |e| fail("failed to load grammar: #{e}") }
         end
       ).invoke
+    end
+
+    def grammars o
+      o.treetop_grammar 'g1.treetop'
     end
 
     attr_reader :pathname
@@ -139,28 +159,20 @@ module ::Skylab::TanMan::Sexp::TestSupport
       end
     end
 
-    TAIL_CONST_RX =
-      /\A#{::Skylab::TanMan::Sexp::TestSupport::Grammars}::Grammar(.+)\z/
-    def tail_path
-      @tail_path ||= begin
-        _tail_const = TAIL_CONST_RX.match(self.class.to_s)[1]
-        ::Skylab::Autoloader::Inflection.pathify _tail_const
-      end
+    def stem_const_rx
+      @stem_const_rx ||= /\A#{anchor_module_head}(.+)\z/
     end
 
-    parent_tmpdir_prepared = nil
-    TMPDIR_F = -> do
-      unless parent_tmpdir_prepared
-        parent_tmpdir_prepared = ::Skylab::TestSupport::Tmpdir.new(
-          ::Skylab::ROOT.join('tmp/tan-man').to_s  )
-        parent_tmpdir_prepared.prepare # erase and rewrite anew each runtime
+    def stem_path
+      @stem_path ||= begin
+        _stem_const = stem_const_rx.match(self.class.to_s)[1]
+        ::Skylab::Autoloader::Inflection.pathify _stem_const
       end
-      parent_tmpdir_prepared
     end
 
     def tmpdir_prepared
       @tmpdir_prepared ||= begin
-        t = TMPDIR_F.call.join tail_path
+        t = prepared_submodule_tmpdir.join stem_path
         t.exist? or t.prepare # because parent gets rewritten once per runtime
         t
       end

@@ -11,8 +11,8 @@ module Skylab::TanMan
     def load_parser_class
       ::Skylab::TreetopTools::Parser::Load.new(
         ->(o) do
-          # o.force_overwrite!
-          o.generated_grammar_dir '../../../../../tmp'
+          force_overwrite? and o.force_overwrite!
+          o.generated_grammar_dir generated_grammar_dir
           o.root_for_relative_paths ::File.expand_path('..', __FILE__)
           o.treetop_grammar 'dot-language-hand-made.treetop'
           o.treetop_grammar 'dot-language.generated.treetop'
@@ -47,6 +47,12 @@ module Skylab::TanMan
         else   ; "one of #{ a.map { |tf| format_f[tf] }.uniq.join(', ') }"
         end
       }"
+    end
+    def force_overwrite?
+      false
+    end
+    def generated_grammar_dir
+      '../../../../../tmp/tan-man'
     end
     def in_file
       line_col = "#{ parser.failure_line }:#{ parser.failure_column }"

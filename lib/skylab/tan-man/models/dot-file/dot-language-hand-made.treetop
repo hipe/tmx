@@ -11,6 +11,26 @@
 
 module Skylab::TanMan::Models::DotFile
   grammar HandMadeSupplement
+    rule s
+      (white / comment) s?
+    end
+    rule white
+      [ \t\n\r]+
+    end
+    rule comment
+      c_style_comment / shell_style_comment
+    end
+    rule c_style_comment
+      '/*'
+      (
+        !'*/'
+        ( . / [\n\r]+ )
+      )*
+      '*/'
+    end
+    rule shell_style_comment
+      '#' ( ![\n\r] . )*
+    end
     rule id
       id_name / id_numeric
       { def tree ; text_value end }

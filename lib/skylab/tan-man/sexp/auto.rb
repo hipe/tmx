@@ -13,16 +13,21 @@ module Skylab::TanMan
     # this library, and possibly generated Sexp classes for use in
     # recursive calls to builder methods.
 
-    def [] syntax_node # just a convenience shorthand that inherits well
-      node2tree syntax_node
+    def [] syntax_node # inheritable API entrypoint
+      node2tree syntax_node, nil
     end
 
     def add_instance_methods i
       if instance_methods_module
         i.tree_class.send :include, instance_methods_module
       end
+      # There might be issues with hacks with more broad patterns intercepting
+      # all potential matches with hacks with more narrow patterns so
+      # order might be important here.
       if Sexp::Auto::Hacks::HeadTail.matches? i
         Sexp::Auto::Hacks::HeadTail.enhance i
+      elsif Sexp::Auto::Hacks::RecursiveTail.matches? i
+        Sexp::Auto::Hacks::RecursiveTail.enhance i
       end
     end
 
@@ -42,13 +47,13 @@ module Skylab::TanMan
       i.tree_class
     end
 
-    def element2tree element
+    def element2tree element, parent_class
       if ! element
         nil # typically as a trailing optional node
       elsif element.respond_to? :tree
         element.tree # for custom definitions e.g. in the grammar (careful!)
       else
-        node2tree element
+        node2tree element, parent_class
       end
     end
 
@@ -76,13 +81,13 @@ module Skylab::TanMan
       sexp_builder_anchor_module.const_get(:ModuleMethods, false)
     end
 
-    def node2tree node
+    def node2tree node, parent_class
       # (Don't call node.tree from here.  That calls this.)
-      inference = Sexp::Auto::Inference[ node ]
+      inference = Sexp::Auto::Inference.get(node, parent_class)
       if inference
         inference2tree inference
       else
-        uninferrable2tree node
+        uninferrable2tree node, parent_class
       end
     end
 
@@ -98,9 +103,9 @@ module Skylab::TanMan
     # into the children one level down.  If you can make inferences of them,
     # then use this generic list class to hold a list of them, else collapse.
 
-    def uninferrable2tree node # must be a syntax node
+    def uninferrable2tree node, parent_class
       inferences = node.elements && node.elements.map do |n|
-        Sexp::Auto::Inference[ n ]
+        Sexp::Auto::Inference.get(n, parent_class)
       end
       if ! (inferences && inferences.any?)
         normalize_text_value node.text_value
@@ -110,7 +115,7 @@ module Skylab::TanMan
           list[idx] = if inferences[idx]
             inference2tree inferences[idx]
           else
-            uninferrable2tree n
+            uninferrable2tree n, parent_class
           end
         end
         list
@@ -127,7 +132,10 @@ module Skylab::TanMan
     include Sexp::Auto::BuildMethods # the constructor (klass2tree) needs this
 
     def klass2tree inference
-      new(* members_of_interest.map{ |m| element2tree inference._node.send(m) })
+      new(* members_of_interest.map do |m|
+          element2tree inference._node.send(m), self
+        end
+      )
     end
 
     attr_accessor :members_of_interest
@@ -151,6 +159,7 @@ module Skylab::TanMan
     :_em_rest,
     :grammar,
     :mod,
+    :_parent_class,
     :tree_class
   )
     # The Inference of a synax node is for "inferring" what Sexp class to use
@@ -161,19 +170,27 @@ module Skylab::TanMan
 
     CACHE = { } # for some algorithms we might try look-ahead to infer names
 
-    def self.[] node
+    def self.get node, parent_class
       if CACHE.key?(node.object_id)
-        CACHE[node.object_id] # might be nil
+        i = CACHE[node.object_id] # might be nil
+        if i
+          if i._parent_class.object_id != parent_class.object_id
+            fail('sanity')
+          end
+        end
+        i
       else
-        CACHE[node.object_id] = inference(node)
+        CACHE[node.object_id] = inference(node, parent_class)
       end
     end
 
-    def self.inference node
+    def self.inference node, parent_class
+      parent_class and (::Class === parent_class or fail("huh? #{parent_class.inspect}"))
       ems = node.extension_modules
       ems.empty? and return nil # possibly a kleene group
       o = new
       o._node = node # not a struct member only to hide it from dumps :/
+      o._parent_class = parent_class
       em = ems.shift
       parts = em.to_s.split('::')
       o.em_first = parts.pop.intern
@@ -244,7 +261,9 @@ module Skylab::TanMan
     end
 
     def _stem const
-      /\A(?<stem>[^0-9]+)[0-9]+\z/.match(const.to_s)[:stem].intern
+      _md = /\A(?<stem>[^0-9]+)[0-9]+\z/.match(const.to_s) or
+        fail("sanity: Expecting this badbody to end in digits: #{const}")
+      _md[:stem].intern
     end
   end
 
@@ -331,8 +350,8 @@ module Skylab::TanMan
     include Sexp::Auto::Lossless::ModuleMethods
     include Sexp::Auto::Lossless::Recursive::BuildMethods # for #recursive call
 
-    def klass2tree inference
-      new(* inference._node.elements.map { |e| element2tree e }) #recursive call
+    def klass2tree inference # the #recursive call
+      new(* inference._node.elements.map { |e| element2tree e, self })
     end
   end
 
@@ -350,11 +369,11 @@ module Skylab::TanMan
     # "head:" and "tail:" (it can have other labels).
     #
     # We enhance the resulting tree class as follows: we include unto it
-    # a module that defines a method called "items" that presumably
+    # a module that defines a method called "_items" that presumably
     # returns an enumerable that will yield the child trees you seek.
     #
     # Also, as a possibly too #opaque added bonus, we will effectively
-    # alias the above mentioned "items" method to a business-specific name we
+    # alias the above mentioned "_items" method to a business-specific name we
     # infer by adding an 's' to an inferred stem that we derive from:
     #
     #   - If the rule name is of the form "foo_list" we infer the stem "foo"
@@ -377,7 +396,7 @@ module Skylab::TanMan
 
       _use_stem = if ( md = LIST_RX.match(inference._nt_stem.to_s) )
         md[:stem].intern
-      elsif ( head_inference = Sexp::Auto::Inference[ head ] )
+      elsif ( head_inference = Sexp::Auto::Inference.get(head, inference.tree_class))
         head_inference._nt_stem
       else
         fail("for this hack to work your rule name must end in _list")
@@ -388,21 +407,19 @@ module Skylab::TanMan
         instance_methods.include?(items_method) and fail("sanity -#{
           } name collision during HeadTail hack: \"#{instance_methods
           }\" method is already defined.")
-        define_method(items_method) { self.items }
+        define_method(items_method) { self._items }
           # future-proof the method's inheritability. also, too #opaque?
       end
     end
   end
   module Sexp::Auto::Hacks::HeadTail::InstanceMethods
-    def items
-      a = [ ]
-      _items a
-      a
+    def _items
+      a = [ ] ; __items a ; a
     end
 
     # we are experimenting with different patterns for this (as seen in
     # the various grammars in the unit tests), so this is all subject to change.
-    def _items y
+    def __items y
       head = self.head ; tail = self.tail
       head and y << head
       if ! tail
@@ -413,16 +430,56 @@ module Skylab::TanMan
         end
       elsif tail.class.nt_name == self.class.nt_name
         # foo_list ::= (s? head:foo s? ';'? '?' tail:foo_list?)?
-        tail._items y
+        tail.__items y
       else
         # foo_list ::= (head:foo tail:(sep content:foo_list)? sep?)?
         tail.class._nt_stem == self.class._nt_stem or fail('sanity') # for now
         if tail.content
           tail.content.class.nt_name == self.class.nt_name or fail('sanity')
-          tail.content._items y
+          tail.content.__items y
         end
       end
       nil
+    end
+  end
+  module Sexp::Auto::Hacks::RecursiveTail
+    # This hack tries to recognize a rule called "foo_list" that has as
+    # one of its members of interest a doohah called foo and then presumably
+    # as antoher one of its optional doohahs a doohah called "foo_list"
+
+    LIST_RX = /\A(?<stem>.+)_list\z/
+
+    def self.matches? i
+      if _md = LIST_RX.match(i.nt_name.to_s)
+        if i.tree_class.members_of_interest.include?(_md[:stem].intern)
+          true
+        end
+      end
+    end
+
+    def self.enhance inference
+      inference.tree_class.class_eval do
+        extend Sexp::Auto::Hacks::RecursiveTail::ModuleMethods
+        include Sexp::Auto::Hacks::RecursiveTail::InstanceMethods
+        self.item_stem = LIST_RX.match(inference._nt_stem)[:stem].intern
+      end
+    end
+  end
+  module Sexp::Auto::Hacks::RecursiveTail::ModuleMethods
+    attr_accessor :item_stem
+  end
+  module Sexp::Auto::Hacks::RecursiveTail::InstanceMethods
+    def _items
+      a = [ ]
+      node = self
+      begin
+        _item = node.send(self.class.item_stem) or fail('sanity')
+        a << _item
+        node = if _tail = node.tail
+          _tail.send(self.class._nt_stem) # nil ok
+        end
+      end while node
+      a
     end
   end
 end

@@ -14,7 +14,7 @@ module Skylab::Dependency::TestSupport
     let(:fingers) { Hash.new { |h, k| h[k] = [] } }
   end
 
-  TEMP_DIR = Skylab::TestSupport::Tmpdir.new(Skylab::ROOT.join('tmp').to_s)
+  TEMP_DIR = ::Skylab::TestSupport::Tmpdir.new(::Skylab::TMPDIR_PATHNAME.to_s)
 
   BUILD_DIR = Skylab::TestSupport::Tmpdir.new(TEMP_DIR.join('build-dependency'))
 

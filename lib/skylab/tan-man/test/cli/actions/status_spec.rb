@@ -4,8 +4,9 @@ require_relative '../../test-support'
 module Skylab::TanMan::TestSupport
   # @todo waiting for permute [#056]
   describe "The #{TanMan::CLI} action Status", tanman: true  do
+    include Tmpdir_InstanceMethods
     def prepare_configs *whichs
-      TMPDIR.prepare
+      prepare_submodule_tmpdir
       whichs.each do |which|
         case which
         when :global
@@ -58,7 +59,7 @@ module Skylab::TanMan::TestSupport
     end
     context 'yes local dir as file' do
       before do
-        TMPDIR.prepare.touch('local-conf.d')
+        prepare_submodule_tmpdir.touch('local-conf.d')
       end
       it 'complain that a folder was expected where a file was found' do
         input 'status'

@@ -6,7 +6,7 @@ module Skylab
         { def tree ; Sexp::Auto[ self ] end }
       end
       rule cluster
-        first:word rest:(sep content:word)*
+        head:word tail:(sep content:word)*
         { def tree ; Sexp::Auto[ self ] end }
       end
       rule word

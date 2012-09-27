@@ -45,6 +45,6 @@ module ::Skylab::CodeMolester::TestSupport
 end
 
 module ::Skylab::CodeMolester::TestSupport
-  TMPDIR = Tmpdir.new(::Skylab::ROOT.join('tmp/co-mo'))
+  TMPDIR = Tmpdir.new(::Skylab::TMPDIR_PATHNAME.join('co-mo'))
 end
 

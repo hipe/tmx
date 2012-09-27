@@ -3,9 +3,10 @@ require File.expand_path('../test-support', __FILE__)
 
 module Skylab::TanMan::TestSupport
   describe "The #{TanMan} CLI", tanman: true do
+    include Tmpdir_InstanceMethods
     context 'for remotes' do
       before do
-        TMPDIR.prepare
+        prepare_submodule_tmpdir
       end
       context 'when there is no local config directory' do
         it 'cannot get added, whines about no directory' do
@@ -30,7 +31,9 @@ module Skylab::TanMan::TestSupport
         announce = :stderr
         it 'you can add a local remote' do
           input 'remote add bing bong'
-          output_shift_only_is announce, %r{^creating .+/tmp/tanman/local-conf\.d.+\d\d bytes\.}, true
+          output_shift_only_is announce,
+            %r{^creating .+/tmp/#{TMPDIR_STEM}/local-conf\.d.+\d\d bytes\.},
+            true
         end
         context 'you can list the remotes' do
           it 'when there are no remotes.' do
