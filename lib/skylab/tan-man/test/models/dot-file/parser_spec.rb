@@ -26,7 +26,7 @@ describe "#{Skylab::TanMan::Models::DotFile::Parser}" do
     using_input '100-hello-world.dot' do
       it 'should give the same statement object, 2 ways' do
         stmt = result.stmt_list.stmt
-        a = result.stmt_list._items # stmts
+        a = result.stmt_list.stmts
         a.length.should eql(1)
         a.first.unparse.should eql("Hello->World")
         a.first.object_id.should eql(stmt.object_id)
@@ -34,10 +34,17 @@ describe "#{Skylab::TanMan::Models::DotFile::Parser}" do
     end
     using_input '200.dot' do
       it 'can get 2 items' do
-        a = result.stmt_list._items # stmts
+        a = result.stmt_list.stmts
         a.length.should eql(2)
         a.first.unparse.should eql('one->two')
         a.last.unparse.should eql('three->four')
+      end
+    end
+    using_input '410-node-with-dbl-quotes.dot' do
+      it 'parses double quoted node ID\'s correctly' do
+        node_stmt = result.stmt_list.stmts.first
+        node_stmt.class._nt_stem.should eql(:node_stmt)
+        node_stmt.node_id.id.should eql('node0')
       end
     end
   end

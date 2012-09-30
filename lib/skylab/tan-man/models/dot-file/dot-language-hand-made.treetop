@@ -1,13 +1,30 @@
-# This grammar defines valid "ID"'s for the dot language.
-
-# It was developed by hand, directly from the
-# 'abstract grammar' definition given in
+# This file constitutes those parts of the dot language grammar that
+# needed to be written "by hand" (as opposed to (semi-) generated from
+# the provided 'abstract grammar definition); for lack of a rigid grammar
+# having been provided in non-natural language form.
+#
+# It is language elements like whitespace, comments, and ID's.
+#
+# Close isomorphicisms should be evident between some of the below
+# language elements and the natural language descriptions given at
 #   http://www.graphviz.org/doc/info/lang.html
-
+# which was used directly and solely as the source for the below such rules.
+#
 # Although it currently only implements a subset of the
 # grammar described therein, its aim is to be correct, if not complete.
-
-# (We had to skip multibyte support for now.  Patches welcome!)
+#
+# Things that for one reason or another are not yet covered in this grammar:
+#   - Currently for "edgeop" we only support '->' and not '--'
+#       (That is, we only support directed and not undirected graphs, for now)
+#       The conditional nature of this rule will require post-processing
+#       that introduces a level of sophistication that we will tackle only
+#       after handling the easier stuff.
+#   Some issuess with ID's:
+#   - We had to skip multibyte support for now.  Patches welcome!
+#   - No support yet for ID's that consist of HTML strings -- egads!
+#       (We will hassle with this on an as-needed basis.)
+#
+# The above list is not necessarily comprehensive.
 
 module Skylab::TanMan::Models::DotFile
   grammar HandMadeSupplement
@@ -32,11 +49,11 @@ module Skylab::TanMan::Models::DotFile
       '#' ( ![\n\r] . )*
     end
     rule id
-      id_name / id_numeric
-      { def tree ; text_value end }
+      id_name / id_numeric / double_quoted_string
     end
     rule id_name
       id_name_start_char id_name_char*
+      { def tree ; text_value end }
     end
     rule id_name_start_char
       [_a-zA-Z]
@@ -47,6 +64,11 @@ module Skylab::TanMan::Models::DotFile
     end
     rule id_numeric
       '-'? ( '.' [0-9]+ / [0-9]+ ( '.' [0-9]* )? )
+      { def tree ; text_value end }
+    end
+    rule double_quoted_string
+      '"' content:('\"' / !'"' .)* '"'
+      { def tree ; content.text_value end }
     end
   # --*--
     # this part is incorrect for the time being (see above link)

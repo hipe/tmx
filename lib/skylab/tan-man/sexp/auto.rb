@@ -361,6 +361,26 @@ module Skylab::TanMan
     # pure container module for holding automagic "hacks"
   end
 
+  module Sexp::Auto::Hack
+    # hack support, implementation details
+  end
+
+  module Sexp::Auto::Hack::ModuleMethods
+    def define_items_method klass, stem
+      items_method = "#{stem}s" # pluralize
+      klass.instance_methods.include?(items_method) and fail("sanity -#{
+        } name collision during hack: \"#{items_method
+        }\" method is already defined.")
+      klass.send(:define_method, items_method) { self._items }
+        # future-proof the method's inheritability. also, too #opaque?
+      nil
+    end
+  end
+
+  module Sexp::Auto::Hack::Constants
+    LIST_RX = /\A(?<stem>.+)_list\z/
+  end
+
   module Sexp::Auto::Hacks::HeadTail
     # This, the HeadTail hack, works and has features as follows:
     #
@@ -382,34 +402,29 @@ module Skylab::TanMan
     #   - else we will fail
     #
 
+    extend Sexp::Auto::Hack::ModuleMethods
+    include Sexp::Auto::Hack::Constants
+
     MEMBERS = [:head, :tail]
     def self.matches? i
       ( MEMBERS - i.tree_class.members_of_interest ).empty?
     end
 
-    LIST_RX = /\A(?<stem>.+)_list\z/
-    def self.enhance inference
+    def self.enhance i # inference
       # (the below hackery is explained in the comment for this module above.)
 
-      head = inference._node.head or
-        fail('for this hack to work, head: must exit')
+      i.tree_class.send(:include, Sexp::Auto::Hacks::HeadTail::InstanceMethods)
 
-      _use_stem = if ( md = LIST_RX.match(inference._nt_stem.to_s) )
+      head = i._node.head or
+        fail('for this hack to work, head: must exit')
+      _use_stem = if ( md = LIST_RX.match(i._nt_stem.to_s) )
         md[:stem].intern
-      elsif ( head_inference = Sexp::Auto::Inference.get(head, inference.tree_class))
+      elsif ( head_inference = Sexp::Auto::Inference.get(head, i.tree_class))
         head_inference._nt_stem
       else
         fail("for this hack to work your rule name must end in _list")
       end
-      items_method = "#{_use_stem}s"
-      inference.tree_class.class_eval do
-        include Sexp::Auto::Hacks::HeadTail::InstanceMethods
-        instance_methods.include?(items_method) and fail("sanity -#{
-          } name collision during HeadTail hack: \"#{instance_methods
-          }\" method is already defined.")
-        define_method(items_method) { self._items }
-          # future-proof the method's inheritability. also, too #opaque?
-      end
+      define_items_method i.tree_class, _use_stem
     end
   end
   module Sexp::Auto::Hacks::HeadTail::InstanceMethods
@@ -447,7 +462,8 @@ module Skylab::TanMan
     # one of its members of interest a doohah called foo and then presumably
     # as antoher one of its optional doohahs a doohah called "foo_list"
 
-    LIST_RX = /\A(?<stem>.+)_list\z/
+    include Sexp::Auto::Hack::Constants
+    extend Sexp::Auto::Hack::ModuleMethods
 
     def self.matches? i
       if _md = LIST_RX.match(i.nt_name.to_s)
@@ -463,6 +479,8 @@ module Skylab::TanMan
         include Sexp::Auto::Hacks::RecursiveTail::InstanceMethods
         self.item_stem = LIST_RX.match(inference._nt_stem)[:stem].intern
       end
+      define_items_method inference.tree_class, inference.tree_class.item_stem
+      nil
     end
   end
   module Sexp::Auto::Hacks::RecursiveTail::ModuleMethods
