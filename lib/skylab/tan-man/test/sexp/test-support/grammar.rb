@@ -68,7 +68,7 @@ module ::Skylab::TanMan::Sexp::TestSupport
 
   protected
 
-    NUM_RX = /\A(.+[^0-9])\d+\z/
+    NUM_RX = /\A(.+[^0-9])\d+(?:_[a-zA-Z]+)?\z/
 
     def anchor_module_head
       _md = NUM_RX.match(self.class.to_s) or fail("failed to infer#{

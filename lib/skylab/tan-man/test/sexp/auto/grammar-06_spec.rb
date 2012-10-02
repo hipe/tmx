@@ -5,6 +5,13 @@ describe "#{::Skylab::TanMan::Sexp::Auto} list pattern (grammar 06)" do
 
   using_grammar '06' do
     using_input '100-nerp' do
+      it 'does not blink (works 2 times in a row)' do
+        a = client.parse_string input_string
+        b = client.parse_string input_string
+        a.class._nt_stem.should eql(:nerks)
+        a.class.should eql(b.class)
+        a.object_id.should_not eql(b.object_id)
+      end
       it_unparses_losslessly
       it 'result lets you get the nerk' do
         o = result.nerk

@@ -5,12 +5,16 @@ module ::Skylab::TanMan::Sexp::Auto::TestSupport
     mod.module_eval do
       extend ModuleMethods
       include InstanceMethods
+      let :input_string do
+        input_pathname.read
+      end
       let :result do
         client.parse_file input_path
       end
     end
   end
   module ModuleMethods
+    include ::Skylab::Autoloader::Inflection::Methods
     def it_unparses_losslessly *tags
       it("unparses losslessly", *tags) do
         str_expected = input_pathname.read
@@ -42,7 +46,10 @@ module ::Skylab::TanMan::Sexp::Auto::TestSupport
         pn = grammars.dir_pathname.join grammar_pathpart
         let(:input_pathname) { pn.join("fixtures/#{input_path_stem}") }
         let(:client) do
-          const = "Grammar#{grammar_pathpart}".intern
+          # hack to allow more complext names like "60-content-pattern"
+          md = /\A(?<num>\d+)(?:-(?<rest>.+))?\z/.match(grammar_pathpart)
+          const = ["Grammar#{md[:num]}",
+            ("_#{ constantize md[:rest] }" if md[:rest]) ].join('').intern
           grammars.constants.include?(const) or
             load pn.join('client').to_s
           grammars.const_get(const).new(nil, $stdin, $stderr)
