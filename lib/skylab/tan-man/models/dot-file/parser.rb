@@ -18,7 +18,7 @@ module Skylab::TanMan
           o.treetop_grammar 'dot-language.generated.treetop'
         end,
         ->(o) do
-           o.on_info { |e| info "#{em '*'} #{e}" }
+           o.on_info { |e| on_parser_info e }
            o.on_error { |e| fail("failed to load grammar: #{e}") }
         end
       ).invoke
@@ -61,6 +61,9 @@ module Skylab::TanMan
       else
         "In #{ input_adapter.entity_noun_stem }:#{ line_col }"
       end
+    end
+    def on_parser_info e
+      info "#{em '*'} #{e}"
     end
     def parser_failure_reason
       [ in_file, expecting, * excerpt_lines ].compact.join("\n")

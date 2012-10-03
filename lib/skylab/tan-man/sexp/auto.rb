@@ -621,4 +621,14 @@ module Skylab::TanMan
       inference._node.text_value
     end
   end
+  # --*--
+  class Sexp::Auto::ContentTextValue < ::Struct.new(:content_text_value)
+    # This is a tree building strategy that: gives you a struct
+    # with a single member called content_text_value that holds
+    # the text_value of the syntax node. Experimental!
+    def self.[] syntax_node
+      super syntax_node.text_value
+    end
+    alias_method :unparse, :content_text_value
+  end
 end

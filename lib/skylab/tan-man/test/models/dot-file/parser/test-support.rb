@@ -41,6 +41,7 @@ module Skylab::TanMan::Models::DotFile::Parser::TestSupport
 
     include TanMan::API::Achtung::SubClient::InstanceMethods
     include TanMan::Models::DotFile::Parser::InstanceMethods
+
     def initialize runtime, opts
       super runtime
       opts.each { |k, v| send("#{k}=", v) }
@@ -49,10 +50,19 @@ module Skylab::TanMan::Models::DotFile::Parser::TestSupport
     def dir_pathname
       @dir_pathname ||= (dir_path and ::Pathname.new(dir_path))
     end
+
+    SIMPLE_ABSPATH_RX = %r{/[-_./a-z0-9]*}i # just a jerky experiment
+    PATH_TOOLS = ::Object.new.extend(::Skylab::Face::PathTools::InstanceMethods)
+      # this looks awful but we want to avoid any interference with tests etc
+
+    def on_parser_info msg
+      msg = msg.gsub(SIMPLE_ABSPATH_RX) { |p| PATH_TOOLS.pretty_path p }
+      info "      (#{msg})"
+    end
   end
   module ModuleMethods
     def input string
-      let(:input) { string }
+      let(:input_string) { string }
       let(:frame) do
         frame = { }
         frame[:result] = client.parse_string string
@@ -62,7 +72,7 @@ module Skylab::TanMan::Models::DotFile::Parser::TestSupport
     end
     def it_unparses_losslessly(*tags)
       it 'unparses losslessly', *tags do
-        result.unparse.should eql(input)
+        result.unparse.should eql(input_string)
       end
     end
   end

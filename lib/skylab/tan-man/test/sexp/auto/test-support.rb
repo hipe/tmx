@@ -37,6 +37,7 @@ module ::Skylab::TanMan::Sexp::Auto::TestSupport
     def using_input input_path_stem, *tags, &b
       context("using input #{input_path_stem}", *tags) do
         let(:input_path_stem) { input_path_stem }
+        let(:input_string) { input_pathname.read }
         instance_eval(&b)
       end
     end

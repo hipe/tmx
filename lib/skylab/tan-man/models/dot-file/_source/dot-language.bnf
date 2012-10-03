@@ -1,5 +1,7 @@
 # bnf2treetop: set s e=':' g="Skylab::TanMan::Models::DotFile::DotLanguage" i=HandMadeSupplement:
 #
+# Run this file to see its ouput with: bnf2treetop <path-to-this-file>
+#
 # copied exactly as-is from http://www.graphviz.org/content/dot-language
 #   with the following (regular, determinisitc) modifications:
 #   1) what was in boldface is now in single quotes
@@ -23,4 +25,4 @@ node_id	:	ID [ port ]
 port	:	':' ID [ ':' compass_pt ]
 |	':' compass_pt
 subgraph	:	[ 'subgraph' [ ID ] ] '{' stmt_list '}'
-compass_pt	:	('n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w' | 'nw' | 'c' | _)
+compass_pt	:	('n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w' | 'nw' | 'c' | '_')

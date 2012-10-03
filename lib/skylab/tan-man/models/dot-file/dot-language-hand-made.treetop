@@ -14,11 +14,10 @@
 # grammar described therein, its aim is to be correct, if not complete.
 #
 # Things that for one reason or another are not yet covered in this grammar:
-#   - Currently for "edgeop" we only support '->' and not '--'
-#       (That is, we only support directed and not undirected graphs, for now)
-#       The conditional nature of this rule will require post-processing
-#       that introduces a level of sophistication that we will tackle only
-#       after handling the easier stuff.
+#   - Currently for "edgeop" we parse '->' and '--' without regards to
+#       whether the graph is directed or undirected.  The grammar is far less
+#       complex if we handle the conditional nature of this rule in
+#       post-processing rather than building it into the grammar itself.
 #   Some issuess with ID's:
 #   - We had to skip multibyte support for now.  Patches welcome!
 #   - No support yet for ID's that consist of HTML strings -- egads!
@@ -53,7 +52,7 @@ module Skylab::TanMan::Models::DotFile
     end
     rule id_name
       id_name_start_char id_name_char*
-      { def tree ; text_value end }
+      { def tree ; ::Skylab::TanMan::Sexp::Auto::ContentTextValue[self] end }
     end
     rule id_name_start_char
       [_a-zA-Z]
@@ -64,16 +63,15 @@ module Skylab::TanMan::Models::DotFile
     end
     rule id_numeric
       '-'? ( '.' [0-9]+ / [0-9]+ ( '.' [0-9]* )? )
-      { def tree ; text_value end }
+      { def tree ; ::Skylab::TanMan::Sexp::Auto::ContentTextValue[self] end }
     end
     rule double_quoted_string
-      '"' content:('\"' / !'"' .)* '"'
-      { def tree ; content.text_value end }
+      '"' content_text_value:('\"' / !'"' .)* '"'
     end
   # --*--
-    # this part is incorrect for the time being (see above link)
-    rule edgeop
-      '->'
+    rule edgeop # see comments at '"edgeop"' above
+      '->' / '--'
+      { def tree ; text_value end }
     end
   end
 end
