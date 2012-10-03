@@ -13,7 +13,7 @@ module Skylab
   module Autoloader end
   module Autoloader::Inflection
     extend self
-    InstanceMethods = self # future-proof
+    InstanceMethods = Methods = self # future-proof, #todo
     EXTNAME = '.rb'
     SANITIZE_PATH_RE =
       %r{#{Regexp.escape(EXTNAME)}\z|(?<=/)/+|(?<=[-_ ])[-_ ]+|[^-_ /a-z0-9]+}i
