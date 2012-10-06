@@ -29,9 +29,9 @@ describe Skylab::PubSub::Emitter do
     context 'gives your class an "emits" method which:' do
       specify { should be_respond_to(:emits) }
       it 'when called with an event graph, adds those types to the types associated with the class' do
-        klass.event_cloud.size.should eql(0)
+        klass.event_cloud.nodes_count.should eql(0)
         klass.emits :scream => :sound, :yell => :sound
-        klass.event_cloud.size.should eql(3)
+        klass.event_cloud.nodes_count.should eql(3)
       end
       context "Let's learn about emits() with a story about a class named Foo." do
         context 'At first, the Foo class of course does not have a method called "on_bar", it:' do

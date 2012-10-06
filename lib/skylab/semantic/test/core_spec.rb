@@ -22,4 +22,14 @@ describe "#{::Skylab::Semantic::Digraph}" do
     digraph[:parent].name.should eql(:parent)
     digraph[:child].is_names.should eql([:parent])
   end
+
+  context 'all ancestor names' do
+    it 'works recursively, depth-first' do
+      digraph = Semantic::Digraph.new(animal: :thing, penguin: :animal,
+        mineral: :thing, tux: [:penguin, :icon], my_tux_sticker: :tux)
+      digraph[:my_tux_sticker].all_ancestor_names.should eql(
+        [:my_tux_sticker, :tux, :penguin, :animal, :thing, :icon]
+      )
+    end
+  end
 end
