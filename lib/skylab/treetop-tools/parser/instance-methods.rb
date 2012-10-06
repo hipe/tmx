@@ -33,10 +33,13 @@ module Skylab::TreetopTools
     end
     attr_reader :input_adapter
     def parse input_adapter
+      @parse_time_elapsed_seconds = nil
       @input_adapter = input_adapter
       string = input_adapter.resolve_whole_string or return
       parser = self.parser or return
+      t1 = ::Time.now
       result = parser.parse string
+      @parse_time_elapsed_seconds = ::Time.now - t1
       if result
         parser_result result
       else
@@ -59,5 +62,6 @@ module Skylab::TreetopTools
     def parser_result result
       result.tree
     end
+    attr_reader :parse_time_elapsed_seconds
   end
 end

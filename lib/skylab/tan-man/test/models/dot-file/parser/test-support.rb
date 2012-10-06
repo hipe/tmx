@@ -43,6 +43,7 @@ module Skylab::TanMan::Models::DotFile::Parser::TestSupport
     include TanMan::Models::DotFile::Parser::InstanceMethods
 
     def initialize runtime, opts
+      @profile = true
       super runtime
       opts.each { |k, v| send("#{k}=", v) }
     end
@@ -59,6 +60,21 @@ module Skylab::TanMan::Models::DotFile::Parser::TestSupport
       msg = msg.gsub(SIMPLE_ABSPATH_RX) { |p| PATH_TOOLS.pretty_path p }
       info "      (#{msg})"
     end
+
+    def parser_result result
+      ret = super
+      if @profile && input_adapter.type.is?(
+        ::Skylab::TreetopTools::Parser::InputAdapter::Types::FILE
+      ) then
+        info( '      (%2.1f ms to parse %s)' % [
+          (parse_time_elapsed_seconds * 1000),
+          input_adapter.pathname.basename.to_s
+        ] )
+      end
+      ret
+    end
+
+    attr_accessor :profile
   end
   module ModuleMethods
     def input string

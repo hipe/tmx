@@ -101,7 +101,7 @@ module Skylab::Semantic
       ].compact.join(' -> ')
     end
     def is? node
-      target_name = node.name
+      target_name = ::Symbol === node ? node : node.name
       !!( all_ancestors.detect { |_node| target_name == _node.name } )
     end
   protected

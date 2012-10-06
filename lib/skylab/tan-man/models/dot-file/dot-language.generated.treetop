@@ -39,7 +39,7 @@ module Skylab::TanMan::Models::DotFile
       agent:('graph' / 'node' / 'edge') attr_list
     end
     rule attr_list
-      s? '[' a_list:a_list? ']' attr_list:attr_list?
+      s? '[' s? a_list:a_list? ']' attr_list:attr_list?
     end
     rule a_list
       s? id s? equals:('=' s? id s?)? ','? a_list:a_list?

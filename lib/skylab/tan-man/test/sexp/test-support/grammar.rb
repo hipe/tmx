@@ -97,7 +97,8 @@ module ::Skylab::TanMan::Sexp::TestSupport
       info "(parsing upstream which is a #{upstream.class})"
       info "(parser is #{parser.class})"
       result = parse upstream
-      info "OK, WE GOT: #{result.class}"
+      info "OK, WE GOT (after #{1000 * parse_time_elapsed_seconds
+        } ms): #{result.class}"
       if result
         require 'pp'
         ::PP.pp result, infostream

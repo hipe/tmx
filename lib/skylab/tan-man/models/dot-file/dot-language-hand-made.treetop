@@ -29,6 +29,7 @@ module Skylab::TanMan::Models::DotFile
   grammar HandMadeSupplement
     rule s
       (white / comment) s?
+      { def tree ; text_value end } # we want tests to pass w or w/o this line
     end
     rule white
       [ \t\n\r]+

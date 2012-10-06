@@ -18,4 +18,10 @@ describe "#{Skylab::TanMan::Models::DotFile::Parser} 490 series" do
       stmt.edge_rhs.recipient.id.content_text_value.should eql('node1')
     end
   end
+  using_input '500-datastruct.dot' do
+    it 'should parse and loslessly unparse this representative example' do
+      (!! result).should eql(true)
+      result.unparse.should eql(input_string)
+    end
+  end
 end
