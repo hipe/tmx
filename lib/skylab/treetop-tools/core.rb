@@ -1,4 +1,5 @@
 # encoding: UTF-8
+require_relative '..'
 require 'skylab/face/core' # MyPathname
 require 'skylab/headless/core'
 require 'skylab/meta-hell/core'

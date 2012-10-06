@@ -56,7 +56,7 @@ module Skylab::Semantic
       end
       while i < len && ::Hash === a[i]
         a[i].each do |k, v|
-          y << node!(k, :"is_name!" => v)
+          y << node!(k, is: v)
         end
         i += 1
       end
@@ -93,12 +93,16 @@ module Skylab::Semantic
   end
   class Node < ::Struct.new(:name, :is_names)
     def all_ancestor_names
-      @graph.all_ancestors(name).map(&:name)
+      all_ancestors.map(&:name)
     end
     def describe
       [ name.to_s,
         (is_names.join(', ') unless is_names.empty?)
       ].compact.join(' -> ')
+    end
+    def is? node
+      target_name = node.name
+      !!( all_ancestors.detect { |_node| target_name == _node.name } )
     end
   protected
     def initialize graph, name
@@ -106,15 +110,18 @@ module Skylab::Semantic
       if self.class === name then dupe!(name) else super(name, []) end
     end
     # --*--
+    def all_ancestors
+      @graph.all_ancestors(name)
+    end
     def dupe! node
       self.name = node.name
       self.is_names = node.is_names.dup
       nil
     end
-    def is_name! name
+    def is name
       case name
       when ::Array
-        name.each { |x| is_name!(x) }
+        name.each { |x| is(x) }
       when ::Symbol
         unless is_names.include? name
           # ensure that the graph has such a node

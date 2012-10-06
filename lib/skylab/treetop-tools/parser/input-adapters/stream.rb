@@ -11,5 +11,6 @@ module Skylab::TreetopTools
         whole_string
       end
     end
+    def type ; Parser::InputAdapter::Types::STREAM end
   end
 end

@@ -30,6 +30,7 @@ module Skylab::TreetopTools
       end
       super # or we might later decide to handle broken pipes here
     end
+    def type ; Parser::InputAdapter::Types::FILE end
   protected
     EVENTS = Headless::Parameter::Definer.new do
       param :on_file_is_dir,    hook: true, writer: true

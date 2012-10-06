@@ -6,5 +6,6 @@ module Skylab::TreetopTools
       upstream.kind_of?(::String) ? upstream :
         error("expecting String, had: #{upstream.inspect}")
     end
+    def type ; Parser::InputAdapter::Types::STRING end
   end
 end
