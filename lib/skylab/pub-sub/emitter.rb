@@ -1,4 +1,4 @@
-module Skylab ; end
+require_relative '../semantic/core'
 
 module Skylab::PubSub
   module Emitter
@@ -6,8 +6,7 @@ module Skylab::PubSub
     COMMON_LEVELS = [:debug, :info, :notice, :warn, :error, :fatal] # didactic, for elsewhere
 
     def emits *nodes
-      event_cloud = self.event_cloud
-      events = event_cloud.merge_definition!(*nodes)
+      events = event_cloud.nodes! nodes
       these = instance_methods.map(&:intern)
       event_cloud.flatten(events).each do |tag|
         unless these.include?(m = "on_#{tag.name}".intern)
@@ -25,9 +24,9 @@ module Skylab::PubSub
     def event_cloud
       @event_cloud ||= begin
         if k = ancestors[(self == ancestors.first ? 1 : 0) .. -3].detect { |m| m.kind_of?(::Class) and m.respond_to?(:event_cloud) }
-          SemanticTagCloud.new(k.event_cloud)
+          ::Skylab::Semantic::Digraph.new(k.event_cloud)
         else
-          SemanticTagCloud.new
+          ::Skylab::Semantic::Digraph.new
         end
       end
     end
@@ -113,7 +112,7 @@ module Skylab::PubSub
         args.first
       else
         tag = args.shift
-        Symbol === tag and tag = ( event_cloud_definer.event_cloud.lookup_tag(tag) or
+        Symbol === tag and tag = ( event_cloud_definer.event_cloud[tag] or
           fail("undeclared event type #{tag.inspect} for #{self.class}") )
         event_class.new(tag, *args, &block)
       end
@@ -126,7 +125,7 @@ module Skylab::PubSub
       else
         type = args.shift
         payload = args
-        tag = event_cloud_definer.event_cloud.lookup_tag(type) or
+        tag = event_cloud_definer.event_cloud[type] or
           fail("undeclared event type #{type.inspect} for #{self.class}")
       end
       (tag.all_ancestor_names & event_listeners.keys).map { |k| event_listeners[k] }.flatten.each do |prok|
@@ -143,109 +142,6 @@ module Skylab::PubSub
     def event_cloud_definer
       singleton_class.instance_variable_defined?('@event_cloud') ? singleton_class : self.class
     end
-  end
-  class SemanticTagCloud < Hash
-    def all_ancestors tag
-      Enumerator.new do |y|
-        seen  = {}
-        found = []
-        visit = ->(k) do
-          t = self[k] or t = merge_definition!(k).first
-          seen[t.name] = true
-          y << t
-          ( t.parent_names - found ).each { |s| seen[s] or visit[s] } # !
-        end
-        visit[tag.name]
-      end
-    end
-    def _deep_copy_init other
-      @order = other.instance_variable_get('@order').dup
-      @order.each do |k|
-        self[k] = other[k].duplicate
-      end
-    end
-    def describe
-      @order.map { |key| self[key].describe }.join("\n")
-    end
-    def flatten tags
-      order = []
-      seen = Hash.new { |h, k| order.push k; h[k] = true }
-      tags.each do |tag|
-        tag.parent_names.each { |k| seen[k] }
-        seen[tag.name]
-      end
-      order.map { |k| self[k] }
-    end
-    def initialize other=nil
-      if other
-        _deep_copy_init other
-      else
-        @order = []
-      end
-    end
-    alias_method :lookup_tag, :[] # more readable code
-    def merge_definition! *nodes
-      resulting_tags = []
-      nodes.each do |node|
-        case node
-        when Symbol
-          resulting_tags.push merge_tag!(Tag.new(node, self))
-        when Hash
-          resulting_tags.concat( node.map { |k, v|
-            parent_names = case v
-            when Array  ; v
-            when Symbol ; [v]
-            else        ; raise ArgumentError.new("need Array or Symbol had #{v.class}:#{v}")
-            end
-            merge_tag! Tag.new(k, self, :parent_names => parent_names)
-          } )
-        else raise ArgumentError.new("need Symbol or Hash had #{node.class}:#{node}")
-        end
-      end
-      resulting_tags
-    end
-    def merge_tag! tag
-      tag.parent_names.each do |parent|
-        (self[parent] ||= Tag.new(parent, self)).children_names |= [tag.name]
-      end
-      if key?(tag.name)
-        self[tag.name].merge!(tag)
-      else
-        @order.push tag.name
-        self[tag.name] = tag
-      end
-    end
-  end
-  class Tag
-    def all_ancestor_names
-      @cloud.all_ancestors(self).map(&:name)
-    end
-    def duplicate
-      self.class.new(@name, cloud, :parent_names => @parent_names.dup, :children_names => @children_names.dup)
-    end
-    def initialize name, cloud, opts=nil
-      name.kind_of?(Symbol) or raise ArgumentError.new("need symbol had #{name.class}")
-      @cloud = cloud
-      @name = name
-      opts and opts.each { |k, v| send("#{k}=", v) }
-      @parent_names ||= []
-      @children_names = []
-    end
-    attr_accessor :parent_names
-    attr_accessor :children_names
-    attr_reader :cloud
-    def describe
-      [@name.to_s, (@parent_names.join(', ') if @parent_names.any?)].compact.join(' -> ')
-    end
-    def is? tag_name
-      cloud.all_ancestors(self).detect { |t| tag_name == t.name }
-    end
-    def merge! tag
-      tag.name == @name or fail("need same tag name to merge tags (#{@name.inspect} != #{tag.name.inspect})")
-      @parent_names |= tag.parent_names
-      self
-    end
-    attr_reader :name
   end
 end
 
