@@ -31,9 +31,11 @@ module Skylab::TanMan::Models::DotFile
       { def tree ; text_value end }
     end
     rule stmt
-      #   the below order (as generated) won't work for us
+      # The order as generated (below) won't work for us because
+      # the "node_id" component of "node_stmt" swallows everything.
+      # We hence change the order so that "node_stmt" is at the end.
       # node_stmt / edge_stmt / attr_stmt / id '=' id / subgraph
-      attr_stmt / edge_stmt / node_stmt / id '=' id / subgraph
+      attr_stmt / edge_stmt / id s? '=' s? id / subgraph / node_stmt
     end
     rule attr_stmt
       agent:('graph' / 'node' / 'edge') attr_list

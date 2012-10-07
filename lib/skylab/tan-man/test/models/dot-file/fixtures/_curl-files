@@ -17,6 +17,7 @@ example () {
 }
 
 example '500-datastruct.dot' 'http://www.graphviz.org/Gallery/directed/datastruct.gv.txt'
+example '699-psg.dot'        'http://www.graphviz.org/Gallery/directed/psg.gv.txt'
 
 run () {
   local idx=0 ; local last=`expr ${#Examples[@]} - 1`
