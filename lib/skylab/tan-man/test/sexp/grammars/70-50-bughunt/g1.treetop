@@ -1,0 +1,22 @@
+module Skylab::TanMan::Sexp::TestSupport::Grammars::Namespace70_50
+  grammar NerpZerp70_50
+    rule gestalt
+      stmt*
+      {
+        def tree
+          ::Skylab::TanMan::Sexp::Auto::Lossless::Recursive[ self ]
+        end
+      }
+    end
+    rule stmt_sep
+      s? ';' s?
+      { def tree ; text_value end }
+    end
+    rule s
+      [ \t\r\n]+
+    end
+    rule stmt
+      'foop' stmt_sep
+    end
+  end
+end

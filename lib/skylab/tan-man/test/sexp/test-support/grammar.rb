@@ -68,12 +68,15 @@ module ::Skylab::TanMan::Sexp::TestSupport
 
   protected
 
-    NUM_RX = /\A(.+[^0-9])\d+(?:_[a-zA-Z]+)?\z/
+
+    NUM_RX = /\A([A-Za-z]+(?:::[A-Za-z]+)+)\d+[^:]+\z/
 
     def anchor_module_head
       _md = NUM_RX.match(self.class.to_s) or fail("failed to infer#{
-        } anchor_module_head from this class name, expecting it to end with#{
-        } a digit: #{self.class}. (Implement your own thing up the chain.)")
+        } anchor_module_head from this class name, expecting leading consts#{
+        } without digits and the trailing const to have a digit in it#{
+        } (You may need to implement your own hacky thing up the chain.)#{
+        } (Your thing: #{self.class})")
       _md[1]
     end
 

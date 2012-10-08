@@ -41,6 +41,7 @@ module ::Skylab::TanMan::Sexp::Auto::TestSupport
         instance_eval(&b)
       end
     end
+    PATHPART_RX = /\A(?<num>\d+(?:-\d+)*)(?:-(?<rest>.+))?\z/
     def using_grammar grammar_pathpart, *tags, &b
       context("using grammar #{grammar_pathpart}", *tags) do
         grammars = ::Skylab::TanMan::Sexp::TestSupport::Grammars
@@ -48,8 +49,8 @@ module ::Skylab::TanMan::Sexp::Auto::TestSupport
         let(:input_pathname) { pn.join("fixtures/#{input_path_stem}") }
         let(:client) do
           # hack to allow more complext names like "60-content-pattern"
-          md = /\A(?<num>\d+)(?:-(?<rest>.+))?\z/.match(grammar_pathpart)
-          const = ["Grammar#{md[:num]}",
+          md = PATHPART_RX.match(grammar_pathpart)
+          const = ["Grammar#{md[:num].gsub('-', '_')}",
             ("_#{ constantize md[:rest] }" if md[:rest]) ].join('').intern
           grammars.constants.include?(const) or
             load pn.join('client').to_s

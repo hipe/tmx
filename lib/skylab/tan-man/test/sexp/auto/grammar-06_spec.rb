@@ -15,8 +15,8 @@ describe "#{::Skylab::TanMan::Sexp::Auto} list pattern (grammar 06)" do
       it_unparses_losslessly
       it 'result lets you get the nerk' do
         o = result.nerk
-        o.class.nt_name.should eql(:nerk)
-        o.unparse.should eql('aaaa')
+        o.class.should_not be_respond_to(:nt_name)
+        o.should eql('aaaa')
       end
     end
     let(:rest) { result.e1 }
@@ -30,8 +30,7 @@ describe "#{::Skylab::TanMan::Sexp::Auto} list pattern (grammar 06)" do
       it 'the first element of the above array looks like this' do
         x = rest.first
         x.class.nt_name.should eql(:nerks0)
-        x.nerk.class.nt_name.should eql(:nerk)
-        x.nerk.unparse.should eql('bbb2')
+        x.nerk.should eql('bbb2')
       end
     end
     using_input '300-nerp' do

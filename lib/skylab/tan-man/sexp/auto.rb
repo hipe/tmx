@@ -4,6 +4,10 @@ module Skylab::TanMan
     # Struct subclasses for noterminal language elements in a Treetop grammar.
   end
 
+  module Sexp::Auto::Constants
+    CUSTOM_PARSE_TREE_METHOD_NAME = :tree
+  end
+
   module Sexp::Auto::BuildMethods
     # These Build Methods build sexps ("trees") from syntax nodes, possibly
     # creating sexp classes as necessary.
@@ -27,7 +31,7 @@ module Skylab::TanMan
 
     WITH_NUMBERS_F = ->(member) { NUM_RX =~ member.to_s }
 
-    def build_member_names i
+    def build_element_names i # extent: * defs, 1 call
       # For this basic auto sexp implementation for deciding what the
       # member names should be, we 1) take the methods
       # of interest and then 2) strip out the ones that end with numbers
@@ -46,8 +50,8 @@ module Skylab::TanMan
       nil
     end
 
-    def build_tree_class i
-      members = build_member_names i
+    def build_tree_class i # extent: solo def, 1 call
+      members = build_element_names i
       tree_class = ::Struct.new(* members)
       tree_class.extend module_methods_module
       tree_class._members = members
@@ -66,10 +70,10 @@ module Skylab::TanMan
       tree_class
     end
 
-    def inference2tree o # solo
+    def inference2tree o # extent: solo def, 2 calls
       if o.member && Sexp::Auto::Hacks::MemberName.matches?(o.member)
         Sexp::Auto::Hacks::MemberName.tree o
-      elsif o.extension_modules? # then there is a lot of inference
+      elsif o.inferrable_element_names?
         tree_class = if o.sexps_module.const_defined?(o.sexp_const, false)
           o.sexps_module.const_get o.sexp_const, false
         else
@@ -85,7 +89,9 @@ module Skylab::TanMan
             Sexp::Auto::Inference.get(n, nil, nil)
           end
         end
-        if a and a.any? { |x| x.extension_modules? }
+        if a and a.any? { |x|
+          x.inferrable_nt_name? or x.inferrable_element_names?
+        }
           list = list_class.new a.length
           a.each_with_index { |_inf, idx| list[idx] = inference2tree(_inf) }
           list
@@ -107,7 +113,7 @@ module Skylab::TanMan
       sexp_builder_anchor_module.const_get(:ModuleMethods, false)
     end
 
-    def node2tree node, parent_class, member_name
+    def node2tree node, parent_class, member_name # extent: solo def, 2 calls
       # don't call node.tree because that can call this
       inference2tree Sexp::Auto::Inference.get(node, parent_class, member_name)
     end
@@ -123,13 +129,14 @@ module Skylab::TanMan
     # This module or descendant modules will be included by generated
     # Sexp ("tree") classes.
 
-    include Sexp::Auto::BuildMethods # inference2tree
+    include Sexp::Auto::Constants # CUSTOM_PARSE_TREE_METHOD_NAME
+    include Sexp::Auto::BuildMethods # node2tree et. al
 
-    def element2tree element, member_name
+    def element2tree element, member_name # extent: solo def, 2 calls
       if ! element
         nil # typically as a trailing optional node
-      elsif element.respond_to? :tree
-        element.tree # for custom definitions e.g. in the grammar (careful!)
+      elsif element.respond_to? CUSTOM_PARSE_TREE_METHOD_NAME
+        element.send CUSTOM_PARSE_TREE_METHOD_NAME # careful!
       else
         node2tree element, self, member_name
       end
@@ -161,16 +168,16 @@ module Skylab::TanMan
 
   class Sexp::Auto::Inference < ::Struct.new(
     :extension_module_metas,
-    :extension_module_meta_of_interest_index,
     :member,
+    :_node,
     :_parent_class,
     :tree_class # only used for hacks for now (experimental!!)
   )
+    include Sexp::Auto::Constants # CUSTOM_PARSE_TREE_METHOD_NAME (on self, too)
+
     # The Inference of a synax node is for "inferring" what Sexp class to use
     # for a given node from its extension modules.  We crawl up backwards from
     # the first extension module to infer things like the sexp wrapper module.
-
-    include Sexp::Inflection::InstanceMethods # symbolize, chomp_digits
 
     CACHE = { } # for some algorithms we might try look-ahead to infer names
 
@@ -181,34 +188,66 @@ module Skylab::TanMan
         i.member != member_name and fail('sanity')
         i
       else
-        CACHE[node.object_id] = new(node, parent_class, member_name)
+        CACHE[node.object_id] = FACTORY_F[node, parent_class, member_name]
       end
     end
 
-  public
-    def extension_modules?
-      :none != extension_module_metas
+    FACTORY_F = ->(node, parent_class, member_name) do
+      a = node.extension_modules
+      if a.empty? # possibly a kleene group!
+        new(nil, member_name, node, parent_class)
+      else
+        # We have at least one extension module so we can definitely infer
+        # a const name. But can we infer the names of the elements?
+        # We can if we have 'methods of interest' that would come from an
+        # extension module  Note, unfortunately, that we have to sidestep
+        # the extension module that gets created by us with a method called
+        # [CUSTOM_PARSE_TREE_METHOD_NAME]. It's a dodgy move, but this whole
+        # house is dodgy o_O
+        i = a.length # left vs. right -- ick!!
+        last = [0, i - 1].max # any second to last one
+        found = nil
+        while (i -= 1) >= last
+          methods = a[i].instance_methods
+          if ! (methods.empty? or
+                methods.include?(CUSTOM_PARSE_TREE_METHOD_NAME)) then
+            found = i ; break
+          end
+        end
+        metas = a.map { |mod| Sexp::Auto::ExtensionModuleMeta[mod] }
+        if found
+          Sexp::Auto::Inference_WithElements.new(
+            metas, member_name, node, parent_class, found)
+        else
+          Sexp::Auto::Inference_WithConst.new(
+            metas, member_name, node, parent_class)
+        end
+      end
     end
 
-    def methods_of_interest
-      extension_module_meta_of_interest.module.instance_methods
+    def inferrable_element_names?
+      false
     end
+    def inferrable_nt_name?
+      false
+    end
+  end
 
-    attr_accessor :_node
+  class Sexp::Auto::Inference_WithConst < Sexp::Auto::Inference
+    # What can we do with a node with one extension module?
+
+    include Sexp::Inflection::InstanceMethods # symbolize, chomp_digits
+
+    def inferrable_nt_name?
+      true
+    end
 
     def nt_name
       symbolize(sexp_const.to_s).intern
     end
 
     def _nt_stem
-      symbolize(extension_module_meta_of_interest.tail_stem.to_s).intern
-    end
-
-    def sexps_module
-      # auto-vivify a module to hold generated sexps
-      anchor_module.const_defined?(:Sexps, false) ?
-        anchor_module.const_get(:Sexps, false) :
-        anchor_module.const_set(:Sexps, ::Module.new)
+      symbolize(nt_name_extension_module_meta.tail_stem.to_s).intern
     end
 
     # Given that the extension modules Foo0, Foo1, Foo2 exist, we infer that
@@ -239,42 +278,41 @@ module Skylab::TanMan
           _h[_stem] = _a
         end)[ stem ]
         h[const] = a.last == const ? stem.intern : const
-      end)[extension_module_meta_of_interest.tail_const]
+      end)[nt_name_extension_module_meta.tail_const]
     end
 
+    def sexps_module
+      # auto-vivify a module to hold generated sexps
+      anchor_module.const_defined?(:Sexps, false) ?
+        anchor_module.const_get(:Sexps, false) :
+        anchor_module.const_set(:Sexps, ::Module.new)
+    end
   protected
-    def initialize node, parent_class, member_name
-      self._node = node # not a struct member only to hide it from dumps :/
-      self._parent_class = parent_class
-      self.member = member_name # nil ok
-      set_extension_modules! node.extension_modules
-    end
-
     def anchor_module
-      extension_module_meta_of_interest.anchor_module
+      nt_name_extension_module_meta.anchor_module
     end
-
-    def extension_module_meta_of_interest
-      extension_module_metas[extension_module_meta_of_interest_index]
-    end
-
     def grammar_module
-      extension_module_meta_of_interest.grammar_module
+      nt_name_extension_module_meta.grammar_module
     end
-
-    def set_extension_modules! a
-      if a.empty? # possibly a kleene group!
-        self.extension_module_metas = :none
-        return
-      end
-      metas = a.map { |mod| Sexp::Auto::ExtensionModuleMeta[mod] }
-      curr_idx = metas.length - 1 # left vs. right -- ick!!!
-      self.extension_module_metas = metas
-      self.extension_module_meta_of_interest_index = curr_idx
-      nil
+    def nt_name_extension_module_meta
+      extension_module_metas.last
     end
   end
 
+  class Sexp::Auto::Inference_WithElements < Sexp::Auto::Inference_WithConst
+    def inferrable_element_names?
+      true
+    end
+    def methods_of_interest
+      extension_module_metas[methods_idx].module.instance_methods
+    end
+  protected
+    def initialize *a, methods_idx
+      @methods_idx = methods_idx
+      super(*a)
+    end
+    attr_reader :methods_idx
+  end
 
   class Sexp::Auto::ExtensionModuleMeta
     # There are so many inflection-heavy hacks going on that it is useful
@@ -350,7 +388,7 @@ module Skylab::TanMan
 
   module Sexp::Auto::Lossless::BuildMethods ; include Sexp::Auto::BuildMethods
 
-    def build_member_names i
+    def build_element_names i # extent: * defs, 1 call
       # This is ridiculously sinful but useful (experimental, too):
       #
       # In theory, for any given syntax node that corresponds to a rule
@@ -491,6 +529,11 @@ module Skylab::TanMan
     #   - If the rule name is of the form "foo_list" we infer the stem "foo"
     #   - else if an inference can be made of the syntax node that is under the
     #     "head' label, we infer the stem from that
+    #     (#todo the above sucks and must be removed.  such lists should be
+    #     possibly zero-length and as such this is a non-deterministic hack.
+    #     *unless* of course the only time (and hence first time)
+    #     this hack is triggered is when it is with a list that is nonzero
+    #     in length.)
     #   - else we will fail
     #
 
@@ -513,10 +556,11 @@ module Skylab::TanMan
         use_stem = md[:stem].intern
       else
         head_inference = Sexp::Auto::Inference.get(head, i.tree_class, :head)
-        if head_inference.extension_modules?
+        if head_inference.inferrable_nt_name?
           use_stem = head_inference._nt_stem
         else
-          fail("for this hack to work your rule name must end in _list")
+          fail("for this hack to work your rule name must end in _list #{
+          }(your rule name: #{i.nt_name})")
         end
       end
       define_items_method i.tree_class, use_stem
