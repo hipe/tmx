@@ -8,7 +8,7 @@ describe "#{::Skylab::TanMan::Sexp::Auto} list pattern (grammar 06)" do
       it_unparses_losslessly
       it 'gets the content_text_value of different kind of comments' do
         a = result.comments
-        a.map { |x| x.class.nt_name }.should eql(
+        a.map { |x| x.class.expression }.should eql(
           [:c_style_comment, :shell_style_comment, :c_style_comment]
         )
         a[0].content_text_value.should eql(' comment 1 ')

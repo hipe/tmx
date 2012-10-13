@@ -55,7 +55,8 @@ module Skylab::TanMan
       tree_class = ::Struct.new(* members)
       tree_class.extend module_methods_module
       tree_class._members = members
-      tree_class.nt_name = i.nt_name ; tree_class._nt_stem = i._nt_stem
+      tree_class.expression = i.expression
+      tree_class.rule = i.rule
       tree_class.members_of_interest = build_members_of_interest(i) || members
       add_instance_methods tree_class
       # There might be issues with hacks with more broad patterns intercepting
@@ -90,7 +91,7 @@ module Skylab::TanMan
           end
         end
         if a and a.any? { |x|
-          x.inferrable_nt_name? or x.inferrable_element_names?
+          x.inferrable_expression? or x.inferrable_element_names?
         }
           list = list_class.new a.length
           a.each_with_index { |_inf, idx| list[idx] = inference2tree(_inf) }
@@ -142,10 +143,10 @@ module Skylab::TanMan
       end
     end
 
+    attr_accessor :expression
     attr_accessor :_members # our version, separate from the ::Struct nerkiss
     attr_accessor :members_of_interest
-    attr_accessor :nt_name
-    attr_accessor :_nt_stem
+    attr_accessor :rule
 
     def tree inference
       _children = members_of_interest.map do |member|
@@ -228,7 +229,7 @@ module Skylab::TanMan
     def inferrable_element_names?
       false
     end
-    def inferrable_nt_name?
+    def inferrable_expression?
       false
     end
   end
@@ -238,16 +239,16 @@ module Skylab::TanMan
 
     include Sexp::Inflection::InstanceMethods # symbolize, chomp_digits
 
-    def inferrable_nt_name?
-      true
-    end
-
-    def nt_name
+    def expression
       symbolize(sexp_const.to_s).intern
     end
 
-    def _nt_stem
-      symbolize(nt_name_extension_module_meta.tail_stem.to_s).intern
+    def inferrable_expression?
+      true
+    end
+
+    def rule
+      symbolize(expression_extension_module_meta.tail_stem.to_s).intern
     end
 
     # Given that the extension modules Foo0, Foo1, Foo2 exist, we infer that
@@ -278,7 +279,7 @@ module Skylab::TanMan
           _h[_stem] = _a
         end)[ stem ]
         h[const] = a.last == const ? stem.intern : const
-      end)[nt_name_extension_module_meta.tail_const]
+      end)[expression_extension_module_meta.tail_const]
     end
 
     def sexps_module
@@ -289,12 +290,12 @@ module Skylab::TanMan
     end
   protected
     def anchor_module
-      nt_name_extension_module_meta.anchor_module
+      expression_extension_module_meta.anchor_module
     end
     def grammar_module
-      nt_name_extension_module_meta.grammar_module
+      expression_extension_module_meta.grammar_module
     end
-    def nt_name_extension_module_meta
+    def expression_extension_module_meta
       extension_module_metas.last
     end
   end
@@ -552,15 +553,15 @@ module Skylab::TanMan
       i.tree_class.send(:include, Sexp::Auto::Hacks::HeadTail::InstanceMethods)
 
       head = i._node.head or fail('for this hack to work, head: must exit')
-      if md = LIST_RX.match(i._nt_stem.to_s)
+      if md = LIST_RX.match(i.rule.to_s)
         use_stem = md[:stem].intern
       else
         head_inference = Sexp::Auto::Inference.get(head, i.tree_class, :head)
-        if head_inference.inferrable_nt_name?
-          use_stem = head_inference._nt_stem
+        if head_inference.inferrable_expression?
+          use_stem = head_inference.rule
         else
           fail("for this hack to work your rule name must end in _list #{
-          }(your rule name: #{i.nt_name})")
+          }(your rule name: #{i.expression})")
         end
       end
       define_items_method i.tree_class, use_stem
@@ -585,17 +586,17 @@ module Skylab::TanMan
         tail.each do |tree|
           y << tree.content
         end
-      elsif tail.class.nt_name == self.class.nt_name
+      elsif tail.class.expression == self.class.expression
         # foo_list ::= (s? head:foo s? ';'? '?' tail:foo_list?)?
         tail.__items y
       else
         # foo_list ::= (head:foo tail:(sep content:foo_list)? sep?)?
-        if tail.class._nt_stem != self.class._nt_stem
+        if tail.class.rule != self.class.rule
           # this used to be an issue, is it not any more!?
           # fail('sanity - this does not look recursive')
         end
         if tail.content
-          tail.content.class.nt_name == self.class.nt_name or fail('sanity')
+          tail.content.class.expression == self.class.expression or fail('sanity')
           tail.content.__items y
         end
       end
@@ -612,7 +613,7 @@ module Skylab::TanMan
     include Sexp::Auto::Hack::Constants
 
     def self.matches? i
-      if _md = LIST_RX.match(i.nt_name.to_s)
+      if _md = LIST_RX.match(i.expression.to_s)
         if i.tree_class.members_of_interest.include?(_md[:stem].intern)
           true
         end
@@ -625,7 +626,7 @@ module Skylab::TanMan
         include Sexp::Auto::Hacks::RecursiveTail::InstanceMethods
       end
       define_items_method inference.tree_class,
-        LIST_RX.match(inference._nt_stem)[:stem].intern
+        LIST_RX.match(inference.rule)[:stem].intern
       nil
     end
   end
@@ -640,7 +641,7 @@ module Skylab::TanMan
         _item = node.send(self.class.item_stem) or fail('sanity')
         a << _item
         node = if _tail = node.tail
-          _tail.send(self.class._nt_stem) # nil ok
+          _tail.send(self.class.rule) # nil ok
         end
       end while node
       a
