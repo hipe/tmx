@@ -89,11 +89,26 @@ module ::Skylab::TanMan::Sexp::TestSupport
       op.on('-s <string>', "parse string instead of #{PATHSPEC_SYNTAX}") do |v|
         invocation_parameters.push([:upstream_string, v])
       end
+      op.on('-e <method>', "if the parse succeeds,",
+        "run <method> on the result and dump this result.") do |meth|
+        invocation_parameters.push([:eval_string, meth])
+      end
       op
     end
 
     def anchor_dir_pathname
       @anchor_dir_pathname ||= Grammars.dir_pathname.join stem_path
+    end
+
+    attr_accessor :eval_string
+
+    def eval_string_run result
+      unless /\A[a-z_]+[a-z0-9_]*\z/ =~ eval_string
+        fail("must be a valid method name: #{eval_string.inspect}")
+      end
+      _ = result.send eval_string
+      ::PP.pp _, infostream
+      true
     end
 
     def execute
@@ -104,7 +119,12 @@ module ::Skylab::TanMan::Sexp::TestSupport
         } ms): #{result.class}"
       if result
         require 'pp'
-        ::PP.pp result, infostream
+        if eval_string
+          eval_string_run result
+        else
+          ::PP.pp result, infostream
+          true
+        end
       end
     end
 

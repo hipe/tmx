@@ -1,7 +1,8 @@
 module Skylab::TanMan
   module Sexp::Auto
-    # This module is an experiment in the automatic generation of useful
-    # Struct subclasses for noterminal language elements in a Treetop grammar.
+    # This module is an experiment in the automatic generation of abstract
+    # syntax trees (their classes and then objects) dynamically
+    # from the syntax nodes of a parse from a Treetop grammar.
   end
 
   module Sexp::Auto::Constants
@@ -63,18 +64,16 @@ module Skylab::TanMan
       # all potential matches with hacks with more narrow patterns so
       # order might be important here.
       i.tree_class and fail('sanity') ; i.tree_class = tree_class # sorry
-      if Sexp::Auto::Hacks::HeadTail.matches? i # run hacks
-        Sexp::Auto::Hacks::HeadTail.enhance i
-      elsif Sexp::Auto::Hacks::RecursiveTail.matches? i
-        Sexp::Auto::Hacks::RecursiveTail.enhance i
-      end
+      hack =   Sexp::Auto::Hacks::HeadTail.match i # run hacks
+      hack ||= Sexp::Auto::Hacks::RecursiveRule.match i
+      hack and hack.commit!
       tree_class
     end
 
     def inference2tree o # extent: solo def, 2 calls
       if o.member && Sexp::Auto::Hacks::MemberName.matches?(o.member)
         Sexp::Auto::Hacks::MemberName.tree o
-      elsif o.inferrable_element_names?
+      elsif o.element_names?
         tree_class = if o.sexps_module.const_defined?(o.sexp_const, false)
           o.sexps_module.const_get o.sexp_const, false
         else
@@ -90,9 +89,7 @@ module Skylab::TanMan
             Sexp::Auto::Inference.get(n, nil, nil)
           end
         end
-        if a and a.any? { |x|
-          x.inferrable_expression? or x.inferrable_element_names?
-        }
+        if a and a.any? { |x| x.expression? or x.element_names? }
           list = list_class.new a.length
           a.each_with_index { |_inf, idx| list[idx] = inference2tree(_inf) }
           list
@@ -144,6 +141,7 @@ module Skylab::TanMan
     end
 
     attr_accessor :expression
+    def _hacks ; @_hacks ||= [] end #debugging-feature-only
     attr_accessor :_members # our version, separate from the ::Struct nerkiss
     attr_accessor :members_of_interest
     attr_accessor :rule
@@ -206,7 +204,7 @@ module Skylab::TanMan
         # [CUSTOM_PARSE_TREE_METHOD_NAME]. It's a dodgy move, but this whole
         # house is dodgy o_O
         i = a.length # left vs. right -- ick!!
-        last = [0, i - 1].max # any second to last one
+        last = [0, i - 2].max # any second to last one
         found = nil
         while (i -= 1) >= last
           methods = a[i].instance_methods
@@ -226,10 +224,22 @@ module Skylab::TanMan
       end
     end
 
-    def inferrable_element_names?
+    def element_names? # are element names inferrable?
+      methods_of_interest?
+    end
+    def expression? # is the expression name inferrable?
       false
     end
-    def inferrable_expression?
+    def members_of_interest
+      tree_class.members_of_interest
+    end
+    def members_of_interest?
+      ! tree_class.nil?
+    end
+    def methods_of_interest? # are we able to determine methods of interest?
+      false
+    end
+    def rule? # is the rule name inferrable?
       false
     end
   end
@@ -242,13 +252,14 @@ module Skylab::TanMan
     def expression
       symbolize(sexp_const.to_s).intern
     end
-
-    def inferrable_expression?
+    def expression?
       true
     end
-
     def rule
       symbolize(expression_extension_module_meta.tail_stem.to_s).intern
+    end
+    def rule?
+      true
     end
 
     # Given that the extension modules Foo0, Foo1, Foo2 exist, we infer that
@@ -297,15 +308,16 @@ module Skylab::TanMan
     end
     def expression_extension_module_meta
       extension_module_metas.last
+      # to see why this is last and not first, see test grammr 60
     end
   end
 
   class Sexp::Auto::Inference_WithElements < Sexp::Auto::Inference_WithConst
-    def inferrable_element_names?
-      true
-    end
     def methods_of_interest
       extension_module_metas[methods_idx].module.instance_methods
+    end
+    def methods_of_interest?
+      true
     end
   protected
     def initialize *a, methods_idx
@@ -335,7 +347,7 @@ module Skylab::TanMan
       @grammar_module ||= anchor_module.const_get(grammar_const, false)
     end
 
-    def inspect # for debugging
+    def inspect #debugging-feature-only
       "#<ExtMod:#{tail_const}>"
     end
 
@@ -491,13 +503,25 @@ module Skylab::TanMan
     # pure container module for holding automagic "hacks"
   end
 
-  module Sexp::Auto::Hack
-    # hack support, implementation details
+  class Sexp::Auto::Hack < ::Struct.new(:block, :state)
+    # A commitable hack object (just a simple block-wrapping state machine),
+    # it separates the matching of a hack from the application of a hack.
+
+    def commit!
+      :uncommitted == state or fail("won't commit the same hack twice")
+      result = block.call
+      self.state = :commited
+      result
+    end
+  protected
+    def initialize &b
+      self.block = b
+      self.state = :uncommitted
+    end
   end
 
   module Sexp::Auto::Hack::ModuleMethods
     def define_items_method klass, stem
-      klass.item_stem = stem
       items_method = "#{stem}s" # pluralize
       klass.instance_methods.include?(items_method) and fail("sanity -#{
         } name collision during hack: \"#{items_method
@@ -513,6 +537,11 @@ module Skylab::TanMan
   end
 
   module Sexp::Auto::Hacks::HeadTail
+    # This HeadTail hack is similar but different from the RecursiveRule hack
+    # thus: they both represent alternate ways to define lists in grammars.
+    # In this pattern a list is accomplished by use of a kleene star.
+    # The other form achieves a list-like pattern with eponymous recursion.
+    #
     # This, the HeadTail hack, works and has features as follows:
     #
     # It will enhance a tree class for an example syntax node that matches
@@ -542,14 +571,14 @@ module Skylab::TanMan
     include Sexp::Auto::Hack::Constants
 
     MEMBERS = [:head, :tail]
-    def self.matches? i
-      ( MEMBERS - i.tree_class.members_of_interest ).empty?
+    def self.match i
+      if ( MEMBERS - i.members_of_interest ).empty? # members incl. head & tail
+        Sexp::Auto::Hack.new { enhance i }
+      end
     end
 
     def self.enhance i # inference
-      # (the below hackery is explained in the comment for this module above.)
-
-      i.tree_class.extend Sexp::Auto::Hacks::HeadTail::ModuleMethods
+      i.tree_class._hacks.push :HeadTail #debugging-feature-only
       i.tree_class.send(:include, Sexp::Auto::Hacks::HeadTail::InstanceMethods)
 
       head = i._node.head or fail('for this hack to work, head: must exit')
@@ -557,7 +586,7 @@ module Skylab::TanMan
         use_stem = md[:stem].intern
       else
         head_inference = Sexp::Auto::Inference.get(head, i.tree_class, :head)
-        if head_inference.inferrable_expression?
+        if head_inference.expression?
           use_stem = head_inference.rule
         else
           fail("for this hack to work your rule name must end in _list #{
@@ -565,10 +594,8 @@ module Skylab::TanMan
         end
       end
       define_items_method i.tree_class, use_stem
+      true
     end
-  end
-  module Sexp::Auto::Hacks::HeadTail::ModuleMethods
-    attr_accessor :item_stem
   end
   module Sexp::Auto::Hacks::HeadTail::InstanceMethods
     def _items
@@ -604,47 +631,50 @@ module Skylab::TanMan
     end
   end
   # ---*---
-  module Sexp::Auto::Hacks::RecursiveTail
-    # This hack tries to recognize a rule called "foo_list" that has as
-    # one of its members of interest a doohah called foo and then presumably
-    # as another one of its optional doohahs a doohah called "foo_list"
+  module Sexp::Auto::Hacks::RecursiveRule
+    # This hack matches a node that matches the first of a series of patterns:
+    # 1) if a rule has an element that itself has the same name as the rule
+    # 2) if the rule is named "foo_list" and has a "foo" as an element
+    #     (a member called "tail" is then assumed that itself must have
+    #      a member called "foo_list")
 
     extend Sexp::Auto::Hack::ModuleMethods
     include Sexp::Auto::Hack::Constants
 
-    def self.matches? i
-      if _md = LIST_RX.match(i.expression.to_s)
-        if i.tree_class.members_of_interest.include?(_md[:stem].intern)
-          true
+    def self.match i
+      if i.members_of_interest?
+        if i.members_of_interest.include? i.rule # "foo" rule with "foo" element
+          Sexp::Auto::Hack.new { enhance i, :content, i.rule }
+        elsif md = LIST_RX.match(i.rule.to_s) # "foo_list" rule with "foo" elem
+          if i.members_of_interest.include? md[:stem].intern
+            Sexp::Auto::Hack.new { enhance i, md[:stem].intern, :tail, i.rule }
+          end
         end
       end
     end
 
-    def self.enhance inference
-      inference.tree_class.class_eval do
-        extend Sexp::Auto::Hacks::RecursiveTail::ModuleMethods
-        include Sexp::Auto::Hacks::RecursiveTail::InstanceMethods
+    def self.enhance i, item_getter, tail_getter, list_getter=nil
+      i.tree_class._hacks.push :RecursiveRule #debugging-feature-only
+      i.tree_class.instance_methods.include?(:_items) and fail('sanity')
+      i.tree_class.send(:define_method, :_items) do
+        y = [ ]
+        node = self
+        begin
+          _item = node.send(item_getter) or fail('sanity')
+          y << _item
+          if _tail_node = node.send(tail_getter)
+            node = _tail_node
+            if list_getter # ick but more logically readable
+              node = node.send(list_getter)
+            end
+          else
+            node = nil
+          end
+        end while node
+        y
       end
-      define_items_method inference.tree_class,
-        LIST_RX.match(inference.rule)[:stem].intern
+      define_items_method i.tree_class, item_getter
       nil
-    end
-  end
-  module Sexp::Auto::Hacks::RecursiveTail::ModuleMethods
-    attr_accessor :item_stem
-  end
-  module Sexp::Auto::Hacks::RecursiveTail::InstanceMethods
-    def _items
-      a = [ ]
-      node = self
-      begin
-        _item = node.send(self.class.item_stem) or fail('sanity')
-        a << _item
-        node = if _tail = node.tail
-          _tail.send(self.class.rule) # nil ok
-        end
-      end while node
-      a
     end
   end
   # ---*---
