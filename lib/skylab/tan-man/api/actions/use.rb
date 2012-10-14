@@ -35,7 +35,9 @@ module Skylab::TanMan
       end
       bytes = nil
       path.open('w+') do |fh|
-        bytes = fh.write('# created by herkemer on derkemer')
+        bytes = fh.write(TanMan::Templates['digraph.dot'].call(
+          created_on: ::Time.now.utc.to_s
+        ))
       end
       info("wrote #{path} (#{bytes} bytes).")
     end

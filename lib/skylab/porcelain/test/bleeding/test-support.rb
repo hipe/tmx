@@ -1,5 +1,6 @@
 require_relative '../test-support'
 require_relative '../../core'
+require 'skylab/headless/core'
 
 module Skylab::Porcelain::Bleeding::TestSupport
   Bleeding = ::Skylab::Porcelain::Bleeding
@@ -27,6 +28,8 @@ module Skylab::Porcelain::Bleeding::TestSupport
     end
   end
 
+  MUSTACHE_RX = ::Skylab::Headless::Constants::MUSTACHE_RX
+
   RSpec::Matchers.define(:be_action) do |expected|
     actual = nil ; fails = [] ; desc = {}
     match do |_actual|
@@ -46,7 +49,7 @@ module Skylab::Porcelain::Bleeding::TestSupport
     end
     failure_message_for_should { |_actual| fails.join('. ') }
     description do
-      'be an action{{aliases}}{{desc}}'.gsub(/{{((?:(?!}})[^{])+)}}/) do
+      'be an action{{aliases}}{{desc}}'.gsub(MUSTACHE_RX) do
         " #{desc[$1.intern]}" if desc[$1.intern]
       end.strip
     end
@@ -102,7 +105,7 @@ module Skylab::Porcelain::Bleeding::TestSupport
     end
     failure_message_for_should { |__actual| fails.join('. ') }
     description do
-      'emit{{pos}}{{type}}{{msg}}'.gsub(/{{((?:(?!}})[^{])+)}}/) do
+      'emit{{pos}}{{type}}{{msg}}'.gsub(MUSTACHE_RX) do
         " #{desc[$1.intern]}" if desc[$1.intern]
       end.strip
     end

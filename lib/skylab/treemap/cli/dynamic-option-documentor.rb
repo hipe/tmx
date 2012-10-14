@@ -69,7 +69,7 @@ module Skylab::Treemap
     attr_accessor :cli
     def desc
       orig_desc.map do |line|
-        line.gsub(/  {{ ((?:(?!}})[^{])+) }}  /x) do
+        line.gsub(::Skylab::Headless::Constants::MUSTACHE_RX) do
           name = $1
           if respond_to?("render_#{name}")
             send("render_#{name}")
