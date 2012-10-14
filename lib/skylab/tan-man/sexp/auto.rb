@@ -55,7 +55,7 @@ module Skylab::TanMan
       members = build_element_names i
       tree_class = ::Struct.new(* members)
       tree_class.extend module_methods_module
-      tree_class._members = members
+      tree_class._members = members.freeze
       tree_class.expression = i.expression
       tree_class.rule = i.rule
       tree_class.members_of_interest = build_members_of_interest(i) || members
@@ -142,7 +142,8 @@ module Skylab::TanMan
 
     attr_accessor :expression
     def _hacks ; @_hacks ||= [] end #debugging-feature-only
-    attr_accessor :_members # our version, separate from the ::Struct nerkiss
+    attr_writer :_members # experimental frozen persistent object
+    def _members ; @_members ||= members.freeze end
     attr_accessor :members_of_interest
     attr_accessor :rule
 
@@ -710,5 +711,6 @@ module Skylab::TanMan
       super syntax_node.text_value
     end
     alias_method :unparse, :content_text_value
+    alias_method :string, :content_text_value
   end
 end

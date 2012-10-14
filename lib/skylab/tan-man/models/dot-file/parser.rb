@@ -1,8 +1,8 @@
 require 'skylab/treetop-tools/core'
+require_relative 'sexps' # before sexp/auto creates any
 
 module Skylab::TanMan
   Models::DotFile::SyntaxNodes and nil # load it here & now
-  Models::DotFile::Sexp = ::Skylab::TanMan::Sexp
   module Models::DotFile::Parser end
   module Models::DotFile::Parser::InstanceMethods
     include ::Skylab::TreetopTools::Parser::InstanceMethods

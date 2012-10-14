@@ -15,6 +15,7 @@
 # (4) (non syntactic): Semantic labels were added to rule components in ways
 #     that were sometimes regular and sometimes not.
 # (5) added content: grouping to a_list for sexp convenience
+# (6) turned 'equals stmt' into its own rule with labels
 
 module Skylab::TanMan::Models::DotFile
   grammar DotLanguage
@@ -36,7 +37,7 @@ module Skylab::TanMan::Models::DotFile
       # the "node_id" component of "node_stmt" swallows everything.
       # We hence change the order so that "node_stmt" is at the end.
       # node_stmt / edge_stmt / attr_stmt / id '=' id / subgraph
-      attr_stmt / edge_stmt / id s? '=' s? id / subgraph / node_stmt
+      attr_stmt / edge_stmt / equals_stmt / subgraph / node_stmt
     end
     rule attr_stmt
       agent:('graph' / 'node' / 'edge') attr_list
@@ -52,6 +53,9 @@ module Skylab::TanMan::Models::DotFile
     end
     rule edge_rhs
       s? edgeop s? recipient:(node_id / subgraph) edge_rhs:edge_rhs?
+    end
+    rule equals_stmt
+      lhs:id s? '=' s? rhs:id
     end
     rule node_stmt
       node_id attr_list:attr_list?
