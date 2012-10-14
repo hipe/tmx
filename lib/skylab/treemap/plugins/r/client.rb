@@ -111,7 +111,7 @@ module Skylab::Treemap::Plugins
       Open3.popen3(bridge.executable_path, '--vanilla') do |sin, sout, serr|
         line = true
         loop do
-          bytes = select_lines_until(0.3, sout: sout, serr: serr) do |o|
+          bytes = select_lines_until(0.3, sout: sout, serr: serr) do |o| # #todo #hl-102
             o.on_sout { |e| $stderr.write "OUT-->#{e}" }
             o.on_serr { |e| $stderr.write "ERR->#{e}" }
           end

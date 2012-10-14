@@ -1,6 +1,7 @@
-module Skylab::TestSupport
-  class StreamSpy < ::Struct.new(:tty, :listeners)
+require 'skylab/headless/core'
 
+module Skylab::TestSupport
+  class StreamSpy < ::Skylab::Headless::IO::Interceptors::Tee
     # A StreamSpy is a simple multiplexer that multiplexes out a subset
     # of the instance methods of the IO module out to an ordered hash of
     # listeners. StreamSpy is vital for automated testing, when you need
@@ -29,34 +30,20 @@ module Skylab::TestSupport
 
     def self.standard
       require 'stringio'
-      new.tap { |o| o.tty![:buffer] = ::StringIO.new }
+      new( buffer: ::StringIO.new ).tty!
     end
-    [:<<, :puts, :write].each do |m|
-      define_method(m) do |*a, &b|
-        listeners.each { |l| l.send(m, *a, &b) }
+    def debug! prepend=nil
+      stderr = $stderr
+      self[:debug] = if prepend
+        ::Skylab::Headless::IO::Interceptors::Filter.new(
+          stderr, line_boundary_string: prepend )
+      else
+        stderr
       end
-    end
-    def [] key
-      listeners[@hash[key]]
-    end
-    def []= key, value
-      listeners[@hash[key] ||= listeners.length] = value
-    end
-    def debug!
-      self[:debug] = $stderr
       self
     end
     def string # just a convenience macro.  :buffer listener must obv. exist
       self[:buffer].string
-    end
-    # Mock whether or not this stream is an interactive terminal (see `IO#tty?`)
-    def tty!    ; self.tty = true  ; self end
-    def no_tty! ; self.tty = false ; self end
-    alias_method :tty?, :tty
-  protected
-    def initialize
-      super(false, [])
-      @hash = {}
     end
   end
 end

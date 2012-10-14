@@ -1,21 +1,14 @@
-require_relative '../../../../..' # bootstrap-in skylab.rb here :/
 require_relative '../../../../core'
+require_relative '../../../test-support'
 
-class ::String
-  # note you will still have a trailing newline, for which u could chop
-  def here # aka unindent, deindent
-    gsub(/^#{::Regexp.escape(match(/\A(?<margin>[[:space:]]+)/)[:margin])}/, '')
-  end
-end
-
-# (reference: http://solnic.eu/2011/01/14/custom-rspec-2-matchers.html)
+# (reference: http://solnic.eu/2014/01/14/custom-rspec-2-matchers.html)
 RSpec::Matchers.define :be_sexp do |expected|
   match do |actual|
     not
-    if /Sexp\z/ !~ (_ = actual.class.to_s.split('::').last) then
-      @message = "expected Sexp had #{_}"
-    elsif (_ = actual.class.nt_name) != expected
-      @message = "expected #{expected} had #{_}"
+    if /\ASexps\z/ !~ (_ = actual.class.to_s.split('::')[-2]) then
+      @message = "expected containing module to be Sexps,  had #{_}"
+    elsif (_ = actual.class.expression) != expected
+      @message = "expected expression to be #{expected.inspect} had #{_.inspect}"
     end
   end
   failure_message_for_should do |actual|
@@ -29,6 +22,15 @@ module Skylab::TanMan::Models::DotFile::Parser::TestSupport
   def self.extended mod
     mod.module_eval do
       extend ModuleMethods
+      include ::Skylab::TanMan::TestSupport::InstanceMethods
+      before(:all) { _my_before_all }
+      let(:client) do
+        _runtime = TanMan::API::Achtung::BUILD_RUNTIME_F.call($stderr, $stderr)
+        ParserProxy.new _runtime, dir_path: ::File.expand_path('..', __FILE__)
+      end
+      let(:input_pathname) do
+        client.dir_pathname.join("../fixtures/#{input_path_stem}")
+      end
     end
   end
   TanMan = ::Skylab::TanMan
@@ -39,18 +41,55 @@ module Skylab::TanMan::Models::DotFile::Parser::TestSupport
 
     include TanMan::API::Achtung::SubClient::InstanceMethods
     include TanMan::Models::DotFile::Parser::InstanceMethods
+
+    def initialize runtime, opts
+      @profile = true
+      super runtime
+      opts.each { |k, v| send("#{k}=", v) }
+    end
+    attr_accessor :dir_path
+    def dir_pathname
+      @dir_pathname ||= (dir_path and ::Pathname.new(dir_path))
+    end
+
+    SIMPLE_ABSPATH_RX = %r{/[-_./a-z0-9]*}i # just a jerky experiment
+    PATH_TOOLS = ::Object.new.extend(::Skylab::Face::PathTools::InstanceMethods)
+      # this looks awful but we want to avoid any interference with tests etc
+
+    def on_parser_info msg
+      msg = msg.gsub(SIMPLE_ABSPATH_RX) { |p| PATH_TOOLS.pretty_path p }
+      info "      (#{msg})"
+    end
+
+    def parser_result result
+      ret = super
+      if @profile && input_adapter.type.is?(
+        ::Skylab::TreetopTools::Parser::InputAdapter::Types::FILE
+      ) then
+        info( '      (%2.1f ms to parse %s)' % [
+          (parse_time_elapsed_seconds * 1000),
+          input_adapter.pathname.basename.to_s
+        ] )
+      end
+      ret
+    end
+
+    attr_accessor :profile
   end
   module ModuleMethods
     def input string
-      frame_f = ->() do
+      let(:input_string) { string }
+      let(:frame) do
         frame = { }
-        runtime = TanMan::API::Achtung::BUILD_RUNTIME_F.call($stderr, $stderr)
-        parser = ParserProxy.new runtime
-        frame[:sexp] = parser.parse_string(string)
-        ( frame_f = ->() { frame } ).call
+        frame[:result] = client.parse_string string
+        frame
       end
-      let(:input) { string }
-      let(:sexp) { frame_f.call[:sexp] }
+      let(:result) { frame[:result] }
+    end
+    def it_unparses_losslessly(*tags)
+      it 'unparses losslessly', *tags do
+        result.unparse.should eql(input_string)
+      end
     end
   end
 end

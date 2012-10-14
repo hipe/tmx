@@ -29,7 +29,7 @@ module Skylab::CssConvert
     end
 
     def fixture_path tail
-      CssConvert.dir.join('test/fixtures', tail)
+      CssConvert.dir_pathname.join('test/fixtures', tail)
     end
 
     def parse_css_in_file pathname

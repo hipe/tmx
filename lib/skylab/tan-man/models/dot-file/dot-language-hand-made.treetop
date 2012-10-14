@@ -1,0 +1,82 @@
+# This file constitutes those parts of the dot language grammar that
+# needed to be written "by hand" (as opposed to (semi-) generated from
+# the provided 'abstract grammar definition); for lack of a rigid grammar
+# having been provided in non-natural language form.
+#
+# It is language elements like whitespace, comments, and ID's.
+#
+# Note isomorphicisms between the below language elements and
+# the natural language descriptions given at
+#   http://www.graphviz.org/doc/info/lang.html
+# which was used directly and solely as the source for the below such rules.
+#
+# Although it currently only implements a subset of the
+# grammar described therein, its aim is to be correct, if not complete.
+#
+# Things that for one reason or another are not yet covered in this grammar:
+#   - Currently for "edgeop" we parse '->' and '--' without regards to
+#       whether the graph is directed or undirected.  The grammar is far less
+#       complex if we handle the conditional nature of this rule in
+#       post-processing rather than building it into the grammar itself.
+#   Some issuess with ID's:
+#   - We had to skip multibyte support for now.  Patches welcome!
+#   - For ID's that consist of HTML strings, we do not parse the HTML
+#     per se (as XML as the documentation calls for), but rather we just scan
+#     for '<<' and '>>' as the delimeters.  This can be improved on an as-
+#     needed basis.
+#
+# The above list is not necessarily comprehensive.
+
+module Skylab::TanMan::Models::DotFile
+  grammar HandMadeSupplement
+    rule s
+      (white / comment) s?
+      { def tree ; text_value end } # we want tests to pass w or w/o this line
+    end
+    rule white
+      [ \t\n\r]+
+    end
+    rule comment
+      c_style_comment / shell_style_comment
+    end
+    rule c_style_comment
+      '/*'
+      (
+        !'*/'
+        ( . / [\n\r]+ )
+      )*
+      '*/'
+    end
+    rule shell_style_comment
+      '#' ( ![\n\r] . )*
+    end
+    rule id
+      id_name / id_numeric / double_quoted_string / id_html
+    end
+    rule id_name
+      id_name_start_char id_name_char*
+      { def tree ; ::Skylab::TanMan::Sexp::Auto::ContentTextValue[self] end }
+    end
+    rule id_name_start_char
+      [_a-zA-Z]
+      # sad: / [#xC8-#x179]
+    end
+    rule id_name_char
+      id_name_start_char / [0-9]
+    end
+    rule id_numeric
+      '-'? ( '.' [0-9]+ / [0-9]+ ( '.' [0-9]* )? )
+      { def tree ; ::Skylab::TanMan::Sexp::Auto::ContentTextValue[self] end }
+    end
+    rule double_quoted_string
+      '"' content_text_value:('\"' / !'"' .)* '"'
+    end
+    rule id_html
+      '<' &'<' content_text_value:( ( !'>' . / '>' !'>' )+ '>' ) '>'
+    end
+    rule edgeop # see comments at '"edgeop"' above
+      '->' / '--'
+      { def tree ; text_value end }
+    end
+  end
+end

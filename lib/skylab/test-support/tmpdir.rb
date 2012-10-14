@@ -1,27 +1,30 @@
 require 'open3'
 require 'stringio'
-require 'skylab/face/core'
+require 'skylab/face/core' # MyPathname *only*
 
 module Skylab::TestSupport
   class Tmpdir < ::Skylab::Face::MyPathname
-    include FileUtils
+    include ::FileUtils
+    def initialize path, opts=nil
+      super path
+      @infostream = $stderr
+      @noop = false # no setter for now! b/c it introduces some issues
+      @requisite_level = 1
+      @verbose = false
+      opts and opts.each { |k, v| send("#{k}=", v) }
+    end
     def copy pathname, destination_basename = nil
       source = ::Skylab::Face::MyPathname.new(pathname.to_s)
       destination = join(destination_basename || source.basename)
       cp source.to_s, destination.to_s, verbose: @verbose, noop: @noop
     end
-    def emit type, msg
-      $stderr.puts msg
+    def emit _, msg
+      @infostream.puts msg
     end
     def fu_output_message msg
       emit :info, msg
     end
-    def initialize path, opts=nil
-      super path
-      @verbose = false
-      @noop = false # no setter for now! b/c it introduces some issues
-      opts and opts.each { |k, v| send("#{k}=", v) }
-    end
+    attr_writer :infostream
     alias_method :fileutils_mkdir, :mkdir # the name 'fu_mkdir' is already used by FileUtils!
     # experimental example interface
     def mkdir path_end, opts=nil
@@ -31,7 +34,7 @@ module Skylab::TestSupport
     end
     def patch str
       cd(to_s) do
-        Open3.popen3('patch -p1') do |sin, sout, serr|
+        ::Open3.popen3('patch -p1') do |sin, sout, serr|
           sin.write str
           sin.close
           "" != (s = serr.read) and raise("patch failed(?): #{s.inspect}")
@@ -43,6 +46,7 @@ module Skylab::TestSupport
         end
       end
     end
+    attr_accessor :requisite_level
     alias_method :fileutils_touch, :touch
     def touch file
       fileutils_touch(join(file), :verbose => @verbose, :noop => @noop)
@@ -63,10 +67,12 @@ module Skylab::TestSupport
       self
     end
     def prepare
-      %r{(?:^|/)tmp(?:/|$)} =~ to_s or return fail("we are being extra cautious")
+      %r{(?:^|/)tmp(?:/|$)} =~ to_s or
+        return fail("for now, tmpdirs must always have /tmp/ in their paths!")
       if exist?
-        remove_entry_secure(to_s)
+        remove_entry_secure to_s
       elsif ! dirname.exist?
+        requisite_level and requisite_level_check
         mkdir_p dirname, :verbose => @verbose, :noop => @noop
       end
       fileutils_mkdir to_s
@@ -74,23 +80,28 @@ module Skylab::TestSupport
     end
     attr_accessor :verbose
     def verbose!
-      tap { |o| o.verbose = true }
+      self.verbose = true ; self
     end
-  end
-end
-
-module Skylab
-  class << TestSupport
-    def tmpdir path, requisite_level
-      requisite_level >= 1 or raise("requisite level must always be one or above")
-      pn = Pathname.new(path)
-      re = Regexp.new("\\A#{requisite_level.times.map{ |_| '[^/]+' }.join('/')}")
-      md = re.match(pn.to_s) or raise("hack failed: #{re} =~ #{pn.to_s.inspect}")
-      if ! File.exist?(md[0])
-        raise("prerequisite folder for tempdir must exist: #{md[0]}")
+  protected
+    def requisite_level_check
+      requisite_level > 0 or fail("requisite_level must be at least 1.")
+      pn = ::Pathname.new to_s
+      re = %r(\A#{ requisite_level.times.map { '[^/]+' }.join('/') })
+      md = re.match(pn.to_s) or fail("hack failed: #{re} =~ #{pn.to_s.inspect}")
+      unless ::File.exist? md[0]
+        fail("prerequisite folder for tempdir must exist: #{ md[0] }")
       end
-      TestSupport::Tmpdir.new(path)
+      nil
+    end
+  end
+
+  module Tmpdir::ModuleMethods
+    def tmpdir path, requisite_level=nil
+      opts = { }
+      requisite_level and opts[:requisite_level] = requisite_level
+      Tmpdir.new(path, opts)
     end
   end
 end
 
+::Skylab::TestSupport.extend ::Skylab::TestSupport::Tmpdir::ModuleMethods

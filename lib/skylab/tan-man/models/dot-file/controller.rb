@@ -1,12 +1,29 @@
 module Skylab::TanMan
-  module Models::DotFile end
-  class Models::DotFile::Controller < ::Struct.new(:path, :statement)
+  class Models::DotFile::Controller < ::Struct.new(:pathname, :statement)
     extend ::Skylab::Headless::Parameter::Controller::StructAdapter
+    include API::Achtung::SubClient::InstanceMethods # info
+    include Models::DotFile::Parser::InstanceMethods
+
+    def check
+      result = parse_file pathname
+      info "OK in dot-file/controller.rb we got something .."
+      require 'pp' ; ::PP.pp result
+      true
+    end
+
+    # execute a statement
     def execute
-      _const = statement.class.nt_const.match(/\A.+(?=Statement\z)/)[0]
-      _class = Models::DotFile::Actions.const_get(_const)
-      _class.new(request_runtime).invoke(
-        path: path, statement: statement, runtime: self)
+      nt_const = statement.class.nt_const.match(/\A.+(?=Statement\z)/)[0]
+      action = Models::DotFile::Actions.const_get(nt_const)
+      action.new(request_runtime).invoke(
+        digraph: self,
+        statement: statement
+      )
+    end
+  protected
+    def initialize request_runtime, pathname = nil
+      self.request_runtime = request_runtime
+      self.pathname = pathname
     end
   end
 end

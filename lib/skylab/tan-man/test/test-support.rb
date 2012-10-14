@@ -1,7 +1,6 @@
 require 'skylab/porcelain/tite-color'
 require 'skylab/test-support/core'
 require 'skylab/test-support/tmpdir'
-require 'shellwords'
 
 module Skylab::TanMan::TestSupport
   include Skylab::TestSupport
@@ -9,7 +8,8 @@ module Skylab::TanMan::TestSupport
   Porcelain = Skylab::Porcelain
   TanMan = Skylab::TanMan
 
-  TMPDIR = Tmpdir.new(Skylab::ROOT.join('tmp/tanman'))
+  TMPDIR_STEM = 'tan-man'
+  TMPDIR = Tmpdir.new(::Skylab::TMPDIR_PATHNAME.join(TMPDIR_STEM).to_s)
 
   # the below machinery has been rigged carefully and is a precision insturment
   class StreamsSpy < Array # that's "streams" plural
@@ -72,64 +72,34 @@ module Skylab::TanMan::TestSupport
 end
 
 module Skylab::TanMan::TestSupport
-  shared_context tanman: true do
-  def api
-    TanMan.api
-  end
-  let :cli do
-    spy = output
-    TanMan::CLI.new do |o|
-      o.program_name = 'ferp'
-      o.stdout = spy.for(:stdout)
-      o.stderr = spy.for(:stderr)
-      o.on_info { |x| o.stderr.puts x.touch!.message } # similar but not same to default
-      o.on_out  { |x| o.stdout.puts x.touch!.message }
-      o.on_all  { |x| o.stderr.puts(x.touch!.message) unless x.touched? }
+  module Tmpdir_InstanceMethods
+    MEMO = ::Class.new.class_eval do
+      execute_f = -> { TMPDIR.prepare }
+      get_f = ->{ _memo = execute_f.call ; (get_f = ->{ _memo }).call }
+      define_method(:get) { get_f.call }
+      define_method(:execute) { execute_f.call }
+      self
+    end.new
+    def prepare_submodule_tmpdir
+      MEMO.execute
+    end
+    def prepared_submodule_tmpdir
+      MEMO.get
     end
   end
-  def input str
-    argv = Shellwords.split(str)
-    self.result = cli.invoke argv
-  end
-  def lone_error ee, regex
-    ee.size.should eql(1)
-    ee.should_not be_success
-    ee.first.message.should match(regex)
-  end
-  def lone_success ee, regex
-    ee.size.should eql(1)
-    ee.should be_success
-    ee.first.message.should match(regex)
-  end
-  attr_accessor :result
-  let(:output) { StreamsSpy.new }
-  def output_shift_is *assertions
-    subject = output.first
-    assertions.each do |assertion|
-      case assertion
-      when FalseClass ; result.should_not be_trueish
-      when Regexp     ; subject.string.should match(assertion)
-      when String     ; subject.string.should be_include(assertion)
-      when Symbol     ; subject.name.should eql(assertion)
-      when TrueClass  ; result.should be_trueish
-      else            ; fail("unrecognized assertion class: #{assertion}")
-      end
+  module InstanceMethods
+    extend Tmpdir_InstanceMethods
+    my_before_all_f = -> do
+      prepared_submodule_tmpdir
+      my_before_all_f = ->{ }
     end
-    output.shift # return subject, and change the stack only at the end
-  end
-  def output_shift_only_is *assertions
-    res = output_shift_is(*assertions)
-    output.size.should eql(0)
-    res
-  end
-  def prepare_local_conf_dir
-    TMPDIR.prepare.mkdir(TanMan::API.local_conf_dirname)
-  end
-  attr_accessor :result
+    MY_BEFORE_ALL_F = ->{ my_before_all_f.call }
+    def _my_before_all
+      MY_BEFORE_ALL_F.call
+    end
   end
 end
 
-RSpec::Matchers.define(:be_trueish) { match { |actual| actual } }
-
-RSpec::Matchers.define(:be_gte) { |expected| match { |actual| actual >= expected } }
-
+if defined?(::RSpec) # egads sorry -- for running CLI visual testing clients
+  require_relative('test-support/for-rspec')
+end

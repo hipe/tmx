@@ -11,7 +11,7 @@ module Skylab::Treemap
 
   module API
     extend Skylab::MetaHell::Autoloader::Autovivifying
-    PLUGINS_DIR = dir.dirname.join('plugins')
+    PLUGINS_DIR = dir_pathname.dirname.join('plugins')
   end
 
   class API::Client

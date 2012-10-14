@@ -3,9 +3,10 @@ require_relative '../../../test-support'
 
 module Skylab::TanMan::TestSupport
   describe "The #{TanMan::API} action Remote List", tanman: true do
+    include Tmpdir_InstanceMethods
     before { api.clear }
     context "when there are no conf dirs at all" do
-      before { TMPDIR.prepare }
+      before { prepared_submodule_tmpdir }
       it "returns an error event explaining the situation" do
         events = api.invoke(%w(remote list))
         lone_error(events, /local conf dir not found/)
@@ -21,4 +22,3 @@ module Skylab::TanMan::TestSupport
     end
   end
 end
-

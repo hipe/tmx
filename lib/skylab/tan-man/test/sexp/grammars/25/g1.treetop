@@ -1,0 +1,27 @@
+module Skylab::TanMan::Sexp::TestSupport::Grammars::Namespace25
+  grammar NerpZerp25
+    rule graph
+      s? 'graph' s? '{' s? stmt_list s? '}' s?
+      {
+        def tree
+          ::Skylab::TanMan::Sexp::Auto::Lossless::Recursive[ self ]
+        end
+      }
+    end
+    rule s
+      [ \t\n\r]+
+    end
+    rule stmt_list
+      (s? head:stmt s? ';'? tail:stmt_list?)?
+    end
+    rule stmt
+      nerp_stmt / zerp_stmt
+    end
+    rule nerp_stmt
+      'nerp'
+    end
+    rule zerp_stmt
+      'zerp'
+    end
+  end
+end

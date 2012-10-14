@@ -230,6 +230,13 @@ module Skylab::TanMan
     end
   end
 
+  class CLI::Actions::Check < CLI::Action
+    desc 'checks if the (dependency graph) file exists and can be parsed.'
+    def invoke dotfile=nil
+      api.invoke(path: dotfile)
+    end
+  end
+
   class CLI::Actions::Tell < CLI::Action
     desc "there's a lot you can tell about a man from his choice of words"
     def invoke *word

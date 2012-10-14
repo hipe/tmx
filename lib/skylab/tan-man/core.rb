@@ -1,3 +1,4 @@
+require_relative '..' # skylab.rb
 require 'skylab/meta-hell/core'
 
 module Skylab

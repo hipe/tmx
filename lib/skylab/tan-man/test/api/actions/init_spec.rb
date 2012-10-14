@@ -3,6 +3,7 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport
   describe "The #{TanMan::API} itself", tanman: true do
+    include Tmpdir_InstanceMethods
     context "when you invoke a nonexistant action" do
       it "it gives you a list-like result whose first event is an error with a message" do
         events = api.invoke(:'not-an-action')
@@ -26,7 +27,7 @@ module Skylab::TanMan::TestSupport
       end
       context "with regards to working or not working" do
         before do
-          TMPDIR.prepare
+          prepare_submodule_tmpdir
         end
         context "when the folder isn't initted" do
           it "works (with json formatting)" do
@@ -34,11 +35,11 @@ module Skylab::TanMan::TestSupport
             events.success?.should eql(true)
             event = events.json_data.first
             event[0].should eql(:info)
-            event[1].should match(%r{mkdir.+tanman/local-conf.d})
+            event[1].should match(%r{mkdir.+#{TMPDIR_STEM}/local-conf.d})
             events = JSON.parse(JSON.pretty_generate(events))
             event = events.first
             event[0].should eql('info')
-            event[1].should match(%r{mkdir.+tanman/local-conf.d})
+            event[1].should match(%r{mkdir.+#{TMPDIR_STEM}/local-conf.d})
           end
         end
         context "when the folder already initted" do
@@ -59,7 +60,8 @@ module Skylab::TanMan::TestSupport
             events.success?.should eql(false)
             events.first.tap do |e|
               e.type.should eql(:error)
-              e.message.should match(%r{directory must exist:.*tanman/not-exist})
+              e.message.should match(
+                %r{directory must exist:.*#{TMPDIR_STEM}/not-exist})
             end
           end
         end
@@ -70,7 +72,8 @@ module Skylab::TanMan::TestSupport
             events.success?.should eql(false)
             events.first.tap do |e|
               e.type.should eql(:error)
-              e.message.should match(%r{path was file, not directory: .*tmp/tanman})
+              e.message.should match(
+                %r{path was file, not directory: .*tmp/#{TMPDIR_STEM}})
             end
           end
         end

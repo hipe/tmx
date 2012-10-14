@@ -1,0 +1,31 @@
+#!/usr/bin/env ruby -w
+
+require_relative '../../sexp/test-support'
+require_relative '../../../core'
+
+module ::Skylab::TanMan::Models::DotFile::TestSupport
+  class Grammar < ::Skylab::TanMan::Sexp::TestSupport::Grammar
+    # we jump through some hoops to bootstrap-in a real life grammar
+    # into the testing mix
+
+    def anchor_dir_pathname
+      @anchor_dir_pathname ||=
+        ::Pathname.new(::File.expand_path('..', __FILE__))
+    end
+
+    def grammars o
+    o.treetop_grammar '../../../models/dot-file/dot-language-hand-made.treetop'
+    o.treetop_grammar '../../../models/dot-file/dot-language.generated.treetop'
+    end
+
+    def force_overwrite? ; true end
+
+    def stem_path
+      'dawt-file' # used to make a tmpdir dir
+    end
+  end
+end
+
+if __FILE__ == $PROGRAM_NAME
+  ::Skylab::TanMan::Models::DotFile::TestSupport::Grammar.new.invoke ARGV
+end

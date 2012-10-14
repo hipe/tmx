@@ -1,0 +1,31 @@
+module Skylab::TanMan::Sexp::TestSupport::Grammars::Namespace70
+  grammar NerpZerp70
+    rule gestalt
+      stmt*
+      {
+        def tree
+          ::Skylab::TanMan::Sexp::Auto::Lossless::Recursive[ self ]
+        end
+      }
+    end
+    rule stmt_sep
+      s? ';' s?
+      { def tree ; text_value end }
+    end
+    rule s
+      [ \t\r\n]+
+    end
+    rule stmt
+      agent:id "'s attributes" s? ':' attr_list stmt_sep
+    end
+    rule attr_list
+      s? '[' s? a_list:a_list? ']' attr_list:attr_list?
+    end
+    rule a_list
+      s? id s? equals:('=' s? id s?)? ','? a_list:a_list?
+    end
+    rule id
+      [A-Za-z]+ ( [A-Za-z]+)*
+    end
+  end
+end
