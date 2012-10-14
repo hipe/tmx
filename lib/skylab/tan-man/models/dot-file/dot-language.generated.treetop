@@ -14,6 +14,7 @@
 # (3) The order of symbols in a set of alternatives was changed.
 # (4) (non syntactic): Semantic labels were added to rule components in ways
 #     that were sometimes regular and sometimes not.
+# (5) added content: grouping to a_list for sexp convenience
 
 module Skylab::TanMan::Models::DotFile
   grammar DotLanguage
@@ -41,10 +42,10 @@ module Skylab::TanMan::Models::DotFile
       agent:('graph' / 'node' / 'edge') attr_list
     end
     rule attr_list
-      s? '[' s? a_list:a_list? ']' attr_list:attr_list?
+      s? '[' s? content:a_list? ']' attr_list:attr_list?
     end
     rule a_list
-      s? id s? equals:('=' s? id s?)? ','? a_list:a_list?
+      s? content:( id s? equals:('=' s? id s?)? ) ','? a_list:a_list?
     end
     rule edge_stmt
       agent:(node_id / subgraph) edge_rhs attr_list:attr_list?

@@ -27,14 +27,16 @@ describe "#{Skylab::TanMan::Models::DotFile::Parser} 490 series" do
   using_input '699-psg.dot' do
     it 'should parse this representative graph with HTML in it' do
       (!! result).should eql(true)
-      a = result.stmt_list.stmts
-      a.length.should eql(26)
-      stmt = a[4]
-      tgt_a_list = stmt.attr_list.a_list.a_list.a_list.a_list.a_list.a_list
-        # the above is fragile and ugly but we decide here to finish up this
-        # html piece before we figure out how to "inferitize" the pattern #todo
-      tgt_a_list.equals.id.class.expression.should eql(:id_html)
-      tgt_a_list.equals.id.content_text_value.should(
+      stmts = result.stmt_list.stmts
+      stmts.length.should eql(26)
+      stmt = stmts[4]
+      a = stmt.attr_list.attrs.first.as.detect do |_a|
+        'label' == _a.id.content_text_value
+      end
+      a_alt = stmt.attr_list.content.a_list.a_list.a_list.a_list.a_list.content
+      a.object_id.should eql(a_alt.object_id)
+      a.equals.id.class.expression.should eql(:id_html)
+      a.equals.id.content_text_value.should(
         match(%r{\A<table .+</table>\z}))
     end
   end

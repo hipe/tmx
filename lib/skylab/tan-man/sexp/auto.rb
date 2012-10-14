@@ -522,7 +522,7 @@ module Skylab::TanMan
 
   module Sexp::Auto::Hack::ModuleMethods
     def define_items_method klass, stem
-      items_method = "#{stem}s" # pluralize
+      items_method = "#{stem}s".intern # pluralize
       klass.instance_methods.include?(items_method) and fail("sanity -#{
         } name collision during hack: \"#{items_method
         }\" method is already defined.")
@@ -643,17 +643,22 @@ module Skylab::TanMan
 
     def self.match i
       if i.members_of_interest?
+        md = LIST_RX.match(i.rule.to_s)
         if i.members_of_interest.include? i.rule # "foo" rule with "foo" element
-          Sexp::Auto::Hack.new { enhance i, :content, i.rule }
-        elsif md = LIST_RX.match(i.rule.to_s) # "foo_list" rule with "foo" elem
+          Sexp::Auto::Hack.new do
+            enhance i, (md ? md[:stem] : i.rule), :content, i.rule
+          end
+        elsif md # "foo_list" rule with "foo" elem
           if i.members_of_interest.include? md[:stem].intern
-            Sexp::Auto::Hack.new { enhance i, md[:stem].intern, :tail, i.rule }
+            Sexp::Auto::Hack.new do
+              enhance i, md[:stem], md[:stem], :tail, i.rule
+            end
           end
         end
       end
     end
 
-    def self.enhance i, item_getter, tail_getter, list_getter=nil
+    def self.enhance i, stem, item_getter, tail_getter, list_getter=nil
       i.tree_class._hacks.push :RecursiveRule #debugging-feature-only
       i.tree_class.instance_methods.include?(:_items) and fail('sanity')
       i.tree_class.send(:define_method, :_items) do
@@ -673,7 +678,7 @@ module Skylab::TanMan
         end while node
         y
       end
-      define_items_method i.tree_class, item_getter
+      define_items_method i.tree_class, stem
       nil
     end
   end

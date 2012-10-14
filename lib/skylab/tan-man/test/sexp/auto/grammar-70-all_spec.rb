@@ -14,7 +14,7 @@ describe "#{::Skylab::TanMan::Sexp::Auto} list pattern (grammars 70*)" do
     using_input 'feep-forp' do
       it 'enumerates the nodes' do
         result.unparse.should eql("feep ; forp ;\n")
-        a = result._items # nodes
+        a = result.nodes # _items
         a.length.should eql(2)
         a.should eql(['feep', 'forp'])
       end

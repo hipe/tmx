@@ -58,9 +58,9 @@ describe "#{Skylab::TanMan::Models::DotFile::Parser} 001 series" do
       it_unparses_losslessly
       it 'works' do
         stmts = result.stmt_list.stmts
-        a_list = stmts.last.attr_list.a_list
-        a_list.id.content_text_value.should eql('shape')
-        a_list.equals.id.content_text_value.should eql('record')
+        a_list = stmts.last.attr_list.content
+        a_list.content.id.content_text_value.should eql('shape')
+        a_list.content.equals.id.content_text_value.should eql('record')
       end
     end
   end
