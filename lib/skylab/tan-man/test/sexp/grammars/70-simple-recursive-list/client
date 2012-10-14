@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby -w
+
+require_relative '../../test-support'
+
+module ::Skylab::TanMan::Sexp::TestSupport
+  class Grammars::Grammar70_SimpleRecursiveList < self::Grammar
+    # everything is magic
+  end
+end
+
+if __FILE__ == $PROGRAM_NAME
+  ::Skylab::TanMan::Sexp::TestSupport::Grammars::
+    Grammar70_SimpleRecursiveList.new.invoke ARGV
+end

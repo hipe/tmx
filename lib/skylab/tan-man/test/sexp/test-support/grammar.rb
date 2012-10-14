@@ -68,12 +68,15 @@ module ::Skylab::TanMan::Sexp::TestSupport
 
   protected
 
-    NUM_RX = /\A(.+[^0-9])\d+(?:_[a-zA-Z]+)?\z/
+
+    NUM_RX = /\A([A-Za-z]+(?:::[A-Za-z]+)+)\d+[^:]+\z/
 
     def anchor_module_head
       _md = NUM_RX.match(self.class.to_s) or fail("failed to infer#{
-        } anchor_module_head from this class name, expecting it to end with#{
-        } a digit: #{self.class}. (Implement your own thing up the chain.)")
+        } anchor_module_head from this class name, expecting leading consts#{
+        } without digits and the trailing const to have a digit in it#{
+        } (You may need to implement your own hacky thing up the chain.)#{
+        } (Your thing: #{self.class})")
       _md[1]
     end
 
@@ -86,11 +89,26 @@ module ::Skylab::TanMan::Sexp::TestSupport
       op.on('-s <string>', "parse string instead of #{PATHSPEC_SYNTAX}") do |v|
         invocation_parameters.push([:upstream_string, v])
       end
+      op.on('-e <method>', "if the parse succeeds,",
+        "run <method> on the result and dump this result.") do |meth|
+        invocation_parameters.push([:eval_string, meth])
+      end
       op
     end
 
     def anchor_dir_pathname
       @anchor_dir_pathname ||= Grammars.dir_pathname.join stem_path
+    end
+
+    attr_accessor :eval_string
+
+    def eval_string_run result
+      unless /\A[a-z_]+[a-z0-9_]*\z/ =~ eval_string
+        fail("must be a valid method name: #{eval_string.inspect}")
+      end
+      _ = result.send eval_string
+      ::PP.pp _, infostream
+      true
     end
 
     def execute
@@ -101,7 +119,12 @@ module ::Skylab::TanMan::Sexp::TestSupport
         } ms): #{result.class}"
       if result
         require 'pp'
-        ::PP.pp result, infostream
+        if eval_string
+          eval_string_run result
+        else
+          ::PP.pp result, infostream
+          true
+        end
       end
     end
 

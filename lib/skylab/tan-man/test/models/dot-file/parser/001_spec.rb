@@ -50,7 +50,7 @@ describe "#{Skylab::TanMan::Models::DotFile::Parser} 001 series" do
       end
       it 'parses double quoted node ID\'s correctly' do
         node_stmt = result.stmt_list.stmts.first
-        node_stmt.class._nt_stem.should eql(:node_stmt)
+        node_stmt.class.rule.should eql(:node_stmt)
         node_stmt.node_id.id.content_text_value.should eql('node0')
       end
     end

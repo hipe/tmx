@@ -7,8 +7,8 @@ RSpec::Matchers.define :be_sexp do |expected|
     not
     if /\ASexps\z/ !~ (_ = actual.class.to_s.split('::')[-2]) then
       @message = "expected containing module to be Sexps,  had #{_}"
-    elsif (_ = actual.class.nt_name) != expected
-      @message = "expected nt_name to be #{expected.inspect} had #{_.inspect}"
+    elsif (_ = actual.class.expression) != expected
+      @message = "expected expression to be #{expected.inspect} had #{_.inspect}"
     end
   end
   failure_message_for_should do |actual|
