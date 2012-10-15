@@ -6,7 +6,7 @@ module Skylab::Permute
     desc "minimal permutations generator."
     def self.build_client_instance rt, tok # @compat
      app = new
-     app.action_init(rt)
+     app.parent = rt
      app.program_name = "#{rt.program_name} #{tok}"
      app
     end
@@ -15,11 +15,12 @@ module Skylab::Permute
   class CLI::Action
     extend ::Skylab::Porcelain::Bleeding::ActionModuleMethods
     extend ::Skylab::PubSub::Emitter
+    emits syntax_error: :info
     def self.build runtime
-      action = new(runtime)
-      action.on_help { |e| runtime.emit(e.type, e) }
-      action.on_info { |e| runtime.emit(e.type, e) }
-      action.on_out  { |e| runtime.emit(e.type, e) }
+      action = new
+      action.parent = runtime
+      action.on_info    { |e| runtime.emit(e.type, e) }
+      action.on_payload { |e| runtime.emit(e.type, e) }
       action
     end
   end
@@ -46,6 +47,7 @@ module Skylab::Permute
         e
       end
       list = [] ; hash = Hash.new { |h, k| list.push(x = AttributeSet.new(k, [])) ; h[k] = x }
+      up = true ; result = nil
       op = ::OptionParser.new do |o|
         b = ->(name) { ->(value) { hash[name].values.push value } }
         if 0 == (extent.short.keys - extent.short_of_long.keys).length
@@ -55,16 +57,24 @@ module Skylab::Permute
           extent.short.keys.each { |n| o.on("-#{n}<VALUE>", "a value of #{n}", &(b[n])) }
         end
         o.on('-h', '--help') do
-          return action.help(full: true)
+          result = action.help(full: true)
+          up = false
         end
       end
       begin
         op.parse!(argv)
       rescue ::OptionParser::ParseError => e
-        return action.help(message: e)
+        result = action.help(message: e) ; up = false
       end
-      list.empty? and return action.help(message: 'please provide one or more --attribute values.')
-      args.push list
+      if up
+        if list.empty?
+          result = action.help(message: 'please provide one or more --attribute values.')
+          up = false
+        else
+          args.push list ; result = true
+        end
+      end
+      result
     end
     def string
       "--attr-a <val1> -a<v2> --b-attr <val3> -b<v4> [..]"
@@ -72,15 +82,16 @@ module Skylab::Permute
   end
   class CLI::Actions::Generate < CLI::Action
     desc "generate permutations."
-    emits :help, :info, :out
+    emits :payload, :info, help: :info
     include Porcelain::Table::RenderTable
     opt_syn = ->() do
       op = HackParse.new
       (opt_syn = ->{ op }).call
     end
     define_method(:option_syntax) { opt_syn.call }
-    # argument_syntax ''
-    def execute set
+    singleton_class.send(:define_method, :option_syntax) { opt_syn.call } # so awful
+
+    def invoke set
       API::Actions::Generate.new(set) do |o|
         rows = []
         o.on_header { |e| rows.push( e.payload.map { |_, s| hdr s } ) }
@@ -88,7 +99,7 @@ module Skylab::Permute
         o.on_end do
           render_table(rows) do |oo|
             oo.on_info { |e| emit(:info, e) }
-            oo.on_row  { |e| emit(:out,  e) }
+            oo.on_row  { |e| emit(:payload,  e) }
           end
         end
       end.execute

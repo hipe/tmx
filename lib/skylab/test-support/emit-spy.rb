@@ -3,6 +3,9 @@ module Skylab::TestSupport
     def initialize &formatter
       super([], false, formatter)
     end
+    def clear!
+      stack.clear
+    end
     def debug!
       self.do_debug = true
       self.formatter ||= ->(*e){ e = e.first if 1 == e.length ; (e.respond_to?(:string) ? e.string : e.to_s) }

@@ -92,10 +92,18 @@ module Skylab::Porcelain::Bleeding
       "#{@parent.program_name} #{aliases.first}"
     end
     def resolve argv # mutates argv
-      args = []
-      ok =   option_syntax.parse!(  argv, args, self) or return (help if false == ok)
-      meth = argument_syntax.parse!(argv, args, self) or return help
-      [meth, args]
+      args = [] # the arguments that are actually passed to the method call
+      ok = option_syntax.parse!(argv, args, self)
+      if ok
+        meth = argument_syntax.parse!(argv, args, self)
+        if meth
+          [meth, args]
+        else
+          help
+        end
+      else
+        false == ok ? help : nil
+      end
     end
   end
   module ActionKlassInstanceMethods
