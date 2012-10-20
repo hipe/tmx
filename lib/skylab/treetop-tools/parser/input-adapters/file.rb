@@ -37,7 +37,14 @@ module Skylab::TreetopTools
       param :on_file_not_found, hook: true, writer: true
     end
     def events
-      @events ||= EVENTS.new(&block)
+      @events ||= begin
+        block = self.block
+        block ||= ->(p) do
+          p.on_file_is_dir    { |e| fail("file is dir: #{pathname}") }
+          p.on_file_not_found { |e| fail("file not found: #{pathname}") }
+        end
+        EVENTS.new(&block)
+      end
     end
     def file_is_dir
       (events.on_file_is_dir || ->(pathname, entity) do

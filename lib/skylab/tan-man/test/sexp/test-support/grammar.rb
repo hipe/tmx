@@ -24,6 +24,7 @@ module ::Skylab::TanMan::Sexp::TestSupport
       false
     end
     def info m ; emit(:info, m) end
+    public :info # for customized on_info_f handlers
     def invite
       info "try #{em "#{program_name} -h"} for help"
     end
@@ -65,6 +66,8 @@ module ::Skylab::TanMan::Sexp::TestSupport
       resolve_upstream(argv) or return
       execute
     end
+
+    attr_accessor :on_info_f
 
   protected
 
@@ -133,6 +136,7 @@ module ::Skylab::TanMan::Sexp::TestSupport
     end
 
     def load_parser_class
+      @on_info_f ||= ->(e) { info "      (loading parser #{e})" }
       ::Skylab::TreetopTools::Parser::Load.new(
         ->(o) do
           force_overwrite? and o.force_overwrite!
@@ -141,7 +145,7 @@ module ::Skylab::TanMan::Sexp::TestSupport
           grammars o
         end,
         ->(o) do
-          o.on_info { |e| info "      (loading parser #{e})" }
+          o.on_info(& @on_info_f )
           o.on_error { |e| fail("failed to load grammar: #{e}") }
         end
       ).invoke

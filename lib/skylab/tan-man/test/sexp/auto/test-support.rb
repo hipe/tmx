@@ -38,7 +38,18 @@ module ::Skylab::TanMan::Sexp::Auto::TestSupport
       context("using input #{input_path_stem}", *tags) do
         let(:input_path_stem) { input_path_stem }
         let(:input_string) { input_pathname.read }
-        instance_eval(&b)
+        module_eval(&b)
+      end
+    end
+    def using_input_string str, *tags, &b
+      desc = tags.shift if ::String === tags.first
+      desc ||= "using input string #{str.inspect}"
+      context(desc, *tags) do
+        let(:input_string) { str }
+        let(:result) do
+          client.parse_string input_string
+        end
+        module_eval(&b)
       end
     end
     PATHPART_RX = /\A(?<num>\d+(?:-\d+)*)(?:-(?<rest>.+))?\z/
@@ -48,20 +59,23 @@ module ::Skylab::TanMan::Sexp::Auto::TestSupport
         pn = grammars.dir_pathname.join grammar_pathpart
         let(:input_pathname) { pn.join("fixtures/#{input_path_stem}") }
         let(:client) do
-          # hack to allow more complext names like "60-content-pattern"
+          # hack to allow more complex names like "60-content-pattern"
           md = PATHPART_RX.match(grammar_pathpart)
           const = ["Grammar#{md[:num].gsub('-', '_')}",
             ("_#{ constantize md[:rest] }" if md[:rest]) ].join('').intern
           grammars.constants.include?(const) or
             load pn.join('client').to_s
-          grammars.const_get(const).new(nil, $stdin, $stderr)
+          client = grammars.const_get(const).new(nil, $stdin, $stderr)
+          initialize_client client
+          client
         end
-        instance_eval(&b)
+        module_eval(&b)
       end
     end
   end
   module InstanceMethods
     include ::Skylab::TanMan::Sexp::Inflection::InstanceMethods
     def input_path ; input_pathname.to_s end
+    def initialize_client client ; end # redefine with your own customizations
   end
 end

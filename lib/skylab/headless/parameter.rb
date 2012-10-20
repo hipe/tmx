@@ -69,8 +69,8 @@ module Skylab::Headless
   end
   class Parameter::Definer::Dynamic < ::Hash
     extend Parameter::Definer::ModuleMethods
-    def initialize &block
-      block.call self
+    def initialize
+      yield self
     end
   end
   module Parameter::Definer
