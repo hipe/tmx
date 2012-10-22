@@ -53,7 +53,7 @@ module Skylab::TanMan
         left = prototype = right = nil
         if before_item
           match_f = match_f_f[ before_item ]
-          right, idx = all.each.with_index.detect { |x, i| match_f[ x ] }
+          right, idx = all.each.with_index.detect { |x, _| match_f[ x ] }
           right or fail("node to insert before not found.")
           left = 0 == idx ? nil : all[idx - 1]
           right = all.detect { |n| match_f[ n ] or (left = n and nil) }
