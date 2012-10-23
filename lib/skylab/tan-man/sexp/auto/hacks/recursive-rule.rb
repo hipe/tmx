@@ -32,6 +32,8 @@ module Skylab::TanMan
     def self.enhance i, stem, item_getter, tail_getter, list_getter=nil
       (METHODS & i.tree_class.instance_methods).empty? or fail('sanity')
       i.tree_class._hacks.push :RecursiveRule #debugging-feature-only
+      i.tree_class.send(:include,
+                          Sexp::Auto::Hacks::RecursiveRule::SexpInstanceMethods)
       next_f = match_f_f = nil # forward-declare all these for scope
       match_f_f = ->(search_item) do
         if ::String === search_item
@@ -43,9 +45,6 @@ module Skylab::TanMan
       next_f = list_getter ?
         ->(node) { o = node[tail_getter] ; o and o[list_getter] } :
         ->(node) { node[tail_getter] }
-      i.tree_class.send(:define_method, :_append!) do |item|
-        _insert_before! item, nil
-      end
       i.tree_class.send(:define_method, :_insert_before!) do |item, before_item|
         all = _nodes.to_a
         all.length < 2 and fail("cannot insert into a list with less than#{
@@ -146,6 +145,20 @@ module Skylab::TanMan
       end
       define_items_method i.tree_class, stem
       nil
+    end
+  end
+  module Sexp::Auto::Hacks::RecursiveRule::SexpInstanceMethods
+    def _append! item
+      _insert_before! item, nil
+    end
+    def list?
+      true
+    end
+    attr_accessor :_prototype
+    def _prototypify!
+      blank_list_controller = self.class.new
+      blank_list_controller._prototype = self
+      blank_list_controller
     end
   end
 end

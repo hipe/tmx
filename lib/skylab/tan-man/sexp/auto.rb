@@ -58,6 +58,7 @@ module Skylab::TanMan
       tree_class.extend module_methods_module
       tree_class._members = members.freeze
       tree_class.expression = i.expression
+      tree_class.grammar = i.grammar_facade
       tree_class.rule = i.rule
       tree_class.members_of_interest = build_members_of_interest(i) || members
       add_instance_methods tree_class
@@ -142,6 +143,7 @@ module Skylab::TanMan
     end
 
     attr_accessor :expression
+    attr_accessor :grammar # a Grammar::Facade
     def _hacks ; @_hacks ||= [] end #debugging-feature-only
     attr_writer :_members # experimental frozen persistent object
     def _members ; @_members ||= members.freeze end
@@ -257,6 +259,17 @@ module Skylab::TanMan
     def expression?
       true
     end
+    def grammar_facade
+      const = "#{expression_extension_module_meta.grammar_const
+        }GrammarFacade".intern
+      if ! anchor_module.const_defined?(const, false)
+        anchor_module.const_set(const,
+          Sexp::Grammar::Facade.new(anchor_module,
+            expression_extension_module_meta.grammar_const)
+        )
+      end
+      anchor_module.const_get(const, false)
+    end
     def rule
       symbolize(expression_extension_module_meta.tail_stem.to_s).intern
     end
@@ -305,12 +318,12 @@ module Skylab::TanMan
     def anchor_module
       expression_extension_module_meta.anchor_module
     end
-    def grammar_module
-      expression_extension_module_meta.grammar_module
-    end
     def expression_extension_module_meta
       extension_module_metas.last
       # to see why this is last and not first, see test grammr 60
+    end
+    def grammar_module
+      expression_extension_module_meta.grammar_module
     end
   end
 
@@ -345,6 +358,10 @@ module Skylab::TanMan
         _parts[0..-3].reduce(::Object) { |m, x| m.const_get(x, false) }
     end
 
+    def grammar_const
+      _parts[-2]
+    end
+
     def grammar_module
       @grammar_module ||= anchor_module.const_get(grammar_const, false)
     end
@@ -366,10 +383,6 @@ module Skylab::TanMan
   protected
     def initialize mod
       @module = mod
-    end
-
-    def grammar_const
-      _parts[-2]
     end
 
     def _parts
@@ -492,8 +505,13 @@ module Skylab::TanMan
     def tree inference # the #recursive call
       elements = inference._node.elements
       (_members.length == elements.length) or fail('sanity: wrong # of els')
+      prev = nil
       _children = elements.zip(_members).map do |element, member|
-        element2tree element, member
+        tree = element2tree element, member
+        if ! tree and prev and hack = Sexp::Prototype.match(prev, self, member)
+          tree = hack.commit!
+        end
+        prev = tree # (used as result of map block)
       end
       new(* _children)
     end
