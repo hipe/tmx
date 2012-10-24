@@ -71,11 +71,19 @@ module Skylab::TanMan
           }than two items -- we need a prototype node for this hack to work.")
         prototype = prototype_a[ [1, [idx, prototype_a.length - 2].min ].max ]
         dupe_proto_member_f = ->(k) { prototype.class._dupe prototype, k }
-        if ::String === prototype[item_getter]
-          item_f = ->(_) { item }
-        else
-          fail("implement me -- non-string items")
-        end
+        item_f = -> do
+          ::String === item or fail("implement me -- non-string items")
+          # (for now we either do or don't parse the item string based on:)
+          if ::String === ( o = prototype[item_getter] )
+            ->(_) { item }
+          else
+            p = o.class.grammar.build_parser_for_rule o.class.rule
+            node = p.parse(item) or fail("failed to parse item to insert #{
+              (p.failure_reason || item).inspect}")
+            sexp = prototype.class.element2tree node, item_getter
+            ->(_) { sexp }
+          end
+        end.call
         if left # appending is painless
           born = self.class.new
           left[tail_getter] = born

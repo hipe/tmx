@@ -39,6 +39,10 @@ describe "#{::Skylab::TanMan::Sexp::Prototype} will be awesome" do
         lines.length.should eql(2)
         lines.last.should eql(o.unparse)
       end
+      it 'appends an invalid string as an item' do
+        result.node_list._append!('fzzzp')
+        result.node_list.unparse.should eql('fzzzp ;')
+      end
     end
     def initialize_client o ; o.on_info_f = ->(e) { } end #silence
   end
@@ -56,11 +60,17 @@ describe "#{::Skylab::TanMan::Sexp::Prototype} will be awesome" do
       it('enumerates') { thing.should eql(['fap', 'fep', 'fip']) }
     end
     using_input 'primordial' do
-      it 'has a "list controller" node, which enumerates', wip:true do
+      it 'appends a valid string as an item' do
         o = result.node_list
         o.should_not be_nil
         o.nodes.should eql([])
-        o._append! 'fizlip'
+        r = o._append! 'fiiiiip'
+        r.object_id.should eql(o.object_id)
+        o.unparse.should eql("fiiiiip\n")
+      end
+      it 'raises an exception if you try to append an invalid string' do
+        ->{ result.node_list._append!('fzzzp') }.should raise_error(
+          /failed to parse item to insert/)
       end
     end
 
