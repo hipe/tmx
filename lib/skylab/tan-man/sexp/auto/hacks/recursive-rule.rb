@@ -30,8 +30,13 @@ module Skylab::TanMan
     METHODS = [:_append!, :_insert_before!, :_items, :_remove!]
 
     def self.enhance i, stem, item_getter, tail_getter, list_getter=nil
+      stem = stem.intern ; item_getter = item_getter.intern
+      tail_getter = tail_getter.intern
+      list_getter and list_getter = list_getter.intern
       (METHODS & i.tree_class.instance_methods).empty? or fail('sanity')
       i.tree_class._hacks.push :RecursiveRule #debugging-feature-only
+      i.tree_class.send(:include,
+                          Sexp::Auto::Hacks::RecursiveRule::SexpInstanceMethods)
       next_f = match_f_f = nil # forward-declare all these for scope
       match_f_f = ->(search_item) do
         if ::String === search_item
@@ -43,57 +48,72 @@ module Skylab::TanMan
       next_f = list_getter ?
         ->(node) { o = node[tail_getter] ; o and o[list_getter] } :
         ->(node) { node[tail_getter] }
-      i.tree_class.send(:define_method, :_append!) do |item|
-        _insert_before! item, nil
-      end
+
+      # --*--
+
       i.tree_class.send(:define_method, :_insert_before!) do |item, before_item|
-        all = _nodes.to_a
-        all.length < 2 and fail("cannot insert into a list with less than#{
-          } two items -- we need a prototype node for this hack to work.")
-        left = prototype = right = nil
-        if before_item
-          match_f = match_f_f[ before_item ]
-          right, idx = all.each.with_index.detect { |x, i| match_f[ x ] }
-          right or fail("node to insert before not found.")
-          left = 0 == idx ? nil : all[idx - 1]
-          right = all.detect { |n| match_f[ n ] or (left = n and nil) }
-        else
-          left = all.last # length was asserted above so this must be non-nil
-          idx = all.length
-        end
-        target = self.class.new
-        duplicate_prototype_f = ->(k) do
-          case prototype[k]
-          when ::NilClass ; nil
-          when ::String ; prototype[k].dup
-          else ; fail('implement me - complex templatization')
+        existing_a = _nodes.to_a
+        idx, left, right = -> do
+          if before_item
+            match_f = match_f_f[ before_item ]
+            r, i = existing_a.each.with_index.detect { |x, _| match_f[ x ] }
+            r or fail("node to insert before not found.")
+            l = 0 == i ? nil : existing_a[i - 1]
+          else
+            l = existing_a.last # nil IFF adding to empty list
+            i = existing_a.length
+            r = nil
           end
-        end
-        prototype = all[ [1, [idx, all.length - 2].min ].max ]
-        if left
-          left[tail_getter] = target
-          init_f_h = ::Hash.new( duplicate_prototype_f )
-          result = target
-        else # inserting at root -- intense, hack similar to _remove! (see)
-          right = self[tail_getter]  # newly created will point to current 2nd
-          self[tail_getter] = target # root will point to newly created
-          swap = self[item_getter]   # hold on to current root content
-          self[item_getter] = item   # root now points to new content
-          item = swap                # newly created will point to current cont.
+          [i, l, r]
+        end.call
+        prototype_a = _prototype ? _prototype._nodes.to_a : existing_a
+        prototype_a.length < 2 and fail("cannot insert into a list with less #{
+          }than two items -- we need a prototype node for this hack to work.")
+        prototype = prototype_a[ [1, [idx, prototype_a.length - 2].min ].max ]
+        dupe_proto_member_f = ->(k) { prototype.class._dupe prototype, k }
+        item_f = -> do
+          ::String === item or fail("implement me -- non-string items")
+          # (for now we either do or don't parse the item string based on:)
+          if ::String === ( o = prototype[item_getter] )
+            ->(_) { item }
+          else
+            p = o.class.grammar.build_parser_for_rule o.class.rule
+            node = p.parse(item) or fail("failed to parse item to insert #{
+              (p.failure_reason || item).inspect}")
+            sexp = prototype.class.element2tree node, item_getter
+            ->(_) { sexp }
+          end
+        end.call
+        if left # appending is painless
+          born = self.class.new
+          left[tail_getter] = born
+          init_f_h = ::Hash.new( dupe_proto_member_f )
+          result = born
+        elsif right
+          # no left means inserting at root -- intense hack -- see _remove!
+          # born will end up in the second slot, root will get the new values
+          right = self[tail_getter] # future born.tail is current root.tail
+          born = self.class.new     #   (right was self, so ok to overwrite)
+          self[tail_getter] = born  # future root.tail is born
+          swap = self[item_getter]  # (hold current root.item)
+          self[item_getter] = item  # future root.item is new item
+          item = swap               # future born.item is current root.item
           init_f_h = ::Hash.new( ->(k) do
-            # for all of these, you want the newly created one to have the
-            # actual one that root used to have, and the absence where the
-            # root item used to be is is a copy of the template!!!
-            _swap = self[k]
-            self[k] = duplicate_prototype_f[ k ]
+            _swap = self[k] # future born members are current root members
+            self[k] = dupe_proto_member_f[ k ] # future root members are nu node
             _swap
           end )
           result = self
+        else # inserting at root on an empty list
+          born = result = self
+          init_f_h = ::Hash.new( ->(k) do
+            born[k].nil? ? dupe_proto_member_f[ k ] : born[k]
+          end )
         end
-        init_f_h[item_getter] = ->(_) { item }
+        init_f_h[item_getter] = item_f
         init_f_h[tail_getter] = ->(_) { right }
         self.class._members.each do |m|
-          target[m] = init_f_h[m].call(m)
+          born[m] = init_f_h[m].call(m)
         end
         result
       end
@@ -146,6 +166,20 @@ module Skylab::TanMan
       end
       define_items_method i.tree_class, stem
       nil
+    end
+  end
+  module Sexp::Auto::Hacks::RecursiveRule::SexpInstanceMethods
+    def _append! item
+      _insert_before! item, nil
+    end
+    def list?
+      true
+    end
+    attr_accessor :_prototype
+    def _prototypify!
+      blank_list_controller = self.class.new
+      blank_list_controller._prototype = self
+      blank_list_controller
     end
   end
 end

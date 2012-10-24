@@ -1,0 +1,42 @@
+module Skylab::TanMan::Sexp::TestSupport::Prototype::Grammars::Namespace70_75
+  grammar NeepZeep70_75
+    rule document
+      'beginning' s node_list 'ending' s?
+      {
+        def tree
+          ::Skylab::TanMan::Sexp::Auto::Lossless::Recursive[ self ]
+        end
+      }
+    end
+    rule node_list
+      (node sep tail:('' node_list)?)?
+    end
+    rule sep
+      s? ';' s? / s
+    end
+    rule node
+      'f' content:[aeiour]+ 'p'
+    end
+    rule s
+      (white / comment) s?
+      { def tree ; text_value end } # we want tests to pass w or w/o this line
+    end
+    rule white
+      [ \t\n\r]+
+    end
+    rule comment
+      c_style_comment / shell_style_comment
+    end
+    rule c_style_comment
+      '/*'
+      (
+        !'*/'
+        ( . / [\n\r]+ )
+      )*
+      '*/'
+    end
+    rule shell_style_comment
+      '#' ( ![\n\r] . )*
+    end
+  end
+end

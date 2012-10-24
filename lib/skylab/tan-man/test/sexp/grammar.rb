@@ -1,6 +1,6 @@
 require 'optparse'
 require 'stringio'
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module ::Skylab::TanMan::Sexp::TestSupport
   module CLI_Client_InstanceMethods
@@ -100,7 +100,7 @@ module ::Skylab::TanMan::Sexp::TestSupport
     end
 
     def anchor_dir_pathname
-      @anchor_dir_pathname ||= Grammars.dir_pathname.join stem_path
+      @anchor_dir_pathname ||= grammars_module.dir_pathname.join stem_path
     end
 
     attr_accessor :eval_string
@@ -133,6 +133,16 @@ module ::Skylab::TanMan::Sexp::TestSupport
 
     def force_overwrite?
       false # in flux -- sometimes we blow away the tmpdir once
+    end
+
+    def self.grammars_module
+      @grammars_module ||= begin
+        self.to_s.split('::')[0..-2].reduce(::Object) { |m, k| m.const_get(k) }
+      end
+    end
+
+    def grammars_module
+      self.class.grammars_module
     end
 
     def load_parser_class

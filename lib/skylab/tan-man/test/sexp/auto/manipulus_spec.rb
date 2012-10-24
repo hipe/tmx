@@ -5,14 +5,6 @@ describe "#{::Skylab::TanMan::Sexp::Auto} MANIPULULS" do
 
   using_grammar '70-75-minimal-recursive-list' do
     # adopts language from XML DOM API: insertBefore, appendChild, removeChild
-    using_input_string '', 'an empty input string' do
-      # this is wip or erase until you change grammar to work with empty string
-      it 'adding befere nil (appending) fails b/c ne prototype', wip:true do
-        -> do
-          result._append!('nouveau')
-        end.should raise_exception(/zeepie deepie/)
-      end
-    end
     using_input_string 'fip ;  ', 'a one element input string' do
       context 'adds' do
         it 'before first' do
@@ -105,6 +97,6 @@ describe "#{::Skylab::TanMan::Sexp::Auto} MANIPULULS" do
     end
   end
   def initialize_client client
-    client.on_info_f = ->(e) { } # silence "creating / using ...treetop.rb"
+    client.on_info_f = ->(e) { } # #silence "creating / using ...treetop.rb"
   end
 end
