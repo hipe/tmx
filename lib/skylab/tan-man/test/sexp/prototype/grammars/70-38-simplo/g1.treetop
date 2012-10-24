@@ -1,0 +1,28 @@
+module Skylab::TanMan::Sexp::TestSupport::Prototype::Grammars::Namespace70_38
+  grammar Grammar70_38
+    rule document
+      s:s? node_list:node_list?
+      {
+        def tree
+          ::Skylab::TanMan::Sexp::Auto::Lossless::Recursive[ self ]
+        end
+      }
+    end
+    rule node_list
+      s? node:( 'f' [aeiour]+ 'p' ) tail:(sep node_list:node_list)? sep?
+    end
+    rule sep
+      s? ';' s? / s
+    end
+    rule s
+      (white / comment) s?
+      { def tree ; text_value end }
+    end
+    rule white
+      [ \t\r\n]+
+    end
+    rule comment
+      '#' ( ![\n\r] . )*
+    end
+  end
+end

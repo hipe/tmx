@@ -132,6 +132,17 @@ module Skylab::TanMan
     include Sexp::Auto::Constants # CUSTOM_PARSE_TREE_METHOD_NAME
     include Sexp::Auto::BuildMethods # node2tree et. al
 
+    def _dupe node, member # experimental
+      # (temporary, fine-grained & centralized logic for this)
+      case( o = node[member] )
+      when ::NilClass     ; nil
+      when ::String       ; o.dup
+      when ::Struct       ; o.class[ * o.class._members.map { |m| _dupe o, m } ]
+      when Sexp::Auto::List ; o.class[ * o.length.times.map { |i| _dupe o, i } ]
+      else                ; fail("implement me -- #{o.class}")
+      end
+    end
+
     def element2tree element, member_name # extent: solo def, 2 calls
       if ! element
         nil # typically as a trailing optional node
