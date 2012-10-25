@@ -27,6 +27,15 @@ module Skylab::TanMan
       if instance_methods_module
         tree_class.send :include, instance_methods_module
       end
+      im = [:Sexp, :InstanceModules, Sexp::Auto.constantize(tree_class.rule)].
+        reduce( tree_class.grammar.anchor_module ) do |m, x|
+        m.const_defined?(x, false) or break;
+        m.const_get(x, false)
+      end
+      if im
+        tree_class.send :include, im
+      end
+      nil
     end
 
     NUM_RX = /\d+\z/
@@ -54,7 +63,7 @@ module Skylab::TanMan
 
     def build_tree_class i # extent: solo def, 1 call
       members = build_element_names i
-      tree_class = ::Struct.new(* members)
+      tree_class = ::Class.new(::Struct.new(* members)) # (bc extension modules)
       tree_class.extend module_methods_module
       tree_class._members = members.freeze
       tree_class.expression = i.expression

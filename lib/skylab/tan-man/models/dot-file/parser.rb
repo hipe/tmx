@@ -1,5 +1,5 @@
 require 'skylab/treetop-tools/core'
-require_relative 'sexps' # before sexp/auto creates any
+require_relative 'sexp' # load now, auto.rb doesn't assume it exists
 
 module Skylab::TanMan
   Models::DotFile::SyntaxNodes and nil # load it here & now
