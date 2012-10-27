@@ -26,7 +26,13 @@ module Skylab::TanMan::Models::DotFile::Parser::TestSupport
       before(:all) { _my_before_all }
       let(:client) do
         _runtime = TanMan::API::Achtung::BUILD_RUNTIME_F.call($stderr, $stderr)
-        ParserProxy.new _runtime, dir_path: ::File.expand_path('..', __FILE__)
+        o = ParserProxy.new(_runtime,
+          dir_path: ::File.expand_path('..', __FILE__))
+        if ! debug_parser_loading
+          o.on_load_parser_info_f = ->(e) { }
+          o.profile = false
+        end
+        o
       end
       let(:input_pathname) do
         client.dir_pathname.join("../fixtures/#{input_path_stem}")
@@ -50,15 +56,6 @@ module Skylab::TanMan::Models::DotFile::Parser::TestSupport
     attr_accessor :dir_path
     def dir_pathname
       @dir_pathname ||= (dir_path and ::Pathname.new(dir_path))
-    end
-
-    SIMPLE_ABSPATH_RX = %r{/[-_./a-z0-9]*}i # just a jerky experiment
-    PATH_TOOLS = ::Object.new.extend(::Skylab::Face::PathTools::InstanceMethods)
-      # this looks awful but we want to avoid any interference with tests etc
-
-    def on_parser_info msg
-      msg = msg.gsub(SIMPLE_ABSPATH_RX) { |p| PATH_TOOLS.pretty_path p }
-      info "      (#{msg})"
     end
 
     def parser_result result

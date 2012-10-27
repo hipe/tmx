@@ -28,12 +28,39 @@ describe "#{Skylab::TanMan::Models::DotFile} Manipulus 700 series" do
         "label=\"Tangent with the C Programming Language\"")
       _retrieve_label_statement.should eql(nil)
     end
-    # it "it can add a label"
     def _retrieve_label_statement
       result.stmt_list.stmts.detect do |s|
         :equals_stmt == s.class.rule && 'label' == s.lhs.string
       end
     end
     let(:label_statement) { _retrieve_label_statement }
+  end
+
+  def _can_set_and_create_the_label
+    o = result
+    o.get_label.should be_nil
+    o.set_label! 'Zeepadeep doobop'
+    o.get_label.should eql('Zeepadeep doobop')
+    full = o.unparse
+    full.should be_include('label="Zeepadeep doobop"')
+    o.set_label! 'bipbap'
+    full = o.unparse
+    full.should_not be_include('Zeep')
+    # the ending should not look like this: "foo}\n"
+    (md = /(?<space>.)}[[:space:]]*\z/m.match(full)).should_not be_nil
+    md[:space].should match(/\A[[:space:]]\z/)
+    nil
+  end
+
+  using_input '710-label-prototype.dot' do
+    it 'can set (AND CREATE) the label' do
+      _can_set_and_create_the_label
+    end
+  end
+
+  using_input '711-label-proto-shell-style.dot' do
+    it 'can set (AND CREATE) the label' do
+      _can_set_and_create_the_label
+    end
   end
 end

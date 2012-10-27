@@ -96,7 +96,4 @@ describe "#{::Skylab::TanMan::Sexp::Auto} MANIPULULS" do
       end
     end
   end
-  def initialize_client client
-    client.on_info_f = ->(e) { } # #silence "creating / using ...treetop.rb"
-  end
 end

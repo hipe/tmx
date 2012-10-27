@@ -1,12 +1,14 @@
-require 'skylab/treetop-tools/core'
 require_relative '../../sexp/auto'
 
 module Skylab::TanMan
   module Statement::Parser::InstanceMethods
-    include ::Skylab::TreetopTools::Parser::InstanceMethods
+    include TanMan::Parser::InstanceMethods
     ENTITY_NOUN_STEM = 'statement'
   protected
     def load_parser_class
+      f = on_load_parser_info_f ||
+        ->(e){ info "#{em '-->'} #{pretty_path_hack e.to_s}" }
+
       ::Skylab::TreetopTools::Parser::Load.new(
         ->(o) do
           # o.force_overwrite!
@@ -15,7 +17,7 @@ module Skylab::TanMan
           o.treetop_grammar 'statement/parser/statement.treetop'
         end,
         ->(o) do
-           o.on_info { |e| info "#{em '*'} #{e}" }
+           o.on_info(& f )
            o.on_error { |e| fail("failed to load grammar: #{e}") }
         end
       ).invoke

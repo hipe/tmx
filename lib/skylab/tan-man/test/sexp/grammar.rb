@@ -24,7 +24,6 @@ module ::Skylab::TanMan::Sexp::TestSupport
       false
     end
     def info m ; emit(:info, m) end
-    public :info # for customized on_info_f handlers
     def invite
       info "try #{em "#{program_name} -h"} for help"
     end
@@ -67,10 +66,7 @@ module ::Skylab::TanMan::Sexp::TestSupport
       execute
     end
 
-    attr_accessor :on_info_f
-
   protected
-
 
     NUM_RX = /\A([A-Za-z]+(?:::[A-Za-z]+)+)\d+[^:]+\z/
 
@@ -146,7 +142,9 @@ module ::Skylab::TanMan::Sexp::TestSupport
     end
 
     def load_parser_class
-      @on_info_f ||= ->(e) { info "      (loading parser #{e})" }
+      f = on_load_parser_info_f ||
+        ->(e) { info "      (loading parser ^_^ #{pretty_path_hack e.to_s})" }
+
       ::Skylab::TreetopTools::Parser::Load.new(
         ->(o) do
           force_overwrite? and o.force_overwrite!
@@ -155,7 +153,7 @@ module ::Skylab::TanMan::Sexp::TestSupport
           grammars o
         end,
         ->(o) do
-          o.on_info(& @on_info_f )
+          o.on_info(& f )
           o.on_error { |e| fail("failed to load grammar: #{e}") }
         end
       ).invoke

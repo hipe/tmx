@@ -44,7 +44,6 @@ describe "#{::Skylab::TanMan::Sexp::Prototype} will be awesome" do
         result.node_list.unparse.should eql('fzzzp ;')
       end
     end
-    def initialize_client o ; o.on_info_f = ->(e) { } end #silence
   end
 
   using_grammar '70-75-with-prototype' do
@@ -75,7 +74,6 @@ describe "#{::Skylab::TanMan::Sexp::Prototype} will be awesome" do
     end
 
     # --*--
-    def initialize_client o ; o.on_info_f = ->(e) { } end #silence
     def thing
       result.node_list.nodes.map(&:unparse)
     end

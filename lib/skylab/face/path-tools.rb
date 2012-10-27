@@ -4,6 +4,9 @@ require 'shellwords'
 module Skylab end
 module Skylab::Face end
 module Skylab::Face::PathTools
+  module Constants
+    ABSOLUTE_PATH_HACK_RX = %r{/[-_./a-z0-9]+}i # just a jerky experiment, #todo
+  end
   home = home_re = pwd = pwd_re = pwd_re_2 = nil
   HOME = ->{ home ||= ::ENV['HOME'] }
   HOME_RE =  ->{ home_re ||= %r[\A#{::Regexp.escape HOME.call}(?=/|\z)] }

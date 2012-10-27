@@ -217,6 +217,29 @@ module Skylab::TanMan
 
   # --*--
 
+  class Sexp::Auto::ContentTextValue < ::Struct.new(:content_text_value)
+    # Exeperimental: Use this as a sexp builder in your grammars (with []) where
+    # you want to flatten a rule into its text value, but rather than use
+    # just a string as the Sexp node, you want this one extra level in it as
+    # a wrapper.
+    #
+    # This is a tree building strategy that: gives you a struct
+    # with a single member called content_text_value that holds
+    # the text_value of the syntax node. Experimental!
+    #
+
+    include Sexp::Auto::InstanceMethods
+    def self.[] syntax_node
+      super syntax_node.text_value
+    end
+    _a = [:content_text_value].freeze
+    singleton_class.send(:define_method, :_members) { _a }
+    alias_method :unparse, :content_text_value
+    alias_method :string, :content_text_value
+  end
+
+  # --*--
+
   class Sexp::Auto::Inference < ::Struct.new(
     :extension_module_metas,
     :member,
