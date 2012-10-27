@@ -70,7 +70,7 @@ module Skylab::TanMan
         prototype_a.length < 2 and fail("cannot insert into a list with less #{
           }than two items -- we need a prototype node for this hack to work.")
         prototype = prototype_a[ [1, [idx, prototype_a.length - 2].min ].max ]
-        dupe_proto_member_f = ->(k) { prototype.class._dupe prototype, k }
+        dupe_proto_member_f = ->(k) { prototype.__dupe_member k }
         item_f = -> do
           ::String === item or fail("implement me -- non-string items")
           # (for now we either do or don't parse the item string based on:)

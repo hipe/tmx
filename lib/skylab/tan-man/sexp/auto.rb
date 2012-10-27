@@ -141,17 +141,6 @@ module Skylab::TanMan
     include Sexp::Auto::Constants # CUSTOM_PARSE_TREE_METHOD_NAME
     include Sexp::Auto::BuildMethods # node2tree et. al
 
-    def _dupe node, member # experimental
-      # (temporary, fine-grained & centralized logic for this)
-      case( o = node[member] )
-      when ::NilClass     ; nil
-      when ::String       ; o.dup
-      when ::Struct       ; o.class[ * o.class._members.map { |m| _dupe o, m } ]
-      when Sexp::Auto::List ; o.class[ * o.length.times.map { |i| _dupe o, i } ]
-      else                ; fail("implement me -- #{o.class}")
-      end
-    end
-
     def element2tree element, member_name # extent: solo def, 2 calls
       if ! element
         nil # typically as a trailing optional node
@@ -179,12 +168,51 @@ module Skylab::TanMan
   end
 
   module Sexp::Auto::InstanceMethods
-    def list? ; false end
+    # For now, methods defined here must have names that do *not* match
+    # /\A[_a-z][a-z0-9][a-z0-9_]*\z/  (i.e. all the methods you define here
+    # must have either a '__' at the beginning, or a '!', '?' in them (for now))
+    #
+    # The above regex represents a "method namespace" that it reserved for names
+    # derived from rule and expression names in the client grammar,
+    # and method names in any client extension modules (that aren't intending
+    # to override these).
+
+    def __dupe
+      # for now, __dupe'ing is used solely for using prototypes
+      self.class.new( * self.class._members.map { |m| __dupe_member m } )
+    end
+
+    def __dupe_member member
+      o = self[member]
+      if o.respond_to?(:__dupe)
+        o.__dupe
+      else
+        case o
+        when ::NilClass ; nil
+        when ::String   ; o.dup
+        else            ; fail("implement me -- #{o.class}")
+        # see doc/sexp.md/"Representing Numeric Values in Sexps"
+        end
+      end
+    end
+
+    def list? # is this sexp node a list-like node?
+      false
+    end
   end
 
   class Sexp::Auto::List < ::Array
-    include Sexp::Auto::InstanceMethods # important
-    def list? ; true end # used only for sanity checks (?)
+    include Sexp::Auto::InstanceMethods
+
+    def __dupe
+      other = self.class.new length
+      length.times.each { |i| other[i] = __dupe_member i }
+      other
+    end
+
+    def list?
+      true
+    end
   end
 
   # --*--
