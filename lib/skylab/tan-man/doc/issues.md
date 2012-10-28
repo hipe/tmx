@@ -1,3 +1,7 @@
+[#010] #open 2012-10-27 associate two nodes
+  1. sic, 2. redudantly, 3. agent not exist 4. target not exist
+[#009] #open 2012-10-27 create a node
+  1. with one template (3 permutations) 2. with another template (3 permutes)
 [#008] #done 2012-10-10 #rename rename "nt" to "expression" / "rule"
 [#007] #open 2012-09-29 #small #critical models/ dir generated during specs
 [#006] #open 2012-09-27 #one-day look into reflection via metagrammer instead

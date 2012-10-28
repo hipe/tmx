@@ -1,9 +1,7 @@
-require_relative '../parser/test-support'
-require_relative '../../../sexp/auto/test-support'
+require_relative '../test-support'
 
-describe "#{Skylab::TanMan::Models::DotFile} Manipulus 700 series" do
-  extend ::Skylab::TanMan::Sexp::Auto::TestSupport
-  extend ::Skylab::TanMan::Models::DotFile::Parser::TestSupport
+describe "#{Skylab::TanMan::Models::DotFile} Manipulus 701 series" do
+  extend ::Skylab::TanMan::Models::DotFile::TestSupport
 
   using_input '705-label.dot' do
     it 'can change the value (rhs) of the label, escaping when necessary' do
