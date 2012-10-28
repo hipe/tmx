@@ -1,4 +1,4 @@
-require_relative 'sexp' # load now, auto.rb doesn't assume it exists
+require_relative 'sexp/instance-methods' # load now, per issue #sky-106
 
 module Skylab::TanMan
   Models::DotFile::SyntaxNodes and nil # load it here & now

@@ -27,7 +27,7 @@ module Skylab::TanMan
       if instance_methods_module
         tree_class.send :include, instance_methods_module
       end
-      im = [:Sexp, :InstanceModules, Sexp::Auto.constantize(tree_class.rule)].
+      im = [:Sexp, :InstanceMethods, Sexp::Auto.constantize(tree_class.rule)].
         reduce( tree_class.grammar.anchor_module ) do |m, x|
         m.const_defined?(x, false) or break;
         m.const_get(x, false)

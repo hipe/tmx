@@ -1,24 +1,4 @@
-module Skylab::TanMan::Models::DotFile::Sexp end
-
-module Skylab::TanMan::Models::DotFile::Sexp::InstanceModules
-
-  module DoubleQuotedString
-    def string
-      content_text_value.gsub('\"', '"')
-    end
-  end
-
-  module EqualsStmt
-    # this is a *big* experiment -- expect this to change a lot
-    def rhs= mixed
-      ::String === mixed or fail('huh?')
-      p = self.class.grammar.build_parser_for_rule(:id)
-      node = p.parse mixed
-      node ||= p.parse "\"#{mixed.gsub('"', '\"')}\""
-      node or fail "sanity - what such string is invalid? #{p.failure_reason}"
-      super self.class.element2tree(node, :rhs)
-    end
-  end
+module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
 
   module Graph
     def _first_label_stmt
@@ -29,6 +9,16 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceModules
     def get_label
       equals_stmt = _first_label_stmt
       equals_stmt.rhs.string if equals_stmt
+    end
+    def _nodes
+      ::Enumerator.new do |y|
+        stmt_list.stmts.each do |s|
+          :node_stmt == s.class.rule and y << s
+        end
+      end
+    end
+    def nodes
+      _nodes.to_a
     end
     def set_label! str
       equals_stmt = _first_label_stmt
