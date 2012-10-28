@@ -1,14 +1,19 @@
-require 'skylab/treetop-tools/core'
-require_relative 'sexps' # before sexp/auto creates any
+require_relative 'sexp' # load now, auto.rb doesn't assume it exists
 
 module Skylab::TanMan
   Models::DotFile::SyntaxNodes and nil # load it here & now
   module Models::DotFile::Parser end
   module Models::DotFile::Parser::InstanceMethods
-    include ::Skylab::TreetopTools::Parser::InstanceMethods
+    include TanMan::Parser::InstanceMethods
+
     ENTITY_NOUN_STEM = 'dot file'
+
   protected
     def load_parser_class
+
+      f = on_load_parser_info_f ||
+        ->(e) { info "#{em '^_^'} #{pretty_path_hack e.to_s}" }
+
       ::Skylab::TreetopTools::Parser::Load.new(
         ->(o) do
           force_overwrite? and o.force_overwrite!
@@ -18,7 +23,7 @@ module Skylab::TanMan
           o.treetop_grammar 'dot-language.generated.treetop'
         end,
         ->(o) do
-           o.on_info { |e| on_parser_info e }
+           o.on_info(& f)
            o.on_error { |e| fail("failed to load grammar: #{e}") }
         end
       ).invoke
@@ -61,9 +66,6 @@ module Skylab::TanMan
       else
         "In #{ input_adapter.entity_noun_stem }:#{ line_col }"
       end
-    end
-    def on_parser_info e
-      info "#{em '*'} #{e}"
     end
     def parser_failure_reason
       [ in_file, expecting, * excerpt_lines ].compact.join("\n")

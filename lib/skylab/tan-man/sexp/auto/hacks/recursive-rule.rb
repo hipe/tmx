@@ -70,11 +70,12 @@ module Skylab::TanMan
         prototype_a.length < 2 and fail("cannot insert into a list with less #{
           }than two items -- we need a prototype node for this hack to work.")
         prototype = prototype_a[ [1, [idx, prototype_a.length - 2].min ].max ]
-        dupe_proto_member_f = ->(k) { prototype.class._dupe prototype, k }
+        dupe_proto_member_f = ->(k) { prototype.__dupe_member k }
         item_f = -> do
-          ::String === item or fail("implement me -- non-string items")
-          # (for now we either do or don't parse the item string based on:)
-          if ::String === ( o = prototype[item_getter] )
+          if ! (::String === item) # validating this would be expensive
+            ->(_) { item }
+          elsif ::String === ( o = prototype[item_getter] )
+          # (for now we either do or don't parse the item string based on above)
             ->(_) { item }
           else
             p = o.class.grammar.build_parser_for_rule o.class.rule
@@ -109,6 +110,10 @@ module Skylab::TanMan
           init_f_h = ::Hash.new( ->(k) do
             born[k].nil? ? dupe_proto_member_f[ k ] : born[k]
           end )
+          if next_f[ prototype ]
+            fail('fix me! -- we don\'t want next nodes in prototypes')
+          end
+          right = dupe_proto_member_f[tail_getter] # for newlines e.g. in protos
         end
         init_f_h[item_getter] = item_f
         init_f_h[tail_getter] = ->(_) { right }
@@ -179,6 +184,7 @@ module Skylab::TanMan
     def _prototypify!
       blank_list_controller = self.class.new
       blank_list_controller._prototype = self
+      blank_list_controller.extend Sexp::Prototype::SexpInstanceMethods
       blank_list_controller
     end
   end

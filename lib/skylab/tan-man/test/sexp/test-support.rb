@@ -57,7 +57,7 @@ module ::Skylab::TanMan::Sexp::TestSupport
           grammars.constants.include?(const) or
             load pn.join('client').to_s
           client = grammars.const_get(const).new(nil, $stdin, $stderr)
-          initialize_client client
+          debug_parser_loading or client.on_load_parser_info_f = ->(e) { }
           client
         end
         module_eval(&b)
@@ -66,7 +66,8 @@ module ::Skylab::TanMan::Sexp::TestSupport
   end
   module InstanceMethods
     include ::Skylab::Autoloader::Inflection::Methods # constantize (sib. mod.)
-    def initialize_client client # redefine with your own customizations
+    def debug_parser_loading
+      false
     end
     def input_path
       input_pathname.to_s
