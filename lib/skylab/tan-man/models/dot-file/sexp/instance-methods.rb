@@ -1,6 +1,25 @@
 module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
   extend ::Skylab::Autoloader
 
+  module Common
+    def _label2id_stem label_str
+      md = /\A(?<stem>\w+)/.match label_str
+      md ? md[:stem] : 'node'
+    end
+
+    # this is a *big* experiment -- expect this to change a lot
+    def _parse_id str, member=nil
+      ::String === str or fail("sanity -- just making extra sure we have this")
+      p = self.class.grammar.build_parser_for_rule :id
+      node = p.parse str
+      node ||= p.parse "\"#{str.gsub('"', '\"')}\""
+      node or fail "sanity - what such string is invalid? #{p.failure_reason}"
+      self.class.element2tree(node, member) # note member might be nil
+    end
+  end
+
+  # --*--
+
   module DoubleQuotedString
     def string
       content_text_value.gsub('\"', '"')
@@ -8,16 +27,14 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
   end
 
   module EqualsStmt
-    # this is a *big* experiment -- expect this to change a lot
+    include Common
     def rhs= mixed
-      ::String === mixed or fail('huh?')
-      p = self.class.grammar.build_parser_for_rule(:id)
-      node = p.parse mixed
-      node ||= p.parse "\"#{mixed.gsub('"', '\"')}\""
-      node or fail "sanity - what such string is invalid? #{p.failure_reason}"
-      super self.class.element2tree(node, :rhs)
+      self[:rhs] = _parse_id(mixed, :rhs)
     end
   end
 
-  self::Graph && nil # #sky-106
+  self::Graph || nil # #sky-106
+
+  self::NodeStmt || nil # #sky-106
+
 end
