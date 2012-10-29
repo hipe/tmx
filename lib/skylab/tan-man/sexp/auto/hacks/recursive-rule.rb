@@ -44,6 +44,7 @@ module Skylab::TanMan
           ->(node) { search_item.object_id == node[item_getter].object_id }
         end
       end
+
       next_f = if list_getter then
         ->(node) do
           o = node[tail_getter]
@@ -54,99 +55,131 @@ module Skylab::TanMan
         ->(node) { node[tail_getter] }
       end
 
-      # --*--
+      # -- (item insertion helper lambdas) --
+
+      _normalize_item_f = ->(item, proto) do
+        if ! (::String === item)         # item is presumably sexp
+          item                           # ..and validating it would be hard
+        elsif ::String === ( o = proto[item_getter] ) # both strings
+          item                           # so again, validating is meh
+        else
+          p = o.class.grammar.build_parser_for_rule o.class.rule
+          node = p.parse(item) or fail("failed to parse item to insert #{
+            (p.failure_reason || item).inspect}")
+          sexp = proto.class.element2tree node, item_getter
+          sexp
+        end
+      end
+
+      _idx_left_right_f = ->(before_item, existing_a) do
+        if before_item
+          match_f = match_f_f[ before_item ]
+          r, i = existing_a.each.with_index.detect { |x, _| match_f[ x ] }
+          r or fail("node to insert before not found.")
+          l = 0 == i ? nil : existing_a[i - 1]
+        else
+          l = existing_a.last # nil IFF adding to empty list
+          i = existing_a.length
+          r = nil
+        end
+        [i, l, r]
+      end
+
+      _proto_f = ->(me, existing_a, idx) do
+        proto_a = me._prototype ? me._prototype._nodes.to_a : existing_a
+        proto_a.length < 2 and fail("cannot insert into a list with less #{
+          }than two items -- we need a prototype node for this hack to work.")
+        _proto_idx = [1, [idx, proto_a.length - 2].min ].max
+        proto_a[_proto_idx]
+      end
+
+      _tail_f_f = ->(right, proto) do
+        # nasty : we want "born" to have a dupe of the tail sexp "proto" iff
+        # there is not already a "right" node to use and the prototype does
+        # not itself have a right node.  This only makes sense in the case of
+        # there being list_getters (else the prototype's right node and tail
+        # sexp are one and the same).  We must do all of this before we re-
+        # assign any members of "left" becasuse left may itself be the
+        # prototype node omfg!!! #todo
+        #
+        use_tail = if right then right
+                   elsif list_getter and ! next_f[ proto ]
+                     proto.__dupe_member tail_getter
+                   else nil end
+        ->(_) { use_tail }
+      end
+
+      # -- List Item Insertion Lambdas (in ascending order of complexity) --
+
+      _initial_f = ->(me, proto) do
+        # The strategy for initial insertion of an item into an empty list
+        # ("list controller") is simply to use the defaults for tail_getter
+        # and item_getter and for the remaining members, for those that are
+        # non-nil make a dupe of the corresponding member from the prototype.
+        #
+        [me, me, ::Hash.new(->(m){me[m].nil? ? proto.__dupe_member(m) : me[m]})]
+      end
+
+      _insert_f = ->(me, proto, left, right) do
+        # For inserting an item under an existing parent (left) node ..
+        born = me.class.new
+        f_h = ::Hash.new ->(m) { proto.__dupe_member m }
+        f_h[tail_getter] = _tail_f_f[ right, proto ] # "left" might itself
+        # be the prototype so call the above now before you mutate it!
+        if list_getter
+          left[tail_getter] or fail('sanity -- expecing foo_list here')
+          left[tail_getter][list_getter] and fail('sanity - expecting no list')
+          left[tail_getter][list_getter] = born
+        else
+          left[tail_getter] && left[tail_getter].object_id != right.object_id &&
+            fail('sanity - lol wat am i doing')
+          left[tail_getter] = born
+        end
+        [born, born, f_h]
+      end
+
+      _swap_f = ->(me, proto, item) do
+        # No left means inserting at root -- an intense hack, see _remove!
+        # born lives in second slot, swapping members with root
+        born = me.class.new
+        f_h = ::Hash.new( ->(m) do # The default behavior for born node members
+          swap = me[m]             # is to give them what was once at root,
+          me[m] = proto.__dupe_member m # and at the same time do this to root
+          swap
+        end )
+        original_root_tail = me[tail_getter]
+        f_h[tail_getter] = ->(_) { original_root_tail }
+        me[tail_getter] = born # think how whacktastic this is
+
+        original_root_item = me[item_getter]
+        f_h[item_getter] = ->(_) { original_root_item }
+        me[item_getter] = _normalize_item_f[ item, proto ]
+
+        [me, born, f_h]
+      end
 
       i.tree_class.send(:define_method, :_insert_before!) do |item, before_item|
         existing_a = _nodes.to_a
-        idx, left, right = -> do
-          if before_item
-            match_f = match_f_f[ before_item ]
-            r, i = existing_a.each.with_index.detect { |x, _| match_f[ x ] }
-            r or fail("node to insert before not found.")
-            l = 0 == i ? nil : existing_a[i - 1]
-          else
-            l = existing_a.last # nil IFF adding to empty list
-            i = existing_a.length
-            r = nil
-          end
-          [i, l, r]
-        end.call
-        prototype_a = _prototype ? _prototype._nodes.to_a : existing_a
-        prototype_a.length < 2 and fail("cannot insert into a list with less #{
-          }than two items -- we need a prototype node for this hack to work.")
-        proto_idx = [1, [idx, prototype_a.length - 2].min ].max
-        prototype = prototype_a[proto_idx]
-        dupe_proto_member_f = ->(k) { prototype.__dupe_member k }
-        item_f = -> do
-          if ! (::String === item) # validating this would be expensive
-            ->(_) { item }
-          elsif ::String === ( o = prototype[item_getter] )
-          # (for now we either do or don't parse the item string based on above)
-            ->(_) { item }
-          else
-            p = o.class.grammar.build_parser_for_rule o.class.rule
-            node = p.parse(item) or fail("failed to parse item to insert #{
-              (p.failure_reason || item).inspect}")
-            sexp = prototype.class.element2tree node, item_getter
-            ->(_) { sexp }
-          end
-        end.call
-        right_f = -> do
-          if ! right && proto_idx == prototype_a.length - 1
-            right = dupe_proto_member_f[ tail_getter ] # for newlines in proto
-          end
+        idx, left, right = _idx_left_right_f[ before_item, existing_a ]
+        proto = _proto_f[ self, existing_a, idx ]
+        result, target, f_h = if left then _insert_f[  self, proto, left, right]
+        elsif right                   then _swap_f[    self, proto, item ]
+        else                               _initial_f[ self, proto ] end
+        unless f_h.key? item_getter
+          use_item = _normalize_item_f[ item, proto ]
+          f_h[item_getter] = ->(_) { use_item }
         end
-        if left # appending is somewhat painless
-          born = self.class.new
-          right or right_f.call
-          if list_getter
-            left[tail_getter] or fail('sanity -- expecing a foo_list node here')
-            left[tail_getter][list_getter] and fail('sanity - lol wat')
-            left[tail_getter][list_getter] = born
-          else
-            if left[tail_getter]
-              left[tail_getter].object_id == right.object_id or
-                fail('sanity - lol wat am i doing')
-            end
-            left[tail_getter] = born
-          end
-          init_f_h = ::Hash.new( dupe_proto_member_f )
-          result = born
-        elsif right
-          # no left means inserting at root -- intense hack -- see _remove!
-          # born will end up in the second slot, root will get the new values
-          right = self[tail_getter] # future born.tail is current root.tail
-          born = self.class.new     #   (right was self, so ok to overwrite)
-          self[tail_getter] = born  # future root.tail is born
-          swap = self[item_getter]  # (hold current root.item)
-          self[item_getter] = item  # future root.item is new item
-          item = swap               # future born.item is current root.item
-          init_f_h = ::Hash.new( ->(k) do
-            _swap = self[k] # future born members are current root members
-            self[k] = dupe_proto_member_f[ k ] # future root members are nu node
-            _swap
-          end )
-          result = self
-        else # inserting at root on an empty list
-          born = result = self
-          init_f_h = ::Hash.new( ->(k) do
-            born[k].nil? ? dupe_proto_member_f[ k ] : born[k]
-          end )
-          if next_f[ prototype ]
-            fail('fix me! -- we don\'t want next nodes in prototypes')
-          end
-          right_f.call
+        unless f_h.key? tail_getter
+          f_h[tail_getter] = _tail_f_f[ right, proto ]
         end
-        init_f_h[item_getter] = item_f
-        init_f_h[tail_getter] = ->(_) { right }
-        self.class._members.each do |m|
-          born[m] = init_f_h[m].call(m)
-        end
+        self.class._members.each { |m| target[m] = f_h[m][ m ] }
         result
       end
+
       i.tree_class.send(:define_method, :_items) do
         _nodes.map { |node| node[item_getter] }
       end
+
       i.tree_class.send(:define_method, :_nodes) do
         ::Enumerator.new do |y|
           if self[item_getter] # else zero-width tree stub
@@ -159,6 +192,7 @@ module Skylab::TanMan
           nil
         end
       end
+
       i.tree_class.send(:define_method, :_remove!) do |search_item|
         match_f = match_f_f[ search_item ] ; parent = nil
         target = _nodes.detect do |node|
