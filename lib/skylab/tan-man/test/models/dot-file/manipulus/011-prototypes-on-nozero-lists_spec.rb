@@ -27,4 +27,21 @@ describe "#{Skylab::TanMan::Models::DotFile} Prototypes w nonzero lists" do
       lines.pop.should eql('blue [label=blue]')
     end
   end
+
+  using_input '011-prototype-with/one-that-comes-after.dot' do
+    it 'can add a node to one node' do
+      result.nodes.length.should eql(1)
+      o = result.node! 'cyan'
+      result.nodes.length.should eql(2)
+      result.nodes.map { |n| n.node_id }.should eql([:cyan, :red])
+      o.unparse.should eql("cyan [label=cyan]")
+      lines = result.unparse.split("\n")
+      lines.pop.should eql('}')
+      lines.pop.should eql('') # we made an extra one on purpose
+      lines.pop.should eql('red [label=red]')
+      lines.pop.should eql('cyan [label=cyan]')
+      lines.pop.should eql('')
+      lines.pop.should eql('*/')
+    end
+  end
 end

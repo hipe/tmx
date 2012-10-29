@@ -138,24 +138,30 @@ module Skylab::TanMan
         [born, born, f_h]
       end
 
-      _swap_f = ->(me, proto, item) do
+      _swap_f = ->(root, proto, item) do
         # No left means inserting at root -- an intense hack, see _remove!
         # born lives in second slot, swapping members with root
-        born = me.class.new
+        born = root.class.new
         f_h = ::Hash.new( ->(m) do # The default behavior for born node members
-          swap = me[m]             # is to give them what was once at root,
-          me[m] = proto.__dupe_member m # and at the same time do this to root
+          swap = root[m]             # is to give them what was once at root,
+          root[m] = proto.__dupe_member m # and at the same time do this to root
           swap
         end )
-        original_root_tail = me[tail_getter]
+        original_root_tail = root[tail_getter]
+        if list_getter && ! next_f[ proto ]
+          tail = proto.__dupe_member(tail_getter)
+          root[tail_getter] = tail
+          tail[list_getter] = born # oh sweet jesus
+        else
+          root[tail_getter] = born # think how whacktastic this is
+        end
         f_h[tail_getter] = ->(_) { original_root_tail }
-        me[tail_getter] = born # think how whacktastic this is
 
-        original_root_item = me[item_getter]
+        original_root_item = root[item_getter]
         f_h[item_getter] = ->(_) { original_root_item }
-        me[item_getter] = _normalize_item_f[ item, proto ]
+        root[item_getter] = _normalize_item_f[ item, proto ]
 
-        [me, born, f_h]
+        [root, born, f_h]
       end
 
       i.tree_class.send(:define_method, :_insert_before!) do |item, before_item|

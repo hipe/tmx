@@ -1,4 +1,4 @@
-[#011] #open make sure complex prototypes can be used with nonzero length lists
+[#011] #done make sure complex prototypes can be used with nonzero length lists
 [#010] #open 2012-10-27 associate two nodes
   1. sic, 2. redudantly, 3. agent not exist 4. target not exist
 [#009] #open 2012-10-27 create a node
