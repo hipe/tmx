@@ -234,8 +234,8 @@ module Skylab::TanMan
     end
     _a = [:content_text_value].freeze
     singleton_class.send(:define_method, :_members) { _a }
-    alias_method :unparse, :content_text_value
-    alias_method :string, :content_text_value
+    def normalized_string ; self[:content_text_value] end
+    def unparse           ; self[:content_text_value] end
   end
 
   # --*--
@@ -579,8 +579,10 @@ module Skylab::TanMan
       prev = nil
       _children = elements.zip(_members).map do |element, member|
         tree = element2tree element, member
-        if ! tree and prev and hack = Sexp::Prototype.match(prev, self, member)
-          tree = hack.commit!
+        # hack alert - this ugliness is for both performance & debugability
+        if ::String === prev && prev.include?('example') and
+          (hack = Sexp::Prototype.match(prev, tree, self, member)) then
+            tree = hack.commit!
         end
         prev = tree # (used as result of map block)
       end

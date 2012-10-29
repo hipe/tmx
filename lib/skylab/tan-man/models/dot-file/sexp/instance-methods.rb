@@ -21,7 +21,7 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
   # --*--
 
   module DoubleQuotedString
-    def string
+    def normalized_string
       content_text_value.gsub('\"', '"')
     end
   end

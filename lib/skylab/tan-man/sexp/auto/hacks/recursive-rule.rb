@@ -37,7 +37,6 @@ module Skylab::TanMan
       i.tree_class._hacks.push :RecursiveRule #debugging-feature-only
       i.tree_class.send(:include,
                           Sexp::Auto::Hacks::RecursiveRule::SexpInstanceMethods)
-      next_f = match_f_f = nil # forward-declare all these for scope
       match_f_f = ->(search_item) do
         if ::String === search_item
           ->(node) { search_item == node[item_getter] }
@@ -45,9 +44,15 @@ module Skylab::TanMan
           ->(node) { search_item.object_id == node[item_getter].object_id }
         end
       end
-      next_f = list_getter ?
-        ->(node) { o = node[tail_getter] ; o and o[list_getter] } :
+      next_f = if list_getter then
+        ->(node) do
+          o = node[tail_getter]
+          o &&= o[list_getter]
+          o
+        end
+      else
         ->(node) { node[tail_getter] }
+      end
 
       # --*--
 
@@ -69,7 +74,8 @@ module Skylab::TanMan
         prototype_a = _prototype ? _prototype._nodes.to_a : existing_a
         prototype_a.length < 2 and fail("cannot insert into a list with less #{
           }than two items -- we need a prototype node for this hack to work.")
-        prototype = prototype_a[ [1, [idx, prototype_a.length - 2].min ].max ]
+        proto_idx = [1, [idx, prototype_a.length - 2].min ].max
+        prototype = prototype_a[proto_idx]
         dupe_proto_member_f = ->(k) { prototype.__dupe_member k }
         item_f = -> do
           if ! (::String === item) # validating this would be expensive
@@ -85,9 +91,25 @@ module Skylab::TanMan
             ->(_) { sexp }
           end
         end.call
-        if left # appending is painless
+        right_f = -> do
+          if ! right && proto_idx == prototype_a.length - 1
+            right = dupe_proto_member_f[ tail_getter ] # for newlines in proto
+          end
+        end
+        if left # appending is somewhat painless
           born = self.class.new
-          left[tail_getter] = born
+          right or right_f.call
+          if list_getter
+            left[tail_getter] or fail('sanity -- expecing a foo_list node here')
+            left[tail_getter][list_getter] and fail('sanity - lol wat')
+            left[tail_getter][list_getter] = born
+          else
+            if left[tail_getter]
+              left[tail_getter].object_id == right.object_id or
+                fail('sanity - lol wat am i doing')
+            end
+            left[tail_getter] = born
+          end
           init_f_h = ::Hash.new( dupe_proto_member_f )
           result = born
         elsif right
@@ -113,7 +135,7 @@ module Skylab::TanMan
           if next_f[ prototype ]
             fail('fix me! -- we don\'t want next nodes in prototypes')
           end
-          right = dupe_proto_member_f[tail_getter] # for newlines e.g. in protos
+          right_f.call
         end
         init_f_h[item_getter] = item_f
         init_f_h[tail_getter] = ->(_) { right }
@@ -131,7 +153,8 @@ module Skylab::TanMan
             curr_node = self
             begin
               y << curr_node
-            end while curr_node = next_f[ curr_node ]
+              curr_node = next_f[ curr_node ]
+            end while curr_node
           end
           nil
         end
@@ -181,11 +204,18 @@ module Skylab::TanMan
       true
     end
     attr_accessor :_prototype
-    def _prototypify!
-      blank_list_controller = self.class.new
-      blank_list_controller._prototype = self
-      blank_list_controller.extend Sexp::Prototype::SexpInstanceMethods
-      blank_list_controller
+    def _prototypify! list_controller
+      o =
+      if list_controller
+        list_controller.class == self.class or fail("test me")
+        list_controller._prototype and fail('sanity')
+        list_controller
+      else
+        self.class.new
+      end
+      o._prototype = self
+      o.extend Sexp::Prototype::SexpInstanceMethods
+      o
     end
   end
 end
