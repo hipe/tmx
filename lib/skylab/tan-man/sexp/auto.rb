@@ -235,6 +235,9 @@ module Skylab::TanMan
     _a = [:content_text_value].freeze
     singleton_class.send(:define_method, :_members) { _a }
     def normalized_string ; self[:content_text_value] end
+    def normalized_string! string
+      fail('implement me') # #todo
+    end
     def unparse           ; self[:content_text_value] end
   end
 

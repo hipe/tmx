@@ -23,4 +23,17 @@ describe "#{Skylab::TanMan::Models::DotFile} Adding Nodes" do
       a.shift.should eql('milk the cow')
     end
   end
+
+  using_input '009.2-more-complex-prototype/first.dot' do
+    it "has a restricted characterset for what it will allow in labels" do
+      ->{ result.node! "\t\t\n\x7F" }.should raise_error(
+        /the following characters are not yet supported: /)
+    end
+    it "will escape certain characters in labels" do
+      o = result.node! 'joe\'s "mother" & i <wat>'
+      o.unparse.should be_include(
+        'joe&apos;s &quot;mother&quot; &amp; i &lt;wat&gt;')
+      # ::File.open('TMP-VISUAL-TEST.dot', 'w+') { |fh| fh.write result.unparse }
+    end
+  end
 end

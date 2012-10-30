@@ -2,6 +2,8 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
   extend ::Skylab::Autoloader
 
   module Common
+    self::TanMan = ::Skylab::TanMan
+
     def _label2id_stem label_str
       md = /\A(?<stem>\w+)/.match label_str
       md ? md[:stem] : 'node'
@@ -19,10 +21,14 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
   end
 
   # --*--
+  # (modules that require more than 20 lines should be moved to their own file.)
 
   module DoubleQuotedString
     def normalized_string
       content_text_value.gsub('\"', '"')
+    end
+    def normalized_string! string
+      fail('implement me') # #todo
     end
   end
 
@@ -35,6 +41,7 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
 
   self::Graph || nil # #sky-106
 
-  self::NodeStmt || nil # #sky-106
+  self::IdHtml || nil # #sky-106
 
+  self::NodeStmt || nil # #sky-106
 end
