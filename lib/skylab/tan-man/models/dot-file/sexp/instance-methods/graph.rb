@@ -37,14 +37,15 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
           found_after ||= node_stmt
         end
       end
-      if found_match
-        fail("remember we want to return a node_stmt -- confirm this")
-        found_match
+      if found_match then found_match
       else
         _node_stmt = _create_node_with_label label
         _stmt_list = stmt_list._insert_before! _node_stmt, found_after
         _stmt_list[:stmt] # _node_stmt
       end
+    end
+    def node_with_id id
+      _node_stmts.detect { |n| id == n.node_id }
     end
     def _node_stmts
       ::Enumerator.new do |y|

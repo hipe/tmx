@@ -9,7 +9,7 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
 
     # this is a *big* experiment -- expect this to change a lot
     def _parse_id str, member=nil
-      ::String === str or fail("sanity -- just making extra sure we have this")
+      ::String === str or fail("sanity -- expecting String had #{str.class}")
       p = self.class.grammar.build_parser_for_rule :id
       node = p.parse str
       node ||= p.parse "\"#{str.gsub('"', '\"')}\""

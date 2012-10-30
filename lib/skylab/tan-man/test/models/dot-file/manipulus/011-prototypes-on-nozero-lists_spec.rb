@@ -12,6 +12,14 @@ describe "#{Skylab::TanMan::Models::DotFile} Prototypes w nonzero lists" do
       result.nodes.map { |n| n.node_id }.should eql([:cyan])
       result.unparse[-5..-1].should eql("n]\n}\n")
     end
+    context 'having quotes in labels' do
+      it 'that are unescaped unparses AND stringifies correctly' do
+        str = %<it's a quote: ">
+        o = result.node! str
+        o.unparse.should be_include('[label="it\'s a quote: \""]')
+        o.label.should eql(str)
+      end
+    end
   end
 
   using_input '011-prototype-with/one-that-comes-before.dot' do
@@ -65,6 +73,14 @@ describe "#{Skylab::TanMan::Models::DotFile} Prototypes w nonzero lists" do
       def get arr
         result.nodes.map(&:node_id).should eql(arr)
       end
+    end
+
+    it 'will not redundantly add a new node if one with same label exists' do
+      result.nodes.length.should eql(3)
+      (item = result.node_with_id :yeti).should_not be_nil
+      ohai = result.node!('yeti')
+      ohai.object_id.should eql(item.object_id)
+      result.nodes.length.should eql(3)
     end
   end
 end
