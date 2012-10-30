@@ -44,4 +44,27 @@ describe "#{Skylab::TanMan::Models::DotFile} Prototypes w nonzero lists" do
       lines.pop.should eql('*/')
     end
   end
+
+  using_input '011-prototype-with/three.dot' do
+    context 'it adds nodes "alphabetically" but does not rearrange existing' do
+      it 'when first one comes after new one, new one goes first' do
+        add 'beta'
+        get [:beta, :gamma, :alpha, :yeti]
+      end
+      it '(inside)' do
+        add 'ham'
+        get [:gamma, :alpha, :ham, :yeti]
+      end
+      it '(last)' do
+        result.node! 'zap'
+        get [:gamma, :alpha, :yeti, :zap]
+      end
+      def add str
+        result.node! str
+      end
+      def get arr
+        result.nodes.map(&:node_id).should eql(arr)
+      end
+    end
+  end
 end

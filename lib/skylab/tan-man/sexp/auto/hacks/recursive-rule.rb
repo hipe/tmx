@@ -88,24 +88,26 @@ module Skylab::TanMan
       _proto_f = ->(me, existing_a, idx) do
         proto_a = me._prototype ? me._prototype._nodes.to_a : existing_a
         proto_a.length < 2 and fail("cannot insert into a list with less #{
-          }than two items -- we need a prototype node for this hack to work.")
+          }than 2 items -- need a prototype list, node, item for hack to work.")
         _proto_idx = [1, [idx, proto_a.length - 2].min ].max
         proto_a[_proto_idx]
       end
 
       _tail_f_f = ->(right, proto) do
-        # nasty : we want "born" to have a dupe of the tail sexp "proto" iff
-        # there is not already a "right" node to use and the prototype does
-        # not itself have a right node.  This only makes sense in the case of
-        # there being list_getters (else the prototype's right node and tail
-        # sexp are one and the same).  We must do all of this before we re-
-        # assign any members of "left" becasuse left may itself be the
-        # prototype node omfg!!! #todo
+        # nasty : we ned to do this before we reassign any members of "left"
+        # because left itself may be the prototype node!
         #
-        use_tail = if right then right
-                   elsif list_getter and ! next_f[ proto ]
-                     proto.__dupe_member tail_getter
-                   else nil end
+        use_tail = if list_getter
+          next_f[ proto ] and fail("can't use non-ultimate node in #{
+            }prototype for this hack to work.") # .. w/o heavy hacking
+          o = proto.__dupe_member tail_getter
+          right and o[list_getter] = right
+          o
+        elsif right
+          right
+        else
+          nil
+        end
         ->(_) { use_tail }
       end
 
@@ -128,7 +130,9 @@ module Skylab::TanMan
         # be the prototype so call the above now before you mutate it!
         if list_getter
           left[tail_getter] or fail('sanity -- expecing foo_list here')
-          left[tail_getter][list_getter] and fail('sanity - expecting no list')
+          left[tail_getter][list_getter] and (
+          left[tail_getter][list_getter].object_id == right.object_id or
+            fail('sanity') )
           left[tail_getter][list_getter] = born
         else
           left[tail_getter] && left[tail_getter].object_id != right.object_id &&
