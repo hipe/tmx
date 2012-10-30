@@ -8,10 +8,8 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
       h = ::Hash[ _node_stmts.map { |n| [n.node_id, true] } ]
       stem = _label2id_stem label
       use_id = stem.intern
-      if h.key? stem
-        i = 1 # so that the first numbered thing will be foo_2
-        nil while h.key?( use_id = "#{stem}_#{i += 1}".intern )
-      end
+      i = 1 # so that the first *numbered* node_id will be foo_2
+      use_id = "#{stem}_#{i + 1}".intern while h.key? use_id
       other.node_id! use_id
       other
     end
