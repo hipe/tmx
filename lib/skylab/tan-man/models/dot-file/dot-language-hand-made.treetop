@@ -70,7 +70,7 @@ module Skylab::TanMan::Models::DotFile
     end
     rule double_quoted_string
       '"' content_text_value:('\"' / !'"' .)* '"'
-      # we have a dedicated sexp class for escaping and unescaping these
+      # (this rule has a dedicated extension module that handling unescaping)
     end
     rule id_html
       '<' &'<' content_text_value:( ( !'>' . / '>' !'>' )+ '>' ) '>'

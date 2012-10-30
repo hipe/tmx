@@ -1,15 +1,13 @@
-require_relative '../parser/test-support'
-require_relative '../../../sexp/auto/test-support'
+require_relative '../test-support'
 
-describe "#{Skylab::TanMan::Models::DotFile} Manipulus 700 series" do
-  extend ::Skylab::TanMan::Sexp::Auto::TestSupport
-  extend ::Skylab::TanMan::Models::DotFile::Parser::TestSupport
+describe "#{Skylab::TanMan::Models::DotFile} Manipulus 701 series" do
+  extend ::Skylab::TanMan::Models::DotFile::TestSupport
 
   using_input '705-label.dot' do
     it 'can change the value (rhs) of the label, escaping when necessary' do
       result.unparse.should eql(input_string)
       stmt = label_statement
-      stmt.rhs.string.should match(/\ATangent with/)
+      stmt.rhs.normalized_string.should match(/\ATangent with/)
       stmt.rhs = "zeep"
       stmt.unparse.should eql('label=zeep')
       stmt.rhs = 'zeep zoop'
@@ -30,7 +28,7 @@ describe "#{Skylab::TanMan::Models::DotFile} Manipulus 700 series" do
     end
     def _retrieve_label_statement
       result.stmt_list.stmts.detect do |s|
-        :equals_stmt == s.class.rule && 'label' == s.lhs.string
+        :equals_stmt == s.class.rule && 'label' == s.lhs.normalized_string
       end
     end
     let(:label_statement) { _retrieve_label_statement }

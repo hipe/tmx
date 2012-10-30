@@ -1,3 +1,4 @@
+[#106] #open 2012-10-28 autoloading vis-a-vis const awareness
 [#105] 2012-08-18 #open play with test/all_specs.rb -w
 [#101] 2012-06-08 #open when doing gem install with rdoc, "stack level too deep"
 [#100.200.001] 2012-06-12 all.rb: fix @delegates tags

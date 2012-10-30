@@ -9,11 +9,11 @@ describe "#{::Skylab::TanMan::Sexp::Auto} MANIPULULS" do
       context 'adds' do
         it 'before first' do
           -> { result._insert_before!('fap', 'fip') }.should raise_exception(
-            /cannot insert into a list with less than two items/i )
+            /cannot insert into a list with less than 2 items/i )
         end
         it 'before nil (append)' do
           -> { result._insert_before!('fap', 'fip') }.should raise_exception(
-            /cannot insert into a list with less than two items/i )
+            /cannot insert into a list with less than 2 items/i )
         end
       end
       context 'removes' do

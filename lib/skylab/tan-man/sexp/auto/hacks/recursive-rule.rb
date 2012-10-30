@@ -37,7 +37,6 @@ module Skylab::TanMan
       i.tree_class._hacks.push :RecursiveRule #debugging-feature-only
       i.tree_class.send(:include,
                           Sexp::Auto::Hacks::RecursiveRule::SexpInstanceMethods)
-      next_f = match_f_f = nil # forward-declare all these for scope
       match_f_f = ->(search_item) do
         if ::String === search_item
           ->(node) { search_item == node[item_getter] }
@@ -45,97 +44,165 @@ module Skylab::TanMan
           ->(node) { search_item.object_id == node[item_getter].object_id }
         end
       end
-      next_f = list_getter ?
-        ->(node) { o = node[tail_getter] ; o and o[list_getter] } :
-        ->(node) { node[tail_getter] }
 
-      # --*--
+      next_f = if list_getter then
+        ->(node) do
+          o = node[tail_getter]
+          o &&= o[list_getter]
+          o
+        end
+      else
+        ->(node) { node[tail_getter] }
+      end
+
+      # -- (item insertion helper lambdas) --
+
+      _normalize_item_f = ->(item, proto) do
+        if ! (::String === item)         # item is presumably sexp
+          item                           # ..and validating it would be hard
+        elsif ::String === ( o = proto[item_getter] ) # both strings
+          item                           # so again, validating is meh
+        else
+          p = o.class.grammar.build_parser_for_rule o.class.rule
+          node = p.parse(item) or fail("failed to parse item to insert #{
+            (p.failure_reason || item).inspect}")
+          sexp = proto.class.element2tree node, item_getter
+          sexp
+        end
+      end
+
+      _idx_left_right_f = ->(before_item, existing_a) do
+        if before_item
+          match_f = match_f_f[ before_item ]
+          r, i = existing_a.each.with_index.detect { |x, _| match_f[ x ] }
+          r or fail("node to insert before not found.")
+          l = 0 == i ? nil : existing_a[i - 1]
+        else
+          l = existing_a.last # nil IFF adding to empty list
+          i = existing_a.length
+          r = nil
+        end
+        [i, l, r]
+      end
+
+      _proto_f = ->(me, existing_a, idx) do
+        proto_a = me._prototype ? me._prototype._nodes.to_a : existing_a
+        proto_a.length < 2 and fail("cannot insert into a list with less #{
+          }than 2 items -- need a prototype list, node, item for hack to work.")
+        _proto_idx = [1, [idx, proto_a.length - 2].min ].max
+        proto_a[_proto_idx]
+      end
+
+      _tail_f_f = ->(right, proto) do
+        # nasty : we ned to do this before we reassign any members of "left"
+        # because left itself may be the prototype node!
+        #
+        use_tail = if list_getter
+          next_f[ proto ] and fail("can't use non-ultimate node in #{
+            }prototype for this hack to work.") # .. w/o heavy hacking
+          o = proto.__dupe_member tail_getter
+          right and o[list_getter] = right
+          o
+        elsif right
+          right
+        else
+          nil
+        end
+        ->(_) { use_tail }
+      end
+
+      # -- List Item Insertion Lambdas (in ascending order of complexity) --
+
+      _initial_f = ->(me, proto) do
+        # The strategy for initial insertion of an item into an empty list
+        # ("list controller") is simply to use the defaults for tail_getter
+        # and item_getter and for the remaining members, for those that are
+        # non-nil make a dupe of the corresponding member from the prototype.
+        #
+        [me, me, ::Hash.new(->(m){me[m].nil? ? proto.__dupe_member(m) : me[m]})]
+      end
+
+      _insert_f = ->(me, proto, left, right) do
+        # For inserting an item under an existing parent (left) node ..
+        born = me.class.new
+        f_h = ::Hash.new ->(m) { proto.__dupe_member m }
+        f_h[tail_getter] = _tail_f_f[ right, proto ] # "left" might itself
+        # be the prototype so call the above now before you mutate it!
+        if list_getter
+          left[tail_getter] or fail('sanity -- expecing foo_list here')
+          left[tail_getter][list_getter] and (
+          left[tail_getter][list_getter].object_id == right.object_id or
+            fail('sanity') )
+          left[tail_getter][list_getter] = born
+        else
+          left[tail_getter] && left[tail_getter].object_id != right.object_id &&
+            fail('sanity - lol wat am i doing')
+          left[tail_getter] = born
+        end
+        [born, born, f_h]
+      end
+
+      _swap_f = ->(root, proto, item) do
+        # No left means inserting at root -- an intense hack, see _remove!
+        # born lives in second slot, swapping members with root
+        born = root.class.new
+        f_h = ::Hash.new( ->(m) do # The default behavior for born node members
+          swap = root[m]             # is to give them what was once at root,
+          root[m] = proto.__dupe_member m # and at the same time do this to root
+          swap
+        end )
+        original_root_tail = root[tail_getter]
+        if list_getter && ! next_f[ proto ]
+          tail = proto.__dupe_member(tail_getter)
+          root[tail_getter] = tail
+          tail[list_getter] = born # oh sweet jesus
+        else
+          root[tail_getter] = born # think how whacktastic this is
+        end
+        f_h[tail_getter] = ->(_) { original_root_tail }
+
+        original_root_item = root[item_getter]
+        f_h[item_getter] = ->(_) { original_root_item }
+        root[item_getter] = _normalize_item_f[ item, proto ]
+
+        [root, born, f_h]
+      end
 
       i.tree_class.send(:define_method, :_insert_before!) do |item, before_item|
         existing_a = _nodes.to_a
-        idx, left, right = -> do
-          if before_item
-            match_f = match_f_f[ before_item ]
-            r, i = existing_a.each.with_index.detect { |x, _| match_f[ x ] }
-            r or fail("node to insert before not found.")
-            l = 0 == i ? nil : existing_a[i - 1]
-          else
-            l = existing_a.last # nil IFF adding to empty list
-            i = existing_a.length
-            r = nil
-          end
-          [i, l, r]
-        end.call
-        prototype_a = _prototype ? _prototype._nodes.to_a : existing_a
-        prototype_a.length < 2 and fail("cannot insert into a list with less #{
-          }than two items -- we need a prototype node for this hack to work.")
-        prototype = prototype_a[ [1, [idx, prototype_a.length - 2].min ].max ]
-        dupe_proto_member_f = ->(k) { prototype.__dupe_member k }
-        item_f = -> do
-          if ! (::String === item) # validating this would be expensive
-            ->(_) { item }
-          elsif ::String === ( o = prototype[item_getter] )
-          # (for now we either do or don't parse the item string based on above)
-            ->(_) { item }
-          else
-            p = o.class.grammar.build_parser_for_rule o.class.rule
-            node = p.parse(item) or fail("failed to parse item to insert #{
-              (p.failure_reason || item).inspect}")
-            sexp = prototype.class.element2tree node, item_getter
-            ->(_) { sexp }
-          end
-        end.call
-        if left # appending is painless
-          born = self.class.new
-          left[tail_getter] = born
-          init_f_h = ::Hash.new( dupe_proto_member_f )
-          result = born
-        elsif right
-          # no left means inserting at root -- intense hack -- see _remove!
-          # born will end up in the second slot, root will get the new values
-          right = self[tail_getter] # future born.tail is current root.tail
-          born = self.class.new     #   (right was self, so ok to overwrite)
-          self[tail_getter] = born  # future root.tail is born
-          swap = self[item_getter]  # (hold current root.item)
-          self[item_getter] = item  # future root.item is new item
-          item = swap               # future born.item is current root.item
-          init_f_h = ::Hash.new( ->(k) do
-            _swap = self[k] # future born members are current root members
-            self[k] = dupe_proto_member_f[ k ] # future root members are nu node
-            _swap
-          end )
-          result = self
-        else # inserting at root on an empty list
-          born = result = self
-          init_f_h = ::Hash.new( ->(k) do
-            born[k].nil? ? dupe_proto_member_f[ k ] : born[k]
-          end )
-          if next_f[ prototype ]
-            fail('fix me! -- we don\'t want next nodes in prototypes')
-          end
-          right = dupe_proto_member_f[tail_getter] # for newlines e.g. in protos
+        idx, left, right = _idx_left_right_f[ before_item, existing_a ]
+        proto = _proto_f[ self, existing_a, idx ]
+        result, target, f_h = if left then _insert_f[  self, proto, left, right]
+        elsif right                   then _swap_f[    self, proto, item ]
+        else                               _initial_f[ self, proto ] end
+        unless f_h.key? item_getter
+          use_item = _normalize_item_f[ item, proto ]
+          f_h[item_getter] = ->(_) { use_item }
         end
-        init_f_h[item_getter] = item_f
-        init_f_h[tail_getter] = ->(_) { right }
-        self.class._members.each do |m|
-          born[m] = init_f_h[m].call(m)
+        unless f_h.key? tail_getter
+          f_h[tail_getter] = _tail_f_f[ right, proto ]
         end
+        self.class._members.each { |m| target[m] = f_h[m][ m ] }
         result
       end
+
       i.tree_class.send(:define_method, :_items) do
         _nodes.map { |node| node[item_getter] }
       end
+
       i.tree_class.send(:define_method, :_nodes) do
         ::Enumerator.new do |y|
           if self[item_getter] # else zero-width tree stub
             curr_node = self
             begin
               y << curr_node
-            end while curr_node = next_f[ curr_node ]
+              curr_node = next_f[ curr_node ]
+            end while curr_node
           end
           nil
         end
       end
+
       i.tree_class.send(:define_method, :_remove!) do |search_item|
         match_f = match_f_f[ search_item ] ; parent = nil
         target = _nodes.detect do |node|
@@ -181,11 +248,18 @@ module Skylab::TanMan
       true
     end
     attr_accessor :_prototype
-    def _prototypify!
-      blank_list_controller = self.class.new
-      blank_list_controller._prototype = self
-      blank_list_controller.extend Sexp::Prototype::SexpInstanceMethods
-      blank_list_controller
+    def _prototypify! list_controller
+      o =
+      if list_controller
+        list_controller.class == self.class or fail("test me")
+        list_controller._prototype and fail('sanity')
+        list_controller
+      else
+        self.class.new
+      end
+      o._prototype = self
+      o.extend Sexp::Prototype::SexpInstanceMethods
+      o
     end
   end
 end

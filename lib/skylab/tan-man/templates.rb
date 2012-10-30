@@ -5,7 +5,7 @@ module Skylab::TanMan
   class << Templates
     def [] stem
       pathname = dir_pathname.join(stem) # it normalizes various paths
-      @cache[pathname.to_s] ||= TanMan::Template.new(pathname: pathname)
+      @cache[pathname.to_s] ||= TanMan::Template.from_pathname(pathname)
     end
     attr_accessor :dir_pathname
   end

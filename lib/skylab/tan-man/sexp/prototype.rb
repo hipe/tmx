@@ -10,7 +10,7 @@ module ::Skylab::TanMan
   end
 
   class << Sexp::Prototype
-    def match prev_tree, tree_class, member
+    def match prev_tree, curr_tree, tree_class, member
       ::String === prev_tree or return
       scn = ::StringScanner.new prev_tree
       scn.skip(/[\r\n]+/)
@@ -24,11 +24,11 @@ module ::Skylab::TanMan
         return
       end
       scn.skip(/example /) or return # the logical cutoff could be wherever
-      klass.new(scn, line_header, member, tree_class)
+      klass.new(scn, curr_tree, line_header, member, tree_class)
     end
   end
 
-  class Sexp::Prototype::Hack < ::Struct.new(:scn, :line_header,
+  class Sexp::Prototype::Hack < ::Struct.new(:scn, :curr_tree, :line_header,
                                              :member, :tree_class)
     LINE_RX = /[^\r\n]*\r?\n|[^\r\n]+\r?\n?/
     NAME_RX = /[_a-z][_a-z0-9]*/i
@@ -43,7 +43,7 @@ module ::Skylab::TanMan
         }a comment: #{parser.failure_reason}")
       sexp = tree_class.element2tree result, member
       if sexp.list?
-        self.list_controller = sexp._prototypify!
+        self.list_controller = sexp._prototypify!(curr_tree)
         parse_the_rest!
         list_controller
       else

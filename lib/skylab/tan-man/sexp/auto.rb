@@ -27,7 +27,7 @@ module Skylab::TanMan
       if instance_methods_module
         tree_class.send :include, instance_methods_module
       end
-      im = [:Sexp, :InstanceModules, Sexp::Auto.constantize(tree_class.rule)].
+      im = [:Sexp, :InstanceMethods, Sexp::Auto.constantize(tree_class.rule)].
         reduce( tree_class.grammar.anchor_module ) do |m, x|
         m.const_defined?(x, false) or break;
         m.const_get(x, false)
@@ -234,8 +234,11 @@ module Skylab::TanMan
     end
     _a = [:content_text_value].freeze
     singleton_class.send(:define_method, :_members) { _a }
-    alias_method :unparse, :content_text_value
-    alias_method :string, :content_text_value
+    def normalized_string ; self[:content_text_value] end
+    def normalized_string! string
+      fail('implement me') # #todo
+    end
+    def unparse           ; self[:content_text_value] end
   end
 
   # --*--
@@ -579,8 +582,10 @@ module Skylab::TanMan
       prev = nil
       _children = elements.zip(_members).map do |element, member|
         tree = element2tree element, member
-        if ! tree and prev and hack = Sexp::Prototype.match(prev, self, member)
-          tree = hack.commit!
+        # hack alert - this ugliness is for both performance & debugability
+        if ::String === prev && prev.include?('example') and
+          (hack = Sexp::Prototype.match(prev, tree, self, member)) then
+            tree = hack.commit!
         end
         prev = tree # (used as result of map block)
       end
