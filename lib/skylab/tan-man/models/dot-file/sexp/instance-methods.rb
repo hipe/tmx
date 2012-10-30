@@ -12,7 +12,7 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
     # this is a *big* experiment -- expect this to change a lot
     def _parse_id str, member=nil
       ::String === str or fail("sanity -- expecting String had #{str.class}")
-      p = self.class.grammar.build_parser_for_rule :id
+      p = self.class.grammar.parser_for_rule :id
       node = p.parse str
       node ||= p.parse "\"#{str.gsub('"', '\"')}\""
       node or fail "sanity - what such string is invalid? #{p.failure_reason}"
@@ -31,6 +31,8 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
       fail('implement me') # #todo
     end
   end
+
+  self::EdgeStmt || nil # #sky-106
 
   module EqualsStmt
     include Common

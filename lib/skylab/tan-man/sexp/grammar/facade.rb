@@ -8,6 +8,14 @@ module Skylab::TanMan
       p
     end
 
+    # be extra careful -- this might be asking for trouble
+    # #todo - swap this and the build calls
+    def parser_for_rule rule_name
+      (@parsers_for_rules ||= ::Hash.new do |h, k|
+        h[k] = build_parser_for_rule k
+      end)[rule_name]
+    end
+
   protected
     def parser_class
       anchor_module.const_get("#{grammar_const}Parser", false)
