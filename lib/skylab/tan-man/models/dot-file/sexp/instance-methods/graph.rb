@@ -2,7 +2,8 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
 
   module Graph
     include Common
-    def associate! source, target
+    def associate! source, target, opts=nil
+      o = EdgeStmt::OPTS.new ; opts and opts.each { |k, v| o[k] = v }
       source_node = node! source
       target_node = node! target
       source_id = source_node.node_id ; source_id_s = source_id.to_s
@@ -18,10 +19,22 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
       end
       if found then found
       else
-        edge_stmt = _edge_stmt_prototype._create(source_node, target_node)
+        edge_stmt = _create_edge_stmt(source_node, target_node, o)
         stmt_list._insert_before! edge_stmt, after
         edge_stmt
       end
+    end
+    def _create_edge_stmt source_node, target_node, o
+      if o.prototype
+        _named_prototype(o.prototype) or
+          fail("no such prototype #{o.prototype.inspect}")
+      else
+        _named_prototype(:edge_stmt) or (@_default_edge_stmt_prototype ||= begin
+          p = self.class.grammar.build_parser_for_rule :edge_stmt
+          n = p.parse('foo -> bar') or fail('unexpected internal parse failure')
+          self.class.element2tree n, nil
+        end)
+      end._create source_node, target_node, o
     end
     def _create_node_with_label label
       proto = stmt_list._named_prototypes[:node_stmt] or fail('no node proto!')
@@ -33,16 +46,6 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
       use_id = "#{stem}_#{i + 1}".intern while h.key? use_id
       other.node_id! use_id
       other
-    end
-    def _edge_stmt_prototype
-      (@_edge_stmt_prototype ||= nil) and return @_edge_stmt_prototype # careful
-      o = _named_prototype(:edge_stmt)
-      o ||= begin
-        p = self.class.grammar.build_parser_for_rule(:edge_stmt)
-        n = p.parse('foo -> bar') or fail('wah?')
-        self.class.element2tree n, nil
-      end
-      @_edge_stmt_prototype = o
     end
     def _edge_stmts
       _stmt_enumerator { |stmt| :edge_stmt == stmt.class.rule }

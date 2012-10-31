@@ -47,9 +47,18 @@ describe "#{Skylab::TanMan::Models::DotFile} (010) associate nodes" do
     end
   end
 
-  using_input '010-edges/point-5-2-named-prototype.dot' do
-    it 'lets you choose which of several edge prototypes'
-    it 'fails if you pick a weird name'
+  using_input '010-edges/point-5-2-named-prototypes.dot' do
+    it 'fails if you pick a weird name' do # 0633 0708
+      ->{ result.associate!('a', 'b', prototype: :clancy) }.should(
+        raise_error(/no such prototype :clancy/) )
+    end
+    it 'lets you choose which of several edge prototypes' do
+      result.associate!('c', 'd', prototype: :fancy)
+      result.associate!('b', 'a', prototype: :boring)
+      lines[-7..-2].should eql(
+        ["a [label=a]", "b [label=b]", "c [label=c]", "d [label=d]",
+        "b -> a [this=is not=fancy]", "c -> d [this=style is=fancy]"])
+    end
   end
 
   using_input '010-edges/point-5-3-with-parameters.dot' do

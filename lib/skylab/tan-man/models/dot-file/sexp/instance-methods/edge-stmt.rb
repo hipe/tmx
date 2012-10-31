@@ -1,7 +1,9 @@
 module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
   module EdgeStmt
+    OPTS = ::Struct.new(:prototype)
+
     include Common
-    def _create source_node, target_node
+    def _create source_node, target_node, o
       # assume you are the prototype
       edge_stmt = __dupe
       edge_stmt.source_node_id! source_node.node_id
