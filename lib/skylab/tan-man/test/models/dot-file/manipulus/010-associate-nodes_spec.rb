@@ -7,7 +7,6 @@ describe "#{Skylab::TanMan::Models::DotFile} (010) associate nodes" do
     it 'associates nodes when neither exists, creating them' do
       o = result.associate! 'one', 'two'
       o.unparse.should eql('one -> two')
-      lines = result.unparse.split("\n")
       lines[-3..-1].should eql(["two [label=two]", "one -> two", "}"])
     end
   end
@@ -15,7 +14,6 @@ describe "#{Skylab::TanMan::Models::DotFile} (010) associate nodes" do
   using_input '010-edges/2-nodes-0-edges.dot' do
     it 'associates when first exists, second does not' do
       o = result.associate! 'alpha', 'peanut gallery'
-      lines = result.unparse.split("\n")
       lines[-3..-1].should eql(
         ['peanut [label="peanut gallery"]', 'alpha -> peanut', '}' ])
     end
@@ -36,13 +34,30 @@ describe "#{Skylab::TanMan::Models::DotFile} (010) associate nodes" do
       result.associate! 'feasly', 'teasly'
       result._edge_stmts.to_a.length.should eql(4)
       result._node_stmts.to_a.length.should eql(2) # it created one that it ..
-      lines = result.unparse.split("\n")
       lines[-5..-1].should eql(['beasly -> teasly', 'feasly -> teasly',
         'gargoyle -> flargoyle', 'ainsly -> fainsly', '}'])
     end
   end
 
-  context "with complex arcs" do
-    it 'lets you specify a label for the association, using a prototype'
+  using_input '010-edges/point-5-1-prototype.dot' do
+    it 'uses any edge prototype called "edge_stmt"' do
+      result.associate! 'foo', "bar's mother"
+      lines[-2].should eql(%(foo -> bar [ penwidth = 5 fontsize = 28 #{
+        }fontcolor = "black" label = "e" ]))
+    end
+  end
+
+  using_input '010-edges/point-5-2-named-prototype.dot' do
+    it 'lets you choose which of several edge prototypes'
+    it 'fails if you pick a weird name'
+  end
+
+  using_input '010-edges/point-5-3-with-parameters.dot' do
+    it 'lets you set template parameters in the prototype'
+  end
+
+  # --*--
+  def lines
+    result.unparse.split("\n")
   end
 end
