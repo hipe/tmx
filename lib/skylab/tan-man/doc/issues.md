@@ -1,3 +1,7 @@
+[#015] #open UI for dissociate (and prune nodes?)
+[#014] #open UI for associate (labeled "depends on")
+[#013] #open UI for chose example, then use example
+[#012] #open 2012-11-01 refactor UI / NLP to use Sexp::Auto
 [#011] #done make sure complex prototypes can be used with nonzero length lists
 [#010] #done 2012-10-27 associate two nodes
   1. sic, 2. redudantly, 3. agent not exist 4. target not exist

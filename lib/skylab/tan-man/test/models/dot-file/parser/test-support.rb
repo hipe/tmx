@@ -25,7 +25,7 @@ module Skylab::TanMan::Models::DotFile::Parser::TestSupport
       include ::Skylab::TanMan::TestSupport::InstanceMethods
       before(:all) { _my_before_all }
       let(:client) do
-        _runtime = TanMan::API::Achtung::BUILD_RUNTIME_F.call($stderr, $stderr)
+        _runtime = :fixme # i don't know why..
         o = ParserProxy.new(_runtime,
           dir_path: ::File.expand_path('..', __FILE__))
         if ! debug_parser_loading
