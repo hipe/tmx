@@ -52,7 +52,7 @@ describe "#{Skylab::TanMan::Models::DotFile} (010) associate nodes" do
       ->{ result.associate!('a', 'b', prototype: :clancy) }.should(
         raise_error(/no such prototype :clancy/) )
     end
-    it 'lets you choose which of several edge prototypes' do
+    it 'lets you choose which of several edge prototypes' do # 0708 0715
       result.associate!('c', 'd', prototype: :fancy)
       result.associate!('b', 'a', prototype: :boring)
       lines[-7..-2].should eql(
@@ -61,8 +61,17 @@ describe "#{Skylab::TanMan::Models::DotFile} (010) associate nodes" do
     end
   end
 
-  using_input '010-edges/point-5-3-with-parameters.dot' do
-    it 'lets you set template parameters in the prototype'
+  using_input '010-edges/point-5-1-prototype.dot' do
+    it 'lets you set attributes in the edge prototype' do # 0718 0747
+      result.associate! 'a', 'b', attrs: { label: %<joe's mom: "jane"> }
+      str = / label =.*/ =~ lines[-2] ? $& : ''
+      str.should eql(%< label = "joe's mom: \\"jane\\"" ]>)
+    end
+    # 0747-0815 + 4hrs
+    it 'lets you set attributes not yet in the edge prototype' do
+      result.associate! 'a', 'b', attrs: { politics: :radical }
+      lines[-2].should be_include('penwidth = 5 politics = radical fontsize')
+    end
   end
 
   # --*--
