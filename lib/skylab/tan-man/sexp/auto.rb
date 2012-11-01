@@ -177,16 +177,44 @@ module Skylab::TanMan
     # and method names in any client extension modules (that aren't intending
     # to override these).
 
-    def __dupe
-      # for now, __dupe'ing is used solely for using prototypes
-      self.class.new( * self.class._members.map { |m| __dupe_member m } )
+    DUPE_OPTS = ::Struct.new :except
+    def __dupe opts=nil
+      if opts then o = DUPE_OPTS.new ; opts.each { |k, v| o[k] = v } end
+      x = self.class.new
+      h = ::Hash[ self.class._members.map { |m| [m, :normal] } ]
+      except = nil
+      if o and o.except
+        except = { }
+        o.except.each do |mixed|
+          case mixed
+          when ::Symbol ; h[mixed] = :except ; except[mixed] = nil
+          when ::Array  ; h[mixed.first] = :except
+                        ; except[mixed.first] =
+                           (1 == mixed.length) ? nil : mixed[1..-1]
+          else          ; fail("invalid \"except\" element: #{mixed.class}")
+          end
+        end
+      end
+      h.each do |k, v|
+        case v
+        when :normal ; x[k] = __dupe_member k
+        when :except ; x[k] = __dupe_member(k, except[k]) if except[k]
+        end
+      end
+      x
     end
 
-    def __dupe_member member
+    def __dupe_member member, except=nil
       o = self[member]
       if o.respond_to?(:__dupe)
-        o.__dupe
+        opts = if except
+          except.detect { |x| ::Symbol != x.class } and fail("sanity - #{
+            }excpecting columnar, 1-dimensional except lists for now.")
+          { except: [except] }
+        end
+        o.__dupe(* [opts].compact ) # #here
       else
+        except and fail('sanity')
         case o
         when ::NilClass ; nil
         when ::String   ; o.dup
@@ -204,7 +232,7 @@ module Skylab::TanMan
   class Sexp::Auto::List < ::Array
     include Sexp::Auto::InstanceMethods
 
-    def __dupe
+    def __dupe # #here
       other = self.class.new length
       length.times.each { |i| other[i] = __dupe_member i }
       other

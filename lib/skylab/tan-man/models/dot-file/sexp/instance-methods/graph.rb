@@ -106,7 +106,7 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
       equals_stmt ||= begin
         proto = _named_prototype(:label) or fail('no label proto')
         created = true
-        proto.__dupe
+        proto.__dupe except: [:rhs]
       end
       equals_stmt.rhs = str
       if created

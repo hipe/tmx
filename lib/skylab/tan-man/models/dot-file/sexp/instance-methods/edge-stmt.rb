@@ -5,7 +5,7 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
     include Common
     def _create source_node, target_node, o
       # assume you are the prototype
-      edge_stmt = __dupe
+      edge_stmt = __dupe(except: [[:agent, :id], [:edge_rhs, :recipient, :id]])
       edge_stmt.source_node_id! source_node.node_id
       edge_stmt.target_node_id! target_node.node_id
       edge_stmt
