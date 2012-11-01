@@ -1,0 +1,14 @@
+digraph {
+/*
+  example stmt_list:
+    foo -> bar
+    biff -> baz
+
+  example node_stmt:
+    learn_c [label="learn C somehow"]
+
+  example edge_stmt:
+    state0 -> state5 [ penwidth = 5 fontsize = 28 fontcolor = "black" label = "e" ]
+
+*/
+}
