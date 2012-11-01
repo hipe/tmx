@@ -7,8 +7,8 @@ module Skylab::TanMan
     include API::Achtung::SubClient::InstanceMethods
     def execute
       info("IVE GOT OT REACH THESE KIDS: \"#{
-        statement.agent.list.join(' ') } -> \"#{
-        statement.target.list.join(' ') }\"")
+        statement.agent.words.join(' ') }\" -> \"#{
+        statement.target.words.join(' ') }\"")
     end
   end
 end

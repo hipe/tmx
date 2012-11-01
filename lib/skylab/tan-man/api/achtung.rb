@@ -12,20 +12,6 @@ module Skylab::TanMan
     # headless, and we can focus on our business logix
   end
 
-  # Isolate the runtime-building part so it can be called (ahem) elsewhere.
-  # It is not made in a more flexible way b/c it's a #jawbreaker.
-  API::Achtung::BUILD_RUNTIME_F = ->(outstream, errstream) do
-    ::Skylab::Headless::Request::Runtime::Minimal.new(
-      API::Achtung::IO_Adapter_Functional.new(
-        ->(type, msg) do
-          msg = msg.message if msg.respond_to?(:message) # @todo etc
-          (:payload == type ? outstream : errstream).puts(msg)
-        end,
-        ::Skylab::Headless::CLI::IO::Pen::MINIMAL # #jawbreaking
-      )
-    )
-  end
-
   class API::Achtung::SubClient ; end # used as a class and as a namespace
 
   module API::Achtung::SubClient::InstanceMethods
@@ -46,19 +32,17 @@ module Skylab::TanMan
 
     def self.call binding, params
       # During #before:#100 times, we make the request runtime here.
-      # Experimentally, we make it as thin as possible.
-
-      cli = binding.runtime.runtime
         # Whatever this binding is supposed to be, it is stupid and confusing.
-        # binding.runtime is the CLI action object.
-        # *It's runtime is the base CLI client.
-        # We have to back all the way out to that
-        # and then build ourselves up from it.
-
-      errstream = cli.stderr
-      outstream = cli.stdout
-      action = new(API::Achtung::BUILD_RUNTIME_F.call(outstream, errstream))
-      action.infostream = errstream
+      # the only things passed to "call" should be a client and params
+      cli_action = binding.runtime
+      cli = cli_action.runtime
+      runtime = ::Skylab::Headless::Request::Runtime::Minimal.new
+      runtime[:io_adapter] = API::Achtung::IO_Adapter_Retrofitter.new(
+        cli_action,
+        ::Skylab::Headless::CLI::IO::Pen::MINIMAL # #jawbreaking
+      )
+      action = new runtime
+      action.infostream = cli.stderr
       action.singletons_f = ->{ binding.singletons }
       action.invoke(params)
     end
@@ -109,12 +93,9 @@ module Skylab::TanMan
     def formal_parameters ; self.class.parameters end     # per param contr. api
   end
 
-  class API::Achtung::IO_Adapter_Functional < ::Struct.new(:emit_f, :pen)
-    # this will ofc. be #pushed-up if it proves useful. (but don't even
-    # think about doing that until we work out the abounding #jawbreaks)
-
-    def emit type, data
-      emit_f.call type, data
+  class API::Achtung::IO_Adapter_Retrofitter < ::Struct.new :client, :pen
+    def emit type, payload
+      client.emit type, payload
     end
   end
 end
