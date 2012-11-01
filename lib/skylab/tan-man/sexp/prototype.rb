@@ -83,10 +83,10 @@ module ::Skylab::TanMan
 
     def parse_the_rest!
       embedded_string = read_and_normalize_remaining_string!
-      self.scn = ::StringScanner.new(embedded_string) # ofuck
-      scn.skip(/[ \t\r\n]+/)
+      self.scn = ::StringScanner.new embedded_string # ofuck
+      scn.skip(/[ \t]*\r?\n/)
       until scn.eos?
-        if scn.skip(/example /)
+        if scn.skip(/[ \t]*example /)
           parse_example!
         else
           scn.skip(LINE_RX) or fail('huh?')

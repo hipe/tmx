@@ -23,6 +23,8 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
   # --*--
   # (modules that require more than 20 lines should be moved to their own file.)
 
+  self::AList || nil # #sky-106
+
   module DoubleQuotedString
     def normalized_string
       content_text_value.gsub('\"', '"')
