@@ -3,11 +3,10 @@ module Skylab
     grammar Statement
       rule dependency_statement
         agent:cluster sep 'depends on' sep target:cluster
-        { def tree ; Sexp::Auto[ self ] end }
+        { def tree ; Sexp::Auto::Recursive[ self ] end }
       end
       rule cluster
         head:word tail:(sep content:word)*
-        { def tree ; Sexp::Auto[ self ] end }
       end
       rule word
         (
