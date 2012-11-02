@@ -1,6 +1,6 @@
 module Skylab::CssConvert
   class Directive::Runner
-    include ::Skylab::Autoloader::Inflection::InstanceMethods
+    include ::Skylab::Autoloader::Inflection::Methods
     include My::Headless::SubClient::InstanceMethods
     def invoke directive_sexp # @prototypical:"example of unwrapping"
       _const = constantize(directive_sexp.node_name)

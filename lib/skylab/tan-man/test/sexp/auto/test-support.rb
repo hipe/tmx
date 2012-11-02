@@ -34,6 +34,6 @@ module ::Skylab::TanMan::Sexp::Auto::TestSupport
   end
   module InstanceMethods
     include ::Skylab::TanMan::Sexp::TestSupport::InstanceMethods
-    include ::Skylab::TanMan::Sexp::Inflection::InstanceMethods
+    include ::Skylab::TanMan::Sexp::Inflection::Methods
   end
 end

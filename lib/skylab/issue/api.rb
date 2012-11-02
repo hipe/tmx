@@ -9,7 +9,7 @@ module Skylab::Issue
 
   class Api
     extend Skylab::MetaHell::Autoloader::Autovivifying
-    include Skylab::Autoloader::Inflection
+    include Skylab::Autoloader::Inflection::Methods
 
     # creates a new instance of the action
     def action *path

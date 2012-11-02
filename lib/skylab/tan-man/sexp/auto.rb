@@ -353,7 +353,7 @@ module Skylab::TanMan
   class Sexp::Auto::Inference_WithConst < Sexp::Auto::Inference
     # What can we do with a node with one extension module?
 
-    include Sexp::Inflection::InstanceMethods # symbolize, chomp_digits
+    include Sexp::Inflection::Methods # symbolize, chomp_digits
 
     def expression
       symbolize(sexp_const.to_s).intern
@@ -448,7 +448,7 @@ module Skylab::TanMan
     # There are so many inflection-heavy hacks going on that it is useful
     # to have this wrapper around extension modules.  Note we flyweight them.
 
-    include Sexp::Inflection::InstanceMethods
+    include Sexp::Inflection::Methods
 
     CACHE = ::Hash.new { |h, mod| h[mod] = new mod }
 

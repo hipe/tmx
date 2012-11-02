@@ -124,7 +124,7 @@ module Skylab::Porcelain::Bleeding::TestSupport
   module ModuleMethods
     include ::Skylab::MetaHell::ModulCreator
     include ::Skylab::MetaHell::KlassCreator
-    include ::Skylab::Autoloader::Inflection
+    include ::Skylab::Autoloader::Inflection::Methods
     def base_module!
       (const = constantize description) !~ /\A[A-Z][_a-zA-Z0-9]*\z/ and fail("oops: #{const.inspect}")
       _last = 0
@@ -175,7 +175,7 @@ module Skylab::Porcelain::Bleeding::TestSupport
     end
   end
   module InstanceMethods
-    include ::Skylab::Autoloader::Inflection # constantize
+    include ::Skylab::Autoloader::Inflection::Methods # constantize
     include ::Skylab::MetaHell::ModulCreator::InstanceMethods
     include ::Skylab::MetaHell::KlassCreator::ExtensorInstanceMethods
     include ::Skylab::Porcelain::TiteColor # unstylize

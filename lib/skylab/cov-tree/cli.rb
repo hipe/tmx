@@ -78,7 +78,7 @@ module Skylab::CovTree
   end
   class CLI::Action
     include CLI::Styles
-    include ::Skylab::Autoloader::Inflection
+    include ::Skylab::Autoloader::Inflection::Methods
     def controller_class # @todo use autoloader instead (requires rearch)
       const_stem = self.class.to_s.split('::').last
       require ROOT.join("api/#{pathify const_stem}").to_s

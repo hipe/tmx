@@ -13,7 +13,7 @@ module Skylab
   module Autoloader end
   module Autoloader::Inflection
     extend self
-    InstanceMethods = Methods = self # future-proof, #todo
+    Methods = self # future-proof, #todo
     EXTNAME = '.rb'
     SANITIZE_PATH_RE =
       %r{#{Regexp.escape(EXTNAME)}\z|(?<=/)/+|(?<=[-_ ])[-_ ]+|[^-_ /a-z0-9]+}i
@@ -32,7 +32,7 @@ module Skylab
     def self.extended mod
       mod.autoloader_init! caller[0]
     end
-    include Autoloader::Inflection::InstanceMethods
+    include Autoloader::Inflection::Methods
     CALLSTACK_RE = /^(?<path_stem>.+)(?=#{::Regexp.escape(EXTNAME)}:\d+:in `)/
     def autoloader_init! caller
       self.dir_path ||= begin
