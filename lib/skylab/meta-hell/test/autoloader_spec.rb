@@ -1,12 +1,12 @@
 require_relative '../../../skylab'
 
 describe Skylab::Autoloader do
-  include subject.call
+  include ::Skylab::Autoloader::ModuleMethods
   def cleanpath path
     path.sub(/\.rb$/, '')
   end
   context "infers a path based on simple heuristics." do
-    let(:subject) { guess_dir(const, path) { |e| fail(e) } }
+    let(:subject) { _guess_dir(const, path) { |e| fail(e.to_s) } }
     def self.with path, const, dir, comment, *a
       describe("The dirpath for #{const} calling from #{path} #{comment}", *a) do
         let(:path) { cleanpath path }
@@ -14,7 +14,7 @@ describe Skylab::Autoloader do
         it { should eql(dir) }
       end
     end
-    with "foo", "Foo", "foo", "(conventional atomic case)"
+    with "foo", "Foo", "foo", "(conventional atomic case)", f: true
     with "foo/bar", "Foo::Bar", 'foo/bar', "(conventional, plural)"
     with "foo/bar", "Foo", "foo", "(peek one level up atomic case)"
     with "C:\>///foo/foo", "Foo", "C:\>/foo", "(double deuce edge case)"
@@ -29,7 +29,7 @@ describe Skylab::Autoloader do
   end
   context "may fail" do
     let(:subject) do
-      -> { guess_dir(const, path) { |e| fail(e) } }
+      -> { _guess_dir(const, path) { |e| fail(e) } }
     end
     def self.bunk path, const, failmsg, *a
       describe("The msg of the exception thrown for #{const} from #{path}", *a) do

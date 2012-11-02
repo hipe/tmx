@@ -1,7 +1,7 @@
 require_relative '../../../../skylab'
 
 describe Skylab::Autoloader::Inflection do
-  include subject.call
+  include ::Skylab::Autoloader::Inflection::Methods
   context "Pathify tries to turn constants into path fragments:" do
     let(:subject) { pathify const }
     def self.yerp const, tgt_path, comment, *a

@@ -4,6 +4,7 @@ module Skylab::TanMan
     # syntax trees (their classes and then objects) dynamically
     # from the syntax nodes of a parse from a Treetop grammar.
     extend ::Skylab::MetaHell::Autoloader::Autovivifying
+    extend ::Skylab::Autoloader::Inflection::Methods
   end
 
   module Sexp::Auto::Constants
