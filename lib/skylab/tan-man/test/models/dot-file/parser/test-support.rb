@@ -1,5 +1,4 @@
-require_relative '../../../../core'
-require_relative '../../../test-support'
+require_relative '../test-support'
 
 # (reference: http://solnic.eu/2014/01/14/custom-rspec-2-matchers.html)
 RSpec::Matchers.define :be_sexp do |expected|
@@ -16,77 +15,26 @@ RSpec::Matchers.define :be_sexp do |expected|
   end
 end
 
-Skylab::TanMan::Models::DotFile::Parser and nil # necessary :(
-
 module Skylab::TanMan::Models::DotFile::Parser::TestSupport
   def self.extended mod
     mod.module_eval do
       extend ModuleMethods
-      include ::Skylab::TanMan::TestSupport::InstanceMethods
+      include InstanceMethods
       before(:all) { _my_before_all }
-      let(:client) do
-        _runtime = :fixme # i don't know why..
-        o = ParserProxy.new(_runtime,
-          dir_path: ::File.expand_path('..', __FILE__))
-        if ! debug_parser_loading
-          o.on_load_parser_info_f = ->(e) { }
-          o.profile = false
-        end
-        o
-      end
-      let(:input_pathname) do
-        client.dir_pathname.join("../fixtures/#{input_path_stem}")
-      end
     end
-  end
-  TanMan = ::Skylab::TanMan
-  class ParserProxy
-    # the point of this (somewhat experimentally) is to see if we can have
-    # a 'pure' parser thing that is divorced from our client controller
-    # with a minimal amount of dedicated logic
-
-    include TanMan::API::Achtung::SubClient::InstanceMethods
-    include TanMan::Models::DotFile::Parser::InstanceMethods
-
-    def initialize runtime, opts
-      @profile = true
-      super runtime
-      opts.each { |k, v| send("#{k}=", v) }
-    end
-    attr_accessor :dir_path
-    def dir_pathname
-      @dir_pathname ||= (dir_path and ::Pathname.new(dir_path))
-    end
-
-    def parser_result result
-      ret = super
-      if @profile && input_adapter.type.is?(
-        ::Skylab::TreetopTools::Parser::InputAdapter::Types::FILE
-      ) then
-        info( '      (%2.1f ms to parse %s)' % [
-          (parse_time_elapsed_seconds * 1000),
-          input_adapter.pathname.basename.to_s
-        ] )
-      end
-      ret
-    end
-
-    attr_accessor :profile
   end
   module ModuleMethods
-    def input string
-      let(:input_string) { string }
-      let(:frame) do
-        frame = { }
-        frame[:result] = client.parse_string string
-        frame
-      end
-      let(:result) { frame[:result] }
-    end
+    include ::Skylab::TanMan::Models::DotFile::TestSupport::ModuleMethods
+
     def it_unparses_losslessly(*tags)
       it 'unparses losslessly', *tags do
         result.unparse.should eql(input_string)
       end
     end
+  end
+  module InstanceMethods
+    extend ::Skylab::TanMan::TestSupport::InstanceMethodsModuleMethods
+    include ::Skylab::TanMan::Models::DotFile::TestSupport::InstanceMethods
+    let(:_parser_dir_path) { ::File.expand_path('..', __FILE__) }
   end
 end

@@ -1,17 +1,11 @@
 #!/usr/bin/env ruby -w
 
-require_relative '../../sexp/test-support'
-require_relative '../../../core'
+require_relative 'test-support'
 
 module ::Skylab::TanMan::Models::DotFile::TestSupport
   class Grammar < ::Skylab::TanMan::Sexp::TestSupport::Grammar
     # we jump through some hoops to bootstrap-in a real life grammar
     # into the testing mix
-
-    def anchor_dir_pathname
-      @anchor_dir_pathname ||=
-        ::Pathname.new(::File.expand_path('..', __FILE__))
-    end
 
     def grammars o
     o.treetop_grammar '../../../models/dot-file/dot-language-hand-made.treetop'

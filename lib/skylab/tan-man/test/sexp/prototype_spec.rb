@@ -1,11 +1,7 @@
-require_relative 'test-support'
+require_relative 'prototype/test-support'
 
 describe "#{::Skylab::TanMan::Sexp::Prototype} will be awesome" do
-  self::Sexp = ::Skylab::TanMan::Sexp
-  extend self::Sexp::TestSupport
-
-  self.grammars_module_f = ->{ Sexp::TestSupport::Prototype::Grammars }
-
+  extend ::Skylab::TanMan::Sexp::TestSupport::Prototype
 
   using_grammar '70-38-simplo' do
     using_input_string '', 'totally empty input string' do

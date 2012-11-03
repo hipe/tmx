@@ -14,7 +14,7 @@ module Skylab
     EXTNAME = '.rb'
 
     def self.extended mod
-      mod.extend(Autoloader::ModuleMethods)._autoloader_init! caller[0]
+      mod.extend(Autoloader::ModuleMethods)._autoloader_extended! caller[0]
     end
   end
 
@@ -26,7 +26,7 @@ module Skylab
 
     -> do
       sanitize_path_rx = %r{ #{::Regexp.escape Autoloader::EXTNAME}\z |
-        (?<=/)/+ | (?<=[-_ ])[-_ ]+ | [^-_ /a-z0-9]+ }ix # #method-private
+        (?<=/)/+ | (?<=[-_ ])[-_ ]+ | [^-_ /a-z0-9]+ }ix
 
       define_method :constantize do |path|
         path.to_s.gsub(sanitize_path_rx, '').gsub(%r|/+|, '::').
@@ -42,17 +42,30 @@ module Skylab
     end
   end
 
+  module Autoloader::ModuleMethodsModuleMethods
+    def extended mod
+      class << mod # #sl-106: we do *not* hack const_defined?, but other may
+        alias_method :const_defined_without_autoloader?, :const_defined?
+      end
+    end
+  end
+
   module Autoloader::ModuleMethods
+    extend Autoloader::ModuleMethodsModuleMethods
     extend Autoloader::Inflection::Methods # pathify
 
     -> do
       rx = /^(?<stem>.+)(?=#{::Regexp.escape(Autoloader::EXTNAME)}:\d+:in `)/
-      define_method :_autoloader_init! do |caller_str|
+      define_method :_autoloader_extended! do |caller_str|
         @dir_path ||= _guess_dir(to_s, caller_str.match(rx)[:stem]) do |e|
           fail "Autoloader hack failed: #{e.class}"
         end
       end
     end.call
+
+    def const_probably_loadable? const
+      _const_missing(const).probably_loadable?
+    end
 
     def const_missing const
       _const_missing(const).load
@@ -63,7 +76,12 @@ module Skylab
       Autoloader::ConstMissing.new const, dir_pathname, self
     end
 
-    attr_accessor :dir_path
+    attr_reader :dir_path
+
+    def dir_path= str
+      @dir_pathname = nil
+      @dir_path = str
+    end
 
     def dir_pathname
       @dir_pathname ||= begin
@@ -107,6 +125,11 @@ module Skylab
       else
         raise ::LoadError.new("no such file to load -- #{file_pathname}")
       end
+      nil
+    end
+
+    def probably_loadable?
+      file_pathname.exist?
     end
 
   protected
@@ -123,9 +146,9 @@ module Skylab
       mutex and fail("circular autoload dependency detected#{
         } in #{file_pathname} with #{const}")
       require normalized
-      mod.const_defined? const, false or
+      mod.const_defined_without_autoloader? const, false or
         fail("#{mod}::#{const} was not defined, must be, in #{file_pathname}")
-      true
+      nil
     end
 
     def normalized

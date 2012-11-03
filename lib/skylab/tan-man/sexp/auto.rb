@@ -3,8 +3,6 @@ module Skylab::TanMan
     # This module is an experiment in the automatic generation of abstract
     # syntax trees (their classes and then objects) dynamically
     # from the syntax nodes of a parse from a Treetop grammar.
-    extend ::Skylab::MetaHell::Autoloader::Autovivifying
-    extend ::Skylab::Autoloader::Inflection::Methods
   end
 
   module Sexp::Auto::Constants
@@ -20,6 +18,8 @@ module Skylab::TanMan
     # this library, and possibly generated Sexp classes for use in
     # recursive calls to builder methods.
 
+    include ::Skylab::Autoloader::Inflection::Methods # constantize
+
     def [] syntax_node # inheritable API entrypoint
       node2tree syntax_node, nil, nil # no class, no member_name
     end
@@ -28,9 +28,9 @@ module Skylab::TanMan
       if instance_methods_module
         tree_class.send :include, instance_methods_module
       end
-      im = [:Sexp, :InstanceMethods, Sexp::Auto.constantize(tree_class.rule)].
+      im = [:Sexp, :InstanceMethods, constantize(tree_class.rule)].
         reduce( tree_class.grammar.anchor_module ) do |m, x|
-        m.const_defined?(x, false) or break;
+        m.const_defined?(x, false) or break
         m.const_get(x, false)
       end
       if im

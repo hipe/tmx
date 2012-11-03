@@ -1,4 +1,3 @@
-require_relative '../api'
 require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport
@@ -13,7 +12,7 @@ module Skylab::TanMan::TestSupport
         events = api.invoke(:'not_an_action')
         events.first.tap do |e|
           e.tag.name.should eql(:error)
-          e.message.should match(/invalid action name part: not_an_action/)
+          e.message.should match(/invalid action name: not_an_action/)
         end
       end
     end

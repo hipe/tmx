@@ -3,7 +3,8 @@ require 'stringio'
 require_relative '../test-support'
 
 module ::Skylab::TanMan::Sexp::TestSupport
-  module CLI_Client_InstanceMethods
+
+  module CLI_Client_InstanceMethods # #todo: #100
   protected
     def em str
       "\e[1;32m#{str}\e[0m"
@@ -50,10 +51,16 @@ module ::Skylab::TanMan::Sexp::TestSupport
     end
   end
 
-  class Grammar < ::Struct.new(:upstream, :paystream, :infostream)
-    include TanMan::Models::DotFile::Parser::InstanceMethods # parsing porcelain
+  class Grammar < ::Struct.new :upstream, :paystream, :infostream
+    extend ::Skylab::Autoloader
+    extend ::Skylab::MetaHell::Let
+    extend self::ModuleMethods
+
+    include ::Skylab::Autoloader::Inflection::Methods
+    include ::Skylab::TanMan::Models::DotFile::Parser::InstanceMethods
+    include ::Skylab::TanMan::TestSupport::Tmpdir_InstanceMethods
     include CLI_Client_InstanceMethods
-    include TanMan::TestSupport::Tmpdir_InstanceMethods # prepared_submodule_tmpdir
+      # prepared_submodule_tmpdir
 
     def initialize i=$stdin, o=$stdout, e=$stderr
       @stdin = i ; self.paystream = o ; self.infostream = e
@@ -68,16 +75,19 @@ module ::Skylab::TanMan::Sexp::TestSupport
 
   protected
 
-    NUM_RX = /\A([A-Za-z]+(?:::[A-Za-z]+)+)\d+[^:]+\z/
 
-    def anchor_module_head
-      _md = NUM_RX.match(self.class.to_s) or fail("failed to infer#{
-        } anchor_module_head from this class name, expecting leading consts#{
-        } without digits and the trailing const to have a digit in it#{
-        } (You may need to implement your own hacky thing up the chain.)#{
-        } (Your thing: #{self.class})")
-      _md[1]
-    end
+    -> do
+      num_rx = /\A([A-Za-z]+(?:::[A-Za-z]+)+)\d+[^:]+\z/
+
+      define_method :anchor_module_head do
+        _md = num_rx.match(self.class.to_s) or fail("failed to infer#{
+          } anchor_module_head from this class name, expecting leading consts#{
+          } without digits and the trailing const to have a digit in it#{
+          } (You may need to implement your own hacky thing up the chain.)#{
+          } (Your thing: #{self.class})")
+        _md[1]
+      end
+    end.call
 
     PATHSPEC_SYNTAX = '[ - | <filename> ]'
 
@@ -95,8 +105,8 @@ module ::Skylab::TanMan::Sexp::TestSupport
       op
     end
 
-    def anchor_dir_pathname
-      @anchor_dir_pathname ||= grammars_module.dir_pathname.join stem_path
+    let :anchor_dir_pathname do
+      self.class.grammars_module.dir_pathname.join stem_path
     end
 
     attr_accessor :eval_string
@@ -129,16 +139,6 @@ module ::Skylab::TanMan::Sexp::TestSupport
 
     def force_overwrite?
       false # in flux -- sometimes we blow away the tmpdir once
-    end
-
-    def self.grammars_module
-      @grammars_module ||= begin
-        self.to_s.split('::')[0..-2].reduce(::Object) { |m, k| m.const_get(k) }
-      end
-    end
-
-    def grammars_module
-      self.class.grammars_module
     end
 
     def load_parser_class
@@ -195,15 +195,12 @@ module ::Skylab::TanMan::Sexp::TestSupport
       end
     end
 
-    def stem_const_rx
-      @stem_const_rx ||= /\A#{anchor_module_head}(.+)\z/
+    let :stem_const_rx do
+      /\A#{anchor_module_head}(.+)\z/
     end
 
-    def stem_path
-      @stem_path ||= begin
-        _stem_const = stem_const_rx.match(self.class.to_s)[1]
-        ::Skylab::Autoloader::Inflection.pathify _stem_const
-      end
+    let :stem_path do
+      pathify stem_const_rx.match(self.class.to_s)[1]
     end
 
     def tmpdir_prepared

@@ -1,8 +1,5 @@
-require_relative 'model'
-
 module Skylab::TanMan
   class Models::Remote < Models::Model
-    extend Skylab::Autoloader
     extend Bleeding::DelegatesTo
 
     NAME_RE = /^[^"]+$/

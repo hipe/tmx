@@ -1,7 +1,7 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
-describe "#{Skylab::TanMan::Models::DotFile} (010) associate nodes" do
-  extend ::Skylab::TanMan::Models::DotFile::TestSupport
+describe "#{Skylab::TanMan::Models::DotFile} (manipulus 010) associate nodes" do
+  extend ::Skylab::TanMan::Models::DotFile::Manipulus::TestSupport
 
   using_input '009-add-node-simple-prototype/zero.dot' do
     it 'associates nodes when neither exists, creating them' do

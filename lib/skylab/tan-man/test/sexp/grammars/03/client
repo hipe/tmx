@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby -w
 
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module ::Skylab::TanMan::Sexp::TestSupport
   class Grammars::Grammar03 < self::Grammar

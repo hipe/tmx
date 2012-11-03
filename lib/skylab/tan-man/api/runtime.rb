@@ -1,8 +1,8 @@
-require_relative 'binding'
 require 'json'
 
 module Skylab::TanMan
-  class API::RootRuntime
+  module API::Runtime end
+  class API::Runtime::Root
     include API::UniversalStyle
 
     def clear
@@ -30,7 +30,7 @@ module Skylab::TanMan
 
   class API::ActionEvents < Array
     extend Bleeding::DelegatesTo
-    extend PubSub::Emitter
+    extend ::Skylab::PubSub::Emitter
     include API::InvocationMethods
 
     emits EVENT_GRAPH.merge( row: :out )

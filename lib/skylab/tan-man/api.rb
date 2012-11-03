@@ -1,30 +1,19 @@
-require File.expand_path('../..', __FILE__)
-require_relative 'core'
 require 'skylab/face/core'
+require 'skylab/meta-hell/core'
 require 'skylab/porcelain/attribute-definer'
 require 'skylab/porcelain/bleeding'
 require 'skylab/pub-sub/emitter'
 
 module Skylab::TanMan
-  Face = Skylab::Face
-  Bleeding = Skylab::Porcelain::Bleeding
-  Porcelain = Skylab::Porcelain
-  PubSub = Skylab::PubSub
+  Bleeding  = ::Skylab::Porcelain::Bleeding
+  Porcelain = ::Skylab::Porcelain
 
   MY_EVENT_GRAPH = { :info => :all, :out => :all, :no_config_dir => :error, :skip => :info }
   EVENT_GRAPH = Bleeding::EVENT_GRAPH.merge(MY_EVENT_GRAPH)
 
-  ROOT = Face::MyPathname.new(File.expand_path('..', __FILE__))
-
-  module API
-    extend ::Skylab::Autoloader
-  end
+  ROOT = ::Skylab::Face::MyPathname.new(File.expand_path('..', __FILE__))
 
   module MetaAttributes
-  end
-
-  module Models
-    extend Skylab::MetaHell::Autoloader::Autovivifying
   end
 
   class << MetaAttributes
@@ -165,6 +154,10 @@ module Skylab::TanMan
     end
   end
 
+  module API end
+
+  class API::RuntimeError < ::RuntimeError ; end # just for fun
+
   class << API
     extend Porcelain::AttributeDefiner
     meta_attribute(*MetaAttributes[:default, :proc])
@@ -233,8 +226,7 @@ module Skylab::TanMan
     end
     def config
       @config ||= begin
-        # require_relative 'models/config'
-        Models::Config::Singleton.new
+        TanMan::Models::Config::Singleton.new
       end
     end
     def initialize
@@ -246,12 +238,11 @@ module Skylab::TanMan
   class << self
     def api
       @api and return @api
-      require_relative 'api/runtime'
-      @api = API::RootRuntime.new
+      @api = API::Runtime::Root.new
     end
   end
 
-  class API::Event < PubSub::Event
+  class API::Event < ::Skylab::PubSub::Event
     # this is all very experimental and subject to change!
     def json_data
       case payload
@@ -271,10 +262,43 @@ module Skylab::TanMan
   API::Emitter = Object.new
   class << API::Emitter
     def new *a
-      PubSub::Emitter.new(*a).tap do |graph|
+      ::Skylab::PubSub::Emitter.new(*a).tap do |graph|
         graph.event_class API::Event
       end
     end
   end
-end
 
+  # --*--
+
+  module API::InvocationMethods
+    include ::Skylab::Autoloader::Inflection::Methods # constantize
+    def invoke action=nil, args=nil, &block
+      if ::Hash === action && ! args
+        args = action
+        action = nil
+      end
+      action ||= runtime.on_no_action_name
+      action = [action] unless ::Array === action
+
+      prev = 'actions'
+      klass = action.reduce(API::Actions) do |mod, name|
+        /\A[-a-z]+\z/ =~ name or return invalid("invalid action name: #{name}")
+        const = constantize name
+        if ! mod.const_defined? const, false
+          if mod.const_probably_loadable? const
+            # will get loaded below at const_get
+          else
+            return invalid(%<"#{prev}" has no "#{name}" action>)
+          end
+        end
+        prev = name
+        mod.const_get const, false
+      end
+      klass.call self, args, &block
+    end
+    def set_transaction_attributes transaction, attributes
+      attributes or return true
+      transaction.update_attributes! attributes
+    end
+  end
+end

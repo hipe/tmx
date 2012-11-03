@@ -1,5 +1,4 @@
-require_relative '../../../api'
-require_relative '../../test-support'
+require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport
   describe "The #{TanMan::API} itself", tanman: true do
@@ -7,7 +6,7 @@ module Skylab::TanMan::TestSupport
     context "when you invoke a nonexistant action" do
       it "it gives you a list-like result whose first event is an error with a message" do
         events = api.invoke(:'not-an-action')
-        lone_error(events, /not an action: not-an-action/)
+        lone_error(events, /not? .*not-an-action/)
       end
     end
     context "the #{TanMan::API} action Init" do

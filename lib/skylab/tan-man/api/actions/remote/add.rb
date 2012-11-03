@@ -1,6 +1,4 @@
 module Skylab::TanMan
-  module API::Actions::Remote
-  end
   class API::Actions::Remote::Add < API::Action
     attribute :host, required: true
     attribute :name, required: true

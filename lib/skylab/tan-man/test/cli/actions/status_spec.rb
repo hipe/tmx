@@ -1,5 +1,4 @@
-require_relative '../../../cli'
-require_relative '../../test-support'
+require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport
   # @todo waiting for permute [#056]

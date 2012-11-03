@@ -1,7 +1,7 @@
 module Skylab::TanMan
   class API::Action
     extend Bleeding::DelegatesTo
-    extend PubSub::Emitter
+    extend ::Skylab::PubSub::Emitter
     extend Porcelain::AttributeDefiner
 
     include API::RuntimeExtensions
@@ -17,7 +17,7 @@ module Skylab::TanMan
 
     def config
       @config ||= begin
-        Models::Config::Controller.new(self)
+        TanMan::Models::Config::Controller.new(self)
       end
     end
 

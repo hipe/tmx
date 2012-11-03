@@ -1,5 +1,3 @@
-require_relative '../../sexp/auto'
-
 module Skylab::TanMan
   module Statement::Parser::InstanceMethods
     include TanMan::Parser::InstanceMethods

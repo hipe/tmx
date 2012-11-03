@@ -1,8 +1,8 @@
-require_relative 'sexp/instance-methods' # load now, per issue #sky-106
-
 module Skylab::TanMan
-  Models::DotFile::SyntaxNodes and nil # load it here & now
-  module Models::DotFile::Parser end
+
+  Models::DotFile::SyntaxNodes || nil           #preload (and see notes in..
+  Models::DotFile::Sexp::InstanceMethods || nil #preload  .. <- here aobut this)
+
   module Models::DotFile::Parser::InstanceMethods
     include TanMan::Parser::InstanceMethods
 
@@ -18,7 +18,7 @@ module Skylab::TanMan
         ->(o) do
           force_overwrite? and o.force_overwrite!
           o.generated_grammar_dir generated_grammar_dir
-          o.root_for_relative_paths ::File.expand_path('..', __FILE__)
+          o.root_for_relative_paths ::File.expand_path('../..', __FILE__)
           o.treetop_grammar 'dot-language-hand-made.treetop'
           o.treetop_grammar 'dot-language.generated.treetop'
         end,

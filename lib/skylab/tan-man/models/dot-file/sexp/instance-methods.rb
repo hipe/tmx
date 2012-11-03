@@ -1,5 +1,26 @@
 module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
-  extend ::Skylab::Autoloader
+
+  extend ::Skylab::Autoloader # we want the plain jane variety, and now later
+
+  class << self
+
+    # This const_defined? hack is an experimental alternative to preloading
+    # every extension module file for every Sexp class "manually".
+    # We must do either one or the other because Sexp::Auto is unaware
+    # of the idea of autoloading (as it probably should be!) and hence
+    # uses const_defined? to determine if extension modules exist
+    # for a given Sexp class.
+
+    def const_defined? const, bool
+      if const_defined_without_autoloader? const, bool
+        true
+      elsif const_probably_loadable? const
+        self.const_get const, false
+      else
+        false
+      end
+    end
+  end
 
   module Common
     self::TanMan = ::Skylab::TanMan
@@ -23,8 +44,6 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
   # --*--
   # (modules that require more than 20 lines should be moved to their own file.)
 
-  self::AList || nil # #sky-106
-
   module DoubleQuotedString
     def normalized_string
       content_text_value.gsub('\"', '"')
@@ -34,18 +53,10 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
     end
   end
 
-  self::EdgeStmt || nil # #sky-106
-
   module EqualsStmt
     include Common
     def rhs= mixed
       self[:rhs] = _parse_id(mixed, :rhs)
     end
   end
-
-  self::Graph || nil # #sky-106
-
-  self::IdHtml || nil # #sky-106
-
-  self::NodeStmt || nil # #sky-106
 end

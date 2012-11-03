@@ -15,8 +15,7 @@ module Skylab::TanMan
     attr_accessor :label
     def remotes
       @remotes ||= begin
-        require_relative '../remote'
-        Models::Remote::Collection.new(self)
+        TanMan::Models::Remote::Collection.new self
       end
     end
   end

@@ -1,7 +1,6 @@
 module Skylab::TanMan
   module Sexp::Auto::Hacks
     # pure container module for holding automagic "hacks"
-    extend ::Skylab::MetaHell::Autoloader::Autovivifying
   end
 
   class Sexp::Auto::Hack < ::Struct.new(:block, :state)

@@ -6,7 +6,6 @@ module Skylab::TanMan
       config_singleton.local[k]
     end
     def add_remote name, url, resource_name
-      require_relative '../remote'
       ready? or return false
       resource = config_singleton.send(resource_name)
       remote = Models::Remote.new.edit(name: name, url: url) { |o| o.on_error { |e| emit(e) } } # experimental pattern

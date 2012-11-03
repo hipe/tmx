@@ -1,6 +1,4 @@
 module Skylab::TanMan
-  module API::Actions::Remote
-  end
   class API::Actions::Remote::List < API::Action
     attribute :verbose, :boolean => true, :default => false
     def execute

@@ -1,6 +1,12 @@
+[#019] #open "magic" for DRYING up tests
+[#018] #open #depends-on:#sl-100 refactor out porcelain
+[#017] #pattern: for to maybe push up to headless
+[#016] #pattern: action instance spawns instance of model controller
 [#015] #open UI for dissociate (and prune nodes?)
 [#014] #open UI for associate (labeled "depends on")
 [#013] #open UI for chose example, then use example
+  1. unify & modernify autoloading
+  2. fix api vis-a-vis actions to integrate with autoloading
 [#012] #done 2012-11-01 refactor UI / NLP to use Sexp::Auto
 [#011] #done make sure complex prototypes can be used with nonzero length lists
 [#010] #done 2012-10-27 associate two nodes

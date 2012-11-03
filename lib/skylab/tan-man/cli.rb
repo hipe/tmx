@@ -1,10 +1,10 @@
-require File.expand_path('../api', __FILE__)
-require 'skylab/porcelain/core'
+require_relative 'core'
+
+Skylab::TanMan::API || nil # #preload
 
 module Skylab::TanMan
-
   class CLI < Bleeding::Runtime
-    extend PubSub::Emitter
+    extend ::Skylab::PubSub::Emitter
 
     emits EVENT_GRAPH
     event_class API::Event
@@ -47,7 +47,7 @@ module Skylab::TanMan
   class CLI::Action
     extend Bleeding::ActionModuleMethods
     extend Bleeding::DelegatesTo
-    extend PubSub::Emitter
+    extend ::Skylab::PubSub::Emitter
     include CLI::ActionInstanceMethods
 
     emits(:out, EVENT_GRAPH)
@@ -66,7 +66,6 @@ module Skylab::TanMan
 
     def api
       @api ||= begin
-        require_relative 'api/binding'
         API::Binding.new(self)
       end
     end

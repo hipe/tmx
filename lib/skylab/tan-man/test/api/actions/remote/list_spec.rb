@@ -1,5 +1,4 @@
-require_relative '../../../../api'
-require_relative '../../../test-support'
+require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport
   describe "The #{TanMan::API} action Remote List", tanman: true do
