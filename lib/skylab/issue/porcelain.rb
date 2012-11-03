@@ -1,5 +1,5 @@
 require_relative 'api'
-require 'skylab/meta-hell/autoloader/autovivifying'
+require 'skylab/meta-hell/core'
 
 # @todo: add a feature that is a report of the todos
 

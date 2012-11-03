@@ -166,8 +166,7 @@ module Skylab::TanMan::TestSupport
     end
 
     let :result do
-      client = self.client
-      _result = if normalized_input_pathname
+      if normalized_input_pathname
         if input_string_to_use
           fail 'sanity - we have both'
         else
@@ -178,7 +177,6 @@ module Skylab::TanMan::TestSupport
       else
         fail 'sanity - we have neither'
       end
-      _result # #todo
     end
   end
 end
