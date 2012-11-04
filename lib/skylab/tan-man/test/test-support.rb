@@ -5,6 +5,8 @@ require 'skylab/test-support/tmpdir'
 
 module Skylab::TanMan::TestSupport
   extend ::Skylab::Autoloader
+  self.dir_path = dir_pathname.join('..').to_s # #temporary!
+
   include ::Skylab::TestSupport
 
   TanMan = Skylab::TanMan
@@ -183,5 +185,5 @@ end
 
 
 if defined? ::RSpec # egads sorry -- for running CLI visual testing clients
-  require_relative 'test-support/for-rspec' # egads sorry - visual test hack
+  require_relative 'for-rspec' # egads sorry - visual test hack
 end
