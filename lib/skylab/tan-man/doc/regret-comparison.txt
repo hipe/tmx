@@ -1,0 +1,34 @@
+tree -P 'test-support\.rb' test --prune test
+
+            NUM  LINES BEFORE REGRET
+├── api
+│   ├── actions
+│   │   ├── remote
+│   │   │   └── test-support.rb    1
+│   │   └── test-support.rb        1
+│   └── test-support.rb            1
+├── cli
+│   ├── actions
+│   │   ├── graph_
+│   │   │   └── test-support.rb    1
+│   │   └── test-support.rb        1
+│   └── test-support.rb            1
+├── models
+│   ├── dot-file
+│   │   ├── manipulus
+│   │   │   └── test-support.rb   20
+│   │   ├── parser
+│   │   │   └── test-support.rb   40
+│   │   └── test-support.rb       26
+│   └── test-support.rb           14
+├── sexp
+│   ├── auto
+│   │   └── test-support.rb       33
+│   ├── grammars
+│   │   └── test-support.rb        1
+│   ├── prototype
+│   │   ├── grammars
+│   │   │   └── test-support.rb    1
+│   │   └── test-support.rb       21
+│   └── test-support.rb           79
+└── test-support.rb              187
