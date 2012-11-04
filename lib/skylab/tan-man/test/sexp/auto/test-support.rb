@@ -1,14 +1,9 @@
-require_relative '../test-support' # TMPDIR
+require_relative '../test-support'
 
-module ::Skylab::TanMan::Sexp::Auto::TestSupport
-  def self.extended mod
-    mod.module_eval do
-      extend ModuleMethods
-      include InstanceMethods
-    end
-  end
+module ::Skylab::TanMan::TestSupport::Sexp::Auto
+  ::Skylab::TanMan::TestSupport::Sexp[ Auto = self ]
+
   module ModuleMethods
-    include ::Skylab::TanMan::Sexp::TestSupport::ModuleMethods
     def it_unparses_losslessly *tags
       it "unparses losslessly", *tags do
         result.unparse.should eql(normalized_input_string)
@@ -26,8 +21,6 @@ module ::Skylab::TanMan::Sexp::Auto::TestSupport
     end
   end
   module InstanceMethods
-    extend ::Skylab::TanMan::TestSupport::InstanceMethodsModuleMethods
-    include ::Skylab::TanMan::Sexp::TestSupport::InstanceMethods
     include ::Skylab::TanMan::Sexp::Inflection::Methods
   end
 end

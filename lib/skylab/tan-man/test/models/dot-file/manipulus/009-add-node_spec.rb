@@ -1,7 +1,7 @@
 require_relative 'test-support'
 
 describe "#{Skylab::TanMan::Models::DotFile} (manipulus 009) Adding Nodes" do
-  extend ::Skylab::TanMan::Models::DotFile::Manipulus::TestSupport
+  extend ::Skylab::TanMan::TestSupport::Models::DotFile::Manipulus
 
   using_input '009-add-node-simple-prototype/zero.dot' do
     it 'adds a node to zero nodes' do

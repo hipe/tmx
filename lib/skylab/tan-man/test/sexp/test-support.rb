@@ -1,35 +1,23 @@
 require_relative '../test-support'
 
-module ::Skylab::TanMan::Sexp::TestSupport
-  extend ::Skylab::MetaHell::Autoloader::Autovivifying::Recursive
-  self.dir_path = dir_pathname.join('..').to_s # there is no test-support/ dir
-
-  TestSupport = self
+module ::Skylab::TanMan::TestSupport::Sexp
+  ::Skylab::TanMan::TestSupport[ Sexp = self ]
 
   module Grammars
-    extend TestSupport::Grammar::Boxxy
-    self.dir_path = dir_pathname.join('../../grammars').to_s # or make an orphan
-  end
-
-  def self.extended mod
-    mod.extend ModuleMethods
-    mod.send :include, InstanceMethods
+    @dir_path = Sexp.dir_pathname.join('grammars').to_s # or make orphan
+    extend Sexp::Grammar::Boxxy
   end
 
   module ModuleMethods
-    include ::Skylab::TanMan::TestSupport::ModuleMethods
-
     def using_grammar grammar_pathpart, *tags, &b
       context "using grammar #{grammar_pathpart}", *tags do
         let(:using_grammar_pathpart) { grammar_pathpart }
-        module_eval &b
+        module_eval( &b )
       end
     end
   end
 
   module InstanceMethods
-    extend ::Skylab::TanMan::TestSupport::InstanceMethodsModuleMethods
-    include ::Skylab::TanMan::TestSupport::InstanceMethods
 
     let :client do
       o = _parser_client_module.new upstream, paystream, infostream
@@ -65,7 +53,7 @@ module ::Skylab::TanMan::Sexp::TestSupport
     end
 
     let :_parser_clients_module do
-      ::Skylab::TanMan::Sexp::TestSupport::Grammars
+      ::Skylab::TanMan::TestSupport::Sexp::Grammars
     end
 
     let :paystream do

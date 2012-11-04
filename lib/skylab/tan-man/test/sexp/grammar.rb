@@ -2,7 +2,7 @@ require 'optparse'
 require 'stringio'
 require_relative '../test-support'
 
-module ::Skylab::TanMan::Sexp::TestSupport
+module ::Skylab::TanMan::TestSupport::Sexp
 
   module CLI_Client_InstanceMethods # #todo: #100
   protected

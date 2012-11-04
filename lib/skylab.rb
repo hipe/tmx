@@ -43,7 +43,7 @@ module Skylab
   end
 
   module Autoloader::ModuleMethodsModuleMethods
-    def extended mod
+    def extended mod # be sure to #trigger this when hacking autoloader
       class << mod # #sl-106: we do *not* hack const_defined?, but other may
         alias_method :const_defined_without_autoloader?, :const_defined?
       end
@@ -55,10 +55,17 @@ module Skylab
     extend Autoloader::Inflection::Methods # pathify
 
     -> do
-      rx = /^(?<stem>.+)(?=#{::Regexp.escape(Autoloader::EXTNAME)}:\d+:in `)/
+      rx = /^(?<path>.+#{ ::Regexp.escape Autoloader::EXTNAME })(?=:\d+:in `)/
+
       define_method :_autoloader_extended! do |caller_str|
-        @dir_path ||= _guess_dir(to_s, caller_str.match(rx)[:stem]) do |e|
-          fail "Autoloader hack failed: #{e.class}"
+        if ! dir_path
+          file = ::Pathname.new caller_str.match(rx)[:path]
+          if ! file.absolute? # this takes a filesystem hit, but you cannot ..
+            file = file.expand_path # reliably autoload with a relpath.
+          end
+          self.dir_path = _guess_dir to_s, file.sub_ext('').to_s do |e|
+            fail "Autoloader hack failed: #{e}"
+          end
         end
       end
     end.call
@@ -88,6 +95,11 @@ module Skylab
         dir_path or fail("sanity - dir_path not known")
         ::Pathname.new dir_path
       end
+    end
+
+    def dir_pathname= pn
+      @dir_path = pn.to_s
+      @dir_pathname = pn
     end
 
     -> do

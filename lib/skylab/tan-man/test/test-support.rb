@@ -1,17 +1,18 @@
 require_relative '../core' # assume tanman core loaded skylab.rb
-require 'skylab/porcelain/tite-color'
+require 'skylab/porcelain/core'
 require 'skylab/test-support/core'
-require 'skylab/test-support/tmpdir'
+
+require_relative 'regret' # we cannot autoload this b.c. it gives us autolaoding
 
 module Skylab::TanMan::TestSupport
-  extend ::Skylab::Autoloader
-  include ::Skylab::TestSupport
+  self::Regret[ self ]
 
-  TanMan = Skylab::TanMan
+  TanMan = ::Skylab::TanMan
 
   TMPDIR_STEM = 'tan-man'
 
-  TMPDIR = Tmpdir.new(::Skylab::TMPDIR_PATHNAME.join(TMPDIR_STEM).to_s)
+  TMPDIR = ::Skylab::TestSupport::Tmpdir.new(
+    ::Skylab::TMPDIR_PATHNAME.join(TMPDIR_STEM).to_s)
 
 
   # this is dodgy but should be ok as long as you accept that:
@@ -51,12 +52,6 @@ module Skylab::TanMan::TestSupport
     end
   end
 
-
-  module InstanceMethodsModuleMethods
-    include ::Skylab::MetaHell::Let::ModuleMethods
-  end
-
-
   module Tmpdir_InstanceMethods
     -> do
       execute_f = -> { TMPDIR.prepare }
@@ -80,10 +75,7 @@ module Skylab::TanMan::TestSupport
 
 
   module InstanceMethods
-    extend InstanceMethodsModuleMethods
-
     include ::Skylab::Autoloader::Inflection::Methods
-
     include TanMan::API::Achtung::SubClient::ModuleMethods # headless_runtime
 
     def _build_normalized_input_pathname stem
@@ -183,5 +175,5 @@ end
 
 
 if defined? ::RSpec # egads sorry -- for running CLI visual testing clients
-  require_relative 'test-support/for-rspec' # egads sorry - visual test hack
+  require_relative 'for-rspec' # egads sorry - visual test hack
 end

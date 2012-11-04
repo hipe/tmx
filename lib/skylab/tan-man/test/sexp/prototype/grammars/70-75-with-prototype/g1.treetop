@@ -1,4 +1,4 @@
-module Skylab::TanMan::Sexp::TestSupport::Prototype::Grammars::Namespace70_75
+module Skylab::TanMan::TestSupport::Sexp::Prototype::Grammars::Namespace70_75
   grammar NeepZeep70_75
     rule document
       'beginning' s node_list 'ending' s?

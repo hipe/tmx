@@ -1,5 +1,5 @@
 module Skylab::TestSupport
-  class EmitSpy < Struct.new(:stack, :do_debug, :formatter)
+  class EmitSpy < ::Struct.new(:stack, :do_debug, :formatter)
     def initialize &formatter
       super([], false, formatter)
     end
