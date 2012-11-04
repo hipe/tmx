@@ -1,4 +1,4 @@
-[#019] #open "magic" for DRYING up tests
+[#019] #done "magic" for DRYING up tests (Regret)
 [#018] #open #depends-on:#sl-100 refactor out porcelain
 [#017] #pattern: for to maybe push up to headless
 [#016] #pattern: action instance spawns instance of model controller

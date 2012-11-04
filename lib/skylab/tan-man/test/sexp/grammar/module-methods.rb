@@ -1,4 +1,4 @@
-module Skylab::TanMan::Sexp::TestSupport
+module Skylab::TanMan::TestSupport::Sexp
   module Grammar::ModuleMethods
     extend ::Skylab::MetaHell::Let
 

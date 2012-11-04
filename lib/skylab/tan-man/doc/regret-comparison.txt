@@ -1,34 +1,48 @@
 tree -P 'test-support\.rb' test --prune test
 
-            NUM  LINES BEFORE REGRET
+a case study in refactoring and DRY :
+
+            NUM  LINES BEFORE REGRET | AFTER
 ├── api
 │   ├── actions
 │   │   ├── remote
-│   │   │   └── test-support.rb    1
-│   │   └── test-support.rb        1
-│   └── test-support.rb            1
+│   │   │   └── test-support.rb    1   .
+│   │   └── test-support.rb        1   .
+│   └── test-support.rb            1   .
 ├── cli
 │   ├── actions
 │   │   ├── graph_
-│   │   │   └── test-support.rb    1
-│   │   └── test-support.rb        1
-│   └── test-support.rb            1
+│   │   │   └── test-support.rb    1   .
+│   │   └── test-support.rb        1   .
+│   └── test-support.rb            1   .
 ├── models
 │   ├── dot-file
 │   │   ├── manipulus
-│   │   │   └── test-support.rb   20
+│   │   │   └── test-support.rb   20   9  45%
 │   │   ├── parser
-│   │   │   └── test-support.rb   40
-│   │   └── test-support.rb       26
-│   └── test-support.rb           14
+│   │   │   └── test-support.rb   40  37  93%
+│   │   └── test-support.rb       27   9  35%
+│   └── test-support.rb           14   5  35%
 ├── sexp
 │   ├── auto
-│   │   └── test-support.rb       33
+│   │   └── test-support.rb       33  26  78%
 │   ├── grammars
-│   │   └── test-support.rb        1
+│   │   └── test-support.rb        1   .
 │   ├── prototype
 │   │   ├── grammars
-│   │   │   └── test-support.rb    1
-│   │   └── test-support.rb       21
-│   └── test-support.rb           79
-└── test-support.rb              187
+│   │   │   └── test-support.rb    1   .
+│   │   └── test-support.rb       21  13  62%
+│   └── test-support.rb           79  67  84%
+└── test-support.rb              188 179  95%
+                                ---- ---  ---
+                                 422 345  82%
+
+
+  NUM LINES REDUCED in test-support.rb's : 77
+  NUM LINES IN regret.rb                 : 76
+
+
+  COST IN TERMS OF DEVELOPMENT TIME      : 1 day
+  SAVINGS, IN TERMS OF LOC               : 1 line of code
+
+~hipe

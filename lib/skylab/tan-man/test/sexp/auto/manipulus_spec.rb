@@ -1,7 +1,7 @@
 require_relative 'test-support'
 
 describe "#{::Skylab::TanMan::Sexp::Auto} MANIPULULS" do
-  extend ::Skylab::TanMan::Sexp::Auto::TestSupport
+  extend ::Skylab::TanMan::TestSupport::Sexp::Auto
 
   using_grammar '70-75-minimal-recursive-list' do
     # adopts language from XML DOM API: insertBefore, appendChild, removeChild

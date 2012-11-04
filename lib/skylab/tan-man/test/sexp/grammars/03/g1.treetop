@@ -1,4 +1,4 @@
-module Skylab::TanMan::Sexp::TestSupport::Grammars::Namespace3
+module Skylab::TanMan::TestSupport::Sexp::Grammars::Namespace3
   grammar HerfusDerfus03
     rule dependency_statement
       agent:cluster sep 'depends on' sep target:cluster "\n"

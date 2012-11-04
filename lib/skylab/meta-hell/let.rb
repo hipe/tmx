@@ -13,7 +13,7 @@ module Skylab::MetaHell
     def let name, &initial_f
       define_method name do
         __memoized.fetch name do |k|
-          __memoized[k] = instance_exec &initial_f
+          __memoized[k] = instance_exec(& initial_f)
         end
       end
     end

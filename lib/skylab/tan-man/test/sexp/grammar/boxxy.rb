@@ -1,10 +1,15 @@
-module ::Skylab::TanMan::Sexp
-  module TestSupport::Grammar::Boxxy
-    include ::Skylab::Autoloader::ModuleMethods
+module ::Skylab::TanMan::TestSupport
+  module Sexp::Grammar::Boxxy
+    # ad-hoc one-off for autoloading our test grammars on-demand
+
     include ::Skylab::Autoloader::Inflection::Methods # pathify
+    include ::Skylab::Autoloader::ModuleMethods # does not #trigger
+
     def self.extended mod
+      extend ::Skylab::Autoloader::ModuleMethods # #trigger (maybe nec. later)
       mod._autoloader_extended! caller[0]
     end
+
     -> do
       rx = /\AGrammar(?<num>[0-9]+)(?:_(?<rest>.+))?\z/
       define_method :const_missing do |const|

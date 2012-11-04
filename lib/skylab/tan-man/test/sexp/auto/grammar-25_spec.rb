@@ -1,7 +1,7 @@
 require_relative 'test-support'
 
 describe "#{::Skylab::TanMan::Sexp::Auto} list pattern (grammar 25)" do
-  extend ::Skylab::TanMan::Sexp::Auto::TestSupport
+  extend ::Skylab::TanMan::TestSupport::Sexp::Auto
 
   using_grammar '25' do
     using_input '200-zero-items' do

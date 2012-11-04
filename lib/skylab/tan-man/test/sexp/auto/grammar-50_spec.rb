@@ -1,7 +1,7 @@
 require_relative 'test-support'
 
 describe "#{::Skylab::TanMan::Sexp::Auto} list pattern (grammar 50)" do
-  extend ::Skylab::TanMan::Sexp::Auto::TestSupport
+  extend ::Skylab::TanMan::TestSupport::Sexp::Auto
 
   using_grammar '50' do
     using_input '010-empty-digraph-no-ws.dot' do
