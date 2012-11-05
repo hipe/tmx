@@ -1,3 +1,4 @@
+[#020] #low-priority nounify cli commands
 [#019] #done "magic" for DRYING up tests (Regret)
 [#018] #open #depends-on:#sl-100 refactor out porcelain
 [#017] #pattern: for to maybe push up to headless

@@ -12,9 +12,8 @@ module Skylab::MetaHell
     extend ::Skylab::Autoloader::ModuleMethodsModuleMethods
     include Autoloader::Autovivifying::ModuleMethods
 
-    def _const_missing const
-      Autoloader::Autovivifying::Recursive::ConstMissing.new(
-        const, dir_pathname, self)
+    def _const_missing_class
+      Autoloader::Autovivifying::Recursive::ConstMissing
     end
   end
 

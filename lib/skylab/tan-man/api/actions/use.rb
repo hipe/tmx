@@ -22,7 +22,7 @@ module Skylab::TanMan
         end
         create_path or return
       end
-      config.set_value(:file, path.expand_path.to_s, :local) or return
+      config.set_value(:file, path.expand_path.to_s, :local)
     end
     # -- * --
     def create_path
@@ -33,12 +33,13 @@ module Skylab::TanMan
           return error("cannot create, already exists: #{path}")
         end
       end
+      # template = service.examples.example #todo:refactor
+      template =  service.examples.fetch 'digraph.dot'
+      content = template.call(
+        created_on: ::Time.now.utc.to_s
+      )
       bytes = nil
-      path.open('w+') do |fh|
-        bytes = fh.write(TanMan::Templates['digraph.dot'].call(
-          created_on: ::Time.now.utc.to_s
-        ))
-      end
+      path.open('w+') { |fh| bytes = fh.write content }
       info("wrote #{path} (#{bytes} bytes).")
     end
   end

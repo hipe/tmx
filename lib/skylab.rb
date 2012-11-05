@@ -80,7 +80,11 @@ module Skylab
     end
 
     def _const_missing const
-      Autoloader::ConstMissing.new const, dir_pathname, self
+      _const_missing_class.new const, dir_pathname, self
+    end
+
+    def _const_missing_class
+      Autoloader::ConstMissing
     end
 
     attr_reader :dir_path

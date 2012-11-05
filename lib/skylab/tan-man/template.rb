@@ -1,5 +1,3 @@
-require 'skylab/headless/core'
-
 module ::Skylab::TanMan
   class Template < ::Struct.new(:pathname, :string)
     def call params

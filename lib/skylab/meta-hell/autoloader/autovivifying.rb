@@ -13,8 +13,8 @@ module Skylab::MetaHell
     extend ::Skylab::Autoloader::ModuleMethodsModuleMethods
     include ::Skylab::Autoloader::ModuleMethods
 
-    def _const_missing const
-      Autoloader::Autovivifying::ConstMissing.new const, dir_pathname, self
+    def _const_missing_class
+      Autoloader::Autovivifying::ConstMissing
     end
   end
 
@@ -28,6 +28,9 @@ module Skylab::MetaHell
 
   class Autoloader::Autovivifying::ConstMissing <
                                               ::Skylab::Autoloader::ConstMissing
+
+    extend MetaHell::Let # for the children
+
     def load
       if file_pathname.exist?
         load_file

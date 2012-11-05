@@ -4,13 +4,14 @@ Skylab::TanMan::API || nil # #preload
 
 module Skylab::TanMan
   class CLI < Bleeding::Runtime
+    extend ::Skylab::MetaHell::Let
     extend ::Skylab::PubSub::Emitter
 
     emits EVENT_GRAPH
     event_class API::Event
 
     def initialize
-      @singletons = API::Singletons.new
+      @singletons = API::Singletons.new # #todo:refactor to memoize
       @stderr = $stderr ; @stdout = $stdout # defaults that might get changed below
       if block_given?
         yield self
@@ -20,6 +21,9 @@ module Skylab::TanMan
       end
     end
     def root_runtime ; self end
+    let :services_runtime do
+      TanMan::Service::Runtime.new
+    end
     attr_reader :singletons
     attr_accessor :stderr, :stdout
     alias_method :infostream, :stderr
@@ -242,5 +246,23 @@ module Skylab::TanMan
       api.invoke(words: word)
     end
   end
-end
 
+  module CLI::Actions::Graph
+    extend CLI::NamespaceModuleMethods
+    desc "do things to graphs."
+    summary { ["#{action_syntax} graph"] }
+  end
+
+  module CLI::Actions::Graph::Example
+    extend CLI::NamespaceModuleMethods
+    desc "what graph example to use?"
+    summary { ["#{action_syntax} vleeplye"] }
+  end
+
+  class CLI::Actions::Graph::Example::Set < CLI::Action
+    desc "set the example graph."
+    def invoke name
+      api.invoke name: name
+    end
+  end
+end

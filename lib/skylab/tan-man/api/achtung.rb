@@ -1,4 +1,3 @@
-require 'skylab/headless/core'
 module Skylab::TanMan
   # Literate programming, for once!?
 
@@ -33,8 +32,9 @@ module Skylab::TanMan
       cli = cli_action.runtime
       runtime = headless_runtime cli_action
       action = new runtime
-      action.infostream = cli.stderr
+      action.infostream = cli.root_runtime.stderr
       action.singletons_f = ->{ binding.singletons }
+      action.services_runtime_f = ->{ binding.services_runtime }
       action.invoke(params)
     end
 
@@ -78,7 +78,7 @@ module Skylab::TanMan
       execute # (you might find this pattern elsewhere in headless)
     end
 
-    # This sub=client will act as the parent runtime for model controllers,
+    # This sub-client will act as the parent runtime for model controllers,
     # and as such it must provide the below methods as a #service to those
     # model controllers. (#todo #after:#100 revisit this)
     def singletons ; singletons_f.call end
@@ -86,8 +86,12 @@ module Skylab::TanMan
     attr_accessor :singletons_f
       # #todo: rename these. it may be a good pattern but it's a terrible name
 
-  protected
+    def service ; services_runtime_f.call end
 
+    attr_accessor :services_runtime_f
+
+
+  protected
 
     def config # #pattern #016
       @config ||= TanMan::Models::Config::Controller.new self
@@ -110,7 +114,7 @@ module Skylab::TanMan
 
     attr_writer :errors_count # #pattern #017
 
-    def formal_paramters # #pattern #017
+    def formal_parameters # #pattern #017
       self.class.parameters
     end
   end
