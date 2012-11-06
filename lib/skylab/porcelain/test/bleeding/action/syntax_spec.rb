@@ -7,7 +7,7 @@ module Skylab::Porcelain::Bleeding::TestSupport
     let(:klass) { self.send(:Akton) }
     let(:runtime) { build_action_runtime 'akton' }
     context "with regards to inferred syntaxes" do
-      klass(:Akton) do
+      klass :Akton do
         extend Bleeding::ActionModuleMethods
         def invoke wiggle=nil, waggle
         end
@@ -44,7 +44,7 @@ module Skylab::Porcelain::Bleeding::TestSupport
       end
     end
     context "with a stated syntax (of options)" do
-      klass(:Akton) do
+      klass :Akton do
         extend Bleeding::ActionModuleMethods
         option_syntax do |_|
           on('-x', 'wing fighter')

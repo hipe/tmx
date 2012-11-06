@@ -33,7 +33,7 @@ module Skylab::Porcelain::Bleeding::TestSupport
       end
     end
     context "Child classes inherit parent summaries in an intuitive manner" do
-      klass(:Child, extends: :Base) do
+      klass :Child, extends: :Base do
         instance_exec(& _hack.child_desc_block)
       end ; let(:child) { _hack = self ; send(:Child) }
       def self.child_desc *a
@@ -60,14 +60,14 @@ module Skylab::Porcelain::Bleeding::TestSupport
     end
     context "The RAW POWER of this is UNLEASHED when you have inherited useful functions",f:true do
       desc 'never see', 'base class'
-      klass(:Child, extends: :Base) do
+      klass :Child, extends: :Base do
         desc "ok go"
         summary { ["#{aliases.first}<-->#{desc.last.upcase.gsub('á', 'Á')}"] }
       end
-      klass(:SubChild1, extends: :Child) do
+      klass :SubChild1, extends: :Child do
         desc "pootenany", "whootenany"
       end
-      klass(:SubChild2, extends: :Child) do
+      klass :SubChild2, extends: :Child do
         desc "say yes to mamá"
       end
       it("it's almost like class-based inheritance!!!") do

@@ -36,7 +36,7 @@ end
 module Skylab::MetaHell::KlassCreator
   module InstanceMethods
     include ::Skylab::MetaHell::ModulCreator::InstanceMethods
-    def klass(full_name, opts={}, &klass_body)
+    def klass!(full_name, opts={}, &klass_body)
       extends = PARSE_OPTS.call(opts)
       defn = BUILD_CLASS_DEFINITION.call(full_name, extends, klass_body)
       instance_eval(&defn)

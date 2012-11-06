@@ -5,12 +5,12 @@ module Skylab::Porcelain::Bleeding::TestSupport
     extend ModuleMethods ; include InstanceMethods
     _hack = nil
     base_module!
-    klass(:BaseAction) do
+    klass :BaseAction do
       extend Bleeding::ActionModuleMethods
     end
-    klass(:Acts__ChildAction1, extends: :BaseAction)
-    it "They can of course be accessed by action runtimes", f:true do
-      send(:Acts__ChildAction1) # (we've got to kick it)
+    klass :Acts__ChildAction1, extends: :BaseAction
+    it "They can of course be accessed by action runtimes" do
+      send :Acts__ChildAction1 # (we've got to kick it)
       act = Bleeding::NamespaceInferred.new(base_module::Acts).fetch('child-action1')
       act.aliases.should eql(['child-action1'])
     end

@@ -29,7 +29,7 @@ module ::Skylab::Porcelain::Bleeding::TestSupport
         @base_module = Module.new.tap do |m|
            ::Skylab::Porcelain::Bleeding::TestSupport.const_set(:TestModule1, m)
         end
-        @my_klass = self.klass(:MyCLIRuntime, extends: Bleeding::Runtime) do # @todo try deeper names
+        @my_klass = klass! :MyCLIRuntime, extends: Bleeding::Runtime do # @todo try deeper names
           o = self
           include RuntimeInstanceMethods
           class o::MyAction
@@ -107,7 +107,7 @@ module ::Skylab::Porcelain::Bleeding::TestSupport
     end
     context "at level 1 (the action 'pony')" do
       before(:all) do
-        @my_klass = self.klass(:MyKliss, extends: Bleeding::Runtime) do
+        @my_klass = klass! :MyKliss, extends: Bleeding::Runtime do
           o = self
           include RuntimeInstanceMethods
           class o::MyAction

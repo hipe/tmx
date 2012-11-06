@@ -4,7 +4,7 @@ module Skylab::Porcelain::Bleeding::TestSupport
   describe "desc, an inheritable attribute of #{Bleeding::ActionModuleMethods}" do
     extend ModuleMethods ; include InstanceMethods
     base_module!
-    klass(:Base) do
+    klass :Base do
       extend Bleeding::ActionModuleMethods
     end
     let(:base) { send(:Base) }
@@ -27,7 +27,7 @@ module Skylab::Porcelain::Bleeding::TestSupport
       base.desc.object_id.should eql(oid)
     end
     context "When you have a child class of a base class with a desc" do
-      klass(:Child, extends: :Base) ; let(:child) { send(:Child) }
+      klass( :Child, extends: :Base ) ; let( :child ) { send(:Child) }
       before(:each) do
         base.desc 'foo', 'bar'
       end
@@ -51,7 +51,7 @@ module Skylab::Porcelain::Bleeding::TestSupport
     end
     context "(bugfix: be sure that flyweighting doesn't interfere)" do
       let(:emit_spy) { ::Skylab::TestSupport::EmitSpy.new }
-      klass(:CLI, extends: Bleeding::Runtime) do
+      klass :CLI, extends: Bleeding::Runtime do
         def initialize rt
           @rt = rt
         end
