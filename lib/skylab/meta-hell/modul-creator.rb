@@ -8,31 +8,62 @@ module Skylab::MetaHell
     SEP = '__'
   end
 
+  module Modul end
+
+  class Modul::Meta < ::Struct.new :name, :children, :blocks
+    def initialize n, cx=[], bx=[]
+      @locked = false
+      super n, cx, bx
+    end
+    def _lock!   ; @locked and fail('sanity') ; @locked = true end
+    def _locked? ; @locked end
+    def _unlock! ; @locked or fail('sanity') ; @locked = false end
+  end
+
 
   module ModulCreator::ModuleMethods
     # *note* this does not exclusively pull in a let() implementation,
     # but expects one.
 
+    extend MetaHell::Let # used for convenience in our implementation
+
     include ModulCreator # #constants
 
     def modul full_name, &f
-      # make definitions for each nesting module too:
-      #
-      #   Foo::Bar::Baz => "Foo", "Foo::Bar", "Foo::Bar::Baz"
-      #
-
       parts = full_name.to_s.split SEP
-      last = parts.length - 1
-      memo = nil
-      parts.each_with_index do |x, i|
-        name = memo = [memo, x].compact.join( SEP )
-        if last == i
-          __meta_hell_module!(name) { modul!(name, &f) }
-        else
-          __meta_hell_module!(name) { modul!(name, full_name, &f) }
+      memo = parts.shift.intern
+      prev = nil
+      g = __meta_hell_known_graph
+      meta_f = -> name do
+        g.fetch( name ){ |k| g[k] = Modul::Meta.new k }
+      end
+      loop do
+        name = memo # localized variable - important!
+        if prev # relate cx to parent
+          m = meta_f[ prev ]
+          m.children.push(name) unless m.children.include? name
+        end
+        if parts.empty? # then you have target doohah
+          m = meta_f[ name ]
+          f and m.blocks.push f
+          __meta_hell_module!(name) { modul! name, g }
+          break
+        else # then you have interceding doohah, send along the block
+          __meta_hell_module!(name) { modul! name, g }
+          prev = memo
+          memo = "#{memo}#{SEP}#{parts.shift}".intern
         end
       end
       nil
+    end
+
+    let :__meta_hell_known_graph do
+      a = ancestors # ACK skip Object, Kernel, BasicObject ACK ACK ACK
+      o = a[ ((self == a.first) ? 1 : 0 ) .. -4 ].detect do |x|
+        x.respond_to? :__meta_hell_known_graph
+      end
+      o and fail("ACK try to implement this crazy shit ~meta hell")
+      { }
     end
 
     def __meta_hell_module! full_module_name, &f
@@ -48,7 +79,7 @@ module Skylab::MetaHell
 
     def ___meta_hell_memoize_module full_module_name, &f
       # memoize the module (e.g. class) around this very definition call
-      # together with the anchor moudle.  Memoizing on the client alone will
+      # together with the anchor moudule.  Memoizing on the client alone will
       # get you possibly repeated definition block runs depending on how
       # you implement that .. in flux!
 
@@ -66,31 +97,45 @@ module Skylab::MetaHell
   module ModulCreator::InstanceMethods
     extend MetaHell::Let::ModuleMethods
 
-    def _module! const_a
-      # Make these modules now iff not defined, recursive.
-      const_a.reduce meta_hell_anchor_module do |mod, const|
+    include ModulCreator # #constants
+
+    def modul! full_name, g=nil, &f
+      # get this module by name now, autovivifying where necessary, and, when
+      # you autovivify, run any and all known blocks on the module iff you
+      # are creating it.
+      anchor = meta_hell_anchor_module
+      const_a = full_name.to_s.split SEP
+      first = true
+      name = nil
+      const_a.reduce anchor do |mod, const|
+        name = (name ? "#{name}#{SEP}#{const}" : const).intern
         if ! mod.const_defined? const, false
           m = ::Module.new
-          _my_name = (mod == meta_hell_anchor_module) ? const.to_s : "#{mod}::#{const}"
+          _my_name = ( first ? const.to_s : "#{mod}::#{const}" ).freeze
           m.singleton_class.send(:define_method, :to_s) { _my_name }
+          meta = g && g[name]
+          if meta
+            if meta._locked?
+              fail("circular dependency with #{name} - you should be #{
+                }using ruby instead.")
+            end
+            meta._lock!
+            meta.blocks.each do |_f|
+              m.module_exec(& _f)
+            end
+            meta._unlock!
+          end
           mod.const_set const, m
+          if meta
+            # this totally will be broken if you think of it as ruby
+            meta.children.each do |ch|
+              modul! ch, g
+            end
+          end
         end
+        first = false
         mod.const_get const, false
       end
-    end
-
-    def modul! full_name, deepest_child_full_name=nil, &body_f
-      # Get this module by name now, autovifiying parent modules as required,
-      # and kicking children along the way (see tests).  Run any block against
-      # the requested module, possibly redundantly if that's what u are doing.
-
-      mod = _module! full_name.to_s.split('__')
-      if deepest_child_full_name
-        modul! deepest_child_full_name, &body_f
-      elsif body_f
-        mod.module_exec(self, &body_f)
-      end
-      mod
     end
   end
 end

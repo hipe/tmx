@@ -48,5 +48,40 @@ module ::Skylab::MetaHell::TestSupport::ModulCreator
         end
       end
     end
+
+    context "multi-statement kicking of children" do
+      snip do
+        modul :American__Family
+        modul :American__Gothic
+      end
+      it "happens" do
+        o.American.constants.length.should eql(2)
+      end
+    end
+
+    context "and holy crap what is this shit" do
+      snip do
+        modul( :My__Pho )     { def zap ; end }
+        modul( :My__BaMi )    { def zip ; end ; def zoop ; end }
+        modul( :His__Pho )    { def glyph ; end }
+        modul( :My__BaMi )    { def zip(a) ; end ; def zorp ; end }
+        modul( :My__Pho__Pas ) { def zangeif ; end }
+      end
+
+      it "per module appears to follow the order it was defined in" do
+        o.My__BaMi.instance_methods.should eql([:zip, :zoop, :zorp])
+        o.My__BaMi.instance_method(:zip).parameters.should eql([[:req, :a]])
+      end
+
+      it "looks like it realizes the whole graph, but still lazily wtf!!" do
+        m = o.meta_hell_anchor_module
+        m.constants.should eql([])
+        o.My__Pho
+        m.object_id.should eql(o.meta_hell_anchor_module.object_id)
+        m.constants.should eql([:My])
+        x = m.const_get(:My, false).const_get(:Pho, false).const_get(:Pas, false)
+        x.instance_methods.should eql([:zangeif])
+      end
+    end
   end
 end
