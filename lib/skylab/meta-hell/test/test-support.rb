@@ -6,4 +6,11 @@ module Skylab::MetaHell::TestSupport
 
   MetaHell = ::Skylab::MetaHell
 
+  module InstanceMethods
+    extend MetaHell::Let
+
+    let :o do
+      klass.new
+    end
+  end
 end

@@ -14,7 +14,7 @@ describe Skylab::Autoloader do
         it { should eql(dir) }
       end
     end
-    with "foo", "Foo", "foo", "(conventional atomic case)", f: true
+    with "foo", "Foo", "foo", "(conventional atomic case)"
     with "foo/bar", "Foo::Bar", 'foo/bar', "(conventional, plural)"
     with "foo/bar", "Foo", "foo", "(peek one level up atomic case)"
     with "C:\>///foo/foo", "Foo", "C:\>/foo", "(double deuce edge case)"
