@@ -1,5 +1,5 @@
 module Skylab::MetaHell
-  module KlassCreator
+  module Klass::Creator
     def self.extended mod
       mod.send(:include, ExtensorInstanceMethods)
     end
