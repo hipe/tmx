@@ -1,1 +1,1 @@
-[#001] get regret
+[#001] get regret #done

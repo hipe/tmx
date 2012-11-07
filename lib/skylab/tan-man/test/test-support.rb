@@ -2,10 +2,8 @@ require_relative '../core' # assume tanman core loaded skylab.rb
 require 'skylab/porcelain/core'
 require 'skylab/test-support/core'
 
-require_relative 'regret' # we cannot autoload this b.c. it gives us autolaoding
-
 module Skylab::TanMan::TestSupport
-  self::Regret[ self ]
+  ::Skylab::TestSupport::Regret[ self ]
 
   TanMan = ::Skylab::TanMan
 
