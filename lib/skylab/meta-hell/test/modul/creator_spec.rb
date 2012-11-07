@@ -1,4 +1,4 @@
-require_relative 'modul-creator/test-support'
+require_relative 'creator/test-support.rb'
 
 module ::Skylab::MetaHell::TestSupport::Modul::Creator
   describe "#{MetaHell::Modul::Creator} uber alles" do

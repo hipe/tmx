@@ -1,7 +1,5 @@
 require_relative '../test-support'
 
-module Skylab::MetaHell::TestSupport::Modul end
-
 module Skylab::MetaHell::TestSupport::Modul::Creator
   include( Up_ = ::Skylab::MetaHell::TestSupport ) # #constants
 
