@@ -59,6 +59,10 @@ module ::Skylab::TestSupport
     # and DRY-ing up what's happening in the tests now.
     #
     def _init_regret! caller_str, parent_anchor_module = nil
+      if parent_anchor_module
+        include parent_anchor_module # #constants
+      end
+
       extend ::Skylab::MetaHell::
         Autoloader::Autovivifying::Recursive::ModuleMethods #conf
 

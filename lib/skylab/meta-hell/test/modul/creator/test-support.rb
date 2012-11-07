@@ -1,15 +1,10 @@
 require_relative '../test-support'
 
 module Skylab::MetaHell::TestSupport::Modul::Creator
-  include( Up_ = ::Skylab::MetaHell::TestSupport ) # #constants
+  ::Skylab::MetaHell::TestSupport::Modul[ self ]
 
   Creator_TestSupport = self
   MetaHell = MetaHell # for here
-
-  def self.extended mod
-    mod.extend ModuleMethods
-    mod.send :include, InstanceMethods
-  end
 
 
   module ModuleMethods
