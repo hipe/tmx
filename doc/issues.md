@@ -1,3 +1,4 @@
+[#109] #pattern self.extended mod pattern
 [#108] #low-low-priority #pattern normalization
 [#107] #low-priority 2012-11-02 this lexical scoping issue
 [#106] #done 2012-10-28 autoloading vis-a-vis const awareness
