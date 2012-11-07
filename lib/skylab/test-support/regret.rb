@@ -1,6 +1,6 @@
-module ::Skylab::TanMan::TestSupport
+module ::Skylab::TestSupport
   module Regret
-    # As the name suggests, we might really regret this. (This is [#019].)
+    # As the name suggests, we might really regret this. (This was [#tm-019].)
     #
     # The Regret module is an alternate way to do something like rspec's
     # shared_contexts but with an implementation that is in some ways more
@@ -59,6 +59,10 @@ module ::Skylab::TanMan::TestSupport
     # and DRY-ing up what's happening in the tests now.
     #
     def _init_regret! caller_str, parent_anchor_module = nil
+      if parent_anchor_module
+        include parent_anchor_module # #constants
+      end
+
       extend ::Skylab::MetaHell::
         Autoloader::Autovivifying::Recursive::ModuleMethods #conf
 

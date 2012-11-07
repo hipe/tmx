@@ -7,6 +7,6 @@ module Skylab
     module Autoloader
       extend ::Skylab::Autoloader
     end
+    extend MetaHell::Autoloader::Autovivifying::ModuleMethods # MWAHAHAHA stupid
   end
 end
-

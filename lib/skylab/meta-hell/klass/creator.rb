@@ -1,5 +1,5 @@
 module Skylab::MetaHell
-  module KlassCreator
+  module Klass::Creator
     def self.extended mod
       mod.send(:include, ExtensorInstanceMethods)
     end
@@ -35,7 +35,7 @@ module Skylab::MetaHell
 end
 module Skylab::MetaHell::KlassCreator
   module InstanceMethods
-    include ::Skylab::MetaHell::ModulCreator::InstanceMethods
+    include ::Skylab::MetaHell::Modul::Creator::InstanceMethods
     def klass!(full_name, opts={}, &klass_body)
       extends = PARSE_OPTS.call(opts)
       defn = BUILD_CLASS_DEFINITION.call(full_name, extends, klass_body)
@@ -52,7 +52,7 @@ module Skylab::MetaHell::KlassCreator
     end
   end
   module ExtensorInstanceMethods
-    include ::Skylab::MetaHell::ModulCreator::InstanceMethods
+    include ::Skylab::MetaHell::Modul::Creator::InstanceMethods
     def get_module mixed
       case mixed
       when NilClass, FalseClass, Module ; mixed
