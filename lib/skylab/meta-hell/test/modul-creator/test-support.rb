@@ -1,9 +1,11 @@
 require_relative '../test-support'
 
-module Skylab::MetaHell::TestSupport::ModulCreator
+module Skylab::MetaHell::TestSupport::Modul end
+
+module Skylab::MetaHell::TestSupport::Modul::Creator
   include( Up_ = ::Skylab::MetaHell::TestSupport ) # #constants
 
-  ModulCreator_TestSupport = self
+  Creator_TestSupport = self
   MetaHell = MetaHell # for here
 
   def self.extended mod
@@ -17,7 +19,7 @@ module Skylab::MetaHell::TestSupport::ModulCreator
       let :klass do
         ::Class.new.class_eval do
           extend MetaHell::Let # compat
-          extend MetaHell::ModulCreator
+          extend MetaHell::Modul::Creator
           let( :meta_hell_anchor_module ) { ::Module.new }
           class_exec(& f)
           self

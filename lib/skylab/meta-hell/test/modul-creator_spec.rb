@@ -1,8 +1,8 @@
 require_relative 'modul-creator/test-support'
 
-module ::Skylab::MetaHell::TestSupport::ModulCreator
-  describe "#{MetaHell::ModulCreator} uber alles" do
-    extend ModulCreator_TestSupport
+module ::Skylab::MetaHell::TestSupport::Modul::Creator
+  describe "#{MetaHell::Modul::Creator} uber alles" do
+    extend Creator_TestSupport
 
 
     context "defining a single module" do
