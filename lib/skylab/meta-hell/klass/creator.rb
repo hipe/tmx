@@ -11,6 +11,7 @@ module Skylab::MetaHell::Klass::Creator
   Klass = MetaHell::Klass
   Modul = MetaHell::Modul
 
+
   def self.extended mod # #sl-109
     mod.extend         ModuleMethods
     mod.send :include, InstanceMethods
@@ -19,43 +20,38 @@ module Skylab::MetaHell::Klass::Creator
   module ModuleMethods
     include Modul::Creator::ModuleMethods # #impl for sure
 
+    o = { }
+
+    o[:build] = -> name, a do
+      m = Klass::Meta.new name
+      m.optionals! a if ! a.empty?
+      m._freeze!
+      m
+    end
+
+    o[:meta] = -> name, a, g do # mutates g
+      meta = g.fetch name do
+        m = K.build[ name, a ]
+        a = nil
+        g[name] = m
+        m
+      end
+      a and meta.optionals! a
+      meta
+    end
+
+    K = ::Struct.new(* o.keys).new ; o.each { |k, v| K[k] = v }
+
     def klass full_name, *a, &f
       let( :_nearest_klass_full_name ) { full_name } # for i.m. klass()
       g = __meta_hell_known_graph
-      F.define_f[ full_name, f,
-        -> name { g.fetch( name ) { |k| g[k] = F.meta_f[ k ] } }, # branch
-        -> name { _meta_hell_klass_meta name, a, g },             # leaf
-        -> name { __meta_hell_module!( name ) { modul! name } }   # memo
-      ]
+      M.define[ full_name, f,
+        -> name { g.fetch( name ) { |k| g[k] = M.build[ k ] } },  # branch
+        -> name { K.meta[ name, a, g ] },                         # leaf
+        -> name { M.body[ self,  name, -> { modul! name } ] }     # body
+      ] # ( note - 'modul!' is being used above only as an accessor )
       nil
     end
-
-    -> do
-      meta_f = nil
-      define_method :_meta_hell_klass_meta do |name, a, g|
-        m, f = meta_f[ name, g ]
-        if ! a.empty?
-          1 == a.length and ::Hash === a.first or fail ArgumentError.exception(
-            "expecting options hash not #{ a.map(&:class).join(', ') }" )
-          a.first.each { |k, v| m._option! k, v }
-        end
-        f.call
-        m
-      end
-
-      meta_f = -> name, g do
-        found = g.key? name
-        m = found ? g[name] : Klass::Meta.new(name)
-        after_f = -> do
-          if ! found
-            m._freeze!
-            g[name] = m
-          end
-        end
-        [ m, after_f ]
-      end
-
-    end.call
   end
 
   module InstanceMethods
@@ -63,8 +59,27 @@ module Skylab::MetaHell::Klass::Creator
 
     include Modul::Creator::InstanceMethods
 
+    K = ModuleMethods::K # #borrow
+
     let( :klass ) { send _nearest_klass_full_name }
 
     let( :object ) { klass.new }
+
+    def klass! full_name, *a, &f
+      # like module!, make this (or reopen it) now, and run any f on it.
+      else_f = -> o, name do # nees to be bound to a, hence here
+        M_.vivify[ o, name,
+          -> { K.build[ name, a ] }, # build_f
+          -> { klass! name } # acccessor_f - watch for inf. recursion
+        ]
+      end
+      M_.bang[ M.parts[ full_name ], f, meta_hell_anchor_module,
+        M_.branch_f[ self, ___meta_hell_known_graph, M_.else ],
+        M_.branch_f[ self, ___meta_hell_known_graph, else_f ],
+        -> m { ::Class == m.class or fail ::TypeError.exception "#{full_name
+          } is not a class (it's a #{m.class})"
+        }
+      ]
+    end
   end
 end

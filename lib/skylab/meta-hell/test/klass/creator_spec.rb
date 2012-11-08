@@ -95,6 +95,23 @@ module ::Skylab::MetaHell::TestSupport::Klass::Creator
           a.should be_include('FunTimes::Pimple')
         end
       end
+      context "watch what happens if you do A::B::C < A::B straight up" do
+        snip do
+          klass :A__B__C, extends: :A__B
+        end
+        doing { o.klass }
+        borks "superclass must be a Class (Module given)"
+      end
+      context "but if you foward-declare the parent class it's ok" do
+        snip do
+          klass :A__B
+          klass :A__B__C, extends: :A__B
+        end
+        doing { o.klass }
+        it "ok" do
+          subject.call.to_s.should eql('A::B::C')
+        end
+      end
     end
 
     context "with reopening classes" do
@@ -136,7 +153,3 @@ module ::Skylab::MetaHell::TestSupport::Klass::Creator
     end
   end
 end
-
-#    context "using klass! on the object as opposed to klass on the module" do
-#      contest "minimal case" do
-#        snip { } # #kick
