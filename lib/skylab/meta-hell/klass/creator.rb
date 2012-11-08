@@ -48,8 +48,8 @@ module Skylab::MetaHell::Klass::Creator
       M.define[ full_name, f,
         -> name { g.fetch( name ) { |k| g[k] = M.build[ k ] } },  # branch
         -> name { K.meta[ name, a, g ] },                         # leaf
-        -> name { __meta_hell_module!( name ) { modul! name } }   # memo
-      ]
+        -> name { M.body[ self,  name, -> { modul! name } ] }     # body
+      ] # ( note - 'modul!' is being used above only as an accessor )
       nil
     end
   end

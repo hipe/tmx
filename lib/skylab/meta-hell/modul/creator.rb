@@ -16,13 +16,19 @@ module Skylab::MetaHell::Modul::Creator
 
     o = ::Hash.new
 
+    o[:body] = -> mod, name, f do
+      M.memoize[ mod, name, f ]
+      mod.module_exec name, & M.convenience
+      nil
+    end
+
     o[:build] = -> name { Modul::Meta.new name }
 
     o[:convenience] = -> full_module_name do   #   _Foo   self.Foo   send(:Foo)
       define_method( "_#{full_module_name}" ) { send full_module_name }
     end
 
-    o[:define] = -> full_name, f, branch_f, leaf_f, memo_f do
+    o[:define] = -> full_name, f, branch_f, leaf_f, body_f do
       parts = M.parts[ full_name ]
       memo = parts.shift.intern
       prev = nil
@@ -39,11 +45,29 @@ module Skylab::MetaHell::Modul::Creator
         else
           m = branch_f[ name ]
         end
-        memo_f[ name ]
+        body_f[ name ]
         break if last
         prev = memo
         memo = "#{memo}#{SEP}#{parts.shift}".intern
       end
+      nil
+    end
+
+    o[:memoize] = -> mod, name, f do
+      # memoize the module (e.g. class) around this very definition call
+      # together with the anchor module.  Memoizing on the client alone will
+      # get you possibly repeated definition block runs depending on how
+      # you implement that .. in flux!
+
+      memo_h = { }
+
+      mod.let name do
+        # ( self here is the client, not the defining class / module )
+        memo_h.fetch( meta_hell_anchor_module.object_id ) do |id|
+          memo_h[id] = instance_exec(& f)
+        end
+      end
+
       nil
     end
 
@@ -60,34 +84,13 @@ module Skylab::MetaHell::Modul::Creator
       { }
     end
 
-    def ___meta_hell_memoize_module full_module_name, &f
-      # memoize the module (e.g. class) around this very definition call
-      # together with the anchor moudule.  Memoizing on the client alone will
-      # get you possibly repeated definition block runs depending on how
-      # you implement that .. in flux!
-
-      memo_h = { }
-
-      let full_module_name do
-        memo_h.fetch( meta_hell_anchor_module.object_id ) do |mod|
-          memo_h[mod] = instance_exec(& f)
-        end
-      end
-    end
-
-    def __meta_hell_module! full_module_name, &f
-      ___meta_hell_memoize_module full_module_name, &f
-      module_exec full_module_name, & M.convenience
-      nil
-    end
-
     def modul full_name, &f
       g = __meta_hell_known_graph
       branch_f = -> name { g.fetch( name ) { |k| g[k] = M.build[ k ] } }
       M.define[ full_name, f,
         branch_f,
         branch_f,
-        -> name { __meta_hell_module!( name ) { modul! name } }
+        -> name { M.body[ self,  name, -> { modul! name } ] }
       ]
       nil
     end
