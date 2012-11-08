@@ -99,7 +99,7 @@ module Skylab::MetaHell::Modul::Creator
 
     o = { }
 
-    o[:bang] = -> parts, f, mod, branch_f, leaf_f do
+    o[:bang] = -> parts, f, mod, branch_f, leaf_f, found_f=nil do
       unless parts.empty? # sanity base case - zero list / empty string
         parts = parts.dup
         seen = [ const = parts.shift.intern ]
@@ -107,6 +107,7 @@ module Skylab::MetaHell::Modul::Creator
           last = parts.empty?
           if mod.const_defined? const, false
             mod = mod.const_get const, false
+            found_f and found_f[ mod ]
           elsif last
             leaf_f.call( seen ) { |m| mod = mod.const_set const, m }
           else

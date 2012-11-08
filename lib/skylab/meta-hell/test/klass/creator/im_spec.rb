@@ -16,8 +16,27 @@ module ::Skylab::MetaHell::TestSupport::Klass::Creator
       end
     end
 
+    context "to to manipulate as a class s/thing started as a module.." do
+      snip
+      doing do
+        o.modul! :Wonder
+        o.klass! :Wonder
+      end
+      borks "Wonder is not a class (it's a Module)"
+    end
 
-    it "try to manipulate as a class s/thing you started as a module"
+    context "but NOTE s/thing that started as a class is ok as a module" do
+      snip
+      doing do
+        o.klass! :Wonder
+        o.modul! :Wonder
+      end
+      it "is ok to do *for now*" do
+        x = subject.call
+        x.to_s.should eql('Wonder')
+        x.class.should eql(::Class)
+      end
+    end
 
     it "show that it autovivifies modules, but go bakc and etc"
   end

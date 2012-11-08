@@ -78,7 +78,10 @@ module Skylab::MetaHell::Klass::Creator
       end
       M_.bang[ M.parts[ full_name ], f, meta_hell_anchor_module,
         M_.branch_f[ self, ___meta_hell_known_graph, M_.else ],
-        M_.branch_f[ self, ___meta_hell_known_graph, _else_f ]
+        M_.branch_f[ self, ___meta_hell_known_graph, _else_f ],
+        -> m { ::Class == m.class or fail ::TypeError.exception "#{full_name
+          } is not a class (it's a #{m.class})"
+        }
       ]
     end
   end
