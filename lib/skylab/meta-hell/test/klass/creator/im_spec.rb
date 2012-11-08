@@ -38,6 +38,19 @@ module ::Skylab::MetaHell::TestSupport::Klass::Creator
       end
     end
 
-    it "show that it autovivifies modules, but go bakc and etc"
+    context "convoluted example - note that at lvl 0 it only .." do
+      snip do
+        klass :Fakon__Bakon
+        klass :Fakon__Jakon
+        klass :Fakon__Bakon__Wilbur
+        klass :Mason__Dixon
+      end
+      it ".. vivifies what it needs! (but not at lvl 1 and below)" do
+        o.klass! :Jasper, extends: :Fakon__Bakon__Wilbur
+        m = o.meta_hell_anchor_module
+        m.constants.should eql([:Fakon, :Jasper])
+        m::Fakon.constants.should eql([:Bakon, :Jakon])
+      end
+    end
   end
 end
