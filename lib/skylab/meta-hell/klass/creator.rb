@@ -46,7 +46,7 @@ module Skylab::MetaHell::Klass::Creator
       let( :_nearest_klass_full_name ) { full_name } # for i.m. klass()
       g = __meta_hell_known_graph
       M.define[ full_name, f,
-        -> name { g.fetch( name ) { |k| g[k] = M.meta[ k ] } }, # branch
+        -> name { g.fetch( name ) { |k| g[k] = M.build[ k ] } },  # branch
         -> name { K.meta[ name, a, g ] },                         # leaf
         -> name { __meta_hell_module!( name ) { modul! name } }   # memo
       ]
@@ -67,18 +67,15 @@ module Skylab::MetaHell::Klass::Creator
 
     def klass! full_name, *a, &f
       # like module!, make this (or reopen it) now, and run any f on it.
-      _else_f = -> o, g, name do # #refactor
-        m = K.build[ name, a ]
-        sc = o.singleton_class
-        sc.send :define_method, name do
-          klass! name # super sketchy if done wrong!
-        end
-        sc.class_exec name, & M.convenience
-        m
+      else_f = -> o, name do # nees to be bound to a, hence here
+        M_.vivify[ o, name,
+          -> { K.build[ name, a ] }, # build_f
+          -> { klass! name } # acccessor_f - watch for inf. recursion
+        ]
       end
       M_.bang[ M.parts[ full_name ], f, meta_hell_anchor_module,
         M_.branch_f[ self, ___meta_hell_known_graph, M_.else ],
-        M_.branch_f[ self, ___meta_hell_known_graph, _else_f ],
+        M_.branch_f[ self, ___meta_hell_known_graph, else_f ],
         -> m { ::Class == m.class or fail ::TypeError.exception "#{full_name
           } is not a class (it's a #{m.class})"
         }

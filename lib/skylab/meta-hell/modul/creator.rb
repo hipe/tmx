@@ -16,11 +16,11 @@ module Skylab::MetaHell::Modul::Creator
 
     o = ::Hash.new
 
+    o[:build] = -> name { Modul::Meta.new name }
+
     o[:convenience] = -> full_module_name do   #   _Foo   self.Foo   send(:Foo)
       define_method( "_#{full_module_name}" ) { send full_module_name }
     end
-
-    o[:meta] = -> name { Modul::Meta.new name }
 
     o[:define] = -> full_name, f, branch_f, leaf_f, memo_f do
       parts = M.parts[ full_name ]
@@ -83,7 +83,7 @@ module Skylab::MetaHell::Modul::Creator
 
     def modul full_name, &f
       g = __meta_hell_known_graph
-      branch_f = -> name { g.fetch( name ) { |k| g[k] = M.meta[ k ] } }
+      branch_f = -> name { g.fetch( name ) { |k| g[k] = M.build[ k ] } }
       M.define[ full_name, f,
         branch_f,
         branch_f,
@@ -127,7 +127,7 @@ module Skylab::MetaHell::Modul::Creator
       # make a lambda that will make branch nodes (e.g. modules or classes)
       -> parts, &result_f do
         name = M_.name[ parts ]
-        meta = g.fetch( name ) { else_f[ o, g, name ] }
+        meta = g.fetch( name ) { else_f[ o, name ] }
         M_.build[ meta, parts, o, g, result_f ]
         nil
       end
@@ -153,14 +153,19 @@ module Skylab::MetaHell::Modul::Creator
       nil
     end
 
-    o[:else] = -> o, g, name do
-      m = M.meta[ name ]
+    o[:vivify] = -> o, name, build_f, accessor_f do
+      m = build_f.call
       sc = o.singleton_class
-      sc.send :define_method, name do
-        modul! name # super sketchy if done wrong!
-      end
+      sc.send(:define_method, name, &accessor_f)
       sc.class_exec name, & M.convenience
       m
+    end
+
+    o[:else] = -> o, name do
+      M_.vivify[ o, name,
+        -> { M.build[ name ] }, # build_f
+        -> { modul! name }   # accessor_f - watch for inf. recursion
+      ]
     end
 
     o[:name] = -> parts  { parts.join(SEP).intern }
