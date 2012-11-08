@@ -45,8 +45,8 @@ module Skylab::MetaHell::Klass::Creator
     def klass full_name, *a, &f
       let( :_nearest_klass_full_name ) { full_name } # for i.m. klass()
       g = __meta_hell_known_graph
-      M.define_f[ full_name, f,
-        -> name { g.fetch( name ) { |k| g[k] = M.meta_f[ k ] } }, # branch
+      M.define[ full_name, f,
+        -> name { g.fetch( name ) { |k| g[k] = M.meta[ k ] } }, # branch
         -> name { K.meta[ name, a, g ] },                         # leaf
         -> name { __meta_hell_module!( name ) { modul! name } }   # memo
       ]
@@ -73,12 +73,12 @@ module Skylab::MetaHell::Klass::Creator
         sc.send :define_method, name do
           klass! name # super sketchy if done wrong!
         end
-        sc.class_exec name, & M.convenience_f
+        sc.class_exec name, & M.convenience
         m
       end
-      M_.bang_f[ M.parts_f[ full_name ], f, meta_hell_anchor_module,
-        M_.branch_f_f[ self, ___meta_hell_known_graph, M_.else_f ],
-        M_.branch_f_f[ self, ___meta_hell_known_graph, _else_f ]
+      M_.bang[ M.parts[ full_name ], f, meta_hell_anchor_module,
+        M_.branch_f[ self, ___meta_hell_known_graph, M_.else ],
+        M_.branch_f[ self, ___meta_hell_known_graph, _else_f ]
       ]
     end
   end

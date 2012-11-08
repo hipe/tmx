@@ -16,15 +16,14 @@ module Skylab::MetaHell::Modul::Creator
 
     o = ::Hash.new
 
-    o[:convenience_f] = -> full_module_name do
-      # _Foo self.Foo send(:Foo)
+    o[:convenience] = -> full_module_name do   #   _Foo   self.Foo   send(:Foo)
       define_method( "_#{full_module_name}" ) { send full_module_name }
     end
 
-    o[:meta_f] = -> name { Modul::Meta.new name }
+    o[:meta] = -> name { Modul::Meta.new name }
 
-    o[:define_f] = -> full_name, f, branch_f, leaf_f, memo_f do
-      parts = M.parts_f[ full_name ]
+    o[:define] = -> full_name, f, branch_f, leaf_f, memo_f do
+      parts = M.parts[ full_name ]
       memo = parts.shift.intern
       prev = nil
       loop do
@@ -48,7 +47,7 @@ module Skylab::MetaHell::Modul::Creator
       nil
     end
 
-    o[:parts_f] = -> full_name { full_name.to_s.split SEP }
+    o[:parts] = -> full_name { full_name.to_s.split SEP }
 
     M = ::Struct.new(* o.keys ).new ; o.each { |k, v| M[k] = v }
 
@@ -78,14 +77,14 @@ module Skylab::MetaHell::Modul::Creator
 
     def __meta_hell_module! full_module_name, &f
       ___meta_hell_memoize_module full_module_name, &f
-      module_exec full_module_name, & M.convenience_f
+      module_exec full_module_name, & M.convenience
       nil
     end
 
     def modul full_name, &f
       g = __meta_hell_known_graph
-      branch_f = -> name { g.fetch( name ) { |k| g[k] = M.meta_f[ k ] } }
-      M.define_f[ full_name, f,
+      branch_f = -> name { g.fetch( name ) { |k| g[k] = M.meta[ k ] } }
+      M.define[ full_name, f,
         branch_f,
         branch_f,
         -> name { __meta_hell_module!( name ) { modul! name } }
@@ -100,7 +99,7 @@ module Skylab::MetaHell::Modul::Creator
 
     o = { }
 
-    o[:bang_f] = -> parts, f, mod, branch_f, leaf_f do
+    o[:bang] = -> parts, f, mod, branch_f, leaf_f do
       unless parts.empty? # sanity base case - zero list / empty string
         parts = parts.dup
         seen = [ const = parts.shift.intern ]
@@ -123,17 +122,17 @@ module Skylab::MetaHell::Modul::Creator
       mod
     end
 
-    o[:branch_f_f] = -> o, g, else_f do
+    o[:branch_f] = -> o, g, else_f do
       # make a lambda that will make branch nodes (e.g. modules or classes)
       -> parts, &result_f do
-        name = M_.name_f[ parts ]
+        name = M_.name[ parts ]
         meta = g.fetch( name ) { else_f[ o, g, name ] }
-        M_.build_f[ meta, parts, o, g, result_f ]
+        M_.build[ meta, parts, o, g, result_f ]
         nil
       end
     end
 
-    o[:build_f] = -> meta, seen, o, g, result_f do
+    o[:build] = -> meta, seen, o, g, result_f do
       s = seen.join( SEP_ ).freeze
       if meta._locked?
         fail "circular dependency on #{s} - should you be using ruby instead?"
@@ -153,17 +152,17 @@ module Skylab::MetaHell::Modul::Creator
       nil
     end
 
-    o[:else_f] = -> o, g, name do
-      m = M.meta_f[ name ]
+    o[:else] = -> o, g, name do
+      m = M.meta[ name ]
       sc = o.singleton_class
       sc.send :define_method, name do
         modul! name # super sketchy if done wrong!
       end
-      sc.class_exec name, & M.convenience_f
+      sc.class_exec name, & M.convenience
       m
     end
 
-    o[:name_f] = -> parts  { parts.join(SEP).intern }
+    o[:name] = -> parts  { parts.join(SEP).intern }
 
     M_ = ::Struct.new(* o.keys ).new ; o.each { |k, v| M_[k] = v }
     M = ModuleMethods::M # hey can i borrow this
@@ -180,8 +179,8 @@ module Skylab::MetaHell::Modul::Creator
       # It does the modules from outside in (breadth-first) no matter
       # what order they were defineed in #experimental!
 
-      branch_f = M_.branch_f_f[ self, ___meta_hell_known_graph, M_.else_f ]
-      M_.bang_f[ M.parts_f[ full_name ], f, meta_hell_anchor_module,
+      branch_f = M_.branch_f[ self, ___meta_hell_known_graph, M_.else ]
+      M_.bang[ M.parts[ full_name ], f, meta_hell_anchor_module,
         branch_f, branch_f]
     end
   end
