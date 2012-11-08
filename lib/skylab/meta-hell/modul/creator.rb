@@ -24,7 +24,7 @@ module Skylab::MetaHell::Modul::Creator
     o[:meta_f] = -> name { Modul::Meta.new name }
 
     o[:define_f] = -> full_name, f, branch_f, leaf_f, memo_f do
-      parts = F.parts_f[ full_name ]
+      parts = M.parts_f[ full_name ]
       memo = parts.shift.intern
       prev = nil
       loop do
@@ -50,7 +50,7 @@ module Skylab::MetaHell::Modul::Creator
 
     o[:parts_f] = -> full_name { full_name.to_s.split SEP }
 
-    F = ::Struct.new(* o.keys ).new ; o.each { |k, v| F[k] = v }
+    M = ::Struct.new(* o.keys ).new ; o.each { |k, v| M[k] = v }
 
     let :__meta_hell_known_graph do
       a = ancestors # ACK skip Object, Kernel, BasicObject ACK ACK ACK
@@ -78,14 +78,14 @@ module Skylab::MetaHell::Modul::Creator
 
     def __meta_hell_module! full_module_name, &f
       ___meta_hell_memoize_module full_module_name, &f
-      module_exec full_module_name, & F.convenience_f
+      module_exec full_module_name, & M.convenience_f
       nil
     end
 
     def modul full_name, &f
       g = __meta_hell_known_graph
-      branch_f = -> name { g.fetch( name ) { |k| g[k] = F.meta_f[ k ] } }
-      F.define_f[ full_name, f,
+      branch_f = -> name { g.fetch( name ) { |k| g[k] = M.meta_f[ k ] } }
+      M.define_f[ full_name, f,
         branch_f,
         branch_f,
         -> name { __meta_hell_module!( name ) { modul! name } }
@@ -126,9 +126,9 @@ module Skylab::MetaHell::Modul::Creator
     o[:branch_f_f] = -> o, g, else_f do
       # make a lambda that will make branch nodes (e.g. modules or classes)
       -> parts, &result_f do
-        name = F_.name_f[ parts ]
+        name = M_.name_f[ parts ]
         meta = g.fetch( name ) { else_f[ o, g, name ] }
-        F_.build_f[ meta, parts, o, g, result_f ]
+        M_.build_f[ meta, parts, o, g, result_f ]
         nil
       end
     end
@@ -154,19 +154,19 @@ module Skylab::MetaHell::Modul::Creator
     end
 
     o[:else_f] = -> o, g, name do
-      m = ModuleMethods::F.meta_f[ name ]
+      m = M.meta_f[ name ]
       sc = o.singleton_class
       sc.send :define_method, name do
         modul! name # super sketchy if done wrong!
       end
-      sc.class_exec name, & ModuleMethods::F.convenience_f
+      sc.class_exec name, & M.convenience_f
       m
     end
 
     o[:name_f] = -> parts  { parts.join(SEP).intern }
 
-    F_ = ::Struct.new(* o.keys ).new ; o.each { |k, v| F_[k] = v }
-    F = ModuleMethods::F # hey can i borrow this
+    M_ = ::Struct.new(* o.keys ).new ; o.each { |k, v| M_[k] = v }
+    M = ModuleMethods::M # hey can i borrow this
 
     let :___meta_hell_known_graph do
       self.class.__meta_hell_known_graph
@@ -180,8 +180,8 @@ module Skylab::MetaHell::Modul::Creator
       # It does the modules from outside in (breadth-first) no matter
       # what order they were defineed in #experimental!
 
-      branch_f = F_.branch_f_f[ self, ___meta_hell_known_graph, F_.else_f ]
-      F_.bang_f[ F.parts_f[ full_name ], f, meta_hell_anchor_module,
+      branch_f = M_.branch_f_f[ self, ___meta_hell_known_graph, M_.else_f ]
+      M_.bang_f[ M.parts_f[ full_name ], f, meta_hell_anchor_module,
         branch_f, branch_f]
     end
   end

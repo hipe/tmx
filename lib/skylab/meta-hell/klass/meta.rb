@@ -37,6 +37,15 @@ module Skylab::MetaHell
       __memoized[:extends] ||= nil
     end
 
+    def optionals! a
+      if ! a.empty?
+        1 == a.length && ::Hash === a.first or fail "expection options #{
+          }hash not not #{ a.map(&:class).join(', ') }"
+        a.first.each { |k, v| _option! k, v }
+      end
+      nil
+    end
+
     def _option! k, v
       if respond_to?( m = "_set_#{k}!" )
         send m, v

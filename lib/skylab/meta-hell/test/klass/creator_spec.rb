@@ -136,7 +136,3 @@ module ::Skylab::MetaHell::TestSupport::Klass::Creator
     end
   end
 end
-
-#    context "using klass! on the object as opposed to klass on the module" do
-#      contest "minimal case" do
-#        snip { } # #kick
