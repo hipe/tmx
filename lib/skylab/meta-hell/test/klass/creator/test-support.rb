@@ -23,7 +23,7 @@ module Skylab::MetaHell::TestSupport::Klass::Creator
           extend MetaHell::Let # compat
           extend MetaHell::Klass::Creator
           let( :meta_hell_anchor_module ) { ::Module.new }
-          class_exec(& f)
+          class_exec(& f) if f
           self
         end
       end

@@ -24,7 +24,7 @@ module Skylab::MetaHell::Modul::Creator
     o[:meta_f] = -> name { Modul::Meta.new name }
 
     o[:define_f] = -> full_name, f, branch_f, leaf_f, memo_f do
-      parts = full_name.to_s.split SEP
+      parts = F.parts_f[ full_name ]
       memo = parts.shift.intern
       prev = nil
       loop do
@@ -47,6 +47,8 @@ module Skylab::MetaHell::Modul::Creator
       end
       nil
     end
+
+    o[:parts_f] = -> full_name { full_name.to_s.split SEP }
 
     F = ::Struct.new(* o.keys ).new ; o.each { |k, v| F[k] = v }
 
@@ -76,7 +78,7 @@ module Skylab::MetaHell::Modul::Creator
 
     def __meta_hell_module! full_module_name, &f
       ___meta_hell_memoize_module full_module_name, &f
-      module_exec full_module_name, & F.convenience_f # ! module_exec
+      module_exec full_module_name, & F.convenience_f
       nil
     end
 
@@ -121,6 +123,16 @@ module Skylab::MetaHell::Modul::Creator
       mod
     end
 
+    o[:branch_f_f] = -> o, g, else_f do
+      # make a lambda that will make branch nodes (e.g. modules or classes)
+      -> parts, &result_f do
+        name = F_.name_f[ parts ]
+        meta = g.fetch( name ) { else_f[ o, g, name ] }
+        F_.build_f[ meta, parts, o, g, result_f ]
+        nil
+      end
+    end
+
     o[:build_f] = -> meta, seen, o, g, result_f do
       s = seen.join( SEP_ ).freeze
       if meta._locked?
@@ -154,6 +166,7 @@ module Skylab::MetaHell::Modul::Creator
     o[:name_f] = -> parts  { parts.join(SEP).intern }
 
     F_ = ::Struct.new(* o.keys ).new ; o.each { |k, v| F_[k] = v }
+    F = ModuleMethods::F # hey can i borrow this
 
     let :___meta_hell_known_graph do
       self.class.__meta_hell_known_graph
@@ -167,14 +180,8 @@ module Skylab::MetaHell::Modul::Creator
       # It does the modules from outside in (breadth-first) no matter
       # what order they were defineed in #experimental!
 
-      branch_f = -> parts, &result_f do
-        g = ___meta_hell_known_graph
-        name = F_.name_f[ parts ]
-        meta = g.fetch( name ) { F_.else_f[ self, g, name ] }
-        F_.build_f[ meta, parts, self, g, result_f ]
-        nil
-      end
-      F_.bang_f[ full_name.to_s.split(SEP), f, meta_hell_anchor_module,
+      branch_f = F_.branch_f_f[ self, ___meta_hell_known_graph, F_.else_f ]
+      F_.bang_f[ F.parts_f[ full_name ], f, meta_hell_anchor_module,
         branch_f, branch_f]
     end
   end
