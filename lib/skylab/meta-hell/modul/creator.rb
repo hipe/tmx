@@ -129,7 +129,7 @@ module Skylab::MetaHell::Modul::Creator
       memo
     end
 
-    M = ::Struct.new(* o.keys ).new ; o.each { |k, v| M[k] = v }
+    M = MetaHell::Struct[ o ]
 
     let :__metahell_known_graph do
       if defined? super  # does this even make sense ? will it ever trigger?
@@ -186,7 +186,7 @@ module Skylab::MetaHell::Modul::Creator
 
     o = { }
 
-    # M_ = ::Struct.new(* o.keys).new ; o.each { |k, v| M_[k] = v }
+    # M_ = MetaHell::Struct[ o ]
 
     def modul! full_name, &module_body_f
       # get this module by name now, autovivifying any modules necessary to
