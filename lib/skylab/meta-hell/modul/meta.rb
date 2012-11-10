@@ -7,8 +7,8 @@ module Skylab::MetaHell
 
     attr_reader :name, :children, :blocks
 
-    def build_product client, _
-      o = ::Module.new            # creating modules is easy you see
+    def build_product(*)          # args are probably client and known graph,
+      o = ::Module.new            # but creating modules is easy you see
       _init_product o
       o
     end

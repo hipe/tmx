@@ -72,6 +72,7 @@ module Skylab::MetaHell::Modul::Creator
           end
         else
           if child.safe? or target_const == child.const
+            # if child is not safe we might trigger a cyclic dependency bork
             built = child.build_product client, g  # recurses?
             if child.children.any?
               deferred.push child
@@ -147,7 +148,7 @@ module Skylab::MetaHell::Modul::Creator
     M = MetaHell::Struct[ o ] #  turns a hash into an ad-hoc struct object
 
     let :__metahell_known_graph do
-      # #todo the below causes core dumps yay
+      # #note the below causes core dumps yay [#006]
       # if defined? super  # does this even make sense ? will it ever trigger?
       #   fail "implement me - dealing with ancestor chain ~meta hell"
       # end
@@ -195,36 +196,53 @@ module Skylab::MetaHell::Modul::Creator
 
     M = ModuleMethods::M # hey can i borrow this
 
+    o = { }
+
+    o[:bang_f] = -> client do    # make a lambda used for banging modules.
+      M_IM._bang_f[ client,      # ('bang' means '[create] retrieve')
+                    ->( memo ) { M.create_meta[ memo.name ].build_product }
+      ]
+    end
+
+    o[:_bang_f] = -> client, build, update=nil do # an abstract bang maker
+      -> memo, const do
+        memo.seen.push const      # Necessary to update this at each step.
+        if client.respond_to? memo.name  # (Elsewhere like above or client
+          memo.mod = client.send memo.name # may have defined this.)
+          update and update[ memo ] # hook if you want it (process existing)
+        else
+          if memo.mod.const_defined? const, false
+            memo.mod = memo.mod.const_get const, false
+            update and update[ memo ]
+          else
+            _mod = build[ memo ] # build the product with this hook
+            memo.mod.const_set const, _mod
+            memo.mod = _mod
+          end
+          M_IM.define_methods[ client.singleton_class, memo.name ]
+        end
+        memo
+      end
+    end
+
+    o[:define_methods] = -> sing_class, name do
+      sing_class.send :define_method, name, do
+        _modul name
+      end
+      sing_class.class_exec name, & M.convenience
+    end
+
+    M_IM = MetaHell::Struct[ o ]
+
 
     def modul! full_name, &module_body
       # get this module by name now, autovivifying any modules necessary to
       # get there.  once you get to it, run any `module_body` on it.
 
-      define_methods = -> sing_class, name do
-        sing_class.send :define_method, name, do
-          _modul name
-        end
-        sing_class.class_exec name, & M.convenience
-      end
+      bang = M_IM.bang_f[ self ]  # 'bang' means "retrieve, creating if nec."
 
-      bang = -> memo, const do    # 'bang' here means "retrieve, creating if
-        memo.seen.push const      # necessary.
-        memo.mod = if respond_to? memo.name # Elsewhere like above or client
-          send memo.name          # may have defined this.
-        else
-          if memo.mod.const_defined? const, false
-            _mod = memo.mod.const_get const, false
-          else
-            _mod = M.create_meta[ memo.name ].build_product self, nil
-            memo.mod.const_set const, _mod
-          end
-          define_methods[ self.singleton_class, memo.name ]
-          _mod
-        end
-        memo
-      end
                                   # break the name into tokens, which each one:
-      _memo = M.reduce[ full_name, Memo.new(meta_hell_anchor_module),
+      m = M.reduce[ full_name, Memo.new(meta_hell_anchor_module),
         bang,                     # this is for "branch" (intermediate) tokens
         -> memo, const do         # and when we get to the target, final node,
           bang[ memo, const ]     # we "bang" it (autovivify it if necessary)
@@ -234,10 +252,10 @@ module Skylab::MetaHell::Modul::Creator
           memo
         end
       ]
-      _memo.mod
+      m.mod
     end
 
-    def _modul full_name
+    def _modul full_name          # read-only retriever
       M.reduce[ full_name, meta_hell_anchor_module, -> mod, const do
         mod.const_get const, false
       end ]

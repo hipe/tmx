@@ -50,7 +50,7 @@ module ::Skylab::MetaHell::TestSupport::Modul::Creator::ModuleMethods
       extend MM_TestSupport
 
       context "minimal" do
-        it "FUCK" do
+        it "a klass can include modules that have graphs, and work" do
           # we want more fine-grained control than before(:all) for now ..
           F.once[]
           Klass.new._Wank.instance_methods.should eql([:worked])

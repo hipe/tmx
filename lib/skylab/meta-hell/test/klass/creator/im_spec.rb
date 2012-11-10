@@ -1,7 +1,7 @@
 require_relative 'test-support'
 
 module ::Skylab::MetaHell::TestSupport::Klass::Creator
-  describe "#{MetaHell::Klass::Creator::InstanceMethods}", wip:true do
+  describe "#{MetaHell::Klass::Creator::InstanceMethods}" do
     extend Creator_TestSupport
 
     context "minimal" do
@@ -38,17 +38,18 @@ module ::Skylab::MetaHell::TestSupport::Klass::Creator
       end
     end
 
-    context "convoluted example - note that at lvl 0 it only .." do
+    context "convoluted example - for now it manages to vivify all of these" do
       snip do
         klass :Fakon__Bakon
         klass :Fakon__Jakon
         klass :Fakon__Bakon__Wilbur
         klass :Mason__Dixon
       end
-      it ".. vivifies what it needs! (but not at lvl 1 and below)" do
+      it ".. (but note that you will get into some problems#{
+        } with cyc. deps soon!)" do
         o.klass! :Jasper, extends: :Fakon__Bakon__Wilbur
         m = o.meta_hell_anchor_module
-        m.constants.should eql([:Fakon, :Jasper])
+        m.constants.should eql([:Fakon, :Mason, :Jasper])
         m::Fakon.constants.should eql([:Bakon, :Jakon])
       end
     end

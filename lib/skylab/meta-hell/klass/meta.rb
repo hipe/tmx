@@ -7,7 +7,7 @@ module Skylab::MetaHell
     # 2) act as an adapter for building the "product" object, in this
     #    case the class, doing things like resolving superclasses, etc.
 
-    def build_product client, kg
+    def build_product client=nil, kg=nil # kg = 'known graph'
       supra = _resolve_superclass client, kg
       o = ::Class.new(* [supra].compact )
       _init_product o
@@ -31,7 +31,12 @@ module Skylab::MetaHell
       nil
     end
 
-    def safe? ; false end
+    def safe?                     # hack to avoid autovivification circ. deps.:
+      ! extends                   # If a class has a superclass, we don't have
+    end                           # or want the logic to untangle a true
+                                  # dependency graph when autovivification
+                                  # happens.  But be warned the whole thing
+                                  # will hence feel inconsistent..
 
   protected
 
@@ -52,6 +57,9 @@ module Skylab::MetaHell
         ::Class => ->( meta, * ) { meta.extends },
 
         ::Symbol => -> me, client, kg do
+          client && kg or fail "can't resolve a superclass name without #{
+          [client, kg].zip(%w(client kg)).each_with_index.map{|a,i|a[1] if
+          ! a[0]}.compact.join(' and ')}"
           meta = kg.fetch me.extends do |x|
             raise "#{x.inspect} is not in the definitions graph.#{
             } The definitions graph includes: (#{ kg.keys.join ', ' })"
@@ -66,20 +74,32 @@ module Skylab::MetaHell
         end
       }
 
-      define_method :_resolve_superclass do |client, kg|
-        f = resolve_superclass.fetch extends.class do |klass|
+      fetch = -> klass do
+        resolve_superclass.fetch klass do |k|
           raise "invalid 'extends:' value - expecting Class or Symbol,#{
-            } had #{ extends.class }"
+            } had #{ k }"
         end
+      end
+
+      define_method :extends= do |mixed|
+        fetch[ mixed.class ]      # confirm that it is a "type" we accept
+        _set_extends! mixed       # confirm that we haven't yet set it
+        mixed
+      end
+
+      define_method :_resolve_superclass do |client, kg|
+        f = fetch[ extends.class ]
         f[ self, client, kg ]
       end
 
     end.call
 
+    public :extends=
+
     def _set_extends! mixed
       if __memoized.key? :extends # if its value is known
         if extends != mixed       # normalizing is out of scope
-          raise ::TypeError.exception("superklass mismatch (#{
+          raise ::TypeError.exception("superklass mismatch for #{name} (#{
             extends || 'nothing' } then #{ mixed || 'nothing' })")
         end                       # else nothing to set
       else
