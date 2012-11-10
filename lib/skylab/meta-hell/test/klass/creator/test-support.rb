@@ -8,9 +8,11 @@ module Skylab::MetaHell::TestSupport::Klass::Creator
 
 
   module ModuleMethods
-    def borks msg
-      # it ( "fuck my life" ) { subject.call }
+    def borks msg                  # this one is pretty but hard to debug
       specify { should( raise_error msg ) }
+    end
+    def borks_ msg                 # this one is easier to debug, but throws
+      it ( "fuck my life" ) { subject.call } # the exception w/o catching it
     end
     def doing &f
       let :subject do
