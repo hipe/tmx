@@ -1,4 +1,4 @@
-require_relative '../../en'
+require_relative 'test-support'
 
 describe Skylab::Porcelain::En do
   describe "oxford_commma" do

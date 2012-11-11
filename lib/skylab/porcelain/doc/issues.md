@@ -1,6 +1,13 @@
+[#009] #open get en/number.rb tests out of the file
+[#008] tracking tag for this pattern -- lexical scoping issue : it seems (but
+  maybe is not) necessary to wrap our `describe` call et al in modules like
+  these (our ad-hoc test-support anchor module) so that the necessary constants
+  are visible.  Is this the case?
+[#007] #open where possibly consider swapping auto-increment with use the mod.
+[#006] #open see if you can get rid of the kicks
 [#005] #open use new metahell
 [#004] #open consider naming some of the runtimes to 'controllers'
 [#003] #open follow convention for nested test support modules
 [#002] #open #cosmetic change ActionModuleMethods to Action::ModuleMethods
-[#001] #open refactor tests to use regret
+[#001] #in-progress refactor tests to use regret
 [#sl-100.300.XXX] 2012-06-08 (numberspace reserved for porcelain.rb)

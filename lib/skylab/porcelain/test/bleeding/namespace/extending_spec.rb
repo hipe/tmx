@@ -1,16 +1,16 @@
 require_relative '../test-support'
 
-module ::Skylab::Porcelain::Bleeding::TestSupport
+module ::Skylab::Porcelain::TestSupport::Bleeding
   describe "As for extending your namespace module with #{Bleeding::NamespaceModuleMethods}" do
-    extend ModuleMethods ; include InstanceMethods
-    base_module!
+    extend Bleeding_TestSupport
+    incrementing_anchor_module!
     with_namespace 'berse-nermsperce'
     with_action 'mer-nermsperce'
     klass :BerseNermsperce__MerNermsperce__MerErkshern do
       def invoke x ; "err-kerr-->#{x}<--" end
     end
     before(:all) do
-      self.BerseNermsperce__MerNermsperce__MerErkshern # kick
+      self.BerseNermsperce__MerNermsperce__MerErkshern # #kick
     end
     def works # a common test below
       subject.fetch('mer-erk').bound_invocation_method.receiver.invoke('fluk').should eql("err-kerr-->fluk<--")
