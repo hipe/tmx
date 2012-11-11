@@ -1,6 +1,6 @@
 require_relative '../test-support'
 
-module Skylab::MetaHell::TestSupport::Modul::Creator
+module ::Skylab::MetaHell::TestSupport::Modul::Creator
   ::Skylab::MetaHell::TestSupport::Modul[ self ]
 
   Creator_TestSupport = self

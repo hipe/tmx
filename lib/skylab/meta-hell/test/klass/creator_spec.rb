@@ -121,7 +121,7 @@ module ::Skylab::MetaHell::TestSupport::Klass::Creator
           klass :Foo, extends: ::Enumerator
         end
         doing { o.klass }
-        borks 'superklass mismatch (nothing then Enumerator)'
+        borks 'superklass mismatch for Foo (nothing then Enumerator)'
       end
       context "what happens when you go [1, 0]" do
         snip do
@@ -139,7 +139,7 @@ module ::Skylab::MetaHell::TestSupport::Klass::Creator
           klass :Foo, extends: ::Enumerator
         end
         doing { o.klass }
-        borks 'superklass mismatch (String then Enumerator)'
+        borks 'superklass mismatch for Foo (String then Enumerator)'
       end
       context "what hppens when you go [A, A]" do
         snip do
