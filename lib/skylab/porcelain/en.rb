@@ -1,12 +1,12 @@
 require_relative '../../skylab'
 
-module Skylab::Porcelain
-  module En
-    extend Skylab::Autoloader
-    extend self
+module Skylab::Porcelain::En
+  extend ::Skylab::Autoloader
+
+  module Methods
 
     def oxford_comma a, ult = ' and ', sep = ', '
-      (hsh = Hash.new(sep))[a.length - 1] = ult
+      (hsh = ::Hash.new(sep))[a.length - 1] = ult
       [a.first, * (1..(a.length-1)).map { |i| [ hsh[i], a[i] ] }.flatten].join
     end
 
@@ -16,17 +16,26 @@ module Skylab::Porcelain
       oxford_comma a, ' or '
     end
 
-    VERBS = { is:   ['exist', 'is', 'are'],
-              no:   ['no ', 'the only '],
-            this: ['these', 'this', 'these'] }
+    -> do # "#{s a, :no}known person#{s a} #{s a, :is} #{self.and a}".strip
 
-    def s a, v=nil # just one tiny hard to read hack
-      count = Numeric === a ? a : a.count
-      v.nil? and return( 1 == count ? '' : 's' )
-      VERBS[v][case count ; when 0 ; 0 ; when 1 ; 1 ; else 2 ; end]
-    end
-    # "#{s a, :no}known person#{s a} #{s a, :is} #{self.and a}".strip
+      verbs = { is:   ['exist', 'is', 'are'],
+                no:   ['no ', 'the only '],
+              this: ['these', 'this', 'these'] }
+
+      (norm = { 0 => 0, 1 => 1 }).default = 2
+
+      define_method :s do |a, v=nil| # just one tine hard to read hack
+        count = ::Numeric === a ? a : a.count
+        if v
+          verbs[v][norm[count]]
+        else
+          1 == count ? '' : 's'
+        end
+      end
+
+    end.call
 
   end
-end
 
+  extend Methods # a.t.t.o.t.w some ppl still call En.oxford_comma as so
+end

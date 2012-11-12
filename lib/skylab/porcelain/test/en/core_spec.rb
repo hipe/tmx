@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-describe Skylab::Porcelain::En do
+describe ::Skylab::Porcelain::En do
   describe "oxford_commma" do
-    include Skylab::Porcelain::En
+    include ::Skylab::Porcelain::En::Methods
     let(:subject) { oxford_comma arr }
     context(a = %w()) do
       let(:arr) { a }
@@ -26,4 +26,3 @@ describe Skylab::Porcelain::En do
     end
   end
 end
-

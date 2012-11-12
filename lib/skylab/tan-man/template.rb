@@ -1,7 +1,7 @@
 module ::Skylab::TanMan
   class Template < ::Struct.new(:pathname, :string)
     def call params
-      template_string.gsub(::Skylab::Headless::Constants::MUSTACHE_RX) do
+      template_string.gsub(::Skylab::Headless::CONSTANTS::MUSTACHE_RX) do
         param = $1.intern
         if params.key?(param)
           params[param]
