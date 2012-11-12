@@ -1,9 +1,5 @@
 module Skylab::Porcelain::TestSupport::Bleeding
 
-  class ::RSpec::Matchers::DSL::Matcher # #refactor: take out or comment #todo wtf
-    include ::Skylab::Porcelain::En::Number
-  end
-
   ::RSpec::Matchers.define :be_action do |expected|
     actual = nil ; fails = [] ; desc = {}
     match do |_actual|
@@ -31,6 +27,8 @@ module Skylab::Porcelain::TestSupport::Bleeding
     end
   end
 
+  num2ord = Porcelain::En::Number::FUN.num2ord
+
   ::RSpec::Matchers.define :be_event do |*expected|
     # the below hooks must be called in the order: MATCH [FAIL_MSG] DESCRPTION
     fails = [] ; desc = {} ; _actual = nil
@@ -39,7 +37,7 @@ module Skylab::Porcelain::TestSupport::Bleeding
       expected.each_with_index do |x, i|
         case x
         when ::Fixnum
-          desc[:pos] = '%-6s' % [-1 == x ? 'last' : num2ord(x + 1)]
+          desc[:pos] = '%-6s' % [-1 == x ? 'last' : num2ord[ x + 1 ]]
           -1 == x and x = actual.length - 1
           idx = x ; index_specified = true
           if actual.length <= idx and expected[i+1]
