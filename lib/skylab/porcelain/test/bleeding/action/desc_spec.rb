@@ -1,9 +1,9 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
-module Skylab::Porcelain::Bleeding::TestSupport
+module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
   describe "desc, an inheritable attribute of #{Bleeding::ActionModuleMethods}" do
-    extend ModuleMethods ; include InstanceMethods
-    base_module!
+    extend Action_TestSupport
+    incrementing_anchor_module!
     klass :Base do
       extend Bleeding::ActionModuleMethods
     end

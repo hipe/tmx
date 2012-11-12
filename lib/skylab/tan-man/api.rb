@@ -173,13 +173,8 @@ module Skylab::TanMan
   API.set_defaults_if_nil!
 
   module GlobalStyle
+    include Porcelain::En::Methods # oxford_comma, s()
     # @later this might be stylus pattern
-    def oxford_comma *a
-      Porcelain::En.oxford_comma(*a)
-    end
-    def s(*a)
-      Porcelain::En.s(*a)
-    end
   end
 
   module API::AdaptiveStyle

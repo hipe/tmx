@@ -68,6 +68,7 @@ module Skylab::MetaHell::Klass::Creator
 
       build, update = K.build_and_update[ me, kg, a ] # see
 
+
                                   # Process every token in `full_name` in a
       M.reduce[ full_name, Memo[ kg ], # reduce operation, branch vs leaf ..
         -> m, o  do               # For each branch node of the path (not last)
