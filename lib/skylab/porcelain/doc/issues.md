@@ -1,3 +1,5 @@
+[#012] #open en's gotta become even more functional, CASE STUDY
+[#011] #open test/porcelain_spec.rb is flagship tent-pole file for [#bs-008]
 [#010] #done puts oxford_comma under Methods
 [#009] #open get en/number.rb tests out of the file
 [#008] tracking tag for this pattern -- lexical scoping issue : it seems (but
