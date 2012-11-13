@@ -1,18 +1,20 @@
 require_relative '../test-support'
 
 module Skylab::MetaHell::TestSupport::Klass::Creator
-  ::Skylab::MetaHell::TestSupport::Klass[ self ]
+  (Parent_ = ::Skylab::MetaHell::TestSupport::Klass)[ self ] # #ts-002, regret
+  Creator_TestSupport = self # courtesy
 
-  Creator_TestSupport = self
-  MetaHell = MetaHell # for here
+  CONSTANTS = Parent_::CONSTANTS
 
+  include CONSTANTS # for the spec
 
   module ModuleMethods
+    include CONSTANTS
     def borks msg                  # this one is pretty but hard to debug
       specify { should( raise_error msg ) }
     end
     def borks_ msg                 # this one is easier to debug, but throws
-      it ( "fuck my life" ) { subject.call } # the exception w/o catching it
+      it( "fuck my life" ) { subject.call } # the exception w/o catching it
     end
     def doing &f
       let :subject do
@@ -34,6 +36,7 @@ module Skylab::MetaHell::TestSupport::Klass::Creator
 
 
   module InstanceMethods
+    include CONSTANTS
     extend MetaHell::Let
   end
 end

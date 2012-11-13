@@ -1,13 +1,15 @@
 require_relative '../test-support'
 
 module ::Skylab::MetaHell::TestSupport::Modul::Creator
-  ::Skylab::MetaHell::TestSupport::Modul[ self ]
+  (Parent_ = ::Skylab::MetaHell::TestSupport::Modul)[ self ] # #ts-002
+  Creator_TestSupport = self # courtesy
 
-  Creator_TestSupport = self
-  MetaHell = MetaHell # for here
+  CONSTANTS = Parent_::CONSTANTS
 
+  include CONSTANTS # for the spec
 
   module ModuleMethods
+    include CONSTANTS
     def snip &f
       let :klass do
         ::Class.new.class_eval do

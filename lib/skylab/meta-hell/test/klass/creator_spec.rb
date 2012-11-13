@@ -80,7 +80,7 @@ module ::Skylab::MetaHell::TestSupport::Klass::Creator
           klass :FunTimes__Pimple
         end
         doing { o.Darymple }
-        borks %r{:FunTimes__Pollyp is not in the definitions graph\. The def}
+        borks %r{:FunTimes__Pollyp.+is not in the definitions graph\. The def}
       end
 
       context "but with a symbolic name that *is* in the definition graph" do

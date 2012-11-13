@@ -50,6 +50,31 @@ module Skylab::MetaHell
 
     -> do
 
+      valid_rx = /\A[A-Z][_a-zA-Z0-9]*\z/
+
+      resolve_class_name = -> client, full_name, kg do
+        # basically just validate full_name, else bork an elaborate msg
+
+        ::Symbol == full_name.class or fail 'sanity' # being cautious for now
+        full_name.to_s =~ valid_rx or raise "malformed name: #{full_name}"
+        if client.respond_to? full_name
+          full_name
+        else
+          err = ["client does not have a `#{full_name}` method"]
+          if kg
+            if kg.key? full_name
+              err.push " (although it was found in the known graph STRANGE)"
+            else
+              err.push " and is not in the definitions graph.#{
+              } The definitions graph includes: (#{ kg.keys.join ', ' })"
+            end
+          else
+            err.push " (and there is no known graph)"
+          end
+          fail "can't resolve class name #{full_name.inspect} -- #{ err * '' }."
+        end
+      end
+
       resolve_superclass = {
 
         ::NilClass => ->(*) { },
@@ -57,18 +82,12 @@ module Skylab::MetaHell
         ::Class => ->( meta, * ) { meta.extends },
 
         ::Symbol => -> me, client, kg do
-          client && kg or fail "can't resolve a superclass name without #{
-          [client, kg].zip(%w(client kg)).each_with_index.map{|a,i|a[1] if
-          ! a[0]}.compact.join(' and ')}"
-          meta = kg.fetch me.extends do |x|
-            raise "#{x.inspect} is not in the definitions graph.#{
-            } The definitions graph includes: (#{ kg.keys.join ', ' })"
-          end
+          full_superclass_name = resolve_class_name[ client, me.extends, kg ]
           if me._locked?
-            fail "cyclic dependency? (#{ me.name } < #{ meta.name })"
+            fail "cyclic dependency? (#{ me.name } < #{ full_superclass_name })"
           end
           me._lock!
-          result = client.send meta.name
+          result = client.send full_superclass_name
           me._unlock!
           result
         end
