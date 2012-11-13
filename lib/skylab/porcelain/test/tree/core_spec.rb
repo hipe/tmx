@@ -23,7 +23,7 @@ end
 
 module Skylab::Porcelain::TestNamespace
   include Skylab::Porcelain
-  describe Tree do
+  describe Tree, ok:true do
     it "renders a pretty tree" do
       foo = ArrayExtension[
         { :name => "document",

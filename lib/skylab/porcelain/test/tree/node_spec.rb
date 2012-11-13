@@ -3,7 +3,7 @@ require File.expand_path('../../../tree/node', __FILE__)
 
 module Skylab::Porcelain::TestNamespace
   include Skylab::Porcelain
-  describe Tree::Node do
+  describe Tree::Node, ok:true do
     let(:paths) { [
       'a',
       'bb/cc/dd',

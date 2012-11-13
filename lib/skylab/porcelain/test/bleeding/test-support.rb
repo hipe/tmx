@@ -2,20 +2,27 @@ require_relative '../test-support'
 require_relative '../../core'
 require 'skylab/headless/core'
 
-module Skylab::Porcelain::Bleeding::TestSupport
-  Bleeding = ::Skylab::Porcelain::Bleeding
-  Porcelain = ::Skylab::Porcelain
-  class SimplifiedEvent < Struct.new(:type, :message) # hack for prettier dumps ick!
+module Skylab::Porcelain::TestSupport::Bleeding
+  Parent_ = ::Skylab::Porcelain::TestSupport # #ts-002
+  Parent_[ self ] # #regret
+  Bleeding_TestSupport = self # courtesy
+
+  module CONSTANTS # #ts-002
+    include Parent_::CONSTANTS
+    MUSTACHE_RX = Headless::CONSTANTS::MUSTACHE_RX
+  end
+
+  class Event_Simplified < ::Struct.new :type, :message
+    # hack for prettier dumps whateveuh
     def string
       "#{type.inspect} #{message.inspect}"
     end
   end
 
-  class ::RSpec::Matchers::DSL::Matcher
-    include ::Skylab::Porcelain::En::Number
-  end
+  include CONSTANTS # have it here so it's seen in my child modules?
+  Porcelain = Porcelain
 
-  class MyEmitSpy < ::Skylab::TestSupport::EmitSpy
+  class My_EmitSpy < ::Skylab::TestSupport::EmitSpy
     include Porcelain::TiteColor # unstylize
     def initialize &b
       unless block_given?
@@ -28,7 +35,11 @@ module Skylab::Porcelain::Bleeding::TestSupport
     end
   end
 
-  MUSTACHE_RX = ::Skylab::Headless::Constants::MUSTACHE_RX
+  module CONSTANTS
+    Event_Simplified = Event_Simplified
+    My_EmitSpy = My_EmitSpy
+  end
+
   last_number = 0
   BUILD_NAMESPACE_RUNTIME = ->(_) do
     @base_module = ::Module.new
@@ -36,13 +47,13 @@ module Skylab::Porcelain::Bleeding::TestSupport
     @nermsperce = m = modul(:MyActions, &namespace_body)
     m = modul(:MyActions, &namespace_body)
     ns = Bleeding::NamespaceInferred.new(m)
-    rt = MyEmitSpy.new
+    rt = My_EmitSpy.new
     # ns.build(rt).object_id == ns.object_id or fail("handle this")
     [ns, rt]
   end
   module ModuleMethods
-    include ::Skylab::MetaHell::ModulCreator
-    include ::Skylab::MetaHell::KlassCreator
+    extend ::Skylab::MetaHell::Modul::Creator
+    include ::Skylab::MetaHell::Klass::Creator
     include ::Skylab::Autoloader::Inflection::Methods
     def base_module!
       (const = constantize description) !~ /\A[A-Z][_a-zA-Z0-9]*\z/ and fail("oops: #{const.inspect}")
@@ -54,7 +65,7 @@ module Skylab::Porcelain::Bleeding::TestSupport
       tok = @last_token
       once = ->(_) do
         ns, rt = instance_eval(&BUILD_NAMESPACE_RUNTIME)
-        ns.find(tok) { |o| o.on_error { |e| rt.emit(SimplifiedEvent.new(e.type, unstylize(e.message))) } }
+        ns.find(tok) { |o| o.on_error { |e| rt.emit(Event_Simplified.new(e.type, unstylize(e.message))) } }
         _use = rt.stack
         (once = ->(_) { _use }).call(nil)
       end
@@ -81,10 +92,16 @@ module Skylab::Porcelain::Bleeding::TestSupport
     end
     def with_action action_token
       once = ->(_) do
-        send("#{constantize ns_token}__#{constantize action_token}") # call the creator
-        action = Bleeding::NamespaceInferred.new(base_module.const_get(constantize ns_token)).
-          build(MyEmitSpy.new.debug!).fetch(action_token)
-        instance_eval(& (once = ->(_) { action }))
+        box_const = constantize ns_token
+        leaf_const = constantize action_token
+        accessor = "#{box_const}__#{leaf_const}"
+        send accessor # #kick #refactor
+        box = send box_const
+        ns = Bleeding::NamespaceInferred.new box # #app-refactor
+        what = ns.build My_EmitSpy.new.debug! # #app-refactor
+        action = what.fetch action_token
+        once = -> { action }
+        action
       end
       let(:fetch) { instance_eval(&once) }
       let(:subject) { fetch }
@@ -94,10 +111,6 @@ module Skylab::Porcelain::Bleeding::TestSupport
     end
   end
   module InstanceMethods
-    include ::Skylab::Autoloader::Inflection::Methods # constantize
-    include ::Skylab::MetaHell::ModulCreator::InstanceMethods
-    include ::Skylab::MetaHell::KlassCreator::ExtensorInstanceMethods
-    include ::Skylab::Porcelain::TiteColor # unstylize
     attr_reader :base_module
     def build_action_runtime action_token
       _rt = Bleeding::Runtime.new
@@ -112,7 +125,7 @@ module Skylab::Porcelain::Bleeding::TestSupport
       _rt.fetch(action_token)
     end
     def emit_spy
-      @emit_spy ||= MyEmitSpy.new
+      @emit_spy ||= My_EmitSpy.new
     end
     def namespace
       @nermsperce

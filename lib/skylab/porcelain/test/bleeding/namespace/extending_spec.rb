@@ -1,7 +1,7 @@
 require_relative '../test-support'
 
 module ::Skylab::Porcelain::TestSupport::Bleeding # #po-008
-  describe "As for extending your namespace module with #{Bleeding::NamespaceModuleMethods}" do
+  describe "As for extending your namespace module with #{Bleeding::NamespaceModuleMethods}", ok:true do
     extend Bleeding_TestSupport
 
     incrementing_anchor_module!

@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-describe ::Skylab::Porcelain::En do
+describe ::Skylab::Porcelain::En, ok:true do
   describe "oxford_commma" do
     include ::Skylab::Porcelain::En::Methods
     let(:subject) { oxford_comma arr }

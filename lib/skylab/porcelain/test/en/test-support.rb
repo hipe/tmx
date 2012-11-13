@@ -8,7 +8,9 @@ module Skylab::Porcelain::TestSupport::En
   En_TestSupport = self # courtesy
 
   module CONSTANTS
-    include Parent_::Constants
+    include Parent_::CONSTANTS
     En = ::Skylab::Porcelain::En
   end
+
+  include CONSTANTS # so that `En` (the right one) can be accessed
 end

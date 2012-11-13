@@ -4,7 +4,7 @@ require 'skylab/porcelain/bleeding'
 
 module Skylab::Porcelain::TestSupport
   include Skylab
-  describe Porcelain::Table do
+  describe Porcelain::Table, ok:true do
     let(:subject) { Porcelain }
     let(:_stdout) { StringIO.new }
     let(:stdout) { _stdout.string }

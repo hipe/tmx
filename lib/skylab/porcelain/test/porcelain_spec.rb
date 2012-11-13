@@ -5,7 +5,7 @@ require File.expand_path('../../all', __FILE__)
 module Skylab::Porcelain::TestSupport
   Porcelain = ::Skylab::Porcelain
 
-  describe "The #{Porcelain} module" do
+  describe "The #{Porcelain} module", ok:true do
     include Porcelain::Styles # unstylize
     let(:debug_ui) { }
     let(:_stderr) { StringIO.new }
