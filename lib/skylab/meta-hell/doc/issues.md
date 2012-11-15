@@ -1,3 +1,4 @@
+[#008] #open after etc, consider pulling in Let
 [#007] #open push up logic for autoviv. of superklassen maybe? (at least test)
 [#006] #note core dumps happen here with super
 [#005] #done second rewrite
