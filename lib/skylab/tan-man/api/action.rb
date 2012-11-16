@@ -2,7 +2,7 @@ module Skylab::TanMan
   class API::Action
     extend Bleeding::DelegatesTo
     extend ::Skylab::PubSub::Emitter
-    extend Porcelain::AttributeDefiner
+    extend Porcelain::Attribute::Definer
 
     include API::RuntimeExtensions
     include Core::Attribute::Reflection::InstanceMethods

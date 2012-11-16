@@ -1,11 +1,11 @@
 require File.expand_path('../../attribute-definer', __FILE__)
 require 'set'
 
-describe Skylab::Porcelain::AttributeDefiner do
+describe Skylab::Porcelain::Attribute::Definer do
   module Helper
     def one_such_class &block
       Class.new.class_eval do
-        extend ::Skylab::Porcelain::AttributeDefiner
+        extend ::Skylab::Porcelain::Attribute::Definer
         instance_eval &block
         self
       end
@@ -114,7 +114,7 @@ describe Skylab::Porcelain::AttributeDefiner do
     let(:defining_module) do
       Module.new.module_eval do
         class << self ; def to_s ; 'defining_module' end end
-        extend Porcelain::AttributeDefiner
+        extend Porcelain::Attribute::Definer
         meta_attribute :regex do |name, meta|
           alias_method(after = "#{name}_after_regex=", "#{name}=")
           define_method("#{name}=") do |str|
@@ -133,7 +133,7 @@ describe Skylab::Porcelain::AttributeDefiner do
       ctx = self
       Class.new.class_eval do
         class << self ; def to_s ; 'importing_class' end end
-        extend Porcelain::AttributeDefiner
+        extend Porcelain::Attribute::Definer
         meta_attribute ctx.defining_module
         self
       end
@@ -148,7 +148,7 @@ describe Skylab::Porcelain::AttributeDefiner do
       end
     end
     it "which transfers the same MetaAttribute object to child (should be ok)" do
-      importing_class.meta_attributes[:regex].should be_kind_of(Porcelain::AttributeDefiner::MetaAttribute)
+      importing_class.meta_attributes[:regex].should be_kind_of(Porcelain::Attribute::Definer::MetaAttribute)
       importing_class.meta_attributes[:regex].object_id.should eql(defining_module.meta_attributes[:regex].object_id)
     end
     it "also it transfers the attribute definition hook from the module" do

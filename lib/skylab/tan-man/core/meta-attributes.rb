@@ -5,13 +5,13 @@ module Skylab::TanMan::Core
     singleton_class.send :alias_method, :[], :const_fetch_all
   end
 
-  module MetaAttributes::Boolean extend Porcelain::AttributeDefiner
+  module MetaAttributes::Boolean extend Porcelain::Attribute::Definer
     meta_attribute :boolean do |name, meta|
       alias_method "#{name}?", name
     end
   end
 
-  module MetaAttributes::Default extend Porcelain::AttributeDefiner
+  module MetaAttributes::Default extend Porcelain::Attribute::Definer
     meta_attribute :default
   end
   module MetaAttributes::Default::InstanceMethods
@@ -23,7 +23,7 @@ module Skylab::TanMan::Core
     end
   end
 
-  module MetaAttributes::MutexBooleanSet extend Porcelain::AttributeDefiner
+  module MetaAttributes::MutexBooleanSet extend Porcelain::Attribute::Definer
     meta_attribute :mutex_boolean_set do |name, h|
       set = h[:mutex_boolean_set]
       alias_method(after = "#{name}_after_mutex_boolean_set=", "#{name}=")
@@ -43,7 +43,7 @@ module Skylab::TanMan::Core
     end
   end
 
-  module MetaAttributes::Pathname extend Porcelain::AttributeDefiner
+  module MetaAttributes::Pathname extend Porcelain::Attribute::Definer
     meta_attribute :pathname do |name, _|
       alias_method(after = "#{name}_after_pathname=", "#{name}=")
       define_method("#{name}=") do |path|
@@ -53,7 +53,7 @@ module Skylab::TanMan::Core
     end
   end
 
-  module MetaAttributes::Proc extend Porcelain::AttributeDefiner
+  module MetaAttributes::Proc extend Porcelain::Attribute::Definer
     meta_attribute :proc do |name, _|
       alias_method(get_proc = "#{name}_proc", name)
       define_method(name) do |&block|
@@ -66,7 +66,7 @@ module Skylab::TanMan::Core
     end
   end
 
-  module MetaAttributes::Regex extend Porcelain::AttributeDefiner
+  module MetaAttributes::Regex extend Porcelain::Attribute::Definer
     meta_attribute :on_regex_fail
     meta_attribute :regex do |name, meta|
       alias_method(after = "#{name}_after_regex=", "#{name}=")
@@ -85,7 +85,7 @@ module Skylab::TanMan::Core
   # and it requires an error_emitter and it requires the styler methods: oxford_comma, pre.
   # A required attribute is considered as not provided IFF it returns nil.
   #
-  module MetaAttributes::Required extend Porcelain::AttributeDefiner
+  module MetaAttributes::Required extend Porcelain::Attribute::Definer
     meta_attribute :required
   end
   module MetaAttributes::Required::InstanceMethods

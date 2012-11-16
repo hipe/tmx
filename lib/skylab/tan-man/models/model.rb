@@ -1,7 +1,7 @@
 module Skylab::TanMan
   class Models::Model
     extend Bleeding::DelegatesTo
-    extend Porcelain::AttributeDefiner
+    extend Porcelain::Attribute::Definer
 
     delegates_to :runtime, :emit
 

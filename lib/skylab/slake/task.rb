@@ -17,7 +17,7 @@ module Skylab::Slake
   end
 
   class Task < Rake::Task
-    extend Skylab::Porcelain::AttributeDefiner
+    extend Skylab::Porcelain::Attribute::Definer
     extend Interpolate
     extend TaskClassMethods
     include Parenthood
