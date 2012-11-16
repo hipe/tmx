@@ -93,7 +93,7 @@ module ::Skylab::TestSupport
 
       -> do
         # experimental filesystem architecture (merged trees)
-        _autoloader_extended! caller_str
+        _autoloader_init! caller_str
         if 'test-support' == dir_pathname.basename.to_s
           self.dir_pathname = dir_pathname.join('..')
           # life is better without test-support folders

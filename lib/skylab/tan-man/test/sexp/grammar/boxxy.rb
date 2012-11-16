@@ -7,7 +7,7 @@ module ::Skylab::TanMan::TestSupport
 
     def self.extended mod
       extend ::Skylab::Autoloader::ModuleMethods # #trigger (maybe nec. later)
-      mod._autoloader_extended! caller[0]
+      mod._autoloader_init! caller[0]
     end
 
     -> do
