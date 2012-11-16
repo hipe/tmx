@@ -4,13 +4,15 @@
 #
 #   * left/right alignment config options
 
-require File.expand_path('../..', __FILE__)
 
-require 'skylab/code-molester/sexp'
-require 'skylab/porcelain/tite-color'
-require 'skylab/pub-sub/emitter'
+require_relative 'core'
+require 'skylab/code-molester/core'
+require 'skylab/pub-sub/core'
 
 module ::Skylab::Porcelain::Table
+
+  Sexp = ::Skylab::CodeMolester::Sexp
+  TiteColor = ::Skylab::Porcelain::TiteColor
 
   module Column
   end
@@ -62,8 +64,6 @@ module ::Skylab::Porcelain::Table
     FLOAT_DETAIL_RE = /\A(-?\d+)((?:\.\d+)?)\z/
   end
 
-  Sexp = ::Skylab::CodeMolester::Sexp
-
   parse_styles = -> do
     # Parse a string with ascii styles into an S-expression.
 
@@ -72,7 +72,7 @@ module ::Skylab::Porcelain::Table
 
     -> str do
       out = nil
-      while md = style_parser.match(str)
+      while md = style_parser_rx.match(str)
         out ||= []
         if md[:string].length.nonzero?
           out.push Sexp[ :string, md[:string] ]
