@@ -1,7 +1,7 @@
 require_relative 'test-support'
 
 module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
-  describe "desc, an inheritable attribute of #{Bleeding::ActionModuleMethods}", ok:true do
+  describe "desc, an inheritable attribute of #{Bleeding::ActionModuleMethods}" do
     extend Action_TestSupport
 
     incrementing_anchor_module!

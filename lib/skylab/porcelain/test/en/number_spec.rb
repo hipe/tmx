@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-describe "#{::Skylab::Porcelain::En::Number}", ok:true do
+describe "#{::Skylab::Porcelain::En::Number}" do
   include ::Skylab::Porcelain::En::Number::Methods
   def self.does mixed, str
     let( :subject ) { send meth, mixed }

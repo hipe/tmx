@@ -15,7 +15,7 @@ module Skylab::Porcelain::TestSupport::En # #po-008
   end
 
 
-  describe "the class that extends #{En::ApiActionInflectionHack}", ok:true do
+  describe "the class that extends #{En::ApiActionInflectionHack}" do
     extend En_TestSupport
 
     it "gets an inflection knobby" do
@@ -54,7 +54,7 @@ module Skylab::Porcelain::TestSupport::En # #po-008
       end
     end
   end
-  describe "the industrious action class", ok:true do
+  describe "the industrious action class" do
     extend En_TestSupport
     incrementing_anchor_module!
 

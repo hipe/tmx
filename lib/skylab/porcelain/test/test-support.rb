@@ -26,7 +26,6 @@ module Skylab::Porcelain::TestSupport
       let :meta_hell_anchor_module do
         m = ::Module.new
         _const = "#{_head}#{_last += 1}"
-        $stderr.puts "MADE INCREMENTING ANCHOR MODULE #{_const}"
         Bleeding.const_set _const, m
         m
       end

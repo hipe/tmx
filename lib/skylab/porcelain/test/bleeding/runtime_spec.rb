@@ -1,12 +1,12 @@
 require_relative 'runtime/test-support'
 
 module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime # #po-008
-  describe "#{::Skylab::Porcelain::Bleeding::Runtime}", ok:true do
+  describe "#{::Skylab::Porcelain::Bleeding::Runtime}" do
     extend Runtime_TestSupport
     include Runtime_TestSupport::CONSTANTS
     Bleeding = self::Bleeding # ruby stahp
 
-    let( :debug ) { true }
+    let( :debug ) { false }
 
     let( :meta_hell_anchor_module )  { Runtime_TestSupport }
 

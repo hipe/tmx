@@ -1,7 +1,7 @@
 require File.expand_path('../../attribute-definer', __FILE__)
 require 'set'
 
-describe Skylab::Porcelain::AttributeDefiner, ok:true do
+describe Skylab::Porcelain::AttributeDefiner do
   module Helper
     def one_such_class &block
       Class.new.class_eval do

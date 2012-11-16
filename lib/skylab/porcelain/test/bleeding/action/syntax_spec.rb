@@ -1,7 +1,7 @@
 require_relative 'test-support'
 
 module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
-  describe "You can reflect on the action's syntax", ok:true do
+  describe "You can reflect on the action's syntax" do
     extend Action_TestSupport
 
     incrementing_anchor_module!

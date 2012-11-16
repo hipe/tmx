@@ -1,7 +1,7 @@
 require_relative '../test-support'
 
 module ::Skylab::Porcelain::TestSupport::Bleeding # #po-008
-  describe "#{Bleeding::NamespaceInstanceMethods} resolving names", ok:true do
+  describe "#{Bleeding::NamespaceInstanceMethods} resolving names" do
     extend Bleeding_TestSupport
     Bleeding = Bleeding # annoying
 

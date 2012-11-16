@@ -1,7 +1,7 @@
 require_relative 'test-support'
 
 module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
-  describe "#{Bleeding::ActionModuleMethods}", ok:true do
+  describe "#{Bleeding::ActionModuleMethods}" do
     extend Action_TestSupport
     incrementing_anchor_module!
     with_namespace 'herp-derp'
