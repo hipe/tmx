@@ -5,7 +5,7 @@ module Skylab::TanMan
     extend Porcelain::AttributeDefiner
 
     include API::RuntimeExtensions
-    include AttributeReflection::InstanceMethods
+    include Core::Attribute::Reflection::InstanceMethods
     include API::AdaptiveStyle
 
     meta_attribute(*MetaAttributes[:boolean, :default, :mutex_boolean_set,:pathname, :required, :regex])

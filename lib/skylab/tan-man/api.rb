@@ -5,38 +5,6 @@ module Skylab::TanMan
 
   ROOT = ::Skylab::Face::MyPathname.new(File.expand_path('..', __FILE__))
 
-  module AttributeReflection
-    # once this settles down it will get pushed up @todo{after:.3}
-  end
-  module AttributeReflection::InstanceMethods
-    def attributes
-      AttributeReflection::InstanceAttributeIterator.new(self)
-    end
-
-    # @note: the default attribute definer for a typical object is its ordinary class.
-    # In some cases -- e.g. if you are dealing with a class or module object and want
-    # to use attribute definer for *that* -- you will want to redefine this method
-    # to return the singleton class instead, for reflection to work (which is required
-    # for some kind of meta-attribute setters, etc)
-    #
-    def attribute_definer
-      self.class
-    end
-  end
-  class AttributeReflection::InstanceAttributeIterator < ::Enumerator
-    def initialize obj
-      super() do |y|
-        attrs = obj.class.attributes
-        attrs.each do |k, h|
-          y << [k, obj.send(k)] # VERY experimental interface
-        end
-      end
-    end
-    def to_h
-      Hash[to_a]
-    end
-  end
-
   module API end
 
   class API::RuntimeError < ::RuntimeError ; end # just for fun
@@ -44,7 +12,7 @@ module Skylab::TanMan
   class << API
     extend Porcelain::AttributeDefiner
     meta_attribute(*MetaAttributes[:default, :proc])
-    include AttributeReflection::InstanceMethods
+    include Core::Attribute::Reflection::InstanceMethods
     alias_method :attribute_definer, :singleton_class # @experimental:
     # this means that the objects will no longer use their class as the attribute_definer
     attribute :global_conf_path, proc: true, default: ->{ "#{ENV['HOME']}/.tanman-config" }
