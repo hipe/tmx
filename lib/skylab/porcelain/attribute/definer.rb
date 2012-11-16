@@ -1,8 +1,13 @@
-module Skylab
-end
+module ::Skylab::Porcelain
 
-module Skylab::Porcelain
-  module AttributeDefiner
+  module Attribute
+    # sorry for the confusion: a MetaAttribute is an attribute an attribute
+    # can have.  An Attribute::Meta is the abstract representation of an
+    # attribute, that is, an attribute's name along with its meta-attribute
+    # values.
+  end
+
+  module Attribute::Definer
     def attribute sym, meta_attributes=nil
       change_request = _attribute_meta_class.new sym
       meta = attributes[sym]
@@ -35,16 +40,18 @@ module Skylab::Porcelain
       nil
     end
     def _attribute_meta_class
-      AttributeMeta
+      Attribute::Meta
     end
     def attribute_meta_class klass
       singleton_class.send(:define_method, :_attribute_meta_class) { klass }
     end
     def attributes
-      @attributes ||= _parent_dup_2(:attributes) { Attributes.new }
+      @attributes ||= _parent_dup_2(:attributes) { Attribute::Box.new }
     end
     def default_meta_attributes
-      @default_meta_attributes ||= _parent_dup(:default_meta_attributes) { MetaAttributes.new }
+      @default_meta_attributes ||= _parent_dup(:default_meta_attributes) do
+        Attribute::MetaAttribute::Box.new
+      end
     end
     def import_meta_attributes mod
       block_given? and raise ArgumentError.new("blocks not supported when importing meta attributes.")
@@ -61,9 +68,10 @@ module Skylab::Porcelain
       b && a.count != 1 and raise ArgumentError.new("with block form, only pass 1 meta_attribute, not #{a.count}")
       a.each do |attr_sym|
         case attr_sym
-        when Symbol ; meta_attributes[attr_sym] ||= MetaAttribute.new(attr_sym)
-        when Module ; import_meta_attributes(attr_sym, &b)
-        else        ; fail("unspported type for meta attribute: #{attr_sym.class}")
+        when ::Symbol ; meta_attributes[attr_sym] ||=
+                          Attribute::MetaAttribute.new attr_sym
+        when ::Module ; import_meta_attributes(attr_sym, &b)
+        else          ; fail("unspported type for meta attribute: #{attr_sym.class}")
         end
       end
       if b
@@ -76,7 +84,9 @@ module Skylab::Porcelain
       nil
     end
     def meta_attributes
-      @meta_attributes ||= _parent_dup_2(:meta_attributes) { MetaAttributes.new }
+      @meta_attributes ||= _parent_dup_2(:meta_attributes) do
+        Attribute::MetaAttribute::Box.new
+      end
     end
     # @todo: clean up this redundancy @after:#100
     def _parent_dup attr_sym, &default
@@ -97,16 +107,23 @@ module Skylab::Porcelain
       ancestors[(self == ancestors.first ? 1 : 0) ..-1].detect { |a| a.kind_of?(Class) and a.respond_to?(method) }
     end
   end
-end
 
-module Skylab::Porcelain::AttributeDefiner
-  module CommonHashInstanceMethods
+
+  class Attribute::Meta < ::Hash
+    def initialize _ # ignore the attribute name for this one!
+    end
+  end
+
+
+  module Attribute::Hash_InstanceMethods
     def duplicate
       self.class[ * map{ |k, v| [k, v.dup] }.flatten(1) ]
     end
   end
-  class Attributes < Hash
-    include CommonHashInstanceMethods
+
+
+  class Attribute::Box < ::Hash
+    include Attribute::Hash_InstanceMethods
 
     # For the attributes that have a key? of `metattribute` return a new hash
     # of the values of the metaattributes
@@ -120,17 +137,13 @@ module Skylab::Porcelain::AttributeDefiner
     #   Foo.attributes.with(:default) #=> { age: 1, sex: :banana }
     #
     def with metaattribute
-      Hash[* map { |k, m| [k, m[metaattribute]] if m.key?(metaattribute) }.compact.flatten(1) ]
+      ::Hash[* map { |k, m| [k, m[metaattribute]] if m.key?(metaattribute) }.
+             compact.flatten(1) ]
     end
   end
-  class AttributeMeta < Hash
-    def initialize _ # ignore the attribute name for this one!
-    end
-  end
-  class MetaAttributes < Hash
-    include CommonHashInstanceMethods
-  end
-  class MetaAttribute
+
+
+  class Attribute::MetaAttribute
     attr_reader :hook
     def hook= prok
       @hook and fail("implement me: clobbering of existing hooks")
@@ -145,5 +158,9 @@ module Skylab::Porcelain::AttributeDefiner
     end
     attr_reader :name
   end
-end
 
+
+  class Attribute::MetaAttribute::Box < ::Hash
+    include Attribute::Hash_InstanceMethods
+  end
+end

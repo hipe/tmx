@@ -1,4 +1,5 @@
-require File.expand_path('../../attribute-definer', __FILE__)
+require_relative '../test-support'
+
 require 'set'
 
 describe Skylab::Porcelain::Attribute::Definer do
@@ -148,7 +149,7 @@ describe Skylab::Porcelain::Attribute::Definer do
       end
     end
     it "which transfers the same MetaAttribute object to child (should be ok)" do
-      importing_class.meta_attributes[:regex].should be_kind_of(Porcelain::Attribute::Definer::MetaAttribute)
+      importing_class.meta_attributes[:regex].should be_kind_of(Porcelain::Attribute::MetaAttribute)
       importing_class.meta_attributes[:regex].object_id.should eql(defining_module.meta_attributes[:regex].object_id)
     end
     it "also it transfers the attribute definition hook from the module" do
@@ -168,4 +169,3 @@ describe Skylab::Porcelain::Attribute::Definer do
     end
   end
 end
-
