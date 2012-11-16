@@ -20,36 +20,9 @@ module Skylab::TanMan
   end
   API.set_defaults_if_nil!
 
-  module GlobalStyle
-    include Porcelain::En::Methods # oxford_comma, s()
-    # @later this might be stylus pattern
-  end
-
-  module API::AdaptiveStyle
-    # Simply provides convenience methods that are shorthand wrappers
-    # for the below style methods, for whose implementation text_styler()
-    # is relied up.
-    #
-    # Because the including module relies upon the text_styler() for
-    # the implementations and the text_styler() may be a variety of
-    # different implementations based on the root runtime, for e.g.
-    # this is considered to be the implementation for "adaptive style."
-    #
-    extend Bleeding::DelegatesTo
-    include GlobalStyle
-
-    delegates_to :text_styler, :pre
-  end
-
-  module API::UniversalStyle
-    def pre str
-      "\"#{str}\""
-    end
-  end
-
   module API::RuntimeExtensions
     extend Bleeding::DelegatesTo
-    include GlobalStyle
+    include Core::Pen::Methods::Global
     def add_invalid_reason mixed
       (@invalid_reasons ||= []).push mixed
     end

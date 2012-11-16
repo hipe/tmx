@@ -6,7 +6,7 @@ module Skylab::TanMan
 
     include API::RuntimeExtensions
     include Core::Attribute::Reflection::InstanceMethods
-    include API::AdaptiveStyle
+    include Core::Pen::Methods::Adaptive
 
     meta_attribute(*MetaAttributes[:boolean, :default, :mutex_boolean_set,:pathname, :required, :regex])
 

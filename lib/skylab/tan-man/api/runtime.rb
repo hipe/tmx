@@ -3,7 +3,7 @@ require 'json'
 module Skylab::TanMan
   module API::Runtime end
   class API::Runtime::Root
-    include API::UniversalStyle
+    include Core::Pen::Methods::Universal
 
     def clear
       @singletons.clear

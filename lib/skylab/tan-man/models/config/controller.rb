@@ -1,7 +1,7 @@
 module Skylab::TanMan
   class Models::Config::Controller
     extend Bleeding::DelegatesTo
-    include API::AdaptiveStyle
+    include Core::Pen::Methods::Adaptive
     def [](k) # is ready? and k is string and local is the thing
       config_singleton.local[k]
     end
