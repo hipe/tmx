@@ -2,13 +2,13 @@ require 'optparse'
 
 module Skylab ; end
 module Skylab::Tolerance
-  module TiteColor
+  module My_TiteColor
     _ = [nil, :strong, * Array.new(29), :red, :green, :yellow, :blue, :magenta, :cyan, :white]
     MAP = Hash[ * _.each_with_index.map { |sym, idx| [sym, idx] if sym }.compact.flatten ]
     def stylize str, *styles ; "\e[#{styles.map{ |s| MAP[s] }.compact.join(';')}m#{str}\e[0m" end
   end
   module Styles
-    include TiteColor
+    include My_TiteColor
     def pre(s) ; stylize(s, :green         ) end
     def hdr(s) ; stylize(s, :strong, :green) end
   end

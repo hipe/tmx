@@ -1,7 +1,7 @@
-require_relative 'creator/test-support.rb'
+require_relative 'creator/test-support'
 
 module ::Skylab::MetaHell::TestSupport::Modul::Creator
-  describe "#{MetaHell::Modul::Creator} uber alles" do
+  describe "say, did you know that when using #{MetaHell::Modul::Creator}" do
     extend Creator_TestSupport
 
 
@@ -78,7 +78,7 @@ module ::Skylab::MetaHell::TestSupport::Modul::Creator
         m.constants.should eql([])
         o.My__Pho
         m.object_id.should eql(o.meta_hell_anchor_module.object_id)
-        m.constants.should eql([:My])
+        m.constants.should eql([:My, :His])
         x = m.const_get(:My, false).const_get(:Pho, false).const_get(:Pas, false)
         x.instance_methods.should eql([:zangeif])
       end

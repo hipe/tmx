@@ -4,7 +4,7 @@ module Skylab::Headless
   extend ::Skylab::MetaHell::Autoloader::Autovivifying
   Headless = self
 
-  module Constants
+  module CONSTANTS
     MUSTACHE_RX = / {{ ( (?: (?!}}) [^{] )+ ) }} /x
   end
 end

@@ -1,9 +1,10 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
-module Skylab::Porcelain::Bleeding::TestSupport
+module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
   describe "desc, an inheritable attribute of #{Bleeding::ActionModuleMethods}" do
-    extend ModuleMethods ; include InstanceMethods
-    base_module!
+    extend Action_TestSupport
+
+    incrementing_anchor_module!
     klass :Base do
       extend Bleeding::ActionModuleMethods
     end
@@ -49,6 +50,8 @@ module Skylab::Porcelain::Bleeding::TestSupport
         base.desc.should eql(['foo', 'bar'])
       end
     end
+    Bleeding = Bleeding # #annoying
+    Event_Simplified = Event_Simplified # #annoying
     context "(bugfix: be sure that flyweighting doesn't interfere)" do
       let(:emit_spy) { ::Skylab::TestSupport::EmitSpy.new }
       klass :CLI, extends: Bleeding::Runtime do
@@ -56,7 +59,7 @@ module Skylab::Porcelain::Bleeding::TestSupport
           @rt = rt
         end
         def emit(t, s)
-          @rt.emit(SimplifiedEvent.new(t, unstylize(s)))
+          @rt.emit(Event_Simplified.new(t, unstylize(s)))
         end
         module self::Actions ; end
         class self::Action

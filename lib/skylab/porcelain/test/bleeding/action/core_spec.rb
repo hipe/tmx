@@ -1,10 +1,9 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
-module Skylab::Porcelain::Bleeding::TestSupport
+module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
   describe "#{Bleeding::ActionModuleMethods}" do
-    extend ModuleMethods
-    include InstanceMethods
-    base_module!
+    extend Action_TestSupport
+    incrementing_anchor_module!
     with_namespace 'herp-derp'
     context "You can't have an action that is a completely blank slate class because that" do
       with_action 'ferp-merp'

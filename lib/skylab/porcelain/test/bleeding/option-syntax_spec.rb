@@ -1,10 +1,9 @@
-require_relative '../../core'
-require_relative '../bleeding/test-support'
+require_relative 'test-support'
 
-module Skylab::Porcelain::Bleeding::TestSupport
+module Skylab::Porcelain::TestSupport::Bleeding # #po-008
   describe Bleeding::OptionSyntax do
-    extend Skylab::MetaHell::KlassCreator
-    let(:base_module) { Module.new }
+    extend Bleeding_TestSupport
+    incrementing_anchor_module!
 
     klass :Alpha do
       extend Bleeding::ActionModuleMethods
@@ -52,11 +51,11 @@ module Skylab::Porcelain::Bleeding::TestSupport
 
     context "Charlie changes it, THEN Bravo changes it, then what does charlie have?" do
       it "is ok, charlie keeps its original fenangling" do
-        self.Charlie.option_syntax_class :whatsit
-        self.Charlie.option_syntax_class.should eql(:whatsit)
-        self.Bravo.option_syntax_class :beavis
-        self.Charlie.option_syntax_class.should eql(:whatsit)
-        self.Bravo.option_syntax_class.should eql(:beavis)
+        _Charlie.option_syntax_class :whatsit
+        _Charlie.option_syntax_class.should eql(:whatsit)
+        _Bravo.option_syntax_class :beavis
+        _Charlie.option_syntax_class.should eql(:whatsit)
+        _Bravo.option_syntax_class.should eql(:beavis)
       end
     end
   end

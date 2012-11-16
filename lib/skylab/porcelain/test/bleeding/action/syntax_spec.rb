@@ -1,10 +1,14 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
-module Skylab::Porcelain::Bleeding::TestSupport
+module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
   describe "You can reflect on the action's syntax" do
-    extend ModuleMethods ; include InstanceMethods
-    base_module!
-    let(:klass) { self.send(:Akton) }
+    extend Action_TestSupport
+
+    incrementing_anchor_module!
+
+
+    let(:klass) { self.send(:Akton) } # #refactor
+
     let(:runtime) { build_action_runtime 'akton' }
     context "with regards to inferred syntaxes" do
       klass :Akton do
