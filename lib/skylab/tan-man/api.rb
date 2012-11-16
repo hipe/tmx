@@ -1,8 +1,5 @@
 module Skylab::TanMan
 
-  MY_EVENT_GRAPH = { :info => :all, :out => :all, :no_config_dir => :error, :skip => :info }
-  EVENT_GRAPH = Bleeding::EVENT_GRAPH.merge(MY_EVENT_GRAPH)
-
   ROOT = ::Skylab::Face::MyPathname.new(File.expand_path('..', __FILE__))
 
   module API end
