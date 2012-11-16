@@ -1,4 +1,6 @@
-[#109] #pattern self.extended mod pattern
+[#111] (was [#109]!) #pattern self.extended mod pattern
+[#110] hipe's rules of order for delcarations in a class ..
+[#109] this whacky pattern of using a class as a namespace
 [#108] #low-low-priority #pattern normalization
 [#107] #low-priority 2012-11-02 this lexical scoping issue
 [#106] #done 2012-10-28 autoloading vis-a-vis const awareness

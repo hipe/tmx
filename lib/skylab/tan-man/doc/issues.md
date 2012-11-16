@@ -1,6 +1,8 @@
+[#022] refactor-in headless, and sub-client
+[#021] #open merge singletons into service
 [#020] #low-priority nounify cli commands
 [#019] #done "magic" for DRYING up tests (Regret)
-[#018] #open #depends-on:#sl-100 refactor out porcelain
+[#018] #open #depends-on:#sl-100 refactor out porcelain ["bleeding"]
 [#017] #pattern: for to maybe push up to headless
 [#016] #pattern: action instance spawns instance of model controller
 [#015] #open UI for dissociate (and prune nodes?)
