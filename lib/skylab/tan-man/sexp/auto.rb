@@ -18,7 +18,7 @@ module Skylab::TanMan
     # this library, and possibly generated Sexp classes for use in
     # recursive calls to builder methods.
 
-    include ::Skylab::Autoloader::Inflection::Methods # constantize
+    include Autoloader::Inflection::Methods # constantize
 
     def [] syntax_node # inheritable API entrypoint
       node2tree syntax_node, nil, nil # no class, no member_name

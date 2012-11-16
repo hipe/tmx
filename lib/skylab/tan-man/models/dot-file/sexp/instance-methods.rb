@@ -12,7 +12,7 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
     # for a given Sexp class.
 
     def const_defined? const, bool
-      if const_defined_without_autoloader? const, bool
+      if autoloader_original_const_defined? const, bool
         true
       elsif const_probably_loadable? const
         self.const_get const, false
