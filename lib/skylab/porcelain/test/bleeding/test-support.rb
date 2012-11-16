@@ -40,17 +40,6 @@ module Skylab::Porcelain::TestSupport::Bleeding
     My_EmitSpy = My_EmitSpy
   end
 
-  last_number = 0
-  BUILD_NAMESPACE_RUNTIME = ->(_) do
-    @base_module = ::Module.new
-    ::Skylab::Porcelain::Bleeding.const_set("Xyzzy#{last_number += 1}", @base_module)
-    @nermsperce = m = modul(:MyActions, &namespace_body)
-    m = modul(:MyActions, &namespace_body)
-    ns = Bleeding::NamespaceInferred.new(m)
-    rt = My_EmitSpy.new
-    # ns.build(rt).object_id == ns.object_id or fail("handle this")
-    [ns, rt]
-  end
   module ModuleMethods
     extend ::Skylab::MetaHell::Modul::Creator
     include ::Skylab::MetaHell::Klass::Creator
@@ -60,32 +49,64 @@ module Skylab::Porcelain::TestSupport::Bleeding
       _last = 0
       let(:base_module) { ::Skylab::Porcelain::Bleeding.const_set("#{const}#{_last += 1}", Module.new) }
     end
-    def events &specify_body
-      specify(&specify_body)
-      tok = @last_token
-      once = ->(_) do
-        ns, rt = instance_eval(&BUILD_NAMESPACE_RUNTIME)
-        ns.find(tok) { |o| o.on_error { |e| rt.emit(Event_Simplified.new(e.type, unstylize(e.message))) } }
-        _use = rt.stack
-        (once = ->(_) { _use }).call(nil)
+
+    -> do # mad hax to clean up later #refactor
+
+      last_number = 0
+
+      namespace_and_runtime = -> do
+        mod = ::Module.new
+        Bleeding_TestSupport.const_set "Xyzzy#{ last_number += 1 }", mod
+        singleton_class.send(:define_method, :meta_hell_anchor_module) { mod }
+        @nermsperce = m = modul!(:MyActions, & _namespace_body)
+        ns = Bleeding::NamespaceInferred.new(m)
+        rt = My_EmitSpy.new
+        # ns.build(rt).object_id == ns.object_id or fail("handle this")
+        [ns, rt]
       end
-      let(:subject) { instance_eval(&once) }
-    end
+
+      define_method :events do |&specify_body|
+        specify(& specify_body)
+        tok = @last_token
+        once = -> do
+          ns, rt = instance_exec(& namespace_and_runtime)
+          ns.find tok do |o|
+            o.on_error do |e|
+              rt.emit( Event_Simplified.new e.type, unstylize(e.message) )
+            end
+          end
+          _use = rt.stack
+          once = -> { _use }
+          _use
+        end
+
+        let(:subject) { instance_exec(& once) }
+      end
+
+      define_method :result do |&specify_body|
+        tok = @last_token
+        once = -> do
+          ns, rt = instance_exec(& namespace_and_runtime)
+          _res = ns.find tok do |o|
+            o.on_error do |e|
+              $stderr.puts "EXpecting no events here (xyzzy) #{e}"
+            end
+          end
+          once = -> { _res }
+          _res
+        end
+
+        let(:subject) { instance_exec(& once) }
+
+        specify do
+          instance_exec(& once)           # this must be run before the body
+          instance_exec(& specify_body)   # of the specify block is evaluated
+        end
+      end
+
+    end.call
     def namespace &b
-      let(:namespace_body) { b }
-    end
-    def result &specify_body
-      tok = @last_token
-      once = ->(_) do
-        ns, rt = instance_eval(&BUILD_NAMESPACE_RUNTIME)
-        _res = ns.find(tok) { |o| o.on_error { |e| $stderr.puts("EXpecting no events here (xyzzy) #{e}") } }
-        (once = ->(_) { _res }).call(nil)
-      end
-      let(:subject) { instance_eval(&once) }
-      specify do
-        instance_eval(&once) # this must be run before the body of the specify block is evaluated
-        instance_exec(&specify_body)
-      end
+      let( :_namespace_body ) { b }
     end
     def token tok
       @last_token = tok
@@ -111,6 +132,8 @@ module Skylab::Porcelain::TestSupport::Bleeding
     end
   end
   module InstanceMethods
+    include Porcelain::TiteColor::Methods
+    include CONSTANTS
     attr_reader :base_module
     def build_action_runtime action_token
       _rt = Bleeding::Runtime.new

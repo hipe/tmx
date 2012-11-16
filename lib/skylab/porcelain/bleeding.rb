@@ -6,7 +6,7 @@ require 'optparse'
 module Skylab::Porcelain::Bleeding
   extend ::Skylab::Autoloader
   module Styles
-    include ::Skylab::Porcelain::En
+    include ::Skylab::Porcelain::En::Methods
     include ::Skylab::Porcelain::TiteColor::Methods
     extend self
     def em(s)  ; stylize(s, :green         )   end

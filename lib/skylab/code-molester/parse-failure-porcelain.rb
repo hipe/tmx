@@ -22,7 +22,7 @@ module Skylab::CodeMolester
   end
 
   class ParseFailurePorcelain # @api private
-    include En
+    include En::Methods
     attr_reader :failures
     attr_reader :info
     def initialize parser
