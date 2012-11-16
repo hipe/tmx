@@ -1,3 +1,4 @@
+[#023] combine all Boxxy
 [#022] refactor-in headless, and sub-client
 [#021] #open merge singletons into service
 [#020] #low-priority nounify cli commands

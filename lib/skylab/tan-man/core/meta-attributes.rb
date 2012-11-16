@@ -1,18 +1,8 @@
 module Skylab::TanMan::Core
 
   module MetaAttributes
-  end
-
-  class << MetaAttributes
-    def all
-      constants.map { |k| const_get(k) }
-    end
-    def [](*a)
-      a.map do |k|
-        konst = k.to_s.gsub(/(?:^|([a-z])_)([a-z])/) { "#{$1}#{$2.upcase}" }.intern
-        const_get konst
-      end
-    end
+    extend TanMan::Boxxy::Methods
+    singleton_class.send :alias_method, :[], :const_fetch_all
   end
 
   module MetaAttributes::Boolean extend Porcelain::AttributeDefiner
