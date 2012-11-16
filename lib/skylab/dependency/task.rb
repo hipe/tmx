@@ -17,7 +17,7 @@ module Skylab::Dependency
 
     extend ::Skylab::PubSub::Emitter # child classes decide what to emit
     include ::Skylab::Face::PathTools::InstanceMethods
-    include ::Skylab::Porcelain::TiteColor
+    include ::Skylab::Porcelain::TiteColor::Methods
 
     def hi str ; stylize str, :strong, :green end
     def no str ; stylize str, :strong, :red   end

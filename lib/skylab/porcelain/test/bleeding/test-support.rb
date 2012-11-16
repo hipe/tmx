@@ -23,7 +23,7 @@ module Skylab::Porcelain::TestSupport::Bleeding
   Porcelain = Porcelain
 
   class My_EmitSpy < ::Skylab::TestSupport::EmitSpy
-    include Porcelain::TiteColor # unstylize
+    include Porcelain::TiteColor::Methods # unstylize
     def initialize &b
       unless block_given?
         b = ->(k, s) { [k, unstylize(s)].inspect }

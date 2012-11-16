@@ -10,7 +10,7 @@ end
 module Skylab::Dependency::TestSupport
 
   DESCRIBE_BLOCK_COMMON_SETUP = ->(_) do
-    include ::Skylab::Porcelain::TiteColor
+    include ::Skylab::Porcelain::TiteColor::Methods
     let(:fingers) { Hash.new { |h, k| h[k] = [] } }
   end
 

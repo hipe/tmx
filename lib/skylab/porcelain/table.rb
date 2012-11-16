@@ -10,30 +10,7 @@ require 'skylab/code-molester/sexp'
 require 'skylab/porcelain/tite-color'
 require 'skylab/pub-sub/emitter'
 
-module Skylab::Porcelain
-
-
-  module TiteColor
-    Sexp = ::Skylab::CodeMolester::Sexp
-    STYLE_PARSER = %r{\A([^\e]*)\e\[(\d+(?:;\d+)*)m(.*)\z}
-    def parse_styles str
-      out = nil
-      while md = STYLE_PARSER.match(str)
-        out ||= []
-        md[1].length.nonzero? and out.push(Sexp[:string, md[1]])
-        out.push Sexp[:style, * md[2].split(';').map(&:to_i)]
-        str = md[3]
-      end
-      if out and str.length.nonzero?
-        out.push Sexp[:string, str]
-      end
-      out
-    end
-  end
-end
-
-module Skylab::Porcelain::Table
-  TiteColor = ::Skylab::Porcelain::TiteColor
+module ::Skylab::Porcelain::Table
 
   module Column
   end
@@ -85,10 +62,36 @@ module Skylab::Porcelain::Table
     FLOAT_DETAIL_RE = /\A(-?\d+)((?:\.\d+)?)\z/
   end
 
+  Sexp = ::Skylab::CodeMolester::Sexp
+
+  parse_styles = -> do
+    # Parse a string with ascii styles into an S-expression.
+
+    style_parser_rx = /\A (?<string>[^\e]*)  \e\[
+      (?<digits> \d+  (?: ; \d+ )* )  m  (?<rest> .*) \z/x
+
+    -> str do
+      out = nil
+      while md = style_parser.match(str)
+        out ||= []
+        if md[:string].length.nonzero?
+          out.push Sexp[ :string, md[:string] ]
+        end
+        out.push Sexp[ :style, * md[:digits].split(';').map(&:to_i) ]
+        str = md[:rest]
+      end
+      if out and str.length.nonzero?
+        out.push Sexp[ :string, str ]
+      end
+      out
+    end
+
+  end.call
+
   Column::STRING.renderer_factory = ->(col) do
     fmt = "%#{'-' if col.align_left?}#{col.max_width_seen[:full]}s"
     ->(str) do
-      if a = TiteColor.parse_styles(str)
+      if a = parse_styles[ str ]
         if 2 == a.count { |p| :style == p.first } and :style == a.first.first and
         :style == a.last.first and [0] == a.last[1..-1]
           "\e[#{a.first[1..-1].join(';')}m#{ fmt % [a[1].last] }\e[0m" # jesus wept
@@ -165,7 +168,7 @@ module Skylab::Porcelain::Table
     end
     def see val
       val.nil? and return
-      val = TiteColor.unstylize(val)
+      val = TiteColor.unstylize val
       val.length > max_width_seen[:full] and max_width_seen[:full] = val.length
       if Column::BLANK.match?(val)
         type_stats[:blank] += 1

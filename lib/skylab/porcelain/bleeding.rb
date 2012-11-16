@@ -7,7 +7,7 @@ module Skylab::Porcelain::Bleeding
   extend ::Skylab::Autoloader
   module Styles
     include ::Skylab::Porcelain::En
-    include ::Skylab::Porcelain::TiteColor
+    include ::Skylab::Porcelain::TiteColor::Methods
     extend self
     def em(s)  ; stylize(s, :green         )   end
     def hdr(s) ; stylize(s, :strong, :green)   end
