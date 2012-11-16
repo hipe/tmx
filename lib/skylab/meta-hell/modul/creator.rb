@@ -62,29 +62,38 @@ module Skylab::MetaHell::Modul::Creator
     end
 
     o[:_build_product] = -> client, g, mod, node_mod, node_name, target_const do
-      node = g.fetch node_name
-      deferred = [] # breadth first?
-      node.children.each do |_name|
-        child = g.fetch _name
-        if node_mod.const_defined? child.const, false
-          if target_const == child.const
-            fail "sanity" # -- why did u ask for it if it was already set?
+      # This function builds the product while implementing vivification.
+      # You got here b/c `target_const` isn't defined in `node_mod`, which is
+      # an arbitrary module with the full name `node_name` under module `mod`.
+      # Using the known grammar `g`, build the module that
+      # will have the name `target_const`, and *experimentally* autovivify
+      # other things.
+      # In a world where circular dependencies don't exist (which, they
+      # shouldn't in a world of statically compiled classes), it is algorith-
+      # mically least complex to build the requested nerk first, and then
+      # after that, build all as-yet unbuilt sibling nerks (for, imagine
+      # this in a world where class Foo descends from sibling class Bar).
+      children = g.fetch(node_name).child_nodes(g).to_a
+      idx = children.index { |c| target_const == c.const }
+      node = children[idx] ; children[idx] = nil
+      new_mod = nil               # We try to preserve the order that the
+      children.each do |child|    # graph was defined in.
+        if ! child                # nil because we nil'd it above - ick
+          if node_mod.const_defined? node.const, false
+            new_mod = node_mod.const_get node.const, false
+          else
+            node._pending = true
+            new_mod = node_mod.const_set node.const, node.build_product(client)
+            node._pending = false
           end
-        else
-          if child.safe? or target_const == child.const
-            # if child is not safe we might trigger a cyclic dependency bork
-            built = child.build_product client, g  # recurses?
-            if child.children.any?
-              deferred.push child
-            end
-            node_mod.const_set child.const, built
-          end
+        elsif ! node_mod.const_defined?(child.const, false) and ! child._pending
+          client.send child.name # don't be constrained by our own graph (defs)
         end
       end
-      deferred.each do |child|
-        child.children.each do |_name|
-          M.graph_bang[ client, g, mod, _name ]
-        end
+      node.child_nodes(g).each do |child|      # kick all of the children nodes
+        next if new_mod.const_defined? child.const, false # when?
+        # add _pending check probably one day ..
+        client.send child.name # don't be constrained by our own graph (defs)
       end
       nil
     end

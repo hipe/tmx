@@ -12,8 +12,6 @@ module ::Skylab::MetaHell::TestSupport::Klass::Creator::ModuleMethods
         extend MetaHell::Klass::Creator
         extend MetaHell::Let
         klass :Alpha do
-          $stderr.puts "ONCE: #{self.object_id}"
-          # fail('where')
           def wrong ; end
         end
         klass :Bravo, extends: :Alpha do
@@ -24,7 +22,6 @@ module ::Skylab::MetaHell::TestSupport::Klass::Creator::ModuleMethods
         extend MetaHell::Klass::Creator
         extend MetaHell::Let
         klass :Alpha do
-          $stderr.puts "TWICE: #{self.object_id}"
           def right ; end
         end
       end

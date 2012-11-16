@@ -7,15 +7,28 @@ module Skylab::MetaHell
 
     attr_reader :name, :children, :blocks
 
-    def build_product(*)          # args are probably client and known graph,
-      o = ::Module.new            # but creating modules is easy you see
+    def build_product _=nil
+      o = ::Module.new            # creating modules is easy you see
       _init_product o
       o
     end
 
-    let( :const ) { @name.to_s.split( SEP_ ).last.intern }
+    attr_accessor :_pending       # hack to avoid autovivification circ. deps.:
+                                  # If a class has a superclass, we don't have
+                                  # or want the logic to untangle a true
+                                  # dependency graph when autovivification
+                                  # happens. But be warned the whole thing
+                                  # will hence feel inconsistent..
 
-    def safe? ; true end
+    def child_nodes known_grammar
+      ::Enumerator.new do |y|
+        children.each do |child_name|
+          y << known_grammar.fetch(child_name)
+        end
+      end
+    end
+
+    let( :const ) { @name.to_s.split( SEP_ ).last.intern }
 
     def _lock!   ; @locked and fail('sanity') ; @locked = true end
     def _locked? ; @locked end

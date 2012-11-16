@@ -7,8 +7,8 @@ module Skylab::MetaHell
     # 2) act as an adapter for building the "product" object, in this
     #    case the class, doing things like resolving superclasses, etc.
 
-    def build_product client=nil, kg=nil # kg = 'known graph'
-      supra = _resolve_superclass client, kg
+    def build_product client=nil
+      supra = _resolve_superclass client
       o = ::Class.new(* [supra].compact )
       _init_product o
       o
@@ -31,13 +31,6 @@ module Skylab::MetaHell
       nil
     end
 
-    def safe?                     # hack to avoid autovivification circ. deps.:
-      ! extends                   # If a class has a superclass, we don't have
-    end                           # or want the logic to untangle a true
-                                  # dependency graph when autovivification
-                                  # happens.  But be warned the whole thing
-                                  # will hence feel inconsistent..
-
   protected
 
     def _option! k, v
@@ -52,7 +45,7 @@ module Skylab::MetaHell
 
       valid_rx = /\A[A-Z][_a-zA-Z0-9]*\z/
 
-      resolve_class_name = -> client, full_name, kg do
+      resolve_class_name = -> client, full_name do
         # basically just validate full_name, else bork an elaborate msg
 
         ::Symbol == full_name.class or fail 'sanity' # being cautious for now
@@ -60,18 +53,8 @@ module Skylab::MetaHell
         if client.respond_to? full_name
           full_name
         else
-          err = ["client does not have a `#{full_name}` method"]
-          if kg
-            if kg.key? full_name
-              err.push " (although it was found in the known graph STRANGE)"
-            else
-              err.push " and is not in the definitions graph.#{
-              } The definitions graph includes: (#{ kg.keys.join ', ' })"
-            end
-          else
-            err.push " (and there is no known graph)"
-          end
-          fail "can't resolve class name #{full_name.inspect} -- #{ err * '' }."
+          fail "can't resolve class name #{full_name.inspect} --#{
+            } client does not have a `#{full_name}` method"
         end
       end
 
@@ -81,8 +64,8 @@ module Skylab::MetaHell
 
         ::Class => ->( meta, * ) { meta.extends },
 
-        ::Symbol => -> me, client, kg do
-          full_superclass_name = resolve_class_name[ client, me.extends, kg ]
+        ::Symbol => -> me, client do
+          full_superclass_name = resolve_class_name[ client, me.extends ]
           if me._locked?
             fail "cyclic dependency? (#{ me.name } < #{ full_superclass_name })"
           end
@@ -106,9 +89,9 @@ module Skylab::MetaHell
         mixed
       end
 
-      define_method :_resolve_superclass do |client, kg|
+      define_method :_resolve_superclass do |client|
         f = fetch[ extends.class ]
-        f[ self, client, kg ]
+        f[ self, client ]
       end
 
     end.call
