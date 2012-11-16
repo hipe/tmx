@@ -1,8 +1,19 @@
 module Skylab::TanMan
 
-  ROOT = ::Skylab::Face::MyPathname.new(File.expand_path('..', __FILE__))
+  module API
+    extend MetaHell::Autoloader::Autovivifying
+  end
 
-  module API end
+  module API::Emitter
+  end
+
+  class << API::Emitter
+    def new *a
+      e = PubSub::Emitter.new(* a)
+      e.event_class API::Event
+      e
+    end
+  end
 
   class API::RuntimeError < ::RuntimeError ; end # just for fun
 
@@ -58,31 +69,6 @@ module Skylab::TanMan
     end
   end
 
-  class API::Event < ::Skylab::PubSub::Event
-    # this is all very experimental and subject to change!
-    def json_data
-      case payload
-      when String, Hash ; [tag.name, payload]
-      when Array        ; [tag.name, *payload]
-      else              ; [tag.name] # no payload for you!
-      end
-    end
-    def message= msg
-      update_attributes!(message: msg)
-    end
-    def to_json *a
-      json_data.to_json(*a)
-    end
-  end
-
-  API::Emitter = Object.new
-  class << API::Emitter
-    def new *a
-      ::Skylab::PubSub::Emitter.new(*a).tap do |graph|
-        graph.event_class API::Event
-      end
-    end
-  end
 
   # --*--
 
