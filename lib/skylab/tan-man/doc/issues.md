@@ -1,3 +1,6 @@
+[#027] #open overhaul to cli actions base class
+[#026] #open API::InvocationMethods away!
+[#025] #open API::RuntimeExtensions away!
 [#024] #open use -h
 [#023] #open combine all Boxxy
 [#022] #open refactor-in headless, and sub-client
