@@ -33,7 +33,7 @@ module Skylab::TanMan
     extend ::Skylab::PubSub::Emitter
     include API::InvocationMethods
 
-    emits EVENT_GRAPH.merge( row: :out )
+    emits Core::Event::GRAPH.merge( row: :out )
     event_class API::Event
 
     attr_accessor :debug

@@ -18,8 +18,8 @@ module Skylab::TanMan
   class API::RuntimeError < ::RuntimeError ; end # just for fun
 
   class << API
-    extend Porcelain::AttributeDefiner
-    meta_attribute(*MetaAttributes[:default, :proc])
+    extend Porcelain::Attribute::Definer
+    meta_attribute(* Core::MetaAttributes[:default, :proc] )
     include Core::Attribute::Reflection::InstanceMethods
     alias_method :attribute_definer, :singleton_class # @experimental:
     # this means that the objects will no longer use their class as the attribute_definer

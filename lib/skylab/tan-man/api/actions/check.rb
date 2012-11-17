@@ -11,7 +11,7 @@ module Skylab::TanMan
         info("exists, selected: #{dot_files.selected_pathname}")
         self.path = dot_files.selected_pathname
       end
-      Models::DotFile::Controller.new(request_runtime, path).check
+      TanMan::Models::DotFile::Controller.new(request_runtime, path).check
     end
   end
 end

@@ -1,20 +1,20 @@
-module Skylab::TanMan::Core
+module Skylab::TanMan
 
-  module MetaAttributes
+  module Core::MetaAttributes
     extend TanMan::Boxxy::Methods
     singleton_class.send :alias_method, :[], :const_fetch_all
   end
 
-  module MetaAttributes::Boolean extend Porcelain::Attribute::Definer
+  module Core::MetaAttributes::Boolean extend Porcelain::Attribute::Definer
     meta_attribute :boolean do |name, meta|
       alias_method "#{name}?", name
     end
   end
 
-  module MetaAttributes::Default extend Porcelain::Attribute::Definer
+  module Core::MetaAttributes::Default extend Porcelain::Attribute::Definer
     meta_attribute :default
   end
-  module MetaAttributes::Default::InstanceMethods
+  module Core::MetaAttributes::Default::InstanceMethods
     def set_defaults_if_nil!
       attribute_definer.attributes.select { |k, v| v.key?(:default) and send(k).nil? }.each do |k, h|
         (val = h[:default]).respond_to?(:call) and ! h[:proc] and val = val.call
@@ -23,7 +23,7 @@ module Skylab::TanMan::Core
     end
   end
 
-  module MetaAttributes::MutexBooleanSet extend Porcelain::Attribute::Definer
+  module Core::MetaAttributes::MutexBooleanSet extend Porcelain::Attribute::Definer
     meta_attribute :mutex_boolean_set do |name, h|
       set = h[:mutex_boolean_set]
       alias_method(after = "#{name}_after_mutex_boolean_set=", "#{name}=")
@@ -43,7 +43,7 @@ module Skylab::TanMan::Core
     end
   end
 
-  module MetaAttributes::Pathname extend Porcelain::Attribute::Definer
+  module Core::MetaAttributes::Pathname extend Porcelain::Attribute::Definer
     meta_attribute :pathname do |name, _|
       alias_method(after = "#{name}_after_pathname=", "#{name}=")
       define_method("#{name}=") do |path|
@@ -53,7 +53,7 @@ module Skylab::TanMan::Core
     end
   end
 
-  module MetaAttributes::Proc extend Porcelain::Attribute::Definer
+  module Core::MetaAttributes::Proc extend Porcelain::Attribute::Definer
     meta_attribute :proc do |name, _|
       alias_method(get_proc = "#{name}_proc", name)
       define_method(name) do |&block|
@@ -66,7 +66,7 @@ module Skylab::TanMan::Core
     end
   end
 
-  module MetaAttributes::Regex extend Porcelain::Attribute::Definer
+  module Core::MetaAttributes::Regex extend Porcelain::Attribute::Definer
     meta_attribute :on_regex_fail
     meta_attribute :regex do |name, meta|
       alias_method(after = "#{name}_after_regex=", "#{name}=")
@@ -85,10 +85,10 @@ module Skylab::TanMan::Core
   # and it requires an error_emitter and it requires the styler methods: oxford_comma, pre.
   # A required attribute is considered as not provided IFF it returns nil.
   #
-  module MetaAttributes::Required extend Porcelain::Attribute::Definer
+  module Core::MetaAttributes::Required extend Porcelain::Attribute::Definer
     meta_attribute :required
   end
-  module MetaAttributes::Required::InstanceMethods
+  module Core::MetaAttributes::Required::InstanceMethods
     def required_ok?
       if (a = attribute_definer.attributes.map.select { |k, h| h[:required] && send(k).nil? }).size.nonzero?
         error_emitter.error( "missing required attribute#{'s' if a.size != 1}: " <<

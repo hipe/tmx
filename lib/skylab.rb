@@ -99,7 +99,8 @@ module Skylab
 
     def dir_pathname
       @dir_pathname ||= begin
-        dir_path or fail("sanity - dir_path not known")
+        dir_path or fail "sanity - dir_pathname requested but dir_path is not#{
+          } set (on #{ name })"
         ::Pathname.new dir_path
       end
     end

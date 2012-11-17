@@ -1,5 +1,6 @@
-[#023] combine all Boxxy
-[#022] refactor-in headless, and sub-client
+[#024] #open use -h
+[#023] #open combine all Boxxy
+[#022] #open refactor-in headless, and sub-client
 [#021] #open merge singletons into service
 [#020] #low-priority nounify cli commands
 [#019] #done "magic" for DRYING up tests (Regret)

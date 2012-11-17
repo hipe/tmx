@@ -1,25 +1,11 @@
 require 'stringio'
 require 'strscan'
 
-# this is intended to be an independant class that is safe to use in
-# isolation from the rest of the library (however, its test suite
-# is currently part of its parent module.)
-
 # This thing was stupid.  I basically wanted to customize treetop Parser#failure_reason
 # but ended up not really adding anything to it.
 #
 
-module Skylab ; end
-
 module Skylab::CodeMolester
-
-  module En # can be moved up
-    def oxford_comma a, ult = ' or ', sep = ', '
-      (hsh = Hash.new(sep))[a.length - 1] = ult
-      [a.first, * (1..(a.length-1)).map { |i| [ hsh[i], a[i] ] }.flatten].join
-    end
-    alias_method :_or, :oxford_comma
-  end
 
   class ParseFailurePorcelain # @api private
     include En::Methods

@@ -10,10 +10,6 @@ module Skylab::TanMan
       end
     end
 
-    def message= msg
-      update_attributes! message: msg
-    end
-
     def to_json *a
       json_data.to_json(*a)
     end
