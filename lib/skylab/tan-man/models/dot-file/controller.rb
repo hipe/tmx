@@ -1,7 +1,7 @@
 module Skylab::TanMan
   class Models::DotFile::Controller < ::Struct.new(:pathname, :statement)
-    extend ::Skylab::Headless::Parameter::Controller::StructAdapter
-    include ::Skylab::Autoloader::Inflection::Methods # constantize
+    extend Headless::Parameter::Controller::StructAdapter
+    include Skylab::Autoloader::Inflection::Methods # constantize
     include API::Achtung::SubClient::InstanceMethods # info
     include Models::DotFile::Parser::InstanceMethods
 

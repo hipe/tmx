@@ -15,7 +15,7 @@ module Skylab::Treemap
   class API::Action
     extend Skylab::Autoloader
     extend Skylab::PubSub::Emitter
-    extend Skylab::Porcelain::AttributeDefiner
+    extend Skylab::Porcelain::Attribute::Definer
     extend Skylab::Porcelain::En::ApiActionInflectionHack
     extend Skylab::Porcelain::Bleeding::DelegatesTo
 

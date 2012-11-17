@@ -11,10 +11,12 @@ module Skylab::Porcelain::En
     end
 
     alias_method :and, :oxford_comma
+    alias_method :_and, :and      # because 'and' is a keyword, maybe prettier
 
     def or a
       oxford_comma a, ' or '
     end
+    alias_method :_or, :or        # because 'or' is a keyword, maybe prettier
 
     -> do # "#{s a, :no}known person#{s a} #{s a, :is} #{self.and a}".strip
 

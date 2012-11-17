@@ -5,10 +5,11 @@ require 'skylab/test-support/core'
 module Skylab::TanMan::TestSupport
   ::Skylab::TestSupport::Regret[ self ]
 
-  TanMan = ::Skylab::TanMan
+  MetaHell     = ::Skylab::MetaHell
+  TanMan       = ::Skylab::TanMan
 
-  TMPDIR_STEM = 'tan-man'
 
+  TMPDIR_STEM  = 'tan-man'
   TMPDIR = ::Skylab::TestSupport::Tmpdir.new(
     ::Skylab::TMPDIR_PATHNAME.join(TMPDIR_STEM).to_s)
 

@@ -1,5 +1,5 @@
 module ::Skylab::TanMan::TestSupport
-  module Sexp::Grammar::Boxxy
+  module Sexp::Grammar::Boxxy # [#023]
     # ad-hoc one-off for autoloading our test grammars on-demand
 
     include ::Skylab::Autoloader::Inflection::Methods # pathify
@@ -7,7 +7,7 @@ module ::Skylab::TanMan::TestSupport
 
     def self.extended mod
       extend ::Skylab::Autoloader::ModuleMethods # #trigger (maybe nec. later)
-      mod._autoloader_extended! caller[0]
+      mod._autoloader_init! caller[0]
     end
 
     -> do

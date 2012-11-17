@@ -7,6 +7,7 @@ module Skylab
   TMPDIR_PATHNAME = ROOT_PATHNAME.join 'tmp'
 end
 
+
 module Skylab
   module Autoloader
     # const_missing hax can suck - use this iff it's compelling. #experimental
@@ -14,13 +15,15 @@ module Skylab
     EXTNAME = '.rb'
 
     def self.extended mod
-      mod.extend(Autoloader::ModuleMethods)._autoloader_extended! caller[0]
+      mod.extend(Autoloader::ModuleMethods)._autoloader_init! caller[0]
     end
   end
+
 
   module Autoloader::Inflection
     extend Methods = ::Module.new # sorry
   end
+
 
   module Autoloader::Inflection::Methods
 
@@ -42,22 +45,22 @@ module Skylab
     end
   end
 
-  module Autoloader::ModuleMethodsModuleMethods
-    def extended mod # be sure to #trigger this when hacking autoloader
-      class << mod # #sl-106: we do *not* hack const_defined?, but other may
-        alias_method :const_defined_without_autoloader?, :const_defined?
-      end
-    end
-  end
 
   module Autoloader::ModuleMethods
-    extend Autoloader::ModuleMethodsModuleMethods
+    include Autoloader::Inflection::Methods # courtesty
     extend Autoloader::Inflection::Methods # pathify
 
     -> do
       rx = /^(?<path>.+#{ ::Regexp.escape Autoloader::EXTNAME })(?=:\d+:in `)/
 
-      define_method :_autoloader_extended! do |caller_str|
+      define_method :_autoloader_init! do |caller_str|
+
+        # be sure to #trigger this *ONCE* when hacking autoloader
+        class << self # #sl-106: we do *not* hack these methods, but other may
+          alias_method :autoloader_original_const_defined?, :const_defined?
+          alias_method :autoloader_original_constants, :constants
+        end
+
         if ! dir_path
           file = ::Pathname.new caller_str.match(rx)[:path]
           if ! file.absolute? # this takes a filesystem hit, but you cannot ..
@@ -80,7 +83,7 @@ module Skylab
     end
 
     def _const_missing const
-      _const_missing_class.new const, dir_pathname, self
+      _const_missing_class.new const.intern, dir_pathname, self
     end
 
     def _const_missing_class
@@ -96,7 +99,8 @@ module Skylab
 
     def dir_pathname
       @dir_pathname ||= begin
-        dir_path or fail("sanity - dir_path not known")
+        dir_path or fail "sanity - dir_pathname requested but dir_path is not#{
+          } set (on #{ name })"
         ::Pathname.new dir_path
       end
     end
@@ -131,6 +135,7 @@ module Skylab
     end.call
   end
 
+
   class Autoloader::ConstMissing < ::Struct.new(:const, :mod_dir_pathname, :mod)
     include Autoloader # EXTNAME
     include Autoloader::Inflection::Methods # pathify
@@ -149,6 +154,8 @@ module Skylab
     end
 
   protected
+    attr_accessor :after_require_f
+
     def file_pathname
       @file_pathname ||= mod_dir_pathname.join("#{pathify const}#{EXTNAME}")
     end
@@ -162,7 +169,8 @@ module Skylab
       mutex and fail("circular autoload dependency detected#{
         } in #{file_pathname} with #{const}")
       require normalized
-      mod.const_defined_without_autoloader? const, false or
+      after_require_f and after_require_f.call
+      mod.autoloader_original_const_defined? const, false or
         fail("#{mod}::#{const} was not defined, must be, in #{file_pathname}")
       nil
     end

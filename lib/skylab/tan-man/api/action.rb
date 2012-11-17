@@ -2,15 +2,15 @@ module Skylab::TanMan
   class API::Action
     extend Bleeding::DelegatesTo
     extend ::Skylab::PubSub::Emitter
-    extend Porcelain::AttributeDefiner
+    extend Porcelain::Attribute::Definer
 
     include API::RuntimeExtensions
-    include AttributeReflection::InstanceMethods
-    include API::AdaptiveStyle
+    include Core::Attribute::Reflection::InstanceMethods
+    include Core::Pen::Methods::Adaptive
 
-    meta_attribute(*MetaAttributes[:boolean, :default, :mutex_boolean_set,:pathname, :required, :regex])
+    meta_attribute(*Core::MetaAttributes[:boolean, :default, :mutex_boolean_set,:pathname, :required, :regex])
 
-    emits Bleeding::EVENT_GRAPH.merge(MY_EVENT_GRAPH)
+    emits Core::Event::GRAPH
     event_class API::Event
 
     delegates_to :class, :action_name

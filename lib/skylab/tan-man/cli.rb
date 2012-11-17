@@ -7,8 +7,8 @@ module Skylab::TanMan
     extend ::Skylab::MetaHell::Let
     extend ::Skylab::PubSub::Emitter
 
-    emits EVENT_GRAPH
-    event_class API::Event
+    emits Core::Event::GRAPH
+    event_class Core::Event
 
     def initialize
       @singletons = API::Singletons.new # #todo:refactor to memoize
@@ -54,8 +54,8 @@ module Skylab::TanMan
     extend ::Skylab::PubSub::Emitter
     include CLI::ActionInstanceMethods
 
-    emits(:out, EVENT_GRAPH)
-    event_class API::Event
+    emits :out, Core::Event::GRAPH
+    event_class Core::Event
 
     alias_method :action_class, :class
 
@@ -134,7 +134,10 @@ module Skylab::TanMan
     desc "show the status of the config director{y|ies} active at the path."
     include Porcelain::Table::RenderTable
     def invoke path=nil
-      path ||= FileUtils.pwd
+      path ||= begin
+                 require 'fileutils'
+                 ::FileUtils.pwd # #todo temporary
+               end
       groups = Hash.new { |h, k| h[k] = [] }
       ee = api.invoke(path: path)
       ee.each do |e|
