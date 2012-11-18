@@ -1,3 +1,4 @@
+[#112] #pattern of emit error
 [#111] (was [#109]!) #pattern self.extended mod pattern
 [#110] hipe's rules of order for delcarations in a class ..
 [#109] this whacky pattern of using a class as a namespace

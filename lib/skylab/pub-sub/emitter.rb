@@ -1,9 +1,35 @@
 require_relative '../semantic/core'
 
 module Skylab::PubSub
+
   module Emitter
 
     COMMON_LEVELS = [:debug, :info, :notice, :warn, :error, :fatal] # didactic, for elsewhere
+
+    def self.extended mod # #sl-111
+      mod.extend Emitter::ModuleMethods
+      mod.send :include, Emitter::InstanceMethods
+    end
+
+    def self.new *a # sugar
+      ::Class.new.class_eval do
+        extend Emitter
+        emits(* a)
+        def error msg # courtesy for this #pattern #sl-112
+          emit :error, msg
+          false
+        end
+        # experimental interface for default constructor: multiple lambdas
+        def initialize *blocks
+          blocks.each { |b| b.call self }
+        end
+        self
+      end
+    end
+  end
+
+
+  module Emitter::ModuleMethods
 
     def emits *nodes
       events = event_cloud.nodes! nodes
@@ -17,10 +43,13 @@ module Skylab::PubSub
         end
       end
     end
+
     def event_class= klass
       define_method(:event_class) { klass }
     end
+
     alias_method :event_class, :'event_class=' #!
+
     def event_cloud
       @event_cloud ||= begin
         if k = ancestors[(self == ancestors.first ? 1 : 0) .. -3].detect { |m| m.kind_of?(::Class) and m.respond_to?(:event_cloud) }
@@ -31,30 +60,10 @@ module Skylab::PubSub
       end
     end
   end
-  class << Emitter
-    def extended mod
-      mod.send(:include, InstanceMethods)
-    end
-    def new *a
-      Class.new.class_eval do
-        extend Emitter
-        emits(*a)
-        def error msg # convenience for this common use case (experimental!)
-          emit(:error, msg)
-          false
-        end
-        # experimental interface for default constructor: multiple lambdas
-        def initialize *blocks
-          blocks.each { |b| b.call(self) }
-        end
-        self
-      end
-    end
-  end
 end
 
 module Skylab::PubSub
-  class Event < Struct.new(:payload, :tag, :touched)
+  class Event < ::Struct.new :payload, :tag, :touched
     def _define_attr_accessors!(*keys)
       (keys.any? ? keys : payload.keys).each do |k|
         singleton_class.send(:define_method, k) { self.payload[k] }
@@ -101,7 +110,7 @@ module Skylab::PubSub
       self[name].push block
     end
   end
-  module InstanceMethods
+  module Emitter::InstanceMethods
     # syntax:
     #   build_event <event>                                        # pass thru
     #   build_event { <tag> | <tag-name> } [ payload_item [..] ]
