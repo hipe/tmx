@@ -1,10 +1,8 @@
 require_relative '../test-support'
 
 module ::Skylab::MetaHell::TestSupport::Modul::Creator
-  (Parent_ = ::Skylab::MetaHell::TestSupport::Modul)[ self ] # #ts-002
+  ::Skylab::MetaHell::TestSupport::Modul[ self ] # #regret
   Creator_TestSupport = self # courtesy
-
-  CONSTANTS = Parent_::CONSTANTS
 
   include CONSTANTS # for the spec
 
