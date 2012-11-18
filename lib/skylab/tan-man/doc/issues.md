@@ -1,3 +1,7 @@
+[#031] regretify all tests #done
+[#030] #open reconceive api as a service
+[#029] #open no more api knob (api.invoke -> api_invoke)
+[#028] #open any and all changes to CLI core client
 [#027] #open overhaul to cli actions base class
 [#026] #open API::InvocationMethods away!
 [#025] #open API::RuntimeExtensions away!
@@ -6,7 +10,7 @@
 [#022] #open refactor-in headless, and sub-client
 [#021] #open merge singletons into service
 [#020] #low-priority nounify cli commands
-[#019] #done "magic" for DRYING up tests (Regret)
+[#019] "magic" for DRYING up tests (Regret) #done
 [#018] #open #depends-on:#sl-100 refactor out porcelain ["bleeding"]
 [#017] #pattern: for to maybe push up to headless
 [#016] #pattern: action instance spawns instance of model controller
@@ -15,13 +19,13 @@
 [#013] #open UI for chose example, then use example
   1. unify & modernify autoloading
   2. fix api vis-a-vis actions to integrate with autoloading
-[#012] #done 2012-11-01 refactor UI / NLP to use Sexp::Auto
+[#012] 2012-11-01 refactor UI / NLP to use Sexp::Auto #done
 [#011] #done make sure complex prototypes can be used with nonzero length lists
-[#010] #done 2012-10-27 associate two nodes
+[#010] 2012-10-27 associate two nodes #done
   1. sic, 2. redudantly, 3. agent not exist 4. target not exist
-[#009] #done 2012-10-27 create a node
+[#009] 2012-10-27 create a node #done
   1. with one template (3 permutations) 2. with another template (3 permutes)
-[#008] #done 2012-10-10 #rename rename "nt" to "expression" / "rule"
+[#008] 2012-10-10 #rename rename "nt" to "expression" / "rule" #done
 [#007] #open 2012-09-29 #small #critical models/ dir generated during specs
 [#006] #open 2012-09-27 #one-day look into reflection via metagrammer instead
 [#005] #open 2012-09-02 #one-day look into "statement oriented" processing

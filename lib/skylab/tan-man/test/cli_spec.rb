@@ -3,7 +3,7 @@ require File.expand_path('../test-support', __FILE__)
 
 module Skylab::TanMan::TestSupport
   describe "The #{TanMan} CLI", tanman: true do
-    include Tmpdir_InstanceMethods
+    extend TanMan_TestSupport
     context 'for remotes' do
       before do
         prepare_submodule_tmpdir

@@ -1,11 +1,11 @@
 require_relative '../test-support'
 
 module ::Skylab::TanMan::TestSupport::Sexp
-  ::Skylab::TanMan::TestSupport[ Sexp = self ]
+  ::Skylab::TanMan::TestSupport[ Sexp_TestSupport = self ]
 
   module Grammars
-    @dir_path = Sexp.dir_pathname.join('grammars').to_s # or make orphan
-    extend Sexp::Grammar::Boxxy
+    @dir_path = Sexp_TestSupport.dir_pathname.join('grammars').to_s # or orphan
+    extend Sexp_TestSupport::Grammar::Boxxy
   end
 
   module ModuleMethods
@@ -53,7 +53,7 @@ module ::Skylab::TanMan::TestSupport::Sexp
     end
 
     let :_parser_clients_module do
-      ::Skylab::TanMan::TestSupport::Sexp::Grammars
+      Sexp_TestSupport::Grammars
     end
 
     let :paystream do

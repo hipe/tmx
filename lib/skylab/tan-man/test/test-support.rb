@@ -1,17 +1,23 @@
-require_relative '../core' # assume tanman core loaded skylab.rb
-require 'skylab/porcelain/core'
+require_relative '../core'
 require 'skylab/test-support/core'
 
 module Skylab::TanMan::TestSupport
   ::Skylab::TestSupport::Regret[ self ]
+  TanMan_TestSupport = self
 
-  MetaHell     = ::Skylab::MetaHell
+  Autoloader   = ::Skylab::Autoloader
   TanMan       = ::Skylab::TanMan
+
+  module CONSTANTS
+    MetaHell     = ::Skylab::MetaHell
+    Tmpdir       = ::Skylab::TestSupport::Tmpdir
+  end
+
+  include CONSTANTS # for use here, below
 
 
   TMPDIR_STEM  = 'tan-man'
-  TMPDIR = ::Skylab::TestSupport::Tmpdir.new(
-    ::Skylab::TMPDIR_PATHNAME.join(TMPDIR_STEM).to_s)
+  TMPDIR = Tmpdir.new(::Skylab::TMPDIR_PATHNAME.join(TMPDIR_STEM).to_s)
 
 
   # this is dodgy but should be ok as long as you accept that:
@@ -74,8 +80,9 @@ module Skylab::TanMan::TestSupport
 
 
   module InstanceMethods
-    include ::Skylab::Autoloader::Inflection::Methods
+    include Autoloader::Inflection::Methods
     include TanMan::API::Achtung::SubClient::ModuleMethods # headless_runtime
+    include Tmpdir_InstanceMethods
 
     def _build_normalized_input_pathname stem
       __input_fixtures_dir_pathname.join stem

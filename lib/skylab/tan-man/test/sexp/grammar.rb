@@ -4,7 +4,7 @@ require_relative '../test-support'
 
 module ::Skylab::TanMan::TestSupport::Sexp
 
-  module CLI_Client_InstanceMethods # #todo: #100
+  module CLI_Client_InstanceMethods # #todo: #sl-100
   protected
     def em str
       "\e[1;32m#{str}\e[0m"
