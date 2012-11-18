@@ -43,6 +43,10 @@ module Skylab::TanMan
       end
     end
 
+    def api_invoke *a
+      api.invoke(* a)
+    end
+
     def format_error event
       event.tap do |e|
         if runtime.runtime

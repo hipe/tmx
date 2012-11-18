@@ -5,19 +5,19 @@ module Skylab::TanMan::TestSupport
   ::Skylab::TestSupport::Regret[ self ]
   TanMan_TestSupport = self
 
-  Autoloader   = ::Skylab::Autoloader
-  TanMan       = ::Skylab::TanMan
 
   module CONSTANTS
+    Autoloader   = ::Skylab::Autoloader
     MetaHell     = ::Skylab::MetaHell
+    TanMan       = ::Skylab::TanMan
     Tmpdir       = ::Skylab::TestSupport::Tmpdir
+    TMPDIR_STEM  = 'tan-man'
+    TMPDIR = Tmpdir.new(::Skylab::TMPDIR_PATHNAME.join(TMPDIR_STEM).to_s)
   end
 
   include CONSTANTS # for use here, below
 
-
-  TMPDIR_STEM  = 'tan-man'
-  TMPDIR = Tmpdir.new(::Skylab::TMPDIR_PATHNAME.join(TMPDIR_STEM).to_s)
+  Autoloader = Autoloader ; TanMan = TanMan ; TMPDIR = TMPDIR  # #annoy
 
 
   # this is dodgy but should be ok as long as you accept that:

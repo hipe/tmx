@@ -45,7 +45,7 @@ module Skylab::TanMan
                  ::FileUtils.pwd # #todo temporary
                end
       groups = Hash.new { |h, k| h[k] = [] }
-      ee = api.invoke(path: path)
+      ee = api_invoke path: path
       ee.each do |e|
         groups[e.is?(:global) ? :global : (e.is?(:local) ? :local : :other )].push(e)
       end
@@ -65,7 +65,8 @@ module Skylab::TanMan
     desc "create the #{API.local_conf_dirname} directory"
     option_syntax { |h| on('-n', '--dry-run', 'dry run.') { h[:dry_run] = true } }
     def invoke path=nil, opts
-      api.invoke opts.merge(path: path, local_conf_dirname: API.local_conf_dirname)
+      api_invoke opts.merge( path: path,
+                             local_conf_dirname: API.local_conf_dirname )
     end
   end
 
@@ -83,7 +84,7 @@ module Skylab::TanMan
     def invoke name, host, opts
       args = opts.merge(name: name, host: host)
       args[:resource] = args.delete(:global) ? :global : :local
-      b = api.invoke(args)
+      b = api_invoke args
       b == false and help(invite_only: true)
       b
     end
@@ -96,7 +97,7 @@ module Skylab::TanMan
     end
     include Porcelain::Table::RenderTable
     def invoke opts
-      table = api.invoke(opts) or return false
+      table = api_invoke(opts) or return false
       render_table(table, separator: '  ') do |o|
         o.field(:resource_label).format { |x| "(resource: #{x})" }
         o.on_empty do |e|
@@ -118,7 +119,7 @@ module Skylab::TanMan
       end
     end
     def invoke remote_name, opts
-      b = api.invoke opts.merge(remote_name: remote_name)
+      b = api_invoke opts.merge( remote_name: remote_name )
       b == false and help(invite_only: true)
       b
     end
@@ -131,28 +132,28 @@ module Skylab::TanMan
       on('-n', '--dry-run', 'dry run.') { h[:dry_run] = true }
     end
     def invoke remote_name, file, opts
-      api.invoke(opts.merge(remote_name: remote_name, file_path:file))
+      api_invoke opts.merge( remote_name: remote_name, file_path: file )
     end
   end
 
   class CLI::Actions::Use < CLI::Action
     desc 'selects which (dependency graph) file to edit'
     def invoke path
-      api.invoke(path: path)
+      api_invoke path: path
     end
   end
 
   class CLI::Actions::Check < CLI::Action
     desc 'checks if the (dependency graph) file exists and can be parsed.'
     def invoke dotfile=nil
-      api.invoke(path: dotfile)
+      api_invoke path: dotfile
     end
   end
 
   class CLI::Actions::Tell < CLI::Action
     desc "there's a lot you can tell about a man from his choice of words"
     def invoke *word
-      api.invoke(words: word)
+      api_invoke words: word
     end
   end
 
@@ -171,7 +172,7 @@ module Skylab::TanMan
   class CLI::Actions::Graph::Example::Set < CLI::Action
     desc "set the example graph."
     def invoke name
-      api.invoke name: name
+      api_invoke name: name
     end
   end
 end
