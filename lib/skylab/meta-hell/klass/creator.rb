@@ -155,7 +155,7 @@ module Skylab::MetaHell::Klass::Creator
 
       build = -> memo do
         meta = create_meta[ memo.name ] # This will process `opts` (extends)
-        mod = meta.build_product  # which should have been normalized and
+        mod = meta.build_product self   # which should have been normalized and
         run_body[ mod ]           # vivified by now if any.
         mod
       end

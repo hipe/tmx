@@ -7,9 +7,9 @@ module Skylab::MetaHell
 
     attr_reader :name, :children, :blocks
 
-    def build_product _=nil
+    def build_product client
       o = ::Module.new            # creating modules is easy you see
-      _init_product o
+      _init_product o, client
       o
     end
 
@@ -42,14 +42,14 @@ module Skylab::MetaHell
       @name.freeze
     end
 
-    def _init_product o
+    def _init_product o, client
       pretty = name.to_s.gsub SEP_, SEP
       o.singleton_class.send(:define_method, :to_s) { pretty }
       fail "circular dependency on #{name} - should you be using ruby #{
         }instead?" if _locked?
       _lock!
       blocks.each do |body|       # note that if you're expecting to
-        o.module_exec(& body)     # find children modules of yourself
+        o.module_exec client, &body # find children modules of yourself
       end                         # here you probabaly will not!
       _unlock!
       nil

@@ -52,11 +52,17 @@ module Skylab::PubSub
 
     def event_cloud
       @event_cloud ||= begin
-        if k = ancestors[(self == ancestors.first ? 1 : 0) .. -3].detect { |m| m.kind_of?(::Class) and m.respond_to?(:event_cloud) }
-          ::Skylab::Semantic::Digraph.new(k.event_cloud)
-        else
-          ::Skylab::Semantic::Digraph.new
+        a = ancestors             # Get every ancestor except self (if not s.c.)
+        a = a[ (self == a.first ? 1 : 0) .. -3 ] # and (ick) Kernel, BasicObject
+        found = []                # and of these, you want of all the ancestors
+        while mod = a.shift       # that respond_to event_cloud, any first class
+          if mod.respond_to? :event_cloud # and all (non-class) modules up to
+            found.push mod        # that class (if any) or the end.  This crazy-
+            ::Class == mod.class and break # ness is to allow inventive merging
+          end                     # of event graphs (#experimental).
         end
+        1 < found.length and fail 'implement me -- merge graphs'
+        ::Skylab::Semantic::Digraph.new(* found.map(&:event_cloud))
       end
     end
   end

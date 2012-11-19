@@ -1,5 +1,4 @@
-require File.expand_path('../../emitter', __FILE__)
-require File.expand_path('../test-support', __FILE__)
+require_relative 'emitter/test-support'
 
 describe Skylab::PubSub::Emitter do
   let(:klass) do
@@ -321,4 +320,3 @@ describe Skylab::PubSub::Emitter do
     end
   end
 end
-
