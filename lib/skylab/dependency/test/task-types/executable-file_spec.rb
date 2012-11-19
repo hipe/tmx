@@ -1,21 +1,13 @@
-require File.expand_path('../test-support', __FILE__)
-require File.expand_path('../../../task-types/executable-file', __FILE__)
+require_relative 'test-support'
 
+module Skylab::Dependency::TestSupport::Tasks
 
-module Skylab::Dependency::TestSupport
-  include Skylab::Dependency
   describe TaskTypes::ExecutableFile do
-    module_eval &DESCRIBE_BLOCK_COMMON_SETUP
+    extend Tasks_TestSupport
     let(:build_args) { { :executable_file => executable_file } }
     let(:context) { { } }
     subject do
-      TaskTypes::ExecutableFile.new(build_args) do |t|
-        t.context = context
-        t.on_all do |e|
-          $debug and $stderr.puts("_dbg: #{e.type}: #{e}")
-          fingers[e.type].push unstylize(e.to_s)
-        end
-      end
+      TaskTypes::ExecutableFile.new( build_args ) { |t| wire! t }
     end
     context "with empty build args" do
       let(:build_args) { { } }

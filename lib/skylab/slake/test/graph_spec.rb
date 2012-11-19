@@ -1,10 +1,11 @@
-root = File.expand_path('../..', __FILE__)
-require "#{root}/graph"
-require "#{root}/task"
+require_relative 'test-support'
 
 include ::Skylab::Slake
-describe Graph do
-  let (:graph) { Graph.new }
+
+describe "#{ Skylab::Slake::Graph }" do
+  include ::Skylab::Slake
+
+  let (:graph) { Slake::Graph.new }
   describe "when built empty" do
     it "does nothing interesting" do
       graph.nodes.empty?.should eql(true)
@@ -58,7 +59,7 @@ describe Graph do
 
   describe "with a graph with one task, set as target" do
     let(:graph) do
-      Graph.new(
+      Slake::Graph.new(
         :name => 'test1',
         :target => 'do this whootily',
         'do this whootily' => Task.new(:action => ->(task, args){ args[:context][:touched] = true })
@@ -73,7 +74,7 @@ describe Graph do
 
   describe "with a graph with two tasks with a unidirectional dependency" do
     let(:graph) do
-      Graph.new(
+      Slake::Graph.new(
         :target => :foo,
         :foo => Task.new(
           :prerequisites => [:bar],

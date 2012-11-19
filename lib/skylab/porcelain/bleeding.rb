@@ -119,7 +119,9 @@ module Skylab::Porcelain::Bleeding
       @argument_syntax ||= ArgumentSyntax.new(->{ instance_method(:invoke).parameters }, ->{ option_syntax.any? })
     end
     def build parent
-      new.tap { |o| o.parent = parent }
+      o = new
+      o.parent = parent
+      o
     end
     def desc *a
       instance_exec(*a, &(redef = ->(*aa) do

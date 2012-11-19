@@ -1,16 +1,15 @@
-require File.expand_path('../test-support', __FILE__)
-require 'skylab/dependency/task-types/get'
+require_relative 'test-support'
 
-module Skylab::Dependency::TestSupport
+module Skylab::Dependency::TestSupport::Tasks
 
-  include ::Skylab::Dependency
   describe TaskTypes::Get do
-    module_eval &DESCRIBE_BLOCK_COMMON_SETUP
+    extend Tasks_TestSupport
+
     let(:build_dir) { BUILD_DIR }
     let(:context) { { :build_dir => build_dir } }
-    let(:host) { Pathname.new('http://localhost:1324/') }
+    let(:host) { ::Pathname.new('http://localhost:1324/') }
     let(:klass) { TaskTypes::Get }
-    let(:log) { StringIO.new }
+    let(:log) { Dependency::Services::StringIO.new }
     before(:each) { BUILD_DIR.prepare }
     before(:all) { FILE_SERVER.run }
 
@@ -18,18 +17,13 @@ module Skylab::Dependency::TestSupport
       klass.new(
         :from => from,
         :get => get
-      ) do |t|
-        t.on_all do |e|
-          $debug and $stderr.puts("_dbg: #{e.type}: #{e}")
-          fingers[e.type].push unstylize(e.to_s)
-        end
-      end
+      ) { |t| wire! t }
     end
     context "when requesting one file", slow:true do
       let(:from) { nil }
-      let(:get) { Pathname.new File.join(host, uri) }
+      let(:get) { ::Pathname.new File.join(host, uri) }
       let(:uri) { "some-file.txt" }
-      let(:source_file_path) { FILE_SERVER.document_root.join(uri) }
+      let(:source_file_path) { FILE_SERVER.doc_root_pathname.join uri }
       context "that exists" do
        it "puts it in the basket, the requested file, byte per byte" do
           subject.invoke(context)
@@ -80,4 +74,3 @@ module Skylab::Dependency::TestSupport
     end
   end
 end
-

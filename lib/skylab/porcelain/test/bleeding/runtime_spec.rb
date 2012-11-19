@@ -168,7 +168,7 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime # #po-008
           end
         end
 
-        frame "with an amibiguous name" do
+        frame "with an ambiguous name" do
           argv 'pony', 'put'
           specify { should be_event(0, :help, /ambiguous action .+put.+did you mean put-down or put-up\?/i) }
         end
@@ -177,7 +177,7 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime # #po-008
           frame "unambiguous fuzzy" do
             msg_rx = /usage.+DORP pony put-down \[<oingo>\] <boingo>/i
 
-            frame "just it does cute sytax thing" do
+            frame "just it does cute syntax thing" do
               argv  'pony', 'put-d'
               specify { should be_event(0, :syntax_error, /missing.+argument.+boingo/i) }
               specify { should be_event(1, msg_rx) }

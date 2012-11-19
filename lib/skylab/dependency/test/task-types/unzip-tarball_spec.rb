@@ -1,16 +1,12 @@
-require File.expand_path('../test-support', __FILE__)
-require 'skylab/dependency/task-types/unzip-tarball'
+require_relative 'test-support'
 
-module Skylab::Dependency::TestSupport
+module Skylab::Dependency::TestSupport::Tasks
 
-  include ::Skylab::Dependency
   describe TaskTypes::UnzipTarball do
-    module_eval &DESCRIBE_BLOCK_COMMON_SETUP
+    extend Tasks_TestSupport
+
     subject do
-      TaskTypes::UnzipTarball.new(build_args) do |o|
-        o.on_all { |e| fingers[e.type].push unstylize(e.to_s) }
-        o.context = context
-      end
+      TaskTypes::UnzipTarball.new( build_args ) { |t| wire! t }
     end
 
     context "with no build args" do
@@ -37,8 +33,8 @@ module Skylab::Dependency::TestSupport
       end
       context "when the tarball exists" do
         let(:unzip_tarball) { FIXTURES_DIR.join('mginy-0.0.1.tar.gz') }
-        before(:each) do
-          # BUILD_DIR.verbose = true e.g.
+        before :each do
+          # BUILD_DIR.verbose = true  # e.g.
           BUILD_DIR.prepare
           BUILD_DIR.copy(unzip_tarball)
         end

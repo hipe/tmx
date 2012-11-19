@@ -23,35 +23,44 @@ module Skylab::MetaHell::Autoloader::Autovivifying
 
   class Recursive::ConstMissing < Autovivifying::ConstMissing
 
-    def _case_insensitive_const_get
-      const_normalized = const.to_s.downcase
-      find_f = -> do
-         mod.autoloader_original_constants.detect do |c|
-          const_normalized == c.to_s.downcase
+    normalize = -> const do
+      const.to_s.gsub('_', '').downcase
+    end
+
+    define_method :_case_insensitive_const_get do
+      normalized = normalize[ self.const ]
+      find = -> do
+        mod.autoloader_original_constants.detect do |c|
+          normalized == normalize[ c ]
         end
       end
-      found = find_f.call
-      if ! found
-        self.after_require_f = -> do
-          found = find_f.call
-          if found and found != const
-            self.const = found        # correct ourself!
-          end
+      correct = -> const do
+        if const and const != self.const
+          self.const = const
         end
-        load
-      end                             # either use the const as it was corrected
-      mod.const_get const, false      # above, or trigger error as normal
+      end
+      found = find.call           # in the existing consts, do i exist (fuzzy)?
+      if found                    # if i am found, make my casing correct
+        correct[ found ]
+      else                        # else load the file, and repeat the same
+        load -> { correct[ find.call ] } # thing again immediately after
+      end                         # you load it, so that our check is ok.
+      mod.const_get self.const, false
     end
 
   protected
 
-    def load_file
+    def load_file after=nil
       super
       o = mod.const_get const, false
       if ! o.respond_to? :autoloader_original_const_defined?
-        o.extend module_methods_module   # "recursive" (infectious)
+        if ::TypeError != (o.singleton_class rescue ::TypeError) # else final
+          o.extend module_methods_module   # "recursive" (infectious)
+          o.dir_path = normalized
+          o._autoloader_init! nil
+        end
+      elsif ! o.dir_path
         o.dir_path = normalized
-        o._autoloader_init! nil
       end
       nil
     end

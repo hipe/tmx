@@ -1,12 +1,8 @@
-require File.expand_path('../../task', __FILE__)
-require File.expand_path('../../version', __FILE__)
-require File.expand_path('../tarball-to', __FILE__)
-require 'skylab/face/open2'
 module Skylab::Dependency
-  class TaskTypes::UnzipTarball < Task
-    include ::Skylab::Face::Open2
-    include ::Skylab::Face::PathTools::InstanceMethods
-    include TaskTypes::TarballTo::Constants
+  class TaskTypes::UnzipTarball < Dependency::Task
+    include Face::Open2
+    include Face::PathTools::InstanceMethods
+    include Dependency::TaskTypes::TarballTo::CONSTANTS
 
     attribute :unzip_tarball, :required => true, :pathname => true
     attribute :build_dir, :from_context => true, :pathname => true, :required => true
@@ -17,7 +13,6 @@ module Skylab::Dependency
       :shell => :all, :out => :all, :err => :all
 
     SIGNIFICANT_SECONDS = 1.0
-    VERSION_REGEX = /-#{Version::REGEX.source}/
 
     def execute args
       @context ||= (args[:context] || {})
@@ -40,7 +35,7 @@ module Skylab::Dependency
     def _execute
       cmd = "cd #{escape_path build_dir}; tar -xzvf #{escape_path @unzip_tarball.basename}"
       emit(:shell, cmd)
-      err = StringIO.new
+      err = Dependency::Services::StringIO.new
       bytes, seconds =  open2(cmd) do |on|
         on.out { |s| emit(:out, s) }
         on.err { |s| emit(:err, s) ; err.write(s) }
@@ -58,11 +53,14 @@ module Skylab::Dependency
       @strips_version_number = true # unimplemented as a full settable attribute
       super
     end
-    def unzipped_dir_basename
+
+    version_rx = /-#{ Dependency::Version::REGEX.source }/
+
+    define_method :unzipped_dir_basename do
       @unzipped_dir_basename ||= begin
         str = unzip_tarball.basename.to_s.gsub(TARBALL_EXTENSION, '')
         if @strips_version_number
-          str.gsub!(VERSION_REGEX, '')
+          str.gsub! version_rx, ''
         end
         str
       end
@@ -72,4 +70,3 @@ module Skylab::Dependency
     end
   end
 end
-

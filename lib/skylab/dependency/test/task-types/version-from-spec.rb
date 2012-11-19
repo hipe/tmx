@@ -1,12 +1,11 @@
-require File.expand_path('../test-support', __FILE__)
-require 'skylab/dependency/task-types/version-from'
+require_relative 'test-support'
 
 module Skylab::Dependency::TestSupport
-  include ::Skylab::Dependency
+
   describe TaskTypes::VersionFrom do
-    module_eval &DESCRIBE_BLOCK_COMMON_SETUP
+    extend Dependency_TestSupport
     let(:klass) { TaskTypes::VersionFrom }
-    let(:log) { StringIO.new }
+    let(:log) { Dependency::Services::StringIO.new }
     let(:must_be_in_range) { nil }
     let(:parse_with) { '/(\d+\.\d+\.\d+)/' }
     let(:version_from) { 'echo "version 1.2.34 is the version"' }
@@ -17,8 +16,8 @@ module Skylab::Dependency::TestSupport
         :version_from => version_from
       ) do |t|
         t.on_all do |e|
-          $debug and puts(e)
-          log.puts unstylize(e.to_s)
+          self.debug and $stderr.puts [e.type, e.message].inspect
+          log.puts e.to_s
         end
       end
     end

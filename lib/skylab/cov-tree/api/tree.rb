@@ -71,7 +71,7 @@ module ::Skylab::CovTree
           error("single-file trees not yet implemented (for #{@path.pretty})")
         elsif test_dir_names.include?(@path.basename.to_s)
           y << Models::MyPathname.new(@path.to_s)
-        else
+        else # [#sl-118] one day this might get unified
           _n = test_dir_names.map { |x| "-name #{Shellwords.escape(x)}" }.join(' -o ')
           Open3.popen3("find #{@path.to_s.shellescape} -type dir \\( #{_n} \\)") do |_, sout, serr|
             '' == (e = serr.read) ? sout.each_line { |l| y << Models::MyPathname.new(l.chomp) } : error(e)

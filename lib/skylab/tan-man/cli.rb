@@ -18,10 +18,6 @@ module Skylab::TanMan
 
     attr_reader :paystream
 
-    def root_runtime
-      self
-    end
-
     let :services_runtime do
       TanMan::Service::Runtime.new
     end

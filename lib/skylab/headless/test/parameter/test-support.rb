@@ -1,42 +1,55 @@
-require_relative '../../core'
-require_relative '../../..' # skylab
-require 'skylab/test-support/core' # StreamSpy
+require_relative '../test-support'
 
-module Skylab::Headless
-  module Parameter::TestSupport
-    def self.extended obj
-      obj.extend Parameter::TestSupport::ModuleMethods
-      obj.send(:include, Parameter::TestSupport::InstanceMethods)
-    end
+module Skylab::Headless::TestSupport::Parameter
+  ::Skylab::Headless::TestSupport[ self ]
+
+
+  module CONSTANTS
+    Parameter = Headless::Parameter
   end
-  module Parameter::TestSupport::ModuleMethods
-    def defn &b
-      @klass = ::Class.new.class_exec do
-        extend Parameter::Definer::ModuleMethods
-        include Parameter::Definer::InstanceMethods::IvarsAdapter
+
+
+  module ModuleMethods
+    include CONSTANTS
+
+    def with &b                   # define the class body you will use in
+      @klass = ::Class.new.class_exec do      # the frame
+        include Headless::SubClient::InstanceMethods
+        extend Parameter::Definer
         class_exec(&b)
       protected
-        def error msg ; @_outstream.puts msg end
-        def pen ; IO::Pen::MINIMAL end
-        def _with_client(&b) ; instance_exec(&b) end
+        # A definition of formal_parameters is needed for compat. with
+        # bound params.  currently its home definition is in
+        # Parameter::Controller::InstanceMethods, however pulling all of that in
+        # is out of scope here, hence we redundantly define this here, but if
+        def formal_parameters     # this moves up to e.g some I_M::Core,
+          self.class.parameters   # then by all means get rid of it here!
+        end
+        def with_client &b        # slated for improvement [#012]
+          instance_exec &b
+        end
         self
       end
     end
+
     def frame &b
       klass = @klass
-      let(:_frame) do
-        object = klass.new
-        outspy = ::Skylab::TestSupport::StreamSpy.standard
-        object.instance_variable_set('@_outstream', outspy)
-        out_f = -> { outspy.string.split("\n") }
-        { klass: klass, object: object, out_f: out_f }
+      let :_frame do
+        client = Headless_TestSupport::Client_Spy.new
+        client.debug = -> { self.debug }
+        object = klass.new client
+        emit_lines = -> do
+          client.send(:io_adapter).stack.map do |pair|
+            pair.length == 2 or fail('sanity - unexpected payload length')
+            pair.last
+          end
+        end
+        { emit_lines: emit_lines, klass: klass, object: object }
       end
-      let(:klass) { _frame[:klass] }
+      let(:emit_lines)   { _frame[:emit_lines].call }
+      let(:klass)  { _frame[:klass] }
       let(:object) { _frame[:object] }
-      let(:out) { _frame[:out_f].call }
       instance_exec(&b)
     end
-  end
-  module Parameter::TestSupport::InstanceMethods
   end
 end

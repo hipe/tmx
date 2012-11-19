@@ -7,7 +7,15 @@ module ::Skylab::Porcelain
     # values.
   end
 
+
   module Attribute::Definer
+    def self.extended mod # per pattern [#sl-111]
+      mod.extend Attribute::Definer::Methods
+    end
+  end
+
+
+  module Attribute::Definer::Methods
     def attribute sym, meta_attributes=nil
       change_request = _attribute_meta_class.new sym
       meta = attributes[sym]

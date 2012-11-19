@@ -1,10 +1,9 @@
 require_relative 'test-support'
 
 describe "#{::Skylab::CssConvert} when parsing directives" do
-  include ::Skylab::CssConvert::TestSupport::InstanceMethods
+  extend ::Skylab::CssConvert::TestSupport
 
-  it "should parse platonic ideal", f:true do
-    # cli_instance.io_adapter.debug!
+  it "should parse platonic ideal" do
     tree = parse_directives_in_file(fixture_path('001-platonic-ideal.txt'))
     tree.first.should == :merge_statement
     itf, sif, su, ls = tree.children(

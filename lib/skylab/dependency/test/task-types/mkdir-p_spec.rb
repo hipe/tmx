@@ -1,13 +1,15 @@
-require File.expand_path('../test-support', __FILE__)
-require 'skylab/dependency/task-types/mkdir-p'
+require_relative 'test-support'
 
-module Skylab::Dependency::TestSupport
-  include ::Skylab::Dependency
+module Skylab::Dependency::TestSupport::Tasks
+
   describe TaskTypes::MkdirP do
+    extend Tasks_TestSupport
+
     subject { TaskTypes::MkdirP }
     let(:all) do
       lambda do |t|
         t.on_all do |e|
+          self.debug and $stderr.puts [e.type, e.message].inspect
           stderr << e.to_s
         end
       end

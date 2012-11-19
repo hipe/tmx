@@ -3,9 +3,9 @@ require_relative 'test-support'
 describe 'If you have an object "object" that has a ' <<
   "#{::Skylab::Headless::Parameter} \"foo\"" do
 
-  extend ::Skylab::Headless::Parameter::TestSupport
+  extend ::Skylab::Headless::TestSupport::Parameter
   context 'and "foo" has the property of e.g. "builder: :foo_f"' do
-    defn do
+    with do
       param :roland_808, builder: :roland_808_f
       attr_accessor :roland_808_f
     end

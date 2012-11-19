@@ -1,14 +1,6 @@
-require 'rake'
-require 'skylab/porcelain/attribute-definer'
-
-module Skylab ; end
+require 'rake' # for fun and as an implementation detail we use it
 
 module Skylab::Slake
-
-  root = File.expand_path('..', __FILE__)
-  require "#{root}/interpolate"
-  require "#{root}/parenthood"
-
 
   module TaskClassMethods
     def task_type_name
@@ -16,11 +8,11 @@ module Skylab::Slake
     end
   end
 
-  class Task < Rake::Task
+  class Task < ::Rake::Task
     extend Skylab::Porcelain::Attribute::Definer
-    extend Interpolate
+    extend Slake::Interpolate
     extend TaskClassMethods
-    include Parenthood
+    include Slake::Parenthood
     def action= action
       @actions.push action
     end
@@ -66,4 +58,3 @@ module Skylab::Slake
     end
   end
 end
-
