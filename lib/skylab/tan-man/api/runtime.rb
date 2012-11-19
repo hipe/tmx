@@ -8,12 +8,9 @@ module Skylab::TanMan
     def clear
       @singletons.clear
     end
-    def initialize
-      @singletons = API::Singletons.new
-    end
     def invoke *a, &b
-      events = API::ActionEvents.new(self)
-      events.debug! if Hash === a.last && a.last.delete(:_debug)
+      events = API::ActionEvents.new self
+      events.debug! if ::Hash === a.last && a.last.delete(:_debug)
       result = events.invoke(*a, &b)
       if result.respond_to?(:each) # @todo{after:.3}: needs something maybe
         result.each do |item|
@@ -25,6 +22,10 @@ module Skylab::TanMan
     attr_reader :singletons
     def text_styler
       self
+    end
+  protected
+    def initialize # *not* pattern [#sl-114]
+      @singletons = API::Singletons.new
     end
   end
 
@@ -60,6 +61,9 @@ module Skylab::TanMan
       emit(:error, msg)
       false
     end
+    def infostream
+      paystream # #todo
+    end
     def json_data
       map(&:json_data)
     end
@@ -77,8 +81,8 @@ module Skylab::TanMan
 
     # "Multipart Events"
     # This is just a q & d p. o. c !!! many holes below, memory leaks etc
-    def stdout
-      @stdout ||= begin
+    def paystream
+      @paystream ||= begin
         o = API::Whatever.new
         buffer = StringIO.new
         list = self
@@ -92,7 +96,6 @@ module Skylab::TanMan
         o
       end
     end
-    alias_method :infostream, :stdout # somebody tell me what the hell is going
     delegates_to :runtime, :text_styler
     def success?
       ! first_error
@@ -100,6 +103,8 @@ module Skylab::TanMan
     def to_json *a
       json_data.to_json(*a) # here only as a sanity check
     end
+  protected
+    # none?
   end
   class API::Whatever
     class << self

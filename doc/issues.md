@@ -1,3 +1,4 @@
+[#114] #pattern of "stdin, stdout, stderr" as constructor to CLI clients
 [#113] #pattern of PIE standard
 [#112] #pattern of emit error
 [#111] (was [#109]!) #pattern self.extended mod pattern

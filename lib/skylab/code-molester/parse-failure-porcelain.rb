@@ -1,3 +1,4 @@
+require_relative 'core'
 require 'stringio'
 require 'strscan'
 

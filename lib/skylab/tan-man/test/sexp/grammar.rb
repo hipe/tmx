@@ -62,7 +62,7 @@ module ::Skylab::TanMan::TestSupport::Sexp
     include CLI_Client_InstanceMethods
       # prepared_submodule_tmpdir
 
-    def initialize i=$stdin, o=$stdout, e=$stderr
+    def initialize i=$stdin, o=$stdout, e=$stderr # pattern [#sl-114]
       @stdin = i ; self.paystream = o ; self.infostream = e
       # (keep stdin on deck but don't set upstream here. it takes logix)
     end

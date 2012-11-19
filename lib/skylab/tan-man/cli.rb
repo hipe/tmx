@@ -3,7 +3,7 @@ require_relative 'core'
 Skylab::TanMan::API || nil # #preload
 
 module Skylab::TanMan
-  class CLI < Bleeding::Runtime
+  class CLI < Bleeding::Runtime                # changes at [#018]
     extend Autoloader                          # to autoload files under cli/
     extend MetaHell::Let                       # used below, temporary #todo
     extend Core::Client::ModuleMethods         # per the pattern
@@ -14,30 +14,41 @@ module Skylab::TanMan
                                                # note this gets merged with
                                                # 'parent' event graph above
 
-    def initialize
-      @singletons = API::Singletons.new # #todo:refactor to memoize
-      @stderr = $stderr ; @stdout = $stdout # defaults that might get changed below
-      if block_given?
-        yield self
-      else
-        on_out { |e| stdout.puts(e.touch!.message) }
-        on_all { |e| stderr.puts(e.touch!.message) unless e.touched? }
-      end
+    attr_reader :infostream
+
+    attr_reader :paystream
+
+    def root_runtime
+      self
     end
-    def root_runtime ; self end
+
     let :services_runtime do
       TanMan::Service::Runtime.new
     end
+
     attr_reader :singletons
-    attr_accessor :stderr, :stdout
-    alias_method :infostream, :stderr
+
     def text_styler ; self end
+
+  protected
+
+    def initialize _=nil, paystream=$stdout, infostream=$stderr # patt.[#sl-114]
+      @singletons = API::Singletons.new # #todo:refactor to memoize
+      @paystream = paystream      # these are just defaults that might ..
+      @infostream = infostream    #   .. get changed in the yield below
+      if block_given?
+        yield self
+      else
+        on_out { |e| self.paystream.puts e.touch!.message }
+        on_all { |e| self.infostream.puts(e.touch!.message) unless e.touched? }
+      end
+    end
   end
 
-  CLI::Action || nil # #todo temporary jawbreak
 
   module CLI::Actions
   end
+
 
   class CLI::Actions::Status < CLI::Action
     desc "show the status of the config director{y|ies} active at the path."
@@ -64,6 +75,7 @@ module Skylab::TanMan
     end
   end
 
+
   class CLI::Actions::Init < CLI::Action
     desc "create the #{API.local_conf_dirname} directory"
     option_syntax { |h| on('-n', '--dry-run', 'dry run.') { h[:dry_run] = true } }
@@ -73,11 +85,13 @@ module Skylab::TanMan
     end
   end
 
+
   module CLI::Actions::Remote
     extend CLI::NamespaceModuleMethods
     desc "manage remotes."
     summary { ["#{action_syntax} remotes"] }
   end
+
 
   class CLI::Actions::Remote::Add < CLI::Action
     option_syntax do |h|
@@ -92,6 +106,7 @@ module Skylab::TanMan
       b
     end
   end
+
 
   class CLI::Actions::Remote::List < CLI::Action
     desc "list the remotes."
@@ -114,6 +129,7 @@ module Skylab::TanMan
     end
   end
 
+
   class CLI::Actions::Remote::Rm < CLI::Action
     desc "remove the remote."
     option_syntax do |h|
@@ -128,6 +144,7 @@ module Skylab::TanMan
     end
   end
 
+
   class CLI::Actions::Push < CLI::Action
     desc "push any single file anywhere in the world."
     desc "(scp wrapper)"
@@ -139,12 +156,14 @@ module Skylab::TanMan
     end
   end
 
+
   class CLI::Actions::Use < CLI::Action
     desc 'selects which (dependency graph) file to edit'
     def invoke path
       api_invoke path: path
     end
   end
+
 
   class CLI::Actions::Check < CLI::Action
     desc 'checks if the (dependency graph) file exists and can be parsed.'
@@ -153,6 +172,7 @@ module Skylab::TanMan
     end
   end
 
+
   class CLI::Actions::Tell < CLI::Action
     desc "there's a lot you can tell about a man from his choice of words"
     def invoke *word
@@ -160,17 +180,20 @@ module Skylab::TanMan
     end
   end
 
+
   module CLI::Actions::Graph
     extend CLI::NamespaceModuleMethods
     desc "do things to graphs."
     summary { ["#{action_syntax} graph"] }
   end
 
+
   module CLI::Actions::Graph::Example
     extend CLI::NamespaceModuleMethods
     desc "what graph example to use?"
     summary { ["#{action_syntax} vleeplye"] }
   end
+
 
   class CLI::Actions::Graph::Example::Set < CLI::Action
     desc "set the example graph."

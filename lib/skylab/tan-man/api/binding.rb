@@ -18,7 +18,7 @@ module Skylab::TanMan
     attr_reader :runtime
     delegates_to :root_runtime, :singletons
     delegates_to :root_runtime, :services_runtime
-    delegates_to :runtime, :stdout, :text_styler
+    delegates_to :runtime, :text_styler
   end
 end
 

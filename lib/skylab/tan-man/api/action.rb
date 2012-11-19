@@ -45,15 +45,16 @@ module Skylab::TanMan
       execute # the specific action is expected to implement this
     end
 
+    delegates_to :runtime, :paystream
+
     attr_reader :runtime
     alias_method :parent, :runtime # @todo 100
 
     delegates_to :root_runtime, :singletons
 
-    def infostream ; runtime.infostream end
-    alias_method :stderr, :infostream # #jawbreak
-
-    delegates_to :runtime, :stdout
+    def infostream
+      runtime.infostream
+    end
 
     delegates_to :runtime, :text_styler
 

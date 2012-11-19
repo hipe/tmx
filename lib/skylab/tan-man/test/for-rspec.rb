@@ -8,16 +8,14 @@ module Skylab::TanMan::TestSupport
   end
   let :cli do
     spy = output
-    TanMan::CLI.new do |o|
+    TanMan::CLI.new nil, spy.for(:paystream), spy.for(:infostream) do |o|
       o.program_name = 'ferp'
-      o.stdout = spy.for(:stdout)
-      o.stderr = spy.for(:stderr)
       if do_debug
         spy.debug!
       end
-      o.on_info { |x| o.stderr.puts x.touch!.message } # similar but not same to default
-      o.on_out  { |x| o.stdout.puts x.touch!.message }
-      o.on_all  { |x| o.stderr.puts(x.touch!.message) unless x.touched? }
+      o.on_info { |x| o.infostream.puts x.touch!.message } # Similar but not
+      o.on_out  { |x| o.paystream.puts x.touch!.message }  # .. same as default
+      o.on_all  { |x| o.infostream.puts(x.touch!.message) unless x.touched? }
     end
   end
   let( :do_debug ) { false }

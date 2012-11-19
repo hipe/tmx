@@ -32,7 +32,7 @@ module Skylab::TanMan
       cli = cli_action.runtime
       runtime = headless_runtime cli_action
       action = new runtime
-      action.infostream = cli.root_runtime.stderr
+      action.infostream = cli.root_runtime.paystream
       action.singletons_f = ->{ binding.singletons }
       action.services_runtime_f = ->{ binding.services_runtime }
       action.invoke(params)
