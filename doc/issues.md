@@ -1,16 +1,22 @@
-[#114] #pattern of "stdin, stdout, stderr" as constructor to CLI clients
-[#113] #pattern of PIE standard
-[#112] #pattern of emit error
-[#111] (was [#109]!) #pattern self.extended mod pattern
-[#110] hipe's rules of order for delcarations in a class ..
-[#109] this whacky pattern of using a class as a namespace
-[#108] #low-low-priority #pattern normalization
-[#107] #low-priority 2012-11-02 this lexical scoping issue
-[#106] #done 2012-10-28 autoloading vis-a-vis const awareness
-[#105] 2012-08-18 #open play with test/all_specs.rb -w
-[#101] 2012-06-08 #open when doing gem install with rdoc, "stack level too deep"
-[#100.200.001] 2012-06-12 all.rb: fix @delegates tags
-[#100.901.3.2.2] 2012-06-12 towards an event wiring pattern
+[#120]       #tracking-tag backticks that could be robustified
+[#119] #open #tracking-tag #pattern of def.self some_thing instead of DSL
+[#118] #open unify find command in multiple places
+[#117]       #pattern of defaults (if not nil, etc)
+[#116]       #pattern of set!, update_attributes! etc (w/ errors_count)
+[#115]       #pattern of functionalizing things
+[#114]       #pattern of "stdin, stdout, stderr" as constructor to CLI clients
+[#113]       #pattern of PIE standard
+[#112]       #pattern of emit error
+[#111]       (was [#109]!) #pattern self.extended mod pattern
+[#110]       #convention hipe's rules of order for delcarations in a class ..
+[#109]       this whacky #pattern of using a class as a namespace
+[#108]       #low-low-priority #pattern normalization
+[#107]       #low-priority 2012-11-02 this lexical scoping issue
+[#106]       #done 2012-10-28 autoloading vis-a-vis const awareness
+[#105] #open 2012-08-18 play with test/all_specs.rb -w
+[#101] #open 2012-06-08 when doing gem install with rdoc, "stack level too deep"
+[#100.200.001] #open 2012-06-12 all.rb: fix @delegates tags
+[#100.901.3.2.2] #open 2012-06-12 towards an event wiring pattern
 [#096] 2012-03-30 @closed: code-molester: files are not paths
 [#095] 2012-03-29 @closed: static fileserver refactor
 [#094] 2012-03-28 @closed: tanman: refactor: this shit is a mess (still).

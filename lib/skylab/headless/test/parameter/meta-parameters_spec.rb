@@ -1,9 +1,9 @@
 require_relative 'test-support'
 
 describe "#{::Skylab::Headless}(meta)Parameters" do
-  extend ::Skylab::Headless::Parameter::TestSupport
+  extend ::Skylab::Headless::TestSupport::Parameter
   context 'can be defined inline alongside parameters with "meta_param"' do
-    defn do
+    with do
       meta_param :inheritable, boolean: true, writer: true
       param :direction, inheritable: true
     end

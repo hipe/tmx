@@ -157,7 +157,7 @@ module Skylab::Face
         end
       end
       def default_action *a
-        a.any? ? (@default_action = (a*'').to_sym) : @default_action
+        a.any? ? (@default_action = (a*'').to_sym) : (@default_action ||= nil)
       end
       # this is nutty: for classes that extend this module, this is
       # something that is triggered when they are subclasses

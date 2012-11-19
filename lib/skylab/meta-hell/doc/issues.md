@@ -1,3 +1,4 @@
+[#009] #open when you made plastic you didn't know about define_singleton_method
 [#008] #open after etc, consider pulling in Let
 [#007] #open push up logic for autoviv. of superklassen maybe? (at least test)
 [#006] #note core dumps happen here with super

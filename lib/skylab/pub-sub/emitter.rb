@@ -4,7 +4,8 @@ module Skylab::PubSub
 
   module Emitter
 
-    COMMON_LEVELS = [:debug, :info, :notice, :warn, :error, :fatal] # didactic, for elsewhere
+    COMMON_LEVELS = [:debug, :info, :notice, :warn, :error, :fatal].freeze
+      # didactic, #bound
 
     def self.extended mod # #sl-111
       mod.extend Emitter::ModuleMethods

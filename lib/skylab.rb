@@ -22,27 +22,40 @@ module Skylab
 
   module Autoloader::Inflection
     extend Methods = ::Module.new # sorry
+
+    o = { }
+
+    sanitize_path_rx = %r{ #{::Regexp.escape Autoloader::EXTNAME}\z |
+      (?<=/)/+ | (?<=[-_ ])[-_ ]+ | [^-_ /a-z0-9]+ }ix
+
+    o[:constantize] = -> path do
+      path.to_s.gsub(sanitize_path_rx, '').gsub(%r|/+|, '::').
+        gsub(/(?<=[-_ ])([A-Z])/){ $1.downcase }.
+        gsub(/(?:(?<=\d)|[-_ ]|\b)([a-z09])/) { $1.upcase }
+    end
+
+    o[:methodify] = -> str do
+      str.to_s.
+        gsub(/(?<=[a-z])([A-Z])|(?<=[A-Z])([A-Z][a-z])/) { "_#{$1 || $2}" }.
+        gsub(/[^a-z0-9]+/i, '_').downcase.intern # munge-in above underscores
+    end
+
+    o[:pathify] = -> const do
+      const.to_s.gsub('::', '/').
+        gsub(/(?<=[a-z])([A-Z])|(?<=[A-Z])([A-Z][a-z])/) { "-#{$1 || $2}" }.
+        gsub('_', '-').downcase
+    end
+
+    FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v }
   end
 
 
   module Autoloader::Inflection::Methods
 
-    -> do
-      sanitize_path_rx = %r{ #{::Regexp.escape Autoloader::EXTNAME}\z |
-        (?<=/)/+ | (?<=[-_ ])[-_ ]+ | [^-_ /a-z0-9]+ }ix
-
-      define_method :constantize do |path|
-        path.to_s.gsub(sanitize_path_rx, '').gsub(%r|/+|, '::').
-          gsub(/(?<=[-_ ])([A-Z])/){ $1.downcase }.
-          gsub(/(?:(?<=\d)|[-_ ]|\b)([a-z09])/) { $1.upcase }
-      end
-    end.call
-
-    def pathify const
-      const.to_s.gsub('::', '/').
-        gsub(/(?<=[a-z])([A-Z])|(?<=[A-Z])([A-Z][a-z])/) { "-#{$1 || $2}" }.
-        gsub('_', '-').downcase
+    Autoloader::Inflection::FUN.members.each do |func|
+      define_method func, & Autoloader::Inflection::FUN[func]
     end
+
   end
 
 
@@ -54,11 +67,13 @@ module Skylab
       rx = /^(?<path>.+#{ ::Regexp.escape Autoloader::EXTNAME })(?=:\d+:in `)/
 
       define_method :_autoloader_init! do |caller_str|
-
         # be sure to #trigger this *ONCE* when hacking autoloader
-        class << self # #sl-106: we do *not* hack these methods, but other may
-          alias_method :autoloader_original_const_defined?, :const_defined?
-          alias_method :autoloader_original_constants, :constants
+
+        if respond_to? :const_defined?         # #sl-106: we do *not* hack these
+          class << self                        # methods, but other may
+            alias_method :autoloader_original_const_defined?, :const_defined?
+            alias_method :autoloader_original_constants, :constants
+          end
         end
 
         if ! dir_path
@@ -67,7 +82,7 @@ module Skylab
             file = file.expand_path # reliably autoload with a relpath.
           end
           self.dir_path = _guess_dir to_s, file.sub_ext('').to_s do |e|
-            fail "Autoloader hack failed: #{e}"
+            fail "Autoloader hack failed: #{ e }"
           end
         end
       end
@@ -83,6 +98,10 @@ module Skylab
     end
 
     def _const_missing const
+      dir_path or fail "Autoloader hack failed: attempt to autoload #{
+        }#{ self.name }::#{ const } when dir_path of that anchor module not #{
+        }yet known (do you need to extend an Autoloader explicitly on that #{
+        }module?)" # could be pushed down if really need to
       _const_missing_class.new const.intern, dir_pathname, self
     end
 
@@ -136,13 +155,13 @@ module Skylab
   end
 
 
-  class Autoloader::ConstMissing < ::Struct.new(:const, :mod_dir_pathname, :mod)
+  class Autoloader::ConstMissing < ::Struct.new :const, :mod_dir_pathname, :mod
     include Autoloader # EXTNAME
     include Autoloader::Inflection::Methods # pathify
 
-    def load
+    def load f=nil
       if file_pathname.exist?
-        load_file
+        load_file f
       else
         raise ::LoadError.new("no such file to load -- #{file_pathname}")
       end
@@ -154,7 +173,10 @@ module Skylab
     end
 
   protected
-    attr_accessor :after_require_f
+
+    def const_not_defined
+      fail "#{ mod }::#{ const } was not defined, must be, in #{ file_pathname}"
+    end
 
     def file_pathname
       @file_pathname ||= mod_dir_pathname.join("#{pathify const}#{EXTNAME}")
@@ -165,13 +187,12 @@ module Skylab
       define_method(:mutex) { mutex_h[normalized] }
     end.call
 
-    def load_file
+    def load_file after=nil
       mutex and fail("circular autoload dependency detected#{
         } in #{file_pathname} with #{const}")
       require normalized
-      after_require_f and after_require_f.call
-      mod.autoloader_original_const_defined? const, false or
-        fail("#{mod}::#{const} was not defined, must be, in #{file_pathname}")
+      after and after.call
+      mod.autoloader_original_const_defined? const, false or const_not_defined
       nil
     end
 

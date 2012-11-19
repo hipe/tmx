@@ -35,7 +35,8 @@ module Skylab::Flex2Treetop
   class My::Headless::Client
     include Headless::Client::InstanceMethods # get ancestor chain right
     def version
-      emit(:payload, "#{program_name} version #{VERSION}")
+      emit :payload, "#{program_name} version #{VERSION}"
+      true
     end
   protected
     def request_runtime_class ; Request::Runtime end
@@ -177,9 +178,9 @@ module Skylab::Flex2Treetop
   def CLI.new ; CLI::Client.new end # reveal
 
   class CLI::Client < My::Headless::Client
-    include Headless::CLI::InstanceMethods
+    include Headless::CLI::Client::InstanceMethods
     def build_option_parser
-      o = @option_parser = ::OptionParser.new # set ivar early for banner= below
+      o = ::OptionParser.new
 
       o.on('-g=<grammar>', '--grammar=<grammar>',
         "nest treetop output in this grammar declaration",
@@ -217,15 +218,14 @@ module Skylab::Flex2Treetop
       ) { params.clear_generated_files! }
 
       o.on('-h', '--help', 'show this message') do
-        suppress_normal_output!.enqueue!(:help)
+        suppress_normal_output!.enqueue! :help
       end
       o.on('-v', '--version', 'show version') do
-        suppress_normal_output!.enqueue!(:version)
+        suppress_normal_output!.enqueue! :version
       end
       o.on('--test', '(shows some visual tests that can be run)') do
         suppress_normal_output!.enqueue!(:show_tests)
       end
-      o.banner = usage_line
       o
     end
 

@@ -1,13 +1,15 @@
 module Skylab::Headless
-  module API end
+  module API
+    # fail "this whole this will be shut down and build back up again for [#010]"
+  end
   module API::InstanceMethods
     include Headless::Client::InstanceMethods
-    def invoke meth, params=nil
+    def invoke meth, params_h=nil
       API::Promise.new do
         response do
           if ! valid_action_names.include?(meth)
             error("cannot #{meth}")
-          elsif result = send(meth, *[params].compact)
+          elsif result = send(meth, *[params_h].compact)
             true == result or emit(:payload, result)
           end
         end

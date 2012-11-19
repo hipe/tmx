@@ -3,9 +3,9 @@ require_relative 'test-support'
 describe 'If you have an object "object" that has a ' <<
   "#{::Skylab::Headless::Parameter} \"foo\"" do
 
-  extend ::Skylab::Headless::Parameter::TestSupport
+  extend ::Skylab::Headless::TestSupport::Parameter
   context 'and "foo" has the property "reader: true"' do
-    defn do
+    with do
       param :foo_readonly, reader: true
     end
     frame do
@@ -19,7 +19,7 @@ describe 'If you have an object "object" that has a ' <<
     end
   end
   context 'and "foo" has the property "writer: true"' do
-    defn do
+    with do
       param :foo_writeonly, writer: true
     end
     frame do
@@ -33,7 +33,7 @@ describe 'If you have an object "object" that has a ' <<
     end
   end
   context 'and "foo" has the property "accessor: true"' do
-    defn do
+    with do
       param :foo_accessor, accessor: true
     end
     frame do

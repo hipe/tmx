@@ -71,14 +71,6 @@ module Skylab::TanMan::TestSupport
     end.call
   end
 
-
-  class Generic
-    class << self
-      public :define_method
-    end
-  end
-
-
   module InstanceMethods
     include Autoloader::Inflection::Methods
     include TanMan::API::Achtung::SubClient::ModuleMethods # headless_runtime
@@ -89,7 +81,7 @@ module Skylab::TanMan::TestSupport
     end
 
     let :client do
-      io_adapter = Generic.new
+      io_adapter = MetaHell::Plastic::Instance.new # just a flexible generic obj
       debug_parser_loading_f = -> { debug_parser_loading }
       io_adapter.singleton_class.define_method :emit do |type, payload|
         if debug_parser_loading_f.call

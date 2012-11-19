@@ -29,9 +29,9 @@ module Skylab::MetaHell::Autoloader
   class Autovivifying::ConstMissing < ::Skylab::Autoloader::ConstMissing
     extend MetaHell::Let
 
-    def load
+    def load f=nil
       if file_pathname.exist?
-        load_file
+        load_file f
       elsif dir_pathname.exist?
         mod.const_set const, build_autovivified_module
       else

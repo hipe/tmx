@@ -1,3 +1,3 @@
-[#003] 2012-09-01 #closed "#keep" macro in comments!! WTF!!!
-[#002] 2012-09-01 #closed --include option
-[#001] 2012-09-01 #closed modeline
+[#003]       #closed 2012-09-01 "#keep" macro in comments!! WTF!!!
+[#002]       #closed 2012-09-01 --include option
+[#001]       #closed 2012-09-01 #closed modeline

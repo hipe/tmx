@@ -1,7 +1,5 @@
 require 'strscan'
 
-module Skylab ; end
-
 module Skylab::Slake
   module Interpolate
     extend self
@@ -58,4 +56,3 @@ module Skylab::Slake::Interpolate
     end
   end
 end
-

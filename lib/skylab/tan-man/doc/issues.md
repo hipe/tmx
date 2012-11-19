@@ -1,3 +1,5 @@
+[#041] #open i don't like how status is implemented with the arrays
+[#040] #open make your own SubClient::InstanceMethods to DRY CLI & API
 [#039] #open API::Whatever becomes MetaHell::Generic
 [#038] #open text_styler away!
 [#037]       reconceive stdout, stderr -> infostream, paystream, errstream

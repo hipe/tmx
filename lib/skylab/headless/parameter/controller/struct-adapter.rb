@@ -6,31 +6,27 @@ module Skylab::Headless
   # a required parameter (and it follows that no actual parameters could
   # be added that are not in the parameter superset, which is the point)
 
-    def self.extended struct_class
+    def self.extended struct_class # looks like [#sl-111] but has more
       struct_class.class_eval do
         extend Parameter::Definer::ModuleMethods
         include Parameter::Controller::StructAdapter::InstanceMethods
-        members.each { |m| param(m, required: true) }
+
+        members.each { |m| param m, required: true }
+
       end
     end
   end
 
   module Parameter::Controller::StructAdapter::InstanceMethods
-    include SubClient::InstanceMethods
     include Parameter::Controller::InstanceMethods
-    def invoke params
-      set!(params) or return
-      execute
+
+    def invoke params_h
+      result = nil
+      begin
+        result = set!(params_h) or break
+        result = execute
+      end while false
+      result
     end
-  protected
-    def error msg
-      emit(:error, msg)
-      self.errors_count += 1
-      false
-    end
-    def errors_count ; @errors_count ||= 0 end
-    attr_writer :errors_count
-    def formal_parameters ; self.class.parameters end
-    def params ; self end # for compat. with set!
   end
 end

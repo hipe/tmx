@@ -2,9 +2,9 @@ require_relative 'test-support'
 
 describe "If you have an object \"object\" that has a " <<
   "#{::Skylab::Headless::Parameter} \"foo\" " do
-  extend ::Skylab::Headless::Parameter::TestSupport
+  extend ::Skylab::Headless::TestSupport::Parameter
   context 'and "foo" has the property "boolean: true"' do
-    defn do
+    with do
       param :finished, boolean: true
     end
     frame do

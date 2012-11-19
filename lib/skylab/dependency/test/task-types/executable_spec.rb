@@ -1,21 +1,17 @@
-require File.expand_path('../test-support', __FILE__)
-require 'skylab/dependency/task-types/executable'
+require_relative 'test-support'
 
-module Skylab::Dependency::TestSupport
+module Skylab::Dependency::TestSupport::Tasks
 
-  include ::Skylab::Dependency
   describe TaskTypes::Executable do
-    module_eval &DESCRIBE_BLOCK_COMMON_SETUP
+    extend Tasks_TestSupport
+
     let(:context) { { } }
     let(:build_args) { {
       :executable => executable
     } }
 
     subject do
-      TaskTypes::Executable.new(build_args) do |o|
-        o.on_all { |e| fingers[e.type].push unstylize(e.to_s) }
-        o.context = context
-      end
+      TaskTypes::Executable.new( build_args ) { |t| wire! t }
     end
 
     context "requires some things" do
@@ -47,4 +43,3 @@ module Skylab::Dependency::TestSupport
     end
   end
 end
-

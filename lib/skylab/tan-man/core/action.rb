@@ -3,10 +3,11 @@ module Skylab::TanMan
   module Core::Action
   end
 
-  module Core::Action::ModuleMethods
-    include PubSub::Emitter::ModuleMethods
 
-  end
+  module Core::Action::ModuleMethods
+    include PubSub::Emitter::ModuleMethods # if descendents want to add to
+  end                             # the even graph or change the class, for e.g.
+
 
   module Core::Action::InstanceMethods
     extend PubSub::Emitter        # we want the methods it generates to be here
@@ -15,20 +16,6 @@ module Skylab::TanMan
       info: :all, out: :all, no_config_dir: :error, skip: :info # modalities
     )
 
-    event_class Core::Event       # sure why not
-
-  protected
-
-    def add_invalid_reason mixed
-      (@invalid_reasons ||= []).push mixed
-    end
-
-    def root_runtime # to be re-evaluated at [#034]
-      if parent
-        parent.root_runtime
-      else
-        self
-      end
-    end
+    event_class Core::Event       # (altho descendents may change it)
   end
 end
