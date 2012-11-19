@@ -31,22 +31,6 @@ module Skylab::TanMan
   end
   API.set_defaults_if_nil!
 
-  module API::RuntimeExtensions
-    extend Bleeding::DelegatesTo
-    include Core::Pen::Methods::Global
-    def add_invalid_reason mixed
-      (@invalid_reasons ||= []).push mixed
-    end
-    def root_runtime
-      if parent
-        parent.root_runtime
-      else
-        self
-      end
-    end
-    delegates_to :runtime, :stdout, :text_styler
-  end
-
   class API::Singletons
     def clear
       @config.clear if @config

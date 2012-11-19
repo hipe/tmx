@@ -1,12 +1,20 @@
+[#038] #open text_styler away!
+[#037] #open reconceive stdout, stderr -> infostream, paystream, errstream
+  .. (i.e. ("PIE" [#sl-113])
+[#036] #open format_error -> inflect_failure_reason (and tests!)
+[#035] #open delegates_to go away as a smell
+[#034] #open sort out root_runtime, client, parent_runtime, etc
+[#033] #open full_action_name_parts becomes normalized_name (action_name ..?)
+[#032] #open rename stdout, stderr
 [#031] regretify all tests #done
 [#030] #open reconceive api as a service
 [#029] #open no more api knob (api.invoke -> api_invoke)
 [#028] #open any and all changes to CLI core client
 [#027] #open overhaul to cli actions base class
 [#026] #open API::InvocationMethods away!
-[#025] #open API::RuntimeExtensions away!
+[#025] API::RuntimeExtensions away! #done
 [#024] #open use -h
-[#023] #open combine all Boxxy
+[#023] #open combine all Boxxy, consider Boxxy-like solutions
 [#022] #open refactor-in headless, and sub-client
 [#021] #open merge singletons into service
 [#020] #low-priority nounify cli commands

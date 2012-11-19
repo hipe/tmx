@@ -31,15 +31,18 @@ module Skylab::TanMan
   class API::ActionEvents < Array
     extend Bleeding::DelegatesTo
     extend ::Skylab::PubSub::Emitter
-    include API::InvocationMethods
 
-    emits Core::Event::GRAPH.merge( row: :out )
+    include API::InvocationMethods # away at [#026]
+    include Core::Action::InstanceMethods      # inherit event cloud!
+
+    emits row: :out                            # and emit this, too
     event_class API::Event
 
     attr_accessor :debug
     alias_method :debug?, :debug
     def debug!
-      tap { |me| me.debug = true }
+      self.debug = true
+      self
     end
     def first_error
       detect { |e| e.is?(:error) }

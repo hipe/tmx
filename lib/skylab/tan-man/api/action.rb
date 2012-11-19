@@ -4,13 +4,12 @@ module Skylab::TanMan
     extend ::Skylab::PubSub::Emitter
     extend Porcelain::Attribute::Definer
 
-    include API::RuntimeExtensions
+    include Core::Action::InstanceMethods
     include Core::Attribute::Reflection::InstanceMethods
     include Core::Pen::Methods::Adaptive
 
     meta_attribute(*Core::MetaAttributes[:boolean, :default, :mutex_boolean_set,:pathname, :required, :regex])
 
-    emits Core::Event::GRAPH
     event_class API::Event
 
     delegates_to :class, :action_name
@@ -78,7 +77,7 @@ module Skylab::TanMan
 
   class << API::Action
 
-    def action_name
+    def action_name # re-evaluated at [#033]
       to_s.match(/[^:]+$/)[0].gsub(/([a-z])([A-Z])/) { "#{$1}-#{$2}" }.downcase
     end
 
@@ -92,4 +91,3 @@ module Skylab::TanMan
     end
   end
 end
-

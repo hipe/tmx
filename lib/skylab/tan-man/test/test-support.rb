@@ -112,6 +112,11 @@ module Skylab::TanMan::TestSupport
       o
     end
 
+    def debug!
+      do_debug # sanity
+      @__memoized[:do_debug] = true
+    end
+
     def debug_parser_loading
       false # save to try it!
     end

@@ -4,12 +4,15 @@ Skylab::TanMan::API || nil # #preload
 
 module Skylab::TanMan
   class CLI < Bleeding::Runtime
-    extend Autoloader
-    extend ::Skylab::MetaHell::Let
-    extend ::Skylab::PubSub::Emitter
+    extend Autoloader                          # to autoload files under cli/
+    extend MetaHell::Let                       # used below, temporary #todo
+    extend Core::Client::ModuleMethods         # per the pattern
 
-    emits Core::Event::GRAPH
-    event_class Core::Event
+    include Core::Client::InstanceMethods      # per the pattern
+
+    emits Porcelain::Bleeding::EVENT_GRAPH     # b/c granulated UI events
+                                               # note this gets merged with
+                                               # 'parent' event graph above
 
     def initialize
       @singletons = API::Singletons.new # #todo:refactor to memoize

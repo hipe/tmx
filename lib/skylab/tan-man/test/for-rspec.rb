@@ -12,11 +12,15 @@ module Skylab::TanMan::TestSupport
       o.program_name = 'ferp'
       o.stdout = spy.for(:stdout)
       o.stderr = spy.for(:stderr)
+      if do_debug
+        spy.debug!
+      end
       o.on_info { |x| o.stderr.puts x.touch!.message } # similar but not same to default
       o.on_out  { |x| o.stdout.puts x.touch!.message }
       o.on_all  { |x| o.stderr.puts(x.touch!.message) unless x.touched? }
     end
   end
+  let( :do_debug ) { false }
   def input str
     argv = Shellwords.split(str)
     self.result = cli.invoke argv

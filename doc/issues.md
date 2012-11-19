@@ -1,3 +1,4 @@
+[#113] #pattern of PIE standard
 [#112] #pattern of emit error
 [#111] (was [#109]!) #pattern self.extended mod pattern
 [#110] hipe's rules of order for delcarations in a class ..
