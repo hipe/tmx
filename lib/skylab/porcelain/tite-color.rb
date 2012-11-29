@@ -25,7 +25,7 @@ module Skylab::Porcelain::TiteColor
     end
 
     (a.compact - [:strong]).each do |c| # pending [#013]
-      define_method( c ) { |s| sylize(s, c) }
+      define_method( c ) { |s| stylize(s, c) }
       define_method(c.to_s.upcase) { |s| stylize(s, :strong, c) }
     end
   end

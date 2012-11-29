@@ -11,6 +11,7 @@ module Skylab
     Bleeding   = ::Skylab::Porcelain::Bleeding
     Face       = ::Skylab::Face
     Headless   = ::Skylab::Headless
+    Inflection = ::Skylab::Autoloader::Inflection
     MetaHell   = ::Skylab::MetaHell
     Porcelain  = ::Skylab::Porcelain
     PubSub     = ::Skylab::PubSub

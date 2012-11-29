@@ -48,17 +48,19 @@ module Skylab::TanMan
     def const_fetch path_a, name_error=nil, invalid_name_error=nil, &both
       both and name_error || invalid_name_error and
         raise ::ArgumentError.exception("can't have both block and lambda args")
+      invalid_name = -> name do
+        invalid_name_error ||= name_error || both || ->( e ) { raise e }
+        invalid_name_error[ Boxxy::InvalidNameError.exception(
+          message: "wrong constant name #{ name }",
+          invalid_name: name
+        ) ]
+      end
       path_a = [path_a] unless ::Array === path_a
       seen = []
       path_a.reduce self do |box, mixed_name|
-        if valid_name_rx !~ mixed_name.to_s
-          invalid_name_error ||= name_error || both || ->( e ) { raise e }
-          return invalid_name_error[ Boxxy::InvalidNameError.exception(
-            message: "wrong constant name #{ mixed_name }",
-            invalid_name: mixed_name
-          ) ]
-        end
+        valid_name_rx =~ mixed_name.to_s or return invalid_name[ mixed_name ]
         const = Inflection::FUN.constantize[ mixed_name ].intern
+        /\A[A-Z][_a-zA-Z0-9]*\z/ =~ const.to_s or return invalid_name[ const ]
         if ! box.autoloader_original_const_defined?(const, false) and
            ! box.const_probably_loadable? const
         then
@@ -87,16 +89,17 @@ module Skylab::TanMan
     # of-concept.
     def each
       constantize = Autoloader::Inflection::FUN.constantize
-      e = ::Enumerator.new do |y|
-        if constants.empty? # for now, load them with brute force (a), (b) iff
-          ::Dir.glob( "#{dir_pathname}/*.rb" ).each do |path| # empty
+      e = ::Enumerator.new do |y|    # for now we load them with "brute force"
+        if ! (@boxxy_loaded ||= nil) # as opposed to the silly mocks we've
+          @boxxy_loaded = true       # used before (we used to simply check if
+          ::Dir.glob( "#{dir_pathname}/*.rb" ).each do |path| # it was
             const = constantize[ ::Pathname.new( path ).basename.sub_ext('') ]
-            case_insensitive_const_get const
-          end
-        end
-        constants.each do |const|
-          y << const_get( const, false )
-        end
+            case_insensitive_const_get const # an empty boxy but that got us
+          end                        # into trouble were tests loaded
+        end                          # explicit box items themselves, for e.g)
+        constants.map(&:to_s).sort.each do |const| # We want to ensure that
+          y << const_get( const, false ) # that the above issue doesn't give
+        end                          # us non-deterministic sort orders
       end
       if block_given?
         e.each { |o| yield o }

@@ -15,7 +15,7 @@ module Skylab::MyTree::TestSupport
     let( :usage_rx ) { /\Ausage: mt \[-h\] \[<action>\] \[<args> \[..\]\]\z/ }
 
 
-    it "0   : no args : expecting, usage, invite" do
+    it "0   : no args : expecting / usage / invite" do
       response = invoke
       line.should match( expecting_rx )
       line.should match( usage_rx )
@@ -25,7 +25,7 @@ module Skylab::MyTree::TestSupport
     end
 
 
-    it "1.1 : one unrec arg : msg, usage, invite" do
+    it "1.1 : one unrec arg : msg / usage / invite" do
       response = invoke 'gah'
       line.should match( /\Athere is no "gah" action\. #{
                                 _expecting_rx.source }\z/ )
@@ -36,7 +36,7 @@ module Skylab::MyTree::TestSupport
     end
 
 
-    it "1.1 : one unrec opt : msg, usage, invite" do
+    it "1.2 : one unrec opt : msg / usage / invite" do
       response = invoke '-x'
       line.should match(/\Ainvalid option: -x\z/)
       line.should match( usage_rx )
@@ -46,7 +46,7 @@ module Skylab::MyTree::TestSupport
     end
 
 
-    it "1.2 : one opt: -h : 1) usage 2) desc 3) action index 4) custom invite" do
+    it "1.3 : one opt: -h : 1) usage 2) desc 3) action index 4) custom invite" do
       response = invoke '-h'
       line.should match( usage_rx )
       line.should eql('')
@@ -72,7 +72,7 @@ module Skylab::MyTree::TestSupport
     # #todo: single line desc       #todo: no-line descs
 
 
-    it "2.1 : -h rec (leaf) arg : 1) usage 2) desc 3) opts descs 4) args desc" do
+    it "2.2 : -h rec (leaf) arg : 1) usage 2) desc 3) opts descs 4) args desc" do
       response = invoke '-h', 'tree'
       line.should match( /\Ausage: mt tree/ )
       line.should eql('')
@@ -91,7 +91,7 @@ module Skylab::MyTree::TestSupport
     # #todo: -h rec branch arg
 
 
-    it "2.2 : -h unrec arg : just like (1.1)" do
+    it "2.1 : -h unrec arg : just like (1.1)" do
       response = invoke '-h', 'florp'
       line.should match( /\Athere is no "florp" action. #{
                                  _expecting_rx.source }\z/ )

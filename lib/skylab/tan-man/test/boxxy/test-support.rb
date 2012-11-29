@@ -17,7 +17,7 @@ require_relative '../../boxxy'
 require 'skylab/test-support/core'
 
 module Skylab::MetaHell::TestSupport::Boxxy
-  ::Skylab::TestSupport::Regret[ self ]
+  ::Skylab::TestSupport::Regret[ Boxxy_TestSupport = self ]
 
   MetaHell = ::Skylab::MetaHell
   TanMan = ::Skylab::TanMan
