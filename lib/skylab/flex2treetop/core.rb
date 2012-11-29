@@ -24,6 +24,9 @@ module Skylab::Flex2Treetop
 
   class Core::Client
     include Headless::Client::InstanceMethods # get ancestor chain right
+    include Headless::Parameter::Controller::InstanceMethods # although
+                                  # cli might not use it we have things
+                                  # we need to override below
 
     def actual_parameters         # more compartmentalized than the default
       @actual_parameters ||= formal_parameters_class.new self
@@ -39,12 +42,12 @@ module Skylab::Flex2Treetop
       flex_name # @todo prefixes, whatever
     end                           # a service to sub-clients
 
-  protected
-
-    def version
+    def version                   # must be public b/c it's an API call
       emit :payload, "#{ program_name } version #{ VERSION }"
       true
     end
+
+  protected
   end
 
 
@@ -118,17 +121,25 @@ module Skylab::Flex2Treetop
   class API::Client < Core::Client
     include Headless::API::InstanceMethods
 
-    def translate request=nil
-      fail 'redo'
-      set! request or return
-      resolve_io or return params.result_state
+    public :info                  # to be re-evaluated at [#008]
+
+    def translate request_h=nil
+      o = nil
       begin
-        params.result_state = API::Translation.new(request_runtime).invoke
-      ensure
-        io_adapter.outstream.closed? or io_adapter.outstream.close
-        io_adapter.instream.closed? or io_adapter.instream.close
-      end
-      params.result_state
+        o = set!( request_h ) or break
+        if ! resolve_io
+          o = params.result_state
+          break
+        end
+        begin
+          params.result_state = Translation.new( self ).invoke
+        ensure
+          io_adapter.outstream.closed? or io_adapter.outstream.close
+          io_adapter.instream.closed? or io_adapter.instream.close
+        end
+        o = params.result_state
+      end while false
+      o
     end
 
   protected
@@ -194,21 +205,23 @@ module Skylab::Flex2Treetop
   end
 
 
-  class API::IO::Adapter < ::Struct.new(
-    :payloads, :errors, :info_stream, :instream, :outstream, :pen
-  )
+  class API::IO::Adapter < ::Struct.new :payloads, :errors, :info_stream,
+    :instream, :outstream, :pen
+
     def emit type, mixed
       case type
       when :payload ; payloads << mixed
       when :error   ; errors   << mixed
-                    ; info_stream.puts("(api #{type} preview): #{mixed}")
-      else          ; info_stream.puts("(api #{type}): #{mixed}")
+                    ; info_stream.puts "(api #{ type } preview): #{ mixed }"
+      else          ; info_stream.puts "(api #{ type }): #{ mixed }"
       end
       nil # undefined
     end
+
   protected
+
     def initialize
-      super([], [], $stderr, nil, nil, API::IO::Pen.new)
+      super [], [], $stderr, nil, nil, API::IO::Pen.new
     end
   end
 
@@ -221,8 +234,8 @@ module Skylab::Flex2Treetop
   class CLI::Client < Core::Client
     include Headless::CLI::Client::InstanceMethods
 
-    public :info                  # translation uses it directly
-
+    public :info                  # translation uses it directly, at odds with
+                                  # [#008
   protected
 
     def build_option_parser
@@ -280,7 +293,7 @@ module Skylab::Flex2Treetop
     end
 
     def formal_parameters_class
-      API::Actions::Translate::Parameters
+      CLI::Actions::Translate::Parameters
     end
 
     def grammar
@@ -618,8 +631,8 @@ end
 module Skylab::Flex2Treetop
   module RuleWriter
   end
-  class RuleWriter::Rule < Struct.new(
-    :request_runtime, :rule_name, :pattern_like)
+  class RuleWriter::Rule < ::Struct.new :request_runtime, :rule_name,
+                                        :pattern_like
 
     def builder                   ; request_runtime.builder end
     def translate_name(*a)        ; request_runtime.translate_name(*a) end

@@ -28,7 +28,7 @@ module Skylab::Headless
       false                       # *very* conventional to result in false!
     end
 
-    def infer_valid_action_names_from_public_instance_methods
+    def infer_valid_action_names_from_public_instance_methods # [#017]
       a = [] ; _a = self.class.ancestors ; m = nil
       a << m if IGNORE_THIS_CONSTANT !~ m.to_s until ::Object == (m = _a.shift)
       a.map { |_m| _m.public_instance_methods false }.flatten

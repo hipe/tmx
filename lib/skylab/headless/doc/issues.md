@@ -1,3 +1,4 @@
+[#017] #open API architecture - is frontier app at odds with assumptions?
 [#016] #open #low-priority dynamic uncolorize payload stream when ! tty?
 [#015] #open rename *::IO::Pen -> *::Pen, rename IO::Adapter -> IO_Adapter
 [#014]       yacc2treetop

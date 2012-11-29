@@ -123,13 +123,12 @@ module Skylab::Flex2Treetop::MyTestSupport
     def api_client
       @api_client ||= begin
         o = Flex2Treetop::API::Client.new
-        o.request_runtime.io_adapter.info_stream = StreamSpy.standard
+        o.send(:io_adapter).info_stream = StreamSpy.standard
         o
       end
     end
     def info_stream_lines
-      api_client.request_runtime.io_adapter.
-        info_stream[:buffer].string.split("\n")
+      api_client.send(:io_adapter).info_stream[:buffer].string.split "\n"
     end
   end
 end

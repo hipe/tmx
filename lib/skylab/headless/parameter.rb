@@ -71,15 +71,13 @@ module Skylab::Headless
 
 
   module Parameter::Definer::InstanceMethods::HashAdapter
-  protected
     def known? k
       key? k
-    end
+    end                           # useless for reflection unless made public
   end
 
 
   module Parameter::Definer::InstanceMethods::StructAdapter
-  protected
     def known? k
       ! self[k].nil?              # caution meet wind
     end
