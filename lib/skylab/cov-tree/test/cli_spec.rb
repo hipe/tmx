@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-describe "#{ ::Skylab::CovTree }" do
+describe "#{ ::Skylab::CovTree } CLI" do
   extend ::Skylab::CovTree::TestSupport
 
   acts_rx = /\{tree\|rerun\}/

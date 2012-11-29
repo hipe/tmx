@@ -9,6 +9,10 @@ module Skylab::CovTree::TestSupport
 
   module CONSTANTS
     CovTree = ::Skylab::CovTree
+
+    pn = ::Skylab::TestSupport.dir_pathname.join '../cov-tree'
+    CovTree.define_singleton_method( :dir_pathname ) { pn }
+    # [#002] waiting for autoloader, after lockdown
   end
 
   module InstanceMethods
@@ -17,15 +21,22 @@ module Skylab::CovTree::TestSupport
     include CONSTANTS # access CovTree from within i.m's in the specs
 
     def args *args
+      debug? and debug "args : #{ args.inspect }"
       c = client
       @result = c.invoke args
+      debug? and debug "RESULT: #{ @result.inspect }"
       nil
     end
 
-    let :client do
+    def ___build_emit_spy!
       @types = []
       @emit_spy = es = ::Skylab::TestSupport::EmitSpy.new
-      es.debug = -> { self.debug }
+      es.debug = -> { self.debug? }
+      es
+    end
+
+    let :client do
+      es = ___build_emit_spy!
       CovTree::CLI.new do |rt|
         rt.invocation_slug = 'cov-tree' # this took me 20 minutes to figure out
         rt.on_all do |e|
@@ -34,7 +45,13 @@ module Skylab::CovTree::TestSupport
       end
     end
 
-    attr_accessor :debug
+    def debug msg
+      $stderr.puts msg
+    end
+
+    attr_accessor :do_debug
+    alias_method :debug?, :do_debug
+    alias_method :debug=, :do_debug=
 
     attr_reader :emit_spy
 
