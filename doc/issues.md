@@ -1,3 +1,5 @@
+[#122] #open #low-priority phase out ROOT_PATHNAME for Skylab.dir_pathname
+[#121]       #pattern of CLI.new, API.invoke as facades hehe inv. of [#109]
 [#120]       #tracking-tag backticks that could be robustified
 [#119] #open #tracking-tag #pattern of def.self some_thing instead of DSL
 [#118] #open unify find command in multiple places

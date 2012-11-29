@@ -6,15 +6,12 @@ module Skylab::Flex2Treetop::MyTestSupport
   Flex2Treetop = ::Skylab::Flex2Treetop
   StreamSpy = ::Skylab::TestSupport::StreamSpy
 
-  Flex2Treetop.respond_to?(:dir) or begin # for now, futureproofing
-    def Flex2Treetop.dir
-      @dir ||= ::Skylab::ROOT_PATHNAME.join('lib/skylab/css-convert')
-    end
-  end
+  # for posterity, we have to keep the below lines, which are mythically
+  # believed to be the origin of "Headless"
   module Headless end
   module Headless::ModuleMethods
     def fixture name
-      ::Skylab::ROOT_PATHNAME.join(Flex2Treetop::FIXTURES[name]).to_s
+      ::Skylab.dir_pathname.join( Flex2Treetop::FIXTURES.fetch( name ) ).to_s
     end
     _tmpdir_f = -> do
       t = ::Skylab::TestSupport::Tmpdir.new(
@@ -40,7 +37,8 @@ module Skylab::Flex2Treetop::MyTestSupport
     end
     def an_invite *a
       it "shows an invite line" do
-        err.last.should eql("use \e[1;32mxyzzy -h\e[0m for more help")
+        s = unstylize err.last
+        s.should eql('use xyzzy -h for help')
       end
     end
   end
@@ -58,32 +56,38 @@ module Skylab::Flex2Treetop::MyTestSupport
     end
   end
   module CLI::InstanceMethods
-    include ::Skylab::Headless::CLI::IO::Pen::InstanceMethods # unstylize
     include Headless::InstanceMethods
-    [:inspy, :outspy, :errspy].each do |sym|
+    [:inspy, :outspy, :errspy].each do |sym|  # so awful, away at [#005]
       ivar = "@#{sym}"
-      define_method(sym) do
-        instance_variable_defined?(ivar) ? instance_variable_get(ivar) :
-          instance_variable_set(ivar, StreamSpy.standard)
+      define_method sym do
+        if instance_variable_defined? ivar
+          instance_variable_get ivar
+        else
+          o = StreamSpy.standard
+          instance_variable_set ivar, o
+        end
       end
     end
     def cli_client
       @cli_client ||= begin
         o = Flex2Treetop::CLI.new
-        o.send(:program_name=, 'xyzzy')
+        o.send :program_name=, 'xyzzy'
         o
       end
     end
+    attr_accessor :do_debug
+    alias_method :debug=, :do_debug=
     def err
       frame[:err].call
     end
     def frame
       @frame ||= nil and return @frame
-      cli_client.request_runtime.io_adapter = io_adapter_spy
-      argv = self.argv # can be erased
-      result = cli_client.invoke(argv)
-      memoize = ->(lamb) do
-        memo = -> { v = lamb.call ; (memo = ->{ v }).call }
+      ioa = io_adapter_spy
+      do_debug and ioa.debug!
+      cli_client.send :io_adapter=, ioa
+      result = cli_client.invoke argv
+      memoize = -> lamb do
+        memo = -> {  v = lamb.call ; ( memo = ->{ v } ).call  }
         -> { memo.call }
       end
       @frame = {
@@ -92,10 +96,12 @@ module Skylab::Flex2Treetop::MyTestSupport
         result: result
       }
     end
-    def io_adapter_spy
+    def io_adapter_spy #  away at [#005]
       @spy ||= begin
-        o = cli_client.send(:build_io_adapter)
-        o.instream = inspy ; o.outstream = outspy ; o.errstream = errspy
+        o = cli_client.send :build_io_adapter
+        o.instream = inspy
+        o.outstream = outspy
+        o.errstream = errspy
         def o.debug!
           instream.debug! ; outstream.debug! ; errstream.debug!
           self
@@ -106,9 +112,8 @@ module Skylab::Flex2Treetop::MyTestSupport
     def out
       frame[:out].call
     end
-    alias_method :pen_unstylize, :unstylize
     def unstylize str
-      result = pen_unstylize(str)
+      result = ::Skylab::Headless::CLI::IO::Pen::FUN.unstylize[ str ] # full
       result.should_not be_nil
       result
     end

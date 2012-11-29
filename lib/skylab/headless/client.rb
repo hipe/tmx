@@ -43,6 +43,8 @@ module Skylab::Headless
       @io_adapter ||= build_io_adapter
     end
 
+    attr_writer :io_adapter       # e.g. from tests
+
     def pen                       # bound to sub-client (#sc-bound)
       io_adapter.pen
     end

@@ -1,10 +1,19 @@
-$:.include?(o = File.expand_path('..', __FILE__)) or $:.unshift(o)
+module Skylab                     # welcome :D
 
-require 'pathname'
+  require 'pathname'              # the only stdlib subproducts get for free
 
-module Skylab
-  ROOT_PATHNAME = ::Pathname.new('../..').expand_path(__FILE__)
-  TMPDIR_PATHNAME = ROOT_PATHNAME.join 'tmp'
+  here = ::Pathname.new( __FILE__ ).expand_path
+
+  $:.include?( o = here.join('..').to_s ) or $:.unshift o # add to include path
+
+  dir_pathname = here.sub_ext ''  # chop of extension and ..
+
+  define_singleton_method( :dir_pathname ) { dir_pathname } # preferred way
+
+  ROOT_PATHNAME = dir_pathname.join '../..' # #away at [#122]
+
+  TMPDIR_PATHNAME = ROOT_PATHNAME.join 'tmp' # centralized here for testing
+
 end
 
 
