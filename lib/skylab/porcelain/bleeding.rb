@@ -1,10 +1,13 @@
-require_relative '..'
 require_relative 'core'
 require 'skylab/pub-sub/emitter'
 require 'optparse'
 
 module Skylab::Porcelain::Bleeding
   extend ::Skylab::Autoloader
+
+  MetaHell = ::Skylab::MetaHell
+  PubSub = ::Skylab::PubSub
+
   module Styles
     include ::Skylab::Porcelain::En::Methods
     include ::Skylab::Porcelain::TiteColor::Methods
@@ -40,15 +43,41 @@ module Skylab::Porcelain::Bleeding
       true
     end
   end
+
+
+  module Action
+    def self.extended klass # #pattern [#sl-111]
+      klass.extend Action::ModuleMethods
+      klass.send :include, ActionKlassInstanceMethods
+    end
+  end
+
+#  amusing #eye-blood :
+#    @argument_syntax ||= if reflector.respond_to?(:argument_syntax) then reflector.argument_syntax.dupe
+#                         else ArgumentSyntax.new(->{ reflector.instance_method(:invoke).parameters }, ->{ option_syntax.any? }) end
+
   module ActionInstanceMethods
+
     include MetaInstanceMethods, Styles
+
     def argument_syntax
-      @argument_syntax ||= if reflector.respond_to?(:argument_syntax) then reflector.argument_syntax.dupe
-                           else ArgumentSyntax.new(->{ reflector.instance_method(:invoke).parameters }, ->{ option_syntax.any? }) end
+      @argument_syntax ||= begin
+        if reflector.respond_to? :argument_syntax
+          o = reflector.argument_syntax.dupe
+        else
+          o = ArgumentSyntax.new(
+            ->{ reflector.unbound_invocation_method.parameters },
+            ->{ option_syntax.any? }
+          )
+        end
+        o
+      end
     end
+
     def bound_invocation_method
-      method(:invoke)
+      method :invoke
     end
+
     def emit *a
       if ! parent
         fail "sanity - where is parent in this #{self.class}:\n#{self.inspect}"
@@ -91,32 +120,45 @@ module Skylab::Porcelain::Bleeding
     def program_name
       "#{ parent.program_name } #{ aliases.first}"
     end
+
     def resolve argv # mutates argv
-      args = [] # the arguments that are actually passed to the method call
-      ok = option_syntax.parse!(argv, args, self)
-      if ok
-        meth = argument_syntax.parse!(argv, args, self)
-        if meth
-          [meth, args]
-        else
-          help
-        end
-      else
-        false == ok ? help : nil
+      r = nil
+      begin
+        args = [] # the arguments that are actually passed to the method call
+        r = option_syntax.parse( argv, args,
+          ->   { help full: true       ; nil   }, # nil = no more help
+          -> e { emit :syntax_error, e ; false }  # false = yes more help
+        )
+        r or break
+        r = argument_syntax.parse( argv, args,
+          -> msg, * { emit :syntax_error, msg ; false }
+        )
+        r or break
+        r = [ bound_invocation_method, args ]
+      end while nil
+      if false == r
+        r = help
       end
+      r
     end
   end
+
+
   module ActionKlassInstanceMethods
     include ActionInstanceMethods
     alias_method :builder, :_klass
   end
-  module ActionModuleMethods
+
+
+  module Action::ModuleMethods
     include MetaMethods
-    def self.extended klass
-      klass.send(:include, ActionKlassInstanceMethods)
-    end
     def argument_syntax
-      @argument_syntax ||= ArgumentSyntax.new(->{ instance_method(:invoke).parameters }, ->{ option_syntax.any? })
+      @argument_syntax ||= begin
+        o = ArgumentSyntax.new(
+          ->{ unbound_invocation_method.parameters },
+          ->{ option_syntax.any? } )
+        o
+      end
     end
     def build parent
       o = new
@@ -156,8 +198,11 @@ module Skylab::Porcelain::Bleeding
       end))
       block or summary
     end
+    def unbound_invocation_method
+      instance_method :invoke
+    end
   end
-  ON_FIND = ::Skylab::PubSub::Emitter.new(:error, ambiguous: :error, not_found: :error, not_provided: :error)
+  ON_FIND = PubSub::Emitter.new(:error, ambiguous: :error, not_found: :error, not_provided: :error)
   module NamespaceInstanceMethods
     include ActionInstanceMethods
     def fetch token, &not_found
@@ -214,7 +259,7 @@ module Skylab::Porcelain::Bleeding
     end
   end
   module NamespaceModuleMethods
-    include ActionModuleMethods
+    include Action::ModuleMethods
     def build parent
       NamespaceInferred.new(self).build(parent)
     end
@@ -252,56 +297,99 @@ module Skylab::Porcelain::Bleeding
       end
     end
   end
-  class ArgumentSyntax < Struct.new(:parameters_block, :takes_options_block)
-    def [] idx
-      string.split(' ')[idx] or "<arg#{idx + 1}>"  # @hack
+
+
+  class ArgumentSyntax < ::Struct.new :params, :takes_options
+    extend MetaHell::Let # we freeze and memoize
+
+    parameter_string = -> o do
+      pre, post = case o.type
+      when :req  ;
+      when :opt  ; ['[', ']']
+      when :rest ; ['[', '[..]]']
+      else       ; fail "sanity - unhandled param type - #{ o.type }"
+      end
+      "#{ pre }<#{ o.name }>#{ post }"
     end
-    def define! s
-      @string = s
+
+    struct = ::Struct.new :type, :name
+
+    define_method :[] do |idx|
+      o = parameters.fetch( idx ) { struct[ :req, "arg#{ idx + 1 }" ] }
+      parameter_string[ o ]
     end
+
+                                  # atomicly prepend all or none of the elements
+                                  # from argv to args, mutating both, iff argv's
+                                  # length is syntacticly valid pursuant to the
+                                  # syntax. result is true on parsing success,
+                                  # else the result of a call to the appropriate
+                                  # callback, which gets passed two arguments:
+                                  # a message string and the relevant metadata.
+
+    def parse argv, args, missing, unexpected=missing
+      counts = parameters.reduce( ::Hash.new { |h, k| h[k] = 0 } ) do |m, p|
+        m[p.type] += 1            # what are the counts of each type of
+        m                         # parameter (:req, :opt, :rest) ?
+      end
+      min_arity = counts[:req]    # the min you can have is the # of req args
+      max_arity = counts.values.reduce(:+) if counts[:rest].zero? # idem
+      r = nil
+      begin
+        if argv.length < min_arity
+          o = parameters.select{ |p| :req == p.type }[ argv.length ]
+          r = missing[ "missing argument: #{ o.name }", o.name ]
+          break
+        end
+        if max_arity and argv.length > max_arity
+          val = argv[max_arity]
+          r = unexpected[ "unexpected argument: #{ val }", val ]
+          break
+        end
+        args[0, 0] = argv # splice its contents into the beginning and
+        argv.clear        # make it empty
+        r = true
+      end while nil
+      r
+    end
+
+    define_method :string do
+      parameters.map { |o| parameter_string[ o ] }.join ' '
+    end
+
+  protected
+
+    def initialize *a
+      @__memoized = { } # ick, before the freeze
+      super
+      freeze
+    end
+
     alias_method :dupe, :dup # careful!
-    def parameters ; parameters_block.call end
-    def parse! argv, args, runtime # @duck bound_invocation_method, emit
-      meth = runtime.bound_invocation_method
-      parameters = takes_options? ? meth.parameters[0..-2] : meth.parameters
-      count = Hash.new { |h, k| h[k] = 0 }
-      parameters.each { |p| count[p.first] += 1 }
-      error = ->(msg) { runtime.emit(:syntax_error, msg) ; false }
-      requireds = ->(i) { parameters.select{ |p| :req == p.first }[i].last }
-      min_arity = count[:req]
-      max_arity = count.values.reduce(:+) if count[:rest].zero?
-      argv.size < min_arity and return error["missing argument: #{requireds[argv.size]}"]
-      argv.size > max_arity and return error["unexpected argument: #{argv[max_arity]}"] if max_arity
-      args[0, 0] = argv
-      argv.clear
-      meth
+
+    let :parameters do # maybe public one day
+      a = params.call
+      takes_options.call and a.pop
+      b = a.map { |o| struct[ * o ] }
+      b
     end
-    def string
-      (@string ||= nil) and return @string
-      parameters[0..(takes_options? ? -2 : -1)].map do |p|
-        a, b = case p.first
-               when :req  ;
-               when :opt  ; %w([ ])
-               when :rest ; %w([ [..]])
-               else       ; fail("not expecting this token: #{p.first.inspect}")
-               end
-        "#{a}<#{p.last}>#{b}"
-      end.join(' ')
-    end
-    def takes_options?
-      takes_options_block.call
-    end
+
   end
-  class OptionSyntax < Struct.new(:definitions, :documentor_class, :parser_class, :help_enabled)
+
+
+
+  class OptionSyntax < ::Struct.new :definitions, :documentor_class,
+    :parser_class, :do_help
+
     include Styles
     def self.build
-      new([], ::OptionParser, ::OptionParser)
+      new [], ::OptionParser, ::OptionParser
     end
     def any?
       definitions.any?
     end
     def build
-      self.class.new(definitions.dup, documentor_class, parser_class, help_enabled)
+      self.class.new definitions.dup, documentor_class, parser_class, do_help
     end
     def on_definition_added
       @on_definition_added ||= {}
@@ -316,6 +404,9 @@ module Skylab::Porcelain::Bleeding
     def help e
       one_big_string = documentor.help { |line| e.emit(:help, line) } and e.emit(:help, one_big_string)
     end
+    def help!
+      self[:do_help] = true
+    end
     def init_documentor doc
       on_definition_added[:documentor] ||= ->() { @documentor = nil ; $stderr.puts("NEATO!") }
       doc.banner = "#{hdr 'options:'}"
@@ -325,32 +416,64 @@ module Skylab::Porcelain::Bleeding
       @documentor = nil
       super(*a)
     end
-    def parse! argv, args, runtime # @duck help, emit
-      definitions.any? or help_enabled or return true
-      args.push(req = {}) if definitions.any?
-      ret = true
+
+
+    def parse argv, args, help, syntax_error # result is true or result
+      r = nil                     # of one of the callbacks `help`, or `se`
       begin
-        parser_class.new do |o|
-          o.on('-h', '--help') do
-            runtime.help(full: true)
-            ret = nil
-          end
-          definitions.each { |d| o.instance_exec(req, &d) }
-        end.parse!(argv)
-      rescue OptionParser::ParseError => e
-        runtime.emit :optparse_parse_error, e
-        ret and ret = false # if ret was already nil, no need to display help again
-      end
-      ret
-    end
+        if definitions.empty?
+          if ! do_help
+            r = true              # parsing with the empty option syntax
+            break                 # (and no help) is a no-op, always success.
+          end                     # (and note it leaves and '-h' in argv!)
+        else
+          opts_h = { }            # your one and only options hash for this
+          args.push opts_h        # request. note we make it (and append to
+        end                       # args) IFF there is one or more defn blocks.
+        o = parser_class.new
+        o.on '-h', '--help' do    # with or w/o defn blocks we might do this
+          r = help.call           # (simply call the callback, caller decides
+        end                       # how to handle this.)
+        definitions.each do |f|
+          o.instance_exec opts_h, &f # run each definition block passing
+        end                       # the same opts hash into its scope.
+
+        r = true                  # do this before below so above help.call
+                                  # can change the value (typically it is set
+        begin                     # set to nil to indicate no more processing)
+          o.parse! argv           # mutate argv, opts_h gets results (e.g.)
+        rescue ::OptionParser::ParseError => e
+          r = syntax_error[ e ]   # let caller decide both
+                                  # how to handle this and what the result
+        end                       # should be.
+      end while nil
+      r                           # note that this should always be true
+    end                           # or the result of a er[] call
+
+
+
+    # the below is jawbreak blood . this will all go away soon like a bad dream
     def string
-      definitions.empty? and return nil
-      documentor.instance_variable_get('@stack')[2].instance_variable_get('@list'). # less hacky is out of scope
-        map { |s| "[#{s.short.first or s.long.first}#{s.arg}]" if s.respond_to?(:short) }.compact.join(' ')
+      result = nil
+      if ! definitions.empty?
+        x = documentor.instance_variable_get('@stack')[2].instance_variable_get('@list') # less hacky is out of scope
+        a = x.map do |s|
+          if s.respond_to? :short
+            "[#{ s.short.first or s.long.first }#{ s.arg }]"
+          end
+        end
+        a.compact!
+        if ! a.empty?
+          result = a.join ' '
+        end
+      end
+      result
     end
   end
+
+
   class Runtime
-    extend ActionModuleMethods
+    extend Action
     include NamespaceInstanceMethods
     def actions
       Actions[ Constants[self.class::Actions], Officious.actions ]
@@ -382,13 +505,16 @@ module Skylab::Porcelain::Bleeding
       set! reflector
     end
     def syntax # tricky: we are using this class IFF we don't have options
-      ArgumentSyntax.new(->{ @reflector.instance_method(:invoke).parameters }, -> { false }).string
+      ArgumentSyntax.new(
+        -> { @reflector.unbound_invocation_method.parameters },
+        -> { false }
+      ).string
     end
   end
   class RuntimeInferred < DocumentorInferred
     def initialize parent, built, builder
       super(parent, builder)
-      @bound_invocation_method = built.method(:invoke)
+      @bound_invocation_method = built.method :invoke
     end
     attr_reader :bound_invocation_method
   end
@@ -414,7 +540,7 @@ module Skylab::Porcelain::Bleeding
     end
   end
   class Officious::Help
-    extend ActionModuleMethods
+    extend Action
     def self.action_meta
       new # use an instance as the action meta, don't defer to MetaInferred
     end
@@ -432,7 +558,11 @@ module Skylab::Porcelain::Bleeding
       result = nil
       begin
         if token
-          b = parent.fetch_builder(token){ |e| result = emit :error, e.message }
+          b = parent.fetch_builder token do |e|
+            emit :error, e.message # result *is* undefined
+            result = false
+            nil # set b!
+          end
           b or break
           o = if b.respond_to? :build
             b.build parent
@@ -450,7 +580,7 @@ module Skylab::Porcelain::Bleeding
         end
       end while nil
       result
-#     which do you prefer, above or below? #bleeding-eyes
+#     which do you prefer, above or below? #eye-blood
 #     token or return @parent.help(full: true)
 #     o = (b = @parent.fetch_builder(token) { |e| return emit(:error, e.message) }).respond_to?(:build) ? b.build(@parent) : b.new
 #     (o.respond_to?(:help) ? o : DocumentorInferred.new(@parent, b)).help(full: true) # 'o' gets thrown away sometimes

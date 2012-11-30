@@ -6,7 +6,7 @@ module Skylab::Porcelain::TestSupport::Bleeding # #po-008
     incrementing_anchor_module!
 
     klass :Alpha do
-      extend Bleeding::ActionModuleMethods
+      extend Bleeding::Action
     end
 
     klass :Bravo, extends: :Alpha do
@@ -30,7 +30,7 @@ module Skylab::Porcelain::TestSupport::Bleeding # #po-008
 
     context "If Alpha changes its option_syntax_class" do
       klass :Alpha do
-        extend Bleeding::ActionModuleMethods
+        extend Bleeding::Action
         option_syntax_class :shenanigans
       end
       assert :Alpha, :shenanigans
@@ -40,7 +40,7 @@ module Skylab::Porcelain::TestSupport::Bleeding # #po-008
 
     context "If Beta changes its option_syntax_class" do
       klass :Bravo do
-        extend Bleeding::ActionModuleMethods
+        extend Bleeding::Action
         option_syntax_class :foonanie
       end
       assert :Alpha, Bleeding::OptionSyntax

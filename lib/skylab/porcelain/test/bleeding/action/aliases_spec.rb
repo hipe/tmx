@@ -1,7 +1,7 @@
 require_relative 'test-support'
 
 module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
-  describe "This is the deal with aliases with #{Bleeding::ActionModuleMethods
+  describe "This is the deal with aliases with #{ Bleeding::Action
     } (NOT an inheritable attribute)" do
 
     extend Action_TestSupport
@@ -10,7 +10,7 @@ module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
 
 
     klass :BaseAction do
-      extend Bleeding::ActionModuleMethods
+      extend Bleeding::Action
     end
 
     klass :Acts__ChildAction1, extends: :BaseAction

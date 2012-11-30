@@ -1,5 +1,4 @@
-require_relative '../../skylab'
-
+require_relative '..'
 require 'skylab/meta-hell/core'
 
 module Skylab
