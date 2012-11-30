@@ -1,6 +1,6 @@
 module Skylab::Treemap
   class CLI::DynamicOptionDocumentor < ::OptionParser
-    extend DelegatesTo
+    extend ::Skylab::MetaHell::DelegatesTo # #while [#003]
 
     attr_accessor :cli
 

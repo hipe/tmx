@@ -17,7 +17,7 @@ module Skylab::Treemap
     extend Skylab::PubSub::Emitter
     extend Skylab::Porcelain::Attribute::Definer
     extend Skylab::Porcelain::En::ApiActionInflectionHack
-    extend Skylab::Porcelain::Bleeding::DelegatesTo
+    extend ::Skylab::MetaHell::DelegatesTo # sic #while [#003]
 
     inflection.stems.noun = 'treemap'
 

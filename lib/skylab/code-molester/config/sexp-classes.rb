@@ -2,7 +2,7 @@ require 'skylab/porcelain/bleeding' # just for delegates_to - ick?
 module Skylab::CodeMolester::Config
   Bleeding = Skylab::Porcelain::Bleeding # do this only in one place
   class Sexp < ::Skylab::CodeMolester::Sexp
-    extend Bleeding::DelegatesTo
+    extend MetaHell::DelegatesTo
     def build_comment_line line
       line = "# #{line.gsub(/[[:space:]#]+/, ' ').strip}\n" # could be improved
       S[:whitespace_line, '', S[:comment, line]]
@@ -36,7 +36,7 @@ module Skylab::CodeMolester::Config
     attr_accessor :root
   end
   class SectionsPseudohash < ValuesPseudohash
-    extend Bleeding::DelegatesTo
+    extend MetaHell::DelegatesTo
     def [] key
       detect { |i| key == i.item_name }
     end

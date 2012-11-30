@@ -6,4 +6,5 @@ module Skylab::CodeMolester
   extend ::Skylab::Autoloader
 
   En = ::Skylab::Porcelain::En
+  MetaHell = ::Skylab::MetaHell
 end

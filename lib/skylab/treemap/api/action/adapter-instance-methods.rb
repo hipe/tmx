@@ -1,7 +1,7 @@
 module Skylab::Treemap
 
   module API::Action::AdapterInstanceMethods
-    extend Skylab::Porcelain::Bleeding::DelegatesTo
+    extend ::Skylab::MetaHell::DelegatesTo # #while [#003]
 
     FailureWiring = Skylab::PubSub::Emitter.new(:failure)
 
