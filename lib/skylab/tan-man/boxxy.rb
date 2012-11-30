@@ -26,13 +26,19 @@ module Skylab::TanMan
     end
   end
 
+
   class Boxxy::InvalidNameError < Boxxy::NameError
+    def initialize msg, name
+      super message: msg, invalid_name: name
+    end
     attr_accessor :invalid_name
   end
+
 
   class Boxxy::NameNotFoundError < Boxxy::NameError
     attr_accessor :const, :module, :name, :seen
   end
+
 
   module Boxxy::ModuleMethods
     # (note that while presently this is coupled tightly with ::Module,
@@ -45,37 +51,45 @@ module Skylab::TanMan
       _autoloader_init! caller_str
     end
 
-    def const_fetch path_a, name_error=nil, invalid_name_error=nil, &both
-      both and name_error || invalid_name_error and
-        raise ::ArgumentError.exception("can't have both block and lambda args")
-      invalid_name = -> name do
-        invalid_name_error ||= name_error || both || ->( e ) { raise e }
-        invalid_name_error[ Boxxy::InvalidNameError.exception(
-          message: "wrong constant name #{ name }",
-          invalid_name: name
-        ) ]
-      end
-      path_a = [path_a] unless ::Array === path_a
-      seen = []
-      path_a.reduce self do |box, mixed_name|
-        valid_name_rx =~ mixed_name.to_s or return invalid_name[ mixed_name ]
-        const = Inflection::FUN.constantize[ mixed_name ].intern
-        /\A[A-Z][_a-zA-Z0-9]*\z/ =~ const.to_s or return invalid_name[ const ]
-        if ! box.autoloader_original_const_defined?(const, false) and
-           ! box.const_probably_loadable? const
-        then
-          name_error ||= both || ->( e ) { raise e }
-          return name_error[ Boxxy::NameNotFoundError.exception(
-            message: "unitialized constant #{ box }::#{ const }",
-            const: const,
-            module: box,
-            name: mixed_name,
-            seen: seen
-          ) ]
+    invalid_ = -> name, f do
+      f ||= -> e { raise e }
+      o = Boxxy::InvalidNameError.new "wrong constant name #{ name }", name
+      f[ o ]
+    end
+
+    define_method :const_fetch do |path_a, not_found=nil, invalid=not_found, &b|
+      b && not_found and raise ::ArgumentError.new "can't have block + lambdas"
+      result = nil ; ::Array === path_a or path_a = [path_a]
+      begin
+        seen = [ ]
+        r = path_a.reduce self do |box, name|
+          if valid_name_rx !~ name.to_s
+            result = invalid_[ name, (invalid || b) ]
+            break
+          end
+          const = Inflection::FUN.constantize[ name ].intern
+          if /\A[A-Z][_a-zA-Z0-9]*\z/ !~ const.to_s # above is fallible
+            result = invalid_[ const, (invalid || b) ]
+            break
+          end
+          if box.autoloader_original_const_defined? const, false or
+             box.const_probably_loadable? const
+          then
+            seen.push name
+            box.case_insensitive_const_get const
+          else
+            f = not_found || b || -> e { raise e }
+            o = Boxxy::NameNotFoundError.exception(
+              message: "unitialized constant #{ box }::#{ const }",
+              const: const, module: box, name: name, seen: seen
+            )
+            result = f[ o ]
+            break
+          end
         end
-        seen.push mixed_name
-        box.case_insensitive_const_get const
-      end
+        r and result = r
+      end while false
+      result
     end
 
     def const_fetch_all *a, &b

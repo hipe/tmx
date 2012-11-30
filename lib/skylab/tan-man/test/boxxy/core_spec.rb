@@ -86,7 +86,7 @@ module Skylab::MetaHell::TestSupport::Boxxy
           -> do
             _Boxxy__Zeep.const_fetch('a', ->{ }) {  }
           end.should raise_exception( ::ArgumentError,
-                                     "can't have both block and lambda args" )
+                                     "can't have block + lambdas" )
         end
       end
     end
