@@ -21,8 +21,10 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime # #po-008
             new.build!(rt)
           end
           def build! rt
-            @parent = rt ; self
+            self.parent = rt
+            self
           end
+          attr_accessor :parent
         end
         module rt::Actions
         end
@@ -95,11 +97,13 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime # #po-008
             new.build! rt
           end
           def build! rt
-            @parent = rt ; self
+            self.parent = rt
+            self
           end
-          def emit(*a)
-            @parent.emit(*a)
+          def emit *a
+            parent.emit(*a)
           end
+          attr_accessor :parent
         end
         module o::Actions
         end

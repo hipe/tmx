@@ -36,12 +36,12 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime
     include CONSTANTS
 
     def emit k, v
-      @parent.emit Event_Simplified.new(k, unstylize(v))
+      parent.emit Event_Simplified.new(k, unstylize(v))
     end
 
     def initialize rt=nil
+      self.parent = rt
       @program_name = 'DORP'
-      @parent = rt
     end
   end
 

@@ -50,10 +50,10 @@ module Skylab::Porcelain::Bleeding
       method(:invoke)
     end
     def emit *a
-      if ! @parent
-        fail("WHERE IS PARENT IN THIS #{self.class}:\n#{self.inspect}") # @todo
+      if ! parent
+        fail "sanity - where is parent in this #{self.class}:\n#{self.inspect}"
       end
-      @parent.emit(*a)
+      parent.emit(*a)
     end
     def help o={}
       emit(:help, o[:message]) if o[:message]
@@ -75,10 +75,10 @@ module Skylab::Porcelain::Bleeding
       emit(:help, "try #{pre "#{program_name} -h"}#{o[:for] || ' for help'}") unless o[:full]
     end
     def help_list
-      option_syntax.any? and option_syntax.help(@parent)
+      option_syntax.any? and option_syntax.help parent
     end
     def help_usage o
-      emit :help, "#{hdr 'usage:'} #{program_name} #{syntax}".strip
+      emit :help, "#{ hdr 'usage:' } #{ program_name } #{ syntax }".strip
     end
     def option_syntax
       @option_syntax ||= option_syntax_class.build
@@ -89,7 +89,7 @@ module Skylab::Porcelain::Bleeding
     attr_accessor :parent
     def parameters ; argument_syntax.parameters end # @delegates_to
     def program_name
-      "#{@parent.program_name} #{aliases.first}"
+      "#{ parent.program_name } #{ aliases.first}"
     end
     def resolve argv # mutates argv
       args = [] # the arguments that are actually passed to the method call
@@ -377,8 +377,9 @@ module Skylab::Porcelain::Bleeding
   class DocumentorInferred < MetaInferred
     include ActionInstanceMethods
     def initialize parent, reflector
-      (@parent = parent).respond_to?(:emit) or fail("emitter?") # @todo might rename all of these to "runtime"
-      set!(reflector)
+      parent.respond_to? :emit or fail "sanity - is parent not an emitter?"
+      self.parent = parent
+      set! reflector
     end
     def syntax # tricky: we are using this class IFF we don't have options
       ArgumentSyntax.new(->{ @reflector.instance_method(:invoke).parameters }, -> { false }).string
@@ -397,7 +398,8 @@ module Skylab::Porcelain::Bleeding
       Actions[ Constants[@modul_with_actions], Officious.actions ]
     end
     def build parent
-      @parent = parent ; self
+      self.parent = parent
+      self
     end
     def initialize modul_with_actions
       @modul_with_actions = modul_with_actions
@@ -423,12 +425,35 @@ module Skylab::Porcelain::Bleeding
       self # not a class
     end
     def build rt
-      @parent = rt ; self # assuming singleton, be careful
+      self.parent = rt   # assuming singleton, be careful
+      self
     end
     def invoke token=nil
-      token or return @parent.help(full: true)
-      o = (b = @parent.fetch_builder(token) { |e| return emit(:error, e.message) }).respond_to?(:build) ? b.build(@parent) : b.new
-      (o.respond_to?(:help) ? o : DocumentorInferred.new(@parent, b)).help(full: true) # 'o' gets thrown away sometimes
+      result = nil
+      begin
+        if token
+          b = parent.fetch_builder(token){ |e| result = emit :error, e.message }
+          b or break
+          o = if b.respond_to? :build
+            b.build parent
+          else
+            b.new
+          end
+          d = if o.respond_to? :help
+            o
+          else
+            DocumentorInferred.new parent, b
+          end
+          d.help full: true # `o` gets thrown away sometimes
+        else
+          parent.help full: true
+        end
+      end while nil
+      result
+#     which do you prefer, above or below? #bleeding-eyes
+#     token or return @parent.help(full: true)
+#     o = (b = @parent.fetch_builder(token) { |e| return emit(:error, e.message) }).respond_to?(:build) ? b.build(@parent) : b.new
+#     (o.respond_to?(:help) ? o : DocumentorInferred.new(@parent, b)).help(full: true) # 'o' gets thrown away sometimes
     end
     def visible?
       false
