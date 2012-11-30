@@ -1,15 +1,12 @@
-require File.expand_path('../../face/path-tools', __FILE__)
 require 'strscan'
 
-module Skylab; end
-
-module Skylab::CodeMolester
+module ::Skylab::CodeMolester
   class SshConfig
     def initialize path
       @path = path
       @valid = @data = @invalid_reason = nil
       if File.exist?(@path)
-        @data = _parse(File.read(@path)) and @valid = true
+        @data = _parse(::File.read(@path)) and @valid = true
       end
     end
     attr_reader :path
@@ -21,14 +18,14 @@ module Skylab::CodeMolester
       @data
     end
     def exists?
-      File.exist?(@path)
+      ::File.exist? @path
     end
     def pretty_path
-      Skylab::Face::PathTools.pretty_path(@path)
+      Face::PathTools.pretty_path @path
     end
     def _parse string
       hosts = []
-      scn = StringScanner.new(string)
+      scn = ::StringScanner.new(string)
       scn.skip(/[[:space:]]+/)
       loop do
       ok = scn.scan(/Host  */) or return _fail("expected: \"Host\" had: #{scn.peek(20).inspect}")

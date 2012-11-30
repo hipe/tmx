@@ -1,15 +1,15 @@
-require 'skylab/porcelain/bleeding' # just for delegates_to - ick?
 module Skylab::CodeMolester::Config
-  Bleeding = Skylab::Porcelain::Bleeding # do this only in one place
-  class Sexp < ::Skylab::CodeMolester::Sexp
-    extend MetaHell::DelegatesTo
-    def build_comment_line line
-      line = "# #{line.gsub(/[[:space:]#]+/, ' ').strip}\n" # could be improved
-      S[:whitespace_line, '', S[:comment, line]]
-    end
-  end
-  S = Sexp
-  class ValuesPseudohash < ::Enumerator
+
+  MetaHell = ::Skylab::MetaHell
+                                  # if you somehow got here without sexp
+  S = self::Sexp                  # load it here and now / shorten it
+                                  # we especially need it for registering
+
+  module Sexps                    # isn't it nice to see a plain old module
+  end                             # so docile
+
+
+  class Sexps::ValuesPseudohash < ::Enumerator
     def [] key
       d = detect { |o| key == o.key } or return nil
       d.value
@@ -35,24 +35,28 @@ module Skylab::CodeMolester::Config
     end
     attr_accessor :root
   end
-  class SectionsPseudohash < ValuesPseudohash
+
+
+  class Sexps::SectionsPseudohash < Sexps::ValuesPseudohash
     extend MetaHell::DelegatesTo
     def [] key
       detect { |i| key == i.item_name }
     end
     def []= key, value
       Hash === value or raise ArgumentError.new("Every assignment to an entire section must be a Hash, had #{value.class}")
-      sec = self[key] || Section.create(key, root)
+      sec = self[key] || Sexps::Section.create(key, root)
       value.each { |k, v| sec[k] = v }
       value
     end
     delegates_to :root, :remove
   end
-  class ContentItemBranch < Sexp
+
+
+  class Sexps::ContentItemBranch < Sexp
     # note that for now this is hard-coded to assume string and not symbol keys!
     # (the test below cannot simply test for Fixnum-based key b/c it also must take ranges)
     def [] *a
-      1 == a.count && String === a.first or return super
+      1 == a.count && ::String === a.first or return super
       name = a.first
       if ( i = content_items.detect { |ii| name == ii.item_name } )
         if i.item_leaf?
@@ -65,7 +69,7 @@ module Skylab::CodeMolester::Config
       end
     end
     def []= *a
-      2 == a.count and String === a.first or return super
+      2 == a.count and ::String === a.first or return super
       set_value(*a)
       a.last
     end
@@ -78,7 +82,7 @@ module Skylab::CodeMolester::Config
     def _no_value name
     end
     def set_value name, value
-      if Hash === value
+      if ::Hash === value
         sections[name] = value
       elsif item = content_items.detect { |i| name == i.item_name }
         _update_value item, value
@@ -87,12 +91,15 @@ module Skylab::CodeMolester::Config
       end
     end
     def value_items
-      ValuesPseudohash.new(self) do |y|
+      Sexps::ValuesPseudohash.new(self) do |y|
         _assignments_sexp.select(:assignment_line).each { |a| y << a }
       end
     end
   end
-  class FileSexp < ContentItemBranch
+
+
+
+  class Sexps::FileSexp < Sexps::ContentItemBranch
     Sexp[:file] = self
     delegates_to :nosecs, :prepend_comment
     # delegates_to :sections, :append_comment # e.g.
@@ -111,11 +118,11 @@ module Skylab::CodeMolester::Config
       # we could try try dynamically add the node if necessary, but it
       # is less hacky to just assume it is there.  "Should" be there for all such valid trees.
       sec = detect(:nosecs) or fail("Invalid file sexp: child not found: nosecs")
-      AssignmentLine.create(name, value, sec)
+      Sexps::AssignmentLine.create name, value, sec
       nil
     end
     def nosecs
-      detect(:nosecs)
+      detect :nosecs
     end
     def sections
       detect(:sections).enumerator
@@ -124,10 +131,12 @@ module Skylab::CodeMolester::Config
       assmt.set_item_value value
     end
   end
-  class Nosecs < ContentItemBranch
+
+
+  class Sexps::Nosecs < Sexps::ContentItemBranch
     Sexp[:nosecs] = self
     def content_items
-      select(:assignment_line)
+      select :assignment_line
     end
     def prepend_comment line
       o = build_comment_line(line) or return false
@@ -135,24 +144,30 @@ module Skylab::CodeMolester::Config
       o
     end
   end
-  class Sections < Sexp
+
+
+
+  class Sexps::Sections < Sexp
     Sexp[:sections] = self
     def enumerator
-      SectionsPseudohash.new(self) do |y|
+      Sexps::SectionsPseudohash.new self do |y|
         select(:section).each { |s| y << s }
       end
     end
     alias_method :content_items, :enumerator
   end
-  class Section < ContentItemBranch
+
+
+
+  class Sexps::Section < Sexps::ContentItemBranch
     Sexp[:section] = self
     def content_items
-      self[2].select(:assignment_line)
+      self[2].select :assignment_line
     end
     def _create_value name, value
       # see comment at other implementation of this method
       items = detect(:items) or fail("Invalid section sexp: child not found: items")
-      AssignmentLine.create(name, value, items)
+      Sexps::AssignmentLine.create(name, value, items)
     end
     def item_leaf?
       false
@@ -169,7 +184,10 @@ module Skylab::CodeMolester::Config
       assmt.set_item_value value
     end
   end
-  class << Section
+
+
+
+  class << Sexps::Section
     def create name, parent
       if tmpl = parent.last(:section)
         sl = tmpl.detect(:header).detect(:section_line)
@@ -186,7 +204,10 @@ module Skylab::CodeMolester::Config
       sect
     end
   end
-  class AssignmentLine < Sexp
+
+
+
+  class Sexps::AssignmentLine < Sexp
     Sexp[:assignment_line] = self
     NAME = 2
     VALUE = 4
@@ -207,7 +228,10 @@ module Skylab::CodeMolester::Config
       self[VALUE][1] = value.to_s
     end
   end
-  class << AssignmentLine
+
+
+
+  class << Sexps::AssignmentLine
     def create name, value, parent
       # use the whitespace formatting of the previous item if you can
       if tmpl = parent.select(:assignment_line).last
@@ -225,9 +249,11 @@ module Skylab::CodeMolester::Config
     end
     attr_accessor :default_indent
   end
-  class Comment < Sexp
+
+
+
+  class Sexps::Comment < Sexp
     Sexp[:comment] = self
     # node_reader :body
   end
 end
-

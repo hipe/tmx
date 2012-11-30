@@ -1,4 +1,3 @@
-require_relative 'core'
 require 'stringio'
 require 'strscan'
 
@@ -6,7 +5,7 @@ require 'strscan'
 # but ended up not really adding anything to it.
 #
 
-module Skylab::CodeMolester
+module ::Skylab::CodeMolester
 
   class ParseFailurePorcelain # @api private
     include En::Methods
@@ -66,4 +65,3 @@ module Skylab::CodeMolester
     end
   end
 end
-
