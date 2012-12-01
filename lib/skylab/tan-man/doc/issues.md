@@ -1,19 +1,24 @@
+[#046]       #trend away from Parameter::Definer and towards lamba args
+[#045] #open param definer up
+[#044] #open #branch-down cli tests
+[#043]       #tracking-tag other guys that could benefit from svc
+[#042] #open FileUtils as a service
 [#041] #open i don't like how status is implemented with the arrays
-[#040] #open make your own SubClient::InstanceMethods to DRY CLI & API
-[#039] #open API::Whatever becomes MetaHell::Generic
+[#040]       #done make your own SubClient::InstanceMethods to DRY CLI & API
+[#039]       #done API::Whatever becomes MetaHell::Generic
 [#038] #open text_styler away!
 [#037]       reconceive stdout, stderr -> infostream, paystream, errstream
   .. (i.e. ("PIE" [#sl-113]) #done
-[#036] #open format_error -> inflect_failure_reason (and tests!)
+[#036]       #done format_error -> inflect_failure_reason (and tests!)
 [#035] #open delegates_to go away as a smell
 [#034] #open sort out root_runtime, client, parent_runtime, etc
 [#033] #open full_action_name_parts becomes normalized_name (action_name ..?)
-[#032]       rename stdout, stderr #done
-[#031]       regretify all tests #done
+[#032]       #done rename stdout, stderr
+[#031]       #done regretify all tests
 [#030] #open reconceive api as a service
-[#029] #open no more api knob (api.invoke -> api_invoke)
+[#029]       #done no more api knob (api.invoke -> api_invoke)
 [#028] #open any and all changes to CLI core client
-[#027] #open overhaul to cli actions base class
+[#027]       overhaul to cli actions base class
 [#026] #open API::InvocationMethods away!
 [#025]       API::RuntimeExtensions away! #done
 [#024] #open use -h
@@ -21,7 +26,7 @@
 [#022] #open refactor-in headless, and sub-client
 [#021] #open merge singletons into service
 [#020] #low-priority nounify cli commands
-[#019] "magic" for DRYING up tests (Regret) #done
+[#019]      #done "magic" for DRYING up tests (Regret) #done
 [#018] #open #depends-on:#sl-100 refactor out porcelain ["bleeding"]
 [#017]       #pattern: for to maybe push up to headless
 [#016]       #pattern: action instance spawns instance of model controller
