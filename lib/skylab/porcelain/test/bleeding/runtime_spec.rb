@@ -197,7 +197,7 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime # #po-008
           frame "exact match, with a thing with no option syntax but help enabled" do
             msg_rx = "usage: DORP pony helpful"
 
-            frame "it -h", f:true do
+            frame "it -h" do
               argv 'pony', 'helpful', '-h'
               specify { should be_event(:help, msg_rx) }
             end

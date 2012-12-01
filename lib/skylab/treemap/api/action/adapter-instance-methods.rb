@@ -36,15 +36,24 @@ module Skylab::Treemap
     end
 
     def set_adapter_name name, &wire
-      e = FailureWiring.new(wire)
+      e = FailureWiring.new wire
       found, a = adapters.fuzzy_match_name name
-      err = case found.length
-      when 0 ; "not found. #{s a, :no}known adapter#{s a} #{s a, :is} #{self.and a.map{|x| pre x}}".strip
-      when 1 ; adapters.active_adapter_name = found.first ; nil
-      else   ; "is ambiguous -- did you mean #{self.or found.map{|x| pre x}}?"
+      err = nil
+      case found.length
+      when 0
+        err = "not found. #{ s :no }known adapter#{ s } #{s :is} #{
+                }#{ and_ a.map { |x| kbd x } }".strip
+      when 1
+        adapters.active_adapter_name = found.first
+      else
+        err = "is ambiguous -- did you mean #{ or_ found.map { |x| kbd x } }?"
       end
-      err and return (e.emit(:failure, "adapter #{pre name} #{err}") and false)
-      adapters.active_adapter_name
+      if err
+        e.emit :failure, "adapter #{ kbd name } #{ err }"
+        false
+      else
+        adapters.active_adapter_name
+      end
     end
   end
 end
