@@ -1,4 +1,4 @@
-require_relative '../../skylab'
+require_relative '..'
 
 module Skylab
   module MetaHell

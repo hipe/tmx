@@ -10,6 +10,7 @@ module Skylab::Headless
   protected
 
     def initialize request_client # this is the heart of it all [#004]
+      block_given? and raise ::ArgumentError.new 'blocks are not honored here'
       _sub_client_init! request_client
     end
 
@@ -21,16 +22,18 @@ module Skylab::Headless
       request_client.send :emit, *a
     end
 
-    def error s
-      request_client.send :error, s
+    def error s                   # be prepared for this to cause trouble
+      emit :error, s
+      false
     end
 
     def io_adapter                # sometimes sub-clients need access to
       request_client.send :io_adapter # the streams, e.g. the instream
     end
 
-    def info s
-      request_client.send :info, s
+    def info s                    # provided as a convenience for this
+      emit :info, s               # extremely common implementation
+      nil
     end
 
     def pen
@@ -56,21 +59,32 @@ module Skylab::Headless
 
     # --- * ---
 
-    THE_ENGLISH_LANGUAGE = # goes away at [#003]
-      { a: ['a '], an: ['an '], is: ['is', 'are'], s:[nil, 's'] }
+    fun = Headless::NLP::EN::Minitesimal::FUN
 
-    def and_ a, last = ' and ', sep = ', '
-      @_coun = ::Fixnum === a ? a : a.length
-      (hsh = Hash.new(sep))[a.length - 1] = last
-      [a.first, * (1..(a.length-1)).map { |i| [ hsh[i], a[i] ] }.flatten].join
+                                  # memoize last counts for shorter strings
+    define_method :and_ do |a|
+      self._nlp_last_length = a.length
+      fun.oxford_comma[ a, ' and ' ]
     end
 
-    def s count=nil, part=nil
-      args = [count, part].compact
-      part = ::Symbol === args.last ? args.pop : :s
-      coun = 1 == args.length ? args.pop : @_coun
-      @_coun = ::Fixnum === coun ? coun : coun.length # gigo
-      THE_ENGLISH_LANGUAGE[part][1 == @_coun ? 0 : 1]
+    attr_accessor :_nlp_last_length
+
+    define_method :or_ do |a|
+      self._nlp_last_length = a.length
+      fun.oxford_comma[ a, ' or ' ]
+    end
+
+    define_method :s do |length=nil, part=nil|
+      args = [length, part].compact
+      pt = ::Symbol === args.last ? args.pop : :s
+      if args.empty?
+        len = self._nlp_last_length or raise ::ArgumentError.new 'numeric?'
+      else
+        x = args.first
+        len = ::Numeric === x ? x : x.length # #gigo
+        self._nlp_last_length = len
+      end
+      fun.s[ len, pt ]
     end
   end
 end

@@ -1,4 +1,4 @@
-require_relative '../../skylab'
+require_relative '..'
 
 module Skylab::Face
   extend ::Skylab::Autoloader

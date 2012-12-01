@@ -1,0 +1,56 @@
+require_relative 'nlp/test-support'
+
+describe "#{::Skylab::Headless::NLP::EN::Minitesimal} FUN" do
+  extend ::Skylab::Headless::TestSupport::NLP
+
+  fun = Headless::NLP::EN::Minitesimal::FUN
+
+  context "oxford_comma" do
+
+    o = -> s, *a do
+      t = [(a.pop if ::Hash === a.last)].compact
+      it "#{s}", *t do
+        so = fun.oxford_comma[ a ]
+        so.should eql(s)
+      end
+    end
+
+    o[ 'four, three, two and one', * %w(four three two one) ]
+
+    o[ 'three, two and one', * %w(three two one) ]
+
+    o[ 'two and one', * %w(two one) ]
+
+    o[ 'one', 'one' ]
+
+    o[ '' ]
+
+  end
+
+
+  context "s", f:true do
+
+    define_method(:s, & fun.s)
+    define_method(:and_, & fun.oxford_comma)
+
+    o = -> a, n, so, *t do
+
+      it "#{so}", *t do
+        x = "#{ s a, :no }known person#{ s a } #{ s a, :is} #{
+          }#{ and_ a }".strip
+        x << " in #{ s n, :this }#{" #{ n }" unless 1 == n }#{
+          } location#{ s n }."
+        x.should eql(so)
+      end
+    end
+
+    o[ %W(A B C), 0, 'known persons are A, B and C in these 0 locations.' ]
+
+    o[ %W(A B), 1,  'known persons are A and B in this location.' ]
+
+    o[ %W(A), 2, 'the only known person is A in these 2 locations.' ]
+
+    o[ [], 3, 'no known persons exist in these 3 locations.' ]
+
+  end
+end

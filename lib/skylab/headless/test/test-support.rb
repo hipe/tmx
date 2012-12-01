@@ -2,7 +2,7 @@ require_relative '../core'
 require 'skylab/test-support/core'
 
 module Skylab::Headless::TestSupport
-  extend ::Skylab::TestSupport::Regret[ Headless_TestSupport = self ]
+  ::Skylab::TestSupport::Regret[ Headless_TestSupport = self ]
 
   module CONSTANTS
     Headless = ::Skylab::Headless
