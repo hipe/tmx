@@ -1,7 +1,8 @@
 require_relative 'test-support'
-require 'json' # [#042]
 
 module Skylab::TanMan::TestSupport::API::Actions
+
+  TanMan::TestSupport::Services::JSON || nil # load it
 
   describe "The #{ TanMan::API } itself", tanman: true do
     extend Actions_TestSupport

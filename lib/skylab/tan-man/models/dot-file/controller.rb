@@ -9,7 +9,7 @@ module Skylab::TanMan
     def check
       result = parse_file pathname
       info "OK in dot-file/controller.rb we got something .."
-      require 'pp' ; ::PP.pp result
+      TanMan::Services::PP.pp result
       true
     end
 

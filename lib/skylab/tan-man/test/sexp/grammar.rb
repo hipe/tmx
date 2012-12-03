@@ -1,5 +1,3 @@
-require 'optparse'
-require 'stringio'
 require_relative '../test-support'
 
 module ::Skylab::TanMan::TestSupport::Sexp
@@ -125,11 +123,10 @@ module ::Skylab::TanMan::TestSupport::Sexp
       info "OK, WE GOT (after #{1000 * parse_time_elapsed_seconds
         } ms): #{result.class}"
       if result
-        require 'pp'
         if eval_string
           eval_string_run result
         else
-          ::PP.pp result, infostream
+          TanMan::TestSupport::Services::PP.pp result, infostream
           true
         end
       end

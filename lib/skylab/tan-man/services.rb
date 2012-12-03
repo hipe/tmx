@@ -1,5 +1,6 @@
 module ::Skylab::TanMan
   module Services                 # 2 different experiments in one
+                                  # being #watched [#mh-011]
 
     extend TanMan::Boxxy
 
@@ -15,9 +16,11 @@ module ::Skylab::TanMan
       end
     end
 
+    o :PP,            -> { require 'pp'       ; ::PP }
+
     o :StringIO,      -> { require 'stringio' ; ::StringIO }
 
-    o :StringScanner, -> { require 'strscan' ; ::StringScanner }
+    o :StringScanner, -> { require 'strscan'  ; ::StringScanner }
 
     build_service = -> pathname do
       const = constantize[ pathname.basename.to_s ]
@@ -26,14 +29,20 @@ module ::Skylab::TanMan
       x
     end
 
-    ok_rx = /\A[-a-z]+\z/
+    extname = Autoloader::EXTNAME
+    ok_rx = /\A[-a-z]+\z/         # ..
 
     init = -> do                  # this gets called only once ever, and lazily
       sc = singleton_class        # it inits the whole anchor service
       sc.extend MetaHell::Let
       dir_pathname.children.each do |pathname|
-        name = methodify[ pathname.basename.to_s ]
-        if ok_rx =~ name
+        o = pathname.basename
+        if extname == o.extname
+          o = o.sub_ext ''
+        end
+        o = o.to_s
+        if ok_rx =~ o
+          name = methodify[ o.to_s ]
           dbg and dbg.puts "loading svc: #{ name } : #{ pathname }"
           sc.let name do          # each service is a memoized result of
             build_service[ pathname ] # this call here (see above)

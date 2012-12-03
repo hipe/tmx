@@ -1,5 +1,5 @@
 module Skylab::Dependency
-  module Services
+  module Services # being #watched [#mh-011]
 
     load_method = ->(const) { "load_#{ Inflection::FUN.methodify[ const ] }" }
 

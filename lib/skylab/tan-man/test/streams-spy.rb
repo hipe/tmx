@@ -47,7 +47,7 @@ module Skylab::TanMan::TestSupport
 
   protected
     def initialize stack, name, debug_f
-      @buffer = ::StringIO.new
+      @buffer = TanMan::TestSupport::Services::StringIO.new
       @debug_f = debug_f
       @name = name
       @stack = stack

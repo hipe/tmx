@@ -25,10 +25,7 @@ module Skylab::TanMan
     option_syntax.help!
 
     def invoke path=nil
-      path ||= begin
-                 require 'fileutils'
-                 ::FileUtils.pwd #  at [#021]: service.file_utils.pwd
-               end
+      path ||= service.file_utils.pwd # at [#021]: service.file_utils.pwd
       events_a = api_invoke path: path
       groups = ::Hash.new { |h, k| h[k] = [] }
       events_a.each do |e|

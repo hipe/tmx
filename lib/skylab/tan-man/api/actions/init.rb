@@ -1,15 +1,16 @@
-require 'fileutils'
-
 module Skylab::TanMan
 
   class API::Actions::Init < API::Action
     extend API::Action::Attribute_Adapter
 
-    include ::FileUtils
+
+    include TanMan::Services::FileUtils::InstanceMethods
 
     attribute :dry_run, boolean: true
-    attribute :local_conf_dirname, required: true, default: API.local_conf_dirname
-    attribute :path, pathname: true, required: true, default: ->{ ::FileUtils.pwd }
+    attribute :local_conf_dirname, required: true,
+                default: API.local_conf_dirname
+    attribute :path, pathname: true, required: true,
+                default: ->{ TanMan::Services::FileUtils.pwd }
 
     emits :all, error: :all, info: :all, skip: :info # etc
 

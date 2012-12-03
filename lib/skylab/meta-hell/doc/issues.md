@@ -1,3 +1,4 @@
+[#011]       #watch services
 [#010] #open pull in DelegatesTo from porcelain!
 [#009] #open when you made plastic you didn't know about define_singleton_method
 [#008]       #done after etc, consider pulling in Let

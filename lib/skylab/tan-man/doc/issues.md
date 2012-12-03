@@ -4,7 +4,7 @@
 [#045]       #postponed Parameter::Definer (up?), vs Attribute::Definer
 [#044] #open #branch-down cli tests
 [#043]       #tracking-tag other guys that could benefit from svc
-[#042] #open FileUtils as a service (JSON)
+[#042]       #done FileUtils as a service (JSON)
 [#041] #open i don't like how status is implemented with the arrays
 [#040]       #done make your own SubClient::InstanceMethods to DRY CLI & API
 [#039]       #done API::Whatever becomes MetaHell::Generic
