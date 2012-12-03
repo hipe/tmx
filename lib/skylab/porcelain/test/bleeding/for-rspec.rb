@@ -27,7 +27,7 @@ module Skylab::Porcelain::TestSupport::Bleeding
     end
   end
 
-  num2ord = Porcelain::En::Number::FUN.num2ord
+  num2ord = Headless::NLP::EN::Number::FUN.num2ord
 
   ::RSpec::Matchers.define :be_event do |*expected|
     # the below hooks must be called in the order: MATCH [FAIL_MSG] DESCRPTION

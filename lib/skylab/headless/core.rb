@@ -2,7 +2,7 @@ require_relative '..'
 require 'skylab/meta-hell/core'
 
 module Skylab::Headless
-  extend ::Skylab::MetaHell::Autoloader::Autovivifying
+  extend ::Skylab::MetaHell::Autoloader::Autovivifying::Recursive
 
   Autoloader = ::Skylab::Autoloader
   Headless = self

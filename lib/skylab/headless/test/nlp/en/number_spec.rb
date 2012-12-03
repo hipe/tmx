@@ -1,7 +1,10 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-describe "#{::Skylab::Porcelain::En::Number}" do
-  include ::Skylab::Porcelain::En::Number::Methods
+describe "#{ Skylab::Headless::NLP::EN::Number }" do
+  extend ::Skylab::Headless::TestSupport::NLP
+
+  include Headless::NLP::EN::Number::Methods
+
   def self.does mixed, str
     let( :subject ) { send meth, mixed }
     it("#{mixed} becomes #{str.inspect}") { subject.should eql(str) }
