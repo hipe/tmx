@@ -72,12 +72,6 @@ module Skylab::TanMan
 
 
   module API
-
-    service = nil
-    define_singleton_method :service do # bridge to [#030] and #slated
-      service ||= API::Service.new
-    end
-
     singletons = nil
     define_singleton_method :singletons do
       singletons ||= API::Singletons.new

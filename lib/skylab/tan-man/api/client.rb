@@ -1,7 +1,9 @@
 module Skylab::TanMan
 
 
-  class API::Client # goes away for sure at [#030]
+  class API::Client                            # the only thing that should
+                                               # have knowledge of this
+                                               # is Services::API
 
     extend Core::Client::ModuleMethods         # per the pattern
 
@@ -10,7 +12,13 @@ module Skylab::TanMan
     event_class API::Event                     # necessary in 2 places b/c
                                                # of the two origins of events
 
-    def invoke normalized_action_name, params_h, &events
+  public
+
+    def invoke normalized_action_name, params_h, events
+      events[ self ]              # we have *got* to wire the api client to the
+                                  # upstream for the infostream hack to
+                                  # work (turning writes into infostream
+                                  # events)
       result = nil
       begin
         k = API::Actions.const_fetch normalized_action_name,
@@ -28,6 +36,12 @@ module Skylab::TanMan
         end
       end while nil
       result
+    end
+
+    attr_writer :pen               # don't overwrite the reader you get
+                                   # from sub-client
+    def pen
+      @pen or super                # simple submodule doesn't cover this
     end
 
   protected

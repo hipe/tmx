@@ -8,7 +8,7 @@ module Skylab::TanMan::TestSupport
     include ::Skylab::TanMan::TestSupport::Tmpdir_InstanceMethods
 
     def api
-      TanMan::API.service
+      TanMan::Services.service.api
     end
 
     let :cli do
@@ -76,7 +76,7 @@ module Skylab::TanMan::TestSupport
     attr_accessor :result
 
     def services_clear
-      TanMan::API.service.clear # [#030]
+      api.clear
     end
   end
 end

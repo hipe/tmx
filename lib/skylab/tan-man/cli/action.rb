@@ -55,19 +55,9 @@ module Skylab::TanMan
 
     # ---------------- jawbreak blood end --------------------
 
-    def api_invoke params_h # impl goes away at [#030] for sure
-      @_api_client ||= begin
-        x = API::Client.new self
-        x.on_all do |e| # we have *got* to wire the api client to ourselves
-          emit e        # for the infostream hack to work (turning writes to
-        end             # infostream into events)
-        x
-      end
-      n = normalized_action_name
-      @_api_client.invoke( n, params_h ) do |o|
-        o.on_all do |e|
-          emit e
-        end
+    def api_invoke params_h
+      service.api.invoke normalized_action_name, params_h, self, -> o do
+        o.on_all { |event| emit event }
       end
     end
 

@@ -8,7 +8,7 @@ module Skylab::TanMan::TestSupport
       h[const] = f
     end
 
-    o :JSON,     -> { require 'fileutils' ; ::FileUtils }
+    o :JSON,     -> { require 'json' ; ::JSON }
 
     o :OptParse, -> { require 'optparse' ; ::OptionParser }
 

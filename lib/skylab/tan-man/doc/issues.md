@@ -2,7 +2,7 @@
 [#047]       where to specify local/global, or merge?
 [#046]       #trend away from Parameter::Definer etc. and towards lamba args
 [#045]       #postponed Parameter::Definer (up?), vs Attribute::Definer
-[#044] #open #branch-down cli tests
+[#044]       #branch-down cli tests (but issue wip)
 [#043]       #tracking-tag other guys that could benefit from svc
 [#042]       #done FileUtils as a service (JSON)
 [#041] #open i don't like how status is implemented with the arrays
@@ -10,14 +10,14 @@
 [#039]       #done API::Whatever becomes MetaHell::Generic
 [#038]       #done text_styler away!
 [#037]       #done reconceive stdout, stderr -> infostream, paystream, errstream
-  .. (i.e. ("PIE" [#sl-113])
+               .. (i.e. ("PIE" [#sl-113])
 [#036]       #done format_error -> inflect_failure_reason (and tests!)
 [#035]       #wont delegates_to go away as a smell (meh)
-[#034] #open sort out root_runtime, client, parent_runtime, etc
+[#034]       #done sort out root_runtime, client, parent_runtime, etc
 [#033]       #done full_action_name_parts becomes normalized_name (action_name ..?)
 [#032]       #done rename stdout, stderr
 [#031]       #done regretify all tests
-[#030] #open reconceive api as a service
+[#030]       #done reconceive api as a service
 [#029]       #done no more api knob (api.invoke -> api_invoke)
 [#028]       #bad-ticket any and all changes to CLI core client
 [#027]       overhaul to cli actions base class

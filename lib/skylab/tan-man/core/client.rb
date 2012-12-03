@@ -28,8 +28,8 @@ module Skylab::TanMan
     end
 
     def service
-      TanMan::Services.service
-    end
+      TanMan::Services.service    # this line should be duplicated only once,
+    end                           # in tests.
 
     def singletons                # [#021]
       API.singletons

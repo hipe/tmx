@@ -42,7 +42,7 @@ module Skylab::TanMan
 
     def dot_files # #pattern #016
       @dot_files ||=
-        TanMan::Models::DotFiles::Controller.new request_runtime, config
+        TanMan::Models::DotFiles::Controller.new request_client, config
     end
   end
 end

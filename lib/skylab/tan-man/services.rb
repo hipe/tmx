@@ -4,7 +4,7 @@ module ::Skylab::TanMan
 
     extend TanMan::Boxxy
 
-    dbg = $stderr
+    dbg = nil #  $stderr
     fun = ::Skylab::Autoloader::Inflection::FUN
     constantize = fun.constantize
     methodify = fun.methodify
