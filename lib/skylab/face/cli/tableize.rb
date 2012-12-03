@@ -1,14 +1,10 @@
-# (this (tiny) file is used in unit test reporting so give it no dependencies.)
-
-module Skylab
-  module Face
-    module CLI # couches
-      module Tableize end
-    end
-  end
-end
-
 module Skylab::Face::CLI
+
+  module Tableize
+    # empty
+  end
+
+
   module Tableize::InstanceMethods
     def tableize rows, opts = {}, &line_f
       opts = { show_header: true }.merge(opts)

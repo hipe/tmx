@@ -1,7 +1,6 @@
 require_relative '..'
 
 require 'skylab/face/core'
-require 'skylab/headless/core'
 require 'skylab/porcelain/core'
 require 'skylab/pub-sub/core'
 

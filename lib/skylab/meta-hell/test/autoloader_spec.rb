@@ -41,4 +41,3 @@ describe Skylab::Autoloader do
     bunk "foo", 'Bar', /failed.*infer.*Bar.*foo/
   end
 end
-

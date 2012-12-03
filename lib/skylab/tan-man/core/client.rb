@@ -17,7 +17,7 @@ module Skylab::TanMan
 
     extend PubSub::Emitter        # we want the instance methods this creates
 
-    emits out: :all, info: :all, error: :all
+    emits payload: :all, info: :all, error: :all
                                   # #todo eventually make this PIE [#037]
                                   # note that clients will add their own events
 

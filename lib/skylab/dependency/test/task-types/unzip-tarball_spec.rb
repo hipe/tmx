@@ -27,7 +27,7 @@ module Skylab::Dependency::TestSupport::Tasks
         it "whines (returns false, emits error)" do
           r = subject.invoke
           r.should eql(false)
-          fingers[:error].size.should eql(1)
+          fingers[:error].length.should eql(1)
           fingers[:error][0].should match(/tarball not found.*not-there/)
         end
       end
@@ -43,7 +43,7 @@ module Skylab::Dependency::TestSupport::Tasks
           it "emits a notice, returns true" do
             r = subject.invoke
             r.should eql(true)
-            fingers[:info].size.should eql(1)
+            fingers[:info].length.should eql(1)
             fingers[:info].first.should match(/exists, won't tar extract: .*mginy/)
           end
         end
@@ -52,7 +52,7 @@ module Skylab::Dependency::TestSupport::Tasks
           it "returns false, emits original error" do
             r = subject.invoke
             r.should eql(false)
-            fingers[:error].size.should eql(1)
+            fingers[:error].length.should eql(1)
             fingers[:error].first.should match(/failed to unzip.*unrecognized archive format/i)
           end
         end
@@ -60,18 +60,17 @@ module Skylab::Dependency::TestSupport::Tasks
           it "returns true, emits shell and tar errstream" do
             r = subject.invoke
             r.should eql(true)
-            fingers[:shell].size.should eql(1)
+            fingers[:shell].length.should eql(1)
             fingers[:shell].first.should match(/cd .*build-dependency.*tar -xzvf mginy.*/)
-            fingers[:err].size.should eql(2)
             tgt = <<-HERE.unindent.strip
               x mginy/
               x mginy/README
             HERE
             fingers[:err].join('').strip.should eql(tgt)
+            # fingers[:err].length.should eql(2)
           end
         end
       end
     end
   end
 end
-

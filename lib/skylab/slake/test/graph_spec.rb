@@ -5,7 +5,7 @@ include ::Skylab::Slake
 describe "#{ Skylab::Slake::Graph }" do
   include ::Skylab::Slake
 
-  let (:graph) { Slake::Graph.new }
+  let( :graph ) { Slake::Graph.new }
   describe "when built empty" do
     it "does nothing interesting" do
       graph.nodes.empty?.should eql(true)

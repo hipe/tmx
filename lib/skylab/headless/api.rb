@@ -91,4 +91,13 @@ module Skylab::Headless
       idx ? "#{ s }[#{ idx }]" : s
     end
   end
+
+
+   class API::IO::Pen::Minimal
+     include API::IO::Pen::InstanceMethods
+   end
+
+
+   API::IO::Pen::MINIMAL = API::IO::Pen::Minimal.new
+
 end

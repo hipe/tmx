@@ -28,7 +28,7 @@ describe "#{Skylab::Bnf2Treetop} CLI integration" do
 
   context 'doing nothing' do
     invoke do
-      error /expecting <bnf-file> had 0 args/i
+      error( /expecting <bnf-file> had 0 args/i )
       usage
       invite
       no_payload
@@ -45,7 +45,7 @@ describe "#{Skylab::Bnf2Treetop} CLI integration" do
 
   context 'giving 2 args' do
     invoke 'one', 'two' do
-      error /expecting <bnf-file> had 2 args/i
+      error( /expecting <bnf-file> had 2 args/i )
       usage
       invite
       no_payload
@@ -54,7 +54,7 @@ describe "#{Skylab::Bnf2Treetop} CLI integration" do
 
   context 'giving it a nonexistant filename' do
     invoke 'not-there.bnf' do
-      error /\bfile not found: not-there\.bnf\b/i
+      error( /\bfile not found: not-there\.bnf\b/i )
       usage
       invite
       no_payload

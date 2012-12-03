@@ -17,6 +17,7 @@ module Skylab::Dependency
       emit :shell, msg
     end
 
+    remove_method :from= # -w, #todo
     def from= p
       _set_path :from, p
     end
@@ -36,6 +37,7 @@ module Skylab::Dependency
       0 == status
     end
 
+    remove_method :move_to= # -w, #todo
     def move_to= p
       _set_path :move_to, p
     end

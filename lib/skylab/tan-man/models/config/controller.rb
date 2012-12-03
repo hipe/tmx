@@ -1,110 +1,157 @@
 module Skylab::TanMan
   class Models::Config::Controller
-    extend Bleeding::DelegatesTo
-    include Core::Pen::Methods::Adaptive
-    def [](k) # is ready? and k is string and local is the thing
+    include Core::SubClient::InstanceMethods # don't need m.m yet
+
+    def [] k # is ready? and k is string and local is the thing
       config_singleton.local[k]
     end
+
     def add_remote name, url, resource_name
-      ready? or return false
-      resource = config_singleton.send(resource_name)
-      remote = Models::Remote.new.edit(name: name, url: url) { |o| o.on_error { |e| emit(e) } } # experimental pattern
-      remote or return false
-      name = remote.name # normalization maybe
-      collection = resource.remotes
-      if collection.detect { |r| name == r.name }
-        emit(:info, "remote #{name.inspect} already exists.")
-        true
+      result = false
+      begin
+        ready? or break
+        resource = resources[ resource_name ]
+        remote = Models::Remote.new
+        ok = remote.edit name: name, url: url do |x|
+          x.on_error { |e| emit e } # #experimental pattern
+        end
+        ok or break
+        name = remote.name # normalization maybe
+        collection = resource.remotes
+        o = collection.detect { |r| name == r.name }
+        if o
+          emit :info, "remote #{ name.inspect } already exists."
+          result = true
+        else
+          collection.push remote
+          result = write_resource resource
+        end
+      end while nil
+      result
+    end
+
+    def known? name, resource_name           # is ready? and name is string
+      result = nil
+      if :all == resource_name
+        result = config_singleton.all_resource_names.detect do |n|
+          resources[ n ].key? name
+        end
       else
-        collection.push remote
-        write_resource resource
+        result = resources[ resource_name ].key? name
       end
+      result
     end
-    delegates_to :runtime, :emit, :error
-    def initialize runtime
-      @remotes = nil
-      @runtime = runtime
-      @config_singleton = runtime.singletons.config
-    end
-    attr_reader :config_singleton
-    def known? name, resource_name=:local # is ready? and name is string
-      config_singleton.send(resource_name).key?(name)
-    end
+
     def load_default_content resource
-      resource.sexp.tap do |o|
-        o.prepend_comment '' # in reverse
-        o.prepend_comment "parts of this file may have been generated and may be overwritten"
-        o.prepend_comment "created #{Time.now.localtime} by tanman"
-      end
+      x = resource.sexp
+      o = -> s { x.prepend_comment s }
+      o[ '' ] # in reverse
+      o[ "parts of this file may have been generated and may be overwritten" ]
+      o[ "created #{ Time.now.localtime } by tanman" ]
+      nil
     end
+
     def ready?
       config_singleton.ready? do |o|
-        o.on_no_config_dir { |e| emit(:no_config_dir, e) } # same payload, different graph
-        o.on_read_global = o.on_read_local = ->(oo) { oo.on_invalid { |e| error e } }
+        o.on_no_config_dir do |e|              # same payload, different graph!
+          emit :no_config_dir, e
+        end
+        x = -> oo do
+          oo.on_invalid do |e|
+            error e
+          end
+        end
+        o.on_read_global = o.on_read_local = x
       end
     end
+
     def remotes
-      @remotes ||= Models::Config::Remotes.new(config_singleton)
+      @remotes ||= Models::Config::Remotes.new request_client
     end
+
     def remove_remote remote_name, resource_name
-      remotes.remove(remote_name, resource_name) do |o|
-        o.on_write = ->(e) { write_resource e.touch!.resource }
-        o.on_all = ->(e) { emit(e) unless e.touched? }
+      remotes.remove remote_name, resource_name do |o|
+        o.on_write = -> e { write_resource e.touch!.resource }
+        o.on_all   = -> e { emit e unless e.touched? }
         o.on_remote_not_found do |e|
-          error "couldn't find a remote named #{e.remote_name.inspect}"
-          a = remotes.map { |r| pre r.name }
+          error "couldn't find a remote named #{ e.remote_name.inspect }"
+          a = remotes.map { |r| kbd r.name }
           rc = e.resources_count
-          available = [
-            "#{s a, :no}known remote#{s a} #{s a, :is} #{oxford_comma(a, ' and ')}".strip,
-            " in #{s rc, :this}#{" #{rc}" unless 1==rc} searched config resource#{s rc}."
-          ].join('')
+          x = "#{ s a, :no }known remote#{s a} #{s a, :is} #{ and_ a }".strip
+          x = "#{x} in #{ s rc, :this }#{" #{ rc }" unless 1==rc }#{
+              } searched config resource#{ s rc }." # #linguitastic
           e.touch!
-          emit(:info, available)
+          info x
         end
       end
     end
-    attr_reader :runtime
+
     def write_resource resource
-      if resource.exist? && resource.pathname.read == resource.content
-        emit :info, "(config file didn't change.)"
-        return true
-      end
-      if ! resource.exist?
-        load_default_content(resource)
-      end
-      is = runtime.infostream
-      resource.write do |o|
-        o.on_error { |e| emit(e) ; return false }
-        o.on_before_edit { |e| is.write(e.touch!.message) }
-        o.on_before_create { |e| is.write(e.touch!.message) }
-        b = ->(e){ is.puts(" .. done (#{e.touch!.bytes} bytes.)") }
-        o.on_after_edit(&b)
-        o.on_after_create(&b)
-        o.on_all { |e| emit(:info, e.message) unless e.touched? }
-      end
+      result = nil
+      begin
+        if resource.exist? && resource.pathname.read == resource.content
+          emit :info, "(config file didn't change.)"
+          result = true
+          break
+        end
+        if ! resource.exist?
+          load_default_content resource
+        end
+        is = infostream # a special case
+        result = resource.write do |o|
+          o.on_error { |e| emit e }
+          o.on_before_edit { |e| is.write e.touch!.message }
+          o.on_before_create { |e| is.write e.touch!.message }
+          b = -> e { is.puts " .. done (#{ e.touch!.bytes } bytes.)" }
+          o.on_after_edit(& b)
+          o.on_after_create(& b)
+          o.on_all { |e| info e.message unless e.touched? }
+        end
+      end while nil
+      result
     end
+
     def set_value name, value, resource_name
-      ready? or return false
-      name = name.to_s # convert symbols to strings or 'key?' fails!
-      resource = config_singleton.send(resource_name)
-      if resource.key?(name)
-        before = resource[name]
-        if value == before
-          emit(:info, "#{name} already set to #{before.inspect}")
-          true
+      result = false
+      begin
+        ready? or break
+        name = name.to_s # convert symbols to strings or 'key?' fails!
+        resource = resources[ resource_name ]
+        result =
+        if resource.key? name
+          before = resource[name]
+          if value == before
+            info "#{ name } already set to #{ before.inspect }"
+            true
+          else
+            info "changing #{name} from #{ before.inspect } to #{value.inspect}"
+            resource[name] = value
+            write_resource resource
+          end
         else
-          emit(:info,
-            "changing #{name} from #{before.inspect} to #{value.inspect}")
+          info "creating #{ name } value: #{ value.inspect }"
           resource[name] = value
           write_resource resource
         end
-      else
-        emit(:info, "creating #{name} value: #{value.inspect}")
-        resource[name] = value
-        write_resource resource
-      end
+      end while nil
+      result
     end
-    delegates_to :runtime, :text_styler
+
+  protected
+
+    def initialize request_client
+      _sub_client_init! request_client
+      @remotes = nil
+    end
+
+
+    def resources
+      resources = -> name do
+        r = config_singleton.send name
+        r
+      end
+      define_singleton_method( :resources ) { resources }
+      send :resources # HAHAHAH
+    end
   end
 end
-

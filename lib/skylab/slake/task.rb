@@ -17,6 +17,7 @@ module Skylab::Slake
       @actions.push action
     end
     def initialize opts=nil
+      @name = nil
       init_parenthood
       block_given? and yield self
       if opts
@@ -38,15 +39,29 @@ module Skylab::Slake
       end
     end
     def name
-      instance_variable_defined?('@name') and return @name
-      self.class != Task and return self.class.task_type_name
-      nil
+      n = nil
+      if @name
+        n = @name
+      elsif Task != self.class # awful #todo
+        self.class.task_type_name
+      end
+      n
     end
     def name= name
+      result = name
       name = name.to_s # per rake
-      @name == name and return name # noop
-      @name.nil? or @name == '' or fail("for now, won't clobber existing names (#{name.inspect} on top of #{@name.inspect})")
-      @name = name
+      begin
+        if @name == name
+          break # noop
+        end
+        if @name.nil? or '' == @name
+          @name = name
+          break
+        end
+        fail "for now, won't clobber existing names (#{ name.inspect } #{
+          }on top of #{ @name.inspect })"
+      end while nil
+      result
     end
     def prerequisites= arr
       @prerequisites.any? and raise RuntimeError.new("prerequisites= cannot be used to overwrite nor concat to any existing prereqs")

@@ -35,14 +35,14 @@ module Skylab::Dependency::TestSupport::Tasks
       context "with regards to dry_run" do
         before { subject.context = context }
         context "by default" do
-          let (:context) { { } }
+          let( :context ) { { } }
           it { should_not be_dry_run }
         end
         context "with dry run in context" do
-          let (:context) { { :dry_run => true } }
+          let( :context ) { { :dry_run => true } }
           it { should be_dry_run }
           context "when invoked" do
-            let (:stderr) { "" }
+            let( :stderr ) { "" }
             before do
               BUILD_DIR.prepare
             end

@@ -1,13 +1,14 @@
 require_relative '../core'
 require 'skylab/test-support/core'
+require 'skylab/headless/test/test-support'
 
 module Skylab::TanMan::TestSupport
-  ::Skylab::TestSupport::Regret[ self ]
-  TanMan_TestSupport = self
+  ::Skylab::TestSupport::Regret[ TanMan_TestSupport = self ]
 
 
   module CONSTANTS
     Autoloader   = ::Skylab::Autoloader
+    Headless     = ::Skylab::Headless
     MetaHell     = ::Skylab::MetaHell
     TanMan       = ::Skylab::TanMan
     Tmpdir       = ::Skylab::TestSupport::Tmpdir
@@ -71,9 +72,13 @@ module Skylab::TanMan::TestSupport
     end.call
   end
 
+  module CONSTANTS
+    Tmpdir_InstanceMethods = Tmpdir_InstanceMethods # suck
+  end
+
   module InstanceMethods
+    include CONSTANTS # to use MetaHell here ?
     include Autoloader::Inflection::Methods
-    include TanMan::API::Achtung::SubClient::ModuleMethods # headless_runtime
     include Tmpdir_InstanceMethods
 
     def _build_normalized_input_pathname stem
@@ -81,37 +86,21 @@ module Skylab::TanMan::TestSupport
     end
 
     let :client do
-      io_adapter = MetaHell::Plastic::Instance.new # just a flexible generic obj
-      debug_parser_loading_f = -> { debug_parser_loading }
-      io_adapter.singleton_class.define_method :emit do |type, payload|
-        if debug_parser_loading_f.call
-          $stderr.puts("      (zeep: #{payload} (#{type}))")
-        elsif :info == type
-          # ok to just totally ignore
-        else
-          fail("ok we probably want StreamsSpy here.")
-        end
-      end
-      rt = headless_runtime io_adapter
-      o = TanMan::TestSupport::ParserProxy.new rt
+      client = :foo
+      o = TanMan::TestSupport::ParserProxy.new client
       o.dir_path = _parser_dir_path
-      if debug_parser_loading
+      if do_debug_parser_loading
         o.profile = true
       else
-        o.on_load_parser_info_f = ->(e) { }
+        o.on_load_parser_info = ->(e) { }
         o.profile = false
       end
       o
     end
 
-    def debug!
-      do_debug # sanity
-      @__memoized[:do_debug] = true
-    end
+    attr_accessor :do_debug
 
-    def debug_parser_loading
-      false # save to try it!
-    end
+    attr_accessor :do_debug_parser_loading
 
     let :__input_fixtures_dir_pathname do
       ::Pathname.new _input_fixtures_dir_path

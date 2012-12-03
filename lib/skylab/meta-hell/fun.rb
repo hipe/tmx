@@ -4,7 +4,7 @@ module Skylab::MetaHell
 
   o[:hash2instance] = -> h do
     i = MetaHell::Plastic::Instance.new
-    h.each { |k, f| i.singleton_class.define_method k, &f }
+    h.each { |k, f| i.define_singleton_method k, &f }
     i
   end
 

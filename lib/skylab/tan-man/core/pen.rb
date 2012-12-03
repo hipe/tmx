@@ -26,7 +26,7 @@ module Skylab::TanMan
     # different implementations based on the root runtime, for e.g.
     # this is considered to be the implementation for "adaptive style."
     #
-    extend Bleeding::DelegatesTo
+    extend MetaHell::DelegatesTo
     include Core::Pen::Methods::Global
 
     delegates_to :text_styler, :pre

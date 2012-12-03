@@ -41,7 +41,7 @@ module Skylab::Dependency::TestSupport::Tasks
         let(:uri) { "not/there.txt" }
         it "should emit error, return false, but not raise" do
           r = subject.invoke(context)
-          fingers[:error].grep(/file not found/i).size.should be > 0
+          fingers[:error].grep(/file not found/i).length.should be > 0
           r.should eql(false)
         end
       end
@@ -55,8 +55,8 @@ module Skylab::Dependency::TestSupport::Tasks
         let(:get) { %w(some-file.txt another-file.txt) }
         it "puts all of the files in the baseket" do
           subject.invoke(context)
-          fingers[:shell].grep(/some-file/).count.should be 1
-          fingers[:shell].grep(/another-file/).count.should be 1
+          fingers[:shell].grep(/some-file/).length.should be 1
+          fingers[:shell].grep(/another-file/).length.should be 1
           # ohai = Dir.new(BUILD_DIR).map { |x| x }
           build_dir_files.join(' ').should eql('another-file.txt some-file.txt')
         end

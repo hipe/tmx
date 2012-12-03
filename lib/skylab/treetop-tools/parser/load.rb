@@ -79,7 +79,7 @@ module Skylab::TreetopTools
           recompile(g) or return
         end
         begin
-          require g.outpathname.bare
+          require g.outpathname.sub_ext('').to_s
         rescue ::NameError => e
           _context = (md = STACK_RE.match e.backtrace[0]) ?
             "in #{ File.basename(md[:file]) }:#{ md[:line] }" :

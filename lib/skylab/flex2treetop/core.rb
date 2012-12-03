@@ -428,7 +428,7 @@ module Skylab::Flex2Treetop
       p.clear_generated_files? and clear_generated_files
       f2tt_rb.exist? ? emit(:info, "using: #{f2tt_rb}") : recompile
       rb = f2tt_rb.absolute? ? f2tt_rb : f2tt_rb.expand_path
-      require rb.to_s.sub(/\.rb\z/, '') # "bare()" externally
+      require rb.sub_ext('').to_s
       if p.suppress_normal_output_after_filesystem_parser?
         emit(:info, "touched files. nothing more to do.")
         p.result_state = :filesystem_parsers_touched

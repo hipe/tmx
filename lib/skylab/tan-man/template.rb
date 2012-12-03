@@ -52,8 +52,8 @@ module Skylab::TanMan
   module Template::ModuleMethods
     include Template::Methods
 
-    def from_pathname pathname
-      new pathname: pathname
+    def from_path path
+      new pathname: ( path ? ::Pathname.new( path.to_s ) : path )
     end
 
     def from_string string

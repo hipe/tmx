@@ -7,7 +7,7 @@ describe Skylab::Porcelain::Attribute::Definer do
     def one_such_class &block
       Class.new.class_eval do
         extend ::Skylab::Porcelain::Attribute::Definer
-        instance_eval &block
+        instance_eval( &block )
         self
       end
     end

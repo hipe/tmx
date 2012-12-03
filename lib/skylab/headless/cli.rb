@@ -353,6 +353,12 @@ module Skylab::Headless
       send( :payload == type ? :outstream : :errstream ).puts msg
       nil # undefined
     end
+
+                                  # per [#sl-114] you're not gonna get it
+                                  # as easy as you would might like
+    def initialize sin, sout, serr, pen=CLI::IO::Pen::MINIMAL
+      super sin, sout, serr, pen
+    end
   end
 
 

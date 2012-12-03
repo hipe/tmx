@@ -66,7 +66,7 @@ describe "#{ ::Skylab::CovTree } CLI" do
     line.should match(/\Asee crude/i)
     line.should match(/\A  \*/)
     line.should match(/\A  \*/)
-    line.should match(/\AUsage: rspec/) # wat
+    line.should match(/\AUsage: /) # wat
     line.should match(/\Aoptions:\z/i)
     l = line
     loop do

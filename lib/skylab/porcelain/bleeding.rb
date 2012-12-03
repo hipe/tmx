@@ -1,5 +1,5 @@
 require_relative 'core'
-require 'skylab/pub-sub/emitter'
+require 'skylab/pub-sub/core'
 require 'optparse'
 
 module Skylab::Porcelain::Bleeding

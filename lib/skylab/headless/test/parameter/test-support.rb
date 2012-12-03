@@ -26,7 +26,7 @@ module Skylab::Headless::TestSupport::Parameter
           self.class.parameters   # then by all means get rid of it here!
         end
         def with_client &b        # slated for improvement [#012]
-          instance_exec &b
+          instance_exec( &b )
         end
         self
       end

@@ -30,7 +30,7 @@ module ::Skylab::CodeMolester
       end
     end
     def paint
-      [ "Expecting #{_or(@info[:expect].map(&:inspect))}",
+      [ "Expecting #{or_(@info[:expect].map(&:inspect))}",
         @info[:line_head],
         (
          if @info[:pretty_path]

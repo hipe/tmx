@@ -9,9 +9,5 @@ module Skylab::TanMan
       else                  ; [tag.name] # no payload for you!
       end
     end
-
-    def to_json *a
-      json_data.to_json(*a)
-    end
   end
 end

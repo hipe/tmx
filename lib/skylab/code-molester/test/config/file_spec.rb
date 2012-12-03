@@ -270,7 +270,7 @@ describe ::Skylab::CodeMolester::Config::File do
         is_valid
       end
       context "if you set its content explicitly with a string" do
-        let (:want_content) do
+        let :want_content do
           <<-HERE.unindent
             who = hah
               boo = bah

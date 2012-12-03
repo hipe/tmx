@@ -4,7 +4,6 @@ module Skylab::TanMan
     :statement
   )
     extend ::Skylab::Headless::Parameter::Controller::StructAdapter
-    include API::Achtung::SubClient::InstanceMethods
     def execute
       info("IVE GOT OT REACH THESE KIDS: \"#{
         statement.agent.words.join(' ') }\" -> \"#{

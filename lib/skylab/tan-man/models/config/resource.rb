@@ -1,6 +1,3 @@
-require 'skylab/code-molester/config/file'
-Skylab::TanMan::CodeMolester = Skylab::CodeMolester # in only once place!
-
 module Skylab::TanMan
   class Models::Config::Resource < CodeMolester::Config::File
     # @smell, experimental
@@ -26,4 +23,3 @@ module Skylab::TanMan
     end
   end
 end
-

@@ -1,23 +1,37 @@
 module Skylab::TanMan
   class Models::DotFiles::Controller < ::Struct.new :selected_pathname
-    include ::Skylab::Headless::SubClient::InstanceMethods
+    include Core::SubClient::InstanceMethods
 
     def ready?
-      @ready_f.call
+      ready.call
     end
 
   protected
 
-    def initialize parent_client, config
-      self.parent_client = parent_client
-      @ready_f = -> do
-        config.ready? or return
-        config.known?('file') or return error("use use")
-        self.selected_pathname = ::Pathname.new(config['file'])
-        selected_pathname.exist? or
-          return error("must exist: #{selected_pathname}")
-        true
+    def initialize request_client, config
+      _sub_client_init! request_client
+      @ready = -> do
+        result = false
+        begin
+          if ! config.ready?
+            break
+          end
+          if ! config.known? 'file', :all
+            error 'use use'
+            break
+          end
+          s = config['file']
+          self.selected_pathname = ::Pathname.new s
+          if selected_pathname.exist?
+            result = true
+          else
+            error "must exist: #{ selected_pathname }"
+          end
+        end while nil
+        result
       end
     end
+
+    attr_reader :ready
   end
 end

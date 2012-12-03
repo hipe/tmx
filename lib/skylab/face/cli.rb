@@ -1,6 +1,6 @@
 require 'optparse'
 
-# an ultralight command-line parser (430 lines)
+# an ultralight command-line parser
 # that wraps around OptParse (can do anything it does)
 # with colors
 # with flexible command-like options ('officious' like -v, -h)
@@ -9,8 +9,11 @@ require 'optparse'
 # with default commands within those namespaces
 # with aliases for commands and namespaces
 
-module Skylab; end
-module Skylab::Face; end
+module Skylab
+  module Face
+    # forward declarations that normally wouldn't go here
+  end
+end
 
 module Skylab::Face::Colors
   extend self

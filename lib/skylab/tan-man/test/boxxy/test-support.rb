@@ -10,7 +10,7 @@ module Skylab::TanMan
   defined? MetaHell or MetaHell = ::Skylab::MetaHell # ick sorry
   defined? TanMan or TanMan = self
 end
-require_relative '../../boxxy'
+require_relative '../../boxxy' # #special
 
 # bootstrapping END
 

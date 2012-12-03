@@ -21,10 +21,10 @@ module ::Skylab::TanMan::TestSupport::Sexp
 
     let :client do
       o = _parser_client_module.new upstream, paystream, infostream
-      if debug_parser_loading
+      if do_debug_parser_loading
         # keep defaults i guess, for now
       else
-        o.on_load_parser_info_f = ->(e) { }
+        o.on_load_parser_info = ->(e) { }
       end
       o
     end

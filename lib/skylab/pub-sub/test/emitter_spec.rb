@@ -1,9 +1,12 @@
 require_relative 'emitter/test-support'
 
+module ::Skylab::PubSub::TestSupport::Emitter # sorry, transitional
+
 describe Skylab::PubSub::Emitter do
+
   let(:klass) do
-    Class.new.class_eval do
-      extend Skylab::PubSub::Emitter
+    ::Class.new.class_eval do
+      extend PubSub::Emitter
       emits :informational, :error => :informational, :info => :informational
       self
     end
@@ -17,8 +20,8 @@ describe Skylab::PubSub::Emitter do
     let(:inside) { ->(_) { } }
     let(:klass) do
       o = self
-      Class.new.class_eval do
-        extend Skylab::PubSub::Emitter
+      ::Class.new.class_eval do
+        extend PubSub::Emitter
         def self.to_s ; 'Foo' end
         class_eval(& o.inside)
         self
@@ -115,8 +118,8 @@ describe Skylab::PubSub::Emitter do
     let(:emits) { ->(_) { } }
     let(:klass) do
       o = self
-      Class.new.class_eval do
-        extend ::Skylab::PubSub::Emitter
+      ::Class.new.class_eval do
+        extend PubSub::Emitter
         class_eval(& o.emits)
         self
       end
@@ -150,7 +153,7 @@ describe Skylab::PubSub::Emitter do
           subject { canary[:arg] }
           context 'with zero payload arguments passes one event object to your handlers.' do
             before  { instance.emit(:bar) }
-            specify { should be_kind_of(::Skylab::PubSub::Event) }
+            specify { should be_kind_of(PubSub::Event) }
             context "whose payload" do
               subject { canary[:arg].payload }
               specify { should eql(nil) }
@@ -158,7 +161,7 @@ describe Skylab::PubSub::Emitter do
           end
           context 'with one payload argument passes one to your handlers.' do
             before  { instance.emit(:bar, 'foo') }
-            specify { should be_kind_of(::Skylab::PubSub::Event) }
+            specify { should be_kind_of(PubSub::Event) }
             context "whose payload" do
               subject { canary[:arg].payload }
               specify { should eql('foo') }
@@ -166,7 +169,7 @@ describe Skylab::PubSub::Emitter do
           end
           context 'with two payload arguments passes two to your handlers.' do
             before  { instance.emit(:bar, 'foo', 'baz') }
-            specify { should be_kind_of(::Skylab::PubSub::Event) }
+            specify { should be_kind_of(PubSub::Event) }
             context "whose payload" do
               subject { canary[:arg].payload }
               specify { should eql(['foo', 'baz']) }
@@ -196,53 +199,49 @@ describe Skylab::PubSub::Emitter do
   end
   context "You can use the touch!/touched? facility on event objects to track whether you've seen them" do
     it 'by explicitly touching and checking for touched?' do
-      emitter.tap do |e|
-        c = Struct.new(:a, :i, :e).new(0, 0, 0)
-        e.on_informational { |e| if ! e.touched? then e.touch! ; c.a += 1  end }
-        e.on_info { |e| c.i += 1 ; e.touch! }
-        e.on_error { |e| c.e += 1 }
-        e.emit(:informational)
-        c.values.should eql([1, 0, 0])
-        e.emit(:info)
-        c.values.should eql([1, 1, 0])
-        e.emit(:error)
-        c.values.should eql([2, 1, 1])
-      end
+      o = emitter
+      c = ::Struct.new(:a, :i, :e).new(0, 0, 0)
+      o.on_informational { |e| if ! e.touched? then e.touch! ; c.a += 1  end }
+      o.on_info { |e| c.i += 1 ; e.touch! }
+      o.on_error { |e| c.e += 1 }
+      o.emit :informational
+      c.values.should eql([1, 0, 0])
+      o.emit :info
+      c.values.should eql([1, 1, 0])
+      o.emit :error
+      c.values.should eql([2, 1, 1])
     end
     context 'A touch will NOT happen automatically when a message is accessed ("to_s" is aliases to "message")' do
-      let (:lines) { [] }
+      let( :lines ) { [] }
       it 'without touch check' do
-        emitter.tap do |e|
-          e.on_informational { |e| lines << "inform:#{e}" }
-          e.on_info          { |e| lines << "info:#{e}" }
-          e.emit(:info, "A")
-          lines.should eql(%w(info:A inform:A))
-        end
+        o = emitter
+        o.on_informational { |e| lines << "inform:#{e}" }
+        o.on_info          { |e| lines << "info:#{e}" }
+        o.emit :info, "A"
+        lines.should eql(%w(info:A inform:A))
       end
       it 'with touch check' do
-        emitter.tap do |e|
-          e.on_informational { |e| lines << "inform:#{e}" unless e.touched? }
-          e.on_info          { |e| lines << "info:#{e}"   unless e.touched? }
-          e.emit(:info, "A")
-          lines.should eql(%w(info:A inform:A))
-        end
+        o = emitter
+        o.on_informational { |e| lines << "inform:#{e}" unless e.touched? }
+        o.on_info          { |e| lines << "info:#{e}"   unless e.touched? }
+        o.emit(:info, "A")
+        lines.should eql(%w(info:A inform:A))
       end
       it 'but with an explicit touch' do
-        emitter.tap do |e|
-          e.on_informational { |e| lines << "inform:#{e.touch!}" unless e.touched? }
-          e.on_info          { |e| lines << "info:#{e.touch!}"   unless e.touched? }
-          e.emit(:info, "A")
-          lines.should eql(%w(info:A))
-        end
+        o = emitter
+        o.on_informational { |e| lines << "inform:#{e.touch!}" unless e.touched? }
+        o.on_info          { |e| lines << "info:#{e.touch!}"   unless e.touched? }
+        o.emit :info, "A"
+        lines.should eql(%w(info:A))
       end
     end
   end
   context "Let's play with some different types of event-type graphs." do
     let(:klass) do
       kg = klass_graph
-      Class.new.class_eval do
-        extend Skylab::PubSub::Emitter
-        emits *kg
+      ::Class.new.class_eval do
+        extend PubSub::Emitter
+        emits( *kg )
         self
       end
     end
@@ -254,12 +253,11 @@ describe Skylab::PubSub::Emitter do
         :hello => :info
       ]}
       it 'triggering an event on a deepest child will trigger the root event' do
-        emitter.tap do |e|
-          touched = 0
-          e.on_all { |e| touched += 1 }
-          e.emit(:hello)
-          touched.should eql(1)
-        end
+        o = emitter
+        touched = 0
+        o.on_all { |e| touched += 1 }
+        o.emit :hello
+        touched.should eql(1)
       end
     end
     context "With an event type tree that is a simple circular directed graph (a triangle)," do
@@ -270,47 +268,46 @@ describe Skylab::PubSub::Emitter do
       }]}
       before(:each) do
         @counts = Hash.new { |h, k| h[k] = 0 }
-        emitter.tap do |e|
-          e.on_father { |e| @counts[:father] += 1 }
-          e.on_son    { |e| @counts[:son]    += 1 }
-          e.on_ghost  { |e| @counts[:ghost]  += 1 }
-        end
+        o = emitter
+        o.on_father { |e| @counts[:father] += 1 }
+        o.on_son    { |e| @counts[:son]    += 1 }
+        o.on_ghost  { |e| @counts[:ghost]  += 1 }
       end
       def same which
         emitter.emit(which)
         @counts.keys.map(&:to_s).sort.join(' ').should eql('father ghost son')
         @counts.values.count{ |v| 1 == v }.should eql(3)
       end
-      it ('an emit to this one emits to all three') { same(:father) }
-      it ('an emit to this one emits to all three') { same(:son) }
-      it ('an emit to this one emits to all three') { same(:ghost) }
+      it( 'an emit to this one emits to all three' ) { same(:father) }
+      it( 'an emit to this one emits to all three' ) { same(:son) }
+      it( 'an emit to this one emits to all three' ) { same(:ghost) }
     end
   end
   context "has a shorthand" do
     let(:normal_class) do
-      Class.new.class_eval do
-        extend Skylab::PubSub::Emitter
+      ::Class.new.class_eval do
+        extend PubSub::Emitter
         emits :one
         self
       end
     end
     let(:shorthand_class) do
-      Skylab::PubSub::Emitter.new(:all, :error => :all)
+      PubSub::Emitter.new(:all, :error => :all)
     end
     it 'which works' do
-      e = normal_class.new
+      o = normal_class.new
       s = nil
-      e.on_one { |x| s = x.to_s }
-      e.emit(:one, 'sone')
+      o.on_one { |x| s = x.to_s }
+      o.emit :one, 'sone'
       s.should eql('sone')
-      e = shorthand_class.new
-      e.on_all { |e| s = e.to_s }
-      e.emit(:error, 'serr')
+      o = shorthand_class.new
+      o.on_all { |e| s = e.to_s }
+      o.emit :error, 'serr'
       s.should eql('serr')
     end
   end
   context "Will graphs defined in a parent class descend to child?" do
-    let(:child_class) { Class.new(klass) }
+    let(:child_class) { ::Class.new(klass) }
     it "YES" do
       ok = nil
       o = child_class.new
@@ -319,4 +316,5 @@ describe Skylab::PubSub::Emitter do
       ok.message.should eql('wankers')
     end
   end
+end
 end

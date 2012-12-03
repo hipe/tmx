@@ -28,7 +28,7 @@ module Skylab::Dependency::TestSupport::Tasks
       it "returns false and emits info" do
         r = subject.invoke
         r.should eql(false)
-        fingers[:info].size.should eql(1)
+        fingers[:info].length.should eql(1)
         fingers[:info].last.should match(/not in PATH: not-an-executable/)
       end
     end

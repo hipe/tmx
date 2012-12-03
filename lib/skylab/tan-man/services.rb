@@ -70,13 +70,13 @@ module ::Skylab::TanMan
 
     fun = TanMan::Services::FUN
 
-    define_method :load do                     # Services doubles as a stdlib
+    define_method :load do |*a, &b|            # Services doubles as a stdlib
       method = fun.load_method[ const ]        # loader experimentally
       if Services.respond_to? method           # this should call const_set
         Services.send method
       else
-        super
-      end
+        super(*a, &b)                          # implicit argument passing [..]
+      end                                      # is not supported
     end
 
     let :file_pathname do                      # for missing const :FooBar

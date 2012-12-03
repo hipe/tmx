@@ -8,7 +8,7 @@ module Skylab::Headless
 
     def self.extended struct_class # looks like [#sl-111] but has more
       struct_class.class_eval do
-        extend Parameter::Definer::ModuleMethods
+        extend Parameter::Definer # gets m.m and appropriate i.m
         include Parameter::Controller::StructAdapter::InstanceMethods
 
         members.each { |m| param m, required: true }
@@ -23,9 +23,9 @@ module Skylab::Headless
     def invoke params_h
       result = nil
       begin
-        result = set!(params_h) or break
+        result = set!( params_h ) or break
         result = execute
-      end while false
+      end while nil
       result
     end
   end

@@ -1,73 +1,50 @@
 require_relative 'core'
 
-Skylab::TanMan::API || nil # #preload
+Skylab::TanMan::API || nil                     # #preload here, prettier below
 
 module Skylab::TanMan
-  class CLI < Bleeding::Runtime                # changes at [#018]
+
+  module CLI
     extend Autoloader                          # to autoload files under cli/
-    extend MetaHell::Let                       # used below, temporary #todo
-    extend Core::Client::ModuleMethods         # per the pattern
 
-    include Core::Client::InstanceMethods      # per the pattern
-
-    emits Porcelain::Bleeding::EVENT_GRAPH     # b/c granulated UI events
-                                               # note this gets merged with
-                                               # 'parent' event graph above
-
-    attr_reader :infostream
-
-    attr_reader :paystream
-
-    let :services_runtime do
-      TanMan::Service::Runtime.new
-    end
-
-    attr_reader :singletons
-
-    def text_styler ; self end
-
-  protected
-
-    def initialize _=nil, paystream=$stdout, infostream=$stderr # patt.[#sl-114]
-      @singletons = API::Singletons.new # #todo:refactor to memoize
-      @paystream = paystream      # these are just defaults that might ..
-      @infostream = infostream    #   .. get changed in the yield below
-      if block_given?
-        yield self
-      else
-        on_out { |e| self.paystream.puts e.touch!.message }
-        on_all { |e| self.infostream.puts(e.touch!.message) unless e.touched? }
-      end
+    def self.new *a, &b
+      CLI::Client.new( *a, &b )
     end
   end
 
 
   module CLI::Actions
+                                  # a box-like module that is all defined here
   end
 
 
   class CLI::Actions::Status < CLI::Action
     desc "show the status of the config director{y|ies} active at the path."
     include Porcelain::Table::RenderTable
+
+    option_syntax.help!
+
     def invoke path=nil
       path ||= begin
                  require 'fileutils'
-                 ::FileUtils.pwd # #todo temporary
+                 ::FileUtils.pwd #  at [#021]: service.file_utils.pwd
                end
-      groups = Hash.new { |h, k| h[k] = [] }
-      ee = api_invoke path: path
-      ee.each do |e|
-        groups[e.is?(:global) ? :global : (e.is?(:local) ? :local : :other )].push(e)
+      events_a = api_invoke path: path
+      groups = ::Hash.new { |h, k| h[k] = [] }
+      events_a.each do |e|
+        g = e.is?(:global) ? :global : (e.is?(:local) ? :local : :other)
+        groups[g].push e
       end
       table = []
       groups.each do |k, e|
-        table.push [[:header, k], e.first.message]
+        table.push [ [:header, k], e.first.message ]
         table.concat( e[1..-1].map{ |x| [nil, x.message] } )
       end
-      render_table(table, separator: '  ') do |o|
+      render_table table, separator: '  ' do |o|
         o.field(:header).format { |x| hdr x }
-        o.on_all { |e| emit(:out, e) }
+        o.on_all { |e| emit :payload, e }
       end
+      true
     end
   end
 
@@ -119,7 +96,9 @@ module Skylab::TanMan
           n = table.num_resources_seen
           emit(:info, "no remotes found in #{n} config file#{s n}")
         end
-        o.on_all { |e| emit(:out, e) unless e.touched? }
+        o.on_all do |e|
+          emit(:payload, e) unless e.touched?
+        end
       end
       true
     end
@@ -155,6 +134,7 @@ module Skylab::TanMan
 
   class CLI::Actions::Use < CLI::Action
     desc 'selects which (dependency graph) file to edit'
+    option_syntax.help!
     def invoke path
       api_invoke path: path
     end
@@ -163,6 +143,7 @@ module Skylab::TanMan
 
   class CLI::Actions::Check < CLI::Action
     desc 'checks if the (dependency graph) file exists and can be parsed.'
+    option_syntax.help!
     def invoke dotfile=nil
       api_invoke path: dotfile
     end
@@ -171,8 +152,12 @@ module Skylab::TanMan
 
   class CLI::Actions::Tell < CLI::Action
     desc "there's a lot you can tell about a man from his choice of words"
-    def invoke *word
-      api_invoke words: word
+    option_syntax do |h|
+      on( '-f', '--force',
+         'rewrites the cached treetop parser file (#dev)' ) { h[:force] = true }
+    end
+    def invoke *word, opts
+      api_invoke words: word, force: opts[:force]
     end
   end
 
@@ -193,6 +178,7 @@ module Skylab::TanMan
 
   class CLI::Actions::Graph::Example::Set < CLI::Action
     desc "set the example graph."
+    option_syntax.help!
     def invoke name
       api_invoke name: name
     end

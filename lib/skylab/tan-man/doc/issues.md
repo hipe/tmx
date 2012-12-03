@@ -1,8 +1,10 @@
-[#046]       #trend away from Parameter::Definer and towards lamba args
-[#045] #open param definer up
+[#048]       what is the deal with the non-orthogonal-ass event interface for remote list
+[#047]       where to specify local/global, or merge?
+[#046]       #trend away from Parameter::Definer etc. and towards lamba args
+[#045] #open Parameter::Definer (up?), vs Attribute::Definer
 [#044] #open #branch-down cli tests
 [#043]       #tracking-tag other guys that could benefit from svc
-[#042] #open FileUtils as a service
+[#042] #open FileUtils as a service (JSON)
 [#041] #open i don't like how status is implemented with the arrays
 [#040]       #done make your own SubClient::InstanceMethods to DRY CLI & API
 [#039]       #done API::Whatever becomes MetaHell::Generic

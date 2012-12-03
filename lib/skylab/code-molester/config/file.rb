@@ -132,6 +132,7 @@ module ::Skylab::CodeMolester
           @state = :invalid
           @invalid_reason = CodeMolester::ParseFailurePorcelain.new p
         end
+        @invalid_reason
       end
       case @state
       when :valid   ; true
@@ -141,15 +142,42 @@ module ::Skylab::CodeMolester
     end
     delegates_to_truish_ivar '@pathname', :writable?
   end
-  class << Config::File
-    def parser_class
-      @parser_class ||= begin
-        ::Treetop.load Config.dir_pathname.join('file-parser').to_s
-        # result is Config::FileParser
-      end
+  class Config::File              # this could be scaled back -- it is after
+                                  # all a constant under a module
+    singleton_class.send :attr_accessor, :do_debug
+    const = :ConfigParser
+    debug = -> { do_debug }
+
+    compile = -> do
+      debug[] and $stderr.puts "creating new #{ const } xyzzy"
+      pathname = Config.dir_pathname.join 'file-parser'
+      o = ::Treetop.load pathname.to_s
+      o.name =~ /::#{ ::Regexp.escape const.to_s }\z/ or fail "huh?#{ o }"
+      o
     end
-    def parser
+
+    parser_class = -> do
+      o = nil
+      if CodeMolester.const_defined? const, false
+        debug[] and $stderr.puts "constant existed! #{ const } xyzzy"
+        o = CodeMolester.const_get const, false
+      else
+        o = compile[]
+      end
+      parser_class = -> do
+        debug[] and $stderr.puts "using memoized #{ const } xyzzy"
+        o
+      end
+      o
+    end
+
+    define_singleton_method :parser_class do
+      parser_class[]
+    end
+
+    def self.parser
       @parser ||= parser_class.new
     end
   end
+  Config::File.do_debug = false
 end
