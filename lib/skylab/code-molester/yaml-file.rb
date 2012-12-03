@@ -1,9 +1,7 @@
 require 'psych'
 require 'yaml'
-require File.expand_path('../../face/path-tools', __FILE__)
-module Skylab; end
 
-module Skylab::CodeMolester
+module ::Skylab::CodeMolester
   module Yaml
     class Node
       def initialize
@@ -144,7 +142,7 @@ module Skylab::CodeMolester
       File.exist?(@path)
     end
     def pretty_path
-      Skylab::Face::PathTools.pretty_path(@path)
+      Face::PathTools.pretty_path @path
     end
     def write
       bytes = nil

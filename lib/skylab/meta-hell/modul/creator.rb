@@ -209,7 +209,7 @@ module Skylab::MetaHell::Modul::Creator
 
     o[:bang_f] = -> client do    # make a lambda used for banging modules.
       M_IM._bang_f[ client,      # ('bang' means '[create] retrieve')
-                    ->( memo ) { M.create_meta[ memo.name ].build_product }
+        ->( memo ) { M.create_meta[ memo.name ].build_product client }
       ]
     end
 

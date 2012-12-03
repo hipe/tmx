@@ -1,9 +1,7 @@
 require 'strscan'
 
-module Skylab ; end
-
 module Skylab::Slake
-  module Interpolate
+  module Interpolate              # deprecated for TanMan::Template
     extend self
     def interpolate string, source
       Interpolation.new(source, string).run
@@ -30,7 +28,9 @@ module Skylab::Slake::Interpolate
         scn.eos? and break
         cheap_ast.push scn.scan %r@([^{]|{(?![- a-z]))*@
         scn.eos? and break
-        cheap_ast.push (scn.scan %r@{[_ a-z]+}@).match(%r@\A{(.+)}\z@)[1].intern
+        s = scn.scan %r@{[_ a-z]+}@
+        sym = s.match( %r@\A{(.+)}\z@ )[1].intern
+        cheap_ast.push sym
       end
       cheap_ast.each_with_index.map do |str_or_sym, idx|
         if idx % 2 == 0
@@ -58,4 +58,3 @@ module Skylab::Slake::Interpolate
     end
   end
 end
-

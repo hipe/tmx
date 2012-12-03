@@ -1,3 +1,3 @@
-[#002] #open this is a placeholder for the CONSTANTS pattern, which might
-  .. get pushed up to here in which case remove all occurences of pattern
+[#003] #open rename all_specs.rb -> all
+[#002] #done CONSTANTS too
 [#001] get regret #done

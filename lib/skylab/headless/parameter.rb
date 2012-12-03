@@ -1,15 +1,39 @@
 module Skylab::Headless
+
   module Parameter
     extend ::Skylab::MetaHell::Autoloader::Autovivifying
   end
-  module Parameter::Definer end
+
+
+  module Parameter::Definer
+    class << self
+      map = -> k do               # sugar, #experimental
+        (map = {
+          ::Class  => Parameter::Definer::InstanceMethods::IvarsAdapter,
+          ::Hash   => Parameter::Definer::InstanceMethods::HashAdapter,
+          ::Struct => Parameter::Definer::InstanceMethods::StructAdapter
+        })[ k ]
+      end
+
+      define_method :extended do |mod| # #[#sl-111] and more .. #experimental !
+        mod.extend Parameter::Definer::ModuleMethods
+        mod.send :include,
+          map[ ( [::Struct, ::Hash] & mod.ancestors ).fetch(0) { ::Class } ]
+      end
+    end
+  end
+
+
   module Parameter::Definer::ModuleMethods
+
     def meta_param name, props=nil, &b
       parameters.meta_param!(name, props, &b)
     end
+
     def param name, props=nil, &b
       parameters.fetch!(name).merge!(props, &b)
     end
+
     def parameters &block
       if block_given? # this "feature" may be removed after benchmarking (@todo)
         (@parameters_f ||= nil) || (@parameters ||= nil) and fail('no')
@@ -40,39 +64,63 @@ module Skylab::Headless
       end
     end
   end
-  module Parameter::Definer::InstanceMethods end
+
+
+  module Parameter::Definer::InstanceMethods
+  end
+
+
   module Parameter::Definer::InstanceMethods::HashAdapter
-    protected
-    def known?(k) ; key?(k) end
+    def known? k
+      key? k
+    end                           # useless for reflection unless made public
   end
+
+
   module Parameter::Definer::InstanceMethods::StructAdapter
-    protected
-    def known?(k) ; ! self[k].nil? end # caution meet wind
-  end
-  module Parameter::Definer::InstanceMethods::IvarsAdapter
-    protected
-    def [](k)
-      unless instance_variable_defined?("@#{k}")
-        fail("getting without checking -- ivar not defined: @#{
-          k} in a #{self.class}")
-      end
-      instance_variable_get("@#{k}")
+    def known? k
+      ! self[k].nil?              # caution meet wind
     end
-    def []=(k, v)   ; instance_variable_set("@#{k}", v)   end
-    def known?(k)   ; instance_variable_defined?("@#{k}") end
   end
-  module Parameter::Definer::InstanceMethods::DelegateToParamsIvar
+
+
+  module Parameter::Definer::InstanceMethods::IvarsAdapter
+  protected
+
+    def [] k
+      if ! instance_variable_defined? "@#{ k }"
+        fail "getting without checking -- ivar not defined: @#{ k } in a #{
+          self.class }"
+      end
+      instance_variable_get "@#{ k }"
+    end
+
+    def []= k, v
+      instance_variable_set "@#{ k }", v
+    end
+
+    def known? k
+      instance_variable_defined? "@#{ k }"
+    end
+  end
+
+
+  module Parameter::Definer::InstanceMethods::ActualParametersIvar
     protected
-    def []  (k)     ; @params[k]        end
-    def []= (k, v)  ; @params[k] = v    end
-    def known?(k)   ; @params.known?(k) end
+    def []  (k)     ; @actual_parameters[k]        end
+    def []= (k, v)  ; @actual_parameters[k] = v    end
+    def known?(k)   ; @actual_parameters.known?(k) end
   end
+
+
   class Parameter::Definer::Dynamic < ::Hash
     extend Parameter::Definer::ModuleMethods
     def initialize
       yield self
     end
   end
+
+
   module Parameter::Definer
     def self.new &block
       k = Class.new Parameter::Definer::Dynamic
@@ -80,35 +128,59 @@ module Skylab::Headless
       k
     end
   end
-  class Parameter::Set < ::Struct.new(:list, :host)
+
+
+  class Parameter::Set < ::Struct.new :list, :host
+
     def [] name
-      list[@hash[name]] if @hash.key?(name)
+      list[@hash[name]] if @hash.key? name
     end
-    def all ; list.dup end
+
+    def each &block               # this was [#007], used to be `all`
+      if block_given?
+        list.each(& block)
+      else
+        list.dup                  # cheap and easy enumerable
+      end
+    end
+
     def fetch name
-      if @hash.key?(name) then list[@hash[name]]
-      else raise ::KeyError.new("no such parameter: #{name.inspect}") end
+      if @hash.key? name
+        list[@hash[name]]
+      else
+        raise ::KeyError.exception "no such parameter: #{name.inspect}"
+      end
     end
+
     def fetch! name
-      @hash.key?(name) or list[@hash[name] = list.length] =
-        host.parameter_definition_class.new(host, name)
+      if ! @hash.key? name
+        list[@hash[name] = list.length] =
+          host.parameter_definition_class.new host, name
+      end
       list[@hash[name]]
     end
+
     def meta_param! name, props, &b
       meta_set.fetch!(name).merge!(props, &b)
     end
+
     def merge! set
       set.list.each do |p|
         fetch!(p.name).merge!(p)
       end
       nil
     end
-    undef_method :select # Struct mixes in Enumerable, causes confusion here
+
+    undef_method :select          # ::Struct mixes in ::Enumerable, causes
+                                  # confusion here. we need to make sure you
+                                  # don't call it accidentally (was [#007])
+
   protected
+
     def initialize host
-      super([], host)
+      super [], host
       @hash = {}
-      host.respond_to?(:parameter_definition_class) or
+      host.respond_to? :parameter_definition_class or
         def host.parameter_definition_class
           Parameter::DEFAULT_DEFINITION_CLASS ; end
     end
@@ -129,6 +201,7 @@ module Skylab::Headless
       @meta_set = meta_host.parameters
     end
   end
+
 
   class Parameter::Definition
     # Experimentally let a parameter definition be defined as a name (symbol)
@@ -264,10 +337,12 @@ module Skylab::Headless
       end
       def! :enum= do |enum|
         filter_upstream! do |val, valid_f|
-          if enum.include?(val) then valid_f.call(val) else
-            _with_client do
+          if enum.include? val
+            valid_f[ val ]
+          else
+            with_client do # slated to be improved [#012]
               error("#{val.inspect} is an invalid value " <<
-                "for #{pen.parameter_label param}")
+                "for #{ parameter_label param }")
             end
           end
         end
@@ -275,7 +350,7 @@ module Skylab::Headless
       def! :hook= do |_|
         host_def(name) { |&b| b ? (self[name] = b) : self[name] }
       end
-      def!(:reader=) { |_| host_def(name) { self[name] } }
+      def!(:reader=) { |_| host_def(name) { self[name] if known? name } }
       def!(:upstream_passthru_filter) do |&f|
         on_tail { assert_writer("passthru filter found with no writer!") }
         filter_upstream! { |val, valid_f| valid_f.call(f.call val) }

@@ -1,15 +1,15 @@
 require_relative 'test-support'
 
 module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
-  describe "desc, an inheritable attribute of #{Bleeding::ActionModuleMethods}" do
+  describe "desc, an inheritable attribute of #{ Bleeding::Action }" do
     extend Action_TestSupport
 
     incrementing_anchor_module!
     klass :Base do
-      extend Bleeding::ActionModuleMethods
+      extend Bleeding::Action
     end
     let(:base) { send(:Base) }
-    context "All classes that extend ActionModuleMethods have a desc that by default" do
+    context "All classes that extend Action have a desc that by default" do
       let(:subject) { base.desc }
       specify { should eql([]) }
       it("have a consistent oid") { base.desc.object_id.should eql(base.desc.object_id) }
@@ -63,7 +63,7 @@ module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
         end
         module self::Actions ; end
         class self::Action
-          extend Bleeding::ActionModuleMethods
+          extend Bleeding::Action
         end
         class self::Actions::Ferp < self::Action
           desc "wing"

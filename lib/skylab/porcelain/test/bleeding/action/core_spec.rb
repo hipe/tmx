@@ -1,8 +1,10 @@
 require_relative 'test-support'
 
 module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
-  describe "#{Bleeding::ActionModuleMethods}" do
+
+  describe "#{ Bleeding::Action }" do
     extend Action_TestSupport
+
     incrementing_anchor_module!
     with_namespace 'herp-derp'
     context "You can't have an action that is a completely blank slate class because that" do
@@ -18,10 +20,10 @@ module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
       end
       specify { should be_action(aliases: ['ferp-merp']) }
     end
-    context "If you make an action class that does nothing but extend #{Bleeding::ActionModuleMethods}, it" do
+    context "If you make an action class that does nothing but extend #{ Bleeding::Action }, it" do
       with_action 'ferp-merp'
       klass :HerpDerp__FerpMerp do
-        extend Bleeding::ActionModuleMethods
+        extend Bleeding::Action
       end
       specify { should be_action(aliases: ['ferp-merp']) }
     end
@@ -30,7 +32,7 @@ module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
         context "with just one line" do
           with_action 'ferp-merp'
           klass :HerpDerp__FerpMerp do
-            extend Bleeding::ActionModuleMethods
+            extend Bleeding::Action
             desc 'zerp'
           end
           specify { should be_action(desc: ['zerp']) }

@@ -1,20 +1,28 @@
 module Skylab::TanMan
-  class API::Actions::Graph::Example::Set < API::Achtung::SubClient
+
+  class API::Actions::Graph::Example::Set < API::Action
+    extend API::Action::Parameter_Adapter
+
     param :name, accessor: true, required: true
 
     param :resource_name, accessor: true, default: :local,
       enum: [:local, :global], required: true
 
   protected
+
     def execute
-      config.ready? or return
-      normalized_validated_name = nil
-      service.examples.normalize self.name do |o|
-        o.on_success { |v| normalized_validated_name = v }
-        o.on_failure { |e| error e }
-      end or return
-      config.set_value :example, normalized_validated_name, resource_name
-      true
+      result = nil
+      begin
+        config.ready? or break
+        sanitized = service.examples.normalize self.name,
+          -> e { error e } # result goes into sanitized, careful!
+        if ! sanitized
+          result = sanitized
+          break
+        end
+        result = config.set_value :example, sanitized, resource_name
+      end while nil
+      result
     end
   end
 end

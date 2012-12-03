@@ -1,15 +1,12 @@
-require File.expand_path('../../task', __FILE__)
-require 'pathname'
-
 module Skylab::Dependency
-  class TaskTypes::BuildTarball < Graph
+  class Dependency::TaskTypes::BuildTarball < Slake::Graph
 
     attribute :build_tarball
     attribute :configure_with, :required => false
 
     def _task_init
       @interpolated or interpolate! or return false
-      pathname = Pathname.new(build_tarball)
+      pathname = ::Pathname.new(build_tarball)
       dirname, basename_with_get_args = [pathname.dirname.to_s, pathname.basename.to_s]
       @basename = /\A([^?]+)/.match(basename_with_get_args)[1]
       @nodes = {
@@ -47,9 +44,8 @@ module Skylab::Dependency
 
     def update_check slake=false
       slake or dependencies_update_check or return false
-      require File.expand_path('../../check-update', __FILE__)
-      old_url = Version.parse_string_with_version(build_tarball, :ui => ui)
-      cu = CheckUpdate.new(build_tarball)
+      old_url = Dependency::Version.parse_string_with_version(build_tarball, :ui => ui)
+      cu = Dependency::CheckUpdate.new(build_tarball)
       if new_url = cu.run(ui)
         old_ver = old_url.detect(:version).to_s
         new_ver = new_url.detect(:version).to_s
@@ -80,4 +76,3 @@ module Skylab::Dependency
     end
   end
 end
-

@@ -1,3 +1,6 @@
+# do not touch this file while it is green -- this file is under active
+# study, and cross-ticketed at [#bs-008] and [#111]
+
 require File.expand_path('../test-support', __FILE__)
 require File.expand_path('../../all', __FILE__)
 

@@ -38,8 +38,11 @@ module Skylab::Bnf2Treetop::TestSupport
     def make_an_example_out_of output_f, *a
       o = ::BasicObject.new
       labels = []
-      class << o ; self end.send(:define_method, :method_missing) do |m, *a|
-        labels.push "#{m.to_s.gsub('_', ' ')}#{'(..)' unless a.empty?}"
+      sc = class << o ; self end # ::BasicObject has no define_singleton_method
+      sc.send :define_method,  :method_missing do |m, *aa|
+        if aa.length.nonzero?
+          labels.push "#{ m.to_s.gsub '_', ' ' }#{ '(..)' }"
+        end
       end
       o.instance_eval(&output_f)
       labels.empty? and labels.push('(none)') # sanity

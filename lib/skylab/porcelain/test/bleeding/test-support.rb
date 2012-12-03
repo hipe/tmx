@@ -3,14 +3,17 @@ require_relative '../../core'
 require 'skylab/headless/core'
 
 module Skylab::Porcelain::TestSupport::Bleeding
-  Parent_ = ::Skylab::Porcelain::TestSupport # #ts-002
-  Parent_[ self ] # #regret
-  Bleeding_TestSupport = self # courtesy
+  ::Skylab::Porcelain::TestSupport[ Bleeding_TestSupport = self ] # #regret
 
-  module CONSTANTS # #ts-002
-    include Parent_::CONSTANTS
+  module CONSTANTS
     MUSTACHE_RX = Headless::CONSTANTS::MUSTACHE_RX
+    self::Bleeding || nil
+    self::Porcelain || nil
   end
+
+  include CONSTANTS
+
+  self::Bleeding || nil
 
   class Event_Simplified < ::Struct.new :type, :message
     # hack for prettier dumps whateveuh
@@ -19,10 +22,9 @@ module Skylab::Porcelain::TestSupport::Bleeding
     end
   end
 
-  include CONSTANTS # have it here so it's seen in my child modules?
-  Porcelain = Porcelain
 
   class My_EmitSpy < ::Skylab::TestSupport::EmitSpy
+    include CONSTANTS
     include Porcelain::TiteColor::Methods # unstylize
     def initialize &b
       unless block_given?
@@ -41,9 +43,9 @@ module Skylab::Porcelain::TestSupport::Bleeding
   end
 
   module ModuleMethods
-    extend ::Skylab::MetaHell::Modul::Creator
-    include ::Skylab::MetaHell::Klass::Creator
-    include ::Skylab::Autoloader::Inflection::Methods
+    extend MetaHell::Modul::Creator
+    include MetaHell::Klass::Creator
+    include Autoloader::Inflection::Methods
     def base_module!
       (const = constantize description) !~ /\A[A-Z][_a-zA-Z0-9]*\z/ and fail("oops: #{const.inspect}")
       _last = 0

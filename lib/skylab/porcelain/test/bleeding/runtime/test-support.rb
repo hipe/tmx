@@ -1,13 +1,11 @@
 require_relative '../test-support'
 
 module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime
-  Parent_ = ::Skylab::Porcelain::TestSupport::Bleeding
-  Parent_[ self ] # #t
-  Runtime_TestSupport = self # courtesy
+  ::Skylab::Porcelain::TestSupport::Bleeding[ Runtime_TestSupport = self ]
 
-  module CONSTANTS # #ts-002
-    include Parent_::CONSTANTS
-  end
+  include CONSTANTS # so we can say `Bleeding` (the right one) in specs!
+
+  Bleeding = self::Bleeding # #annoy -- *necessary* for the six-month @_todo's
 
   class Frame < ::Struct.new :klass, :argv, :debug
     include CONSTANTS
@@ -21,7 +19,7 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime
 
     let :parent_client do
       o = EmitSpy.new
-      o.formatter = -> e { "#{e.type.inspect}<-->#{e.message.inspect}" }
+      o.format = -> e { "#{e.type.inspect}<-->#{e.message.inspect}" }
       o
     end
 
@@ -36,12 +34,12 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime
     include CONSTANTS
 
     def emit k, v
-      @parent.emit Event_Simplified.new(k, unstylize(v))
+      parent.emit Event_Simplified.new(k, unstylize(v))
     end
 
     def initialize rt=nil
+      self.parent = rt
       @program_name = 'DORP'
-      @parent = rt
     end
   end
 

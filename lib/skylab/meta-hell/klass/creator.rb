@@ -60,6 +60,13 @@ module Skylab::MetaHell::Klass::Creator
     def klass full_name, *a, &class_body # `a` is extra args, e.g. extends:
                                   # see extensive comments at klass! for now.
 
+
+      if method_defined? :_nearest_klass_full_name # -w
+        if instance_methods(false).include? :_nearest_klass_full_name
+          remove_method :_nearest_klass_full_name
+        end
+      end
+
       let( :_nearest_klass_full_name ) { full_name } # for i.m. klass()
 
       kg = __metahell_known_graph # (avoid spreading this around)
@@ -155,7 +162,7 @@ module Skylab::MetaHell::Klass::Creator
 
       build = -> memo do
         meta = create_meta[ memo.name ] # This will process `opts` (extends)
-        mod = meta.build_product  # which should have been normalized and
+        mod = meta.build_product self   # which should have been normalized and
         run_body[ mod ]           # vivified by now if any.
         mod
       end

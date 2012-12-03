@@ -4,7 +4,7 @@ require 'skylab/test-support/core'
 module Skylab::MetaHell::TestSupport
   ::Skylab::TestSupport::Regret[ self ]
 
-  module CONSTANTS # #ts-002
+  module CONSTANTS
     MetaHell = ::Skylab::MetaHell
   end
 

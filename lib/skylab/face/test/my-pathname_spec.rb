@@ -1,40 +1,76 @@
 require_relative 'test-support'
 
-describe "#{Skylab::Face::MyPathname}#pretty" do
 
+describe "#{ ::Skylab::Face::MyPathname }#pretty" do
 
-  # --*-- enjoy
-  MEMO = { }
-  WITH = ->(name, *v) { v.empty? ? MEMO[name] : (MEMO[name] = v.first) }
-  THESE = [:HOME, :PWD]
-  def self.frame(&b) ; MEMO.clear ; instance_eval(&b) end
-  def self.home(*v) ; WITH.call(:HOME, *v) end
-  def self.pwd(*v) ; WITH.call(:PWD, *v) end
-  def self.exemplifying desc, *tags, &block
-    memo = MEMO.dup
-    before_f = -> do
-      THESE.each { |k| ::Skylab::Face::PathTools::const_get("CLEAR_#{k}").call }
-      memo.each do |k, v|
-        ::Skylab::Face::PathTools::const_get(k).singleton_class.send(
-          :define_method, :call) { v }
-      end
-      (THESE - memo.keys).each do |k|
-        ::Skylab::Face::PathTools::const_get(k).singleton_class.send(
-          :define_method, :call) { } # application code is expected to then not
-                                     # use such undefined values
-      end
-    end
-    context(desc, *tags) do
-      before(:all) { before_f.call }
-      instance_exec(&block)
+  include ::Skylab::Face # constants
+
+  fun = self::Face::PathTools::FUN
+
+  @memo = { }
+
+  singleton_class.send :attr_reader, :memo
+
+  define_singleton_method :frame do |&b|
+    memo.clear
+    instance_exec( &b )
+  end
+
+  get_set = -> name, *a do
+    case a.length
+    when 0 ; memo.fetch name
+    when 1 ; memo[name] = a.first
+    else   ; fail 'no'
     end
   end
+
+  define_singleton_method :home do |*a|
+    get_set[ :home, *a ]
+  end
+
+  define_singleton_method :pwd do |*a|
+    get_set[ :pwd, *a ]
+  end
+
+  define_singleton_method :exemplifying do |s, *t, &b|
+    home = memo[:home] # nil ok
+    pwd = memo[:pwd] # nil ok
+    _home = -> do
+      home # acccesses this once per frame! -- could be tested
+    end
+    _pwd = -> do
+      pwd # accesses this once per frame! -- could be tested
+    end
+    before_ = -> do
+      fun.clear[ _home, _pwd ]
+    end
+    context s, *t do
+      before :all do
+        before_[]
+      end
+      instance_exec( &b )
+    end
+  end
+
+
   def self.o input, expected, *a
-    msg = (input == expected ? 'does not change' : "prettifies to #{expected.inspect}")
-    it("#{input.inspect} #{msg}", *a)  do
-      ::Skylab::Face::MyPathname.new(input).should prettify_to(expected)
+
+    vp = if input == expected
+      'does not change'
+    else
+      "prettifies to #{ expected.inspect }"
     end
+
+
+    it "#{ input.inspect } #{ vp }", *a  do
+
+      pn = Face::MyPathname.new input
+      pn.should prettify_to( expected )
+
+    end
+
   end
+
   # --*--
 
 

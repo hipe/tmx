@@ -1,44 +1,87 @@
 module Skylab::Headless
   module Parameter::Controller::InstanceMethods
-    # and_ em error errors_count formal_parameters params s
-    def set! request=nil, params_arg=nil
+    include Headless::SubClient::InstanceMethods
+
+    # Put request parameters from `actual_h' (if any) into `actual`
+    # while doing the usual validation, normalization, defaultation, and
+    # emitting of any resulting errors (#pattern [#sl-116]).
+    # Result is a boolean indicating whether no errors occured.
+    #
+    def set! actual_h=nil, actual=self.actual_parameters
+      actual_h = actual_h ? actual_h.dup : { } # don't change original
       errors_count_before = errors_count
-      request = request ? request.dup : {}
-      prune_bad_keys request
-      defaults request
-      use_params = params_arg || params
-      request.each do |name, value|
-        if use_params.respond_to?(writer = "#{name}=")
-          use_params.send(writer, value) # not atomic with above as es muss sein
+      prune_bad_keys actual_h
+      defaults actual_h
+      actual_h.each do |name, value|
+        if actual.respond_to? "#{name}="
+          actual.send "#{name}=", value # not atomic with above as es muss sein
         else
-          error("not writable: #{name}")
+          error "not writable: #{name}"
         end
       end
-      missing_required use_params
-      errors_count_before == errors_count ? use_params : false
+      missing_required actual
+      errors_count_before == errors_count # returning anything otherwise would
+      # be bad design via tight coupling of our implementation and the bool fact
     end
+
   protected
-    def defaults request
-      fp = formal_parameters
-      rks = request.keys ; dks = fp.all.select(&:has_default?).map(&:name)
-      request.merge!  Hash[ (dks - rks).map { |k| [k, fp[k].default_value] } ]
+
+    def actual_parameters # for compatibility with the ever-flexible set!
+      self           # but it is only a default -- parameter controllers are
+    end              # not necessarily the actual parameters container!
+
+    def defaults actual_h        # #pattern [#sl-117]
+      formal_parameters.each do |o|
+        if o.has_default? and actual_h[o.name].nil?
+          actual_h[o.name] = o.default_value
+        end
+      end
       nil
     end
-    def missing_required params
-      a = formal_parameters.list.
-        select { |param| param.required? and params[param.name].nil? }.
-        map { |param| pen.parameter_label param }
-      a.empty? or error("missing the required parameter#{s a} #{and_ a}")
+
+    def error msg                 # the home for this is very in flux [#006]
+      emit :error, msg
+      increment_errors_count!
+      false
+    end
+
+    def errors_count              # idem [#006]
+      @errors_count ||= 0
+    end
+
+    attr_writer :errors_count     # idem [#006]
+
+    def formal_parameters
+      formal_parameters_class.parameters
+    end
+
+    def formal_parameters_class   # feel free to override!
+      self.class
+    end
+
+    def increment_errors_count!
+      self.errors_count += 1
+    end
+
+    def missing_required actual
+      a = formal_parameters.each.select do |p|
+        p.required? and ! actual.known?(p.name) || actual[p.name].nil?
+      end
+      if ! a.empty?
+        a.map! { |param| parameter_label param }
+        error "missing the required parameter#{s a} #{and_ a}"
+      end
       nil
     end
-    def prune_bad_keys request # internal defaults may exist hence ..
-      bad = ->(k) { request.delete(k) } # for non-atomic aggretation of errors
+
+    def prune_bad_keys actual_h # internal defaults may exist hence ..
+      bad = ->(k) { actual_h.delete(k) } # for non-atomic aggretation of errors
       not_param = intern = nil
-      request.keys.each do |key|
+      actual_h.keys.each do |key|
         param = formal_parameters[key]
         if param
           if param.internal?
-            (intern ||= []).push pen.parameter_label(param)
+            (intern ||= []).push parameter_label( param )
             bad.call key
           end
         else

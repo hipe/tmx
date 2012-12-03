@@ -1,9 +1,9 @@
 require_relative '../test-support'
 
 module ::Skylab::MetaHell::TestSupport::Klass::Creator::ModuleMethods
-  (Parent_ = ::Skylab::MetaHell::TestSupport::Klass::Creator)[ self ]
+  ::Skylab::MetaHell::TestSupport::Klass::Creator[ self ]
 
-  include Parent_::CONSTANTS
+  include CONSTANTS
 
   MetaHell = MetaHell # #annoying
 

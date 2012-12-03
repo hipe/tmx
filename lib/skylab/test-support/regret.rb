@@ -26,6 +26,8 @@ module ::Skylab::TestSupport
     #   + They sometimes want to at least be some kind of autoloader, possibly
     #       with a dir_path that is nonstandard in a consistent way.
     #   + The InstanceMethods module pulls in the module called Let
+    #   + There is a CONSTANTS module that forms a central place to hold
+    #     application constants.
     #
     # For our implementation of Regret itself as it will be used in the field,
     # we use the "embellish" (or []) method.  Subsequent uses of it down the
@@ -87,6 +89,8 @@ module ::Skylab::TestSupport
       # to another, the place to do that is e.g. in a module called CONSTANTS
       # that resides in your anchor module.  You would then include that
       # CONSTANTS module in your I_M or your M_M as appropriate. in flux!
+      #
+      # (Now, experimentally, we are doing the above)
 
       extend ::Skylab::MetaHell::
         Autoloader::Autovivifying::Recursive::ModuleMethods #conf
@@ -99,25 +103,30 @@ module ::Skylab::TestSupport
           # life is better without test-support folders
         end
       end.call
+      const_set :CONSTANTS, -> do
+        o = ::Module.new
+        parent_anchor_module and
+          o.send :include, parent_anchor_module.constants_module
+        o
+      end.call
       const_set :ModuleMethods, -> do
         o = ::Module.new
-        if parent_anchor_module
-          o.module_eval {
-            include parent_anchor_module.module_methods_module
-          }
-        end
+        parent_anchor_module and
+          o.send :include, parent_anchor_module.module_methods_module
         o
       end.call
       const_set :InstanceMethods, -> do
         o = ::Module.new
         o.module_eval {
           extend ::Skylab::MetaHell::Let::ModuleMethods # or fly solo .. #rspec
-          if parent_anchor_module
+          parent_anchor_module and
             include parent_anchor_module.instance_methods_module
-          end
         }
         o
       end.call
+    end
+    def constants_module
+      const_get :CONSTANTS, false
     end
     def instance_methods_module
       const_get :InstanceMethods, false

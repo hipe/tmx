@@ -4,12 +4,12 @@ require 'pathname' # already required by whoever but whatever
 describe 'If you have an object "object" that has a ' <<
   "#{::Skylab::Headless::Parameter} \"foo\" " do
 
-  extend ::Skylab::Headless::Parameter::TestSupport
+  extend ::Skylab::Headless::TestSupport::Parameter
   context 'and "foo" has the property "pathname: true"' do
     context '"pathname: true" alone, (i.e. you don\'t specify a writer)' do
       it 'you get bucked - i.e. no passthru filters without writers' do
         -> do
-          self.class.defn do
+          self.class.with do
             param :foo, pathname: true
           end
         end.should raise_error(
@@ -35,7 +35,7 @@ describe 'If you have an object "object" that has a ' <<
     end
     context 'but if you do specify a writer (note order must not matter)' do
       context '"pathname: true, writer: true" (e.g. writer at tail of props)' do
-        defn do
+        with do
           param :foo, pathname: true, writer: true
         end
         frame do
@@ -44,7 +44,7 @@ describe 'If you have an object "object" that has a ' <<
         end
       end
       context '"writer: true, pathname: true" (i.e. writer at head of props)' do
-        defn do
+        with do
           param :foo, writer: true, pathname: true
         end
         frame do

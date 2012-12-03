@@ -3,11 +3,11 @@ require_relative 'test-support'
 describe 'If you have an object "object" that has a ' <<
   "#{::Skylab::Headless::Parameter} \"foo\"" do
 
-  extend ::Skylab::Headless::Parameter::TestSupport
+  extend ::Skylab::Headless::TestSupport::Parameter
   context 'and "foo" either does or doesn\'t have "default: \'anything\'"' do
     let(:foo) { klass.parameters[:foo] }
     context 'if you gave "foo" the property "default: :wazoo"' do
-      defn do
+      with do
         param :foo, default: :wazoo
       end
       frame do
@@ -20,7 +20,7 @@ describe 'If you have an object "object" that has a ' <<
       end
     end
     context "if you did not give it any default assignment" do
-      defn do
+      with do
         param :foo
       end
       frame do
@@ -33,7 +33,7 @@ describe 'If you have an object "object" that has a ' <<
       end
     end
     context "if you give it a false-ish (nil or false) default value" do
-      defn do
+      with do
         param :foo, default: nil
       end
       frame do

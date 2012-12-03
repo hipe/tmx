@@ -32,14 +32,15 @@ module Skylab::CssConvert
   end
 
   module Parser::InstanceMethods
-    include ::Skylab::TreetopTools::Parser::InstanceMethods
-    def load_parser_class &dsl_f
-      _events_f = ->(o) do
-        o.on_info { |e| emit(:info, "#{em '*'} #{e}") }
-        # o.on_error { |e| error("failed to load grammar: #{e}") }
-        o.on_error { |e| fail("failed to load grammarz: #{e}") }
+    include ::Skylab::TreetopTools::Parser::InstanceMethods # sub-client
+    def load_parser_class_with &dsl
+      events = -> o do
+        o.on_info { |e| emit :info, "#{ em '*' } #{ e }" }
+        # o.on_error { |e| error "failed to load grammar: #{ e }" }
+        o.on_error { |e| fail "failed to load grammarz: #{ e }" }
       end
-      ::Skylab::TreetopTools::Parser::Load.new(dsl_f, _events_f).invoke
+      p = ::Skylab::TreetopTools::Parser::Load.new dsl, events
+      p.invoke
     end
   end
 

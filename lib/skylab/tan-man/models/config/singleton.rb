@@ -1,5 +1,9 @@
 module Skylab::TanMan
   class Models::Config::Singleton
+
+    names = [:local, :global].freeze
+    define_method( :all_resource_names ) { names.dup }
+
     def clear
       global.clear
       local.clear
@@ -43,7 +47,7 @@ module Skylab::TanMan
     end
     attr_accessor :local
     protected :'local='
-    class OnReady < API::Emitter.new(:all,
+    class OnReady < API::Emitter.new(:all, # [#043]
       not_ready: :all, no_config_dir: :not_ready, not_a_dir: :no_config_dir
       )
       attr_accessor :on_read_global
@@ -51,8 +55,10 @@ module Skylab::TanMan
     end
     # @todo waiting for permute [#056]
     def ready? &b
-      e = OnReady.new(b)
-      ! [ready_local?(e), ready_global?(e)].index { |x| ! x }
+      e = OnReady.new b
+      a = [ready_local?(e), ready_global?(e)]
+      r = ! a.index { |x| ! x }
+      r
     end
     def ready_global? e
       if global.exist?
@@ -92,4 +98,3 @@ module Skylab::TanMan
     end
   end
 end
-

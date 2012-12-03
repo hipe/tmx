@@ -3,14 +3,14 @@ require_relative 'test-support'
 
 module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
   describe "So check this shit out with summary, an inheritable attribute of #{
-    Bleeding::ActionModuleMethods}:" do
+    Bleeding::Action }:" do
 
     extend Action_TestSupport
 
     incrementing_anchor_module!
 
     klass :Base do                             # We will re-use this defn. in
-      extend Bleeding::ActionModuleMethods     # several constexts below.
+      extend Bleeding::Action                  # several constexts below.
     end
 
     def self.desc *a

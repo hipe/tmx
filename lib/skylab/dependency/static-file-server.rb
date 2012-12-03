@@ -1,159 +1,276 @@
-require 'rack'
 require 'adsf'
-require 'fileutils'
-require_relative('..')
-require 'skylab/pub-sub/emitter'
-
+require 'rack'
 
 module Skylab::Dependency
+
   class StaticFileServer
-    DEFAULT_PORT = 1324
-    include FileUtils
-    extend ::Skylab::PubSub::Emitter
-    emits :all, :info => :all, :warning => :all
-    def determine_rack_handler
-      if h = @rack_handler
-        handler = Rack::Handler.get(h) or fail(
-          "Failed to get rack handler from #{h.inspect}")
-      else
-        begin
-          handler = Rack::Handler::Mongrel
-        rescue LoadError
-          handler = Rack::Handler::WEBrick
+    extend PubSub::Emitter
+
+    include Dependency::Services::FileUtils
+
+    emits info: :all, warn: :all, error: :all # used internally
+
+  public
+
+    def doc_root_pathname
+      @doc_root_pathname ||= begin
+        if doc_root
+          ::Pathname.new doc_root.to_s
         end
       end
-      handler
     end
-    attr_reader :document_root
-    def document_root= root
-      case root
-      when NilClass ; @document_root = nil
-      when String   ; @document_root = Pathname.new(root)
-      when Pathname ; @document_root = root
-      else            raise ArgumentError.new("Bad type for document_root: #{root.class}")
+
+    def run
+      start_unless_running
+    end
+
+  protected
+
+    default_log_level = :info
+    default_port = 1324
+    levels = PubSub::Emitter::COMMON_LEVELS
+    options = ::Struct.new :doc_root, :log_level, :pid_path, :port
+
+    define_method :initialize do |*args|
+      block_given? and raise ::ArgumentError.new 'no block cleverness yet'
+      @downstream = $stderr       # can be made configurable if necessary
+      ::Hash === args.last and opts_h = args.pop # first, before below args
+      args_h = { }
+      args.empty? or args_h[:doc_root] = args.shift
+      args.empty? or args_h[:pid_path] = args.shift
+      args.empty? or raise ::ArgumentError.new 'too many args'
+      if opts_h
+        (a = opts_h.keys & args_h.keys).empty? or
+          raise ::ArgumentError.new "duplicated in args, opts: #{ a.join ', ' }"
+        args_h.merge! opts_h
+        opts_h = nil
       end
-      root
-    end
-    alias_method :_emit, :emit
-    def emit type, message
-      _emit type, "#{message_prefix}#{message}"
-    end
-    def fu_output_message msg # see fileutils.rb
-      emit :info, msg
-    end
-    def initialize *args
-      opts = Hash === args.last ? args.pop.dup : {}
-      args.size.nonzero? and opts[:document_root] = args.shift
-      args.size.nonzero? and opts[:log_level] = args.shift
-      args.size.nonzero? and raise ArgumentError.new('no.')
-      opts = {log_level: :info, port: DEFAULT_PORT}.merge(opts)
+      args_h =
+        { log_level: default_log_level, port: default_port }.merge args_h
+      opts = options.new
+      args_h.each { |k, v| opts[k] = v } # effectively validates keys
       on_all do |e|
-        if $debug or !(l = LEVELS.index(e.type)) or (l >= @log_level_i)
-          $stderr.puts "FILE_SERVER (#{e.type}): #{e}"
+        if levels.index(e.type) >= log_level_i # gigo
+          downstream.puts "FILE_SERVER (#{ e.type }): #{ e.message }"
         end
       end
-      opts.each { |k, v| send("#{k}=", v) }
-      yield(self) if block_given?
+      opts.members.each { |k| send "#{k}=", opts[k] }
     end
-    LEVELS = ::Skylab::PubSub::Emitter::COMMON_LEVELS
-    attr_reader :log_level
-    def log_level= lvl
-      LEVELS.include?(lvl) or fail("no: #{lvl}")
-      @log_level_i = LEVELS.index(@log_level = lvl)
-      lvl
+
+    attr_reader :doc_root
+
+    def doc_root= root
+      @doc_root_pathname = nil
+      @doc_root = root
     end
-    def message_prefix
-      @message_prefix ||= '' # default behavior is for clients to prefix/format the messages
+
+    attr_reader :downstream
+
+    def error msg
+      emit :error, msg
+      nil
     end
-    def name
-      @name || self.class.to_s
+
+    def filesystem_ok &er
+      result = false
+      error = -> msg { ( er || -> m { error m } )[ msg ] }
+      begin
+        if ! pid_pathname.dirname.writable?
+          error[ "not writable: #{ pid_pathname.dirname }" ]
+          break
+        end
+        if ! doc_root_pathname
+          error[ "doc_root not set" ]
+          break
+        end
+        if ! doc_root_pathname.exist?
+          error[ "doc_root directory not found - #{ doc_root_pathname }" ]
+          break
+        end
+        if ! doc_root_pathname.directory?
+          error[ "not a directory - #{ doc_root_pathname }" ]
+          break
+        end
+        result = true
+      end while nil
+      result
     end
-    attr_reader :pid
-    def pid_file
-      @pid_file ||= begin
-        File.directory?(pid_file_dirname) or
-          fail("Can't use #{self.class} without an existing pid_file_dirname: #{pid_file_basename}")
-        File.join(pid_file_dirname, pid_file_basename)
+
+    def fu_output_message msg # compat with fileutils
+      info msg
+    end
+
+    def info msg
+      emit :info, msg
+      nil
+    end
+
+    attr_reader :log_level, :log_level_i
+
+    define_method :log_level= do |level|
+      idx = levels.index level
+      idx or raise ::ArgumentError.new "invalid log level: #{level.inspect} -#{
+       } expecting one of : (#{ levels.map(&:inspect).join ' ' })"
+      @log_level = level
+      @log_level_i = idx
+      level
+    end
+
+    attr_reader :pid_path
+
+    def pid_path= x
+      @pid_pathname = nil
+      @pid_path = x
+    end
+
+    dirname_basename = -> pid_path do
+      pn = ::Pathname.new pid_path.to_s
+      if pn.exist?                # if the file exists
+        if pn.directory?          #   and it looks like a directory
+          dirname = pn            #     then assume that that's the pid dir
+        else                      #   otherwise
+          dirname = pn.dirname    #     split it into a dirname
+          basename = pn.basename  #     and a basename
+        end                       #
+      elsif '' == pn.extname      # otherwise, if the path has no extension,
+        dirname = pn              #   assume it's supposed to be a dir
+      else                        # otherwise assume it's supposed to be a file
+        dirname = pn.dirname      #   split it into a dirname
+        basename = pn.basename    #   and a basename
+      end
+      [dirname, basename]
+    end
+
+    default_basename = 'static-file-server.pid'
+
+    define_method :pid_pathname do |&er|
+      @pid_pathname ||= begin
+        pathname = nil
+        error = -> msg  { (er || -> m { self.error m } )[ msg ] }
+        begin
+          if ! pid_path
+            error[ "pid_path was not set" ]
+            break
+          end
+          dirname, basename = dirname_basename[ pid_path ]
+          if ! dirname.exist?
+            error[ "pid dir not found: #{ dirname }" ]
+            break
+          end
+          if ! dirname.directory?
+            error[ "not a directory: #{ dirname }" ]
+            break
+          end
+          pathname = dirname.join( basename || default_basename )
+        end while nil
+        pathname
       end
     end
-    attr_writer :pid_file
-    def pid_file_basename
-      @pid_file_basename ||= "#{self.class.to_s.gsub('::', '-').downcase}-#{self.class.next_unique_id}.pid"
-    end
-    attr_writer :pid_file_basename
-    def pid_file_dirname
-      @pid_file_diranme || './tmp'
-    end
-    attr_writer :pid_file_dirname
+
     attr_accessor :port
+
     def rack_app
       @rack_app ||= begin
-        docroot = self.document_root or fail("No document_root set, can't create app")
-        emit :info, "building rack app with document_root: #{docroot}"
-        Rack::Builder.new do
-          use Rack::CommonLogger
-          use Rack::ShowExceptions
-          use Rack::Lint
-          use Adsf::Rack::IndexFileFinder, :root => docroot.to_s
-          run Rack::File.new(docroot)
-        end.to_app
+        rack_app = nil
+        begin
+          info "building rack app (doc_root: #{ doc_root } port: #{ port })"
+          doc_root = doc_root_pathname.to_s # b/c of dsl scope too!
+          rack_builder = Headless::FUN.quietly do
+            ::Rack::Builder.new do
+              use ::Rack::CommonLogger
+              use ::Rack::ShowExceptions
+              use ::Rack::Lint
+              use ::Adsf::Rack::IndexFileFinder, root: doc_root
+              run ::Rack::File.new( doc_root )
+            end
+          end
+          rack_app = rack_builder.to_app
+        end while nil
+        rack_app
       end
     end
-    attr_writer :rack_handler
-    # def run # defined below
-    def _run_rack_app handler, app
-      pid = Process.pid
-      File.open(pid_file, 'w') { |fh| fh.write(pid) }
-      emit(:info, "Wrote pid (##{pid}) to file (#{File.basename(pid_file)}) using #{handler}")
-      # if you are going to do something like below, a comment would be nice derkus
-      # Signal.trap("SIGINT") do
-      #  emit(:info, "received SIGINT signal. Sorry, there is no exit (adsf issue?).  Try KILL !?")
-      # end
-      res = handler.run(app, :Port => port) # Errno::EADDRINUSE
+
+    def rack_handler
+      @rack_handler ||= resolve_rack_handler
     end
+
+    def resolve_rack_handler
+      # ::Rack::Handler.get
+      begin
+        ::Rack::Handler::Mongrel
+      rescue ::LoadError
+        ::Rack::Handler::WEBrick
+      end
+    end
+
     def running?
-      @pid = nil
-      File.exist?(pid_file) or return false
-      pid = File.read(pid_file).strip
-      /\A\d+\z/ =~ pid or return warn("pid file content is not a digit: #{pid.inspect}")
-      lines = `ps -p #{pid} -o%cpu -ostat`.strip.split("\n")
-      '%CPU STAT' == (l = lines.shift) or return warn("failed to parse ps response: #{l}")
-      case lines.size
-      when 0 ; remove_stale_pid_file ; false
-      when 1 ; @pid = pid ; true
-      else   ; @pid = pid ; warn("why are there multiple lines?") ; true
-      end
+      result = false
+      begin
+        pid_pathname.exist? or break
+        pid_str = pid_pathname.read.strip
+        if /\A\d+\z/ !~ pid_str
+          warn "pid file content is not a digit: #{ pid_str.inspect }"
+          break
+        end
+        lines = `ps -p #{ pid_str } -o%cpu -ostat`.strip.split "\n" # [#sl-120]
+        header = lines.shift
+        if '%CPU STAT' != header
+          warn "failed to parse first line of ps response: #{ header.inspect }"
+          break
+        end
+        if 0 == lines.length
+          info "removing stale pid file - #{ pid_pathname.basename }"
+          rm pid_pathname.to_s, verbose: true
+          break
+        end
+        if 1 < lines.length
+          warn "why are there multiple lines?"
+        end
+        result = pid_str.to_i
+      end while nil
+      result
     end
-    def remove_stale_pid_file
-      emit :info, "removing stale pid file.."
-      rm pid_file, :verbose => true
-    end
+
     def start
-      running? and fail("won't start server when it's already running.")
-      handler = determine_rack_handler or return false
-      rack_app = self.rack_app or return false
-      pid = fork { _run_rack_app handler, rack_app }
-      Process.detach(pid)
-      emit(:info, "parent process has parent process id : #{Process.pid} " <<
-        "and child id: #{pid}")
+      result = false
+      running? and fail "won't start server when it's already running."
+      begin
+        filesystem_ok { |e| error "can't start server - #{e}" } or break
+        rack_app or break
+        rack_handler or break
+        p = fork do
+          pid = ::Process.pid
+          info "writing new pid file - #{ pid_pathname.basename } (pid: #{pid})"
+          pid_pathname.open( 'w' ) { |o| o.write pid }
+          rack_handler.run rack_app, :Port => port # Errno::EADDRINUSE
+          $stderr.puts "YOU SHOULD NEVER SEE THIS: ROCK HANOI"
+        end
+        ::Process.detach p
+        info "parent process has parent process id : #{ ::Process.pid }#{
+          } and child id: #{ p }"
+        result = p
+      end while nil
+      result
+    end
+
+    def start_unless_running
+      pid = nil
+      begin
+        pid_pathname { |m| error "can't start server - #{ m }" } or break
+          # used by running? and start so do it here
+        p = running?
+        if p
+          info "running (pid ##{ p } in #{ pid_pathname.basename })."
+          break
+        end
+        pid = start
+      end while nil
       pid
     end
-    def start_unless_running
-      if running?
-        emit :info, "is (already) running (pid ##{pid} in file #{File.basename(pid_file)})."
-        return true
-      end
-      start
-    end
-    alias_method :run, :start_unless_running
+
     def warn msg
-      emit :warning, msg
+      emit :warn, msg
       false
     end
   end
-  class << StaticFileServer
-    id = 0
-    define_method(:next_unique_id) { id += 1 }
-  end
 end
-

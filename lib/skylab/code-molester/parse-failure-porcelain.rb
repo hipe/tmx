@@ -5,7 +5,7 @@ require 'strscan'
 # but ended up not really adding anything to it.
 #
 
-module Skylab::CodeMolester
+module ::Skylab::CodeMolester
 
   class ParseFailurePorcelain # @api private
     include En::Methods
@@ -30,7 +30,7 @@ module Skylab::CodeMolester
       end
     end
     def paint
-      [ "Expecting #{_or(@info[:expect].map(&:inspect))}",
+      [ "Expecting #{or_(@info[:expect].map(&:inspect))}",
         @info[:line_head],
         (
          if @info[:pretty_path]
@@ -65,4 +65,3 @@ module Skylab::CodeMolester
     end
   end
 end
-

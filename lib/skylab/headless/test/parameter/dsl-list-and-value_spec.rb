@@ -3,9 +3,9 @@ require_relative 'test-support'
 describe 'If you have an object "object" that has a ' <<
   "#{::Skylab::Headless::Parameter} \"foo\"" do
 
-  extend ::Skylab::Headless::Parameter::TestSupport
+  extend ::Skylab::Headless::TestSupport::Parameter
   context 'and "foo" has the property of "dsl: :value"' do
-    defn do
+    with do
       param :comment, dsl: :value
     end
     frame do
@@ -21,7 +21,7 @@ describe 'If you have an object "object" that has a ' <<
   end
   context 'and "foo" has the property of ' <<
      '"dsl: :value, pathname: true"' do
-    defn do
+    with do
       param :comment, dsl: :value, pathname: true
     end
     frame do
@@ -33,7 +33,7 @@ describe 'If you have an object "object" that has a ' <<
   end
 
   context 'and "foo" has the property of "dsl: :list"' do
-    defn do
+    with do
       param :topping, dsl: :list
     end
     frame do
@@ -57,13 +57,13 @@ describe 'If you have an object "object" that has a ' <<
   end
   context 'and "foo" has the properties ' <<
     '"dsl: :list, enum: [:up, :down, :over]" (CHECK THIS OUT ^_^:)' do
-    defn do
+    with do
       param :move, dsl: :list, enum: [:up, :down, :over]
     end
     frame do
       it '"object.foo :left" is invalid, (still) invokes client ui mechanics' do
         object.move :left
-        out.first.should match(/left.+invalid.+move/)
+        emit_lines.first.should match(/left.+invalid.+move/)
       end
       it '"object.foo <valid> ; object.foo <invalid>" now works as ' <<
           'expected, as a map-reduce' do
@@ -72,7 +72,7 @@ describe 'If you have an object "object" that has a ' <<
         object.move :over
         object.move :sideways
         object.move :down
-        out.length.should eql(1)
+        emit_lines.length.should eql(1)
         object.send(:[], :move).should eql([:up, :over, :down])
       end
     end

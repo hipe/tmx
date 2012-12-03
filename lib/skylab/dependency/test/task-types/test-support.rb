@@ -1,7 +1,23 @@
-require File.expand_path('../../test-support', __FILE__)
+require_relative '../test-support'
 
-module Skylab::Dependency::TaskTypes
-  # there is no central entrypoint file for this module
-  # @todo use meta-hell
+module Skylab::Dependency::TestSupport::Tasks
+  ::Skylab::Dependency::TestSupport[ Tasks_TestSupport = self ] # #regret
+
+  module CONSTANTS
+    include Dependency
+    Dependency::TaskTypes && nil # :/
+  end
+
+  include CONSTANTS # include them here for use in specs
+
+  module InstanceMethods
+    include CONSTANTS # some want BUILD_DIR in the i_m's
+    def wire! o
+      o.context = context
+      o.on_all do |e|
+        self.debug and $stderr.puts [e.type, e.message].inspect
+        fingers[e.type].push unstylize_if_stylized(e.to_s)
+      end
+    end
+  end
 end
-

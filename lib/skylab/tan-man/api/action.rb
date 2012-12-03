@@ -1,95 +1,38 @@
 module Skylab::TanMan
   class API::Action
-    extend Bleeding::DelegatesTo
-    extend ::Skylab::PubSub::Emitter
-    extend Porcelain::Attribute::Definer
+    # extend Autoloader                 # recursiveness apparently o
+    extend Core::Action::ModuleMethods
 
-    include API::RuntimeExtensions
-    include Core::Attribute::Reflection::InstanceMethods
-    include Core::Pen::Methods::Adaptive
+    include Core::Action::InstanceMethods
 
-    meta_attribute(*Core::MetaAttributes[:boolean, :default, :mutex_boolean_set,:pathname, :required, :regex])
-
-    emits Core::Event::GRAPH
     event_class API::Event
 
-    delegates_to :class, :action_name
-
-    def config
-      @config ||= begin
-        TanMan::Models::Config::Controller.new(self)
-      end
+    # Using call() gives us a thick layer of isolation between the outward
+    # representation and inward implementation of an action.  Outwardly,
+    # actions are represented merely as constants inside of some Module
+    # that, all we know is, these constants respond to call().  Inwardly,
+    # they might be just lambdas, or they might be something more.  This
+    # pattern may or may not stick around, and is part of [#sl-100]
+    #
+    def self.call request_client, params_h, events
+      block_given? and fail 'sanity - no blocks here!'
+      action = new request_client, events
+      result = action.set! params_h
+      if result                        # we violate the protected nature of
+        result = action.send :execute  # it only b/c we are the class!
+      end                              # it is protected for the usual reasons
+      result
     end
 
-    def error msg
-      emit :error, msg
-      false
-    end
+  public
 
-    def error_emitter ; self end # meta attributes compat
+    # none
 
-    def initialize runtime
-      @runtime = runtime
-      on_error { |e| add_invalid_reason e }
-      on_all { |e| self.runtime.emit(e) }
-    end
+  protected
 
-    def invalid_reasons?
-      invalid_reasons_count.nonzero?
-    end
-
-    def invalid_reasons_count
-      (@invalid_reasons ||= nil) ? @invalid_reasons.count : 0
-    end
-
-    def invoke
-      execute # the specific action is expected to implement this
-    end
-
-    attr_reader :runtime
-    alias_method :parent, :runtime # @todo 100
-
-    delegates_to :root_runtime, :singletons
-
-    def infostream ; runtime.infostream end
-    alias_method :stderr, :infostream # #jawbreak
-
-    delegates_to :runtime, :stdout
-
-    delegates_to :runtime, :text_styler
-
-    def skip msg
-      emit :skip, msg
-      nil
-    end
-
-    def update_attributes! h
-      c0 = invalid_reasons_count
-      h.each { |k, v| send("#{k}=", v) }
-      c0 >= invalid_reasons_count
-    end
-
-    def valid?
-      invalid_reasons? and return false
-      required_ok? # more hooking required
-      ! invalid_reasons?
-    end
-  end
-
-  class << API::Action
-
-    def action_name
-      to_s.match(/[^:]+$/)[0].gsub(/([a-z])([A-Z])/) { "#{$1}-#{$2}" }.downcase
-    end
-
-    def call runtime, request
-      o = new(runtime)
-      yield(o) if block_given?
-      runtime.set_transaction_attributes(o, request) or return false
-      o.set_defaults_if_nil!
-      o.valid? or return false
-      o.invoke
+    def initialize request_client, events # pass the callable explicity
+      _sub_client_init! request_client
+      events[ self ]
     end
   end
 end
-

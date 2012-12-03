@@ -4,8 +4,13 @@ require 'fileutils'
 require 'open3'
 require File.expand_path('../../lib/skylab', __FILE__)
 require 'skylab/porcelain/all'
+require 'skylab/face/core' ; ::Skylab::Face::MyPathname || nil # fail early
+
 
 module Skylab::GitStashUntracked
+
+  Face = ::Skylab::Face
+
   class Porcelain
     extend ::Skylab::Porcelain
 
@@ -70,47 +75,113 @@ module Skylab::GitStashUntracked
       true
     end
   end
+
+
   class Plumbing
-    def collection
-      Collection.cache[stashes] ||= Collection.new(stashes, :dry_run => @dry_run) { |*a| emit(*a) }
+
+  protected
+
+    def initialize runtime, params_h=nil
+      runtime or fail "sanity - where is runtime?"
+      @runtime = runtime
+      @dry_run = false
+      if params_h
+         params_h.each { |k, v| send "#{ k }=", v }
+      end
     end
+
+    def collection
+      Collection.cache[stashes] ||= begin
+        c = Collection.new stashes, dry_run: dry_run do |type, payload|
+          emit type, payload
+        end
+        c
+      end
+    end
+
     attr_accessor :dry_run
-    def emit a,b ; @runtime.emit(a, b) end
-    def failed msg
-      emit(:error, "failed: #{msg}")
+
+    def emit type, payload
+      @runtime.emit type, payload
+    end
+
+    def error msg
+      emit :error, msg
       false
     end
-    def initialize runtime, request={}
-      @dry_run = false
-      request.each { |k, v| send("#{k}=", v) }
-      @runtime = runtime or fail("where is runtime?")
+
+    def failed msg
+      emit :error, "failed: #{ msg }"
+      false
     end
+
+    def info msg
+      emit :info, msg
+      nil
+    end
+
     attr_accessor :name
+
+    def popen3 cmd, &block
+      ::Open3.popen3 cmd, &block
+    end
+
     attr_accessor :stashes
   end
+
+
   class Plumbing::Save < Plumbing
-    COMMAND = 'git ls-files -o --exclude-standard'
-    def each_file
-      count = 0
-      emit :info, "# #{COMMAND}"
-      Open3.popen3(COMMAND) do |_, sout, serr|
+
+    command = 'git ls-files -o --exclude-standard'
+
+    define_method :each_file do |&path|
+      result = 0
+      info "# #{ command }"
+      popen3 command do |_, sout, serr|
         loop do
-          "" == (e = serr.read) or return emit(:error, e)
-          line = sout.gets or break
-          count += 1
-          yield line.strip
+          e = serr.read
+          if '' != e
+            error e
+            result = false
+            break
+          end
+          line = sout.gets
+          line or break
+          result += 1
+          path[ line.strip ]
         end
       end
-      count
+      result
     end
+
+
+    # see the notes at `pretty_path` -- there is danger here.
+    # if this acts up, change all calls from `.pretty` to `.to_s`
+
     def invoke
-      stash = collection.stash(@name).validate_for_writing or return stash
-      none = true
-      each_file { |file| stash.stash_file file; none = false }
-      none and emit(:info, "no files to stash!")
-      true
+      Face::PathTools.clear # note above
+      result = nil
+      begin
+        stash = collection.stash(name).validate_for_writing
+        if ! stash
+          result = stash
+          break
+        end
+        any = false
+        each_file do |file|
+          stash.stash_file file
+          any = true
+        end
+        if ! any
+          info "no files to stash!"
+        end
+        result = true
+      end while nil
+      result
     end
   end
+
+
   class Plumbing::List < Plumbing
     def invoke
       collection.validate_existence or return false
@@ -140,12 +211,16 @@ module Skylab::GitStashUntracked
     attr_accessor :patch
     attr_accessor :stat
   end
+
+
   class Plumbing::Pop < Plumbing
     def invoke
       @stash = collection.stash(name).validate_existence or return false
       @stash.pop(&method(:emit))
     end
   end
+
+
   class Collection
     @cache = {}
     def each_stash
@@ -160,7 +235,7 @@ module Skylab::GitStashUntracked
       @cache = {}
       @emit = block
       @opts = opts
-      @path = Pathname.new(path)
+      @path = Face::MyPathname.new path
     end
     def stash name
       @cache[name] ||= Stash.new(@path, name, @opts, &@emit)
@@ -171,11 +246,15 @@ module Skylab::GitStashUntracked
       false
     end
   end
+
+
   class << Collection
     attr_reader :cache
   end
+
+
   class Stash
-    include FileUtils
+    include ::FileUtils
     attr_accessor :color
     attr_accessor :dry_run
     def each_patch_line &emit
@@ -189,8 +268,8 @@ module Skylab::GitStashUntracked
       false
     end
     def filenames
-      Enumerator.new do |o|
-        Open3.popen3("cd #{pathname}; find . -type f") do |_, sout, serr|
+      ::Enumerator.new do |o|
+        ::Open3.popen3("cd #{pathname}; find . -type f") do |_, sout, serr|
           '' != (s = serr.read) and fail("uh-oh: #{s}")
           while s = sout.gets
             o << %r{^\./(.*)$}.match(s)[1]
@@ -211,18 +290,35 @@ module Skylab::GitStashUntracked
       @name = stash_name.to_s
       opts.each { |k, v| send("#{k}=", v) }
     end
+
     attr_reader :name
-    def stash_file file
-      @valid or validate_for_writing or return false
-      dest = pathname.join(file)
-      dest.dirname.exist? or (@quiet[dest.dirname.to_s] ||= mkdir_p(dest.dirname, :verbose => true, :noop => @dry_run))
-      move(file, dest, :verbose => true, :noop => @dry_run)
+
+    define_method :stash_file do |file|
+      result = nil
+      begin
+        if ! ( @valid || validate_for_writing )
+          result = false
+          break
+        end
+        dest = pathname.join file
+        if ! dest.dirname.exist?
+          @quiet.fetch dest.dirname.to_s do |normalized|
+            pretty = dest.pretty # #stahp
+            mkdir_p pretty, verbose: true, noop: dry_run
+            @quiet[normalized] = true
+          end
+        end
+        result = move file, dest.pretty, verbose: true, noop: dry_run
+      end while nil
+      result
     end
+
     def pathname
-      @pathname ||= @dirpathname.join(@name)
+      @pathname ||= @dirpathname.join @name
     end
+
     def pop &emit
-      filenames = self.filenames.map { |f| Pathname.new(f) }
+      filenames = self.filenames.map { |f| Face::MyPathname.new(f) }
       if (existed = filenames.select(&:exist?)).any?
         emit[:error, "Can't pop, destination file(s) exist:"]
         existed.each { |p| emit[:error, p.to_s] }
@@ -237,35 +333,59 @@ module Skylab::GitStashUntracked
     end
     def _prune
       stack = []
-      Open3.popen3("find #{pathname} -type d") do |_, sout, serr|
+      ::Open3.popen3("find #{pathname} -type d") do |_, sout, serr|
         while s = sout.gets do stack.push(s.strip) end
       end
       while s = stack.pop
         rmdir(s, :verbose => true)
       end
     end
+
+    # save below as-is for #posterity /slash/ you-know-what
     def validate_existence
       pathname.exist? and return self
       failed("Stash does not exist: #{name}")
     end
+
     def validate_for_writing
-      if pathname.exist?
-        (d = Dir["#{pathname}/*"]).any? and
-          return failed("Destination dir must be empty (\"stash\" already exists?).  Found files:\n#{d.join("\n")}")
-      elsif ! @dirpathname.exist?
-        return failed("Stashes directory must exist: #{@dirpathname}")
-      else
-        # a directory needs to be made, but make it when there are files to move
-      end
-      @valid = true
-      self
+      @valid = valid = nil
+      begin
+        if pathname.exist?
+          dir = ::Dir[ "#{ pathname }/*" ]
+          if dir.any?
+            failed "Destination dir must be empty (\"stash\" already exists?).#{
+              } Found files:\n#{ dir.join "\n" }"
+            valid = false
+          else
+            valid = true          # empty dirs are valid for writing, sure
+          end
+        elsif dirpathname.exist?  # parent path must exist
+          valid = true            # the child dir needs to be made, but not yet
+        else
+          failed "Stashes directory must exist: #{ dirpathname }"
+          valid = false
+        end
+      end while nil
+      @valid = valid
+      result = valid ? self : valid
+      result
     end
+
+  protected # added late in the game -- will refactor to make this higher
+
+    attr_reader :dirpathname
+
   end
-  module PatchMaker ; end
+
+
+  module PatchMaker
+  end
+
+
   class << PatchMaker
-    include FileUtils
+    include ::FileUtils
     def call(path, &emit)
-      File.directory?(path) or raise("not a directory: #{path}")
+      ::File.directory?(path) or raise("not a directory: #{path}")
       each_path = ->(file) do
         begin
           lines = File.read(file).split("\n", -1)
@@ -278,12 +398,12 @@ module Skylab::GitStashUntracked
           end
           emit[:payload, "@@ -0,0 +1,#{lines.count} @@"]
           lines.each { |line| emit[:payload, "+#{line}"] }
-        rescue ArgumentError => e
+        rescue ::ArgumentError => e
           emit[:error, "failed to hack a diff for file. binary file? (#{path})"]
         end
       end
       cd(path) do
-        Open3.popen3('find . -type f') do |_, sout, serr|
+        ::Open3.popen3('find . -type f') do |_, sout, serr|
           '' != (s = serr.read) and raise("nope: #{s}")
           while s = sout.gets do each_path[s.strip] end
         end
@@ -395,4 +515,3 @@ end
 if File.basename(__FILE__) == File.basename($PROGRAM_NAME)
   ::Skylab::GitStashUntracked::Porcelain.new{ |o| o.on_all { |e| $stderr.puts e } }.invoke(ARGV)
 end
-

@@ -1,14 +1,11 @@
 require_relative '../test-support'
 
-Skylab::Porcelain::En::ApiActionInflectionHack # force/test autolaod (nec) :(
+Skylab::Porcelain::En::ApiActionInflectionHack || nil # #annoy
 
 module Skylab::Porcelain::TestSupport::En
-  Parent_ = ::Skylab::Porcelain::TestSupport # for #ts-002
-  Parent_[ self ] # #regret
-  En_TestSupport = self # courtesy
+  ::Skylab::Porcelain::TestSupport[ En_TestSupport = self ] #regret, #courtesy
 
   module CONSTANTS
-    include Parent_::CONSTANTS
     En = ::Skylab::Porcelain::En
   end
 

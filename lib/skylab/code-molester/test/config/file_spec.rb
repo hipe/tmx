@@ -1,11 +1,10 @@
-require File.expand_path('../../test-support', __FILE__)
-require 'skylab/code-molester/config/file'
+require_relative '../test-support'
 
 describe ::Skylab::CodeMolester::Config::File do
   include ::Skylab::CodeMolester::TestSupport
-  let(:klass) { ::Skylab::CodeMolester::Config::File }
+  let(:klass) { CodeMolester::Config::File }
   let(:subject) do
-    o = klass.new(path)
+    o = klass.new path
     input_string and o.content = input_string
     o
   end
@@ -151,7 +150,7 @@ describe ::Skylab::CodeMolester::Config::File do
     end
     context "if you had something invalid as the very last character" do
       let(:input_string) { "\n\n# foo\n  }" }
-      it "will do the same as above"  do
+      it "will do the same as above" do
         invalid_reason.should eql('Expecting "#", "\n" or "[" at the end of "  }" at line 4')
       end
     end
@@ -191,7 +190,7 @@ describe ::Skylab::CodeMolester::Config::File do
         config['fo'].should eql(nil)
       end
     end
-    context "HOWEVER with the 'value_items' pseudoclass", {focus:true} do
+    context "HOWEVER with the 'value_items' pseudoclass" do
       let(:content) { "foo = bar\nbiff = baz\n[allo]" }
       it "you can see its keys like a hash" do
         config.value_items.keys.should eql(%w(foo biff))
@@ -238,7 +237,7 @@ describe ::Skylab::CodeMolester::Config::File do
       specify { parses_ok }
       context "when you use [] to get a section that exists" do
         let(:subject) { config['bizzo'] }
-        specify { subject.should be_kind_of(::Skylab::CodeMolester::Config::Section) }
+        specify { subject.should be_kind_of(CodeMolester::Config::Sexps::Section) }
         specify { subject.section_name.should eql('bizzo') }
         context "when you use [] to get a child value that exists" do
           it "works" do
@@ -271,7 +270,7 @@ describe ::Skylab::CodeMolester::Config::File do
         is_valid
       end
       context "if you set its content explicitly with a string" do
-        let (:want_content) do
+        let :want_content do
           <<-HERE.unindent
             who = hah
               boo = bah
@@ -326,4 +325,3 @@ describe ::Skylab::CodeMolester::Config::File do
     end
   end
 end # describe
-

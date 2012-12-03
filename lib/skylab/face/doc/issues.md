@@ -1,3 +1,5 @@
+[#003] #open rename pretty_path human_escape_path?
+[#002] #open move path-tools to e.g. headless
 [#001] shorten wide lines #open #depends-on:sl-104
 [#sl-100.100.500] 2012-06-08 #open index all features
 [#sl-100.100.400] 2012-06-08 #open rename stuff, unify names

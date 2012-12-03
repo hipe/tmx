@@ -1,5 +1,4 @@
-require_relative 'api'
-require 'skylab/porcelain/bleeding'
+require_relative 'core'
 
 module Skylab::Permute
   class CLI < ::Skylab::Porcelain::Bleeding::Runtime
@@ -13,7 +12,7 @@ module Skylab::Permute
     def self.porcelain ; self end # @compat
   end
   class CLI::Action
-    extend ::Skylab::Porcelain::Bleeding::ActionModuleMethods
+    extend ::Skylab::Porcelain::Bleeding::Action
     extend ::Skylab::PubSub::Emitter
     emits syntax_error: :info
     def self.build runtime
@@ -27,17 +26,23 @@ module Skylab::Permute
   module CLI::Actions
   end
   class HackParse
+    attr_accessor :action
     def any?
       true
     end
-    def help rt
-      rt.emit(:help, "#{rt.hdr 'syntax:'} for now, the namespace of options is only for your attributes.")
+    def help line
+      str = action.instance_exec do
+        "#{ hdr 'syntax:' } for now, the namespace of options is only #{
+          }for your attributes."
+      end
+      line[ str ]
+      nil
     end
     class AttributeSet < Struct.new(:name, :values)
       def length ; values.length end
       def sym    ; name.intern   end
     end
-    def parse! argv, args, action
+    def parse argv, args, help, error
       _ = ->() { Hash.new(0) }
       extent = argv.reduce(Struct.new(:long, :short, :short_of_long).new(_[], _[], _[])) do |e, s|
         case s
@@ -57,21 +62,26 @@ module Skylab::Permute
           extent.short.keys.each { |n| o.on("-#{n}<VALUE>", "a value of #{n}", &(b[n])) }
         end
         o.on('-h', '--help') do
-          result = action.help(full: true)
+          # result = action.help(full: true)
+          result = help[]
           up = false
         end
       end
       begin
         op.parse!(argv)
       rescue ::OptionParser::ParseError => e
-        result = action.help(message: e) ; up = false
+        error[ e ]
+        #  result = action.help(message: e)
+        up = false
       end
       if up
         if list.empty?
-          result = action.help(message: 'please provide one or more --attribute values.')
+          # result = action.help(message: 'please provide one or more --attribute values.')
+          result = error[ 'please provide one or more --atribute values.' ]
           up = false
         else
-          args.push list ; result = true
+          args.push list
+          result = true
         end
       end
       result
@@ -80,19 +90,31 @@ module Skylab::Permute
       "--attr-a <val1> -a<v2> --b-attr <val3> -b<v4> [..]"
     end
   end
+
+
   class CLI::Actions::Generate < CLI::Action
+
     desc "generate permutations."
+
     emits :payload, :info, help: :info
+
     include Porcelain::Table::RenderTable
-    opt_syn = ->() do
+
+    opt_syn = ->() do # hacklund
       op = HackParse.new
       (opt_syn = ->{ op }).call
     end
-    define_method(:option_syntax) { opt_syn.call }
-    singleton_class.send(:define_method, :option_syntax) { opt_syn.call } # so awful
+
+    singleton_class.send(:define_method, :option_syntax) { opt_syn.call }
+
+    define_method :option_syntax do
+      hack = opt_syn.call
+      hack.action = self # so so bad
+      hack
+    end
 
     def invoke set
-      API::Actions::Generate.new(set) do |o|
+      Permute::API::Actions::Generate.new(set) do |o|
         rows = []
         o.on_header { |e| rows.push( e.payload.map { |_, s| hdr s } ) }
         o.on_row { |e| rows.push( e.payload.map { |_, s| s } ) }
@@ -106,4 +128,3 @@ module Skylab::Permute
     end
   end
 end
-

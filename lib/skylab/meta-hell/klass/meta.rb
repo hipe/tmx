@@ -7,10 +7,10 @@ module Skylab::MetaHell
     # 2) act as an adapter for building the "product" object, in this
     #    case the class, doing things like resolving superclasses, etc.
 
-    def build_product client=nil
+    def build_product client
       supra = _resolve_superclass client
       o = ::Class.new(* [supra].compact )
-      _init_product o
+      _init_product o, client
       o
     end
 

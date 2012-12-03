@@ -11,7 +11,7 @@ module Skylab::TanMan
   protected
     def load_parser_class
 
-      f = on_load_parser_info_f ||
+      f = on_load_parser_info ||
         ->(e) { info "#{em '^_^'} #{pretty_path_hack e.to_s}" }
 
       ::Skylab::TreetopTools::Parser::Load.new(

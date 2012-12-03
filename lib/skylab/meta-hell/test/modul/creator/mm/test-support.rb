@@ -1,13 +1,9 @@
 require_relative '../test-support'
 
 module ::Skylab::MetaHell::TestSupport::Modul::Creator::ModuleMethods
-  (Parent_ = ::Skylab::MetaHell::TestSupport::Modul::Creator)[ self ] # #ts-002
+  ::Skylab::MetaHell::TestSupport::Modul::Creator[ self ] # #regret
 
   MM_TestSupport = self # courtesy
-
-  module CONSTANTS
-    include Parent_::CONSTANTS
-  end
 
   include CONSTANTS
 

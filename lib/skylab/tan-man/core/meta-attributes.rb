@@ -1,7 +1,7 @@
 module Skylab::TanMan
 
   module Core::MetaAttributes
-    extend TanMan::Boxxy::Methods
+    extend TanMan::Boxxy
     singleton_class.send :alias_method, :[], :const_fetch_all
   end
 
@@ -15,7 +15,7 @@ module Skylab::TanMan
     meta_attribute :default
   end
   module Core::MetaAttributes::Default::InstanceMethods
-    def set_defaults_if_nil!
+    def set_defaults_if_nil!      # #pattern [#sl-117]
       attribute_definer.attributes.select { |k, v| v.key?(:default) and send(k).nil? }.each do |k, h|
         (val = h[:default]).respond_to?(:call) and ! h[:proc] and val = val.call
         send("#{k}=", val)
@@ -81,20 +81,25 @@ module Skylab::TanMan
     end
   end
 
-  # @note: this requires that the object define an attribute_definer that responds to attributes()
-  # and it requires an error_emitter and it requires the styler methods: oxford_comma, pre.
-  # A required attribute is considered as not provided IFF it returns nil.
+
+  # A required attribute is considered as not provided IFF its result is nil.
+  # The receiver of this must be a sub-client, and have the attribute_definer.
+  #   we will come back to this..
   #
   module Core::MetaAttributes::Required extend Porcelain::Attribute::Definer
     meta_attribute :required
   end
+
   module Core::MetaAttributes::Required::InstanceMethods
     def required_ok?
-      if (a = attribute_definer.attributes.map.select { |k, h| h[:required] && send(k).nil? }).size.nonzero?
-        error_emitter.error( "missing required attribute#{'s' if a.size != 1}: " <<
-          "#{oxford_comma(a.map { |o| "#{pre o.first}" }, ' and ')}")
-      else
+      a = attribute_definer.attributes.to_a
+      b = a.select { |k, o| o[:required] && send(k).nil? }
+      if b.empty?
         true
+      else
+        error "missing required attribute#{ s b }: #{
+          }#{ and_( b.map { |o| "#{ kbd o.first }" } ) }"
+        false
       end
     end
   end

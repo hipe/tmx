@@ -20,7 +20,7 @@ module ::Skylab::Porcelain::TestSupport::Bleeding # #po-008
     context "among one" do
       namespace do
         class self::Ferp
-          extend Bleeding::ActionModuleMethods
+          extend Bleeding::Action
         end
       end
       context "with none given" do

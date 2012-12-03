@@ -1,7 +1,5 @@
 module Skylab::TanMan
   class Models::Remote < Models::Model
-    extend Autoloader
-    extend Bleeding::DelegatesTo
 
     NAME_RE = /^[^"]+$/
     URL_RE = /^[^ ]+$/
