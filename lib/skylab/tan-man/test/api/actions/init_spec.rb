@@ -34,7 +34,7 @@ module Skylab::TanMan::TestSupport::API::Actions
 
       context "with regards to working or not working" do
         before do
-          prepare_submodule_tmpdir
+          prepare_tanman_tmpdir
         end
 
         context "when the folder isn't initted" do

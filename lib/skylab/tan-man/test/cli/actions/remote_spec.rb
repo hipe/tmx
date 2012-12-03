@@ -13,11 +13,12 @@ module Skylab::TanMan::TestSupport
     context 'for remotes' do
 
       before do
-        prepare_submodule_tmpdir
+        prepare_tanman_tmpdir              # TMPDIR.prepare
       end
 
       context 'when there is no local config directory' do
-        it 'cannot get added, whines about no directory' do
+        it 'cannot get added, whines about no directory', wip:true do
+          debug!
           input 'remote add bing bong'
           output_shift_is infostream,
             "ferp failed to add remote - couldn't find local-conf.d in #{
@@ -25,7 +26,7 @@ module Skylab::TanMan::TestSupport
           output_shift_only_is infostream, 'try ferp init to create it', false
         end
 
-        it 'cannot get listed, whines the same' do
+        it 'cannot get listed, whines the same', wip:true do
           input 'remote list'
           output_shift_is infostream,
             "ferp failed to list remote - couldn't find local-conf.d in #{

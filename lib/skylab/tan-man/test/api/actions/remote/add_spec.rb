@@ -14,7 +14,7 @@ module Skylab::TanMan::TestSupport::API::Actions
     context "when there is no local conf directory" do
 
       before do
-        prepare_submodule_tmpdir
+        prepare_tanman_tmpdir
       end
 
       it "requires certain args, derps on failure" do

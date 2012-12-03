@@ -31,7 +31,6 @@ module Skylab::TanMan::TestSupport::CLI
     end
 
 
-
     let :client do
       self.do_debug = true
       o = TanMan::CLI.new

@@ -58,7 +58,7 @@ module ::Skylab::TanMan::TestSupport::Sexp
     include ::Skylab::TanMan::Models::DotFile::Parser::InstanceMethods
     include ::Skylab::TanMan::TestSupport::Tmpdir_InstanceMethods
     include CLI_Client_InstanceMethods
-      # prepared_submodule_tmpdir
+      # prepared_tanman_tmpdir
 
     def initialize i=$stdin, o=$stdout, e=$stderr # pattern [#sl-114]
       @stdin = i ; self.paystream = o ; self.infostream = e
@@ -203,7 +203,7 @@ module ::Skylab::TanMan::TestSupport::Sexp
 
     def tmpdir_prepared
       @tmpdir_prepared ||= begin
-        t = prepared_submodule_tmpdir.join stem_path
+        t = prepared_tanman_tmpdir.join stem_path
         t.exist? or t.prepare # because parent gets rewritten once per runtime
         t
       end

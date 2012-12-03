@@ -99,8 +99,8 @@ module Skylab::TanMan
         end
         is = infostream # a special case
         result = resource.write do |o|
-          o.on_error { |e| emit e }
-          o.on_before_edit { |e| is.write e.touch!.message }
+          o.on_error { |e| error e.message } # we *must* convert from plain to
+          o.on_before_edit { |e| is.write e.touch!.message } # custom event
           o.on_before_create { |e| is.write e.touch!.message }
           b = -> e { is.puts " .. done (#{ e.touch!.bytes } bytes.)" }
           o.on_after_edit(& b)

@@ -9,7 +9,7 @@ module Skylab::TanMan::TestSupport::API::Actions
     before { services_clear }
 
     context "when there are no conf dirs at all" do
-      before { prepared_submodule_tmpdir }
+      before { prepared_tanman_tmpdir }
       it "returns an error event explaining the situation" do
         response = api_invoke(%w(remote list))
         lone_error( response, /local conf dir not found/ )

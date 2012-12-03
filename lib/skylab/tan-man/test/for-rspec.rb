@@ -19,9 +19,6 @@ module Skylab::TanMan::TestSupport
         spy.debug!
       end
       o.program_name = 'ferp'
-#     o.on_info { |x| o.infostream.puts x.touch!.message } # Similar but not
-#     o.on_out  { |x| o.paystream.puts x.touch!.message }  # . same as default
-#     o.on_all  { |x| o.infostream.puts(x.touch!.message) unless x.touched? }
       o
     end
 
@@ -72,7 +69,8 @@ module Skylab::TanMan::TestSupport
     end
 
     def prepare_local_conf_dir
-      prepare_submodule_tmpdir.mkdir(TanMan::API.local_conf_dirname)
+      o = TanMan::API.local_conf_dirname
+      prepare_tanman_tmpdir.mkdir o
     end
 
     attr_accessor :result

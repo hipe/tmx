@@ -63,10 +63,10 @@ module Skylab::TanMan::TestSupport
       execute_f = -> { TMPDIR.prepare }
       get_f = ->{ _memo = execute_f.call ; (get_f = ->{ _memo }).call }
 
-      define_method :prepare_submodule_tmpdir do
+      define_method :prepare_tanman_tmpdir do
         execute_f.call
       end
-      define_method :prepared_submodule_tmpdir do
+      define_method :prepared_tanman_tmpdir do
         get_f.call
       end
     end.call
@@ -122,7 +122,7 @@ module Skylab::TanMan::TestSupport
       f = nil
       define_method(:_my_before_all) { f.call }
       f = -> do
-        prepared_submodule_tmpdir
+        prepared_tanman_tmpdir
         f = ->{ }
       end
       extend Tmpdir_InstanceMethods

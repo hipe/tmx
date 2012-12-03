@@ -9,7 +9,7 @@ module Skylab::TanMan::TestSupport::CLI
     include Tmpdir_InstanceMethods
 
     def prepare_configs *whichs
-      prepare_submodule_tmpdir
+      prepare_tanman_tmpdir
       whichs.each do |which|
         case which
         when :global
@@ -70,7 +70,7 @@ module Skylab::TanMan::TestSupport::CLI
 
     context 'yes local dir as file' do
       before do
-        prepare_submodule_tmpdir.touch('local-conf.d')
+        prepare_tanman_tmpdir.touch('local-conf.d')
         services_clear
       end
       it 'complain that a folder was expected where a file was found' do
