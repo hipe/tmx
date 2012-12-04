@@ -1,18 +1,24 @@
-require_relative '../core' # assume tanman core loaded skylab.rb
-require 'skylab/porcelain/core'
+require_relative '../core'
 require 'skylab/test-support/core'
-
-require_relative 'regret' # we cannot autoload this b.c. it gives us autolaoding
+require 'skylab/headless/test/test-support'
 
 module Skylab::TanMan::TestSupport
-  self::Regret[ self ]
+  ::Skylab::TestSupport::Regret[ TanMan_TestSupport = self ]
 
-  TanMan = ::Skylab::TanMan
 
-  TMPDIR_STEM = 'tan-man'
+  module CONSTANTS
+    Autoloader   = ::Skylab::Autoloader
+    Headless     = ::Skylab::Headless
+    MetaHell     = ::Skylab::MetaHell
+    TanMan       = ::Skylab::TanMan
+    Tmpdir       = ::Skylab::TestSupport::Tmpdir
+    TMPDIR_STEM  = 'tan-man'
+    TMPDIR = Tmpdir.new(::Skylab::TMPDIR_PATHNAME.join(TMPDIR_STEM).to_s)
+  end
 
-  TMPDIR = ::Skylab::TestSupport::Tmpdir.new(
-    ::Skylab::TMPDIR_PATHNAME.join(TMPDIR_STEM).to_s)
+  include CONSTANTS # for use here, below
+
+  Autoloader = Autoloader ; TanMan = TanMan ; TMPDIR = TMPDIR  # #annoy
 
 
   # this is dodgy but should be ok as long as you accept that:
@@ -57,58 +63,44 @@ module Skylab::TanMan::TestSupport
       execute_f = -> { TMPDIR.prepare }
       get_f = ->{ _memo = execute_f.call ; (get_f = ->{ _memo }).call }
 
-      define_method :prepare_submodule_tmpdir do
+      define_method :prepare_tanman_tmpdir do
         execute_f.call
       end
-      define_method :prepared_submodule_tmpdir do
+      define_method :prepared_tanman_tmpdir do
         get_f.call
       end
     end.call
   end
 
-
-  class Generic
-    class << self
-      public :define_method
-    end
+  module CONSTANTS
+    Tmpdir_InstanceMethods = Tmpdir_InstanceMethods # suck
   end
 
-
   module InstanceMethods
-    include ::Skylab::Autoloader::Inflection::Methods
-    include TanMan::API::Achtung::SubClient::ModuleMethods # headless_runtime
+    include CONSTANTS # to use MetaHell here ?
+    include Autoloader::Inflection::Methods
+    include Tmpdir_InstanceMethods
 
     def _build_normalized_input_pathname stem
       __input_fixtures_dir_pathname.join stem
     end
 
     let :client do
-      io_adapter = Generic.new
-      debug_parser_loading_f = -> { debug_parser_loading }
-      io_adapter.singleton_class.define_method :emit do |type, payload|
-        if debug_parser_loading_f.call
-          $stderr.puts("      (zeep: #{payload} (#{type}))")
-        elsif :info == type
-          # ok to just totally ignore
-        else
-          fail("ok we probably want StreamsSpy here.")
-        end
-      end
-      rt = headless_runtime io_adapter
-      o = TanMan::TestSupport::ParserProxy.new rt
+      client = :foo
+      o = TanMan::TestSupport::ParserProxy.new client
       o.dir_path = _parser_dir_path
-      if debug_parser_loading
+      if do_debug_parser_loading
         o.profile = true
       else
-        o.on_load_parser_info_f = ->(e) { }
+        o.on_load_parser_info = ->(e) { }
         o.profile = false
       end
       o
     end
 
-    def debug_parser_loading
-      false # save to try it!
-    end
+    attr_accessor :do_debug
+
+    attr_accessor :do_debug_parser_loading
 
     let :__input_fixtures_dir_pathname do
       ::Pathname.new _input_fixtures_dir_path
@@ -130,7 +122,7 @@ module Skylab::TanMan::TestSupport
       f = nil
       define_method(:_my_before_all) { f.call }
       f = -> do
-        prepared_submodule_tmpdir
+        prepared_tanman_tmpdir
         f = ->{ }
       end
       extend Tmpdir_InstanceMethods

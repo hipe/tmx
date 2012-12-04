@@ -292,7 +292,6 @@ module Skylab::Yacc2Treetop
     end
     TranslateDefaults = {:verbose => true, :force => false, :grammar => nil}
     def translate from_path, to_path, opts = {}
-      require 'debugger' ; debugger ; puts "TOLERANCE IS HAPPY"
       o = merge_opts(opts, @c, TranslateDefaults)
       # we pass some not all of these properties down?
       @c[:grammar] = o[:grammar]

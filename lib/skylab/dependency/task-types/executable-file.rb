@@ -1,7 +1,5 @@
-require File.expand_path('../../task', __FILE__)
-
 module Skylab::Dependency
-  class TaskTypes::ExecutableFile < Task
+  class TaskTypes::ExecutableFile < Dependency::Task
     attribute :executable_file, :required => true, :pathname => true
     emits :all, :info => :all
 
@@ -13,7 +11,7 @@ module Skylab::Dependency
         emit(:info, "executable does not exist: #{@executable_file}")
         return false
       end
-      stat = File::Stat.new(@executable_file.to_s)
+      stat = ::File::Stat.new @executable_file.to_s
       if stat.executable?
         emit(:info, "ok, executable: #{@executable_file}")
         true
@@ -24,4 +22,3 @@ module Skylab::Dependency
     end
   end
 end
-

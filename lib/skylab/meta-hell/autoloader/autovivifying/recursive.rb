@@ -1,58 +1,72 @@
-module Skylab::MetaHell
-  module Autoloader::Autovivifying::Recursive
+module Skylab::MetaHell::Autoloader::Autovivifying
 
+  module Recursive
     def self.extended mod
-      mod.extend Autoloader::Autovivifying::Recursive::ModuleMethods
-      mod._autoloader_extended! caller[0] # necessary b.c. caller
+      mod.extend Recursive::ModuleMethods
+      mod._autoloader_init! caller[0]
     end
   end
 
 
-  module Autoloader::Autovivifying::Recursive::ModuleMethods
-    extend ::Skylab::Autoloader::ModuleMethodsModuleMethods
-    include Autoloader::Autovivifying::ModuleMethods
+  module Recursive::ModuleMethods
+    include Autovivifying::ModuleMethods
+
+    def case_insensitive_const_get const # experiment
+      _const_missing(const)._case_insensitive_const_get
+    end
 
     def _const_missing_class
-      Autoloader::Autovivifying::Recursive::ConstMissing
+      Recursive::ConstMissing
     end
   end
 
-  class Autoloader::Autovivifying::Recursive::AutovivifiedModule <
-                                                              AutovivifiedModule
-    include Autoloader::Autovivifying::Recursive::ModuleMethods
-  end
 
-  class Autoloader::Autovivifying::Recursive::ConstMissing <
-                                         Autoloader::Autovivifying::ConstMissing
+  class Recursive::ConstMissing < Autovivifying::ConstMissing
+
+    normalize = -> const do
+      const.to_s.gsub('_', '').downcase
+    end
+
+    define_method :_case_insensitive_const_get do
+      normalized = normalize[ self.const ]
+      find = -> do
+        mod.autoloader_original_constants.detect do |c|
+          normalized == normalize[ c ]
+        end
+      end
+      correct = -> const do
+        if const and const != self.const
+          self.const = const
+        end
+      end
+      found = find.call           # in the existing consts, do i exist (fuzzy)?
+      if found                    # if i am found, make my casing correct
+        correct[ found ]
+      else                        # else load the file, and repeat the same
+        load -> { correct[ find.call ] } # thing again immediately after
+      end                         # you load it, so that our check is ok.
+      mod.const_get self.const, false
+    end
 
   protected
-    def autovivified_module
-      o = Autoloader::Autovivifying::Recursive::AutovivifiedModule.new
-      o.dir_path = dir_pathname.to_s
-      o
-    end
 
-    def load_file
+    def load_file after=nil
       super
       o = mod.const_get const, false
-      if o.respond_to? :dir_path
-        if o.dir_path
-          # possibly a module that explicitly extended an autoloader of its
-          # own for whatever nefarious reasons
-        else
-          set_dir_path = true
-          # it might not be set in the case of if you have a child class
-          # of a parent class that is "infected" with this recursive hack
+      if ! o.respond_to? :autoloader_original_const_defined?
+        if ::TypeError != (o.singleton_class rescue ::TypeError) # else final
+          o.extend module_methods_module   # "recursive" (infectious)
+          o.dir_path = normalized
+          o._autoloader_init! nil
         end
-      else
-        o.extend Autoloader::Autovivifying::Recursive::ModuleMethods
-        set_dir_path = true
+      elsif ! o.dir_path
+        o.dir_path = normalized
       end
-      if set_dir_path
-        o.dir_path = normalized # you loaded a file. *its* dirpath corresponds
-        # to the path you used to load the file, not *your* dir_path
-      end
-      true
+      nil
+    end
+
+    def module_methods_module
+      Recursive::ModuleMethods
     end
   end
 end

@@ -611,7 +611,7 @@ module Skylab::Porcelain
   end
 
   module Styles
-    include TiteColor
+    include TiteColor::Methods
     extend self
     def e13b str   ; stylize str, :green          end
     def header str ; stylize str, :strong, :green end

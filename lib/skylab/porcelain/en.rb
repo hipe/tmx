@@ -1,32 +1,26 @@
-require_relative '../../skylab'
+require 'skylab/headless/core'
 
-module Skylab::Porcelain
-  module En
-    extend Skylab::Autoloader
-    extend self
+module Skylab::Porcelain::En
+  extend ::Skylab::Autoloader
 
-    def oxford_comma a, ult = ' and ', sep = ', '
-      (hsh = Hash.new(sep))[a.length - 1] = ult
-      [a.first, * (1..(a.length-1)).map { |i| [ hsh[i], a[i] ] }.flatten].join
-    end
+    # this looks like it is slated for deprecation for headless [#hl-003]
 
-    alias_method :and, :oxford_comma
+  module Methods
 
-    def or a
+    headless = ::Skylab::Headless::NLP::EN::Minitesimal::FUN
+
+    define_method :oxford_comma, & headless.oxford_comma
+
+    alias_method :and_, :oxford_comma
+
+    def or_ a
       oxford_comma a, ' or '
     end
 
-    VERBS = { is:   ['exist', 'is', 'are'],
-              no:   ['no ', 'the only '],
-            this: ['these', 'this', 'these'] }
-
-    def s a, v=nil # just one tiny hard to read hack
-      count = Numeric === a ? a : a.count
-      v.nil? and return( 1 == count ? '' : 's' )
-      VERBS[v][case count ; when 0 ; 0 ; when 1 ; 1 ; else 2 ; end]
-    end
-    # "#{s a, :no}known person#{s a} #{s a, :is} #{self.and a}".strip
+    define_method :s, & headless.s
+      # "#{s a, :no}known person#{s a} #{s a, :is} #{self.and a}".strip
 
   end
-end
 
+  extend Methods # a.t.t.o.t.w some ppl still call En.oxford_comma as so
+end

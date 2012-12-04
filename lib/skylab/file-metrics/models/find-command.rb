@@ -1,5 +1,5 @@
 module Skylab::FileMetrics
-  class Models::FindCommand
+  class Models::FindCommand # [#sl-118] one day they will be unified
     include Common::PathTools::InstanceMethods
     def initialize; end
     attr_accessor :paths, :skip_dirs, :names, :extra

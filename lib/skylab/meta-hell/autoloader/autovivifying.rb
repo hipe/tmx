@@ -1,41 +1,39 @@
-module Skylab::MetaHell
-  module Autoloader::Autovivifying
+module Skylab::MetaHell::Autoloader
+
+  Autoloader = self
+  MetaHell = ::Skylab::MetaHell
+
+
+  module Autovivifying
     extend ::Skylab::Autoloader
 
+    Autoloader = Autoloader
+    Autovivifying = self
+
     def self.extended mod
-      mod.extend Autoloader::Autovivifying::ModuleMethods
-      mod._autoloader_extended! caller[0] # necessary b.c. caller
+      mod.extend Autovivifying::ModuleMethods
+      mod._autoloader_init! caller[0]
     end
   end
 
 
-  module Autoloader::Autovivifying::ModuleMethods
-    extend ::Skylab::Autoloader::ModuleMethodsModuleMethods
+  module Autovivifying::ModuleMethods
     include ::Skylab::Autoloader::ModuleMethods
 
     def _const_missing_class
-      Autoloader::Autovivifying::ConstMissing
+      Autovivifying::ConstMissing
     end
   end
 
 
-  class AutovivifiedModule < ::Module
-    alias_method :const_defined_without_autoloader?, :const_defined? # #sl-106
+  class Autovivifying::ConstMissing < ::Skylab::Autoloader::ConstMissing
+    extend MetaHell::Let
 
-    include Autoloader::Autovivifying::ModuleMethods
-  end
-
-
-  class Autoloader::Autovivifying::ConstMissing <
-                                              ::Skylab::Autoloader::ConstMissing
-
-    extend MetaHell::Let # for the children
-
-    def load
+    def load f=nil
       if file_pathname.exist?
-        load_file
+        load_file f
       elsif dir_pathname.exist?
-        mod.const_set const, autovivified_module
+        mod.const_set const, build_autovivified_module
       else
         raise ::NameError.new(%<uninitialized constant #{mod}::#{const} (#{
           }and no such file/directory to autoload -- #{file_pathname.dirname}/#{
@@ -49,14 +47,19 @@ module Skylab::MetaHell
     end
 
   protected
-    def autovivified_module
-      o = AutovivifiedModule.new
-      o.dir_path = dir_pathname.to_s
-      o
+
+    def build_autovivified_module
+      m = ::Module.new
+      m.extend module_methods_module
+      m.dir_path = dir_pathname.to_s
+      m._autoloader_init! nil
+      m
     end
 
-    def dir_pathname
-      @dir_pathname ||= file_pathname.sub_ext('')
+    let( :dir_pathname ) { file_pathname.sub_ext '' }
+
+    def module_methods_module
+      Autovivifying::ModuleMethods
     end
   end
 end

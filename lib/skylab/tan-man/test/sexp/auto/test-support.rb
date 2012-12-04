@@ -1,7 +1,7 @@
 require_relative '../test-support'
 
 module ::Skylab::TanMan::TestSupport::Sexp::Auto
-  ::Skylab::TanMan::TestSupport::Sexp[ Auto = self ]
+  ::Skylab::TanMan::TestSupport::Sexp[ self ]
 
   module ModuleMethods
     def it_unparses_losslessly *tags

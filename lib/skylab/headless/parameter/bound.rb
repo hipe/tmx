@@ -10,8 +10,7 @@ module Skylab::Headless
   end
 
   class Parameter::Bound::Enumerator < ::Enumerator
-    extend Parameter::Definer::ModuleMethods
-    include Parameter::Definer::InstanceMethods::IvarsAdapter
+    extend Parameter::Definer
     def self.[](param) ; Parameter::Bound::Enumerator::Proxy.new(param) end
     def initialize host_instance
       super() { |y| init ; visit(y) }
@@ -80,7 +79,7 @@ module Skylab::Headless
     def dupe changes
       init # should be ok to call multiple times
       self.class.new(Hash[
-        self.class.parameters.all.select(&:inherit?).map do |param|
+        self.class.parameters.each.select(&:inherit?).map do |param|
           [param.name, send(param.name)]
         end].merge(changes) )
     end
@@ -88,7 +87,7 @@ module Skylab::Headless
       f = {}
       host_instance.instance_exec do
         f[:set_f] = ->{ formal_parameters }
-        f[:params_f] = -> { formal_parameters.all }
+        f[:params_f] = -> { formal_parameters.each.to_a }
         f[:known_f] = ->(param) { known? param.name }
         f[:label_f] = ->(param, i=nil) { pen.parameter_label(param, i) }
         f[:read_f] = ->(param) do
@@ -130,7 +129,9 @@ module Skylab::Headless
   end
 
   module Parameter::Bound::InstanceMethods
-    def bound_parameters ; Parameter::Bound::Enumerator::Proxy.new(self) end
+    def bound_parameters
+      Parameter::Bound::Enumerator::Proxy.new self
+    end
   end
 
   class Parameter::Bound::Enumerator::Proxy

@@ -2,26 +2,40 @@ module Skylab::TanMan
   # distinct from a remote collection which is all the remotes in one file
   # this is a higher level enumerator of all the remotes across all resources
   class Models::Config::Remotes < ::Enumerator
-    attr_reader :config_singleton
+
+    alias_method :config_original_initialize, :initialize # ick, enumerator
+                                  # subclients will be annoying unless we are
+                                  # less aggressive somewhere
+
+    include Core::SubClient::InstanceMethods # don't need m.m yet
+
+    # below line is kept for #posterity as the #birth of the sub-client pattern
     # there is some kind of fun @smell here. What we want is shared controller logic
     def get name, e
-      detect { |r| name == r.name } or begin
-        e.emit(:remote_not_found,
+      result = nil
+      begin
+        name = name.to_s
+        result = detect { |r| name == r.name }
+        result and break
+        a = map(&:name).uniq.map { |n| kbd n }
+        msg = "Remote #{ name.inspect } not found. #{ s a, :no }known #{
+          } remote#{ s } #{ s :is } #{ or_ a }.".strip.capitalize
+        e.emit :remote_not_found,
           remote_name: name,
-          known_names: (_ = map(&:name).uniq.map{ |n| e.pre n }),
-          message: ("Remote #{name.inspect} not found. " <<
-            "#{e.s _, :no}known remote#{e.s _} #{e.s _, :is} #{e.oxford_comma(_)}.".strip.capitalize)
-        )
-        false
-      end
+          known_names: a,
+          message: msg
+        result = nil
+      end while nil
+      result
     end
-    def initialize config_singleton, &block
+
+    def initialize request_client, &block
+      _sub_client_init! request_client
       @num_resources_seen = 0
-      @config_singleton = config_singleton
-      block ||= ->(y) do
-        seen = {}
+      block ||= -> y do
+        seen = { }
         @num_resources_seen = 0
-        self.config_singleton.resources.each do |resource|
+        service.config.resources.each do |resource|
           @num_resources_seen += 1
           resource.remotes.each do |remote|
             seen[remote.name] ||= begin
@@ -31,37 +45,41 @@ module Skylab::TanMan
           end
         end
       end
-      super(&block)
+      config_original_initialize(& block)
     end
+
     attr_reader :num_resources_seen
-    class OnRemove < API::Emitter.new(:all, error: :all, remote_not_found: :error)
+
+    on_remove =
+      ::Class.new( API::Emitter.new error: :all, remote_not_found: :error )
+    on_remove.class_eval do
       attr_accessor :on_all
       attr_accessor :on_write
     end
-    def remove remote_name, resource_name, &b
-      e = OnRemove.new(b)
+
+    define_method :remove do |remote_name, resource_name, &b|
+      e = on_remove.new b
       if resource_name
-        config_singleton.send(resource_name).tap do |r|
-          remotes = r.remotes
-          resources_count = 1
-        end
+        resource = service.config.send resource_name # #todo
+        remotes = resource.remotes
+        resources_count = 1
       else
         remotes = self
-        resources_count = config_singleton.resources_count
+        resources_count = service.config.resources_count
       end
-      if remote = remotes.detect { |r| remote_name == r.name }
-        remote.resource.remotes.remove(remote) do |o|
+      remote = remotes.detect { |r| remote_name == r.name }
+      if remote
+        remote.resource.remotes.remove remote do |o|
           o.on_write(& e.on_write)
           o.on_all(& e.on_all)
         end
       else
-        e.emit(:remote_not_found,
+        e.emit :remote_not_found,
           remotes:         remotes,
           remote_name:     remote_name,
           resources_count: resources_count
-        )
+        nil
       end
     end
   end
 end
-

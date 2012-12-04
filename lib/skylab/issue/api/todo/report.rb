@@ -35,7 +35,7 @@ module Skylab::Issue
       @rest
     end
     def dup
-      self.class.new.set!(@string)
+      self.class.new.set! @string
     end
     def initialize
       set! nil

@@ -4,7 +4,6 @@ module Skylab::TanMan::TestSupport
     # a 'pure' parser thing that is divorced from our client controller
     # with a minimal amount of dedicated logic
 
-    include TanMan::API::Achtung::SubClient::InstanceMethods
     include TanMan::Models::DotFile::Parser::InstanceMethods
 
     attr_accessor :dir_path

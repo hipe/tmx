@@ -1,18 +1,6 @@
-require File.expand_path('..', __FILE__)
-prev = $VERBOSE ; $VERBOSE = false
-require 'treetop'
-$VERBOSE = prev # treetop is naughty (@todo etc?)
-require 'skylab/face/core'
-require 'skylab/pub-sub/emitter'
+::Skylab::Headless::FUN.require_quietly[ 'treetop' ]
 
-module Skylab::CodeMolester
-
-  module Config
-    require DIR.join('../parse-failure-porcelain').to_s
-    require DIR.join('../sexp').to_s
-    require "#{DIR}/node"
-  end
-
+module ::Skylab::CodeMolester
   class Config::File
     def self.delegates_when_valid_to implementor, method_name
       define_method(method_name) do |*a, &b|
@@ -74,11 +62,11 @@ module Skylab::CodeMolester
       @pathname.to_s if @pathname
     end
     def path= mixed
-      @pathname = mixed ? ::Skylab::Face::MyPathname.new(mixed) : mixed
+      @pathname = mixed ? Face::MyPathname.new(mixed) : mixed
     end
     attr_reader :pathname
     delegates_to_truish_ivar '@pathname', :pretty
-    OnRead = Skylab::PubSub::Emitter.new(:all, :error => :all, :invalid => :error)
+    OnRead = PubSub::Emitter.new error: :all, invalid: :error
     def read
       e = OnRead.new
       if block_given? then yield(e) else on_read.call(e) end
@@ -102,7 +90,7 @@ module Skylab::CodeMolester
       valid? ? @content.unparse : @content
     end
     delegates_when_valid_to :sexp, :value_items
-    class OnWrite < Skylab::PubSub::Emitter.new(:all, :error => :all, :notice => :all, :before => :all, :after => :all,
+    class OnWrite < PubSub::Emitter.new(:all, :error => :all, :notice => :all, :before => :all, :after => :all,
       :before_edit => [:before, :notice], :after_edit => [:after, :notice],
       :before_create => [:before, :notice], :after_create => [:after, :notice],
       :no_change => :notice)
@@ -142,8 +130,9 @@ module Skylab::CodeMolester
           @invalid_reason = nil
         else
           @state = :invalid
-          @invalid_reason = ParseFailurePorcelain.new(p)
+          @invalid_reason = CodeMolester::ParseFailurePorcelain.new p
         end
+        @invalid_reason
       end
       case @state
       when :valid   ; true
@@ -153,18 +142,42 @@ module Skylab::CodeMolester
     end
     delegates_to_truish_ivar '@pathname', :writable?
   end
-  MyPathname = ::Skylab::Face::MyPathname
-  class << Config::File
-    def parser_class
-      @parser_class ||= begin
-        # require "#{Config::DIR}/file-parser" # if etc ..
-        Treetop.load "#{Config::DIR}/file-parser"
-        # result is Config::FileParser
-      end
+  class Config::File              # this could be scaled back -- it is after
+                                  # all a constant under a module
+    singleton_class.send :attr_accessor, :do_debug
+    const = :ConfigParser
+    debug = -> { do_debug }
+
+    compile = -> do
+      debug[] and $stderr.puts "creating new #{ const } xyzzy"
+      pathname = Config.dir_pathname.join 'file-parser'
+      o = ::Treetop.load pathname.to_s
+      o.name =~ /::#{ ::Regexp.escape const.to_s }\z/ or fail "huh?#{ o }"
+      o
     end
-    def parser
+
+    parser_class = -> do
+      o = nil
+      if CodeMolester.const_defined? const, false
+        debug[] and $stderr.puts "constant existed! #{ const } xyzzy"
+        o = CodeMolester.const_get const, false
+      else
+        o = compile[]
+      end
+      parser_class = -> do
+        debug[] and $stderr.puts "using memoized #{ const } xyzzy"
+        o
+      end
+      o
+    end
+
+    define_singleton_method :parser_class do
+      parser_class[]
+    end
+
+    def self.parser
       @parser ||= parser_class.new
     end
   end
+  Config::File.do_debug = false
 end
-

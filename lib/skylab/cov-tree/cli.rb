@@ -7,8 +7,8 @@ module Skylab::CovTree
     end
   end
   module CLI::Styles
-    include ::Skylab::Porcelain::En
-    include ::Skylab::Porcelain::TiteColor
+    include ::Skylab::Porcelain::En::Methods
+    include ::Skylab::Porcelain::TiteColor::Methods
     def pre(s)  ; stylize(s, :green         )   end
   end
   class CLI

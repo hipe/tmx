@@ -1,12 +1,11 @@
 module Skylab::TanMan
   class Models::Remote < Models::Model
-    extend Bleeding::DelegatesTo
 
     NAME_RE = /^[^"]+$/
     URL_RE = /^[^ ]+$/
     SECTION_NAME_RE = /^remote "([^"]+)"$/
 
-    meta_attribute(* MetaAttributes[:regex, :required] )
+    meta_attribute(* Core::MetaAttributes[:regex, :required] )
     meta_attribute :bound
 
     def bound?

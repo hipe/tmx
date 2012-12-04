@@ -53,9 +53,11 @@ module Skylab::TreetopTools
       nil
     end
     def file_not_found
-      (events.on_file_not_found || ->(pathname, entity) do
-        error("#{entity} not found: #{pathname.pretty}")
-      end).call(upstream, entity_noun_stem)
+      f = events.on_file_not_found
+      f ||= -> pathname, entity do
+        error "#{ entity } not found: #{ pathname.pretty }"
+      end
+      f[ pathname, entity_noun_stem ]
       nil
     end
   end

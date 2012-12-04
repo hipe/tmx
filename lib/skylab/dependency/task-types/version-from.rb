@@ -1,12 +1,6 @@
-require File.expand_path('../../task', __FILE__)
-require File.expand_path('../../version-range', __FILE__)
-require 'stringio'
-require 'skylab/face/open2'
-
-
 module Skylab::Dependency
-  class TaskTypes::VersionFrom < Task
-    include ::Skylab::Face::Open2
+  class TaskTypes::VersionFrom < Dependency::Task
+    include Face::Open2
 
     attribute :must_be_in_range
     attribute :parse_with
@@ -15,17 +9,20 @@ module Skylab::Dependency
 
     emits :all, :info => :all, :payload => :all
 
-    REGEXP_REGEXP = %r{\A/(.+)/([a-z]*)\z}
-    MODIFIER_RE = /\A[imox]*\z/
 
-    def build_regex str
-      if REGEXP_REGEXP =~ str
-        regex_body, modifiers = [$1, $2]
-        MODIFIER_RE =~ modifiers or
-          fail("had modifiers #{modifiers.inspect}, need #{MODIFIER_RE.source}")
-        Regexp.new(regex_body, modifiers)
+    rx_rx = %r{\A/(.+)/([a-z]*)\z}
+    modifier_rx = /\A[imox]*\z/
+
+    define_method :build_regex do |str|
+      md = rx_rx.match str
+      if md
+        regex_body, modifiers = md.captures
+        modifier_rx =~ modifiers or
+          fail("had modifiers #{modifiers.inspect}, need #{modifier_rx.source}")
+        ::Regexp.new regex_body, modifiers
       else
-        fail("Failed to parse regexp: #{str.inspect}.  Needed #{RegexpRegexp.source}")
+        fail "Failed to parse regexp: #{ str.inspect }. #{
+          }#{ rx_rx.source }"
       end
     end
 
@@ -33,7 +30,7 @@ module Skylab::Dependency
       @must_be_in_range or fail(<<-S.gsub(/\n */,' ').strip)
         Do not use "version from" as a target without a "must be in range" assertion.
       S
-      VersionRange.build(@must_be_in_range)
+      TaskTypes::VersionRange.build @must_be_in_range
     end
 
     def check_version
@@ -62,7 +59,7 @@ module Skylab::Dependency
 
     def parse_version_string
       @parse_with and @regex = build_regex(@parse_with)
-      buffer = StringIO.new
+      buffer = Dependency::Services::StringIO.new
       read = lambda { |s| buffer.write(s) }
       open2(version_from) { |on| on.out(&read); on.err(&read) }
       str = buffer.rewind && buffer.read
@@ -82,4 +79,3 @@ module Skylab::Dependency
     end
   end
 end
-

@@ -1,10 +1,8 @@
-require 'optparse'
-require 'stringio'
 require_relative '../test-support'
 
 module ::Skylab::TanMan::TestSupport::Sexp
 
-  module CLI_Client_InstanceMethods # #todo: #100
+  module CLI_Client_InstanceMethods # #todo: #sl-100
   protected
     def em str
       "\e[1;32m#{str}\e[0m"
@@ -13,12 +11,10 @@ module ::Skylab::TanMan::TestSupport::Sexp
       (:payload == type ? paystream : infostream).puts str
     end
     def error msg
-      self.errors_count += 1
+      @errors_count += 1
       emit :error, msg
       false
     end
-    def errors_count ; @errors_count ||= 0 end
-    attr_writer :errors_count
     def failed msg
       info msg
       invite
@@ -32,11 +28,11 @@ module ::Skylab::TanMan::TestSupport::Sexp
     def option_parser ; @option_parser ||= build_option_parser end
     def parse_opts argv
       option_parser.parse! argv
-      before = errors_count # intentionally here to enforce good design
+      before = (@errors_count ||= 0) # intentionally here to enforce good design
       invocation_parameters.each do |key, val|
         send("#{key}=", val)
       end
-      errors_count <= before
+      @errors_count <= before
     rescue ::OptionParser::ParseError => e
       usage e.message
     end
@@ -60,9 +56,9 @@ module ::Skylab::TanMan::TestSupport::Sexp
     include ::Skylab::TanMan::Models::DotFile::Parser::InstanceMethods
     include ::Skylab::TanMan::TestSupport::Tmpdir_InstanceMethods
     include CLI_Client_InstanceMethods
-      # prepared_submodule_tmpdir
+      # prepared_tanman_tmpdir
 
-    def initialize i=$stdin, o=$stdout, e=$stderr
+    def initialize i=$stdin, o=$stdout, e=$stderr # pattern [#sl-114]
       @stdin = i ; self.paystream = o ; self.infostream = e
       # (keep stdin on deck but don't set upstream here. it takes logix)
     end
@@ -127,11 +123,10 @@ module ::Skylab::TanMan::TestSupport::Sexp
       info "OK, WE GOT (after #{1000 * parse_time_elapsed_seconds
         } ms): #{result.class}"
       if result
-        require 'pp'
         if eval_string
           eval_string_run result
         else
-          ::PP.pp result, infostream
+          TanMan::TestSupport::Services::PP.pp result, infostream
           true
         end
       end
@@ -142,7 +137,7 @@ module ::Skylab::TanMan::TestSupport::Sexp
     end
 
     def load_parser_class
-      f = on_load_parser_info_f ||
+      f = on_load_parser_info ||
         ->(e) { info "      (loading parser ^_^ #{pretty_path_hack e.to_s})" }
 
       ::Skylab::TreetopTools::Parser::Load.new(
@@ -205,7 +200,7 @@ module ::Skylab::TanMan::TestSupport::Sexp
 
     def tmpdir_prepared
       @tmpdir_prepared ||= begin
-        t = prepared_submodule_tmpdir.join stem_path
+        t = prepared_tanman_tmpdir.join stem_path
         t.exist? or t.prepare # because parent gets rewritten once per runtime
         t
       end

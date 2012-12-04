@@ -8,7 +8,7 @@ module Skylab::Issue
   class Porcelain
     extend ::Skylab::Porcelain
     extend ::Skylab::MetaHell::Autoloader::Autovivifying
-    include Skylab::Porcelain::En
+    include Skylab::Porcelain::En::Methods
 
     desc "Add an \"issue\" line to #{ISSUES_FILE_NAME}."
     desc "Lines are added to the top and are sequentially numbered."

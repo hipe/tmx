@@ -1,10 +1,19 @@
 require 'pathname'
 
 module Skylab::Face
+
   class MyPathname < ::Pathname
-    include ::Skylab::Face::PathTools::InstanceMethods
-    def bare ; to_s.sub(/\.rb$/, '') end
-    def join(*a) ; self.class.new(super(*a)) end # waiting for ruby patch :(
-    def pretty ; pretty_path(to_s) end
+
+    include Face::PathTools::InstanceMethods
+
+    def join *a  # waiting for ruby patch :(  (as of 1.9.2p290)
+      x = super(* a)
+      r = self.class.new x
+      r
+    end
+
+    def pretty
+      pretty_path to_s
+    end
   end
 end

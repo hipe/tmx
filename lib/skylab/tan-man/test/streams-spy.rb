@@ -1,5 +1,7 @@
 module Skylab::TanMan::TestSupport
 
+  TiteColor = ::Skylab::Porcelain::TiteColor
+
   class StreamsSpy < ::Array
     attr_accessor :debug
     alias_method :debug?, :debug
@@ -28,7 +30,7 @@ module Skylab::TanMan::TestSupport
       line = buffer.string.dup
       buffer.rewind
       buffer.truncate(0)
-      unstyled = ::Skylab::Porcelain::TiteColor.unstylize_if_stylized(line)
+      unstyled = TiteColor.unstylize_if_stylized line
       if debug_f.call
         $stderr.puts("dbg:#{name}:puts:#{string}#{'(line was colored)' if unstyled}")
       end
@@ -45,7 +47,7 @@ module Skylab::TanMan::TestSupport
 
   protected
     def initialize stack, name, debug_f
-      @buffer = ::StringIO.new
+      @buffer = TanMan::TestSupport::Services::StringIO.new
       @debug_f = debug_f
       @name = name
       @stack = stack
