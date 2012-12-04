@@ -20,27 +20,27 @@ module Skylab::TanMan
 
     def execute
       ee = []
-      sing = singletons.config
-      sing.ready? do |o|
+      conf = service.config
+      conf.ready? do |o|
         o.on_not_ready { |e| ee.push build_event(:local_negative, e) } # sketchy as all hell
         o.on_read_global = ->(oo) { oo.on_invalid { |e| ee.push build_event(:global_negative, e) } }
         o.on_read_local  = ->(oo) { oo.on_invalid { |e| ee.push build_event(:local_negative, e)  } }
       end
       unless ee.index { |e| e.is? :global }
-        if sing.global.exist?
+        if conf.global.exist?
           ee.push build_event(:global_found,
-            message: sing.global.pathname.pretty, pathname: sing.global.pathname)
+            message: conf.global.pathname.pretty, pathname: conf.global.pathname)
         else
           ee.push build_event(:global_positive, 'not found')
         end
       end
       unless ee.index { |e| e.is? :local_negative }
-        if sing.local.exist?
+        if conf.local.exist?
           ee.push build_event(:local_found,
-            message: sing.local.pathname.pretty, pathname: sing.local.pathname)
+            message: conf.local.pathname.pretty, pathname: conf.local.pathname)
         else
           ee.push build_event(:local_found,
-            message: "#{sing.local.pathname.dirname.pretty}/", pathname: sing.local.pathname)
+            message: "#{conf.local.pathname.dirname.pretty}/", pathname: conf.local.pathname)
         end
       end
       ee

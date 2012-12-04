@@ -46,6 +46,11 @@ module Skylab::TanMan
 
   protected
 
+    def initialize( * )
+      @pen = nil
+      super
+    end
+
     # a quick and dirty (and fun!) proof of concept to show that we can buffer
     # and then emit events in the API that originated as data from controllers
     # that was written directly to streams.

@@ -1,11 +1,12 @@
-[#048]       what is the deal with the non-orthogonal-ass event interface for remote list
-[#047]       where to specify local/global, or merge?
+[#048] #open failing on tan init should do porcelain too
+[#048] #watch what is the deal with the non-orthogonal-ass event interface for remote list
+[#047] #watch where to specify local/global, or merge?
 [#046]       #trend away from Parameter::Definer etc. and towards lamba args
 [#045]       #postponed Parameter::Definer (up?), vs Attribute::Definer
 [#044]       #branch-down cli tests (but issue wip)
 [#043]       #tracking-tag other guys that could benefit from svc
 [#042]       #done FileUtils as a service (JSON)
-[#041] #open i don't like how status is implemented with the arrays
+[#041] #watch i don't like how status is implemented with the arrays
 [#040]       #done make your own SubClient::InstanceMethods to DRY CLI & API
 [#039]       #done API::Whatever becomes MetaHell::Generic
 [#038]       #done text_styler away!
@@ -26,7 +27,7 @@
 [#024]       #done use -h -- we had to etc use bleeding
 [#023] #open combine all Boxxy, consider Boxxy-like solutions
 [#022]       #done refactor-in headless, and sub-client
-[#021] #open merge singletons into service
+[#021]       merge singletons into service
 [#020] #low-priority nounify cli commands
 [#019]       #done "magic" for DRYING up tests (Regret) #done
 [#018] #open #depends-on:#sl-100 refactor out porcelain ["bleeding"]

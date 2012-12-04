@@ -48,33 +48,4 @@ module Skylab::TanMan
 
   API.set_defaults_if_nil!
 
-
-
-  class API::Singletons           # don't create directly, use API.singletons
-
-    def clear
-      @config.clear if @config
-    end
-
-    def config
-      @config ||= begin
-        TanMan::Models::Config::Singleton.new
-      end
-    end
-
-  protected
-
-    def initialize
-      @config = nil
-    end
-  end
-
-
-
-  module API
-    singletons = nil
-    define_singleton_method :singletons do
-      singletons ||= API::Singletons.new
-    end
-  end
 end

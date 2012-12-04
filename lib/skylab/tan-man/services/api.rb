@@ -6,7 +6,7 @@ module Skylab::TanMan
   public
 
     def clear
-      API.singletons.clear        # etc
+      TanMan::Services.config.clear # yeah about that..
     end
 
 

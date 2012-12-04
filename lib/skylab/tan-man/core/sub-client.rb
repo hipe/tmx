@@ -30,10 +30,6 @@ module Skylab::TanMan
 
   protected
 
-    def config_singleton
-      request_client.send :config_singleton # [#021]
-    end
-
     def infostream
       request_client.send :infostream
     end
@@ -44,10 +40,6 @@ module Skylab::TanMan
 
     def service
       request_client.send :service
-    end
-
-    def singletons                # away at [#021]
-      request_client.send :singletons
     end
 
     def skip msg

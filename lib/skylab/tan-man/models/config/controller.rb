@@ -1,9 +1,10 @@
 module Skylab::TanMan
   class Models::Config::Controller
-    include Core::SubClient::InstanceMethods # don't need m.m yet
+    include Core::SubClient::InstanceMethods # yay
 
     def [] k # is ready? and k is string and local is the thing
-      config_singleton.local[k]
+      fail 'make this first found'
+      service.config.local[k]
     end
 
     def add_remote name, url, resource_name
@@ -33,7 +34,7 @@ module Skylab::TanMan
     def known? name, resource_name           # is ready? and name is string
       result = nil
       if :all == resource_name
-        result = config_singleton.all_resource_names.detect do |n|
+        result = service.config.all_resource_names.detect do |n|
           resources[ n ].key? name
         end
       else
@@ -52,7 +53,7 @@ module Skylab::TanMan
     end
 
     def ready?
-      config_singleton.ready? do |o|
+      service.config.ready? do |o|
         o.on_no_config_dir do |e|              # same payload, different graph!
           emit :no_config_dir, e
         end
@@ -146,9 +147,9 @@ module Skylab::TanMan
 
 
     def resources
-      resources = -> name do
-        r = config_singleton.send name
-        r
+      resources = -> name do                   # memoize a lamba that from
+        r = service.config.send name           # the outside might look like
+        r                                      # a hash
       end
       define_singleton_method( :resources ) { resources }
       send :resources # HAHAHAH
