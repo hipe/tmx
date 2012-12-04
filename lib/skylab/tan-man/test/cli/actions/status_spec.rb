@@ -4,9 +4,10 @@ module Skylab::TanMan::TestSupport::CLI
   # @todo waiting for permute [#056]
   #
 
-  describe "The #{TanMan::CLI} action Status", tanman: true  do
+  describe "The #{TanMan::CLI} action Status", tanman: true,
+                                           cli_action: true do
     extend CLI_TestSupport
-    include Tmpdir_InstanceMethods
+    include Tmpdir::InstanceMethods
 
     def prepare_configs *whichs
       prepare_tanman_tmpdir
@@ -49,7 +50,6 @@ module Skylab::TanMan::TestSupport::CLI
      context 'no local dir' do
       it 'says that local not found' do
         prepare_configs
-        services_clear
         match_one('local ').should be_include('local conf dir not found')
       end
     end
@@ -71,7 +71,6 @@ module Skylab::TanMan::TestSupport::CLI
     context 'yes local dir as file' do
       before do
         prepare_tanman_tmpdir.touch('local-conf.d')
-        services_clear
       end
       it 'complain that a folder was expected where a file was found' do
         input 'status'

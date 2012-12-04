@@ -11,9 +11,9 @@ module Skylab::TanMan::TestSupport
     Headless     = ::Skylab::Headless
     MetaHell     = ::Skylab::MetaHell
     TanMan       = ::Skylab::TanMan
-    Tmpdir       = ::Skylab::TestSupport::Tmpdir
     TMPDIR_STEM  = 'tan-man'
-    TMPDIR = Tmpdir.new(::Skylab::TMPDIR_PATHNAME.join(TMPDIR_STEM).to_s)
+    TMPDIR = ::Skylab::TestSupport::Tmpdir.
+      new( ::Skylab::TMPDIR_PATHNAME.join(TMPDIR_STEM).to_s )
   end
 
   include CONSTANTS # for use here, below
@@ -58,28 +58,54 @@ module Skylab::TanMan::TestSupport
     end
   end
 
-  module Tmpdir_InstanceMethods
-    -> do
-      execute_f = -> { TMPDIR.prepare }
-      get_f = ->{ _memo = execute_f.call ; (get_f = ->{ _memo }).call }
 
-      define_method :prepare_tanman_tmpdir do
-        execute_f.call
-      end
-      define_method :prepared_tanman_tmpdir do
-        get_f.call
-      end
-    end.call
+  module Tmpdir
+
+    o = { }
+
+    get = nil
+
+    prepare = -> do               # always re-create the tmpdir (blows the
+      x = TMPDIR.prepare          # old one and its contents away!).
+      get = -> { x }              # Also memoize it into `get`
+      x
+    end
+
+    get = -> do                   # get the last prepared tmpdir during the
+      prepare[ ]                  # lifetime of this ruby process, re-creating
+    end                           # it (preparing it) iff prepare was never yet
+                                  # called.
+    o[:prepare] = prepare
+
+    o[:get] = -> { get[] }
+
+    FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
+
   end
+
+
+  module Tmpdir::InstanceMethods
+
+    define_method :prepare_tanman_tmpdir, & Tmpdir::FUN.prepare
+
+    define_method :prepared_tanman_tmpdir, & Tmpdir::FUN.get
+
+    def tanman_tmpdir
+      TMPDIR # less screaming in tests is good
+    end
+
+  end
+
 
   module CONSTANTS
-    Tmpdir_InstanceMethods = Tmpdir_InstanceMethods # suck
+    Tmpdir = Tmpdir
   end
+
 
   module InstanceMethods
     include CONSTANTS # to use MetaHell here ?
     include Autoloader::Inflection::Methods
-    include Tmpdir_InstanceMethods
+    include Tmpdir::InstanceMethods
 
     def _build_normalized_input_pathname stem
       __input_fixtures_dir_pathname.join stem
@@ -118,14 +144,14 @@ module Skylab::TanMan::TestSupport
       normalized_input_string
     end
 
+
     -> do
       f = nil
-      define_method(:_my_before_all) { f.call }
+      define_method( :_my_before_all ) { f.call }
       f = -> do
-        prepared_tanman_tmpdir
-        f = ->{ }
+        Tmpdir::FUN.get[ ]
+        f = -> { }
       end
-      extend Tmpdir_InstanceMethods
     end.call
 
 

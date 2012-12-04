@@ -1,11 +1,8 @@
-require 'shellwords'
-
-
 module Skylab::TanMan::TestSupport
 
   shared_context tanman: true do
 
-    include ::Skylab::TanMan::TestSupport::Tmpdir_InstanceMethods
+    include ::Skylab::TanMan::TestSupport::Tmpdir::InstanceMethods
 
     def api
       TanMan::Services.service.api
@@ -23,24 +20,14 @@ module Skylab::TanMan::TestSupport
     end
 
     def debug!
+      CONSTANTS::TMPDIR.debug!
+      TanMan::API.debug = $stderr # ok here i hope
       self.do_debug = true
     end
 
     def input str
-      argv = Shellwords.split str
+      argv = TanMan::TestSupport::Services::Shellwords.split str
       self.result = cli.invoke argv
-    end
-
-    def lone_error response, regex
-      response.should_not be_success
-      response.events.length.should eql(1)
-      response.events.first.message.should match(regex)
-    end
-
-    def lone_success response, regex
-      response.should be_success
-      response.events.length.should eql(1)
-      response.events.first.message.should match(regex)
     end
 
     let(:output) { StreamsSpy.new }
@@ -74,10 +61,6 @@ module Skylab::TanMan::TestSupport
     end
 
     attr_accessor :result
-
-    def services_clear
-      api.clear
-    end
   end
 end
 

@@ -19,7 +19,7 @@ module Skylab::TanMan::TestSupport::Models::DotFile::Parser
   Skylab::TanMan::TestSupport::Models::DotFile[ Parser = self ]
 
   def self.extended mod
-    regret_extended mod
+    _regret_extended mod
     mod.before(:all) { _my_before_all }
   end
 

@@ -1,3 +1,4 @@
+[#010] #open sl/test-support/tmpdir is a great subject
 [#009]       #backburner unwrap -- terrible idea
 [#008] #open index all the vectors of porcelain/test/porcelain_spec.rb
 [#007] #open (put this information somewhere) there is ..

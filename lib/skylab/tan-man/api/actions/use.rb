@@ -3,7 +3,7 @@ module Skylab::TanMan
   class API::Actions::Use < API::Action
     extend API::Action::Parameter_Adapter
 
-    param :path, pathname: true, accessor: true
+    param :path, pathname: true, accessor: true, required: true
 
 
   protected
@@ -44,12 +44,20 @@ module Skylab::TanMan
     def create_path
       result = false
       begin
-        if path.exist?
+        if path.exist? # #pattern [#049]
           if path.directory?
             error "cannot create, is directory: #{ path }"
           else
             error "cannot create, already exists: #{ path }"
           end
+          break
+        elsif path.dirname.exist?
+          if ! path.dirname.directory?
+            error "cannot create, is not directory: #{ path.dirname }"
+            break
+          end
+        else
+          error "cannot create, directory does not exist: #{ path.dirname }"
           break
         end
         template = service.examples.fetch 'digraph.dot'

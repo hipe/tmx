@@ -86,7 +86,7 @@ module Skylab::Headless
       "\"#{ s }\""
     end
 
-    def parameter_label m, idx
+    def parameter_label m, idx=nil
       s = (::Symbol === m) ? m.to_s : m.name.inspect
       idx ? "#{ s }[#{ idx }]" : s
     end

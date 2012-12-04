@@ -58,7 +58,7 @@ module ::Skylab::TestSupport
       mod.extend module_methods_module
       mod.send :include, instance_methods_module
     end
-    alias_method :regret_extended, :extended
+    alias_method :_regret_extended, :extended
 
 
     # There's clearly lots of room for making this more configurable, but at

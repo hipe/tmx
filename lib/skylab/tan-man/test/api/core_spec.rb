@@ -3,7 +3,6 @@ require_relative '../test-support'
 module Skylab::TanMan::TestSupport
 
   describe "The #{ TanMan::API } itself", tanman: true do
-
     it "is a persistent object" do # #slated for [#030]
       api.should be_trueish
       oid = api.object_id
@@ -11,7 +10,7 @@ module Skylab::TanMan::TestSupport
     end
 
     context "when you invoke an action with an invalid name" do
-      it "it gives you a list-like result whose first event is an appropriate error" do
+      it "the first event in the response events is an appropriate error" do
         response = api.invoke :'not_an_action'
         e = response.events.first
         e.tag.name.should eql(:error)

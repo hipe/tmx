@@ -2,6 +2,7 @@ require 'open3'
 require 'stringio'
 require 'skylab/face/core' # MyPathname *only*
 
+# maybe try not to manually beautify this file [#bs-010]
 module Skylab::TestSupport
   class Tmpdir < ::Skylab::Face::MyPathname
     include ::FileUtils
@@ -82,6 +83,7 @@ module Skylab::TestSupport
     def verbose!
       self.verbose = true ; self
     end
+    alias_method :debug!, :verbose! # old convention & new
   protected
     def requisite_level_check
       requisite_level > 0 or fail("requisite_level must be at least 1.")

@@ -6,8 +6,12 @@ module Skylab::TanMan
       events.push event
     end
 
+    def error
+      events.detect { |e| e.is? :error }
+    end
+
     def success?                  # this is how you define it
-      ! events.detect { |e| e.is? :error }
+      ! error
     end
 
     def to_json state, i

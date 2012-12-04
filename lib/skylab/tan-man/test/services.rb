@@ -8,13 +8,17 @@ module Skylab::TanMan::TestSupport
       h[const] = f
     end
 
-    o :JSON,     -> { require 'json' ; ::JSON }
+    o :FileUtils, -> { require 'fileutils' ; ::FileUtils }
 
-    o :OptParse, -> { require 'optparse' ; ::OptionParser }
+    o :JSON,      -> { require 'json' ; ::JSON }
 
-    o :PP,       -> { require 'pp' ; ::PP }
+    o :OptParse,  -> { require 'optparse' ; ::OptionParser }
 
-    o :StringIO, -> { require 'stringio' ; ::StringIO }
+    o :PP,        -> { require 'pp' ; ::PP }
+
+    o :Shellwords, -> { require 'shellwords' ; ::Shellwords }
+
+    o :StringIO,  -> { require 'stringio' ; ::StringIO }
 
 
     define_singleton_method :const_missing do |const|

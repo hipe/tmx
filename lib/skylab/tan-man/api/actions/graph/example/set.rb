@@ -15,7 +15,7 @@ module Skylab::TanMan
       begin
         config.ready? or break
         sanitized = service.examples.normalize self.name,
-          -> e { error e } # result goes into sanitized, careful!
+          -> e { error e }
         if ! sanitized
           result = sanitized
           break

@@ -1,10 +1,9 @@
-require File.expand_path('../test-support', __FILE__)
-# above kept for posterity
-
+require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport
 
-  describe "The #{TanMan} CLI", tanman: true do
+  describe "The #{TanMan} CLI", tanman: true,
+                            cli_action: true do
     extend TanMan_TestSupport
 
 
@@ -18,7 +17,6 @@ module Skylab::TanMan::TestSupport
 
       context 'when there is no local config directory' do
         it 'cannot get added, whines about no directory', wip:true do
-          debug!
           input 'remote add bing bong'
           output_shift_is infostream,
             "ferp failed to add remote - couldn't find local-conf.d in #{
@@ -38,7 +36,6 @@ module Skylab::TanMan::TestSupport
       context 'when there is a local config directory' do
         before do
           prepare_local_conf_dir
-          services_clear
         end
 
         it 'you can add a local remote', f:true do

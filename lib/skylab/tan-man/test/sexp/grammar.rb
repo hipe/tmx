@@ -54,7 +54,7 @@ module ::Skylab::TanMan::TestSupport::Sexp
 
     include ::Skylab::Autoloader::Inflection::Methods
     include ::Skylab::TanMan::Models::DotFile::Parser::InstanceMethods
-    include ::Skylab::TanMan::TestSupport::Tmpdir_InstanceMethods
+    include ::Skylab::TanMan::TestSupport::Tmpdir::InstanceMethods
     include CLI_Client_InstanceMethods
       # prepared_tanman_tmpdir
 
