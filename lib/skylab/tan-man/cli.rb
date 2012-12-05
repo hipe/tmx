@@ -71,9 +71,8 @@ module Skylab::TanMan
     def invoke name, host, opts
       args = opts.merge(name: name, host: host)
       args[:resource] = args.delete(:global) ? :global : :local
-      b = api_invoke args
-      b == false and help(invite_only: true)
-      b
+      result = api_invoke args
+      result
     end
   end
 
@@ -85,19 +84,23 @@ module Skylab::TanMan
     end
     include Porcelain::Table::RenderTable
     def invoke opts
-      table = api_invoke(opts) or return false
-      render_table(table, separator: '  ') do |o|
-        o.field(:resource_label).format { |x| "(resource: #{x})" }
-        o.on_empty do |e|
-          e.touch!
-          n = table.num_resources_seen
-          emit(:info, "no remotes found in #{n} config file#{s n}")
+      result = nil # not false - we never do convention [#hl-109] invite
+      begin
+        table = api_invoke( opts ) or break
+        render_table table, separator: '  ' do |o|
+          o.field(:resource_label).format { |x| "(resource: #{x})" }
+          o.on_empty do |e|
+            e.touch!
+            n = table.num_resources_seen
+            emit :info, "no remotes found in #{n} config file#{s n}"
+          end
+          o.on_all do |e|
+            emit( :payload, e ) unless e.touched?
+          end
         end
-        o.on_all do |e|
-          emit(:payload, e) unless e.touched?
-        end
-      end
-      true
+        result = true
+      end while nil
+      result
     end
   end
 
@@ -110,9 +113,8 @@ module Skylab::TanMan
       end
     end
     def invoke remote_name, opts
-      b = api_invoke opts.merge( remote_name: remote_name )
-      b == false and help(invite_only: true)
-      b
+      result = api_invoke opts.merge( remote_name: remote_name )
+      result
     end
   end
 

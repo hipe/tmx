@@ -13,6 +13,35 @@ module Skylab::TanMan
 
 
 
+    # This is the reasonable place to put the idea that for cli actions,
+    # when an action's invoke() method results in false, we typically
+    # want to display an invite for more help.  #convention [#hl-019]
+    #
+    # Since (at least for this client in this subproduct) we expect this
+    # behavior to be the rule rather than the exception, child
+    # actions who don't want this must return other than false to us.
+    #
+    # (To try to push this behavior down to the cli action class (parent
+    # or child class) creates ugliness because all of our `def invoke`
+    # calls would have to dance around this, it's a wrappping problem -
+    # for the time being we think things like 'outer_invoke' is ugly,
+    # and we've got our naming #convention down pretty well ([#hl-020])
+    #
+    def invoke argv
+      result = super argv # watch for this to break at [#018]
+      if false == result
+        bound_method, = resolve argv.dup # re-resolve, ick!!!
+        if bound_method
+          action = bound_method.receiver
+          action.help invite_only: true
+        else
+          result = help invite_only: true
+        end
+        result = nil
+      end
+      result
+    end
+
   protected
 
     def initialize sin=$stdin, sout=$stdout, serr=$stderr, &events

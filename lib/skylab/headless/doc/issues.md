@@ -1,3 +1,6 @@
+[#020]       #convention `invoke` `execute` `run` `call` have distinct meanings
+               and consistent signatures within modalities
+[#019]       #pattern #convention iff cli action invoke is false, invite
 [#018]       #tracking-tag api action inflection
 [#017] #open API architecture - is frontier app at odds with assumptions?
 [#016] #open #low-priority dynamic uncolorize payload stream when ! tty?

@@ -1,5 +1,6 @@
+[#050] #open just for fun, eliminate all return statements
 [#049]       #watch #pattern - four permutations for file creation (dirname etc)
-[#048] #open failing on tan init should do porcelain too
+[#048]       #done failing on tan init should do porcelain too
 [#048] #watch what is the deal with the non-orthogonal-ass event interface for remote list
 [#047] #watch where to specify local/global, or merge?
 [#046]       #trend away from Parameter::Definer etc. and towards lamba args
