@@ -12,18 +12,25 @@ module Skylab::TanMan
       r
     end
 
-    on_remove = API::Emitter.new error: :all, info: :all, write: :all
+    on_remove = API::Emitter.new error: :all, info: :all, write: :all #[#046]
 
     define_method :remove do |remote, &on_info|
-      e = on_remove.new on_info
-      section_name = remote.sexp.section_name
-      found = resource.sections.detect { |s| section_name == s.section_name }
-      found or return e.error("expected section not found: [#{section_name}]")
-      if resource.sexp.detect(:sections).remove(found)
-        e.emit(:write, resource: resource)
-        e.emit(:info, "removed remote #{remote.name}.")
-        true
+      result = nil
+      begin
+        e = on_remove.new on_info
+        section_name = remote.sexp.section_name
+        found = resource.sections.detect { |s| section_name == s.section_name }
+        if ! found
+          result = e.error "expected section not found: [#{ section_name }]"
+          break
+        end
+        if resource.sexp.detect( :sections ).remove found
+          e.emit :write, resource: resource
+          e.emit :info, "removed remote #{ remote.name }."
+          result = true
+        end
       end
+      result
     end
 
   protected

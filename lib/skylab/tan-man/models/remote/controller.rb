@@ -24,18 +24,30 @@ module Skylab::TanMan
       !! @sexp
     end
 
+
+    # `binding` to a sexp means that you are now a part of it and it is
+    # your parent etc.
+
     def bind sexp
+      result = nil
       ks = self.class.attributes.select { |_, h| h[:bound] }.map { |k, _| k }
-      vals = {} # atomic
+        # look at this awsome use of custom meta-attributes above
+      vals = { } # atomic
       ks.each do |k|
-        (val = send(k)).nil? and fail("wat do when values is nil?")
+        val = send k
+        val.nil? and fail "wat do when values is nil?"
         vals[k] = val
       end
       @sexp = sexp
+      result = true
       ks.each do |k|
-        send("#{k}_write", vals[k]) or return false
+        r = send "#{ k }_write", vals[k]
+        if ! r
+          result = r
+          break
+        end
       end
-      true
+      result
     end
 
 

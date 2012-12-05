@@ -8,7 +8,7 @@ module Skylab::TanMan::Core::Attribute
     # The default attribute definer for a typical object is its ordinary
     # class.  In some cases -- e.g. if you are dealing with a class or module
     # object and want to use attribute definer for *that* -- you will want to
-    # redefine this method to return the singleton class instead, for
+    # redefine this method to result in the singleton class instead, for
     # reflection to work (which is required for some kind of meta-attribute
     # setters, etc)
 

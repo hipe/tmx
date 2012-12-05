@@ -11,20 +11,25 @@ module ::Skylab::TanMan
 
   class << Sexp::Prototype
     def match prev_tree, curr_tree, tree_class, member
-      ::String === prev_tree or return
-      scn = ::StringScanner.new prev_tree
-      scn.skip(/[\r\n]+/)
-      if line_header = scn.scan(/[ \t]*#[ \t]*/)
-        klass = Sexp::Prototype::ShellStyle
-      elsif scn.skip(%r<[ \t]*/\*>)
-        klass = Sexp::Prototype::C_Style
-        scn.skip(/([ \t]*[\r\n]+)+/)
-        line_header = scn.scan(/[ \t]*/)
-      else
-        return
-      end
-      scn.skip(/example /) or return # the logical cutoff could be wherever
-      klass.new(scn, curr_tree, line_header, member, tree_class)
+      result = nil
+      begin
+        ::String === prev_tree or break
+        scn = ::StringScanner.new prev_tree
+        scn.skip( /[\r\n]+/ )
+        line_header = scn.scan( /[ \t]*#[ \t]*/ )
+        if line_header
+          klass = Sexp::Prototype::ShellStyle
+        elsif scn.skip(%r<[ \t]*/\*>)
+          klass = Sexp::Prototype::C_Style
+          scn.skip( /([ \t]*[\r\n]+)+/ )
+          line_header = scn.scan( /[ \t]*/ )
+        else
+          break
+        end
+        scn.skip( /example / ) or break # the logical cutoff could be wherever
+        result = klass.new scn, curr_tree, line_header, member, tree_class
+      end while nil
+      result
     end
   end
 
@@ -34,21 +39,25 @@ module ::Skylab::TanMan
     NAME_RX = /[_a-z][_a-z0-9]*/i
 
     def commit!
-      name = scn.scan(/[a-z_][a-z0-9_]*/) or return
-      name.intern == member or return
-      string = read_embedded_string! or fail('sanity')
-      parser = tree_class.grammar.build_parser_for_rule member
-      result = parser.parse string
-      result or fail("when parsing your #{member} prototype embedded in #{
-        }a comment: #{parser.failure_reason}")
-      sexp = tree_class.element2tree result, member
-      if sexp.list?
-        self.list_controller = sexp._prototypify!(curr_tree)
-        parse_the_rest!
-        list_controller
-      else
-        fail("implement me -- prototypes for non-list rules")
-      end
+      result = nil
+      begin
+        name = scn.scan( /[a-z_][a-z0-9_]*/ ) or break
+        name.intern == member or break
+        string = read_embedded_string! or fail 'sanity'
+        parser = tree_class.grammar.build_parser_for_rule member
+        result = parser.parse string
+        result or fail "when parsing your #{ member } prototype embedded in #{
+          }a comment: #{ parser.failure_reason }"
+        sexp = tree_class.element2tree result, member
+        if sexp.list?
+          self.list_controller = sexp._prototypify! curr_tree
+          parse_the_rest!
+          result = list_controller
+        else
+          fail "implement me -- prototypes for non-list rules"
+        end
+      end while nil
+      result
     end
 
   protected
@@ -113,7 +122,7 @@ module ::Skylab::TanMan
 
     def read_multi_line_embedded_string!
       # If there is no content after the ':' in "example foo_bar:", use this.
-      # For now, must return non-nil or fail
+      # For now, must result in non-nil or fail
       #
       scn.skip(/[ \t]*/) # chomp any trailing _spaces_ after the ':'
       len = scn.match?(/\r?\n/) or fail('expecting newline in comment')

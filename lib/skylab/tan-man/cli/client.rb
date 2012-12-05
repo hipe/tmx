@@ -19,7 +19,7 @@ module Skylab::TanMan
     #
     # Since (at least for this client in this subproduct) we expect this
     # behavior to be the rule rather than the exception, child
-    # actions who don't want this must return other than false to us.
+    # actions who don't want this must result in other than false to us.
     #
     # (To try to push this behavior down to the cli action class (parent
     # or child class) creates ugliness because all of our `def invoke`

@@ -44,14 +44,18 @@ module Skylab::TanMan
     end
     def expecting
       a = parser.terminal_failures
-      format_f = ->(tf) { tf.expected_string.inspect }
-      "expecting #{
-        case a.length
-        when 0 ; return
-        when 1 ; format_f[a.first]
-        else   ; "one of #{ a.map { |tf| format_f[tf] }.uniq.join(', ') }"
+      format = -> tf { tf.expected_string.inspect }
+      result = nil
+      begin
+        inside = case a.length
+        when 0 ; nil
+        when 1 ; format[ a.first ]
+        else   ; "one of #{ a.map { |tf| format[tf] }.uniq.join ', ' }"
         end
-      }"
+        inside or break
+        result = "expecting #{ inside }"
+      end while nil
+      result
     end
     def force_overwrite?
       false

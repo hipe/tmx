@@ -64,9 +64,13 @@ module ::Skylab::TanMan::TestSupport::Sexp
     end
 
     def invoke argv
-      parse_opts(argv) or return
-      resolve_upstream(argv) or return
-      execute
+      result = nil
+      begin
+        parse_opts argv or break
+        resolve_upstream argv or break
+        result = execute
+      end while nil
+      result
     end
 
   protected

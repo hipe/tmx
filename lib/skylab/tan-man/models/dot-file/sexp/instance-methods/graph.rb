@@ -63,7 +63,7 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
       stmt_list._named_prototypes[name]
     end
     def node! label
-      # Found an exact match node by label? return that.
+      # Found an exact match node by label? you found your result.
       # Any first node_stmt lexically greater? insert before that.
       # Any node_stmts at all? insert immediately after last one.
       # Else insert at beginning of all stmts.

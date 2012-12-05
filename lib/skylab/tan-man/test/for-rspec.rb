@@ -46,7 +46,7 @@ module Skylab::TanMan::TestSupport
         else            ; fail("unrecognized assertion class: #{assertion}")
         end
       end
-      output.shift # return subject, and change the stack only at the end
+      output.shift # result in subject, and change the stack only at the end
     end
 
     def output_shift_only_is *assertions

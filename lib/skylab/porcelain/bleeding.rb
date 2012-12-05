@@ -616,8 +616,15 @@ module Skylab::Porcelain::Bleeding
     end
 
     def invoke argv
-      (callable, args = resolve(argv = argv.dup)) or return callable
-      callable.receiver.send(callable.name, *args)
+      block_given? and raise ::ArgumentError.new 'no blocks to `invoke` ever'
+      result = nil
+      callable, args = resolve argv.dup
+      if callable
+        result = callable.receiver.send callable.name, *args
+      else
+        result = callable
+      end
+      result
     end
 
     def program_name
@@ -724,12 +731,12 @@ module Skylab::Porcelain::Bleeding
       self
     end
 
-    def invoke token=nil
+    def invoke token=nil # #todo this signature violates #convention [#hl-020]
       result = nil
       begin
         if token
           b = parent.fetch_builder token do |e|
-            emit :error, e.message # result *is* undefined
+            emit :error, e.message
             result = false
             nil # set b!
           end

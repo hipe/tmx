@@ -21,7 +21,7 @@ module Skylab::TanMan::TestSupport::API::Actions
         lone_error( /missing required attribute.*"host".*"name"/ )
       end
 
-      it "returns an error event if it cannot find the local config dir" do
+      it "result is an error event if it cannot find the local config dir" do
         response = api_invoke name: 'flip', host: 'flap'
         response.success?.should eql(false)
         lone_error( /local conf dir not found/i )

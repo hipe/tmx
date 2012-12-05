@@ -1,3 +1,5 @@
+[#011]       #idea - terrible: results of rcov used to eliminate
+               branches of unused code from sourcecode, programattically!
 [#010] #open sl/test-support/tmpdir is a great subject
 [#009]       #backburner unwrap -- terrible idea
 [#008] #open index all the vectors of porcelain/test/porcelain_spec.rb

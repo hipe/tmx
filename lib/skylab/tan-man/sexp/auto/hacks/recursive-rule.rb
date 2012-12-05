@@ -216,11 +216,11 @@ module Skylab::TanMan
         else
           # When "removing" the first (root) node of a list (tree), we can't
           # actually remove the node itself because it is a handle to the whole
-          # list.  The really hacky part is this: given that we want to return
-          # a node that represents what was removed, and we can't actually
+          # list.  The really hacky part is this: given that we want to result
+          # in a node that represents what was removed, and we can't actually
           # remove the first node, we swap all the properties of the first and
-          # second node (except their "next node" properties) and return what
-          # was once the second node!! ack!
+          # second node (except their "next node" properties) and result in
+          # what was once the second node!! ack!
           # This mess is kept logically separate because as the idea
           # of zero-width list stubs evolves this might become unnecessary.
           object_id == target.object_id or fail('sanity')

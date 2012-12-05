@@ -8,7 +8,7 @@ module Skylab::TanMan
     cache = { }
 
 
-    # For all strings `stem`, normalize it to a joined path and return
+    # For all strings `stem`, normalize it to a joined path and result in
     # a template object representing the possible template file that is
     # there, without checking if the file exists. caches results.
     #

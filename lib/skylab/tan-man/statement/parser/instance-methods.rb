@@ -44,6 +44,7 @@ module Skylab::TanMan
     end
 
     def parser_failure
+      fail 'TEST ME - THE BELOW IS NOT YET COVERED BY TESTS' # #TODO #todo and take returns out
       # failure_reason, failure_line, failure_column
       (a = parser.terminal_failures).empty? and return nil
       _msg = [ 'Expected',
