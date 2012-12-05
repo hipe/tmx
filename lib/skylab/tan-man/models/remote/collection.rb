@@ -1,18 +1,8 @@
 module Skylab::TanMan
   class Models::Remote::Collection < ::Enumerator
-    Remote = Models::Remote
+    Remote = Models::Remote::Controller
+
     attr_reader :resource
-    def initialize resource
-      block_given? and raise ArgumentError.new("this enumerator creates its own block.")
-      @resource = resource
-      super() do |y|
-        resource.sections.each do |sec|
-          if Remote::SECTION_NAME_RE =~ sec.section_name and rem = Remote.bound(self, sec)
-            y << rem
-          end
-        end
-      end
-    end
 
     def push remote
       remote.bound? and fail "won't push bound remote"
@@ -21,7 +11,6 @@ module Skylab::TanMan
       r = remote.bind(sexp) ? self : false
       r
     end
-
 
     on_remove = API::Emitter.new error: :all, info: :all, write: :all
 
@@ -36,6 +25,23 @@ module Skylab::TanMan
         true
       end
     end
+
+  protected
+
+    def initialize resource
+      block_given? and raise ArgumentError.new(
+        "this enumerator creates its own block." )
+      @resource = resource
+      super() do |y|
+        resource.sections.each do |sec|
+          if Remote::SECTION_NAME_RE =~ sec.section_name
+            rem = Remote.bound self, sec
+            if rem
+              y << rem
+            end
+          end
+        end
+      end
+    end
   end
 end
-

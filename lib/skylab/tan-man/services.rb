@@ -6,7 +6,6 @@ module ::Skylab::TanMan
 
     dbg = nil #  $stderr
     fun = ::Skylab::Autoloader::Inflection::FUN
-    constantize = fun.constantize
     methodify = fun.methodify
     load_method = -> const { "load_#{ methodify[ const ] }" }
 
@@ -23,8 +22,7 @@ module ::Skylab::TanMan
     o :StringScanner, -> { require 'strscan'  ; ::StringScanner }
 
     build_service = -> pathname do
-      const = constantize[ pathname.basename.to_s ]
-      klass = Services.case_insensitive_const_get const # maybe triggers our
+      klass = Services.const_fetch pathname.basename.sub_ext('').to_s # BOXXY!!
       x = klass.new               # autoloading .. we don't know here.
       x
     end
@@ -53,13 +51,13 @@ module ::Skylab::TanMan
       end
     end
 
-    service = -> do
-      init[]                      # Service.service always results in the
-      service = -> { self }       # selfsame module, but call init[] once and
+    services = -> do
+      init[]                      # Service.services always results in the
+      services = -> { self }       # selfsame module, but call init[] once and
       self                        # lazily
     end
 
-    define_singleton_method( :service ) { service[] }
+    define_singleton_method( :services ) { services[] }
 
     def self._const_missing_class
       Service_Load

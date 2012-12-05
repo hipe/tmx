@@ -56,7 +56,7 @@ module Skylab::TanMan
     # ---------------- jawbreak blood end --------------------
 
     def api_invoke params_h
-      service.api.invoke normalized_action_name, params_h, self, -> o do
+      services.api.invoke normalized_action_name, params_h, self, -> o do
         o.on_all { |event| emit event }
       end
     end

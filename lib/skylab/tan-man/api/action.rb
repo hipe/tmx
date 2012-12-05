@@ -30,9 +30,42 @@ module Skylab::TanMan
 
   protected
 
-    def initialize request_client, events # pass the callable explicity
+    define_method :initialize do |request_client, events|
       _sub_client_init! request_client
       events[ self ]
+
+      # We cautiouly and experimentally re-introduce the idea of "knobs"
+      # ([#016]) below. (knobs in porcelain.all ended up being a
+      # terrible idea, but here they just feel right.)
+
+      me = self
+
+
+      # Notice there is an inversion in the taxonomy - the class/module
+      # hierarchy goes TanMan::Models::<model>::<controller>
+      # but the knob call goes self.<controller plural>.<model> which
+      # seems fine.
+
+      method_missing = -> controller_const do
+        -> method do
+          k = TanMan::Models.const_fetch( method, false ). # WE LOVE YOU BOXXY
+            const_get( controller_const, false )
+          x = k.new me
+          define_singleton_method( method ) { x }
+          x
+        end
+      end
+
+      o = @collections = ::Object.new
+      o.define_singleton_method :method_missing, & method_missing[ :Collection ]
+
+      o = @controllers = ::Object.new
+      o.define_singleton_method :method_missing, & method_missing[ :Controller ]
+
     end
+
+    attr_reader :collections
+
+    attr_reader :controllers
   end
 end

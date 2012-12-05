@@ -12,8 +12,8 @@ module Skylab::TanMan
     def execute
       result = nil
       begin
-        config.ready? or break
-        result = config.add_remote name, host, resource
+        controllers.config.ready? or break
+        result = controllers.config.add_remote name, host, resource
       end while nil
       result
     end

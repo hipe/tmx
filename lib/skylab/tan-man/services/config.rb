@@ -50,20 +50,21 @@ module Skylab::TanMan
       if ! local.path
         local.path = find_local_path e
       end
+      r = nil
       if local.path # if found then assume exists per above
         if local.modified?
-          local.read(& e.on_read_local)
+          r = local.read(& e.on_read_local)
         else
-          local.valid?
+          r = local.valid?
         end
       else
-        e.emit(:no_config_dir,
+        e.emit :no_config_dir,
           from:    @_orig,
           dirname: @_local_conf_dirname,
           message: "local conf dir not found"
-        )
-        false
+        r = false
       end
+      r
     end
 
     def resources

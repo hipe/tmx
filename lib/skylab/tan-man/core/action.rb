@@ -34,15 +34,5 @@ module Skylab::TanMan
 
     event_class Core::Event       # descendents may change this
 
-  protected
-
-    def config # #pattern #016 - action instances make controllers
-      @config ||= TanMan::Models::Config::Controller.new self
-    end
-
-    def dot_files # #pattern #016
-      @dot_files ||=
-        TanMan::Models::DotFiles::Controller.new request_client, config
-    end
   end
 end

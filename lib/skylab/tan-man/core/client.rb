@@ -23,8 +23,8 @@ module Skylab::TanMan
 
   protected
 
-    def service
-      TanMan::Services.service    # this line should be duplicated only once,
+    def services
+      TanMan::Services.services    # this line should be duplicated only once,
     end                           # in tests.
   end
 end

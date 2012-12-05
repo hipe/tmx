@@ -14,8 +14,8 @@ module Skylab::TanMan::TestSupport::CLI
       end
     end
 
-    o ['tanman', 'service', 'external', 'trepidatious', 'connection', 'delete'],
-       "tanman trepidatious external service failed to delete connection"
+    o ['tanman', 'services', 'external', 'trepidatious', 'connection', 'delete'],
+       "tanman trepidatious external services failed to delete connection"
 
     o ['tanman', 'internationalization', 'language', 'preference', 'set'],
        "tanman language internationalization failed to set preference"

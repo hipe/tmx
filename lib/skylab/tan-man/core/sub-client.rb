@@ -38,8 +38,8 @@ module Skylab::TanMan
       request_client
     end
 
-    def service
-      request_client.send :service
+    def services
+      request_client.send :services
     end
 
     def skip msg

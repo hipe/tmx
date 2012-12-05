@@ -19,31 +19,50 @@ module Skylab::TanMan
   protected
 
     def execute
-      ee = []
-      conf = service.config
-      conf.ready? do |o|
-        o.on_not_ready { |e| ee.push build_event(:local_negative, e) } # sketchy as all hell
-        o.on_read_global = ->(oo) { oo.on_invalid { |e| ee.push build_event(:global_negative, e) } }
-        o.on_read_local  = ->(oo) { oo.on_invalid { |e| ee.push build_event(:local_negative, e)  } }
-      end
-      unless ee.index { |e| e.is? :global }
-        if conf.global.exist?
-          ee.push build_event(:global_found,
-            message: conf.global.pathname.pretty, pathname: conf.global.pathname)
+      service = services.config
+      events = -> do
+        a = []
+        service.ready? do |o|
+          o.on_not_ready do |e|
+            a.push build_event(:local_negative,  e)
+          end
+          o.on_read_global = -> oo do # no no no no no
+            oo.on_invalid do |e|
+              a.push build_event(:global_negative, e)
+            end
+          end
+          o.on_read_local = -> oo do
+            oo.on_invalid do |e|
+              a.push build_event(:local_negative, e)
+            end
+          end
+        end
+        a
+      end.call
+      if ! events.index { |e| e.is? :global }
+        if service.global.exist?
+          ev = build_event :global_found,
+            message:  service.global.pathname.pretty,
+            pathname: service.local.pathname
+          events.push ev
         else
-          ee.push build_event(:global_positive, 'not found')
+          events.push build_event(:global_positive, 'not found')
         end
       end
-      unless ee.index { |e| e.is? :local_negative }
-        if conf.local.exist?
-          ee.push build_event(:local_found,
-            message: conf.local.pathname.pretty, pathname: conf.local.pathname)
+      if ! events.index { |e| e.is? :local_negative }
+        if service.local.exist?
+          ev = build_event :local_found,
+            message: service.local.pathname.pretty,
+            pathname: service.local.pathname
+          events.push ev
         else
-          ee.push build_event(:local_found,
-            message: "#{conf.local.pathname.dirname.pretty}/", pathname: conf.local.pathname)
+          ev = build_event :local_found,
+            message: "#{ service.local.pathname.dirname.pretty }/",
+            pathname: service.local.pathname
+          events.push ev
         end
       end
-      ee
+      events
     end
   end
 end

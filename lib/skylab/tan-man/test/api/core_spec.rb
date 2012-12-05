@@ -3,7 +3,7 @@ require_relative '../test-support'
 module Skylab::TanMan::TestSupport
 
   describe "The #{ TanMan::API } itself", tanman: true do
-    it "is a persistent object" do # #slated for [#030]
+    it "is a persistent object" do
       api.should be_trueish
       oid = api.object_id
       api.object_id.should eql(oid)

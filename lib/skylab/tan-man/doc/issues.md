@@ -33,7 +33,8 @@
 [#019]       #done "magic" for DRYING up tests (Regret) #done
 [#018] #open #depends-on:#sl-100 refactor out porcelain ["bleeding"]
 [#017]       #pattern: for to maybe push up to headless
-[#016]       #pattern: action instance spawns instance of model controller
+[#016]       #done #pattern: action instance spawns instance of model controller
+               .. so make `controllers` knob for clarity
 [#015] #open UI for dissociate (and prune nodes?)
 [#014] #open UI for associate (labeled "depends on")
 [#013] #open UI for chose example, then use example

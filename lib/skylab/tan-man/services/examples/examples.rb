@@ -7,7 +7,7 @@ module ::Skylab::TanMan
   public
 
     def example                   # get the value from config
-      fetch service.config.fetch('example') { 'digraph.dot' }
+      fetch services.config.fetch('example') { 'digraph.dot' }
     end
 
     def fetch basename

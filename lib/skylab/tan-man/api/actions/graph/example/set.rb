@@ -13,14 +13,14 @@ module Skylab::TanMan
     def execute
       result = nil
       begin
-        config.ready? or break
-        sanitized = service.examples.normalize self.name,
+        controllers.config.ready? or break
+        sanitized = services.examples.normalize self.name,
           -> e { error e }
         if ! sanitized
           result = sanitized
           break
         end
-        result = config.set_value :example, sanitized, resource_name
+        result = controllers.config.set_value :example, sanitized, resource_name
       end while nil
       result
     end

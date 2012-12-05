@@ -1,5 +1,5 @@
 module Skylab::TanMan
-  class Models::DotFiles::Controller < ::Struct.new :selected_pathname
+  class Models::DotFile::Collection < ::Struct.new :selected_pathname
     include Core::SubClient::InstanceMethods
 
     def ready?

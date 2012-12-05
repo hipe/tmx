@@ -35,7 +35,7 @@ module Skylab::TanMan
       block ||= -> y do
         seen = { }
         @num_resources_seen = 0
-        service.config.resources.each do |resource|
+        services.config.resources.each do |resource|
           @num_resources_seen += 1
           resource.remotes.each do |remote|
             seen[remote.name] ||= begin
@@ -60,12 +60,12 @@ module Skylab::TanMan
     define_method :remove do |remote_name, resource_name, &b|
       e = on_remove.new b
       if resource_name
-        resource = service.config.send resource_name # #todo
+        resource = services.config.send resource_name # #todo
         remotes = resource.remotes
         resources_count = 1
       else
         remotes = self
-        resources_count = service.config.resources_count
+        resources_count = services.config.resources_count
       end
       remote = remotes.detect { |r| remote_name == r.name }
       if remote

@@ -13,7 +13,7 @@ module Skylab::TanMan
     define_method :execute do
       result = nil
       begin
-        config.ready? or break
+        controllers.config.ready? or break
         tries = [path]
         if '' == path.extname
           tries.push path.class.new( "#{path}#{extname}" )
@@ -33,7 +33,7 @@ module Skylab::TanMan
           result = create_path
           result or break
         end
-        config.set_value :file, path.expand_path.to_s, :local
+        controllers.config.set_value :file, path.expand_path.to_s, :local
         result = true
       end while nil
       result
@@ -60,7 +60,7 @@ module Skylab::TanMan
           error "cannot create, directory does not exist: #{ path.dirname }"
           break
         end
-        template = service.examples.fetch 'digraph.dot'
+        template = services.examples.fetch 'digraph.dot'
         content = template.call created_on: ::Time.now.utc.to_s
         bytes = nil
         path.open('w+') { |fh| bytes = fh.write content }

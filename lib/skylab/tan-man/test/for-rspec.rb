@@ -5,7 +5,7 @@ module Skylab::TanMan::TestSupport
     include ::Skylab::TanMan::TestSupport::Tmpdir::InstanceMethods
 
     def api
-      TanMan::Services.service.api
+      TanMan::Services.services.api
     end
 
     let :cli do

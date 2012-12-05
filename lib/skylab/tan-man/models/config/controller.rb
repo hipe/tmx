@@ -4,7 +4,7 @@ module Skylab::TanMan
 
     def [] k # is ready? and k is string and local is the thing
       fail 'make this first found'
-      service.config.local[k]
+      services.config.local[k]
     end
 
     def add_remote name, url, resource_name
@@ -12,7 +12,7 @@ module Skylab::TanMan
       begin
         ready? or break
         resource = resources[ resource_name ]
-        remote = Models::Remote.new
+        remote = Models::Remote::Controller.new self # sub-client yay!
         ok = remote.edit name: name, url: url do |x|
           x.on_error { |e| emit e } # #experimental pattern
         end
@@ -34,7 +34,7 @@ module Skylab::TanMan
     def known? name, resource_name           # is ready? and name is string
       result = nil
       if :all == resource_name
-        result = service.config.all_resource_names.detect do |n|
+        result = services.config.all_resource_names.detect do |n|
           resources[ n ].key? name
         end
       else
@@ -53,7 +53,7 @@ module Skylab::TanMan
     end
 
     def ready?
-      service.config.ready? do |o|
+      services.config.ready? do |o|
         o.on_no_config_dir do |e|              # same payload, different graph!
           emit :no_config_dir, e
         end
@@ -148,7 +148,7 @@ module Skylab::TanMan
 
     def resources
       resources = -> name do                   # memoize a lamba that from
-        r = service.config.send name           # the outside might look like
+        r = services.config.send name           # the outside might look like
         r                                      # a hash
       end
       define_singleton_method( :resources ) { resources }

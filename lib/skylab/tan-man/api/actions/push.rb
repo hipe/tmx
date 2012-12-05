@@ -16,8 +16,8 @@ module Skylab::TanMan
     def execute
       result = nil
       begin
-        config.ready? or break
-        r = config.remotes.get remote_name, self
+        controllers.config.ready? or break
+        r = controllers.config.remotes.get remote_name, self
         r or break
         self.remote = r
         if ! file_path.exist?
