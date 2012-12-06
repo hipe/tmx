@@ -1,5 +1,3 @@
-require 'stringio'
-
 module ::Skylab::CodeMolester
   # thanks to zenspider
 
@@ -37,7 +35,7 @@ module ::Skylab::CodeMolester
     end
 
     def unparse sio=nil
-      out = sio || ::StringIO.new
+      out = sio || CodeMolester::Services::StringIO.new
       self[1..-1].each do |child|
         if child.respond_to? :unparse
           child.unparse out

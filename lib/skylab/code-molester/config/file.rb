@@ -1,48 +1,52 @@
 ::Skylab::Headless::FUN.require_quietly[ 'treetop' ]
 
+
 module ::Skylab::CodeMolester
+
   class Config::File
-    def self.delegates_when_valid_to implementor, method_name
-      define_method(method_name) do |*a, &b|
-        if valid?
-          send(implementor).send(method_name, *a, &b)
-        else
-          false
-        end
+
+    # like the one in MetaHell::DelegatesTo, but with ad-hoc
+    # customization for this class
+    def self.delegates_to implementor, method_name, condition=nil
+      if ! condition                        # the default condition is that the
+        condition = -> { send implementor } # implementor result must be trueish
       end
-    end
-    def self.delegates_to_truish_ivar attr, method
-      define_method(method) do |*a, &b|
-        if (o = instance_variable_get(attr))
-          o.send(method, *a, &b)
+      defn = -> *a, &b do
+        result = nil
+        if instance_exec(& condition)
+          result = send( implementor ).send method_name, *a, &b
         end
+        result
       end
+      define_method method_name, &defn
     end
-    delegates_when_valid_to :sexp, :[]
-    # []= defined below
+
+    delegates_to :sexp, :[], -> { valid? }
+
+    def []= k, v
+      set_value k, v
+    end
+
     attr_reader :content # @api private!
+
     def content= str
       @content = str
       @state = :unparsed
     end
-    delegates_when_valid_to :sexp, :content_items
-    delegates_to_truish_ivar '@pathname', :dirname
-    delegates_to_truish_ivar '@pathname', :exist?
-    # [path] [opts]
-    def initialize *args
-      @content = @mtime = @on_read = @on_write = @pathname = nil
-      @state = :initial
-      _args = Hash === args.last ? args.pop.dup : {}
-      args.size.nonzero? and _args[:path] = args.pop
-      args.size.nonzero? and raise ArgumentError.new("syntax: #{self.class}.new([path], [opts])")
-      _args.each { |k, v| send("#{k}=", v) }
-      block_given? and yield self
-    end
+
+    delegates_to :sexp, :content_items, -> { valid? }
+
+    delegates_to :pathname, :dirname
+
+    delegates_to :pathname, :exist?
+
     def invalid_reason
       valid?
       @invalid_reason
     end
-    delegates_when_valid_to :sexp, :key?
+
+    delegates_to :sexp, :key?, -> { valid? }
+
     def modified?
       if pathname.exist?
         if @mtime
@@ -52,100 +56,201 @@ module ::Skylab::CodeMolester
         end
       end
     end
+
     def on_read &b
       if b then @on_read = b else @on_read end
     end
+
     def on_write &b
       if b then @on_write = b else @on_write end
     end
+
     def path
       @pathname.to_s if @pathname
     end
+
     def path= mixed
-      @pathname = mixed ? Face::MyPathname.new(mixed) : mixed
+      if mixed
+        @pathname = ::Pathname.new mixed.to_s
+        mixed
+      else
+        @pathname = mixed
+      end
     end
+
     attr_reader :pathname
-    delegates_to_truish_ivar '@pathname', :pretty
-    OnRead = PubSub::Emitter.new error: :all, invalid: :error
-    def read
-      e = OnRead.new
-      if block_given? then yield(e) else on_read.call(e) end
+
+    on_read = PubSub::Emitter.new error: :all, invalid: :error
+
+    define_method :read do
+      e = on_read.new
+      if block_given? then yield e else self.on_read[ e ] end
       self.content = pathname.read
       @mtime = pathname.mtime
+      result = nil
       if valid?
-        self
+        result = self
       else
-        e.emit(:invalid, invalid_reason)
+        e.emit :invalid, invalid_reason
+        result = false
+      end
+      result
+    end
+
+    delegates_to :sexp, :sections, -> { valid? }
+
+    delegates_to :sexp, :set_value, -> { valid? }
+
+    def sexp
+      if valid?
+        @content
+      else
         false
       end
     end
-    delegates_when_valid_to :sexp, :sections
-    delegates_when_valid_to :sexp, :set_value
-    alias_method :[]=, :set_value
-    def sexp # @api private
-      valid? ? @content : false
-    end
-    # def to_s do not define or alias this.  "to_s" is so ambiguous for this class it should not be used.
+
+    # `to_s` - don't define or alias this.  It is so ambiguous
+    # for this class it should not be used.
+
     def string
       valid? ? @content.unparse : @content
     end
-    delegates_when_valid_to :sexp, :value_items
-    class OnWrite < PubSub::Emitter.new(:all, :error => :all, :notice => :all, :before => :all, :after => :all,
-      :before_edit => [:before, :notice], :after_edit => [:after, :notice],
-      :before_create => [:before, :notice], :after_create => [:after, :notice],
-      :no_change => :notice)
-    end
-    def write
-      e = OnWrite.new
-      if block_given? then yield(e) else on_write.call(e) end
-      bytes = nil
-      content = self.string
+
+    delegates_to :sexp, :value_items, -> { valid? }
+
+
+    on_write = PubSub::Emitter.new error: :all, notice: :all,
+      before: :all, after: :all, before_edit: [:before, :notice],
+      after_edit: [:after, :notice], before_create: [:before, :notice],
+      after_create: [:after, :notice], no_change: :notice
+
+
+    define_method :write do
+      e = on_write.new
+      if block_given then yield e else self.on_write[ e ] end
+      result = nil
       if exist?
-        if pathname.read == content
-          e.emit(:no_change, "no change: #{pretty}")
-        else
-          e.emit(:before_edit, message: "updating #{pretty}", resource: self)
-          writable? or return e.error("cannot edit, file is not writable: #{pretty}")
-          pathname.open('w') { |fh| bytes = fh.write(content) }
-          e.emit(:after_edit, message: "updated #{pretty} (#{bytes} bytes)", bytes: bytes)
-        end
+        result = update e
       else
-        e.emit(:before_create, message: "creating #{pretty}", resource: self)
-        dirname.exist? or return e.error("parent directory does not exist, cannot write #{pretty}")
-        dirname.writable? or return e.error("parent direcory is not writable, cannot write #{pretty}")
-        pathname.open('w+') { |fh| bytes = fh.write(content) }
-        e.emit(:after_create, message: "created #{pretty} (#{bytes} bytes)", bytes: bytes)
+        result = create e
       end
-      bytes
+      result
     end
+
     def valid?
-      # look: two case statements in a row.  first one changes state iff necessary. second one no.
-      case @state
-      when :initial, :unparsed
-        @content.nil? and @content = ''
+      if :initial == @state || :unparsed == @state
+        if @content.nil?
+          @content = ''
+        end
         p = self.class.parser
-        if expensive = p.parse(@content) # nil ok
-          @content = expensive.sexp
+        result = p.parse @content
+        if result
+          @content = result.sexp
           @state = :valid
           @invalid_reason = nil
         else
           @state = :invalid
           @invalid_reason = CodeMolester::ParseFailurePorcelain.new p
         end
-        @invalid_reason
       end
+
       case @state
       when :valid   ; true
       when :invalid ; false
-      else          ; fail("unexpected state: #{@state}")
+      else          ; fail "unexpected state: #{ @state }"
       end
     end
-    delegates_to_truish_ivar '@pathname', :writable?
-  end
-  class Config::File              # this could be scaled back -- it is after
-                                  # all a constant under a module
-    singleton_class.send :attr_accessor, :do_debug
+
+    delegates_to :pathname, :writable?
+
+  protected
+
+    # [path] [opts]
+    def initialize *args
+      @content = @mtime = @on_read = @on_write = @pathname = nil
+      @state = :initial
+      params_h = if ::Hash === args.last
+        args.pop.dup
+      else
+        { }
+      end
+      params_h[:path] = args.pop unless args.empty?
+      args.empty? or
+        raise ::ArgumentError.new "syntax: #{ self.class }.new [path [, opts]]"
+      params_h.each { |k, v| send "#{ k }=", v }
+      yield self if block_given?
+    end
+
+
+    def create e
+      result = nil
+
+      begin
+        content = string
+        if content == pathname.read
+          e.emit :no_change, "no change: #{ escaped_path }"
+          break
+        end
+
+        e.emit :before_edit, resource: self,
+          message: "updating #{ escaped_path }"
+
+        if writable?
+          bytes = nil
+          pathname.open( w ) { |fh| bytes = fh.write content }
+          e.emit :after_edit, bytes: bytes,
+            message: "updated #{ escaped_path } (#{ bytes } bytes)"
+          result = bytes
+          break
+        end
+
+        result = e.error "cannot edit, file is not writable: #{ escaped_path }"
+      end while nil
+
+      result
+    end
+
+
+    def update e
+      result = nil
+
+      begin
+        e.emit :before_create, resource: self,
+          message: "creating #{ escaped_path }"
+
+        if ! dirname.exist?
+          result = e.error(
+            "parent directory does not exist, cannot write #{ escaped_path }" )
+          break
+        end
+
+        if ! dirname.writable?
+          result = e.error(
+            "parent direcory is not writable, cannot write #{ escaped_path }" )
+          break
+        end
+
+        bytes = nil
+        pathname.open( 'w+' ) { |fh| bytes = fh.write string }
+
+        e.emit :after_create, bytes: bytes,
+          message: "created #{ escaped_path } (#{ bytes } bytes)"
+
+        result = bytes
+      end while nil
+
+      result
+    end
+
+
+    # ----------------------- define m.m `parser` begin ---------------------
+
+    class << self
+      attr_accessor :do_debug
+    end
+
     const = :ConfigParser
+
     debug = -> { do_debug }
 
     compile = -> do
@@ -178,6 +283,10 @@ module ::Skylab::CodeMolester
     def self.parser
       @parser ||= parser_class.new
     end
+
+    # ------------------------------- end ------------------------------------
   end
-  Config::File.do_debug = false
+
+  Config::File.do_debug = true
+
 end

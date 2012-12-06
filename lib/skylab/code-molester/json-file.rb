@@ -1,5 +1,3 @@
-require 'json'
-
 module ::Skylab::CodeMolester
   class JsonFile
     def initialize path
@@ -7,9 +5,10 @@ module ::Skylab::CodeMolester
       if ::File.exist? @path
         _data = nil
         begin
-          _data = ::JSON.parse(::File.read(@path))
+          s = ::File.read @path
+          _data = CodeMolester::Services::JSON.parse s
           @data = _data
-        rescue JSON::ParserError => e
+        rescue ::JSON::ParserError => e
           @last_parser_error = e
         end
       else
@@ -23,9 +22,6 @@ module ::Skylab::CodeMolester
     end
     def exists?
       ::File.exist? @path
-    end
-    def pretty_path
-      Face::PathTools.pretty_path @path
     end
     def write
       bytes = nil

@@ -1,67 +1,66 @@
-require 'stringio'
-require 'strscan'
-
-# This thing was stupid.  I basically wanted to customize treetop Parser#failure_reason
-# but ended up not really adding anything to it.
-#
-
 module ::Skylab::CodeMolester
 
   class ParseFailurePorcelain # @api private
-    include En::Methods
+    include Porcelain::En::Methods
+
     attr_reader :failures
-    attr_reader :info
-    def initialize parser
+
+    def render
+      o = @meta
+      a = [ "Expecting #{ or_ o[:expect].map(&:inspect) }" ]
+      a << o[:line_head] if o[:line_head]
+      if o[:escaped_path]
+        aa = [ "in #{ o[:escaped_path] }" ]
+        aa << ":#{ o[:line_number] }" if o[:line_number]
+        a << aa.join( '' )
+      elsif o[:line_number]
+        a << "at line #{ o[:line_number] }"
+      end
+      str = a.join ' '
+      str
+    end
+
+    alias_method :to_s, :render
+
+  protected
+
+    # result : start_idx_of_line, line_width, line_number (1-indexed)
+    line_indices = -> string, seek_idx do
+      scn = CodeMolester::Services::StringScanner.new string
+      at_idx = -1
+      line_idx = 0
+      content = nil
+      loop do
+        content = scn.scan( / [^\n]* \n? /x ) # always match, even when eos?
+        next_at_idx = at_idx + content.length
+        if next_at_idx >= seek_idx or scn.eos?
+          break
+        end
+        line_idx += 1
+        at_idx = next_at_idx
+      end
+      [at_idx + 1, content.length, line_idx + 1]
+    end
+
+
+    define_method :initialize do |parser|
       @failures = parser.terminal_failures.dup
-      f = (arr = @failures.dup).shift
-      @info = arr.reduce(
-        :min => f.index, :max => f.index, :expect => [f.expected_string]
-      ) do |m, o|
+      arr = @failures.dup
+      f = arr.shift
+      h = { min: f.index, max: f.index, expect: [f.expected_string] }
+      @meta = arr.reduce( h ) do |m, o|
         o.index < m[:min] and m[:min] = o.index
         o.index > m[:max] and m[:max] = o.index
         m[:expect] |= [o.expected_string]
         m
       end
-      idx, width, @info[:line_number] = self.class.line_indices(parser.input, @info[:min])
-      if @info[:min] == idx
-        @info[:line_head] = "at beginning of line"
+      idx, width, @meta[:line_number] = line_indices[ parser.input, @meta[:min]]
+      if idx == @meta[:min]
+        @meta[:line_head] = "at beginning of line"
       else
-        @info[:line_head] = "at the end of #{parser.input[idx..@info[:min]].inspect}"
+        @meta[:line_head] = "at the end of #{
+          }#{ parser.input[ idx .. @meta[:min] ].inspect }"
       end
-    end
-    def paint
-      [ "Expecting #{or_(@info[:expect].map(&:inspect))}",
-        @info[:line_head],
-        (
-         if @info[:pretty_path]
-           ["in #{@info[:pretty_path]}",
-             (":#{@info[:line_number]}" if @info[:line_number])
-           ].compact.join('')
-         elsif @info[:line_number]
-           "at line #{@info[:line_number]}"
-         end
-        )
-      ].flatten.compact.join(' ')
-    end
-    alias_method :to_s, :paint
-  end
-  class << ParseFailurePorcelain
-    # @return start_idx_of_line, line_width, line_number (1-indexed)
-    def line_indices string, seek_idx
-      scn = ::StringScanner.new(string)
-      at_idx = -1
-      line_idx = 0
-      content = nil
-      loop do
-        content = scn.scan(/[^\n]*\n?/) # should always return '', even when eos?
-        next_input_idx = (at_idx + content.length)
-        if next_input_idx >= seek_idx or scn.eos?
-          break
-        end
-        line_idx += 1
-        at_idx = next_input_idx
-      end
-      [at_idx + 1, content.length, line_idx + 1]
     end
   end
 end

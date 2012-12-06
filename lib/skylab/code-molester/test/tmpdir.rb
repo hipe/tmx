@@ -55,9 +55,13 @@ module ::Skylab::CodeMolester::TestSupport
 
   protected
 
-    def initialize p=nil
+    def initialize path=nil
       self.debug = false
-      p = p ? p.to_s : ::Dir.tmpdir
+      p = if path
+        path.to_s
+      else
+        CodeMolester::Services::Tmpdir.tmpdir
+      end
       super p
       yield self if block_given?
     end
