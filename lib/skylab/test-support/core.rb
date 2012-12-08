@@ -1,4 +1,6 @@
 require File.expand_path('../../../skylab', __FILE__)
+# above is [#bs-010]
+
 require_relative '../meta-hell/core'
 
 class ::String
@@ -8,6 +10,10 @@ class ::String
   end
 end
 
+
 module Skylab::TestSupport
+
+  TestSupport = self
+
   extend ::Skylab::Autoloader
 end

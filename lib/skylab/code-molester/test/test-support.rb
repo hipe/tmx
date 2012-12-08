@@ -4,9 +4,11 @@ require 'skylab/test-support/core'
 
 
 module ::Skylab::CodeMolester::TestSupport
-  ::Skylab::TestSupport::Regret[ CodeMolester_TestSupport = self ]
+  include ::Skylab # TestSupport
 
-  TMPDIR = self::Tmpdir.new ::Skylab::TMPDIR_PATHNAME.join('co-mo').to_s
+  TestSupport::Regret[ CodeMolester_TestSupport = self ]
+
+  TMPDIR = TestSupport::Tmpdir.new ::Skylab::TMPDIR_PATHNAME.join('co-mo')
 
   module CONSTANTS
     CodeMolester = ::Skylab::CodeMolester

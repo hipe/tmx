@@ -12,7 +12,7 @@ module ::Skylab::GitStashUntracked::Tests
 
   tdpn = ::Skylab::TMPDIR_PATHNAME.join 'gsu-xyzzy'
 
-  gsu_tmpdir = TestSupport.tmpdir tdpn.to_s, 1
+  gsu_tmpdir = TestSupport::Tmpdir.new tdpn.to_s
 
   describe ::Skylab::GitStashUntracked do
 
@@ -109,7 +109,8 @@ module ::Skylab::GitStashUntracked::Tests
 
       describe "list" do
         it "which lists the known stashes (just a basic directory listing)" do
-          gsu_tmpdir.prepare.touch_r %w(
+          gsu_tmpdir.prepare
+          gsu_tmpdir.touch_r %w(
             stashes/alpha/herpus/derpus.txt
             stashes/beta/whatever.txt
           )
@@ -129,7 +130,8 @@ module ::Skylab::GitStashUntracked::Tests
       describe "show" do
 
         define_method :with_this_stash do
-          gsu_tmpdir.prepare.patch(<<-HERE.unindent)
+          gsu_tmpdir.prepare
+          gsu_tmpdir.patch(<<-HERE.unindent)
             --- /dev/null
             +++ b/stashes/derp/flip.txt
             @@ -0,0 +1,2 @@
@@ -182,7 +184,8 @@ module ::Skylab::GitStashUntracked::Tests
 
       describe "pop" do
         it "which moves the stashed files back" do
-          gsu_tmpdir.prepare.touch_r %w(
+          gsu_tmpdir.prepare
+          gsu_tmpdir.touch_r %w(
             stashes/dingle/one-dir/one-file.txt
             stashes/dingle/two-dir/three-dir/three-file.txt
             stashes/dingle/four-dir-never-see/fifth-dir-empty/

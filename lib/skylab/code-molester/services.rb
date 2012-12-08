@@ -14,8 +14,6 @@ module Skylab::CodeMolester
 
     o :StringScanner, -> { require 'strscan'  ; ::StringScanner }
 
-    o :Tmpdir,        -> { require 'tmpdir'   ; ::Dir } # Dir.tmpdir is it
-
     o :YAML,          -> { require 'yaml'     ; ::YAML }
 
     define_singleton_method :const_missing do |const|

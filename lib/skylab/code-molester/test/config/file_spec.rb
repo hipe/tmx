@@ -14,7 +14,7 @@ describe ::Skylab::CodeMolester::Config::File do
       :content  => content
     )
   end
-  let(:path) { TMPDIR.join('whatever') }
+  let(:path) { TMPDIR.join 'whatever' }
   let(:input_string) { }
   def parses_ok
     config.invalid_reason.should eql(nil)
@@ -249,14 +249,11 @@ describe ::Skylab::CodeMolester::Config::File do
     end
   end
   context "As for setting values" do
-    before(:all) do
-      TMPDIR.debug = false
-    end
-    before(:each) do
+    before :each do
       TMPDIR.prepare
     end
     context "if you start with a config file that doesn't exist" do
-      let(:path) { TMPDIR.join("my-config.conf") }
+      let(:path) { TMPDIR.join "my-config.conf" }
       let(:config) { klass.new(:path => path) }
       def is_valid
         config.valid?.should eql(true)
