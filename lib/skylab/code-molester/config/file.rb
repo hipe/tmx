@@ -67,9 +67,9 @@ module ::Skylab::CodeMolester
 
     def modified?
       result = nil
-      if !@pathname
+      if ! @pathname
         fail "sanity - it is meaningless to ask if `modified?` on #{
-          }a #{ self.class } not associated with any pathname."
+          }a #{ noun } not associated with any pathname."
       elsif ! valid?
         raise "sanity - invalid files should not be written to disk and hence #{
           }whether such files are modified is the wrong question to ask."
@@ -83,6 +83,26 @@ module ::Skylab::CodeMolester
         end                       # empty files to disk.
       end
       result
+    end
+
+    def noun                      # clients may find this useful in e.g.
+      @entity_noun_stem || 'config file' # reflection (thing `git status`)
+    end
+
+    def path
+      @pathname.to_s if @pathname # a simpler, perhaps more familiar interface
+    end                           # for the outside world
+
+    def path= str                 # with this class we try to create objects
+      if @pathname                # that are "semi-immutable", however for some
+        raise "won't overwrite existing path" # applications it is useful to
+      end                         # be able to build the instancep progressively
+      if str                      # hence we experiment with this.
+        @pathname = ::Pathname.new str.to_s
+        str
+      else
+        @pathname = str
+      end
     end
 
     attr_reader :pathname
@@ -99,13 +119,15 @@ module ::Skylab::CodeMolester
         ( ev[:escape_path] || default_escape_path )[ pathname ]
       end
       @pathname or
-        raise "cannot read - no pathname associated with this #{ self.class }"
+        raise "cannot read - no pathname associated with this #{ noun }"
       res = nil
       if @pathname.exist?
         stat = @pathname.stat
         if 'file' == stat.ftype
           content = @pathname.read # change state only after this succeeds
+          pn_ = @pathname         # clear everythihng but the pathname - ick
           clear
+          @pathname = pn_
           @pathname_was_read = true # used e.g by InvalidReason for l.g.
           @content = content      # avoid circular dependency inf. loop here by
           if valid?               # setting @content before calling `valid?`
@@ -118,7 +140,7 @@ module ::Skylab::CodeMolester
         else
           f = ev[:is_not_file] || ev[:read_error] || ev[:error]
           f ||= -> pn, ftype do
-            raise "expected config file to be of type 'file', had #{ ftype } #{
+            raise "expected #{ noun } to be of type 'file', had #{ ftype } #{
               }- #{ escape_path[ pn ] }"
           end
           res = f[ @pathname, stat.ftype ]
@@ -208,7 +230,7 @@ module ::Skylab::CodeMolester
       block[ em ] if block
       em.escape_path ||= default_escape_path
       @pathname or
-        raise "cannot write - no pathname associated with this #{ self.class }"
+        raise "cannot write - no pathname associated with this #{ noun }"
       if valid?
         if exist?
           if @pathname_was_read
@@ -220,14 +242,14 @@ module ::Skylab::CodeMolester
           result = create em
         end
       else
-        raise "attempt to write invalid #{ self.class } - check if valid? first"
+        raise "attempt to write invalid #{ noun } - check if valid? first"
       end
       result
    end
 
   protected
 
-    opts_struct = ::Struct.new :path, :string
+    opts_struct = ::Struct.new :path, :string, :entity_noun_stem
 
     define_method :initialize do |param_h=nil|
       block_given? and raise 'where?'
@@ -236,6 +258,7 @@ module ::Skylab::CodeMolester
         param_h.each { |k, v| o[k] = v }
       end
       @content = o[:string] # expecting nil or string here
+      @entity_noun_stem = o[:entity_noun_stem]
       @invalid_reason = nil
       @pathname = o[:path] ? ::Pathname.new( o[:path].to_s ) : nil
       @pathname_was_read = nil
@@ -243,8 +266,7 @@ module ::Skylab::CodeMolester
     end
 
     def clear
-      @content = @invalid_reason = @pathname_was_read = @valid = nil
-      # leave pathname, brittany alone
+      @content = @invalid_reason = @pathname = @pathname_was_read = @valid = nil
     end
 
     def create em

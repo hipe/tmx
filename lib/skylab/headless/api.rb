@@ -93,11 +93,11 @@ module Skylab::Headless
   end
 
 
-   class API::IO::Pen::Minimal
-     include API::IO::Pen::InstanceMethods
-   end
+  class API::IO::Pen::Minimal
+    include API::IO::Pen::InstanceMethods
+  end
 
 
-   API::IO::Pen::MINIMAL = API::IO::Pen::Minimal.new
+  API::IO::Pen::MINIMAL = API::IO::Pen::Minimal.new
 
 end

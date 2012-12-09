@@ -29,7 +29,7 @@ module Skylab::TanMan
       on_no_config_dir do |e|     # common to actions, but doesn't have
         e.touch!                  # to be here.
         msg = "couldn't find #{ e.dirname } in this or any parent #{
-          }directory: #{ e.from.pretty }"
+          }directory: #{ escape_path e.from }"
         error msg
         info "(try #{ kbd( full_invocation_string CLI::Actions::Init ) } #{
           }to create it)"

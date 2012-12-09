@@ -15,7 +15,8 @@ module Skylab::Face
     #
     # However, it is perfectly reasonable that some programs use `cd` during
     # the course of their execution, which will then out of the box render
-    # `pretty_path` broken iff it is used while in more than one directory.
+    # `pretty_path` broken iff it is used while in more than one `present
+    # working directory`'
     #
     # In such cases the program *must* call `PathTools.clear` in between times
     # that the current working directory changes and the time that they
@@ -100,6 +101,10 @@ module Skylab::Face
 
     o = { }
 
+    absolute_path_hack_rx = o[:absolute_path_hack_rx] =    # see spec, hackishly
+      %r{ (?<= \A | [[:space:]'"] )  (?: / [^[:space:]'"]+ )+ }x       # used in
+                                                                   # subproducts
+
     o[:clear] = clear
 
     define_singleton_method :clear, &clear
@@ -120,12 +125,6 @@ module Skylab::Face
     end
 
     o[:pretty_path_] = pretty_path_  # expose the algorithm for testing
-
-    absolute_path_hack_rx = %r{/[-_./a-z0-9]+}i # just, no
-
-    o[:pretty_path_hack] = -> str do
-      msg.gsub( absolute_path_hack_rx ) { |s| pretty_path[ s ] }
-    end
 
     FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
 

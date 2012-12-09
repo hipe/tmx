@@ -1,9 +1,10 @@
 module Skylab::TanMan
+
   class Models::Config::Controller
     include Core::SubClient::InstanceMethods # yay
 
     def [] k # is ready? and k is string and local is the thing
-      fail 'make this first found'
+      fail 'make this first found' # #TODO
       services.config.local[k]
     end
 
@@ -53,16 +54,19 @@ module Skylab::TanMan
     end
 
     def ready?
-      services.config.ready? do |o|
-        o.on_no_config_dir do |e|              # same payload, different graph!
-          emit :no_config_dir, e
+      services.config.ready? do |o|            # compare to actions/status.rb
+
+        o.escape_path = ->( p ) { escape_path p } # per modality!
+
+        o.no_config_dir = -> e do
+          emit :no_config_dir, e               # same payload, different graph!
         end
-        x = -> oo do
-          oo.on_invalid do |e|
-            error e
-          end
+
+        o.global_invalid = -> e do
+          error e
         end
-        o.on_read_global = o.on_read_local = x
+
+        o.local_invalid = o.global_invalid
       end
     end
 
@@ -90,7 +94,7 @@ module Skylab::TanMan
     def write_resource resource
       result = nil
       begin
-        if resource.exist? && resource.pathname.read == resource.content
+        if resource.exist? && resource.pathname.read == resource.string
           emit :info, "(config file didn't change.)"
           result = true
           break
@@ -141,14 +145,14 @@ module Skylab::TanMan
   protected
 
     def initialize request_client
-      _sub_client_init! request_client
       @remotes = nil
+      _sub_client_init! request_client
     end
 
 
     def resources
       resources = -> name do                   # memoize a lamba that from
-        r = services.config.send name           # the outside might look like
+        r = services.config.send name          # the outside might look like
         r                                      # a hash
       end
       define_singleton_method( :resources ) { resources }

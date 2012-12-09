@@ -13,7 +13,7 @@ module Skylab::TanMan::TestSupport::API::Actions
 
     context "with some bad args" do
       let :event do
-        response = api_invoke these: 'are', invalid: 'args'
+        api_invoke these: 'are', invalid: 'args'
         response.events.first
       end
 
@@ -35,51 +35,53 @@ module Skylab::TanMan::TestSupport::API::Actions
 
       context "when the folder isn't initted" do
         it "works (with json formatting)" do
-          response = api_invoke path: TMPDIR
+          api_invoke path: TMPDIR # not *from* tmpdir, path is argument
           response.success?.should eql(true)
           event = response.send(:json_data).first
           event[0].should eql(:info)
-          event[1].should match(%r{mkdir.+#{ TMPDIR_STEM }/local-conf.d})
+          event[1].should match( /mkdir local-conf\.d/ )
           json = ::JSON.pretty_generate response
           unencoded = ::JSON.parse json
           event = unencoded.first
           event[0].should eql('info')
-          event[1].should match(%r{mkdir.+#{ TMPDIR_STEM }/local-conf.d})
+          event[1].should match( /mkdir local-conf\.d/ )
         end
       end
 
       context "when the folder already initted" do
         before { prepare_local_conf_dir }
         it "will gracefully give a notice" do
-          response = api_invoke path: TMPDIR
+          api_invoke path: TMPDIR # not *from* tmpdir
           response.events.length.should be_gte(1)
           response.success?.should eql(true)
           e = response.events.first
           e.type.should eql(:skip)
-          e.message.should match(/already exists, skipping/i)
+          e.message.should match( /already exists, skipping/i )
         end
       end
 
       context "when you pass it a path that does not exist" do
         it "it derps" do
-          response = api_invoke path: TMPDIR.join('not-exist')
+          path = TMPDIR.join( 'not-exist' ).to_s
+          api_invoke path: path # not *from* tmpdir
           response.success?.should eql(false)
           e = response.events.first
           e.type.should eql(:error)
           e.message.should match(
-            %r{directory must exist:.*#{ TMPDIR_STEM }/not-exist})
+            /directory must exist: not-exist/
+          )
         end
       end
 
       context "when you pass it a path that is a file not a folder" do
         it "it derps" do
           TMPDIR.touch 'nerk'
-          response = api_invoke path: TMPDIR.join('nerk')
+          api_invoke path: TMPDIR.join('nerk') # not *from* tmpdir
           response.success?.should eql(false)
           e = response.events.first
           e.type.should eql(:error)
           e.message.should match(
-            %r{path was file, not directory: .*tmp/#{ TMPDIR_STEM }})
+            /path was file, not directory: nerk/ )
         end
       end
     end

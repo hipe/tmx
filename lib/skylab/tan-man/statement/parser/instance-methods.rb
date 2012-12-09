@@ -22,7 +22,7 @@ module Skylab::TanMan
     def load_parser_class
       f = on_load_parser_info
       f ||= -> e do
-        info "#{ em '-->' } #{ pretty_path_hack e.to_s }"
+        info "#{ em '-->' } #{ gsub_path_hack e.to_s }"
       end
 
       TreetopTools::Parser::Load.new(
@@ -44,7 +44,7 @@ module Skylab::TanMan
     end
 
     def parser_failure
-      fail 'TEST ME - THE BELOW IS NOT YET COVERED BY TESTS' # #TODO #todo and take returns out
+      fail 'TEST ME - THE BELOW IS NOT YET COVERED BY TESTS' # #TODO (and take returns out)
       # failure_reason, failure_line, failure_column
       (a = parser.terminal_failures).empty? and return nil
       _msg = [ 'Expected',

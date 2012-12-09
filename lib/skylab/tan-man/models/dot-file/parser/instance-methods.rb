@@ -12,7 +12,7 @@ module Skylab::TanMan
     def load_parser_class
 
       f = on_load_parser_info ||
-        ->(e) { info "#{em '^_^'} #{pretty_path_hack e.to_s}" }
+        ->(e) { info "#{ em '^_^' } #{ gsub_path_hack e.to_s }" }
 
       ::Skylab::TreetopTools::Parser::Load.new(
         ->(o) do
@@ -66,7 +66,7 @@ module Skylab::TanMan
     def in_file
       line_col = "#{ parser.failure_line }:#{ parser.failure_column }"
       if input_adapter.respond_to? :pathname
-        "In #{ input_adapter.pathname.pretty }:#{ line_col }"
+        "In #{ escape_path input_adapter.pathname }:#{ line_col }"
       else
         "In #{ input_adapter.entity_noun_stem }:#{ line_col }"
       end

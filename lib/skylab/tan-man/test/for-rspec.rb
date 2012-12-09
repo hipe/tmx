@@ -4,8 +4,12 @@ module Skylab::TanMan::TestSupport
 
     include ::Skylab::TanMan::TestSupport::Tmpdir::InstanceMethods
 
-    def api
-      TanMan::Services.services.api
+    let :api do
+      api = TanMan::Services.services.api
+      if do_debug
+        TanMan::API.debug = $stderr
+      end
+      api
     end
 
     let :cli do
@@ -17,12 +21,6 @@ module Skylab::TanMan::TestSupport
       end
       o.program_name = 'ferp'
       o
-    end
-
-    def debug!
-      CONSTANTS::TMPDIR.debug!
-      TanMan::API.debug = $stderr # ok here i hope
-      self.do_debug = true
     end
 
     def input str

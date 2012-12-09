@@ -13,6 +13,8 @@ module Skylab::TanMan
 
   module Core::Client::InstanceMethods
 
+    include Headless::Client::InstanceMethods # floodgates
+
     include Core::SubClient::InstanceMethods   # ask for trouble by name
 
     extend PubSub::Emitter        # we want the instance methods this creates
@@ -24,7 +26,7 @@ module Skylab::TanMan
   protected
 
     def services
-      TanMan::Services.services    # this line should be duplicated only once,
+      TanMan::Services.services   # this line should be duplicated only once,
     end                           # in tests.
   end
 end

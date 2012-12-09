@@ -1,4 +1,4 @@
-[#050] #open just for fun, eliminate all return statements
+[#050]       #done just for fun, eliminate all return statements
 [#049]       #watch #pattern - four permutations for file creation (dirname etc)
 [#048]       #done failing on tan init should do porcelain too
 [#048] #watch what is the deal with the non-orthogonal-ass event interface for remote list
@@ -27,12 +27,19 @@
 [#026]       #done API::InvocationMethods away!
 [#025]       API::RuntimeExtensions away! #done
 [#024]       #done use -h -- we had to etc use bleeding
-[#023] #open combine all Boxxy, consider Boxxy-like solutions
+[#023]       #deferred combine all Boxxy, consider Boxxy-like solutions
+               #depends-on:#018
 [#022]       #done refactor-in headless, and sub-client
 [#021]       merge singletons into service
-[#020] #low-priority nounify cli commands
+[#020]       #done #low-priority nounify cli commands
+               x. check -> graph check
+               x. push -> graph push
+               x. use -> graph use
+               x. tell -> graph tell
 [#019]       #done "magic" for DRYING up tests (Regret) #done
-[#018] #open #depends-on:#sl-100 refactor out porcelain ["bleeding"]
+[#018]       #deferred #depends-on:#sl-100 refactor out porcelain ["bleeding"]
+               we are gonna hinge this on to treemap for no real reason
+               except the *huge* tangent stack we are under
 [#017]       #pattern: for to maybe push up to headless
 [#016]       #done #pattern: action instance spawns instance of model controller
                .. so make `controllers` knob for clarity

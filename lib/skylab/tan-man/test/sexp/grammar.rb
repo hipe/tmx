@@ -142,7 +142,7 @@ module ::Skylab::TanMan::TestSupport::Sexp
 
     def load_parser_class
       f = on_load_parser_info ||
-        ->(e) { info "      (loading parser ^_^ #{pretty_path_hack e.to_s})" }
+        ->(e) { info "      (loading parser ^_^ #{ gsub_path_hack e.to_s })" }
 
       ::Skylab::TreetopTools::Parser::Load.new(
         ->(o) do
@@ -204,9 +204,12 @@ module ::Skylab::TanMan::TestSupport::Sexp
 
     def tmpdir_prepared
       @tmpdir_prepared ||= begin
-        t = prepared_tanman_tmpdir.join stem_path
-        t.exist? or t.prepare # because parent gets rewritten once per runtime
-        t
+        pn = prepared_tanman_tmpdir.join stem_path
+        td = prepared_tanman_tmpdir.class.new pn
+        if ! td.exist?
+          td.prepare # because parent gets rewritten once per runtime
+        end
+        td
       end
     end
 

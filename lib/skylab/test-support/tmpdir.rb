@@ -17,6 +17,10 @@ module Skylab::TestSupport
       nil # result is undefined for now -- we might turn it into etc
     end
 
+    def debug!                    # this compats with our convention org-wide
+      @verbose = true             # this compats with the file utils convention
+    end
+
     alias_method :tmpdir_original_mkdir, :mkdir
 
     # experimental example interface
@@ -159,7 +163,6 @@ module Skylab::TestSupport
       @noop = x[:noop]
       @verbose = x[:verbose]
       super x[:path]
-      freeze
     end
 
     def fu_output_message msg

@@ -2,6 +2,10 @@ module Skylab::TanMan
   class Models::Remote::Collection < ::Enumerator
     Remote = Models::Remote::Controller
 
+    def clear
+      # nothing to do - hold on to host, enumerator stays same. Careful!
+    end
+
     attr_reader :resource
 
     def push remote
@@ -40,8 +44,8 @@ module Skylab::TanMan
         "this enumerator creates its own block." )
       @resource = resource
       super() do |y|
-        resource.sections.each do |sec|
-          if Remote::SECTION_NAME_RE =~ sec.section_name
+        self.resource.sections.each do |sec|
+          if Remote::SECTION_NAME_RX =~ sec.section_name
             rem = Remote.bound self, sec
             if rem
               y << rem

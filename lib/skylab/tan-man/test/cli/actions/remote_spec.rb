@@ -16,7 +16,7 @@ module Skylab::TanMan::TestSupport
       end
 
       context 'when there is no local config directory' do
-        it 'cannot get added, whines about no directory', wip:true do
+        it 'cannot get added, whines about no directory' do
           input 'remote add bing bong'
           output_shift_is infostream,
             "ferp failed to add remote - couldn't find local-conf.d in #{
@@ -24,7 +24,7 @@ module Skylab::TanMan::TestSupport
           output_shift_only_is infostream, 'try ferp init to create it', false
         end
 
-        it 'cannot get listed, whines the same', wip:true do
+        it 'cannot get listed, whines the same' do
           input 'remote list'
           output_shift_is infostream,
             "ferp failed to list remote - couldn't find local-conf.d in #{
@@ -38,10 +38,10 @@ module Skylab::TanMan::TestSupport
           prepare_local_conf_dir
         end
 
-        it 'you can add a local remote', f:true do
+        it 'you can add a local remote' do
           input 'remote add bing bong'
           output_shift_only_is infostream,
-            %r{creating .+/tmp/#{ TMPDIR_STEM }/local-conf\.d.+\d\d bytes\.},
+            'ferp remote add: creating config .. done (146 bytes.)',
             true
         end
 
@@ -71,7 +71,7 @@ module Skylab::TanMan::TestSupport
           it 'using a valid name works' do
             input 'remote rm foo'
             output_shift_is infostream,
-              %r{updating .*local-conf\.d/config \.\. done \(\d\d+ bytes\.\)}
+              /ferp remote rm: updating config \.\. done \(\d+ bytes\.\)/
             output_shift_only_is infostream,
               'ferp remote rm: removed remote foo', true
           end

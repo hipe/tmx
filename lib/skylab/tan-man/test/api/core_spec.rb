@@ -3,6 +3,8 @@ require_relative '../test-support'
 module Skylab::TanMan::TestSupport
 
   describe "The #{ TanMan::API } itself", tanman: true do
+    extend ::Skylab::TanMan::TestSupport
+
     it "is a persistent object" do
       api.should be_trueish
       oid = api.object_id
@@ -15,7 +17,7 @@ module Skylab::TanMan::TestSupport
         e = response.events.first
         e.tag.name.should eql(:error)
         e.message.should match(
-          /api runtime error : actions has no "not_an_action" action/i )
+          /api name error : actions has no "not_an_action" action/i )
       end
     end
   end

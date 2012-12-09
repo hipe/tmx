@@ -17,6 +17,12 @@ module Skylab::TanMan::TestSupport::API::Actions
       api_invoke_action action_name, *params_h
     end
 
+    def api_invoke_from_tmpdir *params_h
+      from_tmpdir do
+        api_invoke(* params_h )
+      end
+    end
+
     def api_invoke_action action_name, *params_h
       @api_last_response = api.invoke action_name, *params_h
     end

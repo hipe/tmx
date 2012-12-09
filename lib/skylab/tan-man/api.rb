@@ -1,11 +1,9 @@
 module Skylab::TanMan
 
-
   module API
-    class RuntimeError < ::RuntimeError # just for fun
-    end
+    # after this file completes loading, this class will get sexed by
+    # recursive autoloader.
   end
-
 
 
   module API::Emitter             # [#046] may be deprecated
@@ -17,8 +15,9 @@ module Skylab::TanMan
   end
 
 
-
   class << API
+
+    # For no good reason, API (the module) is the home of low-level config.
 
     extend Porcelain::Attribute::Definer
 

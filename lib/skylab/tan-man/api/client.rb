@@ -23,10 +23,10 @@ module Skylab::TanMan
       begin
         k = API::Actions.const_fetch normalized_action_name,
           -> e do
-            invalid "#{e.seen.last || 'actions'} has no \"#{ e.name }\" action"
+            name_error "#{e.seen.last || 'actions'} has no \"#{e.name}\" action"
           end,
           -> e do
-            invalid "invalid action name: #{ e.invalid_name }"
+            name_error "invalid action name: #{ e.invalid_name }"
           end
         k or break
         r = k.call self, params_h, events
@@ -38,18 +38,32 @@ module Skylab::TanMan
       result
     end
 
-    attr_writer :pen               # don't overwrite the reader you get
-                                   # from sub-client
-    def pen
-      @pen or super                # simple submodule doesn't cover this
-    end
-
   protected
 
-    def initialize( * )
-      @pen = nil
-      super
+    pen = Headless::API::IO::Pen::Minimal.new
+
+    pen.define_singleton_method :escape_path do |str|
+      result = nil
+      pathname = ::Pathname.new str.to_s
+      if '.' == pathname.dirname.to_s # if the pathname looks like it might be
+        result = str              # bare, result is exactly like you got it.
+      else                        # otherwise we go with a safest possible
+        result = pathname.basename.to_s  # route and knock the whole dirname out
+      end                         # of it.
+      result
     end
+
+
+    define_method :initialize do |modality_client=nil|
+      if modality_client           # if we are running under some mysterious
+        @pen = modality_client.send :pen # client for some other strange new
+      else                         # modality .. note that we do *not* call super(mc) for now, to check how narrow we can make this coupling
+        @pen = pen
+      end
+    end
+
+    attr_reader :pen               # overwrite `super` which is e.g. delegating
+                                   # to io_adapter.  see our `initialize`
 
     # a quick and dirty (and fun!) proof of concept to show that we can buffer
     # and then emit events in the API that originated as data from controllers
@@ -58,7 +72,7 @@ module Skylab::TanMan
     # note that this only emits on 'puts', hence you may lose trailing data
     #
     io_interceptor = -> emit do
-      buffer = ::StringIO.new
+      buffer = TanMan::Services::StringIO.new
       o = { }
       o[:write] = -> str do
         buffer.write str
@@ -89,8 +103,8 @@ module Skylab::TanMan
       end
     end
 
-    def invalid msg
-      error "api runtime error : #{ msg }"
+    def name_error msg            # (just used in this file)
+      error "api name error : #{ msg }"
       false
     end
   end

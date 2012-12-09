@@ -32,7 +32,6 @@ module Skylab::TanMan::TestSupport::CLI
 
 
     let :client do
-      self.do_debug = true
       o = TanMan::CLI.new
       o.program_name = 'tanmun'
       ioa = Headless::TestSupport::IO_Adapter_Spy.new

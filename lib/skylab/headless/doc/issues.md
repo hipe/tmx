@@ -1,3 +1,5 @@
+[#021]       #feature #deferred #cli - be sure to provide a (flatten) --tree
+               option when looking at a branch help screen!
 [#020]       #convention `invoke` `execute` `run` `call` have distinct meanings
                and consistent signatures within modalities
 [#019]       #pattern #convention iff cli action invoke is false, invite

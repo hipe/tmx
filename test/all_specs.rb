@@ -238,10 +238,12 @@ module Skylab::Test
       infostream.write bad_msg[ 'subproduct', all, bad ]
       nil
     end
+    protected :bad_only
     define_method :bad_skip do |all, bad|
       infostream.write bad_msg[ 'skip', all, bad ]
       nil
     end
+    protected :bad_skip
     def build_option_parser
       @option_parser = o = ::OptionParser.new
       o.banner = usage_line

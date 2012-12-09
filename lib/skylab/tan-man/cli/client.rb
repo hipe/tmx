@@ -44,14 +44,27 @@ module Skylab::TanMan
 
   protected
 
-    def initialize sin=$stdin, sout=$stdout, serr=$stderr, &events
-                                                       # patt. [#sl-114]
+    pen = -> do
+      o = Headless::CLI::IO::Pen::Minimal.new
 
-      ioa = Headless::CLI::IO::Adapter::Minimal.new sin, sout, serr # pen deflt
+      fun = Face::PathTools::FUN
+
+      o.define_singleton_method :escape_path do |str|
+        fun.clear                 # always clear the `pwd` regexen .. it is hell
+        fun.pretty_path[ str ]    # to debug if you don't.  The only reason
+      end                         # not to is on a large number of files
+
+      o
+    end.call
+
+
+    define_method :initialize do |sin=$stdin, sout=$stdout, serr=$stderr,
+                                                      &events| # patt. [#sl-114]
+      ioa = Headless::CLI::IO::Adapter::Minimal.new sin, sout, serr, pen
       self.io_adapter = ioa
-      if block_given?
+      if events
         fail 'do we really want this?'
-        # events[ self ]
+        # ev[ self ]
       else
         on_all { |e| io_adapter.emit e.type, e.message }
         # saying e.to_s is probably not what you want -- you will get a hash
@@ -72,10 +85,6 @@ module Skylab::TanMan
 
     def paystream
       io_adapter.outstream        # note the intentional name-change
-    end
-
-    def pen # gone at [#022]
-      io_adapter.pen
     end
   end
 end

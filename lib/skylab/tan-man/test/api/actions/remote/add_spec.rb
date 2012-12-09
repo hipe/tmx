@@ -42,8 +42,8 @@ module Skylab::TanMan::TestSupport::API::Actions
 
       it "adding a valid local remote works (confirmed with a second api call)" do
         response = api_invoke name: 'flip', host: 'flap'
-        lone_success %r{\bcreating.*#{ TMPDIR_STEM
-          }/local-conf\.d/config.*\.\..*\(\d{2,} bytes\b}
+        lone_success(
+          /\Acreating config \.\. done \(146 bytes\.\)\n\z/ )
 
         response = api_invoke_action [:remote, :list]
         response.should be_success
@@ -57,13 +57,14 @@ module Skylab::TanMan::TestSupport::API::Actions
       it "you can add a valid global remote (json! JSON!)" do
         response = api_invoke name: 'fliz', host: 'flaz', resource: 'global'
         lone_success(
-          %r{\bcreating.*#{ TMPDIR_STEM }/global-conf-file.*\(\d{2,} bytes\b} )
+          /\Acreating global-conf-file \.\. done \(146 bytes\.\)\n\z/ )
         response = api_invoke_action [:remote, :list]
         response.should be_success
         a = response.result.to_a # FIXME [#048]
         a.length.should eql(1)
         a = a.to_a
         a.map!(&:to_a) # omg i'm so sorry
+        TanMan::TestSupport::Services::JSON || nil # ack!
         json = a.to_json
         rows = TanMan::TestSupport::Services::JSON.parse json
         rows.length.should eql(1)

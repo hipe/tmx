@@ -30,6 +30,10 @@ module Skylab::TanMan
 
   protected
 
+    def escape_path *a
+      pen.escape_path(* a)
+    end
+
     def infostream
       request_client.send :infostream
     end
@@ -46,6 +50,5 @@ module Skylab::TanMan
       emit :skip, msg
       nil
     end
-
   end
 end

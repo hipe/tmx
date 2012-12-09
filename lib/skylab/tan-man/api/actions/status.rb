@@ -19,45 +19,49 @@ module Skylab::TanMan
   protected
 
     def execute
-      service = services.config
       events = -> do
         a = []
-        service.ready? do |o|
-          o.on_not_ready do |e|
+        services.config.ready? do |o| # compare to config/controller.rb
+
+          o.escape_path = ->( p ) { escape_path p } # per modality!
+
+          o.not_ready = -> e do
             a.push build_event(:local_negative,  e)
           end
-          o.on_read_global = -> oo do # no no no no no
-            oo.on_invalid do |e|
-              a.push build_event(:global_negative, e)
-            end
+
+          o.global_invalid = -> e do
+            a.push build_event(:global_negative, e)
           end
-          o.on_read_local = -> oo do
-            oo.on_invalid do |e|
-              a.push build_event(:local_negative, e)
-            end
+
+          o.local_invalid = -> e do
+            a.push build_event(:local_negative, e)
           end
+
         end
         a
       end.call
+
+      service = services.config
       if ! events.index { |e| e.is? :global }
         if service.global.exist?
           ev = build_event :global_found,
-            message:  service.global.pathname.pretty,
+            message: "#{ escape_path service.global.pathname }",
             pathname: service.local.pathname
           events.push ev
         else
           events.push build_event(:global_positive, 'not found')
         end
       end
+
       if ! events.index { |e| e.is? :local_negative }
         if service.local.exist?
           ev = build_event :local_found,
-            message: service.local.pathname.pretty,
+            message: service.local.pathname.to_s,
             pathname: service.local.pathname
           events.push ev
         else
           ev = build_event :local_found,
-            message: "#{ service.local.pathname.dirname.pretty }/",
+            message: "#{ service.local.pathname.dirname.to_s }/",
             pathname: service.local.pathname
           events.push ev
         end

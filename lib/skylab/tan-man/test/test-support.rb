@@ -66,9 +66,9 @@ module Skylab::TanMan::TestSupport
     get = nil
 
     prepare = -> do               # always re-create the tmpdir (blows the
-      x = TMPDIR.prepare          # old one and its contents away!).
-      get = -> { x }              # Also memoize it into `get`
-      x
+      TMPDIR.prepare              # old one and its contents away!).
+      get = -> { TMPDIR }         # Also memoize it into `get`
+      TMPDIR
     end
 
     get = -> do                   # get the last prepared tmpdir during the
@@ -123,6 +123,11 @@ module Skylab::TanMan::TestSupport
       end
       o
     end
+
+    def debug!                                 # (aliased to tanman_debug!)
+      self.do_debug = true
+    end
+    alias_method :tanman_debug!, :debug!
 
     attr_accessor :do_debug
 

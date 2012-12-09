@@ -7,7 +7,7 @@ module Skylab::TanMan
 
     NAME_RE = /^[^"]+$/
     URL_RE = /^[^ ]+$/
-    SECTION_NAME_RE = /^remote "([^"]+)"$/
+    SECTION_NAME_RX = /^remote "([^"]+)"$/
 
     meta_attribute(* Core::MetaAttributes[:regex, :required] )
     meta_attribute :bound
@@ -79,7 +79,7 @@ module Skylab::TanMan
     alias_method :'remote_name=', :'name='
 
     def name_read
-      if md = SECTION_NAME_RE.match(sexp.section_name)
+      if md = SECTION_NAME_RX.match( sexp.section_name )
         md[1]
       else
         fail("wat do")
@@ -96,7 +96,7 @@ module Skylab::TanMan
     delegates_to :enumerator, :resource # will fail when etc
 
     def resource_label
-      resource.label if resource
+      resource.noun if resource
     end
 
     def url

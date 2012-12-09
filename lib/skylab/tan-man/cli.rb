@@ -119,19 +119,14 @@ module Skylab::TanMan
   end
 
 
-  class CLI::Actions::Push < CLI::Action
-    desc "push any single file anywhere in the world."
-    desc "(scp wrapper)"
-    option_syntax do |h|
-      on('-n', '--dry-run', 'dry run.') { h[:dry_run] = true }
-    end
-    def invoke remote_name, file, opts
-      api_invoke opts.merge( remote_name: remote_name, file_path: file )
-    end
+  module CLI::Actions::Graph
+    extend CLI::NamespaceModuleMethods
+    desc "do things to graphs."
+    summary { ["#{action_syntax} graph"] }
   end
 
 
-  class CLI::Actions::Use < CLI::Action
+  class CLI::Actions::Graph::Use < CLI::Action
     desc 'selects which (dependency graph) file to edit'
     option_syntax.help!
     def invoke path
@@ -140,16 +135,7 @@ module Skylab::TanMan
   end
 
 
-  class CLI::Actions::Check < CLI::Action
-    desc 'checks if the (dependency graph) file exists and can be parsed.'
-    option_syntax.help!
-    def invoke dotfile=nil
-      api_invoke path: dotfile
-    end
-  end
-
-
-  class CLI::Actions::Tell < CLI::Action
+  class CLI::Actions::Graph::Tell < CLI::Action
     desc "there's a lot you can tell about a man from his choice of words"
     option_syntax do |h|
       on( '-f', '--force',
@@ -161,10 +147,25 @@ module Skylab::TanMan
   end
 
 
-  module CLI::Actions::Graph
-    extend CLI::NamespaceModuleMethods
-    desc "do things to graphs."
-    summary { ["#{action_syntax} graph"] }
+  class CLI::Actions::Graph::Check < CLI::Action
+    desc 'checks if the (dependency graph) file exists and can be parsed.'
+    option_syntax.help!
+    def invoke dotfile=nil
+      api_invoke path: dotfile
+    end
+  end
+
+
+
+  class CLI::Actions::Graph::Push < CLI::Action
+    desc "push any single file anywhere in the world."
+    desc "(scp wrapper)"
+    option_syntax do |h|
+      on('-n', '--dry-run', 'dry run.') { h[:dry_run] = true }
+    end
+    def invoke remote_name, file, opts
+      api_invoke opts.merge( remote_name: remote_name, file_path: file )
+    end
   end
 
 
