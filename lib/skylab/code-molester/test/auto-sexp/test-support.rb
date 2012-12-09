@@ -10,7 +10,7 @@ module ::Skylab::CodeMolester
   end
 
   module TestNamespace::PersonName
-    class Node < ::Treetop::Runtime::SyntaxNode
+    class Node < CodeMolester::Services::Treetop::Runtime::SyntaxNode
       extend CodeMolester::AutoSexp
     end
   end

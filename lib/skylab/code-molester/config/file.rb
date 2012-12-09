@@ -1,17 +1,16 @@
-::Skylab::Headless::FUN.require_quietly[ 'treetop' ]
-
-
 module ::Skylab::CodeMolester
 
   class Config::File
 
-    # like the one in MetaHell::DelegatesTo, but with ad-hoc
-    # customization for this class
+
+    # custom `delegates_to` -- contrast with MetaHell::DelegatesTo
+    # #watch'ing this for push up potential.
+    #
     def self.delegates_to implementor, method_name, condition=nil
       if ! condition                        # the default condition is that the
         condition = -> { send implementor } # implementor result must be trueish
       end
-      defn = -> *a, &b do
+      defn = ->( *a, &b ) do
         result = nil
         if instance_exec(& condition)
           result = send( implementor ).send method_name, *a, &b
@@ -27,11 +26,9 @@ module ::Skylab::CodeMolester
       set_value k, v
     end
 
-    attr_reader :content # @api private!
-
     def content= str
+      @valid = nil
       @content = str
-      @state = :unparsed
     end
 
     delegates_to :sexp, :content_items, -> { valid? }
@@ -41,209 +38,280 @@ module ::Skylab::CodeMolester
     delegates_to :pathname, :exist?
 
     def invalid_reason
-      valid?
+      valid? if @valid.nil?
       @invalid_reason
     end
 
     delegates_to :sexp, :key?, -> { valid? }
 
+
+    # **NOTE** the meaning of `modified?` may have changed since we last used
+    # it: it *used* to mean: "does the file that is currently on disk have
+    # an `mtime` that is greater than the `mtime` was when we last read it?"
+    # whereas *now* it means "are the bytes we have in memory different
+    # than the the bytes that are on disk?".
+    #
+    # The old sense of the meaning may prove useful in the future to protect
+    # against accidental overwrites, (as vi does for e.g) which is why
+    # we keep this note here.
+    #
+    # For those instances that are not (yet?) associated with a pathname,
+    # the question of if it is `modified?` is meaningless and potentially
+    # hazardous if misunderstood.  In such cases we raise a sanity check
+    # exception.
+    #
+    # For those instances that are not valid, the question of whether the
+    # object is `modified?` should not be asked, because this library will
+    # try to prevent you from writing such objects to disk.  Likewise a runtime
+    # error is raised in such cases.
+
     def modified?
-      if pathname.exist?
-        if @mtime
-          pathname.mtime > @mtime
-        else
-          true
-        end
-      end
-    end
-
-    def on_read &b
-      if b then @on_read = b else @on_read end
-    end
-
-    def on_write &b
-      if b then @on_write = b else @on_write end
-    end
-
-    def path
-      @pathname.to_s if @pathname
-    end
-
-    def path= mixed
-      if mixed
-        @pathname = ::Pathname.new mixed.to_s
-        mixed
+      result = nil
+      if !@pathname
+        fail "sanity - it is meaningless to ask if `modified?` on #{
+          }a #{ self.class } not associated with any pathname."
+      elsif ! valid?
+        raise "sanity - invalid files should not be written to disk and hence #{
+          }whether such files are modified is the wrong question to ask."
       else
-        @pathname = mixed
+        if @pathname.exist?
+          result = string == @pathname.read # #twice
+        elsif '' ==  string       # in cases where the file has not (yet) been
+          result = false          # written to disk, consider our structure as
+        else                      # modified IFF we flatten as anything other
+          result = true           # than the empty string, to avoid writing
+        end                       # empty files to disk.
       end
+      result
     end
 
     attr_reader :pathname
 
-    on_read = PubSub::Emitter.new error: :all, invalid: :error
+    default_escape_path = ->( pn ) { pn.basename } # a nice safe common denom.
 
-    define_method :read do
-      e = on_read.new
-      if block_given? then yield e else self.on_read[ e ] end
-      self.content = pathname.read
-      @mtime = pathname.mtime
-      result = nil
-      if valid?
-        result = self
-      else
-        e.emit :invalid, invalid_reason
-        result = false
+    read_events = ::Struct.new :error, :read_error, :no_ent, :is_not_file,
+      :invalid, :escape_path
+
+    define_method :read do |&block|
+      ev = read_events.new
+      block[ ev ] if block
+      escape_path = -> pathname do
+        ( ev[:escape_path] || default_escape_path )[ pathname ]
       end
-      result
+      @pathname or
+        raise "cannot read - no pathname associated with this #{ self.class }"
+      res = nil
+      if @pathname.exist?
+        stat = @pathname.stat
+        if 'file' == stat.ftype
+          content = @pathname.read # change state only after this succeeds
+          clear
+          @pathname_was_read = true # used e.g by InvalidReason for l.g.
+          @content = content      # avoid circular dependency inf. loop here by
+          if valid?               # setting @content before calling `valid?`
+            res = true
+          elsif( f = ev[:invalid] || ev[:error] )
+            res = f[ invalid_reason ]
+          else
+            res = false
+          end
+        else
+          f = ev[:is_not_file] || ev[:read_error] || ev[:error]
+          f ||= -> pn, ftype do
+            raise "expected config file to be of type 'file', had #{ ftype } #{
+              }- #{ escape_path[ pn ] }"
+          end
+          res = f[ @pathname, stat.ftype ]
+        end
+      else
+        f = ev[:no_ent] || ev[:read_error] || ev[:error] || -> pn do
+          raise ::Errno::ENOENT.exception( escape_path[ pn ].to_s )
+          # the class itself writes "No such file or directory - #{ .. }" for us
+        end
+        res = f[ @pathname ]
+      end
+      res
     end
+
 
     delegates_to :sexp, :sections, -> { valid? }
 
     delegates_to :sexp, :set_value, -> { valid? }
 
     def sexp
-      if valid?
+      valid? if @valid.nil?
+      if @valid
         @content
       else
-        false
+        @valid # (presumably false)
+      end
+    end
+
+    def string
+      valid? if @valid.nil?
+      if @valid
+        @content.unparse
+      else
+        @content
       end
     end
 
     # `to_s` - don't define or alias this.  It is so ambiguous
     # for this class it should not be used.
 
-    def string
-      valid? ? @content.unparse : @content
-    end
-
     delegates_to :sexp, :value_items, -> { valid? }
 
 
-    on_write = PubSub::Emitter.new error: :all, notice: :all,
-      before: :all, after: :all, before_edit: [:before, :notice],
-      after_edit: [:after, :notice], before_create: [:before, :notice],
-      after_create: [:after, :notice], no_change: :notice
-
-
-    define_method :write do
-      e = on_write.new
-      if block_given then yield e else self.on_write[ e ] end
-      result = nil
-      if exist?
-        result = update e
-      else
-        result = create e
-      end
-      result
-    end
-
     def valid?
-      if :initial == @state || :unparsed == @state
+      if @valid.nil?
         if @content.nil?
-          @content = ''
+          if @pathname and @pathname.exist?
+            reading = true        # avoid circular dependency inf. loop here
+            read                  # when `read` calls `valid?`
+          else
+            @content = ''
+          end
         end
-        p = self.class.parser
-        result = p.parse @content
-        if result
-          @content = result.sexp
-          @state = :valid
-          @invalid_reason = nil
-        else
-          @state = :invalid
-          @invalid_reason = CodeMolester::ParseFailurePorcelain.new p
+        if ! reading
+          parser = self.class.parser
+          result = parser.parse @content
+          if result
+            @content = result.sexp # @content goes from being a string to a sexp
+            @invalid_reason = nil
+            @valid = true
+          else
+            # (leave content as the invalid string)
+            use_pn = (@pathname and @pathname_was_read) ? @pathname : nil
+            @invalid_reason = CodeMolester::InvalidReason.new parser, use_pn
+            @valid = false
+          end
         end
       end
-
-      case @state
-      when :valid   ; true
-      when :invalid ; false
-      else          ; fail "unexpected state: #{ @state }"
-      end
+      @valid
     end
 
     delegates_to :pathname, :writable?
 
+
+
+    write_emitter = PubSub::Emitter.new error: :all,
+      notice: :all, before: :all, after: :all,
+      before_edit:   [:before, :notice], after_edit:   [:after, :notice],
+      before_create: [:before, :notice], after_create: [:after, :notice],
+      no_change: :notice
+    write_emitter.send :attr_accessor, :escape_path # ouch
+
+
+    define_method :write do |&block|
+      result = nil
+      em = write_emitter.new
+      block[ em ] if block
+      em.escape_path ||= default_escape_path
+      @pathname or
+        raise "cannot write - no pathname associated with this #{ self.class }"
+      if valid?
+        if exist?
+          if @pathname_was_read
+            result = update em
+          else
+            fail "won't overwrite a pathname that was not first read" # stub
+          end
+        else
+          result = create em
+        end
+      else
+        raise "attempt to write invalid #{ self.class } - check if valid? first"
+      end
+      result
+   end
+
   protected
 
-    # [path] [opts]
-    def initialize *args
-      @content = @mtime = @on_read = @on_write = @pathname = nil
-      @state = :initial
-      params_h = if ::Hash === args.last
-        args.pop.dup
-      else
-        { }
+    opts_struct = ::Struct.new :path, :string
+
+    define_method :initialize do |param_h=nil|
+      block_given? and raise 'where?'
+      o = opts_struct.new
+      if param_h
+        param_h.each { |k, v| o[k] = v }
       end
-      params_h[:path] = args.pop unless args.empty?
-      args.empty? or
-        raise ::ArgumentError.new "syntax: #{ self.class }.new [path [, opts]]"
-      params_h.each { |k, v| send "#{ k }=", v }
-      yield self if block_given?
+      @content = o[:string] # expecting nil or string here
+      @invalid_reason = nil
+      @pathname = o[:path] ? ::Pathname.new( o[:path].to_s ) : nil
+      @pathname_was_read = nil
+      @valid = nil
     end
 
-
-    def create e
-      result = nil
-
-      begin
-        content = string
-        if content == pathname.read
-          e.emit :no_change, "no change: #{ escaped_path }"
-          break
-        end
-
-        e.emit :before_edit, resource: self,
-          message: "updating #{ escaped_path }"
-
-        if writable?
-          bytes = nil
-          pathname.open( w ) { |fh| bytes = fh.write content }
-          e.emit :after_edit, bytes: bytes,
-            message: "updated #{ escaped_path } (#{ bytes } bytes)"
-          result = bytes
-          break
-        end
-
-        result = e.error "cannot edit, file is not writable: #{ escaped_path }"
-      end while nil
-
-      result
+    def clear
+      @content = @invalid_reason = @pathname_was_read = @valid = nil
+      # leave pathname, brittany alone
     end
 
-
-    def update e
-      result = nil
-
+    def create em
+      result = nil # assume valid? and @pathname which not exist?
       begin
-        e.emit :before_create, resource: self,
-          message: "creating #{ escaped_path }"
+        em.emit :before_create,
+          resource: self,
+          message: "creating #{ em.escape_path[ @pathname ] }"
 
-        if ! dirname.exist?
-          result = e.error(
-            "parent directory does not exist, cannot write #{ escaped_path }" )
-          break
-        end
+        # because the below are not considered porcelain-level errors, they
+        # use neither the emitter nor `escape_path`
+        @pathname.dirname.exist? or
+          raise "parent directory does not exist, cannot write - #{
+            }#{ @pathname.dirname }"
 
-        if ! dirname.writable?
-          result = e.error(
-            "parent direcory is not writable, cannot write #{ escaped_path }" )
-          break
-        end
+        @pathname.dirname.writable? or
+          raise "parent directory is not writable, cannot write #{
+            }#{ @pathname }"
 
         bytes = nil
-        pathname.open( 'w+' ) { |fh| bytes = fh.write string }
+        @pathname.open( 'w+' ) { |fh| bytes = fh.write string }
 
-        e.emit :after_create, bytes: bytes,
-          message: "created #{ escaped_path } (#{ bytes } bytes)"
+        em.emit :after_create,
+          bytes: bytes,
+          message: "created #{ em.escape_path[ @pathname ] } (#{ bytes } bytes)"
 
         result = bytes
       end while nil
+      result
+    end
 
+    def update em
+      result = nil
+      begin
+        string = self.string      # thread safety HA
+
+        if string == @pathname.read # #twice
+          em.emit :no_change,
+            "no change: #{ em.escape_path[ @pathname ] }"
+          break
+        end
+
+        em.emit :before_edit,
+          resource: self,
+          message: "updating #{ em.escape_path[ @pathname ] }"
+
+        @pathname.writable? or
+          raise "path is not writable, cannot write - #{ @pathname }"
+
+        bytes = nil
+        pathname.open( 'w' ) { |fh| bytes = fh.write string }
+
+        em.emit :after_edit,
+          bytes: bytes,
+          message: "updated #{ em.escape_path[ @pathname ] } (#{ bytes } bytes)"
+
+        result = bytes
+
+      end while nil
       result
     end
 
 
+
+    #
     # ----------------------- define m.m `parser` begin ---------------------
+    #
 
     class << self
       attr_accessor :do_debug
@@ -254,9 +322,9 @@ module ::Skylab::CodeMolester
     debug = -> { do_debug }
 
     compile = -> do
-      debug[] and $stderr.puts "creating new #{ const } xyzzy"
+      debug[] and $stderr.puts "loading new #{ const } xyzzy"
       pathname = Config.dir_pathname.join 'file-parser'
-      o = ::Treetop.load pathname.to_s
+      o = CodeMolester::Services::Treetop.load pathname.to_s
       o.name =~ /::#{ ::Regexp.escape const.to_s }\z/ or fail "huh?#{ o }"
       o
     end

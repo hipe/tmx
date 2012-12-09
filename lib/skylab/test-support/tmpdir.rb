@@ -5,6 +5,11 @@ module Skylab::TestSupport
   class Tmpdir < ::Pathname
     include TestSupport::Services::FileUtils
 
+    def clear                    # sugar around `prepare` that results in self.
+      prepare                    # does a `rm -rf` on the temmpdir, creates!
+      self
+    end
+
     def copy pathname, dest_basename = nil
       source = ::Pathname.new pathname.to_s
       dest = join( dest_basename || source.basename ) # where to? (basename)

@@ -11,6 +11,8 @@ module Skylab::TestSupport
 
     o :Open3,         -> { require 'open3'     ; ::Open3 }
 
+    o :OptionParser,  -> { require 'optparse'  ; ::OptionParser }
+
     o :StringIO,      -> { require 'stringio'  ; ::StringIO }
 
     o :Tmpdir,        -> { require 'tmpdir'    ; ::Dir } # Dir.tmpdir

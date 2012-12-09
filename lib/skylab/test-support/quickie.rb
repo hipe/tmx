@@ -1,12 +1,5 @@
 # [#bs-010] poster child
 
-require 'optparse'
-
-module Skylab
-  module TestSupport
-  end
-end
-
 module Skylab::TestSupport::Quickie
 
   def self.extended mod # #pattern [#sl-111]
@@ -58,8 +51,12 @@ module Skylab::TestSupport::Quickie
       c
     end
   end
+
+
   module ContextClassMethods
     include CommonMethods
+    include ::Skylab::MetaHell::Let::ModuleMethods
+
     def block= b
       class_eval(&b)
     end
@@ -84,8 +81,12 @@ module Skylab::TestSupport::Quickie
     attr_accessor :tag_filter
     attr_accessor :tags
   end
+
+
   module ContextInstanceMethods
     include CommonMethods
+    include ::Skylab::MetaHell::Let::InstanceMethods
+
     attr_writer :block
     ORDER = [:include, :exclude]
     def describe_run_options
@@ -108,6 +109,10 @@ module Skylab::TestSupport::Quickie
       MatchPredicate.new expected, self
     end
 
+    def raise_error expected_class, message_rx
+      RaiseErrorPrediate.new expected_class, message_rx, self
+    end
+
     # --*--
 
     attr_accessor :exampled
@@ -124,7 +129,7 @@ module Skylab::TestSupport::Quickie
     def parse_opts argv
       @tag_filter = @tag_filter_desc = nil
       ors = descs = nil
-      ::OptionParser.new do |o|
+      ::Skylab::TestSupport::Services::OptionParser.new do |o|
         o.on('-t', '--tag TAG[:VALUE]', '(tries to be like the option in rspec',
          'but only sees leaf- not branch-level tags at this time.)'
         ) do |v|
@@ -146,7 +151,7 @@ module Skylab::TestSupport::Quickie
         @tag_filter = ->(tags) { ors.detect { |l| l.call(tags) } }
       end
       true
-    rescue ::OptionParser::ParseError => e
+    rescue ::Skylab::TestSupport::Services::OptionParser::ParseError => e
       stderr.puts "#{e}\ntry #{title "ruby #{$PROGRAM_NAME} -h"} for help"
       false
     end
@@ -210,6 +215,7 @@ module Skylab::TestSupport::Quickie
     attr_writer :tag_filter
   end
 
+
   class EqualsPredicate < Struct.new(:expected, :context)
     def match actual
       if expected == actual
@@ -230,6 +236,23 @@ module Skylab::TestSupport::Quickie
     end
   end
 
+  class RaiseErrorPrediate < ::Struct.new :expected_class, :message_rx, :context
+    def match actual
+      begin
+        actual.call
+      rescue ::StandardError => e
+      end
+      if ! e
+        context.fail! "expected lambda to raise, didn't raise anything."
+      elsif ! e.kind_of?( expected_class )
+        context.fail! "expected #{ expected_class }, had #{ e.class }"
+      elsif message_rx !~ e.message
+        context.fail! "expected #{ e.message } to match #{ message_rx }"
+      else
+        context.pass! "raises #{ expected_class } matching #{ message_rx }"
+      end
+    end
+  end
 
   RUNTIME = ContextClass[stderr: $stderr, indent:'']
   KERNEL_EXTENSION = -> do

@@ -14,6 +14,11 @@ module Skylab::CodeMolester
 
     o :StringScanner, -> { require 'strscan'  ; ::StringScanner }
 
+    o :Treetop,       -> do
+                          Headless::FUN.require_quietly[ 'treetop' ]
+                                                ::Treetop
+                         end
+
     o :YAML,          -> { require 'yaml'     ; ::YAML }
 
     define_singleton_method :const_missing do |const|

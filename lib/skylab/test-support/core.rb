@@ -14,6 +14,7 @@ end
 module Skylab::TestSupport
 
   TestSupport = self
+  MetaHell = ::Skylab::MetaHell
 
   extend ::Skylab::Autoloader
 end

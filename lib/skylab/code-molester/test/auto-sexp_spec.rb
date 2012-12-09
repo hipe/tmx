@@ -5,7 +5,10 @@ describe ::Skylab::CodeMolester::AutoSexp do
   include ::Skylab::CodeMolester::TestSupport::CONSTANTS
 
 
-  let(:parser_class) { ::Treetop.load_from_string grammar }
+  let :parser_class do
+    CodeMolester::Services::Treetop.load_from_string grammar
+  end
+
   let(:parser) { parser_class.new }
   let(:parse_result) { parser.parse(input) }
   let(:sexp) { parse_result.sexp }
@@ -23,7 +26,8 @@ describe ::Skylab::CodeMolester::AutoSexp do
       HERE
     end
     it "(the treetop grammar parses inputs like normal)" do
-      parser.parse('mary').should be_kind_of(::Treetop::Runtime::SyntaxNode)
+      parser.parse('mary').should be_kind_of(
+        CodeMolester::Services::Treetop::Runtime::SyntaxNode )
       parser.parse('joe bob').should be_nil
     end
     it "parse trees get a method called 'sexp'" do
@@ -125,7 +129,9 @@ describe ::Skylab::CodeMolester::AutoSexp do
         end
       end
       module Sandwich
-        class MyNode < ::Treetop::Runtime::SyntaxNode
+        class MyNode <
+          ::Skylab::CodeMolester::Services::Treetop::Runtime::SyntaxNode
+
           extend ::Skylab::CodeMolester::AutoSexp # 2 levels deep, nec
           sexp_factory_class MySexp
         end

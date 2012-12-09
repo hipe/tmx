@@ -8,12 +8,21 @@ module ::Skylab::CodeMolester::TestSupport
 
   TestSupport::Regret[ CodeMolester_TestSupport = self ]
 
-  TMPDIR = TestSupport::Tmpdir.new ::Skylab::TMPDIR_PATHNAME.join('co-mo')
+  TMPDIR = TestSupport::Tmpdir.new(
+    ::Skylab::TMPDIR_PATHNAME.join( 'co-mo' ),
+    verbose: false
+  )
 
   module CONSTANTS
-    CodeMolester = ::Skylab::CodeMolester
+    include ::Skylab # *all subproducts!*
+
+    TMPDIR = TMPDIR
   end
 
   include CONSTANTS
 
+
+  module InstanceMethods
+    include CONSTANTS # refer to constants from i.m's
+  end
 end
