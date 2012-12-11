@@ -34,6 +34,16 @@ module Skylab::TanMan
       pen.escape_path(* a)
     end
 
+
+    rx = Face::PathTools::FUN.absolute_path_hack_rx
+    define_method :gsub_path_hack do |str|
+      res = str.gsub rx do
+        escape_path "#{ $~[0] }" # (delegates to the modality-specific pen)
+      end
+      res
+    end
+
+
     def infostream
       request_client.send :infostream
     end

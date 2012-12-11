@@ -33,7 +33,7 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
     # this is a *big* experiment -- expect this to change a lot
     def _parse_id str, member=nil
       ::String === str or fail("sanity -- expecting String had #{str.class}")
-      p = self.class.grammar.parser_for_rule :id
+      p = self.class.grammar.parser_for_rule :id # danger is here? [#054]
       node = p.parse str
       node ||= p.parse "\"#{str.gsub('"', '\"')}\""
       node or fail "sanity - what such string is invalid? #{p.failure_reason}"
@@ -49,7 +49,7 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
       content_text_value.gsub('\"', '"')
     end
     def normalized_string! string
-      fail('implement me') # #todo
+      fail 'implement me' # at [#052]
     end
   end
 

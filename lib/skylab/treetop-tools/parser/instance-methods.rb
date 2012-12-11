@@ -38,18 +38,24 @@ module Skylab::TreetopTools
     end
 
     def build_file_input_adapter *a, &b
-      if ::Hash === a.last ; opts = a.last else a.push( opts = {} ) end
-      opts.key?(:entity_noun_stem) or
-        a.last[:entity_noun_stem] = entity_noun_stem
-      Parser::InputAdapters::File.new(request_runtime, *a, &b)
+      if ::Hash === a.last
+        opts = a.last.dup         # don't modify original object
+      else
+        opts = { }
+        a.push opts               # hacklette for when we pass `a` on below
+      end
+      if ! opts.key? :entity_noun_stem
+        opts[:entity_noun_stem] = entity_noun_stem
+      end
+      Parser::InputAdapters::File.new self, *a, &b
     end
 
     def build_stream_input_adapter *a
-      Parser::InputAdapters::Stream.new(request_runtime, *a)
+      Parser::InputAdapters::Stream.new self, *a
     end
 
     def build_string_input_adapter *a
-      Parser::InputAdapters::String.new(request_runtime, *a)
+      Parser::InputAdapters::String.new self, *a
     end
 
     def build_parser
@@ -57,7 +63,7 @@ module Skylab::TreetopTools
     end
 
     def entity_noun_stem
-      self.class.const_get(:ENTITY_NOUN_STEM)
+      self.class::ENTITY_NOUN_STEM # not const_get(.., false)
     end
 
     attr_reader :input_adapter

@@ -32,7 +32,7 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
         equals[:id] = _parse_id(label_str)
       end
     end
-    def node_id # #override # #todo:port
+    def node_id # #override # support for 'port' at [#051]
       self[:node_id][:id].normalized_string.intern
     end
     def node_id! node_id

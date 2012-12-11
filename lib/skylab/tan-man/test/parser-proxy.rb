@@ -17,16 +17,17 @@ module Skylab::TanMan::TestSupport
   protected
 
     def parser_result result
-      ret = super
-      if profile && input_adapter.type.is?(
-        ::Skylab::TreetopTools::Parser::InputAdapter::Types::FILE
-      ) then
-        info( '      (%2.1f ms to parse %s)' % [
-          (parse_time_elapsed_seconds * 1000),
-          input_adapter.pathname.basename.to_s
-        ] )
-      end
-      ret
+      res = super
+      begin
+        profile or break
+        is =
+          input_adapter.type.is? TreetopTools::Parser::InputAdapter::Types::FILE
+        is or break
+        ms = parse_time_elapsed_seconds * 1000
+        path = input_adapter.pathname.basename.to_s
+        info( '      (%2.1f ms to parse %s)' % [ms, path] )
+      end while nil
+      res
     end
   end
 end

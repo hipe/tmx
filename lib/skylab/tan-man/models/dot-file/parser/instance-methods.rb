@@ -9,6 +9,7 @@ module Skylab::TanMan
     ENTITY_NOUN_STEM = 'dot file'
 
   protected
+
     def load_parser_class
 
       f = on_load_parser_info ||
@@ -28,7 +29,9 @@ module Skylab::TanMan
         end
       ).invoke
     end
+
     # --*--
+
     def excerpt_lines
       scn = ::StringScanner.new(parser.input) # a ::StringIO is easier,
       stop_at = parser.failure_line           # but this is more fun (powerful?)
@@ -42,6 +45,7 @@ module Skylab::TanMan
         "#{ ' ' * margin.length }#{ '-' * [0, parser.failure_column - 1].max }^"
       ]
     end
+
     def expecting
       a = parser.terminal_failures
       format = -> tf { tf.expected_string.inspect }
@@ -57,22 +61,30 @@ module Skylab::TanMan
       end while nil
       result
     end
+
     def force_overwrite?
       false
     end
+
     def generated_grammar_dir
       '../../../../../tmp/tan-man'
     end
-    def in_file
-      line_col = "#{ parser.failure_line }:#{ parser.failure_column }"
-      if input_adapter.respond_to? :pathname
-        "In #{ escape_path input_adapter.pathname }:#{ line_col }"
-      else
-        "In #{ input_adapter.entity_noun_stem }:#{ line_col }"
-      end
-    end
+
+
     def parser_failure_reason
-      [ in_file, expecting, * excerpt_lines ].compact.join("\n")
+
+      in_file = -> do
+        line_col = "#{ parser.failure_line }:#{ parser.failure_column }"
+        s = nil
+        if input_adapter.respond_to? :pathname
+          s = "In #{ escape_path input_adapter.pathname }:#{ line_col }"
+        else
+          s = "In #{ input_adapter.entity_noun_stem }:#{ line_col }"
+        end
+        s
+      end.call
+
+      [ in_file, expecting, * excerpt_lines ].compact.join "\n"
     end
   end
 end

@@ -79,10 +79,8 @@ module Skylab::TanMan
     #
     rx = Face::PathTools::FUN.absolute_path_hack_rx
     define_method :fu_output_message do |msg|
-      s = msg.gsub rx do
-        escape_path "#{ $~[0] }" # (delegates to the modality-specific pen)
-      end
-      emit :info, s
+      str = gsub_path_hack msg
+      emit :info, str
       nil
     end
   end

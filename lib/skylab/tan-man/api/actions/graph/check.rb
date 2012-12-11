@@ -4,37 +4,41 @@ module Skylab::TanMan
     extend API::Action::Parameter_Adapter
 
     param :path, pathname: true, accessor: true
+    param :verbose, accessor: true
 
   protected
 
     def execute
-      error 'cover me - finish knob refactor here' ; true and return false
-      result = nil
+      res = nil
       begin
         if path
           if path.exist?
             if path.directory?
               error "is directory, expecting dotfile: #{ path }"
-              result = false
+              res = false
               break
             end
           else
             error "dotfile file not found: #{ path }"
-            result = false
+            res = false
             break
           end
-        elsif dot_files.ready?
-          pn = dot_files.selected_pathname
-          info "exists, selected: #{ pn }"
+        elsif collections.dot_file.ready?
+          pn = collections.dot_file.selected_pathname
+          info "exists, selected: #{ escape_path pn }"
           self.path = pn
         else
           info "no dotfile selected. use use?"
           break
         end
-        o = TanMan::Models::DotFile::Controller.new self, path
-        result = o.check
+        o = TanMan::Models::DotFile::Controller.new self
+        o.pathname = path
+        o.statement = false
+        o.verbose = (verbose || false)
+        o.set! or break
+        res = o.check
       end while nil
-      result
+      res
     end
   end
 end

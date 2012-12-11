@@ -1,3 +1,8 @@
+[#054]       #watching it seems like it will probably be dangerous to
+             reuse the same parser for multiple parses?
+[#053]       #postponed normalizing string here
+[#052]       #postponed normalizing double quoted strings
+[#051]       #postponed support for 'port' in dot-lang grammar
 [#050]       #done just for fun, eliminate all return statements
 [#049]       #watch #pattern - four permutations for file creation (dirname etc)
 [#048]       #done failing on tan init should do porcelain too
@@ -29,7 +34,7 @@
 [#024]       #done use -h -- we had to etc use bleeding
 [#023]       #deferred combine all Boxxy, consider Boxxy-like solutions
                #depends-on:#018
-[#022]       #done refactor-in headless, and sub-client
+[#022] #open refactor-in headless, and sub-client
 [#021]       merge singletons into service
 [#020]       #done #low-priority nounify cli commands
                x. check -> graph check

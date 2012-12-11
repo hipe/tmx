@@ -10,6 +10,7 @@ module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
     context "You can't have an action that is a completely blank slate class because that" do
       with_action 'ferp-merp'
       klass :HerpDerp__FerpMerp
+      remove_method :subject # avoids a warning # ./test/all_specs.rb req -v porcelain
       let(:subject) { -> { fetch } }
       specify { should raise_error(NameError, /undefined method `invoke' for class.+FerpMerp/) }
     end

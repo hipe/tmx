@@ -2,6 +2,7 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
 
   module Graph
     include Common
+
     def associate! source, target, opts=nil
       o = EdgeStmt::OPTS.new ; opts and opts.each { |k, v| o[k] = v }
       source_node = node! source
@@ -24,6 +25,7 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
         edge_stmt
       end
     end
+
     def _create_edge_stmt source_node, target_node, o
       if o.prototype
         _named_prototype(o.prototype) or
@@ -36,6 +38,7 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
         end)
       end._create source_node, target_node, o
     end
+
     def _create_node_with_label label
       proto = stmt_list._named_prototypes[:node_stmt] or fail('no node proto!')
       other = proto._create_node_with_label label
@@ -47,21 +50,26 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
       other.node_id! use_id
       other
     end
+
     def _edge_stmts
       _stmt_enumerator { |stmt| :edge_stmt == stmt.class.rule }
     end
+
     def _first_label_stmt
       stmt_list.stmts.detect do |s|
         :equals_stmt == s.class.rule && 'label' == s.lhs.normalized_string
       end
     end
+
     def get_label
       equals_stmt = _first_label_stmt
       equals_stmt.rhs.normalized_string if equals_stmt
     end
+
     def _named_prototype name
       stmt_list._named_prototypes[name]
     end
+
     def node! label
       # Found an exact match node by label? you found your result.
       # Any first node_stmt lexically greater? insert before that.
@@ -92,15 +100,19 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
         stmt_list._insert_before!(_create_node_with_label(label), after)[:stmt]
       end
     end
+
     def node_with_id id
       _node_stmts.detect { |n| id == n.node_id }
     end
+
     def _node_stmts
       _stmt_enumerator { |stmt| :node_stmt == stmt.class.rule }
     end
+
     def nodes
       _node_stmts.to_a
     end
+
     def set_label! str
       equals_stmt = _first_label_stmt
       equals_stmt ||= begin
@@ -115,6 +127,7 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
         equals_stmt
       end
     end
+
     def _stmt_enumerator &block
       ::Enumerator.new do |y|
         stmt_list.stmts.each do |stmt|

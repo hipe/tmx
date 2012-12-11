@@ -3,7 +3,7 @@ module Skylab::Headless
   module CLI
     extend Autoloader
 
-    OPT_RX = /\A-/
+    OPT_RX = /\A-/                # ( yes this is actually used elsewhere :D )
   end
 
 
@@ -17,31 +17,47 @@ module Skylab::Headless
     include Headless::Action::InstanceMethods
 
     def invoke argv
-      @argv = argv
-      (@queue ||= []).clear
-      if option_parser and CLI::OPT_RX =~ argv.first # maybe sub-action want it
-        begin
-          option_parser.parse! argv
-        rescue ::OptionParser::ParseError => e
-          usage e.message
-          return exit_status_for :parse_opts_failed
-        end
-      end
-      queue.empty? and enqueue! default_action
-      result = nil
-      until queue.empty?
-        if m = queue.first # implementations may use (meaningful) empty opcodes
-          if m.respond_to? :call
-            result = m.call or break
-          elsif a = parse_argv_for( m )
-            result = send( m, *a ) or break
+      @argv = argv                # it really is nice to have it both ways, this
+      (@queue ||= []).clear       # create queue if not exist, and empty it
+      result = nil                # (#todo we might be insane and not empty it)
+      begin
+        result = parse_opts argv  # implement parse_opts however you want,
+        true == result or break   # but to allow fancy exit statii we have to
+                                  # observe this strict ickiness [#hl-023]
+
+        if queue.empty?           # during parse_opts client may have added
+          enqueue! default_action # action items to the queue. As name suggests,
+        end                       # this is the default case that they didn't.
+
+        upstream_resolved = false # (experimental, do this at most once)
+        while ! queue.empty?      # effectively for each item on the queue:
+          x = queue.first         # peek ahead before shifting
+          if ! x                  # clients may add a falseish to the queue
+                                  # during parse_opts to indicate they did
+                                  # something, hence don't use default_action
+          elsif x.respond_to? :call # this is typically a lambda added during
+            result = x.call       # parse_opts but it could be anything.
+            true == result or break # again with [#hl-023] for now, exit codes
+
           else
-            result = exit_status_for :parse_argv_failed
-            break
-          end
-        end
-        queue.shift
-      end
+            if ! upstream_resolved # experimentally once evar in this shebang we
+              result = resolve_upstream # give the client a chance to impl.
+              true == result or break # custom upstream resolution [#hl-022]
+              upstream_resolved = true # observing the now familiar chance to
+            end                   # set exit code on failure [#hl-023]
+
+            a = parse_argv_for x  # We assume now that actionable x is a method
+            if ! a                # but if that failed, short circuit out of
+              result = exit_status_for :parse_argv_failed # processing the rest
+              break               # of the queue
+            end
+            result = send( x, *a ) #                 money
+            true == result or break # for now [#hl-023] we assume you gave us
+            result or break       # an exit code and we should stop unless
+          end                     # result was exactly true.
+          queue.shift             # shift queue only when succeeded with that
+        end                       # actionable item.
+      end while nil
       result
     end
 
@@ -136,7 +152,34 @@ module Skylab::Headless
       end
     end
 
+    def parse_opts argv           # mutate `argv` (which is probably also @argv)
+                                  # what you do with the data is your business.
+      exit_status = true          # result in true on success, other on failure
+      begin
+        if argv.empty?            # options are always optional! don't even
+          break                   # build any option_parser, much less invoke it
+        end
+        if CLI::OPT_RX !~ argv.first # avoid parsing opts intended for child
+          break                   # actions by requiring that opts come before
+        end                       # args (might change [#hl-024])
+        if ! option_parser        # if you don't have one, which is certainly
+          break                   # not strange, then we just leave brittany
+        end                       # alone and let downstream deal with argv
+        begin                     # option_parser can be some fancy arbitrary
+          option_parser.parse! argv # thing, but it needs to conform to at least
+        rescue ::OptionParser::ParseError => e # these two parts of stdlib ::O_P
+          usage e.message
+          exit_status = exit_status_for :parse_opts_failed
+        end
+      end while nil
+      exit_status
+    end
+
     attr_reader :queue
+
+    def resolve_upstream          # out of the box we make no assumtions about
+      true                        # what your upstream should be, but per
+    end                           # [#hl-023] this must be literally true for ok
 
     def usage msg=nil
       emit :help, msg if msg
@@ -172,12 +215,30 @@ module Skylab::Headless
 
   protected
 
-    def build_io_adapter
-      io_adapter_class.new $stdin, $stdout, $stderr, build_pen
+
+    def build_io_adapter sin=$stdin, sout=$stdout, serr=$stderr, pen=build_pen
+      # What is really nice is if you observe [#sl-114] and specify what
+      # actual streams you want to use for these formal streams.  However
+      # we grant ourself this one indulgence of specifying these most
+      # conventional of defaults here, provided that this is the only place
+      # library-wide that we will see a mention of these globals.
+
+      io_adapter_class.new sin, sout, serr, pen
     end
 
-    def in_file
-      "#{ parameter_label build_argument_syntax_for(queue.first).first }"
+    def infile_noun               # a bit of a hack to go with resolve_instream
+      name = nil
+      begin
+        if ! queue.empty?
+          as = build_argument_syntax_for queue.first
+          if ! as.empty?
+            name = as.first.name
+            break
+          end
+        end
+        name = 'infile' # sketchy..
+      end while nil
+      parameter_label name
     end
 
     def invite_line
@@ -207,46 +268,88 @@ module Skylab::Headless
 
     attr_writer :program_name
 
-    # its location here is experimental. note it may open a filehandle.
-    def resolve_instream
-      stdin = io_adapter.instream.tty? ? :tty : :stdin
-      no_argv = argv.empty? ? :no_argv : :argv
-      opcode =
-      case [stdin, no_argv]
-      when [:tty, :argv], [:tty, :no_argv] ; :argv
-      when [:stdin, :argv]                 ; :ambiguous
-      when [:stdin, :no_argv]              ; :stdin
+
+    def resolve_instream # (the probable destination of [#hl-022], in flux)
+
+      # #experimental: Figure out which of several possible datasources should
+      # be the stream for reading from based on whether the instream (stdin) is
+      # a tty (interactive terminal) or not, and whether arguments exist in
+      # argv, and if so, whether the number of those argv arguments is one, and
+      # if so, if it is a filename that can be read (whew!)
+      #
+      # If it gets to this last case, (**NOTE**) it will mutate argv by shifting
+      # this one arg off of it, it will open this filehandle (!!),
+      # **and** reassign io_adapter.instream with this handle, possibly
+      # releasing the original handle!! (For now, manifestations of this are
+      # tracked org-wide with the tag #open-filehandle-1)
+      #
+      # This is an #experimental attempt to generalize this stuff, but is
+      # probably premature in its current state, hence [#hl-022] will be
+      # expected to be active for a while.
+      #
+      # The confusingly similarly named `resolve_upstream` is the same idea,
+      # but we let that be a stub function that clients can opt-in to,
+      # possibly implementing it simply by calling this.
+
+      res = false                 # must be true on success per [#hl-023]
+                                  # (imagine that false signifies a request
+                                  # to display usage, invite after the error(s))
+                                  # it is the default value b/c so common!
+
+      try_instream = -> do
+        res = true                # nothing to to.
       end
-      result = nil
-      case opcode
-      when :ambiguous
-        usage "cannot resolve ambiguous instream modality paradigms --#{
-          } both STDIN and #{ in_file } appear to be present."
-      when :stdin ; result = io_adapter.instream
-      when :argv
-        in_path = nil
+
+      ambiguous = -> do
+        error "cannot resolve ambiguous instream modality paradigms --#{
+          } both STDIN and #{ infile_noun } appear to be present."
+      end
+
+      try_argv = -> do
         case argv.length
-        when 0 ; suppress_normal_output ?
-                   info("No #{in_file} argument present. Done.") :
-                   usage("expecting: #{in_file}")
-        when 1 ; in_path = argv.shift
-        else   ; usage("expecting: #{in_file} had: (#{argv.join(' ')})")
-        end
-        in_path and begin
-          in_path = ::Pathname.new(in_path)
-          if ! in_path.exist? then usage("#{in_file} not found: #{in_path}")
-          elsif in_path.directory? then usage("#{in_file} is dir: #{in_path}")
-          else result = io_adapter.instream = in_path.open('r') # ''spot 1''
+        when 0
+          if suppress_normal_output
+            info "No #{ infile_noun } argument present. Done."
+            io_adapter.instream = nil # ok sure why not
+            res = nil
+          else
+            error "expecting: #{ infile_noun }"
           end
+        when 1
+          o = ::Pathname.new argv.shift
+          if o.exist?
+            if o.directory?
+              error "#{ infile_noun } is directory: #{ o }"
+            else
+              io_adapter.instream = o.open 'r'
+              # (the above is #open-filehandle-1 --  don't loose track!)
+              res = true
+            end
+          else
+            error "#{ infile_noun } not found: #{ o }"
+          end
+        else
+          error "expecting: #{ infile_noun } had: (#{ argv.join ' ' })"
         end
       end
-      result
+
+      argv = self.argv.empty?         ? :argv_empty  : :some_argv
+      term = io_adapter.instream.tty? ? :interactive : :noninteractive
+
+      case [term, argv]
+      when [:interactive,    :argv_empty] ; try_argv[ ]
+      when [:interactive,    :some_argv]  ; try_argv[ ]
+      when [:noninteractive, :argv_empty] ; try_instream[ ]
+      when [:noninteractive, :some_argv]  ; ambiguous[ ]
+      end
+
+      res
     end
 
-    def suppress_normal_output!
-      @suppress_normal_output = true
-      self
-    end
+    def suppress_normal_output!   # #experimental hack to let e.g. officious
+      @suppress_normal_output = true # actions indicate that they executed, and
+      self                        # if given a a choice there is no need to do
+    end                           # further processing.
 
     attr_reader :suppress_normal_output
 
@@ -346,16 +449,23 @@ module Skylab::Headless
   end
 
 
-  class CLI::IO::Adapter::Minimal <
-    ::Struct.new :instream, :outstream, :errstream, :pen
+  class CLI::IO::Adapter::Minimal <            # For now (near [#sl-113] we do
+    ::Struct.new :instream, :outstream, :errstream, :pen # not observe the PIE
+    # convention, which is a higher-level eventy thing that assumes semantic
+    # meaning to the different streams. Down here, we just want symbolic names
+    # that represent the actual streams (whatever they are) that are used in the
+    # POSIX standard way of having a standard in, standard out, and standard
+    # error stream.
 
-    def emit type, msg
+
+    def emit type, msg            # life is easy with this default assumption
       send( :payload == type ? :outstream : :errstream ).puts msg
       nil # undefined
     end
 
-                                  # per [#sl-114] you're not gonna get it
-                                  # as easy as you would might like
+
+    # per edict [#sl-114] keep explicit mentions of the streams out at this
+    # level -- they can be nightmarish to adapt otherwise.
     def initialize sin, sout, serr, pen=CLI::IO::Pen::MINIMAL
       super sin, sout, serr, pen
     end
@@ -386,10 +496,15 @@ module Skylab::Headless
       stylize(mixed.to_s.inspect, :strong, :dark_red) # may be overkill
     end
 
-    def parameter_label m, idx=nil
-      stem = (::Symbol === m ? m.to_s : m.name.to_s).gsub('_', '-')
-      idx and idx = "[#{idx}]"
-      "<#{stem}#{idx}>" # will get build out eventually
+    def parameter_label x, idx=nil
+      if ::Symbol === x
+        str = x.to_s
+      else
+        str = x.name.to_s
+      end
+      stem = str.gsub '_', '-'
+      idx = "[#{ idx }]" if idx
+      "<#{ stem }#{ idx }>" # will get built out eventually
     end
 
     def stylize str, *styles

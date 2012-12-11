@@ -1,6 +1,6 @@
 module Skylab::TanMan
 
-  class API::Actions::Tell < API::Action
+  class API::Actions::Graph::Tell < API::Action
     extend API::Action::Parameter_Adapter
 
     param :force, accessor: true, required: false
@@ -11,17 +11,17 @@ module Skylab::TanMan
   protected
 
     def execute # public, to be called from self.class
-      fail 'cover me' ; true and return false
-      result = nil
+      res = nil
       begin
-        dot_files.ready? or break
+        collections.dot_file.ready? or break
         statement = parse_words words, force: force
         statement or break
-        sc = Models::DotFile::Controller.new self
-        result = sc.invoke pathname: dot_files.selected_pathname,
-                           statement: statement
+        selected = collections.dot_file.selected_pathname
+        res = controllers.dot_file.invoke pathname: selected,
+                                         statement: statement,
+                                           verbose: false
       end while nil
-      result
+      res
     end
   end
 end

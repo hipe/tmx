@@ -1,12 +1,19 @@
 require_relative '../test-support'
 
-module ::Skylab::TanMan::TestSupport::Sexp
+module Skylab::TanMan::TestSupport::Sexp
   ::Skylab::TanMan::TestSupport[ Sexp_TestSupport = self ]
 
-  module Grammars
-    @dir_path = Sexp_TestSupport.dir_pathname.join('grammars').to_s # or orphan
-    extend Sexp_TestSupport::Grammar::Boxxy
+  module CONSTANTS
+    Headless     = ::Skylab::Headless
+    TreetopTools = ::Skylab::TreetopTools
   end
+
+  include CONSTANTS
+
+  Headless = self::Headless       # so modules opened lexically inside of self
+                                  # can view this constant as a bareword inside
+                                  # their selves :/
+
 
   module ModuleMethods
     def using_grammar grammar_pathpart, *tags, &b

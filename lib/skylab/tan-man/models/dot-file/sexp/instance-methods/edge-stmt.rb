@@ -20,7 +20,7 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
     end
     def source_node_id! source_node_id
       o = _parse_id source_node_id.to_s
-      self[:agent][:id] = o # #todo:port
+      self[:agent][:id] = o # support for 'port' at [#051]
     end
     def target_node_id
       self[:edge_rhs][:recipient][:id].normalized_string.intern

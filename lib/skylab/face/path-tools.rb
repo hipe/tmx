@@ -102,7 +102,7 @@ module Skylab::Face
     o = { }
 
     absolute_path_hack_rx = o[:absolute_path_hack_rx] =    # see spec, hackishly
-      %r{ (?<= \A | [[:space:]'"] )  (?: / [^[:space:]'"]+ )+ }x       # used in
+      %r{ (?<= \A | [[:space:]'",] )  (?: / [^[:space:]'",]+ )+ }x     # used in
                                                                    # subproducts
 
     o[:clear] = clear

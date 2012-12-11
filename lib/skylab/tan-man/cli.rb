@@ -149,9 +149,11 @@ module Skylab::TanMan
 
   class CLI::Actions::Graph::Check < CLI::Action
     desc 'checks if the (dependency graph) file exists and can be parsed.'
-    option_syntax.help!
-    def invoke dotfile=nil
-      api_invoke path: dotfile
+    option_syntax do |h|
+      on( '-v', '--verbose', 'verbose output' ) { h[:verbose] = true }
+    end
+    def invoke dotfile=nil, opts
+      api_invoke path: dotfile, verbose: opts[:verbose]
     end
   end
 

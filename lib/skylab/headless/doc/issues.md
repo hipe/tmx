@@ -1,3 +1,7 @@
+[#024]       #tracking-tag we only parse options at beginning in case we
+             have sub-actions, but maybe we could improve this for leaf nodes
+[#023]       support for exit statuses might get silly
+[#022]       #watch #pattern #tracking-tag of resolving upstream logic (dry?)
 [#021]       #feature #deferred #cli - be sure to provide a (flatten) --tree
                option when looking at a branch help screen!
 [#020]       #convention `invoke` `execute` `run` `call` have distinct meanings

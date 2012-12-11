@@ -8,19 +8,20 @@ module Skylab::TanMan
 
   protected
 
-    def initialize request_client, config
+    def initialize request_client
       _sub_client_init! request_client
       @ready = -> do
         result = false
+        rc = self.request_client
         begin
-          if ! config.ready?
+          if ! controllers.config.ready?
             break
           end
-          if ! config.known? 'file', :all
-            error 'use use'
+          if ! controllers.config.known? 'file'
+            error 'no "file" in config(s) - please use use'
             break
           end
-          s = config['file']
+          s = controllers.config['file']
           self.selected_pathname = ::Pathname.new s
           if selected_pathname.exist?
             result = true
@@ -33,5 +34,9 @@ module Skylab::TanMan
     end
 
     attr_reader :ready
+
+    def controllers
+      request_client.send :controllers # experimental - do we want this in
+    end                           # sub-client?
   end
 end

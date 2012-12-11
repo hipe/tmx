@@ -44,35 +44,39 @@ module Skylab::TanMan
     end
 
     def parser_failure
-      fail 'TEST ME - THE BELOW IS NOT YET COVERED BY TESTS' # #TODO (and take returns out)
-      # failure_reason, failure_line, failure_column
-      (a = parser.terminal_failures).empty? and return nil
-      _msg = [ 'Expected',
-        (1 == a.length ?
-          a.first.expected_string.inspect :
-          "one of #{a.map { |f| f.expected_string.inspect }.uniq.join(', ')}"
-        ),
-        "at column #{parser.failure_column}", # we are ingnoring failure_line
-        parser_failure_input_excerpt
-       ].join(' ')
-       error(_msg)
+      res = nil
+      begin
+        # parser.failure_reason, parser.failure_line, parser.failure_column
+        failures = parser.terminal_failures
+        failures.empty? and break
+        a = ['Expected']
+        aa = failures.map(& :expected_string).uniq
+        a << (or_ aa.map(& :inspect))
+        a << "at column #{ parser.failure_column }"
+        a << parser_failure_input_excerpt # we are ingnoring failure_line
+        msg = a.join ' '
+        res = error msg
+      end while nil
+      res
     end
 
     def parser_failure_input_excerpt
+      res = nil
       if 0 == parser.failure_index
         md = parser.input.match( # match 'token [ space token ]'
           /\A(?<first>[^[:space:]]*(?:[[:space:]]+[^[:space:]]+)?)
              (?<rest>.+)?/x
         )
-        "at \"#{md[:first]}#{'..' if md[:rest]}\""
+        res = "at \"#{ md[:first] }#{ '..' if md[:rest] }\""
       else
-        _s = parser.input[parser.index...parser.failure_index]
+        _s = parser.input[ parser.index...parser.failure_index ]
         md = _s.match(
           /(?<rest>[[:space:]])?
            (?<last>(?:[^[:space:]]+[[:space:]]+)?[^[:space:]]*)\z/x
         )
-        "after \"#{'..' if md[:rest]}#{md[:last]}\""
+        res = "after \"#{ '..' if md[:rest] }#{ md[:last] }\""
       end
+      res
     end
   end
 end

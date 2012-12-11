@@ -3,9 +3,15 @@ module Skylab::TanMan
   class Models::Config::Controller
     include Core::SubClient::InstanceMethods # yay
 
-    def [] k # is ready? and k is string and local is the thing
-      fail 'make this first found' # #TODO
-      services.config.local[k]
+    def [] k # is ready? and k is string - result is first found
+      res = nil
+      resources.each do |resrc| # order matters here, should be local -> global
+        if resrc.key? k
+          res = resrc[k]
+          break
+        end
+      end
+      res
     end
 
     def add_remote name, url, resource_name
@@ -32,12 +38,13 @@ module Skylab::TanMan
       result
     end
 
-    def known? name, resource_name           # is ready? and name is string
+    def known? name, resource_name=:all        # is ready? and name is string
       result = nil
       if :all == resource_name
-        result = services.config.all_resource_names.detect do |n|
-          resources[ n ].key? name
+        result = resources.each.detect do |resource|
+          resource.key? name
         end
+        result = !! result # avoid temptation
       else
         result = resources[ resource_name ].key? name
       end
@@ -149,14 +156,35 @@ module Skylab::TanMan
       _sub_client_init! request_client
     end
 
-
     def resources
       resources = -> name do                   # memoize a lamba that from
         r = services.config.send name          # the outside might look like
         r                                      # a hash
       end
+
+      enumerator = -> do
+        ::Enumerator.new do |y|
+          names = services.config.all_resource_names
+          names.each do |name|
+            resource = services.config.send name
+            y << resource
+          end
+          nil
+        end
+      end
+
+      resources.define_singleton_method :each do |&block|
+        e = enumerator[ ]
+        if block
+          e.each { |x| block[ x ] }
+        else
+          e
+        end
+      end
+
       define_singleton_method( :resources ) { resources }
-      send :resources # HAHAHAH
+
+      resources
     end
   end
 end

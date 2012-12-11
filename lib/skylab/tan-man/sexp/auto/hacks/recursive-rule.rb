@@ -240,26 +240,19 @@ module Skylab::TanMan
       nil
     end
   end
+
+
   module Sexp::Auto::Hacks::RecursiveRule::SexpInstanceMethods
+
     def _append! item
       _insert_before! item, nil
     end
+
     def list?
       true
     end
-    attr_accessor :_prototype
-    def _prototypify! list_controller
-      o =
-      if list_controller
-        list_controller.class == self.class or fail("test me")
-        list_controller._prototype and fail('sanity')
-        list_controller
-      else
-        self.class.new
-      end
-      o._prototype = self
-      o.extend Sexp::Prototype::SexpInstanceMethods
-      o
-    end
+
+    attr_accessor :_prototype     # used in eponymous file
+
   end
 end

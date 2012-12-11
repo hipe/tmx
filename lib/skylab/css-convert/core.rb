@@ -73,9 +73,9 @@ module Skylab::CssConvert
       result = :error
       begin
         set! or break
-        i = resolve_instream or break
+        resolve_instream or break
         p = CssConvert::Directive::Parser.new self
-        d = p.parse_stream( i ) or break
+        d = p.parse_stream( io_adapter.instream ) or break
         if ! dump_directives d
           result = :ok
           break
@@ -84,6 +84,10 @@ module Skylab::CssConvert
         r.invoke d or break
         result = :ok
       end while false
+      if :error == result
+        emit :help, usage_line
+        emit :help, invite_line
+      end
       exit_status_for result
     end
 

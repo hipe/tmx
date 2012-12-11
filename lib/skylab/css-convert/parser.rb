@@ -3,7 +3,7 @@ require 'skylab/treetop-tools/core'
 module Skylab::CssConvert
   module Parser end
   module Parser::Extlib end
-  module Parser::Extlib::InstanceMethods
+  module Parser::Extlib::InstanceMethods # #watched for dry at [#ttt-002]
 
     def self.override; [:failure_reason] end
 

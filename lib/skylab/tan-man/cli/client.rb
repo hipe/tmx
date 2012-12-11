@@ -58,10 +58,13 @@ module Skylab::TanMan
     end.call
 
 
-    define_method :initialize do |sin=$stdin, sout=$stdout, serr=$stderr,
-                                                      &events| # patt. [#sl-114]
-      ioa = Headless::CLI::IO::Adapter::Minimal.new sin, sout, serr, pen
-      self.io_adapter = ioa
+    define_method :initialize do
+      |sin=$stdin, sout=$stdout, serr=$stderr, &events| # observe pat. [#sl-114]
+
+      # self.io_adapter = build_io_adapter sin, sout, serr, pen # after [#018]
+      self.io_adapter =
+        Headless::CLI::IO::Adapter::Minimal.new sin, sout, serr, pen
+
       if events
         fail 'do we really want this?'
         # ev[ self ]

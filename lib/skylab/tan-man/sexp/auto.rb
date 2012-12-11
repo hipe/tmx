@@ -3,6 +3,16 @@ module Skylab::TanMan
     # This module is an experiment in the automatic generation of abstract
     # syntax trees (their classes and then objects) dynamically
     # from the syntax nodes of a parse from a Treetop grammar.
+
+    class << self
+      attr_accessor :debug_stream
+      attr_accessor :do_debug
+      alias_method :debug?, :do_debug
+    end
+
+    self.debug_stream = $stderr
+    self.do_debug = true          # true until you know enough to find this line
+
   end
 
   module Sexp::Auto::Constants
@@ -265,7 +275,7 @@ module Skylab::TanMan
     singleton_class.send(:define_method, :_members) { _a }
     def normalized_string ; self[:content_text_value] end
     def normalized_string! string
-      fail('implement me') # #todo
+      fail 'implement me' # as [#053]
     end
     def unparse           ; self[:content_text_value] end
   end
@@ -611,11 +621,13 @@ module Skylab::TanMan
       prev = nil
       _children = elements.zip(_members).map do |element, member|
         tree = element2tree element, member
-        # hack alert - this ugliness is for both performance & debugability
-        if ::String === prev && prev.include?('example') and
-          (hack = Sexp::Prototype.match(prev, tree, self, member)) then
-            tree = hack.commit!
-        end
+        begin                                  # hack alert - for performance &
+          ::String === prev or break           # readability for now we do this
+          prev.include? 'example' or break     # ugliness like so
+          hack = Sexp::Prototype.match prev, tree, self, member
+          hack or break                        # the hack might create a node
+          tree = hack.commit!                  # where before there was none
+        end while nil
         prev = tree # (used as result of map block)
       end
       new(* _children)
