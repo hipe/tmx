@@ -40,6 +40,8 @@ module Skylab::CovTree
     'test'     => '*_spec.rb'
   }
 
+  o[:stop_rx] = %r{ \A \. | / \z }x            # all pathnames have such a root
+
   o[:test_basename_rx] =
     %r{ ^ (?: #{ globs.values.uniq.map { |x| glob_to_rx[ x ] }.join '|' } ) $ }x
 

@@ -45,6 +45,9 @@ module Skylab::CovTree
       on '-t', '--tree', "show a shallow tree of matched test files only." do
         param_h[:list_as] = :tree
       end
+      on '-v', '--verbose', 'verbose (debugging) output' do
+        param_h[:verbose] = true
+      end
     end
 
     def tree path=nil, opts

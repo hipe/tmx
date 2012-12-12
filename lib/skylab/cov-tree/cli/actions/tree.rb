@@ -11,7 +11,7 @@ module Skylab::CovTree
       [:code].to_set        => :red,
     }
 
-    params = ::Struct.new :list_as, :path
+    params = ::Struct.new :list_as, :path, :verbose
 
 
     define_method :invoke do |params_h|        # quintessence of headless-like
@@ -22,7 +22,7 @@ module Skylab::CovTree
       params_h.each { |k, v| p[k] = v }        # the params, turning them
       @list_as = p[:list_as]                   # into ivars or getters or w/e
       @path = p[:path]                         # and maybe defaults and
-                                               # validation whatever
+      @verbose = p[:verbose]                   # validation whatever
 
       k = CovTree::API::Actions.const_fetch normalized_name # then we build the
       o = k.new self                           # corresponding API action,
@@ -30,21 +30,25 @@ module Skylab::CovTree
 
       o.on_error { |e| error e }               # then for this particular action
                                                # we do lots of crazy
-      case list_as                             # cockameme wiring ..
+      o.on_info { |e| info e }                 # cockameme wiring ..
+
+      case list_as
       when :tree
         o.on_anchor_point do |e|
-          payload "#{ escape_path e.anchor_point.dir }/"
+          payload "#{ e.anchor_point.dir_pathname }/"
         end
         o.on_test_file do |e|
-          payload "  #{ e.test_file.relative_pathname }" # indented with '  '
+          test_file_relative_pathname =
+            e.anchor.relative_path_to e.short_pathname
+          payload "  #{ test_file_relative_pathname }" # indented with '  '
         end
 
       when :list
         o.on_test_file do |e|
-          payload "#{ escape_path e.test_file.pathname }"
-        end
-
-      end
+          full_pathname = e.anchor.sub_anchor.join e.short_pathname
+          payload "#{ full_pathname }"         # (why use escape_path? it
+        end                                    # looks fine just to use the path
+      end                                      # header that the user provided.)
 
       if list_as
         o.on_number_of_test_files do |e|
@@ -59,8 +63,8 @@ module Skylab::CovTree
       end
 
                                                # now that it is all wired,
-      res = o.invoke list_as: list_as, path: path   # we invoke it, passing
-                                               # it the appropriate params
+      res = o.invoke list_as: list_as,         # we invoke it, passing
+        path: path, verbose: verbose           # it the appropriate params
 
       if ! tree_lines.empty?
         res = render_tree_lines tree_lines
@@ -106,6 +110,8 @@ module Skylab::CovTree
       end
       true
     end
+
+    attr_reader :verbose
   end
 
 
