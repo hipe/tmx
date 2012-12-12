@@ -3,7 +3,16 @@ module Skylab::TanMan
     # This module is an experiment in the automatic generation of abstract
     # syntax trees (their classes and then objects) dynamically
     # from the syntax nodes of a parse from a Treetop grammar.
-    extend ::Skylab::MetaHell::Autoloader::Autovivifying
+
+    class << self
+      attr_accessor :debug_stream
+      attr_accessor :do_debug
+      alias_method :debug?, :do_debug
+    end
+
+    self.debug_stream = $stderr
+    self.do_debug = true          # true until you know enough to find this line
+
   end
 
   module Sexp::Auto::Constants
@@ -19,6 +28,8 @@ module Skylab::TanMan
     # this library, and possibly generated Sexp classes for use in
     # recursive calls to builder methods.
 
+    include Autoloader::Inflection::Methods # constantize
+
     def [] syntax_node # inheritable API entrypoint
       node2tree syntax_node, nil, nil # no class, no member_name
     end
@@ -27,9 +38,9 @@ module Skylab::TanMan
       if instance_methods_module
         tree_class.send :include, instance_methods_module
       end
-      im = [:Sexp, :InstanceMethods, Sexp::Auto.constantize(tree_class.rule)].
+      im = [:Sexp, :InstanceMethods, constantize(tree_class.rule)].
         reduce( tree_class.grammar.anchor_module ) do |m, x|
-        m.const_defined?(x, false) or break;
+        m.const_defined?(x, false) or break
         m.const_get(x, false)
       end
       if im
@@ -264,7 +275,7 @@ module Skylab::TanMan
     singleton_class.send(:define_method, :_members) { _a }
     def normalized_string ; self[:content_text_value] end
     def normalized_string! string
-      fail('implement me') # #todo
+      fail 'implement me' # as [#053]
     end
     def unparse           ; self[:content_text_value] end
   end
@@ -353,7 +364,7 @@ module Skylab::TanMan
   class Sexp::Auto::Inference_WithConst < Sexp::Auto::Inference
     # What can we do with a node with one extension module?
 
-    include Sexp::Inflection::InstanceMethods # symbolize, chomp_digits
+    include Sexp::Inflection::Methods # symbolize, chomp_digits
 
     def expression
       symbolize(sexp_const.to_s).intern
@@ -448,7 +459,7 @@ module Skylab::TanMan
     # There are so many inflection-heavy hacks going on that it is useful
     # to have this wrapper around extension modules.  Note we flyweight them.
 
-    include Sexp::Inflection::InstanceMethods
+    include Sexp::Inflection::Methods
 
     CACHE = ::Hash.new { |h, mod| h[mod] = new mod }
 
@@ -610,11 +621,13 @@ module Skylab::TanMan
       prev = nil
       _children = elements.zip(_members).map do |element, member|
         tree = element2tree element, member
-        # hack alert - this ugliness is for both performance & debugability
-        if ::String === prev && prev.include?('example') and
-          (hack = Sexp::Prototype.match(prev, tree, self, member)) then
-            tree = hack.commit!
-        end
+        begin                                  # hack alert - for performance &
+          ::String === prev or break           # readability for now we do this
+          prev.include? 'example' or break     # ugliness like so
+          hack = Sexp::Prototype.match prev, tree, self, member
+          hack or break                        # the hack might create a node
+          tree = hack.commit!                  # where before there was none
+        end while nil
         prev = tree # (used as result of map block)
       end
       new(* _children)

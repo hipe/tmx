@@ -14,3 +14,7 @@ RSpec::Matchers.define(:prettify_to) do |expected|
       "prettify to #{expected.inspect}"
   end
 end
+
+module Skylab::Face::TestSupport
+  Face = ::Skylab::Face
+end

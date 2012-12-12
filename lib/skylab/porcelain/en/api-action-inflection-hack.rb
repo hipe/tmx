@@ -1,3 +1,4 @@
+# cross fertilization with [#hl-018] (pure tracking number) in >= 1 other spot
 module Skylab::Porcelain
   module En::ApiActionInflectionHack
     def inflection

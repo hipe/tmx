@@ -1,27 +1,23 @@
-require_relative '../../core'
 require_relative 'test-support'
 
-Skylab::Porcelain::En::ApiActionInflectionHack # force/test autolaod (mandatory) :(
+module Skylab::Porcelain::TestSupport::En # #po-008
 
-module Skylab::Porcelain::En
-  module TestSupport
-    class MyAction
-      extend ApiActionInflectionHack
+  class MyAction
+    include CONSTANTS
+    extend En::ApiActionInflectionHack
+  end
+  module MyWidget # a noun
+    class List < MyAction # a verb
+      inflection.inflect.noun :plural
     end
-    module MyWidget # a noun
-      class List < MyAction # a verb
-        inflection.inflect.noun :plural
-      end
-      class Add < MyAction # a verb
-      end
+    class Add < MyAction # a verb
     end
   end
-end
 
-module Skylab::Porcelain::En
-  include TestSupport
 
-  describe "the class that extends #{ApiActionInflectionHack}" do
+  describe "the class that extends #{En::ApiActionInflectionHack}" do
+    extend En_TestSupport
+
     it "gets an inflection knobby" do
       [ MyAction.inflection.object_id,
         MyAction.inflection.object_id,
@@ -51,18 +47,19 @@ module Skylab::Porcelain::En
         let(:inflection) { MyWidget::Add.inflection }
         specify { should eql("adding my widget") }
       end
-      context("it's dumb to ask the base class for its inflection",
-        "but let's see what happens") do
+      context "it's dumb to ask the base class for its inflection ",
+        "but let's see what happens" do
         let(:inflection) { MyAction.inflection }
-        specify { should eql("my actioning test support") }
+         specify { should eql("my actioning en") }
       end
     end
   end
   describe "the industrious action class" do
-    extend ::Skylab::MetaHell::KlassCreator
-    let(:base_module) { Module.new }
+    extend En_TestSupport
+    incrementing_anchor_module!
+
     klass :MyAwesomeAction do
-      extend ApiActionInflectionHack
+      extend En::ApiActionInflectionHack
     end
     klass :Flugelhorn__Show, extends: :MyAwesomeAction do
       inflection.inflect.noun :plural

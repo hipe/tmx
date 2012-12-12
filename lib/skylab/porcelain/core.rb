@@ -1,7 +1,8 @@
-require_relative '../../skylab'
+require_relative '..'
+require 'skylab/meta-hell/core'
 
 module Skylab
   module Porcelain
-    extend Skylab::Autoloader
+    extend ::Skylab::MetaHell::Autoloader::Autovivifying
   end
 end

@@ -1,7 +1,6 @@
 module Skylab::TanMan
   module Sexp::Auto::Hacks
     # pure container module for holding automagic "hacks"
-    extend ::Skylab::MetaHell::Autoloader::Autovivifying
   end
 
   class Sexp::Auto::Hack < ::Struct.new(:block, :state)
@@ -51,7 +50,7 @@ module Skylab::TanMan
     #
     # We enhance the resulting tree class as follows: we include unto it
     # a module that defines a method called "_items" that presumably
-    # returns an enumerable that will yield the child trees you seek.
+    # results in an enumerable that will yield the child trees you seek.
     #
     # Also, as a possibly too #opaque added bonus, we will effectively
     # alias the above mentioned "_items" method to a business-specific name we
@@ -135,7 +134,7 @@ module Skylab::TanMan
   module Sexp::Auto::Hacks::MemberName
     # This hack simply states: If the rule component has a name that
     # ends in '_text_value', then the treeification strategy for it is simply
-    # to call 'text_value' (to return the string) of the syntax node.
+    # to call 'text_value' (to get the result string) of the syntax node.
 
   end
   module Sexp::Auto::Hacks::MemberName::Methods

@@ -1,4 +1,4 @@
-module Skylab::TanMan::Sexp::TestSupport::Grammars::Namespace6
+module Skylab::TanMan::TestSupport::Sexp::Grammars::Namespace6
   grammar DoopieFloopie06
     rule nerks
       nerk (',' nerk)* "\n"

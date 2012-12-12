@@ -1,21 +1,22 @@
-require File.expand_path('../../test-support', __FILE__)
-require 'skylab/code-molester/config/file'
+require_relative '../test-support'
 
 describe ::Skylab::CodeMolester::Config::File do
-  include ::Skylab::CodeMolester::TestSupport
-  let(:klass) { ::Skylab::CodeMolester::Config::File }
-  let(:subject) do
-    o = klass.new(path)
-    input_string and o.content = input_string
-    o
+  extend ::Skylab::CodeMolester::TestSupport
+
+  let(:klass) { CodeMolester::Config::File }
+
+  let :subject do
+    klass.new path: path,
+            string: ( input_string if input_string )
   end
-  let(:config) do
-    klass.new(
-      :path     => path,
-      :content  => content
-    )
+
+  let :config do
+    klass.new path: path,
+            string: content
   end
-  let(:path) { TMPDIR.join('whatever') }
+
+  let(:content) { }
+  let(:path) { TMPDIR.join 'whatever' }
   let(:input_string) { }
   def parses_ok
     config.invalid_reason.should eql(nil)
@@ -140,19 +141,22 @@ describe ::Skylab::CodeMolester::Config::File do
     context "if you had an invalid section name on e.g. the third line" do
       let(:input_string) { "foo=bar\n#ok\n[foo/bar]]\n# one more line" }
       it "it will report line number and context and expecting" do
-        invalid_reason.should match(%r{^expecting.+at the end of "\[foo/bar\]\]" at line 3}i)
+        invalid_reason.should match(
+          %r{^expecting.+in line 3 at the end of "\[foo/bar\]\]"}i )
       end
     end
     context "if you had something invalid at the very first character" do
       let(:input_string) { '{' }
       it "will do the same as above" do
-        invalid_reason.should eql('Expecting "#", "\n" or "[" at beginning of line at line 1')
+        invalid_reason.should eql(
+          'Expecting "#", "\n" or "[" at the beginning of line 1' )
       end
     end
     context "if you had something invalid as the very last character" do
       let(:input_string) { "\n\n# foo\n  }" }
-      it "will do the same as above"  do
-        invalid_reason.should eql('Expecting "#", "\n" or "[" at the end of "  }" at line 4')
+      it "will do the same as above" do
+        invalid_reason.should eql(
+          'Expecting "#", "\n" or "[" in line 4 at the end of "  }"' )
       end
     end
   end
@@ -191,7 +195,7 @@ describe ::Skylab::CodeMolester::Config::File do
         config['fo'].should eql(nil)
       end
     end
-    context "HOWEVER with the 'value_items' pseudoclass", {focus:true} do
+    context "HOWEVER with the 'value_items' pseudoclass" do
       let(:content) { "foo = bar\nbiff = baz\n[allo]" }
       it "you can see its keys like a hash" do
         config.value_items.keys.should eql(%w(foo biff))
@@ -238,7 +242,7 @@ describe ::Skylab::CodeMolester::Config::File do
       specify { parses_ok }
       context "when you use [] to get a section that exists" do
         let(:subject) { config['bizzo'] }
-        specify { subject.should be_kind_of(::Skylab::CodeMolester::Config::Section) }
+        specify { subject.should be_kind_of(CodeMolester::Config::Sexps::Section) }
         specify { subject.section_name.should eql('bizzo') }
         context "when you use [] to get a child value that exists" do
           it "works" do
@@ -250,15 +254,11 @@ describe ::Skylab::CodeMolester::Config::File do
     end
   end
   context "As for setting values" do
-    before(:all) do
-      TMPDIR.debug = false
-    end
-    before(:each) do
+    before :each do
       TMPDIR.prepare
     end
     context "if you start with a config file that doesn't exist" do
-      let(:path) { TMPDIR.join("my-config.conf") }
-      let(:config) { klass.new(:path => path) }
+      let(:path) { TMPDIR.join "my-config.conf" }
       def is_valid
         config.valid?.should eql(true)
         config.sexp.should be_kind_of(Array)
@@ -270,8 +270,8 @@ describe ::Skylab::CodeMolester::Config::File do
       it "It sees itself as valid, and will even show you a parse tree" do
         is_valid
       end
-      context "if you set its content explicitly with a string" do
-        let (:want_content) do
+      context "if you build the instance with a chunky string of content" do
+        let :content do
           <<-HERE.unindent
             who = hah
               boo = bah
@@ -280,9 +280,6 @@ describe ::Skylab::CodeMolester::Config::File do
             [work]
               times = funner # good times here
           HERE
-        end
-        before(:each) do
-          config.content = want_content
         end
         it "lets you access the values even tho the file hasn't been written yet" do
           config['boo'].should eql('bah')
@@ -326,4 +323,3 @@ describe ::Skylab::CodeMolester::Config::File do
     end
   end
 end # describe
-

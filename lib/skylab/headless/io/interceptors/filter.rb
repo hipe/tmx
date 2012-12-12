@@ -1,6 +1,6 @@
 module Skylab::Headless
   class IO::Interceptors::Filter <
-    ::Struct.new(:downstream, :previous_newline, :handlers)
+    ::Struct.new :downstream, :previous_newline, :handlers
 
     # intercept write-like messages intended for an ::IO, but do something
     # magical with the content. Don't forget to call flush! at the end.
@@ -60,5 +60,7 @@ module Skylab::Headless
     alias_method :<<, :write
 
   end
-  class IO::Interceptors::Filter::Handlers < ::Struct.new(:line_boundary) ; end
+
+  class IO::Interceptors::Filter::Handlers < ::Struct.new :line_boundary
+  end
 end

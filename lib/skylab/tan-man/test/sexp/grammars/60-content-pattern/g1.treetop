@@ -1,4 +1,4 @@
-module Skylab::TanMan::Sexp::TestSupport::Grammars::Namespace60
+module Skylab::TanMan::TestSupport::Sexp::Grammars::Namespace60
   grammar NerpZerp60
     rule document
       # interestingly the below custom methods won't take if we have

@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Headless::IO::Interceptors::TestSupport
   Headless = ::Skylab::Headless
-  # extend ::Skylab::TestSupport::Quickie::ModuleMethods
+  # extend ::Skylab::TestSupport::Quickie
   describe "#{::Skylab::Headless::IO::Interceptors::Filter}" do
     context "without a line boundary event handler" do
       it "leaves brittany alone" do

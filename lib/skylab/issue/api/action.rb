@@ -6,7 +6,7 @@ module Skylab::Issue
 
   class Api::Action
     extend ::Skylab::PubSub::Emitter
-    extend ::Skylab::Porcelain::AttributeDefiner
+    extend ::Skylab::Porcelain::Attribute::Definer
     extend ::Skylab::Porcelain::En::ApiActionInflectionHack
 
     meta_attribute :default

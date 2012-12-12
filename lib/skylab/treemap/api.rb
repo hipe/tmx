@@ -7,7 +7,6 @@ require 'singleton'
 module Skylab::Treemap
   Treemap = self
   extend Skylab::Autoloader
-  DelegatesTo = Skylab::Porcelain::Bleeding::DelegatesTo
 
   module API
     extend Skylab::MetaHell::Autoloader::Autovivifying

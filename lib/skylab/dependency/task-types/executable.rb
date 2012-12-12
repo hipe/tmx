@@ -1,10 +1,6 @@
-require File.expand_path('../../task', __FILE__)
-require 'stringio'
-require 'skylab/face/open2'
-
 module Skylab::Dependency
-  class TaskTypes::Executable < Task
-    include ::Skylab::Face::Open2
+  class TaskTypes::Executable < Dependency::Task
+    include Face::Open2
     attribute :executable, :required => true
 
     emits :all, :info => :all
@@ -22,4 +18,3 @@ module Skylab::Dependency
     end
   end
 end
-

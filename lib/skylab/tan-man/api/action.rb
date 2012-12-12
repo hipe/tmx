@@ -1,95 +1,71 @@
 module Skylab::TanMan
   class API::Action
-    extend Bleeding::DelegatesTo
-    extend PubSub::Emitter
-    extend Porcelain::AttributeDefiner
+    # extend Autoloader                 # recursiveness apparently o
+    extend Core::Action::ModuleMethods
 
-    include API::RuntimeExtensions
-    include AttributeReflection::InstanceMethods
-    include API::AdaptiveStyle
+    include Core::Action::InstanceMethods
 
-    meta_attribute(*MetaAttributes[:boolean, :default, :mutex_boolean_set,:pathname, :required, :regex])
-
-    emits Bleeding::EVENT_GRAPH.merge(MY_EVENT_GRAPH)
     event_class API::Event
 
-    delegates_to :class, :action_name
+    # Using call() gives us a thick layer of isolation between the outward
+    # representation and inward implementation of an action.  Outwardly,
+    # actions are represented merely as constants inside of some Module
+    # that, all we know is, these constants respond to call().  Inwardly,
+    # they might be just lambdas, or they might be something more.  This
+    # pattern may or may not stick around, and is part of [#sl-100]
+    #
+    def self.call request_client, params_h, events
+      block_given? and fail 'sanity - no blocks here!'
+      action = new request_client, events
+      result = action.set! params_h
+      if result                        # we violate the protected nature of
+        result = action.send :execute  # it only b/c we are the class!
+      end                              # it is protected for the usual reasons
+      result
+    end
 
-    def config
-      @config ||= begin
-        Models::Config::Controller.new(self)
+  public
+
+    # none
+
+  protected
+
+    define_method :initialize do |request_client, events|
+      _sub_client_init! request_client
+      events[ self ]
+
+      # We cautiouly and experimentally re-introduce the idea of "knobs"
+      # ([#016]) below. (knobs in porcelain.all ended up being a
+      # terrible idea, but here they just feel right.)
+
+      me = self
+
+
+      # Notice there is an inversion in the taxonomy - the class/module
+      # hierarchy goes TanMan::Models::<model>::<controller>
+      # but the knob call goes self.<controller plural>.<model> which
+      # seems fine.
+
+      method_missing = -> controller_const do
+        -> method do
+          k = TanMan::Models.const_fetch( method, false ). # WE LOVE YOU BOXXY
+            const_get( controller_const, false )
+          x = k.new me
+          define_singleton_method( method ) { x }
+          x
+        end
       end
+
+      o = @collections = ::Object.new
+      o.define_singleton_method :method_missing, & method_missing[ :Collection ]
+
+      o = @controllers = ::Object.new
+      o.define_singleton_method :method_missing, & method_missing[ :Controller ]
+
     end
 
-    def error msg
-      emit :error, msg
-      false
-    end
+    attr_reader :collections
 
-    def error_emitter ; self end # meta attributes compat
-
-    def initialize runtime
-      @runtime = runtime
-      on_error { |e| add_invalid_reason e }
-      on_all { |e| self.runtime.emit(e) }
-    end
-
-    def invalid_reasons?
-      invalid_reasons_count.nonzero?
-    end
-
-    def invalid_reasons_count
-      (@invalid_reasons ||= nil) ? @invalid_reasons.count : 0
-    end
-
-    def invoke
-      execute # the specific action is expected to implement this
-    end
-
-    attr_reader :runtime
-    alias_method :parent, :runtime # @todo 100
-
-    delegates_to :root_runtime, :singletons
-
-    def infostream ; runtime.infostream end
-    alias_method :stderr, :infostream # #jawbreak
-
-    delegates_to :runtime, :stdout
-
-    delegates_to :runtime, :text_styler
-
-    def skip msg
-      emit :skip, msg
-      nil
-    end
-
-    def update_attributes! h
-      c0 = invalid_reasons_count
-      h.each { |k, v| send("#{k}=", v) }
-      c0 >= invalid_reasons_count
-    end
-
-    def valid?
-      invalid_reasons? and return false
-      required_ok? # more hooking required
-      ! invalid_reasons?
-    end
-  end
-
-  class << API::Action
-
-    def action_name
-      to_s.match(/[^:]+$/)[0].gsub(/([a-z])([A-Z])/) { "#{$1}-#{$2}" }.downcase
-    end
-
-    def call runtime, request
-      o = new(runtime)
-      yield(o) if block_given?
-      runtime.set_transaction_attributes(o, request) or return false
-      o.set_defaults_if_nil!
-      o.valid? or return false
-      o.invoke
-    end
+    attr_reader :controllers
   end
 end
-

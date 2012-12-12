@@ -1,9 +1,13 @@
-module Skylab::CodeMolester
+module ::Skylab::CodeMolester
+
   module AutoSexp
+    # (this is probably deprecated for things near tan-man)
+
     def self.extended mod
       mod.auto_sexp_init
-      mod.send(:include, InstanceMethods)
+      mod.send :include, InstanceMethods # [#sl-111]
     end
+
     def auto_sexp_init # @api-private
       cache = {} # one cache per class that includes AutoSexp!
       define_method(:sexp_helper_cache) { cache }
@@ -14,18 +18,21 @@ module Skylab::CodeMolester
         elsif factory
           factory
         else
-          require File.expand_path('../sexp', __FILE__)
           factory = Sexp
         end
       end
     end
+
     def build_sexp *a
       sexp_factory_class[*a]
     end
   end
 end
 
-module Skylab::CodeMolester::AutoSexp
+
+
+module ::Skylab::CodeMolester::AutoSexp
+
   EXPAND = { 't' => :terminal, 'n' => :nonterminal, 'w' => :whitespace }
   Ele = Struct.new(:method, :type, :index, :name)
   SexpHelper = Struct.new(:nt, :eles, :methods)
@@ -37,7 +44,7 @@ module Skylab::CodeMolester::AutoSexp
     self
   end.new
 
-  UnhelpfulHelper = Object.new
+  UnhelpfulHelper = ::Object.new
 
   module InstanceMethods # @api private
     def sexp_helper
@@ -76,7 +83,7 @@ module Skylab::CodeMolester::AutoSexp
           when :nonterminal
             s[ele.index] = _sexp_reduce(el, ele.name || ele.method)
           else
-            fail("nope: #{ele}")
+            fail "nope: #{ ele }"
           end
         end
       end
@@ -85,14 +92,14 @@ module Skylab::CodeMolester::AutoSexp
     REDUCE = lambda do |sexp, node|
       if node.terminal?
         # i don't love this
-        if String === sexp.last
+        if ::String === sexp.last
           sexp.last.concat node.text_value
         else
           sexp.push(node.text_value)
         end
       elsif node.respond_to?(:sexp)
         sp = node.sexp
-        if String === sp
+        if ::String === sp
           sexp.push sp
         elsif sexp.symbol_name == sp.symbol_name
           sexp.concat sp[1..-1]
@@ -113,4 +120,3 @@ module Skylab::CodeMolester::AutoSexp
     end
   end
 end
-

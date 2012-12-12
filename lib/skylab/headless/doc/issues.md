@@ -1,3 +1,28 @@
-[#002] 2012-08-29 #open #refactor : interceptors under one roof
-[#001] 2012-08-18 #open #feature : term2html (and architecture)
+[#024]       #tracking-tag we only parse options at beginning in case we
+             have sub-actions, but maybe we could improve this for leaf nodes
+[#023]       support for exit statuses might get silly
+[#022]       #watch #pattern #tracking-tag of resolving upstream logic (dry?)
+[#021]       #feature #deferred #cli - be sure to provide a (flatten) --tree
+               option when looking at a branch help screen!
+[#020]       #convention `invoke` `execute` `run` `call` have distinct meanings
+               and consistent signatures within modalities
+[#019]       #pattern #convention iff cli action invoke is false, invite
+[#018]       #tracking-tag api action inflection
+[#017] #open API architecture - is frontier app at odds with assumptions?
+[#016] #open #low-priority dynamic uncolorize payload stream when ! tty?
+[#015] #open rename *::IO::Pen -> *::Pen, rename IO::Adapter -> IO_Adapter
+[#014]       yacc2treetop
+[#013] #open IGNORE_THIS_CONSTANT haha no
+[#012] #open redesign this with_client nonsense
+[#011] #open regrettify all tests in this subproduct
+[#010] #open refactor API support to take into acct actions & clients
+[#009]       #tracking-tag places where HL::Parameters show signs of strain
+[#008]       P::C::I_M --> SC::I_M
+[#007]       #done use of Parameter::Set#list, unify with Boxxy interface
+[#006]       #tracking-tag errors_count, settle it down eventually (rel. [#sl-116])
+[#005] #open unify concepts let sub-client trump rename parent_runtime par_clien
+[#004]       #pattern tracking the sub-client initialize() in modules thing
+[#003] #open #refactor: use en.rb in sub-client
+[#002] #open 2012-08-29 #refactor : interceptors under one roof
+[#001] #open 2012-08-18 #feature : term2html (and architecture)
 [#sl-100] 2012-06-08 #open integrate porcelain and face and bleeding et. al

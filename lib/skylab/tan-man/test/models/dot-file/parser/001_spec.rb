@@ -1,10 +1,7 @@
 require_relative 'test-support'
-require_relative '../../../sexp/auto/test-support'
-
 
 describe "#{Skylab::TanMan::Models::DotFile::Parser} 001 series" do
-  extend ::Skylab::TanMan::Sexp::Auto::TestSupport
-  extend ::Skylab::TanMan::Models::DotFile::Parser::TestSupport
+  extend ::Skylab::TanMan::TestSupport::Models::DotFile::Parser
 
   context 'parsing an empty digragph' do
     def self.it_yields_a_digraph_document_sexp(*tags)

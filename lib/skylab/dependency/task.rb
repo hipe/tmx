@@ -1,11 +1,6 @@
-require 'skylab/slake/task'
-require 'skylab/pub-sub/emitter'
-require 'skylab/face/path-tools'
-require 'skylab/porcelain/tite-color'
-
 module Skylab::Dependency
 
-  class Task < Skylab::Slake::Task
+  class Task < Slake::Task
     meta_attribute :boolean
     meta_attribute :default
     meta_attribute :from_context
@@ -15,9 +10,9 @@ module Skylab::Dependency
     attr_accessor  :context
     attr_reader :invalid_reason
 
-    extend ::Skylab::PubSub::Emitter # child classes decide what to emit
-    include ::Skylab::Face::PathTools::InstanceMethods
-    include ::Skylab::Porcelain::TiteColor
+    extend PubSub::Emitter # child classes decide what to emit
+    include Face::PathTools::InstanceMethods
+    include Porcelain::TiteColor::Methods
 
     def hi str ; stylize str, :strong, :green end
     def no str ; stylize str, :strong, :red   end
@@ -66,24 +61,23 @@ module Skylab::Dependency
       before = "#{name}_before_pathname"
       alias_method before, name
       define_method(name) do
-        if pn = send(before) and ! pn.kind_of?(Pathname)
-          instance_variable_set("@#{name}", pn = Pathname.new(pn))
+        if pn = send(before) and ! pn.kind_of?(::Pathname)
+          instance_variable_set("@#{name}", pn = ::Pathname.new(pn))
         end
         pn
       end
     end
     def _mutex_fail ks, ks2
       ks.length > ks2.length and ks2.push('("check" and or "update")')
-      ks2.map! { |e| e.kind_of?(String) ? e : "\"#{e.to_s.gsub('_', ' ')}\"" }
+      ks2.map! { |e| e.kind_of?(::String) ? e : "\"#{e.to_s.gsub('_', ' ')}\"" }
       _err "#{ks2.join(' and ')} are mutually exclusive.  Please use only one."
       false
     end
     def dry_run?            ; request[:dry_run]            end
     def optimistic_dry_run? ; request[:optimistic_dry_run] end
     def _view_tree
-      require 'skylab/face/cli/view/tree'
       raise "refactor me (below has moved)"
-      loc = Skylab::Face::Cli::View::Tree::Locus.new
+      loc = Porcelain::Tree::Locus.new
       color = ui.out.tty?
       loc.traverse(self) do |node, meta|
         ui.out.puts "#{loc.prefix(meta)}#{node.styled_name(:color => color)} (#{node.object_id.to_s(16)})"
@@ -91,4 +85,3 @@ module Skylab::Dependency
     end
   end
 end
-

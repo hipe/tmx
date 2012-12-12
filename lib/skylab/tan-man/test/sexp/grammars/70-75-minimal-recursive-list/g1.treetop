@@ -1,4 +1,4 @@
-module Skylab::TanMan::Sexp::TestSupport::Grammars::Namespace70_75
+module Skylab::TanMan::TestSupport::Sexp::Grammars::Namespace70_75
   grammar NerpZerp70_75
     rule node
       s? content:( 'f' [aeiour]+ 'p' ) separator:( s? ';' s? ) node:node?

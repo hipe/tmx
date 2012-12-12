@@ -1,7 +1,7 @@
 require_relative 'test-support'
 
 module Skylab::Headless::IO::Interceptors::TestSupport
-  extend ::Skylab::TestSupport::Quickie::ModuleMethods
+  extend ::Skylab::TestSupport::Quickie
   describe "#{::Skylab::Headless::IO::Interceptors::Tee}" do
     context "with 2 downstreams" do
       it "dispatches the message out to both" do

@@ -3,11 +3,11 @@ require_relative 'test-support'
 describe 'If you have an object "object" with a ' <<
   "#{::Skylab::Headless::Parameter} \"foo\"" do
 
-  extend ::Skylab::Headless::Parameter::TestSupport
+  extend ::Skylab::Headless::TestSupport::Parameter
 
   context 'and "foo" has the property of e.g. "enum: [:alpha, :beta]"' do
     context 'you get no readers or writers out of the box so..' do
-      defn do
+      with do
         param :color, enum: [:red, :blue]
       end
       frame do
@@ -18,7 +18,7 @@ describe 'If you have an object "object" with a ' <<
       end
     end
     context 'but if "foo" also has the property "writer: true"' do
-      defn do
+      with do
         param :color, enum: [:red, :blue], writer: true
       end
       frame do
@@ -28,10 +28,10 @@ describe 'If you have an object "object" with a ' <<
           object.send(:[], :color).should eql(:blue)
         end
         it('"object.foo = :gamma" (an invalid value) will use the host ' <<
-           'instance\'s _with_client method to emit an error message') do
+           'instance\'s with_client method to emit an error message') do # [#012]
           object.color = :orange
-          out.shift.should match(/:orange is an invalid value for .*color/i)
-          out.size.should eql(0)
+          emit_lines.shift.should match(/:orange is an invalid value for .*color/i)
+          emit_lines.length.should eql(0)
         end
       end
     end

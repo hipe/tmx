@@ -1,17 +1,14 @@
-require File.expand_path('../test-support', __FILE__)
-require File.expand_path('../../auto-sexp', __FILE__)
-require 'treetop'
-
-module Skylab::CodeMolester
-  module TestNamespace::PersonName
-    class Node < ::Treetop::Runtime::SyntaxNode
-      extend AutoSexp
-    end
-  end
-end
+require_relative 'auto-sexp/test-support'
 
 describe ::Skylab::CodeMolester::AutoSexp do
-  let(:parser_class) { Treetop.load_from_string grammar }
+
+  include ::Skylab::CodeMolester::TestSupport::CONSTANTS
+
+
+  let :parser_class do
+    CodeMolester::Services::Treetop.load_from_string grammar
+  end
+
   let(:parser) { parser_class.new }
   let(:parse_result) { parser.parse(input) }
   let(:sexp) { parse_result.sexp }
@@ -29,7 +26,8 @@ describe ::Skylab::CodeMolester::AutoSexp do
       HERE
     end
     it "(the treetop grammar parses inputs like normal)" do
-      parser.parse('mary').should be_kind_of(Treetop::Runtime::SyntaxNode)
+      parser.parse('mary').should be_kind_of(
+        CodeMolester::Services::Treetop::Runtime::SyntaxNode )
       parser.parse('joe bob').should be_nil
     end
     it "parse trees get a method called 'sexp'" do
@@ -62,8 +60,8 @@ describe ::Skylab::CodeMolester::AutoSexp do
       HERE
     end
     it "(the treetop grammar parses inputs like normal)" do
-      parser.parse('mary').should be_kind_of(Skylab::CodeMolester::TestNamespace::PersonName::Node)
-      parser.parse('joe bob').should be_kind_of(Skylab::CodeMolester::TestNamespace::PersonName::Node)
+      parser.parse('mary').should be_kind_of(CodeMolester::TestNamespace::PersonName::Node)
+      parser.parse('joe bob').should be_kind_of(CodeMolester::TestNamespace::PersonName::Node)
       parser.parse('joe bob briggs').should be_nil
     end
     context "because the grammar is more complex, stuff starts to happen magically" do
@@ -71,7 +69,7 @@ describe ::Skylab::CodeMolester::AutoSexp do
         let(:input) { "mary" }
         let(:expected) { [:person_name, [:first, "mary"], [:last, '']] }
         specify { should eql(expected) }
-        specify { should be_kind_of(::Skylab::CodeMolester::Sexp) } # !
+        specify { should be_kind_of(CodeMolester::Sexp) } # !
       end
       context 'the sexp for the string "joe bob" (note it is sub-optimal)' do
         let(:input) { "joe bob" }
@@ -120,9 +118,8 @@ describe ::Skylab::CodeMolester::AutoSexp do
     end
   end
   context "When you want custom sexp classes" do
-    require File.expand_path('../../sexp', __FILE__)
-    module Skylab::CodeMolester::TestNamespace
-      class MySexp < Skylab::CodeMolester::Sexp
+    module ::Skylab::CodeMolester::TestNamespace
+      class MySexp < CodeMolester::Sexp
       end
       class Bread < MySexp
         MySexp[:top_slice] = self
@@ -132,8 +129,10 @@ describe ::Skylab::CodeMolester::AutoSexp do
         end
       end
       module Sandwich
-        class MyNode < ::Treetop::Runtime::SyntaxNode
-          extend ::Skylab::CodeMolester::AutoSexp
+        class MyNode <
+          ::Skylab::CodeMolester::Services::Treetop::Runtime::SyntaxNode
+
+          extend ::Skylab::CodeMolester::AutoSexp # 2 levels deep, nec
           sexp_factory_class MySexp
         end
       end
@@ -175,7 +174,7 @@ describe ::Skylab::CodeMolester::AutoSexp do
       let(:input) { '7 grain lettuce tomato 7 grain' }
       context "a sexp node with whose label you registered a custom class, e.g. Bread" do
         let(:subject) { sexp.detect(:top_slice).class }
-        specify { should eql(Skylab::CodeMolester::TestNamespace::Bread) }
+        specify { should eql(CodeMolester::TestNamespace::Bread) }
       end
       context 'calling the custom method ("calories") on your custom sexp class' do
         let(:subject) { sexp.detect(:top_slice).calories }
@@ -184,4 +183,3 @@ describe ::Skylab::CodeMolester::AutoSexp do
     end
   end
 end
-

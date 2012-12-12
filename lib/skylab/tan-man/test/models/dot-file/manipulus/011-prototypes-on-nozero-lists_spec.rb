@@ -1,7 +1,10 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
-describe "#{Skylab::TanMan::Models::DotFile} Prototypes w nonzero lists" do
-  extend ::Skylab::TanMan::Models::DotFile::TestSupport
+describe "#{Skylab::TanMan::Models::DotFile} (manipulus 011) #{
+  } Prototypes with nonzero lists" do
+
+  extend ::Skylab::TanMan::TestSupport::Models::DotFile::Manipulus
+
 
   using_input '011-prototype-with/zero.dot' do
     it 'can add a node to zero nodes' do

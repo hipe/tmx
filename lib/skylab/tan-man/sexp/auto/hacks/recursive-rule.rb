@@ -216,11 +216,11 @@ module Skylab::TanMan
         else
           # When "removing" the first (root) node of a list (tree), we can't
           # actually remove the node itself because it is a handle to the whole
-          # list.  The really hacky part is this: given that we want to return
-          # a node that represents what was removed, and we can't actually
+          # list.  The really hacky part is this: given that we want to result
+          # in a node that represents what was removed, and we can't actually
           # remove the first node, we swap all the properties of the first and
-          # second node (except their "next node" properties) and return what
-          # was once the second node!! ack!
+          # second node (except their "next node" properties) and result in
+          # what was once the second node!! ack!
           # This mess is kept logically separate because as the idea
           # of zero-width list stubs evolves this might become unnecessary.
           object_id == target.object_id or fail('sanity')
@@ -240,26 +240,19 @@ module Skylab::TanMan
       nil
     end
   end
+
+
   module Sexp::Auto::Hacks::RecursiveRule::SexpInstanceMethods
+
     def _append! item
       _insert_before! item, nil
     end
+
     def list?
       true
     end
-    attr_accessor :_prototype
-    def _prototypify! list_controller
-      o =
-      if list_controller
-        list_controller.class == self.class or fail("test me")
-        list_controller._prototype and fail('sanity')
-        list_controller
-      else
-        self.class.new
-      end
-      o._prototype = self
-      o.extend Sexp::Prototype::SexpInstanceMethods
-      o
-    end
+
+    attr_accessor :_prototype     # used in eponymous file
+
   end
 end

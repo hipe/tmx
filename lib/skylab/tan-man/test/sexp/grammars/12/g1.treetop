@@ -1,4 +1,4 @@
-module Skylab::TanMan::Sexp::TestSupport::Grammars::Namespace12
+module Skylab::TanMan::TestSupport::Sexp::Grammars::Namespace12
   grammar DoopieFloopie12
     rule document
       content:(head:stmt tail:(';' content:stmt)* )? "\n"

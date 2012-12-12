@@ -1,4 +1,4 @@
-module Skylab::TanMan::Sexp::TestSupport::Grammars::Namespace70
+module Skylab::TanMan::TestSupport::Sexp::Grammars::Namespace70
   grammar NerpZerp70
     rule gestalt
       stmt*
