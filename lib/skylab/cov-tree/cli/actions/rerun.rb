@@ -1,6 +1,5 @@
-require File.expand_path('../tree', __FILE__)
-
 module Skylab::CovTree
+
   class CLI::Actions::Rerun < CLI::Actions::Tree
 
     @sides = [:all, :rerun] # left one gets the "plus"
@@ -11,10 +10,5 @@ module Skylab::CovTree
       [:rerun].to_set       => :cyan
     }
 
-    def controller_class
-      require ROOT.join('api/rerun').to_s
-      Plumbing::Rerun
-    end
   end
 end
-

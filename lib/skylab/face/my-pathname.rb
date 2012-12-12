@@ -2,7 +2,7 @@ require 'pathname'
 
 module Skylab::Face
 
-  class MyPathname < ::Pathname
+  class MyPathname < ::Pathname # DEPRECATED -- GOING AWAY !! #todo
 
     include Face::PathTools::InstanceMethods
 

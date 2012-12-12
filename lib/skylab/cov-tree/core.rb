@@ -1,38 +1,55 @@
-require File.expand_path('../../../skylab', __FILE__)
+require_relative '..'
+require 'skylab/face/core'
+require 'skylab/porcelain/all' # wicked old ways
 
-require 'strscan'
+module Skylab::CovTree
 
-module Skylab
-  module CovTree
+  Autoloader   = ::Skylab::Autoloader
+  CovTree      = self
+  Face         = ::Skylab::Face
+  MetaHell     = ::Skylab::MetaHell
+  Porcelain    = ::Skylab::Porcelain
+  PubSub       = ::Skylab::PubSub
 
-    ROOT = ::Pathname.new(File.expand_path('..', __FILE__))
+  extend MetaHell::Autoloader::Autovivifying::Recursive # we use Svcs now below
 
-    TEST_DIR_NAMES = %w(test spec features)
-
-    def TEST_DIR_NAMES.string ; "[#{join '|'}]" end
-
-    GLOBS = {
-      'features' => '*.feature',
-      'spec' => '*_spec.rb',
-      'test' => '*_spec.rb'
-    }
-
-    def self.glob_to_re glob
-      scn = ::StringScanner.new(glob)
-      out = []
-      until scn.eos?
-        if scn.scan(/\*/)
-          out.push '(.*)'
-        elsif s = scn.scan(/[^\*]+/)
-          out.push "(#{::Regexp.escape(s)})"
-        else
-          fail("Unexpected rest of string (don't use '**'): #{scn.rest}")
-        end
-      end
-      out.join('')
-    end
-
-    TEST_BASENAME_RE = %r{^(?:#{GLOBS.values.uniq.map{ |x| glob_to_re(x) }.join('|')})$}
+  module Core
+    extend MetaHell::Autoloader::Autovivifying::Recursive # b/c this file req'd
   end
-end
 
+  o = { }
+
+  glob_to_rx = o[:glob_to_rx] = -> glob do # a hack
+    scn = CovTree::Services::StringScanner.new glob
+    out = []
+    until scn.eos?
+      if scn.scan(/\*/)
+        out.push '(.*)'
+      elsif s = scn.scan(/[^\*]+/)
+        out.push "(#{ ::Regexp.escape s })"
+      else
+        fail "Unexpected rest of string (don't use '**'): #{ scn.rest.inspect }"
+      end
+    end
+    out.join ''
+  end
+
+  globs = o[:globs] = {
+    'features' => '*.feature',
+    'spec'     => '*_spec.rb',
+    'test'     => '*_spec.rb'
+  }
+
+  o[:test_basename_rx] =
+    %r{ ^ (?: #{ globs.values.uniq.map { |x| glob_to_rx[ x ] }.join '|' } ) $ }x
+
+  test_dir_names = o[:test_dir_names] = %w(test spec features)
+
+  def test_dir_names.string # kinda goofy
+    "[#{ join '|' }]"
+  end
+
+  FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
+
+
+end

@@ -1,11 +1,14 @@
-require File.expand_path('../tree', __FILE__)
-
 module Skylab::CovTree
+
   class API::Actions::Rerun < API::Actions::Tree
 
-   attr_writer :rerun
+    attr_writer :rerun
 
-    def tree_to_render
+
+    fun = CovTree::FUN
+    globs = fun.globs
+
+    define_method :tree_to_render do
       rerun_ = rerun_file_paths or return false
       rerun = Node.from_paths(rerun_){ |n| n[:type] = :rerun }
       path = rerun.longest_common_base_path or begin
@@ -16,7 +19,7 @@ module Skylab::CovTree
       dir.exist? or
         return error("Sorry, expecting directory to exist: #{dir}")
 
-      glob = GLOBS[path.first] or
+      glob = globs[path.first] or
         return error("Sorry, expecting beginning of test path (#{path.first})" <<
                      " to be one of: (#{GLOB.keys.join(', ')})")
 

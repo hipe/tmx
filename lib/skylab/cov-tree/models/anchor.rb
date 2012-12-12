@@ -1,12 +1,22 @@
 module Skylab::CovTree
-  class Models::Anchor < Struct.new(:dir, :test_files)
+
+  class Models::Anchor < ::Struct.new :dir, :test_files
+
     def tree_combined
       @tree_combined ||= nil and return @tree_combined
-      t = Models::FileNode.combine(tree_of_code, tree_of_tests) { |n| n.isomorphic_slugs.last }
-        # test files isomorph to code files with their last slug
-      # t.slug_dirname = ((@_hack ||= nil) ? dir.dirname : dir.dirname.dirname).to_s
-      @tree_combined = t
+
+      # test files "isomorph" to code files with their last slug
+
+      tree = Models::FileNode.combine tree_of_code, tree_of_tests do |node|
+        node.isomorphic_slugs.last
+      end
+
+      # tree.slug_dirname = ((@_hack ||= nil) ? dir.dirname : dir.dirname.dirname).to_s # #todo WAT
+      @tree_combined = tree
     end
+
+  protected
+
     def tree_of_code
       @tree_of_code ||= nil and return @tree_of_code
       re = %r{^#{Regexp.escape dir.to_s}/}
@@ -20,6 +30,7 @@ module Skylab::CovTree
       end
       @tree_of_code = t
     end
+
     def tree_of_tests
       @tree_of_tests ||= nil and return @tree_of_tests
       _pp = test_files.map { |f| f.pathname.to_s }

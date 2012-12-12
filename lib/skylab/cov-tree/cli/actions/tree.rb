@@ -1,6 +1,5 @@
-require 'set'
-
 module Skylab::CovTree
+
   class CLI::Actions::Tree < CLI::Action
 
     @sides = [:test, :code] # order matters, left one gets the "plus"
@@ -12,70 +11,113 @@ module Skylab::CovTree
       [:code].to_set        => :red,
     }
 
-    def invoke
-      a = []
-      r = controller_class.new(list_as: list_as, path: path, stylus: self) do |o|
-        o.on_error { |e| emit(:error, e) }
-        case list_as
-        when :tree
-          o.on_anchor_point { |e| emit(:payload, "#{e.anchor_point.dir.pretty}/") }
-          o.on_test_file    { |e| emit(:payload, "  #{e.test_file.relative_pathname}") }
-        when :list
-          o.on_test_file    { |e| emit(:payload, e.test_file.pathname.pretty.to_s) }
+    params = ::Struct.new :list_as, :path
+
+
+    define_method :invoke do |params_h|        # quintessence of headless-like
+                                               # pattern (hopefully), all
+                                               # unpacked:
+
+      p = params.new                           # we validate and internalize
+      params_h.each { |k, v| p[k] = v }        # the params, turning them
+      @list_as = p[:list_as]                   # into ivars or getters or w/e
+      @path = p[:path]                         # and maybe defaults and
+                                               # validation whatever
+
+      k = CovTree::API::Actions.const_fetch normalized_name # then we build the
+      o = k.new self                           # corresponding API action,
+                                               # with self as its request_client
+
+      o.on_error { |e| error e }               # then for this particular action
+                                               # we do lots of crazy
+      case list_as                             # cockameme wiring ..
+      when :tree
+        o.on_anchor_point do |e|
+          payload "#{ escape_path e.anchor_point.dir }/"
         end
-        if list_as
-          o.on_number_of_test_files do |e|
-            emit(:info, "(#{e.number} test file#{s e.number} total)")
-          end
+        o.on_test_file do |e|
+          payload "  #{ e.test_file.relative_pathname }" # indented with '  '
         end
-        o.on_tree_line_meta { |e| a << e }
-      end.invoke
-      a.any? and return _render_tree_lines a
-      r
+
+      when :list
+        o.on_test_file do |e|
+          payload "#{ escape_path e.test_file.pathname }"
+        end
+
+      end
+
+      if list_as
+        o.on_number_of_test_files do |e|
+          info "(#{ e.number } test file#{ s e.number } total)"
+        end
+      end
+
+      tree_lines = [ ]
+
+      o.on_tree_line_meta do |e|
+        tree_lines.push e
+      end
+
+                                               # now that it is all wired,
+      res = o.invoke list_as: list_as, path: path   # we invoke it, passing
+                                               # it the appropriate params
+
+      if ! tree_lines.empty?
+        res = render_tree_lines tree_lines
+      end
+
+      res
     end
+
+  protected
+
     attr_accessor :list_as
-    def _render_tree_lines events
-      _matrix = events.map { |e| _prerender_tree_line e.payload }
-      max = _matrix.map{ |a| a.first.length }.max
-      fmt = "%-#{max}s  %s"
-      _matrix.each { |a| emit(:payload, fmt % a) }
-      true
-    end
+
     attr_accessor :path
-    def _prerender_tree_line d
+
+    def prerender_tree_line d
       n = d[:node]
-      a, b = self.class.sides.map { |s| n.types.include?(s) }
+      a, b = self.class.sides.map { |s| n.types.include? s }
       indicator = "[#{a ? '+':' '}|#{b ? '-':' '}]"
-      _use_types = n.leaf? ? n.types : [:branch]
-      color = self.class.color(_use_types) and indicator = send(color, indicator)
+      use_types = n.leaf? ? n.types : [:branch]
+      color = self.class.color use_types
+      indicator = send(color, indicator) if color
       use_slugs = if 2 > n.isomorphic_slugs.length then n.isomorphic_slugs
                   elsif 1 < n.types.length         then n.isomorphic_slugs
                   else # n.types size is zero or one, in such cases we only
-                    # want the main slug, not the isomorphic slugs (whose files don't exist)
-                    [n.slug]
+                    # want the main slug, not the isomorphic slugs
+                    [n.slug] # (whose files don't exist)
                   end
-      slug = use_slugs.join(', ')
-      if dn = n.slug_dirname
+      slug = use_slugs.join ', '
+      dn = n.slug_dirname
+      if dn
         a, b = use_slugs.length > 1 ? ['{', '}'] : ['', '']
-        slug = "#{dn}#{n.path_separator}#{a}#{slug}#{b}"
+        slug = "#{ dn }#{ n.path_separator }#{ a }#{ slug }#{ b }"
       end
-      ["#{d[:prefix]}#{slug}", indicator] # careful!  escape codes have width
+      ["#{ d[:prefix] }#{ slug }", indicator] # careful! escape codes have width
+    end
+
+    def render_tree_lines events
+      matrix = events.map { |e| prerender_tree_line e.payload }
+      max = matrix.reduce( 0 ) { |m, x| (y = x.first.length) > m ? y : m }
+      fmt = "%-#{ max }s  %s"
+      matrix.each do |a|
+        payload( fmt % a )
+      end
+      true
     end
   end
+
+
+
   class << CLI::Actions::Tree
+
     attr_reader :colors
+
     def color types
       @colors[types.to_set] # nil ok
     end
-    def factory params
-      params = params.dup
-      if params.delete(:rerun)
-        require_relative 'rerun'
-        CLI::Actions::Rerun
-      else
-        self
-      end.new params
-    end
+
     attr_reader :sides
   end
 end
