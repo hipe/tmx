@@ -1,7 +1,7 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
 
-describe "#{ ::Skylab::Face::MyPathname }#pretty" do
+describe "#{ ::Skylab::Face::PathTools }#pretty_path" do
 
   include ::Skylab::Face # constants
 
@@ -53,7 +53,15 @@ describe "#{ ::Skylab::Face::MyPathname }#pretty" do
   end
 
 
-  def self.o input, expected, *a
+  my_pathname = ::Class.new( ::Pathname )      # this is for testing and is not
+  my_pathname.class_eval do                    # recommended for an application
+    include ::Skylab::Face::PathTools::InstanceMethods # -- it is poor
+    def pretty                                 # separation of concerns to rely
+      pretty_path to_s                         # on a pathname to decide how to
+    end                                        # render itself.
+  end
+
+  define_singleton_method :o do |input, expected, *a|
 
     vp = if input == expected
       'does not change'
@@ -64,7 +72,7 @@ describe "#{ ::Skylab::Face::MyPathname }#pretty" do
 
     it "#{ input.inspect } #{ vp }", *a  do
 
-      pn = Face::MyPathname.new input
+      pn = my_pathname.new input
       pn.should prettify_to( expected )
 
     end

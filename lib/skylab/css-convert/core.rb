@@ -1,5 +1,5 @@
 require_relative '..'
-require 'skylab/face/core' # MyPathname
+require 'skylab/face/core' # `pretty_path`
 require 'skylab/headless/core'
 require 'optparse'
 
@@ -7,9 +7,9 @@ module Skylab::CssConvert
   extend ::Skylab::MetaHell::Autoloader::Autovivifying
 
   CssConvert = self
+  Face = ::Skylab::Face
   Headless = ::Skylab::Headless
   Inflection = ::Skylab::Autoloader::Inflection
-  MyPathname = ::Skylab::Face::MyPathname
 
   module Core
     # a namespace to hold modality-agnositc stuff
@@ -22,7 +22,10 @@ module Skylab::CssConvert
 
   module Core::SubClient::InstanceMethods
     include Headless::SubClient::InstanceMethods
-    # leave this here because child controllers use it (future proofing)
+
+    def escape_path x
+      request_client.escape_path x
+    end
   end
 
 
@@ -143,6 +146,8 @@ module Skylab::CssConvert
       end
       keep_going
     end
+
+    define_method :escape_path, & Face::PathTools::FUN.pretty_path
 
     def exit_status_for sym
       :ok == sym ? 0 : -1

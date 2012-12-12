@@ -1,31 +1,43 @@
 #!/usr/bin/env ruby -w
 
 require_relative '../lib/skylab'
-require 'skylab/face/core' # only for MyPathname and Tableize::I_M
-require 'skylab/headless/core' # only for require_quietly
+require 'skylab/face/core'      # `pretty_path`, Tableize::I_M
+require 'skylab/headless/core'  # only for require_quietly
 require 'optparse'
+
+
 
 module Skylab::Test
 
   Face = ::Skylab::Face
   Headless = ::Skylab::Headless
 
-  class HeadlessClient < ::Struct.new(:queue, :submodules)
-    protected
+
+  class HeadlessClient < ::Struct.new :queue, :submodules
+
+    # (nothing public declared.)
+
+  protected
+
     def initialize
       super [], []
     end
+
     def add_skip name
       (@skip ||= { })[name.intern] = true
     end
+
+    define_method :escape_path, & Face::PathTools::FUN.pretty_path
+
     def find_submodules
       list = [] ; hash = {}
       submodule_paths.each do |dirpath|
         o = Submodule.new(File.basename(dirpath).intern, dirpath)
         list[hash[o.name] = list.length] = o
-        if (testdir = o.inferred_testdir).exist?
-          a = Face::MyPathname.glob(o.inferred_testdir.join('**/*_spec.rb'))
-          unless a.empty?
+        testdir = o.inferred_testdir
+        if testdir.exist?
+          a = ::Pathname.glob o.inferred_testdir.join('**/*_spec.rb')
+          if ! a.empty?
             o.spec_subdir = testdir
             o.spec_paths = a
           end
@@ -33,8 +45,14 @@ module Skylab::Test
       end
       [list, hash]
     end
+
     def gemroot
-      @gemroot ||= Face::MyPathname.new(::File.expand_path('../..', __FILE__))
+      @gemroot ||= ::Pathname.new(::File.expand_path('../..', __FILE__))
+    end
+
+    def payload str
+      emit :payload, str
+      nil
     end
 
     attr_reader :skip
@@ -91,6 +109,7 @@ module Skylab::Test
         nil
       end
     end
+
     def submodules
       @hash ||= begin # apology
         self.submodules, hash = find_submodules
@@ -98,9 +117,11 @@ module Skylab::Test
       end
       super
     end
+
     def submodule_paths
-      Face::MyPathname.glob(gemroot.join('lib/skylab/*'))
+      ::Pathname.glob gemroot.join( 'lib/skylab/*' )
     end
+
     def write_files_list
       specs = submodules.reduce([]) do |a, submodule|
         a.concat submodule.spec_paths ; a
@@ -109,67 +130,103 @@ module Skylab::Test
         info "No specs found!"
       else
         info "These are the spec files:"
-        specs.each { |s| emit(:payload, s.pretty) }
+        specs.each do spec_pathname
+          payload escape_path( spec_pathname )
+        end
       end
     end
   end
+
+
   class Submodule < ::Struct.new :name, :pathname, :spec_subdir, :spec_paths
     def inferred_testdir
       pathname.join 'test'
     end
+
     def num_test_files
       spec_paths && spec_paths.length or 0
     end
-    protected
-    def initialize name, pathname
-      super(name, Face::MyPathname.new(pathname), nil, [])
+
+  protected
+
+    def initialize name, path
+      pn = ::Pathname.new path.to_s
+      super name, pn, nil, []
     end
   end
+
+
   module CLI_InstanceMethods
     include Face::CLI::Tableize::InstanceMethods
-    protected
+
+    # (nothing public declared.)
+
+  protected
+
     def initialize o = $stdout, e = $stderr
       super()
+      @emit = -> type, str do
+        ( :payload == type  ? o : e ).puts str
+      end
       @infostream = e
-      @emit_f = ->(type, data) { (:payload == type ? o : e).puts data }
     end
+
     def actions
       @actions ||= self.class.public_instance_methods(false) - [:invoke]
     end
-    def em s ; "\e[1;32m#{s}\e[0m" end
-    def emit type, data ; @emit_f.call(type, data) end
+
+    def em s
+      "\e[1;32m#{ s }\e[0m"
+    end
+
+    def emit type, data
+      @emit[ type, data ]
+    end
+
     def help
       info option_parser.banner
       option_parser.summarize { |s| info s }
     end
+
     def info msg
       emit :info, msg
       nil
     end
+
     attr_reader :infostream
+
     def option_parser
       @option_parser ||= build_option_parser
     end
+
     def parse_opts argv
       option_parser.parse! argv
       true
     rescue ::OptionParser::ParseError => e
       usage e
     end
-    def program_name ; @option_parser.program_name end
+
+    def program_name
+      @option_parser.program_name
+    end
+
     def usage msg
-      emit(:error, msg)
+      emit :error, msg
       info usage_line
       info "See #{em "#{program_name} -h"} for more help."
       false
     end
+
     def usage_line
       "#{ em 'Usage:' } #{ option_parser.program_name } [opts] #{
         }[[#{ actions.join '|' }] [..]] [subproduct [subproduct [..]]]"
     end
   end
+
+
   class CLI < HeadlessClient
     include CLI_InstanceMethods
+
     def invoke argv
       result = nil
       begin
@@ -202,7 +259,9 @@ module Skylab::Test
       end while nil
       result
     end
+
   public # the actions
+
     def counts
       tableize(::Enumerator.new do |y|
         total = 0
@@ -214,36 +273,42 @@ module Skylab::Test
       end) { |line| info line }
       true
     end
+
     def files
-      spec_paths.each { |p| emit(:payload, p.pretty) }
+      spec_paths.each do |spec_path|
+        payload escape_path( spec_path )
+      end
       if substring
         report_ignored
       end
       true
     end
+
     def req
       Headless::FUN.require_quietly[ 'rspec' ]
       _req
       true
     end
+
   protected
-    def initialize
-      super
-    end
+
     bad_msg = -> name, all, bad do
       "bad #{ name } name(s) - couldn't find #{ bad.join ', ' } #{
         }among (#{ all.join ', ' }).  skipping all."
     end
+
     define_method :bad_only do |all, bad|
       infostream.write bad_msg[ 'subproduct', all, bad ]
       nil
     end
     protected :bad_only
+
     define_method :bad_skip do |all, bad|
       infostream.write bad_msg[ 'skip', all, bad ]
       nil
     end
     protected :bad_skip
+
     def build_option_parser
       @option_parser = o = ::OptionParser.new
       o.banner = usage_line
@@ -270,6 +335,7 @@ module Skylab::Test
       end
       o
     end
+
     def default_action
       if :cli == run_mode
         require 'rspec/autorun'
@@ -279,11 +345,15 @@ module Skylab::Test
       end
       true
     end
+
     def default_action_name
       :default_action
     end
+
     attr_accessor :ignored_count
+
     attr_reader :only
+
     def _req
       count = 0
       if ! verbose
@@ -307,19 +377,23 @@ module Skylab::Test
       end
       nil
     end
+
     def report_ignored
       info "(ignored the #{ignored_count} files that lacked #{
         }#{substring.inspect} in the name.)"
     end
+
     def run_mode
       @run_mode ||= (
       if __FILE__ == $PROGRAM_NAME then :cli
       elsif %r{/rspec$} =~ $PROGRAM_NAME then :rspec # ick
       else :none end )
     end
+
     attr_accessor :substring
+
     attr_accessor :verbose
   end
 end
 
-::Skylab::Test::CLI.new.invoke ARGV
+Skylab::Test::CLI.new.invoke ARGV
