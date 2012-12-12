@@ -52,12 +52,6 @@ module Skylab::TanMan::TestSupport
       output.size.should eql(0)
       res
     end
-
-    def prepare_local_conf_dir
-      o = TanMan::API.local_conf_dirname
-      prepare_tanman_tmpdir.mkdir o
-    end
-
     attr_accessor :result
   end
 end

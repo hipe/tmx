@@ -164,8 +164,7 @@ module Skylab::TanMan
             }embedded in a comment: #{ reason }"
           break
         end
-        process_parse_result res               # (succeeds or raises for now)
-        result = true
+        result = process_parse_result res      # probably true or false
       end while nil
       result
     end
@@ -201,35 +200,43 @@ module Skylab::TanMan
 
     def process_parse_result syntax_node
       sexp = tree_class.element2tree syntax_node, :whatever
+      res = nil
 
       use_name = -> do                         # for now, we use either the
         str = nil                              # last name (which is a rule
         case @name_tokens.length               # name, or the penultimate
         when 1 ; str = @name_tokens[0]         # name alone, and have not
         when 2 ; str = @name_tokens[0]         # defined how to handle long
-        else   ; fail 'implement me - come up with a design for this' #names
+        else
+          info "sorry - we have not yet designed support for multi-#{
+            }word names yet - \"#{ @name_tokens.join ' ' }\""
+          res = false
         end
-        str.intern
+        str.intern if str
       end.call
 
-      if active_hub
-        active_hub.set_named_prototype! use_name, sexp
-      else
-        hub = nil
-        if curr_tree
-          curr_tree.class == sexp.class or fail 'test me'
-          curr_tree._prototype and fail 'sanity - _prototype already set!'
-          hub = curr_tree
-        elsif sexp.list?
-          hub = sexp.class.new
+      begin
+        use_name or break
+        if active_hub
+          active_hub.set_named_prototype! use_name, sexp
         else
-          fail "implement me - prototypes for non-list rules"
+          hub = nil
+          if curr_tree
+            curr_tree.class == sexp.class or fail 'test me'
+            curr_tree._prototype and fail 'sanity - _prototype already set!'
+            hub = curr_tree
+          elsif sexp.list?
+            hub = sexp.class.new
+          else
+            fail "implement me - prototypes for non-list rules"
+          end
+          hub._prototype = sexp
+          hub.extend Sexp::Prototype::Hub_InstanceMethods
+          self.active_hub = hub
         end
-        hub._prototype = sexp
-        hub.extend Sexp::Prototype::Hub_InstanceMethods
-        self.active_hub = hub
-      end
-      nil # always succeeds for now! or raises
+        res = true
+      end while nil
+      res
     end
 
 

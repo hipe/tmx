@@ -1,5 +1,4 @@
 require_relative '..'
-require 'skylab/face/core' # MyPathname
 require 'skylab/headless/core'
 
 
@@ -8,10 +7,6 @@ module Skylab::TreetopTools
 
   Headless = ::Skylab::Headless
   const_get :Grammar, false       # ick load this now so we can say 'Grammar'
-
-
-  class Pathname < ::Skylab::Face::MyPathname # future-proofed to this
-  end
 
 
   class RuntimeError < ::RuntimeError

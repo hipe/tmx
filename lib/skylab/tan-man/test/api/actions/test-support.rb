@@ -27,11 +27,7 @@ module Skylab::TanMan::TestSupport::API::Actions
       @api_last_response = api.invoke action_name, *params_h
     end
 
-    attr_reader :api_last_response
-
-    def response # careful!
-      api_last_response
-    end
+    attr_reader :api_last_response # or the shorter `response` below
 
     def from_tmpdir &b
       TanMan::TestSupport::Services::FileUtils.cd( prepared_tanman_tmpdir, & b )
@@ -49,6 +45,10 @@ module Skylab::TanMan::TestSupport::API::Actions
       r.should be_success
       r.events.length.should eql(1)
       r.events.first.message.should match(regex)
+    end
+
+    def response # careful!
+      api_last_response
     end
   end
 end

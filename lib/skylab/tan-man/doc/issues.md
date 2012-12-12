@@ -50,7 +50,7 @@
                .. so make `controllers` knob for clarity
 [#015] #open UI for dissociate (and prune nodes?)
 [#014] #open UI for associate (labeled "depends on")
-[#013] #open UI for chose example, then use example
+[#013]       #DONE UI for chose example, then use example
               1. unify & modernify autoloading
               2. fix api vis-a-vis actions to integrate with autoloading
 [#012]       #done 2012-11-01 refactor UI / NLP to use Sexp::Auto

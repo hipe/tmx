@@ -55,7 +55,19 @@ module Skylab::TanMan
 
     # ---------------- jawbreak blood end --------------------
 
-    def api_invoke params_h
+    def api_invoke *args          # [normalized acton name] [params_h]
+      if ::Hash === args.last
+        params_h = args.pop       # else nil ok for these
+      end
+      if ::Array === args.last
+        normalized_action_name = args.pop
+      else
+        normalized_action_name = self.normalized_action_name
+      end
+      if args.any?
+        raise ::ArgumentError.exception "[normalized acton name] [params_h]"
+      end
+
       services.api.invoke normalized_action_name, params_h, self, -> o do
         o.on_all { |event| emit event }
       end

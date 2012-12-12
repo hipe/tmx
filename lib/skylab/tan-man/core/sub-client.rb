@@ -30,6 +30,10 @@ module Skylab::TanMan
 
   protected
 
+    def controllers
+      request_client.send :controllers
+    end
+
     def escape_path *a
       pen.escape_path(* a)
     end

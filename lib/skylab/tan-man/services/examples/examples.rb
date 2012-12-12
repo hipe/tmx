@@ -38,7 +38,9 @@ module ::Skylab::TanMan
         a = tries.map(& :basename)
         b = box_dir_pathname.children.map(& :basename)
         msg = "not found: #{ a.join ', ' }. Known examples: (#{ b.join(', ') })"
-        result = error[ msg ]
+        e = PubSub::Event.new :error, message: msg, valid_names: b.map(&:to_s)
+        def e.to_s ; message end # ick sorry
+        result = error[ e ]
       end
       result
     end

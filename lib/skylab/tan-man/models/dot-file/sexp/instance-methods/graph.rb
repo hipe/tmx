@@ -3,8 +3,13 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
   module Graph
     include Common
 
-    def associate! source, target, opts=nil
-      o = EdgeStmt::OPTS.new ; opts and opts.each { |k, v| o[k] = v }
+    associate_events = ::Struct.new :created, :existed
+
+    define_method :associate! do |source, target, opts=nil, &block|
+      o = EdgeStmt::OPTS.new
+      opts and opts.each { |k, v| o[k] = v }
+      ev = associate_events.new
+      block and block[ ev ]
       source_node = node! source
       target_node = node! target
       source_id = source_node.node_id ; source_id_s = source_id.to_s
@@ -18,12 +23,17 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
           after = e
         end
       end
-      if found then found
+      res = nil
+      if found
+        ev[:existed] and ev[:existed][ found ]
+        res = found
       else
-        edge_stmt = _create_edge_stmt(source_node, target_node, o)
+        edge_stmt = _create_edge_stmt source_node, target_node, o
         stmt_list._insert_before! edge_stmt, after
-        edge_stmt
+        ev[:created] and ev[:created][ edge_stmt ]
+        res = edge_stmt
       end
+      res
     end
 
     def _create_edge_stmt source_node, target_node, o

@@ -10,10 +10,6 @@ module Skylab::TreetopTools
       Parameter # has extra nonsense for dirs [#hl-009] HL::P strain?
     end
 
-    def self.pathname_class                    # [#sl-119] one day DSL
-      Pathname # sub-product-wide we use our local version
-    end
-
     param :enhance_parser_with, dsl: :list
 
     param :force_overwrite, boolean: true

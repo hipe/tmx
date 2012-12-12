@@ -118,10 +118,12 @@ module Skylab::TanMan
       # nor that they are without syntax errors
       @global = TanMan::Models::Config::Resource::Global.new(
         entity_noun_stem: "global config file",
+        normalized_resource_name: :global,
         path:  API.global_conf_path.call
       )
       @local = TanMan::Models::Config::Resource::Local.new(
         entity_noun_stem: "local config file",
+        normalized_resource_name: :local,
         path: nil
       )
     end

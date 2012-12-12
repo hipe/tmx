@@ -11,18 +11,18 @@ module Skylab::TanMan
   protected
 
     def execute
-      result = nil
+      res = nil
       begin
         controllers.config.ready? or break
-        sanitized = services.examples.normalize self.name,
-          -> e { error e }
-        if ! sanitized
-          result = sanitized
+        pathname = services.examples.normalize self.name, -> e { error e }
+        if ! pathname
+          res = pathname
           break
         end
-        result = controllers.config.set_value :example, sanitized, resource_name
+        res = controllers.config.set_value :example,
+          pathname.to_s, resource_name
       end while nil
-      result
+      res
     end
   end
 end

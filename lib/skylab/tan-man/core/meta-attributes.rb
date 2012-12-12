@@ -47,7 +47,7 @@ module Skylab::TanMan
     meta_attribute :pathname do |name, _|
       alias_method(after = "#{name}_after_pathname=", "#{name}=")
       define_method("#{name}=") do |path|
-        send(after, path ? ::Skylab::Face::MyPathname.new(path.to_s) : path)
+        send(after, path ? ::Pathname.new(path.to_s) : path)
         path
       end
     end

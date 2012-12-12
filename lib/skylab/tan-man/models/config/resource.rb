@@ -8,6 +8,8 @@ module Skylab::TanMan
       super                       # we have have these "resources" be long-
     end                           # running.  We will taste the pain.
 
+    attr_reader :normalized_resource_name
+
     def remotes
       @remotes ||= begin
         TanMan::Models::Remote::Collection.new self
@@ -17,6 +19,7 @@ module Skylab::TanMan
   protected
 
     def initialize param_h
+      @normalized_resource_name = param_h.delete :normalized_resource_name
       @remotes = nil
       super param_h
     end

@@ -171,18 +171,15 @@ module Skylab::TanMan
   end
 
 
-  module CLI::Actions::Graph::Example
-    extend CLI::NamespaceModuleMethods
-    desc "what graph example to use?"
-    summary { ["#{action_syntax} vleeplye"] }
-  end
-
-
-  class CLI::Actions::Graph::Example::Set < CLI::Action
-    desc "set the example graph."
+  class CLI::Actions::Graph::Example < CLI::Action
+    desc "what graph example to use? (gets or sets it)"
     option_syntax.help!
-    def invoke name
-      api_invoke name: name
+    def invoke name=nil
+      if name
+        api_invoke [:graph, :example, :set], name: name
+      else
+        api_invoke [:graph, :example, :get]
+      end
     end
   end
 end

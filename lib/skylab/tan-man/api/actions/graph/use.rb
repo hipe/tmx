@@ -16,7 +16,7 @@ module Skylab::TanMan
         controllers.config.ready? or break
         tries = [path]
         if '' == path.extname
-          tries.push path.class.new( "#{path}#{extname}" )
+          tries.push path.class.new( "#{ path }#{ extname }" )
         end
         idx = tries.length.times.detect do |x|
           tries[x].exist? && ! tries[x].directory?
@@ -60,11 +60,13 @@ module Skylab::TanMan
           error "cannot create, directory does not exist: #{ path.dirname }"
           break
         end
-        template = services.examples.fetch 'digraph.dot'
+        template = controllers.examples.use_template # with emission
+        template or break
+        t = " using template #{ template.pathname.basename }"
         content = template.call created_on: ::Time.now.utc.to_s
         bytes = nil
         path.open('w+') { |fh| bytes = fh.write content }
-        info "wrote #{ path } (#{ bytes } bytes)."
+        info "wrote #{ path }#{ t } (#{ bytes } bytes)."
         result = bytes
       end while nil
       result

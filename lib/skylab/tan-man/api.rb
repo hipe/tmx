@@ -38,8 +38,7 @@ module Skylab::TanMan
 
     attribute :local_conf_maxdepth, default: nil # meaningful (and didactic) nil
 
-    attribute :local_conf_startpath,
-                 proc: true, default: ->{ ::Skylab::Face::MyPathname.pwd }
+    attribute :local_conf_startpath, proc: true, default: ->{ ::Pathname.pwd }
 
     attr_accessor :debug          # set to $stderr, for e.g
 

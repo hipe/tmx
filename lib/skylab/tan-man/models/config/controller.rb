@@ -98,6 +98,43 @@ module Skylab::TanMan
       end
     end
 
+    value_meta = ::Struct.new :name, :value, :value_was_set,
+      :searched_resources, :found_resource_index
+
+    define_method :value_meta do |name, resource_name=:all|
+      res = nil
+      begin
+        ready? or break
+        meta = value_meta.new nil, nil, nil, []
+        name = name.to_s # convert symbols to strings or 'key?' fails!
+        meta.name = name
+        resource = nil
+        if :all == resource_name
+          resource, index = resources.each.with_index.detect do |resc,|
+            meta.searched_resources.push resc
+            resc.key? name
+          end
+          if resource
+            meta[:found_resource_index] = index
+            meta[:value_was_set] = true
+          end
+        else
+          resource = resources[ resource_name ]
+          meta.searched_resources.push resource
+          if resource.key? name
+            meta[:value_was_set] = true
+            meta[:found_resource_index] = 0
+          end
+        end
+        res = meta
+        resource or break
+        if meta[:value_was_set]
+          meta[:value] = resource[ name ]
+        end
+      end while nil
+      res
+    end
+
     def write_resource resource
       result = nil
       begin

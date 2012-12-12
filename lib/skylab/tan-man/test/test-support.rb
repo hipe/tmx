@@ -24,11 +24,11 @@ module Skylab::TanMan::TestSupport
   # this is dodgy but should be ok as long as you accept that:
   # 1) you are assuming meta-attributes work and 2) the below is universe-wide!
   # 3) the below presents holes that need to be tested manually
-  ->(o) do
+  -> o do
     o.local_conf_dirname = 'local-conf.d' # a more visible name
     o.local_conf_maxdepth = 1
-    o.local_conf_startpath = ->(){ TMPDIR }
-    o.global_conf_path = ->() { TMPDIR.join('global-conf-file') }
+    o.local_conf_startpath = -> { TMPDIR }
+    o.global_conf_path = -> { TMPDIR.join 'global-conf-file' }
   end.call TanMan::API
 
 
@@ -86,9 +86,17 @@ module Skylab::TanMan::TestSupport
 
   module Tmpdir::InstanceMethods
 
-    define_method :prepare_tanman_tmpdir, & Tmpdir::FUN.prepare
+    fun = Tmpdir::FUN
 
-    define_method :prepared_tanman_tmpdir, & Tmpdir::FUN.get
+    define_method :prepare_tanman_tmpdir do |patch=nil|
+      tmpdir = fun.prepare[ ]
+      if patch
+         tmpdir.patch patch
+      end
+      tmpdir # important
+    end
+
+    define_method :prepared_tanman_tmpdir, & fun.get
 
     def tanman_tmpdir
       TMPDIR # less screaming in tests is good
@@ -178,6 +186,12 @@ module Skylab::TanMan::TestSupport
       else
         fail('sanity - should not have neither')
       end
+    end
+
+    def prepare_local_conf_dir
+      tmpdir = prepare_tanman_tmpdir
+      tmpdir.mkdir TanMan::API.local_conf_dirname
+      tmpdir # important
     end
 
     let :result do
