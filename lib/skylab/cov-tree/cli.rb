@@ -1,19 +1,29 @@
-require File.expand_path('../api', __FILE__)
-require 'skylab/porcelain/all'
+require_relative 'core'
 
 module Skylab::CovTree
-  class CLI
-    module Actions
+
+  class CLI # (fwd decl. of a class also used as a namespace [#sl-109])
+    extend MetaHell::Autoloader::Autovivifying::Recursive
+      # (the above is necessary to state explicitly for this class
+      # only because this file gets loaded directly and not by
+      # a recursive autoloader.  But this is an exception to a rule
+      # that covers just about every other module/file in this subproduct.)
+  end
+
+
+  module CLI::Styles
+    include Porcelain::En::Methods
+    include Porcelain::TiteColor::Methods
+
+    def pre x
+      stylize x.to_s, :green
     end
   end
-  module CLI::Styles
-    include ::Skylab::Porcelain::En::Methods
-    include ::Skylab::Porcelain::TiteColor::Methods
-    def pre(s)  ; stylize(s, :green         )   end
-  end
+
+
   class CLI
-    extend ::Skylab::Porcelain
-    extend ::Skylab::PubSub::Emitter
+    extend Porcelain
+    extend PubSub::Emitter
     include CLI::Styles
 
   inactionable
@@ -28,16 +38,26 @@ module Skylab::CovTree
 
     argument_syntax '[<path>]'
 
-    option_syntax do |ctx|
-      on('-l', '--list', "show a list of matched test files only.") { ctx[:list_as] = :list }
-      on('-t', '--tree', "show a shallow tree of matched test files only.") { ctx[:list_as] = :tree }
+    option_syntax do |param_h|
+      on '-l', '--list', "show a list of matched test files only." do
+        param_h[:list_as] = :list
+      end
+      on '-t', '--tree', "show a shallow tree of matched test files only." do
+        param_h[:list_as] = :tree
+      end
+      on '-v', '--verbose', 'verbose (debugging) output' do
+        param_h[:verbose] = true
+      end
     end
 
     def tree path=nil, opts
-      ok = api.invoke_porcelain(:tree, opts.merge(emitter: self, path: path))
-      ok == false ? invite_fuck_me(:tree) : ok
+      param_h = opts.merge path: path
+      res = cli_invoke :tree, param_h
+      if false == res
+        res = invite_fuck_me :tree
+      end
+      res
     end
-
 
 
     desc "see a left-middle-right filetree diff of rerun list vs. all tests."
@@ -52,20 +72,32 @@ module Skylab::CovTree
     desc "        <rerun-file>                a cucumber-like rerun.txt file"
 
     def rerun path
-      ok = api.invoke_porcelain(:rerun, emitter: self, rerun: path)
-      ok == false ? invite_fuck_me(:rerun) : ok
+      param_h = { emitter: self, rerun: path }
+      res = cli_invoke :rerun, param_h
+      if false == ok
+        res = invite_fuck_me :rerun
+      end
+      res
     end
 
   protected
 
-    def api
-      ::Skylab::CovTree.api
+    def cli_invoke norm_name, param_h
+      k = CLI::Actions.const_fetch norm_name
+      o = k.new self
+      r = o.invoke param_h
+      r
     end
 
+
+    define_method :escape_path, & Face::PathTools::FUN.pretty_path # yay
+
+
     def invite_fuck_me token
-      help_frame.invite(help_frame.action) # @todo fuck this shit
+      help_frame.invite help_frame.action  # #todo fuck this shit
       nil
     end
+
 
     # the gui client runtime that you have, map your events to the parent events.
     def wire! my_runtime, parent
@@ -74,25 +106,6 @@ module Skylab::CovTree
         o.on_error   { |e| parent.emit(:error,   e.touch!) }
         o.on_all     { |e| parent.emit(:info,    e) unless e.touched? }
       end
-    end
-  end
-  class CLI::Action
-    include CLI::Styles
-    include ::Skylab::Autoloader::Inflection::Methods
-    def controller_class # @todo use autoloader instead (requires rearch)
-      const_stem = self.class.to_s.split('::').last
-      require ROOT.join("api/#{pathify const_stem}").to_s
-      API::Actions.const_get const_stem
-    end
-    def emit(*a)
-      @emitter.emit(*a)
-    end
-    attr_writer :emitter
-    def initialize params
-      params.each do |k, v|
-        send("#{k}=", v)
-      end
-      @emitter or fail('no emitter')
     end
   end
 end

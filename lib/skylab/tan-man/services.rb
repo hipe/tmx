@@ -2,7 +2,7 @@ module ::Skylab::TanMan
   module Services                 # 2 different experiments in one
                                   # being #watched [#mh-011]
 
-    extend TanMan::Boxxy
+    extend MetaHell::Boxxy
 
     dbg = nil #  $stderr
     fun = ::Skylab::Autoloader::Inflection::FUN

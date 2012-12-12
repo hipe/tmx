@@ -25,13 +25,13 @@ module Skylab::MyTree
     end
 
     raise = -> msg do
-      e = ::OptionParser::InvalidArgument.exception
+      e = MyTree::Services::OptionParser::InvalidArgument.exception
       e.reason = msg
       raise e
     end
 
     define_method :build_option_parser do
-      o = ::OptionParser.new
+      o = MyTree::Services::OptionParser.new
 
       o.on '-f', '--file <file>', "instead of #{ pl :path },#{
         } get tree paths from file, one per line" do |x| # 80!

@@ -1,18 +1,12 @@
-require_relative '../cli' # for now
-
-require 'skylab/headless/core'
-require 'skylab/meta-hell/core'
+require_relative '../core'
 require 'skylab/test-support/core'
+require 'skylab/headless/core' # only `unstylize`
 
 module Skylab::CovTree::TestSupport
   ::Skylab::TestSupport::Regret[ CovTree_TestSupport = self ]
 
   module CONSTANTS
     CovTree = ::Skylab::CovTree
-
-    pn = ::Skylab::TestSupport.dir_pathname.join '../cov-tree'
-    CovTree.define_singleton_method( :dir_pathname ) { pn }
-    # [#002] waiting for autoloader, after lockdown
   end
 
   module InstanceMethods
@@ -35,6 +29,11 @@ module Skylab::CovTree::TestSupport
       es
     end
 
+    def cd path, &block
+      CovTree::Face::PathTools.clear
+      CovTree::Services::FileUtils.cd path, verbose: debug?, &block
+    end
+
     let :client do
       es = ___build_emit_spy!
       CovTree::CLI.new do |rt|
@@ -52,6 +51,10 @@ module Skylab::CovTree::TestSupport
     attr_accessor :do_debug
     alias_method :debug?, :do_debug
     alias_method :debug=, :do_debug=
+
+    def debug!
+      self.do_debug = true
+    end
 
     attr_reader :emit_spy
 

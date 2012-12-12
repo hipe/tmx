@@ -2,12 +2,12 @@ require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::Boxxy
 
-  describe "#{ TanMan::Boxxy }" do
+  describe "#{ MetaHell::Boxxy }" do
     extend MetaHell::TestSupport::Boxxy
 
     context "minimal case: one item" do
       modul :Boxxy__Zeep do   # Has to be under Boxxy only b/c our containing
-        extend TanMan::Boxxy  # folder is called that, and we need
+        extend MetaHell::Boxxy  # folder is called that, and we need
         module self::Foop     # _autoloader_init to work!.  (self necessary !)
         end
       end

@@ -1,5 +1,5 @@
 module Skylab::MyTree
   module API::Actions::Tree::Metadatas
-    extend TanMan::Boxxy
+    extend MetaHell::Boxxy
   end
 end

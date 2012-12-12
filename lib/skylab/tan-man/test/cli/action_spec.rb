@@ -46,7 +46,7 @@ module Skylab::TanMan::TestSupport::CLI
 
     modul :Actions do
       @dir_path = :nope
-      extend TanMan::Boxxy
+      extend MetaHell::Boxxy
     end
 
 
