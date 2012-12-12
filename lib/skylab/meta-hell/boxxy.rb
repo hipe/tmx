@@ -1,4 +1,4 @@
-module Skylab::TanMan
+module Skylab::MetaHell
   module Boxxy
     # Boxxy turns a module into a 'smart' module that is used as a "Box"
     # that holds and retrieves other modules, giving it behavior
@@ -57,6 +57,8 @@ module Skylab::TanMan
       f[ o ]
     end
 
+    constantize = ::Skylab::Autoloader::Inflection::FUN.constantize
+
     define_method :const_fetch do |path_a, not_found=nil, invalid=not_found, &b|
       b && not_found and raise ::ArgumentError.new "can't have block + lambdas"
       result = nil ; ::Array === path_a or path_a = [path_a]
@@ -67,7 +69,7 @@ module Skylab::TanMan
             result = invalid_[ name, (invalid || b) ]
             break
           end
-          const = Inflection::FUN.constantize[ name ].intern
+          const = constantize[ name ].intern
           if /\A[A-Z][_a-zA-Z0-9]*\z/ !~ const.to_s # above is fallible
             result = invalid_[ const, (invalid || b) ]
             break
@@ -101,8 +103,7 @@ module Skylab::TanMan
     # this is SUPER #experimental OH MY GOD **SO** #experimental
     # More than #experimental, this is just a playful, jaunty little proof-
     # of-concept.
-    def each
-      constantize = Autoloader::Inflection::FUN.constantize
+    define_method :each do
       e = ::Enumerator.new do |y|    # for now we load them with "brute force"
         if ! (@boxxy_loaded ||= nil) # as opposed to the silly mocks we've
           @boxxy_loaded = true       # used before (we used to simply check if

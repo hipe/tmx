@@ -1,5 +1,5 @@
 module Skylab::MetaHell::TestSupport::Boxxy
   module Neeples
-    extend TanMan::Boxxy
+    extend MetaHell::Boxxy
   end
 end
