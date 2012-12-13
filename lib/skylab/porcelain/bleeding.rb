@@ -9,8 +9,8 @@ module Skylab::Porcelain::Bleeding
   PubSub = ::Skylab::PubSub
 
   module Styles
-    include ::Skylab::Porcelain::En::Methods
-    include ::Skylab::Porcelain::TiteColor::Methods
+    include Porcelain::En::Methods
+    include Headless::CLI::Stylize::Methods
     extend self
     def em(s)  ; stylize(s, :green         )   end
     def hdr(s) ; stylize(s, :strong, :green)   end

@@ -124,7 +124,7 @@ module Skylab::Porcelain::TestSupport
         output = []
         render_table(rows, :separator => "\t") do |o|
           o[:header].format { |s| Porcelain::Bleeding::Styles.hdr(s) }
-          o.on_row { |e| output.push Porcelain::TiteColor.unstylize(e.to_s) }
+          o.on_row { |e| output.push Headless::CLI::Stylize::FUN.unstylize[ e ]}
         end
         lengths = output.map { |s| s.match(/^[^\t]*/)[0].length }
         lengths.uniq.size.should eql(1)

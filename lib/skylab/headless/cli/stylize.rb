@@ -1,34 +1,48 @@
-module Skylab
-  module Porcelain
-    # forward-declarations so this file can be standalone if need be
-  end
-end
+module Skylab::Headless
 
-module Skylab::Porcelain::TiteColor
-  module Methods
 
-    a = [nil, :strong, * Array.new(29),
-          :red, :green, :yellow, :blue, :magenta, :cyan, :white]
+
+  module CLI::Stylize
+
+    o = { }
+
+    a = [ nil, :strong, * ::Array.new( 29 ),
+          :red, :green, :yellow, :blue, :magenta, :cyan, :white ]
 
     map = ::Hash[ * a.each_with_index.map{ |s,i| [s,i] if s }.compact.flatten ]
 
-    define_method :stylize do |str, *styles|
-      "\e[#{ styles.map{ |s| map[s] }.compact.join(';') }m#{ str }\e[0m"
+
+    o[:stylize] = -> str, *styles do
+      "\e[#{ styles.map{ |s| map[s] }.compact.join ';' }m#{ str }\e[0m"
     end
 
-    define_method :unstylize_if_stylized do |str| # usu. for testing
+    o[:unstylize_if_stylized] = -> str do # usu. for testing
       str.to_s.dup.gsub! %r{  \e  \[  \d+  (?: ; \d+ )*  m  }x, ''
     end
 
-    define_method :unstylize do |str|
-      unstylize_if_stylized str or str
+    o[:unstylize] = -> str do
+      o[:unstylize_if_stylized][ str ] || str
     end
 
-    (a.compact - [:strong]).each do |c| # pending [#013]
+    FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
+
+  end
+
+
+
+  module CLI::Stylize::Methods
+
+    fun = CLI::Stylize::FUN
+
+    define_method :unstylize_if_stylized, &fun.unstylize_if_stylized
+
+    define_method :stylize, & fun.stylize
+
+    define_method :unstylize, & fun.unstylize
+
+    (a.compact - [:strong]).each do |c| # pending [#pl-013]
       define_method( c ) { |s| stylize(s, c) }
       define_method(c.to_s.upcase) { |s| stylize(s, :strong, c) }
     end
   end
-
-  extend Methods
 end

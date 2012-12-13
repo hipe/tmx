@@ -13,7 +13,7 @@ module Skylab::CovTree
 
   module CLI::Styles
     include Porcelain::En::Methods
-    include Porcelain::TiteColor::Methods
+    include Headless::CLI::Stylize::Methods # `stylize`
 
     def pre x
       stylize x.to_s, :green

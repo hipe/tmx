@@ -7,8 +7,8 @@ module Skylab::FileMetrics
       pane_width = COLS.call || fallback[:pane_width].call
       before = rows.join(separator).length
       my_room = [ (before + separator.length)*-1 + pane_width - MARGIN, MIN_ROOM ].max
-      stylus = ::Skylab::Porcelain::TiteColor
-      stylize = ->(s) { stylus.stylize(s, :green) }
+      stylus = Headless::CLI::Stylize::FUN
+      stylize = ->(s) { stylus.stylize[s, :green] }
       lipstick = ->(ratio) { stylize['+' * (sane[ratio] * my_room).to_i] }
       ->(ratio, rowz, _) { rowz.push lipstick.call(ratio) }
     end

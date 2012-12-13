@@ -25,7 +25,7 @@ module Skylab::Porcelain::TestSupport::Bleeding
 
   class My_EmitSpy < ::Skylab::TestSupport::EmitSpy
     include CONSTANTS
-    include Porcelain::TiteColor::Methods # unstylize
+    include Headless::CLI::Stylize::Methods # unstylize
     def initialize &b
       unless block_given?
         b = ->(k, s) { [k, unstylize(s)].inspect }
@@ -134,7 +134,7 @@ module Skylab::Porcelain::TestSupport::Bleeding
     end
   end
   module InstanceMethods
-    include Porcelain::TiteColor::Methods
+    include Headless::CLI::Stylize::Methods
     include CONSTANTS
     attr_reader :base_module
     def build_action_runtime action_token

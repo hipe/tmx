@@ -12,7 +12,6 @@ require 'skylab/pub-sub/core'
 module ::Skylab::Porcelain::Table
 
   Sexp = ::Skylab::CodeMolester::Sexp
-  TiteColor = ::Skylab::Porcelain::TiteColor
 
   module Column
   end
@@ -168,7 +167,7 @@ module ::Skylab::Porcelain::Table
     end
     def see val
       val.nil? and return
-      val = TiteColor.unstylize val
+      val = Headless::CLI::Stylize::FUN.unstylize[ val ]
       val.length > max_width_seen[:full] and max_width_seen[:full] = val.length
       if Column::BLANK.match?(val)
         type_stats[:blank] += 1
