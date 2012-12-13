@@ -129,7 +129,7 @@ module Skylab::TestSupport::Quickie
     def parse_opts argv
       @tag_filter = @tag_filter_desc = nil
       ors = descs = nil
-      ::Skylab::TestSupport::Services::OptionParser.new do |o|
+      TestSupport_::Services::OptionParser.new do |o|
         o.on('-t', '--tag TAG[:VALUE]', '(tries to be like the option in rspec',
          'but only sees leaf- not branch-level tags at this time.)'
         ) do |v|
@@ -151,7 +151,7 @@ module Skylab::TestSupport::Quickie
         @tag_filter = ->(tags) { ors.detect { |l| l.call(tags) } }
       end
       true
-    rescue ::Skylab::TestSupport::Services::OptionParser::ParseError => e
+    rescue TestSupport_::Services::OptionParser::ParseError => e
       stderr.puts "#{e}\ntry #{title "ruby #{$PROGRAM_NAME} -h"} for help"
       false
     end

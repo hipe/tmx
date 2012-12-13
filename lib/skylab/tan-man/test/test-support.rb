@@ -11,6 +11,7 @@ module Skylab::TanMan::TestSupport
     Headless     = ::Skylab::Headless
     MetaHell     = ::Skylab::MetaHell
     TanMan       = ::Skylab::TanMan
+    TestSupport  = ::Skylab::TestSupport
     TMPDIR_STEM  = 'tan-man'
     TMPDIR = ::Skylab::TestSupport::Tmpdir.
       new( ::Skylab::TMPDIR_PATHNAME.join(TMPDIR_STEM).to_s )

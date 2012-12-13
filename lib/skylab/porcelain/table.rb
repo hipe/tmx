@@ -7,10 +7,12 @@
 
 require_relative 'core'
 require 'skylab/code-molester/core'
+require 'skylab/headless/core'
 require 'skylab/pub-sub/core'
 
 module ::Skylab::Porcelain::Table
 
+  Headless = ::Skylab::Headless
   Sexp = ::Skylab::CodeMolester::Sexp
 
   module Column

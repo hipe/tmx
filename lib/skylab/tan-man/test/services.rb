@@ -18,9 +18,6 @@ module Skylab::TanMan::TestSupport
 
     o :Shellwords, -> { require 'shellwords' ; ::Shellwords }
 
-    o :StringIO,  -> { require 'stringio' ; ::StringIO }
-
-
     define_singleton_method :const_missing do |const|
       if h.key? const
         const_set const, h.fetch(const).call

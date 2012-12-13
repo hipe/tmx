@@ -14,10 +14,12 @@ module Skylab::TanMan::TestSupport
 
     let :cli do
       spy = output
-      $_spy = spy
+      spy.line_filter! -> s do
+        Headless::CLI::Stylize::FUN.unstylize[ s ]
+      end
       o = TanMan::CLI.new nil, spy.for(:paystream), spy.for(:infostream)
       if do_debug
-        spy.debug!
+        spy.debug! $stderr
       end
       o.program_name = 'ferp'
       o
@@ -28,11 +30,11 @@ module Skylab::TanMan::TestSupport
       self.result = cli.invoke argv
     end
 
-    let(:output) { StreamsSpy.new }
+    let(:output) { TestSupport::StreamSpy::Group.new }
 
     def output_shift_is *assertions
-      output.empty? and fail 'there is no output in the stack'
-      subject = output.first
+      output.lines.empty? and fail 'there is no output in the stack'
+      subject = output.lines.first
       assertions.each do |assertion|
         case assertion
         when ::FalseClass ; result.should_not be_trueish
@@ -43,13 +45,13 @@ module Skylab::TanMan::TestSupport
         when ::TrueClass  ; result.should be_trueish
         else            ; fail("unrecognized assertion class: #{assertion}")
         end
-      end
-      output.shift # result in subject, and change the stack only at the end
+      end                         # result in subject, and change the stack
+      output.lines.shift          # only at the end
     end
 
     def output_shift_only_is *assertions
       res = output_shift_is(*assertions)
-      output.size.should eql(0)
+      output.lines.length.should eql(0)
       res
     end
     attr_accessor :result

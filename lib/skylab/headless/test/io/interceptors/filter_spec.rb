@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Headless::IO::Interceptors::TestSupport
   Headless = ::Skylab::Headless
-  # extend ::Skylab::TestSupport::Quickie
+  extend ::Skylab::TestSupport::Quickie
   describe "#{::Skylab::Headless::IO::Interceptors::Filter}" do
     context "without a line boundary event handler" do
       it "leaves brittany alone" do
@@ -17,9 +17,9 @@ module Skylab::Headless::IO::Interceptors::TestSupport
     context "with a line boundary event handler" do
       let(:downstream) { ::StringIO.new }
       let(:stream) do
-        Headless::IO::Interceptors::Filter.new(downstream) do |f|
-          f.on_line_boundary { f.downstream.write("Z ") }
-        end
+        f = Headless::IO::Interceptors::Filter.new downstream
+        f.line_begin = -> { f.downstream.write 'Z ' }
+        f
       end
       def self.assert input, output, *tags
         it("#{input.inspect} becomes #{output.inspect}", *tags) do

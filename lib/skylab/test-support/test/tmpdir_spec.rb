@@ -1,9 +1,14 @@
 require_relative 'test-support'
-require 'skylab/meta-hell/core' # special, we don't want this in ts/core for now
 
-module Skylab::TestSupport::TestSupport
-  extend TestSupport::Quickie # rspec-like testing w/o rspec - try loading
-                              # this file with 'ruby -w this/file.rb'
+module Skylab::TestSupport::TestSupport::Tmpdir
+
+  include ::Skylab::TestSupport::TestSupport::CONSTANTS
+
+  TestSupport = TestSupport       # #annoying
+  Tmpdir = TestSupport::Tmpdir
+
+  extend TestSupport::Quickie     # rspec-like testing w/o rspec - try loading
+                                  # this file with 'ruby -w this/file.rb'
 
   describe "#{ TestSupport::Tmpdir }" do
     extend Skylab::MetaHell::Let

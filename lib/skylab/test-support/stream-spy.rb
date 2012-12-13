@@ -1,5 +1,3 @@
-require 'skylab/headless/core'
-
 module Skylab::TestSupport
   class StreamSpy < ::Skylab::Headless::IO::Interceptors::Tee
     # A StreamSpy is a simple multiplexer that multiplexes out a subset
@@ -28,20 +26,25 @@ module Skylab::TestSupport
     # in addition to writing to the buffer that you will later check.
     #
 
+    # (omg wtf somebody somewhere is defining ::Struct::Group wtf wtf)
+    require_relative 'stream-spy/group'
+
     def self.standard
-      require 'stringio'
-      new( buffer: ::StringIO.new ).tty!
+      new( buffer: TestSupport_::Services::StringIO.new ).tty!
     end
+
     def debug! prepend=nil
-      stderr = $stderr
-      self[:debug] = if prepend
-        ::Skylab::Headless::IO::Interceptors::Filter.new(
-          stderr, line_boundary_string: prepend )
+      down_stream = $stderr
+      if prepend
+        use_stream = Headless::IO::Interceptors::Filter.new down_stream
+        use_stream.line_boundary_string = prepend
       else
-        stderr
+        use_stream = down_stream
       end
+      self[:debug] = use_stream
       self
     end
+
     def string # just a convenience macro.  :buffer listener must obv. exist
       self[:buffer].string
     end

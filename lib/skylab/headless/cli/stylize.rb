@@ -11,6 +11,7 @@ module Skylab::Headless
 
     map = ::Hash[ * a.each_with_index.map{ |s,i| [s,i] if s }.compact.flatten ]
 
+    o[:codes] = a
 
     o[:stylize] = -> str, *styles do
       "\e[#{ styles.map{ |s| map[s] }.compact.join ';' }m#{ str }\e[0m"
@@ -40,7 +41,7 @@ module Skylab::Headless
 
     define_method :unstylize, & fun.unstylize
 
-    (a.compact - [:strong]).each do |c| # pending [#pl-013]
+    (fun.codes.compact - [:strong]).each do |c| # pending [#pl-013]
       define_method( c ) { |s| stylize(s, c) }
       define_method(c.to_s.upcase) { |s| stylize(s, :strong, c) }
     end

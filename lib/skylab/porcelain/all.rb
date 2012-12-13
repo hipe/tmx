@@ -2,7 +2,6 @@ require_relative 'core'
 require 'optparse'
 require 'stringio'
 require 'strscan'
-require File.expand_path('../tite-color', __FILE__)
 require 'skylab/pub-sub/emitter'
 
 # @todo this should either be renamed "dsl" or moved into the toplevel porcelain.rb
