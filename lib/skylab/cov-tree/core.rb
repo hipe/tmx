@@ -7,10 +7,10 @@ module Skylab::CovTree
 
   Autoloader   = ::Skylab::Autoloader
   CovTree      = self
-  Face         = ::Skylab::Face
-  Headless     = ::Skylab::Headless
+  Face         = ::Skylab::Face # `pretty_path`
+  Headless     = ::Skylab::Headless # NLP::EN::Methods
   MetaHell     = ::Skylab::MetaHell
-  Porcelain    = ::Skylab::Porcelain
+  Porcelain    = ::Skylab::Porcelain # all.rb, TiteColor, Tree
   PubSub       = ::Skylab::PubSub
 
   extend MetaHell::Autoloader::Autovivifying::Recursive # we use Svcs now below

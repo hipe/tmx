@@ -55,7 +55,7 @@ module Skylab::CodeMolester
       [min_index, expected]
     end
 
-    include Porcelain::En::Methods # or_
+    include Headless::NLP::EN::Methods # or_
 
     define_method :initialize do |parser, pathname|
 

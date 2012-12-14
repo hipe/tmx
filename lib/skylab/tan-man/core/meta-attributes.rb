@@ -14,26 +14,35 @@ module Skylab::TanMan
   module Core::MetaAttributes::Default extend Porcelain::Attribute::Definer
     meta_attribute :default
   end
+
   module Core::MetaAttributes::Default::InstanceMethods
-    def set_defaults_if_nil!      # #pattern [#sl-117]
-      attribute_definer.attributes.select { |k, v| v.key?(:default) and send(k).nil? }.each do |k, h|
-        (val = h[:default]).respond_to?(:call) and ! h[:proc] and val = val.call
-        send("#{k}=", val)
+    def set_defaults_if_nil!      # #pattern [#sl-117] (prev is [#bs-010])
+      attributes = attribute_definer.attributes.select{ |k, v| v.key? :default }
+      attributes.each do |k, h|
+        if send( k ).nil?
+          val = h[:default]
+          if val.respond_to?( :call ) and ! h[:proc]
+            val = vall.call
+          end
+          send "#{ k }=", val
+        end
       end
     end
   end
 
+
+  # (the below assumes Headless::NLP::EN::Methods)
   module Core::MetaAttributes::MutexBooleanSet extend Porcelain::Attribute::Definer
     meta_attribute :mutex_boolean_set do |name, h|
       set = h[:mutex_boolean_set]
       alias_method(after = "#{name}_after_mutex_boolean_set=", "#{name}=")
       define_method("#{name}=") do |value|
-        intern = String === value ? value.intern : value # always normalize strings for now, you cannot use them
-        if set.include?(intern)
-          send(after, intern)
+        intern = ::String === value ? value.intern : value # always normalize
+        if set.include?(intern)                # strings to symbols for now,
+          send(after, intern)                  # you cannot use them
         else
-          error_emitter.error("#{name} cannot be #{value.inspect}.  It must be "<<
-            "#{Porcelain::En.oxford_comma(set.map { |o| o.to_s.inspect })}")
+          error_emitter.error( "#{ name } cannot be #{ value.inspect }. #{
+            }It must be #{ or_( set.map { |o| o.to_s.inspect } ) }" )
           value
         end
       end

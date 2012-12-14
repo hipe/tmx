@@ -7,6 +7,7 @@ module Skylab::Headless::TestSupport
   module CONSTANTS
     Headless = ::Skylab::Headless
     Headless_TestSupport = Headless_TestSupport
+    MetaHell = ::Skylab::MetaHell
   end
 
   include CONSTANTS   # necessary

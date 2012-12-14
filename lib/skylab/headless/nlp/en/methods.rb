@@ -1,15 +1,17 @@
-require 'skylab/headless/core'
+module Skylab::Headless
 
-module Skylab::Porcelain::En
-  extend ::Skylab::Autoloader
+  module NLP::EN::Methods
 
-    # this looks like it is slated for deprecation for headless [#hl-003]
+    # This travelled a long way to get here, it represents what used to be
+    # the last holdover of nlp from porcelain.  it might just be transitional
+    # until we have coverage good enought to phase-in sub-client i.m
+    # everywhere instead of this yet-another-module but we'll see, maybe
+    # it's ok as-is
 
-  module Methods
 
-    headless = ::Skylab::Headless::NLP::EN::Minitesimal::FUN
+    fun = NLP::EN::Minitesimal::FUN
 
-    define_method :oxford_comma, & headless.oxford_comma
+    define_method :oxford_comma, & fun.oxford_comma
 
     alias_method :and_, :oxford_comma
 
@@ -17,10 +19,11 @@ module Skylab::Porcelain::En
       oxford_comma a, ' or '
     end
 
-    define_method :s, & headless.s
-      # "#{s a, :no}known person#{s a} #{s a, :is} #{self.and a}".strip
+    define_method :s, & fun.s
+
+      # this is its power:
+      #
+      #   "#{s a, :no}known person#{s a} #{s a, :is} #{self.and a}".strip
 
   end
-
-  extend Methods # a.t.t.o.t.w some ppl still call En.oxford_comma as so
 end

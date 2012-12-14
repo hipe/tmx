@@ -1,10 +1,10 @@
 require_relative 'test-support'
 
-module Skylab::Porcelain::TestSupport::En # #po-008
+module Skylab::Headless::TestSupport::NLP::EN
 
   class MyAction
     include CONSTANTS
-    extend En::ApiActionInflectionHack
+    extend Headless::NLP::EN::API_Action_Inflection_Hack
   end
   module MyWidget # a noun
     class List < MyAction # a verb
@@ -15,8 +15,10 @@ module Skylab::Porcelain::TestSupport::En # #po-008
   end
 
 
-  describe "the class that extends #{En::ApiActionInflectionHack}" do
-    extend En_TestSupport
+  describe "the class that extends #{
+    }#{ Headless::NLP::EN::API_Action_Inflection_Hack }" do
+
+    extend EN_TestSupport
 
     it "gets an inflection knobby" do
       [ MyAction.inflection.object_id,
@@ -25,6 +27,9 @@ module Skylab::Porcelain::TestSupport::En # #po-008
    MyWidget::Add.inflection.object_id
       ].uniq.length.should eql(3)
     end
+
+
+
     context "that, assuming that actions are named after verbs" do
       context "infers what the verb is and lets you inflect on it" do
         context "e.g. with #{MyWidget::Add}" do
@@ -36,6 +41,8 @@ module Skylab::Porcelain::TestSupport::En # #po-008
         end
       end
     end
+
+
     context("and further assuming that the surround modules of said actions",
       "are named after nouns, and you tell it which verbs deal with single or plural nouns") do
       subject { "#{inflection.stems.verb.progressive} #{inflection.inflected.noun}" }
@@ -54,12 +61,13 @@ module Skylab::Porcelain::TestSupport::En # #po-008
       end
     end
   end
+
+
   describe "the industrious action class" do
-    extend En_TestSupport
-    incrementing_anchor_module!
+    extend EN_TestSupport
 
     klass :MyAwesomeAction do
-      extend En::ApiActionInflectionHack
+      extend Headless::NLP::EN::API_Action_Inflection_Hack
     end
     klass :Flugelhorn__Show, extends: :MyAwesomeAction do
       inflection.inflect.noun :plural
@@ -85,4 +93,3 @@ module Skylab::Porcelain::TestSupport::En # #po-008
     end
   end
 end
-

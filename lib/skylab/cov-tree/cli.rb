@@ -12,7 +12,7 @@ module Skylab::CovTree
 
 
   module CLI::Styles
-    include Porcelain::En::Methods
+    include Headless::NLP::EN::Methods
     include Headless::CLI::Stylize::Methods # `stylize`
 
     def pre x

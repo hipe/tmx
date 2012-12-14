@@ -1,4 +1,4 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
 describe "#{ Skylab::Headless::NLP::EN::Number }" do
   extend ::Skylab::Headless::TestSupport::NLP

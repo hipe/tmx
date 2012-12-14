@@ -2,7 +2,7 @@ module Skylab::Issue
 
   class Porcelain
     extend Porcelain_
-    include Porcelain_::En::Methods
+    include Headless::NLP::EN::Methods
 
     desc "Add an \"issue\" line to doc/issues.md" # used to by dynamic [#hl-025]
     desc "Lines are added to the top and are sequentially numbered."
