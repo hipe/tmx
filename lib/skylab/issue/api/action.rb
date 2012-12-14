@@ -5,7 +5,7 @@ module Skylab::Issue
     extend PubSub::Emitter
 
     extend Porcelain_::Attribute::Definer
-    extend Porcelain_::En::ApiActionInflectionHack
+    extend Headless::NLP::EN::API_Action_Inflection_Hack
 
     meta_attribute :default
     meta_attribute :required

@@ -2,7 +2,7 @@ module Skylab::Issue
 
   class Porcelain
     extend Porcelain_
-    include Porcelain_::En::Methods
+    include Headless::NLP::EN::Methods
 
     desc "Add an \"issue\" line to doc/issues.md" # used to by dynamic [#hl-025]
     desc "Lines are added to the top and are sequentially numbered."
@@ -124,7 +124,7 @@ module Skylab::Issue
       @api ||= Issue::Api::Client.new self
     end
 
-    define_method :escape_path, &Face::PathTools::FUN.pretty_path
+    define_method :escape_path, &Headless::CLI::PathTools::FUN.pretty_path
 
     def invite api_action
       full = [ program_name, * api_action.normalized_action_name ]
@@ -136,7 +136,7 @@ module Skylab::Issue
     end
 
     def invoke argv
-      Face::PathTools.clear
+      Headless::CLI::PathTools.clear
       super argv
     end
 

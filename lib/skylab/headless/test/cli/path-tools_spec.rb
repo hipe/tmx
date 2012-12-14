@@ -1,11 +1,11 @@
 require_relative 'test-support'
 
 
-module Skylab::Face::TestSupport
+module Skylab::Headless::TestSupport::CLI
 
-  describe "#{ Face::PathTools }::FUN absolute_path_hack_rx" do
+  describe "#{ Headless::CLI::PathTools }::FUN absolute_path_hack_rx" do
 
-    fun = Face::PathTools::FUN
+    fun = Headless::CLI::PathTools::FUN
 
     define_singleton_method :o do |str, capture, *tags|
       vp = if capture

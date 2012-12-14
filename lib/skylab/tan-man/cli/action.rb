@@ -88,7 +88,7 @@ module Skylab::TanMan
     # "tanman/graph/example/set"  -> "tanman graph failed to set example"
     # "tanman/internationalization/language/preference/set" -> [...]
     #
-    # this looks like [#hl-018] as seen in po
+    # this looks like [#hl-018], Headless::NLP::EN::API_Action_Inflection_Hack
 
     sentence = -> a do
       o = []

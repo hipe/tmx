@@ -1,6 +1,4 @@
-require_relative '../core'
-
-RSpec::Matchers.define(:prettify_to) do |expected|
+::RSpec::Matchers.define(:prettify_to) do |expected|
   actual = nil
   match do |_actual|
     actual = _actual.pretty.to_s
@@ -13,8 +11,4 @@ RSpec::Matchers.define(:prettify_to) do |expected|
     actual == expected ? "not change" :
       "prettify to #{expected.inspect}"
   end
-end
-
-module Skylab::Face::TestSupport
-  Face = ::Skylab::Face
 end

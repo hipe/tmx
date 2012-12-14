@@ -1,11 +1,12 @@
 require_relative '../test-support'
+require_relative 'for-rspec' # sorry
 
 
-describe "#{ ::Skylab::Face::PathTools }#pretty_path" do
+describe "#{ Skylab::Headless::CLI::PathTools }#pretty_path" do
 
-  include ::Skylab::Face # constants
+  include ::Skylab::Headless # constants
 
-  fun = self::Face::PathTools::FUN
+  fun = self::Headless::CLI::PathTools::FUN
 
   @memo = { }
 
@@ -55,7 +56,7 @@ describe "#{ ::Skylab::Face::PathTools }#pretty_path" do
 
   my_pathname = ::Class.new( ::Pathname )      # this is for testing and is not
   my_pathname.class_eval do                    # recommended for an application
-    include ::Skylab::Face::PathTools::InstanceMethods # -- it is poor
+    include ::Skylab::Headless::CLI::PathTools::InstanceMethods # -- it is poor
     def pretty                                 # separation of concerns to rely
       pretty_path to_s                         # on a pathname to decide how to
     end                                        # render itself.

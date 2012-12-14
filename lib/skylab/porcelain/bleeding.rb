@@ -1,5 +1,5 @@
 require_relative 'core'
-require 'skylab/headless/core'
+require 'skylab/headless/core' # here til  all.rb is away, Headless::NLP::EN::M.
 require 'skylab/pub-sub/core'
 require 'optparse'
 
@@ -8,11 +8,11 @@ module Skylab::Porcelain::Bleeding
 
   Headless = ::Skylab::Headless
   MetaHell = ::Skylab::MetaHell
-  Porcelain = ::Skylab::Porcelain
+  Porcelain = ::Skylab::Porcelain # #hiccup
   PubSub = ::Skylab::PubSub
 
   module Styles
-    include Porcelain::En::Methods
+    include Headless::NLP::EN::Methods
     include Headless::CLI::Stylize::Methods
     extend self
     def em(s)  ; stylize(s, :green         )   end

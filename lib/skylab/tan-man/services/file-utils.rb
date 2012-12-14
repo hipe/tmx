@@ -77,7 +77,7 @@ module Skylab::TanMan
     # (usually 'verbose'-style messages) from ::FileUtils.  Here we hook
     # into our ridiculous path sanitization and prettification logic
     #
-    rx = Face::PathTools::FUN.absolute_path_hack_rx
+    rx = Headless::CLI::PathTools::FUN.absolute_path_hack_rx
     define_method :fu_output_message do |msg|
       str = gsub_path_hack msg
       emit :info, str

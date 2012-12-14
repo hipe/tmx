@@ -1,6 +1,6 @@
 module Skylab::Dependency
   class TaskTypes::MoveTo < Dependency::Task
-    include Face::PathTools::InstanceMethods
+    include Headless::CLI::PathTools::InstanceMethods
     include Dependency::Services::FileUtils
 
     # @todo look below etc

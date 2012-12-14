@@ -1,15 +1,15 @@
-require_relative '../core'
+require_relative '../../../core'
 
-module Skylab::Face
+module Skylab::Headless
 
   # try running this from various locations, both inside and outside of
   # your home dir
 
   o = ::Object.new
 
-  o.extend Face::PathTools::InstanceMethods
+  o.extend Headless::CLI::PathTools::InstanceMethods
 
-  pwd = ::FileUtils.pwd
+  pwd = Headless::Services::FileUtils.pwd
 
   pn = ::Pathname.new pwd
 
@@ -18,6 +18,6 @@ module Skylab::Face
   puts "here is pwd              : #{ pwd }"
   puts "here is foo              : #{ foo }"
   puts "here is pretty foo:      : #{ o.pretty_path foo }"
-  puts "here is pretty foo again : #{ o.pretty_path other }"
+  puts "here is pretty foo again : #{ o.pretty_path foo }"
 
 end

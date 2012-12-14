@@ -1,7 +1,7 @@
 module Skylab::Dependency
   class Dependency::TaskTypes::ConfigureMakeMakeInstall < Dependency::Task
     include Face::Open2
-    include Face::PathTools::InstanceMethods
+    include Headless::CLI::PathTools::InstanceMethods
     include Dependency::TaskTypes::TarballTo::CONSTANTS
     attribute :configure_make_make_install
     attribute :prefix

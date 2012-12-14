@@ -1,5 +1,7 @@
 require_relative '..' # skylab.rb
 require 'skylab/code-molester/core'
+require 'skylab/face/core' # path-tools
+require 'skylab/porcelain/core' # attr definer, table
 require 'skylab/treetop-tools/core'
 
 

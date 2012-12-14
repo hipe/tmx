@@ -16,7 +16,7 @@ module Skylab::Treemap
     extend Skylab::Autoloader
     extend Skylab::PubSub::Emitter
     extend Skylab::Porcelain::Attribute::Definer
-    extend Skylab::Porcelain::En::ApiActionInflectionHack
+    extend Headless::NLP::EN::API_Action_Inflection_Hack
     extend ::Skylab::MetaHell::DelegatesTo # sic #while [#003]
 
     inflection.stems.noun = 'treemap'
