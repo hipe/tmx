@@ -4,7 +4,6 @@ module Skylab::Issue
     inflection.inflect.noun :plural
 
     attribute :identifier
-    attribute :issues_file_name, :required => true
     attribute :last
 
     emits :all,
@@ -13,39 +12,53 @@ module Skylab::Issue
       :payload => :all,
       :error_with_manifest_line => :error
 
-
-    event_class Api::MyEvent
+  protected
 
     def execute
-      params! or return
-      query = {
-        identifier: identifier,
-        last: last
-      }
-      issues = self.issues.find(query) or return issues
-      paint(issues)
+      res = nil
+      begin
+        break if ! issues # we need them we want them, we want them now
+        found = issues.find identifier: identifier, last: last
+        break( res = found ) if ! found
+        yamlizer # kick
+        res = paint found
+      end while nil
+      res
     end
 
-    FIELDS = [:identifier, :date, :message]
-
     def paint items
-      @yamlize ||= Porcelain::Yamlizer.new(FIELDS) do |o|
-        o.on_line         { |e| emit(:payload, e) }
-      end
+      info "(looking at #{ escape_path manifest_pathname })"
       items.with_count!.each do |item|
         if item.valid?
-          @yamlize[item]
+          @yamlizer[ item ]
         else
-          emit(:error_with_manifest_line, item.invalid_info)
+          h = item.invalid_info
+          emit :error_with_manifest_line, h
         end
       end
-      case (ct = items.last_count)
-      when 0 ; emit(:info, "found no issues #{items.search.adjp}")
-      when 1 ;
-      else   ; emit(:info, "found #{ct} issues #{items.search.adjp}")
+      ct = items.last_count
+      case ct
+      when 0
+        emit :info, "found no issues #{ items.search.adjp }"
+      when 1
+        # ok
+      else
+        emit :info, "found #{ ct } issues #{ items.search.adjp }"
+      end
+      nil
+    end
+
+    fields = [ :identifier, :date, :message ]
+
+    define_method :yamlizer do
+      @yamlizer ||= begin
+        ymlz = Issue::Porcelain::Yamlizer.new( fields ) do |o|
+          o.on_line do |e|
+            emit :payload, e
+          end
+        end
+        ymlz
       end
     end
   end
 end
-
-

@@ -1,73 +1,114 @@
-require 'skylab/pub-sub/emitter'
-require 'skylab/porcelain/core'
-
-
 module Skylab::Issue
 
   class Api::Action
-    extend ::Skylab::PubSub::Emitter
-    extend ::Skylab::Porcelain::Attribute::Definer
-    extend ::Skylab::Porcelain::En::ApiActionInflectionHack
+    include Issue::Core::SubClient::InstanceMethods
+    extend PubSub::Emitter
+
+    extend Porcelain_::Attribute::Definer
+    extend Porcelain_::En::ApiActionInflectionHack
 
     meta_attribute :default
     meta_attribute :required
 
-
-    attribute :issues_file_name, default: ISSUES_FILE_NAME
-
-    attr_reader :client
-
     inflection.inflect.noun :singular
 
-    def failed msg
-      emit(:error, msg) # this might change to raising
-      false
+    event_class Api::MyEvent
+
+    # --*--
+
+    def invoke param_h=nil
+      res = nil
+      begin
+        @param_h and fail 'sanity'
+        @param_h = param_h || { }
+        res = absorb_params!
+        res or break
+        res = execute
+      end while nil
+      if false == res
+        res = invite self         # an invite hook should happen at the
+      end                         # end of invoke for 2 reasons: 1) it wraps
+      res                         # execute, 2) it is hopefully at the end
     end
-    def initialize api
-      @api = api
-    end
-    def info msg
-      emit(:info, msg)
-    end
-    def invoke params=nil
-      @params = params || {}
-      execute # (maybe one day a slake- (rake-) like pattern)
-    end
-    attr_reader :invalid_reason
-    def issues
-      @issues ||= begin
-        Models::Issues.new(
-          :emitter => self,
-          :manifest => @api.issues_manifest(issues_file_name)
-        )
+
+
+    pathify = Autoloader::Inflection::FUN.pathify      # until headless BEGIN #
+    pos = Api.name.length + 2                                                 #
+
+    define_singleton_method :normalized_action_name do
+      @normalized_action_name ||= begin
+        tail = name[ pos .. -1 ]
+        o = tail.split( '::' ).map { |s| pathify[ s ].intern }
+        o
       end
     end
-    def build_event type, data
-      Api::MyEvent.new(type, data) { |o| o.inflection = self.class.inflection }
-    end
-    def params
-      Hash[* @params_keys.map{ |k| [k, send(k)] }.flatten(1) ]
-    end
-    def params!
-      self.class.attributes.tap do |attrs|
-        attrs.each { |k, m| m.key?(:default) && ! @params.key?(k) and @params[k] = m[:default] }
-        if (a = attrs.select{ |k, m| m[:required] && @params[k].nil? }.keys).any?
-          return params_invalid("missing required parameter#{'s' if a.size != 1}: #{a.join(', ')}")
-        end
-      end
-      @params_keys = @params.keys # for later reflection
-      @params.each { |k, v| send("#{k}=", v) }
-      @params = nil
-      true
-    end
-    def params_invalid rsn
-      @invalid_reason = rsn
-      false
-    end
-    def wire!
+
+    def normalized_action_name
+      self.class.normalized_action_name                                       #
+    end                                                  # until headless END #
+
+    def wire! # my body is filled with rage
       yield self
       self
     end
+
+  protected
+
+    def initialize api
+      @issues = nil
+      @param_h = nil
+      _sub_client_init! api
+    end
+
+
+    def absorb_params!
+      res = nil
+      begin
+        attrs = self.class.attributes
+        attrs.each do |k, m|
+          if m.key?( :default ) && ! @param_h.key?( k )
+            @param_h[k] = m[:default]
+          end
+        end
+        missing = attrs.select do |k, m|
+          m[:required] && @param_h[k].nil?
+        end.keys
+        if ! missing.empty?
+          error "missing required parameter#{
+            }#{ 's' if missing.length != 1 }: #{ missing.join ', ' }"
+          break( res = false )
+        end
+        @param_h.each do |k, v|
+          send "#{ k }=", v
+        end
+        @param_h = nil
+        res = true
+      end while nil
+      res
+    end
+
+    def build_event type, data # compat pub-sub
+      Issue::Api::MyEvent.new type, data do |o|
+        o.inflection = self.class.inflection
+      end
+    end
+
+    def manifest_pathname # #gigo
+      @issues.manifest.pathname
+    end
+
+    def issues
+      issues = nil
+      begin
+        break( issues = @issues ) if @issues
+        o = @request_client.find_closest_manifest -> msg do
+          error msg
+        end
+        break if ! o
+        issues = Models::Issues.new self, o
+        @issues = issues
+      end while nil
+      issues
+    end
   end
 end
-

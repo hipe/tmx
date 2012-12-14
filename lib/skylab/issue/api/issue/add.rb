@@ -2,18 +2,15 @@ module Skylab::Issue
   class Api::Issue::Add < Api::Action
 
     attribute :dry_run
-    alias_method :dry_run?, :dry_run # @todo
-    attribute :issues_file_name, required: true
     attribute :message,          :required => true
+    attribute :verbose
 
     emits :all, :error => :all, :info => :all, :payload => :all
 
-    event_class Api::MyEvent
+  protected
 
     def execute
-      params! or return
-      issues.add(message, :dry_run => dry_run?)
+      issues.add message: message, dry_run: dry_run, verbose: verbose
     end
   end
 end
-

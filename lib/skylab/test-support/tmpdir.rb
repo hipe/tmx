@@ -3,7 +3,7 @@
 module Skylab::TestSupport
 
   class Tmpdir < ::Pathname
-    include TestSupport::Services::FileUtils
+    include TestSupport_::Services::FileUtils
 
     def clear                    # sugar around `prepare` that results in self.
       prepare                    # does a `rm -rf` on the temmpdir, creates!
@@ -34,8 +34,10 @@ module Skylab::TestSupport
 
     def patch str
       result = nil
-      cd to_s do
-        TestSupport::Services::Open3.popen3 'patch -p1' do |sin, sout, serr, w|
+      cd to_s, verbose: verbose do
+        cmd_head = 'patch -p1'
+        # verbose and info( "#{ cmd_head } < -" )
+        TestSupport_::Services::Open3.popen3( cmd_head ) do |sin, sout, serr, w|
           sin.write str
           sin.close
           s = serr.read
@@ -156,7 +158,7 @@ module Skylab::TestSupport
       end
       args.empty? or raise ::ArgumentError.exception "no"
       if ! x[:path]
-        x[:path] = TestSupport::Services::Tmpdir.tmpdir
+        x[:path] = TestSupport_::Services::Tmpdir.tmpdir
       end
       @infostream = x[:infostream]
       @max_mkdirs = x[:max_mkdirs]

@@ -1,85 +1,110 @@
 module Skylab::Issue
   class Models::Issue
-    def clear!
-      @index = @invalid_reason = @line = @parsed = @state = nil
-      self
+    include Issue::Core::SubClient::InstanceMethods # #todo why?
+
+
+    def self.build_flyweight request_client, pathname
+      new request_client, pathname
     end
+
+
+    # --*--
+
     def date
-      _parsed[:rest][1,10] # @todo!
+      @tree[:rest][1,10]
     end
+
     def identifier
-      _parsed[:identifier]
+      @tree[:identifier]
     end
-    def initialize params
-      clear!
-      @state = :initial
-      @pathname = (params = params.dup).delete(:pathname)
-      params.any? and raise ArgumentError.new('bad keys')
+
+    def integer                   # used by svc to assign new number
+      @tree[:identifier].to_i     # let's break this soon - ok ?
     end
+
     def invalid_info
-      valid? and return
-      send("invalid_info_#{invalid_reason}")
+      res = nil
+      begin
+        break if valid?
+        meth = "invalid_info_#{ @normalized_invalid_reason }"
+        res = send meth
+      end while nil
+      res
     end
-    def invalid_info_issue_is_in_initial_state
-      { invalid_reason:   invalid_reason }
-    end
-    def invalid_info_line_failed_to_match_regex
-      {
-        line:              @line,
-        line_number:       line_number,
-        pathname:          pathname,
-        invalid_reason:    invalid_reason
-      }
-    end
-    def invalid_reason
-      :unparsed == @state and _parsed
-      case @state
-      when :initial ; :issue_is_in_initial_state
-      when :invalid ; @invalid_reason
-      when :parsed  ; nil
-      else          ; fail('bad state')
-      end
-    end
-    attr_reader :line # should only be used for error reporting
-    def line! line, index
+
+    attr_reader :line             # (only for error reporting)
+
+    def line! line, index         # for #flyweighting, the center of it
       clear!
       @index = index
       @line = line
-      @state = :unparsed
       self
     end
+
     def line_number
       @index + 1
     end
+
     def message
-      _parsed[:rest][12..-1] # @todo!
+      @tree[:rest][12..-1]
     end
-    REGEX = /\A\[#(?<identifier>\d+)\](?<rest>.*)\z/
-    def _parsed
-      if :unparsed == @state
-        if @parsed = REGEX.match(@line)
-          @state = :parsed
-        else
-          @state = :invalid
-          @invalid_reason = :line_failed_to_match_regex
-        end
-      end
-      @parsed
-    end
+
     attr_reader :pathname
-    attr_reader :state
-    def valid?
-      :unparsed == @state and _parsed
-      case @state
-      when :initial  ; false
-      when :invalid  ; false
-      when :parsed   ; true
-      else           ; fail('bad state')
-      end
+
+
+    rx = %r{\A  \[  \#  (?<identifier> \d+ )  \]   (?<rest>.*)   \z}x
+
+    define_method :valid? do
+      res = nil
+      begin
+        if @tree                  # valid, don't parse again
+          res = true
+          break
+        end
+        if false == @tree         # invalid, don't parse again
+          res = false
+          break
+        end
+        if ! @line                # undefined, nothing to parse
+          break
+        end
+        md = rx.match @line
+        if ! md
+          @normalized_invalid_reason = :line_failed_to_match_regex
+          break( res = @tree = false )
+        end
+        @tree = md
+        res = true
+      end while nil
+      res
     end
-  end
-  class << Models::Issue
-    alias_method :build_flyweight, :new
+
+  protected
+
+    def initialize request_client, pathname
+      clear!
+      _sub_client_init! request_client
+      @pathname = pathname
+    end
+
+    def clear!
+      _sub_client_clear!
+      @index = nil
+      @line = nil
+      @normalized_invalid_reason = nil
+      @tree = nil
+      self
+    end
+
+    def invalid_info_line_failed_to_match_regex
+      hack = @normalized_invalid_reason.to_s.gsub '_', ' '
+      {
+        invalid_reason:              hack,
+        line:                        @line,
+        line_number:                 line_number,
+        normalized_invalid_reason:   @normalized_invalid_reason,
+        pathname:                    pathname
+      }
+    end
   end
 end
-

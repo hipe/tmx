@@ -34,10 +34,10 @@ module Skylab::Headless
 
   protected
 
-    def initialize downstreams=nil
+    def initialize downstreams_h=nil
       super []
       @hash = { }
-      downstreams and downstreams.each { |k, v| self[k] = v }
+      downstreams_h and downstreams_h.each { |k, v| self[k] = v }
     end
   end
 end

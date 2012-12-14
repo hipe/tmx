@@ -27,8 +27,8 @@ module Skylab::TanMan::TestSupport::CLI
 
     def match_one str
       input 'status'
-      re = Regexp.new(/\A#{Regexp.escape str}/)
-      lines = output.map(&:string).select { |s| re =~ s }
+      re = ::Regexp.new( /\A#{ ::Regexp.escape str }/ )
+      lines = output.lines.map(&:string).select { |s| re =~ s }
       lines.size.should eql(1)
       lines.first
     end
@@ -74,8 +74,8 @@ module Skylab::TanMan::TestSupport::CLI
       end
       it 'complain that a folder was expected where a file was found' do
         input 'status'
-        output[0].string.should match(/not a directory.+local-conf\.d/)
-        output[1].string.should be_include('local conf dir not found')
+        output.lines[0].string.should match(/not a directory.+local-conf\.d/)
+        output.lines[1].string.should be_include('local conf dir not found')
       end
     end
   end

@@ -2,7 +2,6 @@ require_relative 'core'
 require 'optparse'
 require 'stringio'
 require 'strscan'
-require File.expand_path('../tite-color', __FILE__)
 require 'skylab/pub-sub/emitter'
 
 # @todo this should either be renamed "dsl" or moved into the toplevel porcelain.rb
@@ -417,10 +416,15 @@ module Skylab::Porcelain
       end
     end
     def build_parser context, option_parser = nil
-      option_parser ||= OptionParser.new.tap do |op|
+      if ! option_parser
+        op = ::OptionParser.new
         op.base.long['help'] = ::OptionParser::Switch::NoArgument.new do
           throw :option_action, ->(frame, action) { frame.client_instance.help(action) ; nil }
         end
+
+        op.banner = ''            # without this you hiccup 2 usages, the latter
+                                  # being an unstylied one from o.p
+        option_parser = op
       end
       each { |b| option_parser.instance_exec(context, &b) }
       option_parser
@@ -611,7 +615,7 @@ module Skylab::Porcelain
   end
 
   module Styles
-    include TiteColor::Methods
+    include Headless::CLI::Stylize::Methods
     extend self
     def e13b str   ; stylize str, :green          end
     def header str ; stylize str, :strong, :green end

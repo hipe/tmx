@@ -1,10 +1,10 @@
-require 'open3'
-require 'shellwords'
-
 module Skylab::Issue
-  Todo = Api::Todo # yeah, this sad problem.  or is it a pattern!?
 
-  class Todo::Report < Api::Action
+  # (below line kept for #posterity, is is the twinkle in the eye of the
+  # [#sl-123] convention)
+  # Todo = Api::Todo # yeah, this sad problem.  or is it a pattern!?
+
+  class Api::Todo::Report < Api::Action
     emits :all, error: :all, info: :all, payload: :all,
            number_found: :all
 
@@ -14,8 +14,7 @@ module Skylab::Issue
     attribute :pattern, required: true, default: '@todo\>'
 
     def execute
-      params! or return
-      enum = Todo::TodoEnumerator.new(paths, names, pattern)
+      enum = Api::Todo::TodoEnumerator.new(paths, names, pattern)
       if show_command
         emit(:payload, enum.command)
         return true
@@ -29,7 +28,7 @@ module Skylab::Issue
     end
   end
 
-  class Todo::Todo
+  class Api::Todo::Todo
     def content
       @rest.nil? and parse!
       @rest
@@ -73,7 +72,7 @@ module Skylab::Issue
     end
   end
 
-  class Todo::SystemCommand < Struct.new(:paths, :names, :pattern)
+  class Api::Todo::SystemCommand < ::Struct.new :paths, :names, :pattern
     def string
       ["find #{paths.map(&:shellescape).join(' ')} \\(",
        names.map{ |n| "-name #{n.shellescape}" }.join(' -o '),
@@ -84,16 +83,16 @@ module Skylab::Issue
     alias_method :to_s, :string
   end
 
-  class Todo::TodoEnumerator < Enumerator
+  class Api::Todo::TodoEnumerator < ::Enumerator
     attr_reader :command
-    extend Skylab::PubSub::Emitter
+    extend PubSub::Emitter
     emits :err
     def initialize paths, names, pattern
       block_given? and raise ArgumentError.new("don't pass blocks to this.")
-      @command = Todo::SystemCommand.new(paths, names, pattern)
+      @command = Api::Todo::SystemCommand.new(paths, names, pattern)
       super() do |y|
-        Open3.popen3(@command.string) do |sin, sout, serr|
-          todo = Todo::Todo.new
+        Issue::Services::Open3.popen3( @command.string ) do |sin, sout, serr|
+          todo = Api::Todo::Todo.new
           @last_count = 0
           sout.each_line do |line|
             @last_count += 1
@@ -108,4 +107,3 @@ module Skylab::Issue
     attr_reader :last_count
   end
 end
-

@@ -1,143 +1,214 @@
-require 'skylab/face/path-tools'
-require File.expand_path('../my-enumerator', __FILE__)
-
 module Skylab::Issue
   class Models::Issues::Manifest
-    include FileUtils
-    include ::Skylab::Face::PathTools::InstanceMethods
 
-    ISSUE_NUMBER_DIGITS = 3
-    VALID_DATE = /\A\d{4}-\d{2}-\d{2}\z/
-
-    def add_issue params
-      params[:date] and VALID_DATE =~ params[:date] or
-        return error("invalid date: #{params[:date].inspect}")
-      message_valid?(params[:message]) or return false
-      new_i = greatest_issue_integer + 1
-      id = "[##{"%0#{ISSUE_NUMBER_DIGITS}d" % new_i}]"
-      line = "#{id} #{params[:date]} #{params[:message]}"
-      _tmpdir or return # fail early from this
-      emit :info, "succeeded: #{line}"
-      if dry_run?
-        true
-      else
-        _add_line_to_top line
+    def build_enum issue_flyweight, error, info
+      Models::Issues::MyEnumerator.new do |y|
+        begin
+          if ! pathname?
+            error[ "manifest pathname was not resolved" ]
+            break
+          end
+          if ! pathname.exist?
+            info[ "manifeset file didn't exist - no issues." ]
+            break
+            # (if pathname is resolved (i.e. we know what it *should* be)
+            # and it doesn't exist, there are simply no issues.)
+          end
+          if ! issue_flyweight
+            issue_flyweight = Models::Issue.new nil, pathname
+          end
+          file.lines.each_with_index do |line, idx|
+            ln = issue_flyweight.line! line, idx
+              # (for now we go ahead and throw in the invalid ones too)
+            y << ln
+          end
+        end while nil
       end
     end
 
-    def _add_line_to_top line
-      unless path.exist?
-        fail("impelement me! (create file)")
-      end
-      tmpdir = _tmpdir or return false
-      tmpnew = tmpdir.join('issues.md.next')
-      tmpold = tmpdir.join('issued.md.prev')
-      if tmpnew.exist?
-        rm(tmpnew.to_s, :verbose => true)
-      end
-      File.open(tmpnew.to_s, 'w+') do |fh|
-        fh.puts line
-        # reopen the file if it was opened previous (or is open currently! careful)
-        file.clear!.lines.each { |l| fh.puts l }
-      end
-      if tmpold.exist?
-        rm(tmpold.to_s, :verbose => true)
-      end
-      mv path.to_s, tmpold.to_s, :verbose => true
-      mv tmpnew.to_s, path.to_s, :verbose => true
-      true
+
+    issue_number_digits = 3
+
+    add_struct = ::Struct.new :date, :dry_run, :error,
+                                :escape_path, :info, :message, :verbose
+
+    define_method :add_issue do |&block|
+      res = false
+      begin
+        block[ o = add_struct.new ]
+        if ! normalize_date o
+          break
+        end
+        if ! normalize_message o
+          break
+        end
+        int = greatest_issue_integer + 1
+        id = "[##{   "%0#{ issue_number_digits }d" % int   }]"
+        line = "#{ id } #{ o[:date] } #{ o[:message] }"
+        o.info[ "new line: #{ line }" ]
+        res = add_line_to_top line, o
+        break if ! res
+        o.info[ "done." ]
+      end while nil
+      res
     end
 
-    attr_accessor :dry_run
-    alias_method :dry_run?, :dry_run
+    def pathname
+      @pathname or fail 'sanity - pathname is not known. use `pathname?`'
+      @pathname
+    end
+
+    def pathname?
+      !! @pathname
+    end
+
+  protected
+
+    def initialize pathname
+      @file = nil
+      @pathname = ::Pathname.new pathname
+      @tmpdir_pathname = nil
+    end
+
+    dev_null = ::Object.new                    # hehe the sneaky hoops we jump
+    dev_null.define_singleton_method( :puts ) { |s| } # thru to get a good dry
+
+    define_method :add_line_to_top do |line, o|
+      res = false
+      begin
+        fail "implement me - create file" if ! pathname.exist?
+        fu = self.fu( o )
+        tmpdir_pathname = self.tmpdir_pathname o, fu
+        break if ! tmpdir_pathname
+        tmpold = tmpdir_pathname.join 'issued.md.prev'
+        tmpnew = tmpdir_pathname.join 'issues.md.next'
+        if tmpnew.exist?
+          fu.rm tmpnew, noop: o.dry_run
+        end
+        write = -> fh do
+          fh.puts line                         # ~ put the newline at the top ~
+          file.lines.each do |lin|             # #open-filehandle
+            fh.puts lin                        # (but tested quite well)
+          end
+        end
+        if o.dry_run
+          write[ dev_null ]                    # sneaky
+        else
+          tmpnew.open( 'w+' ) do |fh|
+            write[ fh ]
+          end
+        end
+        if tmpold.exist?
+          fu.rm tmpold, noop: o.dry_run
+        end
+        fu.mv pathname, tmpold, noop: o.dry_run
+        fu.mv tmpnew, pathname, noop: o.dry_run
+        res = true
+      end while nil
+      res
+    end
 
     def file
-      @file ||= begin
-        path.exist? or fail("Don't access file unless it exists (path_resolved?)")
-        require File.expand_path('../file', __FILE__)
-        Models::Issues::File.new(path)
+      file = nil
+      begin
+        break( file = @file ) if @file
+        @pathname or fail 'sanity'
+        file = Models::Issues::File.new @pathname
+        @file = file
+      end while nil
+      file
+    end
+
+    class FU                                   # builds a nerk that is always
+      include Issue::Services::FileUtils       # verbose, output is bound to
+      ::FileUtils.collect_method( :verbose ).each do |name|      # some func
+        define_method( name ) do |*args|
+          super( *fu_update_option( args, verbose: true ) )
+        end
       end
+    protected
+      def initialize f
+        @f = f
+      end
+      def fu_output_message msg
+        @f[ msg ]
+      end
+    end
+
+    def fu o                                   # Using a hacky regex, scan
+      rx = Face::PathTools::FUN.absolute_path_hack_rx # all messages emitted
+      fu = FU.new( -> str do                   # from the file utils client,
+        s = str.gsub( rx ) do                  # and run everything that looks
+          o.escape_path[ $~[0] ]               # like an absolute path thru
+        end                                    # the `escape_path` implemen.
+        o.info[ s ] if o.verbose               # *of the modality client*
+      end )                                    # In turn, emit this messages
+      fu                                       # as info to the same client.
     end
 
     def greatest_issue_integer
-      greatest = build_issues_flyweight.valid.reduce(-1) do |m, issue|
-        m > issue.identifier.to_i ? m : issue.identifier.to_i
+      enum = build_enum nil, nil, nil
+      enum = enum.valid
+      greatest = enum.reduce( -1 ) do |m, issue|
+        x = issue.integer
+        m > x ? m : x
       end
       greatest
     end
 
-    def emit type, msg
-      @emitter.emit(type, msg)
-    end ; protected :emit
 
-    attr_accessor :emitter # this is the single worst architecture smell to date here @todo
+    valid_date_rx = %r{ \A \d{4} - \d{2} - \d{2} \z }x
 
-    def error msg
-      emit(:error, msg) ; false
-    end ; protected :error
-
-    # for compatability with FileUtils
-    def fu_output_message msg
-      emit :info, msg
-    end
-
-    def initialize basename
-      (!basename or basename.empty?) and
-        raise ArgumentError.new("basename cannot be empty (had: #{basename.inspect}).")
-      @basename = Pathname.new(basename.to_s)
-      @basename.absolute? and
-        fail("#{self.class} for now must be build w/ relative pathnames, not #{basename}")
-      @dirname = Pathname.new('.').expand_path
-    end
-
-    def build_issues_flyweight
-      Models::Issues::MyEnumerator.new do |y|
-        if ! path_resolved?
-          # bad, there is no folder, but we do nothing for now
-        elsif path.exist?
-          flyweight = Models::Issue.build_flyweight(pathname: path)
-          file.lines.each_with_index do |line, index|
-            y << flyweight.line!(line, index) # for now we go ahead and throw in invalid ones too
-          end
-        end # note if file doesn't exist, there are simply no issues
-      end
-    end
-
-    def message_valid? message
-      /\A[[:space:]]*\z/ =~ message and return error("Message was blank.")
-      /\n/ =~ message and return error("Message cannot contain newlines.")
-      /\\n/ =~ message and return error("Message cannot contain (escaped or unescaped) newlines.")
-      true
-    end
-
-    attr_reader :path
-
-    def path_resolved?
-      loop do # careful
-        if (p = @dirname.join(@basename)).dirname.exist?
-          @path = p # this should be the only place path is set
-          return true
+    define_method :normalize_date do |o|
+      res = false
+      begin
+        if valid_date_rx !~ o[:date]
+          o.error and error[ "invalid date: #{ o[:date].inspect }" ]
+          break
         end
-        if @dirname.root?
-          return error "#{@basename.dirname.to_s.inspect} not found here or in any parent directory."
-        end
-        @dirname = @dirname.dirname
-      end
+        res = true
+      end while nil
+      res
     end
 
-    def _tmpdir
-      unless @tmpdir
-        @tmpdir = @path.dirname.dirname.join('tmp')
-        unless @tmpdir.dirname.exist?
-          return error("won't create more than one directory. " <<
-            "Parent directory of tmpdir must exist: #{pretty_path @tmpdir}")
+
+    blank_rx = /\A[[:space:]]*\z/
+    nl_rx = /\n/
+    xnl_rx = /\\n/
+
+    define_method :normalize_message do |o|
+      res = false
+      begin
+        msg = o[:message].to_s
+        err = o[:error] ? o[:error] : -> s { }
+        break( err[ "message was blank." ] ) if blank_rx =~ msg
+        break( err[ "message cannot contain newlines." ] ) if nl_rx =~ msg
+        if xnl_rx =~ msg
+          err[ "message cannot contain (escaped or unescaped) newlines." ]
+          break
         end
-        unless @tmpdir.exist?
-          mkdir(@tmpdir.to_s, :verbose => true)
+        res = true
+      end while nil
+      res
+    end
+
+    def tmpdir_pathname o, fu
+      res = false
+      begin
+        break( res = @tmpdir_pathname ) if @tmpdir_pathname
+        pn = ::Skylab::TMPDIR_PATHNAME.join 'issue-PROD' # heh
+        if ! pn.dirname.exist?
+          o.error and o.error[ "won't create more than one directory. #{
+            }Parent directory of our tmpdir (#{ pn.basename }) must exist: #{
+            }#{ escape_path pn.dirname }" ]
+          break
         end
-      end
-      @tmpdir
+        if ! pn.exist?
+          fu.mkdir( pn, noop: o.dry_run )
+        end
+        res = @tmpdir_pathname = pn
+      end while nil
+      res
     end
   end
 end
-

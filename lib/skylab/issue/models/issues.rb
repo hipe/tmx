@@ -1,74 +1,93 @@
-require 'date'
-require 'pathname'
-require 'skylab/face/path-tools'
-
 module Skylab::Issue
   class Models::Issues
-    extend ::Skylab::Autoloader
-    include ::Skylab::Face::PathTools::InstanceMethods
-    o = File.expand_path('..', __FILE__)
-    require "#{o}/issues/manifest"
+    include Issue::Core::SubClient::InstanceMethods
 
-    def add message, opts
-      _update_attributes opts
-      with_manifest do |m|
-        m.path_resolved? or return false
-        m.message_valid?(message) or return false
-        m.add_issue(
-          :date    => todays_date,
-          :message => message
-        )
-      end
-    end
-    attr_accessor :dry_run
-    alias_method :dry_run?, :dry_run
-    def emit t, m
-      @emitter.emit t, m
-    end
-    attr_accessor :emitter
-    def find hash
-      search = Models::Issues::Search.build(emitter, hash) or return search
-      enum = MyEnumerator.new do |y|
-        with_manifest do |mani|
-          mani.build_issues_flyweight.filter do |outp, inp|
-            search.include?(inp) and outp << inp
-          end.each { |o| y << o }
-        end
-      end
-      enum.search = search
-      enum
-    end
-    def initialize opts
-      _update_attributes opts
-    end
-    attr_accessor :manifest
-    def numbers &block
-      with_manifest do |m|
-        m.numbers(&block)
-      end
-    end
-    def todays_date
-      DateTime.now.strftime(DATE_FORMAT)
-    end
-    def _update_attributes opts
-      opts.each { |k, v| send("#{k}=", v) }
-    end
-    def with_manifest
-      res = nil
-      @emitter or fail("emitter not set.")
-      @manifest or fail("manifest not set.")
-      @manifest.emitter = @emitter # ick threads
-      @manifest.dry_run = dry_run?
+
+    require_relative 'issues/file' # File is not ::File [#sl-124]
+
+
+    add_struct = ::Struct.new :message, :dry_run, :verbose
+
+    define_method :add do |param_h| # called by api action(s)
+      res = false
       begin
-        res = yield(manifest)
-      ensure
-        if @manifest
-          @manifest.emitter = nil
-          @manifest.dry_run = true # ick
+        p = add_struct.new
+        param_h.each { |k, v| p[k] = v } # validates names
+        res = manifest.add_issue do |o|
+          o.date = todays_date
+          o.dry_run = p.dry_run
+          o.error = -> x { error x }
+          o.escape_path = -> x { escape_path x }
+          o.info = -> x { info x }
+          o.message = p.message
+          o.verbose = p.verbose
         end
-      end
+      end while nil
       res
+    end
+
+
+    def find search_param_h       # called by api action(s)
+      res = false
+      begin
+        flyweight = issue_flyweight
+        search = Models::Issues::Search.build self, search_param_h
+        break if ! search
+
+        enum = Models::Issues::MyEnumerator.new do |y|
+          enu = manifest.build_enum flyweight, -> m { error m }, -> m { info m}
+
+          enu = enu.filter! -> yy, xx do
+            if search.match? xx
+              yy << xx
+            end
+          end
+
+          enu.each do |x|
+            y << x
+          end
+        end
+        enum.search = search
+        res = enum
+      end while nil
+      res
+    end
+
+    attr_reader :manifest # used in actions for now!
+
+
+#    def numbers &block
+#      fail 'wat'
+#      with_manifest do |o|
+#        o.numbers( &block )
+#      end
+#    end
+#
+
+
+  protected
+
+    def initialize request_client, manifest
+      _sub_client_init! request_client
+      @issue_flyweight = nil
+      @manifest = manifest
+    end
+
+    def issue_flyweight
+      fw = nil
+      begin
+        break( fw = @issue_flyweight ) if @issue_flyweight
+        fw = Models::Issue.build_flyweight self, @manifest.pathname
+        @issue_flyweight = fw
+      end while nil
+      fw
+    end
+
+
+    date_format = '%Y-%m-%d'
+
+    define_method :todays_date do
+      Issue::Services::DateTime.now.strftime date_format
     end
   end
 end
-

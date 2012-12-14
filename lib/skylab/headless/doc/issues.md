@@ -1,3 +1,4 @@
+[#025]       #tracking for that cli weird old trick of dynamic help
 [#024]       #tracking-tag we only parse options at beginning in case we
              have sub-actions, but maybe we could improve this for leaf nodes
 [#023]       support for exit statuses might get silly

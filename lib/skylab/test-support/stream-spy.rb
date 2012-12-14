@@ -1,5 +1,3 @@
-require 'skylab/headless/core'
-
 module Skylab::TestSupport
   class StreamSpy < ::Skylab::Headless::IO::Interceptors::Tee
     # A StreamSpy is a simple multiplexer that multiplexes out a subset
@@ -8,8 +6,8 @@ module Skylab::TestSupport
     # to 'spy' on for e.g. an output stream to ensure that certain data is being
     # written to it.
     #
-    # Typically it's used like this:  In places where you are writing to
-    # $stdout (or $stderr), hopefully you have represented it as variable.
+    # Typically it's used like this: In places where you are writing to
+    # e.g. $stdout or $stderr, hopefully you have represented it as variable.
     # At the beginning of your test, point that variable
     # instead to a StreamSpy that has as its only child member (listener) a
     # :buffer that is a (e.g.) StringIO.  Then in your test assertion ensure
@@ -19,7 +17,7 @@ module Skylab::TestSupport
     # a convenience method is provided that creates one such StreamSpy
     # object: `StreamSpy.standard`)
     #
-    #   @todo example here using etc
+    #   #todo example here using etc
     #
     # Calling debug! on your StreamSpy is another convenience 'macro'
     # that simply adds $stderr to the list of child listeners.  This can
@@ -28,20 +26,25 @@ module Skylab::TestSupport
     # in addition to writing to the buffer that you will later check.
     #
 
+    # (omg wtf somebody somewhere is defining ::Struct::Group wtf [#sl-124])
+    require_relative 'stream-spy/group'
+
     def self.standard
-      require 'stringio'
-      new( buffer: ::StringIO.new ).tty!
+      new( buffer: TestSupport_::Services::StringIO.new ).tty!
     end
+
     def debug! prepend=nil
-      stderr = $stderr
-      self[:debug] = if prepend
-        ::Skylab::Headless::IO::Interceptors::Filter.new(
-          stderr, line_boundary_string: prepend )
+      down_stream = $stderr
+      if prepend
+        use_stream = Headless::IO::Interceptors::Filter.new down_stream
+        use_stream.line_boundary_string = prepend
       else
-        stderr
+        use_stream = down_stream
       end
+      self[:debug] = use_stream
       self
     end
+
     def string # just a convenience macro.  :buffer listener must obv. exist
       self[:buffer].string
     end

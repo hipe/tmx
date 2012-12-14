@@ -1,5 +1,6 @@
 require_relative '..'
 require 'skylab/face/core'
+require 'skylab/headless/core' # haha the triad is here
 require 'skylab/porcelain/all' # wicked old ways
 
 module Skylab::CovTree
@@ -7,6 +8,7 @@ module Skylab::CovTree
   Autoloader   = ::Skylab::Autoloader
   CovTree      = self
   Face         = ::Skylab::Face
+  Headless     = ::Skylab::Headless
   MetaHell     = ::Skylab::MetaHell
   Porcelain    = ::Skylab::Porcelain
   PubSub       = ::Skylab::PubSub
@@ -40,7 +42,7 @@ module Skylab::CovTree
     'test'     => '*_spec.rb'
   }
 
-  o[:stop_rx] = %r{ \A \. | / \z }x            # all pathnames have such a root
+  o[:stop_rx] = Face::PathTools::FUN.stop_rx   # matches root pathnames meh
 
   o[:test_basename_rx] =
     %r{ ^ (?: #{ globs.values.uniq.map { |x| glob_to_rx[ x ] }.join '|' } ) $ }x

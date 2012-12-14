@@ -54,7 +54,7 @@ module Skylab::TanMan::TestSupport
 
           it 'when there is one remote.' do
             input 'remote add nerp derp'
-            output.clear
+            output.lines.clear
             input 'remote list'
             output_shift_only_is paystream, 'nerp  derp', true
           end
@@ -63,7 +63,7 @@ module Skylab::TanMan::TestSupport
         context 'when removing a remote' do
           before do
             input 'remote add foo bar'
-            output.clear
+            output.lines.clear
             input 'remote list'
             output_shift_only_is paystream, 'foo  bar'
           end

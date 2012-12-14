@@ -1,4 +1,4 @@
-class Skylab::Issue::Models::Issues
+class Skylab::Issue::Models::Issues # #[#sl-123] exempt
 
   # this is only for debugging! probably this will go away after some time
   module Friendly
