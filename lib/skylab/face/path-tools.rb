@@ -124,7 +124,12 @@ module Skylab::Face
       pretty_path[ path ]
     end
 
-    o[:pretty_path_] = pretty_path_  # expose the algorithm for testing
+    o[:pretty_path_] = pretty_path_            # expose the algo for testing
+
+    o[:stop_rx] = %r{ \A \. | / \z }x          # all pathnames have such a root
+                                               # hackishly (?) used to determine
+    # this for relative or absolute pn's until something better comes along..
+    # maybe `pn == pn.dirname` instead?
 
     FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
 

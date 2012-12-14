@@ -26,15 +26,22 @@ module Skylab::TestSupport
 
   class StreamSpy::Group
 
-    def debug! stderr             # each time a line is parsed out of any stream
-      @debug = -> line do         # we will `puts` to your `stderr` a line in a
-        stderr.puts [ line.name, line.string ].inspect # format of our choosing
-      end                         # showing both the stream name and the string
-      stderr                      # content after any filters have been applied
+    debug = ::Struct.new :condition, :emit
+
+    define_method :debug! do |stderr|          # each time a line is parsed out
+      @debug ||= debug.new                     # of any stream we will `puts`
+      @debug[:condition] ||= -> { true }       # to your `stderr` a line in a
+      @debug[:emit] = -> line do               # format of our choosing showing
+        stderr.puts [ line.name, line.string ].inspect # both the stream name
+      end                                      # and the string content after
+      stderr                                   # any filters have been applied
     end
 
-    def debug?
-      !! @debug                   # don't share the recipie to our secret sauce
+    define_method :debug= do |f|  # expert mode
+      @debug ||= debug.new
+      @debug[:condition] = f
+      debug!( $stderr ) if ! @debug[:emit]
+      f
     end
 
     def line_filter! f            # when a line is created to be added to
@@ -55,7 +62,9 @@ module Skylab::TestSupport
           downstream.truncate 0
           @line_filters and str = @line_filters.reduce( str ) { |x, f| f[x] }
           line = line_struct.new name, str
-          @debug and @debug[ line ]
+          if @debug and @debug.condition[ ]
+            @debug.emit[ line ]
+          end
           @lines.push line
           nil
         end

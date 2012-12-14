@@ -1,14 +1,13 @@
-require 'skylab/pub-sub/emitter'
-
 module Skylab::Issue
 
   class Porcelain::Yamlizer
-    KNOB = Skylab::PubSub::Emitter.new(:line)
 
-    def initialize fields, &wiring
-      @out = KNOB.new(wiring)
+    emitter = PubSub::Emitter.new :line
+
+    define_method :initialize do |fields, &wiring|
+      @out = emitter.new wiring
       @fields = fields
-      @maxlen = @fields.map { |x| x.to_s.length }.reduce { |m, o| m > o ? m : o }
+      @maxlen = @fields.map { |x| x.to_s.length }.reduce { |m, o| m > o ? m : o}
     end
     def line line
       @out.emit(:line, line)
@@ -23,4 +22,3 @@ module Skylab::Issue
     alias_method :[], :yamlize
   end
 end
-

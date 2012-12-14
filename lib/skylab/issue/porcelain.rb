@@ -1,25 +1,20 @@
-require_relative 'api'
-require 'skylab/meta-hell/core'
-
-# @todo: add a feature that is a report of the todos
-
 module Skylab::Issue
 
   class Porcelain
-    extend ::Skylab::Porcelain
-    extend ::Skylab::MetaHell::Autoloader::Autovivifying
-    include Skylab::Porcelain::En::Methods
+    extend Porcelain_
+    include Porcelain_::En::Methods
 
-    desc "Add an \"issue\" line to #{ISSUES_FILE_NAME}."
+    desc "Add an \"issue\" line to doc/issues.md" # used to by dynamic [#hl-025]
     desc "Lines are added to the top and are sequentially numbered."
 
-    desc ' arguments:' #                      DESC
+    desc ' arguments:' #                      DESC # should be styled [#hl-025]
 
     argument_syntax '<message>'
     desc '   <message>                        a one line description of the issue'
 
     option_syntax do |ctx|
       on('-n', '--dry-run', "don't actually do it") { ctx[:dry_run] = true }
+      on '-v', '--verbose', 'verbose output' do ctx[:verbose] = true end
     end
 
     def add message, ctx
@@ -46,14 +41,20 @@ module Skylab::Issue
       # the api action objects and the "client" (interface) instance that
       # invoked the api action.
       # all.rb does this confusing thing by having non-configurable core clients
+
+
       action.on_error_with_manifest_line do |e|
-        client.emit(:info, '---')
-        client.emit(:error, "error on line #{e.line_number}-->#{e.line}<--")
-        e.message = "failed to parse line #{e.line_number} because " <<
-            "#{e.invalid_reason.to_s.gsub('_', ' ')} " <<
-            "(in #{e.pathname.basename})" # this gets decorated haha
+
+        client.emit :info, '---'
+        client.emit :error, "error on line #{ e.line_number }-->#{ e.line }<--"
+
+        e.message = "failed to parse line #{ e.line_number } because #{
+          }#{ e.invalid_reason } (in #{ escape_path e.pathname })"
+
       end
-      action.invoke({ identifier: identifier }.merge!(ctx))
+
+      h = { identifier: identifier }.merge! ctx
+      action.invoke h
     end
 
 
@@ -70,7 +71,7 @@ module Skylab::Issue
     desc "a report of the @todo's in a codebase"
 
     option_syntax do |o|
-      d = Api::Todo::Report.attributes.with(:default)
+      d = Issue::Api::Todo::Report.attributes.with :default
 
       on('-p', '--pattern <PATTERN>',
         "the todo pattern to use (default: '#{d[:pattern]}')"
@@ -92,36 +93,76 @@ module Skylab::Issue
       action = api.action(:todo, :report).wire!(&wire)
       action.on_number_found { |e| runtime.emit(:info, "(found #{e.count} item#{s e.count})") }
       if tree = opts.delete(:show_tree)
-        tree = Porcelain::Todo::Tree.new(action, runtime)
+        tree = Porcelain::Todo::Tree.new action, runtime
       end
       action.invoke(opts.merge(paths: paths))
       tree and tree.render
     end
 
-
   protected
 
-    # this nonsense wires your evil foreign (frame) runtime to the big deal parent
-    def wire! runtime, parent
-      runtime.event_class = Api::MyEvent
-      runtime.on_error { |e| parent.emit(:error, e.touch!) }
-      runtime.on_info  { |e| parent.emit(:info, e.touch!) }
-      runtime.on_all   { |e| parent.emit(e.type, e) unless e.touched? }
+    # hide the old way / new way dichotomy in here ..
+    def initialize *sin_sout_serr
+      @program_name = nil
+      if block_given?
+        super
+      else
+        up, pay, info = sin_sout_serr
+        pay or raise ::ArgumentError.new "missing required paystream (2nd) arg"
+        info or raise ::ArgumentError.new "missing required infostream (3rd) arg"
+        wiring = -> o do
+          o.on_payload { |e| pay.puts  e.message }
+          o.on_error   { |e| info.puts e.message }
+          o.on_info    { |e| info.puts e.message }
+          o.invocation_slug = @program_name
+        end
+        super(& wiring)
+      end
     end
 
     def api
-      @api ||= Api.new
+      @api ||= Issue::Api::Client.new self
     end
+
+    define_method :escape_path, &Face::PathTools::FUN.pretty_path
+
+    def invite api_action
+      full = [ program_name, * api_action.normalized_action_name ]
+      full[ -1, 0 ] = [ '-h' ]    # wonderhack - you want penult
+      full = full.join ' '
+      msg = "try #{ full }."
+      runtime.emit :help, msg     # kill it with fire
+      nil # we processed the false so don't propagate it
+    end
+
+    def invoke argv
+      Face::PathTools.clear
+      super argv
+    end
+
+    def program_name
+      @program_name || ::File.basename( $PROGRAM_NAME ) # etc kill it with fire
+    end
+
+    attr_writer :program_name
 
     def wire
       @wire ||= ->(action) { wire_action(action) }
     end
 
-    def wire_action action
-      action.on_payload { |e| runtime.emit(:payload, e) }
+    # this nonsense wires your evil foreign (frame) runtime to the big deal parent
+    def wire! runtime, parent
+      runtime.event_class = Issue::Api::MyEvent
+      runtime.on_error { |e| parent.emit(:error, e.touch!) }
+      runtime.on_info  { |e| parent.emit(:info, e.touch!) }
+      runtime.on_all   { |e| parent.emit(e.type, e) unless e.touched? }
+    end
+
+    def wire_action action        # #todo this is nice in constructors for
+      action.on_payload { |e| runtime.emit(:payload, e) }   # cli actions
       action.on_error do |e|
-        e.message = "failed to #{e.verb} #{e.noun} - #{e.message}"
-        runtime.emit(:error, e)
+        e.message = "failed to #{ e.verb } #{ e.noun } - #{ e.message }"
+        runtime.emit :error, e
       end
       action.on_info do |e|
         unless e.touched?
@@ -134,4 +175,3 @@ module Skylab::Issue
     end
   end
 end
-

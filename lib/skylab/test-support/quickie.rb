@@ -2,11 +2,21 @@
 
 module Skylab::TestSupport::Quickie
 
-  def self.extended mod # #pattern [#sl-111]
+  TestSupport = ::Skylab::TestSupport # exemption from [#sl-123]
+
+  hack_the_kernel_once = -> do
+    ::Kernel.send( :define_method, :should ) do |predicate|
+      predicate.match self
+    end
+    hack_the_kernel_once = nil
+  end
+
+  define_singleton_method :extended do |mod| # #pattern [#sl-111] (sort of)
     if ! defined? ::RSpec
       mod.send :extend, ModuleMethods
-      KERNEL_EXTENSION.call
-    end
+      hack_the_kernel_once[ ] if hack_the_kernel_once # kinda janky here but
+                                  # this *must* be counter-conditional on
+    end                           # rspec being loaded!
   end
 
   module TiteStyle
@@ -129,7 +139,7 @@ module Skylab::TestSupport::Quickie
     def parse_opts argv
       @tag_filter = @tag_filter_desc = nil
       ors = descs = nil
-      TestSupport_::Services::OptionParser.new do |o|
+      TestSupport::Services::OptionParser.new do |o|
         o.on('-t', '--tag TAG[:VALUE]', '(tries to be like the option in rspec',
          'but only sees leaf- not branch-level tags at this time.)'
         ) do |v|
@@ -151,7 +161,7 @@ module Skylab::TestSupport::Quickie
         @tag_filter = ->(tags) { ors.detect { |l| l.call(tags) } }
       end
       true
-    rescue TestSupport_::Services::OptionParser::ParseError => e
+    rescue TestSupport::Services::OptionParser::ParseError => e
       stderr.puts "#{e}\ntry #{title "ruby #{$PROGRAM_NAME} -h"} for help"
       false
     end
@@ -255,10 +265,5 @@ module Skylab::TestSupport::Quickie
   end
 
   RUNTIME = ContextClass[stderr: $stderr, indent:'']
-  KERNEL_EXTENSION = -> do
-    ::Kernel.send(:define_method, :should) do |predicate|
-      predicate.match(self)
-    end
-  end
   T1 = Time.now
 end

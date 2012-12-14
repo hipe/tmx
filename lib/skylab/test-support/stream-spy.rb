@@ -6,8 +6,8 @@ module Skylab::TestSupport
     # to 'spy' on for e.g. an output stream to ensure that certain data is being
     # written to it.
     #
-    # Typically it's used like this:  In places where you are writing to
-    # $stdout (or $stderr), hopefully you have represented it as variable.
+    # Typically it's used like this: In places where you are writing to
+    # e.g. $stdout or $stderr, hopefully you have represented it as variable.
     # At the beginning of your test, point that variable
     # instead to a StreamSpy that has as its only child member (listener) a
     # :buffer that is a (e.g.) StringIO.  Then in your test assertion ensure
@@ -17,7 +17,7 @@ module Skylab::TestSupport
     # a convenience method is provided that creates one such StreamSpy
     # object: `StreamSpy.standard`)
     #
-    #   @todo example here using etc
+    #   #todo example here using etc
     #
     # Calling debug! on your StreamSpy is another convenience 'macro'
     # that simply adds $stderr to the list of child listeners.  This can
@@ -26,7 +26,7 @@ module Skylab::TestSupport
     # in addition to writing to the buffer that you will later check.
     #
 
-    # (omg wtf somebody somewhere is defining ::Struct::Group wtf wtf)
+    # (omg wtf somebody somewhere is defining ::Struct::Group wtf [#sl-124])
     require_relative 'stream-spy/group'
 
     def self.standard

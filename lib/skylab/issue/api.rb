@@ -1,34 +1,86 @@
-require_relative '../../skylab'
-require 'skylab/meta-hell/autoloader/autovivifying'
-
 module Skylab::Issue
-
-  DATE_FORMAT = '%Y-%m-%d'
-  ISSUES_FILE_NAME = 'doc/issues.md'
-  ROOT = Pathname.new(File.expand_path('..', __FILE__)) # consider @autoload
-
-  class Api
-    extend Skylab::MetaHell::Autoloader::Autovivifying
-    include Skylab::Autoloader::Inflection::Methods
-
-    # creates a new instance of the action
-    def action *path
-      path.reduce(self.class) { |m, s| m.const_get(constantize(s)) }.new(self)
-        # hide how you construct yourself
-    end
-    # getters for *persistent* models *objects* (think daemons):
-    def issues_manifest pathname
-      @issues_manifest ||= {}
-      (pathname and ! pathname.empty?) or raise ArgumentError(
-        "pathanme must be a non-empty string (had #{pathname.inspect})")
-      @issues_manifest[pathname] ||= begin
-        Models::Issues::Manifest.new(pathname)
-      end
-    end
+  module Api
+    # empty
   end
 
-  module Models
-    extend Skylab::Autoloader
+  class Api::Client
+    include Issue::Core::SubClient::InstanceMethods
+
+
+    constantize = Autoloader::Inflection::FUN.constantize
+
+    define_method :action do |*path|   # create a new instance of the action
+      # keeping for #posterity, primordial boxxy:
+      #path.reduce(self.class) { |m, s| m.const_get(constantize(s)) }.new(self)
+
+      klass = path.reduce( Api ) { |m, x| m.const_get constantize[ x ] }
+      o = klass.new self
+      o
+    end
+
+
+    # getters for *persistent* models *objects* (think daemons):
+
+    def find_closest_manifest error
+      res = nil
+      begin
+        mp = find_closest_manifest_path error
+        mp or break( res = mp )
+        mp.absolute? or fail 'sanity'
+        manny = ( @manifest_cache ||= { } ).fetch( mp.to_s ) do |path| # ofuck
+          man = Issue::Models::Issues::Manifest.new mp
+          man
+        end
+        res = manny
+      end while nil
+      res
+    end
+
+
+    max_num_dirs_to_search = 2
+    manifest_file_name = 'doc/issues.md' # etc
+
+    define_method :find_closest_manifest_path do |error|
+      res = nil
+      begin
+        pn = ::Pathname.new Issue::Services::FileUtils.pwd
+        found = nil
+        num_dirs_searched = 0
+        seen = []
+        loop do
+          if num_dirs_searched >= max_num_dirs_to_search
+            break
+          end
+          num_dirs_searched += 1
+          try = pn.join manifest_file_name
+          if try.exist?
+            found = try
+            break
+          end
+          dirname = pn.dirname
+          if pn == dirname        # we have reached the last nerk of a relative
+            break                 # or absolute pathname.
+          end
+          seen.push pn.basename.to_s
+          pn = dirname
+        end
+        if ! found
+          rev = seen.reverse
+          a = [ * ::Array.new( rev.length, '..' ), * rev ]
+          tot = " (#{ rev.length } total)"
+          error[ "manifest not found, looked for #{ manifest_file_name } #{
+            }in each dir#{tot}: #{ a.join '/' }#{ a.empty? ? '(none)' : '/' }" ]
+          break
+        end
+        res = found
+      end while nil
+      res
+    end
+
+  protected
+
+    def initialize modality_client
+      _sub_client_init! modality_client
+    end
   end
 end
-

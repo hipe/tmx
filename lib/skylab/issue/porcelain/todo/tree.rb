@@ -1,10 +1,7 @@
-require 'skylab/porcelain/tree'
-require 'skylab/porcelain/tree/node'
-
 module Skylab::Issue
 
   class Porcelain::Todo::Tree
-    Node = Skylab::Porcelain::Tree::Node
+    Node = Porcelain_::Tree::Node
 
     def initialize action, client
       @action = action
@@ -39,7 +36,7 @@ module Skylab::Issue
         node
       end
       1 == tree.children_length and tree = tree.children.first # comment out and see
-      Skylab::Porcelain::Tree.lines(tree, node_formatter: ->(x){x} ).each do |line|
+      Porcelain_::Tree.lines(tree, node_formatter: ->(x){x} ).each do |line|
         if line.node.leaf?
           out "#{line.prefix} #{line.node.slug} #{line.node[:todo].content}"
         else

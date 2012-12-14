@@ -34,8 +34,10 @@ module Skylab::TestSupport
 
     def patch str
       result = nil
-      cd to_s do
-        TestSupport_::Services::Open3.popen3 'patch -p1' do |sin, sout, serr, w|
+      cd to_s, verbose: verbose do
+        cmd_head = 'patch -p1'
+        # verbose and info( "#{ cmd_head } < -" )
+        TestSupport_::Services::Open3.popen3( cmd_head ) do |sin, sout, serr, w|
           sin.write str
           sin.close
           s = serr.read
