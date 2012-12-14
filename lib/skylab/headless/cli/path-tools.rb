@@ -1,10 +1,6 @@
-require 'fileutils'
-require 'shellwords'
+module Skylab::Headless
 
-
-module Skylab::Face
-
-  module PathTools
+  module CLI::PathTools
 
     # **NOTE** pretty_path is designed to scale well to a large number
     # of filepaths scrolling by, possibly thousands.  It generates regexen
@@ -34,7 +30,7 @@ module Skylab::Face
     end
 
     pwd__ = -> do
-      ::FileUtils.pwd
+      Headless::Services::FileUtils.pwd
     end
 
     home_rx__ = -> home do
@@ -112,7 +108,7 @@ module Skylab::Face
     o[:escape_path] = -> path do
       path = path.to_s
       if / |\$|'/ =~ path
-        ::Shellwords.shellescape path
+        Headless::Services::Shellwords.shellescape path
       else
         path
       end
@@ -137,9 +133,9 @@ module Skylab::Face
 
 
 
-  module PathTools::InstanceMethods
+  module CLI::PathTools::InstanceMethods
 
-    fun = PathTools::FUN
+    fun = CLI::PathTools::FUN
 
     define_method :escape_path, & fun.escape_path
 

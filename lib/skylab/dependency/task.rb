@@ -11,7 +11,7 @@ module Skylab::Dependency
     attr_reader :invalid_reason
 
     extend PubSub::Emitter # child classes decide what to emit
-    include Face::PathTools::InstanceMethods
+    include Headless::CLI::PathTools::InstanceMethods
     include Headless::CLI::Stylize::Methods # `stylize`
 
     def hi str ; stylize str, :strong, :green end

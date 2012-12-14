@@ -90,7 +90,7 @@ module Skylab::CovTree
     end
 
 
-    define_method :escape_path, & Face::PathTools::FUN.pretty_path # yay
+    define_method :escape_path, & Headless::CLI::PathTools::FUN.pretty_path # yay
 
 
     def invite_fuck_me token

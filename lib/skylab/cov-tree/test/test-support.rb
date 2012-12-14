@@ -30,7 +30,7 @@ module Skylab::CovTree::TestSupport
     end
 
     def cd path, &block
-      CovTree::Face::PathTools.clear
+      CovTree::Headless::CLI::PathTools.clear
       CovTree::Services::FileUtils.cd path, verbose: debug?, &block
     end
 

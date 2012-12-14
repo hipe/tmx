@@ -27,7 +27,7 @@ module Skylab::Test
       (@skip ||= { })[name.intern] = true
     end
 
-    define_method :escape_path, & Face::PathTools::FUN.pretty_path
+    define_method :escape_path, & Headless::CLI::PathTools::FUN.pretty_path
 
     def find_submodules
       list = [] ; hash = {}

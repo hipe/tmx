@@ -136,7 +136,7 @@ module Skylab::Issue
     end
 
     def fu o                                   # Using a hacky regex, scan
-      rx = Face::PathTools::FUN.absolute_path_hack_rx # all messages emitted
+      rx = Headless::CLI::PathTools::FUN.absolute_path_hack_rx # all messages emitted
       fu = FU.new( -> str do                   # from the file utils client,
         s = str.gsub( rx ) do                  # and run everything that looks
           o.escape_path[ $~[0] ]               # like an absolute path thru

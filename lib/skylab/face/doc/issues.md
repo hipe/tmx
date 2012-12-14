@@ -1,4 +1,4 @@
-[#002] #open move path-tools to e.g. headless
+[#002]       #done path-tools to e.g. headless
 [#001]       #postponed shorten wide lines #open #depends-on:sl-104
 [#sl-100.100.500] 2012-06-08 #open index all features
 [#sl-100.100.400] 2012-06-08 #open rename stuff, unify names

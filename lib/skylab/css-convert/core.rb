@@ -1,5 +1,4 @@
 require_relative '..'
-require 'skylab/face/core' # `pretty_path`
 require 'skylab/headless/core'
 require 'optparse'
 
@@ -7,7 +6,6 @@ module Skylab::CssConvert
   extend ::Skylab::MetaHell::Autoloader::Autovivifying
 
   CssConvert = self
-  Face = ::Skylab::Face
   Headless = ::Skylab::Headless
   Inflection = ::Skylab::Autoloader::Inflection
 
@@ -147,7 +145,7 @@ module Skylab::CssConvert
       keep_going
     end
 
-    define_method :escape_path, & Face::PathTools::FUN.pretty_path
+    define_method :escape_path, & Headless::CLI::PathTools::FUN.pretty_path
 
     def exit_status_for sym
       :ok == sym ? 0 : -1

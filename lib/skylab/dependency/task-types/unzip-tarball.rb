@@ -1,7 +1,7 @@
 module Skylab::Dependency
   class TaskTypes::UnzipTarball < Dependency::Task
     include Face::Open2
-    include Face::PathTools::InstanceMethods
+    include Headless::CLI::PathTools::InstanceMethods
     include Dependency::TaskTypes::TarballTo::CONSTANTS
 
     attribute :unzip_tarball, :required => true, :pathname => true

@@ -117,7 +117,7 @@ module Skylab::GitStashUntracked
 
                                                # the Collection is (i think)
                                                # the rootmost data object.
-    fun = Face::PathTools::FUN                 # We ofc. want to pass absoulte
+    fun = Headless::CLI::PathTools::FUN                 # We ofc. want to pass absoulte
     absolute_path_hack_rx = fun.absolute_path_hack_rx # pathnames to the
                                                # ::FileUtils functions but
     define_method :collection do               # when they display in the CLI
@@ -140,7 +140,7 @@ module Skylab::GitStashUntracked
     # allow its own custom version of the method but we can't do that now
     # because of how borked and unusable all.rb is..
 
-    define_method :escape_path, & Face::PathTools::FUN.pretty_path
+    define_method :escape_path, & Headless::CLI::PathTools::FUN.pretty_path
 
     def emit type, payload
       @runtime.emit type, payload
@@ -174,7 +174,7 @@ module Skylab::GitStashUntracked
   class Plumbing::Save < Plumbing
 
     def invoke
-      Face::PathTools.clear # see notes at `pretty_path` -- there is danger
+      Headless::CLI::PathTools.clear # see notes at `pretty_path` -- there is danger
       result = nil
       begin
         stash = collection.stash(name).validate_for_writing

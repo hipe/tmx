@@ -3,7 +3,7 @@ require 'net/http'
 module Skylab::Dependency
   class TaskTypes::Get < Dependency::Task
     include Face::Open2
-    include Face::PathTools::InstanceMethods
+    include Headless::CLI::PathTools::InstanceMethods
 
     attribute :from
     attribute :get, :required => true

@@ -47,7 +47,7 @@ module Skylab::TanMan
     pen = -> do
       o = Headless::CLI::IO::Pen::Minimal.new
 
-      fun = Face::PathTools::FUN
+      fun = Headless::CLI::PathTools::FUN
 
       o.define_singleton_method :escape_path do |str|
         fun.clear                 # always clear the `pwd` regexen .. it is hell
