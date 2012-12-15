@@ -1,6 +1,6 @@
 module Skylab::Issue
 
-  class Porcelain::Yamlizer
+  class CLI::Yamlizer
 
     emitter = PubSub::Emitter.new :line
 

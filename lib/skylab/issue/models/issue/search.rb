@@ -1,5 +1,5 @@
 module Skylab::Issue
-  class Models::Issues::Search
+  class Models::Issue::Search
     include Issue::Core::SubClient::InstanceMethods
 
 

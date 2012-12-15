@@ -2,6 +2,9 @@ module Skylab::Issue
   class Models::Issue
     include Issue::Core::SubClient::InstanceMethods # #todo why?
 
+    require_relative 'issue/enumerator' # [#sl-124] preload bc toplevel exists
+    require_relative 'issue/file'       # [#sl-124] preload bc toplevel exists
+
 
     def self.build_flyweight request_client, pathname
       new request_client, pathname

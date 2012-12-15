@@ -1,5 +1,5 @@
 module Skylab::Issue
-  class Models::Issues::File
+  class Models::Issue::File
 
     def lines
       ::Enumerator.new do |y|

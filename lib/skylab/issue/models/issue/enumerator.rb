@@ -1,7 +1,5 @@
-class Skylab::Issue::Models::Issues # [#sl-123] exemption?
-
-
-  class MyEnumerator < ::Enumerator
+module Skylab::Issue
+  class Models::Issue::Enumerator < ::Enumerator
 
     # thanks to brian chandler from issue 707
     def each &b
@@ -69,7 +67,7 @@ class Skylab::Issue::Models::Issues # [#sl-123] exemption?
 
     def spy_begin y
       @spy.values.each { |e| e.begin[ ] }
-      FunSpy.new( y ){ |item| spy_yield item }
+      Spy_.new( y ){ |item| spy_yield item }
     end
 
     def spy_end
@@ -83,7 +81,7 @@ class Skylab::Issue::Models::Issues # [#sl-123] exemption?
 
 
 
-  class MyEnumerator::FunSpy
+  class Models::Issue::Enumerator::Spy_
     def yield piece
       @b[ piece ]
       @y.yield piece

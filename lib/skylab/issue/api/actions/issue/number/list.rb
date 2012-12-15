@@ -1,5 +1,5 @@
 module Skylab::Issue
-  class Api::Issue::Number::List < Api::Action
+  class API::Actions::Issue::Number::List < API::Action
 
     emits :all, error: :all, info: :all, payload: :all
 

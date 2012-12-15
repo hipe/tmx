@@ -12,7 +12,7 @@ module Skylab::Issue
   Headless = ::Skylab::Headless
   Issue = self # #hiccup
   MetaHell = ::Skylab::MetaHell
-  Porcelain_ = ::Skylab::Porcelain # (SL::Issue::Porcelain is ours!)
+  Porcelain = ::Skylab::Porcelain
   PubSub = ::Skylab::PubSub
 
   extend MetaHell::Autoloader::Autovivifying::Recursive

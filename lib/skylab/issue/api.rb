@@ -1,9 +1,9 @@
 module Skylab::Issue
-  module Api
+  module API
     # empty
   end
 
-  class Api::Client
+  class API::Client
     include Issue::Core::SubClient::InstanceMethods
 
 
@@ -13,7 +13,7 @@ module Skylab::Issue
       # keeping for #posterity, primordial boxxy:
       #path.reduce(self.class) { |m, s| m.const_get(constantize(s)) }.new(self)
 
-      klass = path.reduce( Api ) { |m, x| m.const_get constantize[ x ] }
+      klass = path.reduce(API::Actions) { |m, x| m.const_get constantize[ x ] }
       o = klass.new self
       o
     end
@@ -28,7 +28,7 @@ module Skylab::Issue
         mp or break( res = mp )
         mp.absolute? or fail 'sanity'
         manny = ( @manifest_cache ||= { } ).fetch( mp.to_s ) do |path| # ofuck
-          man = Issue::Models::Issues::Manifest.new mp
+          man = Issue::Services::Manifest.new mp
           man
         end
         res = manny

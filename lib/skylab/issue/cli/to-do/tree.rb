@@ -1,7 +1,28 @@
 module Skylab::Issue
+  class CLI::ToDo::Tree
+    Node = Porcelain::Tree::Node
 
-  class Porcelain::Todo::Tree
-    Node = Porcelain_::Tree::Node
+    def render
+      tree = @todos.reduce(Node.new({slug: :root})) do |node, todo|
+        path = todo.path.split('/').push(todo.line)
+        node.find!(path) do |child|
+          if child.leaf?
+            child[:todo] = todo
+          end
+        end
+        node
+      end
+      1 == tree.children_length and tree = tree.children.first # comment out and see
+      Porcelain::Tree.lines(tree, node_formatter: -> x { x } ).each do |line|
+        if line.node.leaf?
+          out "#{line.prefix} #{line.node.slug} #{line.node[:todo].content}"
+        else
+          out "#{line.prefix} #{line.node.slug}"
+        end
+      end
+    end
+
+  protected
 
     def initialize action, client
       @action = action
@@ -19,31 +40,13 @@ module Skylab::Issue
         end
       end
     end
+
     def info msg
       @client.emit :info, msg
     end
+
     def out msg
       @client.emit :payload, msg
     end
-    def render
-      tree = @todos.reduce(Node.new({slug: :root})) do |node, todo|
-        path = todo.path.split('/').push(todo.line)
-        node.find!(path) do |child|
-          if child.leaf?
-            child[:todo] = todo
-          end
-        end
-        node
-      end
-      1 == tree.children_length and tree = tree.children.first # comment out and see
-      Porcelain_::Tree.lines(tree, node_formatter: ->(x){x} ).each do |line|
-        if line.node.leaf?
-          out "#{line.prefix} #{line.node.slug} #{line.node[:todo].content}"
-        else
-          out "#{line.prefix} #{line.node.slug}"
-        end
-      end
-    end
   end
 end
-

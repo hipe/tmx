@@ -1,5 +1,5 @@
 module Skylab::Issue
-  class Api::MyEvent < PubSub::Event
+  class API::MyEvent < PubSub::Event
     def message= msg # parent class doens't provide this
       if payload.kind_of?(Hash)
         payload.key?(:message) or _define_attr_accessors!(:message)

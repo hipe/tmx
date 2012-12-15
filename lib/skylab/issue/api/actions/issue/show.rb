@@ -1,5 +1,5 @@
 module Skylab::Issue
-  class Api::Issue::Show < Api::Action
+  class API::Actions::Issue::Show < API::Action
 
     inflection.inflect.noun :plural
 
@@ -52,7 +52,7 @@ module Skylab::Issue
 
     define_method :yamlizer do
       @yamlizer ||= begin
-        ymlz = Issue::Porcelain::Yamlizer.new( fields ) do |o|
+        ymlz = Issue::CLI::Yamlizer.new( fields ) do |o|
           o.on_line do |e|
             emit :payload, e
           end

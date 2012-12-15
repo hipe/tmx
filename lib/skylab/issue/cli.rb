@@ -1,7 +1,6 @@
 module Skylab::Issue
-
-  class Porcelain
-    extend Porcelain_
+  class CLI
+    extend Porcelain
     include Headless::NLP::EN::Methods
 
     desc "Add an \"issue\" line to doc/issues.md" # used to by dynamic [#hl-025]
@@ -71,7 +70,7 @@ module Skylab::Issue
     desc "a report of the @todo's in a codebase"
 
     option_syntax do |o|
-      d = Issue::Api::Todo::Report.attributes.with :default
+      d = Issue::API::Actions::ToDo::Report.attributes.with :default
 
       on('-p', '--pattern <PATTERN>',
         "the todo pattern to use (default: '#{d[:pattern]}')"
@@ -81,22 +80,28 @@ module Skylab::Issue
         "multiple times to broaden the search (default: '#{d[:names] * "', '"}')"
         ) { |n| (o[:names] ||= []).push n }
       on('--cmd', 'just show the internal grep / find command',
-         'that would be used (debugging).') { o[:show_command] = true }
+         'that would be used (debugging).') { o[:show_command_only] = true }
       on('-t', '--tree', 'experimental tree rendering') { o[:show_tree] = true }
 
     end
 
     argument_syntax '<path> [<path> [..]]'
 
-    # @todo we wanted to call this todo_report but there was that one bug
-    def todo *paths, opts       # args interface will change
-      action = api.action(:todo, :report).wire!(&wire)
-      action.on_number_found { |e| runtime.emit(:info, "(found #{e.count} item#{s e.count})") }
-      if tree = opts.delete(:show_tree)
-        tree = Porcelain::Todo::Tree.new action, runtime
+    def todo *paths, opts
+      res = nil
+      action = api.action( :to_do, :report ).wire!(&wire)
+      action.on_number_found do |e|
+        runtime.emit :info, "(found #{ e.count } item#{ s e.count })"
       end
-      action.invoke(opts.merge(paths: paths))
-      tree and tree.render
+      show_tree = opts.delete( :show_tree )
+      if show_tree
+        tree = CLI::ToDo::Tree.new action, runtime
+      end
+      res = action.invoke opts.merge( paths: paths )
+      if show_tree
+        res = tree.render
+      end
+      res
     end
 
   protected
@@ -121,7 +126,7 @@ module Skylab::Issue
     end
 
     def api
-      @api ||= Issue::Api::Client.new self
+      @api ||= Issue::API::Client.new self
     end
 
     define_method :escape_path, &Headless::CLI::PathTools::FUN.pretty_path
@@ -152,7 +157,7 @@ module Skylab::Issue
 
     # this nonsense wires your evil foreign (frame) runtime to the big deal parent
     def wire! runtime, parent
-      runtime.event_class = Issue::Api::MyEvent
+      runtime.event_class = Issue::API::MyEvent
       runtime.on_error { |e| parent.emit(:error, e.touch!) }
       runtime.on_info  { |e| parent.emit(:info, e.touch!) }
       runtime.on_all   { |e| parent.emit(e.type, e) unless e.touched? }

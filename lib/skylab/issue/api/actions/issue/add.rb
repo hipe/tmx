@@ -1,5 +1,5 @@
 module Skylab::Issue
-  class Api::Issue::Add < Api::Action
+  class API::Actions::Issue::Add < API::Action
 
     attribute :dry_run
     attribute :message,          :required => true

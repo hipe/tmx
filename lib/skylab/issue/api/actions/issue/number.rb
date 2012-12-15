@@ -1,5 +1,5 @@
 module Skylab::Issue
-  module Api::Issue::Number
+  module API::Actions::Issue::Number
     # empty container - see subdir
   end
 end

@@ -1,10 +1,6 @@
 module Skylab::Issue
-  class Models::Issues
+  class Models::Issue::Collection
     include Issue::Core::SubClient::InstanceMethods
-
-
-    require_relative 'issues/file' # File is not ::File [#sl-124]
-
 
     add_struct = ::Struct.new :message, :dry_run, :verbose
 
@@ -31,10 +27,10 @@ module Skylab::Issue
       res = false
       begin
         flyweight = issue_flyweight
-        search = Models::Issues::Search.build self, search_param_h
+        search = Models::Issue::Search.build self, search_param_h
         break if ! search
 
-        enum = Models::Issues::MyEnumerator.new do |y|
+        enum = Models::Issue::Enumerator.new do |y|
           enu = manifest.build_enum flyweight, -> m { error m }, -> m { info m}
 
           enu = enu.filter! -> yy, xx do

@@ -1,6 +1,6 @@
 require_relative '../test-support'
 
-module Skylab::Issue::TestSupport::Models::Issues::File
+module Skylab::Issue::TestSupport::Models::Issue::File
   ::Skylab::Issue::TestSupport::Models::Issues[ File_TestSupport = self ]
 
 

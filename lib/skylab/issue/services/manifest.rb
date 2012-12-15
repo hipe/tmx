@@ -1,8 +1,8 @@
 module Skylab::Issue
-  class Models::Issues::Manifest
+  class Services::Manifest
 
     def build_enum issue_flyweight, error, info
-      Models::Issues::MyEnumerator.new do |y|
+      Models::Issue::Enumerator.new do |y|
         begin
           if ! pathname?
             error[ "manifest pathname was not resolved" ]
@@ -113,7 +113,7 @@ module Skylab::Issue
       begin
         break( file = @file ) if @file
         @pathname or fail 'sanity'
-        file = Models::Issues::File.new @pathname
+        file = Models::Issue::File.new @pathname
         @file = file
       end while nil
       file

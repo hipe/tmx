@@ -1,10 +1,9 @@
 module Skylab::Issue
-
-  class Api::Action
+  class API::Action
     include Issue::Core::SubClient::InstanceMethods
     extend PubSub::Emitter
 
-    extend Porcelain_::Attribute::Definer
+    extend Porcelain::Attribute::Definer
     extend Headless::NLP::EN::API_Action_Inflection_Hack
 
     meta_attribute :default
@@ -12,7 +11,7 @@ module Skylab::Issue
 
     inflection.inflect.noun :singular
 
-    event_class Api::MyEvent
+    event_class API::MyEvent
 
     # --*--
 
@@ -33,9 +32,10 @@ module Skylab::Issue
 
 
     pathify = Autoloader::Inflection::FUN.pathify      # until headless BEGIN #
-    pos = Api.name.length + 2                                                 #
+    pos = API.name.length + 2                                                 #
 
     define_singleton_method :normalized_action_name do
+      fail 'fix me'
       @normalized_action_name ||= begin
         tail = name[ pos .. -1 ]
         o = tail.split( '::' ).map { |s| pathify[ s ].intern }
@@ -88,7 +88,7 @@ module Skylab::Issue
     end
 
     def build_event type, data # compat pub-sub
-      Issue::Api::MyEvent.new type, data do |o|
+      API::MyEvent.new type, data do |o|
         o.inflection = self.class.inflection
       end
     end
@@ -105,7 +105,7 @@ module Skylab::Issue
           error msg
         end
         break if ! o
-        issues = Models::Issues.new self, o
+        issues = Issue::Models::Issue::Collection.new self, o
         @issues = issues
       end while nil
       issues

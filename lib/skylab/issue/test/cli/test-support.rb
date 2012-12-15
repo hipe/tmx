@@ -13,7 +13,7 @@ module Skylab::Issue::TestSupport::CLI
 
     let :client do
       output = self.output
-      client = Issue::Porcelain.new nil, output.for( :pay ), output.for( :info )
+      client = Issue::CLI.new nil, output.for( :pay ), output.for( :info )
       client.program_name = 'issue'
       client
     end
