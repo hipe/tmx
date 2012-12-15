@@ -1,18 +1,19 @@
-#!/usr/bin/env ruby -w
+require_relative '..'
 
-require 'fileutils'
-require 'open3'
-require File.expand_path('../../lib/skylab', __FILE__)
-require 'skylab/porcelain/all'
-require 'skylab/face/core' # pretty_path
-
+require 'skylab/headless/core'
+require 'skylab/porcelain/all' # EVIL
 
 module Skylab::GitStashUntracked
 
-  Face = ::Skylab::Face
+  Autoloader = ::Skylab::Autoloader  # (doing these explicitly is actually
+  GitStashUntracked = self           # less typing and less ambiguous than
+  Headless = ::Skylab::Headless      # including ::Skylab all over the place)
+  Porcelain = ::Skylab::Porcelain
 
-  class Porcelain
-    extend ::Skylab::Porcelain
+  extend Autoloader                  # for our one other file..
+
+  class CLI
+    extend Porcelain
 
     porcelain do
       emits :payload => :all
@@ -35,7 +36,7 @@ module Skylab::GitStashUntracked
     argument_syntax "<name>"
 
     def save name, opts
-      Plumbing::Save.new(runtime, opts.merge(:name => name)).invoke
+      API::Actions::Save.new(runtime, opts.merge(:name => name)).invoke
     end
 
 
@@ -46,7 +47,7 @@ module Skylab::GitStashUntracked
     end
 
     def list opts
-      Plumbing::List.new(runtime, opts).invoke
+      API::Actions::List.new(runtime, opts).invoke
     end
 
 
@@ -63,7 +64,7 @@ module Skylab::GitStashUntracked
     argument_syntax '<name>'
 
     def show name, opts
-      Plumbing::Show.new(runtime, opts.merge(:name => name)).invoke
+      API::Actions::Show.new(runtime, opts.merge(:name => name)).invoke
     end
 
 
@@ -77,7 +78,7 @@ module Skylab::GitStashUntracked
     argument_syntax '<name>'
 
     def pop name, opts
-      Plumbing::Pop.new(runtime, opts.merge(:name => name)).invoke
+      API::Actions::Pop.new(runtime, opts.merge(:name => name)).invoke
     end
 
 
@@ -87,7 +88,7 @@ module Skylab::GitStashUntracked
     end
 
     def status _
-      o = Plumbing::Save.new runtime
+      o = API::Actions::Save.new runtime
       num = o.each_file do |fn|
         runtime.emit :payload, fn
       end
@@ -96,11 +97,28 @@ module Skylab::GitStashUntracked
       end
       true
     end
+
+  protected
+
+    def initialize _, stdout, stderr
+      block_given? and fail 'sanity'
+      super() do |o|
+        o.on_payload { |e| stdout.puts e }
+        o.on_info { |e| stderr.puts e }
+        o.on_error { |e| stderr.puts e }
+      end
+    end
   end
 
 
 
-  class Plumbing
+  module API
+    # empty.
+  end
+
+
+
+  class API::Action
 
     # (nothing public yet)
 
@@ -117,7 +135,7 @@ module Skylab::GitStashUntracked
 
                                                # the Collection is (i think)
                                                # the rootmost data object.
-    fun = Headless::CLI::PathTools::FUN                 # We ofc. want to pass absoulte
+    fun = Headless::CLI::PathTools::FUN        # We ofc. want to pass absoulte
     absolute_path_hack_rx = fun.absolute_path_hack_rx # pathnames to the
                                                # ::FileUtils functions but
     define_method :collection do               # when they display in the CLI
@@ -164,14 +182,21 @@ module Skylab::GitStashUntracked
     attr_accessor :name
 
     def popen3 cmd, &block
-      ::Open3.popen3 cmd, &block
+      GitStashUntracked::Services::Open3.popen3 cmd, &block
     end
 
     attr_accessor :stashes
   end
 
 
-  class Plumbing::Save < Plumbing
+
+  module API::Actions
+    # empty.
+  end
+
+
+
+  class API::Actions::Save < API::Action
 
     def invoke
       Headless::CLI::PathTools.clear # see notes at `pretty_path` -- there is danger
@@ -222,7 +247,7 @@ module Skylab::GitStashUntracked
 
 
 
-  class Plumbing::List < Plumbing
+  class API::Actions::List < API::Action
     def invoke
       collection.validate_existence or return false
       count = 0
@@ -236,7 +261,7 @@ module Skylab::GitStashUntracked
 
 
 
-  class Plumbing::Show < Plumbing
+  class API::Actions::Show < API::Action
 
     def invoke
       @stash = collection.stash(name).validate_existence or return false
@@ -266,7 +291,7 @@ module Skylab::GitStashUntracked
 
 
 
-  class Plumbing::Pop < Plumbing
+  class API::Actions::Pop < API::Action
     def invoke
       @stash = collection.stash(name).validate_existence or return false
       @stash.pop(&method(:emit))
@@ -319,7 +344,7 @@ module Skylab::GitStashUntracked
 
 
   class Stash
-    include ::FileUtils
+    include GitStashUntracked::Services::FileUtils
 
   public
 
@@ -403,7 +428,7 @@ module Skylab::GitStashUntracked
 
     def filenames
       ::Enumerator.new do |o|
-        ::Open3.popen3("cd #{pathname}; find . -type f") do |_, sout, serr|
+        GitStashUntracked::Services::Open3.popen3("cd #{pathname}; find . -type f") do |_, sout, serr|
           '' != (s = serr.read) and fail("uh-oh: #{s}")
           while s = sout.gets
             o << %r{^\./(.*)$}.match(s)[1]
@@ -441,7 +466,7 @@ module Skylab::GitStashUntracked
 
     def _prune
       stack = []
-      ::Open3.popen3("find #{pathname} -type d") do |_, sout, serr|
+      GitStashUntracked::Services::Open3.popen3("find #{pathname} -type d") do |_, sout, serr|
         while s = sout.gets do stack.push(s.strip) end
       end
       while s = stack.pop
@@ -483,7 +508,7 @@ module Skylab::GitStashUntracked
         end
       end
       cd(path) do
-        ::Open3.popen3('find . -type f') do |_, sout, serr|
+        GitStashUntracked::Services::Open3.popen3('find . -type f') do |_, sout, serr|
           '' != (s = serr.read) and raise("nope: #{s}")
           while s = sout.gets do each_path[s.strip] end
         end
@@ -491,7 +516,7 @@ module Skylab::GitStashUntracked
     end
   end
 
-  extend ::Skylab::Porcelain::Styles
+  extend Porcelain::Styles
 
   PATCH_STYLES = [
     ->(s) { stylize(s, :strong, :red) },
@@ -526,7 +551,7 @@ module Skylab::GitStashUntracked
 
 
   class StatMaker
-    include ::Skylab::Porcelain::Styles
+    include Porcelain::Styles
 
   public
 
@@ -609,9 +634,4 @@ module Skylab::GitStashUntracked
       StatMaker.new(path, opts, &emit).run
     end
   end
-end
-
-# in some cases write a ruby script at ~/bin/g-s-u that simply loads this file
-if File.basename(__FILE__) == File.basename($PROGRAM_NAME)
-  ::Skylab::GitStashUntracked::Porcelain.new{ |o| o.on_all { |e| $stderr.puts e } }.invoke(ARGV)
 end

@@ -1,8 +1,7 @@
-load File.expand_path('../../../../../script/git-stash-untracked', __FILE__)
-
+require_relative '../core'
 require File.expand_path('../../../test-support/core', __FILE__)
 
-require_relative '../../test-support/tmpdir'
+# #posterity above
 
 
 module ::Skylab::GitStashUntracked::Tests
@@ -19,14 +18,7 @@ module ::Skylab::GitStashUntracked::Tests
     describe "has an action called" do
 
       let :app do
-        GitStashUntracked::Porcelain.new do |o|
-          o.on_all do |e|
-            if debug
-              debug.puts "    (dbg:#{ [e.type, e.message].inspect })"
-            end
-            stderr.puts e
-          end
-        end
+        GitStashUntracked::CLI.new nil, stderr, stderr
       end
 
       def cd path, block
@@ -52,7 +44,11 @@ module ::Skylab::GitStashUntracked::Tests
       end
 
       let :stderr do
-        ::StringIO.new
+        o = TestSupport::StreamSpy.standard
+        if debug
+          o.debug! -> e { "    (dbg:#{ [e.type, e.message].inspect })" }
+        end
+        o
       end
 
       def with_popen3_out_as str
@@ -114,7 +110,11 @@ module ::Skylab::GitStashUntracked::Tests
             stashes/alpha/herpus/derpus.txt
             stashes/beta/whatever.txt
           )
-          GitStashUntracked::Plumbing::List.new(runtime_stub, :stashes => gsu_tmpdir.join('stashes')).invoke.should_not eql(false)
+          o = GitStashUntracked::API::Actions::List.new(
+            runtime_stub, stashes: gsu_tmpdir.join( 'stashes' )
+          )
+          r = o.invoke
+          r.should_not eql( false )
           expected = <<-HERE.unindent
             alpha
             beta
@@ -148,7 +148,7 @@ module ::Skylab::GitStashUntracked::Tests
           HERE
         end
 
-        include ::Skylab::Porcelain::Styles # unstylize
+        include Porcelain::Styles # unstylize
 
         it "by default does the --stat format" do
           with_this_stash

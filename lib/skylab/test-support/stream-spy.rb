@@ -37,7 +37,11 @@ module Skylab::TestSupport
       down_stream = $stderr
       if prepend
         use_stream = Headless::IO::Interceptors::Filter.new down_stream
-        use_stream.line_boundary_string = prepend
+        if prepend.respond_to? :call
+          use_stream.puts_filter! prepend
+        else
+          use_stream.line_boundary_string = prepend
+        end
       else
         use_stream = down_stream
       end
