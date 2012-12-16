@@ -21,7 +21,7 @@ module Skylab::Headless
       (@queue ||= []).clear       # create queue if not exist, and empty it
       result = nil                # (#todo we might be insane and not empty it)
       begin
-        result = parse_opts argv  # implement parse_opts however you want,
+        result = parse_opts argv  # implement parse_opt however you want,
         true == result or break   # but to allow fancy exit statii we have to
                                   # observe this strict ickiness [#hl-023]
 
@@ -139,6 +139,10 @@ module Skylab::Headless
       end
     end
 
+    def param_queue               # (experimental atomic processing of .e.g
+      @param_queue ||= []         # options -- see manifesto and warnings at
+    end                           # `process_param_queue!`)
+
     def parse_argv_for m
       build_argument_syntax_for(m).parse_argv(argv) do |o|
         o.on_unexpected do |a|
@@ -172,7 +176,24 @@ module Skylab::Headless
           exit_status = exit_status_for :parse_opts_failed
         end
       end while nil
+      if true == exit_status && @param_queue # get through basic option parsing
+        exit_status = process_param_queue! # first before you actually validate
+      end                         # with your custom setters (if u want)
       exit_status
+    end
+
+    def process_param_queue!      # see how this is uses to see how this is
+      res = true                  # used (sorry!) very experimental.
+      before = error_count        # **NOTE** that by the time it gets on the
+      loop do                     # param queue, it should be past the point
+        k, v = param_queue.shift  # of validating whether it is a writable
+        k or break                # parameters because for now we just call
+        send "#{ k }=", v         # send on it which for all we know could
+      end                         # be some private-ass method.
+      if before < error_count
+        res = false
+      end
+      res
     end
 
     attr_reader :queue

@@ -48,7 +48,6 @@ module Skylab::TanMan::TestSupport::Sexp
     define_method :initialize do
       |sin=$stdin, sout=$stdout, serr=$stderr| # observe pattern [#sl-114]
 
-      @param_queue = []           # shenanigans
       @stdin = sin                # we keep this stream on deck but don't set
                                   # upstream yet. it takes logix. [#hl-022]
       self.io_adapter = build_io_adapter nil, sout, serr, pen
@@ -160,30 +159,6 @@ module Skylab::TanMan::TestSupport::Sexp
     end
 
     attr_reader :pathname
-
-    attr_reader :param_queue
-
-    def parse_opts argv           # enhance headless with param_queue shenans
-      res = super
-      if true == res
-        res = process_param_queue
-      end
-      res
-    end
-
-    def process_param_queue
-      res = true
-      before = error_count
-      loop do
-        k, v = param_queue.shift
-        k or break
-        send "#{ k }=", v
-      end
-      if before < error_count
-        res = false
-      end
-      res
-    end
 
     define_method :resolve_upstream do   # #watch'ed by [#hl-022] for dry
       ok = false                  # [#hl-023] exit-code aware, [#019] invite
