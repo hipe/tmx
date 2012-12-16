@@ -1,16 +1,20 @@
 require_relative '../core'
 require 'skylab/test-support/core'
-require 'skylab/headless/test/test-support' # unstylize_if_stylized
 
 module Skylab::Dependency::TestSupport
   extend ::Skylab::TestSupport::Regret[ Dependency_TestSupport = self ]
 
   module CONSTANTS
     include ::Skylab::Dependency # include lots of constants
-    MetaHell = ::Skylab::MetaHell # not used in application code
+    Headless = ::Skylab::Headless # not used in application code
+    MetaHell = ::Skylab::MetaHell
   end
 
   include CONSTANTS # include them for use in here, and in specs
+
+  Headless = Headless # so they are visible in modules contained by this
+  MetaHell = MetaHell # module, without polluting that module itself's n.s
+
 
   tmpdir = ::Skylab::TestSupport::Tmpdir.new ::Skylab::TMPDIR_PATHNAME.to_s
 
@@ -27,8 +31,14 @@ module Skylab::Dependency::TestSupport
   CONSTANTS::FILE_SERVER = file_server # #bound
 
   module InstanceMethods
-    extend CONSTANTS::MetaHell::Let::ModuleMethods
-    include ::Skylab::Headless::TestSupport::InstanceMethods # see
+    extend MetaHell::Let::ModuleMethods
+    include Headless::CLI::Stylize::Methods # `unstylize`
+
+    attr_accessor :debug
+
+    def debug!
+      self.debug = true
+    end
 
     let(:fingers) { ::Hash.new { |h, k| h[k] = [] } }
 

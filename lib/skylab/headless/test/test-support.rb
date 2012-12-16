@@ -18,12 +18,4 @@ module Skylab::Headless::TestSupport
       let( :debug ) { true }
     end
   end
-
-  module InstanceMethods # #bound to other subproducts!
-    attr_accessor :debug
-
-    def unstylize_if_stylized str
-      Headless::CLI::Pen::FUN.unstylize[ str ] or str
-    end
-  end
 end

@@ -15,7 +15,7 @@ module Skylab::TanMan::TestSupport
     let :cli do
       spy = output
       spy.line_filter! -> s do
-        Headless::CLI::Stylize::FUN.unstylize[ s ]
+        Headless::CLI::Pen::FUN.unstylize[ s ]
       end
       o = TanMan::CLI.new nil, spy.for(:paystream), spy.for(:infostream)
       if do_debug

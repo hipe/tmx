@@ -469,7 +469,7 @@ module Skylab::Headless
   end
 
 
-  module CLI::Pen
+  module CLI::Pen                              # (see manifesto at H_L::Pen)
 
     o = { }
 
@@ -477,24 +477,62 @@ module Skylab::Headless
       concat [:dark_red, :green, :yellow, :blue, :purple, :cyan, :white, :red].
         each.with_index.map { |v, i| [v, i+31] } ]
 
+    o[:code_names] = codes.keys # this is sub-product-private for now, and away at [#pl-013]
+
     o[:stylize] = -> str, *styles do
       "\e[#{ styles.map { |s| codes[s] }.compact.join ';' }m#{ str }\e[0m"
     end
 
-    o[:unstylize] = -> str do # nil if string is not stylized
-      str.dup.gsub! %r{  \e  \[  \d+  (?: ; \d+ )*  m  }x, ''
+    o[:unstylize_stylized] = unstylize_stylized = -> str do # nil when `str` is
+      str.to_s.dup.gsub! %r{  \e  \[  \d+  (?: ; \d+ )*  m  }x, '' # not already
+    end                                        # stylized - rec. only for tests!
+
+    o[:unstylize] = -> str do                  # the safer alternative, for when
+      unstylize_stylized[ str ] || str         # you don't care whether it was
+    end                                        # stylzed in the first place
+
+    FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
+
+  end
+
+
+  module CLI::Stylize
+    # pure namespace contained in this file.
+  end
+
+
+  module CLI::Stylize::Methods                 # here we have what amounts to
+                                               # i.m version of low level funcs,
+    fun = CLI::Pen::FUN                        # if you need e.g. `stylize`
+                                               # or `unstylize` and you don't
+    define_method :stylize, & fun.stylize      # want to pollute your namespace
+                                               # or coupling with all the
+    define_method :unstylize, & fun.unstylize  # view-y style names of Pen::I_M
+                                               # However avoid calling `stylize`
+    define_method :unstylize_stylized, &fun.unstylize_stylized # in application
+                                               # code when you can instead use
+    (fun.code_names - [:strong]).each do |c|   # (away at [#pl-013]) existing,
+      define_method( c ) { |s| stylize(s, c) } # modality-portable styles!
+      define_method(c.to_s.upcase) { |s| stylize(s, :strong, c) }
     end
-
-    FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v }
-
   end
 
 
   module CLI::Pen::InstanceMethods
     include Headless::Pen::InstanceMethods
+                        # (trying to use these when appropriate:
+                        # http://www.w3schools.com/tags/tag_phrase_elements.asp)
+
+    def em s
+      stylize s, :strong, :green
+    end
 
     def invalid_value mixed
       stylize(mixed.to_s.inspect, :strong, :dark_red) # may be overkill
+    end
+
+    def kbd s
+      stylize s, :green
     end
 
     def parameter_label x, idx=nil
@@ -508,25 +546,19 @@ module Skylab::Headless
       "<#{ stem }#{ idx }>" # will get built out eventually
     end
 
-    define_method :stylize, & CLI::Pen::FUN.stylize
+    fun = CLI::Pen::FUN
 
-    define_method :unstylize, & CLI::Pen::FUN.unstylize
-
+    define_method :stylize, & fun.stylize      # yes i repeat these same calls
+                                               # above -- it's because i hate
+    define_method :unstylize, & fun.unstylize  # absurdly long ancestor chains
+                                               # more than i hate a little
+    define_method :unstylize_stylized, & fun.unstylize_stylized # redundancy
+                                               # in declarative metaprogramming.
   end
 
 
   class CLI::Pen::Minimal
     include CLI::Pen::InstanceMethods
-
-    def em s
-      stylize s, :strong, :green
-    end
-
-    def kbd s
-      stylize s, :green
-    end
-
-    # http://www.w3schools.com/tags/tag_phrase_elements.asp
   end
 
   CLI::Pen::MINIMAL = CLI::Pen::Minimal.new
