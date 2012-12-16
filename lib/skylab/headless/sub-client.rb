@@ -11,7 +11,11 @@ module Skylab::Headless
 
     def initialize request_client # this is the heart of it all [#004]
       block_given? and raise ::ArgumentError.new 'blocks are not honored here'
-      _sub_client_init! request_client
+      _headless_sub_client_init! request_client
+    end
+
+    def _headless_sub_client_init! request_client
+      self.request_runtime = request_client
     end
 
     def actual_parameters         # not all stacks use this, just convenience
@@ -42,10 +46,6 @@ module Skylab::Headless
 
     attr_accessor :request_runtime # the center of [#005]
     alias_method :request_client, :request_runtime # one day!!
-
-    def _sub_client_init! request_client
-      self.request_runtime = request_client
-    end
 
     # --- * ---
 

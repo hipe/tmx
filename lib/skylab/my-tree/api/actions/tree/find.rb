@@ -67,7 +67,7 @@ module Skylab::MyTree
 
     def initialize request_client, paths, pattern=nil
       self.type = :file
-      _sub_client_init! request_client
+      _headless_sub_client_init! request_client
       @valid = set! paths: paths, pattern: pattern
     end
 

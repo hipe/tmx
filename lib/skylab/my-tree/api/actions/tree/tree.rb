@@ -45,7 +45,7 @@ module Skylab::MyTree
       @current = []
       @matrix = []
       @verbose = verbose
-      _sub_client_init! request_client
+      _headless_sub_client_init! request_client
     end
 
     def row seen, extra=nil

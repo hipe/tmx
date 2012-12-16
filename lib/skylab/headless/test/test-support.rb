@@ -18,4 +18,12 @@ module Skylab::Headless::TestSupport
       let( :debug ) { true }
     end
   end
+
+  module InstanceMethods
+    attr_accessor :debug
+
+    def debug!
+      self.debug = true
+    end
+  end
 end
