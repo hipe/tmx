@@ -1,4 +1,5 @@
-[#026] #open english unification
+[#027]       #tracking-tag #smell "the sub-client smell number 027" ..
+[#026]       #done english unification
 [#025]       #tracking for that cli weird old trick of dynamic help
 [#024]       #tracking-tag we only parse options at beginning in case we
              have sub-actions, but maybe we could improve this for leaf nodes
@@ -23,7 +24,7 @@
 [#007]       #done use of Parameter::Set#list, unify with Boxxy interface
 [#006]       #tracking-tag errors_count, settle it down eventually (rel. [#sl-116])
 [#005] #open unify concepts let sub-client trump rename parent_runtime par_clien
-[#004]       #pattern tracking the sub-client initialize() in modules thing
+[#004]       #pattern #tracking-tag the sub-client initialize() in modules thing
 [#003]       #done #refactor: use en.rb in sub-client
 [#002]       #done 2012-08-29 #refactor : interceptors under one roof
 [#001] #open 2012-08-18 #feature : term2html (and architecture)

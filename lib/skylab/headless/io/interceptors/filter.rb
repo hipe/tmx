@@ -71,7 +71,19 @@ module Skylab::Headless
       res
     end
 
+    # --*--
+
     alias_method :<<, :write
+
+    [:truncate, :rewind].each do |meth|
+      define_method meth do |*a|
+        if downstream.respond_to? meth
+          downstream.send meth, *a
+        else
+          nil # eek
+        end
+      end
+    end
 
   protected
 

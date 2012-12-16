@@ -61,7 +61,8 @@ module Skylab::MetaHell
 
     define_method :const_fetch do |path_a, not_found=nil, invalid=not_found, &b|
       b && not_found and raise ::ArgumentError.new "can't have block + lambdas"
-      result = nil ; ::Array === path_a or path_a = [path_a]
+      path_a = [path_a] unless ::Array === path_a
+      result = nil
       begin
         seen = [ ]
         r = path_a.reduce self do |box, name|

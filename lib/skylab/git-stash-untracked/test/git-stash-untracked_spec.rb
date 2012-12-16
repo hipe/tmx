@@ -46,7 +46,14 @@ module ::Skylab::GitStashUntracked::Tests
       let :stderr do
         o = TestSupport::StreamSpy.standard
         if debug
-          o.debug! -> e { "    (dbg:#{ [e.type, e.message].inspect })" }
+          o.debug! -> e do
+            if ::String === e
+              "    (dbg:(String?):#{ e.inspect }"
+            else
+              "    (dbg:#{ [e.type, e.message].inspect })"
+            end
+          end
+          o.debug! -> e {  }
         end
         o
       end
@@ -70,7 +77,7 @@ module ::Skylab::GitStashUntracked::Tests
         it "which lists untracked files" do
           with_popen3_out_as "derpus\nnerpus/herpus"
           app.invoke %w(status)
-          cmd_spy.should eql("git ls-files -o --exclude-standard")
+          cmd_spy.should eql("git ls-files --others --exclude-standard")
           stderr.string.should match(/nerpus\/herpus/)
         end
       end
@@ -89,10 +96,10 @@ module ::Skylab::GitStashUntracked::Tests
           actual = stderr.string
 
           expected = <<-HERE.unindent
-            # git ls-files -o --exclude-standard
-            mkdir -p ./tmp/gsu-xyzzy/foo/lippy
+            # git ls-files --others --exclude-standard
+            mkdir -p ./tmp/gsu-xyzzy/foo
             mv lippy ./tmp/gsu-xyzzy/foo/lippy
-            mkdir -p ./tmp/gsu-xyzzy/foo/dippy/doopy
+            mkdir -p ./tmp/gsu-xyzzy/foo/dippy
             mv dippy/doopy ./tmp/gsu-xyzzy/foo/dippy/doopy
             mv dippy/floopy ./tmp/gsu-xyzzy/foo/dippy/floopy
           HERE
@@ -110,10 +117,8 @@ module ::Skylab::GitStashUntracked::Tests
             stashes/alpha/herpus/derpus.txt
             stashes/beta/whatever.txt
           )
-          o = GitStashUntracked::API::Actions::List.new(
-            runtime_stub, stashes: gsu_tmpdir.join( 'stashes' )
-          )
-          r = o.invoke
+          o = GitStashUntracked::API::Actions::List.new runtime_stub
+          r = o.invoke stashes_path: gsu_tmpdir.join( 'stashes' )
           r.should_not eql( false )
           expected = <<-HERE.unindent
             alpha

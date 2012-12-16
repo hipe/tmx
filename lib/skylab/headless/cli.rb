@@ -476,6 +476,14 @@ module Skylab::Headless
 
     o = { }
 
+    codes = ::Hash[ [[:strong, 1]].
+      concat [:dark_red, :green, :yellow, :blue, :purple, :cyan, :white, :red].
+        each.with_index.map { |v, i| [v, i+31] } ]
+
+    o[:stylize] = -> str, *styles do
+      "\e[#{ styles.map { |s| codes[s] }.compact.join ';' }m#{ str }\e[0m"
+    end
+
     o[:unstylize] = -> str do # nil if string is not stylized
       str.dup.gsub! %r{  \e  \[  \d+  (?: ; \d+ )*  m  }x, ''
     end
@@ -487,10 +495,6 @@ module Skylab::Headless
 
   module CLI::IO::Pen::InstanceMethods
     include Headless::IO::Pen::InstanceMethods
-
-    MAP = ::Hash[ [[:strong, 1]].
-      concat [:dark_red, :green, :yellow, :blue, :purple, :cyan, :white, :red].
-        each.with_index.map { |v, i| [v, i+31] } ]
 
     def invalid_value mixed
       stylize(mixed.to_s.inspect, :strong, :dark_red) # may be overkill
@@ -507,9 +511,7 @@ module Skylab::Headless
       "<#{ stem }#{ idx }>" # will get built out eventually
     end
 
-    def stylize str, *styles
-      "\e[#{styles.map{ |s| MAP[s] }.compact.join(';')}m#{str}\e[0m"
-    end
+    define_method :stylize, & CLI::IO::Pen::FUN.stylize
 
     define_method :unstylize, & CLI::IO::Pen::FUN.unstylize
 
