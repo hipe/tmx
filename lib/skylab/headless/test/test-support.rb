@@ -23,7 +23,7 @@ module Skylab::Headless::TestSupport
     attr_accessor :debug
 
     def unstylize_if_stylized str
-      Headless::CLI::IO::Pen::FUN.unstylize[ str ] or str
+      Headless::CLI::Pen::FUN.unstylize[ str ] or str
     end
   end
 end

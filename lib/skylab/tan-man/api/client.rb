@@ -40,7 +40,7 @@ module Skylab::TanMan
 
   protected
 
-    pen = Headless::API::IO::Pen::Minimal.new
+    pen = Headless::API::Pen::Minimal.new
 
     pen.define_singleton_method :escape_path do |str|
       result = nil

@@ -156,7 +156,7 @@ module Skylab::CssConvert
     end
 
     def pen_class
-      CLI::IO::Pen # our own pen, just as a fun p.o.c.
+      CLI::Pen # our own pen, just as a fun p.o.c.
     end
   end
 
@@ -165,8 +165,8 @@ module Skylab::CssConvert
   end
 
 
-  class CLI::IO::Pen
-    include Headless::CLI::IO::Pen::InstanceMethods
+  class CLI::Pen
+    include Headless::CLI::Pen::InstanceMethods
     def em s
       stylize s, :strong, :cyan
     end

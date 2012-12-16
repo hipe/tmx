@@ -58,7 +58,7 @@ module Skylab::CovTree::TestSupport
 
     attr_reader :emit_spy
 
-    unstylize = ::Skylab::Headless::CLI::IO::Pen::FUN.unstylize # will change
+    unstylize = ::Skylab::Headless::CLI::Pen::FUN.unstylize # will change
 
     define_method :line do
       pair = stack.shift

@@ -49,6 +49,6 @@ module Skylab::CssConvert::TestSupport
       build_parser(CssConvert::Directive::Parser).parse_string pathname.read
     end
 
-    define_method :unstylize, & Headless::CLI::IO::Pen::FUN.unstylize
+    define_method :unstylize, & Headless::CLI::Pen::FUN.unstylize
   end
 end

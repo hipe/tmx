@@ -45,7 +45,7 @@ module Skylab::TanMan
   protected
 
     pen = -> do
-      o = Headless::CLI::IO::Pen::Minimal.new
+      o = Headless::CLI::Pen::Minimal.new
 
       fun = Headless::CLI::PathTools::FUN
 
@@ -63,7 +63,7 @@ module Skylab::TanMan
 
       # self.io_adapter = build_io_adapter sin, sout, serr, pen # after [#018]
       self.io_adapter =
-        Headless::CLI::IO::Adapter::Minimal.new sin, sout, serr, pen
+        Headless::CLI::IO_Adapter::Minimal.new sin, sout, serr, pen
 
       if events
         fail 'do we really want this?'

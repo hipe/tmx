@@ -40,7 +40,7 @@ module Skylab::TanMan::TestSupport::Sexp
 
   protected
 
-    pen = Headless::CLI::IO::Pen::Minimal.new
+    pen = Headless::CLI::Pen::Minimal.new
     def pen.escape_path str
       "«#{ str }»"                # "guillemets" just for fun and practice
     end

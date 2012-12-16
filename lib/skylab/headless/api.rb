@@ -70,17 +70,13 @@ module Skylab::Headless
   end
 
 
-  module API
-    module IO
-      module Pen
-        # aggregated forward delcarations can be promoted as needed
-      end
-    end
+  module API::Pen
+    # pure namespace contained entirely within this file. manifesto at H_L::Pen
   end
 
 
-  module API::IO::Pen::InstanceMethods
-    include Headless::IO::Pen::InstanceMethods
+  module API::Pen::InstanceMethods
+    include Headless::Pen::InstanceMethods
 
     def em s
       "\"#{ s }\""
@@ -93,11 +89,11 @@ module Skylab::Headless
   end
 
 
-  class API::IO::Pen::Minimal
-    include API::IO::Pen::InstanceMethods
+  class API::Pen::Minimal
+    include API::Pen::InstanceMethods
   end
 
 
-  API::IO::Pen::MINIMAL = API::IO::Pen::Minimal.new
+  API::Pen::MINIMAL = API::Pen::Minimal.new
 
 end

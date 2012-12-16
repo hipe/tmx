@@ -250,7 +250,7 @@ module Skylab::Headless
     end
 
     def io_adapter_class
-      Headless::CLI::IO::Adapter::Minimal
+      Headless::CLI::IO_Adapter::Minimal
     end
 
     def info msg                  # barebones implementation as a convenience
@@ -259,7 +259,7 @@ module Skylab::Headless
     end
 
     def pen_class
-      CLI::IO::Pen::Minimal
+      CLI::Pen::Minimal
     end
 
     def program_name
@@ -441,15 +441,12 @@ module Skylab::Headless
   end
 
 
-  module CLI::IO
+  module CLI::IO_Adapter
+    # pure namespace, all in this file.
   end
 
 
-  module CLI::IO::Adapter
-  end
-
-
-  class CLI::IO::Adapter::Minimal <            # For now (near [#sl-113] we do
+  class CLI::IO_Adapter::Minimal <            # For now (near [#sl-113] we do
     ::Struct.new :instream, :outstream, :errstream, :pen # not observe the PIE
     # convention, which is a higher-level eventy thing that assumes semantic
     # meaning to the different streams. Down here, we just want symbolic names
@@ -466,13 +463,13 @@ module Skylab::Headless
 
     # per edict [#sl-114] keep explicit mentions of the streams out at this
     # level -- they can be nightmarish to adapt otherwise.
-    def initialize sin, sout, serr, pen=CLI::IO::Pen::MINIMAL
+    def initialize sin, sout, serr, pen=CLI::Pen::MINIMAL
       super sin, sout, serr, pen
     end
   end
 
 
-  module CLI::IO::Pen
+  module CLI::Pen
 
     o = { }
 
@@ -493,8 +490,8 @@ module Skylab::Headless
   end
 
 
-  module CLI::IO::Pen::InstanceMethods
-    include Headless::IO::Pen::InstanceMethods
+  module CLI::Pen::InstanceMethods
+    include Headless::Pen::InstanceMethods
 
     def invalid_value mixed
       stylize(mixed.to_s.inspect, :strong, :dark_red) # may be overkill
@@ -511,15 +508,15 @@ module Skylab::Headless
       "<#{ stem }#{ idx }>" # will get built out eventually
     end
 
-    define_method :stylize, & CLI::IO::Pen::FUN.stylize
+    define_method :stylize, & CLI::Pen::FUN.stylize
 
-    define_method :unstylize, & CLI::IO::Pen::FUN.unstylize
+    define_method :unstylize, & CLI::Pen::FUN.unstylize
 
   end
 
 
-  class CLI::IO::Pen::Minimal
-    include CLI::IO::Pen::InstanceMethods
+  class CLI::Pen::Minimal
+    include CLI::Pen::InstanceMethods
 
     def em s
       stylize s, :strong, :green
@@ -532,6 +529,6 @@ module Skylab::Headless
     # http://www.w3schools.com/tags/tag_phrase_elements.asp
   end
 
-  CLI::IO::Pen::MINIMAL = CLI::IO::Pen::Minimal.new
+  CLI::Pen::MINIMAL = CLI::Pen::Minimal.new
 
 end

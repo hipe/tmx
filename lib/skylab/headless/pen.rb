@@ -1,6 +1,14 @@
 module Skylab::Headless
-  module IO::Pen end
-  module IO::Pen::InstanceMethods
+
+
+  module Pen                      # `Pen` (at this level) is an experimental
+    # pure namespace.             # attempt to generalize and unify a subset
+  end                             # of interface-level string decorating
+                                  # functions so that the same utterances can
+                                  # be articulated across multiple modalities
+                                  # to whatever extent possible.
+
+  module Pen::InstanceMethods
     def em s ; s end
     white_rx = /[[:space:]]/
     define_method :human_escape do |s|         # like shell_escape but for
@@ -14,5 +22,7 @@ module Skylab::Headless
       "#{stem}#{idx}"
     end
   end
-  IO::Pen::MINIMAL = ::Object.new.extend(IO::Pen::InstanceMethods)
+
+  Pen::MINIMAL = ::Object.new.extend Pen::InstanceMethods
+
 end

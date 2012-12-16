@@ -145,7 +145,7 @@ module Skylab::Flex2Treetop
   protected
 
     def build_io_adapter
-      API::IO::Adapter.new
+      API::IO_Adapter.new
     end
 
     def formal_parameters_class
@@ -196,16 +196,12 @@ module Skylab::Flex2Treetop
   end
 
 
-  module API::IO
+  class API::Pen
+    include Headless::API::Pen::InstanceMethods
   end
 
 
-  class API::IO::Pen              # changes at [#hl-015]
-    include Headless::API::IO::Pen::InstanceMethods
-  end
-
-
-  class API::IO::Adapter < ::Struct.new :payloads, :errors, :info_stream,
+  class API::IO_Adapter < ::Struct.new :payloads, :errors, :info_stream,
     :instream, :outstream, :pen
 
     def emit type, mixed
@@ -221,7 +217,7 @@ module Skylab::Flex2Treetop
   protected
 
     def initialize
-      super [], [], $stderr, nil, nil, API::IO::Pen.new
+      super [], [], $stderr, nil, nil, API::Pen.new
     end
   end
 

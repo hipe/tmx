@@ -10,7 +10,7 @@ module Skylab::Headless::TestSupport
 
   protected
 
-    def initialize pen=Headless::IO::Pen::MINIMAL
+    def initialize pen=Headless::Pen::MINIMAL
       super()
       @pen = pen
     end
