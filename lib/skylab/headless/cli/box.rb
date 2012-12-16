@@ -11,9 +11,17 @@ module Skylab::Headless
 
   protected
 
+    def action_box_module
+      self.class.action_box_module
+    end
+
     def box_enqueue_help!
       cmd = argv.shift if CLI::OPT_RX !~ argv.first # hack for prettier syntax:/
       enqueue! -> { help cmd }
+    end
+
+    def branch?
+      ! @leaf # hax
     end
 
     def default_action
@@ -41,13 +49,13 @@ module Skylab::Headless
     end
 
     def expecting_string
-      "expecting {#{ box.each.map { |x|
+      "expecting {#{ action_box_module.each.map { |x|
                               kbd  x.normalized_local_action_name }.join '|' }}"
     end
 
     def fetch action_str
       # #todo: fuzzy find
-      box.const_fetch action_str,
+      action_box_module.const_fetch action_str,
         -> e do
           error "there is no \"#{ e.name }\" action. #{ expecting_string }"
           usage_and_invite
@@ -73,38 +81,54 @@ module Skylab::Headless
       true                                     # continue w/ queue i suppose
     end
 
-    smart_summary_width = -> option_parser, actions do
+    smart_summary_width = -> option_parser, action_objects do
       # (Find the narrowest we can make column A of both sections (options
       # and actions) such that we accomodate the widest content there!)
 
-      max = actions.reduce 0 do |m, a|         # width of the widest action name
-        (x = a.normalized_local_action_name.to_s.length) > m ? x : m
+      max = action_objects.reduce 0 do |m, a|  # width of the widest action name
+        (x = a.send( :normalized_local_action_name ).to_s.length) > m ? x : m
       end
       max = CLI::FUN.summary_width[ option_parser, max ] # ditto here
       max + option_parser.summary_indent.length - 1 # ditto "parent" module
     end
 
+
     define_method :help_screen do
       emit usage_line
-      actions = box.each.to_a.freeze           # sure why not, cautious for now
-      option_parser.summary_width = smart_summary_width[ option_parser, actions]
-      help_options
-      _help_actions actions if actions.any?
+
+      action_objects = action_box_module.each.map do |action_class|
+        action_class.new self     # ich muss sein
+      end
+
+      if option_parser
+        option_parser.summary_width =
+          smart_summary_width[ option_parser, action_objects ]
+
+        help_options
+      end
+
+      _help_actions action_objects if action_objects.any?
+
       emit ''                                  # assumes there is section above!
       emit "use #{ kbd "#{ normalized_invocation_string } -h <action>"
                   } for help on that action"
       nil
     end
 
-    def _help_actions actions
+
+    def _help_actions action_objects
       emit ''
       emit "#{ em 'actions:' }"
       ind = option_parser.summary_indent
       fmt = "%-#{ option_parser.summary_width }s"
-      actions.each do |a|
-        emit "#{ ind }#{ kbd( fmt % [ a.normalized_local_action_name ] ) } #{
-          }teach me how to #{ a.normalized_local_action_name }"
+
+      action_objects.each do |action_object|
+        x = action_object.summary_line
+        x = " #{ x }" if x
+        name = action_object.normalized_local_action_name
+        emit "#{ ind }#{ kbd( fmt % [ name ] ) }#{ x }"
       end
+
       nil
     end
 

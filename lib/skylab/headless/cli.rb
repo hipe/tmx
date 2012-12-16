@@ -8,8 +8,14 @@ module Skylab::Headless
 
 
   module CLI::Action
+    # pure namespace module, contained entirely this file
   end
 
+
+  module CLI::Action::ModuleMethods
+    include Headless::Action::ModuleMethods
+
+  end
 
   module CLI::Action::InstanceMethods
     extend MetaHell::Let
@@ -17,9 +23,9 @@ module Skylab::Headless
     include Headless::Action::InstanceMethods
 
     def invoke argv
+      result = nil
       @argv = argv                # it really is nice to have it both ways, this
-      (@queue ||= []).clear       # create queue if not exist, and empty it
-      result = nil                # (#todo we might be insane and not empty it)
+      @queue ||= []               # (omg cueue might have shenanigans on it)
       begin
         result = parse_opts argv  # implement parse_opt however you want,
         true == result or break   # but to allow fancy exit statii we have to
@@ -61,19 +67,23 @@ module Skylab::Headless
       result
     end
 
+    attr_accessor :param_h        # experimental, for dsl
+
   protected
 
-    let :argument_syntax do          # assumes `default_action` for now
+    let :argument_syntax do       # assumes `default_action` for now
       build_argument_syntax_for default_action
     end
 
     attr_reader :argv
 
+    def build_argument_syntax parameters_a
+      Headless::CLI::ArgumentSyntax::Inferred.new parameters_a,
+        pen, (formal_parameters if respond_to? :formal_parameters)
+    end
+
     def build_argument_syntax_for method_name
-      Headless::CLI::ArgumentSyntax::Inferred.new(
-        method( method_name ).parameters,
-        pen,
-        (formal_parameters if respond_to? :formal_parameters) )
+      build_argument_syntax method( method_name ).parameters
     end
 
     def enqueue! mixed_callable
@@ -89,17 +99,18 @@ module Skylab::Headless
       true                        # do any further processing in the queue.
     end
 
-    def help_options              # in the old days this was option_parser.to_s
-      if option_parser
-        emit :help, ''            # assumes there was previous above content!
-        if option_parser.top.list.detect { |x| x.respond_to? :summarize }
-          emit :help, "#{ em 'options:' }"     # else maybe empty or doc only
-        end
-        option_parser.summarize do |line|
-          emit :help, line
-        end
+
+    def help_options              # precondition: an option_parser exists
+      # (in the old days this was option_parser.to_s, which should still work.)
+      emit :help, ''              # assumes there was previous above content!
+      if option_parser.top.list.detect { |x| x.respond_to? :summarize }
+        emit :help, "#{ em 'options:' }"     # else maybe empty or doc only
+      end
+      option_parser.summarize do |line|
+        emit :help, line
       end
     end
+
 
     smart_summary_width = -> option_parser do
       max = CLI::FUN.summary_width[ option_parser ]
@@ -110,8 +121,10 @@ module Skylab::Headless
 
     define_method :help_screen do
       emit :help, usage_line
-      option_parser.summary_width = smart_summary_width[ option_parser ]
-      help_options
+      if option_parser
+        option_parser.summary_width = smart_summary_width[ option_parser ]
+        help_options
+      end
       nil
     end
 
@@ -122,11 +135,11 @@ module Skylab::Headless
 
     def normalized_invocation_string
       "#{ @request_runtime.send :normalized_invocation_string } #{
-        normalized_local_action_name}"
+        }#{ normalized_local_action_name }"
     end
 
     let :option_parser do
-      build_option_parser
+      self.build_option_parser
     end
 
     def option_syntax_string
@@ -144,40 +157,50 @@ module Skylab::Headless
     end                           # `process_param_queue!`)
 
     def parse_argv_for m
-      build_argument_syntax_for(m).parse_argv(argv) do |o|
+      as = build_argument_syntax_for m
+      res = as.parse_argv( argv ) do |o|
+
         o.on_unexpected do |a|
-          usage("unexpected argument#{s a}: #{a[0].inspect}#{
-            " [..]" if a.length > 1}") && nil
+          usage "unexpected argument#{ s a }: #{ a[0].inspect }#{
+            }#{" [..]" if a.length > 1 }"
+          nil
         end
+
         o.on_missing do |fragment|
           fragment = fragment[0..fragment.index{ |p| :req == p.opt_req_rest }]
-          usage("expecting: #{em fragment.string}") && nil
+          usage "expecting: #{ em fragment.string }"
+          nil
         end
+
       end
+      res
     end
 
     def parse_opts argv           # mutate `argv` (which is probably also @argv)
-                                  # what you do with the data is your business.
+      @leaf ||= nil               # what you do with the data is your business.
       exit_status = true          # result in true on success, other on failure
       begin
         if argv.empty?            # options are always optional! don't even
-          break                   # build any option_parser, much less invoke it
+          break                   # build option_parser, much less invoke it.
         end
-        if CLI::OPT_RX !~ argv.first # avoid parsing opts intended for child
-          break                   # actions by requiring that opts come before
-        end                       # args (might change [#hl-024])
+        if branch?                # If we are a branch, how do we know whether
+          if CLI::OPT_RX !~ argv.first    # to parse the opts?
+            break
+          end
+        end # (might change [#hl-024])
         if ! option_parser        # if you don't have one, which is certainly
           break                   # not strange, then we just leave brittany
         end                       # alone and let downstream deal with argv
         begin                     # option_parser can be some fancy arbitrary
-          option_parser.parse! argv # thing, but it needs to conform to at least
-        rescue ::OptionParser::ParseError => e # these two parts of stdlib ::O_P
-          usage e.message
+          option_parser.parse! argv # thing, but it needs to conform to at
+        rescue Headless::Services::OptionParser::ParseError => e # least
+          usage e.message         # these two parts of stdlib ::O_P
           exit_status = exit_status_for :parse_opts_failed
         end
       end while nil
-      if true == exit_status && @param_queue # get through basic option parsing
-        exit_status = process_param_queue! # first before you actually validate
+      @param_queue ||= nil        # #experimental'y get through basic option
+      if true == exit_status && @param_queue # parsing first before you
+        exit_status = process_param_queue! # before you actually validate
       end                         # with your custom setters (if u want)
       exit_status
     end
@@ -202,6 +225,29 @@ module Skylab::Headless
       true                        # what your upstream should be, but per
     end                           # [#hl-023] this must be literally true for ok
 
+
+    strip_description_label_rx = /\A[ \t]*description:?[ \t]*/i
+
+    define_method :summary_line do
+      res = nil
+      begin
+        if self.class.desc_lines               # 1) if we have desc lines
+          break( res = super )                 # then use the first one (prolly)
+        end
+        op = option_parser                     # 2) else if we have an o.p.
+        if op                                  # *and* the first element of it
+          first = op.top.list.first            # is a string, use that! #exp
+          if ::String === op.top.list.first
+            str = CLI::Pen::FUN.unstylize[ first ]
+            res = str.gsub strip_description_label_rx, '' # (#hack!)
+            break
+          end
+        end
+        res = CLI::Pen::FUN.unstylize[ usage_line ] # 3) else this, unstylized
+      end while nil
+      res
+    end
+
     def usage msg=nil
       emit :help, msg if msg
       usage_and_invite
@@ -221,7 +267,8 @@ module Skylab::Headless
     def usage_syntax_string
       [ normalized_invocation_string,
         option_syntax_string,
-        argument_syntax.string ].compact.join ' '
+        argument_syntax.string
+      ].compact.join ' '
     end
   end
 
@@ -251,7 +298,7 @@ module Skylab::Headless
       result = argv
       while ! actual.empty?
         if formal.empty?
-          result = hooks.on_unexpected.call(actual)
+          result = hooks.on_unexpected[ actual ]
           break
         elsif idx = formal.index { |f| :req == f.opt_req_rest }
           actual.shift # knock these off l to r always
@@ -265,7 +312,7 @@ module Skylab::Headless
         end
       end
       if formal.detect { |p| :req == p.opt_req_rest }
-        result = hooks.on_missing.call(formal)
+        result = hooks.on_missing[ formal ]
       end
       result
     end

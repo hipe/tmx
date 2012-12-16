@@ -18,7 +18,6 @@ module Skylab::Headless
       @error_count = 0            # (if this overwrites an important nonzero
                                   # value here, you deserve whatver happens
                                   # to you. why would u call init 2x?)
-      @param_queue = nil          # (experimental)
       self.request_runtime = request_client
     end
 

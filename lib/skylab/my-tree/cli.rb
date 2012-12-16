@@ -14,11 +14,11 @@ module Skylab::MyTree
     include Headless::CLI::Client::InstanceMethods # not all clients are boxen
     include Headless::CLI::Box::InstanceMethods    # not all boxen are clients
 
-  protected
-
-    def box
+    def self.action_box_module
       API::Actions
     end
+
+  protected
 
     def build_option_parser       # #frontier
       o = MyTree::Services::OptionParser.new
