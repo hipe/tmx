@@ -6,7 +6,7 @@
 [#119] #open #tracking-tag #pattern of def.self some_thing instead of DSL
 [#118] #open unify find command in multiple places
 [#117]       #pattern of defaults (if not nil, etc)
-[#116]       #pattern of set!, update_attributes! etc (w/ errors_count)
+[#116]       #pattern of set!, update_attributes! etc (w/ error_count)
 [#115]       #pattern of functionalizing things
 [#114]       #pattern of "stdin, stdout, stderr" as constructor to CLI clients
 [#113]       #pattern of PIE standard

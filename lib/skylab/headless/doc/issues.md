@@ -1,3 +1,6 @@
+[#029] #open `stylize` as any of two of these happen: [#gs-004] [#bn-005]
+               [#to-001] [#sc-001] [#ts-005] (low level nerks)
+[#028]       #future [#bn-004]
 [#027]       #tracking-tag #smell "the sub-client smell number 027" ..
 [#026]       #done english unification
 [#025]       #tracking for that cli weird old trick of dynamic help
@@ -22,7 +25,7 @@
 [#009]       #tracking-tag places where HL::Parameters show signs of strain
 [#008]       P::C::I_M --> SC::I_M
 [#007]       #done use of Parameter::Set#list, unify with Boxxy interface
-[#006]       #tracking-tag errors_count, settle it down eventually (rel. [#sl-116])
+[#006]       #done #tracking-tag errors_count, settle it down eventually (rel. [#sl-116])
 [#005] #open unify concepts let sub-client trump rename parent_runtime par_clien
 [#004]       #pattern #tracking-tag the sub-client initialize() in modules thing
 [#003]       #done #refactor: use en.rb in sub-client

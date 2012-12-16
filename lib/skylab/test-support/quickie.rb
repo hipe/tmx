@@ -22,7 +22,7 @@ module Skylab::TestSupport::Quickie
   module TiteStyle
     _ = [nil, :strong, * Array.new(29), :red, :green, :yellow, :blue, :magenta, :cyan, :white]
     MAP = Hash[ * _.each_with_index.map { |sym, idx| [sym, idx] if sym }.compact.flatten ]
-    def stylize str, *styles ; "\e[#{styles.map{ |s| MAP[s] }.compact.join(';')}m#{str}\e[0m" end
+    def stylize str, *styles ; "\e[#{styles.map{ |s| MAP[s] }.compact.join(';')}m#{str}\e[0m" end # [#ts-005]
     def title(s) ; stylize(s, :green           ) end
     def faild(s) ; stylize(s, :red             ) end
     def passd(s) ; stylize(s, :green           ) end
