@@ -11,8 +11,8 @@ module Skylab::MyTree
 
 
   class CLI::Client
-    include Headless::CLI::Client::InstanceMethods
-    include Headless::CLI::Box::InstanceMethods
+    include Headless::CLI::Client::InstanceMethods # not all clients are boxen
+    include Headless::CLI::Box::InstanceMethods    # not all boxen are clients
 
   protected
 

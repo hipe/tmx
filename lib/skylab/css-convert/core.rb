@@ -21,6 +21,12 @@ module Skylab::CssConvert
   module Core::SubClient::InstanceMethods
     include Headless::SubClient::InstanceMethods
 
+  protected
+
+    def _css_convert_sub_client_init! request_client
+      _headless_sub_client_init! request_client
+    end
+
     def escape_path x
       request_client.escape_path x
     end
@@ -170,6 +176,10 @@ module Skylab::CssConvert
     def em s
       stylize s, :strong, :cyan
     end
+
+    def kbd s
+      stylize s, :cyan
+    end
   end
 
 
@@ -181,7 +191,8 @@ module Skylab::CssConvert
   protected
     def color_test _
       pen = io_adapter.pen ; width = 50
-      (colors = (pen.class::MAP.keys - [:strong])).each do |c|
+      code_names = Headless::CLI::Pen::FUN.code_names
+      (colors = (code_names - [:strong])).each do |c|
         [[c], [:strong, c]].each do |a|
           s = "would you like some " <<
             "#{pen.stylize(a.map(&:to_s).join(' '), *a)} with that?"
