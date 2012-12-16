@@ -30,6 +30,10 @@ module Skylab::TanMan
 
   protected
 
+    def _tan_man_sub_client_init! request_client
+      _headless_sub_client_init! request_client
+    end
+
     def controllers
       request_client.send :controllers
     end

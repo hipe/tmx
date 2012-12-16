@@ -15,21 +15,33 @@ module Skylab::Headless
     end
 
     def _headless_sub_client_init! request_client
-      self.request_runtime = request_client
-    end
+      @error_count = 0            # (if this overwrites an important nonzero
+      self.request_runtime = request_client # value here, you deserve whatver
+    end                           # happens to you. why would u call init 2x?)
 
     def actual_parameters         # not all stacks use this, just convenience
       request_client.send :actual_parameters
     end
 
-    def emit *a
-      request_client.send :emit, *a
+    def emit *a                   # (don't get into the habbit of expecting
+      request_client.send :emit, *a # meaninful results from `emit` --
+      nil                         # it's just never a good idea.  ever.)
     end
 
-    def error s                   # be prepared for this to cause trouble
-      emit :error, s
-      false
-    end
+    def error s                   # be extra careful around methods that
+      increment_error_count!      # affect or are expected to affect the
+      emit :error, s              # validity of your sub-client!
+      false                       # this implementation is the result of a
+    end                           # "perfect abstraction" but may still cause
+                                  # you pain if you're not careful.
+
+    attr_reader :error_count      # there is no absolutely no guarantee that
+                                  # that out of the box this is reflective
+                                  # of anything that you think it is.  caution!
+
+    def increment_error_count!    # use this if you need to do it manually
+      @error_count += 1           # (note it happens in the above impl for
+    end                           # `error` though)
 
     def io_adapter                # sometimes sub-clients need access to
       request_client.send :io_adapter # the streams, e.g. the instream

@@ -23,20 +23,10 @@ module Skylab::Headless
       io_adapter.emit type, *payload
     end
 
-    def error s                   # bound to sub-client (#sc-bound)
-      emit :error, s              # this does *not* increment a counter [#006]
-      false                       # *very* conventional to result in false!
-    end
-
     def infer_valid_action_names_from_public_instance_methods # [#017]
       a = [] ; _a = self.class.ancestors ; m = nil
       a << m if IGNORE_THIS_CONSTANT !~ m.to_s until ::Object == (m = _a.shift)
       a.map { |_m| _m.public_instance_methods false }.flatten
-    end
-
-    def info s                    # bound to sub-client (#sc-bound)
-      emit :info, s
-      nil                         # result is undefined
     end
 
     def io_adapter                # bound to sub-client (#sc-bound)

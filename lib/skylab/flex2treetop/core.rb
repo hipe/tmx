@@ -48,6 +48,10 @@ module Skylab::Flex2Treetop
     end
 
   protected
+
+    def initialize
+      _headless_sub_client_init! nil # modality clients are always this way
+    end
   end
 
 
