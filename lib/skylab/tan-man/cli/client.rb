@@ -73,6 +73,8 @@ module Skylab::TanMan
         # saying e.to_s is probably not what you want -- you will get a hash
         # if the message has been changed via message=
       end
+
+      _tan_man_sub_client_init! nil # get it?
     end
 
     def anchor_module # gone at [#022] maybe..

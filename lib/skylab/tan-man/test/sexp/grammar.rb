@@ -48,11 +48,11 @@ module Skylab::TanMan::TestSupport::Sexp
     define_method :initialize do
       |sin=$stdin, sout=$stdout, serr=$stderr| # observe pattern [#sl-114]
 
-      @errors_count = 0           # used by experimental param_queue
       @param_queue = []           # shenanigans
       @stdin = sin                # we keep this stream on deck but don't set
                                   # upstream yet. it takes logix. [#hl-022]
       self.io_adapter = build_io_adapter nil, sout, serr, pen
+      _headless_sub_client_init! nil
     end
 
 
@@ -104,12 +104,6 @@ module Skylab::TanMan::TestSupport::Sexp
 
     def default_action
       :execute
-    end
-
-    def error msg                 # part of param_queue
-      @errors_count += 1
-      emit :error, msg
-      false
     end
 
     attr_accessor :eval_string    # used by param_queue
@@ -179,13 +173,13 @@ module Skylab::TanMan::TestSupport::Sexp
 
     def process_param_queue
       res = true
-      before = @errors_count
+      before = error_count
       loop do
         k, v = param_queue.shift
         k or break
         send "#{ k }=", v
       end
-      if before < @errors_count
+      if before < error_count
         res = false
       end
       res

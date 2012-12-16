@@ -16,6 +16,7 @@ module Skylab::GitStashUntracked
 
 
   module SubClient_InstanceMethods
+    include Headless::SubClient::InstanceMethods
 
     # (no public methods defined in this module)
 
@@ -27,8 +28,7 @@ module Skylab::GitStashUntracked
 
     def _gsu_sub_client_init! request_client
       @emit = nil
-      @error_count = 0
-      @request_client = request_client
+      _headless_sub_client_init! request_client
       nil
     end
 
@@ -36,33 +36,21 @@ module Skylab::GitStashUntracked
       if @emit
         @emit[ type, msg ]
       else
-        @request_client.emit type, msg
+        request_client.emit type, msg
       end
     end
 
-    def error msg
-      @error_count += 1
-      emit :error, msg
-      false
-    end
-
-    attr_reader :error_count
-
-    def info msg
+    def info msg                  # (just like ancestor but decorated)
       emit :info, "# #{ msg }"
       nil
     end
 
-    def payload data
+    def payload data              # away at [#ct-005]
       emit :payload, data
       nil
     end
 
-    def pen
-      @request_client.send :pen
-    end
-
-    def stylize *a
+    def stylize *a                # away at [#hl-029]
       pen.stylize(* a )
     end
   end
@@ -72,7 +60,7 @@ module Skylab::GitStashUntracked
   module Color_InstanceMethods
 
     def color?
-      @request_client.send :color?
+      request_client.send :color?
     end
   end
 
@@ -279,7 +267,7 @@ module Skylab::GitStashUntracked
       if verbose                               # path escaping, just show raw,
         res = x                                # long paths.
       else
-        res = @request_client.send :escape_path, x # otherwise, let the modality
+        res = request_client.send :escape_path, x # otherwise, let the modality
       end                                      # client (e.g.) decide how
       res
     end

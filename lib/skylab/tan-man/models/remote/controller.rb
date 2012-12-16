@@ -56,11 +56,11 @@ module Skylab::TanMan
     OnEdit = API::Emitter.new(:all, error: :all)
 
     def edit attrs, &b
-      errors_count = 0
-      self.error_emitter = OnEdit.new(b, ->(o) { o.on_error { errors_count += 1 } } )
+      error_count = 0
+      self.error_emitter = OnEdit.new(b, ->(o) { o.on_error { error_count += 1 } } ) # wtf
       attrs.each { |k, v| send("#{k}=", v) } # assume events are emitted on errors
       self.error_emitter = nil
-      0 == errors_count ? self : false
+      0 == error_count ? self : false
     end
 
     attr_accessor :enumerator

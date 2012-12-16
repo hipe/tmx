@@ -7,9 +7,9 @@ module Skylab::Headless
     # emitting of any resulting errors (#pattern [#sl-116]).
     # Result is a boolean indicating whether no errors occured.
     #
-    def set! actual_h=nil, actual=self.actual_parameters
+    def set! actual_h=nil, actual=self.actual_parameters # [#sl-116]
       actual_h = actual_h ? actual_h.dup : { } # don't change original
-      errors_count_before = errors_count
+      error_count_before = error_count
       prune_bad_keys actual_h
       defaults actual_h
       actual_h.each do |name, value|
@@ -20,7 +20,7 @@ module Skylab::Headless
         end
       end
       missing_required actual
-      errors_count_before == errors_count # returning anything otherwise would
+      error_count_before == error_count # returning anything otherwise would
       # be bad design via tight coupling of our implementation and the bool fact
     end
 
@@ -39,28 +39,12 @@ module Skylab::Headless
       nil
     end
 
-    def error msg                 # the home for this is very in flux [#006]
-      emit :error, msg
-      increment_errors_count!
-      false
-    end
-
-    def errors_count              # idem [#006]
-      @errors_count ||= 0
-    end
-
-    attr_writer :errors_count     # idem [#006]
-
     def formal_parameters
       formal_parameters_class.parameters
     end
 
     def formal_parameters_class   # feel free to override!
       self.class
-    end
-
-    def increment_errors_count!
-      self.errors_count += 1
     end
 
     def missing_required actual

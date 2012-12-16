@@ -80,7 +80,7 @@ module Skylab::Issue
   protected
 
     def initialize modality_client
-      _sub_client_init! modality_client
+      _issue_sub_client_init! modality_client
     end
   end
 end

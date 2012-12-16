@@ -100,7 +100,7 @@ module Skylab::TreetopTools
     end
 
     def normalize_and_validate_paths_to param_name
-      errors_count_before = errors_count
+      error_count_before = error_count
       root_f = ->(bp) do
         root = bound_parameters[param_name]
         ! root.value and return error("#{root.name} must be set in " <<
@@ -125,7 +125,7 @@ module Skylab::TreetopTools
           error("#{ bp.label } not found: #{ bp.value.pretty }")
         end
       end
-      errors_count == errors_count_before
+      error_count == error_count_before
     end
 
     def recompile g

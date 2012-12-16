@@ -104,7 +104,7 @@ module Skylab::Issue
     param_struct = ::Struct.new :identifier, :last
 
     define_method :initialize do |emitter, param_h|
-      _sub_client_init! emitter
+      _issue_sub_client_init! emitter
       @counter = nil
       @index = { }
       @or = [ ]
