@@ -430,12 +430,28 @@ module Skylab::GitStashUntracked
     PARAMS = [:color, :name, :patch, :stashes_path, :stat]
 
     def execute
-      s = collection.stash name
-      @stash = collection.stash(name).validate_existence or return false
-      (@patch.nil? and @stat.nil?) and @stat = true
-      @stat and @stash.each_stat_line(&method(:emit))
-      @patch and @stash.each_patch_line(&method(:emit))
-      true
+      res = nil
+      begin
+        stash = collection.stash name
+        stash = stash.validate_existence
+        if ! stash
+          break( res = stash )
+        end
+        if ! (stat || patch)
+          self.stat = true
+        end
+        if stat
+          stash.stat_lines.each do |type, string|
+            emit type, string
+          end
+        end
+        if patch
+          stash.patch_lines.each do |type, string|
+            emit type, string
+          end
+        end
+      end while nil
+      res
     end
 
   protected
@@ -447,6 +463,8 @@ module Skylab::GitStashUntracked
 
     attr_accessor :color, :name, :patch, :stashes_path, :stat
     alias_method :color?, :color # api compat
+
+    attr_reader :stash
 
   end
 
@@ -523,17 +541,26 @@ module Skylab::GitStashUntracked
     include SubClient_InstanceMethods
     include Color_InstanceMethods
 
-    def each_patch_line &emit
-      f = color? ? ColorizedPatch[ emit ] : emit
-      MakePatch[ pathname, f ]
-    end
-
-    def each_stat_line &emit
-      MakeStat[ self, pathname, emit ]
-    end
-
     def name
       @pathname.basename.to_s
+    end
+
+    def patch_lines
+      ::Enumerator.new do |y|
+        emit = -> type, line do
+          y <<  [type, line]
+        end
+        if color?
+          emit = ColorizedPatch[ emit ]
+        end
+        MakePatch[ pathname, emit ]
+      end
+    end
+
+    def stat_lines
+      ::Enumerator.new do |y|
+        MakeStat[ self, pathname, -> type, msg { y << [type, msg] } ]
+      end
     end
 
     def pop dry_run, verbose, emit
@@ -721,7 +748,7 @@ module Skylab::GitStashUntracked
   ]
 
   ColorizedPatch = -> lamb do
-    ->(type, line) do
+    -> type, line do
       lamb[type, PATCH_STYLES[PATCH_LINE.match(line).captures.each_with_index.detect{ |s, i| ! s.nil? }[1]][line]]
     end
   end
