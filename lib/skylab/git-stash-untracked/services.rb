@@ -6,6 +6,7 @@ module Skylab::GitStashUntracked               # centralize std-lib deps,
 
     o :FileUtils   , -> { require 'fileutils'   ; ::FileUtils }
     o :Open3       , -> { require 'open3'       ; ::Open3 }
+    o :OptionParser, -> { require 'optparse'    ; ::OptionParser }
 
     # --*--
 

@@ -9,8 +9,12 @@ module Skylab::Headless
 
   protected
 
-    def initialize # override parent-child type constructor from s.c. [#004]
-    end            # because a true 'client' is usually at some kind of root
+    def initialize                # (remember this is the base module for those
+                                  # clients that fall all the way back to this
+                                  # and as such it must be modality-agnostic
+                                  # here. anything fancy belongs elsewhere.)
+      _headless_sub_client_init! nil                      # (part of [#hl-004])
+    end
 
     def actual_parameters         # not all stacks use this. #sc-bound
     end                           # override it as you please.

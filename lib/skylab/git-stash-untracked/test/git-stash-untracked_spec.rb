@@ -58,6 +58,8 @@ module ::Skylab::GitStashUntracked::Tests
         o
       end
 
+      define_method :unstylize, & Headless::CLI::Pen::FUN.unstylize
+
       def with_popen3_out_as str
         me = self
         ::Open3.stub :popen3 do |cmd, &block|
@@ -152,8 +154,6 @@ module ::Skylab::GitStashUntracked::Tests
             +
           HERE
         end
-
-        include Porcelain::Styles # unstylize
 
         it "by default does the --stat format" do
           with_this_stash

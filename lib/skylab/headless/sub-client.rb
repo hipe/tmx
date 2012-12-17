@@ -16,8 +16,10 @@ module Skylab::Headless
 
     def _headless_sub_client_init! request_client
       @error_count = 0            # (if this overwrites an important nonzero
-      self.request_runtime = request_client # value here, you deserve whatver
-    end                           # happens to you. why would u call init 2x?)
+                                  # value here, you deserve whatver happens
+                                  # to you. why would u call init 2x?)
+      self.request_runtime = request_client
+    end
 
     def actual_parameters         # not all stacks use this, just convenience
       request_client.send :actual_parameters

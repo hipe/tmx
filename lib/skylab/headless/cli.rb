@@ -8,8 +8,14 @@ module Skylab::Headless
 
 
   module CLI::Action
+    # pure namespace module, contained entirely this file
   end
 
+
+  module CLI::Action::ModuleMethods
+    include Headless::Action::ModuleMethods
+
+  end
 
   module CLI::Action::InstanceMethods
     extend MetaHell::Let
@@ -17,11 +23,11 @@ module Skylab::Headless
     include Headless::Action::InstanceMethods
 
     def invoke argv
+      result = nil
       @argv = argv                # it really is nice to have it both ways, this
-      (@queue ||= []).clear       # create queue if not exist, and empty it
-      result = nil                # (#todo we might be insane and not empty it)
+      @queue ||= []               # (omg cueue might have shenanigans on it)
       begin
-        result = parse_opts argv  # implement parse_opts however you want,
+        result = parse_opts argv  # implement parse_opt however you want,
         true == result or break   # but to allow fancy exit statii we have to
                                   # observe this strict ickiness [#hl-023]
 
@@ -61,19 +67,23 @@ module Skylab::Headless
       result
     end
 
+    attr_accessor :param_h        # experimental, for dsl
+
   protected
 
-    let :argument_syntax do          # assumes `default_action` for now
+    let :argument_syntax do       # assumes `default_action` for now
       build_argument_syntax_for default_action
     end
 
     attr_reader :argv
 
+    def build_argument_syntax parameters_a
+      Headless::CLI::ArgumentSyntax::Inferred.new parameters_a,
+        pen, (formal_parameters if respond_to? :formal_parameters)
+    end
+
     def build_argument_syntax_for method_name
-      Headless::CLI::ArgumentSyntax::Inferred.new(
-        method( method_name ).parameters,
-        pen,
-        (formal_parameters if respond_to? :formal_parameters) )
+      build_argument_syntax method( method_name ).parameters
     end
 
     def enqueue! mixed_callable
@@ -89,17 +99,18 @@ module Skylab::Headless
       true                        # do any further processing in the queue.
     end
 
-    def help_options              # in the old days this was option_parser.to_s
-      if option_parser
-        emit :help, ''            # assumes there was previous above content!
-        if option_parser.top.list.detect { |x| x.respond_to? :summarize }
-          emit :help, "#{ em 'options:' }"     # else maybe empty or doc only
-        end
-        option_parser.summarize do |line|
-          emit :help, line
-        end
+
+    def help_options              # precondition: an option_parser exists
+      # (in the old days this was option_parser.to_s, which should still work.)
+      emit :help, ''              # assumes there was previous above content!
+      if option_parser.top.list.detect { |x| x.respond_to? :summarize }
+        emit :help, "#{ em 'options:' }"     # else maybe empty or doc only
+      end
+      option_parser.summarize do |line|
+        emit :help, line
       end
     end
+
 
     smart_summary_width = -> option_parser do
       max = CLI::FUN.summary_width[ option_parser ]
@@ -110,23 +121,25 @@ module Skylab::Headless
 
     define_method :help_screen do
       emit :help, usage_line
-      option_parser.summary_width = smart_summary_width[ option_parser ]
-      help_options
+      if option_parser
+        option_parser.summary_width = smart_summary_width[ option_parser ]
+        help_options
+      end
       nil
     end
 
     def invite_line # we have to avoid assuming we process opts
-      "use #{ kbd "#{ request_runtime.send :normalized_invocation_string
+      "use #{ kbd "#{ request_runtime.send :normalized_invocation_string }#{
         } -h #{ normalized_local_action_name }" } for help"
     end
 
     def normalized_invocation_string
       "#{ @request_runtime.send :normalized_invocation_string } #{
-        normalized_local_action_name}"
+        }#{ normalized_local_action_name }"
     end
 
     let :option_parser do
-      build_option_parser
+      self.build_option_parser
     end
 
     def option_syntax_string
@@ -139,40 +152,71 @@ module Skylab::Headless
       end
     end
 
+    def param_queue               # (experimental atomic processing of .e.g
+      @param_queue ||= []         # options -- see manifesto and warnings at
+    end                           # `process_param_queue!`)
+
     def parse_argv_for m
-      build_argument_syntax_for(m).parse_argv(argv) do |o|
+      as = build_argument_syntax_for m
+      res = as.parse_argv( argv ) do |o|
+
         o.on_unexpected do |a|
-          usage("unexpected argument#{s a}: #{a[0].inspect}#{
-            " [..]" if a.length > 1}") && nil
+          usage "unexpected argument#{ s a }: #{ a[0].inspect }#{
+            }#{" [..]" if a.length > 1 }"
+          nil
         end
+
         o.on_missing do |fragment|
           fragment = fragment[0..fragment.index{ |p| :req == p.opt_req_rest }]
-          usage("expecting: #{em fragment.string}") && nil
+          usage "expecting: #{ em fragment.string }"
+          nil
         end
+
       end
+      res
     end
 
     def parse_opts argv           # mutate `argv` (which is probably also @argv)
-                                  # what you do with the data is your business.
+      @leaf ||= nil               # what you do with the data is your business.
       exit_status = true          # result in true on success, other on failure
       begin
         if argv.empty?            # options are always optional! don't even
-          break                   # build any option_parser, much less invoke it
+          break                   # build option_parser, much less invoke it.
         end
-        if CLI::OPT_RX !~ argv.first # avoid parsing opts intended for child
-          break                   # actions by requiring that opts come before
-        end                       # args (might change [#hl-024])
+        if branch?                # If we are a branch, how do we know whether
+          if CLI::OPT_RX !~ argv.first    # to parse the opts?
+            break
+          end
+        end # (might change [#hl-024])
         if ! option_parser        # if you don't have one, which is certainly
           break                   # not strange, then we just leave brittany
         end                       # alone and let downstream deal with argv
         begin                     # option_parser can be some fancy arbitrary
-          option_parser.parse! argv # thing, but it needs to conform to at least
-        rescue ::OptionParser::ParseError => e # these two parts of stdlib ::O_P
-          usage e.message
+          option_parser.parse! argv # thing, but it needs to conform to at
+        rescue Headless::Services::OptionParser::ParseError => e # least
+          usage e.message         # these two parts of stdlib ::O_P
           exit_status = exit_status_for :parse_opts_failed
         end
       end while nil
+      @param_queue ||= nil        # #experimental'y get through basic option
+      if true == exit_status && @param_queue # parsing first before you
+        exit_status = process_param_queue! # before you actually validate
+      end                         # with your custom setters (if u want)
       exit_status
+    end
+
+    def process_param_queue!      # see how this is uses to see how this is
+      res = true                  # used (sorry!) very experimental.
+      before = error_count        # **NOTE** that by the time it gets on the
+      loop do                     # param queue, it should be past the point
+        k, v = param_queue.shift  # of validating whether it is a writable
+        k or break                # parameters because for now we just call
+        send "#{ k }=", v         # send on it which for all we know could
+      end                         # be some private-ass method.
+      if before < error_count
+        res = false
+      end
+      res
     end
 
     attr_reader :queue
@@ -180,6 +224,29 @@ module Skylab::Headless
     def resolve_upstream          # out of the box we make no assumtions about
       true                        # what your upstream should be, but per
     end                           # [#hl-023] this must be literally true for ok
+
+
+    strip_description_label_rx = /\A[ \t]*description:?[ \t]*/i
+
+    define_method :summary_line do
+      res = nil
+      begin
+        if self.class.desc_lines               # 1) if we have desc lines
+          break( res = super )                 # then use the first one (prolly)
+        end
+        op = option_parser                     # 2) else if we have an o.p.
+        if op                                  # *and* the first element of it
+          first = op.top.list.first            # is a string, use that! #exp
+          if ::String === op.top.list.first
+            str = CLI::Pen::FUN.unstylize[ first ]
+            res = str.gsub strip_description_label_rx, '' # (#hack!)
+            break
+          end
+        end
+        res = CLI::Pen::FUN.unstylize[ usage_line ] # 3) else this, unstylized
+      end while nil
+      res
+    end
 
     def usage msg=nil
       emit :help, msg if msg
@@ -200,159 +267,9 @@ module Skylab::Headless
     def usage_syntax_string
       [ normalized_invocation_string,
         option_syntax_string,
-        argument_syntax.string ].compact.join ' '
+        argument_syntax.string
+      ].compact.join ' '
     end
-  end
-
-
-  module CLI::Client
-  end
-
-
-  module CLI::Client::InstanceMethods
-    include CLI::Action::InstanceMethods
-    include Headless::Client::InstanceMethods
-
-  protected
-
-
-    def build_io_adapter sin=$stdin, sout=$stdout, serr=$stderr, pen=build_pen
-      # What is really nice is if you observe [#sl-114] and specify what
-      # actual streams you want to use for these formal streams.  However
-      # we grant ourself this one indulgence of specifying these most
-      # conventional of defaults here, provided that this is the only place
-      # library-wide that we will see a mention of these globals.
-
-      io_adapter_class.new sin, sout, serr, pen
-    end
-
-    def infile_noun               # a bit of a hack to go with resolve_instream
-      name = nil
-      begin
-        if ! queue.empty?
-          as = build_argument_syntax_for queue.first
-          if ! as.empty?
-            name = as.first.name
-            break
-          end
-        end
-        name = 'infile' # sketchy..
-      end while nil
-      parameter_label name
-    end
-
-    def invite_line
-      "use #{ kbd "#{ normalized_invocation_string } -h" } for help"
-    end
-
-    def normalized_invocation_string
-      program_name
-    end
-
-    def io_adapter_class
-      Headless::CLI::IO_Adapter::Minimal
-    end
-
-    def info msg                  # barebones implementation as a convenience
-      emit :info, msg             # for this shorthand commonly used in
-      nil                         # debugging and verbose modes
-    end
-
-    def pen_class
-      CLI::Pen::Minimal
-    end
-
-    def program_name
-      (@program_name ||= nil) or ::File.basename $PROGRAM_NAME
-    end
-
-    attr_writer :program_name
-
-
-    def resolve_instream # (the probable destination of [#hl-022], in flux)
-
-      # #experimental: Figure out which of several possible datasources should
-      # be the stream for reading from based on whether the instream (stdin) is
-      # a tty (interactive terminal) or not, and whether arguments exist in
-      # argv, and if so, whether the number of those argv arguments is one, and
-      # if so, if it is a filename that can be read (whew!)
-      #
-      # If it gets to this last case, (**NOTE**) it will mutate argv by shifting
-      # this one arg off of it, it will open this filehandle (!!),
-      # **and** reassign io_adapter.instream with this handle, possibly
-      # releasing the original handle!! (For now, manifestations of this are
-      # tracked org-wide with the tag #open-filehandle-1)
-      #
-      # This is an #experimental attempt to generalize this stuff, but is
-      # probably premature in its current state, hence [#hl-022] will be
-      # expected to be active for a while.
-      #
-      # The confusingly similarly named `resolve_upstream` is the same idea,
-      # but we let that be a stub function that clients can opt-in to,
-      # possibly implementing it simply by calling this.
-
-      res = false                 # must be true on success per [#hl-023]
-                                  # (imagine that false signifies a request
-                                  # to display usage, invite after the error(s))
-                                  # it is the default value b/c so common!
-
-      try_instream = -> do
-        res = true                # nothing to to.
-      end
-
-      ambiguous = -> do
-        error "cannot resolve ambiguous instream modality paradigms --#{
-          } both STDIN and #{ infile_noun } appear to be present."
-      end
-
-      try_argv = -> do
-        case argv.length
-        when 0
-          if suppress_normal_output
-            info "No #{ infile_noun } argument present. Done."
-            io_adapter.instream = nil # ok sure why not
-            res = nil
-          else
-            error "expecting: #{ infile_noun }"
-          end
-        when 1
-          o = ::Pathname.new argv.shift
-          if o.exist?
-            if o.directory?
-              error "#{ infile_noun } is directory: #{ o }"
-            else
-              io_adapter.instream = o.open 'r'
-              # (the above is #open-filehandle-1 --  don't loose track!)
-              res = true
-            end
-          else
-            error "#{ infile_noun } not found: #{ o }"
-          end
-        else
-          error "expecting: #{ infile_noun } had: (#{ argv.join ' ' })"
-        end
-      end
-
-      argv = self.argv.empty?         ? :argv_empty  : :some_argv
-      term = io_adapter.instream.tty? ? :interactive : :noninteractive
-
-      case [term, argv]
-      when [:interactive,    :argv_empty] ; try_argv[ ]
-      when [:interactive,    :some_argv]  ; try_argv[ ]
-      when [:noninteractive, :argv_empty] ; try_instream[ ]
-      when [:noninteractive, :some_argv]  ; ambiguous[ ]
-      end
-
-      res
-    end
-
-    def suppress_normal_output!   # #experimental hack to let e.g. officious
-      @suppress_normal_output = true # actions indicate that they executed, and
-      self                        # if given a a choice there is no need to do
-    end                           # further processing.
-
-    attr_reader :suppress_normal_output
-
   end
 
 
@@ -381,7 +298,7 @@ module Skylab::Headless
       result = argv
       while ! actual.empty?
         if formal.empty?
-          result = hooks.on_unexpected.call(actual)
+          result = hooks.on_unexpected[ actual ]
           break
         elsif idx = formal.index { |f| :req == f.opt_req_rest }
           actual.shift # knock these off l to r always
@@ -395,7 +312,7 @@ module Skylab::Headless
         end
       end
       if formal.detect { |p| :req == p.opt_req_rest }
-        result = hooks.on_missing.call(formal)
+        result = hooks.on_missing[ formal ]
       end
       result
     end
@@ -477,7 +394,7 @@ module Skylab::Headless
       concat [:dark_red, :green, :yellow, :blue, :purple, :cyan, :white, :red].
         each.with_index.map { |v, i| [v, i+31] } ]
 
-    o[:code_names] = codes.keys # this is sub-product-private for now, and away at [#pl-013]
+    o[:code_names] = codes.keys                # a couple subproducts use these
 
     o[:stylize] = -> str, *styles do
       "\e[#{ styles.map { |s| codes[s] }.compact.join ';' }m#{ str }\e[0m"
