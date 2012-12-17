@@ -35,6 +35,10 @@ module Skylab::Headless
       false
     end
 
+    def leaf?                     # (it is important that you leave the impl.
+      ! branch?                   # as such -- the compliment of `branch?` --
+    end                           # for places that redefine `branch?`)
+
     def normalized_action_name
       self.class.normalized_action_name
     end

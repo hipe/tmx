@@ -1,4 +1,4 @@
-[#030] #open the raw dog experimetn
+[#030]       #done the raw dog experiment
 [#029] #open `stylize` as any of two of these happen: [#gs-004] [#bn-005]
                [#to-001] [#sc-001] [#ts-005] (low level nerks)
 [#028]       #future [#bn-004]

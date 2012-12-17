@@ -1,7 +1,6 @@
 require_relative '..'
 
 require 'skylab/headless/core'
-require 'skylab/porcelain/all' # EVIL
 
 module Skylab::GitStashUntracked
 
@@ -9,7 +8,6 @@ module Skylab::GitStashUntracked
   GitStashUntracked = self        # less typing and less ambiguous than
   Headless = ::Skylab::Headless   # including ::Skylab all over the place)
   MetaHell = ::Skylab::MetaHell
-  Porcelain = ::Skylab::Porcelain
 
   extend Autoloader               # for our one other file..
 
@@ -20,7 +18,7 @@ module Skylab::GitStashUntracked
 
     # (no public methods defined in this module)
 
-  protected
+  protected # (protected before public this file only to reduce "strain" on DSL)
 
     def initialize request_client
       _gsu_sub_client_init! request_client
@@ -36,7 +34,7 @@ module Skylab::GitStashUntracked
       if @emit
         @emit[ type, msg ]
       else
-        request_client.emit type, msg
+        request_client.send :emit, type, msg
       end
     end
 
@@ -58,7 +56,6 @@ module Skylab::GitStashUntracked
 
 
   module Color_InstanceMethods
-
     def color?
       request_client.send :color?
     end
@@ -68,101 +65,169 @@ module Skylab::GitStashUntracked
 
   class CLI
     include SubClient_InstanceMethods          # *before* cli client mechanics
-    extend Porcelain
+                                               # if you want to override them.
 
-    porcelain do
-      emits :payload => :all
+  protected                                    # (meh before we load DSL)
+
+    def initialize _, stdout, stderr
+      self.io_adapter = build_io_adapter _, stdout, stderr
+      _gsu_sub_client_init! nil
     end
 
-    DRY_RUN = -> ctx do
-      ctx[:dry_run] = nil unless ctx.key?( :dry_run ) # away soon
-      on '-n', '--dry-run', "Dry run." do
-        ctx[:dry_run] = true
+    def api_invoke mixed_action_name, param_h
+      klass = API::Actions.const_fetch mixed_action_name
+                                  # API::Actions::List, API::Actions::Save
+                                  # API::Actions::Show, API::Actions::Pop
+      o = klass.new self
+      res = o.invoke param_h
+      res
+    end
+
+    def build_option_parser
+      o = GitStashUntracked::Services::OptionParser.new
+      o.version = '0.0.1'         # avoid warnings from calling the builtin '-v'
+      o.release = 'blood'         # idem
+      o.on '-h', '--help', 'this screen, or help for particular action' do
+        box_enqueue_help!
       end
+      o.summary_indent = '  '     # two spaces, down from four
+      o
     end
 
-    STASHES = ->(ctx) do
-      ctx[:stashes_path] = '../Stashes'
-      on '-s', '--stashes <dir>', "Where the stashed files live #{
-        }(default: #{ ctx[:stashes_path] })." do |v|
-        ctx[:stashes_path] = v
+    define_method :escape_path, & Headless::CLI::PathTools::FUN.pretty_path
+    protected :escape_path
+
+
+    pen = Headless::CLI::Pen::MINIMAL
+
+    define_method( :pen ) { pen }
+    protected :pen
+
+
+    # --*--
+
+    def dry_run o
+      param_h[:dry_run] = false
+      o.on '-n', '--dry-run', "Dry run." do
+        param_h[:dry_run] = true
       end
+      nil
     end
 
-    VERBOSE = -> ctx do
-      ctx[:verbose] = nil
-      on '-v', '--verbose', 'verbose output' do
-        ctx[:verbose] = true
+    def help_option o
+      o.on '-h', '--help', 'this screen' do
+        enqueue_help!
       end
+      nil
+    end
+
+    def stashes o
+      param_h[:stashes_path] = '../Stashes'
+      o.on '-s', '--stashes <dir>', "Where the stashed files live #{
+        }(default: #{ param_h[:stashes_path] })." do |v|
+        param_h[:stashes_path] = v
+      end
+      nil
+    end
+
+    def verbose o
+      param_h[:verbose] = false
+      o.on '-v', '--verbose', 'verbose output' do
+        param_h[:verbose] = true
+      end
+      nil
+    end
+
+  public
+
+    extend Headless::CLI::Client::DSL # methods defined below this, when
+                                  # following an option parser def, constitute
+                                  # the extent of this CLI's actions.
+
+    build_option_parser do
+      o = GitStashUntracked::Services::OptionParser.new
+      o.separator " description: move all untracked files to #{
+        }another folder (usu. outside of the project.)"
+      dry_run o
+      help_option o
+      stashes o
+      verbose o
+      o
+    end
+
+    def save name
+      api_invoke :save, param_h.merge( stash_name: name )
     end
 
 
 
-
-    option_syntax do |ctx|
-      separator " description: move all untracked files to another folder (usu. outside of the project.)"
-      instance_exec ctx, &DRY_RUN # these away at [#007]
-      instance_exec ctx, &STASHES
-      instance_exec ctx, &VERBOSE
+    build_option_parser do
+      o = GitStashUntracked::Services::OptionParser.new
+      o.separator " description: lists the \"stashes\" #{
+       }(just a directory listing)."
+      stashes o
+      o
     end
 
-    argument_syntax "<name>"
-
-    def save name, opts
-      api_invoke :save, opts.merge( stash_name: name )
-    end
-
-
-
-    option_syntax do |ctx|
-      separator " description: lists the \"stashes\" (just a directory listing)."
-      instance_exec ctx, &STASHES
-    end
-
-    def list opts
-      api_invoke :list, opts
+    def list
+      api_invoke :list, param_h
     end
 
 
 
-    option_syntax do |ctx|
-      separator " description: In the spirit of `git stash show`, reports on contents of stashes."
-      ctx[:patch] = ctx[:stat] = nil # api requires all args to be present
-      ctx[:color] = true
-      on('--no-color', "No color.") { ctx[:color] = false }
-      on('--stat', "Show diffstat format (default) (can be used with --patch).") { ctx[:stat] = true }
-      on('-p', '-u', '--patch', "Generate patch (can be used with --stat).") { ctx[:patch] = true }
-      instance_exec ctx, &STASHES
+    build_option_parser do
+      o = GitStashUntracked::Services::OptionParser.new
+
+      o.separator " description: In the spirit of `git stash show`, #{
+        }reports on contents of stashes."
+
+      param_h[:color] = true
+      o.on( '--no-color', "No color." ) { param_h[:color] = false }
+
+      help_option o
+
+      param_h[:patch] = nil
+      o.on( '-p', '-u', '--patch', "Generate patch (can be used with --stat)."
+        ) { param_h[:patch] = true }
+
+      stashes o
+
+      param_h[:stat] = nil
+      o.on( '--stat', "Show diffstat format (default) #{
+        }(can be used with --patch)." ) { param_h[:stat] = true }
+      o
     end
 
-    argument_syntax '<name>'
-
-    def show name, opts
-      api_invoke :show, opts.merge( name: name )
-    end
-
-
-
-    option_syntax do |ctx|
-      separator " description: Attempts to put the files back if there are no collisions."
-      instance_exec ctx, &DRY_RUN
-      instance_exec ctx, &STASHES
-      instance_exec ctx, &VERBOSE
-    end
-
-    argument_syntax '<name>'
-
-    def pop name, opts
-      api_invoke :pop, opts.merge( name: name )
+    def show name
+      api_invoke :show, param_h.merge( name: name )
     end
 
 
 
-    option_syntax do |_|
-      separator " description: Shows the files that would be stashed."
+    build_option_parser do
+      o = GitStashUntracked::Services::OptionParser.new
+      o.separator  " description: Attempts to put the files back #{
+        }if there are no collisions."
+      dry_run o
+      stashes o
+      verbose o
+      o
     end
 
-    def status _
+    def pop name
+      api_invoke :pop, param_h.merge( name: name )
+    end
+
+
+
+    build_option_parser do
+      o = GitStashUntracked::Services::OptionParser.new
+      o.separator " description: Shows the files that would be stashed."
+      help_option o
+      o
+    end
+
+    def status
       o = API::Actions::Save.new self
       num = 0
       o.normalized_relative_others.each do |file_name|
@@ -174,42 +239,6 @@ module Skylab::GitStashUntracked
       end
       true
     end
-
-  protected
-
-    def initialize _, stdout, stderr
-      block_given? and fail 'sanity'
-      _gsu_sub_client_init! nil
-      super() do |o|
-        o.on_payload { |e| stdout.puts e }
-        o.on_info { |e| stderr.puts e }
-        o.on_error { |e| stderr.puts e }
-      end
-    end
-
-    def api_invoke mixed_action_name, param_h
-      klass = API::Actions.const_fetch mixed_action_name
-      # (induced above is: API::Actions::List, API::Actions::Save,
-      # API::Actions::Show, API::Actions::Pop)
-      o = klass.new self
-      res = o.invoke param_h
-      res
-    end
-
-
-    def emit type, msg
-      runtime.emit type, msg
-    end
-
-
-    define_method :escape_path, & Headless::CLI::PathTools::FUN.pretty_path
-    protected :escape_path
-
-
-    pen = Headless::CLI::Pen::MINIMAL
-
-    define_method( :pen ) { pen }
-
   end
 
 

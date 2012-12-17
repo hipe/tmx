@@ -129,7 +129,7 @@ module Skylab::Headless
     end
 
     def invite_line # we have to avoid assuming we process opts
-      "use #{ kbd "#{ request_runtime.send :normalized_invocation_string
+      "use #{ kbd "#{ request_runtime.send :normalized_invocation_string }#{
         } -h #{ normalized_local_action_name }" } for help"
     end
 

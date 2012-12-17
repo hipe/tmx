@@ -15,8 +15,10 @@ module Skylab::Headless
       self.class.action_box_module
     end
 
-    def box_enqueue_help!
-      cmd = argv.shift if CLI::OPT_RX !~ argv.first # hack for prettier syntax:/
+    def box_enqueue_help! cmd=nil
+      if ! cmd && CLI::OPT_RX !~ argv.first
+        cmd = argv.shift                       # hack for this prettier syntax:/
+      end
       enqueue! -> { help cmd }
     end
 
@@ -110,8 +112,7 @@ module Skylab::Headless
       _help_actions action_objects if action_objects.any?
 
       emit ''                                  # assumes there is section above!
-      emit "use #{ kbd "#{ normalized_invocation_string } -h <action>"
-                  } for help on that action"
+      emit invite_line_about_action
       nil
     end
 
@@ -132,8 +133,22 @@ module Skylab::Headless
       nil
     end
 
+
+
     def invite_line # override parent because we are box, we take action!
       "use #{ kbd "#{ normalized_invocation_string } -h [<action>]" } for help"
+    end
+
+    alias_method :cli_box_invite_line, :invite_line # (for dsl hack)
+
+
+
+                                  # (in contrast to above, once the user is
+                                  # already looking at the full help screen it
+                                  # is redundant to again invite her to the
+    def invite_line_about_action  # same screen!)
+      "use #{ kbd "#{ normalized_invocation_string } -h <action>"
+        } for help on that action"
     end
   end
 end
