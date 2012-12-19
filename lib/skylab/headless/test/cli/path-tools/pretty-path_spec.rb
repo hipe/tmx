@@ -142,4 +142,13 @@ describe "#{ Skylab::Headless::CLI::PathTools }#pretty_path" do
       o 'home/rms',               'home/rms'
     end
   end
+
+
+  frame do
+    home '/home/rms'
+    pwd '/home/rms/proj/emacs'
+    exemplifying "pwd (#{ pwd }) is in home (#{ home }), relpath wins" do
+      o '/home/rms/proj/hurd',   '../hurd'
+    end
+  end
 end
