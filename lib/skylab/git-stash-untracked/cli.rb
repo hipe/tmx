@@ -38,10 +38,6 @@ module Skylab::GitStashUntracked
       end
     end
 
-    def escape_path x             # pushed up at [/#hl-031]
-      request_client.send :escape_path, x
-    end
-
     def info msg                  # (just like ancestor but decorated)
       emit :info, "# #{ msg }"
       nil

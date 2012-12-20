@@ -41,7 +41,9 @@ module Skylab::Headless
                                   # that out of the box this is reflective
                                   # of anything that you think it is.  caution!
 
-    # def escape_path x           # maybe at [#hl-031]
+    def escape_path x             # (this is the closing of [#hl-031])
+      request_client.send :escape_path, x
+    end
 
     def increment_error_count!    # use this if you need to do it manually
       @error_count += 1           # (note it happens in the above impl for

@@ -18,10 +18,6 @@ module Skylab::Issue
       _headless_sub_client_init! request_client
     end
 
-    def escape_path x
-      request_client.send :escape_path, x
-    end
-
     def invite api_action
       request_client.send :invite, api_action
     end
