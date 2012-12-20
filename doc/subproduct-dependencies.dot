@@ -1,0 +1,57 @@
+# created by tan-man on 2012-12-20 16:03:06 UTC
+
+digraph {
+
+/*
+  example stmt_list:
+    foo -> bar
+    biff -> baz
+
+  example node_stmt:
+    learn_c [label="learn C somehow"]
+*/
+
+label="dependeny graph of the skylab universe (subproducts)"
+
+node [label="\N", style="filled", fillcolor="#b5d5fb", fontname="Futura", penwidth="1.1566", shape="Mrecord"]
+
+# finished green : fillcolor="#79f233"
+
+
+code [label="code molester"]
+cov [label="cov tree"]
+dependency [label=dependency]
+face [label=face]
+file [label="file metrics"]
+file_2 [label="file services"]
+git [label="git viz"]
+guardfile [label=guardfile]
+headless [label=headless]
+meta [label="meta hell"]
+porcelain [label=porcelain]
+pub [label="pub sub"]
+skylab [label="skylab"]
+slake [label=slake]
+test [label="test support"]
+tmx [label=tmx]
+treemap [label=treemap]
+code -> headless
+
+code -> meta
+code -> pub
+cov -> meta
+cov -> porcelain
+cov -> pub
+cov -> guardfile
+dependency -> code
+dependency -> face
+dependency -> headless
+dependency -> porcelain
+dependency -> pub
+dependency -> slake
+headless -> file_2
+porcelain -> headless
+test -> headless
+test -> meta
+treemap -> meta
+}
