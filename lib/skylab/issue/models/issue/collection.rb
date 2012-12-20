@@ -64,7 +64,7 @@ module Skylab::Issue
   protected
 
     def initialize request_client, manifest
-      _sub_client_init! request_client
+      _issue_sub_client_init! request_client
       @issue_flyweight = nil
       @manifest = manifest
     end

@@ -30,13 +30,17 @@ module Skylab::TanMan
 
   protected
 
+    def _tan_man_sub_client_init! request_client
+      _headless_sub_client_init! request_client
+    end
+
     def controllers
       request_client.send :controllers
     end
 
-    def escape_path *a
-      pen.escape_path(* a)
-    end
+    def escape_path *a            # (we wanted this to go away with [#hl-031]
+      pen.escape_path(* a)        # but tan-man apparently thinks it has
+    end                           # special needs.)
 
 
     rx = Headless::CLI::PathTools::FUN.absolute_path_hack_rx

@@ -57,7 +57,7 @@ module Skylab::Issue
     def initialize api
       @issues = nil
       @param_h = nil
-      _sub_client_init! api
+      _issue_sub_client_init! api
     end
 
 
@@ -101,7 +101,7 @@ module Skylab::Issue
       issues = nil
       begin
         break( issues = @issues ) if @issues
-        o = @request_client.find_closest_manifest -> msg do
+        o = request_client.find_closest_manifest -> msg do
           error msg
         end
         break if ! o

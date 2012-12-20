@@ -86,7 +86,7 @@ module Skylab::Issue
 
     def initialize request_client, pathname
       clear!
-      _sub_client_init! request_client
+      _issue_sub_client_init! request_client
       @pathname = pathname
     end
 

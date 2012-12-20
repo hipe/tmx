@@ -58,7 +58,7 @@ module Skylab::MyTree::TestSupport
       if a
         a.map(& :class) == [::Symbol, ::String] or fail('unexpected structure')
         e[:type] = a.first
-        e[:string] = Headless::CLI::IO::Pen::FUN.unstylize[ a.last ] || a.last
+        e[:string] = Headless::CLI::Pen::FUN.unstylize[ a.last ] || a.last
         e
       end
     end

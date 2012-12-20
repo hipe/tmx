@@ -1,8 +1,7 @@
-load File.expand_path('../../../../../script/git-stash-untracked', __FILE__)
-
+require_relative '../core'
 require File.expand_path('../../../test-support/core', __FILE__)
 
-require_relative '../../test-support/tmpdir'
+# #posterity above
 
 
 module ::Skylab::GitStashUntracked::Tests
@@ -19,14 +18,7 @@ module ::Skylab::GitStashUntracked::Tests
     describe "has an action called" do
 
       let :app do
-        GitStashUntracked::Porcelain.new do |o|
-          o.on_all do |e|
-            if debug
-              debug.puts "    (dbg:#{ [e.type, e.message].inspect })"
-            end
-            stderr.puts e
-          end
-        end
+        GitStashUntracked::CLI.new nil, stderr, stderr
       end
 
       def cd path, block
@@ -42,7 +34,7 @@ module ::Skylab::GitStashUntracked::Tests
         nil
       end
 
-      let :runtime_stub do
+      let :mock_client do
         o = ::Object.new
         o.stub :emit do |type, payload|
           debug and debug.puts("    (dbg: #{ [type, payload].inspect })")
@@ -52,8 +44,20 @@ module ::Skylab::GitStashUntracked::Tests
       end
 
       let :stderr do
-        ::StringIO.new
+        o = TestSupport::StreamSpy.standard
+        if debug
+          o.debug! -> e do
+            if ::String === e
+              "    (dbg (was string):#{ e.inspect }"
+            else
+              "    (dbg (was event):#{ [e.type, e.message].inspect })"
+            end
+          end
+        end
+        o
       end
+
+      define_method :unstylize, & Headless::CLI::Pen::FUN.unstylize
 
       def with_popen3_out_as str
         me = self
@@ -74,7 +78,7 @@ module ::Skylab::GitStashUntracked::Tests
         it "which lists untracked files" do
           with_popen3_out_as "derpus\nnerpus/herpus"
           app.invoke %w(status)
-          cmd_spy.should eql("git ls-files -o --exclude-standard")
+          cmd_spy.should eql("git ls-files --others --exclude-standard")
           stderr.string.should match(/nerpus\/herpus/)
         end
       end
@@ -83,24 +87,28 @@ module ::Skylab::GitStashUntracked::Tests
 
       describe "save" do
         it "which moves the untracked files to a stash dir" do
-          gsu_tmpdir.prepare
-          with_popen3_out_as "lippy\ndippy/doopy\ndippy/floopy"
-          from_here = gsu_tmpdir.dirname.dirname # foo when foo/tmp/gsu-xyzzy
-          cd from_here, -> _ do
-            app.invoke ['save', 'foo', '-n', '-s', gsu_tmpdir.to_s]
+          o = gsu_tmpdir.clear
+          o.mkdir 'Stashes'
+          o.touch_r %w(
+            calc/lippy.txt
+            calc/dippy/doopy.txt
+            calc/dippy/floopy.txt
+          )
+          with_popen3_out_as "lippy.txt\ndippy/doopy.txt\ndippy/floopy.txt"
+          cd o.join( 'calc' ), -> _ do
+            app.invoke ['save', 'foo', '-n']
           end
 
           actual = stderr.string
 
           expected = <<-HERE.unindent
-            # git ls-files -o --exclude-standard
-            mkdir -p ./tmp/gsu-xyzzy/foo/lippy
-            mv lippy ./tmp/gsu-xyzzy/foo/lippy
-            mkdir -p ./tmp/gsu-xyzzy/foo/dippy/doopy
-            mv dippy/doopy ./tmp/gsu-xyzzy/foo/dippy/doopy
-            mv dippy/floopy ./tmp/gsu-xyzzy/foo/dippy/floopy
+            # git ls-files --others --exclude-standard
+            mkdir -p ../Stashes/foo
+            mv lippy.txt ../Stashes/foo/lippy.txt
+            mkdir -p ../Stashes/foo/dippy
+            mv dippy/doopy.txt ../Stashes/foo/dippy/doopy.txt
+            mv dippy/floopy.txt ../Stashes/foo/dippy/floopy.txt
           HERE
-
           actual.should eql(expected)
         end
       end
@@ -109,19 +117,22 @@ module ::Skylab::GitStashUntracked::Tests
 
       describe "list" do
         it "which lists the known stashes (just a basic directory listing)" do
-          gsu_tmpdir.prepare
-          gsu_tmpdir.touch_r %w(
-            stashes/alpha/herpus/derpus.txt
-            stashes/beta/whatever.txt
+          gsu_tmpdir.clear.touch_r %w(
+            stashiz/alpha/herpus/derpus.txt
+            stashiz/beta/whatever.txt
           )
-          GitStashUntracked::Plumbing::List.new(runtime_stub, :stashes => gsu_tmpdir.join('stashes')).invoke.should_not eql(false)
+          o = GitStashUntracked::API::Actions::List.new mock_client
+          r = o.invoke stashes_path: gsu_tmpdir.join( 'stashiz' ), verbose: nil
+          r.should_not eql( false )
           expected = <<-HERE.unindent
             alpha
             beta
           HERE
           stderr.string.should eql(expected)
           stderr.truncate(0) ; stderr.rewind
-          app.invoke ['list', '-s', "#{gsu_tmpdir}/stashes"] # same thing but invoked though the porcelain
+
+          # now, try the same thing thru the CLI
+          app.invoke ['list', '-s', "#{ gsu_tmpdir }/stashiz"]
           stderr.string.should eql(expected)
         end
       end
@@ -148,11 +159,11 @@ module ::Skylab::GitStashUntracked::Tests
           HERE
         end
 
-        include ::Skylab::Porcelain::Styles # unstylize
-
         it "by default does the --stat format" do
           with_this_stash
-          app.invoke %w(show derp -s).push(gsu_tmpdir.join('stashes').to_s)
+          argv = %w(show derp)
+          argv.concat ['-s', gsu_tmpdir.join( 'stashes' ).to_s ]
+          app.invoke argv
           expected = <<-HERE.unindent
             flip.txt      | 2 ++
             flop/floop.tx | 4 ++++
@@ -163,7 +174,9 @@ module ::Skylab::GitStashUntracked::Tests
 
         it "it can also do the --patch format" do
           with_this_stash
-          app.invoke %w(show derp --patch -s).push(gsu_tmpdir.join('stashes').to_s)
+          argv = %w(show derp)
+          argv.concat [ '-s', gsu_tmpdir.join( 'stashes' ).to_s, '-p' ]
+          app.invoke argv
           expected = (<<-HERE.unindent)
             --- /dev/null
             +++ b/flip.txt
@@ -193,14 +206,14 @@ module ::Skylab::GitStashUntracked::Tests
             stashes/beta/whatever.txt
             working-dir/
           )
-          working_dir = gsu_tmpdir.join('working-dir')
-          stashes_abspath = gsu_tmpdir.join('stashes').expand_path.to_s
+          working_dir = gsu_tmpdir.join 'working-dir'
+          stashes_abspath = gsu_tmpdir.join( 'stashes' ).expand_path.to_s
           cd working_dir.to_s, -> _ do
             args = %w(pop dingle -s)
             args.push stashes_abspath
             app.invoke args
           end
-          actual = `cd #{working_dir} ; find . -mindepth 1`
+          actual = `cd #{ working_dir } ; find . -mindepth 1`
           expected = <<-HERE.unindent
             ./one-dir
             ./one-dir/one-file.txt

@@ -169,7 +169,7 @@ module ::Skylab::Porcelain::Table
     end
     def see val
       val.nil? and return
-      val = Headless::CLI::Stylize::FUN.unstylize[ val ]
+      val = Headless::CLI::Pen::FUN.unstylize[ val ]
       val.length > max_width_seen[:full] and max_width_seen[:full] = val.length
       if Column::BLANK.match?(val)
         type_stats[:blank] += 1

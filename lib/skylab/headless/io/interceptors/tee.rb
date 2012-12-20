@@ -14,7 +14,12 @@ module Skylab::Headless
 
     include Headless::IO::Interceptor::InstanceMethods
 
-    [:<<, :puts, :write].each do |m|
+    [:<<,
+     :puts,
+     :rewind,                     # not all IO have this, us at own risk
+     :truncate,                   # idem
+     :write
+    ].each do |m|
       define_method m do |*a, &b|
         downstreams.each { |o| o.send(m, *a, &b) }
       end

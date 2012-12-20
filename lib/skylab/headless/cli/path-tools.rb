@@ -41,21 +41,39 @@ module Skylab::Headless
       %r[ \A  #{ ::Regexp.escape pwd[] }  (?=/|\z) ]x
     end
 
+    first_rx = %r{\A[^/]*}        # we need to see if there is a common head
+
+    first = -> str { first_rx.match( str )[0] }
+
     pretty_path__ = -> home, home_rx, pwd, pwd_rx do
       -> path do
         path = path.to_s
         h = { home: home[], pwd: pwd[] }
         if h[:home] && h[:pwd]
-          k = if    0 == h[:home].index(h[:pwd]) then :home # the order
-              elsif 0 == h[:pwd].index(h[:home]) then :pwd
-              end
-          if k and  0 == path.index(h[k])
-            h[ :pwd == k ? :home : :pwd ] = false
+          use_key = if    0 == h[:home].index(h[:pwd]) then :home # the order
+                    elsif 0 == h[:pwd].index(h[:home]) then :pwd
+                    end
+          if use_key and 0 == path.index( h[use_key] )
+            h[ :pwd == use_key ? :home : :pwd ] = false
           end
         end
-        if h[:home] then path = path.sub home_rx[], '~' end
-        if h[:pwd]  then path = path.sub pwd_rx[],  '.' end
-        path
+        %r{\A[^/]*}.match(path)[0]
+        use_path = path
+        if h[:home] then use_path = use_path.sub home_rx[], '~' end
+        if h[:pwd]  then use_path = use_path.sub pwd_rx[],  '.' end
+        begin
+          h[:home] && h[:pwd] or break         # (ick ..);
+          first[ path ] == first[ h[:pwd] ] or break
+          rel_path = ::Pathname.new( path ).relative_path_from(
+            ::Pathname.new( h[:pwd] ) ).to_s
+          if path[-1] == '/'                   # we've got to "correct" the pn
+            rel_path = "#{ rel_path }/"        # version back to our cosmetic
+          end                                  # preservation we do here.
+          if rel_path.length < use_path.length
+            use_path = rel_path
+          end
+        end while nil
+        use_path
       end
     end
 

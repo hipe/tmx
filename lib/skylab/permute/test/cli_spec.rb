@@ -3,7 +3,7 @@ require_relative '../../test-support/core'
 require 'skylab/headless/core'
 
 describe "#{::Skylab::Permute::CLI}" do
-  include ::Skylab::Headless::CLI::IO::Pen::InstanceMethods # unstylize
+  include ::Skylab::Headless::CLI::Pen::InstanceMethods # unstylize
   before(:all) do  # just a bad idea all around, but we want to see how it goes
     cli = Skylab::Permute::CLI.new
     cli.program_name = 'permoot'

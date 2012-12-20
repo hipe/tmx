@@ -40,7 +40,7 @@ module Skylab::TanMan::TestSupport::Sexp
 
   protected
 
-    pen = Headless::CLI::IO::Pen::Minimal.new
+    pen = Headless::CLI::Pen::Minimal.new
     def pen.escape_path str
       "«#{ str }»"                # "guillemets" just for fun and practice
     end
@@ -48,11 +48,10 @@ module Skylab::TanMan::TestSupport::Sexp
     define_method :initialize do
       |sin=$stdin, sout=$stdout, serr=$stderr| # observe pattern [#sl-114]
 
-      @errors_count = 0           # used by experimental param_queue
-      @param_queue = []           # shenanigans
       @stdin = sin                # we keep this stream on deck but don't set
                                   # upstream yet. it takes logix. [#hl-022]
       self.io_adapter = build_io_adapter nil, sout, serr, pen
+      _headless_sub_client_init! nil
     end
 
 
@@ -104,12 +103,6 @@ module Skylab::TanMan::TestSupport::Sexp
 
     def default_action
       :execute
-    end
-
-    def error msg                 # part of param_queue
-      @errors_count += 1
-      emit :error, msg
-      false
     end
 
     attr_accessor :eval_string    # used by param_queue
@@ -166,30 +159,6 @@ module Skylab::TanMan::TestSupport::Sexp
     end
 
     attr_reader :pathname
-
-    attr_reader :param_queue
-
-    def parse_opts argv           # enhance headless with param_queue shenans
-      res = super
-      if true == res
-        res = process_param_queue
-      end
-      res
-    end
-
-    def process_param_queue
-      res = true
-      before = @errors_count
-      loop do
-        k, v = param_queue.shift
-        k or break
-        send "#{ k }=", v
-      end
-      if before < @errors_count
-        res = false
-      end
-      res
-    end
 
     define_method :resolve_upstream do   # #watch'ed by [#hl-022] for dry
       ok = false                  # [#hl-023] exit-code aware, [#019] invite

@@ -171,7 +171,7 @@ module Skylab::Bnf2Treetop
     def version ; infostream.puts("#{program_name} #{version_string}") end
     # --*--
     CODES = { bold: 1, green: 32 }
-    def stylize str, *a
+    def stylize str, *a           # away at [#bn-005]
       "\e[#{ a.map{ |s| CODES[s] }.compact.join(';') }m#{str}\e[0m"
     end
     def em str ; stylize(str, :bold, :green ) end

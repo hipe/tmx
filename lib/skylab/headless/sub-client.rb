@@ -11,21 +11,43 @@ module Skylab::Headless
 
     def initialize request_client # this is the heart of it all [#004]
       block_given? and raise ::ArgumentError.new 'blocks are not honored here'
-      _sub_client_init! request_client
+      _headless_sub_client_init! request_client
+    end
+
+    def _headless_sub_client_init! request_client
+      @error_count = 0            # (if this overwrites an important nonzero
+                                  # value here, you deserve whatver happens
+                                  # to you. why would u call init 2x?)
+      self.request_runtime = request_client
     end
 
     def actual_parameters         # not all stacks use this, just convenience
       request_client.send :actual_parameters
     end
 
-    def emit *a
-      request_client.send :emit, *a
+    def emit *a                   # (don't get into the habbit of expecting
+      request_client.send :emit, *a # meaninful results from `emit` --
+      nil                         # it's just never a good idea.  ever.)
     end
 
-    def error s                   # be prepared for this to cause trouble
-      emit :error, s
-      false
+    def error s                   # be extra careful around methods that
+      increment_error_count!      # affect or are expected to affect the
+      emit :error, s              # validity of your sub-client!
+      false                       # this implementation is the result of a
+    end                           # "perfect abstraction" but may still cause
+                                  # you pain if you're not careful.
+
+    attr_reader :error_count      # there is no absolutely no guarantee that
+                                  # that out of the box this is reflective
+                                  # of anything that you think it is.  caution!
+
+    def escape_path x             # (this is the closing of [#hl-031])
+      request_client.send :escape_path, x
     end
+
+    def increment_error_count!    # use this if you need to do it manually
+      @error_count += 1           # (note it happens in the above impl for
+    end                           # `error` though)
 
     def io_adapter                # sometimes sub-clients need access to
       request_client.send :io_adapter # the streams, e.g. the instream
@@ -36,16 +58,17 @@ module Skylab::Headless
       nil
     end
 
+    def payload x                 # provided as a convenience for this common
+      emit :payload, x            # emitter "macro" -- not all sub-clients
+      nil                         # will necessarily emit this.
+    end
+
     def pen
       request_client.send :pen
     end
 
     attr_accessor :request_runtime # the center of [#005]
     alias_method :request_client, :request_runtime # one day!!
-
-    def _sub_client_init! request_client
-      self.request_runtime = request_client
-    end
 
     # --- * ---
 

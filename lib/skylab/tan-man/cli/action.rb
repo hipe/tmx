@@ -21,7 +21,7 @@ module Skylab::TanMan
     # ---------------- jawbreak blood begin --------------------
 
     def initialize request_client
-      _sub_client_init! request_client
+      _headless_sub_client_init! request_client
 
       # if an emitter emits and no listener is there to hear it, does it make
       # a sound? certainly not.

@@ -45,7 +45,7 @@ module Skylab::TanMan
   protected
 
     pen = -> do
-      o = Headless::CLI::IO::Pen::Minimal.new
+      o = Headless::CLI::Pen::Minimal.new
 
       fun = Headless::CLI::PathTools::FUN
 
@@ -63,7 +63,7 @@ module Skylab::TanMan
 
       # self.io_adapter = build_io_adapter sin, sout, serr, pen # after [#018]
       self.io_adapter =
-        Headless::CLI::IO::Adapter::Minimal.new sin, sout, serr, pen
+        Headless::CLI::IO_Adapter::Minimal.new sin, sout, serr, pen
 
       if events
         fail 'do we really want this?'
@@ -73,6 +73,8 @@ module Skylab::TanMan
         # saying e.to_s is probably not what you want -- you will get a hash
         # if the message has been changed via message=
       end
+
+      _tan_man_sub_client_init! nil # get it?
     end
 
     def anchor_module # gone at [#022] maybe..

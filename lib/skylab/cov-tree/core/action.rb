@@ -28,14 +28,8 @@ module Skylab::CovTree
 
   protected
 
-    def initialize request_client # e.g. the modality (root) client
-      @request_client = request_client
-    end
-
     def normalized_name
       self.class.normalized_name
     end
-
-    attr_reader :request_client
   end
 end

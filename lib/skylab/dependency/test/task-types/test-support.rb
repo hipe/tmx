@@ -16,7 +16,7 @@ module Skylab::Dependency::TestSupport::Tasks
       o.context = context
       o.on_all do |e|
         self.debug and $stderr.puts [e.type, e.message].inspect
-        fingers[e.type].push unstylize_if_stylized(e.to_s)
+        fingers[e.type].push unstylize( e.to_s ) #  soft version - no style ok
       end
     end
   end

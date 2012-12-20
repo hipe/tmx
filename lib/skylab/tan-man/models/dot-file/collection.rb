@@ -9,7 +9,7 @@ module Skylab::TanMan
   protected
 
     def initialize request_client
-      _sub_client_init! request_client
+      _headless_sub_client_init! request_client
       @ready = -> do
         result = false
         rc = self.request_client

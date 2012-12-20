@@ -7,7 +7,7 @@ module Skylab::Treemap
     [:out, :err].each do |m| # def out_string; err_string
       define_method("#{m}_string") do
         str = send("#{m}_stream").string
-        Headless::CLI::Stylize::FUN.unstylize[ str ]
+        Headless::CLI::Pen::FUN.unstylize[ str ]
       end
     end
     def build_stream_spy

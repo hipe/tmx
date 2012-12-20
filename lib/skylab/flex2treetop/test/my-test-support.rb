@@ -113,7 +113,7 @@ module Skylab::Flex2Treetop::MyTestSupport
       frame[:out].call
     end
     def unstylize str
-      result = ::Skylab::Headless::CLI::IO::Pen::FUN.unstylize[ str ] # full
+      result = ::Skylab::Headless::CLI::Pen::FUN.unstylize[ str ] # full
       result.should_not be_nil
       result
     end

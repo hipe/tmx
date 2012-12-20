@@ -11,7 +11,7 @@ module ::Skylab::TanMan
     end
 
     def fetch basename
-      box.fetch basename
+      box_module.fetch basename
     end
 
     define_method :normalize do |name, error|
@@ -25,7 +25,7 @@ module ::Skylab::TanMan
             nil
           end
         end
-        pathname = box_dir_pathname.join name
+        pathname = box_module_dir_pathname.join name
         r = try[ pathname ]
         if ! r and '' == pathname.extname
           r = try[ pathname.sub_ext extname ]
@@ -33,10 +33,10 @@ module ::Skylab::TanMan
         r
       end.call
       if found
-        result = found.relative_path_from box_dir_pathname
+        result = found.relative_path_from box_module_dir_pathname
       else
         a = tries.map(& :basename)
-        b = box_dir_pathname.children.map(& :basename)
+        b = box_module_dir_pathname.children.map(& :basename)
         msg = "not found: #{ a.join ', ' }. Known examples: (#{ b.join(', ') })"
         e = PubSub::Event.new :error, message: msg, valid_names: b.map(&:to_s)
         def e.to_s ; message end # ick sorry
@@ -47,12 +47,12 @@ module ::Skylab::TanMan
 
   protected
 
-    def box
+    def box_module
       TanMan::Examples
     end
 
-    def box_dir_pathname
-      box.dir_pathname
+    def box_module_dir_pathname
+      box_module.dir_pathname
     end
   end
 end

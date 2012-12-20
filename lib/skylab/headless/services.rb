@@ -5,6 +5,7 @@ module Skylab::Headless
     define_singleton_method( :o ) { |k, f| h[k] = f }
 
     o :FileUtils    , -> { require 'fileutils'  ; ::FileUtils }
+    o :OptionParser , -> { require 'optparse'   ; ::OptionParser }
     o :Shellwords   , -> { require 'shellwords' ; ::Shellwords }
 
     define_singleton_method :const_missing do |k|

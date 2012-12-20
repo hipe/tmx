@@ -27,12 +27,21 @@ module Skylab::Headless
       a = a.flatten
       0 == a.length and a.push ''
       a.each do |s|
+        if handlers[:puts_wrap]
+          s = handlers.puts_wrap.reduce( s ) { |m, x| x.call m }
+        end
         s = s.to_s
         s = "#{ s }#{ newline }" if newline != s[-1]
         write s
       end
       nil # per ::IO#puts, but consider it undefined.
     end
+
+    def puts_filter! callable     # each data passed to puts will first be
+      handlers.puts_wrap ||= []   # run through each filter in the order
+      handlers.puts_wrap.push callable    # received in a reduce operation,
+      true                                # the result being what is finally
+    end                                   # passed to puts
 
     define_method :write do |str|
       res = nil
@@ -62,11 +71,23 @@ module Skylab::Headless
       res
     end
 
+    # --*--
+
     alias_method :<<, :write
+
+    [:truncate, :rewind].each do |meth|
+      define_method meth do |*a|
+        if downstream.respond_to? meth
+          downstream.send meth, *a
+        else
+          nil # eek
+        end
+      end
+    end
 
   protected
 
-    handlers_struct = ::Struct.new :line_begin, :line_end
+    handlers_struct = ::Struct.new :line_begin, :line_end, :puts_wrap
 
     define_method :initialize do |downstream|
       @check_for_line_boundaries = nil

@@ -48,5 +48,18 @@ module Skylab::Headless::IO::Interceptors::TestSupport
         downstream.string.should eql("Z abcd\nZ ef")
       end
     end
+
+
+    context "with a puts filter" do
+      it "works with one filter" do
+        downstream = ::StringIO.new
+        stream = Headless::IO::Interceptors::Filter.new( downstream )
+        stream.puts_filter! -> x { "  << epic: #{ x } >>\n" }
+        stream.write 'a'
+        downstream.string.should eql( 'a' )
+        stream.puts( 'bcd' )
+        downstream.string.should eql( "a  << epic: bcd >>\n" )
+      end
+    end
   end
 end

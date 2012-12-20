@@ -52,7 +52,7 @@ module Skylab::Bnf2Treetop::TestSupport
     end
   end
   module CLI::InstanceMethods
-    include ::Skylab::Headless::CLI::IO::Pen::InstanceMethods
+    include ::Skylab::Headless::CLI::Pen::InstanceMethods
 
     FIXTURES = ::Pathname.new(File.expand_path('../../fixtures', __FILE__))
 
