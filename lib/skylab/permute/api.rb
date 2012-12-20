@@ -1,10 +1,4 @@
-require_relative '../../skylab'
-require 'skylab/porcelain/bleeding'
-require 'skylab/pub-sub/emitter'
-
 module Skylab::Permute
-  Bleeding = Skylab::Porcelain::Bleeding
-  Porcelain = Skylab::Porcelain
   module API
     module Actions
     end
@@ -40,4 +34,3 @@ module Skylab::Permute
     attr_reader :sets
   end
 end
-

@@ -1,10 +1,10 @@
 require_relative '../test-support'
 
-
-module ::Skylab::Porcelain::Bleeding::TestSupport
+module ::Skylab::Porcelain::TestSupport::Bleeding # #po-008
   describe "#{Bleeding::NamespaceInstanceMethods} resolving names" do
-    extend ModuleMethods
-    include InstanceMethods
+    extend Bleeding_TestSupport
+    Bleeding = Bleeding # annoying
+
     context "among none" do
       namespace do
       end
@@ -20,7 +20,7 @@ module ::Skylab::Porcelain::Bleeding::TestSupport
     context "among one" do
       namespace do
         class self::Ferp
-          extend Bleeding::ActionModuleMethods
+          extend Bleeding::Action
         end
       end
       context "with none given" do

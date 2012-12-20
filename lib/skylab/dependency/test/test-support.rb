@@ -1,59 +1,46 @@
-require File.expand_path('../../..', __FILE__)
-
-require 'skylab/pub-sub/emitter'
-require 'skylab/test-support/tmpdir'
-
-module Skylab::Dependency
-  # there is no entrypoint file to include for this module
-end
+require_relative '../core'
+require 'skylab/test-support/core'
 
 module Skylab::Dependency::TestSupport
+  extend ::Skylab::TestSupport::Regret[ Dependency_TestSupport = self ]
 
-  DESCRIBE_BLOCK_COMMON_SETUP = ->(_) do
-    include ::Skylab::Porcelain::TiteColor
-    let(:fingers) { Hash.new { |h, k| h[k] = [] } }
+  module CONSTANTS
+    include ::Skylab::Dependency # include lots of constants
+    Headless = ::Skylab::Headless # not used in application code
+    MetaHell = ::Skylab::MetaHell
   end
 
-  TEMP_DIR = Skylab::TestSupport::Tmpdir.new(Skylab::ROOT.join('tmp').to_s)
+  include CONSTANTS # include them for use in here, and in specs
 
-  BUILD_DIR = Skylab::TestSupport::Tmpdir.new(TEMP_DIR.join('build-dependency'))
+  Headless = Headless # so they are visible in modules contained by this
+  MetaHell = MetaHell # module, without polluting that module itself's n.s
 
-  FIXTURES_DIR = Pathname.new(File.expand_path('../fixtures', __FILE__))
 
-  require_relative('../static-file-server')
-  FILE_SERVER = Skylab::Dependency::StaticFileServer.new(FIXTURES_DIR, :warn)
+  tmpdir = ::Skylab::TestSupport::Tmpdir.new ::Skylab::TMPDIR_PATHNAME.to_s
 
-  module CustomExpectationMatchers
-    def be_including foo
-      BeIncluding.new(foo)
-    end
-    def be_subclass_of foo
-      BeSubclassOf.new(foo)
-    end
-  end
+  build_dir = ::Skylab::TestSupport::Tmpdir.new tmpdir.join('build-dependency')
 
-  class BeIncluding
-    def initialize expected
-      @expected = expected
-    end
-    def matches? target
-      (@target = target).include? @expected
-    end
-    def failure_message
-      "expected #{@target.inspect} to include #{@expected}"
-    end
-    def negative_failure_message
-      "expected #{@target.inspect} not to include #{@expected}"
-    end
-  end
+  fixtures_dir = Dependency_TestSupport.dir_pathname.join 'fixtures'
 
-  class BeSubclassOf < BeIncluding
-    def description
-      "be subclass of #{@expected}"
+  file_server = Dependency::StaticFileServer.new fixtures_dir,
+    log_level: :info, # (:info | :warn) e.g.
+    pid_path: tmpdir
+
+  CONSTANTS::BUILD_DIR = build_dir # #bound
+  CONSTANTS::FIXTURES_DIR = fixtures_dir # #bound
+  CONSTANTS::FILE_SERVER = file_server # #bound
+
+  module InstanceMethods
+    extend MetaHell::Let::ModuleMethods
+    include Headless::CLI::Stylize::Methods # `unstylize`
+
+    attr_accessor :debug
+
+    def debug!
+      self.debug = true
     end
-    def matches? foo
-      super(foo.ancestors)
-    end
+
+    let(:fingers) { ::Hash.new { |h, k| h[k] = [] } }
+
   end
 end
-

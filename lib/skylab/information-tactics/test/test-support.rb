@@ -1,6 +1,6 @@
-require_relative '../../test-support/quickie'
+require_relative '../../test-support/core'
 
 module Skylab::InformationTactics::TestSupport
-  extend ::Skylab::TestSupport::Quickie::ModuleMethods
+  extend ::Skylab::TestSupport::Quickie
 end
 

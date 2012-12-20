@@ -12,8 +12,8 @@ module Skylab::Treemap
 
   CLI_ACTIONS_CONST = 'CLI::Actions'
 
-  class Adapter::Mote < Struct.new(:name_function, :adapter_state, :client_module)
-    extend Skylab::Porcelain::Bleeding::DelegatesTo
+  class Adapter::Mote < ::Struct.new :name_function, :adapter_state, :client_module
+    extend ::Skylab::MetaHell::DelegatesTo # #while [#003]
 
     attr_accessor :adapter_module
 

@@ -1,30 +1,46 @@
-require 'skylab/code-molester/config/file'
-Skylab::TanMan::CodeMolester = Skylab::CodeMolester # in only once place!
-
 module Skylab::TanMan
+
   class Models::Config::Resource < CodeMolester::Config::File
-    # @smell, experimental
-    def clear
-      @content = @mtime = nil
-      @state = :initial
-    end
-    def initialize *a
-      @remotes = nil
-      super
-    end
-    attr_accessor :label
+
+                                  # (we make the below method public)
+    def clear                     # we've gotta take responsibility for this:
+      @remotes and @remotes.clear # to be absolutely insane, we want to see if
+      super                       # we have have these "resources" be long-
+    end                           # running.  We will taste the pain.
+
+    attr_reader :normalized_resource_name
+
     def remotes
       @remotes ||= begin
-        require_relative '../remote'
-        Models::Remote::Collection.new(self)
+        TanMan::Models::Remote::Collection.new self
       end
     end
-  end
-  class Models::Config::Local < Models::Config::Resource
-    def clear
-      super
-      @pathname = nil
+
+  protected
+
+    def initialize param_h
+      @normalized_resource_name = param_h.delete :normalized_resource_name
+      @remotes = nil
+      super param_h
     end
   end
-end
 
+
+
+  class Models::Config::Resource::Global < Models::Config::Resource
+    def clear
+      pn = @pathname              # obnoxiously we want to keep the same
+      super                       # pathname for life (for now!) even when
+      @pathname = pn              # our api asks us to `clear`
+      nil
+    end
+  end
+
+
+
+  class Models::Config::Resource::Local < Models::Config::Resource
+
+                                  # nothing special for now!
+
+  end
+end

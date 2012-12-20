@@ -38,7 +38,7 @@ module Skylab::Yacc2Treetop::TestSupport
     end
   end
   module CLI::InstanceMethods
-    include ::Skylab::Headless::CLI::IO::Pen::InstanceMethods # unstylize
+    include ::Skylab::Headless::CLI::Pen::InstanceMethods # unstylize
 
     FIXTURES = ::Pathname.new(File.expand_path('../fixtures', __FILE__))
     INVITE_RE = /\Ayacc2treetop -h for help\z/

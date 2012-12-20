@@ -1,16 +1,8 @@
-require 'skylab/face/path-tools' # assumes INCLUDE_PATH "hack" occured (or gems maybe)
-
-module Skylab
-  module Dependency
-    module Interface ; end
-  end
-end
-
 module Skylab::Dependency
   module Interface
     CliCommands = lambda do |_|
       o do |op, req|
-        extend ::Skylab::Face::PathTools::InstanceMethods
+        extend Headless::CLI::PathTools::InstanceMethods
         item_name = @parent.name
         syntax "#{invocation_string} [opts] [<name> [<name> [..]]]"
         op.banner = <<-HERE.gsub(/^ +/, '')
@@ -45,4 +37,3 @@ module Skylab::Dependency
     end
   end
 end
-

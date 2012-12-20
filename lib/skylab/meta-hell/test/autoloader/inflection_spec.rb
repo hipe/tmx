@@ -1,7 +1,7 @@
 require_relative '../../../../skylab'
 
 describe Skylab::Autoloader::Inflection do
-  include subject.call
+  include ::Skylab::Autoloader::Inflection::Methods
   context "Pathify tries to turn constants into path fragments:" do
     let(:subject) { pathify const }
     def self.yerp const, tgt_path, comment, *a
@@ -40,4 +40,24 @@ describe Skylab::Autoloader::Inflection do
     yerp 'one/////two', 'One::Two', '(corrects multiple slashes)'
     yerp 'path Here This::Is::This', 'PathHereThisIsThis', '(but what about this BS)'
   end
+end
+
+describe "#{ ::Skylab::Autoloader::Inflection }::FUN methodify" do
+
+  o = -> in_s, out_s, *t do
+    it "#{in_s} #{out_s}", *t do
+      ::Skylab::Autoloader::Inflection::FUN.methodify[ in_s ].should eql(out_s)
+    end
+  end
+
+  o[ 'a b', :a_b ]
+
+  o[ 'AbcDef', :abc_def ]
+
+  o[ 'NASASpaceStation', :nasa_space_station ]
+
+  o[ 'abc-def--hij', :abc_def_hij ]
+
+  o[ 'F!@#$%^&*Oo', :f_oo ]
+
 end

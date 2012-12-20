@@ -1,5 +1,3 @@
-module Skylab ; end
-
 module Skylab::Slake
   module Parenthood
     def init_parenthood
@@ -16,4 +14,3 @@ module Skylab::Slake
    alias_method :parent?, :has_parent
   end
 end
-

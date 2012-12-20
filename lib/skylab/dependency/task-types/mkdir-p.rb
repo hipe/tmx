@@ -1,8 +1,6 @@
-require File.expand_path('../../task', __FILE__)
-
 module Skylab::Dependency
-  class TaskTypes::MkdirP < Task
-    include FileUtils
+  class TaskTypes::MkdirP < Dependency::Task
+    include Dependency::Services::FileUtils
     alias_method :fu_mkdir_p, :mkdir_p
     attribute :dry_run, :boolean => true, :from_context => true, :default => false
     attribute :max_depth, :from_context => true, :default => 1
@@ -12,7 +10,7 @@ module Skylab::Dependency
     def execute args
       @context ||= (args[:context] || {})
       valid? or fail(invalid_reason)
-      if File.directory?(dir = Pathname.new(mkdir_p))
+      if ::File.directory?(dir = ::Pathname.new(mkdir_p))
         emit :info, "directory exists: #{dir}"
         return true
       end
@@ -36,4 +34,3 @@ module Skylab::Dependency
     end
   end
 end
-

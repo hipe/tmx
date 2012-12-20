@@ -1,7 +1,9 @@
-require_relative '../../skylab'
+require_relative '..'
+require 'skylab/headless/core'
 
 module Skylab
   module Porcelain
-    extend Skylab::Autoloader
+    Headless = ::Skylab::Headless # i win
+    extend ::Skylab::MetaHell::Autoloader::Autovivifying
   end
 end

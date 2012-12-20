@@ -1,13 +1,5 @@
 module Skylab::TanMan
-  class Models::Model
-    extend Bleeding::DelegatesTo
-    extend Porcelain::AttributeDefiner
-
-    delegates_to :runtime, :emit
-
-    def initialize runtime
-      @runtime = runtime
-    end
+  class Models::Model # at [#040] sub client
+    # nothing yet - pushed down during dev
   end
 end
-

@@ -1,4 +1,4 @@
-require 'skylab/permute/cli'
+require 'skylab/permute/core'
 
 module Skylab
   module Tmx
@@ -8,4 +8,3 @@ module Skylab
     end
   end
 end
-
