@@ -1,3 +1,4 @@
+[#032]      #open #low-priority do we care about our call-stack height for cli?
 [#031]       #done a petition to get escape_path pushed up here
 [#030]       #done the raw dog experiment
 [#029] #open `stylize` as any of two of these happen: [#gs-004] [#bn-005]
