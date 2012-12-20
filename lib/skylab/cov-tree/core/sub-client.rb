@@ -8,10 +8,7 @@ module Skylab::CovTree
 
 
   module Core::SubClient::InstanceMethods
-
-    def escape_path x
-      request_client.escape_path x
-    end
+    include Headless::SubClient::InstanceMethods # #floodgates
 
     def pre x
       request_client.pre x

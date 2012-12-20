@@ -43,11 +43,6 @@ module Skylab::GitStashUntracked
       nil
     end
 
-    def payload data              # away at [#ct-005]
-      emit :payload, data
-      nil
-    end
-
     def stylize *a                # away at [#hl-029]
       pen.stylize(* a )
     end

@@ -58,6 +58,11 @@ module Skylab::Headless
       nil
     end
 
+    def payload x                 # provided as a convenience for this common
+      emit :payload, x            # emitter "macro" -- not all sub-clients
+      nil                         # will necessarily emit this.
+    end
+
     def pen
       request_client.send :pen
     end
