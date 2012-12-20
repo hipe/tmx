@@ -15,6 +15,8 @@ module Skylab::Headless
   module CLI::Action::ModuleMethods
     include Headless::Action::ModuleMethods
 
+    # def desc [#hl-033]
+
   end
 
   module CLI::Action::InstanceMethods

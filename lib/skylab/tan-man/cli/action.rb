@@ -1,20 +1,84 @@
 module Skylab::TanMan
 
   class CLI::Action
-    extend Bleeding::Action # this infects us with a metric fuckton
-      # of bloat and pasta that we don't want from bleeding -- one day we will
-      # do po -> hl [#018] -- but for now we need porcelain like desc() that we
-      # don't yet have in hl. (7 modules from bleeding, 2 from hl!) can't wait!
-
+    extend Headless::CLI::Action::ModuleMethods
     extend Core::Action::ModuleMethods
 
-    # include Headless::CLI::Action::InstanceMethods # let's see if this plays
-      # nice with bleeding above - no. also what is our order, w/ re: to below
-
+    include Headless::CLI::Action::InstanceMethods
     include Core::Action::InstanceMethods
 
     ANCHOR_MODULE = CLI::Actions  # We state what our box module is for
                                   # reflection (e.g. to get normalized name)
+
+    def self.desc *a # up to [#hl-033] when ready
+      if a.empty? # (awful compat for bleeding, don't float this up)
+        if( @desc_lines ||= nil )
+          @desc_lines
+        else
+          [ ].freeze
+        end
+      else
+        ( @desc_lines ||= [ ] ).concat a
+        nil
+      end
+    end
+
+    def self.unbound_invocation_method # #compat-bleeding
+      instance_method :invoke
+    end
+
+    # --*--
+
+    alias_method :tan_man_original_help, :help
+
+    def help o # #bleeding-compat. there is nothing of value here,
+      res = false                 # only blood and noise
+      begin
+        1 == o.length or break
+        case [o.keys.first, o[o.keys.first]]
+        when [:full, true]
+          help_screen
+          res = true # just for fun, continue screening other option things
+        when [:invite_only, true]
+          emit :help, invite_line
+          res = true
+        end
+      end while nil
+      if false == res
+        $stderr.puts "WAT: #{ o.inspect }"
+        res = nil
+      end
+      res
+    end
+
+    def invite_line               # #compat-bleeding #compat-headless
+    # (this is to get the tests to pass but note we should not in the future
+    # assume that the terminal action does not take a meaningful `-h` opt.)
+     "try #{ kbd "#{ request_runtime.send :normalized_invocation_string }#{
+        } #{ normalized_local_action_name } -h" } for help"
+    end
+
+    def resolve argv              # what we have here is an attempt at making
+                                  # #compat-bleeding #compat-headless (!!)
+      res = nil                   # compare to hl:cli:action:im#invoke
+      begin
+        @argv = argv
+        self.param_h ||= { }
+        @queue ||= []
+        res = parse_opts( argv ) or break
+        queue.push( default_action ) if queue.empty?
+        while queue.length > 1
+          meth = queue.shift
+          res = parse_argv_for( meth ) or break
+          res = send( meth, *res ) or break
+        end
+        res or break
+        meth = queue.shift
+        res = parse_argv_for( meth ) or break
+        res = [ method( meth ), res ]
+      end while nil
+      res
+    end
 
   protected
 
@@ -73,6 +137,10 @@ module Skylab::TanMan
       end
     end
 
+    def default_action # #compat-headless
+      :invoke
+    end
+
     def full_invocation_parts klass
       [program_name_hack, * klass.normalized_action_name]
     end
@@ -113,6 +181,10 @@ module Skylab::TanMan
       parts = full_invocation_parts self.class
       words = sentence[ parts ]
       "#{ words.join ' '} - #{ e.message }"
+    end
+
+    def program_name # #compat-bleeding (tracked as [#hl-034])
+      normalized_invocation_string
     end
 
     def program_name_hack

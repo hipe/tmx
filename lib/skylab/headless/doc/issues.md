@@ -1,3 +1,7 @@
+[#034]       #tracking-tag for function-point `program_name` -
+               `normalized_invocation_string`
+[#033]       #tracking-tag for future #push-up abstraction
+              and function-point `desc` etc.
 [#032]      #open #low-priority do we care about our call-stack height for cli?
 [#031]       #done a petition to get escape_path pushed up here
 [#030]       #done the raw dog experiment

@@ -88,6 +88,10 @@ module Skylab::TanMan
     end                           # to this directly, at the byte-level
                                   # and note the intentional name-change
 
+    def normalized_invocation_string # #compat-headless
+      program_name
+    end
+
     def paystream
       io_adapter.outstream        # note the intentional name-change
     end

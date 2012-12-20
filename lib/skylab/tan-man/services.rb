@@ -15,6 +15,8 @@ module ::Skylab::TanMan
       end
     end
 
+    o :OptionParser,  -> { require 'optparse' ; ::OptionParser }
+
     o :PP,            -> { require 'pp'       ; ::PP }
 
     o :StringIO,      -> { require 'stringio' ; ::StringIO }

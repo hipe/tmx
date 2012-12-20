@@ -7,6 +7,8 @@ module Skylab::TanMan
     # or core action i.m's
     #
 
+  protected
+
     def initialize request_client, module_with_actions
       # this was the site of a lot of blood
       block_given?       and fail 'sanity - blocks?'
@@ -14,6 +16,10 @@ module Skylab::TanMan
       _namespace_inferred_init! module_with_actions
       parent              or fail 'sanity - parent?'
       self.request_client or fail 'sanity - req cli?'
+    end
+
+    def normalized_invocation_string # #compat-headless #compat-bleeding
+      program_name
     end
   end
 end

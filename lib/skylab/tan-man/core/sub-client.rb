@@ -42,6 +42,9 @@ module Skylab::TanMan
       pen.escape_path(* a)        # but tan-man apparently thinks it has
     end                           # special needs.)
 
+    def hdr s                     # how do we render headers (e.g. in report
+      em s                        # tables?)
+    end
 
     rx = Headless::CLI::PathTools::FUN.absolute_path_hack_rx
     define_method :gsub_path_hack do |str|

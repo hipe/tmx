@@ -13,16 +13,45 @@ module Skylab::TanMan
   end
 
 
-  module CLI::Actions
-                                  # a box-like module that is all defined here
+
+  module CLI::Actions             # a box-like module that is all defined in
+                                  # this file. needs to be created before the
+  end                             # Action base class will be created below.
+
+
+
+  CLI::Action || nil              # load this class that's defined in another
+  class CLI::Action               # file and re-open it here so that we can
+                                  # have the below re-usable option definitions
+                                  # in this file to keep them all centralized.
+
+    def dry_run_option o
+      o.on '-n', '--dry-run', 'dry run.' do param_h[:dry_run] = true end
+    end
+
+    def help_option o
+      o.on '-h', '--help', 'this screen.' do
+        enqueue! :tan_man_original_help
+      end
+    end
+
+    def verbose_option o
+      o.on '-v', '--verbose', 'verbose output.' do param_h[:verbose] = true end
+    end
   end
 
 
+
   class CLI::Actions::Status < CLI::Action
-    desc "show the status of the config director{y|ies} active at the path."
     include Porcelain::Table::RenderTable
 
-    option_syntax.help!
+    desc "show the status of the config director{y|ies} active at the path."
+
+    def build_option_parser
+      o = TanMan::Services::OptionParser.new
+      help_option o
+      o
+    end
 
     def invoke path=nil
       path ||= services.file_utils.pwd # at [#021]: services.file_utils.pwd
@@ -46,14 +75,24 @@ module Skylab::TanMan
   end
 
 
+
   class CLI::Actions::Init < CLI::Action
-    desc "create the #{API.local_conf_dirname} directory"
-    option_syntax { |h| on('-n', '--dry-run', 'dry run.') { h[:dry_run] = true } }
-    def invoke path=nil, opts
-      api_invoke opts.merge( path: path,
-                             local_conf_dirname: API.local_conf_dirname )
+
+    desc "create the #{ API.local_conf_dirname } directory"
+
+    def build_option_parser
+      o = TanMan::Services::OptionParser.new
+      dry_run_option o
+      help_option o
+      o
+    end
+
+    def invoke path=nil
+      api_invoke param_h.merge( path: path,
+                                local_conf_dirname: API.local_conf_dirname )
     end
   end
+
 
 
   module CLI::Actions::Remote
@@ -63,13 +102,22 @@ module Skylab::TanMan
   end
 
 
+
   class CLI::Actions::Remote::Add < CLI::Action
-    option_syntax do |h|
-      on('-g', '--global', "add it to the global config file.") { h[:global] = true }
-    end
+
     desc "add the remote."
-    def invoke name, host, opts
-      args = opts.merge(name: name, host: host)
+
+    def build_option_parser
+      o = TanMan::Services::OptionParser.new
+      o.on '-g', '--global', 'add it to the global config file.' do
+        param_h[:global] = true
+      end
+      help_option o
+      o
+    end
+
+    def invoke name, host
+      args = param_h.merge( name: name, host: host )
       args[:resource] = args.delete(:global) ? :global : :local
       result = api_invoke args
       result
@@ -77,16 +125,25 @@ module Skylab::TanMan
   end
 
 
+
   class CLI::Actions::Remote::List < CLI::Action
-    desc "list the remotes."
-    option_syntax do |h|
-      on('-v', '--verbose', "show more fields.") { h[:verbose] = true }
-    end
     include Porcelain::Table::RenderTable
-    def invoke opts
+
+    desc "list the remotes."
+
+    def build_option_parser
+      o = TanMan::Services::OptionParser.new
+      help_option o
+      o.on '-v', '--verbose', 'show more fields.' do
+        param_h[:verbose] = true
+      end
+      o
+    end
+
+    def invoke
       result = nil # not false - we never do convention [#hl-109] invite
       begin
-        table = api_invoke( opts ) or break
+        table = api_invoke( param_h ) or break
         render_table table, separator: '  ' do |o|
           o.field(:resource_label).format { |x| "(resource: #{x})" }
           o.on_empty do |e|
@@ -105,18 +162,27 @@ module Skylab::TanMan
   end
 
 
+
   class CLI::Actions::Remote::Rm < CLI::Action
+
     desc "remove the remote."
-    option_syntax do |h|
-      on('-r', '--resource NAME', "which config file (e.g. global, local) (default: first found)") do |v|
-        h[:resource_name] = v
+
+    def build_option_parser
+      o = TanMan::Services::OptionParser.new
+      help_option o
+      o.on '-r', '--resource NAME',
+        'which config file (e.g. global, local) (default: first found)' do |v|
+        param_h[:resource_name] = v
       end
+      o
     end
-    def invoke remote_name, opts
-      result = api_invoke opts.merge( remote_name: remote_name )
+
+    def invoke remote_name
+      result = api_invoke param_h.merge( remote_name: remote_name )
       result
     end
   end
+
 
 
   module CLI::Actions::Graph
@@ -126,54 +192,92 @@ module Skylab::TanMan
   end
 
 
+
   class CLI::Actions::Graph::Use < CLI::Action
+
     desc 'selects which (dependency graph) file to edit'
-    option_syntax.help!
+
+    def build_option_parser
+      o = TanMan::Services::OptionParser.new
+      help_option o
+      o
+    end
+
     def invoke path
       api_invoke path: path
     end
   end
 
 
+
   class CLI::Actions::Graph::Tell < CLI::Action
+
     desc "there's a lot you can tell about a man from his choice of words"
-    option_syntax do |h|
-      on( '-f', '--force',
-         'rewrites the cached treetop parser file (#dev)' ) { h[:force] = true }
+
+    def build_option_parser
+      o = TanMan::Services::OptionParser.new
+      o.on '-f', '--force',
+        'rewrites the cached treetop parser file (#dev)' do
+        param_h[:force] = true
+      end
+      help_option o
+      o
     end
-    def invoke *word, opts
-      api_invoke words: word, force: opts[:force]
+
+    def invoke *word
+      api_invoke words: word, force: param_h[:force]
     end
   end
 
 
+
   class CLI::Actions::Graph::Check < CLI::Action
+
     desc 'checks if the (dependency graph) file exists and can be parsed.'
-    option_syntax do |h|
-      on( '-v', '--verbose', 'verbose output' ) { h[:verbose] = true }
+
+    def build_option_parser
+      o = TanMan::Services::OptionParser.new
+      help_option o
+      verbose_option o
+      o
     end
-    def invoke dotfile=nil, opts
-      api_invoke path: dotfile, verbose: opts[:verbose]
+
+    def invoke dotfile=nil
+      api_invoke path: dotfile, verbose: param_h[:verbose]
     end
   end
 
 
 
   class CLI::Actions::Graph::Push < CLI::Action
+
     desc "push any single file anywhere in the world."
     desc "(scp wrapper)"
-    option_syntax do |h|
-      on('-n', '--dry-run', 'dry run.') { h[:dry_run] = true }
+
+    def build_option_parser
+      o = TanMan::Services::OptionParser.new
+      dry_run_option o
+      help_option o
+      o
     end
-    def invoke remote_name, file, opts
-      api_invoke opts.merge( remote_name: remote_name, file_path: file )
+
+    def invoke remote_name, file
+      api_invoke param_h.merge( remote_name: remote_name, file_path: file )
     end
   end
 
 
+
   class CLI::Actions::Graph::Example < CLI::Action
+
     desc "what graph example to use? (gets or sets it)"
-    option_syntax.help!
+
+    def build_option_parser
+      o = TanMan::Services::OptionParser.new
+      help_option o
+      o
+    end
+
     def invoke name=nil
       if name
         api_invoke [:graph, :example, :set], name: name
