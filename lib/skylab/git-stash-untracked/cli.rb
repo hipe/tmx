@@ -38,6 +38,10 @@ module Skylab::GitStashUntracked
       end
     end
 
+    def escape_path x             # pushed up at [/#hl-031]
+      request_client.send :escape_path, x
+    end
+
     def info msg                  # (just like ancestor but decorated)
       emit :info, "# #{ msg }"
       nil
@@ -63,6 +67,80 @@ module Skylab::GitStashUntracked
 
 
 
+  module PathInfo_InstanceMethods
+
+  protected
+
+    relpath = '../Stashes'
+    define_method :find_closest_path_info do
+      res = nil
+      begin
+        curr = pwd = ::Pathname.pwd
+        found = nil
+        max_dirs_looked = nil                  # #placeholder for possible feat.
+        num_dirs_looked = 0
+        loop do
+          if max_dirs_looked && max_dirs_looked >= num_dirs_looked
+            break
+          end
+          num_dirs_looked += 1
+          if curr.join( relpath ).exist?
+            found = curr
+            break
+          end
+          parent = curr.parent
+          if parent == curr
+            break
+          end
+          curr = parent
+        end
+        if found
+          res = PathInfo.new curr, curr.join( relpath )
+          break
+        end
+        reason = case 1 <=> num_dirs_looked
+        when -1 ; " and the #{ num_dirs_looked - 1 } dirs above it"
+        when  0 ; nil
+        when  1 ; " num_dirs_looked was #{ num_dirs_looked }!" # (strange)
+        end
+        error "couldn't find #{ relpath } in #{ escape_path pwd }#{
+          }#{ reason }"
+        res = false
+      end while nil
+      res
+    end
+
+    attr_reader :path_info
+
+    def resolve_path_info! param_h
+      res = nil
+      begin
+        fail 'sanity - path info already set' if path_info
+        sp = param_h.fetch :stashes_path       # yep, it must exist as a key
+        param_h.delete :stashes_path           # mutate now, sure why not #atom
+        if sp
+          res = PathInfo.new ::Pathname.new( '.' ), ::Pathname.new( sp )
+                                               # this is the "old way" where
+                                               # anchor is pwd, both relative
+        else
+          res = find_closest_path_info         # this is the "new way", anchor
+                                               # will be based on where stashes
+        end                                    # was found.
+        res or break
+        @path_info = res
+        res = true
+      end while nil
+      res
+    end
+
+    def stashes_path                          # for compat. with invoke impl,
+      path_info.stashes_pathname.to_s         # we've got to be able to return
+                                              # a non-nil value for any of these
+    end                                       # that we absorb early (for now)
+  end
+
+
+
   class CLI
     include SubClient_InstanceMethods          # *before* cli client mechanics
                                                # if you want to override them.
@@ -76,8 +154,6 @@ module Skylab::GitStashUntracked
 
     def api_invoke mixed_action_name, param_h
       klass = API::Actions.const_fetch mixed_action_name
-                                  # API::Actions::List, API::Actions::Save
-                                  # API::Actions::Show, API::Actions::Pop
       o = klass.new self
       res = o.invoke param_h
       res
@@ -106,7 +182,7 @@ module Skylab::GitStashUntracked
 
     # --*--
 
-    def dry_run o
+    def dry_run_option o
       param_h[:dry_run] = false
       o.on '-n', '--dry-run', "Dry run." do
         param_h[:dry_run] = true
@@ -121,21 +197,20 @@ module Skylab::GitStashUntracked
       nil
     end
 
-    def stashes o
-      param_h[:stashes_path] = '../Stashes'
-      o.on '-s', '--stashes <dir>', "Where the stashed files live #{
-        }(default: #{ param_h[:stashes_path] })." do |v|
-        param_h[:stashes_path] = v
-      end
-      nil
-    end
-
-    def verbose o
+    def verbose_option o
       param_h[:verbose] = false
       o.on '-v', '--verbose', 'verbose output' do
         param_h[:verbose] = true
       end
       nil
+    end
+
+    def stashes_option o
+      param_h[:stashes_path] = nil
+      o.on '-s', '--stashes <path>',
+        "use <path> as stashes path and pwd as anchor dir" do |v|
+        param_h[:stashes_path] = v
+      end
     end
 
   public
@@ -148,15 +223,15 @@ module Skylab::GitStashUntracked
       o = GitStashUntracked::Services::OptionParser.new
       o.separator " description: move all untracked files to #{
         }another folder (usu. outside of the project.)"
-      dry_run o
+      dry_run_option o
       help_option o
-      stashes o
-      verbose o
+      stashes_option o
+      verbose_option o
       o
     end
 
-    def save name
-      api_invoke :save, param_h.merge( stash_name: name )
+    def save stash_name
+      api_invoke :save, param_h.merge( stash_name: stash_name )
     end
 
 
@@ -164,8 +239,9 @@ module Skylab::GitStashUntracked
     build_option_parser do
       o = GitStashUntracked::Services::OptionParser.new
       o.separator " description: lists the \"stashes\" #{
-       }(just a directory listing)."
-      stashes o
+        }(a glorified dir listing)."
+      stashes_option o
+      verbose_option o
       o
     end
 
@@ -186,20 +262,23 @@ module Skylab::GitStashUntracked
 
       help_option o
 
-      param_h[:patch] = nil
+      param_h[:show_patch] = nil
       o.on( '-p', '-u', '--patch', "Generate patch (can be used with --stat)."
-        ) { param_h[:patch] = true }
+        ) { param_h[:show_patch] = true }
 
-      stashes o
+      stashes_option o
 
-      param_h[:stat] = nil
+      param_h[:show_stat] = nil
       o.on( '--stat', "Show diffstat format (default) #{
-        }(can be used with --patch)." ) { param_h[:stat] = true }
+        }(can be used with --patch)." ) { param_h[:show_stat] = true }
+
+      verbose_option o
+
       o
     end
 
-    def show name
-      api_invoke :show, param_h.merge( name: name )
+    def show stash_name
+      api_invoke :show, param_h.merge( stash_name: stash_name )
     end
 
 
@@ -208,14 +287,14 @@ module Skylab::GitStashUntracked
       o = GitStashUntracked::Services::OptionParser.new
       o.separator  " description: Attempts to put the files back #{
         }if there are no collisions."
-      dry_run o
-      stashes o
-      verbose o
+      dry_run_option o
+      stashes_option o
+      verbose_option o
       o
     end
 
-    def pop name
-      api_invoke :pop, param_h.merge( name: name )
+    def pop stash_name
+      api_invoke :pop, param_h.merge( stash_name: stash_name )
     end
 
 
@@ -224,20 +303,13 @@ module Skylab::GitStashUntracked
       o = GitStashUntracked::Services::OptionParser.new
       o.separator " description: Shows the files that would be stashed."
       help_option o
+      stashes_option o
+      verbose_option o
       o
     end
 
     def status
-      o = API::Actions::Save.new self
-      num = 0
-      o.normalized_relative_others.each do |file_name|
-        num += 1
-        payload file_name
-      end
-      if 0 == num
-        info "(no untracked files)"
-      end
-      true
+      api_invoke :status, param_h
     end
   end
 
@@ -263,7 +335,9 @@ module Skylab::GitStashUntracked
     def invoke param_h
       res = nil
       begin
+        res = resolve_path_info!( param_h ) or break
         res = set!( param_h ) or break
+        Headless::CLI::PathTools.clear # see notes at `pretty_path` - danger
         res = execute
       end while nil
       res
@@ -277,11 +351,11 @@ module Skylab::GitStashUntracked
     absolute_path_hack_rx = fun.absolute_path_hack_rx
 
     define_method :collection do
-      @collection_cache ||= { }
-      @collection_cache.fetch( stashes_path ) do |k|
-        c = Collection.new self, stashes_path, -> type, str do # define emit as:
-          use = str.gsub absolute_path_hack_rx do # scan for strings that look
-            escape_path $~[0]                  # like paths and escape them
+      @collection_cache ||= { }                # (using `path_info` struct as
+      @collection_cache.fetch( path_info ) do |k| # a key works as expected.)
+        c = Stash::Collection.new self, path_info, -> type, str do # define emit
+          use = str.gsub absolute_path_hack_rx do # as: scan for strings that
+            escape_path $~[0]                  # look like paths and escape them
           end                                  # using oure escape_path method
           emit type, use                       # and emit thru our emit method
         end
@@ -301,6 +375,10 @@ module Skylab::GitStashUntracked
       res
     end
 
+    def formal_param_a
+      self.class.const_get :PARAMS, false
+    end
+
     def normalized_action_name
       self.class.normalized_action_name
     end
@@ -313,18 +391,25 @@ module Skylab::GitStashUntracked
       res = nil
       begin
         before = error_count
-        param_a = self.class.const_get :PARAMS, false
-        missing_a = param_a - param_h.keys
-        invalid_a = param_h.keys - param_a
+        missing_a = formal_param_a - param_h.keys
+        invalid_a = param_h.keys - formal_param_a
         error = -> msg do
           self.error "can't invoke api action \"#{
             }#{ normalized_action_name.join ' ' }\" - #{ msg }"
         end
-        if ! invalid_a.empty?
+        if invalid_a.length.nonzero?
           error[ "invalid parameter(s): (#{ invalid_a.join ', ' })" ]
           break( res = false )
         end
-        if ! missing_a.empty?
+        if missing_a.length.nonzero?           # #experimental addition to the
+          missing_a.each_with_index do |k, i|  # canonical algorithm: allow
+            if ! send( "#{ k }" ).nil?         # these to be previously set
+              missing_a[i] = nil
+            end
+          end
+          missing_a.compact!
+        end
+        if missing_a.length.nonzero?
           error[ "missing required parameter(s): (#{ missing_a.join ', ' })" ]
           break( res = false )
         end
@@ -334,27 +419,43 @@ module Skylab::GitStashUntracked
       res
     end
 
-    def verbose                             # if a given action doesn't support
-      true                                  # this, we fallback to "loud" for
-    end                                     # the above nerk
+    def show_info
+      path_info.members.each do |member|
+        info "#{ member }: #{ path_info[member] }"
+      end
+      nil
+    end
+
+    def stashes_path= str
+      if path_info
+        fail "sanity - attempt to set stashes_path after path_info set."
+      end
+      self.path_info = StashesPathInfo.new str
+      str
+    end
+
+    def verbose                                # if a given action doesn't
+      true                                     # support this, we fallback to
+    end                                        # "loud" for the above
   end
 
 
-
+  #                               --*--
 
   module API::Actions
-    extend MetaHell::Boxxy        # (`const_fetch`)
+    extend MetaHell::Boxxy                     # (`const_fetch`)
   end
-
 
 
   class API::Actions::Save < API::Action
+    include PathInfo_InstanceMethods
 
     PARAMS = [ :dry_run, :stash_name, :stashes_path, :verbose ]
 
+  protected
+
     def execute
-      info "(raw stashes path: #{ stashes_path })" if verbose
-      Headless::CLI::PathTools.clear # see notes at `pretty_path` -- there is danger
+      show_info if verbose
       result = nil
       begin
         stash = collection.stash_valid_for_writing stash_name
@@ -376,7 +477,7 @@ module Skylab::GitStashUntracked
 
   protected
 
-    attr_accessor :dry_run, :stash_name, :stashes_path, :verbose
+    attr_accessor :dry_run, :stash_name, :verbose
 
     command_s = 'git ls-files --others --exclude-standard'
 
@@ -401,51 +502,91 @@ module Skylab::GitStashUntracked
 
 
 
-  class API::Actions::List < API::Action
+  class API::Actions::Status < API::Actions::Save
 
-    PARAMS = [:stashes_path]
+    PARAMS = [ :stashes_path, :verbose ]
 
   protected
 
     def execute
-      collection.validate_existence or return false
-      count = 0
-      collection.each_stash do |stash|
-        count += 1
-        emit :payload, stash.name
-      end
-      count
+      res = nil
+      begin
+        show_info if verbose
+        num = 0
+        normalized_relative_others.each do |file_name|
+          num += 1
+          payload file_name
+        end
+        if 0 == num
+          info "(no untracked files)"
+        end
+        res = true
+      end while nil
+      res
+    end
+  end
+
+
+
+  class API::Actions::List < API::Action
+    include PathInfo_InstanceMethods
+
+    PARAMS = [ :stashes_path, :verbose ]
+
+  protected
+
+    def execute
+      res = nil
+      begin
+        show_info if verbose
+        if ! collection.validate_existence
+          break( res = false )
+        end
+        count = 0
+        collection.stashes( verbose ).each do |stash|
+          count += 1
+          emit :payload, stash.stash_name
+        end
+        res = count
+      end while nil
+      res
     end
 
     # --*--
 
-    attr_accessor :stashes_path
+    attr_accessor :verbose
 
   end
 
 
 
   class API::Actions::Show < API::Action
+    include PathInfo_InstanceMethods
 
-    PARAMS = [:color, :name, :patch, :stashes_path, :stat]
+    PARAMS = [ :color, :show_patch, :show_stat, :stash_name,
+                 :stashes_path, :verbose ]
+  protected
 
     def execute
       res = nil
       begin
-        stash = collection.stash name
+        stash = collection.stash stash_name
+        if verbose
+          info "(stash path: #{ stash.send :pathname })"
+        end
         stash = stash.validate_existence
         if ! stash
           break( res = stash )
         end
-        if ! (stat || patch)
-          self.stat = true
+        if ! (show_stat || show_patch)
+          self.show_stat = true
         end
-        if stat
+        if show_stat
           stash.stat_lines.each do |type, string|
             emit type, string
           end
         end
-        if patch
+        if show_patch
           stash.patch_lines.each do |type, string|
             emit type, string
           end
@@ -456,15 +597,8 @@ module Skylab::GitStashUntracked
 
   protected
 
-    def initialize *a
-      @patch = @stat = nil
-      super
-    end
-
-    attr_accessor :color, :name, :patch, :stashes_path, :stat
+    attr_accessor :color, :stash_name, :show_patch, :show_stat, :verbose
     alias_method :color?, :color # api compat
-
-    attr_reader :stash
 
   end
 
@@ -472,78 +606,37 @@ module Skylab::GitStashUntracked
 
   class API::Actions::Pop < API::Action
     include Color_InstanceMethods
+    include PathInfo_InstanceMethods
 
-    PARAMS = [:dry_run, :name, :stashes_path, :verbose]
+    PARAMS = [ :dry_run, :stash_name, :stashes_path, :verbose ]
 
   protected
 
     def execute
-      @stash = collection.stash(name).validate_existence or return false
-      @stash.pop dry_run, verbose, method(:emit)
+      res = nil
+      begin
+        stash = collection.stash( stash_name ).validate_existence
+        break( res = false ) if ! stash
+        stash.pop dry_run, verbose, method( :emit )
+      end while nil
+      res
     end
 
-    attr_accessor :dry_run, :name, :stashes_path, :verbose
+    attr_accessor :dry_run, :stash_name, :verbose
   end
 
 
   # --*--
 
-  class Collection
-    include SubClient_InstanceMethods
-    include Color_InstanceMethods
 
-    def each_stash
-      @pathname.children( false ).each do |child| # or e.g. Errno::ENOENT
-        stash = self.stash child.to_s
-        yield stash
-      end
-      nil
-    end
-
-    def stash name
-      @cache[name] ||= Stash.new self, @pathname, name, @emit
-    end
-
-    def stash_valid_for_writing name
-      stash = self.stash name
-      if stash.valid_for_writing?
-        stash
-      else
-        false
-      end
-    end
-
-    def validate_existence
-      res = nil
-      if @pathname.exist?
-        res = true
-      else
-        @emit[ :error, "Stashes dir does not exist: #{ @pathname }" ]
-        res = false
-      end
-      res
-    end
-
-  protected
-
-    def initialize request_client, stashes_path, emit
-      _gsu_sub_client_init! request_client
-      @cache = { }
-      @emit = emit
-      @pathname = ::Pathname.new stashes_path
-    end
+  class PathInfo < ::Struct.new :anchor_pathname, :stashes_pathname
   end
-
 
 
   class Stash
     include GitStashUntracked::Services::FileUtils
     include SubClient_InstanceMethods
     include Color_InstanceMethods
-
-    def name
-      @pathname.basename.to_s
-    end
 
     def patch_lines
       ::Enumerator.new do |y|
@@ -563,20 +656,36 @@ module Skylab::GitStashUntracked
       end
     end
 
-    def pop dry_run, verbose, emit
-      filenames = self.filenames.map { |f| ::Pathname.new f }
-      # ( the below will need to change for [#005] )
-      if (existed = filenames.select(&:exist?)).any?
-        emit[:error, "Can't pop, destination file(s) exist:"]
-        existed.each { |p| emit[:error, p.to_s] }
-        return false
-      end
-      filenames.each do |path|
-        path.dirname.directory? or mkdir_p(path.dirname, :verbose => true, :noop => dry_run)
-        mv(pathname.join(path), path, :verbose => true, :noop => dry_run) # always verbose when popping
-      end
-      _prune dry_run, verbose
-      true
+    move_struct = ::Struct.new :source_pathname, :dest_pathname
+    define_method :pop do |dry_run, verbose, emit|
+      res = nil
+      begin
+        existed = nil
+        moves = filenames( verbose ).map do |filename|
+          o = move_struct.new
+          o.source_pathname = pathname.join filename
+          o.dest_pathname = path_info.anchor_pathname.join filename
+          if o.dest_pathname.exist?
+            ( existed ||= [] ).push o.dest_pathname
+          end
+          o
+        end
+        if existed
+          emit[ :error, "Can't pop, destination file(s) exist:" ]
+          existed.each { |pn| emit[ :error, pn.to_s ] }
+          break( res = false )
+        end
+        moves.each do |o|
+          if ! o.dest_pathname.dirname.directory? # (always verbose when pop)
+            mkdir_p o.dest_pathname.dirname, noop: dry_run, verbose: true
+          end
+          mv o.source_pathname, o.dest_pathname, noop: dry_run, verbose: true
+            # might fail during a dry run (if a dry mkdir_p above)
+        end
+        prune_directories dry_run, verbose
+        res = true
+      end while nil
+      res
     end
 
     def stash_file normalized_relative_file_name, dry_run
@@ -592,16 +701,21 @@ module Skylab::GitStashUntracked
             @quiet[dir_path] = true
           end
         end
-        # will need to change for [#005] below
         res = move normalized_relative_file_name, dest.to_s, verbose: true, noop: dry_run
       end while nil
       res
     end
 
+    attr_reader :stash_name
+
     # save below as-is for #posterity /slash/ you-know-what
     def validate_existence
-      pathname.exist? and return self
-      error "Stash does not exist: #{ name }"
+      res = false
+      begin
+        break( res = self ) if pathname.exist?
+        error "Stash does not exist: #{ stash_name }"
+      end while nil
+      res
     end
 
     def valid_for_writing?
@@ -613,18 +727,21 @@ module Skylab::GitStashUntracked
 
   protected
 
-    def initialize request_client, dir_pathname, stash_name, emit
+    def initialize request_client, path_info, stash_name, emit
       _gsu_sub_client_init! request_client
-      @color = nil
       @emit = emit
-      @pathname = dir_pathname.join stash_name
+      @path_info = path_info
+      @pathname = path_info.stashes_pathname.join stash_name
       @quiet = { }
+      @stash_name = stash_name
       @valid_for_writing = nil
     end
 
-    def filenames
+    def filenames verbose
       ::Enumerator.new do |o|
-        GitStashUntracked::Services::Open3.popen3("cd #{pathname}; find . -type f") do |_, sout, serr|
+        cmd = "cd #{ pathname }; find . -type f"
+        info( cmd ) if verbose
+        GitStashUntracked::Services::Open3.popen3( cmd ) do |_, sout, serr|
           '' != (s = serr.read) and fail("uh-oh: #{s}")
           while s = sout.gets
             o << %r{^\./(.*)$}.match(s)[1]
@@ -637,11 +754,13 @@ module Skylab::GitStashUntracked
       @emit[ :info, "#{ msg }" ]
     end
 
+    attr_reader :path_info
+
     attr_reader :pathname
 
-    def _prune dry_run, verbose
+    def prune_directories dry_run, verbose
       stack = []
-      cmd = "find #{ @pathname } -type d"
+      cmd = "find #{ pathname } -type d"
       info( cmd ) if verbose
       GitStashUntracked::Services::Open3.popen3 cmd do |_, sout, serr|
         while s = sout.gets                    # depth-first
@@ -657,9 +776,9 @@ module Skylab::GitStashUntracked
     def validate_for_writing!
       valid = nil
       begin
-        dir_pathname = @pathname.dirname
-        if @pathname.exist?
-          dir = ::Dir[ "#{ @pathname }/*" ]
+        dir_pathname = pathname.dirname
+        if pathname.exist?
+          dir = ::Dir[ "#{ pathname }/*" ]
           if dir.any?
             error "Destination dir must be empty (\"stash\" already exists?).#{
               } Found files:\n#{ dir.join "\n" }"
@@ -681,6 +800,65 @@ module Skylab::GitStashUntracked
 
 
 
+  class Stash::Collection
+    include SubClient_InstanceMethods
+    include Color_InstanceMethods
+
+    def stash stash_name
+      @cache[stash_name] ||= Stash.new self, path_info, stash_name, @emit
+    end
+
+    def stash_valid_for_writing stash_name
+      stash = self.stash stash_name
+      if stash.valid_for_writing?
+        stash
+      else
+        false
+      end
+    end
+
+    def stashes verbose
+      ::Enumerator.new do |y|
+        pathname.children( true ).each do |child| # or e.g. Errno::ENOENT
+          if child.directory?
+            stash = self.stash child.basename.to_s
+            y << stash
+          else
+            info "(not a directory: #{ escape_path child })" if verbose
+          end
+        end
+      end
+    end
+
+    def validate_existence
+      res = nil
+      if pathname.exist?
+        res = true
+      else
+        @emit[ :error, "Stashes dir does not exist: #{ pathname }" ]
+        res = false
+      end
+      res
+    end
+
+  protected
+
+    def initialize request_client, path_info, emit
+      _gsu_sub_client_init! request_client
+      @cache = { }
+      @emit = emit
+      @path_info = path_info
+    end
+
+    attr_reader :path_info
+
+    def pathname
+      @path_info.stashes_pathname
+    end
+  end
+
+
+
   module MakePatch
     # singleton hack! (is a module only so the name shows up appropriately)
   end
@@ -691,7 +869,7 @@ module Skylab::GitStashUntracked
     include GitStashUntracked::Services::FileUtils
 
     def call path, emit
-      ::File.directory?(path) or raise "not a directory: #{ path }"
+      ::File.directory?( path ) or raise "not a directory: #{ path }"
       each_path = ->(file) do
         begin
           lines = File.read(file).split("\n", -1)
