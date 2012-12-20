@@ -19,6 +19,8 @@ module ::Skylab::TanMan
 
     o :PP,            -> { require 'pp'       ; ::PP }
 
+    o :Open3,         -> { require 'open3'    ; ::Open3 }
+
     o :StringIO,      -> { require 'stringio' ; ::StringIO }
 
     o :StringScanner, -> { require 'strscan'  ; ::StringScanner }
@@ -79,24 +81,37 @@ module ::Skylab::TanMan
 
     fun = TanMan::Services::FUN
 
-    define_method :load do |*a, &b|            # Services doubles as a stdlib
+    define_method :load do |f=nil|             # Services doubles as a stdlib
       method = fun.load_method[ const ]        # loader experimentally
       if Services.respond_to? method           # this should call const_set
         Services.send method
       else
-        super(*a, &b)                          # implicit argument passing [..]
+        super f                                # implicit argument passing [..]
       end                                      # is not supported
+    end
+
+    def load_file( * )
+      super
+      if @tanman_hack
+        o = mod.const_get const, false         # NASTY
+        o.dir_pathname = o.dir_pathname.dirname
+      end
+      nil
     end
 
     let :file_pathname do                      # for missing const :FooBar
       stem = pathify const                     # either load services/foo-bar.rb
       head = mod_dir_pathname.join stem        # or services/foo-bar/foo-bar.rb
       path = head.sub_ext extname
+      res = nil
       if path.exist?
-        path
+        @tanman_hack = false
+        res = path
       else
-        head.join "#{ stem }#{ extname }"
+        @tanman_hack = true
+        res = head.join "#{ stem }#{ extname }"
       end
+      res
     end
   end
 end

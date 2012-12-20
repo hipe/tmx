@@ -119,25 +119,9 @@ module Skylab::Issue
       file
     end
 
-    class FU                                   # builds a nerk that is always
-      include Issue::Services::FileUtils       # verbose, output is bound to
-      ::FileUtils.collect_method( :verbose ).each do |name|      # some func
-        define_method( name ) do |*args|
-          super( *fu_update_option( args, verbose: true ) )
-        end
-      end
-    protected
-      def initialize f
-        @f = f
-      end
-      def fu_output_message msg
-        @f[ msg ]
-      end
-    end
-
     def fu o                                   # Using a hacky regex, scan
       rx = Headless::CLI::PathTools::FUN.absolute_path_hack_rx # all messages emitted
-      fu = FU.new( -> str do                   # from the file utils client,
+      fu = Headless::IO::FU.new( -> str do     # from the file utils client,
         s = str.gsub( rx ) do                  # and run everything that looks
           o.escape_path[ $~[0] ]               # like an absolute path thru
         end                                    # the `escape_path` implemen.

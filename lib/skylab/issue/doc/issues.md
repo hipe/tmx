@@ -1,3 +1,4 @@
+[#011]       #doc-point tags defined
 [#010] #open either do or don't do something about horrible all.rb dep now
 [#009] #open awesome semantic open tag search - ("smart twitter")
 [#008]       #done -n on all destructive actions

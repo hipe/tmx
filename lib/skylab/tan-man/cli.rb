@@ -216,16 +216,18 @@ module Skylab::TanMan
 
     def build_option_parser
       o = TanMan::Services::OptionParser.new
+      dry_run_option o
       o.on '-f', '--force',
         'rewrites the cached treetop parser file (#dev)' do
         param_h[:force] = true
       end
       help_option o
+      verbose_option o
       o
     end
 
     def invoke *word
-      api_invoke words: word, force: param_h[:force]
+      api_invoke param_h.merge( words: word )
     end
   end
 

@@ -20,7 +20,8 @@ module Skylab::Headless
        is: ['exist', 'is', 'are'],
        no: ['no ', 'the only '],
         s: ['s', nil, 's'],
-     this: ['these', 'this', 'these']
+     this: ['these', 'this', 'these'],
+      was: ['were', 'was', 'were']
     }
 
     (norm = { 0 => 0, 1 => 1 }).default = 2

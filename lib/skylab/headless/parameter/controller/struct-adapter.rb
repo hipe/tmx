@@ -20,13 +20,13 @@ module Skylab::Headless
   module Parameter::Controller::StructAdapter::InstanceMethods
     include Parameter::Controller::InstanceMethods
 
-    def invoke params_h
-      result = nil
+    def invoke param_h
+      res = nil
       begin
-        result = set!( params_h ) or break
-        result = execute
+        res = set!( param_h ) or break
+        res = execute
       end while nil
-      result
+      res
     end
   end
 end

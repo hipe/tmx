@@ -47,16 +47,25 @@ module Skylab::Headless
       self.class
     end
 
+
     def missing_required actual
-      a = formal_parameters.each.select do |p|
-        p.required? and ! actual.known?(p.name) || actual[p.name].nil?
+      required_params = formal_parameters.each.select(&:required?) # twice..
+
+      a = required_params.select do |p|                            # ..is nice
+        -> do
+          break( true ) if ! actual.known?( p.name )
+          break( true ) if actual[p.name].nil?
+        end.call
       end
+
       if ! a.empty?
         a.map! { |param| parameter_label param }
-        error "missing the required parameter#{s a} #{and_ a}"
+        error "missing the required parameter#{ s a } #{ and_ a }"
       end
+
       nil
     end
+
 
     def prune_bad_keys actual_h # internal defaults may exist hence ..
       bad = ->(k) { actual_h.delete(k) } # for non-atomic aggretation of errors
