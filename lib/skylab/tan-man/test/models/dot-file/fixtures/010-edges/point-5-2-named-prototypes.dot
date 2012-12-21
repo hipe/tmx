@@ -1,0 +1,17 @@
+digraph {
+/*
+  example stmt_list:
+    foo -> bar
+    biff -> baz
+
+  example node_stmt:
+    learn_c [label="learn C somehow"]
+
+  example fancy edge_stmt:
+    a -> b [this=style is=fancy]
+
+  example boring edge_stmt:
+    a -> b [this=is not=fancy]
+
+*/
+}

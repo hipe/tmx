@@ -1,34 +1,63 @@
-require_relative 'test-support'
+require_relative 'cli/test-support'
 
 describe "#{Skylab::Bnf2Treetop} CLI integration" do
   extend ::Skylab::Bnf2Treetop::TestSupport::CLI
+
+  def error msg_re
+    err.shift.should match(msg_re)
+  end
+
+  def usage
+    unstylize(err.shift).should eql(
+      'usage: bnf2treetop [options] { <bnf-file> | - }')
+  end
+
+  def invite
+    unstylize(err.shift).should eql('bnf2treetop -h for help')
+  end
+
+  def no_payload
+    out.length.should eql(0)
+  end
+
+  def options_listing
+    unstylize(err.shift).should eql('options:')
+    (10..17).should cover(err.length)
+    err.detect { |s| /\A[[:space:]]/ !~ s }.should eql(nil)
+  end
+
   context 'doing nothing' do
-    invoke
-    it 'shows usage' do
-      should_see_usage
+    invoke do
+      error( /expecting <bnf-file> had 0 args/i )
+      usage
+      invite
+      no_payload
     end
   end
 
   context 'asking for help' do
-    invoke '-h'
-    it 'shows usage' do
-      should_see_usage
+    invoke '-h' do
+      usage
+      options_listing
+      no_payload
     end
   end
 
   context 'giving 2 args' do
-    invoke 'one', 'two'
-    it 'shows usage' do
-      should_see_usage
+    invoke 'one', 'two' do
+      error( /expecting <bnf-file> had 2 args/i )
+      usage
+      invite
+      no_payload
     end
   end
 
   context 'giving it a nonexistant filename' do
-    invoke 'not-there.bnf'
-    it 'says file not found and then shows usage' do
-      err.shift.should match(/\bfile not found: not-there\.bnf\b/i)
-      err.shift.should match(USAGE_RE)
-      err.length.should eql(0)
+    invoke 'not-there.bnf' do
+      error( /\bfile not found: not-there\.bnf\b/i )
+      usage
+      invite
+      no_payload
     end
   end
 

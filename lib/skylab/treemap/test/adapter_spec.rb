@@ -1,4 +1,4 @@
-require_relative '../../test-support/test-support'
+require_relative '../../test-support/core'
 require_relative '../api'
 
 describe "#{Skylab::Treemap::Adapter::NameFunction}::EXTNAME_RE" do

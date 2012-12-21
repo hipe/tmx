@@ -1,16 +1,16 @@
 require_relative 'test-support'
-require 'skylab/porcelain/core' # TiteColor#unstylize
 
-module Skylab::CssConvert
+module Skylab::CssConvert::TestSupport
   describe "Skylab::CssConvert CLI" do
-    include TestSupport::InstanceMethods
+    extend CssConvert_TestSupport
     alias_method :u, :unstylize
     let(:client) { cli_instance }
-    let(:stderr) { client.io_adapter.errstream[:buffer].string.split("\n") }
-    invite_re = /nerk -h for more help/i
+    let(:stderr) do
+      client.send(:io_adapter).errstream[:buffer].string.split "\n"
+    end
+    invite_re = /use nerk -h for help/i
     usage_re = /usage: nerk \[-f\].+\[-v\] \[<directives-file>\]\z/
     it "with no args, gives warm, inviting message" do
-      # client.io_adapter.debug!
       client.invoke([]).should eql(-1)
       stderr.shift.should be_include('expecting: <directives-file>')
       u(stderr.shift).should match(usage_re)

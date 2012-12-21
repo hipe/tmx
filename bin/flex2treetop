@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby -w
 
-require_relative '../lib/skylab/flex2treetop/core'
+require_relative '../lib/skylab'
+require 'skylab/flex2treetop/core'
 
 Skylab::Flex2Treetop::CLI.new.invoke ARGV

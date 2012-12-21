@@ -1,4 +1,4 @@
-require File.expand_path('../../task', __FILE__)
+require_relative 'test-support'
 
 describe ::Skylab::Slake::Task do
 
@@ -9,7 +9,7 @@ describe ::Skylab::Slake::Task do
   end
 
   it "defines settable/gettable attributes in the class" do
-    klass = Class.new(Task).class_eval do
+    klass = ::Class.new(Task).class_eval do
       attribute :some_val
       self
     end
@@ -21,7 +21,7 @@ describe ::Skylab::Slake::Task do
 
   describe "has different ways of describing its actions:" do
     describe "When it overrides the execute() method of rake parent" do
-      class SomeTask < ::Skylab::Slake::Task
+      class SomeTask < Slake::Task
         def execute args
           @touched = true
         end

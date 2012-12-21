@@ -1,13 +1,21 @@
 module Skylab::TanMan
-  module API::Actions::Remote
-  end
+
   class API::Actions::Remote::Rm < API::Action
+    extend API::Action::Attribute_Adapter
+
     attribute :remote_name, required: true
     attribute :resource_name, mutex_boolean_set: [:local, :global]
+
+  protected
+
     def execute
-      config.ready? or return
-      config.remove_remote(remote_name, resource_name) or false
+      result = nil
+      begin
+        controllers.config.ready? or break
+        result = controllers.config.remove_remote remote_name, resource_name
+        result ||= false
+      end while nil
+      result
     end
   end
 end
-

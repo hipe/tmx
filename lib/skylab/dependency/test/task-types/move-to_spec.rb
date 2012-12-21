@@ -1,19 +1,14 @@
-require File.expand_path('../support', __FILE__)
-require 'skylab/dependency/task-types/move-to'
+require_relative 'test-support'
 
-module Skylab::Dependency::TestSupport
+module Skylab::Dependency::TestSupport::Tasks
 
-  include ::Skylab::Dependency
   describe TaskTypes::MoveTo do
+    extend Tasks_TestSupport
 
-    module_eval &DESCRIBE_BLOCK_COMMON_SETUP
     let(:context) { { } }
     let(:build_args) { { :move_to => move_to, :from => from } }
     subject do
-      TaskTypes::MoveTo.new(build_args) do |o|
-        o.on_all { |e| fingers[e.type].push unstylize(e.to_s) }
-        o.context = context
-      end
+      TaskTypes::MoveTo.new( build_args ) { |t| wire! t }
     end
     context "requires move_to and from" do
       let(:build_args) {  }
@@ -24,13 +19,15 @@ module Skylab::Dependency::TestSupport
       end
     end
     context "when moving an existing file" do
-      include FileUtils
+      include Dependency::Services::FileUtils
       def fu_output_message str
-        $debug and $stderr.puts("FOR TESTING: #{s}")
+        self.debug and $stderr.puts "FOR TESTING: #{ s }"
       end
-      before(:each) do
+      before :each do
         BUILD_DIR.prepare
-        cp(FIXTURES_DIR.join('some-file.txt'), BUILD_DIR.join('some-file.txt'), :verbose => true)
+        cp( (FIXTURES_DIR.join 'some-file.txt'),
+            (BUILD_DIR.join 'some-file.txt'),
+            verbose: true )
       end
       let(:from){ BUILD_DIR.join('some-file.txt') }
       context "to an available location" do

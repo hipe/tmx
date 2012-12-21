@@ -1,6 +1,12 @@
-require_relative '../../test-support/quickie'
+require_relative '../core'
+require 'skylab/test-support/core'
 
 module Skylab::InformationTactics::TestSupport
-  extend ::Skylab::TestSupport::Quickie::ModuleMethods
-end
+  ::Skylab::TestSupport::Regret[ self ]
 
+  module CONSTANTS
+    InformationTactics = ::Skylab::InformationTactics
+  end
+
+  extend ::Skylab::TestSupport::Quickie
+end

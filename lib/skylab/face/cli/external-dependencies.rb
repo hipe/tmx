@@ -24,7 +24,7 @@ module Skylab::Face
         @external_dependencies
       end
     end
- end
+  end
 end
 
 module Skylab::Face
@@ -32,4 +32,3 @@ module Skylab::Face
     extend ExternalDependencies::DefinerMethods
   end
 end
-

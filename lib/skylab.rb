@@ -1,88 +1,212 @@
-$:.include?(o = File.expand_path('..', __FILE__)) or $:.unshift(o)
+module Skylab                     # welcome :D
 
-require 'pathname'
+  require 'pathname'              # the only stdlib subproducts get for free
 
-module Skylab
-  ROOT = Pathname.new('../..').expand_path(__FILE__)
+  here = ::Pathname.new( __FILE__ ).expand_path
+
+  $:.include?( o = here.join('..').to_s ) or $:.unshift o # add to include path
+
+  dir_pathname = here.sub_ext ''  # chop of extension and ..
+
+  define_singleton_method( :dir_pathname ) { dir_pathname } # preferred way
+
+  ROOT_PATHNAME = dir_pathname.join '../..' # #away at [#122]
+
+  TMPDIR_PATHNAME = ROOT_PATHNAME.join 'tmp' # centralized here for testing
+
 end
 
+
 module Skylab
-  # experimental.  const_missing hax can suck, so use this only if it's
-  # compelling.  a bit of a mess now until things settle down
-  module Autoloader end
-  module Autoloader::Inflection
-    extend self
-    InstanceMethods = self # future-proof
+  module Autoloader
+    # const_missing hax can suck - use this iff it's compelling. #experimental
+
     EXTNAME = '.rb'
-    SANITIZE_PATH_RE =
-      %r{#{Regexp.escape(EXTNAME)}\z|(?<=/)/+|(?<=[-_ ])[-_ ]+|[^-_ /a-z0-9]+}i
-    def constantize path
-      path.to_s.gsub(SANITIZE_PATH_RE, '').gsub(%r|/+|, '::').
+
+    def self.extended mod
+      mod.extend(Autoloader::ModuleMethods)._autoloader_init! caller[0]
+    end
+  end
+
+
+  module Autoloader::Inflection
+    extend Methods = ::Module.new # sorry
+
+    o = { }
+
+    sanitize_path_rx = %r{ #{::Regexp.escape Autoloader::EXTNAME}\z |
+      (?<=/)/+ | (?<=[-_ ])[-_ ]+ | [^-_ /a-z0-9]+ }ix
+
+    o[:constantize] = -> path do
+      path.to_s.gsub(sanitize_path_rx, '').gsub(%r|/+|, '::').
         gsub(/(?<=[-_ ])([A-Z])/){ $1.downcase }.
         gsub(/(?:(?<=\d)|[-_ ]|\b)([a-z09])/) { $1.upcase }
     end
-    def pathify const
+
+    o[:methodify] = -> str do
+      str.to_s.
+        gsub(/(?<=[a-z])([A-Z])|(?<=[A-Z])([A-Z][a-z])/) { "_#{$1 || $2}" }.
+        gsub(/[^a-z0-9]+/i, '_').downcase.intern # munge-in above underscores
+    end
+
+    o[:pathify] = -> const do
       const.to_s.gsub('::', '/').
         gsub(/(?<=[a-z])([A-Z])|(?<=[A-Z])([A-Z][a-z])/) { "-#{$1 || $2}" }.
         gsub('_', '-').downcase
     end
+
+    FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v }
   end
-  module Autoloader
-    def self.extended mod
-      mod.autoloader_init! caller[0]
+
+
+  module Autoloader::Inflection::Methods
+
+    Autoloader::Inflection::FUN.members.each do |func|
+      define_method func, & Autoloader::Inflection::FUN[func]
     end
-    include Autoloader::Inflection::InstanceMethods
-    CALLSTACK_RE = /^(?<path_stem>.+)(?=#{::Regexp.escape(EXTNAME)}:\d+:in `)/
-    def autoloader_init! caller
-      self.dir_path ||= begin
-        guess_dir(to_s, caller.match(CALLSTACK_RE)[:path_stem],
-          &->(e) { fail("Autoloader hack failed: #{e}") } )
-      end
-      class << self
-        alias_method :const_missing_before_autoloader, :const_missing
-        alias_method :const_missing, :handle_const_missing
-      end
-    end
-    def dir ; @dir ||= ::Pathname.new(dir_path) end
-    attr_accessor :dir_path
-    CONST_RE = %r{\A(?:(?<rest>(?:(?!=::).)+)::)?(?:::)?(?<curr>[^:]+)\z}
-    CONST_TOKENIZER = ->(str) do # returns a lambda that makes a closure around
-      ->() do # 'str' which returns successive next tokens with each call()
-        if md = CONST_RE.match(str)
-          str = md[:rest]
-          Inflection.pathify(md[:curr])
+
+  end
+
+
+  module Autoloader::ModuleMethods
+    include Autoloader::Inflection::Methods # courtesty
+    extend Autoloader::Inflection::Methods # pathify
+
+    -> do
+      rx = /^(?<path>.+#{ ::Regexp.escape Autoloader::EXTNAME })(?=:\d+:in `)/
+
+      define_method :_autoloader_init! do |caller_str|
+        # be sure to #trigger this *ONCE* when hacking autoloader
+
+        if respond_to? :const_defined?         # #sl-106: we do *not* hack these
+          class << self                        # methods, but other may
+            alias_method :autoloader_original_const_defined?, :const_defined?
+            alias_method :autoloader_original_constants, :constants
+          end
         end
+
+        if ! dir_path
+          file = ::Pathname.new caller_str.match(rx)[:path]
+          if ! file.absolute? # this takes a filesystem hit, but you cannot ..
+            file = file.expand_path # reliably autoload with a relpath.
+          end
+          self.dir_path = _guess_dir to_s, file.sub_ext('').to_s do |e|
+            fail "Autoloader hack failed: #{ e }"
+          end
+        end
+      end
+    end.call
+
+    def const_probably_loadable? const
+      _const_missing(const).probably_loadable?
+    end
+
+    def const_missing const
+      _const_missing(const).load
+      const_get const, false
+    end
+
+    def _const_missing const
+      dir_path or fail "Autoloader hack failed: attempt to autoload #{
+        }#{ self.name }::#{ const } when dir_path of that anchor module not #{
+        }yet known (do you need to extend an Autoloader explicitly on that #{
+        }module?)" # could be pushed down if really need to
+      _const_missing_class.new const.intern, dir_pathname, self
+    end
+
+    def _const_missing_class
+      Autoloader::ConstMissing
+    end
+
+    attr_reader :dir_path
+
+    def dir_path= str
+      @dir_pathname = nil
+      @dir_path = str
+    end
+
+    def dir_pathname
+      @dir_pathname ||= begin
+        dir_path or fail "sanity - dir_pathname requested but dir_path is not#{
+          } set (on #{ name })"
+        ::Pathname.new dir_path
       end
     end
 
-    PATH_RE =
-      %r{\A(?:(?:(?<rest>|.*[^/])/+)?(?<peek>[^/]*)/+)?(?<curr>[^/]*)/*\z}
-    def guess_dir const, path, &error
-      head, *search = PATH_RE.match(path ).values_at(1..3)
-      search.compact!
-      c = CONST_TOKENIZER.call(const) ; t = found = nil ; past = []
-      past.push(t) while t = c.call and ! found = search.index(t)
-      if found
-        [ * [head].compact, * search[0..found], * past.reverse ].join('/')
-      else
-        error.call("failed to infer path for #{const} from #{path}")
-      end
+    def dir_pathname= pn
+      @dir_path = pn.to_s
+      @dir_pathname = pn
     end
-    def handle_const_missing const
-      path = "#{dir_path}/#{pathify const}"
-      fail("circular autoload dependency detected in #{path} with #{const}") if
-        (@_autoloader_mutex ||= Hash.new{|h, k| h[k] = 1; nil})[path]
-      if File.exist?("#{path}#{EXTNAME}")
-        require(path)
-      else
-        no_such_file(path, const)
+
+    -> do
+
+      tok_rx = %r{\A(?:(?<rest>(?:(?!=::).)+)::)?(?:::)?(?<curr>[^:]+)\z}
+
+      tokenizer_f_f = ->(s) do                 # "A::B::C" -> "C", "B", "A", nil
+        -> { m = tok_rx.match(s) and (s, x = m.captures) and pathify(x) }
       end
-      const_defined?(const) or
-        fail("#{self}::#{const} was not defined, must be, in #{path}")
-      const_get const
+
+      path_rx =
+        %r{\A(?:(?:(?<rest>|.*[^/])/+)?(?<peek>[^/]*)/+)?(?<curr>[^/]*)/*\z}
+
+      define_method :_guess_dir do |const, path, &error|
+        head, *look = path_rx.match(path).values_at 1..3
+        look.compact!
+        t = found = nil ; tail = [] ; f = tokenizer_f_f[ const ]
+        tail.push t while t = f.call and ! found = look.index(t)
+        if found
+          [ * [head].compact, * look[0..found], * tail.reverse ].join('/')
+        else
+          error[ "failed to infer path for #{const} from #{path}" ]
+        end
+      end
+    end.call
+  end
+
+
+  class Autoloader::ConstMissing < ::Struct.new :const, :mod_dir_pathname, :mod
+    include Autoloader # EXTNAME
+    include Autoloader::Inflection::Methods # pathify
+
+    def load f=nil
+      if file_pathname.exist?
+        load_file f
+      else
+        raise ::LoadError.new("no such file to load -- #{file_pathname}")
+      end
+      nil
     end
-    def no_such_file(path, const)
-      raise LoadError.new("no such file to load -- #{path}")
+
+    def probably_loadable?
+      file_pathname.exist?
+    end
+
+  protected
+
+    def const_not_defined
+      fail "#{ mod }::#{ const } was not defined, must be, in #{ file_pathname}"
+    end
+
+    def file_pathname
+      @file_pathname ||= mod_dir_pathname.join("#{pathify const}#{EXTNAME}")
+    end
+
+    -> do
+      mutex_h = ::Hash.new { |h, k| h[k] = true ; nil }
+      define_method(:mutex) { mutex_h[normalized] }
+    end.call
+
+    def load_file after=nil
+      mutex and fail("circular autoload dependency detected#{
+        } in #{file_pathname} with #{const}")
+      require normalized
+      after and after.call
+      mod.autoloader_original_const_defined? const, false or const_not_defined
+      nil
+    end
+
+    def normalized
+      @normalized ||= file_pathname.sub_ext('').to_s
     end
   end
 end
