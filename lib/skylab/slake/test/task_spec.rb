@@ -1,4 +1,4 @@
-require File.expand_path('../../task', __FILE__)
+require_relative 'test-support'
 
 describe ::Skylab::Slake::Task do
 
@@ -9,7 +9,7 @@ describe ::Skylab::Slake::Task do
   end
 
   it "defines settable/gettable attributes in the class" do
-    klass = Class.new(Task).class_eval do
+    klass = ::Class.new(Task).class_eval do
       attribute :some_val
       self
     end
@@ -19,24 +19,54 @@ describe ::Skylab::Slake::Task do
     t.some_val.should eql('foo')
   end
 
-  describe "when it defines a method called slake()" do
-    class SomeTask < ::Skylab::Slake::Task
-      def slake
-        @touched = true
+  describe "has different ways of describing its actions:" do
+    describe "When it overrides the execute() method of rake parent" do
+      class SomeTask < Slake::Task
+        def execute args
+          @touched = true
+        end
+        attr_accessor :touched
       end
-      attr_accessor :touched
+      it "it will run that badboy when it is invoked" do
+        t = SomeTask.new
+        t.touched.should eql(nil)
+        t.invoke
+        t.touched.should eql(true)
+      end
     end
-    it "will run that badboy when it is invoked" do
-      t = SomeTask.new
-      t.touched.should eql(nil)
-      t.invoke
-      t.touched.should eql(true)
+    describe "When you call enhance() (per rake)" do
+      it "it works" do
+        touched = false
+        t = Task.new.enhance{ touched = true }
+        t.invoke
+        touched.should eql(true)
+      end
     end
-    it "can define its slake() method with a lambda (how it is executed is undefined)" do
-      touched = false
-      t = Task.new(:slake => ->(){ touched = true })
-      t.invoke
-      touched.should eql(true)
+    describe "When you set the action attribute to a lambda" do
+      it "it works (provided you have the right arity)" do
+        touched = false
+        Task.new(:action => ->(t) { touched = true }).invoke
+        touched.should eql(true)
+      end
+    end
+  end
+
+  describe "with regards to passing arguments to the task" do
+    let(:str) { "" }
+    let(:t) do
+      Task.new(:action => ->(t, args) { str.replace "args: #{args.inspect}" })
+    end
+    it "if you pass zero arguments to invoke(), it will have an empty args hash" do
+      t.invoke()
+      str.should eql('args: {}')
+    end
+    it "if you pass it one argument, it will use the default value of its arg_names attribute, [:context]" do
+      t.invoke('a')
+      str.should eql('args: {:context=>"a"}')
+    end
+    it "if you pass more than one argument to invoke(), by default they are ignored" do
+      t.invoke('a', 'b')
+      str.should eql('args: {:context=>"a"}')
     end
   end
 
@@ -72,7 +102,7 @@ describe ::Skylab::Slake::Task do
     end
   end
 
-  describe "with regards to its name, rake parent stringifies all names so" do
+  describe "with regards to its name, the rake parent stringifies all names so" do
     it "a minimal Task object has \"\" for a name" do
       Task.new.name.should eql('')
     end

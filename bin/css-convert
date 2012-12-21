@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby -w
+
+require_relative '../lib/skylab/css-convert/core'
+
+Skylab::CssConvert::CLI.new.invoke ARGV

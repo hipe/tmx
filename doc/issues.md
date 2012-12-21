@@ -1,32 +1,71 @@
+[#124]       #tracking-tag autoloader won't work when there is toplevel name..
+[#123]       #convention #pattern sub-product module 2-level pattern
+[#122] #open #low-priority phase out ROOT_PATHNAME for Skylab.dir_pathname
+[#121]       #pattern of CLI.new, API.invoke as facades hehe inv. of [#109]
+[#120]       #tracking-tag backticks that could be robustified
+[#119] #open #tracking-tag #pattern of def.self some_thing instead of DSL
+[#118] #open unify find command in multiple places
+[#117]       #pattern of defaults (if not nil, etc)
+[#116]       #pattern of set!, update_attributes! etc (w/ error_count)
+[#115]       #pattern of functionalizing things
+[#114]       #pattern of "stdin, stdout, stderr" as constructor to CLI clients
+[#113]       #pattern of PIE standard
+[#112]       #pattern of emit error
+[#111]       (was [#109]!) #pattern self.extended mod pattern
+[#110]       #convention hipe's rules of order for delcarations in a class ..
+[#109]       this whacky #pattern of using a class as a namespace
+[#108]       #low-low-priority #pattern normalization
+[#107]       #low-priority 2012-11-02 this lexical scoping issue
+[#106]       #done 2012-10-28 autoloading vis-a-vis const awareness
+[#105] #open 2012-08-18 play with test/all_specs.rb -w
+[#101] #open 2012-06-08 when doing gem install with rdoc, "stack level too deep"
+[#100.200.001] #open 2012-06-12 all.rb: fix @delegates tags
+[#100.901.3.2.2] #open 2012-06-12 towards an event wiring pattern
+[#096] 2012-03-30 @closed: code-molester: files are not paths
+[#095] 2012-03-29 @closed: static fileserver refactor
+[#094] 2012-03-28 @closed: tanman: refactor: this shit is a mess (still).
+[#093] 2012-03-28 @closed: tanman: status
+[#092] 2012-03-19 @closed: tanman: refactor into api, test all
+[#091] 2012-03-17 @closed: tanman: local .tan
+[#090] 2012-03-16 @closed: porcelain: table: column type inference
+[#089] 2012-03-15 @closed: tanman: remote: remove
+[#088] 2012-03-15 @closed: porcelain: table
+[#087] 2012-03-15 @closed: tanman: remote: list
+[#086] 2012-03-14 @closed: porcelain: meta attrib modules
+[#085] 2012-03-14 @closed: tanman: correct event handling so tan can detect errors
+[#084] 2012-03-14 @closed: integrate all stable into porcelain stable
+[#083] 2012-03-14 @closed: attrib-definer: new home
+[#082] 2012-03-14 @closed: code-molester: improve section handling
+[#081] 2012-03-14 @closed: code-molester: integrate
+[#080] 2012-03-13 @closed: gsu: fix
+[#079] 2012-03-10 @closed: porcelain: bleeding namespaces
+[#078] 2012-03-09 @closed: porcelain: bleeding (usable)
+[#077] 2012-03-08 @closed: asib: put
+[#076] 2012-03-02 @closed: porcelain: simply and reveal tree rendering
+[#075] 2012-02-16 @closed: porcelain: aliases, descs for namesp, acts
 [#074] 2012-02-26 @closed: porcelain: get tree into stable from 026 branch
-[#073] 2012-02-26 @open: git-viz: histree: (file tree with most recents)
-[#072] 2012-02-26 @open: borrow
-[#071] 2012-02-26 @open: fsm: passes with some specs
-[#070] 2012-02-25 @open: face cli: compat back / fwds with porcelain
-[#069] 2012-02-25 @open: porcelain: compat w/ face cli
-[#068] 2012-02-24 @open: porcelain: without syntax uses method sig
-[#067] 2012-02-20 @open: emitter can emit arbitrary number of arguments
-[#066] 2012-02-18 @open: porcelain: namespace native and compat
+[#072] 2012-02-26 #historic: borrow
+[#071] 2012-02-26 #historic: fsm: passes with some specs
+[#070] 2012-02-25 @closed: face cli: compat back / fwds with porcelain
+[#069] 2012-02-25 @closed: porcelain: compat w/ face cli
+[#068] 2012-02-24 @closed: porcelain: without syntax uses method sig
+[#067] 2012-02-20 @closed: emitter can emit arbitrary number of arguments
+[#066] 2012-02-18 @closed: porcelain: namespace native and compat
 [#065] 2012-02-18 @closed: porcelain: default args
 [#064] 2012-02-18 @closed: we must deep copy tag cloud!
 [#063] 2012-02-18 @closed gsu: fix it to use new porcelain
 [#062] 2012-02-18 @closed pub-sub: touch events
 [#061] 2012-02-18 @closed pub-sub: fix issue with deep trees
 [#060] 2012-02-18 @closed tmx: merge issues
-[#059] 2012-02-18 @open pub-sub: no redundant events per listener
 [#058] 2012-02-18 @closed muxer: rename things
 [#057] 2012-02-18 @closed porcelain: events
-[#056] 2011-07-19 @open permute
-[#055] 2012-02-18 @open code molester: file services (write)
 [#054] 2012-02-17 @closed code molester: make values accessor
 [#053] 2012-02-14 @closed code molester: pure refactor: deepening
 [#052] 2012-02-11 @closed code molester: for fun write a config parser
-[#051] 2012-02-11 @open set program name explicitly, streams
+[#051] 2012-02-11 @closed set program name explicitly, streams
 [#050] 2012-02-11 issue: change implementation of search to take lambdas
-[#049] 2012-02-11 @open add "bleed" feature
-[#048] 2012-02-10 @open show should list (for now)
+[#049] 2012-02-11 @closed add "bleed" feature @closed:2012-06-08 haha
 [#047] 2012-02-07 @closed all: mark all closed issues as closed
-[#046] 2012-02-07 @open issue: add verbose/debug mode, put such output there
 [#045] 2012-02-07 @closed all: get *all* tests green, modifying scripts if necessary
 [#044] 2012-02-07 @closed issue: add issue show
 [#043] 2012-02-06 @closed porcelain tree: common base path

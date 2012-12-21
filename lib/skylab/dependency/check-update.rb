@@ -1,6 +1,3 @@
-require 'skylab/face/open2'
-require File.expand_path('../version', __FILE__)
-
 module Skylab
   module Dependency
     class CheckUpdate
@@ -14,7 +11,7 @@ module Skylab
       def run ui
         @versions_not_found.clear
         @ui = ui
-        url = Version.parse_string_with_version(@path, :ui => ui) or return false
+        url = Dependency::Version.parse_string_with_version(@path, :ui => ui) or return false
         version = url.detect(:version)
         increment_this = case true
           when version.has_patch_version? ; :patch
@@ -47,4 +44,3 @@ module Skylab
     end
   end
 end
-

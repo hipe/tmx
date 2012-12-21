@@ -1,10 +1,12 @@
-require File.expand_path('../../version', __FILE__)
-require File.expand_path('../test-support/ui-tee', __FILE__)
+require_relative 'test-support'
+require 'skylab/slake/test/test-support'
 
-module Skylab::Dependency
-  include TestSupport # UiTee
+module Skylab::Dependency::TestSupport
+  include ::Skylab::Slake::TestSupport # so it's avail in s.c. calls below
+  Slake_TestSupport::UI::Tee || nil #(#kick) laod it now so prettier below
 
-  describe Version do
+  describe Dependency::Version do
+    include Dependency_TestSupport # so constants are avail. in i.m.'s below
 
     it "parses the minimal case" do
       _parse "1.2"
@@ -18,39 +20,37 @@ module Skylab::Dependency
     it "parses 12.345.67abc" do
       _parse "12.345.67abc"
     end
-    it "whines on ambiguity" do
-      ui = UiTee.new(:silent => true)
+    it "whines on ambiguity", f:true do
+      ui = UI::Tee.new silent: true
       str = "abc1.2.3def4.5"
-      sexp = Version.parse_string_with_version(str) do |o|
+      sexp = Dependency::Version.parse_string_with_version(str) do |o|
         o.on_error { |e| ui.err.puts e.message }
       end
       sexp.should eq(false)
       ui.err_string.strip.should eq("multiple version strings matched in string: \"abc1.2.3def4.5\"")
     end
     it "allows version bumps" do
-      sexp = Version::parse_string_with_version("abc-1.4.7-def")
+      sexp = Dependency::Version::parse_string_with_version("abc-1.4.7-def")
       ver = sexp.detect(:version)
-      ver.class.should eq(Version)
-      ver.to_s.should eq("1.4.7")
+      ver.class.should eq(Dependency::Version)
+      ver.unparse.should eq("1.4.7")
       ver.bump!(:major)
-      sexp.to_s.should eq("abc-2.4.7-def")
+      sexp.unparse.should eq("abc-2.4.7-def")
       ver.bump!(:major)
-      sexp.to_s.should eq("abc-3.4.7-def")
+      sexp.unparse.should eq("abc-3.4.7-def")
       ver.bump!(:minor)
-      sexp.to_s.should eq("abc-3.5.7-def")
+      sexp.unparse.should eq("abc-3.5.7-def")
       ver.bump!(:patch)
-      sexp.to_s.should eq("abc-3.5.8-def")
-      lambda { ver.bump!(:not_there) }.should raise_error(::Skylab::CodeMolester::Sexp::RuntimeError, "no such node: :not_there")
+      sexp.unparse.should eq("abc-3.5.8-def")
+      lambda { ver.bump!(:not_there) }.should raise_error(::RuntimeError, "no such node: :not_there")
     end
-    include TestSupport # UiTee (again)
     def _parse str
-      ui = UiTee.new
-      sexp = Version::parse_string_with_version(str) do |o|
+      ui = UI::Tee.new
+      sexp = Dependency::Version::parse_string_with_version(str) do |o|
         o.on_informational { |e| ui.err.puts("#{e.type}: #{e.message}") }
       end
-      sexp.to_s.should eq(str)
+      sexp.unparse.should eq(str)
       ui.err_string.should eq("")
     end
   end
 end
-

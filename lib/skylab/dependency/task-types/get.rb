@@ -1,94 +1,79 @@
-require File.expand_path('../../task', __FILE__)
-require 'skylab/face/open2'
-require 'skylab/face/path-tools'
-require 'pathname'
+require 'net/http'
 
-module Skylab
-  module Dependency
-    class TaskTypes::Get < Task
-      include ::Skylab::Face::Open2
-      include ::Skylab::Face::PathTools
-      attribute :from, :required => false
-      attribute :get
+module Skylab::Dependency
+  class TaskTypes::Get < Dependency::Task
+    include Face::Open2
+    include Headless::CLI::PathTools::InstanceMethods
 
-      def interpolate_basename
-        File.dirname get # for children, leave this as accessor
-      end
+    attribute :from
+    attribute :get, :required => true
 
-      def check
-        results = pairs.map do |from_url, to_file|
-          bytes = _bytes(to_file)
-          case bytes
-          when nil
-            _info "would get: #{from_url}"
-            false
-          when 0
-            _info "had zero byte file (strange): (#{pretty_path to_file}). Would overwrite."
-            false
-          else
-            _info "exists (remove/move to download again): #{pretty_path to_file} (#{bytes} bytes)"
-            true
-          end
-        end
-        ! results.index { |b| ! b }
-      end
+    attribute :build_dir, :required => true, :from_context => true
+    attribute :dry_run, :boolean => true, :from_context => true
 
-      def slake
-        do_these = []
-        pairs.each do |from_url, to_file|
-          bytes = _bytes(to_file)
-          case bytes
-          when nil
-            do_these.push [from_url, to_file]
-          when 0
-            _info "had zero byte file (strange), overwriting: #{pretty_path to_file}"
-            do_these.push [from_url, to_file]
-          else
-            _info "#{skp 'assuming'} already downloaded b/c exists (erase/move to re-download): #{pretty_path to_file}"
-          end
-        end
-        results = []
-        do_these.each do |from_url, to_file|
-          res = curl_or_wget(from_url, to_file)
-          results.push res
-        end
-        ! results.index { |b| ! b }
-      end
+    emits(:all,
+      :info => :all,
+      :error => :all,
+      :shell => :all,
+      :stdout => :all,
+      :stderr => :all
+    )
 
-    protected
+    def bytes path
+      ::File.stat(path).size if ::File.exist?(path)
+    end
 
-      def pairs
-        if @from.nil?
-          Pathname.new(@get).tap { |pn| @from = pn.dirname.to_s; @get = pn.basename.to_s }
-        end
-        get_these = @get.kind_of?(Array)?  @get : [@get]
-        get_these.map do |tail|
-          [File.join(@from, tail), File.join(build_dir, tail)]
+    def execute args
+      @context ||= (args[:context] || {})
+      valid? or raise(invalid_reason)
+      workunits = []
+      pairs.each do |from_url, to_file|
+        case (bytes = self.bytes(to_file))
+        when nil
+          workunits.push [from_url, to_file]
+        when 0
+          emit :info, "had zero byte file (strange), overwriting: #{pretty_path to_file}"
+          workunits.push [from_url, to_file]
+        else
+          emit :info, "assuming already downloaded b/c exists " <<
+            "(erase/move to re-download): #{pretty_path to_file}"
         end
       end
+      ! workunits.map do |from_file, to_file|
+        curl_or_wget from_file, to_file
+      end.index{ |b| ! b }
+    end
 
-      def _bytes path
-        File.stat(path).size if File.exist?(path)
+    def pairs
+      if @from.nil?
+        ::Pathname.new(@get).tap { |pn| @from = pn.dirname.to_s; @get = pn.basename.to_s }
       end
-
-        def curl_or_wget from_url, to_file
-          # cmd = "wget -O #{::Skylab::Face::PathTools.escape_path to_file} #{from_url}"
-          cmd = "curl -OL h #{from_url} > #{::Skylab::Face::PathTools.escape_path to_file}"
-          _show_bash cmd
-          bytes, seconds =
-          if dry_run?
-            [0, 0.0]
-          else
-            ::Skylab::Face::Open2.open2(cmd) do |on|
-              on.out { |s| _info "#{_}(out): #{s}" }
-              on.err { |s| ui.err.write(s) }
-            end
-          end
-          _info "read #{bytes} bytes in #{seconds} seconds."
-          true # what does success mean to you
-        end
+      get_these = @get.kind_of?(::Array)?  @get : [@get]
+      get_these.map do |tail|
+        [::File.join(@from, tail), ::File.join(build_dir, tail)]
       end
+    end
 
+    def curl_or_wget from_url, to_file
+      cmd = "curl -o #{escape_path(pretty_path to_file.to_s)} #{from_url}"
+      # cmd = "wget -O #{escape_path to_file} #{from_url}"
+      emit(:shell, cmd)
+      uri = URI.parse(from_url)
+      response = nil
+      ::Net::HTTP.start(uri.host, uri.port) do |h|
+        req = ::Net::HTTP::Get.new(uri.request_uri)
+        response = h.request req
+      end
+      # the *only* distinguishing thing that adsf does in lieu of a 404 is
+      # that it does not send a "last-modified" header (and writes a message in the body)
+      if response.to_hash.key?('last-modified')
+        ::File.open(to_file, 'w+') { |fh| fh.write(response.body) }
+        true
+      else
+        emit(:error, "File not found: #{from_url}")
+        false
+      end
+    end
   end
 end
 

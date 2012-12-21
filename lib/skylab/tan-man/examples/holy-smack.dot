@@ -1,0 +1,27 @@
+# created by tan-man on {{created_on}}
+
+digraph {
+
+/*
+  example stmt_list:
+    foo -> bar
+    biff -> baz
+
+  example node_stmt:
+    learn_c [label="learn C somehow"]
+*/
+
+label="Tangent with the C Programming Language"
+
+node [label="\N", style="filled", fillcolor="#b5d5fb", fontname="Futura", penwidth="1.1566", shape="Mrecord"]
+
+# finished green : fillcolor="#79f233"
+
+
+read_pokes [label="read pokes's code|e:30 v:\na: s:2311"]
+read_norml [label="read norml's code|e:30 v:\na: s:"]
+learn_c [label="learn C somehow"]
+learn_c -> read_norml
+learn_c -> read_pokes
+
+}

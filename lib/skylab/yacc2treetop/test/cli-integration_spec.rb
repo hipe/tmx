@@ -1,0 +1,58 @@
+require_relative 'test-support'
+
+describe "#{Skylab::Yacc2Treetop} CLI integration" do
+  extend ::Skylab::Yacc2Treetop::TestSupport::CLI
+  self::Yacc2Treetop = ::Skylab::Yacc2Treetop
+
+  context 'doing nothing' do
+    invoke
+    it 'writes specific complaint, usage, invite to stderr' do
+      out.length.should eql(0)
+      err.shift.should match(/missing <yaccfile> argument/i)
+      unstylize(err.shift).should match(USAGE_RE)
+      unstylize(err.shift).should match(INVITE_RE)
+      err.length.should eql(0)
+    end
+  end
+
+  context 'asking for help' do
+    invoke '-h'
+    it 'writes usage, option listing to stderr' do
+      out.length.should eql(0)
+      unstylize(err.shift).should match(USAGE_RE)
+      (5..15).should  cover(err.length)
+      err.last.should match(/\A    [ ]*[^ ]/) # any option listing
+    end
+  end
+
+  context 'giving 2 args' do
+    invoke 'one', 'two'
+    it "writes specific complaint, usage, invite to stderr" do
+      out.length.should eql(0)
+      err.shift.should match(/\btoo many args\. +expecting 1 .*file/i)
+      unstylize(err.shift).should match(USAGE_RE)
+      unstylize(err.shift).should match(INVITE_RE)
+      err.length.should eql(0)
+    end
+  end
+
+  context 'giving it a nonexistant filename' do
+    invoke 'not-there.yacc'
+    it 'writes specific complaint, usage, invite to stderr' do
+      out.length.should eql(0)
+      err.shift.should match(/file.+not found.+not-there\.yacc/i)
+      unstylize(err.shift).should match(USAGE_RE)
+      unstylize(err.shift).should match(INVITE_RE)
+      err.length.should eql(0)
+    end
+  end
+
+  context 'giving it a good filename' do
+    invoke self::FIXTURES.join('060.choice-parse.y3').to_s
+    it 'writes a treetop grammar to stdout' do
+      err.length.should eql(0)
+      (4..4).should cover(out.length)
+      out.first.should eql('( type_selector / universal )')
+    end
+  end
+end

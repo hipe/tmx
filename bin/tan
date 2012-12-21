@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby -w
+
+require_relative '../lib/skylab/tan-man/cli'
+
+Skylab::TanMan::CLI.new.invoke ARGV

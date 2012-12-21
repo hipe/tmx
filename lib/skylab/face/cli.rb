@@ -1,15 +1,19 @@
 require 'optparse'
 
-# an ultralight command-line parser (417 lines)
+# an ultralight command-line parser
 # that wraps around OptParse (can do anything it does)
 # with colors
 # with flexible command-like options ('officious' like -v, -h)
 # with commands with arguments based off of method signatures
 # with subcommands, (namespaces) arbitrarily deeply nested
+# with default commands within those namespaces
 # with aliases for commands and namespaces
 
-module Skylab; end
-module Skylab::Face; end
+module Skylab
+  module Face
+    # forward declarations that normally wouldn't go here
+  end
+end
 
 module Skylab::Face::Colors
   extend self
@@ -29,6 +33,7 @@ module Skylab::Face::Colors
 end
 
 module Skylab::Face
+  # @todo:#100.100.400 rename to 'Action'
   class Command
 
     include Colors
@@ -132,7 +137,7 @@ module Skylab::Face
         "#{@parent.invocation_string} #{name}"
       end
       def parent= parent
-        @parent and fail("won't overwrite existing parent")
+        (@parent ||= nil) and fail("won't overwrite existing parent")
         @parent = parent
       end
       def usage msg=nil
@@ -140,7 +145,7 @@ module Skylab::Face
         @err.puts usage_string
         invite
       end
-      alias_method :empty_argv, :usage
+      # alias_method :empty_argv, :usage
     end
     include Nodeish
 
@@ -154,6 +159,9 @@ module Skylab::Face
           Treeish[ defined + implied ]
         end
       end
+      def default_action *a
+        a.any? ? (@default_action = (a*'').to_sym) : (@default_action ||= nil)
+      end
       # this is nutty: for classes that extend this module, this is
       # something that is triggered when they are subclasses
       def inherited cls
@@ -163,8 +171,19 @@ module Skylab::Face
         #   option_definitions.reject! { |a,_| '-h' == a.first }
       end
       def namespace name, *aliases, &block
-        name.nil? and raise ArgumentError.new("First argument must be a namespace name symbol or or a definition array.")
-        def_block = name.kind_of?(Array) ? name : [Namespace, [name, *aliases], block]
+        name or raise ArgumentError.new("First argument must be a namespace name symbol or or a definition array.")
+        def_block = if Array === name
+          aliases.any? and raise ArgumentError.new("when first arg is array it must be the only argument.")
+          block and raise ArgumentError.new("unexpected block here")
+          name
+        else
+          if 1 == aliases.size and Module === aliases.first
+            block and raise ArgumentError.new("unexpected block here")
+            [aliases.first, [name], nil]
+          else
+            [Namespace, [name, *aliases], block] # 'name' takes on a variety of forms here
+          end
+        end
         command_definitions.push Namespace.add_definition(def_block)
       end
       def on *a, &b
@@ -178,7 +197,7 @@ module Skylab::Face
         @command_definitions ||= []
       end
       def method_added name
-        if @grab_next_method
+        if (@grab_next_method ||= nil)
           command_definitions.last[1][0] = name.to_sym
           @grab_next_method = false
         end
@@ -186,7 +205,7 @@ module Skylab::Face
       def option_parser *a, &b
         block_given? or raise ArgumentError.new("block required")
         if a.empty?
-          @grab_next_method and fail("can't have two anonymous " <<
+          (@grab_next_method ||= nil) and fail("can't have two anonymous " <<
           "command definitions in a row.")
           @grab_next_method = true
           a = [nil]
@@ -208,6 +227,12 @@ module Skylab::Face
         @command_tree ||= begin
           interface.command_tree.map { |c| c.parent = self if c.respond_to?(:parent=); c } # careful
         end
+      end
+      def default_action
+        self.class.default_action
+      end
+      def empty_argv
+        default_action ? find_command([default_action]) : usage
       end
       def expecting
         interface.command_tree.map(&:name) * '|'
@@ -241,6 +266,10 @@ module Skylab::Face
           w = rows.map{ |d| d[:name].length }.inject(0){ |m, l| m > l ? m : l }
           fmt = "%#{w}s  "
           rows.each do |row|
+            if ! row[:lines]
+              @out.puts "#{Indent}#{hi(fmt % row[:name])}.."
+              next
+            end
             @out.puts "#{Indent}#{hi(fmt % row[:name])}#{row[:lines].first}"
             row[:lines][1..-1].each do |line|
               @out.puts "#{Indent}#{fmt % ''}#{line}"
@@ -250,7 +279,7 @@ module Skylab::Face
         end
       end
       def option_parser
-        @option_parser.nil? or return @option_parser
+        ! instance_variable_defined?('@option_parser') || @option_parser.nil? or return @option_parser
         op = build_empty_option_parser
         op.banner = usage_string
         if interface.option_definitions.any?
@@ -317,7 +346,7 @@ module Skylab::Face
             x = class << self; self end
             x.send(:define_method, :inspect) { "#<#{name}:Namespace>" }
             x.send(:alias_method, :to_s, :inspect)
-            class_eval(&block)
+            class_eval(&block) if block
             self
           end
         end
@@ -343,10 +372,14 @@ module Skylab::Face
           @definitions
         end
         def parent= parent
-          @parent and fail("won't overwrite parent")
+          instance_variable_defined?('@parent') && @parent and fail("won't overwrite parent")
           @parent = parent
         end
-        def summary
+        def summary *a
+          @summary ||= nil
+          a.any? ? (@summary = a) : (@summary || summary_of_commands)
+        end
+        def summary_of_commands
           a = command_tree.map { |c| hi(c.name) }
           ["child command#{'s' if a.length != 1}: {#{a * '|'}}"]
         end
@@ -362,11 +395,13 @@ class Skylab::Face::Cli
   include Face::Command::Nodeish
   include Face::Command::Treeish
 
-  def initialize
-    @out = $stdout
-    @err = $stderr
+  def initialize opts=nil
+    block_given? and raise ArgumentError.new("this crap comes back after #100")
+    opts and opts.each { |k, v| send("#{k}=", v) }
+    @out ||= $stdout
+    @err ||= $stderr
   end
-  attr_reader :out, :err
+  attr_accessor :out, :err
   attr_accessor :request
   alias_method :interface, :class
   def argument_error e, cmd
@@ -379,9 +414,10 @@ class Skylab::Face::Cli
   def program_name
     @program_name ||= File.basename($PROGRAM_NAME)
   end
+  attr_writer :program_name
   alias_method :invocation_string, :program_name
   def run argv
-    argv.empty?        and return empty_argv
+    argv.empty? and return empty_argv
     runner = self
     begin
       argv.first =~ /^-/ and return runner.run_opts(argv)
@@ -416,4 +452,3 @@ class Skylab::Face::Cli
     end
   end
 end
-

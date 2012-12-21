@@ -1,13 +1,39 @@
-module Skylab ; end
+require_relative '../semantic/core'
 
 module Skylab::PubSub
+
   module Emitter
-    def self.extended mod
-      mod.send(:include, InstanceMethods)
+
+    COMMON_LEVELS = [:debug, :info, :notice, :warn, :error, :fatal].freeze
+      # didactic, #bound
+
+    def self.extended mod # #sl-111
+      mod.extend Emitter::ModuleMethods
+      mod.send :include, Emitter::InstanceMethods
     end
+
+    def self.new *a # sugar
+      ::Class.new.class_eval do
+        extend Emitter
+        emits(* a)
+        def error msg # courtesy for this #pattern #sl-112
+          emit :error, msg
+          false
+        end
+        # experimental interface for default constructor: multiple lambdas
+        def initialize *blocks
+          blocks.each { |b| b.call self }
+        end
+        self
+      end
+    end
+  end
+
+
+  module Emitter::ModuleMethods
+
     def emits *nodes
-      event_cloud = self.event_cloud
-      events = event_cloud.merge_definition!(*nodes)
+      events = event_cloud.nodes! nodes
       these = instance_methods.map(&:intern)
       event_cloud.flatten(events).each do |tag|
         unless these.include?(m = "on_#{tag.name}".intern)
@@ -18,36 +44,68 @@ module Skylab::PubSub
         end
       end
     end
+
+    def event_class= klass
+      define_method(:event_class) { klass }
+    end
+
+    alias_method :event_class, :'event_class=' #!
+
     def event_cloud
       @event_cloud ||= begin
-        if (k = ancestors[self == ancestors.first ? 1 : 0]).respond_to?(:event_cloud)
-          SemanticTagCloud.new(k.event_cloud)
-        else
-          SemanticTagCloud.new
+        a = ancestors             # Get every ancestor except self (if not s.c.)
+        a = a[ (self == a.first ? 1 : 0) .. -3 ] # and (ick) Kernel, BasicObject
+        found = []                # and of these, you want of all the ancestors
+        while mod = a.shift       # that respond_to event_cloud, any first class
+          if mod.respond_to? :event_cloud # and all (non-class) modules up to
+            found.push mod        # that class (if any) or the end.  This crazy-
+            ::Class == mod.class and break # ness is to allow inventive merging
+          end                     # of event graphs (#experimental).
         end
+        1 < found.length and fail 'implement me -- merge graphs'
+        ::Skylab::Semantic::Digraph.new(* found.map(&:event_cloud))
       end
     end
   end
 end
 
 module Skylab::PubSub
-  class Event < Struct.new(:payload, :tag, :touched)
-    def initialize tag, payload
-      Array === payload or raise ArgumentError.new("need arrays here for now!")
+  class Event < ::Struct.new :payload, :tag, :touched
+    def _define_attr_accessors!(*keys)
+      (keys.any? ? keys : payload.keys).each do |k|
+        singleton_class.send(:define_method, k) { self.payload[k] }
+        singleton_class.send(:define_method, "#{k}=") { |v| self.payload[k] = v }
+      end
+    end
+    def initialize tag, *payload
+      case payload.size
+      when 0 ; payload = nil
+      when 1 ; payload = payload.first
+        payload.respond_to?(:payload) and payload = payload.payload # shallow copy another event's payload
+      end
       super(payload, tag, false)
+      Hash === payload and _define_attr_accessors!
+      yield self if block_given?
     end
     alias_method :event_id, :object_id
-    def message
-      self.touched = true
-      payload.map(&:to_s).join(' ')
+    def is? sym
+      tag.is? sym
     end
-    alias_method :to_s, :message
+    def to_s
+      payload.to_s
+    end
+    alias_method :message, :to_s
     def touch!
-      self.touched = true
+      tap { |me| me.touched = true }
     end
     alias_method :touched?, :touched
     def type
       tag.name
+    end
+    def update_attributes! h
+      Hash === payload or self.payload = { message: message }
+      payload.merge! h
+      _define_attr_accessors!
     end
   end
   class EventListeners < Hash
@@ -59,124 +117,47 @@ module Skylab::PubSub
       self[name].push block
     end
   end
-  module InstanceMethods
-    def emit type, *payload
-      cloud = _find_event_cloud
-      tag = cloud[type] or fail("undeclared event type: #{type.inspect}")
-      el = event_listeners
-      event = nil
-      cloud.ancestor_names(tag).map{ |n| el[n] }.compact.flatten.tap do |a|
-        a.each do |b|
-          event ||= Event.new(tag, payload)
-          if 1 == b.arity
-            b.call(event)
-          else
-            b.call(*event.payload)
-          end
-        end
+  module Emitter::InstanceMethods
+    # syntax:
+    #   build_event <event>                                        # pass thru
+    #   build_event { <tag> | <tag-name> } [ payload_item [..] ]
+    def build_event *args, &block
+      args.size == 0 and raise ArgumentError.new('no')
+      if 1 == args.size and args.first.respond_to?(:type) and args.first.respond_to?(:payload)
+        block and fail("you cannot re-emit an event and also provide a constructor block.")
+        args.first
+      else
+        tag = args.shift
+        Symbol === tag and tag = ( event_cloud_definer.event_cloud[tag] or
+          fail("undeclared event type #{tag.inspect} for #{self.class}") )
+        event_class.new(tag, *args, &block)
+      end
+    end
+    def emit *args, &block
+      if 1 == args.size and args.first.respond_to?(:payload)
+        event = args.first
+        tag = event.tag
+        block and raise ArgumentError.new("can't use block when emitting an event object.")
+      else
+        type = args.shift
+        payload = args
+        tag = event_cloud_definer.event_cloud[type] or
+          fail("undeclared event type #{type.inspect} for #{self.class}")
+      end
+      (tag.all_ancestor_names & event_listeners.keys).map { |k| event_listeners[k] }.flatten.each do |prok|
+        event ||= build_event(tag, *payload, &block)
+        prok.call(* 1 == prok.arity ? [event] : event.payload )
       end.count
     end
-    # sucks for now
-    def _find_event_cloud
-      singleton_class.instance_variable_defined?('@event_cloud') and return singleton_class.event_cloud
-      self.class.event_cloud
+    def event_class
+      Event
     end
     def event_listeners
       @event_listeners ||= EventListeners.new
     end
-  end
-  class SemanticTagCloud < Hash
-    def ancestor_names tag
-      seen  = {}
-      found = []
-      visit = ->(k) do
-        t = self[k] or t = merge_definition!(k).first
-        seen[t.name] = true
-        found.push t.name
-        ( t.ancestors - found ).each { |s| seen[s] or visit[s] } # !
-      end
-      visit[tag.name]
-      found
+    def event_cloud_definer
+      singleton_class.instance_variable_defined?('@event_cloud') ? singleton_class : self.class
     end
-    def _deep_copy_init other
-      @order = other.instance_variable_get('@order').dup
-      @order.each do |k|
-        self[k] = other[k].duplicate
-      end
-    end
-    def describe
-      @order.map { |key| self[key].describe }.join("\n")
-    end
-    def flatten tags
-      order = []
-      seen = Hash.new { |h, k| order.push k; h[k] = true }
-      tags.each do |tag|
-        tag.ancestors.each { |k| seen[k] }
-        seen[tag.name]
-      end
-      order.map { |k| self[k] }
-    end
-    def initialize other=nil
-      if other
-        _deep_copy_init other
-      else
-        @order = []
-      end
-    end
-    def merge_definition! *nodes
-      resulting_tags = []
-      nodes.each do |node|
-        case node
-        when Symbol
-          resulting_tags.push merge_tag!(Tag.new(node))
-        when Hash
-          resulting_tags.concat( node.map { |k, v|
-            ancestors = case v
-            when Array  ; v
-            when Symbol ; [v]
-            else        ; raise ArgumentError.new("need Array or Symbol had #{v.class}:#{v}")
-            end
-            merge_tag! Tag.new(k, :ancestors => ancestors)
-          } )
-        else raise ArgumentError.new("need Symbol or Hash had #{node.class}:#{node}")
-        end
-      end
-      resulting_tags
-    end
-    def merge_tag! tag
-      tag.ancestors.each do |parent|
-        (self[parent] ||= Tag.new(parent)).children |= [tag.name]
-      end
-      if key?(tag.name)
-        self[tag.name].merge!(tag)
-      else
-        @order.push tag.name
-        self[tag.name] = tag
-      end
-    end
-  end
-  class Tag
-    def duplicate
-      self.class.new(@name, :ancestors => @ancestors.dup, :children => @children.dup)
-    end
-    def initialize name, opts=nil
-      name.kind_of?(Symbol) or raise ArgumentError.new("need symbol had #{name.class}")
-      @name = name
-      opts and opts.each { |k, v| send("#{k}=", v) }
-      @ancestors ||= []
-      @children = []
-    end
-    attr_accessor :ancestors
-    attr_accessor :children
-    def describe
-      [@name.to_s, (@ancestors.join(', ') if @ancestors.any?)].compact.join(' -> ')
-    end
-    def merge! tag
-      tag.name == @name or fail("need same tag name to merge tags (#{@name.inspect} != #{tag.name.inspect})")
-      @ancestors |= tag.ancestors
-      self
-    end
-    attr_reader :name
   end
 end
 

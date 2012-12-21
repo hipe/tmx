@@ -1,5 +1,5 @@
 $:.include?(skylab_dir = File.expand_path('../../../..', __FILE__)) or $:.unshift(skylab_dir)
-require 'skylab/dependency/primordial'
+# require 'skylab/dependency/primordial' # @todo:#099
 require 'skylab/dependency/interface/cli-commands'
 
 module Skylab::Face
@@ -8,13 +8,14 @@ module Skylab::Face
 
     module DefinerMethods
       def external_dependencies *a, &b
+        @external_dependencies ||= nil
         (a.empty? && b.nil?) and return @external_dependencies
-        @external_dependencies ||= begin
+        if @external_dependencies.nil?
           self.class_eval(&Skylab::Dependency::Interface::CliCommands)
-          Skylab::Dependency::Primordial.new
+          @external_dependencies = nil # @todo in #099 Skylab::Dependency::Primordial.new
         end
-        @external_dependencies.merge_in!(*a, &b)
-        @external_dependencies
+        # @external_dependencies.merge_in!(*a, &b) # @todo in #099
+        nil
       end
       def external_dependencies_inflated
         unless @external_dependencies.inflated?
@@ -23,7 +24,7 @@ module Skylab::Face
         @external_dependencies
       end
     end
- end
+  end
 end
 
 module Skylab::Face
@@ -31,4 +32,3 @@ module Skylab::Face
     extend ExternalDependencies::DefinerMethods
   end
 end
-

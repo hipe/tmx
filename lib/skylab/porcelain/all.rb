@@ -1,10 +1,10 @@
+require_relative 'core'
 require 'optparse'
 require 'stringio'
 require 'strscan'
-require File.expand_path('../tite-color', __FILE__)
-require File.expand_path('../../../skylab', __FILE__)
 require 'skylab/pub-sub/emitter'
 
+# @todo this should either be renamed "dsl" or moved into the toplevel porcelain.rb
 
 module Skylab::Porcelain
   @namespaces = []
@@ -36,11 +36,15 @@ module Skylab::Porcelain
   module Aliasist
     extend Structuralist
     list_accessor_oldschool :aliases
+    def alias name
+      aliases name
+    end
   end
   module Descriptionist
     extend Structuralist
     list_accessor_oldschool :description
     alias_method :desc, :description
+    alias_method :description_lines, :description # temporary compat until after 049.500
   end
   class ActionDef < Struct.new(:aliases, :argument_syntax, :description,
     :method_name, :option_syntax, :settings
@@ -64,24 +68,32 @@ module Skylab::Porcelain
   class PorcelainModuleKnob < Struct.new(:aliases, :client_module, :default,
     :description, :frame_settings, :runtime, :runtime_instance_settings
   )
-    extend Structuralist
     include Descriptionist, Aliasist
     def action
       @action ||= ActionDef.new
+    end
+    def action?
+      @action
     end
     def action!
       a = @action # nil ok
       @action = nil
       a
     end
-    def build_client_instance runtime
-      client_module.new.tap { |o| o.porcelain.runtime = runtime }
+    attr_accessor :actionable
+    alias_method :actionable?, :actionable
+    def build_client_instance runtime, slug
+      client_module.build_client(runtime, slug)
     end
     def default= *defaults
       1 == defaults.size && Array === defaults.first and defaults = defaults.first
       frame_settings.push(->(_){ self.default= defaults })
     end
     alias_method :default, :default= # !
+    def default_summary_lines
+      a = client_module.actions.map { |o| Styles::e13b o.name }
+      ["child command#{'s' if a.length != 1}: {#{a * '|'}}"]
+    end
     def emits(*a)
       runtime.definition_blocks.push(->(_) { emits(*a) })
     end
@@ -91,19 +103,32 @@ module Skylab::Porcelain
     alias_method :fuzzy_match, :fuzzy_match= # !
     def initialize client_module
       @action = nil
+      @actionable = true
       super(nil, client_module, nil, nil, [], RuntimeModuleKnob.new, [])
+    end
+    def instance_method_visibility= visibility
+      case visibility
+      when :public              ; self.actionable = true
+      when :protected, :private ; self.actionable = false
+      else                      ; fail("unexpected value: #{visibility.inspect}")
+      end
+      visibility
     end
     def invocation_name= s
       runtime_instance_settings.push(->(_){ self.invocation_slug = s })
       s
     end
     alias_method :invocation_name, :invocation_name= # !
+    def summary
+      desc or default_summary_lines
+    end
   end
   class RuntimeModuleKnob < Struct.new(:definition_blocks)
     def initialize
       super([])
     end
   end
+  # @todo change this to DSL from Dsl (per convention, near rspec)
   module Dsl
     # (This module is for wiring only.  Must be kept light outside and in.)
     def action &b
@@ -112,11 +137,28 @@ module Skylab::Porcelain
     def argument_syntax str
       @porcelain.action.argument_syntax = str
     end
+    def desc *a
+      @porcelain.action.desc(*a)
+    end
+    def inactionable
+      @porcelain.actionable = false
+    end
     def porcelain_dsl_init
-      @porcelain ||= PorcelainModuleKnob.new(self) # already set iff this is a subclass
+      unless instance_variable_defined?('@porcelain') and @porcelain
+        @porcelain = PorcelainModuleKnob.new(self) # already set iff this is a subclass
+        [:private, :protected, :public].each do |viz|
+          singleton_class.send(:alias_method, "#{viz}_before_porcelain", viz)
+          singleton_class.send(:define_method, viz) do |*a|
+            @porcelain.instance_method_visibility = viz
+            send("#{viz}_before_porcelain", *a)
+          end
+        end
+      end
     end
     def method_added method_name
-      if defn = @porcelain.action!
+      if @porcelain.actionable?
+        @porcelain.action? or @porcelain.action
+        defn = @porcelain.action!
         defn.method_name = method_name
         _actions_cache.cache Action.new(defn, instance_method(method_name))
       end
@@ -141,25 +183,23 @@ module Skylab::Porcelain
       cache = _actions_cache
       ActionEnumerator.new(cache) do |yielder|
         cache.each { |act| yielder << act }
-        public_instance_methods(false).select { |m| ! cache.key?(m) }.each do |method_name|
-          yielder << cache.cache(Action.new(
-            :method_name => method_name, :unbound_method => instance_method(method_name)
-          ))
-        end
       end
+    end
+    def build_client runtime, slug
+      client = new do |rt|
+        rt.invocation_slug = slug
+        client.wire! rt, runtime # it must die, all of it.
+      end
+      client.porcelain.runtime = runtime
+      client
     end
     def extended mod
       fail("implement and test me (probably just call porcelain_dsl_init on the module)")
     end
+    # @todo merge actions cache and actions enumerator !?
     def _actions_cache
-      instance_variable_defined?('@_actions_cache') and return @_actions_cache
-      ancestors = self.ancestors[(self.ancestors.first == self ? 1 : 0)..-1] # singleton class does not have self as first
-      klass = ancestors.detect { |a| a.class == ::Class and a.respond_to?(:_actions_cache) }
-      mods = ancestors.select { |a| a.class == ::Module and a.respond_to?(:_actions_cache) }
-      klass and mods -= klass.ancestors # wow it's if we are implementing ruby in ruby, how stupid
-      @_actions_cache = ActionsCache.new.initiate
-      [*mods, *[klass].compact].each { |anc| @_actions_cache.merge_in_duplicates_no_clobber! anc.actions }
-      @_actions_cache
+      @_actions_cache ||= ActionsCache.new.initiate
+      @_actions_cache.tap { |o| o.merge_new_ancestor_actions!(self) } # every time
     end
     def inherited cls
       cls.porcelain_dsl_init
@@ -180,13 +220,33 @@ module Skylab::Porcelain
     def initiate
       @hash = {}
       @order = []
+      @seen_ancestors = []
       self
     end
     def key? key
       @hash.key? key
     end
-    def merge_in_duplicates_no_clobber! actions
-      actions.each { |a| @hash.key?(a.name) or cache(a.duplicate) }
+    def merge! actions
+      actions.each do |action|
+        if @hash.key?(action.name)
+          @hash[action.name].merge!(action)
+        else
+          cache action.duplicate
+        end
+      end
+    end
+    def merge_new_ancestor_actions! selv
+      ancestors = selv.ancestors
+      (ancestors -= @seen_ancestors).empty? and return
+      @seen_ancestors.concat ancestors
+      ancestors.first == selv and ancestors.shift # singleton classes do not include themselves in ancestor chain
+      klass = ancestors.detect { |a| a.class == ::Class and a.respond_to?(:_actions_cache) }
+      mods = ancestors.select { |a| a.class == ::Module and a.respond_to?(:_actions_cache) }
+      klass and mods -= klass.ancestors # wow it's if we are implementing ruby in ruby, how stupid
+      [*mods, *[klass].compact].each do |anc|
+        merge! anc.actions
+      end
+      true
     end
   end
   class ActionEnumerator < Enumerator
@@ -289,6 +349,9 @@ module Skylab::Porcelain
       params ||= params2
       params and params.each { |k, v| send("#{k}=", v) }
     end
+    def merge! action
+      # @todo we just totally ignore the very idea of this for now
+    end
     def method_name= sym
       self.name ||= self.class.nameize(sym)
       super(sym)
@@ -353,10 +416,15 @@ module Skylab::Porcelain
       end
     end
     def build_parser context, option_parser = nil
-      option_parser ||= OptionParser.new.tap do |op|
+      if ! option_parser
+        op = ::OptionParser.new
         op.base.long['help'] = ::OptionParser::Switch::NoArgument.new do
           throw :option_action, ->(frame, action) { frame.client_instance.help(action) ; nil }
         end
+
+        op.banner = ''            # without this you hiccup 2 usages, the latter
+                                  # being an unstylied one from o.p
+        option_parser = op
       end
       each { |b| option_parser.instance_exec(context, &b) }
       option_parser
@@ -366,10 +434,8 @@ module Skylab::Porcelain
     def help(&block)
       empty? and return
       yield(knob = HelpSubs.new)
-      renderer = r = ::OptionParser.new
+      renderer = r = option_parser
       lucky_matcher = /\A(#{Regexp.escape(r.summary_indent)}.{1,#{r.summary_width}})[ ]*(.*)\z/
-      renderer.banner = ''
-      build_parser({}, renderer)
       lines = renderer.to_s.split("\n")
       once = false
       lines.each do |line|
@@ -383,12 +449,33 @@ module Skylab::Porcelain
         end
       end
     end
+    def option_parser
+      @option_parser ||= begin
+        op = build_parser(@context = {})
+        @rebuild = @context.any?
+        op
+      end
+    end
+    def option_parser_parse! argv
+      if (@option_parser ||= nil)
+        if @rebuild
+          @option_parser = nil
+        else
+          @context.clear
+        end
+      end
+      option_parser.parse! argv
+      if @rebuild
+        @context
+      else
+        @context.dup
+      end
+    end
     def parse_options argv
       empty? and ! Officious::Help::SWITCHES.include?(argv.first) and return nil
       yield(knob = ParseOptsSubs.new)
-      option_parser = build_parser(context = {})
       begin
-        option_parser.parse! argv
+        context = option_parser_parse! argv
       rescue ::OptionParser::ParseError => e
         knob.emit(:syntax, e)
         context = false
@@ -397,11 +484,12 @@ module Skylab::Porcelain
     end
     def to_str
       0 == count and return nil
-      build_parser({}).instance_variable_get('@stack')[2].list.select{ |s| s.kind_of?(::OptionParser::Switch) }.map do |switch| # ick
+      option_parser.instance_variable_get('@stack')[2].list.select{ |s| s.kind_of?(::OptionParser::Switch) }.map do |switch| # ick
         "[#{[(switch.short.first || switch.long.first), switch.arg].compact.join('')}]"
       end.join(' ')
     end
   end
+  # @todo see if we can get this whole class to go away in lieu of the improved reflection of ruby 1.9
   class ArgumentSyntax < Array
     def self.parse_syntax str
       new.init(str).validate
@@ -527,7 +615,7 @@ module Skylab::Porcelain
   end
 
   module Styles
-    include TiteColor
+    include Headless::CLI::Stylize::Methods
     extend self
     def e13b str   ; stylize str, :green          end
     def header str ; stylize str, :strong, :green end
@@ -638,7 +726,7 @@ module Skylab::Porcelain
   end
 
   class CallFrame < Struct.new(:above, :action, :actions_provider, :argv,
-    :below, :client_instance, :default, :defaulted, :emitter, :fuzzy_match,
+    :below, :get_client_instance, :default, :defaulted, :emitter, :fuzzy_match,
     :invocation_slug
   )
     include ArgvTokenParse
@@ -647,8 +735,9 @@ module Skylab::Porcelain
       super
     end
     def client_instance
-      Proc === (i = super) ? i.call : i
+      @client_instance ||= get_client_instance.call
     end
+    attr_writer :client_instance
     alias_method :defaulted?, :defaulted
     def default?
       !! default
@@ -693,12 +782,18 @@ module Skylab::Porcelain
       :error         => :all,
       :info          => :all,
       :help          => :info,
+      :payload       => :all,
       :ui            => :info,
       :usage         => :info,
       :syntax        => :info,
       :runtime_issue => :error
     })
-    %w(invocation render_actions resolve).each do |m| # @delegates
+    alias_method :orig_event_class, :event_class
+    attr_writer :event_class
+    def event_class
+      (@event_class ||= nil) or orig_event_class
+    end
+    %w(invocation render_actions resolve).each do |m| # @delegates @todo:#100.200.1
       define_method(m) { |*a, &b| stack.send(m, *a, &b) }
     end
     def initialize argv, client_instance, instance_defn, module_defn
@@ -789,29 +884,35 @@ module Skylab::Porcelain
   class Namespace < Action
     def actions_provider
       case @mode
-      when :inline   ; singleton_class
+      when :inline   ; inflate! if @block
+                     ; singleton_class
       when :external ; @external_module
       end
     end
-    def _client_instance
-      @_client_instance ||= begin
-        case @mode
-        when :inline
-          @porcelain or porcelain_init # this needs some thought!
-          @porcelain.runtime = @frame.emitter
-          self
-        when :external
-          @external_module.porcelain.build_client_instance(@frame.emitter)
-        end
+    attr_accessor :client_instance
+    def get_ns_client slug
+      case @mode
+      when :inline
+        (@porcelain ||= nil) or porcelain_init # i want it all to go away
+        @porcelain.runtime = @frame.emitter
+        self
+      when :external
+        @external_module.porcelain.build_client_instance(@frame.emitter, slug) # @todo: during:#100.100.400
+      else
+        fail('no')
       end
     end
+    # @todo during:#100.200 for_run <=> build_client_instance
     def for_run ui, slug # compat
-      o = @external_module.porcelain.build_client_instance nil
-      o.porcelain.runtime_instance_settings = ->(p) do
-        p.invocation_slug = slug
-        p.on_all { |e| $stderr.puts e.to_s }
+      if @external_module.respond_to?(:porcelain)
+        @external_module.porcelain.build_client_instance(ui, slug)
+      else
+        @external_module.new(out: ui.out, err: ui.err, program_name: slug)
       end
-      o
+    end
+    def inflate!
+      singleton_class.class_eval(&@block)
+      @block = nil
     end
     def initialize name, *params, &block
       mod = params.shift if Module === params.first
@@ -839,12 +940,20 @@ module Skylab::Porcelain
       super(params, & nil) # explicitly avoid bubbling up the block
       case @mode
       when :external
-        mod.porcelain.aliases and aliases(* mod.porcelain.aliases)
+        if mod.respond_to?(:porcelain)
+          mod.porcelain.aliases and aliases(* mod.porcelain.aliases)
+        end
       when :inline
         class << self
           # we want all this on the sing. class because this object is not a subclass but an instance
           extend ClientModuleMethods
           include ClientInstanceMethods
+          prev = porcelain.actionable
+          porcelain.actionable = false # else it actually pings us for the below definition
+          def singleton_method_added metho
+            singleton_class.method_added metho # yes wtf. talk to matz ^_^
+          end
+          porcelain.actionable = prev
         end
       end
       class << self
@@ -856,15 +965,13 @@ module Skylab::Porcelain
     end
     attr_reader :frame
     def parse argv
-      if @block
-        singleton_class.class_eval(&@block)
-        @block = nil
-      end
+      inflate! if @block
+      slug = argv.first
       @frame = CallFrame.new(
         :argv => argv,
         :action => self,
-        :client_instance => ->{ _client_instance },
-        :invocation_slug => argv.first,
+        :get_client_instance => ->(){ get_ns_client(slug) },
+        :invocation_slug => slug,
         :actions_provider => actions_provider
       )
       if :inline == @mode
@@ -877,10 +984,15 @@ module Skylab::Porcelain
     end
     def summary
       case @mode
-      when :external    ;  @external_module.porcelain.desc
+      when :external
+        if @external_module.respond_to?(:porcelain)
+          @external_module.porcelain.summary
+        else
+          a = @external_module.command_tree.map(&:name) # watch the world burn
+          ["child commandz: {#{a.join('|')}}"]
+        end
       else              ;  fail("implement me")
       end
     end
   end
 end
-

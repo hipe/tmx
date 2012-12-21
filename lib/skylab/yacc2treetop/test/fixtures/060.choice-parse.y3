@@ -1,0 +1,6 @@
+
+simple_selector_sequence
+  : [ type_selector | universal ]
+    [ HASH | class | attrib | pseudo | negation ]*
+  | [ HASH | class | attrib | pseudo | negation ]+
+  ;
