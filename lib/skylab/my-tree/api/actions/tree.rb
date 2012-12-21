@@ -16,7 +16,9 @@ module Skylab::MyTree
 
     def affix_metadata! sym
       if @affix_metadata
-        @affix_metadata.push( sym ).reverse!.uniq!.reverse!
+        @affix_metadata.push( sym ).reverse!
+        @affix_metadata.uniq!
+        @affix_metadata.reverse!
         # unique elements in the freshest requested order
         # ( a b c b    ->  a c b )
       else
@@ -47,6 +49,10 @@ module Skylab::MyTree
       end
 
       o.on('-n', '--dry-run', 'assorted meanings') { self[:dry_run] = true }
+
+      o.on '-m', '--mtime', 'display mtime if ordinary file' do
+        affix_metadata! :mtime
+      end
 
       o.on('-P <pattern>', 'meh') { |x| self[:pattern] = x }
 
@@ -85,11 +91,15 @@ module Skylab::MyTree
 
     attr_reader :file
 
-    def metadata_string line
+    fly = nil
+
+    define_method :metadata_string do |line|
       if @affix_metadata
+        fly ||= MyTree::Models::Node::Flyweight.new
+        fly.set! line
         arr = @affix_metadata.reduce [] do |a, sym|
           x = API::Actions::Tree::Metadatas.const_fetch sym
-          x.call( a, line, self )
+          x.call( a, fly, self )
         end
         if ! arr.empty?
           "(#{ arr.join ', ' })"

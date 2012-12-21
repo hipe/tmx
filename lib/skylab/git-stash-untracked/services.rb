@@ -8,10 +8,6 @@ module Skylab::GitStashUntracked               # centralize std-lib deps,
     o :Open3       , -> { require 'open3'       ; ::Open3 }
     o :OptionParser, -> { require 'optparse'    ; ::OptionParser }
 
-    # --*--
-
-    pathify = ::Skylab::Autoloader::Inflection::FUN.pathify
-
     define_singleton_method :const_missing do |k|
       const_set k, h.fetch( k ).call
     end
