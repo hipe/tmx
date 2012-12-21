@@ -1,16 +1,12 @@
-require File.expand_path('../support', __FILE__)
-require 'skylab/dependency/task-types/unzip-tarball'
+require_relative 'test-support'
 
-module Skylab::Dependency::TestSupport
+module Skylab::Dependency::TestSupport::Tasks
 
-  include ::Skylab::Dependency
   describe TaskTypes::UnzipTarball do
-    module_eval &DESCRIBE_BLOCK_COMMON_SETUP
+    extend Tasks_TestSupport
+
     subject do
-      TaskTypes::UnzipTarball.new(build_args) do |o|
-        o.on_all { |e| fingers[e.type].push unstylize(e.to_s) }
-        o.context = context
-      end
+      TaskTypes::UnzipTarball.new( build_args ) { |t| wire! t }
     end
 
     context "with no build args" do
@@ -31,23 +27,23 @@ module Skylab::Dependency::TestSupport
         it "whines (returns false, emits error)" do
           r = subject.invoke
           r.should eql(false)
-          fingers[:error].size.should eql(1)
+          fingers[:error].length.should eql(1)
           fingers[:error][0].should match(/tarball not found.*not-there/)
         end
       end
       context "when the tarball exists" do
         let(:unzip_tarball) { FIXTURES_DIR.join('mginy-0.0.1.tar.gz') }
-        before(:each) do
-          # BUILD_DIR.verbose = true e.g.
+        before :each do
+          # BUILD_DIR.verbose = true  # e.g.
           BUILD_DIR.prepare
           BUILD_DIR.copy(unzip_tarball)
         end
-        context "when the target directory exists" do
+        context "when the target directery exists" do
           before(:each) { BUILD_DIR.mkdir("#{BUILD_DIR}/mginy", verbose: false) }
           it "emits a notice, returns true" do
             r = subject.invoke
             r.should eql(true)
-            fingers[:info].size.should eql(1)
+            fingers[:info].length.should eql(1)
             fingers[:info].first.should match(/exists, won't tar extract: .*mginy/)
           end
         end
@@ -56,7 +52,7 @@ module Skylab::Dependency::TestSupport
           it "returns false, emits original error" do
             r = subject.invoke
             r.should eql(false)
-            fingers[:error].size.should eql(1)
+            fingers[:error].length.should eql(1)
             fingers[:error].first.should match(/failed to unzip.*unrecognized archive format/i)
           end
         end
@@ -64,18 +60,17 @@ module Skylab::Dependency::TestSupport
           it "returns true, emits shell and tar errstream" do
             r = subject.invoke
             r.should eql(true)
-            fingers[:shell].size.should eql(1)
+            fingers[:shell].length.should eql(1)
             fingers[:shell].first.should match(/cd .*build-dependency.*tar -xzvf mginy.*/)
-            fingers[:err].size.should eql(2)
             tgt = <<-HERE.unindent.strip
               x mginy/
               x mginy/README
             HERE
             fingers[:err].join('').strip.should eql(tgt)
+            # fingers[:err].length.should eql(2)
           end
         end
       end
     end
   end
 end
-

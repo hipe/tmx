@@ -1,6 +1,6 @@
 require 'optparse'
 
-# an ultralight command-line parser (430 lines)
+# an ultralight command-line parser
 # that wraps around OptParse (can do anything it does)
 # with colors
 # with flexible command-like options ('officious' like -v, -h)
@@ -9,8 +9,11 @@ require 'optparse'
 # with default commands within those namespaces
 # with aliases for commands and namespaces
 
-module Skylab; end
-module Skylab::Face; end
+module Skylab
+  module Face
+    # forward declarations that normally wouldn't go here
+  end
+end
 
 module Skylab::Face::Colors
   extend self
@@ -134,7 +137,7 @@ module Skylab::Face
         "#{@parent.invocation_string} #{name}"
       end
       def parent= parent
-        @parent and fail("won't overwrite existing parent")
+        (@parent ||= nil) and fail("won't overwrite existing parent")
         @parent = parent
       end
       def usage msg=nil
@@ -157,7 +160,7 @@ module Skylab::Face
         end
       end
       def default_action *a
-        a.any? ? (@default_action = (a*'').to_sym) : @default_action
+        a.any? ? (@default_action = (a*'').to_sym) : (@default_action ||= nil)
       end
       # this is nutty: for classes that extend this module, this is
       # something that is triggered when they are subclasses
@@ -194,7 +197,7 @@ module Skylab::Face
         @command_definitions ||= []
       end
       def method_added name
-        if @grab_next_method
+        if (@grab_next_method ||= nil)
           command_definitions.last[1][0] = name.to_sym
           @grab_next_method = false
         end
@@ -202,7 +205,7 @@ module Skylab::Face
       def option_parser *a, &b
         block_given? or raise ArgumentError.new("block required")
         if a.empty?
-          @grab_next_method and fail("can't have two anonymous " <<
+          (@grab_next_method ||= nil) and fail("can't have two anonymous " <<
           "command definitions in a row.")
           @grab_next_method = true
           a = [nil]
@@ -276,7 +279,7 @@ module Skylab::Face
         end
       end
       def option_parser
-        @option_parser.nil? or return @option_parser
+        ! instance_variable_defined?('@option_parser') || @option_parser.nil? or return @option_parser
         op = build_empty_option_parser
         op.banner = usage_string
         if interface.option_definitions.any?
@@ -369,10 +372,11 @@ module Skylab::Face
           @definitions
         end
         def parent= parent
-          @parent and fail("won't overwrite parent")
+          instance_variable_defined?('@parent') && @parent and fail("won't overwrite parent")
           @parent = parent
         end
         def summary *a
+          @summary ||= nil
           a.any? ? (@summary = a) : (@summary || summary_of_commands)
         end
         def summary_of_commands
@@ -391,11 +395,11 @@ class Skylab::Face::Cli
   include Face::Command::Nodeish
   include Face::Command::Treeish
 
-  def initialize opts=nil, &events
+  def initialize opts=nil
+    block_given? and raise ArgumentError.new("this crap comes back after #100")
     opts and opts.each { |k, v| send("#{k}=", v) }
     @out ||= $stdout
     @err ||= $stderr
-    events and @err.puts("(notice: ignoring event handlers for now)")
   end
   attr_accessor :out, :err
   attr_accessor :request
@@ -448,4 +452,3 @@ class Skylab::Face::Cli
     end
   end
 end
-

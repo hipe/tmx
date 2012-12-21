@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env ruby -w
 
 require File.expand_path('../../lib/skylab/tmx/cli', __FILE__)
 
@@ -6,9 +6,5 @@ Skylab::Tmx::Cli.new(
   program_name: 'tmx',
   out: $stdout,
   err: $stderr
-) do
-  on_info    { |e| $stderr.puts e }
-  on_error   { |e| $stderr.puts e }
-  on_payload { |e| $stdout.puts e }
-end.run(ARGV)
+).run(ARGV) # see previous version (@todo during:#100.100)
 

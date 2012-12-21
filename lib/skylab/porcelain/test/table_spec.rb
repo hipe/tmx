@@ -10,34 +10,38 @@ module Skylab::Porcelain::TestSupport
     let(:stdout) { _stdout.string }
     context Porcelain::Table do
       specify { should be_const_defined(:Table) }
-      specify { should be_respond_to(:table) }
+    end
+    context "#{Porcelain::Table::RenderTable} instance_methods" do
+      let(:subject) { Porcelain::Table::RenderTable.instance_methods(false) }
+      specify { should be_include(:render_table) }
     end
     context "rendering tables" do
+      include Porcelain::Table::RenderTable
       it "renders the empty table" do
-        r = Porcelain.table([]) { |o| o.on_all { |e| _stdout.puts e } }
+        r = render_table([]) { |o| o.on_all { |e| _stdout.puts e } }
         stdout.should eql("(empty)\n")
         r.should eql(nil)
       end
       it "you can also just get a string back" do
-        Porcelain.table([]).should eql("(empty)\n")
+        render_table([]).should eql("(empty)\n")
       end
       it "renders a 2 x 2 table (align left)" do
         data = [ %w(derp mcderperson),
                  %w(herper mcderpertino) ]
-        Porcelain.table(data).should eql(<<-HERE.unindent)
+        render_table(data).should eql(<<-HERE.unindent)
           derp   mcderperson 
           herper mcderpertino
         HERE
       end
       it "takes options the canonical way" do
-        s = Porcelain.table([['a','b'],['c','dd']], :head => '<<', :tail => '>>', :separator => ' | ')
+        s = render_table([['a','b'],['c','dd']], :head => '<<', :tail => '>>', :separator => ' | ')
         s.should eql(<<-HERE.unindent)
           <<a | b >>
           <<c | dd>>
         HERE
       end
       it "takes options also in the block with the event knob" do
-        Porcelain.table([['a','b'],['c','dd']]) do |o|
+        render_table([['a','b'],['c','dd']]) do |o|
           o.head = '<<' ; o.tail = '>>' ; o.separator = ' | '
           o.on_all { |e| _stdout.puts e }
         end
@@ -48,7 +52,8 @@ module Skylab::Porcelain::TestSupport
       end
     end
     context 'infers types of columns and renders accordingly' do
-      let(:rendered_table) { Porcelain.table(row_enum) }
+      include Porcelain::Table::RenderTable
+      let(:rendered_table) { render_table(row_enum) }
       context 'with some everyday ordinary strings' do
         let(:row_enum) do
           [['meep', 'mop'],
@@ -109,6 +114,7 @@ module Skylab::Porcelain::TestSupport
       end
     end
     context "automatic widths with (ascii escape code) styles" do
+      include Porcelain::Table::RenderTable
       it 'works' do
         rows = [
           [[:header, 'name'], 'hipe'],
@@ -116,9 +122,11 @@ module Skylab::Porcelain::TestSupport
           [nil, 'pear']
         ]
         output = []
-        Porcelain.table(rows, :separator => "\t") do |o|
+        render_table(rows, :separator => "\t") do |o|
           o[:header].format { |s| Porcelain::Bleeding::Styles.hdr(s) }
-          o.on_row { |e| output.push Porcelain::TiteColor.unstylize(e.to_s) }
+          o.on_row do |e|
+            output.push Headless::CLI::Pen::FUN.unstylize[ e.to_s ]
+          end
         end
         lengths = output.map { |s| s.match(/^[^\t]*/)[0].length }
         lengths.uniq.size.should eql(1)
@@ -126,4 +134,3 @@ module Skylab::Porcelain::TestSupport
     end
   end
 end
-

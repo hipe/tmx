@@ -1,13 +1,15 @@
-require File.expand_path('../support', __FILE__)
-require 'skylab/dependency/task-types/mkdir-p'
+require_relative 'test-support'
 
-module Skylab::Dependency::TestSupport
-  include ::Skylab::Dependency
+module Skylab::Dependency::TestSupport::Tasks
+
   describe TaskTypes::MkdirP do
+    extend Tasks_TestSupport
+
     subject { TaskTypes::MkdirP }
     let(:all) do
       lambda do |t|
         t.on_all do |e|
+          self.debug and $stderr.puts [e.type, e.message].inspect
           stderr << e.to_s
         end
       end
@@ -33,14 +35,14 @@ module Skylab::Dependency::TestSupport
       context "with regards to dry_run" do
         before { subject.context = context }
         context "by default" do
-          let (:context) { { } }
+          let( :context ) { { } }
           it { should_not be_dry_run }
         end
         context "with dry run in context" do
-          let (:context) { { :dry_run => true } }
+          let( :context ) { { :dry_run => true } }
           it { should be_dry_run }
           context "when invoked" do
-            let (:stderr) { "" }
+            let( :stderr ) { "" }
             before do
               BUILD_DIR.prepare
             end

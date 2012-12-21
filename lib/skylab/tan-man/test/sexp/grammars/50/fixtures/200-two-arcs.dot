@@ -1,0 +1,4 @@
+digraph G {
+  foo->bar
+  biff->baz
+}  

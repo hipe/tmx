@@ -1,15 +1,154 @@
-DERP = %w(dependency slake)
+#!/usr/bin/env ruby -w
 
-guard('rspec',
-  :all_on_start => false,
-  :cli => '-fd',
-  :spec_paths => DERP.map { |x| "lib/skylab/#{x}/test" }
-) do
-  watch(%r{^lib/skylab/[^/]+/test/.+_spec\.rb$})
-  DERP.each do |x|
-    watch(%r{^lib/skylab/#{x}/task-types/(.+)\.rb$}) do |m|
-      "lib/skylab/#{x}/test/task-types/#{m[1]}_spec.rb"
+require_relative 'lib/skylab/tolerance/core'
+require 'fileutils'
+require 'open3'
+require 'pathname'
+require 'shellwords'
+
+module Skylab::Guardfile
+  module Models
+  end
+  class Models::Cluster < Struct.new(:path)
+    def self.from_datastore data
+      Enumerator.new do |y|
+        data.each_line do |line|
+          y << new(line)
+        end
+      end
+    end
+    def initialize path
+      super path.chomp
+    end
+    alias_method :line, :path
+    alias_method :string, :path
+  end
+  class Models::Cluster::Enumerator < ::Enumerator
+    def from_filesystem pwd
+      self.class.new do |y|
+        pwd = Pathname.new(pwd)
+        Open3.popen3("find #{Shellwords.shellescape pwd.to_s} -type dir -name test -depth 4") do |sin, sout, serr|
+          sout.each_line do |line|
+            pn = Pathname.new(line)
+            pn = pn.relative_path_from(pwd)
+            y << Models::Cluster.new(pn.to_s)
+          end
+          serr.each_line do |line|
+            emit :stderr, line
+          end
+        end
+      end
+    end
+  end
+  class Models::DataFile
+    def initialize parent
+      @commit = true
+      @fh = DATA
+      @parent = parent
+    end
+    def each_line &b
+      (@ram ||= @fh.each_line.map { |l| l }).each(&b)
+    end
+    def emit t, m ; @parent.emit(t, m) end
+    def rewrite! nodes
+      ram = nodes.map(&:line)
+      ll = [] ; line = nil
+      File.open(@fh.path) do |fh|
+        ll.push(line) while line = fh.gets and "__END__\n" != line
+        line == "__END__\n" or fail("__END__ hack failed")
+        ll.push line
+        ram[0..-2].each { |l| ll.push("#{l}\n") }
+        ram.any? and ll.push ram.last
+      end
+      if @commit
+        x = 0
+        File.open(@fh.path, 'w') { |fh| ll.each { |l| x += 1 ; fh.write l } }
+        emit :info, "(wrote #{x} lines.)"
+      end
+      @ram = ram
+    end
+  end
+  class CLI < ::Skylab::Tolerance::Runtime
+    def emit _, msg      ; $stderr.puts(msg)  ; end
+    def option_syntax o                       ; end
+    module Actions                            ; end
+  end
+  class CLI::Action
+    include ::Skylab::Tolerance::ActionInstanceMethods
+    def clusters
+      Models::Cluster.from_datastore(datastore)
+    end
+    def datastore
+      @datastore ||= Models::DataFile.new(self)
+    end
+    def pwd
+      FileUtils.pwd
+    end
+  end
+  module CLI::UpdaterInstanceMethods
+    def render_tagged c
+      emit(:info, "#{c.last.path} #{send(c.first, "(#{c.first.to_s})")}")
+    end
+    def tagged
+      # tag the union of existing and new nodes as follows: { new | ok | stale }
+      # then sort them and print them
+      existeds = clusters.to_a
+      existed = Hash[* existeds.map { |c| [c.path, true] }.flatten(1) ]
+      taggeds = []
+      seen = {}
+      clusters.from_filesystem(pwd).each do |c|
+        seen[c.path] = true
+        taggeds.push [existed[c.path] ? :ok : :new, c]
+      end
+      existeds.each { |c| seen[c.path] or taggeds.push([:stale, c]) }
+      taggeds.sort_by { |c| c.last.path }
+    end
+    def new     str ; stylize str, :green               end
+    def ok      str ; stylize str, :blue                end
+    def stale   str ; stylize str, :yellow              end
+  end
+  class CLI::Actions::List < CLI::Action
+    def option_syntax o ; end
+    def execute opts
+      clusters.each do |clust|
+        emit(:payload, clust.string)
+      end
+    end
+  end
+  class CLI::UpdatingAction < CLI::Action
+    include CLI::UpdaterInstanceMethods
+    def option_syntax o ; end
+  end
+  class CLI::Actions::Check < CLI::UpdatingAction
+    def execute opts
+      tagged.each { |c| render_tagged c }
+    end
+  end
+  class CLI::Actions::Update < CLI::UpdatingAction
+    def execute opts
+      datastore.rewrite! tagged.map(&:last)
+      tagged.each { |c| render_tagged c }
+    end
+  end
+  class CLI::Actions::Prune < CLI::UpdatingAction
+    def execute opts
+      datastore.rewrite!(tagged.select{ |t| :stale != t.first }.map(&:last))
+      tagged.each { |c| render_tagged c }
     end
   end
 end
 
+if __FILE__ == $PROGRAM_NAME
+  ::Skylab::Guardfile::CLI.new.invoke(ARGV)
+end
+
+__END__
+lib/skylab/code-molester/test
+lib/skylab/dependency/test
+lib/skylab/kurse/test
+lib/skylab/meta-hell/test
+lib/skylab/porcelain/test
+lib/skylab/pub-sub/test
+lib/skylab/slake/test
+lib/skylab/tan-man/test
+lib/skylab/treemap/test

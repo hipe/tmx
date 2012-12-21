@@ -4,7 +4,9 @@ require 'skylab/tmx/model/config'
 module Skylab::Tmx::Modules::Bleed
   API_ROOT = Pathname.new('../api').expand_path(__FILE__)
   module Api
+    # extend ::Skylab::Autoloader # @todo
     require API_ROOT.join('action').to_s
+    require API_ROOT.join('bash-action').to_s
     module Actions
     end
   end
@@ -21,6 +23,7 @@ module Skylab::Tmx::Modules::Bleed
     end
     def invoke act, ctx, &events
       events or raise ArgumentError.new("expected block here")
+      Array === act or act = [act]
       require ACTIONS_ROOT.join(act.join('/')).to_s
       klass = act.reduce(Api::Actions) do |m, s|
         m.const_get(s.to_s.gsub(/(^[a-z]|[a-z](?=-))(?:-(.))?/) { "#{$1.upcase}#{$2}" })

@@ -1,0 +1,189 @@
+module Hipe
+module CssConvert
+module CssParsing
+
+# attempt to semi-faithfully implement http://www.w3.org/TR/css3-selectors/
+
+grammar CssFile
+
+  include Common
+
+
+  rule css_file
+    things:( space ( style_block / at_rule ) )* space <CssFile> {
+      def tree
+        CustomTree::Aggregate[:css_file, * (things.elements.map(&:tree) + [space.tree])]
+      end
+    }
+  end
+
+  # http://www.w3.org/TR/CSS21/syndata.html#at-rules
+  rule at_rule
+    '@' css_identifier ( ';' / css_block ) <AtRule> {
+      def tree
+        :at_rule
+      end
+    }
+  end
+
+  # http://www.w3.org/TR/CSS21/syndata.html
+  # 4.1.3 Characters and case
+  # In CSS, identifiers  (including element names, classes, and IDs in selectors)
+  # can contain only the characters [a-zA-Z0-9] and ISO 10646 characters U+00A0 and higher,
+  # plus the hyphen (-) and the underscore (_);
+  # they cannot start with a digit, two hyphens, or a hyphen followed by a digit.
+  # Identifiers can also contain escaped characters and any ISO 10646 character as a numeric code (see next item). For instance, the identifier "B&W?" may be written as "B\&W\?" or "B\26 W\3F".
+  rule css_identifier
+  end
+
+
+  rule style_block
+    space selector space '{' space assignment* '}' <StyleBlock> {
+      def tree
+        :style_block
+      end
+    }
+  end
+
+
+  # "A selector is a chain of one or more sequences of simple selectors separated by combinators."
+  # "One pseudo-element  may be appended to the last sequence of simple selectors in a selector."
+  #
+  rule selector
+    simple_selector_sequence ( combinator simple_selector_sequence )* pseudo_element? <Selectors> {
+      def tree
+        :selector
+      end
+    }
+  end
+
+
+  # (per section 7)
+  # although the spec doesn't specify it, we aren't going to allow whitespace in between this
+  # part and the preseding part
+  #
+  rule pseudo_element
+    "::" ( "first-line" / "first-letter" / "before" / "after" ) <PseudoElement> {
+      def tree
+        :pseudo_element
+      end
+    }
+  end
+
+
+  # "A simple selector is either a type selector, universal selector,
+  #    attribute selector, class selector, ID selector, or pseudo-class."
+  # "A sequence of simple selectors is a chain of simple selectors that are not separated by a combinator."
+  # "It always begins with a type selector or a universal selector."
+  # "No other type selector or universal selector is allowed in the sequence."
+  #
+  rule simple_selector_sequence
+    (type_selector / universal_selector) (attribute_selector / class_selector / id_selector / pseudo_class ) <SimpleSelectorSequence> {
+      def tree
+        :simple_selector_sequence
+      end
+    }
+  end
+
+  # "A type selector is the name of a document language element type written using the syntax of CSS qualified names"
+  #
+  #
+  rule type_selector
+
+  end
+
+
+  # Combinators are: whitespace, "greater-than sign" (U+003E, >), "plus sign" (U+002B, +) and "tilde" (U+007E, ~).
+  # White space may appear between a combinator and the simple selectors around it.
+  #
+  rule combinator
+    ( white* combinator_operator:[>+~] ) / white+ <Combinator> {
+      def tree
+        :combinator # rember the whitespace combinator is the Descendant combinator
+      end
+    }
+  end
+
+
+
+
+  rule assignment
+    assignment_name space ':' space assignment_value space ';' space <Assignment> {
+      def tree
+        :assignment
+      end
+    }
+  end
+
+  rule assignment_value
+    [^;]+ <AssignmentValue> {
+      def tree
+        :assgnmt_val
+      end
+    }
+  end
+
+  rule element_name
+    [a-z] [a-z0-9]* <ElementName> { # h1 etc
+      def tree
+        :el_name_val
+      end
+    }
+  end
+
+  rule class_selector
+    '.' [-_a-zA-z] [-_a-zA-Z0-9]* <ClassSelector> {
+      def tree
+        :cls_sel_val
+      end
+    }
+  end
+
+  rule pseudoclass_selector
+    ':' [a-z]+ <PseudoclassSelector> {
+      def tree
+        :pseudo_val
+      end
+    }
+  end
+
+  rule assignment_name
+    [-a-z]+ <AssignmentName> {
+      def tree
+        :assignment_name
+      end
+    }
+  end
+
+  rule c_style_comment
+    '/*' ( [^*] / '*' !'/' )* '*/' <CStyleComment> {
+      def tree
+        CustomTree::Whitesque[:c_style_comment, text_value]
+      end
+    }
+  end
+
+  rule space
+    ( c_style_comment / white )* <Space> {
+      def tree
+        CustomTree::Aggregate[:space, * elements.map(&:tree) ]
+      end
+    }
+  end
+
+  # 'Only the characters "space" (U+0020), "tab" (U+0009), "line feed" (U+000A),
+  #   "carriage return" (U+000D), and "form feed" (U+000C) can occur in whitespace.
+  #   Other space-like characters, such as "em-space" (U+2003) and
+  #   "ideographic space" (U+3000), are never part of whitespace.
+  #
+  rule white
+    [ \t\n\r\f]+ <White> {
+      def tree
+        CustomTree::Whitesque[:white, elements.first.text_value]
+      end
+    }
+  end
+end
+end
+end
+end

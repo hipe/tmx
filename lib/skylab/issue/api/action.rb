@@ -1,102 +1,114 @@
-require 'skylab/pub-sub/emitter'
-require 'skylab/porcelain/attribute-definer'
-
-
 module Skylab::Issue
-  require ROOT.join('porcelain/yamlizer').to_s
+  class API::Action
+    include Issue::Core::SubClient::InstanceMethods
+    extend PubSub::Emitter
 
-  class Api::Action
-    extend ::Skylab::PubSub::Emitter
-    extend ::Skylab::Porcelain::AttributeDefiner
-    include Porcelain::Yamlizer
+    extend Porcelain::Attribute::Definer
+    extend Headless::NLP::EN::API_Action_Inflection_Hack
 
+    meta_attribute :default
     meta_attribute :required
 
-    def failed msg
-      emit(:error, msg) # this might change to raising
-      false
+    inflection.inflect.noun :singular
+
+    event_class API::MyEvent
+
+    # --*--
+
+    def invoke param_h=nil
+      res = nil
+      begin
+        @param_h and fail 'sanity'
+        @param_h = param_h || { }
+        res = absorb_params!
+        res or break
+        res = execute
+      end while nil
+      if false == res
+        res = invite self         # an invite hook should happen at the
+      end                         # end of invoke for 2 reasons: 1) it wraps
+      res                         # execute, 2) it is hopefully at the end
     end
 
-    def initialize api, context, &events
-      @api = api
-      @params = context
-      instance_eval(&events)
+
+    pathify = Autoloader::Inflection::FUN.pathify      # until headless BEGIN #
+    pos = API.name.length + 2                                                 #
+
+    define_singleton_method :normalized_action_name do
+      fail 'fix me'
+      @normalized_action_name ||= begin
+        tail = name[ pos .. -1 ]
+        o = tail.split( '::' ).map { |s| pathify[ s ].intern }
+        o
+      end
     end
-    def internalize_params!
-      valid? or return failed(invalid_reason)
-      @internalized_param_keys = (a = [])
-      @params.each { |k, v| a.push(k) ; self.send("#{k}=", v) }
-      @params = nil
-      true
+
+    def normalized_action_name
+      self.class.normalized_action_name                                       #
+    end                                                  # until headless END #
+
+    def wire! # my body is filled with rage
+      yield self
+      self
     end
-    def invoke
-      execute # (maybe one day a slake- (rake-) like pattern)
+
+  protected
+
+    def initialize api
+      @issues = nil
+      @param_h = nil
+      _issue_sub_client_init! api
     end
-    attr_reader :invalid_reason
+
+
+    def absorb_params!
+      res = nil
+      begin
+        attrs = self.class.attributes
+        attrs.each do |k, m|
+          if m.key?( :default ) && ! @param_h.key?( k )
+            @param_h[k] = m[:default]
+          end
+        end
+        missing = attrs.select do |k, m|
+          m[:required] && @param_h[k].nil?
+        end.keys
+        if ! missing.empty?
+          error "missing required parameter#{
+            }#{ 's' if missing.length != 1 }: #{ missing.join ', ' }"
+          break( res = false )
+        end
+        @param_h.each do |k, v|
+          send "#{ k }=", v
+        end
+        @param_h = nil
+        res = true
+      end while nil
+      res
+    end
+
+    def build_event type, data # compat pub-sub
+      API::MyEvent.new type, data do |o|
+        o.inflection = self.class.inflection
+      end
+    end
+
+    def manifest_pathname # #gigo
+      @issues.manifest.pathname
+    end
+
     def issues
-      @issues ||= begin
-        require "#{ROOT}/models/issues"
-        Models::Issues.new(
-          :emitter => self,
-          :manifest => @api.issues_manifest(issues_file_name)
-        )
-      end
-    end
-    def issues_file_name
-      @issues_file_name || ISSUES_FILE_NAME
-    end
-    def build_event type, data
-      ev = Api::MyEvent.new(type, data)
-      ev.minsky_frame = self
-      ev
-    end
-    def valid?
-      _required = self.class.attributes.to_a.select{ |k, v| v[:required] }.map(&:first)
-      if (nope = _required.select{ |k| @params[k].nil? and send(k).nil? }).any?
-        @invalid_reason = "missing required parameter#{'s' if nope.size != 1}: #{nope.join(', ')}"
-        return false
-      end
-      true
+      issues = nil
+      begin
+        break( issues = @issues ) if @issues
+        o = request_client.find_closest_manifest -> msg do
+          error msg
+        end
+        break if ! o
+        issues = Issue::Models::Issue::Collection.new self, o
+        @issues = issues
+      end while nil
+      issues
     end
   end
-
-  # silly fun with inflections, but bad for i18n
-  class << Api::Action
-    def inflected_noun
-      @inflected_noun ||= case verb_stem
-        when 'list' ; noun_stem.plural
-        else        ; noun_stem
-      end
-    end
-    def noun_stem       ;  @noun_stem ||= NounStem[name_pieces[-2]]  end
-    def verb_stem       ;  @verb_stem ||= VerbStem[name_pieces.last] end
-    def name_pieces
-      @name_pieces ||= begin
-        to_s.gsub(/([a-z])([A-Z])/){ "#{$1}-#{$2}" }.downcase.split('::')
-      end
-    end
-  end
-
-  class VerbStem < String
-    class << self   ; alias_method :[], :new end
-    def progressive ; "#{self}ing"           end
-  end
-
-  class NounStem < String
-    class << self   ; alias_method :[], :new end
-    def plural      ; "#{self}s"             end # fine for now
-  end
-
-  class Api::MyEvent < ::Skylab::PubSub::Event
-    attr_accessor :minsky_frame
-    # silly fun
-    def noun
-      @minsky_frame.class.inflected_noun
-    end
-    def verb
-      @minsky_frame.class.verb_stem
-    end
-  end
-
 end
-

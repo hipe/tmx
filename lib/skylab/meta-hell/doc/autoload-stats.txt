@@ -1,0 +1,24 @@
+# - when called from "baz/foo-bar/foo-bar.rb" it assumes the dir is "baz/foo-bar" ("modular directories")
+C x/r/client.rb  R                    # one up
+C sl/test-support/test-support.rb Skylab::TestSupport # double deuce
+C sl/issues/api.rb  SL::Issue::Models # one up and one down (hack for no fs)
+C sl/treemap/api.rb SL::Treemap # one up
+C tm/cli.rb TM::CLI::Actions    # one down
+O Skylab::Interface::System ORDINARY
+O en ORDINARY
+O issues::porcelain is ORDINARY
+O porcelain::bleeding ORDINARY
+O sl::issue::api ORDINARY
+O tan::models::remote ORDINARY
+O tm::api
+O tm::api::action.rb is ORDINARY
+O tm:cli
+O tm:models:node straightforw
+O tree ORDINARY
+S DONE issues::porcelain::todo is STUB (ugly stub file)
+S DONE porcelain::core STUB
+S DONE sl::issue::todo STUB
+S DONE tan::models::config STUB
+S DONE tm::api::actions is STUB
+S DONE tm::api::parse is STUB
+S DONE tm::api::render is a STUB
