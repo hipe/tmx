@@ -35,6 +35,10 @@ module Skylab::Headless
       false
     end
 
+    def desc_lines
+      self.class.desc_lines
+    end
+
     def leaf?                     # (it is important that you leave the impl.
       ! branch?                   # as such -- the compliment of `branch?` --
     end                           # for places that redefine `branch?`)

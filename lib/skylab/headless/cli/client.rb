@@ -1,8 +1,14 @@
 module Skylab::Headless
 
   module CLI::Client
-    extend Autoloader             # (lazy-load files under client/)
+    extend Autoloader                          # (lazy-load files under client/)
   end
+
+
+  module CLI::Client::ModuleMethods            # future-proofing, aesthetics
+    include CLI::Action::ModuleMethods
+  end
+
 
   module CLI::Client::InstanceMethods
     include CLI::Action::InstanceMethods

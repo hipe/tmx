@@ -11,8 +11,13 @@ module Skylab::MyTree
 
 
   class CLI::Client
+    extend Headless::CLI::Client::ModuleMethods    # experimental DSL-like
+
     include Headless::CLI::Client::InstanceMethods # not all clients are boxen
     include Headless::CLI::Box::InstanceMethods    # not all boxen are clients
+
+    desc "inspired by unix builtin `tree`"
+    desc "but adds custom features geared towards development"
 
     def self.action_box_module
       API::Actions

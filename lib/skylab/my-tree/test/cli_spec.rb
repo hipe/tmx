@@ -46,16 +46,26 @@ module Skylab::MyTree::TestSupport
     end
 
 
-    it "1.3 : one opt: -h : 1) usage 2) desc 3) action index 4) custom invite" do
+    it "1.3 : one opt: -h :  1) usage  2) desc  3) opts #{
+      }4) action list  5) custom invite" do
       response = invoke '-h'
       line.should match( usage_rx )
       line.should eql('')
+
+      line.should match( /\Adescription:\z/ )
+      l = line
+      begin
+        l.should match( /\A[[:space:]]{2,}[^[:space:]]/ )
+        l = line
+      end while ( l && '' != l )
+
       line.should match( /\Aoptions:\z/ )
       line.should match( option_summary_first_line_rx )
       loop do
         '' == (l = line) and break
         l.should match( option_summary_first_line_rx )
       end
+
       line.should match( /\Aactions:\z/ )
       line.should match( action_summary_line_rx ) # one or more of these
       loop do

@@ -48,9 +48,11 @@ module Skylab::MyTree
         affix_metadata! :line_count
       end
 
-      o.on('-n', '--dry-run', 'assorted meanings') { self[:dry_run] = true }
+      o.on '-n', '--dry-run', 'assorted meanings. do not use heh.' do
+        self[:dry_run] = true
+      end
 
-      o.on '-m', '--mtime', 'display mtime if ordinary file' do
+      o.on '-m', '--mtime', 'if ordinary file, display humanized mtime' do
         affix_metadata! :mtime
       end
 

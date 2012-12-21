@@ -102,6 +102,8 @@ module Skylab::Headless
         action_class.new self     # ich muss sein
       end
 
+      help_description if desc_lines
+
       if option_parser
         option_parser.summary_width =
           smart_summary_width[ option_parser, action_objects ]

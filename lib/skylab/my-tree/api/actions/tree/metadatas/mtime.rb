@@ -1,9 +1,10 @@
 module Skylab::MyTree
   module API::Actions::Tree::Metadatas
 
-    abbrv = ::Hash.new { |k| "#{ k }s" }
+    abbrv = ::Hash.new { |h, k| "#{ k }s" }
     abbrv[:second] = 'sec'
     abbrv[:minute] = 'min'
+    abbrv[:hour] = 'hrs'
     abbrv[:day] = 'day'
     abbrv[:week] = 'wk'
     abbrv[:month] = 'mon'
