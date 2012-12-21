@@ -60,6 +60,11 @@ module Skylab::Headless
           instance_exec(&@parameters_f)
           @parameters_f = nil
         end
+        if const_defined? :PARAMS, false       # this is an ugly little
+          self::PARAMS.each do |name|          # #experimental shorthand
+            p.fetch!( name ).merge!( accessor: true, required: true )
+          end
+        end
         p
       end
     end

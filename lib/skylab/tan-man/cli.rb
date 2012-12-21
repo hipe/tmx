@@ -5,8 +5,9 @@ Skylab::TanMan::API || nil                     # #preload here, prettier below
 module Skylab::TanMan
 
   module CLI
-    extend Autoloader                          # to autoload files under cli/
-
+    extend MetaHell::Autoloader::Autovivifying::Recursive
+                                  # (we need the above to be so before this file
+                                  # finishes loading!)
     def self.new *a, &b
       CLI::Client.new( *a, &b )
     end
@@ -47,13 +48,7 @@ module Skylab::TanMan
 
     desc "show the status of the config director{y|ies} active at the path."
 
-    def build_option_parser
-      o = TanMan::Services::OptionParser.new
-      help_option o
-      o
-    end
-
-    def invoke path=nil
+    def process path=nil
       path ||= services.file_utils.pwd # at [#021]: services.file_utils.pwd
       events_a = api_invoke path: path
       groups = ::Hash.new { |h, k| h[k] = [] }
@@ -80,14 +75,12 @@ module Skylab::TanMan
 
     desc "create the #{ API.local_conf_dirname } directory"
 
-    def build_option_parser
-      o = TanMan::Services::OptionParser.new
+    option_parser do |o|
       dry_run_option o
       help_option o
-      o
     end
 
-    def invoke path=nil
+    def process path=nil
       api_invoke param_h.merge( path: path,
                                 local_conf_dirname: API.local_conf_dirname )
     end
@@ -107,16 +100,14 @@ module Skylab::TanMan
 
     desc "add the remote."
 
-    def build_option_parser
-      o = TanMan::Services::OptionParser.new
+    option_parser do |o|
       o.on '-g', '--global', 'add it to the global config file.' do
         param_h[:global] = true
       end
       help_option o
-      o
     end
 
-    def invoke name, host
+    def process name, host
       args = param_h.merge( name: name, host: host )
       args[:resource] = args.delete(:global) ? :global : :local
       result = api_invoke args
@@ -131,16 +122,14 @@ module Skylab::TanMan
 
     desc "list the remotes."
 
-    def build_option_parser
-      o = TanMan::Services::OptionParser.new
+    option_parser do |o|
       help_option o
       o.on '-v', '--verbose', 'show more fields.' do
         param_h[:verbose] = true
       end
-      o
     end
 
-    def invoke
+    def process
       result = nil # not false - we never do convention [#hl-109] invite
       begin
         table = api_invoke( param_h ) or break
@@ -167,17 +156,15 @@ module Skylab::TanMan
 
     desc "remove the remote."
 
-    def build_option_parser
-      o = TanMan::Services::OptionParser.new
+    option_parser do |o|
       help_option o
       o.on '-r', '--resource NAME',
         'which config file (e.g. global, local) (default: first found)' do |v|
         param_h[:resource_name] = v
       end
-      o
     end
 
-    def invoke remote_name
+    def process remote_name
       result = api_invoke param_h.merge( remote_name: remote_name )
       result
     end
@@ -197,13 +184,7 @@ module Skylab::TanMan
 
     desc 'selects which (dependency graph) file to edit'
 
-    def build_option_parser
-      o = TanMan::Services::OptionParser.new
-      help_option o
-      o
-    end
-
-    def invoke path
+    def process path
       api_invoke path: path
     end
   end
@@ -214,8 +195,7 @@ module Skylab::TanMan
 
     desc "there's a lot you can tell about a man from his choice of words"
 
-    def build_option_parser
-      o = TanMan::Services::OptionParser.new
+    option_parser do |o|
       dry_run_option o
       o.on '-f', '--force',
         'rewrites the cached treetop parser file (#dev)' do
@@ -223,10 +203,9 @@ module Skylab::TanMan
       end
       help_option o
       verbose_option o
-      o
     end
 
-    def invoke *word
+    def process *word
       api_invoke param_h.merge( words: word )
     end
   end
@@ -237,14 +216,12 @@ module Skylab::TanMan
 
     desc 'checks if the (dependency graph) file exists and can be parsed.'
 
-    def build_option_parser
-      o = TanMan::Services::OptionParser.new
+    option_parser do |o|
       help_option o
       verbose_option o
-      o
     end
 
-    def invoke dotfile=nil
+    def process dotfile=nil
       api_invoke path: dotfile, verbose: param_h[:verbose]
     end
   end
@@ -256,14 +233,12 @@ module Skylab::TanMan
     desc "push any single file anywhere in the world."
     desc "(scp wrapper)"
 
-    def build_option_parser
-      o = TanMan::Services::OptionParser.new
+    option_parser do |o|
       dry_run_option o
       help_option o
-      o
     end
 
-    def invoke remote_name, file
+    def process remote_name, file
       api_invoke param_h.merge( remote_name: remote_name, file_path: file )
     end
   end
@@ -274,18 +249,19 @@ module Skylab::TanMan
 
     desc "what graph example to use? (gets or sets it)"
 
-    def build_option_parser
-      o = TanMan::Services::OptionParser.new
-      help_option o
-      o
-    end
-
-    def invoke name=nil
+    def process name=nil
       if name
         api_invoke [:graph, :example, :set], name: name
       else
         api_invoke [:graph, :example, :get]
       end
     end
+  end
+
+
+
+  class CLI::Actions::Graph::Meaning < CLI::Action::Box
+    desc "associate words with node attributes"
+
   end
 end

@@ -31,15 +31,18 @@ module Skylab::Headless
     end
 
     def dispatch action=nil, *args # `args` (the name) is cosmetic here, careful
+      res = nil
       if action
         klass = fetch action
         if klass
-          klass.new( self ).invoke args
+          o = klass.new( self )
+          res = o.invoke args
         end
       else
         error expecting_string
-        usage_and_invite
+        res = usage_and_invite
       end
+      res
     end
 
     def emit type, *payload       # [#ps-002] this is really asking for it:

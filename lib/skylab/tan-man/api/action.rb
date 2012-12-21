@@ -14,10 +14,10 @@ module Skylab::TanMan
     # they might be just lambdas, or they might be something more.  This
     # pattern may or may not stick around, and is part of [#sl-100]
     #
-    def self.call request_client, params_h, events
+    def self.call request_client, param_h, events
       block_given? and fail 'sanity - no blocks here!'
       action = new request_client, events
-      result = action.set! params_h
+      result = action.set! param_h
       if result                        # we violate the protected nature of
         result = action.send :execute  # it only b/c we are the class!
       end                              # it is protected for the usual reasons
