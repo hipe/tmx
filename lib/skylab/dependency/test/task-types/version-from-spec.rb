@@ -1,12 +1,11 @@
-require File.expand_path('../support', __FILE__)
-require 'skylab/dependency/task-types/version-from'
+require_relative 'test-support'
 
 module Skylab::Dependency::TestSupport
-  include ::Skylab::Dependency
+
   describe TaskTypes::VersionFrom do
-    module_eval &DESCRIBE_BLOCK_COMMON_SETUP
+    extend Dependency_TestSupport
     let(:klass) { TaskTypes::VersionFrom }
-    let(:log) { StringIO.new }
+    let(:log) { Dependency::Services::StringIO.new }
     let(:must_be_in_range) { nil }
     let(:parse_with) { '/(\d+\.\d+\.\d+)/' }
     let(:version_from) { 'echo "version 1.2.34 is the version"' }
@@ -17,8 +16,8 @@ module Skylab::Dependency::TestSupport
         :version_from => version_from
       ) do |t|
         t.on_all do |e|
-          $debug and puts(e)
-          log.puts unstylize(e.to_s)
+          self.debug and $stderr.puts [e.type, e.message].inspect
+          log.puts e.to_s
         end
       end
     end
@@ -67,14 +66,14 @@ module Skylab::Dependency::TestSupport
       context "when the regex matches" do
         context "and the version matches" do
           let(:version_from) { 'echo "ver 1.2.1"' }
-          it "says that it matches" do
+          it "says that it matches", wip:true do
             subject.invoke(context).should eql(true)
             log.to_s.include?('version 1.2.1 is in range 1.2+').should eql(true)
           end
         end
-        context "and the version does not match"  do
+        context "and the version does not match" do
           let(:version_from) { 'echo "version 0.0.1"' }
-          it "says that is doensn't match" do
+          it "says that is doesn't match", wip:true do
             subject.invoke(context).should eql(false)
             log.to_s.include?('version mismatch: needed 1.2+ had 0.0.1').should eql(true)
           end
@@ -82,7 +81,7 @@ module Skylab::Dependency::TestSupport
       end
       context "when the regex does not match" do
         let(:version_from) { 'echo "version A.B.C"' }
-        it "reports a failure" do
+        it "reports a failure", wip:true do
           subject.invoke(context).should eql(false)
           log.to_s.include?('needed 1.2+ had version A.B.C').should eql(true)
         end

@@ -2,7 +2,6 @@ require_relative 'core'
 require 'optparse'
 require 'stringio'
 require 'strscan'
-require File.expand_path('../tite-color', __FILE__)
 require 'skylab/pub-sub/emitter'
 
 # @todo this should either be renamed "dsl" or moved into the toplevel porcelain.rb
@@ -417,10 +416,15 @@ module Skylab::Porcelain
       end
     end
     def build_parser context, option_parser = nil
-      option_parser ||= OptionParser.new.tap do |op|
+      if ! option_parser
+        op = ::OptionParser.new
         op.base.long['help'] = ::OptionParser::Switch::NoArgument.new do
           throw :option_action, ->(frame, action) { frame.client_instance.help(action) ; nil }
         end
+
+        op.banner = ''            # without this you hiccup 2 usages, the latter
+                                  # being an unstylied one from o.p
+        option_parser = op
       end
       each { |b| option_parser.instance_exec(context, &b) }
       option_parser
@@ -611,7 +615,7 @@ module Skylab::Porcelain
   end
 
   module Styles
-    include TiteColor
+    include Headless::CLI::Stylize::Methods
     extend self
     def e13b str   ; stylize str, :green          end
     def header str ; stylize str, :strong, :green end
@@ -900,7 +904,11 @@ module Skylab::Porcelain
     end
     # @todo during:#100.200 for_run <=> build_client_instance
     def for_run ui, slug # compat
-      @external_module.porcelain.build_client_instance(ui, slug)
+      if @external_module.respond_to?(:porcelain)
+        @external_module.porcelain.build_client_instance(ui, slug)
+      else
+        @external_module.new(out: ui.out, err: ui.err, program_name: slug)
+      end
     end
     def inflate!
       singleton_class.class_eval(&@block)
@@ -932,7 +940,9 @@ module Skylab::Porcelain
       super(params, & nil) # explicitly avoid bubbling up the block
       case @mode
       when :external
-        mod.porcelain.aliases and aliases(* mod.porcelain.aliases)
+        if mod.respond_to?(:porcelain)
+          mod.porcelain.aliases and aliases(* mod.porcelain.aliases)
+        end
       when :inline
         class << self
           # we want all this on the sing. class because this object is not a subclass but an instance
@@ -974,10 +984,15 @@ module Skylab::Porcelain
     end
     def summary
       case @mode
-      when :external    ;  @external_module.porcelain.summary
+      when :external
+        if @external_module.respond_to?(:porcelain)
+          @external_module.porcelain.summary
+        else
+          a = @external_module.command_tree.map(&:name) # watch the world burn
+          ["child commandz: {#{a.join('|')}}"]
+        end
       else              ;  fail("implement me")
       end
     end
   end
 end
-

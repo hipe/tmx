@@ -1,6 +1,6 @@
 require 'optparse'
 
-# an ultralight command-line parser (430 lines)
+# an ultralight command-line parser
 # that wraps around OptParse (can do anything it does)
 # with colors
 # with flexible command-like options ('officious' like -v, -h)
@@ -9,8 +9,11 @@ require 'optparse'
 # with default commands within those namespaces
 # with aliases for commands and namespaces
 
-module Skylab; end
-module Skylab::Face; end
+module Skylab
+  module Face
+    # forward declarations that normally wouldn't go here
+  end
+end
 
 module Skylab::Face::Colors
   extend self
@@ -157,7 +160,7 @@ module Skylab::Face
         end
       end
       def default_action *a
-        a.any? ? (@default_action = (a*'').to_sym) : @default_action
+        a.any? ? (@default_action = (a*'').to_sym) : (@default_action ||= nil)
       end
       # this is nutty: for classes that extend this module, this is
       # something that is triggered when they are subclasses
@@ -449,4 +452,3 @@ class Skylab::Face::Cli
     end
   end
 end
-

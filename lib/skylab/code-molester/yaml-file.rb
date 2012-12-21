@@ -1,9 +1,4 @@
-require 'psych'
-require 'yaml'
-require File.expand_path('../../face/path-tools', __FILE__)
-module Skylab; end
-
-module Skylab::CodeMolester
+module ::Skylab::CodeMolester
   module Yaml
     class Node
       def initialize
@@ -11,8 +6,9 @@ module Skylab::CodeMolester
       # because of some facepalming decisions of how yaml trees are represented in psych, this.
       # this has some facepalming vulnerabilities of its own
       def init_from_psych_tree psych
-        psych.kind_of?(Psych::Nodes::Mapping) or
-          fail("needed Psych::Nodes::Mapping, had: #{psych.class}")
+        if ! psych.kind_of? CodeMolester::Services::Psych::Nodes::Mapping
+          fail "needed Psych::Nodes::Mapping, had: #{ psych.class }"
+        end
         tree? or _change_to_tree!
         key = nil
         i = -1 ; length = psych.children.length ; while (i+=1) < length
@@ -129,9 +125,9 @@ module Skylab::CodeMolester
 
   class YamlFile < Yaml::Node
     def initialize path
-      @path = path
-      if File.exist?(@path)
-        parsed = YAML.parse(File.read(@path))
+      @pathname = ::Pathname.new path.to_s
+      if pathname.exist?
+        parsed = CodeMolester::Services::YAML.parse pathname.read
         if false == parsed # empty file, special case
           # nothing for now
         else
@@ -139,12 +135,9 @@ module Skylab::CodeMolester
         end
       end
     end
-    attr_reader :path
+    attr_reader :pathname
     def exists?
-      File.exist?(@path)
-    end
-    def pretty_path
-      Skylab::Face::PathTools.pretty_path(@path)
+      pathname.exist?
     end
     def write
       bytes = nil
@@ -152,7 +145,7 @@ module Skylab::CodeMolester
       len = str.length
       len == 0 and return 0 # don't create empty files (for now)
       str =~ /\n\Z/ or str = "#{str}\n" # add newline to end of file if necessary
-      File.open(@path, 'w+') do |fh|
+      pathname.open 'w+' do |fh|
         fh.write str
         bytes = len
       end

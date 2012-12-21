@@ -8,7 +8,7 @@ module Skylab::Treemap
     Bleeding = Skylab::Porcelain::Bleeding
 
     extend Skylab::Autoloader
-    extend Bleeding::DelegatesTo
+    extend ::Skylab::MetaHell::DelegatesTo # #while [#003]
     extend Skylab::PubSub::Emitter
 
     emits Bleeding::EVENT_GRAPH
@@ -67,7 +67,7 @@ module Skylab::Treemap
 
   class CLI::Action
     extend CLI::Bleeding::Action
-    extend CLI::Bleeding::DelegatesTo
+    extend ::Skylab::MetaHell::DelegatesTo # #while [#003]
     delegates_to :runtime, :api
     def wire
       @wire ||= ->(action) { wire_action(action) }

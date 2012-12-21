@@ -1,5 +1,3 @@
-module Skylab; end
-
 module Skylab::Dependency
   class VersionRange
     class << self
@@ -56,4 +54,3 @@ module Skylab::Dependency
     end
   end
 end
-

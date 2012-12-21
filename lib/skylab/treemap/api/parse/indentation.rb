@@ -2,7 +2,7 @@ module Skylab::Treemap
   class API::Parse::Indentation
     extend Skylab::PubSub::Emitter
     emits parse_error: :all
-    extend DelegatesTo
+    extend ::Skylab::MetaHell::DelegatesTo # #while [#003]
     delegates_to :stylus, :pre
 
     def self.invoke(*a, &b)

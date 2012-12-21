@@ -1,4 +1,4 @@
-require_relative '../../test-support/test-support'
+require_relative '../../test-support/core'
 
 require_relative '../cli' # as the entrypoint for this module @todo-in-module
 
@@ -6,7 +6,8 @@ module Skylab::Treemap
   module TestSupport
     [:out, :err].each do |m| # def out_string; err_string
       define_method("#{m}_string") do
-        Skylab::Porcelain::TiteColor.unstylize send("#{m}_stream").string
+        str = send("#{m}_stream").string
+        Headless::CLI::Pen::FUN.unstylize[ str ]
       end
     end
     def build_stream_spy
