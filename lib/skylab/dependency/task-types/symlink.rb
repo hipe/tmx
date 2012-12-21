@@ -1,7 +1,5 @@
-require File.expand_path('../../task', __FILE__)
-
 module Skylab::Dependency
-  class TaskTypes::Symlink < Task
+  class TaskTypes::Symlink < Dependency::Task
     attribute :symlink
     attribute :target
     def slake
@@ -13,13 +11,13 @@ module Skylab::Dependency
       success
     end
     def check
-      lstat = File.lstat(symlink) rescue Errno::ENOENT
-      if lstat == Errno::ENOENT
+      lstat = ::File.lstat(symlink) rescue ::Errno::ENOENT
+      if lstat == ::Errno::ENOENT
         _info "Symbolic link does not exist: #{symlink}"
         false
       elsif lstat.symlink?
-        tgt = File.readlink(symlink)
-        if File.exist?(tgt)
+        tgt = ::File.readlink(symlink)
+        if ::File.exist?(tgt)
           if tgt == target
             _info "link ok: #{symlink} -> #{tgt}"
             true
@@ -40,9 +38,9 @@ module Skylab::Dependency
       end
     end
     def execute
-      if File.exist?(target)
-        if File.exist?(symlink)
-          if File.lstat(symlink).symlink?
+      if ::File.exist?(target)
+        if ::File.exist?(symlink)
+          if ::File.lstat(symlink).symlink?
             [false, true] # later for checking
           else
             _info "File exists but is not symlink: #{symlink}"
@@ -53,7 +51,7 @@ module Skylab::Dependency
           if dry_run?
             optimistic_dry_run? or _pretending "success from above"
             [false, true]
-          elsif 0 == (r = File.symlink(target, symlink))
+          elsif 0 == (r = ::File.symlink(target, symlink))
             [false, true]
           else
             _info "Unexpected status from symlink command: #{r.inspect}"
@@ -66,4 +64,3 @@ module Skylab::Dependency
     end
   end
 end
-

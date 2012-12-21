@@ -1,0 +1,35 @@
+module Skylab::TanMan::TestSupport::Sexp::Grammars::Namespace60
+  grammar NerpZerp60
+    rule document
+      # interestingly the below custom methods won't take if we have
+      # comment_list as the first rule. #todo find out what it is about
+      # the rule that makes it so.
+      comment_list
+      {
+        def tree
+          ::Skylab::TanMan::Sexp::Auto::Lossless::Recursive[ self ]
+        end
+      }
+    end
+    rule comment_list
+      (comment tail:(white? comment_list)?)?
+    end
+    rule white
+      [ \t\n\r]+
+    end
+    rule comment
+      c_style_comment / shell_style_comment
+    end
+    rule c_style_comment
+      '/*'
+      content_text_value:(
+        !'*/'
+        ( . / [\n\r]+ )
+      )*
+      '*/'
+    end
+    rule shell_style_comment
+      '#' content_text_value:( ![\n\r] . )*
+    end
+  end
+end

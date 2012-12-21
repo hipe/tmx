@@ -1,18 +1,14 @@
-require 'json'
-require File.expand_path('../../face/path-tools', __FILE__)
-
-module Skylab; end
-
-module Skylab::CodeMolester
+module ::Skylab::CodeMolester
   class JsonFile
     def initialize path
       @path = path
-      if File.exist?(@path)
+      if ::File.exist? @path
         _data = nil
         begin
-          _data = JSON.parse(File.read(@path))
+          s = ::File.read @path
+          _data = CodeMolester::Services::JSON.parse s
           @data = _data
-        rescue JSON::ParserError => e
+        rescue ::JSON::ParserError => e
           @last_parser_error = e
         end
       else
@@ -25,10 +21,7 @@ module Skylab::CodeMolester
       @data
     end
     def exists?
-      File.exist?(@path)
-    end
-    def pretty_path
-      Skylab::Face::PathTools.pretty_path(@path)
+      ::File.exist? @path
     end
     def write
       bytes = nil
@@ -36,7 +29,7 @@ module Skylab::CodeMolester
       len = str.length
       len == 0 and return 0 # don't create empty files (for now)
       str =~ /\n\Z/ or str = "#{str}\n" # add newline to end of file if necessary
-      File.open(@path, 'w+') do |fh|
+      ::File.open(@path, 'w+') do |fh|
         fh.write str
         bytes = len
       end

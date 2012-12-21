@@ -1,5 +1,4 @@
+#include <ncurses.h>
 #include "common.h"
-#include "ncurses.h"
 
-void hipe_nkurses_blah(char *);
-bool hipe_nkurses_init(void);
+bool hipe_ncurses_session(hipe_runner*);

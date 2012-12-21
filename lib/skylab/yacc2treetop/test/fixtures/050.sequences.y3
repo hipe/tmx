@@ -1,0 +1,8 @@
+/*
+who hah yah yah
+yah yah
+*/
+
+selectors_group
+  : selector [ COMMA S* selector ]*
+  ;

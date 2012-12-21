@@ -1,0 +1,57 @@
+# created by tan-man on 2012-12-20 16:03:06 UTC
+
+digraph {
+
+/*
+  example stmt_list:
+    foo -> bar
+    biff -> baz
+
+  example node_stmt:
+    learn_c [label="learn C somehow"]
+*/
+
+label="dependeny graph of the skylab universe (subproducts)"
+
+node [label="\N", style="filled", fillcolor="#b5d5fb", fontname="Futura", penwidth="1.1566", shape="Mrecord"]
+
+# finished green : fillcolor="#79f233"
+
+
+code [label="code molester" fillcolor="#79f233"]
+cov [label="cov tree" fillcolor="#79f233"]
+dependency [label=dependency fillcolor="#79f233"]
+face [label=face fillcolor="#79f233"]
+file [label="file metrics" fillcolor="#79f233"]
+file_2 [label="file services" fillcolor="#79f233"]
+git [label="git viz" fillcolor="#79f233"]
+guardfile [label=guardfile fillcolor="#79f233"]
+headless [label=headless fillcolor="#79f233"]
+meta [label="meta hell" fillcolor="#79f233"]
+porcelain [label=porcelain fillcolor="#79f233"]
+pub [label="pub sub" fillcolor="#79f233"]
+skylab [label="skylab" fillcolor="#79f233"]
+slake [label=slake fillcolor="#79f233"]
+test [label="test support" fillcolor="#79f233"]
+tmx [label=tmx fillcolor="#79f233"]
+treemap [label=treemap]
+code -> headless
+
+code -> meta
+code -> pub
+cov -> meta
+cov -> porcelain
+cov -> pub
+cov -> guardfile
+dependency -> code
+dependency -> face
+dependency -> headless
+dependency -> porcelain
+dependency -> pub
+dependency -> slake
+headless -> file_2
+porcelain -> headless
+test -> headless
+test -> meta
+treemap -> meta
+}

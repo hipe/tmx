@@ -11,7 +11,7 @@ module Skylab::FileMetrics
   end
 
   module API::CommonInstanceMethods
-    include Common::PathTools
+    include Common::PathTools::InstanceMethods
 
     def initialize *a
       @ui, @req = a

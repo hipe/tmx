@@ -13,7 +13,7 @@ module Skylab::Treemap
       out_string.scan(/^ +treemap\b/).size.should eql(1)
     end
 
-    context "of the actions that it lists in the help screen, it" do
+    context "of the actions that it lists in the help screen, it", wip:true do
       let(:names) do
         tmx_cli.run(['treema', '-h'])
         scn = StringScanner.new(err_string)

@@ -5,7 +5,6 @@ module Skylab::Porcelain::Bleeding
     ambiguous:            :error,
     not_found:            :error,
     not_provided:         :error,
-    optparse_parse_error: :error,
     syntax_error:         :error
   }
 end

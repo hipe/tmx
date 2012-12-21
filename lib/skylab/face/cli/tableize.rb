@@ -1,42 +1,31 @@
-# this file *must* operate standalone, independent of the rest of the system
-# (It is used in reporting of specs.  Avoid cyclic dependencies.)
+module Skylab::Face::CLI
 
-module Skylab
-  module Face
-    class Cli
-    end
-  end
-end
-
-class Skylab::Face::Cli
   module Tableize
-    extend self
-    def tableize rows, out, opts = {}
+    # empty
+  end
+
+
+  module Tableize::InstanceMethods
+    def tableize rows, opts = {}, &line_f
+      opts = { show_header: true }.merge(opts)
       keys_order = []
-      max_width = Hash.new { |h, k| keys_order.push(k); h[k] = 0; }
-      row_keys = nil # for now
+      max_h = ::Hash.new { |h, k| keys_order.push(k) ; h[k] = 0 }
       rows.each do |row|
-        (row_keys || row.keys).each do |key|
-          row[key].to_s.length > max_width[key] and max_width[key] = row[key].to_s.length
-        end
+        row.each { |k, v| (l = v.to_s.length) > max_h[k] and max_h[k] = l }
       end
-      if (opts.key?(:show_header) ? opts[:show_header] : true)
-        label = lambda do |k|
-          _label = k.to_s.sub('_', ' ').capitalize
-          max_width[k] < _label.length and max_width[k] = _label.length
-          _label
+      if opts[:show_header]
+        label_f = ->(k) do
+          l = k.to_s.gsub('_', ' ').capitalize
+          l.length > max_h[k] and max_h[k] = l.length
+          l
         end
-        header_row = Hash[ * keys_order.map{ |k| [ k, label[k] ] }.flatten ]
-        use_rows = [header_row] + rows
-      else
-        use_rows = rows
+        rows = [::Hash[ keys_order.map{ |k| [ k, label_f[k] ] } ]] + rows.to_a
       end
-      left = '| '; sep = '  |  '; right = ' |'
-      use_rows.each do |row|
-        cels = keys_order.map do |key|
-          "%#{max_width[key]}s" % row[key].to_s
-        end
-        out.puts "#{left}#{cels.join(sep)}#{right}"
+      left = '| ' ; sep = '  |  ' ; right = ' |'
+      rows.each do |row|
+        line_f.call("#{left}#{
+          keys_order.map{ |k| "%#{max_h[k]}s" % row[k].to_s }.join(sep)
+        }#{right}")
       end
       nil
     end
