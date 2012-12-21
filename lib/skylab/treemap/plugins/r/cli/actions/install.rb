@@ -2,7 +2,7 @@ module Skylab::Treemap::Plugins::R
   class CLI::Actions::Install < Skylab::Treemap::CLI::Action
     desc "for installing R"
 
-    option_syntax.help_enabled = true
+    option_syntax.help!
 
     URL_BASE = 'http://cran.stat.ucla.edu/'
     def execute
@@ -10,4 +10,3 @@ module Skylab::Treemap::Plugins::R
     end
   end
 end
-

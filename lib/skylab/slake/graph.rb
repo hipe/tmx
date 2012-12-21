@@ -1,15 +1,8 @@
-require 'rake'
-  # as an implementation detail we chose to use rspec to manage parts of the graph, experimentally
-
-module Skylab ; end
+require 'rake' # for fun and as an implementation detail we use it
 
 module Skylab::Slake
-
-  root = File.expand_path('..', __FILE__)
-  require "#{root}/parenthood"
-
   class Graph
-    include Parenthood
+    include Slake::Parenthood
     include ::Rake::TaskManager
     def []=(name, task)
       name = name.to_s
@@ -66,4 +59,3 @@ module Skylab::Slake
     end
   end
 end
-

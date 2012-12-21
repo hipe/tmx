@@ -7,11 +7,10 @@ require 'singleton'
 module Skylab::Treemap
   Treemap = self
   extend Skylab::Autoloader
-  DelegatesTo = Skylab::Porcelain::Bleeding::DelegatesTo
 
   module API
     extend Skylab::MetaHell::Autoloader::Autovivifying
-    PLUGINS_DIR = dir.dirname.join('plugins')
+    PLUGINS_DIR = dir_pathname.dirname.join('plugins')
   end
 
   class API::Client

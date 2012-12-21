@@ -1,0 +1,49 @@
+require_relative 'my-test-support'
+
+module Skylab::Flex2Treetop::MyTestSupport
+
+  describe Skylab::Flex2Treetop do
+    extend API::ModuleMethods ; include API::InstanceMethods # kept for poster.
+
+    context "has an API that" do
+      context "1.1 : when you request a nonexistent action" do
+        it "raises a runtime error" do
+          api_client = self.api_client
+          promise = api_client.invoke :wiggle
+          -> { promise.__result__ }.should raise_error(
+            Flex2Treetop::API::RuntimeError, /cannot wiggle/i )
+        end
+      end
+
+
+      context "1.2 : when you request the 'version' action" do
+        it "returns the version string" do
+          promise = Flex2Treetop::API.invoke :version
+          promise.should be_kind_of( ::String )
+          promise.should match( /\A[ 0-9a-z]+ \d+(?:\.\d+)*\z/i )
+        end
+      end
+
+
+      context "when you request the 'translate' action" do
+
+        context "2.2 : with good parameters" do
+          before { tmpdir.prepare }
+          let(:outfile) { tmpdir.join('out.rb') }
+
+          it "it makes that badboy!", f:true do
+            result = api_client.invoke( :translate,
+              flexfile: fixture(:mini),
+              outfile: outfile )
+            result.should eql(:translated)
+            info.reverse!.pop.should match(
+              /creating.+out\.rb with.+mini\.flex/ )
+            info.pop.should match( /can't deduce a.+rule/i )
+          end
+        end
+      end
+    end
+
+    let( :info ) { info_stream_lines }
+  end
+end

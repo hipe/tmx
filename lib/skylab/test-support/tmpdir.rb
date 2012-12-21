@@ -1,97 +1,186 @@
-require 'open3'
-require 'stringio'
-require File.expand_path('../test-support', __FILE__)
-require 'skylab/face/core'
+# (predecessor to this line was poster-child beautification candidate [#bs-011])
 
 module Skylab::TestSupport
-  class Tmpdir < ::Skylab::Face::MyPathname
-    include FileUtils
-    def copy pathname, destination_basename = nil
-      source = ::Skylab::Face::MyPathname.new(pathname.to_s)
-      destination = join(destination_basename || source.basename)
-      cp source.to_s, destination.to_s, verbose: @verbose, noop: @noop
+
+  class Tmpdir < ::Pathname
+    include TestSupport_::Services::FileUtils
+
+    def clear                    # sugar around `prepare` that results in self.
+      prepare                    # does a `rm -rf` on the temmpdir, creates!
+      self
     end
-    def emit type, msg
-      $stderr.puts msg
+
+    def copy pathname, dest_basename = nil
+      source = ::Pathname.new pathname.to_s
+      dest = join( dest_basename || source.basename ) # where to? (basename)
+      cp source.to_s, dest.to_s, noop: noop, verbose: verbose
+      nil # result is undefined for now -- we might turn it into etc
     end
-    def fu_output_message msg
-      emit :info, msg
+
+    def debug!                    # this compats with our convention org-wide
+      @verbose = true             # this compats with the file utils convention
     end
-    def initialize path, opts=nil
-      super path
-      @verbose = false
-      @noop = false # no setter for now! b/c it introduces some issues
-      opts and opts.each { |k, v| send("#{k}=", v) }
-    end
-    alias_method :fileutils_mkdir, :mkdir # the name 'fu_mkdir' is already used by FileUtils!
+
+    alias_method :tmpdir_original_mkdir, :mkdir
+
     # experimental example interface
     def mkdir path_end, opts=nil
-      my_opts = { noop: @noop, verbose: @verbose }
-      opts and my_opts.merge(opts)
-      fileutils_mkdir(join(path_end), my_opts)
+      use_opts = { noop: noop, verbose: verbose }
+      use_opts.merge!( opts ) if opts
+      use_path = join( path_end ).to_s
+      tmpdir_original_mkdir use_path, use_opts
+      nil # result is undefined for now -- we might turn it into etc
     end
+
     def patch str
-      cd(to_s) do
-        Open3.popen3('patch -p1') do |sin, sout, serr|
+      result = nil
+      cd to_s, verbose: verbose do
+        cmd_head = 'patch -p1'
+        # verbose and info( "#{ cmd_head } < -" )
+        TestSupport_::Services::Open3.popen3( cmd_head ) do |sin, sout, serr, w|
           sin.write str
           sin.close
-          "" != (s = serr.read) and raise("patch failed(?): #{s.inspect}")
-          if @verbose
+          s = serr.read
+          if '' != s
+            raise "patch failed(?): #{ s.inspect }"
+          end
+          if verbose
             while s = sout.gets
-              emit :info, s.strip
+              info s.strip
             end
           end
+          result = w.value # exit_status
         end
       end
+      result
     end
-    alias_method :fileutils_touch, :touch
+
+    safety_rx = %r{ / (?: tmp | T ) (?: / | \z ) }x # IMPORTANT
+
+    define_method :prepare do
+      result = nil
+      sanity = -> path do         # IMPORTANT - try to avoid `rm -rf` any paths
+        if safety_rx !~ path.to_s # except those under a /tmp/ or /T/ dir
+          raise ::SecurityError.exception "unsafe tmpdir name - #{ path }"
+        end
+      end
+      if exist?                   # if this pathname exists
+        if ! directory?
+          raise ::Errno::ENOTDIR.exception to_s
+        end
+        sanity[ self ]            # IMPORTANT
+        if ::Dir[join '*'].any?   # are there any files in it?
+          verbose and fu_output_message "rm -rf #{ to_s }"
+          remove_entry_secure to_s # GULP
+          result = tmpdir_original_mkdir to_s, noop: noop, verbose: verbose
+        else
+          verbose and fu_output_message "(already empty: #{ to_s })"
+          result = nil
+        end
+      else
+        stack = []
+        pop = -> do
+          currnt = self
+          -> do
+            if ! currnt.root? && '.' != currnt.to_s
+              s = currnt.basename.to_s
+              stack.push s
+              currnt = currnt.dirname
+            end
+          end
+        end.call
+        0 < max_mkdirs or fail "max_mkdirs must be at least 1."
+        current = self
+        max_mkdirs.times do
+          x = pop[ ] or break
+          current = x
+        end
+        if ! current.exist?
+          raise ::SecurityError.exception(
+            "won't make more than #{max_mkdirs} dirs - #{current} must exist" )
+        end                                    # so current exists,
+        while ! stack.empty?
+          peek = current.join stack.last
+          peek.exist? or break
+          stack.pop
+          current = peek
+        end                                    # and now current still exists.
+        sanity[ current ]                      # be sure this is a /tmp/
+        result = mkdir_p to_s, noop: noop, verbose: verbose
+      end
+      result
+    end
+
+    alias_method :tmpdir_original_touch, :touch
+
     def touch file
-      fileutils_touch(join(file), :verbose => @verbose, :noop => @noop)
+      use_path = join( file ).to_s
+      tmpdir_original_touch use_path, noop: noop, verbose: verbose
+      nil # result is undefined -- we might etc
     end
+
     def touch_r files
       files.each do |file|
         dest_file = dest_dir = nil
-        dest_path = join(file)
+        dest_path = join file
         if %r{/\z} =~ dest_path.to_s
           dest_dir = dest_path
         else
           dest_dir = dest_path.dirname
           dest_file = dest_path
         end
-        dest_dir.exist? or  mkdir_p(dest_dir, :verbose => @verbose, :noop => @noop)
-        dest_file and fileutils_touch(dest_file, :verbose => @verbose, :noop => @noop)
+        if ! dest_dir.exist?
+          mkdir_p dest_dir, noop: noop, verbose: verbose
+        end
+        if dest_file
+          tmpdir_original_touch dest_file, noop: noop, verbose: verbose
+        end
       end
-      self
+      nil
     end
-    def prepare
-      %r{(?:^|/)tmp(?:/|$)} =~ to_s or return fail("we are being extra cautious")
-      if exist?
-        remove_entry_secure(to_s)
-      elsif ! dirname.exist?
-        mkdir_p dirname, :verbose => @verbose, :noop => @noop
+
+  protected
+
+    o = ::Struct.new( :infostream, :max_mkdirs, :noop, :path, :verbose ).new
+    o[:infostream] = $stderr
+    o[:max_mkdirs] = 1
+    o[:noop] = false
+    o[:verbose] = false
+
+    # [path] [opts]
+    define_method :initialize do |*args|
+      x = o.dup
+      if ::Hash === args.last
+        args.pop.each { |k, v| x[k] = v }
       end
-      fileutils_mkdir to_s
-      self
+      if ::String === args.last or ::Pathname === args.last # ack
+        x[:path] = args.pop
+      end
+      args.empty? or raise ::ArgumentError.exception "no"
+      if ! x[:path]
+        x[:path] = TestSupport_::Services::Tmpdir.tmpdir
+      end
+      @infostream = x[:infostream]
+      @max_mkdirs = x[:max_mkdirs]
+      @noop = x[:noop]
+      @verbose = x[:verbose]
+      super x[:path]
     end
-    attr_accessor :verbose
-    def verbose!
-      tap { |o| o.verbose = true }
+
+    def fu_output_message msg
+      info msg
     end
+
+    def info msg
+      infostream.puts msg
+    end
+
+    attr_reader :infostream # make it writable whenever
+
+    attr_reader :max_mkdirs
+
+    attr_reader :noop
+
+    attr_reader :verbose
   end
 end
-
-module Skylab
-  class << TestSupport
-    def tmpdir path, requisite_level
-      requisite_level >= 1 or raise("requisite level must always be one or above")
-      pn = Pathname.new(path)
-      re = Regexp.new("\\A#{requisite_level.times.map{ |_| '[^/]+' }.join('/')}")
-      md = re.match(pn.to_s) or raise("hack failed: #{re} =~ #{pn.to_s.inspect}")
-      if ! File.exist?(md[0])
-        raise("prerequisite folder for tempdir must exist: #{md[0]}")
-      end
-      TestSupport::Tmpdir.new(path)
-    end
-  end
-end
-

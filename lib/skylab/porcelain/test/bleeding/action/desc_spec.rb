@@ -1,14 +1,15 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
-module Skylab::Porcelain::Bleeding::TestSupport
-  describe "desc, an inheritable attribute of #{Bleeding::ActionModuleMethods}" do
-    extend ModuleMethods ; include InstanceMethods
-    base_module!
-    klass(:Base) do
-      extend Bleeding::ActionModuleMethods
+module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
+  describe "desc, an inheritable attribute of #{ Bleeding::Action }" do
+    extend Action_TestSupport
+
+    incrementing_anchor_module!
+    klass :Base do
+      extend Bleeding::Action
     end
     let(:base) { send(:Base) }
-    context "All classes that extend ActionModuleMethods have a desc that by default" do
+    context "All classes that extend Action have a desc that by default" do
       let(:subject) { base.desc }
       specify { should eql([]) }
       it("have a consistent oid") { base.desc.object_id.should eql(base.desc.object_id) }
@@ -27,7 +28,7 @@ module Skylab::Porcelain::Bleeding::TestSupport
       base.desc.object_id.should eql(oid)
     end
     context "When you have a child class of a base class with a desc" do
-      klass(:Child, extends: :Base) ; let(:child) { send(:Child) }
+      klass( :Child, extends: :Base ) ; let( :child ) { send(:Child) }
       before(:each) do
         base.desc 'foo', 'bar'
       end
@@ -49,18 +50,20 @@ module Skylab::Porcelain::Bleeding::TestSupport
         base.desc.should eql(['foo', 'bar'])
       end
     end
+    Bleeding = Bleeding # #annoying
+    Event_Simplified = Event_Simplified # #annoying
     context "(bugfix: be sure that flyweighting doesn't interfere)" do
       let(:emit_spy) { ::Skylab::TestSupport::EmitSpy.new }
-      klass(:CLI, extends: Bleeding::Runtime) do
+      klass :CLI, extends: Bleeding::Runtime do
         def initialize rt
           @rt = rt
         end
         def emit(t, s)
-          @rt.emit(SimplifiedEvent.new(t, unstylize(s)))
+          @rt.emit(Event_Simplified.new(t, unstylize(s)))
         end
         module self::Actions ; end
         class self::Action
-          extend Bleeding::ActionModuleMethods
+          extend Bleeding::Action
         end
         class self::Actions::Ferp < self::Action
           desc "wing"

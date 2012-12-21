@@ -1,9 +1,7 @@
-require 'skylab/code-molester/config/file'
+require 'skylab/code-molester/core'
 
 
 module Skylab::Tmx
-  module Model
-  end
   class Model::Config < ::Skylab::CodeMolester::Config::File
     PATH = '~/.tmxconfig'
   end
@@ -13,4 +11,3 @@ module Skylab::Tmx
     end
   end
 end
-
