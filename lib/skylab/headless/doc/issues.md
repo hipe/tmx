@@ -1,7 +1,9 @@
-[#034]      #tracking-tag for #function-point `program_name` -
+[#036]       #behavior-point `par`, `parameter_label` etc -- gather it up
+[#035]       #doc-point : the boxxy cluttered namespace problem
+[#034]       #tracking-tag for #function-point `program_name` -
               `normalized_invocation_string`
-[#033]      #function-point #tracking-tag `desc`
-[#032]      #open #low-priority do we care about our call-stack height for cli?
+[#033]       #function-point #tracking-tag `desc`
+[#032]       #open #low-priority do we care about our call-stack height for cli?
 [#031]       #done a petition to get escape_path pushed up here
 [#030]       #done the raw dog experiment
 [#029] #open `stylize` as any of two of these happen: [#gs-004] [#bn-005]

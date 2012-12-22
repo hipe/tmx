@@ -1,4 +1,4 @@
-module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
+module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods # [#sl-123] exempt
 
   module Graph
     include Common
@@ -68,6 +68,25 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
     def _first_label_stmt
       stmt_list.stmts.detect do |s|
         :equals_stmt == s.class.rule && 'label' == s.lhs.normalized_string
+      end
+    end
+
+
+    comment_rx = Comment::MATCH_RX
+
+    define_method :comment_nodes do
+      ::Enumerator.new do |y|
+        space = -> str do
+          if comment_rx =~ str
+            y << str
+          end
+        end
+        [e0, e4, e6].each(& space)
+        stmt_list._nodes.each do |node|
+          space[ node.e2 ]
+          space[ node.tail.stmt_separator ] if node.tail
+        end
+        [e8, e10].each(& space)
       end
     end
 

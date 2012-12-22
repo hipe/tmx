@@ -59,6 +59,14 @@ module Skylab::TanMan
       request_client.send :infostream
     end
 
+    def lbl str                   # render the label for a business name
+      pen.lbl str
+    end
+
+    def par sym                   # modality-specific [#hl-036] parameter
+      pen.par sym                 # rendering
+    end
+
     def parent # adapt to bleeding for now [#018]
       request_client
     end
@@ -70,6 +78,10 @@ module Skylab::TanMan
     def skip msg
       emit :skip, msg
       nil
+    end
+
+    def val x                     # render a business value
+      pen.val x
     end
   end
 end

@@ -51,6 +51,16 @@ module Skylab::TanMan
       "#{ escape_path pathname }"
     end
 
+    def meanings
+      @meanings ||= Models::DotFile::Meaning::Collection.new self
+    end
+
+    def set_meaning agent, target, create, dry_run, verbose,     # contrast
+                                    error, success, neutral      # this way..
+      meanings.set agent, target, create, dry_run, verbose,
+                                   error, success, neutral
+    end
+
     def sexp
       services.tree.fetch pathname do |k, svc|
         tree = parse_file pathname
@@ -59,6 +69,10 @@ module Skylab::TanMan
         end
         tree
       end
+    end
+
+    def unset_meaning *a                                         # ..with this.
+      meanings.unset(* a)
     end
 
     nl_rx = /\n/ # meh
@@ -70,7 +84,7 @@ module Skylab::TanMan
       num
     end
 
-    define_method :write do |dry_run, verbose|
+    define_method :write do |dry_run, force, verbose|
       bytes = nil
       begin
         next_string = sexp.unparse
@@ -86,10 +100,11 @@ module Skylab::TanMan
         end
         num_a = num_lines[ prev_string ]
         num_b = num_lines[ next_string ]
-        if num_b < num_a
-          error "sorry: we won't allow reducing the number of lines yet! #{
-            }( from #{ num_a } to #{ num_b } lines )"
-          break
+        if num_b < num_a && ! force
+          error "ok to reduce number of lines in #{
+            }#{ escape_path pathname } from #{ num_a } to #{ num_b }? #{
+            }If so, use #{ par :force }."
+          break # IMPORTANT!
         end
         bytes = write_commit next_string, dry_run, verbose
         break if ! bytes

@@ -53,6 +53,17 @@ module Skylab::TanMan
       result
     end
 
+    def pen.lbl str               # render a business label name
+      "\"#{ str }\""
+    end
+
+    def pen.par sym               # render a parameter name
+      lbl sym
+    end
+
+    def pen.val x                 # render a business value
+      x.inspect
+    end
 
     define_method :initialize do |modality_client=nil|
       if modality_client           # if we are running under some mysterious
@@ -63,8 +74,8 @@ module Skylab::TanMan
       _tan_man_sub_client_init! nil # ***DO NOT KEEP*** the modality client here
     end
 
-    attr_reader :pen               # overwrite `super` which is e.g. delegating
-                                   # to io_adapter.  see our `initialize`
+    attr_reader :pen              # overwrite `super` which is e.g. delegating
+                                  # to io_adapter.  see our `initialize`
 
     # a quick and dirty (and fun!) proof of concept to show that we can buffer
     # and then emit events in the API that originated as data from controllers

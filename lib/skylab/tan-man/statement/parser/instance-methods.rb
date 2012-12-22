@@ -43,7 +43,7 @@ module Skylab::TanMan
       parse_string words_arr.join(' '), opts
     end
 
-    def parser_failure
+    def parser_failure # might get dried : DRY #watch [#ttt-002]
       res = nil
       begin
         # parser.failure_reason, parser.failure_line, parser.failure_column

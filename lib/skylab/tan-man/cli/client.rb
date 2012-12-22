@@ -54,6 +54,18 @@ module Skylab::TanMan
         fun.pretty_path[ str ]    # to debug if you don't.  The only reason
       end                         # not to is on a large number of files
 
+      def o.lbl str               # render a business parameter name
+        kbd str
+      end
+
+      def o.par sym               # [#sl-036] will be gathered up in the future
+        kbd "--#{ sym.to_s.gsub('_', '-') }" # super hacked for
+      end
+
+      def o.val x                 # render a business value
+        x
+      end
+
       o
     end.call
 
@@ -87,7 +99,6 @@ module Skylab::TanMan
       io_adapter.errstream        # want to write certain kind of messages
     end                           # to this directly, at the byte-level
                                   # and note the intentional name-change
-
     def normalized_invocation_string # #compat-headless
       program_name
     end

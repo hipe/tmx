@@ -12,15 +12,14 @@ module Skylab::TanMan
 
   protected
 
-    def execute # public, to be called from self.class
+    def execute
       res = nil
       begin
-        collections.dot_file.ready? or break
+        controller = collections.dot_file.selected or break
         statement = parse_words words, force: force
         statement or break
         selected = collections.dot_file.selected_pathname
-        res = controllers.dot_file.invoke  dry_run: dry_run,
-                                          pathname: selected,
+        res = controller.invoke            dry_run: dry_run,
                                          statement: statement,
                                            verbose: verbose
       end while nil

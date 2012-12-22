@@ -75,9 +75,9 @@ module Skylab::MetaHell
             result = invalid_[ const, (invalid || b) ]
             break
           end
-          if box.autoloader_original_const_defined? const, false or
-             box.const_probably_loadable? const
-          then
+          ok = box.autoloader_original_const_defined? const, false
+          ok ||= box.const_probably_loadable? const
+          if ok
             seen.push name
             box.case_insensitive_const_get const
           else

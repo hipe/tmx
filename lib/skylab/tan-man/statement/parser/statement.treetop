@@ -1,8 +1,17 @@
 module Skylab
   module TanMan
     grammar Statement
+      rule statement
+        dependency_statement /
+        meaning_statement
+      end
+
       rule dependency_statement
         agent:cluster sep 'depends on' sep target:cluster
+        { def tree ; TanMan::Sexp::Auto::Recursive[ self ] end }
+      end
+      rule meaning_statement
+        agent:cluster sep 'means' sep target:cluster
         { def tree ; TanMan::Sexp::Auto::Recursive[ self ] end }
       end
       rule cluster
@@ -10,7 +19,7 @@ module Skylab
       end
       rule word
         (
-          !'depends on'
+          !('depends on' / 'means')
           [^,;\t\n\r ]
         )+
         { def tree ; text_value end }

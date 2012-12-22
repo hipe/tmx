@@ -6,6 +6,26 @@ module Skylab::TanMan
       ready.call
     end
 
+    def selected
+      res = nil
+      begin
+        break( res = @selected ) if @selected # (there is danger here in the ..
+        break if ! ready? # emits info        # distant future)
+        if ! selected_pathname
+          info "no selected_pathname!" # strange
+          break
+        end
+        # (at the time of this writing the controllers.dot_file seems to
+        # be a sort of singleton, which might be dodgy. we want a controller
+        # object that exists sort of one-to-one with a pathname.)
+        cnt = Models::DotFile::Controller.new request_client # (up not me)
+        cnt.pathname = selected_pathname
+        res = cnt
+        @selected = res
+      end while nil
+      res
+    end
+
   protected
 
     def initialize request_client
@@ -31,6 +51,7 @@ module Skylab::TanMan
         end while nil
         result
       end
+      @selected = nil
     end
 
     attr_reader :ready

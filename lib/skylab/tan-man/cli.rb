@@ -15,9 +15,10 @@ module Skylab::TanMan
 
 
 
-  module CLI::Actions             # a box-like module that is all defined in
-                                  # this file. needs to be created before the
-  end                             # Action base class will be created below.
+  module CLI::Actions             # although all its containees may be in this
+    extend MetaHell::Boxxy        # file, they may need boxxy's `const_fetch`
+  end                             # for shenanigans. `Action` below requires
+                                  # the existence of `Actions`
 
 
 

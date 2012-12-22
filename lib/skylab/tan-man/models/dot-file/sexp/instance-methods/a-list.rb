@@ -1,6 +1,6 @@
 module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
 
-  module AList
+  module A_List
     include Common
     def _insert_assignment! k, v
       # because of the nature of the grammar, you are guaranteed to have at

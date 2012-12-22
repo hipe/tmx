@@ -1,7 +1,5 @@
 module Skylab::TanMan
-
   class Models::Examples::Controller
-
     include Core::SubClient::InstanceMethods
 
     def selected_status resource_name, success
@@ -21,7 +19,7 @@ module Skylab::TanMan
         value = nil
         b = selected_status :all, -> m { value = m.value }
         b or break
-        value ||= 'digraph.dot'
+        value ||= API.default_example_file
         template = services.examples.fetch value # could throw if etc
       end while nil
       template

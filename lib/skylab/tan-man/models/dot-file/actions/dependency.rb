@@ -1,14 +1,5 @@
 module Skylab::TanMan
-  class Models::DotFile::Actions::Dependency < ::Struct.new(
-    :dotfile_controller,
-    :dry_run,
-    :statement,
-    :verbose
-  )
-    include Core::SubClient::InstanceMethods # e.g. `initialize`
-    extend Headless::Parameter::Controller::StructAdapter
-    extend MetaHell::DelegatesTo
-
+  class Models::DotFile::Actions::Dependency < Models::DotFile::Action
     def execute
       res = nil
       begin
@@ -42,10 +33,5 @@ module Skylab::TanMan
       end while nil
       res
     end
-
-  protected
-
-    delegates_to :request_client, :graph_noun
-
   end
 end

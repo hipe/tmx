@@ -94,9 +94,20 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
 
 
   class VerbStem < StringAsStem
-    def progressive
-      "#{ self }ing"
+
+    ends_with_e_rx = /e\z/i
+
+    define_method :progressive do
+      @progressive ||= begin
+        if ends_with_e_rx =~ self
+          "#{ $~.pre_match }ing"
+        else
+          "#{ self }ing"
+        end
+      end
     end
+
+    attr_writer :progressive
   end
 
 
@@ -116,28 +127,61 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
   class Stems # this is the core of the hack
     extend Dupe
 
-    def initialize klass
-      @klass = klass
-    end
+    rx = /([a-z])([A-Z])/
 
-    def name_pieces
-      @name_pieces ||= begin # #todo break the below and then etc.
-        @klass.to_s.gsub(/([a-z])([A-Z])/){ "#{$1} #{$2}" }.downcase.split('::')
+    humanize = -> str do
+      str.gsub( rx ){ "#{$1} #{$2}" }.downcase
+    end
+                                  # automagic is not without its price: in
+                                  # order to infer a noun stem from your
+                                  # action class name, we will start by assuming
+                                  # it is in either the second- or third-to-
+    define_method :noun do        # last 'name piece.' (assumption [#hl-018])
+      @noun ||= begin             # To find the appropriate action constants
+        seen = [ ] ; hop = false  # for the noun, we crawl down the entire
+        name_pieces.reduce( ::Object ) do |m, x| # const tree and back up again
+          m.const_defined?( x, false ) or break
+          y = m.const_get x, false # part-way bc of [#sl-035] - if there is a
+          seen.push y             # pure box module, (that is, a module whose
+          y                       # only purpose is to be a clean namespace
+        end                       # to hold only constituent items), then such
+        ok = seen.empty?
+        ok ||= -> do              # modules usually do *not* have business
+          res = seen[-2]          # semantics - that is, they sometimes do *not*
+          begin                   # have a meaningful name as far as we're
+            o = seen[-3] or break # concerned here.  So if there is such a
+            o.respond_to?( :action_box_module ) or break # module, we want to
+            o.action_box_module == res or break # `hop` over it, thereby
+            hop = true            # not using it as a basis for our
+          end while nil           # noun stem, but rather the const above it
+          true
+        end.call
+        if ok
+          NounStem[ humanize[ name_pieces[ hop ? -3 : -2 ] ] ]
+        end
       end
-    end
-
-    def noun
-      @noun ||= NounStem[ name_pieces[-2] ]
     end
 
     def noun= mixed
       self.dupes |= [:noun] # duplicate this setting down to subclasses
-      ::String === mixed and mixed = NounStem[ mixed ]
+      mixed = NounStem[ mixed ] if ! mixed.respond_to?( :plural )
       @noun = mixed
     end
 
-    def verb
-      @verb ||= VerbStem[ name_pieces.last ]
+    define_method :verb do
+      @verb ||= VerbStem[ humanize[ name_pieces.last ] ]
+    end
+
+  protected
+
+    def initialize klass
+      @klass = klass
+    end
+
+    attr_reader :klass
+
+    def name_pieces
+      @name_pieces ||= klass.to_s.split '::'
     end
   end
 

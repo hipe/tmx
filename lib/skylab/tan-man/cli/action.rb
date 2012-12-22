@@ -6,6 +6,7 @@ module Skylab::TanMan
 
 
   module CLI::Action::ModuleMethods
+    include Headless::NLP::EN::API_Action_Inflection_Hack
     include Headless::CLI::Action::ModuleMethods
     include Core::Action::ModuleMethods
 
@@ -249,7 +250,32 @@ module Skylab::TanMan
     end
 
     def inflect_action_name e
-      "#{ full_invocation_parts.join ' ' }: #{ e }"
+      inflection = self.class.inflection
+      prepositional_phrase = [ 'while' ]                             # "while"
+      progressive = inflection.stems.verb.progressive
+      subject = [ ]
+      verb = [ progressive ]                                        # "adding"
+      object = [ ]
+      a = full_invocation_parts[ 0 .. -2 ] # the last item is handled by above.
+      if a.length.nonzero?   # ( we should at least have the program_name )
+        subject.push a.shift                                        # "tan-man"
+        verb.unshift 'was'                                       # "was adding"
+      end
+      if a.length.nonzero?
+        # target_class = self.class::ANCHOR_MODULE.const_fetch( a )
+        a.pop # we used many elements in the line above, but we pop only 1 here
+        subject.concat a # you could just as soon go object
+        a.clear
+        object.push inflection.inflected.noun
+      end
+      # "#{ full_invocation_parts.join ' ' }: #{ e }"
+      pp = [ *prepositional_phrase, *subject, *verb, *object ].join ' '
+      msg = e.message
+      if '(' == msg[0]
+        "(#{ pp }: #{ msg[1..-1] }"
+      else
+        "#{ pp }: #{ e.message }"
+      end
     end
 
     # ""                          -> ""
@@ -281,7 +307,7 @@ module Skylab::TanMan
     define_singleton_method( :failed_sentence ) { sentence } # for testing! meh
 
     define_method :inflect_failure_reason do |e|
-      parts = full_invocation_parts self.class
+      parts = full_invocation_parts
       words = sentence[ parts ]
       "#{ words.join ' '} - #{ e.message }"
     end
