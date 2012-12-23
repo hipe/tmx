@@ -213,6 +213,20 @@ module Skylab::TanMan
 
 
 
+  class CLI::Actions::Tell < CLI::Action       # YIKES look how ridiculous
+                                               # this "shortcut" is! (neat too)
+
+    desc( * CLI::Actions::Graph::Tell.desc_lines )
+
+    @option_parser_blocks = CLI::Actions::Graph::Tell.option_parser_blocks
+
+    def process *word
+      api_invoke [:graph, :tell], { words: word }.merge( param_h )
+    end
+  end
+
+
+
   class CLI::Actions::Graph::Check < CLI::Action
 
     desc 'checks if the (dependency graph) file exists and can be parsed.'
@@ -264,5 +278,14 @@ module Skylab::TanMan
   class CLI::Actions::Graph::Meaning < CLI::Action::Box
     desc "associate words with node attributes"
 
+  end
+
+
+  class CLI::Actions::Graph::Which < CLI::Action
+    desc "which dotfile?"
+
+    def process
+      api_invoke
+    end
   end
 end

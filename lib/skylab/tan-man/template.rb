@@ -7,13 +7,17 @@ module Skylab::TanMan
                                   # with *only* parameter interpolation
                                   # and nothing else.)  also a sandbox for fun.
 
+    def self.[] template_string, param_h           # collapse a template
+      from_string( template_string ).call param_h  # in one line
+    end
+
     o = { }                       # anonymous functions used all over the place
 
     update_members = -> members do # a function (method body) generator exp.
-      -> params_h do
-        a = params_h.keys - members
+      -> param_h do
+        a = param_h.keys - members
         if a.empty?
-          params_h.each do |k, v|
+          param_h.each do |k, v|
             send "#{ k }=", v
           end
         else
@@ -76,11 +80,11 @@ module Skylab::TanMan
 
     normalize = Template::FUN.normalize_matched_parameter_name
 
-    define_method :call do |params_h|
+    define_method :call do |param_h|
       template_string.gsub( parameter_rx ) do
         param = normalize[ $1 ]
-        if params_h.key? param
-          params_h[ param ]
+        if param_h.key? param
+          param_h[ param ]
         else                      # else we write it back into the string (ick)?
           $~.to_s                 # for possible future chaining in a template
           parametize param        # pipeline or whatever -- *or* optionally
@@ -88,6 +92,7 @@ module Skylab::TanMan
       end                         # kind of thing should probably be done in
     end                           # the controller with template reflection
 
+    alias_method :[], :call       # careful! overrides struct thing
 
     formal_param_struct = ::Struct.new :surface, :normalized_name, :offset
 

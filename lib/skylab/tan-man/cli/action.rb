@@ -183,13 +183,18 @@ module Skylab::TanMan
       # if an emitter emits and no listener is there to hear it, does it make
       # a sound? certainly not.
 
+      on_call_to_action do |e|
+        e.message = TanMan::Template[ e.template, action: act( e.action_class )]
+        nil
+      end
+
       on_no_config_dir do |e|     # common to actions, but doesn't have
         e.touch!                  # to be here.
         msg = "couldn't find #{ e.dirname } in this or any parent #{
           }directory: #{ escape_path e.from }"
         error msg
-        info "(try #{ kbd( full_invocation_string CLI::Actions::Init ) } #{
-          }to create it)"
+        emit :call_to_action, action_class: CLI::Actions::Init,
+                template: 'use {{action}} to create it'
       end
 
       on_info do |e|
@@ -219,9 +224,13 @@ module Skylab::TanMan
 
     # ---------------- jawbreak blood end --------------------
 
-    def api_invoke *args          # [normalized acton name] [params_h]
+    def act action_class
+      kbd( full_invocation_parts( action_class ).join ' ' )
+    end
+
+    def api_invoke *args          # [normalized acton name] [param_h]
       if ::Hash === args.last
-        params_h = args.pop       # else nil ok for these
+        param_h = args.pop       # else nil ok for these
       end
       if ::Array === args.last
         normalized_action_name = args.pop
@@ -229,10 +238,10 @@ module Skylab::TanMan
         normalized_action_name = self.normalized_action_name
       end
       if args.any?
-        raise ::ArgumentError.exception "[normalized acton name] [params_h]"
+        raise ::ArgumentError.exception "[normalized acton name] [param_h]"
       end
 
-      services.api.invoke normalized_action_name, params_h, self, -> o do
+      services.api.invoke normalized_action_name, param_h, self, -> o do
         o.on_all { |event| emit event }
       end
     end
@@ -241,12 +250,8 @@ module Skylab::TanMan
       :process
     end
 
-    def full_invocation_parts klass=self.class
-      [program_name_hack, * klass.normalized_action_name]
-    end
-
-    def full_invocation_string klass=self.class
-      full_invocation_parts( klass ).join ' '
+    def full_invocation_parts action_class=self.class
+      [ program_name_hack, * action_class.normalized_action_name ]
     end
 
     def inflect_action_name e
@@ -268,7 +273,6 @@ module Skylab::TanMan
         a.clear
         object.push inflection.inflected.noun
       end
-      # "#{ full_invocation_parts.join ' ' }: #{ e }"
       pp = [ *prepositional_phrase, *subject, *verb, *object ].join ' '
       msg = e.message
       if '(' == msg[0]

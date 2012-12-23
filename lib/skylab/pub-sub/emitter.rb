@@ -71,12 +71,6 @@ end
 
 module Skylab::PubSub
   class Event < ::Struct.new :payload, :tag, :touched
-    def _define_attr_accessors!(*keys)
-      (keys.any? ? keys : payload.keys).each do |k|
-        singleton_class.send(:define_method, k) { self.payload[k] }
-        singleton_class.send(:define_method, "#{k}=") { |v| self.payload[k] = v }
-      end
-    end
     def initialize tag, *payload
       case payload.size
       when 0 ; payload = nil
@@ -102,12 +96,31 @@ module Skylab::PubSub
     def type
       tag.name
     end
+
     def update_attributes! h
-      Hash === payload or self.payload = { message: message }
+      if ! ( ::Hash === payload )
+        self.payload = { message: message }
+      end
       payload.merge! h
       _define_attr_accessors!
     end
+
+  protected
+                                               # this is badly in need of a re-
+    def _define_attr_accessors! *keys          # design but for the time being
+      @defined_attr_accessors ||= { }          # we want to avoid warnings
+      keys = payload.keys if keys.length.zero?
+      keys.each do |key|
+        @defined_attr_accessors.fetch key do |k|
+          @defined_attr_accessors[ k ] = true
+          define_singleton_method( k ) { payload[ k ] }
+          define_singleton_method( "#{ k }=" ) { |v| payload[ k ] = v }
+        end
+      end
+    end
   end
+
+
   class EventListeners < Hash
     def add_listener name, block
       block.respond_to?(:call) or

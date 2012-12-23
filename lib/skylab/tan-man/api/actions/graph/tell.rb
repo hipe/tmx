@@ -1,5 +1,4 @@
 module Skylab::TanMan
-
   class API::Actions::Graph::Tell < API::Action
     extend API::Action::Parameter_Adapter
 

@@ -1,5 +1,4 @@
 module Skylab::TanMan
-
   class API::Actions::Graph::Check < API::Action
     extend API::Action::Parameter_Adapter
 
@@ -28,7 +27,8 @@ module Skylab::TanMan
           info "using value set in config: #{ escape_path pn }"
           self.path = pn
         else
-          info "no dotfile being used. use use?" # prettify at [#059]
+          emit :call_to_action, action_class: API::Actions::Graph::Use,
+            template: '(then?) use {{action}} to select or create graph' #[#059]
           break
         end
         # as an excercize we build a controller here

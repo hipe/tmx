@@ -32,6 +32,8 @@ module Skylab::TanMan
 
                                   # experimentally we're going all functional
 
+      do_create = nil if :both == do_create # hack to allow a nil thru
+
       name = name.strip           # (just to be sure we are normal-esque)
 
       new_before_this = new_after_this = found = nil # this is everything
@@ -68,15 +70,20 @@ module Skylab::TanMan
       end
 
       update = -> do
-        old_meaning = found.value
-        o = Models::DotFile::Meaning.new self, name, value_str
+        o = found
+        n = Models::DotFile::Meaning.new self, name, value_str
         res = nil
-        ok = o.normalize! -> e { res = error[ e ] }, info
+        ok = n.normalize! -> e { res = error[ e ] }, info
         ok or break res
-        found.whole_string[ found.value_index.begin .. found.value_index.end ] =
-          o.value
-        success[ "changed meaning of #{ lbl name } from #{ val old_meaning } #{
-          }to #{ val o.value }" ]
+        if o.value == n.value
+          info[ "#{ lbl name } already means #{ val n.value }" ]
+          nil
+        else
+          o_value = o.value # you've got to dupe this before it mutates below!
+          o.whole_string[ o.value_index.begin .. o.value_index.end ] = n.value
+          success[ "changed meaning of #{ lbl name } from #{
+            }#{ val o_value } to #{ val n.value }" ]
+        end
       end
 
       list.each do |meaning|
@@ -123,7 +130,7 @@ module Skylab::TanMan
         found = list.detect { |m| meaning == m.name }
         if found
           res = found.destroy error, -> bytes do
-            success[ "#{ lbl meaning } is forgotten (#{ bytes } bytes)" ]
+            success[ "forgetting #{ lbl meaning } (#{ bytes } bytes)" ]
           end
         elsif delete
           res = error[ "there is no such meaning to forget: #{ val meaning }" ]
