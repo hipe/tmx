@@ -1,3 +1,5 @@
+[#059] #open places where you could prettify custom action invites
+[#058] #open get abs paths out of conf file, make them rel to the file
 [#057] #open meanings
 [#056]       #tracking-tag: can we use tan-man to guide refactorings yet?
                #waiting-on:(#014, #015)
@@ -70,4 +72,5 @@
 [#004]       #open #one-day #one-day look into multibyte regexp 2012-09-02
 [#003]       #open #one-day unshield your eyes : google "dotfile grammar" 2012-09-01
 [#002] #open 2012-08-30 rename remote* to fit a pattern (e.g. controller)
+               examples-controller -> example-collection
 [#001]       #done tan -w ok, #depends-on:(#sl-unwip)
