@@ -23,7 +23,7 @@ module Skylab::TanMan
         info message: str, meta: m
       end
       # failure handled by callee
-      controllers.examples.selected_status resource_name, f
+      collections.example.selected_status resource_name, f
     end
   end
 end

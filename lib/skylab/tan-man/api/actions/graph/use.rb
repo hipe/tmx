@@ -60,7 +60,7 @@ module Skylab::TanMan
           error "cannot create, directory does not exist: #{ path.dirname }"
           break
         end
-        template = controllers.examples.use_template # with emission
+        template = collections.example.use_template # with emission
         template or break
         t = " using template #{ template.pathname.basename }"
         content = template.call created_on: ::Time.now.utc.to_s

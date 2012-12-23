@@ -1,5 +1,5 @@
 module Skylab::TanMan
-  class Models::Examples::Controller
+  class Models::Example::Collection
     include Core::SubClient::InstanceMethods
 
     def selected_status resource_name, success
