@@ -2,7 +2,7 @@ module Skylab::TanMan
   class Models::Remote::Collection < ::Enumerator
     Remote = Models::Remote::Controller
 
-    def clear
+    def clear_remote_collection
       # nothing to do - hold on to host, enumerator stays same. Careful!
     end
 

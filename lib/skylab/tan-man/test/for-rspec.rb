@@ -14,13 +14,7 @@ module Skylab::TanMan::TestSupport
 
     let :cli do
       spy = output
-      spy.line_filter! -> s do
-        Headless::CLI::Pen::FUN.unstylize[ s ]
-      end
       o = TanMan::CLI.new nil, spy.for(:paystream), spy.for(:infostream)
-      if do_debug
-        spy.debug! $stderr
-      end
       o.program_name = 'ferp'
       o
     end
@@ -29,8 +23,6 @@ module Skylab::TanMan::TestSupport
       argv = TanMan::TestSupport::Services::Shellwords.split str
       self.result = cli.invoke argv
     end
-
-    let(:output) { TestSupport::StreamSpy::Group.new }
 
     def output_shift_is *assertions
       output.lines.empty? and fail 'there is no output in the stack'

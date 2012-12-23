@@ -114,20 +114,27 @@ module Skylab::TestSupport
     alias_method :tmpdir_original_touch, :touch
 
     def touch file
-      use_path = join( file ).to_s
-      tmpdir_original_touch use_path, noop: noop, verbose: verbose
-      nil # result is undefined -- we might etc
+      pathname = join file
+      tmpdir_original_touch pathname.to_s, noop: noop, verbose: verbose
+      pathname
     end
 
     def touch_r files
+      single_path = ! (::Array === files )
+      if single_path
+        files = [ files ]
+        last_pathname = nil
+      end
       files.each do |file|
         dest_file = dest_dir = nil
         dest_path = join file
         if %r{/\z} =~ dest_path.to_s
           dest_dir = dest_path
+          last_pathname = dist_dir if single_path
         else
           dest_dir = dest_path.dirname
           dest_file = dest_path
+          last_pathname = dest_file if single_path
         end
         if ! dest_dir.exist?
           mkdir_p dest_dir, noop: noop, verbose: verbose
@@ -136,7 +143,9 @@ module Skylab::TestSupport
           tmpdir_original_touch dest_file, noop: noop, verbose: verbose
         end
       end
-      nil
+      if single_path
+        last_pathname # (we could of course adopt this to do etc)
+      end
     end
 
   protected

@@ -116,6 +116,8 @@ module Skylab::TanMan::TestSupport
     include Autoloader::Inflection::Methods
     include Tmpdir::InstanceMethods
 
+    attr_accessor :api_was_cleared # brings it all together
+
     def _build_normalized_input_pathname stem
       __input_fixtures_dir_pathname.join stem
     end
@@ -187,6 +189,13 @@ module Skylab::TanMan::TestSupport
       else
         fail('sanity - should not have neither')
       end
+    end
+
+    let :output do
+      o = TestSupport::StreamSpy::Group.new
+      o.debug = -> { do_debug }
+      o.line_filter! Headless::CLI::Pen::FUN.unstylize
+      o
     end
 
     def prepare_local_conf_dir

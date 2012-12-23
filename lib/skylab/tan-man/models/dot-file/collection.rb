@@ -63,9 +63,5 @@ module Skylab::TanMan
     end
 
     attr_reader :ready
-
-    def controllers
-      request_client.send :controllers # experimental - do we want this in
-    end                           # sub-client?
   end
 end

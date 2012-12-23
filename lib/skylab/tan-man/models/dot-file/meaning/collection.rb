@@ -69,11 +69,11 @@ module Skylab::TanMan
 
       update = -> do
         old_meaning = found.value
-        o = Models::DotFile::Meaning.new self, name, value_string
+        o = Models::DotFile::Meaning.new self, name, value_str
         res = nil
         ok = o.normalize! -> e { res = error[ e ] }, info
         ok or break res
-        found.whole_string[ found.value_index.being .. found.value_index.end ] =
+        found.whole_string[ found.value_index.begin .. found.value_index.end ] =
           o.value
         success[ "changed meaning of #{ lbl name } from #{ val old_meaning } #{
           }to #{ val o.value }" ]

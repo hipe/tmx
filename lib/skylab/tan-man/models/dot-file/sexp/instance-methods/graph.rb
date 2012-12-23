@@ -82,9 +82,11 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods # [#sl-123] exempt
           end
         end
         [e0, e4, e6].each(& space)
-        stmt_list._nodes.each do |node|
-          space[ node.e2 ]
-          space[ node.tail.stmt_separator ] if node.tail
+        if stmt_list
+          stmt_list._nodes.each do |node|
+            space[ node.e2 ]
+            space[ node.tail.stmt_separator ] if node.tail
+          end
         end
         [e8, e10].each(& space)
       end

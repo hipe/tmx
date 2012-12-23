@@ -5,8 +5,10 @@ module Skylab::TanMan
 
   public
 
-    def clear
-      TanMan::Services.config.clear # yeah about that..
+    def clear_all_services        # put your seatbelt on, becase you were
+      Services.config.clear_config_service  # really asking for it
+      Services.tree.clear_tree_service
+      nil
     end
 
 

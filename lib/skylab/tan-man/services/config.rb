@@ -8,9 +8,10 @@ module Skylab::TanMan
 
     define_method( :all_resource_names ) { names.dup }
 
-    def clear
-      global.clear
-      local.clear
+    def clear_config_service
+      global.clear_config_resource
+      local.clear_config_resource
+      nil
     end
 
     attr_reader :global
