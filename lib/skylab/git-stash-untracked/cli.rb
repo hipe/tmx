@@ -43,6 +43,11 @@ module Skylab::GitStashUntracked
       nil
     end
 
+    def shellesc x                # shorhand, just a wrapper - allows you
+      GitStashUntracked::Services::Shellwords || nil # load :/
+      x.to_s.shellescape          # to have stash names with spaces in them!
+    end
+
     def stylize *a                # away at [#hl-029]
       pen.stylize(* a )
     end
@@ -730,7 +735,7 @@ module Skylab::GitStashUntracked
 
     def filenames verbose
       ::Enumerator.new do |o|
-        cmd = "cd #{ pathname }; find . -type f"
+        cmd = "cd #{ shellesc pathname }; find . -type f"
         info( cmd ) if verbose
         GitStashUntracked::Services::Open3.popen3( cmd ) do |_, sout, serr|
           '' != (s = serr.read) and fail("uh-oh: #{s}")
@@ -751,7 +756,7 @@ module Skylab::GitStashUntracked
 
     def prune_directories dry_run, verbose
       stack = []
-      cmd = "find #{ pathname } -type d"
+      cmd = "find #{ shellesc pathname } -type d"
       info( cmd ) if verbose
       GitStashUntracked::Services::Open3.popen3 cmd do |_, sout, serr|
         while s = sout.gets                    # depth-first
@@ -816,7 +821,7 @@ module Skylab::GitStashUntracked
             y << stash
           else
             info "(not a directory: #{ escape_path child })" if verbose
-          end
+          end
         end
       end
     end
