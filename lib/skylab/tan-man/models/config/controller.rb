@@ -60,17 +60,19 @@ module Skylab::TanMan
       nil
     end
 
-    def ready?
+    def ready? err=nil
       services.config.ready? do |o|            # compare to actions/status.rb
 
         o.escape_path = ->( p ) { escape_path p } # per modality!
 
         o.no_config_dir = -> e do
-          emit :no_config_dir, e               # same payload, different graph!
+          if err then err[ e ] else
+            emit :no_config_dir, e            #  same payload, different graph!
+          end
         end
 
         o.global_invalid = -> e do
-          error e
+          if err then err[ e ] else error e end
         end
 
         o.local_invalid = o.global_invalid

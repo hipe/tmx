@@ -2,12 +2,17 @@ module Skylab
   module TanMan
     grammar Statement
       rule statement
+        forget_statement /
         dependency_statement /
         meaning_statement
       end
 
       rule dependency_statement
         agent:cluster sep 'depends on' sep target:cluster
+        { def tree ; TanMan::Sexp::Auto::Recursive[ self ] end }
+      end
+      rule forget_statement
+        'forget' sep target:cluster
         { def tree ; TanMan::Sexp::Auto::Recursive[ self ] end }
       end
       rule meaning_statement

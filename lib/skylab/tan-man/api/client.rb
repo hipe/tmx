@@ -14,7 +14,7 @@ module Skylab::TanMan
 
   public
 
-    def invoke normalized_action_name, params_h, events
+    def invoke normalized_action_name, param_h, events
       events[ self ]              # we have *got* to wire the api client to the
                                   # upstream for the infostream hack to
                                   # work (turning writes into infostream
@@ -29,7 +29,7 @@ module Skylab::TanMan
             name_error "invalid action name: #{ e.invalid_name }"
           end
         k or break
-        r = k.call self, params_h, events
+        r = k.call self, param_h, events
         result = r
         if API.debug
           API.debug.puts "OK API GOT: #{ r.class }"

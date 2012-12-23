@@ -26,8 +26,34 @@ module Skylab::TanMan
       res
     end
 
-    def ready?
-      ready.call
+    config_param = CONFIG_PARAM
+
+    define_method :ready? do |bad_conf=nil, no_param=nil, no_file=nil|
+      res = false
+      begin
+        if ! using_pathname
+          o = controllers.config
+          if ! o.ready?( bad_conf )
+            break
+          end
+          if ! o.known? config_param
+            if no_param then no_param[ config_param ] else
+              error "no '#{ config_param }' value is set in config(s)" # no inv.
+            end
+            break
+          end
+          relpath = o[ config_param ] or fail 'sanity'
+          self.using_pathname = services.config.local.derelativize_path relpath
+        end
+        if using_pathname.exist?
+          res = true
+        else
+          if no_file then no_file[ using_pathname ] else
+            error "dotfile must exist: #{ escape_path using_pathname }"
+          end
+        end
+      end while nil
+      res
     end
 
     attr_accessor :verbose # compat
@@ -35,33 +61,8 @@ module Skylab::TanMan
   protected
 
     def initialize request_client
-      _headless_sub_client_init! request_client
-      @ready = -> do
-        res = false
-        begin
-          conf = controllers.config
-          rc = self.request_client
-          if ! conf.ready?
-            break
-          end
-          if ! conf.known? CONFIG_PARAM
-            error "no '#{ CONFIG_PARAM }' value is set in config(s)" # no inv.
-            break
-          end
-          relpath = conf[ CONFIG_PARAM ] or fail 'sanity'
-          pathname = services.config.local.derelativize_path relpath
-          self.using_pathname = pathname
-          if using_pathname.exist?
-            res = true
-          else
-            error "dotfile must exist: #{ escape_path using_pathname }"
-          end
-        end while nil
-        res
-      end
+      super
       @currently_using = nil
     end
-
-    attr_reader :ready
   end
 end

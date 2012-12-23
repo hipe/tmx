@@ -12,7 +12,7 @@ module Skylab::TanMan
     end
 
 
-    define_method :invoke do |name_a, params_h=nil, upstream_client=nil,
+    define_method :invoke do |name_a, param_h=nil, upstream_client=nil,
                                                                      events=nil|
 
       debug = API.debug           # just for this request, within this call
@@ -38,7 +38,7 @@ module Skylab::TanMan
                                   # things like using modality-specific pens.
                                   # the funny syntax is a sanity check on
                                   # the formal parameters
-      r = api_client.invoke name_a, params_h, events
+      r = api_client.invoke name_a, param_h, events
       if response
         response.result = r
       else

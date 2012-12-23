@@ -30,8 +30,18 @@ module Skylab::TanMan
 
   protected
 
+    def initialize request_client              # have fun with this!
+      _tan_man_sub_client_init! request_client
+    end
+
     def _tan_man_sub_client_init! request_client
       _headless_sub_client_init! request_client
+    end
+
+    def api_invoke normalized_action_name, param_h # *EXPERIMENTAL*
+      services.api.invoke normalized_action_name, param_h, self, -> o do
+        o.on_all { |event| emit event }
+      end
     end
 
     def controllers

@@ -28,9 +28,16 @@ module Skylab::TanMan
     include Core::SubClient::InstanceMethods # per headless, this does a lot
 
 
-    emits Bleeding::EVENT_GRAPH.merge( # this is a graph used in multiple
-      info: :all, payload: :all, no_config_dir: :error, skip: :info # modalities
-    )
+
+                                  # the below event graph is used and
+                                  # must be honored accross modalities.
+
+    emits Bleeding::EVENT_GRAPH.merge(           call_to_action: :all,
+                                                           info: :all,
+                                                  no_config_dir: :error,
+                                                        payload: :all,
+                                                           skip: :info )
+
 
     event_class Core::Event       # descendents may change this
 
