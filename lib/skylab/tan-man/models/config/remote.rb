@@ -1,7 +1,17 @@
 module Skylab::TanMan
-  # distinct from a remote collection which is all the remotes in one file
-  # this is a higher level enumerator of all the remotes across all resources
-  class Models::Config::Remotes < ::Enumerator
+
+  # a higher-level collection controller #experimental-ly subclassing
+  # ::Enumerator, for enumerating all of the remote entries across
+  # all of the config resources.
+
+
+
+  module Models::Config::Remote
+    # empty namespace, all contained within this file for now
+  end
+
+
+  class Models::Config::Remote::Collection < ::Enumerator
 
     alias_method :config_original_initialize, :initialize # ick, enumerator
                                   # subclients will be annoying unless we are

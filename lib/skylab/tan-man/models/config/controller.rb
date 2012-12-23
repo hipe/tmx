@@ -78,7 +78,7 @@ module Skylab::TanMan
     end
 
     def remotes
-      @remotes ||= Models::Config::Remotes.new request_client
+      @remotes ||= Models::Config::Remote::Collection.new request_client
     end
 
     def remove_remote remote_name, resource_name
