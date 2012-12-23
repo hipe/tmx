@@ -15,7 +15,7 @@ module Skylab::TanMan
     def execute
       res = nil
       begin
-        cnt = collections.dot_file.selected or break
+        cnt = collections.dot_file.currently_using or break
         write = nil
         res = cnt.unset_meaning name, true, dry_run, verbose,
           -> e do
@@ -48,7 +48,7 @@ module Skylab::TanMan
       res = nil
       begin
         write = false
-        cnt = collections.dot_file.selected or break
+        cnt = collections.dot_file.currently_using or break
         res = cnt.set_meaning name, value, create, dry_run, verbose,
           -> e do
             error e
@@ -81,7 +81,7 @@ module Skylab::TanMan
     define_method :execute do
       res = nil
       begin
-        cnt = collections.dot_file.selected or break
+        cnt = collections.dot_file.currently_using or break
         count = 0
         cnt.meanings.each do |meaning|
           count += 1

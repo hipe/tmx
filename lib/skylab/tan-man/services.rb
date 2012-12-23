@@ -6,8 +6,8 @@ module ::Skylab::TanMan
 
     dbg = nil #  $stderr
     fun = ::Skylab::Autoloader::Inflection::FUN
-    methodify = fun.methodify
-    load_method = -> const { "load_#{ methodify[ const ] }" }
+    methodize = fun.methodize
+    load_method = -> const { "load_#{ methodize[ const ] }" }
 
     define_singleton_method :o do |const, load_const|
       define_singleton_method( load_method[ const ] ) do
@@ -44,7 +44,7 @@ module ::Skylab::TanMan
         end
         o = o.to_s
         if ok_rx =~ o
-          name = methodify[ o.to_s ]
+          name = methodize[ o.to_s ]
           dbg and dbg.puts "loading svc: #{ name } : #{ pathname }"
           sc.let name do          # each service is a memoized result of
             build_service[ pathname ] # this call here (see above)

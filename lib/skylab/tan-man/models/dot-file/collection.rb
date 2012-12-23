@@ -1,29 +1,32 @@
 module Skylab::TanMan
-  class Models::DotFile::Collection < ::Struct.new :selected_pathname
+  class Models::DotFile::Collection < ::Struct.new :using_pathname
     include Core::SubClient::InstanceMethods
 
-    def ready?
-      ready.call
-    end
+    CONFIG_PARAM = 'using_dotfile'
 
-    def selected
+    def currently_using
       res = nil
       begin
-        break( res = @selected ) if @selected # (there is danger here in the ..
-        break if ! ready? # emits info        # distant future)
-        if ! selected_pathname
-          info "no selected_pathname!" # strange
+        if @currently_using                    # there is danger here in ..
+          break( res = @currently_using )      # the distant future
+        end
+        break if ! ready? # emits info
+        if ! using_pathname
+          info "no using_pathname!" # strange
           break
         end
         # (at the time of this writing the controllers.dot_file seems to
         # be a sort of singleton, which might be dodgy. we want a controller
         # object that exists sort of one-to-one with a pathname.)
         cnt = Models::DotFile::Controller.new request_client # (up not me)
-        cnt.pathname = selected_pathname
-        res = cnt
-        @selected = res
+        cnt.pathname = using_pathname
+        res = @currently_using = cnt
       end while nil
       res
+    end
+
+    def ready?
+      ready.call
     end
 
   protected
@@ -31,27 +34,29 @@ module Skylab::TanMan
     def initialize request_client
       _headless_sub_client_init! request_client
       @ready = -> do
-        result = false
-        rc = self.request_client
+        res = false
         begin
-          if ! controllers.config.ready?
+          conf = controllers.config
+          rc = self.request_client
+          if ! conf.ready?
             break
           end
-          if ! controllers.config.known? 'file'
-            error 'no "file" in config(s) - please use use'
+          if ! conf.known? CONFIG_PARAM
+            error "no '#{ CONFIG_PARAM }' value is set in config(s)" # no inv.
             break
           end
-          s = controllers.config['file']
-          self.selected_pathname = ::Pathname.new s
-          if selected_pathname.exist?
-            result = true
+          relpath = conf[ CONFIG_PARAM ] or fail 'sanity'
+          pathname = services.config.local.derelativize_path relpath
+          self.using_pathname = pathname
+          if using_pathname.exist?
+            res = true
           else
-            error "must exist: #{ selected_pathname }"
+            error "dotfile must exist: #{ escape_path using_pathname }"
           end
         end while nil
-        result
+        res
       end
-      @selected = nil
+      @currently_using = nil
     end
 
     attr_reader :ready

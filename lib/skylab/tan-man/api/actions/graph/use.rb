@@ -23,17 +23,19 @@ module Skylab::TanMan
         end
         if idx
           self[:path] = tries[idx]
-          info "using #{ path }"
+          info "using #{ escape_path path }"
           result = true
         else
           self[:path] = tries.last
           if 1 < tries.length
-            info "(adding #{extname} extension because that's what god wants)"
+            info "(adding #{ extname } extension because that's what god wants)"
           end
           result = create_path
           result or break
         end
-        controllers.config.set_value :file, path.expand_path.to_s, :local
+        relpath = services.config.local.relativize_pathname path
+        controllers.config.set_value Models::DotFile::Collection::CONFIG_PARAM,
+                                       relpath.to_s, :local
         result = true
       end while nil
       result
@@ -60,10 +62,9 @@ module Skylab::TanMan
           error "cannot create, directory does not exist: #{ path.dirname }"
           break
         end
-        template = collections.example.use_template # with emission
-        template or break
-        t = " using template #{ template.pathname.basename }"
-        content = template.call created_on: ::Time.now.utc.to_s
+        example = collections.example.using_example or break # emits
+        t = " using example #{ example.pathname.basename }"
+        content = example.call created_on: ::Time.now.utc.to_s
         bytes = nil
         path.open('w+') { |fh| bytes = fh.write content }
         info "wrote #{ path }#{ t } (#{ bytes } bytes)."

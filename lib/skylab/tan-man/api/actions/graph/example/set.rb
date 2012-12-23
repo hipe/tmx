@@ -15,12 +15,10 @@ module Skylab::TanMan
       begin
         controllers.config.ready? or break
         pathname = services.examples.normalize self.name, -> e { error e }
-        if ! pathname
-          res = pathname
-          break
-        end
-        res = controllers.config.set_value :example,
-          pathname.to_s, resource_name
+        break( res = pathname ) if ! pathname
+        res = controllers.config.set_value(
+                Models::Example::Collection::CONFIG_PARAM,
+                pathname.to_s, resource_name )
       end while nil
       res
     end

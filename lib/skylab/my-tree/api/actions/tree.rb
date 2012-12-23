@@ -70,10 +70,10 @@ module Skylab::MyTree
           letters.split('').each do |s|
             found = a.detect { |word| s == word[0] }
             found or raise[ "expecting any of #{a_s}, not #{ s.inspect }" ]
-            verbose[Inflection::FUN.methodify[ found ]] = true
+            verbose[Inflection::FUN.methodize[ found ]] = true
           end
         else
-          a.each { |word| verbose[Inflection::FUN.methodify[ word ]] = true }
+          a.each { |word| verbose[Inflection::FUN.methodize[ word ]] = true }
         end
       end
 

@@ -23,7 +23,7 @@ module Skylab::TanMan
         while x = a.shift
           mod = mod.const_get x, false
           if use
-            o.push Autoloader::Inflection::FUN.methodify[ x ]
+            o.push Autoloader::Inflection::FUN.methodize[ x ]
           else
             use = true
           end

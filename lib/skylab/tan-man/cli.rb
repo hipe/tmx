@@ -223,7 +223,7 @@ module Skylab::TanMan
     end
 
     def process dotfile=nil
-      api_invoke path: dotfile, verbose: param_h[:verbose]
+      api_invoke( { path: dotfile, verbose: false }.merge param_h )
     end
   end
 

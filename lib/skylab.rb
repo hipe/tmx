@@ -55,7 +55,7 @@ module Skylab
         end.join '::'
     end
 
-    o[:methodify] = -> str do
+    o[:methodize] = -> str do
       str.to_s.
         gsub(/(?<=[a-z])([A-Z])|(?<=[A-Z])([A-Z][a-z])/) { "_#{$1 || $2}" }.
         gsub(/[^a-z0-9]+/i, '_').downcase.intern # munge-in above underscores

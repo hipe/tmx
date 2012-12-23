@@ -15,10 +15,8 @@ module Skylab::TanMan
     def execute
       res = nil
       begin
-        controller = collections.dot_file.selected or break
-        statement = parse_words words, force: force
-        statement or break
-        selected = collections.dot_file.selected_pathname
+        controller = collections.dot_file.currently_using or break
+        statement = parse_words( words, force: force ) or break
         res = controller.invoke            dry_run: dry_run,
                                          statement: statement,
                                            verbose: verbose

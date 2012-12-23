@@ -2,10 +2,12 @@ module Skylab::TanMan
   class Models::Example::Collection
     include Core::SubClient::InstanceMethods
 
-    def selected_status resource_name, success
+    CONFIG_PARAM = 'using_example'
+
+    def using_example_metadata resource_name, success
       ok = nil
       begin
-        meta = controllers.config.value_meta :example, resource_name
+        meta = controllers.config.value_meta CONFIG_PARAM, resource_name
         meta or break
         success[ meta ]
         ok = true
@@ -13,16 +15,16 @@ module Skylab::TanMan
       ok
     end
 
-    def use_template
-      template = nil
+    def using_example
+      example = nil
       begin
         value = nil
-        b = selected_status :all, -> m { value = m.value }
+        b = using_example_metadata :all, -> m { value = m.value }
         b or break
         value ||= API.default_example_file
-        template = services.examples.fetch value # could throw if etc
+        example = services.examples.fetch value # could throw if etc
       end while nil
-      template
+      example
     end
   end
 end

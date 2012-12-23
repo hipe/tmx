@@ -3,7 +3,7 @@ module Skylab::TanMan
     def execute
       res = nil
       begin
-        cnt = collections.dot_file.selected or break
+        cnt = collections.dot_file.currently_using or break
         agent = statement.agent.words.join ' '
         target = statement.target.words.join ' '
         write = false

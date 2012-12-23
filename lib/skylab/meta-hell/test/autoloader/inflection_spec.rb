@@ -67,11 +67,11 @@ end
 
 
 
-describe "#{ ::Skylab::Autoloader::Inflection }::FUN methodify" do
+describe "#{ ::Skylab::Autoloader::Inflection }::FUN methodize" do
 
   o = -> in_s, out_s, *t do
     it "#{in_s} #{out_s}", *t do
-      ::Skylab::Autoloader::Inflection::FUN.methodify[ in_s ].should eql(out_s)
+      ::Skylab::Autoloader::Inflection::FUN.methodize[ in_s ].should eql(out_s)
     end
   end
 

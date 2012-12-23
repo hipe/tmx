@@ -24,18 +24,20 @@ module Skylab::TanMan
             break
           end
         elsif collections.dot_file.ready?
-          pn = collections.dot_file.selected_pathname
-          info "exists, selected: #{ escape_path pn }"
+          pn = collections.dot_file.using_pathname
+          info "using value set in config: #{ escape_path pn }"
           self.path = pn
         else
-          info "no dotfile selected. use use?"
+          info "no dotfile being used. use use?" # prettify at [#059]
           break
         end
+        # as an excercize we build a controller here
         o = TanMan::Models::DotFile::Controller.new self
-        o.pathname = path
-        o.statement = false
-        o.verbose = (verbose || false)
-        o.set! or break
+        b = o.set!  dry_run: false,
+                   pathname: path,
+                  statement: false,
+                    verbose: (verbose || false)
+        b or break
         res = o.check
       end while nil
       res

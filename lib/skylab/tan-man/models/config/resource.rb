@@ -40,7 +40,28 @@ module Skylab::TanMan
 
   class Models::Config::Resource::Local < Models::Config::Resource
 
-                                  # nothing special for now!
+    def absolutize_path path
+      fail 'do me'
 
-  end
+    end
+
+    def derelativize_path relpath              # expand paths that were once
+      anchor_pathname.join relpath             # short and pretty.
+    end
+
+    def relativize_pathname pathname           # make `pathname` relative to
+      if ! pathname.absolute?                  # e.g the directory that has the
+        pathname = pathname.expand_path        # .tanman config dir in it.
+      end                                      # this is what *feels* right.
+      pathname.relative_path_from anchor_pathname # this makes them prettier
+    end                                        # in the config file, and more
+                                               # portable in its way,
+                                               # less portable in another way
+
+  protected
+
+    def anchor_pathname                        # if the config file is
+      pathname.join '../..'                    # .tanman/config, the anchor
+    end                                        # path is the path that has
+  end                                          # the .tanman dir in it.
 end

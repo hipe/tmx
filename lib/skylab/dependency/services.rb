@@ -1,7 +1,7 @@
 module Skylab::Dependency
   module Services # being #watched [#mh-011]
 
-    load_method = ->(const) { "load_#{ Inflection::FUN.methodify[ const ] }" }
+    load_method = ->(const) { "load_#{ Inflection::FUN.methodize[ const ] }" }
 
     define_singleton_method :const_missing do |const|
       if respond_to?( m = load_method[ const ] )
