@@ -34,6 +34,7 @@ module Skylab::TanMan
         # as an excercize we build a controller here
         o = TanMan::Models::DotFile::Controller.new self
         b = o.set!  dry_run: false,
+                      force: false,
                    pathname: path,
                   statement: false,
                     verbose: (verbose || false)

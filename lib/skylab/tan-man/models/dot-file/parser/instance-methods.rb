@@ -12,8 +12,12 @@ module Skylab::TanMan
 
     def load_parser_class
 
-      f = on_load_parser_info ||
-        ->(e) { info "#{ em '^_^' } #{ gsub_path_hack e.to_s }" }
+      on_info = on_load_parser_info
+      on_info ||= -> e do
+        if verbose
+          info "#{ em '^_^' } #{ gsub_path_hack e.to_s }"
+        end
+      end
 
       ::Skylab::TreetopTools::Parser::Load.new(
         ->(o) do
@@ -24,7 +28,7 @@ module Skylab::TanMan
           o.treetop_grammar 'dot-language.generated.treetop'
         end,
         ->(o) do
-           o.on_info(& f)
+           o.on_info(& on_info)
            o.on_error { |e| fail("failed to load grammar: #{e}") }
         end
       ).invoke

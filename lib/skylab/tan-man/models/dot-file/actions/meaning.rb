@@ -4,11 +4,12 @@ module Skylab::TanMan
       res = nil
       begin
         cnt = collections.dot_file.currently_using or break
-        agent = statement.agent.words.join ' '
-        target = statement.target.words.join ' '
+        name = statement.agent.words.join ' '
+        value = statement.target.words.join ' '
         write = false
+        create = nil              # (we don't care whether or not this
+                                  # ends up as a `create` or `update`)
         res = cnt.set_meaning name, value, create, dry_run, verbose,
-          nil, dry_run, verbose,
           -> e do
             error e
             false
@@ -23,7 +24,7 @@ module Skylab::TanMan
             nil
           end
         if write
-          res = dotfile_controller.write dry_run, verbose
+          res = dotfile_controller.write dry_run, force, verbose
         end
       end while nil
       res

@@ -377,6 +377,6 @@ module ::Skylab::CodeMolester
     # ------------------------------- end ------------------------------------
   end
 
-  Config::File.do_debug = true
+  Config::File.do_debug = nil
 
 end

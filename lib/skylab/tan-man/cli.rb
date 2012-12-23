@@ -207,7 +207,7 @@ module Skylab::TanMan
     end
 
     def process *word
-      api_invoke param_h.merge( words: word )
+      api_invoke( { words: word }.merge param_h )
     end
   end
 

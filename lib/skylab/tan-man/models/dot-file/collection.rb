@@ -20,6 +20,7 @@ module Skylab::TanMan
         # object that exists sort of one-to-one with a pathname.)
         cnt = Models::DotFile::Controller.new request_client # (up not me)
         cnt.pathname = using_pathname
+        cnt.verbose = verbose # inherit this puppy
         res = @currently_using = cnt
       end while nil
       res
@@ -28,6 +29,8 @@ module Skylab::TanMan
     def ready?
       ready.call
     end
+
+    attr_accessor :verbose # compat
 
   protected
 

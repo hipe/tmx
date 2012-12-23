@@ -24,5 +24,7 @@ module Skylab::TanMan
         info message: str, meta: m
       end
     end
+
+    attr_reader :verbose #compat
   end
 end

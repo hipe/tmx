@@ -26,5 +26,7 @@ module Skylab::TanMan
       end while nil
       example
     end
+
+    attr_accessor :verbose # compat
   end
 end

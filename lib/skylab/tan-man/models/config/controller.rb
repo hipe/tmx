@@ -135,6 +135,8 @@ module Skylab::TanMan
       res
     end
 
+    attr_accessor :verbose # compat
+
     def write_resource resource
       result = nil
       begin

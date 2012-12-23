@@ -1,5 +1,6 @@
 module Skylab::TanMan
   class Models::DotFile::Controller < ::Struct.new  :dry_run,
+                                                    :force,
                                                     :pathname,
                                                     :statement,
                                                     :verbose
@@ -39,6 +40,7 @@ module Skylab::TanMan
       o = action_class.new self
       res = o.invoke dotfile_controller: self,
                                 dry_run: dry_run,
+                                  force: force,
                               statement: statement,
                                 verbose: verbose
       res
@@ -122,12 +124,19 @@ module Skylab::TanMan
         bytes = nil
         temp.open( 'w' ) { |fh| bytes = fh.write string }
         diff = services.diff.diff pathname, temp, nil,
-          -> e { error e }, -> i { info gsub_path_hack( i ) }
+          -> e do
+            error e
+          end,
+          -> i do
+            if verbose
+              info( gsub_path_hack i ) # e.g. `diff --normal `...
+            end
+          end
         break( res = diff ) if ! diff
         a = []
-        nerk = -> x, str do
+        nerk = -> x, verb do
           break if x == 0
-          a.push "#{ x } line#{ s x } #{ s x, :was } #{ str }"
+          a.push "#{ verb } #{ x } line#{ s x }"
         end
         nerk[ diff.num_lines_removed, 'removed' ]
         nerk[ diff.num_lines_added,   'added'   ]
@@ -136,10 +145,14 @@ module Skylab::TanMan
         if no_change
           a.push "no lines added or removed!"
         end
-        info a.join( ', ' )
+        if verbose
+          info( a.join ', ' )
+        end
         break if no_change
         fu = Headless::IO::FU.new -> msg do
-          info gsub_path_hack( msg )
+          if verbose
+            info( gsub_path_hack msg )
+          end
         end
         fu.mv temp, pathname, noop: dry_run
         bytes

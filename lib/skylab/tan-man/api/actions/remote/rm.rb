@@ -17,5 +17,7 @@ module Skylab::TanMan
       end while nil
       result
     end
+
+    attr_reader :verbose
   end
 end

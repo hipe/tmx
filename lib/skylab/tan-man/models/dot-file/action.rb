@@ -2,6 +2,7 @@ module Skylab::TanMan
   class Models::DotFile::Action < ::Struct.new(
     :dotfile_controller,
     :dry_run,
+    :force,
     :statement,
     :verbose
   )

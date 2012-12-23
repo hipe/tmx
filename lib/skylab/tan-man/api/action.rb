@@ -51,6 +51,7 @@ module Skylab::TanMan
           k = TanMan::Models.const_fetch( method, false ). # WE LOVE YOU BOXXY
             const_get( controller_const, false )
           x = k.new me
+          x.verbose = me.send :verbose # this is so common let's sledgehammer it
           define_singleton_method( method ) { x }
           x
         end

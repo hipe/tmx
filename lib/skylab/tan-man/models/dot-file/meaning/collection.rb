@@ -8,7 +8,7 @@ module Skylab::TanMan
     end
 
 
-    hack_rx = Models::DotFile::Meaning::Flyweight::MATCH_LINE_RX
+    hack_rx = Models::DotFile::Meaning::MATCH_LINE_RX
 
     define_method :list do
       ::Enumerator.new do |y|
@@ -42,7 +42,10 @@ module Skylab::TanMan
                                   # got to walk the tree again to get the item.
                                   # this was a bit tricky! suggestions welcome
           use_meaning = list.detect { |meaning| use_name == meaning.name }
-          new_meaning = Models::DotFile::Meaning.new name, value_str
+          new_meaning = Models::DotFile::Meaning.new self, name, value_str
+          res = nil
+          ok = new_meaning.normalize! -> e { res = error[ e ] }, info
+          ok or break res
           whole_string = use_meaning.whole_string
           bytes_a = whole_string.length
           new_meaning.duplicate_spacing! use_meaning
@@ -65,11 +68,15 @@ module Skylab::TanMan
       end
 
       update = -> do
-        o = found
-        old_meaning = o.value
-        o.whole_string[ o.value_index.begin .. o.value_index.end ] = value_str
+        old_meaning = found.value
+        o = Models::DotFile::Meaning.new self, name, value_string
+        res = nil
+        ok = o.normalize! -> e { res = error[ e ] }, info
+        ok or break res
+        found.whole_string[ found.value_index.being .. found.value_index.end ] =
+          o.value
         success[ "changed meaning of #{ lbl name } from #{ val old_meaning } #{
-          }to #{ val value_str }" ]
+          }to #{ val o.value }" ]
       end
 
       list.each do |meaning|

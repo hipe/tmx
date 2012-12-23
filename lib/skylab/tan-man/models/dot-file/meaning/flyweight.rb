@@ -1,8 +1,6 @@
 module Skylab::TanMan
   class Models::DotFile::Meaning::Flyweight
 
-    MATCH_LINE_RX = /\A[ \t]*[-a-z]+[ \t]*:/
-
     def colon_pos
       index! unless @indexed
       @colon_pos

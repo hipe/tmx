@@ -22,5 +22,7 @@ module Skylab::TanMan
       end while nil
       res
     end
+
+    attr_reader :verbose # compat
   end
 end

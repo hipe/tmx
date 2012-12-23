@@ -38,6 +38,10 @@ module Skylab::TanMan
       request_client.send :controllers
     end
 
+    def collections
+      request_client.send :collections
+    end
+
     def escape_path *a            # (we wanted this to go away with [#hl-031]
       pen.escape_path(* a)        # but tan-man apparently thinks it has
     end                           # special needs.)
@@ -54,6 +58,9 @@ module Skylab::TanMan
       res
     end
 
+    def ick x                     # similar to `val` but for rendering an
+      pen.ick x                   # invalid value.. in some modes they look
+    end                           # better when these have quotes
 
     def infostream
       request_client.send :infostream

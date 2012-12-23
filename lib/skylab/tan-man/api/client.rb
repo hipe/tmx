@@ -53,6 +53,10 @@ module Skylab::TanMan
       result
     end
 
+    def pen.ick x                 # render an invalid value
+      x.inspect
+    end
+
     def pen.lbl str               # render a business label name
       "\"#{ str }\""
     end
