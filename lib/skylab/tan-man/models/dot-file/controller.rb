@@ -60,23 +60,32 @@ module Skylab::TanMan
     end
 
     def fetch_node node_ref, error, info
-      rx = /\A#{ ::Regexp.escape node_ref }/
-      fuzzy_fetch sexp._node_stmts,
-        -> stmt do
-          if rx =~ stmt.label # stmt.node_id
-            node_ref == stmt.label ? 1 : 0.5
-          end
-        end,
-        -> count do
-          error[ "couldn't find a node whose label starts with #{
-            }#{ ick node_ref } (among #{ count } node#{ s count })" ]
-          false # this makes life easier..
-        end,
-        -> partial do
-          info[ "ambiguous node name #{ ick node_ref }. #{
-            }did you mean #{ or_ partial.map { |n| "#{ lbl n.label }" } }?" ]
-          nil # this makes life easier
+      res = nil
+      begin
+        sexp = self.sexp
+        if ! sexp
+          emit :help, "perhaps try fixing above syntax errors and try again"
+          break( res = nil )
         end
+        rx = /\A#{ ::Regexp.escape node_ref }/
+        res = fuzzy_fetch sexp._node_stmts,
+          -> stmt do
+            if rx =~ stmt.label # stmt.node_id
+              node_ref == stmt.label ? 1 : 0.5
+            end
+          end,
+          -> count do
+            error[ "couldn't find a node whose label starts with #{
+              }#{ ick node_ref } (among #{ count } node#{ s count })" ]
+            false # this makes life easier..
+          end,
+          -> partial do
+            info[ "ambiguous node name #{ ick node_ref }. #{
+              }did you mean #{ or_ partial.map { |n| "#{ lbl n.label }" } }?" ]
+            nil # this makes life easier
+          end
+      end while nil
+      res
     end
 
     def graph_noun

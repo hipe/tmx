@@ -1,5 +1,4 @@
 module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
-
   module EdgeStmt
 
     OPTS = ::Struct.new :attrs, :prototype

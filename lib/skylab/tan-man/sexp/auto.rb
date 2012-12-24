@@ -168,6 +168,26 @@ module Skylab::TanMan
     attr_writer :_members # experimental frozen persistent object
     def _members ; @_members ||= members.freeze end
     attr_accessor :members_of_interest
+
+
+    def parse rule, string, err=nil                   # for hacks
+      parser = grammar.build_parser_for_rule rule
+      syn_node = parser.parse string
+      res = nil
+      if syn_node
+        res = element2tree syn_node, "xyzzy_#{ rule }".intern
+      else
+        if err
+          res = err[ parser ]
+        else
+          $stderr.puts "#{ self } parse failed - #{ parser.failure_reason }"
+          res = false
+        end
+      end
+      res
+    end
+
+
     attr_accessor :rule
 
     def tree inference

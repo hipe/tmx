@@ -123,8 +123,9 @@ module Skylab::TanMan::TestSupport
     end
 
     let :client do
-      client = :foo
+      client = Headless::DEV::Client.new
       o = TanMan::TestSupport::ParserProxy.new client
+      o.verbose = -> { do_debug }
       o.dir_path = _parser_dir_path
       if do_debug_parser_loading
         o.profile = true
@@ -137,6 +138,7 @@ module Skylab::TanMan::TestSupport
 
     def debug!                                 # (aliased to tanman_debug!)
       self.do_debug = true
+      self.do_debug_parser_loading = true
     end
     alias_method :tanman_debug!, :debug!
 

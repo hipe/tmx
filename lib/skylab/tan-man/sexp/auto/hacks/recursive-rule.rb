@@ -85,30 +85,34 @@ module Skylab::TanMan
         [i, l, r]
       end
 
-      _proto_f = ->(me, existing_a, idx) do
+      proto_for_insert = -> me, existing_a, idx do
         proto_a = me._prototype ? me._prototype._nodes.to_a : existing_a
-        proto_a.length < 2 and fail("cannot insert into a list with less #{
-          }than 2 items -- need a prototype list, node, item for hack to work.")
-        _proto_idx = [1, [idx, proto_a.length - 2].min ].max
-        proto_a[_proto_idx]
+        if proto_a.length < 2
+          fail "cannot insert into a list with less than 2 items -- #{
+            }for hack to work, need a prototype list, node & item."
+        end
+        idx = [1, [idx, proto_a.length - 2].min ].max
+        proto_a[idx]
       end
 
       _tail_f_f = ->(right, proto) do
         # nasty : we ned to do this before we reassign any members of "left"
         # because left itself may be the prototype node!
         #
-        use_tail = if list_getter
-          next_f[ proto ] and fail("can't use non-ultimate node in #{
-            }prototype for this hack to work.") # .. w/o heavy hacking
+        o = nil
+        if list_getter
+          if next_f[ proto ]
+            fail "can't use non-ultimate node in prototype for this #{
+              }hack to work." # w/o heavy hacking
+          end
           o = proto.__dupe_member tail_getter
-          right and o[list_getter] = right
-          o
+          o[list_getter] = right if right
         elsif right
-          right
+          o = right
         else
-          nil
+          o = nil
         end
-        ->(_) { use_tail }
+        -> _ { o }
       end
 
       # -- List Item Insertion Lambdas (in ascending order of complexity) --
@@ -171,7 +175,7 @@ module Skylab::TanMan
       i.tree_class.send(:define_method, :_insert_before!) do |item, before_item|
         existing_a = _nodes.to_a
         idx, left, right = _idx_left_right_f[ before_item, existing_a ]
-        proto = _proto_f[ self, existing_a, idx ]
+        proto = proto_for_insert[ self, existing_a, idx ]
         result, target, f_h = if left then _insert_f[  self, proto, left, right]
         elsif right                   then _swap_f[    self, proto, item ]
         else                               _initial_f[ self, proto ] end

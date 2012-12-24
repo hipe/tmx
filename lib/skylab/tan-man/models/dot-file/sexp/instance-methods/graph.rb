@@ -1,5 +1,4 @@
 module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods # [#sl-123] exempt
-
   module Graph
     include Common
 

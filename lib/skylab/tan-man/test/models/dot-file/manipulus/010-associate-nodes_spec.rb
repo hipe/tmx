@@ -62,15 +62,18 @@ describe "#{Skylab::TanMan::Models::DotFile} (manipulus 010) associate nodes" do
   end
 
   using_input '010-edges/point-5-1-prototype.dot' do
-    it 'lets you set attributes in the edge prototype' do # 0718 0747
+    it 'lets you set attributes in the edge prototype (alphabeticesque)' do
       result.associate! 'a', 'b', attrs: { label: %<joe's mom: "jane"> }
       str = / label =.*/ =~ lines[-2] ? $& : ''
       str.should eql(%< label = "joe's mom: \\"jane\\"" ]>)
     end
     # 0747-0815 + 4hrs
     it 'lets you set attributes not yet in the edge prototype' do
+      debug!
       result.associate! 'a', 'b', attrs: { politics: :radical }
-      lines[-2].should be_include('penwidth = 5 politics = radical fontsize')
+      lines[-2].should eql(
+"a -> b [ penwidth = 5 fontsize = 28 fontcolor = \"black\" label = \"e\" politics = radical ]"
+                          )
     end
   end
 
