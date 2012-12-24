@@ -56,6 +56,42 @@ module Skylab::TanMan
       pen.escape_path(* a)        # but tan-man apparently thinks it has
     end                           # special needs.)
 
+                                  # generic fuzzy finder
+                                  # `match` receives each item and should result
+                                  # in 1 when exact match, zero / falseish when
+    def fuzzy_fetch enum, match, not_found, ambiguous, fly_collapse=nil
+      fly_collapse ||= -> x { x } # no match or other when partial match.
+      exact = exact_found = nil   # short-circuit on first exact match,
+      count = 0                   # that is result. otherwise `not_found` or
+      partial = [ ]               # `ambiguous` called as appropriate..
+      enum.each do |item|
+        count += 1
+        flot = match[ item ]
+        if flot && 0 != flot
+          if 1 == flot
+            exact_found = true
+            exact = fly_collapse[ item ]
+            break
+          end
+          partial.push fly_collapse[ item ]
+        end
+      end
+      if exact_found
+        res = exact
+      else
+        case partial.length
+        when 0
+          res = not_found[ count ]
+        when 1
+          # maybe add an info hook one day..
+          res = partial.first
+        else
+          res = ambiguous[ partial ]
+        end
+      end
+      res
+    end
+
     def hdr s                     # how do we render headers (e.g. in report
       em s                        # tables?)
     end

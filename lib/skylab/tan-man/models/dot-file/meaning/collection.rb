@@ -2,13 +2,51 @@ module Skylab::TanMan
   class Models::DotFile::Meaning::Collection
     include Core::SubClient::InstanceMethods
 
+    def apply node, meaning_ref, dry_run, verbose, error, success, info
+      res = nil
+      begin
+        meaning = fetch_meaning meaning_ref, error, info
+        meaning or break( res = meaning )
+        resolved = resolve_meaning( meaning ) or break( res = resolved )
+        $stderr.puts "HOLY SHIT GO ON WITH YOUR BAD SELF: #{ resolved.class }"
+        res = true
+      end while nil
+      res
+    end
+
 
     def each &block
       list.each(& block)
     end
 
 
-    hack_rx = Models::DotFile::Meaning::MATCH_LINE_RX
+    def fetch_meaning meaning_ref, error, info
+      rx = /\A#{ ::Regexp.escape meaning_ref }/
+      res = fuzzy_fetch list,
+        -> meaning do
+          if rx =~ meaning.name
+            meaning_ref == meaning.name ? 1 : 0.5
+          end
+        end,
+        -> x do
+          error[ "there is no meaning associated with #{ ick meaning_ref } #{
+            } (among #{ x } meaning#{ s x }). try #{ kbd "tell #{ meaning_ref}#{
+            } means foo" } to give it meaning" ]
+          false # life is easier with false
+        end,
+        -> partial do
+          info[ "#{ ick meaning_ref } has ambiguous meaning. #{
+            }did you mean #{ or_ partial.map { |m| "#{ lbl m.name }" } }?" ]
+          nil # easy life
+        end,
+        -> fly { fly.collapse self } # when we find matches (either partial
+                                  # or exact) we have to "collapse" the
+                                  # flyweight.  Since it is after all a
+                                  # flyweight, its values are transient
+    end
+
+
+    hack_rx = Models::DotFile::Meaning::FUN.match_line_rx
 
     define_method :list do
       ::Enumerator.new do |y|
@@ -24,6 +62,17 @@ module Skylab::TanMan
         end
         nil
       end
+    end
+
+
+    def resolve_meaning meaning
+      graph = Models::DotFile::Meaning::Graph.new self, list # yes a one-off
+      res = graph.resolve meaning, -> o do
+        error describe_interminable_meaning( o )
+        emit :help, "perhaps address these issues with your meaning #{
+          }graph and try again."
+      end
+      res || nil # if it was false, change it to nil - we handled it
     end
 
 
@@ -142,6 +191,25 @@ module Skylab::TanMan
     end
 
   protected
+
+    def describe_interminable_meaning o
+      case o.reason
+      when :interminable
+        s = o.trail.map do |m|
+          "#{ lbl m.name } means #{ val m.value }"
+        end.join ' and '
+        msg = "interminable meaning: #{ s }, but #{
+          }#{ ick o.trail.last.value } has no meaning."
+      when :circular
+        s = o.trail.map do |m|
+          "#{ lbl m.name } -> #{ lbl m.value }"
+        end.join ', '
+        msg = "circular dependency in meaning: #{ s }"
+      else
+        msg = "interminable meaning - #{ o.reason }"
+      end
+      msg
+    end
 
     alias_method :dotfile_controller, :request_client
 
