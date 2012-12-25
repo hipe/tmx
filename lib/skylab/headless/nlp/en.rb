@@ -20,6 +20,7 @@ module Skylab::Headless
        is: ['exist', 'is', 'are'],
        no: ['no ', 'the only '],
         s: ['s', nil, 's'],
+       _s: [ nil, 's' ],               # it requires, they require
      this: ['these', 'this', 'these'],
       was: ['were', 'was', 'were']
     }

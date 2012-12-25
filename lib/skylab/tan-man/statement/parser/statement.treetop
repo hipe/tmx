@@ -17,7 +17,7 @@ module Skylab
         { def tree ; TanMan::Sexp::Auto::Recursive[ self ] end }
       end
       rule dependency_statement
-        agent:cluster sep 'depends on' sep target:cluster
+        agent:cluster sep polarity:( 'depends on' / 'does not depend on' ) sep target:cluster
         { def tree ; TanMan::Sexp::Auto::Recursive[ self ] end }
       end
       rule meaning_statement
@@ -28,7 +28,7 @@ module Skylab
         head:word tail:(sep content:word)*
       end
       rule word
-          !( ( 'depends on' / 'means' / 'is' )  !(!sep .) )
+          !( ( 'depends on' / 'does not depend on' / 'means' / 'is' )  !(!sep .) )
           [^,;\t\n\r ]+
         { def tree ; text_value end }
       end

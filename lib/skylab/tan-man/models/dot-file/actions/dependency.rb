@@ -4,11 +4,13 @@ module Skylab::TanMan
     def execute
       agent = statement.agent.words.join ' '
       target = statement.target.words.join ' '
-      api_invoke [:graph, :dependency, :set], agent: agent,
-                                            dry_run: dry_run,
-                                              force: force,
-                                             target: target,
-                                            verbose: verbose
+      action = 'does not depend on' == statement.polarity ? :unset : :set
+
+      api_invoke [:graph, :dependency, action], agent: agent,
+                                              dry_run: dry_run,
+                                                force: force,
+                                               target: target,
+                                              verbose: verbose
     end
   end
 end

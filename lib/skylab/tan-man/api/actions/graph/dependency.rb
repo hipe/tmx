@@ -35,4 +35,36 @@ module Skylab::TanMan
       res
     end
   end
+
+
+  class API::Actions::Graph::Dependency::Unset < API::Action
+    extend API::Action::Parameter_Adapter
+
+    PARAMS = [ :agent, :dry_run, :force, :target, :verbose ]
+
+  protected
+
+    def execute
+      res = nil
+      begin
+        cnt = collections.dot_file.currently_using or break
+        write = nil
+        cnt.disassociate! agent, target,
+          -> e do # nodes_not_found
+            error e.to_h
+          end,
+          -> e do # nodes_not_associated
+            error e.to_h
+          end,
+          -> e do # success
+            info e.to_h
+            write = true
+          end
+        if write
+          res = cnt.write dry_run, force, verbose
+        end
+      end while nil
+      res
+    end
+  end
 end

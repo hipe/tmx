@@ -15,7 +15,10 @@ label="dependeny graph of the skylab universe (subproducts)"
 
 node [label="\N", style="filled", fillcolor="#b5d5fb", fontname="Futura", penwidth="1.1566", shape="Mrecord"]
 
-# finished green : fillcolor="#79f233"
+#                 blue : fillcolor="#b5d5fb"
+#             finished : green
+#                green : fillcolor="#79f233"
+#         not-finished : blue
 
 
 code [label="code molester" fillcolor="#79f233"]
