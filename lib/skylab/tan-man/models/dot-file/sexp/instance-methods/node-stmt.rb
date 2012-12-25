@@ -1,6 +1,6 @@
-module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
-  module NodeStmt
-    include Common
+module Skylab::TanMan
+  module Models::DotFile::Sexp::InstanceMethods::NodeStmt
+    include Models::DotFile::Sexp::InstanceMethod::InstanceMethods
 
     def _create_node_with_label label
       # imagine you are the proto

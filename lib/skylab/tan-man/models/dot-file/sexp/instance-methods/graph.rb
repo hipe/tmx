@@ -1,11 +1,11 @@
-module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods # [#sl-123] exempt
-  module Graph
-    include Common
+module Skylab::TanMan
+  module Models::DotFile::Sexp::InstanceMethods::Graph
+    include Models::DotFile::Sexp::InstanceMethod::InstanceMethods
 
     associate_events = ::Struct.new :created, :existed
 
     define_method :associate! do |source, target, opts=nil, &block|
-      o = EdgeStmt::OPTS.new
+      o = Models::DotFile::Sexp::InstanceMethods::EdgeStmt::OPTS.new
       opts and opts.each { |k, v| o[k] = v }
       ev = associate_events.new
       block and block[ ev ]
@@ -71,7 +71,7 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods # [#sl-123] exempt
     end
 
 
-    comment_rx = Comment::MATCH_RX
+    comment_rx = Models::DotFile::Sexp::InstanceMethods::Comment::MATCH_RX
 
     define_method :comment_nodes do
       ::Enumerator.new do |y|

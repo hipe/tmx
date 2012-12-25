@@ -33,20 +33,21 @@ module Skylab::TanMan
     # this library, and possibly generated Sexp classes for use in
     # recursive calls to builder methods.
 
-    include Autoloader::Inflection::Methods # constantize
-
     def [] syntax_node # inheritable API entrypoint
       node2tree syntax_node, nil, nil # no class, no member_name
     end
 
-    def add_instance_methods tree_class
+
+    constantize = Autoloader::Inflection::FUN.constantize
+
+    define_method :add_instance_methods do |tree_class|
       if instance_methods_module
         tree_class.send :include, instance_methods_module
       end
-      im = [:Sexp, :InstanceMethods, constantize(tree_class.rule)].
+      im = [:Sexp, :InstanceMethods, constantize[ tree_class.rule ] ].
         reduce( tree_class.grammar.anchor_module ) do |m, x|
-        m.const_defined?(x, false) or break
-        m.const_get(x, false)
+        break if ! m.const_defined? x, false
+        m.const_get x, false
       end
       if im
         tree_class.send :include, im
