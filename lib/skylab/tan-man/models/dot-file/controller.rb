@@ -12,24 +12,99 @@ module Skylab::TanMan
     include Models::DotFile::Parser::InstanceMethods
 
     def check
-      sexp = self.sexp
-      if sexp
+      res = true # always succeeds
+      begin
+        sexp = self.sexp or break # emitted
         if verbose
           # this is strictly a debugging thing expected to be used from the
           # command line.  using the `infostream` (which here in the api
           # is a facade to an event emitter) is really icky and overkill here,
           # hence we just use $stderr directly :/
-          TanMan::Services::PP.pp sexp, $stderr
+          TanMan::Services::PP.pp sexp, $stderr # (note above)
           s = ::Pathname.new( __FILE__ ).relative_path_from TanMan.dir_pathname
           info "(from #{ s })"
         else
           info "#{ escape_path pathname } looks good : #{ sexp.class }"
         end
-      else
-        info "#{ escape_path pathname } didn't parse (?) : #{ sexp.inspect }"
-      end
-      true
+      end while nil
+      res
     end
+
+
+    def disassociate! source_ref, target_ref, nodes_not_found,
+                                                nodes_not_associated, success
+      res = nil
+
+      resolve_nodes = -> do
+        ambis = [] ; not_founds = []
+        ambi = -> o { ambis << o }  ; not_found = -> o { not_founds << o }
+        source_node = fetch_node source_ref, not_found, ambi
+        target_node = fetch_node target_ref, not_found, ambi
+
+        if ! source_node || ! target_node
+          ga = Models::Node::Events::Generic_Event_Aggregate.new self, [ ]
+          ga.list << Models::Node::Events::Node_Not_Founds.new( self,
+            not_founds ) if not_founds.length.nonzero?
+          ga.list.concat ambis
+          res = nodes_not_found[ ga ]
+          break
+        end
+        [ source_node, target_node ]
+      end
+
+      find_edges = -> source_node, target_node do
+        reverse_was_true = nil
+        source_node_id = source_node.node_id
+        target_node_id = target_node.node_id
+        prev_node = sexp.stmt_list
+        a = sexp.stmt_list._nodes.reduce( [ ] ) do |memo, stmt_list|
+          stmt = stmt_list.stmt
+          if :edge_stmt == stmt.class.rule
+            src_id = stmt.source_node_id
+            tgt_id = stmt.target_node_id
+            if src_id == source_node_id
+              if tgt_id == target_node_id
+                memo.push [ prev_node, stmt ]
+              end
+            elsif tgt_id == source_node_id && src_id == target_node_id
+              reverse_was_true = true
+            end
+          end
+          prev_node = stmt_list
+          memo
+        end
+        if a.length.nonzero?
+          a
+        else
+          ev = Models::Node::Events::Nodes_Not_Associated.new( self,
+            source_node, target_node, reverse_was_true )
+          ev.message = "#{ lbl source_node.label } already does not #{
+            }depend on #{ lbl target_node.label }#{ if reverse_was_true then
+            " (but #{ lbl target_node.label } does depend on #{
+            }#{ lbl source_node.label })" end }"
+          rev = nodes_not_associated[ ev ]
+          nil
+        end
+      end
+
+      begin
+        sexp or break # (else we might double up later on emissions ick!)
+        ( source_node, target_node = resolve_nodes[ ] ) or break
+        edges = find_edges[ source_node, target_node ] or break
+        edges.reverse.each do |node, item|
+          edge_stmt = node.destroy_child! item
+          ev = Models::Node::Events::Disassociation_Success.new self,
+            source_node, target_node, edge_stmt
+          ev.message = "#{ lbl source_node.label } no longer depends #{
+            }on #{ lbl target_node.label } (removed this edge_stmt: #{
+            }#{ kbd edge_stmt.unparse })"
+          res = success[ ev ]
+        end
+      end while nil
+      res
+    end
+
+
 
     constantize = ::Skylab::Autoloader::Inflection::FUN.constantize
 
@@ -59,29 +134,25 @@ module Skylab::TanMan
       res
     end
 
-    def fetch_node node_ref, error, info
+    define_method :fetch_node do |node_ref, not_found, ambiguous|
       res = nil
       begin
-        sexp = self.sexp
-        if ! sexp
-          emit :help, "perhaps try fixing above syntax errors and try again"
-          break( res = nil )
-        end
-        rx = /\A#{ ::Regexp.escape node_ref }/
-        res = fuzzy_fetch sexp._node_stmts,
-          -> stmt do
+        sexp = self.sexp or break
+        rx = /\A#{ ::Regexp.escape node_ref }/i # case-insensitive for now,
+        res = fuzzy_fetch sexp._node_stmts,     # we could do a fuzzy tie-
+          -> stmt do                            # breaker if we needed to
             if rx =~ stmt.label # stmt.node_id
               node_ref == stmt.label ? 1 : 0.5
             end
           end,
           -> count do
-            error[ "couldn't find a node whose label starts with #{
-              }#{ ick node_ref } (among #{ count } node#{ s count })" ]
+            not_found[ Models::Node::Events::Node_Not_Found.new(
+              self, node_ref, count ) ]
             false # this makes life easier..
           end,
           -> partial do
-            info[ "ambiguous node name #{ ick node_ref }. #{
-              }did you mean #{ or_ partial.map { |n| "#{ lbl n.label }" } }?" ]
+            ambiguous[ Models::Node::Events::Ambiguous_Node_Reference.new(
+              self, node_ref, partial ) ]
             nil # this makes life easier
           end
       end while nil
@@ -102,14 +173,22 @@ module Skylab::TanMan
                                    error, success, neutral
     end
 
-    def sexp
-      services.tree.fetch pathname do |k, svc|
-        tree = parse_file pathname
-        if tree
-          svc.set! k, tree
+    def sexp # etc
+      res = nil
+      begin
+        res = services.tree.fetch pathname do |k, svc|
+          tree = parse_file pathname
+          if tree
+            svc.set! k, tree
+          end
+          tree
         end
-        tree
-      end
+        if ! res
+          emit :help, "perhaps try fixing above syntax errors and try again"
+          res = nil
+        end
+      end while nil
+      res
     end
 
     def unset_meaning *a                                         # ..with this.

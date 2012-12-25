@@ -1,8 +1,10 @@
-module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
-  # (0..128).each { |i| puts("#{ '%03d' % [i] }: #{ ('%c' % [i] ).inspect }") }
+module Skylab::TanMan
+  module Models::DotFile::Sexp::InstanceMethods::IdHtml
 
-  module IdHtml
+    # (0..128).each { |i| puts("#{ '%03d' % [i] }: #{ ('%c' % [i] ).inspect }") }
+
     DENY_RX = /([^ !#$\%(-;=?-~])/ # ascii 32 (" ") - 126 ("~") minus the 5 belo
+
     HTML_ENTITIES = {
       '"' => 'quot', "'" => 'apos', '&' => 'amp', '<' => 'lt', '>' => 'gt',
     }

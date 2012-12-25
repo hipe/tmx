@@ -1,9 +1,8 @@
-module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
-  module EdgeStmt
+module Skylab::TanMan
+  module Models::DotFile::Sexp::InstanceMethods::EdgeStmt
+    include Models::DotFile::Sexp::InstanceMethod::InstanceMethods
 
     OPTS = ::Struct.new :attrs, :prototype
-
-    include Common
 
     def _attrs! attrs
       self[:attr_list][:content][:a_list]._update_attributes! attrs

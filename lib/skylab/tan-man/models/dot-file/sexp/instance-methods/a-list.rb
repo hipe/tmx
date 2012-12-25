@@ -1,6 +1,6 @@
-module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
-  module A_List
-    include Common
+module Skylab::TanMan
+  module Models::DotFile::Sexp::InstanceMethods::A_List
+    include Models::DotFile::Sexp::InstanceMethod::InstanceMethods
 
     def _insert_assignment! sym, val
       # because of the nature of the grammar, you are guaranteed to have at
