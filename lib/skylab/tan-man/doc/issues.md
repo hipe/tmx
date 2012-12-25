@@ -1,8 +1,9 @@
+[#062]      #later meaning reports!!!!
 [#061]       #done shallow shortcut to `tell` ?
 [#060]       #done #refactor: *all* NLP actions should go thru API duh
 [#059]       #done places where you could prettify custom action invites
 [#058]       #done get abs paths out of conf file, make them rel to the file
-[#057] #open meanings
+[#057]       #done DONE DONE DONE DONE DONE DONE DONE DONE meanings
              2. forgetting them (specs & nlp)
              3. applying them
 [#056]       #tracking-tag: can we use tan-man to guide refactorings yet?

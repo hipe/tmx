@@ -144,7 +144,7 @@ module Skylab::TanMan::TestSupport::Sexp
       f = on_load_parser_info ||
         -> e { info "      (loading parser ^_^ #{ gsub_path_hack e.to_s })" }
 
-      TreetopTools::Parser::Load.new(
+      TreetopTools::Parser::Load.new( self,
         -> o do
           force_overwrite and o.force_overwrite!
           o.generated_grammar_dir tmpdir_prepared

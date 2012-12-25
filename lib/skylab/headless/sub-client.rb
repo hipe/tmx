@@ -78,7 +78,7 @@ module Skylab::Headless
 
     def kbd s ; pen.kbd s end
 
-    def parameter_label x ; pen.parameter_label x end
+    def parameter_label x, *rest ; pen.parameter_label x, *rest end
 
     # --- * ---
 

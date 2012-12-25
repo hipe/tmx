@@ -2,15 +2,32 @@ require_relative 'core'
 
 module Skylab::Permute
   class CLI < ::Skylab::Porcelain::Bleeding::Runtime
+
     desc "minimal permutations generator."
-    def self.build_client_instance rt, tok # @compat
-     app = new
-     app.parent = rt
-     app.program_name = "#{rt.program_name} #{tok}"
-     app
+
+    def self.build_client_instance rt, tok # #compat
+      app = new
+      app.parent = rt
+      app.program_name = "#{ rt.program_name } #{ tok }"
+      app
     end
-    def self.porcelain ; self end # @compat
+
+    def self.porcelain # #compat
+      self
+    end
+
+  protected
+
+    def initialize *a, &b
+      fail 'sanity' if b                       # please pardon our blood
+      if a.length.nonzero?
+        raise ::ArgumentError.new 'no' if 3 != a.length
+        self.parent = Headless::CLI::IO_Adapter::Minimal.new(* a)
+      end                                      # else legacy tmx wiring
+    end
   end
+
+
   class CLI::Action
     extend ::Skylab::Porcelain::Bleeding::Action
     extend ::Skylab::PubSub::Emitter
@@ -23,8 +40,12 @@ module Skylab::Permute
       action
     end
   end
+
+
   module CLI::Actions
   end
+
+
   class HackParse
     attr_accessor :action
     def any?

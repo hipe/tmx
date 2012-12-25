@@ -5,6 +5,41 @@ module Skylab::TanMan
 
 
 
+  class API::Actions::Graph::Meaning::Apply < API::Action
+    extend API::Action::Parameter_Adapter
+
+    PARAMS = [ :dry_run, :meaning, :node, :verbose ]
+
+  protected
+
+    def execute
+      res = nil
+      begin
+        cnt = collections.dot_file.currently_using or break
+        write = nil
+        res = cnt.apply_meaning node, meaning, dry_run, verbose,
+          -> e do
+            error e
+            false
+          end,
+          -> success do
+            info success
+            write = true
+            true
+          end,
+          -> infor do
+            info infor
+          end
+        if write
+          res = cnt.write dry_run, false, verbose
+        end
+      end while nil
+      res
+    end
+  end
+
+
+
   class API::Actions::Graph::Meaning::Forget < API::Action
     extend API::Action::Parameter_Adapter
 

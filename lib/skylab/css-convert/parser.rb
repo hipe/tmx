@@ -39,7 +39,7 @@ module Skylab::CssConvert
         # o.on_error { |e| error "failed to load grammar: #{ e }" }
         o.on_error { |e| fail "failed to load grammarz: #{ e }" }
       end
-      p = ::Skylab::TreetopTools::Parser::Load.new dsl, events
+      p = ::Skylab::TreetopTools::Parser::Load.new self, dsl, events
       p.invoke
     end
   end

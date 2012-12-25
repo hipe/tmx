@@ -4,7 +4,7 @@ describe "#{Skylab::TanMan::Models::DotFile} (manipulus 009) Adding Nodes" do
   extend ::Skylab::TanMan::TestSupport::Models::DotFile::Manipulus
 
   using_input '009-add-node-simple-prototype/zero.dot' do
-    it 'adds a node to zero nodes' do
+    it 'adds a node to zero nodes', f:true do
       result.nodes.should eql([])
       o = result.node! 'feep'
       a = result.nodes

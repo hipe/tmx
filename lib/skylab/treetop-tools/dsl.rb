@@ -79,7 +79,8 @@ module Skylab::TreetopTools
 
   protected
 
-    def initialize dsl_body, events # override sub-client method
+    def initialize request_client, dsl_body, events
+      _headless_sub_client_init! request_client
       self.body = dsl_body
       self.events = events
     end

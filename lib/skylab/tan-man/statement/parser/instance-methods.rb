@@ -27,7 +27,7 @@ module Skylab::TanMan
         end
       end
 
-      TreetopTools::Parser::Load.new(
+      TreetopTools::Parser::Load.new( self,
         -> o do
           o.force_overwrite! if force
           o.generated_grammar_dir '../../../tmp'

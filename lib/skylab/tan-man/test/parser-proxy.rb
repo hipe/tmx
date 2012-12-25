@@ -1,8 +1,8 @@
-module Skylab::TanMan::TestSupport
-  class ParserProxy
+module Skylab::TanMan
+  class TestSupport::ParserProxy
     # the point of this (somewhat experimentally) is to see if we can have
     # a 'pure' parser thing that is divorced from our client controller
-    # with a minimal amount of dedicated logic
+    # with a minimal amount of dedicated logic (the answer was yes)
 
     include TanMan::Models::DotFile::Parser::InstanceMethods
 
@@ -12,9 +12,22 @@ module Skylab::TanMan::TestSupport
       @dir_pathname ||= (dir_path and ::Pathname.new(dir_path))
     end
 
+    public :parser
+
     attr_accessor :profile
 
+    def verbose
+      @verbose and @verbose.call
+    end
+
+    attr_writer :verbose
+
   protected
+
+    def initialize rc
+      @verbose = nil
+      super
+    end
 
     def parser_result result
       res = super

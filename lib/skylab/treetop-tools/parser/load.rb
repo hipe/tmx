@@ -94,7 +94,7 @@ module Skylab::TreetopTools
         file_utils.mkdir_p(g.outpathname.dirname.to_s, verbose: true)
         true
       else
-        error("directory must exist: #{parent.pretty}")
+        error "directory must exist: #{ escape_path parent }"
         false
       end
     end
@@ -119,10 +119,10 @@ module Skylab::TreetopTools
         end
         if bp.value.exist?
           if bp.parameter.dir? and ! bp.value.directory?
-            error("#{ bp.label } is not a directory: #{ p.value.pretty }")
+            error "#{ bp.label } is not a directory: #{ escape_path p.value }"
           end
         elsif bp.parameter.known?(:exist) and :must == bp.parameter.exist
-          error("#{ bp.label } not found: #{ bp.value.pretty }")
+          error "#{ bp.label } not found: #{ escape_path bp.value }"
         end
       end
       error_count == error_count_before

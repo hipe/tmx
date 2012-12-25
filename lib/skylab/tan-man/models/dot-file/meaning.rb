@@ -4,7 +4,14 @@ module Skylab::TanMan
 
     include Core::SubClient::InstanceMethods
 
-    MATCH_LINE_RX = /\A[ \t]*[-a-z]+[ \t]*:/
+
+    def collapse request_client                # we are not a flyweight, hack
+      self.request_client and fail 'sanity'
+      _tan_man_sub_client_init! request_client
+      self
+    end
+
+    match_line_rx = /\A[ \t]*[-a-z]+[ \t]*:/
 
     valid_name_rx = /\A[a-z][-a-z0-9]*\z/
 
@@ -61,11 +68,20 @@ module Skylab::TanMan
       res
     end
 
+    attr_reader :symbol           # exp - doesn't always feel right using only
+                                  # strings, despite what i may have said above
+
+    o = { }
+    o[:match_line_rx] = match_line_rx
+    o[:valid_name_rx] = valid_name_rx
+    FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
+
   protected
 
     def initialize request_client, name, value
       _tan_man_sub_client_init! request_client
       self[:name] = name
+      @symbol = name.intern
       self[:value] = value
       @e0 = @e2 = @e4 = nil
     end
