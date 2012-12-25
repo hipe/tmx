@@ -111,7 +111,7 @@ module Skylab::TanMan
       end
 
 
-      proto_for_insert = -> me, existing_a, idx do              # #single-call
+      normalize_proto_a = -> me, existing_a, idx do             # #single-call
         proto_a = nil
         if me._prototype
           proto_a = me._prototype._nodes.to_a
@@ -122,8 +122,12 @@ module Skylab::TanMan
           fail "cannot insert into a list with less than 2 items -- #{
             }for hack to work, need a prototype list, node & item."
         end
-        idx = [1, [idx, proto_a.length - 2].min ].max
-        proto_a[ idx ]
+
+        res = [ proto_a.first, nil ] # always hold on to first, it can be spec.
+        res[0] = proto_a[0]
+        use_idx = [1, [idx, proto_a.length - 2].min ].max # explain this #todo
+        res[1] = proto_a[ use_idx ]
+        res
       end
 
 
@@ -151,12 +155,13 @@ module Skylab::TanMan
 
       # -- List item insertion lambdas (in ascending order of complexity)
 
-      initial = -> me, proto do                                 # #single-call
+      initial = -> me, proto_a do                               # #single-call
         # The strategy for initial insertion of an item into an empty list
         # ("list controller") is simply to use the defaults for tail_getter
         # and item_getter and for the remaining members, for those that are
         # non-nil make a dupe of the corresponding member from the prototype.
         #
+        proto = proto_a.last
         res = me
         target = me
         xfer = ::Hash.new -> m do
@@ -173,8 +178,10 @@ module Skylab::TanMan
 
 
 
-      insert = -> me, proto, left, right do                     # #single-call
+      insert = -> me, proto_a, left, right do                   # #single-call
         # For inserting an item under an existing parent (left) node ..
+
+        proto = proto_a.last
 
         new = me.class.new
         xfer = ::Hash.new -> m do              # the strategy form making new
@@ -205,36 +212,58 @@ module Skylab::TanMan
 
 
 
-      swap = -> root, proto, new do
+      swap = -> root, proto_a, new_item, existing_length do
+
         # Having no `left` node means inserting at root -- b/c of the
         # structure of recursive rules this works out to be an *intense*
         # hack, see _remove!
-        # `new` goes to live in second slot, swapping members with root omg!
+        #
+        # Specifically, (and remembering: a "node" *has* an "item"
+        # (e.g. AList has AList1), the `new_node` we create actually
+        # goes to live in the second slot, getting for its members
+        # a lot of the members root used to have (like its item and tail)..
+        # hold on tight..
 
-        newer = root.class.new                 # (i still don't understand why)
 
-        xfer = ::Hash.new -> m do              # The default behavior for new
-          swap_me = root[m]                    # node members is to give them
-          root[m] = proto.__dupe_member m      # what was once at root, and at
-          swap_me                              # the same time do this to root
-        end
+        new_node = root.class.new
+        proto_first = proto_a.first            # let's be clear - we use both
+        proto_last = proto_a.last
+                                               # When transferring each member
+                                               # to the new node we created,
+                                               # the default behavior is to
+                                               # snatch the element from the
+                                               # root and give it to the new
+                                               # node, and in its stead give
+                                               # root a shiny new element from
+        xfer = ::Hash.new -> m do              # the prototye.
+          give_to_root = proto_first.__dupe_member m
+          take_from_root = root[m]
+          root[m] = give_to_root
+                                               # If root didn't have anything
+          if ! take_from_root                  # in a spot (e.g. e0, e2), expect
+            take_from_root = proto_last.__dupe_member m # that there is white-
+          end                                  # -space formatting we need that
+          take_from_root                       # the proto_a had but that root
+        end                                    # didnt.
 
         original_root_tail = root[tail_getter]
-        if list_getter && ! next_node[ proto ]
-          tail = proto.__dupe_member tail_getter
+        if list_getter && ! next_node[ proto_last ]
+          tail = proto_last.__dupe_member tail_getter
           root[tail_getter] = tail
-          tail[list_getter] = newer            # oh sweet jesus
+          tail[list_getter] = new_node         # oh sweet jesus
         else
-          root[tail_getter] = newer            # think how whacktastic this is
+          root[tail_getter] = new_node         # think how whacktastic this is
         end
         xfer[tail_getter] = -> _ { original_root_tail }
 
         original_root_item = root[item_getter]
         xfer[item_getter] = -> _ { original_root_item }
 
-        root[item_getter] = normalize_item[ new, proto ]
+        root[item_getter] = normalize_item[ new_item, proto_last ]
 
-        [ root, newer, xfer ]
+        [ root, new_node, xfer ]               # [0] - result of insert call
+                                               # [1] - target of transfer hash
+
       end
 
 
@@ -247,24 +276,24 @@ module Skylab::TanMan
 
         idx, left, right = idx_left_right[ new_before_this, existing_a ]     #
 
-        proto = proto_for_insert[ self, existing_a, idx ]                    #
+        proto_a = normalize_proto_a[ self, existing_a, idx ]                 #
 
         if left
-          res, target, xfer = insert[ self, proto, left, right ]             #
+          res, target, xfer = insert[ self, proto_a, left, right ]           #
         elsif right
-          res, target, xfer = swap[ self, proto, new ]                       #
+          res, target, xfer = swap[ self, proto_a, new, existing_a.length ]  #
         else
-          res, target, xfer = initial[ self, proto ]                         #
+          res, target, xfer = initial[ self, proto_a ]                       #
         end
 
-        if ! xfer.key? item_getter
-          use_item = normalize_item[ new, proto ]
-          xfer[item_getter] = -> _ { use_item }
-        end
+        if ! xfer.key? item_getter             # the default strategy for
+          use_item = normalize_item[ new, proto_a.last ] # populating the
+          xfer[item_getter] = -> _ { use_item }  # `item` (content) part of the
+        end                                    # new node
 
-        if ! xfer.key? tail_getter
-          xfer[tail_getter] = tail_f[ right, proto ]
-        end
+        if ! xfer.key? tail_getter             # the default strategy for
+          xfer[tail_getter] = tail_f[ right, proto_a.last ] # populating the
+        end                                    # "next self" part        #
 
         self.class._members.each do |m|
           target[m] = xfer[m][ m ]
