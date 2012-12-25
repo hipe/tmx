@@ -1,3 +1,4 @@
+fail 'NO' # this is just a sketch - really old scraps possiblly for [#hl-022]
 require File.expand_path('../file-services/write-event-knob', __FILE__)
 
 module Skylab::CodeMolester

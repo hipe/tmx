@@ -27,10 +27,10 @@ describe "#{::Skylab::TanMan::Sexp::Auto} MANIPULULS" do
     end
     using_input_string "feep ; forp ; \n", 'two items' do
       context 'adds' do
-        it 'before first, using 2nd as prototype, and unparsey' do
+        it 'before first, uses first as prototype, and unparsey' do
           inserted = result._insert_before! 'faap', 'feep'
           result.nodes.should eql(['faap', 'feep', 'forp'])
-          result.unparse.should eql("faap ; \nfeep ; forp ; \n")
+          result.unparse.should eql("faap ; feep ; forp ; \n")
           inserted.object_id.should eql(result.object_id) # yikes
         end
         it 'before second using 2nd as prototype' do
@@ -63,19 +63,19 @@ describe "#{::Skylab::TanMan::Sexp::Auto} MANIPULULS" do
     end
     using_input_string "fap;fep ; fip ;\n ", 'three items' do
       context 'adds' do
-        it 'before first using 2nd as prototype' do
+        it 'before first using 1st as prototype' do
           result._insert_before! 'fapp', 'fap'
-          result.unparse.should eql("fapp ; fap;fep ; fip ;\n ")
+          result.unparse.should eql("fapp;fap;fep ; fip ;\n ")
         end
         it 'before second using 2nd as prototype' do
           result._insert_before! 'fapp', 'fep'
           result.unparse.should eql("fap;fapp ; fep ; fip ;\n ")
         end
-        it 'before third using 2nd as prototype' do
+        it 'before third using 2nd as prototype (FOR NOW)' do
           result._insert_before! 'fapp', 'fip'
           result.unparse.should eql("fap;fep ; fapp ; fip ;\n ")
         end
-        it 'before nil (append) using 2nd as prototype' do
+        it 'before nil (append) using 2nd as prototype (FOR NOW)' do
           result._insert_before! 'fapp', nil
           result.unparse.should eql("fap;fep ; fip ;\n fapp ; ")
         end

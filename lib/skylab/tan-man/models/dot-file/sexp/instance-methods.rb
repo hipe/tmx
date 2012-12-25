@@ -22,6 +22,10 @@ module Skylab::TanMan::Models::DotFile::Sexp::InstanceMethods
     end
   end
 
+  module Comment
+    MATCH_RX = %r{\A[[:space:]]*(?:#|/\*)} # #hack
+  end
+
   module Common
     self::TanMan = ::Skylab::TanMan
 

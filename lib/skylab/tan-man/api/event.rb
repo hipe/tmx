@@ -1,4 +1,5 @@
 module Skylab::TanMan
+
   class API::Event < Core::Event
     # this is all very experimental and subject to change!
 

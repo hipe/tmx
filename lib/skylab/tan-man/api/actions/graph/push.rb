@@ -1,5 +1,4 @@
 module Skylab::TanMan
-
   class API::Actions::Graph::Push < API::Action
     extend API::Action::Attribute_Adapter
 

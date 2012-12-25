@@ -21,7 +21,7 @@ module Skylab::TanMan::TestSupport
           output_shift_is infostream,
             "ferp failed to add remote - couldn't find local-conf.d in #{
               }this or any parent directory"
-          output_shift_only_is infostream, 'try ferp init to create it', false
+          output_shift_only_is infostream, 'use ferp init to create it', false
         end
 
         it 'cannot get listed, whines the same' do
@@ -41,7 +41,7 @@ module Skylab::TanMan::TestSupport
         it 'you can add a local remote' do
           input 'remote add bing bong'
           output_shift_only_is infostream,
-            'ferp remote add: creating config .. done (146 bytes.)',
+            'while ferp was adding remote: creating config .. done (146 bytes.)',
             true
         end
 
@@ -71,9 +71,9 @@ module Skylab::TanMan::TestSupport
           it 'using a valid name works' do
             input 'remote rm foo'
             output_shift_is infostream,
-              /ferp remote rm: updating config \.\. done \(\d+ bytes\.\)/
+              /updating config \.\. done \(\d+ bytes\.\)/
             output_shift_only_is infostream,
-              'ferp remote rm: removed remote foo', true
+              /removed remote foo/, true
           end
 
           it 'using an invalid name' do

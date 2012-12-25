@@ -89,7 +89,15 @@ module Skylab::Headless
         f[:set_f] = ->{ formal_parameters }
         f[:params_f] = -> { formal_parameters.each.to_a }
         f[:known_f] = ->(param) { known? param.name }
-        f[:label_f] = ->(param, i=nil) { pen.parameter_label(param, i) }
+
+        f[:label_f] = -> param, i=nil do
+          if request_client
+            parameter_label param, i
+          else
+            "#{ param }#{ "[#{ i }]" if i }" # #todo
+          end
+        end
+
         f[:read_f] = ->(param) do
           m = method(param.name) # catch these errors here, they are sneaky
           m.arity <= 0 or fail("You do not have a reader for #{param.name}")

@@ -11,7 +11,8 @@ module Skylab::TanMan
     # (for now, experimentally this api call is very porcelain-y,
     # but additionally it tries to emit useful metadata)
     def execute
-      f = -> m do
+      # failure handled by callee
+      collections.example.using_example_metadata resource_name, -> m do
         a = m.searched_resources
         str = nil
         if m.value_was_set
@@ -22,8 +23,8 @@ module Skylab::TanMan
         end
         info message: str, meta: m
       end
-      # failure handled by callee
-      controllers.examples.selected_status resource_name, f
     end
+
+    attr_reader :verbose #compat
   end
 end

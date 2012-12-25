@@ -1,3 +1,11 @@
+[#062]      #later meaning reports!!!!
+[#061]       #done shallow shortcut to `tell` ?
+[#060]       #done #refactor: *all* NLP actions should go thru API duh
+[#059]       #done places where you could prettify custom action invites
+[#058]       #done get abs paths out of conf file, make them rel to the file
+[#057]       #done DONE DONE DONE DONE DONE DONE DONE DONE meanings
+             2. forgetting them (specs & nlp)
+             3. applying them
 [#056]       #tracking-tag: can we use tan-man to guide refactorings yet?
                #waiting-on:(#014, #015)
 [#055]       wtf
@@ -63,10 +71,11 @@
 [#009]       #done 2012-10-27 create a node
                1. with one template (3 permutations) 2. with another template (3 permutes)
 [#008]       #done 2012-10-10 #rename rename "nt" to "expression" / "rule"
-[#007] #open #small #critical models/ dir generated during specs 2012-09-29
+[#007]       #done #small #critical models/ dir generated during specs 2012-09-29
 [#006]       #open #one-day look into reflection via metagrammer instead 2012-09-27
 [#005]       #open #one-day look into "statement oriented" processing 2012-09-02
 [#004]       #open #one-day #one-day look into multibyte regexp 2012-09-02
 [#003]       #open #one-day unshield your eyes : google "dotfile grammar" 2012-09-01
-[#002] #open 2012-08-30 rename remote* to fit a pattern (e.g. controller)
+[#002]       #done 2012-08-30 rename remote* to fit a pattern (e.g. controller)
+               examples-controller -> example-collection
 [#001]       #done tan -w ok, #depends-on:(#sl-unwip)

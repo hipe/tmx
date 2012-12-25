@@ -5,6 +5,8 @@ module Skylab::TanMan
 
     include Core::Action::InstanceMethods
 
+    ANCHOR_MODULE = API::Actions  # #experimental near [#059]
+
     event_class API::Event
 
     # Using call() gives us a thick layer of isolation between the outward
@@ -14,10 +16,10 @@ module Skylab::TanMan
     # they might be just lambdas, or they might be something more.  This
     # pattern may or may not stick around, and is part of [#sl-100]
     #
-    def self.call request_client, params_h, events
+    def self.call request_client, param_h, events
       block_given? and fail 'sanity - no blocks here!'
       action = new request_client, events
-      result = action.set! params_h
+      result = action.set! param_h
       if result                        # we violate the protected nature of
         result = action.send :execute  # it only b/c we are the class!
       end                              # it is protected for the usual reasons
@@ -51,6 +53,7 @@ module Skylab::TanMan
           k = TanMan::Models.const_fetch( method, false ). # WE LOVE YOU BOXXY
             const_get( controller_const, false )
           x = k.new me
+          x.verbose = me.send :verbose # this is so common let's sledgehammer it
           define_singleton_method( method ) { x }
           x
         end

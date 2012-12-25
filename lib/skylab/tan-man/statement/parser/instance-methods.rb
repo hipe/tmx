@@ -20,12 +20,14 @@ module Skylab::TanMan
     end
 
     def load_parser_class
-      f = on_load_parser_info
-      f ||= -> e do
-        info "#{ em '-->' } #{ gsub_path_hack e.to_s }"
+      on_info = on_load_parser_info
+      on_info ||= -> e do
+        if verbose
+          info "#{ em '-->' } #{ gsub_path_hack e.to_s }"
+        end
       end
 
-      TreetopTools::Parser::Load.new(
+      TreetopTools::Parser::Load.new( self,
         -> o do
           o.force_overwrite! if force
           o.generated_grammar_dir '../../../tmp'
@@ -33,7 +35,7 @@ module Skylab::TanMan
           o.treetop_grammar 'statement/parser/statement.treetop'
         end,
         -> o do                   # this might get [#046]'d
-           o.on_info(& f)
+           o.on_info(& on_info)
            o.on_error { |e| fail "failed to load grammar: #{ e }" }
         end
       ).invoke
@@ -43,7 +45,7 @@ module Skylab::TanMan
       parse_string words_arr.join(' '), opts
     end
 
-    def parser_failure
+    def parser_failure # might get dried : DRY #watch [#ttt-002]
       res = nil
       begin
         # parser.failure_reason, parser.failure_line, parser.failure_column

@@ -15,9 +15,13 @@ module Skylab::Headless
   module CLI::Action::ModuleMethods
     include Headless::Action::ModuleMethods
 
-    # def desc [#hl-033]
-
+    def desc first, *rest         # [#hl-033] dsl-ly writer (and you have the
+      ( @desc_lines ||= [ ] ).concat [ first, *rest ] # `desc_lines` reader
+      nil                                             # defined in core::action
+    end
   end
+
+
 
   module CLI::Action::InstanceMethods
     extend MetaHell::Let
@@ -102,6 +106,21 @@ module Skylab::Headless
     end
 
 
+    def help_description          # assume desc_lines is nonzero-length array
+      emit :help, ''              # assumes there was content above!
+      if 1 == desc_lines.length   # do the smart thing with formatting
+        emit :help, "#{ em 'description:' } #{ desc_lines.first }"
+      else
+        indent = option_parser ? option_parser.summary_indent : '  '
+        emit :help, "#{ em 'description:' }"
+        desc_lines.each do |line|
+          emit :help, "#{ indent }#{ line }"
+        end
+      end
+      nil
+    end
+
+
     def help_options              # precondition: an option_parser exists
       # (in the old days this was option_parser.to_s, which should still work.)
       emit :help, ''              # assumes there was previous above content!
@@ -123,6 +142,9 @@ module Skylab::Headless
 
     define_method :help_screen do
       emit :help, usage_line
+
+      help_description if desc_lines
+
       if option_parser
         option_parser.summary_width = smart_summary_width[ option_parser ]
         help_options
@@ -234,7 +256,7 @@ module Skylab::Headless
       res = nil
       begin
         if self.class.desc_lines               # 1) if we have desc lines
-          break( res = super )                 # then use the first one (prolly)
+          break( res = super() )               # then use the first one (prolly)
         end
         op = option_parser                     # 2) else if we have an o.p.
         if op                                  # *and* the first element of it

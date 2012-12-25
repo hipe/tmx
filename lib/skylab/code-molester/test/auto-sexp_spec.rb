@@ -5,9 +5,17 @@ describe ::Skylab::CodeMolester::AutoSexp do
   include ::Skylab::CodeMolester::TestSupport::CONSTANTS
 
 
+  cache = { }                     # avoid warnings about etc. don't worry,
+                                  # cacheing like this is *always* fine
   let :parser_class do
-    CodeMolester::Services::Treetop.load_from_string grammar
+    wat = cache.fetch( grammar ) do |str|
+      g = CodeMolester::Services::Treetop.load_from_string str
+      cache[ str ] = g
+      g
+    end
+    wat
   end
+
 
   let(:parser) { parser_class.new }
   let(:parse_result) { parser.parse(input) }
@@ -17,7 +25,7 @@ describe ::Skylab::CodeMolester::AutoSexp do
     let(:grammar) do
       <<-HERE.unindent
         module Skylab::CodeMolester::TestNamespace
-          grammar PersonName
+          grammar PersonName_01
             rule person_name
               [a-z]+ <Node>
             end
@@ -46,7 +54,7 @@ describe ::Skylab::CodeMolester::AutoSexp do
     let(:grammar) do
       <<-HERE.unindent
         module Skylab::CodeMolester::TestNamespace
-          grammar PersonName
+          grammar PersonName_02
             rule person_name
               t_1_first:( [a-z]+ )
               n_2_last:(
@@ -60,8 +68,8 @@ describe ::Skylab::CodeMolester::AutoSexp do
       HERE
     end
     it "(the treetop grammar parses inputs like normal)" do
-      parser.parse('mary').should be_kind_of(CodeMolester::TestNamespace::PersonName::Node)
-      parser.parse('joe bob').should be_kind_of(CodeMolester::TestNamespace::PersonName::Node)
+      parser.parse('mary').should be_kind_of(CodeMolester::TestNamespace::PersonName_02::Node)
+      parser.parse('joe bob').should be_kind_of(CodeMolester::TestNamespace::PersonName_02::Node)
       parser.parse('joe bob briggs').should be_nil
     end
     context "because the grammar is more complex, stuff starts to happen magically" do
@@ -82,7 +90,7 @@ describe ::Skylab::CodeMolester::AutoSexp do
     let(:grammar) do
       <<-HERE.unindent
         module Skylab::CodeMolester::TestNamespace
-          grammar PersonName
+          grammar PersonName_03
             rule person_name
               t_1_first:name
               n_2_last:(

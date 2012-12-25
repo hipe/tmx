@@ -6,8 +6,8 @@ module Skylab::Headless
     include Headless::Services::FileUtils
 
     ::FileUtils.collect_method( :verbose ).each do |name|
-      define_method( name ) do |*args|
-        super( *fu_update_option( args, verbose: true ) )
+      define_method( name ) do |*args, &block|
+        super( *fu_update_option( args, verbose: true ), &block )
       end
     end
 

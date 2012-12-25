@@ -33,11 +33,11 @@ module Skylab::TanMan
 
   public
 
-    def set! params_h
+    def set! param_h
       result = nil
       begin
-        if params_h
-          r = update_attributes! params_h
+        if param_h
+          r = update_attributes! param_h
           if ! r
             result = r
             break
@@ -63,9 +63,9 @@ module Skylab::TanMan
       (@invalid_reasons ||= nil) ? @invalid_reasons.length : 0
     end
 
-    def update_attributes! params_h            # "atomic"
+    def update_attributes! param_h            # "atomic"
       all_keys = attribute_definer.attributes.keys
-      good, bad = params_h.reduce( [[],[]] ) do |m, (k,v)|
+      good, bad = param_h.reduce( [[],[]] ) do |m, (k,v)|
         if all_keys.include? k
           m.first.push [ "#{ k }=", v ]
         else

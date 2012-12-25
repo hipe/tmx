@@ -79,7 +79,23 @@ module Skylab::TestSupport
       stream_spy_for(* a)         # sake  but this one in particular can help
     end                           # make tests concise and readable)
 
-  public
+
+    names_strings_hack = ::Module.new.module_eval do
+      def names   ; self[0] end
+      def strings ; self[1] end
+      self
+    end
+
+    define_method :unzip do       # goofy fun. result: 2 parallel arrays:
+      names = [ ] ; strings = [ ]              # names and strings
+      lines.each do |o|                        # this is of dubious value,
+        names.push o.name                      # but is fun
+        strings.push o.string
+      end
+      [names, strings].extend names_strings_hack
+    end
+
+  protected
 
     def initialize
       @debug = nil

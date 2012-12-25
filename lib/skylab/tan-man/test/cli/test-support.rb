@@ -39,6 +39,5 @@ module Skylab::TanMan::TestSupport::CLI
       o.send :io_adapter=, ioa
       o
     end
-
   end
 end

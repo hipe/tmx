@@ -298,6 +298,8 @@ module ::Skylab::CodeMolester
       result
     end
 
+    attr_reader :entity_noun_stem
+
     def update em
       result = nil
       begin
@@ -377,6 +379,6 @@ module ::Skylab::CodeMolester
     # ------------------------------- end ------------------------------------
   end
 
-  Config::File.do_debug = true
+  Config::File.do_debug = nil
 
 end

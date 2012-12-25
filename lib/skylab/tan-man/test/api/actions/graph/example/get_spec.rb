@@ -17,7 +17,7 @@ module Skylab::TanMan::TestSupport::API::Actions
         --- /dev/null
         +++ b/local-conf.d/config
         @@ -0,0 +1 @@
-        +example=holy-nerp.dot
+        +using_example=holy-nerp.dot
       HERE
 
       api_invoke_from_tmpdir

@@ -60,17 +60,19 @@ module Skylab::TanMan
       nil
     end
 
-    def ready?
+    def ready? err=nil
       services.config.ready? do |o|            # compare to actions/status.rb
 
         o.escape_path = ->( p ) { escape_path p } # per modality!
 
         o.no_config_dir = -> e do
-          emit :no_config_dir, e               # same payload, different graph!
+          if err then err[ e ] else
+            emit :no_config_dir, e            #  same payload, different graph!
+          end
         end
 
         o.global_invalid = -> e do
-          error e
+          if err then err[ e ] else error e end
         end
 
         o.local_invalid = o.global_invalid
@@ -78,7 +80,7 @@ module Skylab::TanMan
     end
 
     def remotes
-      @remotes ||= Models::Config::Remotes.new request_client
+      @remotes ||= Models::Config::Remote::Collection.new request_client
     end
 
     def remove_remote remote_name, resource_name
@@ -134,6 +136,8 @@ module Skylab::TanMan
       end while nil
       res
     end
+
+    attr_accessor :verbose # compat
 
     def write_resource resource
       result = nil

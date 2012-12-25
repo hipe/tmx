@@ -116,13 +116,16 @@ module Skylab::TanMan::TestSupport
     include Autoloader::Inflection::Methods
     include Tmpdir::InstanceMethods
 
+    attr_accessor :api_was_cleared # brings it all together
+
     def _build_normalized_input_pathname stem
       __input_fixtures_dir_pathname.join stem
     end
 
     let :client do
-      client = :foo
+      client = Headless::DEV::Client.new
       o = TanMan::TestSupport::ParserProxy.new client
+      o.verbose = -> { do_debug }
       o.dir_path = _parser_dir_path
       if do_debug_parser_loading
         o.profile = true
@@ -135,6 +138,7 @@ module Skylab::TanMan::TestSupport
 
     def debug!                                 # (aliased to tanman_debug!)
       self.do_debug = true
+      self.do_debug_parser_loading = true
     end
     alias_method :tanman_debug!, :debug!
 
@@ -187,6 +191,13 @@ module Skylab::TanMan::TestSupport
       else
         fail('sanity - should not have neither')
       end
+    end
+
+    let :output do
+      o = TestSupport::StreamSpy::Group.new
+      o.debug = -> { do_debug }
+      o.line_filter! Headless::CLI::Pen::FUN.unstylize
+      o
     end
 
     def prepare_local_conf_dir

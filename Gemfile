@@ -2,12 +2,14 @@ source :rubygems
 
 gem 'highline'
 
+if false
 group :'git-viz' do
   $stderr.puts "(see Gemfile)"
   gem 'grit',
     :git => 'https://github.com/mojombo/grit.git',
     # :git => "#{ENV['HOME']}/Projects/_tmx/Unpacked/grit",
     :ref => '3fc864f3c637e06e2fa7a81f6b48a5df58a9bc5b' # 2012-01-26
+end
 end
 
 group :development do

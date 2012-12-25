@@ -17,7 +17,7 @@ module Skylab::TanMan::TestSupport::API::Actions
         --- /dev/null
         +++ b/local-conf.d/config
         @@ -0,0 +1 @@
-        +example=holy-foly.dot
+        +using_example=holy-foly.dot
       HERE
 
       api_invoke_from_tmpdir name: 'zoidberg'
@@ -38,14 +38,14 @@ module Skylab::TanMan::TestSupport::API::Actions
         --- /dev/null
         +++ b/local-conf.d/config
         @@ -0,0 +1 @@
-        +example=hoitus-toitus.dot
+        +using_example=hoitus-toitus.dot
       HERE
 
       api_invoke_from_tmpdir name: 'holy-smack'
       (1..5).should cover(response.events.length)
       e = response.events.first
       e.type.should eql( :info )
-      e.message.should match( /chang(?:ing|ed) example from #{
+      e.message.should match( /chang(?:ing|ed) using_example from #{
         }"hoitus-toitus\.dot" to "holy-smack\.dot"/i )
     end
   end

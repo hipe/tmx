@@ -4,9 +4,11 @@ module Skylab::Semantic
   class Digraph
 
   public
-    def [](name)
+
+    def [] name
       @hash[name]
     end
+
     def all_ancestors name
       ::Enumerator.new do |y|
         seen = { }
@@ -19,9 +21,17 @@ module Skylab::Semantic
         visit_f[name]
       end
     end
+
+    def clear
+      @hash.clear
+      @order.clear
+      nil
+    end
+
     def describe
       nodes.map(&:describe).join "\n"
     end
+
     def flatten nodes
       # return an emitter that yields, for each node in "node", each of its
       # "is-a" parents and then then node itself.  Each node is
@@ -37,17 +47,19 @@ module Skylab::Semantic
         nil
       end
     end
-    def node! name, predicates=nil
-      if @hash.key?(name)
+
+    def node! name, predicates=nil # node! :ambiguous, is: :error
+      if @hash.key? name
         node = @hash[name]
       else
-        node = Node.new(self, name)
+        node = Node.new self, name
         @hash[name] = node
         @order.push name
       end
-      predicates and predicates.each { |m, v| node.send(m, v) }
+      predicates and predicates.each { |m, v| node.send m, v }
       node
     end
+
     def nodes! a
       i = 0 ; len = a.length ; y = [ ]
       while i < len && ::Symbol === a[i]
@@ -63,25 +75,32 @@ module Skylab::Semantic
       if i < len then raise ::ArgumentError.new("bad type: #{a[i].class}") end
       y
     end
+
     def nodes
       ::Enumerator.new do |y|
         @order.each { |name| y << @hash[name] }
         nil
       end
     end
+
     def nodes_count
       @hash.length
     end
+
   protected
+
     def initialize *a
       if 1 == a.length && self.class === a.first
         dupe! a.first
       else
-        @order = [ ] ; @hash = { }
-        a.empty? or nodes! a
+        @hash = { }
+        @order = [ ]
+        nodes! a if a.length.nonzero?
       end
     end
+
     # --*--
+
     def dupe! digraph
       @hash = { }
       @order = digraph.instance_variable_get('@order').dup
@@ -91,33 +110,46 @@ module Skylab::Semantic
       end
     end
   end
-  class Node < ::Struct.new(:name, :is_names)
+
+
+  class Node < ::Struct.new :name, :is_names
+
     def all_ancestor_names
       all_ancestors.map(&:name)
     end
+
     def describe
       [ name.to_s,
         (is_names.join(', ') unless is_names.empty?)
       ].compact.join(' -> ')
     end
+
     def is? node
       target_name = ::Symbol === node ? node : node.name
       !!( all_ancestors.detect { |_node| target_name == _node.name } )
     end
+
+    attr_accessor :visited        # for client
+
   protected
+
     def initialize graph, name
       @graph = graph
       if self.class === name then dupe!(name) else super(name, []) end
     end
+
     # --*--
+
     def all_ancestors
       @graph.all_ancestors(name)
     end
+
     def dupe! node
       self.name = node.name
       self.is_names = node.is_names.dup
       nil
     end
+
     def is name
       case name
       when ::Array
@@ -129,7 +161,7 @@ module Skylab::Semantic
           is_names.push name
         end
       else
-        raise ::ArgumentError.new("bad type: #{name.class}")
+        raise ::ArgumentError.new "bad type: #{name.class}"
       end
       nil
     end

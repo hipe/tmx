@@ -1,0 +1,263 @@
+#!/usr/bin/env ruby -w
+
+# one-off for writing git commit messages (like git-flow)
+
+module Skylab
+end
+
+
+module Skylab::CI_Txt
+
+  module CLI
+  end
+
+
+  class CLI::Client
+
+    def invoke argv
+      res = nil
+      begin
+        ok = nil
+        begin
+          begin
+            option_parser.parse! argv
+            if argv.any?
+              emit :help, "unexpected arg(s): #{ argv.inspect }"
+              break
+            end
+            ok = true
+          rescue ::OptionParser::ParseError => e
+            emit :help, e.message
+          end
+        end while nil
+        if ! ok
+          emit :help, usage_line
+          emit :help, invite_line
+          break
+        end
+        res = execute
+      end while nil
+      res
+    end
+
+  protected
+
+
+    ref_rx = /\Aref: ([^\n]+)\n\z/
+
+    define_method :branch_name do
+      res = nil
+      begin
+        head_pathname = git_dir.join 'HEAD'
+        content = head_pathname.read
+        unless ref_rx =~ content
+          error "failed to read content of #{ escape_path head_pathanme }"
+          res = false
+          break
+        end
+        whole = $~[1]
+        res = whole.split( '/' ).last
+      end
+      res
+    end
+
+
+    filename = 'ci.txt'
+
+    define_method :build_option_parser do
+      require 'optparse'
+      o = ::OptionParser.new
+
+      o.on '-n', '--dry-run', 'dry run.' do
+        self.dry_run = true
+      end
+
+      o.on '-v', '--verbose', 'be verbose.' do
+        self.verbose = true
+      end
+
+      o.banner = <<-HERE.gsub( /^        /, '' )
+        #{ em 'usage:' } #{ program_name } [opts]
+
+        #{ em 'description:' } creates a #{ filename } file.
+
+        #{ em 'options:' }
+      HERE
+      o
+    end
+
+
+    define_method :create_initial_file do
+      res = nil
+      begin
+        pathname = git_dir.dirname.join filename
+        if pathname.exist?
+          fail 'sanity'
+        end
+        branch_name = self.branch_name or break
+        first_line = "[##{ branch_name }]"
+        info( first_line ) if verbose
+        bytes = nil
+        if dry_run
+          bytes = 0
+        else
+          pathname.open( 'w+' ) do |fh|
+            bytes = fh.write "#{ first_line }\n\n  + " # etc
+          end
+        end
+        info "created #{ escape_path pathname } (#{ bytes } bytes)"
+        res = pathname
+      end while nil
+      res
+    end
+
+    attr_accessor :dry_run
+
+    define_method :execute do
+      res = nil
+      begin
+        @git_dir = find_git_dir or break
+        existing = find_existing
+        if existing
+          info "using #{ escape_path existing }"
+        else
+          existing = create_initial_file
+          existing or break
+        end
+        editor = ::ENV['EDITOR'] || 'vi'
+        cmd = "vi #{ escape_path existing }"
+        if dry_run
+          info "would have executed `#{ cmd }`"
+        else
+          exec cmd
+        end
+      end while nil
+      res
+    end
+
+    define_method :find_existing do
+      curr = pwd
+      stop = git_dir.dirname
+      if ! pwd.to_s.index( stop.to_s )  # is pwd equal to or under stop dir?
+        fail 'sanity'
+      end
+      found = nil
+      loop do
+        try = curr.join filename
+        if try.exist?
+          found = try
+          break
+        end
+        if curr == stop
+          break
+        end
+        curr = curr.dirname
+      end
+      found
+    end
+
+
+    git_dir = '.git'
+
+    define_method :find_git_dir do
+      require 'pathname'
+      curr = @pwd = ::Pathname.pwd
+      found = false
+      seen = [ ]
+      loop do
+        try = curr.join git_dir
+        if try.exist?
+          found = try
+          break
+        end
+        seen.push curr.basename
+        parent = curr.dirname
+        if parent == curr
+          break
+        else
+          curr = parent
+        end
+      end
+      if ! found
+        error "couldn't find #{ em git_dir } directory anywhere from #{
+          }pwd (\"#{ pwd }\") up to \"/\" (#{ seen.length } dirs)"
+      end
+      found
+    end
+
+    attr_reader :git_dir
+
+    attr_reader :pwd
+
+    def usage_line
+      "usage: #{ em program_name }"
+    end
+
+    attr_accessor :verbose
+
+  end
+
+
+  module CLI
+    def self.new *a
+      CLI::Client.new(* a)
+    end
+  end
+
+
+  module CLI::Client::InstanceMethods
+
+  protected
+
+    def initialize _=nil, paystream=$stdout, infostream=$stderr
+      @infostream = infostream
+      @paystream = paystream
+    end
+
+    def em str
+      "\e[1;32m#{ str }\e[0m"
+    end
+
+    def emit type=:info, str
+      send( :payload == type ? :paystream : :infostream ).puts str
+      nil
+    end
+
+    def error msg
+      emit :error, "couldn't #{ em program_name } - #{ msg }"
+      false
+    end
+
+    def escape_path pathname
+      pathname.relative_path_from( pwd ).to_s
+    end
+
+    def info msg
+      emit :info, "#{ em program_name } #{ msg }"
+      nil
+    end
+
+    def invite_line
+      "try #{ em "#{ program_name } -h" } for help"
+    end
+
+    def option_parser
+      @option_parser ||= build_option_parser
+    end
+
+    def program_name
+      ::File.basename $PROGRAM_NAME
+    end
+
+    attr_reader :infostream
+
+    attr_reader :paystream
+
+  end
+
+  class CLI::Client
+    include CLI::Client::InstanceMethods
+  end
+end
+
+Skylab::CI_Txt::CLI.new.invoke ARGV

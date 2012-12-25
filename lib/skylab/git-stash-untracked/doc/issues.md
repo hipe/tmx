@@ -1,3 +1,4 @@
+[#008]       #done stashe names with spaces duh
 [#007]       #done when you fix DSL, do *not* make it instance exec'y b/c of these
                you could also unscream them
 [#006]       #done enums for `each_patch_line`, `each_stat_line`

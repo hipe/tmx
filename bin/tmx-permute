@@ -2,8 +2,4 @@
 
 require File.expand_path('../../lib/skylab/permute/cli', __FILE__)
 
-::Skylab::Permute::Cli.invoke(ARGV) do |o|
-  o.on_info   { |e| $stderr.puts e.to_s }
-  o.on_error  { |e| $stderr.puts e.to_s }
-  o.on_out    { |e| $stdout.puts e.to_s }
-end
+Skylab::Permute::CLI.new( nil, $stdout, $stderr ).invoke ARGV

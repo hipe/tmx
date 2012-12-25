@@ -15,10 +15,10 @@ module Skylab::Headless
       Autoloader::Inflection::FUN.pathify[ str ].intern
     end
 
-    let :normalized_action_name do
+    let :normalized_action_name do # this is a bleeding, incomplete feature..
       a = name[ self::ANCHOR_MODULE.name.length + 2 .. -1].split '::' # terrible
       a.map{ |x| normify[ x ] }.freeze              # but also cheaper
-    end
+    end                           # .. watch frontier tan-man for updates
 
     def normalized_local_action_name
       normalized_action_name.last
@@ -34,6 +34,10 @@ module Skylab::Headless
     def branch?
       false
     end
+
+    def desc_lines                # we want this DSL-y module-methods part of
+      self.class.desc_lines if self.class.respond_to? :desc_lines # it to be
+    end                           # opt-in
 
     def leaf?                     # (it is important that you leave the impl.
       ! branch?                   # as such -- the compliment of `branch?` --

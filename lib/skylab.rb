@@ -38,12 +38,24 @@ module Skylab
       (?<=/)/+ | (?<=[-_ ])[-_ ]+ | [^-_ /a-z0-9]+ }ix
 
     o[:constantize] = -> path do
-      path.to_s.gsub(sanitize_path_rx, '').gsub(%r|/+|, '::').
-        gsub(/(?<=[-_ ])([A-Z])/){ $1.downcase }.
-        gsub(/(?:(?<=\d)|[-_ ]|\b)([a-z09])/) { $1.upcase }
+      path.to_s.gsub( sanitize_path_rx, '' ).    # remove some strings
+        split( '/', -1 ).map do |const|          # each filename as const name
+          const.gsub( /([^-_ ]+)([-_ ]+)?/ ).each do # each part at a separator
+            const, sep = $~.captures
+            const.gsub!( /(?<=[0-9]|\A)([a-z])/ ) { $1.upcase } # "99x" -> "99X"
+            if sep
+              if const.length > 1                # "foo_bar" --> "FooBar"
+                sep = nil
+              else
+                sep = '_'                        # "c_style" --> "C_Style"
+              end
+            end
+            "#{ const }#{ sep }"
+          end
+        end.join '::'
     end
 
-    o[:methodify] = -> str do
+    o[:methodize] = -> str do
       str.to_s.
         gsub(/(?<=[a-z])([A-Z])|(?<=[A-Z])([A-Z][a-z])/) { "_#{$1 || $2}" }.
         gsub(/[^a-z0-9]+/i, '_').downcase.intern # munge-in above underscores

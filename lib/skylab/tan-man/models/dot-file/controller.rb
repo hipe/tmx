@@ -1,5 +1,6 @@
 module Skylab::TanMan
   class Models::DotFile::Controller < ::Struct.new  :dry_run,
+                                                    :force,
                                                     :pathname,
                                                     :statement,
                                                     :verbose
@@ -39,6 +40,7 @@ module Skylab::TanMan
       o = action_class.new self
       res = o.invoke dotfile_controller: self,
                                 dry_run: dry_run,
+                                  force: force,
                               statement: statement,
                                 verbose: verbose
       res
@@ -46,9 +48,58 @@ module Skylab::TanMan
 
 
   # --*-- the below are public but are for sub-clients only --*--
+    def apply_meaning node_ref, meaning, dry_run, verbose, error, success, info
+      res = nil
+      begin
+        node = fetch_node( node_ref, error, info )
+        break( res = node ) if ! node
+        res = meanings.apply node, meaning, dry_run, verbose, error,
+                                                                  success, info
+      end while nil
+      res
+    end
+
+    def fetch_node node_ref, error, info
+      res = nil
+      begin
+        sexp = self.sexp
+        if ! sexp
+          emit :help, "perhaps try fixing above syntax errors and try again"
+          break( res = nil )
+        end
+        rx = /\A#{ ::Regexp.escape node_ref }/
+        res = fuzzy_fetch sexp._node_stmts,
+          -> stmt do
+            if rx =~ stmt.label # stmt.node_id
+              node_ref == stmt.label ? 1 : 0.5
+            end
+          end,
+          -> count do
+            error[ "couldn't find a node whose label starts with #{
+              }#{ ick node_ref } (among #{ count } node#{ s count })" ]
+            false # this makes life easier..
+          end,
+          -> partial do
+            info[ "ambiguous node name #{ ick node_ref }. #{
+              }did you mean #{ or_ partial.map { |n| "#{ lbl n.label }" } }?" ]
+            nil # this makes life easier
+          end
+      end while nil
+      res
+    end
 
     def graph_noun
       "#{ escape_path pathname }"
+    end
+
+    def meanings
+      @meanings ||= Models::DotFile::Meaning::Collection.new self
+    end
+
+    def set_meaning agent, target, create, dry_run, verbose,     # contrast
+                                    error, success, neutral      # this way..
+      meanings.set agent, target, create, dry_run, verbose,
+                                   error, success, neutral
     end
 
     def sexp
@@ -61,6 +112,10 @@ module Skylab::TanMan
       end
     end
 
+    def unset_meaning *a                                         # ..with this.
+      meanings.unset(* a)
+    end
+
     nl_rx = /\n/ # meh
     num_lines = -> str do
       scn = TanMan::Services::StringScanner.new str
@@ -70,7 +125,7 @@ module Skylab::TanMan
       num
     end
 
-    define_method :write do |dry_run, verbose|
+    define_method :write do |dry_run, force, verbose|
       bytes = nil
       begin
         next_string = sexp.unparse
@@ -86,10 +141,11 @@ module Skylab::TanMan
         end
         num_a = num_lines[ prev_string ]
         num_b = num_lines[ next_string ]
-        if num_b < num_a
-          error "sorry: we won't allow reducing the number of lines yet! #{
-            }( from #{ num_a } to #{ num_b } lines )"
-          break
+        if num_b < num_a && ! force
+          error "ok to reduce number of lines in #{
+            }#{ escape_path pathname } from #{ num_a } to #{ num_b }? #{
+            }If so, use #{ par :force }."
+          break # IMPORTANT!
         end
         bytes = write_commit next_string, dry_run, verbose
         break if ! bytes
@@ -107,12 +163,19 @@ module Skylab::TanMan
         bytes = nil
         temp.open( 'w' ) { |fh| bytes = fh.write string }
         diff = services.diff.diff pathname, temp, nil,
-          -> e { error e }, -> i { info gsub_path_hack( i ) }
+          -> e do
+            error e
+          end,
+          -> i do
+            if verbose
+              info( gsub_path_hack i ) # e.g. `diff --normal `...
+            end
+          end
         break( res = diff ) if ! diff
         a = []
-        nerk = -> x, str do
+        nerk = -> x, verb do
           break if x == 0
-          a.push "#{ x } line#{ s x } #{ s x, :was } #{ str }"
+          a.push "#{ verb } #{ x } line#{ s x }"
         end
         nerk[ diff.num_lines_removed, 'removed' ]
         nerk[ diff.num_lines_added,   'added'   ]
@@ -121,10 +184,14 @@ module Skylab::TanMan
         if no_change
           a.push "no lines added or removed!"
         end
-        info a.join( ', ' )
+        if verbose
+          info( a.join ', ' )
+        end
         break if no_change
         fu = Headless::IO::FU.new -> msg do
-          info gsub_path_hack( msg )
+          if verbose
+            info( gsub_path_hack msg )
+          end
         end
         fu.mv temp, pathname, noop: dry_run
         bytes

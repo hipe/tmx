@@ -13,11 +13,16 @@ module Skylab::TanMan
     self.debug_stream = $stderr
     self.do_debug = true          # true until you know enough to find this line
 
+
+    o = { }                       # this of these as opt-in constants
+
+    o[:custom_parse_tree_method_name] = :tree
+
+    FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
+
   end
 
-  module Sexp::Auto::Constants
-    CUSTOM_PARSE_TREE_METHOD_NAME = :tree
-  end
+
 
   module Sexp::Auto::BuildMethods
     # These Build Methods build sexps ("trees") from syntax nodes, possibly
@@ -149,18 +154,22 @@ module Skylab::TanMan
     # This module or descendant modules will be included by generated
     # Sexp ("tree") classes.
 
-    include Sexp::Auto::Constants # CUSTOM_PARSE_TREE_METHOD_NAME
     include Sexp::Auto::BuildMethods # node2tree et. al
 
-    def element2tree element, member_name # extent: solo def, 2 calls
+    # extent: solo def, 2 calls
+    custom_parse_tree_method_name =
+      Sexp::Auto::FUN.custom_parse_tree_method_name
+
+    define_method :element2tree do |element, member_name|
       if ! element
         nil # typically as a trailing optional node
-      elsif element.respond_to? CUSTOM_PARSE_TREE_METHOD_NAME
-        element.send CUSTOM_PARSE_TREE_METHOD_NAME # careful!
+      elsif element.respond_to? custom_parse_tree_method_name
+        element.send custom_parse_tree_method_name # careful!
       else
         node2tree element, self, member_name
       end
     end
+
 
     attr_accessor :expression
     attr_accessor :grammar # a Grammar::Facade
@@ -168,6 +177,26 @@ module Skylab::TanMan
     attr_writer :_members # experimental frozen persistent object
     def _members ; @_members ||= members.freeze end
     attr_accessor :members_of_interest
+
+
+    def parse rule, string, err=nil                   # for hacks
+      parser = grammar.build_parser_for_rule rule
+      syn_node = parser.parse string
+      res = nil
+      if syn_node
+        res = element2tree syn_node, "xyzzy_#{ rule }".intern
+      else
+        if err
+          res = err[ parser ]
+        else
+          $stderr.puts "#{ self } parse failed - #{ parser.failure_reason }"
+          res = false
+        end
+      end
+      res
+    end
+
+
     attr_accessor :rule
 
     def tree inference
@@ -289,36 +318,41 @@ module Skylab::TanMan
     :_parent_class,
     :tree_class # only used for hacks for now (experimental!!)
   )
-    include Sexp::Auto::Constants # CUSTOM_PARSE_TREE_METHOD_NAME (on self, too)
 
     # The Inference of a synax node is for "inferring" what Sexp class to use
     # for a given node from its extension modules.  We crawl up backwards from
     # the first extension module to infer things like the sexp wrapper module.
 
-    CACHE = { } # for some algorithms we might try look-ahead to infer names
+    cache = { } # for some algorithms we might try look-ahead to infer names
 
-    def self.get node, parent_class, member_name
-      if CACHE.key? node.object_id
-        i = CACHE[node.object_id]
-        i._parent_class.object_id != parent_class.object_id and fail('sanity')
-        i.member != member_name and fail('sanity')
+    factory = nil
+
+    define_singleton_method :get do |node, parent_class, member_name|
+      if cache.key? node.object_id
+        i = cache[node.object_id]
+        fail 'sanity' if i._parent_class.object_id != parent_class.object_id
+        fail 'sanity' if i.member != member_name
         i
       else
-        CACHE[node.object_id] = FACTORY_F[node, parent_class, member_name]
+        cache[node.object_id] = factory[ node, parent_class, member_name ]
       end
     end
 
-    FACTORY_F = ->(node, parent_class, member_name) do
+
+    custom_parse_tree_method_name =
+      Sexp::Auto::FUN.custom_parse_tree_method_name
+
+    factory = -> node, parent_class, member_name do
       a = node.extension_modules
       if a.empty? # possibly a kleene group!
-        new(nil, member_name, node, parent_class)
+        new nil, member_name, node, parent_class
       else
         # We have at least one extension module so we can definitely infer
         # a const name. But can we infer the names of the elements?
         # We can if we have 'methods of interest' that would come from an
         # extension module  Note, unfortunately, that we have to sidestep
         # the extension module that gets created by us with a method called
-        # [CUSTOM_PARSE_TREE_METHOD_NAME]. It's a dodgy move, but this whole
+        # [custom_parse_tree_method_name]. It's a dodgy move, but this whole
         # house is dodgy o_O
         i = a.length # left vs. right -- ick!!
         last = [0, i - 2].max # any second to last one
@@ -326,7 +360,7 @@ module Skylab::TanMan
         while (i -= 1) >= last
           methods = a[i].instance_methods
           if ! (methods.empty? or
-                methods.include?(CUSTOM_PARSE_TREE_METHOD_NAME)) then
+                methods.include?(custom_parse_tree_method_name)) then
             found = i ; break
           end
         end
@@ -461,11 +495,14 @@ module Skylab::TanMan
 
     include Sexp::Inflection::Methods
 
-    CACHE = ::Hash.new { |h, mod| h[mod] = new mod }
+    cache = ::Hash.new { |h, mod| h[mod] = new mod }
 
-    def self.[] mod ; CACHE[mod] end
+    define_singleton_method :[] do |mod|
+      cache[mod]
+    end
 
   public
+
     def anchor_module
       @anchor_module ||=
         _parts[0..-3].reduce(::Object) { |m, x| m.const_get(x, false) }
@@ -494,6 +531,7 @@ module Skylab::TanMan
     end
 
   protected
+
     def initialize mod
       @module = mod
     end

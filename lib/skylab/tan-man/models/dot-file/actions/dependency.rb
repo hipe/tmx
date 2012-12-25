@@ -1,51 +1,14 @@
 module Skylab::TanMan
-  class Models::DotFile::Actions::Dependency < ::Struct.new(
-    :dotfile_controller,
-    :dry_run,
-    :statement,
-    :verbose
-  )
-    include Core::SubClient::InstanceMethods # e.g. `initialize`
-    extend Headless::Parameter::Controller::StructAdapter
-    extend MetaHell::DelegatesTo
-
-    def execute
-      res = nil
-      begin
-        graph = dotfile_controller.sexp
-        break( res = graph ) unless graph
-        ok = -> do
-          sl = graph.stmt_list
-          if ! sl._prototype
-            error "the stmt_list does not have a prototype in #{
-              }#{ graph_noun } (is it at the top, after \"graph {\"?)."
-            break false
-          end
-          true
-        end.call
-        break( res = ok ) if ! ok
-        agent_str = statement.agent.words.join ' '
-        target_str = statement.target.words.join ' '
-        do_write = false
-        wat = graph.associate! agent_str, target_str, prototype: nil do |o|
-          o[:existed] = -> x do
-            info "association already existed: #{ x.unparse }"
-          end
-          o[:created] = -> x do
-            do_write = true
-            info "created association: #{ x.unparse }"
-          end
-        end
-        if do_write
-          res = dotfile_controller.write dry_run, verbose
-        end
-      end while nil
-      res
-    end
-
+  class Models::DotFile::Actions::Dependency < Models::DotFile::Action
   protected
-
-    delegates_to :request_client, :graph_noun
-
+    def execute
+      agent = statement.agent.words.join ' '
+      target = statement.target.words.join ' '
+      api_invoke [:graph, :dependency, :set], agent: agent,
+                                            dry_run: dry_run,
+                                              force: force,
+                                             target: target,
+                                            verbose: verbose
+    end
   end
 end

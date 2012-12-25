@@ -30,17 +30,67 @@ module Skylab::TanMan
 
   protected
 
+    def initialize request_client              # have fun with this!
+      _tan_man_sub_client_init! request_client
+    end
+
     def _tan_man_sub_client_init! request_client
       _headless_sub_client_init! request_client
+    end
+
+    def api_invoke normalized_action_name, param_h # *EXPERIMENTAL*
+      services.api.invoke normalized_action_name, param_h, self, -> o do
+        o.on_all { |event| emit event }
+      end
     end
 
     def controllers
       request_client.send :controllers
     end
 
+    def collections
+      request_client.send :collections
+    end
+
     def escape_path *a            # (we wanted this to go away with [#hl-031]
       pen.escape_path(* a)        # but tan-man apparently thinks it has
     end                           # special needs.)
+
+                                  # generic fuzzy finder
+                                  # `match` receives each item and should result
+                                  # in 1 when exact match, zero / falseish when
+    def fuzzy_fetch enum, match, not_found, ambiguous, fly_collapse=nil
+      fly_collapse ||= -> x { x } # no match or other when partial match.
+      exact = exact_found = nil   # short-circuit on first exact match,
+      count = 0                   # that is result. otherwise `not_found` or
+      partial = [ ]               # `ambiguous` called as appropriate..
+      enum.each do |item|
+        count += 1
+        flot = match[ item ]
+        if flot && 0 != flot
+          if 1 == flot
+            exact_found = true
+            exact = fly_collapse[ item ]
+            break
+          end
+          partial.push fly_collapse[ item ]
+        end
+      end
+      if exact_found
+        res = exact
+      else
+        case partial.length
+        when 0
+          res = not_found[ count ]
+        when 1
+          # maybe add an info hook one day..
+          res = partial.first
+        else
+          res = ambiguous[ partial ]
+        end
+      end
+      res
+    end
 
     def hdr s                     # how do we render headers (e.g. in report
       em s                        # tables?)
@@ -54,9 +104,20 @@ module Skylab::TanMan
       res
     end
 
+    def ick x                     # similar to `val` but for rendering an
+      pen.ick x                   # invalid value.. in some modes they look
+    end                           # better when these have quotes
 
     def infostream
       request_client.send :infostream
+    end
+
+    def lbl str                   # render the label for a business name
+      pen.lbl str
+    end
+
+    def par sym                   # modality-specific [#hl-036] parameter
+      pen.par sym                 # rendering
     end
 
     def parent # adapt to bleeding for now [#018]
@@ -70,6 +131,10 @@ module Skylab::TanMan
     def skip msg
       emit :skip, msg
       nil
+    end
+
+    def val x                     # render a business value
+      pen.val x
     end
   end
 end

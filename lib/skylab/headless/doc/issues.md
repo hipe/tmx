@@ -1,8 +1,9 @@
-[#034]       #tracking-tag for function-point `program_name` -
-               `normalized_invocation_string`
-[#033]       #tracking-tag for future #push-up abstraction
-              and function-point `desc` etc.
-[#032]      #open #low-priority do we care about our call-stack height for cli?
+[#036]       #behavior-point `par`, `parameter_label` etc -- gather it up
+[#035]       #doc-point : the boxxy cluttered namespace problem
+[#034]       #tracking-tag for #function-point `program_name` -
+              `normalized_invocation_string`
+[#033]       #function-point #tracking-tag `desc`
+[#032]       #open #low-priority do we care about our call-stack height for cli?
 [#031]       #done a petition to get escape_path pushed up here
 [#030]       #done the raw dog experiment
 [#029] #open `stylize` as any of two of these happen: [#gs-004] [#bn-005]
@@ -15,6 +16,7 @@
              have sub-actions, but maybe we could improve this for leaf nodes
 [#023]       support for exit statuses might get silly
 [#022]       #watch #pattern #tracking-tag of resolving upstream logic (dry?)
+               (this is now a blanket tracker of file-services-related dryables)
 [#021]       #feature #deferred #cli - be sure to provide a (flatten) --tree
                option when looking at a branch help screen!
 [#020]       #convention `invoke` `execute` `run` `call` have distinct meanings
@@ -35,7 +37,7 @@
 [#006]       #done #tracking-tag errors_count, settle it down eventually (rel. [#sl-116])
 [#005] #open unify concepts let sub-client trump rename parent_runtime par_clien
 [#004]       #pattern #tracking-tag the sub-client initialize() in modules thing
-[#003]       #done #refactor: use en.rb in sub-client
+[#003]       #done #refactor: use en.rb in sub-client fo
 [#002]       #done 2012-08-29 #refactor : interceptors under one roof
 [#001] #open 2012-08-18 #feature : term2html (and architecture)
 [#sl-100] 2012-06-08 #open integrate porcelain and face and bleeding et. al

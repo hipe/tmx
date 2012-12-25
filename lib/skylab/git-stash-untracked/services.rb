@@ -7,6 +7,7 @@ module Skylab::GitStashUntracked               # centralize std-lib deps,
     o :FileUtils   , -> { require 'fileutils'   ; ::FileUtils }
     o :Open3       , -> { require 'open3'       ; ::Open3 }
     o :OptionParser, -> { require 'optparse'    ; ::OptionParser }
+    o :Shellwords  , -> { require 'shellwords'  ; ::Shellwords }
 
     define_singleton_method :const_missing do |k|
       const_set k, h.fetch( k ).call

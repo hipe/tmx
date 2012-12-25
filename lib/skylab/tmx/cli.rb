@@ -21,6 +21,7 @@ module Skylab::Tmx
     both = [face_namespaces, porc_namespaces]
 
     o = { }
+    o[:'git-viz'] = false
     o[:jshint] = false
     o[:nginx] = false
     o[:pnp] = false

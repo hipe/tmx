@@ -29,6 +29,8 @@ module Skylab::TanMan
       # this means that the objects will no longer use their class
       # as the attribute_definer
 
+    attribute :default_example_file, default: 'holy-smack.dot'
+
     attribute :global_conf_path,
                  proc: true, default: ->{ "#{ ENV['HOME'] }/.tanman-config" }
 

@@ -123,7 +123,7 @@ module Skylab::Headless
         @normalized_local_action_name = tail                # meh
         @option_parser = o.option_parser                    # eek
         @param_h = o.param_h                                # eek
-        @queue.clear.push Autoloader::Inflection::FUN.methodify[ tail ]
+        @queue.clear.push Autoloader::Inflection::FUN.methodize[ tail ]
                                   # put the method name of the particular
                                   # action on the queue!
         res = invoke args

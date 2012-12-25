@@ -4,6 +4,11 @@ module Skylab::TanMan
     # to use! #experimental
     # (thread safety is a boggling thought.)
 
+    def clear_tree_service
+      @cache.clear
+      nil
+    end
+
     def fetch normalized_pathname, &block
       @cache.fetch normalized_pathname.to_s do |k|
         if ! block

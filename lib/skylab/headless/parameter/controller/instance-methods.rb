@@ -26,6 +26,14 @@ module Skylab::Headless
 
   protected
 
+    def agent_string                           # this saved my hide a few times
+      @agent_string ||= begin                  # but you should of course
+        a = self.class.to_s.split '::'         # override it w/ sthing prettier
+        a = a[ [ a.length, 2 ].min * -1 .. -1 ] # get last 2 or last one
+        a.map { |s| Autoloader::Inflection::FUN.pathify[ s ] }.join ' '
+      end
+    end
+
     def actual_parameters # for compatibility with the ever-flexible set!
       self           # but it is only a default -- parameter controllers are
     end              # not necessarily the actual parameters container!
@@ -47,7 +55,6 @@ module Skylab::Headless
       self.class
     end
 
-
     def missing_required actual
       required_params = formal_parameters.each.select(&:required?) # twice..
 
@@ -60,12 +67,18 @@ module Skylab::Headless
 
       if ! a.empty?
         a.map! { |param| parameter_label param }
-        error "missing the required parameter#{ s a } #{ and_ a }"
+        missing_required_failure a
       end
 
       nil
     end
 
+    def missing_required_failure a
+      as = agent_string
+      as = "#{ as } " if as
+      error "#{ as }missing the required parameter#{ s a } #{ and_ a }"
+      nil
+    end
 
     def prune_bad_keys actual_h # internal defaults may exist hence ..
       bad = ->(k) { actual_h.delete(k) } # for non-atomic aggretation of errors

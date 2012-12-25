@@ -5,12 +5,14 @@ module Skylab::TanMan
 
   public
 
-    def clear
-      TanMan::Services.config.clear # yeah about that..
+    def clear_all_services        # put your seatbelt on, becase you were
+      Services.config.clear_config_service  # really asking for it
+      Services.tree.clear_tree_service
+      nil
     end
 
 
-    define_method :invoke do |name_a, params_h=nil, upstream_client=nil,
+    define_method :invoke do |name_a, param_h=nil, upstream_client=nil,
                                                                      events=nil|
 
       debug = API.debug           # just for this request, within this call
@@ -36,7 +38,7 @@ module Skylab::TanMan
                                   # things like using modality-specific pens.
                                   # the funny syntax is a sanity check on
                                   # the formal parameters
-      r = api_client.invoke name_a, params_h, events
+      r = api_client.invoke name_a, param_h, events
       if response
         response.result = r
       else

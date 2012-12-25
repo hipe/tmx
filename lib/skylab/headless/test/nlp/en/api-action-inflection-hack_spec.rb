@@ -79,9 +79,9 @@ module Skylab::Headless::TestSupport::NLP::EN
     let(:subject) do
       action.inflection.inflected.noun
     end
-    context "when specified as singular" do
-      let(:action) { Flugelhorn__Edit() }
-      specify { should eql("flugelhorn") }
+    it "when specified as singular" do
+      action = _Flugelhorn__Edit
+      action.inflection.inflected.noun.should eql('flugelhorn')
     end
     context "when specified as plural" do
       let(:action) { Flugelhorn__Show() }

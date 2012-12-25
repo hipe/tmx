@@ -13,18 +13,18 @@ module Skylab::TanMan::TestSupport::API::Actions
 
   module InstanceMethods
 
-    def api_invoke *params_h
-      api_invoke_action action_name, *params_h
+    def api_invoke *param_h
+      api_invoke_action action_name, *param_h
     end
 
-    def api_invoke_from_tmpdir *params_h
+    def api_invoke_from_tmpdir *param_h
       from_tmpdir do
-        api_invoke(* params_h )
+        api_invoke(* param_h )
       end
     end
 
-    def api_invoke_action action_name, *params_h
-      @api_last_response = api.invoke action_name, *params_h
+    def api_invoke_action action_name, *param_h
+      @api_last_response = api.invoke action_name, *param_h
     end
 
     attr_reader :api_last_response # or the shorter `response` below
