@@ -16,7 +16,7 @@ module Skylab::TanMan
 
     attr_accessor :profile
 
-    def verbose
+    def verbose_dotfile_parsing
       @verbose and @verbose.call
     end
 

@@ -12,7 +12,7 @@ module Skylab::TanMan
   TanMan::Model::Event || nil # (load it here, then it's prettier below)
 
 
-  class Models::Node::Events::Ambiguous_Node_Reference <
+  class Models::Node::Events::Ambiguous_Reference <
     Model::Event.new :node_ref, :nodes
 
     def build_message
@@ -32,7 +32,7 @@ module Skylab::TanMan
   end
 
 
-  class Models::Node::Events::Node_Not_Found <
+  class Models::Node::Events::Not_Found <
     Model::Event.new :node_ref, :seen_count
 
     def build_message
@@ -42,7 +42,7 @@ module Skylab::TanMan
   end
 
 
-  class Models::Node::Events::Nodes_Not_Associated <
+  class Models::Node::Events::Not_Associated <
     Model::Event.new :source_node, :target_node, :reverse_was_true
 
     def build_message
@@ -52,7 +52,7 @@ module Skylab::TanMan
   end
 
 
-  class Models::Node::Events::Node_Not_Founds <
+  class Models::Node::Events::Not_Founds <
     Model::Event.new :node_not_founds
 
     def build_message

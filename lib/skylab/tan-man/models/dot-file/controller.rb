@@ -1,20 +1,11 @@
 module Skylab::TanMan
-  class Models::DotFile::Controller < ::Struct.new  :dry_run,
-                                                    :force,
-                                                    :pathname,
-                                                    :statement,
-                                                    :verbose
-
+  class Models::DotFile::Controller
     include Core::SubClient::InstanceMethods
-
-    extend Headless::Parameter::Controller::StructAdapter # just the members
-
     include Models::DotFile::Parser::InstanceMethods
 
-    # (the below public nerks are generally called exclusively by
-    # api action implementations!)
 
     def set_dependency source_ref, target_ref, error, success, info
+
       res = nil
       begin
         graph = self.sexp or break( res = graph )
@@ -62,7 +53,7 @@ module Skylab::TanMan
 
         if ! source_node || ! target_node
           agg = Models::Event::Aggregate.new self, [ ]
-          agg.list << Models::Node::Events::Node_Not_Founds.new( self,
+          agg.list << Models::Node::Events::Not_Founds.new( self,
             not_founds ) if not_founds.length.nonzero?
           agg.list.concat ambis
           res = nodes_not_found[ agg ]
@@ -95,7 +86,7 @@ module Skylab::TanMan
         if a.length.nonzero?
           a
         else
-          ev = Models::Node::Events::Nodes_Not_Associated.new( self,
+          ev = Models::Node::Events::Not_Associated.new( self,
             source_node, target_node, reverse_was_true )
           ev.message = "#{ lbl source_node.label } already does not #{
             }depend on #{ lbl target_node.label }#{ if reverse_was_true then
@@ -125,23 +116,6 @@ module Skylab::TanMan
 
 
 
-    constantize = ::Skylab::Autoloader::Inflection::FUN.constantize
-
-    define_method :execute do     # execute a statement
-      rule = statement.class.rule.to_s
-      rule_stem = rule.match(/_statement\z/).pre_match
-      action_class = Models::DotFile::Actions.const_fetch rule_stem
-      o = action_class.new self
-      res = o.invoke dotfile_controller: self,
-                                dry_run: dry_run,
-                                  force: force,
-                              statement: statement,
-                                verbose: verbose
-      res
-    end
-
-
-  # --*-- the below are public but are for sub-clients only --*--
     def apply_meaning node_ref, meaning, dry_run, verbose, error, success, info
       res = nil
       begin
@@ -186,13 +160,15 @@ module Skylab::TanMan
       @meanings ||= Models::DotFile::Meaning::Collection.new self
     end
 
+    attr_reader :pathname
+
     def set_meaning agent, target, create, dry_run, verbose,     # contrast
                                     error, success, neutral      # this way..
       meanings.set agent, target, create, dry_run, verbose,
                                    error, success, neutral
     end
 
-    def sexp # etc
+    def sexp
       res = nil
       begin
         res = services.tree.fetch pathname do |k, svc|
@@ -210,9 +186,28 @@ module Skylab::TanMan
       res
     end
 
-    def unset_meaning *a                                         # ..with this.
+
+    constantize = ::Skylab::Autoloader::Inflection::FUN.constantize
+
+    def tell statement_sexp, dry_run, force, verbose
+      rule = statement_sexp.class.rule.to_s
+      rule_stem = rule.match( /_statement\z/ ).pre_match
+      action_class = Models::DotFile::Actions.const_fetch rule_stem # BOXXY
+      o = action_class.new self
+      res = o.invoke dotfile_controller: self,
+                                dry_run: dry_run,
+                                  force: force,
+                              statement: statement_sexp,
+                                verbose: verbose
+      res
+    end
+
+
+    def unset_meaning *a
       meanings.unset(* a)
     end
+
+    attr_reader :verbose_dotfile_parsing # compat
 
     nl_rx = /\n/ # meh
     num_lines = -> str do
@@ -253,6 +248,11 @@ module Skylab::TanMan
     end
 
   protected
+
+    def initialize request_client, dotfile_pathname
+      super request_client
+      @pathname = dotfile_pathname
+    end
 
     def write_commit string, dry_run, verbose
       res = nil

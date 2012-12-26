@@ -17,10 +17,7 @@ module Skylab::TanMan
       begin
         controller = collections.dot_file.currently_using or break
         statement = parse_words( words ) or break
-        res = controller.invoke dry_run: dry_run,
-                                  force: force,
-                              statement: statement,
-                                verbose: verbose
+        res = controller.tell statement, dry_run, force, verbose
       end while nil
       res
     end

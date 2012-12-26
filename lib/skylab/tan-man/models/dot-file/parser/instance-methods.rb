@@ -14,7 +14,7 @@ module Skylab::TanMan
 
       on_info = on_load_parser_info
       on_info ||= -> e do
-        if verbose
+        if verbose_dotfile_parsing
           info "#{ em '^_^' } #{ gsub_path_hack e.to_s }"
         end
       end

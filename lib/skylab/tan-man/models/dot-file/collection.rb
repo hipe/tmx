@@ -18,9 +18,9 @@ module Skylab::TanMan
         # (at the time of this writing the controllers.dot_file seems to
         # be a sort of singleton, which might be dodgy. we want a controller
         # object that exists sort of one-to-one with a pathname.)
-        cnt = Models::DotFile::Controller.new request_client # (up not me)
-        cnt.pathname = using_pathname
-        cnt.verbose = verbose # inherit this puppy
+        cnt = Models::DotFile::Controller.new(
+          request_client, # (the request_client for it is not me!)
+          using_pathname )
         res = @currently_using = cnt
       end while nil
       res
