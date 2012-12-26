@@ -7,16 +7,12 @@ module Skylab::TanMan
 
   protected
 
-    opts_struct = ::Struct.new :force
-    define_method :absorb_parse_opts! do |o_h|
-      o = opts_struct.new
-      o_h.each { |k, v| o[k] = v }
-      if o[:force]
-        self.force ||= force # hehe sometimes this option takes a long round
-                             # trip back to where it originated (an api
-                             # action)
+    # (we used to use the below for --force but we do it better now)
+    define_method :absorb_parse_opts! do |o_h| # #compat ttt
+      if o_h.any?
+        raise ::ArgumentError.new 'this takes no opts'
       end
-      true                   # semantic
+      true                        # important
     end
 
     def load_parser_class
@@ -29,7 +25,7 @@ module Skylab::TanMan
 
       TreetopTools::Parser::Load.new( self,
         -> o do
-          o.force_overwrite! if force
+          o.force_overwrite! if rebuild_tell_grammar
           o.generated_grammar_dir '../../../tmp'
           o.root_for_relative_paths TanMan.dir_path
           o.treetop_grammar 'statement/parser/statement.treetop'

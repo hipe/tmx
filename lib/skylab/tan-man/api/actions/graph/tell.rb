@@ -4,6 +4,7 @@ module Skylab::TanMan
 
     param :dry_run, accessor: true, default: false
     param :force, accessor: true, default: false
+    param :rebuild_tell_grammar, accessor: true, default: false
     param :verbose, accessor: true, default: false
     param :words, accessor: true, list: true, required: true
 
@@ -15,7 +16,7 @@ module Skylab::TanMan
       res = nil
       begin
         controller = collections.dot_file.currently_using or break
-        statement = parse_words( words, force: force ) or break
+        statement = parse_words( words ) or break
         res = controller.invoke dry_run: dry_run,
                                   force: force,
                               statement: statement,

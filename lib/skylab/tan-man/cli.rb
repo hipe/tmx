@@ -198,9 +198,11 @@ module Skylab::TanMan
 
     option_parser do |o|
       dry_run_option o
-      o.on '-f', '--force',
-        'rewrites the cached treetop parser file (#dev)' do
+      o.on '-f', '--force', 'sometimes required by the action' do
         param_h[:force] = true
+      end
+      o.on '-g', 'rebuilds the Tell grammar (#dev)' do
+        param_h[:rebuild_tell_grammar] = true
       end
       help_option o
       verbose_option o

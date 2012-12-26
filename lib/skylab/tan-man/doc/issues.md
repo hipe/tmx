@@ -1,4 +1,6 @@
-[#063] #open the --force that rewrites parsers should be different than ..
+[#065] #open fuzzy manage dependency
+[#064] #open ui and impl for destory node
+[#063]       #done the --force that rewrites parsers should be different than ..
 [#062]      #later meaning reports!!!!
 [#061]       #done shallow shortcut to `tell` ?
 [#060]       #done #refactor: *all* NLP actions should go thru API duh
