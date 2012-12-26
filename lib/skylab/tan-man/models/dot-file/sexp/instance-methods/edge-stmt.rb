@@ -2,15 +2,13 @@ module Skylab::TanMan
   module Models::DotFile::Sexp::InstanceMethods::EdgeStmt
     include Models::DotFile::Sexp::InstanceMethod::InstanceMethods
 
-    OPTS = ::Struct.new :attrs, :prototype
-
     def _attrs! attrs
       self[:attr_list][:content][:a_list]._update_attributes! attrs
     end
 
     def _create source_node, target_node, o
       # assume you are the prototype
-      edge_stmt = __dupe(except: [[:agent, :id], [:edge_rhs, :recipient, :id]])
+      edge_stmt = __dupe except: [[:agent, :id], [:edge_rhs, :recipient, :id]]
       edge_stmt.source_node_id! source_node.node_id
       edge_stmt.target_node_id! target_node.node_id
       o[:attrs] and edge_stmt._attrs! o[:attrs]

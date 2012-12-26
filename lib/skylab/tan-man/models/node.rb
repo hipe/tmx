@@ -1,48 +1,19 @@
 module Skylab::TanMan
   module Models::Node
+    # (maybe one day etc but for now the sexp *is* the node)
   end
-  module Models::Node::Event
-  end
+
+
   module Models::Node::Events
+    # all here.
   end
 
-  module Models::Node::Event::InstanceMethods
-    include Core::SubClient::InstanceMethods
 
-    def message
-      @message || build_message
-    end
-
-    attr_writer :message
-
-    def to_h
-      members.reduce( message: message ) do |memo, member|
-        val = self[member]
-        if val.respond_to? :to_h
-          val = val.to_h
-        end
-        memo[member] = val
-        memo
-      end
-    end
-
-    def to_s
-      message
-    end
-
-  protected
-
-    def initialize request_client, *a
-      @message = nil
-      _tan_man_sub_client_init! request_client
-      members.zip( a ).each { |k, v| self[k] = v }
-    end
-  end
+  TanMan::Model::Event || nil # (load it here, then it's prettier below)
 
 
   class Models::Node::Events::Ambiguous_Node_Reference <
-    ::Struct.new :node_ref, :nodes
-    include Models::Node::Event::InstanceMethods
+    Model::Event.new :node_ref, :nodes
 
     def build_message
       "ambiguous node name #{ ick node_ref }. #{
@@ -52,8 +23,7 @@ module Skylab::TanMan
 
 
   class Models::Node::Events::Disassociation_Success <
-    ::Struct.new :source_node, :target_node, :edge_stmt
-    include Models::Node::Event::InstanceMethods
+    Model::Event.new :source_node, :target_node, :edge_stmt
 
     def build_message
       "removed association: #{ source_node.node_id } -> #{
@@ -62,19 +32,8 @@ module Skylab::TanMan
   end
 
 
-  class Models::Node::Events::Generic_Event_Aggregate <
-    ::Struct.new :list
-    include Models::Node::Event::InstanceMethods
-
-    def build_message
-      list.map(&:message).join '.  '
-    end
-  end
-
-
   class Models::Node::Events::Node_Not_Found <
-    ::Struct.new :node_ref, :seen_count
-    include Models::Node::Event::InstanceMethods
+    Model::Event.new :node_ref, :seen_count
 
     def build_message
       "couldn't find a node whose label starts with #{
@@ -84,8 +43,7 @@ module Skylab::TanMan
 
 
   class Models::Node::Events::Nodes_Not_Associated <
-    ::Struct.new :source_node, :target_node, :reverse_was_true
-    include Models::Node::Event::InstanceMethods
+    Model::Event.new :source_node, :target_node, :reverse_was_true
 
     def build_message
       "association does not exist: #{ source_node.node_id } #{
@@ -95,8 +53,7 @@ module Skylab::TanMan
 
 
   class Models::Node::Events::Node_Not_Founds <
-    ::Struct.new :node_not_founds
-    include Models::Node::Event::InstanceMethods
+    Model::Event.new :node_not_founds
 
     def build_message
       x = node_not_founds.length ; y = node_not_founds.first.seen_count

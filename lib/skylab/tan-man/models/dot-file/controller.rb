@@ -11,6 +11,25 @@ module Skylab::TanMan
 
     include Models::DotFile::Parser::InstanceMethods
 
+    # (the below public nerks are generally called exclusively by
+    # api action implementations!)
+
+    def set_dependency source_ref, target_ref, error, success, info
+      res = nil
+      begin
+        graph = self.sexp or break( res = graph )
+        if ! graph.stmt_list._prototype
+          res = error[
+             Models::Association::Events::No_Prototype.new self, graph_noun ]
+          break
+        end
+        res = graph.associate! source_ref, target_ref, { prototype: nil },
+          error, success, info
+      end while nil
+      res
+    end
+
+
     def check
       res = true # always succeeds
       begin
@@ -42,11 +61,11 @@ module Skylab::TanMan
         target_node = fetch_node target_ref, not_found, ambi
 
         if ! source_node || ! target_node
-          ga = Models::Node::Events::Generic_Event_Aggregate.new self, [ ]
-          ga.list << Models::Node::Events::Node_Not_Founds.new( self,
+          agg = Models::Event::Aggregate.new self, [ ]
+          agg.list << Models::Node::Events::Node_Not_Founds.new( self,
             not_founds ) if not_founds.length.nonzero?
-          ga.list.concat ambis
-          res = nodes_not_found[ ga ]
+          agg.list.concat ambis
+          res = nodes_not_found[ agg ]
           break
         end
         [ source_node, target_node ]

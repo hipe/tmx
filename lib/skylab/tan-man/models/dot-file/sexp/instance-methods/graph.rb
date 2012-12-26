@@ -2,50 +2,69 @@ module Skylab::TanMan
   module Models::DotFile::Sexp::InstanceMethods::Graph
     include Models::DotFile::Sexp::InstanceMethod::InstanceMethods
 
-    associate_events = ::Struct.new :created, :existed
 
-    define_method :associate! do |source, target, opts=nil, &block|
-      o = Models::DotFile::Sexp::InstanceMethods::EdgeStmt::OPTS.new
-      opts and opts.each { |k, v| o[k] = v }
-      ev = associate_events.new
-      block and block[ ev ]
-      source_node = node! source
-      target_node = node! target
-      source_id = source_node.node_id ; source_id_s = source_id.to_s
-      target_id = target_node.node_id
-      found = after = nil
-      _edge_stmts.each do |e|
-        if source_id == e.source_node_id && target_id == e.target_node_id
-          found = e
-          break
-        elsif ! after and -1 == (source_id_s <=> e.source_node_id.to_s)
-          after = e
-        end
-      end
+    associate_params = ::Struct.new :attrs, :prototype # might move to edge_stmt
+
+    define_method :associate! do
+      |source_ref, target_ref, opt_h=nil, error=nil, success=nil, info=nil|
+
       res = nil
-      if found
-        ev[:existed] and ev[:existed][ found ]
-        res = found
-      else
-        edge_stmt = _create_edge_stmt source_node, target_node, o
-        stmt_list._insert_before! edge_stmt, after
-        ev[:created] and ev[:created][ edge_stmt ]
-        res = edge_stmt
-      end
+      begin
+        params = associate_params.new
+        if opt_h
+          opt_h.each { |k, v| params[k] = v } # (validates names)
+          opt_h = nil
+        end
+        source_node = node! source_ref ; source_ref = nil
+        target_node = node! target_ref ; target_ref = nil
+        source_id = source_node.node_id
+        source_id_s = source_id.to_s   # (for lexicals below, leftmost is used)
+        target_id = target_node.node_id
+
+        # (#watch [#067] - this lexical algorithm space, might get dried)
+        exact_stmt = new_before_this = nil
+        _edge_stmts.each do |e|
+          if source_id == e.source_node_id && target_id == e.target_node_id
+            exact_stmt = e
+            break
+          elsif ! new_before_this &&
+            -1 == ( source_id_s <=> e.source_node_id.to_s )
+            new_before_this = e
+          end
+        end
+        if exact_stmt
+          res = ! info ? exact_stmt :
+            info[ Models::Association::Events::Exists.new self, exact_stmt ]
+          break
+        end
+        edge_stmt = _create_edge_stmt source_node, target_node, params
+        stmt_list._insert_before! edge_stmt, new_before_this
+        res = ! success ? edge_stmt :
+          success[ Models::Association::Events::Created.new self, edge_stmt]
+      end while nil
       res
     end
 
-    def _create_edge_stmt source_node, target_node, o
-      if o.prototype
-        _named_prototype(o.prototype) or
-          fail("no such prototype #{o.prototype.inspect}")
-      else
-        _named_prototype(:edge_stmt) or (@_default_edge_stmt_prototype ||= begin
-          p = self.class.grammar.build_parser_for_rule :edge_stmt
-          n = p.parse('foo -> bar') or fail('unexpected internal parse failure')
-          self.class.element2tree n, nil
-        end)
-      end._create source_node, target_node, o
+    def _create_edge_stmt source_node, target_node, param
+      res = nil
+      begin
+        proto = nil
+        if param.prototype
+          proto = _named_prototype param.prototype
+          fail "no such prototype #{ param.prototype.inspect }" if ! proto
+        else
+          proto = _named_prototype :edge_stmt
+          proto ||= begin
+            @_default_edge_stmt_prototype ||= begin
+              prot = self.class.parse :edge_stmt, 'foo -> bar' # [#054]
+              prot or fail "sanity - uexpected parse failure parsing edge_stmt"
+              prot
+            end
+          end
+        end
+        res = proto._create source_node, target_node, param
+      end while nil
+      res
     end
 
     def _create_node_with_label label
@@ -102,7 +121,7 @@ module Skylab::TanMan
 
     def node! label
       # Found an exact match node by label? you found your result.
-      # Any first node_stmt lexically greater? insert before that.
+      # Any first node_stmt lexically greater? insert before that. [#067]
       # Any node_stmts at all? insert immediately after last one.
       # Else insert at beginning of all stmts.
       #

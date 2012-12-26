@@ -1,3 +1,6 @@
+[#067]       #tracking-tag lexical stuff
+[#066] #open issue with adding a new node on an empty graph,
+             new nodes should always come after `node` node
 [#065] #open fuzzy manage dependency
 [#064] #open ui and impl for destory node
 [#063]       #done the --force that rewrites parsers should be different than ..
@@ -13,7 +16,7 @@
                #waiting-on:(#014, #015)
 [#055]       wtf
 [#054]       #watching it seems like it will probably be dangerous to
-             reuse the same parser for multiple parses?
+             reuse the same parser for multiple parses?, also #tracking-tag
 [#053]       #postponed normalizing string here
 [#052]       #postponed normalizing double quoted strings
 [#051]       #postponed support for 'port' in dot-lang grammar
