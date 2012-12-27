@@ -41,10 +41,10 @@ module Skylab::TanMan::TestSupport
     end
 
     def using_input input_path_stem, *tags, &b
-      context("using input #{input_path_stem}", *tags) do
-        let(:input_path_stem_to_use) { input_path_stem }
-        let(:input_string_to_use) { }
-        module_eval(&b)
+      context "using input #{ input_path_stem }", *tags do
+        let( :input_path_stem_to_use ) { input_path_stem }
+        let( :input_string_to_use ) { }
+        module_eval(& b)
       end
     end
 
@@ -126,7 +126,6 @@ module Skylab::TanMan::TestSupport
       client = Headless::DEV::Client.new
       o = TanMan::TestSupport::ParserProxy.new client
       o.verbose = -> { do_debug }
-      o.dir_path = _parser_dir_path
       if do_debug_parser_loading
         o.profile = true
       else

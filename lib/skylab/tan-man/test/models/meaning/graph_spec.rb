@@ -1,7 +1,7 @@
 require_relative 'graph/test-support'
 
 
-module Skylab::TanMan::TestSupport::Models::DotFile::Meaning::Graph
+module Skylab::TanMan::TestSupport::Models::Meaning::Graph
 
 
   # Quickie
@@ -10,7 +10,7 @@ module Skylab::TanMan::TestSupport::Models::DotFile::Meaning::Graph
     }RESOLVING means turning a meaning into a list #{
     }of one or more terminal meanings, So if if you try resolve" do
 
-    extend TanMan::TestSupport::Models::DotFile::Meaning::Graph
+    extend TanMan::TestSupport::Models::Meaning::Graph
     context "with an empty graph" do
       let :graph do
         graph_from [ ]

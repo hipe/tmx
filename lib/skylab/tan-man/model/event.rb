@@ -23,11 +23,31 @@ module Skylab::TanMan
 
     include Core::SubClient::InstanceMethods
 
+    ANCHOR_MODULE = TanMan        # for `normalized_event_name` below
+
+    class << self
+      extend MetaHell::Let        # just for memoizing belo in the class object
+      let :normalized_event_name, & Headless::Action::FUN.build_normalized_name
+    end
+
+
+    def is? sym                   # this has the obvious barrel of the
+      if ::Symbol === sym         # obvious shotgun it is staring down,
+        normalized_event_name.last == sym              # maybe several
+      else
+        normalized_event_name == sym # ick
+      end
+    end
+
     def message
       @message || build_message
     end
 
     attr_writer :message
+
+    def normalized_event_name
+      self.class.normalized_event_name
+    end
 
     def to_h
       members.reduce( message: message ) do |memo, member|
@@ -57,7 +77,15 @@ module Skylab::TanMan
   class Model::Event::Aggregate < Model::Event.new :list
 
     def build_message
-      list.map(&:message).join '.  '
+      list.map(&:message).join '. '
+    end
+
+    def initialize *a
+      if a.length.zero?
+        super nil, [ ]
+      else
+        super # expert mode
+      end
     end
   end
 end

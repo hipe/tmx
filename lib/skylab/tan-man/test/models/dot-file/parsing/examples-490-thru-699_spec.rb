@@ -1,7 +1,10 @@
 require_relative 'test-support'
 
-describe "#{Skylab::TanMan::Models::DotFile::Parser} 490 series" do
-  extend ::Skylab::TanMan::TestSupport::Models::DotFile::Parser
+
+describe "#{ Skylab::TanMan::Models::DotFile }#{
+  }/parsing/examples-490-699" do
+
+  extend ::Skylab::TanMan::TestSupport::Models::DotFile::Parsing
 
   using_input '490-datastruct-essential.dot' do
     it 'should look kewl, unparse losslessly, semantify an edge stmt' do

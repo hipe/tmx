@@ -1,7 +1,7 @@
 require_relative '../test-support'
 
-module Skylab::TanMan::TestSupport::Models::DotFile::Meaning
-  ::Skylab::TanMan::TestSupport::Models::DotFile[ self ]
+module Skylab::TanMan::TestSupport::Models::Meaning
+  ::Skylab::TanMan::TestSupport::Models[ self ]
 
   include CONSTANTS
 

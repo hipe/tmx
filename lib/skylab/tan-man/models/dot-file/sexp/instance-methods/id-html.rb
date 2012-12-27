@@ -3,37 +3,48 @@ module Skylab::TanMan
 
     # (0..128).each { |i| puts("#{ '%03d' % [i] }: #{ ('%c' % [i] ).inspect }") }
 
-    DENY_RX = /([^ !#$\%(-;=?-~])/ # ascii 32 (" ") - 126 ("~") minus the 5 belo
+    deny_rx = /([^ !#$\%(-;=?-~])/ # ascii 32 (" ") - 126 ("~") minus the 5 belo
 
-    HTML_ENTITIES = {
+    html_entities = {
       '"' => 'quot', "'" => 'apos', '&' => 'amp', '<' => 'lt', '>' => 'gt',
     }
 
-    def _escape_string string
+    define_method :_escape_string do |string, error|
       # for now we go with a narrow whitelist, in future we could expand
       # trivially, but for now extensive html escaping support is wayy outside
       # the scope of all this.
       #
-      bad = nil
-      out = string.gsub(DENY_RX) do
-        if ent = HTML_ENTITIES[$1] then "&#{ent};"
-        else
-          (bad ||= []).push $1
-          nil
+      res = nil
+      begin
+        bad = nil
+
+        out = string.gsub deny_rx do
+          str = $~[1]
+          ent = html_entities[ str ]
+          if ent
+            "&#{ ent };"
+          else
+            ( bad ||= [] ) << str
+            nil
+          end
         end
-      end
-      if bad
-        s = ! (1 == bad.length)
-        fail("html-escaping support is currently very limited. the following #{
-          }character#{'s' if s} #{ s ? 'are' : 'is' } not yet supported: #{
-          bad.uniq.map { |c| "#{c.inspect} (#{ '%03d' % [c.ord] })" }.join(', ')
-          }")
-      end
-      out
+
+        if bad
+          res = error[
+            Models::Sexp::Events::Invalid_Characters.new nil, bad.uniq ]
+          break
+        end
+        res = out
+      end while nil
+      res
     end
+
+
     def normalized_string
       self[:content_text_value]
     end
+
+
     def normalized_string! string
       string.include?('>>') and fail('haha not today my friend. not today.')
       self[:content_text_value] = string

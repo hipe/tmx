@@ -3,16 +3,13 @@ module Skylab::TanMan
     # (maybe one day etc but for now the sexp *is* the node)
   end
 
-
   module Models::Node::Events
     # all here.
   end
 
-
   TanMan::Model::Event || nil # (load it here, then it's prettier below)
 
-
-  class Models::Node::Events::Ambiguous_Reference <
+  class Models::Node::Events::Ambiguous <
     Model::Event.new :node_ref, :nodes
 
     def build_message
@@ -21,16 +18,34 @@ module Skylab::TanMan
     end
   end
 
-
-  class Models::Node::Events::Disassociation_Success <
-    Model::Event.new :source_node, :target_node, :edge_stmt
+  class Models::Node::Events::Created <
+    Model::Event.new :node_stmt
 
     def build_message
-      "removed association: #{ source_node.node_id } -> #{
-        }#{ target_node.node_id } (actual stmt: #{ edge_stmt.unparse }) "
+      "created node: #{ lbl node_stmt.label }"
     end
   end
 
+  class Models::Node::Events::Exists <
+    Model::Event.new :node_stmt, :polarity
+
+    def build_message
+      if polarity
+        "found existing node #{ lbl node_stmt.label }"
+      else
+        "node already existed: #{ lbl node_stmt.label }"
+      end
+    end
+  end
+
+  class Models::Node::Events::No_Prototype <
+    Model::Event.new :graph_noun
+
+    def build_message
+      "the stmt_list does not have a prototype in #{
+      }#{ graph_noun } (is it at the top, after \"graph {\"?)."
+    end
+  end
 
   class Models::Node::Events::Not_Found <
     Model::Event.new :node_ref, :seen_count
@@ -40,17 +55,6 @@ module Skylab::TanMan
         }#{ ick node_ref } (among #{ seen_count } node#{ s seen_count })"
     end
   end
-
-
-  class Models::Node::Events::Not_Associated <
-    Model::Event.new :source_node, :target_node, :reverse_was_true
-
-    def build_message
-      "association does not exist: #{ source_node.node_id } #{
-      }-> #{ target_node.node_id }"
-    end
-  end
-
 
   class Models::Node::Events::Not_Founds <
     Model::Event.new :node_not_founds

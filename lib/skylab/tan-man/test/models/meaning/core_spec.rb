@@ -1,11 +1,11 @@
 require_relative 'test-support'
 
-module Skylab::TanMan::TestSupport::Models::DotFile::Manipulus
+module Skylab::TanMan::TestSupport::Models::Meaning
 
   # Quickie compatible.
 
-  describe "#{ TanMan::Models::DotFile } manipulus 012-a-lists-as-meaning" do
-    extend ::Skylab::TanMan::TestSupport::Models::DotFile::Manipulus
+  describe "#{ TanMan::Models::DotFile::Meaning } core" do
+    extend ::Skylab::TanMan::TestSupport::Models::Meaning
 
     it "add one before one - HERE HAVE A COMMA (this was hard) BUT IT IS MAGIC" do
                                   # client.parser.root = :node_stmt

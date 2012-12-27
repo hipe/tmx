@@ -7,7 +7,7 @@ module Skylab::TanMan
   module Models::DotFile::Sexp::InstanceMethod::InstanceMethods
     def _label2id_stem label_str
       md = /\A(?<stem>\w+)/.match label_str
-      md ? md[:stem] : 'node'
+      md ? md[:stem].downcase : 'node'
     end
 
     # this is a *big* experiment -- expect this to change a lot

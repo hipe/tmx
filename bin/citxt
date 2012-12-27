@@ -22,6 +22,9 @@ module Skylab::CI_Txt
           begin
             option_parser.parse! argv
             if argv.any?
+              self.dir_path = argv.shift
+            end
+            if argv.any?
               emit :help, "unexpected arg(s): #{ argv.inspect }"
               break
             end
@@ -36,6 +39,9 @@ module Skylab::CI_Txt
           break
         end
         res = execute
+        if false == res
+          emit :help, invite_line
+        end
       end while nil
       res
     end
@@ -48,7 +54,7 @@ module Skylab::CI_Txt
     define_method :branch_name do
       res = nil
       begin
-        head_pathname = git_dir.join 'HEAD'
+        head_pathname = git_dir_pathname.join 'HEAD'
         content = head_pathname.read
         unless ref_rx =~ content
           error "failed to read content of #{ escape_path head_pathanme }"
@@ -77,7 +83,7 @@ module Skylab::CI_Txt
       end
 
       o.banner = <<-HERE.gsub( /^        /, '' )
-        #{ em 'usage:' } #{ program_name } [opts]
+        #{ usage_line }
 
         #{ em 'description:' } creates a #{ filename } file.
 
@@ -90,7 +96,23 @@ module Skylab::CI_Txt
     define_method :create_initial_file do
       res = nil
       begin
-        pathname = git_dir.dirname.join filename
+        use_dir = nil
+        if dir_pathname_raw
+          if ! dir_pathname_expanded.directory?
+            error "#{ em param_label } must be directory: #{ dir_pathname_raw }"
+            break( res = false )
+          end
+          inside = dir_pathname_expanded.to_s
+          outside = git_dir_pathname.dirname.to_s
+          if 0 != inside.index( outside )
+            error "#{ inside } must be inside #{ outside }"
+            break( res = false )
+          end
+          use_dir = dir_pathname_expanded
+        else
+          use_dir = git_dir_pathname.dirname
+        end
+        pathname = use_dir.join filename
         if pathname.exist?
           fail 'sanity'
         end
@@ -111,18 +133,36 @@ module Skylab::CI_Txt
       res
     end
 
+    def dir_path= str
+      require 'pathname'
+      @dir_pathname_raw = ::Pathname.new str
+      str
+    end
+
+    def dir_pathname_expanded # assumes `dir_pathname_raw`
+      @dir_pathname_expanded ||= dir_pathname_raw.expand_path
+    end
+
+    attr_reader :dir_pathname_raw # exactly as the use provided it
+
     attr_accessor :dry_run
 
     define_method :execute do
       res = nil
       begin
-        @git_dir = find_git_dir or break
+        @git_dir_pathname = find_git_dir or break
         existing = find_existing
         if existing
+          if dir_pathname_raw
+            if ! reconcile_dir_pathname_with_existing existing
+              res = false
+              break
+            end
+          end
           info "using #{ escape_path existing }"
         else
           existing = create_initial_file
-          existing or break
+          existing or break( res = existing )
         end
         editor = ::ENV['EDITOR'] || 'vi'
         cmd = "vi #{ escape_path existing }"
@@ -137,7 +177,7 @@ module Skylab::CI_Txt
 
     define_method :find_existing do
       curr = pwd
-      stop = git_dir.dirname
+      stop = git_dir_pathname.dirname
       if ! pwd.to_s.index( stop.to_s )  # is pwd equal to or under stop dir?
         fail 'sanity'
       end
@@ -157,7 +197,7 @@ module Skylab::CI_Txt
     end
 
 
-    git_dir = '.git'
+    git_dir_basename = '.git'
 
     define_method :find_git_dir do
       require 'pathname'
@@ -165,7 +205,7 @@ module Skylab::CI_Txt
       found = false
       seen = [ ]
       loop do
-        try = curr.join git_dir
+        try = curr.join git_dir_basename
         if try.exist?
           found = try
           break
@@ -179,18 +219,35 @@ module Skylab::CI_Txt
         end
       end
       if ! found
-        error "couldn't find #{ em git_dir } directory anywhere from #{
+        error "couldn't find #{ em git_dir_basename } directory anywhere from #{
           }pwd (\"#{ pwd }\") up to \"/\" (#{ seen.length } dirs)"
       end
       found
     end
 
-    attr_reader :git_dir
+    attr_reader :git_dir_pathname
+
+    param_label = '<dir_to_create_file_in>'
+
+    define_method :param_label do param_label end
 
     attr_reader :pwd
 
-    def usage_line
-      "usage: #{ em program_name }"
+    define_method :reconcile_dir_pathname_with_existing do |existing|
+      if dir_pathname_expanded == existing.dirname
+        true
+      else
+        error "couldn't reconcile filenames - #{
+        }you specified a #{ em param_label } (#{ dir_pathname_raw }), #{
+        }but an existing #{ filename } was found (#{ escape_path existing }) #{
+        }and it was not in that directory. Either don't specify the path or #{
+        }move the file to where you want it."
+        false
+      end
+    end
+
+    define_method :usage_line do
+      "#{ em 'usage:' } #{ program_name } [-h] [-v] [ #{ param_label } ]"
     end
 
     attr_accessor :verbose

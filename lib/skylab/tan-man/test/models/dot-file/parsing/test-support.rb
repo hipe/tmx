@@ -15,13 +15,17 @@ RSpec::Matchers.define :be_sexp do |expected|
   end
 end
 
-module Skylab::TanMan::TestSupport::Models::DotFile::Parser
-  Skylab::TanMan::TestSupport::Models::DotFile[ Parser = self ]
+
+
+module Skylab::TanMan::TestSupport::Models::DotFile::Parsing
+  Skylab::TanMan::TestSupport::Models::DotFile[ Parsing_TestSupport = self ]
 
   def self.extended mod
     _regret_extended mod
     mod.before(:all) { _my_before_all }
   end
+
+
 
   module ModuleMethods
     def it_unparses_losslessly(*tags)
@@ -31,7 +35,10 @@ module Skylab::TanMan::TestSupport::Models::DotFile::Parser
     end
   end
 
+
   module InstanceMethods
-    let(:_parser_dir_path) { Parser.dir_path }
+    let :_input_fixtures_dir_path do
+      Parsing_TestSupport::Fixtures.dir_path
+    end
   end
 end

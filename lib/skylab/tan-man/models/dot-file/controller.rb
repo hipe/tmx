@@ -3,25 +3,29 @@ module Skylab::TanMan
     include Core::SubClient::InstanceMethods
     include Models::DotFile::Parser::InstanceMethods
 
+    def add_node node_ref, dry_run, force, verbose, error, success
+      if nodes
+        # not currently meaningful = `dry_run`, `verbose`
+        nodes.add node_ref,
+                   ! force, # `do_fuzzy` for now, the inverse of force
+                     error,
+                   success
+      end
+    end
 
-    def set_dependency source_ref, target_ref, error, success, info
-
+    def apply_meaning node_ref, meaning, dry_run, verbose, error, success, info
       res = nil
       begin
-        graph = self.sexp or break( res = graph )
-        if ! graph.stmt_list._prototype
-          res = error[
-             Models::Association::Events::No_Prototype.new self, graph_noun ]
-          break
-        end
-        res = graph.associate! source_ref, target_ref, { prototype: nil },
-          error, success, info
+        nodes or break
+        node = nodes.fetch node_ref, error, info
+        break( res = node ) if ! node
+        res = meanings.apply(
+          node, meaning, dry_run, verbose, error, success, info )
       end while nil
       res
     end
 
-
-    def check
+    def check verbose
       res = true # always succeeds
       begin
         sexp = self.sexp or break # emitted
@@ -40,120 +44,14 @@ module Skylab::TanMan
       res
     end
 
-
-    def disassociate! source_ref, target_ref, nodes_not_found,
-                                                nodes_not_associated, success
-      res = nil
-
-      resolve_nodes = -> do
-        ambis = [] ; not_founds = []
-        ambi = -> o { ambis << o }  ; not_found = -> o { not_founds << o }
-        source_node = fetch_node source_ref, not_found, ambi
-        target_node = fetch_node target_ref, not_found, ambi
-
-        if ! source_node || ! target_node
-          agg = Models::Event::Aggregate.new self, [ ]
-          agg.list << Models::Node::Events::Not_Founds.new( self,
-            not_founds ) if not_founds.length.nonzero?
-          agg.list.concat ambis
-          res = nodes_not_found[ agg ]
-          break
-        end
-        [ source_node, target_node ]
-      end
-
-      find_edges = -> source_node, target_node do
-        reverse_was_true = nil
-        source_node_id = source_node.node_id
-        target_node_id = target_node.node_id
-        prev_node = sexp.stmt_list
-        a = sexp.stmt_list._nodes.reduce( [ ] ) do |memo, stmt_list|
-          stmt = stmt_list.stmt
-          if :edge_stmt == stmt.class.rule
-            src_id = stmt.source_node_id
-            tgt_id = stmt.target_node_id
-            if src_id == source_node_id
-              if tgt_id == target_node_id
-                memo.push [ prev_node, stmt ]
-              end
-            elsif tgt_id == source_node_id && src_id == target_node_id
-              reverse_was_true = true
-            end
-          end
-          prev_node = stmt_list
-          memo
-        end
-        if a.length.nonzero?
-          a
-        else
-          ev = Models::Node::Events::Not_Associated.new( self,
-            source_node, target_node, reverse_was_true )
-          ev.message = "#{ lbl source_node.label } already does not #{
-            }depend on #{ lbl target_node.label }#{ if reverse_was_true then
-            " (but #{ lbl target_node.label } does depend on #{
-            }#{ lbl source_node.label })" end }"
-          rev = nodes_not_associated[ ev ]
-          nil
-        end
-      end
-
-      begin
-        sexp or break # (else we might double up later on emissions ick!)
-        ( source_node, target_node = resolve_nodes[ ] ) or break
-        edges = find_edges[ source_node, target_node ] or break
-        edges.reverse.each do |node, item|
-          edge_stmt = node.destroy_child! item
-          ev = Models::Node::Events::Disassociation_Success.new self,
-            source_node, target_node, edge_stmt
-          ev.message = "#{ lbl source_node.label } no longer depends #{
-            }on #{ lbl target_node.label } (removed this edge_stmt: #{
-            }#{ kbd edge_stmt.unparse })"
-          res = success[ ev ]
-        end
-      end while nil
-      res
-    end
-
-
-
-    def apply_meaning node_ref, meaning, dry_run, verbose, error, success, info
-      res = nil
-      begin
-        node = fetch_node( node_ref, error, info )
-        break( res = node ) if ! node
-        res = meanings.apply node, meaning, dry_run, verbose, error,
-                                                                  success, info
-      end while nil
-      res
-    end
-
-    define_method :fetch_node do |node_ref, not_found, ambiguous|
-      res = nil
-      begin
-        sexp = self.sexp or break
-        rx = /\A#{ ::Regexp.escape node_ref }/i # case-insensitive for now,
-        res = fuzzy_fetch sexp._node_stmts,     # we could do a fuzzy tie-
-          -> stmt do                            # breaker if we needed to
-            if rx =~ stmt.label # stmt.node_id
-              node_ref == stmt.label ? 1 : 0.5
-            end
-          end,
-          -> count do
-            not_found[ Models::Node::Events::Node_Not_Found.new(
-              self, node_ref, count ) ]
-            false # this makes life easier..
-          end,
-          -> partial do
-            ambiguous[ Models::Node::Events::Ambiguous_Node_Reference.new(
-              self, node_ref, partial ) ]
-            nil # this makes life easier
-          end
-      end while nil
-      res
-    end
-
     def graph_noun
       "#{ escape_path pathname }"
+    end
+
+    def list_nodes verbose, payload
+      if nodes
+        nodes.list verbose, payload
+      end
     end
 
     def meanings
@@ -162,10 +60,17 @@ module Skylab::TanMan
 
     attr_reader :pathname
 
-    def set_meaning agent, target, create, dry_run, verbose,     # contrast
-                                    error, success, neutral      # this way..
-      meanings.set agent, target, create, dry_run, verbose,
-                                   error, success, neutral
+    def set_dependency source_ref, target_ref, do_create,
+      do_fuzz, error, success, info
+
+      associations.set_dependency source_ref, target_ref, do_create,
+        do_fuzz, error, success, info
+    end
+
+    def set_meaning agent_ref, target_ref, create, dry_run, verbose,
+                      error, success, info
+      meanings.set agent_ref, target_ref, create, dry_run, verbose,
+        error, success, info
     end
 
     def sexp
@@ -186,7 +91,6 @@ module Skylab::TanMan
       res
     end
 
-
     constantize = ::Skylab::Autoloader::Inflection::FUN.constantize
 
     def tell statement_sexp, dry_run, force, verbose
@@ -202,6 +106,9 @@ module Skylab::TanMan
       res
     end
 
+    def unset_dependency *a
+      associations.unset_dependency(* a)
+    end
 
     def unset_meaning *a
       meanings.unset(* a)
@@ -251,7 +158,25 @@ module Skylab::TanMan
 
     def initialize request_client, dotfile_pathname
       super request_client
+      @associations = nil
+      @nodes = nil
       @pathname = dotfile_pathname
+    end
+
+    def associations
+      @associations ||= begin                  # #sexp-release
+        if sexp = self.sexp
+          Models::Association::Collection.new self, sexp
+        end
+      end
+    end
+
+    def nodes
+      @nodes ||= begin                         # #sexp-release
+        if sexp = self.sexp
+          Models::Node::Collection.new self, sexp
+        end
+      end
     end
 
     def write_commit string, dry_run, verbose

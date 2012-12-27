@@ -9,9 +9,7 @@ module Skylab::TanMan
     # pure namespace, all here
   end
 
-
   TanMan::Model::Event || nil # (load it here, then it's prettier below)
-
 
   class Models::Association::Events::Created <
     Model::Event.new :edge_stmt
@@ -21,22 +19,51 @@ module Skylab::TanMan
     end
   end
 
-
-  class Models::Association::Events::Exists <
-    Model::Event.new :edge_stmt
+  class Models::Association::Events::Disassociation_Success <
+    Model::Event.new :source_node, :target_node, :edge_stmt
 
     def build_message
-      "association already existed: #{ edge_stmt.unparse }"
+      "removed association: #{ source_node.node_id } -> #{
+        }#{ target_node.node_id } (actual stmt: #{ edge_stmt.unparse }) "
     end
   end
 
+  class Models::Association::Events::Exists <
+    Model::Event.new :edge_stmt, :polarity
 
-  class Models::Association::Events::No_Prototype < # this will prob. move
+    def build_message
+      if polarity
+        "found existing association: #{ edge_stmt.unparse }"
+      else
+        "association already exists: #{ edge_stmt.unparse }"
+      end
+    end
+  end
+
+  class Models::Association::Events::No_Prototypes <
     Model::Event.new :graph_noun
 
     def build_message
-      "the stmt_list does not have a prototype in #{
+      "the stmt_list does not have any prototypes in #{
       }#{ graph_noun } (is it at the top, after \"graph {\"?)."
+    end
+  end
+
+  class Models::Association::Events::No_Prototype <
+    Model::Event.new :graph_noun, :prototype_ref
+
+    def build_message
+      "the stmt_list in #{ graph_noun } has no prototype named #{
+      }#{ ick prototype_ref }"
+    end
+  end
+
+  class Models::Association::Events::Not_Associated <
+    Model::Event.new :source_node, :target_node, :reverse_was_true
+
+    def build_message
+      "association does not exist: #{ source_node.node_id } #{
+      }-> #{ target_node.node_id }"
     end
   end
 end

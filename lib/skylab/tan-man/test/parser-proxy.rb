@@ -6,12 +6,6 @@ module Skylab::TanMan
 
     include TanMan::Models::DotFile::Parser::InstanceMethods
 
-    attr_accessor :dir_path
-
-    def dir_pathname
-      @dir_pathname ||= (dir_path and ::Pathname.new(dir_path))
-    end
-
     public :parser
 
     attr_accessor :profile

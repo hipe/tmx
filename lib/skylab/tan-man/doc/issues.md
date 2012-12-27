@@ -1,12 +1,12 @@
 [#070]       #tracking-tag `create` flag as a triad: false, nil, trueish
 [#069]       #tracking-tag fuzzy-finging regexen - case insensitive?
-[#068] #open dot file controller is becoming a god object, also redesign
+[#068]       #done dot file controller is becoming a god object, also redesign
              the way it executes "tell"s, so it's not as much an action
              obj
 [#067]       #tracking-tag lexical stuff ..
-[#066] #open issue with adding a new node on an empty graph,
+[#066]       #done issue with adding a new node on an empty graph,
              new nodes should always come after `node` node
-[#065] #open fuzzy manage dependency
+[#065]       #done fuzzy manage dependency
 [#064] #open ui and impl for destory node
 [#063]       #done the --force that rewrites parsers should be different than ..
 [#062]      #later meaning reports!!!!

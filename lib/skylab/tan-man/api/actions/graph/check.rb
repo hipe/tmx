@@ -37,10 +37,7 @@ module Skylab::TanMan
         # so we can have arbitrary whatever paths easily
         # as an excercize we build a controller here
         cnt = TanMan::Models::DotFile::Controller.new self, pathname
-        res = cnt.check false, # dry_run
-                        false, # force
-                      verbose
-        res = o.check
+        res = cnt.check verbose
       end while nil
       res
     end
