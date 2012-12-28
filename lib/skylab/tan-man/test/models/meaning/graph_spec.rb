@@ -6,7 +6,7 @@ module Skylab::TanMan::TestSupport::Models::Meaning::Graph
 
   # Quickie
 
-  describe "#{ TanMan::Models::DotFile::Meaning::Graph } - #{
+  describe "#{ TanMan::Models::Meaning::Graph } - #{
     }RESOLVING means turning a meaning into a list #{
     }of one or more terminal meanings, So if if you try resolve" do
 

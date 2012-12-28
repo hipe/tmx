@@ -1,5 +1,5 @@
 module Skylab::TanMan
-  class Models::DotFile::Meaning < ::Struct.new :name, :value # KEEP LIFE EASY
+  class Models::Meaning < ::Struct.new :name, :value # KEEP LIFE EASY
                                                # let's always use only strings
 
     include Core::SubClient::InstanceMethods

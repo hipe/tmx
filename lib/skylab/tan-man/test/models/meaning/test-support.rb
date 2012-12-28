@@ -7,6 +7,6 @@ module Skylab::TanMan::TestSupport::Models::Meaning
 
   extend TestSupport::Quickie
 
-  TanMan::Models::DotFile::Meaning.const_get :Graph, false # jerks
+  TanMan::Models::Meaning.const_get :Graph, false # jerks
 
 end

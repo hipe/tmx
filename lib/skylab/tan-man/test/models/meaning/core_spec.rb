@@ -4,7 +4,7 @@ module Skylab::TanMan::TestSupport::Models::Meaning
 
   # Quickie compatible.
 
-  describe "#{ TanMan::Models::DotFile::Meaning } core" do
+  describe "#{ TanMan::Models::Meaning } core" do
     extend ::Skylab::TanMan::TestSupport::Models::Meaning
 
     it "add one before one - HERE HAVE A COMMA (this was hard) BUT IT IS MAGIC" do

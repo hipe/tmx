@@ -1,10 +1,10 @@
 module Skylab::TanMan
-  class Models::DotFile::Meaning::Flyweight
+  class Models::Meaning::Flyweight
 
 
                                   # if you need to use the data in a flyweight
     def collapse request_client   # at any time other than during that iteration
-      Models::DotFile::Meaning.new request_client, name, value # you must
+      Models::Meaning.new request_client, name, value # you must
     end                           # collapse it.  one day when we get retarded
                                   # we might try to make them editable.
 

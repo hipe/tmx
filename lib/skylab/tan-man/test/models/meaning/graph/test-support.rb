@@ -11,7 +11,7 @@ module Skylab::TanMan::TestSupport::Models::Meaning::Graph
   module InstanceMethods
     def graph_from a_a
       enum = [ ]
-      g = TanMan::Models::DotFile::Meaning::Graph.new nil, enum
+      g = TanMan::Models::Meaning::Graph.new nil, enum
       a_a.each do |name, value|
         enum.push new_meaning( name, value )
       end
@@ -22,7 +22,7 @@ module Skylab::TanMan::TestSupport::Models::Meaning::Graph
       graph.send(:list).detect { |m| name_string == m.name } # itself
     end
 
-    meaning_class = TanMan::Models::DotFile::Meaning
+    meaning_class = TanMan::Models::Meaning
     define_method :new_meaning do |name, value|
       meaning_class.new nil, name, value
     end

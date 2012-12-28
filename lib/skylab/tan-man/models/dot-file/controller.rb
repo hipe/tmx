@@ -55,7 +55,7 @@ module Skylab::TanMan
     end
 
     def meanings
-      @meanings ||= Models::DotFile::Meaning::Collection.new self
+      @meanings ||= Models::Meaning::Collection.new self
     end
 
     attr_reader :pathname

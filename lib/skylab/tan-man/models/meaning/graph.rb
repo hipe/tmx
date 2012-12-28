@@ -1,5 +1,5 @@
 module Skylab::TanMan
-  class Models::DotFile::Meaning::Graph
+  class Models::Meaning::Graph
     include Core::SubClient::InstanceMethods
 
     # Some notes about resolving meaning: Meanings are currently stored
@@ -67,7 +67,7 @@ module Skylab::TanMan
     attr_reader :list
 
 
-    valid_name_rx = Models::DotFile::Meaning::FUN.valid_name_rx
+    valid_name_rx = Models::Meaning::FUN.valid_name_rx
 
                                                  # centralize this hack -
     define_method :looks_terminal? do |meaning|  # a meaning looks like a

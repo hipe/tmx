@@ -1,5 +1,5 @@
 module Skylab::TanMan
-  class Models::DotFile::Meaning::Collection
+  class Models::Meaning::Collection
     include Core::SubClient::InstanceMethods
 
     def apply node, meaning_ref, dry_run, verbose, error, success, info
@@ -35,11 +35,11 @@ module Skylab::TanMan
       list.each(& block)
     end
 
-    hack_rx = Models::DotFile::Meaning::FUN.match_line_rx
+    hack_rx = Models::Meaning::FUN.match_line_rx
 
     define_method :list do
       ::Enumerator.new do |y|
-        fly = Models::DotFile::Meaning::Flyweight.new
+        fly = Models::Meaning::Flyweight.new
         sexp.comment_nodes.each do |str|
           enum = Models::Comment::LineEnumerator.for str
           enum.each do |line|
@@ -70,7 +70,7 @@ module Skylab::TanMan
                                   # got to walk the tree again to get the item.
                                   # this was a bit tricky! suggestions welcome
           use_meaning = list.detect { |meaning| use_name == meaning.name }
-          new_meaning = Models::DotFile::Meaning.new self, name, value_str
+          new_meaning = Models::Meaning.new self, name, value_str
           res = nil
           ok = new_meaning.normalize! -> e { res = error[ e ] }, info
           ok or break res
@@ -97,7 +97,7 @@ module Skylab::TanMan
 
       update = -> do
         o = found
-        n = Models::DotFile::Meaning.new self, name, value_str
+        n = Models::Meaning.new self, name, value_str
         res = nil
         ok = n.normalize! -> e { res = error[ e ] }, info
         ok or break res
@@ -298,7 +298,7 @@ module Skylab::TanMan
     end
 
     def resolve_meaning meaning
-      graph = Models::DotFile::Meaning::Graph.new self, list # yes a one-off
+      graph = Models::Meaning::Graph.new self, list # yes a one-off
       res = graph.resolve meaning, -> o do
         error describe_interminable_meaning( o )
         emit :help, "perhaps address these issues with your meaning #{
