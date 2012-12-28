@@ -23,7 +23,7 @@ module Skylab::TanMan
             false
           end,
           -> success do
-            info success
+            info success.to_h
             write = true
             true
           end,

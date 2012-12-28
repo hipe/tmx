@@ -1,10 +1,10 @@
 require_relative 'test-support'
 
-module Skylab::TanMan::TestSupport
+module Skylab::TanMan::TestSupport::CLI::Actions
 
-  describe "The #{TanMan} CLI", tanman: true,
+  describe "The #{ TanMan } cli action", tanman: true,
                             cli_action: true do
-    extend TanMan_TestSupport
+    extend Actions_TestSupport
 
 
     paystream = :paystream ; infostream = :infostream

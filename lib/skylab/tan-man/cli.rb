@@ -283,6 +283,12 @@ module Skylab::TanMan
   end
 
 
+  class CLI::Actions::Graph::Node < CLI::Action::Box
+    desc "do things to nodes"
+
+  end
+
+
   class CLI::Actions::Graph::Which < CLI::Action
     desc "which dotfile?"
 

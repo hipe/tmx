@@ -1,7 +1,10 @@
 require_relative '../test-support'
 
 module Skylab::TanMan::TestSupport::CLI::Actions
-  ::Skylab::TanMan::TestSupport::CLI[ self ]
+  ::Skylab::TanMan::TestSupport::CLI[ Actions_TestSupport = self ]
+
+  include CONSTANTS
+
 
   if defined? ::RSpec             # ack - avoid loading rspec-depedant things
     require_relative 'for-rspec'  # when we are running (e.g. visal tests)

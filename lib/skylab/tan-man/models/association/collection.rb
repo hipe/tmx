@@ -5,14 +5,37 @@ module Skylab::TanMan
     def associate! source_ref, target_ref, assoc_param_h=nil
       # the above signature is for legacy compat. w/ test suite - may change!
 
-      res = prod source_ref,
-                 target_ref,
-       (assoc_param_h||nil), # callee will validate this and use it
-                        nil, # yes, `do_create`, iff necessary
-                      false, # `do_fuzz` never (for compat. w/ legacy for now)
-   -> e { raise e.message }, # turn these into exceptions (legacy compat.)
-                        nil, # don't call anything for success
-                        nil  # don't call anything for info
+           res = prod source_ref,
+                      target_ref,
+                             nil, # yes, `do_create`, iff necessary
+            (assoc_param_h||nil), # callee will validate this and use it
+                           false, # `do_fuzz` never (legacy compat for now)
+        -> e { raise e.message }, # turn these into exceptions (legacy compat.)
+                             nil, # don't call anything for success
+                             nil  # don't call anything for info
+      res
+    end
+
+                                  # if no associations found, result is always
+                                  # nil. if assocations found, if you provided
+                                  # a success[], is result, else is array of one
+                                  # or more edge stmts that were removed.
+    def destroy_all_associations node_id, _, success # i cannot fail
+      res_a = each_associated_list_node( node_id ).to_a.reverse.map do |list|
+        x = list._remove! list.stmt             # (reverse b/c deletes up
+        x.stmt                                  # at root do a lot of juggling
+      end                                       # we want to avoid. might be ok)
+      res = nil
+      if res_a.length.nonzero?
+        res_a.reverse! # cosmetics - restore it back to the maybe lexical order
+        if success
+          ev = Models::Association::Events::Disassociation_Successes.new self,
+            res_a
+          res = success[ ev ]
+        else
+          res = res_a
+        end
+      end
       res
     end
 
@@ -21,8 +44,8 @@ module Skylab::TanMan
 
       res = prod source_ref,
                  target_ref,
-                        nil, # we aren't using the assoc param here yet
                   do_create, # up to caller whether to create etc.
+                        nil, # we aren't using the assoc param here yet
                     do_fuzz, # up to caller whether we do fuzzy dupe checking
                       error, # caller handles error events
                     success, # caller handles successs events
@@ -35,8 +58,8 @@ module Skylab::TanMan
 
       res = prod source_ref,
                  target_ref,
+                      false, # this value is necessary for destroy (create)
                       false, # i'm so sorry, it was too tempting not to..
-                      false, # this value is necessary for detroy (create)
                     do_fuzz, # whether to fuzzy match is up to caller
                       error, # caller handles error events
                     success, # caller handles success events - *REQUIRED* here
@@ -89,7 +112,7 @@ module Skylab::TanMan
     def destroy edge_pairs, source_node, target_node, success
       res = nil
       edge_pairs.reverse.each do |node, item|
-        edge_stmt = node.destroy_child! item
+        edge_stmt = node._remove! item
         ev = Models::Association::Events::Disassociation_Success.new self,
           source_node, target_node, edge_stmt
         ev.message = "#{ lbl source_node.label } no longer depends #{
@@ -98,6 +121,30 @@ module Skylab::TanMan
         res = success[ ev ]
       end
       res # le sketch
+    end
+
+    def each_associated_list_node node_id
+      ::Enumerator.new do |y|     # used to be a nice pretty reduce but w/e
+        each_edge_stmt_list.each do |edge_stmt_list|
+          o = edge_stmt_list.stmt
+          if o.source_node_id == node_id or o.target_node_id == node_id
+            y << edge_stmt_list
+          end
+        end
+        nil
+      end
+    end
+
+    def each_edge_stmt_list       # repeats some of `prod` but w/o all the
+      ::Enumerator.new do |y|     # lexcial trappings
+        sl = graph_sexp.stmt_list or break
+        sl._nodes.each do |stmt_list|
+          stmt = stmt_list.stmt or next
+          :edge_stmt == stmt.class.rule or next
+          y << stmt_list
+        end
+        nil
+      end
     end
 
     def graph_noun
@@ -113,7 +160,7 @@ module Skylab::TanMan
     association_params = ::Struct.new :attrs, :prototype
 
     define_method :prod do
-      |source_ref, target_ref, assoc_param_h, do_create, do_fuzz,
+      |source_ref, target_ref, do_create, assoc_param_h, do_fuzz,
         error, success, info|
 
       res = nil
@@ -142,8 +189,8 @@ module Skylab::TanMan
           eagg = TanMan::Model::Event::Aggregate.new # aggregate errors
           erro = -> e { eagg.list.push e ; false }   # ick, nec
 
-          src = nodes.send :prod, source_ref, do_creat, do_fuzz, erro, succes
-          tgt = nodes.send :prod, target_ref, do_creat, do_fuzz, erro, succes
+          src = nodes.produce source_ref, do_creat, do_fuzz, erro, succes
+          tgt = nodes.produce target_ref, do_creat, do_fuzz, erro, succes
 
           if ! ( src && tgt )                  # emit aggregated errors
             ok = [src, tgt].include?( false ) ? false : nil # omg

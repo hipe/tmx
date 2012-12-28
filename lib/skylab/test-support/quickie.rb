@@ -111,6 +111,10 @@ module Skylab::TestSupport::Quickie
 
     # --*--
 
+    def be_include expected # egads this feels so awful sorry
+      IncludePredicate.new expected, self
+    end
+
     def eql expected
       EqualsPredicate.new expected, self
     end
@@ -120,7 +124,7 @@ module Skylab::TestSupport::Quickie
     end
 
     def raise_error expected_class, message_rx
-      RaiseErrorPrediate.new expected_class, message_rx, self
+      RaiseErrorPredicate.new expected_class, message_rx, self
     end
 
     # --*--
@@ -236,6 +240,17 @@ module Skylab::TestSupport::Quickie
     end
   end
 
+  class IncludePredicate < ::Struct.new :expected, :context # yeah about that..
+    def match actual
+      if actual.include? expected
+        context.pass! "includes." # where is this used? i don't like it #todo
+      else
+        context.fail! "expected #{ actual.inspect } to include #{
+          }#{ expected.inspect }"
+      end
+    end
+  end
+
   class MatchPredicate < ::Struct.new :expected, :context
     def match actual
       if expected =~ actual
@@ -246,7 +261,7 @@ module Skylab::TestSupport::Quickie
     end
   end
 
-  class RaiseErrorPrediate < ::Struct.new :expected_class, :message_rx, :context
+  class RaiseErrorPredicate < ::Struct.new :expected_class, :message_rx, :context
     def match actual
       begin
         actual.call

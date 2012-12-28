@@ -1,3 +1,6 @@
+[#073] #open rename 'examples' to 'starters'
+[#072] #open when returning false, use the terminal action node
+[#071]       #tracking-tag: shift from the `prototypes` paradigm to the 'meh'
 [#070]       #tracking-tag `create` flag as a triad: false, nil, trueish
 [#069]       #tracking-tag fuzzy-finging regexen - case insensitive?
 [#068]       #done dot file controller is becoming a god object, also redesign
@@ -7,7 +10,7 @@
 [#066]       #done issue with adding a new node on an empty graph,
              new nodes should always come after `node` node
 [#065]       #done fuzzy manage dependency
-[#064] #open ui and impl for destory node
+[#064]       ui and impl for destory node
 [#063]       #done the --force that rewrites parsers should be different than ..
 [#062]      #later meaning reports!!!!
 [#061]       #done shallow shortcut to `tell` ?

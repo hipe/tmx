@@ -1,12 +1,12 @@
 require_relative 'test-support'
 
-module Skylab::TanMan::TestSupport::CLI
+module Skylab::TanMan::TestSupport::CLI::Actions
   # @todo waiting for permute [#056]
   #
 
-  describe "The #{TanMan::CLI} action Status", tanman: true,
+  describe "The #{ TanMan::CLI } action `status`", tanman: true,
                                            cli_action: true do
-    extend CLI_TestSupport
+    extend Actions_TestSupport
     include Tmpdir::InstanceMethods
 
     def prepare_configs *whichs

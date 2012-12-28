@@ -9,24 +9,8 @@ module Skylab::TanMan
         meaning or break( res = meaning )
         meanings = resolve_meaning( meaning ) or break( res = meanings )
         attrs = parse_meanings( meanings ) or break( res = attrs )
-        a_list = node.attr_list.content
-        a_list._prototype ||= a_list_prototype
-        added = [] ; changed = []
-        node.attr_list.content._update_attributes! attrs,
-          -> name, val { added << [name, val] },
-          -> name, old, new { changed << [name, old, new] }
-        preds = [ ]
-        if added.length.nonzero?
-          preds << "added attribute#{ s added }: #{
-            }[ #{added.map { |k, v| "#{k}=#{v}" }.join(', ') } ]"
-        end
-        if changed.length.nonzero?
-          preds << "changed #{ changed.map do |k, old, new|
-            "#{ k } from #{ val old } to #{ val new }"
-          end.join ' and ' }"
-        end
-        success[ "on node #{ lbl node.label } #{ preds.join ' and ' }" ]
-        res = true
+        res = dotfile_controller.nodes.node_controller( node ).
+          update_attributes attrs, error, success
       end while nil
       res
     end
@@ -167,18 +151,6 @@ module Skylab::TanMan
     end
 
   protected
-
-    a_list_proto = nil
-
-    define_method :a_list_prototype do
-      a_list_proto ||= begin
-        p = sexp.class.grammar.parser_for_rule :a_list # [#054]
-        syn_node = p.parse 'a=b, c=d' # you are setting the template for spacing
-        a_list = sexp.class.element2tree syn_node, :a_list_prototype
-        a_list
-      end
-      a_list_proto
-    end
 
     def describe_interminable_meaning o
       case o.reason

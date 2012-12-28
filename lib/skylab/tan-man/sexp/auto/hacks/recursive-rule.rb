@@ -32,8 +32,16 @@ module Skylab::TanMan
 
     methods = [:_append!, :_insert_before!, :_items, :_remove!]
 
-    define_singleton_method :enhance do |i, stem, item_getter,
-                                           tail_getter, list_getter=nil|
+    methods.push :_named_prototypes # this is *so* sketchy here #experimental
+                                  # but still we want in the check below
+                                  # to make sure we aren't overriding the
+                                  # good methods
+
+    define_singleton_method :enhance do |i, stem, item, tail, list=nil|
+                                  # *NOTE* the above 3 parameters `item`,
+                                  # `tail`, `list` are *all* symbols that
+                                  # represent struct member names (rule names)
+                                  # from the grammar!
 
       # #experimental'y functional - everything is here
       tree_class = i.tree_class
@@ -41,10 +49,10 @@ module Skylab::TanMan
       (methods & tree_class.instance_methods).empty? or fail 'sanity'
                                                # be sure we're not overwriting
 
-      item_getter = item_getter.intern         # normalize every actual param
-      list_getter = list_getter.intern if list_getter
+      item = item.intern          # normalize every actual param
+      list = list.intern if list
       stem = stem.intern
-      tail_getter = tail_getter.intern
+      tail = tail.intern
 
 
 
@@ -54,40 +62,40 @@ module Skylab::TanMan
 
       match_f = -> search_item do              # a function to make matcher
         if ::String === search_item            # functions for matching nodes
-          -> node { search_item == node[item_getter] }  # that new nodes are
+          -> node { search_item == node[item] }  # that new nodes are
         else                                   # supposed to come before / after
-          -> node { search_item.object_id == node[item_getter].object_id }
+          -> node { search_item.object_id == node[item].object_id }
         end
       end
 
-      next_node = if list_getter then          # determining what is the next
-        -> node do                             # node after a node is different
-          o = node[tail_getter]                # based on whether or not there
-          o &&= o[list_getter]                 # is a tail getter
+      next_node = if list then                # determining what is the next
+        -> node do                            # node after a node is different
+          o = node[tail]                      # based on whether or not there
+          o &&= o[list]                       # is a tail getter
           o
         end
       else
-        -> node { node[tail_getter] }
+        -> node { node[tail] }
       end
 
 
       # -- Item insertion lambdas
 
-      normalize_item = -> item, proto do       # normalize the item for insert
+      normalize_item = -> item_elem, proto do  # normalize the item for insert
         res = nil                              # (parsing string if necessary)
         begin
-          if ! (::String === item)             # then item is presumably a sexp
-            break( res = item )                # and validating it would be
+          if ! (::String === item_elem)        # then item is presumably a sexp
+            break( res = item_elem )           # and validating it would be
           end                                  # prohibitively annoying
-          o = proto[ item_getter ]
+          o = proto[ item ]
           if ::String === o                    # the elem in the proto is also
-            break( res = item )                # a string, they both are, so
+            break( res = item_elem )           # a string, they both are, so
           end                                  # again validating is meh
 
           # item is string and proto elem is not string, assume we are to parse
-          res = o.class.parse o.class.rule, item, -> failed_parser do
+          res = o.class.parse o.class.rule, item_elem, -> failed_parser do
             fail "failed to parse item to insert - #{
-              }#{ ( failed_parser.failure_reason || item ).inspect }"
+              }#{ ( failed_parser.failure_reason || item_elem ).inspect }"
           end
 
         end while nil
@@ -136,13 +144,13 @@ module Skylab::TanMan
         # because left itself may be the prototype node!
         #
         o = nil
-        if list_getter
+        if list
           if next_node[ proto ]
             fail "can't use non-ultimate node in prototype for this #{
               }hack to work." # w/o heavy hacking
           end
-          o = proto.__dupe_member tail_getter
-          o[list_getter] = right if right
+          o = proto.__dupe_member tail
+          o[list] = right if right
         elsif right
           o = right
         else
@@ -157,17 +165,17 @@ module Skylab::TanMan
 
       initial = -> me, proto_a do                               # #single-call
         # The strategy for initial insertion of an item into an empty list
-        # ("list controller") is simply to use the defaults for tail_getter
-        # and item_getter and for the remaining members, for those that are
+        # ("list controller") is simply to use the defaults for tail
+        # and item and for the remaining members, for those that are
         # non-nil make a dupe of the corresponding member from the prototype.
         #
-        proto = proto_a.last
+        proto_n = proto_a.last
         res = me
         target = me
         xfer = ::Hash.new -> m do
           rs = nil
           if me[m].nil?
-            rs = proto.__dupe_member m
+            rs = proto_n.__dupe_member m
           else
             rs = me[m]
           end
@@ -181,33 +189,43 @@ module Skylab::TanMan
       insert = -> me, proto_a, left, right do                   # #single-call
         # For inserting an item under an existing parent (left) node ..
 
-        proto = proto_a.last
+        proto_n = proto_a.last
 
-        new = me.class.new
+        new_list = me.class.new
         xfer = ::Hash.new -> m do              # the strategy form making new
-          rs = proto.__dupe_member m           # node elements is this
+          rs = proto_n.__dupe_member m         # node elements is this
           rs
         end
                                                # `left` might itself be the
-        xfer[tail_getter] = tail_f[ right, proto ] # prototype so call the
+        xfer[tail] = tail_f[ right, proto_n ]  # prototype so call the
                                                # this now before you mutate it
-        if list_getter
-          left[tail_getter] or fail 'sanity -- expecing foo_list here'
-          away = left[tail_getter][list_getter]
-          if away
-            fail 'sanity' if away.object_id != right.object_id
-          end
-          left[tail_getter][list_getter] = new
 
+        clobber = nil                          # make sure we don't
+        if list
+          if left[tail]
+            clobber = left[tail][list]
+          else                                 # presumably we are inserting
+            fail 'sanity' if right             # at the end of the list
+                                               # now, if we don't do the below
+            new_foo_list0 = proto_a.first.tail.__dupe except: [list] # we miss
+                                               # possibly meaningful whitespace
+                                               # eg., which if any is what this
+                                               # var presumably now has in it!
+            new_foo_list0[list] = new_list     # now it is a completely empty
+                                               # shell of a 'tail' with only
+                                               # meaningful eg. whitespace
+            left[tail] = new_foo_list0         # or other separators
+          end
         else
-          away = left[tail_getter]
-          if away
-            fail 'sanity' if away.object_id != right.object_id
-          end
-          left[tail_getter] = new
-
+          clobber = left[tail]
         end
-        [ new, new, xfer ]
+        fail 'sanity' if clobber && clobber.object_id != right.object_id
+        if list
+          left[tail][list] = new_list
+        else
+          left[tail] = new_list
+        end
+        [ new_list, new_list, xfer ]
       end
 
 
@@ -219,15 +237,15 @@ module Skylab::TanMan
         # hack, see _remove!
         #
         # Specifically, (and remembering: a "node" *has* an "item"
-        # (e.g. AList has AList1), the `new_node` we create actually
+        # (e.g. AList has AList1), the `new_list` we create actually
         # goes to live in the second slot, getting for its members
         # a lot of the members root used to have (like its item and tail)..
         # hold on tight..
 
 
-        new_node = root.class.new
-        proto_first = proto_a.first            # let's be clear - we use both
-        proto_last = proto_a.last
+        new_list = root.class.new
+        proto_0 = proto_a.first                # let's be clear - we use both
+        proto_n = proto_a.last
                                                # When transferring each member
                                                # to the new node we created,
                                                # the default behavior is to
@@ -236,32 +254,32 @@ module Skylab::TanMan
                                                # node, and in its stead give
                                                # root a shiny new element from
         xfer = ::Hash.new -> m do              # the prototye.
-          give_to_root = proto_first.__dupe_member m
+          give_to_root = proto_0.__dupe_member m
           take_from_root = root[m]
           root[m] = give_to_root
                                                # If root didn't have anything
           if ! take_from_root                  # in a spot (e.g. e0, e2), expect
-            take_from_root = proto_last.__dupe_member m # that there is white-
+            take_from_root = proto_n.__dupe_member m # that there is white-
           end                                  # -space formatting we need that
           take_from_root                       # the proto_a had but that root
         end                                    # didnt.
 
-        original_root_tail = root[tail_getter]
-        if list_getter && ! next_node[ proto_last ]
-          tail = proto_last.__dupe_member tail_getter
-          root[tail_getter] = tail
-          tail[list_getter] = new_node         # oh sweet jesus
+        orig_root_tail = root[tail]            # about to get clobbered
+        if list && ! next_node[ proto_n ]
+          tail_shell = proto_0[tail].__dupe except: [list]
+          tail_shell[list] = new_list
+          root[tail] = tail_shell              # clobbered is in orig_root_tail
         else
-          root[tail_getter] = new_node         # think how whacktastic this is
+          root[tail] = new_list                # clobbered is in orig_root_tail
         end
-        xfer[tail_getter] = -> _ { original_root_tail }
+        xfer[tail] = -> _ { orig_root_tail }
 
-        original_root_item = root[item_getter]
-        xfer[item_getter] = -> _ { original_root_item }
+        original_root_item = root[item]
+        xfer[item] = -> _ { original_root_item }
 
-        root[item_getter] = normalize_item[ new_item, proto_last ]
+        root[item] = normalize_item[ new_item, proto_n ]
 
-        [ root, new_node, xfer ]               # [0] - result of insert call
+        [ root, new_list, xfer ]               # [0] - result of insert call
                                                # [1] - target of transfer hash
 
       end
@@ -286,13 +304,13 @@ module Skylab::TanMan
           res, target, xfer = initial[ self, proto_a ]                       #
         end
 
-        if ! xfer.key? item_getter             # the default strategy for
+        if ! xfer.key? item                    # the default strategy for
           use_item = normalize_item[ new, proto_a.last ] # populating the
-          xfer[item_getter] = -> _ { use_item }  # `item` (content) part of the
+          xfer[item] = -> _ { use_item }       # `item` (content) part of the
         end                                    # new node
 
-        if ! xfer.key? tail_getter             # the default strategy for
-          xfer[tail_getter] = tail_f[ right, proto_a.last ] # populating the
+        if ! xfer.key? tail                    # the default strategy for
+          xfer[tail] = tail_f[ right, proto_a.last ] # populating the
         end                                    # "next self" part        #
 
         self.class._members.each do |m|
@@ -305,14 +323,19 @@ module Skylab::TanMan
 
       tree_class.send :define_method, :_items do
         _nodes.map do |node|
-          node[item_getter]
+          node[item]
         end
+      end
+
+
+      tree_class.send :define_method, :_items_count_exceeds do |count|
+        !! _nodes.each_with_index.detect { |_, idx| idx == count }
       end
 
 
       tree_class.send :define_method, :_nodes do
         ::Enumerator.new do |y|
-          if self[item_getter] # else zero-width tree stub
+          if self[item] # else zero-width tree stub
             curr_node = self
             begin
               y << curr_node
@@ -341,8 +364,8 @@ module Skylab::TanMan
         fail "node to remove not found." if ! target
 
         if parent
-          parent[tail_getter] = target[tail_getter]
-          target[tail_getter] = nil
+          parent[tail] = target[tail]
+          target[tail] = nil
           res = target
         else
           # When "removing" the first (root) node of a list (tree), we can't
@@ -359,7 +382,7 @@ module Skylab::TanMan
           source = next_node[ target ] || target.class.new
           fail 'sanity' if source.class != target.class
           xfer = ::Hash.new -> m { target[m] }
-          xfer[tail_getter] = -> _ { nil }
+          xfer[tail] = -> _ { nil }
           target.class._members.each do |m|
             swap_me = source[m]
             source[m] = xfer[m][ m ]
@@ -390,7 +413,15 @@ module Skylab::TanMan
       true
     end
 
-    attr_accessor :_prototype     # used in eponymous file
+    def _named_prototypes         # this is an aggregious bit of cross-hack
+                                  # dependency - assume that this sexp class
+                                  # wants to take part in the prototype romp and
+                                  # assume furthermore that we will end up
+                                  # further down in the ancestor chain than the
+    end                           # module that has the correct definition
+                                  # for this, should actual prototypes exist!
+
+    attr_accessor :_prototype     # used in eponymous file, see above comment.
 
   end
 end

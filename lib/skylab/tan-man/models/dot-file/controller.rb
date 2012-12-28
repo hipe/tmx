@@ -17,7 +17,7 @@ module Skylab::TanMan
       res = nil
       begin
         nodes or break
-        node = nodes.fetch node_ref, error, info
+        node = nodes.fetch node_ref, error
         break( res = node ) if ! node
         res = meanings.apply(
           node, meaning, dry_run, verbose, error, success, info )
@@ -48,6 +48,37 @@ module Skylab::TanMan
       "#{ escape_path pathname }"
     end
 
+                                  # leveraging the new 'meh' precept [#071]
+                                  # we do a fantastic hack in the case that
+                                  # we don't have either a stmt_list, and/or
+                                  # a prototype for the stmt_list - we add
+                                  # one here, with spacing decided here
+                                  # because meh! who really cares?
+
+    def insert_stmt new, new_before_this
+      o = self.sexp
+      proto = nil                 # a prototype is created here at most
+      prototype = -> do           # once per root stmt_list (presumably),
+        proto ||= begin           # but used in 2 ways
+          p = o.class.parse :stmt_list, "xyzzy_1\nxyzzy_2"
+          p
+        end
+      end
+      empty_stmt_list = -> do     # this is one of two ways we use the prototype
+        p = prototype[]
+        sl = p.__dupe except: [:stmt, :tail]
+        sl
+      end
+      if ! o.stmt_list
+        o.stmt_list = empty_stmt_list[]
+      end
+      if ! o.stmt_list._prototype && ! o.stmt_list._items_count_exceeds( 1 )
+        o.stmt_list._prototype = prototype[]
+      end
+      # sexp[:stmt_list] = sl_empty
+      o.stmt_list._insert_before! new, new_before_this
+    end
+
     def list_nodes verbose, payload
       if nodes
         nodes.list verbose, payload
@@ -59,6 +90,12 @@ module Skylab::TanMan
     end
 
     attr_reader :pathname
+
+    def rm_node *a
+      if nodes
+        nodes.rm(* a)
+      end
+    end
 
     def set_dependency source_ref, target_ref, do_create,
       do_fuzz, error, success, info
@@ -178,6 +215,8 @@ module Skylab::TanMan
         end
       end
     end
+
+    public :nodes # experimentally expose this (meaning cont)
 
     def write_commit string, dry_run, verbose
       res = nil

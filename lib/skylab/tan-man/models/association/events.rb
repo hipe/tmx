@@ -28,6 +28,15 @@ module Skylab::TanMan
     end
   end
 
+  class Models::Association::Events::Disassociation_Successes <
+    Model::Event.new :edge_stmts
+
+    def build_message
+      a = edge_stmts.map(&:unparse)
+      "removed associaton#{ s a }: #{ a.join ', ' }"
+    end
+  end
+
   class Models::Association::Events::Exists <
     Model::Event.new :edge_stmt, :polarity
 

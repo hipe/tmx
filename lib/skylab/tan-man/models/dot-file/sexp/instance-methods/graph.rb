@@ -70,8 +70,10 @@ module Skylab::TanMan
 
     def _stmt_enumerator &block
       ::Enumerator.new do |y|
-        stmt_list.stmts.each do |stmt|
-          block.call(stmt) and y << stmt
+        if stmt_list
+          stmt_list.stmts.each do |stmt|
+            block.call(stmt) and y << stmt
+          end
         end
       end
     end

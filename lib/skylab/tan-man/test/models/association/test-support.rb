@@ -11,13 +11,8 @@ module Skylab::TanMan::TestSupport::Models::Association
 
   module InstanceMethods
 
-    let :controller do
-      sexp = result or fail 'sanity - did parse fail?'
-      request_client = TanMan::CLI::Client.new :nein, :nein, :nein # for pen :/
-      dfc = TanMan::Models::DotFile::Controller.new request_client, 'xyzzy.dot'
-      dfc.define_singleton_method :sexp do sexp end # eek
-      cnt = TanMan::Models::Association::Collection.new dfc, sexp
-      cnt
+    def collection_class
+      TanMan::Models::Association::Collection
     end
 
     def _input_fixtures_dir_path

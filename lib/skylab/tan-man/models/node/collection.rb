@@ -5,16 +5,41 @@ module Skylab::TanMan
     def add node_ref, do_fuzzy, error, success
       res = prod node_ref,
                      true, # yes `do_create`, call error[] if already exists
+                    false, # no do not destroy
+                 do_fuzzy,
+                    error, # this determines your result if failed e.g. existed
+                  success  # (if the add succeeded, you get the business object)
+      res
+    end
+
+    def fetch node_ref, error
+      res = prod node_ref,
+                    false, # no do not create
+                    false, # no do not destroy
+                     true, # yes sure why not always fuzzy
+                    error, # if provided receives Not_Found, Ambiguous events
+                      nil  # do not create Exists events, just result in node
+      res
+    end
+
+    def produce node_ref, do_create, do_fuzzy, error, success
+      res = prod node_ref,
+                do_create,
+                    false, # no do not destroy
                  do_fuzzy,
                     error,
                   success
       res
     end
 
-    def fetch node_ref, not_found, ambiguous
-      fail 'where / do me'
-      #  prod node_ref, false, true, not_found, ambiguous
-      # not_found[ Models::Node::Events::Not_Found.new( self, node_ref, count ) ]
+    def rm node_ref, do_fuzzy, error, success
+      res = prod node_ref,
+                    false, # no do not create
+                     true, # yes, we are here to destroy
+                 do_fuzzy,
+                    error, # required lambda, called e.g. if node not found
+                  success  # if the destroy succeeds you get a destroyed bus. ob
+      res
     end
 
     def list verbose, payload
@@ -27,6 +52,7 @@ module Skylab::TanMan
     def node! node_ref
       res = prod node_ref,
                       nil, # create iff necessary
+                    false, # no do not destroy
                     false, # this is not fuzzy match - exact match only
  -> e { raise e.message }, # afaik only models sexp events invalid-characters
                       nil  # do not report success, just please give me the node
@@ -45,8 +71,17 @@ module Skylab::TanMan
       res = nil
       begin
 
-        proto = graph_sexp.stmt_list._named_prototypes[ :node_stmt ]
-        if ! proto
+        proto = -> do
+          sl = graph_sexp.stmt_list or break
+          sl._named_prototypes or break
+          sl._named_prototypes[ :node_stmt ] # might be nil
+        end.call
+
+        proto ||= graph_sexp.class.parse :node_stmt, 'foo [label="foo"]'
+                                  # as part of the new "meh" paradigm ([#071])
+                                  # we just hard-code some prototypes if needed
+
+        if ! proto # off for now
           res = error[ Models::Node::Events::No_Prototype.new self, graph_noun ]
           break
         end
@@ -69,12 +104,19 @@ module Skylab::TanMan
       res
     end
 
+    alias_method :dot_file, :request_client
+
     def graph_noun
       request_client.graph_noun
     end
 
     attr_reader :graph_sexp
 
+    def node_controller node_stmt
+      Models::Node::Controller.new request_client, node_stmt
+    end
+
+    public :node_controller # experimentally expose this to other controllers
 
     # When creating new nodes this is how we should decide where they go:
     # (this is likely not implemented fully as you read this)
@@ -103,7 +145,7 @@ module Skylab::TanMan
     # they are supposed to pertain to.
 
 
-    def prod node_ref, do_create, do_fuzzy, error, success
+    def prod node_ref, do_create, do_destroy, do_fuzzy, error, success
 
       # ~ exposition ~
       rx = /\A#{ ::Regexp.escape node_ref }/i # [#069]
@@ -118,7 +160,8 @@ module Skylab::TanMan
 
       # ~ climax ~
       node_statement_count = 0
-      graph_sexp.stmt_list._nodes.each do |stmt_list|
+      sl = graph_sexp.stmt_list
+      sl and sl._nodes.each do |stmt_list|
         stmt = stmt_list[:stmt]
         rule = stmt.class.rule
         if :node_stmt == rule
@@ -159,24 +202,27 @@ module Skylab::TanMan
       res = nil
       begin
         if exact_match_found || fuzzy_matches_found
+          one = exact_match_found || fuzzy_matches_found.first        # CAREFUL
           if do_create
-            use = exact_match_found || fuzzy_matches_found.first # meh
-            res = error[ Models::Node::Events::Exists.new self, use ]
-          elsif exact_match_found
-            res = exact_match_found
-            success[ Models::Node::Events::Exists.new self, res, 1] if success
-          elsif 1 == fuzzy_matches_found.length
-            res = fuzzy_matches_found.first
-            success[ Models::Node::Events::Exists.new self, res, 1] if success
-          else
-            res = error[ Models::Node::Events::Ambiguous.new self,
-                           node_ref, fuzzy_matches_found ]
+            res = error[ Models::Node::Events::Exists.new self, one ] # meh, use
+            break                                                   # first here
           end
+          if exact_match_found || 1 == fuzzy_matches_found.length
+            if do_destroy
+              res = node_controller( one ).destroy error, success
+              break
+            end
+            res = one
+            success[Models::Node::Events::Exists.new self, one, true] if success
+            break
+          end
+          res = error[ Models::Node::Events::Ambiguous.new self,
+                       node_ref, fuzzy_matches_found ]
         elsif do_create || do_create.nil?
           new = create( node_ref, error ) or break( res = new )
           new_before_this = first_lexically_greater_node_stmt ||
             first_non_node_stmt || first_edge_stmt
-          stmt_list = graph_sexp.stmt_list._insert_before! new, new_before_this
+          stmt_list = dot_file.insert_stmt new, new_before_this
           res = stmt_list[:stmt]
           success[ Models::Node::Events::Created.new self, res ] if success
         elsif error               # not found - emit only if asked for
