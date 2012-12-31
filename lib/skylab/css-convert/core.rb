@@ -132,13 +132,21 @@ module Skylab::CssConvert
     }
 
     def dump_this str
-      re = /\A#{ ::Regexp.escape str }/
-      found = DUMPABLE.keys.detect { |s| re =~ s } or return(
-        usage("need one of (#{DUMPABLE.keys.map(&:inspect).join(', ')}) " <<
-          "not: #{str.inspect}"))
-      instance_exec(& DUMPABLE[found])
-      queue.last == :convert or enqueue!(:convert) # etc
-      true
+      res = nil
+      begin
+        re = /\A#{ ::Regexp.escape str }/
+        found = DUMPABLE.keys.detect { |s| re =~ s }
+        if ! found
+          res = usage_and_invite "need one of (#{
+            }#{ DUMPABLE.keys.map(&:inspect).join ', ' }) #{
+            }not: #{ str.inspect }"
+          break
+        end
+        instance_exec(& DUMPABLE[found])
+        equeue!( :convert ) unless :convert == queue.last # etc
+        res = true
+      end while nil
+      res
     end
 
     def dump_directives sexp

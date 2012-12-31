@@ -35,8 +35,12 @@ module Skylab::Headless
       if action
         klass = fetch action
         if klass
-          o = klass.new( self )
+          o = klass.new self
           res = o.invoke args
+          if false == res                      # this cluster here is what
+            emit :help, o.invite_line          # gives us the terminal action
+            res = nil                          # node in the invite line
+          end
         end
       else
         error expecting_string

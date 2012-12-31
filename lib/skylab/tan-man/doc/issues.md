@@ -1,5 +1,5 @@
 [#073] #open rename 'examples' to 'starters'
-[#072] #open when returning false, use the terminal action node
+[#072]       #done when returning false, use the terminal action node
 [#071]       #tracking-tag: shift from the `prototypes` paradigm to the 'meh'
 [#070]       #tracking-tag `create` flag as a triad: false, nil, trueish
 [#069]       #tracking-tag fuzzy-finging regexen - case insensitive?

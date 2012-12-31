@@ -185,14 +185,14 @@ module Skylab::Headless
       res = as.parse_argv( argv ) do |o|
 
         o.on_unexpected do |a|
-          usage "unexpected argument#{ s a }: #{ a[0].inspect }#{
+          usage_and_invite "unexpected argument#{ s a }: #{ a[0].inspect }#{
             }#{" [..]" if a.length > 1 }"
           nil
         end
 
         o.on_missing do |fragment|
           fragment = fragment[0..fragment.index{ |p| :req == p.opt_req_rest }]
-          usage "expecting: #{ em fragment.string }"
+          usage_and_invite "expecting: #{ em fragment.string }"
           nil
         end
 
@@ -218,7 +218,7 @@ module Skylab::Headless
         begin                     # option_parser can be some fancy arbitrary
           option_parser.parse! argv # thing, but it needs to conform to at
         rescue Headless::Services::OptionParser::ParseError => e # least
-          usage e.message         # these two parts of stdlib ::O_P
+          usage_and_invite e.message  # these two parts of stdlib ::O_P
           exit_status = exit_status_for :parse_opts_failed
         end
       end while nil
@@ -272,13 +272,8 @@ module Skylab::Headless
       res
     end
 
-    def usage msg=nil
+    def usage_and_invite msg=nil
       emit :help, msg if msg
-      usage_and_invite
-      nil # return value undefined, but client might override and do otherwise
-    end
-
-    def usage_and_invite
       emit :help, usage_line
       emit :help, invite_line
       nil
