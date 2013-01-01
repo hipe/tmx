@@ -163,26 +163,58 @@ module Skylab::TanMan
 
       # -- List item insertion lambdas (in ascending order of complexity)
 
+                                  # #experimental for hacks .. what is the list
+                                  # of separator or whitespace-like elements
+                                  # that is true-ish in both the head and tail
+                                  # prototypes?
+      inner_f = -> me, proto_0, proto_n do # experimental for hacks!
+        ( me.class._members - [ item, tail ] ).reduce( [] ) do |memo, m|
+          if proto_0[m] && proto_n[m]
+            memo << m
+          end
+          memo
+        end # e.g. `e0`, `e2`, `sep`
+      end
+
       initial = -> me, proto_a do                               # #single-call
-        # The strategy for initial insertion of an item into an empty list
-        # ("list controller") is simply to use the defaults for tail
-        # and item and for the remaining members, for those that are
-        # non-nil make a dupe of the corresponding member from the prototype.
+        # This is for the case of initial insertion of an item into an empty
+        # list node -- something that is not normally possibly with recursive
+        # rules of the form  foo_list ::= (foo (sep foo_list)? sep?)?
+        # (whenever a list node is created it has something in it),
+        # so this only used for the kind of weird hacks this library
+        # is for..
         #
-        proto_n = proto_a.last
-        res = me
-        target = me
+        # Regardless, the strategy for the insertion of an item into an empty
+        # list (which we might call a "list controller") is as follows:
+        #
+        # Take for example a prototype "a=b, c=d":
+        # In this case, we want the newly inserted item to look like "e=f",
+        # so note neither the "," (which is `e2` of proto_0 in one grammar)
+        # nor the " " (which is `e0` of proto_n in the same), make in into
+        # the final item (er, list node). So we have bit of a problem inferring
+        # how the first element inserted into a list should look given
+        # that the the prototype is necessarily (and reasonably) at least
+        # two elements long.
+        #
+        # What we do for now is say, "we will take from proto_0 the element
+
+
+        proto_0, proto_n = [ proto_a.first, proto_a.last ]
+
+        inner = inner_f[ me, proto_0, proto_n ] # see
+
         xfer = ::Hash.new -> m do
-          rs = nil
-          if me[m].nil?
-            rs = proto_n.__dupe_member m
-          else
-            rs = me[m]
+          if me[m]                # if there was already *anything* there, just
+            me[m]                 # use that, don't clobber it.
+          elsif inner.include? m
+            rs = proto_0.__dupe_member m
           end
           rs
         end
-        [ res, target, xfer ]
+        [ me, me, xfer ]          # `me` is the final result, and receiver
+                                  # (below line left intact for that project.)
       end # (there was stark tranformation above for [#bs-010])
+
 
 
 

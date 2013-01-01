@@ -56,7 +56,12 @@ module ::Skylab::TanMan::TestSupport::Sexp::Auto::Recursive_Rule
     gs = nil
     define_method :go do |asst_to_insert_string|
       gs ||= sexp_original_client.parse_string 'digraph{}' # EGADS
-      a_list = gs.class.parse :a_list, with_string
+      if '' == with_string # hack an empty alist..
+        a_list = gs.class.parse :a_list, 'e=f'
+        a_list[:content] = nil # toss a perfectly good AList1
+      else
+        a_list = gs.class.parse :a_list, with_string
+      end
       a_list._prototype = gs.class.parse :a_list, 'a=b, c=d'
       new_before_this = FUN.new_before_this[ a_list, asst_to_insert_string ]
       a_list._insert_before! asst_to_insert_string, new_before_this

@@ -1,3 +1,4 @@
+[#125]       #doc-point #workflow -- when you make overzelous, premature chage..
 [#124]       #tracking-tag autoloader won't work when there is toplevel name..
 [#123]       #convention #pattern sub-product module 2-level pattern
 [#122] #open #low-priority phase out ROOT_PATHNAME for Skylab.dir_pathname

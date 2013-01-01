@@ -1,3 +1,4 @@
+[#074]       #doc-point numerics in sexps #sexp-auto
 [#073] #open rename 'examples' to 'starters'
 [#072]       #done when returning false, use the terminal action node
 [#071]       #tracking-tag: shift from the `prototypes` paradigm to the 'meh'

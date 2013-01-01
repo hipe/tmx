@@ -46,7 +46,11 @@ module ::Skylab::TanMan::TestSupport::Sexp::Auto::Recursive_Rule
     context "with attr_list" do
       include Attr_List_I_M
       context "on zero" do
-        it "1.1 - one on zero - HACKLUND"
+        it "1.1 - one on zero (hacked) - no separators, good!" do
+          go 'nazir=zenith'
+          expect 'nazir=zenith'
+        end
+        with ''
       end
       context "on one" do
         it "2.1 - one after one - PROBLEM: look no commma" do

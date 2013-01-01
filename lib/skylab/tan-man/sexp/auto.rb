@@ -218,51 +218,67 @@ module Skylab::TanMan
     # and method names in any client extension modules (that aren't intending
     # to override these).
 
-    DUPE_OPTS = ::Struct.new :except
-    def __dupe opts=nil
-      if opts then o = DUPE_OPTS.new ; opts.each { |k, v| o[k] = v } end
-      x = self.class.new
-      h = ::Hash[ self.class._members.map { |m| [m, :normal] } ]
-      except = nil
-      if o and o.except
-        except = { }
+    dupe_opts = ::Struct.new :except
+
+    define_method :__dupe do |opts=nil|
+      o = dupe_opts.new
+      opts.each { |k, v| o[k] = v } and opts = nil if opts
+      new = self.class.new
+      op = ::Hash[ self.class._members.map { |m| [m, :normal] } ]
+      if o.except
+        except_h = { }
         o.except.each do |mixed|
           case mixed
-          when ::Symbol ; h[mixed] = :except ; except[mixed] = nil
-          when ::Array  ; h[mixed.first] = :except
-                        ; except[mixed.first] =
-                           (1 == mixed.length) ? nil : mixed[1..-1]
-          else          ; fail("invalid \"except\" element: #{mixed.class}")
+          when ::Symbol
+            op[mixed] = :except
+            except_h[mixed] = :all
+          when ::Array
+            op[mixed.first] = :except
+            if 1 == mixed.length
+              except_h[mixed.first] = :all
+            else
+              v = 2 < mixed.length ? mixed[1..-1] : mixed[1]
+              (except_h[mixed.first] ||= []).push v
+            end
+          else
+            fail "invalid \"except\" element: #{ mixed.class }"
           end
         end
       end
-      h.each do |k, v|
+      op.each do |k, v|
         case v
-        when :normal ; x[k] = __dupe_member k
-        when :except ; x[k] = __dupe_member(k, except[k]) if except[k]
+        when :normal
+          new[k] = __dupe_member k
+        when :except
+          if :all != except_h[k]
+            new[k] = __dupe_member k, except_h[k]
+          end
+        else
+          fail 'sanity - bad opcode'
         end
       end
-      x
+      new
     end
 
-    def __dupe_member member, except=nil
+    def __dupe_member member, except_a=nil
       o = self[member]
-      if o.respond_to?(:__dupe)
-        opts = if except
-          except.detect { |x| ::Symbol != x.class } and fail("sanity - #{
-            }excpecting columnar, 1-dimensional except lists for now.")
-          { except: [except] }
+      if o.respond_to? :__dupe
+        if except_a
+          raise ::TypeError.new( 'nope' ) unless ::Array === except_a
+          opt_h = { except: except_a }
         end
-        o.__dupe(* [opts].compact ) # #here
+        res = o.__dupe(* [opt_h].compact ) # #here
       else
-        except and fail('sanity')
+        except_a and fail('sanity')
+        res =
         case o
         when ::NilClass ; nil
         when ::String   ; o.dup
-        else            ; fail("implement me -- #{o.class}")
-        # see doc/sexp.md/"Representing Numeric Values in Sexps"
+        else            ; fail "implement me -- #{ o.class }"
+        # see #doc-point [#tm-074] - representing numeric values in sexps
         end
       end
+      res
     end
 
     def list? # is this sexp node a list-like node?
