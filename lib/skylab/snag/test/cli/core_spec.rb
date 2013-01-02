@@ -11,10 +11,10 @@ module Skylab::Snag::TestSupport::CLI
 
     acts = '\{.*add.*show.*numbers.*todo.*\}'
     expecting_rx = %r{\AExpecting #{ acts }}i
-    invite_rx = %r{\ATry issue -h for help\.$}i
-    usage_rx = %r{\Ausage: issue #{ acts } \[opts\] \[args\]$}
+    invite_rx = %r{\ATry sn0g -h for help\.$}i
+    usage_rx = %r{\Ausage: sn0g #{ acts } \[opts\] \[args\]$}
     deeper_invite_rx = %r{\AFor help on a particular subcommand, try #{
-      }issue <subcommand> -h\.$}i
+      }sn0g <subcommand> -h\.$}i
 
 
     it "THE CLI CANNON - LVL 0 and LVL 1 UI" do

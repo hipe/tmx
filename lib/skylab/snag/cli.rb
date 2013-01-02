@@ -17,7 +17,7 @@ module Skylab::Snag
     end
 
     def add message, ctx
-      api.action(:issue, :add).wire!(&wire).invoke(ctx.merge( message: message ))
+      api.action(:node, :add).wire!(&wire).invoke(ctx.merge( message: message ))
     end
 
 
@@ -34,7 +34,7 @@ module Skylab::Snag
     argument_syntax '[<identifier>]'
 
     def show identifier=nil, ctx
-      action = api.action(:issue, :show).wire!(&wire)
+      action = api.action(:node, :show).wire!(&wire)
       client = runtime # this is a part we don't like
       # @todo: for:#102.901.3.2.2 : wiring should happen between
       # the api action objects and the "client" (interface) instance that

@@ -1,5 +1,5 @@
 module Skylab::Snag
-  class API::Actions::Issue::Show < API::Action
+  class API::Actions::Node::Show < API::Action
 
     inflection.inflect.noun :plural
 

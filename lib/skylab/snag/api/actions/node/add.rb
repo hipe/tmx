@@ -1,5 +1,5 @@
 module Skylab::Snag
-  class API::Actions::Issue::Add < API::Action
+  class API::Actions::Node::Add < API::Action
 
     attribute :dry_run
     attribute :message,          :required => true

@@ -9,7 +9,7 @@ module Skylab::Snag
         "-exec grep --line-number #{ pattern.shellescape } {} +"
       ].join ' '
 
-    # find lib/skylab/issue -name '*.rb' -exec grep --line-number '@todo\>' {} +
+    # find lib/skylab/snag -name '*.rb' -exec grep --line-number '@todo\>' {} +
     end
 
     alias_method :to_s, :string

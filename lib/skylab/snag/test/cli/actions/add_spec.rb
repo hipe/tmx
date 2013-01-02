@@ -30,7 +30,11 @@ module Skylab::Snag::TestSupport::CLI::Actions
         client_invoke 'add', '-n', '-v', 'foo bizzle'
       end
       o( / new line: / )
-      o( / rm / )
+      if output.lines.first.string =~ /mkdir .+snag-PROD/
+        output.lines.shift # egads sorry this is bad
+      else
+        o( / rm / )
+      end
       o( / mv /)
       o( / mv /)
       o( / done\./ )

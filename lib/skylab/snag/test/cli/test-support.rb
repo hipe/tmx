@@ -14,7 +14,7 @@ module Skylab::Snag::TestSupport::CLI
     let :client do
       output = self.output
       client = Snag::CLI.new nil, output.for( :pay ), output.for( :info )
-      client.program_name = 'issue'
+      client.program_name = 'sn0g'
       client
     end
 
