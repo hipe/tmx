@@ -1,10 +1,10 @@
-require_relative '../../../issue/core'
+require_relative '../../../snag/core'
 
 module Skylab
   module Tmx
-    module Issue
+    module Snag
       extend ::Skylab::Porcelain
-      namespace :'issue', ::Skylab::Issue::CLI, aliases: ['issues']
+      namespace :snag, ::Skylab::Snag::CLI
     end
   end
 end
