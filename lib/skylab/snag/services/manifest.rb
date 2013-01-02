@@ -15,7 +15,7 @@ module Skylab::Snag
             # and it doesn't exist, there are simply no issues.)
           end
           if ! node_flyweight
-            node_flyweight = Models::Node.new nil, pathname
+            node_flyweight = Models::Node::Flyweight.new nil, pathname
           end
           file.lines.each_with_index do |line, idx|
             ln = node_flyweight.line! line, idx

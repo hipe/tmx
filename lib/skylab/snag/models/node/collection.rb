@@ -73,7 +73,7 @@ module Skylab::Snag
       fw = nil
       begin
         break( fw = @node_flyweight ) if @node_flyweight
-        fw = Models::Node.build_flyweight self, @manifest.pathname
+        fw = Models::Node::Flyweight.build self, @manifest.pathname
         @node_flyweight = fw
       end while nil
       fw

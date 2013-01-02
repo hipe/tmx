@@ -1,12 +1,12 @@
 module Skylab::Snag
-  class Models::Node
+  class Models::Node::Flyweight
     include Snag::Core::SubClient::InstanceMethods # #todo why?
 
-    require_relative 'node/enumerator' # [#sl-124] preload bc toplevel exists
-    require_relative 'node/file'       # [#sl-124] preload bc toplevel exists
+    require_relative 'enumerator' # [#sl-124] preload bc toplevel exists
+    require_relative 'file'       # [#sl-124] preload bc toplevel exists
 
 
-    def self.build_flyweight request_client, pathname
+    def self.build request_client, pathname
       new request_client, pathname
     end
 
