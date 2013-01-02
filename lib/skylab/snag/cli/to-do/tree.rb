@@ -1,9 +1,9 @@
 module Skylab::Snag
   class CLI::ToDo::Tree
-    Node = Porcelain::Tree::Node
+    Tree_Node = Porcelain::Tree::Node
 
     def render
-      tree = @todos.reduce(Node.new({slug: :root})) do |node, todo|
+      tree = @todos.reduce( Tree_Node.new slug: :root ) do |node, todo|
         path = todo.path.split('/').push(todo.line)
         node.find!(path) do |child|
           if child.leaf?

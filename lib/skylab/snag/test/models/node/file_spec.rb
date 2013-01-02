@@ -11,7 +11,7 @@ module Skylab::Snag::TestSupport::Models::Node::File
 
     it "when file not found lines.each - raises raw runtime error lazily" do
       file = Snag::Models::Node::File.new( fixture_pathname 'not-there.txt' )
-      enum = file.lines # note it does not raise even yet
+      enum = file.normalized_lines # note it does not raise even yet
       -> do
         enum.each do |line|
         end
@@ -37,14 +37,14 @@ module Skylab::Snag::TestSupport::Models::Node::File
 
       it "when not interrupted, `lines` reads each line, chomped - closes" do
         mutex.should eql(false)
-        file.lines.to_a.should eql( %w(alpha beta gamma) )
+        file.normalized_lines.to_a.should eql( %w(alpha beta gamma) )
         mutex.should eql(nil)
       end
 
 
       it "when interrupted with a `detect`, `lines` - closes" do
         mutex.should eql(false)
-        line = file.lines.detect do |lin|
+        line = file.normalized_lines.detect do |lin|
           mutex.should eql(true)
           'beta' == lin
         end
@@ -56,7 +56,7 @@ module Skylab::Snag::TestSupport::Models::Node::File
       it "when interrupted with a break from each - closes" do
         mutex.should eql(false)
         found = false
-        line = file.lines.each do |lin|
+        line = file.normalized_lines.each do |lin|
           mutex.should eql(true)
           if 'beta' == lin
             found = true

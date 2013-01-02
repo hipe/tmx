@@ -24,7 +24,7 @@ node [label="\N", style="filled", fillcolor="#b5d5fb", fontname="Futura", penwid
 
 open [label="open issue report\n[#014]"]
 rearch [fillcolor="#79f233", label="rearch to find issues.md\n[#015]"]
-remove [label="remove fixed field req\n[#016]"]
+remove [fillcolor="#79f233", label="remove fixed field req\n[#016]"]
 rename [fillcolor="#79f233", label="rename to snag\n[#012]"]
 shortcut [label="shortcut to open issue\n[#013]"]
 open -> rearch

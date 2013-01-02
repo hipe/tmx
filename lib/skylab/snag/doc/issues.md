@@ -1,5 +1,5 @@
 [#016] #open remove fixed field requirement
-[#015] #open rearch to find issues.md
+[#015]       #done rearch to find issues.md
 [#014] #open open issue report
 [#013] #open shortcut to open issue
 [#012] #open rename to snag

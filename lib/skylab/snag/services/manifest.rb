@@ -1,7 +1,7 @@
 module Skylab::Snag
   class Services::Manifest
 
-    def build_enum issue_flyweight, error, info
+    def build_enum node_flyweight, error, info
       Models::Node::Enumerator.new do |y|
         begin
           if ! pathname?
@@ -14,25 +14,20 @@ module Skylab::Snag
             # (if pathname is resolved (i.e. we know what it *should* be)
             # and it doesn't exist, there are simply no issues.)
           end
-          if ! issue_flyweight
-            issue_flyweight = Models::Node.new nil, pathname
-          end
-          file.lines.each_with_index do |line, idx|
-            ln = issue_flyweight.line! line, idx
-              # (for now we go ahead and throw in the invalid ones too)
-            y << ln
-          end
+          node_flyweight ||= Models::Node::Flyweight.new nil, pathname
+          node_flyweight.each_node file.normalized_line_producer, y
+          nil
         end while nil
       end
     end
 
 
-    issue_number_digits = 3
+    node_number_digits = 3
 
     add_struct = ::Struct.new :date, :dry_run, :error,
                                 :escape_path, :info, :message, :verbose
 
-    define_method :add_issue do |&block|
+    define_method :add_node do |&block|
       res = false
       begin
         block[ o = add_struct.new ]
@@ -42,8 +37,8 @@ module Skylab::Snag
         if ! normalize_message o
           break
         end
-        int = greatest_issue_integer + 1
-        id = "[##{   "%0#{ issue_number_digits }d" % int   }]"
+        int = greatest_node_integer + 1
+        id = "[##{   "%0#{ node_number_digits }d" % int   }]"
         line = "#{ id } #{ o[:date] } #{ o[:message] }"
         o.info[ "new line: #{ line }" ]
         res = add_line_to_top line, o
@@ -87,7 +82,7 @@ module Skylab::Snag
         end
         write = -> fh do
           fh.puts line                         # ~ put the newline at the top ~
-          file.lines.each do |lin|             # #open-filehandle
+          file.normalized_lines.each do |lin|  # #open-filehandle
             fh.puts lin                        # (but tested quite well)
           end
         end
@@ -130,11 +125,11 @@ module Skylab::Snag
       fu                                       # as info to the same client.
     end
 
-    def greatest_issue_integer
+    def greatest_node_integer
       enum = build_enum nil, nil, nil
       enum = enum.valid
-      greatest = enum.reduce( -1 ) do |m, issue|
-        x = issue.integer
+      greatest = enum.reduce( -1 ) do |m, node|
+        x = node.integer
         m > x ? m : x
       end
       greatest
