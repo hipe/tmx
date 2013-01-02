@@ -10,6 +10,9 @@ module Skylab::TanMan::TestSupport::Sexp::Prototype::Grammars::Namespace70_75
     end
     rule node_list
       (node sep tail:('' node_list)?)?
+
+      # (at one point we thought we would switch to the separator form:)
+      # (node tail:(sep node_list)? sep?)?
     end
     rule sep
       s? ';' s? / s

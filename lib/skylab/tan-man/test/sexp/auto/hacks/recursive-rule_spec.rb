@@ -53,24 +53,24 @@ module ::Skylab::TanMan::TestSupport::Sexp::Auto::Recursive_Rule
         with ''
       end
       context "on one" do
-        it "2.1 - one after one - PROBLEM: look no commma" do
+        it "2.1 - one after one - uses comma and space" do
           go 'moo=m'
-          expect 'koo=k moo=m'
+          expect 'koo=k, moo=m'
         end
-        it "2.2 - one before one - commas ok" do
+        it "2.2 - one before one - uses comma and space" do
           go 'boo=b'
           expect 'boo=b, koo=k'
         end
         with 'koo=k'
       end
       context "on two" do
-        it "3.1 - one after two - PROBLEM: no comma" do
+        it "3.1 - one after two - uses comma and *one* space per proto" do
           go 'liffo=l'
-          expect 'biffo=x,  kiffo=y liffo=l'
+          expect 'biffo=x,  kiffo=y, liffo=l'
         end
-        it "3.2 - one between two - PROBLEM: no comma" do
+        it "3.2 - one between two - uses command and one leading space" do
           go 'giffo=g'
-          expect 'biffo=x, giffo=g  kiffo=y'
+          expect 'biffo=x, giffo=g,  kiffo=y'
         end
         it "3.3 - one before two - commas OK" do
           go 'aiffo=a'

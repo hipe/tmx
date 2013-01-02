@@ -48,7 +48,7 @@ module Skylab::TanMan::TestSupport::CLI::Actions::Graph
         /on node fizzle added attributes: \[ style=filled, fillcolor=#79f234 \]/
       )
       dotfile_pathname.read.should match(
-        /fizzle \[fillcolor="#79f234", label=fizzle style=filled\]\n/
+        /fizzle \[fillcolor="#79f234", label=fizzle, style=filled\]\n/
       )
     end
   end

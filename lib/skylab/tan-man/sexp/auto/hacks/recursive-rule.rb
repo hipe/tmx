@@ -218,46 +218,66 @@ module Skylab::TanMan
 
 
 
-      insert = -> me, proto_a, left, right do                   # #single-call
+      insert = if list
         # For inserting an item under an existing parent (left) node ..
+        -> me, proto_a, left, right do
+          proto_0, proto_n = [proto_a.first, proto_a.last]
 
-        proto_n = proto_a.last
+          new = proto_n.__dupe except:[item, [tail, list]]
 
-        new_list = me.class.new
-        xfer = ::Hash.new -> m do              # the strategy form making new
-          rs = proto_n.__dupe_member m         # node elements is this
-          rs
-        end
-                                               # `left` might itself be the
-        xfer[tail] = tail_f[ right, proto_n ]  # prototype so call the
-                                               # this now before you mutate it
-
-        clobber = nil                          # make sure we don't
-        if list
-          if left[tail]
-            clobber = left[tail][list]
-          else                                 # presumably we are inserting
-            fail 'sanity' if right             # at the end of the list
-                                               # now, if we don't do the below
-            new_foo_list0 = proto_a.first.tail.__dupe except: [list] # we miss
-                                               # possibly meaningful whitespace
-                                               # eg., which if any is what this
-                                               # var presumably now has in it!
-            new_foo_list0[list] = new_list     # now it is a completely empty
-                                               # shell of a 'tail' with only
-                                               # meaningful eg. whitespace
-            left[tail] = new_foo_list0         # or other separators
+          if ! left[tail]
+            left[tail] = proto_0[tail].__dupe except: [list]
           end
-        else
-          clobber = left[tail]
+          left[tail][list] = new
+
+                                               # (ick) b/c everything is done
+          selfsame = -> k { new[k] }           # above we just xfer in the same
+          xfer = ::Hash.new selfsame           # values here..
+          xfer[tail] = selfsame                # and here.
+
+          if right
+            new[tail][list] = right
+          end
+          [new, new, xfer]
         end
-        fail 'sanity' if clobber && clobber.object_id != right.object_id
-        if list
-          left[tail][list] = new_list
-        else
-          left[tail] = new_list
+      else
+        -> me, proto_a, left, right do
+          proto_0, proto_n = [proto_a.first, proto_a.last]
+
+          ancillary = me.class._members - [item, tail]   # `e0`, `e2`
+          if ! right
+            ancillary.each do |m|
+              if ! left[m] and proto_0[m]
+                left[m] = proto_0.__dupe_member m        # e.g. ','
+              end
+            end
+          end
+
+          if right
+            new = proto_n.class.new
+            ancillary.each do |m|                        # leading ' ' and
+              if proto_0[m]                              # trailing ','
+                new[m] = proto_0.__dupe_member m
+              elsif proto_n[m]
+                new[m] = proto_n.__dupe_member m
+              end
+            end
+          else
+            new = proto_n.__dupe except:[item, tail]     # e.g. ' '
+          end
+
+          selfsame = -> k { new[k] }
+          xfer = ::Hash.new selfsame
+          xfer[tail] = selfsame
+
+          if right
+            new[tail] = right
+          end
+
+          left[tail] = new
+
+          [new, new, xfer]
         end
-        [ new_list, new_list, xfer ]
       end
 
 
@@ -275,9 +295,9 @@ module Skylab::TanMan
         # hold on tight..
 
 
+        proto_0, proto_n = [proto_a.first, proto_a.last]
         new_list = root.class.new
-        proto_0 = proto_a.first                # let's be clear - we use both
-        proto_n = proto_a.last
+
                                                # When transferring each member
                                                # to the new node we created,
                                                # the default behavior is to
@@ -452,6 +472,8 @@ module Skylab::TanMan
                                   # further down in the ancestor chain than the
     end                           # module that has the correct definition
                                   # for this, should actual prototypes exist!
+                                  # the falseish-ness of this is then used to
+                                  # emit `No_Prototypes` events.
 
     attr_accessor :_prototype     # used in eponymous file, see above comment.
 

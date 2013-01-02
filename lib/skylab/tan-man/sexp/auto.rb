@@ -269,7 +269,10 @@ module Skylab::TanMan
         end
         res = o.__dupe(* [opt_h].compact ) # #here
       else
-        except_a and fail('sanity')
+        if except_a and o
+          fail "sanity - had an `except_a` list for a nerk that does #{
+            }not respond to __dupe: #{ o.class }"
+        end
         res =
         case o
         when ::NilClass ; nil
