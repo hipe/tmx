@@ -17,8 +17,8 @@ module Skylab::Snag
     def execute
       res = nil
       begin
-        break if ! issues # we need them we want them, we want them now
-        found = issues.find identifier: identifier, last: last
+        break if ! nodes # we need them we want them, we want them now
+        found = nodes.find identifier: identifier, last: last
         break( res = found ) if ! found
         yamlizer # kick
         res = paint found
@@ -39,11 +39,11 @@ module Skylab::Snag
       ct = items.last_count
       case ct
       when 0
-        emit :info, "found no issues #{ items.search.adjp }"
+        emit :info, "found no nodes #{ items.search.adjp }"
       when 1
         # ok
       else
-        emit :info, "found #{ ct } issues #{ items.search.adjp }"
+        emit :info, "found #{ ct } nodes #{ items.search.adjp }"
       end
       nil
     end

@@ -1,7 +1,7 @@
 module Skylab::Snag
   class Services::Manifest
 
-    def build_enum issue_flyweight, error, info
+    def build_enum node_flyweight, error, info
       Models::Node::Enumerator.new do |y|
         begin
           if ! pathname?
@@ -14,11 +14,11 @@ module Skylab::Snag
             # (if pathname is resolved (i.e. we know what it *should* be)
             # and it doesn't exist, there are simply no issues.)
           end
-          if ! issue_flyweight
-            issue_flyweight = Models::Node.new nil, pathname
+          if ! node_flyweight
+            node_flyweight = Models::Node.new nil, pathname
           end
           file.lines.each_with_index do |line, idx|
-            ln = issue_flyweight.line! line, idx
+            ln = node_flyweight.line! line, idx
               # (for now we go ahead and throw in the invalid ones too)
             y << ln
           end
@@ -27,7 +27,7 @@ module Skylab::Snag
     end
 
 
-    issue_number_digits = 3
+    node_number_digits = 3
 
     add_struct = ::Struct.new :date, :dry_run, :error,
                                 :escape_path, :info, :message, :verbose
@@ -43,7 +43,7 @@ module Skylab::Snag
           break
         end
         int = greatest_node_integer + 1
-        id = "[##{   "%0#{ issue_number_digits }d" % int   }]"
+        id = "[##{   "%0#{ node_number_digits }d" % int   }]"
         line = "#{ id } #{ o[:date] } #{ o[:message] }"
         o.info[ "new line: #{ line }" ]
         res = add_line_to_top line, o
@@ -133,8 +133,8 @@ module Skylab::Snag
     def greatest_node_integer
       enum = build_enum nil, nil, nil
       enum = enum.valid
-      greatest = enum.reduce( -1 ) do |m, issue|
-        x = issue.integer
+      greatest = enum.reduce( -1 ) do |m, node|
+        x = node.integer
         m > x ? m : x
       end
       greatest

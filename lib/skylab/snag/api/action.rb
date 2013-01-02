@@ -55,7 +55,7 @@ module Skylab::Snag
   protected
 
     def initialize api
-      @issues = nil
+      @nodes = nil
       @param_h = nil
       _snag_sub_client_init! api
     end
@@ -94,21 +94,21 @@ module Skylab::Snag
     end
 
     def manifest_pathname # #gigo
-      @issues.manifest.pathname
+      @nodes.manifest.pathname
     end
 
-    def issues
-      issues = nil
+    def nodes
+      nodes = nil
       begin
-        break( issues = @issues ) if @issues
+        break( nodes = @nodes ) if @nodes
         o = request_client.find_closest_manifest -> msg do
           error msg
         end
         break if ! o
-        issues = Snag::Models::Node::Collection.new self, o
-        @issues = issues
+        nodes = Snag::Models::Node::Collection.new self, o
+        @nodes = nodes
       end while nil
-      issues
+      nodes
     end
   end
 end

@@ -6,13 +6,13 @@ module Skylab::Snag
     def execute
       res = nil
       begin
-        break if ! issues
-        all = issues.manifest.build_enum(nil, nil, nil).with_count!
+        break if ! nodes
+        all = nodes.manifest.build_enum(nil, nil, nil).with_count!
         valid = all.valid.with_count!
-        valid.each do |issue|
-          emit(:payload, issue.identifier)
+        valid.each do |node|
+          emit(:payload, node.identifier)
         end
-        info "found #{valid.last_count} valid of #{all.last_count} total issues."
+        info "found #{valid.last_count} valid of #{all.last_count} total nodes."
         res = true
       end while nil
       res

@@ -10,7 +10,7 @@ module Skylab::Snag
   protected
 
     def execute
-      issues.add message: message, dry_run: dry_run, verbose: verbose
+      nodes.add message: message, dry_run: dry_run, verbose: verbose
     end
   end
 end

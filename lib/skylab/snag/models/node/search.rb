@@ -52,10 +52,10 @@ module Skylab::Snag
           info "(ignoring #{ extra.inspect } in search criteria.)"
         end
         @identifier = md[2].to_i
-        set! :identifier, -> issue do
+        set! :identifier, -> node do
           b = false
-          if issue.valid?         # (necessary so we can list invalid issues)
-            if issue.integer == @identifier
+          if node.valid?         # (necessary so we can list invalid nodes)
+            if node.integer == @identifier
               b = true
             end
           end
@@ -66,14 +66,14 @@ module Skylab::Snag
     end
 
 
-    def match? issue
+    def match? node
       if @or.empty?
         set! :and, -> i { true }
       end
-      b = @or.detect { |node| node[ issue ] }
+      b = @or.detect { |func| func[ node ] }
       if @counter and b
-        if (@counter += 1) >= @last
-          throw(:last_item, issue)
+        if ( @counter += 1 ) >= @last
+          throw :last_item, node
         end
       end
       b
