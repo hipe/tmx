@@ -186,14 +186,17 @@ module Skylab::TanMan
           end
         end,
         -> x do
-          error[ "there is no meaning associated with #{ ick meaning_ref } #{
-            } (among #{ x } meaning#{ s x }). try #{ kbd "tell #{ meaning_ref}#{
-            } means foo" } to give it meaning" ]
+          ev = Models::Meaning::Events::Not_Found.new self, meaning_ref,
+            'fetch', :present
+          ev.message = "there is no meaning associated with #{
+            }#{ ick meaning_ref } (among #{ x } meaning#{ s x }). #{
+            }try #{ kbd "tell #{ meaning_ref } means foo" } to give it meaning"
+          error[ ev ]
           false # life is easier with false
         end,
         -> partial do
-          info[ "#{ ick meaning_ref } has ambiguous meaning. #{
-            }did you mean #{ or_ partial.map { |m| "#{ lbl m.name }" } }?" ]
+          info[ Models::Meaning::Events::Ambiguous.new self,
+                meaning_ref, partial ]
           nil # easy life
         end,
         -> fly { fly.collapse self } # when we find matches (either partial

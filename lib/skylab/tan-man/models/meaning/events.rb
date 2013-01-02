@@ -5,6 +5,15 @@ module Skylab::TanMan
 
   TanMan::Model::Event || nil # so it's prettier below
 
+  class Models::Meaning::Events::Ambiguous <
+    Model::Event.new :name, :names
+
+    def build_message
+      "#{ ick node } has ambiguous meaning. #{
+        }did you mean #{ or_ names.map { |m| "#{ lbl m.name }" } }?"
+    end
+  end
+
   class Models::Meaning::Events::Changed <
     Model::Event.new :name, :old_value, :new_value
 
