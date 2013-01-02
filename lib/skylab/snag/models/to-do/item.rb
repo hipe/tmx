@@ -1,4 +1,4 @@
-module Skylab::Issue
+module Skylab::Snag
   class Models::ToDo::Item        # designed for flyweighting
 
     def content

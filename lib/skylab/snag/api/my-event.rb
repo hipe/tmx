@@ -1,4 +1,4 @@
-module Skylab::Issue
+module Skylab::Snag
   class API::MyEvent < PubSub::Event
     def message= msg # parent class doens't provide this
       if payload.kind_of?(Hash)

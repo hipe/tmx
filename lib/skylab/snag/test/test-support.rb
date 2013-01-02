@@ -2,13 +2,13 @@ require_relative '../core'
 require 'skylab/test-support/core'
 
 
-module Skylab::Issue::TestSupport
-  ::Skylab::TestSupport::Regret[ Issue_TestSupport = self ]
+module Skylab::Snag::TestSupport
+  ::Skylab::TestSupport::Regret[ Snag_TestSupport = self ]
 
 
   module CONSTANTS
     Headless = ::Skylab::Headless
-    Issue = ::Skylab::Issue
+    Snag = ::Skylab::Snag
     TestSupport = ::Skylab::TestSupport
   end
 
@@ -30,10 +30,10 @@ module Skylab::Issue::TestSupport
     end
 
     def from_tmpdir &block
-      Issue::Services::FileUtils.cd( tmpdir, verbose: debug?, &block)
+      Snag::Services::FileUtils.cd( tmpdir, verbose: debug?, &block)
     end
 
-    tmpdir = TestSupport::Tmpdir.new ::Skylab::TMPDIR_PATHNAME.join 'issues'
+    tmpdir = TestSupport::Tmpdir.new ::Skylab::TMPDIR_PATHNAME.join 'snaggle'
     define_method :tmpdir do
       tmpdir
     end

@@ -1,5 +1,5 @@
-module Skylab::Issue
-  class Models::Issue::Enumerator < ::Enumerator
+module Skylab::Snag
+  class Models::Node::Enumerator < ::Enumerator
 
     # thanks to brian chandler from issue 707
     def each &b
@@ -81,7 +81,7 @@ module Skylab::Issue
 
 
 
-  class Models::Issue::Enumerator::Spy_
+  class Models::Node::Enumerator::Spy_
     def yield piece
       @b[ piece ]
       @y.yield piece

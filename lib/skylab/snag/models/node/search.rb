@@ -1,6 +1,6 @@
-module Skylab::Issue
-  class Models::Issue::Search
-    include Issue::Core::SubClient::InstanceMethods
+module Skylab::Snag
+  class Models::Node::Search
+    include Snag::Core::SubClient::InstanceMethods
 
 
     def self.build request_client, search_param_h

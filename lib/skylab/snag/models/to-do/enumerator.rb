@@ -1,4 +1,4 @@
-module Skylab::Issue
+module Skylab::Snag
   class Models::ToDo::Enumerator < ::Enumerator
     extend PubSub::Emitter
 
@@ -14,7 +14,7 @@ module Skylab::Issue
       block_given? and fail 'sanity'
       @command = Models::ToDo::Command.new paths, names, pattern
       super() do |y|
-        Issue::Services::Open3.popen3( @command.string ) do |sin, sout, serr|
+        Snag::Services::Open3.popen3( @command.string ) do |sin, sout, serr|
           todo = Models::ToDo::Item.new
           @last_count = 0
           sout.each_line do |line|

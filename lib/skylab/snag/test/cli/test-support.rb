@@ -1,7 +1,7 @@
 require_relative '../test-support'
 
-module Skylab::Issue::TestSupport::CLI
-  ::Skylab::Issue::TestSupport[ CLI_TestSupport = self ]
+module Skylab::Snag::TestSupport::CLI
+  ::Skylab::Snag::TestSupport[ CLI_TestSupport = self ]
 
   include CONSTANTS
 
@@ -13,7 +13,7 @@ module Skylab::Issue::TestSupport::CLI
 
     let :client do
       output = self.output
-      client = Issue::CLI.new nil, output.for( :pay ), output.for( :info )
+      client = Snag::CLI.new nil, output.for( :pay ), output.for( :info )
       client.program_name = 'issue'
       client
     end

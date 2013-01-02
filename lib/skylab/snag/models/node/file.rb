@@ -1,5 +1,5 @@
-module Skylab::Issue
-  class Models::Issue::File
+module Skylab::Snag
+  class Models::Node::File
 
     def lines
       ::Enumerator.new do |y|

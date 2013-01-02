@@ -1,6 +1,6 @@
-module Skylab::Issue
-  class Models::Issue::Collection
-    include Issue::Core::SubClient::InstanceMethods
+module Skylab::Snag
+  class Models::Node::Collection
+    include Snag::Core::SubClient::InstanceMethods
 
     add_struct = ::Struct.new :message, :dry_run, :verbose
 
@@ -27,10 +27,10 @@ module Skylab::Issue
       res = false
       begin
         flyweight = issue_flyweight
-        search = Models::Issue::Search.build self, search_param_h
+        search = Models::Node::Search.build self, search_param_h
         break if ! search
 
-        enum = Models::Issue::Enumerator.new do |y|
+        enum = Models::Node::Enumerator.new do |y|
           enu = manifest.build_enum flyweight, -> m { error m }, -> m { info m}
 
           enu = enu.filter! -> yy, xx do
@@ -73,7 +73,7 @@ module Skylab::Issue
       fw = nil
       begin
         break( fw = @issue_flyweight ) if @issue_flyweight
-        fw = Models::Issue.build_flyweight self, @manifest.pathname
+        fw = Models::Node.build_flyweight self, @manifest.pathname
         @issue_flyweight = fw
       end while nil
       fw
@@ -83,7 +83,7 @@ module Skylab::Issue
     date_format = '%Y-%m-%d'
 
     define_method :todays_date do
-      Issue::Services::DateTime.now.strftime date_format
+      Snag::Services::DateTime.now.strftime date_format
     end
   end
 end

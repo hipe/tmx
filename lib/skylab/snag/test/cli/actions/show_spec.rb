@@ -1,11 +1,11 @@
 require_relative 'test-support'
 
 
-module Skylab::Issue::TestSupport::CLI::Actions
+module Skylab::Snag::TestSupport::CLI::Actions
 
   # has Quickie - try running this with just `ruby -w foo_spec.rb`
 
-  describe "#{ Issue::CLI } Actions - Show" do
+  describe "#{ Snag::CLI } Actions - Show" do
 
     extend Actions_TestSupport
 

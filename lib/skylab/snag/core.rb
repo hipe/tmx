@@ -6,11 +6,11 @@ require 'skylab/porcelain/core'
 require 'skylab/porcelain/all' # wicked old ways
 
 
-module Skylab::Issue
+module Skylab::Snag
 
   Autoloader = ::Skylab::Autoloader
   Headless = ::Skylab::Headless
-  Issue = self # #hiccup
+  Snag = self # #hiccup
   MetaHell = ::Skylab::MetaHell
   Porcelain = ::Skylab::Porcelain
   PubSub = ::Skylab::PubSub

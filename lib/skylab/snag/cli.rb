@@ -1,4 +1,4 @@
-module Skylab::Issue
+module Skylab::Snag
   class CLI
     extend Porcelain
     include Headless::NLP::EN::Methods
@@ -70,7 +70,7 @@ module Skylab::Issue
     desc "a report of the @todo's in a codebase"
 
     option_syntax do |o|
-      d = Issue::API::Actions::ToDo::Report.attributes.with :default
+      d = Snag::API::Actions::ToDo::Report.attributes.with :default
 
       on('-p', '--pattern <PATTERN>',
         "the todo pattern to use (default: '#{d[:pattern]}')"
@@ -126,7 +126,7 @@ module Skylab::Issue
     end
 
     def api
-      @api ||= Issue::API::Client.new self
+      @api ||= Snag::API::Client.new self
     end
 
     define_method :escape_path, &Headless::CLI::PathTools::FUN.pretty_path
@@ -157,7 +157,7 @@ module Skylab::Issue
 
     # this nonsense wires your evil foreign (frame) runtime to the big deal parent
     def wire! runtime, parent
-      runtime.event_class = Issue::API::MyEvent
+      runtime.event_class = Snag::API::MyEvent
       runtime.on_error { |e| parent.emit(:error, e.touch!) }
       runtime.on_info  { |e| parent.emit(:info, e.touch!) }
       runtime.on_all   { |e| parent.emit(e.type, e) unless e.touched? }

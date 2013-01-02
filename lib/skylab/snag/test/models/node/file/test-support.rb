@@ -1,7 +1,7 @@
 require_relative '../test-support'
 
-module Skylab::Issue::TestSupport::Models::Issue::File
-  ::Skylab::Issue::TestSupport::Models::Issues[ File_TestSupport = self ]
+module Skylab::Snag::TestSupport::Models::Node::File
+  ::Skylab::Snag::TestSupport::Models::Node[ File_TestSupport = self ]
 
 
   include CONSTANTS

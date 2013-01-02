@@ -1,10 +1,10 @@
-module Skylab::Issue
+module Skylab::Snag
   module API
     # empty
   end
 
   class API::Client
-    include Issue::Core::SubClient::InstanceMethods
+    include Snag::Core::SubClient::InstanceMethods
 
 
     constantize = Autoloader::Inflection::FUN.constantize
@@ -28,7 +28,7 @@ module Skylab::Issue
         mp or break( res = mp )
         mp.absolute? or fail 'sanity'
         manny = ( @manifest_cache ||= { } ).fetch( mp.to_s ) do |path| # ofuck
-          man = Issue::Services::Manifest.new mp
+          man = Snag::Services::Manifest.new mp
           man
         end
         res = manny
@@ -43,7 +43,7 @@ module Skylab::Issue
     define_method :find_closest_manifest_path do |error|
       res = nil
       begin
-        pn = ::Pathname.new Issue::Services::FileUtils.pwd
+        pn = ::Pathname.new Snag::Services::FileUtils.pwd
         found = nil
         num_dirs_searched = 0
         seen = []

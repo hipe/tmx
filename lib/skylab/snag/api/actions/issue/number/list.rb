@@ -1,4 +1,4 @@
-module Skylab::Issue
+module Skylab::Snag
   class API::Actions::Issue::Number::List < API::Action
 
     emits :all, error: :all, info: :all, payload: :all

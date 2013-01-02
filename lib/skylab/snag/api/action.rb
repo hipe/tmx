@@ -1,6 +1,6 @@
-module Skylab::Issue
+module Skylab::Snag
   class API::Action
-    include Issue::Core::SubClient::InstanceMethods
+    include Snag::Core::SubClient::InstanceMethods
     extend PubSub::Emitter
 
     extend Porcelain::Attribute::Definer
@@ -105,7 +105,7 @@ module Skylab::Issue
           error msg
         end
         break if ! o
-        issues = Issue::Models::Issue::Collection.new self, o
+        issues = Snag::Models::Node::Collection.new self, o
         @issues = issues
       end while nil
       issues

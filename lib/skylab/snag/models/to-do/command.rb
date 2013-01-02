@@ -1,8 +1,8 @@
-module Skylab::Issue
+module Skylab::Snag
   class Models::ToDo::Command < ::Struct.new :paths, :names, :pattern
 
     def string
-      Issue::Services::Shellwords || nil
+      Snag::Services::Shellwords || nil
 
       [ "find #{ paths.map(&:shellescape).join ' ' }",
         "\\(#{ names.map { |n| "-name #{ n.shellescape }" }.join ' -o ' }\\)",

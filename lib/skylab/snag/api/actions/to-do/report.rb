@@ -1,4 +1,4 @@
-module Skylab::Issue
+module Skylab::Snag
 
   # (below line kept for #posterity, is is the twinkle in the eye of the
   # [#sl-123] convention)
@@ -18,7 +18,7 @@ module Skylab::Issue
     def execute
       res = nil
       begin
-        enum = Issue::Models::ToDo::Enumerator.new paths, names, pattern
+        enum = Snag::Models::ToDo::Enumerator.new paths, names, pattern
         if show_command_only
           emit :payload, enum.command
           break( res = true )

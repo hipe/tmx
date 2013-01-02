@@ -1,7 +1,7 @@
 require_relative '../test-support'
 
-module Skylab::Issue::TestSupport::CLI::Actions
-  ::Skylab::Issue::TestSupport::CLI[ Actions_TestSupport = self ]
+module Skylab::Snag::TestSupport::CLI::Actions
+  ::Skylab::Snag::TestSupport::CLI[ Actions_TestSupport = self ]
 
   include CONSTANTS
 

@@ -1,4 +1,4 @@
-module Skylab::Issue
+module Skylab::Snag
 
 
   module Core::SubClient

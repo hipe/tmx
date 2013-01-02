@@ -1,4 +1,4 @@
-module Skylab::Issue
+module Skylab::Snag
   class API::Actions::Issue::Show < API::Action
 
     inflection.inflect.noun :plural
@@ -52,7 +52,7 @@ module Skylab::Issue
 
     define_method :yamlizer do
       @yamlizer ||= begin
-        ymlz = Issue::CLI::Yamlizer.new( fields ) do |o|
+        ymlz = Snag::CLI::Yamlizer.new( fields ) do |o|
           o.on_line do |e|
             emit :payload, e
           end

@@ -1,4 +1,4 @@
-module Skylab::Issue
+module Skylab::Snag
   class API::Actions::Issue::Add < API::Action
 
     attribute :dry_run
