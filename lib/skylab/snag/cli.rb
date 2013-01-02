@@ -3,7 +3,7 @@ module Skylab::Snag
     extend Porcelain
     include Headless::NLP::EN::Methods
 
-    desc "Add an \"issue\" line to doc/issues.md" # used to by dynamic [#hl-025]
+    desc "Add an \"issue\" line to #{ Snag::API.manifest_file_name }" #[#hl-025]
     desc "Lines are added to the top and are sequentially numbered."
 
     desc ' arguments:' #                      DESC # should be styled [#hl-025]

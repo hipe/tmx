@@ -1,6 +1,14 @@
 module Skylab::Snag
   module API
-    # empty
+    # For no good reason API (the module) is the home of low-level,
+    # bootstrappy, zero-config-style config.
+
+    manifest_file_name = 'doc/issues.md'.freeze # etc
+    define_singleton_method :manifest_file_name do manifest_file_name end
+
+    define_singleton_method :max_num_dirs_to_search_for_manifest_file do
+      15 # wuh-evuh
+    end
   end
 
   class API::Client
@@ -37,8 +45,8 @@ module Skylab::Snag
     end
 
 
-    max_num_dirs_to_search = 2
-    manifest_file_name = 'doc/issues.md' # etc
+    max_num_dirs_to_search = API.max_num_dirs_to_search_for_manifest_file
+    manifest_file_name = API.manifest_file_name
 
     define_method :find_closest_manifest_path do |error|
       res = nil

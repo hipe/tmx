@@ -32,7 +32,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
       o( / new line: / )
       if output.lines.first.string =~ /mkdir .+snag-PROD/
         output.lines.shift # egads sorry this is bad
-      else
+      elsif output.lines.first.string =~ / rm / # #todo WAT
         o( / rm / )
       end
       o( / mv /)

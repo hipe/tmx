@@ -80,8 +80,8 @@ module Skylab::Snag
         fu = self.fu( o )
         tmpdir_pathname = self.tmpdir_pathname o, fu
         break if ! tmpdir_pathname
-        tmpold = tmpdir_pathname.join 'issued.md.prev'
-        tmpnew = tmpdir_pathname.join 'issues.md.next'
+        tmpold = tmpdir_pathname.join 'issues-prev.md'
+        tmpnew = tmpdir_pathname.join 'issues-next.md'
         if tmpnew.exist?
           fu.rm tmpnew, noop: o.dry_run
         end
