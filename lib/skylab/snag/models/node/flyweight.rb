@@ -1,113 +1,148 @@
 module Skylab::Snag
   class Models::Node::Flyweight
-    include Snag::Core::SubClient::InstanceMethods # #todo why?
 
-    require_relative 'enumerator' # [#sl-124] preload bc toplevel exists
-    require_relative 'file'       # [#sl-124] preload bc toplevel exists
+    field_names = [
+      :identifier,
+      :first_line_body,
+      :date_string,
+      :extra_lines_count
+    ]
+
+    define_singleton_method :field_names do field_names end
 
 
-    def self.build request_client, pathname
-      new request_client, pathname
+    class Indexes_
+      attr_reader :prefix, :integer, :identifier, :body
+      def clear
+        @prefix.clear
+        @integer.clear
+        @identifier.clear
+        @body.clear
+      end
+    protected
+      def initialize
+        @prefix = Index_.new
+        @integer = Index_.new
+        @identifier = Index_.new
+        @body = Index_.new
+      end
     end
 
+    class Index_
+      attr_accessor :begin, :end
+      def clear
+        @begin = @end = nil
+      end
+      def exist?
+        ! @begin.nil?
+      end
+      def range
+        @begin .. @end
+      end
+    protected
+      alias_method :initialize, :clear
+    end
 
-    # --*--
+    define_method :each_node do |line_producer, node_consumer|
+      o = @indexes
+      line = nil
+      scn = Snag::Services::StringScanner.new ''
+      gets = -> do
+        line = line_producer.gets and scn.string = line
+      end
+      failure = -> msg do
+        $stderr.puts "NOPE - #{ msg } near #{ scn.peek( 8 ).inspect }"
+        node_consumer << self
+        gets[ ]
+      end
+      gets[ ]
+      while line
+        clear
+        '[#' == scn.peek( 2 ) or next failure[ '[#' ]
+        @first_line = line
+        pos = (scn.pos += 2)
+        if scn.skip( /[a-z]+-/ )                             # prefix?
+          o.prefix.begin, o.prefix.end = pos, (pos = scn.pos) - 1
+        end
+        scn.skip( /\d+/ ) or next failure[ 'digits' ]
+        o.integer.begin = o.identifier.begin = pos           # integer &
+        o.integer.end = scn.pos - 1                          #  identifier
+        scn.skip( /(\.\d+)+/ )
+        o.identifier.end = scn.pos - 1
+        scn.skip( /\][\t ]*/ ) or next failure[ ']' ]
+        o.body.begin, o.body.end = scn.pos, line.length - 1  # body
+        if gets[ ]
+          if scn.match?( /[ \t]/ )                           # extra lines
+            loop do
+              @extra_lines.push line
+              gets[ ] or break
+              scn.match?( /[ \t]+/ ) or break
+            end
+          end
+        end
+        @valid = true
+        node_consumer << self
+      end
+    end
 
-    def date
-      @tree[:rest][1,10]
+    date_rx = /\b\d{4}-\d{2}-\d{2}\b/          # (just know that dates like
+                                               # this might be deprecated
+    define_method :date_string do              # in liew of vcs integration)
+      if date_rx =~ @first_line
+        $~[0]
+      end
+    end
+
+    def extra_lines_count
+      @extra_lines.length
+    end
+
+    def first_line_body
+      @first_line[ @indexes.body.range ]
+    end
+
+    def integer
+      @first_line[ @indexes.integer.range ].to_i
     end
 
     def identifier
-      @tree[:identifier]
+      @first_line[ @indexes.identifier.range ]
     end
 
-    def integer                   # used by svc to assign new number
-      @tree[:identifier].to_i     # let's break this soon - ok ?
-    end
+    attr_reader :valid
+    alias_method :valid?, :valid
 
-    def invalid_info
-      res = nil
-      begin
-        break if valid?
-        meth = "invalid_info_#{ @normalized_invalid_reason }"
-        res = send meth
-      end while nil
-      res
-    end
-
-    attr_reader :line             # (only for error reporting)
-
-    def line! line, index         # for #flyweighting, the center of it
-      clear!
-      @index = index
-      @line = line
-      self
-    end
-
-    def line_number
-      @index + 1
-    end
-
-    def message
-      @tree[:rest][12..-1]
-    end
-
-    attr_reader :pathname
-
-
-    rx = %r{\A  \[  \#  (?<identifier> \d+ )  \]   (?<rest>.*)   \z}x
-
-    define_method :valid? do
-      res = nil
-      begin
-        if @tree                  # valid, don't parse again
-          res = true
-          break
-        end
-        if false == @tree         # invalid, don't parse again
-          res = false
-          break
-        end
-        if ! @line                # undefined, nothing to parse
-          break
-        end
-        md = rx.match @line
-        if ! md
-          @normalized_invalid_reason = :line_failed_to_match_regex
-          break( res = @tree = false )
-        end
-        @tree = md
-        res = true
-      end while nil
-      res
+    def yaml_data_pairs # make sure you use `field_names` !
+      a = [
+        [:identifier, identifier],
+        [:first_line_body, first_line_body]
+      ]
+      if (ds = date_string)
+        a.push [:date_string, ds]
+      end
+      if extra_lines_count > 0
+        a.push [:extra_lines_count, extra_lines_count]
+      end
+      a
     end
 
   protected
 
-    def initialize request_client, pathname
-      clear!
-      _snag_sub_client_init! request_client
-      @pathname = pathname
+    def initialize request_client, manifest_pathname
+      # experimentally ignore request client for now!
+
+      @valid = nil
+      @first_line = nil
+      @extra_lines = []
+      @indexes = Indexes_.new
+      @manifiset_pathname = manifest_pathname
     end
 
-    def clear!
-      _sub_client_clear!
-      @index = nil
-      @line = nil
-      @normalized_invalid_reason = nil
-      @tree = nil
-      self
-    end
-
-    def invalid_info_line_failed_to_match_regex
-      hack = @normalized_invalid_reason.to_s.gsub '_', ' '
-      {
-        invalid_reason:              hack,
-        line:                        @line,
-        line_number:                 line_number,
-        normalized_invalid_reason:   @normalized_invalid_reason,
-        pathname:                    pathname
-      }
+    def clear
+      @valid = nil
+      @first_line = nil
+      @extra_lines.clear
+      @indexes.clear
     end
   end
 end

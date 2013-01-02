@@ -37,12 +37,11 @@ module Skylab::Snag::TestSupport::CLI::Actions
       end
       infos.length.should eql(1)
       infos.first.should match( %r{ \./doc/issues\.md }x ) # has this in it
-      pays.length.should eql(4)
+      pays.length.should eql(3)
       o = -> { pays.shift }
       o[].should eql('---')
-      o[].should match( %r{\Aidentifier +: +003\z} )
-      o[].should match( %r{\Adate +: +#open feep\z} ) # !
-      o[].should match( %r{\Amessage +: +my deep\z} )
+      o[].should match( /\Aidentifier +: +003\z/ )
+      o[].should match( /\Afirst_line_body +: #open feep my deep\z/ )
       o[].should eql(nil)
     end
   end

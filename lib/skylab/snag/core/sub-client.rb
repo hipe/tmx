@@ -21,9 +21,5 @@ module Skylab::Snag
     def invite api_action
       request_client.send :invite, api_action
     end
-
-    def _sub_client_clear!                     # expert mode - prolly only use
-      @error_count = 0                         # in flyweighting
-    end
   end
 end

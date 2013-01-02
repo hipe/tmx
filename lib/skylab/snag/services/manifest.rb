@@ -14,14 +14,9 @@ module Skylab::Snag
             # (if pathname is resolved (i.e. we know what it *should* be)
             # and it doesn't exist, there are simply no issues.)
           end
-          if ! node_flyweight
-            node_flyweight = Models::Node::Flyweight.new nil, pathname
-          end
-          file.lines.each_with_index do |line, idx|
-            ln = node_flyweight.line! line, idx
-              # (for now we go ahead and throw in the invalid ones too)
-            y << ln
-          end
+          node_flyweight ||= Models::Node::Flyweight.new nil, pathname
+          node_flyweight.each_node file.normalized_line_producer, y
+          nil
         end while nil
       end
     end
@@ -87,7 +82,7 @@ module Skylab::Snag
         end
         write = -> fh do
           fh.puts line                         # ~ put the newline at the top ~
-          file.lines.each do |lin|             # #open-filehandle
+          file.normalized_lines.each do |lin|  # #open-filehandle
             fh.puts lin                        # (but tested quite well)
           end
         end

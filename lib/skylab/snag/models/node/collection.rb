@@ -31,7 +31,7 @@ module Skylab::Snag
         break if ! search
 
         enum = Models::Node::Enumerator.new do |y|
-          enu = manifest.build_enum flyweight, -> m { error m }, -> m { info m}
+          enu = manifest.build_enum flyweight, -> m { error m }, -> m { info m }
 
           enu = enu.filter! -> yy, xx do
             if search.match? xx
@@ -73,7 +73,7 @@ module Skylab::Snag
       fw = nil
       begin
         break( fw = @node_flyweight ) if @node_flyweight
-        fw = Models::Node::Flyweight.build self, @manifest.pathname
+        fw = Models::Node::Flyweight.new self, @manifest.pathname
         @node_flyweight = fw
       end while nil
       fw

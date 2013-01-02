@@ -4,10 +4,11 @@ module Skylab::Snag
     h = { }
     define_singleton_method( :o ) { |k, f| h[k] = f }
 
-    o :DateTime    , -> { require 'date'        ; ::DateTime }
-    o :FileUtils   , -> { require 'fileutils'   ; ::FileUtils }
-    o :Open3       , -> { require 'open3'       ; ::Open3 }
-    o :Shellwords  , -> { require 'shellwords'  ; ::Shellwords }
+    o :DateTime     , -> { require 'date'        ; ::DateTime }
+    o :FileUtils    , -> { require 'fileutils'   ; ::FileUtils }
+    o :Open3        , -> { require 'open3'       ; ::Open3 }
+    o :Shellwords   , -> { require 'shellwords'  ; ::Shellwords }
+    o :StringScanner, -> { require 'strscan'     ; ::StringScanner }
 
     # --*--
 

@@ -48,11 +48,11 @@ module Skylab::Snag
       nil
     end
 
-    fields = [ :identifier, :date, :message ]
+    field_names = Snag::Models::Node::Flyweight.field_names
 
     define_method :yamlizer do
       @yamlizer ||= begin
-        ymlz = Snag::CLI::Yamlizer.new( fields ) do |o|
+        ymlz = Snag::CLI::Yamlizer.new( field_names ) do |o|
           o.on_line do |e|
             emit :payload, e
           end
