@@ -11,6 +11,13 @@ module Skylab::TanMan::TestSupport::CLI::Actions::Graph
 
 
   module InstanceMethods
+
+    def invoke_from_dotfile_dir *args
+      cd dotfile_pathname.dirname do
+        client.invoke args
+      end
+    end
+
     let :names do
       output_unzip.names
     end

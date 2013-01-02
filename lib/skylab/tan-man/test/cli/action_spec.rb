@@ -20,8 +20,8 @@ module Skylab::TanMan::TestSupport::CLI
     o ['tanman', 'internationalization', 'language', 'preference', 'set'],
        "tanman language internationalization failed to set preference"
 
-    o ['tanman', 'graph', 'example', 'set'],
-       "tanman graph failed to set example"
+    o ['tanman', 'graph', 'starter', 'set'],
+       "tanman graph failed to set starter"
 
     o ['tanman', 'remote', 'add'],
       "tanman failed to add remote"

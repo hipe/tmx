@@ -1,6 +1,7 @@
 module Skylab::TanMan
   module API::Actions::Graph::Dependency
   end
+
   class API::Actions::Graph::Dependency::Set < API::Action
     extend API::Action::Parameter_Adapter
 
@@ -12,30 +13,28 @@ module Skylab::TanMan
       res = nil
       begin
         cnt = collections.dot_file.currently_using or break
-        graph = cnt.sexp or break( res = graph )
-        if ! graph.stmt_list._prototype
-          error "the stmt_list does not have a prototype in #{
-            }#{ cnt.graph_noun } (is it at the top, after \"graph {\"?)."
-          break( res = false )
-        end
-        write = nil
-        graph.associate! agent, target, prototype: nil do |o|
-          o[:existed] = -> x do
-            info "association already existed: #{ x.unparse }"
+        res = cnt.set_dependency agent, target,
+             nil, # `do_create` - create iff necessary
+            true, # fuzzy is always on for now :/
+          -> e do # error
+            error e.to_h
+            false
+          end,
+          -> e do # success
+            info e.to_h
+            true
+          end,
+          -> e do # info
+            info e.to_h
+            nil
           end
-          o[:created] = -> x do
-            write = true
-            info "created association: #{ x.unparse }"
-          end
-        end
-        if write
+        if res
           res = cnt.write dry_run, force, verbose
         end
       end while nil
       res
     end
   end
-
 
   class API::Actions::Graph::Dependency::Unset < API::Action
     extend API::Action::Parameter_Adapter
@@ -48,18 +47,23 @@ module Skylab::TanMan
       res = nil
       begin
         cnt = collections.dot_file.currently_using or break
-        write = nil
-        cnt.disassociate! agent, target,
-          -> e do # nodes_not_found
+        write = cnt.unset_dependency agent, target,
+
+            true, # fuzzy match is alwyas on for now
+
+          -> e do # error
             error e.to_h
           end,
-          -> e do # nodes_not_associated
-            error e.to_h
-          end,
+
           -> e do # success
             info e.to_h
-            write = true
+            true
+          end,
+
+          -> e do # info
+            info e.to_h
           end
+
         if write
           res = cnt.write dry_run, force, verbose
         end

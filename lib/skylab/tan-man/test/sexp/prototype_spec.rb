@@ -1,7 +1,11 @@
 require_relative 'prototype/test-support'
 
+
+# (no Quickie becuase of lots of should_not and be_nil)
+
 describe "#{::Skylab::TanMan::Sexp::Prototype} will be awesome" do
   extend ::Skylab::TanMan::TestSupport::Sexp::Prototype
+
 
   using_grammar '70-38-simplo' do
     using_input_string '', 'totally empty input string' do
@@ -25,19 +29,33 @@ describe "#{::Skylab::TanMan::Sexp::Prototype} will be awesome" do
         ->{ result }.should raise_error(/when parsing .+prototype/)
       end
     end
+
     using_input 'two-element-prototype' do
-      it 'appends a valid string as an item' do
+      it 'appends and inserts valid string items - PARTIALLY PENDING', f:true do
         o = result.node_list
-        r = o._append!('faeioup')
-        o.object_id.should eql(r.object_id)
-        o.unparse.should eql('faeioup ;')
-        lines = result.unparse.split("\n")
-        lines.length.should eql(2)
-        lines.last.should eql(o.unparse)
+        r = o._append! 'faeioup'
+        o.object_id.should eql( r.object_id )
+        o.unparse.should eql( 'faeioup' ) # no seaprator here
+        lines = result.unparse.split "\n"
+        lines.length.should eql( 2 )
+        lines.last.should eql( 'faeioup' )
+        r = o._append! 'fooooop'
+        ( r.object_id == o.object_id ).should eql( false )
+        o.unparse.should eql( 'faeioup ;  fooooop' ) # exactly what u asked for
+        r2 = o._append! 'fuuup'
+        ( r2.object_id == r.object_id ).should eql( false )
+        exp = 'faeioup ;  fooooop ;  fuuup'
+        o.unparse.should eql( exp )
+        result.unparse.split( "\n" ).last.should eql( exp )
+        if false
+        o._insert_before! 'faeup', 'fooooop'
+        o.unparse.should eql( 'faeioup ;  faeup ;  fooooop ;  fuuup' )
+        end
       end
+
       it 'appends an invalid string as an item' do
         result.node_list._append!('fzzzp')
-        result.node_list.unparse.should eql('fzzzp ;')
+        result.node_list.unparse.should eql('fzzzp')
       end
     end
   end
@@ -49,19 +67,21 @@ describe "#{::Skylab::TanMan::Sexp::Prototype} will be awesome" do
       end
     end
     using_input_string 'beginning feep ending', 'one' do
-      it('enumerates') { thing.should eql(['feep']) }
+      it('enumerates') { unparses.should eql(['feep']) }
     end
     using_input_string 'beginning fap;fep;fip ending', 'three' do
-      it('enumerates') { thing.should eql(['fap', 'fep', 'fip']) }
+      it('enumerates') { unparses.should eql(['fap', 'fep', 'fip']) }
     end
     using_input 'primordial' do
-      it 'appends a valid string as an item' do
+      it 'appends a valid string as an item - BORKED - where are semis?' do
         o = result.node_list
         o.should_not be_nil
-        o.nodes.should eql([])
+        o.nodes.should eql( [] )
         r = o._append! 'fiiiiip'
         r.object_id.should eql(o.object_id)
-        o.unparse.should eql("fiiiiip\n")
+        o.unparse.should eql( "fiiiiip;\n" )
+        o._append! 'fap'
+        o.unparse.should eql( "fiiiiip;\nfap\n" ) # look what it did!
       end
       it 'raises an exception if you try to append an invalid string' do
         ->{ result.node_list._append!('fzzzp') }.should raise_error(
@@ -70,7 +90,7 @@ describe "#{::Skylab::TanMan::Sexp::Prototype} will be awesome" do
     end
 
     # --*--
-    def thing
+    def unparses
       result.node_list.nodes.map(&:unparse)
     end
   end

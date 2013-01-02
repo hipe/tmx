@@ -4,8 +4,8 @@ module Skylab::TanMan::TestSupport::CLI::Actions::Graph
 
   # Quickie enabled!
 
-  describe "#{ TanMan::CLI::Actions::Graph }" do
-    extend ::Skylab::TanMan::TestSupport::CLI::Actions::Graph
+  describe "#{ TanMan::CLI::Actions }::Graph::Meaning actions:" do
+    extend TanMan::TestSupport::CLI::Actions::Graph
 
 
     it "`graph meaning list` lists existing meanings found in comments!!!" do
@@ -17,9 +17,7 @@ module Skylab::TanMan::TestSupport::CLI::Actions::Graph
         }
       O
 
-      cd dotfile_pathname.dirname do
-        client.invoke ['graph', 'meaning', 'list']
-      end
+      invoke_from_dotfile_dir 'graph', 'meaning', 'list'
 
       names.should eql( [:paystream, :paystream, :infostream] )
 
@@ -29,6 +27,29 @@ module Skylab::TanMan::TestSupport::CLI::Actions::Graph
         (while timmin graph was listing meanings: found 2 total in ./floo.dot)
       O
       strings.join.should eql( exp )
+    end
+
+
+    # note the below test is here because that is where it fits taxonomically
+    # although it currently reached thru the `tell` command
+
+    it "`tell <node> is <meaning>` applies the meaning!" do
+      using_dotfile <<-O.unindent
+        digraph{
+        # done : style=filled fillcolor="#79f234"
+        fizzle [label=fizzle]
+        sickle [label=sickle]
+        fizzle -> sickle
+        }
+      O
+      invoke_from_dotfile_dir 'tell', 'fizzle', 'is', 'done'
+      names.should eql( [:infostream] )
+      strings.first.should match(
+        /on node fizzle added attributes: \[ style=filled, fillcolor=#79f234 \]/
+      )
+      dotfile_pathname.read.should match(
+        /fizzle \[fillcolor="#79f234", label=fizzle, style=filled\]\n/
+      )
     end
   end
 end

@@ -147,7 +147,7 @@ module Skylab::MyTree
       if 1 == set.length
         send "resolve_lines_from_#{ set.first.symbol }"
       else
-        usage "ambiguous upstream: won't read from #{
+        usage_and_invite "ambiguous upstream: won't read from #{
           and_ set.map { |x| instance_exec(&  x.label) } }"
       end
     end
@@ -162,7 +162,7 @@ module Skylab::MyTree
           fh.close
         end
       rescue ::Errno::ENOENT => e
-        usage "when opening #{ pl :file } : #{ e.message }"
+        usage_and_invite "when opening #{ pl :file } : #{ e.message }"
       end
     end
 

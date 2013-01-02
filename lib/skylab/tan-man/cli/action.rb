@@ -67,7 +67,7 @@ module Skylab::TanMan
     extend CLI::Action::ModuleMethods
     include CLI::Action::InstanceMethods
 
-    ANCHOR_MODULE = CLI::Actions  # We state what our box module is for
+    ANCHOR_MODULE = CLI::Actions  # We state what our "root" box module is for
                                   # reflection (e.g. to get normalized name)
 
     def self.desc *a              # compare to [#hl-033]
@@ -286,7 +286,7 @@ module Skylab::TanMan
     # "tanman"                    -> "tanman failed"
     # "tanman/add"                -> "tanman failed to add"
     # "tanman/remote/add"         -> "tanman failed to add remote"
-    # "tanman/graph/example/set"  -> "tanman graph failed to set example"
+    # "tanman/graph/starter/set"  -> "tanman graph failed to set starter"
     # "tanman/internationalization/language/preference/set" -> [...]
     #
     # this looks like [#hl-018], Headless::NLP::EN::API_Action_Inflection_Hack

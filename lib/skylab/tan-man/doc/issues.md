@@ -1,4 +1,18 @@
-[#063] #open the --force that rewrites parsers should be different than ..
+[#074]       #doc-point numerics in sexps #sexp-auto
+[#073]       #done rename 'examples' to 'starters'
+[#072]       #done when returning false, use the terminal action node
+[#071]       #tracking-tag: shift from the `prototypes` paradigm to the 'meh'
+[#070]       #tracking-tag `create` flag as a triad: false, nil, trueish
+[#069]       #tracking-tag fuzzy-finging regexen - case insensitive?
+[#068]       #done dot file controller is becoming a god object, also redesign
+             the way it executes "tell"s, so it's not as much an action
+             obj
+[#067]       #tracking-tag lexical stuff ..
+[#066]       #done issue with adding a new node on an empty graph,
+             new nodes should always come after `node` node
+[#065]       #done fuzzy manage dependency
+[#064]       ui and impl for destory node
+[#063]       #done the --force that rewrites parsers should be different than ..
 [#062]      #later meaning reports!!!!
 [#061]       #done shallow shortcut to `tell` ?
 [#060]       #done #refactor: *all* NLP actions should go thru API duh
@@ -11,7 +25,7 @@
                #waiting-on:(#014, #015)
 [#055]       wtf
 [#054]       #watching it seems like it will probably be dangerous to
-             reuse the same parser for multiple parses?
+             reuse the same parser for multiple parses?, also #tracking-tag
 [#053]       #postponed normalizing string here
 [#052]       #postponed normalizing double quoted strings
 [#051]       #postponed support for 'port' in dot-lang grammar
@@ -61,7 +75,7 @@
 [#016]       #done #pattern: action instance spawns instance of model controller
                .. so make `controllers` knob for clarity
 [#015]       #done UI for dissociate (and prune nodes? - no, out of scope)
-[#014] #open UI for associate (labeled "depends on")
+[#014]       #done UI for associate (labeled "depends on")
 [#013]       #DONE UI for chose example, then use example
               1. unify & modernify autoloading
               2. fix api vis-a-vis actions to integrate with autoloading

@@ -26,6 +26,8 @@ module Skylab::TanMan::TestSupport::Sexp
 
   module InstanceMethods
 
+    alias_method :sexp_original_client, :client
+
     let :client do
       o = _parser_client_module.new upstream, paystream, infostream
       if do_debug_parser_loading

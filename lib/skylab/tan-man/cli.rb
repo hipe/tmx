@@ -198,9 +198,11 @@ module Skylab::TanMan
 
     option_parser do |o|
       dry_run_option o
-      o.on '-f', '--force',
-        'rewrites the cached treetop parser file (#dev)' do
+      o.on '-f', '--force', 'sometimes required by the action' do
         param_h[:force] = true
+      end
+      o.on '-g', 'rebuilds the Tell grammar (#dev)' do
+        param_h[:rebuild_tell_grammar] = true
       end
       help_option o
       verbose_option o
@@ -225,6 +227,12 @@ module Skylab::TanMan
     end
   end
 
+
+  class CLI::Actions::Graph::Association < CLI::Action::Box
+    desc "low-level manipulation of associations (#dev)"
+    desc "(for normal use use `tell`)"
+
+  end
 
 
   class CLI::Actions::Graph::Check < CLI::Action
@@ -260,15 +268,15 @@ module Skylab::TanMan
 
 
 
-  class CLI::Actions::Graph::Example < CLI::Action
+  class CLI::Actions::Graph::Starter < CLI::Action
 
-    desc "what graph example to use? (gets or sets it)"
+    desc "what graph starter file to use? (gets or sets it)"
 
     def process name=nil
       if name
-        api_invoke [:graph, :example, :set], name: name
+        api_invoke [:graph, :starter, :set], name: name
       else
-        api_invoke [:graph, :example, :get]
+        api_invoke [:graph, :starter, :get]
       end
     end
   end
@@ -277,6 +285,12 @@ module Skylab::TanMan
 
   class CLI::Actions::Graph::Meaning < CLI::Action::Box
     desc "associate words with node attributes"
+
+  end
+
+
+  class CLI::Actions::Graph::Node < CLI::Action::Box
+    desc "do things to nodes"
 
   end
 

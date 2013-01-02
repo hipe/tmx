@@ -1,6 +1,23 @@
 module Skylab::Headless
 
   module Action
+
+    o = { }
+
+    normify = -> str do           # for now we go '-' but me might go '_'
+      Autoloader::Inflection::FUN.pathify[ str ].intern
+    end
+
+                                               # this is a bleeding, incomplete
+    o[:build_normalized_name] = -> do          # feature that does something
+      a = name[ self::ANCHOR_MODULE.name.length + 2 .. -1].split '::' # terrible
+      a.map{ |x| normify[ x ] }.freeze         # but is also cheap.
+    end                                        # watch frontier tan-man for
+                                               # updates to this pattern.
+
+    o[:normfiy] = normify
+
+    FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
   end
 
 
@@ -11,14 +28,7 @@ module Skylab::Headless
       @desc_lines ||= nil
     end
 
-    normify = -> str do           # for now we go '-' but me might go '_'
-      Autoloader::Inflection::FUN.pathify[ str ].intern
-    end
-
-    let :normalized_action_name do # this is a bleeding, incomplete feature..
-      a = name[ self::ANCHOR_MODULE.name.length + 2 .. -1].split '::' # terrible
-      a.map{ |x| normify[ x ] }.freeze              # but also cheaper
-    end                           # .. watch frontier tan-man for updates
+    let :normalized_action_name, & Action::FUN.build_normalized_name
 
     def normalized_local_action_name
       normalized_action_name.last

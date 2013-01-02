@@ -1,17 +1,37 @@
 module Skylab::TanMan
-  class Models::DotFile::Controller < ::Struct.new  :dry_run,
-                                                    :force,
-                                                    :pathname,
-                                                    :statement,
-                                                    :verbose
-
+  class Models::DotFile::Controller
     include Core::SubClient::InstanceMethods
-
-    extend Headless::Parameter::Controller::StructAdapter # just the members
-
     include Models::DotFile::Parser::InstanceMethods
 
-    def check
+    def add_association *a
+      if associations
+        associations.add_association(* a)
+      end
+    end
+
+    def add_node node_ref, dry_run, force, verbose, error, success
+      if nodes
+        # not currently meaningful = `dry_run`, `verbose`
+        nodes.add node_ref,
+                   ! force, # `do_fuzzy` for now, the inverse of force
+                     error,
+                   success
+      end
+    end
+
+    def apply_meaning node_ref, meaning, dry_run, verbose, error, success, info
+      res = nil
+      begin
+        nodes or break
+        node = nodes.fetch node_ref, error
+        break( res = node ) if ! node
+        res = meanings.apply(
+          node, meaning, dry_run, verbose, error, success, info )
+      end while nil
+      res
+    end
+
+    def check verbose
       res = true # always succeeds
       begin
         sexp = self.sexp or break # emitted
@@ -30,150 +50,73 @@ module Skylab::TanMan
       res
     end
 
-
-    def disassociate! source_ref, target_ref, nodes_not_found,
-                                                nodes_not_associated, success
-      res = nil
-
-      resolve_nodes = -> do
-        ambis = [] ; not_founds = []
-        ambi = -> o { ambis << o }  ; not_found = -> o { not_founds << o }
-        source_node = fetch_node source_ref, not_found, ambi
-        target_node = fetch_node target_ref, not_found, ambi
-
-        if ! source_node || ! target_node
-          ga = Models::Node::Events::Generic_Event_Aggregate.new self, [ ]
-          ga.list << Models::Node::Events::Node_Not_Founds.new( self,
-            not_founds ) if not_founds.length.nonzero?
-          ga.list.concat ambis
-          res = nodes_not_found[ ga ]
-          break
-        end
-        [ source_node, target_node ]
-      end
-
-      find_edges = -> source_node, target_node do
-        reverse_was_true = nil
-        source_node_id = source_node.node_id
-        target_node_id = target_node.node_id
-        prev_node = sexp.stmt_list
-        a = sexp.stmt_list._nodes.reduce( [ ] ) do |memo, stmt_list|
-          stmt = stmt_list.stmt
-          if :edge_stmt == stmt.class.rule
-            src_id = stmt.source_node_id
-            tgt_id = stmt.target_node_id
-            if src_id == source_node_id
-              if tgt_id == target_node_id
-                memo.push [ prev_node, stmt ]
-              end
-            elsif tgt_id == source_node_id && src_id == target_node_id
-              reverse_was_true = true
-            end
-          end
-          prev_node = stmt_list
-          memo
-        end
-        if a.length.nonzero?
-          a
-        else
-          ev = Models::Node::Events::Nodes_Not_Associated.new( self,
-            source_node, target_node, reverse_was_true )
-          ev.message = "#{ lbl source_node.label } already does not #{
-            }depend on #{ lbl target_node.label }#{ if reverse_was_true then
-            " (but #{ lbl target_node.label } does depend on #{
-            }#{ lbl source_node.label })" end }"
-          rev = nodes_not_associated[ ev ]
-          nil
-        end
-      end
-
-      begin
-        sexp or break # (else we might double up later on emissions ick!)
-        ( source_node, target_node = resolve_nodes[ ] ) or break
-        edges = find_edges[ source_node, target_node ] or break
-        edges.reverse.each do |node, item|
-          edge_stmt = node.destroy_child! item
-          ev = Models::Node::Events::Disassociation_Success.new self,
-            source_node, target_node, edge_stmt
-          ev.message = "#{ lbl source_node.label } no longer depends #{
-            }on #{ lbl target_node.label } (removed this edge_stmt: #{
-            }#{ kbd edge_stmt.unparse })"
-          res = success[ ev ]
-        end
-      end while nil
-      res
-    end
-
-
-
-    constantize = ::Skylab::Autoloader::Inflection::FUN.constantize
-
-    define_method :execute do     # execute a statement
-      rule = statement.class.rule.to_s
-      rule_stem = rule.match(/_statement\z/).pre_match
-      action_class = Models::DotFile::Actions.const_fetch rule_stem
-      o = action_class.new self
-      res = o.invoke dotfile_controller: self,
-                                dry_run: dry_run,
-                                  force: force,
-                              statement: statement,
-                                verbose: verbose
-      res
-    end
-
-
-  # --*-- the below are public but are for sub-clients only --*--
-    def apply_meaning node_ref, meaning, dry_run, verbose, error, success, info
-      res = nil
-      begin
-        node = fetch_node( node_ref, error, info )
-        break( res = node ) if ! node
-        res = meanings.apply node, meaning, dry_run, verbose, error,
-                                                                  success, info
-      end while nil
-      res
-    end
-
-    define_method :fetch_node do |node_ref, not_found, ambiguous|
-      res = nil
-      begin
-        sexp = self.sexp or break
-        rx = /\A#{ ::Regexp.escape node_ref }/i # case-insensitive for now,
-        res = fuzzy_fetch sexp._node_stmts,     # we could do a fuzzy tie-
-          -> stmt do                            # breaker if we needed to
-            if rx =~ stmt.label # stmt.node_id
-              node_ref == stmt.label ? 1 : 0.5
-            end
-          end,
-          -> count do
-            not_found[ Models::Node::Events::Node_Not_Found.new(
-              self, node_ref, count ) ]
-            false # this makes life easier..
-          end,
-          -> partial do
-            ambiguous[ Models::Node::Events::Ambiguous_Node_Reference.new(
-              self, node_ref, partial ) ]
-            nil # this makes life easier
-          end
-      end while nil
-      res
-    end
-
     def graph_noun
       "#{ escape_path pathname }"
     end
 
+                                  # leveraging the new 'meh' precept [#071]
+                                  # we do a fantastic hack in the case that
+                                  # we don't have either a stmt_list, and/or
+                                  # a prototype for the stmt_list - we add
+                                  # one here, with spacing decided here
+                                  # because meh! who really cares?
+
+    def insert_stmt new, new_before_this
+      o = self.sexp
+      proto = nil                 # a prototype is created here at most
+      prototype = -> do           # once per root stmt_list (presumably),
+        proto ||= begin           # but used in 2 ways
+          p = o.class.parse :stmt_list, "xyzzy_1\nxyzzy_2"
+          p
+        end
+      end
+      empty_stmt_list = -> do     # this is one of two ways we use the prototype
+        p = prototype[]
+        sl = p.__dupe except: [:stmt, :tail]
+        sl
+      end
+      if ! o.stmt_list
+        o.stmt_list = empty_stmt_list[]
+      end
+      if ! o.stmt_list._prototype && ! o.stmt_list._items_count_exceeds( 1 )
+        o.stmt_list._prototype = prototype[]
+      end
+      # sexp[:stmt_list] = sl_empty
+      o.stmt_list._insert_before! new, new_before_this
+    end
+
+    def list_nodes verbose, payload
+      if nodes
+        nodes.list verbose, payload
+      end
+    end
+
     def meanings
-      @meanings ||= Models::DotFile::Meaning::Collection.new self
+      @meanings ||= Models::Meaning::Collection.new self
     end
 
-    def set_meaning agent, target, create, dry_run, verbose,     # contrast
-                                    error, success, neutral      # this way..
-      meanings.set agent, target, create, dry_run, verbose,
-                                   error, success, neutral
+    attr_reader :pathname
+
+    def rm_node *a
+      if nodes
+        nodes.rm(* a)
+      end
     end
 
-    def sexp # etc
+    def set_dependency source_ref, target_ref, do_create,
+      do_fuzz, error, success, info
+
+      associations.set_dependency source_ref, target_ref, do_create,
+        do_fuzz, error, success, info
+    end
+
+    def set_meaning agent_ref, target_ref, create, dry_run, verbose,
+                      error, success, info
+      meanings.set agent_ref, target_ref, create, dry_run, verbose,
+        error, success, info
+    end
+
+    def sexp
       res = nil
       begin
         res = services.tree.fetch pathname do |k, svc|
@@ -191,9 +134,30 @@ module Skylab::TanMan
       res
     end
 
-    def unset_meaning *a                                         # ..with this.
+    constantize = ::Skylab::Autoloader::Inflection::FUN.constantize
+
+    def tell statement_sexp, dry_run, force, verbose
+      rule = statement_sexp.class.rule.to_s
+      rule_stem = rule.match( /_statement\z/ ).pre_match
+      action_class = Models::DotFile::Actions.const_fetch rule_stem # BOXXY
+      o = action_class.new self
+      res = o.invoke dotfile_controller: self,
+                                dry_run: dry_run,
+                                  force: force,
+                              statement: statement_sexp,
+                                verbose: verbose
+      res
+    end
+
+    def unset_dependency *a
+      associations.unset_dependency(* a)
+    end
+
+    def unset_meaning *a
       meanings.unset(* a)
     end
+
+    attr_reader :verbose_dotfile_parsing # compat
 
     nl_rx = /\n/ # meh
     num_lines = -> str do
@@ -234,6 +198,31 @@ module Skylab::TanMan
     end
 
   protected
+
+    def initialize request_client, dotfile_pathname
+      super request_client
+      @associations = nil
+      @nodes = nil
+      @pathname = dotfile_pathname
+    end
+
+    def associations
+      @associations ||= begin                  # #sexp-release
+        if sexp = self.sexp
+          Models::Association::Collection.new self, sexp
+        end
+      end
+    end
+
+    def nodes
+      @nodes ||= begin                         # #sexp-release
+        if sexp = self.sexp
+          Models::Node::Collection.new self, sexp
+        end
+      end
+    end
+
+    public :nodes # experimentally expose this (meaning cont)
 
     def write_commit string, dry_run, verbose
       res = nil
