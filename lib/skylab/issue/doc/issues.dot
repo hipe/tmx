@@ -1,4 +1,4 @@
-# created by tan-man on {{created_on}}
+# created by tan-man on 2013-01-02 04:33:31 UTC
 
 digraph {
 
@@ -11,7 +11,6 @@ digraph {
     learn_c [label="learn C somehow"]
 */
 
-
 #                 blue : fillcolor="#b5d5fb"
 #             finished : green
 #                green : fillcolor="#79f233"
@@ -19,12 +18,13 @@ digraph {
 label="Tangent with the C Programming Language"
 
 node [label="\N", style="filled", fillcolor="#b5d5fb", fontname="Futura", penwidth="1.1566", shape="Mrecord"]
-
-
-read_pokes [label="read pokes's code|e:30 v:\na: s:2311"]
-read_norml [label="read norml's code|e:30 v:\na: s:"]
-learn_c [label="learn C somehow"]
-learn_c -> read_norml
-learn_c -> read_pokes
-
+open [label="open issue report\n[#014]"]
+rearch [label="rearch to find issues.md\n[#015]"]
+remove [label="remove fixed field req\n[#016]"]
+rename [label="rename to snag\n[#012]"]
+shortcut [label="shortcut to open issue\n[#013]"]
+open -> rearch
+open -> remove
+rearch -> rename
+shortcut -> open
 }

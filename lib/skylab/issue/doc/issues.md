@@ -1,3 +1,8 @@
+[#016] #open remove fixed field requirement
+[#015] #open rearch to find issues.md
+[#014] #open open issue report
+[#013] #open shortcut to open issue
+[#012] #open rename to snag
 [#011]       #doc-point tags defined
 [#010] #open either do or don't do something about horrible all.rb dep now
 [#009] #open awesome semantic open tag search - ("smart twitter")
