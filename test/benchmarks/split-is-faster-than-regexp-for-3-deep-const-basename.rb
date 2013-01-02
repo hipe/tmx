@@ -1,21 +1,4 @@
-require 'benchmark'
-
-module Skylab
-  module TestSupport
-    module Benchmarking
-    end
-  end
-end
-
-module Skylab::TestSupport
-  class Benchmarking::Alternative < ::Struct.new(:label, :block)
-    def initialize params
-      params.each { |k, v| send("#{k}=", v) }
-    end
-  end
-end
-
-Alt = Skylab::TestSupport::Benchmarking::Alternative
+require_relative 'test-support'
 
 module Foo
   module BarBaz
@@ -24,38 +7,44 @@ module Foo
   end
 end
 
+alt = Skylab::TestSupport::Benchmarking::Alternative
 mod = Foo::BarBaz::BiffoBazzo
 mod_str = mod.to_s
 
-RE = /[^:]+\z/
+re = /[^:]+\z/
 
 alts = [
-  Alt.new(
+  alt.new(
     label: "3 lvl split pop",
     block: -> { mod_str.split('::').last }
   ),
-  Alt.new(
+  alt.new(
     label: "inline regex",
     block: -> { /[^:]+\z/.match(mod_str)[0] }
   ),
-  Alt.new(
-    label: "regex constant",
-    block: -> { RE.match(mod_str)[0] }
+  alt.new(
+    label: "regex var in outer scope",
+    block: -> { re.match(mod_str)[0] }
   )
 ]
 
-t = 2_000_000
-
-make_bm_jobs = ->(bm) {
-  alts.each { |a| bm.report(a.label) { t.times { a.block.call } } }
-}
-
-test_that_benchmark_blocks_are_correct = ->() do
+test_that_benchmark_blocks_are_correct = -> do
   alts.each do |a|
     s = a.block.call
-    $stderr.puts("OK?:#{ "%30s:------->%s<-------" % [a.label, s] }")
+    $stderr.puts "OK?:#{ "%30s:------->%s<-------" % [a.label, s] }"
   end
 end
 
 # test_that_benchmark_blocks_are_correct.call
-Benchmark.bmbm(&make_bm_jobs)
+
+t = 2_000_000
+
+Benchmark.bmbm do |bm|
+  alts.each do |a|
+    bm.report a.label do
+      t.times do
+        a.block.call
+      end
+    end
+  end
+end
