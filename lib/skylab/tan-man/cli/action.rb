@@ -67,7 +67,7 @@ module Skylab::TanMan
     extend CLI::Action::ModuleMethods
     include CLI::Action::InstanceMethods
 
-    ANCHOR_MODULE = CLI::Actions  # We state what our box module is for
+    ANCHOR_MODULE = CLI::Actions  # We state what our "root" box module is for
                                   # reflection (e.g. to get normalized name)
 
     def self.desc *a              # compare to [#hl-033]

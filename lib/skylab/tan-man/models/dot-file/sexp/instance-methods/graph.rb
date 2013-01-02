@@ -37,10 +37,6 @@ module Skylab::TanMan
       equals_stmt.rhs.normalized_string if equals_stmt
     end
 
-    def _named_prototype name
-      stmt_list._named_prototypes[name]
-    end
-
     def node_with_id id
       _node_stmts.detect { |n| id == n.node_id }
     end
@@ -56,7 +52,8 @@ module Skylab::TanMan
     def set_label! str
       equals_stmt = _first_label_stmt
       equals_stmt ||= begin
-        proto = _named_prototype(:label) or fail('no label proto')
+        proto = stmt_list._named_prototypes[:label]
+        proto or fail 'no label prototype'
         created = true
         proto.__dupe except: [:rhs]
       end

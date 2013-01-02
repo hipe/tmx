@@ -4,7 +4,7 @@ module Skylab::TanMan::TestSupport::CLI::Actions::Graph
 
   # Quickie enabled!
 
-  describe "#{ TanMan::CLI::Actions::Graph }" do
+  describe "#{ TanMan::CLI::Actions }::Graph::Meaning actions:" do
     extend TanMan::TestSupport::CLI::Actions::Graph
 
 

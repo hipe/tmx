@@ -4,7 +4,9 @@ digraph {
 
 label="Tangent with the C Programming Language"
 
-node [label="\N", style="filled", fillcolor="#b5d5fb", fontname="Futura", penwidth="1.1566", shape="Mrecord"]
+edge [fontname="Futur", fontsize="13"]
+
+node [label="\N", style="filled", fillcolor="#b5d5fb", fontname="Futur", fontsize="14" penwidth="1.1566", shape="Mrecord"]
 
 # finished green : fillcolor="#79f233"
 

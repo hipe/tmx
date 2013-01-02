@@ -4,8 +4,8 @@ module Skylab::TanMan::TestSupport::CLI::Actions::Graph
 
   # Quickie enabled!
                                                # (we want to be sure it lazy
-  describe "#{ TanMan::CLI::Actions }::Graph::Node }" do # loads itself properly
-                                               # so don't load it
+  describe "#{ TanMan::CLI::Actions }::Graph::Node actions:" do # loads itself
+                                               # properly so don't load it
                                                # here in the name)
 
     extend TanMan::TestSupport::CLI::Actions::Graph

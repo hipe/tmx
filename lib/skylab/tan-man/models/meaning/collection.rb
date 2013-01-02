@@ -71,11 +71,10 @@ module Skylab::TanMan
             whole_string[ z + 1, 0 ] = new_meaning.line
           end
           bytes_b = whole_string.length
-          success[ "added new meaning #{ lbl name } #{
-            }#{ new_before_this ? 'before' : 'after' } #{
-            }#{ lbl use_name } (#{ bytes_b - bytes_a } bytes)" ]
+          success[ Models::Meaning::Events::Created.new self,
+            name, new_before_this, use_name, ( bytes_b - bytes_a ) ]
         else
-          error[ "can't add meaning when none is there to start with!" ]
+          error[ Models::Meaning::Events::No_Starter.new self ]
         end
       end
 
@@ -91,8 +90,8 @@ module Skylab::TanMan
         else
           o_value = o.value # you've got to dupe this before it mutates below!
           o.whole_string[ o.value_index.begin .. o.value_index.end ] = n.value
-          success[ "changed meaning of #{ lbl name } from #{
-            }#{ val o_value } to #{ val n.value }" ]
+          success[ Models::Meaning::Events::Changed.new self,
+            name, o_value, n.value ]
         end
       end
 
@@ -118,9 +117,11 @@ module Skylab::TanMan
       if found
         if do_create
           if value_str == found.value
-            info[ "#{ lbl name } is already set to that value." ]
+            info[ Models::Meaning::Events::Same_Value_Already_Set.new self,
+              name, value ]
           else
-            error[ "there is already a meaning for #{ lbl name }" ]
+            info[ Models::Meaning::Events::Different_Value_Already_Set.new self,
+              name, found.value, value_str ]
           end
         else
           update[ ]
@@ -128,23 +129,26 @@ module Skylab::TanMan
       elsif do_create.nil? || do_create        # (if you didn't specify whether
         create[ ]                              # this needs to be a create, or
       else                                     # or you specified that it does.)
-        error[ "found no existing meaning to change: #{ val name }" ]
+        error[ Models::Meaning::Events::Not_Found.new self, name ]
       end
       res
     end
 
-    def unset meaning, delete, dry_run, verbose, error, success
+    def unset meaning_name, delete, dry_run, verbose, error, success
       res = nil
       begin
-        found = list.detect { |m| meaning == m.name }
+        found = list.detect { |m| meaning_name == m.name }
         if found
           res = found.destroy error, -> bytes do
-            success[ "forgetting #{ lbl meaning } (#{ bytes } bytes)" ]
+            success[ Models::Meaning::Events::Forgotten.new self,
+              meaning_name, bytes ]
           end
         elsif delete
-          res = error[ "there is no such meaning to forget: #{ val meaning }" ]
+          res = error[ Models::Meaning::Events::Not_Found.new self,
+            meaning_name, 'forget', :present ]
         else
-          res = success["there was no such meaning to forget: #{ val meaning }"]
+          res = success[ Models::Meaning::Events::Not_Found.new self,
+            meaning_name, 'forget', :past ]
         end
       end while nil
       res

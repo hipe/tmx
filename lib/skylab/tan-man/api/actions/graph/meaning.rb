@@ -18,17 +18,17 @@ module Skylab::TanMan
         cnt = collections.dot_file.currently_using or break
         write = nil
         res = cnt.apply_meaning node, meaning, dry_run, verbose,
-          -> e do
-            error e
+          -> e do # error
+            error e.to_h
             false
           end,
-          -> success do
-            info success.to_h
+          -> e do # success
+            info e.to_h
             write = true
             true
           end,
-          -> infor do
-            info infor
+          -> e do # info
+            info e.to_h
           end
         if write
           res = cnt.write dry_run, false, verbose
@@ -53,12 +53,12 @@ module Skylab::TanMan
         cnt = collections.dot_file.currently_using or break
         write = nil
         res = cnt.unset_meaning name, true, dry_run, verbose,
-          -> e do
-            error e
+          -> e do # error
+            error e.to_h
             false
           end,
-          -> success do
-            info success
+          -> e do # success
+            info e.to_h
             write = true
             true
           end
@@ -85,17 +85,17 @@ module Skylab::TanMan
         write = false
         cnt = collections.dot_file.currently_using or break
         res = cnt.set_meaning name, value, create, dry_run, verbose,
-          -> e do
-            error e
+          -> e do # error
+            error e.to_h
             false
           end,
-          -> success do
-            info success
+          -> e do # success
+            info e.to_h
             write = true
             true
           end,
-          -> neutral do
-            info neutral
+          -> e do # info
+            info e.to_h
             nil
           end
         if write

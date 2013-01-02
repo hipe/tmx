@@ -2,12 +2,31 @@ module Skylab::TanMan
   class Models::Association::Collection
     include Core::SubClient::InstanceMethods
 
+    def add_association source_ref, target_ref, label, error, success
+      param_h = label ? { attrs: { label: label } } : nil
+           res = prod source_ref,
+                      target_ref,
+                           false, # no do not create nodes
+                            true, # yes create assoc, we are here for this
+                         param_h,
+                            true, # always fuzzy for now
+                           error, # client handles error
+                         success, # client handles success
+                             nil  # hopefully there is no info, just the 2 above
+      res
+    end
+
+                                  # this is an older way to create associations
+                                  # which is stil totally fine. Quietly create
+                                  # the association with the parameters, if one
+                                  # does not already exist. unless error
+                                  # occured, should always result in edge_stmt
     def associate! source_ref, target_ref, assoc_param_h=nil
-      # the above signature is for legacy compat. w/ test suite - may change!
 
            res = prod source_ref,
                       target_ref,
-                             nil, # yes, `do_create`, iff necessary
+                             nil, # yes create nodes iff necessary
+                             nil, # yes create association iff necessary
             (assoc_param_h||nil), # callee will validate this and use it
                            false, # `do_fuzz` never (legacy compat for now)
         -> e { raise e.message }, # turn these into exceptions (legacy compat.)
@@ -44,7 +63,8 @@ module Skylab::TanMan
 
       res = prod source_ref,
                  target_ref,
-                  do_create, # up to caller whether to create etc.
+                  do_create, # up to caller whether to create (this flag for
+                  do_create, # both nodes and associations is munged together)
                         nil, # we aren't using the assoc param here yet
                     do_fuzz, # up to caller whether we do fuzzy dupe checking
                       error, # caller handles error events
@@ -58,6 +78,7 @@ module Skylab::TanMan
 
       res = prod source_ref,
                  target_ref,
+                      false, # (no never create nodes here)
                       false, # this value is necessary for destroy (create)
                       false, # i'm so sorry, it was too tempting not to..
                     do_fuzz, # whether to fuzzy match is up to caller
@@ -79,32 +100,50 @@ module Skylab::TanMan
 
     def create source_node, target_node, params, error
       res = nil
+      resolve_prototype = -> do
+        sl = graph_sexp.stmt_list
+        if params.prototype
+          if ! sl._named_prototypes
+            res = error[ Models::Association::Events::No_Prototypes.new(
+              self, graph_noun ) ]
+            break false
+          end
+          prot = sl._named_prototypes[ params.prototype ]
+          break( prot ) if prot
+          res = error[ Models::Association::Events::No_Prototype.new(
+            self, graph_noun, params.prototype ) ]
+          break false
+        end
+        if sl._named_prototypes
+          prot = sl._named_prototypes[:edge_stmt]
+          break( prot ) if prot
+        end
+        @_default_edge_stmt_prototype ||= begin # [#071]
+          p = sl.class.parse :edge_stmt, 'a -> b' # no attr_list here
+          p or fail 'sanity - hardcoded prototype parse failed'
+          p
+        end
+      end
       begin
         o = graph_sexp
-        if ! o.stmt_list._prototype
-          res = error[
-            Models::Association::Events::No_Prototypes.new self, graph_noun ]
-          break
-        end
-        if params.prototype
-          proto = o._named_prototype params.prototype
-          if ! proto
-            res = error[
-              Models::Association::Events::No_Prototype.new self, graph_noun,
-                params.prototype ]
-            break
+        ptype = resolve_prototype[] or break
+        new = ptype.__dupe except: [[:agent, :id], [:edge_rhs, :recipient, :id]]
+        new.source_node_id! source_node.node_id
+        new.target_node_id! target_node.node_id
+        if params.attrs
+          if ! new[:attr_list] # get ready for a [#071] f*cef*ck #todo
+            atl = graph_sexp.class.parse :attr_list, '[]'
+            atl or fail 'sanity - hardcoded prototype parse failed'
+            alp = graph_sexp.class.parse :a_list, 'c=d, e=f' # attr_list proto
+            ale = alp.class.new                              # attr_list empty
+            ale._prototype = alp
+            atl[:content] = ale
+            new[:attr_list] = atl
           end
-        else
-          proto = o._named_prototype :edge_stmt
-          proto ||= begin
-            @_default_edge_stmt_prototype ||= begin
-              prot = o.class.parse :edge_stmt, 'foo -> bar' # [#054]
-              prot or fail "sanity - unexpected parse failure parsing edge_stmt"
-              prot
-            end
-          end
+          new.attr_list.content._update_attributes! params.attrs
+          # (we just pretend the part after the ']' in attr list doesn't exist)
         end
-        res = proto._create source_node, target_node, params
+        res = new
       end while nil
       res
     end
@@ -160,7 +199,9 @@ module Skylab::TanMan
     association_params = ::Struct.new :attrs, :prototype
 
     define_method :prod do
-      |source_ref, target_ref, do_create, assoc_param_h, do_fuzz,
+      |source_ref, target_ref,
+        create_nodes, do_create,
+        assoc_param_h, do_fuzz,
         error, success, info|
 
       res = nil
@@ -175,10 +216,6 @@ module Skylab::TanMan
         end
 
         source_node, target_node = -> do       # --~ find nodes ~--
-          do_creat = ( false == do_create ) ? false : nil # soften this so it
-                                               # doesn't bark if this is a
-                                               # strict create for assocs..
-                                               # .. (but not nodes)
 
           if success && (do_create || do_create.nil?)  # aggregate successes
             sagg = TanMan::Model::Event::Aggregate.new # into one lump event
@@ -189,8 +226,8 @@ module Skylab::TanMan
           eagg = TanMan::Model::Event::Aggregate.new # aggregate errors
           erro = -> e { eagg.list.push e ; false }   # ick, nec
 
-          src = nodes.produce source_ref, do_creat, do_fuzz, erro, succes
-          tgt = nodes.produce target_ref, do_creat, do_fuzz, erro, succes
+          src = nodes.produce source_ref, create_nodes, do_fuzz, erro, succes
+          tgt = nodes.produce target_ref, create_nodes, do_fuzz, erro, succes
 
           if ! ( src && tgt )                  # emit aggregated errors
             ok = [src, tgt].include?( false ) ? false : nil # omg
@@ -286,19 +323,19 @@ module Skylab::TanMan
 
                                                # --~ dénouement ~--
         if edge_pairs.length.nonzero?
-          edge_stmt = -> { _, x = edge_pairs.first ; x } # when you only care
+          edge_stmt = -> { edge_pairs.first.last } # when you only care
                                   # about the 1st result, and item not node
 
                                   # in a `create` operation, it is always an
           if do_create            # error to find any existing ones
-            ev = Models::Association::Events::Exists.new self, edge_stmt[ ]
+            ev = Models::Association::Events::Exists.new self, edge_stmt[]
             res = error[ ev ]
           elsif do_create.nil?    # the lazy create result should be the same
             if info               # shape as the successful strict create,
               ev = Models::Association::Events::Exists.new self, edge_stmt[], 1
               info[ ev ]          # namely, the stmt created (or found)
             end
-            res = edge_stmt
+            res = edge_stmt[]
           elsif do_destroy
             res = destroy edge_pairs, source_node, target_node, success
           else

@@ -1,10 +1,4 @@
 module Skylab::TanMan
-  module Models::Association
-    # for now this is just a pure namespace for metadata business-logic
-    # like custom events, and associations are represented exclusively
-    # as sexps in the document!
-  end
-
   module Models::Association::Events
     # pure namespace, all here
   end

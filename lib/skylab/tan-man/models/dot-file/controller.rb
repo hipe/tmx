@@ -3,6 +3,12 @@ module Skylab::TanMan
     include Core::SubClient::InstanceMethods
     include Models::DotFile::Parser::InstanceMethods
 
+    def add_association *a
+      if associations
+        associations.add_association(* a)
+      end
+    end
+
     def add_node node_ref, dry_run, force, verbose, error, success
       if nodes
         # not currently meaningful = `dry_run`, `verbose`

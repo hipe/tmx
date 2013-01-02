@@ -39,11 +39,16 @@ module Skylab::Porcelain::Bleeding
     def _klass;  self.class  end
     alias_method :reflector, :_klass
     def summary
-      if desc
-        desc[0..2]
+      # (note this used to be <= 2 lines of desc, now it is 1..)
+      res = nil
+      desc = self.desc
+      desc or fail "sanity - no generated desc?"
+      if desc.length > 1
+        res = [ "#{ desc.first }.." ]
       else
-        ['fuct up generated summary'] # @todo
+        res = desc
       end
+      res
     end
 
     def visible?

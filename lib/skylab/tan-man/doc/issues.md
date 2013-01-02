@@ -75,7 +75,7 @@
 [#016]       #done #pattern: action instance spawns instance of model controller
                .. so make `controllers` knob for clarity
 [#015]       #done UI for dissociate (and prune nodes? - no, out of scope)
-[#014] #open UI for associate (labeled "depends on")
+[#014]       #done UI for associate (labeled "depends on")
 [#013]       #DONE UI for chose example, then use example
               1. unify & modernify autoloading
               2. fix api vis-a-vis actions to integrate with autoloading

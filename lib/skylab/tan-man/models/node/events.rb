@@ -1,8 +1,4 @@
 module Skylab::TanMan
-  module Models::Node
-    # (maybe one day etc but for now the sexp *is* the node)
-  end
-
   module Models::Node::Events
     # all here.
   end

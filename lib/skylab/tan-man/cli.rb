@@ -228,6 +228,12 @@ module Skylab::TanMan
   end
 
 
+  class CLI::Actions::Graph::Association < CLI::Action::Box
+    desc "low-level manipulation of associations (#dev)"
+    desc "(for normal use use `tell`)"
+
+  end
+
 
   class CLI::Actions::Graph::Check < CLI::Action
 
