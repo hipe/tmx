@@ -104,7 +104,7 @@ module Skylab::Snag
     param_struct = ::Struct.new :identifier, :last
 
     define_method :initialize do |emitter, param_h|
-      _issue_sub_client_init! emitter
+      _snag_sub_client_init! emitter
       @counter = nil
       @index = { }
       @or = [ ]

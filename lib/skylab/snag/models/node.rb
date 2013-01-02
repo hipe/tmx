@@ -86,7 +86,7 @@ module Skylab::Snag
 
     def initialize request_client, pathname
       clear!
-      _issue_sub_client_init! request_client
+      _snag_sub_client_init! request_client
       @pathname = pathname
     end
 

@@ -14,7 +14,7 @@ module Skylab::Snag
 
   protected
 
-    def _issue_sub_client_init! request_client
+    def _snag_sub_client_init! request_client
       _headless_sub_client_init! request_client
     end
 

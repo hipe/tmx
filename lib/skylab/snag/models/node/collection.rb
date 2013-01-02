@@ -9,7 +9,7 @@ module Skylab::Snag
       begin
         p = add_struct.new
         param_h.each { |k, v| p[k] = v } # validates names
-        res = manifest.add_issue do |o|
+        res = manifest.add_node do |o|
           o.date = todays_date
           o.dry_run = p.dry_run
           o.error = -> x { error x }
@@ -26,7 +26,7 @@ module Skylab::Snag
     def find search_param_h       # called by api action(s)
       res = false
       begin
-        flyweight = issue_flyweight
+        flyweight = node_flyweight
         search = Models::Node::Search.build self, search_param_h
         break if ! search
 
@@ -64,17 +64,17 @@ module Skylab::Snag
   protected
 
     def initialize request_client, manifest
-      _issue_sub_client_init! request_client
-      @issue_flyweight = nil
+      _snag_sub_client_init! request_client
+      @node_flyweight = nil
       @manifest = manifest
     end
 
-    def issue_flyweight
+    def node_flyweight
       fw = nil
       begin
-        break( fw = @issue_flyweight ) if @issue_flyweight
+        break( fw = @node_flyweight ) if @node_flyweight
         fw = Models::Node.build_flyweight self, @manifest.pathname
-        @issue_flyweight = fw
+        @node_flyweight = fw
       end while nil
       fw
     end

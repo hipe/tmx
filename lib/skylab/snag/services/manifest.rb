@@ -32,7 +32,7 @@ module Skylab::Snag
     add_struct = ::Struct.new :date, :dry_run, :error,
                                 :escape_path, :info, :message, :verbose
 
-    define_method :add_issue do |&block|
+    define_method :add_node do |&block|
       res = false
       begin
         block[ o = add_struct.new ]
@@ -42,7 +42,7 @@ module Skylab::Snag
         if ! normalize_message o
           break
         end
-        int = greatest_issue_integer + 1
+        int = greatest_node_integer + 1
         id = "[##{   "%0#{ issue_number_digits }d" % int   }]"
         line = "#{ id } #{ o[:date] } #{ o[:message] }"
         o.info[ "new line: #{ line }" ]
@@ -130,7 +130,7 @@ module Skylab::Snag
       fu                                       # as info to the same client.
     end
 
-    def greatest_issue_integer
+    def greatest_node_integer
       enum = build_enum nil, nil, nil
       enum = enum.valid
       greatest = enum.reduce( -1 ) do |m, issue|

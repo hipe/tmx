@@ -57,7 +57,7 @@ module Skylab::Snag
     def initialize api
       @issues = nil
       @param_h = nil
-      _issue_sub_client_init! api
+      _snag_sub_client_init! api
     end
 
 

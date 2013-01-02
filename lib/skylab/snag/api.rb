@@ -88,7 +88,7 @@ module Skylab::Snag
   protected
 
     def initialize modality_client
-      _issue_sub_client_init! modality_client
+      _snag_sub_client_init! modality_client
     end
   end
 end
