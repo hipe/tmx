@@ -1,13 +1,13 @@
 module ::Skylab::TanMan
 
-  class Services::Examples
+  class Services::Starters
 
     extname = '.dot'
 
   public
 
-    def example                   # get the value from config
-      fetch services.config.fetch('example') { 'holy-smack.dot' }
+    def starter                   # get the value from config
+      fetch services.config.fetch('starter') { 'holy-smack.dot' }
     end
 
     def fetch basename
@@ -37,7 +37,7 @@ module ::Skylab::TanMan
       else
         a = tries.map(& :basename)
         b = box_module_dir_pathname.children.map(& :basename)
-        msg = "not found: #{ a.join ', ' }. Known examples: (#{ b.join(', ') })"
+        msg = "not found: #{ a.join ', ' }. Known starters: (#{ b.join(', ') })"
         e = PubSub::Event.new :error, message: msg, valid_names: b.map(&:to_s)
         def e.to_s ; message end # ick sorry
         result = error[ e ]
@@ -48,7 +48,7 @@ module ::Skylab::TanMan
   protected
 
     def box_module
-      TanMan::Examples
+      TanMan::Starters
     end
 
     def box_module_dir_pathname

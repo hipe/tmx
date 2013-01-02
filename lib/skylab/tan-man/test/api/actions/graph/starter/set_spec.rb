@@ -3,21 +3,21 @@ require_relative '../../test-support'
 
 module Skylab::TanMan::TestSupport::API::Actions
 
-  describe "The #{ TanMan::API } action Graph Example Set", tanman: true,
+  describe "The #{ TanMan::API } action Graph Starter Set", tanman: true,
                                                         api_action: true do
 
    extend Actions_TestSupport
 
-    action_name [:graph, :example, :set]
+    action_name [:graph, :starter, :set]
 
-    it "when bad name - \"not found: foo. known examples: bar, baz\" #{
+    it "when bad name - \"not found: foo. known starters: bar, baz\" #{
       }(and metadata)" do
 
       prepare_tanman_tmpdir <<-HERE.unindent
         --- /dev/null
         +++ b/local-conf.d/config
         @@ -0,0 +1 @@
-        +using_example=holy-foly.dot
+        +using_starter=holy-foly.dot
       HERE
 
       api_invoke_from_tmpdir name: 'zoidberg'
@@ -26,7 +26,7 @@ module Skylab::TanMan::TestSupport::API::Actions
       e = response.events.first
       e.type.should eql( :error )
       e.message.should match( /not found: zoidberg, zoidberg\.dot/i )
-      e.message.should match( /known examples:/i )
+      e.message.should match( /known starters:/i )
       e.valid_names.should be_kind_of( ::Array )
       e.valid_names.first.should be_kind_of( ::String )
     end
@@ -38,14 +38,14 @@ module Skylab::TanMan::TestSupport::API::Actions
         --- /dev/null
         +++ b/local-conf.d/config
         @@ -0,0 +1 @@
-        +using_example=hoitus-toitus.dot
+        +using_starter=hoitus-toitus.dot
       HERE
 
       api_invoke_from_tmpdir name: 'holy-smack'
       (1..5).should cover(response.events.length)
       e = response.events.first
       e.type.should eql( :info )
-      e.message.should match( /chang(?:ing|ed) using_example from #{
+      e.message.should match( /chang(?:ing|ed) using_starter from #{
         }"hoitus-toitus\.dot" to "holy-smack\.dot"/i )
     end
   end

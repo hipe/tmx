@@ -268,15 +268,15 @@ module Skylab::TanMan
 
 
 
-  class CLI::Actions::Graph::Example < CLI::Action
+  class CLI::Actions::Graph::Starter < CLI::Action
 
-    desc "what graph example to use? (gets or sets it)"
+    desc "what graph starter file to use? (gets or sets it)"
 
     def process name=nil
       if name
-        api_invoke [:graph, :example, :set], name: name
+        api_invoke [:graph, :starter, :set], name: name
       else
-        api_invoke [:graph, :example, :get]
+        api_invoke [:graph, :starter, :get]
       end
     end
   end

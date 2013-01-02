@@ -61,9 +61,9 @@ module Skylab::TanMan
           error "cannot create, directory does not exist: #{ path.dirname }"
           break
         end
-        example = collections.example.using_example or break # emits
-        t = " using example #{ example.pathname.basename }"
-        content = example.call created_on: ::Time.now.utc.to_s
+        starter = collections.starter.using_starter or break # emits
+        t = " using starter #{ starter.pathname.basename }"
+        content = starter.call created_on: ::Time.now.utc.to_s
         bytes = nil
         path.open('w+') { |fh| bytes = fh.write content }
         info "wrote #{ path }#{ t } (#{ bytes } bytes)."

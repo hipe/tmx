@@ -1,6 +1,6 @@
 module Skylab::TanMan
 
-  module Examples
+  module Starters
     # recursive autoloader should set dir_pathname here *right after*
     # this file is loaded!
     #

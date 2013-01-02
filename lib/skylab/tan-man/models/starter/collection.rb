@@ -1,10 +1,10 @@
 module Skylab::TanMan
-  class Models::Example::Collection
+  class Models::Starter::Collection
     include Core::SubClient::InstanceMethods
 
-    CONFIG_PARAM = 'using_example'
+    CONFIG_PARAM = 'using_starter'
 
-    def using_example_metadata resource_name, success
+    def using_starter_metadata resource_name, success
       ok = nil
       begin
         meta = controllers.config.value_meta CONFIG_PARAM, resource_name
@@ -15,16 +15,16 @@ module Skylab::TanMan
       ok
     end
 
-    def using_example
-      example = nil
+    def using_starter
+      starter = nil
       begin
         value = nil
-        b = using_example_metadata :all, -> m { value = m.value }
+        b = using_starter_metadata :all, -> m { value = m.value }
         b or break
-        value ||= API.default_example_file
-        example = services.examples.fetch value # could throw if etc
+        value ||= API.default_starter_file
+        starter = services.starters.fetch value # could throw if etc
       end while nil
-      example
+      starter
     end
 
     attr_accessor :verbose # compat

@@ -1,6 +1,6 @@
 module Skylab::TanMan
 
-  class API::Actions::Graph::Example::Set < API::Action
+  class API::Actions::Graph::Starter::Set < API::Action
     extend API::Action::Parameter_Adapter
 
     param :name, accessor: true, required: true
@@ -14,10 +14,10 @@ module Skylab::TanMan
       res = nil
       begin
         controllers.config.ready? or break
-        pathname = services.examples.normalize self.name, -> e { error e }
+        pathname = services.starters.normalize self.name, -> e { error e }
         break( res = pathname ) if ! pathname
         res = controllers.config.set_value(
-                Models::Example::Collection::CONFIG_PARAM,
+                Models::Starter::Collection::CONFIG_PARAM,
                 pathname.to_s, resource_name )
       end while nil
       res
