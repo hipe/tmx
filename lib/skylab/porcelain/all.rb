@@ -706,8 +706,17 @@ module Skylab::Porcelain
         self.action = exact
         true
       elsif fuzzy_match?
-        re = /\A#{Regexp.escape invocation_slug}/
-        case (found = actions_provider.actions.select { |a| re =~ a.name.to_s or a.aliases && a.aliases.grep(re) }).size
+        rx = /\A#{ ::Regexp.escape invocation_slug }/
+        found = actions_provider.actions.select do |a|
+          yes = nil
+          if rx =~ a.name.to_s
+            yes = true
+          elsif a.aliases
+            yes = a.aliases.index { |s| rx =~ s }
+          end
+          yes
+        end
+        case found.length
         when 0
           action_invalid
         when 1
