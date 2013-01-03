@@ -63,7 +63,7 @@ module Skylab::Snag
 
     # @todo: bug with "tmx issue number -h"
     def numbers
-      api.action(:node, :number, :list).wire!(&wire).invoke
+      api.action(:nodes, :numbers, :list).wire!(&wire).invoke
     end
 
 

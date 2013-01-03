@@ -1,7 +1,8 @@
 module Skylab::Snag
   module API::Actions::Nodes
-    # nothing fancy yet.
+    # gets sexed
   end
+
   class API::Actions::Nodes::Reduce < API::Action
 
     inflection.inflect.noun :plural
