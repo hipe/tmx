@@ -18,12 +18,14 @@ module Skylab::Snag
     end
   end
 
+
   class API::Actions::Nodes::Reduce < API::Action
 
-    inflection.inflect.noun :plural
+    inflection.inflect.noun :singular
 
     attribute :identifier
     attribute :last
+    attribute :query_sexp
 
     emits :all,
       :error   => :all,
@@ -37,7 +39,10 @@ module Skylab::Snag
       res = nil
       begin
         break if ! nodes # we need them we want them, we want them now
-        found = nodes.find identifier: identifier, last: last
+        sexp = query_sexp.dup if query_sexp
+        (sexp ||= [:and]).push [:identifier, identifier] if identifier
+        sexp ||= [:valid]
+        found = nodes.find last, sexp
         break( res = found ) if ! found
         yamlizer # kick
         res = paint found
@@ -58,11 +63,11 @@ module Skylab::Snag
       ct = items.last_count
       case ct
       when 0
-        emit :info, "found no nodes #{ items.search.adjp }"
+        emit :info, "found no nodes #{ items.search.phrasal_noun_modifier }"
       when 1
         # ok
       else
-        emit :info, "found #{ ct } nodes #{ items.search.adjp }"
+        emit :info, "found #{ ct } nodes #{ items.search.phrasal_noun_modifier}"
       end
       nil
     end

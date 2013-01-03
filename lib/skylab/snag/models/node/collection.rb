@@ -23,11 +23,11 @@ module Skylab::Snag
     end
 
 
-    def find search_param_h       # called by api action(s)
+    def find list, query_sexp
       res = false
       begin
         flyweight = node_flyweight
-        search = Models::Node::Search.build self, search_param_h
+        search = Models::Node::Search.new_valid self, list, query_sexp
         break if ! search
 
         enum = Models::Node::Enumerator.new do |y|
@@ -50,16 +50,6 @@ module Skylab::Snag
     end
 
     attr_reader :manifest # used in actions for now!
-
-
-#    def numbers &block
-#      fail 'wat'
-#      with_manifest do |o|
-#        o.numbers( &block )
-#      end
-#    end
-#
-
 
   protected
 

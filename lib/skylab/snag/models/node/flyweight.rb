@@ -93,6 +93,8 @@ module Skylab::Snag
       end
     end
 
+    attr_reader :extra_lines
+
     def extra_lines_count
       @extra_lines.length
     end

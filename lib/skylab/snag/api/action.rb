@@ -1,10 +1,13 @@
 module Skylab::Snag
   class API::Action
-    include Snag::Core::SubClient::InstanceMethods
-    extend PubSub::Emitter
-
-    extend Porcelain::Attribute::Definer
+    extend Headless::Action::ModuleMethods
     extend Headless::NLP::EN::API_Action_Inflection_Hack
+    extend Porcelain::Attribute::Definer
+
+    include Headless::Action::InstanceMethods
+    include Snag::Core::SubClient::InstanceMethods
+
+    extend PubSub::Emitter # puts `emit` i.m lower on the chain than s.c above!
 
     meta_attribute :default
     meta_attribute :required
@@ -12,6 +15,8 @@ module Skylab::Snag
     inflection.inflect.noun :singular
 
     event_class API::MyEvent
+
+    ANCHOR_MODULE = API::Actions
 
     # --*--
 
@@ -30,23 +35,6 @@ module Skylab::Snag
       res                         # execute, 2) it is hopefully at the end
     end
 
-
-    pathify = Autoloader::Inflection::FUN.pathify      # until headless BEGIN #
-    pos = API.name.length + 2                                                 #
-
-    define_singleton_method :normalized_action_name do
-      fail 'fix me'
-      @normalized_action_name ||= begin
-        tail = name[ pos .. -1 ]
-        o = tail.split( '::' ).map { |s| pathify[ s ].intern }
-        o
-      end
-    end
-
-    def normalized_action_name
-      self.class.normalized_action_name                                       #
-    end                                                  # until headless END #
-
     def wire! # my body is filled with rage
       yield self
       self
@@ -61,23 +49,31 @@ module Skylab::Snag
     end
 
     def absorb_params!
-      res = nil
+      res = false
       begin
-        attrs = self.class.attributes
-        attrs.each do |k, m|
-          if m.key?( :default ) && ! @param_h.key?( k )
-            @param_h[k] = m[:default]
+        formal = self.class.attributes
+        extra = @param_h.keys.reduce [] do |m, k|
+          m << k if ! formal.key? k
+          m
+        end
+        if extra.length.nonzero?
+          error "#{ s extra, :this } #{ s :is } not #{ s :a }#{
+            }parameter#{ s }: #{ extra.join ', ' }"
+          break
+        end
+        formal.each do |k, meta|
+          if meta.key?( :default ) && @param_h[k].nil?
+            @param_h[k] = meta[:default]
           end
         end
-        missing = attrs.each.map do |k, m|
-          if m[:required] && @param_h[k].nil?
-            k
-          end
-        end.compact
-        if ! missing.empty?
-          error "missing required parameter#{
-            }#{ 's' if missing.length != 1 }: #{ missing.join ', ' }"
-          break( res = false )
+        missing = formal.each.reduce [] do |m, (k, meta)|
+          m.push( k ) if meta[:required] && @param_h[k].nil?
+          m
+        end
+        if missing.length.nonzero?
+          error "missing required parameter#{ s missing }: #{
+            }#{ missing.join ', ' }"
+          break
         end
         @param_h.each do |k, v|
           send "#{ k }=", v

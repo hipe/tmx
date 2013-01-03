@@ -3,6 +3,9 @@ module Skylab::Snag
     extend Porcelain
     include Headless::NLP::EN::Methods
 
+
+    # --*--
+
     desc "Add an \"issue\" line to #{ Snag::API.manifest_file_name }" #[#hl-025]
     desc "Lines are added to the top and are sequentially numbered."
 
@@ -20,6 +23,8 @@ module Skylab::Snag
       api_invoke [:nodes, :add], param_h.merge( message: message )
     end
 
+
+    # --*--
 
     desc "show the details of issue(s)"
 
@@ -57,6 +62,8 @@ module Skylab::Snag
     end
 
 
+    # --*--
+
     desc "emit all known issue numbers in descending order to stdout"
     desc "one number per line, with any leading zeros per the file."
     desc "(more of a plumbing than porcelain feature!)"
@@ -66,6 +73,36 @@ module Skylab::Snag
       api_invoke [:nodes, :numbers, :list]
     end
 
+
+    # --*--
+
+    desc "when no arguments provided, list open issues"
+    desc "when one argument provided, is uses as first line of new issue,"
+    desc "and an #open tag will be added if necessary"
+
+    option_syntax do |ctx|
+      on '-n', '--dry-run', "don't actually do it" do ctx[:dry_run] = true end
+      on '-v', '--verbose', 'verbose output' do ctx[:verbose] = true end
+    end
+
+    argument_syntax '[<message>]'
+
+    def open message=nil, param_h
+      rs = nil
+      if message
+        rs = api_invoke [:nodes, :open], message: message
+      else
+        if ! param_h.empty?
+          runtime.emit :info, "(#{ and_( a = param_h.keys ) } #{ s a, :is } #{
+            }used for opening issues, not listing open issues. ignoring.)"
+        end
+        rs = api_invoke [:nodes, :reduce], query_sexp: [:and, [:has_tag, :open]]
+      end
+      rs
+    end
+
+
+    # --*--
 
     desc "a report of the @todo's in a codebase"
 
@@ -142,7 +179,7 @@ module Skylab::Snag
     define_method :escape_path, &Headless::CLI::PathTools::FUN.pretty_path
 
     def invite api_action
-      full = [ program_name, * api_action.normalized_action_name ]
+      full = [ program_name, * api_action.send( :normalized_action_name ) ]
       full[ -1, 0 ] = [ '-h' ]    # wonderhack - you want penult
       full = full.join ' '
       msg = "try #{ full }."
