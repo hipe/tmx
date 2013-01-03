@@ -23,7 +23,7 @@ module Skylab::Dependency
     end
 
     def valid?
-      reqd = self.class.attributes.to_a.select{ |k, v| v[:required] }.map(&:first)
+      reqd = self.class.attributes.each.map { |k, v| k if v[:required] }.compact
       nope = reqd.select { |r| send(r).nil? }
       if nope.any?
         @invalid_reason = "#{name} task missing required attribute#{'s' if nope.length != 1}: #{nope.join(', ')}"

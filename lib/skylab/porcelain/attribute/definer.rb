@@ -18,7 +18,7 @@ module ::Skylab::Porcelain
   module Attribute::Definer::Methods
     def attribute sym, meta_attributes=nil
       change_request = _attribute_meta_class.new sym
-      meta = attributes[sym]
+      meta = attributes.fetch( sym ) { nil }
       if ! meta
         change_request.merge! default_meta_attributes
       end
@@ -122,34 +122,87 @@ module ::Skylab::Porcelain
     end
   end
 
+                                               # (sister class: Parameter::Set)
+  class Attribute::Box
 
-  module Attribute::Hash_InstanceMethods
-    def duplicate
-      self.class[ * map{ |k, v| [k, v.dup] }.flatten(1) ]
+    def []= k, v
+      @order.push( k ) if ! @hash.key?( k )
+      @hash[k] = v
     end
-  end
+
+    def duplicate
+      new = self.class.allocate
+      new.send :initialize_duplicate, @order, @hash
+      new
+    end
+
+    def each &block
+      enum = ::Enumerator.new do |y|
+        @order.each do |k|
+          y << [k, @hash[k]]
+        end
+        nil
+      end
+      if block
+        enum.each(& block)
+      else
+        enum
+      end
+    end
+
+    def fetch key, &otherwise
+      @hash.fetch key, &otherwise
+    end
+
+    def key? key
+      @hash.key? key
+    end
+
+    def keys
+      @order
+    end
 
 
-  class Attribute::Box < ::Hash
-    include Attribute::Hash_InstanceMethods
-
-    # For the attributes that have a key? of `metattribute` return a new hash
-    # of the values of the metaattributes
+    # `with` is a map-reduce operation on a box.
     #
-    # e.g. for an attribute set that looks like:
+    # Use `with` to get a result hash whole elements are determined as
+    # follows: For those attributes of this attribute box that have a
+    # key? of `metaattribute`, the key (name) of the attribute is the
+    # key in the result hash, and the value is the value of that attribute's
+    # metaattribute called `metaattribute`.  It is exactly a map-reduce
+    # operation.
     #
-    #   Foo.attributes #=> { age: { default: 1 }, sex: { default: :banana }, location: {} }
+    # For a much needed example: with an attribute box that looks like:
+    #
+    #   Foo.attributes #=>
+    #     { age: { default: 1 }, sex: { default: :banana }, location: {} }
     #
     # you get:
     #
     #   Foo.attributes.with(:default) #=> { age: 1, sex: :banana }
     #
+
     def with metaattribute
-      ::Hash[* map { |k, m| [k, m[metaattribute]] if m.key?(metaattribute) }.
-             compact.flatten(1) ]
+      ::Hash[
+        @order.map do |k|
+          m = @hash[k]
+          [ k, m[metaattribute] ] if m.key? metaattribute
+        end.compact
+      ]
+    end
+
+  protected
+
+    def initialize other=nil
+      @order = [ ]
+      @hash = { }
+    end
+
+    def initialize_duplicate order, hash
+      @order = order.dup
+      @hash = hash.class[ hash.map { |k, v| [k, v.dup] } ]
     end
   end
-
 
   class Attribute::MetaAttribute
     attr_reader :hook
@@ -167,8 +220,9 @@ module ::Skylab::Porcelain
     attr_reader :name
   end
 
-
   class Attribute::MetaAttribute::Box < ::Hash
-    include Attribute::Hash_InstanceMethods
+    def duplicate
+      self.class[ map { |k, v| [k, v.dup] } ]
+    end
   end
 end

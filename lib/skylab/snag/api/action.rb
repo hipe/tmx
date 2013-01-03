@@ -60,7 +60,6 @@ module Skylab::Snag
       _snag_sub_client_init! api
     end
 
-
     def absorb_params!
       res = nil
       begin
@@ -70,9 +69,11 @@ module Skylab::Snag
             @param_h[k] = m[:default]
           end
         end
-        missing = attrs.select do |k, m|
-          m[:required] && @param_h[k].nil?
-        end.keys
+        missing = attrs.each.map do |k, m|
+          if m[:required] && @param_h[k].nil?
+            k
+          end
+        end.compact
         if ! missing.empty?
           error "missing required parameter#{
             }#{ 's' if missing.length != 1 }: #{ missing.join ', ' }"
