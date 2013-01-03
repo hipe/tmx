@@ -3,6 +3,21 @@ module Skylab::Snag
     # gets sexed
   end
 
+  class API::Actions::Nodes::Add < API::Action
+
+    attribute :dry_run
+    attribute :message,          :required => true
+    attribute :verbose
+
+    emits :all, :error => :all, :info => :all, :payload => :all
+
+  protected
+
+    def execute
+      nodes.add message: message, dry_run: dry_run, verbose: verbose
+    end
+  end
+
   class API::Actions::Nodes::Reduce < API::Action
 
     inflection.inflect.noun :plural

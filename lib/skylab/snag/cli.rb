@@ -16,8 +16,8 @@ module Skylab::Snag
       on '-v', '--verbose', 'verbose output' do ctx[:verbose] = true end
     end
 
-    def add message, ctx
-      api.action(:node, :add).wire!(&wire).invoke(ctx.merge( message: message ))
+    def add message, param_h
+      api_invoke [:nodes, :add], param_h.merge( message: message )
     end
 
 
@@ -63,7 +63,7 @@ module Skylab::Snag
 
     # @todo: bug with "tmx issue number -h"
     def numbers
-      api.action(:nodes, :numbers, :list).wire!(&wire).invoke
+      api_invoke [:nodes, :numbers, :list]
     end
 
 
@@ -127,6 +127,16 @@ module Skylab::Snag
 
     def api
       @api ||= Snag::API::Client.new self
+    end
+
+    def api_invoke normalized_name, param_h=nil
+      res = nil
+      begin
+        a = api.action(* normalized_name ) or break( res = a )
+        a = a.wire!(& wire) # [#010] how i long for you
+        res = a.invoke param_h
+      end while nil
+      res
     end
 
     define_method :escape_path, &Headless::CLI::PathTools::FUN.pretty_path
