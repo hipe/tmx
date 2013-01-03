@@ -23,7 +23,7 @@ module Skylab::Snag
 
     desc "show the details of issue(s)"
 
-    action.alias 'list'
+    action.aliases 'ls', 'show'
 
     option_syntax do |ctx|
       # @todo we would love to have -1, -2 etc
@@ -33,8 +33,8 @@ module Skylab::Snag
 
     argument_syntax '[<identifier>]'
 
-    def show identifier=nil, ctx
-      action = api.action(:node, :show).wire!(&wire)
+    def list identifier=nil, ctx
+      action = api.action( :nodes, :reduce ).wire!(&wire)
       client = runtime # this is a part we don't like
       # @todo: for:#102.901.3.2.2 : wiring should happen between
       # the api action objects and the "client" (interface) instance that

@@ -1,5 +1,8 @@
 module Skylab::Snag
-  class API::Actions::Node::Show < API::Action
+  module API::Actions::Nodes
+    # nothing fancy yet.
+  end
+  class API::Actions::Nodes::Reduce < API::Action
 
     inflection.inflect.noun :plural
 
