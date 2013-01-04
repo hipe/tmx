@@ -28,7 +28,17 @@ module Skylab::Snag
 
       res = false
       begin
-        int = greatest_node_integer + 1
+        greatest, extern_h = greatest_node_integer_and_externals
+        int = greatest
+        loop do
+          int += 1
+          if extern_h[ int ]
+            info[ "avoiding confusing number collision #{
+            }with #{ extern_h[int] }" ]
+          else
+            break
+          end
+        end
         identifier = "%0#{ node_number_digits }d" % int
         lines = ["[##{ identifier }] #{ node.first_line_body }"]
         lines.concat node.extra_lines
@@ -132,14 +142,20 @@ module Skylab::Snag
       fu                                       # as info to the same client.
     end
 
-    def greatest_node_integer
+    def greatest_node_integer_and_externals
       enum = build_enum nil, nil, nil
       enum = enum.valid
+      h = { }
       greatest = enum.reduce( -1 ) do |m, node|
-        x = node.integer
-        m > x ? m : x
+        if node.prefix
+          h[ node.integer ] = "[##{ node.prefix }-#{ node.identifier_string }]"
+          m
+        else
+          x = node.integer
+          m > x ? m : x
+        end
       end
-      greatest
+      [ greatest, h ]
     end
 
     def tmpdir_pathname dry_run, fu, error

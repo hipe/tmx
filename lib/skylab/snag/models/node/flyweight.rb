@@ -63,7 +63,7 @@ module Skylab::Snag
         @first_line = line
         pos = (scn.pos += 2)
         if scn.skip( /[a-z]+-/ )                             # prefix?
-          o.prefix.begin, o.prefix.end = pos, (pos = scn.pos) - 1
+          o.prefix.begin, o.prefix.end = pos, (pos = scn.pos) - 2
         end
         scn.skip( /\d+/ ) or next failure[ 'digits' ]
         o.integer.begin = o.identifier.begin = pos           # integer &
@@ -116,6 +116,12 @@ module Skylab::Snag
 
     def invalid_reason
       parse_failure # for now
+    end
+
+    def prefix
+      if @indexes.prefix.exist?
+        @first_line[ @indexes.prefix.range ]
+      end
     end
 
     attr_reader :valid
