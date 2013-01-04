@@ -17,7 +17,8 @@ module Skylab::TanMan
 
   module Core::MetaAttributes::Default::InstanceMethods
     def set_defaults_if_nil!      # #pattern [#sl-117] (prev is [#bs-010])
-      attributes = attribute_definer.attributes.select{ |k, v| v.key? :default }
+      attributes = attribute_definer.attributes.
+        each.select{ |k, v| v.key? :default }
       attributes.each do |k, h|
         if send( k ).nil?
           val = h[:default]
@@ -101,7 +102,7 @@ module Skylab::TanMan
 
   module Core::MetaAttributes::Required::InstanceMethods
     def required_ok?
-      a = attribute_definer.attributes.to_a
+      a = attribute_definer.attributes.each.to_a
       b = a.select { |k, o| o[:required] && send(k).nil? }
       if b.empty?
         true

@@ -1,0 +1,111 @@
+module Skylab::Snag
+  class API::Action
+    extend Headless::Action::ModuleMethods
+    extend Headless::NLP::EN::API_Action_Inflection_Hack
+    extend Porcelain::Attribute::Definer
+
+    include Headless::Action::InstanceMethods
+    include Snag::Core::SubClient::InstanceMethods
+
+    extend PubSub::Emitter # puts `emit` i.m lower on the chain than s.c above!
+
+    meta_attribute :default
+    meta_attribute :required
+
+    inflection.inflect.noun :singular
+
+    event_class API::MyEvent
+
+    ANCHOR_MODULE = API::Actions
+
+    # --*--
+
+    def invoke param_h=nil
+      res = nil
+      begin
+        @param_h and fail 'sanity'
+        @param_h = param_h || { }
+        res = absorb_params!
+        res or break
+        res = execute
+      end while nil
+      if false == res
+        res = invite self         # an invite hook should happen at the
+      end                         # end of invoke for 2 reasons: 1) it wraps
+      res                         # execute, 2) it is hopefully at the end
+    end
+
+    def wire! # my body is filled with rage
+      yield self
+      self
+    end
+
+  protected
+
+    def initialize api
+      @nodes = nil
+      @param_h = nil
+      _snag_sub_client_init! api
+    end
+
+    def absorb_params!
+      res = false
+      begin
+        formal = self.class.attributes
+        extra = @param_h.keys.reduce [] do |m, k|
+          m << k if ! formal.key? k
+          m
+        end
+        if extra.length.nonzero?
+          error "#{ s extra, :this } #{ s :is } not #{ s :a }#{
+            }parameter#{ s }: #{ extra.join ', ' }"
+          break
+        end
+        formal.each do |k, meta|
+          if meta.key?( :default ) && @param_h[k].nil?
+            @param_h[k] = meta[:default]
+          end
+        end
+        missing = formal.each.reduce [] do |m, (k, meta)|
+          m.push( k ) if meta[:required] && @param_h[k].nil?
+          m
+        end
+        if missing.length.nonzero?
+          error "missing required parameter#{ s missing }: #{
+            }#{ missing.join ', ' }"
+          break
+        end
+        @param_h.each do |k, v|
+          send "#{ k }=", v
+        end
+        @param_h = nil
+        res = true
+      end while nil
+      res
+    end
+
+    def build_event type, data # compat pub-sub
+      API::MyEvent.new type, data do |o|
+        o.inflection = self.class.inflection
+      end
+    end
+
+    def manifest_pathname # #gigo
+      @nodes.manifest.pathname
+    end
+
+    def nodes
+      nodes = nil
+      begin
+        break( nodes = @nodes ) if @nodes
+        o = request_client.find_closest_manifest -> msg do
+          error msg
+        end
+        break if ! o
+        nodes = Snag::Models::Node::Collection.new self, o
+        @nodes = nodes
+      end while nil
+      nodes
+    end
+  end
+end

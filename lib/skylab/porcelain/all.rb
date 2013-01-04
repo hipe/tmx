@@ -629,7 +629,7 @@ module Skylab::Porcelain
     end
     def action_invalid
       issue("Invalid action: #{e13b invocation_slug}", "Expecting #{render_actions}")
-      false
+      nil
     end
     def argv_empty
       if default? and ! defaulted?
@@ -694,7 +694,8 @@ module Skylab::Porcelain
       case wtf
       when Proc       ; [wtf, Action.new(:method_name => :call), [self, self.action]] # option actions
       when NilClass   ; nil # silent!?
-      when FalseClass ; issue(action, render_usage(action)) ; false
+      when FalseClass ; issue action, render_usage( action )
+                      ; nil # silent. (we invited above.)
       when Array      ; [client_instance, action, wtf]
       else            ; fail("wtf: #{wtf}")
       end
@@ -706,8 +707,17 @@ module Skylab::Porcelain
         self.action = exact
         true
       elsif fuzzy_match?
-        re = /\A#{Regexp.escape invocation_slug}/
-        case (found = actions_provider.actions.select { |a| re =~ a.name.to_s or a.aliases && a.aliases.grep(re) }).size
+        rx = /\A#{ ::Regexp.escape invocation_slug }/
+        found = actions_provider.actions.select do |a|
+          yes = nil
+          if rx =~ a.name.to_s
+            yes = true
+          elsif a.aliases
+            yes = a.aliases.index { |s| rx =~ s }
+          end
+          yes
+        end
+        case found.length
         when 0
           action_invalid
         when 1
@@ -717,7 +727,7 @@ module Skylab::Porcelain
           issue("Ambiguous action #{e13b invocation_slug}. "<<
                   "Did you mean #{found.map{ |a| e13b(a.name) }.join(' or ')}?")
           self.action = found # be careful you idiot
-          false
+          nil
         end
       else
         action_invalid

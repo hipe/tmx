@@ -4,6 +4,9 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
   # Watch for it to cross-fertilize with instances of action inflection
   # happening elsewhere as [#hl-018].
 
+  # See notes at `NounStem` to see how far down the rabbit hole of inflection-
+  # hacking goes.
+
   # Don't be decieved, we don't want self.extended [#sl-111] pattern here,
   # you just extend this module and you get this one knob:
 
@@ -113,12 +116,21 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
 
 
   class NounStem < StringAsStem
+
+    def singular
+      self
+    end
+
+    def singular= x
+      define_singleton_method( :singular ) { x }
+    end
+
     def plural
       "#{ self }s" # fine for now
     end
 
-    def singular
-      to_s       # but be careful!
+    def plural= x
+      define_singleton_method( :plural ) { x }
     end
   end
 
@@ -157,7 +169,11 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
           true
         end.call
         if ok
-          NounStem[ humanize[ name_pieces[ hop ? -3 : -2 ] ] ]
+          word = humanize[ name_pieces[ hop ? -3 : -2 ] ]
+          if 's' == word[-1]      # #singularize hack
+            word = word.sub( /s\z/, '' )
+          end
+          NounStem[ word ]
         end
       end
     end
@@ -192,7 +208,7 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
     #
 
     def noun *a
-      if 0 == a.length
+      if a.length.zero?
         @noun ||= :singular
       else
         send :noun=, *a

@@ -11,14 +11,14 @@ digraph {
     learn_c [label="learn C somehow"]
 */
 
-label="Tangent with the C Programming Language"
-
-node [label="\N", style="filled", fillcolor="#b5d5fb", fontname="Futura", penwidth="1.1566", shape="Mrecord"]
 
 #                 blue : fillcolor="#b5d5fb"
 #             finished : green
 #                green : fillcolor="#79f233"
 
+label="Tangent with the C Programming Language"
+
+node [label="\N", style="filled", fillcolor="#b5d5fb", fontname="Futura", penwidth="1.1566", shape="Mrecord"]
 
 
 read_pokes [label="read pokes's code|e:30 v:\na: s:2311"]

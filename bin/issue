@@ -1,5 +1,0 @@
-#!/usr/bin/env ruby -w
-
-require_relative '../lib/skylab/issue/core'
-
-Skylab::Issue::CLI.new( nil, $stdout, $stderr ).invoke ARGV

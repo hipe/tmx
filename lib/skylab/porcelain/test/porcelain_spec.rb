@@ -366,7 +366,7 @@ module Skylab::Porcelain::TestSupport
         end
         it "if you pass it some arguments, it reports a syntax error and shows usage and invites for help" do
           i = instance
-          i.invoke(%w(takes-no-arguments first-arg)).should eql(false)
+          i.invoke(%w(takes-no-arguments first-arg)).should eql(nil)
           s = stderr.split("\n")
           s.shift.should match(/unexpected argument[: ]+"first-arg"/i)
           s.shift.should match(/usage: yourapp takes-no-arguments/i)

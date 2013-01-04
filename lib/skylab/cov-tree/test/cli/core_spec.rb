@@ -83,6 +83,6 @@ describe "#{ ::Skylab::CovTree } CLI" do
     line.should match( /\ATry cov-tree help -h for help\.\z/ ) # wat
     stack.should be_empty
     types.should eql([:syntax, :runtime_issue, :ui])
-    result.should eql(false)
+    result.should eql(nil)
   end
 end
