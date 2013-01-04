@@ -5,6 +5,8 @@ module Skylab::Snag
 
   class API::Actions::Nodes::Add < API::Action
 
+    inflection.inflect.noun :singular
+
     attribute :dry_run
     attribute :message,          :required => true
     attribute :verbose
@@ -21,7 +23,7 @@ module Skylab::Snag
 
   class API::Actions::Nodes::Reduce < API::Action
 
-    inflection.inflect.noun :singular
+    inflection.inflect.noun :plural
 
     attribute :all
     attribute :identifier
