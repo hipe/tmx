@@ -1,3 +1,4 @@
+[#017]       #doc-point - falseish filter on error lambda result delegation
 [#016] #open remove fixed field requirement
 [#015]       #done rearch to find issues.md
 [#014] #open open issue report

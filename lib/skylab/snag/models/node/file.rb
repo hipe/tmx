@@ -1,5 +1,6 @@
 module Skylab::Snag
   class Models::Node::File
+    # (this is used by services and hence cannot be a sub-client!)
 
     # `normalized_line_producer` is like a filehandle that you call `gets`
     # on (in that when you reach the end of the file it returns nil)
@@ -28,6 +29,8 @@ module Skylab::Snag
         res
       end
       lp.define_singleton_method :line_number do line_number end
+      pathname = -> { @pathname }
+      lp.define_singleton_method :pathname do pathname[ ] end
       lp
     end
 

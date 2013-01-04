@@ -9,9 +9,8 @@ module Skylab::Snag::TestSupport::CLI::Actions
 
     extend Actions_TestSupport
 
-    it "if you ask to see only the first one, it shows that" do
-
-      tmpdir_clear.patch <<-HERE.unindent
+    shared_setup = -> ctx do
+      ctx.tmpdir_clear.patch <<-O.unindent
         diff --git a/doc/issues.md b/doc/issues.md
         --- /dev/null
         +++ b/doc/issues.md
@@ -20,11 +19,13 @@ module Skylab::Snag::TestSupport::CLI::Actions
         +[#002]       #done wizzle bizzle 2013-11-11
         +               one more line
         +[#001]       #done
-      HERE
+      O
+      shared_setup = -> _ { }
+    end
 
-      from_tmpdir do
-        client_invoke 'list', '-l1'
-      end
+    it "with `list -n 1` - shows only the first one it finds" do
+      shared_setup[ self ]
+      invoke_from_tmpdir 'list', '-n', '1'
 
       infos = []
       pays = []
@@ -43,6 +44,21 @@ module Skylab::Snag::TestSupport::CLI::Actions
       o[].should match( /\Aidentifier +: +003\z/ )
       o[].should match( /\Afirst_line_body +: #open feep my deep\z/ )
       o[].should eql(nil)
+    end
+
+    context "if you ask to see a particular one" do
+      it "with `show 002 --no-verbose` - it shows it tersely" do
+        shared_setup[ self ]
+        invoke_from_tmpdir 'show', '002', '--no-verbose'
+        names, strings = output.unzip
+        names.count{ |x| x == :pay }.should eql( 2 ) # i don't care about info
+        act = output.lines.select{ |x| :pay == x.name }.map(&:string).join ''
+        exp = <<-O.unindent
+          [#002]       #done wizzle bizzle 2013-11-11
+                         one more line
+        O
+        act.should eql( exp )
+      end
     end
   end
 end

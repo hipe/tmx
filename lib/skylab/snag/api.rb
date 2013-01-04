@@ -15,15 +15,11 @@ module Skylab::Snag
     include Snag::Core::SubClient::InstanceMethods
 
 
-    constantize = Autoloader::Inflection::FUN.constantize
-
-    define_method :action do |*path|   # create a new instance of the action
+    def build_action normalized_action_name
       # keeping for #posterity, primordial boxxy:
       #path.reduce(self.class) { |m, s| m.const_get(constantize(s)) }.new(self)
 
-      klass = path.reduce(API::Actions) { |m, x| m.const_get constantize[ x ] }
-      o = klass.new self
-      o
+      API::Actions.const_fetch( normalized_action_name ).new self
     end
 
 

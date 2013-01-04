@@ -23,15 +23,16 @@ module Skylab::Snag
 
     inflection.inflect.noun :singular
 
+    attribute :all
     attribute :identifier
-    attribute :last
+    attribute :max_count
     attribute :query_sexp
+    attribute :verbose, default: true
 
-    emits :all,
-      :error   => :all,
-      :info    => :all,
-      :payload => :all,
-      :error_with_manifest_line => :error
+    emits payload: :all,
+             info: :all,
+            error: :all,
+     invalid_node: :info  # hm..
 
   protected
 
@@ -40,49 +41,72 @@ module Skylab::Snag
       begin
         break if ! nodes # we need them we want them, we want them now
         sexp = query_sexp.dup if query_sexp
-        (sexp ||= [:and]).push [:identifier, identifier] if identifier
+        ( sexp ||= [:and] ).push [:identifier, identifier] if identifier
+        if all
+          if sexp
+            error "sorry - it doesn't make sense to use `all` with any #{
+            }other search criteria"
+            break( res = false )
+          else
+            sexp = [:all]
+          end
+        end
         sexp ||= [:valid]
-        found = nodes.find last, sexp
-        break( res = found ) if ! found
-        yamlizer # kick
-        res = paint found
+        found = nodes.find( max_count, sexp ) or break( res = found )
+        @render_item = if verbose
+          build_yamlizer
+        else
+          build_terse_node_renderer
+        end
+        res = render_nodes found
       end while nil
       res
     end
 
-    def paint items
-      info "(looking at #{ escape_path manifest_pathname })"
-      items.with_count!.each do |item|
-        if item.valid?
-          @yamlizer[ item ]
-        else
-          h = item.invalid_info
-          emit :error_with_manifest_line, h
+    # --*--
+
+    def build_terse_node_renderer
+      -> node do
+        emit :payload, node.first_line
+        if node.extra_lines_count > 0
+          node.extra_lines.each do |line|
+            emit :payload, line
+          end
         end
+        nil
       end
-      ct = items.last_count
-      case ct
-      when 0
-        emit :info, "found no nodes #{ items.search.phrasal_noun_modifier }"
-      when 1
-        # ok
-      else
-        emit :info, "found #{ ct } nodes #{ items.search.phrasal_noun_modifier}"
-      end
-      nil
     end
 
     field_names = Snag::Models::Node::Flyweight.field_names
 
-    define_method :yamlizer do
-      @yamlizer ||= begin
-        ymlz = Snag::CLI::Yamlizer.new( field_names ) do |o|
-          o.on_line do |e|
-            emit :payload, e
-          end
+    define_method :build_yamlizer do
+      Snag::CLI::Yamlizer.new field_names do |o|
+        o.on_line do |e|
+          emit :payload, e
+          nil
         end
-        ymlz
       end
+    end
+
+    def render_nodes nodes
+      info "(looking at #{ escape_path manifest_pathname })"
+      nodes.with_count!.each do |node|
+        if node.valid?
+          @render_item[ node ]
+        else
+          emit :invalid_node, node.invalid_reason.to_h
+        end
+      end
+      ct = nodes.last_count
+      case ct
+      when 0
+        emit :info, "found no nodes #{ nodes.search.phrasal_noun_modifier }"
+      when 1
+        # ok
+      else
+        emit :info, "found #{ ct } nodes #{ nodes.search.phrasal_noun_modifier}"
+      end
+      nil
     end
   end
 end

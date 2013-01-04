@@ -2,23 +2,23 @@ module Skylab::Snag
   class Models::Node::Search
     include Snag::Core::SubClient::InstanceMethods
 
-    def self.new_valid request_client, last, query_sexp
-      o = new request_client, last, query_sexp
+    def self.new_valid request_client, max_count, query_sexp
+      o = new request_client, max_count, query_sexp
       o.valid
     end
 
     positive_integer_rx = %r{\A\d+\z}
 
-    define_method :last= do |num_s|
+    define_method :max_count= do |num_s|
       if num_s
         if positive_integer_rx =~ num_s
           @counter = 0
-          @last = num_s.to_i
+          @max_count = num_s.to_i
         else
           error "must look like integer: #{ num_s }"
         end
       else
-        @last = @counter = nil
+        @max_count = @counter = nil
       end
       num_s
     end
@@ -26,7 +26,7 @@ module Skylab::Snag
     def match? node
       b = @query.match? node
       if @counter and b
-        if ( @counter += 1 ) >= @last
+        if ( @counter += 1 ) >= @max_count
           throw :last_item, node
         end
       end
@@ -58,7 +58,7 @@ module Skylab::Snag
           klass.new_valid request_client, x
         end
         rs = nil
-        if ! a.detect { |x| ! x }
+        if ! a.index { |x| ! x }
           if a.length < 2
             rs = a.first
           else
@@ -79,21 +79,38 @@ module Skylab::Snag
       end
     end
 
+    # --*--
+
+    class Query_Node_::All
+      def self.new_valid request_client, sexp
+        new request_client
+      end
+      def match? node
+        true
+      end
+      def phrase
+        "either validity or no validity"
+      end
+    protected
+      def initialize request_client
+      end
+    end
+
     class Query_Node_::HasTag
       def self.new_valid request_client, sexp
         tag = sexp[1]
-        if Models::Tag.rx =~ tag
-          new request_client, tag
-        else
-          request_client.send :error, "tag must be composed of 'a-z' - #{
-            }invalid tag name: #{ tag }"
-          false
-        end
+        normalized = Models::Tag.normalize tag,
+          -> invalid do
+            request_client.send :error, ( invalid.render_for request_client )
+          end
+        normalized ? new( request_client, normalized ) : normalized
       end
       def match? node
-        @tag_rx =~ node.first_line_body or
-        if node.extra_lines_count > 0
-          node.extra_lines.index { |x| @tag_rx =~ x }
+        if node.valid
+          @tag_rx =~ node.first_line_body or
+          if node.extra_lines_count > 0
+            node.extra_lines.index { |x| @tag_rx =~ x }
+          end
         end
       end
       def phrase
@@ -103,6 +120,33 @@ module Skylab::Snag
       def initialize request_client, tag
         @tag = tag
         @tag_rx = /(?:^|[[:space:]])##{ ::Regexp.escape tag }\b/
+      end
+    end
+
+    class Query_Node_::Identifier
+      def self.new_valid request_client, sexp
+        identifier_string = sexp[1]
+        normalized = Models::Identifier.normalize identifier_string,
+          -> invalid do
+            request_client.send :error, ( invalid.render_for request_client )
+          end,
+          -> info do
+            request_client.send :info, ( info.render_for request_client )
+          end
+        normalized ? new( request_client, normalized ) : normalized
+      end
+      def match? node
+        if node.valid
+          @identifier_rx =~ node.identifier_string
+        end
+      end
+      def phrase
+        "identifer starting with \"#{ @identifier.identifier }\""
+      end
+    protected
+      def initialize request_client, identifier_struct
+        @identifier = identifier_struct
+        @identifier_rx = /\A#{ ::Regexp.escape @identifier.identifier }/
       end
     end
 
@@ -121,12 +165,15 @@ module Skylab::Snag
       end
     end
 
-    def initialize emitter, last, query_sexp
+    def initialize emitter, max_count, query_sexp
       _snag_sub_client_init! emitter
       @counter = nil
-      @last = nil
-      self.last = last if last
+      @max_count = nil
+      self.max_count = max_count if max_count
       @query = Query_Node_.new_valid self, query_sexp
+      if ! @query && 0 == error_count          # catches some thing earlier..
+        error "failed to build query for one weird old reason" # last resort
+      end
     end
   end
 end

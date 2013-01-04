@@ -50,8 +50,9 @@ module Skylab::Snag
       gets = -> do
         line = line_producer.gets and scn.string = line
       end
-      failure = -> msg do
-        $stderr.puts "NOPE - #{ msg } near #{ scn.peek( 8 ).inspect }"
+      failure = -> exp do
+        parse_failure! exp, scn.peek( 8 ), line,
+          line_producer.line_number, line_producer.pathname
         node_consumer << self
         gets[ ]
       end
@@ -99,6 +100,8 @@ module Skylab::Snag
       @extra_lines.length
     end
 
+    attr_reader :first_line                    # used in some reports, comp next
+
     def first_line_body
       @first_line[ @indexes.body.range ]
     end
@@ -107,8 +110,12 @@ module Skylab::Snag
       @first_line[ @indexes.integer.range ].to_i
     end
 
-    def identifier
-      @first_line[ @indexes.identifier.range ]
+    def identifier_string                      # (not to be confused with the
+      @first_line[ @indexes.identifier.range ] # struct (models)!)
+    end
+
+    def invalid_reason
+      parse_failure # for now
     end
 
     attr_reader :valid
@@ -116,7 +123,7 @@ module Skylab::Snag
 
     def yaml_data_pairs # make sure you use `field_names` !
       a = [
-        [:identifier, identifier],
+        [:identifier, identifier_string],
         [:first_line_body, first_line_body]
       ]
       if (ds = date_string)
@@ -138,6 +145,7 @@ module Skylab::Snag
       @extra_lines = []
       @indexes = Indexes_.new
       @manifiset_pathname = manifest_pathname
+      @parse_failure = nil
     end
 
     def clear
@@ -145,6 +153,21 @@ module Skylab::Snag
       @first_line = nil
       @extra_lines.clear
       @indexes.clear
+    end
+
+    def parse_failure                          # it is a lazily-created fly-
+      @parse_failure if ! @valid               # weight so we have to protect
+    end                                        # against inappropriate access
+
+    def parse_failure! expecting, near, line, line_number, pathname
+      # (be sure to set all properties! it is yet another flyweight)
+      pf = ( @parse_failure ||= Models::Parse::Events::Failure.new )
+      pf.expecting = expecting
+      pf.near = near
+      pf.line = line
+      pf.line_number = line_number
+      pf.pathname = pathname
+      nil
     end
   end
 end
