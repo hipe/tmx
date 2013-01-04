@@ -2,26 +2,23 @@ module Skylab::Snag
   class Models::Node::Collection
     include Snag::Core::SubClient::InstanceMethods
 
-    add_struct = ::Struct.new :message, :dry_run, :verbose
-
-    define_method :add do |param_h| # called by api action(s)
+    def add message, do_prepend_open_tag, dry_run, verbose
       res = false
       begin
-        p = add_struct.new
-        param_h.each { |k, v| p[k] = v } # validates names
-        res = manifest.add_node do |o|
-          o.date = todays_date
-          o.dry_run = p.dry_run
-          o.error = -> x { error x }
-          o.escape_path = -> x { escape_path x }
-          o.info = -> x { info x }
-          o.message = p.message
-          o.verbose = p.verbose
-        end
+        node = Models::Node::Controller.new request_client
+        node.date_string = todays_date if false # off for now
+        node.message = message
+        node.do_prepend_open_tag = do_prepend_open_tag
+        r = node.valid or break( res = r )
+        res = manifest.add_node node,
+          dry_run,
+          verbose,
+          -> x { escape_path x },
+          -> x { error x },
+          -> x { info x }
       end while nil
       res
     end
-
 
     def find list, query_sexp
       res = false

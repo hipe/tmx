@@ -206,8 +206,8 @@ module Skylab::Snag
         dry_run = param_h.delete :dry_run
         verbose = param_h.delete :verbose
         if param_h.empty?
-          info "this feature is pending." ; false and
           res = api_invoke( [:nodes, :add], {
+            do_prepend_open_tag: true,
             dry_run: dry_run,
             message: message,
             verbose: verbose } )

@@ -1,0 +1,54 @@
+require_relative 'test-support'
+
+module Skylab::Snag::TestSupport::Models::Node
+  # Quickie.
+  describe "#{ Snag }::Models::Node::Controller" do
+    extend Node_TestSupport
+    context "delineation" do
+      it "with 3 things added under 73 chars, delineates to one line" do
+        node = build_node
+        node.date_string = '2013-01-04'
+        node.do_prepend_open_tag = true
+        node.message = "gary jules - mad word (manic focus remix)"
+        node.first_line_body.object_id.should eql(
+        node.first_line_body.object_id )
+        node.first_line_body.frozen?.should eql( true )
+        node.first_line_body.should eql(
+          '#open gary jules - mad word (manic focus remix) 2013-01-04' )
+      end
+
+      it "with one line that is just a bunch of words longer than 73 chars" do
+        _109_chars = %[Los Mangeles started playing "Clarity (PRFFTT & #{
+        }Svyable X Ravi Remix)" by Zedd - TableTurner started playing]
+        node = build_node
+        node.message = _109_chars
+        node.first_line_body.length.should eql(73)
+        node.first_line_body[ -3 .. -1 ].should eql(' by')
+        el = node.extra_lines
+        el.length.should eql( 1 )
+        el.first.should eql( 'Zedd - TableTurner started playing' )
+      end
+
+      it "with one long line that looks (to it) line one long word" do
+        node = build_node
+        node.instance_variable_set '@line_width', 10 # other thing is at 7
+        node.instance_variable_set '@max_lines', 4
+        long_line = "ABC_one_line_-two-line-_tre_line_"
+        node.message = long_line
+        node.first_line_body.should eql( 'ABC' )
+        node.extra_lines[0].should eql( '_one_line_' )
+        node.extra_lines[1].should eql( '-two-line-' )
+        node.extra_lines[2].should eql( '_tre_line_' )
+        node.extra_lines.length.should eql(3)
+      end
+    end
+
+    # --*--
+
+    def build_node
+      node = Snag::Models::Node::Controller.new :test_models_node_controller
+      node.instance_variable_set '@extra_lines_header', ''
+      node
+    end
+  end
+end

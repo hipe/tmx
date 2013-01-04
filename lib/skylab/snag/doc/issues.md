@@ -1,9 +1,9 @@
-[#017]       #doc-point - falseish filter on error lambda result delegation
-[#016] #open remove fixed field requirement
+[#017]       #doc-point - errors lambdas that don't result in falsey get false
+[#016]       #done remove fixed field requirement
 [#015]       #done rearch to find issues.md
-[#014] #open open issue report
-[#013] #open shortcut to open issue
-[#012] #open rename to snag
+[#014]       #done open issue report
+[#013]       #done shortcut to open issue
+[#012]       #done rename to snag
 [#011]       #doc-point tags defined
 [#010] #open either do or don't do something about horrible all.rb dep now
 [#009] #open awesome semantic open tag search - ("smart twitter")

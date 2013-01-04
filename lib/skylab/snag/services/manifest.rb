@@ -21,29 +21,21 @@ module Skylab::Snag
       end
     end
 
-
     node_number_digits = 3
 
-    add_struct = ::Struct.new :date, :dry_run, :error,
-                                :escape_path, :info, :message, :verbose
+    define_method :add_node do
+      |node, dry_run, verbose, escape_path, error, info|
 
-    define_method :add_node do |&block|
       res = false
       begin
-        block[ o = add_struct.new ]
-        if ! normalize_date o
-          break
-        end
-        if ! normalize_message o
-          break
-        end
         int = greatest_node_integer + 1
-        id = "[##{   "%0#{ node_number_digits }d" % int   }]"
-        line = "#{ id } #{ o[:date] } #{ o[:message] }"
-        o.info[ "new line: #{ line }" ]
-        res = add_line_to_top line, o
+        identifier = "%0#{ node_number_digits }d" % int
+        lines = ["[##{ identifier }] #{ node.first_line_body }"]
+        lines.concat node.extra_lines
+        res = add_lines_to_top lines, dry_run, escape_path, verbose,
+          error, info
         break if ! res
-        o.info[ "done." ]
+        info[ "done." ]
       end while nil
       res
     end
@@ -68,25 +60,39 @@ module Skylab::Snag
     dev_null = ::Object.new                    # hehe the sneaky hoops we jump
     dev_null.define_singleton_method( :puts ) { |s| } # thru to get a good dry
 
-    define_method :add_line_to_top do |line, o|
+    define_method :add_lines_to_top do
+      |lines, dry_run, escape_path, verbose, error, info|
+
       res = false
       begin
         fail "implement me - create file" if ! pathname.exist?
-        fu = self.fu( o )
-        tmpdir_pathname = self.tmpdir_pathname o, fu
+        fu = self.fu escape_path, verbose, info
+        tmpdir_pathname = self.tmpdir_pathname dry_run, fu, error
         break if ! tmpdir_pathname
         tmpold = tmpdir_pathname.join 'issues-prev.md'
         tmpnew = tmpdir_pathname.join 'issues-next.md'
         if tmpnew.exist?
-          fu.rm tmpnew, noop: o.dry_run
+          fu.rm tmpnew, noop: dry_run
         end
         write = -> fh do
-          fh.puts line                         # ~ put the newline at the top ~
+          s = 's' if 1 == lines.length
+          if lines.length.nonzero?
+            if lines.length == 1
+              info[ "new line: #{ lines[0] }" ]
+            else
+              info[ "new lines:" ]
+              many = true
+            end
+          end
+          lines.each do |l|                    # ~ put the newlines at the top ~
+            info[ l ] if many
+            fh.puts l
+          end
           file.normalized_lines.each do |lin|  # #open-filehandle
             fh.puts lin                        # (but tested quite well)
           end
         end
-        if o.dry_run
+        if dry_run
           write[ dev_null ]                    # sneaky
         else
           tmpnew.open( 'w+' ) do |fh|
@@ -94,10 +100,10 @@ module Skylab::Snag
           end
         end
         if tmpold.exist?
-          fu.rm tmpold, noop: o.dry_run
+          fu.rm tmpold, noop: dry_run
         end
-        fu.mv pathname, tmpold, noop: o.dry_run
-        fu.mv tmpnew, pathname, noop: o.dry_run
+        fu.mv pathname, tmpold, noop: dry_run
+        fu.mv tmpnew, pathname, noop: dry_run
         res = true
       end while nil
       res
@@ -114,13 +120,14 @@ module Skylab::Snag
       file
     end
 
-    def fu o                                   # Using a hacky regex, scan
-      rx = Headless::CLI::PathTools::FUN.absolute_path_hack_rx # all messages emitted
+                                               # Using a hacky regex, scan
+    def fu escape_path, verbose, info          # all messages emitted
+      rx = Headless::CLI::PathTools::FUN.absolute_path_hack_rx
       fu = Headless::IO::FU.new( -> str do     # from the file utils client,
         s = str.gsub( rx ) do                  # and run everything that looks
-          o.escape_path[ $~[0] ]               # like an absolute path thru
+          escape_path[ $~[0] ]                 # like an absolute path thru
         end                                    # the `escape_path` implemen.
-        o.info[ s ] if o.verbose               # *of the modality client*
+        info[ s ] if verbose                   # *of the modality client*
       end )                                    # In turn, emit this messages
       fu                                       # as info to the same client.
     end
@@ -135,55 +142,19 @@ module Skylab::Snag
       greatest
     end
 
-
-    valid_date_rx = %r{ \A \d{4} - \d{2} - \d{2} \z }x
-
-    define_method :normalize_date do |o|
-      res = false
-      begin
-        if valid_date_rx !~ o[:date]
-          o.error and error[ "invalid date: #{ o[:date].inspect }" ]
-          break
-        end
-        res = true
-      end while nil
-      res
-    end
-
-
-    blank_rx = /\A[[:space:]]*\z/
-    nl_rx = /\n/
-    xnl_rx = /\\n/
-
-    define_method :normalize_message do |o|
-      res = false
-      begin
-        msg = o[:message].to_s
-        err = o[:error] ? o[:error] : -> s { }
-        break( err[ "message was blank." ] ) if blank_rx =~ msg
-        break( err[ "message cannot contain newlines." ] ) if nl_rx =~ msg
-        if xnl_rx =~ msg
-          err[ "message cannot contain (escaped or unescaped) newlines." ]
-          break
-        end
-        res = true
-      end while nil
-      res
-    end
-
-    def tmpdir_pathname o, fu
+    def tmpdir_pathname dry_run, fu, error
       res = false
       begin
         break( res = @tmpdir_pathname ) if @tmpdir_pathname
         pn = ::Skylab::TMPDIR_PATHNAME.join 'snag-PROD' # heh
         if ! pn.dirname.exist?
-          o.error and o.error[ "won't create more than one directory. #{
+          error and error[ "won't create more than one directory. #{
             }Parent directory of our tmpdir (#{ pn.basename }) must exist: #{
             }#{ escape_path pn.dirname }" ]
           break
         end
         if ! pn.exist?
-          fu.mkdir( pn, noop: o.dry_run )
+          fu.mkdir( pn, noop: dry_run )
         end
         res = @tmpdir_pathname = pn
       end while nil

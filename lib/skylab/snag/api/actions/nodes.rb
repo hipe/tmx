@@ -7,6 +7,7 @@ module Skylab::Snag
 
     inflection.inflect.noun :singular
 
+    attribute :do_prepend_open_tag, default: false
     attribute :dry_run
     attribute :message,          :required => true
     attribute :verbose
@@ -16,7 +17,10 @@ module Skylab::Snag
   protected
 
     def execute
-      nodes.add message: message, dry_run: dry_run, verbose: verbose
+      nodes.add message,
+        do_prepend_open_tag,
+        dry_run,
+        verbose
     end
   end
 

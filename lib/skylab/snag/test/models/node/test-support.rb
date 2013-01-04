@@ -6,4 +6,6 @@ module Skylab::Snag::TestSupport::Models::Node
 
   include CONSTANTS
 
+  extend TestSupport::Quickie
+
 end
