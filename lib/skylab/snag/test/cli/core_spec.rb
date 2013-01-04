@@ -9,7 +9,7 @@ module Skylab::Snag::TestSupport::CLI
 
     extend CLI_TestSupport
 
-    acts = '\{.*add.*show.*numbers.*todo.*\}'
+    acts = '\{.*add.*list.*numbers.*todo.*\}'
     expecting_rx = %r{\AExpecting #{ acts }}i
     invite_rx = %r{\ATry sn0g -h for help\.$}i
     usage_rx = %r{\Ausage: sn0g #{ acts } \[opts\] \[args\]$}

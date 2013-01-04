@@ -30,7 +30,7 @@ module Skylab::TanMan
 
     def bind sexp
       result = nil
-      ks = self.class.attributes.select { |_, h| h[:bound] }.map { |k, _| k }
+      ks = self.class.attributes.each.map { |k, v| k if v[:bound] }.compact
         # look at this awsome use of custom meta-attributes above
       vals = { } # atomic
       ks.each do |k|

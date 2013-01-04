@@ -25,11 +25,15 @@ module Skylab::TestSupport
 
     # experimental example interface
     def mkdir path_end, opts=nil
+      res = nil
       use_opts = { noop: noop, verbose: verbose }
       use_opts.merge!( opts ) if opts
       use_path = join( path_end ).to_s
-      tmpdir_original_mkdir use_path, use_opts
-      nil # result is undefined for now -- we might turn it into etc
+      arr = tmpdir_original_mkdir use_path, use_opts
+      if ::Array === arr and 1 == arr.length
+        res = self.class.new arr.first
+      end
+      res # result is undefined for now -- the above is experimental!
     end
 
     def patch str
@@ -127,6 +131,9 @@ module Skylab::TestSupport
       end
       files.each do |file|
         dest_file = dest_dir = nil
+        if '/' == file.to_s[0]
+          raise ::ArgumentError.new "must be relative - #{ file }"
+        end
         dest_path = join file
         if %r{/\z} =~ dest_path.to_s
           dest_dir = dest_path
@@ -146,6 +153,18 @@ module Skylab::TestSupport
       if single_path
         last_pathname # (we could of course adopt this to do etc)
       end
+    end
+
+    def write local_path, file_contents
+      res = nil
+      pathname = touch_r local_path
+      if pathname
+        pathname.open 'w' do |fh|
+          fh.write file_contents
+        end
+        res = pathname
+      end
+      res
     end
 
   protected

@@ -59,7 +59,7 @@ module Skylab::TanMan::TestSupport
 
       it "with `formal_paramters`, offset data, surface representation too" do
         o = TanMan::Template.new string: template_string
-        a = o.formal_parameters.to_a
+        a = o.formal_parameters.each.to_a
         a.length.should eql(2)
         a.first.surface.should eql('{{ bar_baz }}')
         a.first.normalized_name.should eql(:bar_baz)

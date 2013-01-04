@@ -62,8 +62,8 @@ describe Skylab::Porcelain::Attribute::Definer do
       end
     end
     it "child classes must be able to override metaproperties" do
-      klass_b.attributes[:foo][:fooish].should eql(false)
-      klass_a.attributes[:foo][:fooish].should eql(true)
+      klass_b.attributes.fetch(:foo)[:fooish].should eql(false)
+      klass_a.attributes.fetch(:foo)[:fooish].should eql(true)
     end
   end
   describe "with meta attributes" do
