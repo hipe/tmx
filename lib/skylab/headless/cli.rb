@@ -1,7 +1,7 @@
 module Skylab::Headless
 
   module CLI
-    extend Autoloader
+    extend MetaHell::Autoloader::Autovivifying::Recursive
 
     OPT_RX = /\A-/                # ( yes this is actually used elsewhere :D )
   end
@@ -153,12 +153,12 @@ module Skylab::Headless
     end
 
     def invite_line # we have to avoid assuming we process opts
-      "use #{ kbd "#{ request_runtime.send :normalized_invocation_string }#{
+      "use #{ kbd "#{ request_client.send :normalized_invocation_string }#{
         } -h #{ normalized_local_action_name }" } for help"
     end
 
     def normalized_invocation_string
-      "#{ @request_runtime.send :normalized_invocation_string } #{
+      "#{ request_client.send :normalized_invocation_string } #{
         }#{ normalized_local_action_name }"
     end
 
@@ -199,19 +199,18 @@ module Skylab::Headless
       end
       res
     end
-
-    def parse_opts argv           # mutate `argv` (which is probably also @argv)
-      @leaf ||= nil               # what you do with the data is your business.
+                                  # mutate `argv` (which is probably also @argv)
+    def parse_opts argv           # what you do with the data is your business.
       exit_status = true          # result in true on success, other on failure
       begin
         if argv.empty?            # options are always optional! don't even
           break                   # build option_parser, much less invoke it.
         end
-        if branch?                # If we are a branch, how do we know whether
-          if CLI::OPT_RX !~ argv.first    # to parse the opts?
-            break
-          end
-        end # (might change [#hl-024])
+        if is_branch              # If we are a branch, how do we know whether
+          if CLI::OPT_RX !~ argv.first # to parse a given opt? the solution is
+            break                 # never parse the opts to avoid a can of worms
+          end                     # with ambiguous grammars ([#hl-024]).
+        end
         if ! option_parser        # if you don't have one, which is certainly
           break                   # not strange, then we just leave brittany
         end                       # alone and let downstream deal with argv

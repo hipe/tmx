@@ -1,21 +1,20 @@
 module Skylab::Headless
-  module CLI::Client::DSL
+  module CLI::Box::DSL
 
     #                         ~ never say never ~                          #
 
 
     def self.extended mod # [#sl-111]
-      mod.send :include, CLI::Client::DSL::InstanceMethods
-      mod.extend CLI::Client::DSL::ModuleMethods
+      mod.extend CLI::Box::DSL::ModuleMethods
+      mod.send :include, CLI::Box::DSL::InstanceMethods
       mod._autoloader_init! caller[0]
       mod
     end
   end
 
-
-
-  module CLI::Client::DSL::ModuleMethods
+  module CLI::Box::DSL::ModuleMethods
     include MetaHell::Autoloader::Autovivifying::Recursive::ModuleMethods
+    include CLI::Action::ModuleMethods         # #reach-up!
 
     def action_box_module
       @action_box_module ||= begin
@@ -76,26 +75,27 @@ module Skylab::Headless
 
 
 
-  module CLI::Client::DSL::InstanceMethods
-    include CLI::Client::InstanceMethods       # not all clients are boxen
-    include CLI::Box::InstanceMethods          # not all boxen are clients
+  module CLI::Box::DSL::InstanceMethods
+    include CLI::Box::InstanceMethods
 
 
   protected
 
+    alias_method :cli_box_dsl_original_argument_syntax, :argument_syntax
 
     def argument_syntax           # "hybridization"
       if @normalized_local_action_name
         build_argument_syntax_for @normalized_local_action_name
       else
-        super
+        cli_box_dsl_original_argument_syntax
       end
     end
-
 
     def default_action
       @default_action ||= :dispatch            # compare to box above - terrible
     end
+
+    alias_method :cli_box_dsl_original_dispatch, :dispatch
 
                                   # because we are DSL we override Box's
                                   # straightforward implementation with these
@@ -104,7 +104,7 @@ module Skylab::Headless
       res = nil
       begin
         if ! action
-          break( res = super )                 # (up to ancestor (box))!
+          break( res = cli_box_dsl_original_dispatch ) # (up to ancestor (box))!
         end
         klass = fetch action
         if ! klass
@@ -118,7 +118,7 @@ module Skylab::Headless
                                   # to try to invoke the action method.
         o = klass.new self        # (let "eek" below mark places of sketchy,
         o.param_h ||= { }         # possibly irreversable mutation)
-        @leaf = o.leaf?                                     # eek
+        @is_leaf = o.is_leaf                                # eek
         tail = o.normalized_local_action_name
         @normalized_local_action_name = tail                # meh
         @option_parser = o.option_parser                    # eek
@@ -149,26 +149,28 @@ module Skylab::Headless
       nil
     end
 
-
+    alias_method :cli_box_dsl_original_invite_line, :invite_line
 
     def invite_line               # hybridization hack
       if @normalized_local_action_name
-        "use #{ kbd "#{ cli_client_dsl_original_normalized_invocation_string }#{
+        "use #{ kbd "#{ cli_box_dsl_original_normalized_invocation_string }#{
           } -h #{ @normalized_local_action_name }" } for help"
       else
-        cli_box_invite_line
+        cli_box_dsl_original_invite_line
       end
     end
 
+    def is_branch
+      ! ( @is_leaf ||= nil )
+    end
 
-    alias_method :cli_client_dsl_original_normalized_invocation_string,
+    alias_method :cli_box_dsl_original_normalized_invocation_string,
       :normalized_invocation_string
-
 
     def normalized_invocation_string  # our invocation string is dynamic based
                                   # on whether we have yet mutated or not!
                                   # (and/or rolled back some of the mutation)
-      a = [ super ]
+      a = [ cli_box_dsl_original_normalized_invocation_string ]
       if (@normalized_local_action_name ||= nil)
         a << @normalized_local_action_name
       end

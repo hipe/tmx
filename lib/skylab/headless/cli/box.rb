@@ -1,13 +1,14 @@
 module Skylab::Headless
-
   module CLI::Box
+    extend MetaHell::Autoloader::Autovivifying::Recursive # [#mh-012]
   end
-
 
   module CLI::Box::InstanceMethods
     # Tests for this exist in the frontier product "my-tree".
     # note that for now this module is kept as standalone, until
     # we get a chance to develop with non-client box controllers.
+
+    include CLI::Action::InstanceMethods # makes dsl hacks easier, not nec. here
 
   protected
 
@@ -20,10 +21,6 @@ module Skylab::Headless
         cmd = argv.shift                       # hack for this prettier syntax:/
       end
       enqueue! -> { help cmd }
-    end
-
-    def branch?
-      ! @leaf # hax
     end
 
     def default_action
@@ -148,16 +145,17 @@ module Skylab::Headless
       "use #{ kbd "#{ normalized_invocation_string } -h [<action>]" } for help"
     end
 
-    alias_method :cli_box_invite_line, :invite_line # (for dsl hack)
-
-
-
                                   # (in contrast to above, once the user is
                                   # already looking at the full help screen it
                                   # is redundant to again invite her to the
     def invite_line_about_action  # same screen!)
       "use #{ kbd "#{ normalized_invocation_string } -h <action>"
         } for help on that action"
+    end
+
+
+    def is_branch
+      true
     end
   end
 end

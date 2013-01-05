@@ -3,7 +3,6 @@ module Skylab::Headless
   module Client
   end
 
-
   module Client::InstanceMethods
     include Headless::SubClient::InstanceMethods
 
@@ -43,12 +42,10 @@ module Skylab::Headless
       io_adapter.pen
     end
 
-    def request_runtime # rename at [#005]
+    def request_client
       fail 'sanity - buck stops here' # makes nasty bugs easier to find
     end
-
-    alias_method :request_client, :request_runtime # away at [#005]
-
   end
+
   IGNORE_THIS_CONSTANT = /\A#{to_s}\b/ # #todo
 end

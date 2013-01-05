@@ -1,3 +1,4 @@
+[#012] #open foo/ and foo.rb should be automagic, no declaration of module
 [#011]       #watch services
 [#010] #open pull in DelegatesTo from porcelain!
 [#009] #open when you made plastic you didn't know about define_singleton_method

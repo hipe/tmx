@@ -41,17 +41,17 @@ module Skylab::Headless
 
   protected
 
-    def branch?
-      false
-    end
-
     def desc_lines                # we want this DSL-y module-methods part of
       self.class.desc_lines if self.class.respond_to? :desc_lines # it to be
     end                           # opt-in
 
-    def leaf?                     # (it is important that you leave the impl.
-      ! branch?                   # as such -- the compliment of `branch?` --
-    end                           # for places that redefine `branch?`)
+    def is_branch                 # "box" means branch, but by default we
+      false                       # assume the action is terminal
+    end
+
+    def is_leaf                   # (it is important that you leave the impl.
+      ! is_branch                 # as such -- the compliment of `is_branch` --
+    end                           # for places that redefine `is_branch`
 
     def normalized_action_name
       self.class.normalized_action_name
