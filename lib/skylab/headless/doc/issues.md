@@ -1,3 +1,5 @@
+[#039] #open clean up smell of @foo ||= nil everywhere
+[#038]       #done change hackiness to the concept of `collapse` in DSL
 [#037]       #tracking-tag box classes that build their own option parsers
 [#036]       #behavior-point `par`, `parameter_label` etc -- gather it up
 [#035]       #doc-point : the boxxy cluttered namespace problem (Actions)

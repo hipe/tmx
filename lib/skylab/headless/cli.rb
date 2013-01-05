@@ -19,13 +19,18 @@ module Skylab::Headless
       ( @desc_lines ||= [ ] ).concat [ first, *rest ] # `desc_lines` reader
       nil                                             # defined in core::action
     end
+
+    def option_parser &block      # dsl-ish that just accrues these for you.
+      ( @option_parser_blocks ||= [ ] ).push block # turning it into an o.p.
+      nil                         # is *your* responsibility. depends on what
+    end                           # happens in your `build_option_parser` if any
+
+    attr_reader :option_parser_blocks
   end
 
 
 
   module CLI::Action::InstanceMethods
-    extend MetaHell::Let
-
     include Headless::Action::InstanceMethods
 
     def invoke argv
@@ -77,8 +82,11 @@ module Skylab::Headless
 
   protected
 
-    let :argument_syntax do       # assumes `default_action` for now
-      build_argument_syntax_for default_action
+    def argument_syntax
+      @argument_syntax ||= begin
+                                  # assumes `default_action` for now..
+        build_argument_syntax_for default_action
+      end
     end
 
     attr_reader :argv
@@ -161,9 +169,11 @@ module Skylab::Headless
       "#{ request_client.send :normalized_invocation_string } #{
         }#{ normalized_local_action_name }"
     end
-
-    let :option_parser do
-      self.build_option_parser
+                                  # out of the box we don't decide how to build
+                                  # your option_parser and you have to define
+                                  # this `bop` yourself (DSL however..)
+    def option_parser
+      @option_parser ||= self.build_option_parser
     end
 
     def option_syntax_string
@@ -214,6 +224,7 @@ module Skylab::Headless
         if ! option_parser        # if you don't have one, which is certainly
           break                   # not strange, then we just leave brittany
         end                       # alone and let downstream deal with argv
+
         begin                     # option_parser can be some fancy arbitrary
           option_parser.parse! argv # thing, but it needs to conform to at
         rescue Headless::Services::OptionParser::ParseError => e # least

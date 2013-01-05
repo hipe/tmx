@@ -154,8 +154,8 @@ module Skylab::Headless
     end
 
 
-    def is_branch
-      true
+    def is_leaf                   # a box is always a branch (see `is_branch`)
+      false
     end
   end
 end

@@ -45,13 +45,18 @@ module Skylab::Headless
       self.class.desc_lines if self.class.respond_to? :desc_lines # it to be
     end                           # opt-in
 
-    def is_branch                 # "box" means branch, but by default we
-      false                       # assume the action is terminal
-    end
+    def is_branch                 # brach == non terminal == box. bc it has far
+      ! is_leaf                   # reaching consequences for request processing
+    end                           # awareness of branchiness is baked-in deep.
+                                  # it is recommended that you *not* redefine
+                                  # this anywhere universe-wide, and rather hack
+                                  # `is_leaf` if you need to, for reasons.
+                                  # (it is this way and not the reverse
+                                  # for reasons.)
 
-    def is_leaf                   # (it is important that you leave the impl.
-      ! is_branch                 # as such -- the compliment of `is_branch` --
-    end                           # for places that redefine `is_branch`
+    def is_leaf                   # out of the (heh) "box" we assume we are
+      true                        # a terminal action and not a box action
+    end
 
     def normalized_action_name
       self.class.normalized_action_name

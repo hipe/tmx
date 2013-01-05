@@ -34,13 +34,6 @@ module Skylab::TanMan
         o
       end
     end
-
-    def option_parser &block
-      ( @option_parser_blocks ||= [ ] ).push block
-      nil
-    end
-
-    attr_reader :option_parser_blocks
   end
 
 
