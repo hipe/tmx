@@ -25,7 +25,7 @@ describe "#{ ::Skylab::CovTree } CLI" do
     line.should match( invite_rx )
     stack.should be_empty
     types.should eql([:runtime_issue, :runtime_issue, :ui])
-    result.should eql(false)
+    result.should eql(nil)
   end
 
   it "1.2 : one unrec opt  : expecting / invite" do
@@ -47,16 +47,16 @@ describe "#{ ::Skylab::CovTree } CLI" do
     )
     stack.should be_empty
     types.should eql([:ui, :ui])
-    result.should eql(1) # #wat #todo
+    result.should eql(nil)
   end
 
   it "2.1 : `-h unrec`     : msg invite" do
     args '-h', 'wat'
-    line.should match(/\ANo such action "wat"\.  #{
+    line.should match(/\ANo such action "wat"\. #{
       }Try cov-tree help #{ actions } -h\.\z/)
     stack.should be_empty
     types.should eql([:error])
-    result.should eql(1) # #wat #todo
+    result.should eql(nil)
   end
 
   it "2.2 : `-h rec`       : 1) usage 2) desc 3) opts" do
@@ -73,7 +73,7 @@ describe "#{ ::Skylab::CovTree } CLI" do
       l = line or break
     end
     types.uniq.should eql([:usage, :help])
-    result.should be_kind_of(::Array) # #wat
+    result.should eql(nil)
   end
 
   it "2.3 : `-h rec more`  : msg / usage / invite" do

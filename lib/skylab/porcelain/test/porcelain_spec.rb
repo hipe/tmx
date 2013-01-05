@@ -38,24 +38,24 @@ module Skylab::Porcelain::TestSupport
         end
       end
       it "the class's public instance methods will make up its public interface / api (actions)" do
-        klass.actions.map(&:name).should eql([:help, :foo, :bar])
+        klass.actions.map(&:action_name).should eql([:help, :foo, :bar])
       end
       it "the class can access the action property by name (which is a dashed version of the method name)" do
-        child_class.actions[:'she-bang'].name.should eql(:'she-bang')
+        child_class.actions[:'she-bang'].action_name.should eql(:'she-bang')
       end
       it "although it is an enumerator, the actions knob returns a consistent object per action" do
         oid = child_class.actions[:'she-bang'].object_id
         child_class.actions[:'she-bang'].object_id.should eql(oid)
-        child_class.actions.detect{ |a| a.name == :'she-bang' }.object_id.should eql(oid)
+        child_class.actions.detect{ |a| a.action_name == :'she-bang' }.object_id.should eql(oid)
       end
       it "any child class of the class will also have this property and inherit the list of actions from its parent" do
-        child_class.actions.map(&:name).should eql([:help, :foo, :bar, :'she-bang'])
+        child_class.actions.map(&:action_name).should eql([:help, :foo, :bar, :'she-bang'])
       end
       context "a simple ancestor chain of 'parent' module and child class" do
         let(:parent)    {         Module.new.module_eval         { extend Porcelain ; def act_m ; end ; self } }
         let(:child)     { o=self ; Class.new.class_eval          { extend Porcelain ; def act_c ; end ; include o.parent ; self } }
         it "child gets parent actions, order is respected (but it's a smell to depend on this)" do
-          child.actions.map(&:name).should eql([:help, :'act-c', :'act-m'])
+          child.actions.map(&:action_name).should eql([:help, :'act-c', :'act-m'])
         end
       end
       describe "all modules in the ancestor chain" do
@@ -68,7 +68,7 @@ module Skylab::Porcelain::TestSupport
         it "get their actions inherited, in a particular order: officious, parent class, [..], my actions, modules included after" do
           ('a'..'f').map { |l| "#{(respond_to?("module_#{l}") ? :module : :class)}_#{l}" }.
                      each { |n| send(n).singleton_class.send(:define_method, :to_s) { n } }
-          class_f.actions.map{ |a| a.name.to_s }.should eql(%w(help act-e act-b act-a act-c act-f act-d))
+          class_f.actions.map{ |a| a.action_name.to_s }.should eql(%w(help act-e act-b act-a act-c act-f act-d))
         end
       end
     end
@@ -522,19 +522,19 @@ module Skylab::Porcelain::TestSupport
       end
       context "(sanity check regression)" do
         it "namespace class action names look ok" do
-          klass_for_namespace.actions.map(&:name).should eql([:help, :tingle])
+          klass_for_namespace.actions.map(&:action_name).should eql([:help, :tingle])
         end
         it "class with inline namespace action names look ok" do
-          klass_with_inline_namespace.actions.map(&:name).should eql([:help, :more, :duckle])
+          klass_with_inline_namespace.actions.map(&:action_name).should eql([:help, :more, :duckle])
         end
         it "class with external namespace action names look ok" do
-          klass_with_external_namespace.actions.map(&:name).should eql([:help, :more, :duckle])
+          klass_with_external_namespace.actions.map(&:action_name).should eql([:help, :more, :duckle])
         end
       end
       context "(class with inline namespace regression)" do
         it "does" do
           ns = klass_with_inline_namespace.actions[:more]
-          ns.actions_provider.actions.map(&:name).should(
+          ns.actions_provider.actions.map(&:action_name).should(
             eql([:help, :tingle])
           )
         end

@@ -91,7 +91,7 @@ module Skylab::Porcelain
     end
     alias_method :default, :default= # !
     def default_summary_lines
-      a = client_module.actions.map { |o| Styles::e13b o.name }
+      a = client_module.actions.map { |o| Styles::e13b o.action_name }
       ["child command#{'s' if a.length != 1}: {#{a * '|'}}"]
     end
     def emits(*a)
@@ -210,9 +210,9 @@ module Skylab::Porcelain
       @hash[k].kind_of?(Symbol) ? @hash[@hash[k]] : @hash[k]
     end
     def cache action
-      @hash.key?(action.name) or @order.push action.name
-      @hash[action.method_name] = action.name
-      @hash[action.name] = action
+      @hash.key?(action.action_name) or @order.push action.action_name
+      @hash[action.method_name] = action.action_name
+      @hash[action.action_name] = action
     end
     def each &block
       @order.each { |k| block.call(@hash[k]) }
@@ -228,8 +228,8 @@ module Skylab::Porcelain
     end
     def merge! actions
       actions.each do |action|
-        if @hash.key?(action.name)
-          @hash[action.name].merge!(action)
+        if @hash.key?(action.action_name)
+          @hash[action.action_name].merge!(action)
         else
           cache action.duplicate
         end
@@ -256,7 +256,7 @@ module Skylab::Porcelain
     end
     def [] sym
       @cache.key?(sym) and return @cache[sym]
-      detect { |a| a.name == sym }
+      detect { |a| a.action_name == sym }
     end
     def visible
       me = self
@@ -297,7 +297,7 @@ module Skylab::Porcelain
   ParseSubs     = Subscriptions.new(:push, :syntax)
 
   class Action < Struct.new(:aliases, :argument_syntax,
-    :argument_syntax_inferred, :description, :method_name, :name, :option_syntax,
+    :argument_syntax_inferred, :description, :method_name, :action_name, :option_syntax,
     :unbound_method, :visible
   )
     extend Structuralist
@@ -353,12 +353,12 @@ module Skylab::Porcelain
       # @todo we just totally ignore the very idea of this for now
     end
     def method_name= sym
-      self.name ||= self.class.nameize(sym)
+      self.action_name ||= self.class.nameize(sym)
       super(sym)
     end
     def name_syntax
-      aliases or return name
-      "{#{ [name, *aliases] * '|' }}"
+      aliases or return action_name
+      "{#{ [action_name, *aliases] * '|' }}"
     end
     def namespace?
       false
@@ -603,9 +603,15 @@ module Skylab::Porcelain
     end
     alias_method :initialize, :porcelain_init
     def invoke argv
-      @porcelain.runtime = Runtime.new(argv, self, @porcelain, self.class.porcelain)
-      (client, action, args = @porcelain.runtime.resolve) or return client
-      client.send(action.method_name, *args)
+      res = nil
+      begin
+        @porcelain.runtime =
+          Runtime.new argv, self, @porcelain, self.class.porcelain
+        client, action_struct, args = @porcelain.runtime.resolve
+        client or break( res = client )
+        res = client.send action_struct.method_name, *args
+      end while nil
+      res
     end
     attr_reader :porcelain
     def porcelain_runtime
@@ -644,13 +650,14 @@ module Skylab::Porcelain
       nil
     end
     def issue *msgs
-      action = msgs.shift if msgs.first.respond_to?(:name)
+      action = msgs.shift if msgs.first.respond_to?(:action_name)
       msgs.each { |s| emitter.emit(:runtime_issue, s) }
       invite action
+      nil
     end
     def invite action=nil
       emitter.emit(:ui, action ?
-        "Try #{e13b "#{invocation(0..-2)} #{action.name} -h"} for help." :
+        "Try #{e13b "#{invocation(0..-2)} #{action.action_name} -h"} for help." :
         "Try #{e13b "#{invocation(0..-2)} -h"} for help."
       )
       nil
@@ -658,59 +665,89 @@ module Skylab::Porcelain
     alias_method :no_command, :argv_empty # for now!
     def on_help_switch
       argv[0] = 'help' # might bite one day
+      true # stay
     end
     def render_actions
       actions_provider or return above.render_actions # sorry
-      "{#{actions_provider.actions.visible.map{ |a| e13b(a.name) }.join('|')}}"
+      "{#{actions_provider.actions.visible.map{ |a| e13b(a.action_name) }.join('|')}}"
     end
     def render_usage action
       "#{header 'usage:'} #{e13b "#{invocation(0..-2)} #{action.syntax}"}"
     end
+
     # @return [invoker, method, args] or false/nil
+    # (this is a bunch of legacy spaghetti, some of which i had to derp with)
     def resolve
-      actions_provider or return above.resolve # sorry
-      self.defaulted = false
-      wtf = nil
-      loop do
-        argv.empty? and (b = argv_empty or return b)
-        Officious::Help::SWITCHES.include?(argv.first) and (on_help_switch or return)
-        /^-/ =~ argv.first and (b = no_command or return b)
-        resolve_action or return false
-        wtf = catch(:option_action) do
-          action.parse(argv) do |o|
-            o.on_syntax { |e| emitter.emit(:syntax, e) }
-            o.on_push do |frame, _| # insane sh*t happening here
+      res = nil
+      begin
+        actions_provider or break( res = above.resolve )
+        self.defaulted = false
+        if argv.empty?
+          r = argv_empty or break( res = r )
+        end
+        if Officious::Help::SWITCHES.include? argv.first
+          r = on_help_switch or break( res = r )
+        end
+        if '-' == argv.first[0]
+          r = no_command or break( res = r )
+        end
+        r = resolve_action or break( res = r )
+        stay = true
+        wtf = catch :option_action do
+          action.parse argv do |o|
+            o.on_syntax do |e|
+              emitter.emit :syntax, e
+            end
+            o.on_push do |frame, _|
               frame.argv = argv
               frame.emitter = emitter
-              frame.fuzzy_match.nil? and frame.fuzzy_match = fuzzy_match
+              if frame.fuzzy_match.nil?
+                frame.fuzzy_match = fuzzy_match
+              end
               self.above = frame
               self.argv = nil
-              return frame.resolve # ! crazy crazy move
+              res = frame.resolve
+              stay = false
             end
           end
         end
-        break
-      end
-      case wtf
-      when Proc       ; [wtf, Action.new(:method_name => :call), [self, self.action]] # option actions
-      when NilClass   ; nil # silent!?
-      when FalseClass ; issue action, render_usage( action )
-                      ; nil # silent. (we invited above.)
-      when Array      ; [client_instance, action, wtf]
-      else            ; fail("wtf: #{wtf}")
-      end
+        stay or break
+        if wtf
+          case wtf
+          when ::Array
+            res = [ client_instance, action, wtf ]
+          when ::Proc
+            res = [ wtf, Action.new(method_name: :call), [ self, self.action ] ]
+          else
+            fail "wtf: #{ wtf }"
+          end
+        elsif false == wtf
+          issue action, render_usage( action )
+        end
+      end while nil
+      res
     end
+
     def resolve_action
+      res = nil
       self.action = nil
       sym = (self.invocation_slug = str = (argv.shift or fail('no'))).intern
-      if exact = actions_provider.actions.detect { |a| sym == a.name or a.aliases && a.aliases.include?(str) }
-        self.action = exact
-        true
+      exact = actions_provider.actions.detect do |a|
+        if sym == a.action_name
+          b = true
+        elsif a.aliases
+          b = a.aliases.include? str
+        end
+        b
+      end
+      if exact
+        action_resolved exact
+        res = true
       elsif fuzzy_match?
         rx = /\A#{ ::Regexp.escape invocation_slug }/
         found = actions_provider.actions.select do |a|
           yes = nil
-          if rx =~ a.name.to_s
+          if rx =~ a.action_name.to_s
             yes = true
           elsif a.aliases
             yes = a.aliases.index { |s| rx =~ s }
@@ -719,19 +756,31 @@ module Skylab::Porcelain
         end
         case found.length
         when 0
-          action_invalid
+          res = action_invalid
         when 1
-          self.action = found.first
-          true
+          action_resolved found.first
+          res = true
         else
           issue("Ambiguous action #{e13b invocation_slug}. "<<
-                  "Did you mean #{found.map{ |a| e13b(a.name) }.join(' or ')}?")
+                  "Did you mean #{found.map{ |a| e13b(a.action_name) }.join(' or ')}?")
           self.action = found # be careful you idiot
-          nil
+          res = nil
         end
       else
-        action_invalid
+        res = action_invalid
       end
+      res
+    end
+  protected
+    def action_resolved x
+      if x.respond_to?(:request_client) && ! x.request_client
+        # then it is a help emissary.  this is a future-compat hack.
+        x.request_client = self
+        self.action = x
+      else
+        self.action = x
+      end
+      nil
     end
   end
 
@@ -834,39 +883,87 @@ module Skylab::Porcelain
     argument_syntax '[<action>]'
     action { visible false }
     def help action=nil
-      Plumbing.new(help_frame, action).invoke
+      help_frame or raise 'need frame.'
+      subclient = Plumbing.new help_frame, action
+      subclient.invoke
     end
   end
-  class Officious::Help::Plumbing < Struct.new(:frame, :action)
+
+  class Officious::Help::Plumbing < ::Struct.new :frame, :action_ref
     include Styles
-    %w(actions emit invocation render_actions).each do |method| # delegates
-      define_method(method) { |*a, &b| frame.send(method, *a, &b) }
+
+    def actions
+      frame.actions
     end
+
+    def emit name, *payload
+      frame.emit name, *payload
+    end
+
+    # had to rescue this. didn't want to
     def help_action
-      o = action
-      if String === o
-        '-h' == o and o = 'help'
-        o = actions[o.intern]
-      end
-      o or return emit(:error, "No such action #{e13b "\"#{action}\""}.  " <<
-        "Try #{e13b invocation} #{render_actions} #{e13b "-h"}.")
-      emit(:usage, frame.render_usage(o))
-      o.help do |x|
-        x.on_header { |name, content| emit(:help, "#{header("#{name}:")}#{ " #{content}" if content}") }
-        x.on_two_col { |a, b| emit(:help, "#{e13b a}#{b}") }
-        x.on_default { |line| emit(:help, line) }
-      end
+      res = nil
+      begin
+        action_ref = self.action_ref
+        if ::String === action_ref
+          action_ref = 'help' if '-h' == action_ref
+          action_struct = actions[ action_ref.intern ]
+        else
+          action_struct = action_ref
+        end
+        if ! action_struct
+          emit :error, "No such action #{ e13b "\"#{ action_ref }\"" }. #{
+          }Try #{ e13b invocation } #{ render_actions } #{ e13b '-h' }."
+          break
+        end
+        s = frame.render_usage action_struct
+        emit :usage, s
+        action_struct.help do |o|
+          o.on_header do |name, content|
+            emit :help, "#{ header "#{ name }:" }#{ " #{ content }" if content}"
+          end
+          o.on_two_col do |a, b|
+            emit :help, "#{ e13b a }#{ b }"
+          end
+          o.on_default do |line|
+            emit :help, line
+          end
+        end
+      end while nil
+      res
     end
+
+    def invocation *x
+      frame.invocation(* x)
+    end
+
     def invoke
-      action and return help_action
-      emit(:ui, "#{header 'usage:'} #{invocation(0..-2)} #{render_actions} [opts] [args]")
-      emit(:ui, "For help on a particular subcommand, try #{e13b "#{invocation(0..-2)} <subcommand> -h"}.")
+      if action_ref
+        help_action
+      else
+        emit :ui, "#{ header 'usage:' } #{ invocation( 0 .. -2 ) } #{
+        }#{ render_actions } [opts] [args]"
+        emit :ui, "For help on a particular subcommand, try #{
+        }#{ e13b "#{ invocation(0..-2) } <subcommand> -h" }."
+      end
+      nil
+    end
+
+    def render_actions
+      frame.render_actions
+    end
+
+  protected
+
+    def initialize frame, action_ref
+      frame or raise ::ArgumentError.new "need frame."
+      super
     end
   end
 
   class << ::Skylab::Porcelain
   end
-  class NamespaceOptionSyntax
+  class NamespaceOptionSyntax < OptionSyntax
     def initialize ns_action
       @ns_action = ns_action
     end
@@ -924,36 +1021,49 @@ module Skylab::Porcelain
       singleton_class.class_eval(&@block)
       @block = nil
     end
-    def initialize name, *params, &block
-      mod = params.shift if Module === params.first
-      case params.size
-      when 0 ; params = { module: mod }
-      when 1 ; params = params.first
-             ; params[:module] = mod
-      else   ; raise ArgumentError.new("expected params: [module] [opts]")
-      end
-      params[:name] = name
-      # params[:method_name] ||= :invoke
-      params[:option_syntax] ||= NamespaceOptionSyntax.new(self)
-      params[:argument_syntax] ||= NamespaceArgumentSyntax.new(self)
-      mod = params.delete(:module) # !
-      mod && block and raise ArgumentError("can't have namespace defined in both block and module.")
-      if mod
-        @mode = :external
-        @block = nil
-        @external_module = mod
+
+                                  # (legacy spaghetti - make this work for tons
+                                  # of different generations of other nerks)
+    resolve_initialization_parameters = -> name, params, block do
+      if ::Hash === params.first
+        param_h = params.shift
+        param_h[:action_name] = name
+        external_module = param_h.delete :module # if any
+      elsif ::Module === params.first
+        external_module = params.shift
+        param_h = { action_name: name }
+      elsif name.respond_to? :call
+        external_module = name.call
+        param_h = { action_name: external_module.normalized_action_name.last }
       else
-        @mode = :inline
-        @block = block # nil ok
-        @external_module = nil
+        param_h = { action_name: name }
       end
-      super(params, & nil) # explicitly avoid bubbling up the block
-      case @mode
-      when :external
-        if mod.respond_to?(:porcelain)
-          mod.porcelain.aliases and aliases(* mod.porcelain.aliases)
+      if params.length.nonzero?
+        raise ::ArgumentError.new "sorry - overloaded method signature fail"
+      end
+      if external_module && block
+        raise ::ArgumentError.new "can't have namespace defined in both #{
+          }block and module"
+      end
+      # param_h[:method_name] ||= :invoke
+      param_h[:option_syntax]   ||= NamespaceOptionSyntax.new   self
+      param_h[:argument_syntax] ||= NamespaceArgumentSyntax.new self
+      [block, external_module, param_h]
+    end
+
+    define_method :initialize do |name, *params, &block|
+      @block, @external_module, param_h =
+        resolve_initialization_parameters[ name, params, block ]
+      name = params = block = nil
+      @mode = @external_module ? :external : :inline
+      super( param_h, & nil ) ; param_h = nil       # do not bubble the block up
+      if :external == @mode
+        if @external_module.respond_to? :porcelain
+          if @external_module.porcelain.aliases
+            aliases(* @external_module.porcelain.aliases)
+          end
         end
-      when :inline
+      else # :inline
         class << self
           # we want all this on the sing. class because this object is not a subclass but an instance
           extend ClientModuleMethods
@@ -965,15 +1075,17 @@ module Skylab::Porcelain
           end
           porcelain.actionable = prev
         end
-      end
-      class << self
-        include Officious::Help
-        include NamespaceAsClientInstanceAdapter # must come after above
+        class << self
+          include Officious::Help
+          include NamespaceAsClientInstanceAdapter # must come after above
+        end
       end
       # porcelain_init
       ::Skylab::Porcelain.namespaces.push self # used for loading hacks
     end
+
     attr_reader :frame
+
     def parse argv
       inflate! if @block
       slug = argv.first
@@ -992,13 +1104,14 @@ module Skylab::Porcelain
       yield(ParseSubs.new).event_listeners[:push].last.call(@frame)
       :never_see
     end
+
     def summary
       case @mode
       when :external
         if @external_module.respond_to?(:porcelain)
           @external_module.porcelain.summary
         else
-          a = @external_module.command_tree.map(&:name) # watch the world burn
+          a = @external_module.command_tree.map(&:action_name) # watch the world burn
           ["child commandz: {#{a.join('|')}}"]
         end
       else              ;  fail("implement me")
