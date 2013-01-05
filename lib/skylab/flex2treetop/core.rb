@@ -357,7 +357,7 @@ module Skylab::Flex2Treetop
         require 'pp'
         ::PP.pp(result.sexp, io_adapter.errstream)
         :showed_sexp
-      elsif result.sexp.translate(request_runtime)
+      elsif result.sexp.translate(request_client)
         :translated
       else
         :translate_failure
@@ -389,7 +389,7 @@ module Skylab::Flex2Treetop
       @file_utils ||= begin
         require 'fileutils'
         extend ::FileUtils
-        @fileutils_output = request_runtime.io_adapter.errstream
+        @fileutils_output = request_client.io_adapter.errstream
         @fileutils_label = "(futils:) "
         singleton_class.send(:public, :rm)
         ->{ self }
@@ -637,22 +637,22 @@ end
 module Skylab::Flex2Treetop
   module RuleWriter
   end
-  class RuleWriter::Rule < ::Struct.new :request_runtime, :rule_name,
+  class RuleWriter::Rule < ::Struct.new :request_client, :rule_name,
                                         :pattern_like
 
-    def builder                   ; request_runtime.builder end
-    def translate_name(*a)        ; request_runtime.translate_name(*a) end
+    def builder                   ; request_client.builder end
+    def translate_name(*a)        ; request_client.translate_name(*a) end
     def write
       builder.rule_declaration(translate_name(rule_name)) do
         builder.write "".indent(builder.level)
-        pattern_like.translate request_runtime
+        pattern_like.translate request_client
         builder.newline
       end
     end
   end
   module RuleWriter::InstanceMethods
-    def write_rule request_runtime
-      yield( build = RuleWriter::Rule.new(request_runtime) )
+    def write_rule request_client
+      yield( build = RuleWriter::Rule.new(request_client) )
       build.write
     end
   end

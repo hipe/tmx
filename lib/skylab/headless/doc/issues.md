@@ -36,7 +36,7 @@
 [#008]       P::C::I_M --> SC::I_M
 [#007]       #done use of Parameter::Set#list, unify with Boxxy interface
 [#006]       #done #tracking-tag errors_count, settle it down eventually (rel. [#sl-116])
-[#005] #open unify concepts let sub-client trump rename parent_runtime par_clien
+[#005]       unify concepts let sub-client trump rename parent_runtime par_clien
 [#004]       #pattern #tracking-tag the sub-client initialize() in modules thing
 [#003]       #done #refactor: use en.rb in sub-client fo
 [#002]       #done 2012-08-29 #refactor : interceptors under one roof

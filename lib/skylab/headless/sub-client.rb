@@ -67,15 +67,7 @@ module Skylab::Headless
       request_client.send :pen
     end
 
-    attr_accessor :request_client # the center of [#005], now correct
-
-    def request_runtime
-      request_client              # (lazy-evaluated alias)
-    end
-
-    def request_runtime= x
-      self.request_client = x     # (idem)
-    end
+    attr_accessor :request_client # (was the center of [#005], now correct)
 
     # --- * ---
 

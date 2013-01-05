@@ -122,7 +122,7 @@ module Skylab::TanMan
     # (this is to get the tests to pass but note we should not in the future
     # assume that the terminal action does not take a meaningful `-h` opt.)
     # #todo
-     "try #{ kbd "#{ request_runtime.send :normalized_invocation_string }#{
+     "try #{ kbd "#{ request_client.send :normalized_invocation_string }#{
         } #{ normalized_local_action_name } -h" } for help"
     end
 

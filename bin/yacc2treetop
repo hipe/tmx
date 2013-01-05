@@ -117,8 +117,8 @@ module Skylab::Yacc2Treetop
 
   module API end
   def API.translate params
-    request_runtime = ExecutionContext.new(nil, params[:infostream] || $stderr)
-    Translator.new(request_runtime).translate(params[:inpath], params[:outpath])
+    request_client = ExecutionContext.new(nil, params[:infostream] || $stderr)
+    Translator.new(request_client).translate(params[:inpath], params[:outpath])
   end
 
   ExecutionContextDefaults = {
