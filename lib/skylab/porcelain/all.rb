@@ -729,9 +729,15 @@ module Skylab::Porcelain
     end
 
     def resolve_action
-      res = nil
-      self.action = nil
-      sym = (self.invocation_slug = str = (argv.shift or fail('no'))).intern
+      res = self.action = nil
+      str = self.invocation_slug = argv.shift or fail 'sanity'
+      sym = invocation_slug.intern
+      if actions_provider.respond_to? :call
+        self.actions_provider = self.actions_provider.call # collapse - load
+        # this can offer considerable savings when compared to other brands
+        # i mean this can allow us to lazy load possibly dozens of files,
+        # possibly using a different framework entirely
+      end
       exact = actions_provider.actions.detect do |a|
         if sym == a.action_name
           b = true
@@ -1024,16 +1030,14 @@ module Skylab::Porcelain
     resolve_initialization_parameters = -> name, params, block do
       if ::Hash === params.first
         param_h = params.shift
-        param_h[:action_name] = name
         external_module = param_h.delete :module # if any
-      elsif ::Module === params.first
-        external_module = params.shift
-        param_h = { action_name: name }
-      elsif name.respond_to? :call
-        external_module = name.call
-        param_h = { action_name: external_module.normalized_action_name.last }
-      else
-        param_h = { action_name: name }
+      elsif
+        param_h = { }
+        if ::Module === params.first
+          external_module = params.shift
+        elsif params.first.respond_to? :call
+          external_module = params.shift
+        end
       end
       if params.length.nonzero?
         raise ::ArgumentError.new "sorry - overloaded method signature fail"
@@ -1042,6 +1046,7 @@ module Skylab::Porcelain
         raise ::ArgumentError.new "can't have namespace defined in both #{
           }block and module"
       end
+      param_h[:action_name] = name
       # param_h[:method_name] ||= :invoke
       param_h[:option_syntax]   ||= NamespaceOptionSyntax.new   self
       param_h[:argument_syntax] ||= NamespaceArgumentSyntax.new self
