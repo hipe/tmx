@@ -104,7 +104,7 @@ module Skylab::MetaHell
     # this is SUPER #experimental OH MY GOD **SO** #experimental
     # More than #experimental, this is just a playful, jaunty little proof-
     # of-concept.
-    define_method :each do
+    define_method :each do |& block|
       e = ::Enumerator.new do |y|    # for now we load them with "brute force"
         if ! (@boxxy_loaded ||= nil) # as opposed to the silly mocks we've
           @boxxy_loaded = true       # used before (we used to simply check if
@@ -117,8 +117,8 @@ module Skylab::MetaHell
           y << const_get( const, false ) # that the above issue doesn't give
         end                          # us non-deterministic sort orders
       end
-      if block_given?
-        e.each { |o| yield o }
+      if block
+        e.each { |x| block[ x ] }
       end
       e
     end

@@ -153,7 +153,7 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
         seen = [ ] ; hop = false  # for the noun, we crawl down the entire
         name_pieces.reduce( ::Object ) do |m, x| # const tree and back up again
           m.const_defined?( x, false ) or break
-          y = m.const_get x, false # part-way bc of [#sl-035] - if there is a
+          y = m.const_get x, false # part-way bc of [#hl-035] - if there is a
           seen.push y             # pure box module, (that is, a module whose
           y                       # only purpose is to be a clean namespace
         end                       # to hold only constituent items), then such

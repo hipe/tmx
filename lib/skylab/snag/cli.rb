@@ -1,5 +1,6 @@
 module Skylab::Snag
   class CLI
+    extend MetaHell::Autoloader::Autovivifying::Recursive # used below
     include Headless::NLP::EN::Methods
 
   protected                       # (DSL happens at bottom half)
@@ -85,7 +86,7 @@ module Skylab::Snag
 
     # --*--
 
-    extend Porcelain                           # entering DSL zone below
+    extend Porcelain                           # now entering DSL zone
 
     desc "Add an \"issue\" line to #{ Snag::API.manifest_file_name }" #[#hl-025]
     desc "Lines are added to the top and are sequentially numbered."
@@ -160,6 +161,10 @@ module Skylab::Snag
         verbose: true
       }.merge! param_h )
     end
+
+    # --*--
+
+    namespace -> { CLI::Actions::Node }
 
     # --*--
 

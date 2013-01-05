@@ -773,13 +773,10 @@ module Skylab::Porcelain
     end
   protected
     def action_resolved x
-      if x.respond_to?(:request_client) && ! x.request_client
-        # then it is a help emissary.  this is a future-compat hack.
-        x.request_client = self
-        self.action = x
-      else
-        self.action = x
-      end
+      if x.respond_to? :collapse_action # then it might be a help emissary or
+        x = x.collapse_action self      # a class from the future. this is a
+      end                               # a forward-fitting future compat hack
+      self.action = x
       nil
     end
   end
