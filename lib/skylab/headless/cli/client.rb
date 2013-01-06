@@ -62,8 +62,10 @@ module Skylab::Headless
       CLI::Pen::Minimal
     end
 
+    attr_reader :program_name ; alias_method :program_name_ivar, :program_name
+
     def program_name
-      (@program_name ||= nil) or ::File.basename $PROGRAM_NAME
+      program_name_ivar or ::File.basename $PROGRAM_NAME
     end
 
     attr_writer :program_name

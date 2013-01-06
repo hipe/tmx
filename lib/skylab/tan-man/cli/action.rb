@@ -63,13 +63,11 @@ module Skylab::TanMan
     ANCHOR_MODULE = CLI::Actions  # We state what our "root" box module is for
                                   # reflection (e.g. to get normalized name)
 
-    def self.desc *a              # compare to [#hl-033]
-      if a.empty? # (awful compat for bleeding, don't float this up)
-        if ( @desc_lines ||= nil )
-          @desc_lines
-        else
-          [ ].freeze
-        end
+    empty_array = [ ].freeze
+
+    define_singleton_method :desc do |*a| # compare to [#hl-033]
+      if a.length.zero?  # (awful compat for bleeding, don't float this up)
+        desc_lines or empty_array
       else
         super(* a )               # up to headless
       end

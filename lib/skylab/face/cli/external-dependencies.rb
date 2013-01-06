@@ -7,12 +7,15 @@ module Skylab::Face
   module ExternalDependencies
 
     module DefinerMethods
+      attr_reader :external_dependencies
+      alias_method :external_dependencies_ivar, :external_dependencies
       def external_dependencies *a, &b
-        @external_dependencies ||= nil
-        (a.empty? && b.nil?) and return @external_dependencies
-        if @external_dependencies.nil?
-          self.class_eval(&Skylab::Dependency::Interface::CliCommands)
-          @external_dependencies = nil # @todo in #099 Skylab::Dependency::Primordial.new
+        if a.length.nonzero? && ! bo
+          external_depedencies_ivar
+        elsif external_dependencies_ivar.nil?
+          self.class_eval(& Skylab::Dependency::Interface::CliCommands)
+          @external_dependencies = nil
+          # @todo in #099 Skylab::Dependency::Primordial.new
         end
         # @external_dependencies.merge_in!(*a, &b) # @todo in #099
         nil

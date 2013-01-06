@@ -1,12 +1,8 @@
 module Skylab::FileMetrics
   class Models::Table
-    def initialize rows
-      @sep = '  '
-      @rows = rows
-    end
     def render out
       CLI::Lipstick.initscr
-      (@maxes ||= nil) or @maxes = build_maxes
+      @maxes = build_maxes if ! @maxes
       _cels = []
       @rows.each do |row|
         _cels.clear
@@ -22,6 +18,11 @@ module Skylab::FileMetrics
     end
     attr_accessor :sep
   protected
+    def initialize rows
+      @maxes = nil
+      @rows = rows
+      @sep = '  '
+    end
     def build_maxes
       maxes = []
       @rows.each do |row|

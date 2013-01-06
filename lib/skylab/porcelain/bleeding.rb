@@ -192,14 +192,23 @@ module Skylab::Porcelain::Bleeding
       o
     end
 
+    attr_reader :desc ; alias_method :desc_ivar, :desc
+
     def desc *a
-      instance_exec(*a, &(redef = ->(*aa) do
-        _desc = aa.flatten ; singleton_class.send(:undef_method, :desc) # so no warnings
-        singleton_class.send(:define_method, :desc) do |*aaa|
-          (aaa.any? or ((@desc ||= nil).nil? and true == (@desc = true))) ? instance_exec(* (_desc + aaa), &redef) : _desc
+      redef = ->( *aa  ) do
+        _desc = aa.flatten
+        singleton_class.send :undef_method, :desc # so no warnings
+        define_singleton_method :desc do |*aaa|
+          if aaa.length.nonzero? or desc_ivar.nil?
+            @desc = true
+            instance_exec( *( _desc + aaa ), &redef )
+          else
+            _desc
+          end
         end
-        self.desc
-      end))
+        desc
+      end
+      instance_exec( *a, &redef )
     end
 
     def option_syntax &defn
@@ -636,9 +645,17 @@ module Skylab::Porcelain::Bleeding
     end
 
     def program_name
-      (@program_name ||= nil) || File.basename($PROGRAM_NAME)
+      @program_name || ::File.basename( $PROGRAM_NAME )
     end
+
     attr_writer :program_name
+
+  protected
+
+    def initialize *a
+      @program_name = nil
+      super
+    end
   end
 
 

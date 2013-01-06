@@ -50,11 +50,11 @@ module ::Skylab::CodeMolester
 
   class << Sexp
 
-    def [] *a                     # builds the sexp either with the registered
-      @factory ||= nil            # factory or as a generic sexp based on if
-      k = if @factory and a.any?  # a factory with that name was registered!
-        @factory[a.first]         # uses self as a default here (see below)
-      else
+                                  # builds the sexp either with the registered
+    def [] *a                     # factory or as a generic sexp based on if
+      k = if factory_ivar and a.length.nonzero?  # a factory with that name was
+        @factory[a.first]         # registered. uses self as a default here
+      else                        # (see below)
         self
       end
       k.new.concat a
@@ -63,6 +63,8 @@ module ::Skylab::CodeMolester
     def []= symbol_name, sexp_klass            # register a factory
       factory[symbol_name] = sexp_klass
     end
+
+    attr_reader :factory ; alias_method :factory_ivar, :factory
 
     def factory
       @factory ||= ::Hash.new self

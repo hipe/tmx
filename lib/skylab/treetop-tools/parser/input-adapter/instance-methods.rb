@@ -9,8 +9,10 @@ module Skylab::TreetopTools
       opts and opts.each { |k, v| send("#{k}=", v) }
     end
     attr_accessor :block
+    attr_reader :entity_noun_stem
+    alias_method :entity_noun_stem_ivar, :entity_noun_stem
     def entity_noun_stem
-      (@entity_noun_stem ||= nil) || default_entity_noun_stem
+      entity_noun_stem_ivar || default_entity_noun_stem
     end
     attr_writer :entity_noun_stem
     attr_accessor :state

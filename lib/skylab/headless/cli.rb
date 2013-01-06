@@ -186,6 +186,8 @@ module Skylab::Headless
       end
     end
 
+    attr_reader :param_queue ; alias_method :param_queue_ivar, :param_queue
+
     def param_queue               # (experimental atomic processing of .e.g
       @param_queue ||= []         # options -- see manifesto and warnings at
     end                           # `process_param_queue!`)
@@ -232,8 +234,8 @@ module Skylab::Headless
           exit_status = exit_status_for :parse_opts_failed
         end
       end while nil
-      @param_queue ||= nil        # #experimental'y get through basic option
-      if true == exit_status && @param_queue # parsing first before you
+                                  # #experimental'y get through basic option
+      if true == exit_status && param_queue_ivar # parsing first before you
         exit_status = process_param_queue! # before you actually validate
       end                         # with your custom setters (if u want)
       exit_status

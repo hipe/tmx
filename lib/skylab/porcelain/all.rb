@@ -457,7 +457,7 @@ module Skylab::Porcelain
       end
     end
     def option_parser_parse! argv
-      if (@option_parser ||= nil)
+      if @option_parser
         if @rebuild
           @option_parser = nil
         else
@@ -487,6 +487,11 @@ module Skylab::Porcelain
       option_parser.instance_variable_get('@stack')[2].list.select{ |s| s.kind_of?(::OptionParser::Switch) }.map do |switch| # ick
         "[#{[(switch.short.first || switch.long.first), switch.arg].compact.join('')}]"
       end.join(' ')
+    end
+  protected
+    def initialize *a
+      super
+      @option_parser = nil
     end
   end
   # @todo see if we can get this whole class to go away in lieu of the improved reflection of ruby 1.9
@@ -850,10 +855,10 @@ module Skylab::Porcelain
       :syntax        => :info,
       :runtime_issue => :error
     })
-    alias_method :orig_event_class, :event_class
+    alias_method :porcelain_original_event_class, :event_class # compat pub sub
     attr_writer :event_class
     def event_class
-      (@event_class ||= nil) or orig_event_class
+      @event_class or porcelain_original_event_class
     end
     %w(invocation render_actions resolve).each do |m| # @delegates @todo:#100.200.1
       define_method(m) { |*a, &b| stack.send(m, *a, &b) }
@@ -862,16 +867,21 @@ module Skylab::Porcelain
       module_defn.runtime.definition_blocks.each { |b| singleton_class.module_eval(&b) }
       module_defn.runtime_instance_settings.each { |b| instance_eval(&b) }
       (b = instance_defn.runtime_instance_settings) and b.call(self)
+      @event_class = nil
       @invocation_slug ||= File.basename($PROGRAM_NAME)
-      frame = CallFrame.new(:invocation_slug => @invocation_slug)
-      frame.above = CallFrame.new(
-        :actions_provider => client_instance.class, :argv => argv,
-        :client_instance  => client_instance,       :emitter => self,
-        :fuzzy_match      => true
-      ).tap do |f|
-        module_defn.frame_settings.each { |bb| f.instance_eval(&bb) }
-      end
-      self.stack = frame
+      self.stack = -> do
+        frame = CallFrame.new invocation_slug: @invocation_slug
+        frame.above = -> do
+          fr = CallFrame.new actions_provider: client_instance.class,
+                                         argv: argv,
+                              client_instance: client_instance,
+                                      emitter: self,
+                                  fuzzy_match: true
+          module_defn.frame_settings.each { |bb| fr.instance_eval(& bb ) }
+          fr
+        end.call
+        frame
+      end.call
     end
     attr_writer :invocation_slug
   end
@@ -1003,7 +1013,7 @@ module Skylab::Porcelain
     def get_ns_client slug
       case @mode
       when :inline
-        (@porcelain ||= nil) or porcelain_init # i want it all to go away
+        @porcelain or porcelain_init # i want it all to go away
         @porcelain.runtime = @frame.emitter
         self
       when :external
@@ -1058,6 +1068,7 @@ module Skylab::Porcelain
         resolve_initialization_parameters[ name, params, block ]
       name = params = block = nil
       @mode = @external_module ? :external : :inline
+      @porcelain = nil
       super( param_h, & nil ) ; param_h = nil       # do not bubble the block up
       if :external == @mode
         if @external_module.respond_to? :porcelain

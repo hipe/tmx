@@ -81,20 +81,21 @@ module Skylab::Flex2Treetop::MyTestSupport
       frame[:err].call
     end
     def frame
-      @frame ||= nil and return @frame
-      ioa = io_adapter_spy
-      do_debug and ioa.debug!
-      cli_client.send :io_adapter=, ioa
-      result = cli_client.invoke argv
-      memoize = -> lamb do
-        memo = -> {  v = lamb.call ; ( memo = ->{ v } ).call  }
-        -> { memo.call }
+      @frame ||= begin
+        ioa = io_adapter_spy
+        do_debug and ioa.debug!
+        cli_client.send :io_adapter=, ioa
+        result = cli_client.invoke argv
+        memoize = -> lamb do
+          memo = -> {  v = lamb.call ; ( memo = ->{ v } ).call  }
+          -> { memo.call }
+        end
+        {
+          err: memoize[->{ _split(:errstream) }],
+          out: memoize[->{ _split(:outstream) }],
+          result: result
+        }
       end
-      @frame = {
-        err: memoize[->{ _split(:errstream) }],
-        out: memoize[->{ _split(:outstream) }],
-        result: result
-      }
     end
     def io_adapter_spy #  away at [#005]
       @spy ||= begin

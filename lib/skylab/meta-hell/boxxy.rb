@@ -51,6 +51,8 @@ module Skylab::MetaHell
       _autoloader_init! caller_str
     end
 
+    attr_reader :boxxy_loaded
+
     invalid_ = -> name, f do
       f ||= -> e { raise e }
       o = Boxxy::InvalidNameError.new "wrong constant name #{ name }", name
@@ -106,7 +108,7 @@ module Skylab::MetaHell
     # of-concept.
     define_method :each do |& block|
       e = ::Enumerator.new do |y|    # for now we load them with "brute force"
-        if ! (@boxxy_loaded ||= nil) # as opposed to the silly mocks we've
+        if ! boxxy_loaded            # as opposed to the silly mocks we've
           @boxxy_loaded = true       # used before (we used to simply check if
           ::Dir.glob( "#{dir_pathname}/*.rb" ).each do |path| # it was
             const = constantize[ ::Pathname.new( path ).basename.sub_ext('') ]

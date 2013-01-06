@@ -24,9 +24,7 @@ module Skylab::Headless
   module Action::ModuleMethods
     extend MetaHell::Let          # we memoize things in the class object
 
-    def desc_lines
-      @desc_lines ||= nil
-    end
+    attr_reader :desc_lines
 
     let :normalized_action_name, & Action::FUN.build_normalized_name
 

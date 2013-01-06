@@ -55,12 +55,15 @@ module Skylab::TanMan
 
   protected
 
+    attr_reader :invalid_reasons
+    alias_method :invalid_reasons_ivar, :invalid_reasons
+
     def invalid_reasons
       @invalid_reasons ||= [ ]
     end
 
     def invalid_reasons_count
-      (@invalid_reasons ||= nil) ? @invalid_reasons.length : 0
+      invalid_reasons_ivar ? invalid_reasons.length : 0
     end
 
     def update_attributes! param_h            # "atomic"

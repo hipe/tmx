@@ -1,16 +1,11 @@
 module Skylab::FileMetrics
   class Models::Count
-    def initialize name=nil, count=nil, fields=nil
-      name and set_field(:name, name)
-      count and set_field(:count, count)
-      fields and fields.each { |k,v| set_field(k, v) }
-    end
     attr_reader   :children # might be nil
     attr_writer   :total # only use this carefully!
 
     # children
     def children?
-      (@children ||= nil) and @children.any?
+      @children and @children.length.nonzero?
     end
     def add_child child
       @children ||= []
@@ -79,10 +74,10 @@ module Skylab::FileMetrics
 
     # stats
     def total
-      if (@total ||= nil)
+      if @total
         @total # this should only be used very carefully!
       elsif ! children?
-        (@count ||= nil)
+        @count
       else
         @children.map(&:total).inject(:+)
       end
@@ -100,6 +95,15 @@ module Skylab::FileMetrics
         lines.push fields.map{ |f| "#{f}: #{send(f).inspect}" }.join(' ')
       end
       lines
+    end
+
+  protected
+
+    def initialize name=nil, count=nil, fields=nil
+      @count = @total = nil
+      set_field( :name, name ) if name
+      set_field( :count, count ) if count
+      fields.each { |k, v| set_field k, v } if fields
     end
   end
 end

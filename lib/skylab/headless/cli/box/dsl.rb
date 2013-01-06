@@ -29,6 +29,8 @@ module Skylab::Headless
       end
     end
 
+    attr_reader :action_class_in_progress
+
     def action_class_in_progress!
       @action_class_in_progress ||= begin
         klass = ::Class.new
@@ -65,7 +67,7 @@ module Skylab::Headless
     end
 
     def method_added meth
-      if @action_class_in_progress ||= nil
+      if action_class_in_progress
         const = Autoloader::Inflection::FUN.constantize[ meth ]
         action_box_module.const_set const, @action_class_in_progress
         @action_class_in_progress = nil

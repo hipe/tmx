@@ -97,17 +97,28 @@ module Skylab::TestSupport::Quickie
     include CommonMethods
     include ::Skylab::MetaHell::Let::InstanceMethods
 
-    attr_writer :block
-    ORDER = [:include, :exclude]
-    def describe_run_options
-      a = @run_options_desc.sort_by{ |k, _| ORDER.index(k) || ORDER.length }.map do |k, v|
-        "#{k} #{Hash[* v.flatten].inspect}"
+    def self.ivar_or_class prop
+      attr_reader prop
+      ivar_reader = "#{ prop }_ivar"
+      alias_method ivar_reader, prop
+      define_method prop do
+        send ivar_reader or self.class.send prop
       end
+    end
+
+    attr_writer :block
+
+    order = [ :include, :exclude ].freeze
+
+    define_method :describe_run_options do
+      a = @run_options_desc.sort_by do |k, v|
+        order.index( k ) || order.length
+      end
+      a.map! { |k, v| "#{ k } #{ Hash[* v.flatten].inspect }" }
       1 == a.length ? " #{a.first}" : ([''] + a).join("\n  ")
     end
-    def descs
-      (@descs ||= nil) or self.class.descs
-    end
+
+    ivar_or_class :descs
 
     # --*--
 
@@ -136,7 +147,7 @@ module Skylab::TestSupport::Quickie
       @failed.call
     end
     attr_writer :failed
-    def indent ; (@indent ||= nil) or self.class.indent end
+    ivar_or_class :indent
     def initialize p=nil
       p and update_attributes!(p)
     end
@@ -171,13 +182,11 @@ module Skylab::TestSupport::Quickie
     end
     def pass! msg
       # stderr.puts "#{indent}  #{msg}"
-      (@passed ||= nil) and @passed.call
+      passed && passed.call
     end
-    attr_writer :passed
+    attr_accessor :passed
     attr_accessor :pended
-    def stderr
-      (@stderr ||= nil) or self.class.stderr
-    end
+    ivar_or_class :stderr
     def run
       parse_opts(ARGV) or return
       @tag_filter and stderr.puts("Run options:#{describe_run_options}\n\n")
@@ -223,9 +232,7 @@ module Skylab::TestSupport::Quickie
       end
     end
     attr_accessor :tags
-    def tag_filter
-      @tag_filter ||= nil or self.class.tag_filter
-    end
+    ivar_or_class :tag_filter
     attr_writer :tag_filter
   end
 
