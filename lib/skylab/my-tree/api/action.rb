@@ -7,7 +7,7 @@ module Skylab::MyTree
     include Headless::Parameter::Controller::InstanceMethods
     include Headless::CLI::Action::InstanceMethods # look!; sub-client
 
-    ANCHOR_MODULE = API::Actions
+    ACTIONS_ANCHOR_MODULE = API::Actions
 
     def default_action
       :process

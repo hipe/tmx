@@ -13,10 +13,10 @@ module Skylab::TanMan
 
     def normalized_action_name                 # this will have problems
       @normalized_action_name ||= begin        # we simply want to have a box
-        anchor = self::ANCHOR_MODULE.name      # module while at the same time
-        0 == name.index( anchor ) or fail 'sanity'  # not have one
+        anchor = self::ACTIONS_ANCHOR_MODULE.name # module while at the same
+        0 == name.index( anchor ) or fail 'sanity'  # time not have one
         significant = name[ anchor.length + 2 .. -1 ]
-        mod = self::ANCHOR_MODULE
+        mod = self::ACTIONS_ANCHOR_MODULE
         a = significant.split '::'
         o = []
         use = true
@@ -60,8 +60,8 @@ module Skylab::TanMan
     extend CLI::Action::ModuleMethods
     include CLI::Action::InstanceMethods
 
-    ANCHOR_MODULE = CLI::Actions  # We state what our "root" box module is for
-                                  # reflection (e.g. to get normalized name)
+    ACTIONS_ANCHOR_MODULE = CLI::Actions  # We state what our "root" box module
+                                  # is for reflection (e.g. for normalized name)
 
     empty_array = [ ].freeze
 
@@ -258,7 +258,7 @@ module Skylab::TanMan
         verb.unshift 'was'                                       # "was adding"
       end
       if a.length.nonzero?
-        # target_class = self.class::ANCHOR_MODULE.const_fetch( a )
+        # target_class = self.class::ACTIONS_ANCHOR_MODULE.const_fetch( a )
         a.pop # we used many elements in the line above, but we pop only 1 here
         subject.concat a # you could just as soon go object
         a.clear

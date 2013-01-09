@@ -35,7 +35,7 @@ module Skylab::Headless
       @action_class_in_progress ||= begin
         klass = ::Class.new
         klass.extend CLI::Box::DSL::Leaf_ModuleMethods
-        klass.const_set :ANCHOR_MODULE, action_box_module
+        klass.const_set :ACTIONS_ANCHOR_MODULE, action_box_module
         klass.send :include, CLI::Box::DSL::Leaf_InstanceMethods
 
         parent_module = self

@@ -8,12 +8,12 @@ module Skylab::Headless
       Autoloader::Inflection::FUN.pathify[ str ].intern
     end
 
-                                               # this is a bleeding, incomplete
-    o[:build_normalized_name] = -> do          # feature that does something
-      a = name[ self::ANCHOR_MODULE.name.length + 2 .. -1].split '::' # terrible
-      a.map{ |x| normify[ x ] }.freeze         # but is also cheap.
-    end                                        # watch frontier tan-man for
-                                               # updates to this pattern.
+                                  # this is a bleeding, incomplete feature that
+                                  # does something terrible but is also cheap.
+    o[:build_normalized_name] = -> anchor_module, mod do
+      a = mod.name[ anchor_module.name.length + 2 .. -1 ].split '::'
+      a.map{ |x| normify[ x ] }.freeze
+    end
 
     o[:normfiy] = normify
 
@@ -26,7 +26,9 @@ module Skylab::Headless
 
     attr_reader :desc_lines
 
-    let :normalized_action_name, & Action::FUN.build_normalized_name
+    let :normalized_action_name do
+      Action::FUN.build_normalized_name[ self::ACTIONS_ANCHOR_MODULE, self]
+    end
 
     def normalized_local_action_name
       normalized_action_name.last

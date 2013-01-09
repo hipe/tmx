@@ -5,7 +5,7 @@ module Skylab::CovTree
 
     include CLI::Styles
 
-    ANCHOR_MODULE = CovTree::CLI::Actions
+    ACTIONS_ANCHOR_MODULE = CovTree::CLI::Actions
 
   protected
 

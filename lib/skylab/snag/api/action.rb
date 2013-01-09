@@ -16,7 +16,7 @@ module Skylab::Snag
 
     event_class API::MyEvent
 
-    ANCHOR_MODULE = API::Actions
+    ACTIONS_ANCHOR_MODULE = API::Actions
 
     # --*--
 

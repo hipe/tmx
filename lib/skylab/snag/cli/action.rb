@@ -4,7 +4,7 @@ module Skylab::Snag
     extend Headless::CLI::Action::ModuleMethods
     include Headless::CLI::Action::InstanceMethods
 
-    ANCHOR_MODULE = CLI::Actions
+    ACTIONS_ANCHOR_MODULE = CLI::Actions
 
     aliases = [].freeze
     define_singleton_method :aliaes do aliases end #retro- and forward-fit

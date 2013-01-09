@@ -5,7 +5,7 @@ module Skylab::Snag
   class Model::Event < ::Struct
     extend Headless::Model::Event # `normalized_event_name`
 
-    ANCHOR_MODULE = Snag::Models
+    EVENTS_ANCHOR_MODULE = Snag::Models
 
     def self.normalized_event_name
       @nen ||= begin              # (just for fun chop out the `events`
