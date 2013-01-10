@@ -7,6 +7,7 @@ module Skylab::CovTree::TestSupport
 
   module CONSTANTS
     CovTree = ::Skylab::CovTree
+    TestSupport = ::Skylab::TestSupport
   end
 
   module InstanceMethods
@@ -23,9 +24,9 @@ module Skylab::CovTree::TestSupport
     end
 
     def ___build_emit_spy!
-      @types = []
-      @emit_spy = es = ::Skylab::TestSupport::EmitSpy.new
+      @emit_spy = es = TestSupport::EmitSpy.new
       es.debug = -> { self.debug? }
+      @names = []
       es
     end
 
@@ -61,20 +62,19 @@ module Skylab::CovTree::TestSupport
     unstylize = ::Skylab::Headless::CLI::Pen::FUN.unstylize # will change
 
     define_method :line do
-      pair = stack.shift
-      if pair
-        types.push pair.first
-        s = pair.last
-        unstylize[ s ] or s
+      e = emitted.shift
+      if e
+        names.push e.name
+        unstylize[ e.string ] or e.string
       end
     end
 
     attr_reader :result
 
-    attr_reader :types
+    attr_reader :names
 
-    def stack
-      emit_spy.stack
+    def emitted
+      emit_spy.emitted
     end
   end
 end

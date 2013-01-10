@@ -39,10 +39,7 @@ module Skylab::Headless::TestSupport::Parameter
         client.debug = -> { self.debug }
         object = klass.new client
         emit_lines = -> do
-          client.send(:io_adapter).stack.map do |pair|
-            pair.length == 2 or fail('sanity - unexpected payload length')
-            pair.last
-          end
+          client.send( :io_adapter ).emitted.map(& :string )
         end
         { emit_lines: emit_lines, klass: klass, object: object }
       end

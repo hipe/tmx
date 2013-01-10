@@ -13,8 +13,8 @@ describe "#{ ::Skylab::CovTree } CLI" do
     args
     line.should match( expecting_rx_ )
     line.should match( invite_rx )
-    stack.should be_empty
-    types.should eql([:runtime_issue, :ui])
+    emitted.should be_empty
+    names.should eql([:runtime_issue, :ui])
     result.should eql(nil)
   end
 
@@ -23,8 +23,8 @@ describe "#{ ::Skylab::CovTree } CLI" do
     line.should match( /\AInvalid action: borf\z/ )
     line.should match( expecting_rx )
     line.should match( invite_rx )
-    stack.should be_empty
-    types.should eql([:runtime_issue, :runtime_issue, :ui])
+    emitted.should be_empty
+    names.should eql([:runtime_issue, :runtime_issue, :ui])
     result.should eql(nil)
   end
 
@@ -32,8 +32,8 @@ describe "#{ ::Skylab::CovTree } CLI" do
     args '-z'
     line.should match( expecting_rx_ )
     line.should match( invite_rx )
-    stack.should be_empty
-    types.should eql([:runtime_issue, :ui])
+    emitted.should be_empty
+    names.should eql([:runtime_issue, :ui])
     result.should eql(nil)
   end
 
@@ -45,8 +45,8 @@ describe "#{ ::Skylab::CovTree } CLI" do
     line.should match(
       /\AFor help on a particular subcommand, try cov-tree <subcommand> -h\.\z/
     )
-    stack.should be_empty
-    types.should eql([:ui, :ui])
+    emitted.should be_empty
+    names.should eql([:ui, :ui])
     result.should eql(nil)
   end
 
@@ -54,8 +54,8 @@ describe "#{ ::Skylab::CovTree } CLI" do
     args '-h', 'wat'
     line.should match(/\ANo such action "wat"\. #{
       }Try cov-tree help #{ actions } -h\.\z/)
-    stack.should be_empty
-    types.should eql([:error])
+    emitted.should be_empty
+    names.should eql([:error])
     result.should eql(nil)
   end
 
@@ -72,7 +72,7 @@ describe "#{ ::Skylab::CovTree } CLI" do
       l.should match(/\A  /)
       l = line or break
     end
-    types.uniq.should eql([:usage, :help])
+    names.uniq.should eql([:usage, :help])
     result.should eql(nil)
   end
 
@@ -81,8 +81,8 @@ describe "#{ ::Skylab::CovTree } CLI" do
     line.should eql('unexpected argument: "wat"')
     line.should match( /\Ausage: cov-tree help \[<action>\]\z/ )
     line.should match( /\ATry cov-tree help -h for help\.\z/ ) # wat
-    stack.should be_empty
-    types.should eql([:syntax, :runtime_issue, :ui])
+    emitted.should be_empty
+    names.should eql([:syntax, :runtime_issue, :ui])
     result.should eql(nil)
   end
 end

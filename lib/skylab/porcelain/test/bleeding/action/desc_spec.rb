@@ -53,7 +53,7 @@ module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
     Bleeding = Bleeding # #annoying
     Event_Simplified = Event_Simplified # #annoying
     context "(bugfix: be sure that flyweighting doesn't interfere)" do
-      let(:emit_spy) { ::Skylab::TestSupport::EmitSpy.new }
+      let(:emit_spy) { TestSupport::EmitSpy.new }
       klass :CLI, extends: Bleeding::Runtime do
         def initialize rt
           @rt = rt
@@ -73,9 +73,11 @@ module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
         end
       end
       it "it should not have flyweighting fuck this whole thing up", f:true do
-        send(:CLI).new(emit_spy).invoke(['-h'])
-        emit_spy.stack.map(&:message).grep(/^ *ferp\b/).first.should be_include('wing')
-        emit_spy.stack.map(&:message).grep(/^ *derp\b/).first.should be_include('ding')
+        app = self.CLI.new emit_spy
+        app.invoke [ '-h' ]
+        a = emit_spy.emitted.map(& :string )
+        a.grep( /^ *ferp\b/ ).first.should be_include( 'wing' )
+        a.grep( /^ *derp\b/ ).first.should be_include( 'ding' )
       end
     end
   end

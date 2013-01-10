@@ -23,14 +23,12 @@ module Skylab::Porcelain::TestSupport::Bleeding
   end
 
 
-  class My_EmitSpy < ::Skylab::TestSupport::EmitSpy
+  class EmitSpy < TestSupport::EmitSpy
     include CONSTANTS
     include Headless::CLI::Stylize::Methods # unstylize
-    def initialize &b
-      unless block_given?
-        b = ->(k, s) { [k, unstylize(s)].inspect }
-      end
-      super(&b)
+    def initialize &block
+      block ||= -> k, s { [ k, unstylize( s ) ].inspect }
+      super(& block)
     end
     def program_name
       'pergrerm'
@@ -39,7 +37,6 @@ module Skylab::Porcelain::TestSupport::Bleeding
 
   module CONSTANTS
     Event_Simplified = Event_Simplified
-    My_EmitSpy = My_EmitSpy
   end
 
   module ModuleMethods
@@ -62,7 +59,7 @@ module Skylab::Porcelain::TestSupport::Bleeding
         singleton_class.send(:define_method, :meta_hell_anchor_module) { mod }
         @nermsperce = m = modul!(:MyActions, & _namespace_body)
         ns = Bleeding::NamespaceInferred.new(m)
-        rt = My_EmitSpy.new
+        rt = EmitSpy.new
         # ns.build(rt).object_id == ns.object_id or fail("handle this")
         [ns, rt]
       end
@@ -77,7 +74,7 @@ module Skylab::Porcelain::TestSupport::Bleeding
               rt.emit( Event_Simplified.new e.type, unstylize(e.message) )
             end
           end
-          _use = rt.stack
+          _use = rt.emitted
           once = -> { _use }
           _use
         end
@@ -121,7 +118,7 @@ module Skylab::Porcelain::TestSupport::Bleeding
         send accessor # #kick #refactor
         box = send box_const
         ns = Bleeding::NamespaceInferred.new box # #app-refactor
-        what = ns.build My_EmitSpy.new.debug! # #app-refactor
+        what = ns.build EmitSpy.new.debug! # #app-refactor
         action = what.fetch action_token
         once = -> { action }
         action
@@ -150,7 +147,7 @@ module Skylab::Porcelain::TestSupport::Bleeding
       _rt.fetch(action_token)
     end
     def emit_spy
-      @emit_spy ||= My_EmitSpy.new
+      @emit_spy ||= EmitSpy.new
     end
     def namespace
       @nermsperce

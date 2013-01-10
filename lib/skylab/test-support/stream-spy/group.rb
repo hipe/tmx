@@ -50,7 +50,7 @@ module Skylab::TestSupport
                                   # on the string, the line having the result.
     attr_reader :lines
 
-    line_struct = ::Struct.new :name, :string
+    line_struct = ::Struct.new :name, :string # #duplicated at [#ts-007]
 
     define_method :stream_spy_for do |name|
       @streams.fetch name do

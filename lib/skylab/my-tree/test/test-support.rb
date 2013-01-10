@@ -38,7 +38,7 @@ module Skylab::MyTree::TestSupport
         ioa
       end
       response = c.invoke argv
-      @queue = c.send(:io_adapter).stack
+      @queue = c.send( :io_adapter ).emitted
       nil
     end
 
@@ -51,14 +51,13 @@ module Skylab::MyTree::TestSupport
 
     attr_reader :queue
 
-    e = ::Struct.new(:type, :string).new       # flyweight danger stupid
+    e = ::Struct.new( :type, :string ).new       # flyweight danger stupid
 
     define_method :shift do
-      a = @queue.shift
-      if a
-        a.map(& :class) == [::Symbol, ::String] or fail('unexpected structure')
-        e[:type] = a.first
-        e[:string] = Headless::CLI::Pen::FUN.unstylize[ a.last ] || a.last
+      e = @queue.shift
+      if e
+        e[:name] = e.name
+        e[:string] = Headless::CLI::Pen::FUN.unstylize[ e.string ] || e.string
         e
       end
     end
