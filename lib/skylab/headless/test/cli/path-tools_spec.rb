@@ -1,6 +1,5 @@
 require_relative 'test-support'
 
-
 module Skylab::Headless::TestSupport::CLI
 
   describe "#{ Headless::CLI::PathTools }::FUN absolute_path_hack_rx" do

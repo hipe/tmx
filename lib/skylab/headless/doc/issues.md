@@ -1,3 +1,5 @@
+[#042] #open spec for cli box dsl
+[#040]       #doc-point: when using dsl, what methods should become actions?..
 [#039]       #done clean up smell of @foo ||= nil everywhere
 [#038]       #done change hackiness to the concept of `collapse` in DSL
 [#037]       #tracking-tag box classes that build their own option parsers

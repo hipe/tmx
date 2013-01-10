@@ -21,15 +21,12 @@ module Skylab::TestSupport
       @verbose = true             # this compats with the file utils convention
     end
 
-    alias_method :tmpdir_original_mkdir, :mkdir
-
-    # experimental example interface
     def mkdir path_end, opts=nil
       res = nil
       use_opts = { noop: noop, verbose: verbose }
       use_opts.merge!( opts ) if opts
       use_path = join( path_end ).to_s
-      arr = tmpdir_original_mkdir use_path, use_opts
+      arr = ::FileUtils.mkdir use_path, use_opts
       if ::Array === arr and 1 == arr.length
         res = self.class.new arr.first
       end
@@ -76,7 +73,7 @@ module Skylab::TestSupport
         if ::Dir[join '*'].any?   # are there any files in it?
           verbose and fu_output_message "rm -rf #{ to_s }"
           remove_entry_secure to_s # GULP
-          result = tmpdir_original_mkdir to_s, noop: noop, verbose: verbose
+          result = ::FileUtils.mkdir @path, noop: noop, verbose: verbose
         else
           verbose and fu_output_message "(already empty: #{ to_s })"
           result = nil

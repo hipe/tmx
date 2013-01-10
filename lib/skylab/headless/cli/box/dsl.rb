@@ -6,14 +6,13 @@ module Skylab::Headless
 
     def self.extended mod # [#sl-111]
       mod.extend CLI::Box::DSL::ModuleMethods
+      mod.last_caller = caller[0]
       mod.send :include, CLI::Box::DSL::InstanceMethods
-      mod._autoloader_init! caller[0]
       mod
     end
   end
 
   module CLI::Box::DSL::ModuleMethods
-    include MetaHell::Autoloader::Autovivifying::Recursive::ModuleMethods
     include CLI::Action::ModuleMethods         # #reach-up!
 
     def action_box_module
@@ -22,8 +21,7 @@ module Skylab::Headless
       else
         mod = ::Module.new
         mod.extend MetaHell::Boxxy::ModuleMethods
-        mod.dir_path = dir_pathname.join( 'actions' ).to_s # do this..
-        mod._autoloader_init! nil                          # before this.
+        mod._boxxy_init_with_no_autoloading!
         mod.send :include, CLI::Box::InstanceMethods
         const_set :Actions, mod
       end
@@ -43,7 +41,7 @@ module Skylab::Headless
                                   # this is some gymnastics: the implementation
                                   # method is not defined in the action class
                                   # but in the semantic container class
-          unbound = parent_module.instance_method normalized_local_action_name
+          unbound = parent_module.instance_method leaf_method_name
           build_argument_syntax unbound.parameters
         end
 
@@ -51,30 +49,36 @@ module Skylab::Headless
       end
     end
 
-    def build_option_parser &blk  # (note this is the *DSL* variant! a setter)
-      kls = action_class_in_progress!
-      if kls.option_parser_blocks
-        raise ::ArgumentError.new "`option_parser` must occur *after* #{
-        }`build_option_parser`"
-      end
-      kls.define_singleton_method( :build_option_parser_f ) { blk } # see call
+    def build_option_parser &block # (This is the DSL block writer.)
+      action_class_in_progress!.build_option_parser(& block)
       nil
     end
 
-    def desc first, *rest                      # [#hl-033]
+    def desc first, *rest         # [#hl-033]
       action_class_in_progress!.desc first, *rest
       nil
     end
 
-    def method_added meth
-      if action_class_in_progress
-        const = Autoloader::Inflection::FUN.constantize[ meth ]
-        action_box_module.const_set const, @action_class_in_progress
-        @action_class_in_progress = nil
-      end
+    def enable_autoloader!
+      fail 'test me!'
+      extend MetaHell::Autoloader::Autovivifying::Recursive::ModuleMethods
+      fail 'sanity' unless @last_caller
+      _autoloader_init! @last_caller
+      @last_caller = nil
+      # mod.dir_path = dir_pathname.join( 'actions' ).to_s # do this..
+      # mod._autoloader_init! nil                          # before this.
     end
 
-    def option_parser &block
+    attr_accessor :last_caller
+
+    def method_added meth         # #doc-point [#hl-040]
+      klass = action_class_in_progress!
+      const = Autoloader::Inflection::FUN.constantize[ meth ]
+      action_box_module.const_set const, @action_class_in_progress
+      @action_class_in_progress = nil
+    end
+
+    def option_parser &block      # (This is the DSL block appender.)
       action_class_in_progress!.option_parser(& block)
       nil
     end
@@ -83,8 +87,12 @@ module Skylab::Headless
   module CLI::Box::DSL::InstanceMethods
     include CLI::Box::InstanceMethods
 
-
   protected
+
+    def initialize request_client
+      super request_client
+      @queue = [ ]                # typically the user does this, not w/ dsl
+    end
 
     alias_method :cli_box_dsl_original_argument_syntax, :argument_syntax
 
@@ -96,7 +104,64 @@ module Skylab::Headless
       end
     end
 
-    attr_reader :collapsed
+    attr_reader :box_dsl_collapsed_to
+
+    alias_method :collapsed, :box_dsl_collapsed_to # it *is* collapsed IFF..
+
+    def build_option_parser       # popular default, [#hl-037]
+      o = create_box_option_parser
+      o.on '-h', '--help [<sub-action>]',
+        'this screen [or sub-action help]' do |v|
+        box_enqueue_help! v
+        true
+      end
+      option_is_visible_in_syntax_string[ o.top.list.last.object_id ] = false
+      o
+    end
+
+    def create_option_parser
+      Headless::Services::OptionParser.new
+    end
+
+    # these two are "hard aliases" and not "soft" ones so if you need to
+    # customize how the o.p is created you have to override them individually.
+
+    alias_method :create_box_option_parser, :create_option_parser
+
+    alias_method :create_leaf_option_parser, :create_option_parser
+
+    # this is the core of this whole dsl hack.
+
+    frame_struct = ::Struct.new :is_leaf, :option_parser
+
+    define_method :collapse! do |action_ref|
+      res = nil
+      begin
+        klass = fetch( action_ref ) or break( res = klass )
+        o = klass.new self
+        leaf_name = o.normalized_local_action_name
+        @box_dsl_collapsed_to = leaf_name
+        x = ( @prev_frame ||= frame_struct.new ) # really ask for it
+        x.is_leaf = true ; @is_leaf = o.is_leaf
+        x.option_parser = option_parser_ivar ; @option_parser = o.option_parser
+        fail 'sanity' if :dispatch != queue.first
+        queue[0] = o.leaf_method_name
+                                  # put the method name of the particular
+                                  # action on the queue -- its placement is
+                                  # sketchy
+        res = true
+      end while nil
+      res
+    end
+
+    def uncollapse! normalized_leaf_name
+      fail 'sanity' if @box_dsl_collapsed_to != normalized_leaf_name
+      o = @prev_frame
+      @is_leaf = o.is_leaf ; o.is_leaf = nil
+      @option_parser = o.option_parser ; o.option_parser = nil
+      @box_dsl_collapsed_to = nil
+      nil
+    end
 
     def default_action
       @default_action ||= :dispatch            # compare to box above
@@ -107,39 +172,17 @@ module Skylab::Headless
                                   # because we are DSL we override Box's
                                   # straightforward implementation with these
                                   # shenanigans (compare!)
-    def dispatch action=nil, *args # `args` (the name) is cosmetic here, careful
                                   # this method is the entrypoint for the
                                   # collection of methods in this file that
                                   # rewrite box i.m's
-
-      res = nil
-      begin
-        if ! action
-          break( res = cli_box_dsl_original_dispatch ) # (up to ancestor (box))!
-        end
-        klass = fetch action
-        if ! klass
-          break( res = klass )
-        end
-                                  # what follows is not suitable for children
-                                  # or anyone: create a dummy action that we
-                                  # use just for reflection but don't ever
-                                  # invoke.  mutate the ever living mercy out
-                                  # of *this* client, basically sacraficing it
-                                  # to try to invoke the action method.
-        o = klass.new self        # (let "eek" below mark places of sketchy,
-        o.param_h ||= { }         # possibly irreversable mutation)
-        tail = o.normalized_local_action_name
-        @box_dsl_collapsed_to = tail
-        @collapsed = true
-        @is_leaf = o.is_leaf             # eek (futurize a bit)
-        @option_parser = o.option_parser # eek
-        @param_h = o.param_h             # eek (must be after o.p above)
-        @queue.clear.push Autoloader::Inflection::FUN.methodize[ tail ]
-                                  # put the method name of the particular
-                                  # action on the queue!
-        res = invoke args
-      end while nil
+                                  # `action` and `args` (the names)
+    def dispatch action=nil, *args # <-- are cosmetic here, careful
+      if action
+        res = collapse! action
+        res &&= invoke args
+      else
+        res = cli_box_dsl_original_dispatch
+      end
       res
     end
 
@@ -196,40 +239,65 @@ module Skylab::Headless
       end
       a.join ' '
     end
+
+    attr_reader :prev_frame
   end
 
   module CLI::Box::DSL::Leaf_ModuleMethods
     include CLI::Action::ModuleMethods         # #reach-up!
-    def build_option_parser_f # popular default, [#hl-037]
-      -> do
-        o = Headless::Services::OptionParser.new
-        o.on '-h', '--help', 'this screen' do
-          enqueue! -> { help cmd }
-        end
-        o
-      end
+
+    def build_option_parser &block # (This is the DSL block writer.)
+      raise ::ArgumentError.new( 'block required.' ) unless block
+      raise ::ArgumentError.new( 'bop must come before op' ) if
+        option_parser_blocks
+      self.build_option_parser_ivar = block
+      nil
     end
+
+    attr_accessor :build_option_parser_ivar
   end
 
   module CLI::Box::DSL::Leaf_InstanceMethods
     include CLI::Action::InstanceMethods # *not* box! this is crazier than we
                                   # want to be just yet. (leaf not branch here.)
 
-                                  # here we see a monumental hack (OMG) to be
-                                  # able to leverage instance methods defined
-                                  # on the CLI client (or sub-client), and have
-                                  # this work both in a documenting and a
-                                  # parsing pass.
+    # This is the DSL so we've gotta provide a `bop` implementation --
+    # there is a delicate, fragile dance that happens below because
+    # we want to be able to leverage instance methods defined in the parent
+    # and have this work both as a documentng and parsing pass.
     def build_option_parser
-      self.param_h ||= { }
-      request_client.param_h = param_h
-      o = request_client.instance_exec(& self.class.build_option_parser_f )
-      if self.class.option_parser_blocks
-        self.class.option_parser_blocks.each do |block|
-          request_client.instance_exec o, &block
+      leaf = self
+      leaf_name = leaf.normalized_local_action_name
+      build_option_parser = leaf.class.build_option_parser_ivar
+      build_option_parser ||= -> do
+        o = create_leaf_option_parser
+        if a = leaf.class.option_parser_blocks
+          a.each do |block|
+            instance_exec o, &block
+          end
         end
+        o.on '-h', '--help', 'this screen' do
+          if prev_frame
+            uncollapse! leaf_name
+          end # else hackery
+          if queue.length.nonzero?
+            fail 'sanity' if leaf_name != queue.first
+            queue.shift
+          end
+          enqueue! -> do          # (almost same as `box_enqueue_help!`)
+            leaf.help
+            true                  # ask for trouble by name by parsing others
+          end
+        end
+        o
       end
-      o
+      request_client.instance_exec(& build_option_parser)
+    end
+
+    methodize = Autoloader::Inflection::FUN.methodize
+
+    define_method :leaf_method_name do
+      methodize[ normalized_local_action_name ]
     end
   end
 end

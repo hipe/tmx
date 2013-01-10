@@ -14,6 +14,7 @@ module ::Skylab::GitStashUntracked::Tests
   gsu_tmpdir = TestSupport::Tmpdir.new tdpn.to_s
 
   describe ::Skylab::GitStashUntracked do
+    include ::Skylab
 
     describe "has an action called" do
 
@@ -22,7 +23,7 @@ module ::Skylab::GitStashUntracked::Tests
       end
 
       def cd path, block
-        ::FileUtils.cd path.to_s, &block
+        GitStashUntracked::Services::FileUtils.cd path.to_s, &block
       end
 
       attr_accessor :cmd_spy
@@ -61,9 +62,9 @@ module ::Skylab::GitStashUntracked::Tests
 
       def with_popen3_out_as str
         me = self
-        ::Open3.stub :popen3 do |cmd, &block|
+        GitStashUntracked::Services::Open3.stub :popen3 do |cmd, &block|
           self.cmd_spy = cmd
-          serr = ::StringIO.new ''
+          serr = GitStashUntracked::Services::StringIO.new ''
           sout = ::StringIO.new str
           block[ nil, sout, serr ]
         end

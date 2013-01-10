@@ -36,7 +36,7 @@ describe Skylab::Headless::Parameter::Bound do
         end
         names.should eql([:age, :pet, :pet, :hobby])
         values.should eql(['fifty one', 'goldfish', 'llama', 'spelunk-fishing'])
-        labels.join(' ').should eql(":age :pet[0] :pet[1] :hobby")
+        labels.join(' ').should eql("age pet[0] pet[1] hobby")
       end
 
       it "search through all values and change values procedurally" do

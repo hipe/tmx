@@ -29,7 +29,6 @@ module Skylab::Headless
   end
 
 
-
   module CLI::Action::InstanceMethods
     include Headless::Action::InstanceMethods
 
@@ -78,8 +77,6 @@ module Skylab::Headless
       result
     end
 
-    attr_accessor :param_h        # experimental, for dsl
-
   protected
 
     def argument_syntax
@@ -113,7 +110,6 @@ module Skylab::Headless
       true                        # do any further processing in the queue.
     end
 
-
     def help_description          # assume desc_lines is nonzero-length array
       emit :help, ''              # assumes there was content above!
       if 1 == desc_lines.length   # do the smart thing with formatting
@@ -128,7 +124,6 @@ module Skylab::Headless
       nil
     end
 
-
     def help_options              # precondition: an option_parser exists
       # (in the old days this was option_parser.to_s, which should still work.)
       emit :help, ''              # assumes there was previous above content!
@@ -139,7 +134,6 @@ module Skylab::Headless
         emit :help, line
       end
     end
-
 
     smart_summary_width = -> option_parser do
       max = CLI::FUN.summary_width[ option_parser ]
@@ -169,6 +163,15 @@ module Skylab::Headless
       "#{ request_client.send :normalized_invocation_string } #{
         }#{ normalized_local_action_name }"
     end
+
+    def option_is_visible_in_syntax_string
+      @option_is_visible_in_syntax_string ||= ::Hash.new { |*| true }
+    end
+
+    attr_reader :option_parser
+
+    alias_method :option_parser_ivar, :option_parser
+
                                   # out of the box we don't decide how to build
                                   # your option_parser and you have to define
                                   # this `bop` yourself (DSL however..)
@@ -177,12 +180,18 @@ module Skylab::Headless
     end
 
     def option_syntax_string
+      # stolen and improved from Bleeding #todo:
       if option_parser
-        option_parser.top.list.map do |s|
-          if s.respond_to? :short
-            "[#{s.short.first or s.long.first}#{s.arg}]"
+        option_is_visible_in_syntax_string || nil
+        a = option_parser.top.list.map do |s|
+          if s.respond_to?( :short ) &&
+            @option_is_visible_in_syntax_string[ s.object_id ]
+            "[#{ s.short.first or s.long.first }#{ s.arg }]"
           end
-        end.compact.join ' ' # stolen and improved from Bleeding #todo
+        end.compact
+        if a.length.nonzero?
+          a.join ' '
+        end
       end
     end
 
@@ -260,7 +269,6 @@ module Skylab::Headless
     def resolve_upstream          # out of the box we make no assumtions about
       true                        # what your upstream should be, but per
     end                           # [#hl-023] this must be literally true for ok
-
 
     strip_description_label_rx = /\A[ \t]*description:?[ \t]*/i
 
@@ -349,13 +357,16 @@ module Skylab::Headless
     end
 
     def string
-      map do |p|
+      a = map do |p|
         case p.opt_req_rest
         when :opt  ; "[#{ parameter_label p }]"
         when :req  ; "#{ parameter_label p }"
         when :rest ; "[#{ parameter_label p } [..]]"
         end
-      end.join(' ')
+      end
+      if a.length.nonzero?
+        a.join ' '
+      end
     end
 
   # -- * --
@@ -385,7 +396,6 @@ module Skylab::Headless
     end
 
     attr_reader :pen
-
   end
 
 

@@ -11,8 +11,6 @@ module Skylab::GitStashUntracked
 
   extend Autoloader               # for our one other file..
 
-
-
   module SubClient_InstanceMethods
     include Headless::SubClient::InstanceMethods
 
@@ -53,15 +51,11 @@ module Skylab::GitStashUntracked
     end
   end
 
-
-
   module Color_InstanceMethods
     def color?
       request_client.send :color?
     end
   end
-
-
 
   module PathInfo_InstanceMethods
 
@@ -135,8 +129,6 @@ module Skylab::GitStashUntracked
     end                                       # that we absorb early (for now)
   end
 
-
-
   class CLI
     include SubClient_InstanceMethods          # *before* cli client mechanics
                                                # if you want to override them.
@@ -144,6 +136,7 @@ module Skylab::GitStashUntracked
   protected                                    # (meh before we load DSL)
 
     def initialize _, stdout, stderr
+      @param_h = { }
       self.io_adapter = build_io_adapter _, stdout, stderr
       _gsu_sub_client_init! nil
     end
@@ -156,7 +149,7 @@ module Skylab::GitStashUntracked
     end
 
     def build_option_parser
-      o = GitStashUntracked::Services::OptionParser.new
+      o = create_option_parser
       o.version = '0.0.1'         # avoid warnings from calling the builtin '-v'
       o.release = 'blood'         # idem
       o.on '-h', '--help', 'this screen, or help for particular action' do
@@ -166,15 +159,23 @@ module Skylab::GitStashUntracked
       o
     end
 
+    def create_option_parser
+      GitStashUntracked::Services::OptionParser.new
+    end
+
+    def create_leaf_option_parser
+      create_option_parser
+    end
+
     define_method :escape_path, & Headless::CLI::PathTools::FUN.pretty_path
     protected :escape_path
 
+    attr_reader :param_h          # this moves a lot
 
     pen = Headless::CLI::Pen::MINIMAL
 
     define_method( :pen ) { pen }
     protected :pen
-
 
     # --*--
 
@@ -215,8 +216,7 @@ module Skylab::GitStashUntracked
                                   # following an option parser def, constitute
                                   # the extent of this CLI's actions.
 
-    build_option_parser do
-      o = GitStashUntracked::Services::OptionParser.new
+    option_parser do |o|
       o.separator " description: move all untracked files to #{
         }another folder (usu. outside of the project.)"
       dry_run_option o
@@ -230,10 +230,7 @@ module Skylab::GitStashUntracked
       api_invoke :save, param_h.merge( stash_name: stash_name )
     end
 
-
-
-    build_option_parser do
-      o = GitStashUntracked::Services::OptionParser.new
+    option_parser do |o|
       o.separator " description: lists the \"stashes\" #{
         }(a glorified dir listing)."
       stashes_option o
@@ -245,10 +242,7 @@ module Skylab::GitStashUntracked
       api_invoke :list, param_h
     end
 
-
-
-    build_option_parser do
-      o = GitStashUntracked::Services::OptionParser.new
+    option_parser do |o|
 
       o.separator " description: In the spirit of `git stash show`, #{
         }reports on contents of stashes."
@@ -277,10 +271,7 @@ module Skylab::GitStashUntracked
       api_invoke :show, param_h.merge( stash_name: stash_name )
     end
 
-
-
-    build_option_parser do
-      o = GitStashUntracked::Services::OptionParser.new
+    option_parser do |o|
       o.separator  " description: Attempts to put the files back #{
         }if there are no collisions."
       dry_run_option o
@@ -293,10 +284,7 @@ module Skylab::GitStashUntracked
       api_invoke :pop, param_h.merge( stash_name: stash_name )
     end
 
-
-
-    build_option_parser do
-      o = GitStashUntracked::Services::OptionParser.new
+    option_parser do |o|
       o.separator " description: Shows the files that would be stashed."
       help_option o
       stashes_option o
@@ -309,17 +297,12 @@ module Skylab::GitStashUntracked
     end
   end
 
-
-
   module API
     # empty.
   end
 
-
-
   class API::Action
     include SubClient_InstanceMethods
-
 
     pathify = Autoloader::Inflection::FUN.pathify
 
@@ -435,13 +418,11 @@ module Skylab::GitStashUntracked
     end                                        # "loud" for the above
   end
 
-
   #                               --*--
 
   module API::Actions
     extend MetaHell::Boxxy                     # (`const_fetch`)
   end
-
 
   class API::Actions::Save < API::Action
     include PathInfo_InstanceMethods
@@ -496,8 +477,6 @@ module Skylab::GitStashUntracked
     end
   end
 
-
-
   class API::Actions::Status < API::Actions::Save
 
     PARAMS = [ :stashes_path, :verbose ]
@@ -521,8 +500,6 @@ module Skylab::GitStashUntracked
       res
     end
   end
-
-
 
   class API::Actions::List < API::Action
     include PathInfo_InstanceMethods
@@ -553,8 +530,6 @@ module Skylab::GitStashUntracked
     attr_accessor :verbose
 
   end
-
-
 
   class API::Actions::Show < API::Action
     include PathInfo_InstanceMethods
@@ -598,8 +573,6 @@ module Skylab::GitStashUntracked
 
   end
 
-
-
   class API::Actions::Pop < API::Action
     include Color_InstanceMethods
     include PathInfo_InstanceMethods
@@ -621,13 +594,10 @@ module Skylab::GitStashUntracked
     attr_accessor :dry_run, :stash_name, :verbose
   end
 
-
   # --*--
-
 
   class PathInfo < ::Struct.new :anchor_pathname, :stashes_pathname
   end
-
 
   class Stash
     include GitStashUntracked::Services::FileUtils
@@ -853,13 +823,9 @@ module Skylab::GitStashUntracked
     end
   end
 
-
-
   module MakePatch
     # singleton hack! (is a module only so the name shows up appropriately)
   end
-
-
 
   class << MakePatch
     include GitStashUntracked::Services::FileUtils
@@ -926,8 +892,6 @@ module Skylab::GitStashUntracked
       lamb[type, PATCH_STYLES[PATCH_LINE.match(line).captures.each_with_index.detect{ |s, i| ! s.nil? }[1]][line]]
     end
   end
-
-
 
   class MakeStat
     include SubClient_InstanceMethods

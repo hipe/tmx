@@ -167,7 +167,7 @@ module Skylab::TanMan
     # ---------------- jawbreak blood begin --------------------
 
     def initialize request_client
-      self.param_h = { }
+      @param_h = { }
 
       _headless_sub_client_init! request_client
 
@@ -306,6 +306,8 @@ module Skylab::TanMan
       words = sentence[ parts ]
       "#{ words.join ' '} - #{ e.message }"
     end
+
+    attr_reader :param_h
 
     def program_name # #compat-bleeding (tracked as [#hl-034])
       normalized_invocation_string

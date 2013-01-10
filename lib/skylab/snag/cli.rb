@@ -164,7 +164,7 @@ module Skylab::Snag
 
     # --*--
 
-    namespace -> { CLI::Actions::Node }
+    namespace :node, -> { CLI::Actions::Node }
 
     # --*--
 

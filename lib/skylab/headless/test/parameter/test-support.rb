@@ -36,7 +36,7 @@ module Skylab::Headless::TestSupport::Parameter
       klass = @klass
       let :_frame do
         client = Headless_TestSupport::Client_Spy.new
-        client.debug = -> { self.debug }
+        client.debug = -> { do_debug }
         object = klass.new client
         emit_lines = -> do
           client.send( :io_adapter ).emitted.map(& :string )

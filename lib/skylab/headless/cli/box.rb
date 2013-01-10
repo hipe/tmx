@@ -98,7 +98,6 @@ module Skylab::Headless
       max + option_parser.summary_indent.length - 1 # ditto "parent" module
     end
 
-
     define_method :help_screen do
       emit usage_line
 
@@ -122,7 +121,6 @@ module Skylab::Headless
       nil
     end
 
-
     def _help_actions action_objects
       emit ''
       emit "#{ em 'actions:' }"
@@ -139,12 +137,9 @@ module Skylab::Headless
       nil
     end
 
-
-
     def invite_line # override parent because we are box, we take action!
       "use #{ kbd "#{ normalized_invocation_string } -h [<action>]" } for help"
     end
-
                                   # (in contrast to above, once the user is
                                   # already looking at the full help screen it
                                   # is redundant to again invite her to the
@@ -152,7 +147,6 @@ module Skylab::Headless
       "use #{ kbd "#{ normalized_invocation_string } -h <action>"
         } for help on that action"
     end
-
 
     def is_leaf                   # a box is always a branch (see `is_branch`)
       false

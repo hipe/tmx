@@ -6,9 +6,6 @@ module Skylab::Snag
 
     ACTIONS_ANCHOR_MODULE = CLI::Actions
 
-    aliases = [].freeze
-    define_singleton_method :aliaes do aliases end #retro- and forward-fit
-
     def self.action_name          # compat to all.rb
       normalized_action_name.last
     end
