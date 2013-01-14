@@ -1,7 +1,8 @@
 module Skylab::Snag
   class CLI
     extend MetaHell::Autoloader::Autovivifying::Recursive # used below
-    include Headless::NLP::EN::Methods
+
+    include CLI::Action::InstanceMethods
 
   protected                       # (DSL happens at bottom half)
 
@@ -24,20 +25,6 @@ module Skylab::Snag
         end
         super(& wiring)
       end
-    end
-
-    def api
-      @api ||= Snag::API::Client.new self
-    end
-
-    def api_invoke normalized_name, param_h=nil
-      res = nil
-      begin
-        a = api.build_action( normalized_name ) or break( res = a )
-        a = a.wire!(& wire) # [#010] how i long for you
-        res = a.invoke param_h
-      end while nil
-      res
     end
 
     def error msg # away at [#010]
@@ -108,8 +95,7 @@ module Skylab::Snag
     end
 
     def add message, param_h
-      api_invoke [:nodes, :add],
-        { message: message }.merge( param_h )
+      api_invoke [:nodes, :add], { message: message }.merge( param_h )
     end
 
     # --*--
@@ -139,7 +125,7 @@ module Skylab::Snag
     argument_syntax '[<identifier>]'
 
     def list identifier=nil, param_h
-      action = api.build_action( [:nodes, :reduce] ).wire!(&wire)
+      action = api_build_wired_action [:nodes, :reduce]
       client = runtime # this is a part we don't like
       # @todo: for:#102.901.3.2.2 : wiring should happen between
       # the api action objects and the "client" (interface) instance that
@@ -261,7 +247,7 @@ module Skylab::Snag
 
     def todo *paths, opts
       res = nil
-      action = api.build_action( [:to_do, :report] ).wire!(&wire)
+      action = api_build_wired_action [:to_do, :report]
       action.on_number_found do |e|
         info "(found #{ e.count } item#{ s e.count })"
       end
@@ -279,10 +265,6 @@ module Skylab::Snag
   protected                       # (below was left in the bottom half b/c
                                   # it is the evil that shall not be touched
                                   # until [#010])
-
-    def wire
-      @wire ||= ->(action) { wire_action(action) }
-    end
 
     # this nonsense wires your evil foreign (frame) runtime to the big deal parent
     def wire! runtime, parent
@@ -306,6 +288,7 @@ module Skylab::Snag
           runtime.emit(:info, e)
         end
       end
+      nil
     end
   end
 

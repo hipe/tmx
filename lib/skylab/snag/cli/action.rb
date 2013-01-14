@@ -1,10 +1,83 @@
 module Skylab::Snag
-  class CLI::Action # just derping around for now
-    extend MetaHell::Autoloader::Autovivifying::Recursive
-    extend Headless::CLI::Action::ModuleMethods
+  class CLI::Action # just derping around for now, also [#sl-109]
+    def self.porcelain            # compat all.rb [#sg-010]
+      :porcelain_not_used
+    end
+  end
+
+  module CLI::Action::InstanceMethods
+    include Snag::Core::SubClient::InstanceMethods
     include Headless::CLI::Action::InstanceMethods
 
-    ACTIONS_ANCHOR_MODULE = CLI::Actions
+  protected
+
+    def api
+      @api ||= Snag::API::Client.new self
+    end
+
+    def api_build_wired_action normalized_action_name
+      action = api.build_action normalized_action_name
+      wire_action action
+      action
+    end
+
+    def api_invoke normalized_name, param_h=nil
+      res = nil
+      begin
+        act = api_build_wired_action( normalized_name ) or break( res = act )
+        res = act.invoke param_h
+      end while nil
+      res
+    end
+  end
+
+  class CLI::Client < Headless::DEV::Client
+    # mash together something that lets us straddle two worlds
+
+    include Snag::Core::SubClient::InstanceMethods
+
+  protected
+
+    def initialize legacy_client, pnum
+      super()
+      nis = legacy_client.invocation
+      nis_a = nis.split ' '
+      @normalized_invocation_string =
+        nis_a[ 0 .. (- (pnum + 1)) ].join ' '
+      @hack = -> do
+        cfa = [ cf = legacy_client ] # KILL THIS WITH FIRE
+        cfa.push( cf ) while ( cf = cf.below )
+        cli = cfa[ -2 ].client_instance
+        cli
+      end
+    end
+
+    def invite x
+      legacy_client.send :invite, x
+    end
+
+    def legacy_client
+      @hack.call
+    end
+
+    attr_reader :normalized_invocation_string
+
+    def request_client
+      legacy_client # not memoizing it just for more attractive dumps!
+    end
+
+    def wire_action action
+      legacy_client.send :wire_action, action
+    end
+  end
+
+  class CLI::Action
+    extend MetaHell::Autoloader::Autovivifying::Recursive
+    extend Headless::CLI::Action::ModuleMethods
+
+    include CLI::Action::InstanceMethods
+
+                                  # (necessarily re-opened below)
 
     def self.action_name          # compat to all.rb
       normalized_action_name.last
@@ -13,19 +86,27 @@ module Skylab::Snag
     def self.aliases              # compat to all.rb
     end
 
-    o = { }
 
-    o[:hack_me_a_modality_client] = -> legacy_client, pnum do
-      hack_modality_client = Headless::DEV::Client.new
-      nis = legacy_client.invocation
-      nis_a = nis.split ' '
-      pis = nis_a[ 0 .. (- (pnum + 1)) ].join(' ')
-      hack_modality_client.define_singleton_method(
-        :normalized_invocation_string ) { pis }
-      hack_modality_client
+  protected
+    def initialize request_client
+      super
+      @param_h = { }
     end
 
-    FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
+    # --*--
+
+    def dry_run_option o
+      o.on '-n', '--dry-run', 'dry run.' do param_h[:dry_run] = true end
+    end
+
+    # --*--
+
+    attr_reader :param_h
+
+    def wire_action action
+      @request_client.send :wire_action, action
+      nil
+    end
   end
 
 
@@ -40,10 +121,9 @@ module Skylab::Snag
       @actions ||= CLI::Action::Enumerator.new self
     end                           # all of this is derp
 
-    hack_me_a_modality_client = CLI::Action::FUN.hack_me_a_modality_client
-
     define_singleton_method :collapse_action do |legacy_client|
-      new hack_me_a_modality_client[ legacy_client, 1 ]
+      client = CLI::Client.new legacy_client, 1
+      new client
     end
 
                                   # #experimental #frontier #push-up candidate
@@ -56,9 +136,8 @@ module Skylab::Snag
 
     # --*--
 
-    def parse argv                # compat all.rb
-      res = invoke argv
-      res ? nil : res
+    define_method :parse do |argv| # compat all.rb [#sg-010]
+      [ self, :invoke, [argv] ]   # [ client, action_ref, args ]
     end
 
   protected
@@ -75,6 +154,10 @@ module Skylab::Snag
       end
       o
     end
+  end
+
+  class CLI::Action
+    ACTIONS_ANCHOR_MODULE = CLI::Actions # here b.c of an otherwise circ. dep.
   end
 
   class CLI::Action::Enumerator < ::Enumerator # experimental derping - mind you
@@ -131,11 +214,9 @@ module Skylab::Snag
                                   # help was requested (all.rb) and to that
                                   # end we are derping by any means necessary
 
-    hack_me_a_modality_client = CLI::Action::FUN.hack_me_a_modality_client
-
     define_method :parse do |argv|
-      hacked_modality_client = hack_me_a_modality_client[ @request_client, 2 ]
-      box_emissary = @box_class.new hacked_modality_client
+      client = CLI::Client.new @request_client, 2
+      box_emissary = @box_class.new client
       box_emissary.send :enqueue!, :help
       box_emissary.invoke argv                 # (headless would let us
       nil                                      # continue to process queue.)

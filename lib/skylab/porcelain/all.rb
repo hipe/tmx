@@ -376,7 +376,7 @@ module Skylab::Porcelain
       #  argv.concat Array.new(argument_syntax.length - argv.length) # but still it is so dodgy!
       # end
       opts and argv.push(opts)
-      argv
+      [ nil, self, argv ] # [ receiver, action_ref, args ]
     end
     def settings= ba
       ba.each { |b| instance_eval(&b) }
@@ -612,9 +612,10 @@ module Skylab::Porcelain
       begin
         @porcelain.runtime =
           Runtime.new argv, self, @porcelain, self.class.porcelain
-        client, action_struct, args = @porcelain.runtime.resolve
+        client, meth, args = @porcelain.runtime.resolve
         client or break( res = client )
-        res = client.send action_struct.method_name, *args
+        meth = meth.method_name if ! ( ::Symbol === meth )
+        res = client.send meth, *args
       end while nil
       res
     end
@@ -720,7 +721,8 @@ module Skylab::Porcelain
         if wtf
           case wtf
           when ::Array
-            res = [ client_instance, action, wtf ]
+            wtf[0] ||= client_instance # res = [ client_instance, action, wtf ]
+            res = wtf # experimentallly we want a total divorce
           when ::Proc
             res = [ wtf, Action.new(method_name: :call), [ self, self.action ] ]
           else
@@ -1006,7 +1008,7 @@ module Skylab::Porcelain
       case @mode
       when :inline   ; inflate! if @block
                      ; singleton_class
-      when :external ; @external_module
+      when :external ; external_module
       end
     end
     attr_accessor :client_instance
@@ -1017,7 +1019,7 @@ module Skylab::Porcelain
         @porcelain.runtime = @frame.emitter
         self
       when :external
-        @external_module.porcelain.build_client_instance(@frame.emitter, slug) # @todo: during:#100.100.400
+        external_module.porcelain.build_client_instance(@frame.emitter, slug) # @todo: during:#100.100.400
       else
         fail('no')
       end
@@ -1040,19 +1042,19 @@ module Skylab::Porcelain
     resolve_initialization_parameters = -> name, params, block do
       if ::Hash === params.first
         param_h = params.shift
-        external_module = param_h.delete :module # if any
-      elsif
+        external_module_ref = param_h.delete :module # if any
+      else
         param_h = { }
         if ::Module === params.first
-          external_module = params.shift
+          external_module_ref = params.shift
         elsif params.first.respond_to? :call
-          external_module = params.shift
+          external_module_ref = params.shift
         end
       end
       if params.length.nonzero?
         raise ::ArgumentError.new "sorry - overloaded method signature fail"
       end
-      if external_module && block
+      if external_module_ref && block
         raise ::ArgumentError.new "can't have namespace defined in both #{
           }block and module"
       end
@@ -1060,18 +1062,29 @@ module Skylab::Porcelain
       # param_h[:method_name] ||= :invoke
       param_h[:option_syntax]   ||= NamespaceOptionSyntax.new   self
       param_h[:argument_syntax] ||= NamespaceArgumentSyntax.new self
-      [block, external_module, param_h]
+      [block, external_module_ref, param_h]
     end
 
     define_method :initialize do |name, *params, &block|
-      @block, @external_module, param_h =
+      @block, external_module_ref, param_h =
         resolve_initialization_parameters[ name, params, block ]
       name = params = block = nil
-      @mode = @external_module ? :external : :inline
+      if external_module_ref
+        @mode = :external
+        if ::Module === external_module_ref
+          @external_module = external_module_ref
+          @external_module_ref = nil
+        else
+          @external_module = nil
+          @external_module_ref = external_module_ref
+        end
+      else
+        @mode = :inline
+      end
       @porcelain = nil
       super( param_h, & nil ) ; param_h = nil       # do not bubble the block up
       if :external == @mode
-        if @external_module.respond_to? :porcelain
+        if @external_module && @external_module.respond_to?( :porcelain )
           if @external_module.porcelain.aliases
             aliases(* @external_module.porcelain.aliases)
           end
@@ -1105,7 +1118,9 @@ module Skylab::Porcelain
       @frame = CallFrame.new(
         :argv => argv,
         :action => self,
-        :get_client_instance => ->(){ get_ns_client(slug) },
+        :get_client_instance => -> do
+          get_ns_client slug
+        end,
         :invocation_slug => slug,
         :actions_provider => actions_provider
       )
@@ -1128,6 +1143,16 @@ module Skylab::Porcelain
           ["child commandz: {#{a.join('|')}}"]
         end
       else              ;  fail("implement me")
+      end
+    end
+
+  protected
+
+    def external_module
+      @external_module ||= begin
+        em = @external_module_ref.call
+        @external_module_ref = nil
+        em
       end
     end
   end

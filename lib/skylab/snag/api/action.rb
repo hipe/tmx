@@ -18,6 +18,24 @@ module Skylab::Snag
 
     ACTIONS_ANCHOR_MODULE = API::Actions
 
+    def self.attributes_or_params
+      res = nil
+      if const_defined? :PARAMS, false
+        a = const_get :PARAMS, false
+        res = ::Hash[ a.map { |k| [ k, { required: true } ] } ]
+      else
+        res = self.attributes     # (for clearer error msgs)
+      end
+      res
+    end
+
+    def self.params *params       # nerka derka nerka derka nerka derka
+      fail 'sanity' if const_defined? :PARAMS, false
+      attr_accessor( *params )
+      const_set :PARAMS, params
+      nil
+    end
+
     # --*--
 
     def invoke param_h=nil
@@ -35,11 +53,6 @@ module Skylab::Snag
       res                         # execute, 2) it is hopefully at the end
     end
 
-    def wire! # my body is filled with rage
-      yield self
-      self
-    end
-
   protected
 
     def initialize api
@@ -51,7 +64,7 @@ module Skylab::Snag
     def absorb_params!
       res = false
       begin
-        formal = self.class.attributes
+        formal = self.class.attributes_or_params
         extra = @param_h.keys.reduce [] do |m, k|
           m << k if ! formal.key? k
           m
@@ -106,6 +119,17 @@ module Skylab::Snag
         @nodes = nodes
       end while nil
       nodes
+    end
+  end
+
+  module API::Action::Node_InstanceMethods
+    def find_node node_ref
+      res = nil
+      begin
+        res = nodes or break
+        res = @nodes.fetch_node node_ref, -> nr { }
+      end while nil
+      res
     end
   end
 end
