@@ -71,6 +71,10 @@ module Skylab::Snag
     attr_writer :program_name
     public :program_name=
 
+    def val x                     # how do you decorate a special value?
+      em x
+    end
+
     # --*--
 
     extend Porcelain                           # now entering DSL zone
@@ -122,9 +126,9 @@ module Skylab::Snag
       end
     end
 
-    argument_syntax '[<identifier>]'
+    argument_syntax '[<identifier_ref>]'
 
-    def list identifier=nil, param_h
+    def list identifier_ref=nil, param_h
       action = api_build_wired_action [:nodes, :reduce]
       client = runtime # this is a part we don't like
       # @todo: for:#102.901.3.2.2 : wiring should happen between
@@ -143,7 +147,7 @@ module Skylab::Snag
       end
 
       action.invoke( {
-        identifier: identifier,
+        identifier_ref: identifier_ref,
         verbose: true
       }.merge! param_h )
     end
@@ -275,17 +279,34 @@ module Skylab::Snag
     end
 
     def wire_action action        # #todo this is nice in constructors for
-      action.on_payload { |e| runtime.emit(:payload, e) }   # cli actions
+                                  # cli actions
+      action.on_payload do |e|
+        runtime.emit :payload, e
+      end
+
+      render = -> e do
+        msg = nil
+        if e.payload.respond_to? :render_for
+          msg = e.payload.render_for self
+        else
+          msg = e.message
+        end
+        msg
+      end
+
       action.on_error do |e|
-        e.message = "failed to #{ e.verb } #{ e.noun } - #{ e.message }"
+        rendered = render[ e ]
+        e.message = "failed to #{ e.verb } #{ e.noun } - #{ rendered }"
         runtime.emit :error, e
       end
+
       action.on_info do |e|
         unless e.touched?
-          md = %r{\A\((.+)\)\z}.match(e.message) and e.message = md[1]
-          e.message = "while #{e.verb.progressive} #{e.noun}, #{e.message}"
-          md and e.message = "(#{e.message})" # so ridiculous
-          runtime.emit(:info, e)
+          rendered = render[ e ]
+          md = %r{\A\((.+)\)\z}.match( rendered ) and rendered = md[1]
+          e.message = "while #{ e.verb.progressive } #{ e.noun }, #{ rendered }"
+          md and e.message = "(#{ e.message })" # so ridiculous
+          runtime.emit :info, e
         end
       end
       nil

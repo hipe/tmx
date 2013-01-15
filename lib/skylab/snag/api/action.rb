@@ -108,28 +108,17 @@ module Skylab::Snag
     end
 
     def nodes
-      nodes = nil
-      begin
-        break( nodes = @nodes ) if @nodes
-        o = request_client.find_closest_manifest -> msg do
-          error msg
-        end
-        break if ! o
-        nodes = Snag::Models::Node::Collection.new self, o
-        @nodes = nodes
-      end while nil
-      nodes
-    end
-  end
-
-  module API::Action::Node_InstanceMethods
-    def find_node node_ref
-      res = nil
-      begin
-        res = nodes or break
-        res = @nodes.fetch_node node_ref, -> nr { }
-      end while nil
-      res
+      @nodes ||= begin
+        nodes = nil
+        begin
+          mf = request_client.find_closest_manifest -> msg do
+            error msg
+          end
+          mf or break( nodes = mf )
+          nodes = Snag::Models::Node::Collection.new self, mf
+        end while nil
+        nodes
+      end
     end
   end
 end

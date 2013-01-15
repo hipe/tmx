@@ -1,3 +1,4 @@
+[#126]       #tracking-tag singleton obj with class made just for readable errs
 [#125]       #doc-point #workflow -- when you make overzelous, premature chage..
 [#124]       #tracking-tag autoloader won't work when there is toplevel name..
 [#123]       #convention #pattern sub-product module 2-level pattern

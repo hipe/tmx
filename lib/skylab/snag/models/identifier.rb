@@ -1,11 +1,15 @@
 module Skylab::Snag
-  class Models::Identifier < ::Struct.new :prefix, :identifier, :integer_string
+  class Models::Identifier < ::Struct.new :prefix, :body, :integer_string
+
+    def self.create_rendered_string int, node_number_digits
+      "[##{ "%0#{ node_number_digits }d" % int }]"
+    end
 
     rx = /
       \A
       \[?\#?                                   # (we can ignore these for you)
-      (?:  (?<prefix> [a-z]+ ) - )?            # maybe it starts with a prefix
-      (?<identifier>                           # and then has the identifier
+      (?:  (?<prefix> [a-z]+ ) - )?            # maybe it starts with a prefix &
+      (?<identifier_body>                      # then has the identifier_body
         (?<integer> \d+ )                      # which always has an integer
         (?: \. \d+ )*                          # and maybe dewey-decimal sub-
       )                                        # parts
@@ -18,7 +22,8 @@ module Skylab::Snag
       md = rx.match x.to_s
       res = nil
       if md
-        o = Models::Identifier.new md[:prefix], md[:identifier], md[:integer]
+        o = Models::Identifier.new md[:prefix],
+                                   md[:identifier_body], md[:integer]
         if o.prefix && info
           info[ Models::Identifier::Events::Prefix_Ignored.new o ]
         end
@@ -28,6 +33,16 @@ module Skylab::Snag
         res = r ? false : r
       end
       res
+    end
+
+    def self.render prefix, body
+      "[##{ "#{ prefix }-" if prefix }#{ body }]"
+    end
+
+    # --*--
+
+    def render
+      self.class.render prefix, body
     end
   end
 

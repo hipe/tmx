@@ -57,7 +57,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
         end.join
         exp = <<-O.unindent
           ---
-          identifier        : 004.2
+          identifier_body   : 004.2
           first_line_body   : #open this is #feature-creep but meh
           ---
         O

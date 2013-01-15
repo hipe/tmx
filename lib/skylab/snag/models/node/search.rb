@@ -130,10 +130,10 @@ module Skylab::Snag
       end
     end
 
-    class Query_Nodes_::Identifier
+    class Query_Nodes_::IdentifierRef
       def self.new_valid request_client, sexp
-        identifier_string = sexp[1]
-        normalized = Models::Identifier.normalize identifier_string,
+        identifier_body = sexp[1] # prefixes might bite [#019]
+        normalized = Models::Identifier.normalize identifier_body,
           -> invalid do
             request_client.send :error, ( invalid.render_for request_client )
           end,
@@ -144,16 +144,16 @@ module Skylab::Snag
       end
       def match? node
         if node.valid
-          @identifier_rx =~ node.identifier_string
+          @identifier_rx =~ node.identifier_body
         end
       end
       def phrase
-        "identifer starting with \"#{ @identifier.identifier }\""
+        "identifer starting with \"#{ @identifier.body }\""
       end
     protected
       def initialize request_client, identifier_struct
         @identifier = identifier_struct
-        @identifier_rx = /\A#{ ::Regexp.escape @identifier.identifier }/
+        @identifier_rx = /\A#{ ::Regexp.escape @identifier.body }/ # [#019]
       end
     end
 

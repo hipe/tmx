@@ -41,7 +41,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
       pays.length.should eql(3)
       o = -> { pays.shift }
       o[].should eql('---')
-      o[].should match( /\Aidentifier +: +003\z/ )
+      o[].should match( /\Aidentifier_body +: +003\z/ )
       o[].should match( /\Afirst_line_body +: #open feep my deep\z/ )
       o[].should eql(nil)
     end

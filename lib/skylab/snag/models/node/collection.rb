@@ -20,11 +20,35 @@ module Skylab::Snag
       res
     end
 
-    def find list, query_sexp
+    def changed node, dry_run, verbose
+      manifest.change_node node, dry_run, verbose,
+        -> x { escape_path x },
+        -> x { error x },
+        -> x { info x }
+    end
+
+    def fetch_node node_ref, not_found=nil
+      res = nil
+      begin
+        res = find( 1, [ :identifier_ref, node_ref ] ) or break
+        fly = res.to_a.first      # just have faith in the system
+        if ! fly
+          not_found ||= -> nr do
+            error "there is no node with the identifer #{ ick nr }"
+          end
+          break( res = not_found[ node_ref ] )
+        end
+        res = Models::Node::Controller.new self, fly
+      end while nil
+      res
+    end
+
+    def find max_count, query_sexp
       res = false
       begin
         flyweight = node_flyweight
-        search = Models::Node::Search.new_valid self, list, query_sexp
+
+        search = Models::Node::Search.new_valid self, max_count, query_sexp
         break if ! search
 
         enum = Models::Node::Enumerator.new do |y|
@@ -57,15 +81,10 @@ module Skylab::Snag
     end
 
     def node_flyweight
-      fw = nil
-      begin
-        break( fw = @node_flyweight ) if @node_flyweight
-        fw = Models::Node::Flyweight.new self, @manifest.pathname
-        @node_flyweight = fw
-      end while nil
-      fw
+      @node_flyweight ||= begin
+        Models::Node::Flyweight.new self, @manifest.pathname
+      end
     end
-
 
     date_format = '%Y-%m-%d'
 

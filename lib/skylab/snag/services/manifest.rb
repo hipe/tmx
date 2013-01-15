@@ -9,23 +9,26 @@ module Skylab::Snag
             break
           end
           if ! pathname.exist?
-            info[ "manifeset file didn't exist - no issues." ]
+            info[ "manifest file didn't exist - no issues." ]
             break
             # (if pathname is resolved (i.e. we know what it *should* be)
             # and it doesn't exist, there are simply no issues.)
           end
           node_flyweight ||= Models::Node::Flyweight.new nil, pathname
-          node_flyweight.each_node file.normalized_line_producer, y
+          last_item = catch :last_item do
+            node_flyweight.each_node file.normalized_line_producer, y
+            nil
+          end
+          if last_item
+            file.release_early
+            throw :last_item, last_item
+          end
           nil
         end while nil
       end
     end
 
-    node_number_digits = 3
-
-    define_method :add_node do
-      |node, dry_run, verbose, escape_path, error, info|
-
+    def add_node node, dry_run, verbose, escape_path, error, info
       res = false
       begin
         greatest, extern_h = greatest_node_integer_and_externals
@@ -39,15 +42,18 @@ module Skylab::Snag
             break
           end
         end
-        identifier = "%0#{ node_number_digits }d" % int
-        lines = ["[##{ identifier }] #{ node.first_line_body }"]
-        lines.concat node.extra_lines
-        res = add_lines_to_top lines, dry_run, escape_path, verbose,
-          error, info
+        res = edit_lines 0, render_lines( node, int ), dry_run, escape_path,
+          verbose, error, info
         break if ! res
         info[ "done." ]
       end while nil
       res
+    end
+
+    def change_node node, dry_run, verbose, escape_path, error, info
+      lines = render_lines node
+      edit_lines node.identifier.render, lines, dry_run, escape_path,
+        verbose, error, info
     end
 
     def pathname
@@ -67,11 +73,78 @@ module Skylab::Snag
       @tmpdir_pathname = nil
     end
 
-    dev_null = ::Object.new                    # hehe the sneaky hoops we jump
-    dev_null.define_singleton_method( :puts ) { |s| } # thru to get a good dry
+    change_lines = -> error, file, info, lines, rendered_identifier do
+      -> fh do
+        sep = nil
+        write = -> lin do
+          fh.write "#{ sep }#{ lin }"
+          sep ||= "\n" # meh [#020]
+          nil
+        end
+        res = nil
+        found = false
+        existing = file.normalized_line_producer
+        line = existing.gets
+        while line
+          if 0 == line.index( rendered_identifier )
+            found = true
+            begin                 # discard old lines
+              line = existing.gets
+            end while line && /^[[:space:]]/ =~ line # eek
+            lines.each do |new_line|
+              write[ new_line ]
+            end
+          else
+            write[ line ]
+            line = existing.gets
+          end
+        end
+        if found
+          res = true
+        else
+          res = error[ "node lines not found for node with identifer #{
+            }#{ rendered_identifier }" ]
+        end
+        res
+      end
+    end
 
-    define_method :add_lines_to_top do
-      |lines, dry_run, escape_path, verbose, error, info|
+    prepend_lines = -> file, info, lines do
+      -> fh do
+        if lines.length.nonzero?
+          if lines.length == 1
+            info[ "new line: #{ lines[0] }" ]
+          else
+            info[ "new lines:" ]
+            many = true
+          end
+        end
+        lines.each do |l|                      # ~ put the newlines at the top ~
+          info[ l ] if many
+          fh.puts l
+        end
+        file.normalized_lines.each do |lin|    # (#open-filehandle)
+          fh.puts lin
+        end
+      end
+    end
+
+    class DevNull_                # hehe the sneaky hops we jump thru to get
+      def puts *a                 # a good dry run. (class for sing. [#sl-126])
+      end
+      def write s
+      end
+    end
+
+    dev_null = DevNull_.new
+
+    # when `lines_ref` is zero it means "insert `lines` at the beginning"
+    # else `lines_ref` is expected to be a rendered identifier, for which
+    # `lines` will replace the existing lines for that node. `error` is
+    # called when the node lines are not found for a `node_ref`.
+
+    define_method :edit_lines do
+      |lines_ref, lines, dry_run, escape_path, verbose, error, info|
 
       res = false
       begin
@@ -84,23 +157,10 @@ module Skylab::Snag
         if tmpnew.exist?
           fu.rm tmpnew, noop: dry_run
         end
-        write = -> fh do
-          s = 's' if 1 == lines.length
-          if lines.length.nonzero?
-            if lines.length == 1
-              info[ "new line: #{ lines[0] }" ]
-            else
-              info[ "new lines:" ]
-              many = true
-            end
-          end
-          lines.each do |l|                    # ~ put the newlines at the top ~
-            info[ l ] if many
-            fh.puts l
-          end
-          file.normalized_lines.each do |lin|  # #open-filehandle
-            fh.puts lin                        # (but tested quite well)
-          end
+        write = if 0 == lines_ref
+          prepend_lines[ file, info, lines ]
+        else
+          change_lines[ error, file, info, lines, lines_ref ]
         end
         if dry_run
           write[ dev_null ]                    # sneaky
@@ -120,14 +180,10 @@ module Skylab::Snag
     end
 
     def file
-      file = nil
-      begin
-        break( file = @file ) if @file
+      @file ||= begin
         @pathname or fail 'sanity'
-        file = Models::Node::File.new @pathname
-        @file = file
-      end while nil
-      file
+        Models::Node::File.new @pathname
+      end
     end
 
                                                # Using a hacky regex, scan
@@ -145,18 +201,36 @@ module Skylab::Snag
     def greatest_node_integer_and_externals
       enum = build_enum nil, nil, nil
       enum = enum.valid
-      h = { }
+      prefixed_h = { }
       greatest = enum.reduce( -1 ) do |m, node|
-        if node.prefix
-          h[ node.integer ] = "[##{ node.prefix }-#{ node.identifier_string }]"
+        if node.identifier_prefix
+          prefixed_h[ node.integer ] = Snag::Models::Identifier.render(
+            node.identifier_prefix, node.identifier_body )
           m
         else
           x = node.integer
           m > x ? m : x
         end
       end
-      [ greatest, h ]
+      [ greatest, prefixed_h ]
     end
+
+    -> do
+
+      id_num_digits = 3
+
+      define_method :render_lines do |node, int=nil|
+        rendered_identifier = if int
+          Snag::Models::Identifier.create_rendered_string int, id_num_digits
+        else
+          node.rendered_identifier
+        end
+        lines = [ "#{ rendered_identifier } #{ node.first_line_body }" ]
+        lines.concat node.extra_lines
+        lines
+      end
+
+    end.call
 
     def tmpdir_pathname dry_run, fu, error
       res = false

@@ -9,15 +9,15 @@ module Skylab::Snag
   class API::Actions::Node::Tags::Add < API::Action
     emits :payload, :info, :error
 
-    params :dry_run, :node_ref, :tag_name
-
-    include API::Action::Node_InstanceMethods
+    params :dry_run, :node_ref, :tag_name, :verbose
 
     def execute
       res = nil
       begin
-        node = find_node( node_ref ) or break( res = node )
-        res = node.add_tag tag_name, -> e { error e }, -> e { info e }
+        nodes or break
+        node = @nodes.fetch_node( node_ref ) or break( res = node )
+        res = node.append_tag( tag_name ) or break
+        res = @nodes.changed node, dry_run, verbose
       end while nil
       res
     end

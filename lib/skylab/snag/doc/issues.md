@@ -1,3 +1,5 @@
+[#020]       #tracking-tag newlines - places where they might bite
+[#019]       #tracking-tag prefixes - places where they might bite
 [#018] #open functionality, interface for closing an issue
 [#017]       #doc-point - errors lambdas that don't result in falsey get false
 [#016]       #done remove fixed field requirement

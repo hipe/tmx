@@ -99,6 +99,10 @@ module Skylab::Snag
       o.on '-n', '--dry-run', 'dry run.' do param_h[:dry_run] = true end
     end
 
+    def verbose_option o
+      o.on '-v', '--verbose', 'verbose output.' do param_h[:verbose] = true end
+    end
+
     # --*--
 
     attr_reader :param_h

@@ -2,6 +2,30 @@ module Skylab::Snag
   class Models::Node::Controller
     include Snag::Core::SubClient::InstanceMethods
 
+    def add_tag tag_ref, do_append
+      res = nil
+      begin
+        tag_body = Models::Tag.normalize tag_ref,
+          -> e { error e }, -> e { info e }
+        tag_body or break( res = tag_body )
+        enum = Models::Tag::Collection.new @message
+        found = enum.detect { |tg| tg.name == tag_body }
+        if found
+          res = error "tag already exists - #{ found }"
+          break
+        end
+        res = enum.add! tag_body, do_append, -> e { error e }, -> e { info e }
+        res or break              # (this might always succeed)
+        undelineate               # here after above success. caveat err cnt
+        res = valid               # it might be too long now
+      end while nil
+      res
+    end
+
+    def append_tag tag_ref
+      add_tag tag_ref, true
+    end
+
     attr_reader :date_string
 
     def date_string= string
@@ -34,17 +58,26 @@ module Skylab::Snag
       @first_line_body
     end
 
+    attr_reader :identifier
+
     def message= msg
       ok = Models::Message.normalize msg, -> e { error e }, -> e { info e }
       if ok
         undelineate
-        clear_valid
         @message = ok
       end
       msg
     end
 
-    def valid
+    def prepend_tag tag_ref
+      add_tag tag_ref, false
+    end
+
+    def rendered_identifier
+      @identifier.render
+    end
+
+    def valid err=nil
       if @valid.nil? # iff not, we've already done this
         begin
           break( @valid = false ) if error_count > 0 # iff errors emitted
@@ -61,21 +94,37 @@ module Skylab::Snag
 
   protected
 
-    def initialize request_client
-      super
+    def initialize request_client, flyweight=nil
+      super request_client
       @date_string = nil
       @delineated = nil
       @do_prepend_open_tag = nil
       @extra_line_header = nil
-      @first_line_body = nil
       @extra_lines = []
+      @first_line_body = nil
+      @identifier = nil
       @line_width = nil
       @max_lines = nil
       @message = nil
+      absorb_flyweight!( flyweight ) if flyweight
+      nil
     end
 
-    def clear_valid
-      @valid = nil
+    def absorb_flyweight! flyweight
+      # (this was written expecting it's called only from a constructor)
+      @delineated and fail 'test me'
+      @identifier = flyweight.build_identifier
+      reduce = [ flyweight.first_line_body ]
+      reduce.concat( flyweight.extra_lines.map do |el|
+        if 0 == el.index( extra_lines_header )
+          use = el[ extra_lines_header.length .. -1 ]
+        else
+          use = el.strip # sketchy but not really -- whatever
+        end
+        use
+      end )
+      @message = reduce.join ' '
+      nil
     end
 
     first_wrd = -> str do
@@ -183,9 +232,10 @@ module Skylab::Snag
     end
 
     def undelineate
+      @delineated = nil
       @extra_lines.clear
       @first_line_body = nil
-      @delineated = nil
+      @valid = nil
     end
   end
 end

@@ -1,7 +1,6 @@
 module Skylab::Snag
   class Models::Tag < ::Struct.new :name
 
-
     canonical = -> do
       h = {
         open: new( :open )
@@ -15,7 +14,17 @@ module Skylab::Snag
 
     define_singleton_method :canonical do canonical end
 
-    valid_tag_rx = /\A[-a-z]+\z/
+    def self.render body_string
+      "##{ body_string }"
+    end
+
+    tag_body_rx = /[-a-z]+/
+
+    valid_tag_rx = /\A#{ tag_body_rx.source }\z/
+
+    rendered_tag_rx = /(?<!\w)#(?<tag_body>#{ tag_body_rx.source })(?!\w)/
+
+    define_singleton_method :rendered_tag_rx do rendered_tag_rx end
 
     define_singleton_method :normalize do |tag_name, error, info=nil|
       if valid_tag_rx =~ tag_name
@@ -29,7 +38,7 @@ module Skylab::Snag
     # --*--
 
     def to_s
-      "##{ name }"
+      self.class.render name
     end
 
   protected
@@ -42,6 +51,12 @@ module Skylab::Snag
 
 
   module Models::Tag::Events
+  end
+
+  class Models::Tag::Events::Added < Snag::Model::Event.new :rendered, :verb
+    build_message -> do
+      "#{ verb } #{ val rendered }"
+    end
   end
 
   class Models::Tag::Events::Invalid < Snag::Model::Event.new :name
