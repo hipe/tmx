@@ -6,6 +6,8 @@ module Skylab::Headless::TestSupport::NLP::EN
 
   include CONSTANTS
 
+  extend ::Skylab::TestSupport::Quickie
+
   MetaHell = MetaHell # #annoy
 
   module ModuleMethods
