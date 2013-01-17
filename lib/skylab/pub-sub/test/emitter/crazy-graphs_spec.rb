@@ -9,6 +9,7 @@ module ::Skylab::PubSub::TestSupport::Emitter
       modul :Alpha do
         extend PubSub::Emitter
         emits :alpha
+        public :emit # [#ps-002] public for testing
       end
       klass :Gamma do |o|
         extend PubSub::Emitter::ModuleMethods
@@ -27,6 +28,7 @@ module ::Skylab::PubSub::TestSupport::Emitter
       modul :Alpha do
         extend PubSub::Emitter
         emits :alpha
+        public :emit # [#ps-002] public for testing
       end
       modul :Beta do |o|
         include o.Alpha

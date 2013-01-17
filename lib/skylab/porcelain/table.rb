@@ -212,6 +212,8 @@ module ::Skylab::Porcelain::Table
       extend ::Skylab::PubSub::Emitter
       emits(:all, :info => :all, :empty => :info, :row => :all, :row_count => :data)
 
+      public :emit # #pattern [#ps-002]
+
       def field name
         @fields[name] ||= Column::ViewModel.new(nil, field_name: name)
       end

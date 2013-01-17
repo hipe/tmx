@@ -283,6 +283,8 @@ module Skylab::Porcelain
       Subscriptions == self or fail("hack failed")
       Class.new(Subscriptions).class_eval do
         extend ::Skylab::PubSub::Emitter
+        public :emit # [#ps-002] (this is just like something over there)
+        public :event_listeners # shoehorn legacy bad design into design imprv.
         emits :all
         names.each { |n| emits(n => :all) }
         class << self
@@ -857,6 +859,9 @@ module Skylab::Porcelain
       :syntax        => :info,
       :runtime_issue => :error
     })
+
+    public :emit # shoehorn legacy bad design inside better design [#ps-002]
+
     alias_method :porcelain_original_event_class, :event_class # compat pub sub
     attr_writer :event_class
     def event_class

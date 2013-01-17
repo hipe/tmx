@@ -8,6 +8,7 @@ describe Skylab::PubSub::Emitter do
     ::Class.new.class_eval do
       extend PubSub::Emitter
       emits :informational, :error => :informational, :info => :informational
+      public :emit # [#ps-002] public for testing
       self
     end
   end
@@ -22,6 +23,8 @@ describe Skylab::PubSub::Emitter do
       o = self
       ::Class.new.class_eval do
         extend PubSub::Emitter
+        public :emit # [#ps-002] public for testing
+        public :emits?
         def self.to_s ; 'Foo' end
         class_eval(& o.inside)
         self
@@ -71,10 +74,19 @@ describe Skylab::PubSub::Emitter do
               end
             end
           end
+
+          context "with `emits?`" do
+            it " - you can see if it emits something", f:true do
+              instance = klass.new
+              instance.emits?( :baz ).should eql( false )
+              instance.emits?( :bar ).should eql( true )
+            end
+          end
         end
       end
     end
   end
+
   it 'describes its tag graph' do
     emitter.class.event_cloud.describe.should eql(<<-HERE.unindent.strip)
       informational
@@ -120,6 +132,7 @@ describe Skylab::PubSub::Emitter do
       o = self
       ::Class.new.class_eval do
         extend PubSub::Emitter
+        public :emit # [#ps-002] public for testing
         class_eval(& o.emits)
         self
       end
@@ -241,6 +254,7 @@ describe Skylab::PubSub::Emitter do
       kg = klass_graph
       ::Class.new.class_eval do
         extend PubSub::Emitter
+        public :emit # [#ps-002] public for testing
         emits( *kg )
         self
       end
@@ -287,6 +301,7 @@ describe Skylab::PubSub::Emitter do
     let(:normal_class) do
       ::Class.new.class_eval do
         extend PubSub::Emitter
+        public :emit # [#ps-002] public for testing
         emits :one
         self
       end

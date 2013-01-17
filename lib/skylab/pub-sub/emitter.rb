@@ -14,21 +14,29 @@ module Skylab::PubSub
 
     def self.new *a # sugar
       ::Class.new.class_eval do
+
         extend Emitter
-        emits(* a)
-        def error msg # courtesy for this #pattern #sl-112
+
+        public :emit # [#ps-002] these objects are used exclusively so
+
+        emits(* a )
+
+        def error msg # provided as a courtesy for this common #pattern #sl-112
           emit :error, msg
           false
         end
+
+      protected
+
         # experimental interface for default constructor: multiple lambdas
         def initialize *blocks
           blocks.each { |b| b.call self }
         end
+
         self
       end
     end
   end
-
 
   module Emitter::ModuleMethods
 
@@ -67,9 +75,7 @@ module Skylab::PubSub
       end
     end
   end
-end
 
-module Skylab::PubSub
   class Event < ::Struct.new :payload, :tag, :touched
     def initialize tag, *payload
       case payload.size
@@ -120,8 +126,7 @@ module Skylab::PubSub
     end
   end
 
-
-  class EventListeners < Hash
+  class EventListeners < ::Hash
     def add_listener name, block
       block.respond_to?(:call) or
         raise ArgumentError.new("no block given. " <<
@@ -130,7 +135,11 @@ module Skylab::PubSub
       self[name].push block
     end
   end
+
   module Emitter::InstanceMethods
+
+  protected
+
     # syntax:
     #   build_event <event>                                        # pass thru
     #   build_event { <tag> | <tag-name> } [ payload_item [..] ]
@@ -146,6 +155,7 @@ module Skylab::PubSub
         event_class.new(tag, *args, &block)
       end
     end
+
     def emit *args, &block
       if 1 == args.size and args.first.respond_to?(:payload)
         event = args.first
@@ -162,15 +172,21 @@ module Skylab::PubSub
         prok.call(* 1 == prok.arity ? [event] : event.payload )
       end.count
     end
+
+    def emits? event_name
+      event_cloud_definer.event_cloud.has? event_name
+    end
+
     def event_class
       Event
     end
+
     def event_listeners
       @event_listeners ||= EventListeners.new
     end
+
     def event_cloud_definer
       singleton_class.instance_variable_defined?('@event_cloud') ? singleton_class : self.class
     end
   end
 end
-
