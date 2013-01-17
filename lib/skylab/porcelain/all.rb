@@ -741,12 +741,22 @@ module Skylab::Porcelain
       res = self.action = nil
       str = self.invocation_slug = argv.shift or fail 'sanity'
       sym = invocation_slug.intern
+
       if actions_provider.respond_to? :call
-        self.actions_provider = self.actions_provider.call # collapse - load
+        self.actions_provider = actions_provider.call # collapse - load
         # this can offer considerable savings when compared to other brands
         # i mean this can allow us to lazy load possibly dozens of files,
         # possibly using a different framework entirely
       end
+
+      if actions_provider.respond_to? :collapse_intermediate_action
+        self.actions_provider =
+          actions_provider.collapse_intermediate_action self
+        # collapse the box (branch) action itself into a live, wired action.
+        # this way leaf actions that need a live parent action can have one.
+        # (the leaf would grab this in its `collapse_action` impl.)
+      end
+
       exact = actions_provider.actions.detect do |a|
         if sym == a.action_name
           b = true

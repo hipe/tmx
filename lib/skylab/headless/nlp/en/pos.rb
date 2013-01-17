@@ -9,6 +9,13 @@ module Skylab::Headless
     class << self
       alias_method :[], :new
     end
+
+  protected
+
+    def initialize stem
+      stem = stem.to_s if ::Symbol === stem # strict for now
+      super
+    end
   end
 
   module NLP::EN::POS

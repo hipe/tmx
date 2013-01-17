@@ -31,7 +31,7 @@ module Skylab::Headless
 
     def action_class_in_progress!
       @action_class_in_progress ||= begin
-        klass = ::Class.new
+        klass = ::Class.new cli_box_dsl_leaf_action_superclass
         klass.extend CLI::Box::DSL::Leaf_ModuleMethods
         klass.const_set :ACTIONS_ANCHOR_MODULE, action_box_module
         klass.send :include, CLI::Box::DSL::Leaf_InstanceMethods
@@ -54,6 +54,8 @@ module Skylab::Headless
       nil
     end
 
+    alias_method :cli_box_dsl_original_desc, :desc
+
     def desc first, *rest         # [#hl-033]
       action_class_in_progress!.desc first, *rest
       nil
@@ -70,6 +72,12 @@ module Skylab::Headless
     end
 
     attr_accessor :last_caller
+
+    cli_box_dsl_leaf_action_superclass = ::Object
+
+    define_method :cli_box_dsl_leaf_action_superclass do # special needs
+      cli_box_dsl_leaf_action_superclass
+    end
 
     def method_added meth         # #doc-point [#hl-040]
       klass = action_class_in_progress!
@@ -137,7 +145,10 @@ module Skylab::Headless
     define_method :collapse! do |action_ref|
       res = nil
       begin
-        klass = fetch( action_ref ) or break( res = klass )
+        klass = if ::Class === action_ref then action_ref else
+          fetch action_ref
+        end
+        klass or break( res = klass )
         o = klass.new self
         leaf_name = o.normalized_local_action_name
         @box_dsl_collapsed_to = leaf_name
