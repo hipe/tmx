@@ -5,7 +5,7 @@ module Skylab::Snag
       Snag::Services::Shellwords || nil
 
       [ "find #{ paths.map(&:shellescape).join ' ' }",
-        "\\(#{ names.map { |n| "-name #{ n.shellescape }" }.join ' -o ' }\\)",
+        "\\( #{ names.map { |n| "-name #{ n.shellescape }" }.join ' -o ' } \\)",
         "-exec grep --line-number #{ pattern.shellescape } {} +"
       ].join ' '
 

@@ -1,3 +1,5 @@
+[#026] #open refactor porcelain tree
+[#025]       #done fix and cover todo tree
 [#024]       #done inconsistencies over writing terminal newlines in file
 [#023]       #done refactor whatever
 [#022] #open #gimmick thing that converts @todo's into issues!?? 2012-06-04

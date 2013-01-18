@@ -15,9 +15,13 @@ module Skylab::Snag
       1 == tree.children_length and tree = tree.children.first # comment out and see
       Porcelain::Tree.lines(tree, node_formatter: -> x { x } ).each do |line|
         if line.node.leaf?
-          out "#{line.prefix} #{line.node.slug} #{line.node[:todo].content}"
+          a = [ "#{ line.prefix } #{ line.node.slug }" ]
+          if line.node[:todo]
+            a.push line.node[:todo].content
+          end
+          out a.join( ' ' )
         else
-          out "#{line.prefix} #{line.node.slug}"
+          out "#{ line.prefix } #{ line.node.slug }"
         end
       end
     end
@@ -28,7 +32,7 @@ module Skylab::Snag
       @action = action
       @client = client
       @todos = []
-      @action.event_listeners[:payload].clear
+      @action.send( :event_listeners )[:payload].clear # #todo NO. BAD.
       @action.on_payload do |event|
         pay = event.payload
         if pay.respond_to? :valid?
