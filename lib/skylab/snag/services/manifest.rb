@@ -73,14 +73,18 @@ module Skylab::Snag
       @tmpdir_pathname = nil
     end
 
+    write_f = -> fh do
+      sep = nil
+      -> line do
+        fh.write "#{ sep }#{ line }"
+        sep ||= "\n" # meh [#020]
+        nil
+      end
+    end
+
     change_lines = -> error, file, info, lines, rendered_identifier do
       -> fh do
-        sep = nil
-        write = -> lin do
-          fh.write "#{ sep }#{ lin }"
-          sep ||= "\n" # meh [#020]
-          nil
-        end
+        write = write_f[ fh ]
         res = nil
         found = false
         existing = file.normalized_line_producer
@@ -111,6 +115,7 @@ module Skylab::Snag
 
     prepend_lines = -> file, info, lines do
       -> fh do
+        write = write_f[ fh ]
         if lines.length.nonzero?
           if lines.length == 1
             info[ "new line: #{ lines[0] }" ]
@@ -121,10 +126,10 @@ module Skylab::Snag
         end
         lines.each do |l|                      # ~ put the newlines at the top ~
           info[ l ] if many
-          fh.puts l
+          write[ l ]
         end
         file.normalized_lines.each do |lin|    # (#open-filehandle)
-          fh.puts lin
+          write[ lin ]
         end
       end
     end

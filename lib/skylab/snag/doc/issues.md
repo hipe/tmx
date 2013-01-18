@@ -1,4 +1,5 @@
-[#023] #open refactor whatever
+[#024]       #done inconsistencies over writing terminal newlines in file
+[#023]       #done refactor whatever
 [#022] #open #gimmick thing that converts @todo's into issues!?? 2012-06-04
                (formerly [#sl-097])
 [#021]       #doc-point, #tracking-tag - this conv. of indenting per `#open`
