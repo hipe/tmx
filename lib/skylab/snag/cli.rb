@@ -71,10 +71,6 @@ module Skylab::Snag
     attr_writer :program_name
     public :program_name=
 
-    def val x                     # how do you decorate a special value?
-      em x
-    end
-
     # --*--
 
     extend Porcelain                           # now entering DSL zone
@@ -260,6 +256,10 @@ module Skylab::Snag
 
     def ick x                     # for rendering invalid values
       x.to_s.inspect
+    end
+
+    def val x                     # how do you decorate a special value?
+      em x
     end
   end
 

@@ -1,14 +1,11 @@
 require_relative '../test-support'
 
-module Skylab::Snag::TestSupport::Models::Node::File
-  ::Skylab::Snag::TestSupport::Models::Node[ File_TestSupport = self ]
-
+module Skylab::Snag::TestSupport::Models::Manifest::File
+  ::Skylab::Snag::TestSupport::Models::Manifest[ File_TestSupport = self ]
 
   include CONSTANTS
 
-
   extend TestSupport::Quickie # try loading test files directly with `ruby -w`
-
 
   module InstanceMethods
 

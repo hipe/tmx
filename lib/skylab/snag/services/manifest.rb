@@ -182,7 +182,7 @@ module Skylab::Snag
     def file
       @file ||= begin
         @pathname or fail 'sanity'
-        Models::Node::File.new @pathname
+        Models::Manifest::File.new @pathname
       end
     end
 

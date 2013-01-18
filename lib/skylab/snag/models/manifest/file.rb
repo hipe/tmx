@@ -1,5 +1,5 @@
 module Skylab::Snag
-  class Models::Node::File
+  class Models::Manifest::File
     # (this is used by services and hence cannot be a sub-client!)
 
     # `normalized_line_producer` is like a filehandle that you call `gets`
