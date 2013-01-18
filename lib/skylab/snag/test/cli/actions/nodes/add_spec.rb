@@ -1,5 +1,4 @@
-require_relative 'test-support'
-
+require_relative '../test-support'
 
 module Skylab::Snag::TestSupport::CLI::Actions
 
@@ -8,7 +7,6 @@ module Skylab::Snag::TestSupport::CLI::Actions
   describe "#{ Snag::CLI } Actions - Add" do
 
     extend Actions_TestSupport
-
 
     def prepare_tmpdir
       tmpdir_clear.patch <<-HERE.unindent
@@ -23,11 +21,12 @@ module Skylab::Snag::TestSupport::CLI::Actions
       HERE
     end
 
+    invocation = [ 'nodes', 'add' ] # how it is invoked in cli changes s/times
 
     it "verbose dry run" do
       prepare_tmpdir
       from_tmpdir do
-        client_invoke 'add', '-n', '-v', 'foo bizzle'
+        client_invoke( *invocation, '-n', '-v', 'foo bizzle' )
       end
       o( / new line: / )
       if output.lines.first.string =~ /mkdir .+snag-PROD/
@@ -44,7 +43,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
     it "non-verbose non-dry run" do
       prepare_tmpdir
       from_tmpdir do
-        client_invoke 'add', 'foo bizzle'
+        client_invoke( *invocation, 'foo bizzle' )
       end
       o( /new line: \[#004\] foo bizzle$/ )
       o( /\bdone\./ )

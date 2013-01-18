@@ -15,16 +15,21 @@ module Skylab::Snag
       @api ||= Snag::API::Client.new self
     end
 
-    def api_build_wired_action normalized_action_name
+    def api_build_wired_action normalized_action_name, wiring=nil
       action = api.build_action normalized_action_name
-      wire_action action
+      if wiring
+        wiring[ action ]
+      else
+        wire_action action
+      end
       action
     end
 
-    def api_invoke normalized_name, param_h=nil
+    def api_invoke normalized_name, param_h=nil, wiring=nil
       res = nil
       begin
-        act = api_build_wired_action( normalized_name ) or break( res = act )
+        act = api_build_wired_action normalized_name, wiring
+        act or break( res = act )
         res = act.invoke param_h
       end while nil
       res
@@ -34,6 +39,7 @@ module Skylab::Snag
   class CLI::Client < Headless::DEV::Client
     # mash together something that lets us straddle two worlds
 
+    # include CLI::Action::InstanceMethods # (used to be s.c)
     include Snag::Core::SubClient::InstanceMethods
 
   protected
@@ -50,6 +56,10 @@ module Skylab::Snag
         cli = cfa[ -2 ].client_instance
         cli
       end
+    end
+
+    def create_leaf_option_parser
+      Snag::Services::OptionParser.new
     end
 
     def invite x
@@ -86,8 +96,18 @@ module Skylab::Snag
     def self.aliases              # compat to all.rb
     end
 
+    def self.collapse_action legacy_client # #todo
+      new legacy_client.actions_provider
+    end
+
+    # --*--
+
+    def parse argv                # compat all.rb [#sg-010]
+      [ self, :invoke, [ argv ] ] # [ client, action_ref, args ]
+    end
 
   protected
+
     def initialize request_client
       super
       @param_h = { }
@@ -106,13 +126,7 @@ module Skylab::Snag
     # --*--
 
     attr_reader :param_h
-
-    def wire_action action
-      @request_client.send :wire_action, action
-      nil
-    end
   end
-
 
   class CLI::Action::Box < CLI::Action
     include Headless::CLI::Box::InstanceMethods
@@ -125,9 +139,9 @@ module Skylab::Snag
       @actions ||= CLI::Action::Enumerator.new self
     end                           # all of this is derp
 
-    define_singleton_method :collapse_action do |legacy_client|
-      client = CLI::Client.new legacy_client, 1
-      new client
+    def self.collapse_intermediate_action legacy_client
+      # when we are finding a leaf, we need a live parent
+      new( CLI::Client.new legacy_client, 2 ) # TWO here
     end
 
                                   # #experimental #frontier #push-up candidate
@@ -138,10 +152,8 @@ module Skylab::Snag
       ( klass.const_set :Actions, ::Module.new ).extend MetaHell::Boxxy
     end
 
-    # --*--
-
-    define_method :parse do |argv| # compat all.rb [#sg-010]
-      [ self, :invoke, [argv] ]   # [ client, action_ref, args ]
+    def actions
+      self.class.actions
     end
 
   protected
@@ -158,7 +170,46 @@ module Skylab::Snag
       end
       o
     end
+
+    # (we don't necessarily have to combine the dsl- and non-dsl-variant:)
+
+    define_singleton_method :cli_box_dsl_leaf_action_superclass do
+      CLI::Action::Box_DSL_Leaf
+    end
+
+    extend Headless::CLI::Box::DSL
   end
+
+  class CLI::Action::Box_DSL_Leaf < CLI::Action
+    # When we "def" a function in the dsl, what class do we use?
+    # this will experimentally backpedal over some of the box logic around
+    # collapsing in order to pass-off the same behavior to legacy porcelain.
+
+    def self.collapse_action legacy_client
+      # *EXPERIMENTAL*: make a dupe of box, collapse it
+      box1 = legacy_client.actions_provider
+      box2 = box1.class.allocate
+      leaf_class = self
+      box2.instance_exec do
+        h = {
+          :@error_count    => -> _ { @error_count = 0 },     # yes
+          :@queue          => -> _ { @queue = [:dispatch] }, # hack city
+          :@param_h        => -> x { @param_h = x },         # maybe
+          :@request_client => -> x { @request_client = x }   # yes
+        }
+        box1.instance_variables.each do |ivar| # what to do with *each* one?
+          h[ivar][ box1.instance_variable_get ivar ]
+        end
+        collapse! leaf_class
+      end
+      box2
+    end
+
+  protected
+
+  end
+
+  # --*--    below here make sure to have created all dsl support etc    --*--
 
   class CLI::Action
     ACTIONS_ANCHOR_MODULE = CLI::Actions # here b.c of an otherwise circ. dep.

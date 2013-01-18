@@ -1,6 +1,4 @@
 module Skylab::Snag
-  module CLI::Actions
-  end
 
   class CLI::Actions::Node < CLI::Action::Box
   end

@@ -9,6 +9,8 @@ module Skylab::Snag
 
     extend PubSub::Emitter # puts `emit` i.m lower on the chain than s.c above!
 
+    public :emits? # for #experimental dynamic wiring per action reflection
+
     meta_attribute :default
     meta_attribute :required
 

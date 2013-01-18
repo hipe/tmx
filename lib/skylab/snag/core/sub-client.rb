@@ -23,5 +23,13 @@ module Skylab::Snag
     def val x                     # typically emphasize a value
       request_client.send :val, x
     end
+
+    def wire_action x
+      request_client.send :wire_action, x
+    end
+
+    def wire_action_for_error x
+      request_client.send :wire_action_for_error, x
+    end
   end
 end

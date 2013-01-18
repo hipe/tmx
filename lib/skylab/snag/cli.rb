@@ -79,31 +79,6 @@ module Skylab::Snag
 
     extend Porcelain                           # now entering DSL zone
 
-    desc "Add an \"issue\" line to #{ Snag::API.manifest_file_name }" #[#hl-025]
-    desc "Lines are added to the top and are sequentially numbered."
-
-    desc ' arguments:' #                      DESC # should be styled [#hl-025]
-
-    argument_syntax '<message>'
-    desc '   <message>                        a one line description of the issue'
-
-    option_syntax do |param_h|                 # (away at [#010] these two lines
-      o = self                                 #  to `option_parser do |o|`.
-                                               #  This is repeated in this file)
-      o.on '-n', '--dry-run', "don't actually do it" do
-        param_h[:dry_run] = true
-      end
-      o.on '-v', '--verbose', 'verbose output' do
-        param_h[:verbose] = true
-      end
-    end
-
-    def add message, param_h
-      api_invoke [:nodes, :add], { message: message }.merge( param_h )
-    end
-
-    # --*--
-
     desc "show the details of issue(s)"
 
     action.aliases 'ls', 'show'
@@ -155,6 +130,8 @@ module Skylab::Snag
     # --*--
 
     namespace :node, -> { CLI::Actions::Node }
+
+    namespace :nodes, -> { CLI::Actions::Nodes }
 
     # --*--
 
@@ -277,37 +254,48 @@ module Skylab::Snag
       runtime.on_info  { |e| parent.emit(:info, e.touch!) }
       runtime.on_all   { |e| parent.emit(e.type, e) unless e.touched? }
     end
-
-    def wire_action action        # #todo this is nice in constructors for
-                                  # cli actions
-      action.on_payload do |e|
-        runtime.emit :payload, e
-      end
-
-      render = -> e do
-        msg = nil
-        if e.payload.respond_to? :render_for
-          msg = e.payload.render_for self
-        else
-          msg = e.message
+                                  # (also this kind of thing can be nice in
+    def wire_action action        # constructors for cli actions)
+      if action.emits? :payload
+        action.on_payload do |e|
+          runtime.emit :payload, e
         end
-        msg
       end
+      wire_action_for_info  action if action.emits? :info
+      wire_action_for_error action if action.emits? :error
+      nil
+    end
 
+    render = -> me, e do
+      msg = nil
+      if e.payload.respond_to? :render_for
+        msg = e.payload.render_for me
+      else
+        msg = e.message
+      end
+      msg
+    end
+
+    define_method :wire_action_for_error do |action|
       action.on_error do |e|
-        rendered = render[ e ]
+        rendered = render[ self, e ]
         e.message = "failed to #{ e.verb } #{ e.noun } - #{ rendered }"
         runtime.emit :error, e
+        nil
       end
+      nil
+    end
 
+    define_method :wire_action_for_info do |action|
       action.on_info do |e|
         unless e.touched?
-          rendered = render[ e ]
+          rendered = render[ self, e ]
           md = %r{\A\((.+)\)\z}.match( rendered ) and rendered = md[1]
           e.message = "while #{ e.verb.progressive } #{ e.noun }, #{ rendered }"
           md and e.message = "(#{ e.message })" # so ridiculous
           runtime.emit :info, e
         end
+        nil
       end
       nil
     end
