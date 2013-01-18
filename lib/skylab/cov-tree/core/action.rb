@@ -9,12 +9,13 @@ module Skylab::CovTree
 
 
   module Core::Action::ModuleMethods
+    include Headless::Action::ModuleMethods
 
     methodize = Autoloader::Inflection::FUN.methodize
 
     define_method :normalized_name do # ::Blah::Actions::Foo::X -> [:foo, :x]
       @normalized_name ||= begin
-        amn = self::ACTIONS_ANCHOR_MODULE.name
+        amn = actions_anchor_module.name
         0 == name.index( amn ) or fail 'sanity'
         rest = name[ (amn.length + 2) .. -1 ]
         rest.split( '::' ).map { |s| methodize[ s ] }

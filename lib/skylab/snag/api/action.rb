@@ -18,7 +18,7 @@ module Skylab::Snag
 
     event_class API::MyEvent
 
-    ACTIONS_ANCHOR_MODULE = API::Actions
+    ACTIONS_ANCHOR_MODULE = -> { API::Actions }
 
     def self.attributes_or_params
       res = nil

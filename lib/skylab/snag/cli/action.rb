@@ -1,5 +1,7 @@
 module Skylab::Snag
   class CLI::Action # just derping around for now, also [#sl-109]
+    ACTIONS_ANCHOR_MODULE = -> { CLI::Actions }
+
     def self.porcelain            # compat all.rb [#sg-010]
       :porcelain_not_used
     end
@@ -227,12 +229,6 @@ module Skylab::Snag
 
   protected
 
-  end
-
-  # --*--    below here make sure to have created all dsl support etc    --*--
-
-  class CLI::Action
-    ACTIONS_ANCHOR_MODULE = CLI::Actions # here b.c of an otherwise circ. dep.
   end
 
   class CLI::Action::Enumerator < ::Enumerator # experimental derping - mind you
