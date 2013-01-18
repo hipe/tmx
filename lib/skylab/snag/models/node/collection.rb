@@ -34,7 +34,7 @@ module Skylab::Snag
         fly = res.to_a.first      # just have faith in the system
         if ! fly
           not_found ||= -> nr do
-            error "there is no node with the identifer #{ ick nr }"
+            error "there is no node with the identifier #{ ick nr }"
           end
           break( res = not_found[ node_ref ] )
         end

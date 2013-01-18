@@ -56,9 +56,13 @@ module Skylab::Snag
       end
     end
 
+    def open?                     # necessary in short-circuit finds to check
+      @fh                         # if the one we found was also the last one
+    end                           # in which case it will be closed already
+
     def release_early
-      @fh.close
       @file_mutex = nil
+      @fh.close
       @fh = nil
     end
 
@@ -69,6 +73,7 @@ module Skylab::Snag
 
     def initialize pathname
       @file_mutex = false
+      @fh = nil
       @pathname = pathname
     end
   end

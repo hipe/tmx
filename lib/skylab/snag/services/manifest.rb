@@ -20,7 +20,7 @@ module Skylab::Snag
             nil
           end
           if last_item
-            file.release_early
+            file.release_early if file.open? # might be last one.
             throw :last_item, last_item
           end
           nil
@@ -102,7 +102,7 @@ module Skylab::Snag
         if found
           res = true
         else
-          res = error[ "node lines not found for node with identifer #{
+          res = error[ "node lines not found for node with identifier #{
             }#{ rendered_identifier }" ]
         end
         res

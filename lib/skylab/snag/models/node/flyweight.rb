@@ -66,7 +66,7 @@ module Skylab::Snag
         '[#' == scn.peek( 2 ) or next failure[ '[#' ]
         @first_line = line
         pos = (scn.pos += 2)
-        if scn.skip( /[a-z]+-/ )                             # identifer_prefix?
+        if scn.skip( /[a-z]+-/ )                            # identifier_prefix?
           o.identifier_prefix.begin, o.identifier_prefix.end =
             pos, (pos = scn.pos) - 2
         end

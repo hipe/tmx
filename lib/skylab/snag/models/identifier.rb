@@ -44,6 +44,8 @@ module Skylab::Snag
     def render
       self.class.render prefix, body
     end
+
+    alias_method :to_s, :render
   end
 
   module Models::Identifier::Events
@@ -51,7 +53,7 @@ module Skylab::Snag
 
   class Models::Identifier::Events::Invalid < Snag::Model::Event.new :mixed
     build_message -> do
-      "invalid identifer name #{ ick mixed } - full valid tag: #{
+      "invalid identifier name #{ ick mixed } - rendered full identifer: #{
       }\"[#foo-001.2.3]\", equivalent to: \"001.2.3\" #{
       }(prefixes ignored), \"001\" matches the superset"
     end

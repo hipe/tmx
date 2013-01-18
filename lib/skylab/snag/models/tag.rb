@@ -27,8 +27,9 @@ module Skylab::Snag
     define_singleton_method :rendered_tag_rx do rendered_tag_rx end
 
     define_singleton_method :normalize do |tag_name, error, info=nil|
-      if valid_tag_rx =~ tag_name
-        tag_name
+      tag_name_s = tag_name.to_s
+      if valid_tag_rx =~ tag_name_s
+        tag_name_s.intern
       else
         rs = error[ Models::Tag::Events::Invalid.new tag_name ]
         rs ? false : rs           # Our delegated result must be falseish,
@@ -37,9 +38,11 @@ module Skylab::Snag
 
     # --*--
 
-    def to_s
+    def render
       self.class.render name
     end
+
+    alias_method :to_s, :render
 
   protected
 
@@ -53,15 +56,29 @@ module Skylab::Snag
   module Models::Tag::Events
   end
 
-  class Models::Tag::Events::Added < Snag::Model::Event.new :rendered, :verb
+  class Models::Tag::Events::Add < Snag::Model::Event.new :rendered, :verb
     build_message -> do
-      "#{ verb } #{ val rendered }"
+      "#{ Headless::NLP::EN::POS::Verb[ verb.to_s ].preterite } #{
+        }#{ val rendered }"
     end
   end
 
   class Models::Tag::Events::Invalid < Snag::Model::Event.new :name
     build_message -> do
       "tag must be composed of 'a-z' - invalid tag name: #{ ick name }"
+    end
+  end
+
+  class Models::Tag::Events::Rm < Snag::Model::Event.new :rendered
+    build_message -> do
+      "removed #{ val rendered }"
+    end
+  end
+
+  class Models::Tag::Events::Tags < Snag::Model::Event.new :node, :tags
+    build_message -> do
+      "#{ val node.identifier } is tagged with #{
+        }#{ and_ tags.map{ |t| val t } }."
     end
   end
 end

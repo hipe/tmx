@@ -45,7 +45,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
       from_tmpdir do
         client_invoke( *invocation, 'foo bizzle' )
       end
-      o( /new line: \[#004\] foo bizzle$/ )
+      o( /new line: \[#004\] {7}foo bizzle$/ )
       o( /\bdone\./ )
       o
     end

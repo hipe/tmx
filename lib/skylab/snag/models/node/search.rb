@@ -17,7 +17,7 @@ module Skylab::Snag
           elsif positive_integer_rx =~ integer_ref
             integer = integer_ref.to_i
           else
-            error "must look like integer: #{ num_s }"
+            error "must look like integer: #{ integer_ref }"
             break
           end
           @counter = 0
@@ -106,11 +106,15 @@ module Skylab::Snag
     class Query_Nodes_::HasTag
       def self.new_valid request_client, sexp
         tag = sexp[1]
-        normalized = Models::Tag.normalize tag,
+        normalized_tag_name = Models::Tag.normalize tag,
           -> invalid do
             request_client.send :error, ( invalid.render_for request_client )
           end
-        normalized ? new( request_client, normalized ) : normalized
+        if normalized_tag_name
+          new request_client, normalized_tag_name
+        else
+          normalized_tag_name
+        end
       end
       def match? node
         if node.valid
@@ -148,7 +152,7 @@ module Skylab::Snag
         end
       end
       def phrase
-        "identifer starting with \"#{ @identifier.body }\""
+        "identifier starting with \"#{ @identifier.body }\""
       end
     protected
       def initialize request_client, identifier_struct

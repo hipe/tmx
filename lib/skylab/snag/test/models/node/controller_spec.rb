@@ -22,17 +22,18 @@ module Skylab::Snag::TestSupport::Models::Node
         }Svyable X Ravi Remix)" by Zedd - TableTurner started playing]
         node = build_node
         node.message = _109_chars
-        node.first_line_body.length.should eql(73)
-        node.first_line_body[ -3 .. -1 ].should eql(' by')
+        node.first_line_body.length.should eql( 68 )
+        node.first_line_body[ -7 .. -1 ].should eql( ' X Ravi' )
         el = node.extra_lines
         el.length.should eql( 1 )
-        el.first.should eql( 'Zedd - TableTurner started playing' )
+        el.first.should eql( 'Remix)" by Zedd - TableTurner started playing' )
       end
 
       it "with one long line that looks (to it) line one long word" do
         node = build_node
-        node.instance_variable_set '@line_width', 10 # other thing is at 7
-        node.instance_variable_set '@max_lines', 4
+        node.instance_variable_set :@do_prepend_open_tag_ws, false
+        node.instance_variable_set :@line_width, 10 # other thing is at 7
+        node.instance_variable_set :@max_lines, 5
         long_line = "ABC_one_line_-two-line-_tre_line_"
         node.message = long_line
         node.first_line_body.should eql( 'ABC' )
@@ -45,8 +46,15 @@ module Skylab::Snag::TestSupport::Models::Node
 
     # --*--
 
-    def build_node
-      node = Snag::Models::Node::Controller.new :test_models_node_controller
+
+    class Controller_RC_Mock
+      def emit name, pay
+        $stderr.puts "WAT: #{ [name, pay].inspect }"
+      end
+    end
+
+    define_method :build_node do
+      node = Snag::Models::Node::Controller.new Controller_RC_Mock.new
       node.instance_variable_set '@extra_lines_header', ''
       node
     end

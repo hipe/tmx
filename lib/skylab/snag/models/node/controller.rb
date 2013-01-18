@@ -3,27 +3,25 @@ module Skylab::Snag
     include Snag::Core::SubClient::InstanceMethods
 
     def add_tag tag_ref, do_append
-      res = nil
-      begin
-        tag_body = Models::Tag.normalize tag_ref,
-          -> e { error e }, -> e { info e }
-        tag_body or break( res = tag_body )
-        enum = Models::Tag::Collection.new @message
-        found = enum.detect { |tg| tg.name == tag_body }
-        if found
-          res = error "tag already exists - #{ found }"
-          break
-        end
-        res = enum.add! tag_body, do_append, -> e { error e }, -> e { info e }
-        res or break              # (this might always succeed)
-        undelineate               # here after above success. caveat err cnt
-        res = valid               # it might be too long now
-      end while nil
-      res
+      tag( ( do_append ? :append : :prepend ), tag_ref, -> e { error e } )
     end
 
-    def append_tag tag_ref
-      add_tag tag_ref, true
+    def close
+      res = nil
+      begin
+        redundant = -> e { info e ; nil }
+        a = tag :remove,  :open, redundant
+        b = tag :prepend, :done, redundant
+        res = if false == a || false == b
+          # an error for one is an error for all, don't rewrite file
+          false
+        else
+          # two nils means it was fully redundant, do not rewrite file
+          # else at least one of them was trueish, rewrite file.
+          a || b
+        end
+      end while nil
+      res
     end
 
     attr_reader :date_string
@@ -69,12 +67,16 @@ module Skylab::Snag
       msg
     end
 
-    def prepend_tag tag_ref
-      add_tag tag_ref, false
+    def remove_tag tag_ref
+      tag :remove, tag_ref, -> e { error e }
     end
 
     def rendered_identifier
       @identifier.render
+    end
+
+    def tags
+      @tags ||= Models::Tag::Collection.new @message # asking for trouble
     end
 
     def valid err=nil
@@ -99,6 +101,7 @@ module Skylab::Snag
       @date_string = nil
       @delineated = nil
       @do_prepend_open_tag = nil
+      @do_prepend_open_tag_ws = true
       @extra_line_header = nil
       @extra_lines = []
       @first_line_body = nil
@@ -142,9 +145,16 @@ module Skylab::Snag
           lines = []
           ok = true
 
+          open_tag = Models::Tag.canonical[ :open ]
           scn = Snag::Services::StringScanner.new -> do
             parts = [ ]
-            parts.push Models::Tag.canonical[ :open ] if @do_prepend_open_tag
+            if @do_prepend_open_tag
+              parts.push open_tag
+            elsif @do_prepend_open_tag_ws
+              if ! ( @message && 0 == @message.index( open_tag.render ) )
+                parts.push( ' ' * open_tag.render.length ) # [#sg-021]
+              end
+            end
             parts.push @message if @message
             parts.push @date_string if @date_string
             parts.join ' '
@@ -229,6 +239,48 @@ module Skylab::Snag
 
     def max_lines
       @max_lines ||= Models::Node.max_lines_per_node
+    end
+
+    tag_parse_args = -> operation do
+      case operation
+      when :prepend ; do_add = true ; do_append = false
+      when :append  ; do_add = true ; do_append = true
+      when :remove  ; do_add = false
+      else raise ::ArgumentError.new "no"
+      end
+      [ do_add, do_append ]
+    end
+
+    define_method :tag do |operation, tag_ref, redundant|
+      do_add, do_append = tag_parse_args[ operation ] ; operation = nil
+      res = nil
+      begin
+        tag_body = Models::Tag.normalize tag_ref,
+          -> e { error e }, -> e { info e }
+        tag_body or break( res = tag_body )
+        enum = tags # goofing around here ..
+        found = enum.detect { |tg| tg.normalized_name == tag_body }
+        if do_add
+          if found
+            res = redundant[ "#{ val identifier } is already tagged #{
+              }with #{ val found }" ]
+            break
+          end
+          res = enum.add! tag_body, do_append, -> e { error e }, -> e { info e }
+          res or break              # (this might always succeed)
+        else
+          if ! found
+            res = redundant[ "#{ val identifier } is not tagged with #{
+              }#{ ick Models::Tag.render( tag_body ) }" ]
+            break
+          end
+          res = enum.rm! found, -> e { error e }, -> e { info e }
+          res or break
+        end
+        undelineate               # here after above success. caveat err cnt
+        res = valid               # it might be too long now
+      end while nil
+      res
     end
 
     def undelineate

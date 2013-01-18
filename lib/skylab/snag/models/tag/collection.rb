@@ -10,15 +10,35 @@ module Skylab::Snag
       else
         @scn.string.replace "#{ tag_str }#{ sep }#{ @scn.string }"
       end
-      info[ Models::Tag::Events::Added.new tag_str,
-              ( do_append ? :append : :prepend ) ]
+      info[ Models::Tag::Events::Add.new tag_str,
+            ( do_append ? :append : :prepend ) ]
+      true
+    end
+
+    def rm! fly, error, info
+      message = @scn.string
+      pos_a = fly.begin
+      pos_b = fly.end
+      if pos_a > 0 && ' ' == message[ pos_a - 1 ]
+        pos_a -= 1
+      elsif pos_b < ( message.length - 1 ) && ' ' == message[ pos_b + 1 ]
+        pos_b += 1
+      end
+      pos_a = nil if 0 == pos_a
+      pos_b = nil if pos_b == ( message.length - 1 )
+      new = "#{ message[ 0 .. ( pos_a - 1 ) ] if pos_a }#{
+        }#{ message[ ( pos_b + 1 ) .. -1 ] if pos_b }"
+      rendered = fly.render
+      fly.reset
+      @scn.string.replace new
+      info[ Models::Tag::Events::Rm.new rendered ]
       true
     end
 
   protected
 
     def initialize body_string
-      @fly = Snag::Models::Tag.allocate # not frozen
+      @fly = Snag::Models::Tag::Flyweight.new body_string
       @scn = Snag::Services::StringScanner.new body_string
       super( ) { |y| visit y }
     end
@@ -32,9 +52,9 @@ module Skylab::Snag
       loop do
         @scn.skip rx_
         @scn.eos? and break
-        rendered = @scn.scan( rx ) or fail 'sanity'
-        md = rx.match rendered # inorite
-        @fly.name = md[:tag_body]
+        beg = @scn.pos
+        len = @scn.skip( rx ) or fail 'sanity'
+        @fly.set beg, ( beg + len - 1 )
         y << @fly
       end
       nil
