@@ -10,7 +10,7 @@ module Skylab::Snag
 
     attribute :names, required: true, default: ['*.rb']
     attribute :paths, required: true
-    attribute :pattern, required: true, default: '@todo\>'
+    attribute :pattern, required: true, default: "@#{ }todo\\>"
     attribute :show_command_only
 
   protected

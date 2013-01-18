@@ -23,7 +23,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
       o
     end
 
-    invocation = [ 'todo' ]
+    invocation = [ 'todo', 'find' ]
 
     define_method :invoke do |*argv|
       @pn = setup[ self ]

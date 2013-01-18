@@ -46,11 +46,11 @@ module Skylab::Snag
     end
 
     def info msg
-      @client.emit :info, msg
+      @client.send :emit, :info, msg
     end
 
     def out msg
-      @client.emit :payload, msg
+      @client.send :emit, :payload, msg
     end
   end
 end

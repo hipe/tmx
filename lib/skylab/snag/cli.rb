@@ -27,6 +27,10 @@ module Skylab::Snag
       end
     end
 
+    def emit name, pay
+      porcelain.runtime.emit name, pay
+    end
+
     def error msg # away at [#010]
       porcelain.runtime.emit :error, "#{ program_name } says: #{ msg }"
       false
@@ -152,42 +156,9 @@ module Skylab::Snag
 
     # --*--
 
-    desc "a report of the @todo's in a codebase"
+    namespace :todo, -> { CLI::Actions::Todo }
 
-    option_syntax do |o|
-      d = Snag::API::Actions::ToDo::Report.attributes.with :default
-
-      on('-p', '--pattern <PATTERN>',
-        "the todo pattern to use (default: '#{d[:pattern]}')"
-        ) { |p| o[:pattern] = p }
-      on('--name <NAME>',
-        "the filename patterns to search, can be specified",
-        "multiple times to broaden the search (default: '#{d[:names] * "', '"}')"
-        ) { |n| (o[:names] ||= []).push n }
-      on('--cmd', 'just show the internal grep / find command',
-         'that would be used (debugging).') { o[:show_command_only] = true }
-      on('-t', '--tree', 'experimental tree rendering') { o[:show_tree] = true }
-
-    end
-
-    argument_syntax '<path> [<path> [..]]'
-
-    def todo *paths, opts
-      res = nil
-      action = api_build_wired_action [:to_do, :report]
-      action.on_number_found do |e|
-        info "(found #{ e.count } item#{ s e.count })"
-      end
-      show_tree = opts.delete( :show_tree )
-      if show_tree
-        tree = CLI::ToDo::Tree.new action, runtime
-      end
-      res = action.invoke opts.merge( paths: paths )
-      if show_tree
-        res = tree.render
-      end
-      res
-    end
+    # --*--
 
   protected                       # (below was left in the bottom half b/c
                                   # it is the evil that shall not be touched
