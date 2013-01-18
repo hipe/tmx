@@ -1,5 +1,5 @@
 module Skylab::Snag
-  class Models::ToDo::Item        # designed for flyweighting
+  class Models::ToDo::Flyweight
 
     def content
       @rest.nil? and parse!

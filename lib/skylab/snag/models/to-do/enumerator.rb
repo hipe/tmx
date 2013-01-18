@@ -15,7 +15,7 @@ module Skylab::Snag
       @command = Models::ToDo::Command.new paths, names, pattern
       super() do |y|
         Snag::Services::Open3.popen3( @command.string ) do |sin, sout, serr|
-          todo = Models::ToDo::Item.new
+          todo = Models::ToDo::Flyweight.new
           @last_count = 0
           sout.each_line do |line|
             @last_count += 1
