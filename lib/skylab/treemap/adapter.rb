@@ -93,7 +93,8 @@ module Skylab::Treemap
 
     def active_class
       @active_class ||= begin
-        if mote = self[(@active_adapter_name ||= nil)]
+        mote = self[ active_adapter_name ] if active_adapter_name
+        if mote
           mote.client_module or mote.load! { |e| fail(e) }
         end
       end

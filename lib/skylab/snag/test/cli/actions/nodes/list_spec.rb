@@ -1,4 +1,4 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
 
 module Skylab::Snag::TestSupport::CLI::Actions
@@ -23,9 +23,11 @@ module Skylab::Snag::TestSupport::CLI::Actions
       shared_setup = -> _ { }
     end
 
+    invocation = [ 'nodes', 'list' ]
+
     it "with `list -n 1` - shows only the first one it finds" do
       shared_setup[ self ]
-      invoke_from_tmpdir 'list', '-n', '1'
+      invoke_from_tmpdir( *invocation, '-n', '1' )
 
       infos = []
       pays = []
@@ -41,7 +43,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
       pays.length.should eql(3)
       o = -> { pays.shift }
       o[].should eql('---')
-      o[].should match( /\Aidentifier +: +003\z/ )
+      o[].should match( /\Aidentifier_body +: +003\z/ )
       o[].should match( /\Afirst_line_body +: #open feep my deep\z/ )
       o[].should eql(nil)
     end
@@ -49,7 +51,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
     context "if you ask to see a particular one" do
       it "with `show 002 --no-verbose` - it shows it tersely" do
         shared_setup[ self ]
-        invoke_from_tmpdir 'show', '002', '--no-verbose'
+        invoke_from_tmpdir( *invocation, '002', '--no-verbose' )
         names, strings = output.unzip
         names.count{ |x| x == :pay }.should eql( 2 ) # i don't care about info
         act = output.lines.select{ |x| :pay == x.name }.map(&:string).join ''

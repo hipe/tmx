@@ -2,7 +2,8 @@ module Skylab::Snag
   class Models::Node::Flyweight
 
     field_names = [
-      :identifier,
+      :identifier_prefix,
+      :identifier_body,
       :first_line_body,
       :date_string,
       :extra_lines_count
@@ -10,20 +11,19 @@ module Skylab::Snag
 
     define_singleton_method :field_names do field_names end
 
-
     class Indexes_
-      attr_reader :prefix, :integer, :identifier, :body
+      attr_reader :identifier_prefix, :integer, :identifier_body, :body
       def clear
-        @prefix.clear
+        @identifier_prefix.clear
         @integer.clear
-        @identifier.clear
+        @identifier_body.clear
         @body.clear
       end
     protected
       def initialize
-        @prefix = Index_.new
+        @identifier_prefix = Index_.new
         @integer = Index_.new
-        @identifier = Index_.new
+        @identifier_body = Index_.new
         @body = Index_.new
       end
     end
@@ -41,6 +41,10 @@ module Skylab::Snag
       end
     protected
       alias_method :initialize, :clear
+    end
+
+    def build_identifier
+      Models::Identifier.new identifier_prefix, identifier_body, integer_string
     end
 
     define_method :each_node do |line_producer, node_consumer|
@@ -62,14 +66,15 @@ module Skylab::Snag
         '[#' == scn.peek( 2 ) or next failure[ '[#' ]
         @first_line = line
         pos = (scn.pos += 2)
-        if scn.skip( /[a-z]+-/ )                             # prefix?
-          o.prefix.begin, o.prefix.end = pos, (pos = scn.pos) - 2
+        if scn.skip( /[a-z]+-/ )                            # identifier_prefix?
+          o.identifier_prefix.begin, o.identifier_prefix.end =
+            pos, (pos = scn.pos) - 2
         end
         scn.skip( /\d+/ ) or next failure[ 'digits' ]
-        o.integer.begin = o.identifier.begin = pos           # integer &
-        o.integer.end = scn.pos - 1                          #  identifier
+        o.integer.begin = o.identifier_body.begin = pos      # integer &
+        o.integer.end = scn.pos - 1                          #  identifier_body
         scn.skip( /(\.\d+)+/ )
-        o.identifier.end = scn.pos - 1
+        o.identifier_body.end = scn.pos - 1
         scn.skip( /\][\t ]*/ ) or next failure[ ']' ]
         o.body.begin, o.body.end = scn.pos, line.length - 1  # body
         if gets[ ]
@@ -88,7 +93,7 @@ module Skylab::Snag
 
     date_rx = /\b\d{4}-\d{2}-\d{2}\b/          # (just know that dates like
                                                # this might be deprecated
-    define_method :date_string do              # in liew of vcs integration)
+    define_method :date_string do              # in lieu of vcs integration)
       if date_rx =~ @first_line
         $~[0]
       end
@@ -106,22 +111,30 @@ module Skylab::Snag
       @first_line[ @indexes.body.range ]
     end
 
-    def integer
-      @first_line[ @indexes.integer.range ].to_i
+    def integer_string
+      @first_line[ @indexes.integer.range ]
     end
 
-    def identifier_string                      # (not to be confused with the
-      @first_line[ @indexes.identifier.range ] # struct (models)!)
+    def integer
+      integer_string.to_i
+    end
+
+    def identifier_body
+      @first_line[ @indexes.identifier_body.range ]
     end
 
     def invalid_reason
       parse_failure # for now
     end
 
-    def prefix
-      if @indexes.prefix.exist?
-        @first_line[ @indexes.prefix.range ]
+    def identifier_prefix
+      if @indexes.identifier_prefix.exist?
+        @first_line[ @indexes.identifier_prefix.range ]
       end
+    end
+
+    def rendered_identifier
+      Models::Identifier.render identifier_prefix, identifier_body
     end
 
     attr_reader :valid
@@ -129,7 +142,7 @@ module Skylab::Snag
 
     def yaml_data_pairs # make sure you use `field_names` !
       a = [
-        [:identifier, identifier_string],
+        [:identifier_body, identifier_body],
         [:first_line_body, first_line_body]
       ]
       if (ds = date_string)

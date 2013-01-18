@@ -1,6 +1,8 @@
 module Skylab::Snag
   class CLI
-    include Headless::NLP::EN::Methods
+    extend MetaHell::Autoloader::Autovivifying::Recursive # used below
+
+    include CLI::Action::InstanceMethods
 
   protected                       # (DSL happens at bottom half)
 
@@ -23,20 +25,6 @@ module Skylab::Snag
         end
         super(& wiring)
       end
-    end
-
-    def api
-      @api ||= Snag::API::Client.new self
-    end
-
-    def api_invoke normalized_name, param_h=nil
-      res = nil
-      begin
-        a = api.build_action( normalized_name ) or break( res = a )
-        a = a.wire!(& wire) # [#010] how i long for you
-        res = a.invoke param_h
-      end while nil
-      res
     end
 
     def error msg # away at [#010]
@@ -85,81 +73,11 @@ module Skylab::Snag
 
     # --*--
 
-    extend Porcelain                           # entering DSL zone below
+    extend Porcelain                           # now entering DSL zone
 
-    desc "Add an \"issue\" line to #{ Snag::API.manifest_file_name }" #[#hl-025]
-    desc "Lines are added to the top and are sequentially numbered."
+    namespace :node, -> { CLI::Actions::Node }
 
-    desc ' arguments:' #                      DESC # should be styled [#hl-025]
-
-    argument_syntax '<message>'
-    desc '   <message>                        a one line description of the issue'
-
-    option_syntax do |param_h|                 # (away at [#010] these two lines
-      o = self                                 #  to `option_parser do |o|`.
-                                               #  This is repeated in this file)
-      o.on '-n', '--dry-run', "don't actually do it" do
-        param_h[:dry_run] = true
-      end
-      o.on '-v', '--verbose', 'verbose output' do
-        param_h[:verbose] = true
-      end
-    end
-
-    def add message, param_h
-      api_invoke [:nodes, :add],
-        { message: message }.merge( param_h )
-    end
-
-    # --*--
-
-    desc "show the details of issue(s)"
-
-    action.aliases 'ls', 'show'
-
-    option_syntax do |param_h|
-      o = self
-      o.on '-a', '--all', 'show all (even invalid) issues' do
-        param_h[:all] = true
-      end
-      # @todo we would love to have -1, -2 etc
-      o.on '-n', '--max-count <num>', "limit output to N nodes" do |n|
-        param_h[:max_count] = n
-      end
-      o.on '-v', '--[no-]verbose',
-        "`verbose` means yml-like output (default: verbose)" do |v|
-        param_h[:verbose] = v
-      end
-      o.on '-V', '(same as `--no-verbose`)' do
-        param_h[:verbose] = false
-      end
-    end
-
-    argument_syntax '[<identifier>]'
-
-    def list identifier=nil, param_h
-      action = api.build_action( [:nodes, :reduce] ).wire!(&wire)
-      client = runtime # this is a part we don't like
-      # @todo: for:#102.901.3.2.2 : wiring should happen between
-      # the api action objects and the "client" (interface) instance that
-      # invoked the api action.
-      # all.rb does this confusing thing by having non-configurable core clients
-
-
-      action.on_invalid_node do |e|
-        client.emit :info, '---'
-        client.emit :error, "error on line #{ e.line_number }-->#{ e.line }<--"
-
-        e.message = "failed to parse line #{ e.line_number } because #{
-          }#{ e.invalid_reason_string } (in #{ escape_path e.pathname })"
-
-      end
-
-      action.invoke( {
-        identifier: identifier,
-        verbose: true
-      }.merge! param_h )
-    end
+    namespace :nodes, -> { CLI::Actions::Nodes }
 
     # --*--
 
@@ -256,7 +174,7 @@ module Skylab::Snag
 
     def todo *paths, opts
       res = nil
-      action = api.build_action( [:to_do, :report] ).wire!(&wire)
+      action = api_build_wired_action [:to_do, :report]
       action.on_number_found do |e|
         info "(found #{ e.count } item#{ s e.count })"
       end
@@ -275,10 +193,6 @@ module Skylab::Snag
                                   # it is the evil that shall not be touched
                                   # until [#010])
 
-    def wire
-      @wire ||= ->(action) { wire_action(action) }
-    end
-
     # this nonsense wires your evil foreign (frame) runtime to the big deal parent
     def wire! runtime, parent
       runtime.event_class = Snag::API::MyEvent
@@ -286,21 +200,50 @@ module Skylab::Snag
       runtime.on_info  { |e| parent.emit(:info, e.touch!) }
       runtime.on_all   { |e| parent.emit(e.type, e) unless e.touched? }
     end
-
-    def wire_action action        # #todo this is nice in constructors for
-      action.on_payload { |e| runtime.emit(:payload, e) }   # cli actions
-      action.on_error do |e|
-        e.message = "failed to #{ e.verb } #{ e.noun } - #{ e.message }"
-        runtime.emit :error, e
-      end
-      action.on_info do |e|
-        unless e.touched?
-          md = %r{\A\((.+)\)\z}.match(e.message) and e.message = md[1]
-          e.message = "while #{e.verb.progressive} #{e.noun}, #{e.message}"
-          md and e.message = "(#{e.message})" # so ridiculous
-          runtime.emit(:info, e)
+                                  # (also this kind of thing can be nice in
+    def wire_action action        # constructors for cli actions)
+      if action.emits? :payload
+        action.on_payload do |e|
+          runtime.emit :payload, e
         end
       end
+      wire_action_for_info  action if action.emits? :info
+      wire_action_for_error action if action.emits? :error
+      nil
+    end
+
+    render = -> me, e do
+      msg = nil
+      if e.payload.respond_to? :render_for
+        msg = e.payload.render_for me
+      else
+        msg = e.message
+      end
+      msg
+    end
+
+    define_method :wire_action_for_error do |action|
+      action.on_error do |e|
+        rendered = render[ self, e ]
+        e.message = "failed to #{ e.verb } #{ e.noun } - #{ rendered }"
+        runtime.emit :error, e
+        nil
+      end
+      nil
+    end
+
+    define_method :wire_action_for_info do |action|
+      action.on_info do |e|
+        unless e.touched?
+          rendered = render[ self, e ]
+          md = %r{\A\((.+)\)\z}.match( rendered ) and rendered = md[1]
+          e.message = "while #{ e.verb.progressive } #{ e.noun }, #{ rendered }"
+          md and e.message = "(#{ e.message })" # so ridiculous
+          runtime.emit :info, e
+        end
+        nil
+      end
+      nil
     end
   end
 
@@ -313,6 +256,10 @@ module Skylab::Snag
 
     def ick x                     # for rendering invalid values
       x.to_s.inspect
+    end
+
+    def val x                     # how do you decorate a special value?
+      em x
     end
   end
 

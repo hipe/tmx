@@ -24,7 +24,7 @@ module Skylab::TanMan
     include Core::SubClient::InstanceMethods
     extend Headless::Model::Event
 
-    ANCHOR_MODULE = TanMan        # for `normalized_event_name` (hl compat)
+    EVENTS_ANCHOR_MODULE = TanMan # for `normalized_event_name` (hl compat)
 
     def message
       @message || build_message

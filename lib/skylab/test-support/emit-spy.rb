@@ -1,5 +1,5 @@
 module Skylab::TestSupport
-  class EmitSpy < ::Struct.new :stack, :debug, :format
+  class EmitSpy
 
     # Acts as an interceptor for *only* emit(), which writes each such
     # event to a stack (presumably for immediate subsequent test assertion)
@@ -8,16 +8,21 @@ module Skylab::TestSupport
     #
 
     def clear!
-      stack.clear
+      @emitted.clear
     end
 
     def do_debug
-      debug.call if self[:debug]
+      @debug.call if @debug
     end
 
     def do_debug= b
-      self.debug = -> { b }
+      @debug = -> { b }
       b
+    end
+
+    def debug= callable
+      raise ::ArgumentError.new('callable?') if ! callable.respond_to?( :call )
+      @debug = callable
     end
 
     def debug!
@@ -30,33 +35,55 @@ module Skylab::TestSupport
       self
     end
 
-    def emit type, *payload                    # per spec [#ps-001]
+    emit_struct = ::Struct.new :name, :string, :payload  # similar to [#ts-007]
+
+    define_method :emit do |type, *payload|      # per spec [#ps-001]
       do_debug and $stderr.puts format[ type, * payload ]
-      if payload.empty?
-        stack.push type                        # your witness
+      case payload.length
+      when 0
+        if ::Symbol === type
+          em = emit_struct.new type
+        else
+          em = emit_struct.new type.type, type.message
+        end
+      when 1
+        if ::String === payload.first
+          em = emit_struct.new type, payload.first
+        else
+          em = emit_struct.new type, nil, payload.first
+        end
       else
-        stack.push [ type, *payload ]
+        em = emit_struct.new type, nil, payload
       end
+      @emitted.push em
       nil
     end
 
+    attr_reader :emitted
+
     def format
-      if ! self[:format]
-        self[:format] = -> type, *payload do   # per spec [#ps-001]
-          if payload.empty? and type.respond_to?(:string)
+      @format ||= begin
+        -> type, *payload do   # per spec [#ps-001]
+          if payload.length.zero? and type.respond_to?( :string )
             type.string
           else
-            [type, *payload].inspect
+            [ type, *payload ].inspect
           end
         end
       end
-      super
+    end
+
+    def format= callable
+      raise ::ArgumentError.new( "callable?" ) if ! callable.respond_to?(:call)
+      @format = callable
     end
 
   protected
 
     def initialize &format_for_debug
-      super [], nil, format_for_debug
+      @debug = nil
+      @format = format_for_debug
+      @emitted = []
     end
   end
 end

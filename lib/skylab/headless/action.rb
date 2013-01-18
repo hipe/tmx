@@ -8,12 +8,12 @@ module Skylab::Headless
       Autoloader::Inflection::FUN.pathify[ str ].intern
     end
 
-                                               # this is a bleeding, incomplete
-    o[:build_normalized_name] = -> do          # feature that does something
-      a = name[ self::ANCHOR_MODULE.name.length + 2 .. -1].split '::' # terrible
-      a.map{ |x| normify[ x ] }.freeze         # but is also cheap.
-    end                                        # watch frontier tan-man for
-                                               # updates to this pattern.
+                                  # this is a bleeding, incomplete feature that
+                                  # does something terrible but is also cheap.
+    o[:build_normalized_name] = -> anchor_module, mod do
+      a = mod.name[ anchor_module.name.length + 2 .. -1 ].split '::'
+      a.map{ |x| normify[ x ] }.freeze
+    end
 
     o[:normfiy] = normify
 
@@ -24,11 +24,11 @@ module Skylab::Headless
   module Action::ModuleMethods
     extend MetaHell::Let          # we memoize things in the class object
 
-    def desc_lines
-      @desc_lines ||= nil
-    end
+    attr_reader :desc_lines
 
-    let :normalized_action_name, & Action::FUN.build_normalized_name
+    let :normalized_action_name do
+      Action::FUN.build_normalized_name[ self::ACTIONS_ANCHOR_MODULE, self]
+    end
 
     def normalized_local_action_name
       normalized_action_name.last
@@ -41,17 +41,22 @@ module Skylab::Headless
 
   protected
 
-    def branch?
-      false
-    end
-
     def desc_lines                # we want this DSL-y module-methods part of
       self.class.desc_lines if self.class.respond_to? :desc_lines # it to be
     end                           # opt-in
 
-    def leaf?                     # (it is important that you leave the impl.
-      ! branch?                   # as such -- the compliment of `branch?` --
-    end                           # for places that redefine `branch?`)
+    def is_branch                 # brach == non terminal == box. bc it has far
+      ! is_leaf                   # reaching consequences for request processing
+    end                           # awareness of branchiness is baked-in deep.
+                                  # it is recommended that you *not* redefine
+                                  # this anywhere universe-wide, and rather hack
+                                  # `is_leaf` if you need to, for reasons.
+                                  # (it is this way and not the reverse
+                                  # for reasons.)
+
+    def is_leaf                   # out of the (heh) "box" we assume we are
+      true                        # a terminal action and not a box action
+    end
 
     def normalized_action_name
       self.class.normalized_action_name

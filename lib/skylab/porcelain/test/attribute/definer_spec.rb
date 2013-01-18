@@ -92,6 +92,7 @@ describe Skylab::Porcelain::Attribute::Definer do
         klass_a = one_such_class do
           meta_attribute :whoopie
           def self.on_whoopie_attribute name, meta
+            remove_method name
             define_method(name) { "A:#{instance_variable_get("@#{name}")}:B" }
             touched.push [name, meta]
           end

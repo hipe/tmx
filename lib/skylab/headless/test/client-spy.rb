@@ -7,7 +7,12 @@ module Skylab::Headless::TestSupport
     include Headless::Client::InstanceMethods
 
 
-    attr_writer :debug
+    attr_reader :debug
+
+    def debug= callable
+      fail ::ArgumentError.new( 'callable?' ) if ! callable.respond_to?( :call )
+      @debug = callable
+    end
 
   protected
 
@@ -22,5 +27,10 @@ module Skylab::Headless::TestSupport
         o
       end
     end
+  end
+
+  class Client_Spy::CLI < Client_Spy
+    # ok sure, if you really need it
+    attr_accessor :normalized_invocation_string
   end
 end

@@ -136,8 +136,9 @@ module Skylab::Face
         name = aliases.nil? ? self.name : "{#{[self.name, *aliases].join('|')}}"
         "#{@parent.invocation_string} #{name}"
       end
+      attr_reader :parent
       def parent= parent
-        (@parent ||= nil) and fail("won't overwrite existing parent")
+        fail "won't overwrite existing parent" if self.parent
         @parent = parent
       end
       def usage msg=nil
@@ -159,9 +160,12 @@ module Skylab::Face
           Treeish[ defined + implied ]
         end
       end
+      attr_reader :default_action
+      alias_method :default_action_ivar, :default_action
       def default_action *a
-        a.any? ? (@default_action = (a*'').to_sym) : (@default_action ||= nil)
+        a.any? ? (@default_action = (a*'').to_sym) : default_action_ivar
       end
+      attr_reader :grab_next_method
       # this is nutty: for classes that extend this module, this is
       # something that is triggered when they are subclasses
       def inherited cls
@@ -197,7 +201,7 @@ module Skylab::Face
         @command_definitions ||= []
       end
       def method_added name
-        if (@grab_next_method ||= nil)
+        if grab_next_method
           command_definitions.last[1][0] = name.to_sym
           @grab_next_method = false
         end
@@ -205,8 +209,8 @@ module Skylab::Face
       def option_parser *a, &b
         block_given? or raise ArgumentError.new("block required")
         if a.empty?
-          (@grab_next_method ||= nil) and fail("can't have two anonymous " <<
-          "command definitions in a row.")
+          fail "can't have two anonymous command definitions in a row." if
+            grab_next_method
           @grab_next_method = true
           a = [nil]
         end
@@ -376,12 +380,15 @@ module Skylab::Face
           @parent = parent
         end
         def summary *a
-          @summary ||= nil
           a.any? ? (@summary = a) : (@summary || summary_of_commands)
         end
         def summary_of_commands
           a = command_tree.map { |c| hi(c.name) }
           ["child command#{'s' if a.length != 1}: {#{a * '|'}}"]
+        end
+      protected
+        def initialize
+          @summary = nil
         end
       end
     end

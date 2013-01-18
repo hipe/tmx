@@ -41,7 +41,7 @@ module Skylab::TanMan::TestSupport::CLI
     extend CLI_TestSupport
 
     klass :Action, extends: TanMan::CLI::Action do |o|
-      self::ANCHOR_MODULE = o.Actions
+      self::ACTIONS_ANCHOR_MODULE = o.Actions
     end
 
     modul :Actions do

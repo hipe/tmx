@@ -34,9 +34,11 @@ module Skylab::Headless
       parameters.fetch!(name).merge!(props, &b)
     end
 
+    attr_reader :parameters ; alias_method :parameters_ivar, :parameters
+
     def parameters &block
       if block_given? # this "feature" may be removed after benchmarking (@todo)
-        (@parameters_f ||= nil) || (@parameters ||= nil) and fail('no')
+        fail 'sanity' if parameters_f or parameters_ivar
         @parameters_f = block
         return
       end
@@ -55,7 +57,7 @@ module Skylab::Headless
           end
         end
         mods.reverse.each { |mod| p.merge!(mod.parameters) }
-        if (@parameters_f ||= nil)
+        if parameters_f
           @parameters = p # prevent inf. recursion, the below call may need this
           instance_exec(&@parameters_f)
           @parameters_f = nil
@@ -68,6 +70,8 @@ module Skylab::Headless
         p
       end
     end
+
+    attr_reader :parameters_f
   end
 
 
@@ -185,25 +189,28 @@ module Skylab::Headless
     def initialize host
       super [], host
       @hash = {}
+      @meta_set = nil
       host.respond_to? :parameter_definition_class or
         def host.parameter_definition_class
           Parameter::DEFAULT_DEFINITION_CLASS ; end
     end
     def meta_set
-      (@meta_set ||= nil) and return @meta_set
-      # We must make our own procedurally-generated parameter definition class
-      # no matter what lest we create unintentional mutations out of our scope.
-      # If a parameter_definition_class has been indicated explicitly or
-      # otherwise, that's fine, use it as a base class here.
-      host.const_defined?(:ParameterDefinition0) and fail('sanity check')
-      meta_host = ::Class.new(host.parameter_definition_class)
-      host.const_set(:ParameterDefinition0, meta_host)
-      host.singleton_class.class_eval do
-        remove_method :parameter_definition_class # avoid warnings, careful!
-        def parameter_definition_class ; self::ParameterDefinition0 end
+      @meta_set ||= begin
+        # We must make our own procedurally-generated parameter definition class
+        # no matter what lest we create unintentional mutations out of our
+        # scope. If a parameter_definition_class has been indicated explicitly
+        # otherwise, that's fine, use it as a base class here.
+        fail 'sanity' if host.const_defined? :ParameterDefinition0
+        meta_host = ::Class.new host.parameter_definition_class
+        host.const_set :ParameterDefinition0, meta_host
+        host.singleton_class.class_eval do
+          remove_method :parameter_definition_class # avoid warnings, careful!
+          def parameter_definition_class
+            self::ParameterDefinition0
+          end
+        end
+        meta_host.parameters
       end
-      host.singleton_class
-      @meta_set = meta_host.parameters
     end
   end
 

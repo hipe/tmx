@@ -13,10 +13,10 @@ module Skylab::TanMan
 
     def normalized_action_name                 # this will have problems
       @normalized_action_name ||= begin        # we simply want to have a box
-        anchor = self::ANCHOR_MODULE.name      # module while at the same time
-        0 == name.index( anchor ) or fail 'sanity'  # not have one
+        anchor = self::ACTIONS_ANCHOR_MODULE.name # module while at the same
+        0 == name.index( anchor ) or fail 'sanity'  # time not have one
         significant = name[ anchor.length + 2 .. -1 ]
-        mod = self::ANCHOR_MODULE
+        mod = self::ACTIONS_ANCHOR_MODULE
         a = significant.split '::'
         o = []
         use = true
@@ -34,13 +34,6 @@ module Skylab::TanMan
         o
       end
     end
-
-    def option_parser &block
-      ( @option_parser_blocks ||= [ ] ).push block
-      nil
-    end
-
-    attr_reader :option_parser_blocks
   end
 
 
@@ -67,16 +60,14 @@ module Skylab::TanMan
     extend CLI::Action::ModuleMethods
     include CLI::Action::InstanceMethods
 
-    ANCHOR_MODULE = CLI::Actions  # We state what our "root" box module is for
-                                  # reflection (e.g. to get normalized name)
+    ACTIONS_ANCHOR_MODULE = CLI::Actions  # We state what our "root" box module
+                                  # is for reflection (e.g. for normalized name)
 
-    def self.desc *a              # compare to [#hl-033]
-      if a.empty? # (awful compat for bleeding, don't float this up)
-        if ( @desc_lines ||= nil )
-          @desc_lines
-        else
-          [ ].freeze
-        end
+    empty_array = [ ].freeze
+
+    define_singleton_method :desc do |*a| # compare to [#hl-033]
+      if a.length.zero?  # (awful compat for bleeding, don't float this up)
+        desc_lines or empty_array
       else
         super(* a )               # up to headless
       end
@@ -122,7 +113,7 @@ module Skylab::TanMan
     # (this is to get the tests to pass but note we should not in the future
     # assume that the terminal action does not take a meaningful `-h` opt.)
     # #todo
-     "try #{ kbd "#{ request_runtime.send :normalized_invocation_string }#{
+     "try #{ kbd "#{ request_client.send :normalized_invocation_string }#{
         } #{ normalized_local_action_name } -h" } for help"
     end
 
@@ -176,7 +167,7 @@ module Skylab::TanMan
     # ---------------- jawbreak blood begin --------------------
 
     def initialize request_client
-      self.param_h = { }
+      @param_h = { }
 
       _headless_sub_client_init! request_client
 
@@ -267,7 +258,7 @@ module Skylab::TanMan
         verb.unshift 'was'                                       # "was adding"
       end
       if a.length.nonzero?
-        # target_class = self.class::ANCHOR_MODULE.const_fetch( a )
+        # target_class = self.class::ACTIONS_ANCHOR_MODULE.const_fetch( a )
         a.pop # we used many elements in the line above, but we pop only 1 here
         subject.concat a # you could just as soon go object
         a.clear
@@ -315,6 +306,8 @@ module Skylab::TanMan
       words = sentence[ parts ]
       "#{ words.join ' '} - #{ e.message }"
     end
+
+    attr_reader :param_h
 
     def program_name # #compat-bleeding (tracked as [#hl-034])
       normalized_invocation_string

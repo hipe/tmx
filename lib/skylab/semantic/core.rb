@@ -48,6 +48,10 @@ module Skylab::Semantic
       end
     end
 
+    def has? name
+      @hash.key? name
+    end
+
     def node! name, predicates=nil # node! :ambiguous, is: :error
       if @hash.key? name
         node = @hash[name]
@@ -110,7 +114,6 @@ module Skylab::Semantic
       end
     end
   end
-
 
   class Node < ::Struct.new :name, :is_names
 

@@ -9,18 +9,25 @@ module Skylab::Snag
 
     positive_integer_rx = %r{\A\d+\z}
 
-    define_method :max_count= do |num_s|
-      if num_s
-        if positive_integer_rx =~ num_s
+    define_method :max_count= do |integer_ref|
+      begin
+        if integer_ref
+          if ::Fixnum === integer_ref
+            integer = integer_ref
+          elsif positive_integer_rx =~ integer_ref
+            integer = integer_ref.to_i
+          else
+            error "must look like integer: #{ integer_ref }"
+            break
+          end
           @counter = 0
-          @max_count = num_s.to_i
+          @max_count = integer
         else
-          error "must look like integer: #{ num_s }"
+          @counter = nil
+          @max_count = nil
         end
-      else
-        @max_count = @counter = nil
-      end
-      num_s
+      end while nil
+      integer_ref
     end
 
     def match? node
@@ -43,7 +50,7 @@ module Skylab::Snag
 
   protected
 
-    module Query_Node_
+    module Query_Nodes_
       extend MetaHell::Boxxy
       def self.new_valid request_client, query_sexp
         klass = const_fetch query_sexp.first
@@ -51,10 +58,10 @@ module Skylab::Snag
       end
     end
 
-    class Query_Node_::And
+    class Query_Nodes_::And
       def self.new_valid request_client, query_sexp
         a = query_sexp[ 1 .. -1 ].map do |x|
-          klass = Query_Node_.const_fetch x.first
+          klass = Query_Nodes_.const_fetch x.first
           klass.new_valid request_client, x
         end
         rs = nil
@@ -81,7 +88,7 @@ module Skylab::Snag
 
     # --*--
 
-    class Query_Node_::All
+    class Query_Nodes_::All
       def self.new_valid request_client, sexp
         new request_client
       end
@@ -96,14 +103,18 @@ module Skylab::Snag
       end
     end
 
-    class Query_Node_::HasTag
+    class Query_Nodes_::HasTag
       def self.new_valid request_client, sexp
         tag = sexp[1]
-        normalized = Models::Tag.normalize tag,
+        normalized_tag_name = Models::Tag.normalize tag,
           -> invalid do
             request_client.send :error, ( invalid.render_for request_client )
           end
-        normalized ? new( request_client, normalized ) : normalized
+        if normalized_tag_name
+          new request_client, normalized_tag_name
+        else
+          normalized_tag_name
+        end
       end
       def match? node
         if node.valid
@@ -123,10 +134,10 @@ module Skylab::Snag
       end
     end
 
-    class Query_Node_::Identifier
+    class Query_Nodes_::IdentifierRef
       def self.new_valid request_client, sexp
-        identifier_string = sexp[1]
-        normalized = Models::Identifier.normalize identifier_string,
+        identifier_body = sexp[1] # prefixes might bite [#019]
+        normalized = Models::Identifier.normalize identifier_body,
           -> invalid do
             request_client.send :error, ( invalid.render_for request_client )
           end,
@@ -137,20 +148,20 @@ module Skylab::Snag
       end
       def match? node
         if node.valid
-          @identifier_rx =~ node.identifier_string
+          @identifier_rx =~ node.identifier_body
         end
       end
       def phrase
-        "identifer starting with \"#{ @identifier.identifier }\""
+        "identifier starting with \"#{ @identifier.body }\""
       end
     protected
       def initialize request_client, identifier_struct
         @identifier = identifier_struct
-        @identifier_rx = /\A#{ ::Regexp.escape @identifier.identifier }/
+        @identifier_rx = /\A#{ ::Regexp.escape @identifier.body }/ # [#019]
       end
     end
 
-    class Query_Node_::Valid
+    class Query_Nodes_::Valid
       def self.new_valid *a
         new( *a )
       end
@@ -170,7 +181,7 @@ module Skylab::Snag
       @counter = nil
       @max_count = nil
       self.max_count = max_count if max_count
-      @query = Query_Node_.new_valid self, query_sexp
+      @query = Query_Nodes_.new_valid self, query_sexp
       if ! @query && 0 == error_count          # catches some thing earlier..
         error "failed to build query for one weird old reason" # last resort
       end

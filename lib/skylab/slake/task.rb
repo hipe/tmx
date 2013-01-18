@@ -31,7 +31,8 @@ module Skylab::Slake
     meta_attribute :interpolated
     def self.on_interpolated_attribute name, meta
       if meta[:interpolated]
-        define_method(name) do
+        remove_method name
+        define_method name do
           self.class.interpolate instance_variable_get("@#{name}"), self
         end
       else

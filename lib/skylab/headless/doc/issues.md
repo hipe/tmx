@@ -1,5 +1,10 @@
+[#042] #open spec for cli box dsl
+[#040]       #doc-point: when using dsl, what methods should become actions?..
+[#039]       #done clean up smell of @foo ||= nil everywhere
+[#038]       #done change hackiness to the concept of `collapse` in DSL
+[#037]       #tracking-tag box classes that build their own option parsers
 [#036]       #behavior-point `par`, `parameter_label` etc -- gather it up
-[#035]       #doc-point : the boxxy cluttered namespace problem
+[#035]       #doc-point : the boxxy cluttered namespace problem (Actions)
 [#034]       #tracking-tag for #function-point `program_name` -
               `normalized_invocation_string`
 [#033]       #function-point #tracking-tag `desc`
@@ -35,7 +40,7 @@
 [#008]       P::C::I_M --> SC::I_M
 [#007]       #done use of Parameter::Set#list, unify with Boxxy interface
 [#006]       #done #tracking-tag errors_count, settle it down eventually (rel. [#sl-116])
-[#005] #open unify concepts let sub-client trump rename parent_runtime par_clien
+[#005]       unify concepts let sub-client trump rename parent_runtime par_clien
 [#004]       #pattern #tracking-tag the sub-client initialize() in modules thing
 [#003]       #done #refactor: use en.rb in sub-client fo
 [#002]       #done 2012-08-29 #refactor : interceptors under one roof

@@ -51,48 +51,48 @@ module Skylab::MetaHell
       _autoloader_init! caller_str
     end
 
+    def _boxxy_init_with_no_autoloading!
+      self.dir_path = false
+      _autoloader_init! nil
+    end
+
+    attr_reader :boxxy_loaded
+
     invalid_ = -> name, f do
-      f ||= -> e { raise e }
       o = Boxxy::InvalidNameError.new "wrong constant name #{ name }", name
+      f ||= -> e { raise e }
       f[ o ]
     end
 
     constantize = ::Skylab::Autoloader::Inflection::FUN.constantize
 
+    valid_const_rx = /\A[A-Z][_a-zA-Z0-9]*\z/ # `valid_name_rx` is fallible
+
     define_method :const_fetch do |path_a, not_found=nil, invalid=not_found, &b|
-      b && not_found and raise ::ArgumentError.new "can't have block + lambdas"
-      path_a = [path_a] unless ::Array === path_a
-      result = nil
-      begin
-        seen = [ ]
-        r = path_a.reduce self do |box, name|
-          if valid_name_rx !~ name.to_s
-            result = invalid_[ name, (invalid || b) ]
-            break
-          end
-          const = constantize[ name ].intern
-          if /\A[A-Z][_a-zA-Z0-9]*\z/ !~ const.to_s # above is fallible
-            result = invalid_[ const, (invalid || b) ]
-            break
-          end
-          ok = box.autoloader_original_const_defined? const, false
-          ok ||= box.const_probably_loadable? const
-          if ok
-            seen.push name
-            box.case_insensitive_const_get const
-          else
-            f = not_found || b || -> e { raise e }
-            o = Boxxy::NameNotFoundError.exception(
-              message: "unitialized constant #{ box }::#{ const }",
-              const: const, module: box, name: name, seen: seen
-            )
-            result = f[ o ]
-            break
-          end
+      raise ::ArgumentError.new("can't have block + lambdas") if b && not_found
+      path_a = [ path_a ] unless ::Array === path_a
+      seen = [ ]
+      path_a.reduce self do |box, name|
+        break invalid_[ name, (invalid || b) ] if valid_name_rx !~ name.to_s
+        const = constantize[ name ].intern
+        break invalid_[ const, (invalid || b) ] if valid_const_rx !~ const.to_s
+        rs = nil
+        if box.autoloader_original_const_defined? const, false
+          rs = box.const_get const, false
+        elsif box.dir_path && box.const_probably_loadable?( const )
+          rs = box.case_insensitive_const_get const
         end
-        r and result = r
-      end while false
-      result
+        if rs
+          seen.push name
+          rs
+        else
+          o = Boxxy::NameNotFoundError.exception message:
+            "unitialized constant #{ box }::#{ const }",
+            const: const, module: box, name: name, seen: seen
+          f = not_found || b || -> e { raise e }
+          break f[ o ]
+        end
+      end
     end
 
     def const_fetch_all *a, &b
@@ -104,12 +104,12 @@ module Skylab::MetaHell
     # this is SUPER #experimental OH MY GOD **SO** #experimental
     # More than #experimental, this is just a playful, jaunty little proof-
     # of-concept.
-    define_method :each do
+    define_method :each do |& block|
       e = ::Enumerator.new do |y|    # for now we load them with "brute force"
-        if ! (@boxxy_loaded ||= nil) # as opposed to the silly mocks we've
+        if ! boxxy_loaded && dir_path  # as opposed to the silly mocks we've
           @boxxy_loaded = true       # used before (we used to simply check if
-          ::Dir.glob( "#{dir_pathname}/*.rb" ).each do |path| # it was
-            const = constantize[ ::Pathname.new( path ).basename.sub_ext('') ]
+          ::Dir.glob( "#{ dir_pathname }/*.rb" ).each do |path| # it was
+            const = constantize[ ::Pathname.new( path ).basename.sub_ext '' ]
             case_insensitive_const_get const # an empty boxy but that got us
           end                        # into trouble were tests loaded
         end                          # explicit box items themselves, for e.g)
@@ -117,8 +117,8 @@ module Skylab::MetaHell
           y << const_get( const, false ) # that the above issue doesn't give
         end                          # us non-deterministic sort orders
       end
-      if block_given?
-        e.each { |o| yield o }
+      if block
+        e.each { |x| block[ x ] }
       end
       e
     end

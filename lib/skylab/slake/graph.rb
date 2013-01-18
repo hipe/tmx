@@ -24,6 +24,7 @@ module Skylab::Slake
     alias_method :rake_task_manager_initialize, :initialize
     def initialize opts=nil
       @order = []
+      @target = nil
       init_parenthood
       rake_task_manager_initialize
       opts and update_attributes opts

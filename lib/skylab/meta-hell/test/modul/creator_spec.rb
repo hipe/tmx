@@ -64,7 +64,13 @@ module ::Skylab::MetaHell::TestSupport::Modul::Creator
         modul( :My__Pho )     { def zap ; end }
         modul( :My__BaMi )    { def zip ; end ; def zoop ; end }
         modul( :His__Pho )    { def glyph ; end }
-        modul( :My__BaMi )    { def zip(a) ; end ; def zorp ; end }
+        modul :My__BaMi do
+          undef_method :zip
+          def zip a
+          end
+          def zorp
+          end
+        end
         modul( :My__Pho__Pas ) { def zangeif ; end }
       end
 

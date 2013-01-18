@@ -20,10 +20,10 @@ module Skylab::CssConvert
     attr_reader :sexp
   protected
     def css_parser
-      @css_parser ||= CssConvert::CSS::Parser.new request_runtime
+      @css_parser ||= CssConvert::CSS::Parser.new request_client
     end
-    def initialize request_runtime, sexp
-      super(request_runtime)
+    def initialize request_client, sexp
+      super(request_client)
       @sexp = sexp
     end
   end

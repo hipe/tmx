@@ -58,18 +58,20 @@ module Skylab::FlattenFiles
       @errstream = $stderr
       @fileutils_output = errstream
       @fileutils_label = "#{program_name}: "
+      @option_parser = nil
     end
     def emit(type, data) ; errstream.puts(data) end
     attr_reader :errstream
     def option_parser
-      (@option_parser ||= nil) and return @option_parser
-      o = @option_parser = ::OptionParser.new
-      o.banner = usage_line
-      o.separator "\ndescription: all files in <infolder> recursive,\n" <<
-        "  move them to <outfolder>.  on name collision, file is skipped.\n\n"
-      o.separator 'options:'
-      o.on('-n', '--dry-run', 'Dry run.') { self.dry = true }
-      o
+      @option_parser ||= begin
+        o = ::OptionParser.new
+        o.banner = usage_line
+        o.separator "\ndescription: all files in <infolder> recursive,\n" <<
+          "  move them to <outfolder>.  on name collision, file is skipped.\n\n"
+        o.separator 'options:'
+        o.on('-n', '--dry-run', 'Dry run.') { self.dry = true }
+        o
+      end
     end
     NUM_ARGS = 2
     def parse_args argv

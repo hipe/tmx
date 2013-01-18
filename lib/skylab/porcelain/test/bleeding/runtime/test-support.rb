@@ -18,7 +18,7 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime
     end
 
     let :parent_client do
-      o = EmitSpy.new
+      o = TestSupport::EmitSpy.new
       o.format = -> e { "#{e.type.inspect}<-->#{e.message.inspect}" }
       o
     end
@@ -88,7 +88,7 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime
     let :subject do
       # frame itself is memoized with the closure hack
       frame.result # trigger it, possibly re-accessing a self-memoized value
-      frame.parent_client.stack # expecting an array from an emit spy
+      frame.parent_client.emitted # expecting an array from an emit spy
     end
   end
 end

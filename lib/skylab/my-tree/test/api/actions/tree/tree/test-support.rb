@@ -30,7 +30,7 @@ module ::Skylab::MyTree::TestSupport::API::Actions::Tree::Tree
         o.puts s
       end
       o.flush
-      actual = spy.send(:io_adapter).stack.map(&:last).join "\n"
+      actual = spy.send( :io_adapter ).emitted.map(& :string ).join "\n"
       expected = str.unindent.chomp
       actual.should eql(expected)
       nil

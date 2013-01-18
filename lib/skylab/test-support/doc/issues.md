@@ -1,3 +1,4 @@
+[#007]       #tracking tag of simlar places with line / emit structs
 [#006] #open test/all: redundancy points, maybe waits for [#tm-056]
 [#005] #open quickie: redundancy points #upfactor
 [#004] #open quickie: module names into fashion

@@ -1,16 +1,15 @@
 require_relative 'file/test-support'
 
-
-module Skylab::Snag::TestSupport::Models::Node::File
+module Skylab::Snag::TestSupport::Models::Manifest::File
 
   # has Quickie
 
-  describe "#{ Snag::Models::Node::File }" do
+  describe "#{ Snag::Models::Manifest::File }" do
 
     extend File_TestSupport
 
     it "when file not found lines.each - raises raw runtime error lazily" do
-      file = Snag::Models::Node::File.new( fixture_pathname 'not-there.txt' )
+      file = Snag::Models::Manifest::File.new( fixture_pathname 'not-there.txt' )
       enum = file.normalized_lines # note it does not raise even yet
       -> do
         enum.each do |line|
@@ -22,7 +21,7 @@ module Skylab::Snag::TestSupport::Models::Node::File
     context "when file found" do
 
       let :file do
-        file = Snag::Models::Node::File.new( fixture_pathname 'foo.txt' )
+        file = Snag::Models::Manifest::File.new( fixture_pathname 'foo.txt' )
         file
       end
 

@@ -1,13 +1,11 @@
-require_relative '../cli.rb'
-require_relative '../../test-support/core'
-require 'skylab/headless/core'
+require_relative 'test-support'
 
-describe "#{::Skylab::Permute::CLI}" do
-  include ::Skylab::Headless::CLI::Pen::InstanceMethods # unstylize
+describe "#{ ::Skylab::Permute::CLI }" do
   before(:all) do  # just a bad idea all around, but we want to see how it goes
-    cli = Skylab::Permute::CLI.new
+    extend ::Skylab # constants
+    cli = Permute::CLI.new
     cli.program_name = 'permoot'
-    spy = ::Skylab::TestSupport::EmitSpy.new
+    spy = TestSupport::EmitSpy.new
     cli.singleton_class.send(:define_method, :emit) do |type, payload|
       spy.emit(type, payload)
     end
@@ -16,8 +14,9 @@ describe "#{::Skylab::Permute::CLI}" do
   end
   after { @spy.clear! } # you are so dumb
   attr_reader :cli, :spy
-  let(:out) do
-    spy.stack.map { |o| s = o[1].to_s ; unstylize(s) or s }
+  unstylize = ::Skylab::Headless::CLI::Pen::FUN.unstylize
+  let :out do
+    spy.emitted.map do |e| unstylize[ e.string || e.payload.to_s ] end
   end
   USAGE_RX = /usage.+permoot.+opts.+args/
   INVITE_RX = /try.+permoot.+for help/

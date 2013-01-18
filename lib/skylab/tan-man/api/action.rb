@@ -5,7 +5,7 @@ module Skylab::TanMan
 
     include Core::Action::InstanceMethods
 
-    ANCHOR_MODULE = API::Actions  # #experimental near [#059]
+    ACTIONS_ANCHOR_MODULE = API::Actions  # #experimental near [#059]
 
     event_class API::Event
 

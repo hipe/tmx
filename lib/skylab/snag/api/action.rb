@@ -9,6 +9,8 @@ module Skylab::Snag
 
     extend PubSub::Emitter # puts `emit` i.m lower on the chain than s.c above!
 
+    public :emits? # for #experimental dynamic wiring per action reflection
+
     meta_attribute :default
     meta_attribute :required
 
@@ -16,7 +18,25 @@ module Skylab::Snag
 
     event_class API::MyEvent
 
-    ANCHOR_MODULE = API::Actions
+    ACTIONS_ANCHOR_MODULE = API::Actions
+
+    def self.attributes_or_params
+      res = nil
+      if const_defined? :PARAMS, false
+        a = const_get :PARAMS, false
+        res = ::Hash[ a.map { |k| [ k, { required: true } ] } ]
+      else
+        res = self.attributes     # (for clearer error msgs)
+      end
+      res
+    end
+
+    def self.params *params       # nerka derka nerka derka nerka derka
+      fail 'sanity' if const_defined? :PARAMS, false
+      attr_accessor( *params )
+      const_set :PARAMS, params
+      nil
+    end
 
     # --*--
 
@@ -35,11 +55,6 @@ module Skylab::Snag
       res                         # execute, 2) it is hopefully at the end
     end
 
-    def wire! # my body is filled with rage
-      yield self
-      self
-    end
-
   protected
 
     def initialize api
@@ -51,7 +66,7 @@ module Skylab::Snag
     def absorb_params!
       res = false
       begin
-        formal = self.class.attributes
+        formal = self.class.attributes_or_params
         extra = @param_h.keys.reduce [] do |m, k|
           m << k if ! formal.key? k
           m
@@ -95,17 +110,17 @@ module Skylab::Snag
     end
 
     def nodes
-      nodes = nil
-      begin
-        break( nodes = @nodes ) if @nodes
-        o = request_client.find_closest_manifest -> msg do
-          error msg
-        end
-        break if ! o
-        nodes = Snag::Models::Node::Collection.new self, o
-        @nodes = nodes
-      end while nil
-      nodes
+      @nodes ||= begin
+        nodes = nil
+        begin
+          mf = request_client.find_closest_manifest -> msg do
+            error msg
+          end
+          mf or break( nodes = mf )
+          nodes = Snag::Models::Node::Collection.new self, mf
+        end while nil
+        nodes
+      end
     end
   end
 end

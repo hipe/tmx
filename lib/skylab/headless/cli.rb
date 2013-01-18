@@ -1,7 +1,7 @@
 module Skylab::Headless
 
   module CLI
-    extend Autoloader
+    extend MetaHell::Autoloader::Autovivifying::Recursive
 
     OPT_RX = /\A-/                # ( yes this is actually used elsewhere :D )
   end
@@ -19,13 +19,17 @@ module Skylab::Headless
       ( @desc_lines ||= [ ] ).concat [ first, *rest ] # `desc_lines` reader
       nil                                             # defined in core::action
     end
+
+    def option_parser &block      # dsl-ish that just accrues these for you.
+      ( @option_parser_blocks ||= [ ] ).push block # turning it into an o.p.
+      nil                         # is *your* responsibility. depends on what
+    end                           # happens in your `build_option_parser` if any
+
+    attr_reader :option_parser_blocks
   end
 
 
-
   module CLI::Action::InstanceMethods
-    extend MetaHell::Let
-
     include Headless::Action::InstanceMethods
 
     def invoke argv
@@ -73,12 +77,13 @@ module Skylab::Headless
       result
     end
 
-    attr_accessor :param_h        # experimental, for dsl
-
   protected
 
-    let :argument_syntax do       # assumes `default_action` for now
-      build_argument_syntax_for default_action
+    def argument_syntax
+      @argument_syntax ||= begin
+                                  # assumes `default_action` for now..
+        build_argument_syntax_for default_action
+      end
     end
 
     attr_reader :argv
@@ -105,7 +110,6 @@ module Skylab::Headless
       true                        # do any further processing in the queue.
     end
 
-
     def help_description          # assume desc_lines is nonzero-length array
       emit :help, ''              # assumes there was content above!
       if 1 == desc_lines.length   # do the smart thing with formatting
@@ -120,7 +124,6 @@ module Skylab::Headless
       nil
     end
 
-
     def help_options              # precondition: an option_parser exists
       # (in the old days this was option_parser.to_s, which should still work.)
       emit :help, ''              # assumes there was previous above content!
@@ -131,7 +134,6 @@ module Skylab::Headless
         emit :help, line
       end
     end
-
 
     smart_summary_width = -> option_parser do
       max = CLI::FUN.summary_width[ option_parser ]
@@ -153,28 +155,47 @@ module Skylab::Headless
     end
 
     def invite_line # we have to avoid assuming we process opts
-      "use #{ kbd "#{ request_runtime.send :normalized_invocation_string }#{
+      "use #{ kbd "#{ request_client.send :normalized_invocation_string }#{
         } -h #{ normalized_local_action_name }" } for help"
     end
 
     def normalized_invocation_string
-      "#{ @request_runtime.send :normalized_invocation_string } #{
+      "#{ request_client.send :normalized_invocation_string } #{
         }#{ normalized_local_action_name }"
     end
 
-    let :option_parser do
-      self.build_option_parser
+    def option_is_visible_in_syntax_string
+      @option_is_visible_in_syntax_string ||= ::Hash.new { |*| true }
+    end
+
+    attr_reader :option_parser
+
+    alias_method :option_parser_ivar, :option_parser
+
+                                  # out of the box we don't decide how to build
+                                  # your option_parser and you have to define
+                                  # this `bop` yourself (DSL however..)
+    def option_parser
+      @option_parser ||= self.build_option_parser
     end
 
     def option_syntax_string
+      # stolen and improved from Bleeding #todo:
       if option_parser
-        option_parser.top.list.map do |s|
-          if s.respond_to? :short
-            "[#{s.short.first or s.long.first}#{s.arg}]"
+        option_is_visible_in_syntax_string || nil
+        a = option_parser.top.list.map do |s|
+          if s.respond_to?( :short ) &&
+            @option_is_visible_in_syntax_string[ s.object_id ]
+            "[#{ s.short.first or s.long.first }#{ s.arg }]"
           end
-        end.compact.join ' ' # stolen and improved from Bleeding #todo
+        end.compact
+        if a.length.nonzero?
+          a.join ' '
+        end
       end
     end
+
+    attr_reader :param_queue ; alias_method :param_queue_ivar, :param_queue
 
     def param_queue               # (experimental atomic processing of .e.g
       @param_queue ||= []         # options -- see manifesto and warnings at
@@ -199,22 +220,22 @@ module Skylab::Headless
       end
       res
     end
-
-    def parse_opts argv           # mutate `argv` (which is probably also @argv)
-      @leaf ||= nil               # what you do with the data is your business.
+                                  # mutate `argv` (which is probably also @argv)
+    def parse_opts argv           # what you do with the data is your business.
       exit_status = true          # result in true on success, other on failure
       begin
         if argv.empty?            # options are always optional! don't even
           break                   # build option_parser, much less invoke it.
         end
-        if branch?                # If we are a branch, how do we know whether
-          if CLI::OPT_RX !~ argv.first    # to parse the opts?
-            break
-          end
-        end # (might change [#hl-024])
+        if is_branch              # If we are a branch, how do we know whether
+          if CLI::OPT_RX !~ argv.first # to parse a given opt? the solution is
+            break                 # never parse the opts to avoid a can of worms
+          end                     # with ambiguous grammars ([#hl-024]).
+        end
         if ! option_parser        # if you don't have one, which is certainly
           break                   # not strange, then we just leave brittany
         end                       # alone and let downstream deal with argv
+
         begin                     # option_parser can be some fancy arbitrary
           option_parser.parse! argv # thing, but it needs to conform to at
         rescue Headless::Services::OptionParser::ParseError => e # least
@@ -222,8 +243,8 @@ module Skylab::Headless
           exit_status = exit_status_for :parse_opts_failed
         end
       end while nil
-      @param_queue ||= nil        # #experimental'y get through basic option
-      if true == exit_status && @param_queue # parsing first before you
+                                  # #experimental'y get through basic option
+      if true == exit_status && param_queue_ivar # parsing first before you
         exit_status = process_param_queue! # before you actually validate
       end                         # with your custom setters (if u want)
       exit_status
@@ -248,7 +269,6 @@ module Skylab::Headless
     def resolve_upstream          # out of the box we make no assumtions about
       true                        # what your upstream should be, but per
     end                           # [#hl-023] this must be literally true for ok
-
 
     strip_description_label_rx = /\A[ \t]*description:?[ \t]*/i
 
@@ -337,13 +357,16 @@ module Skylab::Headless
     end
 
     def string
-      map do |p|
+      a = map do |p|
         case p.opt_req_rest
         when :opt  ; "[#{ parameter_label p }]"
         when :req  ; "#{ parameter_label p }"
         when :rest ; "[#{ parameter_label p } [..]]"
         end
-      end.join(' ')
+      end
+      if a.length.nonzero?
+        a.join ' '
+      end
     end
 
   # -- * --
@@ -373,7 +396,6 @@ module Skylab::Headless
     end
 
     attr_reader :pen
-
   end
 
 

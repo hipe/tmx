@@ -7,6 +7,7 @@ module Skylab::Snag
     o :DateTime     , -> { require 'date'        ; ::DateTime }
     o :FileUtils    , -> { require 'fileutils'   ; ::FileUtils }
     o :Open3        , -> { require 'open3'       ; ::Open3 }
+    o :OptionParser , -> { require 'optparse'    ; ::OptionParser }
     o :Shellwords   , -> { require 'shellwords'  ; ::Shellwords }
     o :StringScanner, -> { require 'strscan'     ; ::StringScanner }
 

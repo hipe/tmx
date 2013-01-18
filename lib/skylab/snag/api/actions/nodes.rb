@@ -30,7 +30,7 @@ module Skylab::Snag
     inflection.inflect.noun :plural
 
     attribute :all
-    attribute :identifier
+    attribute :identifier_ref
     attribute :max_count
     attribute :query_sexp
     attribute :verbose, default: true
@@ -47,7 +47,9 @@ module Skylab::Snag
       begin
         break if ! nodes # we need them we want them, we want them now
         sexp = query_sexp.dup if query_sexp
-        ( sexp ||= [:and] ).push [:identifier, identifier] if identifier
+        if identifier_ref
+          ( sexp ||= [:and] ).push [:identifier_ref, identifier_ref]
+        end
         if all
           if sexp
             error "sorry - it doesn't make sense to use `all` with any #{

@@ -10,7 +10,7 @@ module Skylab::Snag
         all = nodes.manifest.build_enum(nil, nil, nil).with_count!
         valid = all.valid.with_count!
         valid.each do |node|
-          emit(:payload, node.identifier)
+          emit :payload, node.rendered_identifier
         end
         info "found #{valid.last_count} valid of #{all.last_count} total nodes."
         res = true

@@ -5,7 +5,7 @@ module Skylab::CovTree
 
     extend PubSub::Emitter
 
-    ANCHOR_MODULE = CovTree::API::Actions
+    ACTIONS_ANCHOR_MODULE = CovTree::API::Actions
 
   protected
 

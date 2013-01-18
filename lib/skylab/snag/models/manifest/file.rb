@@ -1,5 +1,5 @@
 module Skylab::Snag
-  class Models::Node::File
+  class Models::Manifest::File
     # (this is used by services and hence cannot be a sub-client!)
 
     # `normalized_line_producer` is like a filehandle that you call `gets`
@@ -34,7 +34,6 @@ module Skylab::Snag
       lp
     end
 
-
     # `normalized_lines` is comparable to File#each (aka `each_line`, `lines`)
     # except a) it internalizes the fact that it is a file, taking care of
     # closing the file for you, and b) it chomps each line, so you don't have
@@ -46,16 +45,25 @@ module Skylab::Snag
       ::Enumerator.new do |y|
         @file_mutex and fail 'sanity'
         @file_mutex = true
-        fh = @pathname.open 'r' # #open-filehandle, #gigo
+        @fh = @pathname.open 'r' # #open-filehandle, #gigo
         begin
-          fh.each do |line|
+          @fh.each do |line|
             y << line.chomp
           end
         ensure
-          fh.close
-          @file_mutex = nil
+          release_early
         end
       end
+    end
+
+    def open?                     # necessary in short-circuit finds to check
+      @fh                         # if the one we found was also the last one
+    end                           # in which case it will be closed already
+
+    def release_early
+      @file_mutex = nil
+      @fh.close
+      @fh = nil
     end
 
     # (from stack overflow #3024372, thank you molf for a tail-like
@@ -65,6 +73,7 @@ module Skylab::Snag
 
     def initialize pathname
       @file_mutex = false
+      @fh = nil
       @pathname = pathname
     end
   end

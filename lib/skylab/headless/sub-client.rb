@@ -18,7 +18,7 @@ module Skylab::Headless
       @error_count = 0            # (if this overwrites an important nonzero
                                   # value here, you deserve whatver happens
                                   # to you. why would u call init 2x?)
-      self.request_runtime = request_client
+      self.request_client = request_client
     end
 
     def actual_parameters         # not all stacks use this, just convenience
@@ -67,8 +67,7 @@ module Skylab::Headless
       request_client.send :pen
     end
 
-    attr_accessor :request_runtime # the center of [#005]
-    alias_method :request_client, :request_runtime # one day!!
+    attr_accessor :request_client # (was the center of [#005], now correct)
 
     # --- * ---
 

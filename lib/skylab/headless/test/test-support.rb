@@ -8,6 +8,7 @@ module Skylab::Headless::TestSupport
     Headless = ::Skylab::Headless
     Headless_TestSupport = Headless_TestSupport
     MetaHell = ::Skylab::MetaHell
+    TestSupport = ::Skylab::TestSupport
   end
 
   include CONSTANTS   # necessary
@@ -15,15 +16,15 @@ module Skylab::Headless::TestSupport
 
   module ModuleMethods
     def debug!
-      let( :debug ) { true }
+      let( :do_debug ) { true }
     end
   end
 
   module InstanceMethods
-    attr_accessor :debug
+    attr_accessor :do_debug
 
     def debug!
-      self.debug = true
+      self.do_debug = true
     end
   end
 end

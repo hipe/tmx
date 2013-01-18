@@ -5,7 +5,7 @@ module Skylab::Snag
   class Model::Event < ::Struct
     extend Headless::Model::Event # `normalized_event_name`
 
-    ANCHOR_MODULE = Snag::Models
+    EVENTS_ANCHOR_MODULE = Snag::Models
 
     def self.normalized_event_name
       @nen ||= begin              # (just for fun chop out the `events`
@@ -41,10 +41,12 @@ module Skylab::Snag
       if event_class.const_defined? :SubClient, false
         event_class.const_get :SubClient, false
       else
-        ad_hoc_subclass = ::Class.new event_class
-        event_class.const_set :SubClient, ad_hoc_subclass
-        event_class.send :include, Model::Event::SubClient
-        ad_hoc_subclass
+        kls = event_class.const_set :SubClient, ::Class.new( event_class )
+        kls.class_eval do
+          include  Model::Event::SubClient
+          public :render
+        end
+        kls
       end
     end
 

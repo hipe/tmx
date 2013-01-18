@@ -51,27 +51,27 @@ module Skylab::Porcelain::TestSupport::Bleeding
             fails.push("expected exactly #{idx} events, had #{actual.length}")
           end
         when ::String
-          if actual[idx].message == x
+          if actual[idx].string == x
             desc[:msg] = x.inspect
           else
             fails.push("expected message #{x.inspect
-              }, had #{actual[idx].message.inspect}")
+              }, had #{actual[idx].string.inspect}")
             desc[:msg] = x
           end
         when ::Symbol
-          if actual[idx].type == x
-            desc[:type] = actual[idx].type.inspect
+          if actual[idx].name == x
+            desc[:type] = x.inspect
           else
             fails.push("expected type #{x.inspect
-              }, had #{actual[idx].type.inspect}")
+              }, had #{actual[idx].name.inspect}")
             desc[:type] = x.inspect
           end
         when ::Regexp
-          if actual[idx].message =~ x
-            desc[:msg] = actual[idx].message.inspect
+          if actual[idx].string =~ x
+            desc[:msg] = actual[idx].string.inspect
           else
             fails.push("expected message to match #{x.inspect
-              }, had #{actual[idx].message.inspect}")
+              }, had #{actual[idx].string.inspect}")
             desc[:msg] = x
           end
         else

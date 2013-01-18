@@ -1,3 +1,4 @@
+[#126]       #tracking-tag singleton obj with class made just for readable errs
 [#125]       #doc-point #workflow -- when you make overzelous, premature chage..
 [#124]       #tracking-tag autoloader won't work when there is toplevel name..
 [#123]       #convention #pattern sub-product module 2-level pattern
@@ -19,9 +20,9 @@
 [#107]       #low-priority 2012-11-02 this lexical scoping issue
 [#106]       #done 2012-10-28 autoloading vis-a-vis const awareness
 [#105] #open 2012-08-18 play with test/all_specs.rb -w
+[#102.901.3.2.2] #doc-point #open 2012-06-12 towards an event wiring pattern ..
 [#101] #open 2012-06-08 when doing gem install with rdoc, "stack level too deep"
 [#100.200.001] #open 2012-06-12 all.rb: fix @delegates tags
-[#100.901.3.2.2] #open 2012-06-12 towards an event wiring pattern
 [#096] 2012-03-30 @closed: code-molester: files are not paths
 [#095] 2012-03-29 @closed: static fileserver refactor
 [#094] 2012-03-28 @closed: tanman: refactor: this shit is a mess (still).

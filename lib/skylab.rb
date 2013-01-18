@@ -97,7 +97,7 @@ module Skylab
           end
         end
 
-        if ! dir_path
+        if dir_path.nil?
           file = ::Pathname.new caller_str.match(rx)[:path]
           if ! file.absolute? # this takes a filesystem hit, but you cannot ..
             file = file.expand_path # reliably autoload with a relpath.

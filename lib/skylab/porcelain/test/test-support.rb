@@ -8,10 +8,10 @@ module Skylab::Porcelain::TestSupport
   module CONSTANTS
     Autoloader = ::Skylab::Autoloader
     Bleeding = ::Skylab::Porcelain::Bleeding
-    EmitSpy = ::Skylab::TestSupport::EmitSpy
     Headless = ::Skylab::Headless
     MetaHell = ::Skylab::MetaHell
     Porcelain = ::Skylab::Porcelain
+    TestSupport = ::Skylab::TestSupport
   end
 
   module ModuleMethods

@@ -4,12 +4,13 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
   # Watch for it to cross-fertilize with instances of action inflection
   # happening elsewhere as [#hl-018].
 
-  # See notes at `NounStem` to see how far down the rabbit hole of inflection-
-  # hacking goes.
+  # See notes at `NLP::EN::POS::Noun` to see how far down the
+  # inflection-hacking rabbit hole goes.
 
   # Don't be decieved, we don't want self.extended [#sl-111] pattern here,
   # you just extend this module and you get this one knob:
 
+  NLP = ::Skylab::Headless::NLP # (future-proof parts in case not [#sl-123])
 
   def inflection
     # Classes or modules that extend this badboy get an `inflection` knob
@@ -88,54 +89,6 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
 
 
 
-  class StringAsStem < ::String
-    class << self
-      alias_method :[], :new
-    end
-  end
-
-
-
-  class VerbStem < StringAsStem
-
-    ends_with_e_rx = /e\z/i
-
-    define_method :progressive do
-      @progressive ||= begin
-        if ends_with_e_rx =~ self
-          "#{ $~.pre_match }ing"
-        else
-          "#{ self }ing"
-        end
-      end
-    end
-
-    attr_writer :progressive
-  end
-
-
-
-  class NounStem < StringAsStem
-
-    def singular
-      self
-    end
-
-    def singular= x
-      define_singleton_method( :singular ) { x }
-    end
-
-    def plural
-      "#{ self }s" # fine for now
-    end
-
-    def plural= x
-      define_singleton_method( :plural ) { x }
-    end
-  end
-
-
-
   class Stems # this is the core of the hack
     extend Dupe
 
@@ -153,7 +106,7 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
         seen = [ ] ; hop = false  # for the noun, we crawl down the entire
         name_pieces.reduce( ::Object ) do |m, x| # const tree and back up again
           m.const_defined?( x, false ) or break
-          y = m.const_get x, false # part-way bc of [#sl-035] - if there is a
+          y = m.const_get x, false # part-way bc of [#hl-035] - if there is a
           seen.push y             # pure box module, (that is, a module whose
           y                       # only purpose is to be a clean namespace
         end                       # to hold only constituent items), then such
@@ -173,19 +126,19 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
           if 's' == word[-1]      # #singularize hack
             word = word.sub( /s\z/, '' )
           end
-          NounStem[ word ]
+          NLP::EN::POS::Noun[ word ]
         end
       end
     end
 
     def noun= mixed
       self.dupes |= [:noun] # duplicate this setting down to subclasses
-      mixed = NounStem[ mixed ] if ! mixed.respond_to?( :plural )
+      mixed = NLP::EN::POS::Noun[ mixed ] if ! mixed.respond_to?( :plural )
       @noun = mixed
     end
 
     define_method :verb do
-      @verb ||= VerbStem[ humanize[ name_pieces.last ] ]
+      @verb ||= NLP::EN::POS::Verb[ humanize[ name_pieces.last ] ]
     end
 
   protected
