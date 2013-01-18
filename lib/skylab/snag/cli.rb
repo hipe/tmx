@@ -79,56 +79,6 @@ module Skylab::Snag
 
     extend Porcelain                           # now entering DSL zone
 
-    desc "show the details of issue(s)"
-
-    action.aliases 'ls', 'show'
-
-    option_syntax do |param_h|
-      o = self
-      o.on '-a', '--all', 'show all (even invalid) issues' do
-        param_h[:all] = true
-      end
-      # @todo we would love to have -1, -2 etc
-      o.on '-n', '--max-count <num>', "limit output to N nodes" do |n|
-        param_h[:max_count] = n
-      end
-      o.on '-v', '--[no-]verbose',
-        "`verbose` means yml-like output (default: verbose)" do |v|
-        param_h[:verbose] = v
-      end
-      o.on '-V', '(same as `--no-verbose`)' do
-        param_h[:verbose] = false
-      end
-    end
-
-    argument_syntax '[<identifier_ref>]'
-
-    def list identifier_ref=nil, param_h
-      action = api_build_wired_action [:nodes, :reduce]
-      client = runtime # this is a part we don't like
-      # @todo: for:#102.901.3.2.2 : wiring should happen between
-      # the api action objects and the "client" (interface) instance that
-      # invoked the api action.
-      # all.rb does this confusing thing by having non-configurable core clients
-
-
-      action.on_invalid_node do |e|
-        client.emit :info, '---'
-        client.emit :error, "error on line #{ e.line_number }-->#{ e.line }<--"
-
-        e.message = "failed to parse line #{ e.line_number } because #{
-          }#{ e.invalid_reason_string } (in #{ escape_path e.pathname })"
-
-      end
-
-      action.invoke( {
-        identifier_ref: identifier_ref,
-        verbose: true
-      }.merge! param_h )
-    end
-
-    # --*--
-
     namespace :node, -> { CLI::Actions::Node }
 
     namespace :nodes, -> { CLI::Actions::Nodes }
