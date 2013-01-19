@@ -2,7 +2,7 @@ require_relative '../core'
 require 'skylab/test-support/core'
 
 module Skylab::Dependency::TestSupport
-  extend ::Skylab::TestSupport::Regret[ Dependency_TestSupport = self ]
+  ::Skylab::TestSupport::Regret[ Dependency_TestSupport = self ]
 
   module CONSTANTS
     include ::Skylab::Dependency # include lots of constants

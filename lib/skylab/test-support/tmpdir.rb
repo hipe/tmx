@@ -19,7 +19,7 @@ module Skylab::TestSupport
 
     def debug!                    # this compats with our convention org-wide
       @verbose = true             # this compats with the file utils convention
-    end
+    end                           # (but see also `verbose!` chainable variant)
 
     def mkdir path_end, opts=nil
       res = nil
@@ -34,26 +34,8 @@ module Skylab::TestSupport
     end
 
     def patch str
-      result = nil
-      cd to_s, verbose: verbose do
-        cmd_head = 'patch -p1'
-        # verbose and info( "#{ cmd_head } < -" )
-        TestSupport_::Services::Open3.popen3( cmd_head ) do |sin, sout, serr, w|
-          sin.write str
-          sin.close
-          s = serr.read
-          if '' != s
-            raise "patch failed(?): #{ s.inspect }"
-          end
-          if verbose
-            while s = sout.gets
-              info s.strip
-            end
-          end
-          result = w.value # exit_status
-        end
-      end
-      result
+      Headless::Services::Patch.call str, to_s, verbose, -> e { info e }
+      # (result is exit_status)
     end
 
     safety_rx = %r{ / (?: tmp | T ) (?: / | \z ) }x # IMPORTANT
@@ -162,6 +144,11 @@ module Skylab::TestSupport
         res = pathname
       end
       res
+    end
+
+    def verbose!                  # see also the similar `debug!`
+      @verbose = true
+      self
     end
 
   protected

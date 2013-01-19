@@ -5,7 +5,7 @@ require 'skylab/meta-hell/core'
 require 'skylab/test-support/core'
 
 module Skylab::MyTree::TestSupport
-  extend ::Skylab::TestSupport::Regret[ self ]
+  ::Skylab::TestSupport::Regret[ self ]
 
 
   module CONSTANTS

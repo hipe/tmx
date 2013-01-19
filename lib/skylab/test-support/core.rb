@@ -21,6 +21,7 @@ end
 
 module Skylab::TestSupport
 
+  Autoloader = ::Skylab::Autoloader
   Headless = ::Skylab::Headless
   MetaHell = ::Skylab::MetaHell
   TestSupport_ = self             # (do *not* set the convenience "hiccup"

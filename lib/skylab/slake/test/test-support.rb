@@ -2,7 +2,7 @@ require_relative '../../test-support/core'
 require_relative '../core'
 
 module Skylab::Slake::TestSupport
-  extend ::Skylab::TestSupport::Regret[ Slake_TestSupport = self ]
+  ::Skylab::TestSupport::Regret[ Slake_TestSupport = self ]
 
   module CONSTANTS
     TEST_ROOT_DIR = ::File.expand_path '..', __FILE__
