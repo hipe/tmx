@@ -2,7 +2,7 @@ module Skylab::Snag
   class Models::Node::Collection
     include Snag::Core::SubClient::InstanceMethods
 
-    def add message, do_prepend_open_tag, dry_run, verbose
+    def add message, do_prepend_open_tag, dry_run, verbose, new_node=nil
       res = false
       begin
         node = Models::Node::Controller.new request_client
@@ -16,6 +16,7 @@ module Skylab::Snag
           -> x { escape_path x },
           -> x { error x },
           -> x { info x }
+        new_node[ node ] if res
       end while nil
       res
     end

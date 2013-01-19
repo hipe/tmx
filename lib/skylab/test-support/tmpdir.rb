@@ -34,7 +34,8 @@ module Skylab::TestSupport
     end
 
     def patch str
-      Headless::Services::Patch.call str, to_s, verbose, -> e { info e }
+      Headless::Services::Patch.directory str, to_s, noop, verbose,
+        -> e { info e }
       # (result is exit_status)
     end
 

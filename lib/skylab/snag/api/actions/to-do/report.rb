@@ -10,8 +10,9 @@ module Skylab::Snag
 
     attribute :names, required: true, default: ['*.rb']
     attribute :paths, required: true
-    attribute :pattern, required: true, default: "@#{ }todo\\>"
+    attribute :pattern, required: true, default: Snag::Models::Pattern.default
     attribute :show_command_only
+    attribute :verbose
 
   protected
 
@@ -23,11 +24,14 @@ module Skylab::Snag
           emit :payload, enum.command
           break( res = true )
         end
-        enum.on_err { |e| emit :info, e }
+        if verbose
+          emit :info, enum.command
+        end
+        enum.on_stderr_line { |e| emit :info, e }
         enum.each do |todo|
           emit :payload, todo
         end
-        emit :number_found, count: enum.last_count
+        emit :number_found, count: enum.seen_count
         res = true
       end while nil
       res

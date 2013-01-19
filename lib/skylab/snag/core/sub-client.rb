@@ -12,6 +12,10 @@ module Skylab::Snag
       _headless_sub_client_init! request_client
     end
 
+    def api_invoke norm_name, param_h=nil, wiring=nil
+      request_client.send :api_invoke, norm_name, param_h, wiring
+    end
+
     def ick x                     # how do you decorate an invalid value?
       request_client.send :ick, x
     end
@@ -29,6 +33,10 @@ module Skylab::Snag
     end
 
     def wire_action_for_error x
+      request_client.send :wire_action_for_error, x
+    end
+
+    def wire_action_for_info x
       request_client.send :wire_action_for_error, x
     end
   end

@@ -7,6 +7,13 @@ module Skylab::Snag::TestSupport::CLI::Actions
 
   extend TestSupport::Quickie  # try running a _spec.rb file with `ruby -w`
 
+  module ModuleMethods
+    include CONSTANTS
+    def manifest_path
+      Snag::API.manifest_path
+    end
+  end
+
   module InstanceMethods
     def invoke_from_tmpdir *argv
       from_tmpdir do

@@ -4,7 +4,7 @@ module Skylab::Snag
 
     def render
       tree = @todos.reduce( Tree_Node.new slug: :root ) do |node, todo|
-        path = todo.path.split('/').push(todo.line)
+        path = todo.path.split( '/' ).push todo.line_number_string
         node.find!(path) do |child|
           if child.leaf?
             child[:todo] = todo
@@ -17,7 +17,7 @@ module Skylab::Snag
         if line.node.leaf?
           a = [ "#{ line.prefix } #{ line.node.slug }" ]
           if line.node[:todo]
-            a.push line.node[:todo].content
+            a.push line.node[:todo].full_source_line
           end
           out a.join( ' ' )
         else
@@ -37,7 +37,7 @@ module Skylab::Snag
         pay = event.payload
         if pay.respond_to? :valid?
           if pay.valid?
-            @todos.push pay.dup
+            @todos.push pay.collapse
           end
         else
           info "not teh payload we were expecing: #{pay.class}"

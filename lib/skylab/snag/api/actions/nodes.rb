@@ -14,13 +14,18 @@ module Skylab::Snag
 
     emits :all, :error => :all, :info => :all, :payload => :all
 
+    emits :new_node
+
   protected
 
     def execute
-      nodes.add message,
-        do_prepend_open_tag,
-        dry_run,
-        verbose
+      if nodes
+        @nodes.add message,
+          do_prepend_open_tag,
+          dry_run,
+          verbose,
+          -> n { emit :new_node, n }
+      end
     end
   end
 
@@ -105,7 +110,7 @@ module Skylab::Snag
           emit :invalid_node, node.invalid_reason.to_h
         end
       end
-      ct = nodes.last_count
+      ct = nodes.seen_count
       case ct
       when 0
         emit :info, "found no nodes #{ nodes.search.phrasal_noun_modifier }"

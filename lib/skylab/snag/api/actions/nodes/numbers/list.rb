@@ -12,7 +12,7 @@ module Skylab::Snag
         valid.each do |node|
           emit :payload, node.rendered_identifier
         end
-        info "found #{valid.last_count} valid of #{all.last_count} total nodes."
+        info "found #{valid.seen_count} valid of #{all.seen_count} total nodes."
         res = true
       end while nil
       res

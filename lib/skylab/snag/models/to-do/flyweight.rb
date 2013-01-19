@@ -1,58 +1,59 @@
 module Skylab::Snag
   class Models::ToDo::Flyweight
 
-    def content
-      @rest.nil? and parse!
-      @rest
+    def collapse
+      Models::ToDo.new path, line_number_string, full_source_line, @pattern
     end
 
-    def dup
-      self.class.new.set! @string
+    def full_source_line
+      @md or parse
+      @md[:full_source_line]
     end
 
-    def line
-      @line.nil? and parse!
-      @line
+    attr_reader :full_string
+
+    alias_method :to_s, :full_string
+
+    def line_number_string
+      @md or parse
+      @md[:line]
     end
 
     def path
-      @path.nil? and parse!
-      @path
+      @md or parse
+      @md[:path]
     end
 
     def set! string
-      @line = @path = @rest = nil
-      @string = string
+      @md = nil
+      @full_string = string
       self
     end
 
-    attr_reader :string
-
-    alias_method :to_s, :string
-
     def valid?
-      if ! (@line && @path) and @string
-        parse!
+      @md or parse
+      if @md
+        @md[:line] && @md[:path]
       end
-      @line && @path
     end
 
   protected
 
-    def initialize
-      set! nil
+    def initialize pattern
+      @full_string = nil
+      @md = nil
+      @pattern = pattern          # just passed around. not used here.
     end
 
+    rx = /\A (?<path>[^:]+) : (?<line>\d+) : (?<full_source_line>.*) $/x
+    # (if the above changes be *sure* to audit all of the heavyweight class)
 
-    rx = /\A (?<path>[^:]+) : (?<line>\d+) : (?<rest>.*) $/x
-
-    define_method :parse! do
-      if @string and md = rx.match( @string )
-        @line = md[:line].to_i
-        @path = md[:path]
-        @rest = md[:rest]
+    define_method :parse do
+      if @full_string and md = rx.match( @full_string )
+        @md = md
       else
-        @line = @path = @rest = false
+        @md = false
+        fail 'sanity'
       end
     end
   end

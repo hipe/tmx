@@ -10,6 +10,7 @@ module Skylab::Snag
     def initialize *sin_sout_serr
       @program_name = nil
       if block_given?
+        fail 'where?'
         super
       else
         up, pay, info = sin_sout_serr
@@ -28,18 +29,18 @@ module Skylab::Snag
     end
 
     def emit name, pay
-      porcelain.runtime.emit name, pay
+      runtime.emit name, pay
     end
 
     def error msg # away at [#010]
-      porcelain.runtime.emit :error, "#{ program_name } says: #{ msg }"
+      emit :error, "#{ program_name } says: #{ msg }"
       false
     end
 
     define_method :escape_path, &Headless::CLI::PathTools::FUN.pretty_path
 
     def info msg # away at [#010]
-      porcelain.runtime.emit :info, "#{ program_name } wants you to know: #{
+      emit :info, "#{ program_name } wants you to know: #{
       }#{ msg }"
       nil
     end
@@ -58,7 +59,9 @@ module Skylab::Snag
 
     def invoke argv               # modify at [#010]
       Headless::CLI::PathTools.clear # see
+
       res = super argv            # (handles invites when parsing goes wrong)
+
       if false == res             # (but otherwise when we result in false..)
         # in the future: emit :help, invite_lite
         porcelain.runtime.stack.first.issue
@@ -66,6 +69,7 @@ module Skylab::Snag
       end
       res
     end
+
     public :invoke
 
     def program_name
@@ -197,7 +201,7 @@ module Skylab::Snag
       action.on_error do |e|
         rendered = render[ self, e ]
         e.message = "failed to #{ e.verb } #{ e.noun } - #{ rendered }"
-        runtime.emit :error, e
+        emit :error, e
         nil
       end
       nil
@@ -210,7 +214,7 @@ module Skylab::Snag
           md = %r{\A\((.+)\)\z}.match( rendered ) and rendered = md[1]
           e.message = "while #{ e.verb.progressive } #{ e.noun }, #{ rendered }"
           md and e.message = "(#{ e.message })" # so ridiculous
-          runtime.emit :info, e
+          emit :info, e
         end
         nil
       end

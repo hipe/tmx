@@ -225,12 +225,10 @@ module Skylab::Snag
       id_num_digits = 3
 
       define_method :render_lines do |node, int=nil|
-        rendered_identifier = if int
-          Snag::Models::Identifier.create_rendered_string int, id_num_digits
-        else
-          node.rendered_identifier
+        if int
+          node.build_identifier! int, id_num_digits
         end
-        lines = [ "#{ rendered_identifier } #{ node.first_line_body }" ]
+        lines = [ "#{ node.identifier.render } #{ node.first_line_body }" ]
         lines.concat node.extra_lines
         lines
       end
