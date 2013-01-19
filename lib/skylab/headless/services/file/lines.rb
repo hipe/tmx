@@ -22,7 +22,7 @@ module Skylab::Headless
         @lines = pathname
         super( ) { |y| visit_no_fs y }
       else
-        @pathname = pathname
+        @pathname = ::Pathname.new pathname
         super( ) { |y| visit_fs y }
       end
     end

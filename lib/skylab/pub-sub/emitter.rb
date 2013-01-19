@@ -79,26 +79,44 @@ module Skylab::PubSub
   class Event < ::Struct.new :payload, :tag, :touched
     def initialize tag, *payload
       case payload.size
-      when 0 ; payload = nil
-      when 1 ; payload = payload.first
-        payload.respond_to?(:payload) and payload = payload.payload # shallow copy another event's payload
+      when 0
+        payload = nil
+      when 1
+        payload = payload.first
+        if payload.respond_to?( :is_event ) and payload.is_event
+          # shallow-copy another event's payload. we used to just check
+          # for respond_to?(:payload) but this got us in to trouble b/c
+          # sometimes payloads are themselves controllers
+          payload = payload.payload
+        end
       end
-      super(payload, tag, false)
-      Hash === payload and _define_attr_accessors!
+      super payload, tag, false
+      ::Hash === payload and _define_attr_accessors!
       yield self if block_given?
     end
+
     alias_method :event_id, :object_id
+
+    def is_event
+      true
+    end
+
     def is? sym
       tag.is? sym
     end
+
     def to_s
       payload.to_s
     end
+
     alias_method :message, :to_s
+
     def touch!
       tap { |me| me.touched = true }
     end
+
     alias_method :touched?, :touched
+
     def type
       tag.name
     end

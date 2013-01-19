@@ -90,7 +90,11 @@ module Skylab::Headless
 
     def initialize content_string
       @chunks = [ ]
-      @lines = Services::File::Lines.new content_string.split( /^/ )
+      if ::String === content_string
+        @lines = Services::File::Lines.new content_string.split( /^/ )
+      else
+        @lines = content_string # assumes it is `Lines` !
+      end
       @offset = 0
     end
   end

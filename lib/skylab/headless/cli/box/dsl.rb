@@ -61,6 +61,18 @@ module Skylab::Headless
       nil
     end
 
+    attr_reader :dsl_is_disabled # yeah .. ugly way to counteract [#040]
+
+    def dsl_off
+      @dsl_is_disabled = true
+      nil
+    end
+
+    def dsl_on
+      @dsl_is_disabled = false
+      nil
+    end
+
     def enable_autoloader!
       fail 'test me!'
       extend MetaHell::Autoloader::Autovivifying::Recursive::ModuleMethods
@@ -80,10 +92,12 @@ module Skylab::Headless
     end
 
     def method_added meth         # #doc-point [#hl-040]
-      klass = action_class_in_progress!
-      const = Autoloader::Inflection::FUN.constantize[ meth ]
-      action_box_module.const_set const, @action_class_in_progress
-      @action_class_in_progress = nil
+      if ! dsl_is_disabled
+        klass = action_class_in_progress!
+        const = Autoloader::Inflection::FUN.constantize[ meth ]
+        action_box_module.const_set const, @action_class_in_progress
+        @action_class_in_progress = nil
+      end
     end
 
     def option_parser &block      # (This is the DSL block appender.)
