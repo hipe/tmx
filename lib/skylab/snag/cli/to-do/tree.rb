@@ -103,7 +103,7 @@ module Skylab::Snag
       @action = action
       @do_pretty = do_pretty
       @todos = []
-      @action.send( :event_listeners )[:payload].clear # #todo NO. BAD.
+      @action.send( :event_listeners )[:payload].clear # [#031] - NO. BAD.
       @action.on_payload do |event|
         pay = event.payload
         if pay.respond_to? :valid?

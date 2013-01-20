@@ -1,3 +1,7 @@
+[#033] #open #tracking-tag non-deterministic smelly tests
+[#032] #open see if we can unify find commands org wide
+[#031] #open NO. BAD.
+[#030] #open we would love to have -1, -2 etc
 [#029]       #tracking-tag #pattern of instance_eval for rendering
 [#028] #open melt makes patch for whole codebase
 [#027]       #done move and maybe refactor todo -> todo find

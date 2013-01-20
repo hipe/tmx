@@ -35,7 +35,7 @@ module Skylab::Snag
         param_h[:all] = true
       end
 
-      # @todo we would love to have -1, -2 etc
+      # [#030] - we would love to have -1, -2 etc
 
       o.on '-n', '--max-count <num>', "limit output to N nodes" do |n|
         param_h[:max_count] = n

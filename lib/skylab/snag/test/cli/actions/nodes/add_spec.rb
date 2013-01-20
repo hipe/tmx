@@ -29,7 +29,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
         client_invoke( *invocation, '-n', '-v', 'foo bizzle' )
       end
       o( / new line: / )
-      if output.lines.first.string =~ /mkdir .+snag-PROD/ # #todo #tracking-tag non-deterministic smelly tests
+      if output.lines.first.string =~ /mkdir .+snag-PROD/ # [#033]
         output.lines.shift
       elsif output.lines.first.string =~ / rm /
         output.lines.shift
