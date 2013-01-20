@@ -16,7 +16,7 @@ module Skylab::Porcelain::TestNamespace
     end
     def name     ; self[:name] end
     def children ; self[:children] end
-    def children?; !! self[:children] end
+    def has_children; !! self[:children] end
     def children_length ; self[:children] ? self[:children].length : 0 end
   end
 end

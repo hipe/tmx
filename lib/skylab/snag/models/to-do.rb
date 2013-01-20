@@ -17,16 +17,12 @@ module Skylab::Snag
     attr_reader :line_number_string
 
     def message_body_string
-      @ranges or parse
-      if @ranges.body.count.nonzero?
-        @full_source_line[ @ranges.body ]
-      end
+      range :body
     end
 
     def one_line_summary # [#it-001] summarization might be nice here
-      @ranges or parse
-      if @replacement_line
-        @replacement_line[ @ranges.precomment.end + 3 .. -1 ] # ICK
+      if @replacement_line and @ranges || parse
+        @replacement_line[ @ranges.tag.begin .. -1 ]
       else
         message_body_string
       end
@@ -34,14 +30,30 @@ module Skylab::Snag
 
     attr_reader :path
 
-    def source_line_string_before_comment
-      @ranges or parse
-      if @ranges.precomment.count.nonzero?
-        @full_source_line[ @ranges.precomment ]
+    def post_tag_string
+      if @ranges || parse
+        @full_source_line[ @ranges.tag.end + 1 .. -1 ]
+      end
+    end
+
+    def pre_comment_string
+      range :precomment
+    end
+
+    def pre_tag_string
+      if @ranges || parse
+        r =  @ranges.precomment.begin .. @ranges.tag.begin - 1
+        if r.count.nonzero?
+          @full_source_line[ r ]
+        end
       end
     end
 
     attr_accessor :replacement_line
+
+    def tag_string
+      range :tag
+    end
 
   protected
 
@@ -63,7 +75,7 @@ module Skylab::Snag
       before_rx = /(?:(?!#{ todo_rx.source }).)*/
     end
 
-    ranges_struct = ::Struct.new :precomment, :body
+    ranges_struct = ::Struct.new :precomment, :tag, :body
 
     rscn = scn = nil
 
@@ -96,11 +108,22 @@ module Skylab::Snag
         0 .. rscn.string.length - rscn.pos - 1
       end.call
       # the beginning of the rest now looks like: '%todo '
+      pos = scn.pos
       scn.skip( todo_rx ) or fail 'rx'
+      ranges.tag = pos .. scn.pos - 1
       scn.skip( /[[:space:]]*/ )
       ranges.body = scn.pos .. scn.string.length - 1
       @ranges = ranges
-      nil
+      true
+    end
+
+    def range name
+      if @ranges || parse
+        r = @ranges[ name ]
+        if r.count.nonzero?
+          @full_source_line[ r ]
+        end
+      end
     end
   end
 end

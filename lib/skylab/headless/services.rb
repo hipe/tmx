@@ -9,6 +9,7 @@ module Skylab::Headless
     o :Open3        , -> { require 'open3'      ; ::Open3 }
     o :OptionParser , -> { require 'optparse'   ; ::OptionParser }
     o :Patch        , -> { require_relative 'services/patch/core' }
+    o :Producer     , -> { require_relative 'services/producer' }
     o :Shellwords   , -> { require 'shellwords' ; ::Shellwords }
     o :StringIO     , -> { require 'stringio'   ; ::StringIO }
 

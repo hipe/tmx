@@ -431,7 +431,7 @@ module Skylab::Headless
 
     o = { }
 
-    codes = ::Hash[ [[:strong, 1]].
+    codes = ::Hash[ [[:strong, 1], [:reverse, 7]].
       concat [:dark_red, :green, :yellow, :blue, :purple, :cyan, :white, :red].
         each.with_index.map { |v, i| [v, i+31] } ]
 

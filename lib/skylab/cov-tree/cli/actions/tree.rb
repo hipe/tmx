@@ -83,7 +83,7 @@ module Skylab::CovTree
       n = d[:node]
       a, b = self.class.sides.map { |s| n.types.include? s }
       indicator = "[#{a ? '+':' '}|#{b ? '-':' '}]"
-      use_types = n.leaf? ? n.types : [:branch]
+      use_types = n.is_leaf ? n.types : [:branch]
       color = self.class.color use_types
       indicator = send(color, indicator) if color
       use_slugs = if 2 > n.isomorphic_slugs.length then n.isomorphic_slugs
