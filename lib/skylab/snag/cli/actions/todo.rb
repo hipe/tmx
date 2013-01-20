@@ -10,8 +10,9 @@ module Skylab::Snag
       command_option o
       pattern_option o
       name_option o
-      o.on '-t', '--tree', 'experimental tree rendering' do
-        param_h[:show_tree] = true
+      o.on '-t', '--tree', 'experimental tree rendering (try -t -t)' do
+        param_h[:show_tree] ||= 0
+        param_h[:show_tree] += 1
       end
       verbose_option o
       nil
@@ -23,8 +24,8 @@ module Skylab::Snag
       action.on_number_found do |e|
         info "(found #{ e.count } item#{ s e.count })"
       end
-      if param_h.delete :show_tree
-        tree = CLI::ToDo::Tree.new request_client, action
+      if int = param_h.delete( :show_tree )
+        tree = CLI::ToDo::Tree.new request_client, action, ( int > 1 )
       end
       res = action.invoke( { paths: path }.merge param_h )
       if tree

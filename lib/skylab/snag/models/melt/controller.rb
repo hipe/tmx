@@ -118,7 +118,7 @@ module Skylab::Snag
         if @file_changes.length.nonzero? && @file_changes.last.path != todo.path
           res = file_changes_flush or break
         end
-        new_line = "#{ todo.source_line_string_before_comment }#{
+        new_line = "#{ todo.pre_comment_string }#{
           }# #{ node.identifier }" # some lines will just be a comment
         excerpt = message_body_excerpt[ new_line, todo ]
         if excerpt

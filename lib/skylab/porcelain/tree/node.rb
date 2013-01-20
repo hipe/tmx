@@ -28,6 +28,10 @@ module Skylab::Porcelain
       _find _find_path_normalize( path ), true, &init_new_node_block
     end
 
+    def is_branch
+      ! is_leaf
+    end
+
     def is_leaf
       0 == children_length
     end
