@@ -15,19 +15,21 @@ module ::Skylab::TestSupport
     # TestSupport modules have the following in common:
     #
     #   + They usually define a ModuleMethods and an InstanceMethods
-    #       (the module that has two above modules inside of it we refer to
-    #        here as an "anchor module".)
+    #     (the module that has two above modules inside of it we refer to
+    #     here as an "anchor module".)
     #   + They have the usual implemtation of extended() which is to include
-    #       one and extend the other of the above on the extending module.
+    #     one and extend the other of the above on the extending module.
     #   + These two modules always include their "parents" if any.
-    #       (Where, if you have Foo::M_M and Foo::I_M and Bar::M_M and Bar::I_M,
-    #       and Bar is actually inside Foo (Foo::Bar), the "parent" of
-    #       Bar::M_M is Foo::M_M and the "parent" of Bar::I_M is Foo::I_M.)
+    #     (Where, if you have Foo::M_M and Foo::I_M and Bar::M_M and Bar::I_M,
+    #     and Bar is actually inside Foo (Foo::Bar), the "parent" of
+    #     Bar::M_M is Foo::M_M and the "parent" of Bar::I_M is Foo::I_M.)
     #   + They sometimes want to at least be some kind of autoloader, possibly
-    #       with a dir_path that is nonstandard in a consistent way.
+    #     with a dir_path that is nonstandard in a consistent way.
     #   + The InstanceMethods module pulls in the module called Let
     #   + There is a CONSTANTS module that forms a central place to hold
     #     application constants.
+    #   + They might want to have a tmpdir, named and sandboxed
+    #     appropriately.
     #
     # For our implementation of Regret itself as it will be used in the field,
     # we use the "embellish" (or []) method.  Subsequent uses of it down the
@@ -40,7 +42,9 @@ module ::Skylab::TestSupport
     def embellish mod
       mod.extend Regret::AnchorModuleMethods
       mod._init_regret! caller[0]
+      nil
     end
+
     alias_method :[], :embellish
   end
 
@@ -51,13 +55,16 @@ module ::Skylab::TestSupport
     def edify child_mod
       child_mod.extend Regret::AnchorModuleMethods
       child_mod._init_regret! caller[0], self
+      nil
     end
+
     alias_method :[], :edify
 
     def extended mod
       mod.extend module_methods_module
       mod.send :include, instance_methods_module
     end
+
     alias_method :_regret_extended, :extended
 
 
@@ -124,16 +131,57 @@ module ::Skylab::TestSupport
         }
         o
       end.call
+
+      define_singleton_method :parent_anchor_module do # nil ok!
+        parent_anchor_module
+      end
+
+      nil
     end
+
     def constants_module
       const_get :CONSTANTS, false
     end
+
+    def count_to_top
+      if parent_anchor_module
+        1 + parent_anchor_module.count_to_top
+      else
+        0
+      end
+    end
+
     def instance_methods_module
       const_get :InstanceMethods, false
     end
+
     def module_methods_module
       const_get :ModuleMethods, false
     end
-    protected
+
+    def tmpdir
+      @tmpdir ||= begin
+        TestSupport_::Tmpdir.new path: tmpdir_pathname,
+          max_mkdirs: ( count_to_top + 1 ) # one for tmp/your-sub-product
+      end
+    end
+
+    def tmpdir_pathname
+      @tmpdir_pathname ||= begin
+        pam = parent_anchor_module or raise "You better set #{
+          }@tmpdir_pathname in #{ self } because somebody is looking for it."
+        par = parent_anchor_module.tmpdir_pathname
+        dir = Autoloader::Inflection::FUN.pathify[
+          name[ name.rindex( ':' ) + 1 .. -1 ] ]
+        par.join dir
+      end
+    end
+
+    attr_writer :tmpdir_pathname
+
+  protected
+
+    # nothing is protected.
+
   end
 end

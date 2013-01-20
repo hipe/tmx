@@ -4,6 +4,8 @@ require 'skylab/test-support/core'
 module Skylab::Headless::TestSupport
   ::Skylab::TestSupport::Regret[ Headless_TestSupport = self ]
 
+  self.tmpdir_pathname = ::Skylab::TMPDIR_PATHNAME.join 'hl'
+
   module CONSTANTS
     Headless = ::Skylab::Headless
     Headless_TestSupport = Headless_TestSupport

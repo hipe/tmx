@@ -8,7 +8,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
     extend Actions_TestSupport
 
     setup = -> ctx do
-      ctx.tmpdir_clear.write 'doc/issues.md', <<-O.unindent
+      ctx.tmpdir_clear.write manifest_path, <<-O.unindent
         [#003] #open biff bazz
           this second line will get concatted
         [#002]       #done this one is finished

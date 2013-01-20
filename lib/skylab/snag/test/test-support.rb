@@ -33,7 +33,12 @@ module Skylab::Snag::TestSupport
       Snag::Services::FileUtils.cd( tmpdir, verbose: debug?, &block)
     end
 
+    manifest_path = Snag::API.manifest_path
+
+    define_method :manifest_path do manifest_path end
+
     tmpdir = TestSupport::Tmpdir.new ::Skylab::TMPDIR_PATHNAME.join 'snaggle'
+
     define_method :tmpdir do
       tmpdir
     end

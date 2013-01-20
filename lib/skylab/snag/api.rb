@@ -3,17 +3,40 @@ module Skylab::Snag
     # For no good reason API (the module) is the home of low-level,
     # bootstrappy, zero-config-style config.
 
-    manifest_file_name = 'doc/issues.md'.freeze # etc
-    define_singleton_method :manifest_file_name do manifest_file_name end
+    manifest_path = 'doc/issues.md'.freeze # etc
+
+    define_singleton_method :manifest_path do manifest_path end
+
+    max_num_dirs_to_search_for_manifest_file = 15 # wuh-evuh
 
     define_singleton_method :max_num_dirs_to_search_for_manifest_file do
-      15 # wuh-evuh
+      max_num_dirs_to_search_for_manifest_file
     end
   end
 
   class API::Client
     include Snag::Core::SubClient::InstanceMethods
 
+    @setup = nil                  # experimental hackery for .. well ..
+
+    class << self
+
+      attr_reader :setup
+
+      alias_method :setup_ivar, :setup
+
+      def setup f
+        @setup and fail "won't stack (or queue) setups"
+        @setup = f
+        nil
+      end
+
+      def setup_delete
+        x = @setup
+        @setup = nil
+        x
+      end
+    end
 
     def build_action normalized_action_name
       # keeping for #posterity, primordial boxxy:
@@ -21,7 +44,6 @@ module Skylab::Snag
 
       API::Actions.const_fetch( normalized_action_name ).new self
     end
-
 
     # getters for *persistent* models *objects* (think daemons):
 
@@ -40,9 +62,7 @@ module Skylab::Snag
       res
     end
 
-
-    max_num_dirs_to_search = API.max_num_dirs_to_search_for_manifest_file
-    manifest_file_name = API.manifest_file_name
+    manifest_path = API.manifest_path
 
     define_method :find_closest_manifest_path do |error|
       res = nil
@@ -51,12 +71,13 @@ module Skylab::Snag
         found = nil
         num_dirs_searched = 0
         seen = []
+        max = max_num_dirs_to_search_for_manifest_file
         loop do
-          if num_dirs_searched >= max_num_dirs_to_search
+          if num_dirs_searched >= max
             break
           end
           num_dirs_searched += 1
-          try = pn.join manifest_file_name
+          try = pn.join manifest_path
           if try.exist?
             found = try
             break
@@ -72,7 +93,7 @@ module Skylab::Snag
           rev = seen.reverse
           a = [ * ::Array.new( rev.length, '..' ), * rev ]
           tot = " (#{ rev.length } total)"
-          error[ "manifest not found, looked for #{ manifest_file_name } #{
+          error[ "manifest not found, looked for #{ manifest_path } #{
             }in each dir#{tot}: #{ a.join '/' }#{ a.empty? ? '(none)' : '/' }" ]
           break
         end
@@ -81,10 +102,19 @@ module Skylab::Snag
       res
     end
 
+    attr_writer :max_num_dirs_to_search_for_manifest_file
+
   protected
 
     def initialize modality_client
       _snag_sub_client_init! modality_client
+      @max_num_dirs_to_search_for_manifest_file = nil
+      API::Client.setup_delete[ self ] if API::Client.setup_ivar
+    end
+
+    def max_num_dirs_to_search_for_manifest_file
+      @max_num_dirs_to_search_for_manifest_file ||
+        API.max_num_dirs_to_search_for_manifest_file
     end
   end
 end

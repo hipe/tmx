@@ -24,10 +24,16 @@ module Skylab::Headless
   module Action::ModuleMethods
     extend MetaHell::Let          # we memoize things in the class object
 
+    def actions_anchor_module
+      x = const_get :ACTIONS_ANCHOR_MODULE, true
+      x.respond_to?( :call ) and x = x.call
+      x
+    end
+
     attr_reader :desc_lines
 
     let :normalized_action_name do
-      Action::FUN.build_normalized_name[ self::ACTIONS_ANCHOR_MODULE, self]
+      Action::FUN.build_normalized_name[ actions_anchor_module, self ]
     end
 
     def normalized_local_action_name

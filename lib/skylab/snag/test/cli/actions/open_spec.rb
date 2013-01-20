@@ -12,7 +12,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
     shared_setup = -> ctx do      # differently just for fun
                                   # (one time we memoized it but oh lawd)
 
-      ctx.tmpdir_clear.write 'doc/issues.md', <<-O.unindent
+      ctx.tmpdir_clear.write manifest_path, <<-O.unindent
         [#004.2] #open this is #feature-creep but meh
         [#004] #open here's an open guy
                         with two lines

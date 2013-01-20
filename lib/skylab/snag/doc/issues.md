@@ -1,4 +1,10 @@
-[#023] #open refactor whatever
+[#029]       #tracking-tag #pattern of instance_eval for rendering
+[#028] #open melt makes patch for whole codebase
+[#027]       #done move and maybe refactor todo -> todo find
+[#026] #open refactor porcelain tree
+[#025]       #done fix and cover todo tree
+[#024]       #done inconsistencies over writing terminal newlines in file
+[#023]       #done refactor whatever
 [#022] #open #gimmick thing that converts @todo's into issues!?? 2012-06-04
                (formerly [#sl-097])
 [#021]       #doc-point, #tracking-tag - this conv. of indenting per `#open`

@@ -1,10 +1,6 @@
 module Skylab::Snag
   class Models::Identifier < ::Struct.new :prefix, :body, :integer_string
 
-    def self.create_rendered_string int, node_number_digits
-      "[##{ "%0#{ node_number_digits }d" % int }]"
-    end
-
     rx = /
       \A
       \[?\#?                                   # (we can ignore these for you)
@@ -16,7 +12,6 @@ module Skylab::Snag
       \]?                                      # (ignored for you)
       \z
     /x
-
 
     define_singleton_method :normalize do |x, error, info=nil|
       md = rx.match x.to_s

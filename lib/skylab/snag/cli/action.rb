@@ -1,5 +1,7 @@
 module Skylab::Snag
   class CLI::Action # just derping around for now, also [#sl-109]
+    ACTIONS_ANCHOR_MODULE = -> { CLI::Actions }
+
     def self.porcelain            # compat all.rb [#sg-010]
       :porcelain_not_used
     end
@@ -44,22 +46,27 @@ module Skylab::Snag
 
   protected
 
-    def initialize legacy_client, pnum
-      super()
-      nis = legacy_client.invocation
+    def initialize legacy_call_frame, pnum
+      # super() don't call this - it only sets @io_adapter
+      nis = legacy_call_frame.invocation
       nis_a = nis.split ' '
       @normalized_invocation_string =
         nis_a[ 0 .. (- (pnum + 1)) ].join ' '
       @hack = -> do
-        cfa = [ cf = legacy_client ] # KILL THIS WITH FIRE
+        cfa = [ cf = legacy_call_frame ] # KILL THIS WITH FIRE
         cfa.push( cf ) while ( cf = cf.below )
         cli = cfa[ -2 ].client_instance
         cli
       end
+      @io_adapter = CLI::Client::IO_Adapter.new
     end
 
     def create_leaf_option_parser
       Snag::Services::OptionParser.new
+    end
+
+    def emit name, pay
+      legacy_client.send :emit, name, pay
     end
 
     def invite x
@@ -67,7 +74,11 @@ module Skylab::Snag
     end
 
     def legacy_client
-      @hack.call
+      @legacy_client ||= begin
+        lc = @hack.call
+        @hack = nil
+        lc
+      end
     end
 
     attr_reader :normalized_invocation_string
@@ -78,6 +89,17 @@ module Skylab::Snag
 
     def wire_action action
       legacy_client.send :wire_action, action
+    end
+  end
+
+  class CLI::Client::IO_Adapter
+
+    attr_reader :pen
+
+  protected
+
+    def initialize
+      @pen = Headless::CLI::Pen::MINIMAL
     end
   end
 
@@ -207,12 +229,6 @@ module Skylab::Snag
 
   protected
 
-  end
-
-  # --*--    below here make sure to have created all dsl support etc    --*--
-
-  class CLI::Action
-    ACTIONS_ANCHOR_MODULE = CLI::Actions # here b.c of an otherwise circ. dep.
   end
 
   class CLI::Action::Enumerator < ::Enumerator # experimental derping - mind you

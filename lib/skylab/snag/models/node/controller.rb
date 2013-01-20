@@ -6,6 +6,13 @@ module Skylab::Snag
       tag( ( do_append ? :append : :prepend ), tag_ref, -> e { error e } )
     end
 
+    def build_identifier! int, node_number_digits
+      fail "won't clobber existing identifier" if @identifier
+      integer_string = "%0#{ node_number_digits }d" % int
+      @identifier = Models::Identifier.new nil, integer_string, integer_string
+      nil
+    end
+
     def close
       res = nil
       begin
@@ -69,10 +76,6 @@ module Skylab::Snag
 
     def remove_tag tag_ref
       tag :remove, tag_ref, -> e { error e }
-    end
-
-    def rendered_identifier
-      @identifier.render
     end
 
     def tags

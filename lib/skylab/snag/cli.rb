@@ -10,6 +10,7 @@ module Skylab::Snag
     def initialize *sin_sout_serr
       @program_name = nil
       if block_given?
+        fail 'where?'
         super
       else
         up, pay, info = sin_sout_serr
@@ -27,15 +28,19 @@ module Skylab::Snag
       end
     end
 
+    def emit name, pay
+      runtime.emit name, pay
+    end
+
     def error msg # away at [#010]
-      porcelain.runtime.emit :error, "#{ program_name } says: #{ msg }"
+      emit :error, "#{ program_name } says: #{ msg }"
       false
     end
 
     define_method :escape_path, &Headless::CLI::PathTools::FUN.pretty_path
 
     def info msg # away at [#010]
-      porcelain.runtime.emit :info, "#{ program_name } wants you to know: #{
+      emit :info, "#{ program_name } wants you to know: #{
       }#{ msg }"
       nil
     end
@@ -54,7 +59,9 @@ module Skylab::Snag
 
     def invoke argv               # modify at [#010]
       Headless::CLI::PathTools.clear # see
+
       res = super argv            # (handles invites when parsing goes wrong)
+
       if false == res             # (but otherwise when we result in false..)
         # in the future: emit :help, invite_lite
         porcelain.runtime.stack.first.issue
@@ -62,6 +69,7 @@ module Skylab::Snag
       end
       res
     end
+
     public :invoke
 
     def program_name
@@ -152,42 +160,9 @@ module Skylab::Snag
 
     # --*--
 
-    desc "a report of the @todo's in a codebase"
+    namespace :todo, -> { CLI::Actions::Todo }
 
-    option_syntax do |o|
-      d = Snag::API::Actions::ToDo::Report.attributes.with :default
-
-      on('-p', '--pattern <PATTERN>',
-        "the todo pattern to use (default: '#{d[:pattern]}')"
-        ) { |p| o[:pattern] = p }
-      on('--name <NAME>',
-        "the filename patterns to search, can be specified",
-        "multiple times to broaden the search (default: '#{d[:names] * "', '"}')"
-        ) { |n| (o[:names] ||= []).push n }
-      on('--cmd', 'just show the internal grep / find command',
-         'that would be used (debugging).') { o[:show_command_only] = true }
-      on('-t', '--tree', 'experimental tree rendering') { o[:show_tree] = true }
-
-    end
-
-    argument_syntax '<path> [<path> [..]]'
-
-    def todo *paths, opts
-      res = nil
-      action = api_build_wired_action [:to_do, :report]
-      action.on_number_found do |e|
-        info "(found #{ e.count } item#{ s e.count })"
-      end
-      show_tree = opts.delete( :show_tree )
-      if show_tree
-        tree = CLI::ToDo::Tree.new action, runtime
-      end
-      res = action.invoke opts.merge( paths: paths )
-      if show_tree
-        res = tree.render
-      end
-      res
-    end
+    # --*--
 
   protected                       # (below was left in the bottom half b/c
                                   # it is the evil that shall not be touched
@@ -226,7 +201,7 @@ module Skylab::Snag
       action.on_error do |e|
         rendered = render[ self, e ]
         e.message = "failed to #{ e.verb } #{ e.noun } - #{ rendered }"
-        runtime.emit :error, e
+        emit :error, e
         nil
       end
       nil
@@ -239,7 +214,7 @@ module Skylab::Snag
           md = %r{\A\((.+)\)\z}.match( rendered ) and rendered = md[1]
           e.message = "while #{ e.verb.progressive } #{ e.noun }, #{ rendered }"
           md and e.message = "(#{ e.message })" # so ridiculous
-          runtime.emit :info, e
+          emit :info, e
         end
         nil
       end

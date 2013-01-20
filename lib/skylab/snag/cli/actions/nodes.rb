@@ -5,7 +5,7 @@ module Skylab::Snag
 
     cli_box_dsl_original_desc 'make the magic happen'
 
-    desc "Add an \"issue\" line to #{ Snag::API.manifest_file_name }" #[#hl-025]
+    desc "Add an \"issue\" line to #{ Snag::API.manifest_path }" #[#hl-025]
     desc "Lines are added to the top and are sequentially numbered."
 
     # desc ' arguments:' #                      DESC # should be styled [#hl-025]

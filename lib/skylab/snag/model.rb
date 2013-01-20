@@ -34,7 +34,7 @@ module Skylab::Snag
                                   # because a) making events themselves be
                                   # sub-clients feels icky and wrong and b)
                                   # calling instance_eval on an arbitrary
-                                  # request client also feels wrong.
+                                  # request client also feels wrong. ([#029])
 
 
     def self.for event_class

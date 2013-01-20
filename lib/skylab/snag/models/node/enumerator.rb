@@ -26,12 +26,11 @@ module Skylab::Snag
       end
     end
 
-    def last_count
-      @spy[:counting].value[ ]
-    end
-
     attr_accessor :search
 
+    def seen_count
+      @spy[:counting].value[ ]
+    end
 
     spy_struct = ::Struct.new :begin, :yield, :ended, :value
 

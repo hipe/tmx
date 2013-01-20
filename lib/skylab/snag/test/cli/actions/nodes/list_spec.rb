@@ -11,9 +11,9 @@ module Skylab::Snag::TestSupport::CLI::Actions
 
     shared_setup = -> ctx do
       ctx.tmpdir_clear.patch <<-O.unindent
-        diff --git a/doc/issues.md b/doc/issues.md
+        diff --git a/#{ manifest_path } b/#{ manifest_path }
         --- /dev/null
-        +++ b/doc/issues.md
+        +++ b/#{ manifest_path }
         @@ -0,0 +1,4 @@
         +[#003] #open feep my deep
         +[#002]       #done wizzle bizzle 2013-11-11
