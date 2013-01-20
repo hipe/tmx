@@ -56,6 +56,10 @@ module Skylab::MetaHell
       _autoloader_init! nil
     end
 
+    fun = ::Skylab::Autoloader::Inflection::FUN
+
+    constantize = fun.constantize
+
     attr_reader :boxxy_loaded
 
     invalid_ = -> name, f do
@@ -63,8 +67,6 @@ module Skylab::MetaHell
       f ||= -> e { raise e }
       f[ o ]
     end
-
-    constantize = ::Skylab::Autoloader::Inflection::FUN.constantize
 
     valid_const_rx = /\A[A-Z][_a-zA-Z0-9]*\z/ # `valid_name_rx` is fallible
 
@@ -79,8 +81,12 @@ module Skylab::MetaHell
         rs = nil
         if box.autoloader_original_const_defined? const, false
           rs = box.const_get const, false
-        elsif box.dir_path && box.const_probably_loadable?( const )
-          rs = box.case_insensitive_const_get const
+        elsif box.dir_path # sadly, used just as a duck-check
+          if c = box.alternative_casing_match( const )
+            rs = box.const_get c, false
+          elsif box.const_probably_loadable?( const )
+            rs = box.case_insensitive_const_get const
+          end
         end
         if rs
           seen.push name

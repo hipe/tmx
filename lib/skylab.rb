@@ -109,6 +109,17 @@ module Skylab
       end
     end.call
 
+    fun = Autoloader::Inflection::FUN
+
+    methodize = fun.methodize
+
+    define_method :alternative_casing_match do |x|
+      scream_case = methodize[ x ].to_s.upcase.intern
+      if autoloader_original_const_defined? scream_case, false
+        scream_case
+      end
+    end
+
     def const_probably_loadable? const
       _const_missing(const).probably_loadable?
     end

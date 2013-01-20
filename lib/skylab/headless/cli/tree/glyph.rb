@@ -5,11 +5,7 @@ module Skylab::Headless
   end
 
   module CLI::Tree::Glyph::Sets
-
-    _freeze = -> h do
-      h.values.each(& :freeze )
-      nil
-    end
+    extend MetaHell::Boxxy        # BOXXY IS QUEEN OF METAPROGRAMming
 
 
     WIDE = {                      # (these styles came to us later, and are
@@ -20,8 +16,16 @@ module Skylab::Headless
       tee:       '├──'
     }
 
-    _freeze[ WIDE ]
+    NARROW = {
+      blank:     '  ',
+      crook:     ' └',
+      pipe:      ' │',
+      separator: '/',
+      tee:       ' ├'
+    }
 
-    NARROW = :foo
+    self.each do |gs|             # freeze each of the strings in case
+      gs.values.each(& :freeze )  # someone accidentally mutates them
+    end                           # (it's happened once or twice :P)
   end
 end
