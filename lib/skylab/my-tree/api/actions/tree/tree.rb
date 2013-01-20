@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Skylab::MyTree
 
   class API::Actions::Tree::Tree
@@ -43,6 +42,7 @@ module Skylab::MyTree
 
     def initialize request_client, verbose
       @current = []
+      @glyph_set = Headless::CLI::Tree::Glyph::Sets::WIDE
       @matrix = []
       @verbose = verbose
       _headless_sub_client_init! request_client
@@ -83,20 +83,10 @@ module Skylab::MyTree
       nil
     end
 
-    glyph = -> str, name do
-      str.freeze
-      define_method( name ) { str }
+    Headless::CLI::Tree::Glyphs.each do |glyph|
+      # blank crook pipe separator tee
+      n = glyph.name
+      define_method( n ) { @glyph_set[ n ] }
     end
-
-    glyph[ '   ', :blank ]
-
-    glyph[ '└──', :crook ]
-
-    glyph[ '│  ', :pipe ]
-
-    glyph[ '/',   :separator ]
-
-    glyph[ '├──', :tee   ]
-
   end
 end
