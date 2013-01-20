@@ -1,16 +1,22 @@
 module Skylab::Porcelain
-  class Tree::Children < Array
-    def initialize
-      @slugs = {}
-    end
+  class Tree::Children < ::Array
+
     def [] slug
-      Integer === slug and return super(slug)
-      @slugs.key?(slug) or return nil
-      super @slugs[slug]
+      if ::Integer === slug
+        super
+      elsif @slugs.key? slug
+        super @slugs[slug]
+      end
     end
+
     def []= slug, val
-      Integer === slug ? super : set(slug, val)
+      if ::Integer === slug
+        super
+      else
+        set slug, val
+      end
     end
+
     def set slug, *slugs, new
       idx = killme = nil
       slugs.unshift slug
@@ -21,6 +27,12 @@ module Skylab::Porcelain
       idx ||= length
       slugs.each { |s| @slugs[s] = idx }
       self[idx] = new
+    end
+
+  protected
+
+    def initialize
+      @slugs = { }
     end
   end
 end
