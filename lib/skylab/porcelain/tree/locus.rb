@@ -48,7 +48,7 @@ module ::Skylab::Porcelain
     def _traverse root, meta={ }
       @block.call root, meta
       sum = 1
-      if root.children?
+      if root.has_children
         _push meta
         last = root.children_length - 1
         root.children.each_with_index do |child, idx|

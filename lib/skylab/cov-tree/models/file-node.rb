@@ -37,7 +37,7 @@ module Skylab::CovTree
     test_basename_rx = CovTree::FUN.test_basename_rx
 
     define_method :isomorphs! do
-      if ! children? and 1 == types.length and 1 == isomorphic_slugs.length
+      if ! has_children and 1 == types.length and 1 == isomorphic_slugs.length
         case types.first
         when :test
           md = slug.match test_basename_rx

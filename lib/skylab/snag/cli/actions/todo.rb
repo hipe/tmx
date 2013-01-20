@@ -24,7 +24,7 @@ module Skylab::Snag
         info "(found #{ e.count } item#{ s e.count })"
       end
       if param_h.delete :show_tree
-        tree = CLI::ToDo::Tree.new action, request_client
+        tree = CLI::ToDo::Tree.new request_client, action
       end
       res = action.invoke( { paths: path }.merge param_h )
       if tree

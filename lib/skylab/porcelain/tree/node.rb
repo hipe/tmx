@@ -1,6 +1,6 @@
 module Skylab::Porcelain
-  class Tree::Node < ::Hash
-    # shenanigans
+  class Tree::Node
+    # [#sl-109] class as namespace
   end
 
   module Tree::Node::CommonMethods
@@ -12,7 +12,7 @@ module Skylab::Porcelain
   module Tree::Node::InstanceMethods
     include Tree::Node::CommonMethods
 
-    def children?
+    def has_children
       0 < children_length
     end
 
@@ -28,12 +28,14 @@ module Skylab::Porcelain
       _find _find_path_normalize( path ), true, &init_new_node_block
     end
 
-    def isomorphic_slugs_length   # can be redefined e.g.
-      isomorphic_slugs.length     # to avoid autovivification
+    def is_leaf
+      0 == children_length
     end
 
-    def leaf?
-      0 == children_length
+    attr_accessor :is_root
+
+    def isomorphic_slugs_length   # can be redefined e.g.
+      isomorphic_slugs.length     # to avoid autovivification
     end
 
     def longest_common_base_path
@@ -107,9 +109,17 @@ module Skylab::Porcelain
 
   protected
 
-    def initialize params, &b
-      params.each { |k, v| send "#{ k }=", v }
-      yield self if block_given?
+    param_h_h = {
+      is_root: -> v { self.is_root = v },
+      slug:    -> v { self.slug = v }
+    }
+
+    define_method :initialize do |param_h, &b|
+      super( & nil )
+      param_h.each do |k, v|
+        instance_exec v, & param_h_h.fetch( k )
+      end
+      b[ self ] if b
     end
 
     def _find_path_normalize mixed
@@ -144,12 +154,12 @@ module Skylab::Porcelain
     end
 
     def _paths arr, prefix
-      if ! root? || prefix # @todo wtf
-        my_path = [prefix, slug, ('' if children?)].compact.join(path_separator)
+      if ! is_root || prefix # @todo wtf
+        my_path = [prefix, slug, ('' if has_children)].compact.join(path_separator)
         arr.push(my_path)
       end
-      if children?
-        my_prefix = root? ? nil : [prefix, slug].compact.join(path_separator)
+      if has_children
+        my_prefix = is_root ? nil : [prefix, slug].compact.join(path_separator)
         children.each { |node| node._paths(arr, my_prefix) }
       end
       nil
@@ -160,7 +170,7 @@ module Skylab::Porcelain
     include Tree::Node::CommonMethods
 
     def build *a, &b
-      new *a, &b
+      new( *a, &b )
     end
 
     def combine node1, node2, *nodes, &slugmaker
@@ -177,13 +187,13 @@ module Skylab::Porcelain
       case slug_h.length
       when 0 # res stays as nil
       when 1 # when `slug_h` is length 1 then associate all nodes at this level
-        combined = pairs.reduce( build root: true ) do |m, p|
+        combined = pairs.reduce( build is_root: true ) do |m, p|
           m.merge! p.last, except: [:children]
         end
         order_a = []
         _h = ::Hash.new { |h, k| order_a << k ; h[k] = [] }
         childs_by_slug = pairs.reduce _h do |m, p|
-          if p.last.children?
+          if p.last.has_children
             p.last.children.each do |c|
               m[ slugmaker[ c ] ] << c
             end
@@ -196,7 +206,7 @@ module Skylab::Porcelain
             if 1 == childs.length
               m[slug] = childs.first
             else
-              m[slug] = combine *childs, &slugmaker
+              m[slug] = combine( *childs, &slugmaker )
             end
             m
           end
@@ -212,7 +222,7 @@ module Skylab::Porcelain
 
     def from_paths paths, &node_init_block
       sep = path_separator
-      paths.reduce(build(root: true, &node_init_block)) do |root, path|
+      paths.reduce(build( is_root: true, &node_init_block)) do |root, path|
         root.find!(path.to_s.split(sep), &node_init_block)
         root
       end
@@ -223,28 +233,28 @@ module Skylab::Porcelain
     extend  Tree::Node::ModuleMethods
     include Tree::Node::InstanceMethods
 
+    attr_reader :children
+
+    alias_method :children_ivar, :children
+
     def children
-      self[:children] ||= Tree::Children.new
+      children_ivar or @children = Tree::Children.new
     end
 
     def children_length
-      self[:children] ? self[:children].length : 0
+      children_ivar ? @children.length : 0
     end
 
+    attr_reader :isomorphic_slugs
+
+    alias_method :isomorphic_slugs_ivar, :isomorphic_slugs
+
     def isomorphic_slugs
-      self[:isomorphic_slugs] ||= []
+      @isomorphic_slugs ||= []
     end
 
     def isomorphic_slugs_length
-      self[:isomorphic_slugs] ? self[:isomorphic_slugs].length : 0
-    end
-
-    def root= b
-      self[:root] = b
-    end
-
-    def root?
-      self[:root]
+      isomorphic_slugs_ivar ? @isomorphic_slugs.length : 0
     end
   end
 end
