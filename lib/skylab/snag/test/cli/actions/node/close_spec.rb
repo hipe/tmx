@@ -42,7 +42,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
 
     it "closing one that is already closed - whines gracefully" do
       invoke '002'
-      expect :info, /\[#002\] is not tagged with "#open"/ # #todo look at these two
+      expect :info, /\[#002\] is not tagged with "#open"/ # [#it-002] agg.
       expect :info, /\[#002\] is already tagged with #done/
     end
 
