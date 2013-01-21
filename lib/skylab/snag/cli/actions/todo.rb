@@ -4,7 +4,7 @@ module Skylab::Snag
 
     cli_box_dsl_original_desc 'actions that work with TODO-like tags'
 
-    desc "a report of the @#{ }todo's in a codebase"
+    desc "a report of the @#{}todo's in a codebase"
 
     option_parser do |o|
       command_option o
@@ -19,13 +19,22 @@ module Skylab::Snag
     end
 
     def find *path
-      res = nil
-      action = api_build_wired_action [:to_do, :report]
+      action = api.build_action [:to_do, :report]
+      wire_action_for_info action
+      wire_action_for_error action
       action.on_number_found do |e|
         info "(found #{ e.count } item#{ s e.count })"
       end
-      if int = param_h.delete( :show_tree )
-        tree = CLI::ToDo::Tree.new request_client, action, ( int > 1 )
+      tree_pretty_level = param_h.delete :show_tree
+      if tree_pretty_level
+        tree = CLI::ToDo::Tree.new request_client, ( tree_pretty_level > 1 )
+        action.on_payload do |e|
+          tree << e.payload
+        end
+      else
+        action.on_payload do |e|
+          self.payload e
+        end
       end
       res = action.invoke( { paths: path }.merge param_h )
       if tree
