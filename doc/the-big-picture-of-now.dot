@@ -1,0 +1,32 @@
+# created by tan-man on 2013-01-21 01:44:05 UTC
+
+digraph {
+
+/*
+  example stmt_list:
+    foo -> bar
+    biff -> baz
+
+  example node_stmt:
+    learn_c [label="learn C somehow"]
+*/
+
+
+#                 blue : fillcolor="#b5d5fb"
+#             finished : green
+#                green : fillcolor="#79f233"
+
+label="Tangent with the C Programming Language"
+
+node [label="\N", style="filled", fillcolor="#b5d5fb", fontname="Futura", penwidth="1.1566", shape="Mrecord"]
+
+
+call [label="call graph"]
+feat [label="feat mat"]
+legacy [label=legacy]
+sparkle [label=sparkle]
+summarization [label=summarization]
+feat -> sparkle
+legacy -> feat
+summarization -> call
+}
