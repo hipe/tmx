@@ -34,10 +34,13 @@ module Skylab::Snag
       o.on '-a', '--all', 'show all (even invalid) issues' do
         param_h[:all] = true
       end
+                                  # [#030] - we would love to have -1, -2 etc
+      o.on( /^-(?<num>\d+)$/ ) do |md|
+        [ '--max-count', md[:num] ]
+      end
 
-      # [#030] - we would love to have -1, -2 etc
-
-      o.on '-n', '--max-count <num>', "limit output to N nodes" do |n|
+      o.on '-n', '--max-count <num>',
+        "limit output to N nodes (also -<n>)" do |n|
         param_h[:max_count] = n
       end
 
@@ -68,6 +71,12 @@ module Skylab::Snag
         identifier_ref: identifier_ref,
         verbose: true
       }.merge! param_h )
+    end
+
+    self::Actions::List.class_eval do # omg [#030] experimental cust. of o.p
+      def leaf_create_option_parser
+        Snag::CLI.const_get( :OptionParser, false ).new # antidote to [#sl-124]
+      end
     end
   end
 end

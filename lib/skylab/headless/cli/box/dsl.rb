@@ -295,7 +295,7 @@ module Skylab::Headless
       leaf_name = leaf.normalized_local_action_name
       build_option_parser = leaf.class.build_option_parser_ivar
       build_option_parser ||= -> do
-        o = create_leaf_option_parser
+        o = leaf.leaf_create_option_parser || create_leaf_option_parser
         if a = leaf.class.option_parser_blocks
           a.each do |block|
             instance_exec o, &block
@@ -317,6 +317,13 @@ module Skylab::Headless
         o
       end
       request_client.instance_exec(& build_option_parser)
+    end
+
+    def leaf_create_option_parser
+      # for custom overriding to e.g. use a custom class. it is so-named
+      # to make the code more traceable, because it is differently used
+      # than the other similarly-named method.  also we don't yet know
+      # if we will ever need both! (leaf/branch hybrid)
     end
 
     methodize = Autoloader::Inflection::FUN.methodize

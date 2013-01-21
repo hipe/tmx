@@ -48,6 +48,12 @@ module Skylab::Snag::TestSupport::CLI::Actions
       o[].should eql(nil)
     end
 
+    it "with `list -2` - also works (-<n> option yay)" do
+      shared_setup[ self ]
+      invoke_from_tmpdir( *invocation, '-2' )
+      output.lines.last.string.should match( /found 2 nodes with validity/ )
+    end
+
     context "if you ask to see a particular one" do
       it "with `show 002 --no-verbose` - it shows it tersely" do
         shared_setup[ self ]
