@@ -93,7 +93,6 @@ module Skylab::Snag
     desc "one number per line, with any leading zeros per the file."
     desc "(more of a plumbing than porcelain feature!)"
 
-    # @todo: bug with "tmx issue number -h"
     def numbers
       api_invoke [:nodes, :numbers, :list]
     end

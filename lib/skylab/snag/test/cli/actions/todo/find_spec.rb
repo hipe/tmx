@@ -23,10 +23,12 @@ module Skylab::Snag::TestSupport::CLI::Actions
       o
     end
 
+    define_method :setup do setup[ self ] end
+
     invocation = [ 'todo', 'find' ]
 
     define_method :invoke do |*argv|
-      @pn = setup[ self ]
+      @pn = self.setup
       invoke_from_tmpdir( *invocation, *argv )
     end
 
@@ -36,7 +38,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
       line.string.should match( rx )
     end
 
-    it "regular style - works, is hard to read", f:true do
+    it "regular style - works, is hard to read" do
       invoke '-p', "##{}todo\\>", '.'
       expect :pay, %r{^\./ferbis\.rb:2:beta ##{}todo$}
       expect :pay, %r{jerbis/one.rb.*\b1\b}
@@ -52,6 +54,23 @@ module Skylab::Snag::TestSupport::CLI::Actions
       expect :pay, /2.*beta ##{}todo/
       expect :pay, /\bjerbis\b/
       expect :pay, /\bone\.rb\b/
+    end
+
+    context "pretty tree style" do
+
+      def setup
+        ctx = self
+        o = ctx.tmpdir_clear
+        o.write 'meeple.rb', <<-O.unindent
+          one # %delegates %todo:#100.200.1
+        O
+        o
+      end
+
+      it "colorizes pretty -tt style even if ##{}todo is not at beginning" do
+        invoke '-p', '%todo\>', '-tt', '.'
+        output.lines.first.string.should match( /found 1 /)
+      end
     end
   end
 end

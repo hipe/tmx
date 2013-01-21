@@ -29,10 +29,10 @@ module Skylab::Snag::TestSupport::CLI::Actions
         client_invoke( *invocation, '-n', '-v', 'foo bizzle' )
       end
       o( / new line: / )
-      if output.lines.first.string =~ /mkdir .+snag-PROD/
-        output.lines.shift # egads sorry this is bad
-      elsif output.lines.first.string =~ / rm / # #todo WAT
-        o( / rm / )
+      if output.lines.first.string =~ /mkdir .+snag-PROD/ # [#033]
+        output.lines.shift
+      elsif output.lines.first.string =~ / rm /
+        output.lines.shift
       end
       o( / mv /)
       o( / mv /)

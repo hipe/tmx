@@ -10,6 +10,13 @@ module Skylab::Snag
   class CLI::ToDo::Tree
     include Snag::Core::SubClient::InstanceMethods
 
+    def << todo
+      if todo.valid?
+        @todos.push todo.collapse
+      end
+      nil
+    end
+
     tree_lines_producer_basic = -> tree do
       lines = Porcelain::Tree.lines tree, node_formatter: -> x { x }
       enum = ::Enumerator.new do |y|
@@ -98,22 +105,10 @@ module Skylab::Snag
 
   protected
 
-    def initialize client, action, do_pretty
+    def initialize client, do_pretty
       _snag_sub_client_init! client
-      @action = action
       @do_pretty = do_pretty
       @todos = []
-      @action.send( :event_listeners )[:payload].clear # #todo NO. BAD.
-      @action.on_payload do |event|
-        pay = event.payload
-        if pay.respond_to? :valid?
-          if pay.valid?
-            @todos.push pay.collapse
-          end
-        else
-          info "not teh payload we were expecing: #{ pay.class }"
-        end
-      end
     end
   end
 end

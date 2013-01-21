@@ -118,7 +118,7 @@ module Skylab::Snag
     def self.aliases              # compat to all.rb
     end
 
-    def self.collapse_action legacy_client # #todo
+    def self.collapse_action legacy_client
       new legacy_client.actions_provider
     end
 

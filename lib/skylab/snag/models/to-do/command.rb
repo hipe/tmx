@@ -1,5 +1,5 @@
 module Skylab::Snag
-  class Models::ToDo::Command # #todo see if we can unify find commands org wide
+  class Models::ToDo::Command # [#032] - see if we can unify find commands ..
 
     attr_reader :names
 

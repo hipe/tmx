@@ -102,7 +102,7 @@ module Skylab::Snag
       ranges.precomment = -> do # we need to back up till
         scn.skip( before_rx ) or fail 'rx'      # before the '#' :(
         rscn.string = full_source_line[ 0, scn.pos ].reverse
-        if ! rscn.skip( /[[:space:]]*#/ ) && '#' != scn.peek( 1 )
+        if ! rscn.skip_until( /#/ ) && '#' != scn.peek( 1 )
           fail 'rx' # covered - the tag's hash might have been a comment leader
         end
         0 .. rscn.string.length - rscn.pos - 1
