@@ -9,6 +9,20 @@ module Skylab::Headless
 
     o = { }
 
+    initial_vowel_rx = /\A[a-z]/i
+
+    all_caps_rx = /\A[A-Z]+\z/
+
+    o[:an] = -> x, cnt=nil do          # crude guess at 'a' vs. 'an'
+      x = x.to_s
+      res = initial_vowel_rx =~ x ? 'an' : 'a'
+      if cnt                           # if the count is also variable then
+        res = o[:s][ cnt, res.intern ] # you have more work to do
+      end
+      res = res.upcase if res && all_caps_rx =~ x # the just be cute
+      res
+    end
+
     o[:oxford_comma] = -> a, ult = " and ", sep = ", " do
       (hsh = ::Hash.new(sep))[a.length - 1] = ult
       [a.first, * (1..(a.length-1)).map { |i| [ hsh[i], a[i] ] }.flatten].join

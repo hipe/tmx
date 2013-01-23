@@ -24,7 +24,9 @@ module Skylab::Snag
       res = nil
       if const_defined? :PARAMS, false
         a = const_get :PARAMS, false
-        res = ::Hash[ a.map { |k| [ k, { required: true } ] } ]
+        res = Porcelain::Attribute::Box[ a.map do |k|
+          [ k, Porcelain::Attribute::Metadata[ required: true ] ]
+        end ]
       else
         res = self.attributes     # (for clearer error msgs)
       end
@@ -68,7 +70,7 @@ module Skylab::Snag
       begin
         formal = self.class.attributes_or_params
         extra = @param_h.keys.reduce [] do |m, k|
-          m << k if ! formal.key? k
+          m << k if ! formal.has? k
           m
         end
         if extra.length.nonzero?
@@ -77,7 +79,7 @@ module Skylab::Snag
           break
         end
         formal.each do |k, meta|
-          if meta.key?( :default ) && @param_h[k].nil?
+          if meta.has?( :default ) && @param_h[k].nil?
             @param_h[k] = meta[:default]
           end
         end

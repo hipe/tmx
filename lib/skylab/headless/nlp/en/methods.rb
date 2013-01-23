@@ -11,6 +11,8 @@ module Skylab::Headless
 
     fun = NLP::EN::Minitesimal::FUN
 
+    define_method :an, & fun.an
+
     define_method :oxford_comma, & fun.oxford_comma
 
     alias_method :and_, :oxford_comma

@@ -1,0 +1,3 @@
+%s/^\( *\)let(:subject) { \([^}]\+\) }/\1str = \2/gc
+%s/^\( *\)specify { should \([^}]\+\) }/\1str.should \2/gc
+%s/context "/it "/gc

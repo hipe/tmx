@@ -29,7 +29,7 @@ describe Skylab::Porcelain::Attribute::Definer do
       attribute :foo
       attribute :bar
     end
-    klass.attributes.keys.to_set.should eql([:bar, :foo].to_set)
+    klass.attributes.names.to_set.should eql([:bar, :foo].to_set)
   end
   describe "when dealing with class inheritance" do
     klass_a = one_such_class do
@@ -45,7 +45,7 @@ describe Skylab::Porcelain::Attribute::Definer do
       b.foo.should eql('x')
     end
     it "inherits the reflection" do
-      klass_b.attributes.keys.to_set.should eql([:foo, :bar].to_set)
+      klass_b.attributes.names.to_set.should eql([:foo, :bar].to_set)
     end
   end
   describe "class inheritance with regards to metaproperties", {focus:true} do
@@ -78,13 +78,13 @@ describe Skylab::Porcelain::Attribute::Definer do
       let(:klass_a) { one_such_class { meta_attribute :height } }
       let(:klass_b) { Class.new(klass_a).class_eval { meta_attribute :weight; self } }
       it "as here" do
-        klass_b.meta_attributes.keys.to_set.should eql([:height, :weight].to_set)
+        klass_b.meta_attributes.names.to_set.should eql([:height, :weight].to_set)
       end
       it "but adding things to the parent dynamically won't inherit" do
         klass_a.meta_attribute :age
-        klass_b.meta_attributes.keys.to_set.should eql([:height, :weight, :age].to_set)
+        klass_b.meta_attributes.names.to_set.should eql([:height, :weight, :age].to_set)
         klass_a.meta_attribute :volume
-        klass_b.meta_attributes.keys.to_set.should eql([:height, :weight, :age].to_set)
+        klass_b.meta_attributes.names.to_set.should eql([:height, :weight, :age].to_set)
       end
     end
     describe "you can define hooks" do

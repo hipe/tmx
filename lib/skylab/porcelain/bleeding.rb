@@ -136,7 +136,7 @@ module Skylab::Porcelain::Bleeding
     end
 
     def option_syntax
-      @option_syntax ||= option_syntax_class.build
+      @option_syntax ||= build_option_syntax
     end
 
     def option_syntax_class
@@ -148,7 +148,7 @@ module Skylab::Porcelain::Bleeding
     def parameters ; argument_syntax.parameters end # @delegates_to
 
     def program_name
-      "#{ parent.program_name } #{ aliases.first}"
+      "#{ parent.program_name } #{ aliases.first }"
     end
 
     def resolve argv # mutates argv
@@ -171,6 +171,12 @@ module Skylab::Porcelain::Bleeding
       end
       r
     end
+
+  protected
+
+    def build_option_syntax
+      self.class.option_syntax.dupe
+    end
   end
 
   module ActionKlassInstanceMethods
@@ -180,6 +186,7 @@ module Skylab::Porcelain::Bleeding
 
   module Action::ModuleMethods
     include MetaMethods
+
     def argument_syntax
       @argument_syntax ||= begin
         o = ArgumentSyntax.new(
@@ -216,8 +223,8 @@ module Skylab::Porcelain::Bleeding
 
     def option_syntax &block
       @option_syntax ||= begin
-        osy = option_syntax_class.build
-        option_syntax_class osy # hack to get this to descend, will go away
+        osy = option_syntax_class.new
+        # option_syntax_class osy # hack to get this to descend, will go away
         osy
       end
       if block
@@ -228,16 +235,30 @@ module Skylab::Porcelain::Bleeding
       end
     end
 
-    def option_syntax_class k=nil
-      k.nil? ? OptionSyntax : instance_exec(k, &(redef = ->(k2) {
-        undef_method(:option_syntax_class)
-        define_method(:option_syntax_class) { k2 }
-        singleton_class.send(:undef_method, :option_syntax_class)
-        singleton_class.send(:define_method, :option_syntax_class) { |k3 = nil| k3.nil? ? k2 : instance_exec(k3, &redef) }
-      }))
+    def option_syntax_class klass=nil
+      if klass.nil?
+        OptionSyntax
+      else
+        redef = -> k2 do
+          undef_method :option_syntax_class
+          define_method :option_syntax_class do k2 end
+          class << self
+            undef_method :option_syntax_class
+          end
+          define_singleton_method :option_syntax_class do |k3=nil|
+            if k3.nil?
+              k2
+            else
+              instance_exec k3, &redef
+            end
+          end
+        end
+        instance_exec klass, &redef
+      end
     end
 
     def _self;   self        end
+
     alias_method :reflector, :_self
 
     def summary &block
@@ -276,86 +297,84 @@ module Skylab::Porcelain::Bleeding
     attr_accessor :action_anchor_module
 
     def fetch token, &not_found
-      result = nil
-      begin
-        result = b = fetch_builder( token, &not_found )
-        result or break
-        o = b.respond_to?(:build) ? b.build(self) : b.new
-        o2 = o.respond_to?(:resolve) ? o : RuntimeInferred.new(self, o, b)
-        result = o2
-      end while nil
-      result
+      res = fetch_builder token, &not_found
+      if res
+        kls = res
+        act = if kls.respond_to? :build
+          kls.build self
+        else
+          kls.new
+        end
+        res = if act.respond_to? :resolve then act
+        else
+          RuntimeInferred.new self, act, kls
+        end
+      end
+      res
     end
-
                                   # in the spirit of .fetch
     def fetch_builder token, &not_found
-      result = nil
-      begin
-        err = nil
-        m = find token do |o|
-          o.on_error do |e|
-            err = e
-          end
+      es = nil
+      mod = find token do |o|
+        o.on_error do |er|
+          res = ( not_found || -> e { raise ::KeyError, e.message } ) [ er ]
         end
-        if err
-          f = not_found || -> e { raise ::KeyError.new e.message }
-          result = f[err]
-          break
-        end
-        m or break # unlikely
-        if ! m.respond_to?(:build) && ::Module === m && ! (::Class === m)
-          result = NamespaceInferred.new m
+      end
+      if mod
+        if mod.respond_to?(:build) || !(::Module === mod && ! (::Class === mod))
+          res = mod
         else
-          result = m
+          res = NamespaceInferred.new mod
         end
-      end while nil
-      result
+      end
+      res
+    end
+
+    resolve_builder = -> act do
+      bld = if act.respond_to? :builder then act.builder else act end
+      bld or fail 'sanity - action.builder returned nil?'
+      bld
     end
 
     on_find = PubSub::Emitter.new ambiguous: :error,
       not_found: :error, not_provided: :error
 
                                   # result is nil or builder
+                                  # 1st exact match steals the whole show
     define_method :find do |token, &error|
-      result = nil # resolve the match early! (flyweighting ick)
+      res = nil
       begin
         e = on_find.new error
         if ! token
           e.emit :not_provided, "expecting #{ syntax }"
-          break
+          break( res = false )
         end
-        found = [] ; builder = nil ; rx = /^#{ ::Regexp.escape token }/
+        builder = nil ; found = [] ; rx = /^#{ ::Regexp.escape token }/
         actions.names.each do |act|
-          a = act.aliases.grep rx
-          first_match = a.reduce do |m, name|
-            if name == token
-              result = act.builder  # 1st whole match always wins the whole show
-              break
+          fnd = act.aliases.grep rx
+          if fnd.length.nonzero?
+            if fnd.include? token
+              break( res = resolve_builder[ act ] ) # (note we set res)
             end
-            m
-          end
-          result and break        # found an exact match, done
-          if first_match
-            found.push first_match
-            builder = if act.respond_to? :builder then act.builder else act end
-            builder or fail 'sanity - action.builder returned nil?'
+            found.push fnd.first
+            builder = resolve_builder[ act ]
           end
         end
-        result and break          # and so on
+        res and break             # and so on
         case found.length
         when 0 ; e.emit :not_found, "invalid action #{ token.inspect }. #{
                    }expecting #{ syntax }"
-        when 1 ; result = builder # fuzzy match, found 1 match
+        when 1 ; res = builder # fuzzy match, found 1 match
         else   ; e.emit :ambiguous, "ambiguous action #{ token.inspect }. #{
                    }did you mean #{ or_ found.map { |n| "#{ pre n }" } }?"
         end
       end while nil
-      result
+      res
     end
 
-    def help_invite o
-      a, b = if o[:full] then ['<action>',   " on a particular action."]
-                         else ['[<action>]'] end
+    def help_invite o=nil
+      a, b = if (o && o[:full]) then ['<action>',   " on a particular action."]
+                                else ['[<action>]'] end
       emit :help, "try #{pre "#{program_name} #{a} -h"} for help#{b}"
     end
 
@@ -364,7 +383,7 @@ module Skylab::Porcelain::Bleeding
         rows << [ help.aliases.first, ( help.summary_lines || [] ) ]
         rows
       end
-      emit :help, (tbl.empty? ? "(no actions)" : "#{hdr 'actions:'}")
+      emit :help, (tbl.length.zero? ? "(no actions)" : "#{hdr 'actions:'}")
       width = tbl.reduce(0) { |m, o| o[0].length > m ? o[0].length : m }
       fmt = "  #{em "%#{width}s"}  %s"
       fmt2 = "  #{' ' * width}  %s"
@@ -379,18 +398,18 @@ module Skylab::Porcelain::Bleeding
       emit :help, "#{hdr 'usage:'} #{program_name} #{syntax} [opts] [args]"
     end
 
-    def resolve argv # mutates argv
-      result = nil
-      begin
-        token = argv.shift
-        o = fetch token do |e|
-          result = help message: e.message, syntax: false
-          nil # the fetch must still fail regardless of what help returns!
-        end
-        o or break
-        result = o.resolve argv
-      end while nil
-      result
+    attr_reader :last_fetch_result
+
+    def resolve argv # mutates argv .. here is the secret to our tail call rec.
+      res = nil
+      x = fetch argv.shift do |e|
+        res = help message: e.message, syntax: false
+        nil                       # *ensure* that x is false-ish!
+      end
+      if x
+        res = x.resolve argv
+      end
+      res
     end
 
     def syntax
@@ -490,6 +509,7 @@ module Skylab::Porcelain::Bleeding
                                   # callback, which gets passed two arguments:
                                   # a message string and the relevant metadata.
 
+                                  # *no* exclamation! [#po-016]
     def parse argv, args, missing, unexpected=missing
       counts = parameters.reduce( ::Hash.new { |h, k| h[k] = 0 } ) do |m, p|
         m[p.type] += 1            # what are the counts of each type of
@@ -531,44 +551,47 @@ module Skylab::Porcelain::Bleeding
     alias_method :dupe, :dup # careful!
 
     let :parameters do # maybe public one day
-      a = params.call
-      takes_options.call and a.pop
-      b = a.map { |o| struct[ * o ] }
-      b
+      args = params.call
+      args.pop if takes_options[]
+      res = args.map { |o| struct[ * o ] }
+      res
     end
   end
 
-  class OptionSyntax < ::Struct.new :definitions, :documentor_class,
-    :parser_class, :do_help
-
+  class OptionSyntax
     include Styles
-    def self.build
-      new [], ::OptionParser, ::OptionParser
-    end
 
     def any?
-      definitions.any?
-    end
-
-    def build
-      self.class.new definitions.dup, documentor_class, parser_class, do_help
+      @definitions.length.nonzero?
     end
 
     def define! &block
-      definitions.push block
+      @definitions.push block
       @on_definition_added_h.each do |_, b|
         instance_exec( &b )
       end
       nil
     end
 
+    def dupe
+      otr = self.class.new @definitions.dup, @documentor_class, @parser_class,
+        @do_help
+      otr
+    end
+
+    attr_accessor :definitions
+
+    attr_accessor :do_help
+
     def documentor
       @documentor ||= begin
-        d = documentor_class.new
-        init_documentor d
+        d = @documentor_class.new
+        documentor_visit d
         d
       end
     end
+
+    attr_accessor :documentor_class
 
     def help y # !
       documentor.summarize do |line| # use optparse interface! - keep [#po-015]
@@ -578,37 +601,27 @@ module Skylab::Porcelain::Bleeding
     end
 
     def help!
-      self[:do_help] = true
-    end
-
-    def init_documentor doc
-      @on_definition_added_h[:documentor] ||= -> do
-        fail 'sanity - you probably want this hook to be set for documentors'
-      end
-      doc.banner = "#{ hdr 'options:' }"
-      null_h = { }
-      definitions.each { |b| doc.instance_exec null_h, &b }
+      @do_help = true
       nil
     end
 
     attr_reader :on_definition_added_h
 
+                                  # *no* exclamation! [#016]
     def parse argv, args, help, syntax_error # result is true or result
       r = nil                     # of one of the callbacks `help`, or `se`
       begin
-        if definitions.empty?
+        if definitions.length.zero?
           if ! do_help
-            r = true              # parsing with the empty option syntax
-            break                 # (and no help) is a no-op, always success.
-          end                     # (and note it leaves and '-h' in argv!)
-        else
+            break( r = true )     # parsing with the empty option syntax
+          end                     # (and no help) is a no-op, always success.
+        else                      # (and note it leaves and '-h' in argv!)
           opts_h = { }            # your one and only options hash for this
           args.push opts_h        # request. note we make it (and append to
         end                       # args) IFF there is one or more defn blocks.
         o = parser_class.new
         o.on '-h', '--help' do    # with or w/o defn blocks we might do this
-
-          r = help.call           # (simply call the callback, callee decides
+          r = help[]              # (simply call the callback, callee decides
         end                       # how to handle this.)
         definitions.each do |f|
           o.instance_exec opts_h, &f # run each definition block passing
@@ -626,15 +639,14 @@ module Skylab::Porcelain::Bleeding
       r                           # note that this should always be true
     end                           # or the result of a er[] call
 
+    attr_accessor :parser_class
 
-    # the below is jawbreak blood . this will all go away soon like a bad dream
     def string
       res = nil
       if definitions.length.nonzero?
-        switch_a = documentor.top.list
-        string_a = switch_a.reduce [] do |m, sw|
+        string_a = switches.reduce [] do |m, sw|
           if sw.respond_to? :short
-            m << "[#{ sw.short.first or sw.long.first }#{ sw.arg }]"
+            m << "[#{ sw.short.first || sw.long.first }#{ sw.arg }]"
           end
           m
         end
@@ -647,10 +659,27 @@ module Skylab::Porcelain::Bleeding
 
   protected
 
-    def initialize *a
+    def initialize definitions=[], documentor_class=::OptionParser,
+      parser_class=::OptionParser, do_help=nil
+      @definitions, @documentor_class, @parser_class, @do_help =
+        definitions, documentor_class, parser_class, do_help
       @documentor = nil
+      @switches = nil
       @on_definition_added_h = { }
-      super(*a)
+    end
+
+    def documentor_visit doc
+      @on_definition_added_h[:documentor] ||= -> do
+        fail 'sanity - you probably want this hook to be set for documentors'
+      end
+      doc.banner = "#{ hdr 'options:' }"
+      null_h = { }
+      @definitions.each { |b| doc.instance_exec null_h, &b }
+      nil
+    end
+
+    def switches
+      @switches || documentor.top.list # we don't memoize it but you might
     end
   end
 
@@ -667,15 +696,15 @@ module Skylab::Porcelain::Bleeding
     end
 
     def invoke argv
-      block_given? and raise ::ArgumentError.new 'no blocks to `invoke` ever'
-      result = nil
-      callable, args = resolve argv.dup
-      if callable
-        result = callable.receiver.send callable.name, *args
+      block_given? and raise 'no blocks here ever'
+      res = nil
+      method, args = resolve argv.dup
+      if method
+        res = method.receiver.send method.name, *args
       else
-        result = callable
+        res = method
       end
-      result
+      res
     end
 
     attr_reader :program_name
@@ -806,7 +835,7 @@ module Skylab::Porcelain::Bleeding
           d = if o.respond_to? :help
             o
           else
-            DocumentorInferred.new parent, b
+            DocumentorInferred.new parent, b, o
           end
           d.help full: true # `o` gets thrown away sometimes
         else

@@ -56,104 +56,146 @@ module ::Skylab::Porcelain
           change_request.merge! meta_attributes
         end
       end
-      (b = change_request.keys - self.meta_attributes.keys).any? and
-        raise RuntimeError.new("meta attributes must first be declared: #{b.map(&:inspect) * ', '}")
+      b = change_request.names - self.meta_attributes.names
+      if b.length.nonzero?
+        raise "meta attributes must first be declared: #{
+          }#{ b.map(&:inspect) * ', ' }"
+      end
       if meta
         meta.merge! change_request
       else
-        method_defined?(sym) or attr_reader(sym)
-        method_defined?("#{sym}=") or attr_writer(sym)
+        method_defined? sym or attr_reader sym
+        method_defined? "#{ sym }=" or attr_writer sym
         meta = attributes[sym] = change_request
       end
       change_request.each do |k, v|
-        respond_to?(m = "on_#{k}_attribute") and send(m, sym, meta)
+        respond_to?(m = "on_#{ k }_attribute") and send m, sym, meta
       end
       nil
     end
+
     def _attribute_meta_class
       Attribute::Metadata
     end
+
     def attribute_meta_class klass
-      singleton_class.send(:define_method, :_attribute_meta_class) { klass }
+      define_singleton_method :_attribute_meta_class do klass end
     end
+
     def attributes
-      @attributes ||= _parent_dup_2(:attributes) { Attribute::Box.new }
+      @attributes ||= _parent_dup_2( :attributes ) { Attribute::Box.new }
     end
+
     def default_meta_attributes
-      @default_meta_attributes ||= _parent_dup(:default_meta_attributes) do
+      @default_meta_attributes ||= _parent_dup( :default_meta_attributes ) do
         Attribute::MetaAttribute::Box.new
       end
     end
+
     def import_meta_attributes mod
-      block_given? and raise ArgumentError.new("blocks not supported when importing meta attributes.")
-      if mod.const_defined?(:InstanceMethods)
+      block_given? and raise ::ArgumentError,
+        "blocks not supported when importing meta attributes."
+      if mod.const_defined? :InstanceMethods, false
         include mod::InstanceMethods
       end
       mod.meta_attributes.each do |k, meta|
-        respond_to?(meta.hook_name) || meta_attributes.key?(k) and fail("implement me: decide clobber behavior")
-        singleton_class.send(:define_method, meta.hook_name, & meta.hook) if meta.hook
+        if respond_to?( meta.hook_name ) || meta_attributes.has?( k )
+          fail "implement me: decide clobber behavior"
+        end
+        if meta.hook
+          define_singleton_method meta.hook_name, & meta.hook
+        end
         meta_attributes[k] = meta
       end
     end
+
     def meta_attribute *a, &b
-      b && a.count != 1 and raise ArgumentError.new("with block form, only pass 1 meta_attribute, not #{a.count}")
+      if b && a.length != 1
+        raise ::ArgumentError,
+          "with block form, only pass 1 meta_attribute, not #{ a.length }"
+      end
+
       a.each do |attr_sym|
         case attr_sym
-        when ::Symbol ; meta_attributes[attr_sym] ||=
-                          Attribute::MetaAttribute.new attr_sym
-        when ::Module ; import_meta_attributes(attr_sym, &b)
-        else          ; fail("unspported type for meta attribute: #{attr_sym.class}")
+        when ::Symbol
+          meta_attributes[attr_sym] ||= Attribute::MetaAttribute.new attr_sym
+        when ::Module
+          import_meta_attributes attr_sym, &b
+        else
+          fail "unspported type for meta attribute: #{ attr_sym.class }"
         end
       end
+
       if b
         attr_sym = a.last
-        singleton_class.send(:define_method, ("on_#{attr_sym}_attribute")) do |*aa|
+        define_singleton_method "on_#{ attr_sym }_attribute" do |*aa| # posterity..
           instance_exec(* aa[0..(b.arity < 0 ? [aa.length - 1, 0].max : b.arity - 1)], &b) # as many or as few args
         end
         meta_attributes[attr_sym].hook = b
       end
       nil
     end
+
     def meta_attributes
-      @meta_attributes ||= _parent_dup_2(:meta_attributes) do
+      @meta_attributes ||= _parent_dup_2( :meta_attributes ) do
         Attribute::MetaAttribute::Box.new
       end
     end
+
     # @todo: clean up this redundancy @after:#100
     def _parent_dup attr_sym, &default
-      if p = _parent_respond_to(attr_sym) and a = p.send(attr_sym)
+      if p = _parent_respond_to( attr_sym ) and a = p.send( attr_sym )
         a.dup
       else
         default.call
       end
     end
+
     def _parent_dup_2 attr_sym, &default
-      if p = _parent_respond_to(attr_sym) and a = p.send(attr_sym)
-        a.duplicate
+      if p = _parent_respond_to( attr_sym ) and a = p.send( attr_sym )
+        a.dupe
       else
         default.call
       end
     end
+
     def _parent_respond_to method
-      ancestors[(self == ancestors.first ? 1 : 0) ..-1].detect { |a| a.kind_of?(Class) and a.respond_to?(method) }
+      ancestors[ (self == ancestors.first ? 1 : 0) .. -1 ].detect do |a|
+        ::Class === a and a.respond_to? method
+      end
     end
   end
-
 
   class Attribute::Metadata < ::Hash
-    def initialize _ # ignore the attribute name for this one!
-    end
-  end
 
+    def self.[] h                 # (basically converts a hash to
+      new = self.new              # our native form.)
+      h.each { |k, v| new[k] = v }
+      new
+    end
+
+    alias_method :has?, :key?     # these changes appear
+    undef_method :key?            # in one
+
+    alias_method :names, :keys    # other place
+    undef_method :keys            # in this file
+
+    def initialize _=nil          # we ignore the name for now but u don't have
+    end                           # to!
+  end
                                                # (sister class: Parameter::Set)
   class Attribute::Box
+
+    class << self
+      alias_method :[], :new
+    end
 
     def []= k, v
       @order.push( k ) if ! @hash.key?( k )
       @hash[k] = v
     end
 
-    def duplicate
+    def dupe
       new = self.class.allocate
       new.send :initialize_duplicate, @order, @hash
       new
@@ -177,12 +219,15 @@ module ::Skylab::Porcelain
       @hash.fetch key, &otherwise
     end
 
-    def key? key
+    alias_method :[], :fetch      # this is not like a hash, it is strict,
+                                  # use `fetch` if you need hash-like softness
+
+    def has? key
       @hash.key? key
     end
 
-    def keys
-      @order
+    def names
+      @order.dup
     end
 
 
@@ -209,16 +254,22 @@ module ::Skylab::Porcelain
       ::Hash[
         @order.map do |k|
           m = @hash[k]
-          [ k, m[metaattribute] ] if m.key? metaattribute
+          [ k, m[metaattribute] ] if m.has? metaattribute
         end.compact
       ]
     end
 
   protected
 
-    def initialize other=nil
+    def initialize initial_a=nil
       @order = [ ]
       @hash = { }
+      if initial_a
+        initial_a.each do |k, v|
+          self[ k ] = v
+        end
+      end
+      nil
     end
 
     def initialize_duplicate order, hash
@@ -229,23 +280,35 @@ module ::Skylab::Porcelain
 
   class Attribute::MetaAttribute
     attr_reader :hook
-    def hook= prok
-      @hook and fail("implement me: clobbering of existing hooks")
-      @hook = prok
+    def hook= func
+      @hook and fail "implement me: clobbering of existing hooks"
+      @hook = func
     end
+
     def hook_name
-      "on_#{@name}_attribute"
+      "on_#{ @name }_attribute"
     end
+
     def initialize name_sym
       @hook = nil
       @name = name_sym
     end
+
     attr_reader :name
   end
+                                  # sneaky way to prove that we are sort of
+                                  # serious about not subclassing core classes
+                                  # frivolously or just for the novelty
 
   class Attribute::MetaAttribute::Box < ::Hash
-    def duplicate
+    def dupe
       self.class[ map { |k, v| [k, v.dup] } ]
     end
+
+    alias_method :has?, :key?     # these changes appear
+    undef_method :key?            # in one
+
+    alias_method :names, :keys    # other place
+    undef_method :keys            # in this file
   end
 end
