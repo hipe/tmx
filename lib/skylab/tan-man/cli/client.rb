@@ -94,7 +94,7 @@ module Skylab::TanMan
       _tan_man_sub_client_init! nil # get it?
     end
 
-    def anchor_module # gone at [#022] maybe..
+    def action_anchor_module      # gone at [#022] maybe..
       CLI::Actions
     end
 

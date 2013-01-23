@@ -1,12 +1,35 @@
 module ::Skylab::Porcelain
 
   module Attribute
-    # sorry for the confusion: a MetaAttribute is an attribute an attribute
-    # can have.  An Attribute::Meta is the abstract representation of an
-    # attribute, that is, an attribute's name along with its meta-attribute
-    # values.
+    # Sorry for the confusion: some arbitrary set of name-value pairs,
+    # e.g. "age" / "sex" / "location" of 55 / male / mom's basement,
+    # let those be called 'actual attributes'.
+    #
+    # Now you might want to define 'formal attributes' that define some
+    # superset of recognizable or allowable names (and possibly values)
+    # for the actual attributes. For each such formal attribute,
+    # this library lets you define one Attribute::Metadata that will
+    # have metadata about each particular formal attributes.
+    #
+    # An associated set of such formal attributes is known here as an
+    # `Attribute::Box` (think of it as an overwrought method signature,
+    # or formal function parameters, or a regular expression etc, or
+    # superset definition, or map-reduce operation, etc wat)
+    #
+    # To dig down even deeper, this library also lets you (requires you,
+    # even) to stipulate the ways you define attributes themselves.
+    #
+    # Those are called `Attribute::MetaAttribute`s, and there is a box
+    # for those too..
+    #
+    # So, in reverse, from the base: you make a box of meta-attributes.
+    # This defines how you will define attributes. You can then,
+    # (in each class for e.g.) define a box of attributes, using those
+    # meta-attributes. Then when you have object of one such class,
+    # it will itself have (actual) attributes.
+    #
+    # It may be confusing now, but note how lightweight the library is:
   end
-
 
   module Attribute::Definer
     def self.extended mod # per pattern [#sl-111]
@@ -48,7 +71,7 @@ module ::Skylab::Porcelain
       nil
     end
     def _attribute_meta_class
-      Attribute::Meta
+      Attribute::Metadata
     end
     def attribute_meta_class klass
       singleton_class.send(:define_method, :_attribute_meta_class) { klass }
@@ -117,7 +140,7 @@ module ::Skylab::Porcelain
   end
 
 
-  class Attribute::Meta < ::Hash
+  class Attribute::Metadata < ::Hash
     def initialize _ # ignore the attribute name for this one!
     end
   end

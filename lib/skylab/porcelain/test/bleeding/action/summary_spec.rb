@@ -21,7 +21,7 @@ module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
       if given_desc
         _Base.desc(* given_desc)               #  .. and we'll run it here.
       end
-      _Base.summary
+      _Base.summary_lines
     end
 
 
@@ -63,7 +63,7 @@ module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
           _Base.desc(* given_desc)
         end
         _Child.class_exec(& given_child_block)
-        _Child.summary
+        _Child.summary_lines
       end
 
       context "So, as the summary is by default the above described function" do
@@ -120,8 +120,8 @@ module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
       end
 
       it "it's almost like class-based inheritance!!!" do
-        _SubChild1.summary.should eql(['sub-child1<-->WHOOTENANY'])
-        _SubChild2.summary.should eql(['sub-child2<-->SAY YES TO MAMÁ'])
+        _SubChild1.summary_lines.should eql(['sub-child1<-->WHOOTENANY'])
+        _SubChild2.summary_lines.should eql(['sub-child2<-->SAY YES TO MAMÁ'])
       end
     end
   end

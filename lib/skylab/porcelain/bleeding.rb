@@ -32,13 +32,22 @@ module Skylab::Porcelain::Bleeding
 
   module MetaInstanceMethods
     include MetaMethods
+
     def desc
       reflector.respond_to?(:desc) ? reflector.desc.dup : [] # do not mutate, flyweighting!
     end
 
-    def _klass;  self.class  end
+    def is_visible
+      true
+    end
+
+    def _klass
+      self.class
+    end
+
     alias_method :reflector, :_klass
-    def summary
+
+    def summary_lines
       # (note this used to be <= 2 lines of desc, now it is 1..)
       res = nil
       desc = self.desc
@@ -50,12 +59,7 @@ module Skylab::Porcelain::Bleeding
       end
       res
     end
-
-    def visible?
-      true
-    end
   end
-
 
   module Action
     def self.extended klass # #pattern [#sl-111]
@@ -91,10 +95,11 @@ module Skylab::Porcelain::Bleeding
     end
 
     def emit *a
-      if ! parent
-        fail "sanity - where is parent in this #{self.class}:\n#{self.inspect}"
+      if parent
+        parent.send :emit, *a
+      else
+        fail "sanity - where is parent of this #{ self.class }?"
       end
-      parent.emit(*a)
     end
 
     def help o={}
@@ -168,12 +173,10 @@ module Skylab::Porcelain::Bleeding
     end
   end
 
-
   module ActionKlassInstanceMethods
     include ActionInstanceMethods
     alias_method :builder, :_klass
   end
-
 
   module Action::ModuleMethods
     include MetaMethods
@@ -211,10 +214,18 @@ module Skylab::Porcelain::Bleeding
       instance_exec( *a, &redef )
     end
 
-    def option_syntax &defn
-      option_syntax_class(os = option_syntax_class.build)
-      os.define!(&defn) if block_given?
-      os
+    def option_syntax &block
+      @option_syntax ||= begin
+        osy = option_syntax_class.build
+        option_syntax_class osy # hack to get this to descend, will go away
+        osy
+      end
+      if block
+        @option_syntax.define!(& block )
+        nil
+      else
+        @option_syntax
+      end
     end
 
     def option_syntax_class k=nil
@@ -228,14 +239,30 @@ module Skylab::Porcelain::Bleeding
 
     def _self;   self        end
     alias_method :reflector, :_self
+
     def summary &block
-      _use_block = block || ->() { (desc || [])[0..1] }
-      instance_exec(_use_block, &(redef = ->(b2) do
-        singleton_class.send(:define_method, :summary) do |&b3|
-          b3 ? instance_exec(b3, &redef) : instance_exec(&b2)
+      raise ::ArgumentError.new 'dsl writer only. requires block' if ! block
+      summary_lines(& block )
+    end
+
+                                  # #todo - not ok - this was fun when we
+                                  # were young and dumb but now this eye-blood
+                                  # is not worth the cleverness. the point has
+                                  # been made and a rewrite is in order
+    def summary_lines &block
+      redef = -> b3 do
+        define_singleton_method :summary_lines do |&b4|
+          if b4
+            instance_exec b4, &redef
+          else
+            instance_exec(& b3)
+          end
         end
-      end))
-      block or summary
+      end
+      instance_exec( ( block || -> { (desc || [])[ 0..1 ] } ), &redef )
+      if ! block
+        summary_lines
+      end
     end
 
     def unbound_invocation_method
@@ -243,12 +270,10 @@ module Skylab::Porcelain::Bleeding
     end
   end
 
-
-
   module NamespaceInstanceMethods
     include ActionInstanceMethods
 
-    attr_accessor :anchor_module
+    attr_accessor :action_anchor_module
 
     def fetch token, &not_found
       result = nil
@@ -287,10 +312,8 @@ module Skylab::Porcelain::Bleeding
       result
     end
 
-
     on_find = PubSub::Emitter.new ambiguous: :error,
       not_found: :error, not_provided: :error
-
 
                                   # result is nil or builder
     define_method :find do |token, &error|
@@ -337,7 +360,10 @@ module Skylab::Porcelain::Bleeding
     end
 
     def help_list
-      tbl = actions.helps.visible.map { |h|  [h.aliases.first, (h.summary || [])] }
+      tbl = actions.helps.visible.reduce [] do |rows, help|
+        rows << [ help.aliases.first, ( help.summary_lines || [] ) ]
+        rows
+      end
       emit :help, (tbl.empty? ? "(no actions)" : "#{hdr 'actions:'}")
       width = tbl.reduce(0) { |m, o| o[0].length > m ? o[0].length : m }
       fmt = "  #{em "%#{width}s"}  %s"
@@ -372,7 +398,6 @@ module Skylab::Porcelain::Bleeding
     end
   end
 
-
   module NamespaceModuleMethods
     include Action::ModuleMethods
     def build parent
@@ -387,7 +412,7 @@ module Skylab::Porcelain::Bleeding
         block_given? and raise ArgumentError.new("can't have both block and args")
         init(*a) or raise ArgumentError.new("init() block must return a Proc")
       else
-        b or raise ArgumentError("block must be given if args are not")
+        b or raise ::ArgumentError.new "block must be given if args are not"
       end
       super(&@block)
     end
@@ -397,9 +422,8 @@ module Skylab::Porcelain::Bleeding
     end
 
     def _self   ; self                                                   end
-    def visible ; filter { |y, a| y << a if a.visible? }                 end
+    def visible ; filter { |y, a| y << a if a.is_visible }               end
   end
-
 
   class Actions < ActionEnumerator
 
@@ -417,7 +441,6 @@ module Skylab::Porcelain::Bleeding
 
     alias_method :names, :_self # hook for stubbing
   end
-
 
   class Constants < ActionEnumerator
 
@@ -438,7 +461,6 @@ module Skylab::Porcelain::Bleeding
       end
     end
   end
-
 
   class ArgumentSyntax < ::Struct.new :params, :takes_options
     extend MetaHell::Let # we freeze and memoize
@@ -516,7 +538,6 @@ module Skylab::Porcelain::Bleeding
     end
   end
 
-
   class OptionSyntax < ::Struct.new :definitions, :documentor_class,
     :parser_class, :do_help
 
@@ -533,21 +554,24 @@ module Skylab::Porcelain::Bleeding
       self.class.new definitions.dup, documentor_class, parser_class, do_help
     end
 
-    def on_definition_added
-      @on_definition_added ||= {}
-    end
-
-    def define! &b
-      definitions.push b
-      on_definition_added.each { |_, l| instance_exec(&l) }
+    def define! &block
+      definitions.push block
+      @on_definition_added_h.each do |_, b|
+        instance_exec( &b )
+      end
+      nil
     end
 
     def documentor
-      @documentor ||= documentor_class.new.tap { |d| init_documentor(d) }
+      @documentor ||= begin
+        d = documentor_class.new
+        init_documentor d
+        d
+      end
     end
 
     def help y # !
-      documentor.summarize do |line| # use optparse interface!
+      documentor.summarize do |line| # use optparse interface! - keep [#po-015]
         y[ line ]
       end
       nil
@@ -558,15 +582,16 @@ module Skylab::Porcelain::Bleeding
     end
 
     def init_documentor doc
-      on_definition_added[:documentor] ||= ->() { @documentor = nil ; $stderr.puts("NEATO!") }
-      doc.banner = "#{hdr 'options:'}"
-      _ = {} ; definitions.each { |d| doc.instance_exec(_, &d) }
+      @on_definition_added_h[:documentor] ||= -> do
+        fail 'sanity - you probably want this hook to be set for documentors'
+      end
+      doc.banner = "#{ hdr 'options:' }"
+      null_h = { }
+      definitions.each { |b| doc.instance_exec null_h, &b }
+      nil
     end
 
-    def initialize *a
-      @documentor = nil
-      super(*a)
-    end
+    attr_reader :on_definition_added_h
 
     def parse argv, args, help, syntax_error # result is true or result
       r = nil                     # of one of the callbacks `help`, or `se`
@@ -582,7 +607,8 @@ module Skylab::Porcelain::Bleeding
         end                       # args) IFF there is one or more defn blocks.
         o = parser_class.new
         o.on '-h', '--help' do    # with or w/o defn blocks we might do this
-          r = help.call           # (simply call the callback, caller decides
+
+          r = help.call           # (simply call the callback, callee decides
         end                       # how to handle this.)
         definitions.each do |f|
           o.instance_exec opts_h, &f # run each definition block passing
@@ -603,32 +629,40 @@ module Skylab::Porcelain::Bleeding
 
     # the below is jawbreak blood . this will all go away soon like a bad dream
     def string
-      result = nil
-      if ! definitions.empty?
-        x = documentor.instance_variable_get('@stack')[2].instance_variable_get('@list') # less hacky is out of scope
-        a = x.map do |s|
-          if s.respond_to? :short
-            "[#{ s.short.first or s.long.first }#{ s.arg }]"
+      res = nil
+      if definitions.length.nonzero?
+        switch_a = documentor.top.list
+        string_a = switch_a.reduce [] do |m, sw|
+          if sw.respond_to? :short
+            m << "[#{ sw.short.first or sw.long.first }#{ sw.arg }]"
           end
+          m
         end
-        a.compact!
-        if ! a.empty?
-          result = a.join ' '
+        if string_a.length.nonzero?
+          res = string_a.join ' '
         end
       end
-      result
+      res
+    end
+
+  protected
+
+    def initialize *a
+      @documentor = nil
+      @on_definition_added_h = { }
+      super(*a)
     end
   end
-
 
   class Runtime
     extend Action
     include NamespaceInstanceMethods
+
     def actions
-      Actions[ Constants[anchor_module], Officious.actions ]
+      Actions[ Constants[action_anchor_module], Officious.actions ]
     end
 
-    def anchor_module
+    def action_anchor_module
       self.class::Actions
     end
 
@@ -662,7 +696,6 @@ module Skylab::Porcelain::Bleeding
     end
   end
 
-
   class MetaInferred
     include MetaInstanceMethods
     attr_reader :reflector
@@ -674,7 +707,6 @@ module Skylab::Porcelain::Bleeding
       @reflector = reflector ; self
     end
   end
-
 
   class DocumentorInferred < MetaInferred
     include ActionInstanceMethods
@@ -692,7 +724,6 @@ module Skylab::Porcelain::Bleeding
     end
   end
 
-
   class RuntimeInferred < DocumentorInferred
     def initialize parent, built, builder
       super(parent, builder)
@@ -701,14 +732,13 @@ module Skylab::Porcelain::Bleeding
     attr_reader :bound_invocation_method
   end
 
-
   class NamespaceInferred
     include NamespaceInstanceMethods
 
     def actions
-      anchor_module or fail "sanity - where is anchor_module - #{
+      action_anchor_module or fail "sanity - where is action_anchor_module - #{
         }call _namespace_inferred_init! on construction"
-      c = Constants[anchor_module]
+      c = Constants[action_anchor_module]
       o = Officious.actions
       x = Actions[c, o]
       x
@@ -723,23 +753,21 @@ module Skylab::Porcelain::Bleeding
       _namespace_inferred_init! module_with_actions
     end
 
-    alias_method :reflector, :anchor_module # for documentation generation
+    alias_method :reflector, :action_anchor_module # for documentors
 
-    alias_method :builder, :anchor_module   # for find
+    alias_method :builder, :action_anchor_module   # for find
 
     def _namespace_inferred_init! module_with_actions
       module_with_actions or fail 'sanity - huh?'
-      self.anchor_module = module_with_actions
+      self.action_anchor_module = module_with_actions
     end
   end
-
 
   module Officious
     def self.actions
       Constants[self]
     end
   end
-
 
   class Officious::Help
     extend Action
@@ -792,7 +820,7 @@ module Skylab::Porcelain::Bleeding
 #     (o.respond_to?(:help) ? o : DocumentorInferred.new(@parent, b)).help(full: true) # 'o' gets thrown away sometimes
     end
 
-    def visible?
+    def is_visible
       false
     end
   end

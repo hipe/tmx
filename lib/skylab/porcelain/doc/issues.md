@@ -1,3 +1,5 @@
+[#015]       #tracking-tag custom option parser api - abstraction candidat
+             es
 [#014]       #done (also [#sg-026]) clean up porcelain tree
 [#013] #open deprecate tite-color methods named after colors
 [#012]       #done en's gotta become even more functional, CASE STUDY

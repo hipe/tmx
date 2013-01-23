@@ -1,44 +1,51 @@
 module Skylab::Porcelain::Bleeding
   module Stubs
     def self.extended mod
-      mod.send :extend, Stubs::ModuleMethods
+      mod.extend Stubs::ModuleMethods
+      mod.send :_bleeding_stubs_init!, caller[0]
     end
   end
+
   module Stubs::ModuleMethods
-    def action_names
-      @build_from_stub ||= ->(*a) { build_from_stub(*a) }
-      ActionEnumerator.new do |y|
-        Dir["#{dir}/*"].each do |path|
-          y << Stubs::Stub.new( path.match(%r{((?:(?!\.rb)[^/])*)(?=(?:\.rb)?\z)})[0], # gulp
-            @build_from_stub )
-        end
+    include ::Skylab::Autoloader::ModuleMethods
+
+    def constants
+      @constants or read_fs
+      @constants
+    end
+
+    if false
+    pathify = -> do # #todo this might actually be an improvement
+      rx = /(?<=[a-z])(?=[A-Z])|_|(?<=[A-Z])(?=[A-Z][a-z])/
+      -> x { x.to_s.gsub( rx ){ '-' }.downcase }
+    end.call
+    end
+
+  protected
+
+    def _bleeding_stubs_init! callr
+      _autoloader_init! callr
+      class << self
+        alias_method :bleeding_stubs_original_constants, :constants
+        alias_method :bleeding_stubs_original_const_get, :const_get
       end
+      @constants = nil
     end
-    def action_helps
-      ActionEnumerator.new do |y|
-        action_names.each { |a| y << load_action(a) }
+
+    # (haha posterity - look what we did before we knew about sub_ext:)
+    # wat_rx = %r{ ( (?: (?!\.rb)[^/] )* )  (?= (?:\.rb)? \z)  }x
+
+    constantize = -> do
+      rx = /(?:^|-)([a-z])/
+      -> x { x.to_s.gsub( rx ) { $~[1].upcase } }
+    end.call
+
+    define_method :read_fs do
+      @constants = dir_pathname.children( false ).reduce( [ ] ) do |m, pn|
+        m << constantize[ pn.sub_ext( '' ).to_s ].intern
+        m
       end
-    end
-    def build_from_stub stub, *a
-      load_action(stub).build(*a)
-    end
-    def load_action stub
-      const_get stub.const
-    end
-  end
-  class Stubs::Stub < Struct.new(:name, :build_proc)
-    def build *a
-      build_proc.call(self, *a)
-    end
-    def const
-      name.gsub(/(?:^|-)([a-z])/){ $1.upcase }
-    end
-    def names
-      [name]
-    end
-    def visible?
-      true
+      nil
     end
   end
 end
-

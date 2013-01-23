@@ -119,8 +119,8 @@ module Skylab::Porcelain
       s
     end
     alias_method :invocation_name, :invocation_name= # !
-    def summary
-      desc or default_summary_lines
+    def summary_lines
+      desc || default_summary_lines
     end
   end
   class RuntimeModuleKnob < Struct.new(:definition_blocks)
@@ -262,7 +262,7 @@ module Skylab::Porcelain
       me = self
       self.class.new(@cache) do |yielder|
         me.each do |a|
-          yielder.yield(a) if a.visible?
+          yielder.yield(a) if a.visible
         end
       end
     end
@@ -393,7 +393,6 @@ module Skylab::Porcelain
       Hash[ * members.map { |k| [k, send(k)] }.flatten(1) ]
     end
     attr_accessor_oldschool :visible
-    alias_method :visible?, :visible
   end
   class << Action
     def define &block
@@ -1148,11 +1147,11 @@ module Skylab::Porcelain
       :never_see
     end
 
-    def summary
+    def summary_lines
       case @mode
       when :external
         if @external_module.respond_to?(:porcelain)
-          @external_module.porcelain.summary
+          @external_module.porcelain.summary_lines
         else
           a = @external_module.command_tree.map(&:action_name) # watch the world burn
           ["child commandz: {#{a.join('|')}}"]
