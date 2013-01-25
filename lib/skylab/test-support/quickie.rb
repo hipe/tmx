@@ -46,11 +46,12 @@ module Skylab::TestSupport::Quickie
       params[:descs] = rest.unshift(desc) if desc
       params
     end
-    attr_accessor :stderr
+    attr_accessor :infostream
     def update_attributes! p
       p.each { |k, v| send("#{k}=", v) }
     end
   end
+
   module ContextClass
     def self.[] params
       p = params.delete(:parent)
@@ -62,7 +63,6 @@ module Skylab::TestSupport::Quickie
     end
   end
 
-
   module ContextClassMethods
     include CommonMethods
     include ::Skylab::MetaHell::Let::ModuleMethods
@@ -70,28 +70,32 @@ module Skylab::TestSupport::Quickie
     def block= b
       class_eval(&b)
     end
+
     def context *rest, &b
       desc = rest.shift
       c = ContextClass[normalize_parameters(desc, *rest, indent: indent, parent: self,
                                             tag_filter: tag_filter, &b)]
       example_blocks.push c
     end
+
     def describe desc, *rest, &b
-      c = ContextClass[normalize_parameters(desc, *rest, indent: indent, parent: self, stderr: stderr,
+      # #todo something is broken here - try substituting a 'desc' for a 'ctx'
+      c = ContextClass[normalize_parameters(desc, *rest, indent: indent, parent: self, infostream: infostream,
                                             tag_filter: tag_filter, &b)]
       o = c.new
       o.run
     end
+
     def example_blocks
       @example_blocks ||= []
     end
+
     def it d, *rest, &b
       example_blocks.push normalize_parameters(d, *rest, {}, &b)
     end
     attr_accessor :tag_filter
     attr_accessor :tags
   end
-
 
   module ContextInstanceMethods
     include CommonMethods
@@ -120,37 +124,25 @@ module Skylab::TestSupport::Quickie
 
     ivar_or_class :descs
 
-    # --*--
-
-    def be_include expected # egads this feels so awful sorry
-      IncludePredicate.new expected, self
-    end
-
-    def eql expected
-      EqualsPredicate.new expected, self
-    end
-
-    def match expected
-      MatchPredicate.new expected, self
-    end
-
-    def raise_error expected_class, message_rx
-      RaiseErrorPredicate.new expected_class, message_rx, self
-    end
-
-    # --*--
-
     attr_accessor :exampled
-    def example_blocks ; self.class.example_blocks end
-    def fail! msg
-      stderr.puts "#{indent}  #{faild msg}"
+
+    def example_blocks
+      self.class.example_blocks
+    end
+
+    def fail msg
+      infostream.puts "#{indent}  #{faild msg}"
       @failed.call
     end
+
     attr_writer :failed
+
     ivar_or_class :indent
+
     def initialize p=nil
       p and update_attributes!(p)
     end
+
     def parse_opts argv
       @tag_filter = @tag_filter_desc = nil
       ors = descs = nil
@@ -177,48 +169,61 @@ module Skylab::TestSupport::Quickie
       end
       true
     rescue TestSupport::Services::OptionParser::ParseError => e
-      stderr.puts "#{e}\ntry #{title "ruby #{$PROGRAM_NAME} -h"} for help"
+      infostream.puts "#{e}\ntry #{title "ruby #{$PROGRAM_NAME} -h"} for help"
       false
     end
-    def pass! msg
-      # stderr.puts "#{indent}  #{msg}"
+
+    def pass msg_func
+      # infostream.puts "#{indent}  #{msg}"
       passed && passed.call
     end
+
     attr_accessor :passed
+
     attr_accessor :pended
-    ivar_or_class :stderr
+
+    ivar_or_class :infostream
+
     def run
       parse_opts(ARGV) or return
-      @tag_filter and stderr.puts("Run options:#{describe_run_options}\n\n")
+      @tag_filter and infostream.puts("Run options:#{describe_run_options}\n\n")
       e = f = p = 0
       @exampled = -> { e += 1 }
       @failed = -> { f += 1 }
       @pended = -> { p += 1 }
       _run_children
-      0 == e and stderr.puts("\nAll examples were filtered out")
-      stderr.puts "\nFinished in #{Time.now - T1} seconds"
+      0 == e and infostream.puts("\nAll examples were filtered out")
+      infostream.puts "\nFinished in #{Time.now - T1} seconds"
       pnd = ", #{ p } pending" if p > 0
-      stderr.puts send( f > 0 ? :faild : ( p > 0 ? :pendng : :passd),
+      infostream.puts send( f > 0 ? :faild : ( p > 0 ? :pendng : :passd),
                       "#{ e } example#{ s e }, #{ f } failure#{ s f }#{ pnd }" )
     end
+
+    attr_accessor :tags
+
+    ivar_or_class :tag_filter
+
+    attr_writer :tag_filter
+
+  protected
 
     def _run
       if @block
         @exampled.call
-        stderr.puts "#{indent}#{title descs.join(' ')}"
+        infostream.puts "#{indent}#{title descs.join(' ')}"
         instance_eval(& @block)
       else
         @pended.call
-        stderr.puts "#{indent}#{pendng descs.join(' ')}"
+        infostream.puts "#{indent}#{pendng descs.join(' ')}"
       end
       nil
     end
 
     def _run_children
-      stderr.puts "#{indent}#{descs.join(' ')}"
+      infostream.puts "#{indent}#{descs.join(' ')}"
       _indent = "#{indent}  "
       _params = { exampled: @exampled, failed: @failed, pended: @pended,
-                  indent: "#{indent}  ", stderr: stderr,
+                  indent: "#{indent}  ", infostream: infostream,
                   tag_filter: tag_filter }
       example_blocks.each do |eb|
         if ::Class == eb.class
@@ -231,61 +236,91 @@ module Skylab::TestSupport::Quickie
         end
       end
     end
-    attr_accessor :tags
-    ivar_or_class :tag_filter
-    attr_writer :tag_filter
   end
 
-
-  class EqualsPredicate < Struct.new(:expected, :context)
+  class EqualsPredicate < Struct.new :context, :expected
     def match actual
       if expected == actual
-        context.pass!("equals #{expected.inspect}")
+        context.pass -> { "equals #{ expected.inspect }" }
       else
-        context.fail!("expected #{expected.inspect}, got #{actual.inspect}")
+        context.fail "expected #{ expected.inspect }, got #{ actual.inspect }"
       end
+      nil
     end
   end
 
-  class IncludePredicate < ::Struct.new :expected, :context # yeah about that..
+  class IncludePredicate < ::Struct.new :context, :expected # yeah about that..
     def match actual
       if actual.include? expected
-        context.pass! "includes." # where is this used? i don't like it #todo
+        context.pass -> { "includes #{ expected.inspect }" }
       else
-        context.fail! "expected #{ actual.inspect } to include #{
+        context.fail "expected #{ actual.inspect } to include #{
           }#{ expected.inspect }"
       end
+      nil
     end
   end
 
-  class MatchPredicate < ::Struct.new :expected, :context
+  class KindOfPredicate < ::Struct.new :context, :expected
+    def match actual
+      if actual.kind_of? expected
+        context.pass -> { "is kind of #{ expected.inspect }" }
+      else
+        context.fail "expected #{ actual.inspect } to include #{
+        }#{ expected.inspect }"
+      end
+      nil
+    end
+  end
+
+  class MatchPredicate < ::Struct.new :context, :expected
     def match actual
       if expected =~ actual
-        context.pass! "matches #{ expected.inspect }"
+        context.pass -> { "matches #{ expected.inspect }" }
       else
-        context.fail! "expected #{ expected.inspect }, had #{ actual.inspect } "
+        context.fail "expected #{ expected.inspect }, had #{ actual.inspect } "
       end
+      nil
     end
   end
 
-  class RaiseErrorPredicate < ::Struct.new :expected_class, :message_rx, :context
+  class RaiseErrorPredicate < ::Struct.new :context, :expected_class, :message_rx
     def match actual
       begin
         actual.call
       rescue ::StandardError => e
       end
       if ! e
-        context.fail! "expected lambda to raise, didn't raise anything."
+        context.fail "expected lambda to raise, didn't raise anything."
       elsif ! e.kind_of?( expected_class )
-        context.fail! "expected #{ expected_class }, had #{ e.class }"
+        context.fail "expected #{ expected_class }, had #{ e.class }"
       elsif message_rx !~ e.message
-        context.fail! "expected #{ e.message } to match #{ message_rx }"
+        context.fail "expected #{ e.message } to match #{ message_rx }"
       else
-        context.pass! "raises #{ expected_class } matching #{ message_rx }"
+        context.pass -> do
+          "raises #{ expected_class } matching #{ message_rx }"
+        end
+      end
+      nil
+    end
+  end
+
+  module ContextInstanceMethods # re-opened
+    # egads this feels wrong sorry, borrow against the future i guess
+    [
+      :be_include , IncludePredicate,
+      :be_kind_of , KindOfPredicate,
+      :match      , MatchPredicate,
+      :eql        , EqualsPredicate,
+      :raise_error, RaiseErrorPredicate
+    ].
+      each_slice 2 do |meth, const|
+      define_method meth do |expected, *rest|
+        const.new self, expected, *rest
       end
     end
   end
 
-  RUNTIME = ContextClass[stderr: $stderr, indent:'']
+  RUNTIME = ContextClass[ infostream: $stderr, indent:'' ]
   T1 = Time.now
 end

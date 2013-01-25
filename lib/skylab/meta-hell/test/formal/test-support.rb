@@ -5,4 +5,5 @@ module ::Skylab::MetaHell::TestSupport::Formal
 
   include CONSTANTS
 
+  extend TestSupport::Quickie
 end

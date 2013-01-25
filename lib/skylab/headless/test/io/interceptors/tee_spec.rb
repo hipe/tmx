@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::Headless::IO::Interceptors::TestSupport
-  extend ::Skylab::TestSupport::Quickie
-  describe "#{::Skylab::Headless::IO::Interceptors::Tee}" do
+module Skylab::Headless::TestSupport::IO::Interceptors
+
+  describe "#{ Headless::IO::Interceptors::Tee }" do
     context "with 2 downstreams" do
       it "dispatches the message out to both" do
         tee = Headless::IO::Interceptors::Tee.new
@@ -15,6 +15,7 @@ module Skylab::Headless::IO::Interceptors::TestSupport
         tee[:bar].string.should eql(tee[:foo].string)
       end
     end
+
     context "with 0 downstreams" do
       it "does nothing" do
         tee = Headless::IO::Interceptors::Tee.new
