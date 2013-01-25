@@ -9,7 +9,7 @@ module Skylab::Slake
   end
 
   class Task < ::Rake::Task
-    extend Skylab::Porcelain::Attribute::Definer
+    extend MetaHell::Formal::Attribute::Definer
     extend Slake::Interpolate
     extend TaskClassMethods
     include Slake::Parenthood

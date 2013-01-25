@@ -5,7 +5,7 @@ module Skylab::TanMan
       # this apparently has to happen on the parent class or the class
       # and can't simply be mixed in via plain old m.m and i.m modules
 
-      klass.extend Porcelain::Attribute::Definer::Methods # so it can say
+      klass.extend MetaHell::Formal::Attribute::Definer::Methods # so it can say
                                        # `attribute` and `meta_attribute`
 
       klass.send :include, API::Action::Attribute_Adapter::InstanceMethods
@@ -67,7 +67,7 @@ module Skylab::TanMan
     end
 
     def update_attributes! param_h            # "atomic"
-      all_keys = attribute_definer.attributes.keys
+      all_keys = attribute_definer.attributes.names
       good, bad = param_h.reduce( [[],[]] ) do |m, (k,v)|
         if all_keys.include? k
           m.first.push [ "#{ k }=", v ]

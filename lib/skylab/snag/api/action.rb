@@ -2,7 +2,7 @@ module Skylab::Snag
   class API::Action
     extend Headless::Action::ModuleMethods
     extend Headless::NLP::EN::API_Action_Inflection_Hack
-    extend Porcelain::Attribute::Definer
+    extend MetaHell::Formal::Attribute::Definer
 
     include Headless::Action::InstanceMethods
     include Snag::Core::SubClient::InstanceMethods
@@ -24,8 +24,8 @@ module Skylab::Snag
       res = nil
       if const_defined? :PARAMS, false
         a = const_get :PARAMS, false
-        res = Porcelain::Attribute::Box[ a.map do |k|
-          [ k, Porcelain::Attribute::Metadata[ required: true ] ]
+        res = MetaHell::Formal::Attribute::Box[ a.map do |k|
+          [ k, MetaHell::Formal::Attribute::Metadata[ required: true ] ]
         end ]
       else
         res = self.attributes     # (for clearer error msgs)

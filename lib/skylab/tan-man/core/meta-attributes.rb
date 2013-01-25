@@ -5,20 +5,20 @@ module Skylab::TanMan
     singleton_class.send :alias_method, :[], :const_fetch_all
   end
 
-  module Core::MetaAttributes::Boolean extend Porcelain::Attribute::Definer
+  module Core::MetaAttributes::Boolean extend MetaHell::Formal::Attribute::Definer
     meta_attribute :boolean do |name, meta|
       alias_method "#{name}?", name
     end
   end
 
-  module Core::MetaAttributes::Default extend Porcelain::Attribute::Definer
+  module Core::MetaAttributes::Default extend MetaHell::Formal::Attribute::Definer
     meta_attribute :default
   end
 
   module Core::MetaAttributes::Default::InstanceMethods
     def set_defaults_if_nil!      # #pattern [#sl-117] (prev is [#bs-010])
       attributes = attribute_definer.attributes.
-        each.select{ |k, v| v.key? :default }
+        each.select{ |k, v| v.has? :default }
       attributes.each do |k, h|
         if send( k ).nil?
           val = h[:default]
@@ -33,7 +33,7 @@ module Skylab::TanMan
 
 
   # (the below assumes Headless::NLP::EN::Methods)
-  module Core::MetaAttributes::MutexBooleanSet extend Porcelain::Attribute::Definer
+  module Core::MetaAttributes::MutexBooleanSet extend MetaHell::Formal::Attribute::Definer
     meta_attribute :mutex_boolean_set do |name, h|
       set = h[:mutex_boolean_set]
       alias_method(after = "#{name}_after_mutex_boolean_set=", "#{name}=")
@@ -53,7 +53,7 @@ module Skylab::TanMan
     end
   end
 
-  module Core::MetaAttributes::Pathname extend Porcelain::Attribute::Definer
+  module Core::MetaAttributes::Pathname extend MetaHell::Formal::Attribute::Definer
     meta_attribute :pathname do |name, _|
       alias_method(after = "#{name}_after_pathname=", "#{name}=")
       define_method("#{name}=") do |path|
@@ -63,7 +63,7 @@ module Skylab::TanMan
     end
   end
 
-  module Core::MetaAttributes::Proc extend Porcelain::Attribute::Definer
+  module Core::MetaAttributes::Proc extend MetaHell::Formal::Attribute::Definer
     meta_attribute :proc do |name, _|
       alias_method(get_proc = "#{name}_proc", name)
       define_method(name) do |&block|
@@ -76,7 +76,7 @@ module Skylab::TanMan
     end
   end
 
-  module Core::MetaAttributes::Regex extend Porcelain::Attribute::Definer
+  module Core::MetaAttributes::Regex extend MetaHell::Formal::Attribute::Definer
     meta_attribute :on_regex_fail
     meta_attribute :regex do |name, meta|
       alias_method(after = "#{name}_after_regex=", "#{name}=")
@@ -96,7 +96,7 @@ module Skylab::TanMan
   # The receiver of this must be a sub-client, and have the attribute_definer.
   #   we will come back to this..
   #
-  module Core::MetaAttributes::Required extend Porcelain::Attribute::Definer
+  module Core::MetaAttributes::Required extend MetaHell::Formal::Attribute::Definer
     meta_attribute :required
   end
 

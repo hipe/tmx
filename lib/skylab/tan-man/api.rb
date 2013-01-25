@@ -19,7 +19,7 @@ module Skylab::TanMan
 
     # For no good reason, API (the module) is the home of low-level config.
 
-    extend Porcelain::Attribute::Definer
+    extend MetaHell::Formal::Attribute::Definer
 
     include Core::Attribute::Reflection::InstanceMethods
 

@@ -1,6 +1,6 @@
-module ::Skylab::Porcelain
+module ::Skylab::MetaHell
 
-  module Attribute
+  module Formal::Attribute
     # Sorry for the confusion: some arbitrary set of name-value pairs,
     # e.g. "age" / "sex" / "location" of 55 / male / mom's basement,
     # let those be called 'actual attributes'.
@@ -8,18 +8,18 @@ module ::Skylab::Porcelain
     # Now you might want to define 'formal attributes' that define some
     # superset of recognizable or allowable names (and possibly values)
     # for the actual attributes. For each such formal attribute,
-    # this library lets you define one Attribute::Metadata that will
+    # this library lets you define one Formal::Attribute::Metadata that will
     # have metadata about each particular formal attributes.
     #
     # An associated set of such formal attributes is known here as an
-    # `Attribute::Box` (think of it as an overwrought method signature,
+    # `Formal::Attribute::Box` (think of it as an overwrought method signature,
     # or formal function parameters, or a regular expression etc, or
     # superset definition, or map-reduce operation, etc wat)
     #
     # To dig down even deeper, this library also lets you (requires you,
     # even) to stipulate the ways you define attributes themselves.
     #
-    # Those are called `Attribute::MetaAttribute`s, and there is a box
+    # Those are called `Formal::Attribute::MetaAttribute`s, and there is a box
     # for those too..
     #
     # So, in reverse, from the base: you make a box of meta-attributes.
@@ -31,14 +31,14 @@ module ::Skylab::Porcelain
     # It may be confusing now, but note how lightweight the library is:
   end
 
-  module Attribute::Definer
+  module Formal::Attribute::Definer
     def self.extended mod # per pattern [#sl-111]
-      mod.extend Attribute::Definer::Methods
+      mod.extend Formal::Attribute::Definer::Methods
     end
   end
 
 
-  module Attribute::Definer::Methods
+  module Formal::Attribute::Definer::Methods
     def attribute sym, meta_attributes=nil
       change_request = _attribute_meta_class.new sym
       meta = attributes.fetch( sym ) { nil }
@@ -75,7 +75,7 @@ module ::Skylab::Porcelain
     end
 
     def _attribute_meta_class
-      Attribute::Metadata
+      Formal::Attribute::Metadata
     end
 
     def attribute_meta_class klass
@@ -83,12 +83,12 @@ module ::Skylab::Porcelain
     end
 
     def attributes
-      @attributes ||= _parent_dup_2( :attributes ) { Attribute::Box.new }
+      @attributes ||= _parent_dup_2( :attributes ) { Formal::Attribute::Box.new}
     end
 
     def default_meta_attributes
       @default_meta_attributes ||= _parent_dup( :default_meta_attributes ) do
-        Attribute::MetaAttribute::Box.new
+        Formal::Attribute::MetaAttribute::Box.new
       end
     end
 
@@ -118,7 +118,8 @@ module ::Skylab::Porcelain
       a.each do |attr_sym|
         case attr_sym
         when ::Symbol
-          meta_attributes[attr_sym] ||= Attribute::MetaAttribute.new attr_sym
+          meta_attributes[attr_sym] ||=
+            Formal::Attribute::MetaAttribute.new attr_sym
         when ::Module
           import_meta_attributes attr_sym, &b
         else
@@ -138,7 +139,7 @@ module ::Skylab::Porcelain
 
     def meta_attributes
       @meta_attributes ||= _parent_dup_2( :meta_attributes ) do
-        Attribute::MetaAttribute::Box.new
+        Formal::Attribute::MetaAttribute::Box.new
       end
     end
 
@@ -166,7 +167,7 @@ module ::Skylab::Porcelain
     end
   end
 
-  class Attribute::Metadata < ::Hash
+  class Formal::Attribute::Metadata < ::Hash
 
     def self.[] h                 # (basically converts a hash to
       new = self.new              # our native form.)
@@ -184,7 +185,7 @@ module ::Skylab::Porcelain
     end                           # to!
   end
                                                # (sister class: Parameter::Set)
-  class Attribute::Box
+  class Formal::Attribute::Box
 
     class << self
       alias_method :[], :new
@@ -278,7 +279,7 @@ module ::Skylab::Porcelain
     end
   end
 
-  class Attribute::MetaAttribute
+  class Formal::Attribute::MetaAttribute
     attr_reader :hook
     def hook= func
       @hook and fail "implement me: clobbering of existing hooks"
@@ -300,7 +301,7 @@ module ::Skylab::Porcelain
                                   # serious about not subclassing core classes
                                   # frivolously or just for the novelty
 
-  class Attribute::MetaAttribute::Box < ::Hash
+  class Formal::Attribute::MetaAttribute::Box < ::Hash
     def dupe
       self.class[ map { |k, v| [k, v.dup] } ]
     end
