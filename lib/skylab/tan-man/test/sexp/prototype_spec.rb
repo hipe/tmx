@@ -1,11 +1,12 @@
 require_relative 'prototype/test-support'
 
+# Quickie has arrived to this spec
 
-# (no Quickie becuase of lots of should_not and be_nil)
+module Skylab::TanMan::TestSupport::Sexp::Prototype
+  describe "#{ TanMan::Sexp::Prototype } will be awesome" do
+  # a hiccup in indentation starts here for quickie :/
 
-describe "#{::Skylab::TanMan::Sexp::Prototype} will be awesome" do
-  extend ::Skylab::TanMan::TestSupport::Sexp::Prototype
-
+  extend Prototype_TestSupport
 
   using_grammar '70-38-simplo' do
     using_input_string '', 'totally empty input string' do
@@ -25,13 +26,13 @@ describe "#{::Skylab::TanMan::Sexp::Prototype} will be awesome" do
       end
     end
     using_input 'invalid-prototype' do
-      it 'raises a runmun error at parse time' do
+      it 'raises a runmun error at parse time', f:true do
         ->{ result }.should raise_error(/when parsing .+prototype/)
       end
     end
 
     using_input 'two-element-prototype' do
-      it 'appends and inserts valid string items - PARTIALLY PENDING', f:true do
+      it 'appends and inserts valid string items - PARTIALLY PENDING' do
         o = result.node_list
         r = o._append! 'faeioup'
         o.object_id.should eql( r.object_id )
@@ -75,7 +76,7 @@ describe "#{::Skylab::TanMan::Sexp::Prototype} will be awesome" do
     using_input 'primordial' do
       it 'appends a valid string as an item - BORKED - where are semis?' do
         o = result.node_list
-        o.should_not be_nil
+        o.nil?.should eql( false )
         o.nodes.should eql( [] )
         r = o._append! 'fiiiiip'
         r.object_id.should eql(o.object_id)
@@ -95,3 +96,4 @@ describe "#{::Skylab::TanMan::Sexp::Prototype} will be awesome" do
     end
   end
 end
+end # a hiccup in indentation for Quickie
