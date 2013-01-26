@@ -15,7 +15,7 @@ module Skylab::Treemap
   class API::Action
     extend Skylab::Autoloader
     extend Skylab::PubSub::Emitter
-    extend Skylab::Porcelain::Attribute::Definer
+    extend Skylab::MetaHell::Formal::Attribute::Definer
     extend Headless::NLP::EN::API_Action_Inflection_Hack
     extend ::Skylab::MetaHell::DelegatesTo # sic #while [#003]
 

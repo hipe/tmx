@@ -1,7 +1,7 @@
 module Skylab::TanMan
   class Models::Remote::Controller < Models::Model
      extend MetaHell::DelegatesTo
-     extend Porcelain::Attribute::Definer
+     extend MetaHell::Formal::Attribute::Definer
 
     # `bound` means "is it bound to a sexp?" .. might go away
 

@@ -59,7 +59,7 @@ module Skylab::Porcelain
         opt_h.each { |k, v| h.fetch( k )[ v ] }
         opt_h = nil
       end.call end
-      attrs.each do |attr|
+      attrs.each do |attr|        # (this looks somewhat like [#mh-014])
         new  = nil
         mine = send attr
         othr = other.send attr

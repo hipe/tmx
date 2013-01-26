@@ -18,7 +18,7 @@ module Skylab::TanMan
 
   module Core::SubClient::ModuleMethods
     include MetaHell::DelegatesTo
-    include Porcelain::Attribute::Definer
+    include MetaHell::Formal::Attribute::Definer
   end
 
 

@@ -6,6 +6,7 @@ module Skylab::MetaHell::TestSupport
 
   module CONSTANTS
     MetaHell = ::Skylab::MetaHell
+    TestSupport = ::Skylab::TestSupport
   end
 
   module InstanceMethods

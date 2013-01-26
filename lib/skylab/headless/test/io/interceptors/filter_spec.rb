@@ -1,9 +1,7 @@
 require_relative 'test-support'
 
-module Skylab::Headless::IO::Interceptors::TestSupport
-  Headless = ::Skylab::Headless
-  extend ::Skylab::TestSupport::Quickie
-  describe "#{::Skylab::Headless::IO::Interceptors::Filter}" do
+module Skylab::Headless::TestSupport::IO::Interceptors
+  describe "#{ Headless::IO::Interceptors::Filter }" do
     context "without a line boundary event handler" do
       it "leaves brittany alone" do
         downstream = ::StringIO.new

@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport::Models::Node
 
-  # Quickie?
+  # Quickie has arrived!
 
   describe "#{ Skylab::TanMan::Models::Node } prototypes" do
     extend ::Skylab::TanMan::TestSupport::Models::Node
@@ -84,7 +84,7 @@ module Skylab::TanMan::TestSupport::Models::Node
 
       it 'will not redundantly add a new node if one with same label exists' do
         result.nodes.length.should eql(3)
-        (item = result.node_with_id :yeti).should_not be_nil
+        (item = result.node_with_id :yeti).nil?.should eql(false)
         ohai = controller.node!('yeti')
         ohai.object_id.should eql(item.object_id)
         result.nodes.length.should eql(3)
