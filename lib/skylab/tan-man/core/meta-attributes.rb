@@ -16,21 +16,22 @@ module Skylab::TanMan
   end
 
   module Core::MetaAttributes::Default::InstanceMethods
+                                  # also we are calling this [#hl-047] ..
     def set_defaults_if_nil!      # #pattern [#sl-117] (prev is [#bs-010])
-      attributes = attribute_definer.attributes.
-        each.select{ |k, v| v.has? :default }
-      attributes.each do |k, h|
+      attrs = attribute_definer.attributes.each.select do |k, attr|
+        attr.has? :default
+      end
+      attrs.each do |k, h|
         if send( k ).nil?
           val = h[:default]
           if val.respond_to?( :call ) and ! h[:proc]
-            val = vall.call
+            val = val.call
           end
           send "#{ k }=", val
         end
       end
     end
   end
-
 
   # (the below assumes Headless::NLP::EN::Methods)
   module Core::MetaAttributes::MutexBooleanSet extend MetaHell::Formal::Attribute::Definer
@@ -77,20 +78,26 @@ module Skylab::TanMan
   end
 
   module Core::MetaAttributes::Regex extend MetaHell::Formal::Attribute::Definer
+
     meta_attribute :on_regex_fail
+
     meta_attribute :regex do |name, meta|
-      alias_method(after = "#{name}_after_regex=", "#{name}=")
-      define_method("#{name}=") do |str|
-        if (re = meta[:regex]) =~ str
-          send(after, str)
+      after = "#{ name }_after_regex="
+      alias_method after, "#{ name }="
+      define_method "#{name}=" do |str|
+        if meta[:regex] =~ str
+          send after, str
         else
-          error_emitter.error(meta[:on_regex_fail] || "#{str.inspect} did not match pattern for #{name}: /#{re.source}/")
+          msg = meta.fetch :on_regex_fail do
+            "#{ str.inspect } did not match pattern for #{
+              }#{ name }: /#{ meta[:regex].source }/"
+          end
+          error_emitter.error msg
           str
         end
       end
     end
   end
-
 
   # A required attribute is considered as not provided IFF its result is nil.
   # The receiver of this must be a sub-client, and have the attribute_definer.
@@ -101,14 +108,20 @@ module Skylab::TanMan
   end
 
   module Core::MetaAttributes::Required::InstanceMethods
+                                  # (these are tracked with [#hl-047] maybe..)
     def required_ok?
-      a = attribute_definer.attributes.each.to_a
-      b = a.select { |k, o| o[:required] && send(k).nil? }
-      if b.empty?
+      a = attribute_definer.attributes.each.reduce( [] ) do |m, (k, v)|
+        if v.has? :required and v[:required] and send( k ).nil?
+          m << v
+        end
+        m
+      end
+      if a.length.zero?
         true
       else
-        error "missing required attribute#{ s b }: #{
-          }#{ and_( b.map { |o| "#{ kbd o.first }" } ) }"
+        error "missing required attribute#{ s a }: #{
+          }#{ and_( a.map { |o| "#{ kbd o.label_string }" } ) }" # if..
+          # this borks on you just change it to `normalized_name`
         false
       end
     end

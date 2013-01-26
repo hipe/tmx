@@ -5,12 +5,13 @@ require 'set'
 module ::Skylab::MetaHell::TestSupport::Formal
   module Methods
     include CONSTANTS
-    def one_such_class &block
-      ::Class.new.class_eval do
+    define_method :one_such_class do |&block|
+      kls = Formal_TestSupport.const_set "KLS_#{ FUN.next_id[] }", ::Class.new
+      kls.class_eval do
         extend MetaHell::Formal::Attribute::Definer
-        instance_eval( &block )
-        self
+        class_exec(& block )
       end
+      kls
     end
   end
 
@@ -67,14 +68,14 @@ module ::Skylab::MetaHell::TestSupport::Formal
 
     context "class inheritance with regards to metaproperties" do
 
-      let(:klass_a) do
+      let :klass_a do
         one_such_class do
           meta_attribute :fooish
           attribute :foo, :fooish => true
         end
       end
 
-      let(:klass_b) do
+      let :klass_b do
         ::Class.new(klass_a).class_eval do
           attribute :foo, :fooish => false
           self
@@ -98,8 +99,23 @@ module ::Skylab::MetaHell::TestSupport::Formal
       end
 
       context "they get inherited from parent" do
-        let(:klass_a) { one_such_class { meta_attribute :height } }
-        let(:klass_b) { ::Class.new(klass_a).class_eval { meta_attribute :weight; self } }
+
+        let :klass_a do
+          one_such_class do
+            meta_attribute :height
+            class << self
+              public :meta_attributes
+            end
+          end
+        end
+
+        let :klass_b do
+          ::Class.new( klass_a).class_eval do
+            meta_attribute :weight
+            self
+          end
+        end
+
         it "as here" do
           klass_b.meta_attributes.names.to_set.should eql([:height, :weight].to_set)
         end
@@ -126,14 +142,17 @@ module ::Skylab::MetaHell::TestSupport::Formal
 
           klass_b = ::Class.new(klass_a).class_eval do
             @touched = []
-            class << self ; attr_reader :touched end
-            attribute :wankers, :whoopie => :nerp
+            class << self
+              attr_reader :touched
+            end
+            attribute :wankers, whoopie: :nerp
             self
           end
 
           who, hah = klass_b.touched.first
           who.should eql :wankers
-          hah.should eql(:whoopie => :nerp)
+          hah.names.should eql([:whoopie])
+          hah[:whoopie].should eql(:nerp)
           obj = klass_b.new
           obj.wankers = 'derp'
           obj.wankers.should eql('A:derp:B')
@@ -145,8 +164,11 @@ module ::Skylab::MetaHell::TestSupport::Formal
 
       let :defining_module do
         ::Module.new.module_eval do
-          class << self ; def to_s ; 'defining_module' end end
           extend MetaHell::Formal::Attribute::Definer
+          class << self
+            def to_s ; 'defining_module' end
+            public :meta_attributes
+          end
           meta_attribute :regex do |name, meta|
             alias_method(after = "#{name}_after_regex=", "#{name}=")
             define_method("#{name}=") do |str|
@@ -165,8 +187,11 @@ module ::Skylab::MetaHell::TestSupport::Formal
       let :importing_class do
         ctx = self
         ::Class.new.class_eval do
-          class << self ; def to_s ; 'importing_class' end end
           extend MetaHell::Formal::Attribute::Definer
+          class << self
+            def to_s ; 'importing_class' end
+            public :meta_attributes
+          end
           meta_attribute ctx.defining_module
           self
         end
@@ -183,7 +208,7 @@ module ::Skylab::MetaHell::TestSupport::Formal
         end
       end
 
-      it "which transfers the same MetaAttribute object to child (should be ok)" do
+      it "which transfers the same MetaAttribute object to child (should be ok)", f:true do
         importing_class.meta_attributes[:regex].should be_kind_of(MetaHell::Formal::Attribute::MetaAttribute)
         importing_class.meta_attributes[:regex].object_id.should eql(defining_module.meta_attributes[:regex].object_id)
       end

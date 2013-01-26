@@ -66,7 +66,7 @@ module Skylab::Snag
     dsl_off
 
     d = -> do
-      x = Snag::API::Actions::ToDo::Report.attributes.with :default
+      x = Snag::API::Actions::ToDo::Report.attributes.box_reduce :default
       d = -> { x }
       x
     end

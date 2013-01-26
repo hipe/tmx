@@ -52,3 +52,16 @@ So, mitigating (1) and towards (4) is this:
 So in conclusion, "todos" are a great step towards beautiful code,
 but they are only a first step!
 
+
+### Indicating dependencies in code with other issues
+
+stating that one actionable thing should happen before or after
+another thing **in code** should be done with extreme discretion.
+these things are so volatile, they can easily go stale quickly, and/or
+if they live in the code they can lay around for months or longer,
+possibly causing confusion or mis-information in the future. The general
+spirit of planning/contingency analysis has value, but consider instead
+melting such a comment into a ticket and having the battle over
+depencies and pre-requisites there instead. while code is a poor
+fit for this kind of discussion, it is precisely what the
+issue collection exists for.

@@ -18,10 +18,13 @@ module Skylab::TanMan
       klass.meta_attribute(* Core::MetaAttributes[ :boolean, :default,
                          :mutex_boolean_set, :pathname, :required, :regex ] )
 
+      klass.attribute_metadata_class do        # (just playing w/ the feature)
+        def label_string
+          normalized_name.to_s
+        end
+      end
     end
   end
-
-
 
   module API::Action::Attribute_Adapter::InstanceMethods
     include Core::Attribute::Reflection::InstanceMethods

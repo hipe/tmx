@@ -1,6 +1,9 @@
 module Skylab::Dependency
 
   class Task < Slake::Task
+    attribute_metadata_class do
+      def [] k ; fetch( k ) { } end # soften it
+    end
     meta_attribute :boolean
     meta_attribute :default
     meta_attribute :from_context
@@ -15,6 +18,7 @@ module Skylab::Dependency
     include Headless::CLI::Stylize::Methods # `stylize`
 
     def hi str ; stylize str, :strong, :green end
+
     def no str ; stylize str, :strong, :red   end
 
     def initialize(*)
@@ -22,11 +26,12 @@ module Skylab::Dependency
       event_listeners[:all] ||= [lambda { |e| $stdout.puts e }]
     end
 
-    def valid?
+    def valid? # [#hl-047]
       reqd = self.class.attributes.each.map { |k, v| k if v[:required] }.compact
       nope = reqd.select { |r| send(r).nil? }
       if nope.any?
-        @invalid_reason = "#{name} task missing required attribute#{'s' if nope.length != 1}: #{nope.join(', ')}"
+        @invalid_reason = "#{name} task missing required attribute#{
+          }#{'s' if nope.length != 1}: #{nope.join(', ')}"
         return false
       end
       true
@@ -37,6 +42,7 @@ module Skylab::Dependency
     def on_boolean_attribute name, meta
       define_method("#{name}?") { send(name) } # alias_method misses future hacks
     end
+
     def on_default_attribute name, meta
       alias_method "#{name}_before_default", name
       define_method(name) do
@@ -45,6 +51,7 @@ module Skylab::Dependency
         meta[:default]
       end
     end
+
     def on_from_context_attribute name, meta
       alias_method "#{name}_before_from_context", name
       define_method(name) do
@@ -57,6 +64,7 @@ module Skylab::Dependency
         send "#{name}_before_from_context"
       end
     end
+
     def on_pathname_attribute name, meta
       before = "#{name}_before_pathname"
       alias_method before, name
@@ -67,14 +75,18 @@ module Skylab::Dependency
         pn
       end
     end
+
     def _mutex_fail ks, ks2
       ks.length > ks2.length and ks2.push('("check" and or "update")')
       ks2.map! { |e| e.kind_of?(::String) ? e : "\"#{e.to_s.gsub('_', ' ')}\"" }
       _err "#{ks2.join(' and ')} are mutually exclusive.  Please use only one."
       false
     end
+
     def dry_run?            ; request[:dry_run]            end
+
     def optimistic_dry_run? ; request[:optimistic_dry_run] end
+
     def _view_tree
       raise "refactor me (below has moved)"
       loc = Porcelain::Tree::Locus.new

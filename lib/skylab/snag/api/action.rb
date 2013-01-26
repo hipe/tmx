@@ -1,32 +1,27 @@
 module Skylab::Snag
-  class API::Action
+  class API::Action               # (following [#sl-110] order)
     extend Headless::Action::ModuleMethods
+    include Headless::Action::InstanceMethods # before below per `emit`
+    ACTIONS_ANCHOR_MODULE = -> { API::Actions }
+
     extend Headless::NLP::EN::API_Action_Inflection_Hack
-    extend MetaHell::Formal::Attribute::Definer
-
-    include Headless::Action::InstanceMethods
-    include Snag::Core::SubClient::InstanceMethods
-
-    extend PubSub::Emitter # puts `emit` i.m lower on the chain than s.c above!
-
-    public :emits? # for #experimental dynamic wiring per action reflection
-
-    meta_attribute :default
-    meta_attribute :required
-
     inflection.inflect.noun :singular
 
-    event_class API::MyEvent
+    extend MetaHell::Formal::Attribute::Definer
+    meta_attribute :default
+    meta_attribute :required, default: false
 
-    ACTIONS_ANCHOR_MODULE = -> { API::Actions }
+    extend PubSub::Emitter # puts `emit` i.m lower on the chain than s.c above!
+    event_class API::MyEvent
+    public :emits? # for #experimental dynamic wiring per action reflection
 
     def self.attributes_or_params
       res = nil
       if const_defined? :PARAMS, false
         a = const_get :PARAMS, false
-        res = MetaHell::Formal::Attribute::Box[ a.map do |k|
-          [ k, MetaHell::Formal::Attribute::Metadata[ required: true ] ]
-        end ]
+        res = MetaHell::Formal::Attribute::Box[
+          a.map { |sym| [ sym, { required: true } ] }
+        ]
       else
         res = self.attributes     # (for clearer error msgs)
       end
@@ -41,6 +36,7 @@ module Skylab::Snag
     end
 
     # --*--
+    include Snag::Core::SubClient::InstanceMethods
 
     def invoke param_h=nil
       res = nil
@@ -65,7 +61,7 @@ module Skylab::Snag
       _snag_sub_client_init! api
     end
 
-    def absorb_params!
+    def absorb_params!            # [#hl-047] this kind of algo, sort of
       res = false
       begin
         formal = self.class.attributes_or_params
@@ -84,7 +80,9 @@ module Skylab::Snag
           end
         end
         missing = formal.each.reduce [] do |m, (k, meta)|
-          m.push( k ) if meta[:required] && @param_h[k].nil?
+          if meta[:required] && @param_h[k].nil?
+            m << k
+          end
           m
         end
         if missing.length.nonzero?
