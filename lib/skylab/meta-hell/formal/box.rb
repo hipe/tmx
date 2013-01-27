@@ -44,6 +44,10 @@ module Skylab::MetaHell
       @order.dup
     end
 
+    def length
+      @order.length
+    end
+
     def _order                    # tiny optimization ..?
       @order
     end
@@ -65,6 +69,12 @@ module Skylab::MetaHell
         }#{ normalized_name }"
       @order << normalized_name
       @hash[ normalized_name ] = x
+      nil
+    end
+
+    def clear
+      @order.clear
+      @hash.clear
       nil
     end
                                   # this is just one very experimental
