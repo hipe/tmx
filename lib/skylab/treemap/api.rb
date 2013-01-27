@@ -2,12 +2,10 @@ module Skylab::Treemap
   module API
   end
 
-  class API::Client # #todo move this - it's the bulk of the file
-    include ::Singleton # let this be the only use of singletons - they are evil
-                        # gives you `instance`, accesses the singleton obj to
-                        # todo - go it away, singleton
+  class API::Client # [#032] - #move api client - it's the bulk of the file
+    include ::Singleton # [#033] - - go it away, singleton
 
-    def action *names # #todo look at what this is
+    def action *names # [#034] - look at what this is
       klass = names.reduce API::Actions do |m, n|
         m.const_get n.to_s.gsub(/(?:^|_)([a-z])/){ $1.upcase }
       end

@@ -10,7 +10,7 @@ module Skylab::Treemap
       TestSupport::StreamSpy.standard # add .debug! if u want
     end
     def build_tmx_cli
-      fail 'wat' # #todo
+      fail 'wat' # [#051] - - legcy test wiring
       require 'skylab/tmx/cli'
       ::Skylab::Tmx::Cli.new(
         program_name: 'tmx',

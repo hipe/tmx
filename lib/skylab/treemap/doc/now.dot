@@ -18,13 +18,54 @@ label="Treemap Focus"
 #                green : fillcolor="#79f233"
 
 node [label="\N", style="filled", fillcolor="#b5d5fb", fontname="Futura", penwidth="1.1566", shape="Mrecord"]
+node [label="[#050]"]
+_tmp [label="_tmp-r-data move\n[#013]"]
+abstract [label="abstract tabular\n[#018]"]
+adapter [label="adapter arch\n[#017]"]
+adapters [label="adapters need a core.rb\n[#049]"]
+audit_2 [label="audit legacy wiring\n[#045]"]
 audit [fillcolor="#79f233", label="audit method visibility\n[#008]"]
+cli_2 [label="cli action\n[#043]"]
 cli [label="cli audit org wide\n[#016]"]
+easy [label=easy]
 existing [label="existing tests\n[#007]"]
 flush [label="flush some todos"]
 get [fillcolor="#79f233", label="get cli working\n[#006]"]
+legacy [label="legacy macro wiring\n[#042]"]
+move_6 [label="move Tempdir\n[#031]"]
+move [label="move adapter i.m\n[#024]"]
+move_7 [label="move api client\n[#032]"]
+move_4 [label="move api path\n[#028]"]
+move_3 [label="move file lines enu\n[#026]"]
+move_2 [label="move puts proxy\n[#025]"]
+move_5 [label="move render csv\n[#020]"]
+moves [label=moves]
+much [label="much later"]
+name [label="name func away\n[#023]"]
+op [label="op.docmtr\n[#036]"]
+option [label="option parser\n[#014]"]
+parse [label="parse indentation\n[#027]"]
+singleton [label="singleton away\n[#033]"]
+stylus [label="stylus wiring\n[#011]"]
+_tmp -> easy
+abstract -> much
+adapters -> adapter
 audit -> existing
+audit_2 -> legacy
 cli -> existing
+cli_2 -> moves
 existing -> get
 flush -> existing
+move -> moves
+move_2 -> moves
+move_3 -> moves
+move_4 -> moves
+move_5 -> moves
+move_6 -> moves
+move_7 -> moves
+node -> stylus
+op -> moves
+parse -> moves
+singleton -> much
+stylus -> much
 }

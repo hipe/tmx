@@ -1,5 +1,5 @@
 module Skylab::Treemap
-  class CLI::DynamicOptionDocumentor < ::OptionParser # #todo - rename to op:docmtr
+  class CLI::DynamicOptionDocumentor < ::OptionParser # [#036] - - rename to ..
     include Treemap::Core::SubClient::InstanceMethods
 
 
@@ -47,7 +47,7 @@ module Skylab::Treemap
     def api_action
       @cli_action.send :api_action  # experimental access
     end
-                                  # #todo kill this with fire, i mean no.
+                                  # [#037] - kill this with fire, i mean no.
                                   # you are the documentor.  you are in
                                   # an option_syntax block, and an
                                   # option wants to retrieve its more
@@ -108,7 +108,7 @@ module Skylab::Treemap
 
     def dummarize *a, &b          # we just wrap summarize with a different
       summarize( *a, &b )         # name to catch errors early if the hack
-    end                           # isn't wired right (#todo this is so ugly)
+    end                           # [#038] - saying "dumarize" is so ugly)
 
   protected
 

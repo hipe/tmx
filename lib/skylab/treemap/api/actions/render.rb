@@ -231,7 +231,7 @@ module Skylab::Treemap
     end
 
     def tree_to_csv
-      srand 867 # jenny's phone number - 867 5309 # #todo
+      srand 867 # jenny's phone number - 867 5309 # %todo
       csv_no_change or begin
         with_csv_out_stream do |csv_out|
           API::Render::CSV.invoke @tree do |o|
@@ -261,7 +261,7 @@ module Skylab::Treemap
       end
     end
 
-    class PutsProxy < ::Struct.new :func # #todo - move
+    class PutsProxy < ::Struct.new :func # [#025] - - move PutsProxy
       def puts str
         func[ str ]
       end

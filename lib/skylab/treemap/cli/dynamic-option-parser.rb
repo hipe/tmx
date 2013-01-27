@@ -3,7 +3,7 @@ module Skylab::Treemap
 
   protected
 
-    wat_a = [ ].freeze # #todo wat
+    wat_a = [ ].freeze # [#039] - wat
 
     define_method :more do |_|
       wat_a

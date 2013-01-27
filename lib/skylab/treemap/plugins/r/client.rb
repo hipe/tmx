@@ -1,5 +1,5 @@
 module Skylab::Treemap
-  module Plugins::R # #todo move
+  module Plugins::R # [#049] - adapters need a core.rb
     extend Autoloader
     module CLI
       module Actions
@@ -21,7 +21,7 @@ module Skylab::Treemap
 
     def load_options_into cli_action           # [#014.4] k.i.w.f
       cli_action.option_syntax.define! do |o|
-        s = cli_action.send :stylus  # #todo - bad and wrong
+        s = cli_action.send :stylus  # [#050] - - stylus wiring is bad and wrong
         separator ''
         separator s.hdr 'r-specific options:'
         on '--r-script', 'output to stdout the generated r script, stop.' do

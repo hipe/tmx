@@ -1,6 +1,6 @@
 module Skylab::Treemap
-  class API::Render::CSV          # #todo guess where this is going . mebbe
-                                  # #todo there is randomness in here
+  class API::Render::CSV          # [#029] - #move render csv
+                                  # [#030] - #doc-point there is randomness ..
     extend PubSub::Emitter
 
     emits payload: :all, error: :all, info: :all

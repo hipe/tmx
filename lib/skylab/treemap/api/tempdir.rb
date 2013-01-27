@@ -1,5 +1,5 @@
 module Skylab::Treemap
-  class API::Tempdir < API::Path  # #todo - this emits events it is a m.c
+  class API::Tempdir < API::Path  # [#031] - - Tempdir emits events it is a ..
     extend PubSub::Emitter
 
     emits :created, :exists, :failure

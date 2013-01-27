@@ -1,7 +1,8 @@
 module Skylab::Treemap
   module Adapter
 
-    o = { }                       # #todo etc - this is etc
+    o = { }                       # (inflection that is similar but maybe
+                                  # not the same as elsewhere..)
 
     o[:constantize] = -> dashed_name do
       dashed_name.gsub( /(?:^|-)([a-z0-9])/ ) { $1.upcase }
@@ -24,9 +25,9 @@ module Skylab::Treemap
                                   # we almost god rid of this, but then it
                                   # flourished
 
-    def action_box                # #todo you know what i'm thinking
+    def action_box                # [#022] - eventually boxify the mods
       @action_box ||= Adapter::Action::Box.new @rc, @name_function,
-        cli_action_pathanmes, self
+        cli_action_pathnames, self
     end
 
     def cli_metadata_emissary
@@ -43,7 +44,7 @@ module Skylab::Treemap
     end
 
     def has_cli_actions
-      cli_action_pathanmes if @cli_action_pathnames.nil?
+      cli_action_pathnames if @cli_action_pathnames.nil?
       !! @cli_action_pathnames
     end
 
@@ -76,10 +77,6 @@ module Skylab::Treemap
       @name_function.stem.intern
     end
 
-    def to_s # #todo - temporary
-      normalized_local_name.to_s
-    end
-
   protected
 
     def initialize rc, name_function, adapter_state, adapter_box
@@ -108,13 +105,12 @@ module Skylab::Treemap
 
     attr_accessor :adapter_module
 
-    def cli_action_pathanmes
+    def cli_action_pathnames
       if @cli_action_pathnames.nil?   # if we haven't tried yet
         a = ::Pathname.glob( adapter_box.module.dir_pathname.join(
           @name_function.cli_actions_glob_tail ) )
         @cli_action_pathnames = a.length.zero? ? false : a
       end
-      # puts "(#{ @name_function.stem } has some cli actions)" # #todo - twice ?
       @cli_action_pathnames
     end
 
@@ -288,8 +284,7 @@ module Skylab::Treemap
     # what's in a name? two classes at least
   end
 
-  class Adapter::Name::Function # #todo considering making this go away
-    # for some combination of boxxy and bleeding stubs but we'll see
+  class Adapter::Name::Function # [#023] - considering eliminating name func ..
 
     fun = Adapter::FUN
 
@@ -418,10 +413,6 @@ module Skylab::Treemap
       @normalized_local_name ||= begin
         @pathname.basename.sub_ext( '' ).to_s.intern
       end
-    end
-
-    def to_s
-      normalized_local_name.to_s # #todo - temporary
     end
 
     attr_reader :pathname

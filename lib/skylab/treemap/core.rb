@@ -1,4 +1,4 @@
-require 'singleton' # #todo - goes away
+require 'singleton' # [#048] - - singleton goes away
 
 require_relative '..'
 require 'skylab/face/core'

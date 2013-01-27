@@ -1,5 +1,5 @@
 module Skylab::Treemap
-  class API::FileLinesEnumerator < ::Enumerator # #todo
+  class API::FileLinesEnumerator < ::Enumerator # [#026]
     def close_if_open
       @file.closed? ? nil : (@file.close || true)
     end

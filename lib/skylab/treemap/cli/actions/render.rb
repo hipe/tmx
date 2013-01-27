@@ -49,7 +49,7 @@ module Skylab::Treemap
           end
         end
         res = act.invoke opt_h.merge!( inpath: inpath )
-        if false == res # #todo might not be necessary ..
+        if false == res # [#035] - checking for help invite at action level ..
           help_invite
           res = nil
         end

@@ -1,5 +1,5 @@
 module Skylab::Treemap
-  class API::Path < ::Pathname # #todo move this to model, #todo rename to pn
+  class API::Path < ::Pathname # [#028] - move Api::Path to model, #todo ..
 
     def is_missing_required_force
       @is_missing_required_force[ self ]

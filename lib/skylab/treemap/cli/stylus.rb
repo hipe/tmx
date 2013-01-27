@@ -2,7 +2,7 @@ module Skylab::Treemap
   class CLI::Stylus
     include Bleeding::Styles
 
-    def bad_value value           # #todo rename to `ick`
+    def bad_value value           # [#040] - rename to `ick`
       pre value.inspect
     end
 
@@ -57,7 +57,7 @@ module Skylab::Treemap
       self
     end
 
-    def value value              # #todo rename to `val`
+    def value value              # [#041] - rename to `val`
       pre value.inspect
     end
 

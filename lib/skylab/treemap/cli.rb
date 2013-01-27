@@ -89,7 +89,7 @@ module Skylab::Treemap
       a
     end
 
-    def porcelain # @todo 100.200 not here
+    def porcelain # [#042] - 100.200 not here
       fail 'i will find you and i will kill you'
       self.class
     end
@@ -116,7 +116,7 @@ module Skylab::Treemap
     extend Bleeding::Stubs
   end
 
-  class CLI::Action # #todo consider moving this
+  class CLI::Action # [#043] - consider moving cli action
     extend Bleeding::Action
 
     include Treemap::Core::SubClient::InstanceMethods
@@ -136,7 +136,7 @@ module Skylab::Treemap
       @error_count = 0
     end
 
-    def error msg                 # #todo
+    def error msg                 # [#044] - - s.c#error ?
       emit :error, msg
       false
     end
@@ -155,7 +155,7 @@ module Skylab::Treemap
   end
 
   class << CLI
-    def build_client_instance request_client, slug # #todo - wat where
+    def build_client_instance request_client, slug # [#045] - - audit legacy ..
       fail 'wat i hate you'
       new do |c|
         c.program_name = slug
@@ -165,12 +165,12 @@ module Skylab::Treemap
         c.on_payload { |e| request_client.emit(:payload, e) }
         c.do_stylize = request_client.err.tty?
         if runtime_instance_setting
-          runtime_instance_settings.call c # @todo #100.200
+          runtime_instance_settings.call c # [#046] - #100.200
         end
       end
     end
 
-    def porcelain # @todo #100.200 not here
+    def porcelain # [#047] - #100.200 not here
       fail 'wat i hate you'
       self
     end

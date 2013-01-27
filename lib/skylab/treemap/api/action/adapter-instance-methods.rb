@@ -1,5 +1,5 @@
 module Skylab::Treemap
-  module API::Action::AdapterInstanceMethods # #todo move this to somewhere..
+  module API::Action::AdapterInstanceMethods # [#024] - move adapter instance ..
     include Treemap::Core::SubClient::InstanceMethods
 
   protected
