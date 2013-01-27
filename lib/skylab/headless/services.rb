@@ -9,9 +9,11 @@ module Skylab::Headless
     o :Open3        , -> { require 'open3'      ; ::Open3 }
     o :OptionParser , -> { require 'optparse'   ; ::OptionParser }
     o :Patch        , -> { require_relative 'services/patch/core' }
+    o :PubSub       , -> { require 'skylab/pub-sub/core' ; ::Skylab::PubSub }
     o :Producer     , -> { require_relative 'services/producer' }
     o :Shellwords   , -> { require 'shellwords' ; ::Shellwords }
     o :StringIO     , -> { require 'stringio'   ; ::StringIO }
+    o :StringScanner, -> { require 'strscan'    ; ::StringScanner }
 
     class << self
       alias_method :svcs_original_const_missing, :const_missing
@@ -19,17 +21,17 @@ module Skylab::Headless
 
     define_singleton_method :const_missing do |k|
       x = h.fetch( k ).call
-      if true == x
-        if const_defined? k, false
+      if true == x                             # (this makes a sketchy
+        if const_defined? k, false             # assumption..)
           const_get k, false
         else
           # less confusing than: svcs_original_const_missing (from autol.)
           raise ::NameError.new "uninitialized constant #{ self }::#{ k } #{
             }- your custom loader should initialize it and did not."
         end
-      else
-        const_set k, x
-        x
+      else                                     # you loaded e.g. a toplevel
+        const_set k, x                         # stdlib module, now set it
+        x                                      # as a constant of yours
       end
     end
   end
