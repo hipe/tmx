@@ -1,8 +1,7 @@
-require_relative '../../test-support'
+require_relative '../test-support'
 
 module Skylab::Headless::TestSupport::IO::Interceptors
-  # CAREFUL - skipping IO in the chain b/c right now it is only cosmetic
-  ::Skylab::Headless::TestSupport[ self ]
+  ::Skylab::Headless::TestSupport::IO[ self ]
 
   include CONSTANTS # so we can say Headless inside the describe block
 

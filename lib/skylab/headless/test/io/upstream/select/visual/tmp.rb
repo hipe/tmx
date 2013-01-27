@@ -1,14 +1,13 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env ruby -w
 
-require 'rubygems'
-require 'open4'
+v = $VERBOSE ; $VERBOSE = nil ; require 'open4' ; $VERBOSE = v # open4 is loud
 require 'strscan'
 
 puts "starting ruby."
 
 
 def flush_buffer! err_buff, require_newline = true
-  scn = StringScanner.new(err_buff)
+  scn = ::StringScanner.new(err_buff)
   num_chars_read = 0
   until scn.eos?
     got = scn.scan( require_newline ? /\A.+?\r?\n/ : /.*/ ) or break
@@ -20,7 +19,8 @@ def flush_buffer! err_buff, require_newline = true
 end
 
 MAXLEN = 80
-status = Open4.open4('sh') do |pid, sin, sout, serr|
+
+status = ::Open4.open4('sh') do |pid, sin, sout, serr|
   sin.puts('source tmp.sh'); sin.close
   obuff = ''
   eopen = true
@@ -35,13 +35,13 @@ status = Open4.open4('sh') do |pid, sin, sout, serr|
           flush_buffer!(my_ebuff)
         end
       end
-    rescue Errno::EAGAIN, Errno::EWOULDBLOCK => e
-    rescue EOFError => e
+    rescue ::Errno::EAGAIN, ::Errno::EWOULDBLOCK => e
+    rescue ::EOFError => e
       eopen = false
       my_ebuff.empty? || flush_buffer!(my_ebuff, false)
     end
   end
 end
 
-puts "\npid ##{status.pid} exited with status #{status.exitstatus}"
+puts "\npid ##{ status.pid } exited with status #{ status.exitstatus }"
 puts "done with ruby."

@@ -1,16 +1,22 @@
 require 'open3'
 
 module Skylab::Interface
-  module System  # [#001] - these belong in i.m's
+  module System
     extend Autoloader
+  end
+
+  module System::InstanceMethods
     # placeholder for etc yadda yadda the big dream, because probably
     # 'Open3' isn't cool anymore!
+
+  protected
+
     def sys
-      @system_interface ||= System::Interface.new
+      @sys ||= System::Client.new
     end
   end
 
-  class System::Interface
+  class System::Client
     def which exe_name
       /\A[-a-z]+\z/i =~ exe_name or fail "invalid name: #{ exe_name }"
       out = err = nil

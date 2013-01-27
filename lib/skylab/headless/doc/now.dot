@@ -1,0 +1,30 @@
+# created by tan-man on 2013-01-27 02:54:50 UTC
+
+digraph {
+
+/*
+  example stmt_list:
+    foo -> bar
+    biff -> baz
+
+  example node_stmt:
+    learn_c [label="learn C somehow"]
+*/
+
+label="Headless Now"
+
+#                 blue : fillcolor="#b5d5fb"
+#                 done : finished
+#             finished : green
+#                green : fillcolor="#79f233"
+
+node [label="\N", style="filled", fillcolor="#b5d5fb", fontname="Futura", penwidth="1.1566", shape="Mrecord"]
+
+chunker [label=chunker]
+get [label="get back to treemap"]
+nonblocking [label="nonblocking io"]
+semantic [fillcolor="#79f233", label="semantic looks like boxxy"]
+chunker -> semantic
+get -> nonblocking
+nonblocking -> chunker
+}

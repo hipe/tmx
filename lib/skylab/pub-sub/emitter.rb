@@ -1,5 +1,3 @@
-require_relative '../semantic/core'
-
 module Skylab::PubSub
 
   module Emitter
