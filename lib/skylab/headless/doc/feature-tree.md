@@ -20,8 +20,7 @@ parsers ("frameworks") in this codebase, with the following properties:
 
 + The Tree of existing features across the libs:
   + Features as the pertain to a "runtime":
-    + Features as they pertain to the runtime selecting an action: 
+    + Features as they pertain to the runtime selecting an action:
       + A default action may be specified
         + by at least one of:
             class, { string | symbol } of { surface | internal } name
-   
