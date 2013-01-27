@@ -1,6 +1,5 @@
 module Skylab::Treemap
   module Models
-    extend Skylab::Autoloader
+    extend Autoloader
   end
 end
-

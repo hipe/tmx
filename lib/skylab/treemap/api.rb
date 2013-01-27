@@ -1,44 +1,42 @@
-require_relative '../../skylab'
-require 'skylab/meta-hell/autoloader/autovivifying'
-require 'skylab/pub-sub/emitter'
-require 'skylab/porcelain/bleeding'
-require 'singleton'
-
 module Skylab::Treemap
-  Treemap = self
-  extend Skylab::Autoloader
-
   module API
-    extend Skylab::MetaHell::Autoloader::Autovivifying
-    PLUGINS_DIR = dir_pathname.dirname.join('plugins')
   end
 
-  class API::Client
-    include Singleton
+  class API::Client # #todo move this - it's the bulk of the file
+    include ::Singleton # let this be the only use of singletons - they are evil
+                        # gives you `instance`, accesses the singleton obj to
+                        # todo - go it away, singleton
 
-    def action *names
-      klass = names.reduce(API::Actions) do |m, n|
+    def action *names # #todo look at what this is
+      klass = names.reduce API::Actions do |m, n|
         m.const_get n.to_s.gsub(/(?:^|_)([a-z])/){ $1.upcase }
       end
-      o = klass.new
-      o.api_client = self
-      o
+      klass.new self
     end
-    def adapters
-      @adapters ||= Skylab::Treemap::Adapter::Collection(Skylab::Treemap::Plugins, API::PLUGINS_DIR, 'client.rb')
+
+    def adapter_box                  # api actions will use these
+      @adapter_box ||= Treemap::Adapter::Box.new nil, Treemap::Plugins, 'client.rb'
+    end
+
+  protected
+
+    def initialize
+      @adapter_box = nil
     end
   end
 
-  class API::Event < Skylab::PubSub::Event
+  class API::Event < PubSub::Event
+
+  protected
+
     def initialize tag, *payload
-      if payload.size == 2 and Hash === payload.last
+      if payload.size == 2 and ::Hash === payload.last
         h = payload.pop
         h[:message] = payload.first
-        super(tag, h)
+        super tag, h
       else
-        super(tag, *payload)
+        super tag, *payload
       end
     end
   end
 end
-

@@ -11,15 +11,20 @@ digraph {
     learn_c [label="learn C somehow"]
 */
 
+label="Treemap Focus"
 
 #                 blue : fillcolor="#b5d5fb"
 #             finished : green
 #                green : fillcolor="#79f233"
 
-label="Treemap Focus"
-
 node [label="\N", style="filled", fillcolor="#b5d5fb", fontname="Futura", penwidth="1.1566", shape="Mrecord"]
+audit [fillcolor="#79f233", label="audit method visibility\n[#008]"]
+cli [label="cli audit org wide\n[#016]"]
 existing [label="existing tests\n[#007]"]
-get [label="get cli working\n[#006]"]
+flush [label="flush some todos"]
+get [fillcolor="#79f233", label="get cli working\n[#006]"]
+audit -> existing
+cli -> existing
 existing -> get
+flush -> existing
 }

@@ -1,50 +1,72 @@
 module Skylab::Treemap
-
   class CLI::Stylus
-    include Skylab::Porcelain::Bleeding::Styles
-    def action_attributes
-      @api_action.attributes
-    end
-    attr_reader :active
-    def bad_value value
+    include Bleeding::Styles
+
+    def bad_value value           # #todo rename to `ick`
       pre value.inspect
     end
+
+    alias_method :treemap_original_stylize, :stylize
+
     def do_stylize= bool
-      if @active != (b = !! bool)
-        singleton_class.send(:alias_method, :stylize, b ? :orig_stylize : :plain)
-        @active = b
+      bool = !! bool              # normalizing it is necessary for the below
+      if bool != @is_hot
+        singleton_class.send :alias_method, :stylize,
+          ( bool ? :treemap_original_stylize : :plain )
+        @is_hot = bool
       end
       bool
     end
-    def initialize
-      @active = true
-    end
-    alias_method :orig_stylize, :stylize
-    def option_syntax_options
-      @cli_action.option_syntax.options
-    end
-    def param name, render_method=nil
-      s =
-      if option_syntax_options.key?(name)
-        option_syntax_options[name].send(render_method || :long_name)
-      elsif action_attributes.key?(name)
-        action_attributes[name].label
-      else
-        name.to_s
+
+    def escape_path x
+      if ::Pathname === x
+        if x.absolute?
+          x2 = x.relative_path_from ::Pathname.pwd
+          if x2.to_s.length < x.to_s.length
+            x = x2
+          end
+        end
       end
-      pre s
+      "#{ x }"
     end
-    def plain(s, *a)
+
+    alias_method :kbd, :pre
+
+    def param x, render_method=nil             # generic rendering of params
+      # [#011] this whole mess needs a design overhaul. what is the stylus
+      # then, if it needs to have the cli and api actions inside of it!?
+      str = nil
+      if (( cli_option = @cli_action.options.fuzzy_fetch( x ) { } ))
+        str = cli_option.send( render_method || :render )
+      elsif (( attr = @api_action.formal_attributes.fetch( x ) { } ))
+        str = attr.label_string
+      else
+        str = x.to_s
+      end
+      pre str
+    end
+
+    def plain s, *a
       s
     end
-    def wire! cli_action, api_action
+
+    def set_last_actions api_action, cli_action # [#011] unacceptable
+      # [#011] this whole mess is unacceptable - used in `params`
       @api_action = api_action
       @cli_action = cli_action
       self
     end
-    def value value
+
+    def value value              # #todo rename to `val`
       pre value.inspect
+    end
+
+  protected
+
+    def initialize
+      @is_hot = true              # a cli stylus that is not hot does not use
+                                  # ascii escape sequences in its styling.
+                                  # (#feature-point [#019])
     end
   end
 end
-

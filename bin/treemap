@@ -1,14 +1,5 @@
 #!/usr/bin/env ruby -w
 
-require_relative '../lib/skylab/treemap/cli'
+require_relative '../lib/skylab/treemap/core'
 
-Skylab::Treemap::CLI.new do |c|
-  stdout = $stdout
-  stderr = $stderr
-  c.do_stylize = stderr.tty?
-  c.on_error   { |e| stdout.puts e }
-  c.on_help    { |e| stderr.puts e }
-  c.on_info    { |e| stderr.puts e }
-  c.on_payload { |e| stdout.puts e }
-end.invoke(ARGV)
-
+Skylab::Treemap::CLI.new( $stdin, $stdout, $stderr ).invoke ARGV

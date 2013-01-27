@@ -224,9 +224,10 @@ module ::Skylab::MetaHell
       pairs.each do |attr_ref, func|
         if func
           ::Symbol === attr_ref or raise arg_error[ attr_ref ]
+          # truncate the args if for e.g. the hook doesn't need metadata
           limit = func.arity > 0 ? -> a { a[0, func.arity] } : -> a { a }
           define_singleton_method "on_#{ attr_ref }_attribute" do |*a|
-            instance_exec limit[ a ] , &func
+            instance_exec( * limit[ a ] , &func)
           end
           meta_attributes.vivify( attr_ref ).hook = func
         else
@@ -378,6 +379,14 @@ module ::Skylab::MetaHell
       nil
     end
 
+    def dupe
+      nn = @normalized_name
+      super.instance_exec do
+        @normalized_name = nn
+        self
+      end
+    end
+
     # merge the hash-like `enum_x` into self whereby for each element if
     # self has? an element with the name, replace it else add it.
     def merge! enum_x
@@ -470,7 +479,25 @@ module ::Skylab::MetaHell
       new
     end
 
-    public :dupe                  # (used in definer logic)
+    public :dupe                  # definer calls this directly
+
+    def with mattr_name, &block
+      enum = nil
+      enum = Formal::Box::Enumerator.new do |y|
+        yld = if 1 == enum.block_arity
+          -> o { y << o }
+        else
+          -> o { y << [ o.normalized_name, o ] }
+        end
+        each do |o|
+          if o.has? mattr_name
+            yld[ o ]
+          end
+        end
+        nil
+      end
+      block ? enum.each(& block ) : enum
+    end
 
   protected
 

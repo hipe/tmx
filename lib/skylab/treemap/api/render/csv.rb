@@ -1,10 +1,50 @@
 module Skylab::Treemap
-  class API::Render::CSV
-    extend Skylab::PubSub::Emitter
+  class API::Render::CSV          # #todo guess where this is going . mebbe
+                                  # #todo there is randomness in here
+    extend PubSub::Emitter
+
     emits payload: :all, error: :all, info: :all
 
-    def self.invoke(*a, &b)
-      new(*a, &b).invoke
+    def self.[] tree              # render the tree as a string #exp
+      io = Headless::Services::StringIO.new
+      me = self.new tree  do |o|
+        o.on_payload(& io.method(:puts))
+      end
+      me.send :execute # #special-privileges
+      io.rewind
+      io.read
+    end
+
+    def self.invoke *a, &b
+      new( *a, &b ).send :execute # #special-privileges
+    end
+
+    # --*--
+
+  protected
+
+    row_struct = ::Class.new(
+      ::Struct.new :id, :area, :group, :color ).class_eval do
+
+      deny_rx = %r{[^-/a-z0-9 ]}i
+
+      define_method :string do
+        values.map do |v|
+          case v
+          when ::NilClass      ; ''
+          when ::Float, ::Fixnum ; v.to_s
+          else %("#{ v.to_s.gsub deny_rx, '' }")
+          end
+        end.join ','
+      end
+
+      self
+    end
+
+    define_method :initialize do |tree, &block|
+      @row = row_struct.new
+      block[ self ]
+      @tree = tree
     end
 
     def clear!
@@ -13,57 +53,32 @@ module Skylab::Treemap
 
     attr_reader :current_line_number
 
-    DENY_RE = %r{[^-/a-z0-9 ]}i
-    PATH_DENY_RE = %r{/}
+    path_deny_rx = %r{/}
 
-    class Row < Struct.new(:id, :area, :group, :color)
-      def string
-        values.map do |v|
-          case v
-          when NilClass      ; ''
-          when Float, Fixnum ; v.to_s
-          else %("#{v.to_s.gsub(DENY_RE,'')}")
-          end
-        end.join ','
-      end
-    end
-
-    def emit_line node, path_parts
-      @row.id = (@current_line_number += 1)
-      path = path_parts + [node.content]
-      path = path.map { |s| s.gsub(PATH_DENY_RE, '') }.join('/')
-      @row.area = (rand * 1000).to_i
+    define_method :emit_line do |node, path_parts|
+      @row.id = ( @current_line_number += 1 )
+      path = path_parts + [ node.content ]
+      path = path.map { |s| s.gsub path_deny_rx, '' }.join '/'
+      @row.area = ( rand * 1000 ).to_i
       @row.group = path
-      @row.color = (rand * 1000).to_i
-      emit(:payload, @row.string)
+      @row.color = ( rand * 1000 ).to_i
+      emit :payload, @row.string
+      nil
     end
 
     def emit_first_line
-      emit(:payload, 'id, area, group, color')
+      emit :payload, 'id, area, group, color'
     end
 
-    def initialize tree
-      @row = Row.new
-      yield self
-      @tree = tree
-    end
+    res_st = ::Struct.new :num_lines
 
-    def info msg
-      emit(:info, msg)
-    end
-
-    Result = Struct.new(:num_lines)
-
-    def invoke
+    define_method :execute do
       clear!
       emit_first_line
-      Models::Node::Visitor.new(@tree).invoke do |o|
-        o.on_visit do |e|
-          emit_line e.payload.node, e.payload.path
-        end
-      end
-      Result.new(current_line_number)
+      Models::Node::Visitor[ @tree, -> e do
+        emit_line e.node, e.path
+      end ]
+      res_st.new current_line_number
     end
   end
 end
-

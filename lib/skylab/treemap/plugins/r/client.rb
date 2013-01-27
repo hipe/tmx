@@ -1,163 +1,221 @@
-require 'skylab/interface/system'
-require 'skylab/meta-hell/autoloader/autovivifying'
-
-module Skylab::Treemap::Plugins
-
-  API = Skylab::Treemap::API
-
-  module R
-    extend Skylab::Autoloader
+module Skylab::Treemap
+  module Plugins::R # #todo move
+    extend Autoloader
     module CLI
       module Actions
-        extend Skylab::MetaHell::Autoloader::Autovivifying
-        extend Skylab::Porcelain::Bleeding::Stubs
+        extend MetaHell::Autoloader::Autovivifying
+        extend Bleeding::Stubs
       end
     end
   end
 
-  class R::Client
-    extend Skylab::PubSub::Emitter
-    emits :r_script, :success, :failure
+  class Plugins::R::Client
+    # gotchas: + pattern of emitting a path: everywhere as metadata
 
-    def load_attributes o
-      o.attribute :r_script_stream, :enum => [:payload], stops_after: :r_script, stop_implied: true
+    def load_attributes_into o                 # called by the api action
+      o.attribute :r_script_stream, enum: [:payload],
+        stops_after: :r_script, stop_implied: true
+      o.attribute :default_outpath, default: pdf_outpath
+      nil
     end
 
-    def load_options cli
-      cli.option_syntax.define! do |o|
-        s = cli.stylus
-        separator('')
-        separator(s.hdr 'r-specific options:')
-        on('--r-script', 'output to stdout the generated r script, stop.') { o[:r_script_stream] = :payload }
+    def load_options_into cli_action           # [#014.4] k.i.w.f
+      cli_action.option_syntax.define! do |o|
+        s = cli_action.send :stylus  # #todo - bad and wrong
+        separator ''
+        separator s.hdr 'r-specific options:'
+        on '--r-script', 'output to stdout the generated r script, stop.' do
+          o[:r_script_stream] = :payload
+        end
       end
+      nil
     end
 
+    param_h_h_h = -> do
+      o = { }
+      set = -> me, k, v do
+        me.instance_variable_set "@#{ k }", v
+      end
+      o[:hook] = -> k, v do
+        v && ! v.respond_to?( :call ) and
+          raise ::ArgumentError, "expecting function - #{ v }"
+        set[ self, "on_#{ k }".intern, v ]
+      end
+      o[:pathname] = -> k, v do
+        k2 = k.to_s.gsub( /(?<=_)(in|out)path\z/ ) { "#{ $1 }_pathname" }.intern
+        set[ self, k2, ( v ? ::Pathname.new( v ) : v ) ]
+      end
+      o[:required] = -> k, v do
+        v or raise ::ArgumentError, "required - #{ k }"
+      end
+      o[:set] = -> k, v do
+        set[ self, k, v]
+      end
+      o
+    end.call
 
-    include Skylab::Interface::System::SelectLinesUntil
+    param_h_h = {
+      csv_inpath:          [:required, :pathname],
+      failure:             [:required, :hook],
+      info:                [:hook],
+      rscript:             [:hook],
+      stop_after_script:   [:set],
+      success:             [:hook],
+      title:               [:set],
+      tmpdir:              [:required, :set],
+    }
 
-    def initialize
-      block_given? and raise ArgumentError.new("for now, events are not wired here")
-      @bridge = nil
-      @stop_after_script = false
-      @csv_path = nil
-      @tempdir = nil
-      @title ||= 'Treemap'
+    define_method :render_treemap do |param_h|
+      res = false
+      begin
+        forml, actul = param_h_h.keys, param_h.keys
+        ( bad = actul - forml ).any? and raise ::NameError, "no: #{ bad * ' ' }"
+        ( mis = forml - actul ).any? and raise ::ArgumentError, "missing:#{mis}"
+        param_h.each do |k, v|
+          param_h_h.fetch( k ).each do |kk|
+            instance_exec k, v, &param_h_h_h.fetch( kk )
+          end
+          nil
+        end
+        @title ||= 'Treemap'
+        res = execute
+      end while nil
+      res
+    end                           # (will need to think about re-wiring if we
+                                  # ever invoke the same client twice!)
+  protected
+
+    def initialize _ # adapter_box
+      block_given? and fail "no wiring here"
+      @infostream = $stderr # meh
     end
-
-    attr_accessor :csv_path, :tempdir, :stop_after_script, :title
 
     def bridge
-      @bridge ||= R::Bridge.new do |o|
-        o.on_info  { |e| info e }
-        o.on_error { |e| error e }
+      @bridge ||= Plugins::R::Bridge.new do |o|
+        o.on_info(& method(:info) )
+        o.on_error(& method(:error))
       end
     end
 
-    def build_script_lines_enumerator
-      @script or return false
-      API::MemoryLinesEnumerator.new(@script)
-    end
-
-    DENY_RE = /[^- a-z0-9]+/i
-    def e str
-      str.to_s.gsub(DENY_RE, '')
-    end
-
-    def execute
-      ready? or return
-      generate_script! or return
-      event_listeners[:r_script] and script.each { |s| emit(:r_script, s ) }
-      stop_after_script and return true
-      pipe_the_script or return
-    end
-
-    def failure msg, pathname=nil
-      emit(:failure, message: msg, pathname: pathname) # nil pathname ok
+    def error msg, metadata=nil
+      @on_failure[ msg, metadata ]
       false
     end
 
-    def success msg, pathname
-      emit(:success, message: msg, pathname: pathname)
-      true
+    def execute
+      begin
+        normalize_tmpdir or break
+        normalize_csv_path or break
+        generate_script or break
+        @stop_after_script and break
+        pipe_the_script
+      end while nil
     end
 
-    def generate_script!
-      (@script ||= []).clear
-      @script << '# install.packages("portfolio") # this installs it, only necessary once'
-      @script << 'library(portfolio)'
-      @script << %|data <- read.csv("#{csv_path}")|
-      @script << %|map.market(id=data$id, area=data$area, group=data$group, color=data$color, main="#{e title}")|
-      @script << "# end of generated script"
-      @script
+    deny_rx = /[^- a-z0-9]+/i
+
+    esc = -> str do
+      str.to_s.gsub deny_rx, ''
     end
 
-    def invoke &block
-      block.call self # will need to re-wire if we ever re-run the same client
-      execute
+    define_method :generate_script do
+      if @csv_in_pathname && @title
+        y = ( @script ||= [] ).clear
+        y << %|# install.packages("portfolio") # install it, necessary one once|
+        y << %|library(portfolio)|
+        y << %|data <- read.csv("#{ @csv_in_pathname }")|
+        y << %|map.market(id=data$id, area=data$area, group=data$group, #{
+          }color=data$color, main="#{ esc[ @title ] }")|
+        y << %|# end of generated script|
+        y.each { |s| @on_script[ s ] } if @on_rscript
+        true
+      else
+        @script = false
+      end
     end
 
-    def self.pdf_path_guess
-      @pdf_path_guess ||= API::Path.new(File.join(FileUtils.pwd, 'Rplots.pdf'))
-    end
-    def pdf_path_guess
-      self.class.pdf_path_guess
+    def info msg
+      @on_info[ msg ] if @on_info
+      nil
     end
 
-    def pipe_the_script
-      @script or return false # just to be sure
-      bridge.ready? or return failed("count not find r: #{bridge.not_ready_reason}")
-      mtime1 = pdf_path_guess.exist? && pdf_path_guess.stat.mtime
-      lines = self.build_script_lines_enumerator
-      Open3.popen3(bridge.executable_path, '--vanilla') do |sin, sout, serr|
-        line = true
-        loop do
-          bytes = select_lines_until(0.3, sout: sout, serr: serr) do |o| # #todo #hl-102
-            o.on_sout { |e| $stderr.write "OUT-->#{e}" }
-            o.on_serr { |e| $stderr.write "ERR->#{e}" }
-          end
-          if line and line = lines.gets
-            $stderr.puts "MINE-->#{line}"
-            sin.puts line
-          end
-          if 0 == bytes and ! line
-            break
-          end
-        end
-      end # popen3
-      report_result mtime1
-    end
-
-    def update_parameters! csv_path, tempdir
-      @csv_path = csv_path
-      @tempdir = tempdir
-      self
-    end
-
-    def report_result mtime1
-      mtime2 = pdf_path_guess.exist? && pdf_path_guess.stat.mtime
+    def msg_res mtime1
+      mtime2 = @pdf_outpath.exist? && @pdf_outpath.stat.mtime
       msg, ok = if mtime1
         if mtime2
           if mtime1 == mtime2
-            ["failed to create new file, old file intact (?)", false]
+            [ "failed to create new file, old file intact (?)", false ]
           else
-            ["overwrote file", true] end
+            [ "overwrote file", true ] end
         else
-          ["was there before and isnt't now!?", false] end
+          [ "was there before and isnt't now!?", false ] end
       elsif mtime2
-        ["wrote new file", true]
+        [ "wrote new file", true ]
       else
-        ["failed to generate file or generated file not found", false]
+        [ "failed to generate file or generated file not found", false ]
       end
-      send(ok ? :success : :failure, msg, pdf_path_guess)
+      [ msg, ok ]
     end
 
-    def ready?
-      tempdir.ready? or return
-      csv_path.exist? or return failure("couldn't find csv: #{csv_path.pretty}")
-      true
+    def normalize_csv_path
+      @csv_in_pathname.exist? or begin
+        error "couldn't find csv", path: @csv_in_pathname
+      end
     end
 
-    attr_reader :script
+    def normalize_tmpdir
+      if @tmpdir.is_normalized
+        info "tmpdir already normalized."
+        true
+      elsif @tmpdir.normalize # emits events to upstream client
+        true
+      else
+        error "failed to normalized tmpdir", path: @tmpdir
+        false
+      end
+    end
+
+    pdf_pathname_guess = -> do
+      x = ::Pathname.pwd.join 'Rplots.pdf'
+      pdf_pathname_guess = -> { x }
+      x
+    end
+
+    define_method :pdf_outpath do
+      @pdf_outpath ||= pdf_pathname_guess[] # the issue is .. uh ..
+    end
+
+    def pipe_the_script
+      res = false
+      begin
+        @script or break # one last little sanity check
+        bridge.is_active || @bridge.activate || break
+        mtime1 = pdf_outpath.exist? && @pdf_outpath.stat.mtime
+        upstream = API::MemoryLinesEnumerator.new @script
+        inf = -> s { @infostream.write s }
+        select = Headless::IO::Upstream::Select.new
+        select.timeout_seconds = 0.3
+        select.line[:sout] = -> s { inf[ "OUT-->#{ s }" ] }
+        select.line[:serr] = -> s { inf[ "ERR-->#{ s }" ] }
+        argv = [ @bridge.executable_path, '--vanilla' ] # wat
+        Headless::Services::Open3.popen3( *argv ) do |sin, sout, serr|
+          select.stream[:sout] = sout
+          select.stream[:serr] = serr
+          upline = true
+          loop do
+            bytes = select.select
+            if upline &&= upstream.gets
+              inf[ "MINE-->#{ upline }" ]
+              sin.puts upline     # YOU WRITE THAT LINE TO THAT PROCESS
+            end
+            break if 0 == bytes || ! upline
+          end
+        end
+        msg, res = msg_res mtime1
+        f = res ? @on_success : @on_failure
+        f[ msg, path: @pdf_outpath ] if f
+      end while nil
+      res
+    end
   end
 end
-

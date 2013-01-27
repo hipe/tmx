@@ -1,8 +1,5 @@
-require_relative '../../test-support/core'
-require_relative '../api'
-
-describe "#{Skylab::Treemap::Adapter::NameFunction}::EXTNAME_RE" do
-  let(:re) { Skylab::Treemap::Adapter::NameFunction::EXTNAME_RE }
+describe "#{ Skylab::Treemap::Adapter } whackily hand-written sub_ext" do
+  let(:re) { ::Skylab::Treemap::Adapter::FUN.extname_rx }
   let(:match_data) { re.match(input) }
   let(:subject) { md = match_data || {} ; [md[:stem], md[:extname]] }
   def self.this input, output, *rest
@@ -23,4 +20,3 @@ describe "#{Skylab::Treemap::Adapter::NameFunction}::EXTNAME_RE" do
     this 'foo.bar.baz', ['foo.bar', '.baz']
   end
 end
-

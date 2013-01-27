@@ -1,132 +1,180 @@
-require 'skylab/porcelain/core'
-require 'skylab/pub-sub/emitter'
-
 module Skylab::Treemap
 
-  class MyAttributeMeta < Hash
-    def initialize sym
-      @intern = sym
-    end
-    def label
-      self[:label] || @intern.to_s.gsub('_', ' ')
-    end
-  end
-
   class API::Action
-    extend Skylab::Autoloader
-    extend Skylab::PubSub::Emitter
-    extend Skylab::MetaHell::Formal::Attribute::Definer
     extend Headless::NLP::EN::API_Action_Inflection_Hack
-    extend ::Skylab::MetaHell::DelegatesTo # sic #while [#003]
+    extend MetaHell::Formal::Attribute::Definer
+    extend PubSub::Emitter
 
     inflection.stems.noun = 'treemap'
 
-    attribute_meta_class MyAttributeMeta
-
-    meta_attribute :default
-
-    meta_attribute :enum do |name, ma|
-      alias_method("#{name}_before_enum=", "#{name}=")
-      define_method("#{name}=") do |val|
-        if ma[:enum].include?(val)
-          send("#{name}_before_enum=", val)
-        else
-          add_validation_error(name, val,
-            "must be #{oxford_comma(ma[:enum].map{|x| pre x}, ' or ')} (had {{value}})")
-          val
+    attribute_metadata_class do
+      def is? mattr                          # exp.
+        fetch mattr do end
+      end
+      def label_string                       # bc. _not_ modality aware!
+        fetch :label do                      # future-proofing,
+          normalized_name.to_s.gsub '_', ' ' # if metaattr not exist
         end
       end
     end
 
-    meta_attribute :path do |name, _|
-      require 'skylab/face/path-tools'
-      alias_method("#{name}_after_path=", "#{name}=")
-      define_method("#{name}=") do |path|
-        send("#{name}_after_path=", path ? ::Skylab::Face::MyPathname.new(path.to_s) : path)
+    counter = ::Hash.new { |h, k| h[k] = 0 }
+
+    define_singleton_method :chain do |new_name, &body|
+      num = counter[ new_name ] += 1
+      prev = "treemap_original_#{ new_name }_#{ num }"
+      alias_method prev, new_name
+      define_method new_name do |x|
+        y = -> xx { send prev, xx }
+        instance_exec x, y, &body
+      end
+      nil
+    end
+
+    meta_attribute :default
+
+    meta_attribute :enum do |attribute_name, attr_metadata|
+      chain "#{ attribute_name }=" do |x, y|
+        if attr_metadata[:enum].include?( x ) then y[ x ] else
+          at_the_time = attr_metadata[:enum].dup # (but still not safe.. (..))
+          add_validation_error_for attribute_name, -> do
+            "must be #{ or_ at_the_time.map(& method(:pre)) } #{
+              }(had #{ value x })"
+          end
+        end
+        x
+      end
+    end
+
+    meta_attribute :path do |name|
+      chain "#{ name }=" do |path, y|
+        y[ path ? ::Pathname.new( path ) : path ]
         path
       end
     end
 
-    meta_attribute :regex do |name, ma|
-      alias_method("#{name}_before_regex=", "#{name}=")
-      define_method("#{name}=") do |val|
-        if md = ma[:regex].first.match(val.to_s)
-          send("#{name}_before_regex=", md[0])
+    meta_attribute :regex do |name, attr_metadata|
+      chain "#{ name }=" do |x, y|
+        if attr_metadata[:regex].first =~ x.to_s
+          y[ $~[0] ]
         else
-          add_validation_error(name, val, ma[:regex].last)
-          val
+          add_validation_error_for name, -> do
+            attr_metadata[:regex].last.gsub '{{value}}', value( x )
+          end
         end
+        x
       end
     end
 
     meta_attribute :required
 
-    def add_validation_error name, value, message
-      message.gsub!('{{value}}') { bad_value value }
-      (validation_errors[name] ||= []).push(message)
-    end
+    # -- * --
 
-    attr_accessor :api_client
+    include Treemap::Core::SubClient::InstanceMethods
+    require_relative 'action/adapter-instance-methods' # b.c no a.l yet ?
+    include Treemap::API::Action::AdapterInstanceMethods
 
-    def attributes
-      singleton_class.attributes
-    end
 
-    def clear!
-      attributes.keys.each { |k| instance_variable_set("@#{k}", nil) }
-      (@validation_errors ||= {}).clear
-      self
-    end
+    public :activate_adapter_if_necessary   # experimental-near hacks
 
-    def error *a
-      emit(:error, *a)
-      false
-    end
-
-    def info *a
-      emit(:info, *a)
-      true
-    end
-
-    attr_accessor :stylus
-    delegates_to :stylus, :and, :bad_value, :or, :oxford_comma, :pre, :param, :s
-
-    def update_parameters! params
-      param_keys, attrib_keys = [params, attributes].map(&:keys)
-      good, bad = [:&, :-].map { |x| param_keys.send(x, attrib_keys) }
-      if 0 < bad.length
-        (validation_errors[nil] ||= []).push "unrecognized parameter#{s bad}: #{oxford_comma bad.map{|k| param k}}"
-      end
-      good.each { |k| send("#{k}=", params[k]) } # do the rest anyway, hell why not (aggregate validation errors)
-      self
-    end
-
-    def validate
-      attributes.with(:default).each do |k, v|
-        if send(k).nil?
-          send("#{k}=", v)
+                                  # mutates param_h (experimental
+                                  # future-proofing for possible chaining or
+                                  # action aggregtation, etc.) [#021]
+    def invoke param_h            # this was the original [#hl-047]
+      res = false ; formal = formal_attributes
+      begin
+        forml, actul = formal.names, param_h.keys
+        good, bad = [:&, :-].map { |x| actul.send x, forml } # bad keys
+        if bad.length.nonzero?
+          error "unrecognized parameter#{ s bad }: #{
+            }#{ and_ bad.map{ |k| param k } }"
+          break
+        end                                                # process provided
+        good.each { |k| send "#{ k }=", param_h.delete( k ) } # [#020], [#021]
+        @error_count.zero? or break                        # early stop
+        formal.with :default do |name, attr|               # defaults
+          send "#{ name }=", attr[:default] if send( name ).nil?
         end
-      end
-      validation_errors.each do |k, errs|
-        if k
-          error(%{#{param k} #{errs.join(' and it ')}})
-        else
-          errs.each { |e| error e }
+        a = formal.each.reduce( [ ] ) do |m, (name, attr)|  # check missing
+          m << attr if attr.is? :required and send( name ).nil?
+          m
         end
-      end.size > 0 and return false # avoid superflous messages below
-      ok = true
-      if (a = attributes.select{ |n, m| m[:required] and ! send(n) }).any?
-        ok = error("missing required parameter#{s a}: " <<
-          "#{oxford_comma(a.map { |o| param o.first }) }")
+        if a.length.nonzero?
+          error "missing required parameter#{ s a } - #{
+            }#{ and_ a.map { |o| param o.first } }"
+          break
+        end
+        res = true
+      end while nil
+      if res
+        res = execute
+      else
+        flush_validation_messages
       end
-      ok
+      res
     end
 
-    attr_reader :validation_errors
+    attr_writer :stylus # when the action is built and wired it gets this
 
-    def wire!
-      yield self
+  protected
+
+    def initialize api_client
+      @validation_errors = API::Action::Generic_Box.new
+      clear
+      @api_client = api_client
+      nil
     end
+
+    def add_validation_error_for attr_name, *mixed_message
+      @error_count += 1
+      ( @validation_errors[attr_name] ||= [] ).push mixed_message
+      nil
+    end
+
+    attr_reader :api_client
+
+    def clear
+      formal_attributes.names.each { |k| instance_variable_set "@#{ k }", nil }
+      @error_count = 0
+      @validation_errors.clear
+      nil
+    end
+
+    def flush_validation_messages
+      @validation_errors.each do |name, errors|
+        label = formal_attributes.if? name, -> x do
+          x.label_string
+        end, -> do
+          "**#{ name }**"
+        end
+        phrase_a = errors.reduce( [] ) do |y, (func)| # future-proof the sig
+          y << instance_exec(& func )
+          y
+        end
+        errors.clear
+        error "#{ param label } #{ phrase_a.join ' and it ' }"
+        errors.clear
+      end
+      @validation_errors.clear
+      nil
+    end
+
+    alias_method :formal_attribute_definer, :singleton_class
+
+    def formal_attributes
+      formal_attribute_definer.attributes
+    end
+
+    def request_client
+      @api_client
+    end
+
+    attr_reader :stylus
+  end
+
+  class API::Action::Generic_Box < MetaHell::Formal::Box # experiment
+    public :clear
+    def [] k     ; fetch( k ) { } end
+    def []= k, v ; add k, v end
   end
 end
-

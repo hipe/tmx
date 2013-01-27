@@ -1,33 +1,42 @@
-require 'open3'
+module Skylab::Headless
 
-module Skylab::Interface
   module System
-    extend Autoloader
+    # all in this file for now
   end
 
   module System::InstanceMethods
+    # remember singletons are bad for testing
+
     # placeholder for etc yadda yadda the big dream, because probably
     # 'Open3' isn't cool anymore!
 
   protected
 
-    def sys
-      @sys ||= System::Client.new
+    def system
+      @system ||= System::Client.new
     end
   end
 
   class System::Client
+
     def which exe_name
-      /\A[-a-z]+\z/i =~ exe_name or fail "invalid name: #{ exe_name }"
-      out = err = nil
-      ::Open3.popen3 'which', exe_name do |sin, sout, serr|
-        err = serr.read
-        if '' != err
-          fail "no: #{ err.inspect }"
+      if /\A[-a-z0-9_]+\z/i !~ exe_name
+        raise "invalid name: #{ exe_name }"
+      else
+        out = nil
+        Headless::Services::Open3.popen3 'which', exe_name do |_, sout, serr|
+          if '' != ( err = serr.read )
+            raise ::SystemCallError, "unexpected response from which - #{ err }"
+          end
+          out = sout.read.strip
         end
-        out = sout.read.strip
+        '' == out ? nil : out
       end
-      '' == out ? nil : out
     end
+
+  protected
+
+    # nothing is protected
+
   end
 end

@@ -1,50 +1,64 @@
 module Skylab::Treemap
   class Models::Node
-    extend Skylab::Autoloader
+    extend Autoloader
+
+    prop_a = [ :indent, :content, :line_number ].freeze
+
+    prop_a.each { |p| attr_reader p }
 
     def children
-      @children or fail("no")
-      Enumerator.new do |y|
+      @children or fail "no"
+      ::Enumerator.new do |y|
         @children.each { |c| y << c }
+        nil
       end
     end
-    def children?
-      @children and (0 < @children.size)
-    end
+
     def children_length
       @children ? @children.length : 0
     end
-    def content
-      line_content
-    end
-    attr_accessor :indent
-    def indent_length
-      @indent ? @indent.length : 0
-    end
-    def initialize data=nil
-      @children = @indent = nil
-      update_attributes!(data) if data
-    end
+
     def first
       @children.first
     end
+
+    def has_children
+      children_length.nonzero?
+    end
+
+    def indent_length
+      @indent ? @indent.length : 0
+    end
+
     def last
       @children.last
     end
-    attr_accessor :line_content
-    attr_accessor :line_number
+
     def line_string
-      "#{indent}#{line_content}"
+      "#{ @indent }#{ @content }"
     end
+
     def name
-      line_content
+      @content
     end
+
     def push node
-      (@children ||= []).push node
+      ( @children ||= [] ).push node
     end
-    def update_attributes! data
-      data.each { |k, v| send("#{k}=", v) }
+
+  protected
+
+    prop_h_h = ::Hash[ prop_a.map { |p| [ p,
+      -> v { instance_variable_set "@#{ p }", v } ] } ]
+
+    define_method :initialize do |prop_h=nil|
+      @indent = nil
+      @content = nil
+      @line_number = nil
+      @children = nil
+      if prop_h
+        prop_h.each { |p, v| instance_exec v, & prop_h_h.fetch( p ) }
+      end
     end
   end
 end
-

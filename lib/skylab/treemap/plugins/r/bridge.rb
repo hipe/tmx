@@ -1,35 +1,49 @@
-module Skylab::Treemap::Plugins::TreemapRenderAdapters
-
-  class R::Bridge
-    extend Skylab::PubSub::Emitter
+module Skylab::Treemap
+  class Plugins::R::Bridge
+    extend PubSub::Emitter
     emits :info, :error
 
-    include Skylab::Interface::System
-    attr_reader :executable_name
-    def executable_path
-      @ready.nil? and ! ready? and return false
-      @executable_path or @ready
+    def activate
+      begin
+        if @is_active
+          info "already active"
+          break
+        end
+        @executable_path = system.which @executable_name
+        if @executable_path
+          @is_active = true
+        else
+          error "executable by this name is not in #{
+            }the PATH: \"#{ @executable_name }\""
+        end
+      end while nil
+      @is_active
     end
-    def initialize
+
+    attr_reader :executable_path               # concomitant with `is_ready`
+
+    attr_reader :is_active
+
+  protected
+
+    def initialize &wire
       @executable_name = 'R'
-      @ready = nil
-      yield(self) if block_given?
+      @executable_path = nil # this is really all this does now is set this
+      @is_active = nil
+      wire[ self ]
+      nil
     end
-    def not_ready msg
-      @ready = false
-      @not_ready_reason = msg
-      false
+
+    include Headless::System::InstanceMethods # `system.which`
+
+    def error msg
+      emit :error, msg
+      @is_ready = false
     end
-    attr_reader :not_ready_reason
-    def ready?
-      if ! @ready.nil? # this may change, or get a reset etc
-        return @ready
-      end
-      unless @executable_path = sys.which(executable_name)
-        return not_ready(%{executable by this name is not in the PATH: "#{executable_name}"})
-      end
-      @ready = true
+
+    def info msg
+      emit :info, msg
+      nil
     end
   end
 end
-
