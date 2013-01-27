@@ -1,60 +1,64 @@
 module Skylab::Treemap
+  module API::Action::AdapterInstanceMethods # #todo move this to somewhere..
+    include Treemap::Core::SubClient::InstanceMethods
 
-  module API::Action::AdapterInstanceMethods
-    extend ::Skylab::MetaHell::DelegatesTo # #while [#003]
-
-    FailureWiring = Skylab::PubSub::Emitter.new(:failure)
-
-    def activate_adapter! name, &wire
-      e = FailureWiring.new(wire)
-      set_adapter_name(name) do |o|
-        o.on_failure { |_e| e.emit( _e ) }
-      end or return false
-      adapter_instance
-    end
-
-    def adapter_class
-      adapters.active_class
-    end
-
-    def adapter_instance
-      @adapter_instance ||= begin
-        adapter_class or return
-        o = adapter_class.new
-        o.load_attributes(self.singleton_class)
-        o
+  protected
+                                  # result values are very important and fixed:
+                                  # false if failure
+                                  # nil if no change (to adapter, not name)
+                                  # else adapter instance (it changed)
+    def activate_adapter_if_necessary name, error
+      res = set_adapter_name name, error
+      if false != res
+        before = adapter_box.hot_instance_ivar
+        if ! ( before && res.nil? ) # assume this means correct is already set
+          res or fail 'sanity' # it's not nil and and it's not false so
+          if ! adapter_box.hot_class_ivar
+            res = adapter_box.load_hot_class error
+          end
+          res &&= adapter_box.hot_instance
+        end
       end
+      res
     end
 
-    delegates_to :api_client, :adapters
+    def adapter_box
+      @adapter_box ||= api_client.adapter_box
+    end
+                                  # if you don't have this, then defaulting
+                                  # logic will change the active adapter
+    def adapter_name              # from one that you selected! (because
+      adapter_box.hot_name        # the parad definer creates a reader
+    end                           # for you! ouch!)
+
 
     def adapter_name= name
-      set_adapter_name(name) do |o|
-        o.on_failure { |e| add_validation_error(:adapter_name, name, "failed to load {{value}}: adapter #{e}") }
-      end
+      set_adapter_name name, -> e do
+        add_validation_error_for :adapter_name,
+          "failed to load {{adapter_name}}: adapter #{ e }",
+            adapter_name: name
+        end
       name
     end
 
-    def set_adapter_name name, &wire
-      e = FailureWiring.new wire
-      found, a = adapters.fuzzy_match_name name
-      err = nil
+    def set_adapter_name name, error=nil       # res false, nil, or name
+      res = false
+      found, a = adapter_box.fuzzy_match_name name
       case found.length
       when 0
-        err = "not found. #{ s :no }known adapter#{ s } #{s :is} #{
-                }#{ and_ a.map { |x| kbd x } }".strip
+        # i bet you wish you had headless sub-client [#010]
+        err = "not found. #{ s a, :no }known adapter#{ s a } #{ s a, :is } #{
+                }#{ and_ a.map { |x| pre x } }".strip
       when 1
-        adapters.active_adapter_name = found.first
+        res = adapter_box.set_hot_name found.first # nil or name
       else
-        err = "is ambiguous -- did you mean #{ or_ found.map { |x| kbd x } }?"
+        err = "is ambiguous -- did you mean #{ or_ found.map { |x| pre x } }?"
       end
-      if err
-        e.emit :failure, "adapter #{ kbd name } #{ err }"
-        false
-      else
-        adapters.active_adapter_name
+      if false == res
+        error ||= -> e { self.error e }
+        error[ "adapter #{ pre name } #{ err }" ]
       end
+      res
     end
   end
 end
-

@@ -1,11 +1,12 @@
 module Skylab::Treemap
   class CLI::DynamicOptionParser < ::OptionParser
-    def documentor?
-      false
-    end
-    def more *a
-      []
+
+  protected
+
+    wat_a = [ ].freeze # #todo wat
+
+    define_method :more do |_|
+      wat_a
     end
   end
 end
-

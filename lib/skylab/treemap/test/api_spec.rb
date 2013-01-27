@@ -1,5 +1,3 @@
-require_relative '../api'
-
 module Skylab::Treemap
   describe API do
     context "inflection hack for the action of" do
@@ -18,4 +16,3 @@ module Skylab::Treemap
     end
   end
 end
-

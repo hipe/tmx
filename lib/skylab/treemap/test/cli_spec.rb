@@ -16,7 +16,7 @@ module Skylab::Treemap
     context "of the actions that it lists in the help screen, it", wip:true do
       let(:names) do
         tmx_cli.run(['treema', '-h'])
-        scn = StringScanner.new(err_string)
+        scn = ::StringScanner.new err_string
         scn.skip_until(/\nactions:\n/) or fail('failed to find "actions:" section')
         names = []
         while line = scn.scan(/^[[:space:]].*\n/) do

@@ -1,11 +1,19 @@
-require 'skylab/face/core'
-
 module Skylab::Treemap
-  class API::Path < ::Skylab::Face::MyPathname
-    attr_writer :forceless
-    def forceless?
-      @forceless.call
+  class API::Path < ::Pathname # #todo move this to model, #todo rename to pn
+
+    def is_missing_required_force
+      @is_missing_required_force[ self ]
+    end
+
+    def relative_path_from *a     # if you want to have these
+      ::Pathname.new( self ).relative_path_from( *a ) # shiny constructors..
+    end                           # then for now we want obtrusive errors
+
+ protected
+
+    def initialize path_x, is_missing_required_force
+      super path_x
+      @is_missing_required_force = is_missing_required_force
     end
   end
 end
-
