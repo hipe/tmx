@@ -1,3 +1,4 @@
+[#052] #open invert is broken so stops are broken
 [#051] #open - legcy test wiring
 [#050] #open - stylus wiring is bad and wrong
 [#049] #open adapters need a core.rb
@@ -6,28 +7,28 @@
 [#046] #open #100.200
 [#045] #open - audit legacy wiring like this or k.i.w.f
 [#044] #open - s.c#error ?
-[#043] #open consider moving cli action
+[#043]       #done consider moving cli action
 [#042] #open 100.200 not here
 [#041] #open rename to `val`
 [#040] #open rename to `ick`
 [#039] #open wat
 [#038] #open saying "dumarize" is so ugly)
 [#037] #open kill this with fire, i mean no.
-[#036] #open - rename to op:docmtr
+[#036]       #done - rename to op:docmtr
 [#035] #open checking for help invite at action level might not be necessa
              ry
 [#034] #open look at what this is
 [#033] #open - go it away, singleton
-[#032] #open #move api client - it's the bulk of the file
-[#031] #open - Tempdir emits events it is a m.c and rename to Tmpdir to be more
-             like its kin #rename
+[#032]       #done #move api client - it's the bulk of the file
+[#031]       #done - Tempdir emits events it is a m.c and rename to Tmpdir to be
+             more like its kin #rename
 [#030]       #done #doc-point there is randomness in here
-[#029] #open #move render csv
-[#028] #open move Api::Path to model, #todo rename to pn
-[#027] #open - move Parse::Indention to etc..
-[#026] #open move FileLinesEnuemrator to parsing svcs or s/thing
-[#025] #open - move PutsProxy
-[#024] #open move adapter instance methods
+[#029]       #done #move render csv
+[#028]       #done move Api::Path to model, #todo rename to pn
+[#027]       #done - move Parse::Indention to etc..
+[#026]       #done move FileLinesEnuemrator to parsing svcs or s/thing
+[#025]       #done - move PutsProxy
+[#024]       #done move adapter instance methods
 [#023] #open considering eliminating name func for some combination of boxxy and
              bleeding stubs but we'll see
 [#022] #open eventually boxify the mods

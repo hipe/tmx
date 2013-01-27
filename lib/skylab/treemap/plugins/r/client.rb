@@ -191,7 +191,7 @@ module Skylab::Treemap
         @script or break # one last little sanity check
         bridge.is_active || @bridge.activate || break
         mtime1 = pdf_outpath.exist? && @pdf_outpath.stat.mtime
-        upstream = API::MemoryLinesEnumerator.new @script
+        upstream = Services::File::Lines::Enumerator::From::Array.new @script
         inf = -> s { @infostream.write s }
         select = Headless::IO::Upstream::Select.new
         select.timeout_seconds = 0.3

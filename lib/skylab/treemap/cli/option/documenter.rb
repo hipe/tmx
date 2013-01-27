@@ -1,5 +1,6 @@
 module Skylab::Treemap
-  class CLI::DynamicOptionDocumentor < ::OptionParser # [#036] - - rename to ..
+
+  class CLI::Option::Documenter < ::OptionParser # [#036] - - rename to ..
     include Treemap::Core::SubClient::InstanceMethods
 
 

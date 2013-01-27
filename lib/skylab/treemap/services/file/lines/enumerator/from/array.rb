@@ -1,5 +1,5 @@
-module Skylab::Treemap::API
-  class MemoryLinesEnumerator < ::Enumerator
+module Skylab::Treemap
+  class Services::File::Lines::Enumerator::From::Array < ::Enumerator
     def last_number
       @last_number.call
     end

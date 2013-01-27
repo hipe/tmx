@@ -2,7 +2,7 @@ module Skylab::Treemap
   class CLI::Actions::Render < CLI::Action
     desc "render a treemap from a text-based tree structure"
 
-    option_syntax_class CLI::DynamicOptionSyntax
+    option_syntax_class CLI::Option::Parser::Syntax
 
     option_syntax do |o|
       o[:char] = '+'
@@ -62,8 +62,8 @@ module Skylab::Treemap
     def build_option_syntax       # k.i.w.f
       load_adapter = -> name { self.load_adapter name }
       op = self.class.option_syntax.dupe
-      op.parser_class = CLI::DynamicOptionParser
-      op.documentor_class = CLI::DynamicOptionDocumentor
+      op.parser_class = CLI::Option::Parser
+      op.documentor_class = CLI::Option::Documenter
       clia = self
       op[:documentor_visit] = -> doc do # [#014.1]
         doc.cli_action = clia
@@ -117,7 +117,7 @@ module Skylab::Treemap
     end
 
     def parse_opts_stop opt_h
-      opt_to_event = api_action.formal_attributes.with :stops_after
+      opt_to_event = api_action.formal_attributes.with :stops_after # [#052] borked
       event_to_opt = opt_to_event.invert
       order = api_action.event_order.map { |e| event_to_opt[e] }.compact
       given = opt_h.keys & [:stop, *order]

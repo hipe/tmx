@@ -1,25 +1,5 @@
 module Skylab::Treemap
-  module MetaHell
-    include ::Skylab::MetaHell    # we won't have its autolaoder, so..
-    ::Skylab::MetaHell::Autoloader  || nil
-    ::Skylab::MetaHell::DelegatesTo || nil
-    ::Skylab::MetaHell::Formal      || nil
-  end                             # it's ugly, and tracked by [#003]
-
-  module MetaHell::InstanceMethods
-
-  protected
-                                  # (this method is protected hence
-                                  # the name need not be all terse &
-    def redefine_method! name, func  # pretty-like.)
-      if respond_to? name
-        singleton_class.send :alias_method, "orig_#{ name }", name
-      end
-      singleton_class.send :define_method, name, &func
-    end
-  end
-
-  class MetaHell::Proxy < ::BasicObject
+  class Model::Proxy < ::BasicObject
     # makes a generic proxy class that makes generic proxy objects
     # that proxy calls ..
 

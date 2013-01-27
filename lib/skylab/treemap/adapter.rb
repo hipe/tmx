@@ -559,7 +559,7 @@ module Skylab::Treemap
   protected
 
     def build_option_syntax
-      os = CLI::DynamicOptionSyntax.new [], ::OptionParser, :parser_class
+      os = CLI::Option::Parser::Syntax.new [], ::OptionParser, :parser_class
       os.define! do |h|
         on '-a', '--adapter <NAME>' do |v| h[:adapter_name] = v end
         on '-h', '--help' do h[:help] = true end

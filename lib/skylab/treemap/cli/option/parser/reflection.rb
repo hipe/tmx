@@ -1,13 +1,13 @@
 module Skylab::Treemap
-  module CLI::OptionSyntaxReflection # # todo
+  module CLI::Option::Parser::Reflection # # todo
   end
 
-  module CLI::OptionSyntaxReflection::InstanceMethods
+  module CLI::Option::Parser::Reflection::InstanceMethods
     def options
       @options_f ||= -> do
         seen_definition_length = 0
         is_current = false
-        box = CLI::OptionSyntaxReflection::Option_Box.new
+        box = CLI::Option::Parser::Reflection::Option_Box.new
         on_definition_added_h[:option_syntax_reflection] = -> do
           is_current = false      # for the future, we must note we have more
           box.clear!              # options to process when more are aded
@@ -16,7 +16,7 @@ module Skylab::Treemap
         add_help = -> do          # #tracked by [#015]
           # the `help` option gets special treament because sometimes it's magic
           box.fetch_by_normalized_name :help do |k|
-            o = CLI::OptionSyntaxReflection::Option_Metadata.build_from_args(
+            o = CLI::Option::Parser::Reflection::Option_Metadata.build_from_args(
               ['-h', '--help'] ).validate
             box.add o
             nil
@@ -25,7 +25,7 @@ module Skylab::Treemap
         -> do
           if ! is_current
             recorder =
-              CLI::OptionSyntaxReflection::Recorders::OptionParser.new box
+              CLI::Option::Parser::Reflection::Recorders::OptionParser.new box
             while seen_definition_length < definitions.length
               defn = definitions[ seen_definition_length ]
               recorder.absorb defn
@@ -41,7 +41,7 @@ module Skylab::Treemap
     end
   end
 
-  class CLI::OptionSyntaxReflection::Option_Box
+  class CLI::Option::Parser::Reflection::Option_Box
 
     def add opt
       if @hash.key? opt.normalized_name
@@ -110,7 +110,7 @@ module Skylab::Treemap
     end
   end
 
-  class CLI::OptionSyntaxReflection::Option_Metadata
+  class CLI::Option::Parser::Reflection::Option_Metadata
     # an abstract nerk for derking your gerks
 
     long_rx = /\A
@@ -347,10 +347,10 @@ module Skylab::Treemap
     end
   end
 
-  module CLI::OptionSyntaxReflection::Recorders
+  module CLI::Option::Parser::Reflection::Recorders
   end
 
-  class CLI::OptionSyntaxReflection::Recorders::OptionParser
+  class CLI::Option::Parser::Reflection::Recorders::OptionParser
     # a recorder for option parser definitions
 
     def on *a, &b
@@ -384,7 +384,7 @@ module Skylab::Treemap
                                   # (in the order they are used)
       @default_h = { }
       @param_h_recorder =
-        CLI::OptionSyntaxReflection::Recorders::Param_H.new @default_h
+        CLI::Option::Parser::Reflection::Recorders::Param_H.new @default_h
       @option_definition_queue = [ ]
       @option_box = option_box
     end
@@ -423,7 +423,7 @@ module Skylab::Treemap
           ::Hash === args.last and fail 'implement me'
           args.push default: @default_h[ key ]
         end
-        opt = CLI::OptionSyntaxReflection::Option_Metadata.build_from_args(
+        opt = CLI::Option::Parser::Reflection::Option_Metadata.build_from_args(
           args, key, -> e { error e } )
         opt or break
         existing = @option_box.fetch_by_normalized_name(
@@ -442,7 +442,7 @@ module Skylab::Treemap
     end
   end
 
-  class CLI::OptionSyntaxReflection::Recorders::Param_H
+  class CLI::Option::Parser::Reflection::Recorders::Param_H
     # this is necessarily a modal recorder - we want to do different things
     # with the values we receive based on what mode we are in.
 
@@ -490,7 +490,7 @@ module Skylab::Treemap
     end
   end
 
-  class CLI::OptionSyntaxReflection::Option_Scanner # for ::OptionParser hacks
+  class CLI::Option::Parser::Reflection::Option_Scanner # for ::OptionParser hacks
 
     attr_reader :count
 
@@ -530,7 +530,7 @@ module Skylab::Treemap
       @enum = ::Enumerator.new do |y|
         enum.each { |x| y << x }
       end
-      @fly = CLI::OptionSyntaxReflection::Option_Metadata.new(
+      @fly = CLI::Option::Parser::Reflection::Option_Metadata.new(
         * 6.times.map { nil } ) # for now
     end
 

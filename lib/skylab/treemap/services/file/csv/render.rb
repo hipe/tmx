@@ -1,5 +1,5 @@
 module Skylab::Treemap
-  class API::Render::CSV          # [#029] - #move render csv
+  class Treemap::Services::File::CSV::Render # (was [#029])
                                   # [#030] - #doc-point there is randomness ..
     extend PubSub::Emitter
 

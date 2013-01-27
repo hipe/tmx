@@ -1,5 +1,5 @@
 module Skylab::Treemap
-  class API::Parse::Indentation # [#027] - - move Parse::Indention to etc..
+  class Services::File::Indented::Parse # (was [#027])
     extend PubSub::Emitter
 
     emits parse_error: :all
@@ -51,7 +51,7 @@ module Skylab::Treemap
       res = nil
       begin
         clear!
-        @lines = API::FileLinesEnumerator.new @pathname.open( 'r' )
+        @lines = Services::File::Lines::Enumerator.new @pathname.open( 'r' )
         @first_line_rx = /\A[[:space:]]*#{ ::Regexp.escape @char } /
         @line_rx = /\A
           (?<indent> [[:space:]]* #{ ::Regexp.escape @char } )

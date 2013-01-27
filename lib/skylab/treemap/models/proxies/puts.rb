@@ -1,5 +1,5 @@
 module Skylab::Treemap
-  class Proxies::Puts < ::Struct.new :func
+  class Models::Proxies::Puts < ::Struct.new :func
     def puts str
       func[ str ]
     end

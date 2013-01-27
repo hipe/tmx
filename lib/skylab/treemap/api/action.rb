@@ -71,8 +71,7 @@ module Skylab::Treemap
     # -- * --
 
     include Treemap::Core::SubClient::InstanceMethods
-    require_relative 'action/adapter-instance-methods' # b.c no a.l yet ?
-    include Treemap::API::Action::AdapterInstanceMethods
+    include Treemap::Adapter::API_Action::InstanceMethods # not all s.c should
 
 
     public :activate_adapter_if_necessary   # experimental-near hacks

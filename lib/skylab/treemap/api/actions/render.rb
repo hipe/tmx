@@ -64,7 +64,7 @@ module Skylab::Treemap
       if :payload != @csv_stream &&            # if we are not emitting it
         csv_tmp_pathname.exist? then
         curr_bytes = csv_tmp_pathname.read
-        next_bytes = API::Render::CSV[ @tree ]
+        next_bytes = Treemap::Services::File::CSV::Render[ @tree ]
         if next_bytes && curr_bytes == next_bytes
           info '(no change in csv. skipping)'
           true
@@ -113,7 +113,7 @@ module Skylab::Treemap
       case stop_compare name
       when 0, -1
         info "(stopping because #{ param :stop } (stated or implied) #{
-          }after #{ param formal_attributes.with( :stops_after ).invert[name]})"
+          }after #{ param formal_attributes.with( :stops_after ).invert[name]})" # [#052] borked
         res = nil # stop execution with nothing to report
       end
       res
@@ -132,8 +132,8 @@ module Skylab::Treemap
 
     def inpath_to_tree
       begin
-        res = API::Parse::Indentation[ formal_attributes, char, inpath, stylus,
-          -> e { error e } ]
+        res = Treemap::Services::File::Indented::Parse[ formal_attributes,
+          char, inpath, stylus, -> e { error e } ]
         res or break
         @tree = res
         res = true
@@ -171,8 +171,8 @@ module Skylab::Treemap
       begin
         res = expecting( :default_outpath ) or break
         pathn = default_outpath
-        outpn = API::Path.new pathn, -> pn do # `is_missing_required_force`
-          b = pn.exist?
+        outpn = Treemap::Models::Pathname.new pathn, -> pn do
+          b = pn.exist?                        # (`is_missing_required_force`)
           b &&= outpath_requires_force
           b &&= ! stop_before?( :write_outfile )
           b &&= ! force
@@ -195,7 +195,7 @@ module Skylab::Treemap
       res = true
       formal_attributes.with( :stops_after ).each do |attrib, event|
         if send( attrib ) && ( self.stop_after ||= event ) != event
-          inv = formal_attributes.with( :stops_after ).invert
+          inv = formal_attributes.with( :stops_after ).invert # [#052] borked
           res = error "can't have the (possibly implied) #{
             } #{ param :stop } after both #{ param inv[stop_after] }#{
             } and #{ param attrib }"
@@ -234,7 +234,7 @@ module Skylab::Treemap
       srand 867 # jenny's phone number - 867 5309 # %todo
       csv_no_change or begin
         with_csv_out_stream do |csv_out|
-          API::Render::CSV.invoke @tree do |o|
+          Treemap::Services::File::CSV::Render.invoke @tree do |o|
             o.on_payload { |e| csv_out.puts e.to_s }
             o.on_error   { |e| error e }
             o.on_info    { |e| info e }
@@ -247,9 +247,9 @@ module Skylab::Treemap
       @tmpdir ||= begin
         path = tmpdir_path
         path = path.call if path.respond_to? :call
-        API::Tempdir.new path do |o|
+        Treemap::Models::Pathname::Tmpdir.new path do |o|
           o.on_created do |e|
-            info "created directory", path: e.tmpdir
+            info "created directory", path: e.path
           end
           o.on_exists do |e|
             info "using #{ escape_path e.path }"
@@ -261,21 +261,15 @@ module Skylab::Treemap
       end
     end
 
-    class PutsProxy < ::Struct.new :func # [#025] - - move PutsProxy
-      def puts str
-        func[ str ]
-      end
-    end
-
     def with_csv_out_stream &block # result is result of block or conventional
       res = nil
       begin
         if :payload == csv_stream
-          pxy = PutsProxy.new -> line do
+          pxy = Treemap::Models::Proxies::Puts.new -> line do
             emit :payload, line
           end
           yield pxy
-          stop_after? :csv # just to get a message
+          event_point_reached :csv # just to get a message
         else
           tmpdir.normalize or break
           existed = csv_tmp_pathname.exist?

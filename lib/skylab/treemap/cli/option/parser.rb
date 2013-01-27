@@ -1,5 +1,5 @@
 module Skylab::Treemap
-  class CLI::DynamicOptionParser < ::OptionParser
+  class CLI::Option::Parser < ::OptionParser
 
   protected
 

@@ -8,6 +8,7 @@ require 'skylab/pub-sub/core'
 module Skylab::Treemap
   [ :Autoloader,
     :Headless,
+    :MetaHell,
     :Porcelain,
     :PubSub,
     :Treemap
@@ -16,8 +17,6 @@ module Skylab::Treemap
   end
 
   Bleeding = Porcelain::Bleeding
-
-  require_relative 'meta-hell'    # sorry, there is some wankiness [#003]
 
   extend MetaHell::Autoloader::Autovivifying::Recursive
 
