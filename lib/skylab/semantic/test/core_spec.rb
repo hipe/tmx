@@ -25,11 +25,35 @@ module Skylab::Semantic::TestSupport
       digraph[:child].is_names.should eql( [:parent] )
     end
 
-    it "did you know that you can use `has?`", f:true do
-      d = Semantic::Digraph.new :mineral, dog: :animal
-      (d.has?( :mineral ) && d.has?( :dog ) && d.has?( :animal )).should(
-        eql( true ) )
-      d.has?( :aardvark ).should eql( false )
+    context "there are Formal::Box-like accessors you can use:" do
+
+      it "did you know that you can use `has?`" do
+        d = Semantic::Digraph.new :mineral, dog: :animal
+        (d.has?( :mineral ) && d.has?( :dog ) && d.has?( :animal )).should(
+          eql( true ) )
+        d.has?( :aardvark ).should eql( false )
+      end
+
+      plant = -> do
+        d = Semantic::Digraph.new :plant, flower: :plant, bedillia: :flower
+        plant = -> { d }
+        d
+      end
+
+      it "you can use `names` like a Formal::Box - (is there even a flower called a `bedillia`?)" do
+        d = plant[]
+        names = d.names
+        names.should eql([:plant, :flower, :bedillia])
+        (d.names.object_id == names.object_id).should eql( false )
+      end
+
+      it "you can use `fetch` to fetch by name" do
+        d = plant[]
+        got = d.fetch :flower
+        got.name.should eql( :flower )
+        dont = d.fetch :animal do end
+        dont.should be_nil
+      end
     end
 
     context 'all ancestor names' do

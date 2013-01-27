@@ -32,6 +32,10 @@ module Skylab::Semantic
       nodes.map(&:describe).join "\n"
     end
 
+    def fetch name, &otherwise
+      @hash.fetch name, &otherwise
+    end
+
     def flatten nodes
       # return an emitter that yields, for each node in "node", each of its
       # "is-a" parents and then then node itself.  Each node is
@@ -50,6 +54,10 @@ module Skylab::Semantic
 
     def has? name
       @hash.key? name
+    end
+
+    def names
+      @order.dup
     end
 
     def node! name, predicates=nil # node! :ambiguous, is: :error
