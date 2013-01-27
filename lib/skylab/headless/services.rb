@@ -7,6 +7,7 @@ module Skylab::Headless
     o :File         , -> { require_relative 'services/file/core' }
     o :FileUtils    , -> { require 'fileutils'  ; ::FileUtils }
     o :Open3        , -> { require 'open3'      ; ::Open3 }
+    o :Open4        , -> { require_quietly 'open4'; ::Open4 }
     o :OptionParser , -> { require 'optparse'   ; ::OptionParser }
     o :Patch        , -> { require_relative 'services/patch/core' }
     o :PubSub       , -> { require 'skylab/pub-sub/core' ; ::Skylab::PubSub }
@@ -20,7 +21,7 @@ module Skylab::Headless
     end
 
     define_singleton_method :const_missing do |k|
-      x = h.fetch( k ).call
+      x = instance_exec(& h.fetch( k ))
       if true == x                             # (this makes a sketchy
         if const_defined? k, false             # assumption..)
           const_get k, false
@@ -33,6 +34,10 @@ module Skylab::Headless
         const_set k, x                         # stdlib module, now set it
         x                                      # as a constant of yours
       end
+    end
+
+    def self.require_quietly path
+      Headless::FUN.require_quietly[ path ]
     end
   end
 end
