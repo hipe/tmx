@@ -207,9 +207,14 @@ module Skylab::TestSupport::Quickie
       p and update_attributes!(p)
     end
 
-    no_method = -> actual, context do
-      context.fail "expected #{ actual.inspect } to have a #{
-        }`#{ context.expected_method_name }` method"
+    insp = -> x do # yeah..
+      str = x.inspect
+      str.length > 80 ? x.class.to_s : str # WHATEVER
+    end
+
+    no_method = -> context, predicate, actual do
+      context.fail "expected #{ insp[ actual ] } to have a #{
+        }`#{ predicate.expected_method_name }` method"
       nil
     end
 
@@ -218,10 +223,6 @@ module Skylab::TestSupport::Quickie
       include: [ "includes", "to include" ],
       nil:     [ "is nil", "to be nil" ]
     }
-
-    insp = -> x do # this is just a placeholder becuase we know
-      x.inspect # we might end up needing to fix all these file wide ..
-    end
 
     msgs = -> be_what, takes_args do
       pos, neg = omfg_h.fetch be_what.intern do |k|
@@ -263,7 +264,7 @@ module Skylab::TestSupport::Quickie
               context.fail fail_msg[ actual, self ]
             end
           else
-            no_method[ actual, self ]
+            no_method[ context, self, actual ]
           end
         end
       end
