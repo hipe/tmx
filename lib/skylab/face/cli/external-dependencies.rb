@@ -10,7 +10,7 @@ module Skylab::Face
       attr_reader :external_dependencies
       alias_method :external_dependencies_ivar, :external_dependencies
       def external_dependencies *a, &b
-        if a.length.nonzero? && ! bo
+        if a.length.nonzero? && ! b
           external_depedencies_ivar
         elsif external_dependencies_ivar.nil?
           self.class_eval(& Skylab::Dependency::Interface::CliCommands)

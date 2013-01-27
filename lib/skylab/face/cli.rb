@@ -87,6 +87,8 @@ module Skylab::Face
       @intern.to_s
     end
 
+    alias_method :action_name, :name # forward-fit
+
     def parse argv
       req = { }
       class << req
@@ -270,7 +272,7 @@ module Skylab::Face
           w = rows.map{ |d| d[:name].length }.inject(0){ |m, l| m > l ? m : l }
           fmt = "%#{w}s  "
           rows.each do |row|
-            if ! row[:lines]
+            if ! row[:lines] || row[:lines].length.zero?
               @out.puts "#{Indent}#{hi(fmt % row[:name])}.."
               next
             end
@@ -349,7 +351,10 @@ module Skylab::Face
             self.aliases = aliases.any? ? aliases.map(&:to_s) : nil
             x = class << self; self end
             x.send(:define_method, :inspect) { "#<#{name}:Namespace>" }
-            x.send(:alias_method, :to_s, :inspect)
+            class << self
+              alias_method :to_s, :inspect
+              attr_reader :external_depedencies_ivar
+            end
             class_eval(&block) if block
             self
           end
@@ -379,8 +384,14 @@ module Skylab::Face
           instance_variable_defined?('@parent') && @parent and fail("won't overwrite parent")
           @parent = parent
         end
+        attr_reader :summary
+        alias_method :summary_ivar, :summary
         def summary *a
-          a.any? ? (@summary = a) : (@summary || summary_of_commands)
+          if a.length.nonzero?
+            @summary = a
+          else
+            summary_ivar || summary_of_commands
+          end
         end
         def summary_of_commands
           a = command_tree.map { |c| hi(c.name) }

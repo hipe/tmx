@@ -5,10 +5,10 @@
 [#048] #open - singleton goes away
 [#047] #open #100.200 not here
 [#046] #open #100.200
-[#045] #open - audit legacy wiring like this or k.i.w.f
+[#045]       audit legacy wiring like this or k.i.w.f - keep it around for now
 [#044] #open - s.c#error ?
 [#043]       #done consider moving cli action
-[#042] #open 100.200 not here
+[#042]       "100.200 not here" i have no idea what it means but ..
 [#041] #open rename to `val`
 [#040] #open rename to `ick`
 [#039] #open wat

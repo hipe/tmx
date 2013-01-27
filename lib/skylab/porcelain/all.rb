@@ -358,6 +358,9 @@ module Skylab::Porcelain
       self.action_name ||= self.class.nameize(sym)
       super(sym)
     end
+    def name
+      aliases && aliases.first or action_name # compat with old face cli # #todo
+    end
     def name_syntax
       aliases or return action_name
       "{#{ [action_name, *aliases] * '|' }}"
@@ -382,6 +385,9 @@ module Skylab::Porcelain
     end
     def settings= ba
       ba.each { |b| instance_eval(&b) }
+    end
+    def summary # compat with really old all face cli ##todo
+      summary_lines || [ syntax ]
     end
     def syntax
       [name_syntax, option_syntax.to_str, argument_syntax.to_str].compact.join(' ')
@@ -1053,21 +1059,20 @@ module Skylab::Porcelain
 
                                   # (legacy spaghetti - make this work for tons
                                   # of different generations of other nerks)
-    resolve_initialization_parameters = -> name, params, block do
-      if ::Hash === params.first
-        param_h = params.shift
-        external_module_ref = param_h.delete :module # if any
-      else
-        param_h = { }
-        if ::Module === params.first
-          external_module_ref = params.shift
-        elsif params.first.respond_to? :call
-          external_module_ref = params.shift
-        end
+    resolve_initialization_parameters = -> name, param_a, block do
+      if ::Module === param_a.first
+        external_module_ref = param_a.shift
+      elsif param_a.first.respond_to? :call
+        external_module_ref = param_a.shift
       end
-      if params.length.nonzero?
+      if ::Hash === param_a.first
+        param_h = param_a.shift
+      end
+      if param_a.length.nonzero?
         raise ::ArgumentError.new "sorry - overloaded method signature fail"
       end
+      param_h ||= { }
+      external_module_ref ||= param_h.delete :module # if any
       if external_module_ref && block
         raise ::ArgumentError.new "can't have namespace defined in both #{
           }block and module"
@@ -1148,15 +1153,16 @@ module Skylab::Porcelain
     end
 
     def summary_lines
-      case @mode
-      when :external
-        if @external_module.respond_to?(:porcelain)
-          @external_module.porcelain.summary_lines
+      if :external == @mode
+        em = external_module
+        if em.respond_to? :porcelain
+          em.porcelain.summary_lines
         else
-          a = @external_module.command_tree.map(&:action_name) # watch the world burn
-          ["child commandz: {#{a.join('|')}}"]
+          a = em.command_tree.map(& :action_name) # watch the world burn
+          [ "child commandz: { #{a.join('|') }}" ]
         end
-      else              ;  fail("implement me")
+      else
+        fail "implement me - #{ @mode }"
       end
     end
 

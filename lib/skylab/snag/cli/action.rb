@@ -3,7 +3,11 @@ module Skylab::Snag
     ACTIONS_ANCHOR_MODULE = -> { CLI::Actions }
 
     def self.porcelain            # compat all.rb [#sg-010]
-      :porcelain_not_used
+      self
+    end
+
+    def self.summary_lines        # wicked old ways [#sg-010]
+      nil
     end
   end
 

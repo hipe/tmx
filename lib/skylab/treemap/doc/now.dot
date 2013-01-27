@@ -23,13 +23,11 @@ _tmp [label="_tmp-r-data move\n[#013]"]
 abstract [label="abstract tabular\n[#018]"]
 adapter [label="adapter arch\n[#017]"]
 adapters [label="adapters need a core.rb\n[#049]"]
-audit_2 [label="audit legacy wiring\n[#045]"]
 audit [fillcolor="#79f233", label="audit method visibility\n[#008]"]
 cli [label="cli audit org wide\n[#016]"]
 easy [label=easy]
 existing [label="existing tests\n[#007]"]
 get [fillcolor="#79f233", label="get cli working\n[#006]"]
-legacy [label="legacy macro wiring\n[#042]"]
 much [label="much later"]
 name [label="name func away\n[#023]"]
 option [label="option parser\n[#014]"]
@@ -39,7 +37,6 @@ _tmp -> easy
 abstract -> much
 adapters -> adapter
 audit -> existing
-audit_2 -> legacy
 cli -> existing
 existing -> get
 node -> stylus

@@ -1,4 +1,4 @@
-require_relative '../../../treemap/cli'
+require_relative '../../../treemap/core'
 
 module Skylab
   module Tmx
@@ -8,5 +8,3 @@ module Skylab
     end
   end
 end
-
-

@@ -118,7 +118,6 @@ module Skylab::Treemap
 
   class << CLI
     def build_client_instance request_client, slug # [#045] - - audit legacy ..
-      fail 'wat i hate you'
       new do |c|
         c.program_name = slug
         c.on_error   { |e| request_client.emit(:error, e) }
@@ -133,7 +132,6 @@ module Skylab::Treemap
     end
 
     def porcelain # [#047] - #100.200 not here
-      fail 'wat i hate you'
       self
     end
 

@@ -1,4 +1,4 @@
-require_relative '../../../cov-tree/cli'
+require_relative '../../../cov-tree/core'
 
 module Skylab
   module Tmx
@@ -8,4 +8,3 @@ module Skylab
     end
   end
 end
-

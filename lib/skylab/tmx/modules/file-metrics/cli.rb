@@ -1,4 +1,4 @@
-require 'skylab/file-metrics/cli'
+require 'skylab/file-metrics/core'
 
 module Skylab
   module Tmx
