@@ -1,5 +1,5 @@
 module Skylab::Treemap
-  class Model::Proxy < ::BasicObject
+  class Services::Proxy < ::BasicObject
     # makes a generic proxy class that makes generic proxy objects
     # that proxy calls ..
 

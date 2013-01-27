@@ -15,8 +15,8 @@ module Skylab::Treemap::TestSupport
   end
 end
 
-module Skylab::Treemap::TestSupport::MetaHell
-  ::Skylab::Treemap::TestSupport[ MetaHell_TestSupport = self ]
+module Skylab::Treemap::TestSupport::Services
+  ::Skylab::Treemap::TestSupport[ Services_TestSupport = self ]
 
   include CONSTANTS
 
@@ -36,7 +36,7 @@ module Skylab::Treemap::TestSupport::MetaHell
         "inner-bang:(#{ x })"
       end
 
-      pxy_cls = Treemap::MetaHell::Proxy.new bang: -> x do
+      pxy_cls = Treemap::Services::Proxy.new bang: -> x do
         "outer-bang:(#{ x })"
       end
 
