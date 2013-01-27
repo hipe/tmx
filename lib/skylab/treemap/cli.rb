@@ -126,12 +126,12 @@ module Skylab::Treemap
         c.on_payload { |e| request_client.emit(:payload, e) }
         c.do_stylize = request_client.err.tty?
         if runtime_instance_setting
-          runtime_instance_settings.call c # [#046] - #100.200
+          runtime_instance_settings.call c # [#046] - #100.200 pure eyeblood
         end
       end
     end
 
-    def porcelain # [#047] - #100.200 not here
+    def porcelain # [#047] - #100.200 we do not want this here
       self
     end
 

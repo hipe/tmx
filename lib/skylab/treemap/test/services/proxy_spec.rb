@@ -1,19 +1,4 @@
-# side-stepping parent for now
-
-require_relative '../../core'
-require 'skylab/test-support/core'
-
-module Skylab::Treemap::TestSupport
-
-  @dir_path = ::Pathname.new( '../..' ).expand_path( __FILE__ ).to_s # while side-stepping
-
-  ::Skylab::TestSupport::Regret[ self ]
-
-  module CONSTANTS
-    TestSupport = ::Skylab::TestSupport
-    Treemap = ::Skylab::Treemap
-  end
-end
+require_relative '../test-support'
 
 module Skylab::Treemap::TestSupport::Services
   ::Skylab::Treemap::TestSupport[ Services_TestSupport = self ]

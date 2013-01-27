@@ -175,7 +175,7 @@ module Skylab::Treemap
       end
     end
 
-    attr_reader :hot_name # weird design [#009]
+    attr_reader :hot_name
 
     def load_hot_class err=nil                 # expect params to expand
       res = nil
@@ -191,9 +191,6 @@ module Skylab::Treemap
 
     attr_reader :name_function_function  # this is duplicated by motes
 
-                                            # called by `set_adapter_name` (why?)
-                                            # weird design [#009]
-
     define_method :fuzzy_match_name do |name|
       name = fun.normalize_to_dashed_slug[ name ]
       found = @order.grep( /^#{ ::Regexp.escape name }/ )
@@ -207,7 +204,7 @@ module Skylab::Treemap
       @order.dup
     end
 
-    def set_hot_name name         # [#009] weird design (was?)
+    def set_hot_name name
       @hash.fetch name do |k|
         raise ::KeyError, "adapter name is not in collection: #{ k.inspect }"
       end

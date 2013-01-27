@@ -1,23 +1,22 @@
 [#052] #open invert is broken so stops are broken
-[#051] #open - legcy test wiring
+[#051]       #done - legacy test wiring
 [#050] #open - stylus wiring is bad and wrong
 [#049]       #done adapters need a core.rb
 [#048] #open - singleton goes away
-[#047] #open #100.200 not here
-[#046] #open #100.200
+[#047]       #postponed #100.200 we do not want this here not here - legacy
+[#046]       #postponed #100.200 - pure eyblood
 [#045]       audit legacy wiring like this or k.i.w.f - keep it around for now
 [#044] #open - s.c#error ?
 [#043]       #done consider moving cli action
 [#042]       "100.200 not here" i have no idea what it means but ..
 [#041] #open rename to `val`
 [#040] #open rename to `ick`
-[#039] #open wat
+[#039] #open track the ridiculousness of more-ness
 [#038] #open saying "dumarize" is so ugly)
 [#037] #open kill this with fire, i mean no.
 [#036]       #done - rename to op:docmtr
-[#035] #open checking for help invite at action level might not be necessa
-             ry
-[#034] #open look at what this is
+[#035] #open checking for help invite at action level might not be necessary
+[#034] #open look at what this is - definately boxxy tiem
 [#033] #open - go it away, singleton
 [#032]       #done #move api client - it's the bulk of the file
 [#031]       #done - Tempdir emits events it is a m.c and rename to Tmpdir to be
@@ -46,12 +45,12 @@
 [#012]       #tracking-tag all purpose legacy (porcelain) marker
 [#011] #open unacceptable stylus wiring
 [#010] #open #tracking-tag once we get hl sub-client in here
-[#009] #open this weird design
+[#009]       #done weird design
 [#008]       #done audit public / private
-[#007] #open existing tests working again
+[#007]       #done existing tests working again
 [#006]       #done get cli working again
 [#005] #open verbose mode
-[#004] #open rid of Skylab constants everywhere
+[#004]       #done rid of Skylab constants everywhere
 [#003]       #while name collision with MetaHell
 [#002]       #done make core.rb
 [#sl-102] #open 2012-06-08 #open treemap, ofc!

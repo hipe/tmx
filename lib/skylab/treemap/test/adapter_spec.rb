@@ -1,22 +1,40 @@
-describe "#{ Skylab::Treemap::Adapter } whackily hand-written sub_ext" do
-  let(:re) { ::Skylab::Treemap::Adapter::FUN.extname_rx }
-  let(:match_data) { re.match(input) }
-  let(:subject) { md = match_data || {} ; [md[:stem], md[:extname]] }
-  def self.this input, output, *rest
-    context(input.inspect) do
-      let(:input) { input }
-      specify { should eql(output) }
+require_relative 'test-support'
+
+module Skylab::Treemap::TestSupport
+
+  describe "#{ Skylab::Treemap::Adapter } whackily hand-written sub_ext" do
+
+    rx = Treemap::Adapter::FUN.extname_rx
+
+    let( :match_data ) { rx.match input }
+
+    null_a = [ nil, nil ]
+
+    let :subject do
+      ( md = match_data ) ? [ md[:stem], md[:extname] ] : null_a
     end
-  end
-  context "matches the set of all strings" do
-    this '', ['', nil]
-    this '.', ['', '.']
-    this '..', ['.','.']
-    this '...', ['..','.']
-    this '.abc', ['', '.abc']
-    this 'abc.', ['abc', '.']
-    this 'foo', ['foo', nil]
-    this 'foo.bar', ['foo', '.bar']
-    this 'foo.bar.baz', ['foo.bar', '.baz']
+
+    def self.o input, output, *rest
+      context "#{ input.inspect }" do
+        let :input do
+          input
+        end
+        specify do
+          should eql( output )
+        end
+      end
+    end
+
+    context "matches the set of all strings" do
+      o '', ['', nil]
+      o '.', ['', '.']
+      o '..', ['.','.']
+      o '...', ['..','.']
+      o '.abc', ['', '.abc']
+      o 'abc.', ['abc', '.']
+      o 'foo', ['foo', nil]
+      o 'foo.bar', ['foo', '.bar']
+      o 'foo.bar.baz', ['foo.bar', '.baz']
+    end
   end
 end
