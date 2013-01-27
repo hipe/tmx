@@ -1,7 +1,7 @@
 [#052] #open invert is broken so stops are broken
 [#051] #open - legcy test wiring
 [#050] #open - stylus wiring is bad and wrong
-[#049] #open adapters need a core.rb
+[#049]       #done adapters need a core.rb
 [#048] #open - singleton goes away
 [#047] #open #100.200 not here
 [#046] #open #100.200
@@ -37,12 +37,12 @@
              progressive validation errors (may be a feature, may be a smell)
 [#019]       #feature-point the stylus that is not hot
 [#018] #open abstract tabular instead of csv
-[#017] #open adapters should all have at least a core.rb, autoloadify thin
-             gs!
+[#017]       #done adapters should all have at least a core.rb, autoloadify thin
+             gs! (actually not necessary, a.l descends down)
 [#016] #open big dep graph audit of all cli on all subproducts
 [#015]       #tracking-tag special treatment of help option in reflecion
 [#014] #open a whole file just on things i want to fix wih o.p
-[#013] #open consider moving _tmp-r-data/ -> data/intermediate
+[#013]       #done consider moving `_tmp-r-data/` -> data/intermediate
 [#012]       #tracking-tag all purpose legacy (porcelain) marker
 [#011] #open unacceptable stylus wiring
 [#010] #open #tracking-tag once we get hl sub-client in here

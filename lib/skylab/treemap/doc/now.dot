@@ -19,10 +19,7 @@ label="Treemap Focus"
 
 node [label="\N", style="filled", fillcolor="#b5d5fb", fontname="Futura", penwidth="1.1566", shape="Mrecord"]
 node [label="[#050]"]
-_tmp [label="_tmp-r-data move\n[#013]"]
 abstract [label="abstract tabular\n[#018]"]
-adapter [label="adapter arch\n[#017]"]
-adapters [label="adapters need a core.rb\n[#049]"]
 audit [fillcolor="#79f233", label="audit method visibility\n[#008]"]
 cli [label="cli audit org wide\n[#016]"]
 easy [label=easy]
@@ -33,9 +30,7 @@ name [label="name func away\n[#023]"]
 option [label="option parser\n[#014]"]
 singleton [label="singleton away\n[#033]"]
 stylus [label="stylus wiring\n[#011]"]
-_tmp -> easy
 abstract -> much
-adapters -> adapter
 audit -> existing
 cli -> existing
 existing -> get

@@ -20,7 +20,7 @@ module Skylab::Treemap
     attribute :force
     attribute :inpath, path: true, required: true
     attribute :outpath_requires_force, default: true
-    attribute :tmpdir_path, default: -> { ::Pathname.pwd.join '_tmp-r-data' }
+    attribute :tmpdir_path, default: -> { ::Pathname.pwd.join 'data/intermediate' }
     attribute :stop_after, enum: order_a
     attribute :title, default: 'Treemap Tiem'
 

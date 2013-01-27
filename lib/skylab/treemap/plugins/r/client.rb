@@ -1,14 +1,4 @@
 module Skylab::Treemap
-  module Plugins::R # [#049] - adapters need a core.rb
-    extend Autoloader
-    module CLI
-      module Actions
-        extend MetaHell::Autoloader::Autovivifying
-        extend Bleeding::Stubs
-      end
-    end
-  end
-
   class Plugins::R::Client
     # gotchas: + pattern of emitting a path: everywhere as metadata
 
