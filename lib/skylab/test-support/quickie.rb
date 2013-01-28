@@ -258,7 +258,7 @@ module Skylab::TestSupport::Quickie
         pass_msg, fail_msg = msgs[ md[:be_what], takes_args ]
         klass.define_method :match do |actual|
           if actual.respond_to? meth
-            if actual.send meth, *args
+            if actual.send meth, * self.args
               context.pass -> { pass_msg[ actual, self ] }
             else
               context.fail fail_msg[ actual, self ]

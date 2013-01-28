@@ -12,14 +12,7 @@ module Skylab::Headless::TestSupport::CLI::Box::DSL
     # ~ Part 1. Functions. ~      # these are nice because its easier at
                                   # a glance to see a function's dependencies
 
-    memoize = -> func do
-      use = -> do
-        x = func.call             # actually call the client initializer
-        use = -> { x }            # memoize the result for subsequent calls
-        x
-      end
-      -> { use.call }
-    end
+    memoize = MetaHell::FUN.memoize
 
     acts_class = -> const, nlam, block=nil do
       cls = DSL_TestSupport.const_set const, ::Class.new

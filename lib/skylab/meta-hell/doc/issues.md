@@ -1,3 +1,4 @@
+[#016]       #tracking-tag wow hash-like iterators are sure annoying
 [#015]       #tracking-tag early deep-copy vs. lazy deep-copy of defaults
 [#014]       #tracking-tag #attr #doc-point dup[e]ing behavior
 [#013]       #done move porcelain attribtues to here, then clean up
@@ -10,6 +11,6 @@
 [#006]       #note core dumps happen here with super
 [#005]       #done second rewrite
 [#004]       #done #refactor look for opportunities to rid of `meta_hell` prefix
-[#003]       #done consider scrapping _f name convention for..
+[#003]       #done consider scrapping `_f` name convention for..
 [#002]       #done instance method klass creator tests
 [#001]       #done metahell tests and resolve #kick issue maybe
