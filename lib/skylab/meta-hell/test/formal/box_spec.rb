@@ -54,7 +54,8 @@ module ::Skylab::MetaHell::TestSupport::Formal::Box
       end
     end
 
-    context "honeybadger does advanced tricks" do
+    context "honeybadger does advanced tricks - #{
+      }arity IS an argument" do
 
       subject -> do
         box = new_modified_box
@@ -64,16 +65,19 @@ module ::Skylab::MetaHell::TestSupport::Formal::Box
         box
       end
 
-      it "this is kind of weird: - arity IS an argument" do
+      it "select with 1 arg" do
         x1 = subject.select do |x|
           [:One, :Five].include? x
-        end
+        end.to_a
+        x1.length.should eql( 2 )
+        x1.first.should be_kind_of(::Symbol)
+      end
+
+      it "select with 2 args" do
         x2 = subject.select do |k, v|
           [:One, :Five].include? v
-        end
-        x1.length.should eql( 2 )
+        end.to_a
         x2.length.should eql( 2 )
-        x1.first.should be_kind_of(::Symbol)
         x2.first.should be_kind_of(::Array)
       end
     end
@@ -114,6 +118,24 @@ module ::Skylab::MetaHell::TestSupport::Formal::Box
         rescue ::KeyError => e
         end
         e.to_s.should match( /value not found matching <#Proc.*box_spec/ ) # EEK
+      end
+    end
+
+    context "canonicals - reduce" do
+
+      subject -> do
+        box = new_modified_box
+        box.add :aa, :AA
+        box.add :bbb, :B
+        box.add :c, :CCC
+        box
+      end
+
+      it "is tricky - reduce, 2 arg form", f:true do
+        a = subject.reduce [] do |m, (k, v)|
+          m << v if :bbb == k or :CCC == v ; m
+        end
+        a.should eql( [ :B, :CCC ] )
       end
     end
   end

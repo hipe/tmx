@@ -326,10 +326,8 @@ module Skylab::Headless
       # if we will ever need both! (leaf/branch hybrid)
     end
 
-    methodize = Autoloader::Inflection::FUN.methodize
-
-    define_method :leaf_method_name do
-      methodize[ normalized_local_action_name ]
+    def leaf_method_name
+      normalized_local_action_name_as_method_name
     end
   end
 end

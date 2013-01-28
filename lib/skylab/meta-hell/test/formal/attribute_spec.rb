@@ -1,31 +1,14 @@
-require_relative 'test-support'
+require_relative 'attribute/test-support'
 
 require 'set'
 
-module ::Skylab::MetaHell::TestSupport::Formal
-  module Methods
-    include CONSTANTS
-    define_method :one_such_class do |&block|
-      kls = Formal_TestSupport.const_set "KLS_#{ FUN.next_id[] }", ::Class.new
-      kls.class_eval do
-        extend MetaHell::Formal::Attribute::Definer
-        class_exec(& block )
-      end
-      kls
-    end
-  end
-
-  module ModuleMethods
-    include Methods
-  end
-
-  module InstanceMethods
-    include Methods
-  end
+module ::Skylab::MetaHell::TestSupport::Formal::Attribute
+  # Quickie.
+  #
 
   describe MetaHell::Formal::Attribute::Definer do
-    extend Formal_TestSupport::ModuleMethods
-    include Formal_TestSupport::InstanceMethods
+    extend Attribute_TestSupport::ModuleMethods
+    include Attribute_TestSupport::InstanceMethods
 
     it "creates getter/setters on classes" do
       klass = one_such_class do

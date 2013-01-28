@@ -10,11 +10,6 @@ module ::Skylab::MetaHell::TestSupport::Formal::Box
   module ModuleMethods
     include CONSTANTS
 
-    def subject func
-      define_method :subject, & MetaHell::FUN.memoize[ func ]
-      nil
-    end
-
     def new_modified_box
       box = MetaHell::Formal::Box.new
       class << box

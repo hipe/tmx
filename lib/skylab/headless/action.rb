@@ -39,7 +39,13 @@ module Skylab::Headless
     def normalized_local_action_name
       normalized_action_name.last
     end
-  end
+
+    methodize = Autoloader::Inflection::FUN.methodize
+
+    define_method :normalized_local_action_name_as_method_name do # this is used
+      methodize[ normalized_local_action_name ] # by dsl sublibrary and by
+    end                           # external subproducts. it shouldn't be too
+  end                             # hard to search for occurences of it
 
 
   module Action::InstanceMethods
@@ -70,6 +76,10 @@ module Skylab::Headless
 
     def normalized_local_action_name
       self.class.normalized_local_action_name
+    end
+
+    def normalized_local_action_name_as_method_name
+      self.class.normalized_local_action_name_as_method_name
     end
 
     def summary_line              # simple, modality-agnostic nerk

@@ -482,21 +482,11 @@ module ::Skylab::MetaHell
     public :dupe                  # definer calls this directly
 
     def with mattr_name, &block
-      enum = nil                  # (this can't be right, watch [#016])
-      enum = Formal::Box::Enumerator.new do |y|
-        yld = if 1 == enum.block_arity
-          -> o { y << o }
-        else
-          -> o { y.yield o.normalized_name, o }
-        end
-        each do |o|
-          if o.has? mattr_name
-            yld[ o ]
-          end
-        end
-        nil
+      ea = each
+      ea2 = ea.filter -> k, v do
+        v.has? mattr_name
       end
-      block ? enum.each(& block ) : enum
+      ea2.each(& block)
     end
 
   protected

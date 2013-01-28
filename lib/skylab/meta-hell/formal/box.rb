@@ -7,12 +7,13 @@ module Skylab::MetaHell
                                   # (this list is here so it can be near the
                                   # other one but it might not be yet used
                                   # here. very #exploratory/#experimental:)
-    canonical_methods = [ :detect, :each, :map, :reduce, :select ].freeze
+    canonical_derived_methods = [ :map, :select ].freeze
 
-    define_singleton_method :canonical_methods do canonical_methods end
-
+    define_singleton_method :canonical_derived_methods do
+      canonical_derived_methods
+    end
                                   # convenience delegators to the enumerator
-    [ :detect, :defectch, :map, :reduce, :select ].each do |m|  # +1 -1
+    [ :detect, :defectch, :filter, :map, :reduce, :select ].each do |m|
       define_method m do |*a, &b|
         each.send m, *a, &b
       end
@@ -21,9 +22,9 @@ module Skylab::MetaHell
     def each *a, &b
       Formal::Box::Enumerator.new( -> y do
         @order.each do |k|
-          y.yield k, @hash.fetch( k )
+          y.yield k, @hash.fetch( k ) # always give the yielder 2 args (norm'd)
         end
-      end ).each( *a, &b )
+      end )._each( *a, &b )
     end
 
     def fetch key, &otherwise
@@ -134,11 +135,57 @@ module Skylab::MetaHell
     # this exists a) because it makes sense to use enumerator for enumerating
     # and b) to wrap up all the crazines we do with hash-like iteration
 
-    Formal::Box.canonical_methods.each do |m|
-      define_method m do |*a, &b|
-        b && ! @arity_set and base_arity_around b
-        super( *a, &b )
+    def _each &func # just saves us from making 1 extra object
+      if func
+        each( &func)
+      else
+        self
       end
+    end
+
+    ONE_ = -> k, v { [ v ] }
+
+    TWO_ = ->( *a ) { a }
+
+    norm_h = ::Hash.new do |h, k|
+      raise ::ArgumentError, "arity not supported: #{ k }"
+    end
+
+    norm_h[1]  = ONE_
+    norm_h[-1] = ONE_
+    norm_h[2]  = TWO_
+
+    define_method :each do |&func|
+      if func
+        if @arity_override
+          arity = @arity_override
+          @arity_override = nil
+        else
+          arity = func.arity
+        end
+        normalize = norm_h[ arity ]
+        super( & -> k, v do
+          func[ * normalize[ k, v ] ]
+        end )
+      else
+        super( )
+      end
+    end
+
+    Formal::Box.canonical_derived_methods.each do |m|
+      define_method m do |&func|
+        if func && 2 == func.arity
+          @arity_override = 2
+          super(& func )
+        else
+          super(& func )
+        end
+      end
+    end
+
+    def reduce *a, &func          # this one is tricky - we have to err on
+      @arity_override = 2 if func # the side of being hash-like
+      super(*a, &func)
     end
 
     # defectch - fetch-like detect
@@ -153,15 +200,18 @@ module Skylab::MetaHell
     # Whether or not using this constitues a smell is left to the discretion
     # of the user.
 
-    def defectch key_func, else_func=nil
-      base_arity_around key_func
-      is_found = nil
-      res = normalized_detect( -> args do
-        b = key_func[ *args ]
-        b and is_found = true
-        b
-      end )
-      if is_found
+    define_method :defectch do |key_func, else_func=nil|
+      @arity_override = 2 # you want the below detect to always get 2
+      norm = norm_h[ key_func.arity ]
+      found = res = nil
+      detect do |k, v|
+        if key_func[ * norm[ k, v ] ]
+          found = true
+          res = 2 == key_func.arity ? [ k, v ] : v
+          true
+        end
+      end
+      if found
         res
       elsif else_func
         else_func[]
@@ -171,80 +221,31 @@ module Skylab::MetaHell
       end
     end
 
+    define_method :filter do |func|
+      normalize = norm_h[ func.arity ]
+      outer = self
+      inner = self.class.new( -> normal_yielder do
+        outer.each do |k, v|
+          if func[ * normalize[ k, v ] ]
+            normal_yielder.yield k, v
+          end
+        end
+      end )
+      inner
+    end
+
   protected
 
     alias_method :metahell_original_initialize, :initialize
 
     def initialize func
       super(& method( :visit ) )
-      @arity_set = nil
-      @func = func
-    end
-
-    def base_arity_around b
-      @hot_arity = b.arity
-      @arity_set = true
-      nil
-    end
-
-    def dupe *arity
-      new = self.class.allocate
-      f = @func
-      new.instance_exec do
-        metahell_original_initialize(& method( :visit ) )
-        @func = f
-        if arity.length.nonzero?
-          @hot_arity = arity.first
-          @arity_set = true
-        else
-          @arity_set = nil
-        end
-        nil
-      end
-      new
-    end
-
-    def normalized_detect normalized_upstream
-      filter = if 2 == @hot_arity
-        ->( ( k, v) ) do
-          normalized_upstream[ [ k, v ] ]
-        end
-      else
-        -> v do
-          normalized_upstream[ [ v ] ]
-        end
-      end
-      otr = dupe @hot_arity # #todo this might not be necessary
-      k, v = otr.detect(& filter )
+      @arity_override = nil
+      @normalized_yielder_consumer = func
     end
 
     def visit y
-      arity = @arity_set ? @hot_arity : -1
-      case arity
-      when 1, -1
-        @func[ Formal::Box::Enumerator::Yielder.new -> args do
-          y << args[ 1 ] # hm..
-        end ]
-      when 2
-        @func[ y ]
-      else
-        raise ::ArgumentError, "arity? #{ arity } (did you go thru each?)"
-      end
-    end
-  end
-
-  class Formal::Box::Enumerator::Yielder # proxies 1 or -1 args blocks
-
-    def yield *x                  # accept user's strange args
-      @func[ x ]
-    end
-
-    alias_method :<<, :yield
-
-  protected
-
-    def initialize func
-      @func = func
+      @normalized_yielder_consumer[ y ]
     end
   end
 end
