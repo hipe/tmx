@@ -1,3 +1,4 @@
+[#017] #open corral tees
 [#016]       #tracking-tag wow hash-like iterators are sure annoying
 [#015]       #tracking-tag early deep-copy vs. lazy deep-copy of defaults
 [#014]       #tracking-tag #attr #doc-point dup[e]ing behavior
