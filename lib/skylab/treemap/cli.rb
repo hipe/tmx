@@ -46,7 +46,7 @@ module Skylab::Treemap
       nil
     end
 
-    include Treemap::Adapter::API_Action::InstanceMethods # not all s.c should
+    include Treemap::Adapter::InstanceMethods::API_Action # not all s.c should
 
     def actions                   # compat - legacy and kewl
       a = [ Bleeding::Constants[ action_anchor_module ] ]

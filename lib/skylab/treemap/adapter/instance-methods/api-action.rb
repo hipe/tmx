@@ -1,5 +1,5 @@
 module Skylab::Treemap
-  module Adapter::API_Action::InstanceMethods # (was [#024])
+  module Adapter::InstanceMethods::API_Action # (was [#024])
     include Treemap::Core::SubClient::InstanceMethods
 
   protected
