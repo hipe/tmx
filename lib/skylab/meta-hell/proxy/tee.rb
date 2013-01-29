@@ -73,8 +73,8 @@ module Skylab::MetaHell
 
     def dispatch method, args, func
       res = seen = nil
-      @box.each do |x|
-        r = x.send method, *args, &func
+      @box.each do |x|            # (if the receiver is a ::BasicObject it
+        r = x.__send__ method, *args, &func # won't have plain old `send`)
         seen ||= begin
           res = r
           true

@@ -1,13 +1,13 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
-module Skylab::Treemap::TestSupport::Services
-  ::Skylab::Treemap::TestSupport[ Services_TestSupport = self ]
+module Skylab::MetaHell::TestSupport::Proxy::Filter
+  ::Skylab::MetaHell::TestSupport::Proxy[ Filter_TestSupport = self ]
 
   include CONSTANTS
 
   extend TestSupport::Quickie
 
-  describe "#{ Treemap }::MetaHell::Proxy" do
+  describe "#{ MetaHell }::Proxy::Filter::Post" do
 
     it 'proxies nerks to a reciever, possibly wrapping them' do
 
@@ -21,7 +21,7 @@ module Skylab::Treemap::TestSupport::Services
         "inner-bang:(#{ x })"
       end
 
-      pxy_cls = Treemap::Services::Proxy.new bang: -> x do
+      pxy_cls = MetaHell::Proxy::Filter::Post.new bang: -> x do
         "outer-bang:(#{ x })"
       end
 

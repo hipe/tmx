@@ -1,7 +1,24 @@
-module Skylab::Treemap
-  class Services::Proxy < ::BasicObject
-    # makes a generic proxy class that makes generic proxy objects
-    # that proxy calls ..
+module Skylab::MetaHell
+
+  module Proxy::Filter
+  end
+
+  class Proxy::Filter::Post < ::BasicObject
+
+    # post-filter.
+    # makes a generic proxy class that makes a generic proxy objects that
+    # is constructed with one upstream. Although it is the proxy wall that
+    # receives the message before the upstream does, here is why it is called
+    # an upstream and not a downstream: for a certain subset of methods,
+    # whatever that upstream passes back as a result, the proxy object runs
+    # it through a function of the user's creation.
+    #
+    # that pairing of method names with functions is accomplished by a hash
+    # that is passed during production of the proxy _class_.
+    #
+    # Amusingly we don't know why we originally wrote this anymore (it
+    # came from super legacy tan-man and stayed on top of refactorings b/c
+    # it was well tested.) but not matter, it is here if we ever need it.
 
     class << self
       alias_method :treemap_original_new, :new
