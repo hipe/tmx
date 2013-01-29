@@ -1,5 +1,6 @@
-module Skylab::Slake::TestSupport
-  class Tee < ::Hash
+module Skylab::MetaHell
+  class Proxy::Tee < ::Hash
+
     %w(puts write).each do |meth|
       define_method meth do |*a|
         each do |k, v|
@@ -7,7 +8,9 @@ module Skylab::Slake::TestSupport
         end
       end
     end
+
   protected
+
     def initialize hash
       hash.each do |k, v|
         self[k] = v

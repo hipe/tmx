@@ -9,5 +9,11 @@ module Skylab::Slake::TestSupport
     FIXTURES_DIR = "#{ TEST_ROOT_DIR }/fixtures"
     TMP_DIR = File.expand_path '../../../../../tmp', __FILE__
     TEST_BUILD_DIR = ::File.join(TMP_DIR, 'build_dir')
+
+    MetaHell = ::Skylab::MetaHell
   end
+
+  include CONSTANTS
+
+  MetaHell = MetaHell             # (prettier from support classes below)
 end
