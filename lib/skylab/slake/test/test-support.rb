@@ -10,10 +10,10 @@ module Skylab::Slake::TestSupport
     TMP_DIR = File.expand_path '../../../../../tmp', __FILE__
     TEST_BUILD_DIR = ::File.join(TMP_DIR, 'build_dir')
 
-    MetaHell = ::Skylab::MetaHell
+    Headless = ::Skylab::Headless
   end
 
   include CONSTANTS
 
-  MetaHell = MetaHell             # (prettier from support classes below)
+  Headless = Headless  # (prettier from support classes below)
 end

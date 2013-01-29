@@ -9,6 +9,14 @@ module Skylab::MetaHell::TestSupport
     TestSupport = ::Skylab::TestSupport
   end
 
+  module ModuleMethods
+    include CONSTANTS
+    def memoize name, func
+      define_method name, & MetaHell::FUN.memoize[ func ]
+      nil
+    end
+  end
+
   module InstanceMethods
     include CONSTANTS
     extend MetaHell::Let

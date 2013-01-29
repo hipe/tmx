@@ -10,12 +10,13 @@ module Skylab::Slake::TestSupport
       end
     end
 
-    tee = -> silent, stream do # #todo after [#mh-017] clean this up, use box-like add
-      if silent
-        MetaHell::Proxy::Tee.new buffer: ::StringIO.new
-      else
-        MetaHell::Proxy::Tee.new stream: stream, buffer: ::StringIO.new
+    new_tee = -> silent, stream do
+      tee = Headless::IO::Interceptors::Tee.new
+      tee[:buffer] = ::StringIO.new
+      if ! silent
+        tee[:stream] = stream
       end
+      tee
     end
 
     opt_h_h = {
@@ -25,9 +26,10 @@ module Skylab::Slake::TestSupport
     }
 
     define_method :initialize do |opt_h=nil|
+      @silent = nil
       opt_h.each { |k, v| instance_exec( v, & opt_h_h.fetch( k ) ) } if opt_h
-      @out ||= tee[ silent, $stdout ]
-      @err ||= tee[ silent, $stderr ]
+      @out ||= new_tee[ silent, $stdout ]
+      @err ||= new_tee[ silent, $stderr ]
     end
   end
 end

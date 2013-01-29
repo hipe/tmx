@@ -1,6 +1,11 @@
 module Skylab::Headless
 
-  class IO::Interceptors::Tee < ::Struct.new :downstreams
+  class IO::Interceptors::Tee < MetaHell::Proxy::Tee.new(
+    :<<,
+    :puts,
+    :rewind,                      # not all IO have this, us at own risk
+    :truncate,                    # idem
+    :write )
 
     # Inspired by (but probably not that similar to) Perl's IO::Tee,
     # an IO::Interceptors::Tee is a simple multiplexer that intercepts
@@ -9,40 +14,8 @@ module Skylab::Headless
     #
     # Tee represents its downstream listeners as (effectively) elements
     # of an ordered hash; that is, they are ordered and can be referenced
-    # by their symbol.
-
+    # by their symbol (this is called a "Box" around these parts).
 
     include Headless::IO::Interceptor::InstanceMethods
-
-    [:<<,
-     :puts,
-     :rewind,                     # not all IO have this, us at own risk
-     :truncate,                   # idem
-     :write
-    ].each do |m|
-      define_method m do |*a, &b|
-        downstreams.each { |o| o.send(m, *a, &b) }
-      end
-    end
-
-    def [] key # #gigo
-      downstreams[@hash[key]]
-    end
-
-    def []= key, value
-      downstreams[@hash[key] ||= downstreams.length] = value
-    end
-
-    def has? k
-      @hash.key? k
-    end
-
-  protected
-
-    def initialize downstreams_h=nil
-      super []
-      @hash = { }
-      downstreams_h and downstreams_h.each { |k, v| self[k] = v }
-    end
   end
 end
