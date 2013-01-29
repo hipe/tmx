@@ -1,3 +1,4 @@
+[#018] #open corral proxies
 [#017]       #done corral tees
 [#016]       #tracking-tag wow hash-like iterators are sure annoying
 [#015]       #tracking-tag early deep-copy vs. lazy deep-copy of defaults
