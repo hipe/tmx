@@ -113,7 +113,7 @@ module Skylab::Treemap
   end
 
   module CLI::Actions
-    extend Bleeding::Stubs
+    extend MetaHell::Boxxy
   end
 
   class << CLI

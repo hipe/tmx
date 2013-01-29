@@ -106,6 +106,8 @@ module Skylab
             fail "Autoloader hack failed: #{ e }"
           end
         end
+
+        nil
       end
     end.call
 

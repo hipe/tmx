@@ -16,6 +16,6 @@ module Skylab::Treemap
 
   module Plugins::FooBar::CLI::Actions
     extend MetaHell::Autoloader::Autovivifying
-    extend Bleeding::Stubs
+    extend MetaHell::Boxxy
   end
 end
