@@ -30,7 +30,7 @@ module Skylab::Treemap
 
     option_syntax.more :s, -> o do
       fa = api_action.formal_attributes
-      stop, impl = [ :stops_after, :stop_implied ].map { |x| fa.box_reduce x }
+      stop, impl = [ :stops_after, :stop_implied ].map { |x| fa.meta_attribute_value_box x }
       ks = stop.names - impl.names
       o << "(can appear after #{ and_ ks.map { |k| param k } }) #{
           }(implied after #{ and_ impl.names.map { |k| param k } })"

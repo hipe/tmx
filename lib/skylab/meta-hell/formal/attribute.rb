@@ -455,6 +455,8 @@ module ::Skylab::MetaHell
 
     public :accept                # (used in definer logic)
 
+    public :dupe                  # definer calls this directly
+
     # result is a new box whose every element represents every element from
     # this box that has? `metaattribute`. Every element in the result box
     # will have a name that corresponds to the name used for the original
@@ -463,10 +465,11 @@ module ::Skylab::MetaHell
     #   Foo.attributes #=>
     #     {:age=>{:default=>1}, :sex=>{:default=>:banana}, :location=>{}}
     #
-    #   Foo.attributes.box_reduce :default #=> {:age=>1, :sex=>:banana}
+    #   Foo.attributes.meta_attribute_value_box :default #=>
+    #     {:age=>1, :sex=>:banana}
     #
 
-    def box_reduce name
+    def meta_attribute_value_box name
       new = Formal::Box.new       # it would be wrong to result in otherwise
       each = self.each
       new.instance_exec do
@@ -478,8 +481,6 @@ module ::Skylab::MetaHell
       end
       new
     end
-
-    public :dupe                  # definer calls this directly
 
     def with mattr_name, &block
       ea = each
