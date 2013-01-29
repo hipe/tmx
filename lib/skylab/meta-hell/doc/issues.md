@@ -7,7 +7,7 @@
 [#012] #open foo/ and foo.rb should be automagic, no declaration of module
 [#011]       #watch services
 [#010]       #done pull in DelegatesTo from porcelain!
-[#009] #open when you made plastic you didn't know about `define_singleton_method`
+[#009]       #done hen you made plastic you didn't know about `define_singleton_method`
 [#008]       #done after etc, consider pulling in Let
 [#007] #open push up logic for autoviv. of superklassen maybe? (at least test)
 [#006]       #note core dumps happen here with super

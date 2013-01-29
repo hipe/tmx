@@ -2,11 +2,9 @@ module Skylab::MetaHell
 
   o = { }
 
-  o[:hash2instance] = -> h do
-    i = MetaHell::Plastic::Instance.new
-    h.each { |k, f| i.define_singleton_method k, &f }
-    i
-  end
+  o[:hash2instance] = -> h do  # (this is here for symmetry with the below
+    MetaHell::Proxy::Dynamic[ h ]  # but it somewhat breaks the spirit of FUN)
+  end                          # although have a look it's quite simple
 
   o[:hash2struct] = -> h do
     s = ::Struct.new(* h.keys ).new ; h.each { |k, v| s[k] = v } ; s

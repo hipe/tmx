@@ -89,20 +89,19 @@ module Skylab::TanMan
     #
     io_interceptor = -> emit do
       buffer = TanMan::Services::StringIO.new
-      o = { }
-      o[:write] = -> str do
-        buffer.write str
-        str.to_s.length
-      end
-      o[:puts] = -> str do
-        buffer.puts str
-        payload = buffer.string.dup # ! you've goota dup it
-        buffer.truncate 0
-        emit[ payload ]
-        nil
-      end
-      x = MetaHell::Plastic::Instance[ o ] # a quick mock
-      x
+      MetaHell::Proxy::Dynamic[
+        write: -> str do
+          buffer.write str
+          str.to_s.length
+        end,
+        puts: -> str do
+          buffer.puts str
+          payload = buffer.string.dup # ! you've goota dup it
+          buffer.truncate 0
+          emit[ payload ]
+          nil
+        end
+      ]
     end
 
     define_method :infostream do  # what's going on here is that because we

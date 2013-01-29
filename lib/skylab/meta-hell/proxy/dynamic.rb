@@ -1,28 +1,36 @@
 module Skylab::MetaHell
 
-  module Plastic
-    # #experimental.  Simply create an object whose singleton class
-    # has a `define_method` method that has been made public, and
-    # other fluff around it (or not) for quick and dirty metaprogramming.
-    #
-    # Alternate names for this that have been or are
-    # being considered include: `Generic`, `Dynamic`
-    #
-    # (this will be re-evaluated at [#009] about define_singleton_methods)
-    #
-    # (in light of above, it is now just an ordinary empty class, will
-    # might be only slighly more usefull than an ::Object.new because
-    # of the name you get that might lead you here.)
-    #
-  end
+  class Proxy::Dynamic < ::BasicObject
 
-  class Plastic::Instance
-    class << self
-      # public :define_method     # we did this before we knew about
-                                  # define_singleton_method
+    # #experimental - for quick and dirty hacks or experimentation,
+    # simply takes a hash-like whose keys are presumed to represent method
+    # names and whose values are presumed to be functions, and make and
+    # object out of it.
+    #
+    # (Alternate names for this that have been or are being considered
+    # or have been used for this are / were: `Generic`, `Plastic`)
+    #
+    # (This was the orignal home of [#mh-009] - it was developed right before
+    # we found out about define_singleton_method, but it stays b/c it's actually
+    # a bit clearer to read than hacks like *that*. If for no other reason
+    # it might be only slighly more useful than using ::Object because it leads
+    # you here to read this.) (hm..)
+    #
 
-      def [] h                    # convenience wrapper for below
-        MetaHell::FUN.hash2instance[ h ]
+    def self.[] h
+      new h
+    end
+
+  protected
+
+    def initialize h
+      singleton_class = class << self
+        self
+      end
+      singleton_class.class_exec do
+        h.each do |k, func|
+          define_method k, &func
+        end
       end
     end
   end
