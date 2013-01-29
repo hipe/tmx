@@ -8,15 +8,16 @@ module Skylab::Headless
     # in seconds and one or more callbacks that corresponds to a set of one
     # or more streams to read from. The streams are set with the `streams`
     # box and the hooks are set with the `line` box (for now this chunks output
-    # into lines).  When you call `select` on the Select object, it
+    # into lines). When you call `select` on the Select object, it
     # calls `select` internally, and calls your callbacks as appropriate
     # when data is available in that stream and it makes one or more complete
     # lines (the appropriate callback is called once for each line.)
     # When no data is available in any of the streams within the time
-    # alloted, 0 is returned from the call to select.
+    # alloted, an integer representing the total number of bytes read is
+    # the result - possibly 0, possibly a billiondy.
     #
     # For now, the input is always chunked into single lines (except the last
-    # flush). Work in progres!
+    # flush). Work in progres! (tracked by [#hl-048])
 
     attr_reader :line
 

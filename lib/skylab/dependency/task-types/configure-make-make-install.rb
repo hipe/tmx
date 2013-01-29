@@ -109,8 +109,8 @@ module Skylab::Dependency
       end
       # multiplex two output streams into a total of four things
       Dependency::Services::StringIO # load
-      out = Face::Open2::Tee.new(:out => ui.out, :buffer => ::StringIO.new)
-      err = Face::Open2::Tee.new(:err => ui.err, :buffer => ::StringIO.new)
+      out = MetaHell::Proxy::Tee.new out: ui.out, buffer: ::StringIO.new
+      err = MetaHell::Proxy::Tee.new out: ui.err, buffer: ::StringIO.new
       open2(cmd, out, err)
       err[:buffer].rewind ; s = err[:buffer].read
       if "" != (s)

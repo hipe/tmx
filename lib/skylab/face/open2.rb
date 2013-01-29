@@ -1,20 +1,24 @@
 require 'open3'
 
-module Skylab; end
 module Skylab::Face
 
   # read both stdout and stderr of a system command without blocking
+  # (this is superseded by [#hl-048] Headless::IO::Upstream::Select,
+  # and was probably its inspiration without knowing it)
   #
 
   module Open2
     extend self
+
     class Handler
       [:out, :err].each do |out|
         define_method(out) { |&b| instance_variable_set("@_#{out}", b) }
         attr_accessor "_#{out}"
       end
     end
+
     NUM_BYTES = 4096
+
     def open2 cmd, sout=nil, serr=nil, &b
       on = Handler.new
       sout and on.out { |s| sout.write(s) }
@@ -28,7 +32,7 @@ module Skylab::Face
       end
       if sout.nil? and serr.nil? and b.nil?
         require 'stringio'
-        omnibuffer = StringIO.new
+        omnibuffer = ::StringIO.new
         on.out { |s| omnibuffer.write(s) }
         on.err { |s| omnibuffer.write(s) }
       else
@@ -37,17 +41,17 @@ module Skylab::Face
       end
       bytes = 0
       time = Time.now
-      Open3.popen3(cmd) do |sin, _sout, _serr|
+      ::Open3.popen3(cmd) do |sin, _sout, _serr|
         open = [ { :in => _serr, :out => :_err }, { :in => _sout, :out => :_out } ]
         loop do
           open.each_with_index do |s, idx|
-            if IO.select([s[:in]], nil, nil, 0.1) # yes this could instead do .. etc
+            if ::IO.select([s[:in]], nil, nil, 0.1) # yes this could instead do .. etc
               str = nil
               done = false
               begin
                 str = s[:in].readpartial NUM_BYTES
                 s[:in].closed? and done = true
-              rescue EOFError => e
+              rescue ::EOFError => e
                 done = true
               end
               if str
@@ -65,23 +69,6 @@ module Skylab::Face
       end
       omnibuffer and omnibuffer.rewind and return omnibuffer.read
       [bytes, Time.now - time]
-    end
-  end
-
-  module Open2
-    class Tee
-      def initialize hash
-        @children = hash
-      end
-      attr_reader :children
-      def [] name
-        @children[name]
-      end
-      %w(write flush).each do |name|
-        define_method(name) do |*a|
-          @children.values.map { |c| c.send(name, *a) }
-        end
-      end
     end
   end
 end
