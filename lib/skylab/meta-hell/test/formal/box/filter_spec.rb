@@ -10,7 +10,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Box
 
       st = ::Struct.new :red, :blue
 
-      subject -> do
+      memoize :box, -> do
         box = new_modified_box
         box.add :one, st.new( true, false )
         box.add :two, st.new( false, true )
@@ -19,7 +19,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Box
       end
 
       it "2 arg then 2 arg" do
-        ea = subject.each
+        ea = box.each
         ea2 = ea.filter -> k, v do
           v.red
         end
@@ -34,7 +34,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Box
       end
 
       it "1 arg then 1 arg" do
-        ea = subject.each
+        ea = box.each
         ea2 = ea.filter -> x do
           x.blue
         end
@@ -46,7 +46,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Box
       end
 
       it "1 arg then 1 arg map" do
-        ea = subject.each
+        ea = box.each
         ea2 = ea.filter -> x do
           x.blue
         end
@@ -59,7 +59,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Box
       it "1 arg filter, then two arg filter, then a reduce #{
         } (FILTER COMPOSITION)" do
 
-        ea = subject.filter -> x do
+        ea = box.filter -> x do
           x.red
         end
         ea2 = ea.filter -> k, v do
@@ -73,7 +73,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Box
       end
 
       it "2 arg filter, then 2 arg map" do
-        ea = subject.filter -> k, v do
+        ea = box.filter -> k, v do
           :three == k or false == v.red
         end
         a = ea.map do |k, v|
@@ -82,6 +82,13 @@ module ::Skylab::MetaHell::TestSupport::Formal::Box
         a.length.should eql( 2 )
         a.first.first.should eql( :two )
         a.last.last.blue.should eql( true )
+      end
+
+      it "for the most beautiful thing in the world, YOU CAN #{
+        }CHAIN THESE FOOKROS LIKE THIS:" do
+        box2 = box.filter(& :red ).filter(& :blue ).to_box
+        box2.length.should eql( 1 )
+        box2.first.values_at( 0, 1 ).should eql([true, true])
       end
     end
   end

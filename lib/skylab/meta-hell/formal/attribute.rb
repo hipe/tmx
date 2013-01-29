@@ -469,26 +469,28 @@ module ::Skylab::MetaHell
     #     {:age=>1, :sex=>:banana}
     #
 
-    def meta_attribute_value_box name
-      new = Formal::Box.new       # it would be wrong to result in otherwise
-      each = self.each
-      new.instance_exec do
-        each.reduce nil do |_, (k, attr)|
-          if attr.has? name
-            add k, attr.fetch( name )
-          end
-        end
-      end
-      new
+    def meta_attribute_value_box mattr_name
+      with( mattr_name ).box_map { |x| x[mattr_name] }
     end
 
+    # `with` - wrapper around: produce a new enumerator that filters for only
+    # those attributes that has? `mattr_name`. note it does not care if those
+    # meta-attribute values are trueish, only if they `has?` that meta-attribute
+    # in the box. (a most common use case is defaults - sometimes defaults are
+    # nil or false. this is different than a formal attribute not having
+    # a default set.).
+
     def with mattr_name, &block
-      ea = each
-      ea2 = ea.filter -> k, v do
-        v.has? mattr_name
-      end
-      ea2.each(& block)
+      ea = filter -> x { x.has? mattr_name }
+      block ? ea.each(& block ) : ea
     end
+
+    # `which` - #experimental (we are considering adding a `with`-like ability
+    # to use a mattr name instead of a block, so it would be like a `with`
+    # with an extra true-ish check. but only if necessary)
+    #
+
+    alias_method :which, :filter
 
   protected
 

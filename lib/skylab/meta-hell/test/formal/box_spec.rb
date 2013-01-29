@@ -65,20 +65,22 @@ module ::Skylab::MetaHell::TestSupport::Formal::Box
         box
       end
 
-      it "select with 1 arg" do
+      it "select with 1 arg - result is box" do
         x1 = subject.select do |x|
           [:One, :Five].include? x
-        end.to_a
+        end
         x1.length.should eql( 2 )
         x1.first.should be_kind_of(::Symbol)
+        x1.should be_respond_to( :filter )
       end
 
-      it "select with 2 args" do
+      it "select with 2 args - result is box" do
         x2 = subject.select do |k, v|
           [:One, :Five].include? v
-        end.to_a
+        end
         x2.length.should eql( 2 )
-        x2.first.should be_kind_of(::Array)
+        x2.first.should be_kind_of(::Symbol)
+        x2.should be_respond_to( :filter )
       end
     end
 

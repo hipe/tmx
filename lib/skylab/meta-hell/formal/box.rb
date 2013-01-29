@@ -4,15 +4,6 @@ module Skylab::MetaHell
                                   # like other things too. by default none of
                                   # its public members mutate its composition.
 
-                                  # (this list is here so it can be near the
-                                  # other one but it might not be yet used
-                                  # here. very #exploratory/#experimental:)
-    canonical_derived_methods = [ :map, :select ].freeze
-
-    define_singleton_method :canonical_derived_methods do
-      canonical_derived_methods
-    end
-                                  # convenience delegators to the enumerator
     [ :detect, :defectch, :filter, :map, :reduce, :select ].each do |m|
       define_method m do |*a, &b|
         each.send m, *a, &b
@@ -20,7 +11,7 @@ module Skylab::MetaHell
     end
 
     def each *a, &b
-      Formal::Box::Enumerator.new( -> y do
+      Formal::Box::Enumerator.new( self.class, -> y do
         @order.each do |k|
           y.yield k, @hash.fetch( k ) # always give the yielder 2 args (norm'd)
         end
@@ -31,8 +22,24 @@ module Skylab::MetaHell
       @hash.fetch key, &otherwise
     end
 
+    def fetch_index ref, &otherwise
+      begin
+        key = @order.fetch ref    # (we can't let the user's logic break ours)
+        @hash.fetch key           # (this whole thing is actually just for
+      rescue ::IndexError => e    # `first`, which is actually only used
+        if otherwise then otherwise[ ref ] else # in a test attotw.)
+          raise e
+        end
+      end
+    end
+
     alias_method :[], :fetch      # this is not like a hash, it is strict,
                                   # use `fetch` if you need hash-like softness
+
+    def first &b
+      fetch_index 0, &b
+    end
+
     def has? key
       @hash.key? key
     end
@@ -60,6 +67,10 @@ module Skylab::MetaHell
       @order.dup
     end
 
+    def last &b
+      fetch_index( -1, &b )
+    end
+
     def length
       @order.length
     end
@@ -70,10 +81,10 @@ module Skylab::MetaHell
 
   protected
 
-    def initialize
-      @order = [ ]
-      @hash = { }
-    end
+    def initialize                # **NOTE** if you are subclassing Formal::Box
+      @order = [ ]                # your nerk *must* take a zero arg form of
+      @hash = { }                 # `new`, it is used in algorithms like
+    end                           # `select` to build result boxes progressively
 
     def accept attr               # convenience `store`-ish for nodes like this
       add attr.normalized_name, attr
@@ -135,6 +146,32 @@ module Skylab::MetaHell
     # this exists a) because it makes sense to use enumerator for enumerating
     # and b) to wrap up all the crazines we do with hash-like iteration
 
+    # box_map - result is a new Box that will have the same keys in the same
+    # order as the virtual box represented by this enumerator at the time
+    # of this call, but whose each value will be result of passing the
+    # value of *this* virtual box to `func`.  Result is not not of the
+    # same box class as the one that created this enumerator,
+    # just a generic formal box. (You can use `_box_map` to specify the
+    # class.)
+
+    def box_map &func
+      if func
+        _box_map Formal::Box, func
+      else
+        self # why would you pass no block i don't know but this is just
+      end    # for compat. with Enumerable.
+    end
+
+    def _box_map box_class, func
+      ea = self
+      box_class.new.instance_exec do
+        ea.each do |k, v|
+          add k, func[ v ]
+        end
+        self
+      end
+    end
+
     def _each &func # just saves us from making 1 extra object
       if func
         each( &func)
@@ -155,6 +192,8 @@ module Skylab::MetaHell
     norm_h[-1] = ONE_
     norm_h[2]  = TWO_
 
+    alias_method :metahell_original_each, :each
+
     define_method :each do |&func|
       if func
         if @arity_override
@@ -172,7 +211,7 @@ module Skylab::MetaHell
       end
     end
 
-    Formal::Box.canonical_derived_methods.each do |m|
+    [ :map ].each do |m|
       define_method m do |&func|
         if func && 2 == func.arity
           @arity_override = 2
@@ -221,27 +260,48 @@ module Skylab::MetaHell
       end
     end
 
-    define_method :filter do |func|
-      normalize = norm_h[ func.arity ]
-      outer = self
-      inner = self.class.new( -> normal_yielder do
-        outer.each do |k, v|
-          if func[ * normalize[ k, v ] ]
-            normal_yielder.yield k, v
-          end
+    def filter *args, &func
+      args.push func if func
+      args.length == 1 or raise ::ArgumentError, "expecting 1 { proc | block }"
+      _filter args.first
+    end
+
+                                  # Array#select result is array, Hash is hash..
+    def select &func
+      _filter( func ).to_box
+    end
+
+    def to_box                    # if you want a box after e.g a chain of
+      ea = self                   # for e.g. filters, or whatever just anything
+      @box_class.new.instance_exec do
+        ea.each do |k, v|
+          add k, v
         end
-      end )
-      inner
+        self
+      end
     end
 
   protected
 
     alias_method :metahell_original_initialize, :initialize
 
-    def initialize func
+    def initialize box_class, func
       super(& method( :visit ) )
       @arity_override = nil
+      @box_class = box_class
       @normalized_yielder_consumer = func
+    end
+
+    define_method :_filter do |func|
+      normalize = norm_h[ func.arity ]
+      outer = self
+      self.class.new( @box_class, -> normal_yielder do
+        outer.each do |k, v|
+          if func[ * normalize[ k, v ] ]
+            normal_yielder.yield k, v
+          end
+        end
+      end )
     end
 
     def visit y

@@ -25,8 +25,13 @@ module ::Skylab::MetaHell::TestSupport::Formal
   module ModuleMethods
     include CONSTANTS
 
+    def memoize name, func
+      define_method name, & MetaHell::FUN.memoize[ func ]
+      nil
+    end
+
     def subject func
-      define_method :subject, & MetaHell::FUN.memoize[ func ]
+      memoize :subject, func
       nil
     end
   end
