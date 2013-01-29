@@ -11,7 +11,7 @@ module Skylab::Treemap
       on('-a <NAME>', '--adapter <NAME>', * more(:a)){ |v| o[:adapter_name] = v }
       on('-c', '--char <CHAR>', "use CHAR (default: {{default}})") { |v| o[:char] = v }
       on('--tree', 'show the text-based structure in a tree (debugging)') { o[:do_show_tree] = true }
-      on('--csv', 'output the csv to stdout instead of tempfile, stop.') { o[:csv_stream] = :payload }
+      on('--csv', 'output the csv to stdout instead of tempfile, stop.') { o[:csv_is_payload] = true }
       on('--stop', 'stop execution after the previously indicated step', * more(:s)) { o[:stop] = true }
       on('-F', '--force', 'force overwriting of an exiting file') { o[:force] = true }
       on('--[no-]exec', "the default is to open the file with exec {{default}}") { |v| o[:exec] = v }
@@ -30,7 +30,7 @@ module Skylab::Treemap
 
     option_syntax.more :s, -> o do
       fa = api_action.formal_attributes
-      stop, impl = [ :stops_after, :stop_implied ].map { |x| fa.meta_attribute_value_box x }
+      stop, impl = [ :stop_at, :stop_is_induced ].map { |x| fa.meta_attribute_value_box x }
       ks = stop.names - impl.names
       o << "(can appear after #{ and_ ks.map { |k| param k } }) #{
           }(implied after #{ and_ impl.names.map { |k| param k } })"
@@ -38,13 +38,15 @@ module Skylab::Treemap
     end
 
     def invoke inpath, opt_h
-      res = nil ; act = api_action
+      res = nil
+      act = api_action
       begin
         break if ! parse_opts opt_h
         do_exec = opt_h.delete :exec
         act.on_treemap do |e|
-          if do_exec && e.path.exist? && ! act.stop_before?( :exec_open_file )
-            act.info "calling exec() to open the pdf!"
+          if do_exec && e.path.exist? && !
+            act.stop_is_requested_before( :exec_open_eventpoint ) then
+            act.info "calling exec() to open the pdf!" # #todo bad
             exec "open #{ e.path }"
           end
         end
@@ -115,22 +117,27 @@ module Skylab::Treemap
         true
       end
     end
+                                  # it's a smell to reach over like this,
+                                  # but this crazy syntax has special needs
+                                  # all the api wants is a `stop_at` param
 
     def parse_opts_stop opt_h
-      opt_to_event = api_action.formal_attributes.with :stops_after # [#052] borked
-      event_to_opt = opt_to_event.invert
-      order = api_action.event_order.map { |e| event_to_opt[e] }.compact
-      given = opt_h.keys & [:stop, *order]
-      given.pop while :stop != given.last
-      if 1 == given.length
+      act = api_action
+      a2e, e2a = act.attr_name_to_eventpoint, act.eventpoint_to_attr_name
+      a_order = act.event_order.reduce [] do |memo, ename|
+        memo << e2a[ ename ] if e2a.has? ename
+        memo
+      end
+      given_a = opt_h.keys & [ :stop, *a_order ] # sort first by second!
+      given_a.pop while :stop != given_a.last
+      if 1 == given_a.length
         error "#{ param :stop } must come somewhere after at #{
-          }least one of #{ or_ order.map{ |x| param x } }"
+          }least one of #{ or_ a_order.map{ |x| param x } }"
         help_invite
         res = nil
       else
-        x = opt_to_event[given[-2]]
-        x or fail 'error parsing stop'
-        opt_h[:stop_after] = x
+        ref = a2e.fetch given_a[-2]
+        opt_h[:stop_at] = ref
         opt_h.delete :stop
         res = true
       end

@@ -35,6 +35,7 @@ module Skylab::Treemap
     def param x, render_method=nil             # generic rendering of params
       # [#011] this whole mess needs a design overhaul. what is the stylus
       # then, if it needs to have the cli and api actions inside of it!?
+      ::Symbol === x or x = x.normalized_name
       str = nil
       if (( cli_option = @cli_action.options.fuzzy_fetch( x ) { } ))
         str = cli_option.send( render_method || :render )

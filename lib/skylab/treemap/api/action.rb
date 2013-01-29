@@ -164,6 +164,11 @@ module Skylab::Treemap
       formal_attribute_definer.attributes
     end
 
+    def payload line              # imagine having this live in or or another
+      emit :payload, line         # but not both of the two sides
+      nil
+    end
+
     def request_client
       @api_client
     end

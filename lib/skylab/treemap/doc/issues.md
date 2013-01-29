@@ -1,7 +1,7 @@
 [#052] #open invert is broken so stops are broken
 [#051]       #done - legacy test wiring
 [#050] #open - stylus wiring is bad and wrong
-[#049]       #done adapters need a core.rb
+[#049]       #tracking-tag adapter arch. all-purpose
 [#048] #open - singleton goes away
 [#047]       #postponed #100.200 we do not want this here not here - legacy
 [#046]       #postponed #100.200 - pure eyblood

@@ -5,32 +5,59 @@ module Skylab::Treemap
 
     event_class API::Event
 
-    order_a = [:do_show_tree, :csv, :r_script, :write_outfile, :exec_open_file]
-    order_a.freeze
+    order_a = [ :tree_eventpoint, :csv_eventpoint, :script_eventpoint,
+                :write_outfile_eventpoint, :exec_open_eventpoint ] # not all of
+                # these are explicitly ticked, are didactic & future-proofed too
 
-    meta_attribute :stops_after
-    meta_attribute :stop_implied
+    meta_attribute :is_adapter_parameter
+    meta_attribute :stop_at
+    meta_attribute :stop_is_induced
+
+    attribute_metadata_class do
+      [ :stop_is_induced,         # make soft boolean readers for these m.attrs
+        :is_adapter_parameter ].each do |m|
+        define_method m do        # this is here to fail. makes it more readable
+          fetch m do end          # in application code.  also this dsl is
+        end                       # pretty wild
+      end
+
+      def has_stop_at             # this is here to fail
+        has? :stop_at
+      end
+
+      def stop_at
+        fetch :stop_at            # this is here to fail
+      end
+    end
 
     attribute :adapter_name, default: 'r'
     attribute :char, required: true,
       regex: [ /^.$/, 'must be a single character (had {{value}})' ]
-    attribute :csv_stream, enum: [:payload], stops_after: :csv,
-                           stop_implied: true
-    attribute :do_show_tree, stops_after: :do_show_tree
+    attribute :csv_is_payload, stop_at: :csv_eventpoint, stop_is_induced: 1
+    attribute :do_show_tree, stop_at: :tree_eventpoint
     attribute :force
     attribute :inpath, path: true, required: true
     attribute :outpath_requires_force, default: true
     attribute :tmpdir_path, default: -> { ::Pathname.pwd.join 'data/intermediate' }
-    attribute :stop_after, enum: order_a
+    attribute :stop_at, enum: order_a
     attribute :title, default: 'Treemap Tiem'
 
     public :adapter_box           # expose this from above for reflection
                                   # for generating documentation
 
+    def attr_name_to_eventpoint
+      @attr_name_to_eventpoint ||=
+        formal_attributes.with( :stop_at ).box_map(& :stop_at )
+    end
+
     singleton_class.send :public, :attribute # experimental for the adapter
                                   # to nerk it
 
     define_method :event_order do order_a end # used in documentors
+
+    def eventpoint_to_attr_name
+      @event_point_to_attr_name ||= attr_name_to_eventpoint.invert
+    end
 
     public :formal_attributes     # documentors use this to determine defaults
 
@@ -50,9 +77,9 @@ module Skylab::Treemap
         res = inpath_to_tree or break
         res = show_tree or break
         res = tree_to_csv or break
-        res = event_point_reached( :csv ) or break
+        res = tick_eventpoint( :csv_eventpoint ) or break
         res = csv_to_treemap or break
-        res = event_point_reached( :do_show_tree ) or break
+        res = tick_eventpoint( :tree_eventpoint ) or break
         info "finished."
         emit :treemap, path: @outpath
         res = true
@@ -60,33 +87,31 @@ module Skylab::Treemap
       res
     end
 
-    def  csv_no_change                         # do not re-write the csv
-      if :payload != @csv_stream &&            # if we are not emitting it
-        csv_tmp_pathname.exist? then
+    def csv_needs_to_be_written
+      if csv_is_payload then
+        true                      # always write the csv when it is to stdout
+      elsif ! csv_tmp_pathname.exist?
+        true                      # yes please write it in cases such as this
+      else
         curr_bytes = csv_tmp_pathname.read
         next_bytes = Treemap::Services::File::CSV::Render[ @tree ]
-        if next_bytes && curr_bytes == next_bytes
-          info '(no change in csv. skipping)'
-          true
-        end
+        yes = ! next_bytes || next_bytes != curr_bytes
+        yes or info '(no change in csv. skipping)'
+        yes
       end
     end
 
     def csv_to_treemap
       res = false
       begin
-        expecting :r_script_stream or break
-        if :payload == r_script_stream
-          on_r_script = -> e { emit :payload, e }
-          stop_after_script = true
-        end
-        res = adapter_box.hot_instance.render_treemap(
+        param_h = {
                    csv_inpath: csv_tmp_pathname,
                          info: method( :info ),
+                   stop_at: @stop_at,
                         title: title,
                        tmpdir: tmpdir,
-                      rscript: on_r_script,
-            stop_after_script: stop_after_script,
+                           #--*--
+                      payline: method( :payload ),
                       success: -> msg, metadata do
                                  info "generated treemap: #{ msg }",
                                  metadata
@@ -95,7 +120,13 @@ module Skylab::Treemap
                                  error "failed to generate treemap: #{ msg }",
                                  metadata
                                end
-         )
+        }
+        formal_attributes.which(& :is_adapter_parameter ).each do |k, fattr|
+          param_h[ k ] = send k
+        end # this is a smell but oh well it's fun
+        res = adapter_box.hot_instance.invoke :render, param_h
+        # `invoke` gives the plugin impl. autonomy also there is the big
+        # arch. issue of [#049]
       end while nil
       res
     end
@@ -104,19 +135,6 @@ module Skylab::Treemap
 
     define_method :csv_tmp_pathname do ||
       @csv_tmp_pathname ||= tmpdir.join( csv_out_name )
-    end
-
-    # this is "now that we are after X, have we passed a stop?"
-    # and not "is there a stop after X?"
-    def event_point_reached name
-      res = true # true = keep going
-      case stop_compare name
-      when 0, -1
-        info "(stopping because #{ param :stop } (stated or implied) #{
-          }after #{ param formal_attributes.with( :stops_after ).invert[name]})" # [#052] borked
-        res = nil # stop execution with nothing to report
-      end
-      res
     end
 
     def expecting attr
@@ -167,20 +185,22 @@ module Skylab::Treemap
     end
 
     def resolve_outpath
-      res = false
       begin
-        res = expecting( :default_outpath ) or break
-        pathn = default_outpath
+        if stop_is_requested_before :write_outfile_eventpoint
+          @outpath = nil
+          break( res = true )
+        end
+        pathn = adapter_box.hot_instance.default_outpath
         outpn = Treemap::Models::Pathname.new pathn, -> pn do
           b = pn.exist?                        # (`is_missing_required_force`)
           b &&= outpath_requires_force
-          b &&= ! stop_before?( :write_outfile )
           b &&= ! force
           b
         end
         if outpn.is_missing_required_force
           error "outpath exists, won't overwrite without #{
             }#{ param :force }", path: outpn
+          res = false
           break
         end
         @outpath = outpn
@@ -189,18 +209,45 @@ module Skylab::Treemap
       end while nil
       res
     end
-
-
+                                  # this is the part that checks: if parameters
+                                  # are present that inducde stops, are they
+                                  # at odds with any other stops?
     def resolve_stops
-      res = true
-      formal_attributes.with( :stops_after ).each do |attrib, event|
-        if send( attrib ) && ( self.stop_after ||= event ) != event
-          inv = formal_attributes.with( :stops_after ).invert # [#052] borked
-          res = error "can't have the (possibly implied) #{
-            } #{ param :stop } after both #{ param inv[stop_after] }#{
-            } and #{ param attrib }"
-          break( res = false )
+      # in the event order, and only for those attrs that have associated stops
+      # see if a corresponding parameter was requested and etc.
+      e2a = eventpoint_to_attr_name
+      do_induce = nil
+      stops_requested = event_order.reduce [] do |memo, eventpoint|
+        if e2a.has? eventpoint    # (not all epoints have a fattr)
+          aname = e2a[eventpoint]
+          fattr = formal_attributes[aname]
+          if @stop_at == eventpoint # then the user requested it
+            memo << fattr
+          elsif fattr.stop_is_induced and send aname # then, if the param is
+            do_induce = true      # trueish you get the stop !
+            memo << fattr
+          end
         end
+        memo
+      end
+      res = true
+      case len = stops_requested.length
+      when 0
+        @stop_at = nil
+      when 1
+        @stop_at ||= stops_requested.first.stop_at if do_induce
+      else
+        error "there are #{ len } stops requested, choose one: #{
+          stops_requested.map do |fattr|
+            stem = param fattr
+            if fattr.stop_is_induced
+              "#{ stem } (implied stop)"
+            else
+              "#{ stem } #{ param :stop }"
+            end
+          end.join ', '
+        }"
+        res = false
       end
       res
     end
@@ -208,31 +255,57 @@ module Skylab::Treemap
     def show_tree
       if do_show_tree
         res = render_debug
-        res and event_point_reached :do_show_tree
+        if res
+          res = tick_eventpoint :tree_eventpoint
+        end
       else
-        true
+        res = true
       end
-    end
-
-    # this is "is there a stop anywhere before X?"
-    def stop_before? name
-      -1 == stop_compare( name )
+      res
     end
 
     def stop_compare name
-      res = nil
-      begin
-        name_index = event_order.index name
-        name_index or raise ::NameError.new "bad name: #{ name }"
-        @stop_after or break
-        res = event_order.index( @stop_after ) <=> name_index
-      end while nil
+      @stop_at or fail "check @stop_at before calling this."
+      name_index = event_order.index name
+      name_index or raise ::NameError, "bad name: #{ name }"
+      res = event_order.index( @stop_at ) <=> name_index
+      res
+    end
+
+    def stop_is_requested_before name
+      if @stop_at
+        res = -1 == stop_compare( name )
+      end
+      res
+    end
+
+    # "now that we are after X, have we passed a stop?"
+    def tick_eventpoint eventpoint_ref
+      if @stop_at
+        cmp = stop_compare eventpoint_ref
+        case cmp
+        when 0, -1
+          # what is the attr that stops after this eventpoint? we want its label
+          fattr = formal_attributes.defectch -> x do
+            x.has_stop_at and eventpoint_ref == x.stop_at
+          end
+          parts = [ param( :stop ) ]
+          parts << "(induced)" if fattr.stop_is_induced
+          parts << "after #{ param fattr }"
+          info "(stopping because #{ parts.join ' ' })" # (was [#052] borked)
+          res = nil                 # stop execution with nothing to report
+        when 1
+          res = true              # the stop comes later
+        else exit 1 end           # sanity - find me
+      else
+        res = true                # there is no stop, keep going
+      end
       res
     end
 
     def tree_to_csv
-      srand 867 # jenny's phone number - 867 5309 # %todo
-      csv_no_change or begin
+      srand 867 # #todo this is just so we can trigger dupe-checking on fs
+      if csv_needs_to_be_written
         with_csv_out_stream do |csv_out|
           Treemap::Services::File::CSV::Render.invoke @tree do |o|
             o.on_payload { |e| csv_out.puts e.to_s }
@@ -240,6 +313,8 @@ module Skylab::Treemap
             o.on_info    { |e| info e }
           end
         end
+      else
+        true  # assume csv existed on disk and is valid
       end
     end
 
@@ -261,32 +336,6 @@ module Skylab::Treemap
       end
     end
 
-    def with_csv_out_stream &block # result is result of block or conventional
-      res = nil
-      begin
-        if :payload == csv_stream
-          pxy = Treemap::Models::Proxies::Puts.new -> line do
-            emit :payload, line
-          end
-          yield pxy
-          event_point_reached :csv # just to get a message
-        else
-          tmpdir.normalize or break
-          existed = csv_tmp_pathname.exist?
-          csv_tmp_pathname.open 'w+' do |fh|
-            res = block[ fh ]
-          end
-          if res
-            info "#{ existed ? 'overwrote' : 'wrote' } #{
-              }(#{ res.num_lines } lines)", path: csv_tmp_pathname
-          else
-            error "had an issue in writing csv file", path: csv_tmp_pathname
-          end
-        end
-      end while nil
-      res
-    end
-
     def with_adapter_instance &block  # this will go straight up to somewhere
       res = adapter_box.fetch_hot_instance do |e|
         error "no adapter currently selected - #{ e }"
@@ -295,6 +344,31 @@ module Skylab::Treemap
       if res
         res = block[ res ]
       end
+      res
+    end
+
+    def with_csv_out_stream &block # result is result of block or conventional
+      begin
+        if csv_is_payload
+          pxy = Treemap::Models::Proxies::Puts.new -> line do
+            emit :payload, line
+          end
+          res = block[ pxy ]
+        else
+          res = tmpdir.normalize or break
+          did_overwrite = csv_tmp_pathname.exist?
+          csv_tmp_pathname.open 'w+' do |fh|
+            res = block[ fh ]
+          end
+          if ! res
+            error "had an issue in writing csv file", path: csv_tmp_pathname
+            break
+          end
+          info "#{ did_overwrite ? 'overwrote' : 'wrote' } #{
+            }(#{ res.num_lines } lines)", path: csv_tmp_pathname
+          res = true
+        end
+      end while nil
       res
     end
   end
