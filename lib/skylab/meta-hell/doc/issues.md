@@ -1,3 +1,4 @@
+[#019]       #done boxxy peeks at fs now, hacks `constants`
 [#018] #open corral proxies
 [#017]       #done corral tees
 [#016]       #tracking-tag wow hash-like iterators are sure annoying

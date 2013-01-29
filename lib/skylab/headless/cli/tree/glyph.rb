@@ -24,7 +24,7 @@ module Skylab::Headless
       tee:       ' ├'
     }
 
-    self.each do |gs|             # freeze each of the strings in case
+    each do |gs|                  # freeze each of the strings in case
       gs.values.each(& :freeze )  # someone accidentally mutates them
     end                           # (it's happened once or twice :P)
   end
