@@ -168,22 +168,14 @@ module Skylab::MetaHell
 
   protected
 
+    constantify = ::Skylab::Headless::Name::FUN.constantify # shh
+
     extname = ::Skylab::Autoloader::EXTNAME
 
     leaf_or_branch_rx = /\A
       (?<stem>  [a-z][a-z0-9-]* )
       (?<ext> #{ ::Regexp.escape extname } )?
     \z/x
-
-    constantify = -> do # (tighter version for the sake of simplicity for now)
-      rx = /(?:^|-)([a-z])/
-      -> x { x.to_s.gsub( rx ) { $~[1].upcase } }
-    end.call
-
-    pathify = -> do # #todo **NOTE** not used but this might actually be an improvement
-      rx = /(?<=[a-z])(?=[A-Z])|_|(?<=[A-Z])(?=[A-Z][a-z])/
-      -> x { x.to_s.gsub( rx ){ '-' }.downcase }
-    end.call
 
     define_method :hit_fs do    # read fs to guess what your constants are
       if dir_path && dir_pathname.exist?

@@ -135,6 +135,30 @@ module Skylab::MetaHell
       end
     end
 
+    def _fuzzy_reduce ref, tuple               # tuple gets (k, x, y). yield
+      rx = /\A#{ ::Regexp.escape ref.to_s.downcase }/ # each name you want to
+      match = nil                                     # try. box result.
+      matched_name = nil
+      name_consumer = ::Enumerator::Yielder.new do |name|
+        if rx =~ name.to_s
+          match = true
+          matched_name = name
+          raise ::StopIteration
+        end
+      end
+      me = self
+      MetaHell::Formal::Box.new.instance_exec do
+        me.reduce( self ) do |memo, (k, v)|
+          match = false
+          tuple[ k, v, name_consumer ] rescue ::StopIteration
+          if match
+            add k, Formal::Box::MatchData.new( matched_name, k, v )
+          end
+          memo
+        end
+      end
+    end
+
     def replace name, value
       res = @hash.fetch name
       @hash[name] = value
@@ -308,4 +332,7 @@ module Skylab::MetaHell
       @normalized_yielder_consumer[ y ]
     end
   end
+
+  Formal::Box::MatchData = ::Struct.new :string_matched, :name, :item
+
 end
