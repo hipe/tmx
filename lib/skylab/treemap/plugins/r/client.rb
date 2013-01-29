@@ -1,25 +1,45 @@
 module Skylab::Treemap
   class Plugins::R::Client
     # gotchas: + pattern of emitting a path: everywhere as metadata
+    # [#049] plugin arch: client *actions* are the ones that need to
+    # populate the f.a's and opts
+
+    def default_outpath           # request client requires this (the adapter
+      pdf_outpath                 # chooses the name, see!?)
+    end
+
+    def invoke action_ref, param_h # this logic will get split up.. [#049]
+      kls = Plugins::R::API::Actions.const_fetch action_ref
+      sym = kls.normalized_local_action_name_as_method_name
+      send sym, param_h
+    end
 
     def load_attributes_into o                 # called by the api action
-      o.attribute :r_script_stream, enum: [:payload],
-        stops_after: :r_script, stop_implied: true
-      o.attribute :default_outpath, default: pdf_outpath
+      o.attribute :the_rscript_is_the_payload, stop_at: :script_eventpoint,
+        stop_is_induced: true, is_adapter_parameter: true
       nil
     end
 
     def load_options_into cli_action           # [#014.4] k.i.w.f
-      cli_action.option_syntax.define! do |o|
-        s = cli_action.send :stylus  # [#050] - - stylus wiring is bad and wrong
+      cli_action.option_syntax.define! do |o|  # #todo near [#014] rename to add_definition
+        s = cli_action.send :stylus  # [#050] - - stylus wiring is bad and wrong - this will be fixed when `self` is fixed
         separator ''
         separator s.hdr 'r-specific options:'
         on '--r-script', 'output to stdout the generated r script, stop.' do
-          o[:r_script_stream] = :payload
+          o[:the_rscript_is_the_payload] = true
         end
       end
       nil
     end
+
+  protected
+
+    def initialize _ # adapter_box
+      @infostream = $stderr # meh
+      @lines = nil
+    end
+
+    # --*--
 
     param_h_h_h = -> do
       o = { }
@@ -31,12 +51,12 @@ module Skylab::Treemap
           raise ::ArgumentError, "expecting function - #{ v }"
         set[ self, "on_#{ k }".intern, v ]
       end
+      o[:trueish] = -> k, v do
+        v or raise ::ArgumentError, "required - #{ k }"
+      end
       o[:pathname] = -> k, v do
         k2 = k.to_s.gsub( /(?<=_)(in|out)path\z/ ) { "#{ $1 }_pathname" }.intern
         set[ self, k2, ( v ? ::Pathname.new( v ) : v ) ]
-      end
-      o[:required] = -> k, v do
-        v or raise ::ArgumentError, "required - #{ k }"
       end
       o[:set] = -> k, v do
         set[ self, k, v]
@@ -45,40 +65,35 @@ module Skylab::Treemap
     end.call
 
     param_h_h = {
-      csv_inpath:          [:required, :pathname],
-      failure:             [:required, :hook],
+      csv_inpath:          [:trueish, :pathname],
+      failure:             [:trueish, :hook],
       info:                [:hook],
-      rscript:             [:hook],
-      stop_after_script:   [:set],
+      payline:             [:trueish, :hook],
+      stop_at:          [:set],
       success:             [:hook],
+      the_rscript_is_the_payload: [:set],
       title:               [:set],
-      tmpdir:              [:required, :set],
+      tmpdir:              [:trueish, :set],
     }
 
-    define_method :render_treemap do |param_h|
+    define_method :render do |param_h|
       res = false
       begin
         forml, actul = param_h_h.keys, param_h.keys
         ( bad = actul - forml ).any? and raise ::NameError, "no: #{ bad * ' ' }"
         ( mis = forml - actul ).any? and raise ::ArgumentError, "missing:#{mis}"
-        param_h.each do |k, v|
+        param_h.each do |k, v|                 # (tained order)
           param_h_h.fetch( k ).each do |kk|
             instance_exec k, v, &param_h_h_h.fetch( kk )
           end
           nil
         end
-        @title ||= 'Treemap'
+        @title ||= 'Treemap'      # #todo you know you want it
         res = execute
       end while nil
       res
     end                           # (will need to think about re-wiring if we
                                   # ever invoke the same client twice!)
-  protected
-
-    def initialize _ # adapter_box
-      block_given? and fail "no wiring here"
-      @infostream = $stderr # meh
-    end
 
     def bridge
       @bridge ||= Plugins::R::Bridge.new do |o|
@@ -97,7 +112,6 @@ module Skylab::Treemap
         normalize_tmpdir or break
         normalize_csv_path or break
         generate_script or break
-        @stop_after_script and break
         pipe_the_script
       end while nil
     end
@@ -108,20 +122,31 @@ module Skylab::Treemap
       str.to_s.gsub deny_rx, ''
     end
 
-    define_method :generate_script do
-      if @csv_in_pathname && @title
-        y = ( @script ||= [] ).clear
+    Plugins::R::Client::Tees_LTLT = MetaHell::Proxy::Tee.new :<<
+
+    define_method :generate_script do         # just as a fun excercize we
+                                              # separate how the lines are used
+      if @csv_in_pathname && @title           # from where they are made:
+        @lines ? @lines.clear : ( @lines = [] ) # run all operations thru
+        y = Plugins::R::Client::Tees_LTLT.new # a tee for fun and flexibility.
+        y[:lines] = @lines                   # (mostly fun.)
+        on_payline = @on_payline
+        if @the_rscript_is_the_payload        # if the remote host wants to
+          y[:downstream] = MetaHell::Proxy::Dynamic[ # see every line of the
+            :<< => -> s { on_payline[ s ] } ] # script to do whatever with
+                                              # as it is made, we way-over
+        end                                   # engineered this for that purpose
         y << %|# install.packages("portfolio") # install it, necessary one once|
         y << %|library(portfolio)|
         y << %|data <- read.csv("#{ @csv_in_pathname }")|
         y << %|map.market(id=data$id, area=data$area, group=data$group, #{
           }color=data$color, main="#{ esc[ @title ] }")|
         y << %|# end of generated script|
-        y.each { |s| @on_script[ s ] } if @on_rscript
-        true
+        res = :script_eventpoint == @stop_at ? nil : true
       else
-        @script = false
+        res = @lines = false
       end
+      res
     end
 
     def info msg
@@ -178,10 +203,10 @@ module Skylab::Treemap
     def pipe_the_script
       res = false
       begin
-        @script or break # one last little sanity check
+        @lines or break # one last little sanity check
         bridge.is_active || @bridge.activate || break
         mtime1 = pdf_outpath.exist? && @pdf_outpath.stat.mtime
-        upstream = Services::File::Lines::Enumerator::From::Array.new @script
+        upstream = Services::File::Lines::Enumerator::From::Array.new @lines
         inf = -> s { @infostream.write s }
         select = Headless::IO::Upstream::Select.new
         select.timeout_seconds = 0.3
