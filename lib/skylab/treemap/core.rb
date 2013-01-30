@@ -24,3 +24,4 @@ module Skylab::Treemap
     extend MetaHell::Autoloader::Autovivifying::Recursive
   end
 end
+::Skylab::Treemap.const_get(:Adapter, false) ; require_relative 'adapter/mote' # 1 commit shenanigans
