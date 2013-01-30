@@ -21,7 +21,7 @@ module Skylab::Treemap
           nil
         end
       res = if found then found else
-        msg = "adapter #{ bad_value adapter_ref } #{ msg }"
+        msg = "adapter #{ ick adapter_ref } #{ msg }"
         otherwise ? otherwise[ msg ] : error( msg )
       end
       res

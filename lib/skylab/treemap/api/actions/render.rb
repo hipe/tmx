@@ -312,10 +312,9 @@ module Skylab::Treemap
       srand 867 # #todo this is just so we can trigger dupe-checking on fs
       if csv_needs_to_be_written
         with_csv_out_stream do |csv_out|
-          Treemap::Services::File::CSV::Render.invoke @tree do |o|
-            o.on_payload { |e| csv_out.puts e.to_s }
-            o.on_error   { |e| error e }
-            o.on_info    { |e| info e }
+          csv = Treemap::Services::File::CSV::Render.new @tree
+          csv.each do |line|
+            csv_out.puts "#{ line }"
           end
         end
       else

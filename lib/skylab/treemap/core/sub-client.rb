@@ -28,15 +28,15 @@ module Skylab::Treemap
 
     delegates_to :stylus,
       :and_,
-      :bad_value,
       :em,
       :escape_path,
+      :ick,
       :kbd,
       :or_,
       :pre,
       :param,
       :s,
-      :value
+      :val
 
     def api_client
       request_client.send :api_client

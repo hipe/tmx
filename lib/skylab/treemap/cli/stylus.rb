@@ -2,10 +2,6 @@ module Skylab::Treemap
   class CLI::Stylus
     include Bleeding::Styles
 
-    def bad_value value           # [#040] - rename to `ick`
-      pre value.inspect
-    end
-
     alias_method :treemap_original_stylize, :stylize
 
     def do_stylize= bool
@@ -28,6 +24,10 @@ module Skylab::Treemap
         end
       end
       "#{ x }"
+    end
+
+    def ick value                 # decorate an incorrect value
+      pre value.inspect
     end
 
     alias_method :kbd, :pre
@@ -58,8 +58,8 @@ module Skylab::Treemap
       self
     end
 
-    def value value              # [#041] - rename to `val`
-      pre value.inspect
+    def val x                     # decorate a 'value'
+      pre x.inspect
     end
 
   protected

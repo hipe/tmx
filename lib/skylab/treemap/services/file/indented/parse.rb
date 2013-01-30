@@ -29,7 +29,7 @@ module Skylab::Treemap
     def advance_to_first_line
       res = @lines.peeking.detect { |line| @first_line_rx =~ line }
       if ! res
-        res = parse_error "#{ pre @attributes.fetch(:char).label } #{
+        res = parse_error "#{ pre @attributes.fetch(:char).label_string } #{
           }not found at the start of any line (of #{ @lines.index + 1 })"
       end
       res

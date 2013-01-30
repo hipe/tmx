@@ -8,8 +8,8 @@
 [#045]       audit legacy wiring like this or k.i.w.f - keep it around for now
 [#044] #open - s.c#error ?
 [#043]       #done consider moving cli action
-[#042]       "100.200 not here" i have no idea what it means but ..
-[#041] #open rename to `val`
+[#042]       #done "100.200 not here" i have no idea what it means but ..
+[#041]       #done rename to `val`
 [#040] #open rename to `ick`
 [#039] #open track the ridiculousness of more-ness
 [#038] #open saying "dumarize" is so ugly)
@@ -35,7 +35,7 @@
 [#020]       #feature-point non-atomicicity of parameter setting for aggregated,
              progressive validation errors (may be a feature, may be a smell)
 [#019]       #feature-point the stylus that is not hot
-[#018] #open abstract tabular instead of csv
+[#018]       #done abstract tabular instead of csv
 [#017]       #done adapters should all have at least a core.rb, autoloadify thin
              gs! (actually not necessary, a.l descends down)
 [#016] #open big dep graph audit of all cli on all subproducts

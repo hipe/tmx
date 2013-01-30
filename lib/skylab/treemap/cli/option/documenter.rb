@@ -137,7 +137,7 @@ module Skylab::Treemap
       sw = cli_action.option_syntax.options.fetch_by_switch(
         long.first || short.first ) # shouldn't matter which, either should do
       cli_action.instance_exec do # inspired by [#sg-029] ..
-        "#{ value sw.default }"
+        "#{ val sw.default }"
       end
     end
   end

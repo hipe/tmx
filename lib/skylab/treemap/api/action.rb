@@ -56,7 +56,7 @@ module Skylab::Treemap
           at_the_time = attr_metadata[:enum].dup # (but still not safe.. (..))
           add_validation_error_for attribute_name, -> do
             "must be #{ or_ at_the_time.map(& method(:pre)) } #{
-              }(had #{ value x })"
+              }(had #{ val x })"
           end
         end
         x

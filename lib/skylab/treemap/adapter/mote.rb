@@ -123,7 +123,7 @@ module Skylab::Treemap
 
     def _summary_lines y  # this is the lightweight version
       if @is_native
-        y << "the #{ value @name.to_slug } action."
+        y << "the #{ val @name.to_slug } action."
       end
       nil
     end
