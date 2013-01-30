@@ -4,7 +4,12 @@ module Skylab::Treemap::TestSupport
 
   describe "#{ Skylab::Treemap::Adapter } whackily hand-written sub_ext" do
 
-    rx = Treemap::Adapter::FUN.extname_rx
+    # #todo this isn't even used anywhere anymore
+
+    rx = /\A (?: (?<stem>|.*[^\.]|\.+)
+      (?<extname>\.[^\.]*)
+      |(?<stem>[^\.]*)
+    ) \z/x
 
     let( :match_data ) { rx.match input }
 

@@ -1,5 +1,5 @@
 module Skylab::Treemap
-  class Plugins::R::CLI::Actions::Install < Treemap::CLI::Action
+  class Plugins::R::CLI::Actions::Install < Plugins::R::CLI::Action
 
     desc "for installing R"
 

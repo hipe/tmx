@@ -1,5 +1,5 @@
 module Skylab::Treemap
-  class Plugins::FooBar::CLI::Actions::Install < Treemap::CLI::Action
+  class Plugins::FooBar::CLI::Actions::Install < Plugins::FooBar::CLI::Action
     desc "yerp"
 
   end

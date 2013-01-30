@@ -10,6 +10,22 @@ module Skylab::Treemap
 
   protected
 
+    def _treemap_sub_client_init rc=nil
+      if rc
+        if rc.respond_to? :call
+          @rc = rc
+          @request_client = nil
+        else
+          @rc = nil
+          @request_client = rc
+        end
+      else
+        @rc = @request_client = nil
+      end
+      @error_count = 0
+      nil
+    end
+
     delegates_to :stylus,
       :and_,
       :bad_value,
@@ -21,10 +37,6 @@ module Skylab::Treemap
       :param,
       :s,
       :value
-
-    def adapter_box
-      request_client.send :adapter_box
-    end
 
     def api_client
       request_client.send :api_client
@@ -45,11 +57,25 @@ module Skylab::Treemap
       # thing and being a *cli* sub-client (action) when you invoke this.
       # things can be splayed out as needed.
       "#{ request_client.send :normalized_invocation_string } #{
-        }#{ normalized_local_name }"
+        }#{ name.to_slug }"
+    end
+
+    def request_client
+      @rc ? @rc.call : @request_client
     end
 
     def stylus
       request_client.send :stylus
     end
+  end
+
+  module Core::Action  # sorry, avoiding orphan
+  end
+
+  module Core::Action::InstanceMethods
+
+    include Headless::Action::InstanceMethods
+    include Core::SubClient::InstanceMethods
+
   end
 end

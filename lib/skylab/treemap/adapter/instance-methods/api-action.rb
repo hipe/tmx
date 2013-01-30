@@ -1,63 +1,31 @@
 module Skylab::Treemap
   module Adapter::InstanceMethods::API_Action # (was [#024])
-    include Treemap::Core::SubClient::InstanceMethods
+    include Adapter::InstanceMethods::Action
 
   protected
-                                  # result values are very important and fixed:
-                                  # false if failure
-                                  # nil if no change (to adapter, not name)
-                                  # else adapter instance (it changed)
-    def activate_adapter_if_necessary name, error
-      res = set_adapter_name name, error
-      if false != res
-        before = adapter_box.hot_instance_ivar
-        if ! ( before && res.nil? ) # assume this means correct is already set
-          res or fail 'sanity' # it's not nil and and it's not false so
-          if ! adapter_box.hot_class_ivar
-            res = adapter_box.load_hot_class error
-          end
-          res &&= adapter_box.hot_instance
-        end
-      end
-      res
+
+    def _adapter_init
+      @adapter_action_cache = { }
     end
 
-    def adapter_box
-      @adapter_box ||= api_client.adapter_box
-    end
-                                  # if you don't have this, then defaulting
-                                  # logic will change the active adapter
-    def adapter_name              # from one that you selected! (because
-      adapter_box.hot_name        # the parad definer creates a reader
-    end                           # for you! ouch!)
-
-
-    def adapter_name= name
-      set_adapter_name name, -> e do
-        add_validation_error_for :adapter_name,
-          "failed to load {{adapter_name}}: adapter #{ e }",
-            adapter_name: name
-        end
-      name
+    def adapter_api_action
+      with_adapter_api_action -> x { x }
     end
 
-    def set_adapter_name name, error=nil       # res false, nil, or name
+    def with_adapter_api_action func
       res = false
-      found, a = adapter_box.fuzzy_match_name name
-      case found.length
-      when 0
-        # i bet you wish you had headless sub-client [#010]
-        err = "not found. #{ s a, :no }known adapter#{ s a } #{ s a, :is } #{
-                }#{ and_ a.map { |x| pre x } }".strip
-      when 1
-        res = adapter_box.set_hot_name found.first # nil or name
-      else
-        err = "is ambiguous -- did you mean #{ or_ found.map { |x| pre x } }?"
-      end
-      if false == res
-        error ||= -> e { self.error e }
-        error[ "adapter #{ pre name } #{ err }" ]
-      end
+      begin
+        @adapter_name or break( error "adapter name not set" )
+        res = resolve_adapter( @adapter_name ) or break
+        res = res.item.resolve_api_action_class( normalized_action_name,
+          -> e do
+            error e
+          end )
+        action = @adapter_action_cache.fetch( res ) do |k|
+          @adapter_action_cache[ k ] = k.new self
+        end
+        res = func[ action ]
+      end while nil
       res
     end
   end

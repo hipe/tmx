@@ -1,4 +1,4 @@
-[#052] #open invert is broken so stops are broken
+[#052]       #done invert is broken so stops are broken
 [#051]       #done - legacy test wiring
 [#050] #open - stylus wiring is bad and wrong
 [#049]       #tracking-tag adapter arch. all-purpose

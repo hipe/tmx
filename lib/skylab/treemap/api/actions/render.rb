@@ -63,8 +63,12 @@ module Skylab::Treemap
 
   protected
 
-    def initialize api_client
-      super
+    def initialize mode_client
+      Treemap::CLI::Action === mode_client or fail "sanity - this has #{
+        }changed - we construct api actions with a mode client now, #{
+        } had: #{ mode_client.class }"
+      super mode_client
+      _adapter_init
       @outpath = nil
     end
 
@@ -122,11 +126,11 @@ module Skylab::Treemap
                                end
         }
         formal_attributes.which(& :is_adapter_parameter ).each do |k, fattr|
-          param_h[ k ] = send k
-        end # this is a smell but oh well it's fun
-        res = adapter_box.hot_instance.invoke :render, param_h
-        # `invoke` gives the plugin impl. autonomy also there is the big
-        # arch. issue of [#049]
+          param_h[ k ] = send k   # fun smell
+        end
+        res = with_adapter_api_action -> action do
+          action.invoke param_h
+        end
       end while nil
       res
     end
@@ -190,7 +194,8 @@ module Skylab::Treemap
           @outpath = nil
           break( res = true )
         end
-        pathn = adapter_box.hot_instance.default_outpath
+        res = adapter_api_action or break
+        pathn = res.default_outpath
         outpn = Treemap::Models::Pathname.new pathn, -> pn do
           b = pn.exist?                        # (`is_missing_required_force`)
           b &&= outpath_requires_force

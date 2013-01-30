@@ -17,7 +17,6 @@ module Skylab::Treemap
 
     def initialize attributes, char, pathname, stylus, error
       block_given? and fail 'no'
-      @error_count = 0
       @attributes, @char, @stylus = attributes, char, stylus
       @lines = @line_rx = @first_line_rx = nil
       @pathname = ( ::Pathname.new( pathname ) if pathname )

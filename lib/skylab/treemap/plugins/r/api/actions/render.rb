@@ -1,41 +1,20 @@
 module Skylab::Treemap
-  class Plugins::R::Client
+
+  class Plugins::R::API::Actions::Render
     # gotchas: + pattern of emitting a path: everywhere as metadata
-    # [#049] plugin arch: client *actions* are the ones that need to
-    # populate the f.a's and opts
 
     def default_outpath           # request client requires this (the adapter
       pdf_outpath                 # chooses the name, see!?)
     end
 
-    def invoke action_ref, param_h # this logic will get split up.. [#049]
-      kls = Plugins::R::API::Actions.const_fetch action_ref
-      sym = kls.normalized_local_action_name_as_method_name
-      send sym, param_h
-    end
-
-    def load_attributes_into o                 # called by the api action
-      o.attribute :the_rscript_is_the_payload, stop_at: :script_eventpoint,
-        stop_is_induced: true, is_adapter_parameter: true
-      nil
-    end
-
-    def load_options_into cli_action           # [#014.4] k.i.w.f
-      cli_action.option_syntax.define! do |o|  # #todo near [#014] rename to add_definition
-        s = cli_action.send :stylus  # [#050] - - stylus wiring is bad and wrong - this will be fixed when `self` is fixed
-        separator ''
-        separator s.hdr 'r-specific options:'
-        on '--r-script', 'output to stdout the generated r script, stop.' do
-          o[:the_rscript_is_the_payload] = true
-        end
-      end
-      nil
-    end
+    # (public `invoke` defined below)
 
   protected
 
-    def initialize _ # adapter_box
-      @infostream = $stderr # meh
+    def initialize _              # (this is the upstream api action but
+                                  # we avoid coupling to it in favor of
+                                  # hooks that emit metadata)
+      @infostream = $stderr # meh this is just while we debug nonblocking io
       @lines = nil
     end
 
@@ -76,7 +55,7 @@ module Skylab::Treemap
       tmpdir:              [:trueish, :set],
     }
 
-    define_method :render do |param_h|
+    define_method :invoke do |param_h|
       res = false
       begin
         forml, actul = param_h_h.keys, param_h.keys
@@ -122,14 +101,14 @@ module Skylab::Treemap
       str.to_s.gsub deny_rx, ''
     end
 
-    Plugins::R::Client::Tees_LTLT = MetaHell::Proxy::Tee.new :<<
+    Plugins::R::API::Actions::Render::Tees_LTLT = MetaHell::Proxy::Tee.new :<<
 
     define_method :generate_script do         # just as a fun excercize we
                                               # separate how the lines are used
       if @csv_in_pathname && @title           # from where they are made:
         @lines ? @lines.clear : ( @lines = [] ) # run all operations thru
-        y = Plugins::R::Client::Tees_LTLT.new # a tee for fun and flexibility.
-        y[:lines] = @lines                   # (mostly fun.)
+        y = Plugins::R::API::Actions::Render::Tees_LTLT.new # a tee for fun and
+        y[:lines] = @lines                   # flexibility (mostly fun.)
         on_payline = @on_payline
         if @the_rscript_is_the_payload        # if the remote host wants to
           y[:downstream] = MetaHell::Proxy::Dynamic[ # see every line of the

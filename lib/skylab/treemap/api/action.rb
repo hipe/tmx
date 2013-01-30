@@ -1,19 +1,36 @@
 module Skylab::Treemap
 
   class API::Action
-    extend Headless::NLP::EN::API_Action_Inflection_Hack
-    extend MetaHell::Formal::Attribute::Definer
-    extend PubSub::Emitter
+                                               # (order)
 
-    inflection.stems.noun = 'treemap'
+    extend Headless::Action::ModuleMethods     # for normalized name inference
+
+    ACTIONS_ANCHOR_MODULE = -> { API::Actions }  # idem
+
+    include Treemap::Core::Action::InstanceMethods  # idem, stylers
+
+    extend Headless::NLP::EN::API_Action_Inflection_Hack  # for noun inflection
+                                               # when reporting actions
+    inflection.stems.noun = 'treemap'          # idem
+
+
+    extend MetaHell::Formal::Attribute::Definer # formal attributes can be used
+                                               # for the 95% use case of
+                                               # parameter validation
+
+    include Treemap::Adapter::InstanceMethods::API_Action # not necessarily
+                                               # every action needs them
+
+    extend PubSub::Emitter                     # this has to come after s.c
+                                               # because of `emit`
 
     attribute_metadata_class do
-      def is? mattr                          # exp.
+      def is? mattr                            # exp.
         fetch mattr do end
       end
-      def label_string                       # bc. _not_ modality aware!
-        fetch :label do                      # future-proofing,
-          normalized_name.to_s.gsub '_', ' ' # if metaattr not exist
+      def label_string                         # bc. _not_ modality aware!
+        fetch :label do                        # future-proofing,
+          normalized_name.to_s.gsub '_', ' '   # if metaattr not exist
         end
       end
     end
@@ -70,11 +87,8 @@ module Skylab::Treemap
 
     # -- * --
 
-    include Treemap::Core::SubClient::InstanceMethods
-    include Treemap::Adapter::InstanceMethods::API_Action # not all s.c should
 
 
-    public :activate_adapter_if_necessary   # experimental-near hacks
 
                                   # mutates param_h (experimental
                                   # future-proofing for possible chaining or
@@ -118,8 +132,9 @@ module Skylab::Treemap
   protected
 
     def initialize api_client
+      _treemap_sub_client_init nil
       @validation_errors = API::Action::Generic_Box.new
-      clear
+      clear_attribute_ivars
       @api_client = api_client
       nil
     end
@@ -133,7 +148,7 @@ module Skylab::Treemap
     attr_reader :api_client
 
     def clear
-      formal_attributes.names.each { |k| instance_variable_set "@#{ k }", nil }
+      clear_attribute_ivars
       @error_count = 0
       @validation_errors.clear
       nil
@@ -162,6 +177,11 @@ module Skylab::Treemap
 
     def formal_attributes
       formal_attribute_definer.attributes
+    end
+
+    def clear_attribute_ivars
+      formal_attributes.names.each { |k| instance_variable_set "@#{ k }", nil }
+      nil
     end
 
     def payload line              # imagine having this live in or or another

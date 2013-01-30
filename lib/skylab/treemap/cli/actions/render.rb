@@ -61,8 +61,15 @@ module Skylab::Treemap
 
   protected
 
+    def initialize(*)
+      super
+      _adapter_init
+    end
+
+  include Treemap::Adapter::InstanceMethods::CLI_Action
+
     def build_option_syntax       # k.i.w.f
-      load_adapter = -> name { self.load_adapter name }
+      enhance_with_adapter = -> x { self.enhance_with_adapter x }
       op = self.class.option_syntax.dupe
       op.parser_class = CLI::Option::Parser
       op.documentor_class = CLI::Option::Documenter
@@ -75,39 +82,17 @@ module Skylab::Treemap
       # my whole entire life - before we parse opts like normal..
       # we convinced ourselves that the only way to bootrap the adapter was
       op[:parse] = -> argv, args, help, syn_err do   # EPIC HACKERY..
-        name = options[:adapter_name].parse! argv    # mutate argv
-        name or (hlp = options[:help].parse argv)    # do not mutate argv
+        ref = options[:adapter_name].parse! argv     # mutate argv
+        ref or (hlp = options[:help].parse argv)     # do not mutate argv
                                   # LOAD THE ADAPTER HERE - FRAGILE CITY
         rs = true                 # if a name was provided, load that, else
-        if name || ! ( 1 == argv.length && hlp )     # ( load the default unless
-          rs = load_adapter[ name ] # help appeared as the only option )
+        if ref || ! ( 1 == argv.length && hlp )     # ( load the default unless
+          rs = enhance_with_adapter[ ref ] # help appeared as the only option )
         end
         rs &&= orig_parse argv, args, help, syn_err
         rs
       end
       op
-    end
-
-    def api_action                # this may very well prove to be a non-
-      @api_action ||= begin       # standard coupling of api & modality
-        action = api_client.action :render
-        wire_api_action action
-        action
-      end
-    end
-
-    def load_adapter name
-      name ||= api_action.formal_attributes[:adapter_name][:default]
-      name or fail 'sanity'
-      ad = api_action.activate_adapter_if_necessary name, -> e do
-        info e
-        help_invite for: ' for more about help with adapters.'
-      end
-      if ad # if you got it it means there were no errors *and* it changed
-        ad.load_attributes_into api_action.formal_attribute_definer
-        ad.load_options_into self
-        true
-      end
     end
 
     def parse_opts opt_h

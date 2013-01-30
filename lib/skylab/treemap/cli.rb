@@ -26,7 +26,7 @@ module Skylab::Treemap
   protected
 
     def initialize *a, &b
-      @error_count = 0
+      _treemap_sub_client_init nil
       @stylus = Stylus.new # let's have this be the only place this is built
       if a.length.nonzero?
         3 == a.length or raise ::ArgumentError.new "expecting sin, sout, serr"
@@ -46,15 +46,15 @@ module Skylab::Treemap
       nil
     end
 
-    include Treemap::Adapter::InstanceMethods::API_Action # not all s.c should
-
-    def actions                   # compat - legacy and kewl
-      a = [ Bleeding::Constants[ action_anchor_module ] ]
-      a << plugin_action_box_flip_box
-      a << Bleeding::Officious.actions
-      Bleeding::Actions[ * a ]
+    def actions                   # compat, was kind kewl
+      @actions ||= begin
+        # Bleeding::Constants[ action_anchor_module ] (just local no adapters)
+        Bleeding::Actions[
+          Treemap::Adapter::Mote::Actions.new( self ),
+          Bleeding::Officious.actions
+        ]
+      end
     end
-
                                   # (be ready to pivot the below design,
                                   # singletons are bad (read the blogs)
                                   # so we might make it a property of the
@@ -80,13 +80,6 @@ module Skylab::Treemap
 
     def normalized_invocation_string # #forward-fit #buck-stop
       program_name
-    end
-
-    def plugin_action_box_flip_box
-      @plugin_action_box_flip ||= Treemap::Adapter::BoxFlip.new self
-      a = [ ]
-      @plugin_action_box_flip.visit a
-      a
     end
 
     def porcelain # [#042] - 100.200 not here

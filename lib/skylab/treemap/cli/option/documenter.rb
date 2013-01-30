@@ -39,9 +39,9 @@ module Skylab::Treemap
 
   protected
 
-    def initialize( * )
-      super
-      @error_count = 0
+    def initialize x=nil
+      super()  # important - initialze o.p!
+      _treemap_sub_client_init x
       @cli_action = nil
     end
 

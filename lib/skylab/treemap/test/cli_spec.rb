@@ -16,8 +16,12 @@ module Skylab::Treemap::TestSupport::CLI
         fail 'failed to find "actions:" section'
       names = []
       while line = scn.scan( /^[[:space:]].*\n/ ) do
-        if md = line.match( /^[[:space:]]+([-a-z]+)*/) # weak!
-          names.push md[1]
+        if md = line.match( /^[[:space:]]+([-a-z]+)?/) # weak!
+          if md[1]
+            names.push md[1]
+          else
+            line.should match( /can utilize plugin/ ) # #todo this is awful
+          end
         end
       end
       names.should eql( %w(render doobie install) )
