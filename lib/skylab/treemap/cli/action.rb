@@ -1,11 +1,13 @@
 module Skylab::Treemap
   class CLI::Action
 
-    extend Headless::Action::ModuleMethods # let legacy trump frontier for now..
+    extend Headless::CLI::Action::ModuleMethods # let legacy trump frontier..
 
     MODALITIES_ANCHOR_MODULE = Treemap
 
     ACTIONS_ANCHOR_MODULE = -> { Treemap::CLI::Actions }
+
+    include Headless::CLI::Action::InstanceMethods
 
     extend Bleeding::Action       # legacy
 
