@@ -1,3 +1,4 @@
+[#020] #open box instance methods separate from box class
 [#019]       #done boxxy peeks at fs now, hacks `constants`
 [#018] #open corral proxies
 [#017]       #done corral tees

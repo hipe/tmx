@@ -739,7 +739,7 @@ module Skylab::Porcelain::Bleeding
 
   class DocumentorInferred < MetaInferred
     include ActionInstanceMethods
-    def initialize parent, reflector
+    def initialize parent, reflector, _obj=nil
       parent.respond_to? :emit or fail "sanity - is parent not an emitter?"
       self.parent = parent
       set! reflector

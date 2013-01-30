@@ -4,18 +4,18 @@ module Skylab::MetaHell
                                   # like other things too. by default none of
                                   # its public members mutate its composition.
 
-    [ :detect, :defectch, :filter, :map, :reduce, :select ].each do |m|
+    [ :detect, :defectch, :filter, :map, :reduce, :select, :which ].each do |m|
       define_method m do |*a, &b|
         each.send m, *a, &b
       end
     end
 
     def each *a, &b
-      Formal::Box::Enumerator.new( self.class, -> y do
+      Formal::Box::Enumerator.new( -> y do
         @order.each do |k|
           y.yield k, @hash.fetch( k ) # always give the yielder 2 args (norm'd)
         end
-      end )._each( *a, &b )
+      end, self.class )._each( *a, &b )
     end
 
     def fetch key, &otherwise
@@ -38,6 +38,30 @@ module Skylab::MetaHell
 
     def first &b
       fetch_index 0, &b
+    end
+
+    # fuzzy_fetch
+    # This is a higher-level, porcelain-y convenience function, written as an
+    # #experimental attempt to corral repetitive code like this into one place.
+    # (and it will likely be moved to an InstanceMethods one day [#mh-020])
+    # To use it, your box subclass must implement `fuzzy_reduce` (usually in
+    # about one line) (see). Internally, it creates a subset box of the items
+    # that match the string per your fuzzy_reduce method. If none was matched
+    # `when_zero` is called with no arguments. If one, `when_one` is called
+    # with **the matching `Formal::Box::Matchdata` object (see)**, which has
+    # the matched item in it with other metadata (some algos like to know
+    # what search string was used, or which of several searched-against strings
+    # was matched). If more than one item was matched, `when_many` is called
+    # with the whole box of matchdatas. Result is result of the callback.
+    #
+
+    def fuzzy_fetch search_ref, when_zero, when_one, when_many
+      match_box = fuzzy_reduce search_ref
+      case match_box.length
+      when 0 ; when_zero[]
+      when 1 ; when_one[ match_box.first ]
+      else   ; when_many[ match_box ]
+      end
     end
 
     def has? key
@@ -135,6 +159,35 @@ module Skylab::MetaHell
       end
     end
 
+    #   `fuzzy_reduce` via `_fuzzy_reduce`
+    # `fuzzy_reduce` is typically used as a backend for `fuzzy_fetch` (see).
+    # In your box subclass, implement a method `fuzzy_reduce ref` and for its
+    # body you will typically call `_fuzzy_reduce`, passing it a string as
+    # a search query, and a function that takes three arguments. the function
+    # will be called once for each item in your box, and will be passed the
+    # item's name, value, and a yielder. Pass into the yielder whatever
+    # string(s) you want to represent the item by in this search:
+    #
+    #     def fuzzy_reduce ref                            # `slug` e.g. is
+    #       _fuzzy_reduce ref, -> k, v, y { y << v.slug } # something your items
+    #     end                                             # respond to, stringy
+    #
+    # Internally, e.g _fuzzy_reduce will use a regex created from the search
+    # ref and match it against each string you yield, stopping at the first
+    # match per item (but still the broader search continues over each item).
+    # The result is a new box whose names correspond to the matching subset
+    # of names in your box, and whose values will be one Formal::Box::MatchData
+    # per item (see).
+    #
+    # If your items have multiple aliases or keywords to be searched
+    # against (i.e. not just one "name" string), just loop over them and
+    # yield each one to the yielder, which is what it's there for.
+    #
+    # (The reason you have to implement a `fuzzy_reduce` yourself is because
+    # it would be a bit of a smell for this library to assume how to induce
+    # one or more strings for your items.)
+    #
+
     def _fuzzy_reduce ref, tuple               # tuple gets (k, x, y). yield
       rx = /\A#{ ::Regexp.escape ref.to_s.downcase }/ # each name you want to
       match = nil                                     # try. box result.
@@ -164,6 +217,10 @@ module Skylab::MetaHell
       @hash[name] = value
       res
     end
+  end
+
+  class Formal::Box::Open < Formal::Box
+    public :accept, :open  # #exp
   end
 
   class Formal::Box::Enumerator < ::Enumerator
@@ -305,11 +362,15 @@ module Skylab::MetaHell
       end
     end
 
+    alias_method :which, :filter  # #experimental
+
   protected
 
     alias_method :metahell_original_initialize, :initialize
 
-    def initialize box_class, func
+    def initialize func, box_class=Formal::Box
+      func.respond_to?( :call ) or raise ::ArgumentError, "f?: #{ func.class }"
+      ::Class === box_class or raise ::ArgumentError, "c?: #{ box_class.class }"
       super(& method( :visit ) )
       @arity_override = nil
       @box_class = box_class
@@ -319,13 +380,13 @@ module Skylab::MetaHell
     define_method :_filter do |func|
       normalize = norm_h[ func.arity ]
       outer = self
-      self.class.new( @box_class, -> normal_yielder do
+      self.class.new( -> normal_yielder do
         outer.each do |k, v|
           if func[ * normalize[ k, v ] ]
             normal_yielder.yield k, v
           end
         end
-      end )
+      end, @box_class )
     end
 
     def visit y

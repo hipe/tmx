@@ -152,21 +152,25 @@ module Skylab::MetaHell
       # boxy but that got us into trouble where tests loaded explicit box
       # items themselves, for e.g) We want to ensure that this doesn't give
       # us non-deterministic sort orders.
-      ea = ::Enumerator.new do |y|
+      ea = MetaHell::Formal::Box::Enumerator.new( -> normalized_consumer do
         if ! @boxxy_load_mutex && dir_path
           @boxxy_load_mutex = true  # mutex lock!
           constants.each do |const|
             case_insensitive_const_get const  # MONEYSHOT
           end
         end
-        constants.map(&:to_s).sort.each do |const|
-          y << const_get( const, false )
+        constants_sorted.each do |const|
+          normalized_consumer.yield const, const_get( const, false )
         end
-      end
+      end )
       block ? ea.each(& block ) : ea
     end
 
   protected
+
+    def constants_sorted
+      constants.map(& :to_s ).sort.map(& :intern )
+    end
 
     constantify = ::Skylab::Headless::Name::FUN.constantify # shh
 

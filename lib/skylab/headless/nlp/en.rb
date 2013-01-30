@@ -9,7 +9,7 @@ module Skylab::Headless
 
     o = { }
 
-    initial_vowel_rx = /\A[a-z]/i
+    initial_vowel_rx = /\A[a-e]/i
 
     all_caps_rx = /\A[A-Z]+\z/
 

@@ -32,6 +32,12 @@ module Skylab::Headless
 
     attr_reader :desc_lines
 
+    def modalities_anchor_module
+      x = const_get :MODALITIES_ANCHOR_MODULE, true
+      x.respond_to?( :call ) and x = x.call
+      x
+    end
+
     let :normalized_action_name do
       Action::FUN.build_normalized_name[ actions_anchor_module, self ]
     end
