@@ -1,6 +1,6 @@
 module Skylab::Treemap
   class CLI::Option::Parser::Syntax < Bleeding::OptionSyntax
-    include CLI::Option::Parser::Reflection::InstanceMethods
+    include CLI::Option::Box::InstanceMethods
 
     def []= k, v                  # redefine any instance method you want!
       redefine_method! k, v       # (silly experimentation)
@@ -37,7 +37,7 @@ module Skylab::Treemap
     def string emph=nil           # emphasize an option, **SUPREME HACK**
       if emph
         list = documentor.top.list.dup
-        scn = CLI::Option::Parser::Reflection::Option_Scanner.new list
+        scn = CLI::Option::Box::Option_Scanner.new list
         pop = scn.fetch -> x { emph == x.normalized_name } # else fails
         list[ scn.count - 1, 1 ] = []
         @switches = list
