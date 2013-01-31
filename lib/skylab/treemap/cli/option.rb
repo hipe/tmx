@@ -1,13 +1,13 @@
 module Skylab::Treemap
-  module CLI::Option::Box # # todo
+  module CLI::Option # # todo
   end
 
-  module CLI::Option::Box::InstanceMethods
+  module CLI::Option::InstanceMethods
     def options
       @options_f ||= -> do
         seen_definition_length = 0
         is_current = false
-        box = CLI::Option::Box::Option_Box.new
+        box = CLI::Option::Option_Box.new
         on_definition_added_h[:option_syntax_reflection] = -> do
           is_current = false      # for the future, we must note we have more
           box.clear!              # options to process when more are aded
@@ -16,7 +16,7 @@ module Skylab::Treemap
         add_help = -> do          # #tracked by [#015]
           # the `help` option gets special treament because sometimes it's magic
           box.fetch_by_normalized_name :help do |k|
-            o = CLI::Option::Box::Option_Metadata.build_from_args(
+            o = CLI::Option::Option_Metadata.build_from_args(
               ['-h', '--help'] ).validate
             box.add o
             nil
@@ -25,7 +25,7 @@ module Skylab::Treemap
         -> do
           if ! is_current
             recorder =
-              CLI::Option::Box::Recorders::OptionParser.new box
+              CLI::Option::Recorders::OptionParser.new box
             while seen_definition_length < definitions.length
               defn = definitions[ seen_definition_length ]
               recorder.absorb defn
@@ -41,7 +41,7 @@ module Skylab::Treemap
     end
   end
 
-  class CLI::Option::Box::Option_Box
+  class CLI::Option::Option_Box
 
     def add opt
       if @hash.key? opt.normalized_name
@@ -110,7 +110,7 @@ module Skylab::Treemap
     end
   end
 
-  class CLI::Option::Box::Option_Metadata
+  class CLI::Option::Option_Metadata
     # an abstract nerk for derking your gerks
 
     long_rx = /\A
@@ -347,10 +347,10 @@ module Skylab::Treemap
     end
   end
 
-  module CLI::Option::Box::Recorders
+  module CLI::Option::Recorders
   end
 
-  class CLI::Option::Box::Recorders::OptionParser
+  class CLI::Option::Recorders::OptionParser
     # a recorder for option parser definitions
 
     def on *a, &b
@@ -384,7 +384,7 @@ module Skylab::Treemap
                                   # (in the order they are used)
       @default_h = { }
       @param_h_recorder =
-        CLI::Option::Box::Recorders::Param_H.new @default_h
+        CLI::Option::Recorders::Param_H.new @default_h
       @option_definition_queue = [ ]
       @option_box = option_box
     end
@@ -423,7 +423,7 @@ module Skylab::Treemap
           ::Hash === args.last and fail 'implement me'
           args.push default: @default_h[ key ]
         end
-        opt = CLI::Option::Box::Option_Metadata.build_from_args(
+        opt = CLI::Option::Option_Metadata.build_from_args(
           args, key, -> e { error e } )
         opt or break
         existing = @option_box.fetch_by_normalized_name(
@@ -442,7 +442,7 @@ module Skylab::Treemap
     end
   end
 
-  class CLI::Option::Box::Recorders::Param_H
+  class CLI::Option::Recorders::Param_H
     # this is necessarily a modal recorder - we want to do different things
     # with the values we receive based on what mode we are in.
 
@@ -490,7 +490,7 @@ module Skylab::Treemap
     end
   end
 
-  class CLI::Option::Box::Option_Scanner # for ::OptionParser hacks
+  class CLI::Option::Option_Scanner # for ::OptionParser hacks
 
     attr_reader :count
 
@@ -530,7 +530,7 @@ module Skylab::Treemap
       @enum = ::Enumerator.new do |y|
         enum.each { |x| y << x }
       end
-      @fly = CLI::Option::Box::Option_Metadata.new(
+      @fly = CLI::Option::Option_Metadata.new(
         * 6.times.map { nil } ) # for now
     end
 
