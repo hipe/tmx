@@ -37,7 +37,7 @@ module Skylab::Treemap
     def string emph=nil           # emphasize an option, **SUPREME HACK**
       if emph
         list = documentor.top.list.dup
-        scn = CLI::Option::Option_Scanner.new list
+        scn = CLI::Option::Scanner.new list
         pop = scn.fetch -> x { emph == x.normalized_name } # else fails
         list[ scn.count - 1, 1 ] = []
         @switches = list
