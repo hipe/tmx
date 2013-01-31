@@ -108,13 +108,13 @@ module Skylab::Treemap
       if @csv_in_pathname && @title           # from where they are made:
         @lines ? @lines.clear : ( @lines = [] ) # run all operations thru
         y = Plugins::R::API::Actions::Render::Tees_LTLT.new # a tee for fun and
-        y[:lines] = @lines                   # flexibility (mostly fun.)
-        on_payline = @on_payline
+        y[:lines] = @lines                    # flexibility (mostly fun.)
         if @the_rscript_is_the_payload        # if the remote host wants to
-          y[:downstream] = MetaHell::Proxy::Dynamic[ # see every line of the
-            :<< => -> s { on_payline[ s ] } ] # script to do whatever with
+          y[:downstream] = MetaHell::Proxy::Ad_Hoc :<< => @on_payline
+                                              # see every line of the
+                                              # script to do whatever with
                                               # as it is made, we way-over
-        end                                   # engineered this for that purpose
+                                              # engineered this for that purpose
         y << %|# install.packages("portfolio") # install it, necessary one once|
         y << %|library(portfolio)|
         y << %|data <- read.csv("#{ @csv_in_pathname }")|

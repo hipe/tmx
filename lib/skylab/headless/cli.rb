@@ -133,6 +133,7 @@ module Skylab::Headless
       option_parser.summarize do |line|
         emit :help, line
       end
+      nil                         # #bqwahtevr i guess you could be done
     end
 
     smart_summary_width = -> option_parser do
@@ -151,7 +152,8 @@ module Skylab::Headless
         option_parser.summary_width = smart_summary_width[ option_parser ]
         help_options
       end
-      nil
+
+      nil  # (now is an ideal time to result in nil)
     end
 
     def invite_line # we have to avoid assuming we process opts

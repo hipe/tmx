@@ -1,6 +1,6 @@
 module Skylab::MetaHell
 
-  class Proxy::Dynamic < ::BasicObject
+  class Proxy::Ad_Hoc < ::BasicObject
 
     # #experimental - for quick and dirty hacks or experimentation,
     # simply takes a hash-like whose keys are presumed to represent method
@@ -8,7 +8,8 @@ module Skylab::MetaHell
     # object out of it.
     #
     # (Alternate names for this that have been or are being considered
-    # or have been used for this are / were: `Generic`, `Plastic`)
+    # or have been used for this are / were: `Generic`, `Plastic`, `Dynamic`.
+    # kind of amusing, actually)
     #
     # (This was the orignal home of [#mh-009] - it was developed right before
     # we found out about define_singleton_method, but it stays b/c it's actually
@@ -17,8 +18,8 @@ module Skylab::MetaHell
     # you here to read this.) (hm..)
     #
 
-    def self.[] h
-      new h
+    class << self
+      alias_method :[], :new
     end
 
   protected
@@ -29,7 +30,9 @@ module Skylab::MetaHell
       end
       singleton_class.class_exec do
         h.each do |k, func|
-          define_method k, &func
+          define_method k do |*a, &b|          # necessary to do in these two
+            func[ *a, &b ]                     # steps because we want to call
+          end                                  # the proc in its original ctxt
         end
       end
     end

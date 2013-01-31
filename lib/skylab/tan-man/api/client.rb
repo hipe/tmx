@@ -89,7 +89,7 @@ module Skylab::TanMan
     #
     io_interceptor = -> emit do
       buffer = TanMan::Services::StringIO.new
-      MetaHell::Proxy::Dynamic[
+      MetaHell::Proxy::Ad_Hoc[
         write: -> str do
           buffer.write str
           str.to_s.length

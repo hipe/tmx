@@ -38,7 +38,7 @@
 [#018]       #done abstract tabular instead of csv
 [#017]       #done adapters should all have at least a core.rb, autoloadify thin
              gs! (actually not necessary, a.l descends down)
-[#016] #open big dep graph audit of all cli on all subproducts
+[#016]       #done big dep graph audit of all cli on all subproducts
 [#015]       #tracking-tag special treatment of help option in reflecion
 [#014] #open a whole file just on things i want to fix wih o.p
 [#013]       #done consider moving `_tmp-r-data/` -> data/intermediate

@@ -220,7 +220,7 @@ module Skylab::MetaHell
   end
 
   class Formal::Box::Open < Formal::Box
-    public :accept, :open  # #exp
+    public :accept, :add  # #exp
   end
 
   class Formal::Box::Enumerator < ::Enumerator

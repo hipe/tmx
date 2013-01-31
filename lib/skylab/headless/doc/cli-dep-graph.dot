@@ -1,0 +1,55 @@
+# created by tan-man on 2013-01-30 16:31:11 UTC
+
+digraph {
+
+/*
+  example stmt_list:
+    foo -> bar
+    biff -> baz
+
+  example node_stmt:
+    learn_c [label="learn C somehow"]
+*/
+
+
+label="cli dependency graph"
+
+#                 blue : fillcolor="#b5d5fb"
+#             finished : green
+#                green : fillcolor="#79f233"
+
+
+node [label="\N", style="filled", fillcolor="#b5d5fb", fontname="Futura", penwidth="1.1566", shape="Mrecord"]
+
+all [label="all.rb"]
+bleeding [label=bleeding]
+bnf2tt [label=bnf2tt]
+cov [label="cov-tree"]
+css [label="css-conv"]
+f2tt [label=f2tt]
+face [label=face]
+filemetrics [label=filemetrics]
+gsu [label=gsu]
+headless [label="headless cli"]
+homespun [label=homespun]
+my [label="my tree"]
+permute [label=permute]
+snag [label=snag]
+tan [label=tan]
+treemap [label=treemap]
+y2tt [label=y2tt]
+bnf2tt -> headless
+cov -> all
+cov -> headless
+css -> headless
+f2tt -> headless
+face -> bleeding
+filemetrics -> face
+gsu -> headless
+my -> headless
+permute -> bleeding
+snag -> all
+tan -> face
+treemap -> bleeding
+y2tt -> homespun
+}
