@@ -1,3 +1,6 @@
+[#050]       #doc-point name conventions!
+[#049]       #later formal parameters deep audit and refactor, [#009]
+             [#049.1] - set becomes box
 [#048]       #tracking-tag for select / Select in this library
 [#047]       #tracking-tag for cool short algos that illustrate simple things
              well - i mean this is a placeholder for that one thing
@@ -10,7 +13,8 @@
 [#039]       #done clean up smell of @foo ||= nil everywhere
 [#038]       #done change hackiness to the concept of `collapse` in DSL
 [#037]       #tracking-tag box classes that build their own option parsers
-[#036]       #behavior-point `par`, `parameter_label` etc -- gather it up
+[#036]       #behavior-point `par`, `parameter_label` etc -- gather it up ..
+               also: there's room for nonsense here.. big nonsense..
 [#035]       #doc-point : the boxxy cluttered namespace problem (Actions)
 [#034]       #tracking-tag for #function-point `program_name` -
               `normalized_invocation_string`
@@ -34,6 +38,7 @@
 [#020]       #convention `invoke` `execute` `run` `call` have distinct meanings
                and consistent signatures within modalities
 [#019]       #pattern #convention iff cli action invoke is false, invite
+               (referred to now as the "common triad" #doc-point) ..
 [#018]       #tracking-tag api action inflection
 [#017] #open API architecture - is frontier app at odds with assumptions?
 [#016] #open #low-priority dynamic uncolorize payload stream when ! tty?
