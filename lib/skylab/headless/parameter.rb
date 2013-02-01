@@ -139,71 +139,75 @@ module Skylab::Headless
   end
 
 
-  class Parameter::Set < ::Struct.new :list, :host
+  class Parameter::Set < MetaHell::Formal::Box
 
-    def [] name
-      list[@hash[name]] if @hash.key? name
+    def [] normalized_local_name
+      @hash.fetch normalized_local_name do end
     end
 
-    def each &block               # this was [#007], used to be `all`
-      if block_given?
-        list.each(& block)
-      else
-        list.dup                  # cheap and easy enumerable
-      end
+    def each &b                   # experimentally fully charge your graph..
+      ea = super(& nil )
+      ea.box_instance = -> { self } # with this hack
+      b ? ea.each(& b ) : ea
     end
 
-    def fetch name
-      if @hash.key? name
-        list[@hash[name]]
-      else
-        raise ::KeyError.exception "no such parameter: #{name.inspect}"
-      end
-    end
+    def empty? ;  @order.length.zero? ;  end ; def any? ; @order.length.nonzero? ; end  # #todo - transitional
+    alias_method :known?, :has?
 
     def fetch! name
-      if ! @hash.key? name
-        list[@hash[name] = list.length] =
-          host.parameter_definition_class.new host, name
+      if? name, -> x { x },
+      -> do
+        x = @host.parameter_definition_class.new @host, name
+        add name, x
+        x
       end
-      list[@hash[name]]
     end
 
     def meta_param! name, props, &b
-      meta_set.fetch!(name).merge!(props, &b)
+      meta_set.fetch!( name ).merge!( props, &b )
     end
 
     def merge! set
-      set.list.each do |p|
-        fetch!(p.name).merge!(p)
+      set.each do |name, param|
+        fetch!( name ).merge! param
       end
       nil
     end
 
-    undef_method :select          # ::Struct mixes in ::Enumerable, causes
-                                  # confusion here. we need to make sure you
-                                  # don't call it accidentally (was [#007])
-
   protected
 
     def initialize host
-      super [], host
-      @hash = {}
-      @meta_set = nil
-      host.respond_to? :parameter_definition_class or
+      super( )  # init box!
+      if ! host.respond_to? :parameter_definition_class
         def host.parameter_definition_class
-          Parameter::DEFAULT_DEFINITION_CLASS ; end
+          Parameter::DEFAULT_DEFINITION_CLASS
+        end
+      end
+      @host = host
+      @meta_set = nil
+      nil
     end
+
+    def base_args
+      [ @host, @meta_set ]
+    end
+
+    def base_init host, meta_set
+      @host = host
+      @meta_set = meta_set  # .. watch out for this..
+      nil
+    end
+
     def meta_set
       @meta_set ||= begin
         # We must make our own procedurally-generated parameter definition class
         # no matter what lest we create unintentional mutations out of our
         # scope. If a parameter_definition_class has been indicated explicitly
         # otherwise, that's fine, use it as a base class here.
-        fail 'sanity' if host.const_defined? :ParameterDefinition0
-        meta_host = ::Class.new host.parameter_definition_class
-        host.const_set :ParameterDefinition0, meta_host
-        host.singleton_class.class_eval do
+        fail 'sanity' if @host.const_defined? :ParameterDefinition0
+        meta_host = ::Class.new @host.parameter_definition_class
+        @host.const_set :ParameterDefinition0, meta_host
+        @host.singleton_class.class_eval do
           remove_method :parameter_definition_class # avoid warnings, careful!
           def parameter_definition_class
             self::ParameterDefinition0

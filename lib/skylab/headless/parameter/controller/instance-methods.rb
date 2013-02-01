@@ -56,20 +56,17 @@ module Skylab::Headless
     end
 
     def missing_required actual
-      required_params = formal_parameters.each.select(&:required?) # twice..
-
-      a = required_params.select do |p|                            # ..is nice
-        -> do
-          break( true ) if ! actual.known?( p.name )
-          break( true ) if actual[p.name].nil?
-        end.call
+      missing_a = formal_parameters.reduce [] do |m, (k, v)|
+        if v.required?
+          if ! actual.known?( k ) || actual[ k ].nil?
+            m << v
+          end
+        end
+        m
       end
-
-      if ! a.empty?
-        a.map! { |param| parameter_label param }
-        missing_required_failure a
+      if missing_a.length.nonzero?
+        missing_required_failure missing_a.map(& method( :parameter_label ) )
       end
-
       nil
     end
 
