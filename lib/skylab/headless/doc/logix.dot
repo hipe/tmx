@@ -1,0 +1,31 @@
+# created by tan-man on 2013-02-02 08:00:09 UTC
+
+digraph {
+
+/*
+  example stmt_list:
+    foo -> bar
+    biff -> baz
+
+  example node_stmt:
+    learn_c [label="learn C somehow"]
+*/
+
+label="what is your logic?"
+
+#                 blue : fillcolor="#b5d5fb"
+#             finished : green
+#                green : fillcolor="#79f233"
+
+
+node [label="\N", style="filled", fillcolor="#b5d5fb", fontname="Futura", penwidth="1.1566", shape="Mrecord"]
+
+method [label=method]
+name [label=name]
+provided [label=provided]
+receiver [label=receiver]
+method -> name
+method -> provided
+method -> receiver
+name -> provided
+}
