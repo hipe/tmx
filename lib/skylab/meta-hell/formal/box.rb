@@ -361,7 +361,7 @@ module Skylab::MetaHell
     end
                                    # if you want to collapse back down to a box
     def to_box                     # after a chain of e.g. filters or whatever
-      ea = self
+      ea = self                    # (base_args/base_init tracked by [#mh-021])
       ba = @box_instance.call.send :base_args if @box_instance
       @box_class.allocate.instance_exec do
         _meta_hell_formal_box_core_init

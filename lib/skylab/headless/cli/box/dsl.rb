@@ -211,7 +211,7 @@ module Skylab::Headless
       res
     end
 
-    def enqueue_help!             # fragile and tricky: you are e.g. the root
+    def enqueue_help              # fragile and tricky: you are e.g. the root
                                   # modality client.  you received an
                                   # invoke ['foo', '-h'] which then called
                                   # dipatch, who then enqueued the method
