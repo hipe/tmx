@@ -20,12 +20,23 @@ label="what is your logic?"
 
 node [label="\N", style="filled", fillcolor="#b5d5fb", fontname="Futura", penwidth="1.1566", shape="Mrecord"]
 
+args [label=args]
 method [label=method]
-name [label=name]
-provided [label=provided]
+method_must_come_from_one_of [label="which must\ncome from\none of", fontsize="10pt"]
+method_name [label=name]
+method_provided [label="provided"]
+method_these [label="these", fontsize="10pt"]
+ultimately [label="ultimately what\nyou have to have is", fontsize="10pt"]
+receiver [label="receiver"]
+receiver_must_come_from_one_of [label="which will\nalways be", fontsize="10pt"]
 receiver [label=receiver]
-method -> name
-method -> provided
-method -> receiver
-name -> provided
+method -> method_must_come_from_one_of
+method_must_come_from_one_of -> method_provided
+method_must_come_from_one_of -> method_these
+method_these -> method_name
+method_these -> receiver
+receiver -> receiver_must_come_from_one_of
+receiver_must_come_from_one_of -> self
+ultimately -> args
+ultimately -> method
 }
