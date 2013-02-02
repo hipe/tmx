@@ -18,25 +18,49 @@ label="what is your logic?"
 #                green : fillcolor="#79f233"
 
 
-node [label="\N", style="filled", fillcolor="#b5d5fb", fontname="Futura", penwidth="1.1566", shape="Mrecord"]
+node [label="\N", style="filled", fillcolor="#b5d5fb", fontname="Futura", fontsize="16pt", penwidth="1.1566", shape="Mrecord"]
 
-args [label=args]
-method [label=method]
-method_must_come_from_one_of [label="which must\ncome from\none of", fontsize="10pt"]
-method_name [label=name]
-method_provided [label="provided"]
-method_these [label="these", fontsize="10pt"]
-ultimately [label="ultimately what\nyou have to have is", fontsize="10pt"]
-receiver [label="receiver"]
-receiver_must_come_from_one_of [label="which will\nalways be", fontsize="10pt"]
-receiver [label=receiver]
-method -> method_must_come_from_one_of
-method_must_come_from_one_of -> method_provided
-method_must_come_from_one_of -> method_these
-method_these -> method_name
-method_these -> receiver
-receiver -> receiver_must_come_from_one_of
-receiver_must_come_from_one_of -> self
-ultimately -> args
-ultimately -> method
+args_na [label="requires\nno args", fontsize="14pt"]
+args_prov [label="provided\nargs"]
+args_branch [label="which must\ncome from\none of", fontsize="12pt"]
+argv [label="parsing argv\nto fit the method"]
+method [label="a method\nobject"]
+args [label="and some\nargs"]
+meth_branch [label="which must\ncome from\none of", fontsize="12pt"]
+meth_derived [label="a derived\nmethod object"]
+meth_derived_branch [label="which must\ncome from\nboth of", fontsize="12pt"]
+meth_derived_join [label="both of which\ncome together\nfrom either", fontsize="12pt"]
+meth_name [label="a method\nname"]
+meth_name_prov [label="a method name\nprovided"]
+meth_name_prov_args [label="whose args\nmust come\nfrom one of", fontsize="12pt"]
+meth_prov [label="a provided\nmethod object"]
+meth_prov_args_branch [label="whose args must\ncome from", fontsize="12pt"]
+meth_receiver [label="receiver"]
+proc_prov [label="a provided\nproc", fontsize="14pt"]
+self_meth [label="both of", fontsize="12pt"]
+ultimately [label="ultimately what\nwe want is", fontsize="12pt"]
+args->args_branch
+args_branch->args_na
+args_branch->args_prov
+args_branch->argv
+method->meth_branch
+meth_branch->meth_derived
+meth_branch->meth_prov
+meth_derived->meth_derived_branch
+meth_derived_branch->meth_receiver
+meth_derived_branch->meth_name
+meth_derived_join->proc_prov
+meth_derived_join->self_meth
+proc_prov->args_na
+meth_name_prov->meth_name_prov_args
+meth_prov->meth_prov_args_branch
+meth_prov_args_branch->args_prov
+meth_receiver->meth_derived_join
+meth_name->meth_derived_join
+meth_name_prov_args->argv
+meth_name_prov_args->args_prov
+self_meth->meth_name_prov
+self_meth->self
+ultimately->method
+ultimately->args
 }
