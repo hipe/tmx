@@ -16,11 +16,11 @@ module Skylab::Headless
       self.class.action_box_module
     end
 
-    def box_enqueue_help! cmd=nil
+    def box_enqueue_help cmd=nil
       if ! cmd && CLI::OPT_RX !~ argv.first
         cmd = argv.shift                       # hack for this prettier syntax:/
       end
-      enqueue! -> { help cmd }
+      enqueue -> { help cmd }
     end
 
     def default_action

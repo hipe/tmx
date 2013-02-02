@@ -12,7 +12,7 @@ module Skylab::Headless
                                   # clients that fall all the way back to this
                                   # and as such it must be modality-agnostic
                                   # here. anything fancy belongs elsewhere.)
-      _headless_sub_client_init! nil                      # (part of [#hl-004])
+      _headless_sub_client_init nil                      # (part of [#hl-004])
     end
 
     def actual_parameters         # not all stacks use this. #sc-bound

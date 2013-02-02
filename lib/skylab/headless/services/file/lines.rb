@@ -27,12 +27,13 @@ module Skylab::Headless
       end
     end
 
-    def line_number!
-      if @line_number
-        @line_number += 1
-      else
+    def increment_line_number
+      if @line_number.nil?
         @line_number = 1
+      else
+        @line_number += 1
       end
+      nil
     end
 
     def visit_fs y
@@ -41,7 +42,7 @@ module Skylab::Headless
       @line_number = nil
       @live = true
       @fh.each_line do |line|
-        line_number!
+        increment_line_number
         y << line
       end
       @fh.close
@@ -56,7 +57,7 @@ module Skylab::Headless
       @live = true
       while @lines.length.nonzero?
         line = @lines.shift
-        line_number!
+        increment_line_number
         y << line
       end
       @lines = nil

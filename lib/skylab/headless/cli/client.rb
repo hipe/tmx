@@ -29,14 +29,14 @@ module Skylab::Headless
     def infile_noun               # a bit of a hack to go with resolve_instream
       name = nil
       begin
-        if ! queue.empty?
-          as = build_argument_syntax_for queue.first
-          if ! as.empty?
-            name = as.first.name
+        if @queue.length.nonzero?
+          as = build_argument_syntax_for @queue.first
+          if as.length.nonzero?
+            name = as.first.name.normalized_local_name
             break
           end
         end
-        name = 'infile' # sketchy..
+        name = :infile  # sketchy..
       end while nil
       parameter_label name
     end

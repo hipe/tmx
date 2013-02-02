@@ -3,7 +3,7 @@
 module Skylab::Headless
 
   class Parameter::Bound < Struct.new(:parameter, :read_f, :write_f, :label_f)
-    def name ; parameter.name end
+    def normalized_local_name ; parameter.normalized_local_name end
     def label ; label_f.call(parameter) end
     def value ; read_f.call end
     def value=(x) ; write_f.call(x) end
@@ -80,7 +80,7 @@ module Skylab::Headless
       init # should be ok to call multiple times
       self.class.new(Hash[
         self.class.parameters.each.select(&:inherit?).map do |param|
-          [param.name, send(param.name)]
+          [param.normalized_local_name, send(param.normalized_local_name)]
         end].merge(changes) )
     end
     def process_host_instance host_instance
@@ -88,7 +88,7 @@ module Skylab::Headless
       host_instance.instance_exec do
         f[:set_f] = ->{ formal_parameters }
         f[:params_f] = -> { formal_parameters.each.to_a }
-        f[:known_f] = ->(param) { known? param.name }
+        f[:known_f] = ->(param) { known? param.normalized_local_name }
 
         f[:label_f] = -> param, i=nil do
           if request_client
@@ -99,15 +99,15 @@ module Skylab::Headless
         end
 
         f[:read_f] = ->(param) do
-          m = method(param.name) # catch these errors here, they are sneaky
-          m.arity <= 0 or fail("You do not have a reader for #{param.name}")
+          m = method(param.normalized_local_name) # catch these errors here, they are sneaky
+          m.arity <= 0 or fail("You do not have a reader for #{param.normalized_local_name}")
           m.call
         end
         f[:upstream_f] = ->(param, val, &valid_f) do
           param.apply_upstream_filter(self, val, &valid_f)
         end
         f[:write_f] = ->(param, val) do
-          param.apply_upstream_filter(self, val) { |v| self[param.name] = v }
+          param.apply_upstream_filter(self, val) { |v| self[param.normalized_local_name] = v }
         end
       end
       f.each { |k, v| send("#{k}=", v) }

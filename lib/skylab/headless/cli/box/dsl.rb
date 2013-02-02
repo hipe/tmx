@@ -77,10 +77,10 @@ module Skylab::Headless
       fail 'test me!'
       extend MetaHell::Autoloader::Autovivifying::Recursive::ModuleMethods
       fail 'sanity' unless @last_caller
-      _autoloader_init! @last_caller
+      _autoloader_init @last_caller
       @last_caller = nil
       # mod.dir_path = dir_pathname.join( 'actions' ).to_s # do this..
-      # mod._autoloader_init! nil                          # before this.
+      # mod._autoloader_init nil                          # before this.
     end
 
     attr_accessor :last_caller
@@ -134,7 +134,7 @@ module Skylab::Headless
       o = create_box_option_parser
       o.on '-h', '--help [<sub-action>]',
         'this screen [or sub-action help]' do |v|
-        box_enqueue_help! v
+        box_enqueue_help v
         true
       end
       option_is_visible_in_syntax_string[ o.top.list.last.object_id ] = false
@@ -222,7 +222,7 @@ module Skylab::Headless
                                   # block to the queue that processes the help.
       queue.first == @box_dsl_collapsed_to or fail( 'sanity' )
       queue.shift                 # (done processing the name, shift it off.)
-      box_enqueue_help! @box_dsl_collapsed_to
+      box_enqueue_help @box_dsl_collapsed_to
       @box_dsl_collapsed_to = nil
       nil
     end
@@ -309,7 +309,7 @@ module Skylab::Headless
             fail 'sanity' if leaf_name != queue.first
             queue.shift
           end
-          enqueue! -> do          # (almost same as `box_enqueue_help!`)
+          enqueue -> do          # (almost same as `box_enqueue_help`)
             leaf.help
             true                  # ask for trouble by name by parsing others
           end

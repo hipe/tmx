@@ -1,9 +1,8 @@
 module Skylab::Headless
 
-  module Parameter
-    extend ::Skylab::MetaHell::Autoloader::Autovivifying
+  class Parameter  # at [#049] this might become s/thing like Formal::Parameter
+                   # re-opened below
   end
-
 
   module Parameter::Definer
     class << self
@@ -23,15 +22,14 @@ module Skylab::Headless
     end
   end
 
-
   module Parameter::Definer::ModuleMethods
 
     def meta_param name, props=nil, &b
-      parameters.meta_param!(name, props, &b)
+      parameters.meta_param! name, props, &b
     end
 
     def param name, props=nil, &b
-      parameters.fetch!(name).merge!(props, &b)
+      parameters.fetch!( name ).merge! props, &b
     end
 
     attr_reader :parameters ; alias_method :parameters_ivar, :parameters
@@ -74,10 +72,8 @@ module Skylab::Headless
     attr_reader :parameters_f
   end
 
-
   module Parameter::Definer::InstanceMethods
   end
-
 
   module Parameter::Definer::InstanceMethods::HashAdapter
     def known? k
@@ -85,13 +81,11 @@ module Skylab::Headless
     end                           # useless for reflection unless made public
   end
 
-
   module Parameter::Definer::InstanceMethods::StructAdapter
     def known? k
       ! self[k].nil?              # caution meet wind
     end
   end
-
 
   module Parameter::Definer::InstanceMethods::IvarsAdapter
   protected
@@ -113,7 +107,6 @@ module Skylab::Headless
     end
   end
 
-
   module Parameter::Definer::InstanceMethods::ActualParametersIvar
     protected
     def []  (k)     ; @actual_parameters[k]        end
@@ -121,14 +114,12 @@ module Skylab::Headless
     def known?(k)   ; @actual_parameters.known?(k) end
   end
 
-
   class Parameter::Definer::Dynamic < ::Hash
     extend Parameter::Definer::ModuleMethods
     def initialize
       yield self
     end
   end
-
 
   module Parameter::Definer
     def self.new &block
@@ -151,13 +142,12 @@ module Skylab::Headless
       b ? ea.each(& b ) : ea
     end
 
-    def empty? ;  @order.length.zero? ;  end ; def any? ; @order.length.nonzero? ; end  # #todo - transitional
-    alias_method :known?, :has?
+    alias_method :known?, :has?  # this one feels ok
 
     def fetch! name
       if? name, -> x { x },
       -> do
-        x = @host.parameter_definition_class.new @host, name
+        x = @host.formal_parameter_class.new @host, name
         add name, x
         x
       end
@@ -178,8 +168,8 @@ module Skylab::Headless
 
     def initialize host
       super( )  # init box!
-      if ! host.respond_to? :parameter_definition_class
-        def host.parameter_definition_class
+      if ! host.respond_to? :formal_parameter_class
+        def host.formal_parameter_class
           Parameter::DEFAULT_DEFINITION_CLASS
         end
       end
@@ -202,14 +192,14 @@ module Skylab::Headless
       @meta_set ||= begin
         # We must make our own procedurally-generated parameter definition class
         # no matter what lest we create unintentional mutations out of our
-        # scope. If a parameter_definition_class has been indicated explicitly
+        # scope. If a formal_parameter_class has been indicated explicitly
         # otherwise, that's fine, use it as a base class here.
         fail 'sanity' if @host.const_defined? :ParameterDefinition0
-        meta_host = ::Class.new @host.parameter_definition_class
+        meta_host = ::Class.new @host.formal_parameter_class
         @host.const_set :ParameterDefinition0, meta_host
         @host.singleton_class.class_eval do
-          remove_method :parameter_definition_class # avoid warnings, careful!
-          def parameter_definition_class
+          remove_method :formal_parameter_class # avoid warnings, careful!
+          def formal_parameter_class
             self::ParameterDefinition0
           end
         end
@@ -219,8 +209,8 @@ module Skylab::Headless
   end
 
 
-  class Parameter::Definition
-    # Experimentally let a parameter definition be defined as a name (symbol)
+  class Parameter  # re-opened
+    # Experimentally let a formal parameter be defined as a name (symbol)
     # and an unordered set of zero or more properties, each defined as a
     # name-value pair (with Symbols for names, values as as-yet undefined.)
     # A parameter definition is always created in association with one host
@@ -229,7 +219,7 @@ module Skylab::Headless
     # example a child class of a parent class that has parameter definitions.
 
     Parameter::DEFAULT_DEFINITION_CLASS = self # when the host module doesn't
-                            # specify explicitly a parameter_definition_class
+                            # specify explicitly a formal_parameter_class
 
     # -- * -- stuff you need because you're not a hash
     include Parameter::Definer::InstanceMethods::IvarsAdapter
@@ -254,14 +244,22 @@ module Skylab::Headless
       nil
     end
 
-    attr_reader :name
+    def name
+      @name ||= Headless::Name::Function.new @normalized_local_name
+    end
+
+    attr_reader :normalized_local_name
 
   protected
 
     # this badboy bears some explanation: so many of these method definitions
     # need the same variables to be in scope that it is tighter to define
     # them all here in this way.  Also it looks really really weird.
+    # [#049] we're gonna shut this whole thing down and merge this in with
+    # the way formal attributes does it.
+    #
     def initialize host, name
+      ::Symbol === name or fail "sjkanity - #{ host.class } for ::Symbol" # #todo
       @has_tail_queue = nil
       @property_keys = []
       class << self
@@ -281,7 +279,7 @@ module Skylab::Headless
       end
       tail_queue = nil
       def!(:at_tail) do
-        begin ; tail_queue.shift.call end until tail_queue.empty?
+        begin ; tail_queue.shift.call end while tail_queue.length.nonzero?
         tail_queue = nil
       end
       def!(:filter_upstream!) { |&node| upstream_queue.unshift node }
@@ -328,7 +326,7 @@ module Skylab::Headless
           end
           host_def(name, & (if reader then
             ->(*a) do
-              if a.empty? then known?(name) ? self[name] : nil
+              if a.length.zero? then known?(name) ? self[name] : nil
               else a.each { |val| upstream_f.call(self, val) } end
             end
           else
@@ -375,12 +373,12 @@ module Skylab::Headless
         filter_upstream_last! { |val, _| self[name] = val } # buck stops here
         host_def("#{name}=") { |val| upstream_f.call(self, val) }
       end
-      @name = name ; @host = host
+      @normalized_local_name = name ; @host = host
     end
     # -- * --
     # now we use our own hands to hit ourself with our own dogfood
     extend Parameter::Definer::ModuleMethods
-    def self.parameter_definition_class ; self end # during transition
+    def self.formal_parameter_class ; self end # during transition
 
     param :has_default, boolean: 'does_not_have_default'
     def default= anything

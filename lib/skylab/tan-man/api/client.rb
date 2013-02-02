@@ -75,7 +75,7 @@ module Skylab::TanMan
       else                         # modality .. note that we do *not* call super(mc) for now, to check how narrow we can make this coupling
         @pen = pen
       end
-      _tan_man_sub_client_init! nil # ***DO NOT KEEP*** the modality client here
+      _tan_man_sub_client_init nil # ***DO NOT KEEP*** the modality client here
     end
 
     attr_reader :pen              # overwrite `super` which is e.g. delegating

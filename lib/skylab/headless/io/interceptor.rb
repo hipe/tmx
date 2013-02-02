@@ -5,6 +5,6 @@ module Skylab::Headless
     attr_accessor :tty
     def tty!    ; self.tty = true  ; self end
     def no_tty! ; self.tty = false ; self end
-    alias_method :tty?, :tty
+    alias_method :tty?, :tty  # compat with (look like) ::IO
   end
 end

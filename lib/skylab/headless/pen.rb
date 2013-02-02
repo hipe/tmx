@@ -27,7 +27,7 @@ module Skylab::Headless
 
     def parameter_label mixed, idx=nil
       idx = "[#{ idx }]" if idx
-      stem = ::Symbol === mixed ? mixed : mixed.name
+      stem = ::Symbol === mixed ? mixed : mixed.normalized_local_name
       "#{ stem }#{ idx }"
     end
   end

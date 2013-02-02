@@ -91,7 +91,7 @@ module Skylab::TanMan
         # if the message has been changed via message=
       end
 
-      _tan_man_sub_client_init! nil # get it?
+      _tan_man_sub_client_init nil # get it?
     end
 
     def action_anchor_module      # gone at [#022] maybe..

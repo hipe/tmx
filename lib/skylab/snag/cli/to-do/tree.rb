@@ -106,7 +106,7 @@ module Skylab::Snag
   protected
 
     def initialize client, do_pretty
-      _snag_sub_client_init! client
+      _snag_sub_client_init client
       @do_pretty = do_pretty
       @todos = []
     end

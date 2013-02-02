@@ -55,7 +55,7 @@ module Skylab::Snag
   protected
 
     def initialize request_client, event
-      _snag_sub_client_init! request_client
+      _snag_sub_client_init request_client
       @message_lambda = event.message_lambda
       event.members.each do |m|
         self[m] = event[m]

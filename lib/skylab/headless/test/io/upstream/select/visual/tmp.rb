@@ -38,7 +38,7 @@ status = ::Open4.open4('sh') do |pid, sin, sout, serr|
     rescue ::Errno::EAGAIN, ::Errno::EWOULDBLOCK => e
     rescue ::EOFError => e
       eopen = false
-      my_ebuff.empty? || flush_buffer!(my_ebuff, false)
+      my_ebuff.lengh.zero? || flush_buffer!(my_ebuff, false)
     end
   end
 end

@@ -42,7 +42,7 @@ module Skylab::Headless
                                   # observe this strict ickiness [#hl-023]
 
         if queue.empty?           # during parse_opts client may have added
-          enqueue! default_action # action items to the queue. As name suggests,
+          enqueue default_action  # action items to the queue. As name suggests,
         end                       # this is the default case that they didn't.
 
         upstream_resolved = false # (experimental, do this at most once)
@@ -97,7 +97,7 @@ module Skylab::Headless
       build_argument_syntax method( method_name ).parameters
     end
 
-    def enqueue! mixed_callable
+    def enqueue mixed_callable
       queue.push mixed_callable
     end
 
@@ -384,8 +384,7 @@ module Skylab::Headless
       @pen = pen
       formal_parameters ||= {}
       formal_method_parameters = method_parameters.map do |opt_req_rest, name|
-        p = formal_parameters[name] ||
-          Headless::Parameter::Definition.new( nil, name )
+        p = formal_parameters[name] || Headless::Parameter.new( nil, name )
         p.extend Headless::CLI::ArgumentSyntax::ParameterInstanceMethods
         p.opt_req_rest = opt_req_rest # mutates the parameter!
         p
@@ -499,7 +498,7 @@ module Skylab::Headless
       if ::Symbol === x
         str = x.to_s
       else
-        str = x.name.to_s
+        str = x.normalized_local_name.to_s
       end
       stem = str.gsub '_', '-'
       idx = "[#{ idx }]" if idx

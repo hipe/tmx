@@ -24,7 +24,7 @@ module Skylab
     EXTNAME = '.rb'
 
     def self.extended mod
-      mod.extend(Autoloader::ModuleMethods)._autoloader_init! caller[0]
+      mod.extend( Autoloader::ModuleMethods )._autoloader_init caller[0]
     end
   end
 
@@ -87,7 +87,7 @@ module Skylab
     -> do
       rx = /^(?<path>.+#{ ::Regexp.escape Autoloader::EXTNAME })(?=:\d+:in `)/
 
-      define_method :_autoloader_init! do |caller_str|
+      define_method :_autoloader_init do |caller_str|
         # be sure to #trigger this *ONCE* when hacking autoloader
 
         if respond_to? :const_defined?         # #sl-106: we do *not* hack these

@@ -13,10 +13,10 @@ module Skylab::Headless
       prune_bad_keys actual_h
       defaults actual_h
       actual_h.each do |name, value|
-        if actual.respond_to? "#{name}="
-          actual.send "#{name}=", value # not atomic with above as es muss sein
+        if actual.respond_to? "#{ name }="
+          actual.send "#{ name }=", value # not atomic with above as es muss sein
         else
-          error "not writable: #{name}"
+          error "not writable: #{ name }"
         end
       end
       missing_required actual
@@ -40,8 +40,8 @@ module Skylab::Headless
 
     def defaults actual_h        # #pattern [#sl-117]
       formal_parameters.each do |o|
-        if o.has_default? and actual_h[o.name].nil?
-          actual_h[o.name] = o.default_value
+        if o.has_default? and actual_h[o.normalized_local_name].nil?
+          actual_h[o.normalized_local_name] = o.default_value
         end
       end
       nil

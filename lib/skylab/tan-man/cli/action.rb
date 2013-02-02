@@ -172,7 +172,7 @@ module Skylab::TanMan
     def initialize request_client
       @param_h = { }
 
-      _headless_sub_client_init! request_client
+      _headless_sub_client_init request_client
 
       # if an emitter emits and no listener is there to hear it, does it make
       # a sound? certainly not.

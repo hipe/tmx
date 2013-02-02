@@ -50,7 +50,7 @@ module Skylab::Flex2Treetop
   protected
 
     def initialize
-      _headless_sub_client_init! nil # modality clients are always this way
+      _headless_sub_client_init nil # modality clients are always this way
     end
   end
 
@@ -254,7 +254,7 @@ module Skylab::Flex2Treetop
       o.on('--flex-tt',
        'write the flex treetop grammar to stdout.',
        "suppress normal output. (devel)"
-      ) { suppress_normal_output!.enqueue!(:grammar) }
+      ) { suppress_normal_output!.enqueue :grammar }
 
       o.on('-t[=<dir>]', '--tempdir[=<dir>]',
         '[write, ]read flex treetop grammar',
@@ -277,13 +277,13 @@ module Skylab::Flex2Treetop
       ) { params.clear_generated_files! }
 
       o.on '-h', '--help', 'this' do
-        suppress_normal_output!.enqueue! :help
+        suppress_normal_output!.enqueue :help
       end
       o.on('-v', '--version', 'show version') do
-        suppress_normal_output!.enqueue! :version
+        suppress_normal_output!.enqueue :version
       end
       o.on('--test', '(shows some visual tests that can be run)') do
-        suppress_normal_output!.enqueue! :show_tests
+        suppress_normal_output!.enqueue :show_tests
       end
       o
     end

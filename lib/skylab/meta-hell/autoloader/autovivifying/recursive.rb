@@ -3,7 +3,7 @@ module Skylab::MetaHell::Autoloader::Autovivifying
   module Recursive
     def self.extended mod
       mod.extend Recursive::ModuleMethods
-      mod._autoloader_init! caller[0]
+      mod._autoloader_init caller[0]
     end
   end
 
@@ -57,7 +57,7 @@ module Skylab::MetaHell::Autoloader::Autovivifying
         if ::TypeError != (o.singleton_class rescue ::TypeError) # else final
           o.extend module_methods_module   # "recursive" (infectious)
           o.dir_path = normalized
-          o._autoloader_init! nil
+          o._autoloader_init nil
         end
       elsif ! o.dir_path
         o.dir_path = normalized

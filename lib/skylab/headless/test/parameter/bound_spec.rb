@@ -30,7 +30,7 @@ describe Skylab::Headless::Parameter::Bound do
       it "like iterate over each value in a flat, indifferent manner" do
         names = [] ; values = [] ; labels = []
         object.bound_parameters.each do |p|
-          names.push p.name
+          names.push p.normalized_local_name
           values.push p.value
           labels.push p.label
         end
@@ -88,9 +88,9 @@ describe Skylab::Headless::Parameter::Bound do
 
       it '"object.bound_parameters.at(:fee, :bar)" works!' do
         d, h = object.bound_parameters.at(:derkemer, :herkemer).to_a
-        d.name.should eql(:derkemer)
+        d.normalized_local_name.should eql(:derkemer)
         d.value.should be_nil
-        h.name.should eql(:herkemer)
+        h.normalized_local_name.should eql(:herkemer)
         h.value.should eql('the herkemer')
       end
 

@@ -6,15 +6,18 @@ module Skylab::Headless
 
 
   module SubClient::InstanceMethods
+    # **NOTE** the below are not all unobtrusive and auto-vivifying like
+    # some i.m modules try to be. The participating object _must_ call
+    # `_headless_sub_client_init`
 
   protected
 
     def initialize request_client # this is the heart of it all [#004]
       block_given? and raise ::ArgumentError.new 'blocks are not honored here'
-      _headless_sub_client_init! request_client
+      _headless_sub_client_init request_client
     end
 
-    def _headless_sub_client_init! request_client
+    def _headless_sub_client_init request_client
       @error_count = 0            # (if this overwrites an important nonzero
                                   # value here, you deserve whatver happens
                                   # to you. why would u call init 2x?)
@@ -31,7 +34,7 @@ module Skylab::Headless
     end
 
     def error s                   # be extra careful around methods that
-      increment_error_count!      # affect or are expected to affect the
+      @error_count += 1           # affect or are expected to affect the
       emit :error, s              # validity of your sub-client!
       false                       # this implementation is the result of a
     end                           # "perfect abstraction" but may still cause
@@ -44,10 +47,6 @@ module Skylab::Headless
     def escape_path x             # (this is the closing of [#hl-031])
       request_client.send :escape_path, x
     end
-
-    def increment_error_count!    # use this if you need to do it manually
-      @error_count += 1           # (note it happens in the above impl for
-    end                           # `error` though)
 
     def io_adapter                # sometimes sub-clients need access to
       request_client.send :io_adapter # the streams, e.g. the instream
@@ -99,7 +98,7 @@ module Skylab::Headless
     define_method :s do |length=nil, part=nil|
       args = [length, part].compact
       pt = ::Symbol === args.last ? args.pop : :s
-      if args.empty?
+      if args.length.zero?
         len = self._nlp_last_length or raise ::ArgumentError.new 'numeric?'
       else
         x = args.first

@@ -23,8 +23,8 @@ module Skylab::CssConvert
 
   protected
 
-    def _css_convert_sub_client_init! request_client
-      _headless_sub_client_init! request_client
+    def _css_convert_sub_client_init request_client
+      _headless_sub_client_init request_client
     end
 
     def escape_path x

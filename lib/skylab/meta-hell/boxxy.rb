@@ -11,7 +11,7 @@ module Skylab::MetaHell
 
     def self.extended mod
       mod.extend Boxxy::ModuleMethods
-      mod._boxxy_init! caller[0]
+      mod._boxxy_init caller[0]
     end
   end
 
@@ -47,9 +47,9 @@ module Skylab::MetaHell
 
     include MetaHell::Autoloader::Autovivifying::Recursive::ModuleMethods
 
-    def _boxxy_init! caller_str
+    def _boxxy_init caller_str
       __boxxy_init do
-        _autoloader_init! caller_str
+        _autoloader_init caller_str
       end
       nil
     end
@@ -57,7 +57,7 @@ module Skylab::MetaHell
     def _boxxy_init_with_no_autoloading!
       __boxxy_init do
         self.dir_path = false
-        _autoloader_init! nil
+        _autoloader_init nil
       end
       nil
     end
