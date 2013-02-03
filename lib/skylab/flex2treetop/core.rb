@@ -78,7 +78,7 @@ module Skylab::Flex2Treetop
     param :verbose, boolean: true, default: true, writer: true
     # -- * --
     # the /^[a-z]/ namespace is off limits to us for method names here
-    def _client &block # on the chopping block [#hl-012]
+    def _with_client &block # on the chopping block [#hl-012]
       @_client.instance_eval(&block)
     end
   protected
@@ -254,7 +254,7 @@ module Skylab::Flex2Treetop
       o.on('--flex-tt',
        'write the flex treetop grammar to stdout.',
        "suppress normal output. (devel)"
-      ) { suppress_normal_output!.enqueue :grammar }
+      ) { enqueue :grammar }
 
       o.on('-t[=<dir>]', '--tempdir[=<dir>]',
         '[write, ]read flex treetop grammar',
@@ -265,7 +265,7 @@ module Skylab::Flex2Treetop
         v and params.filesystem_parser_dir = v
         if params.filesystem_parser_enabled?
           params.suppress_normal_output_after_filesystem_parser!
-          suppress_normal_output! # a small smell is here
+          enqueue :no_op
         else
           params.filesystem_parser_enabled!
         end
@@ -277,13 +277,13 @@ module Skylab::Flex2Treetop
       ) { params.clear_generated_files! }
 
       o.on '-h', '--help', 'this' do
-        suppress_normal_output!.enqueue :help
+        enqueue :help
       end
       o.on('-v', '--version', 'show version') do
-        suppress_normal_output!.enqueue :version
+        enqueue :version
       end
       o.on('--test', '(shows some visual tests that can be run)') do
-        suppress_normal_output!.enqueue :show_tests
+        enqueue :show_tests
       end
       o
     end
@@ -298,7 +298,11 @@ module Skylab::Flex2Treetop
 
     def grammar
       emit :payload, TREETOP_GRAMMAR
+      true
     end
+
+    def no_op  # avoid invoking the default action. we use this from
+    end        # from the o.p block when there is nothing more to do.
 
     def show_tests
       require 'fileutils'
@@ -317,20 +321,15 @@ module Skylab::Flex2Treetop
     end
 
     def translate flexfile
-      result = nil
-      begin
-        if ! suppress_normal_output
-          result = resolve_instream
-          if true != result
-            if false == result
-              emit :help, invite_line
-            end
-            break
-          end
-        end
-        result = Translation.new( self ).invoke
-      end while nil
-      result
+      res = resolve_instream
+      if res
+        res = Translation.new( self ).invoke
+      end
+      if false == res
+        emit :help, invite_line
+        res = nil
+      end
+      res
     end
   end
 
@@ -437,7 +436,7 @@ module Skylab::Flex2Treetop
       require rb.sub_ext('').to_s
       if p.suppress_normal_output_after_filesystem_parser?
         emit(:info, "touched files. nothing more to do.")
-        p.result_state = :filesystem_parsers_touched
+        p.result_state = :filesystem_touched
         false # leave
       else
         true # stay

@@ -354,9 +354,9 @@ module Skylab::Headless
           if enum.include? val
             valid_f[ val ]
           else
-            with_client do # slated to be improved [#012]
-              error("#{val.inspect} is an invalid value " <<
-                "for #{ parameter_label param }")
+           _with_client do # slated to be improved [#012]
+             error("#{ val.inspect } is an invalid value " <<
+               "for #{ parameter_label param }")
             end
           end
         end

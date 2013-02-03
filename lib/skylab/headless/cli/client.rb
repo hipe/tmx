@@ -117,13 +117,8 @@ module Skylab::Headless
       try_argv = -> do
         case @argv.length
         when 0
-          if suppress_normal_output
-            info "No #{ infile_noun } argument present. Done."
-            io_adapter.instream = nil # ok sure why not
-            res = nil
-          else
-            error "expecting: #{ infile_noun }"
-          end
+          error "expecting: #{ infile_noun }"
+          res = false
         when 1
           o = ::Pathname.new @argv.shift
           if o.exist?
@@ -154,13 +149,5 @@ module Skylab::Headless
 
       res
     end
-
-    def suppress_normal_output!   # #experimental hack to let e.g. officious
-      @suppress_normal_output = true # actions indicate that they executed, and
-      self                        # if given a a choice there is no need to do
-    end                           # further processing.  # #todo this will prob. be replaced with adding noop to the queue
-
-    attr_reader :suppress_normal_output
-
   end
 end
