@@ -33,7 +33,7 @@ module Skylab::MyTree
       # o.on '--alabaster-platypus <FRANCIS_MACDERMOT>'
       # o.on '--wat <PEACE>', 'parla tedesco'
       o.on '-h', '--help', 'this screen, or help for particular action' do
-        box_enqueue_help!
+        box_enqueue_help
       end
       o.summary_indent = '  ' # two spaces, down from four
       # o.banner = "#{ usage_line }\n#{ em 'options:' }" # the old hack

@@ -29,23 +29,20 @@ module Skylab::Headless
     def infile_noun               # a bit of a hack to go with resolve_instream
       name = nil
       begin
-        if ! queue.empty?
-          as = build_argument_syntax_for queue.first
-          if ! as.empty?
-            name = as.first.name
+        ref = @queue.first
+        if ref && ::Symbol === ref && :help != ref  # BLEARG
+          as = argument_syntax_for_method ref
+          if as.length.nonzero?
+            name = as.first.name.normalized_local_name
             break
           end
         end
-        name = 'infile' # sketchy..
+        name = :infile  # sketchy..
       end while nil
       parameter_label name
     end
 
-    def invite_line
-      "use #{ kbd "#{ normalized_invocation_string } -h" } for help"
-    end
-
-    def normalized_invocation_string
+    def normalized_invocation_string  # #buck-stops: here
       program_name
     end
 
@@ -56,6 +53,16 @@ module Skylab::Headless
     def info msg                  # barebones implementation as a convenience
       emit :info, msg             # for this shorthand commonly used in
       nil                         # debugging and verbose modes
+    end
+
+    def parameter_label x, idx=nil  # [#036] explains it all, somewhat
+      idx = "[#{ idx }]" if idx
+      if ::Symbol === x
+        stem = Headless::Name::FUN.slugulate[ x ]
+      else
+        stem = x.name.to_slug  # errors please
+      end
+      em "<#{ stem }#{ idx }>"
     end
 
     def pen_class
@@ -108,17 +115,12 @@ module Skylab::Headless
       end
 
       try_argv = -> do
-        case argv.length
+        case @argv.length
         when 0
-          if suppress_normal_output
-            info "No #{ infile_noun } argument present. Done."
-            io_adapter.instream = nil # ok sure why not
-            res = nil
-          else
-            error "expecting: #{ infile_noun }"
-          end
+          error "expecting: #{ infile_noun }"
+          res = false
         when 1
-          o = ::Pathname.new argv.shift
+          o = ::Pathname.new @argv.shift
           if o.exist?
             if o.directory?
               error "#{ infile_noun } is directory: #{ o }"
@@ -131,11 +133,11 @@ module Skylab::Headless
             error "#{ infile_noun } not found: #{ o }"
           end
         else
-          error "expecting: #{ infile_noun } had: (#{ argv.join ' ' })"
+          error "expecting: #{ infile_noun } had: (#{ @argv.join ' ' })"
         end
       end
 
-      argv = self.argv.empty?         ? :argv_empty  : :some_argv
+      argv = @argv.length.zero?   ? :argv_empty  : :some_argv
       term = io_adapter.instream.tty? ? :interactive : :noninteractive
 
       case [term, argv]
@@ -147,13 +149,5 @@ module Skylab::Headless
 
       res
     end
-
-    def suppress_normal_output!   # #experimental hack to let e.g. officious
-      @suppress_normal_output = true # actions indicate that they executed, and
-      self                        # if given a a choice there is no need to do
-    end                           # further processing.
-
-    attr_reader :suppress_normal_output
-
   end
 end

@@ -84,7 +84,7 @@ module Skylab::TanMan
     meta_attribute :regex do |name, meta|
       after = "#{ name }_after_regex="
       alias_method after, "#{ name }="
-      define_method "#{name}=" do |str|
+      define_method "#{ name }=" do |str|
         if meta[:regex] =~ str
           send after, str
         else

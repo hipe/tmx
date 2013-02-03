@@ -30,6 +30,7 @@ f2tt [label=f2tt]
 face [label=face]
 filemetrics [label=filemetrics]
 gsu [label=gsu]
+guardfile [label=guardfile]
 headless [label="headless cli"]
 homespun [label=homespun]
 my [label="my tree"]
@@ -37,6 +38,7 @@ permute [label=permute]
 snag [label=snag]
 tan [label=tan]
 treemap [label=treemap]
+tolerance [label=tolerance]
 y2tt [label=y2tt]
 bnf2tt -> headless
 cov -> all
@@ -46,6 +48,7 @@ f2tt -> headless
 face -> bleeding
 filemetrics -> face
 gsu -> headless
+guardfile -> tolerance
 my -> headless
 permute -> bleeding
 snag -> all

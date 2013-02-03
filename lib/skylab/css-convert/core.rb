@@ -23,8 +23,8 @@ module Skylab::CssConvert
 
   protected
 
-    def _css_convert_sub_client_init! request_client
-      _headless_sub_client_init! request_client
+    def _css_convert_sub_client_init request_client
+      _headless_sub_client_init request_client
     end
 
     def escape_path x
@@ -67,8 +67,8 @@ module Skylab::CssConvert
   end
 
   module CLI
-    def self.new
-      CLI::Client.new
+    def self.new sin, sout, serr
+      CLI::Client.new sin, sout, serr
     end
   end
 
@@ -76,7 +76,7 @@ module Skylab::CssConvert
     include Headless::CLI::Client::InstanceMethods
     include Core::Client::InstanceMethods
 
-    def convert directives_file=nil
+    def convert directives_file
       result = :error
       begin
         set! or break
@@ -100,6 +100,12 @@ module Skylab::CssConvert
 
   protected
 
+    def initialize sin, sout, serr
+      super( )
+      @io_adapter = build_io_adapter sin, sout, serr
+      nil
+    end
+
     def actual_parameters
       @actual_parameters ||= formal_parameters_class.new
     end
@@ -112,13 +118,13 @@ module Skylab::CssConvert
       o.on('-d', '--dump={d|c}',
         '(debugging) Show sexp of directives (d) or css (c).',
         'More than once will supress normal output (e.g. "-dd -dd").') do |v|
-        enqueue! ->{ dump_this v }
+        enqueue -> { dump_this v }
       end
       o.on('-t', '--test[=name]', 'list available visual tests. (devel)') do |v|
-        enqueue!( v ? -> { test v } : :test )
+        enqueue( v ? -> { test v } : :test )
       end
-      o.on('-h', '--help', 'this screen') { enqueue! :help } # hehe comment out
-      o.on('-v', '--version', 'show version') { enqueue! :version }
+      o.on('-h', '--help', 'this screen') { enqueue :help } # hehe comment out
+      o.on('-v', '--version', 'show version') { enqueue :version }
       o
     end
 

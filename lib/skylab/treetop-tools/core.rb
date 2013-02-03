@@ -13,7 +13,7 @@ module Skylab::TreetopTools
   end
 
 
-  class Parameter < Headless::Parameter::Definition
+  class Parameter < Headless::Parameter
     param :dir, boolean: true
     param :exist, enum: [:must], accessor: true
 

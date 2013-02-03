@@ -77,7 +77,7 @@ module Skylab::MyTree
         end
       end
 
-      o.on('-h', '--help', 'me') { enqueue! :help }
+      o.on('-h', '--help', 'me') { enqueue :help }
 
       o.separator ''
 

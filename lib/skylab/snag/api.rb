@@ -107,7 +107,7 @@ module Skylab::Snag
   protected
 
     def initialize modality_client
-      _snag_sub_client_init! modality_client
+      _snag_sub_client_init modality_client
       @max_num_dirs_to_search_for_manifest_file = nil
       API::Client.setup_delete[ self ] if API::Client.setup_ivar
     end

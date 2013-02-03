@@ -9,13 +9,13 @@ module Skylab::Headless
         sopts, lopts = [], []   # short and long opts that have not been done
         x.short.each { |s| sdone.fetch(s) { sopts.push s ; sdone[s] = true } }
         x.long.each  { |s| ldone.fetch(s) { lopts.push s ; ldone[s] = true } }
-        if ! (sopts.empty? && lopts.empty?)
+        if sopts.length.nonzero? || lopts.length.nonzero?
           left = [sopts.join(', ')]
           lopts.each do |s|
             l = left.last.length + s.length
             l += x.arg.length if 1 == left.length && x.arg
-            left.push '' if l >= max && ! sopts.empty?
-            left.last << (left.last.empty? ? (' ' * 4) : ', ') << s
+            left.push '' if l >= max && sopts.length.nonzero?
+            left.last << (left.last.length.zero? ? (' ' * 4) : ', ') << s
           end
           x.arg and left.first.concat(
             left[1] ? "#{ x.arg.sub(/\A(\[?)=/, '\1') }," : x.arg )
@@ -43,6 +43,7 @@ module Skylab::Headless
       end
     end
 
-    FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v }
+    FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } # note -
+    # because of something awful that autoloader does we do not freeze ourself
   end
 end

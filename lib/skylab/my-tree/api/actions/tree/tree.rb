@@ -45,7 +45,7 @@ module Skylab::MyTree
       @glyph_set = Headless::CLI::Tree::Glyph::Sets::WIDE
       @matrix = []
       @verbose = verbose
-      _headless_sub_client_init! request_client
+      _headless_sub_client_init request_client
     end
 
     def row seen, extra=nil
@@ -85,7 +85,7 @@ module Skylab::MyTree
 
     Headless::CLI::Tree::Glyphs.each do |glyph|
       # blank crook pipe separator tee
-      n = glyph.name
+      n = glyph.normalized_local_name
       define_method( n ) { @glyph_set[ n ] }
     end
   end

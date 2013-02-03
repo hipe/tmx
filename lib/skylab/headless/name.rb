@@ -2,19 +2,22 @@ module Skylab::Headless
   module Name                     # a fresh new spin on an old favorite
     o = { }
 
-    o[:constantify] = -> do # (tighter version for the sake of simplicity)
+    # **NOTE** the below have a much more narrow set of allowable
+    # input data that inflection methods you might find elsewhere in
+    # the system.
+
+    o[:constantify] = -> do       # make a normalized symbol look like a const
       rx = /(?:^|[-_])([a-z])/
       -> x { x.to_s.gsub( rx ) { $~[1].upcase } }
     end.call
 
-
-    o[:pathicate] = -> do # not as full but might be an improvement
+    o[:normify] = -> do          # make a const-looking string be normalized.
       rx = /(?<=[a-z])(?=[A-Z])|_|(?<=[A-Z])(?=[A-Z][a-z])/
-      -> x { x.to_s.gsub( rx ){ '-' }.downcase }
+      -> x { x.to_s.gsub( rx ) { '_' }.downcase.intern }
     end.call
 
-    o[:methodate] = -> x do
-      o[:pathicate][x].gsub( '-', '_' ).intern
+    o[:slugulate] = -> x do      # for normals only. centralize this nerk
+      x.to_s.gsub '_', '-'
     end
 
     FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
@@ -32,7 +35,7 @@ module Skylab::Headless
 
   protected
 
-    def initialize normalized_local_name
+    def initialize normalized_local_name       # (consider freezing your n.f)
       @normalized_local_name = normalized_local_name
     end
   end
@@ -46,7 +49,7 @@ module Skylab::Headless
     end
 
     def to_slug
-      normalized_local_name.to_s.gsub '_', '-'
+      Name::FUN.slugulate[ normalized_local_name ]
     end
   end
 
@@ -55,7 +58,7 @@ module Skylab::Headless
   end
 
   module Name::Function::From
-  end # cute
+  end  # cute
 
   class Name::Function::From::Constant < Name::Function
     # constant names can hold more information than others, so converting
@@ -69,7 +72,33 @@ module Skylab::Headless
 
     def initialize const
       @const = const
-      @normalized_local_name = Headless::Name::FUN.methodate[ const ]
+      @normalized_local_name = Headless::Name::FUN.normify[ const ]
+      nil
+    end
+  end
+
+  module Name::Function::From::Module
+  end  # no
+
+  class Name::Function::From::Module::Graph
+    # (centralize this hacky fun here.)
+
+    def local
+      @name_a.last
+    end
+
+    def normalized_name
+      @normalized_name ||= @name_a.map(& :normalized_local_name ).freeze
+    end
+
+  protected
+
+    def initialize n2, n1  # n2 - your module name  n1 - box module name
+      0 == n2.index( n1 ) or raise "sanity - #{ n1 } does not contain #{ n2 }"
+      @name_a = n2[ n1.length + 2 .. -1 ].split( '::' ).reduce [] do |m, c|
+        m << Name::Function::From::Constant.new( c ).freeze
+      end  # (because we reveal the constituents, we don't want to take chances)
+      nil
     end
   end
 end

@@ -8,8 +8,8 @@ module Skylab::Snag
                                   # (no public methods declared here)
   protected
 
-    def _snag_sub_client_init! request_client
-      _headless_sub_client_init! request_client
+    def _snag_sub_client_init request_client
+      _headless_sub_client_init request_client
     end
 
     def api_invoke norm_name, param_h=nil, wiring=nil

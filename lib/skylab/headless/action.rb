@@ -1,28 +1,9 @@
 module Skylab::Headless
 
   module Action
-
-    o = { }
-
-    normify = -> str do           # for now we go '-' but me might go '_'
-      Autoloader::Inflection::FUN.pathify[ str ].intern
-    end
-
-                                  # this is a bleeding, incomplete feature that
-                                  # does something terrible but is also cheap.
-    o[:build_normalized_name] = -> anchor_module, mod do
-      a = mod.name[ anchor_module.name.length + 2 .. -1 ].split '::'
-      a.map{ |x| normify[ x ] }.freeze
-    end
-
-    o[:normfiy] = normify
-
-    FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
   end
 
-
   module Action::ModuleMethods
-    extend MetaHell::Let          # we memoize things in the class object
 
     def actions_anchor_module
       x = const_get :ACTIONS_ANCHOR_MODULE, true
@@ -38,30 +19,40 @@ module Skylab::Headless
       x
     end
 
-    let :normalized_action_name do
-      Action::FUN.build_normalized_name[ actions_anchor_module, self ]
+    def name_function
+      @name_function ||= Headless::Name::Function::From::Module::Graph.new(
+        name, actions_anchor_module.name )  # (one place in particular will be
+    end  # upset if not all naming happens via this ivar !)
+
+    def normalized_action_name
+      name_function.normalized_name
     end
-
-    def normalized_local_action_name
-      normalized_action_name.last
-    end
-
-    methodize = Autoloader::Inflection::FUN.methodize
-
-    define_method :normalized_local_action_name_as_method_name do # this is used
-      methodize[ normalized_local_action_name ] # by dsl sublibrary and by
-    end                           # external subproducts. it shouldn't be too
-  end                             # hard to search for occurences of it
-
+  end
 
   module Action::InstanceMethods
     include Headless::SubClient::InstanceMethods
+
+    # **NOTE** *any* public methods defined below are very #experimental
+    # while we decide what the set of `public` should be for is for and how
+    # action objects (in their many various incarnations) are used here..
+
+    def name                      # life is much easier if when we say `name`
+      self.class.name_function.local  # of an an action object, we are talking
+    end                           # about the local (tail) element of the
+                                  # action class's name function.
+
 
   protected
 
     def desc_lines                # we want this DSL-y module-methods part of
       self.class.desc_lines if self.class.respond_to? :desc_lines # it to be
     end                           # opt-in
+
+    def formal_attributes         # hook for this experiment - [#049], [#036]
+    end
+
+    def formal_parameters         # idem
+    end
 
     def is_branch                 # brach == non terminal == box. bc it has far
       ! is_leaf                   # reaching consequences for request processing
@@ -81,24 +72,25 @@ module Skylab::Headless
     end
 
     def normalized_local_action_name
-      self.class.normalized_local_action_name
+      self.class.name_function.local.normalized_local_name
     end
 
-    def normalized_local_action_name_as_method_name
-      self.class.normalized_local_action_name_as_method_name
+    def parameter_label x, idx=nil  # [#036] explains it all
+      if formal_parameters
+        fp = formal_parameters.fetch( x ) { }
+      end
+      if ! fp && formal_attributes
+        fp = formal_attributes.fetch( x ) { }
+      end
+      request_client.send :parameter_label, ( fp || x ), idx
     end
 
     def summary_line              # simple, modality-agnostic nerk
-      res = nil
-      begin
-        if self.class.desc_lines
-          res = self.class.desc_lines.first
-          break
-        else
-          res = "the #{ normalized_local_action_name } action."
-        end
-      end while nil
-      res
+      if self.class.desc_lines
+        self.class.desc_lines.first
+      else
+        "the #{ name.to_slug } action."
+      end
     end
   end
 end

@@ -11,7 +11,7 @@ module Skylab::MetaHell
 
     def self.extended mod
       mod.extend Boxxy::ModuleMethods
-      mod._boxxy_init! caller[0]
+      mod._boxxy_init caller[0]
     end
   end
 
@@ -46,18 +46,12 @@ module Skylab::MetaHell
     # possibly into an external controller or something..)
 
     include MetaHell::Autoloader::Autovivifying::Recursive::ModuleMethods
+      # (making Boxxy an extension of a.l is convenient but not without
+      # its cost. tracked (with nothing yet to say) at [#mh-022])
 
-    def _boxxy_init! caller_str
+    def _boxxy_init caller_str
       __boxxy_init do
-        _autoloader_init! caller_str
-      end
-      nil
-    end
-
-    def _boxxy_init_with_no_autoloading!
-      __boxxy_init do
-        self.dir_path = false
-        _autoloader_init! nil
+        _autoloader_init caller_str
       end
       nil
     end
@@ -78,6 +72,13 @@ module Skylab::MetaHell
       end                         # we do this multiple times, life sucks
       nil
     end
+
+    # `constants` -
+    # Boxxy do a thing here will call "optimistic constant inference", which is
+    # a hack that says "if you follow these rules, you won't have to load a
+    # million files to know that you have these million constants with these
+    # million names under this constant".  You can guess how it works. This
+    # is part of the social contract that hold this whole society together.
                                   # (see `each`)
     def boxxy_constants           # (this gets swapped in for `constants`)
       @boxxy_is_hot or hit_fs     # (and feels really sketchy but seems
@@ -201,7 +202,7 @@ module Skylab::MetaHell
       else
         @constants = boxxy_original_constants
       end
-      @boxxy_is_hot = true
+      @boxxy_is_hot = true  # (see ^^)
       nil
     end
 

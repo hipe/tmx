@@ -76,7 +76,7 @@ module Skylab::Snag
   protected
 
     def initialize request_client, manifest
-      _snag_sub_client_init! request_client
+      _snag_sub_client_init request_client
       @node_flyweight = nil
       @manifest = manifest
     end

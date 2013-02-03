@@ -64,8 +64,8 @@ module Skylab::Headless
 
       define_method :write_simple do |io|
         @chunks.each do |c|
-          lf = c.left.any?
-          rt = c.right.any?
+          lf = c.left.length.nonzero?
+          rt = c.right.length.nonzero?
           letter = if lf
                      if rt then 'c' else 'd' end
                    elsif rt then 'a'

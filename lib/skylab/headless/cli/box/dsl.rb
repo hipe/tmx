@@ -3,27 +3,64 @@ module Skylab::Headless
 
     #                         ~ never say never ~                          #
 
-
     def self.extended mod # [#sl-111]
       mod.extend CLI::Box::DSL::ModuleMethods
-      mod.last_caller = caller[0]
       mod.send :include, CLI::Box::DSL::InstanceMethods
-      mod
+      nil
     end
   end
 
   module CLI::Box::DSL::ModuleMethods
+    include MetaHell::Autoloader::Autovivifying::Recursive::ModuleMethods
+    #
+    # this deserves some explanation: we use Boxxy on our action box module
+    # because that was exactly what it was designed for: to be an unobtrusive
+    # hack for painless retrieval and collection management for constituent
+    # module. now the point of this whole nerk here is to create such a
+    # box module and, *as the file is being loaded*, blit it with classes
+    # that are generated dynamically to model all of your actions from
+    # methods as they are defined. that's the essence of why we are here.
+    # While some actions (e.g. clients) may not need an autoloader, if
+    # there's any chance they do it must be wired properly, and that is
+    # convenient do below when the modules are created rather than at some
+    # later point (e.g after the file is done loading, as recursive a.l does)
+    #
+    # BUT it is also nice to be able to extend a *base (action) class* with
+    # this DSL extension and have it work in *child* classes. While we could
+    # do some awful hacking to make the autoload hack work for subclasses
+    # as they appear in other files .. just no.
+    #
+    # All of this is to say: 1) that is why we include a.l above, and
+    # 2) this is why we have some conditional nerking around below, to charge
+    # the module graph with autoloading only if it has signed on for it.
+    #
+    # (btw you would do that via either extending a.l explicitly on your class
+    # *before* you extend this .. *and* i think the client DSL will do it
+    # for you too if that fits your app.)
+    #
+
     include CLI::Action::ModuleMethods         # #reach-up!
 
     def action_box_module
       if const_defined? :Actions, false
         const_get :Actions, false
       else
-        mod = ::Module.new
-        mod.extend MetaHell::Boxxy::ModuleMethods
-        mod._boxxy_init_with_no_autoloading!
-        mod.send :include, CLI::Box::InstanceMethods
-        const_set :Actions, mod
+        box = self
+        box_mod = const_set :Actions, ::Module.new
+        box_mod.module_eval do
+          extend MetaHell::Boxxy::ModuleMethods
+          include CLI::Box::InstanceMethods
+
+          if box.dir_path  # this noise is what the extnesive note above is abt.
+            self.dir_path = box.dir_pathname.join 'actions'  # eew sorry
+          else
+            self.dir_path = false  # tell a.l do not try to induce our path
+          end
+          _boxxy_init nil  # (but no matter what, don't leave dir path nil
+                           # when you send no caller_str up this chain.)
+          self
+        end
+        box_mod
       end
     end
 
@@ -31,22 +68,26 @@ module Skylab::Headless
 
     def action_class_in_progress!
       @action_class_in_progress ||= begin
-        klass = ::Class.new cli_box_dsl_leaf_action_superclass
-        klass.extend CLI::Box::DSL::Leaf_ModuleMethods
-        klass.const_set :ACTIONS_ANCHOR_MODULE, action_box_module
-        klass.send :include, CLI::Box::DSL::Leaf_InstanceMethods
-
-        parent_module = self
-        klass.send :define_method, :argument_syntax do
+        box = self
+        ::Class.new( cli_box_dsl_leaf_action_superclass ).class_exec do
+          extend CLI::Box::DSL::Leaf_ModuleMethods
+          const_set :ACTIONS_ANCHOR_MODULE, box.action_box_module
+          include CLI::Box::DSL::Leaf_InstanceMethods
+          define_method :argument_syntax do
+            Headless::CLI::Argument::Syntax::Inferred.new(
+              box.instance_method( leaf_method_name ).parameters, nil )
+          end
                                   # this is some gymnastics: the implementation
                                   # method is not defined in the action class
                                   # but in the semantic container class
-          unbound = parent_module.instance_method leaf_method_name
-          build_argument_syntax unbound.parameters
+          undef_method :invoke
+          self
         end
-
-        klass
       end
+    end
+
+    def box                       # #experimental un-dsl ..
+      @box_proxy ||= CLI::Box::Proxy.new( desc: ->( *a ) { box_desc( *a ) } )
     end
 
     def build_option_parser &block # (This is the DSL block writer.)
@@ -54,7 +95,7 @@ module Skylab::Headless
       nil
     end
 
-    alias_method :cli_box_dsl_original_desc, :desc
+    alias_method :box_desc, :desc  # when you want to describe the box..
 
     def desc first, *rest         # [#hl-033]
       action_class_in_progress!.desc first, *rest
@@ -71,16 +112,6 @@ module Skylab::Headless
     def dsl_on
       @dsl_is_disabled = false
       nil
-    end
-
-    def enable_autoloader!
-      fail 'test me!'
-      extend MetaHell::Autoloader::Autovivifying::Recursive::ModuleMethods
-      fail 'sanity' unless @last_caller
-      _autoloader_init! @last_caller
-      @last_caller = nil
-      # mod.dir_path = dir_pathname.join( 'actions' ).to_s # do this..
-      # mod._autoloader_init! nil                          # before this.
     end
 
     attr_accessor :last_caller
@@ -113,28 +144,26 @@ module Skylab::Headless
 
     def initialize request_client
       super request_client
-      @queue = [ ]                # typically the user does this, not w/ dsl
+      @queue = [ ]                # usu. lazy vivified in `invoke`, not so here
     end
 
-    alias_method :cli_box_dsl_original_argument_syntax, :argument_syntax
-
     def argument_syntax           # "hybridization"
-      if collapsed
-        build_argument_syntax_for @box_dsl_collapsed_to
+      if is_collapsed
+        argument_syntax_for_method @box_dsl_collapsed_to
       else
-        cli_box_dsl_original_argument_syntax
+        argument_syntax_for_method :dispatch
       end
     end
 
     attr_reader :box_dsl_collapsed_to
 
-    alias_method :collapsed, :box_dsl_collapsed_to # it *is* collapsed IFF..
+    alias_method :is_collapsed, :box_dsl_collapsed_to # it *is* is_collapsed IFF..
 
     def build_option_parser       # popular default, [#hl-037]
       o = create_box_option_parser
       o.on '-h', '--help [<sub-action>]',
         'this screen [or sub-action help]' do |v|
-        box_enqueue_help! v
+        box_enqueue_help v
         true
       end
       option_is_visible_in_syntax_string[ o.top.list.last.object_id ] = false
@@ -164,13 +193,12 @@ module Skylab::Headless
         end
         klass or break( res = klass )
         o = klass.new self
-        leaf_name = o.normalized_local_action_name
-        @box_dsl_collapsed_to = leaf_name
+        @box_dsl_collapsed_to = o.normalized_local_action_name
         x = ( @prev_frame ||= frame_struct.new ) # really ask for it
         x.is_leaf = true ; @is_leaf = o.is_leaf
         x.option_parser = option_parser_ivar ; @option_parser = o.option_parser
-        fail 'sanity' if :dispatch != queue.first
-        queue[0] = o.leaf_method_name
+        fail 'sanity' if :dispatch != @queue.first
+        @queue[0] = o.leaf_method_name
                                   # put the method name of the particular
                                   # action on the queue -- its placement is
                                   # sketchy
@@ -211,7 +239,7 @@ module Skylab::Headless
       res
     end
 
-    def enqueue_help!             # fragile and tricky: you are e.g. the root
+    def enqueue_help              # fragile and tricky: you are e.g. the root
                                   # modality client.  you received an
                                   # invoke ['foo', '-h'] which then called
                                   # dipatch, who then enqueued the method
@@ -220,24 +248,21 @@ module Skylab::Headless
                                   # what we are now doing, we 1) remove that
                                   # method from the queue and then 2) add our
                                   # block to the queue that processes the help.
-      queue.first == @box_dsl_collapsed_to or fail( 'sanity' )
-      queue.shift                 # (done processing the name, shift it off.)
-      box_enqueue_help! @box_dsl_collapsed_to
+      @queue.first == @box_dsl_collapsed_to or fail( 'sanity' )
+      @queue.shift                 # (done processing the name, shift it off.)
+      box_enqueue_help @box_dsl_collapsed_to
       @box_dsl_collapsed_to = nil
       nil
     end
 
-    alias_method :cli_box_dsl_original_invite_line, :invite_line
-
     def invite_line               # hybridization hack
-      if collapsed
-        "use #{ kbd "#{ cli_box_dsl_original_normalized_invocation_string }#{
-          } -h #{ @box_dsl_collapsed_to }" } for help"
+      if is_collapsed
+        render_invite_line "#{ normalized_invocation_string false } -h #{
+          }#{ @box_dsl_collapsed_to }"
       else
-        cli_box_dsl_original_invite_line
+        super
       end
     end
-
                                   # please watch carefully: we 1) out of the box
                                   # identify as being a branch and 2) make this
                                   # hackishly mutable despite the fact that we
@@ -249,17 +274,15 @@ module Skylab::Headless
                                   # above it in the chain. (ok the 2 things
                                   # are: 1. attr_reader creates a reader
                                   # that does not emit warnings on uninitted
-                                  # vars and 2 an unitted var is nil is
+                                  # vars and 2. an unitted var is nil is
                                   # false-ish.)
 
-    alias_method :cli_box_dsl_original_normalized_invocation_string,
-      :normalized_invocation_string
-
-    def normalized_invocation_string  # our invocation string is dynamic based
+                                  # our invocation string is dynamic based
                                   # on whether we have yet mutated or not!
-                                  # (and/or rolled back some of the mutation)
-      a = [ cli_box_dsl_original_normalized_invocation_string ]
-      if collapsed
+                                  # (and/or rolled back some of
+    def normalized_invocation_string as_collapsed=true
+      a = [ super(  ) ]  # the mutation)
+      if is_collapsed && as_collapsed
         a << @box_dsl_collapsed_to
       end
       a.join ' '
@@ -292,27 +315,25 @@ module Skylab::Headless
     # and have this work both as a documentng and parsing pass.
     def build_option_parser
       leaf = self
-      leaf_name = leaf.normalized_local_action_name
       build_option_parser = leaf.class.build_option_parser_ivar
       build_option_parser ||= -> do
         o = leaf.leaf_create_option_parser || create_leaf_option_parser
-        if a = leaf.class.option_parser_blocks
-          a.each do |block|
+        if leaf.class.option_parser_blocks
+          leaf.class.option_parser_blocks.each do |block|
             instance_exec o, &block
           end
         end
         o.on '-h', '--help', 'this screen' do
+          leaf_name = leaf.normalized_local_action_name
           if prev_frame
             uncollapse! leaf_name
           end # else hackery
-          if queue.length.nonzero?
-            fail 'sanity' if leaf_name != queue.first
-            queue.shift
+          if @queue.length.nonzero?
+            leaf_name == @queue.first or fail "sanity - #{ @queue.first }"
+            @queue.shift
           end
-          enqueue! -> do          # (almost same as `box_enqueue_help!`)
-            leaf.help
-            true                  # ask for trouble by name by parsing others
-          end
+          enqueue [ :help, -> { leaf } ] # compare `box_enqueue_help`
+          nil  # o.p ignores it newayz
         end
         o
       end
@@ -327,7 +348,7 @@ module Skylab::Headless
     end
 
     def leaf_method_name
-      normalized_local_action_name_as_method_name
+      name.normalized_local_name
     end
   end
 end

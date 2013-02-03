@@ -766,7 +766,7 @@ module Skylab::Porcelain::Bleeding
 
     def actions
       action_anchor_module or fail "sanity - where is action_anchor_module - #{
-        }call _namespace_inferred_init! on construction"
+        }call _namespace_inferred_init on construction"
       c = Constants[action_anchor_module]
       o = Officious.actions
       x = Actions[c, o]
@@ -779,14 +779,14 @@ module Skylab::Porcelain::Bleeding
     end
 
     def initialize module_with_actions
-      _namespace_inferred_init! module_with_actions
+      _namespace_inferred_init module_with_actions
     end
 
     alias_method :reflector, :action_anchor_module # for documentors
 
     alias_method :builder, :action_anchor_module   # for find
 
-    def _namespace_inferred_init! module_with_actions
+    def _namespace_inferred_init module_with_actions
       module_with_actions or fail 'sanity - huh?'
       self.action_anchor_module = module_with_actions
     end

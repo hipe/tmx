@@ -51,7 +51,7 @@ module Skylab::TanMan
 
     def initialize request_client, *a
       @message = nil
-      _tan_man_sub_client_init! request_client
+      _tan_man_sub_client_init request_client
       members.zip( a ).each { |k, v| self[k] = v }
     end
   end

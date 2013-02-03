@@ -7,6 +7,8 @@ module Skylab::TanMan
 
     extend Core::Client::ModuleMethods         # per the pattern
 
+    include Headless::API::Client::InstanceMethods  # now we need parameter_label
+
     include Core::Client::InstanceMethods      # per the pattern
 
     event_class API::Event                     # necessary in 2 places b/c
@@ -75,7 +77,7 @@ module Skylab::TanMan
       else                         # modality .. note that we do *not* call super(mc) for now, to check how narrow we can make this coupling
         @pen = pen
       end
-      _tan_man_sub_client_init! nil # ***DO NOT KEEP*** the modality client here
+      _tan_man_sub_client_init nil # ***DO NOT KEEP*** the modality client here
     end
 
     attr_reader :pen              # overwrite `super` which is e.g. delegating

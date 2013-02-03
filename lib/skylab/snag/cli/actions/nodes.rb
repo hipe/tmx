@@ -3,7 +3,7 @@ module Skylab::Snag
   class CLI::Actions::Nodes < CLI::Action::Box
     extend Headless::CLI::Box::DSL
 
-    cli_box_dsl_original_desc 'make the magic happen'
+    box.desc 'make the magic happen'
 
     desc "Add an \"issue\" line to #{ Snag::API.manifest_path }" #[#hl-025]
     desc "Lines are added to the top and are sequentially numbered."

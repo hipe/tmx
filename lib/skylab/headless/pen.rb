@@ -17,18 +17,12 @@ module Skylab::Headless
       white_rx =~ s ? s.inspect : s            # humans -- basically use quotes
     end                                        # iff necessary (né smart_quotes)
 
-    def kbd s
-      em s
-    end
-
-    def invalid_value s
+    def ick s                     # render an invalid value
       s
     end
 
-    def parameter_label mixed, idx=nil
-      idx = "[#{ idx }]" if idx
-      stem = ::Symbol === mixed ? mixed : mixed.name
-      "#{ stem }#{ idx }"
+    def kbd s
+      em s
     end
   end
 

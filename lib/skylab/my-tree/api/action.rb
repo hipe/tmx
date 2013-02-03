@@ -4,8 +4,9 @@ module Skylab::MyTree
     extend Headless::Action::ModuleMethods
     extend Headless::CLI::Action::ModuleMethods # play with dsl, look!
 
-    include Headless::Parameter::Controller::InstanceMethods
     include Headless::CLI::Action::InstanceMethods # look!; sub-client
+    include Headless::Parameter::Controller::InstanceMethods  # after s.c above
+      # b.c of h.l's `formal_attributes`/`formal_parameters` compat. hook
 
     ACTIONS_ANCHOR_MODULE = -> { API::Actions }
 

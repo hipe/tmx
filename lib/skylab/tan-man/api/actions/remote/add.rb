@@ -5,6 +5,7 @@ module Skylab::TanMan
 
     attribute :host, required: true
     attribute :name, required: true
+    attr_reader :name  # ICK override ..
     attribute :resource, default: :local, mutex_boolean_set: [:local, :global]
 
   protected

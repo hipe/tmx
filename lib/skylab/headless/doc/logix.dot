@@ -1,0 +1,57 @@
+# created by tan-man on 2013-02-02 08:00:09 UTC
+
+digraph {
+
+/*
+  example stmt_list:
+    foo -> bar
+    biff -> baz
+
+  example node_stmt:
+    learn_c [label="learn C somehow"]
+*/
+
+label="what is your logic?"
+
+#                 blue : fillcolor="#b5d5fb"
+#             finished : green
+#                green : fillcolor="#79f233"
+
+
+node [label="\N", style="filled", fillcolor="#b5d5fb", fontname="Futura", fontsize="16pt", penwidth="1.1566", shape="Mrecord"]
+
+args_na [label="requires\nno args", fontsize="14pt"]
+args_prov [label="provided\nargs"]
+args_branch [label="which must\ncome from\none of", fontsize="12pt"]
+argv [label="parsing argv\nto fit the method"]
+method [label="a method\nobject"]
+meth_branch [label="which must\ncome from\none of", fontsize="12pt"]
+args [label="and some\nargs"]
+meth_derived_join [label="a derived\nmethod object\nfrom one of", fontsize="14pt"]
+meth_name_prov [label="a method name\nprovided"]
+meth_name_prov_args [label="whose args\nmust come\nfrom one of", fontsize="12pt"]
+meth_prov [label="a provided\nmethod object"]
+meth_prov_args_branch [label="whose args must\ncome from", fontsize="12pt"]
+proc_prov [label="a provided\nproc", fontsize="14pt"]
+self_meth [label="both of", fontsize="12pt"]
+ultimately [label="ultimately what\nwe want is", fontsize="12pt"]
+args->args_branch
+args_branch->args_na
+args_branch->args_prov
+args_branch->argv
+method->meth_branch
+meth_branch->meth_derived_join
+meth_branch->meth_prov
+meth_derived_join->proc_prov
+meth_derived_join->self_meth
+proc_prov->args_na
+meth_name_prov->meth_name_prov_args
+meth_prov->meth_prov_args_branch
+meth_prov_args_branch->args_prov
+meth_name_prov_args->argv
+meth_name_prov_args->args_prov
+self_meth->meth_name_prov
+self_meth->self
+ultimately->method
+ultimately->args
+}

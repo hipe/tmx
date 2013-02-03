@@ -21,9 +21,12 @@ module Skylab::Headless
   module Model::Event::ModuleMethods
     extend MetaHell::Let          # just for memoizing below
 
-    let :normalized_event_name do
-      Headless::Action::FUN.build_normalized_name[
-        self::EVENTS_ANCHOR_MODULE, self ]
+    let :name_function do
+      Headless::Name::From::Module::Graph self, self::EVENTS_ANCHOR_MODULE
+    end
+
+    def normalized_event_name
+      name_function.normalized_name
     end
   end
 

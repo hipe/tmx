@@ -51,7 +51,7 @@ module Skylab::TanMan::TestSupport::Sexp
       @stdin = sin                # we keep this stream on deck but don't set
                                   # upstream yet. it takes logix. [#hl-022]
       self.io_adapter = build_io_adapter nil, sout, serr, pen
-      _headless_sub_client_init! nil
+      _headless_sub_client_init nil
     end
 
 
