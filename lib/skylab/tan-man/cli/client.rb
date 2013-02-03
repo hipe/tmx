@@ -75,23 +75,16 @@ module Skylab::TanMan
     end.call
 
 
-    define_method :initialize do
-      |sin=$stdin, sout=$stdout, serr=$stderr, &events| # observe pat. [#sl-114]
+    define_method :initialize do |sin=$stdin, sout=$stdout, serr=$stderr|
+      _tan_man_sub_client_init nil  # get it? # [#sl-114] above
 
       # self.io_adapter = build_io_adapter sin, sout, serr, pen # after [#018]
-      self.io_adapter =
-        Headless::CLI::IO_Adapter::Minimal.new sin, sout, serr, pen
+      self.io_adapter = Headless::CLI::IO_Adapter::Minimal.new(
+        sin, sout, serr, pen )
 
-      if events
-        fail 'do we really want this?'
-        # ev[ self ]
-      else
-        on_all { |e| io_adapter.emit e.type, e.message }
+      on_all { |e| io_adapter.emit e.type, e.message }
         # saying e.to_s is probably not what you want -- you will get a hash
         # if the message has been changed via message=
-      end
-
-      _tan_man_sub_client_init nil # get it?
     end
 
     def action_anchor_module      # gone at [#022] maybe..

@@ -57,6 +57,10 @@ module Skylab::Headless
       nil
     end
 
+    def parameter_label x, *rest  # [#036] explains it all
+      request_client.send :parameter_label, x, *rest
+    end
+
     def payload x                 # provided as a convenience for this common
       emit :payload, x            # emitter "macro" -- not all sub-clients
       nil                         # will necessarily emit this.
@@ -74,9 +78,9 @@ module Skylab::Headless
 
     def human_escape s ; pen.human_escape s end
 
-    def kbd s ; pen.kbd s end
+    def ick s ; pen.ick s end
 
-    def parameter_label x, *rest ; pen.parameter_label x, *rest end
+    def kbd s ; pen.kbd s end
 
     # --- * ---
 

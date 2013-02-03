@@ -1,6 +1,46 @@
 # name conventions
 
+## some thoughts on the name `name`
+
+Don't use it. As a complete variable or method name, "name" is so vague
+that it itself is almost useless as a name. Is it a symbol or a string?
+It is appropriate as a label for a user interface or is it used internally
+as a key? Is it unique in some context and suitable as an identifier (key),
+and if so what is the context, how broad is the namespace?
+
+These distinctions are *very* important, and get very muddled
+when we start calling things simply "name". Yes there's context, sure,
+and you can document somewhere what is intended for the particular symbol,
+but that doesn't help the fact that whenever I read `name` as a name I
+immediately cringe at the thought that I will have to at that moment guess
+which it is.
+
+Use more specific names for variables or methods that represent names.
+
+  + `foo_label` or `bar_string` is nice, the former suggests that it is
+  suitable for display to the user, the latter is at least being explicit.
+
+  + `normalized_name` is better. When I see "normalized" here i think
+  "symbol", which is a step in the right direction. *however*, in some
+  contexts a `normalized_name` is still too vague (..)
+
+### with one exception..
+
+An important exception to all of the above, and one that is in itself
+telling, is that we *can* use the name `name` to hold a name function.
+This is because when you see something like `foo.name.to_slug` it is
+imminently readable and not ambiguous (if slug has meaning to you).
+
+However, when you call a variable for holding name functions `name`, still
+please be conscientious of all of the above concerns and make a comment
+where necessary if ever it is not clear from that one line of code
+what is in that particular name.
+
+
 ## functions / methods
+
+
+### string-rendering methods
 
   + `foo_string` -
   result must be a string. must take 0 args. frequently if the

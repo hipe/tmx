@@ -42,8 +42,18 @@ module Skylab::Headless
       io_adapter.pen
     end
 
-    def request_client
-      fail 'sanity - buck stops here' # makes nasty bugs easier to find
+    call_frame_rx = /
+      #{ Autoloader::Inflection::FUN.call_frame_path_rx.source } :
+      (?<no>\d+) : in [ ] ` (?<meth>[^']+) '
+    \z/x
+
+    define_method :request_client do
+      md = call_frame_rx.match caller.first
+      if md
+        xtra = " - `#{ md[:meth] }` wants the r.c of this #{ self.class } #{
+          }(whose r.c is human) - do you need to define a terminal form?"
+      end
+      fail "sanity - buck stops here#{ xtra }" # makes nasty bugs easier to find
     end
   end
 

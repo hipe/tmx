@@ -7,6 +7,8 @@ module Skylab::TanMan
 
     extend Core::Client::ModuleMethods         # per the pattern
 
+    include Headless::API::Client::InstanceMethods  # now we need parameter_label
+
     include Core::Client::InstanceMethods      # per the pattern
 
     event_class API::Event                     # necessary in 2 places b/c

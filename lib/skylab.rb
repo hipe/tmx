@@ -34,6 +34,9 @@ module Skylab
 
     o = { }
 
+    o[:call_frame_path_rx] =
+      /^(?<path>.+#{ ::Regexp.escape Autoloader::EXTNAME })(?=:\d+:in[ ]`)/x
+
     sanitize_path_rx = %r{ #{::Regexp.escape Autoloader::EXTNAME}\z |
       (?<=/)/+ | (?<=[-_ ])[-_ ]+ | [^-_ /a-z0-9]+ }ix
 
@@ -72,11 +75,9 @@ module Skylab
 
 
   module Autoloader::Inflection::Methods
-
-    Autoloader::Inflection::FUN.members.each do |func|
-      define_method func, & Autoloader::Inflection::FUN[func]
+    [ :constantize, :methodize, :pathify ].each do |m|
+      define_method m, & Autoloader::Inflection::FUN[m]
     end
-
   end
 
 
@@ -85,7 +86,7 @@ module Skylab
     extend Autoloader::Inflection::Methods # pathify
 
     -> do
-      rx = /^(?<path>.+#{ ::Regexp.escape Autoloader::EXTNAME })(?=:\d+:in `)/
+      rx = Autoloader::Inflection::FUN.call_frame_path_rx
 
       define_method :_autoloader_init do |caller_str|
         # be sure to #trigger this *ONCE* when hacking autoloader
@@ -98,7 +99,7 @@ module Skylab
         end
 
         if dir_path.nil?
-          file = ::Pathname.new caller_str.match(rx)[:path]
+          file = ::Pathname.new caller_str.match( rx )[ :path ]
           if ! file.absolute? # this takes a filesystem hit, but you cannot ..
             file = file.expand_path # reliably autoload with a relpath.
           end

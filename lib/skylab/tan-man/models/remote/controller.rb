@@ -53,12 +53,14 @@ module Skylab::TanMan
 
     # @todo{after:.3} abstract or eliminate // at [#046] change it to etc
 
-    OnEdit = API::Emitter.new(:all, error: :all)
+    OnEdit = API::Emitter.new :all, error: :all
 
     def edit attrs, &b
       error_count = 0
       self.error_emitter = OnEdit.new(b, ->(o) { o.on_error { error_count += 1 } } ) # wtf
-      attrs.each { |k, v| send("#{k}=", v) } # assume events are emitted on errors
+      attrs.each do |k, v|
+        send "#{ k }=", v # assume events are emitted on errors
+      end
       self.error_emitter = nil
       0 == error_count ? self : false
     end

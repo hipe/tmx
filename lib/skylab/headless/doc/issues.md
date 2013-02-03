@@ -8,7 +8,7 @@
 [#045] #open #tracking-tag ellipsify - take into acct word producers
 [#044]       file services, #tracking-tag for nerks that will push up.
 [#043]       #tracking-tag newlines (DOS line endings) be damned!
-[#042] #open spec for cli box dsl
+[#042]       #done spec for cli box dsl
 [#040]       #doc-point: when using dsl, what methods should become actions?..
 [#039]       #done clean up smell of @foo ||= nil everywhere
 [#038]       #done change hackiness to the concept of `collapse` in DSL
@@ -47,7 +47,7 @@
 [#013] #open IGNORE_THIS_CONSTANT haha no
 [#012] #open redesign this with_client nonsense
 [#011]       #done regrettify all tests in this subproduct
-[#010] #open refactor API support to take into acct actions & clients
+[#010]       #done refactor API support to take into acct actions & clients
 [#009]       #tracking-tag places where HL::Parameters show signs of strain
 [#008]       P::C::I_M --> SC::I_M
 [#007]       #done use of Parameter::Set#list, unify with Boxxy interface

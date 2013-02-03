@@ -1,16 +1,19 @@
 module Skylab::Headless
 
   module API
-    # fail "this whole this will be shut down and build back up again for [#010]"
+    # (this used to not know about actions and clients! [#hl-010])
     # the frontier sub-product for this is flex2treetop - make sure to
     # cross-test the two! changes anticipated near [#017]
 
-    class API::RuntimeError < ::RuntimeError
+    class RuntimeError < ::RuntimeError
     end
   end
 
+  module API::Client
+    # what did you think we were going to write it for you? :P
+  end
 
-  module API::InstanceMethods
+  module API::Client::InstanceMethods
     include Headless::Client::InstanceMethods
 
     def invoke meth, params_h=nil
@@ -25,12 +28,18 @@ module Skylab::Headless
       end
     end
 
-  protected
+    def parameter_label x, idx=nil  # [#036] explains it all
+      idx = "[#{ idx }]" if idx
+      stem = if ::Symbol === x then x else
+        stem = x.name.normalized_local_name  # errors please
+      end
+      "<#{ stem }#{ idx }>"
+    end
 
     def response
       yield # caller must handle return value processing of client method
 
-      if io_adapter.errors.empty?
+      if io_adapter.errors.length.zero?
         if io_adapter.payloads.length > 1
           io_adapter.payloads
         else
@@ -46,7 +55,6 @@ module Skylab::Headless
       API::RuntimeError
     end
   end
-
 
   class API::Promise < ::BasicObject # thanks Ben Lavender
 
@@ -69,11 +77,9 @@ module Skylab::Headless
     end
   end
 
-
   module API::Pen
     # pure namespace contained entirely within this file. manifesto at H_L::Pen
   end
-
 
   module API::Pen::InstanceMethods
     include Headless::Pen::InstanceMethods
@@ -81,18 +87,11 @@ module Skylab::Headless
     def em s
       "\"#{ s }\""
     end
-
-    def parameter_label m, idx=nil
-      s = (::Symbol === m) ? m.to_s : m.normalized_local_name.inspect
-      idx ? "#{ s }[#{ idx }]" : s
-    end
   end
-
 
   class API::Pen::Minimal
     include API::Pen::InstanceMethods
   end
-
 
   API::Pen::MINIMAL = API::Pen::Minimal.new
 

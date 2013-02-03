@@ -112,56 +112,24 @@ module Skylab::TanMan
 
     alias_method :help, :tan_man_help_adapter
 
-    def invite_line               # #compat-bleeding #compat-headless
-    # (this is to get the tests to pass but note we should not in the future
-    # assume that the terminal action does not take a meaningful `-h` opt.)
-    # #todo
-     "try #{ kbd "#{ request_client.send :normalized_invocation_string }#{
-        } #{ normalized_local_action_name } -h" } for help"
+    def render_invite_line inner_string
+      "try #{ kbd inner_string } for help"  # we wear `try` as a badge of shame
     end
 
-
-    proc_that_looks_like_bound_method = ::Struct.new :receiver, :name
-
-    define_method :resolve do |argv|
-                                  # what we have here is an attempt at making|
-                                  # #compat-bleeding #compat-headless (!!)
-      res = nil                   # compare to hl:cli:action:im#invoke
-      begin                       # which it comes annoyingly close to
-        @argv = argv
-        @queue ||= []
-        res = parse_opts( argv ) or break
-        queue.push( default_action ) if queue.empty?
-        execute = -> callable do  # do this for all but the last callable
-          if callable.respond_to? :call  # in the queue: process it as normal
-            res = callable.call   # (all of this is ridiculous and should be
-          else                    # killed with fire, but is necessary during
-            res = parse_argv_for( callable ) or break # jawbreak)
-            res = send( callable, *res ) or break
-          end
-          nil
-        end
-        prepare = -> callable do  # do this for the last callable in the queue:
-          if callable.respond_to? :call # something different:
-            res = [               # we've got to follow what looks like
-              ( proc_that_looks_like_bound_method.new callable, :call ),
-              []                  # ( no args - you get NOTHING )
-            ]                     # this tail-call recursion nonsense
-          else
-            res = parse_argv_for( callable ) or break
-            res = [ method( callable ), res ]
-          end
-          # result looks like : [ (receiver, name), args ] ( a bound method )
-          nil
-        end
-        while queue.length > 1    # (so, new way was queue, old way was tail-
-          execute[ queue.shift ]  # call.  we run down the queue until the last
-          res or break            # callble, then we pass that.)
-        end
-        res or break
-        queue.length == 1 or fail "sanity"
-        prepare[ queue.last ]
-      end while nil
+    def resolve argv  # just blood
+      @do_hack_normalize_callable = true
+      res, meth, args = invoke argv
+      if res
+        [ meth, args ]
+      end # always result in nil on failure - h.l took care of it
+    end # with:
+    def normalize_callable x  # hack parent to break out of its invoke loop early
+      res = nil
+      if @do_hack_normalize_callable
+        res = [ super ]
+      else
+        res = super
+      end
       res
     end
 
@@ -170,6 +138,7 @@ module Skylab::TanMan
     # ---------------- jawbreak blood begin --------------------
 
     def initialize request_client
+      @do_hack_normalize_callable = nil
       @param_h = { }
 
       _headless_sub_client_init request_client
