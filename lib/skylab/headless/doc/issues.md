@@ -1,3 +1,6 @@
+[#050]       #doc-point name conventions!
+[#049]       #later formal parameters deep audit and refactor, [#009]
+             [#049.1] - set becomes box
 [#048]       #tracking-tag for select / Select in this library
 [#047]       #tracking-tag for cool short algos that illustrate simple things
              well - i mean this is a placeholder for that one thing
@@ -5,12 +8,13 @@
 [#045] #open #tracking-tag ellipsify - take into acct word producers
 [#044]       file services, #tracking-tag for nerks that will push up.
 [#043]       #tracking-tag newlines (DOS line endings) be damned!
-[#042] #open spec for cli box dsl
+[#042]       #done spec for cli box dsl
 [#040]       #doc-point: when using dsl, what methods should become actions?..
 [#039]       #done clean up smell of @foo ||= nil everywhere
 [#038]       #done change hackiness to the concept of `collapse` in DSL
 [#037]       #tracking-tag box classes that build their own option parsers
-[#036]       #behavior-point `par`, `parameter_label` etc -- gather it up
+[#036]       #behavior-point `par`, `parameter_label` etc -- gather it up ..
+               also: there's room for nonsense here.. big nonsense..
 [#035]       #doc-point : the boxxy cluttered namespace problem (Actions)
 [#034]       #tracking-tag for #function-point `program_name` -
               `normalized_invocation_string`
@@ -34,6 +38,7 @@
 [#020]       #convention `invoke` `execute` `run` `call` have distinct meanings
                and consistent signatures within modalities
 [#019]       #pattern #convention iff cli action invoke is false, invite
+               (referred to now as the "common triad" #doc-point) ..
 [#018]       #tracking-tag api action inflection
 [#017] #open API architecture - is frontier app at odds with assumptions?
 [#016] #open #low-priority dynamic uncolorize payload stream when ! tty?
@@ -42,7 +47,7 @@
 [#013] #open IGNORE_THIS_CONSTANT haha no
 [#012] #open redesign this with_client nonsense
 [#011]       #done regrettify all tests in this subproduct
-[#010] #open refactor API support to take into acct actions & clients
+[#010]       #done refactor API support to take into acct actions & clients
 [#009]       #tracking-tag places where HL::Parameters show signs of strain
 [#008]       P::C::I_M --> SC::I_M
 [#007]       #done use of Parameter::Set#list, unify with Boxxy interface

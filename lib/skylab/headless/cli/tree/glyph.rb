@@ -1,6 +1,6 @@
 # encoding: UTF-8
 module Skylab::Headless
-  class CLI::Tree::Glyph < ::Struct.new :name
+  class CLI::Tree::Glyph < ::Struct.new :normalized_local_name
     # (used elsewhere for reflection.)
   end
 

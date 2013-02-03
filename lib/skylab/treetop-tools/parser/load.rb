@@ -6,7 +6,7 @@ module Skylab::TreetopTools
   class Parser::Load::DSL < DSL::Joystick
     # Define the DSL that will be used to load grammars.
 
-    def self.parameter_definition_class        # [#sl-119] one day DSL
+    def self.formal_parameter_class            # [#sl-119] one day DSL
       Parameter # has extra nonsense for dirs [#hl-009] HL::P strain?
     end
 
@@ -29,7 +29,7 @@ module Skylab::TreetopTools
 
     include Headless::Parameter::Bound::InstanceMethods # bound_parameters
 
-    attr_reader(* DSL.parameters.each.map(&:name)) # for after
+    attr_reader(* DSL.parameters.each.map(& :normalized_local_name ) ) # for after
                                                    # call_body_and_absorb
     def invoke
       result = false
@@ -103,10 +103,10 @@ module Skylab::TreetopTools
       error_count_before = error_count
       root_f = ->(bp) do
         root = bound_parameters[param_name]
-        ! root.value and return error("#{root.name} must be set in " <<
-          "order to support a relative path like #{bp.label}!")
-        ! root.value.absolute? and return error("#{root.name} must " <<
-          "be an absolute path in order to expand paths like #{bp.label}")
+        ! root.value and return error("#{ root.normalized_local_name } must be set in "<<
+          "order to support a relative path like #{ bp.label }!")
+        ! root.value.absolute? and return error("#{ root.normalized_local_name } must " <<
+          "be an absolute path in order to expand paths like #{ bp.label }")
         (root_f = ->(_) { root }).call(nil)
       end
       pathname_params = bound_parameters.where do |bp|
@@ -134,7 +134,7 @@ module Skylab::TreetopTools
         compiler.compile(g.inpath, g.outpath)
         true
       rescue ::RuntimeError => e
-        raise RuntimeError.new("when compiling #{g.name}:\n#{e.message}")
+        raise RuntimeError.new("when compiling #{ g.normalized_local_name }:\n#{ e.message }")
       end
     end
 

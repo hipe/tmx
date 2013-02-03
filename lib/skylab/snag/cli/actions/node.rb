@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class CLI::Actions::Node < CLI::Action::Box
 
-    cli_box_dsl_original_desc 'actions that act on a given node'
+    box.desc 'actions that act on a given node'
 
     desc 'close a node (remove tag #open and add tag #done)'
 
@@ -20,7 +20,7 @@ module Skylab::Snag
 
   class CLI::Actions::Node::Actions::Tags < CLI::Action::Box
 
-    cli_box_dsl_original_desc 'actions for tags on a given node'
+    box.desc 'actions for tags on a given node'
 
     desc 'add a tag to a node.'
 

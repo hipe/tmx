@@ -19,12 +19,12 @@ module Skylab::GitStashUntracked
   protected # (protected before public this file only to reduce "strain" on DSL)
 
     def initialize request_client
-      _gsu_sub_client_init! request_client
+      _gsu_sub_client_init request_client
     end
 
-    def _gsu_sub_client_init! request_client
+    def _gsu_sub_client_init request_client
       @emit = nil
-      _headless_sub_client_init! request_client
+      _headless_sub_client_init request_client
       nil
     end
 
@@ -138,7 +138,7 @@ module Skylab::GitStashUntracked
     def initialize _, stdout, stderr
       @param_h = { }
       self.io_adapter = build_io_adapter _, stdout, stderr
-      _gsu_sub_client_init! nil
+      _gsu_sub_client_init nil
     end
 
     def api_invoke mixed_action_name, param_h
@@ -153,7 +153,7 @@ module Skylab::GitStashUntracked
       o.version = '0.0.1'         # avoid warnings from calling the builtin '-v'
       o.release = 'blood'         # idem
       o.on '-h', '--help', 'this screen, or help for particular action' do
-        box_enqueue_help!
+        box_enqueue_help
       end
       o.summary_indent = '  '     # two spaces, down from four
       o
@@ -189,7 +189,7 @@ module Skylab::GitStashUntracked
 
     def help_option o
       o.on '-h', '--help', 'this screen' do
-        enqueue_help!
+        enqueue_help
       end
       nil
     end
@@ -694,7 +694,7 @@ module Skylab::GitStashUntracked
   protected
 
     def initialize request_client, path_info, stash_name, emit
-      _gsu_sub_client_init! request_client
+      _gsu_sub_client_init request_client
       @emit = emit
       @path_info = path_info
       @pathname = path_info.stashes_pathname.join stash_name
@@ -810,7 +810,7 @@ module Skylab::GitStashUntracked
   protected
 
     def initialize request_client, path_info, emit
-      _gsu_sub_client_init! request_client
+      _gsu_sub_client_init request_client
       @cache = { }
       @emit = emit
       @path_info = path_info
@@ -911,7 +911,7 @@ module Skylab::GitStashUntracked
   protected
 
     def initialize request_client, pathname, emit
-      _gsu_sub_client_init! request_client
+      _gsu_sub_client_init request_client
       @emit = emit
       @pathname = pathname
     end

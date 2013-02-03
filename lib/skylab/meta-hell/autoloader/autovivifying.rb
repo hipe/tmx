@@ -12,7 +12,7 @@ module Skylab::MetaHell::Autoloader
 
     def self.extended mod
       mod.extend Autovivifying::ModuleMethods
-      mod._autoloader_init! caller[0]
+      mod._autoloader_init caller[0]
     end
   end
 
@@ -52,7 +52,7 @@ module Skylab::MetaHell::Autoloader
       m = ::Module.new
       m.extend module_methods_module
       m.dir_path = dir_pathname.to_s
-      m._autoloader_init! nil
+      m._autoloader_init nil
       m
     end
 

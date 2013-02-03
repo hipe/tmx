@@ -16,8 +16,8 @@ module Skylab::TanMan
                                                # have a deep narrow filetree)
 
     def self.inherited klass
-      klass._autoloader_init! caller[0]
-      # klass._boxxy_init! caller[0]
+      klass._autoloader_init caller[0]
+      # klass._boxxy_init caller[0]
     end
 
 
@@ -36,7 +36,7 @@ module Skylab::TanMan
     def build_option_parser       # #frontier, tracked by [#hl-037]
       o = TanMan::Services::OptionParser.new
       o.on '-h', '--help', 'this screen, or help for particular sub-action' do
-        box_enqueue_help!
+        box_enqueue_help
       end
       o
     end

@@ -192,7 +192,7 @@ module Skylab::Snag
     def build_option_parser       # tracked by [#hl-037]
       o = Snag::Services::OptionParser.new
       o.on '-h', '--help', 'this screen, or help for particular sub-action' do
-        box_enqueue_help!
+        box_enqueue_help
       end
       o
     end
@@ -292,7 +292,7 @@ module Skylab::Snag
     define_method :parse do |argv|
       client = CLI::Client.new @request_client, 2
       box_emissary = @box_class.new client
-      box_emissary.send :enqueue!, :help
+      box_emissary.send :enqueue, :help
       box_emissary.invoke argv                 # (headless would let us
       nil                                      # continue to process queue.)
     end

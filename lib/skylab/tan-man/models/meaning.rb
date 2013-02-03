@@ -7,7 +7,7 @@ module Skylab::TanMan
 
     def collapse request_client                # we are not a flyweight, hack
       self.request_client and fail 'sanity'
-      _tan_man_sub_client_init! request_client
+      _tan_man_sub_client_init request_client
       self
     end
 
@@ -79,7 +79,7 @@ module Skylab::TanMan
   protected
 
     def initialize request_client, name, value
-      _tan_man_sub_client_init! request_client
+      _tan_man_sub_client_init request_client
       self[:name] = name
       @symbol = name.intern
       self[:value] = value

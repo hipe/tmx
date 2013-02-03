@@ -20,13 +20,8 @@ module Skylab::Headless
       nil
     end
 
-    def any?
-      ! empty?
-    end
-
-    def empty?
-      # for fun we do this the risky when we could just ..
-      -1 == ( @range.end - @range.begin )
+    def length
+      @range.end - @range.begin + 1
     end
 
     def line_count

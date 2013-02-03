@@ -53,7 +53,7 @@ module Skylab::TreetopTools
       if const_defined? const, false # members are determined by the names
         const_get const, false    # of the parameters of our DSL
       else
-        k = ::Class.new( ::Struct.new(* parameters.each.map(& :name) ) )
+        k = ::Class.new( ::Struct.new(* parameters.each.map(& :normalized_local_name ) ) )
         k.class_eval do
           include Headless::Parameter::Definer::InstanceMethods::StructAdapter
           public :known?
@@ -80,7 +80,7 @@ module Skylab::TreetopTools
   protected
 
     def initialize request_client, dsl_body, events
-      _headless_sub_client_init! request_client
+      _headless_sub_client_init request_client
       self.body = dsl_body
       self.events = events
     end

@@ -13,10 +13,10 @@ module Skylab::Headless
       prune_bad_keys actual_h
       defaults actual_h
       actual_h.each do |name, value|
-        if actual.respond_to? "#{name}="
-          actual.send "#{name}=", value # not atomic with above as es muss sein
+        if actual.respond_to? "#{ name }="
+          actual.send "#{ name }=", value # not atomic with above as es muss sein
         else
-          error "not writable: #{name}"
+          error "not writable: #{ name }"
         end
       end
       missing_required actual
@@ -40,8 +40,8 @@ module Skylab::Headless
 
     def defaults actual_h        # #pattern [#sl-117]
       formal_parameters.each do |o|
-        if o.has_default? and actual_h[o.name].nil?
-          actual_h[o.name] = o.default_value
+        if o.has_default? and actual_h[o.normalized_local_name].nil?
+          actual_h[o.normalized_local_name] = o.default_value
         end
       end
       nil
@@ -56,20 +56,17 @@ module Skylab::Headless
     end
 
     def missing_required actual
-      required_params = formal_parameters.each.select(&:required?) # twice..
-
-      a = required_params.select do |p|                            # ..is nice
-        -> do
-          break( true ) if ! actual.known?( p.name )
-          break( true ) if actual[p.name].nil?
-        end.call
+      missing_a = formal_parameters.reduce [] do |m, (k, v)|
+        if v.required?
+          if ! actual.known?( k ) || actual[ k ].nil?
+            m << v
+          end
+        end
+        m
       end
-
-      if ! a.empty?
-        a.map! { |param| parameter_label param }
-        missing_required_failure a
+      if missing_a.length.nonzero?
+        missing_required_failure missing_a.map(& method( :parameter_label ) )
       end
-
       nil
     end
 

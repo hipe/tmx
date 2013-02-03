@@ -10,12 +10,12 @@ module Skylab::MetaHell
       end
     end
 
-    def each *a, &b
+    def each &b
       Formal::Box::Enumerator.new( -> y do
         @order.each do |k|
           y.yield k, @hash.fetch( k ) # always give the yielder 2 args (norm'd)
         end
-      end, self.class )._each( *a, &b )
+      end, self.class )._each( &b )
     end
 
     def fetch key, &otherwise
@@ -72,7 +72,12 @@ module Skylab::MetaHell
       if @hash.key? name
         found[ @hash.fetch name ]
       else
-        not_found[ ]
+        not_found ||= -> { raise ::NameError, "name not found: #{name.inspect}"}
+        x = not_found.arity.abs
+        a = [ ]
+        a << self if x > 0
+        a << name if x > 1
+        not_found[ * a ]
       end
     end
 
@@ -105,10 +110,16 @@ module Skylab::MetaHell
 
   protected
 
-    def initialize                # **NOTE** if you are subclassing Formal::Box
-      @order = [ ]                # your nerk *must* take a zero arg form of
-      @hash = { }                 # `new`, it is used in algorithms like
-    end                           # `select` to build result boxes progressively
+    def initialize                # (subclasses call super( ) of course!)
+      @order = [ ]
+      @hash = { }
+    end
+
+    alias_method :_meta_hell_formal_box_core_init, :initialize # see `to_box`
+
+    # base_args / base_init       # #todo
+
+    # --*--
 
     def accept attr               # convenience `store`-ish for nodes like this
       add attr.normalized_name, attr
@@ -226,6 +237,8 @@ module Skylab::MetaHell
   class Formal::Box::Enumerator < ::Enumerator
     # this exists a) because it makes sense to use enumerator for enumerating
     # and b) to wrap up all the crazines we do with hash-like iteration
+
+    attr_writer :box_instance  # for hacks, near `to_box`
 
     # box_map - result is a new Box that will have the same keys in the same
     # order as the virtual box represented by this enumerator at the time
@@ -351,13 +364,16 @@ module Skylab::MetaHell
     def select &func
       _filter( func ).to_box
     end
-
-    def to_box                    # if you want a box after e.g a chain of
-      ea = self                   # for e.g. filters, or whatever just anything
-      @box_class.new.instance_exec do
+                                   # if you want to collapse back down to a box
+    def to_box                     # after a chain of e.g. filters or whatever
+      ea = self                    # (base_args/base_init tracked by [#mh-021])
+      ba = @box_instance.call.send :base_args if @box_instance
+      @box_class.allocate.instance_exec do
+        _meta_hell_formal_box_core_init
         ea.each do |k, v|
           add k, v
         end
+        base_init(* ba ) if ba    # (designed not to be too hackable..)
         self
       end
     end
@@ -368,13 +384,14 @@ module Skylab::MetaHell
 
     alias_method :metahell_original_initialize, :initialize
 
-    def initialize func, box_class=Formal::Box
+    def initialize func, box_class=Formal::Box, box_instance=nil
       func.respond_to?( :call ) or raise ::ArgumentError, "f?: #{ func.class }"
       ::Class === box_class or raise ::ArgumentError, "c?: #{ box_class.class }"
       super(& method( :visit ) )
       @arity_override = nil
       @box_class = box_class
       @normalized_yielder_consumer = func
+      @box_instance = box_instance
     end
 
     define_method :_filter do |func|
@@ -386,7 +403,7 @@ module Skylab::MetaHell
             normal_yielder.yield k, v
           end
         end
-      end, @box_class )
+      end, @box_class, @box_instance )
     end
 
     def visit y

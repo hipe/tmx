@@ -2,7 +2,7 @@ module Skylab::Snag
 
   class CLI::Actions::Todo < CLI::Action::Box
 
-    cli_box_dsl_original_desc 'actions that work with TODO-like tags'
+    box.desc 'actions that work with TODO-like tags'
 
     desc "a report of the @#{}todo's in a codebase"
 

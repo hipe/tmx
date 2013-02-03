@@ -25,7 +25,7 @@ module Skylab::Headless::TestSupport::Parameter
         def formal_parameters     # this moves up to e.g some I_M::Core,
           self.class.parameters   # then by all means get rid of it here!
         end
-        def with_client &b        # slated for improvement [#012]
+        def _with_client &b        # slated for improvement [#012]
           instance_exec( &b )
         end
         self

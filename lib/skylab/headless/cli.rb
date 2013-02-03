@@ -6,11 +6,17 @@ module Skylab::Headless
     OPT_RX = /\A-/                # ( yes this is actually used elsewhere :D )
   end
 
-
   module CLI::Action
-    # pure namespace module, contained entirely this file
-  end
 
+    o = { }
+
+    o[:summary_width] = -> op, max=0 do  # hack a peek into o.p to decide how
+      max = CLI::FUN.summary_width[ op, max ] # wide to make column A
+      max + op.summary_indent.length - 1  # (one space from o.p)
+    end
+
+    FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
+  end
 
   module CLI::Action::ModuleMethods
     include Headless::Action::ModuleMethods
@@ -28,383 +34,494 @@ module Skylab::Headless
     attr_reader :option_parser_blocks
   end
 
-
   module CLI::Action::InstanceMethods
     include Headless::Action::InstanceMethods
 
     def invoke argv
-      result = nil
-      @argv = argv                # it really is nice to have it both ways, this
-      @queue ||= []               # (omg cueue might have shenanigans on it)
-      begin
-        result = parse_opts argv  # implement parse_opt however you want,
-        true == result or break   # but to allow fancy exit statii we have to
-                                  # observe this strict ickiness [#hl-023]
-
-        if queue.empty?           # during parse_opts client may have added
-          enqueue! default_action # action items to the queue. As name suggests,
-        end                       # this is the default case that they didn't.
-
-        upstream_resolved = false # (experimental, do this at most once)
-        while ! queue.empty?      # effectively for each item on the queue:
-          x = queue.first         # peek ahead before shifting
-          if ! x                  # clients may add a falseish to the queue
-                                  # during parse_opts to indicate they did
-                                  # something, hence don't use default_action
-          elsif x.respond_to? :call # this is typically a lambda added during
-            result = x.call       # parse_opts but it could be anything.
-            true == result or break # again with [#hl-023] for now, exit codes
-
-          else
-            if ! upstream_resolved # experimentally once evar in this shebang we
-              result = resolve_upstream # give the client a chance to impl.
-              true == result or break # custom upstream resolution [#hl-022]
-              upstream_resolved = true # observing the now familiar chance to
-            end                   # set exit code on failure [#hl-023]
-
-            a = parse_argv_for x  # We assume now that actionable x is a method
-            if ! a                # but if that failed, short circuit out of
-              result = exit_status_for :parse_argv_failed # processing the rest
-              break               # of the queue
-            end
-            result = send( x, *a ) #                 money
-            true == result or break # for now [#hl-023] we assume you gave us
-            result or break       # an exit code and we should stop unless
-          end                     # result was exactly true.
-          queue.shift             # shift queue only when succeeded with that
-        end                       # actionable item.
-      end while nil
-      result
+      @argv = argv ; arg = nil    # some callables care about @argv, some don't
+      @queue ||= []               # essential here, must can be set elsewhere
+      res = parse_opts @argv      # passed as arg so descendents can play dumb
+      if true == res              # we check this a lot for [#hl-019], [#hl-023]
+        @queue.push default_action if @queue.length.zero?
+        begin                     # for each item on the queue, execute it but
+          res, meth, args = normalize_callable @queue.first
+          true == res or break
+          res = meth.receiver.send meth.name, *args
+          true == res or break
+          @queue.shift            # now it is ok to say we processed it
+        end while @queue.length.nonzero?
+      end
+      res
     end
 
   protected
 
-    def argument_syntax
-      @argument_syntax ||= begin
-                                  # assumes `default_action` for now..
-        build_argument_syntax_for default_action
+    # (no initter method but ivars get set in `invoke`!)
+
+    #                 ~ core controller-like methods ~
+
+    def absorb_param_queue        # (see `param_queue` if you haven't)
+      before = error_count        # (**NOTE** that by the time we get here,
+      while @param_queue.length.nonzero? # we should be past the point of
+        k, v = @param_queue.shift # validating whether it is a writable param
+        send "#{ k }=", v         # because for now we just call send on it
+      end                         # which for all we know could be some
+      before < error_count        # random-ass private method)
+    end
+
+    def enqueue mixed_callable
+      @queue.push mixed_callable
+    end
+
+    def exit_status_for sym       # [#hl-023] hook for exit statii if u want
+    end
+
+    def normalize_callable x
+      if ::Array === x
+        m = x.shift ; a = x       # (ick for now we mutate the queue element
+        @queue[ 0 ] = m           # since we are processing it now and we need
+      else                        # to store somewhere the name of the method
+        m = x ; a = []            # used)
       end
-    end
-
-    attr_reader :argv
-
-    def build_argument_syntax parameters_a
-      Headless::CLI::ArgumentSyntax::Inferred.new parameters_a,
-        pen, (formal_parameters if respond_to? :formal_parameters)
-    end
-
-    def build_argument_syntax_for method_name
-      build_argument_syntax method( method_name ).parameters
-    end
-
-    def enqueue! mixed_callable
-      queue.push mixed_callable
-    end
-
-    def exit_status_for sym
-                                  # descendants may want to do something fancy
-    end
-
-    def help
-      help_screen                 # just for fun we return trueish so that we
-      true                        # do any further processing in the queue.
-    end
-
-    def help_description          # assume desc_lines is nonzero-length array
-      emit :help, ''              # assumes there was content above!
-      if 1 == desc_lines.length   # do the smart thing with formatting
-        emit :help, "#{ em 'description:' } #{ desc_lines.first }"
+      if ::Symbol === m
+        normalize_callable_symbol m, a
       else
-        indent = option_parser ? option_parser.summary_indent : '  '
-        emit :help, "#{ em 'description:' }"
-        desc_lines.each do |line|
-          emit :help, "#{ indent }#{ line }"
+        opt = true ; req = false # are args allowed? are they mandatory?
+        if m.respond_to? :receiver and m.respond_to? :name
+          req = true
+          method = m
+        elsif m.respond_to? :call
+          opt = false
+          method = m.method :call
+        else
+          raise ::ArgumentError, "no - #{ m.class }"
         end
+        if req
+          a.length.zero? and raise ::ArgumentError, "(1 for 2) - #{ m.class }"
+        elsif ! opt && a.length.nonzero?
+          raise ::ArgumentError, "(#{ a.length } for 1) - #{ m.class }"
+        end
+        1 < a.length and raise ::ArgumentError, "#{ a.length } for 1..2"
+        [ true, method, a.length.zero? ? [] : a.pop ]
       end
-      nil
     end
 
-    def help_options              # precondition: an option_parser exists
-      # (in the old days this was option_parser.to_s, which should still work.)
-      emit :help, ''              # assumes there was previous above content!
-      if option_parser.top.list.detect { |x| x.respond_to? :summarize }
-        emit :help, "#{ em 'options:' }"     # else maybe empty or doc only
-      end
-      option_parser.summarize do |line|
-        emit :help, line
-      end
-      nil                         # #bqwahtevr i guess you could be done
-    end
-
-    smart_summary_width = -> option_parser do
-      max = CLI::FUN.summary_width[ option_parser ]
-      # Make the indent of the second column be the same as the first.
-      # (Out of the box we get one space, hence the minus one.)
-      max + option_parser.summary_indent.length - 1
-    end
-
-    define_method :help_screen do
-      emit :help, usage_line
-
-      help_description if desc_lines
-
-      if option_parser
-        option_parser.summary_width = smart_summary_width[ option_parser ]
-        help_options
-      end
-
-      nil  # (now is an ideal time to result in nil)
-    end
-
-    def invite_line # we have to avoid assuming we process opts
-      "use #{ kbd "#{ request_client.send :normalized_invocation_string }#{
-        } -h #{ normalized_local_action_name }" } for help"
-    end
-
-    def normalized_invocation_string
-      "#{ request_client.send :normalized_invocation_string } #{
-        }#{ normalized_local_action_name }"
-    end
-
-    def option_is_visible_in_syntax_string
-      @option_is_visible_in_syntax_string ||= ::Hash.new { |*| true }
-    end
-
-    attr_reader :option_parser
-
-    alias_method :option_parser_ivar, :option_parser
-
-                                  # out of the box we don't decide how to build
-                                  # your option_parser and you have to define
-                                  # this `bop` yourself (DSL however..)
-    def option_parser
-      @option_parser ||= self.build_option_parser
-    end
-
-    def option_syntax_string
-      # stolen and improved from Bleeding #todo:
-      if option_parser
-        option_is_visible_in_syntax_string || nil
-        a = option_parser.top.list.map do |s|
-          if s.respond_to?( :short ) &&
-            @option_is_visible_in_syntax_string[ s.object_id ]
-            "[#{ s.short.first or s.long.first }#{ s.arg }]"
+    def normalize_callable_symbol sym, args
+      cmp = 1 <=> args.length
+      if -1 == cmp then raise ::ArgumentError, "#{ args.length } for 1..2" end
+      if 0 == cmp                 # (args were provided internally to the item
+        [ true, method( sym ), args.first ]  # that was on the queue.)
+      else
+        @upstream_is_collapsed ||= begin  # experimental one-time hook [#hl-022]
+          @upstream_status = resolve_upstream  # clients can define this to get
+          true                    # this hook called once, used in execution
+        end                       # here as a prerequisite for below.
+        if true == @upstream_status
+          res = validate_arity_for sym, @argv
+          if true == res
+            [ true, method( sym ), @argv ]
+          else
+            [ res ]
           end
-        end.compact
-        if a.length.nonzero?
-          a.join ' '
+        else
+          [ @upstream_status ]
         end
       end
     end
+
+    # param_queue - a param queue is an experimental solution to the problem
+    # of wanting to process options and arguments in an order-sensitive way,
+    # (in the order they were received, for e.g.) and also wanting to separate
+    # the parsing pass from the subsequent processing pass, i.e atomicly.
+    #
 
     attr_reader :param_queue ; alias_method :param_queue_ivar, :param_queue
 
     def param_queue               # (experimental atomic processing of .e.g
-      @param_queue ||= []         # options -- see manifesto and warnings at
-    end                           # `process_param_queue!`)
+      @param_queue ||= []         # options -- see warnings at
+    end                           # `absorb_param_queue`)
 
-    def parse_argv_for m
-      as = build_argument_syntax_for m
-      res = as.parse_argv( argv ) do |o|
-
-        o.on_unexpected do |a|
-          usage_and_invite "unexpected argument#{ s a }: #{ a[0].inspect }#{
-            }#{" [..]" if a.length > 1 }"
-          nil
-        end
-
-        o.on_missing do |fragment|
-          fragment = fragment[0..fragment.index{ |p| :req == p.opt_req_rest }]
-          usage_and_invite "expecting: #{ em fragment.string }"
-          nil
-        end
-
-      end
-      res
-    end
-                                  # mutate `argv` (which is probably also @argv)
-    def parse_opts argv           # what you do with the data is your business.
-      exit_status = true          # result in true on success, other on failure
-      begin
-        if argv.empty?            # options are always optional! don't even
-          break                   # build option_parser, much less invoke it.
-        end
-        if is_branch              # If we are a branch, how do we know whether
-          if CLI::OPT_RX !~ argv.first # to parse a given opt? the solution is
-            break                 # never parse the opts to avoid a can of worms
-          end                     # with ambiguous grammars ([#hl-024]).
-        end
-        if ! option_parser        # if you don't have one, which is certainly
-          break                   # not strange, then we just leave brittany
-        end                       # alone and let downstream deal with argv
-
-        begin                     # option_parser can be some fancy arbitrary
-          option_parser.parse! argv # thing, but it needs to conform to at
-        rescue Headless::Services::OptionParser::ParseError => e # least
-          usage_and_invite e.message  # these two parts of stdlib ::O_P
-          exit_status = exit_status_for :parse_opts_failed
-        end
-      end while nil
-                                  # #experimental'y get through basic option
-      if true == exit_status && param_queue_ivar # parsing first before you
-        exit_status = process_param_queue! # before you actually validate
-      end                         # with your custom setters (if u want)
-      exit_status
-    end
-
-    def process_param_queue!      # see how this is uses to see how this is
-      res = true                  # used (sorry!) very experimental.
-      before = error_count        # **NOTE** that by the time it gets on the
-      loop do                     # param queue, it should be past the point
-        k, v = param_queue.shift  # of validating whether it is a writable
-        k or break                # parameters because for now we just call
-        send "#{ k }=", v         # send on it which for all we know could
-      end                         # be some private-ass method.
-      if before < error_count
-        res = false
-      end
-      res
-    end
-
-    attr_reader :queue
+    attr_reader :queue            # (internal use - this is for action graphs
+                                  # that will use `argument_syntax` on objects
+                                  # that haven't been invoked yet.)
 
     def resolve_upstream          # out of the box we make no assumtions about
       true                        # what your upstream should be, but per
     end                           # [#hl-023] this must be literally true for ok
 
-    strip_description_label_rx = /\A[ \t]*description:?[ \t]*/i
+    #   ~ core help-, string-, ui-msg-rendering methods and support ~
 
-    define_method :summary_line do
-      res = nil
-      begin
-        if self.class.desc_lines               # 1) if we have desc lines
-          break( res = super() )               # then use the first one (prolly)
-        end
-        op = option_parser                     # 2) else if we have an o.p.
-        if op                                  # *and* the first element of it
-          first = op.top.list.first            # is a string, use that! #exp
-          if ::String === op.top.list.first
-            str = CLI::Pen::FUN.unstylize[ first ]
-            res = str.gsub strip_description_label_rx, '' # (#hack!)
-            break
-          end
-        end
-        res = CLI::Pen::FUN.unstylize[ usage_line ] # 3) else this, unstylized
-      end while nil
-      res
+    # a "porcelain-visible" toplevel entrypoint method/action for help of
+    # (non-box) actions!  (if you add a var name here it may appear in the
+    # interface!) (just for fun we result in true instead of nil which may
+    # have a strange effect..)
+
+    def help
+      @queue[ 0 ] = default_action  # always this is the action we show.
+      help_screen help_yielder
+      true
     end
 
-    def usage_and_invite msg=nil
-      emit :help, msg if msg
-      emit :help, usage_line
-      emit :help, invite_line
+    def help_description y # assume desc_lines is nonzero-length array
+      y << ''                     # assumes there was content above!
+      if 1 == desc_lines.length   # do the smart thing with formatting
+        y << "#{ em 'description:' } #{ desc_lines.first }"
+      else
+        indent = option_parser ? option_parser.summary_indent : '  '
+        y << "#{ em 'description:' }"
+        desc_lines.each do |line|
+          y << "#{ indent }#{ line }"
+        end
+      end
+      nil
+    end
+
+    def help_options y     # precondition: an option_parser exists
+      # (in the old days this was option_parser.to_s, which should still work.)
+      y << ''                     # assumes there was previous above content!
+      option_parser = option_documenter
+      does_have_summary = option_parser.top.list.detect do |x|
+        x.respond_to? :summarize
+      end
+      if does_have_summary
+        y << "#{ em 'options:' }" # else maybe empty or doc only
+      end
+      option_parser.summarize do |line|
+        y << line
+      end
+      nil
+    end
+
+    def help_screen y
+      y << usage_line
+      help_description y if desc_lines
+      if option_documenter
+        option_documenter.summary_width =
+          CLI::Action::FUN.summary_width[ option_documenter ]
+        help_options y
+      end
+      nil
+    end
+
+    def normalized_invocation_string  # since you are an action you can assume
+      "#{ request_client.send :normalized_invocation_string }#{   # you have a
+        } #{ name.to_slug }"                                          # parent
+    end
+
+    def help_yielder
+      @help_yielder ||= ::Enumerator::Yielder.new { |l| emit :help, l }
+    end
+
+    def invite_line
+      render_invite_line "#{ normalized_invocation_string } -h"
+    end                           # (this like so is used by cli-client too)
+
+    def render_invite_line inner_string, z=nil
+      "use #{ kbd inner_string } for help#{ ' ' if z }#{ z }"
+    end
+
+    strip_description_label_rx = /\A[ \t]*description:?[ \t]*/i  # hack below
+
+    define_method :summary_line do
+      if self.class.desc_lines
+        super( )                  # 1) use first desc line if you have that
+      elsif option_parser
+        first = @option_parser.top.list.first
+        if ::String === first     # 2) else use o.p banner if that
+          str = CLI::Pen::FUN.unstylize[ first ]
+          str.gsub strip_description_label_rx, '' # (#hack!)
+        else
+          CLI::Pen::FUN.unstylize[ usage_line ] # 3) else this, unstylized
+        end
+      end
+    end
+
+    def usage_and_invite msg=nil  # a mid-level entrypoint for this common form
+      y = help_yielder            # of interface screen, called from `invoke` or
+      y << msg if msg             # other actions that typically want to "exit"
+      y << usage_line             # with this info. (it can be broken down
+      y << invite_line            # further if needed..)
       nil
     end
 
     def usage_line
-      "#{ em('usage:') } #{ usage_syntax_string }"
+      a = [ em( 'usage:' ) ]      # (yes everything here does result in 1 line)
+      a << normalized_invocation_string
+      x = render_option_syntax                   ; a << x if x
+      x = render_argument_syntax argument_syntax ; a << x if x
+      a.compact.join ' '
     end
 
-    def usage_syntax_string
-      [ normalized_invocation_string,
-        option_syntax_string,
-        argument_syntax.string
-      ].compact.join ' '
+    #      ~ options - modeling, sub-control and rendering (mvvm) ~
+
+    def option_documenter         # (a hook for descendents to override into,
+      option_parser               # it will be called whenever something is
+    end                           # being done that is expressly presentational)
+
+    def option_is_visible_in_syntax_string
+      @option_is_visible_in_syntax_string ||= ::Hash.new { |*| true }
+    end
+
+    # Out of the box we don't decide how to build your option_parser, you must
+    # define `build_option_parser` (called below) yourself (even if have a
+    # grammar that takes no options, just result in falseish, but you must
+    # stil define a `b.o.p`, to keep things explicit.) (the DSL however is
+    # a different story..)
+    # Whatever if anything you result in from your `b.o.p`, if you result in a
+    # true-ish it must follow a core interface for an o.p, one that is a tiny
+    # subset of (and of course based off of) the public methods of stdlib's o.p:
+    #
+    #   + your o.p must provide a `parse!` that takes 1 array arg, like o.p
+    #   + on parse failures your o.p must raise a stdlib o.p::ParseError
+    #   + `top.list` must result in a switches enumberable
+    #   + each switch must have a `long`, `short` and `arg` that look like o.p
+
+    attr_reader :option_parser    # look:
+
+    alias_method :option_parser_ivar, :option_parser
+
+    def option_parser
+      if option_parser_ivar.nil?  # (mutex-out subsequent calls to b.o.p
+        @option_parser = build_option_parser || false  # unless user nillifies)
+      end
+      @option_parser
+    end
+                                  # mutate `argv` (which is probably also @argv)
+    def parse_opts argv           # what you do with the data is your business.
+      res = true                  # result in true on success, other on failure
+      begin
+        break if argv.length.zero? # don't even build option parser.
+        break if is_branch && CLI::OPT_RX !~ argv.first # ambig. grammars [#024]
+        break if ! option_parser  # leave brittany alone, downstream gets argv
+
+        begin                     # option_parser can be some fancy arbitrary
+          option_parser.parse! argv # thing, but it needs to conform to at
+        rescue Headless::Services::OptionParser::ParseError => e # least
+          usage_and_invite e.message  # these two parts of stdlib ::O_P
+          res = exit_status_for :parse_opts_failed
+        end
+      end while nil
+      if true == res && param_queue_ivar
+        res = absorb_param_queue  # (here. see `param_queue`)
+      end
+      res
+    end
+                                  # nil when no o.p, nil when no visible opts
+                                  # there is currently no unstyled form but..
+    def render_option_syntax      # ..one could be made. also this does not
+      if option_documenter        # currently style but one could be made.
+        a = visible_options.reduce [] do |m, sw|
+          m << "[#{ sw.short.first or sw.long.first }#{ sw.arg }]"
+        end
+        a.join ' ' if a.length.nonzero?
+      end
+    end
+                                  # assume o.p complete, use hack, o.p compat
+    def visible_options           # maybe zero length, kept flat & functiony
+      ::Enumerator.new do |y|
+        option_is_visible_in_syntax_string || nil # kick, ick
+        option_documenter.top.list.each do |sw|
+          if sw.respond_to?( :short ) &&
+            @option_is_visible_in_syntax_string[ sw.object_id ] then
+              y << sw
+          end
+        end
+        nil
+      end
+    end
+
+    #      ~ arguments - modeling, sub-control and rendering (mvvm) ~
+    #
+
+    def argument_syntax           # what a.s is "current" or "active"?
+      sym = if queue && @queue.length.nonzero? && ::Symbol === @queue.first
+        @queue.first  # (it looks wrong, but does it need fixing?)
+      else
+        default_action
+      end
+      argument_syntax_for_method sym
+    end
+
+    def argument_syntax_cache     # (right now little is lost and little is
+      @argument_syntax_cache_h ||= { }  # gained by this but watch out near
+    end                           # box / dsl)
+
+    def argument_syntax_for_method method_ref
+      argument_syntax_cache.fetch method_ref.intern do |meth_ref|
+        @argument_syntax_cache_h[ meth_ref ] =
+          Headless::CLI::Argument::Syntax::Inferred.new(
+            method( meth_ref ).parameters, formal_parameters ) # nil ok, f.p
+      end
+    end
+
+    def render_argument arg
+      a, b = reqity_brackets arg.reqity
+      "#{ a }<#{ arg.formal.name.to_slug }>#{ b }"
+    end
+
+    arg_string_h = {
+      opt:  [ '[', ']'      ],
+      req:  [ '',  ''       ],
+      rest: [ '[', ' [..]]' ]
+    }.each { |_, a| a.each(& :freeze).freeze }.freeze
+
+    define_method :reqity_brackets do |reqity|
+      arg_string_h.fetch reqity
+    end
+
+    # a #view-template-ish for rendering a particular argument syntax object
+    # into a styled string. result is nil if the syntax has no elements,
+    # otherwise a non-zero length, possibly styled string. With `em_range`
+    # you can emphasize a contiguous subset of the elements. (there is
+    # significance that this happens here and not in an auxiliary object)
+
+    def render_argument_syntax syn, em_range=nil  # of the elements.
+      a = syn.each.with_index.reduce [] do |m, (arg, idx)|
+        s = render_argument arg
+        if em_range and em_range.include? idx
+          s = em s
+        end
+        m << s
+      end
+      a.join ' ' if a.length.nonzero?
+    end
+                                  # `meth_ref` is symbol or string method name
+                                  # result is true or exit status
+    def validate_arity_for meth_ref, args
+      res = nil                   # assuming below is true, always re-assigned
+      syn = argument_syntax_for_method meth_ref # (this will almost certainly raise on
+      if syn                      # raise on failure, but it could change.)
+        res = syn.validate_arity args do |o|
+          o.on_unexpected do |a|
+            usage_and_invite "unexpected argument#{ s a }: #{ ick a[0] }#{
+              }#{" [..]" if a.length > 1 }"
+            exit_status_for :argv_parse_failure_unexpected_arguments
+          end
+          o.on_missing do |fragment|
+            a = fragment[ 0 .. fragment.index { |x| :req == x.reqity } ]
+            usage_and_invite "expecting: #{ render_argument_syntax a, 0..0 }"
+            exit_status_for :argv_parse_failure_missing_required_arguments
+          end
+        end
+      end
+      res
     end
   end
 
+  class CLI::Argument   # might be joined by sister CLI::Option one day..
+    # simple wrapper that combines ruby's builtin method.parameters `reqity`
+    # with a formal parameter. (`reqity` is a term we straight made up to refer
+    # to that property that is either :req, :opt or :rest, as seen in the
+    # structure returned by ::Method#parameters.)
 
-  module CLI::ArgumentSyntax
-  end
+    attr_reader :formal
 
-
-  module CLI::ArgumentSyntax::ParameterInstanceMethods
-    attr_accessor :opt_req_rest
-  end
-
-
-  class CLI::ArgumentSyntax::Inferred < ::Array
-
-    def [] *a
-      super._dupe! self
+    def name
+      @name ||= Headless::Name::Function.new @formal.normalized_local_name
     end
 
-    def parse_argv argv, &events
+    attr_reader :reqity
+
+    def initialize formal, reqity
+      @formal, @reqity = formal, reqity
+    end
+  end
+
+  class CLI::Argument::Syntax     # abstract
+
+    # For error reporting it is useful to speak in terms of sub-slices of
+    # argument syntaxes (used at least 2x here). (In fact, this was originally
+    # a sub-class of ::Array (eek))  So some of that is mimiced here.
+
+    [
+      :each,   # used here in `render_argument_syntax`, from it we can have etc
+      :first,  # for a.s inspection in cli/client
+      :index,  # used here
+      :length  # in cli/client
+    ].each do |m|
+      define_method m do |*a, &b|
+        @elements.send m, *a, &b
+      end
+    end
+
+    def slice ref
+      if ::Range === ref
+        new = self.class.allocate
+        ba = base_args ; e = @elements
+        new.instance_exec do
+          base_init(* ba )
+          @elements = e[ref]
+        end
+        new
+      else
+        @elements.fetch range
+      end
+    end
+
+    alias_method :[], :slice
+
+    # (we once had a `string` but it was a smell here - pls render it yrself)
+
+  protected
+
+    def initialize                # child classes must set @elements
+    end
+
+    alias_method :base_init, :initialize
+
+    def base_args                 # compat with our `slice`. add parameters
+      []                          # that you want to copy-by-reference to
+    end                           # a nerk result of slice
+  end
+
+  class CLI::Argument::Syntax::Inferred < CLI::Argument::Syntax
+
+    def validate_arity arg_a, &events  # result is true or hook result
       hooks = Headless::Parameter::Definer.new do
         param :on_missing, hook: true
         param :on_unexpected, hook: true
-      end.new(&events)
-      formal = dup
-      actual = argv.dup
-      result = argv
-      while ! actual.empty?
-        if formal.empty?
-          result = hooks.on_unexpected[ actual ]
+      end.new(& events )
+      formal_idx = actual_idx = 0
+      formal_end = @elements.length - 1
+      actual_end = arg_a.length  - 1
+      res = true  # important
+      while actual_idx <= actual_end
+        if formal_idx > formal_end
+          res = hooks.on_unexpected[ arg_a[ actual_idx .. -1 ] ]
           break
-        elsif idx = formal.index { |f| :req == f.opt_req_rest }
-          actual.shift # knock these off l to r always
-          formal[idx] = nil # knock the leftmost required off
-          formal.compact!
-        elsif :rest == formal.first.opt_req_rest
-          break
-        elsif # assume first is :opt and no required exist
-          formal.shift
-          actual.shift
         end
-      end
-      if formal.detect { |p| :req == p.opt_req_rest }
-        result = hooks.on_missing[ formal ]
-      end
-      result
-    end
-
-    def string
-      a = map do |p|
-        case p.opt_req_rest
-        when :opt  ; "[#{ parameter_label p }]"
-        when :req  ; "#{ parameter_label p }"
-        when :rest ; "[#{ parameter_label p } [..]]"
+        if :rest == @elements[ formal_idx ].reqity
+          formal_idx += 1
+          break                   # (regardless of a, *b, c)
         end
+        formal_idx += 1
+        actual_idx += 1           # (regardless of opt / req)
       end
-      if a.length.nonzero?
-        a.join ' '
+      idx = (formal_idx .. formal_end).detect do |i| # (bad range s/times)
+        :req == @elements[i].reqity
       end
-    end
-
-  # -- * --
-
-    def _dupe! other
-      @pen = other.pen
-      self
+      if idx
+        res = hooks.on_missing[ self[ idx .. -1 ] ]
+      end
+      res
     end
 
   protected
 
-    def initialize method_parameters, pen, formal_parameters
-      @pen = pen
-      formal_parameters ||= {}
-      formal_method_parameters = method_parameters.map do |opt_req_rest, name|
-        p = formal_parameters[name] ||
-          Headless::Parameter::Definition.new( nil, name )
-        p.extend Headless::CLI::ArgumentSyntax::ParameterInstanceMethods
-        p.opt_req_rest = opt_req_rest # mutates the parameter!
-        p
+    def initialize ruby_param_a, formals
+      @elements = ruby_param_a.reduce [] do |m, (opt_req_rest, name)|
+        if formals
+          fp = formals[ name ]
+        end
+        fp ||= Headless::Parameter.new nil, name
+        m << CLI::Argument.new( fp, opt_req_rest )
       end
-      concat formal_method_parameters
     end
-
-    def parameter_label *a
-      pen.parameter_label(* a) # etc
-    end
-
-    attr_reader :pen
   end
-
 
   module CLI::IO_Adapter
     # pure namespace, all in this file.
   end
-
 
   class CLI::IO_Adapter::Minimal <            # For now (near [#sl-113] we do
     ::Struct.new :instream, :outstream, :errstream, :pen # not observe the PIE
@@ -414,12 +531,10 @@ module Skylab::Headless
     # POSIX standard way of having a standard in, standard out, and standard
     # error stream.
 
-
     def emit type, msg            # life is easy with this default assumption
       send( :payload == type ? :outstream : :errstream ).puts msg
       nil # undefined
     end
-
 
     # per edict [#sl-114] keep explicit mentions of the streams out at this
     # level -- they can be nightmarish to adapt otherwise.
@@ -427,7 +542,6 @@ module Skylab::Headless
       super sin, sout, serr, pen
     end
   end
-
 
   module CLI::Pen                              # (see manifesto at H_L::Pen)
 
@@ -455,11 +569,9 @@ module Skylab::Headless
 
   end
 
-
   module CLI::Stylize
     # pure namespace contained in this file.
   end
-
 
   module CLI::Stylize::Methods                 # here we have what amounts to
                                                # i.m version of low level funcs,
@@ -477,7 +589,6 @@ module Skylab::Headless
     end
   end
 
-
   module CLI::Pen::InstanceMethods
     include Headless::Pen::InstanceMethods
                         # (trying to use these when appropriate:
@@ -487,23 +598,13 @@ module Skylab::Headless
       stylize s, :strong, :green
     end
 
-    def invalid_value mixed
-      stylize(mixed.to_s.inspect, :strong, :dark_red) # may be overkill
+    def ick mixed                 # render an invalid value
+      # stylize mixed.to_s.inspect, :strong, :dark_red  # may be overkill
+      %|"#{ mixed }"|
     end
 
     def kbd s
       stylize s, :green
-    end
-
-    def parameter_label x, idx=nil
-      if ::Symbol === x
-        str = x.to_s
-      else
-        str = x.name.to_s
-      end
-      stem = str.gsub '_', '-'
-      idx = "[#{ idx }]" if idx
-      "<#{ stem }#{ idx }>" # will get built out eventually
     end
 
     fun = CLI::Pen::FUN
@@ -515,7 +616,6 @@ module Skylab::Headless
     define_method :unstylize_stylized, & fun.unstylize_stylized # redundancy
                                                # in declarative metaprogramming.
   end
-
 
   class CLI::Pen::Minimal
     include CLI::Pen::InstanceMethods

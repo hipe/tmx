@@ -10,8 +10,14 @@ module Skylab::CssConvert::TestSupport
   module CONSTANTS
     CssConvert = ::Skylab::CssConvert
     Headless = ::Skylab::Headless
+    TestSupport = ::Skylab::TestSupport
   end
 
+  include CONSTANTS
+
+  extend TestSupport::Quickie
+
+  Streams = ::Struct.new :instream, :outstream, :errstream
 
   module InstanceMethods
     include CONSTANTS
@@ -24,18 +30,24 @@ module Skylab::CssConvert::TestSupport
 
     def cli_instance
       @cli_instance ||= begin
-        o = CssConvert::CLI.new
-        o.send(:program_name=, 'nerk')
-        a = o.send :io_adapter
-        (_streams = %w(outstream errstream)).each do |stream|
-          a.send("#{stream}=", ::Skylab::TestSupport::StreamSpy.standard)
+        streams = Streams.new(
+          TestSupport::StreamSpy.standard,
+          TestSupport::StreamSpy.standard,
+          TestSupport::StreamSpy.standard )
+        app = CssConvert::CLI.new(* streams.values )
+        app.send :program_name=, 'nerk'
+        if do_debug
+          streams.values.each { |io| io.debug! if io }
         end
-        a.define_singleton_method :debug! do
-          _streams.each { |s| send(s).debug! }
-        end
-        o
+        app
       end
     end
+
+    def debug!
+      @do_debug = true
+    end
+
+    attr_reader :do_debug
 
     def fixture_path tail
       CssConvert.dir_pathname.join('test/fixtures', tail)

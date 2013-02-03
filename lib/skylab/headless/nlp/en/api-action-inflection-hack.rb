@@ -110,7 +110,7 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
           seen.push y             # pure box module, (that is, a module whose
           y                       # only purpose is to be a clean namespace
         end                       # to hold only constituent items), then such
-        ok = seen.empty?
+        ok = seen.length.zero?
         ok ||= -> do              # modules usually do *not* have business
           res = seen[-2]          # semantics - that is, they sometimes do *not*
           begin                   # have a meaningful name as far as we're

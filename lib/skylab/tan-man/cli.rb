@@ -33,7 +33,7 @@ module Skylab::TanMan
 
     def help_option o
       o.on '-h', '--help', 'this screen.' do
-        enqueue! :tan_man_original_help
+        enqueue :help
       end
     end
 
