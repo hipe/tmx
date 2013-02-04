@@ -1,7 +1,8 @@
 require_relative '../core'
 
-require 'skylab/headless/core' # unstylize
-require 'skylab/test-support/core'
+require 'skylab/headless/test/test-support' # gives us h.l core and t.s core
+                                            # unstylize
+
 
 module Skylab::CssConvert::TestSupport
   ::Skylab::TestSupport::Regret[ CssConvert_TestSupport = self ]
@@ -17,8 +18,6 @@ module Skylab::CssConvert::TestSupport
 
   extend TestSupport::Quickie
 
-  Streams = ::Struct.new :instream, :outstream, :errstream
-
   module InstanceMethods
     include CONSTANTS
 
@@ -30,10 +29,7 @@ module Skylab::CssConvert::TestSupport
 
     def cli_instance
       @cli_instance ||= begin
-        streams = Streams.new(
-          TestSupport::StreamSpy.standard,
-          TestSupport::StreamSpy.standard,
-          TestSupport::StreamSpy.standard )
+        streams = Headless::TestSupport::CLI::Streams_Spy.new
         app = CssConvert::CLI.new(* streams.values )
         app.send :program_name=, 'nerk'
         if do_debug

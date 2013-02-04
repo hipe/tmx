@@ -40,7 +40,7 @@ module Skylab::TestSupport
         if prepend.respond_to? :call
           use_stream.puts_filter! prepend
         else
-          use_stream.line_boundary_string = prepend
+          use_stream.line_begin_string = prepend
         end
       else
         use_stream = down_stream
