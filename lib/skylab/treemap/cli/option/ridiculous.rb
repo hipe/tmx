@@ -19,7 +19,7 @@ module Skylab::Treemap
 
 
   module CLI::Option::Ridiculous::ModuleMethods
-     include Headless::CLI::Action::ModuleMethods
+    include Headless::CLI::Action::ModuleMethods
 
     def option_parser             # just for resulting in a DSL for the `more`
       if block_given?
@@ -42,9 +42,6 @@ module Skylab::Treemap
       end
       nil
     end
-
-  protected
-
   end
 
   module CLI::Option::Ridiculous::InstanceMethods
@@ -87,12 +84,14 @@ module Skylab::Treemap
     def build_option_parser
       _option_parser_ridiculous_host_is_initted and fail 'sanity'
       _option_parser_ridiculous_host_init
-      CLI::Option::Ridiculous::Dispatch.new(
-        :add_definition_block => method( :dispatch_definition_block ),
-        :nil?                 => -> { false },
-        :options              => -> { option_documenter.options },
-        :parse!            => ->( *a ) { parsing_option_parser.parse!( *a ) }
-      )
+      if option_parser_blocks
+        CLI::Option::Ridiculous::Dispatch.new(
+          :add_definition_block => method( :dispatch_definition_block ),
+          :nil?                 => -> { false },
+          :options              => -> { option_documenter.options },
+          :parse!            => ->( *a ) { parsing_option_parser.parse!( *a ) }
+        )
+      end
     end
 
     def dispatch_definition_block block
@@ -179,7 +178,7 @@ module Skylab::Treemap
                                   # decorate a a default value to be used as
                                   # a substitution for {{default}}
 
-    def render_option_default opt
+    def render_default_for_option opt
       val opt.default_value
     end
   end

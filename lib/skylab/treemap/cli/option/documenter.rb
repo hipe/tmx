@@ -147,6 +147,7 @@ module Skylab::Treemap
 
     class Probe::Name < ::BasicObject
       me = self ; define_method :class do me end  # be honest and kind
+      def enqueue x ; end  # hard-coded hack for now!!
       def respond_to? x ; true end
       def initialize on_param_h_store
         @param_h = Probe::Param_H.new on_param_h_store
@@ -267,23 +268,17 @@ module Skylab::Treemap
     define_method :summarize_switch do |sw, idx, args, blk|
       sw.summarize(* args ) do |line|  # (no how about *I'll* call it)
         use_line = line.gsub mustache_rx do
-          meth = "render_option_#{ $~[1] }" # e.g. ".._default"
-          if respond_to? meth
-            wid = CLI::Option::Scanner::FUN.weak_identifier_for_switch[ sw ]
-            opt = options_fetch( @flip_box.fetch wid )
-            s = send meth, opt
-          else                                 # put the orig. string back,
-            s = $~[0]                          # e.g. '{{default}}' (for 2
-          end                                  # reasons - chaining, loud errs)
+          stem = $~[1].strip
+          meth = "render_#{ stem }_for_option" # e.g. render_default_for_option
+          # (we used to put $~[0] back, now we are loud with failure..)
+          wid = CLI::Option::Scanner::FUN.weak_identifier_for_switch[ sw ]
+          opt = options_fetch( @flip_box.fetch wid )
+          s = @host.send meth, opt
+          s ||= "(no #{ stem })"  # e.g "(no default)"  .. you could of course..
           s
         end
         blk[ use_line ]
       end
-    end
-
-    def render_option_default opt
-      str = @host.render_option_default opt
-      str || '(no default)'
     end
 
     class Pxy::Switch < MetaHell::Proxy::Functional.new :arg, :long,
@@ -316,7 +311,7 @@ module Skylab::Treemap
       if @last_arg_key_used
         @last_arg_key_used
       else
-        otherwize[ "block not set anything in @param_h" ]
+        otherwise[ "block not set anything in @param_h" ]
         false
       end
     end

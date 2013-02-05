@@ -1,9 +1,15 @@
 module Skylab::Treemap
   module Adapter::InstanceMethods::Action
 
+    def adapters= box  # hacked for now..
+      @adapters = box
+    end
+
     def adapter_box
       @adapter_box ||= api_client.adapter_box
     end
+
+    attr_accessor :catalyzer
 
     def resolve_adapter adapter_ref, otherwise=nil
       msg = nil

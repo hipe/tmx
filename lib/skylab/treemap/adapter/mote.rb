@@ -32,7 +32,7 @@ module Skylab::Treemap
   protected
 
     def initialize mc
-      super()  # init the box
+      super nil  # init the box, by way of h.l s.c
       Treemap::CLI === mc or fail "we need the mode client to inspect actions"
       _treemap_sub_client_init -> { mc }  # init self as a s.c
       @hot = nil
@@ -87,11 +87,11 @@ module Skylab::Treemap
       [ @name.to_slug ]
     end
 
-    def build *a  # this is a legacy request for a hot action, possibly for x
+    def build mc  # this is a legacy request for a hot action, possibly for x
       if @is_native
-        build_native(* a )
+        build_native mc
       else
-        build_strange
+        build_strange mc
       end
     end
 
@@ -102,7 +102,7 @@ module Skylab::Treemap
   protected
 
     def initialize rc, const, nf=nil
-      _treemap_sub_client_init rc
+      _treemap_sub_client_init( rc.respond_to?(:call) ? rc : -> { rc } )
       @adapters = nil  # will be used ase true-ish test
       @is_visible = true
       if const
@@ -119,6 +119,27 @@ module Skylab::Treemap
       action = kls.new request_client.mode_client
       action.adapters = @adapters if @adapters
       action
+    end
+
+    # (we are implementing a feature we don't need yet - that of actions
+    # that plugins have that the core app doesn't have - becaues we are crazy)
+
+    def build_strange mc
+      # things are very different if we have multiple v.s 1 adapter for the
+      # a given action -- we want to pass control over to the adapter action
+      # asap so:
+      if 1 == @adapters.length
+        kls = @adapters.first.resolve_cli_action_class @name.to_slug, -> e do
+          usage_and_invite e
+        end
+        if kls
+          charged = kls.new mc # (r.c is not self, it is not parent.)
+          charged.legacy_proxy
+        end
+      else
+        ub = Adapter::Action::Unbound.new mc, @adapters, @name
+        ub.legacy_proxy
+      end
     end
 
     def _summary_lines y  # this is the lightweight version

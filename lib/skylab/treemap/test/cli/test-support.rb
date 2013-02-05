@@ -58,6 +58,21 @@ module Skylab::Treemap::TestSupport::CLI
       Headless::CLI::Pen::FUN.unstylize_stylized[ str ]
     end
 
+    def styld exp
+      str = styled serrs.shift
+      if ::Regexp === exp
+        str.should match( exp )
+      else
+        str.should eql( exp )
+      end
+      nil
+    end
+
+    def white
+      str = serrs.shift
+      str.should eql( '' )
+    end
+
     #         ~ for the 2-stream form ~
 
     def serr

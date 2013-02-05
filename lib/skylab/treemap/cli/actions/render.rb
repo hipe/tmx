@@ -6,6 +6,7 @@ module Skylab::Treemap
                                   # fully wired for hacking from old and new
 
     include Treemap::Adapter::InstanceMethods::CLI_Action
+                                  # see notes there, this adapts old help reqs
 
     desc "render a treemap from a text-based tree structure"
 
@@ -62,8 +63,6 @@ module Skylab::Treemap
 
 
     def process inpath, opts=nil  # **NOTE** opts is cosmetic here! (even the
-      $stderr.puts "OK TO HERE" ; exit 0
-
       res = nil                   # spelling)
       act = api_action
       begin
@@ -92,23 +91,6 @@ module Skylab::Treemap
       _adapter_init
     end
 
-    # def build_option_syntax       # k.i.w.f  # #todo
-      # enhance_with_adapter = -> x { self.enhance_with_adapter x }
-      # op = self.class.option_syntax.dupe
-      # op.parser_class = CLI::Option::Parser
-      # op.documentor_class = CLI::Option::Documenter
-      # clia = self
-      # op[:documentor_visit] = -> doc do # [#014.1]
-       #  doc.cli_action = clia
-       #  orig_documentor_visit doc
-      # end
-      # op[:parse] = -> argv, args, help, syn_err do
-#        ref = options[:adapter_name].parse! argv     # mutate argv
-#        ref or (hlp = options[:help].parse argv)     # do not mutate argv
-      # end
-      # op
-    # end
-
     def parse_opts argv
       # ok get ready..bc this took me like a month to write and then another
       # month to untangle: *before* we parse the opts like normal, we actually
@@ -134,12 +116,11 @@ module Skylab::Treemap
     end
 
     def post_process_param_h
-      $stderr.puts "STOPPING AT STOPS" ; exit 0
-#      if opt_h[:stop]
-#        parse_opts_stop opt_h
-#      else
-#        true
-      nil
+      if @param_h[:stop]
+        parse_opts_stop @param_h[:stop]
+      else
+        true
+      end
     end
                                   # it's a smell to reach over like this,
                                   # but this crazy syntax has special needs

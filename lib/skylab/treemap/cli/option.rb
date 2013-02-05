@@ -67,6 +67,14 @@ module Skylab::Treemap
 
     # --*--
 
+    def argument_string
+      @long_rest || @short_rest   # really really not robust
+    end
+
+    def argmnt_str
+      @short_rest || @long_rest
+    end
+
     attr_accessor :block  # not used here but your algo might like it
 
     def default_value
@@ -186,14 +194,6 @@ module Skylab::Treemap
       if takes_argument
         argument_is_optional_rx =~ argument_string # asking for trouble!
       end
-    end
-
-    def argument_string
-      @long_rest || @short_rest   # really really not robust
-    end
-
-    def argmnt_str
-      @short_rest || @long_rest
     end
 
     alias_method :takes_argument, :argument_string

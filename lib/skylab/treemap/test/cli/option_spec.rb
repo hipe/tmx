@@ -13,23 +13,20 @@ module Skylab::Treemap::TestSupport::CLI
 
     it "`render -r` - CHECK THIS SHIZ OUT - help is dynamic - (superlock)" do
       client.invoke ['render', '-h']
-      str = styled serrs.shift
-      str.should match( /^usage: nerkiss render .*\[-c <CHAR>\]/ )
-      serrs.shift.should eql( '' )
-      styled( serrs.shift ).should match( /^description: .*treemap/ )
-      serrs.shift.should eql( '' )
-      styled( serrs.shift ).should match( /^options:/ )
+      styld( /^usage: nerkiss render .*\[-c <CHAR>\]/ )
+      white
+      styld( /^description: .*treemap/ )
+      white
+      styld( /^options:/ )
       serrs.shift.should match( /-a\b.*--adapter <NAME>[ ]*which.+adapter/ )
-      styled( serrs.shift ).strip.should eql(
-        '(known adapters are foo_bar and r) (default: r)'
-      )
+      styled( serrs.shift.strip ).should eql(
+        '(known adapters are foo_bar and r) (default: r)' )
     end
 
     it "help for specific adapter, adapter not found" do
       client.invoke [ 'render', '-h', '-a', 'twerk' ]
-      styled( serrs.shift ).should match(
-        /adapter "twerk" not found.+known adapters are.+\band\b/i )
-      styled( serrs.shift ).should match( /^usage:/i )
+      styld( /adapter "twerk" not found.+known adapters are.+\band\b/i )
+      styld( /^usage:/i )
       styled( serrs.shift ).downcase.should be_include( "use nerkiss render #{
         }-h for help about render help for a particular adapter" )
     end

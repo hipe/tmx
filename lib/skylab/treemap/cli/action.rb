@@ -1,29 +1,85 @@
 module Skylab::Treemap
   class CLI::Action
     # 1) this has been almost totally divorced from the legac f.w except for
-    # the could of nerks below.
+    # these kind of proxy nerks below.
+    # 2) we are allowing for the possibility that other parts of the system
+    # will want to leverage action-like methods without necessarily subclassing
+    # (hence the open-and-close-and-open dance below)
+  end
 
-    def resolve args  # #legacy wiring:
-      [ method( :__legacy_invoke ), [ args ] ]
-    end
-
-    def __legacy_invoke args
-      invoke args  # yes, you could just etc - but this is a debugger entrypoint
-                   # takes us into our sanctuary - clean h.l parsing
-    end
-
-    extend Headless::CLI::Action::ModuleMethods
+  module CLI::Action::InstanceMethods  # might be borrowd by motes, cards, flies
     include Headless::CLI::Action::InstanceMethods
+    include Treemap::Core::Action::InstanceMethods # might override some legacy
+
+    def help *a                  # [#012]
+      if 1 == a.length && { full: true }
+        a.pop  # then legacy came in thru the front `tm -h act'
+      end
+      super
+    end
+
+    def summary_lines            # public for legacy - not universal
+      y = [ ]
+      _summary_lines y
+      if @adapters
+        summary_lines_for_adapters y
+      end
+      y
+    end
+
+  protected
+                                  # (there are some things we need if we didn't
+                                  # go thru `invoke`..)
+    def __legacy_init_ui
+      option_parser
+      @queue ||= [ ]
+      nil
+    end
+
+    def build_option_parser       # rudimentary impl. that reads these defs,
+      a = self.class.option_parser_blocks  # if you're not using ridiculous
+      if a.length.nonzero?        # and etc. (e.g. adapter actions)
+        @param_h ||= { }          # a common choice
+        op = ::OptionParser.new
+        a.each { |b| instance_exec op, &b }
+        op
+      end
+    end
+
+    def slug                      # [#054]
+      @name.to_slug
+    end
+
+    def summary_lines_for_adapters y
+      a = @adapters.reduce [] do |yy, adapter|
+        yy << adapter.name.to_slug
+      end
+      x = and_ a.map(& method(:val))
+      if @is_native
+        y << "(can utilize plugin#{ s a } #{ x })"
+      else
+        y << "#{ val name.to_slug } for the #{ x } plugin#{ s a }"
+      end
+      y
+    end
+  end
+
+  class CLI::Action
+    extend Headless::CLI::Action::ModuleMethods
+    include Treemap::CLI::Action::InstanceMethods
 
     MODALITIES_ANCHOR_MODULE = Treemap
 
     ACTIONS_ANCHOR_MODULE = -> { Treemap::CLI::Actions }
 
-    include Treemap::Core::Action::InstanceMethods # might override some legacy
+    #         ~ public methods called by the legacy f.w ~
+
 
     def options                   # used by stylus ick to impl. `param`
       option_syntax.options
     end
+
+    #      ~ (watch how we bend a huge new api to a huge old one:) ~
 
     module Proxy
     end
@@ -74,13 +130,22 @@ module Skylab::Treemap
       render_option_syntax  # oh i guess that wasn't that bad actually
     end
 
-    # --*--
-
-    def adapters= box  # hacked for now..
-      @adapters = box
+    def resolve args  # #legacy wiring:
+      [ method( :__legacy_invoke ), [ args ] ]
+    end
+    # =
+    def __legacy_invoke args
+      invoke args  # yes, you could just etc - but this is a debugger entrypoint
+                   # takes us into our sanctuary - clean h.l parsing
     end
 
-    attr_accessor :catalyzer
+    #         ~ for when adapter actions get passed to the f.w ~
+
+    def legacy_proxy
+      @legacy_proxy ||= __build_legacy_proxy
+    end
+
+    # --*--
 
   protected
 
@@ -119,33 +184,31 @@ module Skylab::Treemap
       stylus.set_last_actions api_action, self # **TOTALLY** unacceptable
       nil
     end
-  end
 
-  module CLI::Action::InstanceMethods  # might be borrowd by motes, cards, flies
+    #         ~ for when f.w is touching an adapter action raw ~
 
-
-    def summary_lines  # public for legacy
-      y = [ ]
-      _summary_lines y
-      if @adapters
-        summary_lines_for_adapters y
-      end
-      y
+    class LegPxy < MetaHell::Proxy::Nice.new :help, :resolve
+      def respond_to?(*) true end  # i want it all
     end
 
-  protected
+    def __build_legacy_proxy
+      LegPxy.new(
+        help:                method( :__legacy_help ),
+        resolve:             method( :__legacy_resolve )
+      )
+    end
 
-    def summary_lines_for_adapters y
-      a = @adapters.reduce [] do |yy, adapter|
-        yy << adapter.name.to_slug
-      end
-      x = and_ a.map(& method(:val))
-      if @is_native
-        y << "(can utilize plugin#{ s a } #{ x })"
+    def __legacy_help h
+      if { full: true } == h
+        __legacy_init_ui
+        help
       else
-        y << "#{ val name.to_slug } for the #{ x } plugin#{ s a }"
+        fail 'implement me'  # #todo
       end
-      y
+    end
+
+    def __legacy_resolve argv
+      [ method( :invoke ), [ argv ] ]
     end
   end
 end

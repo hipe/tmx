@@ -17,7 +17,7 @@ module Skylab::Treemap
         if last_fetch_result
           last_fetch_result.usage_and_invite
         else
-          usage_and_invite
+          help_usage( {} ) ; help_invite # (legacy mess, change to `usage_and_invite` then)
         end
       end
       if ::Fixnum === res then res else false == res ? 1 : 0 end # cute

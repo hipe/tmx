@@ -1,3 +1,4 @@
+[#054]       #tracking-tag slug
 [#053] #open (or #tracking-tag) load file when desc lines are necessary, maybe
 [#052]       #done invert is broken so stops are broken
 [#051]       #done - legacy test wiring
@@ -43,7 +44,7 @@
 [#015]       #tracking-tag special treatment of help option in reflecion
 [#014]       #done a whole file just on things i want to fix wih o.p
 [#013]       #done consider moving `_tmp-r-data/` -> data/intermediate
-[#012]       #tracking-tag all purpose legacy (porcelain) marker
+[#012] #open #tracking-tag all purpose legacy (porcelain) marker
 [#011] #open unacceptable stylus wiring
 [#010] #open #tracking-tag once we get hl sub-client in here
 [#009]       #doc-point (ticket changed) `option_parser_blocks` is sweetened

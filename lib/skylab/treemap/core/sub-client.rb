@@ -3,16 +3,16 @@ module Skylab::Treemap
   end
 
   module Core::SubClient::InstanceMethods
-    extend MetaHell::DelegatesTo # sic #while [#003]
+    extend MetaHell::DelegatesTo
 
-    include Headless::NLP::EN::Methods # this is in porcelain bleeding but
-                                  # fortunately we are not always that.
+    include Headless::SubClient::InstanceMethods  # floodgates!
 
   protected
 
     def _treemap_sub_client_init rc=nil
-      if rc
-        if rc.respond_to? :call
+      _headless_sub_client_init nil  # ( @error_count, e.g )
+      if rc                        # cute experiment with setting r.c like this
+        if rc.respond_to? :call    # for devious reasons i won't admit to
           @rc = rc
           @request_client = nil
         else
@@ -22,21 +22,17 @@ module Skylab::Treemap
       else
         @rc = @request_client = nil
       end
-      @error_count = 0
       nil
     end
 
     delegates_to :stylus,
-      :and_,
       :em,
       :escape_path,
       :hdr,
       :ick,
       :kbd,
-      :or_,
       :pre,
       :param,
-      :s,
       :val
 
     def api_client
