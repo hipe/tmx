@@ -50,7 +50,7 @@ module Skylab::Headless
     FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
 
 
-    define_singleton_method :inflect do |&body| # useful quick & dirty hack
+    def self.inflect &body                     # useful quick & dirty hack
       o = ::Object.new                         # for low-commitment inflection
       o.extend Headless::SubClient::InstanceMethods # so bad but u get the idea
       r = o.instance_exec(& body)

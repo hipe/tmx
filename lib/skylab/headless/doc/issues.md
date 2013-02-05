@@ -54,6 +54,7 @@
 [#006]       #done #tracking-tag errors_count, settle it down eventually (rel. [#sl-116])
 [#005]       unify concepts let sub-client trump rename parent_runtime par_clien
 [#004]       #pattern #tracking-tag the sub-client initialize() in modules thing
+               (see document)
 [#003]       #done #refactor: use en.rb in sub-client fo
 [#002]       #done 2012-08-29 #refactor : interceptors under one roof
 [#001] #open 2012-08-18 #feature : term2html (and architecture)

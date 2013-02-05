@@ -167,7 +167,7 @@ module Skylab::Headless
       if 1 == desc_lines.length   # do the smart thing with formatting
         y << "#{ em 'description:' } #{ desc_lines.first }"
       else
-        indent = option_parser ? option_parser.summary_indent : '  '
+        indent = option_documenter ? option_documenter.summary_indent : '  '
         y << "#{ em 'description:' }"
         desc_lines.each do |line|
           y << "#{ indent }#{ line }"
@@ -313,12 +313,18 @@ module Skylab::Headless
       end
       res
     end
+
+    def rndr_switch sw            # (hook for shenanigans)
+      "[#{ sw.short.first or sw.long.first }#{ sw.arg }]"
+    end
                                   # nil when no o.p, nil when no visible opts
                                   # there is currently no unstyled form but..
     def render_option_syntax      # ..one could be made. also this does not
       if option_documenter        # currently style but one could be made.
         a = visible_options.reduce [] do |m, sw|
-          m << "[#{ sw.short.first or sw.long.first }#{ sw.arg }]"
+          s = rndr_switch sw
+          m << s if s
+          m
         end
         a.join ' ' if a.length.nonzero?
       end

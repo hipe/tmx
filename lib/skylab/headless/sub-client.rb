@@ -12,9 +12,10 @@ module Skylab::Headless
 
   protected
 
-    def initialize request_client # this is the heart of it all [#004]
+    def initialize request_client # this is the heart of it all [#004] (see)
       block_given? and raise ::ArgumentError.new 'blocks are not honored here'
       _headless_sub_client_init request_client
+      super(   )
     end
 
     def _headless_sub_client_init request_client
@@ -87,12 +88,22 @@ module Skylab::Headless
     fun = Headless::NLP::EN::Minitesimal::FUN
 
                                   # memoize last counts for shorter strings
+
+    attr_accessor :_nlp_last_length
+
+    define_method :an do |s, x=nil|
+      if x
+        self._nlp_last_length = x
+      else
+        x = _nlp_last_length
+      end
+      fun.an[ s, x ]
+    end
+
     define_method :and_ do |a|
       self._nlp_last_length = a.length
       fun.oxford_comma[ a, ' and ' ]
     end
-
-    attr_accessor :_nlp_last_length
 
     define_method :or_ do |a|
       self._nlp_last_length = a.length
