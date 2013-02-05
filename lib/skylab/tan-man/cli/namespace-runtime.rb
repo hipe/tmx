@@ -1,6 +1,6 @@
 module Skylab::TanMan
 
-  class CLI::NamespaceRuntime < Bleeding::NamespaceInferred
+  class CLI::NamespaceRuntime < Bleeding::Namespace::Inferred
     # to be refactored at [#023]
 
     include Core::SubClient::InstanceMethods

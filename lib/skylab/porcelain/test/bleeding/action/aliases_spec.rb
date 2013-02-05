@@ -18,7 +18,7 @@ module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
 
     it "They can of course be accessed by action runtimes" do
       _Acts__ChildAction1 # #kick
-      box = Bleeding::NamespaceInferred.new _Acts
+      box = Bleeding::Namespace::Inferred.new _Acts
       act = box.fetch 'child-action1'
       act.aliases.should eql(['child-action1'])
     end

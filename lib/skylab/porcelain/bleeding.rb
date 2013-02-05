@@ -20,7 +20,10 @@ module Skylab::Porcelain::Bleeding
     alias_method :pre, :em
   end
 
-  module MetaMethods
+  module Meta
+  end
+
+  module Meta::Methods
     def aliases_inferred
       [reflector.to_s.match(/[^:]+$/)[0].gsub(/(?<=[a-z])([A-Z])/) { "-#{$1}" }.downcase]
     end
@@ -30,8 +33,8 @@ module Skylab::Porcelain::Bleeding
     end
   end
 
-  module MetaInstanceMethods
-    include MetaMethods
+  module Meta::InstaceMethods
+    include Meta::Methods
 
     def desc
       reflector.respond_to?(:desc) ? reflector.desc.dup : [] # do not mutate, flyweighting!
@@ -64,7 +67,7 @@ module Skylab::Porcelain::Bleeding
   module Action
     def self.extended klass # #pattern [#sl-111]
       klass.extend Action::ModuleMethods
-      klass.send :include, ActionKlassInstanceMethods
+      klass.send :include, Action::InstanceMethods
     end
   end
 
@@ -72,9 +75,9 @@ module Skylab::Porcelain::Bleeding
 #    @argument_syntax ||= if reflector.respond_to?(:argument_syntax) then reflector.argument_syntax.dupe
 #                         else ArgumentSyntax.new(->{ reflector.instance_method(:invoke).parameters }, ->{ option_syntax.any? }) end
 
-  module ActionInstanceMethods
+  module Action::InstanceMethods
 
-    include MetaInstanceMethods, Styles
+    include Meta::InstaceMethods, Styles
 
     def argument_syntax
       @argument_syntax ||= begin
@@ -93,6 +96,8 @@ module Skylab::Porcelain::Bleeding
     def bound_invocation_method
       method :invoke
     end
+
+    alias_method :builder, :_klass  # gets overridden a lot here
 
     def emit *a
       if parent
@@ -179,13 +184,8 @@ module Skylab::Porcelain::Bleeding
     end
   end
 
-  module ActionKlassInstanceMethods
-    include ActionInstanceMethods
-    alias_method :builder, :_klass
-  end
-
   module Action::ModuleMethods
-    include MetaMethods
+    include Meta::Methods
 
     def argument_syntax
       @argument_syntax ||= begin
@@ -291,10 +291,16 @@ module Skylab::Porcelain::Bleeding
     end
   end
 
-  module NamespaceInstanceMethods
-    include ActionInstanceMethods
+  module Namespace
+  end
+
+  module Namespace::InstanceMethods
+    include Action::InstanceMethods
 
     attr_accessor :action_anchor_module
+
+    def builder  # override the def we get from parent
+    end
 
     def fetch token, &not_found
       res = fetch_builder token, &not_found
@@ -307,7 +313,7 @@ module Skylab::Porcelain::Bleeding
         end
         res = if act.respond_to? :resolve then act
         else
-          RuntimeInferred.new self, act, kls
+          Runtime::Inferred.new self, act, kls
         end
       end
       res
@@ -324,7 +330,7 @@ module Skylab::Porcelain::Bleeding
         if mod.respond_to?(:build) || !(::Module === mod && ! (::Class === mod))
           res = mod
         else
-          res = NamespaceInferred.new mod
+          res = Namespace::Inferred.new mod
         end
       end
       res
@@ -420,7 +426,7 @@ module Skylab::Porcelain::Bleeding
   module NamespaceModuleMethods
     include Action::ModuleMethods
     def build parent
-      NamespaceInferred.new(self).build(parent)
+      Namespace::Inferred.new(self).build(parent)
     end
   end
 
@@ -685,7 +691,7 @@ module Skylab::Porcelain::Bleeding
 
   class Runtime
     extend Action
-    include NamespaceInstanceMethods
+    include Namespace::InstanceMethods
 
     def actions
       Actions[ Constants[action_anchor_module], Officious.actions ]
@@ -726,7 +732,7 @@ module Skylab::Porcelain::Bleeding
   end
 
   class MetaInferred
-    include MetaInstanceMethods
+    include Meta::InstaceMethods
     attr_reader :reflector
     alias_method :builder, :reflector
     def initialize # @todo make less of these
@@ -738,7 +744,11 @@ module Skylab::Porcelain::Bleeding
   end
 
   class DocumentorInferred < MetaInferred
-    include ActionInstanceMethods
+    include Action::InstanceMethods
+
+    def builder  # overrided the def we got from parent
+    end
+
     def initialize parent, reflector, _obj=nil
       parent.respond_to? :emit or fail "sanity - is parent not an emitter?"
       self.parent = parent
@@ -753,7 +763,7 @@ module Skylab::Porcelain::Bleeding
     end
   end
 
-  class RuntimeInferred < DocumentorInferred
+  class Runtime::Inferred < DocumentorInferred
     def initialize parent, built, builder
       super(parent, builder)
       @bound_invocation_method = built.method :invoke
@@ -761,8 +771,8 @@ module Skylab::Porcelain::Bleeding
     attr_reader :bound_invocation_method
   end
 
-  class NamespaceInferred
-    include NamespaceInstanceMethods
+  class Namespace::Inferred
+    include Namespace::InstanceMethods
 
     def actions
       action_anchor_module or fail "sanity - where is action_anchor_module - #{
