@@ -13,7 +13,7 @@ module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
     context "with regards to inferred syntaxes" do
       klass :Akton do
         extend Bleeding::Action
-        def invoke wiggle=nil, waggle
+        def process wiggle=nil, waggle
         end
       end
       context "of arguments" do
@@ -54,7 +54,7 @@ module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
           on('-x', 'wing fighter')
           on('-p<queue>', '--pee <queue>', "pee queue")
         end
-        def invoke zoip=nil, voip, opts
+        def process zoip=nil, voip, opts
         end
       end
       context "the syntax of options" do

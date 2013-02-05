@@ -25,7 +25,7 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime # #po-008
         end
         class rt::Actions::Act2 < rt::MyAction
           desc 'fooibles your dooibles'
-          def invoke fizzle, bazzle
+          def process fizzle, bazzle
             "yerp: #{fizzle.inspect} #{bazzle.inspect}"
           end
         end
@@ -100,7 +100,7 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime # #po-008
         end
 
         class o::Actions::Pony::HelpLess < o::Action
-          def invoke oingo=nil, boingo
+          def process oingo=nil, boingo
             emit :ze_payload,
               "yerp-->#{ oingo.inspect }<-->#{ boingo.inspect }<--"
             :you_put_down_the_pony
@@ -109,7 +109,7 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime # #po-008
 
         class o::Actions::Pony::Helpful < o::Action
           option_syntax.help!
-          def invoke
+          def process
             emit :mein_payload, "yoip"
           end
         end

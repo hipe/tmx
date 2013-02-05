@@ -58,7 +58,7 @@ module Skylab::Porcelain::TestSupport::Bleeding
         Bleeding_TestSupport.const_set "Xyzzy#{ last_number += 1 }", mod
         singleton_class.send(:define_method, :meta_hell_anchor_module) { mod }
         @nermsperce = m = modul!(:MyActions, & _namespace_body)
-        ns = Bleeding::NamespaceInferred.new(m)
+        ns = Bleeding::Namespace::Inferred.new(m)
         rt = EmitSpy.new
         # ns.build(rt).object_id == ns.object_id or fail("handle this")
         [ns, rt]
@@ -117,7 +117,7 @@ module Skylab::Porcelain::TestSupport::Bleeding
         accessor = "#{box_const}__#{leaf_const}"
         send accessor # #kick #refactor
         box = send box_const
-        ns = Bleeding::NamespaceInferred.new box # #app-refactor
+        ns = Bleeding::Namespace::Inferred.new box # #app-refactor
         what = ns.build EmitSpy.new.debug! # #app-refactor
         action = what.fetch action_token
         once = -> { action }

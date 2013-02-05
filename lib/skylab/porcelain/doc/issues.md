@@ -17,6 +17,6 @@
 [#005]       #done use new metahell
 [#004] #open consider naming some of the runtimes to 'controllers'
 [#003]       #done follow convention for nested test support modules #regret #dup
-[#002] #open #cosmetic change ActionModuleMethods to Action::ModuleMethods et.al
+[#002]       #done #cosmetic change ActionModuleMethods to Action::ModuleMethods et.al
 [#001]       #done refactor tests to use regret
 [#sl-100.300.XXX] 2012-06-08 (numberspace reserved for porcelain.rb)
