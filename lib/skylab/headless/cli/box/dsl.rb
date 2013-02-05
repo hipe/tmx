@@ -255,10 +255,10 @@ module Skylab::Headless
       nil
     end
 
-    def invite_line               # hybridization hack
+    def invite_line z=nil         # hybridization hack
       if is_collapsed
         render_invite_line "#{ normalized_invocation_string false } -h #{
-          }#{ @box_dsl_collapsed_to }"
+          }#{ @box_dsl_collapsed_to }", z
       else
         super
       end

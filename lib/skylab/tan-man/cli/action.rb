@@ -112,8 +112,9 @@ module Skylab::TanMan
 
     alias_method :help, :tan_man_help_adapter
 
-    def render_invite_line inner_string
-      "try #{ kbd inner_string } for help"  # we wear `try` as a badge of shame
+    def render_invite_line inner_string, z=nil
+      "try #{ kbd inner_string } for help#{ " #{ z }" if z }"
+      # this is just symbolic - we wear `try` as a badge of shame
     end
 
     def resolve argv  # just blood

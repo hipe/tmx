@@ -212,12 +212,12 @@ module Skylab::Headless
       @help_yielder ||= ::Enumerator::Yielder.new { |l| emit :help, l }
     end
 
-    def invite_line
-      render_invite_line "#{ normalized_invocation_string } -h"
+    def invite_line z=nil
+      render_invite_line "#{ normalized_invocation_string } -h", z
     end                           # (this like so is used by cli-client too)
 
     def render_invite_line inner_string, z=nil
-      "use #{ kbd inner_string } for help#{ ' ' if z }#{ z }"
+      "use #{ kbd inner_string } for help#{ " #{ z }" if z }"
     end
 
     strip_description_label_rx = /\A[ \t]*description:?[ \t]*/i  # hack below
@@ -236,11 +236,18 @@ module Skylab::Headless
       end
     end
 
-    def usage_and_invite msg=nil  # a mid-level entrypoint for this common form
-      y = help_yielder            # of interface screen, called from `invoke` or
-      y << msg if msg             # other actions that typically want to "exit"
-      y << usage_line             # with this info. (it can be broken down
-      y << invite_line            # further if needed..)
+    # `usage_and_invite` - a mid-level entrypoint for this common form
+    # of inteface screen of interface screen, called from `invoke` or
+    # other actions that typically want to make a graceful "exit" with this
+    # info. (it can be broken down further if needed..)
+    # `msg` if provided gets its own leading first line. `z` if
+    # provided gets appended to the end of the invite line.
+
+    def usage_and_invite msg=nil, z=nil
+      y = help_yielder
+      y << msg if msg
+      y << usage_line
+      y << invite_line( z )
       nil
     end
 

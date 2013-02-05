@@ -160,8 +160,8 @@ module Skylab::Headless
       nil
     end
 
-    def invite_line  # override parent because we are box, we take action!
-      render_invite_line "#{ normalized_invocation_string } -h [<action>]"
+    def invite_line z=nil  # override parent because we are box, we take action!
+      render_invite_line "#{ normalized_invocation_string } -h [<action>]", z
     end
                                   # (in contrast to above, once the user is
                                   # already looking at the full help screen it
