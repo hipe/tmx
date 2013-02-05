@@ -10,14 +10,14 @@ module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
     context "You can't have an action that is a completely blank slate class because that" do
       with_action 'ferp-merp'
       klass :HerpDerp__FerpMerp
-      remove_method :subject # avoids a warning # ./test/all_specs.rb req -v porcelain
+      remove_method :subject # avoids a warning # ./test/all req -v porcelain
       let(:subject) { -> { fetch } }
-      specify { should raise_error(NameError, /undefined method `invoke' for class.+FerpMerp/) }
+      specify { should raise_error(NameError, /undefined method `process' for class.+FerpMerp/) }
     end
-    context "So if you make an action class called FerpMerp that does nothing but define invoke(), it" do
+    context "So if you make an action class called FerpMerp that does nothing but define process(), it" do
       with_action 'ferp-merp'
       klass :HerpDerp__FerpMerp do
-        def invoke ; end
+        def process ; end
       end
       specify { should be_action(aliases: ['ferp-merp']) }
     end

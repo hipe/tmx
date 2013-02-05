@@ -8,13 +8,13 @@ module ::Skylab::Porcelain::TestSupport::Bleeding # #po-008
     with_namespace 'berse-nermsperce'
     with_action 'mer-nermsperce'
     klass :BerseNermsperce__MerNermsperce__MerErkshern do
-      def invoke x ; "err-kerr-->#{x}<--" end
+      def process x ; "err-kerr-->#{x}<--" end
     end
     before(:all) do
       self.BerseNermsperce__MerNermsperce__MerErkshern # #kick
     end
     def works # a common test below
-      subject.fetch('mer-erk').bound_invocation_method.receiver.invoke('fluk').should eql("err-kerr-->fluk<--")
+      subject.fetch('mer-erk').bound_invocation_method.receiver.process('fluk').should eql("err-kerr-->fluk<--")
     end
     context "a plain old module with a plain old action in it" do
       modul :BerseNermsperce__MerNermsperce

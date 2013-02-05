@@ -49,7 +49,7 @@ describe "#{ ::Skylab::Permute::CLI }" do
       end
     end
     context 'with one lovely set of args' do
-      it 'works splendidly', f:true do
+      it 'works splendidly' do
         cli.invoke( %w(generate --flavor vanilla -fchocolate
           --cone sugar -cwaffe -ccup) )
         exp = <<-HERE.gsub(/^ +/, '').strip

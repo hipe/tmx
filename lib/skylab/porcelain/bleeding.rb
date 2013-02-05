@@ -94,7 +94,7 @@ module Skylab::Porcelain::Bleeding
     end
 
     def bound_invocation_method
-      method :invoke
+      method Action::DEFAULT_PROCESS_METHOD_NAME  # (accords with [#hl-020])
     end
 
     alias_method :builder, :_klass  # gets overridden a lot here
@@ -183,6 +183,8 @@ module Skylab::Porcelain::Bleeding
       self.class.option_syntax.dupe
     end
   end
+
+  Action::DEFAULT_PROCESS_METHOD_NAME = :process
 
   module Action::ModuleMethods
     include Meta::Methods
@@ -287,7 +289,7 @@ module Skylab::Porcelain::Bleeding
     end
 
     def unbound_invocation_method
-      instance_method :invoke
+      instance_method Action::DEFAULT_PROCESS_METHOD_NAME
     end
   end
 
@@ -408,7 +410,7 @@ module Skylab::Porcelain::Bleeding
 
     def resolve argv # mutates argv .. here is the secret to our tail call rec.
       res = nil
-      x = fetch argv.shift do |e|
+      x = fetch argv.shift do |e|  # might even be '-h' at this point, is ok
         res = help message: e.message, syntax: false
         nil                       # *ensure* that x is false-ish!
       end
@@ -701,7 +703,7 @@ module Skylab::Porcelain::Bleeding
       self.class::Actions
     end
 
-    def invoke argv
+    def invoke argv  # (signatre is in accordance with [#hl-020])
       block_given? and raise 'no blocks here ever'
       res = nil
       method, args = resolve argv.dup
@@ -765,8 +767,9 @@ module Skylab::Porcelain::Bleeding
 
   class Runtime::Inferred < DocumentorInferred
     def initialize parent, built, builder
-      super(parent, builder)
-      @bound_invocation_method = built.method :invoke
+      super parent, builder
+      @bound_invocation_method =
+        built.method Action::DEFAULT_PROCESS_METHOD_NAME
     end
     attr_reader :bound_invocation_method
   end
@@ -802,7 +805,7 @@ module Skylab::Porcelain::Bleeding
     end
   end
 
-  module Officious
+  module Officious   # (imagine this is called 'Actions')
     def self.actions
       Constants[self]
     end
@@ -827,7 +830,7 @@ module Skylab::Porcelain::Bleeding
       self
     end
 
-    def invoke token=nil # #todo this signature violates #convention [#hl-020]
+    def process token=nil # named in accorance with #convention [#hl-020]
       result = nil
       begin
         if token

@@ -134,7 +134,7 @@ module Skylab::Permute
       hack
     end
 
-    def invoke set
+    def process set
       Permute::API::Actions::Generate.new(set) do |o|
         rows = []
         o.on_header { |e| rows.push( e.payload.map { |_, s| hdr s } ) }
