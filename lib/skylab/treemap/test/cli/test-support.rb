@@ -7,14 +7,58 @@ module Skylab::Treemap::TestSupport::CLI
 
   extend TestSupport::Quickie
 
+  NUM_STREAMS = { 2 => 2, 3 => 3 }  # hack something..
+
+  module ModuleMethods
+    define_method :num_streams do |num|
+      NUM_STREAMS.fetch num
+      define_method :_num_streams do num end
+      num
+    end
+  end
+
   module InstanceMethods
     include CONSTANTS # `TestSupport` is called upon in i.m's
 
-    def debug!
-      stream.sout.debug!
-      stream.serr.debug!
+    def _num_streams
+      :set_number_of_streams_with_num_streams
+    end
+
+    #         ~ for the 3-stream version ~
+
+    def client
+      @client ||= begin
+        streams = self.streams
+        cli = Treemap::CLI.new(* streams.values )
+        cli.program_name = 'nerkiss'
+        cli
+      end
+    end
+
+    define_method :debug! do |*a|
+      case NUM_STREAMS.fetch( _num_streams )
+      when 2
+        stream.sout.debug!(* a )
+        stream.serr.debug!(* a )
+      when 3
+        streams.debug!(* a )
+      end
       nil
     end
+
+    def serrs
+      @serrs ||= streams.errstream.string.split "\n"
+    end
+
+    def streams
+      @streams ||= Headless::TestSupport::CLI::Streams_Spy.new nil  # no $stdin
+    end
+
+    def styled str
+      Headless::CLI::Pen::FUN.unstylize_stylized[ str ]
+    end
+
+    #         ~ for the 2-stream form ~
 
     def serr
       _unstylize :serr

@@ -30,6 +30,7 @@ module Skylab::Treemap
       :and_,
       :em,
       :escape_path,
+      :hdr,
       :ick,
       :kbd,
       :or_,

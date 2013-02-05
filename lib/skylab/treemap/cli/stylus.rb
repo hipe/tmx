@@ -37,7 +37,7 @@ module Skylab::Treemap
       # then, if it needs to have the cli and api actions inside of it!?
       ::Symbol === x or x = x.normalized_name
       str = nil
-      if (( cli_option = @cli_action.options.fuzzy_fetch( x ) { } ))
+      if (( cli_option = @cli_action.options.fetch( x ) { } ))
         str = cli_option.send( render_method || :render )
       elsif (( attr = @api_action.formal_attributes.fetch( x ) { } ))
         str = attr.label_string

@@ -21,7 +21,8 @@ module Skylab::Treemap
         end
       end, -> failed do
         info failed
-        help_invite for: ' for more about help with adapters.'
+        usage_and_invite nil, "about #{ em name.to_slug } help for #{
+          }a particular adapter."
         nil
       end
     end

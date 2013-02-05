@@ -15,9 +15,9 @@ module Skylab::Treemap
       res = super
       if false == res
         if last_fetch_result
-          last_fetch_result.help_invite
+          last_fetch_result.usage_and_invite
         else
-          help_invite
+          usage_and_invite
         end
       end
       if ::Fixnum === res then res else false == res ? 1 : 0 end # cute

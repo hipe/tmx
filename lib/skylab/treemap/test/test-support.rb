@@ -1,5 +1,5 @@
 require_relative '../core'
-require 'skylab/test-support/core'
+require 'skylab/headless/test/test-support'  # give me h.l core *and* t.s core!!
 
 module Skylab::Treemap::TestSupport
   ::Skylab::TestSupport::Regret[ Treemap_TestSupport = self ]

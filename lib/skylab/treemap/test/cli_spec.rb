@@ -4,6 +4,8 @@ module Skylab::Treemap::TestSupport::CLI
   describe "The Treemap Module's CLI" do
     extend CLI_TestSupport
 
+    num_streams 2  # (hack to get debug! compat)
+
     it "is available under the 'tmx' executable" do
       tmx_cli.run ['-h']
       sout.scan( /^ +treemap\b/ ).length.should eql( 1 )

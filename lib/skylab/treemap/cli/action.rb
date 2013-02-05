@@ -1,15 +1,23 @@
 module Skylab::Treemap
   class CLI::Action
+    # 1) this has been almost totally divorced from the legac f.w except for
+    # the could of nerks below.
 
-    extend Headless::CLI::Action::ModuleMethods # let legacy trump frontier..
+    def resolve args  # #legacy wiring:
+      [ method( :__legacy_invoke ), [ args ] ]
+    end
+
+    def __legacy_invoke args
+      invoke args  # yes, you could just etc - but this is a debugger entrypoint
+                   # takes us into our sanctuary - clean h.l parsing
+    end
+
+    extend Headless::CLI::Action::ModuleMethods
+    include Headless::CLI::Action::InstanceMethods
 
     MODALITIES_ANCHOR_MODULE = Treemap
 
     ACTIONS_ANCHOR_MODULE = -> { Treemap::CLI::Actions }
-
-    include Headless::CLI::Action::InstanceMethods
-
-    extend Bleeding::Action       # legacy
 
     include Treemap::Core::Action::InstanceMethods # might override some legacy
 
@@ -17,8 +25,53 @@ module Skylab::Treemap
       option_syntax.options
     end
 
-    def option_syntax             # used all over the place by documentors
-      @option_syntax ||= build_option_syntax
+    module Proxy
+    end
+
+    Proxy::Option_Syntax = MetaHell::Proxy::Functional.new(
+      :any?, :help, :options, :parse, :string )
+
+                                  # mock a legcay o.syn with a hookback so
+    def option_syntax             # we can get control back to here, a hack!
+      @option_syntax ||= Proxy::Option_Syntax.new(
+        :options => method( :__option_syntax_options ),
+        :parse => method( :__option_syntax_parse_legacy ),
+        :string => method( :__option_syntax_string_legacy ),
+        :any? => method( :__option_syntax_any_legacy ),
+        :help => method( :__option_syntax_help_legacy )
+      )
+    end
+
+    def __option_syntax_any_legacy
+      # err on the side of futurism and assume we could have an option_parser
+      # but have a zero length set of definitions for it
+      !! option_parser_blocks  # relies upon the sweetening from [#tm-009]
+    end
+
+    def __option_syntax_help_legacy f
+      # the legacy nerk invoke straight up help..
+      y = ::Enumerator::Yielder.new do |x|
+        $stderr.puts "OK NEAT:-->#{ x }<--"  # #todo
+      end
+      help_options y
+      nil
+    end
+
+    def __option_syntax_parse_legacy argv, *_ # headless does not think it is
+      # appropriate to take action while in the middle of parsing arguments.
+      # however nerky nerky derky dery
+      rs = parse_opts argv        # rides you into headless
+      true == rs ? true : nil     # we've got to swallow the false i guess..
+    end
+
+    def __option_syntax_options
+      option_documenter.options
+    end
+
+    def __option_syntax_string_legacy # i hope your eyes like having blood in
+      # them: for lvl 0 errs (missing arg), legacy catches that and needs this.
+      # but for a lvl1 err (bad opt), headless will do the equivalent of this
+      render_option_syntax  # oh i guess that wasn't that bad actually
     end
 
     # --*--
@@ -46,10 +99,9 @@ module Skylab::Treemap
       end
     end
 
-    def error msg                 # [#044] - - s.c#error ?
-      emit :error, msg
-      false
-    end
+    def default_action            # compat h.l
+      :process                    # (`invoke` belongs to the framework
+    end                           #  `execute` is for when we take no args)
 
     def request_client            # away at [#012]
       @parent

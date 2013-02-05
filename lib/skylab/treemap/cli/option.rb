@@ -3,6 +3,10 @@ module Skylab::Treemap
   class CLI::Option
     # an abstract nerk for derking your gerks
 
+    # --*--
+
+    o = { }
+
     long_rx = /\A
       -- (?<no_part> \[no-\] )?
          (?<long_stem> [^\[\]=\s]{2,} )
@@ -13,6 +17,14 @@ module Skylab::Treemap
       -  (?<short_stem> [^-\[= ] )
          (?<short_rest> [-\[= ].* )?
     \z/x
+
+    o[:long_rx] = long_rx
+
+    o[:short_rx] = short_rx
+
+    FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
+
+    # --*--
 
     define_singleton_method :parse do |args| # a *function*'s args. cannot fail.
       if ::Hash === args.last
@@ -55,9 +67,11 @@ module Skylab::Treemap
 
     # --*--
 
-    def default
+    attr_accessor :block  # not used here but your algo might like it
+
+    def default_value
       @has_default or fail 'do not request default w/o checking `has_default`'
-      @default
+      @default_value
     end
 
     attr_reader :has_default
@@ -70,9 +84,12 @@ module Skylab::Treemap
       @short_stem
     end
 
-    attr_reader :normalized_name
+    attr_accessor :is_collapsed                # freeform whatever mixed use
+
+    attr_accessor :normalized_name             # be careful
 
     # a monumental hack to try and parse out *one* switch [arg] from an argv
+
     def parse argv
       res, = _parse argv
       res
@@ -122,10 +139,10 @@ module Skylab::Treemap
       normalized_name, long_stem, short_stem, no_part,
         long_rest, short_rest
 
-      @has_default = @default = nil
+      @has_default = @default_value = nil
 
       if opt_h
-        opt_h_h = { default: -> v { self.default = v } }
+        opt_h_h = { default: -> v { self.default_value = v } }
         opt_h.each { |k, v| opt_h_h.fetch( k )[v] }
       end
     end
@@ -139,6 +156,8 @@ module Skylab::Treemap
       nil
     end
 
+    attr_reader :switch  # #experimental - watch for smells!
+
     def takes_no
       @no_part
     end
@@ -151,6 +170,10 @@ module Skylab::Treemap
         error[ "couldn't find a suitable long name" ]
         false
       end
+    end
+
+    def weak_identifier  # to co-incide with hacks with identifying o.p switches
+      render_long_no_no || render_short
     end
 
   protected
@@ -196,9 +219,9 @@ module Skylab::Treemap
       ::Regexp.new aa.join( '|' )
     end
 
-    def default= val
+    def default_value= val
       @has_default = true
-      @default = val
+      @default_value = val
     end
 
     def _parse argv
@@ -235,5 +258,7 @@ module Skylab::Treemap
       end
       [ res, knock ]
     end
+
+    attr_writer :switch  # experimental - watch for smells
   end
 end

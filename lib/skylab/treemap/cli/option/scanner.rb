@@ -1,6 +1,25 @@
 module Skylab::Treemap
 
-  class CLI::Option::Scanner # for ::OptionParser hacks
+  class CLI::Option::Scanner # for quick ::OptionParser hacks
+
+    o = { }
+
+    o[:weak_identifier_for_switch] = -> sw, otherwise=nil do
+      stem = nil
+      if sw.long.length.nonzero?
+        md = CLI::Option::FUN.long_rx.match sw.long.first
+        stem = "--#{ md[:long_stem] }" if md
+      else
+        md = CLI::Option::FUN.short_rx.match sw.short.first
+        stem = "-#{ md[:short_stem] }" if md
+      end
+      if stem then stem
+      elsif otherwise then otherwise[ ] else
+        raise ::RuntimeError, "can't infer weak identifier from switch"
+      end
+    end
+
+    FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
 
     attr_reader :count
 
