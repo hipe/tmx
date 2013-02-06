@@ -10,15 +10,15 @@ module Skylab::Semantic::TestSupport
       digraph.nodes_count.should eql( 0 )
     end
 
-    it "here have one with one node" do
-      digraph = Semantic::Digraph.new :solo
+    it "here have one with one node", f:true do
+      digraph = Semantic::Digraph[ :solo ]
       digraph.nodes_count.should eql( 1 )
       node = digraph[:solo]
       node.name.should eql( :solo )
     end
 
     it "here have the minimal graph" do
-      digraph = Semantic::Digraph.new child: :parent
+      digraph = Semantic::Digraph[ child: :parent ]
       digraph.nodes_count.should eql( 2 )
       digraph[:child].name.should eql( :child )
       digraph[:parent].name.should eql( :parent )
@@ -28,14 +28,14 @@ module Skylab::Semantic::TestSupport
     context "there are Formal::Box-like accessors you can use:" do
 
       it "did you know that you can use `has?`" do
-        d = Semantic::Digraph.new :mineral, dog: :animal
+        d = Semantic::Digraph[ :mineral, dog: :animal ]
         (d.has?( :mineral ) && d.has?( :dog ) && d.has?( :animal )).should(
           eql( true ) )
         d.has?( :aardvark ).should eql( false )
       end
 
       plant = -> do
-        d = Semantic::Digraph.new :plant, flower: :plant, bedillia: :flower
+        d = Semantic::Digraph[ :plant, flower: :plant, bedillia: :flower ]
         plant = -> { d }
         d
       end
@@ -58,8 +58,8 @@ module Skylab::Semantic::TestSupport
 
     context 'all ancestor names' do
       it 'works recursively, depth-first' do
-        digraph = Semantic::Digraph.new animal: :thing, penguin: :animal,
-          mineral: :thing, tux: [ :penguin, :icon ], my_tux_sticker: :tux
+        digraph = Semantic::Digraph[ animal: :thing, penguin: :animal,
+          mineral: :thing, tux: [ :penguin, :icon ], my_tux_sticker: :tux ]
 
         digraph[:my_tux_sticker].all_ancestor_names.should eql(
           [ :my_tux_sticker, :tux, :penguin, :animal, :thing, :icon ]

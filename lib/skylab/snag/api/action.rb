@@ -100,9 +100,9 @@ module Skylab::Snag
     end
 
     def build_event type, data # compat pub-sub
-      API::MyEvent.new type, data do |o|
-        o.inflection = self.class.inflection
-      end
+      e = API::MyEvent.new type, data
+      e.inflection = self.class.inflection
+      e
     end
 
     def manifest_pathname # #gigo

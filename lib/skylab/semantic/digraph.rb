@@ -3,6 +3,12 @@ require_relative '..'
 module Skylab::Semantic
   class Digraph
 
+    def self.[] *a
+      g = new
+      g.nodes! a
+      g
+    end
+
   public
 
     def [] name
@@ -32,12 +38,20 @@ module Skylab::Semantic
       nodes.map(&:describe).join "\n"
     end
 
+    def dupe
+      ba = base_args
+      self.class.allocate.instance_exec do
+        base_init(* ba )
+        self
+      end
+    end
+
     def fetch name, &otherwise
       @hash.fetch name, &otherwise
     end
 
     def flatten nodes
-      # return an emitter that yields, for each node in "node", each of its
+      # result is an emitter that yields, for each node in "node", each of its
       # "is-a" parents and then then node itself.  Each node is
       # presented only once, so nodes that have been presented already
       # are skipped on subsequent visits.  #todo: find out why this is
@@ -68,7 +82,9 @@ module Skylab::Semantic
         @hash[name] = node
         @order.push name
       end
-      predicates and predicates.each { |m, v| node.send m, v }
+      if predicates
+        node.absorb_predicates predicates
+      end
       node
     end
 
@@ -101,78 +117,103 @@ module Skylab::Semantic
 
   protected
 
-    def initialize *a
-      if 1 == a.length && self.class === a.first
-        dupe! a.first
-      else
-        @hash = { }
-        @order = [ ]
-        nodes! a if a.length.nonzero?
-      end
+    def initialize
+      @order = [ ]
+      @hash = { }
     end
 
-    # --*--
+    def base_args
+      [ @order, @hash ]
+    end
 
-    def dupe! digraph
+    def base_init order, hash
+      @order = order.dup
       @hash = { }
-      @order = digraph.instance_variable_get('@order').dup
-      _hash = digraph.instance_variable_get('@hash')
-      @order.each do |k|
-        @hash[k] = Node.new(self, _hash[k])
+      hash.each do |k, v|
+        @hash[ k ] = v.dupe self
       end
+      nil
     end
   end
 
-  class Node < ::Struct.new :name, :is_names
+  class Node
+
+    pred_h_h = {                  # (validates the predicate name, and
+      is: -> v { is! v }          # translates from one nice-looking dsl
+    }                             # to another name convention.)
+
+    define_method :absorb_predicates do |pred_h|
+      pred_h.each { |k, v| instance_exec v, & pred_h_h.fetch( k ) }
+      nil
+    end
 
     def all_ancestor_names
-      all_ancestors.map(&:name)
+      all_ancestors.map(& :name )
     end
 
     def describe
-      [ name.to_s,
-        (is_names.join(', ') unless is_names.empty?)
-      ].compact.join(' -> ')
+      a = [ @name.to_s ]
+      a << @is_names.join( ', ' ) if @is_names.length.nonzero?
+      a * ' -> '
+    end
+
+    def dupe graph
+      ba = base_args
+      self.class.allocate.instance_exec do
+        base_init graph, *ba
+        self
+      end
     end
 
     def is? node
-      target_name = ::Symbol === node ? node : node.name
-      !!( all_ancestors.detect { |_node| target_name == _node.name } )
+      name = ::Symbol === node ? node : node.name
+      !! all_ancestors.detect do |nd|
+        name == nd.name
+      end
     end
+
+    attr_reader :is_names
+
+    attr_reader :name
 
     attr_accessor :visited        # for client
 
   protected
 
     def initialize graph, name
-      @graph = graph
-      if self.class === name then dupe!(name) else super(name, []) end
-    end
-
-    # --*--
-
-    def all_ancestors
-      @graph.all_ancestors(name)
-    end
-
-    def dupe! node
-      self.name = node.name
-      self.is_names = node.is_names.dup
+      ::Symbol === name or fail 'dupe logic will fail with non-immediate values'
+      @name, @graph = name, graph
+      @is_names = [ ]
       nil
     end
 
-    def is name
+    def base_args
+      [ @name, @is_names ]
+    end
+
+    def base_init graph, name, is_names
+      @name = name
+      @is_names = is_names.dup
+      @graph = graph
+      nil
+    end
+
+    def all_ancestors
+      @graph.all_ancestors @name
+    end
+
+    def is! name
       case name
       when ::Array
-        name.each { |x| is(x) }
+        name.each(& method( :is! ) )
       when ::Symbol
-        unless is_names.include? name
+        if ! @is_names.include? name
           # ensure that the graph has such a node
           @graph.node! name
-          is_names.push name
+          @is_names.push name
         end
       else
-        raise ::ArgumentError.new "bad type: #{name.class}"
+        raise ::ArgumentError.new "bad type: #{ name.class }"
       end
       nil
     end

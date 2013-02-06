@@ -11,7 +11,7 @@ module Skylab::PubSub
     end
 
     def self.new *a # sugar
-      ::Class.new.class_eval do
+      ::Class.new.class_exec do
 
         extend Emitter
 
@@ -38,24 +38,24 @@ module Skylab::PubSub
 
   module Emitter::ModuleMethods
 
-    def emits *nodes
-      events = event_graph.nodes! nodes
-      these = instance_methods.map(&:intern)
-      event_graph.flatten(events).each do |tag|
-        unless these.include?(m = "on_#{tag.name}".intern)
-          define_method(m) do |&block|
+    def emits *graph_ref
+      events = event_graph.nodes! graph_ref
+      @event_graph.flatten( events ).reduce( nil ) do |_, tag|
+        m = "on_#{ tag.name }"
+        if ! method_defined? m
+          define_method m do |&block|
             event_listeners.add_listener tag.name, block
             self
           end
         end
+        nil
       end
+      nil
     end
 
-    def event_class= klass
-      define_method(:event_class) { klass }
+    def event_class klass                      # on a module it's a writer
+      define_method :event_class do klass end  # on an instance it's a reader
     end
-
-    alias_method :event_class, :'event_class=' #!
 
     def event_graph
       @event_graph ||= begin
@@ -68,15 +68,66 @@ module Skylab::PubSub
             ::Class == mod.class and break # ness is to allow inventive merging
           end                     # of event graphs (#experimental).
         end
-        1 < found.length and fail 'implement me -- merge graphs'
-        ::Skylab::Semantic::Digraph.new(* found.map(&:event_graph))
+        case found.length
+        when 0
+          ::Skylab::Semantic::Digraph.new
+        when 1
+          found.first.event_graph.dupe
+        else
+          fail 'implement me --merge graphs'
+        end
       end
     end
   end
 
-  class Event < ::Struct.new :payload, :tag, :touched
+  class Event
+
+    alias_method :event_id, :object_id
+
+    def is_event
+      true
+    end
+
+    def is? sym
+      @tag.is? sym
+    end
+
+    attr_accessor :payload
+
+    attr_reader :tag
+
+    def to_s
+      @payload.to_s
+    end
+
+    alias_method :message, :to_s
+
+    def touch!
+      @touched = true
+      self
+    end
+
+    attr_reader :touched
+
+    alias_method :touched?, :touched
+
+    def type
+      @tag.name
+    end
+
+    def update_attributes! h
+      if ! ( ::Hash === @payload )
+        @payload = { message: message }  # urg
+      end
+      @payload.merge! h
+      _define_attr_accessors!
+      nil
+    end
+
+  protected
+
     def initialize tag, *payload
-      case payload.size
+      case payload.length
       when 0
         payload = nil
       when 1
@@ -88,61 +139,29 @@ module Skylab::PubSub
           payload = payload.payload
         end
       end
-      super payload, tag, false
+      @tag = tag
+      @touched = false
+      @payload = payload
       ::Hash === payload and _define_attr_accessors!
-      yield self if block_given?
+      nil
     end
 
-    alias_method :event_id, :object_id
-
-    def is_event
-      true
-    end
-
-    def is? sym
-      tag.is? sym
-    end
-
-    def to_s
-      payload.to_s
-    end
-
-    alias_method :message, :to_s
-
-    def touch!
-      tap { |me| me.touched = true }
-    end
-
-    alias_method :touched?, :touched
-
-    def type
-      tag.name
-    end
-
-    def update_attributes! h
-      if ! ( ::Hash === payload )
-        self.payload = { message: message }
-      end
-      payload.merge! h
-      _define_attr_accessors!
-    end
-
-  protected
                                                # this is badly in need of a re-
     def _define_attr_accessors! *keys          # design but for the time being
       @defined_attr_accessors ||= { }          # we want to avoid warnings
-      keys = payload.keys if keys.length.zero?
+      keys = @payload.keys if keys.length.zero?
       keys.each do |key|
         @defined_attr_accessors.fetch key do |k|
           @defined_attr_accessors[ k ] = true
-          define_singleton_method( k ) { payload[ k ] }
-          define_singleton_method( "#{ k }=" ) { |v| payload[ k ] = v }
+          define_singleton_method( k ) { @payload[ k ] }
+          define_singleton_method( "#{ k }=" ) { |v| @payload[ k ] = v }
         end
       end
+      nil
     end
   end
 
-  class EventListeners < ::Hash
+  class EventListeners < ::Hash  # #todo
     def add_listener name, block
       block.respond_to?(:call) or
         raise ArgumentError.new("no block given. " <<
@@ -201,8 +220,20 @@ module Skylab::PubSub
       @event_listeners ||= EventListeners.new
     end
 
+    def event_cloud_definer
+      if singleton_class.instance_variable_defined? :@event_graph
+        singleton_class
+      else
+        self.class
+      end
+    end
+
     def event_graph_definer
       singleton_class.instance_variable_defined?('@event_graph') ? singleton_class : self.class
+    end
+
+    def unhandled_event_streams
+      fail '# #todo'
     end
   end
 end
