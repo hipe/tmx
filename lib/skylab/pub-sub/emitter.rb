@@ -39,9 +39,9 @@ module Skylab::PubSub
   module Emitter::ModuleMethods
 
     def emits *nodes
-      events = event_cloud.nodes! nodes
+      events = event_graph.nodes! nodes
       these = instance_methods.map(&:intern)
-      event_cloud.flatten(events).each do |tag|
+      event_graph.flatten(events).each do |tag|
         unless these.include?(m = "on_#{tag.name}".intern)
           define_method(m) do |&block|
             event_listeners.add_listener tag.name, block
@@ -57,19 +57,19 @@ module Skylab::PubSub
 
     alias_method :event_class, :'event_class=' #!
 
-    def event_cloud
-      @event_cloud ||= begin
+    def event_graph
+      @event_graph ||= begin
         a = ancestors             # Get every ancestor except self (if not s.c.)
         a = a[ (self == a.first ? 1 : 0) .. -3 ] # and (ick) Kernel, BasicObject
         found = []                # and of these, you want of all the ancestors
-        while mod = a.shift       # that respond_to event_cloud, any first class
-          if mod.respond_to? :event_cloud # and all (non-class) modules up to
+        while mod = a.shift       # that respond_to event_graph, any first class
+          if mod.respond_to? :event_graph # and all (non-class) modules up to
             found.push mod        # that class (if any) or the end.  This crazy-
             ::Class == mod.class and break # ness is to allow inventive merging
           end                     # of event graphs (#experimental).
         end
         1 < found.length and fail 'implement me -- merge graphs'
-        ::Skylab::Semantic::Digraph.new(* found.map(&:event_cloud))
+        ::Skylab::Semantic::Digraph.new(* found.map(&:event_graph))
       end
     end
   end
@@ -166,7 +166,7 @@ module Skylab::PubSub
         args.first
       else
         tag = args.shift
-        Symbol === tag and tag = ( event_cloud_definer.event_cloud[tag] or
+        Symbol === tag and tag = ( event_graph_definer.event_graph[tag] or
           fail("undeclared event type #{tag.inspect} for #{self.class}") )
         event_class.new(tag, *args, &block)
       end
@@ -180,7 +180,7 @@ module Skylab::PubSub
       else
         type = args.shift
         payload = args
-        tag = event_cloud_definer.event_cloud[type] or
+        tag = event_graph_definer.event_graph[type] or
           fail("undeclared event type #{type.inspect} for #{self.class}")
       end
       (tag.all_ancestor_names & event_listeners.keys).map { |k| event_listeners[k] }.flatten.each do |prok|
@@ -190,7 +190,7 @@ module Skylab::PubSub
     end
 
     def emits? event_name
-      event_cloud_definer.event_cloud.has? event_name
+      event_graph_definer.event_graph.has? event_name
     end
 
     def event_class
@@ -201,8 +201,8 @@ module Skylab::PubSub
       @event_listeners ||= EventListeners.new
     end
 
-    def event_cloud_definer
-      singleton_class.instance_variable_defined?('@event_cloud') ? singleton_class : self.class
+    def event_graph_definer
+      singleton_class.instance_variable_defined?('@event_graph') ? singleton_class : self.class
     end
   end
 end
