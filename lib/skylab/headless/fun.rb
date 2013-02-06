@@ -1,6 +1,11 @@
 module Skylab::Headless
   o = { }
 
+  o[:call_frame_rx] = /
+      #{ Autoloader::Inflection::FUN.call_frame_path_rx.source } :
+      (?<no>\d+) : in [ ] ` (?<meth>[^']+) '
+    \z/x
+
   o[:require_quietly] = -> s do   # Useful to load libraries that are not
     FUN.quietly { require s }     # warning friendly
   end

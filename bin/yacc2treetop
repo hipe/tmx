@@ -62,8 +62,8 @@ module Skylab::Yacc2Treetop
       @errstream = e ; @outstream = o
       @program_name = nil
     end
-    Codes = {:bold=>1,:dark_red=>31,:green=>32,:yellow=>33,:blue=>34,
-      :purple=>35,:cyan=>36,:white=>37,:red=>38}
+    Codes = {:bold=>1,:red=>31,:green=>32,:yellow=>33,:blue=>34,
+      :purple=>35,:cyan=>36,:white=>37}
     def color(s, *a); "\e[#{a.map{|x|Codes[x]}.compact*';'}m#{s}\e[0m" end
     def em(s); style(s, :em) end
     Styles = { :error => [:bold, :red], :em => [:bold, :green] }

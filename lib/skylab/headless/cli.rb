@@ -560,9 +560,11 @@ module Skylab::Headless
 
     o = { }
 
+
     codes = ::Hash[ [[:strong, 1], [:reverse, 7]].
-      concat [:dark_red, :green, :yellow, :blue, :purple, :cyan, :white, :red].
+      concat [:red, :green, :yellow, :blue, :purple, :cyan, :white].
         each.with_index.map { |v, i| [v, i+31] } ]
+          # ascii-table.com/ansi-escape-sequences.php  (red = 31, etc)
 
     o[:code_names] = codes.keys                # a couple subproducts use these
 
@@ -612,7 +614,7 @@ module Skylab::Headless
     end
 
     def ick mixed                 # render an invalid value
-      # stylize mixed.to_s.inspect, :strong, :dark_red  # may be overkill
+      # stylize mixed.to_s.inspect, :strong, :red  # may be overkill
       %|"#{ mixed }"|
     end
 
