@@ -17,8 +17,8 @@ module Skylab::TanMan::TestSupport::API::Actions
         response.events.first
       end
 
-      context "event tag name" do
-        subject { event.tag.name }
+      context "event stream name" do
+        subject { event.stream_name }
         specify { should eql(:error) }
       end
 

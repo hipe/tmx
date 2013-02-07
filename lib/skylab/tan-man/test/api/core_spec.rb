@@ -15,7 +15,7 @@ module Skylab::TanMan::TestSupport
       it "the first event in the response events is an appropriate error" do
         response = api.invoke :'not_an_action'
         e = response.events.first
-        e.tag.name.should eql(:error)
+        e.stream_name.should eql(:error)
         e.message.should match(
           /api name error : actions has no "not_an_action" action/i )
       end

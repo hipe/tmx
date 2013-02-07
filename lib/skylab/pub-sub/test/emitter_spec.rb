@@ -87,7 +87,7 @@ describe Skylab::PubSub::Emitter do
     end
   end
 
-  it 'describes its tag graph' do
+  it 'describes its stream graph' do
     emitter.class.event_graph.describe.should eql(<<-HERE.unindent.strip)
       informational
       error -> informational

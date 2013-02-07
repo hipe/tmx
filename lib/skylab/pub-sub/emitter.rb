@@ -40,11 +40,11 @@ module Skylab::PubSub
 
     def emits *graph_ref
       events = event_graph.nodes! graph_ref
-      @event_graph.flatten( events ).reduce( nil ) do |_, tag|
-        m = "on_#{ tag.name }"
+      @event_graph.flatten( events ).reduce( nil ) do |_, stream|
+        m = "on_#{ stream.name }"
         if ! method_defined? m
           define_method m do |&block|
-            event_listeners.add_listener tag.name, block
+            event_listeners.add_listener stream.name, block
             self
           end
         end
@@ -89,12 +89,16 @@ module Skylab::PubSub
     end
 
     def is? sym
-      @tag.is? sym
+      @stream.is? sym
     end
 
     attr_accessor :payload
 
-    attr_reader :tag
+    attr_reader :stream
+
+    def stream_name
+      @stream.name
+    end
 
     def to_s
       @payload.to_s
@@ -112,7 +116,7 @@ module Skylab::PubSub
     alias_method :touched?, :touched
 
     def type
-      @tag.name
+      @stream.name
     end
 
     def update_attributes! h
@@ -126,7 +130,7 @@ module Skylab::PubSub
 
   protected
 
-    def initialize tag, *payload
+    def initialize stream, *payload
       case payload.length
       when 0
         payload = nil
@@ -139,7 +143,7 @@ module Skylab::PubSub
           payload = payload.payload
         end
       end
-      @tag = tag
+      @stream = stream
       @touched = false
       @payload = payload
       ::Hash === payload and _define_attr_accessors!
@@ -177,33 +181,33 @@ module Skylab::PubSub
 
     # syntax:
     #   build_event <event>                                        # pass thru
-    #   build_event { <tag> | <tag-name> } [ payload_item [..] ]
+    #   build_event { <stream> | <stream-name> } [ payload_item [..] ]
     def build_event *args, &block
       args.size == 0 and raise ArgumentError.new('no')
       if 1 == args.size and args.first.respond_to?(:type) and args.first.respond_to?(:payload)
         block and fail("you cannot re-emit an event and also provide a constructor block.")
         args.first
       else
-        tag = args.shift
-        Symbol === tag and tag = ( event_graph_definer.event_graph[tag] or
-          fail("undeclared event type #{tag.inspect} for #{self.class}") )
-        event_class.new(tag, *args, &block)
+        stream = args.shift
+        Symbol === stream and stream = ( event_graph_definer.event_graph[stream] or
+          fail("undeclared event type #{stream.inspect} for #{self.class}") )
+        event_class.new(stream, *args, &block)
       end
     end
 
     def emit *args, &block
       if 1 == args.size and args.first.respond_to?(:payload)
         event = args.first
-        tag = event.tag
+        stream = event.stream
         block and raise ArgumentError.new("can't use block when emitting an event object.")
       else
         type = args.shift
         payload = args
-        tag = event_graph_definer.event_graph[type] or
+        stream = event_graph_definer.event_graph[type] or
           fail("undeclared event type #{type.inspect} for #{self.class}")
       end
-      (tag.all_ancestor_names & event_listeners.keys).map { |k| event_listeners[k] }.flatten.each do |prok|
-        event ||= build_event(tag, *payload, &block)
+      (stream.all_ancestor_names & event_listeners.keys).map { |k| event_listeners[k] }.flatten.each do |prok|
+        event ||= build_event(stream, *payload, &block)
         prok.call(* 1 == prok.arity ? [event] : event.payload )
       end.count
     end
