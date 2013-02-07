@@ -136,7 +136,7 @@ module Skylab::MetaHell
         }#{ normalized_name }"
       @order << normalized_name
       @hash[ normalized_name ] = x
-      nil
+      x
     end
 
     def clear

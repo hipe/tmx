@@ -1,0 +1,29 @@
+# created by tan-man on 2013-02-07 02:15:19 UTC
+
+digraph {
+
+/*
+  example stmt_list:
+    foo -> bar
+    biff -> baz
+
+  example node_stmt:
+    learn_c [label="learn C somehow"]
+*/
+
+
+#                 blue : fillcolor="#b5d5fb"
+#                green : fillcolor="#79f233"
+
+node [label="\N", style="filled", fillcolor="#b5d5fb", fontname="Futura", penwidth="1.1566", shape="Mrecord"]
+
+label="Core Dependencies (sadly hand written for now ..)"
+
+
+meta [label="meta-hell"]
+pub [label="pub-sub"]
+semantic [label=semantic]
+pub -> meta
+pub -> semantic
+semantic -> meta
+}

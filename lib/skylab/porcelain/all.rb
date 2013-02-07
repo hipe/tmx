@@ -271,7 +271,7 @@ module Skylab::Porcelain
     def to_proc
       orig = self
       lambda do |neue|
-        orig.event_listeners.keys.each do |k|
+        orig.event_listeners.names.each do |k|
           neue.send("on_#{k}") { |*e| orig.emit(k, *e) }
         end
       end
@@ -1148,7 +1148,7 @@ module Skylab::Porcelain
       end
       failed = super(argv) or return failed
       # the grammar for namespaces takes no options and does not change argv
-      yield(ParseSubs.new).event_listeners[:push].last.call(@frame)
+      yield(ParseSubs.new).event_listeners.fetch( :push ).last.call( @frame )  # i dont..
       :never_see
     end
 

@@ -23,7 +23,7 @@ module Skylab::Dependency
 
     def initialize(*)
       super
-      event_listeners[:all] ||= [lambda { |e| $stdout.puts e }]
+      # (we used to default to a stderr listener here)
     end
 
     def valid? # [#hl-047]

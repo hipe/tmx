@@ -246,7 +246,7 @@ module ::Skylab::Porcelain::Table
           row_cache.push col
         end
       end
-      o.emit(:row_count) { { row_count: cache.size } }
+      o.emit :row_count, row_count: cache.size
       if cache.size.zero? then o.emit(:empty, '(empty)') else
         arr = cols.ordered.to_a # cache the results, it won't change
         cache.each do |row|

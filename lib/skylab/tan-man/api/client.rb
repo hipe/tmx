@@ -110,7 +110,7 @@ module Skylab::TanMan
       @infostream ||= begin       # as the api only emit events, we try
         f = -> str do             # (for fun!?) to translate informational
                                   # stream writes into events..
-          if event_listeners.empty?
+          if event_listeners.length.zero?
             fail 'sanity - no listeners of api client on stream write!'
           end
           emit :info, str

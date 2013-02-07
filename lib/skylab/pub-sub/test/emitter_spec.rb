@@ -50,7 +50,7 @@ describe Skylab::PubSub::Emitter do
           context 'then with objects of class Foo you can then call on_bar.' do
             context 'It expects you to call on_bar with a block, not doing so:' do
               subject { ->() { instance.on_bar } }
-              specify { should raise_exception(ArgumentError, /no block given/i) }
+              specify { should raise_exception( ::ArgumentError, /callable\?/ ) }
             end
             context 'When you call "on_bar" with a block,' do
               let(:touch_me) { { touched: :was_not_touched } }
@@ -76,7 +76,7 @@ describe Skylab::PubSub::Emitter do
           end
 
           context "with `emits?`" do
-            it " - you can see if it emits something", f:true do
+            it " - you can see if it emits something" do
               instance = klass.new
               instance.emits?( :baz ).should eql( false )
               instance.emits?( :bar ).should eql( true )

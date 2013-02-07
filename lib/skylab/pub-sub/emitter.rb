@@ -2,10 +2,10 @@ module Skylab::PubSub
 
   module Emitter
 
-    COMMON_LEVELS = [:debug, :info, :notice, :warn, :error, :fatal].freeze
+    COMMON_LEVELS = [ :debug, :info, :notice, :warn, :error, :fatal ].freeze
       # didactic, #bound
 
-    def self.extended mod # #sl-111
+    def self.extended mod  # #sl-111
       mod.extend Emitter::ModuleMethods
       mod.send :include, Emitter::InstanceMethods
     end
@@ -162,15 +162,16 @@ module Skylab::PubSub
     end
   end
 
-  class EventListeners < ::Hash  # #todo
-    def add_listener name, block
-      block.respond_to?(:call) or
-        raise ArgumentError.new("no block given. " <<
-          "Your \"block\" argument to add_listener (a #{block.class}) did not respond to \"call\"")
-      self[name] ||= []
-      self[name].push block
+  class Event::Listeners < MetaHell::Formal::Box
+    def add_listener name, blk
+      blk.respond_to? :call or raise ::ArgumentError, "callable? #{ blk.class }"
+      @hash.fetch name do
+        add name, []
+      end.push blk
+      nil
     end
   end
+
 
   module Emitter::InstanceMethods
 
@@ -192,21 +193,27 @@ module Skylab::PubSub
       end
     end
 
-    def emit *args, &block
-      if 1 == args.size and args.first.respond_to?(:payload)
+    def emit *args
+      if 1 == args.length &&
+          args.first.respond_to?(:is_event) && args.first.is_event then
         event = args.first
         stream = event.stream
-        block and raise ArgumentError.new("can't use block when emitting an event object.")
       else
-        type = args.shift
+        stream_name = args.shift
         payload = args
-        stream = event_graph_definer.event_graph[type] or
-          fail("undeclared event type #{type.inspect} for #{self.class}")
+        stream = event_graph_definer.event_graph[ stream_name ]
+        fail "undeclared event type #{ stream_name.inspect } #{
+          }for #{ self.class }" if ! stream
       end
-      (stream.all_ancestor_names & event_listeners.keys).map { |k| event_listeners[k] }.flatten.each do |prok|
-        event ||= build_event(stream, *payload, &block)
-        prok.call(* 1 == prok.arity ? [event] : event.payload )
-      end.count
+      a = (stream.all_ancestor_names & event_listeners.names).reduce [] do |m,k|
+        m.concat @event_listeners.fetch( k )
+        m
+      end
+      a.each do |func|
+        event ||= build_event stream, *payload  # note no block
+        func.call(* 1 == func.arity ? [ event ] : event.payload )
+      end
+      nil  # (we used to result in a count of listeners but what a smell!)
     end
 
     def emits? event_name
@@ -218,7 +225,7 @@ module Skylab::PubSub
     end
 
     def event_listeners
-      @event_listeners ||= EventListeners.new
+      @event_listeners ||= Event::Listeners.new
     end
 
     def event_cloud_definer

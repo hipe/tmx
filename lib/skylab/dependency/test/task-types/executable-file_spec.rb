@@ -41,4 +41,3 @@ module Skylab::Dependency::TestSupport::Tasks
     end
   end
 end
-
