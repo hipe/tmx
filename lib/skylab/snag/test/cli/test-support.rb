@@ -37,7 +37,7 @@ module Skylab::Snag::TestSupport::CLI
         curr = output.lines.shift
         if curr
           curr.string.should match( rx )
-          curr.name.should eql(name)
+          curr.stream_name.should eql(name)
         else
           fail "Had no more events in queue, expecting #{ [type, rx].inspect }"
         end

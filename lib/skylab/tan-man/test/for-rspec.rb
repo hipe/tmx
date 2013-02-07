@@ -33,7 +33,7 @@ module Skylab::TanMan::TestSupport
         when ::Regexp     ; subject.string.should match(assertion)
         when ::String     ; rx = /#{ ::Regexp.escape assertion }/
                           ; subject.string.should match(rx) # better error msg
-        when ::Symbol     ; subject.name.should eql(assertion)
+        when ::Symbol     ; subject.stream_name.should eql(assertion)
         when ::TrueClass  ; result.should be_trueish
         else            ; fail("unrecognized assertion class: #{assertion}")
         end

@@ -15,8 +15,8 @@ module Skylab::Dependency::TestSupport::Tasks
     def wire! o
       o.context = context
       o.on_all do |e|
-        self.debug and $stderr.puts [e.type, e.message].inspect
-        fingers[e.type].push unstylize( e.to_s ) #  soft version - no style ok
+        self.debug and $stderr.puts [e.stream_name, e.message].inspect
+        fingers[e.stream_name].push unstylize( e.to_s ) #  soft version - no style ok
       end
     end
   end

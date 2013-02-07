@@ -11,11 +11,11 @@ module Skylab::Semantic
 
   public
 
-    def [] name
-      @hash[name]
+    def [] normalized_local_name
+      @hash[normalized_local_name]
     end
 
-    def all_ancestors name
+    def all_ancestors normalized_local_name
       ::Enumerator.new do |y|
         seen = { }
         visit_f = ->(_name) do
@@ -24,7 +24,7 @@ module Skylab::Semantic
           seen[_name] = true
           node.is_names.each { |__name| seen.key?(__name) or visit_f[__name] }
         end
-        visit_f[name]
+        visit_f[normalized_local_name]
       end
     end
 
@@ -46,8 +46,8 @@ module Skylab::Semantic
       end
     end
 
-    def fetch name, &otherwise
-      @hash.fetch name, &otherwise
+    def fetch normalized_local_name, &otherwise
+      @hash.fetch normalized_local_name, &otherwise
     end
 
     def flatten nodes
@@ -60,27 +60,27 @@ module Skylab::Semantic
         seen = ::Hash.new { |h, k| y << self[k] ; h[k] = true }
         nodes.each do |node|
           node.is_names.each { |k| seen[k] }
-          seen[node.name]
+          seen[ node.normalized_local_name ]
         end
         nil
       end
     end
 
-    def has? name
-      @hash.key? name
+    def has? normalized_local_name
+      @hash.key? normalized_local_name
     end
 
     def names
       @order.dup
     end
 
-    def node! name, predicates=nil # node! :ambiguous, is: :error
-      if @hash.key? name
-        node = @hash[name]
+    def node! normalized_local_name, predicates=nil # node! :ambiguous, is: :error
+      if @hash.key? normalized_local_name
+        node = @hash[normalized_local_name]
       else
-        node = Node.new self, name
-        @hash[name] = node
-        @order.push name
+        node = Node.new self, normalized_local_name
+        @hash[normalized_local_name] = node
+        @order.push normalized_local_name
       end
       if predicates
         node.absorb_predicates predicates
@@ -106,7 +106,7 @@ module Skylab::Semantic
 
     def nodes
       ::Enumerator.new do |y|
-        @order.each { |name| y << @hash[name] }
+        @order.each { |normalized_local_name| y << @hash[normalized_local_name] }
         nil
       end
     end
@@ -148,11 +148,11 @@ module Skylab::Semantic
     end
 
     def all_ancestor_names
-      all_ancestors.map(& :name )
+      all_ancestors.map(& :normalized_local_name )
     end
 
     def describe
-      a = [ @name.to_s ]
+      a = [ @normalized_local_name.to_s ]
       a << @is_names.join( ', ' ) if @is_names.length.nonzero?
       a * ' -> '
     end
@@ -166,54 +166,54 @@ module Skylab::Semantic
     end
 
     def is? node
-      name = ::Symbol === node ? node : node.name
+      normalized_local_name = ::Symbol === node ? node : node.normalized_local_name
       !! all_ancestors.detect do |nd|
-        name == nd.name
+        normalized_local_name == nd.normalized_local_name
       end
     end
 
     attr_reader :is_names
 
-    attr_reader :name
+    attr_reader :normalized_local_name
 
     attr_accessor :visited        # for client
 
   protected
 
-    def initialize graph, name
-      ::Symbol === name or fail 'dupe logic will fail with non-immediate values'
-      @name, @graph = name, graph
+    def initialize graph, normalized_local_name
+      ::Symbol === normalized_local_name or fail 'dupe logic will fail with non-immediate values'
+      @normalized_local_name, @graph = normalized_local_name, graph
       @is_names = [ ]
       nil
     end
 
     def base_args
-      [ @name, @is_names ]
+      [ @normalized_local_name, @is_names ]
     end
 
-    def base_init graph, name, is_names
-      @name = name
+    def base_init graph, normalized_local_name, is_names
+      @normalized_local_name = normalized_local_name
       @is_names = is_names.dup
       @graph = graph
       nil
     end
 
     def all_ancestors
-      @graph.all_ancestors @name
+      @graph.all_ancestors @normalized_local_name
     end
 
-    def is! name
-      case name
+    def is! normalized_local_name
+      case normalized_local_name
       when ::Array
-        name.each(& method( :is! ) )
+        normalized_local_name.each(& method( :is! ) )
       when ::Symbol
-        if ! @is_names.include? name
+        if ! @is_names.include? normalized_local_name
           # ensure that the graph has such a node
-          @graph.node! name
-          @is_names.push name
+          @graph.node! normalized_local_name
+          @is_names.push normalized_local_name
         end
       else
-        raise ::ArgumentError.new "bad type: #{ name.class }"
+        raise ::ArgumentError.new "bad type: #{ normalized_local_name.class }"
       end
       nil
     end

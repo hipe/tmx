@@ -14,14 +14,14 @@ module Skylab::Semantic::TestSupport
       digraph = Semantic::Digraph[ :solo ]
       digraph.nodes_count.should eql( 1 )
       node = digraph[:solo]
-      node.name.should eql( :solo )
+      node.normalized_local_name.should eql( :solo )
     end
 
     it "here have the minimal graph" do
       digraph = Semantic::Digraph[ child: :parent ]
       digraph.nodes_count.should eql( 2 )
-      digraph[:child].name.should eql( :child )
-      digraph[:parent].name.should eql( :parent )
+      digraph[:child].normalized_local_name.should eql( :child )
+      digraph[:parent].normalized_local_name.should eql( :parent )
       digraph[:child].is_names.should eql( [:parent] )
     end
 
@@ -50,7 +50,7 @@ module Skylab::Semantic::TestSupport
       it "you can use `fetch` to fetch by name" do
         d = plant[]
         got = d.fetch :flower
-        got.name.should eql( :flower )
+        got.normalized_local_name.should eql( :flower )
         dont = d.fetch :animal do end
         dont.should be_nil
       end

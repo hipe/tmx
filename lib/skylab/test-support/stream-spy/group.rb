@@ -1,11 +1,11 @@
 module Skylab::TestSupport
 
-  # manages a group of special ,rstream spies, creating each one in turn with
+  # manages a group of special stream spies, creating each one in turn with
   # `stream_spy_for` with a name you choose for each stream spy.
   # When any of those stream-likes gets written to (with `<<`, `write`, `puts`,
   # e.g) and that data has a newline in it, this puppy will create a "line"
   # metadata struct out of the line which simply groups the name you chose
-  # and the string (the struct hence has the members `name` and `string`).
+  # and the string (the struct hence has the members `stream_name` and `string`).
   #
   # (If you have added line filter(s) with `line_filter!`, this will be
   # applied to the string before creating the metadata struct out of it.
@@ -32,7 +32,7 @@ module Skylab::TestSupport
       @debug ||= debug.new                     # of any stream we will `puts`
       @debug[:condition] ||= -> { true }       # to your `stderr` a line in a
       @debug[:emit] = -> line do               # format of our choosing showing
-        stderr.puts [ line.name, line.string ].inspect # both the stream name
+        stderr.puts [ line.stream_name, line.string ].inspect # both the stream name
       end                                      # and the string content after
       stderr                                   # any filters have been applied
     end
@@ -50,7 +50,7 @@ module Skylab::TestSupport
                                   # on the string, the line having the result.
     attr_reader :lines
 
-    line_struct = ::Struct.new :name, :string # #duplicated at [#ts-007]
+    line_struct = ::Struct.new :stream_name, :string # #duplicated at [#ts-007]
 
     define_method :stream_spy_for do |name|
       @streams.fetch name do
@@ -89,7 +89,7 @@ module Skylab::TestSupport
     define_method :unzip do       # goofy fun. result: 2 parallel arrays:
       names = [ ] ; strings = [ ]              # names and strings
       lines.each do |o|                        # this is of dubious value,
-        names.push o.name                      # but is fun
+        names.push o.stream_name                      # but is fun
         strings.push o.string
       end
       [names, strings].extend names_strings_hack

@@ -16,7 +16,7 @@ module Skylab::TestSupport::TestSupport::StreamSpy
       blue.puts "b1\nb2"
       red.write "r2\nnever see"
       g.lines.length.should eql(4)
-      g.lines.map(&:name).should eql([:red, :blue, :blue, :red])
+      g.lines.map(&:stream_name).should eql([:red, :blue, :blue, :red])
       g.lines.map(&:string).join('').should eql("r1\nb1\nb2\nr2\n")
     end
   end

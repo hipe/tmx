@@ -23,7 +23,7 @@ module Skylab::TanMan
         events = -> o do          # this will hook into the action and, for
           o.on_all do |e|         # low-level invalid things, the client itself
             if debug
-              debug.puts "  >>> (api preview: #{[e.type, e.message].inspect })"
+              debug.puts "  >>> (api preview: #{[e.stream_name, e.message].inspect })"
             end
             response.add_event e
             nil

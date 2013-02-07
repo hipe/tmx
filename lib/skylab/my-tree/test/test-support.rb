@@ -56,7 +56,7 @@ module Skylab::MyTree::TestSupport
     define_method :shift do
       e = @queue.shift
       if e
-        e[:name] = e.name
+        e[:stream_name] = e.stream_name
         e[:string] = Headless::CLI::Pen::FUN.unstylize[ e.string ] || e.string
         e
       end

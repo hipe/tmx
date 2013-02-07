@@ -32,10 +32,10 @@ module Skylab::Snag::TestSupport::CLI::Actions
       infos = []
       pays = []
       output.lines.each do |line|
-        case line.name
+        case line.stream_name
         when :info ; infos.push line.string
         when :pay  ; pays.push line.string.chomp
-        else       ; fail "wat? - #{ line.name }"
+        else       ; fail "wat? - #{ line.stream_name }"
         end
       end
       infos.length.should eql(1)
@@ -60,7 +60,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
         invoke_from_tmpdir( *invocation, '002', '--no-verbose' )
         names, strings = output.unzip
         names.count{ |x| x == :pay }.should eql( 2 ) # i don't care about info
-        act = output.lines.select{ |x| :pay == x.name }.map(&:string).join ''
+        act = output.lines.select{ |x| :pay == x.stream_name }.map(&:string).join ''
         exp = <<-O.unindent
           [#002]       #done wizzle bizzle 2013-11-11
                          one more line

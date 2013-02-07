@@ -59,11 +59,11 @@ module Skylab::Porcelain::TestSupport::Bleeding
             desc[:msg] = x
           end
         when ::Symbol
-          if actual[idx].name == x
+          if actual[idx].stream_name == x
             desc[:type] = x.inspect
           else
             fails.push("expected type #{x.inspect
-              }, had #{actual[idx].name.inspect}")
+              }, had #{actual[idx].stream_name.inspect}")
             desc[:type] = x.inspect
           end
         when ::Regexp

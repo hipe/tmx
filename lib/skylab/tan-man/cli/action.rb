@@ -176,7 +176,7 @@ module Skylab::TanMan
       end
 
        on_all do |e|
-        # $stderr.puts "OK: #{ [e.type, e.message].inspect }"
+        # $stderr.puts "OK: #{ [e.stream_name, e.message].inspect }"
         if ! e.touched?
           # we are re-emitting to parent the event #todo is this ok?
           request_client.send :emit,  e

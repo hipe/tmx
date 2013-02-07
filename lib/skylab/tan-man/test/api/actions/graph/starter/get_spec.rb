@@ -23,7 +23,7 @@ module Skylab::TanMan::TestSupport::API::Actions
       api_invoke_from_tmpdir
       response.events.length.should eql(1)
       e = response.events.first
-      e.type.should eql(:info)
+      e.stream_name.should eql(:info)
       e.message.should eql(
         'starter is set to "holy-nerp.dot" in local config file.')
       e.meta.value_was_set.should eql(true)
@@ -42,7 +42,7 @@ module Skylab::TanMan::TestSupport::API::Actions
       api_invoke_from_tmpdir
       response.events.length.should eql(1)
       e = response.events.first
-      e.type.should eql(:info)
+      e.stream_name.should eql(:info)
       e.message.should eql(
         "there is no starter set in local config file or global config file" )
       (!! e.meta.value_was_set).should eql(false)

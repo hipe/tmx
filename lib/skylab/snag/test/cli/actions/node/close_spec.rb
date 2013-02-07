@@ -25,7 +25,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
 
     def expect name, rx
       line = output.lines.shift
-      line.name.should eql( name )
+      line.stream_name.should eql( name )
       line.string.should match( rx )
     end
 

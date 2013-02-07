@@ -15,10 +15,10 @@ module Skylab::Porcelain::TestSupport::Bleeding
 
   self::Bleeding || nil
 
-  class Event_Simplified < ::Struct.new :type, :message
+  class Event_Simplified < ::Struct.new :stream_name, :message
     # hack for prettier dumps whateveuh
     def string
-      "#{type.inspect} #{message.inspect}"
+      "#{stream_name.inspect} #{message.inspect}"
     end
   end
 
@@ -71,7 +71,7 @@ module Skylab::Porcelain::TestSupport::Bleeding
           ns, rt = instance_exec(& namespace_and_runtime)
           ns.find tok do |o|
             o.on_error do |e|
-              rt.emit( Event_Simplified.new e.type, unstylize(e.message) )
+              rt.emit( Event_Simplified.new e.stream_name, unstylize(e.message) )
             end
           end
           _use = rt.emitted

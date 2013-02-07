@@ -24,7 +24,7 @@ module Skylab::TanMan::TestSupport::API::Actions
 
       response.events.length.should eql(1)
       e = response.events.first
-      e.type.should eql( :error )
+      e.stream_name.should eql( :error )
       e.message.should match( /not found: zoidberg, zoidberg\.dot/i )
       e.message.should match( /known starters:/i )
       e.valid_names.should be_kind_of( ::Array )
@@ -44,7 +44,7 @@ module Skylab::TanMan::TestSupport::API::Actions
       api_invoke_from_tmpdir name: 'holy-smack'
       (1..5).should cover(response.events.length)
       e = response.events.first
-      e.type.should eql( :info )
+      e.stream_name.should eql( :info )
       e.message.should match( /chang(?:ing|ed) using_starter from #{
         }"hoitus-toitus\.dot" to "holy-smack\.dot"/i )
     end

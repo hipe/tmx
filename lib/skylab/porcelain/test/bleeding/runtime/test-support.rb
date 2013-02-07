@@ -19,7 +19,7 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime
 
     let :parent_client do
       o = TestSupport::EmitSpy.new
-      o.format = -> e { "#{e.type.inspect}<-->#{e.message.inspect}" }
+      o.format = -> e { "#{e.stream_name.inspect}<-->#{e.message.inspect}" }
       o
     end
 

@@ -36,7 +36,7 @@ module Skylab::Headless::TestSupport::CLI::Box::DSL
     end
 
     _expect_names = -> me, ioa, *names do
-      actual = ioa.emitted.map(& :name)
+      actual = ioa.emitted.map(& :stream_name )
       actual.should me.eql( names )
       nil
     end
@@ -199,7 +199,7 @@ module Skylab::Headless::TestSupport::CLI::Box::DSL
       it "1.3. no args as expected - works" do
         res = invoke 'yowzaa'
         ioa.emitted.length.should eql( 1 )
-        ioa.emitted.first.name.should eql( :foofie )
+        ioa.emitted.first.stream_name.should eql( :foofie )
         ioa.emitted.first.string.should eql( 'doofie' )
         res.should eql( :koofie )
       end

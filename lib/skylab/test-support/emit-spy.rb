@@ -35,25 +35,25 @@ module Skylab::TestSupport
       self
     end
 
-    emit_struct = ::Struct.new :name, :string, :payload  # similar to [#ts-007]
+    Event_Mote = ::Struct.new :stream_name, :string, :payload # similar to [#ts-007]
 
-    define_method :emit do |type, *payload|      # per spec [#ps-001]
-      do_debug and $stderr.puts format[ type, * payload ]
+    def emit stream, *payload      # per spec [#ps-001]
+      do_debug and $stderr.puts format[ stream, * payload ]
       case payload.length
       when 0
-        if ::Symbol === type
-          em = emit_struct.new type
+        if ::Symbol === stream
+          em = Event_Mote.new stream
         else
-          em = emit_struct.new type.type, type.message
+          em = Event_Mote.new stream.stream_name, stream.message
         end
       when 1
         if ::String === payload.first
-          em = emit_struct.new type, payload.first
+          em = Event_Mote.new stream, payload.first
         else
-          em = emit_struct.new type, nil, payload.first
+          em = Event_Mote.new stream, nil, payload.first
         end
       else
-        em = emit_struct.new type, nil, payload
+        em = Event_Mote.new stream, nil, payload
       end
       @emitted.push em
       nil

@@ -35,8 +35,8 @@ module Skylab::Permute
     def self.build runtime
       action = new
       action.parent = runtime
-      action.on_info    { |e| runtime.emit(e.type, e) }
-      action.on_payload { |e| runtime.emit(e.type, e) }
+      action.on_info    { |e| runtime.emit(e.stream_name, e) }
+      action.on_payload { |e| runtime.emit(e.stream_name, e) }
       action
     end
   end

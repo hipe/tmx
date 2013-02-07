@@ -55,7 +55,7 @@ module Skylab::TanMan::TestSupport::API::Actions
           response.events.length.should be_gte(1)
           response.success?.should eql(true)
           e = response.events.first
-          e.type.should eql(:skip)
+          e.stream_name.should eql(:skip)
           e.message.should match( /already exists, skipping/i )
         end
       end
@@ -66,7 +66,7 @@ module Skylab::TanMan::TestSupport::API::Actions
           api_invoke path: path # not *from* tmpdir
           response.success?.should eql(false)
           e = response.events.first
-          e.type.should eql(:error)
+          e.stream_name.should eql(:error)
           e.message.should match(
             /directory must exist: not-exist/
           )
@@ -79,7 +79,7 @@ module Skylab::TanMan::TestSupport::API::Actions
           api_invoke path: TMPDIR.join('nerk') # not *from* tmpdir
           response.success?.should eql(false)
           e = response.events.first
-          e.type.should eql(:error)
+          e.stream_name.should eql(:error)
           e.message.should match(
             /path was file, not directory: nerk/ )
         end

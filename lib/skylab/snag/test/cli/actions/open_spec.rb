@@ -29,8 +29,8 @@ module Skylab::Snag::TestSupport::CLI::Actions
         shared_setup[ self ]
         invoke_from_tmpdir 'o'
         a = output.lines
-        :info == a.first.name and a.shift
-        a.map(& :name).should eql(
+        :info == a.first.stream_name and a.shift
+        a.map(& :stream_name).should eql(
           [:pay, :pay, :pay, :pay, :pay, :info] )
         exp = <<-O.unindent
           [#004.2] #open this is #feature-creep but meh
@@ -47,7 +47,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
         shared_setup[ self ]
         invoke_from_tmpdir 'open', '-v'
         act = output.lines.reduce( [] ) do |m, (x, idx)|
-          if :pay == x.name
+          if :pay == x.stream_name
             m.push x.string
             if 4 == m.length
               break( m )

@@ -14,10 +14,10 @@ describe "#{ ::Skylab::CovTree } CLI action: tree" do
 
                                                # each one of the returned
     while e = emitted.shift                    # events that is a payload
-      if :payload == e.name                    # should be a "line" that is
+      if :payload == e.stream_name             # should be a "line" that is
         e.string.should match( %r{ \A \./cov-tree\/.+_spec\.rb \z }x ) # a path
       else                                     # that is relative to where
-        e.name.should eql( :info )             # we ran it from. This last
+        e.stream_name.should eql( :info )      # we ran it from. This last
         e.string.should match(/\d test files total/) # event should be an :info
         emitted.should be_empty                # that tells us the number of
         break                                  # files.
@@ -31,14 +31,14 @@ describe "#{ ::Skylab::CovTree } CLI action: tree" do
   it "show a shallow tree of matched test files only." do
     args 'tree', '-t', CovTree.dir_pathname.to_s
     while e = emitted.shift
-      if :payload == e.name
+      if :payload == e.stream_name
         if /\A[^ ]/ =~ e.string
           e.string.should match(/\/test\/\z/) # silly
         else
           e.string.should match(/_spec\.rb\z/)
         end
       else
-        e.name.should eql( :info )
+        e.stream_name.should eql( :info )
         e.string.should match(/\d test files total/)
       end
     end

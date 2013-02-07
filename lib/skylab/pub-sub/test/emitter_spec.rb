@@ -104,15 +104,15 @@ describe Skylab::PubSub::Emitter do
   end
   it 'notifies subscribers of parent events about child events' do
     the_msg = nil
-    emitter.on_informational { |e| the_msg = "#{e.type}: #{e.message}" }
+    emitter.on_informational { |e| the_msg = "#{e.stream_name}: #{e.message}" }
     emitter.emit(:error, 'yes')
     the_msg.should eql('error: yes')
   end
   it 'will double-notify a single subscriber if it subscribes to multiple facets of it' do
     the_child_msg = nil
     the_parent_msg = nil
-    emitter.on_informational { |e| the_parent_msg = "#{e.type}: #{e.message}" }
-    emitter.on_info          { |e| the_child_msg  = "#{e.type}: #{e.message}" }
+    emitter.on_informational { |e| the_parent_msg = "#{e.stream_name}: #{e.message}" }
+    emitter.on_info          { |e| the_child_msg  = "#{e.stream_name}: #{e.message}" }
     emitter.emit(:info, 'foo')
     the_child_msg.should eql('info: foo')
     the_parent_msg.should eql('info: foo')

@@ -50,8 +50,8 @@ module Skylab::Dependency
       opts = options.new
       args_h.each { |k, v| opts[k] = v } # effectively validates keys
       on_all do |e|
-        if levels.index(e.type) >= log_level_i # gigo
-          downstream.puts "FILE_SERVER (#{ e.type }): #{ e.message }"
+        if levels.index(e.stream_name) >= log_level_i # gigo
+          downstream.puts "FILE_SERVER (#{ e.stream_name }): #{ e.message }"
         end
       end
       opts.members.each { |k| send "#{k}=", opts[k] }

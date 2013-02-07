@@ -41,10 +41,10 @@ module Skylab::PubSub
     def emits *graph_ref
       events = event_graph.nodes! graph_ref
       @event_graph.flatten( events ).reduce( nil ) do |_, stream|
-        m = "on_#{ stream.name }"
+        m = "on_#{ stream.normalized_local_name }"
         if ! method_defined? m
           define_method m do |&block|
-            event_listeners.add_listener stream.name, block
+            event_listeners.add_listener stream.normalized_local_name, block
             self
           end
         end
@@ -97,7 +97,7 @@ module Skylab::PubSub
     attr_reader :stream
 
     def stream_name
-      @stream.name
+      @stream.normalized_local_name
     end
 
     def to_s
@@ -115,9 +115,6 @@ module Skylab::PubSub
 
     alias_method :touched?, :touched
 
-    def type
-      @stream.name
-    end
 
     def update_attributes! h
       if ! ( ::Hash === @payload )

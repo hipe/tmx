@@ -82,7 +82,7 @@ module Skylab::TanMan
       self.io_adapter = Headless::CLI::IO_Adapter::Minimal.new(
         sin, sout, serr, pen )
 
-      on_all { |e| io_adapter.emit e.type, e.message }
+      on_all { |e| io_adapter.emit e.stream_name, e.message }
         # saying e.to_s is probably not what you want -- you will get a hash
         # if the message has been changed via message=
     end

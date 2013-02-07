@@ -20,7 +20,7 @@ module Skylab::CovTree::TestSupport::CLI
         rt.on_all do |e|
           unless e.touched?
             e.touch!
-            es.emit e.type, e.payload
+            es.emit e.stream_name, e.payload
           end
         end
       end

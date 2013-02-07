@@ -9,7 +9,7 @@ module Skylab::Dependency::TestSupport::Tasks
     let(:all) do
       lambda do |t|
         t.on_all do |e|
-          self.debug and $stderr.puts [e.type, e.message].inspect
+          self.debug and $stderr.puts [e.stream_name, e.message].inspect
           stderr << e.to_s
         end
       end
