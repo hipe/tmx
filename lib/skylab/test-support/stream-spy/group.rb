@@ -1,5 +1,8 @@
 module Skylab::TestSupport
 
+  # (see also the comparable but simpler Headless::TestSupport::CLI::Streams_Spy
+  # which may be a good fit for testing specifically CLI apps)
+
   # manages a group of special stream spies, creating each one in turn with
   # `stream_spy_for` with a name you choose for each stream spy.
   # When any of those stream-likes gets written to (with `<<`, `write`, `puts`,

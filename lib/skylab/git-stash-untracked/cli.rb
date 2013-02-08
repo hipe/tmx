@@ -212,9 +212,14 @@ module Skylab::GitStashUntracked
 
   public
 
-    extend Headless::CLI::Client::DSL # methods defined below this, when
-                                  # following an option parser def, constitute
-                                  # the extent of this CLI's actions.
+    #                 ~ DSL line of demarcation ~
+    # methods defined below the two extends calls make up the extend of the
+    # CLI's actions.
+
+    extend Headless::CLI::Client::DSL   # is a client, we need 1 mode client
+    extend Headless::CLI::Box::DSL      # is a box b.c has child actions
+      # this comes after above because e.g o.p calls below
+
 
     option_parser do |o|
       o.separator " description: move all untracked files to #{

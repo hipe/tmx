@@ -21,17 +21,36 @@ module Skylab::Headless
   module CLI::Action::ModuleMethods
     include Headless::Action::ModuleMethods
 
-    def desc first, *rest         # [#hl-033] dsl-ly writer (and you have the
-      ( @desc_lines ||= [ ] ).concat [ first, *rest ] # `desc_lines` reader
-      nil                                             # defined in core::action
+    #         ~ `desc` facility - module methods ~
+    #   (see explanation in the corresponding i.m section)
+
+    def desc *lines, &block       # `desc` - [#hl-033] dsl-ly writer.
+      @desc_blocks ||= [ ]
+      if lines.length.zero?
+        if ! block
+          raise ::ArgumentError, "this is a dsl-ish attr writer. arg expected"
+        end
+      elsif block
+        raise ::ArgumentError, "can't have both lines and block."
+      else
+        block = -> y do
+          lines.each(& y.method( :yield ) )
+        end
+      end
+      @desc_blocks << block
+      nil
     end
+
+    attr_reader :desc_blocks
+
+    #         ~ option parser facility - module methods ~
 
     def option_parser &block      # dsl-ish that just accrues these for you.
       ( @option_parser_blocks ||= [ ] ).push block # turning it into an o.p.
       nil                         # is *your* responsibility. depends on what
     end                           # happens in your `build_option_parser` if any
 
-    attr_reader :option_parser_blocks
+    attr_reader :option_parser_blocks  # nil when none yet added.
   end
 
   module CLI::Action::InstanceMethods
@@ -162,6 +181,30 @@ module Skylab::Headless
       true
     end
 
+    def help_screen y                          # (post-order for the big ones)
+      y << usage_line
+      help_description y if desc_lines
+      # (Find the narrowest we can make column A of all sections (including
+      # any options) such that we accomodate the widest content there!)
+      max_width = if ! @sections then 0 else
+        @sections.reduce 0 do |memo, sect|
+          if sect.lines
+            memo = sect.lines.reduce memo do |m, row|
+              ( row.first && row.first.length > m ) ? row.first.length : m
+            end
+          end
+          memo
+        end
+      end
+      if option_documenter
+        w = CLI::Action::FUN.summary_width[ option_documenter, max_width ]
+        option_documenter.summary_width = w
+        help_options y
+      end
+      help_sections y, max_width if @sections
+      nil
+    end
+
     def help_description y # assume desc_lines is nonzero-length array
       y << ''                     # assumes there was content above!
       if 1 == desc_lines.length   # do the smart thing with formatting
@@ -192,16 +235,40 @@ module Skylab::Headless
       nil
     end
 
-    def help_screen y
-      y << usage_line
-      help_description y if desc_lines
-      if option_documenter
-        option_documenter.summary_width =
-          CLI::Action::FUN.summary_width[ option_documenter ]
-        help_options y
+    def help_sections y, max_width
+      od = option_documenter
+      if od
+        ind, sw = od.summary_indent, od.summary_width
+      else
+        ind, sw = '  ', max_width
+      end
+      fmt = "%-#{ sw }s"
+      @sections.each do |section|
+        y << ''                     # we've been assuming there is content above
+        y << "#{ hdr section.header }" if section.header
+        if section.lines
+          section.lines.each do |row|
+            if row.length.zero?
+              y << ''
+            else
+              cels = [ ]
+              if row.length == 1
+                cels << h2( row[0] ) if row[0]
+              else
+                cels << h2( fmt % ( row[0] || '' ) )
+                if row.length > 1
+                  cels.concat row[ 1..-1 ]
+                end
+              end
+              y << "#{ ind }#{ cels * ' ' }"
+            end
+          end
+        end
       end
       nil
     end
+
+    #                ~~ (assorted help support) ~~
 
     def normalized_invocation_string  # since you are an action you can assume
       "#{ request_client.send :normalized_invocation_string }#{   # you have a
@@ -223,8 +290,8 @@ module Skylab::Headless
     strip_description_label_rx = /\A[ \t]*description:?[ \t]*/i  # hack below
 
     define_method :summary_line do
-      if self.class.desc_lines
-        super( )                  # 1) use first desc line if you have that
+      if desc_lines
+        @desc_lines.first         # 1) use first desc line if you have that
       elsif option_parser
         first = @option_parser.top.list.first
         if ::String === first     # 2) else use o.p banner if that
@@ -258,6 +325,103 @@ module Skylab::Headless
       x = render_argument_syntax argument_syntax ; a << x if x
       a.compact.join ' '
     end
+
+    #         ~ the `desc_lines` facility ~
+
+    #  + there is a corsponding opt-in m.m side to this i.m side [#hl-033]
+    #  + @desc_lines (the ivar) is cached because of how it is used but if that
+    #    is ever a problem just nillify it
+    #  + @desc_lines (once it is collapsed) is meant to be always either
+    #    false or a non-zero-length array. This makes implementation easier
+    #    in several places.
+    #  + This implementation must not and should not be married tightly to
+    #    the module methods -- they should be opt-in.
+
+    attr_reader :desc_lines  # watch:
+
+    alias_method :desc_lines_ivar, :desc_lines
+
+    def desc_lines                # it is cached because of how it is used but
+      if desc_lines_ivar.nil?     # you can nillify the ivar as necessary or
+        @desc_lines = build_desc_lines || false  # even override this whole
+      else                        # shebang.
+        @desc_lines
+      end
+    end
+
+    def build_desc_lines          # (this is where @sections is set too!)
+      ea = each_desc_line_raw
+      if ea
+        sections = parse_sections ea
+        with_header, no_header = sections.partition { |s| s.header }
+        @sections = with_header.length.zero? ? false : with_header
+        x = no_header.reduce [] do |m, sect|
+          m.concat sect.lines
+        end
+        x if x.length.nonzero?
+      else
+        @sections = false
+        nil
+      end
+    end
+
+    def each_desc_line_raw
+      if self.class.respond_to?( :desc_blocks ) and self.class.desc_blocks
+        ::Enumerator.new do |y|
+          self.class.desc_blocks.each do |blk|
+            instance_exec y, &blk
+          end
+        end
+      end
+    end
+
+    section_rx = /\A[^:]+:\z/  # the rx that shifts you into section state
+    section_filter = -> s { s.strip.split( /[[:space:]]+/, 2 ) }
+
+    normal_rx = /\A(?![[:space:]])/  # the rx that shift you out of section state
+    normal_filter = -> x { x }
+
+    define_method :parse_sections do |ea|  # hack for pretty formatting
+      y = [] ; normal_shift = nil  # scope
+      rx = section_rx ; filter = normal_filter
+      shift = section_shift = -> line do
+        y << CLI::Desc_Sect.new( line )
+        rx = normal_rx
+        shift = normal_shift
+        filter = section_filter
+      end
+      normal_shift = -> line do  # when in a section and you get a non-indented
+        if section_rx =~ line    # line, it is either normal or another sect
+          section_shift[ line ]
+        else
+          y << CLI::Desc_Sect.new( nil, [ line ] )
+          rx = section_rx
+          shift = section_shift
+          filter = normal_filter
+        end
+      end
+      ea.each do |line|
+        if rx =~ line
+          shift[ line ]
+        else
+          y << ( CLI::Desc_Sect.new ) if y.length.zero?
+          ( y.last.lines ||= [ ] ) << filter[ line ]
+        end
+      end
+      y
+    end
+
+    attr_reader :sections
+
+    alias_method :sections_ivar, :sections
+
+    def sections
+      if sections_ivar.nil?
+        desc_lines
+      end
+      @sections
+    end
+
 
     #      ~ options - modeling, sub-control and rendering (mvvm) ~
 
@@ -421,6 +585,10 @@ module Skylab::Headless
     end
   end
 
+  module CLI
+    Desc_Sect = ::Struct.new :header, :lines
+  end
+
   class CLI::Argument   # might be joined by sister CLI::Option one day..
     # simple wrapper that combines ruby's builtin method.parameters `reqity`
     # with a formal parameter. (`reqity` is a term we straight made up to refer
@@ -489,15 +657,18 @@ module Skylab::Headless
 
   class CLI::Argument::Syntax::Inferred < CLI::Argument::Syntax
 
+    Validate = Headless::Parameter::Definer.new do
+      param :on_missing,    hook: true
+      param :on_unexpected, hook: true
+    end
+
     def validate_arity arg_a, &events  # result is true or hook result
-      hooks = Headless::Parameter::Definer.new do
-        param :on_missing, hook: true
-        param :on_unexpected, hook: true
-      end.new(& events )
+      hooks = Validate.new(& events )
       formal_idx = actual_idx = 0
       formal_end = @elements.length - 1
-      actual_end = arg_a.length  - 1
+      actual_end = arg_a.length - 1
       res = true  # important
+
       while actual_idx <= actual_end
         if formal_idx > formal_end
           res = hooks.on_unexpected[ arg_a[ actual_idx .. -1 ] ]
@@ -510,11 +681,18 @@ module Skylab::Headless
         formal_idx += 1
         actual_idx += 1           # (regardless of opt / req)
       end
-      idx = (formal_idx .. formal_end).detect do |i| # (bad range s/times)
-        :req == @elements[i].reqity
+      # are there any required parameters yet unseen?
+      if formal_idx <= formal_end
+        unseen_req_idx = ( formal_idx .. formal_end ).detect do |i|
+          :req == @elements[i].reqity
+        end
       end
-      if idx
-        res = hooks.on_missing[ self[ idx .. -1 ] ]
+      if unseen_req_idx           # below allows for (*a, b)
+        num_unseen_formal = formal_end - formal_idx + 1
+        num_unseen_actual = actual_end - actual_idx + 1
+        if num_unseen_formal > num_unseen_actual
+          res = hooks.on_missing[ self[ unseen_req_idx .. -1 ] ]
+        end
       end
       res
     end
@@ -611,6 +789,14 @@ module Skylab::Headless
 
     def em s
       stylize s, :strong, :green
+    end
+
+    def hdr s
+      em s
+    end
+
+    def h2 s
+      stylize s, :green
     end
 
     def ick mixed                 # render an invalid value

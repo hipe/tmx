@@ -218,7 +218,7 @@ module Skylab::TanMan
   class CLI::Actions::Tell < CLI::Action       # YIKES look how ridiculous
                                                # this "shortcut" is! (neat too)
 
-    desc( * CLI::Actions::Graph::Tell.desc_lines )
+    @desc_blocks = CLI::Actions::Graph::Tell.desc_blocks
 
     @option_parser_blocks = CLI::Actions::Graph::Tell.option_parser_blocks
 

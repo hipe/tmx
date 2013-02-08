@@ -17,12 +17,14 @@ digraph {
 
 node [label="\N", style="filled", fillcolor="#b5d5fb", fontname="Futura", penwidth="1.1566", shape="Mrecord"]
 
-label="Core Dependencies (sadly hand written for now ..)"
+label="Core Dependencies (hand written (for now ..))"
 
 
+headless [label=headless]
 meta [label="meta-hell"]
 pub [label="pub-sub"]
 semantic [label=semantic]
+headless -> meta
 pub -> meta
 pub -> semantic
 semantic -> meta

@@ -63,17 +63,6 @@ module Skylab::Headless
 
     #   ~ core help-, string-, ui-msg-rendering methods and support ~
 
-    summary_width = -> option_parser, action_objects do
-      # (Find the narrowest we can make column A of both sections (options
-      # and actions) such that we accomodate the widest content there!)
-
-      max = action_objects.reduce 0 do |m, a|  # width of the widest action name
-        x = a.name.to_slug.to_s.length
-        x > m ? x : m
-      end
-      CLI::Action::FUN.summary_width[ option_parser, max ]
-    end
-
     # `box_enqueue_help` - a convenience -h / --help handler to be used in
     # an o.p block for the option. `cmd` is typically the arg passed to your
     # -h (you have to pass it in the handler block to here.)  Hackishly we
@@ -103,43 +92,29 @@ module Skylab::Headless
       true                        # (just for fun we result in true instead of
     end                           # nil which may have a strange effect..)
 
-    def help_actions y, action_objects
-      y << ''                     # (assumes there is a section above)
-      y << "#{ em 'actions:' }"
-      ind = option_parser.summary_indent
-      fmt = "%-#{ option_parser.summary_width }s"
-
-      action_objects.each do |action_object|
-        x = action_object.summary_line
-        x = " #{ x }" if x
-        y << "#{ ind }#{ kbd( fmt % [ action_object.name.to_slug] ) }#{ x }"
-      end
-
-      nil
-    end
-
     def help_screen y, action=nil
       if action
         help_screen_for_child y, action
       else
-        help_screen_for_adult y
+        super y
+        y << ''                   # assume there is some section above
+        y << invite_line_about_action
       end
+      nil
     end
 
-    define_method :help_screen_for_adult do |y|   # (ugly for now..)
-      y << usage_line                          # " (means a copypasta of sister)
-      help_description y if desc_lines         # "
-      actions = action_box_module.each.reduce [] do |m, (k, c)|
+    def build_desc_lines          # (related to above - when we make descs
+      res = super                 #  we make sections too)
+      visible = action_box_module.each.reduce [] do |m, (k, c)|
         m << ( c.new self )       # ich muss sein - we need a charged graph
       end
-      if option_parser            # if we have one we show it *after*..
-        @option_parser.summary_width = summary_width[ @option_parser, actions ]
-        help_options y            # re-adjust o.p spacing per actions!!
+      if visible.length.nonzero?
+        ( @sections ||= [] ) << section = CLI::Desc_Sect.new( 'actions:', [ ] )
+        visible.each do |act|
+          section.lines << [ act.name.to_slug, act.summary_line ]
+        end
       end
-      help_actions( y, actions ) if actions.length.nonzero?
-      y << ''                     # assume there is some section above
-      y << invite_line_about_action
-      nil
+      res
     end
 
     def help_screen_for_child y, action_ref

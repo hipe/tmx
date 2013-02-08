@@ -1,5 +1,7 @@
 module Skylab::TestSupport
+
   class StreamSpy < ::Skylab::Headless::IO::Interceptors::Tee
+
     # A StreamSpy is a simple multiplexer that multiplexes out a subset
     # of the instance methods of the IO module out to an ordered hash of
     # listeners. StreamSpy is vital for automated testing, when you need
@@ -25,12 +27,27 @@ module Skylab::TestSupport
     # as it were, and have it output to $stderr what is being written to it,
     # in addition to writing to the buffer that you will later check.
     #
+    # #todo - whether this is on the one hand a pure tee or on the other
+    # always consisting of at least an IO buffer, it is confusing and showing
+    # strain. survey if ever we do not make a s.s that is standard, and if not
+    # then bake it in and if so then subclass.
+    #
 
     # (omg wtf somebody somewhere is defining ::Struct::Group wtf [#sl-124])
     require_relative 'stream-spy/group'
 
     def self.standard
       new( buffer: TestSupport_::Services::StringIO.new ).tty!
+    end
+
+    # --*--
+
+    def clear_buffer
+      self[:buffer].instance_exec do
+        rewind
+        truncate 0
+      end
+      nil
     end
 
     def debug! prepend=nil

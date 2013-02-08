@@ -4,6 +4,11 @@ module Skylab::Headless::TestSupport
                                   # (the SECOND you do anything funky, change
                                   # this to a class, you hear!?)
 
+    def clear_buffers
+      values.each(& :clear_buffer )
+      nil
+    end
+
     def debug! prepend=nil
       values.each do |v|
         v.debug!( prepend ) if v

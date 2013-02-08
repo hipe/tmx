@@ -11,8 +11,6 @@ module Skylab::Headless
       x
     end
 
-    attr_reader :desc_lines
-
     def modalities_anchor_module
       x = const_get :MODALITIES_ANCHOR_MODULE, true
       x.respond_to?( :call ) and x = x.call
@@ -41,12 +39,7 @@ module Skylab::Headless
     end                           # about the local (tail) element of the
                                   # action class's name function.
 
-
   protected
-
-    def desc_lines                # we want this DSL-y module-methods part of
-      self.class.desc_lines if self.class.respond_to? :desc_lines # it to be
-    end                           # opt-in
 
     def formal_attributes         # hook for this experiment - [#049], [#036]
     end
@@ -83,14 +76,6 @@ module Skylab::Headless
         fp = formal_attributes.fetch( x ) { }
       end
       request_client.send :parameter_label, ( fp || x ), idx
-    end
-
-    def summary_line              # simple, modality-agnostic nerk
-      if self.class.desc_lines
-        self.class.desc_lines.first
-      else
-        "the #{ name.to_slug } action."
-      end
     end
   end
 end

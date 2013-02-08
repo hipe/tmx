@@ -49,9 +49,7 @@ module Skylab::Flex2Treetop
 
   protected
 
-    def initialize
-      _headless_sub_client_init nil # modality clients are always this way
-    end
+    # ( `initialize` will be defined by the h.l modality i.m!)
   end
 
 
@@ -148,6 +146,8 @@ module Skylab::Flex2Treetop
 
   protected
 
+    # (`initialize` defined in h.l api client i.m!)
+
     def build_io_adapter
       API::IO_Adapter.new
     end
@@ -226,8 +226,8 @@ module Skylab::Flex2Treetop
   end
 
 
-  def CLI.new                     # #pattern [#sl-121]
-    CLI::Client.new
+  def CLI.new *a                  # #pattern [#sl-121]
+    CLI::Client.new(* a )
   end
 
 
@@ -237,6 +237,8 @@ module Skylab::Flex2Treetop
     public :info                  # translation uses it directly, at odds with
                                   # [#008]
   protected
+
+    # ( `initialize` defined in h.l cli client i.m !)
 
     def build_option_parser
       o = ::OptionParser.new

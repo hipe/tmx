@@ -16,6 +16,14 @@ module Skylab::Headless
 
   protected
 
+    def initialize *three         # example rudimentary implementation
+      _headless_sub_client_init nil # modality clients are always this way
+      if three.length.nonzero?
+        @io_adapter = build_io_adapter(* three )
+      end
+      nil
+    end
+
     def build_io_adapter sin=$stdin, sout=$stdout, serr=$stderr, pen=build_pen
       # What is really nice is if you observe [#sl-114] and specify what
       # actual streams you want to use for these formal streams.  However

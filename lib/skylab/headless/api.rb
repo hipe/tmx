@@ -54,6 +54,12 @@ module Skylab::Headless
     def runtime_error_class
       API::RuntimeError
     end
+
+  protected
+
+    def initialize                # example rudimentary implementation
+      _headless_sub_client_init nil # modality clients are always this way
+    end
   end
 
   class API::Promise < ::BasicObject # thanks Ben Lavender

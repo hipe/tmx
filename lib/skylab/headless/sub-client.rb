@@ -79,6 +79,10 @@ module Skylab::Headless
 
     def human_escape s ; pen.human_escape s end
 
+    def hdr s ; pen.hdr s end
+
+    def h2  s ; pen.h2  s end
+
     def ick s ; pen.ick s end
 
     def kbd s ; pen.kbd s end

@@ -70,7 +70,8 @@ module Skylab::TanMan
 
     define_singleton_method :desc do |*a| # compare to [#hl-033]
       if a.length.zero?  # (awful compat for bleeding, don't float this up)
-        desc_lines or empty_array
+        # (the right way dictates that we need an instance & runtime for this)
+        ( new nil ).send( :desc_lines ) or empty_array
       else
         super(* a )               # up to headless
       end
