@@ -1,3 +1,4 @@
+[#055] #open #hookback - let pub-sub know when ridiculous is ready
 [#054]       #tracking-tag slug
 [#053] #open (or #tracking-tag) load file when desc lines are necessary, maybe
 [#052]       #done invert is broken so stops are broken

@@ -1,3 +1,4 @@
+[#005] #open (#waiting) cross reference to [#tr-055], can use nifty ridiculous
 [#004]       #done rename `event_cloudt` -> `event_graph`
 [#003]       #done event class should not be a struct
 [#002]       #tracking-tag #pattern: public emitters
