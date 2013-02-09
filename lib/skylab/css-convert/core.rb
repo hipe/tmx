@@ -158,7 +158,7 @@ module Skylab::CssConvert
     def dump_directives sexp
       keep_going = true
       if actual_parameters.dump_directives?
-        require 'pp'              # possible future fun with [#tm-043] svc
+        require 'pp'     # possible future fun with [#ta-043] svc # #todo
         ::PP.pp sexp, request_client.io_adapter.errstream
         keep_going = ! actual_parameters.dump_directives_and_exit?
       end
@@ -219,7 +219,7 @@ module Skylab::CssConvert
     end
 
     def fixture test
-      require 'fileutils' # #[tm-042] as service
+      require 'fileutils' # #[ta-042] as service  # #todo
       _pwd = ::Pathname.new(FileUtils.pwd)
       _basename = "#{test.name}-#{test.value}"
       fixture_path = FIXTURES_DIR.join(_basename).relative_path_from(_pwd)

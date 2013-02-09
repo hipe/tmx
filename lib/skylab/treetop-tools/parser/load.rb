@@ -59,7 +59,7 @@ module Skylab::TreetopTools
       @compiler ||= ::Treetop::Compiler::GrammarCompiler.new
     end
 
-    def file_utils                # could benefit from [#tm-042] f.u as svc
+    def file_utils                # could benefit from [#ta-042] f.u as svc
       require 'fileutils'
       ::FileUtils
     end

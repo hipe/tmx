@@ -278,7 +278,7 @@ module Skylab::TanMan
         when ::NilClass ; nil
         when ::String   ; o.dup
         else            ; fail "implement me -- #{ o.class }"
-        # see #doc-point [#tm-074] - representing numeric values in sexps
+        # see #doc-point [#ta-074] - representing numeric values in sexps
         end
       end
       res

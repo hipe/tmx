@@ -141,7 +141,7 @@ module Skylab::Treemap
                                   # that this these ar objs are persistent)
         end
         a if a.length.nonzero?    # to the outside, nil when empty - important,
-      end                         # tracked by [#tm-009], change with caution
+      end                         # tracked by [#tr-009], change with caution
     end
 
     def parsing_option_parser

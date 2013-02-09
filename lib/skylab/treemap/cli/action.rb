@@ -101,7 +101,7 @@ module Skylab::Treemap
     def __option_syntax_any_legacy
       # err on the side of futurism and assume we could have an option_parser
       # but have a zero length set of definitions for it
-      !! option_parser_blocks  # relies upon the sweetening from [#tm-009]
+      !! option_parser_blocks  # relies upon the sweetening from [#tr-009]
     end
 
     def __option_syntax_help_legacy f

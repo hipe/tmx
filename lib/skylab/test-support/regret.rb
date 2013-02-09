@@ -1,6 +1,6 @@
 module ::Skylab::TestSupport
   module Regret
-    # As the name suggests, we might really regret this. (This was [#tm-019].)
+    # As the name suggests, we might really regret this. (This was [#ta-019].)
     #
     # The Regret module is an alternate way to do something like rspec's
     # shared_contexts but with an implementation that is in some ways more
