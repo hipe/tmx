@@ -45,7 +45,6 @@ module Skylab::TanMan
 
 
   class CLI::Actions::Status < CLI::Action
-    include Porcelain::Table::RenderTable
 
     desc "show the status of the config director{y|ies} active at the path."
 
@@ -62,9 +61,10 @@ module Skylab::TanMan
         table.push [ [:header, k], e.first.message ]
         table.concat( e[1..-1].map{ |x| [nil, x.message] } )
       end
-      render_table table, separator: '  ' do |o|
-        o.field(:header).format { |x| hdr x }
-        o.on_all { |e| emit :payload, e }
+      Porcelain::Table.render table, separator: '  ' do |o|
+        o.field!( :header ).style = method( :hdr )
+        o.on_row  { |e| emit :payload, e.text }
+        o.on_info { |e| emit :info,    e.text }  # e.g 0 rows
       end
       true
     end
@@ -119,7 +119,6 @@ module Skylab::TanMan
 
 
   class CLI::Actions::Remote::List < CLI::Action
-    include Porcelain::Table::RenderTable
 
     desc "list the remotes."
 
@@ -134,15 +133,15 @@ module Skylab::TanMan
       result = nil # not false - we never do convention [#hl-109] invite
       begin
         table = api_invoke( param_h ) or break
-        render_table table, separator: '  ' do |o|
-          o.field(:resource_label).format { |x| "(resource: #{x})" }
+        Porcelain::Table.render table, separator: '  ' do |o|
+          o.field!( :resource_label ).style = -> x { "(resource: #{ x })" }
           o.on_empty do |e|
             e.touch!
             n = table.num_resources_seen
-            emit :info, "no remotes found in #{n} config file#{s n}"
+            emit :info, "no remotes found in #{ n } config file#{ s n }"
           end
-          o.on_all do |e|
-            emit( :payload, e ) unless e.touched?
+          o.on_row do |e|
+            emit :payload, e.text unless e.touched?
           end
         end
         result = true
@@ -150,8 +149,6 @@ module Skylab::TanMan
       result
     end
   end
-
-
 
   class CLI::Actions::Remote::Rm < CLI::Action
 

@@ -119,8 +119,6 @@ module Skylab::Permute
 
     emits :payload, :info, help: :info
 
-    include Porcelain::Table::RenderTable
-
     opt_syn = ->() do # hacklund
       op = HackParse.new
       (opt_syn = ->{ op }).call
@@ -140,9 +138,9 @@ module Skylab::Permute
         o.on_header { |e| rows.push( e.payload.map { |_, s| hdr s } ) }
         o.on_row { |e| rows.push( e.payload.map { |_, s| s } ) }
         o.on_end do
-          render_table(rows) do |oo|
-            oo.on_info { |e| emit(:info, e) }
-            oo.on_row  { |e| emit(:payload,  e) }
+          Porcelain::Table.render rows do |oo|
+            oo.on_info { |e| emit :info, e.text }
+            oo.on_row  { |e| emit :payload, e.text }
           end
         end
       end.execute

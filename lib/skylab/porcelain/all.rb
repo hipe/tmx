@@ -2,7 +2,6 @@ require_relative 'core'
 require 'optparse'
 require 'stringio'
 require 'strscan'
-require 'skylab/pub-sub/core'
 
 # @todo this should either be renamed "dsl" or moved into the toplevel porcelain.rb
 

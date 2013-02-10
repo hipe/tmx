@@ -1,260 +1,381 @@
-# rewrite as an excercize to be purely event-driven
+module Skylab::Porcelain
 
-# issues / wishlist:
-#
-#   * left/right alignment config options
+  module Table
+
+    # a rewrite of a table renderer that, as an excercise:
+    #   + is purely event-driven
+    #   + does some clever bs with type inference and alignment
+
+    # issues / wishlist:
+    #
+    #   * left/right alignment config options
+    #   + TODO rename to Auto somewhere..
 
 
-require_relative 'core'
-require 'skylab/code-molester/core'
-require 'skylab/headless/core'
-require 'skylab/pub-sub/core'
-
-module ::Skylab::Porcelain::Table
-
-  Headless = ::Skylab::Headless
-  Sexp = ::Skylab::CodeMolester::Sexp
-
-  module Column
-  end
-
-  class Column::Type < Struct.new(:align, :ancestor_names, :name, :regex, :renderer_factory)
-    def ancestor
-      ancestor_names.size == 1 or fail("ancestor() accessor can only be " <<
-        "used on nodes with one ancestor (\"parent\").  #{name.inspect} " <<
-        "has: (#{ancestor_names.map(&:inspect).join(', ')})")
-      Column::TYPES[ancestor_names.first]
+    conduit_and_result = -> param_h, blk do
+      conduit = Conduit.new ; res = nil
+      param_h.each { |k, v| conduit.send "#{ k }=", v } if param_h
+      if blk then blk[ conduit ] else
+        res = Headless::Services::StringIO.new
+        conduit.on_text { |ev| res.puts ev.text }
+      end
+      conduit.instance_exec do
+        @head ||=nil ; @tail ||= nil ; @separator ||= ' '
+      end
+      [ conduit, res ]
     end
-    def ancestors= o # for now this adds to the ordered set, but it might change!
-      self.ancestor_names |= (Array===o ? o : [o])
-    end
-    def ancestor_names_recursive seen = nil
-      Enumerator.new do |y|
-        seen ||= {}
-        ancestor_names.each do |k|
-          unless seen[k]
-            seen[k] = true
-            anc = Column::TYPES[k] or fail("huh?")
-            y << k
-            anc.ancestor_names_recursive(seen).each { |kk| y << kk }
+
+    census_and_rows = -> row_enum, conduit do
+      census = Census.new
+      field_box = conduit.instance_variable_get :@field_box
+      rows_cache = row_enum.reduce [] do |rows, cel_enum|
+        rows << ( cel_enum.each_with_index.reduce [] do |cels, (cel_x, idx)|
+          cel_s = if ::String === cel_x
+            cel_x
+          elsif ::Array === cel_x
+            if 2 == cel_x.length
+              field_box.fetch( cel_x.first ).style[ cel_x.last ]
+            else
+              raise ::ArgumentError, "expecting 2 had #{ cel_x.length } arr"
+            end
+          elsif ::NilClass
+            nil
+          else
+            raise ::ArgumentError, "no strategy for #{ cel_x.class }"
           end
-        end
+          census.see idx, cel_s
+          cels << cel_s
+        end )
       end
+      [ census, rows_cache ]
     end
-    def build_cel_renderer col
-      renderer_factory or fail("#{name} did not define a renderer (a build_cel_renderer)")
-      renderer_factory.call col
+
+    render = -> row_enum, param_h=nil, &blk do
+      conduit, sio = conduit_and_result[ param_h, blk ]
+      census, rows = census_and_rows[ row_enum, conduit ]
+      Table::Engine.new( conduit, census, rows, sio ).render
     end
-    def initialize name, args
-      super(nil, [], name, nil, nil)
-      args.each { |k, v| send("#{k}=", v) }
-    end
-    def match? str
-      regex.match(str)
-    end
+
+    define_singleton_method :render, &render
   end
 
-  module Column
-    TYPES = {
-      :string  => (STRING   = Type.new(:string,  :regex => //, :align => :left)),
-      :float   => (FLOAT    = Type.new(:float,   :ancestors => :string,  :regex => /\A-?\d+(?:\.\d+)?\z/)),
-      :integer => (INTEGER  = Type.new(:integer, :ancestors => :float,   :regex => /\A-?\d+\z/, :align => :right)),
-      :blank   => (BLANK    = Type.new(:blank,   :ancestors => :string,  :regex => /\A[[:space:]]*\z/ ))
-    }
-    TIGHTEST = INTEGER
-    FLOAT_DETAIL_RE = /\A(-?\d+)((?:\.\d+)?)\z/
-  end
-
-  parse_styles = -> do
-    # Parse a string with ascii styles into an S-expression.
-
-    style_parser_rx = /\A (?<string>[^\e]*)  \e\[
-      (?<digits> \d+  (?: ; \d+ )* )  m  (?<rest> .*) \z/x
-
-    -> str do
-      out = nil
-      while md = style_parser_rx.match(str)
-        out ||= []
-        if md[:string].length.nonzero?
-          out.push Sexp[ :string, md[:string] ]
-        end
-        out.push Sexp[ :style, * md[:digits].split(';').map(&:to_i) ]
-        str = md[:rest]
-      end
-      if out and str.length.nonzero?
-        out.push Sexp[ :string, str ]
-      end
-      out
-    end
-
-  end.call
-
-  Column::STRING.renderer_factory = ->(col) do
-    fmt = "%#{'-' if col.align_left?}#{col.max_width_seen[:full]}s"
-    ->(str) do
-      if a = parse_styles[ str ]
-        if 2 == a.count { |p| :style == p.first } and :style == a.first.first and
-        :style == a.last.first and [0] == a.last[1..-1]
-          "\e[#{a.first[1..-1].join(';')}m#{ fmt % [a[1].last] }\e[0m" # jesus wept
-        else
-          str # whatever you do to "fix" these cases will require overhauling a lot
-        end
+  module Table::Event             # pure factory
+    def self.new xx, x  # TODO stashed changed pending
+      if ::String === x
+        Table::Event::Textual.new xx, x
       else
-        fmt % [str]
+        fail 'wat'
       end
     end
   end
 
-  Column::BLANK.renderer_factory = Column::INTEGER.renderer_factory = Column::STRING.renderer_factory
+  class Table::Event::Textual < PubSub::Event
 
-  Column::FLOAT.renderer_factory = ->(col) do
-    int_max = col.max_width_seen[:integer_part]
-    flt_max = col.max_width_seen[:fractional_part]
-    fmt = "%#{int_max}s%-#{flt_max}s"
-    fallback_renderer = Column::STRING.build_cel_renderer(col)
-    ->(str) do
-      if md = Column::FLOAT_DETAIL_RE.match(str)
-        fmt % md.captures
-      else
-        fallback_renderer.call(str)
+    attr_reader :text
+
+    undef_method :to_s  # TODO stashed changes pending
+
+  protected
+
+    def initialize xx, x  # TODO stashed changes pending
+      super xx  # #todo
+      @text = x
+    end
+  end
+
+  class Table::Conduit  # TODO move this up in the file after event_class is..
+    extend PubSub::Emitter
+
+    event_class Table::Event
+
+    emits row: :text, info: :text, empty: :info, row_count: :data
+
+    attr_writer :head, :tail, :separator
+
+    def field! symbol
+      @field_box.if? symbol, -> x { x }, -> box do
+        box.add symbol, Table::Field::Conduit.new
       end
     end
-  end
 
-  Column::Type.tap do |klass|
-    Column::TYPES.values.map(&:name).each do |name|
-      klass.send(:define_method, "#{name}?") do
-        name == self.name or ancestor_names_recursive.detect { |k| name == k }
-      end
-    end
-    klass.send(:alias_method, :numeric?, :float?)
-  end
+  protected
 
-  class Column::ViewModel < Struct.new(:align, :index, :max_width_seen, :printf_format, :type_stats,
-    :field_name, :formatter
-  )
-    def align_left?
-      align and return :left == align
-      :left == (inferred_type || Column::STRING).align
-    end
-    def cel_renderer
-      @cel_renderer ||= (inferred_type || STRING).build_cel_renderer(self)
-    end
-    def format &b
-      1 == b.arity or raise ArgumentError.new("formatter blocks must always take exactly one argument")
-      self.formatter = b
-    end
-    def _format_cel str
-      formatter ? formatter.call(str) : str.to_s
-    end
-    def initialize index, opts = nil
-      @cel_renderer = @inferred_type = nil
-      super(nil, index, nil, nil, nil)
-      self.type_stats = Hash.new { |h, k| h[k] = 0 }
-      self.max_width_seen = Hash.new { |h, k| h[k] = 0 }
-      opts and opts.each { |k, v| send("#{k}=", v) }
-    end
-    def inferred_type
-      @inferred_type ||= infer_type
-    end
-    def infer_type
-      Column::TYPES[infer_type_name] || Column::STRING
-    end
-    def infer_type_name
-      type_stats.empty? and return :string
-      type_stats.reduce { |m, o| o.last > m.last ? o : m }.first
-    end
-    def render_cel str
-      cel_renderer.call(str)
-    end
-    def see val
-      val.nil? and return
-      val = Headless::CLI::Pen::FUN.unstylize[ val ]
-      val.length > max_width_seen[:full] and max_width_seen[:full] = val.length
-      if Column::BLANK.match?(val)
-        type_stats[:blank] += 1
-      else
-        type = Column::TIGHTEST
-        type = type.ancestor until type.match?(val)
-        type_stats[type.name] += 1
-        if :float == type.name
-          md = Column::FLOAT_DETAIL_RE.match(val)
-          md[1].length > max_width_seen[:integer_part] and max_width_seen[:integer_part] = md[1].length
-          md[2].length > max_width_seen[:fractional_part] and max_width_seen[:fractional_part] = md[2].length
-        end
-      end
-    end
-  end
-
-
-  module Columns
-  end
-
-  class Columns::ViewModelAggregator < Hash
     def initialize
-      super { |h, k| h[k] = Column::ViewModel.new(k) }
-    end
-    def ordered
-      Enumerator.new { |y| ordered_keys.each { |idx| y << self[idx] } }
-    end
-    def ordered_keys
-      size.zero? and return []
-      min, max = keys.reduce([nil,nil]) { |m, o| m[0] = o if !m[0] || m[0] > o ; m[1] = o if !m[1] || m[1] < o ; m }
-      (min..max).to_a
+      @head = @tail = @separator = nil
+      @field_box = MetaHell::Formal::Box::Open.new
     end
   end
 
-  module RenderTable
-    def build_table_columns_inferences_aggregator
-      Columns::ViewModelAggregator.new
-    end
-    class OnTable < Struct.new(:head, :tail, :separator)
-      extend ::Skylab::PubSub::Emitter
-      emits(:all, :info => :all, :empty => :info, :row => :all, :row_count => :data)
+  class Table::Engine < Table::Conduit
 
-      public :emit # #pattern [#ps-002]
-
-      def field name
-        @fields[name] ||= Column::ViewModel.new(nil, field_name: name)
+    def render
+      emit :row_count, row_count: @row_a.length
+      if @row_a.length.zero?
+        emit :empty, '(empty)'
+      else
+        @row_a.each do |col_a|
+          emit :row, "#{ @head }#{
+            }#{ @idx_a.map do |idx|
+              @field_h.fetch( idx ).render col_a[idx]
+            end.join @separator
+          }#{ @tail }"
+        end
       end
-      alias_method :[], :field
-      attr_reader :fields
-      def format_cel field_name, cel_value
-        fields[field_name] ? fields[field_name]._format_cel(cel_value) : cel_value
-      end
-      def initialize
-        @fields = {}
+      if @sio
+        @sio.rewind
+        @sio.read
       end
     end
-    def render_table row_enumerator, opts=nil
-      o = OnTable.new
-      opts and opts.each { |k, v| o.send("#{k}=", v) }
-      if block_given? then yield(o) else
-        ret = StringIO.new
-        o.on_all { |ev| ret.puts ev }
+
+  protected
+
+    def initialize conduit, census, rows, sio
+      conduit.instance_variables.each do |ivar|
+        instance_variable_set ivar, conduit.instance_variable_get( ivar )
       end
-      o.head ||= '' ; o.tail ||= '' ; o.separator ||= ' '
-      cache = []
-      cols = build_table_columns_inferences_aggregator
-      row_enumerator.each do |col_enumerator|
-        cache.push(row_cache = [])
-        col_enumerator.each_with_index do |col, idx|
-          if Array === col && 2 == col.count
-            col = o.format_cel(*col)
+      @row_a, @sio = rows, sio
+      @field_h = { }
+      @idx_a = []
+      census.fields.each do |stats|
+        if stats.has_information
+          @idx_a << stats.index
+          @field_h[ stats.index ] = Table::Field.new stats.index, stats
+        end
+      end
+      nil
+    end
+  end
+
+  class Table::Census
+
+    def fields
+      ::Enumerator.new do |y|
+        # we're just being crazy - what is the min and max index seen!?
+        min, max = @hash.keys.reduce [ nil, nil ] do |m, x|
+          m[0] = x if ! m[0] || m[0] > x
+          m[1] = x if ! m[1] || m[1] < x
+          m
+        end
+        if min && max
+          ( min .. max ).each do |idx|
+            if @hash.key? idx  # sure why not - skip columns that you never saw
+              y << @hash[ idx ]
+            end
           end
-          cols[idx].see(col)
-          row_cache.push col
         end
+        nil
       end
-      o.emit :row_count, row_count: cache.size
-      if cache.size.zero? then o.emit(:empty, '(empty)') else
-        arr = cols.ordered.to_a # cache the results, it won't change
-        cache.each do |row|
-          o.emit :row, "#{o.head}#{arr.map { |c| c.render_cel(row[c.index]) }.join(o.separator)}#{o.tail}"
-        end
-      end
-      ret.string if ret
     end
+
+    def see idx, text
+      @hash.fetch idx do
+        @hash[ idx ] = Table::Cel::Stats.new idx
+      end.see text
+      nil
+    end
+
+  protected
+
+    def initialize
+      @hash = { }
+    end
+  end
+                                  # (it's really cel-type but we don't model
+  class Table::Cel                #  cels directly and it's a nicer name)
+
+    attr_reader :align
+
+    attr_reader :ancestor
+
+    def match? str
+      @rx =~ str
+    end
+
+    attr_reader :render
+
+    attr_reader :rx
+
+    attr_reader :symbol
+
+  protected
+
+    param_h_h = {
+      align: -> v { @align = v },
+      ancestor: -> v { @ancestor_symbol = v },
+      render: -> v { @render = v },
+      rx: -> v { @rx = v }
+    }
+
+    define_method :initialize do |symbol, param_h|
+      @symbol = symbol
+      @ancestor_symbol = nil
+      param_h.each do |k, v|
+        instance_exec v, & param_h_h.fetch( k )
+      end
+      @ancestor = (Table::Cels.const_fetch @ancestor_symbol if @ancestor_symbol)
+      freeze
+    end
+
+    def ancestor_names_recursive
+      @ancestor_names_recursive ||= begin
+        box = MetaHell::Formal::Box::Open.new
+        _ancestor_names_recursive box
+        box.names
+      end
+    end
+
+    def _ancestor_names_recursive box
+      if @ancestor
+        box.if? @ancestor, -> x { }, -> bx do
+          bx.add @ancestor, true
+          anc = Table::Cels.fetch @ancestor
+          anc.send :_ancestor_names_recursive, box
+        end
+      end
+      nil
+    end
+  end
+
+  class Table::Cel
+    FLOAT_DETAIL_RX = /\A(-?\d+)((?:\.\d+)?)\z/  # used 2x
+  end
+
+  module Table::Cels
+
+    extend MetaHell::Boxxy
+
+    parse_styles   = Headless::CLI::FUN.parse_styles
+    unparse_styles = Headless::CLI::FUN.unparse_styles
+    unstylize      = Headless::CLI::Pen::FUN.unstylize
+    hackable_a = [ :style, :string, :style ]
+
+    common = -> fld do
+      fmt = "%#{ '-' if fld.is_align_left }#{ fld.max_width :full }s"
+      -> str do
+        sexp = parse_styles[ str ]  # are you ready for ridiculous? if the
+        if sexp  # string was styled, remove the styling, apply the width
+          if hackable_a == sexp.map(& :first )  # resizing, and re-apply styling
+            sexp[1][1] = fmt % sexp[1][1]
+            unparse_styles[ sexp ]
+          else
+            unstylize[ str ]  # glhf
+          end
+        else
+          fmt % str
+        end
+      end
+    end
+
+    float_detail_rx = Table::Cel::FLOAT_DETAIL_RX
+
+    float = -> fld do
+      int_max = fld.max_width :int_part
+      flt_max = fld.max_width :frac_prt
+      fmt = "%#{ int_max }s%-#{ flt_max }s"
+      fallback = common[ fld ]
+      -> str do
+        md = float_detail_rx.match str
+        if md
+          fmt % md.captures
+        else
+          fallback[ str ]
+        end
+      end
+    end
+
+    STRING = Table::Cel.new :string, rx: //, align: :left, render: common
+
+
+    BLANK = Table::Cel.new :blank, ancestor: :string,
+                                   rx: /\A[[:space:]]*\z/, render: common
+
+    FLOAT = Table::Cel.new :float, ancestor: :string,
+                                   rx: /\A-?\d+(?:\.\d+)?\z/, render: float
+
+    INTEGER = Table::Cel.new :integer, ancestor: :float, align: :right,
+                                       rx: /\A-?\d+\z/, render: common
+
+  end
+
+  class Table::Cel::Stats
+
+    def has_information
+      0 < @num_non_nil_seen
+    end
+
+    attr_reader :index
+
+    attr_reader :max_h
+
+    attr_reader :type_h
+
+    # --*--
+
+    blank_rx = Table::Cels::BLANK.rx
+    unstylize = Headless::CLI::Pen::FUN.unstylize
+    start_type = Table::Cels::INTEGER
+    float_detail_rx = Table::Cel::FLOAT_DETAIL_RX
+
+    define_method :see do |cel_x|  # `cel_x` must be ::String or nil
+      if ! cel_x.nil?
+        ::String === cel_x or raise ::ArgumentError, "table cels *must* #{
+          }be nil or string for reasons - #{ cel_x.class }"
+        @num_non_nil_seen += 1
+        raw = unstylize[ cel_x ]
+        @max_h[:full] = raw.length if raw.length > @max_h[:full]
+        if blank_rx =~ raw
+          @type_h[:blank] += 1
+        else
+          type = start_type
+          type = type.ancestor until type.match? raw  # ballzy
+          @type_h[ type.symbol ] += 1
+          if :float == type.symbol
+            md = float_detail_rx.match raw
+            @max_h[:int_part] = md[1].length if md[1].length > @max_h[:int_part]
+            @max_h[:frac_prt] = md[2].length if md[2].length > @max_h[:frac_prt]
+          end
+        end
+      end
+    end
+
+  protected
+
+    def initialize idx
+      @num_non_nil_seen = 0
+      @index = idx
+      @max_h, @type_h = 2.times.map { ::Hash.new { |h, k| h[k] = 0 } }
+      # `max_h` -  max width seen in this column for this kind of thing
+      # `type_h` - number of each type of thing seen in this column
+    end
+  end
+
+  class Table::Field
+
+    attr_reader :is_align_left
+
+    def max_width k
+      @stats.max_h[ k ] if @stats.max_h.key? k
+    end
+
+    def render str
+      @render[ str ]
+    end
+
+  protected
+
+    def initialize index, stats
+      @index = index
+      mode = stats.type_h.reduce( [ :string, 0 ] ) do |m, pair|
+        pair.last > m.last ? pair : m
+      end.first
+      @cel = Table::Cels.const_fetch mode
+      @stats = stats
+      @is_align_left = :left == @cel.align
+      @render = @cel.render[ self ]
+    end
+  end
+
+  class Table::Field::Conduit
+    attr_accessor :style  # a function
   end
 end
-

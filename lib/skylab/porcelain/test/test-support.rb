@@ -1,6 +1,5 @@
 require_relative '../core'
 require 'skylab/test-support/core'
-require 'skylab/headless/core' # just MUSTACHE_RX
 
 module Skylab::Porcelain::TestSupport
   ::Skylab::TestSupport::Regret[ self ]

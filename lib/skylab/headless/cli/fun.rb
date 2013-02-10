@@ -2,6 +2,45 @@ module Skylab::Headless
 
   module CLI
 
+    o = { }
+
+    o[:parse_styles] = -> do
+      # Parse a string with ascii styles into an S-expression.
+
+      sexp = Headless::Services::CodeMolester::Sexp
+
+      rx = /\A (?<string>[^\e]+)?  \e\[
+        (?<digits> \d+  (?: ; \d+ )* )  m  (?<rest> .*) \z/x
+
+      -> str do
+        res = nil
+        loop do
+          md = rx.match str
+          md or break
+          res ||= [ ]
+          res << sexp[:string, md[:string]] if md[:string]
+          res << sexp[:style, * md[:digits].split( ';' ).map(& :to_i )]
+          str = md[:rest]
+        end
+        if res && str.length.nonzero?
+          res << sexp[:string, str]
+        end
+        res
+      end
+    end.call
+
+    o[:unparse_styles] = -> do
+      h = {
+        string: -> sexp { sexp[1] },
+        style: -> sexp {  "\e[#{ sexp[1..-1].join ';' }m" }
+      }
+      -> sexp do
+        sexp.reduce [] do |m, sxp|
+          m << h.fetch( sxp[0] ).call( sxp )
+        end.join ''
+      end
+    end.call
+
     left_peeker_hack = -> summary_width do     # i'm sorry -- there was no
       max = summary_width - 1                  # other way
       sdone, ldone = {}, {}
@@ -24,8 +63,6 @@ module Skylab::Headless
         nil
       end
     end
-
-    o = { }
 
     # Find the width of the widest content that will go in column A
     # in the help screen of this `option_parser`

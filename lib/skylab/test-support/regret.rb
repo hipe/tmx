@@ -72,7 +72,14 @@ module ::Skylab::TestSupport
     # this phase, this is just a proof of concept geared around duplicating
     # and DRY-ing up what's happening in the tests now.
     #
-    def _init_regret! caller_str, parent_anchor_module = nil
+
+
+    spec_tail = "_spec#{ Autoloader::EXTNAME }"
+    spec_tail_len = spec_tail.length
+    spec_rx = %r| \A  (?<dir>.+[^/])  /
+                      (?<stem>[^/]+) #{ ::Regexp.escape spec_tail } \z |x
+
+    define_method :_init_regret! do |caller_str, parent_anchor_module=nil|
       # *note*: We do *not* include the parent_anchor_module itself
       # into this client anchor_module.  If you do, with our chosen naming
       # convention it will have the effect of having the test-support
@@ -104,10 +111,24 @@ module ::Skylab::TestSupport
 
       -> do
         # experimental filesystem architecture (merged trees)
-        _autoloader_init caller_str
-        if 'test-support' == dir_pathname.basename.to_s
-          self.dir_pathname = dir_pathname.join('..')
-          # life is better without test-support folders
+        is_normal = true
+        if parent_anchor_module   # here have a hack so that instead of
+          # it needing to live in foo/test-support.rb it can be in foo_spec.rb
+          md = Headless::FUN.call_frame_rx.match caller_str
+          if spec_tail == md[:path][ - spec_tail_len, spec_tail_len ]
+            is_normal = false
+            stem = spec_rx.match( md[:path] )[:stem]
+            self.dir_pathname = parent_anchor_module.dir_pathname.join stem
+            _autoloader_init nil
+          end
+        end
+        if is_normal
+          _autoloader_init caller_str
+          if 'test-support' == dir_pathname.basename.to_s  # here have a hack
+            # so that when it *is* is 'test-support' we "correct" the path
+            # (life is better *without* test-support folders trust me!)
+            self.dir_pathname = dir_pathname.join('..')
+          end
         end
       end.call
       const_set :CONSTANTS, -> do

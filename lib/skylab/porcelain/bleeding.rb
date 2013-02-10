@@ -1,6 +1,5 @@
 require_relative 'core'
 require 'skylab/headless/core' # here til  all.rb is away, Headless::NLP::EN::M.
-require 'skylab/pub-sub/core'
 require 'optparse'
 
 module Skylab::Porcelain::Bleeding

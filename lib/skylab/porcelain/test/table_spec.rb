@@ -1,23 +1,23 @@
 require File.expand_path('../test-support', __FILE__)
-require 'stringio'  # #todo - wat is table's problem!?
 
 module Skylab::Porcelain::TestSupport::Table
-  @dir_path = ::Skylab::Porcelain::TestSupport.dir_pathname.join 'table_spec'
-
   ::Skylab::Porcelain::TestSupport[ Table_TestSupport = self ]
 
   include CONSTANTS
 
+  Table = Porcelain::Table  # (below here please don't say the p word any more)
+
   extend TestSupport::Quickie
 
-  describe "#{ Porcelain::Table } (the RenderTable i.m)" do
 
-    include Porcelain::Table::RenderTable
+  describe "#{ Table } (the RenderTable i.m)" do
+
+    include CONSTANTS  # so we can say h.l e.g in i.m
 
     # --*--
 
     def outstream
-      @outstream ||= ::StringIO.new
+      @outstream ||= Headless::Services::StringIO.new
     end
 
     def outstr
@@ -25,12 +25,18 @@ module Skylab::Porcelain::TestSupport::Table
       @outstream.read
     end
 
+    def render_table *a, &b  # we seem to like to change the interface a lot
+      Table.render( *a, &b )
+    end
+
     # --*--
 
     it "render_table( [] ){ .. } - renders the empty table" do
       a = [ ]
       res = render_table [ ] do |o|
-        o.on_all { |e| a << "#{ e }" }
+        o.on_text do |e|
+          a << "#{ e.text }"
+        end
       end
       a.join.should eql( "(empty)" )
       res.should eql( nil )
@@ -62,8 +68,8 @@ module Skylab::Porcelain::TestSupport::Table
     it "options via the proxy knob thing - works" do
       render_table [['a','b'], ['c','dd']] do |o|
         o.head = '<<' ; o.tail = '>>' ; o.separator = ' | '
-        o.on_all do |e|
-          outstream.puts e
+        o.on_text do |e|
+          outstream.puts e.text
         end
       end
 
@@ -134,7 +140,7 @@ module Skylab::Porcelain::TestSupport::Table
       end
     end
 
-    it "input data has ascii escape sequences - widths still work (inorite)" do
+    it "optionally format input dynamically with e.g. ascii escape sequences" do
 
       row_enum = [
         [[:header, 'name'], 'hipe'],
@@ -144,9 +150,9 @@ module Skylab::Porcelain::TestSupport::Table
 
       a = []
       render_table row_enum, separator: "\t" do |o|
-        o[:header].format(& Porcelain::Bleeding::Styles.method( :hdr ))
+        o.field!( :header ).style = Headless::CLI::Pen::MINIMAL.method(:hdr)
         o.on_row do |e|
-          a << Headless::CLI::Pen::FUN.unstylize[ e.to_s ]
+          a << Headless::CLI::Pen::FUN.unstylize[ e.text ]
         end
       end
       lengths = a.map { |s| s.match(/^[^\t]*/)[0].length }

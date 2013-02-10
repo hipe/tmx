@@ -83,6 +83,7 @@ module Skylab::Treemap
     end
 
     def desc_lines  # compat h.l to show in its help screens
+      @sections ||= nil  # etc
       y = [ ]
       a = @adapter_a.map(& :slug )
       y << "there exist#{ s a, :_s } #{ an slug, a }`#{ slug }` #{
