@@ -1,16 +1,21 @@
-module Skylab::Porcelain
+module Skylab::Headless::CLI::Table
 
-  module Table
-
+    # (emigrated from porcelain, one of its last remaining useful nerks)
     # a rewrite of a table renderer that, as an excercise:
     #   + is purely event-driven
     #   + does some clever bs with type inference and alignment
-
     # issues / wishlist:
     #
     #   * left/right alignment config options
     #   + TODO rename to Auto somewhere..
 
+  include ::Skylab
+  Headless = ::Skylab::Headless
+  MetaHell = ::Skylab::MetaHell
+  PubSub = Headless::Services::PubSub
+  Table = self  # partly b.c PubSub is not part of headless proper
+
+  module Table
 
     conduit_and_result = -> param_h, blk do
       conduit = Conduit.new ; res = nil

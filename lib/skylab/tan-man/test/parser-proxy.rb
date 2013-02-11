@@ -1,4 +1,5 @@
 module Skylab::TanMan
+
   class TestSupport::ParserProxy
     # the point of this (somewhat experimentally) is to see if we can have
     # a 'pure' parser thing that is divorced from our client controller

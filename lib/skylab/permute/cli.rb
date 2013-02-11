@@ -1,7 +1,7 @@
 require_relative 'core'
 
 module Skylab::Permute
-  class CLI < ::Skylab::Porcelain::Bleeding::Runtime
+  class CLI < Bleeding::Runtime
 
     desc "minimal permutations generator."
 
@@ -29,8 +29,8 @@ module Skylab::Permute
 
 
   class CLI::Action
-    extend ::Skylab::Porcelain::Bleeding::Action
-    extend ::Skylab::PubSub::Emitter
+    extend Bleeding::Action
+    extend PubSub::Emitter
     emits syntax_error: :info
     def self.build runtime
       action = new
@@ -138,7 +138,7 @@ module Skylab::Permute
         o.on_header { |e| rows.push( e.payload.map { |_, s| hdr s } ) }
         o.on_row { |e| rows.push( e.payload.map { |_, s| s } ) }
         o.on_end do
-          Porcelain::Table.render rows do |oo|
+          Headless::CLI::Table.render rows do |oo|
             oo.on_info { |e| emit :info, e.text }
             oo.on_row  { |e| emit :payload, e.text }
           end

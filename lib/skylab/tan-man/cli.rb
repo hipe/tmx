@@ -61,7 +61,7 @@ module Skylab::TanMan
         table.push [ [:header, k], e.first.message ]
         table.concat( e[1..-1].map{ |x| [nil, x.message] } )
       end
-      Porcelain::Table.render table, separator: '  ' do |o|
+      Headless::CLI::Table.render table, separator: '  ' do |o|
         o.field!( :header ).style = method( :hdr )
         o.on_row  { |e| emit :payload, e.text }
         o.on_info { |e| emit :info,    e.text }  # e.g 0 rows
@@ -133,7 +133,7 @@ module Skylab::TanMan
       result = nil # not false - we never do convention [#hl-109] invite
       begin
         table = api_invoke( param_h ) or break
-        Porcelain::Table.render table, separator: '  ' do |o|
+        Headless::CLI::Table.render table, separator: '  ' do |o|
           o.field!( :resource_label ).style = -> x { "(resource: #{ x })" }
           o.on_empty do |e|
             e.touch!

@@ -7,7 +7,7 @@ module Skylab::TanMan
     include Core::Client::InstanceMethods      # per the pattern
 
 
-    emits Porcelain::Bleeding::EVENT_GRAPH     # b/c granulated UI events
+    emits Bleeding::EVENT_GRAPH                # b/c granulated UI events
                                                # note this gets merged with
                                                # 'parent' event graph above
 

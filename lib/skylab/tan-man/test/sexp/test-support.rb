@@ -5,7 +5,7 @@ module Skylab::TanMan::TestSupport::Sexp
 
   module CONSTANTS
     Headless     = ::Skylab::Headless
-    TreetopTools = ::Skylab::TreetopTools
+    TreetopTools = Headless::Services::TreetopTools
   end
 
   include CONSTANTS

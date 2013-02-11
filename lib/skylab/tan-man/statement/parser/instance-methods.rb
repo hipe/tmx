@@ -23,7 +23,7 @@ module Skylab::TanMan
         end
       end
 
-      TreetopTools::Parser::Load.new( self,
+      Headless::Services::TreetopTools::Parser::Load.new( self,
         -> o do
           o.force_overwrite! if rebuild_tell_grammar
           o.generated_grammar_dir '../../../tmp'

@@ -1,6 +1,7 @@
 module Skylab::TanMan
 
-  class Models::Config::Resource < CodeMolester::Config::File
+  class Models::Config::Resource <
+    Headless::Services::CodeMolester::Config::File
 
                                   # we've gotta take responsibility for this:
                                   # to be absolutely insane, we want to see if

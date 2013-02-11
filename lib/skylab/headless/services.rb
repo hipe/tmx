@@ -4,7 +4,8 @@ module Skylab::Headless
     h = { }
     define_singleton_method( :o ) { |k, f| h[k] = f }
 
-    o :CodeMolester , -> { require 'skylab/code-molester/core' ; ::Skylab::CodeMolester }
+    o :CodeMolester , -> { require 'skylab/code-molester/core'
+                                                  ::Skylab::CodeMolester }
     o :File         , -> { require_relative 'services/file/core' }
     o :FileUtils    , -> { require 'fileutils'  ; ::FileUtils }
     o :Open3        , -> { require 'open3'      ; ::Open3 }
@@ -16,6 +17,8 @@ module Skylab::Headless
     o :Shellwords   , -> { require 'shellwords' ; ::Shellwords }
     o :StringIO     , -> { require 'stringio'   ; ::StringIO }
     o :StringScanner, -> { require 'strscan'    ; ::StringScanner }
+    o :TreetopTools , -> { require 'skylab/treetop-tools/core'
+                                                  ::Skylab::TreetopTools }
 
     class << self
       alias_method :svcs_original_const_missing, :const_missing

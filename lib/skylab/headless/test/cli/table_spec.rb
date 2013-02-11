@@ -1,11 +1,11 @@
-require File.expand_path('../test-support', __FILE__)
+require_relative 'test-support'
 
-module Skylab::Porcelain::TestSupport::Table
-  ::Skylab::Porcelain::TestSupport[ Table_TestSupport = self ]
+module Skylab::Headless::TestSupport::CLI::Table
+  ::Skylab::Headless::TestSupport::CLI[ Table_TestSupport = self ]
 
   include CONSTANTS
 
-  Table = Porcelain::Table  # (below here please don't say the p word any more)
+  Table = Headless::CLI::Table
 
   extend TestSupport::Quickie
 

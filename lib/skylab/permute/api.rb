@@ -4,7 +4,7 @@ module Skylab::Permute
     end
   end
   class API::Action
-    extend Skylab::PubSub::Emitter
+    extend PubSub::Emitter
   end
   class Permuterator < Enumerator
     def initialize sets

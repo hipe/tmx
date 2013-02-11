@@ -19,7 +19,7 @@ module Skylab::TanMan
         end
       end
 
-      ::Skylab::TreetopTools::Parser::Load.new( self,
+      Headless::Services::TreetopTools::Parser::Load.new( self,
         ->(o) do
           force_overwrite? and o.force_overwrite!
           o.generated_grammar_dir generated_grammar_dir

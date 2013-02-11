@@ -4,7 +4,6 @@ module Skylab::TanMan
     # forward-declaration for this class-as-namespace #pattern [#sl-109]
   end
 
-
   module CLI::Action::ModuleMethods
     include Headless::NLP::EN::API_Action_Inflection_Hack
     include Headless::CLI::Action::ModuleMethods
