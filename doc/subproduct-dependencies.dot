@@ -21,40 +21,86 @@ node [label="\N", style="filled", fillcolor="#b5d5fb", fontname="Futura", penwid
 #         not-finished : blue
 
 
-code [label="code molester" fillcolor="#79f233"]
-cov [label="cov tree" fillcolor="#79f233"]
-dependency [label=dependency fillcolor="#79f233"]
-face [label=face fillcolor="#79f233"]
-file [label="file metrics" fillcolor="#79f233"]
-file_2 [label="file services" fillcolor="#79f233"]
-git [label="git viz" fillcolor="#79f233"]
-guardfile [label=guardfile fillcolor="#79f233"]
+bleeding [label="bleeding" fillcolor="#b5d5fb"]
+bnf [label="bnf2treetop" fillcolor="#79f233"]
+code [label="code molester" fillcolor="#b5d5fb"]
+cov [label="cov tree" fillcolor="#b5d5fb"]
+css [label="css convert" fillcolor="#79f233"]
+dependency [label=dependency fillcolor="#b5d5fb"]
+face [label=face fillcolor="#dddddd"]
+file [label="file metrics" fillcolor="#999999"]
+flex [label="flex2treetop" fillcolor="#79f233"]
+git [label="git viz" fillcolor="#dddddd"]
+gsu [label="git stash untracked" fillcolor="#79f233"]
+guardfile [label=guardfile fillcolor="#dddddd"]
 headless [label=headless fillcolor="#79f233"]
+info [label="information\ntactics" fillcolor="#79f233"]
+legacy [label="legacy" fillcolor="#b5d5fb"]
 meta [label="meta hell" fillcolor="#79f233"]
-porcelain [label=porcelain fillcolor="#79f233"]
+mytree [label="my tree" fillcolor="#79f233"]
+permute [label="permute" fillcolor="#b5d5fb"]
+porcelain [label=porcelain fillcolor="#b5d5fb"]
 pub [label="pub sub" fillcolor="#79f233"]
-skylab [label="skylab" fillcolor="#79f233"]
+semantic [label="semantic" fillcolor="#79f233"]
 slake [label=slake fillcolor="#79f233"]
+snag [label="snag" fillcolor="#79f233"]
+tan [label="tan-man" fillcolor="#b5d5fb"]
 test [label="test support" fillcolor="#79f233"]
-tmx [label=tmx fillcolor="#79f233"]
-treemap [label=treemap]
-code -> headless
+tolerance [label="tolerance" fillcolor="#dddddd"]
+treemap [label="treemap" fillcolor="#b5d5fb"]
+treetop [label="treetop\ntools" fillcolor="#b5d5fb"]
+tmx [label=tmx fillcolor="#dddddd"]
+yacc [label="yacc2treetop" fillcolor="#79f233"]
 
+bleeding -> pub
+code -> headless
 code -> meta
 code -> pub
+cov -> headless
 cov -> meta
 cov -> porcelain
 cov -> pub
-cov -> guardfile
+css -> headless
+git -> meta
+gsu -> headless
+gsu -> meta
+guardfile -> tolerance
 dependency -> code
 dependency -> face
 dependency -> headless
 dependency -> porcelain
 dependency -> pub
 dependency -> slake
-headless -> file_2
+face -> meta
+file -> headless
+flex -> headless
+headless -> meta
+legacy -> headless
+legacy -> meta
+legacy -> porcelain
+mytree -> headless
+mytree -> info
+mytree -> meta
+permute -> bleeding
+permute -> headless
+permute -> pub
 porcelain -> headless
+porcelain -> meta
+porcelain -> pub
+pub -> semantic
+semantic -> meta
+slake -> meta
+snag -> legacy
+snag -> headless
+tan -> bleeding
+tan -> headless
+tan -> meta
+tan -> pub
 test -> headless
 test -> meta
+treemap -> headless
 treemap -> meta
+treemap -> porcelain
+treemap -> pub
+treetop -> headless
 }
