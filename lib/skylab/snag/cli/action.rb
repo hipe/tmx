@@ -129,7 +129,12 @@ module Skylab::Snag
     # --*--
 
     def parse argv                # compat all.rb [#sg-010]
-      [ self, :invoke, [ argv ] ] # [ client, action_ref, args ]
+
+      if is_leaf
+        [ @request_client, :dispatch, [ name.as_slug, * argv ] ]
+      else # is branch
+        [ self, :invoke, [ argv ] ] # [ client, action_ref, args ]
+      end
     end
 
   protected
@@ -211,7 +216,10 @@ module Skylab::Snag
     # this will experimentally backpedal over some of the box logic around
     # collapsing in order to pass-off the same behavior to legacy porcelain.
 
-    def self.collapse_action legacy_client
+    skip_h = {
+      :@downstream_action => true
+    }
+    define_singleton_method :legacy_client do
       # *EXPERIMENTAL*: make a dupe of box, collapse it
       box1 = legacy_client.actions_provider
       box2 = box1.class.allocate
@@ -224,9 +232,11 @@ module Skylab::Snag
           :@request_client => -> x { @request_client = x }   # yes
         }
         box1.instance_variables.each do |ivar| # what to do with *each* one?
-          h[ivar][ box1.instance_variable_get ivar ]
+          if ! skip_h[ ivar ]
+            h.fetch( ivar ).call box1.instance_variable_get( ivar )
+          end
         end
-        collapse! leaf_class
+        # collapse! leaf_class
       end
       box2
     end

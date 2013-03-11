@@ -7,7 +7,6 @@ module Skylab::MyTree
 
   Headless = ::Skylab::Headless
   InformationTactics = ::Skylab::InformationTactics
-  Inflection = ::Skylab::Autoloader::Inflection
   MetaHell = ::Skylab::MetaHell
   MyTree = self
 
@@ -15,5 +14,8 @@ module Skylab::MyTree
 
   module API
     extend MetaHell::Autoloader::Autovivifying::Recursive
+    module Actions
+      extend MetaHell::Boxxy
+    end
   end
 end

@@ -40,7 +40,7 @@ module Skylab::TanMan
     end
 
     def initialize request_client, &block
-      _headless_sub_client_init request_client
+      init_headless_sub_client request_client
       @num_resources_seen = 0
       block ||= -> y do
         seen = { }

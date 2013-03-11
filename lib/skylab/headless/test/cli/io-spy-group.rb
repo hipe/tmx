@@ -1,6 +1,8 @@
 module Skylab::Headless::TestSupport
 
-  class CLI::Streams_Spy < ::Struct.new :instream, :outstream, :errstream
+  # (see also the way more complicated ::Skylab::TestSupport::IO::Spy::Group)
+
+  class CLI::IO_Spy_Group < ::Struct.new :instream, :outstream, :errstream
                                   # (the SECOND you do anything funky, change
                                   # this to a class, you hear!?)
 
@@ -10,13 +12,17 @@ module Skylab::Headless::TestSupport
     end
 
     def debug! prepend=nil
+      @do_debug = true
       values.each do |v|
         v.debug!( prepend ) if v
       end
       nil
     end
 
+    attr_reader :do_debug        # just to see if you called `debug!`
+
     def initialize *three
+      @do_debug = nil
       three.length > 3 and raise ::ArgumentError, "it's three bro"
       1.upto( 3 ) do |len|        # (allow caller to pass intentional nils..)
         if three.length < len

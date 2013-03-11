@@ -110,7 +110,7 @@ module Skylab::Treemap
     end
 
     def adapter adapter, argv
-      kls = adapter.resolve_cli_action_class @name.to_slug, -> e do
+      kls = adapter.resolve_cli_action_class @name.as_slug, -> e do
         usage_and_invite e
       end
       if kls

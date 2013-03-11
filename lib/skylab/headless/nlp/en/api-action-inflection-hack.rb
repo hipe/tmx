@@ -19,8 +19,6 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
     @inflection ||= Inflection.new self
   end
 
-
-
   module Dupe                     # (apparently some mess of a dsl for deep-
                                   # duping)
 
@@ -55,8 +53,6 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
 
   end
 
-
-
   module Dupe::InstanceMethods
 
     def dupes *a
@@ -87,9 +83,8 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
     end
   end
 
-
-
   class Stems # this is the core of the hack
+
     extend Dupe
 
     rx = /([a-z])([A-Z])/
@@ -131,14 +126,26 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
       end
     end
 
-    def noun= mixed
+    def noun= x
       self.dupes |= [:noun] # duplicate this setting down to subclasses
-      mixed = NLP::EN::POS::Noun[ mixed ] if ! mixed.respond_to?( :plural )
-      @noun = mixed
+      use = if x.respond_to? :plural then x else
+        NLP::EN::POS::Noun[ x.to_s ]
+      end
+      @noun = use
+      x
     end
 
     define_method :verb do
       @verb ||= NLP::EN::POS::Verb[ humanize[ name_pieces.last ] ]
+    end
+
+    def verb= x
+      # note we don't bother with duping this down to subclasses!
+      use = if x.respond_to? :preterite then x else
+        NLP::EN::POS::Verb[ x ]
+      end
+      @verb = use
+      x
     end
 
   protected
@@ -154,8 +161,6 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
     end
   end
 
-
-
   class Inflect
     # for setting how to inflect things
     #
@@ -170,8 +175,6 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
 
     attr_writer :noun
   end
-
-
 
   class Inflected
     # for getting the inflected thing
@@ -189,8 +192,6 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
       @inflection = inflection
     end
   end
-
-
 
   class Inflection
     extend Dupe

@@ -1,10 +1,11 @@
 module Skylab::Headless
+
   module Services::Patch          # using the host system's `patch` utility,
                                   # apply a patch to a file or directory on the
                                   # filesystem given
                                   # a string that contains the patch data.
 
-    extend MetaHell::Autoloader::Autovivifying::Recursive
+    extend MAARS
 
 
     patch = -> patch_str, as, target_path, dry_run, verbose, info do

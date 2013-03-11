@@ -1,23 +1,35 @@
 require_relative '../core'
 
 require 'skylab/headless/test/test-support'
-require 'skylab/meta-hell/core'
-require 'skylab/test-support/core'
 
 module Skylab::MyTree::TestSupport
   ::Skylab::TestSupport::Regret[ self ]
 
 
+  class FUN # #abuse
+    expect_text = -> emission do
+      txt = emission.payload_x
+      ::String === txt or fail "expected text"
+      txt
+    end
+
+    define_singleton_method :expect_text do expect_text end
+  end
+
   module CONSTANTS
+    FUN = FUN
     Headless = ::Skylab::Headless
     MetaHell = ::Skylab::MetaHell
     MyTree = ::Skylab::MyTree
+    TestSupport = ::Skylab::TestSupport  # le balls
   end
 
   include CONSTANTS # so we can use them in the spec body
 
+  extend TestSupport::Quickie
 
   module InstanceMethods
+
     include CONSTANTS             # for immediately below, and others
 
     extend MetaHell::Let
@@ -29,37 +41,31 @@ module Skylab::MyTree::TestSupport
     end
 
     def invoke *argv
-      c = MyTree::CLI.new
-      c.send :program_name=, 'mt'
-      me = self
-      c.singleton_class.send :define_method, :build_io_adapter do
-        ioa = Headless::TestSupport::Client_Spy::CLI.new c.build_pen
-        ioa.debug = -> { me.debug }
-        ioa
+      me = self ; ioa = nil
+      client = MyTree::CLI.new.instance_exec do
+        @program_name = 'mt'
+        @io_adapter = Headless::TestSupport::IO_Adapter_Spy.new build_pen
+        @io_adapter.debug = -> { me.debug }
+        ioa = @io_adapter
+        self
       end
-      response = c.invoke argv
-      @queue = c.send( :io_adapter ).emitted
-      nil
+      exit_result = client.invoke argv
+      @emission_queue = ioa.delete_emission_a
+      exit_result
     end
 
-    def line
-      o = shift
-      if o
-        o.string
+    -> do  # `line`
+
+      unstylize = Headless::CLI::Pen::FUN.unstylize
+
+      expect_text = FUN.expect_text
+
+      define_method :line do
+        e = @emission_queue.shift
+        if e
+          unstylize[ expect_text[ e ] ]
+        end
       end
-    end
-
-    attr_reader :queue
-
-    e = ::Struct.new( :type, :string ).new       # flyweight danger stupid
-
-    define_method :shift do
-      e = @queue.shift
-      if e
-        e[:stream_name] = e.stream_name
-        e[:string] = Headless::CLI::Pen::FUN.unstylize[ e.string ] || e.string
-        e
-      end
-    end
+    end.call
   end
 end

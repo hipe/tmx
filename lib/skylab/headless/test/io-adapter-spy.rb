@@ -1,5 +1,6 @@
 module Skylab::Headless::TestSupport
-  class IO_Adapter_Spy < TestSupport::IO::Spy
+
+  class IO_Adapter_Spy < Services::PubSub_TestSupport::Emit_Spy
 
     # Used (at the time of this writing ouside of this product) for doing
     # emit-spy-style testing of our all-important IO::Adapter, which is like
@@ -10,7 +11,7 @@ module Skylab::Headless::TestSupport
   protected
 
     def initialize pen=Headless::Pen::MINIMAL
-      super()
+      super(  )
       @pen = pen
     end
   end

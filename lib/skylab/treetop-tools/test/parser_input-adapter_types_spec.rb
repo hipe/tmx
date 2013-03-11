@@ -1,6 +1,9 @@
 require_relative 'test-support'
 
-describe "#{::Skylab::TreetopTools::Parser::InputAdapter::Types}" do
+# Quickie!?
+
+describe "#{ ::Skylab::TreetopTools::Parser::InputAdapter::Types }" do
+
   self::TTT = ::Skylab::TreetopTools
 
   it "does semantic digraph thing" do

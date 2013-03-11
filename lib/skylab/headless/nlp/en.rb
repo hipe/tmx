@@ -1,5 +1,7 @@
 module Skylab::Headless
+
   module NLP
+
     module EN
       # forward declarations should be flattened as needed
     end

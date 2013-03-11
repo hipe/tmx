@@ -24,7 +24,7 @@ module Skylab::GitStashUntracked
 
     def _gsu_sub_client_init request_client
       @emit = nil
-      _headless_sub_client_init request_client
+      init_headless_sub_client request_client
       nil
     end
 

@@ -1,6 +1,6 @@
 module Skylab::MyTree
 
-  class API::Actions::Tree::Tree
+  class API::Actions::Tree::Tree  # will likely be moved [#mt-004]
     # extend Headless::Parameter::Definer
 
     include Headless::Parameter::Controller::InstanceMethods
@@ -40,18 +40,23 @@ module Skylab::MyTree
 
   protected
 
-    def initialize request_client, verbose
+    # (note: `do_verbose_lines` is so verbose we recommend you only use
+    # it when you are troubleshooting the flushing behavior. it's neat
+    # to see, once.)
+
+    def initialize request_client, do_verbose_lines
+      init_headless_sub_client request_client
       @current = []
       @glyph_set = Headless::CLI::Tree::Glyph::Sets::WIDE
       @matrix = []
-      @verbose = verbose
-      _headless_sub_client_init request_client
+      @do_verbose_lines = do_verbose_lines
     end
 
     def row seen, extra=nil
-      @verbose[:lines] and
-        emit :info, "(adding row: #{ seen.inspect }#{ '..' if extra })"
       if seen
+        if @do_verbose_lines
+          emit :info, "(adding row: #{ seen.inspect }#{ '..' if extra })"
+        end
         minimal = ::Array.new seen.length
         seen.empty? or minimal[-1] = [seen.last, extra].compact.join(' ')
         @matrix.push minimal
@@ -85,7 +90,7 @@ module Skylab::MyTree
 
     Headless::CLI::Tree::Glyphs.each do |glyph|
       # blank crook pipe separator tee
-      n = glyph.normalized_local_name
+      n = glyph.normalized_glyph_name
       define_method( n ) { @glyph_set[ n ] }
     end
   end

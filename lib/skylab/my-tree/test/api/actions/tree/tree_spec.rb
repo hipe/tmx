@@ -2,7 +2,9 @@
 
 require_relative 'tree/test-support'
 
-describe ::Skylab::MyTree::API::Actions::Tree::Tree do
+module ::Skylab::MyTree::TestSupport::API::Actions::Tree::Tree  # (indentation hiccup sorry)
+  describe ::Skylab::MyTree::API::Actions::Tree::Tree do  # will move with [#mt-004]
+
   extend ::Skylab::MyTree::TestSupport::API::Actions::Tree::Tree
 
   it "this magic example that brought it all home (the pink paper sessions)" do
@@ -91,3 +93,4 @@ describe ::Skylab::MyTree::API::Actions::Tree::Tree do
 
   end
 end
+end  # hiccup sorry

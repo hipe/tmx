@@ -105,10 +105,26 @@ module Skylab::Headless
       nil
     end
 
+    def append_syntax str
+      action_class_in_progress!.append_syntax str
+      nil
+    end
+
     alias_method :box_desc, :desc  # when you want to describe the box..
 
-    def desc first, *rest         # [#hl-033]
-      action_class_in_progress!.desc first, *rest
+    def desc *a, &b                # [#hl-033] (general tracking of `desc`)
+      if ! b || a.length.nonzero?
+        # for anything other than the block form, simply propagate.
+        # (it would typically be one descrption string as the lone item in `a`)
+        action_class_in_progress!.desc( *a, &b )
+      else
+        # the block form is more complicated - evaluate the desc in the context
+        # of the parent object, b.c that is where you would have defiend helpers
+        action_class_in_progress!.desc do |o|
+          @request_client.instance_exec o, &b
+          nil
+        end
+      end
       nil
     end
 
@@ -124,12 +140,16 @@ module Skylab::Headless
       nil
     end
 
-    attr_accessor :last_caller
-
     cli_box_dsl_leaf_action_superclass = ::Object
 
     define_method :_cli_box_dsl_leaf_action_superclass do # special needs
       cli_box_dsl_leaf_action_superclass
+    end
+
+    def cli_box_dsl_leaf_action_superclass klass
+      define_singleton_method :_cli_box_dsl_leaf_action_superclass do
+        klass
+      end
     end
 
     def method_added meth         # #doc-point [#hl-040]
@@ -145,6 +165,11 @@ module Skylab::Headless
       action_class_in_progress!.option_parser(& block)
       nil
     end
+
+    def option_parser_class x
+      action_class_in_progress!.option_parser_class x
+      nil
+    end
   end
 
   module CLI::Box::DSL::InstanceMethods
@@ -155,124 +180,61 @@ module Skylab::Headless
 
     def initialize request_client
       super request_client
-      @queue = [ ]                # usu. lazy vivified in `invoke`, not so here
+      _headless_cli_box_dsl_init
     end
 
-    def argument_syntax           # "hybridization"
-      if is_collapsed
-        argument_syntax_for_method @box_dsl_collapsed_to
-      else
-        argument_syntax_for_method :dispatch
-      end
-    end
+    alias_method :init_headless_cli_box_dsl, :initialize
 
-    attr_reader :box_dsl_collapsed_to
-
-    alias_method :is_collapsed, :box_dsl_collapsed_to # it *is* is_collapsed IFF..
-
-    def build_option_parser       # popular default, [#hl-037]
-      o = create_box_option_parser
-      o.on '-h', '--help [<sub-action>]',
-        'this screen [or sub-action help]' do |v|
-        box_enqueue_help v
-        true
-      end
-      option_is_visible_in_syntax_string[ o.top.list.last.object_id ] = false
-      o
-    end
-
-    def create_option_parser
-      Headless::Services::OptionParser.new
-    end
-
-    # these two are "hard aliases" and not "soft" ones so if you need to
-    # customize how the o.p is created you have to override them individually.
-
-    alias_method :create_box_option_parser, :create_option_parser
-
-    alias_method :create_leaf_option_parser, :create_option_parser
-
-    # this is the core of this whole dsl hack.
-
-    frame_struct = ::Struct.new :is_leaf, :option_parser
-
-    define_method :collapse! do |action_ref|
-      res = nil
-      begin
-        klass = if ::Class === action_ref then action_ref else
-          fetch action_ref
-        end
-        klass or break( res = klass )
-        o = klass.new self
-        @box_dsl_collapsed_to = o.normalized_local_action_name
-        x = ( @prev_frame ||= frame_struct.new ) # really ask for it
-        x.is_leaf = true ; @is_leaf = o.is_leaf
-        x.option_parser = option_parser_ivar ; @option_parser = o.option_parser
-        fail 'sanity' if :dispatch != @queue.first
-        @queue[0] = o.leaf_method_name
-                                  # put the method name of the particular
-                                  # action on the queue -- its placement is
-                                  # sketchy
-        res = true
-      end while nil
-      res
-    end
-
-    def uncollapse! normalized_leaf_name
-      fail 'sanity' if @box_dsl_collapsed_to != normalized_leaf_name
-      o = @prev_frame
-      @is_leaf = o.is_leaf ; o.is_leaf = nil
-      @option_parser = o.option_parser ; o.option_parser = nil
-      @box_dsl_collapsed_to = nil
+    def _headless_cli_box_dsl_init  # revealed for hybrids w/ client
+      @downstream_action ||= nil
+      @queue ||= [ ]              # usu. lazy vivified in `invoke`, not so here
       nil
     end
 
-    def default_action
-      @default_action ||= :dispatch            # compare to box above
-    end
+    #         ~ dispatch and friends (pre-order-ish) ~
+
+    # this is the core of this whole dsl hack. because we are DSL we override
+    # Box's straightforward implementation with these shenanigans (compare!)
+    # this method is the entrypoint for the collection of methods in this
+    # file that rewrite box i.m's `action` and `args` (the names)
 
     alias_method :cli_box_dsl_original_dispatch, :dispatch
 
-                                  # because we are DSL we override Box's
-                                  # straightforward implementation with these
-                                  # shenanigans (compare!)
-                                  # this method is the entrypoint for the
-                                  # collection of methods in this file that
-                                  # rewrite box i.m's
-                                  # `action` and `args` (the names)
-    def dispatch action=nil, *args # <-- are cosmetic here, careful
-      if action
-        res = collapse! action
-        res &&= invoke args
-      else
-        res = cli_box_dsl_original_dispatch
+    frame_struct = ::Struct.new :is_leaf, :option_parser
+
+    define_method :dispatch do |action=nil, *args|  # **NOTE** params cosmetic!
+      action_ref = action  # clean that name up right away
+      if ! action_ref then cli_box_dsl_original_dispatch else
+        klass = if ::Class === action_ref
+          fail "where?"  # #todo
+        else
+          fetch action_ref
+        end
+        if ! klass then klass else
+          live_action = klass.new self
+          if live_action.is_branch  # why deny the child its own autonomy
+            live_action.invoke args
+          else
+            @downstream_action = live_action
+            x = ( @prev_frame ||= frame_struct.new ) # really ask for it
+            x.is_leaf = true ; @is_leaf = live_action.is_leaf
+            x.option_parser = option_parser_ivar
+            @option_parser = live_action.option_parser
+            if @queue.length.nonzero?
+              fail 'sanity' if :dispatch != @queue[0]
+            end
+            @queue[0] = live_action.leaf_method_name
+                                      # put the method name of the particular
+                                      # action on the queue -- its placement is
+                                      # sketchy
+            invoke args
+          end
+        end
       end
-      res
     end
 
-    def enqueue_help              # fragile and tricky: you are e.g. the root
-                                  # modality client.  you received an
-                                  # invoke ['foo', '-h'] which then called
-                                  # dipatch, who then enqueued the method
-                                  # name :foo.  Since we don't actually use
-                                  # the method to process help (for that is
-                                  # what we are now doing, we 1) remove that
-                                  # method from the queue and then 2) add our
-                                  # block to the queue that processes the help.
-      @queue.first == @box_dsl_collapsed_to or fail( 'sanity' )
-      @queue.shift                 # (done processing the name, shift it off.)
-      box_enqueue_help @box_dsl_collapsed_to
-      @box_dsl_collapsed_to = nil
-      nil
-    end
-
-    def invite_line z=nil         # hybridization hack
-      if is_collapsed
-        render_invite_line "#{ normalized_invocation_string false } -h #{
-          }#{ @box_dsl_collapsed_to }", z
-      else
-        super
-      end
+    def is_collapsed
+      @downstream_action
     end
                                   # please watch carefully: we 1) out of the box
                                   # identify as being a branch and 2) make this
@@ -288,15 +250,106 @@ module Skylab::Headless
                                   # vars and 2. an unitted var is nil is
                                   # false-ish.)
 
+
+                                  # undoes the collapsing k.i.w.f oh lord
+    def uncollapse! normalized_leaf_name  # called from children corroborating
+      if @downstream_action.normalized_local_action_name !=
+          normalized_leaf_name then
+        fail 'sanity'
+      end
+      o = @prev_frame
+      @is_leaf = o.is_leaf ; o.is_leaf = nil
+      @option_parser = o.option_parser ; o.option_parser = nil
+      @downstream_action = nil
+      nil
+    end
+
+    def default_action                         # (called by `invoke`)
+      @default_action ||= :dispatch            # compare to box above
+    end
+
+    #         ~  hacks to the components (in display- then pre-order) ~
+
                                   # our invocation string is dynamic based
                                   # on whether we have yet mutated or not!
-                                  # (and/or rolled back some of
+
     def normalized_invocation_string as_collapsed=true
-      a = [ super(  ) ]  # the mutation)
+      a = [ super(  ) ]
       if is_collapsed && as_collapsed
-        a << @box_dsl_collapsed_to
+        a << @downstream_action.name.as_slug
       end
       a.join ' '
+    end
+
+    def build_option_parser       # popular default, [#hl-037]
+      o = create_box_option_parser
+      sw = o.define '-h', '--help [<sub-action>]',
+        'this screen [or sub-action help]' do |v|
+        box_enqueue_help v
+        true
+      end
+      option_is_visible_in_syntax_string[ sw.object_id ] = false
+      o
+    end
+
+    def create_option_parser
+      op = Headless::Services::OptionParser.new
+      op.base.long.clear  # never use builtin 'officious' -v, -h  # [#059]
+      op
+    end
+
+    # these two are "hard aliases" and not "soft" ones so if you need to
+    # customize how the o.p is created you have to override them individually.
+
+    alias_method :create_box_option_parser, :create_option_parser
+
+    alias_method :create_leaf_option_parser, :create_option_parser
+      # this is for a box creating its child leaf o.p
+
+
+    def argument_syntax           # "hybridization"
+      if is_collapsed
+        argument_syntax_for_method(
+          @downstream_action.normalized_local_action_name )
+      else
+        argument_syntax_for_method :dispatch
+      end
+    end
+
+    def render_argument_syntax syn, em_range=nil
+      if @downstream_action && @downstream_action.class.append_syntax_a
+        "#{ super } #{ @downstream_action.class.append_syntax_a * ' ' }"
+      else
+        super
+      end
+    end
+
+    def invite_line z=nil         # hybridization hack
+      if is_collapsed
+        render_invite_line "#{ normalized_invocation_string false } -h #{
+          }#{ @downstream_action.name.as_slug }", z
+      else
+        super
+      end
+    end
+
+    # --*--
+
+    def enqueue_help              # fragile and tricky: you are e.g. the root
+                                  # modality client. you received an
+                                  # invoke ['foo', '-h'] which then called
+                                  # dipatch, who then enqueued the method
+                                  # name :foo.  Since we don't actually use
+                                  # the method to process help (for that is
+                                  # what we are now doing, we 1) remove that
+                                  # method from the queue and then 2) add our
+                                  # block to the queue that processes the help.
+      norm_name = @downstream_action.normalized_local_action_name
+      @queue.first == norm_name or fail 'sanity'
+      @queue.shift                 # (done processing the name, shift it off.)
+      box_enqueue_help norm_name
+      @downstream_action = nil
+      nil
     end
 
     attr_reader :prev_frame
@@ -306,17 +359,25 @@ module Skylab::Headless
     include CLI::Action::ModuleMethods         # #reach-up!
 
     def build_option_parser &block # (This is the DSL block writer.)
-      raise ::ArgumentError.new( 'block required.' ) unless block
-      raise ::ArgumentError.new( 'bop must come before op' ) if
-        option_parser_blocks
+      raise ::ArgumentError, 'block required.' if ! block
+      raise ::ArgumentError, 'bop must come before op' if option_parser_blocks
       self.build_option_parser_ivar = block
       nil
     end
 
     attr_accessor :build_option_parser_ivar
+
+    def option_parser_class x
+      if build_option_parser_ivar
+        raise ::ArgumentError, "`b.o.p` and `o.p class` are mutex"
+      else
+        define_method :option_parser_class do x end
+      end
+    end
   end
 
   module CLI::Box::DSL::Leaf_InstanceMethods
+
     include CLI::Action::InstanceMethods # *not* box! this is crazier than we
                                   # want to be just yet. (leaf not branch here.)
 
@@ -352,10 +413,15 @@ module Skylab::Headless
     end
 
     def leaf_create_option_parser
-      # for custom overriding to e.g. use a custom class. it is so-named
-      # to make the code more traceable, because it is differently used
-      # than the other similarly-named method.  also we don't yet know
-      # if we will ever need both! (leaf/branch hybrid)
+      if option_parser_class
+        ref = option_parser_class
+        ref = ref.call if ref.respond_to? :call
+        ref.new
+      end
+    end
+
+    def option_parser_class
+      # hook for custom o.p class
     end
 
     def leaf_method_name

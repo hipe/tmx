@@ -1,7 +1,8 @@
 module Skylab::Headless
 
   module CLI
-    extend MetaHell::Autoloader::Autovivifying::Recursive
+
+    extend MAARS
 
     OPT_RX = /\A-/                # ( yes this is actually used elsewhere :D )
   end
@@ -19,7 +20,26 @@ module Skylab::Headless
   end
 
   module CLI::Action::ModuleMethods
+
     include Headless::Action::ModuleMethods
+
+    #         ~ option parser facility - module methods ~
+
+    def option_parser &block      # dsl-ish that just accrues these for you.
+      ( @option_parser_blocks ||= [ ] ).push block # turning it into an o.p.
+      nil                         # is *your* responsibility. depends on what
+    end                           # happens in your `build_option_parser` if any
+
+    attr_reader :option_parser_blocks  # nil when none yet added.
+
+    #         ~ argument syntax rendering - module methods ~
+
+    def append_syntax str  # for hacky custom syntaxes that you want to document
+      ( @append_syntax_a ||= [] ) << str
+      nil
+    end
+
+    attr_reader :append_syntax_a
 
     #         ~ `desc` facility - module methods ~
     #   (see explanation in the corresponding i.m section)
@@ -42,18 +62,10 @@ module Skylab::Headless
     end
 
     attr_reader :desc_blocks
-
-    #         ~ option parser facility - module methods ~
-
-    def option_parser &block      # dsl-ish that just accrues these for you.
-      ( @option_parser_blocks ||= [ ] ).push block # turning it into an o.p.
-      nil                         # is *your* responsibility. depends on what
-    end                           # happens in your `build_option_parser` if any
-
-    attr_reader :option_parser_blocks  # nil when none yet added.
   end
 
   module CLI::Action::InstanceMethods
+
     include Headless::Action::InstanceMethods
 
     def invoke argv
@@ -181,16 +193,16 @@ module Skylab::Headless
       true
     end
 
-    def help_screen y                          # (post-order for the big ones)
+    def help_screen y                          # (pre-order for the big ones)
       y << usage_line
       help_description y if desc_lines
       # (Find the narrowest we can make column A of all sections (including
       # any options) such that we accomodate the widest content there!)
       max_width = if ! @sections then 0 else
         @sections.reduce 0 do |memo, sect|
-          if sect.lines
+          if sect.lines.length.nonzero?
             memo = sect.lines.reduce memo do |m, row|
-              ( row.first && row.first.length > m ) ? row.first.length : m
+              ( row[1] && row[1].length > m ) ? row[1].length : m
             end
           end
           memo
@@ -223,7 +235,7 @@ module Skylab::Headless
       # (in the old days this was option_parser.to_s, which should still work.)
       y << ''                     # assumes there was previous above content!
       option_parser = option_documenter
-      does_have_summary = option_parser.top.list.detect do |x|
+      does_have_summary = option_parser.top.list.detect do |x|  # #[059] base?
         x.respond_to? :summarize
       end
       if does_have_summary
@@ -238,31 +250,30 @@ module Skylab::Headless
     def help_sections y, max_width
       od = option_documenter
       if od
-        ind, sw = od.summary_indent, od.summary_width
+        ind, sw = od.summary_indent, ( od.summary_width + 1 )  # dunno
       else
         ind, sw = '  ', max_width
       end
       fmt = "%-#{ sw }s"
+      h = {
+        line: -> x { y << x[1] },
+        item:  -> x do
+          if x[1]
+            if x[2]
+              y << "#{ ind }#{ h2( fmt % x[1] ) }#{ x[2] }"
+            else
+              y << "#{ ind }#{ h2 x[1] }"
+            end
+          else
+            y << "#{ ind }#{ fmt % '' }#{ x[2] }"
+          end
+        end
+      }
       @sections.each do |section|
         y << ''                     # we've been assuming there is content above
         y << "#{ hdr section.header }" if section.header
-        if section.lines
-          section.lines.each do |row|
-            if row.length.zero?
-              y << ''
-            else
-              cels = [ ]
-              if row.length == 1
-                cels << h2( row[0] ) if row[0]
-              else
-                cels << h2( fmt % ( row[0] || '' ) )
-                if row.length > 1
-                  cels.concat row[ 1..-1 ]
-                end
-              end
-              y << "#{ ind }#{ cels * ' ' }"
-            end
-          end
+        section.lines.each do |line|
+          h.fetch( line[0] )[ line ]
         end
       end
       nil
@@ -272,7 +283,7 @@ module Skylab::Headless
 
     def normalized_invocation_string  # since you are an action you can assume
       "#{ request_client.send :normalized_invocation_string }#{   # you have a
-        } #{ name.to_slug }"                                          # parent
+        } #{ name.as_slug }"                                          # parent
     end
 
     def help_yielder
@@ -293,7 +304,7 @@ module Skylab::Headless
       if desc_lines
         @desc_lines.first         # 1) use first desc line if you have that
       elsif option_parser
-        first = @option_parser.top.list.first
+        first = @option_parser.top.list.first  # NOTE not base()
         if ::String === first     # 2) else use o.p banner if that
           str = CLI::Pen::FUN.unstylize[ first ]
           str.gsub strip_description_label_rx, '' # (#hack!)
@@ -349,25 +360,26 @@ module Skylab::Headless
       end
     end
 
-    def build_desc_lines          # (this is where @sections is set too!)
-      ea = each_desc_line_raw
-      if ea
-        sections = parse_sections ea
-        with_header, no_header = sections.partition { |s| s.header }
-        @sections = with_header.length.zero? ? false : with_header
-        x = no_header.reduce [] do |m, sect|
-          m.concat sect.lines
+    def build_desc_lines          # this is where @sections is set too!
+      @sections = false           # just to be safe
+      lines = raw_desc_lines
+      if lines
+        sections = parse_sections lines
+        if sections.length.nonzero?
+          if ! sections[0].header
+            res = sections.shift.lines.map { |x| x[1] }  # always nonzero
+          end
+          if sections.length.nonzero?
+            @sections = sections
+          end
         end
-        x if x.length.nonzero?
-      else
-        @sections = false
-        nil
-      end
+      end                         # don't worry, `parse_sections` is infallible.
+      res
     end
 
-    def each_desc_line_raw
+    def raw_desc_lines
       if self.class.respond_to?( :desc_blocks ) and self.class.desc_blocks
-        ::Enumerator.new do |y|
+        Headless::Services::Enumerator::Lines::Producer.new do |y|
           self.class.desc_blocks.each do |blk|
             instance_exec y, &blk
           end
@@ -375,53 +387,98 @@ module Skylab::Headless
       end
     end
 
-    section_rx = /\A[^:]+:\z/  # the rx that shifts you into section state
-    section_filter = -> s { s.strip.split( /[[:space:]]+/, 2 ) }
+    parse_sections = -> do
 
-    normal_rx = /\A(?![[:space:]])/  # the rx that shift you out of section state
-    normal_filter = -> x { x }
+      # `parse_sections` - the rules are simple: a line that consists of one
+      # or more non-colons, and then terminated by a colon, that is a section
+      # header. That may be followed by an item line which is a line that:
+      # starts with one or more spaces, then any nonzero-length string
+      # without two contiguous spaces in it, then two or more spaces, then the
+      # first non-space and whatever comes after it. These two content-y parts
+      # that were matched make up the item-line's header and body.
+      # (Provisions may be made for an item-line either without a header or
+      # without body). An item-line may be followed by an item sub-line, which
+      # is any line immediately following an item-line or other sub-line that
+      # has more indent than that last item-line. This pattern is not recursive
+      # (there are no more levels of depth), and none of these need have
+      # consistent indentation; it is only that the sub-lines have more
+      # indentation than their host item line. Here is an e.g of the 4 kinds:
+      #
+      #    bleep bloop              # 1) normal line (pretend it has no indent)
+      #    ferpy derpy:             # 2) this is a section hdr b/c of the ':'
+      #      nerpulous  ferpulous   # 3) item line b.c space: nonzero, then >=2x
+      #      bleep blop  blaugh     # 3) "bleep blop" is header, rest is body
+      #        shim sham flam       # 4) item sub-line b.c more indent than 3
+      #      [<path> [..]]  bazzle  # 3) something like this was the insp.
+      #
+      # Tabs would be trivial to add support for but they make the regexen
+      # look really ugly so just don't use them. You just can't have them.
+      #
+      # This algorithm is infallbile and it cannot fail.
 
-    define_method :parse_sections do |ea|  # hack for pretty formatting
-      y = [] ; normal_shift = nil  # scope
-      rx = section_rx ; filter = normal_filter
-      shift = section_shift = -> line do
-        y << CLI::Desc_Sect.new( line )
-        rx = normal_rx
-        shift = normal_shift
-        filter = section_filter
+
+      state_h = { }  # das state machine
+
+      state = ::Struct.new :rx, :to
+
+      #         name               regex         which can be followed by..
+
+      state_h[ :initial ] = state[ nil,          [ :section, :desc ] ]
+      state_h[ :desc    ] = state[ //,           [ :section, :normal ] ]
+      state_h[ :normal  ] = state[ //,           [ :section, :normal ] ]
+      state_h[ :section ] = state[ /\A[^:]+:\z/, [ :item, :normal ] ]
+      state_h[ :item    ] = state[
+                         /\A(?<ind> +)(?<hdr>((?!  ).)+)(?: {2,}(?<bdy>.+))?\z/,
+                                        [ :subitem, :item, :section, :normal ] ]
+      state_h[ :subitem ] = state[ nil, # (<- guess what will happen here)
+                                        [ :subitem, :item, :section, :normal ] ]
+
+      module CLI::Desc
+        Section = ::Struct.new :header, :lines
       end
-      normal_shift = -> line do  # when in a section and you get a non-indented
-        if section_rx =~ line    # line, it is either normal or another sect
-          section_shift[ line ]
-        else
-          y << CLI::Desc_Sect.new( nil, [ line ] )
-          rx = section_rx
-          shift = section_shift
-          filter = normal_filter
+
+      item_rx_h = ::Hash.new { |h, k| h[k] = /\A {#{ k },}(.+)\z/ }  # cache rx
+
+      -> lines, sections do
+        stat = state_h[ :initial ]  # (var meaning change!!)
+        section = line = nil
+        push = -> { sections << ( section = CLI::Desc::Section.new nil, [] )  }
+        trigger_h = {
+          desc:    -> { push[] ; section.lines << [ :line, line ] },
+          section: -> { push[] ; section.header = line },
+          normal:  -> {          section.lines << [ :line, line ] },
+          item:    -> {          section.lines << [ :item, * $~.captures[1..-1]]
+                                 state_h[:subitem].rx =  # *NOTE* not reentrant
+                                   item_rx_h[ $~[:ind].length + 1 ] },
+          subitem: -> {          section.lines << [ :item, nil, $~[1] ] }
+        }
+        while line = lines.gets
+          name = stat.to.detect{ |sym| state_h[ sym ].rx =~ line }
+          trigger_h.fetch( name ).call
+          stat = state_h.fetch name
         end
+        nil
       end
-      ea.each do |line|
-        if rx =~ line
-          shift[ line ]
-        else
-          y << ( CLI::Desc_Sect.new ) if y.length.zero?
-          ( y.last.lines ||= [ ] ) << filter[ line ]
-        end
-      end
-      y
+    end.call
+
+    define_singleton_method :parse_sections do parse_sections end  # testing.
+
+    define_method :parse_sections do |lines|
+      sections = [ ]
+      parse_sections[ lines, sections ]
+      sections
     end
 
-    attr_reader :sections
+    attr_reader :sections  # look:
 
     alias_method :sections_ivar, :sections
 
     def sections
-      if sections_ivar.nil?
+      if sections_ivar.nil?       # important - `build_desc_lines` is it
         desc_lines
       end
       @sections
     end
-
 
     #      ~ options - modeling, sub-control and rendering (mvvm) ~
 
@@ -444,7 +501,7 @@ module Skylab::Headless
     #
     #   + your o.p must provide a `parse!` that takes 1 array arg, like o.p
     #   + on parse failures your o.p must raise a stdlib o.p::ParseError
-    #   + `top.list` must result in a switches enumberable
+    #   + your o.p must have a `visit` that works like stdlib o.p
     #   + each switch must have a `long`, `short` and `arg` that look like o.p
 
     attr_reader :option_parser    # look:
@@ -464,11 +521,12 @@ module Skylab::Headless
         break if argv.length.zero? # don't even build option parser.
         break if is_branch && CLI::OPT_RX !~ argv.first # ambig. grammars [#024]
         break if ! option_parser  # leave brittany alone, downstream gets argv
-
-        begin                     # option_parser can be some fancy arbitrary
-          option_parser.parse! argv # thing, but it needs to conform to at
-        rescue Headless::Services::OptionParser::ParseError => e # least
-          usage_and_invite e.message  # these two parts of stdlib ::O_P
+        # `option_parser` can be some fancy arbitrary thing, but it needs to
+        # conform to at least these two parts of stdlib ::O_P..
+        begin
+          option_parser.parse!( argv ) { |b| instance_exec(& b ) } # hack
+        rescue Headless::Services::OptionParser::ParseError => e
+          usage_and_invite e.message
           res = exit_status_for :parse_opts_failed
         end
       end while nil
@@ -479,7 +537,10 @@ module Skylab::Headless
     end
 
     def rndr_switch sw            # (hook for shenanigans)
-      "[#{ sw.short.first or sw.long.first }#{ sw.arg }]"
+      if sw.short || sw.long      # nerculouses composed of just a rx, for e.g
+        "[#{ (sw.short && sw.short.first) or (sw.long && sw.long.first) }#{
+          }#{ sw.arg }]"
+      end
     end
                                   # nil when no o.p, nil when no visible opts
                                   # there is currently no unstyled form but..
@@ -497,7 +558,7 @@ module Skylab::Headless
     def visible_options           # maybe zero length, kept flat & functiony
       ::Enumerator.new do |y|
         option_is_visible_in_syntax_string || nil # kick, ick
-        option_documenter.top.list.each do |sw|
+        CLI::Option::Enumerator.new( option_documenter ).each do |sw|
           if sw.respond_to?( :short ) &&
             @option_is_visible_in_syntax_string[ sw.object_id ] then
               y << sw
@@ -531,21 +592,6 @@ module Skylab::Headless
       end
     end
 
-    def render_argument arg
-      a, b = reqity_brackets arg.reqity
-      "#{ a }<#{ arg.formal.name.to_slug }>#{ b }"
-    end
-
-    arg_string_h = {
-      opt:  [ '[', ']'      ],
-      req:  [ '',  ''       ],
-      rest: [ '[', ' [..]]' ]
-    }.each { |_, a| a.each(& :freeze).freeze }.freeze
-
-    define_method :reqity_brackets do |reqity|
-      arg_string_h.fetch reqity
-    end
-
     # a #view-template-ish for rendering a particular argument syntax object
     # into a styled string. result is nil if the syntax has no elements,
     # otherwise a non-zero length, possibly styled string. With `em_range`
@@ -560,13 +606,28 @@ module Skylab::Headless
         end
         m << s
       end
+      if self.class.respond_to? :append_syntax_a and self.class.append_syntax_a
+        a.concat self.class.append_syntax_a  # for custom hacky syntaxes
+      end
       a.join ' ' if a.length.nonzero?
     end
+
+    def render_argument arg       # (no styling just text)
+      a, b = reqity_brackets arg.reqity
+      "#{ a }<#{ arg.formal.name.as_slug }>#{ b }"
+    end
+
+    -> do
+      reqity_brackets = nil  # load it wherever it is only when you need it
+      define_method :reqity_brackets do |reqity|
+        ( reqity_brackets ||= CLI::Argument::FUN.reqity_brackets )[ reqity ]
+      end
+    end.call
                                   # `meth_ref` is symbol or string method name
                                   # result is true or exit status
     def validate_arity_for meth_ref, args
       res = nil                   # assuming below is true, always re-assigned
-      syn = argument_syntax_for_method meth_ref # (this will almost certainly raise on
+      syn = argument_syntax_for_method meth_ref # (this will almost certainly
       if syn                      # raise on failure, but it could change.)
         res = syn.validate_arity args do |o|
           o.on_unexpected do |a|
@@ -583,29 +644,79 @@ module Skylab::Headless
       end
       res
     end
-  end
 
-  module CLI
-    Desc_Sect = ::Struct.new :header, :lines
+    #         ~ `parameters` - abstract reflection and rendering ~
+
+    def param norm_name
+      parm = fetch_parameter norm_name
+      if parm.is_option
+        parm.as_parameter_signifier
+      elsif param.is_argument
+        render_argument parm
+      end
+    end
+
+    def fetch_parameter norm_name, &otr
+      as = argument_syntax
+      if as
+        rs = as.fetch_parameter norm_name do end
+      end
+      if ! rs and option_parser and @option_parser.respond_to? :fetch_parameter
+        rs = @option_parser.fetch_parameter norm_name do end
+      end
+      if rs then rs else
+        ( otr || -> { raise ::KeyError,
+                      "parameter not found: #{ norm_name.inspect }" } ).call
+      end
+    end
   end
 
   class CLI::Argument   # might be joined by sister CLI::Option one day..
+
     # simple wrapper that combines ruby's builtin method.parameters `reqity`
     # with a formal parameter. (`reqity` is a term we straight made up to refer
     # to that property that is either :req, :opt or :rest, as seen in the
-    # structure returned by ::Method#parameters.)
+    # result structure of ruby's ::Method#parameters.)
+
+    def normalized_parameter_name     # will be queried by reflection api
+      @formal.normalized_parameter_name
+    end
 
     attr_reader :formal
 
     def name
-      @name ||= Headless::Name::Function.new @formal.normalized_local_name
+      @name ||= Headless::Name::Function.new @formal.normalized_parameter_name
     end
 
     attr_reader :reqity
 
+    #         ~ courtesy for `parameter reflection` api ~
+
+    def is_argument
+      true
+    end
+
+    def is_option
+      false
+    end
+
     def initialize formal, reqity
       @formal, @reqity = formal, reqity
     end
+
+    FUN = ::Struct.new( :reqity_brackets )[
+      -> do
+        arg_string_h = {
+          opt:  [ '[', ']'      ],
+          req:  [ '',  ''       ],
+          rest: [ '[', ' [..]]' ]
+          # block: - not represented here. we trigger the error on purpose -
+        }.each { |_, a| a.each(& :freeze).freeze }.freeze  # block parameters
+                                  # arge not isomorphic
+        -> x do
+          arg_string_h.fetch x
+        end
+      end.call ].freeze
   end
 
   class CLI::Argument::Syntax     # abstract
@@ -615,6 +726,7 @@ module Skylab::Headless
     # a sub-class of ::Array (eek))  So some of that is mimiced here.
 
     [
+      :detect, # courtesy for reflection api
       :each,   # used here in `render_argument_syntax`, from it we can have etc
       :first,  # for a.s inspection in cli/client
       :index,  # used here
@@ -642,6 +754,19 @@ module Skylab::Headless
     alias_method :[], :slice
 
     # (we once had a `string` but it was a smell here - pls render it yrself)
+
+    #        ~ reflection api (as a courtesy for experiments) ~
+
+    def fetch_parameter norm_name, &otr
+      parm = @elements.detect do |x|
+        norm_name == x.normalized_parameter_name
+      end
+      if parm then parm else
+        ( otr || -> { raise ::KeyError,
+                      "argument not found: #{ norm_name.inspect }" } ).call
+
+      end
+    end
 
   protected
 
@@ -714,23 +839,32 @@ module Skylab::Headless
     # pure namespace, all in this file.
   end
 
-  class CLI::IO_Adapter::Minimal <            # For now (near [#sl-113] we do
-    ::Struct.new :instream, :outstream, :errstream, :pen # not observe the PIE
+  class CLI::IO_Adapter::Minimal # ([#sl-113]) here we do *not* observe the PIE
     # convention, which is a higher-level eventy thing that assumes semantic
     # meaning to the different streams. Down here, we just want symbolic names
     # that represent the actual streams (whatever they are) that are used in the
     # POSIX standard way of having a standard in, standard out, and standard
     # error stream.
 
+    attr_reader :instream, :outstream, :errstream, :pen
+
+    attr_writer :instream  # it gets modified from the cli client s/times
+
     def emit type, msg            # life is easy with this default assumption
-      send( :payload == type ? :outstream : :errstream ).puts msg
+      instance_variable_get( :payload == type ? :@outstream : :@errstream ).
+        puts msg
       nil # undefined
+    end
+
+    def two
+      [ @outstream, @errstream ]
     end
 
     # per edict [#sl-114] keep explicit mentions of the streams out at this
     # level -- they can be nightmarish to adapt otherwise.
     def initialize sin, sout, serr, pen=CLI::Pen::MINIMAL
-      super sin, sout, serr, pen
+      @instream, @outstream, @errstream, @pen = sin, sout, serr, pen
+      nil
     end
   end
 
@@ -738,6 +872,7 @@ module Skylab::Headless
 
     o = { }
 
+    #         ~ ansi escape sequences support ~
 
     codes = ::Hash[ [[:strong, 1], [:reverse, 7]].
       concat [:red, :green, :yellow, :blue, :purple, :cyan, :white].
@@ -750,20 +885,27 @@ module Skylab::Headless
       "\e[#{ styles.map { |s| codes[s] }.compact.join ';' }m#{ str }\e[0m"
     end
 
+    simple_style_rx =  %r{  \e  \[  \d+  (?: ; \d+ )*  m  }x
+
     o[:unstylize_stylized] = unstylize_stylized = -> str do # nil when `str` is
-      str.to_s.dup.gsub! %r{  \e  \[  \d+  (?: ; \d+ )*  m  }x, '' # not already
+      str.to_s.dup.gsub! simple_style_rx, '' # not already
     end                                        # stylized - rec. only for tests!
 
     o[:unstylize] = -> str do                  # the safer alternative, for when
       unstylize_stylized[ str ] || str         # you don't care whether it was
     end                                        # stylzed in the first place
 
+    o[:simple_style_rx] = simple_style_rx
+
+    # (see also CLI::FUN - there is extended support for e.g turning styled
+    # text back and forth into s-expressions)
+
     FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
 
   end
 
   module CLI::Stylize
-    # pure namespace contained in this file.
+    extend MAARS
   end
 
   module CLI::Stylize::Methods                 # here we have what amounts to
@@ -783,30 +925,34 @@ module Skylab::Headless
   end
 
   module CLI::Pen::InstanceMethods
-    include Headless::Pen::InstanceMethods
-                        # (trying to use these when appropriate:
-                        # http://www.w3schools.com/tags/tag_phrase_elements.asp)
 
-    def em s
+    include Headless::Pen::InstanceMethods     # (see)
+
+    def em s                                   # style a header
       stylize s, :strong, :green
     end
 
-    def hdr s
-      em s
-    end
+    # (`hdr` -> `em` from above)               # style a header
 
-    def h2 s
+    def h2 s                                   # style a smaller header
       stylize s, :green
     end
 
-    def ick mixed                 # render an invalid value
-      # stylize mixed.to_s.inspect, :strong, :red  # may be overkill
+    def ick mixed                              # style an invalid value
       %|"#{ mixed }"|
     end
 
-    def kbd s
+    def kbd s                                  # style as e.g kbd inut, or code
       stylize s, :green
     end
+
+    def omg x                                  # style an error with
+      x = x.to_s                               #  excessive & exuberant emphasis
+      x = x.inspect unless x.index ' '         # (opposite human_escape)
+      stylize x, :strong, :red                 # may be overkill
+    end
+
+    # def `val` - how may votes? (1: sg) [#hl-051]
 
     fun = CLI::Pen::FUN
 

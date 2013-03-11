@@ -2,7 +2,7 @@ module Skylab::Headless
 
   module CLI
 
-    o = { }
+    o = MetaHell::Formal::Box::Open.new
 
     o[:parse_styles] = -> do
       # Parse a string with ascii styles into an S-expression.
@@ -10,7 +10,7 @@ module Skylab::Headless
       sexp = Headless::Services::CodeMolester::Sexp
 
       rx = /\A (?<string>[^\e]+)?  \e\[
-        (?<digits> \d+  (?: ; \d+ )* )  m  (?<rest> .*) \z/x
+        (?<digits> \d+  (?: ; \d+ )* )  m  (?<rest> .*) \z/mx
 
       -> str do
         res = nil
@@ -41,13 +41,24 @@ module Skylab::Headless
       end
     end.call
 
+    o[:unstylize_sexp] = -> sx do
+      sx.reduce [] do |m, x|
+        m << x[1] if :string == x[0]
+        m
+      end.join ''
+    end
+
     left_peeker_hack = -> summary_width do     # i'm sorry -- there was no
       max = summary_width - 1                  # other way
       sdone, ldone = {}, {}
       -> x, &y do
         sopts, lopts = [], []   # short and long opts that have not been done
-        x.short.each { |s| sdone.fetch(s) { sopts.push s ; sdone[s] = true } }
-        x.long.each  { |s| ldone.fetch(s) { lopts.push s ; ldone[s] = true } }
+        if x.short
+          x.short.each { |s| sdone.fetch(s) { sopts.push s ; sdone[s] = true } }
+        end
+        if x.long
+          x.long.each  { |s| ldone.fetch(s) { lopts.push s ; ldone[s] = true } }
+        end
         if sopts.length.nonzero? || lopts.length.nonzero?
           left = [sopts.join(', ')]
           lopts.each do |s|
@@ -69,8 +80,7 @@ module Skylab::Headless
 
     o[:summary_width] = -> option_parser, max = 0 do
       left_peek = left_peeker_hack[ option_parser.summary_width ]
-
-      option_parser.top.list.reduce max do |m, x|
+      CLI::Option::Enumerator.new( option_parser ).reduce max do |m, x|
         if x.respond_to? :summarize
           left_peek.call( x ) do |str|
             str.length > m and m = str.length
@@ -80,7 +90,6 @@ module Skylab::Headless
       end
     end
 
-    FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } # note -
-    # because of something awful that autoloader does we do not freeze ourself
+    FUN = o.to_struct
   end
 end

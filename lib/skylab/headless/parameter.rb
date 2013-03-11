@@ -132,8 +132,8 @@ module Skylab::Headless
 
   class Parameter::Set < MetaHell::Formal::Box
 
-    def [] normalized_local_name
-      @hash.fetch normalized_local_name do end
+    def [] normalized_parameter_name
+      @hash.fetch normalized_parameter_name do end
     end
 
     alias_method :known?, :has?  # this one feels ok
@@ -241,10 +241,10 @@ module Skylab::Headless
     end
 
     def name
-      @name ||= Headless::Name::Function.new @normalized_local_name
+      @name ||= Headless::Name::Function.new @normalized_parameter_name
     end
 
-    attr_reader :normalized_local_name
+    attr_reader :normalized_parameter_name
 
   protected
 
@@ -369,7 +369,7 @@ module Skylab::Headless
         filter_upstream_last! { |val, _| self[name] = val } # buck stops here
         host_def("#{name}=") { |val| upstream_f.call(self, val) }
       end
-      @normalized_local_name = name ; @host = host
+      @normalized_parameter_name = name ; @host = host
     end
     # -- * --
     # now we use our own hands to hit ourself with our own dogfood

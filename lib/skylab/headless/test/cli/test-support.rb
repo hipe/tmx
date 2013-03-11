@@ -1,6 +1,7 @@
 require_relative '../test-support'
 
 module Skylab::Headless::TestSupport::CLI
+
   ::Skylab::Headless::TestSupport[ CLI_TestSupport = self ]
 
   include CONSTANTS
@@ -22,7 +23,7 @@ module Skylab::Headless::TestSupport::CLI
       end ]
 
       streams = memoize[ -> do
-        Headless_TestSupport::CLI::Streams_Spy.new
+        Headless_TestSupport::CLI::IO_Spy_Group.new
       end ]
 
       instance = memoize[ -> do
@@ -53,5 +54,9 @@ module Skylab::Headless::TestSupport::CLI
     include CONSTANTS
 
     define_method :styled, & Headless::CLI::Pen::FUN.unstylize_stylized
+
+    expect_text = FUN.expect_text
+
+    define_method :expect_text do expect_text end
   end
 end

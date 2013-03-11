@@ -708,7 +708,7 @@ module Skylab::Porcelain
         wtf = catch :option_action do
           action.parse argv do |o|
             o.on_syntax do |e|
-              emitter.emit :syntax, e
+             emitter.emit :syntax, e
             end
             o.on_push do |frame, _|
               frame.argv = argv

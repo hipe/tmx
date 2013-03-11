@@ -31,7 +31,7 @@ module Skylab::Headless
     def parameter_label x, idx=nil  # [#036] explains it all
       idx = "[#{ idx }]" if idx
       stem = if ::Symbol === x then x else
-        stem = x.name.normalized_local_name  # errors please
+        stem = x.normalized_parameter_name  # errors please
       end
       "<#{ stem }#{ idx }>"
     end
@@ -58,7 +58,7 @@ module Skylab::Headless
   protected
 
     def initialize                # example rudimentary implementation
-      _headless_sub_client_init nil # modality clients are always this way
+      init_headless_sub_client nil # modality clients are always this way
     end
   end
 

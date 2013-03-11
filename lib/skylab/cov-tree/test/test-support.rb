@@ -1,7 +1,7 @@
 require_relative '../core'
 require 'skylab/test-support/core'
 require 'skylab/headless/core' # only `unstylize`
-require 'skylab/porcelain/test/bleeding/test-support'
+require 'skylab/pub-sub/test/test-support'
 
 module Skylab::CovTree::TestSupport
   ::Skylab::TestSupport::Regret[ CovTree_TestSupport = self ]
@@ -9,16 +9,7 @@ module Skylab::CovTree::TestSupport
   module CONSTANTS
     CovTree = ::Skylab::CovTree
     TestSupport = ::Skylab::TestSupport
-  end
-
-  Blah = ::Struct.new :stream_name, :string
-
-  class Emit_Spy < ::Skylab::Porcelain::TestSupport::Bleeding::Emit_Spy
-    def emit *x
-      if 1 == x.length then super else
-        super Blah.new( *x )
-      end
-    end
+    PubSub_TestSupport = ::Skylab::PubSub::TestSupport
   end
 
   module InstanceMethods
@@ -35,7 +26,7 @@ module Skylab::CovTree::TestSupport
     end
 
     def ___build_emit_spy!
-      @emit_spy = es = Emit_Spy.new
+      @emit_spy = es = PubSub_TestSupport::Emit_Spy.new
       # es.debug = -> { self.debug? }
       @names = []
       es
@@ -76,7 +67,7 @@ module Skylab::CovTree::TestSupport
       e = emitted.shift
       if e
         names.push e.stream_name
-        unstylize[ e.string ] or e.string
+        unstylize[ e.payload_x ]
       end
     end
 
@@ -85,7 +76,7 @@ module Skylab::CovTree::TestSupport
     attr_reader :names
 
     def emitted
-      emit_spy.emitted
+      emit_spy.emission_a
     end
   end
 end

@@ -4,26 +4,50 @@ module Skylab::Headless
     # this used to be more complicated, but you see what it has become now
   end
 
-
   module SubClient::InstanceMethods
     # **NOTE** the below are not all unobtrusive and auto-vivifying like
     # some i.m modules try to be. The participating object _must_ call
-    # `_headless_sub_client_init`
+    # `init_headless_sub_client`
 
   protected
 
     def initialize request_client # this is the heart of it all [#004] (see)
       block_given? and raise ::ArgumentError.new 'blocks are not honored here'
-      _headless_sub_client_init request_client
+      init_headless_sub_client request_client
       super(   )
     end
 
-    def _headless_sub_client_init request_client
+    #         ~ getting and setting the request client ~
+
+    def init_headless_sub_client request_client
       @error_count = 0            # (if this overwrites an important nonzero
                                   # value here, you deserve whatver happens
                                   # to you. why would u call init 2x?)
-      self.request_client = request_client
+      self.request_client = request_client  # (some environments employ
+    end                           # alternatives to the ivar for storing r.c)
+
+    attr_writer :request_client
+
+    def request_client
+      @request_client or begin
+        caller_a = caller
+        md = Headless::FUN.call_frame_rx.match caller_a[ 0 ]
+        desc = if md
+          if 0 == md[:meth].index( 'block ' )
+            pth = md[:path]
+            pth.sub! %r|\A#{ ::Regexp.escape ::Skylab.dir_pathname.to_s }/|, ''
+            " in block at #{ pth }:#{ md[:no] }"
+          else
+            " of `#{ md[:meth] }`"
+          end
+        end
+        fail "#{ self.class } cannot delegate call#{ desc } #{
+          }upwards to request client - request client is human (#{
+          }do you need to implement it for that class)?"
+      end
     end
+
+    #         ~ an alphabetical list of things ~
 
     def actual_parameters         # not all stacks use this, just convenience
       request_client.send :actual_parameters
@@ -71,21 +95,21 @@ module Skylab::Headless
       request_client.send :pen
     end
 
-    attr_accessor :request_client # (was the center of [#005], now correct)
-
     # --- * ---
 
-    def em s ; pen.em s end
+    def em s ; pen.em s end       # style for emphasis
 
-    def human_escape s ; pen.human_escape s end
+    def human_escape s ; pen.human_escape s end  # usu. add quotes conditonally
 
-    def hdr s ; pen.hdr s end
+    def hdr s ; pen.hdr s end     # style as a header
 
-    def h2  s ; pen.h2  s end
+    def h2  s ; pen.h2  s end     # style as a smaller header
 
-    def ick s ; pen.ick s end
+    def ick s ; pen.ick s end     # style a usu. user-entered x that is invalid
 
-    def kbd s ; pen.kbd s end
+    def kbd s ; pen.kbd s end     # style e.g keyboard input or code
+
+    def omg s ; pen.omg s end     # style an error emphatically
 
     # --- * ---
 

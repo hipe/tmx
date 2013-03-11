@@ -38,8 +38,8 @@ module Skylab::Treemap
     end
 
     def slug  # this makes maps much prettier, and is used as the 'against'
-      @name.to_slug  # string in `fuzzy_reduce` for the adapter box.
-    end       # (although we typically just call `name.to_slug`)
+      @name.as_slug  # string in `fuzzy_reduce` for the adapter box.
+    end       # (although we typically just call `name.as_slug`)
 
   protected
 

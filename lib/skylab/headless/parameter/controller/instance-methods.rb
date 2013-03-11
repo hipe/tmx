@@ -40,8 +40,8 @@ module Skylab::Headless
 
     def defaults actual_h        # #pattern [#sl-117]
       formal_parameters.each do |o|
-        if o.has_default? and actual_h[o.normalized_local_name].nil?
-          actual_h[o.normalized_local_name] = o.default_value
+        if o.has_default? and actual_h[o.normalized_parameter_name].nil?
+          actual_h[o.normalized_parameter_name] = o.default_value
         end
       end
       nil

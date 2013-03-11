@@ -1,5 +1,7 @@
 module Skylab::Headless::TestSupport
+
   class Client_Spy
+
     # use for emit-spy-style testing of application code (e.g controllers)
     # in a *generic* (modality agnostic) way
 
@@ -15,12 +17,8 @@ module Skylab::Headless::TestSupport
       @debug = callable
     end
 
-    attr_reader :emitted
-
-    Fuu = ::Struct.new :stream_name, :string  # #todo during integration only
-
-    def emit *a
-      ( @emitted ||= [ ] )  << Fuu.new( * a )
+    def emission_a
+      io_adapter.emission_a
     end
 
   protected
@@ -33,7 +31,7 @@ module Skylab::Headless::TestSupport
       @io_adapter ||= begin
         pen = resolve_pen
         o = Headless::TestSupport::IO_Adapter_Spy.new( * [ pen ].compact )
-        # o.debug = -> { @debug.call } # #todo during integration only
+        o.debug = -> { @debug.call }
         o
       end
     end
@@ -52,7 +50,7 @@ module Skylab::Headless::TestSupport
     def parameter_label x, idx=nil  # ICK
       idx = "[#{ idx }]" if idx
       stem = if ::Symbol === x then x else
-        stem = x.name.normalized_local_name  # errors please
+        stem = x.normalized_parameter_name  # errors please
       end
       "#{ stem }#{ idx }"
     end
@@ -70,8 +68,8 @@ module Skylab::Headless::TestSupport
     end
 
     def clear!  # #todo during integration
-      if emitted
-        @emitted.clear
+      if emission_a
+        @emission_a.clear
       end
     end
   end

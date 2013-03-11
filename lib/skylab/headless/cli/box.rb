@@ -25,7 +25,7 @@ module Skylab::Headless
     # and method signature that appears below is both designed that way
     # *and* appears in help screens -- weird!)
 
-    def dispatch action=nil, *args
+    def dispatch action=nil, *args  # (**NOTE** param names are cosmetic!)
       res = nil
       if action
         klass = fetch action
@@ -80,7 +80,7 @@ module Skylab::Headless
 
     def expecting_string
       a = action_box_module.each.reduce [] do |m, (k, x)|
-        m << x.name_function.local.to_slug
+        m << x.name_function.local.as_slug
       end
       "expecting {#{ a.map(& method( :kbd ) ) * '|' }}"
     end
@@ -109,9 +109,10 @@ module Skylab::Headless
         m << ( c.new self )       # ich muss sein - we need a charged graph
       end
       if visible.length.nonzero?
-        ( @sections ||= [] ) << section = CLI::Desc_Sect.new( 'actions:', [ ] )
+        ( @sections ||= [] ) <<
+          ( section = CLI::Desc::Section.new 'actions:', [ ] )
         visible.each do |act|
-          section.lines << [ act.name.to_slug, act.summary_line ]
+          section.lines << [ :item, act.name.as_slug, act.summary_line ]
         end
       end
       res

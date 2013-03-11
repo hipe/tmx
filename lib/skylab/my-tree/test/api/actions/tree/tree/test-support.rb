@@ -13,7 +13,12 @@ end
 module ::Skylab::MyTree::TestSupport::API::Actions::Tree::Tree
   ::Skylab::MyTree::TestSupport[ self ] # #regret
 
+  include CONSTANTS
+
+  extend TestSupport::Quickie
+
   module InstanceMethods
+
     include CONSTANTS
 
     attr_accessor :debug
@@ -25,12 +30,12 @@ module ::Skylab::MyTree::TestSupport::API::Actions::Tree::Tree
     def makes str
       spy = Headless::TestSupport::Client_Spy.new
       spy.debug = -> { self.debug }
-      o = MyTree::API::Actions::Tree::Tree.new spy, { }
+      o = MyTree::API::Actions::Tree::Tree.new spy, nil # not verbose
       @with.split( "\n" ).each do |s|
         o.puts s
       end
       o.flush
-      actual = spy.emitted.map(& :string ).join "\n"
+      actual = spy.emission_a.map(& FUN.expect_text ).join "\n"
       expected = str.unindent.chomp
       actual.should eql(expected)
       nil

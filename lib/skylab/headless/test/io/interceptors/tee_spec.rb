@@ -12,7 +12,7 @@ module Skylab::Headless::TestSupport::IO::Interceptors
         tee.puts('b')
         tee << 'c'
         tee[:foo].string.should eql("ab\nc")
-        tee[:bar].string.should eql(tee[:foo].string)
+        tee[:bar].string.should eql( tee[:foo].string )
       end
     end
 

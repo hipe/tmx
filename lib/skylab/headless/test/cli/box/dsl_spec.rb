@@ -37,13 +37,13 @@ module Skylab::Headless::TestSupport::CLI::Box::DSL
     end
 
     _expect_names = -> me, ioa, *names do
-      actual = ioa.emitted.map(& :stream_name )
+      actual = ioa.emission_a.map(& :stream_name )
       actual.should me.eql( names )
       nil
     end
 
     _expect_strings = -> me, ioa, strings do
-      strs = ioa.emitted.map(& :string)
+      strs = ioa.emission_a.map(& me.expect_text )
       while str = strs.shift
         str = Headless::CLI::Pen::FUN.unstylize[ str ]
         expecting = strings.shift or fail "unexpected string - #{ str }"
@@ -112,7 +112,7 @@ module Skylab::Headless::TestSupport::CLI::Box::DSL
 
       it " 1.1. funky action - jizz / jazz / other" do
         invoke 'jenkum'
-        msg = ioa.emitted.first.string
+        msg = expect_text[ ioa.emission_a.first ]
         msg.should match( expecting_nothing_rx )
         msg.include?( 'there is no "jenkum" action.' ).should eql( true )
       end
@@ -189,19 +189,19 @@ module Skylab::Headless::TestSupport::CLI::Box::DSL
 
       it "1.4. just `-h` - the big screen" do
         invoke '-h'
-        ioa.emitted.length.should eql( 9 )
-        str = expect_styled ioa.emitted.first.string
+        ioa.emission_a.length.should eql( 9 )
+        str = expect_styled expect_text[ ioa.emission_a.first ]
         str.should match( usage_rx )
-        str = expect_styled ioa.emitted.last.string
+        str = expect_styled expect_text[ ioa.emission_a.last ]
         str.should eql(
           "use myapp box-1-0 -h <action> for help on that action" )
       end
 
       it "1.3. no args as expected - works" do
         res = invoke 'yowzaa'
-        ioa.emitted.length.should eql( 1 )
-        ioa.emitted.first.stream_name.should eql( :foofie )
-        ioa.emitted.first.string.should eql( 'doofie' )
+        ioa.emission_a.length.should eql( 1 )
+        ioa.emission_a.first.stream_name.should eql( :foofie )
+        expect_text[ ioa.emission_a.first ].should eql( 'doofie' )
         res.should eql( :koofie )
       end
     end
@@ -228,9 +228,10 @@ module Skylab::Headless::TestSupport::CLI::Box::DSL
 
         it "shows help screen with custom op" do
           invoke '-h', 'wankers'
-          str = expect_styled ioa.emitted.first.string
+          str = expect_styled expect_text[ ioa.emission_a.first ]
           str.should eql( "usage: myapp box-2-0 wankers [-x <foo>] <bankers>" )
-          ioa.emitted.last.string.strip.should eql( '-x, --xylophone <foo>' )
+          expect_text[ ioa.emission_a.last ].strip.
+            should eql( '-x, --xylophone <foo>' )
         end
 
         it "uses custom op to parse opts" do
@@ -261,7 +262,7 @@ module Skylab::Headless::TestSupport::CLI::Box::DSL
 
         it "you still get the builtin -h, which comes at end" do
           invoke 'dinkle', '-h'
-          penult, ult = ioa.emitted[-2..-1].map(&:string)
+          penult, ult = ioa.emission_a[-2..-1].map(& expect_text )
           penult.should match( /ylophone/ )
           ult.should match( /--help +this screen/ )
         end

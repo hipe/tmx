@@ -4,11 +4,9 @@ module Skylab::Headless
     extend Autoloader                          # (lazy-load files under client/)
   end
 
-
   module CLI::Client::ModuleMethods            # future-proofing, aesthetics
     include CLI::Action::ModuleMethods
   end
-
 
   module CLI::Client::InstanceMethods
     include CLI::Action::InstanceMethods
@@ -16,13 +14,24 @@ module Skylab::Headless
 
   protected
 
-    def initialize *three         # example rudimentary implementation
-      _headless_sub_client_init nil # modality clients are always this way
-      if three.length.nonzero?
-        @io_adapter = build_io_adapter(* three )
+    param_h = {
+      0 => -> _ { },
+      3 => -> a do
+        @io_adapter = build_io_adapter(* a )
+      end
+    }
+
+    define_method :initialize do |*a|
+      init_headless_sub_client nil  # modality clients are always this way
+      instance_exec( a, & param_h.fetch( a.length ) )
+      if self.class.respond_to? :_headless_inits and self.class._headless_inits
+        _headless_inits_run  # [#052]
       end
       nil
     end
+
+    alias_method :init_headless_cli_client, :initialize
+      # (`initialize` rarely gets left alone)
 
     def build_io_adapter sin=$stdin, sout=$stdout, serr=$stderr, pen=build_pen
       # What is really nice is if you observe [#sl-114] and specify what
@@ -41,7 +50,7 @@ module Skylab::Headless
         if ref && ::Symbol === ref && :help != ref  # BLEARG
           as = argument_syntax_for_method ref
           if as.length.nonzero?
-            name = as.first.name.normalized_local_name
+            name = as.first.normalized_parameter_name
             break
           end
         end
@@ -68,7 +77,7 @@ module Skylab::Headless
       if ::Symbol === x
         stem = Headless::Name::FUN.slugulate[ x ]
       else
-        stem = x.name.to_slug  # errors please
+        stem = x.name.as_slug  # errors please
       end
       em "<#{ stem }#{ idx }>"
     end

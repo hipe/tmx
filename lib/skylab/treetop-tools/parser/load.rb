@@ -1,4 +1,5 @@
 module Skylab::TreetopTools
+
   class Parser::Load < DSL::Client::Minimal
     # #pattern [#sl-109] class as namespace
   end
@@ -24,13 +25,12 @@ module Skylab::TreetopTools
 
   end
 
-
   class Parser::Load # re-open!
 
     include Headless::Parameter::Bound::InstanceMethods # bound_parameters
 
-    attr_reader(* DSL.parameters.each.map(& :normalized_local_name ) ) # for after
-                                                   # call_body_and_absorb
+    attr_reader(* DSL.parameters.each.map(& :normalized_parameter_name ) )
+                                  # for after call_body_and_absorb
     def invoke
       result = false
       begin
@@ -100,42 +100,65 @@ module Skylab::TreetopTools
     end
 
     def normalize_and_validate_paths_to param_name
+
       error_count_before = error_count
-      root_f = ->(bp) do
-        root = bound_parameters[param_name]
-        ! root.value and return error("#{ root.normalized_local_name } must be set in "<<
-          "order to support a relative path like #{ bp.label }!")
-        ! root.value.absolute? and return error("#{ root.normalized_local_name } must " <<
-          "be an absolute path in order to expand paths like #{ bp.label }")
-        (root_f = ->(_) { root }).call(nil)
-      end
-      pathname_params = bound_parameters.where do |bp|
-        bp.known?(:pathname) and bp[:pathname]
-      end.to_a
-      pathname_params.each do |bp|
-        bp.value or next # if path value wasn't specified, leave brittany alone
-        if ! bp.value.absolute? # expand *all* relative paths
-          bp.value = root_f[bp].value.join(bp.value) # sexy and evil
+
+      root = -> bp do
+        rot = bound_parameters[ param_name ]
+        if ! rot.value
+          error "#{ rot.normalized_parameter_name } must be set #{
+            }in order to support a relative path like #{ bp.label }!"
+          nil
+        elsif ! rot.value.absolute?
+          error "#{ rot.normalized_parameter_name } must be an absolute path #{
+            }in order to expand paths like #{ bp.label }"
+          nil
+        else
+          res = rot.value
+          root = -> _ { res }
+          res
         end
-        if bp.value.exist?
-          if bp.parameter.dir? and ! bp.value.directory?
-            error "#{ bp.label } is not a directory: #{ escape_path p.value }"
+      end
+
+      pathname_param_a = bound_parameters.where do |ap| # `ap`= actual parameter
+        ap.known? :pathname and ap[:pathname]
+      end.to_a
+
+      pathname_param_a.each do |ap|
+        if ap.value
+          # it path wasn't specified, leave brittany alone
+          if ! ap.value.absolute?  # expand *all* relative paths
+            rot = root[ ap ] or break
+            ap.value = rot.join ap.value
           end
-        elsif bp.parameter.known?(:exist) and :must == bp.parameter.exist
-          error "#{ bp.label } not found: #{ escape_path bp.value }"
+          if ap.value.exist?
+            if ap.parameter.dir? and ! ap.value.directory?
+              error "#{ ap.label } is not a directory: #{ escape_path ap.value}"
+            end
+          elsif ap.parameter.known? :exist and :must == ap.parameter.exist
+            error "#{ ap.label } not found: #{ escape_path ap.value }"
+          end
         end
       end
       error_count == error_count_before
     end
 
     def recompile g
-      g.outpathname.dirname.directory? or mkdir_safe(g) or return
-      begin
-        compiler.compile(g.inpath, g.outpath)
-        true
-      rescue ::RuntimeError => e
-        raise RuntimeError.new("when compiling #{ g.normalized_local_name }:\n#{ e.message }")
+      ok = true
+      if ! g.outpathname.dirname.directory?
+        if ! mkdir_safe g
+          ok = false
+        end
       end
+      if ok
+        begin
+          compiler.compile g.inpath, g.outpath
+        rescue ::RuntimeError => e
+          raise ::RuntimeError, "when compiling #{ g.normalized_grammar_name }#{
+            }:\n#{ e.message }"
+        end
+      end
+      ok
     end
 
     def subclass cls, mod

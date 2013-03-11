@@ -22,7 +22,7 @@ module Skylab::Treemap
         end,
         -> x { x },
         -> match_box do
-          a = match_box.map { |md| md.item.to_slug }
+          a = match_box.map { |md| md.item.as_slug }
           msg = "is ambiguous -- did you mean #{ or_ a.map(& method(:pre)) }?"
           nil
         end

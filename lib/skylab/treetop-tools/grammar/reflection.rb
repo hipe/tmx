@@ -1,46 +1,13 @@
 module Skylab::TreetopTools
 
-  class Grammar::Reflection < ::Struct.new :name, :inpath_f, :outdir_f
+  class Grammar::Reflection
 
     def inpath
-      inpathname.to_s
+      @inpath[].to_s
     end
 
     def inpathname
-      inpath_f.call
-    end
-
-    NAME_RX = /[A-Z][a-zA-Z0-9_]+/  # consider functionalizing [#sl-115] these
-
-    SPACE_RX = /[ \t]*(#.*)?\n?/
-
-    def nested_const_names
-      # this implementation is a shameless & deferential tribute which, if not
-      # obvious at first glance, is intended to symbolize the triumph of
-      # the recursive buck stopping somewhere even if it perhaps doesn't
-      # need to.  (i.e.: yes i know, and i'm considering it.)
-      lines = build_lines_enumerator or return false
-      require 'strscan'
-      consts = [] ; scn = nil
-      lines.each do |line|
-        scn ? (scn.string = line) : (scn = ::StringScanner.new line)
-        scn.skip SPACE_RX
-        scn.eos? and next
-        if scn.scan(/module[ \t]+/)
-          consts << (scn.scan(NAME_RX) or fail("no: #{scn.rest}"))
-          while scn.scan(/::/)
-            consts << (scn.scan(NAME_RX) or fail("no: #{scn.rest}"))
-          end
-        elsif scn.scan(/grammar[ \t]+/)
-          consts << (scn.scan(NAME_RX) or fail("no: #{scn.rest}"))
-          break
-        else
-          fail("grammar grammar hack failed: #{scn.rest.inspect}")
-        end
-        scn.skip SPACE_RX
-        scn.eos? or fail("grammar grammar hack failed: #{scn.rest.inspect}")
-      end
-      consts
+      @inpath[]
     end
 
     def outpath
@@ -48,17 +15,64 @@ module Skylab::TreetopTools
     end
 
     def outpathname
-      outdir_f.call.join "#{ name }.rb"
+      @outdir[].join "#{ @name }.rb"
     end
+
+    -> do
+
+      name_rx = /[A-Z][a-zA-Z0-9_]+/  # consider functionalizing [#sl-115] these
+
+      space_rx = /[ \t]*(#.*)?\n?/
+
+      define_method :nested_const_names do
+        # this implementation is a shameless & deferential tribute which, if
+        # not obvious at first glance, is intended to symbolize the triumph
+        # of the recursive buck stopping somewhere even if it perhaps doesn't
+        # need to.  (i.e.: yes i know, and i'm considering it.)
+
+        ea = ::Enumerator.new do |y|
+          s = nil ; fh = @inpath[].open 'r'
+          y << s while s = fh.gets
+          fh.close
+          nil
+        end
+        scn = nil
+        failed = -> rsn do
+          fail "expected #{ rsn } near #{ scn.rest[ 0, 12 ].inspect }"
+        end
+        fetch = -> rx do
+          scn.scan rx or failed[ rx.inspect ]
+        end
+        ea.reduce [] do |memo, line|
+          if scn
+            scn.string = line
+          else
+            scn = Headless::Services::StringScanner.new line
+          end
+          scn.skip space_rx
+          if ! scn.eos?
+            if scn.scan( /module[ \t]+/ )
+              memo << fetch[ name_rx ]
+              while scn.scan( /::/ )
+                memo << fetch[ name_rx ]
+              end
+            elsif scn.scan( /grammar[ \t]+/ )
+              break( memo << fetch[ name_rx ] )
+            else
+              failed[ 'module or grammar' ]
+            end
+            scn.skip( /\n/ )
+            scn.eos? or failed[ 'eos' ]
+          end
+          memo
+        end
+      end
+    end.call
 
   protected
 
-    def build_lines_enumerator
-      ::Enumerator.new do |y|
-        fh = inpath_f.call.open('r') ; s = nil
-        y << s while s = fh.gets
-        fh.close
-      end
+    def initialize name, inpath_f, outdir_f
+      @name, @inpath, @outdir = name, inpath_f, outdir_f
     end
   end
 end

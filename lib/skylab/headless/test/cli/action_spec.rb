@@ -1,11 +1,8 @@
-require_relative 'test-support'
+require_relative 'action/test-support'
 
 module Skylab::Headless::TestSupport::CLI::Action
-  ::Skylab::Headless::TestSupport::CLI[ Action_TestSupport = self ]
 
-  include CONSTANTS
-
-  extend TestSupport::Quickie
+  # Quickie.
 
   describe "#{ Headless }::CLI::Action - invoke (parsing)" do
 

@@ -10,7 +10,7 @@ module Skylab::Treemap
   protected
 
     def _treemap_sub_client_init rc=nil
-      _headless_sub_client_init nil  # ( @error_count, e.g )
+      init_headless_sub_client nil  # ( @error_count, e.g )
       if rc                        # cute experiment with setting r.c like this
         if rc.respond_to? :call    # for devious reasons i won't admit to
           @rc = rc
@@ -54,7 +54,7 @@ module Skylab::Treemap
       # thing and being a *cli* sub-client (action) when you invoke this.
       # things can be splayed out as needed.
       "#{ request_client.send :normalized_invocation_string } #{
-        }#{ name.to_slug }"
+        }#{ name.as_slug }"
     end
 
     def request_client

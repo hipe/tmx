@@ -1,17 +1,16 @@
 require_relative '..'
 require 'skylab/headless/core'
 
-
 module Skylab::TreetopTools
+
   extend ::Skylab::MetaHell::Autoloader::Autovivifying::Recursive
 
   Headless = ::Skylab::Headless
-  const_get :Grammar, false       # ick load this now so we can say 'Grammar'
 
+  const_get :Grammar, false       # ick load this now so we can say 'Grammar'
 
   class RuntimeError < ::RuntimeError
   end
-
 
   class Parameter < Headless::Parameter
     param :dir, boolean: true

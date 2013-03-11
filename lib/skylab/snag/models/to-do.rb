@@ -30,6 +30,13 @@ module Skylab::Snag
 
     attr_reader :path
 
+    def pathname
+      if @pathname.nil?
+        @pathname = @path ? ::Pathname.new( @path ) : false
+      end
+      @pathname
+    end
+
     def post_tag_string
       if @ranges || parse
         @full_source_line[ @ranges.tag.end + 1 .. -1 ]
@@ -60,6 +67,7 @@ module Skylab::Snag
     define_method :initialize do
       |path, line_number_string, full_source_line, pattern|
       @path = path                # (order ivars {aesthet, isomorph}ically!)
+      @pathname = nil
       @line_number_string = line_number_string
       @line_number = @line_number_string.to_i
       @full_source_line = full_source_line

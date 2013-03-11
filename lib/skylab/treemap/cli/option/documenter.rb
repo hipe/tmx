@@ -115,9 +115,20 @@ module Skylab::Treemap
 
     Pxy::Top = MetaHell::Proxy::Functional.new :list
 
-    def top
+    def top  # #todo this is probably dep'd
       @top_pxy ||= Pxy::Top.new list: -> { top_list }
     end
+
+    -> do  # `visit` - this is probably replacing above.  look like an o.p
+      h = {
+        each_option: -> blk do  # #todo this is not complete
+          top_list.each(& blk )
+        end
+      }
+      define_method :visit do |meth, &blk|
+        instance_exec( blk, & h.fetch( meth ) )
+      end
+    end.call
 
   protected
 
@@ -282,7 +293,7 @@ module Skylab::Treemap
     end
 
     class Pxy::Switch < MetaHell::Proxy::Functional.new :arg, :long,
-      :object_id, :short
+      :object_id, :short, :send
 
       def respond_to? x ; true end  # i want it all
     end
@@ -295,7 +306,8 @@ module Skylab::Treemap
             :arg => -> { sw.arg },
             :long => -> { sw.long },
             :object_id => -> { sw.object_id }, # used to look up if visible ..
-            :short => -> { sw.short }
+            :short => -> { sw.short },
+            :send => -> x, *a { sw.send x, *a }  # used by hl o.p
           )
           y << pxy
         end

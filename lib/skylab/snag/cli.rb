@@ -59,8 +59,7 @@ module Skylab::Snag
 
     def invoke argv               # modify at [#010]
       Headless::CLI::PathTools.clear # see
-
-      res = super argv            # (handles invites when parsing goes wrong)
+      res = super                 # (handles invites when parsing goes wrong)
 
       if false == res             # (but otherwise when we result in false..)
         # in the future: emit :help, invite_lite

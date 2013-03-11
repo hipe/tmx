@@ -29,7 +29,7 @@ module Skylab::CssConvert::TestSupport
 
     def cli_instance
       @cli_instance ||= begin
-        streams = Headless::TestSupport::CLI::Streams_Spy.new
+        streams = Headless::TestSupport::CLI::IO_Spy_Group.new
         app = CssConvert::CLI.new(* streams.values )
         app.send :program_name=, 'nerk'
         if do_debug

@@ -3,11 +3,9 @@ require_relative '../test-support'
 module Skylab::Headless::TestSupport::Parameter
   ::Skylab::Headless::TestSupport[ self ]
 
-
   module CONSTANTS
     Parameter = Headless::Parameter
   end
-
 
   module ModuleMethods
     include CONSTANTS
@@ -39,9 +37,8 @@ module Skylab::Headless::TestSupport::Parameter
         client.debug = -> { do_debug }
         object = klass.new client
         emit_lines = -> do
-          # client.send( :io_adapter ).emitted.map(& :string )
-          if client.emitted
-            client.emitted.map(& :string ) #todo during integration
+          if client.emission_a
+            client.emission_a.map(& :payload_x )
           else
             []
           end

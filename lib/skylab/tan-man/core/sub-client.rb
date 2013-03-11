@@ -35,7 +35,7 @@ module Skylab::TanMan
     end
 
     def _tan_man_sub_client_init request_client
-      _headless_sub_client_init request_client
+      init_headless_sub_client request_client
     end
 
     def api_invoke normalized_action_name, param_h # *EXPERIMENTAL*

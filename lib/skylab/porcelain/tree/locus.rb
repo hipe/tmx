@@ -1,8 +1,9 @@
 module ::Skylab::Porcelain
+
   class Tree::Locus
 
     Headless::CLI::Tree::Glyphs.each do |g|
-      attr_accessor g.normalized_local_name # blank crook pipe separator tee
+      attr_accessor g.normalized_glyph_name # blank crook pipe separator tee
     end
 
     attr_accessor :branch
@@ -70,8 +71,11 @@ module ::Skylab::Porcelain
       if ::Symbol === x
         x = Headless::CLI::Tree::Glyph::Sets.const_fetch x
       end
-      safe_names_h ||=
-        ::Hash[ Headless::CLI::Tree::Glyphs.each.map { |g| [g.normalized_local_name, true ]} ]
+      safe_names_h ||= ::Hash[
+        Headless::CLI::Tree::Glyphs.each.map do |g|
+          [ g.normalized_glyph_name, true ]
+       end
+      ]
       x.each do |n, v|
         if safe_names_h[ n ]
           instance_variable_set "@#{ n }", v

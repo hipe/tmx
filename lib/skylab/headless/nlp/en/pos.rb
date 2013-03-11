@@ -1,4 +1,5 @@
 module Skylab::Headless
+
   module NLP::EN::Part_Of_Speech
     # (this is the support module for the box module POS)
   end

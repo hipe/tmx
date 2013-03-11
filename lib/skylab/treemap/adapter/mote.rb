@@ -84,7 +84,7 @@ module Skylab::Treemap
     end
 
     def aliases
-      [ @name.to_slug ]
+      [ @name.as_slug ]
     end
 
     def build mc  # this is a legacy request for a hot action, possibly for x
@@ -115,7 +115,7 @@ module Skylab::Treemap
     end
 
     def build_native *a
-      kls = request_client.action_const_get @name.to_const
+      kls = request_client.action_const_get @name.as_const
       action = kls.new request_client.mode_client
       action.adapters = @adapters if @adapters
       action
@@ -129,7 +129,7 @@ module Skylab::Treemap
       # a given action -- we want to pass control over to the adapter action
       # asap so:
       if 1 == @adapters.length
-        kls = @adapters.first.resolve_cli_action_class @name.to_slug, -> e do
+        kls = @adapters.first.resolve_cli_action_class @name.as_slug, -> e do
           usage_and_invite e
         end
         if kls
@@ -144,7 +144,7 @@ module Skylab::Treemap
 
     def _summary_lines y  # this is the lightweight version
       if @is_native
-        y << "the #{ val @name.to_slug } action."
+        y << "the #{ val @name.as_slug } action."
       end
       nil
     end

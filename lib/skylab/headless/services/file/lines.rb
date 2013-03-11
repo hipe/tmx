@@ -1,5 +1,9 @@
 module Skylab::Headless
-  class Services::File::Lines < ::Enumerator
+
+  module Services::File::Lines
+  end
+
+  class Services::File::Lines::Producer < ::Enumerator
                                   # read lines in a more convenient way
                                   # (this is tracked by [#hl-044])
 
@@ -18,13 +22,8 @@ module Skylab::Headless
       @fh = nil
       @line_number = nil
       @live = true
-      if ::Array === pathname
-        @lines = pathname
-        super( ) { |y| visit_no_fs y }
-      else
-        @pathname = ::Pathname.new pathname
-        super( ) { |y| visit_fs y }
-      end
+      @pathname = pathname  # gigo
+      super( ) { |y| visit_fs y }
     end
 
     def increment_line_number
@@ -47,20 +46,6 @@ module Skylab::Headless
       end
       @fh.close
       @fh = nil
-      @live = nil
-      nil
-    end
-
-    def visit_no_fs y
-      @lines or fail 'implement me - lines exhausted'
-      @line_number = nil
-      @live = true
-      while @lines.length.nonzero?
-        line = @lines.shift
-        increment_line_number
-        y << line
-      end
-      @lines = nil
       @live = nil
       nil
     end

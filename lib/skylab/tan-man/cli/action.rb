@@ -142,7 +142,7 @@ module Skylab::TanMan
       @do_hack_normalize_callable = nil
       @param_h = { }
 
-      _headless_sub_client_init request_client
+      init_headless_sub_client request_client
 
       # if an emitter emits and no listener is there to hear it, does it make
       # a sound? certainly not.

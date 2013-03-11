@@ -8,7 +8,7 @@ module Skylab::MyTree
     include Headless::Parameter::Controller::InstanceMethods  # after s.c above
       # b.c of h.l's `formal_attributes`/`formal_parameters` compat. hook
 
-    ACTIONS_ANCHOR_MODULE = -> { API::Actions }
+    ACTIONS_ANCHOR_MODULE = API::Actions
 
     def default_action
       :process

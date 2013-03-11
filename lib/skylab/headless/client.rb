@@ -12,7 +12,7 @@ module Skylab::Headless
                                   # clients that fall all the way back to this
                                   # and as such it must be modality-agnostic
                                   # here. anything fancy belongs elsewhere.)
-      _headless_sub_client_init nil                      # (part of [#hl-004])
+      init_headless_sub_client nil                      # (part of [#hl-004])
     end
 
     def actual_parameters         # not all stacks use this. #sc-bound
@@ -40,15 +40,6 @@ module Skylab::Headless
 
     def pen                       # bound to sub-client (#sc-bound)
       io_adapter.pen
-    end
-
-    define_method :request_client do
-      md = Headless::FUN.call_frame_rx.match caller.first
-      if md
-        xtra = " - `#{ md[:meth] }` wants the r.c of this #{ self.class } #{
-          }(whose r.c is human) - do you need to define a terminal form?"
-      end
-      fail "sanity - buck stops here#{ xtra }" # makes nasty bugs easier to find
     end
   end
 

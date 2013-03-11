@@ -47,18 +47,18 @@ module Skylab::Treemap
     end
 
     def slug                      # [#054]
-      @name.to_slug
+      @name.as_slug
     end
 
     def summary_lines_for_adapters y
       a = @adapters.reduce [] do |yy, adapter|
-        yy << adapter.name.to_slug
+        yy << adapter.name.as_slug
       end
       x = and_ a.map(& method(:val))
       if @is_native
         y << "(can utilize plugin#{ s a } #{ x })"
       else
-        y << "#{ val name.to_slug } for the #{ x } plugin#{ s a }"
+        y << "#{ val name.as_slug } for the #{ x } plugin#{ s a }"
       end
       y
     end

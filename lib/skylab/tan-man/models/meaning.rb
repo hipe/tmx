@@ -6,7 +6,7 @@ module Skylab::TanMan
 
 
     def collapse request_client                # we are not a flyweight, hack
-      self.request_client and fail 'sanity'
+      @request_client and fail 'sanity'
       _tan_man_sub_client_init request_client
       self
     end
