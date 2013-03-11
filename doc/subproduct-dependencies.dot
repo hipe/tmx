@@ -58,7 +58,7 @@ code -> meta
 code -> pub
 cov -> headless
 cov -> meta
-cov -> porcelain
+cov -> legacy
 cov -> pub
 css -> headless
 git -> meta
@@ -92,6 +92,7 @@ semantic -> meta
 slake -> meta
 snag -> legacy
 snag -> headless
+tan -> code
 tan -> bleeding
 tan -> headless
 tan -> meta
