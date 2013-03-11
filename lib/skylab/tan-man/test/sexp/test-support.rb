@@ -42,8 +42,8 @@ module Skylab::TanMan::TestSupport::Sexp
       $stderr # #kiss
     end
 
-    let :_input_fixtures_dir_path do
-      _parser_client_module.fixtures_dir_path
+    let :_input_fixtures_dir_pathname do
+      _parser_client_module.fixtures_dir_pathname
     end
 
     -> do

@@ -374,7 +374,7 @@ module ::Skylab::MetaHell
   class Formal::Attribute::Metadata < Formal::Box
 
     def add_default name, val     # this is internal
-      x = _dupe val
+      x = dupe_constituent_value val
       add name, x
       nil
     end
@@ -388,11 +388,11 @@ module ::Skylab::MetaHell
     end
 
     # merge the hash-like `enum_x` into self whereby for each element if
-    # self has? an element with the name, replace it else add it.
+    # self has? an element with the name, change it else add it.
     def merge! enum_x
       enum_x.each do |k, v|
         if? k,
-          -> x { replace k, v },
+          -> x { change k, v },
           -> { add k, v }
       end
       nil

@@ -2,13 +2,16 @@ require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::Boxxy
 
+  # Quickie!
+
   describe "#{ MetaHell::Boxxy }" do
+
     extend MetaHell::TestSupport::Boxxy
 
     context "minimal case: one item" do
       modul :Boxxy__Zeep do   # Has to be under Boxxy only b/c our containing
         extend MetaHell::Boxxy  # folder is called that, and we need
-        module self::Foop     # _autoloader_init to work!.  (self necessary !)
+        module self::Foop     # init_autoloader to work!.  (self necessary !)
         end
       end
 
@@ -35,14 +38,15 @@ module Skylab::MetaHell::TestSupport::Boxxy
 
       context "with a name that is valid but not found" do
         it "raises a ::NameError with lots of metadata" do
-          begin _Boxxy__Zeep.const_fetch [:nerp, :derp]
+          begin
+            _Boxxy__Zeep.const_fetch [:nerp, :derp]
           rescue ::NameError => e
           end
           e.message.should eql('unitialized constant Boxxy::Zeep::Nerp')
           e.module.to_s.should eql('Boxxy::Zeep')
           e.const.should eql(:Nerp)
           e.name.should eql(:nerp)
-          e.seen.should eql([])
+          e.seen_a.should eql([])
         end
       end
 
@@ -85,8 +89,7 @@ module Skylab::MetaHell::TestSupport::Boxxy
         it "cannot be as a lamba and a block" do
           -> do
             _Boxxy__Zeep.const_fetch('a', ->{ }) {  }
-          end.should raise_exception( ::ArgumentError,
-                                     "can't have block + lambdas" )
+          end.should raise_error( ::ArgumentError, "can't have block + lambdas")
         end
       end
     end

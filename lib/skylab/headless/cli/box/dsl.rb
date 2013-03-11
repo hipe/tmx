@@ -1,22 +1,30 @@
 module Skylab::Headless
+
   module CLI::Box::DSL
 
     #                         ~ never say never ~                          #
 
     def self.extended mod # [#sl-111]
-      mod.extend CLI::Box::DSL::ModuleMethods
-      mod.send :include, CLI::Box::DSL::InstanceMethods
+      mod.module_exec do
+        include CLI::Box::DSL::InstanceMethods
+        @tug_class = MAARS::Tug
+        extend CLI::Box::DSL::ModuleMethods  # `method_added` - avoid troubl
+        _headless_init_add :_headless_cli_box_dsl_init
+        init_autoloader caller[2]
+      end
       nil
     end
   end
 
   module CLI::Box::DSL::ModuleMethods
-    include MetaHell::Autoloader::Autovivifying::Recursive::ModuleMethods
+
+    include Autoloader::Methods
+
     #
     # this deserves some explanation: we use Boxxy on our action box module
     # because that was exactly what it was designed for: to be an unobtrusive
     # hack for painless retrieval and collection management for constituent
-    # module. now the point of this whole nerk here is to create such a
+    # modules. now the point of this whole nerk here is to _create_ such a
     # box module and, *as the file is being loaded*, blit it with classes
     # that are generated dynamically to model all of your actions from
     # methods as they are defined. that's the essence of why we are here.
@@ -47,16 +55,17 @@ module Skylab::Headless
       else
         box = self
         box_mod = const_set :Actions, ::Module.new
-        box_mod.module_eval do
+        box_mod.module_exec do
           extend MetaHell::Boxxy::ModuleMethods
           include CLI::Box::InstanceMethods
-
-          if box.dir_path  # this noise is what the extnesive note above is abt.
-            self.dir_path = box.dir_pathname.join 'actions'  # eew sorry
+          @tug_class = MAARS::Tug
+          if box.dir_pathname  # see extensive note above about all this noise
+            @dir_pathname = box.dir_pathname.join 'actions'  # eew sorry
           else
-            self.dir_path = false  # tell a.l do not try to induce our path
+            @dir_pathname = false  # tells a.l not to try to induce our path
+            box.dir_pathname_waitlist :Actions, self
           end
-          _boxxy_init nil  # (but no matter what, don't leave dir path nil
+          init_boxxy nil   # (but no matter what, don't leave dir path nil
                            # when you send no caller_str up this chain.)
           self
         end
@@ -69,10 +78,11 @@ module Skylab::Headless
     def action_class_in_progress!
       @action_class_in_progress ||= begin
         box = self
-        ::Class.new( cli_box_dsl_leaf_action_superclass ).class_exec do
+        ::Class.new( _cli_box_dsl_leaf_action_superclass ).class_exec do
           extend CLI::Box::DSL::Leaf_ModuleMethods
           const_set :ACTIONS_ANCHOR_MODULE, box.action_box_module
           include CLI::Box::DSL::Leaf_InstanceMethods
+          @tug_class = MAARS::Tug
           define_method :argument_syntax do
             Headless::CLI::Argument::Syntax::Inferred.new(
               box.instance_method( leaf_method_name ).parameters, nil )
@@ -91,7 +101,7 @@ module Skylab::Headless
     end
 
     def build_option_parser &block # (This is the DSL block writer.)
-      action_class_in_progress!.build_option_parser(& block)
+      action_class_in_progress!.build_option_parser(& block )
       nil
     end
 
@@ -118,7 +128,7 @@ module Skylab::Headless
 
     cli_box_dsl_leaf_action_superclass = ::Object
 
-    define_method :cli_box_dsl_leaf_action_superclass do # special needs
+    define_method :_cli_box_dsl_leaf_action_superclass do # special needs
       cli_box_dsl_leaf_action_superclass
     end
 
@@ -138,6 +148,7 @@ module Skylab::Headless
   end
 
   module CLI::Box::DSL::InstanceMethods
+
     include CLI::Box::InstanceMethods
 
   protected

@@ -15,8 +15,8 @@ module Skylab::TanMan::TestSupport::Models::Association
       TanMan::Models::Association::Collection
     end
 
-    def _input_fixtures_dir_path
-      Association_TestSupport::Fixtures.dir_path
+    def _input_fixtures_dir_pathname
+      Association_TestSupport::Fixtures.dir_pathname
     end
 
     def lines

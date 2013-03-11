@@ -28,25 +28,44 @@ module Skylab::MetaHell
   end
 
   module Proxy::Nice::Basic
+
     # another goofball experiment - make a ::BasicObject s.c that is nice
-    #
+    # NOTE do not just create your produced subclass with Basic.new and
+    # expect it to work like a functional proxy! This simply produces
+    # a ::BasicObject subclass that a) does the nice things and b) makes
+    # a constructor (if you have nonzero length members in your definition)
+    # that takes a hash yet passes ordered args to your `initialize`
+    # This, in contrast to working with functional proxies, makes no
+    # assumptions about how you want to implement you proxy.
+
     def self.new *a
-      valid = ::Struct.new(* a ).new
+      valid = if a.length.nonzero? then ::Struct.new(* a ).new end
       kls = ::Class.new ::BasicObject
       def kls.inherited kls2
         kls2.send :define_method, :class do kls2 end
       end
       kls.class_exec do
         define_method :class do kls end
-        define_method :inspect do
-          "#<#{ self.class } #{ valid.members.join ', ' }>"
-        end
-        define_singleton_method :new do |h|
-          h.keys.each { |k| valid[ k ] }              # all keys are valid
-          args = valid.members.map { |k| h.fetch k }  # no keys are missing
-          obj = allocate
-          obj.__send__ :initialize, * args
-          obj
+        if valid
+          define_method :inspect do
+            "#<#{ self.class } #{ valid.members.join ', ' }>"
+          end
+          define_singleton_method :new do |h|
+            h.keys.each { |k| valid[ k ] }              # all keys are valid
+            args = valid.members.map { |k| h.fetch k }  # no keys are missing
+            obj = allocate
+            obj.__send__ :initialize, * args
+            obj
+          end
+        else
+          define_method :inspect do
+            "#<#{ self.class }>"
+          end
+          define_singleton_method :new do
+            obj = allocate
+            obj.__send__ :initialize
+            obj
+          end
         end
       end
       kls

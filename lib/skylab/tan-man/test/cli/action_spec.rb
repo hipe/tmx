@@ -36,8 +36,8 @@ module Skylab::TanMan::TestSupport::CLI
       ''
   end
 
-
   describe "#{ TanMan::CLI::Action } inflect_failure_reason" do
+
     extend CLI_TestSupport
 
     klass :Action, extends: TanMan::CLI::Action do |o|
@@ -45,10 +45,9 @@ module Skylab::TanMan::TestSupport::CLI
     end
 
     modul :Actions do
-      @dir_path = :nope
+      @dir_pathname = :nope
       extend MetaHell::Boxxy
     end
-
 
     event_struct = ::Struct.new :message
 
@@ -60,11 +59,11 @@ module Skylab::TanMan::TestSupport::CLI
       end
 
       it "tanmun failed to add - derp" do
+        action = self.action
         s = action.inflect_failure_reason event
         s.should eql('tanmun failed to add - derp')
       end
     end
-
 
     context "with a 5 level deep action'" do
 

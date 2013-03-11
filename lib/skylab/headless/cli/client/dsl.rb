@@ -7,17 +7,20 @@ module Skylab::Headless
     # subcommands (i.e isn't a "box"). Everything is experimental and subject
     # to change and will definately break your app. Everything.
 
-    def self.extended mod # [#sl-111]
-      mod.extend CLI::Client::DSL::ModuleMethods
-      mod.send :include, CLI::Client::DSL::InstanceMethods
-      mod._autoloader_init caller[0]  # extensive note about this in box/dsl.rb
+    def self.extended mod  # [#sl-111]
+      mod.module_eval do
+        include CLI::Client::DSL::InstanceMethods
+        @tug_class = MAARS::Tug
+        extend CLI::Client::DSL::ModuleMethods # `method_added` avoid trouble
+        init_autoloader caller[2] # extensive note about this in box/dsl.rb
+      end
       nil
     end
   end
 
   module CLI::Client::DSL::ModuleMethods
-    include MetaHell::Autoloader::Autovivifying::Recursive::ModuleMethods
-                                  # (see extensive node in box/dsl.rb)
+
+    include Autoloader::Methods   # (see extensive node in box/dsl.rb)
 
     include CLI::Action::ModuleMethods  # `option_parser`, `desc`
 

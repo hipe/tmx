@@ -2,7 +2,7 @@ module Skylab::TanMan::TestSupport::Sexp
   module Grammar::ModuleMethods
     extend ::Skylab::MetaHell::Let
 
-    let :fixtures_dir_path do
+    let :fixtures_dir_pathname do
       dir_pathname.join('../fixtures').to_s
     end
 

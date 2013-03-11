@@ -27,7 +27,7 @@ module Skylab::TanMan
         -> o do
           o.force_overwrite! if rebuild_tell_grammar
           o.generated_grammar_dir '../../../tmp'
-          o.root_for_relative_paths TanMan.dir_path
+          o.root_for_relative_paths TanMan.dir_pathname
           o.treetop_grammar 'statement/parser/statement.treetop'
         end,
         -> o do                   # this might get [#046]'d

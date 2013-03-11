@@ -89,9 +89,9 @@ module Skylab::Treemap
           has = true
         else  # for now we jump thru hacking hoops to keep this out of the
           if ! mod.respond_to? :boxxy_original_constants # adapter code
-            mod.dir_path or fail 'sanity - recursive autloader?'
+            mod.dir_pathname or fail 'sanity - recursive autloader?'
             mod.extend MetaHell::Boxxy::ModuleMethods
-            mod.__boxxy_init
+            mod.send :init_boxxy, nil
           end
           has = mod.constants.length.nonzero?
           catalyze_base_class mode
@@ -103,7 +103,7 @@ module Skylab::Treemap
 
     def with_any *consts, &func
       found = consts.reduce @module do |memo, const|
-        if memo.autoloader_original_const_defined? const, false
+        if memo.const_defined? const, false
           memo = memo.const_get const, false
         else
           # ( we debug here a lot )

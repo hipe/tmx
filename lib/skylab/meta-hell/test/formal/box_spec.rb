@@ -67,7 +67,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Box
 
       it "select with 1 arg - result is box" do
         x1 = subject.select do |x|
-          [:One, :Five].include? x
+          [ :One, :Five ].include? x
         end
         x1.length.should eql( 2 )
         x1.first.should be_kind_of(::Symbol)
@@ -76,7 +76,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Box
 
       it "select with 2 args - result is box" do
         x2 = subject.select do |k, v|
-          [:One, :Five].include? v
+          [ :One, :Five ].include? v
         end
         x2.length.should eql( 2 )
         x2.first.should be_kind_of(::Symbol)
@@ -133,7 +133,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Box
         box
       end
 
-      it "is tricky - reduce, 2 arg form", f:true do
+      it "is tricky - reduce, 2 arg form" do
         a = subject.reduce [] do |m, (k, v)|
           m << v if :bbb == k or :CCC == v ; m
         end

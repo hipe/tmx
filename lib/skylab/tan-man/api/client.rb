@@ -25,7 +25,8 @@ module Skylab::TanMan
       begin
         k = API::Actions.const_fetch normalized_action_name,
           -> e do
-            name_error "#{e.seen.last || 'actions'} has no \"#{e.name}\" action"
+            name_error "#{ e.seen_a.last || 'actions' } has no #{
+              }\"#{ e.name }\" action"
           end,
           -> e do
             name_error "invalid action name: #{ e.invalid_name }"

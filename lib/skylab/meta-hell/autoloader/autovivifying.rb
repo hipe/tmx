@@ -1,65 +1,86 @@
-module Skylab::MetaHell::Autoloader
+module Skylab::MetaHell
 
-  Autoloader = self
-  MetaHell = ::Skylab::MetaHell
+  module Autoloader::Autovivifying
 
-
-  module Autovivifying
-    extend ::Skylab::Autoloader
-
-    Autoloader = Autoloader
-    Autovivifying = self
+    extend Autoloader_            # myself? i'm a basic autoloader.
 
     def self.extended mod
-      mod.extend Autovivifying::ModuleMethods
-      mod._autoloader_init caller[0]
-    end
-  end
-
-
-  module Autovivifying::ModuleMethods
-    include ::Skylab::Autoloader::ModuleMethods
-
-    def _const_missing_class
-      Autovivifying::ConstMissing
-    end
-  end
-
-
-  class Autovivifying::ConstMissing < ::Skylab::Autoloader::ConstMissing
-    extend MetaHell::Let
-
-    def load f=nil
-      if file_pathname.exist?
-        load_file f
-      elsif dir_pathname.exist?
-        mod.const_set const, build_autovivified_module
-      else
-        raise ::NameError.new(%<uninitialized constant #{mod}::#{const} (#{
-          }and no such file/directory to autoload -- #{file_pathname.dirname}/#{
-          dir_pathname.basename}[#{EXTNAME}])>)
+      mod.module_exec do
+        extend Autoloader_::Methods
+        @tug_class = Autoloader::Autovivifying::Tug
+        init_autoloader caller[2]  # location of call to `extend`!
       end
       nil
     end
+  end
+
+  class Autoloader::Autovivifying::Tug < Autoloader_::Tug
+
+    def load f=nil                # compare to super
+      if leaf_pathname.exist?
+        load_file f
+      elsif branch_pathname.exist?
+        @mod.const_set @const, build_autovivified_module
+        true
+      elsif ! stowaway
+        raise ::NameError, "uninitialized constant #{ @mod }::#{ @const } #{
+          }and no such directory [file] to autoload -- #{
+          }#{ pth @branch_pathname }[#{ Autoloader_::EXTNAME }]"
+      end  # (result is result of callee)
+    end
 
     def probably_loadable?
-      super or dir_pathname.exist?
+      super or branch_pathname.exist?
     end
 
   protected
 
-    def build_autovivified_module
-      m = ::Module.new
-      m.extend module_methods_module
-      m.dir_path = dir_pathname.to_s
-      m._autoloader_init nil
-      m
+    #         ~ public method support, pre order ~
+
+    def branch_pathname
+      @branch_pathname ||= leaf_pathname.sub_ext ''
     end
 
-    let( :dir_pathname ) { file_pathname.sub_ext '' }
+    def build_autovivified_module
+      me = self
+      ::Module.new.module_exec do
+        extend Autoloader_::Methods
+        @tug_class = me.class
+        @dir_pathname = me.send :branch_pathname
+        self
+      end
+    end
 
-    def module_methods_module
-      Autovivifying::ModuleMethods
+    def pth pathname
+      pathname.relative_path_from ::Skylab.dir_pathname
+    end
+
+    #         ~ the stowaway experiment ~
+
+    def stowaway
+      stow_a = @mod.send :stowaway_a
+      if stow_a
+        host_const = stow_a.reduce nil do |_, (*guest_a, host)|
+          break host if guest_a.include? @const
+        end
+        if host_const
+          # assume that `host_const` represents a loadable but not yet loaded
+          # node that holds the definition for both `host_const` and @const.
+          # let's let the module decide the tug class, as we hack this:
+          tug = @mod.tug_class.new host_const, @mod_dir_pathname, @mod
+          if tug.load   # (else it borked, for now)
+            # (for now we avoid usuing c-onst_defined? out of deference for
+            # one possible spot [#ta-078])
+            if @mod.constants.include? @const
+              true
+            else
+              raise ::NameError, "#{ @mod }::#{ @const }, as a stowaway #{
+                }under #{ host_const }, was expected but not found in #{
+                }#{ pth tug.leaf_pathname }"
+            end
+          end
+        end
+      end
     end
   end
 end

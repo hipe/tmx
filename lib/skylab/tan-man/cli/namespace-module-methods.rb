@@ -6,7 +6,7 @@ module Skylab::TanMan
     include MetaHell::Boxxy::ModuleMethods
 
     def self.extended mod
-      mod._boxxy_init caller[0]
+      mod.send :init_boxxy, caller[0]
     end
 
     def build request_client

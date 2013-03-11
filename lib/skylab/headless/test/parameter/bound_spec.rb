@@ -1,6 +1,9 @@
 require_relative 'test-support'
 
 describe Skylab::Headless::Parameter::Bound do
+
+  # (no Q-uickie because `before` blocks are used!)
+
   extend ::Skylab::Headless::TestSupport::Parameter
 
   def self.bound_with &b
@@ -9,7 +12,6 @@ describe Skylab::Headless::Parameter::Bound do
       instance_exec(&b)
     end
   end
-
 
   context "lets you do questionable parameter reflection and manipulation" do
 
@@ -52,7 +54,6 @@ describe Skylab::Headless::Parameter::Bound do
       end
     end
   end
-
 
   context 'where clauses!' do
     bound_with do

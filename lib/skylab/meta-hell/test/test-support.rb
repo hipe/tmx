@@ -2,9 +2,11 @@ require_relative '../core'
 require 'skylab/test-support/core'
 
 module Skylab::MetaHell::TestSupport
+
   ::Skylab::TestSupport::Regret[ self ]
 
   module CONSTANTS
+    Autoloader_ = ::Skylab::Autoloader  # org-wide and sub-lib wide avoid confus
     MetaHell = ::Skylab::MetaHell
     TestSupport = ::Skylab::TestSupport
   end

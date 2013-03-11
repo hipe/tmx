@@ -19,6 +19,7 @@ module Skylab::Headless
     # For now, the input is always chunked into single lines (except the last
     # flush). Work in progres! (tracked by [#hl-048])
 
+
     attr_reader :line
 
     def select
@@ -56,7 +57,7 @@ module Skylab::Headless
 
     def initialize                # no args - manipulate exclusively thru
       @timeout_seconds = 0.3      # the setters
-      @maxlen = 4096              # ~ 6 lines of "text" - private for now
+      @maxlen = Headless::CONSTANTS::MAXLEN  # private for now but trivial etc
       @remaining_a = [ ]          # streams we are still reading
       @stream_name_h = { }        # reverse-lookup stream's name
 

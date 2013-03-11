@@ -29,6 +29,11 @@ module Skylab::MetaHell
         self
       end
       singleton_class.class_exec do
+        if ! h.key? :inspect
+          define_method :inspect do
+            "<##{ Proxy::Ad_Hoc }:(#{ h.keys.join ', ' })>"
+          end
+        end
         h.each do |k, func|
           define_method k do |*a, &b|          # necessary to do in these two
             func[ *a, &b ]                     # steps because we want to call

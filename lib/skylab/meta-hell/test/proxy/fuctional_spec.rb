@@ -23,7 +23,7 @@ module Skylab::MetaHell::TestSupport::Proxy::Functional
       pxy.bar.should eql( 'who' )
     end
 
-    it "but don't touch the sides", f:true do
+    it "but don't touch the sides" do
       kls = MetaHell::Proxy::Functional.new :zerpie, :derkie, :tata
 
       proc do

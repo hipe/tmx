@@ -199,7 +199,7 @@ module Skylab::Snag
 
     # (we don't necessarily have to combine the dsl- and non-dsl-variant:)
 
-    define_singleton_method :cli_box_dsl_leaf_action_superclass do
+    define_singleton_method :_cli_box_dsl_leaf_action_superclass do
       CLI::Action::Box_DSL_Leaf
     end
 

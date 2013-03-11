@@ -9,8 +9,8 @@ module Skylab::TanMan::TestSupport::Models::DotFile::Manipulating::Label
   extend TestSupport::Quickie # run some tests without rspec, just `ruby -w`
 
   module InstanceMethods
-    let :_input_fixtures_dir_path do
-      Label_TestSupport::Fixtures.dir_path
+    let :_input_fixtures_dir_pathname do
+      Label_TestSupport::Fixtures.dir_pathname
     end
   end
 end

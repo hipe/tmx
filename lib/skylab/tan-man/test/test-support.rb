@@ -146,7 +146,7 @@ module Skylab::TanMan::TestSupport
     attr_accessor :do_debug_parser_loading
 
     let :__input_fixtures_dir_pathname do
-      ::Pathname.new _input_fixtures_dir_path
+      ::Pathname.new _input_fixtures_dir_pathname
     end
 
     def input_path

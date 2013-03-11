@@ -1,10 +1,12 @@
 module ::Skylab::TanMan
+
   module Services                 # 2 different experiments in one
                                   # being #watched [#mh-011]
+    # this is due for a cleanup [#077]
 
     extend MetaHell::Boxxy
 
-    dbg = nil #  $stderr
+    dbg = nil # $stderr
     fun = ::Skylab::Autoloader::Inflection::FUN
     methodize = fun.methodize
     load_method = -> const { "load_#{ methodize[ const ] }" }
@@ -16,13 +18,9 @@ module ::Skylab::TanMan
     end
 
     o :OptionParser,  -> { require 'optparse' ; ::OptionParser }
-
     o :PP,            -> { require 'pp'       ; ::PP }
-
     o :Open3,         -> { require 'open3'    ; ::Open3 }
-
     o :StringIO,      -> { require 'stringio' ; ::StringIO }
-
     o :StringScanner, -> { require 'strscan'  ; ::StringScanner }
 
     build_service = -> pathname do
@@ -63,10 +61,6 @@ module ::Skylab::TanMan
 
     define_singleton_method( :services ) { services[] }
 
-    def self._const_missing_class
-      Service_Load
-    end
-
     o = { }
 
     o[:load_method] = load_method # 'export' this definition
@@ -74,15 +68,13 @@ module ::Skylab::TanMan
     FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
   end
 
-
-  class Service_Load < MetaHell::Autoloader::Autovivifying::
-                                          Recursive::ConstMissing
-    extname = Autoloader::EXTNAME
+  class Service_Load < MetaHell::Autoloader::Autovivifying::Recursive::Tug
 
     fun = TanMan::Services::FUN
 
     define_method :load do |f=nil|             # Services doubles as a stdlib
-      method = fun.load_method[ const ]        # loader experimentally
+      method = fun.load_method[ @const ]       # loader experimentally
+
       if Services.respond_to? method           # this should call const_set
         Services.send method
       else
@@ -92,26 +84,45 @@ module ::Skylab::TanMan
 
     def load_file( * )
       super
-      if @tanman_hack
-        o = mod.const_get const, false         # NASTY
-        o.dir_pathname = o.dir_pathname.dirname
+      if @is_hiccup                            # see `leaf_pathname`
+        x = @mod.const_get @const, false       # NASTY
+        x.instance_exec do
+          @dir_pathname = @dir_pathname.dirname  # NOAASSTTYYYY!!!
+        end
       end
       nil
     end
 
-    let :file_pathname do                      # for missing const :FooBar
-      stem = pathify const                     # either load services/foo-bar.rb
-      head = mod_dir_pathname.join stem        # or services/foo-bar/foo-bar.rb
-      path = head.sub_ext extname
-      res = nil
-      if path.exist?
-        @tanman_hack = false
-        res = path
-      else
-        @tanman_hack = true
-        res = head.join "#{ stem }#{ extname }"
+    -> do
+
+      extname = Autoloader::EXTNAME
+      pathify = Autoloader::Inflection::FUN.pathify
+
+      # `leaf_pathname` (modifed version) - for missing const :FooBar
+      # either load services/foo-bar.rb or services/foo-bar/foo-bar.rb
+      # This is to allow plugin-like services to be completely contained
+      # under one directory yet still sort-of conform to the naming
+      # convention.
+
+      define_method :leaf_pathname do
+        @leaf_pathname ||= begin
+          stem = pathify[ @const ]
+          head = @mod_dir_pathname.join stem
+          path = head.sub_ext extname
+          if path.exist?
+            @is_hiccup = false
+            path
+          else
+            # if foo/bar.rb does not exist, assume foo/bar/bar.rb is expected
+            @is_hiccup = true
+            head.join "#{ stem }#{ extname }"
+          end
+        end
       end
-      res
-    end
+    end.call
+  end
+
+  module Services # #re-open
+    @tug_class = Service_Load
   end
 end

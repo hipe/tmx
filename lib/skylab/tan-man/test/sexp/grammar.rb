@@ -19,7 +19,6 @@ module Skylab::TanMan::TestSupport::Sexp
 
     extend MetaHell::Let
 
-    # include Autoloader::Inflection::Methods
     include TanMan::Models::DotFile::Parser::InstanceMethods # err msg porcelain
     include TanMan::TestSupport::Tmpdir::InstanceMethods #prepared_tanman_tmpdir
 

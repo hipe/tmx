@@ -44,7 +44,10 @@ module Skylab::MetaHell
 
     def _init_product o, client
       pretty = name.to_s.gsub SEP_, SEP
-      o.singleton_class.send(:define_method, :to_s) { pretty }
+      o.define_singleton_method :to_s do pretty end
+      class << o
+        alias_method :name, :to_s
+      end
       fail "circular dependency on #{name} - should you be using ruby #{
         }instead?" if _locked?
       _lock!

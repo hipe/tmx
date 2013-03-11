@@ -1,72 +1,50 @@
-module Skylab::MetaHell::Autoloader::Autovivifying
+module Skylab::MetaHell
 
-  module Recursive
+  module Autoloader::Autovivifying::Recursive
     def self.extended mod
-      mod.extend Recursive::ModuleMethods
-      mod._autoloader_init caller[0]
+      mod.module_exec do
+        extend Autoloader_::Methods
+        @tug_class = Autoloader::Autovivifying::Recursive::Tug
+        init_autoloader caller[2]  # the location of the call to `extend` !
+      end
     end
   end
 
+  class Autoloader::Autovivifying::Recursive::Tug <
+        Autoloader::Autovivifying::Tug
 
-  module Recursive::ModuleMethods
-    include Autovivifying::ModuleMethods
+    attr_reader :const
 
-    def case_insensitive_const_get const # experiment
-      _const_missing(const)._case_insensitive_const_get
-    end
+    protected
 
-    def _const_missing_class
-      Recursive::ConstMissing
-    end
-  end
-
-
-  class Recursive::ConstMissing < Autovivifying::ConstMissing
-
-    normalize = -> const do
-      const.to_s.gsub('_', '').downcase
-    end
-
-    define_method :_case_insensitive_const_get do
-      normalized = normalize[ self.const ]
-      find = -> do
-        mod.autoloader_original_constants.detect do |c|
-          normalized == normalize[ c ]
-        end
-      end
-      correct = -> const do
-        if const and const != self.const
-          self.const = const
-        end
-      end
-      found = find.call           # in the existing consts, do i exist (fuzzy)?
-      if found                    # if i am found, make my casing correct
-        correct[ found ]
-      else                        # else load the file, and repeat the same
-        load -> { correct[ find.call ] } # thing again immediately after
-      end                         # you load it, so that our check is ok.
-      mod.const_get self.const, false
-    end
-
-  protected
+    # `load_file` - do what parent does, and (since the load didn't raise an
+    # exception, it set the appropriate constant of the appropriate module --
+    # the end result of autoloading), if the value of that constant can
+    # define a singleton class, (i.e it's a module, a class, or even some
+    # arbitrary object that can have an s.c), then we "upgrade" it to be
+    # a recursive autoloader based on the straightforward nerkage below.
 
     def load_file after=nil
       super
-      o = mod.const_get const, false
-      if ! o.respond_to? :autoloader_original_const_defined?
-        if ::TypeError != (o.singleton_class rescue ::TypeError) # else final
-          o.extend module_methods_module   # "recursive" (infectious)
-          o.dir_path = normalized
-          o._autoloader_init nil
-        end
-      elsif ! o.dir_path
-        o.dir_path = normalized
+      x = @mod.const_get @const, false
+      do_initialize = if x.respond_to? :dir_pathname
+        true
+      elsif ::TypeError != ( x.singleton_class rescue ::TypeError ) # else final
+        x.extend Autoloader_::Methods
+        true
       end
-      nil
-    end
-
-    def module_methods_module
-      Recursive::ModuleMethods
+      if do_initialize
+        me = self
+        x.instance_exec do
+          if dir_pathname.nil?  # allow shenanigans
+            init_dir_pathname me.send( :branch_pathname )
+          end
+          if tug_class.nil?
+            @tug_class = me.class
+          end
+        end
+      end
+      true  # (in case we ever fail gracefully, future-proof it)
     end
   end
 end

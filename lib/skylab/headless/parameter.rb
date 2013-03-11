@@ -136,12 +136,6 @@ module Skylab::Headless
       @hash.fetch normalized_local_name do end
     end
 
-    def each &b                   # experimentally fully charge your graph..
-      ea = super(& nil )
-      ea.box_instance = -> { self } # with this hack
-      b ? ea.each(& b ) : ea
-    end
-
     alias_method :known?, :has?  # this one feels ok
 
     def fetch! name
@@ -179,10 +173,12 @@ module Skylab::Headless
     end
 
     def base_args
-      [ @host, @meta_set ]
+      supr = super
+      [ * supr, @host, @meta_set ]
     end
 
-    def base_init host, meta_set
+    def base_init *supr, host, meta_set
+      super(* supr )
       @host = host
       @meta_set = meta_set  # .. watch out for this..
       nil

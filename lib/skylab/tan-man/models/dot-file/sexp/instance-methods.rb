@@ -32,14 +32,8 @@ module Skylab::TanMan
     # uses const_defined? to determine if extension modules exist
     # for a given Sexp class.
 
-    def self.const_defined? const, bool
-      if autoloader_original_const_defined? const, bool
-        true
-      elsif const_probably_loadable? const
-        self.const_get const, false
-      else
-        false
-      end
+    def self.const_defined? const_str, look_up=true
+      super or const_probably_loadable? const_str
     end
   end
 

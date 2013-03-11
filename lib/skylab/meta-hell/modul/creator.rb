@@ -50,6 +50,7 @@ module Skylab::MetaHell::Modul::Creator
       # The result is the requested module.
 
       mem =  InstanceMethods::Memo.new mod
+
       M.reduce[ name, mem, -> memo, const do
         if ! memo.mod.const_defined? const, false
           M._build_product[ client, graph, mod, memo.mod, memo.name, const ]

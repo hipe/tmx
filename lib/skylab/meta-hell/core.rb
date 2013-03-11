@@ -1,21 +1,32 @@
 require_relative '..'
 
 module Skylab
-  module MetaHell
-    MetaHell = self
-    extend ::Skylab::Autoloader
-    module Autoloader
-      extend ::Skylab::Autoloader
-    end
-    extend MetaHell::Autoloader::Autovivifying::ModuleMethods # MWAHAHAHA stupid
-  end
 
-  module MetaHell::Proxy
-    extend MetaHell::Autoloader::Autovivifying # dumb, meet dumber. when you
-    class << self                              # break this life will suck
-      def Ad_Hoc h
-        self::Ad_Hoc.new h  # just say it you hate me now
-      end                                      # the reason this is here and
-    end                                        # not there or the other place
-  end                                          # is because of orphans and
-end                                            # autoloading, respectively
+  module MetaHell                 # welcome to meta hell
+
+    MetaHell = self               # (so we can reach up then down from below)
+
+    Autoloader_ = Autoloader      # the toplevel one (which will probably move
+                                  # here one day) we will refer to internally
+                                  # as this. NOW..
+
+    # ARE YOU READY TO EAT YOUR OWN DOGFOOD THAT IS MADE OF YOUR BODY
+
+    #                    ~ auto-trans-substantiation ~
+
+    module Autoloader             # we have our own module called this.
+      extend Autoloader_          # confusingly extend it with this,
+    end                           # now it itself is a basic autoloader.
+
+                                  # but what we really want is not to ourselves
+                                  # be a basic autoloader and not to ourselves
+                                  # be an autovivifing autoloader, but for us
+                                  # ourselves to be a full-on, balls-out,
+                                  # recusive auto-vivifying autoloader.
+
+    MAARS = Autoloader::Autovivifying::Recursive
+
+    extend MAARS                  # which is such a long name you never want
+                                  # to have to say it more than once.
+  end
+end

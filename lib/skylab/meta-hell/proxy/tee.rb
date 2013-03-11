@@ -1,4 +1,5 @@
 module Skylab::MetaHell
+
   class Proxy::Tee < ::BasicObject # construct a tee like you would a struct
 
     class << self
@@ -27,7 +28,7 @@ module Skylab::MetaHell
         class << self
           alias_method :new, :metahell_original_new
         end
-        kls = self                # basic object don't resond to `class`
+        kls = self                # basic object don't respond to `class`
         methods.each do |m|       # basic object don't care
           class_exec m, &add_method
         end
@@ -58,6 +59,12 @@ module Skylab::MetaHell
     end
 
     alias_method :inspect, :to_s  # (makes errors more traceable)
+
+    def method sym
+      ::Proc.new do |*a, &b|
+        __send__ sym, *a, &b      # sorry, it is the best i can do
+      end                         # on short notice
+    end
   end
 
   class Proxy::Tee::Mux           # (internal dispatcher for proxy tee)

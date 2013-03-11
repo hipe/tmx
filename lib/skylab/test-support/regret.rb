@@ -1,5 +1,7 @@
 module ::Skylab::TestSupport
+
   module Regret
+
     # As the name suggests, we might really regret this. (This was [#ta-019].)
     #
     # The Regret module is an alternate way to do something like rspec's
@@ -40,8 +42,10 @@ module ::Skylab::TestSupport
   module Regret::MyModuleMethods
 
     def embellish mod
-      mod.extend Regret::AnchorModuleMethods
-      mod._init_regret! caller[0]
+      mod.module_exec do
+        extend Regret::AnchorModuleMethods
+        init_regret caller[2]
+      end
       nil
     end
 
@@ -52,9 +56,15 @@ module ::Skylab::TestSupport
 
   module Regret::AnchorModuleMethods
 
+    include Autoloader::Methods   # a regrettified module is an a.l module
+                                  # that we twerk out a bit
+
     def edify child_mod
-      child_mod.extend Regret::AnchorModuleMethods
-      child_mod._init_regret! caller[0], self
+      me = self
+      child_mod.module_exec do
+        extend Regret::AnchorModuleMethods
+        init_regret caller[2], me
+      end
       nil
     end
 
@@ -79,7 +89,8 @@ module ::Skylab::TestSupport
     spec_rx = %r| \A  (?<dir>.+[^/])  /
                       (?<stem>[^/]+) #{ ::Regexp.escape spec_tail } \z |x
 
-    define_method :_init_regret! do |caller_str, parent_anchor_module=nil|
+    define_method :init_regret do |caller_str, parent_anchor_module=nil|
+
       # *note*: We do *not* include the parent_anchor_module itself
       # into this client anchor_module.  If you do, with our chosen naming
       # convention it will have the effect of having the test-support
@@ -106,8 +117,9 @@ module ::Skylab::TestSupport
       #
       # (Now, experimentally, we are doing the above)
 
-      extend ::Skylab::MetaHell::
-        Autoloader::Autovivifying::Recursive::ModuleMethods #conf
+      if tug_class.nil?  # if you set it to false you are crazy
+        @tug_class = MetaHell::Autoloader::Autovivifying::Recursive::Tug
+      end
 
       -> do
         # experimental filesystem architecture (merged trees)
@@ -118,31 +130,34 @@ module ::Skylab::TestSupport
           if spec_tail == md[:path][ - spec_tail_len, spec_tail_len ]
             is_normal = false
             stem = spec_rx.match( md[:path] )[:stem]
-            self.dir_pathname = parent_anchor_module.dir_pathname.join stem
-            _autoloader_init nil
+            @dir_pathname = parent_anchor_module.dir_pathname.join stem
+            init_autoloader nil
           end
         end
         if is_normal
-          _autoloader_init caller_str
+          init_autoloader caller_str
           if 'test-support' == dir_pathname.basename.to_s  # here have a hack
             # so that when it *is* is 'test-support' we "correct" the path
             # (life is better *without* test-support folders trust me!)
-            self.dir_pathname = dir_pathname.join('..')
+            @dir_pathname = dir_pathname.join('..')
           end
         end
       end.call
+
       const_set :CONSTANTS, -> do
         o = ::Module.new
         parent_anchor_module and
           o.send :include, parent_anchor_module.constants_module
         o
       end.call
+
       const_set :ModuleMethods, -> do
         o = ::Module.new
         parent_anchor_module and
           o.send :include, parent_anchor_module.module_methods_module
         o
       end.call
+
       const_set :InstanceMethods, -> do
         o = ::Module.new
         o.module_eval {
@@ -159,6 +174,8 @@ module ::Skylab::TestSupport
 
       nil
     end
+
+    protected :init_regret
 
     def constants_module
       const_get :CONSTANTS, false

@@ -22,9 +22,19 @@ module Skylab::Headless
         name, actions_anchor_module.name )  # (one place in particular will be
     end  # upset if not all naming happens via this ivar !)
 
+    alias_method :full_name_function, :name_function  # this is necessary
+      # to give some crossover compatibilty with legacy action sheets, which
+      # have name fuctions that are not full.
+
     def normalized_action_name
       name_function.normalized_name
     end
+
+    def _headless_init_add x
+      ( @_headless_inits ||= [] ) << x  # #experimental
+    end
+
+    attr_reader :_headless_inits  # #experimental
   end
 
   module Action::InstanceMethods
@@ -76,6 +86,18 @@ module Skylab::Headless
         fp = formal_attributes.fetch( x ) { }
       end
       request_client.send :parameter_label, ( fp || x ), idx
+    end
+
+    def _headless_inits_run  # assumes self.class._headless_inits
+      @_headless_inits_ran_h ||= ::Hash.new { |h, k| h[k] = true ; nil }
+      self.class._headless_inits.each do |method_name|
+        if @_headless_inits_ran_h[ method_name ]
+          fail "sanity - already ran: #{ method_name } - figure this logic out"
+        else
+          send method_name
+        end
+      end
+      nil
     end
   end
 end

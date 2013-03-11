@@ -1,4 +1,3 @@
-# (was [#bs-010] poster child before this commit)
 
 module Skylab::TestSupport::Quickie
 
@@ -16,12 +15,12 @@ module Skylab::TestSupport::Quickie
   # of that) in that file.
 
   # RSpec-like features it *does* include include:
-  #   + arbitrarily deeply nested contexts
-  #   + memoized attr_accessors with `let`
+  #   + arbitrarily deeply nested contexts (can define class methods, i.m's).
+  #   + memoized attr_accessors with `let` (that nest appropriatly)
   #   + core predicate matchers for `eql`, `match`, `raise_error`,
   #   + the wildcard predicate matcher `be_<foo>` (`be_include`, `be_kind_of`)
   #   + tag filters (only run certain examples tagged a certain way)
-  #   + pending examples (contexts?)
+  #   + pending examples (and contexts! unlike r.s)
   #
   # These are the most salient (to me) features it does *not* ape of RSpec:
   #   + `should_not` (meh)
@@ -30,65 +29,167 @@ module Skylab::TestSupport::Quickie
   #   + `specify`
   #   + custom matchers
   #   + ..and pretty much everything else not in the first list!
+  #
+  # Strange behaviors (features not bugs!):
+  #
+  #   + Quickie has the exception matcher (should raise_error(..)) that tries
+  #     to work just like r.s, but beyond this: **Quickie does not use
+  #     exceptions internally to indicate a test failure.**  2 corollaries
+  #     follow from this:
+  #     1) when there are multiple tests (`x.should eql(y)`)
+  #     in one example (`it "..." { }`), the first failing test will not
+  #     automatically halt further processing of the example (in contrast to
+  #     r.s).
+  #     2) Quickie makes no effort to rescue any exceptions, so any that are
+  #     unhandled during test execution bubble all the way out and probably
+  #     halt the execution of subsequent tests. it is the way of simplicity.
+  #   + As hinted at above, Quickie finds it just as easy to mark an
+  #     entire context as pending (because it has no block) as it does
+  #     for an example, so this is something it does that ::RSpec does not do.
+  #     Arguably this can be a nice enhancement to flow, when you know you
+  #     are going to make a node a context rather than an example, but you
+  #     want to just jot it down and pend it.
+  #     (::Rspec lets such nodes exist, it just does not report them, hence
+  #     cross-compatibility is not broken, it's just that one way is better.)
 
 
   # ~ just for fun, below is sometimes defined in a pre-order-ish traversal ~
 
   # (which is supposed to mean that where possible things in the file
   # are presented in the order there are called during a typical execution,
-  # so that if you had a strack trace of each first time a function was
+  # so that if you had a stack trace of each first time a function was
   # called, that is ideally the order they will appear in this file.
   # In theory this should make it more of a narrative story to read top
   # to bottom (and hopefully have your eyes jumping shorter distances)
   # if it's your idea of fun to read the whole thing .. we'll see..)
 
-  Quickie = self  # (for readability and future-proofing)
+  MetaHell = ::Skylab::MetaHell   # (for readability)
+  Quickie = self                  # (for readability and future-proofing)
   TestSupport = ::Skylab::TestSupport  # idem
-  MetaHell = ::Skylab::MetaHell  # idem
 
-                                  # when you extend quickie on a module:
+  service = nil                   # (here for scope, defined below)
+
+                                  # one way to hook into quickie is this:
+                                  # when you extend quickie on to a module
   define_singleton_method :extended do |mod|  # #pattern [#sl-111] (sorta)
 
-    if defined? ::RSpec           # NOTE Quickie ever running *must* be
-      define_singleton_method :extended do |*| end  # counter-conditional
-    else                          # on RSpec even having loaded. i shudder
-                                  # at the thought of debugging that.
-      ::Kernel.module_exec do
-        def should predicate      # define `should` for the whole world
-          predicate.match self
+    singleton_class.send :remove_method, :extended  # redefine it below..
+
+                                  # it's going to rustle the service
+    if service[].quickie_has_reign  # only contort modules if no ::RSpec!
+      define_singleton_method :extended do |md|  # redefine this selfsame method
+        md.extend ModuleMethods   # just to show that we are serious -
+      end                         # this gets our m.m in its singleton ancestor
+      extended mod                # then (gulp) call self with this new
+    else
+      define_singleton_method :extended do |*| end  # otherwise to show that we
+                                  # are serious about *not* doing quickie
+    end                           # (b.c e.g ::RSpec is loaded)
+  end                             # NOTE Quickie ever running *must* be
+                                  # counter-conditional on ::RSpec even having
+                                  # loaded! i shudder at the thought of
+                                  # debugging that.
+
+                                  # so what is this `service` metioned above?
+  service = -> do                 # it is a true service, it gets memoized
+    svc = Quickie::Service.new    # and everything (but could be tested in
+    svc.run                       # isolation)
+    service = -> { svc }
+    svc
+  end
+
+  class Quickie::Service          # (we will re-open this progressively as nec.)
+
+    # (`initialize` at end, different concerns are aggregated there)
+
+    # `run` - future-proof ourselves as a proper state machine
+    def run
+      if @is_running then raise ::RuntimeError, "service is already running."
+      else
+        @is_running = true
+        @quickie_has_reign = ! defined? ::RSpec  # IMPORTANT - everything will
+                                  # suck if they both load
+        if @quickie_has_reign     # (no reason not to do this now i suppose)
+          ::Kernel.module_exec do
+            def should predicate  # define `should` for the whole world
+              predicate.match self
+            end
+          end
         end
       end
+      nil
+    end
 
-      singleton_class.send :remove_method, :extended  # (avoid warnings)
+    attr_reader :quickie_has_reign
 
-      define_singleton_method :extended do |md|  # once.
-        md.extend ModuleMethods
-      end
-      extended mod                # the money shot
+  protected
+
+    def initialize
+      @is_running = false
+      @has_seen_one = nil  # to trigger the warning about this not yet impl.
+      @kernel_describe_is_enabled = nil
     end
   end
 
-  module Quickie::ModuleMethods   # the story really begins here:
+  # the story really begins from a `describe` that is from some sort
+  # of non-context, like a quickie-empowered module (empowering revealed above):
 
-    # pls don't be alarmed - this might as well be called `run` - it's the
-    # one true hack in this file - when you say `describe` under an ordinary
-    # module that is quickie-enabled, you get this, not a true describe,
-    # but something that delegates the describe to a context and then
-    # initiates the run sequence on the object graph.  # #todo we might
-    # improve this to do whatever rspec does so `descirbe` works as
-    # a Kernel method and not just from a Quickie-empowered module.
-    # also fix this for multiple files. # #todo
-
-    def describe desc, *rest, &b
-      rest.unshift desc
-      ctx = ::Class.new Context
-      FUN.context_init[ ctx, rest, nil, b ]
-      cli = Client.new ctx
-      cli.invoke ::ARGV
+  module Quickie::ModuleMethods
+    def describe desc, *rest, &b  # (same as 1 below)
+      m, a = Quickie.service.resolve_describe desc, *rest, &b
+      m.receiver.send m.name, *a
     end
+  end
+
+  # (or from anywhere, if this hack is turned on #experimental (and we break
+  # the narrative for aesthetics sorry)
+
+  def self.enable_kernel_describe
+    Quickie.service.enable_kernel_describe
+  end
+
+  class Quickie::Service
+    def enable_kernel_describe
+      if ! @kernel_describe_is_enabled
+        @kernel_describe_is_enabled = true
+        if ::Kernel.method_defined? :describe then nil else  # just don't mess
+          ::Kernel.module_exec do
+            def describe desc, *rest, &b  # (same as 1 above)
+              m, a = Quickie.service.resolve_describe desc, *rest, &b
+              m.receiver.send m.name, *a
+            end
+          end
+          nil
+        end
+      end
+    end
+  end
+
+  define_singleton_method :service do service[] end  # `Quickie.service`
+
+  class Quickie::Service
+
+    def resolve_describe desc, *rest, &b
+      rest.unshift desc                        # normalize the desc into an ary
+      ctx = ::Class.new Quickie::Context       # 1 desc. always == 1 context
+      FUN.context_init[ ctx, rest, nil, b ]    # init the kls, absorb the defn.
+      cli = Client.new ctx                     # WOAH - make a client now
+
+      # for now, per root describe we run the whole show .. this will get you
+      # multiple UI's and test runs in one invocation until [#ts-008]
+      # unless you load only one file and it has only one root describe.
+
+      if ! @has_seen_one then @has_seen_one = true else
+        cli.puts "quickie note - aggregating root describes (and running #{
+          }them all at once) is not yet available. running them individually."
+      end
+      cli.resolve_invoke ::ARGV   # so that's how it goes for now - a `describe`
+                                  # from a non-context context gets invoked
+    end                           # right away.
   end
 
   class Quickie::Context
+
     # (note that any names here will collide with user-defined module
     # methods and so on.. so just keep it in mind for now..)
 
@@ -101,13 +202,12 @@ module Skylab::TestSupport::Quickie
     end
 
     def self.description
-      @desc.first
+      @desc_a.fetch( 0 ) if @desc_a.length.nonzero?  # e.g
     end
 
-    def self.context desc, *rest, &b
+    def self.context *desc_a, &b
       c = ::Class.new self
-      rest.unshift desc
-      FUN.context_init[ c, rest, @tagset, b ]
+      FUN.context_init[ c, desc_a, @tagset, b ]
       @elements << [ :branch, c ]
       nil
     end
@@ -144,10 +244,10 @@ module Skylab::TestSupport::Quickie
 
   o = { }  # (this turns into `FUN` below)
 
-  o[:context_init] = -> c, desc, inherited_tagset, b do
+  o[:context_init] = -> c, desc_a, inherited_tagset, b do
     c.class_exec do
-      @tagset = FUN.tagset[ desc, inherited_tagset ]
-      @desc = desc
+      @tagset = FUN.tagset[ desc_a, inherited_tagset ]
+      @desc_a = desc_a
       @elements = [ ]
       if b
         @is_pending = false
@@ -209,12 +309,17 @@ module Skylab::TestSupport::Quickie
 
   class Quickie::Client
 
-    def invoke argv
-      res = parse_argv argv
-      if res
-        res = execute
+    def resolve_invoke argv
+      ok = parse_argv argv  # totally absorbed on success
+      if ok
+        [ method( :execute ), [] ]
+      else
+        [ method( :noop ), [] ]
       end
-      res
+    end
+
+    def puts line  # (svc wants this)
+      @y << line
     end
 
   protected
@@ -321,6 +426,9 @@ module Skylab::TestSupport::Quickie
       flush[]
       conclude @y, rt
       nil
+    end
+
+    def noop
     end
 
     # `build_rendering_functions` - this is kind of derky mostly because
@@ -474,9 +582,9 @@ module Skylab::TestSupport::Quickie
 
       if e.zero?
         if @or_a
-          y << "All examples were filtered out\n\n"
+          y << "All examples were filtered out"
         else
-          y << "No examples found.\n\n"
+          y << "No examples found.\n\n"  # <- trying to look like r.s there
         end
       end
 
@@ -565,6 +673,7 @@ module Skylab::TestSupport::Quickie
   #         ~ predicates (core) ! (section 2) ~
 
   class Quickie::Predicate
+
     class << self
       alias_method :quickie_original_new, :new
     end
@@ -615,7 +724,7 @@ module Skylab::TestSupport::Quickie
       if @expected == actual
         passed -> { "equals #{ @expected.inspect }" }
       else
-        failed "expected #{ @expected.inspect }, got #{actual.inspect}"
+        failed "expected #{ @expected.inspect }, got #{ actual.inspect }"
       end
       nil
     end
@@ -763,7 +872,7 @@ module Skylab::TestSupport::Quickie
               failed fail_msg[ actual, self ]
             end
           else
-            no_method[ context, self, actual ]
+            no_method[ @context, self, actual ]
           end
         end
       end
@@ -777,7 +886,7 @@ module Skylab::TestSupport::Quickie
     insp = nil
 
     no_method = -> context, predicate, actual do
-      context.fail "expected #{ insp[ actual ] } to have a #{
+      fail "expected #{ insp[ actual ] } to have a #{
         }`#{ predicate.expected_method_name }` method"
       nil
     end

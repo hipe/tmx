@@ -7,7 +7,7 @@ module Skylab::TanMan
 
     def self.action_box_module # compat hl:cli:box, centerpiece of this class:
       if ! const_defined? :Actions, false      # this load hack allows us to
-        require dir_path                       # define only the barebones
+        require dir_pathname.to_s              # define only the barebones
       end                                      # stuff in cli.rb and load the
       const_get :Actions, false                # contents only lazily
     end                                        # (to be clear, we could do
@@ -16,8 +16,7 @@ module Skylab::TanMan
                                                # have a deep narrow filetree)
 
     def self.inherited klass
-      klass._autoloader_init caller[0]
-      # klass._boxxy_init caller[0]
+      klass.send :init_autoloader, caller[0]
     end
 
 
