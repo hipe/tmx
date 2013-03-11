@@ -1,3 +1,15 @@
+[#059]       #tracking places where we nerk with detecting o.p dflt --help -h
+[#058]       #doc-point narrative pre-order ("outside-in") ..
+[#057] #open see how throwing a :terminate could help with o.p deep graphs
+[#056]       #doc-point "parsing argv is (almost) always descructive,
+               to facilitate agnostic, progressive chaining .."
+[#055]       #pattern we keep tabs out of regexen not because it
+             wouldn't  make them more powerful, it would. it's becase
+             they are unattractive to look at as regegen.
+[#054]       #doc-point this insane pattern for adapters
+[#053]       #tracking-tag for anything related to h.l option scanner
+[#052]       module i.m init experiment - "init hooks"
+[#051]       #subscription `val` as a canonical decorator
 [#050]       #doc-point name conventions!
 [#049]       #later formal parameters deep audit and refactor, [#009]
              [#049.1] - set becomes box

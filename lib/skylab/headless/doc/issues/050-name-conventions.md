@@ -42,22 +42,36 @@ what is in that particular name.
 
 ### string-rendering methods
 
-  + `foo_string` -
+  + `to_s`, `to_str` -
+  guess what: for new code, i almost never use either of them. Unless i
+  really (really) want it to have the look of being interpolated in a string
+  (and i can't think of one instance where i do implicitly), i opt for
+  one of the below. Say what you mean - don't let the objects put words in
+  your mouth, and don't put objects ..
+
+  + `string`, `foo_string` -
   result must be a string. must take 0 args. frequently if the
   method has "string" in the name (as opposed to e.g. "render") it implies that
   the string is not collapsed down to one mode (that it is not styled).
+  (also see notes at `render` for further distinction..)
 
-  + `foo_line` -
+  + `text` (vs. `string`)
+  It's a subtle, semantic distinction: `text` is a subset of `string`
+  that is for sure suitable to be read by humans (we don't know yet if
+  it should imply that it is already styled or not). (We used to call it
+  `message` but that seemed *too* pointed).
+
+  + `line`, `foo_line` -
   like above, but of course implies that it probably should not have
   newlines in it. this might be stylized for the particular modality.
 
-  + `foo_lines` -
+  + `lines`, `foo_lines` -
   must result in enumerable, e.g. array. usually (always?) takes no args.
   this might be stylized for the particular modality.
 
   (saying "line" or "lines" usually implies a certain mode..)
 
-  + `render_foo` -
+  + `render`, `render_foo` -
   (at one point we thought .. but then we were like ..)
   rendering freqently happens internally (read: protected methods).
   the optimal shape for the method depends largely on what is being done;
@@ -71,10 +85,21 @@ what is in that particular name.
   if the method is to take a yielder, it must a) take it as the first
   argument and b) it is strongly encouraged that your result be
   undefined.
+
+  #### `render` means moving parts
+  e.g I was trying to decide between `render` and `string` for a class
+  that models a `find` command (think `ack`). At first i was like, "string"
+  because it looks better, and i mean, it's a command, it's so close to
+  a string already, yeah!? NO. The particular class tries to prevent itself
+  from producing an invalid string representation of the command, so it
+  is not "guaranteed" to produce a string; it is not "isomorphic" with a
+  string. I chose "render" because it implies that it does some work, and
+  that success is not guaranteed.
+
   ..
 
-  + the above can have modifiers after them (`foo_string_for_bar`) and
-  the guidelines still hold.
+  + the above can have modifiers *after* them too (`foo_string_for_bar`)
+  and the guidelines should generally still hold.
 
 
 ## exclamation points
