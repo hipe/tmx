@@ -1,0 +1,196 @@
+#!/usr/bin/env ruby -w
+
+  #                             ~ uncommit ~
+  # move a single file one commit backwards in history - remove the changeset
+  # of a single file and **amend the commit!** and turn that changeset into
+  # a patch named after the file.
+
+exit_status = 0
+
+-> do
+  stay = true
+
+  y = -> do
+    stderr = $stderr
+    yld = ::Enumerator::Yielder.new { |msg| stderr.puts msg }
+    yld
+  end.call
+
+  usage = -> do
+    y << "usage: #{ ::File.basename $PROGRAM_NAME } some/file.rb"
+    exit_status = 1
+    stay = false
+  end
+
+  if ! ARGV[0]
+    break usage[]
+  end
+
+  require 'pathname'
+
+  i_pn = ::Pathname.new ARGV[0]
+
+  bork = -> msg=nil do
+    y << msg if msg
+    stay = false
+  end
+
+  if ! i_pn.exist?
+    break bork[ "not exist - #{ i_pn }" ]
+  end
+
+  if ! i_pn.relative?
+    break bork[ "for now won't handle absolute paths - #{ i_pn }" ]
+  end
+
+  require 'open3'
+
+  noerr = -> serr do
+    '' == ( e = serr.read ) or bork[ "unexpected - #{ e }" ]
+  end
+
+  kbd = -> str do
+    "\e[32m#{ str }\e[0m"
+  end
+
+  -> do  # are there any staged changed currently?
+    # this must mean *not* just for cwd, but whole repo
+
+    ::Open3.popen3 'git', 'diff', '--cached', '--name-only' do |_, sout, serr|
+      noerr[ serr ] or break
+      line = sout.gets
+      if line
+        bork[ "can't uncommit with staged changes:" ]
+        begin
+          y << "  #{ kbd[ '+' ] } #{ line.chomp }"
+          line = sout.gets
+        end while line
+      end
+    end
+    stay
+  end.call or break
+
+  -> do  # is the file modified?
+    ::Open3.popen3 'git', 'ls-files', '-m', i_pn.to_s do |sin, sout, serr|
+      noerr[ serr ] or break
+      '' != ( o = sout.read ) and break( bork[ "has changes, aborting #{
+        }- #{ o }" ] )
+    end
+    stay
+  end.call or break
+
+  o_pn = ::Pathname.new "#{ i_pn.to_s.gsub( '/', '_' ) }.patch"
+  if o_pn.exist?
+    break bork[ "exists, won't overwrite - #{ o_pn }" ]
+  end
+
+  o_fh = nil
+
+  wrote_num_bytes = 0
+
+  page_size = 4096  # meh
+
+  ::Open3.popen3 'git', 'show', i_pn.to_s do |sin, sout, serr|
+    '' != ( e = serr.read ) and break( bork[ "unexpected - #{ e }" ] )
+    chunk = sout.read( page_size )
+
+    if chunk
+      o_fh = o_pn.open 'w+'
+    else
+      break bork[ "had no changes in most recent commit - #{ i_pn }" ]
+    end
+
+    begin
+      wrote_num_bytes += o_fh.write( chunk )
+      chunk = sout.read( page_size )
+    end while chunk
+  end
+
+  if o_fh
+    o_fh.close ; o_fh = nil
+  end
+
+  stay or break
+
+  y << "(wrote #{ o_pn } (#{ wrote_num_bytes } bytes))"
+
+  wrote_num_bytes.nonzero? or break  # be absolutely sure!
+
+  cmd = [ 'patch',
+    '--verbose',
+    # '--dry-run',
+    '--unified',
+    '--reverse',
+    '--input', o_pn.to_s,
+    i_pn.to_s
+  ]
+
+  y << "(running: #{ kbd[ cmd * ' ' ] })"
+
+  exitstatus = ::Open3.popen3( * cmd ) do |sin, sout, serr, wait_thrd|
+    saw = nil
+    line = sout.read
+    while '' != line
+      saw ||= true
+      y << "(#{ line.chomp })"
+      line = sout.read
+    end
+    '' != ( e = serr.read ) and break bork[ "unexpected - #{ e }" ]
+    if ! saw
+      bork[ "was expecting output from patch." ]
+    end
+    wait_thrd.value.exitstatus
+  end
+
+  stay or break
+
+  -> do  # make *sure* the above modified the file in question
+    ::Open3.popen3 'git', 'ls-files', '-m', i_pn.to_s do |_, sout, serr|
+      noerr[ serr ] or break
+      line = sout.read
+      line.chomp!
+      if i_pn.to_s != line
+        bork[ "expecting modified file - #{ line } and #{ i_pn }" ]
+      end
+    end
+    stay
+  end.call or break
+
+  -> do  # add.
+    ::Open3.popen3 'git', 'add', i_pn.to_s do |_, sout, serr|
+      noerr[ serr ] or break
+      noerr[ sout ] or break
+    end
+    stay
+  end.call or break
+
+  -> do  # confirm staged.
+    ::Open3.popen3 'git', 'diff', '--cached', '--name-only' do |_, sout, serr|
+      noerr[ serr ] or break
+      ( o = sout.read ).chomp!
+      if i_pn.to_s != o[ i_pn.to_s.length * -1 .. -1 ]
+        bork[ "did not match - #{ i_pn } - #{ o }" ]
+      end
+    end
+    stay
+  end.call or break
+
+  -> do  # commit!
+    ::Open3.popen3 'git', 'commit', '--amend', '-CHEAD' do |_, sout, serr|
+      line = sout.gets
+      if line
+        begin
+          y << "(#{ line.chomp })"
+          line = sout.gets
+        end while line
+      end
+      noerr[ serr ]
+    end
+    stay
+  end.call or break
+
+  y << "uncommitted!"
+
+end.call
+
+exit exit_status
