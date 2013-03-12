@@ -5,8 +5,11 @@ module Skylab::TanMan
   end
 
   module CLI::Action::ModuleMethods
+
     include Headless::NLP::EN::API_Action_Inflection_Hack
+
     include Headless::CLI::Action::ModuleMethods
+
     include Core::Action::ModuleMethods
 
                                                # this will have problems
@@ -38,9 +41,10 @@ module Skylab::TanMan
     end
   end
 
-
   module CLI::Action::InstanceMethods
+
     include Headless::CLI::Action::InstanceMethods
+
     include Core::Action::InstanceMethods
 
     def build_option_parser
@@ -57,13 +61,16 @@ module Skylab::TanMan
     end
   end
 
-
   class CLI::Action
+
     extend CLI::Action::ModuleMethods
+
     include CLI::Action::InstanceMethods
 
     ACTIONS_ANCHOR_MODULE = -> { CLI::Actions }
     # the above is our "root" box module, for reflection (e.g. normalized_name)
+
+    event_factory CLI::Event::Factory
 
     empty_array = [ ].freeze
 
@@ -148,7 +155,8 @@ module Skylab::TanMan
       # a sound? certainly not.
 
       on_call_to_action do |e|
-        e.message = TanMan::Template[ e.template, action: act( e.action_class )]
+        msg = TanMan::Template[ e.template, action: act( e.action_class ) ]
+        emit :help, msg  # if something else is listening to *this* ..
         nil
       end
 
@@ -162,16 +170,16 @@ module Skylab::TanMan
       end
 
       on_info do |e|
-        if ! e.inflected_with_action_name
+        if ! e.is_inflected_with_action_name
           e.message = inflect_action_name e
-          e.inflected_with_action_name = true
+          e.is_inflected_with_action_name = true
         end
       end
 
       on_error do |e|
-        if ! e.inflected_with_failure_reason
+        if ! e.is_inflected_with_failure_reason
           e.message = inflect_failure_reason e
-          e.inflected_with_failure_reason = true
+          e.is_inflected_with_failure_reason = true
         end
       end
 

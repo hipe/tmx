@@ -5,6 +5,7 @@ module Skylab::TanMan
   end
 
   module Models::DotFile::Sexp::InstanceMethod::InstanceMethods
+
     def _label2id_stem label_str
       md = /\A(?<stem>\w+)/.match label_str
       md ? md[:stem].downcase : 'node'
@@ -13,7 +14,7 @@ module Skylab::TanMan
     # this is a *big* experiment -- expect this to change a lot
     def _parse_id str, member=nil
       fail "sanity - expecting String had #{ str.class }" if !(::String === str)
-      p = self.class.grammar.parser_for_rule :id # danger is here? [#054]
+      p = self.class.grammar.parser_for_rule :id  # danger is here? [#054]
       node = p.parse str
       node ||= p.parse "\"#{str.gsub('"', '\"')}\""
       fail "sanity - what such string is invalid? #{p.failure_reason}" if ! node
@@ -21,16 +22,15 @@ module Skylab::TanMan
     end
   end
 
-
   module Models::DotFile::Sexp::InstanceMethods
-    extend Autoloader # we want the plain jane variety
 
-    # This const_defined? hack is an #experimental alternative to preloading
-    # every extension module file for every Sexp class "manually".
+    extend MetaHell::Boxxy
+
+    # (this is the other end of [#078]) - This c-onst_defined? hack is an
+    # #experimental alternative of loading every extention module file
+    # for every Sexp class whole-hog, "manually".
     # We must do either one or the other because Sexp::Auto is unaware
-    # of the idea of autoloading (as it probably should be!) and hence
-    # uses const_defined? to determine if extension modules exist
-    # for a given Sexp class.
+    # (as it should be!) of the idea of autoloading. experimental!
 
     def self.const_defined? const_str, look_up=true
       super or const_probably_loadable? const_str
@@ -38,7 +38,11 @@ module Skylab::TanMan
   end
 
   module Models::DotFile::Sexp::InstanceMethods::Comment
-    MATCH_RX = %r{\A[[:space:]]*(?:#|/\*)} # #hack
+
+    match_rx = %r{\A[[:space:]]*(?:#|/\*)} # #hack
+
+    define_singleton_method :match_rx do match_rx end
+
   end
 
   # --*--

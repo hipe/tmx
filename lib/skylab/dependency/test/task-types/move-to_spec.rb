@@ -2,7 +2,10 @@ require_relative 'test-support'
 
 module Skylab::Dependency::TestSupport::Tasks
 
+  # (not Q-uickie - `before` used below)
+
   describe TaskTypes::MoveTo do
+
     extend Tasks_TestSupport
 
     let(:context) { { } }
@@ -21,7 +24,8 @@ module Skylab::Dependency::TestSupport::Tasks
     context "when moving an existing file" do
       include Dependency::Services::FileUtils
       def fu_output_message str
-        self.debug and $stderr.puts "FOR TESTING: #{ s }"
+        dputs "FOR TESTING: #{ str }" if do_debug
+        nil
       end
       before :each do
         BUILD_DIR.prepare

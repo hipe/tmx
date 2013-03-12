@@ -5,6 +5,7 @@ module Skylab::TanMan::TestSupport::Models::Meaning
   # Quickie compatible.
 
   describe "#{ TanMan::Models::Meaning } core" do
+
     extend ::Skylab::TanMan::TestSupport::Models::Meaning
 
     it "add one before one - HERE HAVE A COMMA (this was hard) BUT IT IS MAGIC" do
@@ -26,11 +27,13 @@ module Skylab::TanMan::TestSupport::Models::Meaning
 
 
     it "UPDATE ONE AND ADD ONE -- WHAT WILL HAPPEN!!?? - note order logic" do
+
       graph = client.parse_string <<-O.unindent
         digraph {
           barl [label=barl, fillcolor="too"]
         }
       O
+
       stmt = graph._node_stmts.to_a.first
       alist = stmt.attr_list.content
       alist.unparse.should eql( 'label=barl, fillcolor="too"' )

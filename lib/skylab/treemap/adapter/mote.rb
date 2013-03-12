@@ -1,8 +1,10 @@
 module Skylab::Treemap
+
   module Adapter
   end
 
   module Adapter::Mote
+
     # a "mote" is an experimental construct, something like a flyweight
     # except it has identity, and something like a "catalyzer", which is
     # also a thing. The premise here is that we can represent a large action
@@ -17,7 +19,9 @@ module Skylab::Treemap
 
 
   class Adapter::Mote::Actions < MetaHell::Formal::Box::Open
+
     include Treemap::Core::SubClient::InstanceMethods
+
     # all motes (almost by definition now) render themselves to screen.
     # we have implemented this by making a graph of subclients because
     # this is easiest. The rootmost node in the graph (the only one the
@@ -33,23 +37,23 @@ module Skylab::Treemap
 
     def initialize mc
       super nil  # init the box, by way of h.l s.c
-      Treemap::CLI === mc or fail "we need the mode client to inspect actions"
-      _treemap_sub_client_init -> { mc }  # init self as a s.c
+      Treemap::CLI::Client === mc or fail "we need the m.c to inspect actions"
+      init_treemap_sub_client -> { mc }  # init self as a s.c
       @hot = nil
     end
 
-    def action_const_get const
-      mode_client.class::Actions.const_get const, false
+    def actions_const_get const
+      mode_client.actions_const_get const
     end
 
     def load
-      mode_client.class::Actions.constants.reduce self do |memo, const|
+      mode_client.actions_box_module.constants.reduce self do |memo, const|
         action = Adapter::Mote::Action.new self, const
-        memo.add action.name.normalized_local_name, action
+        memo.add action.normalized_local_action_name, action
         memo
       end # Now the box has cards for all the local (non adapter) actions.
-      adapters = mode_client.api_client.adapter_box.each.which(&:has_cli_actions)
-      adapters.reduce( self ) do |memo, (adname, adapter)|
+      adaptrs = mode_client.api_client.adapter_box.each.which(&:has_cli_actions)
+      adaptrs.reduce( self ) do |memo, (adname, adapter)|
         adapter.cli_action_names.reduce memo do |mem, (aname, nf)|
           mem.if? aname, -> x do
             x.add_adapter adapter
@@ -62,7 +66,6 @@ module Skylab::Treemap
         end
         memo
       end
-
       @hot = true
       nil
     end
@@ -71,11 +74,13 @@ module Skylab::Treemap
       @rc.call
     end
 
-    public :action_const_get, :mode_client  # (child s.c only)
+    public :actions_const_get, :mode_client  # (child s.c only)
   end
 
   class Adapter::Mote::Action
+
     include Treemap::Core::SubClient::InstanceMethods
+
     include Treemap::CLI::Action::InstanceMethods  # for rendering summaries
 
     def add_adapter catalyzer
@@ -99,10 +104,14 @@ module Skylab::Treemap
 
     attr_reader :name
 
+    def normalized_local_action_name
+      @name.normalized_local_name
+    end
+
   protected
 
     def initialize rc, const, nf=nil
-      _treemap_sub_client_init( rc.respond_to?(:call) ? rc : -> { rc } )
+      init_treemap_sub_client( rc.respond_to?(:call) ? rc : -> { rc } )
       @adapters = nil  # will be used ase true-ish test
       @is_visible = true
       if const
@@ -115,7 +124,7 @@ module Skylab::Treemap
     end
 
     def build_native *a
-      kls = request_client.action_const_get @name.as_const
+      kls = request_client.actions_const_get @name.as_const
       action = kls.new request_client.mode_client
       action.adapters = @adapters if @adapters
       action
@@ -133,7 +142,8 @@ module Skylab::Treemap
           usage_and_invite e
         end
         if kls
-          charged = kls.new mc # (r.c is not self, it is not parent.)
+          charged = mc.build_wired_adapter_action kls
+          # (btw r.c of produces action is not self, it is not parent.)
           charged.legacy_proxy
         end
       else

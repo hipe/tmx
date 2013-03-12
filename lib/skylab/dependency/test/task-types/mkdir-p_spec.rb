@@ -2,20 +2,26 @@ require_relative 'test-support'
 
 module Skylab::Dependency::TestSupport::Tasks
 
+  # (not Q-uickie - `before` used below)
+
   describe TaskTypes::MkdirP do
+
     extend Tasks_TestSupport
 
     subject { TaskTypes::MkdirP }
     let(:all) do
       lambda do |t|
         t.on_all do |e|
-          self.debug and $stderr.puts [e.stream_name, e.message].inspect
-          stderr << e.to_s
+          debug_event e if do_debug
+          stderr << e.text
         end
       end
     end
-    it "builds an empty object" do
-      subject.new.should be_kind_of(TaskTypes::MkdirP)
+    it "won't build an empty object" do
+      -> do
+        subject.new
+      end.should raise_error( ::RuntimeError,
+        /unhandled stream\(s\): .*all.+info/i )
     end
     context "as empty" do
       subject do

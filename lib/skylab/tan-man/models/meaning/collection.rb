@@ -1,5 +1,7 @@
 module Skylab::TanMan
+
   class Models::Meaning::Collection
+
     include Core::SubClient::InstanceMethods
 
     def apply node, meaning_ref, dry_run, verbose, error, success, info
@@ -156,25 +158,6 @@ module Skylab::TanMan
 
   protected
 
-    def describe_interminable_meaning o
-      case o.reason
-      when :interminable
-        s = o.trail.map do |m|
-          "#{ lbl m.name } means #{ val m.value }"
-        end.join ' and '
-        msg = "interminable meaning: #{ s }, but #{
-          }#{ ick o.trail.last.value } has no meaning."
-      when :circular
-        s = o.trail.map do |m|
-          "#{ lbl m.name } -> #{ lbl m.value }"
-        end.join ', '
-        msg = "circular dependency in meaning: #{ s }"
-      else
-        msg = "interminable meaning - #{ o.reason }"
-      end
-      msg
-    end
-
     alias_method :dotfile_controller, :request_client
 
     def fetch_meaning meaning_ref, error, info
@@ -207,15 +190,14 @@ module Skylab::TanMan
 
     meaning_assignment_entry = ::Struct.new :a_list1, :meaning
 
-    define_method :parse_meanings do |meanings|
+    define_method :parse_meanings do |meaning_a|
       res = false                 # result
       ok = true                   # whether to keep processing here
       p = sexp.class.grammar.parser_for_rule :a_list # #watch [#054]
-      parse = -> m do
-        syn_node = p.parse m.value
+      parse = -> str do
+        syn_node = p.parse str
         if ! syn_node
-          error "failed to parse #{ lbl m.name } : #{ val m.value } - #{
-            }#{ p.failure_reason }"
+          error "failed to parse #{ val str } - #{ p.failure_reason }"
           emit :help, "try again after fixing the above syntax errors"
           ok = false ; res = nil
         end
@@ -243,7 +225,7 @@ module Skylab::TanMan
         ok = false ; res = nil
       end
 
-      meanings.each do |m|
+      meaning_a.each do |m|
         syn_node = parse[ m ] or break
         a_list = sexp.class.element2tree syn_node, :custom_a_list
         a_list._items.each do |a_list1|
@@ -276,18 +258,41 @@ module Skylab::TanMan
       res
     end
 
+    def sexp
+      dotfile_controller.sexp
+    end
+
     def resolve_meaning meaning
-      graph = Models::Meaning::Graph.new self, list # yes a one-off
-      res = graph.resolve meaning, -> o do
-        error describe_interminable_meaning( o )
+      graph = Models::Meaning::Graph.new self, list  # yes a one-off
+      meaning_a = graph.resolve_meaning_strings meaning.name, -> interm do
+        error describe_interminable_meaning( interm )
         emit :help, "perhaps address these issues with your meaning #{
           }graph and try again."
       end
-      res || nil # if it was false, change it to nil - we handled it
+      meaning_a || nil  # if it was false, we handled it. change to nil
     end
 
-    def sexp
-      dotfile_controller.sexp
+    def describe_interminable_meaning o
+      case o.reason
+      when :interminable
+        trail_a = o.trail_a
+        stack_a = [ "#{ ick trail_a.last } has no meaning." ]
+        if 1 < trail_a.length
+          stack_a << "#{ lbl trail_a[-2] } means #{ val trail_a[-1] }, but "
+          trail_a.pop
+        end
+        while 1 < trail_a.length
+          stack_a << "#{ lbl trail_a[-2] } means #{ val trail_a[-1] } and "
+          trail_a.pop
+        end
+        stack_a.reverse.join
+      when :circular
+        trail_a = o.trail_a
+        s = trail_a.map{ |sym| "#{ lbl sym }" }.join( ' -> ' )
+        "circular dependency in meaning: #{ s }"
+      else
+        "interminable meaning - #{ o.reason }"
+      end
     end
   end
 end

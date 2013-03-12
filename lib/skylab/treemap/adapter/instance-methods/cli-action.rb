@@ -1,5 +1,7 @@
 module Skylab::Treemap
+
   module Adapter::InstanceMethods::CLI_Action
+
     include Adapter::InstanceMethods::Action
 
   protected
@@ -12,7 +14,7 @@ module Skylab::Treemap
 
     def enhance_with_adapter ref
       ref ||= api_action.formal_attributes[:adapter_name][:default]
-      with_adapter_cli_action [ref, :render], -> act do
+      with_adapter_cli_action  [ ref, * normalized_action_name ], -> act do
         if @active_adapter_action_id != act.object_id
           @active_adapter_action_id = act.object_id
           act.load_attributes_into api_action.formal_attribute_definer
@@ -38,7 +40,7 @@ module Skylab::Treemap
         end
         if kls
           action = @adapter_action_cache.fetch( kls ) do |k|
-            @adapter_action_cache[ k ] = k.new self
+            @adapter_action_cache[ k ] = build_wired_adapter_action kls
           end
           res = func[ action ]
         end

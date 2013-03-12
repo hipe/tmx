@@ -2,15 +2,19 @@ require_relative 'test-support'
 
 module Skylab::Dependency::TestSupport::Tasks
 
+  # Quickie!
+
   describe TaskTypes::Executable do
+
     extend Tasks_TestSupport
 
     let(:context) { { } }
+
     let(:build_args) { {
       :executable => executable
     } }
 
-    subject do
+    let :subject do
       TaskTypes::Executable.new( build_args ) { |t| wire! t }
     end
 

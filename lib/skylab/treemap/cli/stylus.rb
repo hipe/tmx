@@ -1,5 +1,7 @@
 module Skylab::Treemap
+
   class CLI::Stylus
+
     include Bleeding::Styles
 
     alias_method :treemap_original_stylize, :stylize
@@ -31,21 +33,6 @@ module Skylab::Treemap
     end
 
     alias_method :kbd, :pre
-
-    def param x, render_method=nil             # generic rendering of params
-      # [#011] this whole mess needs a design overhaul. what is the stylus
-      # then, if it needs to have the cli and api actions inside of it!?
-      ::Symbol === x or x = x.normalized_name
-      str = nil
-      if (( cli_option = @cli_action.options.fetch( x ) { } ))
-        str = cli_option.send( render_method || :render )
-      elsif (( attr = @api_action.formal_attributes.fetch( x ) { } ))
-        str = attr.label_string
-      else
-        str = x.to_s
-      end
-      pre str
-    end
 
     def plain s, *a
       s

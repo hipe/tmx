@@ -8,6 +8,7 @@ module Skylab::Dependency::TestSupport
     include ::Skylab::Dependency # include lots of constants
     Headless = ::Skylab::Headless # not used in application code
     MetaHell = ::Skylab::MetaHell
+    TestSupport = ::Skylab::TestSupport
   end
 
   include CONSTANTS # include them for use in here, and in specs
@@ -15,6 +16,7 @@ module Skylab::Dependency::TestSupport
   Headless = Headless # so they are visible in modules contained by this
   MetaHell = MetaHell # module, without polluting that module itself's n.s
 
+  extend TestSupport::Quickie  # if you dare..
 
   tmpdir = ::Skylab::TestSupport::Tmpdir.new ::Skylab::TMPDIR_PATHNAME.to_s
 
@@ -31,14 +33,22 @@ module Skylab::Dependency::TestSupport
   CONSTANTS::FILE_SERVER = file_server # #bound
 
   module InstanceMethods
+
     extend MetaHell::Let::ModuleMethods
     include Headless::CLI::Stylize::Methods # `unstylize`
 
-    attr_accessor :debug
-
     def debug!
-      self.debug = true
+      @do_debug = true
     end
+
+    attr_reader :do_debug
+
+    -> do
+      sdbg = $stderr
+      define_method :dputs do |x|
+        sdbg.puts x
+      end
+    end.call
 
     let(:fingers) { ::Hash.new { |h, k| h[k] = [] } }
 

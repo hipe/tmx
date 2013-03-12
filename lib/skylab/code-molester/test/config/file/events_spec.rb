@@ -1,11 +1,12 @@
 require_relative 'test-support'
 
 module Skylab::CodeMolester::TestSupport::Config::File
+
   extend TestSupport::Quickie # try running this file just with `ruby -w`
 
   describe "#{ CodeMolester::Config::File } events" do
-    extend File_TestSupport
 
+    extend File_TestSupport
 
     def self.expect desc, exp, *tags, &block
       it "#{ desc } - #{ exp }", *tags do
@@ -13,13 +14,11 @@ module Skylab::CodeMolester::TestSupport::Config::File
       end
     end
 
-
     context "reading a file that doesn't exist" do
 
       let :o do
         config_file_new path: tmpdir.join( 'not-exist.conf' )
       end
-
 
       expect "out of the box, does not tell you full pathnames",
         'No such file or directory - not-exist.conf' do |exp|
@@ -39,7 +38,6 @@ module Skylab::CodeMolester::TestSupport::Config::File
           %r{\ANo such file or directory - --> .+co-mo/not-exist.conf <--\z} )
       end
     end
-
 
     context "try to read a file when the path is actually a directory" do
 
@@ -68,7 +66,6 @@ module Skylab::CodeMolester::TestSupport::Config::File
         # note that asking if 'valid?' will sill raise around the same issues
       end
     end
-
 
     expect "when file (on disk) is invalid at line 1 column N",
       'Expecting "=" in boeuf.conf:1 at the end of "who h"' do |exp|
@@ -101,7 +98,6 @@ module Skylab::CodeMolester::TestSupport::Config::File
       str.should eql(x)
     end
 
-
     context "on the use of `modified?`" do
 
       it "do not ask this of instances with no pathname" do
@@ -116,7 +112,6 @@ module Skylab::CodeMolester::TestSupport::Config::File
           /the wrong question to ask/ )
       end
     end
-
 
     context "valid string provided, path doesn't exist" do
 
@@ -137,7 +132,6 @@ module Skylab::CodeMolester::TestSupport::Config::File
         o.modified?.should eql(true)
       end
     end
-
 
     context "creating a new file" do
       context "when the object is (or would be) valid" do
@@ -181,7 +175,6 @@ module Skylab::CodeMolester::TestSupport::Config::File
             end
           end
 
-
           context "when the containing dir does not exist" do
             let :path do
               tmpdir.join 'some-dir-not-there/some.conf'
@@ -195,7 +188,6 @@ module Skylab::CodeMolester::TestSupport::Config::File
         end
       end
 
-
       context "when the object is not valid" do
 
         let :o do
@@ -208,7 +200,6 @@ module Skylab::CodeMolester::TestSupport::Config::File
         end
       end
     end
-
 
     context "an archetypal use case - read file, make changes, write" do
 
@@ -239,9 +230,7 @@ module Skylab::CodeMolester::TestSupport::Config::File
         end
       end
 
-
       context "with only path (of file that existed)" do
-
 
         it "`write` works with no event handlers, result is bytes" do
           prepare_wiz_conf

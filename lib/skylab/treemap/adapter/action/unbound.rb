@@ -1,6 +1,7 @@
 module Skylab::Treemap
 
   class Adapter::Action::Unbound
+
     #                      ~ Unbound Actions wtf ~
     #        a ridiculous experiment: the action as a a concrete
     #          ui object, but abstracted from any one adapter.
@@ -20,7 +21,7 @@ module Skylab::Treemap
   protected
 
     def initialize mc, adapter_a, name_func
-      _treemap_sub_client_init -> { mc }
+      init_treemap_sub_client -> { mc }
       @adapter_a, @name = adapter_a, name_func
       @ui_is_initted = nil
       nil

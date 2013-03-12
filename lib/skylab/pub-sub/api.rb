@@ -1,50 +1,57 @@
 module Skylab::PubSub
+
   module API
+    extend MetaHell::Autoloader::Autovivifying::Recursive
   end
 
-  module API::Actions
-  end
+  class API::Action
 
-  class API::Actions::GraphViz
-    PARAMS = [ :default_outfile_name,
-               :do_digraph,
-               :do_open,
-               :do_show_backtrace,
-               :files,
-               :klass,
-               :outfile_is_payload,
-               :outfile_name,
-               :use_force
-    ].each { |k| attr_writer k }
+    def self.formal_parameters
+      @formal_parameters ||= begin
+        const_get( :PARAMS, false ).map { |k| API::Formal_Parameter.new k }
+      end
+    end
 
-    def execute
-      res = nil
-      begin
-        res = resolve_params or break
-        res = resolve_infiles or break
-        res = resolve_klass or break
-        res = resolve_graph or break
-        res = resolve_paystream or break
-        res = render_graph or break
-        res = open_file or break
-      end while nil
-      res
+    def self.name_function
+      @name_function ||= begin
+        Headless::Name::Function::From::Constant.from_name name
+      end
+    end
+
+    def absorb param_h
+      param_h_h = ::Hash[ formal_parameters.map { |p| [ p.sym, p ] } ]
+      param_h.each do |k, v|
+        instance_variable_set param_h_h.fetch( k ).ivar, v
+      end
+      nil
     end
 
   protected
 
-    #         ~ housekeeping ~
+    #         ~ housekeeping & basic ui ~
 
-    def initialize outstream, errstream
-      @outstream, @errstream = outstream, errstream
+    def initialize prefix, paystream, infostream
+      formal_parameters.each do |p|
+        instance_variable_set p.ivar, nil
+      end
+      @error_count = 0
+      @request_client_prefix = prefix
+      @paystream, @infostream = paystream, infostream
     end
 
+    def formal_parameters
+      self.class.formal_parameters
+    end
+
+    # --*--
+
     def emit stream, line
-      ( :pay == stream ? @outstream : @errstream ).puts line
+      ( :pay == stream ? @paystream : @infostream ).puts line
       nil
     end
 
     def error msg
+      @error_count += 1
       emit :err, msg  # it looks nicer to have these be w/o prefix
       false
     end
@@ -60,25 +67,21 @@ module Skylab::PubSub
       nil
     end
 
-    prefix = 'pub-sub-viz '  # looks better w/o
+    def prefix
+      "#{ @request_client_prefix } #{ self.class.name_function.local_slug } "
+    end
 
-    define_method :prefix do prefix end
-
-    #         ~ implementation in order ~
+    #         ~ in order of typical use ~
 
     def resolve_params
-      missing = PARAMS.reduce [] do |m, k|
-        if instance_variable_defined? :"@#{ k }"
-          if instance_variable_get(:"@#{ k }").nil?
-            m << k
-          end
-        else
-          m << k
+      missing = formal_parameters.reduce [] do |m, p|
+        if instance_variable_get( p.ivar ).nil?
+          m << p.label
         end
         m
       end
       if missing.length.zero? then true else
-        error "missing required paramer(s): (#{ missing.join ', ' })"
+        error "#{ prefix }missing required paramer(s): (#{ missing.join ', ' })"
         nil
       end
     end
@@ -89,7 +92,16 @@ module Skylab::PubSub
         @files.each do |file|
           pn = ::Pathname.new file
           if pn.exist?
-            load pn.to_s
+            if pn.relative?
+              pn = pn.expand_path
+            end
+            pn = pn.sub_ext ''
+            rs = require "#{ pn }"
+            if false == rs
+              info "(using loaded - #{ file })"
+            else
+              info "(loaded - #{ file })"
+            end
           else
             break( res = error "file not found: #{ pn }" )
           end
@@ -99,28 +111,31 @@ module Skylab::PubSub
       end
     end
 
-    const = '[A-Z][A-Za-z0-9_]*'
+    -> do
 
-    klass_rx = /\A (?:::)?
-      (?<inner>
-        (?: #{ const } )
-        (?: ::  #{ const } )*
-      )
-    \z/x
+      const = '[A-Z][A-Za-z0-9_]*'
 
-    define_method :resolve_klass do ||
-      if @klass
-        md = klass_rx.match( @klass )
-        if md
-          const_a = md[:inner].split '::'
-          load_module const_a
+      modul_rx = /\A (?:::)?
+        (?<inner>
+          (?: #{ const } )
+          (?: ::  #{ const } )*
+        )
+      \z/x
+
+      define_method :resolve_mod do ||
+        if @modul
+          md = modul_rx.match( @modul )
+          if md
+            const_a = md[:inner].split '::'
+            load_module const_a
+          else
+            error "doesn't look like a class or module constant - #{ @modul }"
+          end
         else
-          error "doesn't look like a class or module constant - #{ @klass }"
+          error "required - `modul`"
         end
-      else
-        error "required - `klass`"
       end
-    end
+    end.call
 
     def load_module const_a
       res = true
@@ -144,101 +159,45 @@ module Skylab::PubSub
       res
     end
 
-    max_line_width =  120
+    -> do
 
-    define_method :load_module_fancy_error do |m, c, e|
-      info "failed to load the constant with const_get:"
-      @errstream.puts "  #{ e }"
-      a = m.constants
-      if a.length.zero?
-        @errstream.puts "  #{ m } has no constants"
-      else
-        line = "  loaded constants of #{ m } include ("
-        s = a.join ', '
-        avail = max_line_width - line.length - 1 # ')'
-        if s.length > avail
-          avail -= ( ellipsis = '[..]' ).length
-          s = avail < 1 ? '' : "#{ s[ 0, avail ] }#{ ellipsis }"
-        end
-        @errstream.puts "#{ line }#{ s })"
-      end
-      break( res = nil )
-    end
+      max_line_width =  120
 
-    meth = :event_graph # #todo this changes to :event_stream_graph in a stash
-
-    define_method :resolve_graph do  # assumes @mod
-      if @mod.respond_to? meth
-        @event_stream_graph = @mod.send meth
-        true  # (in the off chance that we let the above result in falseish)
-      else
-        error "expected #{ @mod } to respond_to? #{ meth }"
-      end
-    end
-
-    def resolve_paystream
-      res = true  # important
-      if @outfile_is_payload
-        @outfile_name or fail 'sanity'
-        @outpn = ::Pathname.new @outfile_name
-        if @outpn.exist?
-          if @default_outfile_name != @outfile_name
-            if ! @use_force
-              error "exists, won't overwrite without force - #{ @outpn }"
-              res = nil  # prettier not to dump all the ui here
-            end
-          end
-        end
-        if res
-          @errstream.write "(#{ prefix }writing #{ @outpn } .."
-          @paystream = @outpn.open 'w+'
-        end
-      else
-        @paystream = @outstream
-      end
-      res
-    end
-
-    define_method :render_graph do  # assumes @event_stream_graph
-      raw = @event_stream_graph.describe
-      if raw
-        require 'strscan'  # just for fun ..
-        scn = ::StringScanner.new raw ; num = 0 ; line = nil
-        gets = -> do
-          s = scn.scan( /[^\r\n]*\r?\n|[^\r\n]+/ )
-          s and num += 1
-          s
-        end
-        if @do_digraph
-          @paystream.puts "digraph {"
-          @paystream.puts "  node [shape=\"Mrecord\"]"
-          @paystream.puts "  label=\"event stream graph for #{ @mod }\""
-          _gets = gets
-          gets = -> { x = _gets[] and "  #{ x }" }
-        end
-        @paystream.puts( line ) while line = gets[]
-        @paystream.write "}" if @do_digraph
-        if @paystream.tty?
-          @errstream.write "\n" if @do_digraph  # eew - digraph wo trailing nl
+      define_method :load_module_fancy_error do |m, c, e|
+        info "failed to load the constant with const_get:"
+        @infostream.puts "  #{ e }"
+        a = m.constants
+        if a.length.zero?
+          @infostream.puts "  #{ m } has no constants"
         else
-          @paystream.close
-          @errstream.puts "done.)"
+          line = "  loaded constants of #{ m } include ("
+          s = a.join ', '
+          avail = max_line_width - line.length - 1 # ')'
+          if s.length > avail
+            avail -= ( ellipsis = '[..]' ).length
+            s = avail < 1 ? '' : "#{ s[ 0, avail ] }#{ ellipsis }"
+          end
+          @infostream.puts "#{ line }#{ s })"
         end
-        info "(got #{ num } lines from #{ @mod }##{ meth }#describe)"
-        res = true
-      else
-        error "`#{ @event_stream_graph.class }#describe` was falseish"
-        res = nil
+        break( res = nil )
       end
-      res
-    end
+    end.call
+  end
 
-    def open_file
-      if @outfile_is_payload
-        exec 'open', @outpn.to_s  # goodbye self
-      else
-        true
-      end
+  class API::Formal_Parameter
+
+    attr_reader :ivar
+
+    attr_reader :label
+
+    attr_reader :sym
+
+  protected
+
+    def initialize name
+      @sym = name
+      @ivar = :"@#{ name }"
+      @label = name.to_s
     end
   end
 end

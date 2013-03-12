@@ -14,7 +14,7 @@ module Skylab::TanMan
       res = nil
       begin
         controllers.config.ready? or break
-        pathname = services.starters.normalize self.name, -> e { error e }
+        pathname = services.starters.normalize self.name, -> h { error h }
         break( res = pathname ) if ! pathname
         res = controllers.config.set_value(
                 Models::Starter::Collection::CONFIG_PARAM,

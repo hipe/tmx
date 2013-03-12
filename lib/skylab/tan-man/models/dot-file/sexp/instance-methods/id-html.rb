@@ -1,4 +1,5 @@
 module Skylab::TanMan
+
   module Models::DotFile::Sexp::InstanceMethods::IdHtml
 
     # (0..128).each { |i| puts("#{ '%03d' % [i] }: #{ ('%c' % [i] ).inspect }") }
@@ -39,11 +40,9 @@ module Skylab::TanMan
       res
     end
 
-
     def normalized_string
       self[:content_text_value]
     end
-
 
     def normalized_string! string
       string.include?('>>') and fail('haha not today my friend. not today.')

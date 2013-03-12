@@ -1,29 +1,26 @@
 require_relative 'graph/test-support'
 
-
 module Skylab::TanMan::TestSupport::Models::Meaning::Graph
-
 
   # Quickie
 
   describe "#{ TanMan::Models::Meaning::Graph } - #{
-    }RESOLVING means turning a meaning into a list #{
-    }of one or more terminal meanings, So if if you try resolve" do
+      }RESOLVING means turning a meaning into a list #{
+      }of one or more terminal meanings, So if if you try resolve" do
 
     extend TanMan::TestSupport::Models::Meaning::Graph
+
     context "with an empty graph" do
       let :graph do
         graph_from [ ]
       end
 
       it "any meaning - KeyError" do
-        meaning = new_meaning 'foo', 'bar'
         -> do
-          graph.resolve meaning, nil
+          graph.resolve_meaning_strings 'foo', nil
         end.should raise_error( ::KeyError, /key not found: :foo/ )
       end
     end
-
 
     context "with a graph with one terminal node of meaning" do
 
@@ -32,20 +29,17 @@ module Skylab::TanMan::TestSupport::Models::Meaning::Graph
       end
 
       it "the one meaning - you got it" do
-        meaning = _meaning 'red'
-        arr = graph.resolve meaning, nil
-        arr.length.should eql(1)
-        arr.first.should eql(meaning)
+        arr = graph.resolve_meaning_strings 'red', nil
+        arr.length.should eql( 1 )
+        arr[0].should eql( 'color=#fa0schwartz' )
       end
 
       it "an unknown meaning - KeyError" do
-        meaning = new_meaning 'foo', 'bar'
         -> do
-          graph.resolve meaning, nil
+          graph.resolve_meaning_strings 'foo', nil
         end.should raise_error( ::KeyError, /key not found: :foo/ )
       end
     end
-
 
     context "with a graph with one non-terminal node of meaning" do
 
@@ -54,17 +48,16 @@ module Skylab::TanMan::TestSupport::Models::Meaning::Graph
       end
 
       it "the one meaning - nerp" do
-        meaning = _meaning 'angry-color'
-        nerp = nil
-        arr = graph.resolve meaning, -> x do
-          nerp = x
+        interm = nil
+        arr = graph.resolve_meaning_strings 'angry-color', -> x do
+          interm = x
         end
-        nerp.trail.length.should eql(1)
-        nerp.trail.first.should eql(meaning)
-        arr.should eql(false)
+        trail_a = interm.trail_a
+        trail_a.length.should eql( 2 )
+        trail_a.should eql( [ :'angry-color', :red ] )
+        arr.should eql( false )
       end
     end
-
 
     context "with a graph with one NT and one T (related)" do
 
@@ -74,135 +67,137 @@ module Skylab::TanMan::TestSupport::Models::Meaning::Graph
       end
 
       it "the NT meaning - T" do
-        nt = _meaning 'happy'
-        t = _meaning 'happy-color'
-        arr = graph.resolve nt, nil
-        arr.length.should eql(1)
-        arr.first.should eql(t)
+        arr = graph.resolve_meaning_strings 'happy', nil
+        arr.length.should eql( 1 )
+        arr[0].should eql( 'foo=bar' )
       end
 
       it "the T meaning - T" do
-        nt = _meaning 'happy'
-        t = _meaning 'happy-color'
-        arr = graph.resolve t, nil
-        arr.length.should eql(1)
-        arr.first.should eql(t)
+        arr = graph.resolve_meaning_strings 'happy-color', nil
+        arr.length.should eql( 1 )
+        arr[0].should eql( 'foo=bar' )
       end
     end
 
-
     context "a NT meaning that splays out into multiple terminal meanings" do
+
       let :graph do
         graph_from [
-          ['zero-day', 'important'],
-          ['zero-day', 'urgent'],
-          ['urgent', 'color=red'],
-          ['urgent', 'border=heavy'],
-          ['important', 'border=heavy'],
-          ['important', 'icon=star']
+          [ 'zero-day', 'important' ],
+          [ 'zero-day', 'urgent' ],
+          [ 'urgent', 'color=red' ],
+          [ 'urgent', 'border=heavy' ],
+          [ 'important', 'border=heavy' ],
+          [ 'important', 'icon=star' ]
         ]
       end
-      it "resolves to 3 unique definitions but gives you 4 meanings!" do
-        top = _meaning 'zero-day' # *NOTE* this has multiple meanings
-        arr = graph.resolve top, nil
-        arr.map(&:symbol).should eql([:important, :important, :urgent, :urgent])
-        arr.map(&:value).should eql(
-          ["border=heavy", "icon=star", "color=red", "border=heavy"] )
+
+      it "resolves to the four terminal meanings along six arcs" do
+        term_a = graph.resolve_meaning_strings 'zero-day', nil
+        term_a.should eql(
+          [ "border=heavy", "icon=star", "color=red", "border=heavy" ]
+        )
       end
     end
 
     context "in a diamond graph, won't repeat meanings" do
+
       let :graph do
         graph_from [
-          ['appliance', 'category=appliance'],
-          ['clock', 'appliance'],
-          ['radio', 'appliance'],
-          ['clock-radio', 'clock'],
-          ['clock-radio', 'radio']
+          [ 'appliance', 'category=appliance' ],
+          [ 'clock', 'appliance' ],
+          [ 'radio', 'appliance' ],
+          [ 'clock-radio', 'clock' ],
+          [ 'clock-radio', 'radio' ]
         ]
       end
 
       it " - resolves to just the one nerk" do
-        top = _meaning 'clock-radio' # *NOTE* this has multiple meanings
-        arr = graph.resolve top, nil
-        arr.length.should eql(1)
+        term_a = graph.resolve_meaning_strings 'clock-radio', nil
+        term_a.length.should eql( 1 )
+        term_a[ 0 ].should eql( 'category=appliance' )
       end
     end
 
     context "if unresolvable you get a semantic trail!" do
+
       let :graph do
         graph_from [
-          ['done-color', 'green'],
-          ['finished', 'done-color']
+          [ 'done-color', 'green' ],
+          [ 'finished', 'done-color' ]
         ]
       end
+
       it "which is cool for rich error reporting" do
-        top = _meaning 'finished'
-        nerp = nil
-        arr = graph.resolve top, -> x do
-          nerp = x
+        interm = nil
+        arr = graph.resolve_meaning_strings 'finished', -> x do
+          interm = x
         end
-        o = nerp.trail.shift
-        a = [ "#{ o.name } means #{ o.value }" ]
-        while o_ = nerp.trail.shift
-          o = o_
-          a.push " and #{ o.name } means #{ o.value }"
+        trail_a = interm.trail_a
+        arr.should eql( false )
+        stack_a = [ "#{ trail_a.last } has no meaning." ]
+        if 1 < trail_a.length
+          stack_a << "#{ trail_a[-2] } means #{ trail_a[-1] }, but "
+          trail_a.pop
         end
-        a.push ", but #{ o.value } has no meaning."
+        while 1 < trail_a.length
+          stack_a << "#{ trail_a[-2] } means #{ trail_a[-1] } and "
+          trail_a.pop
+        end
+        msg = stack_a.reverse.join
         exp = "finished means done-color and done-color means green, #{
           }but green has no meaning."
-        a.join.should eql(exp)
+        msg.should eql( exp )
       end
     end
-
 
     circ_str = -> nerp do
-      nerp.trail.map { |m| "#{ m.name } -> #{ m.value }" }.join ', '
+      nerp.trail_a.map { |m| "#{ m.name } -> #{ m.value }" }.join ', '
     end
 
-
     context "simple circular" do
+
       let :graph do
         graph_from [
-          ['yin', 'yang'],
-          ['yang', 'yin']
+          [ 'yin', 'yang' ],
+          [ 'yang', 'yin' ]
         ]
       end
+
       -> do
-        exp = 'yin -> yang, yang -> yin'
+
+        exp = 'yin -> yang -> yin'
+
         it "- circular dependency: #{ exp }" do
-          top = _meaning 'yin'
-          nerp = nil
-          arr = graph.resolve top, -> x { nerp = x }
+          interm = nil
+          arr = graph.resolve_meaning_strings 'yin', -> x { interm = x }
           arr.should eql( false )
-          nerp.reason.should eql( :circular )
-          msg = circ_str[ nerp ]
-          msg.should eql( exp )
+          interm.reason.should eql( :circular )
+          interm.trail_a.join( ' -> ' ).should eql( exp )
         end
       end.call
     end
 
 
     context "deeper circular" do
+
       let :graph do
         graph_from [
-          ['fear', 'anger'],
-          ['anger', 'hate'],
-          ['hate', 'suffering'],
-          ['suffering', 'fear']
+          [ 'fear', 'anger' ],
+          [ 'anger', 'hate' ],
+          [ 'hate', 'suffering' ],
+          [ 'suffering', 'fear' ]
         ]
       end
 
       -> do
-        exp = "fear -> anger, anger -> hate, hate -> suffering, #{
-          }suffering -> fear"
+
+        exp = "fear -> anger -> hate -> suffering -> fear"
 
         it "- circ dep: #{ exp }" do
-          top = _meaning 'fear'
-          nerp = nil
-          graph.resolve top, -> x { nerp = x }
-          msg = circ_str[ nerp ]
-          msg.should eql( exp )
+          interm = nil
+          graph.resolve_meaning_strings 'fear', -> x { interm = x }
+          interm.trail_a.join( ' -> ' ).should eql( exp )
         end
       end.call
     end

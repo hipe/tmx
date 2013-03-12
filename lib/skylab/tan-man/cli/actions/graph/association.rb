@@ -1,8 +1,10 @@
 module Skylab::TanMan
-  module CLI::Actions::Graph::Association::Actions
-    extend MetaHell::Boxxy
-  end
 
+  module CLI::Actions::Graph::Association::Actions
+
+    extend MetaHell::Boxxy
+
+  end
 
   class CLI::Actions::Graph::Association::Actions::Add < CLI::Action
 

@@ -1,6 +1,7 @@
 require_relative 'test-support'
 
 module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
+
   describe "This is the deal with aliases with #{ Bleeding::Action
     } (NOT an inheritable attribute)" do
 
@@ -8,13 +9,11 @@ module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
 
     incrementing_anchor_module!
 
-
     klass :BaseAction do
       extend Bleeding::Action
     end
 
     klass :Acts__ChildAction1, extends: :BaseAction
-
 
     it "They can of course be accessed by action runtimes" do
       _Acts__ChildAction1 # #kick

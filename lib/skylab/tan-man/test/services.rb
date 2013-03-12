@@ -12,8 +12,6 @@ module Skylab::TanMan::TestSupport
 
     o :JSON,      -> { require 'json' ; ::JSON }
 
-    o :OptParse,  -> { require 'optparse' ; ::OptionParser }
-
     o :PP,        -> { require 'pp' ; ::PP }
 
     o :Shellwords, -> { require 'shellwords' ; ::Shellwords }

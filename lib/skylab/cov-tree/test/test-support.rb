@@ -42,7 +42,7 @@ module Skylab::CovTree::TestSupport
       CovTree::CLI.new do |rt|
         rt.invocation_slug = 'cov-tree' # this took me 20 minutes to figure out
         rt.on_all do |e|
-          es.emit e.stream_name, e.payload
+          es.emit e.stream_name, * e.payload_a  # #todo remove after integration
         end
       end
     end
@@ -67,7 +67,8 @@ module Skylab::CovTree::TestSupport
       e = emitted.shift
       if e
         names.push e.stream_name
-        unstylize[ e.payload_x ]
+        x = e.payload_x ; x = x.payload_a[0] if ! x.respond_to?( :to_s )
+        unstylize[ x ]
       end
     end
 

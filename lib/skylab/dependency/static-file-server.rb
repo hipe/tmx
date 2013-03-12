@@ -4,7 +4,10 @@ require 'rack'
 module Skylab::Dependency
 
   class StaticFileServer
+
     extend PubSub::Emitter
+
+    event_class PubSub::Event::Textual
 
     include Dependency::Services::FileUtils
 
@@ -51,7 +54,7 @@ module Skylab::Dependency
       args_h.each { |k, v| opts[k] = v } # effectively validates keys
       on_all do |e|
         if levels.index(e.stream_name) >= log_level_i # gigo
-          downstream.puts "FILE_SERVER (#{ e.stream_name }): #{ e.message }"
+          downstream.puts "FILE_SERVER (#{ e.stream_name }): #{ e.text }"
         end
       end
       opts.members.each { |k| send "#{k}=", opts[k] }

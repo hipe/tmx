@@ -20,7 +20,4 @@ module ::Skylab::TanMan::TestSupport::Sexp::Auto
       end
     end
   end
-  module InstanceMethods
-    include ::Skylab::TanMan::Sexp::Inflection::Methods
-  end
 end

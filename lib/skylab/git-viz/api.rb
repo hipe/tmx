@@ -48,4 +48,3 @@ module Skylab::GitViz
 end
 
 require File.expand_path('../api/action', __FILE__)
-

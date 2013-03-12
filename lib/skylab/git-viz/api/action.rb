@@ -1,8 +1,8 @@
-require 'skylab/slake/attribute-definer'
-
 module Skylab::GitViz
-  class Api::Action < Struct.new(:api, :params)
-    extend ::Skylab::Slake::AttributeDefiner
+  fail 'we jangled the below 2 lines a bit but you get to do the rest'
+  class Api::Action < ::Struct.new :api, :params
+    extend MetaHell::Formal::Attribute::Definer
+
     meta_attribute :pathname
     meta_attribute :default
     def emit(*a)
@@ -29,4 +29,3 @@ module Skylab::GitViz
     end
   end
 end
-

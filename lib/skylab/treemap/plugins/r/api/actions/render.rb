@@ -11,10 +11,10 @@ module Skylab::Treemap
 
   protected
 
-    def initialize _              # (this is the upstream api action but
+    def initialize rc             # (this is the upstream api action but
                                   # we avoid coupling to it in favor of
                                   # hooks that emit metadata)
-      @infostream = $stderr # meh this is just while we debug nonblocking io
+      @infostream = rc.send :infostream  # gimme
       @lines = nil
     end
 
@@ -91,8 +91,9 @@ module Skylab::Treemap
         normalize_tmpdir or break
         normalize_csv_path or break
         generate_script or break
-        pipe_the_script
+        res = pipe_the_script
       end while nil
+      res
     end
 
     deny_rx = /[^- a-z0-9]+/i
@@ -115,6 +116,7 @@ module Skylab::Treemap
                                               # script to do whatever with
                                               # as it is made, we way-over
                                               # engineered this for that purpose
+        end
         y << %|# install.packages("portfolio") # install it, necessary one once|
         y << %|library(portfolio)|
         y << %|data <- read.csv("#{ @csv_in_pathname }")|
@@ -186,12 +188,14 @@ module Skylab::Treemap
         bridge.is_active || @bridge.activate || break
         mtime1 = pdf_outpath.exist? && @pdf_outpath.stat.mtime
         upstream = Services::File::Lines::Enumerator::From::Array.new @lines
-        inf = -> s { @infostream.write s }
+        inf = if @infostream then -> s { @infostream.write s } else
+          -> s { emit :info_line, s }  # #todo
+        end
         select = Headless::IO::Upstream::Select.new
         select.timeout_seconds = 0.3
         select.line[:sout] = -> s { inf[ "OUT-->#{ s }" ] }
         select.line[:serr] = -> s { inf[ "ERR-->#{ s }" ] }
-        argv = [ @bridge.executable_path, '--vanilla' ] # wat
+        argv = [ @bridge.executable_path, '--vanilla' ]  # wat
         Headless::Services::Open3.popen3( *argv ) do |sin, sout, serr|
           select.stream[:sout] = sout
           select.stream[:serr] = serr

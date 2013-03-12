@@ -11,7 +11,7 @@ module Skylab::TanMan
                                                # note this gets merged with
                                                # 'parent' event graph above
 
-
+    event_factory CLI::Event::Factory
 
     # This is the reasonable place to put the idea that for cli actions,
     # when an action's invoke() method results in false, we typically

@@ -24,7 +24,7 @@ module Skylab::TanMan::TestSupport::API::Actions
 
       context "event message" do
         subject { event.message }
-        specify { should match(/invalid action parameters: \(these, invalid\)/) }
+        specify { should match(/invalid action parameters: \(these, invalid\)/)}
       end
     end
 
@@ -36,15 +36,19 @@ module Skylab::TanMan::TestSupport::API::Actions
       context "when the folder isn't initted" do
         it "works (with json formatting)" do
           api_invoke path: TMPDIR # not *from* tmpdir, path is argument
-          response.success?.should eql(true)
-          event = response.send(:json_data).first
-          event[0].should eql(:info)
-          event[1].should match( /mkdir local-conf\.d/ )
+          response.success?.should eql( true )
+          event_a = response.send :json_data
+          event = event_a.first
+          event[ :stream_name ].should eql( :info )
+          event[ :shape ].should eql( :textual )
+          event[ :payload ].should match( /mkdir local-conf\.d/ )
           json = ::JSON.pretty_generate response
-          unencoded = ::JSON.parse json
-          event = unencoded.first
-          event[0].should eql('info')
-          event[1].should match( /mkdir local-conf\.d/ )
+          unencoded_a = ::JSON.parse json
+          unencoded_a.length.should eql( 2 )
+          event = unencoded_a[ 0 ]
+          event[ 'stream_name' ].should eql( 'info' )
+          event[ 'shape' ].should eql( 'textual' )
+          event[ 'payload' ].should match( /mkdir local-conf\.d/ )
         end
       end
 

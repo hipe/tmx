@@ -1,10 +1,11 @@
 module Skylab::TanMan
 
   class API::Actions::Graph::Starter::Get < API::Action
+
     extend API::Action::Parameter_Adapter
 
     param :resource_name, accessor: true, default: :all,
-      enum: [:local, :global, :all], required: true
+      enum: [ :local, :global, :all ], required: true
 
   protected
 

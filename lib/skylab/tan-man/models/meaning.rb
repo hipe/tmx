@@ -1,4 +1,5 @@
 module Skylab::TanMan
+
   class Models::Meaning < ::Struct.new :name, :value # KEEP LIFE EASY
                                                # let's always use only strings
 

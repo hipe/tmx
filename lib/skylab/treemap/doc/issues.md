@@ -1,3 +1,4 @@
+[#056]       #doc-point towards an event wiring pattern..
 [#055] #open #hookback - let pub-sub know when ridiculous is ready
 [#054]       #tracking-tag slug
 [#053] #open (or #tracking-tag) load file when desc lines are necessary, maybe
@@ -18,7 +19,7 @@
 [#038]       #done saying "dumarize" is so ugly)
 [#037]       #done kill this with fire, i mean no.
 [#036]       #done - rename to op:docmtr
-[#035] #open checking for help invite at action level might not be necessary
+[#035]       #done - give annotated invitations but from the mode client
 [#034]       #done look at what this is - definately boxxy tiem
 [#033] #open - go it away, singleton
 [#032]       #done #move api client - it's the bulk of the file

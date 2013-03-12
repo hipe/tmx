@@ -3,52 +3,47 @@ module Skylab::Treemap
   class CLI::Option
     # an abstract nerk for derking your gerks
 
-    # --*--
+    FUN = -> do
 
-    o = { }
+      o = { }
 
-    long_rx = /\A
-      -- (?<no_part> \[no-\] )?
-         (?<long_stem> [^\[\]=\s]{2,} )
-         (?<long_rest> .+ )?
-    \z/x
+      # `parse` - parse the args that you might see going to an option
+      # parser option definition (like to `::OptionParser#on`)
+      # This function is infallible and cannot fail and will always succeed.
 
-    short_rx = /\A
-      -  (?<short_stem> [^-\[= ] )
-         (?<short_rest> [-\[= ].* )?
-    \z/x
+      o[:parse] = -> do
 
-    o[:long_rx] = long_rx
+        long_rx, short_rx = Headless::CLI::Option::FUN.at :long_rx, :short_rx
 
-    o[:short_rx] = short_rx
-
-    FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
-
-    # --*--
-
-    define_singleton_method :parse do |args| # a *function*'s args. cannot fail.
-      if ::Hash === args.last
-        opt_h = ( args = args.dup ).pop # for whacky newfangled etc
-      end
-      looking = [ long_rx, short_rx ]
-      md_h = { }
-      match = -> part do
-        if ::String === part
-          md, idx = looking.each_with_index.reduce( nil ) do |_, (rx, i)|
-            m = rx.match( part ) and break [ m, i ]
+        -> args do
+          if ::Hash === args.last
+            opt_h = ( args = args.dup ).pop # for whacky newfangled etc
           end
-          if md
-            looking[ idx, 1 ] = []
-            md.names.each { |n| md_h[n.intern] = md[n] }
-            true
+          looking = [ long_rx, short_rx ]
+          md_h = { }
+          match = -> part do
+            if ::String === part
+              md, idx = looking.each_with_index.reduce( nil ) do |_, (rx, i)|
+                m = rx.match( part ) and break [ m, i ]
+              end
+              if md
+                looking[ idx, 1 ] = []
+                md.names.each { |n| md_h[n.intern] = md[n] }
+                true
+              end
+            end
           end
+          args.each do |part|
+            match[ part ] and looking.length.zero? and break
+          end
+          [ md_h, opt_h ]
         end
-      end
-      args.each do |part|
-        match[ part ] and looking.length.zero? and break
-      end
-      [ md_h, opt_h ]
-    end
+      end.call
+
+      x = ::Struct.new(* o.keys ).new ; o.each { |k, v| x[k] = v } ; x.freeze
+    end.call
+
+    define_singleton_method :parse, & FUN.parse
 
     arg_a = [ :long_stem, :short_stem, :no_part, :long_rest, :short_rest ]
 
@@ -78,7 +73,8 @@ module Skylab::Treemap
     attr_accessor :block  # not used here but your algo might like it
 
     def default_value
-      @has_default or fail 'do not request default w/o checking `has_default`'
+      @has_default or
+        fail "no default (check `has_default` first) - #{ render }"
       @default_value
     end
 

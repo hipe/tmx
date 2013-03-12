@@ -2,7 +2,10 @@ require_relative 'test-support'
 
 module Skylab::Dependency::TestSupport::Tasks
 
+  # (not Q-uickie - `before` used below)
+
   describe TaskTypes::UnzipTarball do
+
     extend Tasks_TestSupport
 
     subject do

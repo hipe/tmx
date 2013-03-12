@@ -1,6 +1,7 @@
 require_relative 'core'
 
 module Skylab::Permute
+
   class CLI < Bleeding::Runtime
 
     desc "minimal permutations generator."
@@ -18,100 +19,165 @@ module Skylab::Permute
 
   protected
 
-    def initialize *a, &b
-      fail 'sanity' if b                       # please pardon our blood
-      if a.length.nonzero?
-        raise ::ArgumentError.new 'no' if 3 != a.length
-        self.parent = Headless::CLI::IO_Adapter::Minimal.new(* a)
-      end                                      # else legacy tmx wiring
+    param_h = {
+      0 => -> _, b do
+        if b
+          b[ self ]
+        else
+          # fail "block?" - egads no, testing
+        end
+      end,
+      3 => -> a, b do
+        if b
+          fail "block and args?"
+        else
+          self.parent = Headless::CLI::IO_Adapter::Minimal.new(* a )
+        end
+      end
+    }
+
+    define_method :initialize do |*a, &b|      # please pardon our blood
+      instance_exec a, b, & param_h.fetch( a.length )
     end
   end
-
 
   class CLI::Action
+
     extend Bleeding::Action
+
     extend PubSub::Emitter
+
     emits syntax_error: :info
+
+    event_factory -> _, __, x { x }  # "datapoints"
+
     def self.build runtime
-      action = new
-      action.parent = runtime
-      action.on_info    { |e| runtime.emit(e.stream_name, e) }
-      action.on_payload { |e| runtime.emit(e.stream_name, e) }
-      action
+      act = new
+      act.parent = runtime
+      act.on_info do |e|
+        runtime.emit :info, e
+      end
+      act.on_payload do |e|
+        runtime.emit :payload, e
+      end
+      act
     end
   end
-
 
   module CLI::Actions
   end
 
-
   class HackParse
-    attr_accessor :action
+
+    attr_accessor :live_action
+
     def any?
       true
     end
+
     def help line
-      str = action.instance_exec do
-        "#{ hdr 'syntax:' } for now, the namespace of options is only #{
-          }for your attributes."
+      str = @live_action.instance_exec do
+        "#{ hdr 'syntax:' } for now, the namespace of all switches is only #{
+          }for your aspect values."
       end
       line[ str ]
       nil
     end
-    class AttributeSet < Struct.new(:name, :values)
-      def length ; values.length end
-      def sym    ; name.intern   end
-    end
-    def parse argv, args, help, error
-      _ = ->() { Hash.new(0) }
-      extent = argv.reduce(Struct.new(:long, :short, :short_of_long).new(_[], _[], _[])) do |e, s|
-        case s
-        when /^--(?!help)(([-a-zA-Z0-9])[-a-zA-Z0-9]*)/ ; e.long[$1]  += 1 ; e.short_of_long[$2] += 1
-        when /^-(?!h)([a-zA-Z0-9])/                     ; e.short[$1] += 1
-        end
-        e
+
+    class Enum
+
+      attr_reader :normalized_name
+
+      attr_reader :value_a
+
+      def length
+        @value_a.length
       end
-      list = [] ; hash = Hash.new { |h, k| list.push(x = AttributeSet.new(k, [])) ; h[k] = x }
-      up = true ; result = nil
-      op = ::OptionParser.new do |o|
-        b = ->(name) { ->(value) { hash[name].values.push value } }
-        if 0 == (extent.short.keys - extent.short_of_long.keys).length
-          extent.long.keys.each { |n| o.on("-#{n[0,1]}<VALUE>", "--#{n} <VALUE>", "a value of #{n}", &b[n])}
-        else
-          extent.long.keys.each { |n| o.on("--#{n} <VALUE>", "a value of #{n}", &(b[n])) }
-          extent.short.keys.each { |n| o.on("-#{n}<VALUE>", "a value of #{n}", &(b[n])) }
+
+      def label
+        @normalized_name.to_s
+      end
+
+      def initialize norm_name
+        @value_a = []
+        @normalized_name = norm_name
+      end
+    end
+
+    def parse argv, args, help, error  # (unhack as needed)
+      extent = argv.reduce(
+        ::Struct.new( :long, :short, :short_of_long ).new(
+          * 3.times.map { ::Hash.new 0 }
+        )
+      ) do |m, token|
+        case token
+        when /^--(?!help)(([-a-zA-Z0-9])[-a-zA-Z0-9]*)/
+          m.long[$1]  += 1
+          m.short_of_long[$2] += 1
+        when /^-(?!h)([a-zA-Z0-9])/
+          m.short[$1] += 1
         end
-        o.on('-h', '--help') do
-          # result = action.help(full: true)
-          result = help[]
-          up = false
+        m
+      end
+
+      list = []
+      hash = ::Hash.new do |h, k|
+        x = Enum.new k
+        list << x
+        h[k] = x
+      end
+
+      done = false ; res = nil
+      op = ::OptionParser.new  # as soon as you have to nerk with this [#ps-008]
+      b = -> name do
+        -> value do
+          hash[name.intern].value_a << value
+          nil
+        end
+      end
+      len = ( extent.short.keys - extent.short_of_long.keys ).length
+      if 0 == len
+        extent.long.keys.each do |n|
+          op.on "-#{ n[0, 1] }<VALUE>", "--#{ n } <VALUE>",
+            "a value of #{ n }", & b[n]
+        end
+      else
+        extent.long.keys.each do |n|
+          op.on "--#{ n } <VALUE>", "a value of #{ n }", & b[n]
+        end
+        extent.short.keys.each do |n|
+          op.on "-#{ n }<VALUE>", "a value of #{ n }", & b[n]
+        end
+      end
+      if 2 > argv.length  # omg so weird - don't process '-h' as help when..
+        op.on '-h', '--help' do
+          res = help[]
+          done = true
         end
       end
       begin
         op.parse!(argv)
       rescue ::OptionParser::ParseError => e
         error[ e ]
-        #  result = action.help(message: e)
-        up = false
+        res = false
+        done = true
       end
-      if up
+      if ! done
         if list.empty?
-          # result = action.help(message: 'please provide one or more --attribute values.')
-          result = error[ 'please provide one or more --atribute values.' ]
-          up = false
+          res = error[ 'please provide one or more --<aspect> values.' ]
+          done = false
         else
           args.push list
-          result = true
+          res = true
         end
       end
-      result
+      res
     end
+
     def string
-      "--attr-a <val1> -a<v2> --b-attr <val3> -b<v4> [..]"
+      "--a-aspect <val1> -a<v2> --b-aspect <val3> -b<v4> [..]"
     end
   end
-
 
   class CLI::Actions::Generate < CLI::Action
 
@@ -119,28 +185,33 @@ module Skylab::Permute
 
     emits :payload, :info, help: :info
 
-    opt_syn = ->() do # hacklund
+    opt_syn = -> do  # hacklund
       op = HackParse.new
-      (opt_syn = ->{ op }).call
+      opt_syn = -> { op }
+      op
     end
 
-    singleton_class.send(:define_method, :option_syntax) { opt_syn.call }
+    define_singleton_method :option_syntax do opt_syn[] end
 
     define_method :option_syntax do
       hack = opt_syn.call
-      hack.action = self # so so bad
+      hack.live_action = self # so so bad
       hack
     end
 
-    def process set
-      Permute::API::Actions::Generate.new(set) do |o|
-        rows = []
-        o.on_header { |e| rows.push( e.payload.map { |_, s| hdr s } ) }
-        o.on_row { |e| rows.push( e.payload.map { |_, s| s } ) }
-        o.on_end do
-          Headless::CLI::Table.render rows do |oo|
-            oo.on_info { |e| emit :info, e.text }
-            oo.on_row  { |e| emit :payload, e.text }
+    def process enum_a
+      Permute::API::Actions::Generate.new enum_a do |o|
+        row_a = []
+        o.on_header do |pairs|
+          row_a << pairs.map { |_, label| hdr label }
+        end
+        o.on_row do |pairs|
+          row_a << pairs.map { |_, value| value }
+        end
+        o.on_finished do
+          Headless::CLI::Table.render row_a do |oo|
+            oo.on_info { |txt| emit :info, txt }
+            oo.on_row  { |txt| emit :payload, txt }
           end
         end
       end.execute

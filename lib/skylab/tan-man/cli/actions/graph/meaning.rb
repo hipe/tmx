@@ -1,8 +1,10 @@
 module Skylab::TanMan
-  module CLI::Actions::Graph::Meaning::Actions
-    extend MetaHell::Boxxy
-  end
 
+  module CLI::Actions::Graph::Meaning::Actions
+
+    extend MetaHell::Boxxy
+
+  end
 
   class CLI::Actions::Graph::Meaning::Actions::Add < CLI::Action
 
@@ -23,7 +25,6 @@ module Skylab::TanMan
     end
   end
 
-
   class CLI::Actions::Graph::Meaning::Actions::Change < CLI::Action
 
     desc "alter existing meaning"
@@ -42,7 +43,6 @@ module Skylab::TanMan
           value: value, verbose: false }.merge( param_h )
     end
   end
-
 
   class CLI::Actions::Graph::Meaning::Actions::Forget < CLI::Action
 
@@ -66,7 +66,6 @@ module Skylab::TanMan
           merge( param_h )
     end
   end
-
 
   class CLI::Actions::Graph::Meaning::Actions::List < CLI::Action
 

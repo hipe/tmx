@@ -1,9 +1,10 @@
 module Skylab::Treemap
 
   class API::Action
-                                               # (order)
+                                               # (order matters!)
 
-    extend Headless::Action::ModuleMethods     # for normalized name inference
+    extend Treemap::Core::Action::ModuleMethods# gets method definers
+                                               # gets normalized name inference
 
     ACTIONS_ANCHOR_MODULE = -> { API::Actions }  # idem
 
@@ -11,7 +12,7 @@ module Skylab::Treemap
 
     extend Headless::NLP::EN::API_Action_Inflection_Hack  # for noun inflection
                                                # when reporting actions
-    inflection.stems.noun = 'treemap'          # idem
+    inflection.stems.noun = 'treemap'          # idem (might be smell in api)
 
 
     extend MetaHell::Formal::Attribute::Definer # formal attributes can be used
@@ -87,9 +88,6 @@ module Skylab::Treemap
 
     # -- * --
 
-
-
-
                                   # mutates param_h (experimental
                                   # future-proofing for possible chaining or
                                   # action aggregtation, etc.) [#021]
@@ -97,18 +95,18 @@ module Skylab::Treemap
       res = false ; formal = formal_attributes
       begin
         forml, actul = formal.names, param_h.keys
-        good, bad = [:&, :-].map { |x| actul.send x, forml } # bad keys
-        if bad.length.nonzero?
-          error "unrecognized parameter#{ s bad }: #{
+        good, bad = [:&, :-].map { |x| actul.send x, forml } # 1. check for and
+        if bad.length.nonzero?                             # short circuit if
+          error "unrecognized parameter#{ s bad }: #{      # any bad keys.
             }#{ and_ bad.map{ |k| param k } }"
           break
-        end                                                # process provided
+        end                                                # 2. absorb provided
         good.each { |k| send "#{ k }=", param_h.delete( k ) } # [#020], [#021]
-        @error_count.zero? or break                        # early stop
-        formal.with :default do |name, attr|               # defaults
-          send "#{ name }=", attr[:default] if send( name ).nil?
-        end
-        a = formal.each.reduce( [ ] ) do |m, (name, attr)|  # check missing
+        @error_count.zero? or break                        # with short circuit
+        formal.with :default do |name, attr|               # 3. set defaults
+          send "#{ name }=", attr[:default] if send( name ).nil?  # (the get
+        end                                                # any val/norm)
+        a = formal.each.reduce( [ ] ) do |m, (name, attr)|  # 4. check missing
           m << attr if attr.is? :required and send( name ).nil?
           m
         end
@@ -127,25 +125,53 @@ module Skylab::Treemap
       res
     end
 
-    attr_writer :stylus # when the action is built and wired it gets this
-
   protected
 
-    def initialize api_client
-      _treemap_sub_client_init nil
+    # (the below solves [#011] - tree grows down) **NOTE** api actions do
+    # *not* typically wire themselves to the client -- it is for the (modal)
+    # client to decide how the api action should be wired, with knowledge
+    # of the event profile of the api action.
+
+    def initialize modal_rc
+      Treemap::CLI::Action === modal_rc or fail "sanity - this has #{
+        }changed - we construct api actions with a mode client now, #{
+        } had: #{ modal_rc.class }"
+      init_treemap_sub_client -> { modal_rc }
       @validation_errors = API::Action::Generic_Box.new
       clear_attribute_ivars
-      @api_client = api_client
       nil
     end
+
+    # parts of the system seem to think they are special
+
+    def error text, *annot
+      @error_count += 1
+      emit :error, text, *annot
+      false
+    end
+
+    def info text, *annot  # they think the rules don't apply
+      emit :info, text, *annot
+      false
+    end
+    -> do
+
+      norm_h = {
+        1 => -> x { x },
+        2 => -> a, b { b.merge message: a }
+      }
+
+      define_method :build_event do |stream_name, *payload_a|
+        payload_x = norm_h.fetch( payload_a.length )[ * payload_a ]
+        @event_factory[ self.class, stream_name, payload_x ]
+      end
+    end.call
 
     def add_validation_error_for attr_name, *mixed_message
       @error_count += 1
       ( @validation_errors[attr_name] ||= [] ).push mixed_message
       nil
     end
-
-    attr_reader :api_client
 
     def clear
       clear_attribute_ivars
@@ -155,19 +181,13 @@ module Skylab::Treemap
     end
 
     def flush_validation_messages
-      @validation_errors.each do |name, errors|
-        label = formal_attributes.if? name, -> x do
-          x.label_string
-        end, -> do
-          "**#{ name }**"
-        end
+      @validation_errors.each do |fattr_norm_name, errors|
         phrase_a = errors.reduce( [] ) do |y, (func)| # future-proof the sig
           y << instance_exec(& func )
           y
         end
         errors.clear
-        error "#{ param label } #{ phrase_a.join ' and it ' }"
-        errors.clear
+        error "#{ param fattr_norm_name } #{ phrase_a.join ' and it ' }"
       end
       @validation_errors.clear
       nil
@@ -183,17 +203,6 @@ module Skylab::Treemap
       formal_attributes.names.each { |k| instance_variable_set "@#{ k }", nil }
       nil
     end
-
-    def payload line              # imagine having this live in or or another
-      emit :payload, line         # but not both of the two sides
-      nil
-    end
-
-    def request_client
-      @api_client
-    end
-
-    attr_reader :stylus
   end
 
   class API::Action::Generic_Box < MetaHell::Formal::Box # experiment

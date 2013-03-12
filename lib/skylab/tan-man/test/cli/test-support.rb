@@ -1,18 +1,24 @@
 require_relative '../test-support'
 
 module Skylab::TanMan::TestSupport::CLI
+
   ::Skylab::TanMan::TestSupport[ CLI_TestSupport = self ]
 
   include CONSTANTS # so we can say TanMan in the spec's module
 
+  extend TestSupport::Quickie
+
   module ModuleMethods
+
     include CONSTANTS
 
     include MetaHell::Klass::Creator::ModuleMethods
   end
 
   module InstanceMethods
+
     include CONSTANTS
+
     extend MetaHell::Let
 
     include MetaHell::Klass::Creator::InstanceMethods
@@ -20,7 +26,6 @@ module Skylab::TanMan::TestSupport::CLI
     def meta_hell_anchor_module
       CLI_TestSupport::SANDBOX
     end
-
 
     let :action do
       k = klass
@@ -32,6 +37,12 @@ module Skylab::TanMan::TestSupport::CLI
       o
     end
 
+    let :cli do
+      spy = output
+      o = TanMan::CLI.new nil, spy.for(:paystream), spy.for(:infostream)
+      o.program_name = 'ferp'
+      o
+    end
 
     let :client do
       o = TanMan::CLI.new

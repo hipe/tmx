@@ -7,4 +7,3 @@ module Skylab::GitViz
     end
   end
 end
-

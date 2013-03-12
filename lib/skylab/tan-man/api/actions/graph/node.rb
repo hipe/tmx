@@ -2,7 +2,6 @@ module Skylab::TanMan
   module API::Actions::Graph::Node
   end
 
-
   class API::Actions::Graph::Node::Add < API::Action
     extend API::Action::Parameter_Adapter
 
@@ -32,8 +31,8 @@ module Skylab::TanMan
     end
   end
 
-
   class API::Actions::Graph::Node::List < API::Action
+
     extend API::Action::Parameter_Adapter
 
     PARAMS = [ :verbose ]
@@ -55,10 +54,8 @@ module Skylab::TanMan
     end
   end
 
-
-
-
   class API::Actions::Graph::Node::Rm < API::Action
+
     extend API::Action::Parameter_Adapter
 
     PARAMS = [ :dry_run, :node_ref, :verbose ]

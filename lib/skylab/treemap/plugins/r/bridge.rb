@@ -1,7 +1,12 @@
 module Skylab::Treemap
+
   class Plugins::R::Bridge
+
     extend PubSub::Emitter
+
     emits :info, :error
+
+    event_factory PubSub::Event::Factory::Datapoint
 
     def activate
       begin

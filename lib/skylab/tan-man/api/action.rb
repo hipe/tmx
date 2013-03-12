@@ -1,13 +1,14 @@
 module Skylab::TanMan
+
   class API::Action
-    # extend Autoloader                 # recursiveness apparently o
+
     extend Core::Action::ModuleMethods
 
     include Core::Action::InstanceMethods
 
     ACTIONS_ANCHOR_MODULE = API::Actions  # #experimental near [#059]
 
-    event_class API::Event
+    event_factory API::Event::Factory     # two places, here and api client
 
     # Using call() gives us a thick layer of isolation between the outward
     # representation and inward implementation of an action.  Outwardly,
@@ -15,14 +16,14 @@ module Skylab::TanMan
     # that, all we know is, these constants respond to call().  Inwardly,
     # they might be just lambdas, or they might be something more.  This
     # pattern may or may not stick around, and is part of [#sl-100]
-    #
+
     def self.call request_client, param_h, events
       block_given? and fail 'sanity - no blocks here!'
       action = new request_client, events
       result = action.set! param_h
-      if result                        # we violate the protected nature of
-        result = action.send :execute  # it only b/c we are the class!
-      end                              # it is protected for the usual reasons
+      if result                         # we violate the protected nature of
+        result = action.send :execute   # it only b/c we are the class!
+      end                               # it is protected for the usual reasons
       result
     end
 
@@ -41,7 +42,6 @@ module Skylab::TanMan
       # terrible idea, but here they just feel right.)
 
       me = self
-
 
       # Notice there is an inversion in the taxonomy - the class/module
       # hierarchy goes TanMan::Models::<model>::<controller>

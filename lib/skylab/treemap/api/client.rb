@@ -1,5 +1,7 @@
 module Skylab::Treemap
+
   class API::Client # (was [#032])
+
     include ::Singleton # [#033] - - go it away, singleton
 
     def adapter_box                  # BUCK api actions will use these

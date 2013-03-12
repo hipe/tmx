@@ -1,8 +1,14 @@
 module Skylab::Treemap
+
   class Models::Pathname::Tmpdir < Models::Pathname # (was [#031])
+
     extend PubSub::Emitter
 
-    emits :created, :exists, :failure
+    emits             created: :annotated,
+                       exists: :annotated,
+                      failure: :text
+
+    event_factory Treemap::Model::Event::FACTORY
 
     attr_reader :is_normalized
 

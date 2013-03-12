@@ -13,27 +13,42 @@ module Skylab::Treemap
     :PubSub,
     :Treemap
   ].each do |c|
-    const_set c, ::Skylab.const_get( c, false )
+    const_set c, ::Skylab.const_get( c, false )  # (it's more readable to
+  end                             # have these subproduct consts in our sandbox)
+
+  Bleeding = Porcelain::Bleeding  # and this might as well be its own subproduct
+                                  # it is a legacy f.w that might go away
+
+  MAARS = MetaHell::Autoloader::Autovivifying::Recursive
+
+  #         ~ tiny stowaway modules, too small for their own file ~
+  #                          (in load order)
+
+  module CLI
+    extend MAARS
+
+    def self.new *a, &b
+      CLI::Client.new( *a, &b )   # a conventional delegation. conform to the
+    end                           # standard that CLI.new always works.
   end
 
-  Bleeding = Porcelain::Bleeding
-
-  extend MetaHell::Autoloader::Autovivifying::Recursive
-
   module Core
-    extend MetaHell::Autoloader::Autovivifying::Recursive
-    const_get :SubClient, false # ick sorry just avoiding widow Core::Action
+    extend MAARS
+
+    stowaway :Action, :Event, :SubClient  # (load s.c to find action, event)
+  end
+
+  module Plugins                  # stowaway
+    extend MetaHell::Boxxy
   end
 
   module API
-    extend MetaHell::Autoloader::Autovivifying::Recursive
+    extend MAARS
+    module Actions
+      extend MetaHell::Boxxy
+    end
   end
 
-  module API::Actions
-    extend MetaHell::Boxxy
-  end
-
-  module Plugins
-    extend MetaHell::Boxxy
-  end
+  extend MAARS                    # we put it at the
+                                  # bottom as proof that we don't use it here.
 end

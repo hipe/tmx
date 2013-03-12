@@ -9,9 +9,9 @@ module Skylab::CovTree::TestSupport::CLI
       es = ___build_emit_spy!
 
       fsck = -> p do # so borked, waiting for [#003]
-        p.on_error    { |e| es.emit :error, e.to_s }
-        p.on_info     { |e| es.emit(:info, e.touch!.to_s) unless e.touched? }
-        p.on_payload  { |e| es.emit(:payload, e.to_s) }
+        p.on_error    { |e| es.emit :error, e.payload_a[0] }
+        p.on_info     { |e| es.emit(:info, e.touch!.payload_a[0]) unless e.touched? }
+        p.on_payload  { |e| es.emit(:payload, e.payload_a[0]) }
       end
 
       cli = CovTree::CLI.new do |rt|

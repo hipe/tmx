@@ -1,19 +1,46 @@
 module Skylab::Headless::CLI::Table
 
-    # (emigrated from porcelain, one of its last remaining useful nerks)
-    # a rewrite of a table renderer that, as an excercise:
-    #   + is purely event-driven
-    #   + does some clever bs with type inference and alignment
-    # issues / wishlist:
-    #
-    #   * left/right alignment config options
-    #   + TODO rename to Auto somewhere..
+  # (emigrated from porcelain, one of its last remaining useful nerks)
+  # a rewrite of a table renderer that, as an excercise:
+  #   + is purely event-driven
+  #   + does some clever bs with type inference and alignment
+  # issues / wishlist:
+  #
+  #   * left/right alignment config options
 
-  include ::Skylab
   Headless = ::Skylab::Headless
   MetaHell = ::Skylab::MetaHell
   PubSub = Headless::Services::PubSub
   Table = self  # partly b.c PubSub is not part of headless proper
+
+  class Table::Conduit
+    # here have a goofy experiment - the public methods here (direct and
+    # derived) are isomorphic with the parameters you can pass as settings
+    # to your call to Table.render (or you can manipualte it directly in
+    # the block).
+
+    extend PubSub::Emitter
+
+    event_factory -> { PubSub::Event::Factory::Isomorphic.new Table::Events }
+
+    emits row: :text,  # (contrast with `textual`, `on_text` reads better)
+         info: :text,  # (:info is strictly a branch not a leaf)
+        empty: :info,
+    row_count: :datapoint
+
+    attr_writer :head, :tail, :separator
+
+    def field! symbol
+      @field_box.if? symbol, -> x { x }, -> box do
+        box.add symbol, Table::Field::Conduit.new
+      end
+    end
+    # --*--
+    def initialize
+      @head = @tail = @separator = nil
+      @field_box = MetaHell::Formal::Box::Open.new
+    end
+  end
 
   module Table
 
@@ -22,7 +49,7 @@ module Skylab::Headless::CLI::Table
       param_h.each { |k, v| conduit.send "#{ k }=", v } if param_h
       if blk then blk[ conduit ] else
         res = Headless::Services::StringIO.new
-        conduit.on_text { |ev| res.puts ev.text }
+        conduit.on_text { |txt| res.puts txt }
       end
       conduit.instance_exec do
         @head ||=nil ; @tail ||= nil ; @separator ||= ' '
@@ -64,57 +91,26 @@ module Skylab::Headless::CLI::Table
     define_singleton_method :render, &render
   end
 
-  module Table::Event             # pure factory
-    def self.new xx, x  # TODO stashed changed pending
-      if ::String === x
-        Table::Event::Textual.new xx, x
-      else
-        fail 'wat'
-      end
+  module Table::Events
+    extend MetaHell::Boxxy  # this gives us `const_fetch`
+  end
+
+  module Table::Events::Datapoint
+    def self.event graph, stream_name, payload_x
+      payload_x
     end
   end
 
-  class Table::Event::Textual < PubSub::Event
-
-    attr_reader :text
-
-    undef_method :to_s  # TODO stashed changes pending
-
-  protected
-
-    def initialize xx, x  # TODO stashed changes pending
-      super xx  # #todo
-      @text = x
-    end
-  end
-
-  class Table::Conduit  # TODO move this up in the file after event_class is..
-    extend PubSub::Emitter
-
-    event_class Table::Event
-
-    emits row: :text, info: :text, empty: :info, row_count: :data
-
-    attr_writer :head, :tail, :separator
-
-    def field! symbol
-      @field_box.if? symbol, -> x { x }, -> box do
-        box.add symbol, Table::Field::Conduit.new
-      end
-    end
-
-  protected
-
-    def initialize
-      @head = @tail = @separator = nil
-      @field_box = MetaHell::Formal::Box::Open.new
+  module Table::Events::Text
+    def self.event graph, stream_name, payload_x
+      payload_x
     end
   end
 
   class Table::Engine < Table::Conduit
 
     def render
-      emit :row_count, row_count: @row_a.length
+      emit :row_count, @row_a.length
       if @row_a.length.zero?
         emit :empty, '(empty)'
       else

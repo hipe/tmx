@@ -1,6 +1,7 @@
 module Skylab::Treemap
 
   class Plugins::R::CLI::Actions::Render < Plugins::R::CLI::Action
+
     # for the future, and used in validation of action names
 
     def load_attributes_into o                 # called by the api action

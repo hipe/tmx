@@ -45,6 +45,7 @@ module Skylab::Treemap
   end
 
   module CLI::Option::Ridiculous::InstanceMethods
+
     include Headless::CLI::Action::InstanceMethods
       # (taps you into the whole critical f.w of h.l, for e.g `invoke`)
 
@@ -180,6 +181,13 @@ module Skylab::Treemap
 
     def render_default_for_option opt
       val opt.default_value
+    end
+
+    #         ~ parameter reflection ~
+
+    def has_formal_parameter norm
+      option_documenter.has_formal_parameter norm
+      # (and when you need to, one for args too)
     end
   end
 end

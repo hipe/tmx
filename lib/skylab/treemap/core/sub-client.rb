@@ -1,30 +1,46 @@
 module Skylab::Treemap
+
   module Core::SubClient
   end
 
   module Core::SubClient::InstanceMethods
+
     extend MetaHell::DelegatesTo
 
     include Headless::SubClient::InstanceMethods  # floodgates!
 
   protected
 
-    def _treemap_sub_client_init rc=nil
-      init_headless_sub_client nil  # ( @error_count, e.g )
-      if rc                        # cute experiment with setting r.c like this
-        if rc.respond_to? :call    # for devious reasons i won't admit to
-          @rc = rc
-          @request_client = nil
+    def init_treemap_sub_client x
+      init_headless_sub_client x # sets @error_count, e.g and..
+      nil
+    end
+
+    def request_client= x         # .. calls this (overriden), which:
+      if x
+        if x.respond_to? :call    # does a cute little experiment with setting
+          @rc = x                 # r.c like this for devious reasons i won't
+          @request_client = nil   # admit to at this time
         else
           @rc = nil
-          @request_client = rc
+          @request_client = x
         end
       else
         @rc = @request_client = nil
       end
-      nil
+      x
     end
 
+    def request_client            # also we override this one to conincide.
+      @rc ? @rc.call : @request_client or no_request_client
+    end
+
+    def no_request_client         # special hack for nice error msgs
+      meth = Headless::FUN.call_frame_rx.match( caller[1] )[:meth]
+      fail "can't delegate #{ self.class }##{ meth } up to request client #{
+        }because request client is human - implement it?"
+    end
+                                  #      ~ pen delegators are popular ~
     delegates_to :stylus,
       :em,
       :escape_path,
@@ -32,47 +48,102 @@ module Skylab::Treemap
       :ick,
       :kbd,
       :pre,
-      :param,
       :val
+                                   #      ~ simple delegators upwards ~
 
-    def api_client
-      request_client.send :api_client
+    def infostream
+      puts "BING: #{ self.class }"
+      request_client.send :infostream  # an adapter api action wants it!!
     end
 
-    def info msg, *meta           # api acts e.g. use this
-      emit :info, msg, *meta
-      nil
-    end
-
-    def error msg, *meta          # this is used by root mode client
-      emit :error, msg, *meta
-      @error_count += 0           # this is part of the contract
-      false
-    end
-
-    def normalized_invocation_string # # we will assume you are doing the right
-      # thing and being a *cli* sub-client (action) when you invoke this.
-      # things can be splayed out as needed.
-      "#{ request_client.send :normalized_invocation_string } #{
-        }#{ name.as_slug }"
-    end
-
-    def request_client
-      @rc ? @rc.call : @request_client
+    def param x, render_method=nil  # (used to be [#011])
+      request_client.send :param, x, render_method
     end
 
     def stylus
       request_client.send :stylus
     end
+
+    def api_client
+      request_client.send :api_client
+    end
+
+    #         ~ stowaway methods (not nec. available in all areas) ~
+
+    def unhandled_event_stream_names
+      unhandled_event_stream_graph.names
+    end
   end
 
+  #         ~ stowaway modules (too small to have their own files) ~
+
   module Core::Action  # sorry, avoiding orphan
+  end
+
+  module Core::Action::ModuleMethods
+
+    include Headless::Action::ModuleMethods  # we use its name inference
+
+    def define_methods_for_emitters *stream_name_a
+      stream_name_a.each do |stream_name|
+        if method_defined? stream_name
+          raise ::ArgumentError, "this causes big problems - #{ stream_name }"
+        else
+          define_method stream_name do |payload_x|
+            emit stream_name, payload_x
+          end
+        end
+      end
+    end
   end
 
   module Core::Action::InstanceMethods
 
     include Headless::Action::InstanceMethods
+
     include Core::SubClient::InstanceMethods
 
   end
+
+  module Core::Event  # sorry, avoiding orphan
+  end
+
+  class Core::Event::Annotated    # abstract.
+                                  # assumes an overridden `build_event`
+    def self.event action_sheet, stream_name, payload_x
+      new action_sheet, payload_x
+    end
+
+    attr_reader :action_sheet
+
+    def has_metadata
+      false
+    end
+
+    def initialize action_sheet
+      @action_sheet = action_sheet
+    end
+  end
+
+  class Core::Event::Annotated::Text < Core::Event::Annotated
+
+    attr_reader :text
+
+    def initialize cli_action_class, text
+      super cli_action_class
+      @text = text
+    end
+  end
+
+  Core::Event::FACTORY = PubSub::Event::Factory::Explicit.new(
+    {
+             payload_line: :datapoint,
+                     info: :textual,
+                info_line: :datapoint,
+                    error: :textual,
+                     help: :datapoint
+    }, {
+      datapoint: PubSub::Event::Factory::Datapoint
+    }
+  )
 end

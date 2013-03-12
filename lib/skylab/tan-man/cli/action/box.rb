@@ -1,24 +1,27 @@
 module Skylab::TanMan
 
   class CLI::Action::Box < CLI::Action
+
     # extend MetaHell::Boxxy::ModuleMethods when we need it it is here
 
     include Headless::CLI::Box::InstanceMethods
-
-    def self.action_box_module # compat hl:cli:box, centerpiece of this class:
-      if ! const_defined? :Actions, false      # this load hack allows us to
-        require dir_pathname.to_s              # define only the barebones
-      end                                      # stuff in cli.rb and load the
-      const_get :Actions, false                # contents only lazily
-    end                                        # (to be clear, we could do
-                                               # the above just with the auto-
-                                               # loader alone but then we would
-                                               # have a deep narrow filetree)
 
     def self.inherited klass
       klass.send :init_autoloader, caller[0]
     end
 
+    # `action_box_module` - this is the centerpiece of this class: this load
+    # hack allows us to define only the barebones stuff in cli.rb and then
+    # load the contents only lazily. (to be clear, we could do the above
+    # with the autoloader alone but then we would have a deep, narrow
+    # filetree (?).)
+
+    def self.action_box_module
+      if ! const_defined? :Actions, false
+        require dir_pathname.to_s
+      end
+      const_get :Actions, false
+    end
 
     alias_method :tan_man_original_help, :help
 

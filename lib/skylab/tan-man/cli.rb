@@ -13,14 +13,10 @@ module Skylab::TanMan
     end
   end
 
-
-
   module CLI::Actions             # although all its containees may be in this
     extend MetaHell::Boxxy        # file, they may need boxxy's `const_fetch`
   end                             # for shenanigans. `Action` below requires
                                   # the existence of `Actions`
-
-
 
   CLI::Action || nil              # load this class that's defined in another
   class CLI::Action               # file and re-open it here so that we can
@@ -42,35 +38,39 @@ module Skylab::TanMan
     end
   end
 
-
-
   class CLI::Actions::Status < CLI::Action
 
     desc "show the status of the config director{y|ies} active at the path."
 
     def process path=nil
-      path ||= services.file_utils.pwd # at [#021]: services.file_utils.pwd
+      path ||= services.file_utils.pwd # (closed [#021])
       events_a = api_invoke path: path
       groups = ::Hash.new { |h, k| h[k] = [] }
       events_a.each do |e|
         g = e.is?(:global) ? :global : (e.is?(:local) ? :local : :other)
         groups[g].push e
       end
-      table = []
-      groups.each do |k, e|
-        table.push [ [:header, k], e.first.message ]
-        table.concat( e[1..-1].map{ |x| [nil, x.message] } )
+      row_a = []
+      groups.each do |k, event_a|
+        first_event = event_a.first
+        row_a << [ [ :header, k ], first_event.message ]
+        if 1 < event_a.length
+          row_a.concat( event_a[ 1..-1 ].map{ |e| [ nil, e.message ] } )
+        end
       end
-      Headless::CLI::Table.render table, separator: '  ' do |o|
+
+      Headless::CLI::Table.render row_a, separator: '  ' do |o|
         o.field!( :header ).style = method( :hdr )
-        o.on_row  { |e| emit :payload, e.text }
-        o.on_info { |e| emit :info,    e.text }  # e.g 0 rows
+        o.on_row do |txt|
+          emit :payload, txt
+        end
+        o.on_info do |txt|
+          emit :info, txt  # e.g 0 rows
+        end
       end
       true
     end
   end
-
-
 
   class CLI::Actions::Init < CLI::Action
 
@@ -87,15 +87,11 @@ module Skylab::TanMan
     end
   end
 
-
-
   module CLI::Actions::Remote
     extend CLI::NamespaceModuleMethods
     desc "manage remotes."
     summary { ["#{action_syntax} remotes"] }
   end
-
-
 
   class CLI::Actions::Remote::Add < CLI::Action
 
@@ -116,8 +112,6 @@ module Skylab::TanMan
     end
   end
 
-
-
   class CLI::Actions::Remote::List < CLI::Action
 
     desc "list the remotes."
@@ -135,13 +129,12 @@ module Skylab::TanMan
         table = api_invoke( param_h ) or break
         Headless::CLI::Table.render table, separator: '  ' do |o|
           o.field!( :resource_label ).style = -> x { "(resource: #{ x })" }
-          o.on_empty do |e|
-            e.touch!
+          o.on_empty do |txt|
             n = table.num_resources_seen
             emit :info, "no remotes found in #{ n } config file#{ s n }"
           end
-          o.on_row do |e|
-            emit :payload, e.text unless e.touched?
+          o.on_row do |txt|
+            emit :payload, txt
           end
         end
         result = true
@@ -168,15 +161,11 @@ module Skylab::TanMan
     end
   end
 
-
-
   module CLI::Actions::Graph
     extend CLI::NamespaceModuleMethods
     desc "do things to graphs."
     summary { ["#{action_syntax} graph"] }
   end
-
-
 
   class CLI::Actions::Graph::Use < CLI::Action
 
@@ -186,8 +175,6 @@ module Skylab::TanMan
       api_invoke path: path
     end
   end
-
-
 
   class CLI::Actions::Graph::Tell < CLI::Action
 
@@ -210,8 +197,6 @@ module Skylab::TanMan
     end
   end
 
-
-
   class CLI::Actions::Tell < CLI::Action       # YIKES look how ridiculous
                                                # this "shortcut" is! (neat too)
 
@@ -224,13 +209,11 @@ module Skylab::TanMan
     end
   end
 
-
   class CLI::Actions::Graph::Association < CLI::Action::Box
     desc "low-level manipulation of associations (#dev)"
     desc "(for normal use use `tell`)"
 
   end
-
 
   class CLI::Actions::Graph::Check < CLI::Action
 
@@ -245,8 +228,6 @@ module Skylab::TanMan
       api_invoke( { path: dotfile, verbose: false }.merge param_h )
     end
   end
-
-
 
   class CLI::Actions::Graph::Push < CLI::Action
 
@@ -263,8 +244,6 @@ module Skylab::TanMan
     end
   end
 
-
-
   class CLI::Actions::Graph::Starter < CLI::Action
 
     desc "what graph starter file to use? (gets or sets it)"
@@ -278,19 +257,15 @@ module Skylab::TanMan
     end
   end
 
-
-
   class CLI::Actions::Graph::Meaning < CLI::Action::Box
     desc "associate words with node attributes"
 
   end
 
-
   class CLI::Actions::Graph::Node < CLI::Action::Box
     desc "do things to nodes"
 
   end
-
 
   class CLI::Actions::Graph::Which < CLI::Action
     desc "which dotfile?"

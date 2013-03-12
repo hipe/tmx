@@ -1,9 +1,15 @@
 require_relative '../test-support'
 
 module Skylab::TanMan::TestSupport::API
+
   ::Skylab::TanMan::TestSupport[ API_TestSupport = self ]
 
+  include CONSTANTS
+
+  extend TestSupport::Quickie
+
   module InstanceMethods
+
     def debug!                                 # (aliased to tanman_api_debug!)
       tanman_debug!
       TMPDIR.debug!

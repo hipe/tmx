@@ -1147,7 +1147,10 @@ module Skylab::Porcelain
       end
       failed = super(argv) or return failed
       # the grammar for namespaces takes no options and does not change argv
-      yield(ParseSubs.new).event_listeners.fetch( :push ).last.call( @frame )  # i dont..
+      -> do  # #todo this whole this is garbage
+        yield( x = ParseSubs.new )
+        x.emit :push, @frame
+      end.call
       :never_see
     end
 

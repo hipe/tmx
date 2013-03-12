@@ -1,4 +1,5 @@
 module Skylab::Treemap
+
   class CLI::Action
     # 1) this has been almost totally divorced from the legac f.w except for
     # these kind of proxy nerks below.
@@ -7,18 +8,36 @@ module Skylab::Treemap
     # (hence the open-and-close-and-open dance below)
   end
 
-  module CLI::Action::InstanceMethods  # might be borrowd by motes, cards, flies
-    include Headless::CLI::Action::InstanceMethods
-    include Treemap::Core::Action::InstanceMethods # might override some legacy
+  CLI::Action::FUN = -> do
 
-    def help *a                  # [#012]
+    o = ::Struct.new( :build_event ).new
+
+    # it was too hard and too ridiculous to try to wedge this into the
+    # mode client and the actions without overwriting a bunch of stuff.
+    o[:build_event] = -> stream_name, text do
+      @event_factory[ self.class, stream_name, text ]
+    end
+
+    o
+  end.call
+
+  module CLI::Action::InstanceMethods  # might be borrowd by motes, cards, flies
+
+    include Headless::CLI::Action::InstanceMethods  # the current favorite for
+                                  # cli basics like `invoke`
+
+    include Treemap::Core::Action::InstanceMethods # brings in our own custom
+                                  # subclient methods among other things
+
+    def help *a                   # [#012]
       if 1 == a.length && { full: true }
+        __legacy_init_ui
         a.pop  # then legacy came in thru the front `tm -h act'
       end
       super
     end
 
-    def summary_lines            # public for legacy - not universal
+    def summary_lines             # public for legacy - not universal
       y = [ ]
       _summary_lines y
       if @adapters
@@ -28,6 +47,11 @@ module Skylab::Treemap
     end
 
   protected
+
+    #         ~ custom event building ~
+
+    define_method :build_event, & CLI::Action::FUN.build_event
+
                                   # (there are some things we need if we didn't
                                   # go thru `invoke`..)
     def __legacy_init_ui
@@ -38,7 +62,7 @@ module Skylab::Treemap
 
     def build_option_parser       # rudimentary impl. that reads these defs,
       a = self.class.option_parser_blocks  # if you're not using ridiculous
-      if a.length.nonzero?        # and etc. (e.g. adapter actions)
+      if a && a.length.nonzero?   # and etc. (e.g. adapter actions)
         @param_h ||= { }          # a common choice
         op = ::OptionParser.new
         a.each { |b| instance_exec op, &b }
@@ -65,19 +89,56 @@ module Skylab::Treemap
   end
 
   class CLI::Action
-    extend Headless::CLI::Action::ModuleMethods
-    include Treemap::CLI::Action::InstanceMethods
+    #         ~ because we are a class of action: ~
 
-    MODALITIES_ANCHOR_MODULE = Treemap
+    extend Headless::CLI::Action::ModuleMethods    # basic CLI DSL methods lik
+                                        # `option_parser` and `desc` (writers)
+    MODALITIES_ANCHOR_MODULE = Treemap  # actions can reach classes from
+                                        # the rest of the system
+    ACTIONS_ANCHOR_MODULE = -> { Treemap::CLI::Actions }  # actions can
+                                        # infer their full normalized
+                                        # name from their class name
 
-    ACTIONS_ANCHOR_MODULE = -> { Treemap::CLI::Actions }
+    #         ~ for our event profile: ~
+
+    include Headless::CLI::Action::InstanceMethods  # NOTE *that* ver. of `emit`
+
+    extend PubSub::Emitter        # (child classes *must* declare their own
+                                  # event profile, also defaults are assumed
+                                  # in `initialize` here!)  NOTE this ver.
+
+    include Treemap::CLI::Action::InstanceMethods  # our own custom generic cli
+                                  # NOTE *this* version of `build_event`
+
+    event_factory CLI::Event::FACTORY
+                                  # a reasonable default for today
+
+    #         ~ for noun inflection when reporting actions ~
+
+    extend Headless::NLP::EN::API_Action_Inflection_Hack
+    inflection.stems.noun = 'treemap'  # (these classes here are verbs)
+
+    public :usage_and_invite  # for [#035] annotated invites
+
+    #         ~ reflection and fun ~
+
+    def fetch_actual_parameter norm, &b  # assumes post-execute
+      actual_parameters_box.fetch norm, &b
+    end
+
+    def actual_parameters_box
+      if @actual_parameters_box.nil?
+        @actual_parameters_box = if @param_h_spent
+          MetaHell::Formal::Box.around_hash @param_h_spent  # frozen h, btw
+        else
+          false
+        end
+      end
+      @actual_parameters_box
+    end ; protected :actual_parameters_box
+
 
     #         ~ public methods called by the legacy f.w ~
-
-
-    def options                   # used by stylus ick to impl. `param`
-      option_syntax.options
-    end
 
     #      ~ (watch how we bend a huge new api to a huge old one:) ~
 
@@ -149,41 +210,64 @@ module Skylab::Treemap
 
   protected
 
-    def initialize rc=nil         # porcelain gives you nothing, but adapters
-      @parent = nil               # in Action_Flyweight_ we make emissaries
-      super( rc )                 # sets @parent via request_client=
+
+    def initialize mc
+      Treemap::CLI::Client === mc or fail "test me - modal client? #{ mc.class }"
+      init_treemap_sub_client -> { mc }
+      on_info      mc.handle :info
+      on_info_line mc.handle :info_line
+      on_error     mc.handle :error
+      on_help      mc.handle :info_line
+      names = unhandled_event_stream_names
+      if names.length.nonzero?
+        raise ::RuntimeError, "unhandled: #{ names.inpsect } - #{ self.class }"
+      end
+      @actual_parameters_box = nil
+      nil
     end
 
-    def api_action                # experimentally the cli action builds the
-      @api_action ||= begin       # api action, the tree grows downward
-        kls = self.class.modalities_anchor_module::API::Actions.const_fetch(
-          normalized_action_name ) # (was [#034])
-        action = kls.new self
-        wire_api_action action
-        action
-      end
+    #         ~ api action building (in approximate order) ~
+
+                                  # experimentally the cli action builds the
+    def api_action                # api action, the tree grows downward
+      @api_action ||= build_wired_api_action
     end
+
+    alias_method :sister, :api_action  # experimental conventional name etc
+
+    def build_unwired_api_action
+      kls = self.class.modalities_anchor_module::API::Actions.const_fetch(
+        normalized_action_name ) # (was [#034])
+      kls.new self
+    end
+
+    #         ~ rendering of particular api etc things ~
+
+    # This is our version of [#hl-036] (fixes [#011]): the modal action
+    # decides how to render parameters as they get mentioned for
+    # rendering to the target mode.
+
+    def param x, render_method=nil             # generic rendering of params
+      ::Symbol === x or x = x.normalized_name
+      opt = option_parser.options.fetch x do end
+      if opt
+        str = opt.send( render_method || :render )
+      else
+        attr = sister.formal_attributes.fetch x do end
+        if attr
+          str = attr.label_string
+        else
+          str = x.to_s
+        end
+      end
+      pre str
+    end
+
+    #         ~ compat h.l ~
 
     def default_action            # compat h.l
       :process                    # (`invoke` belongs to the framework
     end                           #  `execute` is for when we take no args)
-
-    def request_client            # away at [#012]
-      @parent
-    end
-
-    def request_client= x         # away at [#012]
-      @parent and fail "sanity"
-      @parent = x
-    end
-
-    def wire_api_action api_action
-      request_client.send :wire_api_action, api_action
-      stylus = request_client.send :stylus     # [#011] unacceptable
-      api_action.stylus = stylus
-      stylus.set_last_actions api_action, self # **TOTALLY** unacceptable
-      nil
-    end
 
     #         ~ for when f.w is touching an adapter action raw ~
 

@@ -11,7 +11,7 @@ module Skylab::TanMan
 
     include Core::Client::InstanceMethods      # per the pattern
 
-    event_class API::Event                     # necessary in 2 places b/c
+    event_factory API::Event::Factory          # necessary in 2 places b/c
                                                # of the two origins of events
 
   public

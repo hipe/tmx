@@ -1,4 +1,5 @@
 module Skylab::Treemap
+
   class Models::Pathname < ::Pathname # (was [#028])
 
     def is_missing_required_force

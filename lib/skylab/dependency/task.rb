@@ -14,6 +14,9 @@ module Skylab::Dependency
     attr_reader :invalid_reason
 
     extend PubSub::Emitter # child classes decide what to emit
+
+    event_class PubSub::Event::Textual  # can be made more complicated..
+
     include Headless::CLI::PathTools::InstanceMethods
     include Headless::CLI::Stylize::Methods # `stylize`
 
@@ -21,9 +24,13 @@ module Skylab::Dependency
 
     def no str ; stylize str, :strong, :red   end
 
-    def initialize(*)
+    def initialize(* a )
       super
-      # (we used to default to a stderr listener here)
+       g = unhandled_event_stream_graph
+       if g.names.length.nonzero?
+         fail "unhandled stream(s): #{ g.names }"  # #todo
+       end
+       nil
     end
 
     def valid? # [#hl-047]

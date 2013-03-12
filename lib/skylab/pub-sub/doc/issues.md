@@ -1,6 +1,12 @@
+[#009]       #tracking-tag advanced semantic reflection -
+               `significant_unhandled_event_stream_names`
+[#008]       #tracking-tag this option scanner
+[#007] #open #tracking-tag this new way to do boxxy event factories
+[#006]       #event-marker: asssuming event shape/utility is a smell
 [#005] #open (#waiting) cross reference to [#tr-055], can use nifty ridiculous
-[#004]       #done rename `event_cloudt` -> `event_graph`
+[#004]       #done rename `event_cloud` -> `event_graph`
 [#003]       #done event class should not be a struct
 [#002]       #tracking-tag #pattern: public emitters
-[#001]       #pattern: assume emit(type, *payload) and ..
+[#001]       #pattern: #doc-point "events and their payloads"
+               assume emit(type, *payload) and ..
 [#sl-059] 2012-02-18 #open no redundant events per listener

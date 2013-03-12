@@ -44,9 +44,9 @@ module Skylab::TanMan
       if instance_methods_module
         tree_class.send :include, instance_methods_module
       end
-      im = [:Sexp, :InstanceMethods, constantize[ tree_class.rule ] ].
-        reduce( tree_class.grammar.anchor_module ) do |m, x|
-        break if ! m.const_defined? x, false
+      im = [ :Sexp, :InstanceMethods, constantize[ tree_class.rule ] ].
+          reduce( tree_class.grammar.anchor_module ) do |m, x|
+        break if ! m.const_defined? x, false  # one end of [#078]
         m.const_get x, false
       end
       if im
@@ -102,7 +102,7 @@ module Skylab::TanMan
       if o.member && Sexp::Auto::Hacks::MemberName.matches?(o.member)
         Sexp::Auto::Hacks::MemberName.tree o
       elsif o.element_names?
-        tree_class = if o.sexps_module.const_defined?(o.sexp_const, false)
+        tree_class = if o.sexps_module.const_defined?( o.sexp_const, false )
           o.sexps_module.const_get o.sexp_const, false
         else
           o.sexps_module.const_set o.sexp_const, build_tree_class(o)
@@ -136,7 +136,7 @@ module Skylab::TanMan
     end
 
     def module_methods_module
-      sexp_builder_anchor_module.const_get(:ModuleMethods, false)
+      sexp_builder_anchor_module.const_get :ModuleMethods, false
     end
 
     def node2tree node, parent_class, member_name # extent: solo def, 2 calls
@@ -323,9 +323,11 @@ module Skylab::TanMan
     _a = [:content_text_value].freeze
     singleton_class.send(:define_method, :_members) { _a }
     def normalized_string ; self[:content_text_value] end
+
     def normalized_string! string
       fail 'implement me' # as [#053]
     end
+
     def unparse           ; self[:content_text_value] end
   end
 
@@ -398,18 +400,23 @@ module Skylab::TanMan
     def element_names? # are element names inferrable?
       methods_of_interest?
     end
+
     def expression? # is the expression name inferrable?
       false
     end
+
     def members_of_interest
       tree_class.members_of_interest
     end
+
     def members_of_interest?
       ! tree_class.nil?
     end
+
     def methods_of_interest? # are we able to determine methods of interest?
       false
     end
+
     def rule? # is the rule name inferrable?
       false
     end
@@ -423,23 +430,26 @@ module Skylab::TanMan
     def expression
       symbolize(sexp_const.to_s).intern
     end
+
     def expression?
       true
     end
+
     def grammar_facade
-      const = "#{expression_extension_module_meta.grammar_const
+      const = "#{ expression_extension_module_meta.grammar_const }#{
         }GrammarFacade".intern
-      if ! anchor_module.const_defined?(const, false)
-        anchor_module.const_set(const,
-          Sexp::Grammar::Facade.new(anchor_module,
-            expression_extension_module_meta.grammar_const)
-        )
+      if ! anchor_module.const_defined? const, false
+        anchor_module.const_set( const,
+          Sexp::Grammar::Facade.new( anchor_module,
+            expression_extension_module_meta.grammar_const ) )
       end
-      anchor_module.const_get(const, false)
+      anchor_module.const_get const, false
     end
+
     def rule
       symbolize(expression_extension_module_meta.tail_stem.to_s).intern
     end
+
     def rule?
       true
     end
@@ -459,36 +469,52 @@ module Skylab::TanMan
     #   Foo0 => Foo0, Foo1 => Foo1, BUT : Foo2 => Foo
 
     STEM = { } # grammar_mod => :Foo => [:Foo0, :Foo1, :Foo2]
+
     SEXP = { } # grammar_mod => { :Foo3 => :Foo, :Foo2 => :Foo2, ... }
+
     def sexp_const
-      (SEXP[grammar_module] ||= ::Hash.new do |h, const|
-        stem = chomp_digits const
-        a = (STEM[grammar_module] ||= ::Hash.new do |_h, _stem|
-          i = 0 ; _a = [ ] ; gm = grammar_module
-          loop do
-            _a.push "#{_stem}#{i}".intern
-            gm.const_defined?("#{_stem}#{ i += 1 }") or break
+      ( SEXP.fetch grammar_module do |grammar_module|
+        SEXP[ grammar_module ] = (
+         ::Hash.new do |hsh, const|
+            stem = chomp_digits const
+            arr = (
+              STEM.fetch grammar_module do |gram_mod|
+                STEM[gram_mod] = (
+                  ::Hash.new do |h, stm|
+                    i = 0 ; a = [ ] ; gm = gram_mod
+                    loop do
+                      a.push "#{ stm }#{ i }".intern
+                      gm.const_defined? "#{ stm }#{  i += 1  }" or break
+                    end
+                    h[ stm ] = a
+                  end
+                )
+              end
+             )[ stem ]
+            hsh[const] = arr.last == const ? stem.intern : const
           end
-          _h[_stem] = _a
-        end)[ stem ]
-        h[const] = a.last == const ? stem.intern : const
-      end)[expression_extension_module_meta.tail_const]
+        )
+      end )[ expression_extension_module_meta.tail_const ]
     end
 
     def sexps_module
       # auto-vivify a module to hold generated sexps
-      anchor_module.const_defined?(:Sexps, false) ?
-        anchor_module.const_get(:Sexps, false) :
-        anchor_module.const_set(:Sexps, ::Module.new)
+      anchor_module.const_defined?( :Sexps, false ) ?
+        anchor_module.const_get( :Sexps, false ) :
+        anchor_module.const_set( :Sexps, ::Module.new )
     end
+
   protected
+
     def anchor_module
       expression_extension_module_meta.anchor_module
     end
+
     def expression_extension_module_meta
       extension_module_metas.last
       # to see why this is last and not first, see test grammr 60
     end
+
     def grammar_module
       expression_extension_module_meta.grammar_module
     end
@@ -498,14 +524,18 @@ module Skylab::TanMan
     def methods_of_interest
       extension_module_metas[methods_idx].module.instance_methods
     end
+
     def methods_of_interest?
       true
     end
+
   protected
+
     def initialize *a, methods_idx
       @methods_idx = methods_idx
-      super(*a)
+      super(* a )
     end
+
     attr_reader :methods_idx
   end
 
@@ -525,7 +555,7 @@ module Skylab::TanMan
 
     def anchor_module
       @anchor_module ||=
-        _parts[0..-3].reduce(::Object) { |m, x| m.const_get(x, false) }
+        _parts[0..-3].reduce ::Object do |m, x| m.const_get x, false end
     end
 
     def grammar_const

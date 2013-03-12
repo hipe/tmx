@@ -13,6 +13,14 @@ module Skylab::CovTree
 
     params = ::Struct.new :list_as, :path, :verbose
 
+    fly = ( Integration_Hack = ::Struct.new :anchor, :anchor_point,
+                                              :short_pathname, :number ).new
+    integration_hack = -> e do  # #todo integration only
+      fly.members.each do |k|
+        fly[k] = e.payload_a[0][k]
+      end
+      fly
+    end
 
     define_method :invoke do |params_h|        # quintessence of headless-like
                                                # pattern (hopefully), all
@@ -35,9 +43,11 @@ module Skylab::CovTree
       case list_as
       when :tree
         o.on_anchor_point do |e|
+          e = integration_hack[ e ]
           payload "#{ e.anchor_point.dir_pathname }/"
         end
         o.on_test_file do |e|
+          e = integration_hack[ e ]
           test_file_relative_pathname =
             e.anchor.relative_path_to e.short_pathname
           payload "  #{ test_file_relative_pathname }" # indented with '  '
@@ -45,6 +55,7 @@ module Skylab::CovTree
 
       when :list
         o.on_test_file do |e|
+          e = integration_hack[ e ]
           full_pathname = e.anchor.sub_anchor.join e.short_pathname
           payload "#{ full_pathname }"         # (why use escape_path? it
         end                                    # looks fine just to use the path
@@ -52,6 +63,7 @@ module Skylab::CovTree
 
       if list_as
         o.on_number_of_test_files do |e|
+          e = integration_hack[ e ]
           info "(#{ e.number } test file#{ s e.number } total)"
         end
       end
@@ -59,7 +71,7 @@ module Skylab::CovTree
       tree_lines = [ ]
 
       o.on_tree_line_meta do |e|
-        tree_lines.push e
+        tree_lines.push e.payload_a[0]
       end
 
                                                # now that it is all wired,
@@ -102,7 +114,9 @@ module Skylab::CovTree
     end
 
     def render_tree_lines events
-      matrix = events.map { |e| prerender_tree_line e.payload }
+      matrix = events.map do |x|  # #todo integration
+        prerender_tree_line x
+      end
       max = matrix.reduce( 0 ) { |m, x| (y = x.first.length) > m ? y : m }
       fmt = "%-#{ max }s  %s"
       matrix.each do |a|

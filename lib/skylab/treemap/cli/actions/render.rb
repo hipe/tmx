@@ -8,13 +8,22 @@ module Skylab::Treemap
     include Treemap::Adapter::InstanceMethods::CLI_Action
                                   # see notes there, this adapts old help reqs
 
+    emits :error                  # usu. gets styled
+
+    emits :help                   # a line for a help screen (from h.l)
+
+    emits :info                   # usu. gets stylsed
+
+    emits :info_line              # usu. unstyled, raw line
+
     desc "render a treemap from a text-based tree structure"
 
     option_parser do |o|
       # $stderr.puts "NERK : #{ self.class } : #{ o.class } : #{ @param_h.class }"
 
       @param_h[:char] = '+'
-      @param_h[:exec] = true
+      @param_h[:do_exec] = true
+      @param_queue ||= []
 
       o.on '-a <NAME>', '--adapter <NAME>', * more(:a) do |v|
         @param_h[:adapter_name] = v
@@ -23,28 +32,31 @@ module Skylab::Treemap
         @param_h[:char] = v
       end
       o.on '--tree', 'show the text-based structure in a tree (debugging)' do
-        @param_h[:do_show_tree] = true
+        @param_queue << :do_show_tree
       end
       o.on '--csv', 'output the csv to stdout instead of tempfile, stop.' do
-        @param_h[:csv_is_payload] = true
+        @param_queue << :csv_is_payload
       end
       o.on '--stop', 'stop execution after the previously indicated step',
         * more(:s) do
-        @param_h[:stop] = true
+        @param_queue << :stop
       end
       o.on '-F', '--force', 'force overwriting of an exiting file' do
         @param_h[:force] = true
       end
       o.on '--[no-]exec',
         "the default is to open the file with exec ({{default}})" do |v|
-        @param_h[:exec] = v
+        @param_h[:do_exec] = v
+      end
+      o.on '-v', '--verbose', 'verbose output (implemented sparely)' do
+        @param_h[:is_verbose] = true
       end
     end
 
     option_parser.more :a do |y|
       y << 'which treemap rendering adapter to use.'
-      a = api_action.adapter_box.names
-      o = api_action.formal_attributes.fetch :adapter_name
+      a = sister.adapter_box.names
+      o = sister.formal_attributes.fetch :adapter_name
       y << "(#{ s a, :no }known adapter#{ s a } #{ s a, :is } #{
         }#{ and_ a.map{ |x| pre x } }) (default: #{ pre o[:default] })"
       y << "(to see adapter-specific opts use this in conjunction #{
@@ -53,7 +65,7 @@ module Skylab::Treemap
     end
 
     option_parser.more :s, do |y|
-      fa = api_action.formal_attributes
+      fa = sister.formal_attributes
       stop, impl = [ :stop_at, :stop_is_induced ].map { |x| fa.meta_attribute_value_box x }
       ks = stop.names - impl.names
       y << "(can appear after #{ and_ ks.map { |k| param k } }) #{
@@ -61,35 +73,14 @@ module Skylab::Treemap
       nil
     end
 
-
-    def process inpath, opts=nil  # **NOTE** opts is cosmetic here! (even the
-      res = nil                   # spelling)
-      act = api_action
-      begin
-        res = post_process_param_h
-        res or break
-        act.on_treemap do |e|
-          if do_exec && e.path.exist? && !
-            act.stop_is_requested_before( :exec_open_eventpoint ) then
-            act.info "calling exec() to open the pdf!" # #todo bad
-            exec "open #{ e.path }"
-          end
-        end
-        res = act.invoke opts.merge!( inpath: inpath )
-        if false == res # [#035] - checking for help invite at action level ..
-          usage_and_invite
-          res = nil
-        end
-      end while nil
-      res
-    end
-
   protected
 
-    def initialize(*)
+    def initialize( * )
       super
       _adapter_init
     end
+
+    #                    ~ (nerks in order of nerking) ~
 
     def parse_opts argv
       # ok get ready..bc this took me like a month to write and then another
@@ -115,38 +106,83 @@ module Skylab::Treemap
       res
     end
 
-    def post_process_param_h
-      if @param_h[:stop]
-        parse_opts_stop @param_h[:stop]
+    # (as soon as the o.p is requested, it runs blocks which require the
+    # api action ("sister"), which is wired once here.)
+
+    def build_wired_api_action
+      rc = request_client
+      a = build_unwired_api_action
+      a.on_payload_line rc.handle :payload_line
+      a.on_info         rc.handle :info
+      a.on_info_line    rc.handle :info_line
+      a.on_error        rc.handle :error
+      a.on_pdf do |e|
+        if @do_exec
+          if a.stop_is_requested_before :exec_open_eventpoint
+            info "(stop was requested before executing opening of pdf.)"
+          else
+            if e.path.exist?
+              info "calling exec() to open the pdf (!) - #{ escape_path e.path }"
+              cmd = "open #{ e.path }"
+              # $stderr.puts "(would have done: #{ cmd })"
+              exec "open #{ e.path }"
+            else
+              error "expected pdf output not found: #{ escape_path e.path }"
+            end
+          end
+        end
+      end
+      g = a.unhandled_event_stream_graph
+      names = g.names
+      if names.length.nonzero?
+        fail "unhandled: #{ names.inspect } of #{ a.class }"
       else
-        true
+        a
       end
     end
-                                  # it's a smell to reach over like this,
-                                  # but this crazy syntax has special needs
-                                  # all the api wants is a `stop_at` param
 
-    def parse_opts_stop opt_h
-      act = api_action
-      a2e, e2a = act.attr_name_to_eventpoint, act.eventpoint_to_attr_name
-      a_order = act.event_order.reduce [] do |memo, ename|
-        memo << e2a[ ename ] if e2a.has? ename
-        memo
-      end
-      given_a = opt_h.keys & [ :stop, *a_order ] # sort first by second!
-      given_a.pop while :stop != given_a.last
-      if 1 == given_a.length
-        error "#{ param :stop } must come somewhere after at #{
-          }least one of #{ or_ a_order.map{ |x| param x } }"
-        usage_and_invite
-        res = nil
-      else
-        ref = a2e.fetch given_a[-2]
-        opt_h[:stop_at] = ref
-        opt_h.delete :stop
+    # `absorb_param_queue` - as an experiment we are seeing what it takes
+    # to parse an order-sensitive syntax like this. We have an ordered
+    # @param_queue and a (should be thought of as unordered) @param_h.
+    # All we want is to distill the former down into the latter, by setting
+    # a `true` value for each nerk, and setting one `stop_at` param if
+    # appropriate.
+
+    def absorb_param_queue
+      begin
+        break( res = true ) if @param_queue.length.zero?
+        e2a = sister.eventpoint_to_attr_name
+        a_order = sister.event_order.reduce [] do |memo, ename|
+          memo << e2a[ ename ] if e2a.has? ename
+          memo
+        end
+        idx = @param_queue.index :stop  # nil ok
+        if idx
+          if 0 == idx
+            error "#{ param :stop } must come somewhere after at #{
+              }least one of #{ or_ a_order.map{ |x| param x } }"
+            break
+          end
+          # (stop does not necessarily need to be at the end.)
+          @param_queue[ idx ] = nil
+          @param_h[:stop_at] =    # mutating p.q is what is easiest,
+            sister.attr_name_to_eventpoint.fetch @param_queue[ idx - 1 ]
+          @param_queue.compact!   # also it is what we are here to do
+        end
+        @param_queue.compact.uniq.each { |k| @param_h[k] = true }
+        @param_queue = nil
         res = true
-      end
+      end while nil
       res
+    end
+
+    def process inpath            # **NOTE** signature is cosmetic here! names!
+      param_h = @param_h
+      @param_h = nil  # let's be clear..
+      @param_h_spent = param_h.dup.freeze
+      param_h[ :inpath ] = inpath
+      @do_exec = param_h.delete :do_exec  # (we handle this now)
+      sister.invoke param_h  # (no invite here, was [#035])
     end
   end
 end

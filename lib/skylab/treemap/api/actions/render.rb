@@ -1,9 +1,14 @@
 module Skylab::Treemap
+
   class API::Actions::Render < API::Action
 
-    emits :treemap, payload: :all, info: :all, error: :all, info_line: :all
+    emits :payload_line # e.g if alternate payload, like csv or script contents.
 
-    event_class API::Event
+    emits :info, :info_line, :error  # standard fare
+
+    emits :pdf  # (how this is managed may changed. not all nerks will derk)
+
+    event_factory API::Event::FACTORY
 
     order_a = [ :tree_eventpoint, :csv_eventpoint, :script_eventpoint,
                 :write_outfile_eventpoint, :exec_open_eventpoint ] # not all of
@@ -63,11 +68,8 @@ module Skylab::Treemap
 
   protected
 
-    def initialize mode_client
-      Treemap::CLI::Action === mode_client or fail "sanity - this has #{
-        }changed - we construct api actions with a mode client now, #{
-        } had: #{ mode_client.class }"
-      super mode_client
+    def initialize modal_rc
+      super
       _adapter_init
       @outpath = nil
     end
@@ -85,7 +87,7 @@ module Skylab::Treemap
         res = csv_to_treemap or break
         res = tick_eventpoint( :tree_eventpoint ) or break
         info "finished."
-        emit :treemap, path: @outpath
+        emit :pdf, path: @outpath
         res = true
       end while nil
       res
@@ -115,7 +117,7 @@ module Skylab::Treemap
                         title: title,
                        tmpdir: tmpdir,
                            #--*--
-                      payline: method( :payload ),
+                      payline: method( :payload_line ),
                       success: -> msg, metadata do
                                  info "generated treemap: #{ msg }",
                                  metadata
@@ -161,10 +163,6 @@ module Skylab::Treemap
         res = true
       end while nil
       res
-    end
-
-    def info_line line
-      emit :info_line, line
     end
 
     def render_debug
@@ -284,6 +282,8 @@ module Skylab::Treemap
       res
     end
 
+    public :stop_is_requested_before  # smell? cli wants this
+
     # "now that we are after X, have we passed a stop?"
     def tick_eventpoint eventpoint_ref
       if @stop_at
@@ -354,9 +354,7 @@ module Skylab::Treemap
     def with_csv_out_stream &block # result is result of block or conventional
       begin
         if csv_is_payload
-          pxy = Treemap::Models::Proxies::Puts.new -> line do
-            emit :payload, line
-          end
+          pxy = Treemap::Models::Proxies::Puts.new method( :payload_line )
           res = block[ pxy ]
         else
           res = tmpdir.normalize or break
@@ -375,5 +373,7 @@ module Skylab::Treemap
       end while nil
       res
     end
+
+    define_methods_for_emitters :payload_line
   end
 end

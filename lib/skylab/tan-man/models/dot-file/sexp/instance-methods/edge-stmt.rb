@@ -1,5 +1,7 @@
 module Skylab::TanMan
+
   module Models::DotFile::Sexp::InstanceMethods::EdgeStmt
+
     include Models::DotFile::Sexp::InstanceMethod::InstanceMethods
 
     def source_node_id

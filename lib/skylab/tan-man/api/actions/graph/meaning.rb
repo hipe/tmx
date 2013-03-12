@@ -1,11 +1,11 @@
 module Skylab::TanMan
+
   module API::Actions::Graph::Meaning
     # this will get sexed by the autoloader
   end
 
-
-
   class API::Actions::Graph::Meaning::Apply < API::Action
+
     extend API::Action::Parameter_Adapter
 
     PARAMS = [ :dry_run, :meaning, :node, :verbose ]
@@ -38,9 +38,8 @@ module Skylab::TanMan
     end
   end
 
-
-
   class API::Actions::Graph::Meaning::Forget < API::Action
+
     extend API::Action::Parameter_Adapter
 
     PARAMS = [ :dry_run, :force, :name, :verbose ]
@@ -70,9 +69,8 @@ module Skylab::TanMan
     end
   end
 
-
-
   class API::Actions::Graph::Meaning::Learn < API::Action
+
     extend API::Action::Parameter_Adapter
 
     PARAMS = [ :create, :dry_run, :name, :value, :verbose ]
@@ -106,12 +104,11 @@ module Skylab::TanMan
     end
   end
 
-
-
   class API::Actions::Graph::Meaning::List < API::Action
+
     extend API::Action::Parameter_Adapter
 
-    PARAMS = [:verbose]
+    PARAMS = [ :verbose ]
 
     define_method :execute do
       res = nil

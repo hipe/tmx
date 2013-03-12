@@ -1,8 +1,10 @@
 module Skylab::TanMan
-  module CLI::Actions::Graph::Node::Actions
-    extend MetaHell::Boxxy
-  end
 
+  module CLI::Actions::Graph::Node::Actions
+
+    extend MetaHell::Boxxy
+
+  end
 
   class CLI::Actions::Graph::Node::Actions::Add < CLI::Action
 
@@ -25,7 +27,6 @@ module Skylab::TanMan
     end
   end
 
-
   class CLI::Actions::Graph::Node::Actions::List < CLI::Action
 
     desc "list nodes in the graph"
@@ -40,7 +41,6 @@ module Skylab::TanMan
       api_invoke( { verbose: false }.merge param_h )
     end
   end
-
 
   class CLI::Actions::Graph::Node::Actions::Rm < CLI::Action
 

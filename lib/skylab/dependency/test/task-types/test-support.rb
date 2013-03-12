@@ -10,14 +10,23 @@ module Skylab::Dependency::TestSupport::Tasks
 
   include CONSTANTS # include them here for use in specs
 
+  extend TestSupport::Quickie  # let's see..
+
   module InstanceMethods
+
     include CONSTANTS # some want BUILD_DIR in the i_m's
+
     def wire! o
       o.context = context
       o.on_all do |e|
-        self.debug and $stderr.puts [e.stream_name, e.message].inspect
-        fingers[e.stream_name].push unstylize( e.to_s ) #  soft version - no style ok
+        debug_event e if do_debug
+        fingers[ e.stream_name ] << unstylize( e.text )
       end
+    end
+
+    def debug_event e
+      dputs [ e.stream_name, e.text ].inspect
+      nil
     end
   end
 end

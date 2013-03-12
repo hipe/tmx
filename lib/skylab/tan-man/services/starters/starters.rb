@@ -7,12 +7,15 @@ module ::Skylab::TanMan
   public
 
     def starter                   # get the value from config
-      fetch services.config.fetch('starter') { 'holy-smack.dot' }
+      fetch services.config.fetch 'starter' do 'holy-smack.dot' end
     end
 
     def fetch basename
       box_module.fetch basename
     end
+
+    # `error` if one occurs will get called with a hash of metadata,
+    # including one `message`.
 
     define_method :normalize do |name, error|
       tries = []
@@ -33,16 +36,17 @@ module ::Skylab::TanMan
         r
       end.call
       if found
-        result = found.relative_path_from box_module_dir_pathname
+        res = found.relative_path_from box_module_dir_pathname
       else
-        a = tries.map(& :basename)
-        b = box_module_dir_pathname.children.map(& :basename)
-        msg = "not found: #{ a.join ', ' }. Known starters: (#{ b.join(', ') })"
-        e = PubSub::Event.new :error, message: msg, valid_names: b.map(&:to_s)
-        def e.to_s ; message end # ick sorry
-        result = error[ e ]
+        a = tries.map(& :basename )
+        b = box_module_dir_pathname.children.map(& :basename )
+        res = error[
+          message:
+            "not found: #{ a.join ', ' }. Known starters: (#{ b.join ', ' })",
+          valid_names: b.map(& :to_s )
+        ]
       end
-      result
+      res
     end
 
   protected

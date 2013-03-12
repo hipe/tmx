@@ -2,7 +2,6 @@ require_relative 'runtime/test-support'
 
 module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime # #po-008
 
-
   describe "#{ Bleeding::Runtime }" do
 
     extend Runtime_TestSupport

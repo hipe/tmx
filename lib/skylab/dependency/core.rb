@@ -2,10 +2,7 @@ require_relative '..'
 
 require 'skylab/code-molester/core'
 require 'skylab/face/core'
-require 'skylab/headless/core'
-require 'skylab/meta-hell/core'
 require 'skylab/porcelain/core'
-require 'skylab/pub-sub/core'
 require 'skylab/slake/core'
 
 module Skylab::Dependency

@@ -18,8 +18,8 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime
     end
 
     let :parent_client do
-      o = TestSupport::EmitSpy.new
-      o.format = -> e { "#{e.stream_name.inspect}<-->#{e.message.inspect}" }
+      o = PubSub_TestSupport::Emit_Spy.new
+      o.debug = -> { debug }
       o
     end
 
@@ -29,13 +29,8 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime
     end
   end
 
-
   module Runtime_InstanceMethods
     include CONSTANTS
-
-    def emit k, v
-      parent.emit Event_Simplified.new(k, unstylize(v))
-    end
 
     def initialize rt=nil
       self.parent = rt
@@ -43,12 +38,10 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime
     end
   end
 
-
   module CONSTANTS
     Frame = Frame
     Runtime_InstanceMethods = Runtime_InstanceMethods
   end
-
 
   module ModuleMethods
 
@@ -66,16 +59,15 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime
 
     # --*-- DSL-y function ish --*--
     -> do
-      usage_re =  /usage.+DORP <action> \[opts\] \[args\]/i
-      invite_re =  /try DORP \[<action>\] -h for help/i
+      usage_rx =  /usage.+DORP <action> \[opts\] \[args\]/i
+      invite_rx =  /try DORP \[<action>\] -h for help/i
       define_method :specify_should_usage_invite do
-        specify { should be_event(1, :help, usage_re) }
-        specify { should be_event(2, :help, invite_re) }
+        specify { should be_event(1, :help, usage_rx) }
+        specify { should be_event(2, :help, invite_rx) }
       end
     end.call
     # --* end --*--
   end
-
 
   module InstanceMethods
     include CONSTANTS
@@ -88,7 +80,7 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime
     let :subject do
       # frame itself is memoized with the closure hack
       frame.result # trigger it, possibly re-accessing a self-memoized value
-      frame.parent_client.emitted # expecting an array from an emit spy
+      frame.parent_client.emission_a # from the Emit_Spy
     end
   end
 end

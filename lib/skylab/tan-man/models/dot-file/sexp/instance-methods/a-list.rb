@@ -1,5 +1,7 @@
 module Skylab::TanMan
+
   module Models::DotFile::Sexp::InstanceMethods::A_List
+
     include Models::DotFile::Sexp::InstanceMethod::InstanceMethods
 
     def _insert_assignment! sym, val
@@ -38,7 +40,6 @@ module Skylab::TanMan
       new[:equals][:id] = _parse_id val.to_s
       _insert_before! new, new_before_this_asst # nil ok for 2nd param
     end
-
 
     def _update_attributes! attrs, add=nil, change=nil
       attrs = attrs.map { |k, v| [k.intern, v] } # normalize to arr of [sym, x]

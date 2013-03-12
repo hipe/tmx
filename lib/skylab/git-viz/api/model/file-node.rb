@@ -5,4 +5,3 @@ module Skylab::GitViz
     attr_accessor :file
   end
 end
-

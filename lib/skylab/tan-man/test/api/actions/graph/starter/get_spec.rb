@@ -1,6 +1,5 @@
 require_relative '../../test-support'
 
-
 module Skylab::TanMan::TestSupport::API::Actions
 
   describe "The #{ TanMan::API } action Graph Starter Get", tanman: true,
@@ -8,10 +7,10 @@ module Skylab::TanMan::TestSupport::API::Actions
 
    extend Actions_TestSupport
 
-    action_name [:graph, :starter, :get]
+    action_name [ :graph, :starter, :get ]
 
     it "when set - \"starter is set to \"holy-nerp.dot\" in local config #{
-      }file\" (and tons of metadata)" do
+        }file\" (and tons of metadata)", f:true do
 
       prepare_tanman_tmpdir <<-HERE.unindent
         --- /dev/null
@@ -21,32 +20,34 @@ module Skylab::TanMan::TestSupport::API::Actions
       HERE
 
       api_invoke_from_tmpdir
-      response.events.length.should eql(1)
+      response.events.length.should eql( 1 )
       e = response.events.first
-      e.stream_name.should eql(:info)
+      e.stream_name.should eql( :info )
       e.message.should eql(
-        'starter is set to "holy-nerp.dot" in local config file.')
-      e.meta.value_was_set.should eql(true)
-      e.meta.searched_resources.length.should eql(1)
+        'starter is set to "holy-nerp.dot" in local config file.' )
+      e.meta.value_was_set.should eql( true )
+      e.meta.searched_resources.length.should eql( 1 )
     end
 
 
     it "when not set - \"there is no starter set in local config file or #{
-      }global config file\" (and metadata)"  do
+        }global config file\" (and metadata)"  do
+
       prepare_tanman_tmpdir <<-HERE.unindent
         --- /dev/null
         +++ b/local-conf.d/config
         @@ -0,0 +1 @@
         +EXOMPLIE = holy-foly.dot
       HERE
+
       api_invoke_from_tmpdir
-      response.events.length.should eql(1)
+      response.events.length.should eql( 1 )
       e = response.events.first
-      e.stream_name.should eql(:info)
+      e.stream_name.should eql( :info )
       e.message.should eql(
         "there is no starter set in local config file or global config file" )
-      (!! e.meta.value_was_set).should eql(false)
-      e.meta.searched_resources.length.should eql(2) # two this time, no
+      ( !! e.meta.value_was_set ).should eql( false )
+      e.meta.searched_resources.length.should eql( 2 ) # two this time, no
     end                                        # short circuit
   end
 end

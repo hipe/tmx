@@ -10,65 +10,110 @@ module Skylab::PubSub
     # 1 place! this dependency must be downwards-only from this node.
 
   class CLI
-    extend Headless::CLI::Client::DSL
 
-    desc 'visualize a pub-sub event stream graph for a particular class'
+    def initialize *a             # necessary when you have a client and a box
+      init_headless_cli_client_dsl( *a )
+      @param_h = { }
+      @opendata = nil
+    end
+
+    def file_argument o
+      o << "  <file>   file(s) to #{ em '`require`' }d in order"
+    end
+
+    extend Headless::CLI::Client::DSL # before below
+    extend Headless::CLI::Box::DSL    # after above, to override o.p things
+
+    desc 'visualize a pub-sub event stream graph for a particular module'
 
     option_parser do |o|
       # [#005] - we will leverage synergies below at some later date
-      @param_h ||= {  }
-      @param_h[:default_outfile_name] = 'tmp.dot'
-      @param_h[:outfile_name] = @param_h[:default_outfile_name]
-      @param_h[:do_open] =
-        @param_h[:do_digraph] =
-        @param_h[:do_show_backtrace] =
-        @param_h[:outfile_is_payload] =
-        @param_h[:use_force] = false
+      p = @param_h
+      p[:default_outfile_name] = 'tmp.dot'
+      p[:outfile_name] = p[:default_outfile_name]
+      p[:do_open] =
+        p[:do_digraph] =
+        p[:do_show_backtrace] =
+        p[:do_write_files] =
+        p[:use_force] = false
 
       o.on '-d', '--digraph', 'surround output in "digraph{ .. }"' do
-        @param_h[:do_digraph] = true
+        p[:do_digraph] = true
       end
 
       o.on '--outfile[=<filename>]',
         "write output to <filename> (implies -d) (\"=\" necessary!)",
-        "(if no arg provided, filename is \"#{@param_h[:outfile_name]}\")",
+        "(if no arg provided, filename is \"#{p[:outfile_name]}\")",
         "(requires -F iff output filename is not default name)" do |v|
-        @param_h[:outfile_is_payload] = true
-        @param_h[:outfile_name] = v if v
-        @param_h[:do_digraph] = true
+        p[:do_write_files] = true
+        p[:outfile_name] = v if v
+        p[:do_digraph] = true
       end
 
       o.on '-F', '--force', 'necessary to overwrite the non-default file.' do
-        @param_h[:use_force] = true
+        p[:use_force] = true
       end
 
       o.on '--open', "use the `open` command on your os on the#{
         } generated file", "(implies --outfile..)" do
-        @param_h[:do_open] = true
-        @param_h[:outfile_is_payload] = true
-        @param_h[:do_digraph] = true
+        p[:do_open] = true
+        p[:do_write_files] = true
+        p[:do_digraph] = true
       end
     end
 
     desc do |o|
       o << "write the output to stdout by default."
       o << "arguments:"
-      o << "  <file>   file(s) to #{ em '`load`' } in order"
-      o << "  <klass>  show the event stream graph for this class"
+      file_argument o
+      o << "  <module>  show the event stream graph for this module"
+      o << '    if not provided (i.e 1 filename), will do something tricky'
     end
 
-    default_action :viz
+    append_syntax '[<module>]'
 
-    def viz file, *additional_file, klass
-      additional_file.unshift file
-      o = PubSub::API::Actions::GraphViz.new(
-        io_adapter.outstream, io_adapter.errstream )
-      o.files, o.klass = additional_file, klass
-      @param_h.each { |k, v| o.send "#{ k }=", v }
-      x = o.execute
-      if false == x
-        usage_and_invite
+    def viz file, *additional_file
+      if additional_file.length.zero?
+        do_guess_mod = true
+        modul = false
+      else
+        modul = additional_file.pop
+        do_guess_mod = false
       end
+      additional_file.unshift file
+      o = PubSub::API::Actions::GraphViz.new( program_name, * io_adapter.two )
+      o.absorb @param_h.merge!( files: additional_file, modul: modul,
+        do_guess_mod: do_guess_mod )
+      x = o.execute
+      usage_and_invite if false == x
+      x ? x : ( false == x ? 1 : 0 )
+    end
+
+    desc 'fire one off (test factories)'
+
+    option_parser do |o|
+      p = @param_h
+      p[:do_show_backtrace] = false
+    end
+
+    option_parser_class -> { CLI::Option::Parser::Fire }
+
+    append_syntax(
+      '[ -- ( <payload_string> | --name-1 <val-1> [ --n-2 <v2> [..]] ) ]' )
+
+    desc do |o|
+      o << "arguments:"
+      file_argument o
+      o << '  <klass>  fire the event from an object of this class'
+      o << ' <stream-name>  fizzle'
+    end
+
+    def fire file, klass, stream_name
+      o = PubSub::API::Actions::Fire.new( program_name, * io_adapter.two )
+      o.absorb @param_h.merge!( files: [ file ], modul: klass,
+        opendata: ( @opendata || false ), stream_name: stream_name.intern )
+      x = o.execute
+      usage_and_invite if false == x
       x ? x : ( false == x ? 1 : 0 )
     end
   end

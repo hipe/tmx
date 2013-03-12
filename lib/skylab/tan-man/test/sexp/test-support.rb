@@ -47,13 +47,20 @@ module Skylab::TanMan::TestSupport::Sexp
     end
 
     -> do
+
+      constantize = Autoloader::Inflection::FUN.constantize
+
       rx = /\A(?<num>\d+(?:-\d+)*)(?:-(?<rest>.+))?\z/
 
       let :_parser_client_constant do
-        md = rx.match(using_grammar_pathpart) or fail("expecting #{
-          } to start with numbers: \"#{using_grammar_pathpart}\"")
-        "Grammar#{ md[:num].gsub '-', '_' }#{ "_#{ constantize md[:rest] }" if
-          md[:rest] }".intern
+        md = rx.match using_grammar_pathpart
+        if ! md then
+          fail "expected this to start with numbers - #{
+            }\"#{ using_grammar_pathpart }\""
+        else
+          "Grammar#{ md[:num].gsub '-', '_' }#{
+            }#{ "_#{ constantize[ md[:rest] ] }" if md[:rest] }".intern
+        end
       end
     end.call
 

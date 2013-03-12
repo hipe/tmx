@@ -1,4 +1,5 @@
 module Skylab::Treemap
+
   class Adapter::Catalyzer        # (at various times this was called 'mote'
                                   # and then 'metadata' but it started to
                                   # become this..)
@@ -29,6 +30,14 @@ module Skylab::Treemap
 
     attr_reader :name  # name function
 
+    def normalized_local_adapter_name
+      @name.normalized_local_name
+    end
+
+    def slug  # this makes maps much prettier, and is used as the 'against'
+      @name.as_slug  # string in `fuzzy_reduce` for the adapter box.
+    end       # (although we typically just call `name.as_slug`)
+
     def resolve_api_action_class tainted_a, error
       resolve_action_class :API, tainted_a, error
     end
@@ -36,10 +45,6 @@ module Skylab::Treemap
     def resolve_cli_action_class tainted_a, error
       resolve_action_class :CLI, tainted_a, error
     end
-
-    def slug  # this makes maps much prettier, and is used as the 'against'
-      @name.as_slug  # string in `fuzzy_reduce` for the adapter box.
-    end       # (although we typically just call `name.as_slug`)
 
   protected
 
@@ -49,13 +54,18 @@ module Skylab::Treemap
       @has_actions = { }
     end
 
-    def catalyze_base_class mode
+    def catalyze_base_class mode               # `mode` e.g :CLI or :API
       # assumes that <mode> actions have been sussed out and exist
-      if ! @module::const_get( mode, false ).constants.include?( :Action )
-        klass = ::Class.new Treemap::const_get( mode, false )::Action
-        @module.const_get( mode )::const_set :Action, klass
-        klass.const_set :ACTIONS_ANCHOR_MODULE,
-          @module::const_get( mode )::Actions
+      mod = @module  # scope
+      mode_mod = mod.const_get mode, false
+      if ! mode_mod.constants.include? :Action
+        kls = ::Class.new Treemap::const_get( mode, false )::Action
+        mode_mod.const_set :Action, kls
+        kls.class_eval do
+          include(
+            Treemap::Adapter.const_get( mode, false )::Action::InstanceMethods )
+          const_set :ACTIONS_ANCHOR_MODULE, mode_mod::Actions
+        end
       end
       nil
     end

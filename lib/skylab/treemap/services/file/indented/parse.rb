@@ -1,8 +1,12 @@
 module Skylab::Treemap
-  class Services::File::Indented::Parse # (was [#027])
+
+  class Services::File::Indented::Parse  # (was [#027])
+
     extend PubSub::Emitter
 
     emits parse_error: :all
+
+    event_factory PubSub::Event::Factory::Datapoint
 
     def self.[] attributes, char, pathname, stylus, error
       o = new attributes, char, pathname, stylus, error

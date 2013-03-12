@@ -4,21 +4,6 @@ module Skylab::TanMan::TestSupport
 
     include ::Skylab::TanMan::TestSupport::Tmpdir::InstanceMethods
 
-    let :api do
-      api = TanMan::Services.services.api
-      if do_debug
-        TanMan::API.debug = $stderr
-      end
-      api
-    end
-
-    let :cli do
-      spy = output
-      o = TanMan::CLI.new nil, spy.for(:paystream), spy.for(:infostream)
-      o.program_name = 'ferp'
-      o
-    end
-
     def input str
       argv = TanMan::TestSupport::Services::Shellwords.split str
       self.result = cli.invoke argv
@@ -50,13 +35,11 @@ module Skylab::TanMan::TestSupport
   end
 end
 
-
 RSpec::Matchers.define :be_trueish do
   match do |actual|
     actual
   end
 end
-
 
 RSpec::Matchers.define :be_gte do |expected|
   match do |actual|

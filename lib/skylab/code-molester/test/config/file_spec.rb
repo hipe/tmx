@@ -1,6 +1,7 @@
 require_relative '../test-support'
 
 describe ::Skylab::CodeMolester::Config::File do
+
   extend ::Skylab::CodeMolester::TestSupport
 
   let(:klass) { CodeMolester::Config::File }

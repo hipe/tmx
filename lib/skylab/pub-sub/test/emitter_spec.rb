@@ -1,335 +1,297 @@
 require_relative 'emitter/test-support'
 
-module ::Skylab::PubSub::TestSupport::Emitter # sorry, transitional
+module ::Skylab::PubSub::TestSupport::Emitter
 
-describe Skylab::PubSub::Emitter do
+  # Quickie.
 
-  let(:klass) do
-    ::Class.new.class_eval do
-      extend PubSub::Emitter
-      emits :informational, :error => :informational, :info => :informational
-      public :emit # [#ps-002] public for testing
-      self
-    end
-  end
-  let(:instance) { klass.new }
-  let(:emitter) { klass.new }
-  def _see o
-    "#<#{o.class}:0x%x>" % [o.object_id]
-  end
-  context 'when extended by a class' do
-    let(:inside) { ->(_) { } }
-    let(:klass) do
-      o = self
-      ::Class.new.class_eval do
-        extend PubSub::Emitter
-        public :emit # [#ps-002] public for testing
-        public :emits?
-        def self.to_s ; 'Foo' end
-        class_eval(& o.inside)
-        self
-      end
-    end
-    subject { klass }
-    context 'gives your class an "emits" method which:' do
-      specify { should be_respond_to(:emits) }
-      it 'when called with an event graph, adds those types to the types associated with the class' do
-        klass.event_graph.nodes_count.should eql(0)
-        klass.emits :scream => :sound, :yell => :sound
-        klass.event_graph.nodes_count.should eql(3)
-      end
-      context "Let's learn about emits() with a story about a class named Foo." do
-        context 'At first, the Foo class of course does not have a method called "on_bar", it:' do
-          specify { should_not be_public_method_defined(:on_bar) }
-        end
-        context 'Once it declares that it emits an event of type :bar' do
-          let(:inside) { ->(_) { emits :bar } }
-          context 'then gets a method called "on_bar":, i.e. it:' do
-            specify { should be_public_method_defined(:on_bar) }
-          end
-          context 'then with objects of class Foo you can then call on_bar.' do
-            context 'It expects you to call on_bar with a block, not doing so:' do
-              subject { ->() { instance.on_bar } }
-              specify { should raise_exception( ::ArgumentError, /callable\?/ ) }
-            end
-            context 'When you call "on_bar" with a block,' do
-              let(:touch_me) { { touched: :was_not_touched } }
-              let(:instance) do
-                o = klass.new
-                o.on_bar { touch_me[:touched] = :it_was_touched }
-                o
-              end
-              context '(the well-formed call to on_bar will return your same instance again, for chaining:)' do
-                let(:instance) { klass.new }
-                subject { _see(instance.on_bar{ || }) }
-                specify { should eql(_see instance) }
-              end
-              context  'the handler block will not have been called at first. Out of the box the canary:' do
-                subject { touch_me[:touched] }
-                specify { should eql(:was_not_touched) }
-                context 'but if you then emit one such event with a call to "emit(:bar)", the canary:' do
-                  before { instance.emit(:bar) }
-                  specify { should eql(:it_was_touched) }
-                end
-              end
-            end
-          end
+  describe "#{ PubSub }::Emitter" do
 
-          context "with `emits?`" do
-            it " - you can see if it emits something" do
-              instance = klass.new
-              instance.emits?( :baz ).should eql( false )
-              instance.emits?( :bar ).should eql( true )
-            end
-          end
-        end
-      end
-    end
-  end
+    extend Emitter_TestSupport
 
-  it 'describes its stream graph' do
-    emitter.class.event_graph.describe.should eql(<<-HERE.unindent.strip)
-      informational
-      error -> informational
-      info -> informational
-    HERE
-  end
-  it 'notifies subscribers of its child events' do
-    the_msg = nil
-    emitter.on_error do |event|
-      the_msg = event.message
-    end
-    emitter.emit(:error, 'yes')
-    the_msg.should eql('yes')
-  end
-  it 'notifies subscribers of parent events about child events' do
-    the_msg = nil
-    emitter.on_informational { |e| the_msg = "#{e.stream_name}: #{e.message}" }
-    emitter.emit(:error, 'yes')
-    the_msg.should eql('error: yes')
-  end
-  it 'will double-notify a single subscriber if it subscribes to multiple facets of it' do
-    the_child_msg = nil
-    the_parent_msg = nil
-    emitter.on_informational { |e| the_parent_msg = "#{e.stream_name}: #{e.message}" }
-    emitter.on_info          { |e| the_child_msg  = "#{e.stream_name}: #{e.message}" }
-    emitter.emit(:info, 'foo')
-    the_child_msg.should eql('info: foo')
-    the_parent_msg.should eql('info: foo')
-  end
-  it 'but the listener can check the event-id of the event if it wants to, it will be the same event' do
-    id_one = id_two = nil
-    emitter.on_informational { |e| id_one = e.event_id }
-    emitter.on_info          { |e| id_two = e.event_id }
-    emitter.emit(:info)
-    id_one.should_not eql(nil)
-    id_one.should eql(id_two)
-    id_two.should be_kind_of(Fixnum)
-  end
-  context 'With regards to the parameters passed to your event handlers' do
-    let(:emits) { ->(_) { } }
-    let(:klass) do
-      o = self
-      ::Class.new.class_eval do
-        extend PubSub::Emitter
-        public :emit # [#ps-002] public for testing
-        class_eval(& o.emits)
-        self
-      end
-    end
-    context 'with a simple emit interface of one event type' do
-      let(:emits) { ->(_) { emits :bar } }
-      let(:canary) { { } }
-      context "when you emit a :bar type event with zero arguments" do
-        context 'if your event handler takes a variable number of arguments, emitting such an event' do
-          let(:instance) do
-            klass.new.on_bar { |*a| canary[:args] = a } # expects chaining-style return value
-          end
-          subject { canary[:args] }
-          context 'with zero payload arguments passes zero to your handlers.' do
-            before  { instance.emit(:bar) }
-            specify { should eql([]) }
-          end
-          context 'with one payload argument passes one to your handlers.' do
-            before  { instance.emit(:bar, 'foo') }
-            specify { should eql(['foo']) }
-          end
-          context 'with two payload arguments passes two to your handlers.' do
-            before  { instance.emit(:bar, 'one', 2) }
-            specify { should eql(['one', 2]) }
-          end
+    # --*--
+
+    context "when a class extends it" do
+
+      context 'gives your class an "emits" method which:' do
+
+        it "your class responds to it" do
+          klass.should be_respond_to( :emits )
         end
-        context 'if your event handler takes exactly one argument, emitting such an event' do
-          let(:instance) do
-            klass.new.on_bar { |one| canary[:arg] = one } # expects chaining-style return value
-          end
-          subject { canary[:arg] }
-          context 'with zero payload arguments passes one event object to your handlers.' do
-            before  { instance.emit(:bar) }
-            specify { should be_kind_of(PubSub::Event) }
-            context "whose payload" do
-              subject { canary[:arg].payload }
-              specify { should eql(nil) }
-            end
-          end
-          context 'with one payload argument passes one to your handlers.' do
-            before  { instance.emit(:bar, 'foo') }
-            specify { should be_kind_of(PubSub::Event) }
-            context "whose payload" do
-              subject { canary[:arg].payload }
-              specify { should eql('foo') }
-            end
-          end
-          context 'with two payload arguments passes two to your handlers.' do
-            before  { instance.emit(:bar, 'foo', 'baz') }
-            specify { should be_kind_of(PubSub::Event) }
-            context "whose payload" do
-              subject { canary[:arg].payload }
-              specify { should eql(['foo', 'baz']) }
-            end
-          end
-        end
-        context 'if your event handler takes exactly two arguments, emitting such an event' do
-          let(:instance) do
-            klass.new.on_bar { |a, b| canary[:args] = [a, b] } # expects chaining-style return value
-          end
-          subject { canary[:args] }
-          context 'with zero payload arguments passes two nils to your handlers.' do
-            before  { instance.emit(:bar) }
-            specify { should eql([nil, nil]) }
-          end
-          context 'with one payload "foo" argument passes to following to your handlers:' do
-            before  { instance.emit(:bar, 'foo') }
-            specify { should eql(['foo', nil]) }
-          end
-          context 'with two payload arguments passes two to your handlers.' do
-            before  { instance.emit(:bar, 'one', 2) }
-            specify { should eql(['one', 2]) }
-          end
+
+        it "when called with an event graph, adds those types to the #{
+            }types associated with the class" do
+
+          klass.event_stream_graph.node_count.should eql( 0 )
+          klass.send :emits, scream: :sound, yell: :sound
+          klass.event_stream_graph.node_count.should eql( 3 )
         end
       end
     end
-  end
-  context "You can use the touch!/touched? facility on event objects to track whether you've seen them" do
-    it 'by explicitly touching and checking for touched?' do
-      o = emitter
-      c = ::Struct.new(:a, :i, :e).new(0, 0, 0)
-      o.on_informational { |e| if ! e.touched? then e.touch! ; c.a += 1  end }
-      o.on_info { |e| c.i += 1 ; e.touch! }
-      o.on_error { |e| c.e += 1 }
-      o.emit :informational
-      c.values.should eql([1, 0, 0])
-      o.emit :info
-      c.values.should eql([1, 1, 0])
-      o.emit :error
-      c.values.should eql([2, 1, 1])
-    end
-    context 'A touch will NOT happen automatically when a message is accessed ("to_s" is aliases to "message")' do
-      let( :lines ) { [] }
-      it 'without touch check' do
-        o = emitter
-        o.on_informational { |e| lines << "inform:#{e}" }
-        o.on_info          { |e| lines << "info:#{e}" }
-        o.emit :info, "A"
-        lines.should eql(%w(info:A inform:A))
+
+    context 'When you call "on_foo" with a block,' do
+
+      inside do
+        emits :foo
       end
-      it 'with touch check' do
-        o = emitter
-        o.on_informational { |e| lines << "inform:#{e}" unless e.touched? }
-        o.on_info          { |e| lines << "info:#{e}"   unless e.touched? }
-        o.emit(:info, "A")
-        lines.should eql(%w(info:A inform:A))
+
+      let :touch_me do
+        { touched: :was_not_touched }
       end
-      it 'but with an explicit touch' do
-        o = emitter
-        o.on_informational { |e| lines << "inform:#{e.touch!}" unless e.touched? }
-        o.on_info          { |e| lines << "info:#{e.touch!}"   unless e.touched? }
-        o.emit :info, "A"
-        lines.should eql(%w(info:A))
+
+      let :emitter do
+        o = klass.new
+        o.on_foo { touch_me[:touched] = :it_was_touched }
+        o
+      end
+
+      it "the well-formed call to `on_foo` will result in #{
+          }the same proc you gave it, for chaining" do
+        nerk = -> { }
+        x = emitter.on_foo(& nerk )
+        x.object_id.should eql( nerk.object_id )
+      end
+
+      it "the call to emit( :foo ) - invokes the block." do
+        touch_me[:touched].should eql( :was_not_touched )
+        res = emitter.emit :foo
+        touch_me[:touched].should eql( :it_was_touched )
+        res.should eql( nil )
+      end
+
+      it "with `emits?` - you can see if it emits something" do
+        emitter.emits?( :baz ).should eql( false )
+        emitter.emits?( :foo ).should eql( true )
       end
     end
-  end
-  context "Let's play with some different types of event-type graphs." do
-    let(:klass) do
-      kg = klass_graph
-      ::Class.new.class_eval do
-        extend PubSub::Emitter
-        public :emit # [#ps-002] public for testing
-        emits( *kg )
-        self
+
+    context "this klass with a typical 3-node event stream graph" do
+
+      inside do
+        emits :informational, error: :informational, info: :informational
+      end
+
+      it "reflects on its event stream graph" do
+        act = klass.event_stream_graph.describe
+        exp = <<-HERE.unindent.strip
+          informational
+          error -> informational
+          info -> informational
+        HERE
+      end
+
+      it "notifies subscribers of its child events" do
+        msg = nil
+        emitter.on_error do |event|
+          msg = event.payload_a.first
+        end
+        emitter.emit :error, 'yes'
+        msg.should eql( 'yes' )
+      end
+
+      it "notifies subscribers of parent events about child events" do
+        msg = nil
+        emitter.on_informational do |e|
+          msg = "#{ e.stream_name }: #{ e.payload_a.first }"
+        end
+        emitter.emit :error, 'yes'
+        msg.should eql( 'error: yes' )
+      end
+
+      it "will double-notify a single subscriber if it subscribes #{
+          }to multiple facets of it" do
+        chld = nil
+        prnt = nil
+        emitter.on_informational { |e| prnt = "#{e.stream_name}: #{e.payload_a.first}" }
+        emitter.on_info          { |e| chld = "#{e.stream_name}: #{e.payload_a.first}" }
+        emitter.emit :info, 'foo'
+        chld.should eql( 'info: foo' )
+        prnt.should eql( 'info: foo' )
+      end
+
+      it "but the listener can check the event-id of the event if it #{
+          }wants to, it will be the same event" do
+        id_one = id_two = nil
+        emitter.on_informational { |e| id_one = e.event_id }
+        emitter.on_info          { |e| id_two = e.event_id }
+        emitter.emit( :info )
+        ( !! id_one ).should eql( true )
+        id_one.should eql( id_two )
+        id_two.should be_kind_of( ::Fixnum )
       end
     end
-    context 'With an event-type tree three levels deep and two wide,' do
-      let(:klass_graph){[
-        :all,
-        :error => :all,
-        :info => :all,
-        :hello => :info
-      ]}
-      it 'triggering an event on a deepest child will trigger the root event' do
+
+    context "You can use the touch!/touched? facility on event objects #{
+        }to track whether you've seen them (but this is a smell..)" do
+
+      inside do
+        emits :informational, error: :informational, info: :informational
+      end
+
+      it 'by explicitly touching and checking for touched?' do
         o = emitter
-        touched = 0
-        o.on_all { |e| touched += 1 }
-        o.emit :hello
-        touched.should eql(1)
+        c = ::Struct.new( :a, :i, :e ).new( 0, 0, 0 )
+        o.on_informational do |e|
+          if ! e.touched?
+            e.touch!
+            c.a += 1
+          end
+        end
+        o.on_info do |e|
+          c.i += 1
+          e.touch!
+        end
+        o.on_error do |e|
+          c.e += 1
+        end
+        o.emit :informational
+        c.values.should eql( [1, 0, 0] )
+        o.emit :info
+        c.values.should eql( [1, 1, 0] )
+        o.emit :error
+        c.values.should eql( [2, 1, 1] )
+      end
+
+      context "A touch will NOT happen automatically when payload is #{
+        }accessed (duh)" do
+
+        let :lines do [ ] end
+
+        it "without touch check" do
+          o = emitter
+          o.on_informational { |e| lines << "inform:#{ e.payload_a.first }" }
+          o.on_info          { |e| lines << "info:#{ e.payload_a.first }" }
+          o.emit :info, "A"
+          lines.should eql( %w(info:A inform:A) )
+        end
+
+        it 'with touch check' do
+          o = emitter
+          o.on_informational { |e| lines << "inform:#{ e.payload_a.first }" unless e.touched? }
+          o.on_info          { |e| lines << "info:#{ e.payload_a.first }"   unless e.touched? }
+          o.emit :info, "A"
+          lines.should eql( %w( info:A inform:A ) )
+        end
+
+        it 'but with an explicit touch' do
+          o = emitter
+          o.on_informational do |e|
+            lines << "inform:#{ e.touch!.payload_a.first }" unless e.touched?
+          end
+          o.on_info do |e|
+            lines << "info:#{ e.touch!.payload_a.first }" unless e.touched?
+          end
+          o.emit :info, "A"
+          lines.should eql( %w(info:A ) )
+        end
       end
     end
-    context "With an event type tree that is a simple circular directed graph (a triangle)," do
-      let(:klass_graph) {[{
-        :father => :son,
-        :ghost  => :father,
-        :son    => :ghost
-      }]}
-      before(:each) do
-        @counts = Hash.new { |h, k| h[k] = 0 }
-        o = emitter
-        o.on_father { |e| @counts[:father] += 1 }
-        o.on_son    { |e| @counts[:son]    += 1 }
-        o.on_ghost  { |e| @counts[:ghost]  += 1 }
+
+    context "Let's play with some different types of event-type graphs." do
+
+      def inside
+        sg = stream_graph         # ^^ context of the test  ^^
+        -> do                     # vv context of the class vv
+          emits( *sg )
+        end
       end
-      def same which
-        emitter.emit(which)
-        @counts.keys.map(&:to_s).sort.join(' ').should eql('father ghost son')
-        @counts.values.count{ |v| 1 == v }.should eql(3)
+
+      context 'With an event-type tree three levels deep and two wide,' do
+
+        let :stream_graph do [
+          :all,
+          error: :all,
+          info: :all,
+          hello: :info
+        ] end
+
+        it "triggering an event on a deepest child will trigger #{
+            } the root event" do
+          o = emitter
+          touched = 0
+          o.on_all { |e| touched += 1 }
+          o.emit :hello
+          touched.should eql( 1 )
+        end
       end
-      it( 'an emit to this one emits to all three' ) { same(:father) }
-      it( 'an emit to this one emits to all three' ) { same(:son) }
-      it( 'an emit to this one emits to all three' ) { same(:ghost) }
+
+      context "With an event stream graph that is a simple circular #{
+          }directed graph (a triangle)," do
+
+        let :stream_graph do [
+          father: :son,
+          ghost: :father,
+          son: :ghost
+        ] end
+
+        def same which
+          @counts = Hash.new { |h, k| h[k] = 0 }
+          o = emitter
+          o.on_father { |e| @counts[:father] += 1 }
+          o.on_son    { |e| @counts[:son]    += 1 }
+          o.on_ghost  { |e| @counts[:ghost]  += 1 }
+
+          emitter.emit which
+          s = @counts.keys.map(& :to_s ).sort.join ' '
+          s.should eql( 'father ghost son' )
+          @counts.values.count{ |v| 1 == v }.should eql( 3 )
+        end
+
+        it "an emit to father emits to all three" do
+          same :father
+        end
+
+        it "an emit to son emits to all three" do
+          same :son
+        end
+
+        it "an emit to ghost emits to all three" do
+          same :ghost
+        end
+      end
     end
-  end
-  context "has a shorthand" do
-    let(:normal_class) do
-      ::Class.new.class_eval do
-        extend PubSub::Emitter
-        public :emit # [#ps-002] public for testing
+
+    context "has a shorthand for creating emitter classes" do
+
+      inside do
         emits :one
-        self
+      end
+
+      alias_method :normal_class, :klass
+
+      let :shorthand_class do
+        PubSub::Emitter.new :all, error: :all
+      end
+
+      it "which works" do
+        o = normal_class.new
+        s = nil
+        o.on_one { |x| s = x.payload_a.first }
+        o.emit :one, 'sone'
+        s.should eql( 'sone' )
+        o = shorthand_class.new
+        o.on_all { |e| s = e.payload_a.first.to_s }
+        o.emit :error, 'serr'
+        s.should eql( 'serr' )
       end
     end
-    let(:shorthand_class) do
-      PubSub::Emitter.new(:all, :error => :all)
-    end
-    it 'which works' do
-      o = normal_class.new
-      s = nil
-      o.on_one { |x| s = x.to_s }
-      o.emit :one, 'sone'
-      s.should eql('sone')
-      o = shorthand_class.new
-      o.on_all { |e| s = e.to_s }
-      o.emit :error, 'serr'
-      s.should eql('serr')
-    end
-  end
-  context "Will graphs defined in a parent class descend to child?" do
-    let(:child_class) { ::Class.new(klass) }
-    it "YES" do
-      ok = nil
-      o = child_class.new
-      o.on_informational { |e| ok = e }
-      o.emit(:info, "wankers")
-      ok.message.should eql('wankers')
+
+    context "will graphs defined in a parent class descend to child?" do
+
+      inside do
+        emits :informational, error: :informational, info: :informational
+      end
+
+      let :child_class do
+        ::Class.new klass
+      end
+
+      it "YES" do
+        ok = nil
+        o = child_class.new
+        o.on_informational { |e| ok = e }
+        o.emit :info, "wankers"
+        ok.payload_a.first.should eql( 'wankers' )
+      end
     end
   end
-end
 end

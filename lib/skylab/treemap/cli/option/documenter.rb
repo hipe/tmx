@@ -4,15 +4,34 @@ module Skylab::Treemap
 
   public
 
-  #         ~ (yes the public interface, usu. documenting hooks) ~
+    #         ~ parameter reflection API ~
+
+    # Kind of a big deal to the rest of the system, reflection on
+    # all of the nerks. Note this frequently gets requested as the option
+    # parser definition blocks are being run so care must be taken with
+    # lazy-instantiation of the option documenter (singular!).
+
+    Options = MetaHell::Proxy::Nice.new :fetch
+
+    def options
+      @options ||= Options.new fetch: method( :options_fetch )
+    end
+
+    def has_formal_parameter norm_name
+      @option_box.has? norm_name
+    end
+
+    #         ~ mostly documenting hoooks ~
 
     def absorb_unseen_definition_blocks blocks, extension_blocks
+
       # extensions must be run before a true documenting pass (because. e.g
       # `more`s need to be read before they are written.)
       # However, the extensions (and possibly the normal definitions)
       # may want to be able to refer to the switches by normalized name
       # in their rendered strings. We hence try to save reading `mores`
       # till the very end somehow.
+
       if @blocks_a
         if ! blocks || @blocks_a.object_id != blocks.object_id
           fail "hack failed - blocks definition array changed?"
@@ -31,6 +50,7 @@ module Skylab::Treemap
 
     # (just a special accessor to be used from the i.m's typically just
     # for appending a -h option at the end of it.)
+
     def on *a, &b
       b and fail "you can't add a block to a documenting option"
       @model_probe.on(* a )
@@ -53,20 +73,11 @@ module Skylab::Treemap
     #
 
     module Pxy
+      # usually we write out what is attempted to read from us
     end
 
     module Probe
-    end
-
-    # Kind of a big deal to the rest of the system, reflection on
-    # all of the nerks. Note this frequently gets requested as the option
-    # parser definition blocks are being run so care must be taken with
-    # lazy-instantiation of the option documenter (singular!).
-
-    Options = MetaHell::Proxy::Nice.new :fetch
-
-    def options
-      @options ||= Options.new fetch: method( :options_fetch )
+      # usually we store what is written to us
     end
 
     class Pxy::Smrz < MetaHell::Proxy::Functional.new :summarize
@@ -113,10 +124,10 @@ module Skylab::Treemap
       @model.summary_width = x    # use it to hold it sure why not. f.w needs it
     end
 
-    Pxy::Top = MetaHell::Proxy::Functional.new :list
+    Pxy::Top = MetaHell::Proxy::Nice.new :list
 
-    def top  # #todo this is probably dep'd
-      @top_pxy ||= Pxy::Top.new list: -> { top_list }
+    def top
+      @top_pxy ||= Pxy::Top.new list: method( :top_list )
     end
 
     -> do  # `visit` - this is probably replacing above.  look like an o.p
@@ -132,37 +143,29 @@ module Skylab::Treemap
 
   protected
 
-    class Probe::Param_H < MetaHell::Proxy::Nice.new :[]=
-      def initialize on_store
-        super :[]= => on_store
+    # act like an action, but do 'census' style things
+
+    class Probe::Action < MetaHell::Proxy::Nice::Basic.new(
+      :read_param_h, :write_param_h, :write_param_queue
+    )
+      def hdr s ; s end           # we don't style things during 'census' probe
+      def more x ; [ ] end        # idem
+
+      def initialize read_param_h, write_param_h, write_param_queue
+        @param_h = Probe::Hash.new read_param_h, write_param_h
+        @param_queue = ::Enumerator::Yielder.new(& write_param_queue )
+        nil
       end
     end
 
-    class Probe::Action < MetaHell::Proxy::Nice.new :hdr, :more
-
-      valid = ::Struct.new( :hdr, :read_more, :store_default ).new
-
-      define_method :initialize do |h|        # (we can't raise here)
-        h.keys.each { |k| valid[ k ] }        # all keys are valid
-        valid.members.each { |k| h.fetch k }  # no keys are missing
-        h = h.dup
-        @param_h = Probe::Param_H.new h.delete( :store_default )
-        h[:more] = h.delete :read_more
-        super h
+    class Probe::Hash < MetaHell::Proxy::Nice.new :[], :[]=
+      def initialize read, write
+        super :[] => read, :[]= => write
       end
     end
 
     class Probe::Model < MetaHell::Proxy::Nice.new :on, :separator
       def respond_to? x ; true end
-    end
-
-    class Probe::Name < ::BasicObject
-      me = self ; define_method :class do me end  # be honest and kind
-      def enqueue x ; end  # hard-coded hack for now!!
-      def respond_to? x ; true end
-      def initialize on_param_h_store
-        @param_h = Probe::Param_H.new on_param_h_store
-      end
     end
 
     def initialize host
@@ -175,18 +178,79 @@ module Skylab::Treemap
       @flip_box, @default_box, @option_box, @more_box = 4.times.map do
         MetaHell::Formal::Box::Open.new
       end
+      param_h = { } ; param_queue = [ ]
       @census_probe = Probe::Action.new(
-        hdr: -> s { s },  # we don't style things during 'census' probe
-        read_more:  method( :do_not_read_more ),  # we don't read 'more'
-        store_default: method( :default_added )   # definately store these.
+        read_param_h: -> k do
+          fail "test me - it's probably fine" ; param_h[ k ]
+        end,
+        write_param_h: -> k, v do
+          @write_param_h[ k, v ]
+          param_h[ k ] = v
+        end,
+        write_param_queue: -> v do
+          @write_param_queue[ v ]
+          param_queue << v
+        end
       )
       @model_probe = Probe::Model.new(
         on:          method( :option_definition_added ),
         separator:   method( :option_separator )
       )
-      @name_probe = Probe::Name.new -> k, v do
-        @last_arg_key_used = k
-        v
+      @write_param_h_h = {
+        probe_default: -> k, v { @default_box.add k, v },
+        probe_name:    -> k, v { @param_key_mutex[ k ] }
+      }
+      @write_param_h = @write_param_h_h[ :probe_default ]
+      @write_param_queue = -> x do
+        ::Symbol === x or fail "hack failed - expecting symbol - #{ x.class }"
+        @param_key_mutex[ x ]
+      end
+    end
+
+    #         ~ support for the census pass (wired in above method) ~
+
+    def option_definition_added *args, &block
+      @model.on(* args, &block )
+      opt = CLI::Option.build_from_args args, nil, @fail  # no norm_name yet
+      if opt
+        if opt.weak_identifier
+          if block  # no block iff cosmetic!
+            norm_name = hack_infer_normalized_name block,
+              -> e { @fail[ "#{ opt.weak_identifier } #{ e }" ] }
+          else
+            norm_name = opt.normalized_name  # MY GOD BE CAREFUL
+          end
+        else
+          opt = @fail[ "can't derive weak identifier for option" ]
+        end
+      end
+      if opt && norm_name
+        opt.normalized_name = norm_name
+        @flip_box.add opt.weak_identifier, norm_name
+        @option_box.add norm_name, opt
+      end
+      nil
+    end
+
+    def hack_infer_normalized_name block, otherwise  # (called in above method)
+      # this block was created in the context of the action probe, so when
+      # you call `call` on the block, the probe is the self.
+      prev = @write_param_h
+      @write_param_h = @write_param_h_h[ :probe_name ]
+      seen = nil
+      @param_key_mutex = -> k do
+        if seen && seen != k
+          fail "hack failed - param key mismatch - #{ seen } to #{ k }"
+        end
+        seen = k
+      end
+      block.call( * block.arity.abs.times.map { } )
+      @write_param_h = prev
+      if seen
+        seen
+      else
+        otherwise[ "block not set anything in @param_h" ]
+        false
       end
     end
 
@@ -247,6 +311,13 @@ module Skylab::Treemap
 
     # (see long note at `summarize`)
 
+    class Pxy::Action < MetaHell::Proxy::Nice.new :hdr, :more
+      def initialize h
+        super
+        @param_h = { }
+      end
+    end
+
     def build_view_model
       # carry-over old values to new and make a few prayers about some things..
       h = { }
@@ -258,39 +329,41 @@ module Skylab::Treemap
       op.instance_exec do
         h.each { |k, v| instance_variable_set k, v }
       end
-      doc_ctx = Probe::Action.new(
+      doc_ctx = Pxy::Action.new(
         hdr: @host.method( :hdr ),
-        read_more: method( :read_more ),  # only *NOW* do we read these!
-        store_default: -> k, v { v }      # (ingore when defaults are set..
-      )                                      #  but if needed we can do this
-                                             #  the right way..)
+        more: method( :read_more )        # only *NOW* do we read these!
+      )
       @blocks_a.each do |blk|
         doc_ctx.instance_exec op, &blk
       end
       op
     end
 
-    # whatever strings the upstream gives us to represent this switch,
-    # we do at least 2 things to it.. (this is from a call of `summarize`
-    # from the frameworks)
+    -> do
 
-    mustache_rx = Headless::CONSTANTS::MUSTACHE_RX
+      # whatever strings the upstream gives us to represent this switch,
+      # we do at least 2 things to it.. (this is from a call of `summarize`
+      # from the frameworks)
 
-    define_method :summarize_switch do |sw, idx, args, blk|
-      sw.summarize(* args ) do |line|  # (no how about *I'll* call it)
-        use_line = line.gsub mustache_rx do
-          stem = $~[1].strip
-          meth = "render_#{ stem }_for_option" # e.g. render_default_for_option
-          # (we used to put $~[0] back, now we are loud with failure..)
-          wid = CLI::Option::Scanner::FUN.weak_identifier_for_switch[ sw ]
-          opt = options_fetch( @flip_box.fetch wid )
-          s = @host.send meth, opt
-          s ||= "(no #{ stem })"  # e.g "(no default)"  .. you could of course..
-          s
+      fun = Headless::CLI::Option::Parser::Scanner::FUN
+      mustache_rx = Headless::CONSTANTS::MUSTACHE_RX
+
+      define_method :summarize_switch do |sw, idx, args, blk|
+        sw.summarize(* args ) do |line|  # (no how about *I'll* call it)
+          use_line = line.gsub mustache_rx do
+            stem = $~[1].strip
+            meth = "render_#{ stem }_for_option" # e.g. render_default_for_option
+            # (we used to put $~[0] back, now we are loud with failure..)
+            wid = fun.weak_identifier_for_switch[ sw ]
+            opt = options_fetch( @flip_box.fetch wid )
+            s = @host.send meth, opt
+            s ||= "(no #{ stem })"  # e.g "(no default)"  .. you could of course..
+            s
+          end
+          blk[ use_line ]
         end
-        blk[ use_line ]
       end
-    end
+    end.call
 
     class Pxy::Switch < MetaHell::Proxy::Functional.new :arg, :long,
       :object_id, :short, :send
@@ -316,40 +389,6 @@ module Skylab::Treemap
     end
 
     #         ~ internal mechanics & hookbacks ~
-
-    def hack_infer_normalized_name block, otherwise
-      @last_arg_key_used = nil
-      @name_probe.instance_exec( * block.arity.abs.times.map { }, & block )
-      if @last_arg_key_used
-        @last_arg_key_used
-      else
-        otherwise[ "block not set anything in @param_h" ]
-        false
-      end
-    end
-
-    def option_definition_added *args, &block
-      @model.on(* args, &block )
-      opt = CLI::Option.build_from_args args, nil, @fail  # no norm_name yet
-      if opt
-        if opt.weak_identifier
-          if block  # no block iff cosmetic!
-            norm_name = hack_infer_normalized_name block,
-              -> e { @fail[ "#{ opt.weak_identifier } #{ e }" ] }
-          else
-            norm_name = opt.normalized_name  # MY GOD BE CAREFUL
-          end
-        else
-          opt = @fail[ "can't derive weak identifier for option" ]
-        end
-      end
-      if opt && norm_name
-        opt.normalized_name = norm_name
-        @flip_box.add opt.weak_identifier, norm_name
-        @option_box.add norm_name, opt
-      end
-      nil
-    end
 
     def option_separator *a
       # so .. we don't give it to the model, and we don't hook into it..

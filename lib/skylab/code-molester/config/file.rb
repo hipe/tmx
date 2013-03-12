@@ -2,10 +2,14 @@ module ::Skylab::CodeMolester
 
   class Config::File
 
+    module Foofer
+      extend PubSub::Emitter
+      emits wizzle: :paazle
+    end
 
     # custom `delegates_to` -- contrast with MetaHell::DelegatesTo
     # #watch'ing this for push up potential.
-    #
+
     def self.delegates_to implementor, method_name, condition=nil
       if ! condition                        # the default condition is that the
         condition = -> { send implementor } # implementor result must be trueish
@@ -107,7 +111,7 @@ module ::Skylab::CodeMolester
 
     attr_reader :pathname
 
-    default_escape_path = ->( pn ) { pn.basename } # a nice safe common denom.
+    default_escape_path = -> pn { pn.basename } # a nice safe common denom.
 
     read_events = ::Struct.new :error, :read_error, :no_ent, :is_not_file,
       :invalid, :escape_path
@@ -155,7 +159,6 @@ module ::Skylab::CodeMolester
       res
     end
 
-
     delegates_to :sexp, :sections, -> { valid? }
 
     delegates_to :sexp, :set_value, -> { valid? }
@@ -182,7 +185,6 @@ module ::Skylab::CodeMolester
     # for this class it should not be used.
 
     delegates_to :sexp, :value_items, -> { valid? }
-
 
     def valid?
       if @valid.nil?
@@ -214,19 +216,46 @@ module ::Skylab::CodeMolester
 
     delegates_to :pathname, :writable?
 
+    # (below class is file-private but so-named for friendlier debugging)
 
+    Write = PubSub::Emitter.new
 
-    write_emitter = PubSub::Emitter.new error: :all,
-      notice: :all, before: :all, after: :all,
-      before_edit:   [:before, :notice], after_edit:   [:after, :notice],
-      before_create: [:before, :notice], after_create: [:after, :notice],
-      no_change: :notice
-    write_emitter.send :attr_accessor, :escape_path # ouch
+    class Write
+      # the world'd most interesting graph
 
+      emits error: [ :text, :all ],
+        notice: [ :text, :all ], before: :all, after: :all,
+        before_edit:   [ :structural, :notice, :before ],
+        after_edit:    [ :structural, :notice, :after ],
+        before_create: [ :structural, :notice, :before ],
+        after_create:  [ :structural, :notice, :after ],
+        no_change:     [ :notice, :text ]
+
+      event_factory -> { PubSub::Event::Factory::Isomorphic.new Events }
+
+      -> do  # this terrific fun is tracked by [#ps-009]
+
+        modifier_a = [ :text, :structural, :notice, :before, :after, :all ]
+
+        define_method :significant_unhandled_event_stream_names do
+          unhandled_event_stream_graph.names - modifier_a
+        end
+      end.call
+
+      attr_accessor :escape_path
+    end
+
+    module Events
+      extend MetaHell::Boxxy
+      Text = PubSub::Event::Factory::Datapoint
+      Structural = PubSub::Event::Factory::Structural.new 2
+    end
+
+    # `default_escape_path` define above
 
     define_method :write do |&block|
-      result = nil
-      em = write_emitter.new
+      res = nil
+      em = Write.new
       block[ em ] if block
       em.escape_path ||= default_escape_path
       @pathname or
@@ -234,18 +263,18 @@ module ::Skylab::CodeMolester
       if valid?
         if exist?
           if @pathname_was_read
-            result = update em
+            res = update em
           else
             fail "won't overwrite a pathname that was not first read" # stub
           end
         else
-          result = create em
+          res = create em
         end
       else
         raise "attempt to write invalid #{ noun } - check if valid? first"
       end
-      result
-   end
+      res
+    end
 
   protected
 
@@ -330,8 +359,6 @@ module ::Skylab::CodeMolester
       end while nil
       result
     end
-
-
 
     #
     # ----------------------- define m.m `parser` begin ---------------------

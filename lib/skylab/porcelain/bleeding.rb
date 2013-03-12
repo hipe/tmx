@@ -1,5 +1,5 @@
 require_relative 'core'
-require 'skylab/headless/core' # here til  all.rb is away, Headless::NLP::EN::M.
+require 'skylab/headless/core' # here til legacy.rb is away, Headless::NLP::EN::M.
 require 'optparse'
 
 module Skylab::Porcelain::Bleeding
@@ -156,7 +156,6 @@ module Skylab::Porcelain::Bleeding
     end
 
     def resolve argv # mutates argv
-      r = nil
       begin
         args = [] # the arguments that are actually passed to the method call
         r = option_syntax.parse( argv, args,
@@ -324,7 +323,7 @@ module Skylab::Porcelain::Bleeding
       es = nil
       mod = find token do |o|
         o.on_error do |er|
-          res = ( not_found || -> e { raise ::KeyError, e.message } ) [ er ]
+          res = ( not_found || -> e { raise ::KeyError, e } ) [ er ]
         end
       end
       if mod
@@ -337,27 +336,25 @@ module Skylab::Porcelain::Bleeding
       res
     end
 
-    resolve_builder = -> act do
-      bld = if act.respond_to? :builder then act.builder else act end
-      bld or fail 'sanity - action.builder returned nil?'
-      bld
-    end
-
-    on_find = PubSub::Emitter.new ambiguous: :error,
+    Find = PubSub::Emitter.new ambiguous: :error,
       not_found: :error, not_provided: :error
 
-                                  # result is nil or builder
-                                  # 1st exact match steals the whole show
-    define_method :find do |token, &error|
+    Find.event_factory -> _, __, x { x }  # "datapoint" - events are just the data
+
+    resolve_builder = nil         # scope
+                                  # result is nil or builder, 1st exact match
+    define_method :find do |token, &error| # steals the whole show
       res = nil
       begin
-        e = on_find.new error
+        e = Find.new error
         if ! token
           e.emit :not_provided, "expecting #{ syntax }"
           break( res = false )
         end
         builder = nil ; found = [] ; rx = /^#{ ::Regexp.escape token }/
-        actions.names.each do |act|
+        actions = self.actions
+        names = actions.names
+        names.each do |act|
           fnd = act.aliases.grep rx
           if fnd.length.nonzero?
             if fnd.include? token
@@ -378,6 +375,14 @@ module Skylab::Porcelain::Bleeding
       end while nil
       res
     end
+
+    resolve_builder = -> act do
+      bld = if act.respond_to? :builder then act.builder else act end
+      bld or fail 'sanity - action.builder returned nil?'
+      bld
+    end
+
+
 
     def help_invite o=nil
       a, b = if (o && o[:full]) then ['<action>',   " on a particular action."]
@@ -405,12 +410,12 @@ module Skylab::Porcelain::Bleeding
       emit :help, "#{hdr 'usage:'} #{program_name} #{syntax} [opts] [args]"
     end
 
-    attr_reader :last_fetch_result
+    attr_reader :last_live_action
 
     def resolve argv # mutates argv .. here is the secret to our tail call rec.
       res = nil
       x = fetch argv.shift do |e|  # might even be '-h' at this point, is ok
-        res = help message: e.message, syntax: false
+        res = help message: e, syntax: false
         nil                       # *ensure* that x is false-ish!
       end
       if x
@@ -432,7 +437,9 @@ module Skylab::Porcelain::Bleeding
   end
 
   class ActionEnumerator < ::Enumerator
+
     singleton_class.send(:alias_method, :[], :new)
+
     def initialize *a, &b
       @block = if a.length > 0 then
         block_given? and raise ArgumentError.new("can't have both block and args")
@@ -440,15 +447,20 @@ module Skylab::Porcelain::Bleeding
       else
         b or raise ::ArgumentError.new "block must be given if args are not"
       end
-      super(&@block)
+      super(& @block )
     end
 
     def filter &b
       self.class.new { |y| each { |*a| b.call(y, *a) } }
     end
 
-    def _self   ; self                                                   end
-    def visible ; filter { |y, a| y << a if a.is_visible }               end
+    def _self
+      self
+    end
+
+    def visible
+      filter { |y, a| y << a if a.is_visible }
+    end
   end
 
   class Actions < ActionEnumerator
@@ -703,11 +715,11 @@ module Skylab::Porcelain::Bleeding
     end
 
     def invoke argv  # (signatre is in accordance with [#hl-020])
-      block_given? and raise 'no blocks here ever'
       res = nil
       method, args = resolve argv.dup
-      if method
+      @last_live_action = if method
         res = method.receiver.send method.name, *args
+        method.receiver
       else
         res = method
       end
@@ -834,7 +846,7 @@ module Skylab::Porcelain::Bleeding
       begin
         if token
           b = parent.fetch_builder token do |e|
-            emit :error, e.message
+            emit :error, e
             result = false
             nil # set b!
           end

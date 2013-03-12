@@ -27,7 +27,7 @@ module Skylab::TanMan
     end
 
     def json_data
-      events.map(& :json_data)
+      events.map(& :json_data )
     end
   end
 end

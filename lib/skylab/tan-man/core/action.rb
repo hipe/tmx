@@ -3,7 +3,6 @@ module Skylab::TanMan
   module Core::Action             # it is probably not prudent to make a
   end                             # modality-agnostic action base class!
 
-
   module Core::Action::ModuleMethods
 
     include Headless::Action::ModuleMethods # maybe one day dsl services
@@ -17,7 +16,6 @@ module Skylab::TanMan
     end
   end
 
-
   module Core::Action::InstanceMethods
 
     include Headless::Action::InstanceMethods # per headless pattern
@@ -27,8 +25,6 @@ module Skylab::TanMan
 
     include Core::SubClient::InstanceMethods # per headless, this does a lot
 
-
-
                                   # the below event graph is used and
                                   # must be honored accross modalities.
 
@@ -37,9 +33,5 @@ module Skylab::TanMan
                                                   no_config_dir: :error,
                                                         payload: :all,
                                                            skip: :info )
-
-
-    event_class Core::Event       # descendents may change this
-
   end
 end

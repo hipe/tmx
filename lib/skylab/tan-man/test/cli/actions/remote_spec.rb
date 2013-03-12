@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::TanMan::TestSupport::CLI::Actions
 
-  describe "The #{ TanMan } cli action", tanman: true,
+  describe "The #{ TanMan } CLI action", tanman: true,
                             cli_action: true do
     extend Actions_TestSupport
 
@@ -16,7 +16,7 @@ module Skylab::TanMan::TestSupport::CLI::Actions
       end
 
       context 'when there is no local config directory' do
-        it 'cannot get added, whines about no directory' do
+        it "cannot get added, whines about no directory" do
           input 'remote add bing bong'
           output_shift_is infostream,
             "ferp failed to add remote - couldn't find local-conf.d in #{

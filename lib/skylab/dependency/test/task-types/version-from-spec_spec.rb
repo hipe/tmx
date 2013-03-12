@@ -1,23 +1,27 @@
 require_relative 'test-support'
 
-module Skylab::Dependency::TestSupport
+module Skylab::Dependency::TestSupport::Tasks
+
+  # Quickie!
 
   describe TaskTypes::VersionFrom do
-    extend Dependency_TestSupport
+
+    extend Tasks_TestSupport
+
     let(:klass) { TaskTypes::VersionFrom }
     let(:log) { Dependency::Services::StringIO.new }
     let(:must_be_in_range) { nil }
     let(:parse_with) { '/(\d+\.\d+\.\d+)/' }
     let(:version_from) { 'echo "version 1.2.34 is the version"' }
-    subject do
+    let :subject do
       klass.new(
         :must_be_in_range => must_be_in_range,
         :parse_with => parse_with,
         :version_from => version_from
       ) do |t|
         t.on_all do |e|
-          self.debug and $stderr.puts [e.stream_name, e.message].inspect
-          log.puts e.to_s
+          debug_event e if do_debug
+          log.puts e.text
         end
       end
     end
@@ -51,7 +55,7 @@ module Skylab::Dependency::TestSupport
         let(:must_be_in_range) { '~> 1.2' }
         it "fails" do
           lambda{ subject.invoke context }.should(
-            raise_exception(/Bad range assertion/)
+            raise_error(/Bad range assertion/)
           )
         end
       end
@@ -59,34 +63,35 @@ module Skylab::Dependency::TestSupport
         let(:must_be_in_range) { nil }
         it "fails" do
           lambda{ subject.invoke context }.should(
-            raise_exception(/do not use.*without.*must be in range/i)
+            raise_error(/do not use.*without.*must be in range/i)
           )
         end
       end
       context "when the regex matches" do
         context "and the version matches" do
           let(:version_from) { 'echo "ver 1.2.1"' }
-          it "says that it matches", wip:true do
-            subject.invoke(context).should eql(true)
-            log.to_s.include?('version 1.2.1 is in range 1.2+').should eql(true)
+          it "says that it matches" do
+            res = subject.invoke( context ).should eql( true )
+            log.string.include?('version 1.2.1 is in range 1.2+').should eql(true)
           end
         end
         context "and the version does not match" do
           let(:version_from) { 'echo "version 0.0.1"' }
-          it "says that is doesn't match", wip:true do
-            subject.invoke(context).should eql(false)
-            log.to_s.include?('version mismatch: needed 1.2+ had 0.0.1').should eql(true)
+          it "says that is doesn't match" do
+            subject.invoke( context ).should eql( false )
+            unstylize( log.string ).should match(
+              /\bversion mismatch: needed 1\.2\+ had 0\.0\.1\b/i
+            )
           end
         end
       end
       context "when the regex does not match" do
         let(:version_from) { 'echo "version A.B.C"' }
-        it "reports a failure", wip:true do
+        it "reports a failure" do
           subject.invoke(context).should eql(false)
-          log.to_s.include?('needed 1.2+ had version A.B.C').should eql(true)
+          log.string.include?('needed 1.2+ had version A.B.C').should eql(true)
         end
       end
     end
   end
 end
-

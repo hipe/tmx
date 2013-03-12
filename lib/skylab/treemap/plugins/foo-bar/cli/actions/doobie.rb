@@ -1,11 +1,17 @@
 module Skylab::Treemap
+
   class Plugins::FooBar::CLI::Actions::Doobie < Plugins::FooBar::CLI::Action
+
     desc "do some doobies"
+
+    emits( * Treemap::CLI::Event::CANON_STREAMS )
+
+    # emits :payload_line, :info, :info_line, :error, :help
 
   protected
 
     def process arg1, arg2, arg3=nil
-      emit :payload, "CERNGRETERLERTIONS: #{ arg1 } #{ arg2 } #{ arg3 }"
+      emit :payload_line, "CERNGRETERLERTIONS: #{ arg1 } #{ arg2 } #{ arg3 }"
       0
     end
 

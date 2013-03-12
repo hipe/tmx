@@ -1,6 +1,10 @@
 module Skylab::TanMan
 
+  Models::Config::Value_Metadata = ::Struct.new :name, :value, :value_was_set,
+      :searched_resources, :found_resource_index
+
   class Models::Config::Controller
+
     include Core::SubClient::InstanceMethods # yay
 
     def [] k # is ready? and k is string - result is first found
@@ -100,14 +104,11 @@ module Skylab::TanMan
       end
     end
 
-    value_meta = ::Struct.new :name, :value, :value_was_set,
-      :searched_resources, :found_resource_index
-
     define_method :value_meta do |name, resource_name=:all|
       res = nil
       begin
         ready? or break
-        meta = value_meta.new nil, nil, nil, []
+        meta = Models::Config::Value_Metadata.new nil, nil, nil, []
         name = name.to_s # convert symbols to strings or 'key?' fails!
         meta.name = name
         resource = nil
@@ -140,28 +141,36 @@ module Skylab::TanMan
     attr_accessor :verbose # compat
 
     def write_resource resource
-      result = nil
-      begin
-        if resource.exist? && resource.pathname.read == resource.string
-          emit :info, "(config file didn't change.)"
-          result = true
-          break
+
+      if ! resource.exist?
+        load_default_content resource
+      end
+
+      serr = infostream # a special case
+
+      resource.write do |w|
+
+        w.on_error(& method( :error ) ) # propagate the text msg up
+
+        w.on_before_create w.on_before_edit -> o do  # first part of msg
+          serr.write o.message
         end
-        if ! resource.exist?
-          load_default_content resource
+
+        w.on_after_create w.on_after_edit -> o do  # last part
+          serr.puts " .. done (#{ o.bytes } bytes.)"
         end
-        is = infostream # a special case
-        result = resource.write do |o|
-          o.on_error { |e| error e.message } # we *must* convert from plain to
-          o.on_before_edit { |e| is.write e.touch!.message } # custom event
-          o.on_before_create { |e| is.write e.touch!.message }
-          b = -> e { is.puts " .. done (#{ e.touch!.bytes } bytes.)" }
-          o.on_after_edit(& b)
-          o.on_after_create(& b)
-          o.on_all { |e| info e.message unless e.touched? }
+
+        w.on_no_change do |txt|
+          info txt
         end
-      end while nil
-      result
+
+        missed_a = w.significant_unhandled_event_stream_names
+        if missed_a.length.nonzero?
+          raise ::RuntimeError, "unhandled: #{ missed_a.join ', ' }"
+        end
+
+        nil
+      end
     end
 
     def set_value name, value, resource_name

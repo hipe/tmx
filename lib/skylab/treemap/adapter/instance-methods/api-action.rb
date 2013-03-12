@@ -1,5 +1,7 @@
 module Skylab::Treemap
+
   module Adapter::InstanceMethods::API_Action # (was [#024])
+
     include Adapter::InstanceMethods::Action
 
   protected

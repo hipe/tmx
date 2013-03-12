@@ -1,5 +1,7 @@
 module Skylab::Dependency
+
   class TaskTypes::VersionFrom < Dependency::Task
+
     include Face::Open2
 
     attribute :must_be_in_range
@@ -30,7 +32,7 @@ module Skylab::Dependency
       @must_be_in_range or fail(<<-S.gsub(/\n */,' ').strip)
         Do not use "version from" as a target without a "must be in range" assertion.
       S
-      TaskTypes::VersionRange.build @must_be_in_range
+      Dependency::VersionRange.build @must_be_in_range
     end
 
     def check_version
@@ -68,6 +70,13 @@ module Skylab::Dependency
       else
         [str, false]
       end
+    end
+
+  protected
+
+    def initialize( * )
+      super
+      @regex = nil
     end
 
     def _show_version

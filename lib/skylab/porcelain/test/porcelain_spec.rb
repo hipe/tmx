@@ -15,7 +15,14 @@ module Skylab::Porcelain::TestSupport
     let(:stderr) { _stderr.string }
     let(:instance) do
       klass.new do |o|
-        o.on_all { |e| _stderr.puts unstylize(e) ; debug_ui and $stderr.puts("DBG-->#{e}<--") }
+        o.on_all do |e|
+          x = e.payload_a[0]
+          if ! x.respond_to? :to_s
+            x = x.payload_a[0]  # #todo integration only
+          end
+          _stderr.puts unstylize( x )
+          debug_ui and $stderr.puts( "DBG-->#{ x.inspect }<--" )
+        end
       end
     end
     describe "extended by a class allows that" do
@@ -201,7 +208,7 @@ module Skylab::Porcelain::TestSupport
           end
         end # optional
         describe "a syntax for arguments of" do
-          let(:knob) { lambda { |k| k.on_all { |e| _stderr.puts e } } }
+          let(:knob) { lambda { |k| k.on_all { |e| _stderr.puts e.payload_a.first } } }
           describe "zero-length" do
             let(:syntax) { Porcelain::ArgumentSyntax.parse_syntax('') }
             it "against the zero-length args emits no errors and returns true" do

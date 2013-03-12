@@ -9,7 +9,6 @@ module Skylab::Headless::TestSupport::CLI::Table
 
   extend TestSupport::Quickie
 
-
   describe "#{ Table } (the RenderTable i.m)" do
 
     include CONSTANTS  # so we can say h.l e.g in i.m
@@ -31,11 +30,11 @@ module Skylab::Headless::TestSupport::CLI::Table
 
     # --*--
 
-    it "render_table( [] ){ .. } - renders the empty table" do
+    it "render_table( [] ){ .. } - renders the empty table", f:true do
       a = [ ]
       res = render_table [ ] do |o|
-        o.on_text do |e|
-          a << "#{ e.text }"
+        o.on_text do |txt|
+          a << txt
         end
       end
       a.join.should eql( "(empty)" )
@@ -68,8 +67,8 @@ module Skylab::Headless::TestSupport::CLI::Table
     it "options via the proxy knob thing - works" do
       render_table [['a','b'], ['c','dd']] do |o|
         o.head = '<<' ; o.tail = '>>' ; o.separator = ' | '
-        o.on_text do |e|
-          outstream.puts e.text
+        o.on_text do |txt|
+          outstream.puts txt
         end
       end
 
@@ -151,8 +150,8 @@ module Skylab::Headless::TestSupport::CLI::Table
       a = []
       render_table row_enum, separator: "\t" do |o|
         o.field!( :header ).style = Headless::CLI::Pen::MINIMAL.method(:hdr)
-        o.on_row do |e|
-          a << Headless::CLI::Pen::FUN.unstylize[ e.text ]
+        o.on_row do |txt|
+          a << Headless::CLI::Pen::FUN.unstylize[ txt ]
         end
       end
       lengths = a.map { |s| s.match(/^[^\t]*/)[0].length }

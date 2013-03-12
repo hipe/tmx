@@ -2,7 +2,10 @@ require_relative 'test-support'
 
 module Skylab::Dependency::TestSupport::Tasks
 
+  # (not Q-uickie - `before` used below)
+
   describe TaskTypes::TarballTo do
+
     extend Tasks_TestSupport
 
     let(:context) { { :build_dir => BUILD_DIR.to_s } }
@@ -40,7 +43,6 @@ module Skylab::Dependency::TestSupport::Tasks
       end
 
       it "must work" do
-        # self.debug = true
         r = subject.invoke
         r.should eql(true)
         # the below is temporary, it is not to spec afaik

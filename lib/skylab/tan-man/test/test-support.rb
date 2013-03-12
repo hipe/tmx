@@ -3,8 +3,8 @@ require 'skylab/test-support/core'
 require 'skylab/headless/test/test-support'
 
 module Skylab::TanMan::TestSupport
-  ::Skylab::TestSupport::Regret[ TanMan_TestSupport = self ]
 
+  ::Skylab::TestSupport::Regret[ TanMan_TestSupport = self ]
 
   module CONSTANTS
     Autoloader   = ::Skylab::Autoloader
@@ -102,7 +102,6 @@ module Skylab::TanMan::TestSupport
     def tanman_tmpdir
       TMPDIR # less screaming in tests is good
     end
-
   end
 
 
@@ -113,13 +112,20 @@ module Skylab::TanMan::TestSupport
 
   module InstanceMethods
     include CONSTANTS # to use MetaHell here ?
-    include Autoloader::Inflection::Methods
     include Tmpdir::InstanceMethods
 
     attr_accessor :api_was_cleared # brings it all together
 
     def _build_normalized_input_pathname stem
       __input_fixtures_dir_pathname.join stem
+    end
+
+    let :api do
+      api = TanMan::Services.services.api
+      if do_debug
+        TanMan::API.debug = $stderr
+      end
+      api
     end
 
     let :client do
@@ -161,7 +167,6 @@ module Skylab::TanMan::TestSupport
       normalized_input_string
     end
 
-
     -> do
       f = nil
       define_method( :_my_before_all ) { f.call }
@@ -170,7 +175,6 @@ module Skylab::TanMan::TestSupport
         f = -> { }
       end
     end.call
-
 
     let :normalized_input_pathname do
       if input_path_stem_to_use

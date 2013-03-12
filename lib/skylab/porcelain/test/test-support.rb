@@ -2,7 +2,8 @@ require_relative '../core'
 require 'skylab/test-support/core'
 
 module Skylab::Porcelain::TestSupport
-  ::Skylab::TestSupport::Regret[ self ]
+
+  ::Skylab::TestSupport::Regret[ Porcelain_TestSupport = self ]
 
   module CONSTANTS
     Autoloader = ::Skylab::Autoloader
@@ -10,31 +11,54 @@ module Skylab::Porcelain::TestSupport
     Headless = ::Skylab::Headless
     MetaHell = ::Skylab::MetaHell
     Porcelain = ::Skylab::Porcelain
+    PubSub = ::Skylab::PubSub
     TestSupport = ::Skylab::TestSupport
   end
 
+  include CONSTANTS
+
+  extend TestSupport::Quickie
+
   module ModuleMethods
     include CONSTANTS
-    include Autoloader::Inflection::Methods # constantize
     include MetaHell::Klass::Creator::ModuleMethods # klass etc
 
-    def incrementing_anchor_module!
-      _head = constantize description
-      _head =~ /\A[A-Z][_a-zA-Z0-9]*\z/ or fail "oops: #{_head.inspect}"
-      _last = 0
-      let :meta_hell_anchor_module do
-        m = ::Module.new
-        _const = "#{_head}#{_last += 1}"
-        Bleeding.const_set _const, m
-        m
+    define_method :constantize, & Autoloader::Inflection::FUN.constantize
+
+    def incrementing_anchor_module!  # so ridiculous
+      head = Autoloader::Inflection::FUN.constantize[ description ]
+      if /\A[A-Z][_a-zA-Z0-9]*\z/ !~ head
+        fail "oops - #{ head }"
+      else
+        last_id = 0
+        let :meta_hell_anchor_module do
+          mod = Porcelain_TestSupport.const_set "#{ head }#{ last_id += 1 }",
+            ::Module.new
+          mod
+        end
       end
     end
   end
 
   module InstanceMethods
    include CONSTANTS
-   include Autoloader::Inflection::Methods # constantize
    include MetaHell::Klass::Creator::InstanceMethods # klass!
 
+   define_method :style_free, & Headless::CLI::Pen::FUN.unstylize
+
+   define_method :unstylize_stylized,
+     & Headless::CLI::Pen::FUN.unstylize_stylized
+
+   define_method :constantize, & Autoloader::Inflection::FUN.constantize
+
+   attr_accessor :do_debug
+
+   def debug!
+     @do_debug = true
+   end
+
+   infostream = $stderr
+
+   define_method :infostream do infostream end
   end
 end

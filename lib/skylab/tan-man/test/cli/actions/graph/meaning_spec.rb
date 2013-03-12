@@ -5,8 +5,8 @@ module Skylab::TanMan::TestSupport::CLI::Actions::Graph
   # Quickie enabled!
 
   describe "#{ TanMan::CLI::Actions }::Graph::Meaning actions:" do
-    extend TanMan::TestSupport::CLI::Actions::Graph
 
+    extend TanMan::TestSupport::CLI::Actions::Graph
 
     it "`graph meaning list` lists existing meanings found in comments!!!" do
 
@@ -19,7 +19,7 @@ module Skylab::TanMan::TestSupport::CLI::Actions::Graph
 
       invoke_from_dotfile_dir 'graph', 'meaning', 'list'
 
-      names.should eql( [:paystream, :paystream, :infostream] )
+      names.should eql(  [ :paystream, :paystream, :infostream ] )
 
       exp = <<-O.gsub( /^        /, '' )
                        money : honey
@@ -29,11 +29,11 @@ module Skylab::TanMan::TestSupport::CLI::Actions::Graph
       strings.join.should eql( exp )
     end
 
-
     # note the below test is here because that is where it fits taxonomically
     # although it currently reached thru the `tell` command
 
-    it "`tell <node> is <meaning>` applies the meaning!" do
+    it "`tell <node> is <meaning>` applies the meaning!", f:true do
+
       using_dotfile <<-O.unindent
         digraph{
         # done : style=filled fillcolor="#79f234"
@@ -42,6 +42,7 @@ module Skylab::TanMan::TestSupport::CLI::Actions::Graph
         fizzle -> sickle
         }
       O
+
       invoke_from_dotfile_dir 'tell', 'fizzle', 'is', 'done'
       names.should eql( [:infostream] )
       strings.first.should match(

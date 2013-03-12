@@ -2,10 +2,13 @@ require_relative 'test-support'
 
 module ::Skylab::PubSub::TestSupport::Emitter
 
-  describe "#{Skylab::PubSub::Emitter} Crazy Graphs:" do
+  # Quickie.
+
+  describe "#{ Skylab::PubSub::Emitter } Crazy Graphs:" do
+
     extend ::Skylab::PubSub::TestSupport::Emitter
 
-    context "class Gamma extends mod Alpha which defines a graph" do
+    context "class Gamma extends mod Alpha which defines a graph" do  # #todo below could be etc
       modul :Alpha do
         extend PubSub::Emitter
         emits :alpha
@@ -16,7 +19,7 @@ module ::Skylab::PubSub::TestSupport::Emitter
         include o.Alpha
       end
 
-      it "works" do
+      it "works", f:true do
         g = _Gamma.new
         g.emit :alpha, nil # does not raise
         ->{ g.emit :no, nil }.should raise_error(
