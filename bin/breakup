@@ -1,0 +1,234 @@
+#!/usr/bin/env ruby -w
+
+  #                              ~ breakup ~
+  #
+  # a goofy fun script that simply sets up the last two commits of a file
+  # under `opendiff` (FileMerge) with the "right" names so you can bifurcate
+  # a large commit into two smaller commits. There is a recursive one
+  # lying around here too, and it is only five lines long (but i run it
+  # by hand in bash) wtf!  it also experiments with drunken monkey style
+  #
+
+exit_status = 0
+
+-> do  # meh
+
+  stay = true
+
+  y = kbd = program_name = nil
+
+  src_pn = -> do  # resolve the source pathname (some e.g source file)
+
+    fn = ARGV[0]
+
+    stderr = $stderr
+
+    y = ::Enumerator::Yielder.new { |line| stderr.puts line }
+
+    program_name = -> do
+      ::File.basename $PROGRAM_NAME
+    end
+
+    hdr = kbd = -> str do
+      "\e[32m#{ str }\e[0m"
+    end
+
+    if ! fn or [ '-h', '--help' ].include? fn
+      y << "#{ hdr[ 'usage:' ] } #{ program_name[] } path/to/file.rb"
+      y << "#{ hdr[ 'description:' ] } #{
+        }break a commit into 2 smaller steps with opendiff"
+      break
+    end
+
+    require 'pathname'
+
+    s_pn = ::Pathname.new fn
+
+    invite = -> do
+      y << "try #{ kbd[ "#{ program_name[] } -h" ] } for help (heh fat chance)"
+    end
+
+    if ! s_pn.exist?
+      y << "file not found - #{ s_pn }"
+      invite[]
+      break
+    end
+
+    s_pn
+  end.call or break
+
+  bork = showcmd = nil
+
+  -> do  # stay iff `source_pn` is free from uncommitted changes.
+    require 'open3'
+
+    bork = -> msg=nil do
+      if msg
+        y << "#{ program_name[] } #{ msg }"
+      end
+      exit_status = 1
+      stay = false
+    end
+
+    showcmd = -> cmd do
+      y << "(running #{ kbd[ cmd * ' ' ] })"
+    end
+
+    showcmd[ cmd = [ 'git', 'ls-files', '-m', '--', src_pn.to_s ] ]
+
+    ::Open3.popen3( * cmd ) do |_, sout, serr|
+      '' == ( e = serr.read ) or break( bork[ "- huh? #{ e }" ] )
+      if '' != ( o = sout.read )
+        y << "has current changes - #{ o }"
+        y << "(maybe #{ kbd[ "git checkout #{src_pn}"]} to throw away yr changes?)"
+        bork[]
+      end
+    end
+
+    stay
+  end.call or break
+
+
+  patch_pn, patch_fh = -> do   # write the patchfile, give these results
+
+    ptch_pn = ::Pathname.new "tmp.patch"  # `patchfile`
+
+    ptch_fh = nil  # this is sketchily used for writing then reading
+
+    showcmd[ cmd = [ 'git', 'show', src_pn.to_s ] ]
+
+    ::Open3.popen3( *cmd ) do |_, sout, serr|
+      '' == ( e = serr.read ) or break( bork[ "- git - #{ e }" ] )
+
+      line = sout.gets
+      if '' == line or ! line
+        y << "no delta in last commit for this file? - #{ src_pn }"
+        y << "(see for yourself with #{ kbd[ cmd * ' ' ] })"
+        break bork[]
+      end
+
+      ptch_fh = ptch_pn.open 'w+'
+      cnt = 0
+      begin
+        ptch_fh.write line
+        cnt += 1
+        line = sout.gets
+      end while line
+
+      y << "(wrote #{ ptch_pn } (#{ cnt } lines))"
+
+    end
+    stay or break
+    [ ptch_pn, ptch_fh ]
+  end.call
+
+  patch_pn && patch_fh or break
+
+  foo_pn = -> do  # apply the patch to make the BEFORE ("foo")
+
+    o_pn = ::Pathname.new "tmp.foo#{ src_pn.extname }"
+
+    cmd = 'patch',
+      '--reverse',
+      '--unified',
+      '--verbose',
+      '--batch',
+      "--input=#{ patch_pn }",
+      "--output=#{ o_pn }",
+      src_pn.to_s
+
+    showcmd[ cmd ]
+
+    if o_pn.exist?
+      o_pn.truncate 0  # used to determine success
+    end
+
+    patch_fh.flush  # necessary, or the file isn't there when we go to read it below
+    patch_fh.rewind  # careful!
+
+    did_say_something = nil
+
+    exitstatus = ::Open3.popen3( * cmd ) do |sin, sout, serr, wait_thr|
+      sin.close  # helps to be clear, also another way to write
+      '' == ( e = serr.read ) or break( bork[ "did not expect - #{ e }" ] )
+      while ( line = sout.gets )
+        did_say_something ||= true
+        puts "(#{ line.chomp })"
+      end
+      wait_thr.value.exitstatus  # meh always 0 even on failure
+    end  # (exitstatus seems zero even when patch fails. thanks larry wall :P)
+
+    stay or break
+
+    patch_fh.close
+    patch_fh = nil
+
+    if o_pn.stat.size.zero?
+      if did_say_something
+        bork[ "failed to produce patch. sorry!" ]
+      else
+        bork[ "failed to produce patch - unknown reason!" ]
+      end
+      break
+    end
+
+    o_pn
+  end.call or break
+
+  bar_pn = -> do  # making the AFTER ("bar") is easier
+    b_pn = ::Pathname.new "tmp.bar#{ src_pn.extname }"
+
+    require 'fileutils'
+
+    fu = ::Class.new.class_exec do
+      # a FileUtils controller that is always verbose, output bound
+      # to some function.
+      #
+
+      include ::FileUtils
+
+      ::FileUtils.collect_method( :verbose ).each do |name|
+        define_method( name ) do |*args, &block|
+          super( *fu_update_option( args, verbose: true ), &block )
+        end
+      end
+
+      def fu_output_message msg
+        @f[ msg ]
+      end
+
+      def initialize func
+        @f = func
+      end
+      self
+    end.new( -> msg do y << "(#{ program_name[] } - #{ msg })" end  )
+
+    fu.cp src_pn, b_pn
+
+    b_pn
+
+  end.call or break
+
+  -> do  # do the opendiff cmd
+
+    mid_pn = "tmp.mid#{ src_pn.extname }"
+
+    cmd = [
+      'opendiff',
+      foo_pn.to_s,
+      bar_pn.to_s,
+      '-merge',
+      mid_pn.to_s
+    ]
+    showcmd[ cmd ]
+
+    ::Open3.popen3( * cmd ) do |sin, sout, serr, wait_thrd|
+      sin.close
+      x =  wait_thrd.value.exitstatus  # aww too bad, FileMerge doesn't block
+    end
+  end.call
+
+
+end.call
+
+exit exit_status
