@@ -1,3 +1,4 @@
+[#004]       argument error hack
 [#003] #open Face::Open2 is superseded by Headless::IO::Upstream::Select
 [#002]       #done path-tools to e.g. headless
 [#001]       #postponed shorten wide lines #open #depends-on:sl-104

@@ -5,16 +5,20 @@ module Skylab::Face
 
   Face = self
   MetaHell = ::Skylab::MetaHell
+  MAARS = MetaHell::Autoloader::Autovivifying::Recursive
 
-  extend MetaHell::Autoloader::Autovivifying::Recursive
+  extend MAARS
 
-  module CLI
-    # you won't believe this -- during transition there is actually
-    # both a module called `Face::CLI` and a class called `Face::Cli` :/
-    # This is only necessary during that time.
+  module Services
 
-    extend MetaHell::Autoloader::Autovivifying::Recursive
-      # we don't want face/cli.rb to know about our existence, for old
-      # libraries that still use it standalone
+    o = { }
+
+    o[:Headless] = -> { require 'skylab/headless/core' ; ::Skylab::Headless }
+
+    o[:OptionParser] = -> { require 'optparse' ; ::OptionParser }
+
+    define_singleton_method :const_missing do |const|
+      const_set const, o.fetch( const ).call
+    end
   end
 end
