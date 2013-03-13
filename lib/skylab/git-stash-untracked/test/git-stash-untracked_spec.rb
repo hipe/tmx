@@ -45,7 +45,7 @@ module ::Skylab::GitStashUntracked::Tests
       end
 
       let :stderr do
-        o = TestSupport::StreamSpy.standard
+        o = TestSupport::IO::Spy.standard
         if debug
           o.debug! -> e do
             if ::String === e

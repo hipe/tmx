@@ -23,7 +23,7 @@ module Skylab::TanMan::TestSupport::CLI::Actions
     end
 
     let :client do # todo how do the other clients function?
-      spy = output # StreamSpy::Group
+      spy = output # IO::Spy::Group
       o = TanMan::CLI.new nil, spy.for( :paystream ), spy.for( :infostream )
       o.program_name = 'timmin'
       o

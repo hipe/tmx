@@ -37,7 +37,7 @@ module Skylab::TanMan::TestSupport::CLI
       o = TanMan::CLI.new
       o.program_name = 'tanmun'
       ioa = Headless::TestSupport::IO_Adapter_Spy.new
-      ioa.debug = -> { do_debug }
+      # ioa.debug = -> { do_debug }  # #todo during integration only
       o.send :io_adapter=, ioa
       o
     end

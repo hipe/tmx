@@ -1,6 +1,7 @@
 module Skylab::TestSupport
 
-  # (see also the comparable but simpler Headless::TestSupport::CLI::Streams_Spy
+  # (see also the comparable but simpler
+  #   Headless::TestSupport::CLI::IO::Spy::Group
   # which may be a good fit for testing specifically CLI apps)
 
   # manages a group of special stream spies, creating each one in turn with
@@ -27,7 +28,7 @@ module Skylab::TestSupport
   # This is all just the ostensibly necessarily convoluted way that
   # we spoof a stdout and stderr for testing
 
-  class StreamSpy::Group
+  class IO::Spy::Group
 
     debug = ::Struct.new :condition, :emit
 
@@ -35,16 +36,22 @@ module Skylab::TestSupport
       @debug ||= debug.new                     # of any stream we will `puts`
       @debug[:condition] ||= -> { true }       # to your `stderr` a line in a
       @debug[:emit] = -> line do               # format of our choosing showing
-        stderr.puts [ line.stream_name, line.string ].inspect # both the stream name
-      end                                      # and the string content after
-      stderr                                   # any filters have been applied
-    end
+        stderr.puts [ line.stream_name, line.string ].inspect # both the stream
+      end                                      # name and the string content
+      stderr                                   # after any filters have been
+    end                                        # applied
+
+    attr_reader :debug                         # (some tests want to know)
 
     define_method :debug= do |f|  # expert mode
       @debug ||= debug.new
       @debug[:condition] = f
       debug!( $stderr ) if ! @debug[:emit]
       f
+    end
+
+    def do_debug
+      @debug && @debug.condition[ ]
     end
 
     def line_filter! f            # when a line is created to be added to
@@ -71,7 +78,7 @@ module Skylab::TestSupport
           @lines.push line
           nil
         end
-        spy = StreamSpy.new # not a standard one! we do things differently
+        spy = IO::Spy.new # not a standard one! we do things differently
         spy[:line_emitter] = filter # `line_emitter` the name is insignificant
         @streams[name] = spy
         spy

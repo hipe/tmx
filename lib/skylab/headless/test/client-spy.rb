@@ -15,6 +15,14 @@ module Skylab::Headless::TestSupport
       @debug = callable
     end
 
+    attr_reader :emitted
+
+    Fuu = ::Struct.new :stream_name, :string  # #todo during integration only
+
+    def emit *a
+      ( @emitted ||= [ ] )  << Fuu.new( * a )
+    end
+
   protected
 
     def initialize
@@ -23,12 +31,22 @@ module Skylab::Headless::TestSupport
 
     def io_adapter
       @io_adapter ||= begin
-        pen = self.class::USE_THIS_PEN
-        pen &&= pen.call
+        pen = resolve_pen
         o = Headless::TestSupport::IO_Adapter_Spy.new( * [ pen ].compact )
-        o.debug = -> { @debug.call }
+        # o.debug = -> { @debug.call } # #todo during integration only
         o
       end
+    end
+
+    attr_reader :use_this_pen
+
+    def resolve_pen
+      pen = use_this_pen
+      if ! pen
+        pen = self.class::USE_THIS_PEN
+        pen &&= pen.call
+      end
+      pen
     end
 
     def parameter_label x, idx=nil  # ICK
@@ -45,5 +63,16 @@ module Skylab::Headless::TestSupport
     attr_accessor :normalized_invocation_string
 
     USE_THIS_PEN = -> { Headless::CLI::Pen::MINIMAL }
+
+
+    def initialize pen=nil
+      @use_this_pen = pen
+    end
+
+    def clear!  # #todo during integration
+      if emitted
+        @emitted.clear
+      end
+    end
   end
 end

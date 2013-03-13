@@ -1,6 +1,7 @@
 require_relative '../core'
 require 'skylab/test-support/core'
 require 'skylab/headless/core' # only `unstylize`
+require 'skylab/porcelain/test/bleeding/test-support'
 
 module Skylab::CovTree::TestSupport
   ::Skylab::TestSupport::Regret[ CovTree_TestSupport = self ]
@@ -8,6 +9,16 @@ module Skylab::CovTree::TestSupport
   module CONSTANTS
     CovTree = ::Skylab::CovTree
     TestSupport = ::Skylab::TestSupport
+  end
+
+  Blah = ::Struct.new :stream_name, :string
+
+  class Emit_Spy < ::Skylab::Porcelain::TestSupport::Bleeding::Emit_Spy
+    def emit *x
+      if 1 == x.length then super else
+        super Blah.new( *x )
+      end
+    end
   end
 
   module InstanceMethods
@@ -24,8 +35,8 @@ module Skylab::CovTree::TestSupport
     end
 
     def ___build_emit_spy!
-      @emit_spy = es = TestSupport::EmitSpy.new
-      es.debug = -> { self.debug? }
+      @emit_spy = es = Emit_Spy.new
+      # es.debug = -> { self.debug? }
       @names = []
       es
     end

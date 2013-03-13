@@ -1,5 +1,5 @@
 module Skylab::Headless::TestSupport
-  class IO_Adapter_Spy < TestSupport::EmitSpy
+  class IO_Adapter_Spy < TestSupport::IO::Spy
 
     # Used (at the time of this writing ouside of this product) for doing
     # emit-spy-style testing of our all-important IO::Adapter, which is like

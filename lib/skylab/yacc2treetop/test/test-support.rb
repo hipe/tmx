@@ -18,8 +18,8 @@ module Skylab::Yacc2Treetop::TestSupport
   module CLI::ModuleMethods
     def invoke *argv
       let(:_frame) do
-        errstream = ::Skylab::TestSupport::StreamSpy.standard
-        outstream = ::Skylab::TestSupport::StreamSpy.standard
+        errstream = ::Skylab::TestSupport::IO::Spy.standard
+        outstream = ::Skylab::TestSupport::IO::Spy.standard
         cli = Yacc2Treetop::Cli.new(outstream, errstream)
         cli.program_name = 'yacc2treetop'
         o = ::Struct.new(:debug_f, :err_f, :out_f).new # 'joystick'

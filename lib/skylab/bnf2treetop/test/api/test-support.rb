@@ -7,7 +7,7 @@ module Skylab::Bnf2Treetop::API::TestSupport
     end
   end
   module InstanceMethods
-    StreamSpy = ::Skylab::TestSupport::StreamSpy
+    IO_Spy = ::Skylab::TestSupport::IO::Spy
 
     attr_reader :info
 
@@ -19,10 +19,10 @@ module Skylab::Bnf2Treetop::API::TestSupport
 
       request[:paystream] = paystream =
         ::StringIO.new
-        # StreamSpy.standard.debug!('      FOO')
+        # IO::Spy.standard.debug!('      FOO')
       request[:infostream] = infostream =
         ::StringIO.new
-        # StreamSpy.standard.debug!('      WTF!? - ')
+        # IO::Spy.standard.debug!('      WTF!? - ')
 
       ::Skylab::Bnf2Treetop::API.translate(request) # t or nil
 

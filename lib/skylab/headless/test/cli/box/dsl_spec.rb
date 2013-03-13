@@ -29,7 +29,8 @@ module Skylab::Headless::TestSupport::CLI::Box::DSL
       spy = Headless_TestSupport::Client_Spy::CLI.new
       spy.normalized_invocation_string = 'myapp'
       spy.debug = -> { me.do_debug }
-      ioa = spy.send :io_adapter
+      # ioa = spy.send :io_adapter
+      ioa = spy  # ACK  #todo
       box = cls_func[].new spy
       me.ioa = ioa
       box

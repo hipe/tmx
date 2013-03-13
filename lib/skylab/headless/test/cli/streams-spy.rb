@@ -20,7 +20,7 @@ module Skylab::Headless::TestSupport
       three.length > 3 and raise ::ArgumentError, "it's three bro"
       1.upto( 3 ) do |len|        # (allow caller to pass intentional nils..)
         if three.length < len
-          three[ len - 1 ] = ::Skylab::TestSupport::StreamSpy.standard
+          three[ len - 1 ] = ::Skylab::TestSupport::IO::Spy.standard
         end
       end
       super

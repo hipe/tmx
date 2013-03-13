@@ -1,5 +1,5 @@
 require_relative '../test-support'
-require 'skylab/test-support/core' # StreamSpy
+require 'skylab/test-support/core' # IO::Spy
 require 'skylab/headless/core' # unstylize
 
 module Skylab::Bnf2Treetop::TestSupport
@@ -16,8 +16,8 @@ module Skylab::Bnf2Treetop::TestSupport
     def invoke *argv, &output_f
       ::Hash === argv.last and tags = argv.pop # BE CAREFUL!!!!
       let(:_frame) do
-        errstream = ::Skylab::TestSupport::StreamSpy.standard
-        outstream = ::Skylab::TestSupport::StreamSpy.standard
+        errstream = ::Skylab::TestSupport::IO::Spy.standard
+        outstream = ::Skylab::TestSupport::IO::Spy.standard
         cli = Bnf2Treetop::CLI.new(outstream, errstream)
         cli.program_name = 'bnf2treetop'
         o = ::Struct.new(:debug_f, :err_f, :out_f).new # 'joystick'

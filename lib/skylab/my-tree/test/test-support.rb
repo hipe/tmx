@@ -33,7 +33,7 @@ module Skylab::MyTree::TestSupport
       c.send :program_name=, 'mt'
       me = self
       c.singleton_class.send :define_method, :build_io_adapter do
-        ioa = Headless::TestSupport::IO_Adapter_Spy.new c.build_pen
+        ioa = Headless::TestSupport::Client_Spy::CLI.new c.build_pen
         ioa.debug = -> { me.debug }
         ioa
       end

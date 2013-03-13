@@ -46,7 +46,7 @@ module Skylab::Snag::TestSupport::CLI
     end
 
     let :output do
-      output = TestSupport::StreamSpy::Group.new
+      output = TestSupport::IO::Spy::Group.new
       output.line_filter! -> s do
         Headless::CLI::Pen::FUN.unstylize[ s ]
       end

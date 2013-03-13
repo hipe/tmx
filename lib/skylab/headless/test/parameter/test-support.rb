@@ -39,7 +39,12 @@ module Skylab::Headless::TestSupport::Parameter
         client.debug = -> { do_debug }
         object = klass.new client
         emit_lines = -> do
-          client.send( :io_adapter ).emitted.map(& :string )
+          # client.send( :io_adapter ).emitted.map(& :string )
+          if client.emitted
+            client.emitted.map(& :string ) #todo during integration
+          else
+            []
+          end
         end
         { emit_lines: emit_lines, klass: klass, object: object }
       end

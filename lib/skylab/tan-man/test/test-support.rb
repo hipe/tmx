@@ -193,7 +193,7 @@ module Skylab::TanMan::TestSupport
     end
 
     let :output do
-      o = TestSupport::StreamSpy::Group.new
+      o = TestSupport::IO::Spy::Group.new
       o.debug = -> { do_debug }
       o.line_filter! Headless::CLI::Pen::FUN.unstylize
       o

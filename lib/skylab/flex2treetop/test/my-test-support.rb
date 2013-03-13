@@ -4,7 +4,7 @@ require 'skylab/test-support/core'
 
 module Skylab::Flex2Treetop::MyTestSupport
   Flex2Treetop = ::Skylab::Flex2Treetop
-  StreamSpy = ::Skylab::TestSupport::StreamSpy
+  IO_Spy = ::Skylab::TestSupport::IO::Spy
 
   # for posterity, we have to keep the below lines, which are mythically
   # believed to be the origin of "Headless"
@@ -63,7 +63,7 @@ module Skylab::Flex2Treetop::MyTestSupport
         if instance_variable_defined? ivar
           instance_variable_get ivar
         else
-          o = StreamSpy.standard
+          o = IO_Spy.standard
           instance_variable_set ivar, o
         end
       end
@@ -99,10 +99,7 @@ module Skylab::Flex2Treetop::MyTestSupport
     end
     def io_adapter_spy #  away at [#005]
       @spy ||= begin
-        o = cli_client.send :build_io_adapter
-        o.instream = inspy
-        o.outstream = outspy
-        o.errstream = errspy
+        o = cli_client.send :build_io_adapter, inspy, outspy, errspy
         def o.debug!
           instream.debug! ; outstream.debug! ; errstream.debug!
           self
@@ -124,7 +121,7 @@ module Skylab::Flex2Treetop::MyTestSupport
     def api_client
       @api_client ||= begin
         o = Flex2Treetop::API::Client.new
-        o.send(:io_adapter).info_stream = StreamSpy.standard
+        o.send(:io_adapter).info_stream = IO_Spy.standard
         o
       end
     end
