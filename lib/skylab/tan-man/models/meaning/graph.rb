@@ -89,25 +89,25 @@ module Skylab::TanMan
       end
     end
 
-    define_method :reduce do |meaning, memo, interminable_meaning|
+    define_method :reduce do |meaning, memo, interminable_meaning, v_h=nil|
+      v_h ||= ::Hash.new { |h, k| h[k] = true ; nil }  # #todo integration only
       sem = digraph[ meaning.symbol ]
       sem or raise ::KeyError.new "key not found: #{ meaning.symbol.inspect }"
       if sem.is_names.length.zero?
         if ! memo.resolution.include?( meaning )
           memo.resolution.push meaning
         end # else deadly diamond of doom (see spec)
-      elsif sem.visited
+      elsif v_h[ sem.normalized_local_name ]
         interminable_meaning[ CircularDependency.new memo.trail ]
         memo = false
         break
       else
-        sem.visited = true
         memo.trail.push meaning
         sem.is_names.each do |rhs_sym|
           if index.key? rhs_sym
             index.fetch( rhs_sym ).each do |mean|
               mem = memo_class.new memo.resolution, memo.trail.dup
-              if ! reduce mean, mem, interminable_meaning
+              if ! reduce mean, mem, interminable_meaning, v_h
                 memo = false
                 break
               end

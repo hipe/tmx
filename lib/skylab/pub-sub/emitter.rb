@@ -40,11 +40,11 @@ module Skylab::PubSub
 
     def emits *graph_ref
       events = event_graph.nodes! graph_ref
-      @event_graph.flatten( events ).reduce( nil ) do |_, stream|
-        m = "on_#{ stream.normalized_local_name }"
+      @event_graph.flatten( events ).reduce( nil ) do |_, stream_name|
+        m = "on_#{ stream_name }"
         if ! method_defined? m
           define_method m do |&block|
-            event_listeners.add_listener stream.normalized_local_name, block
+            event_listeners.add_listener stream_name, block
             self
           end
         end
