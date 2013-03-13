@@ -1,4 +1,29 @@
 module Skylab::Snag
+
+  Integration_Hack_Msg = -> e do  # #todo integration only!
+    if e.respond_to? :msg then e.msg else
+      x = e.payload_a[0]
+      if x.respond_to? :msg then x.msg else
+        if ::String === x then x else
+          require 'debugger' ; debugger ; 1==1
+        end
+      end
+    end
+  end
+
+  Integration_Hack_Data = -> do
+    fly = ::Struct.new( :count ).new
+    -> e do
+      if ! ( ::Hash === e.stream_name )
+        fail "wat: #{ e.class } : #{ e.stream_name.class }"
+      end
+      fly.members.each do |x|
+        fly[x] = e.stream_name[x]
+      end
+      fly
+    end
+  end.call
+
   class CLI
     extend MetaHell::Autoloader::Autovivifying::Recursive # used below
 
@@ -19,9 +44,9 @@ module Skylab::Snag
         info or
           raise ::ArgumentError.new "missing required infostream (3rd) arg"
         wiring = -> o do
-          o.on_payload { |e| pay.puts  e.message }
-          o.on_error   { |e| info.puts e.message }
-          o.on_info    { |e| info.puts e.message }
+          o.on_payload { |e| pay.puts Integration_Hack_Msg[ e ] }
+          o.on_error   { |e| info.puts Integration_Hack_Msg[ e ] }  # #todo integration only
+          o.on_info    { |e| info.puts Integration_Hack_Msg[ e ] }
           o.invocation_slug = @program_name
         end
         super(& wiring)
@@ -186,11 +211,10 @@ module Skylab::Snag
     end
 
     render = -> me, e do
-      msg = nil
-      if e.payload.respond_to? :render_for
-        msg = e.payload.render_for me
+      if e.does_render_for
+        msg = e.render_for me
       else
-        msg = e.message
+        msg = e.msg
       end
       msg
     end
@@ -211,7 +235,7 @@ module Skylab::Snag
           rendered = render[ self, e ]
           md = %r{\A\((.+)\)\z}.match( rendered ) and rendered = md[1]
           e.message = "while #{ e.verb.progressive } #{ e.noun }, #{ rendered }"
-          md and e.message = "(#{ e.message })" # so ridiculous
+          md and e.message = "(#{ e.msg })" # so ridiculous
           emit :info, e
         end
         nil

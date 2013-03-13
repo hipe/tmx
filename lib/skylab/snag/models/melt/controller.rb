@@ -171,7 +171,9 @@ module Skylab::Snag
           message: todo.message_body_string,
           verbose: @verbose
         }, -> action do
-          action.on_new_node { |n| new_node = n.payload }
+          action.on_new_node do |n|
+            new_node = n.stream_name  # #todo integration only
+          end
           action.on_info { |e| emit :info, e }
           action.on_error { |e| error e }
         end )

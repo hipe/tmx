@@ -23,13 +23,14 @@ module Skylab::Snag
       wire_action_for_info action
       wire_action_for_error action
       action.on_number_found do |e|
+        e = Integration_Hack_Data[ e ]
         info "(found #{ e.count } item#{ s e.count })"
       end
       tree_pretty_level = param_h.delete :show_tree
       if tree_pretty_level
         tree = CLI::ToDo::Tree.new request_client, ( tree_pretty_level > 1 )
         action.on_payload do |e|
-          tree << e.payload
+          tree << e.stream_name  # #todo integration only
         end
       else
         action.on_payload do |e|

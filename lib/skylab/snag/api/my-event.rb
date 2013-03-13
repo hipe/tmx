@@ -1,17 +1,27 @@
 module Skylab::Snag
-  class API::MyEvent < PubSub::Event
+  # this whole file is only for during integration!
+  class API::MyEvent < PubSub::Event::Unified
+
     def message= msg # parent class doens't provide this
-      if payload.kind_of?(Hash)
-        payload.key?(:message) or _define_attr_accessors!(:message)
-        payload[:message] = msg
+      @msg = msg
+    end
+
+    def msg # it derps over on payload.to_s without this # #todo
+      if @msg then
+        if ::String === @msg then @msg else
+          require 'debugger' ; debugger ; 1==1
+        end
       else
-        self.payload = msg
+        if ::String === @stream_name then
+          @stream_name
+        elsif @stream_name.respond_to? :payload_a
+          @stream_name.payload_a[0]
+        else
+          @stream_name.to_s
+        end
       end
     end
-    # with out this it derps over by doing payload.to_s
-    def to_s # it derps over on payload.to_s without this
-      message # ich muss sein
-    end
+
     # silly fun
     attr_accessor :inflection
     def noun
@@ -19,6 +29,23 @@ module Skylab::Snag
     end
     def verb
       inflection.stems.verb
+    end
+
+    def does_render_for
+      @stream_name.respond_to? :render_for  # #todo integration only
+    end
+
+    def render_for x  # #todo integration only
+      if ::String === @stream_name
+        @stream_name
+      else
+        @stream_name.render_for x
+      end
+    end
+
+    def initialize *a
+      @msg = nil
+      super
     end
   end
 end
