@@ -1,88 +1,93 @@
 require_relative 'test-support'
 
 describe "#{ ::Skylab::CovTree } CLI" do
-  extend ::Skylab::CovTree::TestSupport
+
+  extend ::Skylab::CovTree::TestSupport::CLI
 
   acts_rx = /\{tree\|rerun\}/
   actions = acts_rx.source
-  expecting_rx_ = /\AExpecting #{ actions }\.\z/ # look!
-  expecting_rx  = /\AExpecting #{ actions }\z/
+  expecting_rx_ = /\AExpecting #{ actions }\.\z/i # look!
+  expecting_rx  = /\AExpecting #{ actions }\z/i
+  usage_rx = /\AUsage: cov-tree #{ actions } \[opts\] \[args\]\z/i
   invite_rx = /\ATry cov-tree -h for help\.\z/
 
   it "0   : no args        : expecting / invite" do
-    args
+    argv
     line.should match( expecting_rx_ )
+    line.should match( usage_rx )
     line.should match( invite_rx )
-    emitted.should be_empty
-    names.should eql([:runtime_issue, :ui])
-    result.should eql(nil)
+    emission_a.should be_empty
+    names.should eql( [ :usage_issue, :usage, :ui ] )
+    result.should eql( 1 )  # old-school exit code
   end
 
   it "1.1 : one unrec arg  : msg / expecting / invite" do
-    args 'borf'
-    line.should match( /\AInvalid action: borf\z/ )
+    argv 'borf'
+    line.should match( /\Ainvalid action: borf\z/i )
     line.should match( expecting_rx )
     line.should match( invite_rx )
-    emitted.should be_empty
-    names.should eql([:runtime_issue, :runtime_issue, :ui])
-    result.should eql(nil)
+    emission_a.should be_empty
+    names.should eql( [ :usage_issue, :usage_issue, :ui ] )
+    result.should eql( 1 )  # old-school exit code
   end
 
   it "1.2 : one unrec opt  : expecting / invite" do
-    args '-z'
-    line.should match( expecting_rx_ )
+    argv '-z'
+    line.should match( /\Ainvalid action: -z\z/i )
+    line.should match( expecting_rx )
     line.should match( invite_rx )
-    emitted.should be_empty
-    names.should eql([:runtime_issue, :ui])
-    result.should eql(nil)
+    emission_a.should be_empty
+    names.should eql( [ :usage_issue, :usage_issue, :ui ] )
+    result.should eql( 1 )
   end
 
-  usage_rx = /\Ausage: cov-tree #{ actions } \[opts\] \[args\]\z/
-
   it "1.3 : one opt : `-h` : usage / invite" do
-    args '-h'
+    argv '-h'
     line.should match( usage_rx )
+    line.should match( /^$/ )
     line.should match(
-      /\AFor help on a particular subcommand, try cov-tree <subcommand> -h\.\z/
+    /\AFor help on a particular subcommand, try cov-tree <subcommand> -h\.\z/i
     )
-    emitted.should be_empty
-    names.should eql([:ui, :ui])
-    result.should eql(nil)
+    emission_a.should be_empty
+    names.detect{ |x| :help != x }.should be_nil
+    result.should eql( 0 )
   end
 
   it "2.1 : `-h unrec`     : msg invite" do
-    args '-h', 'wat'
-    line.should match(/\ANo such action "wat"\. #{
-      }Try cov-tree help #{ actions } -h\.\z/)
-    emitted.should be_empty
-    names.should eql([:error])
-    result.should eql(nil)
+    argv '-h', 'wat'
+    line.should match( /\Ainvalid action: wat\z/i )
+    line.should match( expecting_rx )
+    line.should match( invite_rx )
+    emission_a.should be_empty
+    names.should eql( [:usage_issue, :usage_issue, :ui] )
+    result.should eql( 1 )
   end
 
   it "2.2 : `-h rec`       : 1) usage 2) desc 3) opts" do
-    args '-h', 'tree'
-    line.should match(/\Ausage: cov-tree tree/)
-    line.should match(/\Adescription:\z/i)
-    line.should match(/\Asee crude/i)
-    line.should match(/\A  \*/)
-    line.should match(/\A  \*/)
-    line.should match(/\Aoptions:\z/i)
+    argv '-h', 'tree'
+    line.should match(/\Ausage: cov-tree tree/i)
+    line.should match( /^$/ )
+    line.should match(/\Adescription:?\z/i)
+    line.should match(/\A *see crude/i)
+    line.should match(/\A +\*/)
+    line.should match(/\A +\*/)
+    line.should match( /^$/ )
+    line.should match(/\Aoptions:?\z/i)
     l = line
     loop do
       l.should match(/\A  /)
       l = line or break
     end
-    names.uniq.should eql([:usage, :help])
-    result.should eql(nil)
+    names.uniq.should eql( [ :help ] )
+    result.should eql( 0 )
   end
 
   it "2.3 : `-h rec more`  : msg / usage / invite" do
-    args '-h', 'tree', 'wat'
-    line.should eql('unexpected argument: "wat"')
-    line.should match( /\Ausage: cov-tree help \[<action>\]\z/ )
-    line.should match( /\ATry cov-tree help -h for help\.\z/ ) # wat
-    emitted.should be_empty
-    names.should eql([:syntax, :runtime_issue, :ui])
-    result.should eql(nil)
+    argv '-h', 'tree', 'wat'
+    line.should match( /\bignoring: "wat"/ )
+    line.should match( /\Ausage: cov-tree / )
+    # ..meh
+    names.uniq.should eql( [ :info, :help ] )
+    result.should eql( 0 )
   end
 end

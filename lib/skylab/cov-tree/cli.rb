@@ -3,13 +3,7 @@ require_relative 'core'
 module Skylab::CovTree
 
   class CLI # (fwd decl. of a class also used as a namespace [#sl-109])
-    extend MetaHell::Autoloader::Autovivifying::Recursive
-      # (the above is necessary to state explicitly for this class
-      # only because this file gets loaded directly and not by
-      # a recursive autoloader.  But this is an exception to a rule
-      # that covers just about every other module/file in this subproduct.)
   end
-
 
   module CLI::Styles
     include Headless::NLP::EN::Methods
@@ -20,17 +14,21 @@ module Skylab::CovTree
     end
   end
 
-
   class CLI
-    extend Porcelain
-    extend PubSub::Emitter
+
+  protected
+
     include CLI::Styles
 
-  inactionable
+    define_method :escape_path, & Headless::CLI::PathTools::FUN.pretty_path # yay
 
-    emits :error, :info, :payload
-
+    extend PubSub::Emitter  # do this before you extend legacy, it give you
+                            # a graph
   public
+
+    # --*--                         DSL ZONE                              --*--
+
+    extend Porcelain::Legacy::DSL
 
     desc "see crude unit test coverage with a left-right-middle filetree diff"
     desc "  * test files with corresponding application files appear as green."
@@ -38,27 +36,32 @@ module Skylab::CovTree
 
     argument_syntax '[<path>]'
 
-    option_syntax do |param_h|
-      on '-l', '--list', "show a list of matched test files only." do
+    option_parser do |o|
+      param_h = @param_h
+      o.on '-l', '--list', "show a list of matched test files only." do
         param_h[:list_as] = :list
       end
-      on '-t', '--tree', "show a shallow tree of matched test files only." do
+      o.on '-t', '--tree', "show a shallow tree of matched test files only." do
         param_h[:list_as] = :tree
       end
-      on '-v', '--verbose', 'verbose (debugging) output' do
+      o.on '-v', '--verbose', 'verbose (debugging) output' do
         param_h[:verbose] = true
       end
     end
 
     def tree path=nil, opts
       param_h = opts.merge path: path
-      res = cli_invoke :tree, param_h
+      klass = CLI::Actions.const_fetch :tree  # grease the gears
+      live_action = klass.new self  # BOOM
+      res = live_action.subinvoke param_h
       if false == res
-        res = invite_fuck_me :tree
+        invite
+        res = status_error
       end
       res
     end
 
+    # --*--
 
     desc "see a left-middle-right filetree diff of rerun list vs. all tests."
     desc "  * tests that failed (that appeared in your rerun list) appear as red."
@@ -78,34 +81,6 @@ module Skylab::CovTree
         res = invite_fuck_me :rerun
       end
       res
-    end
-
-  protected
-
-    def cli_invoke norm_name, param_h
-      k = CLI::Actions.const_fetch norm_name
-      o = k.new self
-      r = o.invoke param_h
-      r
-    end
-
-
-    define_method :escape_path, & Headless::CLI::PathTools::FUN.pretty_path # yay
-
-
-    def invite_fuck_me token
-      help_frame.invite help_frame.action  # #todo fuck this shit
-      nil
-    end
-
-
-    # the gui client runtime that you have, map your events to the parent events.
-    def wire! my_runtime, parent
-      my_runtime.tap do |o|
-        o.on_payload { |e| parent.emit(:payload, e.touch!) }
-        o.on_error   { |e| parent.emit(:error,   e.touch!) }
-        o.on_all     { |e| parent.emit(:info,    e) unless e.touched? }
-      end
     end
   end
 end

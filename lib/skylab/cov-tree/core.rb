@@ -1,6 +1,6 @@
 require_relative '..'
 require 'skylab/headless/core' # haha the triad is here
-require 'skylab/porcelain/all' # wicked old ways
+require 'skylab/porcelain/core' # wicked old ways
 
 module Skylab::CovTree
 
@@ -8,7 +8,7 @@ module Skylab::CovTree
   CovTree      = self
   Headless     = ::Skylab::Headless # NLP::EN::Methods
   MetaHell     = ::Skylab::MetaHell
-  Porcelain    = ::Skylab::Porcelain # all.rb, TiteColor, Tree
+  Porcelain    = ::Skylab::Porcelain # legacy.rb, TiteColor, Tree
   PubSub       = ::Skylab::PubSub
 
   extend MetaHell::Autoloader::Autovivifying::Recursive # we use Svcs now below

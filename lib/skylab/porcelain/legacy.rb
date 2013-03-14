@@ -1,1181 +1,1625 @@
-require_relative 'core'
-require 'optparse'
-require 'stringio'
-require 'strscan'
+module Skylab::Porcelain::Legacy
 
-# @todo this should either be renamed "dsl" or moved into the toplevel porcelain.rb
+  Headless = ::Skylab::Headless
+  Legacy = self  # 3 rsns: readability, autoloading, future-proofing
+  MAARS  = ::Skylab::MetaHell::Autoloader::Autovivifying::Recursive
+  MetaHell = ::Skylab::MetaHell
+  Porcelain = ::Skylab::Porcelain
 
-module Skylab::Porcelain
-  @namespaces = []
-  class << self
-    def extended mod
-      mod.send(:extend, ClientModuleMethods)
-      mod.send(:include, ClientInstanceMethods)
-      mod.send(:include, Officious::Help) unless mod.ancestors.include?(Officious::Help)
+  module DSL                      # (section 1 of 7)
+    def self.extended mod  # [#sl-111]
+      mod.extend DSL::ModuleMethods
+      mod.send :include, Client::InstanceMethods
+      mod._porcelain_legacy_dsl_init
+      nil
     end
-    attr_reader :namespaces
   end
-  module Structuralist
-    def attr_accessor_oldschool name
-      define_method(name) do |*a|
-        case a.size ; when 0 ; super()
-                      when 1 ; send("#{name}=", a.first)
-                      else   ; raise ArgumentError.new("#{name} takes 0 or 1 arg.")
+
+  module DSL::ModuleMethods
+
+    #         ~ here have these for defining your thing ~
+
+    def visible b
+      @story.action_sheet!.is_visible = b
+    end
+
+    def aliases alius, *rest
+      @story.action_sheet!.concat_aliases rest.unshift( alius )
+      nil
+    end
+
+    def option_parser &blk
+      @story.action_sheet!.add_option_parser_block blk
+      nil
+    end
+
+    def option_parser_class kls
+      @story.action_sheet!.option_parser_class = kls
+    end
+
+    def argument_syntax str
+      @story.action_sheet!.argument_syntax_string = str
+      nil
+    end
+
+    def desc str, *rest
+      @story.action_sheet!.concat_desc rest.unshift( str )
+      nil
+    end
+
+    #         ~ these are some nerks that affect the whole derk ~
+
+    def fuzzy_match b
+      @story.do_fuzzy = b
+    end
+
+    def default_action norm_name, argv=nil
+      @story.set_default_action norm_name, argv
+    end
+
+    # (`namespace` - seet re-opening below)
+
+    #         ~ this is some reflection stuff ~
+
+    def actions  # per spec
+      story.actions  # go thru the method you want the hook
+    end
+
+    def story
+      if ! @is_collapsed
+        if ! @story.action_box.has? :help
+          @story.add_action_sheet :help, Officious::Help.action_sheet
+          @order_a << :help
+        end
+        the_list = @order_a & public_instance_methods( false )  # assumes 1.9!
+        sheetless = the_list - @story.action_box._order
+        if sheetless.length.nonzero?
+          sheetful = the_list & @story.action_box._order
+          sh = @story.delete_action_sheet_if_building_action_sheet
+          sheetless.each do |meth|
+            @story.action_sheet!
+            @story.accept_method_added meth
+          end
+          @story.adopt_action_sheet( sh ) if sh
+          # (you can deal with resorting here)
+          if the_list != @story.action_box._order && sheetful.length.nonzero?
+            resort_is_needed = true
+          end
+        end
+        @story.inherit_unseen_ancestor_stories  # modules may have been added
+        @is_collapsed = true
+      end
+      @story
+    end
+
+    # --*--
+
+    # (this gets aliased over to `method_added` after init)
+    def _porcelain_legacy_method_added method_name
+      @is_collapsed = false
+      @order_a << method_name
+      if @story.is_building_action_sheet
+        @story.accept_method_added method_name
+      end
+      nil
+    end
+
+    mutex_h = { } ; event_graph_init = nil  # open up as needed
+
+    define_method :_porcelain_legacy_dsl_init do
+      # (this may get called multiple times per module object if for
+      # example a class descends from a charged class and itself extends
+      # the DSL. So we arrive here from one or both of 2 ways. Either way
+      # or both is fine, but we want to be sure that we never init a module
+      # more than once. Break this up as needed.)
+      #
+      mutex_h.fetch self do
+        mutex_h[ self ] = true
+        if respond_to? :emits     # pub-sub is opt-in. implement emit as u like
+          class_exec(& event_graph_init )
+        end
+        @is_collapsed = nil
+        @order_a = [ ]
+        @story ||= begin
+          story = Story.new self
+          story.inherit_unseen_ancestor_stories  # first absorb any from the
+          # ancestor chain right now, to produce the order this is expected.
+          story
+        end
+        if ! method_defined? :emit  # don't overwrite pub-sub version, e.g
+          alias_method :emit, :_porcelain_legacy_emit
+        end
+        class << self
+          alias_method :method_added, :_porcelain_legacy_method_added
+        end
+      end
+      nil
+    end
+
+    event_graph_init = -> do
+      if ! instance_methods( false ).include?( :event_class )
+        event_class ::Skylab::PubSub::Event::Textual
+      end  # experimental ack - all our events are textual, so..
+
+      emits         payload: :all,
+                       info: :all,
+                      error: :all,
+                       help: :info,
+                         ui: :info,
+                      usage: :info,
+                usage_issue: :error
+      nil
+    end
+
+    def inherited kls
+      kls._porcelain_legacy_dsl_init
+      nil
+    end
+  end
+
+  class Story                     # (section 3 of 7)
+                                  # (experimentally the "story" is the backend
+                                  # of the DSL. it collects and retrieves the
+                                  # data that makes up the "model" for the
+                                  # interface.)
+
+    #         ~ action-related methods ~
+
+    def action_sheet!
+      @action_sheet ||= Action::Sheet.for_story_host_module self
+    end
+
+    def is_building_action_sheet
+      !! @action_sheet
+    end
+
+    def delete_action_sheet_if_building_action_sheet
+      if @action_sheet
+        x = @action_sheet
+        @action_sheet = nil
+        x
+      end
+    end
+
+    def delete_action_sheet!
+      action_sheet!
+      delete_action_sheet_if_building_action_sheet
+    end
+
+    def adopt_action_sheet sheet
+      @action_sheet and raise ::ArgumentError, "sanity - sheet in progress"
+      @action_sheet = sheet
+      nil
+    end
+
+    def add_action_sheet norm_name, sheet
+      @action_box.add norm_name, sheet
+      nil
+    end
+
+    def accept_method_added method_name
+      sheet = delete_action_sheet!
+      sheet = sheet.collapse_with_unbound_method(
+        @story_host_module.instance_method( method_name ) )
+      @action_box.add sheet.normalized_local_action_name, sheet
+      nil
+    end
+
+    # (`accept_namespace_added` - see re-opening below)
+
+    def actions
+      @action_box.each
+    end
+
+    attr_reader :action_box  # used for hacks
+
+    #         ~ runtime settings ~
+
+    attr_accessor :do_fuzzy  # story doesn't use this directly, just holds it
+
+    Default_Action = ::Struct.new :normalized_name_path, :argv
+
+    def set_default_action norm_name, argv=nil
+      @default_action and fail "won't clobber default action"
+      norm_name = [ norm_name ] if ! ( ::Array === norm_name )
+      argv ||= [ ]
+      @default_action = Default_Action.new( norm_name, argv ).freeze
+      nil
+    end
+
+    attr_reader :default_action
+
+    # `fetch_action_sheet` - result in one of three possible outcomes
+    # (the third only possible when `do_fuzzy`):
+    #
+    # 1) No matching action sheets were found. Result is result of `not_found`.
+    #
+    # 2) Exactly one action sheet was able to be resolved from the name ref.
+    # It is the result. This outcome is arrived at in one of two ways:
+    # 2a) As soon as one action is found with one name that is an exact match
+    # of the name ref, the rest of the search is short-circuited and this
+    # is the result (regardless of `do_fuzzy`). This has the effect that if
+    # multiple actions share names, order matters, and the action appearing
+    # earlier will always "swallow" the match, always preventing subsequent
+    # such actions from matching. 2b) when `do_fuzzy` and exactly one action
+    # can be resolved, this is the result.
+    #
+    # 3) The last possible outcome is only in the case of `do_fuzzy`- Each
+    # action that has one or more names that matched the name ref with the
+    # fuzzy algorithm (which is simply "starts with this string, case-
+    # insensitive"), the first name that matched among all the action's
+    # names will be aggregated on to a list. You then end up with a list
+    # of names that matched, one name per action that matched. In cases where
+    # there were no exact matches (b.c that would have short circuited per
+    # above) and there was not zero (see above) and not one (see above),
+    # `ambiguous` will be called with this list of names, and our result
+    # is its result. whew!
+    #
+
+    def fetch_action_sheet ref, do_fuzzy, not_found, ambiguous
+      exact = -> n { :exact if ref == n }
+      match = if do_fuzzy
+        rx = /\A#{ ::Regexp.escape ref }/i
+        -> n do
+          if rx =~ n
+            exact[ n ] || :fuzzy
+          end
+        end
+      else
+        exact
+      end
+      ambi_a = nil
+      last_ambi_action = nil
+      exact_found = catch :exact_found do
+        ambi_a = @action_box.reduce [] do |amb_a, (k, action)|
+          action.names.each do |n|
+            case match[n]
+            when :exact
+              throw :exact_found, action
+            when :fuzzy
+              last_ambi_action = action
+              amb_a << n
+              break  # done seeing names for this action!
+            end
+          end
+          amb_a
+        end
+        nil
+      end
+      if exact_found || 1 == ambi_a.length
+        exact_found || last_ambi_action
+      elsif 1 < ambi_a.length
+        ambiguous[ ambi_a ]
+      else
+        not_found[ ]
+      end
+    end
+
+    #         ~ inheritance & absorbtion ~
+
+    def inherit_unseen_ancestor_stories
+      anc = @story_host_module.ancestors
+      if @ancestors_seen_h.length < anc.length
+        h = @ancestors_seen_h
+        mod = anc.shift
+        if @story_host_module == mod  # else ancestor chain is of a sing class
+          h[mod] = true
+          mod = anc.shift
+        end
+        while mod && ::Object != mod
+          h.fetch mod do
+            h[ mod ] = true
+            if mod.respond_to? :story
+              inherit_story mod.story  # please keep this tight with mutex
+            end
+          end
+          if ::Class === mod  # assume etc
+            break
+          end
+          mod = anc.shift
+        end
+        # (there is a chance we would miss once, if an ancestor class
+        # adds a module to its chain after we saw it. but, really?)
+        while mod
+          h[ mod ] = true
+          mod = anc.shift
+        end
+      end
+      nil
+    end
+
+    def inherit_story story
+      story.actions.each do |name, action_sheet|
+        if ! @action_box.has? name
+          @action_box.add name, action_sheet
+        end
+      end
+      nil
+    end
+
+    def adapt_story story
+      story.actions.each do |name, action_sheet|
+        if ! @action_box.has? name
+          @action_box.add name, Pxy::Sheet.new( action_sheet, story )
+        end
+      end
+      nil
+    end
+
+  protected
+
+    def initialize story_host_module
+      @story_host_module = story_host_module
+      @action_sheet = nil
+      @action_box = MetaHell::Formal::Box::Open.new
+      @action_box.enumerator_class = Action::Enumerator
+      @ancestors_seen_h = { }
+      @do_fuzzy = true  # note this isn't used internally by this class
+      @default_action = nil
+    end
+  end
+
+  class Action  # used as namespace here, re-opends below as class
+  end
+
+  class Action::Enumerator < MetaHell::Formal::Box::Enumerator # (used by story)
+
+    def [] k  # actually just fetch - will throw on bad key
+      @box_ref.call.fetch k
+    end
+
+    def visible
+      filter(& :is_visible )
+    end
+  end
+
+  class Action::Sheet               # (section 3 of 7)
+                                    # (experimental goofy name for this thing)
+
+    def self.for_story_host_module namespace_module
+      new.instance_exec do
+        @action_subclient = -> request_client do
+          Action.new request_client, self
+        end
+        self
+      end
+    end
+
+    def self.for_action_class action_class
+      new.instance_exec do
+        @is_collapsed = true  # don't take an unbound method as a name
+        name = action_class.name
+        @name_function = Headless::Name::Function.from_const(
+          name[ name.rindex(':') + 1  ..  -1] )
+        @action_subclient = -> request_client do
+          action_class.new request_client, self
+        end
+        self
+      end
+    end
+
+    #         ~ for each "field" of upstream info, writers then readers ~
+    #           (presented roughly in the order as it might be
+    #               read from when presenting a help screen)
+
+    attr_accessor :is_visible                  #   ~ visibility ~
+
+    def concat_desc a                          #   ~ description ~
+      ( @desc_a ||= [] ).concat a
+      nil
+    end
+
+    def description_lines
+      @desc_a  # (per spec)
+    end
+
+    def add_option_parser_block blk            #   ~ options ~
+      ( @option_parser_block_a ||= [] ) << blk
+      nil
+    end
+
+    attr_reader :option_parser_block_a
+
+    def option_parser_class= kls
+      if @option_parser_class then fail "won't clobber o.p kls" else
+        @option_parser_class = kls
+      end
+    end
+
+    def option_parser_class
+      @option_parser_class || Porcelain::Services::OptionParser
+    end
+
+    def argument_syntax_string= str            #   ~ arguments ~
+      if @argument_syntax_string
+        fail "won't clobber existing argument syntax - #{
+          }#{ @argument_syntax_string }"
+      else
+        @argument_syntax_string = str
+      end
+    end
+
+    def argument_syntax
+      if @argument_syntax.nil?
+        if @argument_syntax_string
+          ass = @argument_syntax_string
+          @argument_syntax_string = nil
+        else
+          parts = []
+          arity = @unbound_method.arity
+          if 0 > arity
+            parts << '[<arg> [..]]'
+            arity = ( arity * -1 - 1 )  # -1 => 0, -2 => 1, -3 => 2 ..
+          end
+          if @option_parser_block_a
+            arity = [ 0, arity - 1 ].max  # 0 => 0, 1 => 0, 2 => 1 ..
+          end
+          parts[ 0, 0 ] = ( 0...arity ).map { |i| "<arg#{ i + 1 }>" }
+          ass = parts * ' '
+        end
+        @argument_syntax = Argument::Syntax.from_string ass
+      end
+      @argument_syntax
+    end
+
+    def concat_aliases a                       #   ~ names - aliases ~
+      ( @alias_a ||= [] ).concat a
+      nil
+    end
+
+    attr_reader :alias_a
+
+    def collapse_with_unbound_method unbound_method
+      if @is_collapsed
+        fail "sanity - action sheet is already collapsed (frozen)"
+      else
+        @is_collapsed = true
+        @name_function = Headless::Name::Function.new unbound_method.name
+        @unbound_method = unbound_method
+        self
+      end
+    end
+
+    attr_reader :unbound_method
+
+    # (`collapse_as_namespace` - see re-opening below)
+
+                                               #   ~ name derivatives ~
+
+    def normalized_local_action_name           # used by action box, NOTE -
+      @name_function.normalized_local_name     #   we might s/_action_/_node_/
+    end
+
+    def slug
+      @name_function.as_slug
+    end
+
+    def names
+      @names ||= begin
+        y = [ slug ]
+        y.concat @alias_a if @alias_a
+        y
+      end
+    end
+
+    def full_name_function
+      # (this will be borked if ever you actually need truly deep names -
+      # h.l has to be better at something! (just kidding, it's better at a lot!)
+
+      @full_name_function ||=
+        Headless::Name::Function::Full.new [ @name_function ]
+    end
+
+    #         ~ catalyzing ~
+
+    def action_subclient request_client
+      @action_subclient[ request_client ]
+    end
+
+  protected
+
+    def initialize
+      @is_visible = true
+      @alias_a = nil
+      @name_function = nil
+      @option_parser_block_a = nil
+      @option_parser_class = nil
+      @argument_syntax_string = nil
+      @argument_syntax = nil
+      @desc_a = nil
+      @is_collapsed = nil
+    end
+  end
+
+  module SubClient_InstanceMethods             # (section 4 of 7 - i.m's)
+
+  protected
+
+    def hdr str
+      @request_client.send :hdr, str
+    end
+
+    def kbd x  # just a cute alternative
+      @kbd ||= @request_client.method :kbd
+      @kbd[ x ]
+    end
+  end
+
+  module Action::InstanceMethods
+
+    include SubClient_InstanceMethods
+
+    #         ~ `resolve_argv` the primary public entrypoint ~
+
+                                  # standard 3-arg result
+    def resolve_argv argv         # mutates argv, compare to n.s version
+      exit_code, method, args = resolve_options argv
+      if exit_code || method then [ exit_code, method, args ] else
+        resolve_arguments argv
+      end
+    end
+
+    #         ~ experimental convenience & reflection nerks ~
+
+    def fetch_param norm, &otr
+      if option_parser
+        parm = option_parser_scanner.fetch norm do end
+      end
+      if ! parm && @action_sheet.argument_syntax
+        parm = @action_sheet.argument_syntax.fetch norm do end
+      end
+      if parm then parm else
+        otr ||= -> { raise ::KeyError, "param not found: #{ norm.inspect }" }
+        otr[* [ norm ][ 0, otr.arity.abs ] ]
+      end
+    end
+
+  protected
+
+    def initialize request_client, action_sheet=nil
+      @option_parser = nil
+      @option_parser_scanner = nil
+      @request_client = request_client
+      @action_sheet = action_sheet if action_sheet
+      @borrowed_queue = nil
+      nil
+    end
+
+    def _porcelain_legacy_emit stream, text
+      @request_client.send :emit, stream, text
+    end
+
+    def resolve_options argv      # standard 3-arg result
+      if option_parser
+        begin
+          option_parser.parse! argv
+          exit_code = nil
+          parse_ok = true
+        rescue ::OptionParser::ParseError => e
+          usage_and_invite e.message
+          exit_code = status_option_parser_parse_error
+          parse_ok = false
+        end
+      # (for those actions that have no option parser, if e.g an '-h' or
+      # a --help is the next argument we process it as help anyway. the only
+      # way to opt-out of this behavior is to override this method [#po-017])
+      elsif argv.length.nonzero? && '-' == argv[0][0] &&
+          Officious::Help.action_sheet.names.include?( argv[0] ) then
+        parse_ok = true
+        argv.shift  # #tossed
+        ( @borrowed_queue ||= [ ] ) << :help
+      end
+
+      if ! parse_ok then [ exit_code, nil, nil ] else
+        if @borrowed_queue && @borrowed_queue.length.nonzero?
+          if argv.length.nonzero?
+            emit :info, "(ignoring: #{ argv.map(& :inspect ).join ' ' })"
+          end
+          resolve_queue
+        else
+          [ nil, nil, nil ]  # procede as normal.
         end
       end
     end
-    def list_accessor_oldschool name
-      define_method(name) do |*a|
-        val = super()
-        0 == a.size and return val
-        (val or self.send("#{name}=", [])).concat a.flatten
+
+    def status_option_parser_parse_error
+      1
+    end
+
+    # `option_parser` - there are many like it, but this one is my own.
+    # + NOTE this does DSL-style gymnastics with lots of scope jumping
+    # + this mutates self, sets lots of ivars, so we don't write a separate
+    #   `build_option_parser`
+
+    def option_parser
+      if @option_parser.nil?
+        if @action_sheet.option_parser_block_a  # is used as context for o.p!
+          visible_h = ::Hash.new { true }             # hacktown
+          as = @action_sheet ; queue = param_h = nil  # scope
+          op = as.option_parser_class.new
+          @request_client.instance_exec do            # NOTE below is inside r.c
+            queue = @queue ||= [ ]  # r.c that has an o.p must have a @queue!
+            param_h = @param_h ||= { }                # and a @param_h
+
+            as.option_parser_block_a.each do |blk|
+              instance_exec op, &blk
+            end
+            h = false                                 # is '-h' defined?
+            ea = Headless::CLI::Option::Enumerator.new op
+            help_is_defined = ea.detect do |sw|
+              if sw.respond_to? :short
+                h = true if ! h && sw.short.include?( '-h' )
+                sw.long.include? '--help'
+              end
+            end
+            if ! help_is_defined
+              sw = op.define(
+                * [ ( '-h' if ! h ), '--help', 'this screen' ].compact
+              ) do @queue.push :help end
+              visible_h[ sw.object_id ] = false       # hacksville
+            end
+          end # instance_exec
+          @option_parser = op
+          @borrowed_queue = queue
+          @borrowed_param_h = param_h
+          @switch_is_visible = -> sw { visible_h[ sw.object_id ] }
+        else
+          @option_parser = false
+        end
+      end
+      @option_parser
+    end
+
+    def option_parser_scanner     # (assumes @option_parser !)
+      @option_parser_scanner ||= begin
+        Headless::CLI::Option::Parser::Scanner.new @option_parser
       end
     end
-  end
-  module Aliasist
-    extend Structuralist
-    list_accessor_oldschool :aliases
-    def alias name
-      aliases name
-    end
-  end
-  module Descriptionist
-    extend Structuralist
-    list_accessor_oldschool :description
-    alias_method :desc, :description
-    alias_method :description_lines, :description # temporary compat until after 049.500
-  end
-  class ActionDef < Struct.new(:aliases, :argument_syntax, :description,
-    :method_name, :option_syntax, :settings
-  )
-    include Descriptionist, Aliasist
-    def argument_syntax= str
-      argument_syntax and fail("won't clobber existing argument syntax")
-      super(str)
-    end
-    def initialize
-      self.settings = []
-    end
-    def option_syntax= b
-      option_syntax and fail("for now, can't re-open option sytaces")
-      super(b)
-    end
-    def to_hash
-      Hash[* members.map { |m| [m, send(m)] }.flatten(1) ]
-    end
-  end
-  class PorcelainModuleKnob < Struct.new(:aliases, :client_module, :default,
-    :description, :frame_settings, :runtime, :runtime_instance_settings
-  )
-    include Descriptionist, Aliasist
-    def action
-      @action ||= ActionDef.new
-    end
-    def action?
-      @action
-    end
-    def action!
-      a = @action # nil ok
-      @action = nil
-      a
-    end
-    attr_accessor :actionable
-    alias_method :actionable?, :actionable
-    def build_client_instance runtime, slug
-      client_module.build_client(runtime, slug)
-    end
-    def default= *defaults
-      1 == defaults.size && Array === defaults.first and defaults = defaults.first
-      frame_settings.push(->(_){ self.default= defaults })
-    end
-    alias_method :default, :default= # !
-    def default_summary_lines
-      a = client_module.actions.map { |o| Styles::e13b o.action_name }
-      ["child command#{'s' if a.length != 1}: {#{a * '|'}}"]
-    end
-    def emits(*a)
-      runtime.definition_blocks.push(->(_) { emits(*a) })
-    end
-    def fuzzy_match= b
-      frame_settings.push(->(_){ self.fuzzy_match = b })
-    end
-    alias_method :fuzzy_match, :fuzzy_match= # !
-    def initialize client_module
-      @action = nil
-      @actionable = true
-      super(nil, client_module, nil, nil, [], RuntimeModuleKnob.new, [])
-    end
-    def instance_method_visibility= visibility
-      case visibility
-      when :public              ; self.actionable = true
-      when :protected, :private ; self.actionable = false
-      else                      ; fail("unexpected value: #{visibility.inspect}")
+
+    def resolve_queue  # assume nonzero length queue
+      normalize = -> x do
+        if ::Symbol === x
+          p, a = method( x ), []  # p = proc, a = args
+        elsif ::Array === x
+          p, a = x
+        elsif x.respond_to? :call
+          p, a = x, []
+        else
+          raise ::ArgumentError, "no: #{ x.class }"
+        end
+        [ p, a ]
       end
-      visibility
+      halt = nil
+      while @borrowed_queue.length > 1  # for all but the final queue item
+        p, a = normalize[ @borrowed_queue.shift ]
+        rs = p.call( *a )
+        rs or break( halt = true )
+      end
+      if halt
+        [ ( false == rs ? status_error : status_early ),  nil, nil ]
+      else
+        [ nil, * normalize[ @borrowed_queue.shift ] ]
+      end
     end
-    def invocation_name= s
-      runtime_instance_settings.push(->(_){ self.invocation_slug = s })
-      s
+
+    def status_error  # generic error occured
+      1
     end
-    alias_method :invocation_name, :invocation_name= # !
-    def summary_lines
-      desc || default_summary_lines
+
+    def status_early  # non-erroneous early exit
+      0
     end
-  end
-  class RuntimeModuleKnob < Struct.new(:definition_blocks)
-    def initialize
-      super([])
+
+    def status_normal
+      0
     end
-  end
-  # @todo change this to DSL from Dsl (per convention, near rspec)
-  module Dsl
-    # (This module is for wiring only.  Must be kept light outside and in.)
-    def action &b
-      @porcelain.action.tap { |a| a.settings.push(b) if b }
+
+    def resolve_arguments argv  # NOTE here we do the legacy b.s
+      ok = argument_syntax_subclient.validate argv, -> err do
+        usage_and_invite err
+        false
+      end
+      if ! ok then [ status_error, nil, nil ] else
+        args = argv.slice! 0..-1
+        if option_parser
+          args << @borrowed_param_h
+        end
+        [ nil, bound_process_method, args ]
+      end
     end
-    def argument_syntax str
-      @porcelain.action.argument_syntax = str
+
+    def bound_process_method  # (make sure to override this when you are doing
+      # dsl-derived actions. here we are assuming you have a dedicated action
+      # class..)
+      method @action_sheet.normalized_local_action_name  # #experimental
     end
-    def desc *a
-      @porcelain.action.desc(*a)
+
+    def help
+      y = ::Enumerator::Yielder.new do |x|
+        emit :help, x
+      end
+      y << render_usage_line
+      render_desc y
+      render_options y
+      render_invite_to_even_more_help y
+      nil
     end
-    def inactionable
-      @porcelain.actionable = false
-    end
-    def porcelain_dsl_init
-      unless instance_variable_defined?('@porcelain') and @porcelain
-        @porcelain = PorcelainModuleKnob.new(self) # already set iff this is a subclass
-        [:private, :protected, :public].each do |viz|
-          singleton_class.send(:alias_method, "#{viz}_before_porcelain", viz)
-          singleton_class.send(:define_method, viz) do |*a|
-            @porcelain.instance_method_visibility = viz
-            send("#{viz}_before_porcelain", *a)
+
+    def render_desc y
+      a = @action_sheet.description_lines
+      if a
+        y << ''
+        if 1 == a.length
+          y << "#{ hdr 'description:' } #{ a[0] }"
+        else
+          y << "#{ hdr 'description' }"
+          a.each do |line|
+            y << "  #{ line }"
           end
         end
       end
-    end
-    def method_added method_name
-      if @porcelain.actionable?
-        @porcelain.action? or @porcelain.action
-        defn = @porcelain.action!
-        defn.method_name = method_name
-        _actions_cache.cache Action.new(defn, instance_method(method_name))
-      end
-    end
-    def namespace name, *params, &block
-      _actions_cache.cache Namespace.new(name, *params, &block)
-    end
-    def option_syntax &block
-      @porcelain.action.option_syntax = block
-    end
-    def porcelain &block
-      @porcelain.instance_eval(&block) if block_given?
-      @porcelain
-    end
-  end
-  module ClientModuleMethods
-    include Dsl
-    def self.extended mod
-      mod.porcelain_dsl_init
-    end
-    def actions
-      cache = _actions_cache
-      ActionEnumerator.new(cache) do |yielder|
-        cache.each { |act| yielder << act }
-      end
-    end
-    def build_client runtime, slug
-      client = new do |rt|
-        rt.invocation_slug = slug
-        client.wire! rt, runtime # it must die, all of it.
-      end
-      client.porcelain.runtime = runtime
-      client
-    end
-    def extended mod
-      fail("implement and test me (probably just call porcelain_dsl_init on the module)")
-    end
-    # @todo merge actions cache and actions enumerator !?
-    def _actions_cache
-      @_actions_cache ||= ActionsCache.new.initiate
-      @_actions_cache.tap { |o| o.merge_new_ancestor_actions!(self) } # every time
-    end
-    def inherited cls
-      cls.porcelain_dsl_init
-    end
-  end
-  class ActionsCache
-    def [] k
-      @hash[k].kind_of?(Symbol) ? @hash[@hash[k]] : @hash[k]
-    end
-    def cache action
-      @hash.key?(action.action_name) or @order.push action.action_name
-      @hash[action.method_name] = action.action_name
-      @hash[action.action_name] = action
-    end
-    def each &block
-      @order.each { |k| block.call(@hash[k]) }
-    end
-    def initiate
-      @hash = {}
-      @order = []
-      @seen_ancestors = []
-      self
-    end
-    def key? key
-      @hash.key? key
-    end
-    def merge! actions
-      actions.each do |action|
-        if @hash.key?(action.action_name)
-          @hash[action.action_name].merge!(action)
-        else
-          cache action.duplicate
-        end
-      end
-    end
-    def merge_new_ancestor_actions! selv
-      ancestors = selv.ancestors
-      (ancestors -= @seen_ancestors).empty? and return
-      @seen_ancestors.concat ancestors
-      ancestors.first == selv and ancestors.shift # singleton classes do not include themselves in ancestor chain
-      klass = ancestors.detect { |a| a.class == ::Class and a.respond_to?(:_actions_cache) }
-      mods = ancestors.select { |a| a.class == ::Module and a.respond_to?(:_actions_cache) }
-      klass and mods -= klass.ancestors # wow it's if we are implementing ruby in ruby, how stupid
-      [*mods, *[klass].compact].each do |anc|
-        merge! anc.actions
-      end
-      true
-    end
-  end
-  class ActionEnumerator < Enumerator
-    def initialize cache, &block
-      @cache = cache
-      super(&block)
-    end
-    def [] sym
-      @cache.key?(sym) and return @cache[sym]
-      detect { |a| a.action_name == sym }
-    end
-    def visible
-      me = self
-      self.class.new(@cache) do |yielder|
-        me.each do |a|
-          yielder.yield(a) if a.visible
-        end
-      end
-    end
-  end
-  class Subscriptions
-    def to_proc
-      orig = self
-      lambda do |neue|
-        orig.event_listeners.names.each do |k|
-          neue.send("on_#{k}") { |*e| orig.emit(k, *e) }
-        end
-      end
-    end
-  end
-  class << Subscriptions
-    alias_method :_new, :new
-    def new(*names)
-      Subscriptions == self or fail("hack failed")
-      Class.new(Subscriptions).class_eval do
-        extend ::Skylab::PubSub::Emitter
-        public :emit # [#ps-002] (this is just like something over there)
-        public :event_listeners # shoehorn legacy bad design into design imprv.
-        emits :all
-        names.each { |n| emits(n => :all) }
-        class << self
-          alias_method :new, :_new
-        end
-        self
-      end
-    end
-  end
-  HelpSubs      = Subscriptions.new(:default, :header, :two_col)
-  ParseOptsSubs = Subscriptions.new(:syntax, :help_flagged, :push) # hack'd
-  ParseSubs     = Subscriptions.new(:push, :syntax)
-
-  class Action < Struct.new(:aliases, :argument_syntax,
-    :argument_syntax_inferred, :description, :method_name, :action_name, :option_syntax,
-    :unbound_method, :visible
-  )
-    extend Structuralist
-    include Descriptionist, Aliasist # namespace objects use aliases in themselves explicitly below
-    def argument_syntax
-      (as = super).respond_to?(:parse_arguments) ? as :
-        (self.argument_syntax = ArgumentSyntax.parse_syntax(as || _argument_syntax_inferred))
-    end
-    def _argument_syntax_inferred
-      self.argument_syntax_inferred = true
-      arr = []
-      if 0 > (a = unbound_method.arity)
-        arr.push '[<arg> [..]]'
-        a = (a * -1 - 1)
-      end
-      if option_syntax.any?
-        a = [0, a - 1].max
-      end
-      arr[0, 0] = (0...a).map { |i| "<arg#{i + 1}>" }
-      arr * ' '
-    end
-    alias_method :argument_syntax_inferred?, :argument_syntax_inferred
-    def duplicate
-      Action.new( :aliases         => (aliases     ? aliases.dup     : nil),
-                  :argument_syntax => argument_syntax.to_str, # !
-                  :description     => (description ? description.dup : nil),
-                  :method_name     => method_name,
-                  :option_syntax   => option_syntax.duplicate,
-                  :unbound_method  => unbound_method, # sketchy / experimental
-                  :visible         => visible)
-    end
-    def help(&block)
-      if description
-        yield(o = HelpSubs.new)
-        if 1 == description.size
-          o.emit(:header, 'description', description.first)
-        else
-          o.emit(:header, 'description')
-          description.each { |s| o.emit(:default, s) }
-        end
-      end
-      option_syntax.help(&block)
-    end
-    def initialize params=nil, unbound = nil, &block
-      super(nil, nil, false, nil, nil, nil, nil, unbound, true)
-      ActionDef === params and params = params.to_hash
-      block and params2 = self.class.define(&block).to_hash
-      params && params2 and (params.merge!(params2))
-      params ||= params2
-      params and params.each { |k, v| send("#{k}=", v) }
-    end
-    def merge! action
-      # @todo we just totally ignore the very idea of this for now
-    end
-    def method_name= sym
-      self.action_name ||= self.class.nameize(sym)
-      super(sym)
-    end
-    def name
-      aliases && aliases.first or action_name # compat with old face cli # #todo
-    end
-    def name_syntax
-      aliases or return action_name
-      "{#{ [action_name, *aliases] * '|' }}"
-    end
-    def namespace?
-      false
-    end
-    def option_syntax
-      (os = super).respond_to?(:parse_options) ? os :
-        (self.option_syntax = OptionSyntax.build(os))
-    end
-    def parse argv
-      yield(o = ParseSubs.new)
-      false == (opts = option_syntax.parse_options(argv, & o.to_proc)) and return false # !
-      b = argument_syntax.parse_arguments(argv, & o.to_proc) or return b
-      # experimental sugar to avoid the client having to do their own parsing in this scenario, apparently not necessary in 1.9!
-      # if opts && argument_syntax.any? && ! argument_syntax.last.glob? && argv.length < argument_syntax.length
-      #  argv.concat Array.new(argument_syntax.length - argv.length) # but still it is so dodgy!
-      # end
-      opts and argv.push(opts)
-      [ nil, self, argv ] # [ receiver, action_ref, args ]
-    end
-    def settings= ba
-      ba.each { |b| instance_eval(&b) }
-    end
-    def summary # compat with really old all face cli ##todo
-      summary_lines || [ syntax ]
-    end
-    def syntax
-      [name_syntax, option_syntax.to_str, argument_syntax.to_str].compact.join(' ')
-    end
-    def to_hash
-      duplicate._to_hash
-    end
-    def _to_hash
-      Hash[ * members.map { |k| [k, send(k)] }.flatten(1) ]
-    end
-    attr_accessor_oldschool :visible
-  end
-  class << Action
-    def define &block
-      kls = Class.new.class_eval do
-        extend ClientModuleMethods
-        class_eval(&block)
-        self
-      end
-      1 == (acts = kls.actions.map{ |x| x }).size or
-        raise("Block was expected to define one action. Had #{acts.size}.")
-      acts.first
-    end
-    def nameize sym
-      sym.to_s.gsub('_', '-').intern
-    end
-  end
-  class OptionSyntax < Array
-    def self.build mixed
-      case mixed
-      when NilClass ; new
-      when Proc     ; new.push mixed
-      end
-    end
-    def build_parser context, option_parser = nil
-      if ! option_parser
-        op = ::OptionParser.new
-        op.base.long['help'] = ::OptionParser::Switch::NoArgument.new do
-          throw :option_action, ->(frame, action) { frame.client_instance.help(action) ; nil }
-        end
-
-        op.banner = ''            # without this you hiccup 2 usages, the latter
-                                  # being an unstylied one from o.p
-        option_parser = op
-      end
-      each { |b| option_parser.instance_exec(context, &b) }
-      option_parser
-    end
-    alias_method :duplicate, :dup # only as long as it's stateless
-    HEADER = /\A +[^:]+:/
-    def help(&block)
-      empty? and return
-      yield(knob = HelpSubs.new)
-      renderer = r = option_parser
-      lucky_matcher = /\A(#{Regexp.escape(r.summary_indent)}.{1,#{r.summary_width}})[ ]*(.*)\z/
-      lines = renderer.to_s.split("\n")
-      once = false
-      lines.each do |line|
-        case line
-        when ''            ; # we might emit this after all
-        when lucky_matcher ;
-                           ; once ||= (knob.emit(:header, 'options') || true)
-                           ; knob.emit(:two_col, $1, $2)
-        when HEADER        ; knob.emit(:header, *line.strip.split(':', 2))
-        else               ; knob.emit(:default, line)
-        end
-      end
-    end
-    def option_parser
-      @option_parser ||= begin
-        op = build_parser(@context = {})
-        @rebuild = @context.any?
-        op
-      end
-    end
-    def option_parser_parse! argv
-      if @option_parser
-        if @rebuild
-          @option_parser = nil
-        else
-          @context.clear
-        end
-      end
-      option_parser.parse! argv
-      if @rebuild
-        @context
-      else
-        @context.dup
-      end
-    end
-    def parse_options argv
-      empty? and ! Officious::Help::SWITCHES.include?(argv.first) and return nil
-      yield(knob = ParseOptsSubs.new)
-      begin
-        context = option_parser_parse! argv
-      rescue ::OptionParser::ParseError => e
-        knob.emit(:syntax, e)
-        context = false
-      end
-      context
-    end
-    def to_str
-      0 == count and return nil
-      option_parser.instance_variable_get('@stack')[2].list.select{ |s| s.kind_of?(::OptionParser::Switch) }.map do |switch| # ick
-        "[#{[(switch.short.first || switch.long.first), switch.arg].compact.join('')}]"
-      end.join(' ')
-    end
-  protected
-    def initialize *a
-      super
-      @option_parser = nil
-    end
-  end
-  # @todo see if we can get this whole class to go away in lieu of the improved reflection of ruby 1.9
-  class ArgumentSyntax < Array
-    def self.parse_syntax str
-      new.init(str).validate
-    end
-    def init str
-      p = StringScanner.new(str)
-      until p.eos?
-        p.skip(/ /)
-        matched = p.scan(Parameter::REGEX) or
-          raise RuntimeError.new("failed to parse: #{p.rest.inspect}#{" (after #{last.to_str.inspect})" if any?}")
-        matchdata = Parameter::REGEX.match(matched)
-        push Parameter.new(:matchdata => matchdata)
-      end
-      self
-    end
-    def parse_arguments argv, &block
-      ArgumentParse[self, argv, &block]
-    end
-    def to_str
-      0 == count and return nil
-      join(' ')
-    end
-    def validate
-      signature = map { |p| p.glob? ? 'G' : 'g' }.join('')
-      /G.*G/ =~ signature and fail("globs cannot be used more than once (had: #{signature})")
-      /\AGg/ =~ signature and fail("globs cannot occur at the beginning (had: #{signature})")
-      /gGg/  =~ signature and fail("globs cannot occur in the middle (had: #{signature})")
-      signature = map { |p| p.required? ? 'o' : 'O' }.join('')
-      /\AOo/ =~ signature and fail("optionals cannot occur at the beginning (had: #{signature})")
-      /oO+o/ =~ signature and fail("optionals cannot occur in the middle (had: #{signature})")
-      self
-    end
-    ArgumentParse = lambda do |syntax, argv, &block|
-      # (i blame Davis Frank for inspiring me to experiment with writing this like this)
-      block[o = ParseSubs.new]
-      o.respond_to?(:on_all) or fail("no")
-      tokens = ArrayAsTokens.new(argv)
-      symbols = ArrayAsTokens.new(syntax)
-      nope = lambda { |msg| o.emit(:syntax, msg) ; false }
-      touched = false
-      while tokens.any?
-        symbol = symbols.current or return nope["unexpected argument: #{tokens.current.inspect}"]
-        tokens.advance
-        if symbol.glob?
-          touched = true
-        else
-          symbols.advance
-        end
-      end
-      (s = symbols.current) and s.required? and (!s.glob? or !touched) and
-        return nope["expecting: #{Styles::e13b s.to_str}"]
-      true
-    end
-  end
-  class ArgumentSyntax::ArrayAsTokens
-    def initialize arr
-      @current = 0
-      @length = arr.count
-      @arr = arr
-    end
-    def advance
-      @current += 1
-    end
-    def any?
-      @current < @length
-    end
-    def current
-      @arr[@current]
-    end
-  end
-  class Parameter
-    NAME = %r{<([-_a-z][-_a-z0-9]*)>}
-    REGEX = %r{
-           #{NAME.source} [ ]* ( \[ (?: <\1> [ ]* \[ \.\.\.? \] | \.\.\.? ) \] )?
-      | \[ #{NAME.source} [ ]* ( \[ (?: <\3> [ ]* \[ \.\.\.? \] | \.\.\.? ) \] )? \]
-    }x
-    def glob? ; @max.nil? end
-    def initialize opts
-      opts.each { |k, v| send("#{k}=", v) }
-    end
-    def matchdata= md
-      @name = (md[1] || md[3]).intern
-      if md[1]
-        @min = 1
-        @max = md[2] ? nil : 1
-      else
-        @min = 0
-        @max = md[4] ? nil : 1
-      end
-    end
-    def required? ; @min > 0 ; end
-    def to_str
-      ellipses = @max.nil? ? " [<#{@name}>[...]]" : ''
-      required? ? "<#{@name}>#{ellipses}" : "[<#{@name}>#{ellipses}]"
-    end
-  end
-
-  class PorcelainInstanceKnob < Struct.new(:runtime, :runtime_instance_settings)
-  end
-
-  # .. below is invocation mechanics
-  module ClientInstanceMethods
-    def porcelain_init &block
-      @porcelain ||= PorcelainInstanceKnob.new
-      @porcelain.runtime = nil
-      @porcelain.runtime_instance_settings = block ||
-        ->(o) { o.on_all { |e| $stderr.puts " * #{e}" } } # an ugly default to make you want to change it
-    end
-    def help_frame
-      @porcelain.runtime.stack.top
-    end
-    alias_method :initialize, :porcelain_init
-    def invoke argv
-      res = nil
-      begin
-        @porcelain.runtime =
-          Runtime.new argv, self, @porcelain, self.class.porcelain
-        client, meth, args = @porcelain.runtime.resolve
-        client or break( res = client )
-        meth = meth.method_name if ! ( ::Symbol === meth )
-        res = client.send meth, *args
-      end while nil
-      res
-    end
-    attr_reader :porcelain
-    def porcelain_runtime
-      @porcelain.runtime
-    end
-    alias_method :runtime, :porcelain_runtime
-  end
-
-  module Styles
-    include Headless::CLI::Stylize::Methods
-    extend self
-    def e13b str   ; stylize str, :green          end
-    def header str ; stylize str, :strong, :green end
-  end
-
-
-  module ArgvTokenParse
-    include Styles
-    def actions
-      actions_provider.actions
-    end
-    def action_invalid
-      issue("Invalid action: #{e13b invocation_slug}", "Expecting #{render_actions}")
       nil
     end
-    def argv_empty
-      if default? and ! defaulted?
-        argv[0, 0] = default.map(&:to_s)
-        self.defaulted = true #!
+
+    # `render_options` - basically just o.p#to_s sexed up a tiny bit.
+    # (see `render_option_syntax` for the single-line form)
+    # if in the option parser string you see any lines that have content
+    # that matches the below regex, assume you can safely consider it
+    # part of a two-column layout, and hack it accordingly
+
+    def render_options y
+      op = option_parser
+      if op
+        lucky_rx = /\A
+          (?<col_a>
+            #{ ::Regexp.escape op.summary_indent } . {1,#{ op.summary_width }}
+          )
+          [ ]+
+          (?<col_b> . + )
+        \z/x
+        y << ''
+        y << "#{ hdr 'options' }"
+        op.summarize do |line|
+          if lucky_rx =~ line
+            y << "#{ kbd $~[:col_a] }#{ $~[:col_b] }"
+          else
+            y << line
+          end
+        end
+      end
+      nil
+    end
+
+    def render_invite_to_even_more_help y
+      # hook for e.g namespaces
+    end
+
+    def argument_syntax_subclient
+      @argument_syntax_subclient ||= @action_sheet.argument_syntax.
+        argument_syntax_subclient self
+    end
+
+    def render_syntax_string
+      y = [ didactic_invocation_string ]
+      str = render_option_syntax
+      y << str if str
+      str = argument_syntax_subclient.render
+      y << str if str
+      y.join ' '
+    end
+
+    def didactic_invocation_string
+      parts = [ ]
+      parts << @request_client.send( :normalized_invocation_string )
+      if @action_sheet.alias_a
+        parts << "{#{ @action_sheet.names * '|' }}"
+      else
+        parts << @action_sheet.slug
+      end
+      parts * ' '
+    end
+
+    def normalized_invocation_string
+      "#{ @request_client.send( :normalized_invocation_string ) } #{
+        }#{ @action_sheet.slug }"
+    end
+
+    def render_option_syntax
+      if option_parser
+        ea = Headless::CLI::Option::Enumerator.new option_parser
+        parts = ea.reduce [] do |m, sw|
+          if sw.respond_to?( :short ) && @switch_is_visible[ sw ]
+            m << "[#{ sw.short.first || sw.long.first }#{ sw.arg }]"
+          end
+          m
+        end
+        if parts.length.nonzero?
+          parts * ' '
+        end
+      end
+    end
+
+    def usage_and_invite msg
+      emit :usage_issue, msg
+      emit :usage, render_usage_line
+      invite
+      nil
+    end
+
+    def render_usage_line
+      "#{ hdr 'usage:' } #{ render_syntax_string }"
+    end
+
+    def invite
+      emit :ui, "Try #{ kbd "#{ normalized_invocation_string } -h"} for help."
+    end
+  end
+
+  class Namespace < Action  # used as namespace here, class below
+  end
+
+  module Adapter
+    extend MAARS
+  end
+
+  module Namespace::InstanceMethods
+
+    include Action::InstanceMethods
+
+    Adapter = Adapter  # [#hl-054]
+
+    #         ~ resolution methods (in roughly pre-order traversal) ~
+
+    # [ bound_method, args ] or false/nil. mutates argv.
+    def resolve_argv argv  # compare to action versoin
+      if argv.length.zero?
+        resolve_argv_empty
+      else
+        resolve_action argv
+      end
+    end
+
+  protected
+
+    def resolve_argv_empty
+      if self.class.story.default_action
+        da = self.class.story.default_action
+        # NOTE watch this, it is a bit of an abuse:
+        resolve_action [ da.normalized_name_path, * da.argv ]
       else
         argv_empty_final
       end
     end
+
+    def resolve_action argv  # assume nonzero arg length
+      @legacy_last_action_subclient = nil
+      action_sheet = fetch_action_sheet argv.first
+      if action_sheet
+        argv.shift   # NOTE token used is #tossed for now, we used to keep it
+        sc = action_sheet.action_subclient self
+        @legacy_last_action_subclient = sc
+        sc.resolve_argv argv
+      elsif false == action_sheet
+        # show the invite now lest it be not fully and accurately qualified.
+        invite
+        [ status_invalid_action, nil, nil ]
+      end
+    end
+
+    def status_invalid_action
+      1
+    end
+
+    def fetch_action_sheet ref
+      if ::Array === ref
+        fail "implement me - deep paths" if 1 < ref.length
+        ref = ref.first
+        ref = Headless::Name::FUN.slugulate[ ref ]
+      end
+      self.class.story.fetch_action_sheet ref, self.class.story.do_fuzzy,
+        -> do
+          emit :usage_issue, "invalid action: #{ kbd ref }"
+          emit :usage_issue, "expecting #{ render_actions }"
+          false
+        end,
+        -> ambi_a do
+          emit :usage_issue, "Ambiguous action #{ kbd ref }. #{
+            }Did you mean #{ ambi_a.map(& method( :kbd )) * ' or ' }?"
+          false
+        end
+    end
+
     def argv_empty_final
-      issue("Expecting #{render_actions}.")
-      nil
+      usage_and_invite "expecting #{ render_actions }."
+      [ status_error, nil, nil ]
     end
-    def issue *msgs
-      action = msgs.shift if msgs.first.respond_to?(:action_name)
-      msgs.each { |s| emitter.emit(:runtime_issue, s) }
-      invite action
-      nil
+
+    def render_syntax_string
+      "#{ didactic_invocation_string } #{ render_actions } [opts] [args]"
     end
-    def invite action=nil
-      emitter.emit(:ui, action ?
-        "Try #{e13b "#{invocation(0..-2)} #{action.action_name} -h"} for help." :
-        "Try #{e13b "#{invocation(0..-2)} -h"} for help."
-      )
-      nil
-    end
-    alias_method :no_command, :argv_empty # for now!
-    def on_help_switch
-      argv[0] = 'help' # might bite one day
-      true # stay
-    end
+
     def render_actions
-      actions_provider or return above.render_actions # sorry
-      "{#{actions_provider.actions.visible.map{ |a| e13b(a.action_name) }.join('|')}}"
-    end
-    def render_usage action
-      "#{header 'usage:'} #{e13b "#{invocation(0..-2)} #{action.syntax}"}"
-    end
-
-    # @return [invoker, method, args] or false/nil
-    # (this is a bunch of legacy spaghetti, some of which i had to derp with)
-    def resolve
-      res = nil
-      begin
-        actions_provider or break( res = above.resolve )
-        self.defaulted = false
-        if argv.empty?
-          r = argv_empty or break( res = r )
-        end
-        if Officious::Help::SWITCHES.include? argv.first
-          r = on_help_switch or break( res = r )
-        end
-        if '-' == argv.first[0]
-          r = no_command or break( res = r )
-        end
-        r = resolve_action or break( res = r )
-        stay = true
-        wtf = catch :option_action do
-          action.parse argv do |o|
-            o.on_syntax do |e|
-             emitter.emit :syntax, e
-            end
-            o.on_push do |frame, _|
-              frame.argv = argv
-              frame.emitter = emitter
-              if frame.fuzzy_match.nil?
-                frame.fuzzy_match = fuzzy_match
-              end
-              self.above = frame
-              self.argv = nil
-              res = frame.resolve
-              stay = false
-            end
-          end
-        end
-        stay or break
-        if wtf
-          case wtf
-          when ::Array
-            wtf[0] ||= client_instance # res = [ client_instance, action, wtf ]
-            res = wtf # experimentallly we want a total divorce
-          when ::Proc
-            res = [ wtf, Action.new(method_name: :call), [ self, self.action ] ]
-          else
-            fail "wtf: #{ wtf }"
-          end
-        elsif false == wtf
-          issue action, render_usage( action )
-        end
-      end while nil
-      res
+      arr = self.class.story.actions.visible.reduce [] do |m, (k, sheet)|
+        m << "#{ kbd sheet.slug }"
+      end
+      "{#{ arr * '|' }}"
     end
 
-    def resolve_action
-      res = self.action = nil
-      str = self.invocation_slug = argv.shift or fail 'sanity'
-      sym = invocation_slug.intern
+    def render_options y
+      nil  # yes, no.
+    end
 
-      if actions_provider.respond_to? :call
-        self.actions_provider = actions_provider.call # collapse - load
-        # this can offer considerable savings when compared to other brands
-        # i mean this can allow us to lazy load possibly dozens of files,
-        # possibly using a different framework entirely
-      end
+    def render_invite_to_even_more_help y
+      y << ''
+      y << "For help on a particular subcommand, try #{
+        }#{ kbd "#{ normalized_invocation_string } <subcommand> -h" }."
+    end
+  end
 
-      if actions_provider.respond_to? :collapse_intermediate_action
-        self.actions_provider =
-          actions_provider.collapse_intermediate_action self
-        # collapse the box (branch) action itself into a live, wired action.
-        # this way leaf actions that need a live parent action can have one.
-        # (the leaf would grab this in its `collapse_action` impl.)
-      end
+  module Client
+  end
 
-      exact = actions_provider.actions.detect do |a|
-        if sym == a.action_name
-          b = true
-        elsif a.aliases
-          b = a.aliases.include? str
-        end
-        b
-      end
-      if exact
-        action_resolved exact
-        res = true
-      elsif fuzzy_match?
-        rx = /\A#{ ::Regexp.escape invocation_slug }/
-        found = actions_provider.actions.select do |a|
-          yes = nil
-          if rx =~ a.action_name.to_s
-            yes = true
-          elsif a.aliases
-            yes = a.aliases.index { |s| rx =~ s }
-          end
-          yes
-        end
-        case found.length
-        when 0
-          res = action_invalid
-        when 1
-          action_resolved found.first
-          res = true
+  module Client::InstanceMethods
+
+    include Namespace::InstanceMethods
+
+    include Headless::CLI::Pen::InstanceMethods
+
+    def invoke argv  # mutates argv. standard 3-arg result.
+      exit_code, method, args = resolve_argv argv
+      if exit_code then res = exit_code else
+        rs = method.receiver.send method.name, * args
+        # (turn conventional true / false / nil into exit codes)
+        res = if rs
+          true == rs ? status_normal : rs
         else
-          issue("Ambiguous action #{e13b invocation_slug}. "<<
-                  "Did you mean #{found.map{ |a| e13b(a.action_name) }.join(' or ')}?")
-          self.action = found # be careful you idiot
-          res = nil
+          false == rs ? status_error : status_normal
         end
-      else
-        res = action_invalid
       end
       res
     end
+
+    def get_bound_method m
+      method m
+    end
+
   protected
-    def action_resolved x
-      if x.respond_to? :collapse_action # then it might be a help emissary or
-        x = x.collapse_action self      # a class from the future. this is a
-      end                               # a forward-fitting future compat hack
-      self.action = x
+
+    # `initialize` - etc.. #todo
+
+    args_length_h = {
+      0 => -> blk do
+        blk or raise ::ArgumentError, "this #{ self.class } - a legacy #{
+          } CLI client - requires that you construct it with 1 block or #{
+          }3 args for io wiring (no arguments given) (nils or empty block ok)"
+        blk[ self ]
+        nil
+      end,
+      2 => -> rc, as, blk do  # experimental - one class plugs this in as..
+        blk and raise ::ArgumentError, "can't wire a sub-cliented client"
+        @request_client = rc
+        @action_sheet = as
+        @paystream = rc.send :paystream
+        @infostream = rc.send :infostream
+        nil
+      end,
+      3 => -> up, pay, info, blk do
+        blk and raise ::ArgumentError, "won't take block and args"
+        if respond_to? :event_listeners  # if pub sub
+          if pay  # (may have intentionally passed nil)
+            on_payload        do |e| pay.puts  e.text end
+          end
+          if info  # (may have intentionally passed nil)
+            on_info( on_error do |e| info.puts e.text end )
+          end
+        else
+          @paystream, @infostream = pay, info
+        end
+        nil
+      end
+    }
+
+    define_method :initialize do |*up_pay_info, &wire|
+      @program_name = @request_client = @action_sheet = nil
+      instance_exec(* up_pay_info, wire,
+                   & args_length_h.fetch( up_pay_info.length ) )
+    end
+
+    attr_reader :infostream, :paystream  # for sub-cliented cliented, as above
+
+    # non-pub-sub variant of `emit` gets "turned on" elsewhere
+
+    def _porcelain_legacy_emit stream_name, text
+      ( :payload == stream_name ? @paystream : @infostream ).puts text
+      nil
+    end
+
+    #         ~ resolution and support (in roughly pre order) ~
+
+    def normalized_invocation_string
+      if @request_client          # some clients get plugged in under
+        super                     # other clients
+      else
+        @program_name || ::File.basename( $PROGRAM_NAME )
+      end
+    end
+
+    alias_method :didactic_invocation_string, :normalized_invocation_string
+
+    def render_desc y
+      # sadly, no. override n.s version. maybe after integration. also,
+      # yes a modality client *could* have its own action sheet but i thought
+      # we did this already over there in h.l. yes we did. meearrg.
+    end
+  end
+
+
+  class Action                      # (section 5 of 7 - and support)
+    include Action::InstanceMethods
+
+  protected
+    # all this is for dsl-style actions defined as methods on a host client
+
+    def emit stream, text
+      @request_client.send :emit, stream, text
+    end
+
+    def bound_process_method  # this is for a dsl-style method on a host client
+      @request_client.get_bound_method @action_sheet.normalized_local_action_name
+    end
+  end
+
+  class Argument
+
+    name_rx = /<( [-_a-z] [-_a-z0-9]* )>/x
+
+    rx = /
+         #{ name_rx.source } [ ]* ( \[ (?: <\1> [ ]* \[ \.\.\.? \] | \.\.\.? ) \] )?
+    | \[ #{ name_rx.source } [ ]* ( \[ (?: <\3> [ ]* \[ \.\.\.? \] | \.\.\.? ) \] )? \]
+    /x
+
+    define_singleton_method :rx do rx end
+
+    def is_glob
+      @max.nil?
+    end
+
+    def is_required
+      @min > 0
+    end
+
+    attr_reader :normalized_parameter_name  # needed by a `fetch`
+
+    def slug
+      Headless::Name::FUN.slugulate[ @normalized_parameter_name ]
+    end
+
+    def string
+      if ! @max
+        ellipsis = " [<#{ slug }>[...]]"
+      end
+      if is_required
+        "<#{ slug }>#{ ellipsis }"
+      else
+        "[<#{ slug }>#{ ellipsis }]"
+      end
+    end
+
+  protected
+
+    def initialize name1, max1, name2, max2
+      @normalized_parameter_name = ( name1 || name2 ).intern
+      if name1
+        @min = 1
+        @max = max1 ? nil : 1
+      else
+        @min = 0
+        @max = max2 ? nil : 1
+      end
+    end
+  end
+
+  # @todo see if we can get this whole class to go away in lieu of the
+  # improved reflection of ruby 1.9
+
+  class Argument::Syntax
+
+    def self.from_string str
+      new( str ).validate_self
+    end
+
+    # --*--
+
+    [
+      :first,
+      :length
+    ].each do |meth|
+      define_method meth do |*a, &b|
+        @elements.send meth, *a, &b
+      end
+    end
+
+    def string
+      if @elements.length.nonzero?
+        @elements.map(& :string ).join ' '
+      end
+    end
+
+    def validate_self
+      signature = nil
+      err = -> do
+        signature = @elements.map do |arg| arg.is_glob ? 'G' : 'g' end.join ''
+        /G.*G/ =~ signature and break "globs cannot be used more than once"
+        /\AGg/ =~ signature and break "globs cannot occur at the beginning"
+        /gGg/  =~ signature and break "globs cannot occur in the middle"
+        signature = @elements.map do |arg| arg.is_required ? 'o' : 'O' end.join ''
+        /\AOo/ =~ signature and break "optionals cannot occur at the beginning"
+        /oO+o/ =~ signature and break "optionals cannot occur in the middle"
+        nil
+      end.call
+      if err
+        raise ::ArgumentError, "#{ err } (had: #{ signature })"
+      else
+        self
+      end
+    end
+
+    def argument_syntax_subclient request_client
+      Argument::Syntax::SubClient.new request_client, @elements
+    end
+
+    #                  ~ reflection & courtesy ~
+
+    def fetch norm, &otr
+      idx = @elements.index do |arg|
+        norm == arg.normalized_parameter_name
+      end
+      if idx then @elements.fetch( idx ) else
+        otr ||= -> { raise ::KeyError, "argument not found: #{ norm.inspect }" }
+        otr[ * [norm][ 0, otr.arity ] ]
+      end
+    end
+
+  protected
+
+    def initialize str
+      @elements = [ ]
+      scn = Porcelain::Services::StringScanner.new str
+      rx = argument_rx
+      while ! scn.eos?
+        scn.skip( / / )
+        matched = scn.scan rx
+        if ! matched
+          raise ::ArgumentError, "failed to parse #{ scn.rest.inspect }#{
+            }#{ " (after #{ @elements.last.string.inspect })" if
+              @elements.length.nonzero? }"
+        end
+        md = rx.match matched
+        @elements << Argument.new( * md.captures )
+      end
+      nil
+    end
+
+    def argument_rx
+      Argument.rx
+    end
+  end
+
+  class Argument::Syntax::SubClient < Argument::Syntax
+
+    # sane design and elegant argument parameters dictate that we make a
+    # subclass of a.s just for validating argv (the whole point). pub sub
+    # is not the answer, nor is jagged payloads. pls wtach:
+
+    include SubClient_InstanceMethods
+
+    def render
+      if @elements.length.nonzero?
+        @elements.map(& :string ).join ' '
+      end
+    end
+
+    # (an earlier incarnation of this gave thanks of inspiration
+    # to Davis Frank of pivotal)
+
+    def validate argv, error
+      tokens = Argument::Scanner.new argv
+      params = Argument::Scanner.new @elements
+      saw_glob = false
+      err = nil
+      while ! tokens.eos?
+        p = params.current
+        if ! p
+          break( err = "unexpected argument: #{ tokens.current.inspect }" )
+        end
+        tokens.advance
+        if p.is_glob
+          saw_glob = true
+        else
+          params.advance
+        end
+      end
+      if ! err
+        p = params.current
+        if p && p.is_required && ( ! p.is_glob && ! saw_glob )
+          err = "expecting: #{ kbd p.string }"
+        end
+      end
+      if err
+        error[ err ]
+      else
+        true
+      end
+    end
+
+  protected
+
+    def initialize request_client, elements
+      @request_client = request_client
+      @elements = elements
+      @kbd = nil
+    end
+  end
+
+  class Argument::Scanner
+
+    def advance
+      @current += 1
+    end
+
+    def current
+      @args[ @current ]
+    end
+
+    def eos?
+      @current >= @length
+    end
+
+  protected
+
+    def initialize args
+      @current = 0
+      @length = args.length
+      @args = args
+    end
+  end
+
+  module Action::DSL
+    def self.extended mod
+      mod.extend Action::DSL::ModuleMethods
+      mod.send :include, Action::InstanceMethods
+      mod._porcelain_legacy_action_dsl_init
       nil
     end
   end
 
-  class CallFrame < Struct.new(:above, :action, :actions_provider, :argv,
-    :below, :get_client_instance, :default, :defaulted, :emitter, :fuzzy_match,
-    :invocation_slug
-  )
-    include ArgvTokenParse
-    def above= x
-      x.below = self
-      super
-    end
-    def client_instance
-      @client_instance ||= get_client_instance.call
-    end
-    attr_writer :client_instance
-    alias_method :defaulted?, :defaulted
-    def default?
-      !! default
-    end
-    def emit(*a)
-      emitter.emit(*a)
-    end
-    alias_method :fuzzy_match?, :fuzzy_match
-    def initialize params
-      params.each { |k, v| send("#{k}=", v) }
-    end
-    # lots of experimenty hacky
-    def invocation o=nil
-      n = self
-      case o
-      when NilClass
-        n = n.below while n.below
-        r = n.invocation(StringIO.new).string
-      when StringIO
-        0 == o.pos or o.write(' ')
-        o.write invocation_slug
-        above and above.invocation_slug and above.invocation(o)
-        r = o
-      when Range
-        n = n.below while n.below
-        r = n.invocation([])[o].join(' ')
-      when Array
-        o.push invocation_slug
-        above and above.invocation(o)
-        r = o
+  module Action::DSL::ModuleMethods
+
+    mutex_h = { }  # no matter what never init a module more than once
+    define_method :_porcelain_legacy_action_dsl_init do
+      mutex_h.fetch self do
+        mutex_h[ self ] = true
+        @action_sheet ||= Action::Sheet.for_action_class( self )
+        if ! method_defined? :emit  # don't overwrite pub-sub version, e.g
+          alias_method :emit, :_porcelain_legacy_emit
+        end
       end
-      r
+      nil
     end
-    def top
-      above ? above.top : self
+
+    #      ~ here, please use these to define your action ~
+
+    def visible b
+      @action_sheet.is_visible = b
+      nil
     end
+
+    def aliases alius, *rest
+      @action_sheet.concat_aliases rest.unshift( alius )
+      nil
+    end
+
+    def option_parser &blk
+      @action_sheet.add_option_parser_block blk
+      nil
+    end
+
+    def argument_syntax str
+      @action_sheet.argument_syntax_string = str
+      nil
+    end
+
+    def desc str, *rest
+      @action_sheet.concat_desc rest.unshift( str )
+      nil
+    end
+
+    #         ~ this is some nerkage for reflection et. al ~
+
+    attr_reader :action_sheet
+
+  protected
+
+    # nothing is protected.
+
   end
 
-  class Runtime < Struct.new(:stack)
-    extend ::Skylab::PubSub::Emitter
-    emits({
-      :error         => :all,
-      :info          => :all,
-      :help          => :info,
-      :payload       => :all,
-      :ui            => :info,
-      :usage         => :info,
-      :syntax        => :info,
-      :runtime_issue => :error
-    })
-
-    public :emit # shoehorn legacy bad design inside better design [#ps-002]
-
-    alias_method :porcelain_original_event_class, :event_class # compat pub sub
-    attr_writer :event_class
-    def event_class
-      @event_class or porcelain_original_event_class
-    end
-    %w(invocation render_actions resolve).each do |m| # @delegates @todo:#100.200.1
-      define_method(m) { |*a, &b| stack.send(m, *a, &b) }
-    end
-    def initialize argv, client_instance, instance_defn, module_defn
-      module_defn.runtime.definition_blocks.each { |b| singleton_class.module_eval(&b) }
-      module_defn.runtime_instance_settings.each { |b| instance_eval(&b) }
-      (b = instance_defn.runtime_instance_settings) and b.call(self)
-      @event_class = nil
-      @invocation_slug ||= File.basename($PROGRAM_NAME)
-      self.stack = -> do
-        frame = CallFrame.new invocation_slug: @invocation_slug
-        frame.above = -> do
-          fr = CallFrame.new actions_provider: client_instance.class,
-                                         argv: argv,
-                              client_instance: client_instance,
-                                      emitter: self,
-                                  fuzzy_match: true
-          module_defn.frame_settings.each { |bb| fr.instance_eval(& bb ) }
-          fr
-        end.call
-        frame
-      end.call
-    end
-    attr_writer :invocation_slug
-  end
+  #         ~ Officious ~         # (section 6 of 7 - officous help)
 
   module Officious
-    # name/idea borrowed from something in OptionParse (ruby std lib)
   end
 
-  module Officious::Help
-    SWITCHES = %w(-h --help)
-    extend ::Skylab::Porcelain
-    argument_syntax '[<action>]'
-    action { visible false }
-    def help action=nil
-      help_frame or raise 'need frame.'
-      subclient = Plumbing.new help_frame, action
-      subclient.invoke
-    end
-  end
+  class Officious::Help
 
-  class Officious::Help::Plumbing < ::Struct.new :frame, :action_ref
-    include Styles
+    extend Action::DSL
 
-    def actions
-      frame.actions
-    end
+    aliases '-h', '--help'
 
-    def emit name, *payload
-      frame.emit name, *payload
-    end
+    argument_syntax '[<arg> [..]]'
 
-    # had to rescue this. didn't want to
-    def help_action
-      res = nil
-      begin
-        action_ref = self.action_ref
-        if ::String === action_ref
-          action_ref = 'help' if '-h' == action_ref
-          action_struct = actions[ action_ref.intern ]
-        else
-          action_struct = action_ref
-        end
-        if ! action_struct
-          emit :error, "No such action #{ e13b "\"#{ action_ref }\"" }. #{
-          }Try #{ e13b invocation } #{ render_actions } #{ e13b '-h' }."
-          break
-        end
-        s = frame.render_usage action_struct
-        emit :usage, s
-        action_struct.help do |o|
-          o.on_header do |name, content|
-            emit :help, "#{ header "#{ name }:" }#{ " #{ content }" if content}"
-          end
-          o.on_two_col do |a, b|
-            emit :help, "#{ e13b a }#{ b }"
-          end
-          o.on_default do |line|
-            emit :help, line
-          end
-        end
-      end while nil
-      res
-    end
+    visible false
 
-    def invocation *x
-      frame.invocation(* x)
-    end
+  protected
 
-    def invoke
-      if action_ref
-        help_action
+    def resolve_arguments argv  # if you look at our actual signature we take
+      # any number of arguments.  in practice we recursively nerk the derk
+      if 0 == argv.length
+        rs = @request_client.send :help
+        [ ( false == rs ) ? status_error : status_normal , nil, nil ]
       else
-        emit :ui, "#{ header 'usage:' } #{ invocation( 0 .. -2 ) } #{
-        }#{ render_actions } [opts] [args]"
-        emit :ui, "For help on a particular subcommand, try #{
-        }#{ e13b "#{ invocation(0..-2) } <subcommand> -h" }."
+        argv << '--help'  # eek
+        @request_client.send :resolve_action, argv
       end
+    end
+  end
+
+  #         ~ Namespaces ~        # (section 7 of 7)
+
+  module DSL  # (re-opened)
+
+    def namespace normalized_local_ns_name, ext_ref=nil, xtra_h=nil, &inline_def
+      # we need the namespace to occur in the right order, after/before
+      # e.g officious help, and after/before public methods (with or without
+      # explicit sheets having been created for them), so for one thing we
+      # use the accessor and not the ivar below for `story`..
+      story.accept_namespace_added normalized_local_ns_name,
+        ext_ref, xtra_h, inline_def
+      nil
+    end
+  end
+
+  class Story  # (re-opened)
+
+    def accept_namespace_added normalized_local_ns_name, ext_ref,
+          xtra_h=nil, inline_def
+
+      ::Symbol === normalized_local_ns_name or fail 'get with the future'
+      s1 = delete_action_sheet!
+      nf = Headless::Name::Function.new normalized_local_ns_name
+      s2 = s1.collapse_as_namespace nf,
+        ext_ref, inline_def, xtra_h, @story_host_module
+      @action_box.add s2.normalized_local_node_name, s2
+      nil
+    end
+  end
+
+  class Action::Sheet  # (re-opened)
+
+    def collapse_as_namespace name_func,
+        ext_ref, inline_def, xtra_h, story_host_module
+
+      if @is_collapsed
+        fail "sanity - action sheet is already collapsed (frozen)"
+      elsif @option_parser_block_a
+        raise ::ArgumentError, "namespaces can't have option parsers"
+      elsif @argument_syntax_string
+        raise ::ArgumentError, "namespaces can't have argument syntaxes"
+      else
+        res = Namespace::Sheet.new @is_visible,
+          @alias_a,
+          @desc_a,
+          name_func,
+          ext_ref,
+          inline_def,
+          story_host_module
+        res.absorb_h xtra_h if xtra_h
+        @is_visible = @alias_a = @argument_syntax_string = @argument_syntax =
+          @desc_a = nil
+        freeze  # just being cute, this obj is a tombstone now # #todo
+        res
+      end
+    end
+  end
+
+  class Namespace::Sheet < Action::Sheet
+
+    def action_subclient request_client
+      # take it. [#hl-054]
+      action_class::Adapter::For::Legacy::Of::Action_Subclient[
+        action_class, request_client, self
+      ]
+    end
+
+    def face_adapter_namespace_args
+      Legacy::Adapter::For::Face::Of::Namespace_Args[ self ]
+    end
+
+    -> do
+      param_h_h = {
+        aliases: -> v do
+          @alias_a ||= [ ]
+          @alias_a |= v
+        end
+      }
+      define_method :absorb_h do |xtra_h|
+        xtra_h.each { |k, v| instance_exec v, & param_h_h.fetch( k ) }
+        nil
+      end
+    end.call
+
+    def normalized_local_node_name
+      @name_function.normalized_local_name
+    end
+
+  protected
+
+    def initialize is_visible, alias_a, desc_a, name_function,
+      ext_ref, inline_def, story_host_module
+      @is_visible, @alias_a, @desc_a, @name_function,
+        @ext_ref, @inline_def, @story_host_module =
+      is_visible, alias_a, desc_a, name_function,
+        ext_ref, inline_def, story_host_module
+      @action_class = nil
       nil
     end
 
-    def render_actions
-      frame.render_actions
+    # `action_class` - experimentally we try to mimic as closely as possible
+    # the derkage of hand-writing a modality client, so we dynamically generate
+    # a class that will be the action-like sub-client, to represent the n.s
+    # Also, we shoe-horn in box-modules, anticipating the future.
+
+    def action_class
+      @action_class ||= begin
+        if @inline_def
+          @ext_ref and raise ::ArgumentError, "1 arg and block or 2 args no blk"
+          blk = @inline_def ; @inline_def = nil
+          action_class_from_block blk
+        elsif @ext_ref
+          ext_ref = @ext_ref ; @ext_ref = nil
+          if ext_ref.respond_to? :call
+            ext_ref.call
+          elsif ::Class === ext_ref
+            ext_ref
+          else
+            raise ::ArgumentError, "cannot resolve an action class - #{ext_ref}"
+          end
+        else
+          raise ::ArgumentError, "expecting 2nd arg or block to define n.s"
+        end
+      end
+    end
+
+    def action_class_from_block blk
+      act = namespace_class
+      act.class_exec(& blk )
+      act
+    end
+
+    def action_class_from_class kls
+      act = namespace_class
+      act.story.adapt_story kls.story
+      act
+    end
+
+    def namespace_class
+      existing_or do |box, const|
+        # (we could also extend n.s class with the dsl m.m but it adds
+        # an extra lookup when the story is initted..)
+        kls = box.const_set const, ::Class.new( Namespace )
+        kls.extend DSL::ModuleMethods
+        kls._porcelain_legacy_dsl_init
+        kls
+      end
+    end
+
+    def existing_or &blk
+      box = box_module
+      const = @name_function.as_const
+      if box.const_defined? const, false
+        act = box.const_get const, false
+      else
+        act = blk[ box, const ]
+      end
+      act
+    end
+
+    def box_module
+      if @story_host_module.const_defined? :Actions, false # idgaf - looks familiar
+        @story_host_module.const_get :Actions, false
+      else
+        mod = @story_host_module.const_set :Actions, ::Module.new
+        # ...
+        mod
+      end
+    end
+  end
+
+  class Namespace  # declared above. not instantiated directly
+                                               # (the dynamically created sub-
+                                               # class will ge the DSL m.m)
+    include Namespace::InstanceMethods         # it doesn't get the client i.m
+
+    def get_bound_method meth
+      method meth
     end
 
   protected
 
-    def initialize frame, action_ref
-      frame or raise ::ArgumentError.new "need frame."
-      super
+    kls = self
+
+    define_method :initialize do |request_client, action_sheet|
+      kls == self.class and fail "sanity - do not instantiate directly."
+      @request_client, @action_sheet = request_client, action_sheet
+      nil
     end
   end
 
-  class << ::Skylab::Porcelain
+  #         ~ big time hacks for this modularity nonsense ~ SECTION 8
+
+  module Pxy
   end
-  class NamespaceOptionSyntax < OptionSyntax
-    def initialize ns_action
-      @ns_action = ns_action
+
+  class Pxy::Sheet
+    [:names, :is_visible, :slug].each do |m|
+      define_method m do @real.send m end
     end
-    def parse_options args
-      nil # a namespace never parses options, only a one-token name
+
+    def action_subclient request_client  # #todo big mess while we decide
+      strange_client_kls = @story.instance_variable_get :@story_host_module
+      Pxy::SubClient.new strange_client_kls, @real, request_client
     end
-    def to_str
-      nil # important
-    end
-  end
-  class NamespaceArgumentSyntax < ArgumentSyntax
-    def initialize namespace_instance
-      @namespace_instance = namespace_instance
-      init('<action> [<arg> [..]]').validate
-    end
-    def to_s
-      @namespace_instance.frame.render_actions
+
+    def initialize action_sheet, story
+      @real = action_sheet
+      @story = story
     end
   end
-  module NamespaceAsClientInstanceAdapter
-    def help_frame
-      frame
+
+  class Pxy::RequestClient
+
+    include SubClient_InstanceMethods  # we use kbd and hdr
+
+    def normalized_invocation_string
+      "#{ @request_client.send :normalized_invocation_string }"
+    end
+
+    def emit a, b
+      @request_client.send :emit, a, b
+    end
+
+    def get_bound_method meth  # upstream
+      @strange_client.get_bound_method meth
+    end
+
+    def initialize strange_client, real_rc
+      @strange_client = strange_client
+      @request_client = real_rc
     end
   end
-  class Namespace < Action
-    def actions_provider
-      case @mode
-      when :inline   ; inflate! if @block
-                     ; singleton_class
-      when :external ; external_module
-      end
-    end
-    attr_accessor :client_instance
-    def get_ns_client slug
-      case @mode
-      when :inline
-        @porcelain or porcelain_init # i want it all to go away
-        @porcelain.runtime = @frame.emitter
-        self
-      when :external
-        external_module.porcelain.build_client_instance(@frame.emitter, slug) # @todo: during:#100.100.400
-      else
-        fail('no')
-      end
-    end
-    # @todo during:#100.200 for_run <=> build_client_instance
-    def for_run ui, slug # compat
-      if @external_module.respond_to?(:porcelain)
-        @external_module.porcelain.build_client_instance(ui, slug)
-      else
-        @external_module.new(out: ui.out, err: ui.err, program_name: slug)
-      end
-    end
-    def inflate!
-      singleton_class.class_eval(&@block)
-      @block = nil
+
+  class Pxy::SubClient
+
+    def resolve_argv argv  # downstream
+      @real_sc.resolve_argv argv
     end
 
-                                  # (legacy spaghetti - make this work for tons
-                                  # of different generations of other nerks)
-    resolve_initialization_parameters = -> name, param_a, block do
-      if ::Module === param_a.first
-        external_module_ref = param_a.shift
-      elsif param_a.first.respond_to? :call
-        external_module_ref = param_a.shift
-      end
-      if ::Hash === param_a.first
-        param_h = param_a.shift
-      end
-      if param_a.length.nonzero?
-        raise ::ArgumentError.new "sorry - overloaded method signature fail"
-      end
-      param_h ||= { }
-      external_module_ref ||= param_h.delete :module # if any
-      if external_module_ref && block
-        raise ::ArgumentError.new "can't have namespace defined in both #{
-          }block and module"
-      end
-      param_h[:action_name] = name
-      # param_h[:method_name] ||= :invoke
-      param_h[:option_syntax]   ||= NamespaceOptionSyntax.new   self
-      param_h[:argument_syntax] ||= NamespaceArgumentSyntax.new self
-      [block, external_module_ref, param_h]
-    end
-
-    define_method :initialize do |name, *params, &block|
-      @block, external_module_ref, param_h =
-        resolve_initialization_parameters[ name, params, block ]
-      name = params = block = nil
-      if external_module_ref
-        @mode = :external
-        if ::Module === external_module_ref
-          @external_module = external_module_ref
-          @external_module_ref = nil
-        else
-          @external_module = nil
-          @external_module_ref = external_module_ref
-        end
-      else
-        @mode = :inline
-      end
-      @porcelain = nil
-      super( param_h, & nil ) ; param_h = nil       # do not bubble the block up
-      if :external == @mode
-        if @external_module && @external_module.respond_to?( :porcelain )
-          if @external_module.porcelain.aliases
-            aliases(* @external_module.porcelain.aliases)
-          end
-        end
-      else # :inline
-        class << self
-          # we want all this on the sing. class because this object is not a subclass but an instance
-          extend ClientModuleMethods
-          include ClientInstanceMethods
-          prev = porcelain.actionable
-          porcelain.actionable = false # else it actually pings us for the below definition
-          def singleton_method_added metho
-            singleton_class.method_added metho # yes wtf. talk to matz ^_^
-          end
-          porcelain.actionable = prev
-        end
-        class << self
-          include Officious::Help
-          include NamespaceAsClientInstanceAdapter # must come after above
-        end
-      end
-      # porcelain_init
-      ::Skylab::Porcelain.namespaces.push self # used for loading hacks
-    end
-
-    attr_reader :frame
-
-    def parse argv
-      inflate! if @block
-      slug = argv.first
-      @frame = CallFrame.new(
-        :argv => argv,
-        :action => self,
-        :get_client_instance => -> do
-          get_ns_client slug
-        end,
-        :invocation_slug => slug,
-        :actions_provider => actions_provider
-      )
-      if :inline == @mode
-        singleton_class.porcelain.frame_settings.each { |b| f.instance_eval(&b) }
-      end
-      failed = super(argv) or return failed
-      # the grammar for namespaces takes no options and does not change argv
-      -> do  # #todo this whole this is garbage
-        yield( x = ParseSubs.new )
-        x.emit :push, @frame
-      end.call
-      :never_see
-    end
-
-    def summary_lines
-      if :external == @mode
-        em = external_module
-        if em.respond_to? :porcelain
-          em.porcelain.summary_lines
-        else
-          a = em.command_tree.map(& :action_name) # watch the world burn
-          [ "child commandz: { #{a.join('|') }}" ]
-        end
-      else
-        fail "implement me - #{ @mode }"
-      end
-    end
-
-  protected
-
-    def external_module
-      @external_module ||= begin
-        em = @external_module_ref.call
-        @external_module_ref = nil
-        em
-      end
+    def initialize strange_client_kls, strange_action_sheet, request_client
+      real_client = request_client.instance_variable_get :@request_client
+      pay, info = real_client.instance_exec { [@paystream, @infostream ] }
+      strange_client = strange_client_kls.new nil, pay, info
+      rc = Pxy::RequestClient.new strange_client, request_client
+      @real_sc = strange_action_sheet.action_subclient rc
+      nil
     end
   end
 end

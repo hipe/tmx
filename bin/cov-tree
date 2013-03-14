@@ -1,22 +1,5 @@
 #!/usr/bin/env ruby -w
 
-require_relative '../lib/skylab/cov-tree/cli'
+require_relative '../lib/skylab/cov-tree/core'
 
-# @todo all.rb is so hopelessly borked look at this shit
-fscking_retarded = -> p do
-  p.on_error   { |e| $stderr.puts e }
-  p.on_info    { |e| $stderr.puts(e) unless e.touched? }
-  p.on_payload { |e| $stdout.puts e }
-end
-
-fuck_me_twice = -> p do
-  fscking_retarded[ p ]
-  p.on_help { |e| $stderr.puts e.touch!.to_s }
-  p.on_ui do |e|
-    !e.touched? and $stderr.tty? and $stderr.puts(e.touch!.to_s)
-  end
-end
-
-client = Skylab::CovTree::CLI.new(&fuck_me_twice)
-fscking_retarded[ client ]
-client.invoke ARGV
+Skylab::CovTree::CLI.new( $stdin, $stdout, $stderr ).invoke ARGV

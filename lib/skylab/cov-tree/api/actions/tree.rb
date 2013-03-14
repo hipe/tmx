@@ -2,14 +2,12 @@ module Skylab::CovTree
 
   class API::Actions::Tree < API::Action
 
-    emits :anchor_point,
-      :error,
-      :info,
-      :number_of_test_files,
-      :test_file,
-      :tree_line_meta
-
-
+    emits    anchor_point: :datapoint,
+                    error: :datapoint,
+                     info: :datapoint,
+     number_of_test_files: :datapoint,
+                test_file: :structural,
+           tree_line_meta: :structural
 
     params = ::Struct.new :list_as, :path, :verbose
 
@@ -30,16 +28,12 @@ module Skylab::CovTree
       res
     end
 
-
-
   protected
-
 
     def initialize request_client
       @last_error_message = nil
       super request_client
     end
-
 
     globs = CovTree::FUN.globs
 
@@ -65,14 +59,12 @@ module Skylab::CovTree
       end
     end
 
-
     attr_reader :last_error_message
-
 
     def list
       num = 0
       anchors.each do |anchor|
-        emit :anchor_point, anchor_point: anchor
+        emit :anchor_point, anchor
         anchor.test_file_short_pathnames.each do |shpn|
           num += 1
           emit :test_file, anchor: anchor, short_pathname: shpn
@@ -82,15 +74,13 @@ module Skylab::CovTree
       if last_error_message
         res = false
       else
-        emit :number_of_test_files, number: num
+        emit :number_of_test_files, num
         res = true
       end
       res
     end
 
-
     attr_accessor :list_as
-
 
     strip_trailing_rx = %r{ \A (?<no_trailing> / | .* [^/] ) /* \z }x
 
