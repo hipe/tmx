@@ -22,6 +22,10 @@ module Skylab::Headless
       x.to_s.gsub '_', '-'
     end
 
+    o[:metholate] = -> x do       # in case your normal is a slug for some rsn.
+      x.to_s.gsub '-', '_'
+    end
+
     FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
   end
 
@@ -51,9 +55,9 @@ module Skylab::Headless
     end
 
     def as_method
-      normalized_local_name                    # fine for now mebbe ..
-    end
-
+      Name::FUN.metholate[ normalized_local_name ].intern  # or even if slug-
+    end                                        # some applications annoyingly
+                                               # allow for slug-looking normals
     def as_slug
       Name::FUN.slugulate[ normalized_local_name ]
     end

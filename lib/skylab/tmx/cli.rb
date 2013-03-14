@@ -22,7 +22,7 @@ module Skylab::TMX
     :bleed,
     :cli,
     :'cov-tree',
-    :'file-metrics',  # #todo - during transition only fm is not yet integrated
+    # :'file-metrics',  # - ok
     :'git-viz',
     :jshint,
     :nginx,

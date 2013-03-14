@@ -1,37 +1,44 @@
 module Skylab::FileMetrics
+
   class Models::Table
+
     def render out
       CLI::Lipstick.initscr
-      @maxes = build_maxes if ! @maxes
-      _cels = []
-      @rows.each do |row|
-        _cels.clear
+      @max_a = build_maxes if ! @max_a
+      cel_a = []
+      @row_a.each do |row|
+        cel_a.clear
         row.each_with_index do |cel, idx|
-          if ::String === cel
-            _cels.push("%#{@maxes[idx]}s" % cel)
+          if cel.respond_to? :render
+            cel.render cel_a, self
           else
-            cel[:render].call(_cels, self)
+            cel_a << ( "%#{ @max_a[ idx ] }s" % cel )
           end
         end
-        out.puts _cels.join(@sep)
+        out.puts cel_a.join( @sep )
       end
+      nil
     end
+
     attr_accessor :sep
+
   protected
-    def initialize rows
-      @maxes = nil
-      @rows = rows
+
+    def initialize row_a
+      @max_a = nil
+      @row_a = row_a
       @sep = '  '
     end
+
     def build_maxes
-      maxes = []
-      @rows.each do |row|
+      max_a = []
+      @row_a.each do |row|
         row.each_with_index do |cel, idx|
-          len = ::String === cel ? cel.length : cel[:chars_length].call
-          maxes[idx] = len if maxes[idx].nil? || maxes[idx] < len
+          len = ( cel ? cel.length : 0 )  # cel should be a string or proxy
+          max_a[idx] = len if max_a[idx].nil? || max_a[idx] < len
         end
       end
-      maxes
+      max_a
     end
   end
 end
