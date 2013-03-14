@@ -1,5 +1,7 @@
 module Skylab::Snag
+
   class Models::Manifest::File
+
     # (this is used by services and hence cannot be a sub-client!)
     # ([#hl-044] might subsume parts (most?) of this)
 

@@ -25,7 +25,7 @@ module Skylab
     end
 
     module Treemap
-      extend ::Skylab::Porcelain
+      extend ::Skylab::Porcelain::Legacy::DSL
       namespace :'treemap', Treemap::Adapter_Ass.new( ::Skylab::Treemap::CLI )
     end
 

@@ -1,16 +1,11 @@
 module Skylab::Snag
+
   class Models::ToDo
     # imagine that parts of this are frozen
 
     require_relative 'to-do/enumerator' # [#sl-124] preload bc toplevel exists
 
     attr_reader :full_source_line
-
-    def full_string
-      "#{ path }:#{ line_number_string }:#{ full_source_line }"
-    end
-
-    alias_method :render, :full_string
 
     attr_reader :line_number
 

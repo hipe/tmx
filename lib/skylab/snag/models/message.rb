@@ -1,4 +1,5 @@
 module Skylab::Snag
+
   module Models::Message
 
     blank_rx = /\A[[:space:]]*\z/

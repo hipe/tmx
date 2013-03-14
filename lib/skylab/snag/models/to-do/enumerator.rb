@@ -1,60 +1,69 @@
 module Skylab::Snag
+
   class Models::ToDo::Enumerator < ::Enumerator
+
     extend PubSub::Emitter
 
-    emits :stderr_line
+    emits :error, :command
+
+    event_factory Snag::API::Events::Datapoint
+
+    # (primary public method is `each` whose protected impl is `visit`)
+
+    #         ~ courtesy reflection & rendering (in asc. complexity) ~
 
     attr_reader :command
-
-    def names
-      @command.names
-    end
-
-    def paths
-      @command.paths
-    end
-
-    def pattern
-      @command.pattern
-    end
-
-    def render_description_pp_for client # like [#029]
-      me = self
-      client.instance_exec do
-        a = [ "in #{ and_ me.paths.map { |p| val p } }" ]
-        if me.names.length.nonzero?
-          a << "named #{ or_ me.names.map { |n| val n } }"
-        end
-        a << "with the pattern #{ val me.pattern }"
-        a.join ' '
-      end
-    end
 
     attr_reader :seen_count
 
   protected
 
     def initialize paths, names, pattern
-      block_given? and fail 'sanity'
       @seen_count = nil
       @command = Models::ToDo::Command.new paths, names, pattern
-      super( ) do |y|
-        visit y
+      super(& method( :visit ) )
+    end
+
+    def visit y  # ( methods presented in pre-order from here )
+      res = false
+      if all_required_events_are_handled
+        res = true
+        @seen_count = 0
+        err = -> e { emit :error, e ; res = false }
+        @command.pattern -> p do
+          @pattern = p
+          @command.command -> cmd do
+            emit :command, cmd
+            visit_valid y, cmd
+          end, err
+        end, err
+      end
+      res  # ick i hate semantic results from iterators..
+    end
+
+    def all_required_events_are_handled
+      a = unhandled_event_stream_graph.names
+      if a.length.zero? then true else
+        msg = "strict about event coverage for now - unhandled: #{ a * ', ' }"
+        if a.include? :error
+          raise ::RuntimeError, msg
+        else
+          emit :error, msg
+        end
       end
     end
 
-    def visit y
+    def visit_valid y, cmd
       res = true
-      Snag::Services::Open3.popen3( @command.render ) do |sin, sout, serr|
-        todo = Models::ToDo::Flyweight.new @command.pattern
-        @seen_count = 0
+      Snag::Services::Open3.popen3( cmd ) do |sin, sout, serr|
+        todo = Models::ToDo::Flyweight.new @pattern
         sout.each_line do |line|
           @seen_count += 1
-          y << todo.set!( line.chomp )
+          y << todo.replace( line.chomp )
         end
         serr.each_line do |line|
           res = false
-          emit :stderr_line, line.chomp
+          emit :error, "(unexpected output: #{ line.chomp })"
         end
       end
       res

@@ -545,7 +545,13 @@ module Skylab::Porcelain::Legacy
     end
   end
 
+  module Adapter
+    extend MAARS
+  end
+
   module Action::InstanceMethods
+
+    Adapter = Adapter  # [#hl-054]
 
     include SubClient_InstanceMethods
 
@@ -858,15 +864,9 @@ module Skylab::Porcelain::Legacy
   class Namespace < Action  # used as namespace here, class below
   end
 
-  module Adapter
-    extend MAARS
-  end
-
   module Namespace::InstanceMethods
 
     include Action::InstanceMethods
-
-    Adapter = Adapter  # [#hl-054]
 
     #         ~ resolution methods (in roughly pre-order traversal) ~
 
@@ -1399,8 +1399,24 @@ module Skylab::Porcelain::Legacy
       s2 = s1.collapse_as_namespace nf,
         ext_ref, inline_def, xtra_h, @story_host_module
       @action_box.add s2.normalized_local_node_name, s2
+      @@namespaces << s2  # #todo - integration only
       nil
     end
+
+    # START - this is for during integration *only* # #todo
+    @@namespaces = [ ]  # used for a hack that will be put down soon
+    -> do
+      namespaces = -> do  # you don't get to have the whole array
+        NSs_Read_Only_Pxy = MetaHell::Proxy::Nice.new :length, :[]
+        pxy = NSs_Read_Only_Pxy.new( :length => -> { @@namespaces.length },
+                            :'[]' => -> idx { @@namespaces[ idx ] } )
+        namespaces = -> { pxy } ; pxy
+      end
+      Legacy.class_exec do
+        define_singleton_method :namespaces do namespaces[] end
+      end
+    end.call
+    # END
   end
 
   class Action::Sheet  # (re-opened)
@@ -1432,6 +1448,20 @@ module Skylab::Porcelain::Legacy
   end
 
   class Namespace::Sheet < Action::Sheet
+
+    def name  # #todo - this is for integration only
+      @name_function.as_slug
+    end
+    def aliases  # #todo - this is for integration only
+      alias_a
+    end
+    def for_run mc, slug_fragment  # #todo - integration only
+      action_class.new out: mc.out, err: mc.err,
+        program_name: "#{ mc.program_name } #{ @name_function.as_slug }"
+    end
+    def summary
+      @desc_a || [ "the #{ @name_function.as_slug } action" ]
+    end
 
     def action_subclient request_client
       # take it. [#hl-054]
@@ -1488,8 +1518,8 @@ module Skylab::Porcelain::Legacy
           ext_ref = @ext_ref ; @ext_ref = nil
           if ext_ref.respond_to? :call
             ext_ref.call
-          elsif ::Class === ext_ref
-            ext_ref
+          elsif ext_ref.respond_to? :new  # we used to check is_a? ::Class..
+            ext_ref                       # but this allows for more hacks
           else
             raise ::ArgumentError, "cannot resolve an action class - #{ext_ref}"
           end

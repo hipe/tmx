@@ -1,5 +1,7 @@
 module Skylab::Snag
+
   module Models::Manifest
+
     require_relative 'manifest/file'     # [#sl-124] preload bc toplevel exists
 
     header_width = '[#867] '.length

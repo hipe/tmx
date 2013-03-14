@@ -1,4 +1,5 @@
 module Skylab::Snag
+
   module Services
 
     h = { }

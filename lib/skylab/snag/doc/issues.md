@@ -1,6 +1,7 @@
 [#033]       #tracking-tag non-deterministic smelly tests
 [#032]       see if we can unify find commands org wide #tracking-tag
-[#031]       #done NO. BAD. (horrible event wiring in todo tree)
+[#031]       #done NO. BAD. (horrible event wiring in todo tree) ..
+               and some comments on ui vs. api and so on
 [#030]       #done we would love to have -1, -2 etc
 [#029]       #tracking-tag #pattern of instance_eval for rendering
 [#028]       melt makes patch for whole codebase #deferred

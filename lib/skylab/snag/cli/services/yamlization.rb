@@ -1,35 +1,45 @@
 module Skylab::Snag
 
-  class CLI::Yamlizer
+  class CLI::Services::Yamlization
 
-    def yamlize record
-      line '---'
+    extend PubSub::Emitter
 
-      fmt = "%-#{ @maxlen }s"
+    emits :text_line
+
+    event_factory Snag::API::Events::Datapoint
+
+    def << record
+
+      @y << '---'
 
       record.yaml_data_pairs.each do |field_name, string_value|
-        line "#{ fmt % field_name } : #{ string_value }"
+        @y << "#{ @fmt % field_name } : #{ string_value }"
       end
 
       nil
     end
 
-    alias_method :[], :yamlize
+    # (hack to fail loudly when nothing is listening|)
+
+    m = instance_method :on_text_line
+
+    define_method :on_text_line do |*a, &b|
+      @y ||= ::Enumerator::Yielder.new do |txt|
+        emit :text_line, txt
+        nil
+      end
+      m.bind( self ).call( *a, &b )
+    end
 
   protected
 
-    emitter = PubSub::Emitter.new :line
-
-    define_method :initialize do |field_names, &wiring|
-      @out = emitter.new wiring
-      @maxlen = field_names.reduce( 0 ) do |m, sym|
+    def initialize field_names
+      maxlen = field_names.reduce( 0 ) do |m, sym|
         x = sym.to_s.length
         m > x ? m : x
       end
-    end
-
-    def line line
-      @out.emit :line, line
+      @fmt = "%-#{ maxlen }s"
+      nil
     end
   end
 end

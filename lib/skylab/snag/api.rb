@@ -1,5 +1,7 @@
 module Skylab::Snag
+
   module API
+
     # For no good reason API (the module) is the home of low-level,
     # bootstrappy, zero-config-style config.
 
@@ -41,7 +43,6 @@ module Skylab::Snag
     def build_action normalized_action_name
       # keeping for #posterity, primordial boxxy:
       #path.reduce(self.class) { |m, s| m.const_get(constantize(s)) }.new(self)
-
       API::Actions.const_fetch( normalized_action_name ).new self
     end
 

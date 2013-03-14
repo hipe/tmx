@@ -1,49 +1,50 @@
 module Skylab::Snag
+
   module API::Actions::Nodes
     # gets sexed
   end
 
   class API::Actions::Nodes::Add < API::Action
 
-    inflection.inflect.noun :singular
-
+    attribute :be_verbose
     attribute :do_prepend_open_tag, default: false
-    attribute :dry_run
-    attribute :message,          :required => true
-    attribute :verbose
+    attribute    :dry_run
+    attribute    :message, required: false
 
-    emits :all, :error => :all, :info => :all, :payload => :all
+    emits            info: :lingual,
+                 new_node: :datapoint,
+                 raw_info: :datapoint
 
-    emits :new_node
+    inflection.inflect.noun :singular
 
   protected
 
     def execute
       if nodes
-        @nodes.add message,
-          do_prepend_open_tag,
-          dry_run,
-          verbose,
-          -> n { emit :new_node, n }
+        @nodes.add @message,
+          @do_prepend_open_tag,
+          @dry_run,
+          @be_verbose,
+          -> n do
+            emit :new_node, n
+          end
       end
     end
   end
 
-
   class API::Actions::Nodes::Reduce < API::Action
 
-    inflection.inflect.noun :plural
-
-    attribute :all
+    attribute :be_verbose, default: true
+    attribute :include_all  # (includes invalid nodes)
     attribute :identifier_ref
-    attribute :max_count
+    attribute  :max_count
     attribute :query_sexp
-    attribute :verbose, default: true
 
-    emits payload: :all,
-             info: :all,
-            error: :all,
-     invalid_node: :info  # hm..
+    emits           info: :lingual,
+            invalid_node: :structural,
+             output_line: :datapoint
+
+    inflection.inflect.noun :plural
 
   protected
 
@@ -51,25 +52,29 @@ module Skylab::Snag
       res = nil
       begin
         break if ! nodes # we need them we want them, we want them now
-        sexp = query_sexp.dup if query_sexp
-        if identifier_ref
-          ( sexp ||= [:and] ).push [:identifier_ref, identifier_ref]
+        sexp = @query_sexp.dup if @query_sexp
+        if @identifier_ref
+          ( sexp ||= [ :and ] ).push [ :identifier_ref, @identifier_ref ]
         end
-        if all
+        if @include_all
           if sexp
             error "sorry - it doesn't make sense to use `all` with any #{
-            }other search criteria"
+              }other search criteria"
             break( res = false )
           else
-            sexp = [:all]
+            sexp = [ :all ]
           end
         end
-        sexp ||= [:valid]
-        found = nodes.find( max_count, sexp ) or break( res = found )
-        @render_item = if verbose
-          build_yamlizer
+        sexp ||= [ :valid ]
+        found = nodes.find( @max_count, sexp ) or break( res = found )
+        @lines = Snag::Services::Yielder::Mono.new do |txt|
+          emit :output_line, txt
+          nil
+        end
+        @y = if @be_verbose
+          render_node_as_yaml
         else
-          build_terse_node_renderer
+          render_node_tersely
         end
         res = render_nodes found
       end while nil
@@ -78,36 +83,30 @@ module Skylab::Snag
 
     # --*--
 
-    def build_terse_node_renderer
-      -> node do
-        emit :payload, node.first_line
-        if node.extra_lines_count > 0
-          node.extra_lines.each do |line|
-            emit :payload, line
-          end
-        end
+    def render_node_tersely
+      m = @lines.method( :<< )
+      ::Enumerator::Yielder.new do |n|
+        @lines << n.first_line
+        n.extra_lines.each(& m ) if n.extra_lines_count.nonzero?
         nil
       end
     end
 
     field_names = Snag::Models::Node::Flyweight.field_names
 
-    define_method :build_yamlizer do
-      Snag::CLI::Yamlizer.new field_names do |o|
-        o.on_line do |e|
-          emit :payload, e
-          nil
-        end
-      end
+    define_method :render_node_as_yaml do
+      o = Snag::CLI::Services::Yamlization.new field_names
+      o.on_text_line(& @lines.method( :<< ) )
+      o
     end
 
     def render_nodes nodes
       info "(looking at #{ escape_path manifest_pathname })"
       nodes.with_count!.each do |node|
         if node.valid?
-          @render_item[ node ]
+          @y << node
         else
-          emit :invalid_node, node.invalid_reason.to_h
+          emit :invalid_node, node.invalid_reason.to_hash
         end
       end
       ct = nodes.seen_count

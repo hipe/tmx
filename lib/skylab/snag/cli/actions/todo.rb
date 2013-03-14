@@ -11,37 +11,51 @@ module Skylab::Snag
       pattern_option o
       name_option o
       o.on '-t', '--tree', 'experimental tree rendering (try -t -t)' do
-        param_h[:show_tree] ||= 0
-        param_h[:show_tree] += 1
+        param_h[:tree_level] ||= 0
+        param_h[:tree_level] += 1
       end
       verbose_option o
       nil
     end
 
-    def find *path
-      action = api.build_action [:to_do, :report]
-      wire_action_for_info action
-      wire_action_for_error action
-      action.on_number_found do |e|
-        e = Integration_Hack_Data[ e ]
-        info "(found #{ e.count } item#{ s e.count })"
+    build_tree = nil
+
+    define_method :find do |path, *paths|
+      paths.unshift( path ) ; path = nil
+      @param_h[ :paths ] = paths ; paths = nil
+      if @param_h.key? :tree_level
+        tree_level = @param_h.delete :tree_level
       end
-      tree_pretty_level = param_h.delete :show_tree
-      if tree_pretty_level
-        tree = CLI::ToDo::Tree.new request_client, ( tree_pretty_level > 1 )
-        action.on_payload do |e|
-          tree << e.stream_name  # #todo integration only
+      tree = nil
+      res = api_invoke [ :to_do, :report ], @param_h do |a|
+        a.on_info handle_info
+        a.on_error handle_error
+        a.on_command do |cmd|
+          payload cmd
         end
-      else
-        action.on_payload do |e|
-          self.payload e
+        a.on_number_found do |num|
+          info "(found #{ num } item#{ s num })"
+        end
+        if tree_level
+          tree = build_tree[ a, tree_level, request_client ]
+        else
+          a.on_todo do |t|
+            payload t.upstream_output_line
+          end
         end
       end
-      res = action.invoke( { paths: path }.merge param_h )
-      if tree
+      if tree && res
         res = tree.render
       end
       res
+    end
+
+    build_tree = -> action, level, request_client do
+      tree = CLI::ToDo::Tree.new request_client, ( level > 1 )
+      action.on_todo do |todo|
+        tree << todo  # with each todo, build the tree
+      end
+      tree
     end
 
     # --*--
@@ -55,11 +69,28 @@ module Skylab::Snag
       verbose_option o
     end
 
+    desc do |y|  # #todo - can you melt me
+      df = API::Actions::ToDo::Melt.attributes[ :paths ][ :default ]
+      df.map!(& method( :ick ))
+      y << 'arguments:'
+      s = "  #{ param :path }  the path(s) to search (default: #{ df * ', '})"
+      y << s
+      nil
+    end
+
     def melt *path
-      action = api_build_wired_action [:to_do, :melt]
-      action.invoke( {
-        dry_run: false, paths: path, verbose: false
-      }.merge param_h )
+      if path.length.zero?  # triggering dflts to list params is not automatic
+        path.concat API::Actions::ToDo::Melt.attributes[ :paths ][ :default ]
+      end
+      api_invoke [ :to_do, :melt ],
+        {           dry_run: false,
+                      paths: path,
+                 be_verbose: false }.merge!( param_h ), -> a do
+        a.on_payload handle_payload
+        a.on_info handle_info
+        a.on_raw_info handle_raw_info
+        a.on_error handle_error
+      end
     end
 
   protected

@@ -13,8 +13,13 @@ module Skylab::Snag
 
     def close node_ref
       api_invoke [ :node, :close ], {
-          dry_run: false, node_ref: node_ref, verbose: false,
-        }.merge( param_h )
+                 be_verbose: false,
+                    dry_run: false,
+                   node_ref: node_ref
+        }.merge( param_h ) do |a|
+        a.on_info handle_info
+        a.on_error handle_error
+      end
     end
   end
 
@@ -34,23 +39,31 @@ module Skylab::Snag
     end
 
     def add node_ref, tag_name
-      api_invoke [:node, :tags, :add],
-        { dry_run: false,
-          node_ref: node_ref,
-          do_append: true,
-          tag_name: tag_name,
-          verbose: false }.merge( param_h )
+      api_invoke [ :node, :tags, :add ], {
+                 be_verbose: false,
+                  do_append: true,
+                    dry_run: false,
+                   node_ref: node_ref,
+                   tag_name: tag_name
+      }.merge( param_h ) do |a|
+        a.on_error handle_error
+        a.on_info do |e|
+          require 'debugger' ; debugger ; 1==1||nil
+
+        end
+      end
     end
 
     desc 'list the tags for a given node.'
 
     def ls node_ref
-      api_invoke( [:node, :tags, :ls],
+      api_invoke(
+        [ :node, :tags, :ls ],
         { node_ref: node_ref },
-        -> api_action do
-          wire_action_for_error api_action
-          api_action.on_payload do |e|         # just for fun we make the
-            payload e.payload.render_for( self ) # payload crunchy
+        -> o do
+          o.on_error handle_error
+          o.on_tags do |tags|
+            payload tags.render_under( self )  # just for fun i tell you
             nil
           end
         end )
@@ -64,9 +77,11 @@ module Skylab::Snag
     end
 
     def rm node_ref, tag_name
-      api_invoke [:node, :tags, :rm],
+      api_invoke( [ :node, :tags, :rm ],
         { dry_run: false, node_ref: node_ref, tag_name: tag_name,
-          verbose: false }.merge( param_h )
+          verbose: false }.merge( param_h ) ) do |a|
+          fail 'ok'
+        end
     end
   end
 end

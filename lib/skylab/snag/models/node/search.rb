@@ -1,5 +1,7 @@
 module Skylab::Snag
+
   class Models::Node::Search
+
     include Snag::Core::SubClient::InstanceMethods
 
     def self.new_valid request_client, max_count, query_sexp
@@ -108,7 +110,7 @@ module Skylab::Snag
         tag = sexp[1]
         normalized_tag_name = Models::Tag.normalize tag,
           -> invalid do
-            request_client.send :error, ( invalid.render_for request_client )
+            request_client.send :error, ( invalid.render_under request_client )
           end
         if normalized_tag_name
           new request_client, normalized_tag_name
@@ -139,10 +141,10 @@ module Skylab::Snag
         identifier_body = sexp[1] # prefixes might bite [#019]
         normalized = Models::Identifier.normalize identifier_body,
           -> invalid do
-            request_client.send :error, ( invalid.render_for request_client )
+            request_client.send :error, ( invalid.render_under request_client )
           end,
           -> info do
-            request_client.send :info, ( info.render_for request_client )
+            request_client.send :info, ( info.render_under request_client )
           end
         normalized ? new( request_client, normalized ) : normalized
       end

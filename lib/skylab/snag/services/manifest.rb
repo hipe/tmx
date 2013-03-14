@@ -28,7 +28,7 @@ module Skylab::Snag
       end
     end
 
-    def add_node node, dry_run, verbose, escape_path, error, info
+    def add_node node, dry_run, verbose_x, escape_path, error, info, raw_info
       res = false
       begin
         greatest, extern_h = greatest_node_integer_and_externals
@@ -43,17 +43,17 @@ module Skylab::Snag
           end
         end
         res = edit_lines 0, render_lines( node, int ), dry_run, escape_path,
-          verbose, error, info
+          verbose_x, error, info, raw_info
         break if ! res
         info[ "done." ]
       end while nil
       res
     end
 
-    def change_node node, dry_run, verbose, escape_path, error, info
+    def change_node node, dry_run, verbose_x, escape_path, error, info, raw_info
       lines = render_lines node
       edit_lines node.identifier.render, lines, dry_run, escape_path,
-        verbose, error, info
+        verbose_x, error, info, raw_info
     end
 
     def pathname
@@ -82,7 +82,7 @@ module Skylab::Snag
       end
     end
 
-    change_lines = -> error, file, info, lines, rendered_identifier do
+    change_lines = -> error, file, info, raw_info, lines, rendered_identifier do
       -> fh do
         write = write_f[ fh ]
         res = nil
@@ -113,7 +113,7 @@ module Skylab::Snag
       end
     end
 
-    prepend_lines = -> file, info, lines do
+    prepend_lines = -> file, info, raw_info, lines do
       -> fh do
         write = write_f[ fh ]
         if lines.length.nonzero?
@@ -125,7 +125,7 @@ module Skylab::Snag
           end
         end
         lines.each do |l|                      # ~ put the newlines at the top ~
-          info[ l ] if many
+          raw_info[ l ] if many
           write[ l ]
         end
         file.normalized_lines.each do |lin|    # (#open-filehandle)
@@ -149,12 +149,13 @@ module Skylab::Snag
     # called when the node lines are not found for a `node_ref`.
 
     define_method :edit_lines do
-      |lines_ref, lines, dry_run, escape_path, verbose, error, info|
+      |lines_ref, lines, dry_run, escape_path, be_verbose, error, info,
+        raw_info|
 
       res = false
       begin
         fail "implement me - create file" if ! pathname.exist?
-        fu = self.fu escape_path, verbose, info
+        fu = self.fu escape_path, be_verbose, info
         tmpdir_pathname = self.tmpdir_pathname dry_run, fu, error
         break if ! tmpdir_pathname
         tmpold = tmpdir_pathname.join 'issues-prev.md'
@@ -163,9 +164,9 @@ module Skylab::Snag
           fu.rm tmpnew, noop: dry_run
         end
         write = if 0 == lines_ref
-          prepend_lines[ file, info, lines ]
+          prepend_lines[ file, info, raw_info, lines ]
         else
-          change_lines[ error, file, info, lines, lines_ref ]
+          change_lines[ error, file, info, raw_info, lines, lines_ref ]
         end
         if dry_run
           write[ dev_null ]                    # sneaky
@@ -192,13 +193,13 @@ module Skylab::Snag
     end
 
                                                # Using a hacky regex, scan
-    def fu escape_path, verbose, info          # all messages emitted
+    def fu escape_path, be_verbose, info       # all messages emitted
       rx = Headless::CLI::PathTools::FUN.absolute_path_hack_rx
       fu = Headless::IO::FU.new( -> str do     # from the file utils client,
         s = str.gsub( rx ) do                  # and run everything that looks
           escape_path[ $~[0] ]                 # like an absolute path thru
         end                                    # the `escape_path` implemen.
-        info[ s ] if verbose                   # *of the modality client*
+        info[ s ] if be_verbose                # *of the modality client*
       end )                                    # In turn, emit this messages
       fu                                       # as info to the same client.
     end

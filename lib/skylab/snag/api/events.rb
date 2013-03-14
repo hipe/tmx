@@ -1,51 +1,92 @@
 module Skylab::Snag
-  # this whole file is only for during integration!
-  class API::MyEvent < PubSub::Event::Unified
 
-    def message= msg # parent class doens't provide this
-      @msg = msg
-    end
+  module API::Events
 
-    def msg # it derps over on payload.to_s without this # #todo
-      if @msg then
-        if ::String === @msg then @msg else
-          require 'debugger' ; debugger ; 1==1
-        end
-      else
-        if ::String === @stream_name then
-          @stream_name
-        elsif @stream_name.respond_to? :payload_a
-          @stream_name.payload_a[0]
-        else
-          @stream_name.to_s
-        end
+    extend MetaHell::Boxxy
+
+    terminal_stream_names = nil
+
+    define_singleton_method :terminal_stream_names do
+      terminal_stream_names ||= constants.map(& Headless::Name::FUN.normify )
+    end  # (for debugging, reflect e.g [:datapoint, :lingual, :structural])
+
+    module Datapoint
+      def self.event graph, stream, act, x
+        x
+      end
+      def self.call graph, stream, x
+        # (hack it so it can be used as a factory by CLI::Services::Yamlization)
+        x
       end
     end
 
-    # silly fun
-    attr_accessor :inflection
+    Structural = -> do
+      o = PubSub::Event::Factory::Structural.new 5  # sanity - max
+      class << o
+        alias_method :snag_original_event, :event
+        def event _, __, ___, payload_h
+          snag_original_event _, __, payload_h
+        end
+      end
+      o
+    end.call
+  end
+
+  class API::Events::Lingual < PubSub::Event::Unified
+
+  public
+
+    #         ~ nlp assistance hack ~
+
+    attr_writer :inflection
+
     def noun
-      inflection.inflected.noun
+      @inflection.inflected.noun
     end
+
     def verb
-      inflection.stems.verb
+      @inflection.stems.verb
     end
 
-    def does_render_for
-      @stream_name.respond_to? :render_for  # #todo integration only
+    #         ~ experimental autonomously rendering events ~
+
+    attr_reader :can_render_under
+
+    def render_under x
+      @upstream_event.render_under x
     end
 
-    def render_for x  # #todo integration only
-      if ::String === @stream_name
-        @stream_name
+    def fetch_text &otr
+      if @text then @text
+      elsif @upstream_event then @upstream_event.fetch_text(& otr )
       else
-        @stream_name.render_for x
+        ( otr || -> { raise ::RuntimeError, "no text" } )[]
       end
     end
 
-    def initialize *a
-      @msg = nil
-      super
+    class << self
+      alias_method :event, :new
+    end
+
+    def initialize a, b, act, x
+      super a, b
+      @inflection = act.class.inflection
+      @can_render_under =
+      if x.respond_to? :can_render_under
+        if x.can_render_under
+          @upstream_event = x
+          @text = nil
+          true
+        else
+          @upstream_event = x
+          @text = nil
+          false
+        end
+      else
+        @upstream_event = nil
+        @text = x
+        nil
+      end
     end
   end
 end

@@ -1,8 +1,10 @@
 module Skylab::Snag
+
   module Model
   end
 
   class Model::Event < ::Struct
+
     extend Headless::Model::Event # `normalized_event_name`
 
     EVENTS_ANCHOR_MODULE = Snag::Models
@@ -15,16 +17,29 @@ module Skylab::Snag
       end
     end
 
+    # --*--
+
+
+    def is_event  # compat
+      true
+    end
+
+    #         ~ zany messsage experiment ~
+
     def self.build_message message_lambda
       define_method :message_lambda do message_lambda end
     end
 
-    def render_for request_client
-      Model::Event::SubClient.for( self.class ).
-        new( request_client, self ).render
+    def message_lambda
     end
 
-    def message_lambda
+    def can_render_under  # compat
+      !! message_lambda
+    end
+
+    def render_under request_client
+      Model::Event::SubClient.for( self.class ).
+        new( request_client, self ).render
     end
   end
 

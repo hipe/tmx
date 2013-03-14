@@ -1,4 +1,5 @@
 module Skylab::Snag
+
   module Models::Date
 
     valid_date_rx = %r{ \A \d{4} - \d{2} - \d{2} \z }x

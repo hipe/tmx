@@ -1,4 +1,5 @@
 module Skylab::Snag
+
   class Models::Node::Flyweight
 
     field_names = [
