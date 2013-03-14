@@ -702,9 +702,14 @@ module Skylab::Porcelain::Bleeding
     end
   end
 
+  module Adapter   # for "ouroboros" ([#hl-069]).
+    extend MetaHell::Autoloader::Autovivifying::Recursive
+  end
+
   class Runtime
     extend Action
     include Namespace::InstanceMethods
+    Adapter = Adapter # see above. monadic.
 
     def actions
       Actions[ Constants[action_anchor_module], Officious.actions ]

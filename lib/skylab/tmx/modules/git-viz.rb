@@ -1,11 +1,7 @@
-require File.expand_path('../../../../git-viz/cli', __FILE__)
+require File.expand_path('../../../git-viz/cli', __FILE__)
 
-module Skylab
-  module Tmx
-    module CovTree
-      extend ::Skylab::Porcelain
-      namespace :'git-viz', ::Skylab::GitViz::Cli
-    end
-  end
+class Skylab::TMX::CLI
+
+  namespace :'git-viz', -> { ::Skylab::GitViz::CLI }
+
 end
-

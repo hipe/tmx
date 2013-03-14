@@ -18,7 +18,7 @@ module Skylab::Treemap::TestSupport::CLI
   end
 
   module InstanceMethods
-    include CONSTANTS # `TestSupport` is called upon in i.m's
+    include CONSTANTS  # `TestSupport` is called upon in i.m's
 
     def _num_streams
       :set_number_of_streams_with_num_streams
@@ -99,7 +99,7 @@ module Skylab::Treemap::TestSupport::CLI
     def tmx_cli # (was [#051] legacy test wiring)
       @tmx_cli ||= begin
         require 'skylab/tmx/cli'
-        cli = ::Skylab::Tmx::Cli.new( program_name: 'tmx',
+        cli = ::Skylab::TMX::CLI.new( program_name: 'tmx',
           out: stream.sout, err: stream.serr )
         cli
       end

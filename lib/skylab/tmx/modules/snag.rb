@@ -1,10 +1,7 @@
-require_relative '../../../snag/core'
+require 'skylab/snag/core'
 
-module Skylab
-  module Tmx
-    module Snag
-      extend ::Skylab::Porcelain::Legacy::DSL
-      namespace :snag, ::Skylab::Snag::CLI
-    end
-  end
+class Skylab::TMX::CLI
+
+  namespace :snag, -> { ::Skylab::Snag::CLI }
+
 end

@@ -20,7 +20,7 @@ module Skylab::Yacc2Treetop::TestSupport
       let(:_frame) do
         errstream = ::Skylab::TestSupport::IO::Spy.standard
         outstream = ::Skylab::TestSupport::IO::Spy.standard
-        cli = Yacc2Treetop::Cli.new(outstream, errstream)
+        cli = Yacc2Treetop::CLI.new(outstream, errstream)
         cli.program_name = 'yacc2treetop'
         o = ::Struct.new(:debug_f, :err_f, :out_f).new # 'joystick'
         o.debug_f = ->{ outstream.debug!; errstream.debug! }

@@ -1,8 +1,8 @@
 require File.expand_path('../api', __FILE__)
 
-module Skylab::Tmx
+module Skylab::TMX
   module Modules::TeamCity
-    class Cli < Skylab::Face::Cli
+    class CLI < Skylab::Face::CLI
       namespace(:"team-city", :tc) do
         external_dependencies File.expand_path('../data/deps.json', __FILE__)
       end

@@ -1,4 +1,4 @@
-module Skylab::Tmx::Modules::Bleed::Api
+module Skylab::TMX::Modules::Bleed::API
   class BashAction < Action
     emits :bash
     def env_path

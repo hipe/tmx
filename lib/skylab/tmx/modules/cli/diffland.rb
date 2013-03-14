@@ -1,6 +1,6 @@
 require 'open3'
 
-module Skylab::Tmx::Modules::Cli
+module Skylab::TMX::Modules::CLI
   module Diffland
     extend Skylab::Face::Colors
     class << self

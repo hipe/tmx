@@ -2,8 +2,8 @@ require File.expand_path('../api', __FILE__)
 # (requires at bottom!)
 
 module Skylab::GitViz
-  class Cli
-    include Api::InstanceMethods
+  class CLI
+    include API::InstanceMethods
 
     ROOT = Pathname.new('..').expand_path(__FILE__)
     extend ::Skylab::Porcelain
@@ -30,11 +30,11 @@ module Skylab::GitViz
     def porcelain_dispatch *a
       meth = runtime.stack.top.action.name
       require self.class::ROOT.join("cli/actions/#{meth}").to_s
-      Cli::Actions::const_get(camelize meth).new(runtime).invoke(*a)
+      CLI::Actions::const_get(camelize meth).new(runtime).invoke(*a)
     end
   end
 
-  module Cli::Actions
+  module CLI::Actions
   end
 end
 

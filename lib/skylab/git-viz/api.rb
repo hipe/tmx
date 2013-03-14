@@ -1,7 +1,7 @@
 # (requires happen at the bottom!)
 
 module Skylab::GitViz
-  class Api < Struct.new(:runtime)
+  class API < ::Struct.new :runtime
     ROOT = Pathname.new('..').expand_path(__FILE__)
     def emit(*a)
       runtime.emit(*a)
@@ -13,7 +13,7 @@ module Skylab::GitViz
     def invoke req
       meth = runtime.stack.top.action.name.to_s
       require ROOT.join("api/actions/#{meth}").to_s
-      k = Api::Actions.const_get(camelize meth)
+      k = API::Actions.const_get(camelize meth)
       k.new(self, req).invoke
     end
     define_method(:root) { ROOT }
@@ -32,19 +32,19 @@ module Skylab::GitViz
       end
     end
   end
-  class << Api
+  class << API
     attr_reader :instance
   end
-  module Api::Actions
+  module API::Actions
   end
-  module Api::Model
+  module API::Model
   end
-  module Api::InstanceMethods
+  module API::InstanceMethods
     def camelize s
       s.to_s.gsub(/(?:^|-)([a-z])/) { $1.upcase }
     end
   end
-  Api.send(:include, Api::InstanceMethods)
+  API.send(:include, API::InstanceMethods)
 end
 
 require File.expand_path('../api/action', __FILE__)

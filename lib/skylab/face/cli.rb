@@ -2,7 +2,7 @@ module Skylab::Face
 
   # `Face`
   #   + wraps around ::OptionParser by default
-  #   + renders *styled* help screens and the usual help UI
+  #   + renders styled help screens and the usual help UI
   #   + arbitrarily deeply nested sub-commands (namespaces)
   #   + nodes (commands and namespaces) can have aliases
   #   + fuzzy matching
@@ -57,7 +57,6 @@ module Skylab::Face
   protected  # `run` support (pre-order)
 
     def invoked argv  # funny n-ame to distinguish it from `invoke` is important!
-      # (removed checks for `invoke` for now)
       if argv.length.zero?
         _, res = empty_argv
         res
@@ -71,6 +70,10 @@ module Skylab::Face
           stay, res = branch.find_command argv
           stay or break
           cmd = res
+          if cmd.respond_to? :invokee
+            stay = false
+            break( res = cmd.invokee.invoke argv )
+          end
           cmd.respond_to? :find_command or break
           branch = cmd  # tail-call like
         end while argv.length.nonzero?
@@ -114,7 +117,7 @@ module Skylab::Face
       @program_name || ::File.basename( $PROGRAM_NAME )
     end
 
-    attr_reader :margin, :out, :err
+    attr_reader :margin, :in, :out, :err
 
   protected
 
@@ -123,6 +126,7 @@ module Skylab::Face
       margin, out, err = '  '.freeze, $stdout, $stderr
 
       opt_h_h = {
+        in:  -> v { @in  = v },
         out: -> v { @out = v },
         err: -> v { @err = v },
         program_name: -> v { @program_name = v },
@@ -140,6 +144,7 @@ module Skylab::Face
         end
         @program_name ||= nil
         @margin ||= margin
+        # (we let @in remain unset, it does not get defaulted. it is special)
         @out ||= out
         @err ||= err
         @y = ::Enumerator::Yielder.new(& @err.method( :puts ) )  # `help_yielder`

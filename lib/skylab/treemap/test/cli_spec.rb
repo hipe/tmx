@@ -10,7 +10,7 @@ module Skylab::Treemap::TestSupport::CLI
 
     it "is available under the 'tmx' executable" do
       tmx_cli.run ['-h']
-      sout.scan( /^ +treemap\b/ ).length.should eql( 1 )
+      serr.scan( /^ +treemap\b/ ).length.should eql( 1 )
     end
 
     it "lists render in the help screen" do

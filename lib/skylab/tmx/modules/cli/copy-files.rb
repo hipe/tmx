@@ -1,4 +1,4 @@
-module Skylab::Tmx::Modules::Cli
+module Skylab::TMX::Modules::CLI
   module CopyFiles
     class MalformedRequest < ::RuntimeError ; end
     def copy_files files, src_dir, dst_dir, &handlers_definition

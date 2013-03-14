@@ -1,4 +1,4 @@
-module Skylab::Tmx::Modules::Bleed::Api
+module Skylab::TMX::Modules::Bleed::API
   class Actions::Unbleed < BashAction
     def invoke
       parts = env_path.split(':')

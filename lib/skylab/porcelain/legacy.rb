@@ -750,6 +750,7 @@ module Skylab::Porcelain::Legacy
       render_invite_to_even_more_help y
       nil
     end
+    public :help
 
     def render_desc y
       a = @action_sheet.description_lines
@@ -944,6 +945,13 @@ module Skylab::Porcelain::Legacy
       end
       "{#{ arr * '|' }}"
     end
+
+    def syntax_text  # (used in listings sometimes)
+      "#{ didactic_invocation_string }#{
+        }{#{ self.class.story.actions.visible.map(& :slug ) * '|' }} #{
+        }[opts] [args]"
+    end
+    public :syntax_text
 
     def render_options y
       nil  # yes, no.

@@ -1,11 +1,10 @@
-module Skylab::Face::CLI
+module Skylab::Face
 
-  module Tableize
+  module CLI::Tableize
     # empty
   end
 
-
-  module Tableize::InstanceMethods
+  module CLI::Tableize::InstanceMethods
     def tableize rows, opts = {}, &line_f
       opts = { show_header: true }.merge(opts)
       keys_order = []

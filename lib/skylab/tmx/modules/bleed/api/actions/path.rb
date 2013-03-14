@@ -1,4 +1,4 @@
-module Skylab::Tmx::Modules::Bleed::Api
+module Skylab::TMX::Modules::Bleed::API
   class Actions::Path < Action
     emits :path # note this is not added to the 'all' network (no touching hacks needed)
     def get_path

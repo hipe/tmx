@@ -1,4 +1,4 @@
-module Skylab::Tmx::Modules::Bleed::Api
+module Skylab::TMX::Modules::Bleed::API
   module MyPathTools
     def contract_tilde path
       path.sub(%r{^#{Regexp.escape ENV['HOME']}/}, '~/')
@@ -12,7 +12,7 @@ module Skylab::Tmx::Modules::Bleed::Api
     include MyPathTools
 
     def config
-      @config ||= ::Skylab::Tmx::Model::Config.build
+      @config ||= ::Skylab::TMX::Model::Config.build
     end
     def config_get_path
       (o = config['bleed']) or return error("section not found in #{config.pretty}: [bleed]")

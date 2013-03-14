@@ -108,7 +108,7 @@ module Skylab::MetaHell
 
     def if? name, found, not_found
       if @hash.key? name
-        found[ @hash.fetch name ]
+        found[ @hash.fetch name ] if found
       else
         not_found ||= -> { raise ::NameError, "name not found: #{name.inspect}"}
         x = not_found.arity.abs

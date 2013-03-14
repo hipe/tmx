@@ -1,5 +1,5 @@
-module Skylab::Tmx::Modules::Cli
-  class Cli < Skylab::Face::Cli
+module Skylab::TMX::Modules::CLI
+  class CLI < Skylab::Face::CLI
     namespace :cli do
       o :pull do |op, req|
         syntax "#{invocation_string} [opts] <source>"
@@ -11,7 +11,7 @@ module Skylab::Tmx::Modules::Cli
       end
       def pull req, source
         require "#{File.dirname(__FILE__)}/api"
-        Api::Pull.run(self, source, req)
+        API::Pull.run(self, source, req)
       end
       o :push do |op, req|
         syntax "#{invocation_string} [opts] <target>"
@@ -23,7 +23,7 @@ module Skylab::Tmx::Modules::Cli
       end
       def push req, target
         require "#{File.dirname(__FILE__)}/api"
-        Api::Push.run(self, target, req)
+        API::Push.run(self, target, req)
       end
     end
   end

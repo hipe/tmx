@@ -1,7 +1,7 @@
 require_relative 'api'
 
-module Skylab::Tmx::Modules
-  class Bleed::Cli < Skylab::Face::Cli
+module Skylab::TMX::Modules
+  class Bleed::CLI < Skylab::Face::CLI
     namespace(:bleed) do
       default_action :load
       summary "run a bleeding edge version of tmx"
@@ -21,7 +21,7 @@ module Skylab::Tmx::Modules
       end
 
       o do |op, ctx|
-        op.banner = "Inits a #{Skylab::Tmx::Model::Config::PATH}"
+        op.banner = "Inits a #{Skylab::TMX::Model::Config::PATH}"
       end
       def init ctx
         api(:init, ctx) do |o|
@@ -49,7 +49,7 @@ module Skylab::Tmx::Modules
     private
 
       def api *a, &b
-        @api ||= Bleed::Api.build
+        @api ||= Bleed::API.build
         0 < a.length ? @api.invoke(*a, &b) : @api
       end
       def file_events prefix, o
