@@ -1,7 +1,7 @@
 require_relative 'core'
 
 module Skylab::FileMetrics
-  class CLI < ::Skylab::Face::Cli
+  class CLI < ::Skylab::Face::CLI
     extend ::Skylab::Autoloader
 
     # lost indent

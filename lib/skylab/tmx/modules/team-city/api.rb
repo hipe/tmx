@@ -1,9 +1,9 @@
 require 'fileutils'
 require 'json'
 
-module Skylab::Tmx
+module Skylab::TMX
   module Modules::TeamCity
-    module Api
+    module API
 
     end
   end

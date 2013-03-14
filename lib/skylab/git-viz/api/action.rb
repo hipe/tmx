@@ -1,6 +1,6 @@
 module Skylab::GitViz
   fail 'we jangled the below 2 lines a bit but you get to do the rest'
-  class Api::Action < ::Struct.new :api, :params
+  class API::Action < ::Struct.new :api, :params
     extend MetaHell::Formal::Attribute::Definer
 
     meta_attribute :pathname
@@ -13,7 +13,7 @@ module Skylab::GitViz
       self.class.defaults.each { |k, v| send("#{k}=", v) }
     end
   end
-  class << Api::Action
+  class << API::Action
     attr_reader :defaults
     def inherited mod
       mod.instance_variable_set('@defaults', {})

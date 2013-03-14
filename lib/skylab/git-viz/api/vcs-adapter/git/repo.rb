@@ -4,7 +4,7 @@
 # other VCS's like hg; and to insulate ourselves from implementations in general
 #
 
-module Skylab::GitViz::Api::VcsAdapter
+module Skylab::GitViz::API::VcsAdapter
   class Git::Repo < Struct.new(:focus_path, :native, :root)
     @@instances = {}
     def self.instances ; @@instances end

@@ -1,3 +1,4 @@
+[#069]       #doc-point (sorry to jump ahead) "ouroboros"
 [#059]       #tracking places where we nerk with detecting o.p dflt --help -h
 [#058]       #doc-point narrative pre-order ("outside-in") ..
 [#057] #open see how throwing a :terminate could help with o.p deep graphs

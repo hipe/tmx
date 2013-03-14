@@ -1,4 +1,4 @@
-module Skylab::Tmx::Modules::Bleed::Api
+module Skylab::TMX::Modules::Bleed::API
   class Actions::Load < BashAction
     def invoke
       (config_read and dir = config_get_path) or return

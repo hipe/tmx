@@ -117,7 +117,7 @@ module TmxGit
   DefaultUi = Struct.new(:out, :err).new($stdout, $stderr)
   module Push
     class InvalidRequestError < RuntimeError; end
-    class Cli
+    class CLI
       include Colors
       attr_reader :ui
       def program_name
@@ -172,7 +172,7 @@ module TmxGit
           return invite_help(e)
         end
         begin
-          Api.new(ui, req).push
+          API.new(ui, req).push
         rescue InvalidRequestError => e
           return invite_help(e)
         end
@@ -185,7 +185,7 @@ module TmxGit
         false
       end
     end
-    class Api
+    class API
       include Colors
       def initialize *a
         @ui, @req = a
@@ -703,5 +703,5 @@ module TmxGit
 end
 
 if __FILE__ == $PROGRAM_NAME
-  TmxGit::Push::Cli.new.run ARGV
+  TmxGit::Push::CLI.new.run ARGV
 end

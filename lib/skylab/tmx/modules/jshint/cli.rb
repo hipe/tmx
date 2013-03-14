@@ -1,8 +1,8 @@
 require 'skylab/face/cli'
 
-module Skylab::Tmx
+module Skylab::TMX
   module Modules::Jshint
-    class Cli < Skylab::Face::Cli
+    class CLI < Skylab::Face::CLI
       namespace :"jshint" do
         def install *a
           Plumbing.new.run
@@ -12,7 +12,7 @@ module Skylab::Tmx
   end
 end
 
-module ::Skylab::Tmx::Modules::Jshint
+module ::Skylab::TMX::Modules::Jshint
   class Plumbing
     def run
       require 'json'

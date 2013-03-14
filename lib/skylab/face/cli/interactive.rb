@@ -1,4 +1,4 @@
-class Skylab::Face::Cli
+class Skylab::Face::CLI
   class Interactive
     def self.run ui, opts, request
       new(ui, opts, request).run

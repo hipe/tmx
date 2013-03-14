@@ -1,4 +1,4 @@
-module Skylab::Tmx::Modules::Bleed::Api
+module Skylab::TMX::Modules::Bleed::API
   class Actions::Init < Action
     def invoke
       if config.exist?

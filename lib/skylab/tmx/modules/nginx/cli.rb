@@ -1,8 +1,8 @@
 require 'skylab/face/cli/external-dependencies'
 
-module Skylab::Tmx
+module Skylab::TMX
   module Modules::Nginx
-    class Cli < Skylab::Face::Cli
+    class CLI < Skylab::Face::CLI
       namespace :"nginx" do
         external_dependencies File.expand_path('../data/deps.json', __FILE__)
       end

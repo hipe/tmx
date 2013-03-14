@@ -1,5 +1,5 @@
 module Skylab::GitViz
-  class Cli::Actions::HistTree < Cli::Action
+  class CLI::Actions::HistTree < CLI::Action
     def invoke req
       tree = api.invoke(req) or return tree
       tree.text do |row|

@@ -1,6 +1,6 @@
 require File.expand_path('../file-node', __FILE__)
 
-module Skylab::GitViz::Api::Model
+module Skylab::GitViz::API::Model
   class FileTree < FileNode
   end
 
