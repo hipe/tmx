@@ -1,90 +1,170 @@
 module Skylab::FileMetrics
 
   module API
-   class RuntimeError         < ::RuntimeError; end
-   class SystemInterfaceError <   RuntimeError; end
+    module Common
+    end
+
+    class RuntimeError < ::RuntimeError
+    end
+
+    class SystemError < ::SystemCallError
+    end
   end
 
+  module API::Common::ModuleMethods
 
-  module API::CommonModuleMethods
-    def run(*a) ; new(*a).run ; end
+    def run *a
+      new(* a ).run
+    end
   end
 
-  module API::CommonInstanceMethods
-    include Common::PathTools::InstanceMethods
+  module API::Common::InstanceMethods
+
+  protected
 
     def initialize *a
       @ui, @req = a
     end
 
-    def count_lines files, label=nil
-      (_filters =
-      [ (%s{grep -v '^[ \t]*$'} unless @req[:count_blank_lines]),
-        (%s{grep -v '^[ \t]*#'} unless @req[:count_comment_lines])
-      ].compact).empty? and return linecount_using_wc(files)
-      cmd_tail = "#{_filters.join(' | ')} | wc -l"
-      count = Models::Count.new(label || '.') # count.add_child(Models::Count.new($2, $1.to_i))
-      files.each do |file|
-        cmd = "cat #{escape_path(file)} | #{cmd_tail}"
-        @req[:show_commands] and @ui.err.puts(cmd)
-        _ = %x{#{cmd}}
-        if _ =~ /\A[[:space:]]*(\d+)[[:space:]]*\z/
-          count.add_child(Models::Count.new(file, $1.to_i))
+    def error msg
+      @ui.err.puts msg
+      false
+    end
+
+    -> do
+      nilf = -> _ { } ; vp = nil
+      define_method :count_lines do |file_a, label=nil|
+        filter_a = []
+        plus, minus = if ! @req.fetch( :info_volume ) then [ nilf, nilf ] else
+          [ vp[ 'include' ], vp[ 'exclude' ] ]
+        end
+        if @req[:count_blank_lines] then plus[ :blank_lines ] else
+          minus[ :blank_lines ]
+          filter_a << "grep -v '^[ \t]*$'"
+        end
+        if @req[:count_comment_lines] then plus[ :comment_lines ] else
+          filter_a << "grep -v '^[ \t]*#'"
+        end
+        label ||= '.'
+        count = if filter_a.length.nonzero?
+          linecount_using_grep_chain file_a, filter_a, label
         else
-          count.add_child(Models::Count.new(file, 0, :notice => "(parse failed: #{_})"))
+          linecount_using_wc file_a, label
+        end
+        if count
+          count.collapse_and_distribute
+        end
+        count
+      end
+
+      noun_h = build_noun_h = nil
+
+      vp = -> verb_stem do
+        -> noun_ref do
+          noun_h ||= build_noun_h[ ]
+
+        end
+      end
+
+      build_noun_h = -> do
+        {
+          blank_lines:   Headless::NLP::EN::POS::Noun[ 'blank line' ],
+          comment_lines: Headless::NLP::EN::POS::Noun[ 'comment line' ]
+        }
+      end
+
+    end.call
+
+    def linecount_using_grep_chain file_a, filter_a, label
+      cmd_tail = "#{ filter_a * ' | ' } | wc -l"
+      file_a.reduce( linecount_class.new label ) do |coun, file|
+        cmd = "cat #{ shellescape_path file } | #{ cmd_tail }"
+        if @req[:show_commands] || @req.fetch( :trace_volume )
+          @ui.err.puts cmd
+        end
+        rs = %x{ #{ cmd } }
+        cnt = linecount_class.new file
+        if rs =~ /\A[[:space:]]*(\d+)[[:space:]]*\z/
+          cnt.count = $1.to_i
+        else
+          cnt.notice = "(parse failed - #{ rs })"
+        end
+        coun << cnt
+        coun
+      end
+    end
+
+    def linecount_class
+      self.class.const_get :LineCount, false  # meh
+    end
+
+    def linecount_using_wc file_a, label
+      # (this hackery deserves explanation: we assume the following: there
+      # is one corresponding output line from `wc` for each argument (treated
+      # as input file) (the stream to which that line was written will be
+      # either stdout or stderr depending on whether an error was encountered
+      # (e.g "No such file or directory")). Additionally there is one final
+      # "X total" line (where 'X' is the sum of etc) IFF there were more than
+      # one argument to `wc`. (Hence there will always be either one line
+      # of output or greater than two lines of output, never two.)
+      # (the above is tracked with [#001])
+      #
+      # Now, on top of all that, we pipe all this to `sort -g`
+      # (--general-numeric-sort), which doesn't mangle the position of our
+      # "X total" line only because that line always has the greatest number,
+      # hence always ends up at the end (where it started) after sorting!)
+      #
+
+      count = linecount_class.new label
+      file_a.length.zero? and return count  # we usu. avoid return, 2 easy here
+      cmd = "wc -l #{ file_a.map(& method(:shellescape_path )) * ' '} | sort -g"
+      if @req[:show_commands] || @req.fetch( :debug_volume )
+        @ui.err.puts cmd
+      end
+      line_a = `#{ cmd }`.split "\n"  # [#004] backticks might change
+      if line_a.length.zero?
+        raise SystemError, 'never'
+      else
+        one = 1 == file_a.length
+        range = if one then 0..0 else 0..-2 end
+        line_a[ range ].reduce count do |coun, line|
+          if ! ( /\A *(\d+) (.+)\z/ =~ line )  # [#002]
+            raise SystemError, "expecting integer token - #{ line }"
+          end
+          coun << linecount_class.new( $2, $1.to_i )
+          coun
+        end
+        if ! one
+          if ! ( /\A *(\d+) total\z/ =~ line_a.last )
+            raise SystemError, "expecting total line - #{ line_a.last }"
+          end
+          count.count = $1.to_i  # here is [#001] - let wc to the addition
         end
       end
       count
     end
 
-    def linecount_using_wc files
-      count = Models::Count.new('.')
-      files.empty? and return count
-      _ = "wc -l #{files.map{ |x| escape_path(x) } * ' '} | sort -g"
-      @req[:show_commands] and @ui.err.puts(_)
-      lines = `#{_}`.split("\n")
-      case lines.size
-      when 0
-        raise SystemInterfaceError.new("never")
-      when 1
-        /\A *(\d+) (.+)\z/ =~ lines.first or
-          raise SystemInterfaceError.new("regex failed to match: #{lines.first}")
-        count.add_child(Models::Count.new($2, $1.to_i))
-        # truncated form looses information:
-        # count.name = $2; count.count = $1.to_i
-      else
-        lines[0..-2].each do |line|
-          /\A *(\d+) (.+)\z/ =~ line or
-            raise SystemInterfaceError.new("regex failed to match: #{line}")
-          count.add_child(Models::Count.new($2, $1.to_i))
-        end
-        (/\A *(\d+) total\z/ =~ lines.last and $1.to_i) or
-          raise SystemInterfaceError.new("regex failed to match: #{lines.last}")
-        count.total = $1.to_i # might as well use this one and not calculate it ourselves
-      end
-      count
-    end
-    def _render_table count, out, field_meta={}
-      unless count.children?
+    define_method :shellescape_path, & FUN.shellescape_path
+    protected :shellescape_path
+
+    def rndr_tbl count, out, sexp
+      if count.zero_children?
         out.puts "(table has no rows)"
-        return false
-      end
-      labels = {} ; filters = {}
-      ok = { label: ->(f, v) { labels[f] = v } , filter: ->(f, v) { filters[f] = v } }
-      field_meta.each { |f, m| m.each { |k, v| ok[k] ? ok[k].call(f, v) : fail("no: #{k}") } }
-      labels[:_default] ||= lambda { |f| f.to_s.split('_').map(&:capitalize).join(' ') }
-      header_row = count.children.first.fields.map do |f|
-        v = labels.key?(f) ? labels[f] : labels[:_default]
-        v.kind_of?(Proc) ? v.call(f) : v
-      end
-      rows = count.children.map do |_count|
-        _count.fields.map do |field|
-          v = _count.send(field)
-          filters.key?(field) ? filters[field].call(v) : v.to_s
+        false
+      else
+        field_a = count.first_child.class.members
+        mani = Services::Table::Manifold.new sexp do |mn|
+          mn.hdr = -> m do
+            m.to_s.split( '_' ).map(& :capitalize ) * ' '
+          end
+          mn.add_fields count.first_child.class.members  # did we forget any?
         end
+        row_a = [ mani.build_header_row ]
+        row_a.concat count.each_child.map(& mani.method( :build_row ) )
+        wat = count.summary_rows
+        row_a.concat count.summary_rows.map(& mani.method( :build_row ) )
+        Models::Table.new( row_a ).render( out )
       end
-      rows = [header_row] + rows + count.summary_rows
-      Models::Table.new(rows).render(out)
     end
   end
 end

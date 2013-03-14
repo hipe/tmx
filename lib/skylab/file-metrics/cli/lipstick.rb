@@ -1,29 +1,66 @@
 module Skylab::FileMetrics
+
   module CLI::Lipstick
-    MIN_ROOM = 4
-    MARGIN = 1
-    def self.build rows, separator, fallback
-      sane = ->(x) { [[x, 0.0].max, 1.0].min }
-      pane_width = COLS.call || fallback[:pane_width].call
-      before = rows.join(separator).length
-      my_room = [ (before + separator.length)*-1 + pane_width - MARGIN, MIN_ROOM ].max
-      stylus = Headless::CLI::Pen::FUN
-      stylize = ->(s) { stylus.stylize[s, :green] }
-      lipstick = ->(ratio) { stylize['+' * (sane[ratio] * my_room).to_i] }
-      ->(ratio, rowz, _) { rowz.push lipstick.call(ratio) }
+
+    # lipstick is the rendering with glyphs of a certain normalized scalar
+    # (a "ratio" between 0.0 and 1.0 incl.)
+
+    set_cols = get_cols = nil
+
+    -> do  # `[]`
+
+      min_room = 4
+      margin = 1
+      norm = stylus = stylize = nil
+
+      define_singleton_method :[] do |row_a, sep, fallback|
+        pane_width = get_cols[] || fallback[]
+        before = row_a.join( sep ).length
+        my_room = -> do
+          x = ( before + sep.length ) * -1 + pane_width - margin
+          [ x, min_room ].max
+        end.call
+        lipstick = -> ratio do
+          if ratio  # allow nil to mean "don't do it"
+            stylize[ "+" * ( norm[ ratio ] * my_room ).to_i ]
+          end
+        end
+        -> ratio, rw_a, _ do
+          rw_a << lipstick[ ratio ]
+        end
+      end
+
+      norm = -> x do
+        [ [x, 0.0].max, 1.0 ].min
+      end
+
+      stylus = nil
+      stylize = -> s do
+        stylus ||= Headless::CLI::Pen::MINIMAL
+        stylus.stylize s, :green
+      end
+    end.call
+
+    define_singleton_method :initscr do
+      begin
+        v = $VERBOSE; $VERBOSE = nil
+        Services::Ncurses.initscr
+        $VERBOSE = v # snowleopard-ncurses ncurses_wrap.c:1951 @todo easy patch
+        set_cols[ ::Ncurses.COLS ]
+        ::Ncurses.endwin
+      rescue ::LoadError
+      end
     end
 
-    _cols = nil
-    COLS = ->(cols = nil) { cols ? (_cols = cols) : _cols }
-
-    def self.initscr
-      require 'ncurses'
-      _d = $VERBOSE; $VERBOSE = nil
-      ::Ncurses.initscr
-      $VERBOSE = _d # snowleopard-ncurses ncurses_wrap.c:1951 @todo easy patch
-      COLS.call ::Ncurses.COLS
-      ::Ncurses.endwin
-    rescue ::LoadError
-    end
+    set_cols, get_cols = -> do
+      num = nil
+      set = -> x do
+        num = x
+      end
+      get = -> do
+        num
+      end
+      [ set, get ]
+    end.call
   end
 end

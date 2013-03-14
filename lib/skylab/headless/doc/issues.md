@@ -1,4 +1,7 @@
 [#069]       #doc-point (sorry to jump ahead) "ouroboros"
+[#062] #open the sweeping architecture change to accomodate homonyms
+[#061]       flyweight the architecture of language production
+[#060]       #doc-point: normalized line producers / consumers
 [#059]       #tracking places where we nerk with detecting o.p dflt --help -h
 [#058]       #doc-point narrative pre-order ("outside-in") ..
 [#057] #open see how throwing a :terminate could help with o.p deep graphs

@@ -1,17 +1,19 @@
-require File.expand_path('../common', __FILE__)
-
 module Skylab::FileMetrics
 
-  class API::Dirs
-    extend API::CommonModuleMethods
-    include API::CommonInstanceMethods
+  class API::Actions::Dirs
+
+    extend API::Common::ModuleMethods
+
+    include API::Common::InstanceMethods
 
     def run
       count = Models::Count.new("folders summary")
       find_cmd = build_find_dirs_command
       @req[:show_commands] and @ui.err.puts(find_cmd)
       dirs = %x{#{find_cmd}}.split("\n")
-      @req[:show_files_list] and @ui.err.puts(dirs)
+      if @req[:show_files_list] || @req.fetch( :debug_volume )
+        @ui.err.puts( dirs )
+      end
       dirs.each do |dir|
         _files = %x{#{build_find_files_command(dir)}}.split("\n")
         _dir_count = Models::Count.new(dir, nil)
@@ -28,53 +30,70 @@ module Skylab::FileMetrics
           end
         end
         _folder_count = count_lines(_ok_files, File.basename(dir))
-        _folder_count.total.nil? and _folder_count.total = 0
+        _folder_count.count ||= 0
         count.add_child _folder_count
       end
-      total = count.total.to_f
-      if count.children.nil?
+      if count.zero_children?
         @ui.err.puts "(no children)"
-        return
+        nil
+      else
+        count.collapse_and_distribute do |child|
+          child.set_field :num_files, child.nonzero_children?  # ick / meh
+          child.set_field :num_lines, child.count # just to be clear
+        end
       end
-      count.sort_children_by! { |c| -1 * c.total }
-      max = count.children.map(&:total).max.to_f
-      count.children.each do |o|
-        o.set_field(:num_files, o.children ? o.children.size : nil)
-        o.set_field(:num_lines, o.total)
-        o.set_field(:total_share, o.total.to_f / total)
-        o.set_field(:max_share, p = o.total.to_f / max)
-        o.set_field(:lipstick, p)
-      end
-      count.display_summary_for(:name) { "Total:" }
-      count.display_total_for(:num_files) { |d| "%d" % d }
-      count.display_total_for(:num_lines) { |d| "%d" % d }
+      count.display_summary_for :label do |_| "Total:" end
+      count.display_summary_for :lipstick do |_| nil end
+      count.display_total_for(:num_files) { |d| "%d" % d if d }
+      count.display_total_for(:num_lines) { |d| "%d" % d if d }
       render_table count, @ui.err
     end
-  private
+
+    # (we are trying to keep some ancient code for posterity for now ..)
+    Models_ = Models
+    module Models
+      Count = FileMetrics::Models::Count.subclass :total_share,
+        :max_share, :lipstick
+    end
+
+    LineCount = Models::Count
+
+  protected
+
     def build_find_dirs_command
-      Models::FindCommand.build do |o|
-        o.paths = [@req[:path]]
-        o.skip_dirs = @req[:exclude_dirs]
-        o.names = @req[:include_names]
-        o.extra = ' -a -maxdepth 1 -type d'
-      end
+      cmd = Models_::FindCommand.valid( -> c do
+        c.add_path @req[:path]
+        c.concat_skip_dirs @req[:exclude_dirs]
+        c.concat_names @req[:include_names]
+        c.extra = '-a -maxdepth 1 -type d'
+      end, -> msg do
+        fail "no - #{ msg }"
+      end ).string
     end
+
     def build_find_files_command path
-      Models::FindCommand.build do |f|
-        f.paths = [path]
-        f.skip_dirs = @req[:exclude_dirs]
-        f.names = @req[:include_names]
-        f.extra = '-not -type d'
+      Models_::FindCommand.valid -> c do
+        c.add_path path
+        c.concat_skip_dirs @req[:exclude_dirs]
+        c.concat_names @req[:include_names]
+        c.extra = '-not -type d'
+      end, method( :error )
+    end
+
+    -> do  # `render_table`
+
+      percent = -> v { "%0.2f%%" % ( v * 100 ) if v }
+
+      define_method :render_table do |count, out|
+        rndr_tbl count, out, [ :fields,
+          [ :label,       header: 'Directory' ],
+          [ :count,       header: 'Lines' ],
+          [ :total_share, filter: percent ],
+          [ :max_share,   filter: percent ],
+          [ :lipstick,    :autonomous, header: '' ]
+        ]
       end
-    end
-    def render_table count, out
-      _percent = ->(v) { "%0.2f%%" % (v * 100) }
-      _render_table(count, out,
-        count:        { label: 'Lines' },
-        total_share:  { filter: _percent },
-        max_share:    { filter: _percent },
-        lipstick:     { label: '', filter: ->(x) { x } }
-      )
-    end
+      protected :render_table
+    end.call
   end
 end

@@ -1,120 +1,159 @@
-require File.expand_path('../common', __FILE__)
-require 'skylab/face/open2'
-require 'pathname'
-require 'stringio'
-require 'strscan'
-
 module Skylab::FileMetrics
 
-  class API::Ext
-    extend API::CommonModuleMethods
-    include API::CommonInstanceMethods
-    include Skylab::Face::Open2
-    GitObjectRe = /\A[0-9a-f]{38,40}\z/
-    def run
-      pats = []
-      @req[:git] and pats.push([GitObjectRe, 'git object'])
-      pats.push([/\A\./, '(dotfiles)'])
-      @req[:verbose] and PP.pp(@req, @ui.err)
-      files = find_files
-      extension_counts = Hash.new { |h, k| h[k] = { :count => 0, :extension => k } }
-      files.each do |file|
-        pn = Pathname.new(file)
-        ext = pn.extname.to_s
-        # normalize filenames without extensions but that are of the same type, using a regex
-        ext.empty? && (ext = ((pat = pats.detect{ |p| p[0] =~ pn.basename.to_s }) ? pat[1] : pn.basename.to_s))
-        extension_counts[ext][:count] += 1
+  class API::Actions::Ext
+
+    extend API::Common::ModuleMethods
+
+    include API::Common::InstanceMethods
+
+    include Face::Open2
+
+    -> do
+
+      inflect = nil
+
+      define_method :run do ||
+        res = false
+        begin
+          ext_count_h = self.ext_count_h or break
+          count = Count.new 'Extension Counts'
+          single_a = nil
+          ext_count_h.values.each do |cnt|
+            if 1 == cnt.count and @req[:group_singles]
+              ( single_a ||= [ ] ) << cnt.extension
+            else
+              count << Count.new( "*#{ cnt.extension }", cnt.count )
+            end
+          end
+          if single_a
+            count << Count.new( '(monadic *)', single_a.length )
+          end
+          if count.zero_children?
+            @ui.err.puts "(no extensions)"
+            res = nil
+          else
+            count.collapse_and_distribute or break
+            render_table count, @ui.err
+            if single_a
+              @ui.err.puts "(* only occuring once were: #{ single_a * ' and ' })"  # NOT GOOD ENOUGH -- on deck..
+#              @ui.err.puts inflect[ -> {
+#                "(* only occuring once #{ s single_a.length, :was }: #{
+#                  }#{ and_ single_a })"
+#              } ]
+            end
+            res = true
+          end
+        end while nil
+        res
       end
-      count = Models::Count.new('Extension Counts')
-      singles = nil
-      extension_counts.values.each do |data|
-        if @req[:group_singles] and 1 == data[:count]
-          singles ||= []
-          singles.push data[:extension]
-        else
-          count.add_child Models::Count.new("*``#{data[:extension]}", data[:count])
-        end
+
+      # inflect = Headless::NLP::EN::Minitesimal::FUN.inflect
+
+    end.call
+
+  protected
+
+    Count = Models::Count.subclass :total_share, :max_share, :lipstick
+
+    Count_ = ::Struct.new :extension, :count
+
+    -> do  # `ext_count_h`
+
+      define_method :ext_count_h do
+        res = false
+        begin
+          file_a = self.file_a or break
+          pat_a = []
+          pat_a << Pattern_h.fetch( :git_object ) if @req[:git]
+          pat_a << Pattern_h.fetch( :dotfile )
+          ext_count_h = ::Hash.new do |h, k|
+            h[k] = Count_[ k, 0 ]
+          end
+          # resolve *some* logical extension ("type") for each file - for those
+          # files without an actual extension use the patterns.
+          file_a.each do |file|
+            pn = ::Pathname.new file
+            use_ext = pn.extname.to_s
+            # (please leave this line intact, below was *perfect* [#bs-010])
+            if '' == use_ext  # (yes, '.foo' has an extname of '' thankfully)
+              pat = pat_a.detect { |p| p.rx =~ file }
+              use_ext = if pat then pat.label else pn.basename.to_s end
+            end
+            ext_count_h[ use_ext ].count += 1
+          end
+          res = ext_count_h
+        end while nil
+        res
       end
-      if singles
-        grouped_singles = true
-        count.add_child Models::Count.new("(assorted)", singles.size)
-      end
-      if count.children.nil?
-        @ui.err.puts "(no extenstions)"
-      else
-        massage count
-        render_table count, @ui.err
-      end
-      if singles
-        if grouped_singles
-          @ui.err.puts <<-HERE.gsub(/\n */, ' ').strip
-            (assorted were: #{singles * ', '}.)
-          HERE
-        else
-          @ui.err.puts <<-HERE.gsub(/\n */, ' ').strip
-            (The following occured only once and were not counted in the final tally:
-            #{singles * ', '}.)
-          HERE
-        end
-      end
-    end
+      protected :ext_count_h
+
+      Pattern_ = ::Struct.new :rx, :label
+
+      Pattern_h = {
+        git_object: Pattern_[ /\A[0-9a-f]{38,40}\z/, 'git object' ],
+        dotfile: Pattern_[ /\A\./, 'dotfile' ],
+        no_extension: Pattern_[ nil, 'no extension' ]
+      }
+
+    end.call
 
     # this does things wierdly as an experiment for massively progressive output
-    def find_files
-      cmd = build_find_command.to_s
-      @req[:show_commands] and @ui.err.puts(cmd)
-      buff = StringIO.new
-      open2(cmd) do |op|
-        op.err { |s| fail("not expecting stderr output from find cmd: #{s.inspect}.") }
-        if @req[:verbose]
-          op.out { |s| buff.write(s); @ui.err.write(s) }
-        else
-          op.out { |s| buff.write(s) }
+    def file_a
+      res = false
+      begin
+        cmd = build_find_command or break
+        if @req[:show_commands] || @req.fetch( :debug_volume )
+          @ui.err.puts cmd.string
         end
-      end
-      s = StringScanner.new(buff.rewind && buff.read)
-      files = []
-      s.skip(/\n+/)
-      while line = s.scan(/[^\n]+/)
-        files.push line
-        s.skip(/\n+/)
-      end
-      files
+        buff = Services::StringIO.new
+        stay = true
+        open2 cmd.string do |o|
+          o.err do |s|
+            fail "not exptecting stderr output from find cmd - #{ s.strip }."
+            stay = false
+          end
+          o.out( & ( if @req.fetch( :debug_volume )
+            -> s do
+              buff.write s
+              @ui.err.write s
+            end
+          else -> s { buff.write s } end ) )
+        end
+        stay or break
+        scn = Services::StringScanner.new buff.string  # not good just fun
+        file_a = [ ]
+        loop do
+          scn.skip( /\n+/ )
+          line = scn.scan( /[^\n]+/ ) or break
+          file_a << line
+        end
+        res = file_a
+      end while nil
+      res
     end
 
     def build_find_command
-      Models::FindCommand.build do |f|
-        f.paths = @req[:paths]
-        f.skip_dirs = @req[:exclude_dirs]
-        f.names = @req[:include_names]
-        f.extra = '-not -type d'
-      end
+      Models::FindCommand.valid -> c do
+        c.concat_paths @req[:paths]
+        c.concat_skip_dirs @req[:exclude_dirs]
+        c.concat_names @req[:include_names]
+        c.extra = '-not -type d'
+      end, method( :error )
     end
 
-    def massage count
-      return unless count.children?
-      count.sort_children_by! { |c| -1 * c.count }
-      total = count.total.to_f
-      max = count.children.map(&:count).max.to_f
-      count.children.each do |o|
-        o.set_field(:total_share, o.count.to_f / total)
-        o.set_field(:max_share, p = o.count.to_f / max)
-        o.set_field(:lipstick, p)
-      end
-      count.display_summary_for(:name) { "Total:" }
-      count.display_total_for(:count) { |d| "%d" % d }
-      nil
-    end
+    -> do  # `render_table`
 
-    def render_table count, out
-      count.children? or return
-      _percent = ->(v) { "%0.2f%%" % (v * 100) }
-      _render_table(count, out,
-        count:        { label: 'Num Files' },
-        total_share:  { filter: _percent },
-        max_share:    { filter: _percent },
-        lipstick:     { label: '', filter: ->(x) { x } }
-      )
-    end
+      percent = -> v { "%0.2f%%" % ( v * 100 ) }
+
+      define_method :render_table do |count, out|
+        rndr_tbl count, out, [ :fields,
+          [ :label,        header: 'Extension' ],
+          [ :count,        header: 'Num Files' ],
+          [ :total_share,  filter: percent ],
+          [ :max_share,    filter: percent ],
+          [ :lipstick,     :autonomous, header: '' ] ]
+      end
+      protected :render_table
+    end.call
   end
 end

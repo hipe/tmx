@@ -1,17 +1,20 @@
-require_relative 'core'
-
 module Skylab::FileMetrics
+
   class CLI < ::Skylab::Face::CLI
+
     extend ::Skylab::Autoloader
 
     # lost indent
-      COMMON = lambda do |op, req|
+      def op_common_head
+        op = @command.op
+
+        req = ( @param_h ||= { } )
 
         req[:exclude_dirs] = ['.*']
 
         op.on('-D', '--exclude-dir DIR',
           'Folders whose basename match this pattern will not be',
-          'descended into.  It can be specified multiple times',
+          'descended into. It can be specified multiple times',
           'with multiple patterns to narrow the search.',
           'If not provided, the default is to skip folders whose',
           "name starts with a '.' (period).  To include such",
@@ -24,7 +27,6 @@ module Skylab::FileMetrics
               req[:exclude_dirs].push dir
             end
         end
-
 
         req[:include_names] = []
 
@@ -41,11 +43,21 @@ module Skylab::FileMetrics
           req[:include_names].push pattern
         end
 
-        req[:verbose] = false
+        # e.g - fatal error warning notice info debug trace
+
+        ( volume_a = [ :info_volume, :debug_volume, :trace_volume ].freeze ).
+          each { |k| req[k] = nil }  # so we can fetch them
         op.on('-v', '--verbose',
-          'e.g. show the generated {find|wc} commands we (would) use, etc') do
-          req[:verbose] = true
-          req[:show_commands] = true
+          'e.g. show the generated {find|wc} commands we (would) use, etc',
+          '(try using multiple -v for more detail)') do
+          not_yet_set = volume_a.detect { |k| ! req[ k ] }
+          if not_yet_set then req[ not_yet_set ] = true else
+            @did_emit_verbose_max_volume_notice ||= begin
+              s = Headless::NLP::EN::Number::FUN.number[ volume_a.length ]
+              @err.puts "(#{ s } is the max number of -v.)"
+              true
+            end
+          end
         end
 
         op.on('-l', '--list', 'list the resulting files that match the query (before running reports)') {
@@ -54,62 +66,75 @@ module Skylab::FileMetrics
         req[:show_report] = true
         op.on('-R', '--no-report', "don't actually run the whole report") {
           req[:show_report] = false }
-      end
 
-      o :"line-count", :"lc", :"sloc" do |op, req|
-        syntax "#{invocation_string} [opts] [PATH [PATH [...]]]"
-        op.banner = "
-          Shows the linecount of each file, longest first. Show
+        req
+      end
+      protected :op_common_head
+
+      option_parser do |op|
+
+        op.banner = "#{ hi 'description:' }#{
+          } Shows the linecount of each file, longest first. Show
           percentages of max for each file.   Will go recursively
-          into directories.\n#{usage_string}
+          into directories.
         ".gsub(/^ +/, '')
 
-        COMMON.call(op, req)
-
+        req = op_common_head
         req[:count_comment_lines] = true
         req[:count_blank_lines]   = true
         op.on('-C', '--no-comments',
           "don't count lines with ruby-style comments") { req[:count_comment_lines] = false }
         op.on('-B', '--no-blank-lines',
           "don't count blank lines") { req[:count_blank_lines] = false }
+
+        op_common_tail
       end
 
-      def line_count opts, *paths
+      aliases :lc, :sloc
+
+      def line_count *paths
+        opts = @param_h
         paths.empty? and paths.push('.')
         opts[:paths] = paths
-        require File.expand_path('../api/line-count', __FILE__)
-        API::LineCount.run(self, opts)
+        api_call :line_count
       end
 
-      o :"dirs" do |op, req|
-        syntax "#{invocation_string} [opts] [<path>]"
+      -> do
+        UI = ::Struct.new :out, :err
+        def api_call name_sym
+          @ui ||= UI.new @out, @err
+          kls = API::Actions.const_fetch name_sym
+          kls.run @ui, @param_h
+        end
+        protected :api_call
+      end.call
+
+      option_parser do |op|
         op.banner = <<-DESC.gsub(/^ +/, '')
-          Experimental report.  With all folders one level under <path>,
+          #{ hi 'description:' }#{
+          } Experimental report. With all folders one level under <path>,
           for each of them report number of files and total sloc,
           and show them in order of total sloc and percent of max
         DESC
-        COMMON.call(op, req)
+        op_common_head
+        op_common_tail
       end
 
-      def dirs opts, path=nil
+      def dirs path=nil
+        opts = @param_h
         opts[:path] = path || '.'
-        require File.expand_path('../api/dirs', __FILE__)
-        API::Dirs.run(self, opts)
+        api_call :dirs
       end
 
+      option_parser do |op|
 
-      o :"ext" do |op, req|
-
-        syntax "#{invocation_string} [opts] [<path> [<path> [..]]]"
-
-        op.banner = <<-DESC.gsub(/^ +/, '')
-          #{hi 'description:'} just report on the number of files with different extensions,
+        op.banner = <<-O.gsub( /^ +/, '' )  # #todo
+          #{ hi 'description:' }#{
+          } just report on the number of files with different extensions,
           ordered by frequency of extension
-          #{usage_string}
-          #{hi 'options:'}
-        DESC
+        O
 
-        COMMON.call(op, req)
+        req = op_common_head
 
         req[:git] = true
         op.on('--[no-]git-aware', "be aware of git commit objects,",
@@ -117,18 +142,32 @@ module Skylab::FileMetrics
         ) { |x| req[:git] = x }
 
         req[:group_singles] = true
-        op.on('--[no-]group-singles', "by default, extensions that occur only once",
-          "are globbed together. Use this flag ",
-          "to include them in the main table. (default: #{req[:group_singles]})"
+        op.on('--[no-]group-singles',
+          "by default, extensions that occur only once are globbed",
+          "together. Use the --no form of this flag to flatten them and",
+          "count them inline with the rest (default: #{req[:group_singles]})"
         ) { |x| req[:group_singles] = x }
 
+        op_common_tail
       end
 
-      def ext opts, *paths
+      def ext *paths
+        opts = @param_h
         paths.empty? and paths.push('.')
         opts[:paths] = paths
-        require File.expand_path('../api/ext', __FILE__)
-        API::Ext.run(self, opts)
+        api_call :ext
+      end
+
+    protected
+
+      def op_common_tail
+        # massive but semi-elegant hack, #goof-on wheel greasing.
+        Headless::Services::String::Lines::Consumer @command.op.banner do |y|
+          y << ''
+          @command.usage y
+          y << "\n#{ hi 'options:' }\n"
+        end
+        nil
       end
     # lost indent
   end
