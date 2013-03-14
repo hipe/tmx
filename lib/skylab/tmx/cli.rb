@@ -2,7 +2,7 @@ require_relative '..'
 
 require 'skylab/face/core'
 require 'skylab/meta-hell/core'
-require 'skylab/porcelain/all' # special, annoying
+require 'skylab/porcelain/core'
 
 module Skylab; end
 
@@ -17,7 +17,7 @@ module Skylab::Tmx
 
     # @todo: @after:#100 unhack the below rediculous mess
     face_namespaces = ::Skylab::Face::Command::Namespace.namespaces
-    porc_namespaces = ::Skylab::Porcelain.namespaces
+    porc_namespaces = ::Skylab::Porcelain::Legacy.namespaces  # #todo integration only
     both = [face_namespaces, porc_namespaces]
 
     o = { }

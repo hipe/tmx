@@ -1,8 +1,10 @@
 module Skylab::Snag
+
   class Models::Node::Collection
+
     include Snag::Core::SubClient::InstanceMethods
 
-    def add message, do_prepend_open_tag, dry_run, verbose, new_node=nil
+    def add message, do_prepend_open_tag, dry_run, verbose_x, new_node=nil
       res = false
       begin
         node = Models::Node::Controller.new request_client
@@ -12,20 +14,26 @@ module Skylab::Snag
         r = node.valid or break( res = r )
         res = manifest.add_node node,
           dry_run,
-          verbose,
-          -> x { escape_path x },
-          -> x { error x },
-          -> x { info x }
+          verbose_x,
+          method( :escape_path ),
+          method( :error ),
+          method( :info ),
+          -> raw_info do  # let's try not to style these..
+            @request_client.send :emit, :raw_info, raw_info
+          end
         new_node[ node ] if res
       end while nil
       res
     end
 
-    def changed node, dry_run, verbose
-      manifest.change_node node, dry_run, verbose,
-        -> x { escape_path x },
-        -> x { error x },
-        -> x { info x }
+    def changed node, dry_run, verbose_x
+      manifest.change_node node, dry_run, verbose_x,
+        method( :escape_path ),
+        method( :error ),
+        method( :info ),
+        -> raw_info do
+          @request_client.send :emit, :raw_info, raw_info
+        end
     end
 
     def fetch_node node_ref, not_found=nil

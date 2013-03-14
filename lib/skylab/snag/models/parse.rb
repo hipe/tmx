@@ -1,4 +1,5 @@
 module Skylab::Snag
+
   module Models::Parse
   end
 
@@ -8,7 +9,7 @@ module Skylab::Snag
   class Models::Parse::Events::Failure <
     Snag::Model::Event.new :expecting, :near, :line, :line_number, :pathname
 
-    def to_h
+    def to_hash
       {
         line: line,
         line_number: line_number,

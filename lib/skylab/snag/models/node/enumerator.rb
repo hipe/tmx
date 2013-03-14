@@ -1,4 +1,5 @@
 module Skylab::Snag
+
   class Models::Node::Enumerator < ::Enumerator
 
     # thanks to brian chandler from issue 707

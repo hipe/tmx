@@ -58,7 +58,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
         end
       end
 
-      it 'ADDS LINE TO MANIFEST AND CHANGES SOURCE CODE LINE' do
+      it "ADDS LINE TO MANIFEST AND CHANGES SOURCE CODE LINE" do
         invoke '--name', '*.sc', '.'
         output.lines.last.string.should match(
           %r{changed 1 line in \./jeebis\.sc.+we should fix this} )

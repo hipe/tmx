@@ -1,4 +1,5 @@
 module Skylab::Snag
+
   class Models::Identifier < ::Struct.new :prefix, :body, :integer_string
 
     rx = /

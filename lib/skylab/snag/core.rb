@@ -3,7 +3,6 @@ require_relative '..'
 require 'skylab/headless/core'
 require 'skylab/meta-hell/core'
 require 'skylab/porcelain/core'
-require 'skylab/porcelain/all' # wicked old ways
 
 
 module Skylab::Snag

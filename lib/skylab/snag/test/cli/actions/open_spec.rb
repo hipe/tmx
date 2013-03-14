@@ -25,7 +25,9 @@ module Skylab::Snag::TestSupport::CLI::Actions
     end
 
     context "with no arguments show a report of open tickets!" do
+
       it "`open` (with no options) - shows a subset of lines from the file" do
+
         shared_setup[ self ]
         invoke_from_tmpdir 'o'
         a = output.lines
@@ -66,23 +68,40 @@ module Skylab::Snag::TestSupport::CLI::Actions
     end
 
     context "with one argument" do
+
       it "`open foo` opens a ticket" do
         shared_setup[ self ]
         invoke_from_tmpdir 'open', 'foo'
         output.lines.first.string.should match(
           /new line: \[#005\] #open foo/ )
         output.lines.clear
-        invoke_from_tmpdir 'open', "1234 6789 2234 6789 3234 6789 #{
-        }4234 6789 5234 6789 6234 6789 7234 6789 8234 6789"
-        cut = 'while adding node, '.length
-        lines = output.lines.map { |x| x.string[ cut .. -2 ] }
-        o = -> exp { act = lines.shift ; act.should eql( exp ) }
-        o[ 'new lines:' ]
-        o[ "[#006] #open 1234 6789 2234 6789 3234 6789 4234 6789 #{
-            }5234 6789 6234 6789 7234" ] # 78 chars wide yay
-        o[ "             6789 8234 6789" ]
-        o[ "done." ]
-        lines.length.should eql(0)
+        invoke_from_tmpdir 'open', # eighty characters:
+<<-O.chop
+1234 6789 2234 6789 3234 6789 4234 6789 5234 6789 6234 6789 7234 6789 8234 6789
+O
+
+        next_raw_line = -> do  # not exatcly raw.. we chop exactly one char
+          line = output.lines.shift.string
+          line.chop!
+          line
+        end
+
+        cutlen = 'while adding node, '.length
+
+        cut = -> str { str[ cutlen .. -1 ] }
+
+        next_cut_line = -> do
+          cut[ next_raw_line[] ]
+        end
+
+        next_cut_line[].should eql( 'new lines:' )
+
+        next_raw_line[].should eql(
+ "[#006] #open 1234 6789 2234 6789 3234 6789 4234 6789 5234 6789 6234 6789 7234"
+        ) # 78 chars wide yay
+        next_raw_line[].should eql( "             6789 8234 6789" )  # DAMN STRA
+        next_cut_line[].should eql( 'done.' )
+        output.lines.length.should eql( 0 )
       end
     end
   end

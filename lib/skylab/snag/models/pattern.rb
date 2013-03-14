@@ -1,4 +1,5 @@
 module Skylab::Snag
+
   module Models::Pattern
 
     default = '[@#]todo\>'

@@ -1,40 +1,50 @@
 module Skylab::Snag
 
-  # (below line kept for #posterity, is is the twinkle in the eye of the
+  # (below line kept for #posterity, it is the twinkle in the eye of the
   # [#sl-123] convention)
-  # Todo = Api::Todo # yeah, this sad problem.  or is it a pattern!?
+  # Todo = Api::Todo # yeah, this sad problem. or is it a pattern!?
 
   class API::Actions::ToDo::Report < API::Action
-    emits :all, error: :all, info: :all, payload: :all,
-           number_found: :all
 
-    attribute :names, required: true, default: ['*.rb']
-    attribute :paths, required: true
-    attribute :pattern, required: true, default: Snag::Models::Pattern.default
+    attribute  :be_verbose
+    attribute      :names, required: true,
+                            default: [ "*#{ Autoloader::EXTNAME }" ] # '*.rb'
+    attribute      :paths, required: true
+    attribute    :pattern, required: true,
+                             default: Snag::Models::Pattern.default
     attribute :show_command_only
-    attribute :verbose
+
+    emits            info: :lingual,
+                     todo: :datapoint,
+                  command: :datapoint,  # only for `show_command_only`
+             number_found: :datapoint
 
   protected
 
     def execute
-      res = nil
-      begin
-        enum = Snag::Models::ToDo::Enumerator.new paths, names, pattern
-        if show_command_only
-          emit :payload, enum.command
-          break( res = true )
+      ea = Snag::Models::ToDo::Enumerator.new @paths, @names, @pattern
+      if @show_command_only
+        ea.command.if_valid -> cmd do
+          emit :command, cmd
+          true
+        end, -> err do
+          error err
         end
-        if verbose
-          emit :info, enum.command
+      else
+        ea.on_error method( :error )  # e.g unexpected output from `find`
+        ea.on_command do |cmd|  # if strict event handling, we must.
+          if @be_verbose
+            emit :command, cmd
+          end
         end
-        enum.on_stderr_line { |e| emit :info, e }
-        enum.each do |todo|
-          emit :payload, todo
+        res = ea.each do |todo|
+          emit :todo, todo
         end
-        emit :number_found, count: enum.seen_count
-        res = true
-      end while nil
-      res
+        if ea.seen_count
+          emit :number_found, ea.seen_count
+        end
+        res
+      end
     end
   end
 end

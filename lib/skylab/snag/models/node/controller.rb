@@ -1,5 +1,7 @@
 module Skylab::Snag
+
   class Models::Node::Controller
+
     include Snag::Core::SubClient::InstanceMethods
 
     def add_tag tag_ref, do_append
@@ -82,7 +84,7 @@ module Skylab::Snag
       @tags ||= Models::Tag::Collection.new @message # asking for trouble
     end
 
-    def valid err=nil
+    def valid
       if @valid.nil? # iff not, we've already done this
         begin
           break( @valid = false ) if error_count > 0 # iff errors emitted
@@ -237,7 +239,7 @@ module Skylab::Snag
     end
 
     def line_width
-      @line_width || Models::Manifest.line_width
+      @line_width || Models::Manifest.line_width  # don't memoize it
     end
 
     def max_lines
@@ -255,31 +257,27 @@ module Skylab::Snag
     end
 
     define_method :tag do |operation, tag_ref, redundant|
+      error, info = method( :error ), method( :info )
       do_add, do_append = tag_parse_args[ operation ] ; operation = nil
-      res = nil
       begin
-        tag_body = Models::Tag.normalize tag_ref,
-          -> e { error e }, -> e { info e }
-        tag_body or break( res = tag_body )
-        enum = tags # goofing around here ..
-        found = enum.detect { |tg| tg.normalized_name == tag_body }
-        if do_add
+        res = Models::Tag.normalize( tag_ref, error, info ) or break
+        tag_body = res
+        found = tags.detect { |tg| tg.normalized_name == tag_body }
+        rdn = nil ; redundnt = -> msg { rdn = true ; redundant[ msg ] }
+        res = if do_add
           if found
-            res = redundant[ "#{ val identifier } is already tagged #{
+            redundnt[ "#{ val @identifier } is already tagged #{
               }with #{ val found }" ]
-            break
+          else
+            tags.add! tag_body, do_append, error, info
           end
-          res = enum.add! tag_body, do_append, -> e { error e }, -> e { info e }
-          res or break              # (this might always succeed)
+        elsif found
+          tags.rm! found, error, info
         else
-          if ! found
-            res = redundant[ "#{ val identifier } is not tagged with #{
-              }#{ ick Models::Tag.render( tag_body ) }" ]
-            break
-          end
-          res = enum.rm! found, -> e { error e }, -> e { info e }
-          res or break
+          redundnt[ "#{ val @identifier } is not tagged with #{
+            }#{ ick Models::Tag.render( tag_body ) }" ]
         end
+        rdn and break
         undelineate               # here after above success. caveat err cnt
         res = valid               # it might be too long now
       end while nil

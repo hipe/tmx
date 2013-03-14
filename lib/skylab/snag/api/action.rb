@@ -1,5 +1,7 @@
 module Skylab::Snag
+
   class API::Action               # (following [#sl-110] order)
+
     extend Headless::Action::ModuleMethods
     include Headless::Action::InstanceMethods # before below per `emit`
     ACTIONS_ANCHOR_MODULE = -> { API::Actions }
@@ -11,9 +13,22 @@ module Skylab::Snag
     meta_attribute :default
     meta_attribute :required, default: false
 
-    extend PubSub::Emitter # puts `emit` i.m lower on the chain than s.c above!
-    event_class API::MyEvent
-    public :emits? # for #experimental dynamic wiring per action reflection
+    extend PubSub::Emitter  # put `emit` i.m lower on the chain than s.c above!
+
+    event_factory MetaHell::FUN.memoize[ -> do
+      PubSub::Event::Factory::Isomorphic.new API::Events # oh boy .. use the
+    end ]                   # same factory instance for every action subclass
+                            # instance which *should* be fine given the funda-
+                            # mental supposition of isomorphic factories (see)
+                            # **NOTE** see warnings there too re: coherence
+
+    emits error: :lingual   # probably every api action subclass should have it
+                            # in its graph that it emits this (and so it does)
+                            # because we emit errors in `absorb_param_h`
+                            # which they all use (i think..)
+
+    public :emits?          # allows #experimental dynamic wiring per
+                            # event stream graph reflection like this
 
     def self.attributes_or_params
       res = nil
@@ -36,6 +51,7 @@ module Skylab::Snag
     end
 
     # --*--
+
     include Snag::Core::SubClient::InstanceMethods
 
     def invoke param_h=nil
@@ -43,14 +59,11 @@ module Skylab::Snag
       begin
         @param_h and fail 'sanity'
         @param_h = param_h || { }
-        res = absorb_params!
+        res = absorb_param_h
         res or break
-        res = execute
+        res = execute  # false ok - pass it to modal. don't handle ui here.
       end while nil
-      if false == res
-        res = invite self         # an invite hook should happen at the
-      end                         # end of invoke for 2 reasons: 1) it wraps
-      res                         # execute, 2) it is hopefully at the end
+      res
     end
 
   protected
@@ -61,7 +74,7 @@ module Skylab::Snag
       _snag_sub_client_init api
     end
 
-    def absorb_params!            # [#hl-047] this kind of algo, sort of
+    def absorb_param_h            # [#hl-047] this kind of algo, sort of
       res = false
       begin
         formal = self.class.attributes_or_params
@@ -69,19 +82,22 @@ module Skylab::Snag
           m << k if ! formal.has? k
           m
         end
-        if extra.length.nonzero?
+        if extra.length.nonzero?               # 1) bork on unexpected params
           error "#{ s extra, :this } #{ s :is } not #{ s :a }#{
             }parameter#{ s }: #{ extra.join ', ' }"
           break
         end
-        formal.each do |k, meta|
-          if meta.has?( :default ) && @param_h[k].nil?
-            @param_h[k] = meta[:default]
+        formal.each do |k, meta|               # 2) mutate the request h with
+          ivar = :"@#{ k }"
+          if meta.has?( :default ) && @param_h[k].nil?  # defaults iff nec.
+            @param_h[k] = meta[:default]       # (else set the ivar to nil!!)
+          elsif ! instance_variable_defined? ivar
+            instance_variable_set ivar, nil
           end
         end
-        missing = formal.each.reduce [] do |m, (k, meta)|
-          if meta[:required] && @param_h[k].nil?
-            m << k
+        missing = formal.each.reduce [] do |m, (k, meta)|  # 3) aggregate and
+          if meta[:required] && @param_h[k].nil?  # then bork on required
+            m << k                             # missing actual params.
           end
           m
         end
@@ -90,19 +106,13 @@ module Skylab::Snag
             }#{ missing.join ', ' }"
           break
         end
-        @param_h.each do |k, v|
-          send "#{ k }=", v
+        @param_h.each do |k, v|                # 4) absorb the request params
+          send "#{ k }=", v                    #    by going thru the writers
         end
         @param_h = nil
         res = true
       end while nil
       res
-    end
-
-    def build_event type, data # compat pub-sub
-      e = API::MyEvent.new type, data
-      e.inflection = self.class.inflection
-      e
     end
 
     def manifest_pathname # #gigo
@@ -121,6 +131,16 @@ module Skylab::Snag
         end while nil
         nodes
       end
+    end
+
+    # `build_event` - we override the one we get from pub-sub to pass our
+    # factory 1 more parameter than usual (if e.g the event class being
+    # used is "lingual" it will take linguistic metadata from us, the
+    # caller).
+
+    def build_event stream_name, pay_x
+
+      @event_factory.call @event_stream_graph.call, stream_name, self, pay_x
     end
   end
 end

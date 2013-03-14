@@ -1,4 +1,5 @@
 module Skylab::Snag
+
   class Models::Tag::Flyweight
 
     attr_reader :begin

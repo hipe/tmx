@@ -1,4 +1,5 @@
 module Skylab::Snag
+
   class Models::ToDo::Flyweight
 
     def collapse
@@ -10,10 +11,6 @@ module Skylab::Snag
       @md[:full_source_line]
     end
 
-    attr_reader :full_string
-
-    alias_method :to_s, :full_string
-
     def line_number_string
       @md or parse
       @md[:line]
@@ -24,11 +21,15 @@ module Skylab::Snag
       @md[:path]
     end
 
-    def set! string
+    # replace the *entire* defining contents of the flyweight
+
+    def replace string
       @md = nil
-      @full_string = string
+      @upstream_output_line = string
       self
     end
+
+    attr_reader :upstream_output_line
 
     def valid?
       @md or parse
@@ -40,7 +41,7 @@ module Skylab::Snag
   protected
 
     def initialize pattern
-      @full_string = nil
+      @upstream_output_line = nil  # e.g ffrom find, e.g "path:line:source"
       @md = nil
       @pattern = pattern          # just passed around. not used here.
     end
@@ -49,7 +50,7 @@ module Skylab::Snag
     # (if the above changes be *sure* to audit all of the heavyweight class)
 
     define_method :parse do
-      if @full_string and md = rx.match( @full_string )
+      if @upstream_output_line and md = rx.match( @upstream_output_line )
         @md = md
       else
         @md = false

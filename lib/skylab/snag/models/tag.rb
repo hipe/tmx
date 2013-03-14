@@ -1,4 +1,5 @@
 module Skylab::Snag
+
   class Models::Tag < ::Struct.new :name
 
     canonical = -> do
@@ -51,7 +52,6 @@ module Skylab::Snag
       freeze
     end
   end
-
 
   module Models::Tag::Events
   end

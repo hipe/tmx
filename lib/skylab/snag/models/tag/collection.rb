@@ -1,4 +1,5 @@
 module Skylab::Snag
+
   class Models::Tag::Collection < ::Enumerator # #EXPERIMENTAL
 
     def add! body_string, do_append, error, info

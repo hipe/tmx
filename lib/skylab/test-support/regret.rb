@@ -34,8 +34,8 @@ module ::Skylab::TestSupport
     #     appropriately.
     #
     # For our implementation of Regret itself as it will be used in the field,
-    # we use the "embellish" (or []) method.  Subsequent uses of it down the
-    # nodes of the tree will use the [] method of the parent module
+    # we use the `embellish` (or []) method.  Subsequent uses of it down the
+    # nodes of the tree will use the `edify` (or []) method of the parent module
     #
   end
 
@@ -77,23 +77,23 @@ module ::Skylab::TestSupport
 
     alias_method :_regret_extended, :extended
 
-
-    # There's clearly lots of room for making this more configurable, but at
-    # this phase, this is just a proof of concept geared around duplicating
-    # and DRY-ing up what's happening in the tests now.
-    #
-
+    # (There's room for making this more configurable, but at this phase,
+    # this is just a proof of concept geared around duplicating and DRY-ing
+    # up what's happening in the tests now.)
 
     spec_tail = "_spec#{ Autoloader::EXTNAME }"
     spec_tail_len = spec_tail.length
     spec_rx = %r| \A  (?<dir>.+[^/])  /
                       (?<stem>[^/]+) #{ ::Regexp.escape spec_tail } \z |x
 
+    module_bumper = nil  # (kind of a kewl tool in its own right..)
+
     define_method :init_regret do |caller_str, parent_anchor_module=nil|
 
       # *note*: We do *not* include the parent_anchor_module itself
       # into this client anchor_module.  If you do, with our chosen naming
-      # convention it will have the effect of having the test-support
+      # convention (which seems vital and monadic at this point)
+      # it will have the effect of having the test-support
       # anchor modules masking the client modules of the same name:
       #
       #   e.g.:  MyApp::Mod_1                      # business logic for your app
@@ -107,13 +107,17 @@ module ::Skylab::TestSupport
       #   a module that has included same, and you say `Mod_1`, which Mod_1
       #   do you mean?  It's arguably bad design to mean T_S::Mod_1
       #   (so confusing!) but that's what you would get if anchor modules
-      #   included their parent anchor modules.  I bet it's crystal clear now,
+      #   included their parent anchor modules. I bet it's crystal clear now,
       #   eh!?
       #
       # If you want constants to be "inherited down" from one anchor module
       # to another, the place to do that is e.g. in a module called CONSTANTS
       # that resides in your anchor module.  You would then include that
       # CONSTANTS module in your I_M or your M_M as appropriate. in flux!
+      # This way it is a) opt-in whether which modules at a particular node
+      # (file) are getting which constants in their chain and b) for a given
+      # product which (er) constants should *be* in CONSTANTS in the first
+      # place.
       #
       # (Now, experimentally, we are doing the above)
 
@@ -121,61 +125,81 @@ module ::Skylab::TestSupport
         @tug_class = MetaHell::Autoloader::Autovivifying::Recursive::Tug
       end
 
-      -> do
+      -> do  # set @dir_pathname with logic per architecture conventions
+
+        prev_dir_pathname = dir_pathname  # is overwritten conditionally ICK
+
         # experimental filesystem architecture (merged trees)
-        is_normal = true
+        is_normal = true  # it is normal if e.g test-support.rb is the file
         if parent_anchor_module   # here have a hack so that instead of
           # it needing to live in foo/test-support.rb it can be in foo_spec.rb
+          # NOTE if multiple edification, last one wins! (overwrites!!)
           md = Headless::FUN.call_frame_rx.match caller_str
           if spec_tail == md[:path][ - spec_tail_len, spec_tail_len ]
             is_normal = false
             stem = spec_rx.match( md[:path] )[:stem]
             @dir_pathname = parent_anchor_module.dir_pathname.join stem
-            init_autoloader nil
+            if ! prev_dir_pathname
+              init_autoloader nil
+            end
           end
         end
-        if is_normal
+
+        if is_normal && prev_dir_pathname.nil?
           init_autoloader caller_str
           if 'test-support' == dir_pathname.basename.to_s  # here have a hack
-            # so that when it *is* is 'test-support' we "correct" the path
-            # (life is better *without* test-support folders trust me!)
-            @dir_pathname = dir_pathname.join('..')
+            # so that when it *is* is 'test-support' (the normal case)
+            # we "correct" the path (life is better *without* test-support
+            # _folders_ trust me!)
+            @dir_pathname = dir_pathname.join '..'
           end
         end
       end.call
 
-      const_set :CONSTANTS, -> do
-        o = ::Module.new
-        parent_anchor_module and
-          o.send :include, parent_anchor_module.constants_module
-        o
-      end.call
+      bump_module = module_bumper[ self ]
 
-      const_set :ModuleMethods, -> do
-        o = ::Module.new
-        parent_anchor_module and
-          o.send :include, parent_anchor_module.module_methods_module
-        o
-      end.call
+      bump_module[ :CONSTANTS, -> do
+        if parent_anchor_module
+          include parent_anchor_module.constants_module
+        end
+      end ]
 
-      const_set :InstanceMethods, -> do
-        o = ::Module.new
-        o.module_eval {
-          extend ::Skylab::MetaHell::Let::ModuleMethods # or fly solo .. #rspec
-          parent_anchor_module and
-            include parent_anchor_module.instance_methods_module
-        }
-        o
-      end.call
+      bump_module[ :ModuleMethods, -> do
+        if parent_anchor_module
+          include parent_anchor_module.module_methods_module
+        end
+      end ]
 
-      define_singleton_method :parent_anchor_module do # nil ok!
-        parent_anchor_module
+      bump_module[ :InstanceMethods, -> do
+        extend ::Skylab::MetaHell::Let::ModuleMethods # or fly solo .. #rspec
+        if parent_anchor_module
+          include parent_anchor_module.instance_methods_module
+        end
+      end ]
+
+      if ! respond_to? :parent_anchor_module
+        define_singleton_method :parent_anchor_module do # nil ok!
+          parent_anchor_module
+        end
       end
 
       nil
     end
-
     protected :init_regret
+
+    module_bumper = -> host_module do
+      -> const, func=nil do
+        mod = if host_module.const_defined? const, false
+          host_module.const_get const, false
+        else
+          host_module.const_set const, ::Module.new
+        end
+        if func
+          mod.module_exec(& func )
+        end
+        mod
+      end
+    end
 
     def constants_module
       const_get :CONSTANTS, false

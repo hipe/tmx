@@ -1,4 +1,5 @@
 module Skylab::Snag
+
   module Core::SubClient
   end
 
@@ -12,32 +13,11 @@ module Skylab::Snag
       init_headless_sub_client request_client
     end
 
-    def api_invoke norm_name, param_h=nil, wiring=nil
-      request_client.send :api_invoke, norm_name, param_h, wiring
+    def api_invoke norm_name, param_h, *a, &b
+      request_client.send :api_invoke, norm_name, param_h, *a, &b
     end
 
-    def ick x                     # how do you decorate an invalid value?
-      request_client.send :ick, x
-    end
-
-    def invite api_action
-      request_client.send :invite, api_action
-    end
-
-    def val x                     # typically emphasize a value
-      request_client.send :val, x
-    end
-
-    def wire_action x
-      request_client.send :wire_action, x
-    end
-
-    def wire_action_for_error x
-      request_client.send :wire_action_for_error, x
-    end
-
-    def wire_action_for_info x
-      request_client.send :wire_action_for_error, x
-    end
+    alias_method :val, :kbd
+      # (maybe one day synchronized swimming will be in the olympics) [#hl-051]
   end
 end

@@ -1,13 +1,11 @@
 module Skylab::Snag
-  class CLI::OptionParser < Snag::Services::OptionParser
 
-    def on *a, &b
-      if 1 == a.length && ::Regexp === a.first
-        regexp_filter a.first, b
-      else
-        super
-      end
-    end
+  module CLI::Option
+  end
+
+  class CLI::Option::Parser < Snag::Services::OptionParser
+
+    # off the chain [#030] custom parsing of e.g -1, -2 just because
 
     def parse! argv
       if @regexp_filters
@@ -37,7 +35,7 @@ module Skylab::Snag
 
     rx_filter_struct = ::Struct.new :rx, :block
 
-    define_method :regexp_filter do |rx, block|
+    define_method :regexp_replace_tokens do |rx, &block|
       o = rx_filter_struct.new rx, block
       ( @regexp_filters ||= [] ) << o
       o

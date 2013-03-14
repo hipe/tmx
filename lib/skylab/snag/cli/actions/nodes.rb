@@ -1,7 +1,6 @@
 module Skylab::Snag
 
   class CLI::Actions::Nodes < CLI::Action::Box
-    extend Headless::CLI::Box::DSL
 
     box.desc 'make the magic happen'
 
@@ -19,9 +18,20 @@ module Skylab::Snag
     end
 
     def add message
-      api_invoke [:nodes, :add], {
-        dry_run: false, message: message, verbose: false
-      }.merge( param_h )
+      api_invoke( [ :nodes, :add ], {
+                 be_verbose: false,
+                    dry_run: false,
+                    message: message,
+      }.merge( param_h ) ) do |a|
+        a.on_error handle_error
+        a.on_info handle_info
+        a.on_raw_info handle_raw_info
+        a.on_new_node -> node do
+          # oops the manifest takes care of it
+          # info "added #{ node.identifier.render } #{ node_msg_smry node }"
+        end
+       nil
+      end
     end
 
     # --*--
@@ -31,14 +41,15 @@ module Skylab::Snag
     # action.aliases 'ls', 'show'
 
     option_parser do |o|
+
       o.on '-a', '--all', 'show all (even invalid) issues' do
-        param_h[:all] = true
-      end
-                                  # [#030] - we would love to have -1, -2 etc
-      o.on( /^-(?<num>\d+)$/ ) do |md|
-        [ '--max-count', md[:num] ]
+        param_h[:include_all] = true
       end
 
+      o.regexp_replace_tokens %r(^-(?<num>\d+)$) do |md|   # replace -1, -2 etc
+        [ '--max-count', md[:num] ]                        # with this, before
+      end                                                  # o.p gets it [#030]
+                                                           # (AMAZING HACK)
       o.on '-n', '--max-count <num>',
         "limit output to N nodes (also -<n>)" do |n|
         param_h[:max_count] = n
@@ -46,36 +57,32 @@ module Skylab::Snag
 
       o.on '-v', '--[no-]verbose',
         "`verbose` means yml-like output (default: verbose)" do |v|
-        param_h[:verbose] = v
+        param_h[:be_verbose] = v
       end
 
       o.on '-V', '(same as `--no-verbose`)' do
-        param_h[:verbose] = false
+        param_h[:be_verbose] = false
       end
     end
+
+    option_parser_class CLI::Option::Parser  # use the custom one
+
+    # (this function was original conception point of #doc-point [#sl-102])
 
     def list identifier_ref=nil
-      action = api_build_wired_action [:nodes, :reduce]
-
-      # (below was original conception point of #doc-point [#sl-102])
-
-      action.on_invalid_node do |e|
-        info '---'
-        error "error on line #{ e.line_number }-->#{ e.line }<--"
-
-        e.message = "failed to parse line #{ e.line_number } because #{
-          }#{ e.invalid_reason_string } (in #{ escape_path e.pathname })"
-      end
-
-      action.invoke( {
-        identifier_ref: identifier_ref,
-        verbose: true
-      }.merge! param_h )
-    end
-
-    self::Actions::List.class_eval do # omg [#030] experimental cust. of o.p
-      def leaf_create_option_parser
-        Snag::CLI.const_get( :OptionParser, false ).new # antidote to [#sl-124]
+      api_invoke( [ :nodes, :reduce ],
+        {     be_verbose: true,
+          identifier_ref: identifier_ref }.merge!( param_h ) ) do |a|
+        a.on_output_line handle_payload
+        a.on_info        handle_info
+        a.on_error       handle_error
+        a.on_invalid_node do |e|
+          info '---'
+          e2 = API::Events::Lingual.new :esg, # hack  # #todo
+            nil, @downstream_action,  # no stream name / what we collapsed to
+            "##{ invalid_node_message e }"
+          handle_error[ e2 ]  # whether or not it is an error is sort of a
+        end                   # soft design concern
       end
     end
   end

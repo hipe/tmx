@@ -1,111 +1,164 @@
 module Skylab::Snag
 
-  Integration_Hack_Msg = -> e do  # #todo integration only!
-    if e.respond_to? :msg then e.msg else
-      x = e.payload_a[0]
-      if x.respond_to? :msg then x.msg else
-        if ::String === x then x else
-          require 'debugger' ; debugger ; 1==1
-        end
-      end
-    end
-  end
-
-  Integration_Hack_Data = -> do
-    fly = ::Struct.new( :count ).new
-    -> e do
-      if ! ( ::Hash === e.stream_name )
-        fail "wat: #{ e.class } : #{ e.stream_name.class }"
-      end
-      fly.members.each do |x|
-        fly[x] = e.stream_name[x]
-      end
-      fly
-    end
-  end.call
-
   class CLI
-    extend MetaHell::Autoloader::Autovivifying::Recursive # used below
+
+    # notable things about it:
+    #   + it itself is not a pub sub emitter - kiss
+    #   + it's a franken-client of both legacy and headless,
+    #       with latter trumping former. that it works is a testament to
+    #       something, i'm not sure what
+    #   + legacy DSL gets turned on below and that's when it hits the fan
+
+    extend MetaHell::Autoloader::Autovivifying::Recursive
+                                  # we autoload during load of this file
 
     include CLI::Action::InstanceMethods
 
-  protected                       # (DSL happens at bottom half)
-
-    # hide the old way / new way dichotomy in here ..
-    def initialize *sin_sout_serr
-      @program_name = nil
-      if block_given?
-        fail 'where?'
-        super
-      else
-        up, pay, info = sin_sout_serr
-        pay or
-          raise ::ArgumentError.new "missing required paystream (2nd) arg"
-        info or
-          raise ::ArgumentError.new "missing required infostream (3rd) arg"
-        wiring = -> o do
-          o.on_payload { |e| pay.puts Integration_Hack_Msg[ e ] }
-          o.on_error   { |e| info.puts Integration_Hack_Msg[ e ] }  # #todo integration only
-          o.on_info    { |e| info.puts Integration_Hack_Msg[ e ] }
-          o.invocation_slug = @program_name
-        end
-        super(& wiring)
-      end
-    end
-
-    def emit name, pay
-      runtime.emit name, pay
-    end
-
-    def error msg # away at [#010]
-      emit :error, "#{ program_name } says: #{ msg }"
-      false
-    end
-
-    define_method :escape_path, &Headless::CLI::PathTools::FUN.pretty_path
-
-    def info msg # away at [#010]
-      emit :info, "#{ program_name } wants you to know: #{
-      }#{ msg }"
-      nil
-    end
-
-    def invite api_or_cli_action_instance
-      nan = if ::Array === api_or_cli_action_instance  # no CLI::Actions yet
-        api_or_cli_action_instance
-      else
-        api_or_cli_action_instance.send :normalized_action_name
-      end
-      full = [ program_name, * nan, '-h' ].join ' '
-      msg = "#{ kbd full } might have more information"
-      runtime.emit :help, msg     # kill it with fire
-      nil # we processed the false so don't propagate it
-    end
+    include Headless::CLI::Client::InstanceMethods
 
     def invoke argv               # modify at [#010]
       Headless::CLI::PathTools.clear # see
-      res = super                 # (handles invites when parsing goes wrong)
-
-      if false == res             # (but otherwise when we result in false..)
-        # in the future: emit :help, invite_lite
-        porcelain.runtime.stack.first.issue
+      res = super argv            # super handles argument errors etc.
+      if false == res             # but if this, it is a petition for this:
+        error "a low-ass-level error occured."
         res = nil
       end
       res
     end
 
-    public :invoke
+  protected                       # (DSL happens at bottom half)
 
-    def program_name
-      @program_name || ::File.basename( $PROGRAM_NAME ) # etc kill it with fire
+    # `initialize` - we are straddling two f.w's: all we want is our (modality)
+    # calls to to `emit` to "work". we follow the good standard of [#sl-114],
+    # which among other things makes testing easier. Even though `legacy` gets
+    # priority on the chain, it won't overwrit the (io adapter-based) `emit`
+    # we get from h.l, which is good.
+
+    def initialize up, pay, info  # (only strictifies the signature)
+      super nil, nil, nil                      # lets legacy know we do it
+      init_headless_cli_client up, pay, info  # i mean h.l does it
+      nil
     end
 
-    attr_writer :program_name
-    public :program_name=
+    #         ~ event handling and emitting ~
+
+    # emission of payload is straightforward. it is payload, we do not decorate
+    # it. (#doc-point [#031] might have details on this)
+
+    def handle_payload
+      @handle_payload ||= -> txt do
+        ::String === txt or fail "where? #{ txt.class }"  # #todo - remove
+        payload txt
+      end
+    end
+
+    def handle_raw_info
+      @handle_raw_info ||= -> txt do
+        ::String === txt or fail "wat #{ x.class }" # #todo -remove
+        info txt
+      end
+    end
+
+    render = -> me, e do
+      if e.can_render_under
+        e.render_under me
+      else
+        e.fetch_text
+      end
+    end
+
+    split = -> do  # so ridiculous - "# (foo)" => [ "# (", "foo", ")" ]
+      rx = /\A([( #]+)(.*[^)])(\))?\z/
+      -> txt do
+        if rx =~ txt
+          $~.captures
+        else
+          [ nil, txt, nil ]
+        end
+      end
+    end.call
+
+    define_method :handle_info do
+      @handle_info ||= -> e do  # assume API::Events::Lingual subproduct wide?
+        txt = render[ self, e ]
+        a, txt, z = split[ txt ]
+        txt = "#{ a }while #{ e.verb.progressive } #{ e.noun }, #{ txt }#{ z }"
+        info txt                               # (flatten the payload [#031])
+      end
+    end
+
+    define_method :handle_error do
+      @handle_error ||= -> e do
+        txt = render[ self, e ]
+        a, txt, z = split[ txt ]
+        txt = "#{ a }failed to #{ e.verb } #{ e.noun } - #{ txt }#{ z }"
+        error txt                               # (it flattens it [#031])
+      end
+    end
+
+    def issue_an_invitation_for norm_name_a
+      as = CLI.fetch_action_sheetish norm_name_a
+      issue_an_invitation_to_sheet as
+      nil
+    end
+
+    def self.fetch_action_sheetish norm_name_a  #straddle
+      # there is 1 level of legacy actions (which are now fine, it was cleaned)
+      # but this nerk may be among the non-legacy too. hacklund
+      if 1 == norm_name_a.length
+        story.action_box[ norm_name_a[0] ]
+      else
+        a = norm_name_a.dup  # [ 'a', 'b' ] => [ 'a', :Actions, 'b'] ..
+        full_a = a.reduce( [ a.shift ] ) { |m, x| m << :Actions ; m << x ; m }
+        CLI::Actions.const_fetch full_a  # result in a class as a sheet!!
+      end
+    end
+
+    def issue_an_invitation_to live_action  # assume everything
+      issue_an_invitation_to_sheet live_action.class
+    end
+
+    def issue_an_invitation_to_sheet action_sheet
+      parts = action_sheet.full_name_function.map :as_slug
+      parts.unshift program_name
+      parts << '-h'
+      emit :ui, "#{ kbd parts.join( ' ' ) } might have more information"
+      nil  # SWALLOWED IT
+    end
+
+    #         ~ renderers not tied to any particular kind of event ~
+    #         ~ (some for compat as a modality client for headless) ~
+    #         ~ (alphabetical) ~
+
+    define_method :escape_path, &Headless::CLI::PathTools::FUN.pretty_path
+
+    def val x                     # how do you decorate a special value?
+      em x
+    end
+
+    def render_param param        # `param` is a wrapper object
+      if param.is_option
+        param.as_parameter_signifier
+      elsif param.is_argument
+        "<#{ param.slug }>"
+      end
+    end
+
+    #         ~ a fresh take on [#hl-036] `param` ~
+
+    def param norm_name
+      @legacy_last_action_subclient.fetch_param norm_name
+    end
+
+    #         ~ api nerks ~
+
+    def api
+      @api ||= Snag::API::Client.new self
+    end
 
     # --*--
 
-    extend Porcelain                           # now entering DSL zone
+    extend Porcelain::Legacy::DSL              # now entering DSL zone
 
     namespace :node, -> { CLI::Actions::Node }
 
@@ -118,7 +171,11 @@ module Skylab::Snag
     desc "(more of a plumbing than porcelain feature!)"
 
     def numbers
-      api_invoke [:nodes, :numbers, :list]
+      api_invoke [ :nodes, :numbers, :list ], nil, -> a do
+        a.on_error handle_error
+        a.on_info handle_info
+        a.on_output_line handle_payload
+      end
     end
 
     # --*--
@@ -127,56 +184,69 @@ module Skylab::Snag
     desc "when one argument provided, is used as first line of new issue"
     desc "that will be tagged #open"
 
-    option_syntax do |param_h|
-      o = self
+    option_parser do |o|
+      param_h = @param_h
+
       o.on '-n', '--max-count <num>',
         "limit output to N nodes (list only)" do |n|
         param_h[:max_count] = n
       end
+
+      o.regexp_replace_tokens %r{\A-(?<num>\d+)\z} do |md|  # [#030]
+        [ '--max-count', md[:num] ]
+      end
+
       o.on '--dry-run', "don't actually add the node (add only)" do
         param_h[:dry_run] = true
       end
+
       o.on '-v', '--verbose', 'verbose output' do
-        param_h[:verbose] = true
+        param_h[:be_verbose] = true
       end
     end
+
+    option_parser_class CLI::Option::Parser
 
     argument_syntax '[<message>]'
 
     def open message=nil, param_h
-      res = nil
+      # ( see description above - for fun we do a tricky dynamic syntax )
+      pbox = MetaHell::Formal::Box::Open.from_hash param_h ; param_h = nil
       msg = -> is_opening do                   # i hope you enjoyed this
-        a_b = ['opening issues', 'listing open issues']
+        a_b = [ 'opening issues', 'listing open issues' ]
         a_b.reverse! if is_opening
-        "sorry - #{ and_( a = param_h.keys ) } #{ s a, :is } #{
-        }used for #{ a_b.first }, not #{ a_b.last }"
+        a = pbox.names.map { |n| em render_param( param n ) }
+        "sorry - #{ and_ a } #{ s :is } used for #{ a_b.first}, not #{a_b.last}"
       end
       if message
-        dry_run = param_h.delete :dry_run
-        verbose = param_h.delete :verbose
-        if param_h.empty?
-          res = api_invoke( [:nodes, :add], {
-            do_prepend_open_tag: true,
-            dry_run: dry_run,
-            message: message,
-            verbose: verbose } )
-        else
-          res = error msg[ true ]
+        p = pbox.partition_by_keys! :dry_run, :be_verbose  # p has the <= 2 eles
+        if pbox.length.nonzero? then res = error msg[ true ] else
+          res = api_invoke [ :nodes, :add ],
+            p.to_hash.merge!(
+              do_prepend_open_tag: true,
+                          message: message
+            ), -> a do
+              a.on_error handle_error
+              a.on_info handle_info
+              a.on_raw_info handle_raw_info
+              a.on_new_node { |_| } # handled by manifest for now
+            end
         end
       else
-        max_count = param_h.delete :max_count
-        verbose = param_h.delete( :verbose ) || false # we decide here the dflt
-        if param_h.empty?
-          res = api_invoke( [:nodes, :reduce], {
-            max_count: max_count,
-            query_sexp: [:and, [:has_tag, :open]],
-            verbose: verbose } )
-        else
-          res = error msg[ false ]
+        p = pbox.partition_by_keys! :max_count, :be_verbose
+        if pbox.length.nonzero? then res = error msg[ false ] else
+          p.add( :be_verbose, false ) if ! p.has? :be_verbose # decide dflt here
+          p.add :query_sexp, [ :and, [ :has_tag, :open ] ]
+          res = api_invoke [ :nodes, :reduce ], p.to_hash, -> a do
+            a.on_output_line handle_payload
+            a.on_info handle_info
+            a.on_error handle_error
+            a.on_invalid_node { |e| info invalid_node_message( e ) }
+          end
         end
       end
       if false == res
-        res = invite [:open]
+        res = issue_an_invitation_for [ :open ]
       end
       res
     end
@@ -187,80 +257,9 @@ module Skylab::Snag
 
     # --*--
 
-  protected                       # (below was left in the bottom half b/c
-                                  # it is the evil that shall not be touched
-                                  # until [#010])
-
-    # this nonsense wires your evil foreign (frame) runtime to the big deal parent
-    def wire! runtime, parent
-      runtime.event_class = Snag::API::MyEvent
-      runtime.on_error { |e| parent.emit(:error, e.touch!) }
-      runtime.on_info  { |e| parent.emit(:info, e.touch!) }
-      runtime.on_all   { |e| parent.emit(e.type, e) unless e.touched? }
-    end
-                                  # (also this kind of thing can be nice in
-    def wire_action action        # constructors for cli actions)
-      if action.emits? :payload
-        action.on_payload do |e|
-          runtime.emit :payload, e
-        end
-      end
-      wire_action_for_info  action if action.emits? :info
-      wire_action_for_error action if action.emits? :error
-      nil
-    end
-
-    render = -> me, e do
-      if e.does_render_for
-        msg = e.render_for me
-      else
-        msg = e.msg
-      end
-      msg
-    end
-
-    define_method :wire_action_for_error do |action|
-      action.on_error do |e|
-        rendered = render[ self, e ]
-        e.message = "failed to #{ e.verb } #{ e.noun } - #{ rendered }"
-        emit :error, e
-        nil
-      end
-      nil
-    end
-
-    define_method :wire_action_for_info do |action|
-      action.on_info do |e|
-        unless e.touched?
-          rendered = render[ self, e ]
-          md = %r{\A\((.+)\)\z}.match( rendered ) and rendered = md[1]
-          e.message = "while #{ e.verb.progressive } #{ e.noun }, #{ rendered }"
-          md and e.message = "(#{ e.msg })" # so ridiculous
-          emit :info, e
-        end
-        nil
-      end
-      nil
-    end
   end
 
-  module CLI_PenMethods           # here just for compartmentalization
-                                  # and clarity
-
-    include Headless::CLI::Pen::InstanceMethods
-
-  protected
-
-    def ick x                     # for rendering invalid values
-      x.to_s.inspect
-    end
-
-    def val x                     # how do you decorate a special value?
-      em x
-    end
-  end
-
-  class CLI
-    include CLI_PenMethods
-  end
+  module CLI::Actions             # avoiding an #orphan sorry
+    extend MetaHell::Boxxy        # (it's as if we are wiring an autoloader)
+  end                             # also BOXXY IS QUEEN
 end

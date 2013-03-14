@@ -1,28 +1,22 @@
 require_relative '../core'
 require 'skylab/test-support/core'
 
-
 module Skylab::Snag::TestSupport
   ::Skylab::TestSupport::Regret[ Snag_TestSupport = self ]
 
-
   module CONSTANTS
     Headless = ::Skylab::Headless
+    MetaHell = ::Skylab::MetaHell
     Snag = ::Skylab::Snag
     TestSupport = ::Skylab::TestSupport
   end
 
-
   include CONSTANTS # in the body of child modules
-
-
 
   module InstanceMethods
     include CONSTANTS
 
     attr_accessor :do_debug
-
-    alias_method :debug?, :do_debug
 
     def debug!
       tmpdir.debug!
@@ -30,7 +24,7 @@ module Skylab::Snag::TestSupport
     end
 
     def from_tmpdir &block
-      Snag::Services::FileUtils.cd( tmpdir, verbose: debug?, &block)
+      Snag::Services::FileUtils.cd tmpdir, verbose: do_debug, &block
     end
 
     manifest_path = Snag::API.manifest_path

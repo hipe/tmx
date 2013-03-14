@@ -1,76 +1,91 @@
 module Skylab::Snag
+
   module API::Actions::Node
+    # (as a fun exercise, can you spot the exploratory exercise in here?)
   end
 
   class API::Actions::Node::Close < API::Action
-    emits :info, :error
 
-    params :dry_run, :node_ref, :verbose
+    params    :be_verbose,
+                 :dry_run,
+                :node_ref
+
+    emits            info: :lingual
 
     def execute
       res = nil
       begin
         nodes or break
-        node = @nodes.fetch_node( node_ref ) or break( res = node )
+        res = node = @nodes.fetch_node( @node_ref ) or break
         res = node.close or break
-        res = @nodes.changed node, dry_run, verbose
+        res = @nodes.changed node, @dry_run, @be_verbose
       end while nil
       res
     end
   end
 
   module API::Actions::Node::Tags
-    extend MetaHell::Autoloader::Autovivifying::Recursive
   end
 
   class API::Actions::Node::Tags::Add < API::Action
-    emits :payload, :info, :error
 
-    params :do_append, :dry_run, :node_ref, :tag_name, :verbose
+    params    :be_verbose,
+               :do_append,
+                 :dry_run,
+                :node_ref,
+                :tag_name
+
+    emits            info: :lingual
 
     def execute
       res = nil
       begin
         nodes or break
-        node = @nodes.fetch_node( node_ref ) or break( res = node )
-        res = node.add_tag( tag_name, do_append ) or break
-        res = @nodes.changed node, dry_run, verbose
+        node = @nodes.fetch_node( @node_ref ) or break( res = node )
+        res = node.add_tag( @tag_name, @do_append ) or break
+        res = @nodes.changed node, @dry_run, @be_verbose
       end while nil
       res
     end
   end
 
   class API::Actions::Node::Tags::Ls < API::Action
-    emits :payload, :error
 
-    params :node_ref
+    params       :node_ref
+
+    emits            tags: :datapoint
 
     def execute
-      res = nil
-      begin
-        nodes or break
-        node = @nodes.fetch_node( node_ref ) or break( res = node )
-        payload Snag::Models::Tag::Events::Tags.new( node, node.tags )
-        res = true
-      end while nil
-      res
+      if nodes
+        node = @nodes.fetch_node @node_ref
+        if ! node then node else
+          emit :tags, Snag::Models::Tag::Events::Tags.new( node, node.tags )
+          true
+        end
+      end
     end
   end
 
   class API::Actions::Node::Tags::Rm < API::Action
-    emits :payload, :info, :error
 
-    params :dry_run, :node_ref, :tag_name, :verbose
+    params    :be_verbose,
+                 :dry_run,
+                :node_ref,
+                :tag_name
+
+    emits           info: :lingual,
+                 payload: :datapoint
 
     def execute
-      res = nil
-      begin
-        nodes or break
-        node = @nodes.fetch_node( node_ref ) or break( res = node )
-        res = node.remove_tag( tag_name ) or break
-        res = @nodes.changed node, dry_run, verbose
-      end while nil
-      res
+      nodes and begin
+        node = @nodes.fetch_node @node_ref
+        node and begin
+          ok = node.remove_tag @tag_name
+          ok and begin
+            @nodes.changed node, @dry_run, @be_verbose
+          end
+        end
+      end
     end
   end
 end

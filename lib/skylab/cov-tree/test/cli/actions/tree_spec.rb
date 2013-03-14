@@ -1,60 +1,64 @@
 # encoding: utf-8
 require_relative '../test-support'
 
-describe "#{ ::Skylab::CovTree } CLI action: tree" do
+describe "#{ ::Skylab::CovTree } CLI action: tree" do  # Quickie maybe..
+
   extend ::Skylab::CovTree::TestSupport::CLI
 
+  text = -> x do
+    txt = x.payload_x
+    ::String === txt or fail "expected text had #{ txt.class }"
+    txt
+  end
 
   it "show a list of matched test files only." do
 
     cd CovTree.dir_pathname.dirname do         # cd to lib/skylab ..
-      args 'tree', '-l', './cov-tree'          # and ask about this subproduct
+      argv 'tree', '-l', './cov-tree'          # and ask about this subproduct
     end                                        # itself. (yes this is a self-
                                                # referential test ^_^)
 
                                                # each one of the returned
-    while e = emitted.shift                    # events that is a payload
+    while e = emission_a.shift                    # events that is a payload
       if :payload == e.stream_name             # should be a "line" that is
-        e.payload_x.should match( %r{ \A \./cov-tree\/.+_spec\.rb \z }x ) # a path
+        text[ e ].should match( %r{ \A \./cov-tree\/.+_spec\.rb \z }x ) # a path
       else                                     # that is relative to where
         e.stream_name.should eql( :info )      # we ran it from. This last
-        e.payload_x.should match(/\d test files total/) # event should be an :info
-        emitted.should be_empty                # that tells us the number of
+        text[ e ].should match(/\d test files total/) # event should be an :info
+        emission_a.should be_empty                # that tells us the number of
         break                                  # files.
       end
     end
 
-    result.should eql(true)
+    result.should eql( 0 )
   end
 
-
   it "show a shallow tree of matched test files only." do
-    args 'tree', '-t', CovTree.dir_pathname.to_s
-    while e = emitted.shift
+    argv 'tree', '-t', CovTree.dir_pathname.to_s
+    while e = emission_a.shift
       if :payload == e.stream_name
-        if /\A[^ ]/ =~ e.payload_x
-          e.payload_x.should match(/\/test\/\z/) # silly
+        if /\A[^ ]/ =~ text[ e ]
+          text[ e ].should match(/\/test\/\z/) # silly
         else
-          e.payload_x.should match(/_spec\.rb\z/)
+          text[ e ].should match(/_spec\.rb\z/)
         end
       else
         e.stream_name.should eql( :info )
-        e.payload_x.should match(/\d test files total/)
+        text[ e ].should match(/\d test files total/)
       end
     end
   end
 
-
   it "Couldn't find test directory: foo/bar/[test|spec|features]" do
-    args 'tree', CovTree.dir_pathname.join('models').to_s
+    argv 'tree', CovTree.dir_pathname.join('models').to_s
     line.should match(/\ACouldn't find test directory.+\[test\|spec\|features/)
-    result.should eql(nil)
+    result.should eql( 1 )
   end
 
 
   it "LOOK AT THAT BEAUTIFUL COV TREE" do
     cd CovTree.dir_pathname.dirname.to_s do
-      args 'tree', 'cov-tree'
+      argv 'tree', 'cov-tree'
     end
     line.should match(/\Acov-tree, cov-tree\/test +\[\+\|-\]\z/)
     line.should match(/\A ├api +\[ \|-\]\z/)
@@ -65,6 +69,6 @@ describe "#{ ::Skylab::CovTree } CLI action: tree" do
     end
     l.should eql( ' │ │ └tree.rb, tree_spec.rb  [+|-]' ) # we hate happiness
     names.uniq.should eql([:payload])
-    result.should eql(true)
+    result.should eql( 0 )
   end
 end

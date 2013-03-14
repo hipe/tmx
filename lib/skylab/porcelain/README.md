@@ -1,6 +1,0 @@
-# Porcelain
-
-## Features
-
-  * namespaces
-
