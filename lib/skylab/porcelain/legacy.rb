@@ -993,7 +993,7 @@ module Skylab::Porcelain::Legacy
 
   protected
 
-    # `initialize` - etc.. #todo
+    # `initialize` - etc.. #todo - we should settle down this interface mebbe
 
     args_length_h = {
       0 => -> blk do
@@ -1032,6 +1032,8 @@ module Skylab::Porcelain::Legacy
       instance_exec(* up_pay_info, wire,
                    & args_length_h.fetch( up_pay_info.length ) )
     end
+
+    attr_writer :program_name  # for ouroboros  [#hl-069]
 
     attr_reader :infostream, :paystream  # for sub-cliented cliented, as above
 
@@ -1407,24 +1409,8 @@ module Skylab::Porcelain::Legacy
       s2 = s1.collapse_as_namespace nf,
         ext_ref, inline_def, xtra_h, @story_host_module
       @action_box.add s2.normalized_local_node_name, s2
-      @@namespaces << s2  # #todo - integration only
       nil
     end
-
-    # START - this is for during integration *only* # #todo
-    @@namespaces = [ ]  # used for a hack that will be put down soon
-    -> do
-      namespaces = -> do  # you don't get to have the whole array
-        NSs_Read_Only_Pxy = MetaHell::Proxy::Nice.new :length, :[]
-        pxy = NSs_Read_Only_Pxy.new( :length => -> { @@namespaces.length },
-                            :'[]' => -> idx { @@namespaces[ idx ] } )
-        namespaces = -> { pxy } ; pxy
-      end
-      Legacy.class_exec do
-        define_singleton_method :namespaces do namespaces[] end
-      end
-    end.call
-    # END
   end
 
   class Action::Sheet  # (re-opened)
@@ -1449,7 +1435,7 @@ module Skylab::Porcelain::Legacy
         res.absorb_h xtra_h if xtra_h
         @is_visible = @alias_a = @argument_syntax_string = @argument_syntax =
           @desc_a = nil
-        freeze  # just being cute, this obj is a tombstone now # #todo
+        freeze  # just being cute, this obj is a tombstone now
         res
       end
     end
@@ -1457,16 +1443,6 @@ module Skylab::Porcelain::Legacy
 
   class Namespace::Sheet < Action::Sheet
 
-    def name  # #todo - this is for integration only
-      @name_function.as_slug
-    end
-    def aliases  # #todo - this is for integration only
-      alias_a
-    end
-    def for_run mc, slug_fragment  # #todo - integration only
-      action_class.new out: mc.out, err: mc.err,
-        program_name: "#{ mc.program_name } #{ @name_function.as_slug }"
-    end
     def summary
       @desc_a || [ "the #{ @name_function.as_slug } action" ]
     end

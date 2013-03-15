@@ -120,8 +120,22 @@ module Skylab::Headless
       else
         # the block form is more complicated - evaluate the desc in the context
         # of the parent object, b.c that is where you would have defiend helpers
-        action_class_in_progress!.desc do |o|
-          @request_client.instance_exec o, &b
+        # (Also, it won't do it now, it will do it later, which is good because
+        # the block might access helpers that need metadata about the action,
+        # which isn't complete yet! hence the 'current action' stuff..)
+        #
+        action_class_in_progress!.desc do |y|
+          me = self  # at this spot now we are being lazy-evaluated (late)
+          @request_client.instance_exec do  # spot [#064]
+            if @downstream_action != me
+              if @downstream_action # [#064]
+                change_to me
+              else
+                collapse_to me
+              end
+            end
+            instance_exec y, &b
+          end
           nil
         end
       end
@@ -200,9 +214,7 @@ module Skylab::Headless
 
     alias_method :cli_box_dsl_original_dispatch, :dispatch
 
-    frame_struct = ::Struct.new :is_leaf, :option_parser
-
-    define_method :dispatch do |action=nil, *args|  # **NOTE** params cosmetic!
+    def dispatch action=nil, *args  # **NOTE** params cosmetic!
       action_ref = action  # clean that name up right away
       if ! action_ref then cli_box_dsl_original_dispatch else
         klass = if ::Class === action_ref
@@ -215,26 +227,50 @@ module Skylab::Headless
           if live_action.is_branch  # why deny the child its own autonomy
             live_action.invoke args
           else
-            @downstream_action = live_action
-            x = ( @prev_frame ||= frame_struct.new ) # really ask for it
-            x.is_leaf = true ; @is_leaf = live_action.is_leaf
-            x.option_parser = option_parser_ivar
-            @option_parser = live_action.option_parser
-            if @queue.length.nonzero?
-              fail 'sanity' if :dispatch != @queue[0]
-            end
-            @queue[0] = live_action.leaf_method_name
-                                      # put the method name of the particular
-                                      # action on the queue -- its placement is
-                                      # sketchy
+            collapse_to live_action
             invoke args
           end
         end
       end
     end
 
-    def is_collapsed
-      @downstream_action
+    Frame_ = ::Struct.new :is_leaf, :option_parser
+
+    def collapse_to live_action
+      if @queue.length.nonzero?
+        fail 'sanity' if :dispatch != @queue[0]
+      end
+      @prev_frame ||= Frame_.new  # really asking for it
+      @prev_frame.is_leaf = false
+      @prev_frame.option_parser = option_parser_ivar
+      change_to live_action
+      nil
+    end
+
+    def change_to live_action     # we hate this
+      @downstream_action = live_action
+      @is_leaf = live_action.is_leaf
+      @option_parser = live_action.option_parser
+      @queue[0] = live_action.leaf_method_name
+                                  # put the method name of the particular
+                                  # action on the queue -- its placement is
+                                  # sketchy
+
+      nil
+    end
+                                  # undoes the collapsing k.i.w.f oh lord
+                                  # called from children corroborating
+    def uncollapse_from normalized_leaf_name
+      if @downstream_action.normalized_local_action_name !=
+          normalized_leaf_name then
+        fail 'sanity'
+      end
+      @is_leaf = @prev_frame.is_leaf
+      @prev_frame.is_leaf = nil
+      @option_parser = @prev_frame.option_parser
+      @prev_frame.option_parser = nil
+      @downstream_action = nil
+      nil
     end
                                   # please watch carefully: we 1) out of the box
                                   # identify as being a branch and 2) make this
@@ -251,19 +287,6 @@ module Skylab::Headless
                                   # false-ish.)
 
 
-                                  # undoes the collapsing k.i.w.f oh lord
-    def uncollapse! normalized_leaf_name  # called from children corroborating
-      if @downstream_action.normalized_local_action_name !=
-          normalized_leaf_name then
-        fail 'sanity'
-      end
-      o = @prev_frame
-      @is_leaf = o.is_leaf ; o.is_leaf = nil
-      @option_parser = o.option_parser ; o.option_parser = nil
-      @downstream_action = nil
-      nil
-    end
-
     def default_action                         # (called by `invoke`)
       @default_action ||= :dispatch            # compare to box above
     end
@@ -273,12 +296,16 @@ module Skylab::Headless
                                   # our invocation string is dynamic based
                                   # on whether we have yet mutated or not!
 
-    def normalized_invocation_string as_collapsed=true
+    def normalized_invocation_string as_collapsed=true  # hybridized
       a = [ super(  ) ]
       if is_collapsed && as_collapsed
         a << @downstream_action.name.as_slug
       end
       a.join ' '
+    end
+
+    def is_collapsed
+      @downstream_action
     end
 
     def build_option_parser       # popular default, [#hl-037]
@@ -307,7 +334,7 @@ module Skylab::Headless
       # this is for a box creating its child leaf o.p
 
 
-    def argument_syntax           # "hybridization"
+    def argument_syntax           # [#063] hybridized
       if is_collapsed
         argument_syntax_for_method(
           @downstream_action.normalized_local_action_name )
@@ -316,7 +343,7 @@ module Skylab::Headless
       end
     end
 
-    def render_argument_syntax syn, em_range=nil
+    def render_argument_syntax syn, em_range=nil  # [#063] hybridized
       if @downstream_action && @downstream_action.class.append_syntax_a
         "#{ super } #{ @downstream_action.class.append_syntax_a * ' ' }"
       else
@@ -324,13 +351,28 @@ module Skylab::Headless
       end
     end
 
-    def invite_line z=nil         # hybridization hack
+    def invite_line z=nil         # [#063] hybridized
       if is_collapsed
         render_invite_line "#{ normalized_invocation_string false } -h #{
           }#{ @downstream_action.name.as_slug }", z
       else
         super
       end
+    end
+
+    def build_desc_lines          # [#063] hybridized, spot [#064]
+      # check this awfulness out: when we build our desc lines we call for
+      # the `summary_line` of each (visible) child. the summary line of each
+      # child, in turn, may call *its* `desc_lines` which in turn calls
+      # *its* version of this method, which in turns causes this object
+      # to "collapse" around the child.. When all this whootenany is done,
+      # we have to make sure to uncollapse so that we don't report child
+      # parts as our own!
+      x = super
+      if is_collapsed
+        uncollapse_from @downstream_action.normalized_local_action_name
+      end
+      x
     end
 
     # --*--
@@ -356,6 +398,7 @@ module Skylab::Headless
   end
 
   module CLI::Box::DSL::Leaf_ModuleMethods
+
     include CLI::Action::ModuleMethods         # #reach-up!
 
     def build_option_parser &block # (This is the DSL block writer.)
@@ -398,7 +441,7 @@ module Skylab::Headless
         o.on '-h', '--help', 'this screen' do
           leaf_name = leaf.normalized_local_action_name
           if prev_frame
-            uncollapse! leaf_name
+            uncollapse_from leaf_name
           end # else hackery
           if @queue.length.nonzero?
             leaf_name == @queue.first or fail "sanity - #{ @queue.first }"

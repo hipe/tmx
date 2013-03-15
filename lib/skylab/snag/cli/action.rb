@@ -68,7 +68,7 @@ module Skylab::Snag
 
     def warn_about_unhandled_streams action
       g = action.send :unhandled_event_stream_graph
-      missed = g.names - API::Events.terminal_stream_names
+      missed = g.names - Snag::API::Events.terminal_stream_names
         # (ignore 'base types' like :lingual, :datapoint)
       if missed.length.nonzero?
         emit :warn, "(warning, unhandled: #{ missed.join ', ' })"

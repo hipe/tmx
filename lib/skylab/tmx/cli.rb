@@ -17,11 +17,13 @@ module Skylab::TMX
   # it is useful during development to be able to focus on one
   # sub-node at a time when necessary, by commenting *in* an
   # item below to *de*activate it. (comment it out to activate it! #todo))
+  # (the ones de-activated below also happen to be the uninteresting,
+  # really old ones)
 
   metadata_h = ::Hash[ [
     :bleed,
     :cli,
-    :'cov-tree',
+    # :'cov-tree',  # - ok
     # :'file-metrics',  # - ok
     :'git-viz',
     :jshint,
@@ -31,6 +33,7 @@ module Skylab::TMX
     :schema,
     # :snag, # - ok
     :'team-city',
+    # :tan-man, # - ok
     # :treemap, # - ok
     :xpdf
   ].map { |k| [ k, false ] } ].freeze

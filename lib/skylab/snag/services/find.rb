@@ -1,6 +1,6 @@
 module Skylab::Snag
 
-  class Models::ToDo::Command  # [#032] - see if we can unify find commands ..
+  class Services::Find  # [#032] - see if we can unify find commands ..
 
     #         ~ the point is to make it hard to succeed ~
 

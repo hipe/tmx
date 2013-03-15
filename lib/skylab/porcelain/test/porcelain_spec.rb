@@ -508,7 +508,7 @@ module Skylab::Porcelain::TestSupport
     context "(part 7) With regards to Namespaces.." do
       context "Porcelain itself" do
         subject { Porcelain::Legacy }
-        it { should respond_to(:namespaces) }
+        it { should_not respond_to(:namespaces) }  # tombstone of the past
       end
       if false # sorry
       context "if you try to use both an external class and an inline namespace definition"

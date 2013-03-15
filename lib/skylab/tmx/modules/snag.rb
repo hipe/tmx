@@ -1,7 +1,11 @@
-require 'skylab/snag/core'
-
 class Skylab::TMX::CLI
 
-  namespace :snag, -> { ::Skylab::Snag::CLI }
+  namespace :snag, -> do
+
+    require 'skylab/snag/core'
+
+    ::Skylab::Snag::CLI
+
+  end, aliases: [ :sg ]
 
 end

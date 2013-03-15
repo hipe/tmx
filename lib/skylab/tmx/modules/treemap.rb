@@ -1,7 +1,11 @@
-require 'skylab/treemap/core'
-
 class Skylab::TMX::CLI
 
-  namespace :'treemap', -> { ::Skylab::Treemap::CLI }
+  namespace :'treemap', -> do
+
+    require 'skylab/treemap/core'
+
+    ::Skylab::Treemap::CLI
+
+  end
 
 end

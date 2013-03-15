@@ -5,6 +5,8 @@ Skylab::TanMan::API || nil                     # #preload here, prettier below
 module Skylab::TanMan
 
   module CLI
+    Adapter = Bleeding::Adapter  # "ouroboros" ([#hl-069])
+
     extend MetaHell::Autoloader::Autovivifying::Recursive
                                   # (we need the above to be so before this file
                                   # finishes loading!)

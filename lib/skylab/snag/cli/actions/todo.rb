@@ -18,45 +18,48 @@ module Skylab::Snag
       nil
     end
 
-    build_tree = nil
+    -> do  # `find`
 
-    define_method :find do |path, *paths|
-      paths.unshift( path ) ; path = nil
-      @param_h[ :paths ] = paths ; paths = nil
-      if @param_h.key? :tree_level
-        tree_level = @param_h.delete :tree_level
-      end
-      tree = nil
-      res = api_invoke [ :to_do, :report ], @param_h do |a|
-        a.on_info handle_info
-        a.on_error handle_error
-        a.on_command do |cmd|
-          payload cmd
+      build_tree = nil
+
+      define_method :find do |path, *paths|
+        paths.unshift( path ) ; path = nil
+        @param_h[ :paths ] = paths ; paths = nil
+        if @param_h.key? :tree_level
+          tree_level = @param_h.delete :tree_level
         end
-        a.on_number_found do |num|
-          info "(found #{ num } item#{ s num })"
-        end
-        if tree_level
-          tree = build_tree[ a, tree_level, request_client ]
-        else
-          a.on_todo do |t|
-            payload t.upstream_output_line
+        tree = nil
+        res = api_invoke [ :to_do, :report ], @param_h do |a|
+          a.on_info handle_info
+          a.on_error handle_error
+          a.on_command do |cmd|
+            payload cmd
+          end
+          a.on_number_found do |num|
+            info "(found #{ num } item#{ s num })"
+          end
+          if tree_level
+            tree = build_tree[ a, tree_level, request_client ]
+          else
+            a.on_todo do |t|
+              payload t.upstream_output_line
+            end
           end
         end
+        if tree && res
+          res = tree.render
+        end
+        res
       end
-      if tree && res
-        res = tree.render
-      end
-      res
-    end
 
-    build_tree = -> action, level, request_client do
-      tree = CLI::ToDo::Tree.new request_client, ( level > 1 )
-      action.on_todo do |todo|
-        tree << todo  # with each todo, build the tree
+      build_tree = -> action, level, request_client do
+        tree = CLI::ToDo::Tree.new request_client, ( level > 1 )
+        action.on_todo do |todo|
+          tree << todo  # with each todo, build the tree
+        end
+        tree
       end
-      tree
-    end
+    end.call
 
     # --*--
 
@@ -70,17 +73,17 @@ module Skylab::Snag
     end
 
     desc do |y|  # #todo - can you melt me
-      df = API::Actions::ToDo::Melt.attributes[ :paths ][ :default ]
+      df = Snag::API::Actions::ToDo::Melt.attributes[ :paths ][ :default ]
       df.map!(& method( :ick ))
       y << 'arguments:'
-      s = "  #{ param :path }  the path(s) to search (default: #{ df * ', '})"
+      s = "  #{ param :path } the path(s) to search (default: #{ df * ', '})"
       y << s
       nil
     end
 
     def melt *path
       if path.length.zero?  # triggering dflts to list params is not automatic
-        path.concat API::Actions::ToDo::Melt.attributes[ :paths ][ :default ]
+        path.concat Snag::API::Actions::ToDo::Melt.attributes[ :paths ][ :default ]
       end
       api_invoke [ :to_do, :melt ],
         {           dry_run: false,
@@ -97,10 +100,11 @@ module Skylab::Snag
 
     dsl_off
 
-    d = -> do
-      x = Snag::API::Actions::ToDo::Report.attributes.meta_attribute_value_box :default
-      d = -> { x }
-      x
+    default = -> do
+      box = Snag::API::Actions::ToDo::Report.attributes.
+        meta_attribute_value_box :default
+      default = -> { box }
+      box
     end
 
     define_method :command_option do |o|
@@ -114,14 +118,14 @@ module Skylab::Snag
       o.on '--name <NAME>',
         "the filename patterns to search, can be specified",
         "multiple times to broaden the search #{
-          }(default: '#{ d[][:names] * "', '" }')" do |n|
+          }(default: '#{ default[][:names] * "', '" }')" do |n|
             ( param_h[:names] ||= [] ).push n
       end
     end
 
     define_method :pattern_option do |o|
       o.on '-p', '--pattern <PATTERN>',
-        "the todo pattern to use (default: '#{ d[][:pattern] }')" do |p|
+        "the todo pattern to use (default: '#{ default[][:pattern] }')" do |p|
         param_h[:pattern] = p
       end
     end

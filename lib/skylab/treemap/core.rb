@@ -26,7 +26,7 @@ module Skylab::Treemap
 
   module CLI
     extend MAARS
-    Adapter = Porcelain::Bleeding::Adapter # "ouroboros" ([#hl-069])
+    Adapter = Porcelain::Bleeding::Adapter  # "ouroboros" ([#hl-069])
 
     def self.new *a, &b
       CLI::Client.new( *a, &b )   # a conventional delegation. conform to the

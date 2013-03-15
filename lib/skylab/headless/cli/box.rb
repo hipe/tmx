@@ -103,15 +103,19 @@ module Skylab::Headless
       nil
     end
 
-    def build_desc_lines          # (related to above - when we make descs
-      res = super                 #  we make sections too)
-      visible = action_box_module.each.reduce [] do |m, (k, c)|
+    # `build_desc_lines` - this hackishly results in the array *and* has
+    # side-effects (#todo) (here b.c called by `help_screen` in parent).
+    # When we collapse the descs we build the sections too.
+
+    def build_desc_lines
+      res = super
+      a = action_box_module.each.reduce [] do |m, (k, c)|
         m << ( c.new self )       # ich muss sein - we need a charged graph
       end
-      if visible.length.nonzero?
-        ( @sections ||= [] ) <<
-          ( section = CLI::Desc::Section.new 'actions:', [ ] )
-        visible.each do |act|
+      if a.length.nonzero?
+        section = CLI::Desc::Section.new "action#{ s a }:", [ ]
+        ( @sections ||= [] ) << section
+        a.each do |act|
           section.lines << [ :item, act.name.as_slug, act.summary_line ]
         end
       end

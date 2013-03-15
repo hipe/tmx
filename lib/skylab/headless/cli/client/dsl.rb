@@ -49,7 +49,9 @@ module Skylab::Headless
   end
 
   module CLI::Client::DSL::InstanceMethods
+
     include CLI::Client::InstanceMethods
+
     # include CLI::Box::DSL::InstanceMethods WAS
 
   protected

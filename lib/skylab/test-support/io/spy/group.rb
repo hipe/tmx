@@ -114,4 +114,49 @@ module Skylab::TestSupport
       @streams = { }
     end
   end
+
+
+  class IO::Spy::Group::Composite
+
+    def self.of enum
+      me = new
+      enum.each do |emission|
+        me.see emission
+      end
+      me.to_read_only
+    end
+
+    def see struct
+      @stream_name_hash.fetch struct.stream_name do |k|
+        @stream_name_hash[k] = true
+        @unique_stream_name_order << k
+      end
+      @text_a << struct.string
+      nil
+    end
+
+    def to_read_only
+      ReadOnly.new @unique_stream_name_order, @text_a
+    end
+
+    def initialize
+      @unique_stream_name_order = [ ]
+      @stream_name_hash = { }
+      @text_a = [ ]
+    end
+  end
+
+  class IO::Spy::Group::Composite::ReadOnly
+
+    def full_text
+      @full_text ||= @text_a.join ''  # remember we didn't chomp anything!
+    end
+
+    attr_reader :unique_stream_name_order
+
+    def initialize unique_stream_name_order, text_a
+      @unique_stream_name_order, @text_a =
+        unique_stream_name_order.dup.freeze, text_a.dup.freeze
+    end
+  end
 end

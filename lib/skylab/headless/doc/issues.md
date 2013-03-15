@@ -1,4 +1,6 @@
 [#069]       #doc-point (sorry to jump ahead) "ouroboros"
+[#064]       #spot a wicked tricky thing
+[#063] #open it smells because of hybridization
 [#062] #open the sweeping architecture change to accomodate homonyms
 [#061]       flyweight the architecture of language production
 [#060]       #doc-point: normalized line producers / consumers

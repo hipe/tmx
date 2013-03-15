@@ -24,8 +24,8 @@ module Skylab::Snag
     def execute
       ea = Snag::Models::ToDo::Enumerator.new @paths, @names, @pattern
       if @show_command_only
-        ea.command.if_valid -> cmd do
-          emit :command, cmd
+        ea.command.command -> cmd_str do
+          emit :command, cmd_str
           true
         end, -> err do
           error err

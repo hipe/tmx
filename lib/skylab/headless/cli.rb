@@ -26,7 +26,7 @@ module Skylab::Headless
     #         ~ option parser facility - module methods ~
 
     def option_parser &block      # dsl-ish that just accrues these for you.
-      ( @option_parser_blocks ||= [ ] ).push block # turning it into an o.p.
+      ( @option_parser_blocks ||= [ ] ) << block # turning it into an o.p.
       nil                         # is *your* responsibility. depends on what
     end                           # happens in your `build_option_parser` if any
 
@@ -45,7 +45,6 @@ module Skylab::Headless
     #   (see explanation in the corresponding i.m section)
 
     def desc *lines, &block       # `desc` - [#hl-033] dsl-ly writer.
-      @desc_blocks ||= [ ]
       if lines.length.zero?
         if ! block
           raise ::ArgumentError, "this is a dsl-ish attr writer. arg expected"
@@ -57,7 +56,7 @@ module Skylab::Headless
           lines.each(& y.method( :yield ) )
         end
       end
-      @desc_blocks << block
+      ( @desc_blocks ||= [ ] ) << block
       nil
     end
 
@@ -298,21 +297,24 @@ module Skylab::Headless
       "use #{ kbd inner_string } for help#{ " #{ z }" if z }"
     end
 
-    strip_description_label_rx = /\A[ \t]*description:?[ \t]*/i  # hack below
+    -> do  # `summary_line`
 
-    define_method :summary_line do
-      if desc_lines
-        @desc_lines.first         # 1) use first desc line if you have that
-      elsif option_parser
-        first = @option_parser.top.list.first  # NOTE not base()
-        if ::String === first     # 2) else use o.p banner if that
-          str = CLI::Pen::FUN.unstylize[ first ]
-          str.gsub strip_description_label_rx, '' # (#hack!)
-        else
-          CLI::Pen::FUN.unstylize[ usage_line ] # 3) else this, unstylized
+      strip_description_label_rx = /\A[ \t]*description:?[ \t]*/i
+
+      define_method :summary_line do
+        if desc_lines
+          @desc_lines.first         # 1) use first desc line if you have that
+        elsif option_parser
+          first = @option_parser.top.list.first  # NOTE not base()
+          if ::String === first     # 2) else use o.p banner if that
+            str = CLI::Pen::FUN.unstylize[ first ]
+            str.gsub strip_description_label_rx, '' # (#hack!)
+          else
+            CLI::Pen::FUN.unstylize[ usage_line ] # 3) else this, unstylized
+          end
         end
       end
-    end
+    end.call
 
     # `usage_and_invite` - a mid-level entrypoint for this common form
     # of inteface screen of interface screen, called from `invoke` or
@@ -651,7 +653,7 @@ module Skylab::Headless
       parm = fetch_parameter norm_name
       if parm.is_option
         parm.as_parameter_signifier
-      elsif param.is_argument
+      elsif parm.is_argument
         render_argument parm
       end
     end

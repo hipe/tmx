@@ -56,6 +56,11 @@ module Skylab::Snag::TestSupport::CLI::Actions
       expect :pay, /\bone\.rb\b/
     end
 
+    it "show command - works" do
+      invoke '--cmd', '.'
+      expect :pay, /\Afind .+ grep\b/
+    end
+
     context "pretty tree style" do
 
       def setup

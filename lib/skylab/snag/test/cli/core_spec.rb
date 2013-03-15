@@ -44,6 +44,16 @@ module Skylab::Snag::TestSupport::CLI
         o deeper_invite_rx
         o
       end
+
+      it "2.3x4H (good arg/good opt) (help postfix) (param api)" do
+        client_invoke 'todo', '-h'
+        c = output.class::Composite.of output.lines
+        c.unique_stream_name_order.should eql( [ :info ] )
+        c.full_text.should be_include(
+          'usage: sn0g todo [<action>] [<args> [..]]' )
+        c.full_text.should be_include( 'sub-action help' )
+        c.full_text.should be_include( 'melt is insanity' )
+      end
     end
   end
 end

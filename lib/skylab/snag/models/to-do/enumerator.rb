@@ -20,7 +20,7 @@ module Skylab::Snag
 
     def initialize paths, names, pattern
       @seen_count = nil
-      @command = Models::ToDo::Command.new paths, names, pattern
+      @command = Snag::Services::Find.new paths, names, pattern
       super(& method( :visit ) )
     end
 

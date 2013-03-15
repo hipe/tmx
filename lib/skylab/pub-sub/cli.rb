@@ -12,7 +12,7 @@ module Skylab::PubSub
   class CLI
 
     def initialize *a             # necessary when you have a client and a box
-      init_headless_cli_client_dsl( *a )
+      init_headless_cli_client( * a )
       @param_h = { }
       @opendata = nil
     end
