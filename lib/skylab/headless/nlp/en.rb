@@ -49,8 +49,9 @@ module Skylab::Headless
       inflected.fetch(v)[ zero_one_two ]
     end
 
-    FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
-
+    o[:inflect] = -> func do
+      inflect(& func )
+    end
 
     def self.inflect &body                     # useful quick & dirty hack
       o = ::Object.new                         # for low-commitment inflection
@@ -58,5 +59,7 @@ module Skylab::Headless
       r = o.instance_exec(& body)
       r
     end
+
+    FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
   end
 end
