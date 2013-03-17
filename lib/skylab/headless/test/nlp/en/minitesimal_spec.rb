@@ -6,7 +6,7 @@ describe "#{ ::Skylab::Headless::NLP::EN::Minitesimal } FUN" do
 
   fun = Headless::NLP::EN::Minitesimal::FUN
 
-  context "oxford_comma" do
+  context "oxford_comma", f:true do
 
     o = -> s, *a do
       t = [(a.pop if ::Hash === a.last)].compact
@@ -24,24 +24,27 @@ describe "#{ ::Skylab::Headless::NLP::EN::Minitesimal } FUN" do
 
     o[ 'one', 'one' ]
 
-    o[ '' ]
+    o[ nil ]
 
   end
 
 
-  context "s", f:true do
+  context "s" do
 
-    define_method(:s, & fun.s)
-    define_method(:and_, & fun.oxford_comma)
+    define_method :s, & fun.s
+
+    define_method :_and do |a|
+      x = fun.oxford_comma[ a ]
+      x and " #{ x }"
+    end
+
+    # ( has a complimentary test in `nlp_spec.rb` )
 
     o = -> a, n, so, *t do
-
-      it "#{so}", *t do
-        x = "#{ s a, :no }known person#{ s a } #{ s a, :is} #{
-          }#{ and_ a }".strip
-        x << " in #{ s n, :this }#{" #{ n }" unless 1 == n }#{
-          } location#{ s n }."
-        x.should eql(so)
+      it "#{ so }", *t do
+        x = "#{ s a, :no }known person#{ s a } #{ s a, :exis}#{ _and a }#{
+          } in #{ s n, :this }#{ " #{ n }" if 1 != n } location#{ s n }."
+        x.should eql( so )
       end
     end
 

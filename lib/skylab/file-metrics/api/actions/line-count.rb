@@ -97,6 +97,7 @@ module Skylab::FileMetrics
 
       define_method :render_table do |count, out|
         rndr_tbl count, out, [ :fields,
+          [ :label,       header: 'File' ],
           [ :count,       header: 'Lines' ],
           [ :total_share, filter: percent ],
           [ :max_share,   filter: percent ],

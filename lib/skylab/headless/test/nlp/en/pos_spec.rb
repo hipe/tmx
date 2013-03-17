@@ -11,7 +11,7 @@ module Skylab::Headless::TestSupport::NLP::EN
       let :subject do NLP::EN::POS::Noun[ 'foot' ] end
 
       it "default inflection is singular" do
-        subject.stem.should eql( 'foot' )
+        subject.lemma.should eql( 'foot' )
       end
 
       it "plural sure-al" do

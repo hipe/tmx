@@ -1,4 +1,5 @@
 module Skylab::Headless
+
   class Services::Producer
 
     def gets

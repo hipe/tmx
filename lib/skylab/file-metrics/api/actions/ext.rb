@@ -35,11 +35,10 @@ module Skylab::FileMetrics
             count.collapse_and_distribute or break
             render_table count, @ui.err
             if single_a
-              @ui.err.puts "(* only occuring once were: #{ single_a * ' and ' })"  # NOT GOOD ENOUGH -- on deck..
-#              @ui.err.puts inflect[ -> {
-#                "(* only occuring once #{ s single_a.length, :was }: #{
-#                  }#{ and_ single_a })"
-#              } ]
+              @ui.err.puts inflect[ -> {
+                "(* only occuring once #{ s single_a, :was }: #{
+                  }#{ and_ single_a })"
+              } ]
             end
             res = true
           end
@@ -47,7 +46,7 @@ module Skylab::FileMetrics
         res
       end
 
-      # inflect = Headless::NLP::EN::Minitesimal::FUN.inflect
+      inflect = Headless::NLP::EN::Minitesimal::FUN.inflect
 
     end.call
 

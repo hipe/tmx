@@ -31,11 +31,11 @@ module Skylab::FileMetrics
       false
     end
 
-    -> do
-      nilf = -> _ { } ; vp = nil
+    -> do  # `count_lines`
+      noop = -> _ { } ; vp = nil
       define_method :count_lines do |file_a, label=nil|
         filter_a = []
-        plus, minus = if ! @req.fetch( :info_volume ) then [ nilf, nilf ] else
+        plus, minus = if ! @req.fetch( :info_volume ) then [ noop, noop ] else
           [ vp[ 'include' ], vp[ 'exclude' ] ]
         end
         if @req[:count_blank_lines] then plus[ :blank_lines ] else
@@ -46,14 +46,12 @@ module Skylab::FileMetrics
           filter_a << "grep -v '^[ \t]*#'"
         end
         label ||= '.'
-        count = if filter_a.length.nonzero?
-          linecount_using_grep_chain file_a, filter_a, label
-        else
+        count = if filter_a.length.zero?
           linecount_using_wc file_a, label
+        else
+          linecount_using_grep_chain file_a, filter_a, label
         end
-        if count
-          count.collapse_and_distribute
-        end
+        # (no `collapse_and_distribute` here, caller might customize its call)
         count
       end
 

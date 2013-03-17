@@ -10,4 +10,6 @@ module Skylab::Headless::TestSupport::NLP
 
   include CONSTANTS   # necessary to say `Headless` in the body of the spec
 
+  TestSupport::Quickie.enable_kernel_describe
+
 end

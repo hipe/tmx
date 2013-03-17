@@ -13,7 +13,7 @@ module Skylab::TanMan
 
     o = { }                       # anonymous functions used all over the place
 
-    update_members = -> members do # a function (method body) generator exp.
+    update_members = -> members do  # a function (method body) generator exp.
       -> param_h do
         a = param_h.keys - members
         if a.empty?
@@ -21,9 +21,9 @@ module Skylab::TanMan
             send "#{ k }=", v
           end
         else
-          str = Headless::NLP::EN::Minitesimal.inflect do
+          str = Headless::NLP::EN::Minitesimal::FUN.inflect[ -> do
             "no member#{ s a } #{ or_( a.map { |x| "'#{ x }'" } ) } in struct"
-          end
+          end ]
           raise ::NameError.exception str
         end
       end

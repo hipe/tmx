@@ -229,7 +229,7 @@ module Skylab::TanMan
     def inflect_action_name e
       inflection = self.class.inflection
       prepositional_phrase = [ 'while' ]                             # "while"
-      progressive = inflection.stems.verb.progressive
+      progressive = inflection.lexemes.verb.progressive
       subject = [ ]
       verb = [ progressive ]                                        # "adding"
       object = [ ]

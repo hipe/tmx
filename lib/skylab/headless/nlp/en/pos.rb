@@ -25,111 +25,52 @@ module Skylab::Headless
 
   class NLP::EN::Part_Of_Speech::Lexeme_
 
-    # the wikipedia explanation of `lexeme` is pretty much right on target
-    # for our use cases here. (historical note - this class used to be a
-    # hacked subclass of ::String!!)
+    # the wikipedia explanation of `lexeme` is pretty much spot on with
+    # our intention here (good job, wikpedia!). (The last word of the
+    # first sentence the wikipedia article is the third word of this
+    # one, and the only word that occurs three times in this sentence.)
+    #
+    # familiarity with the following terms from the above source is recommended
+    # and will be assumed in comments & code (in fact the whole architecture is
+    # based on:) `lexicon`, `lexeme`, `grammatical category`, `exponent`,
+    # `form`. more loosely we will dance around with ideas of
+    # `syntactic categories` and `phrase structure grammars` but attotw
+    # we know less what we are doing there.
+    #
+    # more specifically, a Lexeme_ subclass will generally represent one
+    # syntactic category and one inflection paradigm. we don't expect to
+    # make too many of these, possibly just two.
+    #
+    # (historical note - this class used to be a hacked subclass of ::String!!)
+    #
+    # We document our journey as a narrative and riveting story.
+    # we start from the beginning (one of them, anyway): with your new
+    # lexeme class (we won't make that many of them), you define its
+    # grammatical categories, at its essence a two dimensional structure:
+    # a simple hash with simple array values, each array containing symbols.
+    # see you at next storypoint! (storypoints have leading capital letters).
 
     def self.grammatical_categories h
 
       @category_box ||= begin
+        @form_box     = MetaHell::Formal::Box::Open.new
         @exponent_box = MetaHell::Formal::Box::Open.new
-        @category_box = MetaHell::Formal::Box::Open.new
+                        MetaHell::Formal::Box::Open.new  # NOTE look.
       end
 
       h.each do |cat_sym, exponent_a|
         Category_.there_exists_a_category cat_sym
         cat = Category_.new exponent_a
         @category_box.add cat_sym, cat
-        exponent_a.each do |exponent_sym|
-          @exponent_box.add exponent_sym, ( Exponent_.new cat_sym )
+        exponent_a.each do |exp_sym|
+          @exponent_box.add exp_sym, ( Exponent_.new exp_sym, cat_sym )
         end
       end
 
       nil
     end
 
-    class << self
-      attr_reader :exponent_box, :category_box
-    end
-
-    # `combination_class` a simple struct suitable to be used as a record
-    # of a form -  what you get depends on the state of the category box!
-
-    def self.combination_class
-      Exp_Comb_Struct_Factory_[ @category_box._order ]
-    end
-
-    Exp_Comb_Struct_Factory_ = ::Hash.new do |h, k|
-      omg = k.join( '__' )
-      omg[0] = omg[0].upcase
-      strct = ::Struct.new( * k )
-      Exponent_Combination_.const_set omg, strct
-      h[ k ] = strct
-    end
-
-    module Exponent_Combination_
-    end
-
-    # the production class is produced lazily at time of first request -
-    # whatever the state is of the *categories* (not exponents) is at that
-    # time will get baked in to the class (and subsequent categories will
-    # not make it into the class as setters).
-
-    def self.production_class
-      if const_defined? :Production, false
-        const_get :Production, false
-      else
-        lex_cls = self
-        cat_box = @category_box
-        exp_box = @exponent_box
-        kls = ::Class.new( Production_ ).class_exec do
-          define_singleton_method :lexeme_class do lex_cls end
-          define_method :lexeme_class do lex_cls end
-          cat_box.each do |cat_sym, cat|
-            define_method "#{ cat_sym }=" do |x|
-              @exponent_ref_is_mutable or make_exponent_ref_mutable
-              if x.nil? or cat.exponent_a.include? x
-                @exponent_ref[ cat_sym ] = x
-              else
-                raise ::KeyError, "bad exponent for #{ cat_sym } - #{ x }"
-              end
-            end
-            define_method cat_sym do
-              @exponent_ref[ cat_sym ]
-            end
-          end
-          self
-        end
-        const_set :Production, kls
-        kls
-      end
-    end
-
-    # if you are familiar, `as` is a lot like ::Rspec's `let`,
-    # the main difference being it memoizes to an ivar named after
-    # the property rather than writing to e.g. `@__memoized`.
-
-    def self.as exponent_sym, &block
-      @exponent_box.has? exponent_sym or raise ::KeyError, "undeclared #{
-        } grammatical category exponent - #{ exponent_sym } for #{ self }"
-
-      ivar = :"@#{ exponent_sym }"
-      define_method exponent_sym do
-        if instance_variable_defined? ivar
-          instance_variable_get ivar
-        else
-          instance_variable_set ivar, instance_exec(& block )
-        end
-      end
-
-      define_method "#{ exponent_sym }=" do |x|
-        instance_variable_set ivar, x
-      end
-    end
-
     Category_ = ::Struct.new :exponent_a  # as it exists in one lexeme
-
-    Category__ = ::Struct.new :extent_x # as it exists in the universe
 
     class Category_
 
@@ -147,36 +88,241 @@ module Skylab::Headless
       class << self
         attr_reader :box
       end
+
+      Category__ = ::Struct.new :extent_x # as it exists in the universe
     end
 
-    Exponent_ = ::Struct.new :category_sym
+    Exponent_ = ::Struct.new :exponent_sym, :category_sym
 
-    # define_singleton_method :as, & NLP::EN::Part_Of_Speech::FUN.as
+    # Then with the lexeme class we want to define default production
+    # strategies (regular forms). we are simply associating a combination
+    # of (often 1) exponent (like :preterite) with one hacky rendering
+    # strategy (like "add -'ed' to the lemma")
+    #
+    # (if you are familiar, `as` is a lot like ::Rspec's `let`,
+    # the main difference being it memoizes to an ivar named after
+    # the property rather than writing to e.g. `@__memoized`.)
 
-    def self.produce x
-      if has_lexicon and lexicon.has_monadic_form? x
-        form = @lexicon.fetch_monadic_form x
-        lexeme = @lexicon.fetch_monadic_lexeme form.lemma_ref
-        ohai = production_class.new lexeme.lemma, form.exponent_ref
-      else
-        # we might want to add it to the lexicon!? why / why not (..[#065])
-        ohai = production_class.new x, :lemma
+    def self.as combination_ref, &block
+      c = build_immutable_combination combination_ref
+      ivar = c.ivar
+      define_method c.form_reader_method_name do
+        if instance_variable_defined? ivar
+          instance_variable_get ivar  # nil must be ok
+        else
+          instance_variable_set ivar, instance_exec(& block )
+        end
       end
-      ohai
+      define_method c.form_writer_method_name do |x|
+        instance_variable_set ivar, x
+      end
+      @form_box.add c.form_key,
+        Form_::Unbound_.new( c, instance_method( c.form_reader_method_name ) )
+      nil
     end
 
-    def self.has_lexicon
-      lexicon_ivar || lexicon_blocks
+    def self.build_immutable_combination combination_ref
+      c = combination_class.new
+      c.extend Exponent_::Combination_::Immutable_InstanceMethods
+      combination_a = normalize_combination_ref combination_ref
+      combination_a.each do |exponent_sym|
+        c[ @exponent_box.fetch( exponent_sym ).category_sym ] = exponent_sym
+      end
+      c.freeze
     end
 
-    class << self
-      attr_reader :lexicon
+    def self.normalize_combination_ref combination_ref
+      if ! combination_ref.respond_to? :each
+        combination_ref = combination_ref.to_s.split( '_' ).map(& :intern )
+      end
+      combination_ref
+    end
+
+    # `combination_class` a simple struct suitable to be used as a record
+    # of a form -  what you get depends on the state of the category box!
+
+    def self.combination_class
+      Exponent_::Combination_::Struct_Factory_[ @category_box._order ]
+    end
+
+    module Exponent_::Combination_
+    end
+
+    Exponent_::Combination_::Struct_Factory_ = ::Hash.new do |h, k|
+      strct = ::Struct.new( * k )
+      omg = k * '__'
+      omg[0] = omg[0].upcase
+      Exponent_::Combinations_.const_set omg, strct
+      h[ k ] = strct
+    end
+
+    module Exponent_::Combination_::Immutable_InstanceMethods
+      def form_reader_method_name
+        @form_key  # trigger warnings (and those below)
+      end
+      def form_writer_method_name
+        @form_writer_method_name
+      end
+      def form_key
+        @form_key
+      end
+      def ivar
+        @ivar
+      end
+      def freeze
+        exponent_a = values.select { |x| x }
+        if exponent_a.length.nonzero?
+          @form_key = ( exponent_a * '__' ).intern # meh
+          @form_writer_method_name = ( "#{ @form_key }=" ).intern
+          @ivar = "@#{ @form_key }".intern
+        end
+        super
+      end
+      def dupe
+        otr = dup  # NOTE it does *not* dupe-over this selfsame i.m module
+        otr  # and that's exactly what we want! it's just as simple struct
+      end
+    end
+
+    module Exponent_::Combinations_
+      # filled with dynamically produced structs (probably on the order of
+      # as many as there are syntactic categories).
+    end
+
+    module Form_
+    end
+
+    # `Form_::Unbound_` - a form associated with an unbound method,
+    # and not any one particular lexeme. created above, used in `forms`
+
+    class Form_::Unbound_  # #todo
+      attr_reader :combination
+      attr_reader :unbound_method
+      def bind lexeme
+        Form_::Bound_.new @combination, @unbound_method.bind( lexeme )
+      end
+      def initialize combination, unbound_method
+        @combination = combination
+        @unbound_method = unbound_method
+      end
+    end
+
+    # `Form_::Bound_` - a form bound to a lexeme and its instance method
+    # for producing the form. created above, used in `semicollapse`
+
+    class Form_::Bound_
+      attr_reader :combination
+      def surface_form
+        @bound_method.call
+      end
+      def initialize combination, bound_method
+        @combination = combination
+        @bound_method = bound_method
+      end
+    end
+
+  protected
+
+    # To *construct* a lexeme finally, we take optionally a string for
+    # the lemma form, and then optionally a hash of irregular forms.
+    # the hash related one exponent combination to one surface form.
+
+    -> do
+
+      match_h = {
+        string: -> x { x.respond_to? :ascii_only? },
+        hash:   -> x { x.respond_to? :each },
+        fixnum: -> x { x.respond_to? :even? }
+      }
+
+      op_h = {
+        string: -> str { set_lemma str },
+        hash:   -> hash { add_irregular_forms hash },
+        fixnum: -> fix { accept_lemma fix }
+      }
+
+      tick_h = ::Hash[ match_h.keys.map { |k| [ k, true ] } ]
+
+      define_method :initialize do |*x_a|
+        h = tick_h.dup
+        while x_a.length.nonzero?
+          x = x_a.pop
+          key = h.keys.detect do |k|
+            match_h[k][ x ]
+          end
+          if key
+            h.delete key
+            instance_exec x, & op_h.fetch( key )
+          else
+            raise ::ArgumentError, "unable to process for lexeme a #{ x.class }"
+          end
+        end
+      end
+    end.call
+
+    def self.[] lemma_str
+      new lemma_str
+    end
+
+    def set_lemma str
+      accept_lemma str.dup.freeze
+      str
+    end
+    public :set_lemma
+
+    def accept_lemma x
+      did = nil
+      @lemma ||= ( did = true and x )
+      did or raise ::ArgumentError, "won't clobber existing lemma - #{ @lemma }"
+      nil
+    end
+
+    # (watch for similarities with `self.as`)
+    def add_irregular_forms form_h
+      @irregular_box ||= MetaHell::Formal::Box::Open.new if form_h.any?
+      form_h.each do |combination_x, surface_form|
+        c = self.class.build_immutable_combination combination_x
+        instance_variable_set c.ivar,  # allow nils
+          ( surface_form ? surface_form.dup.freeze : surface_form )
+        if ! respond_to? c.form_reader_method_name  # (here is hopefully the
+          # *only* place we need special code for combinatorial forms)
+          ivar = c.ivar
+          define_singleton_method c.form_reader_method_name do
+            instance_variable_get ivar
+          end
+        end
+        @irregular_box.add c.form_key,
+          Form_::Bound_.new( c, method( c.form_reader_method_name ) )
+      end
+      nil
+    end
+
+    class << self  # here, have some readers for above.
+      attr_reader :exponent_box, :category_box
+      attr_reader :lexicon  # necessary before it's redefined below
       alias_method :lexicon_ivar, :lexicon
+      attr_reader :lexicon_blocks  # used below
     end
 
-    # `lexicon` - either add to it with a block, or result in it.
+    # When we make a lexeme with irregular production strategies (which
+    # we will need to do for the most common verbs, because the most common
+    # verbs are in fact irregular because of some linguistic phenomenon
+    # with some name that more broadly exhibits one of natural language's
+    # anti-optimalities from a computational perspective. yes i'm arguing
+    # that we should all speak Lojban.), when we make such a lexeme we
+    # need some place to put it so that it Just Works when we later go
+    # to use it, e.g in a sentence. That place is called a...
 
     def self.lexicon &blk
+
+      # (note that for now too a lexicon is associated with a lexeme class
+      # (syntactic category!?) as zero-or-one lexicon *per* *lexeme* *class*
+      # so e.g there will be one lexicon with nouns and *another* with e.g
+      # verbs. this is for ease of implementation because we take tagged
+      # input, and are only doing crude NL production and not (yet) NL
+      # processing; but keep in mind we might flip it, reverse it, or
+      # aggregate syntactic cateogry lexioncs into a more bigger one.)
+
       if blk
         if lexicon_ivar  # if you already started a lexicon, just process it
           blk.call @lexicon
@@ -200,48 +346,228 @@ module Skylab::Headless
       end
     end
 
-    class << self
-      attr_reader :lexicon_blocks
-    end
+    class Lexicon_  # hehe Lexeme_::Lexicon_
 
-    alias_method :as, :send  # assumes that the argument is already validated
-      # by the caller (presumably a production).
+      def initialize pos_class
+        @pos_class = pos_class
+        @monadic_form_box = MetaHell::Formal::Box::Open.new
+        @monadic_lemma_box = MetaHell::Formal::Box::Open.new
+        @last_lemmaless_id = 0
+      end
+      protected :initialize
 
-    def [] form_sym
-      if ! self.class.exponent_box.has? form_sym
-        raise ::KeyError, "form not found: #{ form_sym.inspect }"
-      else
-        send form_sym  # we don't access ivars to trip autovivifying blocks..
+      # `[]=` Add the lemma to the lexicon NOTE this is DSL-ish and it
+      # mutates the lexeme by setting its lemma if it is not yet set!
+
+      def []= lemma_x, lexeme
+        lexeme.set_lemma lemma_x if ! lexeme.lemma_ivar  # semi-constructor
+
+        # 1. You want to be able to look up the lemma and get the lemma
+        add_monadic_form lemma_x, lemma_x, :lemma
+
+        # 2. You want to be able to look up the different irregular forms.
+        if lexeme.irregular_box
+          lexeme.irregular_box.each do |form|
+            x = form.surface_form   # some forms serve to nullify
+            if x
+              add_monadic_form form.surface_form, lemma_x, form.combination
+            end
+          end
+        end
+
+        # 3. you gotta be able to look up the lexeme itself, we use the lemma
+        @monadic_lemma_box.add lemma_x, lexeme
+
+        lexeme
+      end
+
+      def add_monadic_form surface_form, lemma_ref, combination
+        @monadic_form_box.add surface_form,
+          Form_.new( surface_form, lemma_ref, combination )
+        nil
+      end
+      protected :add_monadic_form
+
+        # `Lexeme_::Lexicon_::Form_` -
+      Form_ = ::Struct.new :surface_form, :lemma_ref, :combination
+
+      # `<<` DSL-ish to create a lemma-less lexeme and add ito
+      # NOTE experimental!
+
+      def << form_h
+        lexeme = @pos_class.new( @last_lemmaless_id += 1, form_h )
+        self[ lexeme.lemma ] = lexeme
       end
     end
 
-    def semicollapse exponent_ref
-      if ::Symbol === exponent_ref  # is this ok?
-        self[ exponent_ref ]
-      else
-        fail "wat - #{ exponent_ref.class }"
+  public
+
+    attr_reader :lemma
+    alias_method :lemma_ivar, :lemma
+
+    def irregular_form_exponents
+      ::Enumerator.new do |y|
+        if irregular_box
+          @irregular_box._order.each do |exponent_sym|
+            y << self.class.exponent_box.fetch( exponent_sym )
+          end
+        end
+        nil
       end
     end
 
-    attr_reader :lemma  # not `lemma_ref` for reasons..
+    attr_reader :irregular_box  # public
 
-  protected
+    def as exponent_sym  # assumes not combinatorial
+      if ! self.class.exponent_box.has? exponent_sym
+        raise ::KeyError, "form not found: #{ exponent_sym.inspect }"
+      else
+        send exponent_sym  # we don't access ivars to trip autovivifying blocks.
+      end
+    end
 
-    def initialize lemma, irregular_h=nil
-      ::String === lemma or fail( 'please update your code' ) # #lemma
-      @lemma = lemma.dup.freeze
-      if irregular_h
-        exp = self.class.exponent_box
-        irregular_h.each do |k, frm|
-          exp.has?( k ) or raise "bad form - #{ k }"
-          instance_variable_set "@#{ k }", frm  # ick, meh
+    # Now that we have some lexemes, with grammatical categories and exponents,
+    # and those lexems are stored in a lexicon related to syntactic categories
+    # which are themselves lexeme subclasses (whew!), we might want to actually
+    # make a "production" of a lexeme. we do that with:
+
+    def self.produce x
+      if has_lexicon and lexicon.has_monadic_form? x
+        lex_form = @lexicon.fetch_monadic_form x
+        lexeme = @lexicon.fetch_monadic_lexeme lex_form.lemma_ref
+        p = production_class.new lexeme.lemma, lex_form.combination
+      else
+        # we might want to add it to the lexicon!? why / why not (..[#065])
+        p = production_class.new x, :lemma
+      end
+      p
+    end
+
+    def self.has_lexicon
+      lexicon_ivar || lexicon_blocks
+    end
+
+    class Lexicon_  # (re-open)
+
+      def has_monadic_form? x
+        @monadic_form_box.has? x
+      end
+
+      def fetch_monadic_form x
+        @monadic_form_box.fetch x
+      end
+    end
+
+    # (the production class is produced lazily at time of first request -
+    # whatever the state is of the *categories* (not exponents) is at that
+    # time will get baked in to the class (and subsequent categories will
+    # not make it into the class as setters).)
+
+    def self.production_class
+      if const_defined? :Production, false
+        const_get :Production, false
+      else
+        lex_cls = self
+        cat_box = @category_box
+        exp_box = @exponent_box
+        kls = ::Class.new( Production_ ).class_exec do
+          define_singleton_method :lexeme_class do lex_cls end
+          define_method :lexeme_class do lex_cls end
+          cat_box.each do |cat_sym, cat|
+            define_method "#{ cat_sym }=" do |x|
+              change_exponent cat_sym, x
+              x
+            end
+            define_method cat_sym do
+              get_exponent cat_sym
+            end
+          end
+          self
+        end
+        const_set :Production, kls
+        kls
+      end
+    end
+
+    Lexeme_ = self  # your children are looking for you
+
+    class Production_  # `Lexeme_::Production_`
+
+      #                         ~ write ~
+
+      def change_exponent k, v
+        a = prepare_change_exponent k, v
+        if ! a then a else
+          @combination_is_mutable or make_combination_mutable
+          commit_change_exponent( *a )
+          true
         end
       end
-    end
 
-    attr_reader :current_form_name
+      def prepare_change_exponent k, v
+        if v and ! lexeme_class.category_box.fetch( k ).
+            exponent_a.include?( v ) then raise ::KeyError, "bad #{
+          }exponent for #{ k } - #{ v } (#{ lexeme_class })"
+        else
+          [ k, v ]
+        end
+      end
 
-    class Production_  # hides inside Lexeme_ as long as it can..
+      def exponent= x  # strain of [#066]
+        comb_a = Lexeme_.normalize_combination_ref x
+        pair_a = comb_a.reduce [] do |pr_a, exponent_sym|
+          exp = lexeme_class.exponent_box.fetch exponent_sym do end
+          if ! exp then raise ::KeyError,
+            "no exponent \"#{ x }\" for #{ lexeme_class }"
+          else
+            pair = prepare_change_exponent exp.category_sym, exponent_sym
+            if pair then pr_a << pair else break( nil ) end
+            pr_a
+          end
+        end
+        if pair_a then
+          clear_combination
+          pair_a.each { |k, v| commit_change_exponent k, v }
+        end
+        x
+      end
+
+      def clear_combination
+        @combination_is_mutable or make_combination_mutable
+        @combination.members.each do |m|
+          @combination[m] = nil
+        end
+        nil
+      end
+      protected :clear_combination
+
+      def commit_change_exponent k, v
+        @combination[ k ] = v
+        nil
+      end
+      protected :commit_change_exponent
+
+      def trickle_down_exponent k, v
+        cat = lexeme_class.category_box.fetch( k ) do end
+        if cat
+          if cat.exponent_a.include? v
+            @combination_is_mutable or make_combination_mutable
+            # (we used to clear the combination, now we just do this EEW):
+            if v and :markedness != k
+              @combination[:markedness] = nil
+            end
+            commit_change_exponent k, v
+            self
+          end
+        end
+      end
+
+      #                         ~ read ~
+
+      def get_exponent category_sym
+        @combination[ category_sym ]
+      end
+      protected :get_exponent
 
       def render y
         str = string
@@ -249,13 +575,27 @@ module Skylab::Headless
         nil
       end
 
+      def string
+        resolve_lexeme.semicollapse @combination
+      end
+
+    protected
+
+      def initialize lemma_ref, combination
+        @lemma_ref = lemma_ref
+        if combination.respond_to? :members
+          @combination = combination
+          @combination_is_mutable = false
+        else
+          @combination = lexeme_class.combination_class.new
+          @combination_is_mutable = true
+          self.exponent = combination
+        end
+      end
+
       # (we used to hold the particular form in a @form ivar of the particular
       # lexeme, but this architecture fell apart when you got into lexicons.
       # this class satisfies [#061].)
-
-      def string
-        resolve_lexeme.semicollapse @exponent_ref
-      end
 
       def resolve_lexeme
         if lexeme_class.has_lexicon
@@ -264,185 +604,129 @@ module Skylab::Headless
           else
             # i just can't bare the thought of needlessy creating on-the fly
             lex = lexeme_class.new @lemma_ref  # lexemes. they are words man.
-            lexeme_class.lexicon[ @lemma_ref ] = lex
+            lexeme_class.lexicon[ @lemma_ref ] = lex  # they are words. [#065]
             lex
           end
         else
           @lexeme ||= lexeme_class.new( @lemma_ref )
         end
       end
-      protected :resolve_lexeme
 
-      attr_reader :lemma_ref, :exponent_ref
-
-      def exponent= x  # strain of [#066]
-        if ! lexeme_class.exponent_box.has? x
-          raise ::KeyError, "no exponent \"#{ x }\" for #{ lexeme_class }"
-        else
-          @exponent_ref = x
-        end
-      end
-
-      def []= cat_sym, exp_sym
-        fail "do me"
-      end
-
-      def make_exponent_ref_mutable
-        if ! ( @exponent_ref.frozen? && ! @exponent_ref_is_mutable )
+      def make_combination_mutable
+        if ! ( @combination.frozen? && ! @combination_is_mutable )
           fail 'sanity'  # #todo this is for development only
         else
-          @exponent_ref = @exponent_ref.dup  # if you get "can't dup Symbol"..
-          @exponent_ref_is_mutable = true
+          @combination = @combination.dupe  # if you get "can't dup Symbol"..
+          @combination_is_mutable = true
         end
         nil
       end
+    end
 
-      def trickle_down_exponent cat_sym, exp_sym
-        cat = lexeme_class.category_box.fetch( cat_sym ) do end
-        if cat
-          if cat.exponent_a.include? exp_sym
-            fail 'do me here'
-            self[ cat_sym ] = exp_sym
-            self
-          end
-        end
+    class Lexicon_
+
+      def has_monadic_lexeme? x
+        @monadic_lemma_box.has? x
       end
 
-    protected
-
-      def initialize lemma_ref, exponent_ref
-        @exponent_ref_is_mutable = false
-        @lemma_ref, @exponent_ref = lemma_ref, exponent_ref
+      def fetch_monadic_lexeme x
+        @monadic_lemma_box.fetch x
       end
     end
-  end
 
-  class Lexicon_
-
-    def has_monadic_form? x
-      @monadic_form_box.has? x
-    end
-
-    def fetch_monadic_form x
-      @monadic_form_box.fetch x
-    end
-
-    def has_monadic_lexeme? x
-      @monadic_lemma_box.has? x
-    end
-
-    def fetch_monadic_lexeme x
-      @monadic_lemma_box.fetch x
-    end
-
-    def add_monadic_form frm_str, frm_sym, lemma_str
-      @monadic_form_box.add frm_str, Form_.new( frm_str, lemma_str, frm_sym )
-      nil
-    end
-
-    def []= lemma_str, lexeme
-      # lexicon[ 'have' ] = new 'have', preterite: 'had', third_singular: 'has'
-
-      # 1. You want to be able to look up the lemma and get the lemma
-      # ( NOTE we hackisly assume lemma is always first! )
-      add_monadic_form lemma_str, :lemma, lemma_str
-
-      # 2. You want to be able to look up the different forms.
-      lexeme.class.exponent_box._order[ 1 .. -1 ].each do |exponent_sym|
-        form_str = lexeme[ exponent_sym ]
-        if form_str
-          add_monadic_form form_str, exponent_sym, lemma_str
-        end
-      end
-
-      # 3. from a lemma you want to be able to look up the lexeme
-      @monadic_lemma_box.add lemma_str, lexeme
-      lexeme
-    end
-
-    def << h  # hackisly add a lemma-less lexeme (e.g The Pronoun)
-      exp_box = @pos_class.exponent_box ; cat_box = @pos_class.category_box
-      lemma_ref = ( @last_lemmaless_id += 1 )
-      comb_kls = @pos_class.combination_class
-      form_a = [ ]
-      h.each do |exp_arr, form_str|
-        comb = comb_kls.new
-        exp_arr.each do |exp_sym|
-          exp = exp_box.fetch exp_sym
-          if comb[ exp.category_sym ]
-            raise ::KeyError, "#{  exp.category_sym  } can't be both #{
-              }#{ comb[ exp.category_sym ] } and #{ first }"
-          end
-          comb[ exp.category_sym ] = exp_sym
-        end
-        comb.freeze
-        frm = Form_.new( form_str, lemma_ref, comb )
-        form_a << frm
-        @monadic_form_box.add form_str, frm
-      end
-      @monadic_lemma_box.add lemma_ref, NLP::EN::Part_Of_Speech::
-        Lexeme_::Combinatorial_.new( @pos_class, lemma_ref, form_a )
-      nil
-    end
-
-    def initialize pos_class
-      @pos_class = pos_class
-      @monadic_form_box = MetaHell::Formal::Box::Open.new
-      @monadic_lemma_box = MetaHell::Formal::Box::Open.new
-      @last_lemmaless_id = 0
-    end
-
-    Form_ = ::Struct.new :form_str, :lemma_ref, :exponent_ref
-  end
-
-  class NLP::EN::Part_Of_Speech::Lexeme_::Combinatorial_
-
-    # `semicollapse` - given the `exponent_ref` (that is a structure-like
+    # `semicollapse` - this is a goof
+    # given the `combination` (that is a structure-like
     # combination of grammatical category exponents), resolve some kind
-    # of string expressing perhaps fuzzily the grammatical category
-    # combination (e.g. "her or his")
+    # of string expressing perhaps fuzzily the grammatical category / exponent
+    # combination (e.g. "her or his") based on the set of regular and
+    # any irregular forms or this lexeme. (this nerk happens to be the
+    # centerpiece of this whole endeavor. it was the novelty algorithm that
+    # became the raison d'etre of this whole nerkiss around you now)
 
-    def semicollapse exponent_ref
-      # ( numbr=sing case=subj person=nil ) -> [[:numbr, :sing], [:case, :subj]]
-      and_query_a = exponent_ref.members.reduce [] do |arr, cat|
-        v = exponent_ref[ cat ]
+    def semicollapse combination
+      and_a = combination.members.reduce [] do |arr, cat|  # basically a crude
+        v = combination[ cat ]                 # SELECT statement
         arr << [ cat , v ] if v
         arr
-      end
-      ohai = @form_a.reduce [] do |arr, frm|
-        exp_ref = frm.exponent_ref
-        if ! ( and_query_a.detect do |category, exponent|
-          # we disqualify this form from the running IFF it *both*
-          # has an exponent for that grammatical category *and* that
-          # exponent is not the same exponent as that in the query
-          exp_ref[ category ] && exp_ref[ category ] != exponent
-        end ) then
-          arr << frm.form_str
+      end  # (numb=sing case=subj person=nil) -> [[:nubm, :sing],[:case, :subj]]
+      max = 0
+      reslt_a = forms.reduce [] do |res_a, frm|
+        form_comb = frm.combination
+        score = and_a.reduce 0 do |scor, (category, exponent)| # if
+          v = form_comb[ category ]            # in this form if the gram.
+          if ! v                               # cat. exponent is falseish
+            scor = 1 if scor.zero?             # then bump it only to one
+          elsif v == exponent                  # elsif it's set and same as goal
+            scor = 2 if scor < 2  # hm..       # then bump score to ceiling
+          else                                 # if this exponent is unequal
+            break 0                            # then short circuit fail.
+          end
+          scor
         end
-        arr
+        max = score if score > max
+        res_a << [ score, frm ] if score.nonzero?
+        res_a
       end
-      case ohai.length
-      when 1 ; ohai[ 0 ]
-      when 0 ; nil
+      if max.nonzero?
+        result_a = reslt_a.reduce [] do |res_a, (score, frm)|
+          if score == max
+            x = frm.surface_form
+            res_a << x if x  # uh-0h
+          end
+          res_a
+        end
+        if 1 == result_a.length then result_a[ 0 ] else
+          result_a * ' or ' # hacked for now
+        end
+      end
+    end
+
+    # (we can either optimize this for speed or for memory: because slow
+    # language production is a good problem to have, and not one we *do*
+    # yet have, *and* because it's nice having readable dumps of the
+    # object graph, we opt for the latter, possibly re-creating the bound
+    # method for regular forms each time the lexeme is collapsed: meh.)
+
+    def forms
+      if irregular_box
+        forms_with_irregulars
       else
-        ohai * ' or '  # hacked for now, it's just a meh fun p.o.c
+        ::Enumerator.new do |y|
+          self.class.form_box.each do |frm|
+            y << frm.bind( self )
+          end
+        end
       end
     end
+    protected :forms
 
-    attr_reader :lemma_ref
-    alias_method :lemma, :lemma_ref  # think how Verb#lemma works..
-
-    def initialize pos_noun, lemma_ref, form_a
-      @pos_noun, @lemma_ref, @form_a = pos_noun, lemma_ref, form_a
+    class << self
+      attr_reader :form_box
     end
-  end
 
-  module NLP::EN::POS
-
-    # thi is strictly a parts of speech box module.  a parts of speech
-    # box module may only contain parts of speech constants,
-    # or other parts of speech box modules.
-
+    # #todo both above *and* below can be tightened
+    def forms_with_irregulars
+      ::Enumerator.new do |y|
+        # some irregulars replace existing regulars, some irregulars introduce
+        # new combinations. for no good reason, we will do the latter group
+        # first, and then the first group inline with the regulars in the
+        # order of the regulars.
+        special_a = @irregular_box._order - self.class.form_box._order
+        special_a.each do |k|
+          y << @irregular_box.fetch( k )
+        end
+        self.class.form_box.each do |frm|
+          bound = nil
+          @irregular_box.if? frm.combination.form_key, -> frm_bnd do
+            bound = frm_bnd
+          end, -> bx, k do
+            bound = frm.bind( self )
+          end
+          y << bound
+        end
+        nil
+      end
+    end
   end
 
   class NLP::EN::Part_Of_Speech::Phrase_
@@ -462,6 +746,14 @@ module Skylab::Headless
     def self.new part, *parts
       ea = @each
       ::Class.new( self ).class_exec do
+        agree_a = -> do
+          ::Hash === parts.last or break
+          opt_h = parts.pop
+          agre_a = nil
+          opt_h_h = { agree: -> x { agre_a = x } }
+          opt_h.each { |k, v| opt_h_h.fetch( k )[ v ] }
+          agre_a
+        end.call
         ea << self
         membership_st =
           parts.unshift(part).reduce MetaHell::Formal::Box::Open.new do |bx, x|
@@ -493,6 +785,8 @@ module Skylab::Headless
               end
             end
           end
+
+          define_method :agree_a do agree_a end
         end
 
         membership_st._order.each do |k|
@@ -574,9 +868,8 @@ module Skylab::Headless
                 Lexeme_::Category_.box._order.each do |cat_sym|
             define_method "#{ cat_sym }=" do |x|
               res = trickle_down_exponent cat_sym, x
-              if ! res
-                raise ::KeyError, "no: #{ cat_sym } - #{ x }"
-              end
+              if ! res then raise ::KeyError, "no child node accepted - #{
+                }#{ cat_sym.inspect } => #{ x.inspect }" end
               x
             end
           end
@@ -590,11 +883,17 @@ module Skylab::Headless
     end
 
     # result is nil or the winning part (e.g production)
-    def trickle_down_exponent cat_sym, exp_sym
-      parts.reduce nil do |_, part|
-        x = part.trickle_down_exponent cat_sym, exp_sym
-        x and break( x )
-        nil
+    def trickle_down_exponent cat_sym, exponent_sym
+      parts.reduce nil do |res, part|
+        x = part.trickle_down_exponent cat_sym, exponent_sym
+        if x
+          if self.class.agree_a and self.class.agree_a.include? cat_sym
+            res ||= true  # bump result up from nil, but stay
+          else
+            break true  # short circuit iff you don't do agreement
+          end
+        end
+        res
       end
     end
 
@@ -617,11 +916,15 @@ module Skylab::Headless
 
   module NLP::EN::POS
 
-    extend MetaHell::Boxxy
+    # this is strictly a cordoned-off box module only for parts of speech
+    # modules. a parts of speech box module may only contain parts of
+    # speech constants, or other parts of speech box modules.
 
-    abbrev( v: :Verb, n: :Noun, vp: [ :Verb, :Phrase ], np: [ :Noun, :Phrase ] )
+    extend MetaHell::Boxxy  # (`abbrev`, `const_fetch`)
 
-    abbrev( adjp: [ :Adjective, :Phrase ], nmodp: [ :NounModifier, :Phrase ] )
+    abbrev v: :Verb, n: :Noun, vp: [ :Verb, :Phrase ], np: [ :Noun, :Phrase ]
+
+    abbrev adjp: [ :Adjective, :Phrase ], nmodp: [ :NounModifier, :Phrase ]
 
   end
 
@@ -629,19 +932,22 @@ module Skylab::Headless
 
     grammatical_categories(
 
-      unmarked: [ :lemma ],
+      markedness: [ :lemma ],  # (just because we need `lemma` as an exponent)
 
-      tense: [ :preterite, :progressive ],  # else "unmarked" (lemma)
+      number: [ :singular, :plural ],
 
-      person: [ :third_singular ]   # else "unmarked" (lemma)
+      person: [ :first, :second, :third ],
+
+      tense: [ :present, :preterite, :progressive ]
 
     )
 
     #       ~ default production strategies for category exponents ~
 
     as :lemma
-      # for now, `lemma` is a form you can produce. no block is provided
-      # assuming that always the lemma is set as an ivar.
+    # for now `lemma` is a producible form, treated as any other
+    # exponent (might change!). no block is provided here, assuming
+    # that always the lemma is set as an ivar.
 
     ends_with_e_rx = /e\z/i  # 2x
 
@@ -661,7 +967,7 @@ module Skylab::Headless
       end
     end
 
-    as :third_singular do
+    as :singular_third_present do
       "#{ @lemma }s"
     end
 
@@ -669,7 +975,7 @@ module Skylab::Headless
 
     Phrase = NLP::EN::Part_Of_Speech::Phrase_.new :v, :np
 
-    lexicon[ 'have' ] = new 'have', preterite: 'had', third_singular: 'has'
+    lexicon[ 'have' ] = new preterite: 'had', singular_third_present: 'has'
 
   end
 
@@ -680,13 +986,16 @@ module Skylab::Headless
 
     grammatical_categories(
 
-      person: [ :first, :second, :third ],
-
-      number: [ :singular, :plural ],
+      markedness: [ :lemma ],  # (just becasue we need `lemma` as an exponent)
 
       case:   [ :subjective, :objective ],
 
-      gender: [ :feminine, :masculine, :neuter ]
+      gender: [ :feminine, :masculine, :neuter ],
+
+      number: [ :singular, :plural ],
+
+      person: [ :first, :second, :third ]
+
     )
 
     as :singular do
@@ -697,9 +1006,13 @@ module Skylab::Headless
       "#{ @lemma }s"
     end
 
-    lexicon do |lx|
+    lexicon do |lexicn|
 
-      lx << {
+      lexicn << {  # (add a lexeme with the below irregulars and no lemma)
+
+        [ :singular ] => nil,  # don't use default singular form
+
+        [ :plural ] => nil,  # don't use default plural form
 
         [ :first, :singular, :subjective ] => 'I',
 
@@ -731,7 +1044,7 @@ module Skylab::Headless
 
     # `Noun::Phrase`
 
-    Phrase = NLP::EN::Part_Of_Speech::Phrase_.new :adjp, :n, :nmodp
+    Phrase = NLP::EN::Part_Of_Speech::Phrase_.new :adjp, :n, :nmodp,
 
   end
 
@@ -741,10 +1054,12 @@ module Skylab::Headless
 
       # `Sentence::Phrase`
 
-      Phrase = NLP::EN::Part_Of_Speech::Phrase_.new :np, :vp
+      Phrase = NLP::EN::Part_Of_Speech::Phrase_.new :np, :vp,
+        agree: [ :number, :person ]
 
     end
   end
 
   NLP::EN::Part_Of_Speech::Phrase_.define_category_writers  # trickle down
+
 end

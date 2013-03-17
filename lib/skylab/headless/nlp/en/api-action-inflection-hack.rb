@@ -10,6 +10,7 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
   # Don't be decieved, we don't want self.extended [#sl-111] pattern here,
   # you just extend this module and you get this one knob:
 
+  MetaHell = ::Skylab::MetaHell
   NLP = ::Skylab::Headless::NLP # (future-proof parts in case not [#sl-123])
 
   def inflection
@@ -40,7 +41,6 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
     end
 
     attr_writer :dupes
-
 
     o = { }
 
@@ -83,7 +83,7 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
     end
   end
 
-  class Stems # this is the core of the hack
+  class Lexemes # this is the core of the hack
 
     extend Dupe
 
@@ -109,7 +109,7 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
         ok ||= -> do              # modules usually do *not* have business
           res = seen[-2]          # semantics - that is, they sometimes do *not*
           begin                   # have a meaningful name as far as we're
-            o = seen[-3] or break # concerned here.  So if there is such a
+            o = seen[-3] or break # concerned here. So if there is such a
             o.respond_to?( :action_box_module ) or break # module, we want to
             o.action_box_module == res or break # `hop` over it, thereby
             hop = true            # not using it as a basis for our
@@ -162,28 +162,32 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
   end
 
   class Inflect
-    # for setting how to inflect things
-    #
 
-    def noun *a
-      if a.length.zero?
-        @noun ||= :singular
-      else
-        send :noun=, *a
-      end
+    # for setting how to inflect things
+
+    extend MetaHell::DSL_DSL
+
+    dsl_dsl do
+      atom_accessor :noun
+      atom_accessor :verb
     end
 
-    attr_writer :noun
+    def initialize
+      @noun = :singular
+      @verb = :lemma
+    end
   end
 
   class Inflected
-    # for getting the inflected thing
-    #
 
-    attr_reader :inflection
+    # DSL-ish wrapper for getting the inflected string of the component
 
     def noun
-      inflection.stems.noun.send inflection.inflect.noun
+      @inflection.lexemes.noun.send @inflection.inflect.noun
+    end
+
+    def verb
+      @inflection.lexemes.verb.send @inflection.inflect.verb
     end
 
   protected
@@ -196,7 +200,7 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
   class Inflection
     extend Dupe
 
-    dupes :stems
+    dupes :lexemes
 
     def inflect
       @inflect ||= Inflect.new
@@ -206,8 +210,8 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
       @inflected ||= Inflected.new self
     end
 
-    def stems
-      @stems ||= Stems.new @klass
+    def lexemes
+      @lexemes ||= Lexemes.new @klass
     end
 
   protected

@@ -111,44 +111,116 @@ module Skylab::Headless
 
     def omg s ; pen.omg s end     # style an error emphatically
 
-    # --- * ---
+  end
 
-    fun = Headless::NLP::EN::Minitesimal::FUN
+  SubClient::EN_FUN = -> do
 
-                                  # memoize last counts for shorter strings
+    # things about nlp here: 1) we put our nlp-ish subclient instance methods
+    # *first* in a struct-box and then distribute the definitions to this i.m
+    # module so that a) they can be re-used elsewhere independent of s.c but
+    # b) our ancester chain doesn't get annoyingly long. 2) for those nlp
+    # functions that inflect based on number (most of them) what we do here
+    # different from our downstream (dependees) is we memoize the last used
+    # numeric expressors (for the 'number' grammatical category) so that they
+    # don't need to be re-submitted as arguments for subsequent utterance
+    # producers, for shorter, more readable utterance templates.
+    #
+    # `numerish` below means "more broad than numeric" e.g an array is
+    # numerish because we can derive a numeric property from it - its length.
+    # also a `numerish` might hold `nil` or `false` which variously
+    # may have special meanings (e.g `nil` might tell a function "substitute
+    # some default for `nil`) whereas `false` might mean "substitute a default
+    # iff this is is a terminal node in the callstack, otherwise propagate
+    # the value `false`).
 
-    attr_accessor :_nlp_last_length
+    o = MetaHell::Formal::Box::Open.new
 
-    define_method :an do |s, x=nil|
-      if x
-        self._nlp_last_length = x
-      else
-        x = _nlp_last_length
+    bump_numerish = fun = nil
+
+    o[:an] = -> lemma, numerish=false do
+      instance_exec numerish, -> nmrsh do
+        fun[].an[ lemma, nmrsh ]
+      end, & bump_numerish
+    end
+
+    o[:_non_one] = -> numerish=nil do  # for nlp hacks, leading space iff not 1
+      instance_exec numerish, -> nmrsh do
+        " #{ nmrsh }" if 1 != nmrsh
+      end, & bump_numerish
+    end
+
+    -> do  # `s`
+      h = { symbol: -> x { x.respond_to? :id2name },
+            numeric: -> x { ! x.respond_to? :id2name } } # defer it
+      o[:s] = -> * args do  # [length] [lexeme_sym]
+        numerish, lexeme_sym = MetaHell::FUN.parse[ h, args, :numeric, :symbol ]
+        lexeme_sym ||= :s  # when `numerish` is nil it means "use memoized"
+        instance_exec numerish, -> num do
+          fun[].s[ num, lexeme_sym ]
+        end, & bump_numerish
       end
-      fun.an[ s, x ]
-    end
+    end.call
 
-    define_method :and_ do |a|
-      self._nlp_last_length = a.length
-      fun.oxford_comma[ a, ' and ' ]
-    end
-
-    define_method :or_ do |a|
-      self._nlp_last_length = a.length
-      fun.oxford_comma[ a, ' or ' ]
-    end
-
-    define_method :s do |length=nil, part=nil|
-      args = [length, part].compact
-      pt = ::Symbol === args.last ? args.pop : :s
-      if args.length.zero?
-        len = self._nlp_last_length or raise ::ArgumentError.new 'numeric?'
+    bump_numerish = -> numerish_x, func do
+      if numerish_x
+        if numerish_x.respond_to? :length
+          numerish = numerish_x.length
+        else
+          numerish = numerish_x
+        end
+        self.nlp_last_length = numerish
+      elsif false == numerish_x
+        numerish = false
       else
-        x = args.first
-        len = ::Numeric === x ? x : x.length # #gigo
-        self._nlp_last_length = len
+        numerish = self.nlp_last_length
       end
-      fun.s[ len, pt ]
+      instance_exec numerish, &func
+    end
+
+    o[:'nlp_last_length='] = -> x do
+      @nlp_last_length = x
+    end
+
+    o[:nlp_last_length] = -> do
+      @nlp_last_length
+    end
+
+    memoize_length = -> f do
+      -> a do
+        self.nlp_last_length = a.length
+        instance_exec a, &f
+      end
+    end
+
+    o[:and_] = memoize_length[ -> a do
+      fun[].oxford_comma[ a, ' and ' ]
+    end ]
+
+    o[:_and] = -> a do  # (when you want the leading space conditionally on etc)
+      x = self.and_ a
+      x and " #{ x }"
+    end
+
+    o[:or_] = memoize_length[ -> a do
+      fun[].oxford_comma[ a, ' or ' ]
+    end ]
+
+    fun = -> do
+      # ( we've got to lazy-load it b.c of a circular dependency in the files )
+      x = Headless::NLP::EN::Minitesimal::FUN
+      fun = -> { x }
+      x
+    end
+
+    o.to_struct
+
+  end.call
+
+  module Headless::SubClient::InstanceMethods
+
+    Headless::SubClient::EN_FUN.each do |method_name, body|
+      define_method method_name, &body
+      protected method_name
     end
   end
 end

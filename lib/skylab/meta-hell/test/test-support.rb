@@ -4,6 +4,7 @@ require 'skylab/test-support/core'
 module Skylab::MetaHell::TestSupport
 
   ::Skylab::TestSupport::Regret[ self ]
+  ::Skylab::TestSupport::Quickie.enable_kernel_describe
 
   module CONSTANTS
     Autoloader_ = ::Skylab::Autoloader  # org-wide and sub-lib wide avoid confus

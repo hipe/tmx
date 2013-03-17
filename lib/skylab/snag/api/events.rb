@@ -40,12 +40,20 @@ module Skylab::Snag
 
     attr_writer :inflection
 
-    def noun
+    def inflected_noun
       @inflection.inflected.noun
     end
 
-    def verb
-      @inflection.stems.verb
+    def inflected_verb
+      @inflection.inflected.verb
+    end
+
+    def noun_lexeme
+      @inflection.lexemes.noun
+    end
+
+    def verb_lexeme
+      @inflection.lexemes.verb
     end
 
     #         ~ experimental autonomously rendering events ~

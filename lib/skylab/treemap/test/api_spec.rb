@@ -6,9 +6,9 @@ module Skylab::Treemap::TestSupport
 
     context "inflection hack for the action of" do
 
-      let(:stems) { klass.inflection.stems }
+      let(:lexemes) { klass.inflection.lexemes }
 
-      let(:subject) { "#{stems.verb.progressive} #{stems.noun}" }
+      let(:subject) { "#{lexemes.verb.progressive} #{lexemes.noun.lemma}" }
 
       context "the render action" do
         let(:klass) { Treemap::API::Actions::Render }
