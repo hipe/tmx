@@ -1,6 +1,6 @@
 module Skylab::FileMetrics
 
-  class Models::FindCommand # [#sl-118] one day they will be unified
+  class Services::Find # [#sl-118] one day they will be unified
 
     class << self
       protected :new

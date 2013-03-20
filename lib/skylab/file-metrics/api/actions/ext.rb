@@ -132,7 +132,7 @@ module Skylab::FileMetrics
     end
 
     def build_find_command
-      Models::FindCommand.valid -> c do
+      Services::Find.valid -> c do
         c.concat_paths @req[:paths]
         c.concat_skip_dirs @req[:exclude_dirs]
         c.concat_names @req[:include_names]
