@@ -101,6 +101,7 @@ module Skylab::FileMetrics
         end
         field_a = instance_exec field_a, &membrs
         instance_exec field_a, &set_get_field
+        alias_method :[], :get_field
         define_method :initialize, & ( initialize[ field_a, member_index_h ] )
         self
       end
@@ -115,14 +116,18 @@ module Skylab::FileMetrics
     end
 
     set_get_field = -> field_a do
-      set_h = { } ; get_h = { }
+      set_h = { } ; get_h = { } ; ivr_h = { }
       field_a.each do |key|
         ivar = "@#{ key }"
         set_h[ key ] = -> v { instance_variable_set ivar, v }
-        get_h[ key ] = ->   { instance_variable_get ivar    }
+        ivr_h[ key ] = ->   { instance_variable_get ivar    }
+        get_h[ key ] = ->   { send key }
       end
       define_method :set_field do |k, v|
         instance_exec v, & set_h.fetch( k )
+      end
+      define_method :get_field_ivar do |k|
+        instance_exec(& ivr_h.fetch( k ) )
       end
       define_method :get_field do |k|
         instance_exec(& get_h.fetch( k ) )

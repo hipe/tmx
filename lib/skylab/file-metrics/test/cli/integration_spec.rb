@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::FileMetrics::TestSupport::CLI
 
-  # Quickie.
+  # Quickie - but NOTE it gets whacky b.c of ncurses!
 
   describe "#{ FileMetrics }::CLI - integration" do
 
@@ -13,70 +13,102 @@ module Skylab::FileMetrics::TestSupport::CLI
       desc 'give me `lc` here and now'
       argv 'lc', '[fm dir]'
       ptrn '2.3x3'
-      it does do
-        # (see [#007] - we do it for reasons)
+      expt_desc "header / first line / summary line"
+
+      memoize_output_lines do
         TestSupport::Services::FileUtils.cd FileMetrics.dir_pathname.to_s do
-          invoke [ 'lc', '.' ]  # le dorky [#006]
-          lines = convert_whole_err_string_to_unstylized_lines
-          headers = headers_hack lines[0]
-          headers.should eql( [ :file, :lines, :total_share, :max_share ] )
-          cels = cels_hack lines[1]
-          cels.shift.should eql( './cli.rb' )  # meh
-          ( 50 .. 300 ).should be_include( expect_integer( cels.shift ) )
-          expect_percent cels.shift
-          expect_percent cels.shift, 100.0
-          expect_pluses cels.shift, 16 .. 100
-          cels.should be_empty
+          invoke [ 'lc', '.' ]  # le dorky [#006], [#007]
         end
+      end
+
+      it "header" do
+        headers_hack( output_lines[ 0 ] ).should eql(
+          [ :file, :lines, :total_share, :max_share ]
+        )
+      end
+
+      it "body" do
+        arr = cels_hack output_lines[ 1 ]
+        arr.length.should eql( 5 )
+        fl, ln, pc1, pc2, lip = arr
+        fl.should eql( './api/common.rb' )  # meh
+        expect_integer ln, 50 .. 300
+        expect_percent pc1
+        expect_percent pc2, 100.0
+        expect_pluses lip, 16..100
+      end
+
+      it "summary" do
+        output_lines[ -1 ].should match( /\A +total: +\d{4} +\z/i )
       end
     end
 
-    context "ext" do
+    context "ext - lines:" do
 
       desc 'i want `ext` here now'
       argv 'ext', '[fm dir]'
       ptrn '2.3x3'
       expt_desc 'header looks good'
 
-      it does do
+      memoize_output_lines do
+        TestSupport::Services::FileUtils.cd FileMetrics.dir_pathname.to_s do
+          invoke [ 'ext', '.' ]  # more dorky [#006], [#007]
+        end
+      end
+
+      it "header" do
         headers_hack( output_lines[0] ).should eql(
           [ :extension, :num_files, :total_share, :max_share ] )
       end
 
-      it "first body line looks good" do
-        line = output_lines[1]
-        cel_a = line.strip.split( / +/ )
-        cel_a.shift.should eql( '*.rb' )
-        num = cel_a.shift
-        num.should match( /\A\d+\z/ )
-        ( 18 .. 18 ).should be_include( num.to_i )  # saying hello to the future
-        expect_percent cel_a.shift
-        expect_percent cel_a.shift, 100.0
-        expect_pluses cel_a.shift, 16..100
-        cel_a.should be_empty
+      it "body" do
+        ( 4..6 ).should be_include( output_lines.length )
+        arr = cels_hack output_lines[ 1 ]
+        arr.length.should eql( 5 )
+        lbl, num, pc1, pc2, lip = arr
+        lbl.should eql( '*.rb' )
+        expect_integer num, 18..18  # greetings from the past
+        expect_percent pc1
+        expect_percent pc2, 100.0
+        expect_pluses lip, 16..100
       end
 
-      it "final line looks good" do
-        line_a = output_lines
-        ( 4..6 ).should be_include(  line_a.length  )  # hello from the past
-        line_a.last.should eql(  # will loosen up later #todo
+      it "final" do
+        output_lines[ -1 ].should eql(  # will loosen up later #todo
           "(* only occuring once were: .one and .two)" )
+        # (note there are no summary lines for the ext report)
+      end
+    end
+
+    context "dirs - lines:" do
+
+      desc 'show me the `dirs`'
+      argv 'dirs', '[fm dir]'
+      ptrn '2.3x3'
+
+      memoize_output_lines do
+        TestSupport::Services::FileUtils.cd( FileMetrics.dir_pathname.to_s ) do
+          invoke [ 'dirs', '.' ]  # still dorky [#006], [#007]
+        end
       end
 
-      -> do  # `output_lines`  - a memoizing cheat
-        did = res = nil
-        define_method :output_lines do
-          if ! did
-            did = true
-            # self reflexive test ([#006]) that does a cd ([#007])
-            TestSupport::Services::FileUtils.cd FileMetrics.dir_pathname.to_s do
-              invoke [ 'ext', '.' ]
-              res = convert_whole_err_string_to_unstylized_lines
-            end
-          end
-          res
-        end
-      end.call
+      it "header" do
+        headers_hack( output_lines[0] ).should eql(
+          [ :directory, :num_files, :num_lines, :total_share, :max_share ] )
+      end
+
+      it "body" do
+        dr, nf, nl, ts, ms, lp = output_lines[1].strip.split( /(?!< ) +(?! )/ )
+        expect_integer nf, 3..10
+        expect_integer nl, 400..500  # hello from the past
+        expect_percent ts
+        expect_percent ms, 100.0
+        expect_pluses lp, 16..100
+      end
+
+      it "sumary" do
+        output_lines[ -1 ].should match( /\A +total: +\d{2,3} +\d{4} +\z/i )
+      end
     end
   end
 end

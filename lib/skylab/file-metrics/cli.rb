@@ -113,7 +113,7 @@ module Skylab::FileMetrics
           #{ hi 'description:' }#{
           } Experimental report. With all folders one level under <path>,
           for each of them report number of files and total sloc,
-          and show them in order of total sloc and percent of max
+          and show them in order of total sloc.
         DESC
         op_common_head
         op_common_tail

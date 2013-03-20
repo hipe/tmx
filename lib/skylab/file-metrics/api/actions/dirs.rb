@@ -15,7 +15,9 @@ module Skylab::FileMetrics
         @ui.err.puts( dirs )
       end
       dirs.each do |dir|
-        _files = %x{#{build_find_files_command(dir)}}.split("\n")
+        cmd = build_find_files_command( [ dir ] ) or break
+        stdout_lines cmd.string, ( _files = [] ) or break
+        # (for fun, leaving below antique lines intact as long as possible!)
         _dir_count = Models::Count.new(dir, nil)
         _ok_files = []; _errs = []
         _files.each do |f|
@@ -39,21 +41,20 @@ module Skylab::FileMetrics
       else
         count.collapse_and_distribute do |child|
           child.set_field :num_files, child.nonzero_children?  # ick / meh
-          child.set_field :num_lines, child.count # just to be clear
+          child.set_field :num_lines, child.count  # just to be clear
         end
+        count.display_summary_for :label do "Total:" end
+        count.display_summary_for :lipstick do nil end
+        count.display_total_for :num_files do |d| "%d" % d if d end
+        count.display_total_for :num_lines do |d| "%d" % d if d end
       end
-      count.display_summary_for :label do |_| "Total:" end
-      count.display_summary_for :lipstick do |_| nil end
-      count.display_total_for(:num_files) { |d| "%d" % d if d }
-      count.display_total_for(:num_lines) { |d| "%d" % d if d }
       render_table count, @ui.err
     end
 
     # (we are trying to keep some ancient code for posterity for now ..)
-    Models_ = Models
     module Models
-      Count = FileMetrics::Models::Count.subclass :total_share,
-        :max_share, :lipstick
+      Count = FileMetrics::Models::Count.subclass :num_files,
+        :num_lines, :total_share, :max_share, :lipstick_float, :lipstick
     end
 
     LineCount = Models::Count
@@ -61,7 +62,7 @@ module Skylab::FileMetrics
   protected
 
     def build_find_dirs_command
-      cmd = Models_::FindCommand.valid( -> c do
+      cmd = Services::Find.valid( -> c do
         c.add_path @req[:path]
         c.concat_skip_dirs @req[:exclude_dirs]
         c.concat_names @req[:include_names]
@@ -71,15 +72,6 @@ module Skylab::FileMetrics
       end ).string
     end
 
-    def build_find_files_command path
-      Models_::FindCommand.valid -> c do
-        c.add_path path
-        c.concat_skip_dirs @req[:exclude_dirs]
-        c.concat_names @req[:include_names]
-        c.extra = '-not -type d'
-      end, method( :error )
-    end
-
     -> do  # `render_table`
 
       percent = -> v { "%0.2f%%" % ( v * 100 ) if v }
@@ -87,9 +79,13 @@ module Skylab::FileMetrics
       define_method :render_table do |count, out|
         rndr_tbl count, out, [ :fields,
           [ :label,       header: 'Directory' ],
-          [ :count,       header: 'Lines' ],
+          [ :count,       :noop ],
+          [ :num_files,   filter: -> x { x.to_s } ],
+          [ :num_lines,   filter: -> x { x.to_s } ],
+          [ :rest,        :rest ],  # any fields not stated here, glob them
           [ :total_share, filter: percent ],
           [ :max_share,   filter: percent ],
+          [ :lipstick_float, :noop ],
           [ :lipstick,    :autonomous, header: '' ]
         ]
       end

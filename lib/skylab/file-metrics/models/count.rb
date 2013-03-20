@@ -10,7 +10,7 @@ module Skylab::FileMetrics
       end
     end
 
-    def collapse_and_distribute
+    def collapse_and_distribute &ping_each_child
       # all your children are in. tell them now which one is your favorite.
       if nonzero_children?
         max_f = @child_a.reduce { |a, b| b.count > a.count ? b : a }.count.to_f
@@ -19,14 +19,15 @@ module Skylab::FileMetrics
           c.set_field :total_share, c.count.to_f / total_f
           share_of_max = c.count.to_f / max_f
           c.set_field :max_share, share_of_max
-          c.set_field :lipstick, share_of_max
+          c.set_field :lipstick_float, share_of_max
+          ping_each_child and ping_each_child[ c ]
         end
         sort_children_by! { |c| -1 * c.count }
       end
       true  # future-proof
     end
 
-    attr_writer :lipstick  # ratio of 0 to 1?
+    attr_writer :lipstick_float  # ratio of 0 to 1?
 
     -> do
 
@@ -39,7 +40,7 @@ module Skylab::FileMetrics
           :length => -> { 0 },
           :respond_to? => -> x { true },
           :render => -> row_a, table do
-            lpstck[ @lipstick, row_a, table ]
+            lpstck[ @lipstick_float, row_a, table ]
           end
         )
       end
@@ -62,7 +63,7 @@ module Skylab::FileMetrics
 
     def display_total_for field_name, &render
       render ||= default_render_total
-      display_summary_for field_name, do |_|
+      display_summary_for field_name, do
         render[ each_child.map(& field_name ).map { |v| v ? v : 0 }.reduce :+ ]
       end
       nil
@@ -85,25 +86,25 @@ module Skylab::FileMetrics
       end
     end
 
-    -> do  # `summary_rows`
+    -> do  # `summary_nodes`
 
       empty_a = [ ].freeze  # ocd
 
       to_s = -> x { x.to_s if ! x.nil? }
 
-      define_method :summary_rows do
+      define_method :summary_nodes do
         res = if zero_children? or ! column_summary_cel then empty_a else
-          fc = first_child
-          obj = fc.class.members.reduce fc.class.new do |o, sym|
-            f = @column_summary_cel.fetch sym do to_s end
-            if 1 != f.arity then fail "arity? - #{ f }" else
-              v = send sym  # got `get_field` b.c we want to trigger count logic
-              use_v = f.call v
-              o.set_field sym, use_v
+          proto = first_child
+          node = proto.class.members.reduce proto.class.new do |o, sym|
+            f = @column_summary_cel.fetch sym do nil end
+            if f
+              if f.arity.nonzero? then fail "arity? - #{ f }" else
+                o.set_field sym, f[]
+              end
             end
             o
           end
-          [ obj ]
+          [ node ]
         end
         res
       end

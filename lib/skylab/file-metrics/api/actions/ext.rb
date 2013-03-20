@@ -52,7 +52,8 @@ module Skylab::FileMetrics
 
   protected
 
-    Count = Models::Count.subclass :total_share, :max_share, :lipstick
+    Count = Models::Count.subclass :total_share, :max_share, :lipstick_float,
+      :lipstick
 
     Count_ = ::Struct.new :extension, :count
 
@@ -100,13 +101,13 @@ module Skylab::FileMetrics
     def file_a
       res = false
       begin
-        cmd = build_find_command or break
+        cmd = build_find_files_command( @req[:paths] ) or break
         if @req[:show_commands] || @req.fetch( :debug_volume )
           @ui.err.puts cmd.string
         end
         buff = Services::StringIO.new
         stay = true
-        open2 cmd.string do |o|
+        open2 cmd.string do |o|  # [#004]
           o.err do |s|
             fail "not exptecting stderr output from find cmd - #{ s.strip }."
             stay = false
@@ -131,15 +132,6 @@ module Skylab::FileMetrics
       res
     end
 
-    def build_find_command
-      Services::Find.valid -> c do
-        c.concat_paths @req[:paths]
-        c.concat_skip_dirs @req[:exclude_dirs]
-        c.concat_names @req[:include_names]
-        c.extra = '-not -type d'
-      end, method( :error )
-    end
-
     -> do  # `render_table`
 
       percent = -> v { "%0.2f%%" % ( v * 100 ) }
@@ -150,6 +142,7 @@ module Skylab::FileMetrics
           [ :count,        header: 'Num Files' ],
           [ :total_share,  filter: percent ],
           [ :max_share,    filter: percent ],
+          [ :lipstick_float, :noop ],
           [ :lipstick,     :autonomous, header: '' ] ]
       end
       protected :render_table

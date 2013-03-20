@@ -90,6 +90,18 @@ module Skylab::Face::TestSupport::CLI
       as = Whereby.new( sym, rx, modifier, strm ).freeze
       define_method "__as_#{ sym }" do as end
     end
+
+    def memoize_output_lines &block
+      did = res = nil
+      define_method :output_lines do
+        did or begin
+          did = true
+          instance_exec(& block )
+          res = convert_whole_err_string_to_unstylized_lines
+        end
+        res
+      end
+    end
   end
 
   Whereby = ::Struct.new :sym, :rx, :modifier, :stream_name

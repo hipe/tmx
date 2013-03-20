@@ -22,13 +22,40 @@ module Skylab::FileMetrics
 
   protected
 
-    def initialize *a
-      @ui, @req = a
+    def initialize ui, req
+      @ui, @req = ui, req
     end
 
     def error msg
       @ui.err.puts msg
       false
+    end
+
+    def build_find_files_command path_a
+      Services::Find.valid -> c do
+        c.concat_paths path_a
+        c.concat_skip_dirs @req[:exclude_dirs]
+        c.concat_names @req[:include_names]
+        c.extra = '-not -type d'
+      end, method( :error )
+    end
+
+    # `stdout_lines` - write each (chomped) line of stdout that results from
+    # executing `command_string` on the system to `y` using `<<`.
+    # any stdout data is written to our own selfsame stream, decorated.
+    # result is true of no stderr data was written, false if it was.
+
+    def stdout_lines command_string, y
+      FileMetrics::Services::Open3.popen3 command_string do |_, sout, serr|
+        er = nil
+        Headless::Services::Distribute::Lines[
+          sout, -> line { y << line },  # (upstream already chomped it)
+          serr, -> line do
+            er ||= true
+            @ui.err.puts "(unexpected errput - \"#{ line }\")"
+          end ]
+        ! er
+      end
     end
 
     -> do  # `count_lines`
@@ -80,7 +107,11 @@ module Skylab::FileMetrics
         if @req[:show_commands] || @req.fetch( :trace_volume )
           @ui.err.puts cmd
         end
-        rs = %x{ #{ cmd } }
+        rs = -> do
+          stdout_lines cmd, ( lines = [] ) or break
+          lines * ''
+        end.call
+        rs or break
         cnt = linecount_class.new file
         if rs =~ /\A[[:space:]]*(\d+)[[:space:]]*\z/
           cnt.count = $1.to_i
@@ -97,6 +128,7 @@ module Skylab::FileMetrics
     end
 
     def linecount_using_wc file_a, label
+
       # (this hackery deserves explanation: we assume the following: there
       # is one corresponding output line from `wc` for each argument (treated
       # as input file) (the stream to which that line was written will be
@@ -119,7 +151,7 @@ module Skylab::FileMetrics
       if @req[:show_commands] || @req.fetch( :debug_volume )
         @ui.err.puts cmd
       end
-      line_a = `#{ cmd }`.split "\n"  # [#004] backticks might change
+      stdout_lines cmd, ( line_a = [] )  # (was #004)
       if line_a.length.zero?
         raise SystemError, 'never'
       else
@@ -150,17 +182,22 @@ module Skylab::FileMetrics
         out.puts "(table has no rows)"
         false
       else
-        field_a = count.first_child.class.members
         mani = Services::Table::Manifold.new sexp do |mn|
           mn.hdr = -> m do
             m.to_s.split( '_' ).map(& :capitalize ) * ' '
           end
-          mn.add_fields count.first_child.class.members  # did we forget any?
+          mn.the_rest count.first_child.class.members  # did we forget any?
         end
         row_a = [ mani.build_header_row ]
-        row_a.concat count.each_child.map(& mani.method( :build_row ) )
-        wat = count.summary_rows
-        row_a.concat count.summary_rows.map(& mani.method( :build_row ) )
+        count.each_child do |cx|
+          row_a << mani.build_row( cx )
+        end
+        node_a = count.summary_nodes
+        if node_a.length.nonzero?  # (contents may be unpacked for debugging..)
+          node_a.each do |node|
+            row_a << mani.build_summary_row( node )
+          end
+        end
         Models::Table.new( row_a ).render( out )
       end
     end

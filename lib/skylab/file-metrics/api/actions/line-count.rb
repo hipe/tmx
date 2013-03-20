@@ -20,6 +20,8 @@ module Skylab::FileMetrics
             @ui.err.puts "no files found."
           else
             count.collapse_and_distribute
+            count.display_summary_for :label do "Total:" end
+            count.display_total_for :count do |d| "%d" % d if d end
             render_table count, @ui.err
           end
         end
@@ -27,7 +29,8 @@ module Skylab::FileMetrics
       res
     end
 
-    LineCount = Models::Count.subclass :total_share, :max_share, :lipstick
+    LineCount = Models::Count.subclass :total_share, :max_share, :lipstick,
+      :lipstick_float
 
   protected
 
@@ -45,50 +48,15 @@ module Skylab::FileMetrics
       end
     end
 
-    Stream_ = ::Struct.new :io, :func
-
     def files_in_dir path, file_a
-      cmd = build_find_command
+      cmd = build_find_files_command @path_a
       if cmd
         cmd_string = cmd.string
         if @req[:show_commands] || @req.fetch( :debug_volume )
           @ui.err.puts cmd_string
         end
-        # overblown but neat algo -
-        ok = FileMetrics::Services::Open3.popen3 cmd_string do |_, sout, serr|
-          er = nil
-          hot_a = [
-            Stream_[ sout, -> ln { file_a << ln } ],
-            Stream_[ serr, -> ln do
-              er ||= true
-              @ui.err.puts "(find errorr? - \"#{ ln }\")"
-            end ] ]
-          begin
-            (( hot_a.length - 1 ).downto 0 ).each do |idx|
-              stream = hot_a[idx]
-              line = stream.io.gets
-              if line
-                line.chomp!
-                stream.func[ line ]
-              else
-                hot_a[ idx ] = nil  # why we do it backwards NOTE
-                hot_a.compact!
-              end
-            end
-          end while hot_a.length.nonzero?
-          ! er
-        end
-        ok
+        stdout_lines cmd_string, file_a
       end
-    end
-
-    def build_find_command
-      Services::Find.valid -> c do
-        c.concat_paths @path_a
-        c.concat_skip_dirs @req[:exclude_dirs]
-        c.concat_names @req[:include_names]
-        c.extra = '-not -type d'
-      end, method( :error )
     end
 
     -> do  # `render_table`
@@ -101,6 +69,7 @@ module Skylab::FileMetrics
           [ :count,       header: 'Lines' ],
           [ :total_share, filter: percent ],
           [ :max_share,   filter: percent ],
+          [ :lipstick_float, :noop ],
           [ :lipstick,    :autonomous, header: '' ]
         ]
       end

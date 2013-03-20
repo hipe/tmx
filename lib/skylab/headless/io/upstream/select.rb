@@ -18,7 +18,7 @@ module Skylab::Headless
     #
     # For now, the input is always chunked into single lines (except the last
     # flush). Work in progres! (tracked by [#hl-048])
-
+    # (a simpler, blocking version - H_L::Services::Distribute::Lines)
 
     attr_reader :line
 

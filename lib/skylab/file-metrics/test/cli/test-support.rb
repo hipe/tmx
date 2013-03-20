@@ -48,10 +48,16 @@ module Skylab::FileMetrics::TestSupport::CLI
 
     -> do  # `expect_integer`
       rx = /\A\d+\z/
-      define_method :expect_integer do |x|
+      define_method :expect_integer do |x, range=nil|
         if rx =~ x then $~[0].to_i else
           fail "expecting this to look like integer - #{ x.inspect }"
         end
+        if range
+          if ! range.include? x.to_i
+            fail "expecting integer #{ x.to_i } to be btwn #{ range }"
+          end
+        end
+        nil
       end
     end.call
 
@@ -63,8 +69,8 @@ module Skylab::FileMetrics::TestSupport::CLI
         elsif pct_f
           f = $~[0].to_f
           f.should eql( pct_f )
-          nil
         end
+        nil
       end
     end.call
 
@@ -76,6 +82,7 @@ module Skylab::FileMetrics::TestSupport::CLI
         elsif ! range.include? x.length
           fail "expecting number of pluses #{ x.length } to be btwn #{ range }"
         end
+        nil
       end
     end.call
   end

@@ -4,7 +4,7 @@ module Skylab::FileMetrics
 
     def render out
       CLI::Lipstick.initscr
-      @max_a = build_maxes if ! @max_a
+      @max_a = prerender if ! @max_a
       cel_a = []
       @row_a.each do |row|
         cel_a.clear
@@ -30,7 +30,7 @@ module Skylab::FileMetrics
       @sep = '  '
     end
 
-    def build_maxes
+    def prerender  # result - `max_a`
       max_a = []
       @row_a.each do |row|
         row.each_with_index do |cel, idx|

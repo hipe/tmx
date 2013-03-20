@@ -382,12 +382,12 @@ module Skylab::MetaHell
     #         ~ nerks that remove constituents (alpha. order) ~
 
     def clear                     # clears all constituent data from membership
-      @order.clear                # (but of course does not cacade out). does
+      @order.clear                # (but of course does not cascade out). does
       @hash.clear                 # not touch non-constituent ivars.
       nil
     end
 
-    # `partition!
+    # `partition!`
     # TL;DR: For all the members that match `func`, take them out of this
     # box and put them in a new box. In more detail:
     # (it's like an ::Enumerable#partition but one result instead of two,
@@ -397,8 +397,8 @@ module Skylab::MetaHell
     # same "non-constituent" ivars, initted with `base_args`) whose
     # constituency is the set of zero or more name-value pairs that resulted in
     # true-ish when passed to `func` (which must take 2 args). Each matched
-    # name-value pair is removed from the reciever. No matter what, you end
-    # up with two boxes where once there was one and the still the same total
+    # name-value pair is removed from the reciever. No matter what you end
+    # up with two boxes where once there was one and still the same total
     # number of members.
 
     def partition! &func
@@ -426,7 +426,7 @@ module Skylab::MetaHell
         @hash.fetch n  # just assert that it is there
         @order.index( n ) or raise ::NameError, "key not found: #{ n.inspect }"
       end
-      idx_a.reverse.each do |idx|  # we pervertedly allow the nil key wtf
+      idx_a.sort!.reverse!.each do |idx|  # we pervertedly allow the nil key wtf
         @order[ idx, 1 ] = empty_a
       end
       name_a.map do |n|
@@ -587,7 +587,7 @@ module Skylab::MetaHell
     # of the user.
 
     define_method :defectch do |key_func, else_func=nil|
-      @arity_override = 2 # you want the below detect to always get 2
+      @arity_override = 2  # you want the below detect to always get 2 ICK
       norm = norm_h[ key_func.arity ]
       found = res = nil
       detect do |k, v|
