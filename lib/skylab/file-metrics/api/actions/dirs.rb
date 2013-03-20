@@ -7,7 +7,7 @@ module Skylab::FileMetrics
     include API::Common::InstanceMethods
 
     def run
-      count = Models::Count.new("folders summary")
+      c = Models::Count.new("folders summary")
       find_cmd = build_find_dirs_command
       @req[:show_commands] and @ui.err.puts(find_cmd)
       dirs = %x{#{find_cmd}}.split("\n")
@@ -33,22 +33,18 @@ module Skylab::FileMetrics
         end
         _folder_count = count_lines(_ok_files, File.basename(dir))
         _folder_count.count ||= 0
-        count.add_child _folder_count
+        c.add_child _folder_count
       end
-      if count.zero_children?
-        @ui.err.puts "(no children)"
+      if c.zero_children?
+        @ui.err.puts "(no dirs)"
         nil
       else
-        count.collapse_and_distribute do |child|
-          child.set_field :num_files, child.nonzero_children?  # ick / meh
-          child.set_field :num_lines, child.count  # just to be clear
+        c.collapse_and_distribute do |cx|
+          cx.set_field :num_files, cx.nonzero_children?  # ick / meh
+          cx.set_field :num_lines, cx.count  # just to be clear
         end
-        count.display_summary_for :label do "Total:" end
-        count.display_summary_for :lipstick do nil end
-        count.display_total_for :num_files do |d| "%d" % d if d end
-        count.display_total_for :num_lines do |d| "%d" % d if d end
       end
-      render_table count, @ui.err
+      render_table c, @ui.err
     end
 
     # (we are trying to keep some ancient code for posterity for now ..)
@@ -77,19 +73,34 @@ module Skylab::FileMetrics
       percent = -> v { "%0.2f%%" % ( v * 100 ) if v }
 
       define_method :render_table do |count, out|
-        rndr_tbl count, out, [ :fields,
-          [ :label,       header: 'Directory' ],
-          [ :count,       :noop ],
-          [ :num_files,   filter: -> x { x.to_s } ],
-          [ :num_lines,   filter: -> x { x.to_s } ],
-          [ :rest,        :rest ],  # any fields not stated here, glob them
-          [ :total_share, filter: percent ],
-          [ :max_share,   filter: percent ],
-          [ :lipstick_float, :noop ],
-          [ :lipstick,    :autonomous, header: '' ]
-        ]
+
+        rndr_tbl out, count, -> do
+          fields [
+            [ :label,               header: 'Directory' ],
+            [ :count,               :noop ],
+            [ :num_files,           prerender: -> x { x.to_s } ],
+            [ :num_lines,           prerender: -> x { x.to_s } ],
+            [ :rest,                :rest ],  # any fields not stated here, glob them
+            [ :total_share,         prerender: percent ],
+            [ :max_share,           prerender: percent ],
+            [ :lipstick_float,      :noop ],
+            [ :lipstick,            FileMetrics::CLI::Lipstick::FIELD ]
+          ]
+          field[:label].summary -> do
+            'Total: '
+          end, -> do
+            fail 'me'
+          end
+          field[:num_files].summary -> do
+            "%d" % count.sum_of( :num_files )
+          end
+          field[:num_lines].summary -> c do
+            "%d" % count.sum_of( :num_lines )
+          end
+          field[:lipstick].summary nil
+        end
       end
-      protected :render_table
     end.call
+    protected :render_table
   end
 end

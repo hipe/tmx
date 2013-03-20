@@ -64,7 +64,7 @@ module Skylab::FileMetrics
         begin
           file_a = self.file_a or break
           pat_a = []
-          pat_a << Pattern_h.fetch( :git_object ) if @req[:git]
+          pat_a << Pattern_h.fetch( :git_object ) if @req[:git]  # eew
           pat_a << Pattern_h.fetch( :dotfile )
           ext_count_h = ::Hash.new do |h, k|
             h[k] = Count_[ k, 0 ]
@@ -137,13 +137,17 @@ module Skylab::FileMetrics
       percent = -> v { "%0.2f%%" % ( v * 100 ) }
 
       define_method :render_table do |count, out|
-        rndr_tbl count, out, [ :fields,
-          [ :label,        header: 'Extension' ],
-          [ :count,        header: 'Num Files' ],
-          [ :total_share,  filter: percent ],
-          [ :max_share,    filter: percent ],
-          [ :lipstick_float, :noop ],
-          [ :lipstick,     :autonomous, header: '' ] ]
+        rndr_tbl out, count, -> do
+          fields [
+            [ :label,               header: 'Extension' ],
+            [ :count,               header: 'Num Files' ],
+            [ :rest,                :rest ],  # if we forgot any fields, glob them here
+            [ :total_share,         prerender: percent ],
+            [ :max_share,           prerender: percent ],
+            [ :lipstick_float,      :noop ],
+            [ :lipstick,            FileMetrics::CLI::Lipstick::FIELD ]
+          ]
+        end
       end
       protected :render_table
     end.call

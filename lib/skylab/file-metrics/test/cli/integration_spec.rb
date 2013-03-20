@@ -8,6 +8,8 @@ module Skylab::FileMetrics::TestSupport::CLI
 
     extend CLI_TestSupport
 
+    floor = 14
+
     context "lc" do
 
       desc 'give me `lc` here and now'
@@ -31,15 +33,15 @@ module Skylab::FileMetrics::TestSupport::CLI
         arr = cels_hack output_lines[ 1 ]
         arr.length.should eql( 5 )
         fl, ln, pc1, pc2, lip = arr
-        fl.should eql( './api/common.rb' )  # meh
-        expect_integer ln, 50 .. 300
+        fl.should eql( './services/table.rb' )  # meh
+        expect_integer ln, 50 .. 400
         expect_percent pc1
         expect_percent pc2, 100.0
-        expect_pluses lip, 16..100
+        expect_pluses lip, floor..100
       end
 
       it "summary" do
-        output_lines[ -1 ].should match( /\A +total: +\d{4} +\z/i )
+        output_lines[ -1 ].should match( /\A +total: +\d{2} +\d{4} +\z/i )
       end
     end
 
@@ -67,10 +69,10 @@ module Skylab::FileMetrics::TestSupport::CLI
         arr.length.should eql( 5 )
         lbl, num, pc1, pc2, lip = arr
         lbl.should eql( '*.rb' )
-        expect_integer num, 18..18  # greetings from the past
+        expect_integer num, 17..18  # greetings from the past
         expect_percent pc1
         expect_percent pc2, 100.0
-        expect_pluses lip, 16..100
+        expect_pluses lip, floor..100
       end
 
       it "final" do
@@ -100,10 +102,10 @@ module Skylab::FileMetrics::TestSupport::CLI
       it "body" do
         dr, nf, nl, ts, ms, lp = output_lines[1].strip.split( /(?!< ) +(?! )/ )
         expect_integer nf, 3..10
-        expect_integer nl, 400..500  # hello from the past
+        expect_integer nl, 400..520  # hello from the past
         expect_percent ts
         expect_percent ms, 100.0
-        expect_pluses lp, 16..100
+        expect_pluses lp, floor..100
       end
 
       it "sumary" do

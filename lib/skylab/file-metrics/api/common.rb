@@ -1,14 +1,12 @@
 module Skylab::FileMetrics
 
-  module API
-    module Common
-    end
+  module API::Common
+  end
 
-    class RuntimeError < ::RuntimeError
-    end
+  class API::Common::RuntimeError < ::RuntimeError
+  end
 
-    class SystemError < ::SystemCallError
-    end
+  class API::Common::SystemError < ::SystemCallError
   end
 
   module API::Common::ModuleMethods
@@ -43,34 +41,74 @@ module Skylab::FileMetrics
     # `stdout_lines` - write each (chomped) line of stdout that results from
     # executing `command_string` on the system to `y` using `<<`.
     # any stdout data is written to our own selfsame stream, decorated.
-    # result is true of no stderr data was written, false if it was.
+    # result is true if no stderr data was written, false if it was.
 
     def stdout_lines command_string, y
+      tsa_limit = ( @tsa_limit ||= 0.33 )  # tsa = time since activity
+      last_activitiy_time = ::Time.now
       FileMetrics::Services::Open3.popen3 command_string do |_, sout, serr|
         er = nil
-        Headless::Services::Distribute::Lines[
-          sout, -> line { y << line },  # (upstream already chomped it)
-          serr, -> line do
-            er ||= true
-            @ui.err.puts "(unexpected errput - \"#{ line }\")"
-          end ]
+        select = Headless::IO::Upstream::Select.new
+        select.timeout_seconds = 5.0  # exaggerated amount for fun
+
+        num_souts = 0
+        did_filler_activity = false
+
+        -> do
+          # (this block is all just a UI nicety - 'TSA' - time since activity)
+          select.heartbeat 0.33 do
+            if num_souts.zero?
+              @ui.err.write '.'
+            else
+              @ui.err.write( '*' * num_souts )
+              num_souts = 0
+            end
+            did_filler_activity ||= true
+          end
+        end.call
+
+        select.on sout do |line|
+          num_souts += 1
+          line.chomp!
+          y << line
+        end
+
+        select.on serr do |line|
+          line.chomp!
+          er ||= true
+          @ui.err.puts "(unexpected errput - #{ line }\")"
+        end
+
+        select.select
+        if did_filler_activity
+          @ui.err.write " done.\n"
+        end
         ! er
       end
     end
 
     -> do  # `count_lines`
-      noop = -> _ { } ; vp = nil
+
+      noop = -> _ { } ; build_prattle_space = nil
+
       define_method :count_lines do |file_a, label=nil|
         filter_a = []
-        plus, minus = if ! @req.fetch( :info_volume ) then [ noop, noop ] else
-          [ vp[ 'include' ], vp[ 'exclude' ] ]
+        if @req.fetch :info_volume
+          incl, excl, prattle = build_prattle_space[]  # sorry - fun custom hack
+        else
+          incl = excl = noop
         end
-        if @req[:count_blank_lines] then plus[ :blank_lines ] else
-          minus[ :blank_lines ]
+        if @req[:count_blank_lines] then incl[ :blank_lines ] else
+          excl[ :blank_lines ]
           filter_a << "grep -v '^[ \t]*$'"
         end
-        if @req[:count_comment_lines] then plus[ :comment_lines ] else
+        if @req[:count_comment_lines] then incl[ :comment_lines ] else
+          excl[ :comment_lines ]
           filter_a << "grep -v '^[ \t]*#'"
+        end
+        if prattle
+          cp = prattle.conjunction_phrase
+          @ui.err.puts "(#{ cp.string })"
         end
         label ||= '.'
         count = if filter_a.length.zero?
@@ -82,22 +120,46 @@ module Skylab::FileMetrics
         count
       end
 
-      noun_h = build_noun_h = nil
+      # (this is not worth the space, but it's so goddamned fun!)
+      # with axes/categories of { including | exluding } x { A | B },
+      # produce programatically all the permutations of utterances:
+      # "including A and B", "including A and excluding B", "excluding A and B"
+      # and at least 1 other..
 
-      vp = -> verb_stem do
-        -> noun_ref do
-          noun_h ||= build_noun_h[ ]
-
+      build_prattle_space = -> do
+        noun_h = { blank_lines: 'blank line', comment_lines: 'comment line' }
+        verb_h = { include: 'include', exclude: 'exclude' }
+        interface = MetaHell::Proxy::Nice.new :conjunction_phrase
+        -> do
+          predicate_box = MetaHell::Formal::Box::Open.new
+          aggregate = -> verb_sym, noun_sym do
+            predicate_box.if? verb_sym, -> vp do
+              vp << noun_h.fetch( noun_sym )
+              nil
+            end, -> box, k do
+              x = Headless::NLP::EN::POS::Verb::Phrase.new(
+                v: verb_h.fetch( k ),
+                np: noun_h.fetch( noun_sym )
+              )
+              x.np.n.number = :plural  # just greasing the wheels
+              x.v.markedness = nil
+              x.v.tense = :progressive
+              box.add k, x
+              nil
+            end
+            nil
+          end
+          cp = nil
+          [  -> sym { aggregate[ :include, sym ] },  # `incl`
+             -> sym { aggregate[ :exclude, sym ] },  # `excl`
+             interface.new(                          # `prattle`
+              conjunction_phrase: -> do
+                cp ||= Headless::NLP::EN::POS::Conjunction_::Phrase_.new(*
+                  predicate_box.values )
+              end )
+          ]
         end
-      end
-
-      build_noun_h = -> do
-        {
-          blank_lines:   Headless::NLP::EN::POS::Noun[ 'blank line' ],
-          comment_lines: Headless::NLP::EN::POS::Noun[ 'comment line' ]
-        }
-      end
-
+      end.call
     end.call
 
     def linecount_using_grep_chain file_a, filter_a, label
@@ -177,28 +239,19 @@ module Skylab::FileMetrics
     define_method :shellescape_path, & FUN.shellescape_path
     protected :shellescape_path
 
-    def rndr_tbl count, out, sexp
+    def rndr_tbl out, count, design
       if count.zero_children?
-        out.puts "(table has no rows)"
+        out.puts "(table has no rows)"  # last ditch fallback.
         false
       else
-        mani = Services::Table::Manifold.new sexp do |mn|
-          mn.hdr = -> m do
-            m.to_s.split( '_' ).map(& :capitalize ) * ' '
+        Services::Table::Render[ out, count.each_child, [ design,
+          -> d do  # grease wheels
+            d.the_rest count.first_child.class.members  # did we forget any?
+            d.hdr do |sym|  # hack a header from the field id as a default
+              sym.to_s.split( '_' ).map(& :capitalize ) * ' '
+            end
           end
-          mn.the_rest count.first_child.class.members  # did we forget any?
-        end
-        row_a = [ mani.build_header_row ]
-        count.each_child do |cx|
-          row_a << mani.build_row( cx )
-        end
-        node_a = count.summary_nodes
-        if node_a.length.nonzero?  # (contents may be unpacked for debugging..)
-          node_a.each do |node|
-            row_a << mani.build_summary_row( node )
-          end
-        end
-        Models::Table.new( row_a ).render( out )
+        ] ]
       end
     end
   end

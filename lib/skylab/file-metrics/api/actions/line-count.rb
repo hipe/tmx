@@ -15,14 +15,12 @@ module Skylab::FileMetrics
         if ! @req[:show_report]
           break( res = true )
         else
-          count = count_lines( file_a ) or break
-          if count.zero_children?
-            @ui.err.puts "no files found."
+          c = count_lines( file_a ) or break
+          if c.zero_children?
+            @ui.err.puts "(no files)"
           else
-            count.collapse_and_distribute
-            count.display_summary_for :label do "Total:" end
-            count.display_total_for :count do |d| "%d" % d if d end
-            render_table count, @ui.err
+            c.collapse_and_distribute
+            render_table c, @ui.err
           end
         end
       end while false
@@ -35,27 +33,32 @@ module Skylab::FileMetrics
   protected
 
     def file_a
-      @path_a.reduce [] do |file_a, path|
+      res_a = [ ]
+      y = ::Enumerator::Yielder.new do |line|  # (just grease the wheels..)
+        res_a << line
+      end
+      @path_a.reduce y do |path_y, path|
         st = begin ::File::Stat.new( path ) ; rescue ::Errno::ENOENT => e ; end
         if ! st
           @ui.err.puts "skipping - #{ e.message.sub(/^[A-Z]/) {$~[0].downcase}}"
         elsif st.file?
-          file_a << path
+          path_y << path
         elsif st.directory?
-          files_in_dir path, file_a or break
+          files_in_dir path, path_y or break
         end
-        file_a
+        path_y
       end
+      res_a
     end
 
-    def files_in_dir path, file_a
+    def files_in_dir path, line_y
       cmd = build_find_files_command @path_a
       if cmd
         cmd_string = cmd.string
         if @req[:show_commands] || @req.fetch( :debug_volume )
           @ui.err.puts cmd_string
         end
-        stdout_lines cmd_string, file_a
+        stdout_lines cmd_string, line_y
       end
     end
 
@@ -64,14 +67,26 @@ module Skylab::FileMetrics
       percent = -> v { "%0.2f%%" % ( v * 100 ) }
 
       define_method :render_table do |count, out|
-        rndr_tbl count, out, [ :fields,
-          [ :label,       header: 'File' ],
-          [ :count,       header: 'Lines' ],
-          [ :total_share, filter: percent ],
-          [ :max_share,   filter: percent ],
-          [ :lipstick_float, :noop ],
-          [ :lipstick,    :autonomous, header: '' ]
-        ]
+        rndr_tbl out, count, -> do
+          fields [
+            [ :label,               header: 'File' ],
+            [ :count,               header: 'Lines' ],
+            [ :rest,                :rest ],  # if we forgot any fields, glob them here
+            [ :total_share,         prerender: percent ],
+            [ :max_share,           prerender: percent ],
+            [ :lipstick_float,      :noop ],
+            [ :lipstick,            FileMetrics::CLI::Lipstick::FIELD ]
+          ]
+          field[:label].summary -> do
+              "Total: #{ count.child_count }"
+            end, -> do
+              fail "helf"
+            end
+          field[:count].summary -> do
+              "%d" % count.sum_of( :count )
+            end
+          field[:lipstick].summary nil
+        end
       end
       protected :render_table
     end.call

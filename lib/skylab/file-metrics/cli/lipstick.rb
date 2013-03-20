@@ -3,7 +3,17 @@ module Skylab::FileMetrics
   module CLI::Lipstick
 
     # lipstick is the rendering with glyphs of a certain normalized scalar
-    # (a "ratio" between 0.0 and 1.0 incl.)
+    # (a "ratio" between 0.0 and 1.0 incl.), taking into account how
+    # wide the screen is at render time.
+
+    FIELD = {
+      header: '',
+      is_autonomous: true,
+      cook: -> metrics do
+        CLI::Lipstick.initscr  # here is as good as anywhere. - comment out!
+        CLI::Lipstick[ metrics, -> { 80 } ]  # screen width fallback !
+      end
+    }
 
     set_cols = get_cols = nil
 
@@ -13,32 +23,35 @@ module Skylab::FileMetrics
       margin = 1
       norm = stylus = stylize = nil
 
-      define_singleton_method :[] do |row_a, sep, fallback|
+      define_singleton_method :[] do |metrics, fallback|
         pane_width = get_cols[] || fallback[]
-        before = row_a.join( sep ).length
+        sep = metrics.sep
+        before = metrics.max_a.reduce( :+ ) +
+          ( [ metrics.max_a.length - 1, 0 ].max * sep.length )
+          # (minus one because it's a separator, minus one b.c we don't
+          # count lipstick, and then plus one for the left margin hack
+          # (which happens at exactly [#008]))
+
         my_room = -> do
           x = ( before + sep.length ) * -1 + pane_width - margin
           [ x, min_room ].max
         end.call
-        lipstick = -> ratio do
-          if ratio  # allow nil to mean "don't do it"
-            stylize[ "+" * ( norm[ ratio ] * my_room ).to_i ]
+        -> pxy do
+          if pxy  # allow nil to mean "don't do it"
+            stylize[ "+" * ( norm[ pxy.normalized_scalar ] * my_room ).to_i ]
           end
-        end
-        -> ratio, rw_a, _ do
-          rw_a << lipstick[ ratio ]
         end
       end
 
       norm = -> x do
-        [ [x, 0.0].max, 1.0 ].min
+        [ [ x, 0.0 ].max, 1.0 ].min
       end
 
       stylus = nil
       stylize = -> s do
-        stylus ||= Headless::CLI::Pen::MINIMAL
-        stylus.stylize s, :green
+        ( stylus ||= Headless::CLI::Pen::MINIMAL ).stylize s, :green
       end
+
     end.call
 
     define_singleton_method :initscr do

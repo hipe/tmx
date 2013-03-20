@@ -29,90 +29,29 @@ module Skylab::FileMetrics
 
     attr_writer :lipstick_float  # ratio of 0 to 1?
 
-    -> do
+    def lipstick
 
-      lpstck = nil
+      @lipstick_pxy ||= CelPxy_.new(
 
-      CelPxy_ = MetaHell::Proxy::Nice.new :length, :respond_to?, :render
+        # we act like a string during the pre-render, and don't ever add
+        :length => -> { 0 },  # any width, you are strictly a decoration.
 
-      define_method :lipstick do
-        @lipstick_pxy ||= CelPxy_.new(
-          :length => -> { 0 },
-          :respond_to? => -> x { true },
-          :render => -> row_a, table do
-            lpstck[ @lipstick_float, row_a, table ]
-          end
-        )
-      end
+        :respond_to? => -> x { true },  # catch errors
 
-      lpstck = -> ratio, row_a, table do
-        lpst = CLI::Lipstick[ row_a, table.sep, -> { 80 } ] # fallback
-        lpstck = lpst
-        lpst[ ratio, row_a, table ]
-      end
-    end.call
-
-    # display (writers [/readers])
-
-    def display_summary_for field_name, &func
-      ( @column_summary_cel ||= { } )[ field_name ] = func
-      nil
-    end
-
-    attr_reader :column_summary_cel
-
-    def display_total_for field_name, &render
-      render ||= default_render_total
-      display_summary_for field_name, do
-        render[ each_child.map(& field_name ).map { |v| v ? v : 0 }.reduce :+ ]
-      end
-      nil
-    end
-
-    attr_reader :default_render_total
-
-    alias_method :default_render_total_ivar, :default_render_total
-
-    def default_render_total &func
-      if func
-        @default_render_total = func
-        nil
-      elsif default_render_total_ivar
-        @default_render_total
-      else
-        @default_render_total = -> x do
-          "Total: #{ ( ( ::Float === x  ) ? '%.2f' : '%d' ) % x }"
+        :normalized_scalar => -> do
+          @lipstick_float
         end
-      end
+      )
     end
 
-    -> do  # `summary_nodes`
+    CelPxy_ = MetaHell::Proxy::Nice.new :length, :respond_to?,
+      :normalized_scalar
 
-      empty_a = [ ].freeze  # ocd
-
-      to_s = -> x { x.to_s if ! x.nil? }
-
-      define_method :summary_nodes do
-        res = if zero_children? or ! column_summary_cel then empty_a else
-          proto = first_child
-          node = proto.class.members.reduce proto.class.new do |o, sym|
-            f = @column_summary_cel.fetch sym do nil end
-            if f
-              if f.arity.nonzero? then fail "arity? - #{ f }" else
-                o.set_field sym, f[]
-              end
-            end
-            o
-          end
-          [ node ]
-        end
-        res
-      end
-    end.call
-
-    def initialize( * )
-      # any ivars you set here look ugly in big trees
-      super
+    def sum_of sym
+      each_child.map(& sym ).reduce :+
+        # http://howfuckedismydatabase.com/nosql
     end
+
+    # `initialize` - note any ivars you would set would look ugly in big trees
   end
 end

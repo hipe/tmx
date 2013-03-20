@@ -18,5 +18,12 @@ module Skylab::Headless
     # by their symbol (this is called a "Box" around these parts).
 
     include Headless::IO::Interceptor::InstanceMethods
+
+    -> do
+      kls = self
+      define_method :respond_to? do |m|
+        kls.method_names.include? m.intern
+      end
+    end.call
   end
 end

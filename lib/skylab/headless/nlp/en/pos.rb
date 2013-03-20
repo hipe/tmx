@@ -89,7 +89,7 @@ module Skylab::Headless
         attr_reader :box
       end
 
-      Category__ = ::Struct.new :extent_x # as it exists in the universe
+      Category__ = ::Struct.new :extent_x  # as it exists in the universe
     end
 
     Exponent_ = ::Struct.new :exponent_sym, :category_sym
@@ -139,7 +139,7 @@ module Skylab::Headless
     end
 
     # `combination_class` a simple struct suitable to be used as a record
-    # of a form -  what you get depends on the state of the category box!
+    # of a form - what you get depends on the state of the category box!
 
     def self.combination_class
       Exponent_::Combination_::Struct_Factory_[ @category_box._order ]
@@ -825,7 +825,7 @@ module Skylab::Headless
     def string
       y = [ ]
       render y
-      y * ' '  # meh for now
+      y * ' '  # meh for now, 2x [#068]
     end
 
     def parts
@@ -1062,4 +1062,92 @@ module Skylab::Headless
 
   NLP::EN::Part_Of_Speech::Phrase_.define_category_writers  # trickle down
 
+  # BEGIN
+  # NOTE the below is not only #experimental it is #exploratory - that is,
+  # it is *guaranteed* to change. we just want to see how it feels to type.
+
+  class NLP::EN::POS::Verb::Phrase
+
+    # #exploratory - what if turning a single noun into a group were this
+    # easy? (but note we define it on the parent of the `np`, which happens
+    # to be a `vp` here.)
+
+    def << noun_x
+      noun = NLP::EN::POS::Noun::Production.new noun_x, :lemma
+      noun.number = :plural
+      if ! np.is_aggregator
+        @np = NLP::EN::POS::Conjunction_::Phrase_.new @np
+      end
+      @np << noun
+    end
+  end
+
+  class NLP::EN::POS::Noun::Phrase
+    def is_aggregator
+      false
+    end
+  end
+
+  module NLP::EN::POS::Conjunction_  # (i guess this is what we are here for)
+  end
+
+  class NLP::EN::POS::Conjunction_::Phrase_  # hack experiment!
+
+    def string  # 2x [#068] (sort of)
+      y = [ ]
+      render y
+      y * ' ' if y.length.nonzero?
+    end
+
+    -> do  # `render` (le hack)
+      yes, no = 'and', 'or'
+      define_method :render do |y|
+        if @a.length.nonzero?
+          @a[0].render y
+          conj = @polarity ? yes : no
+          @a[ 1 .. -1 ].each do |x|
+            y << conj
+            x.render y
+          end
+        end
+        nil
+      end
+    end.call
+
+    def is_aggregator
+      true
+    end
+
+    def << x
+      @a << x  # meh
+    end
+
+    def count
+      @a.count
+    end
+
+    def each &b
+      @a.each( &b )
+    end
+
+    def _a  # top secret
+      @a
+    end
+
+    attr_reader :polarity
+
+    -> do  # `polarity=` ( hack )
+      h = ::Hash[ [ :positive, :negative ].map { |x| [ x, x ] } ]
+      define_method :polarity= do |x|
+        @polarity = h.fetch( x )
+      end
+    end.call
+
+    def initialize *meh
+      @polarity = :positive
+      @a = meh
+    end
+  end
+
+  # END
 end

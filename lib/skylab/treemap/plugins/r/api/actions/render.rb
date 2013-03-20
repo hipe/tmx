@@ -193,12 +193,10 @@ module Skylab::Treemap
         end
         select = Headless::IO::Upstream::Select.new
         select.timeout_seconds = 0.3
-        select.line[:sout] = -> s { inf[ "OUT-->#{ s }" ] }
-        select.line[:serr] = -> s { inf[ "ERR-->#{ s }" ] }
         argv = [ @bridge.executable_path, '--vanilla' ]  # wat
         Headless::Services::Open3.popen3( *argv ) do |sin, sout, serr|
-          select.stream[:sout] = sout
-          select.stream[:serr] = serr
+          select.on sout do |ln| inf[ "OUT-->#{ ln }" ] end
+          select.on serr do |ln| inf[ "ERR-->#{ ln }" ] end
           upline = true
           loop do
             bytes = select.select

@@ -1,40 +1,44 @@
 module Skylab::MetaHell
 
-  class Proxy::Tee < ::BasicObject # construct a tee like you would a struct
+  class Proxy::Tee < ::BasicObject  # construct a tee like you would a struct
 
     class << self
       alias_method :metahell_original_new, :new
     end
 
-    def self.method_names         # (not used but meh)
-      @method_names.dup
-    end
+    next_id = -> do
+      id = 0
+      -> { id += 1 }
+    end.call
 
-    add_method = -> method do
-      @method_names << method
-      define_method method do |*a, &b|
-        @mux.dispatch method, a, b
-      end
-    end
+    define_singleton_method :new do |method, *method_a|
 
-    id = 0
-    next_id = -> { id += 1 }
-
-    define_singleton_method :new do |method, *methods|
-      methods.unshift method
+      method_a.unshift method ; method = nil  # just for the syntax above.
+      method_a.freeze
 
       ::Class.new( self ).class_exec do
-        @method_names = []
+
         class << self
           alias_method :new, :metahell_original_new
         end
-        kls = self                # basic object don't respond to `class`
-        methods.each do |m|       # basic object don't care
-          class_exec m, &add_method
+
+        method_a.each do |m|
+          define_method m do |*a, &b|
+            @mux.dispatch m, a, b
+          end
         end
+
+        define_singleton_method :method_names do
+          method_a
+        end
+
+        kls = self                # basic object don't respond to `class`
+                                  # basic object don't care
+
         define_method :initialize do |*a|
           @mux = Proxy::Tee::Mux.new self, kls, next_id[], a
         end
+
         self
       end
     end

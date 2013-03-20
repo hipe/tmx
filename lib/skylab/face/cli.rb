@@ -582,13 +582,17 @@ module Skylab::Face
 
     # existential workhorse `process_options` - called from main loop
 
-    def process_options argv
+    def process_options argv, do_permute=false
       @argv = argv  # monadic. experimental. some switches do custom hacks
                                                # assume '-' == argv[0][0]
                                                # if no o.p, yet there is '-',
       if ! option_parser then true else        # this will probably soft bork
         begin                                  # parse destructively, in order
-          @op.order! argv                      # NOTE stop at 1st non-{arg|opt}!
+          if do_permute                        # (permute is typically used
+            @op.permute! argv                  # for terminal nodes ("commands")
+          else                                 # as op. to namespaces.)
+            @op.order! argv                    # NOTE stop at 1st non-{arg|opt}!
+          end
         rescue ::OptionParser::ParseError => e
           parse_error = true                   # don't linger in this frame
         end
@@ -724,7 +728,7 @@ module Skylab::Face
     # like `process_options` but for a terminal node ("command")
     def parse argv
       if option_parser
-        process_options argv  # very likely [ nil, nil ]
+        process_options argv, true  # very likely [ nil, nil ]
       else
         # #todo
         fail 'test me - you have to try hard not to have an o.p'

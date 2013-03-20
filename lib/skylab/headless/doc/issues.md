@@ -1,4 +1,5 @@
 [#069]       #doc-point (sorry to jump ahead) "ouroboros"
+[#068]       track this redundancy during a hack
 [#067]       merge this into that
 [#066]       track this combinatorial dichototmy
 [#065]       how / when are things added to the lexicon
