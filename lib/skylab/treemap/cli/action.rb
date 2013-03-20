@@ -116,7 +116,7 @@ module Skylab::Treemap
     #         ~ for noun inflection when reporting actions ~
 
     extend Headless::NLP::EN::API_Action_Inflection_Hack
-    inflection.stems.noun = 'treemap'  # (these classes here are verbs)
+    inflection.lexemes.noun = 'treemap'  # (these classes here are verbs)
 
     public :usage_and_invite  # for [#035] annotated invites
 

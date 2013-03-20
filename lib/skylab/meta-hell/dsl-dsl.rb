@@ -8,7 +8,7 @@ module Skylab::MetaHell
     # level, and getters at the instance level.
     #
     # (This is basically like the `let` of ::Rspec fame, except it makes
-    # sugar for you.  I WILL CALL IT SUGAR FACTORY)
+    # sugar for you. I WILL CALL IT SUGAR FACTORY)
     #
     # `list` type behaves like `atom` type identically except it globs
     # the incoming args when setting.  `block` works as expected, too,
@@ -24,6 +24,10 @@ module Skylab::MetaHell
 
       def atom name
         @atom[ name ]
+      end
+
+      def atom_accessor name
+        @atom_accessor[ name ]
       end
 
       def list name
@@ -85,6 +89,25 @@ module Skylab::MetaHell
             # check that a block was passed.
 
           [ atom, list, block ]
+        end
+
+        @atom_accessor = -> sym do
+
+          reader = "get_#{ sym }".intern
+          writer = "#{ sym }=".intern
+
+          mod.module_exec do
+
+            attr_accessor sym                  # make the reader and the writer
+            alias_method reader, sym           # reader `foo` becomes `get_foo`
+
+            sig_a = [ reader, writer ]
+
+            define_method sym do |*a|
+              send sig_a.fetch( a.length ), *a
+            end
+          end
+          nil
         end
       end
     end

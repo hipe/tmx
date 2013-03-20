@@ -181,7 +181,7 @@ module Skylab::Face::TestSupport::CLI
       end
     end
 
-    -> do  # `expect_styled`
+    -> do  # `expect_styled`, `convert_whole_err_string_to_unstylized_lines`
 
       unstylize_stylized = Headless::CLI::Pen::FUN.unstylize_stylized
 
@@ -191,6 +191,13 @@ module Skylab::Face::TestSupport::CLI
           fail "line wasn't styled - #{ line.inspect }"
         end
       end
+
+      define_method :convert_whole_err_string_to_unstylized_lines do
+        x = whole_err_string
+        str = unstylize_stylized[ x ]
+        str.split "\n"
+      end
+
     end.call
 
     def expect_match text, rx

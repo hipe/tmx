@@ -35,7 +35,7 @@ module Skylab::Headless::TestSupport::NLP::EN
         context "e.g. with #{MyWidget::Add}" do
           let(:klass) { MyWidget::Add }
           context "the progressive form of it" do
-            subject { klass.inflection.stems.verb.progressive }
+            subject { klass.inflection.lexemes.verb.progressive }
             specify { should eql('adding') }
           end
         end
@@ -45,7 +45,7 @@ module Skylab::Headless::TestSupport::NLP::EN
 
     context("and further assuming that the surround modules of said actions",
       "are named after nouns, and you tell it which verbs deal with single or plural nouns") do
-      subject { "#{inflection.stems.verb.progressive} #{inflection.inflected.noun}" }
+      subject { "#{inflection.lexemes.verb.progressive} #{inflection.inflected.noun}" }
       context "compare the inflection for LIST:" do
         let(:inflection) { MyWidget::List.inflection }
         specify { should eql("listing my widgets") }
@@ -89,7 +89,7 @@ module Skylab::Headless::TestSupport::NLP::EN
     end
     context "when not specified it will use the singular" do
       let(:action) { Flugelhorn__TheDerpAction() }
-      specify { should eql(action.inflection.stems.noun.singular) }
+      specify { should eql(action.inflection.lexemes.noun.singular) }
     end
   end
 end

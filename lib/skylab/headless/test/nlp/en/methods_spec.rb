@@ -6,7 +6,7 @@ describe ::Skylab::Headless::NLP::EN::Methods do
     let(:subject) { oxford_comma arr }
     context(a = %w()) do
       let(:arr) { a }
-      specify { should eql('') }
+      specify { should eql( nil ) }
     end
     context(b = %w(eenie)) do
       let(:arr) { b }

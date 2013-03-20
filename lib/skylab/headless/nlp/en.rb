@@ -15,25 +15,39 @@ module Skylab::Headless
 
     all_caps_rx = /\A[A-Z]+\z/
 
-    o[:an] = -> x, cnt=nil do          # crude guess at 'a' vs. 'an'
-      x = x.to_s
-      res = initial_vowel_rx =~ x ? 'an' : 'a'
-      if cnt                           # if the count is also variable then
-        res = o[:s][ cnt, res.intern ] # you have more work to do
+    # `an` - crude hack-guess at 'a' vs. 'an'
+
+    o[:an] = -> lemma_x, cnt=nil do
+      lemma = lemma_x.to_s
+      if lemma.length.nonzero?
+        res = o[:s][
+          cnt || 1,
+          initial_vowel_rx =~ lemma ? :an : :a
+        ]
+        if res && all_caps_rx =~ lemma
+          res = res.upcase
+        end
+        res
       end
-      res = res.upcase if res && all_caps_rx =~ x # the just be cute
-      res
     end
 
     o[:oxford_comma] = -> a, ult = " and ", sep = ", " do
-      (hsh = ::Hash.new(sep))[a.length - 1] = ult
-      [a.first, * (1..(a.length-1)).map { |i| [ hsh[i], a[i] ] }.flatten].join
+      if a.length.nonzero?
+        res = ( 1 .. ( a.length - 2 ) ).reduce [ a[0] ] do |ar, idx|
+          ar << sep << a[idx]
+        end
+        if 1 < a.length
+          res << ult << a[-1]
+        end
+        res * ''
+      end
     end
 
     inflected = {
         a: ['no ', 'a '],              # no birds  / a bird   / birds
        an: ['no ', 'an '],             # no errors / an error / errors
-       is: ['exist', 'is', 'are'],
+     exis: ['exist', 'is', 'are'],
+       is: ['are', 'is', 'are'],
        no: ['no ', 'the only '],
         s: ['s', nil, 's'],
        _s: [ nil, 's' ],               # it requires, they require
@@ -41,22 +55,32 @@ module Skylab::Headless
       was: ['were', 'was', 'were']
     }
 
-    (norm = { 0 => 0, 1 => 1 }).default = 2
+    ( norm = { 0 => 0, 1 => 1 } ).default = 2
 
     o[:s] = -> a, v=:s do
-      count = ::Numeric === a ? a : a.length # if float, watch what happens
+      count = ::Numeric === a ? a : a.length  # if float, watch what happens
       zero_one_two = norm[ count ]
-      inflected.fetch(v)[ zero_one_two ]
+      inflected.fetch( v )[ zero_one_two ]
+    end
+
+    -> do  # `inflect` - goofy experiment for low-commitment inflection
+
+      pool_a = [ ]
+
+      o[:inflect] = -> func do
+        x = pool_a.length.zero? ? Inflector_.new : pool_a.pop
+        res = x.instance_exec(& func )
+        pool_a << x
+        res
+      end
+    end.call
+
+    class Inflector_
+      Headless::SubClient::EN_FUN.each do |m, f|
+        define_method m, &f
+      end
     end
 
     FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
-
-
-    def self.inflect &body                     # useful quick & dirty hack
-      o = ::Object.new                         # for low-commitment inflection
-      o.extend Headless::SubClient::InstanceMethods # so bad but u get the idea
-      r = o.instance_exec(& body)
-      r
-    end
   end
 end

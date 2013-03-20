@@ -82,7 +82,8 @@ module Skylab::Snag
       @handle_info ||= -> e do  # assume API::Events::Lingual subproduct wide?
         txt = render[ self, e ]
         a, txt, z = split[ txt ]
-        txt = "#{ a }while #{ e.verb.progressive } #{ e.noun }, #{ txt }#{ z }"
+        txt ="#{ a }while #{ e.verb_lexeme.progressive } #{ e.inflected_noun }#{
+          }, #{ txt }#{ z }"
         info txt                               # (flatten the payload [#031])
       end
     end
@@ -91,7 +92,9 @@ module Skylab::Snag
       @handle_error ||= -> e do
         txt = render[ self, e ]
         a, txt, z = split[ txt ]
-        txt = "#{ a }failed to #{ e.verb } #{ e.noun } - #{ txt }#{ z }"
+        e.inflected_verb
+        txt = "#{ a }failed to #{ e.inflected_verb } #{ e.inflected_noun } #{
+          }- #{ txt }#{ z }"
         error txt                               # (it flattens it [#031])
       end
     end

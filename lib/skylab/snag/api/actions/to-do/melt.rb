@@ -13,7 +13,7 @@ module Skylab::Snag
                   payload: :datapoint
 
     inflection.inflect.noun :plural
-    inflection.stems.noun.plural = "todo's"
+    inflection.lexemes.noun.plural = "todo's"
 
   protected
 

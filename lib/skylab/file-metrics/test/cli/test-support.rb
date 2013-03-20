@@ -37,5 +37,46 @@ module Skylab::FileMetrics::TestSupport::CLI
     def program_name
       'fm'
     end
+
+    def headers_hack line
+      cels_hack( line ).map { |x| x.downcase.gsub( ' ', '_' ).intern }
+    end
+
+    def cels_hack line
+      line.strip.split( / {2,}/ )
+    end
+
+    -> do  # `expect_integer`
+      rx = /\A\d+\z/
+      define_method :expect_integer do |x|
+        if rx =~ x then $~[0].to_i else
+          fail "expecting this to look like integer - #{ x.inspect }"
+        end
+      end
+    end.call
+
+    -> do  # `expect_percent`
+      rx = /\A\d{1,3}\.\d\d%\z/
+      define_method :expect_percent do |x, pct_f=nil|
+        if rx !~ x then
+          fail "expecting this to look like percent - #{ x.inspect }"
+        elsif pct_f
+          f = $~[0].to_f
+          f.should eql( pct_f )
+          nil
+        end
+      end
+    end.call
+
+    -> do  # `expect_pluses`
+      rx = /\A\++\z/
+      define_method :expect_pluses do |x, range|
+        if rx !~ x then
+          fail "expecting this to look like pluses - #{ x.inspect }"
+        elsif ! range.include? x.length
+          fail "expecting number of pluses #{ x.length } to be btwn #{ range }"
+        end
+      end
+    end.call
   end
 end

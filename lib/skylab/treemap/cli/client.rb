@@ -20,8 +20,8 @@ module Skylab::Treemap
                                   # this is for when calls come
                                   # from inside the house
 
-    inflection.stems.noun = 'treemap'
-    inflection.stems.verb = 'run'
+    inflection.lexemes.noun = 'treemap'
+    inflection.lexemes.verb = 'run'
 
     def invoke( * )
       res = super
@@ -149,12 +149,12 @@ module Skylab::Treemap
             'during the process of',
             'during',
             'while' ], rand: 3 ]
-          verb = e.action_sheet.inflection.stems.verb
+          verb_lexeme = e.action_sheet.inflection.lexemes.verb
           noun = e.action_sheet.inflection.inflected.noun
           msg = render_emission e
           a, inner, z = split_rx.match( msg ).captures
           a ||= "#{ em 'o' } "  # bullet only when no paren
-          body = "#{ cycle[] } #{ verb.progressive }, #{ noun } #{ inner }"
+          body = "#{ cycle[] } #{ verb_lexeme.progressive }, #{ noun } #{inner}"
           text = [ a, body, z ].join ''
           emit :info_line, text
           nil
@@ -162,7 +162,7 @@ module Skylab::Treemap
 
         o[:error] = -> e do
           @error_count += 1  # (we are overriding something that does same.)
-          verb = e.action_sheet.inflection.stems.verb
+          verb = e.action_sheet.inflection.lexemes.verb.lemma
           noun = e.action_sheet.inflection.inflected.noun
           msg = render_emission e
           emit :error,

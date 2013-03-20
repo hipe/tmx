@@ -12,7 +12,7 @@ module Skylab::Treemap
 
     extend Headless::NLP::EN::API_Action_Inflection_Hack  # for noun inflection
                                                # when reporting actions
-    inflection.stems.noun = 'treemap'          # idem (might be smell in api)
+    inflection.lexemes.noun = 'treemap'          # idem (might be smell in api)
 
 
     extend MetaHell::Formal::Attribute::Definer # formal attributes can be used

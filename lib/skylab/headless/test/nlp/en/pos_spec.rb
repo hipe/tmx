@@ -5,12 +5,13 @@ module Skylab::Headless::TestSupport::NLP::EN
   # le Quickie.
 
   describe "#{ NLP::EN::POS }" do
+
     context "#{ NLP::EN::POS::Noun }" do
 
       let :subject do NLP::EN::POS::Noun[ 'foot' ] end
 
       it "default inflection is singular" do
-        subject.should eql( 'foot' )
+        subject.lemma.should eql( 'foot' )
       end
 
       it "plural sure-al" do
@@ -20,7 +21,6 @@ module Skylab::Headless::TestSupport::NLP::EN
       it "`singular=` - redefines singular (e.g. if source is not sing.)" do
         subject.singular = 'ferk'
         subject.singular.should eql( 'ferk' )
-        subject.should eql( 'foot' )
       end
 
       it "`plural=` - e.g you can define irregular plurals for that noun" do

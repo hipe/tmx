@@ -17,9 +17,9 @@ module Skylab::FileMetrics
           'descended into. It can be specified multiple times',
           'with multiple patterns to narrow the search.',
           'If not provided, the default is to skip folders whose',
-          "name starts with a '.' (period).  To include such",
+          "name starts with a '.' (period). To include such",
           'dirs, specify "--exclude-dirs=[]" the first time you',
-          'use this option in the command.  (it has the effect',
+          'use this option in the command. (it has the effect',
           'of clearing the "blacklist" of directories to skip)') do |dir|
             if '[]' == dir
               req[:exclude_dirs].clear
@@ -31,11 +31,11 @@ module Skylab::FileMetrics
         req[:include_names] = []
 
         op.on('-n', '--name NAME',
-          "e.g. --name='*.rb'.  When present, this limits the",
+          "e.g. --name='*.rb'. When present, this limits the",
           'files analyzed to the ones whose basename matches',
           'this pattern. It can be specified multiple times to',
           'add multiple filename patterns, which will broaden',
-          'the search.  You should use single quotes to avoid',
+          'the search. You should use single quotes to avoid',
           'shell expansion.',
           ' ',
           'When PATH is a file, this option is ignored.'
@@ -74,9 +74,8 @@ module Skylab::FileMetrics
       option_parser do |op|
 
         op.banner = "#{ hi 'description:' }#{
-          } Shows the linecount of each file, longest first. Show
-          percentages of max for each file.   Will go recursively
-          into directories.
+          } Shows the linecount of each file, longest first. Show percentages
+          of max for each file. Will go recursively into directories.
         ".gsub(/^ +/, '')
 
         req = op_common_head
