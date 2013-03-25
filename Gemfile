@@ -20,4 +20,6 @@ group :development do
   #  `tan-man`
   gem 'treetop'
 
+  #  `xargs-ish-i`
+  gem 'ncurses-ruby'
 end

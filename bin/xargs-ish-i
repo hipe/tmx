@@ -1,0 +1,687 @@
+#!/usr/bin/env ruby -w
+
+  # a stupid-simplified interactive-ified xargs-ish.
+  # iterate over each line of a *file* (not stdin) and prompt the user
+  # y/n about each line. if 'y', execute the command template, substituting
+  # the (chomped) line of the file .. BE CAREFUL
+
+  # (the bulk of this "one-off" turned into a goof-off exercise in functional
+  # text formatting, the frontier that it is. no ivars, no classes.)
+
+exit_code = -> do
+
+  #         ~ some pseudo-constants ~
+
+  do_stay = true ; do_not_stay = false
+  ok = 0 ; not_ok = 1
+
+  #         ~ asssign global-ishes to locals ~
+
+  argv = ARGV
+
+  y = -> do
+    stderr = $stderr
+    ::Enumerator::Yielder.new { |line| stderr.puts line }
+  end.call
+
+  #         ~ narrative pre-order, a story:  ~
+
+  invite = kbd = ltgt = undr = nil
+  stay, res, path, replstr, cmd_a = -> do  # parse args, maybe show usage.
+
+    same = -> x { x }
+
+    styl = ->( *n ) do
+      if n.length.zero? then same else
+        -> str do
+          "\e[#{ n * ';' }m#{ str }\e[0m"
+        end
+      end
+    end
+
+    hdr = kbd = styl[ 32 ]
+    undr = styl[ 4 ]
+
+    program_name = -> do
+      ::File.basename $PROGRAM_NAME
+    end
+
+    ltgt = -> str { "<#{ str }>" }
+
+    syntax = -> kyb=same, arg=ltgt, plus=nil do  # kyb = keyboard style
+
+      plus ||= -> x do
+        "#{ arg[ x ] } [..]"
+      end
+
+      # (the duplication below w/ the state machine is kind of gross #todo)
+      o = [ ]
+      o << kyb[ program_name[] ]
+      o << arg[ 'file' ]
+      o << kyb[ '-J' ]
+      o << arg[ 'replstr' ]
+      o << arg[ 'utility' ]
+      o << plus[ 'argument' ]
+      o * ' '
+    end
+
+    usage = -> do
+      y << "#{ hdr[ 'usage:' ] } #{ syntax[] }"
+    end
+
+    invite = -> do
+      y << "use #{ kbd[ "#{ program_name[] } -h" ] } for help."
+    end
+
+    do_stay_in_loop = true ; do_not_stay_in_loop = false
+
+    description = nil  # used in the next function, defined below it
+
+    help_screen = -> do
+      usage[]
+      y << nil
+      y << "#{ hdr[ 'description:' ] } #{ description[] }"
+      y << nil
+      y << "use #{ kbd[ "#{ program_name[] } --help" ] } for more help."
+      [ do_not_stay_in_loop, do_not_stay, ok ]
+    end
+
+    description = -> do
+      ::File.open __FILE__, 'r' do |fh|  # hehe fun hack
+        rx = /\A[[:space:]]*#(?!!) *(?=.)/
+        ::Enumerator.new do |yldr|
+          while line = fh.gets ; yldr << line end
+        end.reduce nil do |m, line|
+          break $~.post_match.chomp if rx =~ line
+        end
+      end
+    end
+
+    manly_sect = nil  # used next, defined right after
+
+    manly_help = -> do
+      sect = manly_sect[ y ]
+      sect[ 'name', -> o do
+        o << "#{ hedr[ program_name[] ] } -- #{ description[] }"
+      end ]
+      sect[ 'synopsis', -> o do
+        o << syntax[ emph, undr, plus ]
+      end ]
+      sect[ 'description', -> o do
+        o << "The #{ keyb[ program_name[] ] } utility is hacked, pared-down, #{
+          }stupid-simplified goof-off one-off inspired by #{
+          }#{ keyb[ 'xargs' ] } (see!) that, for each line of #{
+          }#{ undr[ 'file' ] }, builds the command produced by #{
+          }substituting-in that line for #{ undr[ 'replstr' ] } #{
+          }in the command template created by #{
+          }#{ undr[ 'utility'] } #{ plus[ 'argument' ] }, #{
+          }and for each such command gives you a #{
+          }\"yes/no\" prompt letting you decide whether or not to #{
+          }execute that command."
+
+        o << "The \"option\" is as follows:"
+
+        opt[ '-J replstr', -> x do
+          x << "The first occurence of #{ undr[ 'replstr' ] } in your #{
+            }command string (#{ undr['utility'] } #{ plus['argument'] }) #{
+            }will get replaced with each line (chomped) from #{ undr['file'] }."
+        end ]
+      end ]
+      sect[ 'example', -> o do
+        o << "imagine a world free from disease"
+
+        o << "   $this is a hack"
+        o << "   $so is this"
+      end ]
+      [ do_not_stay_in_loop, do_not_stay, ok ]
+    end
+
+    manly_sect = -> do
+
+      left_margin = 5
+      left_margin_2 = 8
+      right_margin = 11
+
+      page_context = section_wrapper = join_filter = nil
+      mnly_sct = -> downstream do
+
+        context = page_context[ downstream ]
+
+        section_wrappr = section_wrapper[ downstream ]
+
+        flter = join_filter[
+          -> title, paragraphs do
+            context.instance_exec do
+              downstream << hedr[ title.upcase ]
+            end
+            # with the user's `paragraphs` function, evaluating it in the
+            # context of the ..er.. `context`, pass the function the consumer
+            # for a filter chain, one that separates paragraphs with a newline,
+            # and word-wraps each paragraph.
+            context.instance_exec(
+              join_filter[
+                -> para { section_wrappr << para },
+                -> { downstream << nil }  # separate paragraphs with one newline
+              ],
+              &paragraphs
+            )
+            nil
+          end,
+          -> { downstream << nil }  # separate the items with one newline
+        ]
+
+        -> title, paragraphs do  # sugar
+          flter.yield title, paragraphs
+        end
+      end
+
+      state_filter = -> do
+        struct = ::Struct.new :name, :func
+        ->( *arr ) do  # NOTE interface is exploratory
+          hash = { }
+          proto_a = arr.each_with_index.map do |(name, func), idx|
+            hash[ name ] = idx
+
+            struct.new name, func
+          end
+
+          initial = proto_a.fetch( 0 ).name
+          ->( *construct_a ) do
+
+            state = proto_a.fetch hash.fetch( initial )
+            last_state = state.name
+
+            ::Enumerator::Yielder.new do |*yield_a|
+              if ! state
+                fail "unexpected upstream data after #{ last_state_name }"
+              else
+                arity = state.func.arity
+                args = case arity <=> 0
+                when -1 ; [ * construct_a, * yield_a ]
+                when  0 ; [ ]
+                else    ;
+                  [ * construct_a[ 0 ... ( arity - 1 ) ], yield_a ]
+                end
+                next_state_name = state.func[ * args ]
+                if next_state_name
+                  if state.name != next_state_name
+                    last_state = next_state_name
+                    state = proto_a.fetch hash.fetch( next_state_name )
+                  end
+                else
+                  state = nil
+                end
+              end
+              nil
+            end
+          end
+        end
+      end.call
+
+      word_scanner = nil
+      cols = nil
+      wrap = nil
+      without_style = nil
+      page_context = -> do  # several experiments here..
+        o = { }
+        o[:emph] = styl[ 31 ]
+        o[:hedr] = styl[ 31, 1 ]
+        o[:keyb] = styl[ 31 ]
+        o[:plus] = nil
+        o[:splat] = nil
+        o[:undr] = undr
+        o[:opt] = nil
+
+        prototype = ::Struct.new( *o.keys ).new( *o.values ).freeze
+
+        indent_1 = ' ' * left_margin
+        indent_2 = ' ' * ( left_margin + left_margin_2 )
+
+        columns = -> do
+          f = -> do
+            res = cols[]
+            res -= right_margin if res
+            f = -> { res }
+            res
+          end
+          -> { f.call }
+        end.call
+
+        subsequent_para = [ :subsequent_para,
+          -> downstream, (para) do
+            downstream << nil  # like `join_filter`
+            wrap[ downstream, word_scanner[ para ], indent_2, columns[] ]
+            :subsequent_para
+          end
+        ]
+
+        # (when the string describing the option is short enough to fit
+        # the first line of its first paragraph, it becomes this fun:)
+
+        less_lines_filter = state_filter[
+          [ :first_para,
+            -> downstream, styled, (para) do
+              downstream << nil
+              x = [ 1, left_margin_2 - without_style[ styled ].length ].max
+              scn = word_scanner[ "#{ styled }#{ ' ' * x }#{ para }" ]
+              more =
+                wrap[ downstream, scn, indent_1, columns[], 1 ]
+              if more
+                wrap[ downstream, scn, indent_2, columns[] ]
+              end
+              :subsequent_para
+            end
+          ],
+          subsequent_para
+        ]
+
+        more_lines_filter = state_filter[
+          [ :first_para,
+            -> downstream, styled, (para) do
+              downstream << nil
+              downstream << "#{ indent_1 }#{ styled }"
+              wrap[ downstream, word_scanner[ para ], indent_2, columns[] ]
+              :subsequent_para
+            end
+          ],
+          subsequent_para
+        ]
+
+        -> downstream do  # kind of ew / kind of meh
+          ctx = prototype.dup
+          style_a = [ ctx.hedr, ctx.undr ]  # x
+          ctx.plus = -> x do
+            "#{ ctx.undr[x] } [#{ ctx.undr[ '...' ] }]"
+          end
+          ctx.splat = -> x do
+            "[#{ ctx.undr[ x ] } #{ ctx.undr[ '...' ] }]"
+          end
+          ctx.opt = -> syn_str, paragraphs do
+            styled = syn_str.split( ' ', 2 ).each.with_index.map do |x, i|
+              style_a.fetch( i )[ x ]
+            end.join ' '
+            fltr = if syn_str.length < left_margin_2
+              less_lines_filter[ downstream, styled ]
+            else
+              more_lines_filter[ downstream, styled ]
+            end
+            paragraphs[ fltr ]
+            nil
+          end
+          ctx
+        end
+      end.call
+
+      word_scanner = -> do
+
+        struct = ::Struct.new :space, :word, :space_length, :word_length, :scan
+
+        -> para do
+          defined? ::StringScanner or require 'strscan'
+          scn = ::StringScanner.new para
+          s = struct.new
+          s[:scan] = -> do
+            if scn.eos?
+              struct.members.each { |m| s[m] = nil }  # sanity
+              s = nil
+              nil
+            else
+              s.space = scn.scan( /[[:space:]]+/ )
+              s.word = scn.scan( /[^[:space:]]+/ )
+              s.space_length = s.space ? s.space.length : 0
+              s.word_length = if ! s.word then 0 else
+                without_style[ s.word ].length
+              end
+              s.word
+            end
+          end
+          s
+        end
+      end.call
+
+      cols = -> do
+        f = -> do
+          begin require 'ncurses' ; rescue ::LoadError ; end
+          if defined? ::Ncurses
+            v = $VERBOSE ; $VERBOSE = nil
+            ::Ncurses.initscr
+            # #todo easy patch snowleopard-ncurses ncurses_wrap.c:1951
+            $VERBOSE = v
+            columns = ::Ncurses.COLS
+            ::Ncurses.endwin
+          end
+          f = -> { columns }
+          columns
+        end
+        -> { f[] }
+      end.call
+
+      no_columns = nil
+      wrap = -> downstream, scn, indent_string, columns, line_limit=nil do
+        columns or break no_columns[ downstream, scn, indent_string ]
+        # indent_length = indent_string.length
+        line = ''
+        flush = -> do
+          downstream << line
+          stay = false
+        end
+        more_lines_exist = nil
+        bump_line_limit = if ! line_limit then -> { true } else -> do
+          number_of_lines_done = 0
+          -> do
+            if number_of_lines_done < line_limit
+              number_of_lines_done += 1
+              true
+            else
+              more_lines_exist ||= true
+              false
+            end
+          end
+        end.call end
+        stay = scn.scan[]
+        while stay && bump_line_limit[]
+          line.clear << indent_string << scn.word
+          if line.length > columns
+            downstream << line.dup
+            scn.scan[] or break flush[]
+            next
+          end
+          while true
+            scn.scan[] or break flush[]
+            if line.length + scn.space_length + scn.word_length > columns
+              downstream << line.dup
+              break  # back up to each line
+            else
+              line << scn.space if scn.space
+              line << scn.word
+            end
+          end
+        end
+        more_lines_exist
+      end
+      no_columns = -> downstream, scn, indent_string do
+        arr = [ indent_string ]
+        while scn.scan[]
+          arr << scn.space if scn.space
+          arr << scn.word
+        end
+        if 1 < arr.length
+          downstream << ( arr * '' )
+        end
+        nil
+      end
+
+      without_style = -> do
+        ascii_escape_code_rx = /\e\[\d{1,3}(?:;\d{1,3})*m/
+        -> str do
+          str.gsub ascii_escape_code_rx, ''
+        end
+      end.call
+
+      wrapper_maker = nil
+      section_wrapper = -> downstream do
+        section_wrapper = wrapper_maker[ left_margin, right_margin ]
+        section_wrapper[ downstream ]
+      end
+
+      wrapper_maker = -> do
+        f = -> leftm, rightm do
+          f = if cols[]
+            indent = ' ' * left_margin
+            columns = cols[]
+            -> lm, rm do
+              use_cols = columns - rm
+              -> downstream do
+                ::Enumerator::Yielder.new do |para|
+                  wrap[ downstream, word_scanner[ para ], indent, use_cols ]
+                end
+              end
+            end
+          else
+            ->( * ) do
+              -> downstream do
+                ::Enumerator::Yielder.new do |para|
+                  downstream << para
+                end
+              end
+            end
+          end
+          f[ leftm, rightm ]
+        end
+        -> leftm, rightm do
+          f[ leftm, rightm ]
+        end
+      end.call
+
+      join_filter = state_filter[
+        [ :initial, -> downstream_func, upstream_a do
+          downstream_func[ * upstream_a ]
+          :subsequent
+        end ],
+        [ :subsequent, -> downstream_func, separator_func, upstream_a do
+          separator_func[]
+          downstream_func[ * upstream_a ]
+          :subsequent
+        end ]
+      ]
+
+      mnly_sct
+    end.call
+
+    procede = pth = rplstr = cm_a = nil
+
+    state = ::Struct.new :to, :rx, :desc, :act
+
+    state_h = {
+      initial: state[ [ :short_help, :long_help, :file ] ],
+
+      short_help: state[ nil,     /\A-h\z/, '-h', -> { help_screen[] } ],
+
+      long_help: state[ nil,      /\A--help\z/, '--help', -> { manly_help[] } ],
+
+      file:    state[ [ :j_opt ], /\A[^-].+\z/, '<file>',
+                                    -> { pth = argv.shift ; do_stay_in_loop } ],
+
+      j_opt:   state[ [ :j_arg ], /\A-J\z/, '-J',
+                                          -> { argv.shift ; do_stay_in_loop } ],
+
+      j_arg:   state[ [ :util ], /\A[^-].*\z/, '<replstr>',
+                                 -> { rplstr = argv.shift ; do_stay_in_loop } ],
+
+      util:    state[ nil,        /\A[^-].+\z/, '<utility>', -> { procede[] } ]
+    }
+
+    current_state = state_h.fetch :initial
+
+    expecting = -> msg=nil do
+      or_a = current_state.to.reduce [] do |m, s|
+        d = state_h.fetch( s ).desc
+        m.concat( d.respond_to?( :each ) ? d : [ d ] )
+        m
+      end
+      y << "#{ "#{ msg }. " if msg }expecting #{ or_a.map(& kbd ) * ' or ' }"
+      usage[]
+      invite[]
+      [ do_not_stay, not_ok ]
+    end
+
+    procede = -> do
+      cm_a = argv.dup
+      argv.clear
+      [ do_not_stay_in_loop, do_stay, nil ]
+    end
+
+    sty, rs = loop do
+      if argv.empty?
+        break expecting[]
+      end
+      nxt = current_state.to.reduce nil do |m, s|
+        stat = state_h.fetch s
+        break stat if stat.rx =~ argv[ 0 ]
+      end
+      if ! nxt
+        break expecting[ "unrecognized argument \"#{ argv[0] }\"" ]
+      end
+      current_state = nxt
+      stay_in_loop, parent_stay, r = current_state.act.call
+      if ! stay_in_loop
+        break parent_stay, r
+      end
+    end
+    sty or break false, rs
+
+    [ do_stay, nil, pth, rplstr, cm_a ]
+  end.call
+
+  stay or break( res )
+
+  # assume true-ish `path`, `replstr`, `cmd_a`
+
+  _arg = -> x do
+    kbd[ ltgt[ x ] ]
+  end
+
+  bork = -> msg do
+    y << msg
+    invite[]
+    not_ok
+  end
+
+  repl_idx = cmd_a.index replstr
+
+  repl_idx or break bork[ "expected #{ kbd[ "#{ ltgt[ 'utility' ] } [..]" ] }#{
+    } to include #{ undr[ 'replstr' ] } \"#{ replstr }\" - #{ cmd_a * ' ' }" ]
+
+  $stdin.tty? or break bork[ "must be run from an interactive terminal. #{
+    }cannot pipe data in." ]
+
+  ::File.exist? path or break bork[ "expected file that exists - #{ path }" ]
+
+  res = ok
+
+  y_or_n = -> do
+    rx = /\A[[:space:]]*(?:(?<yes>y(?:es)?)|(?<no>n(?:o)?))[[:space:]]*\z/i
+    -> yes, no, parse_err, abrt do
+      sty = begin
+        resp = $stdin.gets
+        true
+      rescue ::Interrupt
+        false
+      end
+      ( sty && resp ) or break abrt[]  # ctrl-c or ctrl-d for e.g
+      resp.chomp!
+      rx =~ resp or break parse_err[ resp ]
+      if { yes: true, no: false }.fetch( $~.names.reduce( [] ) do |m, n|
+        m << n if $~[n]
+        m # the most obfuscated sanity check ever
+      end.join.intern ) then yes[] else no[] end
+    end
+  end.call
+
+  require 'open3'
+
+  process = nil
+  run = -> do
+    maxlen = 4096
+    timeout_seconds = 1.0
+
+    -> command_a do
+      command_a = command_a.dup  # just b.c it scares me
+      res = true
+
+      ::Open3.popen3( * command_a ) do |_, sout, serr|
+        remain_a = [ sout, serr ]
+        got_data = false
+        begin
+          avail_a, = ::IO.select remain_a, nil, nil, timeout_seconds
+          if ! avail_a
+            y << "got no data in #{ timeout_seconds } second(s) - for now we abort"
+            res = false
+            break
+          end
+          avail_a.each do |io|
+            data = begin
+              io.readpartial maxlen
+            rescue ::EOFError
+              nil
+            end
+            if data
+              got_data ||= true
+              process[ data, ( serr == io ? :stderr : :stdout ) ]
+            else
+              idx = remain_a.index( io ) or fail 'sanity'
+              remain_a[ idx ] = nil
+              remain_a.compact!
+            end
+          end
+        end while remain_a.length.nonzero?
+        if res and ! got_data
+          y << "(command emitted neither stdout nor stderr data.)"
+        end
+      end
+      res
+    end
+  end.call
+
+  process = -> do
+    require 'strscan'
+    scn = ::StringScanner.new ''  # not re-entrant
+    line_rx = /[^\n]*\n|[^\n]+/
+    op_h = {
+      stdout: -> line do
+        line.chomp!
+        $stdout.puts "STDOUT: -->#{ line }<--"
+      end,
+      stderr: -> line do
+        line.chomp!
+        y << "STDERR: -->#{ line }<--"
+      end
+    }
+    -> data, which do
+      scn.string = data
+      f = op_h.fetch which
+      while ! scn.eos?
+        line = scn.scan( line_rx ) or fail 'sanity'
+        f[ line ]
+      end
+      nil
+    end
+  end.call
+
+  ::File.open path do |fh|
+    do_read = true
+    goodbye = -> do
+      y << "goodbye."
+      do_read = false
+      false
+    end
+    while do_read and line = fh.gets
+      line.chomp!
+      cmd_a[ repl_idx ] = line  # EEW
+      do_prompt = true
+      while do_prompt
+        do_prompt = false
+        y << ">> #{ ( cmd_a * ' ' ) }"
+        y << "run the above? y/n"
+        y_or_n[
+          -> do
+            run[ cmd_a ] or goodbye[]
+          end,
+          -> do
+            true
+          end,
+          -> input do
+            y << "am i to understand this? - #{ input.inspect }"
+            do_prompt = true
+            true
+          end,
+          goodbye
+        ] or break
+      end
+    end
+  end
+
+  ok
+end.call
+
+exit exit_code

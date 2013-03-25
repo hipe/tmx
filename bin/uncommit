@@ -12,8 +12,7 @@ exit_status = 0
 
   y = -> do
     stderr = $stderr
-    yld = ::Enumerator::Yielder.new { |msg| stderr.puts msg }
-    yld
+    ::Enumerator::Yielder.new { |msg| stderr.puts msg }
   end.call
 
   usage = -> do
