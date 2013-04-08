@@ -29,8 +29,11 @@ module Skylab::TanMan
 
     attribute :default_starter_file, default: 'holy-smack.dot'
 
-    attribute :global_conf_path,
-                 proc: true, default: ->{ "#{ ENV['HOME'] }/.tanman-config" }
+    attribute :global_conf_path, proc: true,
+                default: -> do
+                  Headless::FUN.
+                    home_directory_pathname[].join( 'tanman-config' ).to_s
+                end
 
     attribute :local_conf_config_name, default: 'config'
 

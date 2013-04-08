@@ -26,7 +26,7 @@ module Skylab::Headless
     # --*--                           enjoy                           --*--
 
     home__ = -> do
-      ::ENV['HOME']
+      Headless::FUN.home_directory_path[]
     end
 
     pwd__ = -> do
@@ -115,7 +115,7 @@ module Skylab::Headless
 
     o = { }
 
-    absolute_path_hack_rx = o[:absolute_path_hack_rx] =    # see spec, hackishly
+    o[:absolute_path_hack_rx] =                            # see spec, hackishly
       %r{ (?<= \A | [[:space:]'",] )  (?: / [^[:space:]'",]+ )+ }x     # used in
                                                                    # subproducts
 
@@ -139,6 +139,32 @@ module Skylab::Headless
     end
 
     o[:pretty_path_] = pretty_path_            # expose the algo for testing
+
+    o[:expand_tilde] = -> do                   # careful - is le hack
+
+      rx = /\A~(?=\/|\z)/  # (a tilde at the beginning of the string
+        # followed by either a forward slash or the end of the line)
+
+      -> path_string do
+        path_string.sub rx do
+          Headless::FUN.home_directory_path[] || $~[0]
+        end
+      end
+    end.call
+
+    # `contract_tilde` - the opposite of `expand_tilde` - replace a substring
+    # of the path with "~" where appropriate.
+    # #todo - this is not, but might could be, used in ta
+
+    o[:contract_tilde] = -> path_string do
+      rs = path_string
+      pth = Headless::FUN.home_directory_path[]
+      if pth && path_string.index( pth ).zero? && (  # ick, meh
+        pth.length == path_string.length || '/' == path_string[ pth.length ] )
+        rs = "~#{ path_string[ pth.length .. - 1 ] }"
+      end
+      rs
+    end
 
     o[:stop_rx] = %r{ \A \. | / \z }x          # all pathnames have such a root
                                                # hackishly (?) used to determine

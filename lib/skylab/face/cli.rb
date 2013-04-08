@@ -80,6 +80,7 @@ module Skylab::Face
       if ! stay then res else
         stay, res = cmd.parse argv
         if ! stay then res else
+          branch.last_normalized_child_slug = cmd.normalized_invocation_slug
           begin
             branch.send cmd.method_name, * argv
           rescue ::ArgumentError => ex  # ick this ain't right
@@ -822,9 +823,23 @@ module Skylab::Face
       a * ' '
     end
 
+  public  # up-delegators
+
     def invocation_string
-      "#{ @parent.invocation_string } #{ @sheet.slug }"
-    end  ; public :invocation_string  # up-delegator
+      "#{ @parent.invocation_string } #{ normalized_invocation_slug }"
+    end
+
+    def normalized_invocation_slug
+      @sheet.slug.intern
+    end
+
+  protected
+
+    def last_child_invocation_string
+      if last_normalized_child_slug
+        "#{ invocation_string } #{ last_normalized_child_slug }"
+      end
+    end
 
     def option_syntax
       if option_parser && has_partially_visible_op
@@ -1051,6 +1066,15 @@ module Skylab::Face
         report_expecting
       else
         super
+      end
+    end
+
+    attr_reader :last_normalized_child_slug
+    def last_normalized_child_slug= x
+      if last_normalized_child_slug
+        raise "sanity - are you really re-invoking the same branch instance?"
+      else
+        @last_normalized_child_slug = x
       end
     end
 

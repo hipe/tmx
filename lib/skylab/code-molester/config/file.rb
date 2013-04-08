@@ -113,11 +113,11 @@ module ::Skylab::CodeMolester
 
     default_escape_path = -> pn { pn.basename } # a nice safe common denom.
 
-    read_events = ::Struct.new :error, :read_error, :no_ent, :is_not_file,
+    Read = ::Struct.new :error, :read_error, :no_ent, :is_not_file,
       :invalid, :escape_path
 
     define_method :read do |&block|
-      ev = read_events.new
+      ev = Read.new
       block[ ev ] if block
       escape_path = -> pathname do
         ( ev[:escape_path] || default_escape_path )[ pathname ]

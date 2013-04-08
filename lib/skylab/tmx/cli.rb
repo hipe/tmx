@@ -21,7 +21,7 @@ module Skylab::TMX
   # really old ones)
 
   metadata_h = ::Hash[ [
-    :bleed,
+    # :bleed,  # - ok
     :cli,
     # :'cov-tree',  # - ok
     # :'file-metrics',  # - ok
@@ -33,7 +33,7 @@ module Skylab::TMX
     :schema,
     # :snag, # - ok
     :'team-city',
-    # :tan-man, # - ok
+    # :'tan-man', # - ok
     # :treemap, # - ok
     :xpdf
   ].map { |k| [ k, false ] } ].freeze

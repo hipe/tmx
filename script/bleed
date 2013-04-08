@@ -13,7 +13,7 @@ payload = lambda do
   when nil
     {
       :new_path => ([dir] + parts).join(':'),
-      :message  => "prepending bin folder to the beginning of the PATH.",
+      :message  => "prepending to beginning of PATH - #{ dir }",
       :success  => true
     }
   when 0

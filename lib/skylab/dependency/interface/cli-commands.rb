@@ -23,7 +23,10 @@ module Skylab::Dependency
         op.on('-o', '--optimistic', "Experimental extended version of dry run (implies)",
                "that tries to run a fuller simulation than ordinary dry run of what the task",
                "will look like as it runs and succeeds.") { req[:dry_run] = req[:optimistic_dry_run] = true }
-        req[:build_dir] =  File.join(ENV['HOME'] || '~', '/build')
+
+        req[ :build_dir ] = Headless::FUN.
+          home_directory_pathname.join( 'build' ).to_s
+
         op.on('--build-dir DIR',
           "Specifies build directory. (default: #{pretty_path(req[:build_dir])})") { |bd| req[:build_dir] = bd }
         op.on('--name NAME', "only run the child node with the given NAME (debugging)") { |nm| req[:name] = nm }

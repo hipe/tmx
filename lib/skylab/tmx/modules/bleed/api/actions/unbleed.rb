@@ -1,14 +1,28 @@
 module Skylab::TMX::Modules::Bleed::API
-  class Actions::Unbleed < BashAction
+
+  class Actions::Unbleed < Action
+
+    emits :bash, :error, :notice
+
     def invoke
-      parts = env_path.split(':')
-      path = parts.first
-      if /\bbleed/ !~ path
-        info "nerp: expecting to see the string \"bleed\" here: \"#{path}\""
-      else
-        info "shifting this element off the head of the PATH: \"#{path}\""
-        set_env_path parts[1..-1].join(':')
+      res = nil
+      error = -> msg do
+        emit :bash, "echo #{ msg.inspect } ;"  # dodgy
+        self.error msg
+        false
       end
+      begin
+        p = ::ENV[ 'PATH' ] or break error[ "no PATH environment variable?" ]
+        a = p.split ::File::PATH_SEPARATOR
+        p = config_get_path or break error[ "can't unbleed because of above" ]
+        p = ::Pathname.new( p ).expand_path.join( 'bin' ).to_s
+        i = a.index( p ) or break error[ "PATH does not include path - #{ p }"]
+        b = [ * a[ 0 ... i ], * a[ i + 1 .. -1 ] ]  # (paranoid compact)
+        emit :bash, "export PATH=\"#{ b * ':' }\" ;"
+        emit :bash, "echo \"removed from head of PATH - #{ p }\" ;"
+        res = true
+      end while nil
+      res
     end
   end
 end

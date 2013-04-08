@@ -1,62 +1,142 @@
-require_relative 'api'
+class Skylab::TMX::CLI
+  namespace :bleed, -> do
+    ::Skylab::TMX::Modules::Bleed::CLI
+  end
+end
 
-module Skylab::TMX::Modules
-  class Bleed::CLI < Skylab::Face::CLI
-    namespace(:bleed) do
-      default_action :load
-      summary "run a bleeding edge version of tmx"
-      o do |op, ctx|
-        op.banner = "attempts to hack your path"
-        op.separator "by invoking a bash script"
-      end
-      def load params
-        api(:load, params) { |o| o.on_bash { |e| out.puts "#{e.bash} ; " } }
-      end
+module Skylab
 
-      o do |o, params|
-        o.banner = "unbleed your path"
-      end
-      def unbleed params
-        api(:unbleed, params) { |o| o.on_bash { |e| out.puts "#{e.bash} ; " } }
-      end
+  class TMX::Modules::Bleed::CLI < Face::CLI
 
-      o do |op, ctx|
-        op.banner = "Inits a #{Skylab::TMX::Model::Config::PATH}"
+    # summary "run a bleeding edge version of tmx"  # #todo - later or never
+
+    default_argv :load
+
+    tmxconfig = -> do
+      TMX::Models::Config::PATH
+    end
+
+    option_parser do |o|
+      o.banner = "Inits a #{ tmxconfig[] }"
+    end
+
+    def init
+      api :init do |o|
+        handle o, :head, :tail, :error, :info
       end
-      def init ctx
-        api(:init, ctx) do |o|
-          o.on_head { |e| err.write "tmx-bleed: init: #{e.message}" ; e.touch! }
-          o.on_tail { |e| err.puts e.message ; e.touch! }
-          o.on_all  { |e| err.puts "tmx-bleed: init: #{e.message}" unless e.touched? }
+    end
+
+    option_parser do |o|
+      o.banner = @command.usage_line
+
+      o.separator "\n#{ hi 'description:' } Gets or sets path to the #{
+        }bleeding-edge tmx codebase.\n#{
+        }note this does not change your PATH or what the tmx executable\n#{
+        }points to (see 'load'))"
+    end
+
+    def path path=nil
+      path ? set_path( path ) : get_path
+    end
+
+    def set_path path
+      api [ :path, :set ], path do |o|
+        handle o, :head, :tail, :error, :notice, :info
+      end
+    end
+    protected :set_path
+
+    def get_path
+      api [ :path, :get ] do |o|
+        handle o, :path, :error, :notice
+      end
+    end
+    protected :get_path
+
+    option_parser do |o|
+      o.banner = "#{ hi 'description:' } outputs to stdout the bash #{
+        }commands to hack your path"
+      o.separator "to use the bleeding edge version of tmx per #{ tmxconfig[] }"
+    end
+
+    def load
+      api :load do |o|
+        handle o, :bash, :error, :notice
+      end
+    end
+
+    option_parser do |o|
+      o.banner = "#{ hi 'description:' } outputs to stdout the bash #{
+        }commands to unhack your path"
+      o.separator "(the opposite of `bleed`)"
+    end
+
+    def unbleed
+      api :unbleed do |o|
+        handle o, :bash, :error, :notice
+      end
+    end
+
+  private
+
+    def api *a, &b
+      @api ||= TMX::Modules::Bleed::API::Client.new
+      @api.invoke( *a, &b )
+    end
+
+    def handle o, *event_a
+      event_a.each do |event_stream_name|
+        if ! o.emits? event_stream_name
+          raise "#{ event_stream_name.inspect } is not emitted by #{ o.class }"
+        else
+          o.on event_stream_name, method( "handle_#{ event_stream_name }" )
         end
       end
-
-      o do |o, c|
-        syntax "#{invocation_string} [opts] [<path>]"
-        o.banner = "Gets or sets path to the bleeding-edge tmx codebase.\n"<<
-          "(note this does not change your PATH or what the tmx executable points to (see 'load'))\n" <<
-          "#{usage_string}"
+      a = ( o.unhandled_event_stream_graph ).names - [ :all ]
+      if a.length.nonzero?
+        raise "unhandled event(s) for #{ o.class } - #{ a.inspect }"
       end
-      def path ctx, path=nil
-        ctx[:path] = path
-        api(:path, ctx) do |o|
-          o.on_path { |e| out.puts e.message }
-          file_events('path: ', o)
-          o.on_all { |e| err.puts "tmx-bleed: path: #{e.type}: #{e.message}" unless e.touched? }
-        end
-      end
+      nil
+    end
 
-    private
+    def handle_head e
+      @err.write "#{ invocation_str }: #{ atom e }"
+      nil
+    end
 
-      def api *a, &b
-        @api ||= Bleed::API.build
-        0 < a.length ? @api.invoke(*a, &b) : @api
+    alias_method :invocation_str, :last_child_invocation_string
+
+    def atom e
+      e.payload_a.fetch 0
+    end
+
+    def handle_tail e
+      @err.puts atom( e )
+      nil
+    end
+
+    def handle_error e
+      @err.puts "#{ invocation_str } error: #{ atom e }"
+      false
+    end
+
+    def self.define_protected_method a, &b
+      define_method a, &b
+      protected a
+    end
+
+    [ :notice, :info ].each do |event_stream_name|
+      define_protected_method "handle_#{ event_stream_name }" do |e|
+        @err.puts "#{ invocation_str } #{ event_stream_name }: #{ atom e }"
+        nil
       end
-      def file_events prefix, o
-        o.on_head { |e| err.write "tmx-bleed: #{prefix}#{e.message}" ; e.touch! }
-        o.on_tail { |e| err.puts e.message ; e.touch! }
+    end
+
+    [ :bash, :path ].each do |event_stream_name|
+      define_protected_method "handle_#{ event_stream_name }" do |e|
+        @out.puts atom( e )
+        nil
       end
     end
   end
 end
-

@@ -33,14 +33,18 @@ module Skylab::Face
     # the strange value for that property. But the wrongmost way of all is:
 
     Ouroboros_Sheet = MetaHell::Proxy::Nice.new :slug, :options, :command_tree,
-      :method_name
+      :method_name, :host_module, :default_argv, :normalized_local_command_name
+
 
     class Ouroboros_Sheet
       def self.[] tail, head
         new                slug: -> do tail.slug end,
                         options: -> do head.options end,
                    command_tree: -> do head.command_tree end,
-                    method_name: -> do tail.method_name end  # NOTE b.c namesp.
+                    method_name: -> do tail.method_name end, # NOTE b.c namesp.
+                    host_module: -> do head.host_module end,
+                   default_argv: -> do head.default_argv end,
+  normalized_local_command_name: -> do tail.normalized_local_command_name end
       end
     end
   end
