@@ -71,9 +71,20 @@ module Skylab::TMX
       ::Skylab.dir_pathname.join( '../../VERSION' ).read.strip
     end                           # will do either --version or --verbose
                                   # on -v "correctly" via MAGIC.
+
+    alias_method :tmx_show_version, :show_version
+    def show_version
+      rs = tmx_show_version
+      if @is_verbose
+        @out.puts ::RUBY_DESCRIPTION
+      end
+      rs
+    end
+    protected :show_version
+
     def enable_verbose
       @y << '(verbose mode on.)'
-      @be_verbose = true
+      @is_verbose = true
     end
     protected :enable_verbose
 
