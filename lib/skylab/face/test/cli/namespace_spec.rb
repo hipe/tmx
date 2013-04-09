@@ -145,5 +145,51 @@ module Skylab::Face::TestSupport::CLI::Namespace
         end
       end
     end
+
+    context "namespace default argv" do
+
+      context "first level" do
+
+        with_body do
+
+          default_argv 'biz', 'foo', 'bar'
+
+          def biz *x
+            @y << "<<#{ x.inspect }>>"
+            :yep
+          end
+        end
+
+        it "works" do
+          res = invoke []
+          res.should eql( :yep )
+          io_spy_group.errstream.string.chop.should eql( '<<["foo", "bar"]>>' )
+        end
+      end
+
+      context "next level" do
+
+        with_body do
+
+          namespace :bar do
+
+            default_argv 'wiff', 'waff', 'woof'
+
+            namespace :wiff do
+              def waff x
+                @y << "WOOF:#{ x }"
+                :yup
+              end
+            end
+          end
+        end
+
+        it "works" do
+          res = invoke [ 'bar' ]
+          io_spy_group.errstream.string.chop.should eql( 'WOOF:woof' )
+          res.should eql( :yup )
+        end
+      end
+    end
   end
 end

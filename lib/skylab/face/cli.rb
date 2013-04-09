@@ -57,35 +57,33 @@ module Skylab::Face
   protected  # `run` support (pre-order)
 
     def invoked argv  # funny n-ame to distinguish it from `invoke` is important!
-      if argv.length.zero?
-        _, res = empty_argv
-        res
-      else
-        branch = self ; stay = true
-        begin
-          if '-' == argv[0][0]
-            stay, res = branch.process_options argv
-            stay or break
-          end
-          stay, res = branch.find_command argv
+      branch = cmd = self ; stay = true
+      while true
+        if argv.length.zero? && branch.default_argv
+          argv.concat branch.default_argv
+        end
+        argv.length.zero? and break
+        if '-' == argv[0][0]
+          stay, res = branch.process_options argv
           stay or break
-          cmd = res
-          if cmd.respond_to? :invokee
-            stay = false
-            break( res = cmd.invokee.invoke argv )
-          end
-          cmd.respond_to? :find_command or break
-          branch = cmd  # tail-call like
-        end while argv.length.nonzero?
-
+        end
+        stay, res = branch.find_command argv
+        stay or break
+        cmd = res
+        if cmd.respond_to? :invokee
+          stay = false
+          break( res = cmd.invokee.invoke argv )
+        end
+        cmd.respond_to? :find_command or break
+        branch = cmd  # tail-call like
+      end
+      if ! stay then res else
+        stay, res = cmd.parse argv
         if ! stay then res else
-          stay, res = cmd.parse argv
-          if ! stay then res else
-            begin
-              branch.send cmd.method_name, * argv
-            rescue ::ArgumentError => ex  # ick this ain't right
-              argument_error ex, cmd  # this position is locked in the stack!
-            end
+          begin
+            branch.send cmd.method_name, * argv
+          rescue ::ArgumentError => ex  # ick this ain't right
+            argument_error ex, cmd  # this position is locked in the stack!
           end
         end
       end
@@ -113,6 +111,7 @@ module Skylab::Face
     #               ( public for children, as in parent )
 
   public
+
     def invocation_string
       @program_name || ::File.basename( $PROGRAM_NAME )
     end
@@ -265,13 +264,6 @@ module Skylab::Face
 
     alias_method :name, :name_function  # (please don't use this bare)
 
-    # `method_name` ( namespace edition ) - only when argv terminates on
-    # a branch.
-
-    def method_name
-      @empty_argv_method_name
-    end
-
     def mod_ref= mod_ref
       if @mod_ref
         raise ::ArgumentError, "won't clobber existing mod ref"
@@ -397,7 +389,7 @@ module Skylab::Face
 
     attr_writer :hot  # write the hot function yourself
 
-    -> do
+    -> do  # `hot`
 
       mod_blocks = nil
 
@@ -446,6 +438,8 @@ module Skylab::Face
       end
     end.call
 
+    attr_accessor :default_argv  # easy enough
+
     # `initialize` - it became unholy because we had to underload the signature
     # while trying to reign-in 30 different subproducts and libraries
 
@@ -467,9 +461,9 @@ module Skylab::Face
 
       define_method :initialize do |host_module, norm=nil, *ref_xtra_h, &block|
         super( )
-        @empty_argv_method_name = :empty_argv
         @host_module = host_module
-        @current_leaf = @is_reified = @hot = @hot_class = @options = nil
+        @current_leaf = @default_argv = @is_reified = @hot =
+          @hot_class = @options = nil
         @box = MetaHell::Formal::Box::Open.new
         @norm = norm if norm  # else trigger warnings when accessing the ivar
         @mod_ref, xtra_h, mod_block =  # mutex on @mod_ref vs @mod_block !
@@ -986,7 +980,7 @@ module Skylab::Face
     end
   end
 
-  class Namespace
+  class Namespace  # (re-open)
 
     Adapter = CLI::Adapter  # this puts the constant in the scope of n.s subclss
 
@@ -1013,6 +1007,15 @@ module Skylab::Face
         @order_a  # triggers warnings
       end
 
+      def default_argv *a
+        if @story.default_argv  # for now, but meh
+          raise ::ArgumentError, "won't overwrite existing `default_argv`"
+        else
+          @story.default_argv = a
+        end
+        a
+      end
+
     protected
 
       def on first, *rest, &b
@@ -1037,6 +1040,20 @@ module Skylab::Face
       end
     end
 
+  public
+
+    def default_argv  # from main function
+      @sheet.default_argv
+    end
+
+    def parse argv  # branches always do this (default argv was covered above)
+      if argv.empty?
+        report_expecting
+      else
+        super
+      end
+    end
+
   protected  # (shadow `process_options` support)
 
     def option_parser_host
@@ -1048,43 +1065,38 @@ module Skylab::Face
       nil
     end
 
-    # existential workhorse `find_command` - called from main loop
+    # `find_command` - existential workhorse called from main loop.
+    # assumes at least 1 element in argv. remove at most 1 element off
+    # the head of `argv`. result in approriate response pair -
+    # if command can be resolved, a *hot* subcommand is the payload
+    # element of the pair.
 
-    # `find_command` - remove at most 1 element off the head of `argv`.
-    # result in approriate response pair - if command can be resolved,
-    # a *hot* subcommand is the payload element of the pair.
-
-    def find_command argv  # workhorse - result in hot subcommand
-      if argv.length.zero? then empty_argv else
-        given = argv.first
-        rx = /\A#{ ::Regexp.escape given }/
-        @is_puffed or puff
-        found_a = catch :break_two do
-          if ! @sheet.command_tree then [] else
-            @sheet.command_tree.reduce [] do |memo, (_, node)|
-              num = node.all_aliases.reduce 0 do |m, nm|
-                if given == nm
-                  throw :break_two, ( memo.clear << node )
-                end
-                rx =~ nm ? ( m + 1 ) : m  # keep looking, maybe exact match
+    def find_command argv  # assumes at least 1
+      given = argv.fetch 0
+      rx = /\A#{ ::Regexp.escape given }/
+      @is_puffed or puff
+      found_a = catch :break_two do
+        if ! @sheet.command_tree then [] else
+          @sheet.command_tree.reduce [] do |memo, (_, node)|
+            num = node.all_aliases.reduce 0 do |m, nm|
+              if given == nm
+                throw :break_two, ( memo.clear << node )
               end
-              memo << node if num.nonzero?
-              memo
+              rx =~ nm ? ( m + 1 ) : m  # keep looking, maybe exact match
             end
+            memo << node if num.nonzero?
+            memo
           end
         end
-        case found_a.length
-        when 0 ; unrecognized_command given
-        when 1 ; [ true, ( found_a[ 0 ].hot self, @sheet, argv.shift ) ]
-        else   ; ambiguous_command found_a, given
-        end
+      end
+      case found_a.length
+      when 0 ; unrecognized_command given
+      when 1 ; [ true, ( found_a[ 0 ].hot self, @sheet, argv.shift ) ]
+      else   ; ambiguous_command found_a, given
       end
     end
 
-    # `find_command` support
-
-    def empty_argv
-      # used to have `default_action` logic but that is being rebuilt
+    def report_expecting
       reason "Expecting #{ expecting }."
       [ false, nil ]
     end
@@ -1222,9 +1234,7 @@ module Skylab::Face
         y << hi( "command#{ 's' if 1 != a.length }:" )
         item_a = a.reduce [] do |row, (_,sheet)|
           node = sheet.hot self, @sheet, nil  # rc, rc_sheet, slug_fragment
-          if ! node.slug
-            require 'debugger' ; debugger ; 1==1||nil
-          end
+          node.slug or fail 'sanity'
           row << Item[ node.slug, node.summary ]
         end
         w = item_a.map { |o| o.hdr.length }.reduce 2 do |m, l| m > l ? m : l end
