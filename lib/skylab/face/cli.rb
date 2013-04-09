@@ -902,7 +902,7 @@ module Skylab::Face
         #                       ~ pre-order ~
 
         hl_is_loaded = load_hl = unstylize_sexp = parse_styles = chunker =
-          a_fex_lines_rx = header_rx = excerpt_str_h = unstyle_h = nil
+          header_rx = excerpt_str_h = unstyle_h = nil
 
         first_lines = nil
         hack_exp_fr_op = -> op, usage_header_txt do

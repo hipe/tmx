@@ -8,7 +8,7 @@ module Skylab::TanMan::TestSupport
       s = "no members 'fling' or 'ding' in struct"
       it s do
         -> do
-          o = TanMan::Template.new pathname: 'foo', fling: 'bar', ding: 'x'
+          TanMan::Template.new pathname: 'foo', fling: 'bar', ding: 'x'
         end.should raise_exception( ::NameError, s )
       end
     end
@@ -21,7 +21,6 @@ module Skylab::TanMan::TestSupport
         s = o.call bar_baz: 'bongo'
         s.should eql('foo bongo bif')
       end
-
 
       context "left diff -- params that are in template but not in actuals" do
 

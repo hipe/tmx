@@ -15,14 +15,11 @@ module Skylab::Bnf2Treetop::API::TestSupport
 
     def translate request
 
-      request[:upstream] = ::StringIO.new(request.delete(:string))
+      request[:upstream] = ::StringIO.new request.delete( :string )
 
-      request[:paystream] = paystream =
-        ::StringIO.new
-        # IO::Spy.standard.debug!('      FOO')
-      request[:infostream] = infostream =
-        ::StringIO.new
-        # IO::Spy.standard.debug!('      WTF!? - ')
+      request[:paystream] = ::StringIO.new
+
+      request[:infostream] = infostream = ::StringIO.new
 
       ::Skylab::Bnf2Treetop::API.translate(request) # t or nil
 

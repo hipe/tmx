@@ -4,9 +4,9 @@ describe "#{ ::Skylab::Headless::NLP::EN::Minitesimal } FUN" do
 
   extend ::Skylab::Headless::TestSupport::NLP
 
-  fun = Headless::NLP::EN::Minitesimal::FUN
+  fun = self::Headless::NLP::EN::Minitesimal::FUN
 
-  context "oxford_comma", f:true do
+  context "oxford_comma" do
 
     o = -> s, *a do
       t = [(a.pop if ::Hash === a.last)].compact

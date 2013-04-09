@@ -87,11 +87,11 @@ module Skylab::Treemap::TestSupport::CLI
       Headless::CLI::Pen::FUN.unstylize[ stream[k].string ]
     end
 
-    stream_struct = ::Struct.new :sout, :serr
+    Stream_ = ::Struct.new :sout, :serr
 
     define_method :stream do
       @stream ||= begin
-        o = stream_struct.new(
+        Stream_.new(
           TestSupport::IO::Spy.standard, TestSupport::IO::Spy.standard )
       end
     end

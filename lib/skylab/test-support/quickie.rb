@@ -383,7 +383,6 @@ module Skylab::TestSupport::Quickie
         val = val ? val.intern : true
         @desc_h ||= { }
         @or_a ||= [ ]
-        no, tg, vl = md.captures.zip( [nil, nil, true] ).map { |a, b| a || b }
         ( @desc_h[ no ? :exclude : :include ] ||= [ ] ) << [ tag, val ]
         if no
           @or_a << -> tag_h { ! ( val == tag_h[ tag ] if tag_h ) }
@@ -403,7 +402,7 @@ module Skylab::TestSupport::Quickie
     end
 
     def execute
-      branch, leaf, passed, failed, pended, ind, skip, flush =
+      branch, leaf, passed, failed, pended, skip, flush =
         build_rendering_functions
       rt = Quickie::Runtime.new passed, failed, pended
       commence  # above `example_producer` call
@@ -533,15 +532,11 @@ module Skylab::TestSupport::Quickie
         eg = nil
       end
 
-      depth = -> { d }
-
       outer_flush = -> do
         flush[ ] if eg
       end
 
-      outer_indent = -> { ind[ d ] }
-
-      [ branch, leaf, passed, failed, pended, outer_indent, skip, outer_flush ]
+      [ branch, leaf, passed, failed, pended, skip, outer_flush ]
     end
 
     -> do  # `stylize` - map colors to numbers, make strs like "\e[36mhi\e[0m"

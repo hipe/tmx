@@ -119,7 +119,7 @@ module Skylab::Face::TestSupport::CLI
 
     let :client do
       g = io_spy_group
-      client = self.class.client_class.new out: g.outstream, err: g.errstream,
+      self.class.client_class.new out: g.outstream, err: g.errstream,
         program_name: program_name
     end
 

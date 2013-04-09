@@ -1,13 +1,14 @@
 require_relative 'test-support'
 require 'skylab/pub-sub/test/test-support'  # keep here until needed elsewhere
 
-describe "#{ ::Skylab::Permute::CLI }" do
+module ::Skylab  # (dark hack to work with 1.9.2 to 1.9.3 change)
+# ..
+describe "#{ Permute::CLI }" do
 
   before :all do  # just a bad idea all around, but we want to see how it goes
-    extend ::Skylab # constants
     cli = Permute::CLI.new
     cli.program_name = 'permoot'
-    spy = ::Skylab::PubSub::TestSupport::Emit_Spy.new
+    spy = PubSub::TestSupport::Emit_Spy.new
     cli.singleton_class.send(:define_method, :emit) do |type, payload|
       spy.emit(type, payload)
     end
@@ -19,7 +20,7 @@ describe "#{ ::Skylab::Permute::CLI }" do
 
   attr_reader :cli, :spy
 
-  unstylize = ::Skylab::Headless::CLI::Pen::FUN.unstylize
+  unstylize = Headless::CLI::Pen::FUN.unstylize
 
   let :out do
     spy.emission_a.map do |e| unstylize[ e.payload_x ] end
@@ -78,4 +79,6 @@ describe "#{ ::Skylab::Permute::CLI }" do
       end
     end
   end
+end
+# ..
 end

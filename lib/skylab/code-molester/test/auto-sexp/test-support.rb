@@ -1,6 +1,5 @@
 require_relative '../test-support'
 
-
 module ::Skylab::CodeMolester
 
   self::Config::File || nil # ick load treetop :(

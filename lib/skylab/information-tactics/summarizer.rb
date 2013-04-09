@@ -49,7 +49,7 @@ module Skylab::InformationTactics
     end
     def truncate maxlen, str
       -1 == maxlen || maxlen.nil? and return str
-      case 0 <=> (over = str.length - maxlen)
+      case 0 <=> ( str.length - maxlen )
       when 1, 0 ; str
       else      ; "#{str[0, [0, maxlen - ellipsis.length].max]}#{ellipsis[0, maxlen]}"
       end

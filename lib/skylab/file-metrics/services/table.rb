@@ -302,7 +302,7 @@ module Skylab::FileMetrics
 
         sra = nil
         process_field = -> sym do
-          fld = fetch sym
+          fetch sym  # sanity
           Field_::Conduit_.new(
             summary: -> x, y=nil do
               sra ||= [ { } ]

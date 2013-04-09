@@ -83,7 +83,7 @@ module Skylab::Porcelain::Legacy
           @story.adopt_action_sheet( sh ) if sh
           # (you can deal with resorting here)
           if the_list != @story.action_box._order && sheetful.length.nonzero?
-            resort_is_needed = true
+            fail 'do me - resort'  # #todo
           end
         end
         @story.inherit_unseen_ancestor_stories  # modules may have been added
@@ -271,7 +271,7 @@ module Skylab::Porcelain::Legacy
       ambi_a = nil
       last_ambi_action = nil
       exact_found = catch :exact_found do
-        ambi_a = @action_box.reduce [] do |amb_a, (k, action)|
+        ambi_a = @action_box.reduce [] do |amb_a, (_, action)|
           action.names.each do |n|
             case match[n]
             when :exact
@@ -940,7 +940,7 @@ module Skylab::Porcelain::Legacy
     end
 
     def render_actions
-      arr = self.class.story.actions.visible.reduce [] do |m, (k, sheet)|
+      arr = self.class.story.actions.visible.reduce [] do |m, (_, sheet)|
         m << "#{ kbd sheet.slug }"
       end
       "{#{ arr * '|' }}"

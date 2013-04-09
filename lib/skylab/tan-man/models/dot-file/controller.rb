@@ -134,8 +134,6 @@ module Skylab::TanMan
       res
     end
 
-    constantize = ::Skylab::Autoloader::Inflection::FUN.constantize
-
     def tell statement_sexp, dry_run, force, verbose
       rule = statement_sexp.class.rule.to_s
       rule_stem = rule.match( /_statement\z/ ).pre_match
@@ -247,7 +245,6 @@ module Skylab::TanMan
         end
         nerk[ diff.num_lines_removed, 'removed' ]
         nerk[ diff.num_lines_added,   'added'   ]
-        was_empty = a.empty?
         no_change = ( 0 == diff.num_lines_added && 0 == diff.num_lines_removed )
         if no_change
           a.push "no lines added or removed!"

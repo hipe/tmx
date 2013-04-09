@@ -94,7 +94,7 @@ module Skylab::FileMetrics
           field[:num_files].summary -> do
             "%d" % count.sum_of( :num_files )
           end
-          field[:num_lines].summary -> c do
+          field[:num_lines].summary -> do
             "%d" % count.sum_of( :num_lines )
           end
           field[:lipstick].summary nil

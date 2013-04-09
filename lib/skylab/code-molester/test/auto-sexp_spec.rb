@@ -1,12 +1,17 @@
 require_relative 'auto-sexp/test-support'
 
-describe ::Skylab::CodeMolester::AutoSexp do
+module ::Skylab::CodeMolester::TestSupport
 
   include ::Skylab::CodeMolester::TestSupport::CONSTANTS
+  # wow scope rules changed btwn 1.9.2 and 1.9.3..
 
+# ..
+
+describe ::Skylab::CodeMolester::AutoSexp do
 
   cache = { }                     # avoid warnings about etc. don't worry,
                                   # cacheing like this is *always* fine
+
   let :parser_class do
     wat = cache.fetch( grammar ) do |str|
       g = CodeMolester::Services::Treetop.load_from_string str
@@ -190,4 +195,6 @@ describe ::Skylab::CodeMolester::AutoSexp do
       end
     end
   end
+end
+# ..
 end

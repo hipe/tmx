@@ -21,7 +21,6 @@ module Skylab::Porcelain::Bleeding
           rl = my_mc_class.new rc.in, rc.out, rc.err
           rl.program_name =
             "#{ rc.invocation_string } #{ my_sheet.name.as_slug }"
-          rl_client = -> { real }
           rl
         end
 

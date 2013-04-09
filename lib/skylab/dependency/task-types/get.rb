@@ -28,7 +28,7 @@ module Skylab::Dependency
       valid? or raise(invalid_reason)
       workunits = []
       pairs.each do |from_url, to_file|
-        case (bytes = self.bytes(to_file))
+        case self.bytes( to_file )
         when nil
           workunits.push [from_url, to_file]
         when 0

@@ -8,7 +8,7 @@ module Skylab::Treemap
     end
 
     def fuzzy_reduce ref
-      res = _fuzzy_reduce ref,
+      _fuzzy_reduce ref,
         -> k, v, y do
           y << v.slug
         end

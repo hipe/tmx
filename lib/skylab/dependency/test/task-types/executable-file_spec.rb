@@ -39,6 +39,7 @@ module Skylab::Dependency::TestSupport::Tasks
       it "should emit a notice and return false" do
         r = subject.invoke
         fingers[:info].last.should match(/executable does not exist.*not-a-file/)
+        r.should eql( false )
       end
     end
 
@@ -47,6 +48,7 @@ module Skylab::Dependency::TestSupport::Tasks
       it "should emit a notice and return false" do
         r = subject.invoke
         fingers[:info].last.should match(/exists but is not executable.*some-file/)
+        r.should eql( false )
       end
     end
   end

@@ -1,5 +1,11 @@
 require_relative '../test-support'
 
+module ::Skylab::CodeMolester::TestSupport
+
+  include ::Skylab::CodeMolester::TestSupport::CONSTANTS
+
+# ..
+
 describe ::Skylab::CodeMolester::Config::File do
 
   extend ::Skylab::CodeMolester::TestSupport
@@ -324,3 +330,5 @@ describe ::Skylab::CodeMolester::Config::File do
     end
   end
 end # describe
+# ..
+end

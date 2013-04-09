@@ -19,9 +19,10 @@ module Skylab::TanMan::TestSupport::Models::Association
 
     using_input '2-nodes-0-edges.dot' do
       it 'associates when first exists, second does not' do
-        o = controller.associate! 'alpha', 'peanut gallery'
+        r = controller.associate! 'alpha', 'peanut gallery'
         lines[-3..-1].should eql(
           ['peanut [label="peanut gallery"]', 'alpha -> peanut', '}' ])
+        r.should be_respond_to( :source_node_id )   # edge statement
       end
     end
 
@@ -35,7 +36,7 @@ module Skylab::TanMan::TestSupport::Models::Association
 
     using_input '0-nodes-3-edges.dot' do
       it "adds edge statements in unobtrusive lexical-esque order, #{
-           } with taxonomy and proximity", f:true do
+           } with taxonomy and proximity" do
         result._edge_stmts.to_a.length.should eql( 3 )
         result._node_stmts.to_a.length.should eql( 0 )
         controller.associate! 'feasly', 'teasly'

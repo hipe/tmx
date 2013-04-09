@@ -24,7 +24,7 @@ module Skylab::Headless::TestSupport::NLP::EN::Phrase
           v.string.object_id.should eql( oid )
           -> do
             v.string.concat ''
-          end.should raise_error( ::RuntimeError, /can't modify frozen string/ )
+          end.should raise_error( ::RuntimeError, /can't modify frozen String/ )
         end
 
         it "(lexicon caches every new lexeme for now)" do

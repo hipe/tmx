@@ -61,7 +61,6 @@ module ::Skylab::GitStashUntracked::Tests
       define_method :unstylize, & Headless::CLI::Pen::FUN.unstylize
 
       def with_popen3_out_as str
-        me = self
         GitStashUntracked::Services::Open3.stub :popen3 do |cmd, &block|
           self.cmd_spy = cmd
           serr = GitStashUntracked::Services::StringIO.new ''

@@ -14,9 +14,9 @@ module Skylab::TanMan
       ! error
     end
 
-    def to_json state, i
+    def to_json state
       as_array = events.map { |e| e.json_data }
-      json = as_array.to_json state, i
+      json = as_array.to_json state
       json
     end
 

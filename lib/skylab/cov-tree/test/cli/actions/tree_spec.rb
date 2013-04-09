@@ -1,9 +1,11 @@
 # encoding: utf-8
 require_relative '../test-support'
 
-describe "#{ ::Skylab::CovTree } CLI action: tree" do  # Quickie maybe..
+module Skylab  # (dark hack for 1.9.2 to 1.9.3)
+# ..
+describe "#{ CovTree } CLI action: tree" do  # Quickie maybe..
 
-  extend ::Skylab::CovTree::TestSupport::CLI
+  extend CovTree::TestSupport::CLI
 
   text = -> x do
     txt = x.payload_x
@@ -12,7 +14,6 @@ describe "#{ ::Skylab::CovTree } CLI action: tree" do  # Quickie maybe..
   end
 
   it "show a list of matched test files only." do
-
     cd CovTree.dir_pathname.dirname do         # cd to lib/skylab ..
       argv 'tree', '-l', './cov-tree'          # and ask about this subproduct
     end                                        # itself. (yes this is a self-
@@ -71,4 +72,6 @@ describe "#{ ::Skylab::CovTree } CLI action: tree" do  # Quickie maybe..
     names.uniq.should eql([:payload])
     result.should eql( 0 )
   end
+end
+# ..
 end

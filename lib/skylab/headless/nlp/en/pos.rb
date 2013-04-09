@@ -469,7 +469,6 @@ module Skylab::Headless
       else
         lex_cls = self
         cat_box = @category_box
-        exp_box = @exponent_box
         kls = ::Class.new( Production_ ).class_exec do
           define_singleton_method :lexeme_class do lex_cls end
           define_method :lexeme_class do lex_cls end
@@ -1044,7 +1043,7 @@ module Skylab::Headless
 
     # `Noun::Phrase`
 
-    Phrase = NLP::EN::Part_Of_Speech::Phrase_.new :adjp, :n, :nmodp,
+    Phrase = NLP::EN::Part_Of_Speech::Phrase_.new :adjp, :n, :nmodp
 
   end
 

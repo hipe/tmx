@@ -125,7 +125,6 @@ module Skylab::TanMan
         end
       end
       begin
-        o = graph_sexp
         ptype = resolve_prototype[] or break
         new = ptype.__dupe except: [[:agent, :id], [:edge_rhs, :recipient, :id]]
         new.source_node_id! source_node.node_id

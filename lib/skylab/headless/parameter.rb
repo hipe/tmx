@@ -43,7 +43,7 @@ module Skylab::Headless
       @parameters ||= begin
         p = Parameter::Set.new(self)
         a = ancestors
-        nil until ::Object == (m = a.pop)
+        nil until ::Object == a.pop
         self == a[0] and a.shift
         mods = [] ; klass = nil
         a.each do |mod|

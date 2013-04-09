@@ -51,7 +51,7 @@ module Skylab::Face
               begin
                 str = s[:in].readpartial NUM_BYTES
                 s[:in].closed? and done = true
-              rescue ::EOFError => e
+              rescue ::EOFError
                 done = true
               end
               if str

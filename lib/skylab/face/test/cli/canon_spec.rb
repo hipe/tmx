@@ -294,6 +294,7 @@ module Skylab::Face::TestSupport::CLI
         it does do
           res = invoke argv
           expect_nonstyled_line( /\Awrong number of arguments \(0 for 1\)\z/i )
+          res.should eql( nil )
         end
       end
     end
@@ -425,8 +426,9 @@ module Skylab::Face::TestSupport::CLI
         argv 'fiz', '-sohai'
         expt_desc 'works'
         it does do
-          x, h = invoke argv
+          r, h = invoke argv
           expect_no_more_output
+          r.should eql( nil )
           h.fetch( :someval ).should eql( 'ohai' )
         end
       end

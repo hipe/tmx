@@ -168,7 +168,7 @@ module Skylab::Headless
 
     def method_added meth         # #doc-point [#hl-040]
       if ! dsl_is_disabled
-        klass = action_class_in_progress!
+        action_class_in_progress!
         const = Autoloader::Inflection::FUN.constantize[ meth ]
         action_box_module.const_set const, @action_class_in_progress
         @action_class_in_progress = nil

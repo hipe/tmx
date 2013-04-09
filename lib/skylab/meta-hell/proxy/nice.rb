@@ -34,7 +34,7 @@ module Skylab::MetaHell
     # expect it to work like a functional proxy! This simply produces
     # a ::BasicObject subclass that a) does the nice things and b) makes
     # a constructor (if you have nonzero length members in your definition)
-    # that takes a hash yet passes ordered args to your `initialize`
+    # that takes a hash yet passes ordered args to *your* `initialize`
     # This, in contrast to working with functional proxies, makes no
     # assumptions about how you want to implement you proxy.
 
@@ -50,11 +50,16 @@ module Skylab::MetaHell
           define_method :inspect do
             "#<#{ self.class } #{ valid.members.join ', ' }>"
           end
+          define_method :initialize do |*args|
+            # (internal sanity check - affects test only, compat for 1.9.3)
+            args.length == a.length or raise ::ArgumentError, "wrong number #{
+              }of arguments (#{ args.length } for #{ a.length })"
+          end
           define_singleton_method :new do |h|
             h.keys.each { |k| valid[ k ] }              # all keys are valid
             args = valid.members.map { |k| h.fetch k }  # no keys are missing
             obj = allocate
-            obj.__send__ :initialize, * args
+            obj.__send__ :initialize, *args
             obj
           end
         else

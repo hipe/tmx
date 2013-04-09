@@ -78,14 +78,14 @@ module Skylab::Headless
         bytes = 0
         init_heartbeat[]
         while up_a.length.nonzero?
-          read_a, _w, _e = ::IO.select up_a, nil, nil, timeout_seconds
+          read_a, _, _ = ::IO.select up_a, nil, nil, timeout_seconds  # #todo at 2.0.0 - `_w`, `_e`
           heartbeat[]
           read_a or break
           read_a.each do |io|
             begin
               str = io.readpartial maxlen
               eof = io.closed?
-            rescue ::EOFError => e
+            rescue ::EOFError
               eof = true
             end
             if str

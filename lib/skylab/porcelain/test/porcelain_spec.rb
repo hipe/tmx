@@ -359,8 +359,9 @@ module Skylab::Porcelain::TestSupport
       let(:klass) do
         Class.new.class_eval do
           extend Porcelain::Legacy::DSL
-        private
-          attr_reader :argv
+          attr_reader :argv, :touched
+          protected :argv, :touched
+        protected
           def initialize( * )
             super
             @touched = nil
@@ -370,8 +371,6 @@ module Skylab::Porcelain::TestSupport
           def takes_no_arguments
             @touched = true
           end
-        private
-          attr_reader :touched
           self
         end
       end
@@ -427,7 +426,7 @@ module Skylab::Porcelain::TestSupport
         subject do
           act = instance.send( :fetch_action_sheet, 'whatever-is-clever' ).
             action_subclient( instance )
-          str = act.send :render_syntax_string
+          act.send :render_syntax_string
         end
         specify { should eql('yourapp whatever-is-clever [-a] [-p[=foo]] [--bananna=<type>] <foo> [<bar>]') }
       end

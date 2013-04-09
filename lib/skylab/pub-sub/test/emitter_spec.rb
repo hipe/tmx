@@ -77,6 +77,7 @@ module ::Skylab::PubSub::TestSupport::Emitter
           error -> informational
           info -> informational
         HERE
+        act.should eql( exp )
       end
 
       it "notifies subscribers of its child events" do

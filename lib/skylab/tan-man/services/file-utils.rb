@@ -6,11 +6,10 @@
 # Fortunately for us this turned out to be a good idea, this also centralizes
 # our customized `fu_output_message` behavior, which provides a stunning,
 # extraordinary and transcendent yet lithe display of how powerful and elegant
-# headless can be, done right.
+# headless can be.
 
 require 'fileutils'               # one main point of this is to have
                                   # exactly 1 place where this happens
-
 module Skylab::TanMan
 
   class Services::FileUtils       # creates the services.file_utils object sing.
@@ -27,7 +26,6 @@ module Skylab::TanMan
     ::FileUtils::METHODS.each { |m| public m } # so, `pwd` for example
   end
 
-
   module Services::FileUtils::InstanceMethods
     # Something really crazy and magical happens here - whoever (probably
     # api action instances) wants the file utils instance methods, they grab
@@ -38,11 +36,8 @@ module Skylab::TanMan
 
     include ::FileUtils
 
-
     alias_method :tanman_original_fu_output_message, :fu_output_message
     # (if someone ever needs this.  we don't)
-
-
 
     # The tiny jumble below deserves some explanation so we don't forget why
     # we are going thru all this:
@@ -71,13 +66,10 @@ module Skylab::TanMan
     # hopefully our regex is tight enough to catch all strings that matter
     # and none that don't for the sake of this zany proof of concept.
 
-
-
-    # overriding fu_output_message is the right way to customize
+    # `fu_output_message` - overriding it is the right way to customize
     # (usually 'verbose'-style messages) from ::FileUtils.  Here we hook
     # into our ridiculous path sanitization and prettification logic
-    #
-    rx = Headless::CLI::PathTools::FUN.absolute_path_hack_rx
+
     define_method :fu_output_message do |msg|
       str = gsub_path_hack msg
       emit :info, str

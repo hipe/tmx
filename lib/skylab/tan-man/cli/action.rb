@@ -297,7 +297,7 @@ module Skylab::TanMan
       # expect this to break around [#022] because bleeding thinks of
       # 'program name' as being the full path, but is broken for deep
       # graphs. or not
-      program_name =  self.program_name.split(' ').first # #ick
+      program_name.split( ' ' ).first  # #ick
     end
   end
 end

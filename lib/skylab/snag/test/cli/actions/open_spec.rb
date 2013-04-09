@@ -48,7 +48,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
       it "`open -v` - show it verbosely (the yaml report)" do
         shared_setup[ self ]
         invoke_from_tmpdir 'open', '-v'
-        act = output.lines.reduce( [] ) do |m, (x, idx)|
+        act = output.lines.reduce( [] ) do |m, (x, _)|
           if :pay == x.stream_name
             m.push x.string
             if 4 == m.length

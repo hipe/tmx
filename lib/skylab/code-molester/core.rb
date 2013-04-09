@@ -9,6 +9,5 @@ module ::Skylab::CodeMolester
   MetaHell     = ::Skylab::MetaHell
   PubSub       = ::Skylab::PubSub
 
-
   extend MetaHell::Autoloader::Autovivifying::Recursive
 end

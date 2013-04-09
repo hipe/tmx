@@ -68,7 +68,7 @@ module Skylab::Headless
     include Headless::Action::InstanceMethods
 
     def invoke argv
-      @argv = argv ; arg = nil    # some callables care about @argv, some don't
+      @argv = argv                # some callables care about @argv, some don't
       @queue ||= []               # essential here, must can be set elsewhere
       res = parse_opts @argv      # passed as arg so descendents can play dumb
       if true == res              # we check this a lot for [#hl-019], [#hl-023]

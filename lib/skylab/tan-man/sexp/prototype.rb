@@ -121,8 +121,6 @@ module Skylab::TanMan
     end
 
     fun = Sexp::Prototype::FUN
-    blank_rx = fun.blank_rx
-    line_rx = fun.line_rx
 
     define_method :attempt_to_process_example_body! do
       result = nil

@@ -64,7 +64,7 @@ module Skylab::Treemap
       nil
     end
 
-    option_parser.more :s, do |y|
+    option_parser.more :s do |y|
       fa = sister.formal_attributes
       stop, impl = [ :stop_at, :stop_is_induced ].map { |x| fa.meta_attribute_value_box x }
       ks = stop.names - impl.names
@@ -125,7 +125,7 @@ module Skylab::Treemap
               info "calling exec() to open the pdf (!) - #{ escape_path e.path }"
               cmd = "open #{ e.path }"
               # $stderr.puts "(would have done: #{ cmd })"
-              exec "open #{ e.path }"
+              exec cmd
             else
               error "expected pdf output not found: #{ escape_path e.path }"
             end

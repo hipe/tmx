@@ -320,7 +320,7 @@ module Skylab::Porcelain::Bleeding
     end
                                   # in the spirit of .fetch
     def fetch_builder token, &not_found
-      es = nil
+      res = nil
       mod = find token do |o|
         o.on_error do |er|
           res = ( not_found || -> e { raise ::KeyError, e } ) [ er ]

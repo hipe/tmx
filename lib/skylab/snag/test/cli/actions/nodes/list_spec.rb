@@ -58,7 +58,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
       it "with `show 002 --no-verbose` - it shows it tersely" do
         shared_setup[ self ]
         invoke_from_tmpdir( *invocation, '002', '--no-verbose' )
-        names, strings = output.unzip
+        names, = output.unzip
         names.count{ |x| x == :pay }.should eql( 2 ) # i don't care about info
         act = output.lines.select{ |x| :pay == x.stream_name }.map(&:string).join ''
         exp = <<-O.unindent

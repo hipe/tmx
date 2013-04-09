@@ -145,7 +145,7 @@ module Skylab::Headless::TestSupport::CLI::Box::DSL
         op.top.list.length.should eql( 1 ) # which has only 1 element
         op.top.list.first.short.first.should eql( '-h' ) # which is '-h'
         op.parse '--hel'
-        action.instance_variable_get( :@queue ).should eql( nil )
+        action.instance_variable_defined?( :@queue ).should eql( false )
         box.instance_variable_get( :@queue ).length.should eql( 1 )
       end
 

@@ -52,10 +52,8 @@ module Skylab::Treemap
 
       new = self.new nil, * arg_a.length.times.map { }
       new.set_from_args args, normalized_key
-      if error                    # you get a validation check iff you passed
-        err = error               # an `error` handler
-        error = -> e { "#{ e } in #{ args.inspect }" }
-        new = new.validate error
+      if error  # you get a validation check iff you passed an `error` handler
+        new = new.validate -> e { error[ " #{ e } in #{ args.inspect }" ] }
       end
       new
     end

@@ -4,7 +4,7 @@ describe "#{ Skylab::Headless::NLP::EN::Number }" do
 
   extend ::Skylab::Headless::TestSupport::NLP
 
-  include Headless::NLP::EN::Number::Methods
+  include self::Headless::NLP::EN::Number::Methods
 
   def self.does mixed, str
     let( :subject ) { send meth, mixed }

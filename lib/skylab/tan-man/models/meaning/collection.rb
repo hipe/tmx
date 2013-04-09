@@ -162,7 +162,7 @@ module Skylab::TanMan
 
     def fetch_meaning meaning_ref, error, info
       rx = /\A#{ ::Regexp.escape meaning_ref }/
-      res = fuzzy_fetch list,
+      fuzzy_fetch list,
         -> meaning do
           if rx =~ meaning.name
             meaning_ref == meaning.name ? 1 : 0.5

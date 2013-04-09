@@ -2,7 +2,6 @@ require_relative '../core'
 
 require 'skylab/test-support/core'
 
-
 module ::Skylab::CodeMolester::TestSupport
   include ::Skylab # TestSupport
 

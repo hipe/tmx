@@ -16,7 +16,7 @@ module Skylab::MetaHell::Modul::Creator
     o = ::Hash.new
 
     o[:build_meta_f] = -> me, known_graph do
-      build_meta = -> name do
+      -> name do
         M.define_methods[ me, name, M.get_product_f[ known_graph, name ] ]
         M.create_meta[ name ]
       end
@@ -236,7 +236,7 @@ module Skylab::MetaHell::Modul::Creator
     end
 
     o[:define_methods] = -> sing_class, name do
-      sing_class.send :define_method, name, do
+      sing_class.send :define_method, name do
         _modul name
       end
       sing_class.class_exec name, & M.convenience

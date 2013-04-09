@@ -79,7 +79,7 @@ module Skylab::Headless
     end
 
     def expecting_string
-      a = action_box_module.each.reduce [] do |m, (k, x)|
+      a = action_box_module.each.reduce [] do |m, (_, x)|
         m << x.name_function.local.as_slug
       end
       "expecting {#{ a.map(& method( :kbd ) ) * '|' }}"
@@ -109,7 +109,7 @@ module Skylab::Headless
 
     def build_desc_lines
       res = super
-      a = action_box_module.each.reduce [] do |m, (k, c)|
+      a = action_box_module.each.reduce [] do |m, (_, c)|
         m << ( c.new self )       # ich muss sein - we need a charged graph
       end
       if a.length.nonzero?

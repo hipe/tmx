@@ -1,6 +1,10 @@
 require_relative 'test-support'
 
-describe "#{Skylab::Yacc2Treetop} CLI integration" do
+module ::Skylab::Yacc2Treetop::TestSupport::CLI
+  include InstanceMethods  # for constants (1.9.2 to 1.9.3)
+# ..
+
+describe "#{::Skylab::Yacc2Treetop} CLI integration" do
   extend ::Skylab::Yacc2Treetop::TestSupport::CLI
   self::Yacc2Treetop = ::Skylab::Yacc2Treetop
 
@@ -55,4 +59,6 @@ describe "#{Skylab::Yacc2Treetop} CLI integration" do
       out.first.should eql('( type_selector / universal )')
     end
   end
+end
+# ..
 end

@@ -73,6 +73,7 @@ module ::Skylab::TestSupport
     def extended mod
       mod.extend module_methods_module
       mod.send :include, instance_methods_module
+      mod.send :include, constants_module  # for 1.9.3
     end
 
     alias_method :_regret_extended, :extended
@@ -230,7 +231,7 @@ module ::Skylab::TestSupport
 
     def tmpdir_pathname
       @tmpdir_pathname ||= begin
-        pam = parent_anchor_module or raise "You better set #{
+        parent_anchor_module or raise "You better set #{
           }@tmpdir_pathname in #{ self } because somebody is looking for it."
         par = parent_anchor_module.tmpdir_pathname
         dir = Autoloader::Inflection::FUN.pathify[

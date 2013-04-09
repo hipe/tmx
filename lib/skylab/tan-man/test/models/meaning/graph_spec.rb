@@ -151,10 +151,6 @@ module Skylab::TanMan::TestSupport::Models::Meaning::Graph
       end
     end
 
-    circ_str = -> nerp do
-      nerp.trail_a.map { |m| "#{ m.name } -> #{ m.value }" }.join ', '
-    end
-
     context "simple circular" do
 
       let :graph do

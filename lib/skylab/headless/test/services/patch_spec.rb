@@ -9,8 +9,6 @@ module Skylab::Headless::TestSupport::Services::Patch
 
   describe "#{ Headless::Services }::Patch::Models::ContentPatch" do
 
-    tmpdir = Patch_TestSupport.tmpdir
-
     patch = Headless::Services::Patch::Models::ContentPatch
 
     context "changes (\"c\")" do

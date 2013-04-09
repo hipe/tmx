@@ -55,7 +55,7 @@ module Skylab::Snag::TestSupport::Models::Manifest::File
       it "when interrupted with a break from each - closes" do
         mutex.should eql(false)
         found = false
-        line = file.normalized_lines.each do |lin|
+        file.normalized_lines.each do |lin|
           mutex.should eql(true)
           if 'beta' == lin
             found = true

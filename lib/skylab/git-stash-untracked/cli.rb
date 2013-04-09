@@ -849,7 +849,7 @@ module Skylab::GitStashUntracked
           end
           emit[:payload, "@@ -0,0 +1,#{lines.count} @@"]
           lines.each { |line| emit[:payload, "+#{line}"] }
-        rescue ::ArgumentError => e
+        rescue ::ArgumentError
           emit[:error, "failed to hack a diff for file. binary file? (#{path})"]
         end
       end

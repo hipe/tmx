@@ -71,7 +71,7 @@ module Skylab::Dependency::TestSupport::Tasks
         context "and the version matches" do
           let(:version_from) { 'echo "ver 1.2.1"' }
           it "says that it matches" do
-            res = subject.invoke( context ).should eql( true )
+            subject.invoke( context ).should eql( true )
             log.string.include?('version 1.2.1 is in range 1.2+').should eql(true)
           end
         end

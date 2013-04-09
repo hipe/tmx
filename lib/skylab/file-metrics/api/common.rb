@@ -45,7 +45,6 @@ module Skylab::FileMetrics
 
     def stdout_lines command_string, y
       tsa_limit = ( @tsa_limit ||= 0.33 )  # tsa = time since activity
-      last_activitiy_time = ::Time.now
       FileMetrics::Services::Open3.popen3 command_string do |_, sout, serr|
         er = nil
         select = Headless::IO::Upstream::Select.new
@@ -56,7 +55,7 @@ module Skylab::FileMetrics
 
         -> do
           # (this block is all just a UI nicety - 'TSA' - time since activity)
-          select.heartbeat 0.33 do
+          select.heartbeat tsa_limit do
             if num_souts.zero?
               @ui.err.write '.'
             else

@@ -19,6 +19,7 @@ module Skylab::TanMan::TestSupport::API::Actions
       it "requires certain args, derps on failure" do
         response = api_invoke
         lone_error( /missing required attribute.*"host".*"name"/ )
+        response.success?.should eql( false )
       end
 
       it "result is an error event if it cannot find the local config dir" do
@@ -38,6 +39,7 @@ module Skylab::TanMan::TestSupport::API::Actions
       it "an invalid remote derps (host with space)" do
         response = api_invoke name: 'floop', host: 'space case'
         lone_error( /"space case" did not match pattern for url/ )
+        response.success?.should eql( false )
       end
 
       it "adding a valid local remote works (confirmed with a second api call)" do

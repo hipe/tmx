@@ -18,7 +18,6 @@ module Skylab::TanMan
       to = value_index.last + 1 # dos line endings whatever
       new_string = scn.string.dup
       new_string[ from .. to ] = ''
-      old_name = name
       old_len = scn.string.length
       scn.string.replace( new_string )
       new_len = scn.string.length

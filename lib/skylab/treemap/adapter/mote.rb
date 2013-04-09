@@ -53,7 +53,7 @@ module Skylab::Treemap
         memo
       end # Now the box has cards for all the local (non adapter) actions.
       adaptrs = mode_client.api_client.adapter_box.each.which(&:has_cli_actions)
-      adaptrs.reduce( self ) do |memo, (adname, adapter)|
+      adaptrs.reduce( self ) do |memo, (_, adapter)|
         adapter.cli_action_names.reduce memo do |mem, (aname, nf)|
           mem.if? aname, -> x do
             x.add_adapter adapter

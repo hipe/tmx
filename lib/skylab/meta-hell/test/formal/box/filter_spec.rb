@@ -65,7 +65,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Box
         ea2 = ea.filter -> k, v do
           :three == k and true == v.blue
         end
-        a = ea2.reduce [] do |m, (k,x)| # always keys for you here
+        a = ea2.reduce [] do |m, (_, x)| # always keys for you here
           m << x ; m
         end
         a.length.should eql( 1 )

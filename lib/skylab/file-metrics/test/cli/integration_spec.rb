@@ -101,6 +101,7 @@ module Skylab::FileMetrics::TestSupport::CLI
 
       it "body" do
         dr, nf, nl, ts, ms, lp = output_lines[1].strip.split( /(?!< ) +(?! )/ )
+        dr.should eql( 'api' )
         expect_integer nf, 3..10
         expect_integer nl, 400..520  # hello from the past
         expect_percent ts

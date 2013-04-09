@@ -235,7 +235,7 @@ module ::Skylab::MetaHell
           when ::Symbol          # no block just a name.
             meta_attributes.vivify! attr_ref # this may be too strict
           when ::Hash
-            ma = meta_attributes.vivify_from_hash attr_ref # validates
+            meta_attributes.vivify_from_hash attr_ref  # validates
           when ::Module
             import_meta_attributes_from_module attr_ref
           else
@@ -245,7 +245,6 @@ module ::Skylab::MetaHell
       end
       nil
     end
-
                                   # retrieve the box that represents the
                                   # metaattributes defined for this definer
                                   # creating it lazily.
