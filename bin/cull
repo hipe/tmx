@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby -w
+
+require_relative '../lib/skylab/cull/core'
+
+Skylab::Cull::CLI.new( out: $stdout, err: $stderr ).run ARGV
