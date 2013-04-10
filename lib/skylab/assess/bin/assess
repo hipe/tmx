@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+#!/usr/bin/ruby
+
+root = File.expand_path('../lib',File.dirname(__FILE__))
+$LOAD_PATH.unshift(root) unless $LOAD_PATH.include?(root)
+
+require 'assess'
+require 'assess/commands'
+Hipe::Assess::Commands.invoke ARGV
