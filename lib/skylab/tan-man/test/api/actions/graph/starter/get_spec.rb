@@ -10,7 +10,7 @@ module Skylab::TanMan::TestSupport::API::Actions
     action_name [ :graph, :starter, :get ]
 
     it "when set - \"starter is set to \"holy-nerp.dot\" in local config #{
-        }file\" (and tons of metadata)", f:true do
+        }file\" (and tons of metadata)" do
 
       prepare_tanman_tmpdir <<-HERE.unindent
         --- /dev/null

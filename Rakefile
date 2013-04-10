@@ -2,18 +2,37 @@
 
 require 'rubygems'
 require 'bundler'
+
+-> do
+  stderr = $stderr
+  enum = nil
+
+  define_method :info do |*msgs, &blk|
+    enum ||= ::Enumerator::Yielder.new { |msg| stderr.puts "(#{ msg })" }
+    msgs.each { |msg| enum << msg }
+    blk and blk[ enum ]
+    enum << "from BEEF"
+    nil
+  end
+end.call
+
 begin
-  Bundler.setup(:default, :development)
+  Bundler.setup :default, :development
 rescue Bundler::BundlerError => e
-  $stderr.puts e.message
-  $stderr.puts "Run `bundle install` to install missing gems"
+  info do |i|
+    i << e.message
+    i << "Run `bundle install` to install missing gems"
+  end
   exit e.status_code
 end
-require 'rake'
 
+require 'rake'
 require 'jeweler'
+
 Jeweler::Tasks.new do |gem|
-  # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
+
+  # `gem` is Gem::Specification - http://docs.rubygems.org/read/chapter/20
+
   gem.name = "tmx"
   gem.homepage = "http://github.com/hipe/tmx"
   gem.license = "MIT"
@@ -23,17 +42,27 @@ Jeweler::Tasks.new do |gem|
   gem.authors = ["Mark Meves"]
   # dependencies defined in Gemfile
 end
+
 Jeweler::RubygemsDotOrgTasks.new
+
 
 # be sure to use jeweler to see all the other goodies we're not using,
 # e.g. TestTask, RcovTask
 
 require 'rdoc/task'
+require 'pathname'
+
 RDoc::Task.new do |rdoc|
-  version = File.exist?('VERSION') ? File.read('VERSION') : ""
 
   rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "tmx #{version}"
-  rdoc.rdoc_files.include('README*')
-  rdoc.rdoc_files.include('lib/**/*.rb')
+  rdoc.rdoc_files.include 'README*'
+  rdoc.rdoc_files.include 'lib/**/*.rb'
+
+  vpn = ::Pathname.new "#{ __dir__ }/VERSION"
+  if vpn.exist?
+    rdoc.title = "tmx #{ vpn.read.chomp }"
+  else
+    info "version unknown because no such path - #{ vpn }"
+    rdoc.title = "tmx"
+  end
 end

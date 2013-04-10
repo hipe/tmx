@@ -194,7 +194,7 @@ describe ::Skylab::CodeMolester::Config::File do
       context "if you use a symbol for a key" do
         it "we don't do magic conversion for you, in fact it throws for now" do
           lambda { config[:foo] }.should raise_exception(
-            TypeError, /can't convert Symbol into Integer/)
+            ::TypeError, /no implicit conversion of Symbol into Integer/ )
         end
       end
       it "will get nil if it asks for a name that isn't there" do

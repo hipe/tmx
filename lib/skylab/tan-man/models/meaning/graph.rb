@@ -7,7 +7,7 @@ module Skylab::TanMan
     # Some notes about resolving meaning: Meanings are currently stored
     # in comment strings in the sexps, and are not in their 'resting state'
     # held as sexps like other parts of the document. For this reason and
-    # others, we do not cache a parsed sexp / graph of meanings;, but rather
+    # others, we do not cache a parsed sexp / graph of meanings, but rather
     # each time a meaning is to be applied (after being resolved) to a node,
     # we create an entire semantic graph to nerk the derk. This may have
     # to change for some strange scenario where we need more performace,
@@ -18,7 +18,7 @@ module Skylab::TanMan
     #
     # Implementation note: experimentally this graph is "collapsed" one-way
     # lazily - so it indexes itself zero or one times and never goes back.
-    # Hence afte we index ourselves we can release the source data and not
+    # Hence after we index ourselves we can release the source data and not
     # get confused.
 
     def resolve_meaning_strings meaning_name, interminable_meaning

@@ -26,14 +26,16 @@ module Skylab::MetaHell::TestSupport::Proxy::Functional
     it "but don't touch the sides" do
       kls = MetaHell::Proxy::Functional.new :zerpie, :derkie, :tata
 
-      proc do
+      pred = proc do
         kls.new murphy: :bed
-      end.should raise_error( ::NameError, /no member 'murphy' in struct/ )
+      end
+
+      pred.should raise_error( ::KeyError, /key not found: :murphy/ )
 
       proc do
         kls.new zerpie: :herpie
       end.should raise_error( ::ArgumentError,
-                             /your proxy must define \(derkie, tata\)/ )
+        /you must provide \(a\) function\(s\) for - \(derkie, tata\)/ )
     end
   end
 end

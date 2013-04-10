@@ -1,3 +1,4 @@
+[#010]       #tracking-tack "dark hack" this one weird old trick makes ..
 [#009]       #subscription - will Quickie ever short-circuit (throw
                exceptions) on individual test-failures like ::Rspec?
 [#008]       #tracking-tag quickie root invocation (runtime/context)

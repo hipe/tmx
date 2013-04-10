@@ -1,4 +1,5 @@
 module Skylab::Slake::TestSupport
+
   class UI::Tee                   # experimental custom runtime spy etc.
                                   # (not really a proper tee - misnomer?)
 

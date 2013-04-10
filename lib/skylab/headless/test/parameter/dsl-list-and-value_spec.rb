@@ -1,6 +1,7 @@
 require_relative 'test-support'
 
 describe 'If you have an object "object" that has a ' <<
+
   "#{::Skylab::Headless::Parameter} \"foo\"" do
 
   extend ::Skylab::Headless::TestSupport::Parameter
@@ -19,6 +20,7 @@ describe 'If you have an object "object" that has a ' <<
       end
     end
   end
+
   context 'and "foo" has the property of ' <<
      '"dsl: :value, pathname: true"' do
     with do
@@ -40,7 +42,7 @@ describe 'If you have an object "object" that has a ' <<
       it '"object.foo" should not be a reader because it is a writer ' <<
           '(keep it orthoganal and "simple")' do
         -> { object.topping }.should raise_error( ::ArgumentError,
-          /wrong number of arguments \(0 for 1\)/ )
+          /wrong number of arguments \(0 for 1\+\)/ )
       end
       it '(access "foo" internally to see that it starts out as nil ' <<
           'and not an array)' do
@@ -55,6 +57,7 @@ describe 'If you have an object "object" that has a ' <<
       end
     end
   end
+
   context 'and "foo" has the properties ' <<
     '"dsl: :list, enum: [:up, :down, :over]" (CHECK THIS OUT ^_^:)' do
     with do

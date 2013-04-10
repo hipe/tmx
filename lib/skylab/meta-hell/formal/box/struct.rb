@@ -8,7 +8,6 @@ module Skylab::MetaHell
 
     include Formal::Box::InstanceMethods::Readers
 
-
     # `produce` - so the upstream box might be an arbitrary box subclass.
     # We, however, will produce an instance of our selfsame ::Struct
     # subclass here, which mixes-in box reader instance methods.

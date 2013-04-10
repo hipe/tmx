@@ -19,7 +19,7 @@ module ::Skylab::PubSub::TestSupport::Emitter
         include o.Alpha
       end
 
-      it "works", f:true do
+      it "works" do
         g = _Gamma.new
         g.emit :alpha, nil # does not raise
         ->{ g.emit :no, nil }.should raise_error(

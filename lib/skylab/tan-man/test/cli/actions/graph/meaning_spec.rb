@@ -32,7 +32,7 @@ module Skylab::TanMan::TestSupport::CLI::Actions::Graph
     # note the below test is here because that is where it fits taxonomically
     # although it currently reached thru the `tell` command
 
-    it "`tell <node> is <meaning>` applies the meaning!", f:true do
+    it "`tell <node> is <meaning>` applies the meaning!" do
 
       using_dotfile <<-O.unindent
         digraph{

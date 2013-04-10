@@ -191,7 +191,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Attribute
         end
       end
 
-      it "which transfers the same MetaAttribute object to child (should be ok)", f:true do
+      it "which transfers the same MetaAttribute object to child (should be ok)" do
         importing_class.meta_attributes[:regex].should be_kind_of(MetaHell::Formal::Attribute::MetaAttribute)
         importing_class.meta_attributes[:regex].object_id.should eql(defining_module.meta_attributes[:regex].object_id)
       end

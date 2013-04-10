@@ -7,13 +7,16 @@ module Skylab::Slake::TestSupport
   module CONSTANTS
     TEST_ROOT_DIR = ::File.expand_path '..', __FILE__
     FIXTURES_DIR = "#{ TEST_ROOT_DIR }/fixtures"
-    TMP_DIR = File.expand_path '../../../../../tmp', __FILE__
+    TMP_DIR = ::File.expand_path '../../../../../tmp', __FILE__
     TEST_BUILD_DIR = ::File.join(TMP_DIR, 'build_dir')
 
-    Headless = ::Skylab::Headless
+    include ::Skylab
+    TestSupport = TestSupport
+
+    include ::Skylab::Slake  # e.g just say `Task`
   end
 
   include CONSTANTS
 
-  Headless = Headless  # (prettier from support classes below)
+  Headless = Headless  # (`dependency` (subroduct) test suite)
 end

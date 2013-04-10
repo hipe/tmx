@@ -31,7 +31,7 @@ module Skylab::Flex2Treetop::MyTestSupport
           before { tmpdir.prepare }
           let(:outfile) { tmpdir.join('out.rb') }
 
-          it "it makes that badboy!", f:true do
+          it "it makes that badboy!" do
             result = api_client.invoke( :translate,
               flexfile: fixture(:mini),
               outfile: outfile )

@@ -306,22 +306,22 @@ module Skylab::Porcelain::TestSupport
       end
       it "with empty argv it complains, lists available actions and invites to more help" do
         instance.invoke []
-        stderr.should match(expecting_foo_bar)
-        stderr.should match(/try yourapp -h for help/i)
+        styled_stderr.should match(expecting_foo_bar)
+        styled_stderr.should match(/try yourapp -h for help/i)
       end
       it "with a bad action name it complains, lists available actions and invites to more help" do
         instance.invoke ['derpis']
-        stderr.should match(/invalid action: derpis/i)
-        stderr.should match(expecting_foo_bar)
+        styled_stderr.should match(/invalid action: derpis/i)
+        styled_stderr.should match(expecting_foo_bar)
       end
       it "with -h or --help as the first argument, you get help (listing of avaiable commands)" do
         instance.invoke ['-h']
-        stderr.should match(/usage: yourapp \{(?:help\|)?foo\|bar\}/i)
-        stderr.should match(/for help on a particular subcommand/i)
+        styled_stderr.should match(/usage: yourapp \{(?:help\|)?foo\|bar\}/i)
+        styled_stderr.should match(/for help on a particular subcommand/i)
       end
       it "with -h (or help) followed by an action name, you get action-specific help" do
         instance.invoke ['-h', 'foo']
-        stderr.should match(/usage: yourapp foo/i)
+        styled_stderr.should match(/usage: yourapp foo/i)
       end
       context "does fuzzy matching on the action name" do
         let(:klass) do
@@ -710,7 +710,7 @@ module Skylab::Porcelain::TestSupport
           let(:argv) { %w(foo biz baz boz) }
           it "will still throw an argument error" do
             lambda { instance.invoke(argv) }.
-              should raise_exception(ArgumentError, /wrong number of arguments \(3 for 2\)/)
+              should raise_exception(ArgumentError, /wrong number of arguments \(3 for 1..2\)/)
           end
         end
       end

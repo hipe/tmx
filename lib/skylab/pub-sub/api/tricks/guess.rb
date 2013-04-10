@@ -65,6 +65,7 @@ module Skylab::PubSub
     end
 
     def scan_the_depths depth
+      fail 'update me (respond_to)'  # #todo
       if @anchor_mod.respond_to? :emits
         [ @anchor_mod ]
       elsif depth.zero?
@@ -90,6 +91,7 @@ module Skylab::PubSub
         @child_relconst_a << ( name[ @relname.length .. -1 ] )
         if modul.const_defined? const, false  # give autoloading a chance to be avoided!
           mod = modul.const_get const, false
+          fail 'update me'  # #todo
           if mod.respond_to? :emits
             y << mod
           end

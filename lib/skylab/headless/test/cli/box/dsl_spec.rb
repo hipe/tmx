@@ -179,7 +179,7 @@ module Skylab::Headless::TestSupport::CLI::Box::DSL
         expect_strings 'invalid option: -x', _usage_rx, _invite_rx
       end
 
-      it "2.4. expected opt (help) - screen", f:true do
+      it "2.4. expected opt (help) - screen" do
         invoke 'yowzaa', '-h'
         expect_strings 'usage: myapp box-1-0 yowzaa [-h]',
           '',

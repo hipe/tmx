@@ -168,7 +168,7 @@ module Skylab::Headless
         else
           numerish = numerish_x
         end
-        self.nlp_last_length = numerish
+        set_nlp_last_length numerish
       elsif false == numerish_x
         numerish = false
       else
@@ -177,17 +177,17 @@ module Skylab::Headless
       instance_exec numerish, &func
     end
 
-    o[:'nlp_last_length='] = -> x do
-      @nlp_last_length = x
-    end
-
     o[:nlp_last_length] = -> do
       @nlp_last_length
     end
 
+    o[:set_nlp_last_length] = -> x do   # (because to_struct creates getters
+      @nlp_last_length = x              # and setters for each of its methods
+    end                                 # you can't have your nerk end with '=')
+
     memoize_length = -> f do
       -> a do
-        self.nlp_last_length = a.length
+        set_nlp_last_length a.length
         instance_exec a, &f
       end
     end
@@ -205,6 +205,7 @@ module Skylab::Headless
       fun[].oxford_comma[ a, ' or ' ]
     end ]
 
+
     fun = -> do
       # ( we've got to lazy-load it b.c of a circular dependency in the files )
       x = Headless::NLP::EN::Minitesimal::FUN
@@ -215,6 +216,7 @@ module Skylab::Headless
     o.to_struct
 
   end.call
+
 
   module Headless::SubClient::InstanceMethods
 

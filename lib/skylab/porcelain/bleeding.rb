@@ -36,7 +36,7 @@ module Skylab::Porcelain::Bleeding
     include Meta::Methods
 
     def desc
-      reflector.respond_to?(:desc) ? reflector.desc.dup : [] # do not mutate, flyweighting!
+      reflector.respond_to?(:desc) ? reflector.desc.dup : []  # do not mutate, flyweighting!
     end
 
     def is_visible
@@ -768,7 +768,9 @@ module Skylab::Porcelain::Bleeding
     end
 
     def initialize parent, reflector, _obj=nil
-      parent.respond_to? :emit or fail "sanity - is parent not an emitter?"
+      if ! parent.singleton_class.method_defined? :emit
+        fail "sanity - is parent not an emitter?"
+      end
       self.parent = parent
       set! reflector
     end

@@ -30,7 +30,7 @@ module Skylab::Headless::TestSupport::CLI::Table
 
     # --*--
 
-    it "render_table( [] ){ .. } - renders the empty table", f:true do
+    it "render_table( [] ){ .. } - renders the empty table" do
       a = [ ]
       res = render_table [ ] do |o|
         o.on_text do |txt|

@@ -72,7 +72,7 @@ describe "Skylab::MetaHell::FUN" do
         parse( 12, :m ).should eql( [ 12, :m ] )
       end
 
-      it "wrong order", f:true do
+      it "wrong order" do
         -> do
           parse :m, 12
         end.should raise_error( ::ArgumentError, /unrec.+index 1.+\b12\b/i )

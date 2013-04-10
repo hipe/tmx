@@ -159,7 +159,7 @@ module Skylab::Treemap
     end
 
     class Probe::Hash < MetaHell::Proxy::Nice.new :[], :[]=
-      def initialize read, write
+      def self.new read, write
         super :[] => read, :[]= => write
       end
     end

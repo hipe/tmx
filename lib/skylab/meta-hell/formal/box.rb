@@ -293,6 +293,7 @@ module Skylab::MetaHell
         self
       end
     end
+    public :dupe
 
     def dupe_args                 # for initting full duplicates, see `dupe`
       [ * base_args, @order, @hash ]

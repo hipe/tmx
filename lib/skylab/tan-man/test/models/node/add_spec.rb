@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module  Skylab::TanMan::TestSupport::Models::Node
+module Skylab::TanMan::TestSupport::Models::Node
 
-  # *Partially* Quickie compatible oh my!
+  # Quickie.
 
   describe "#{ Skylab::TanMan::Models::Node } adding" do
 
@@ -21,15 +21,13 @@ module  Skylab::TanMan::TestSupport::Models::Node
         controller.node! 'milk the cow'
         controller.node! 'milk the cat'
         controller.node! 'MiLk the catfish'
-        result.nodes.map(& :node_id).should eql( [:milk_3, :milk_2, :milk] )
+        result.nodes.map(& :node_id).should eql( [ :milk_3, :milk_2, :milk ] )
         a = result.nodes.map(& :label)
         a.shift.should eql( 'MiLk the catfish' )
         a.shift.should eql( 'milk the cat' )
         a.shift.should eql( 'milk the cow' )
       end
     end
-
-
 
     using_input(
       "big-ass-prototype-with-html-in-it-watchya-gonna-do-now-omg.dot" ) do
@@ -38,7 +36,7 @@ module  Skylab::TanMan::TestSupport::Models::Node
         msg = <<-O.unindent.strip
           html-escaping support is currently very limited. #{
           }the following characters are not yet supported: "\\t" (009), #{
-          }"\\n" (010), "\\x7F" (127)
+          }"\\n" (010), "\\u007F" (127)
         O
 
         it "when you try to use weird chars for labels - #{
@@ -52,8 +50,6 @@ module  Skylab::TanMan::TestSupport::Models::Node
           e.message.should eql( msg )
         end
       end.call
-
-
 
       -> do
         input = 'joe\'s "mother" & i <wat>'

@@ -180,6 +180,7 @@ module Skylab                     # Welcome! :D
           }module?)" # could be pushed down if really need to
       end
     end
+    public :const_tug  # for 2.0.0
 
     def const_probably_loadable? const  # courtesy, used elsewhere
       const_tug( const ).probably_loadable?

@@ -60,14 +60,15 @@ module Skylab::MetaHell::Klass::Creator
     def klass full_name, *a, &class_body # `a` is extra args, e.g. extends:
                                   # see extensive comments at klass! for now.
 
-
-      if method_defined? :_nearest_klass_full_name # -w
-        if instance_methods(false).include? :_nearest_klass_full_name
-          remove_method :_nearest_klass_full_name
-        end
+      if method_defined? :_nearest_klass_full_name and
+          public_instance_methods( false ).include? :_nearest_klass_full_name
+        undef_method :_nearest_klass_full_name  # -w
       end
-
-      let( :_nearest_klass_full_name ) { full_name } # for i.m. klass()
+      -> do
+        ::Symbol == full_name.class or fail "(fullname must be immutable!)"
+        fullname = full_name  # (no need to dup since above)
+        define_method :_nearest_klass_full_name do fullname end
+      end.call
 
       kg = __metahell_known_graph # (avoid spreading this around)
 

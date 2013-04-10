@@ -1,7 +1,7 @@
 # encoding: utf-8
 require_relative '../test-support'
 
-module Skylab  # (dark hack for 1.9.2 to 1.9.3)
+module Skylab  # [#ts-010]
 # ..
 describe "#{ CovTree } CLI action: tree" do  # Quickie maybe..
 

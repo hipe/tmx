@@ -1119,6 +1119,7 @@ module Skylab::Face
       else   ; ambiguous_command found_a, given
       end
     end
+    public :find_command  # IMPORTANT - 2.0.0 - respond_to?
 
     def report_expecting
       reason "Expecting #{ expecting }."

@@ -253,6 +253,7 @@ module ::Skylab::MetaHell
         Formal::Attribute::MetaAttribute::Box.new
       end
     end
+    public :meta_attributes       # #important - for 2.0.0
 
     def on_attribute_introduced attr
       attr.normalized_name.tap do |name|
@@ -268,7 +269,9 @@ module ::Skylab::MetaHell
       attributes.accept attr
       nil
     end
+    public :on_attribute_introduced
   end
+
                                   # a meta attribute is of course an attribute's
                                   # attribute. users can define them.
                                   # e.g. `default`, `required`, these are

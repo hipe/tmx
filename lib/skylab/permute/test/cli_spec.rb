@@ -1,7 +1,7 @@
 require_relative 'test-support'
 require 'skylab/pub-sub/test/test-support'  # keep here until needed elsewhere
 
-module ::Skylab  # (dark hack to work with 1.9.2 to 1.9.3 change)
+module ::Skylab  # [#ts-010]
 # ..
 describe "#{ Permute::CLI }" do
 

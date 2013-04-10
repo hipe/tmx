@@ -108,5 +108,6 @@ module Skylab::MetaHell
         __memoized[:extends] = mixed
       end
     end
+    public :_set_extends!
   end
 end

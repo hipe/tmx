@@ -38,9 +38,12 @@ module Skylab::Slake
     def nodes
       @order.map { |name| @tasks[name] }
     end
+
+    # (this implementation is identical to that of rake/application.rb attotw)
     def options
-      @options ||= Struct.new(:dryrun, :trace).new(false, false)
+      @options ||= ::OpenStruct.new  # e.g `dryrun`, `trace`, `always_multitask`
     end
+
     SPECIAL_KEYS = [:name, :target]
     attr_accessor :target
     def update_attributes opts

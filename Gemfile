@@ -4,12 +4,13 @@ group :development do
 
   #  for building the gem -
   gem 'rake'
-  gem 'jeweler'
-
+  gem 'jeweler', git: 'https://github.com/emilsoman/jeweler.git',
+                 ref: 'be5ddc35db350e2f0180f165a3129e2833a93072'
+                 # #todo - watch / contribute to above effort
 
   #  for testing, universe-wide (necessary for more than one sub-product)
-  gem 'rspec', '~> 2.9'
-  gem 'debugger'  # #todo - rspec needs this?
+  gem 'rspec'
+  gem 'debugger'
 
   #  by subproduct -
 

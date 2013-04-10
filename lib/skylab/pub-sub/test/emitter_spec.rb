@@ -15,7 +15,8 @@ module ::Skylab::PubSub::TestSupport::Emitter
       context 'gives your class an "emits" method which:' do
 
         it "your class responds to it" do
-          klass.should be_respond_to( :emits )
+          klass.singleton_class.protected_method_defined?( :emits ).
+            should eql( true )
         end
 
         it "when called with an event graph, adds those types to the #{

@@ -1,26 +1,52 @@
 require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::Proxy
-  once = -> do
-    Bingo = MetaHell::Proxy::Nice::Basic.new :moo
-    class Fingo < MetaHell::Proxy::Nice::Basic.new :loo
-    end
-    once = -> { }
-    nil
+
+  module SANDBOX
   end
 
   describe "#{ MetaHell }::Proxy::Nice is nice" do
 
-    it "it creates classes that creates objects that respond to .." do
-      once[]
-      boo = Bingo.new moo: 'x'
-      foo = Fingo.new loo: 'y'
-      ( boo.class == Bingo ).should eql( true )
-      ( foo.class == Fingo ).should eql( true )
-      boo.inspect.should eql(
-        '#<Skylab::MetaHell::TestSupport::Proxy::Bingo moo>' )
-      foo.inspect.should eql(
-        '#<Skylab::MetaHell::TestSupport::Proxy::Fingo loo>' )
+    context "with a straight up-produced class" do
+      once = -> do
+        kls = SANDBOX::Bingo = MetaHell::Proxy::Nice::Basic.new :moo, :mar
+        kls.class_exec do
+          attr_reader :two
+          def initialize one, two
+            @two = [ one, two ]
+          end
+        end
+        ( once = -> { kls } ).call
+      end
+
+      it "class / construct / inspect" do
+        x = once[].new moo: 'x1', mar: 'x2'
+        ( SANDBOX::Bingo == x.class ).should eql( true )
+        x.inspect.should eql(
+          '#<Skylab::MetaHell::TestSupport::Proxy::SANDBOX::Bingo moo, mar>' )
+        x.two.should eql( [ 'x1', 'x2' ] )
+      end
+    end
+
+    context "with a subclass of a produced class" do
+      once = -> do
+        class SANDBOX::Fingo < MetaHell::Proxy::Nice::Basic.new :loo
+          attr_reader :liu
+          def initialize liu
+            @liu = liu
+          end
+        end
+        k = SANDBOX::Fingo
+        ( once = -> { k } ).call
+      end
+
+      it "construct / class / inspect" do
+        foo = once[].new loo: 'y'
+        ( SANDBOX::Fingo == foo.class ).should eql( true )
+        foo.inspect.should eql(
+          '#<Skylab::MetaHell::TestSupport::Proxy::SANDBOX::Fingo loo>' )
+        foo.liu.should eql( 'y' )
+      end
     end
 
     context "does it work if you don't subclass it?" do
@@ -28,6 +54,16 @@ module Skylab::MetaHell::TestSupport::Proxy
       define_method :klass, & MetaHell::FUN.memoize[ -> do
         const = "KLS_#{ Proxy_TestSupport.next_id }"
         kls = MetaHell::Proxy::Nice::Basic.new :weazel, :skeezel
+        kls.class_eval do
+          def initialize w, s
+            @alpha, @beta = w, s
+          end
+          def go
+            @alpha.call
+            @beta.call 'ohai'
+            :gamma
+          end
+        end
         Proxy_TestSupport.const_set const, kls
         kls
       end ]
@@ -44,6 +80,10 @@ module Skylab::MetaHell::TestSupport::Proxy
         rescue ::NoMethodError => e
         end
         e.message.should match( /\Aundefined method `weazel' for/ )
+
+        proxy_object.go.should eql( :gamma )
+        wzl.should eql( :yep )
+        szl.should eql( "moink : ohai" )
       end
     end
   end

@@ -1,8 +1,10 @@
 # encoding: utf-8
 
-require_relative '../../tree'
+require_relative '../test-support'
 
 module Skylab::Porcelain::TestNamespace
+  # (above line left intact for posterity)
+
   module ArrayExtension
     class << self
       def extend_to el
@@ -19,11 +21,10 @@ module Skylab::Porcelain::TestNamespace
     def has_children; !! self[:children] end
     def children_length ; self[:children] ? self[:children].length : 0 end
   end
-end
 
-module Skylab::Porcelain::TestNamespace
-  include Skylab::Porcelain
-  describe Tree do
+  include ::Skylab
+
+  describe Porcelain::Tree do
     it "renders a pretty tree" do
       foo = ArrayExtension[
         { :name => "document",
@@ -74,4 +75,3 @@ module Skylab::Porcelain::TestNamespace
     end
   end
 end
-

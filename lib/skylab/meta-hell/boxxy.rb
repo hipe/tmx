@@ -191,7 +191,7 @@ module Skylab::MetaHell
         if cnst                   # then we found existing w/ a diff. casing
           getme = cnst
         elsif box.respond_to? :const_tug
-          tug = box.send :const_tug, const  # just prod the f.s with a tug
+          tug = box.const_tug const  # just prod the f.s with a tug
           if tug.probably_loadable?
             tug.load -> do
               exist_b = cfunc.call

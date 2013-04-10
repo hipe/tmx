@@ -1,11 +1,16 @@
 require_relative 'test-support'
 
-describe Skylab::Slake::Interpolate do
-  include ::Skylab::Slake
+Skylab::TestSupport::Quickie.enable_kernel_describe
+
+module Skylab::Slake  # [#ts-010]
+# ..
+describe Slake::Interpolate do
+  # include ::Skylab::Slake
 
   it "works" do
     src = ::Struct.new(:a, :b).new('one', 'two')
-    subject.interpolate('{a}AND{b}', src).should eql('oneANDtwo')
+    Interpolate.interpolate( '{a}AND{b}', src ).
+      should eql( 'oneANDtwo' )
   end
 
   describe "with circular dependencies" do
@@ -30,8 +35,11 @@ describe Skylab::Slake::Interpolate do
     end
 
     it "can guarantee protection" do
-      lambda{ klass.new.one }.should raise_exception(::RuntimeError, 'circular depdendency: Foo#two')
+      -> do
+        klass.new.one
+      end.should raise_error( ::RuntimeError, 'circular depdendency: Foo#two' )
     end
   end
 end
-
+# ..
+end

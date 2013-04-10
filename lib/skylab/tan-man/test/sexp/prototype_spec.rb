@@ -26,7 +26,7 @@ module Skylab::TanMan::TestSupport::Sexp::Prototype
       end
     end
     using_input 'invalid-prototype' do
-      it 'raises a runmun error at parse time', f:true do
+      it 'raises a runmun error at parse time' do
         ->{ result }.should raise_error(/when parsing .+prototype/)
       end
     end

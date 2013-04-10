@@ -4,7 +4,7 @@ module ::Skylab::MetaHell::TestSupport::Boxxy
 
   describe "#{ MetaHell::Boxxy } load" do
 
-    it "fetching the same nerk twice does not fail", f:true do # catch an edge case
+    it "fetching the same nerk twice does not fail" do # catch an edge case
       mod = Boxxy_TestSupport::Fixtures::Neeples
       mod.const_fetch :line_count
       mod.const_fetch :line_count

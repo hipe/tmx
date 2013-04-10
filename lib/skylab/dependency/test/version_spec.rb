@@ -27,7 +27,7 @@ module Skylab::Dependency::TestSupport
       _parse "12.345.67abc"
     end
 
-    it "whines on ambiguity", f:true do
+    it "whines on ambiguity" do
       ui = UI::Tee.new silent: true
       str = "abc1.2.3def4.5"
       sexp = Dependency::Version.parse_string_with_version(str) do |o|

@@ -1,15 +1,16 @@
 require_relative 'test-support'
 
-describe ::Skylab::Slake::Task do
-
-  include ::Skylab::Slake
+module Skylab::Slake::TestSupport  # [#ts-010]
+  TestSupport::Quickie.enable_kernel_describe
+# ..
+describe Slake::Task do
 
   it "descends from Rake::Task (fyi)" do
-    Task.new.should be_kind_of(::Rake::Task)
+    Task.new.should be_kind_of( ::Rake::Task )
   end
 
   it "defines settable/gettable attributes in the class" do
-    klass = ::Class.new(Task).class_eval do
+    klass = ::Class.new( Task ).class_eval do
       attribute :some_val
       self
     end
@@ -21,7 +22,7 @@ describe ::Skylab::Slake::Task do
 
   describe "has different ways of describing its actions:" do
     describe "When it overrides the execute() method of rake parent" do
-      class SomeTask < Slake::Task
+      class SomeTask < Task
         def execute args
           @touched = true
         end
@@ -72,7 +73,7 @@ describe ::Skylab::Slake::Task do
 
   describe "can define attributes as being interpolated" do
     it "and can then make references to other attributes" do
-      klass = Class.new(::Skylab::Slake::Task).class_eval do
+      klass = ::Class.new( Task ).class_eval do
         attribute :foo, :interpolated => true
         attribute :bar
         self
@@ -86,7 +87,7 @@ describe ::Skylab::Slake::Task do
   end
 
   describe "when it comes to parents, it" do
-    FakeParent = Class.new.class_eval do
+    FakeParent = ::Class.new.class_eval do
       self
     end.new
 
@@ -114,4 +115,5 @@ describe ::Skylab::Slake::Task do
     end
   end
 end
-
+# ..
+end

@@ -115,9 +115,13 @@ module Skylab::Porcelain::Legacy
       #
       mutex_h.fetch self do
         mutex_h[ self ] = true
-        if respond_to? :emits     # pub-sub is opt-in. implement emit as u like
+
+        # pub-sub is opt-in hence the below conditional --
+        # implement `emit` as u like.
+        if singleton_class.method_defined? :emits  # *not* r-espond_to
           class_exec(& event_graph_init )
         end
+
         @is_collapsed = nil
         @order_a = [ ]
         @story ||= begin
@@ -1013,7 +1017,7 @@ module Skylab::Porcelain::Legacy
       end,
       3 => -> up, pay, info, blk do
         blk and raise ::ArgumentError, "won't take block and args"
-        if respond_to? :event_listeners  # if pub sub
+        if singleton_class.method_defined? :event_listeners  # if pub sub
           if pay  # (may have intentionally passed nil)
             on_payload        do |e| pay.puts  e.text end
           end
