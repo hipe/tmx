@@ -8,7 +8,6 @@ module Skylab::CodeMolester
     # If ever we have really kinky requirements for rendering parse
     # error messages, this would be a place to start.
 
-
     render_options = ::Struct.new :escape_path
 
     define_method :render do |opts_h=nil|
@@ -82,8 +81,7 @@ module Skylab::CodeMolester
           a << "at the beginning of line #{ line_number }"
         end
 
-        str = a.join ' '
-        str
+        a.join ' '
       end
       freeze
     end

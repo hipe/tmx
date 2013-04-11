@@ -1,6 +1,6 @@
 module ::Skylab::CodeMolester
-  # thanks to zenspider
 
+  # apologies to zenspider
 
   class Sexp < ::Array
 

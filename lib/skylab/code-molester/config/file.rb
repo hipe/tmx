@@ -2,6 +2,8 @@ module ::Skylab::CodeMolester
 
   class Config::File
 
+    # (while [#ps-101] (cover pub-sub viz) is open..)
+
     module Foofer
       extend PubSub::Emitter
       emits wizzle: :paazle
@@ -48,7 +50,6 @@ module ::Skylab::CodeMolester
 
     delegates_to :sexp, :key?, -> { valid? }
 
-
     # **NOTE** the meaning of `modified?` may have changed since we last used
     # it: it *used* to mean: "does the file that is currently on disk have
     # an `mtime` that is greater than the `mtime` was when we last read it?"
@@ -61,12 +62,12 @@ module ::Skylab::CodeMolester
     #
     # For those instances that are not (yet?) associated with a pathname,
     # the question of if it is `modified?` is meaningless and potentially
-    # hazardous if misunderstood.  In such cases we raise a sanity check
+    # hazardous if misunderstood. In such cases we raise a sanity check
     # exception.
     #
     # For those instances that are not valid, the question of whether the
     # object is `modified?` should not be asked, because this library will
-    # try to prevent you from writing such objects to disk.  Likewise a runtime
+    # try to prevent you from writing such objects to disk. Likewise a runtime
     # error is raised in such cases.
 
     def modified?
@@ -90,7 +91,7 @@ module ::Skylab::CodeMolester
     end
 
     def noun                      # clients may find this useful in e.g.
-      @entity_noun_stem || 'config file' # reflection (thing `git status`)
+      @entity_noun_stem || 'config file'  # reflection (thing `git status`)
     end
 
     def path
@@ -99,7 +100,7 @@ module ::Skylab::CodeMolester
 
     def path= str                 # with this class we try to create objects
       if @pathname                # that are "semi-immutable", however for some
-        raise "won't overwrite existing path" # applications it is useful to
+        raise "won't overwrite existing path"  # applications it is useful to
       end                         # be able to build the instancep progressively
       if str                      # hence we experiment with this.
         @pathname = ::Pathname.new str.to_s
@@ -116,7 +117,7 @@ module ::Skylab::CodeMolester
     Read = ::Struct.new :error, :read_error, :no_ent, :is_not_file,
       :invalid, :escape_path
 
-    define_method :read do |&block|
+    define_method :read do |&block|  # ( b.c uses `default_escape_path` )
       ev = Read.new
       block[ ev ] if block
       escape_path = -> pathname do
@@ -128,11 +129,11 @@ module ::Skylab::CodeMolester
       if @pathname.exist?
         stat = @pathname.stat
         if 'file' == stat.ftype
-          content = @pathname.read # change state only after this succeeds
+          content = @pathname.read  # change state only after this succeeds
           pn_ = @pathname         # clear everythihng but the pathname - ick
           clear
           @pathname = pn_
-          @pathname_was_read = true # used e.g by InvalidReason for l.g.
+          @pathname_was_read = true  # used e.g by InvalidReason for l.g.
           @content = content      # avoid circular dependency inf. loop here by
           if valid?               # setting @content before calling `valid?`
             res = true
@@ -181,8 +182,9 @@ module ::Skylab::CodeMolester
       end
     end
 
-    # `to_s` - don't define or alias this.  It is so ambiguous
-    # for this class it should not be used.
+    # `to_s` - don't define or alias this. It is so ambiguous for such an
+    # object as this that it should not be assigned any special behavior,
+    # nor used in application code.
 
     delegates_to :sexp, :value_items, -> { valid? }
 
@@ -216,52 +218,104 @@ module ::Skylab::CodeMolester
 
     delegates_to :pathname, :writable?
 
-    # (below class is file-private but so-named for friendlier debugging)
-
-    Write = PubSub::Emitter.new
-
+    Write = PubSub::Emitter.new  # see `write`
     class Write
-      # the world'd most interesting graph
+
+      # (this class is file-private but so-named for friendlier debugging)
+
+      # the world'd most interesting graph - see `write`
 
       taxonomic_streams :all, :structural, :text, :notice, :before, :after
 
       emits error: [ :text, :all ],
         notice: [ :text, :all ], before: :all, after: :all,
-        before_edit:   [ :structural, :notice, :before ],
-        after_edit:    [ :structural, :notice, :after ],
+        before_update:   [ :structural, :notice, :before ],
+        after_update:    [ :structural, :notice, :after ],
         before_create: [ :structural, :notice, :before ],
         after_create:  [ :structural, :notice, :after ],
         no_change:     [ :notice, :text ]
 
       event_factory -> { PubSub::Event::Factory::Isomorphic.new Events }
 
+      # a dubious and experimental way to pass in parameters -
+
+      attr_accessor :dry_run
+      alias_method :is_dry_run, :dry_run
+
       attr_accessor :escape_path
+    end
+
+    module EVENT_
+      # filled with joy
     end
 
     module Events
       extend MetaHell::Boxxy
       Text = PubSub::Event::Factory::Datapoint
-      Structural = PubSub::Event::Factory::Structural.new 2
+      Structural = PubSub::Event::Factory::Structural.new 2, nil, EVENT_
     end
 
-    # `default_escape_path` define above
+    # `write` - because so many different interesting things can happen when
+    # we set out to write a file, we have a custom emitter class that models
+    # this event graph that callers can use to hook into these event streams.
+    #
+    # For one thing the file either does or does not already exist,
+    # and for these two states we will variously use the verbs `update`
+    # or `create` respectively in various symbols below.
+    #
+    # We emit separate events immediately `before` and immediately `after`
+    # the file is written to, which, when events on such streams are received
+    # by the caller that has a CLI modality, they are frequently written
+    # out as one line in two parts, with the reasoning that it is useful to
+    # see separately that the file writing *began* at all and that the file
+    # writing *completed* (successfully) -- and doing this in two separate
+    # lines may be considered too noisy -- however having the first half
+    # of the line written out e.g. to a logfile might be nice so that you
+    # have the filename recorded right before e.g a permission error was
+    # thrown by the filesystem.)
+    #
+    # The four symbols introduced above (`create`, `update`, `before`,
+    # `after`) exist as taxonomic streams, and then additionally one stream
+    # each for the four permutations of the two "exponents" for each of the
+    # two "categories" exists ("before_create", "after_update") etc.
+    #
+    # ("taxonomic streams" are streams that exist only to categories other
+    # streams (kind of like folders, more like tags). they are useful if
+    # you wanted subscribe only to certain sub-streams of events -
+    # e.g only the "after-" related events or only the "update-" related
+    # events.)
+    #
+    # Other taxonomic streams used include `text` v.s `structural` (whether
+    # the event is a string or a struct-ish of metadata (in the inheritence
+    # chain of a given stream, first one wins here) -- this may help you
+    # decide programmatically how to handle the event); and `notice` vs.
+    # `error` i.e. the severity -- e.g you may only want to act on events
+    # when they are at a certain level of severity to you.
+    #
+    # This big graph of streams is best viewed with `pub-sub viz`, a command-
+    # line tool that is part of pub-sub and works in conjunction with graph-viz
+    # to display this graph visually.
+    #
+    # (incidentally this and its two constituent implementation methods
+    # is becoming the poster-child wet-dream of [#hl-022], which seeks
+    # - possibly in vain - to dry up this prevalent pattern..)
 
-    define_method :write do |&block|
+    define_method :write do |&block|  # ( because uses `default_escape_path`)
       res = nil
-      em = Write.new
-      block[ em ] if block
-      em.escape_path ||= default_escape_path
+      w = Write.new
+      block[ w ] if block
+      w.escape_path ||= default_escape_path
       @pathname or
         raise "cannot write - no pathname associated with this #{ noun }"
       if valid?
         if exist?
           if @pathname_was_read
-            res = update em
+            res = update w
           else
-            fail "won't overwrite a pathname that was not first read" # stub
+            fail "won't overwrite a pathname that was not first read"  # stub
           end
         else
-          res = create em
+          res = create w
         end
       else
         raise "attempt to write invalid #{ noun } - check if valid? first"
@@ -291,66 +345,80 @@ module ::Skylab::CodeMolester
       @content = @invalid_reason = @pathname = @pathname_was_read = @valid = nil
     end
 
-    def create em
-      result = nil # assume valid? and @pathname which not exist?
+    def create w  # ( assumes valid? and @pathname which not exist? )
+      res = nil
       begin
-        em.emit :before_create,
+        w.emit :before_create,
           resource: self,
-          message: "creating #{ em.escape_path[ @pathname ] }"
+          message_function: -> { "creating #{ w.escape_path[ @pathname ] }" }
 
         # because the below are not considered porcelain-level errors, they
-        # use neither the emitter nor `escape_path`
+        # use neither the emitter nor `escape_path` (for now..)
         @pathname.dirname.exist? or
           raise "parent directory does not exist, cannot write - #{
             }#{ @pathname.dirname }"
 
         @pathname.dirname.writable? or
-          raise "parent directory is not writable, cannot write #{
+          raise "parent directory is not writable, cannot write - #{
             }#{ @pathname }"
 
         bytes = nil
-        @pathname.open( 'w+' ) { |fh| bytes = fh.write string }
 
-        em.emit :after_create,
+        if ! w.is_dry_run              # (contrast with `update`)
+          @pathname.open 'a' do |fh|   # ('a' not 'w' to fail gloriously)
+            bytes = fh.write string
+          end
+        end
+
+        w.emit :after_create,
           bytes: bytes,
-          message: "created #{ em.escape_path[ @pathname ] } (#{ bytes } bytes)"
+          message_function: -> do
+            "created #{ w.escape_path[ @pathname ] } (#{ bytes } bytes)"
+          end
 
-        result = bytes
+        res = bytes
       end while nil
-      result
+      res
     end
 
     attr_reader :entity_noun_stem
 
-    def update em
-      result = nil
+    def update w
+      res = nil
       begin
         string = self.string      # thread safety HA
 
         if string == @pathname.read # #twice
-          em.emit :no_change,
-            "no change: #{ em.escape_path[ @pathname ] }"
+          w.emit :no_change,
+            "no change: #{ w.escape_path[ @pathname ] }"
           break
         end
 
-        em.emit :before_edit,
+        w.emit :before_update,
           resource: self,
-          message: "updating #{ em.escape_path[ @pathname ] }"
+          message_function: -> { "updating #{ w.escape_path[ @pathname ] }" }
 
         @pathname.writable? or
           raise "path is not writable, cannot write - #{ @pathname }"
 
         bytes = nil
-        pathname.open( 'w' ) { |fh| bytes = fh.write string }
 
-        em.emit :after_edit,
+        pathname.open 'w' do |fh|
+          if ! w.is_dry_run  # ( contrast with `create` )
+            bytes = fh.write string
+          end
+        end
+
+        w.emit :after_update,
           bytes: bytes,
-          message: "updated #{ em.escape_path[ @pathname ] } (#{ bytes } bytes)"
+          message_function: -> do
+            "updated #{ w.escape_path[ @pathname ] } (#{ bytes } bytes)"
+          end
 
-        result = bytes
+        res = bytes
 
       end while nil
-      result
+      res
     end
 
     #

@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::CodeMolester::TestSupport::Config::File
 
-  extend TestSupport::Quickie # try running this file just with `ruby -w`
+  extend TestSupport::Quickie  # try running this file just with `ruby -w`
 
   describe "#{ CodeMolester::Config::File } events" do
 
@@ -24,7 +24,7 @@ module Skylab::CodeMolester::TestSupport::Config::File
         'No such file or directory - not-exist.conf' do |exp|
 
         begin o.read { |o| } ; rescue ::Errno::ENOENT => e ; end
-        e.message.should eql(exp)
+        e.message.should eql( exp )
       end
 
       it "with a custom `escape_path` lamda, display e.g. full pathnames" do
@@ -140,12 +140,12 @@ module Skylab::CodeMolester::TestSupport::Config::File
         end
 
         context "when the target path does not exist" do
-          context "when the containing dir exists - works" do
+          context "when the containing dir exists" do
             let :path do
               tmpdir.join 'some.conf'
             end
 
-            it "when calling `write` with no event handlers" do
+            it "when calling `write` with no event handlers - works" do
               tmpdir.clear # ick
               path.exist?.should eql(false)
               res = o.write
@@ -153,25 +153,43 @@ module Skylab::CodeMolester::TestSupport::Config::File
               path.exist?.should eql(true)
             end
 
-            it "when calling `write` with some event handlers" do
+            it "when calling `write` with some event handlers - works" do
               tmpdir.clear # ick
               path.exist?.should eql(false)
               str1 = '' ; ohai = str2 = nil
-              res = o.write do |em|
-                em.escape_path = ->( pn ) { "~~{ #{ pn.basename } }~~" }
-                em.on_before_create do |e|
+              res = o.write do |w|
+                w.escape_path = ->( pn ) { "~~{ #{ pn.basename } }~~" }
+                w.on_before_create do |e|
                   ohai = e.resource.pathname.basename.to_s
-                  str1 << e.message
+                  str1 << e.message_function[]
                 end
-                em.on_after_create do |e|
+                w.on_after_create do |e|
                   str1 << " .. done (#{ e.bytes } bytes)."
-                  str2 = e.message
+                  str2 = e.message_function[]
                 end
               end
               ohai.should eql('some.conf')
               res.should eql(7) # the number of bytes written!
               str1.should eql('creating ~~{ some.conf }~~ .. done (7 bytes).')
               str2.should eql('created ~~{ some.conf }~~ (7 bytes)')
+              path.exist?.should eql( true )
+            end
+
+            it "when employing `dry_run` - does not write file", f:true do
+              tmpdir.clear  # ick
+              path.exist?.should eql( false )
+              yep = nil
+              o = self.o
+              $path = path
+              bytes = o.write do |w|
+                w.dry_run = true
+                w.on_after_create do |e|
+                  yep = e.message_function[]
+                end
+              end
+              bytes.should eql( nil )
+              yep.should match( /created some.conf \( bytes\)/ )
+              path.exist?.should eql( false )
             end
           end
 
@@ -251,11 +269,11 @@ module Skylab::CodeMolester::TestSupport::Config::File
           config_file_new path: path
           o['foo'] = 'boffo'
           str = ''
-          res = o.write do |em|
-            em.on_before_edit do |e|
+          res = o.write do |w|
+            w.on_before_update do |e|
               str << "updating #{ e.resource.pathname.basename }"
             end
-            em.on_after_edit do |e|
+            w.on_after_update do |e|
               str << " .. done (#{ e.bytes } bytes)."
             end
           end

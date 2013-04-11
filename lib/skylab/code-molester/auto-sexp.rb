@@ -29,8 +29,6 @@ module ::Skylab::CodeMolester
   end
 end
 
-
-
 module ::Skylab::CodeMolester::AutoSexp
 
   EXPAND = { 't' => :terminal, 'n' => :nonterminal, 'w' => :whitespace }
