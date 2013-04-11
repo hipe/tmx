@@ -1,9 +1,5 @@
 module Skylab::PubSub
 
-  module API
-    extend MetaHell::Autoloader::Autovivifying::Recursive
-  end
-
   class API::Action
 
     def self.formal_parameters
@@ -182,22 +178,5 @@ module Skylab::PubSub
         break( res = nil )
       end
     end.call
-  end
-
-  class API::Formal_Parameter
-
-    attr_reader :ivar
-
-    attr_reader :label
-
-    attr_reader :sym
-
-  protected
-
-    def initialize name
-      @sym = name
-      @ivar = :"@#{ name }"
-      @label = name.to_s
-    end
   end
 end

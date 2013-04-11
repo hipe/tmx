@@ -12,4 +12,5 @@ module Skylab::PubSub
 
   # (note `FUN` is a stowaway module in emitter.rb)
 
+  MAARS = MetaHell::Autoloader::Autovivifying::Recursive
 end
