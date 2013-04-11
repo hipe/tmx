@@ -33,8 +33,8 @@ module Skylab::Face
   class CLI < Namespace
 
     def self.inherited cls
+      cls.init_namespace NS_Sheet.new( cls )   # Namespace classes
       super  # kray
-      cls.init_namespace NS_Sheet.new( cls )  # Namespace classes
 
         # - like many other entities here - internally store their business
         # data in a "character-sheet"-ish object (called a "story" when
@@ -418,7 +418,12 @@ module Skylab::Face
 
       mod_blocks = -> rc_sheet do
         box = box_mod[ rc_sheet ]
-        kls = box.const_set self.name.as_const, ::Class.new( Namespace )
+        kls = ::Class.new Namespace
+
+        kls.instance_variable_set :@story, nil
+          # either we do this or we subclass namespace ..
+
+        kls = box.const_set self.name.as_const, kls
         kls.init_namespace self
         kls.story.add_option BRANCH_HELP
         @host_module = kls  # important! before below.
@@ -997,7 +1002,9 @@ module Skylab::Face
 
   class Namespace  # (re-open)
 
-    Adapter = CLI::Adapter  # this puts the constant in the scope of n.s subclss
+    module Adapter  # intermediate n.s's use a different adapter
+      extend MAARS  # than mode clients
+    end
 
     #                 ~ parts of our DSL and cetera ~
 
@@ -1007,11 +1014,18 @@ module Skylab::Face
         cls.class_exec do
           @do_grab_next_method = nil
           @order_a = [ ]
+          @story ||= begin
+            NS_Sheet.new( self )
+          end
         end
+        nil
       end
 
       def init_namespace sheet
-        @story = sheet
+        did = nil
+        @story ||= begin did = true ; sheet end
+        did or fail "sanity - clobber existing story?"  # #todo
+        nil
       end
 
       def story
@@ -1292,8 +1306,13 @@ module Skylab::Face
     end
     public :error_stream_yielder  # #up-delegator
 
-    def initialize request_client, slug_fragment
-      super request_client, self.class.story, slug_fragment
+    def initialize request_client, slug_fragment, opt_h=nil
+      if opt_h
+        sheet = nil
+        opt_h_h = { sheet: -> x { sheet = x } }
+        opt_h.each { |k, v| opt_h_h.fetch( k ).call( v ) }
+      end
+      super request_client, sheet || self.class.story, slug_fragment
     end
 
     def self.method_added meth  # keep at end!

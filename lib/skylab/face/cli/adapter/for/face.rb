@@ -4,14 +4,15 @@ module Skylab::Face
 
     module Of
 
-      Hot = -> strange_mod do
+      Hot = -> own_strange_app_class do
         -> sheet, rc, rc_sheet, slug_fragment do
-          strange_mod.new(
+          pn = "#{ rc.invocation_string } #{ sheet.name.as_slug }"
+          sht = Ouroboros_Sheet[ sheet, own_strange_app_class.story ]
+          own_strange_app_class.new(
             out: rc.out,
             err: rc.err,
-            program_name:
-              "#{ rc.invocation_string } #{ sheet.name.as_slug }",
-            sheet: Ouroboros_Sheet[ sheet, strange_mod.story ]
+            program_name: pn,
+            sheet: sht
           )
         end
       end

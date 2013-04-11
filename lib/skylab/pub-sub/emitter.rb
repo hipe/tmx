@@ -650,6 +650,7 @@ module Skylab::PubSub
         extend PubSub::Emitter
 
         public :emit # [#ps-002] these objects are used exclusively so
+        public :with_specificity  # likewise this is always ok here
 
         class << self
           public :event_class, :event_factory

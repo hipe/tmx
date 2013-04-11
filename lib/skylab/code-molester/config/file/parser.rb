@@ -138,7 +138,7 @@ module Skylab::CodeMolester
     -> do  # kinda hacky to do this here but we want it self-contained ..
       env_var = 'SKYLAB_CM_DEBUG'
       val = ::ENV[ env_var ]
-      if val
+      if val && '' != val
         y << "#{ env_var }=#{ val.inspect }"
         self.do_debug = true
       end

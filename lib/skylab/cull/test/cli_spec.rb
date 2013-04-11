@@ -6,7 +6,7 @@ module Skylab::Cull::TestSupport
 
     extend Cull_TestSupport
 
-    as :exp, /\AExpecting init\.\z/, :styled
+    as :exp, /\AExpecting init/, :styled
     as :inv, /\ATry wtvr -h \[sub-cmd\] for help\.\z/, :styled
 
     context "canon" do

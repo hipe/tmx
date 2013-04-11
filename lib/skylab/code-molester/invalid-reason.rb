@@ -7,6 +7,11 @@ module Skylab::CodeMolester
     #
     # If ever we have really kinky requirements for rendering parse
     # error messages, this would be a place to start.
+    #
+    # EDIT: no actually i take that back. this class *is* used and it *is*
+    # useful - it is the first hint an event object as we use them today -
+    # it is a nice little encapsulation of the parse error message that
+    # we can throw around and bubble up.
 
     render_options = ::Struct.new :escape_path
 

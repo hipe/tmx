@@ -216,6 +216,16 @@ module ::Skylab::CodeMolester
       @valid
     end
 
+    # the new way - looks atomic to the outside, might be from immutable object
+
+    def if_valid if_yes_have_self, if_no_have_this_error_metadata
+      if valid?
+        if_yes_have_self[ self ]
+      else
+        if_no_have_this_error_metadata[ @invalid_reason ]
+      end
+    end
+
     delegates_to :pathname, :writable?
 
     Write = PubSub::Emitter.new  # see `write`
@@ -229,10 +239,10 @@ module ::Skylab::CodeMolester
 
       emits error: [ :text, :all ],
         notice: [ :text, :all ], before: :all, after: :all,
-        before_update:   [ :structural, :notice, :before ],
-        after_update:    [ :structural, :notice, :after ],
-        before_create: [ :structural, :notice, :before ],
-        after_create:  [ :structural, :notice, :after ],
+        before_update:   [ :structural, :before, :notice ],
+        after_update:    [ :structural, :after, :notice ],
+        before_create: [ :structural, :before, :notice ],
+        after_create:  [ :structural, :after, :notice ],
         no_change:     [ :notice, :text ]
 
       event_factory -> { PubSub::Event::Factory::Isomorphic.new Events }

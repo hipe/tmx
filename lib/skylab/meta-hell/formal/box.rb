@@ -349,8 +349,8 @@ module Skylab::MetaHell
   protected
       #         ~ protected methods that add to the box's contituency ~
 
-    def accept attr               # convenience `store`-ish for nodes like this
-      add attr.normalized_name, attr  # might go away, hella smell #todo
+    def accept item               # convenience `store`-ish for nodes like this
+      add item.normalized_name, item  # might go away, hella smell #todo
       nil
     end
                                   # (note there is not even a protected version
@@ -475,7 +475,7 @@ module Skylab::MetaHell
     end
 
     #   ~ mutators made public (we might just do it whole hog..) ~
-    public :accept, :add, :change  # #exp
+    public :accept, :add, :change, :clear  # #exp
 
     public :partition_by_keys!, :sort_names_by!
 

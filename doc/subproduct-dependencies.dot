@@ -26,6 +26,7 @@ bnf [label="bnf2treetop" fillcolor="#79f233"]
 code [label="code molester" fillcolor="#b5d5fb"]
 cov [label="cov tree" fillcolor="#b5d5fb"]
 css [label="css convert" fillcolor="#79f233"]
+cull [label="cull" fillcolor="#79f233"]
 dependency [label=dependency fillcolor="#b5d5fb"]
 face [label=face fillcolor="#dddddd"]
 file [label="file metrics" fillcolor="#999999"]
@@ -61,6 +62,7 @@ cov -> meta
 cov -> legacy
 cov -> pub
 css -> headless
+cull -> face
 git -> meta
 gsu -> headless
 gsu -> meta
@@ -71,6 +73,7 @@ dependency -> headless
 dependency -> porcelain
 dependency -> pub
 dependency -> slake
+file -> face
 face -> meta
 file -> headless
 flex -> headless
@@ -99,6 +102,7 @@ tan -> meta
 tan -> pub
 test -> headless
 test -> meta
+tmx -> face
 treemap -> headless
 treemap -> meta
 treemap -> porcelain
