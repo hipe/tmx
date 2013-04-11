@@ -2,11 +2,11 @@ require_relative '../semantic/core' # etc
 
 module Skylab::PubSub
 
-  extend ::Skylab::Autoloader
+  %i[ Autoloader MetaHell PubSub Semantic ].each do |i|
+    const_set i, ::Skylab.const_get( i )
+  end
 
-  MetaHell = ::Skylab::MetaHell
-  PubSub   = self
-  Semantic = ::Skylab::Semantic
+  extend MetaHell::Autoloader::Autovivifying::Recursive
 
   self.const_get :Emitter, false
 

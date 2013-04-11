@@ -11,6 +11,7 @@ module Skylab::PubSub
                :files,
                :modul,
                :outfile_name,
+               :root_constant,
                :use_force
     ].each { |k| attr_writer k }
 
@@ -19,6 +20,7 @@ module Skylab::PubSub
       begin
         res = resolve_params or break
         res = resolve_infiles or break
+        res = resolve_root_const or break
         res = resolve_mods or break
         res = resolve_jobs or break
         res = execute_jobs or break
@@ -35,8 +37,71 @@ module Skylab::PubSub
       @do_guess_mod ? true : super
     end
 
+    -> do  # `resolve_root_const`
+
+      pathify = Autoloader::Inflection::FUN.pathify
+      constantize = Autoloader::Inflection::FUN.constantize
+
+      define_method :resolve_root_const do
+        @mod_a = nil
+        res = false
+
+        early_ok = -> do
+          res = true
+          nil
+        end
+
+        idx = part_a = path = nil
+        resolve_idx = -> do
+          @root_constant or break early_ok[ ]
+          filename = pathify[ @root_constant ]
+          path = @files.fetch 0
+          part_a = path.split '/'
+          idx = part_a.index filename
+          idx or break error "expected #{ filename.inspect } to occur in #{
+            }path but it did not - #{ path }"
+          true
+        end
+
+        toplevel_const = -> do
+          pn = ::Pathname.new(
+            "#{ part_a[ 0 .. idx ] * '/' }#{ Autoloader::EXTNAME }" )
+          pn.exist? or break error( "expected to exist but did not - #{
+            }#{ pn }" )
+          if ! ::Object.const_defined? @root_constant
+            load pn
+          end
+          if ! ::Object.const_defined? @root_constant
+            break error( "toplevel constants #{ @root_constant.inspect } #{
+             }not defined after loading file - #{ pn }" )
+          end
+          true
+        end
+
+        load_each_const = -> do
+          rc = ::Object.const_get @root_constant
+          const = part_a[ idx + 1 .. -1 ].reduce rc do |cnst, x|
+            cnst.const_get constantize[ x ], false
+          end
+          @files.length > 1 and fail "test me - multiple files"  # todo
+          @do_guess_mod = nil
+          @mod_a = [ const ]
+          true
+        end
+
+        -> do
+          resolve_idx[ ] or break
+          toplevel_const[ ] or break
+          load_each_const[ ] or break
+          res = true
+        end.call
+        res
+      end
+    end.call
+
     def resolve_mods
-      if @do_guess_mod
+      if @mod_a  # then nothing
+      elsif @do_guess_mod
         o = API::Tricks::Guess.new prefix, @paystream, @infostream, @files.first
         a = o.guess
         a and mod_a = a
@@ -45,7 +110,8 @@ module Skylab::PubSub
           mod_a = [ @mod ]
         end
       end
-      if ! mod_a then false else
+      if @mod_a then true
+      elsif ! mod_a then false else
         @mod_a = mod_a
         true
       end

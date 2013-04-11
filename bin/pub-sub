@@ -2,4 +2,4 @@
 
 require_relative '../lib/skylab/pub-sub/core'
 
-::Skylab::PubSub::CLI.new.invoke ARGV
+::Skylab::PubSub::CLI.new( nil, $stdout, $stderr ).invoke ARGV

@@ -4,6 +4,18 @@ module Skylab::PubSub
     extend MAARS
   end
 
+  API::FUN = -> do
+
+    o = { }
+
+    o[:looks_like_emitter_module] = -> x do
+      x.singleton_class.method_defined? :emits
+    end
+
+    ::Struct.new( * o.keys ).new( * o.values )
+
+  end.call
+
   class API::Formal_Parameter
 
     attr_reader :ivar

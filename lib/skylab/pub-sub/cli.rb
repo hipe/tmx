@@ -35,7 +35,12 @@ module Skylab::PubSub
         p[:do_digraph] =
         p[:do_show_backtrace] =
         p[:do_write_files] =
+        p[:root_constant] =
         p[:use_force] = false
+
+      o.on '-r <root-const>', "root constant (e.g `Skylab`)" do |x|
+        p[:root_constant] = x
+      end
 
       o.on '-d', '--digraph', 'surround output in "digraph{ .. }"' do
         p[:do_digraph] = true

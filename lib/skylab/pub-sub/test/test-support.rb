@@ -15,4 +15,14 @@ module Skylab::PubSub::TestSupport
                                   # lexically scoped under this one.
                                   # (necessary for e.g in Nub)
 
+  include CONSTANTS
+
+  PubSub = PubSub  # yeah
+
+  module InstanceMethods
+
+    def fixtures_dir_pn
+      PubSub::TestSupport.dir_pathname.join( 'fixtures' )
+    end
+  end
 end

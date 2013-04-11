@@ -118,7 +118,7 @@ module Skylab::PubSub
         )
       \z/x
 
-      define_method :resolve_mod do ||
+      define_method :resolve_mod do
         if @modul
           md = modul_rx.match( @modul )
           if md
@@ -175,7 +175,6 @@ module Skylab::PubSub
           end
           @infostream.puts "#{ line }#{ s })"
         end
-        break( res = nil )
       end
     end.call
   end
