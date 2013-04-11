@@ -230,7 +230,10 @@ module Skylab::Semantic
       inverted = invert
       name_a.each do |key|
         if inverted.has? key
-          inverted.walk_pre_order( key, 0, extent_h ).each do end
+          if ! extent_h[ key ]
+            inverted.walk_pre_order( key, 0, extent_h ).each do end
+              # see each one
+          end
         end
       end
       # build a sub-graph wherein you don't include any nodes on the list

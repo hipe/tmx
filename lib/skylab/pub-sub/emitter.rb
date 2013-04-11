@@ -167,6 +167,10 @@ module Skylab::PubSub
       event_listeners.add_listener stream_name, *func, &block
     end
 
+    def with_specificity &blk
+      event_listeners.with_specificity( blk )
+    end
+
     -> do
 
       #                       ~ EXPERIMENTAL ~
@@ -391,6 +395,9 @@ module Skylab::PubSub
 
   protected
 
+    # `emit` - this is a sacred and holy workhorse method.
+    # it is one of the centers of the universe.
+
     def emit x, *payload_a
       esg = @event_stream_graph.call
       if 0 == payload_a.length && x.respond_to?( :is_event ) && x.is_event
@@ -401,18 +408,18 @@ module Skylab::PubSub
           fail "undeclared event type #{ x.inspect } for #{ self.class }"
         end.normalized_local_node_name  # errors please, it's just x
       end
-      ancestors = esg.ancestors( stream_name ).to_a
+      ancestor_a = esg.ancestors( stream_name ).to_a
       # (the below line is like the central thesis statement of the whole lib)
-      ( ancestors & @event_listeners.names ).each do |k|
+      ( ancestor_a & @event_listeners.names ).each do |k|
         @event_listeners.fetch( k ).each do |func|
           if do_build
             do_build = nil
             event = build_event stream_name, *payload_a
           end
-          if 1 == func.arity
+          if 1 == func.arity                   # ( tied to [#ps-013] )
             func[ event ]
           elsif event
-            if event.respond_to? :payload_a   # #todo remove if never used
+            if event.respond_to? :payload_a    # #todo remove if never used
               func[ * event.payload_a ]
             else
               func[ * payload_a ]
@@ -422,6 +429,7 @@ module Skylab::PubSub
           end
         end
       end
+      @event_listeners.emitted                 # notify it
       nil  # (we used to result in a count of listeners but what a smell!)
     end
 
@@ -549,17 +557,62 @@ module Skylab::PubSub
   end
 
   class PubSub::Event::Listeners < MetaHell::Formal::Box
+
     def add_listener name, func=nil, &blk
       if func
         blk and raise ::ArgumentError, "too many arguments (func and block?)"
         blk = func
       end
-      if blk.respond_to? :call
-        @hash.fetch name do add name, [] end.push blk
-      else
-        raise ::ArgumentError, "callable? #{ blk.class }" # #todo - take this out after allgreen
+      blk.respond_to? :call or raise ::ArgumentError, "callable? #{ blk.class }"
+      if @is_in_group
+        inner_block = blk
+        group_id = @current_group_id
+        blk = -> *a do
+          @group_frame_h.fetch group_id do
+            @group_frame_h[ group_id ] = true
+            inner_block[ *a ]
+            nil
+          end
+        end
+        if 1 == inner_block.arity
+          def blk.arity ; 1 end  # HUGE HACK - so it works here [#ps-013]
+        end
       end
+      ( @hash.fetch name do add name, [] end ) << blk
       blk  # important - per spec, for chaining
+    end
+
+    -> do  # `with_specificity`
+
+      mutex_h = ::Hash.new { |h, k| h[ k ] = 0 }
+        # disallow nested spec. blocks of same emitter
+
+      define_method :with_specificity do |blk|
+        ( mutex_h[ object_id ] += 1 ) > 1 and
+          raise "specificity blocks cannot be nested."
+        @is_in_group = true
+        @current_group_id ||= 0
+        @current_group_id += 1
+        @group_frame_h ||= { }
+        blk[ ]
+        mutex_h[ object_id ] -= 1
+        @is_in_group = false
+        nil
+      end
+
+    end.call
+
+    def emitted
+      @group_frame_h && @group_frame_h.clear
+    end
+
+  protected
+
+    def initialize
+      super
+      @is_in_group =              # are we inside of a specificity block now?
+        @current_group_id =       # used in a closure to identify each spec. blk
+        @group_frame_h = nil      # hash of group id => true per each emit
     end
   end
 

@@ -5,5 +5,7 @@ module Skylab::PubSub::TestSupport
     extend PubSub::Emitter
     emits hacking: [ :business, :pleasure ]
 
+    public :emit, :with_specificity
+
   end
 end

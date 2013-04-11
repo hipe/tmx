@@ -6,9 +6,9 @@ module Skylab::PubSub::TestSupport
   ::Skylab::TestSupport::Regret[ self ]
 
   module CONSTANTS
-    Headless = ::Skylab::Headless
-    PubSub = ::Skylab::PubSub  # required by sub-nodes
-    TestSupport = ::Skylab::TestSupport  # le balls
+    %i| Headless PubSub TestSupport MetaHell |.each do |i|
+      const_set i, ::Skylab.const_get( i )
+    end
   end
 
   Headless = CONSTANTS::Headless  # so that h.l is visible in all modules
