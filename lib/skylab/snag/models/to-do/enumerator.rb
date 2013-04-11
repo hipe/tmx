@@ -42,14 +42,15 @@ module Skylab::Snag
     end
 
     def all_required_events_are_handled
-      a = unhandled_event_stream_graph.names
-      if a.length.zero? then true else
+      if_unhandled_stream_names -> a do
         msg = "strict about event coverage for now - unhandled: #{ a * ', ' }"
         if a.include? :error
           raise ::RuntimeError, msg
         else
           emit :error, msg
         end
+      end, -> do  # else
+        true
       end
     end
 

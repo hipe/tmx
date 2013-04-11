@@ -22,13 +22,14 @@ module Skylab::Snag
                             # mental supposition of isomorphic factories (see)
                             # **NOTE** see warnings there too re: coherence
 
+    taxonomic_streams(* Snag::API::Events.taxonomic_streams )
+                            # we check for unhandled even streams, but we don't
+                            # care about taxonomic streams like these.
+
     emits error: :lingual   # probably every api action subclass should have it
                             # in its graph that it emits this (and so it does)
                             # because we emit errors in `absorb_param_h`
                             # which they all use (i think..)
-
-    public :emits?          # allows #experimental dynamic wiring per
-                            # event stream graph reflection like this
 
     def self.attributes_or_params
       res = nil

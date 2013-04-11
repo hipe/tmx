@@ -9,6 +9,8 @@ module Skylab::Treemap
 
     extend PubSub::Emitter        # NOTE here. overwrite s.c version of `emit`
 
+    taxonomic_streams :all
+
     emits Bleeding::EVENT_GRAPH.merge(
       ::Hash[ CLI::Event::CANON_STREAMS.map { |sn| [ sn, :all ] } ]
     )                             # your best friend right now is:
@@ -77,14 +79,12 @@ module Skylab::Treemap
       define_method :initialize do |*a, &b|
         init_treemap_sub_client nil
         instance_exec( *a, b, & signature_h.fetch( a.length ) )
-        a = unhandled_event_stream_names - [ :all ]
-        if a.length.nonzero?
-          raise ::ArgumentError, "unhandled: #{ a.inspect } for #{ self.class }"
-        else
-          @stylus = CLI::Stylus.new              # never build one anywhere else
-          @stylus.do_stylize = @infostream.tty?  # iff interactive terminals.
-          @plugin_action_box_flip = nil
+        if_unhandled_non_taxonomic_streams do |msg|
+          raise ::ArgumentError, msg
         end
+        @stylus = CLI::Stylus.new              # never build one anywhere else
+        @stylus.do_stylize = @infostream.tty?  # iff interactive terminals.
+        @plugin_action_box_flip = nil
         nil
       end
     end.call

@@ -14,6 +14,7 @@ module Skylab::PubSub
     def event_stream_graph
 
       @event_stream_graph ||= begin
+
         # Traverse up the chain of every ancestor except self (and self is
         # not in the chain if we are an s.c), (also we (ick) skip ::Kernel
         # and ::BasicObject which will not fly if etc #todo) and for each
@@ -82,6 +83,13 @@ module Skylab::PubSub
       end                         # eew 2x)
       nil
     end
+
+    #        ~ advanced semantic reflection experiments ~
+
+    def taxonomic_streams * name_a
+      event_stream_graph.set_taxonomic_stream_names name_a
+      nil
+    end
   end
 
   class PubSub::Stream < Semantic::Digraph::Node  # (stowaway) used above
@@ -99,17 +107,52 @@ module Skylab::PubSub
       walk_pre_order( sym, 0 ) if has? sym
     end
 
+    #         ~ reflection experiments (implementation) ~
+
+    def set_taxonomic_stream_names name_a
+      if @taxonomic_stream_names
+        raise "sorry - won't clobber existing taxonomic stream names"
+      else
+        @taxonomic_stream_names = name_a.dup.freeze
+      end
+      name_a
+    end
+
+    attr_reader :taxonomic_stream_names
+
   protected
 
     def initialize
+      @taxonomic_stream_names = nil
       @node_class = PubSub::Stream
       super
+    end
+
+    #         ~ dupe support ~
+
+    def base_args
+      super << @taxonomic_stream_names  # careful
+    end
+
+    def base_init *a, taxonomic_stream_names
+      super( *a )
+      @taxonomic_stream_names = ( if taxonomic_stream_names
+        taxonomic_stream_names.dup.freeze
+      end )
+      nil
     end
   end
 
   module PubSub::Emitter::InstanceMethods
 
-    # (no public methods added by pub-sub)
+    # ( for now, it is the policy of this library never to add destructive
+    #   public instance methods (e.g something that adds a listener to a
+    #   stream, etc.). Those instance methods that have side-effects, e.g. ones
+    #   that add listeners to a stream or emit events, are by default protected.
+    #   As appropriate to the design of the application the client must
+    #   publicize the desired destructive methods explicitly. )
+    #
+    # ( however there may be some public *non*-destructive i.m's added below..)
 
   protected
 
@@ -204,13 +247,142 @@ module Skylab::PubSub
       PubSub::Event::Unified  # a default
     end
 
-    #         ~ convenience reflection methods (alphabetical) ~
+    #         ~ non-destructive reflection methods (in aesthetic order) ~
+
+  public
 
     def emits? stream_name
       event_stream_graph.has? stream_name
     end
 
-    def unhandled_event_stream_graph
+    # `if_unhandled[_non_taxonomic]_stream[_name]s` - a facility for checking
+    # that you are handling all of the event streams that you care about.
+    #
+    # the above name permutes out to 4 methods each of which has the same
+    # argument signature: its arguments must fall into one of the
+    # following forms (that expands out to many permutations (seven?)):
+    #
+    # `argument_signature` ::= &block
+    #                      |   <callable-ish> [<callable-ish>]
+    #
+    # `callable-ish` ::= ( proc | symbol )
+    #
+    # the one-block and one-callable forms are isomorphic in the expected way.
+    # a symbol will be "expanded" into a proc by calling `method`
+    # hence the receiver must implement a method by that name somewhere
+    # (#todo give example of this).
+    #
+    # these `if_unhandled_[..]` methods all resolve list of stream names that
+    # represent those streams that do not have any listeners connected to
+    # them [#todo it begs the question..]. we will herein refer to this list as
+    # "the result list", even though the list is not (necessarily) the result
+    # of the method call, as we are about to explain.
+    #
+    # if you called the `_non_taxonomic` form it assumes that the emitter
+    # has set a list of `taxonomic_streams` whose names will be excluded
+    # from the result list. if the emitter does not know of any taxonomic
+    # streams at all a runtime error is raised (which avoids accidental silent
+    # failure of the ultimate intended purpose of this whole shebang).
+    #
+    # the argument signature resolves-out to two functions - if a second
+    # <callable-ish> was not provided it is effectively the same as using
+    # `-> { }` (the no-op function). the first function will be called if
+    # the result list is of nonzero length, the second if not. the result
+    # of the `if_unhandled_[..]` call is the result of the function called.
+    #
+    # for the `[..]_names` form of this method, when there is a nonzero length
+    # list of unhandled stream names, the first function will be called with
+    # the array of names as its sole argument. alternately, if the
+    # `[..]_streams` form was called, an appropriate message is passed instead
+    # of an array.
+    #
+    # to raise a runtime error if there are any unhandled stream of self -
+    #
+    #   if_unhandled_streams :fail
+    #
+    # (which is equivalent to:)
+    #
+    #   if_unhandled_streams method( :fail )
+    #
+    # (which in turn is equivalent to:)
+    #
+    #   if_unhandled_streams { |msg| fail msg }
+    #
+    # (idem:)
+    #
+    #   if_unhandled_streams -> msg { fail msg }
+    #
+    # to be about as ornate as possible:
+    #
+    #   ok = if_unhandled_non_taxonomic_stream_names -> name_a do
+    #     puts "these stream(s) are not handled: (#{ name_a * ', ' })"
+    #     false
+    #   end, -> do  # else
+    #     puts "all (non-taxonomic) streams are handled."
+    #     true
+    #   end
+    #   # ..
+    #
+    # (this explanation leaves room for improvement, but the above is
+    # everything there is to know, in an albeit condensed form.)
+
+    def if_unhandled_streams *a, &b
+      _if_unhandled true, true, a, b
+    end
+
+    def if_unhandled_non_taxonomic_streams *a, &b
+      _if_unhandled false, true, a, b
+    end
+
+    def if_unhandled_stream_names *a, &b
+      _if_unhandled true, false, a, b
+    end
+
+    def if_unhandled_non_taxonomic_stream_names *a, &b
+      _if_unhandled false, false, a, b
+    end
+
+    -> do  # `_if_unhandled`
+      arg_h = {
+        1 => -> a do a << -> { } end,
+        2 => -> a do end
+      }
+      resolve_callable = nil
+      define_method :_if_unhandled do |yes_taxonomic, yes_message, a, b|
+        err = -> do
+          if b
+            a.length.nonzero? and break "can't have block and arguments"
+            a << b
+          end
+          arg_h.fetch( a.length )[ a ]
+          nil
+        end.call
+        err and raise ::ArgumentError, err
+        name_a = unhandled_stream_graph.names
+        if ! yes_taxonomic  # always run even when empty list, trigger errors
+          t_a = event_stream_graph.taxonomic_stream_names
+          t_a or raise "there are no known `taxonomic_streams` for #{
+            }this #{ self.class }"
+          name_a -= t_a
+        end
+        if name_a.length.zero?
+           resolve_callable[ self, a.fetch( 1 ) ].call
+        else
+          res = if ! yes_message then name_a else
+            "unhandled#{ ' non-taxonomic' if ! yes_taxonomic } #{
+              }event stream#{ 's' if 1 != name_a.length } #{
+              }#{ name_a.inspect } of emitter #{ self.class }"
+          end
+          resolve_callable[ self, a.fetch( 0 ) ].call res
+        end
+      end
+      protected :_if_unhandled
+      resolve_callable = -> me, x do
+        if x.respond_to? :call then x else me.method( x ) end
+      end
+    end.call
+
+    def unhandled_stream_graph
       event_stream_graph.minus event_listeners.names
     end
   end
@@ -270,7 +442,7 @@ module Skylab::PubSub
   #
   # Out of the box the PubSub::Event::Unified doesn't know how to render
   # itself or its payload, because that depends on the payload itself,
-  # the application and the modality.  But what it *is* for is for when
+  # the application and the modality. But what it *is* for is for when
   # you want the event object itself to be able to reflect metadata
   # about the event, like`e.is? :error` or `e.touched?`. *or* you plan
   # to corral all of your events through e.g one filter or aggregator

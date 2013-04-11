@@ -26,11 +26,8 @@ module Skylab::Dependency
 
     def initialize(* a )
       super
-       g = unhandled_event_stream_graph
-       if g.names.length.nonzero?
-         fail "unhandled stream(s): #{ g.names }"  # #todo
-       end
-       nil
+      if_unhandled_streams :fail
+      nil
     end
 
     def valid? # [#hl-047]

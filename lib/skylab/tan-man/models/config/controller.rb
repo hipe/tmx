@@ -164,10 +164,7 @@ module Skylab::TanMan
           info txt
         end
 
-        missed_a = w.significant_unhandled_event_stream_names
-        if missed_a.length.nonzero?
-          raise ::RuntimeError, "unhandled: #{ missed_a.join ', ' }"
-        end
+        w.if_unhandled_non_taxonomic_streams method( :raise )
 
         nil
       end

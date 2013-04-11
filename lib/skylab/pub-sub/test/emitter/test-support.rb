@@ -46,7 +46,6 @@ module Skylab::PubSub::TestSupport::Emitter
       kls.class_exec do
         extend PubSub::Emitter
         public :emit # [#ps-002] public for testing
-        public :emits?
         class_exec(& blk ) if blk
       end
       kls

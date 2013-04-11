@@ -92,10 +92,7 @@ module Skylab
           o.on event_stream_name, method( "handle_#{ event_stream_name }" )
         end
       end
-      a = ( o.unhandled_event_stream_graph ).names - [ :all ]
-      if a.length.nonzero?
-        raise "unhandled event(s) for #{ o.class } - #{ a.inspect }"
-      end
+      o.if_unhandled_non_taxonomic_streams :raise
       nil
     end
 

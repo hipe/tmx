@@ -218,10 +218,7 @@ module Skylab::Treemap
       on_info_line mc.handle :info_line
       on_error     mc.handle :error
       on_help      mc.handle :info_line
-      names = unhandled_event_stream_names
-      if names.length.nonzero?
-        raise ::RuntimeError, "unhandled: #{ names.inpsect } - #{ self.class }"
-      end
+      if_unhandled_streams :raise
       @actual_parameters_box = nil
       nil
     end

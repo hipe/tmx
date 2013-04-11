@@ -2,7 +2,6 @@
 
   + upgrade and prune all gem dependencies
 
-
 ## release 0.6.0 - last for ruby 1.9.3
 
 ## release 0.5.0 - last for ruby 1.9.2

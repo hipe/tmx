@@ -223,6 +223,8 @@ module ::Skylab::CodeMolester
     class Write
       # the world'd most interesting graph
 
+      taxonomic_streams :all, :structural, :text, :notice, :before, :after
+
       emits error: [ :text, :all ],
         notice: [ :text, :all ], before: :all, after: :all,
         before_edit:   [ :structural, :notice, :before ],
@@ -232,15 +234,6 @@ module ::Skylab::CodeMolester
         no_change:     [ :notice, :text ]
 
       event_factory -> { PubSub::Event::Factory::Isomorphic.new Events }
-
-      -> do  # this terrific fun is tracked by [#ps-009]
-
-        modifier_a = [ :text, :structural, :notice, :before, :after, :all ]
-
-        define_method :significant_unhandled_event_stream_names do
-          unhandled_event_stream_graph.names - modifier_a
-        end
-      end.call
 
       attr_accessor :escape_path
     end

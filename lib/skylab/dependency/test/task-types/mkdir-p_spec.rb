@@ -21,7 +21,7 @@ module Skylab::Dependency::TestSupport::Tasks
       -> do
         subject.new
       end.should raise_error( ::RuntimeError,
-        /unhandled stream\(s\): .*all.+info/i )
+        /unhandled event streams?.+all.+info/ )
     end
     context "as empty" do
       subject do

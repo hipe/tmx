@@ -4,11 +4,13 @@ module Skylab::Snag
 
     extend MetaHell::Boxxy
 
-    terminal_stream_names = nil
-
-    define_singleton_method :terminal_stream_names do
-      terminal_stream_names ||= constants.map(& Headless::Name::FUN.normify )
-    end  # (for debugging, reflect e.g [:datapoint, :lingual, :structural])
+    -> do  # `taxonomic_streams`
+      memo = nil
+      define_singleton_method :taxonomic_streams do
+        memo ||= constants.map( & Headless::Name::FUN.normify )
+        #  e.g [:datapoint, :lingual, :structural ]
+      end
+    end.call
 
     module Datapoint
       def self.event graph, stream, act, x

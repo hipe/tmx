@@ -22,10 +22,7 @@ module Skylab::Treemap
         end
       end
 
-      a = unhandled_event_stream_names
-      if a.length.nonzero?
-        raise ::ArgumentError, "unhandled: #{ a.inspect } for #{ self.class }"
-      end
+      if_unhandled_streams { |msg| raise ::ArgumentError, msg }
     end
   end
 end

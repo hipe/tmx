@@ -1,3 +1,5 @@
+[#011]       #tickler consider renaming pub-sub to 'stream'
+[#010] #open cover pub-sub-viz
 [#009]       #tracking-tag advanced semantic reflection -
                `significant_unhandled_event_stream_names`
 [#008]       #tracking-tag this option scanner

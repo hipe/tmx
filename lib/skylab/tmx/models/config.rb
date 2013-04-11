@@ -7,8 +7,7 @@ module Skylab
     PATH = '~/.tmxconfig'
 
     def self.build
-      p = Headless::CLI::PathTools::FUN.expand_tilde[ self::PATH ]
-      new path: p
+      new path: Headless::CLI::PathTools::FUN.expand_tilde[ self::PATH ]
     end
   end
 end

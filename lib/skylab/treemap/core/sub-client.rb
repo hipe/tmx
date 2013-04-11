@@ -67,12 +67,6 @@ module Skylab::Treemap
     def api_client
       request_client.send :api_client
     end
-
-    #         ~ stowaway methods (not nec. available in all areas) ~
-
-    def unhandled_event_stream_names
-      unhandled_event_stream_graph.names
-    end
   end
 
   #         ~ stowaway modules (too small to have their own files) ~

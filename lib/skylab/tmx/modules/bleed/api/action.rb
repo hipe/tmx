@@ -3,8 +3,10 @@ module Skylab
   class TMX::Modules::Bleed::API::Action
 
     extend PubSub::Emitter
-    public :emits?, :on, :unhandled_event_stream_graph
-      # allow external things to read/write these
+
+    taxonomic_streams :all  # used for implementing borking on unhandled.
+
+    public :on  # allow the external addition of listeners to streams.
 
     # graph set by children
 
@@ -101,30 +103,25 @@ module Skylab
 
     def config_write
       res = true
-      config.write do |o|
+      config.write do |w|
 
-        o.on_before do |e|
+        w.on_before do |e|
           emit :head, "config: #{ e.message }"
         end
 
-        o.on_after do |e|
+        w.on_after do |e|
           emit :tail, " .. done (wrote #{ e.bytes } bytes)"
         end
 
-        o.on_error do |e|
+        w.on_error do |e|
           error e.message
         end
 
-        o.on_no_change do |e|
+        w.on_no_change do |e|
           info e.message
         end
 
-        a = o.send( :unhandled_event_stream_graph ).names -
-          [ :all, :text, :notice, :structural ]
-
-        if a.length.nonzero?
-          raise "unhandled event stream(s) - #{ a.inspect }"
-        end
+        w.if_unhandled_non_taxonomic_streams method( :raise )
       end
       res
     end

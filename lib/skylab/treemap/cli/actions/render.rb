@@ -132,13 +132,8 @@ module Skylab::Treemap
           end
         end
       end
-      g = a.unhandled_event_stream_graph
-      names = g.names
-      if names.length.nonzero?
-        fail "unhandled: #{ names.inspect } of #{ a.class }"
-      else
-        a
-      end
+      a.if_unhandled_streams method( :fail )
+      a
     end
 
     # `absorb_param_queue` - as an experiment we are seeing what it takes
