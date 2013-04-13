@@ -1,20 +1,28 @@
 module Skylab                     # Welcome! :D
 
   #         ~ the sole function of this file is to provide autoloading ~
+  #         ~ and a handful of universal-ish constant-ish functions ~
 
   require 'pathname'              # the only stdlib subproducts get for free
 
-  here = ::Pathname.new( __FILE__ ).expand_path
+  here = ::Pathname.new __FILE__  # one of the three centers of the universe
 
   $:.include?( o = here.join('..').to_s ) or $:.unshift o # add to include path
 
   dir_pathname = here.sub_ext ''  # chop of extension and ..
 
-  define_singleton_method( :dir_pathname ) { dir_pathname } # preferred way..
+  define_singleton_method :dir_pathname do  # expose it to rest of the system.
+    dir_pathname
+  end
 
-  ROOT_PATHNAME = dir_pathname.join '../..' # ..old way, #away at [#122]
-
-  TMPDIR_PATHNAME = ROOT_PATHNAME.join 'tmp' # centralized here for testing
+  -> do  # `tmpdir_pathname` - hellof used in testing, but see below
+    tmpdir_pathname = nil
+    define_singleton_method :tmpdir_pathname do
+      tmpdir_pathname ||= dir_pathname.join '../../tmp'
+      # #todo why can't you be more like your brother `cache_pathname`?
+      # because you need a deep audit and small redesign [#128]
+    end
+  end.call
 
   module Autoloader
     # const_missing hax can suck - use this iff it's compelling. #experimental

@@ -9,7 +9,7 @@ module ::Skylab::GitStashUntracked::Tests
 
   TestSupport = ::Skylab::TestSupport
 
-  tdpn = ::Skylab::TMPDIR_PATHNAME.join 'gsu-xyzzy'
+  tdpn = ::Skylab.tmpdir_pathname.join 'gsu-xyzzy'
 
   gsu_tmpdir = TestSupport::Tmpdir.new tdpn.to_s
 

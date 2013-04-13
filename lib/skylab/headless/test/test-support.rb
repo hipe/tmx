@@ -5,7 +5,7 @@ module Skylab::Headless::TestSupport
 
   ::Skylab::TestSupport::Regret[ Headless_TestSupport = self ]
 
-  self.tmpdir_pathname = ::Skylab::TMPDIR_PATHNAME.join 'hl'
+  self.tmpdir_pathname = ::Skylab.tmpdir_pathname.join 'hl'
 
   class FUN  # #abuse
     expect_text = -> emission do

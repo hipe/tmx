@@ -110,6 +110,7 @@ module Skylab::TestSupport::TestSupport::Tmpdir
       tmpdir = Tmpdir.new target, verbose: true
       begin tmpdir.prepare ; rescue ::Errno::ENOTDIR => e ; end
       e.message.should match( /Not a directory - .+ts-some-file/ )
+      clean[ ]
     end
 
     it "some arbitrary unsafe path - stops you b/c exceeds max mkdirs" do
@@ -133,7 +134,7 @@ module Skylab::TestSupport::TestSupport::Tmpdir
     # --*--
 
     def anchor
-      ::Skylab::TMPDIR_PATHNAME
+      ::Skylab.tmpdir_pathname
     end
 
     def fu

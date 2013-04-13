@@ -14,7 +14,7 @@ module Skylab::TanMan::TestSupport
     TestSupport  = ::Skylab::TestSupport
     TMPDIR_STEM  = 'tan-man'
     TMPDIR = ::Skylab::TestSupport::Tmpdir.
-      new( ::Skylab::TMPDIR_PATHNAME.join(TMPDIR_STEM).to_s )
+      new( ::Skylab.tmpdir_pathname.join(TMPDIR_STEM).to_s )
   end
 
   include CONSTANTS # for use here, below

@@ -31,7 +31,7 @@ module Skylab::Snag::TestSupport
 
     define_method :manifest_path do manifest_path end
 
-    tmpdir = TestSupport::Tmpdir.new ::Skylab::TMPDIR_PATHNAME.join 'snaggle'
+    tmpdir = TestSupport::Tmpdir.new ::Skylab.tmpdir_pathname.join 'snaggle'
 
     define_method :tmpdir do
       tmpdir

@@ -8,7 +8,7 @@ module ::Skylab::CodeMolester::TestSupport
   TestSupport::Regret[ CodeMolester_TestSupport = self ]
 
   TMPDIR = TestSupport::Tmpdir.new(
-    ::Skylab::TMPDIR_PATHNAME.join( 'co-mo' ),
+    ::Skylab.tmpdir_pathname.join( 'co-mo' ),
     verbose: false
   )
 

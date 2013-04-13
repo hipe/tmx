@@ -240,7 +240,7 @@ module Skylab::Snag
       res = false
       begin
         break( res = @tmpdir_pathname ) if @tmpdir_pathname
-        pn = ::Skylab::TMPDIR_PATHNAME.join 'snag-PROD' # heh
+        pn = ::Skylab.tmpdir_pathname.join 'snag-PROD' # heh
         if ! pn.dirname.exist?
           error and error[ "won't create more than one directory. #{
             }Parent directory of our tmpdir (#{ pn.basename }) must exist: #{

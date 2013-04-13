@@ -18,7 +18,7 @@ module Skylab::Dependency::TestSupport
 
   extend TestSupport::Quickie  # if you dare..
 
-  tmpdir = ::Skylab::TestSupport::Tmpdir.new ::Skylab::TMPDIR_PATHNAME.to_s
+  tmpdir = ::Skylab::TestSupport::Tmpdir.new ::Skylab.tmpdir_pathname.to_s
 
   build_dir = ::Skylab::TestSupport::Tmpdir.new tmpdir.join('build-dependency')
 

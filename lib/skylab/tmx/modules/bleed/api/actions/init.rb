@@ -14,7 +14,8 @@ module Skylab
 
         config['bleed'] ||= { } # create the section called [bleed]
 
-        config['bleed']['path'] = contract_tilde ::Skylab::ROOT_PATHNAME.to_s
+        config['bleed']['path'] =  # (below was [#sl-122])
+          contract_tilde ::Skylab.dir_pathname.join( '../..' ).to_s
 
         config_write
       end

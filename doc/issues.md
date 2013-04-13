@@ -1,9 +1,11 @@
+[#128] #open this is strictly a development, pre-alpha version
+               (especially) as long as you are using skylab/tmp!
 [#127] #open unify inflection module methods interface
 [#126]       #tracking-tag singleton obj with class made just for readable errs
 [#125]       #doc-point #workflow -- when you make overzelous, premature chage..
 [#124]       #tracking-tag autoloader won't work when there is toplevel name..
 [#123]       #convention #pattern sub-product module 2-level pattern
-[#122] #open #low-priority phase out ROOT_PATHNAME for Skylab.dir_pathname
+[#122]       #done #low-priority phase out ROOT_PATHNAME for Skylab.dir_pathname
 [#121]       #pattern of CLI.new, API.invoke as facades hehe inv. of [#109]
 [#120]       #tracking-tag backticks that could be robustified
 [#119] #open #tracking-tag #pattern of def.self some_thing instead of DSL
