@@ -1,6 +1,9 @@
 module ::Skylab::CodeMolester
 
-  class Config::File
+  module Config::File  # ( re-opened at end )
+  end
+
+  class Config::File::Model
 
     # (while [#ps-101] (cover pub-sub viz) is open..)
 
@@ -433,12 +436,18 @@ module ::Skylab::CodeMolester
 
     debug = -> { do_debug }
 
+    check_names = nil
     compile = -> do
       debug[] and $stderr.puts "loading new #{ const } xyzzy"
-      pathname = Config.dir_pathname.join 'file-parser'
+      pathname = Config::File.dir_pathname.join 'parser'
       o = CodeMolester::Services::Treetop.load pathname.to_s
-      o.name =~ /::#{ ::Regexp.escape const.to_s }\z/ or fail "huh?#{ o }"
+      check_names[ o ]
       o
+    end
+
+    check_names = -> o do
+      exp ="#{ self.to_s.split( '::' )[ 0 .. -2 ].join( '::' ) }Parser"
+      exp == o.name or fail "sanity (#{ o.name } for #{ exp })"
     end
 
     parser_class = -> do
@@ -467,6 +476,19 @@ module ::Skylab::CodeMolester
     # ------------------------------- end ------------------------------------
   end
 
-  Config::File.do_debug = nil
+  module Config::File
+
+    CodeMolester::Services.const_get :Treetop, false
+
+    Node = Config::Node
+      # so we can say `Node` in the grammar! - this is the
+      # composition parsing expression grammars allow.
+
+    %i| do_debug= |.each do |i|
+      define_singleton_method i, & Config::File::Model.method( i )
+    end
+  end
+
+  Config::File.do_debug = true
 
 end
