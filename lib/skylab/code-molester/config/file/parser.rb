@@ -24,12 +24,16 @@ module Skylab::CodeMolester
       # load-time nonsense of dynamic enabling of grammar features. hence we
       # can do the below to the extent that all that holds. note the grammar
       # certainly changes over time during development, however. to this end
-      # we maintain a simple integer-based grammar version number which will
-      # be incremented manually whenever there's a commit to *master* branch
+      # we maintain a semver.org-inspired grammar versioning scheme which is
+      # used for uniquely representing the state of the grammar. the version
+      # is incremented manually whenever there's a commit to *master* branch
       # that changes the grammar. NOTE all branches that are not master that
-      # are making changes to the grammar must affix the version string (uh-
-      # oh i lied it's not an integer it's a string now) with their branch's
-      # name. note too that this issue affects end-users installing gems too
+      # are making changes to the grammar must affix some identifying string
+      # to the end of the version string (in VERSION). this scheme should be
+      # considered from the perspectives of both developers checking out and
+      # running different branches, and (perhaps most importantly of all) an
+      # end-user (imgine again a developer) upgrading to a gem version where
+      # the grammar changes. clearing a cache would thus never be necessary.
 
       # These kind of things are candidates to be pushed up into
       # ::Skylab::TreetopTools, but should not be abstracted out of this
@@ -38,8 +42,6 @@ module Skylab::CodeMolester
       parent_module = Config
 
       const = :FileParser  # treetop appends the 'Parser' for us.
-
-      version = '2'  # (the jump from version 1 to 2 introduced dashes)
 
       parser = nil  # (this on the other hand might be stupid - let's find out)
 
@@ -60,7 +62,10 @@ module Skylab::CodeMolester
         end
       end
 
-      path_part = "config/file/parser/version-#{ version }.rb"
+      path_part = "config/file/parser/version-#{
+        ::File.read( "#{ __dir__ }/parser/VERSION" ).chomp
+      }.rb"
+
         # both the the input path (the hand-written .tt file)
         # *and* the output path (the generated parser class)
         # will be derived from the above.
@@ -82,8 +87,9 @@ module Skylab::CodeMolester
 
       mkdir_p = nil
       compile_parser = -> o_pn do
+
         i_pn = CodeMolester.dir_pathname.join( path_part ).  # hack around
-          dirname.sub_ext( '.treetop' )                      #   'version-'
+          dirname.join( 'grammar.treetop' )                  #   'version-'
         cmp = Services::Treetop::Compiler::GrammarCompiler.new
         ovr = o_pn.exist?  # even if we never overwrite we don't know that here.
         if debug
