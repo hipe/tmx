@@ -1,7 +1,7 @@
 module Skylab::TanMan
 
   class Models::Config::Resource <
-    Headless::Services::CodeMolester::Config::File
+    Headless::Services::CodeMolester::Config::File::Model
 
                                   # we've gotta take responsibility for this:
                                   # to be absolutely insane, we want to see if

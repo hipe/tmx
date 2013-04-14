@@ -11,7 +11,7 @@ module Skylab::CodeMolester::TestSupport::Config::File
     include CONSTANTS # so we can say C_M from within i.m's below
 
     def config_file_new *a
-      @o = CodeMolester::Config::File.new(* a)
+      @o = CodeMolester::Config::File::Model.new(* a)
     end
 
 

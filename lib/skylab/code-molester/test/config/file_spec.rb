@@ -10,7 +10,7 @@ describe ::Skylab::CodeMolester::Config::File do
 
   extend ::Skylab::CodeMolester::TestSupport
 
-  let(:klass) { CodeMolester::Config::File }
+  let(:klass) { CodeMolester::Config::File::Model }
 
   let :subject do
     klass.new path: path,
