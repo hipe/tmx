@@ -4,10 +4,14 @@ require 'skylab/pub-sub/core'
 
 module ::Skylab::CodeMolester
 
-  CodeMolester = self # a handle for autoloading unobtrustively
-  Headless     = ::Skylab::Headless
-  MetaHell     = ::Skylab::MetaHell
-  PubSub       = ::Skylab::PubSub
+  %i| CodeMolester Headless MetaHell PubSub |.each do |i|
+    const_set i, ::Skylab.const_get( i, false )
+  end
 
-  extend MetaHell::Autoloader::Autovivifying::Recursive
+  MAARS = MetaHell::Autoloader::Autovivifying::Recursive
+
+  extend MAARS
+
+  const_get :Services, false
+
 end

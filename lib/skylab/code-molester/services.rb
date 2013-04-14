@@ -8,6 +8,8 @@ module Skylab::CodeMolester
       h[const] = f
     end
 
+    o :FileUtils,     -> { require 'fileutils' ; ::FileUtils }
+
     o :Psych,         -> { require 'psych'    ; ::Psych }
 
     o :StringIO,      -> { require 'stringio' ; ::StringIO }

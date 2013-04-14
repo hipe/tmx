@@ -24,6 +24,26 @@ module Skylab                     # Welcome! :D
     end
   end.call
 
+  # `cache_pathname` - experimentally for caching things in production -
+  # it should only be used with the utmost OCD-fueled hyper-extreme caution
+  # and over-engineering you can muster, because nothing puts a turd in
+  # your easter basket worse than an epic bughunt caused by a stale cache
+  # save for actually doing that.
+
+  -> do
+    cache_pathname = nil
+    define_singleton_method :cache_pathname do
+      cache_pathname ||= begin
+        require 'tmpdir'
+        pn = ::Pathname.new( ::Dir.tmpdir ).join( 'sl.skylab' )
+        if ! pn.exist?
+          ::Dir.mkdir pn.to_s, 0766  # same perms as `TemporaryItems`
+        end
+        pn
+      end
+    end
+  end.call
+
   module Autoloader
     # const_missing hax can suck - use this iff it's compelling. #experimental
 

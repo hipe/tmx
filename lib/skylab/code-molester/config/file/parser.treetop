@@ -8,14 +8,14 @@ module Skylab::CodeMolester::Config
          n_2_item:unsectioned_item
               )*
        )?
-     n_2_sections:section* <Node>
+     n_2_sections:section* <Config::Node>
     end
     rule unsectioned_item
       assignment_line / whitespace_line
     end
     rule comment
               w_1:('#' [ \t]*)
-         t_2_body:( ![\n] . )* <Node>
+         t_2_body:( ![\n] . )* <Config::Node>
     end
     rule assignment_line
               w_1:[ \t]*
@@ -23,18 +23,18 @@ module Skylab::CodeMolester::Config
               w_3:( [ \t]* '=' [ \t]* )
         t_4_value:( [ \t]* ( ![ \t#\n] . )+ )*
               w_5:[ \t]*
-      n_6_comment:comment? <Node>
+      n_6_comment:comment? <Config::Node>
     end
     rule whitespace_line
               w_1:[ \t]*
-      n_2_comment:comment? <Node>
+      n_2_comment:comment? <Config::Node>
     end
     rule section
        n_1_header:section_line
         n_2_items:(
               w_1:"\n"
               n_2:( assignment_line / whitespace_line )
-        )* <Node>
+        )* <Config::Node>
     end
     rule section_line
               w_1:( [ \t]* '[' [ \t]* )
@@ -42,7 +42,7 @@ module Skylab::CodeMolester::Config
               n_3:(
               w_1:( [ \t]* ']' [ \t]* )
       n_2_comment:comment?
-               ) <Node>
+               ) <Config::Node>
     end
   end
 end

@@ -1,8 +1,5 @@
 module ::Skylab::CodeMolester
 
-  module Config::File  # ( re-opened at end )
-  end
-
   class Config::File::Model
 
     # (while [#ps-101] (cover pub-sub viz) is open..)
@@ -202,7 +199,7 @@ module ::Skylab::CodeMolester
           end
         end
         if ! reading
-          parser = self.class.parser
+          parser = Config::File::Parser.instance
           result = parser.parse @content
           if result
             @content = result.sexp # @content goes from being a string to a sexp
@@ -423,72 +420,5 @@ module ::Skylab::CodeMolester
       end while nil
       res
     end
-
-    #
-    # ----------------------- define m.m `parser` begin ---------------------
-    #
-
-    class << self
-      attr_accessor :do_debug
-    end
-
-    const = :ConfigParser
-
-    debug = -> { do_debug }
-
-    check_names = nil
-    compile = -> do
-      debug[] and $stderr.puts "loading new #{ const } xyzzy"
-      pathname = Config::File.dir_pathname.join 'parser'
-      o = CodeMolester::Services::Treetop.load pathname.to_s
-      check_names[ o ]
-      o
-    end
-
-    check_names = -> o do
-      exp ="#{ self.to_s.split( '::' )[ 0 .. -2 ].join( '::' ) }Parser"
-      exp == o.name or fail "sanity (#{ o.name } for #{ exp })"
-    end
-
-    parser_class = -> do
-      o = nil
-      if CodeMolester.const_defined? const, false
-        debug[] and $stderr.puts "constant existed! #{ const } xyzzy"
-        o = CodeMolester.const_get const, false
-      else
-        o = compile[]
-      end
-      parser_class = -> do
-        debug[] and $stderr.puts "using memoized #{ const } xyzzy"
-        o
-      end
-      o
-    end
-
-    define_singleton_method :parser_class do
-      parser_class[]
-    end
-
-    def self.parser
-      @parser ||= parser_class.new
-    end
-
-    # ------------------------------- end ------------------------------------
   end
-
-  module Config::File
-
-    CodeMolester::Services.const_get :Treetop, false
-
-    Node = Config::Node
-      # so we can say `Node` in the grammar! - this is the
-      # composition parsing expression grammars allow.
-
-    %i| do_debug= |.each do |i|
-      define_singleton_method i, & Config::File::Model.method( i )
-    end
-  end
-
-  Config::File.do_debug = true
-
 end
