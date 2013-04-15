@@ -1,6 +1,6 @@
 module ::Skylab::CodeMolester
 
-  module AutoSexp
+  module Sexp::Auto
     # (this is probably deprecated for things near tan-man)
 
     def self.extended mod
@@ -9,7 +9,7 @@ module ::Skylab::CodeMolester
     end
 
     def auto_sexp_init # @api-private
-      cache = {} # one cache per class that includes AutoSexp!
+      cache = {} # one cache per class that includes Sexp::Auto!
       define_method(:sexp_helper_cache) { cache }
       factory = nil
       self.singleton_class.send(:define_method, :sexp_factory_class) do |klass=nil|
@@ -29,7 +29,7 @@ module ::Skylab::CodeMolester
   end
 end
 
-module ::Skylab::CodeMolester::AutoSexp
+module ::Skylab::CodeMolester::Sexp::Auto
 
   EXPAND = { 't' => :terminal, 'n' => :nonterminal, 'w' => :whitespace }
   Ele = Struct.new(:method, :type, :index, :name)

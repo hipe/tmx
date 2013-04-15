@@ -14,19 +14,19 @@ module ::Skylab::CodeMolester
 
   module TestNamespace::PersonName_01
     class Node < CodeMolester::Services::Treetop::Runtime::SyntaxNode
-      extend CodeMolester::AutoSexp
+      extend CodeMolester::Sexp::Auto
     end
   end
 
   module TestNamespace::PersonName_02
     class Node < CodeMolester::Services::Treetop::Runtime::SyntaxNode
-      extend CodeMolester::AutoSexp
+      extend CodeMolester::Sexp::Auto
     end
   end
 
   module TestNamespace::PersonName_03
     class Node < CodeMolester::Services::Treetop::Runtime::SyntaxNode
-      extend CodeMolester::AutoSexp
+      extend CodeMolester::Sexp::Auto
     end
   end
 end

@@ -7,7 +7,7 @@ module ::Skylab::CodeMolester::TestSupport
 
 # ..
 
-describe ::Skylab::CodeMolester::AutoSexp do
+describe ::Skylab::CodeMolester::Sexp::Auto do
 
   cache = { }                     # avoid warnings about etc. don't worry,
                                   # cacheing like this is *always* fine
@@ -145,7 +145,7 @@ describe ::Skylab::CodeMolester::AutoSexp do
         class MyNode <
           ::Skylab::CodeMolester::Services::Treetop::Runtime::SyntaxNode
 
-          extend ::Skylab::CodeMolester::AutoSexp # 2 levels deep, nec
+          extend ::Skylab::CodeMolester::Sexp::Auto # 2 levels deep, nec
           sexp_factory_class MySexp
         end
       end
