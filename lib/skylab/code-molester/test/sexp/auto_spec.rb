@@ -1,4 +1,4 @@
-require_relative 'auto-sexp/test-support'
+require_relative 'auto/test-support'
 
 module ::Skylab::CodeMolester::TestSupport
 
