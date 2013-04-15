@@ -28,8 +28,8 @@ module ::Skylab::CodeMolester
 
     delegates_to :sexp, :[], -> { valid? }
 
-    def []= k, v
-      set_value k, v
+    def []= k, x
+      set_mixed k, x
     end
 
     def content= str
@@ -162,7 +162,7 @@ module ::Skylab::CodeMolester
 
     delegates_to :sexp, :sections, -> { valid? }
 
-    delegates_to :sexp, :set_value, -> { valid? }
+    delegates_to :sexp, :set_mixed, -> { valid? }
 
     def sexp
       valid? if @valid.nil?

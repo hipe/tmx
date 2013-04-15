@@ -3,7 +3,7 @@ module Skylab::CodeMolester
 
   class Config::Node < ::Treetop::Runtime::SyntaxNode
     extend CodeMolester::Sexp::Auto
-    sexp_factory_class Config::Sexp
+    sexp_auto_class Config::Sexp
   end
 
 end

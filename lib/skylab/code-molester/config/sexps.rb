@@ -15,7 +15,7 @@ module Skylab::CodeMolester::Config
       d.value
     end
     def []= key, value
-      root.set_value(key, value)
+      root.set_mixed key, value
     end
     def initialize root, &b
       self.root = root
@@ -70,7 +70,7 @@ module Skylab::CodeMolester::Config
     end
     def []= *a
       2 == a.count and ::String === a.first or return super
-      set_value(*a)
+      set_mixed( *a )
       a.last
     end
     def item_leaf?
@@ -81,7 +81,7 @@ module Skylab::CodeMolester::Config
     end
     def _no_value name
     end
-    def set_value name, value
+    def set_mixed name, value
       if ::Hash === value
         sections[name] = value
       elsif item = content_items.detect { |i| name == i.item_name }

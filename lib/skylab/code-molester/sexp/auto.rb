@@ -9,12 +9,18 @@ module ::Skylab::CodeMolester
     end
 
     def auto_sexp_init # @api-private
-      cache = {} # one cache per class that includes Sexp::Auto!
-      define_method(:sexp_helper_cache) { cache }
+
+      cache_h = { } # one cache per class that includes Sexp::Auto!
+
+      define_method :sexp_helper_cache do
+        cache_h
+      end
+
       factory = nil
-      self.singleton_class.send(:define_method, :sexp_factory_class) do |klass=nil|
-        if klass
-          factory = klass
+
+      define_singleton_method :sexp_auto_class do |kls=nil|
+        if kls
+          factory = kls
         elsif factory
           factory
         else
@@ -24,7 +30,7 @@ module ::Skylab::CodeMolester
     end
 
     def build_sexp *a
-      sexp_factory_class[*a]
+      sexp_auto_class[ *a ]
     end
   end
 end
@@ -45,6 +51,7 @@ module ::Skylab::CodeMolester::Sexp::Auto
   UnhelpfulHelper = ::Object.new
 
   module InstanceMethods # @api private
+
     def sexp_helper
       key = singleton_class.ancestors.first
       sexp_helper_cache[key] ||= begin
@@ -64,6 +71,7 @@ module ::Skylab::CodeMolester::Sexp::Auto
         end
       end
     end
+
     def sexp
       h = sexp_helper
       h.nt.nil? and return text_value # hack
@@ -87,6 +95,7 @@ module ::Skylab::CodeMolester::Sexp::Auto
       end
       s
     end
+
     REDUCE = lambda do |sexp, node|
       if node.terminal?
         # i don't love this
@@ -111,6 +120,7 @@ module ::Skylab::CodeMolester::Sexp::Auto
       end
       nil
     end
+
     def _sexp_reduce node, name
       s = self.class.build_sexp(name)
       REDUCE[s, node]

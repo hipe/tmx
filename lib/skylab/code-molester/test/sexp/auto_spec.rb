@@ -4,7 +4,7 @@ module ::Skylab::CodeMolester::TestSupport
 
   include ::Skylab::CodeMolester::TestSupport::CONSTANTS
   # wow scope rules changed btwn 1.9.2 and 1.9.3..
-
+  CodeMolester = CodeMolester  # yes
 # ..
 
 describe ::Skylab::CodeMolester::Sexp::Auto do
@@ -130,26 +130,37 @@ describe ::Skylab::CodeMolester::Sexp::Auto do
       end
     end
   end
+
   context "When you want custom sexp classes" do
+
     module ::Skylab::CodeMolester::TestNamespace
+
       class MySexp < CodeMolester::Sexp
       end
+
       class Bread < MySexp
+
         MySexp[:top_slice] = self
         MySexp[:bottom_slice] = self
+
         def calories
-          "#{unparse} has 100 calories"
+          "#{ unparse } has 100 calories"
         end
       end
-      module Sandwich
-        class MyNode <
-          ::Skylab::CodeMolester::Services::Treetop::Runtime::SyntaxNode
 
-          extend ::Skylab::CodeMolester::Sexp::Auto # 2 levels deep, nec
-          sexp_factory_class MySexp
+      module Sandwich
+
+        class MyNode < CodeMolester::Services::Treetop::Runtime::SyntaxNode
+
+          extend CodeMolester::Sexp::Auto
+          sexp_auto_class MySexp
+
+          # CodeMolester::Sexp::Auto.enhance( self ).sexp_auto_class MySexp
+
         end
       end
     end
+
     let(:grammar) do
       <<-HERE.unindent
         module Skylab::CodeMolester::TestNamespace
@@ -178,11 +189,26 @@ describe ::Skylab::CodeMolester::Sexp::Auto do
         end
       HERE
     end
+
     context "(this tree is ANNOYING)" do
-      let(:input) { 'rye lettuce tomato rye' }
-      let(:expected) { [:sandwich, [:top_slice, "rye"], [:items, [:item, "lettuce"], [:more_items, " tomato"]], [:bottom_slice, "rye"]] }
-      specify { should eql(expected) }
+      let :input do
+        'rye lettuce tomato rye'
+      end
+
+      let :expected do
+        [ :sandwich,
+          [:top_slice, "rye"],
+          [:items, [:item, "lettuce"], [:more_items, " tomato"]],
+          [:bottom_slice, "rye"] ]
+      end
+
+      it 'works' do
+        raw_tree = parse_result
+        s = raw_tree.sexp
+        s.should eql( expected )
+      end
     end
+
     context "you register them as above and everything just works magically" do
       let(:input) { '7 grain lettuce tomato 7 grain' }
       context "a sexp node with whose label you registered a custom class, e.g. Bread" do
