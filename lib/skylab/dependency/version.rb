@@ -33,13 +33,13 @@ module Skylab::Dependency
     end
 
     def bump! which
-      node = detect(which) or fail("no such node: #{ which.inspect }")
+      node = child(which) or fail("no such node: #{ which.inspect }")
       node[1] += 1
     end
 
-    def has_minor_version? ; !! detect(:minor) end
+    def has_minor_version? ; !! child(:minor) end
 
-    def has_patch_version? ; !! detect(:patch) end
+    def has_patch_version? ; !! child(:patch) end
 
   protected
 

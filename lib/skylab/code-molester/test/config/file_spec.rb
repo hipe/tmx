@@ -77,13 +77,13 @@ describe ::Skylab::CodeMolester::Config::File do
         @line.symbol_name.should eql(:assignment_line)
       end
       def name
-        @line.detect(:name).last
+        @line.child( :name ).last
       end
       def value
-        @line.detect(:value).last
+        @line.child( :value ).last
       end
       def comment
-        @line.detect(:comment).detect(:body).unparse
+        @line.child( :comment ).child( :body ).unparse
       end
       context("as the ideal, general case") do
         let(:input_string) { "foo=bar" }
@@ -124,7 +124,7 @@ describe ::Skylab::CodeMolester::Config::File do
         @line = line
       end
       def section_name_node
-        @line.detect(:header).detect(:section_line).detect(:name).last
+        @line.child( :header ).child( :section_line ).child( :name ).last
       end
       context "in the ideal, general case" do
         let(:input_string) { "[foo]" }

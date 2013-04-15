@@ -39,7 +39,7 @@ module Skylab::Dependency::TestSupport
 
     it "allows version bumps" do
       sexp = Dependency::Version::parse_string_with_version( "abc-1.4.7-def" )
-      ver = sexp.detect( :version )
+      ver = sexp.child( :version )
       ver.class.should eql( Dependency::Version )
       ver.unparse.should eql( "1.4.7" )
       ver.bump! :major

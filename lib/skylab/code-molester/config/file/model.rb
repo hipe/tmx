@@ -2,9 +2,11 @@ module ::Skylab::CodeMolester
 
   class Config::File::Model
 
-    # (while [#ps-101] (cover pub-sub viz) is open..)
+    module Foofer # (ignore)
 
-    module Foofer
+      # (while [#ps-101] (cover pub-sub viz) is open..) (multiple graphs
+      # in one file, specifically)
+
       extend PubSub::Emitter
       emits wizzle: :paazle
     end

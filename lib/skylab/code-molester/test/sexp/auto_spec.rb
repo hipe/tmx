@@ -136,10 +136,10 @@ describe ::Skylab::CodeMolester::Sexp::Auto do
     module ::Skylab::CodeMolester::TestNamespace
 
       class MySexp < CodeMolester::Sexp
+        CodeMolester::Sexp::Registrar[ self ]
       end
 
       class Bread < MySexp
-
         MySexp[:top_slice] = self
         MySexp[:bottom_slice] = self
 
@@ -207,13 +207,20 @@ describe ::Skylab::CodeMolester::Sexp::Auto do
     end
 
     context "you register them as above and everything just works magically" do
+
       let(:input) { '7 grain lettuce tomato 7 grain' }
-      context "a sexp node with whose label you registered a custom class, e.g. Bread" do
-        let(:subject) { sexp.detect(:top_slice).class }
-        specify { should eql(CodeMolester::TestNamespace::Bread) }
+
+      it "a sexp node with whose label you registered a custom class, #{
+          }e.g. Bread" do
+
+        raw_tree = parse_result
+        sexp = raw_tree.sexp
+        ts = sexp.child :top_slice
+        ts.class.should eql( CodeMolester::TestNamespace::Bread )
       end
+
       context 'calling the custom method ("calories") on your custom sexp class' do
-        let(:subject) { sexp.detect(:top_slice).calories }
+        let(:subject) { sexp.child(:top_slice).calories }
         specify { should eql("7 grain has 100 calories") }
       end
     end
