@@ -1,37 +1,89 @@
 module ::Skylab::CodeMolester
 
   module Sexp::Auto
-    # (this is probably deprecated for things near tan-man)
 
-    def self.extended mod
-      mod.auto_sexp_init
-      mod.send :include, InstanceMethods # [#sl-111]
-    end
+    # (redundancy note-
+    # there is another Sexp::Auto in tan-man. this one was started before
+    # that one, then that one grew very strong, and now we are cleaning
+    # up this one. but the point is we are no where near ready to merge
+    # the two - they work very differently. they will have to continue
+    # to cross-polinate for a while..)
 
-    def auto_sexp_init # @api-private
-
-      cache_h = { } # one cache per class that includes Sexp::Auto!
-
-      define_method :sexp_helper_cache do
-        cache_h
-      end
-
-      factory = nil
-
-      define_singleton_method :sexp_auto_class do |kls=nil|
-        if kls
-          factory = kls
-        elsif factory
-          factory
-        else
-          factory = Sexp
+    class Conduit_
+      def initialize mod, op_h
+        op_h.keys.each do |k|
+          define_singleton_method k do |*a|
+            mod.module_exec( *a, & op_h.fetch( k ) )
+          end
         end
       end
     end
 
-    def build_sexp *a
-      sexp_auto_class[ *a ]
+    class Conduit_::SingleShot
+      def with sexp_auto_class
+        @mutex = :with
+        freeze
+        @then[ :sexp_auto_class, sexp_auto_class ]
+        sexp_auto_class
+      end
+
+      def initialize &later
+        @then = later
+      end
     end
+
+    # `[]` - like `enhance` but use the default sexp class
+    # ( also just for fun we grease the wheels with the alternate syntax )
+
+    def self.[] mod
+      enhance mod do
+        sexp_auto_class Sexp
+      end
+    end
+
+    -> do  # `enhance`
+
+      init = nil ; op_h = { }
+
+      define_singleton_method :enhance do |mod, &blk|
+        if blk
+          mod.module_exec( & init )
+          Conduit_.new( mod, op_h ).instance_exec( &blk )
+          nil
+        else
+          Conduit_::SingleShot.new do |name, value|
+            mod.module_exec( & init )
+            mod.module_exec value, & op_h.fetch( name )
+            nil
+          end
+        end
+      end
+
+      mut_h = { }
+      init = -> do  # self is the client module
+        did = nil
+        mut_h.fetch object_id do
+          mut_h[ object_id ] = did = true
+
+          include InstanceMethods
+
+          cache_h = { }  # one cache per class that includes Sexp::Auto!
+
+          define_method :sexp_helper_cache do
+            cache_h
+          end
+        end
+        did or fail "test me - multiple enhancements not yet tested."
+      end
+
+      op_h[:sexp_auto_class] = -> kls do  # self is the client module
+
+        define_singleton_method :build_sexp do |*a|
+          kls[ *a ]
+        end
+
+      end
+    end.call
   end
 end
 

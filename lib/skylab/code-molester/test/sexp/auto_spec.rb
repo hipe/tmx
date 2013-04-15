@@ -152,10 +152,7 @@ describe ::Skylab::CodeMolester::Sexp::Auto do
 
         class MyNode < CodeMolester::Services::Treetop::Runtime::SyntaxNode
 
-          extend CodeMolester::Sexp::Auto
-          sexp_auto_class MySexp
-
-          # CodeMolester::Sexp::Auto.enhance( self ).sexp_auto_class MySexp
+          CodeMolester::Sexp::Auto.enhance( self ).with MySexp
 
         end
       end
