@@ -1,9 +1,8 @@
 module Skylab::CodeMolester
 
-
   class Config::Node < ::Treetop::Runtime::SyntaxNode
-    extend CodeMolester::Sexp::Auto
-    sexp_factory_class Config::Sexp
-  end
 
+    CodeMolester::Sexp::Auto.enhance( self ).with Config::Sexp
+
+  end
 end

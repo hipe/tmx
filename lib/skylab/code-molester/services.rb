@@ -23,8 +23,15 @@ module Skylab::CodeMolester
 
     o :YAML,          -> { require 'yaml'     ; ::YAML }
 
+
+    extend MAARS  # LOOK.
+
     define_singleton_method :const_missing do |const|
-      const_set const, h.fetch( const ).call
+      if h.key? const
+        const_set const, h.fetch( const ).call
+      else
+        super const  # KRAY!
+      end
     end
   end
 end

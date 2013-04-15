@@ -175,7 +175,7 @@ module Skylab::CodeMolester::TestSupport::Config::File
               path.exist?.should eql( true )
             end
 
-            it "when employing `dry_run` - does not write file", f:true do
+            it "when employing `dry_run` - does not write file" do
               tmpdir.clear  # ick
               path.exist?.should eql( false )
               yep = nil

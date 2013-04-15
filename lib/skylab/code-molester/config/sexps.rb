@@ -15,7 +15,7 @@ module Skylab::CodeMolester::Config
       d.value
     end
     def []= key, value
-      root.set_value(key, value)
+      root.set_mixed key, value
     end
     def initialize root, &b
       self.root = root
@@ -42,12 +42,13 @@ module Skylab::CodeMolester::Config
     def [] key
       detect { |i| key == i.item_name }
     end
-    def []= key, value
+    def set_section_with_hash key, value
       Hash === value or raise ArgumentError.new("Every assignment to an entire section must be a Hash, had #{value.class}")
       sec = self[key] || Sexps::Section.create(key, root)
       value.each { |k, v| sec[k] = v }
       value
     end
+    alias_method :[]=, :set_section_with_hash
     delegates_to :root, :remove
   end
 
@@ -70,7 +71,7 @@ module Skylab::CodeMolester::Config
     end
     def []= *a
       2 == a.count and ::String === a.first or return super
-      set_value(*a)
+      set_mixed( *a )
       a.last
     end
     def item_leaf?
@@ -81,18 +82,20 @@ module Skylab::CodeMolester::Config
     end
     def _no_value name
     end
-    def set_value name, value
+    def set_mixed name_str, value
       if ::Hash === value
-        sections[name] = value
-      elsif item = content_items.detect { |i| name == i.item_name }
+        sections.set_section_with_hash name_str, value
+      elsif item = content_items.detect { |i| name_str == i.item_name }
         _update_value item, value
       else
-        _create_value name, value
+        _create_value name_str, value
       end
     end
     def value_items
       Sexps::ValuesPseudohash.new(self) do |y|
-        _assignments_sexp.select(:assignment_line).each { |a| y << a }
+        _assignments_sexp.children( :assignment_line ).each do |sx|
+          y << sx
+        end
       end
     end
   end
@@ -117,15 +120,15 @@ module Skylab::CodeMolester::Config
     def _create_value name, value
       # we could try try dynamically add the node if necessary, but it
       # is less hacky to just assume it is there.  "Should" be there for all such valid trees.
-      sec = detect(:nosecs) or fail("Invalid file sexp: child not found: nosecs")
+      sec = nosecs or fail "Invalid file sexp: child not found: nosecs"
       Sexps::AssignmentLine.create name, value, sec
       nil
     end
     def nosecs
-      detect :nosecs
+      child :nosecs
     end
     def sections
-      detect(:sections).enumerator
+      child( :sections ).enumerator
     end
     def _update_value assmt, value
       assmt.set_item_value value
@@ -136,7 +139,7 @@ module Skylab::CodeMolester::Config
   class Sexps::Nosecs < Sexps::ContentItemBranch
     Sexp[:nosecs] = self
     def content_items
-      select :assignment_line
+      select_children :assignment_line
     end
     def prepend_comment line
       o = build_comment_line(line) or return false
@@ -151,7 +154,9 @@ module Skylab::CodeMolester::Config
     Sexp[:sections] = self
     def enumerator
       Sexps::SectionsPseudohash.new self do |y|
-        select(:section).each { |s| y << s }
+        select_children( :section ).each do |s|
+          y << s
+        end
       end
     end
     alias_method :content_items, :enumerator
@@ -162,11 +167,12 @@ module Skylab::CodeMolester::Config
   class Sexps::Section < Sexps::ContentItemBranch
     Sexp[:section] = self
     def content_items
-      self[2].select :assignment_line
+      self[2].select_children :assignment_line
     end
     def _create_value name, value
       # see comment at other implementation of this method
-      items = detect(:items) or fail("Invalid section sexp: child not found: items")
+      items = child :items
+      items or fail "Invalid section sexp: child not found: items"
       Sexps::AssignmentLine.create(name, value, items)
     end
     def item_leaf?
@@ -189,8 +195,9 @@ module Skylab::CodeMolester::Config
 
   class << Sexps::Section
     def create name, parent
-      if tmpl = parent.last(:section)
-        sl = tmpl.detect(:header).detect(:section_line)
+      tmpl = parent.rchild :section
+      if tmpl
+        sl = tmpl.child(:header).child(:section_line)
         s0 = sl[1]
         s1 = sl[3][1]
       else
@@ -234,7 +241,8 @@ module Skylab::CodeMolester::Config
   class << Sexps::AssignmentLine
     def create name, value, parent
       # use the whitespace formatting of the previous item if you can
-      if tmpl = parent.select(:assignment_line).last
+      tmpl = parent.rchild :assignment_line
+      if tmpl
         # anything?
       else
         tmpl = [nil, default_indent, nil, ' = ', nil]

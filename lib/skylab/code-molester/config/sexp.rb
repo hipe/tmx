@@ -1,8 +1,11 @@
 module Skylab::CodeMolester
 
 
-  class Config::Sexp < ::Skylab::CodeMolester::Sexp
+  class Config::Sexp < CodeMolester::Sexp
+
     extend MetaHell::DelegatesTo # gotta
+
+    Sexp::Registrar[ self ]
 
     S = self
 

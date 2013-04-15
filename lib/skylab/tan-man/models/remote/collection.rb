@@ -10,7 +10,8 @@ module Skylab::TanMan
 
     def push remote
       remote.bound? and fail "won't push bound remote"
-      parent = resource.sexp.detect :sections
+      parent = resource.sexp.child :sections
+
       sexp = Headless::Services::
         CodeMolester::Config::Sexps::Section.create '', parent
       r = remote.bind(sexp) ? self : false
@@ -29,7 +30,7 @@ module Skylab::TanMan
           result = e.error "expected section not found: [#{ section_name }]"
           break
         end
-        if resource.sexp.detect( :sections ).remove found
+        if resource.sexp.child( :sections ).remove found
           e.emit :write, resource: resource
           e.emit :info, "removed remote #{ remote.name }."
           result = true

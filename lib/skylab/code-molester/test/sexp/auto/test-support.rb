@@ -1,4 +1,4 @@
-require_relative '../test-support'
+require_relative '../../test-support'
 
 module ::Skylab::CodeMolester
 
@@ -14,19 +14,19 @@ module ::Skylab::CodeMolester
 
   module TestNamespace::PersonName_01
     class Node < CodeMolester::Services::Treetop::Runtime::SyntaxNode
-      extend CodeMolester::Sexp::Auto
+      CodeMolester::Sexp::Auto[ self ]
     end
   end
 
   module TestNamespace::PersonName_02
     class Node < CodeMolester::Services::Treetop::Runtime::SyntaxNode
-      extend CodeMolester::Sexp::Auto
+      CodeMolester::Sexp::Auto[ self ]
     end
   end
 
   module TestNamespace::PersonName_03
     class Node < CodeMolester::Services::Treetop::Runtime::SyntaxNode
-      extend CodeMolester::Sexp::Auto
+      CodeMolester::Sexp::Auto[ self ]
     end
   end
 end
