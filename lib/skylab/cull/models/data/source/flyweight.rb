@@ -77,9 +77,9 @@ module Skylab::Cull
       if @name
         @box.add :name, @name  # kind of eew, kind of meh
       end
-      sx = @section_sexp.detect :items
+      sx = @section_sexp.child :items
       if sx
-        sx.each :assignment_line do |al|
+        sx.children :assignment_line do |al|
           al.with_scanner do |scn|
             @box.add scn.scan( :name ).fetch( 1 ).gsub( '-', '_' ).intern,
               scn.scan( :value ).fetch( 1 )

@@ -10,12 +10,13 @@ module Skylab::TanMan
 
     def push remote
       remote.bound? and fail "won't push bound remote"
-      parent = resource.sexp.child :sections
-
-      sexp = Headless::Services::
-        CodeMolester::Config::Sexps::Section.create '', parent
-      r = remote.bind(sexp) ? self : false
-      r
+      sections = resource.sexp.child :sections
+      sexp = sections.content_items.append_section ''
+      if remote.bind sexp
+        self
+      else
+        false
+      end
     end
 
     on_remove = API::Emitter.new error: :all, info: :all, write: :all #[#046]

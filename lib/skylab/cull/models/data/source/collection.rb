@@ -47,6 +47,44 @@ module Skylab::Cull
       nil
     end
 
+    def add name, url, tag_a, is_dry_run, is_verbose, error_event, info
+      @model[ :configs ].if_config -> do
+        res = nil
+        cnt = @model[ :data, :source ].if_init_valid name, url, tag_a, -> cont do
+          cont
+        end, -> e do
+          res = error_event[ e ]
+          nil
+        end
+        if ! cnt then res else
+         add_valid_data_source cnt,
+            is_dry_run, is_verbose, error_event, info
+        end
+      end, error_event
+    end
+
+    module Exists
+    end
+
+    Exists::Already = Models::Event.new do |name_string|
+      "data source already exists, won't clobber - #{ name_string }"
+    end
+
+    def add_valid_data_source cnt, d, v, e, i
+      name = cnt.name
+      exists = data_sources.detect do |ds|
+        name == ds.name
+      end
+      if exists
+        e[ Exists::Already[ name_string: exists.name ] ]
+      else
+        @model[ :config ].insert_valid_data_source cnt, d, v, e, i
+      end
+    end
+    protected :add_valid_data_source
+
+  protected
+
     def initialize client
       @model = client
     end

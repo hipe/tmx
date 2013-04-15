@@ -18,6 +18,14 @@ module Skylab::Cull
       @param_h = { }
     end
 
+    def dry_run_option o
+      @param_h[:is_dry_run] = nil
+      o.on '-n', '--dry-run', 'dry-run.' do
+        @param_h[:is_dry_run] = true
+      end
+      nil
+    end
+
     def api *args
       a = normalized_child_name
       param_h = complete_param_h args

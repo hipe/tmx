@@ -8,99 +8,189 @@ module Skylab::CodeMolester::Config
   module Sexps                    # isn't it nice to see a plain old module
   end                             # so docile
 
+  class Sexps::Enumerator < ::Enumerator
 
-  class Sexps::ValuesPseudohash < ::Enumerator
-    def [] key
-      d = detect { |o| key == o.key } or return nil
-      d.value
+    def each &blk
+      if 2 != blk.arity then super else
+        super do |l|
+          blk[ l.key, l.value ]
+        end
+      end
     end
-    def []= key, value
-      root.set_mixed key, value
+
+  protected
+
+    def initialize host, &blk
+      @host = host
+      super( & blk )
     end
-    def initialize root, &b
-      self.root = root
-      super(&b)
+
+    attr_reader :host
+  end
+
+  class Sexps::Enumerator::Hashish < Sexps::Enumerator
+
+    def [] k
+      item = detect do |i|
+        k == i.key
+      end
+      if item
+        item.value
+      end
     end
-    def each &b
-      if 2 == b.arity
-        super do |el|
-          b.call(el.key, el.value)
+
+    def keys
+      map( & :key )
+    end
+
+    def []= k, v
+      @host.set_mixed k, v
+    end
+  end
+
+  class Sexps::Enumerator::Hashish::Sections < Sexps::Enumerator::Hashish
+
+    extend MetaHell::DelegatesTo
+
+    def [] k
+      detect do |i|
+        k == i.item_name
+      end
+    end
+
+    -> do  # `set_section_with_hash`  ( a.k.a `[]=` ), `insert_after`
+
+      append_to_parent = nil
+      define_method :set_section_with_hash do |key, body_data_pairs|
+        if ! body_data_pairs.respond_to? :each_pair
+          raise ::ArgumentError, "When assigning to an entire section, #{
+            }expected hash-like, had #{ body_data_pairs.class }"
+        end
+        sec = self[ key ] || append_to_parent[ @host, key ]
+        body_data_pairs.each_pair do |k, v|
+          sec[ k.to_s ] = v
+        end
+        sec
+      end
+
+      create = nil
+      define_method :insert_after do |sect_name, body_data_pairs, before|
+        sec = create[ sect_name, @host, body_data_pairs ]
+        @host.insert_after sect_name, sec, before
+      end
+
+      define_method :append_section do |sect_name, body_data_pairs=nil|
+        sec = create[ sect_name, @host, body_data_pairs ]
+        @host << sec  # pray
+        sec
+      end
+
+      append_to_parent = -> parent, name do
+        sect = create[ name, parent ]
+        # parent.push "\n" # this probably breaks syntax, let's see if it's ok
+        # SEE TESTS re above)
+        parent << sect
+        sect
+      end
+
+      create = -> name, parent, body_data_pairs=nil do
+        tmpl = parent.rchild :section
+        if tmpl
+          sl = tmpl.child( :header ).child( :section_line )
+          s0 = sl[1]
+          s1 = sl[3][1]
+        else
+          s0 = '['
+          s1 = ']'
+        end
+        sec = S[ :section,
+          S[ :header,
+            S[ :section_line, s0, S[ :name, name.to_s ], S[ :n_3, s1 ] ]
+          ],
+          S[ :items, "\n" ]
+        ]
+        if body_data_pairs
+          body_data_pairs.each_pair do |k, v|
+            k = k.to_s  # it is time
+            sec[ k ] = v
+          end
+        end
+        sec
+      end
+
+      alias_method :[]=, :set_section_with_hash
+
+    end.call
+
+    delegates_to :host, :remove
+  end
+
+  class Sexps::ContentItemBranch < Sexp
+
+    # note that for now this is hard-coded to assume string and not symbol keys!
+    # (the test below cannot simply test for Fixnum-based key b/c it also must
+    # take ranges)
+
+    def [] kx, *kxa  # ::Array supports arguments like arr[ 0, 1 ]
+      if kxa.length.zero? and kx.respond_to? :ascii_only?
+        sx = content_items.detect { |sexp| kx == sexp.item_name }
+        if sx
+          if sx.item_leaf?
+            sx.item_value
+          else
+            sx
+          end
+        else
+          _no_value kx
         end
       else
         super
       end
     end
-    def keys
-      map { |v| v.key }
-    end
-    attr_accessor :root
-  end
 
-
-  class Sexps::SectionsPseudohash < Sexps::ValuesPseudohash
-    extend MetaHell::DelegatesTo
-    def [] key
-      detect { |i| key == i.item_name }
-    end
-    def set_section_with_hash key, value
-      Hash === value or raise ArgumentError.new("Every assignment to an entire section must be a Hash, had #{value.class}")
-      sec = self[key] || Sexps::Section.create(key, root)
-      value.each { |k, v| sec[k] = v }
-      value
-    end
-    alias_method :[]=, :set_section_with_hash
-    delegates_to :root, :remove
-  end
-
-
-  class Sexps::ContentItemBranch < Sexp
-    # note that for now this is hard-coded to assume string and not symbol keys!
-    # (the test below cannot simply test for Fixnum-based key b/c it also must take ranges)
-    def [] *a
-      1 == a.count && ::String === a.first or return super
-      name = a.first
-      if ( i = content_items.detect { |ii| name == ii.item_name } )
-        if i.item_leaf?
-          i.item_value
-        else
-          i
-        end
+    def []= kx, *kxa, v
+      if kxa.length.zero? and kx.respond_to? :ascii_only?
+        set_mixed kx, v
+        v
       else
-        _no_value name
+        super
       end
     end
-    def []= *a
-      2 == a.count and ::String === a.first or return super
-      set_mixed( *a )
-      a.last
-    end
+
     def item_leaf?
       false
     end
+
     def key? name
       !! content_items.detect { |ii| name == ii.item_name }
     end
+
     def _no_value name
     end
-    def set_mixed name_str, value
-      if ::Hash === value
-        sections.set_section_with_hash name_str, value
-      elsif item = content_items.detect { |i| name_str == i.item_name }
-        _update_value item, value
+
+    def set_mixed name_str, x
+      if x.respond_to? :each_pair
+        sections.set_section_with_hash name_str, x
       else
-        _create_value name_str, value
+        item = content_items.detect do |i|
+          name_str == i.item_name
+        end
+        if item
+          _update_value item, x
+        else
+          _create_value name_str, x
+        end
       end
     end
+
     def value_items
-      Sexps::ValuesPseudohash.new(self) do |y|
-        _assignments_sexp.children( :assignment_line ).each do |sx|
+      Sexps::Enumerator::Hashish.new self do |y|
+        _assignments_sexp.children(:assignment_line).each do |sx|
           y << sx
         end
       end
     end
   end
-
-
 
   class Sexps::FileSexp < Sexps::ContentItemBranch
     Sexp[:file] = self
@@ -135,34 +225,55 @@ module Skylab::CodeMolester::Config
     end
   end
 
-
   class Sexps::Nosecs < Sexps::ContentItemBranch
+
     Sexp[:nosecs] = self
+
     def content_items
       select_children :assignment_line
     end
+
     def prepend_comment line
       o = build_comment_line(line) or return false
-      self[1,0] = [o] # supreme hackery
+      self[ 1, 0 ] = [o] # supreme hackery
       o
     end
   end
 
-
-
   class Sexps::Sections < Sexp
+
     Sexp[:sections] = self
+
     def enumerator
-      Sexps::SectionsPseudohash.new self do |y|
-        select_children( :section ).each do |s|
-          y << s
+      Sexps::Enumerator::Hashish::Sections.new self do |y|
+        select_children( :section ).each do |sx|
+          y << sx
         end
       end
     end
+
     alias_method :content_items, :enumerator
+
+    def insert_after sect_name, item, before_sexp
+      if before_sexp
+        here = before_sexp.section_name
+        pos = nil
+        with_scanner_for_symbol :section do |scn|
+          while x = scn.gets
+            if here == x.section_name
+              pos = scn.pos
+              break
+            end
+          end
+        end
+        pos or raise ::KeyError, "after? - #{ here }"
+      else
+        pos = 0  # insert after this position (strict sexps)
+      end
+      self[ pos + 1 , 0 ] = [ item ]
+      nil
+    end
   end
-
-
 
   class Sexps::Section < Sexps::ContentItemBranch
     Sexp[:section] = self
@@ -191,28 +302,11 @@ module Skylab::CodeMolester::Config
     end
   end
 
+  class Sexps::Section
 
+    # (used to have hellof builders here, but it was an API liability)
 
-  class << Sexps::Section
-    def create name, parent
-      tmpl = parent.rchild :section
-      if tmpl
-        sl = tmpl.child(:header).child(:section_line)
-        s0 = sl[1]
-        s1 = sl[3][1]
-      else
-        s0 = '['
-        s1 = ']'
-      end
-      sect = S[:section, S[:header, S[:section_line, s0, S[:name, name.to_s], S[:n_3, s1]]],
-        S[:items, "\n"]]
-      # parent.push "\n" # this probably breaks syntax, let's see if it's ok # SEE TESTS
-      parent.push sect
-      sect
-    end
   end
-
-
 
   class Sexps::AssignmentLine < Sexp
     Sexp[:assignment_line] = self
@@ -236,8 +330,6 @@ module Skylab::CodeMolester::Config
     end
   end
 
-
-
   class << Sexps::AssignmentLine
     def create name, value, parent
       # use the whitespace formatting of the previous item if you can
@@ -257,8 +349,6 @@ module Skylab::CodeMolester::Config
     end
     attr_accessor :default_indent
   end
-
-
 
   class Sexps::Comment < Sexp
     Sexp[:comment] = self

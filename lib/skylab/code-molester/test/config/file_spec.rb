@@ -129,7 +129,7 @@ describe ::Skylab::CodeMolester::Config::File do
       context "in the ideal, general case" do
         let(:input_string) { "[foo]" }
         it "works" do
-          section_name_node.should eql('foo')
+           section_name_node.should eql('foo')
         end
       end
       context "with lots of spaces and tabs everywhere" do
@@ -315,15 +315,20 @@ describe ::Skylab::CodeMolester::Config::File do
             HERE
           end
           it "lets you create a section by assigning a hash to it" do
+            config = self.config
             last_part = ->(s) { s.match(/good times here(.+)\z/m)[1] }
             last_part[config.string].should eql("\n")
-            config['goal'] ||= {}
+            config['goal'] ||= { }
+            x = config['goal']
+            x.should be_respond_to( :child )
             config['goal']['dream'] = 'deadline'
-            last_part[config.string].should eql(<<-HERE.gsub(/^(  ){6}/, ''))
+            act = last_part[ config.string ]
+            exp = (<<-HERE.gsub(/^(  ){6}/, ''))
 
             [goal]
               dream = deadline
             HERE
+            act.should eql( exp )
           end
         end
       end

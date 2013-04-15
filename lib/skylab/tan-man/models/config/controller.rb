@@ -57,7 +57,9 @@ module Skylab::TanMan
 
     def load_default_content resource
       x = resource.sexp
-      o = -> s { x.prepend_comment s }
+      o = -> s do
+        x.prepend_comment s
+      end
       o[ '' ] # in reverse
       o[ "parts of this file may have been generated and may be overwritten" ]
       o[ "created #{ Time.now.localtime } by tanman" ]

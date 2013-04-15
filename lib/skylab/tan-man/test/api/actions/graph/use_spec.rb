@@ -63,7 +63,7 @@ module Skylab::TanMan::TestSupport::API::Actions
           lone_error( /cannot create, is directory: is-a-directory\.dot/i )
         end
 
-        it 'and you give it a path that is a file - "file exists" ' do
+        it 'and you give it a path that is a file - "file exists" ', f:true do
           prepared_tanman_tmpdir.touch 'hi-im-here.dot'
           from_tmpdir do
             api_invoke path: 'hi-im-here.dot'

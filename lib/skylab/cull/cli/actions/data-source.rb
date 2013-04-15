@@ -11,5 +11,18 @@ module Skylab::Cull
     def list
       api
     end
+
+    option_parser do |o|
+      dry_run_option o
+
+      @param_h[ :tag_a ] = nil
+      o.on '-t', '--tag <name>' do |v|
+        ( @param_h[ :tag_a ] ||= [ ] ) << v
+      end
+    end
+
+    def add name, url
+      api name, url
+    end
   end
 end

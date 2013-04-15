@@ -9,10 +9,7 @@ module Skylab::Cull
       o.separator @command.usage_line
       o.separator "#{ hi 'options:' }"
 
-      @param_h[:is_dry_run] = nil
-      o.on '-n', '--dry-run', 'dry-run.' do
-        @param_h[:is_dry_run] = true
-      end
+      dry_run_option o
 
       @param_h[:is_verbose] = nil
       o.on '-v', '--verbose', 'verbose.' do

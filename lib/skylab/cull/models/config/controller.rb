@@ -5,6 +5,10 @@ module Skylab::Cull
     module Events
     end
 
+    def do_cache  # be careful!
+      true
+    end
+
     -> do  # `new_valid`
 
       Init_ = ::Struct.new :api_client, :pathname
@@ -58,6 +62,73 @@ module Skylab::Cull
         end
       end while nil
       res
+    end
+
+    def insert_valid_data_source src, d, v, e, i
+      insert_valid_item 'data-source', src, d, v, e, i
+    end
+
+    Collision = Models::Event.new do |section_name|
+      "name collision with #{ section_name.inspect }"
+    end
+
+    Inserted = Models::Event.new do |item|
+      "inserted into list - #{ item.name.inspect }"
+    end
+
+    def insert_valid_item sect_name, cont, dry, verbose, error_event, info_ev
+      section_name = "#{ sect_name } #{ cont.name.inspect }"
+      res = nil ; this_before_me = nil
+      stay = true
+      sct = @file.sections
+      sct and sct.each do |s|
+        cmp = section_name <=> s.section_name
+        if -1 == cmp
+          break
+        elsif 1 == cmp
+          this_before_me = s
+        else
+          res = error_event[ Collision[ section_name: section_name ] ]
+          break( stay = false )
+        end
+      end
+      if ! stay then res else
+        b_h = cont.body_h
+        @file.sections.insert_after section_name, b_h, this_before_me if ! dry
+        info_ev[ Inserted[ item: cont ] ]
+        write dry, error_event, info_ev
+      end
+    end
+    protected :insert_valid_item
+
+    Wrap = Models::Event.new do |upstream|
+      upstream.message_function[]
+    end
+
+    Text = Models::Event.new do |text|
+      text
+    end
+
+    Invalid = Models::Event.new do |rsn_o|
+      rsn_o.render
+    end
+
+    def write dry, error_event, info_event
+      if @file.valid?
+        @file.write do |w|
+          w.with_specificity do
+            w.on_text do |e|
+              info_event[ Text[ text: e ] ]
+            end
+            w.on_structural do |e|
+              info_event[ Wrap[ upstream: e ] ]
+            end
+          end
+          w.dry_run = dry
+        end
+      else
+        error_event[ Invalid[ rsn_o: @file.invalid_reason ] ]
+      end
     end
   end
 end
