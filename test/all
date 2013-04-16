@@ -32,7 +32,6 @@ module Skylab::Test
         default_action
         argument_list
         ready
-        sort
         conclude
       |
       services %i|
@@ -41,7 +40,6 @@ module Skylab::Test
         paystream
         full_name
         run_mode
-        sort
       |
       services_delegated_to :subtree, %i|
         hot_spec_paths
@@ -255,21 +253,6 @@ module Skylab::Test
         else :none end
     end
 
-    def sort cache_a  # - service
-      okay = true
-      emit_eventpoint :sort, cache_a do |ea|
-        ea.each do |ok, client|
-          if ! ok
-            okay = false
-            @info_y << "#{ client.plugin_slug } plugin failed #{
-              }to sort, not going any further."
-            break
-          end
-        end
-      end
-      okay
-    end
-
     # (called by the framework from `parse_opts`)
 
     def build_option_parser
@@ -448,7 +431,6 @@ module Skylab::Test
       services %i|
         infostream
         info_y
-        sort
       |
 
       plugin_services %i|
@@ -477,6 +459,7 @@ module Skylab::Test
         available_options
         compile
         is_active_boolean_agent
+        sort
         postvalidate
         conclude
       |
@@ -546,6 +529,7 @@ module Skylab::Test
         end
         r = -> do
           conflict_a and break report_conflicts( conflict_a )
+          children_sort( sp_cache_a ) or break false
           postvalidate_children or break false
           true
         end.call
@@ -679,17 +663,27 @@ module Skylab::Test
       false  # important - becomes `did_run` for some
     end
 
+    def children_sort sp_cache_a
+      _emit_to_children :sort, sp_cache_a
+    end
+
     def postvalidate_children
+      _emit_to_children :postvalidate
+    end
+
+    def _emit_to_children eventpoint_i, * arg_a
       ok = true ; info_y = host.info_y
-      emit_eventpoint_to_each_client :postvalidate do |client|
-        ::Enumerator::Yielder.new do |msg|
+      emit_eventpoint_to_each_client eventpoint_i do |client|
+        y = ::Enumerator::Yielder.new do |msg|
           ok = false
           info_y << "#{ client.plugin_slug } plugin #{ msg }"
         end
+        [ * arg_a, y ]
       end
       ok or info_y << "won't procede further because of the above."
       ok
     end
+    private :_emit_to_children
   end
 
   class Plugins::Subtree::Subproduct_
@@ -1110,6 +1104,128 @@ module Skylab::Test
     end
   end
 
+  class Plugins::Subtree::Agent::Order
+
+    # (just for fun we do this as a standalone class, to grease it)
+
+    Headless::Plugin.enhance self do
+      eventpoints %i|
+        available_options
+        compile
+        sort
+        conclude
+      |
+
+      services %i|
+      |
+    end
+
+    def initialize
+      @sexp = @do_verbose = nil
+    end
+
+    available_options do |o, _|
+      o.on '-f', '--first <name-frag>', 'run this one first' do |x|
+        ( @sexp ||= [ ] ) << [ :first, x ]
+      end
+
+      o.on '-t', '--then <name-frag>', 'run these ones in this order' do |x|
+        ( @sexp ||= [ ] ) << [ :then, x ]
+      end
+
+      o.on '-v', '--verbose', 'be verbose.' do
+        @do_verbose = true
+      end
+
+      true
+    end
+
+    compile do |y|
+      if @sexp
+        bork = -> msg do
+          y << "nonsensical ordering: #{ msg }"
+        end
+        x = @sexp.fetch( 0 ).fetch( 0 )
+        x == :first or break bork[ "--#{ x } before --first? NEVER." ]
+        wat = @sexp[ 1..-1 ].detect { |k,| :first == k }
+        wat and break bork[ "did not come first: --first #{ wat.fetch 1 }" ]
+        nil
+      end
+      nil
+    end
+
+    conclude do |y|
+      if @sexp && @do_verbose
+        y << "surely did order it"
+        true
+      end
+    end
+
+    class Comp_Tuple_ < ::Array
+
+      include ::Comparable
+
+      def <=> other
+        length.times.reduce 0 do |m, idx|
+          x = self[ idx ]
+          y = other[ idx ]
+          if x.nil?
+            if ! y.nil?
+              break 1
+            end # else stay
+          elsif y.nil?
+            break -1
+          else
+            c = x <=> y
+            if ! c.zero?
+              break c
+            end
+          end
+          m
+        end
+      end
+    end
+
+    sort do |cache_a, y|
+      if @sexp
+        _sort cache_a, y
+      end
+    end
+
+    def _sort cache_a, y
+      orig_h = { }
+      cache_a.each_with_index do |(sp, _), idx|
+        orig_h[ sp.slug ] = idx
+      end
+      rx_a = @sexp.map do |(_, val)|
+        %r{\A#{ ::Regexp.escape val }}
+      end
+      pool_a = rx_a.length.times.to_a
+      cache_a.sort_by! do |(sp, _)|
+        slug = sp.slug
+        res = if pool_a
+          pool_a.each_with_index.reduce nil do |m, (ix, i)|
+            if rx_a.fetch( ix ) =~ slug
+              pool_a[ i ] = nil
+              pool_a.compact!
+              pool_a.length.zero? and pool_a = nil
+              break Comp_Tuple_[ ix ]
+            end
+          end
+        end
+        res || Comp_Tuple_[ nil, orig_h.fetch( slug ) ]
+      end
+      if pool_a
+        a = pool_a.map do |idx|
+          "\"#{ @sexp.fetch( idx ).fetch( 1 ) }\""
+        end
+        y << "found no subproducts matching #{ a * ' or ' }"
+        false
+      end
+    end
+    protected :_sort
+  end
+
   module Plugins::Files
 
     Headless::Plugin.enhance self do
@@ -1143,7 +1259,7 @@ module Skylab::Test
     )
 
     available_options do |o, _|
-      o.on '-p', '--pretty', '..filenames.' do
+      o.on '-p', '--pretty', '..filenames. (files)' do
         @do_pretty = true
       end
 
