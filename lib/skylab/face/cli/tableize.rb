@@ -5,6 +5,9 @@ module Skylab::Face
   end
 
   module CLI::Tableize::InstanceMethods
+
+    # `tableize` - deprecated for `tablify`
+
     def tableize rows, opts = {}, &line_f
       opts = { show_header: true }.merge(opts)
       keys_order = []
@@ -26,6 +29,33 @@ module Skylab::Face
           keys_order.map{ |k| "%#{max_h[k]}s" % row[k].to_s }.join(sep)
         }#{right}")
       end
+      nil
+    end
+
+    def tablify col_a, row_ea, line, show_header=true, left = '| ',
+        sep = '  |  ', right = ' |'
+
+      w = col_a.length
+      max_h = ::Hash.new { |h, k| h[ k ] = 0 }
+      max = -> *a do
+        w.times do |x|
+          l = a.fetch( x ).to_s.length
+          l > max_h[ x ] and max_h[ x ] = l
+        end
+      end
+
+      max[ *col_a ] if show_header
+      row_ea.each( & max )
+
+      fmt = "#{ left }#{ w.times.map do |x|
+        "%#{ max_h.fetch x }s"
+      end * sep }#{ right }"
+
+      row = -> * a do
+        line.call( fmt % a )
+      end
+      row[ * col_a ] if show_header
+      row_ea.each( & row )
       nil
     end
   end

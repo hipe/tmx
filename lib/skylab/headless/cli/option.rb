@@ -250,6 +250,34 @@ module Skylab::Headless
       @sexp
     end
 
+    # `short_fulls` - sexperts only
+
+    def short_fulls
+      @sexp.nil? and _parse_args
+      if @sexp
+        ::Enumerator.new do |y|
+          @sexp.children( :short_full ).each do |sx|
+            y << sx.last
+          end
+          nil
+        end
+      end
+    end
+
+    # `long_fulls` - sexperts only
+
+    def long_fulls
+      @sexp.nil? and _parse_args
+      if @sexp
+        ::Enumerator.new do |y|
+          @sexp.children( :long_sexp ).each do |sx|
+            y << ( sx.last.values * '' )
+          end
+          nil
+        end
+      end
+    end
+
     # this is kind of wonktastic how we do this - for this library (this file)
     # we follow our usual functional scopey nonsense. but also we 'export'
     # some nerks for others to use. in those cases we use:

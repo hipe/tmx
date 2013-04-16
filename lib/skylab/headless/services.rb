@@ -12,6 +12,7 @@ module Skylab::Headless
     o :Open4        , -> { require_quietly 'open4'; ::Open4 }
     o :OptionParser , -> { require 'optparse'   ; ::OptionParser }
     o :PubSub       , -> { require 'skylab/pub-sub/core' ; ::Skylab::PubSub }
+    o :Set          , -> { require 'set'        ; ::Set }
     o :Shellwords   , -> { require 'shellwords' ; ::Shellwords }
     o :StringIO     , -> { require 'stringio'   ; ::StringIO }
     o :StringScanner, -> { require 'strscan'    ; ::StringScanner }

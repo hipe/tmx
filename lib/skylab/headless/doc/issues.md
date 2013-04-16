@@ -1,3 +1,4 @@
+[#070]       plugins! (an experiment with this node..)
 [#069]       #doc-point (sorry to jump ahead) "ouroboros"
 [#068]       track this redundancy during a hack
 [#067]       merge this into that

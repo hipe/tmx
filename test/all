@@ -5,178 +5,98 @@ require 'skylab/face/core'      # `pretty_path`, Tableize::I_M
 require 'skylab/headless/core'  # only for require_quietly
 require 'optparse'
 
-
-
 module Skylab::Test
 
-  Face = ::Skylab::Face
-  Headless = ::Skylab::Headless
+  %i| Face Headless Test |.each do |i|
+    const_set i, ::Skylab.const_get( i, false )
+  end
 
+  module Core  # `Headless`
+  end
 
-  class HeadlessClient < ::Struct.new :queue, :submodules
+  module Plugins
+    # the set of available plugins is isomorphic with constants here.
+  end
+
+  class Core::Client
 
     # (nothing public declared.)
 
-  protected
+    Headless::Plugin::Host.enhance self do
+      add_plugins_box_module Plugins
+      eventpoints %i|
+        available_actions
+        action_summaries
+        available_options
+        default_action
+        argument_list
+        ready
+        sort
+        conclude
+      |
+      services %i|
+        infostream
+        paystream
+        full_name
+        run_mode
+        mutable_argv
+        sort
+      |
+      services_delegated_to :subtree, %i|
+        subproduct_dir_pathname
+        all_subproducts
+        all_spec_paths
+        hot_spec_paths
+      |
+    end
 
     def initialize
-      super [], []
+      @queue_a = []
     end
 
-    def add_skip name
-      (@skip ||= { })[name.intern] = true
-    end
+    # `full_name` - a service provided by this host
 
-    define_method :escape_path, & Headless::CLI::PathTools::FUN.pretty_path
-
-    def find_submodules
-      list = [] ; hash = {}
-      submodule_paths.each do |dirpath|
-        o = Submodule.new(File.basename(dirpath).intern, dirpath)
-        list[hash[o.name] = list.length] = o
-        testdir = o.inferred_testdir
-        if testdir.exist?
-          a = ::Pathname.glob o.inferred_testdir.join('**/*_spec.rb')
-          if ! a.empty?
-            o.spec_subdir = testdir
-            o.spec_paths = a
-          end
-        end
-      end
-      [list, hash]
-    end
-
-    def gemroot
-      @gemroot ||= ::Pathname.new(::File.expand_path('../..', __FILE__))
-    end
-
-    def payload str
-      emit :payload, str
-      nil
-    end
-
-    attr_reader :skip
-
-    def spec_paths                # experimentally big and functional
-      match = if skip
-        h = skip
-        -> sym { ! h[sym] }
-      elsif only
-        h = ::Hash[ only.map { |x| [x.intern, true] } ]
-        -> sym { h[sym] }
-      else
-        -> sym { true }
-      end
-      visit_submodule = -> y, submodule do
-        if substring
-          submodule.spec_paths.each do |p|
-            if p.to_s.include? substring
-              y << p
-            else
-              self.ignored_count += 1
-            end
-          end
-        else
-          submodule.spec_paths.each { |p| y << p }
-        end
-      end
-      valid = -> seen do
-        ok = true
-        if skip
-          if (bad = skip.keys - seen).length.nonzero?
-            ok = bad_skip seen, bad
-          end
-        elsif only
-          if (bad = only - seen).length.nonzero?
-            ok = bad_only seen, bad
-          end
-        end
-        ok
-      end
-      ::Enumerator.new do |y|
-        seen = [ ] ; self.ignored_count = 0
-        atom = submodules.reduce [] do |m, submodule|
-          seen.push submodule.name
-          if match[ submodule.name ]
-            m.push submodule
-          end
-          m
-        end
-        ok = valid[ seen ]
-        if ok
-          atom.each { |s| visit_submodule[ y, s ] }
-        end
-        nil
-      end
-    end
-
-    def submodules
-      @hash ||= begin # apology
-        self.submodules, hash = find_submodules
-        hash
-      end
-      super
-    end
-
-    def submodule_paths
-      ::Pathname.glob gemroot.join( 'lib/skylab/*' )
-    end
-
-    def write_files_list
-      specs = submodules.reduce([]) do |a, submodule|
-        a.concat submodule.spec_paths ; a
-      end
-      if specs.empty?
-        info "No specs found!"
-      else
-        info "These are the spec files:"
-        specs.each do spec_pathname
-          payload escape_path( spec_pathname )
-        end
-      end
+    def full_name
+      #  program_name   # why do this when you could ..
+      @full_name ||= ::Pathname.new( __FILE__ ).expand_path.relative_path_from(
+        ::Skylab.dir_pathname.dirname.dirname ).to_s
     end
   end
 
+  class CLI < Core::Client  # ( re-opened below )
+  end
 
-  class Submodule < ::Struct.new :name, :pathname, :spec_subdir, :spec_paths
-    def inferred_testdir
-      pathname.join 'test'
-    end
+  module CLI::SubClient
+  end
 
-    def num_test_files
-      spec_paths && spec_paths.length or 0
-    end
+  module CLI::SubClient::InstanceMethods
+
+    include Face::CLI::Tableize::InstanceMethods
 
   protected
 
-    def initialize name, path
-      pn = ::Pathname.new path.to_s
-      super name, pn, nil, []
+    def em s
+      "\e[1;32m#{ s }\e[0m"
     end
+
+    define_method :pretty_path, & Headless::CLI::PathTools::FUN.pretty_path
+
   end
 
+  module CLI::Client_InstanceMethods
 
-  module CLI_InstanceMethods
-    include Face::CLI::Tableize::InstanceMethods
+    include CLI::SubClient::InstanceMethods
 
     # (nothing public declared.)
 
   protected
 
     def initialize o = $stdout, e = $stderr
-      super()
+      super( )
       @emit = -> type, str do
         ( :payload == type  ? o : e ).puts str
       end
-      @infostream = e
-    end
-
-    def actions
-      @actions ||= self.class.public_instance_methods(false) - [:invoke]
-    end
-
-    def em s
-      "\e[1;32m#{ s }\e[0m"
+      @paystream, @infostream = o, e
     end
 
     def emit type, data
@@ -193,14 +113,14 @@ module Skylab::Test
       nil
     end
 
-    attr_reader :infostream
+    attr_reader :infostream, :paystream  # services
 
     def option_parser
       @option_parser ||= build_option_parser
     end
 
-    def parse_opts argv
-      option_parser.parse! argv
+    def parse_opts
+      option_parser.parse! @argv
       true
     rescue ::OptionParser::ParseError => e
       usage e
@@ -213,186 +133,1204 @@ module Skylab::Test
     def usage msg
       emit :error, msg
       info usage_line
-      info "See #{em "#{program_name} -h"} for more help."
+      info "See #{ em "#{ program_name } -h" } for more help."
       false
     end
 
     def usage_line
       "#{ em 'Usage:' } #{ option_parser.program_name } [opts] #{
-        }[[#{ actions.join '|' }] [..]] [subproduct [subproduct [..]]]"
+        }[[#{ action_names * '|' }] [..]] [subproduct [subproduct [..]]]"
     end
   end
 
+  module Host_InstanceMethods  # (re-opened below)
+  end
 
-  class CLI < HeadlessClient
-    include CLI_InstanceMethods
+  class CLI < Core::Client
+
+    include CLI::Client_InstanceMethods
+    include Host_InstanceMethods
+
+    def initialize
+      super
+      @action_a = nil
+    end
 
     def invoke argv
-      result = nil
+      r = nil
+      begin
+        @argv = argv
+        r = resolve_queue or break
+        r = ready or break
+        while tok = @queue_a.shift  # not using reduce b.c 1 stack frame
+          action = @action_a.detect { |a| a.normalized_local_name == tok }
+          if action
+            plugin_validate_client action.client
+            r = action.client.send action.as_method
+            if false == r
+              break  # meh
+            else
+              emit_eventpoint_to_each_client :conclude do |client|
+                ::Enumerator::Yielder.new do |msg|
+                  info.puts "(#{ client.plugin_slug } plugin #{ msg })"
+                end
+              end
+            end
+          else
+            send tok  # e.g 'help'
+          end
+        end
+      end while nil
+      r
+    end
+
+    def ready
+      ok = true ; info = @infostream
+      emit_eventpoint_to_each_client :ready do |client|
+        ::Enumerator::Yielder.new do |msg|
+          ok = false
+          info.puts "#{ client.plugin_slug } #{ msg }"
+        end
+      end
+      if ok then ok else
+        info.puts "won't procede further because of the above."
+        false
+      end
+    end
+    protected :ready
+
+    # `resolve_queue` - test/all is expected to be run for at least two
+    # purposes - 1) it is a file we can load with `rspec` and have it load
+    # "every" spec file in our universe.  2) it is an executable we can run
+    # standalone utilizing several options, including but not limited to
+    # invoking `rspec` *while* having warnings turned on on our tests.
+    # `run_mode` exists to determine and represent that distinction.
+
+    # NOTE - it bears pointing out that the grammar for this utility is
+    # ambiguous. it draws symbols from both the set of available action names
+    # and the set of existing subproduct names, such that how your command is
+    # interpreted will depend on both of these at the time it is run, with
+    # tokens you intend as subproduct names possibly getting masked by (and
+    # interpreted as) action names.
+    #
+    # there is no solution yet implemented for this problem (for whenever there
+    # exists as an input token a token that looks like an action name that
+    # action will be popped off the input stream and added to the action queue
+    # as long as such tokens exist at the front of the input stream), but at
+    # present the problem is not a problem because there is no set union between
+    # the exponents of the two namespaces, (that is, there is no name that is
+    # shared by both action and subproduct name) hence the grammar is de-facto
+    # unambiguous, but only by sheer dumb luck.
+    #
+    # the solution (if ever needed) will likely be adding the one line of code
+    # necessary to let "--" separate these two nonterminal symbols.
+
+    def resolve_queue
+      ok = true
       begin
         if :cli == run_mode
-          parse_opts argv or break
-          loop do
-            argv.empty? and break
-            if actions.include? argv.first.intern
-              queue.push argv.shift.intern
-            else
-              break
-            end
+          parse_opts or break
+          parse_any_explicit_actions_off_of_argv or break
+        end
+        resolve_default_action_if_necessary or break
+        if :cli == @run_mode && @argv.length.nonzero?
+          emit_eventpoint :argument_list, @argv
+          if @argv.length.nonzero?
+            @infostream.puts "won't run with unresolved argv - #{ @argv }"
+            ok = false
           end
-          if ! argv.empty?
-            @only = argv.map(&:intern) # can u guess what [*argv] does
-            argv.clear # whatever just trying to be polite
-          end
-          if skip and only
-            result = usage "can't use --skip along with subproduct names."
+        end
+      end while nil
+      ok && @queue_a.length.nonzero?
+    end
+
+    # `run_mode` - see notes at `resolve_queue`.
+    # result is { :cli | :rspec | :none }
+
+    def run_mode  # - service
+      @run_mode ||= if __FILE__ == $PROGRAM_NAME then :cli
+        elsif %r{/rspec$} =~ $PROGRAM_NAME then :rspec  # ick
+        else :none end
+    end
+
+    def mutable_argv  # - service (experimental)
+      @argv
+    end
+
+    def sort cache_a  # - service
+      okay = true
+      emit_eventpoint :sort, cache_a do |ea|
+        ea.each do |ok, client|
+          if ! ok
+            okay = false
+            @infostream.puts "#{ client.plugin_slug } plugin failed #{
+              }to sort, not going any further."
             break
           end
         end
-        if queue.empty?
-          queue.push default_action_name
-        end
-        result = queue.reduce nil do |_, action|
-          r = send action
-          r
-        end
-      end while nil
-      result
-    end
-
-  public # the actions
-
-    def counts
-      tableize(::Enumerator.new do |y|
-        total = 0
-        submodules.each do |o|
-          total += (cnt = o.num_test_files)
-          y << { submodule: o.name.to_s, num_test_files: cnt }
-        end
-        y << { submodule: '(total)', num_test_files: total }
-      end) { |line| info line }
-      true
-    end
-
-    def files
-      spec_paths.each do |spec_path|
-        payload escape_path( spec_path )
       end
-      if substring
-        report_ignored
-      end
-      true
+      okay
     end
 
-    def req
-      Headless::FUN.require_quietly[ 'rspec' ]
-      _req
-      true
-    end
-
-  protected
-
-    bad_msg = -> name, all, bad do
-      "bad #{ name } name(s) - couldn't find #{ bad.join ', ' } #{
-        }among (#{ all.join ', ' }).  skipping all."
-    end
-
-    define_method :bad_only do |all, bad|
-      infostream.write bad_msg[ 'subproduct', all, bad ]
-      nil
-    end
-    protected :bad_only
-
-    define_method :bad_skip do |all, bad|
-      infostream.write bad_msg[ 'skip', all, bad ]
-      nil
-    end
-    protected :bad_skip
+    # (called by the framework from `parse_opts`)
 
     def build_option_parser
       @option_parser = o = ::OptionParser.new
       o.banner = usage_line
       o.separator(
         "#{em 'Description:'} runs all known tests in the skylab universe.")
-      o.separator <<-HERE.gsub(/^#{' '*6}/, '')
-      #{em 'Actions:'}
-          counts    show a report of number of tests per submodule
-          files     write to stdout the pretty name of each test file
-          req       require() each file (but do not require 'rspec/autorun')
-      #{em 'Options:'}
-      HERE
-      o.on('-h', '--help', "This screen.") do
-        queue.push :help
+
+      h = { }
+      emit_eventpoint :action_summaries do |ea|
+        ea.each do |hash|
+          h.merge! hash
+        end
       end
-      o.on('-s', '--substring <substr>',
-             "if present, only load spec files",
-             "whose [pretty] name includes substr") { |s| self.substring = s }
-      o.on('--not <sub-product>', 'skip this sub-product',
-             "(can specified multiple. exact match norm'd subproduct name)"
-          ) { |x| add_skip x.intern }
-      o.on('-v', '--verbose', "(things like output filenames)") do
-        self.verbose = true
+
+      max = 0
+      pair_a = action_a.reduce [] do |m, act|
+        act.slug.length > max and max = act.slug.length
+        m << [ act.slug, ( h.fetch( act.norm ) do
+          "the #{ em act.slug } action"
+        end ) ]
+        m
       end
+
+      fmt = "    %-#{ max }s    %s"
+      a = pair_a.reduce [] do |m, (one, two)|
+        m << fmt % [ one, two ]
+      end
+      o.separator "#{ em 'Actions:' }\n#{ a * "\n" }"
+
+      o.separator "#{ em 'Options:' }"
+
+      merge_options o, -> merger do
+        merger.add(Headless::CLI::Option.on( '-h', '--help', 'this screen.' ) do
+          @queue_a << :help
+        end )  # when we add self, we've got to define `plugin_slug`
+      end
+
       o
     end
 
-    def default_action
-      if :cli == run_mode
-        require 'rspec/autorun'
+    def plugin_slug  # - because we add self to merged o.p
+      program_name
+    end
+    public :plugin_slug
+
+    def action_names
+      @action_names ||= action_a.map( & :slug )
+    end
+
+    # `action_a` - this is where we aggregate and sort the action metadata
+    # from all our plugins and line it up into a neat little row (note it
+    # is in a determinsistic way, to boot).
+
+    def action_a
+      if ! @action_a
+        emit_eventpoint :available_actions do |ea|
+          @action_a = plugin_flatten_and_sort ea, Action_
+        end
+        @action_a ||= [ ]
       end
-      if [:cli, :rspec].include? run_mode
-        req
+      @action_a
+    end
+
+    Action_ = ::Struct.new :normalized_local_name, :client, :priority
+    class Action_
+      alias_method :norm, :normalized_local_name
+      def slug
+        @slug ||= normalized_local_name.to_s  # important
+      end
+      def as_method
+        @as_method ||= slug.gsub( '-', '_' ).intern
+      end
+    end
+
+    def parse_any_explicit_actions_off_of_argv
+      while @argv.length.nonzero?
+        tok = @argv.fetch 0
+        rx = /\A#{ ::Regexp.escape tok }/i
+        act = @action_a.detect { |a| rx =~ a.slug }
+        if act
+          @argv.shift  # (we lose the actual token used here.)
+          @queue_a << act.norm
+        else
+          break
+        end
       end
       true
     end
 
-    def default_action_name
-      :default_action
+    def resolve_default_action_if_necessary
+      if @queue_a.length.zero?  # could be shortened but meh
+        nam = nil
+        emit_eventpoint :default_action do |ea|
+          wgt = 0.0
+          nam = ea.reduce nil do |m, ((name, weight), _c) |
+            if weight > wgt
+              m, wgt = name, weight
+            end
+            m
+          end
+        end
+        nam && @queue_a << nam
+      end
+      @queue_a.length.nonzero?
     end
+  end
 
-    attr_accessor :ignored_count
+  module Host_InstanceMethods
 
-    attr_reader :only
+    # because we are crazy and we have plugins with plugins ..
 
-    def _req
-      count = 0
-      if ! verbose
-        infostream.write '('
-      end
-      spec_paths.each do |p|
-        count += 1
-        if verbose
-          info "   #{em '>>>'} #{p}"
-        else
-          infostream.write '.'
+  protected
+
+    # `merge_options` - comprehend over all plugins and hack an
+    # aggregate option parser.
+
+    def merge_options up_op, at_end=nil, ctx_a=nil
+      ep = plugin_manager.fetch_eventpoint :available_options  # (raises custm)
+      merger = Headless::CLI::Option::Merger.new method( :qualified_plugin_slug)
+      @plugin_manager.hot_plugins.each do |client|
+        if client.plugin_subscribed? ep.name  # (as op to `c.plugin_eventpoint`)
+          rec = Headless::CLI::Option::Parser::Recorder.new do |opt|
+            merger.add opt, * [ * ctx_a, client ]
+          end
+          client.send ep.as_method_name, rec, ctx_a
         end
-        require p.to_s
       end
-      if verbose
-        if substring
-          report_ignored
-        end
-      else
-        infostream.write " loaded #{count} spec files)\n\n"
-      end
+      at_end and at_end[ merger ]
+      merger.write up_op
       nil
     end
 
-    def report_ignored
-      info "(ignored the #{ignored_count} files that lacked #{
-        }#{substring.inspect} in the name.)"
+    # `qualified_plugin_slug` - this method (as a proc) is passed to the
+    # option merger to tell it how to render the slug-like identifying
+    # string for the plugin (a hacky view template). (the merger makes some
+    # decisions on its own, like adding parenthesis, and putting the slug
+    # string at the end and not the beginning of all the content)
+
+    def qualified_plugin_slug * cx_a
+
+      # the hacky way we get around desc lines qualifiying themselves
+      # multiple times for the final desc line of a plugin that has plugins
+      # (whew) is this (add a `true or` in there to see the difference):
+
+      if ! cx_a.last.is_plugin_host
+        a = cx_a.reduce [] do |m, client|
+          m << client.plugin_slug
+          m
+        end
+        "#{ a * ' ' } plugin"
+      end
+    end
+  end
+
+  module Plugins_  # shh.. cheap way to turn one off
+  end
+
+  # `Subtree` plugin - experimentally, this is more like an "extension".
+  # this whole app is basically useless without it, but we put it down
+  # here as an exercize in compartmentalization. `Subtree` manages determining
+  # the tree of tests to run, and paring down the tree with any options
+  # provided.  (in fact, `Subtree` itself will have plugin modules that
+  # themselves provide different such options.)
+
+  module Plugins::Subtree
+
+    Headless::Plugin.enhance self do
+      eventpoints %i|
+        available_options
+        argument_list
+        ready
+        conclude
+      |
+
+      services %i|
+        infostream
+        sort
+      |
+
+      plugin_services %i|
+        all_spec_paths
+        all_subproducts
+        hot_spec_paths
+        subproduct_dir_pathname
+      |
+    end
+  end
+
+  class Plugins::Subtree::Client
+
+    # this is becoming more of a heavily relied-upon extension than just
+    # # (more of a heavily depended upon extension)
+
+    Headless::Plugin::Host.enhance self do
+
+      # LOOK - experimentally we are a plugin *and* a plugin host ("app")
+      # we use abbreviated names when there is a symbol of the same name in
+      # the parent (e.g `argument_list` up, `arg_list` here), to mitigate
+      # only slightly a potentially confusing situation.
+
+      plugin_box_module -> { Plugins::Subtree::Agent }
+
+      eventpoints %i|
+        arg_list
+        available_options
+        compile
+        is_active_boolean_agent
+        postvalidate
+        conclude
+      |
+
+      services %i|
+      |
     end
 
-    def run_mode
-      @run_mode ||= (
-      if __FILE__ == $PROGRAM_NAME then :cli
-      elsif %r{/rspec$} =~ $PROGRAM_NAME then :rspec # ick
-      else :none end )
+    include Host_InstanceMethods
+
+    def initialize
+      @all_subproducts_cache_a = nil
     end
 
-    attr_accessor :substring
+    available_options do |o, ctx_a|
+      ctx_a ||= [ ]
+      ctx_a << self  # qualify names
+      merge_options o, nil, ctx_a
+      true  # maybe, maybe not important
+    end
 
-    attr_accessor :verbose
+    argument_list do |argv|
+      emit_eventpoint :arg_list, argv
+      nil  # our
+    end
+
+    ready do |y|
+      emit_eventpoint( :compile, y ).nonzero? || nil
+    end
+
+    conclude do |y|
+      emit_eventpoint( :conclude, y ).nonzero? || nil
+    end
+
+    # ~ in vaguely narrative pre-order with occasional aesthetic pyramiding ~
+
+    def all_spec_paths  # - a service exposed by this plugin
+      ::Enumerator.new do |y|
+        all_subproducts.each do |sp|
+          sp.all_spec_paths.each do |pn|
+            y << pn
+          end
+        end
+      end
+    end
+
+    class Pass_Agent_
+      def pass *_
+        :yes
+      end
+    end
+
+    PASS_ = Pass_Agent_.new
+
+    # `hot_spec_paths` - i spent 24 hours writing the dependency injection
+    # framework just so i could have fun writing this one method ..
+
+    def hot_spec_paths
+      # what are the hot agents?
+      and_a = nil
+      emit_eventpoint :is_active_boolean_agent do |ea|
+        and_a = ea.reduce [] do |m, (_true, is_active_boolean_agent)|
+          m << is_active_boolean_agent
+        end
+      end
+      and_a << PASS_ if and_a.length.zero?
+      ::Enumerator.new do |y|
+        conflict_a = nil
+        cache_a = [ ]  # be atomic. 2D array
+        all_subproducts.each do |sp|
+          cache_a << [ sp, cach_a = [ ] ]
+          sp.all_spec_paths.each do |pn|
+            confl_a = nil
+            res = agt = nil
+            and_a.each do |ag|
+              r = ag.pass sp, pn
+              if ! r
+                fail "fix the below logic if you have a `nil` pass response."
+              end
+              if res
+                if res != r
+                  ( confl_a ||= [ ] ) << [ ag, r ]
+                  break  # for now
+                end
+              else
+                res = r
+                agt = ag
+              end
+            end
+            if confl_a
+              ( conflict_a ||= [ ] ) <<
+                [ sp, pn, confl_a.unshift( [ agt, res ] ) ]
+              break
+            elsif :yes == res
+              cach_a << pn
+            elsif :no != res
+              raise "agent `pass` result was invalid ( #{ r.inspect } from #{
+                }#{ ag.to_s })"
+            end
+          end
+          conflict_a and break  # or not..
+        end
+        if conflict_a
+          report_conflicts conflict_a
+        else
+          postprocess y, cache_a
+        end
+      end
+    end
+
+    def postprocess y, cache_a
+      ok = true ; info = host.infostream
+      emit_eventpoint_to_each_client :postvalidate do |client|
+        ::Enumerator::Yielder.new do |msg|
+          ok = false
+          info.puts "#{ client.plugin_slug } plugin #{ msg }"
+        end
+      end
+      if ! ok
+        info.puts "won't procede further because of the above."
+        ok
+      else
+        flush y, cache_a
+      end
+    end
+    protected :postprocess
+
+    def flush y, cache_a
+      res = host.sort cache_a
+      if false != res  # NOTE is this bad to rely on a svc response?
+        m = y.method :<<
+        cache_a.each do |_sp, pn_a|
+          pn_a.each( & m )
+        end
+        res = nil
+      end
+      res
+    end
+    protected :flush
+
+    def report_conflicts conflict_a
+      info = host.infostream
+      info.puts "your search terms didn't make sense to me -"
+      conflict_a.each do |sp, pn, confl_a|
+        ag_a = [ ] ; resp_a = [ ] ; detail_a = [ ]
+        confl_a.each do |ag, resp|
+          ag_a << ag.identify
+          resp_a << resp
+          detail_a << ag.detail_np
+        end
+
+        path = pn.relative_path_from( sp.dir_pathname ).to_s
+
+        str_a = [ ]
+        str_a << "confused about what to do with \"#{ sp.slug }\"'s #{
+          }spec \"#{ path }\" -"
+
+        n = confl_a.length
+        str_a << "#{ ( ( n.times.reduce [] do |m, x|
+          m << " #{ ag_a.fetch x } must have #{ detail_a.fetch x }"
+          m
+        end ) * ', while' ) }."
+
+        str_a << " with this spec (\"#{ path }\"),"
+
+        str_a << " #{ ( ( n.times.reduce [] do |m, x|
+          m << "#{ ag_a.fetch x } said \"#{ resp_a.fetch x }\""
+        end ) * ' and ' ) }"
+
+        info.puts "#{ str_a * '' }. WAT DO"
+      end
+      false
+    end
+
+    # `all_subproducts` - a service exposed by this plugin
+    # consider strongly using `hot_spec_paths` instead if that's what you
+    # really mean - that will enable you to leverage the filtering
+    # facilities.
+
+    -> do
+      white_rx = /\A[-a-z0-9]+\z/
+
+      define_method :all_subproducts do
+        ::Enumerator.new do |y|
+          if @all_subproducts_cache_a
+            @all_subproducts_cache_a.each( & y.method( :<< ) )
+          else
+            ( a = @all_subproducts_cache_a = [ ] )
+            pn_a = ::Pathname.glob "#{ subproduct_dir_pathname }/*"
+            pn_a.each do |pn|
+              slug_s = pn.basename.to_s
+              if white_rx =~ slug_s
+                sp = Plugins::Subtree::Subproduct_.new slug_s, pn
+                a << sp
+                y << sp
+              end
+            end
+          end
+          nil
+        end
+      end
+    end.call
+
+    def subproduct_dir_pathname  # svc
+      ::Skylab.dir_pathname
+    end
+  end
+
+  class Plugins::Subtree::Subproduct_
+
+    def initialize slug, dir_pathname
+      @dir_pathname = dir_pathname
+      @normalized_local_name = slug.intern
+    end
+
+    attr_reader :normalized_local_name, :dir_pathname
+
+    def slug
+      @slug ||= @normalized_local_name.to_s
+    end
+
+    -> do  # `all_spec_paths`
+      spec_paths_cache = nil
+      define_method :all_spec_paths do
+        spec_paths_cache[ @normalized_local_name ]
+      end
+
+      cache_h = build_cache_h = nil ; empty_a = [ ].freeze  # ocd
+      spec_paths_cache = -> norm do
+        cache_h ||= build_cache_h[ ]
+        cache_h.fetch norm do empty_a end
+      end
+
+      rx = %r|\G[-a-z0-9]+(?=/)|
+      build_cache_h = -> do
+        a = ::Pathname.glob ::Skylab.dir_pathname.join('*/test/**/*_spec.rb')
+        offset = ::Skylab.dir_pathname.to_s.length + 1
+        prev = oa = nil
+        a.reduce( { } ) do |h, pn|
+          md = rx.match( pn.to_s, offset ) or fail "wat - #{ pn }"
+          slug = md[0].intern
+          if prev != slug
+            oa.freeze if oa
+            prev = slug
+            h[ slug ] = ( oa = [ ] )
+          end
+          oa << pn
+          h
+        end
+      end
+    end.call
+  end
+
+  module Plugins::Subtree  # (re-open)
+
+    # (for local readability we break the indentation convention .. maybe
+    # this means it's time for a separate file!)
+
+    class Agent
+      # search agents classes go here
+
+      def identify
+        "#{ plugin_slug } agent"
+      end
+
+      #         ~ instance methods that subclasses must define: ~
+
+      # `pass` ( sp, pn ) - `sp` is a subproduct metadata, and `np` is an
+      # absolute ::Pathname in that subproduct. result must be `:yes` or
+      # `:no` indicating whether or not this spec file represented by `pn`
+      # may pass or not, given the state of this filtering agent.
+
+      # `detail_np` - each child must implement this. it will be used
+      # when reporting conflicts, and possibly for its own internal
+      # self-articulation.
+
+    end
+
+    module Agent_
+      # (you can hack disable a plugin by renaming its containing module shh..)
+    end
+
+    class Agent::Black < Agent
+
+      # blacklist-based filtering  ( `--not <subproduct>` )
+
+      Headless::Plugin.enhance self do
+        eventpoints %i|
+          available_options
+          is_active_boolean_agent
+          conclude
+        |
+      end
+
+      def initialize
+        @is_hot = nil
+      end
+
+      available_options do |o, _|
+
+        o.on '--not <sub-product>', 'skip this sub-product',
+          "(can specified multiple. exact match norm'd subproduct name)" do |x|
+            @is_hot or activate
+            @skip_rx_a << %r{\A#{ ::Regexp.escape x }}
+            @str_a << x  # (might just be for ancilliary use)
+        end
+
+        o.on '-v', '--verbose', 'report number of skipped files' do
+          @do_verbose or activate_verbose
+        end
+
+        true  # ( it is the API standard to return non-nil if actions taken )
+      end
+
+      def activate
+        @is_hot and fail "sanity - unexpected state transition"
+        @is_hot = true
+        @str_a = [ ]
+        @skip_rx_a = [ ]
+        @cache_h = { }
+        @do_verbose ||= nil
+        nil
+      end
+      protected :activate
+
+      def activate_verbose
+        @do_verbose = true
+        @ignored_spec_count = 0
+      end
+      protected :activate_verbose
+
+      is_active_boolean_agent do
+
+        # as an agent, you are hot iff the `--not` option was used
+
+        @is_hot
+      end
+
+      # `pass` - see parent class
+
+      def pass sp, pn
+        yn = @cache_h.fetch( sp.slug ) do |k|
+          r = @skip_rx_a.reduce :yes do |m, rx|
+            if rx =~ k
+              break :no
+            end
+            m
+          end
+          @cache_h[ k ] = r
+        end
+        if @do_verbose and :no == yn
+          @ignored_spec_count += 1
+        end
+        yn
+      end
+
+      conclude do |y|
+        if @is_hot && @do_verbose
+          y << "skipped #{ @ignored_spec_count } spec file(s) #{
+            }#{ detail_np }"
+          true
+        end
+      end
+
+      # `detail_np` - see parent class
+      def detail_np
+        "a subproduct name not starting with #{
+          ( @str_a.reduce [] do |m, x|
+            m << "\"#{ x }\""
+            m
+          end ) * ' or '
+        }"
+      end
+    end
+
+    class Agent::White < Agent
+
+      # whitelist-based filtering via subrpdocut name ( <sub1> <sub2> [..] )
+
+      Headless::Plugin.enhance self do
+        eventpoints %i|
+          available_options
+          arg_list
+          compile
+          is_active_boolean_agent
+          postvalidate
+          conclude
+        |
+      end
+
+      def initialize
+        @is_hot = nil
+      end
+
+      available_options do |o, _|
+        o.on '-v', '--verbose', 'show subproducts that were skipped' do
+          @do_verbose = true
+        end
+        true  # because we have some
+      end
+
+      arg_list do |argv|
+        if argv.length.zero?
+          fail "sanity - `arg_list` eventpoint must fire only for non-zero len."
+        else
+          activate
+          @str_a = argv.dup  # ( guess what this does : [ * argv ] )
+          argv.clear
+          true  # because we processed it
+        end
+      end
+
+      def activate
+        @is_hot and fail "sanity - unexpected state transition"
+        @do_verbose ||= nil
+        @is_hot = true
+        nil
+      end
+      protected :activate
+
+      compile do |y|
+        _compile y if @is_hot  # because compile is called whether hot or not
+      end
+
+      def _compile y
+        @str_a.freeze
+        @length = @str_a.length
+        @rx_a = @str_a.map { |s| %r{\A#{ ::Regexp.escape s }} }.freeze
+        @cache_h = { }
+        require 'set'
+        @pool_set = ::Set[ * @str_a ]
+        if @do_verbose
+          @ignore_name_a = [ ]
+          @ignore_count_h = ::Hash.new do |h, k|
+            h[ k ] = 0
+          end
+        end
+        nil
+      end
+      protected :_compile
+
+      is_active_boolean_agent do
+
+        # as an agent, you are hot iff you received the `arglist` eventpoint
+        # (hence for which there was a nonzero-length list of arguments).
+
+        @is_hot
+      end
+
+      # `pass` - see parent class
+
+      def pass sp, pn
+
+        # (a whitelist (always?) starts with `no` and then discovers any `yes`)
+
+        yn = @cache_h.fetch sp.slug do |slug|
+          @cache_h[ slug ] = @length.times.reduce :no do |m, idx|
+            if @rx_a.fetch( idx ) =~ slug
+              @pool_set.delete @str_a.fetch( idx )
+              break :yes
+            end
+            m
+          end
+        end
+
+        if @do_verbose && :no == yn  # report stats about nodes ignored
+          @ignore_count_h[ sp.slug ] += 1
+        end
+
+        yn
+      end
+
+      postvalidate do |y|
+        if @is_hot
+          if @pool_set.length.nonzero?
+            y << "didn't recognize this/these as subproduct names - #{
+              }#{ @pool_set.to_a.inspect }"
+          end
+        end
+        nil
+      end
+
+      conclude do |y|
+        if @is_hot && @do_verbose
+          if @ignore_name_a.length.nonzero?
+            first = true
+            a = @ignore_name_a.reduce [] do |m, x|
+              num = @ignore_count_h.fetch( x )
+              if num.nonzero?
+                if first
+                  m << "#{ x } (#{ num } file(s))"
+                  first = false
+                else
+                  m << "#{ x } (#{ num })"
+                end
+              end
+              m
+            end
+            y << "filtered out files from these subproducts - (#{
+              }#{ a * ', ' })"
+          else
+            y << "filtered out no files."
+          end
+          true
+        end
+      end
+
+      # `detail_np` - see parent class
+
+      def detail_np
+        "a subproduct name starting with #{
+          @str_a.map { |x| "\"#{ x }\"" } * ' or '
+        }"
+      end
+    end
+
+    class Agent::Substring < Agent
+
+      # pattern-based whitelisting
+
+      include CLI::SubClient::InstanceMethods
+
+      def initialize
+        @is_hot = nil
+      end
+
+      Headless::Plugin.enhance self do
+        eventpoints %i|
+          available_options
+          compile
+          is_active_boolean_agent
+          conclude
+        |
+      end
+
+      available_options do |o, _|
+
+        o.on '-s', '--substring <substr>',
+          "if present, only load spec files",
+          "whose [pretty] name includes substr" do |s|
+            @is_hot or activate  # it happens only here
+            @substring_a << s
+        end
+
+        o.on '-v', '--verbose',
+          'report details about skipped filenames' do
+            @do_verbose = true
+        end
+
+        true  # we should follow the standard, even if result is ignored
+      end
+
+      def activate
+        @is_hot = true
+        @substring_a = [ ]
+        nil
+      end
+      protected :activate
+
+      compile do |y|
+        @do_verbose ||= nil
+        @skipped_spec_count = 0 if @do_verbose
+        nil
+      end
+
+      is_active_boolean_agent do
+        # as an agent, you are hot iff you processed any options
+        @is_hot
+      end
+
+      # `pass` - see parent class
+
+      def pass sp, pn
+        str = pretty_path( pn ).to_s
+        ok = ! @substring_a.index do |s|
+          ! str.include?( s )
+        end
+        if ok
+          :yes
+        else
+          if @do_verbose
+            @skipped_spec_count += 1
+          end
+          :no
+        end
+      end
+
+      conclude do |y|
+        if @do_verbose and @is_hot
+          y << "skipped #{ @skipped_spec_count } spec file(s) without #{
+            }#{ detail_np }"
+        end
+        true
+      end
+
+      # `detail_np` - see parent class
+
+      def detail_np
+        "a spec file pretty pathname that contains #{
+          ( @substring_a.reduce [] do |m, x|
+            m << "\"#{ x }\""
+          end ) * ' and '
+        }"
+      end
+    end
+  end
+
+  module Plugins::Files
+
+    Headless::Plugin.enhance self do
+      eventpoints %i|
+        available_actions
+        action_summaries
+        available_options
+        conclude
+      |
+      services %i|
+        paystream
+        hot_spec_paths
+      |
+    end
+  end
+
+  class Plugins::Files::Client
+
+    include CLI::SubClient::InstanceMethods
+
+    def initialize
+      @do_pretty = @do_verbose = @did_run = nil
+    end
+
+    available_actions [
+      [ :files, 0.50 ]
+    ]
+
+    action_summaries(
+      files: "write to stdout the pretty name of each test file"
+    )
+
+    available_options do |o, _|
+      o.on '-p', '--pretty', '..filenames.' do
+        @do_pretty = true
+      end
+
+      o.on '-v', '--verbose', 'this way you can have everything' do
+        @do_verbose = true
+      end
+
+      true  # when you took action, non-nil
+    end
+
+    def files
+      paystream, hot_spec_paths = host[ :paystream, :hot_spec_paths ]
+
+      block = if @do_pretty
+                -> spec_path do
+                  paystream.puts pretty_path( spec_path )
+                end
+              else
+                -> spec_path do
+                  paystream.puts "#{ spec_path }"
+                end
+              end
+      count = 0
+      hot_spec_paths.each do |pn|
+        count += 1
+        block[ pn ]
+      end
+      @last_count = count if @do_verbose  # volume
+      @did_run = true
+      nil
+    end
+
+    conclude do |y|
+      if @do_verbose && @did_run
+        y << "listed #{ @last_count } spec file(s)"
+        true
+      end
+    end
+  end
+
+  module Plugins::Counts
+
+    Headless::Plugin.enhance self do
+      eventpoints %i|
+        available_actions
+        action_summaries
+      |
+      services %i|
+        infostream
+        hot_spec_paths
+        subproduct_dir_pathname
+      |
+    end
+  end
+
+  class Plugins::Counts::Client
+
+    include CLI::SubClient::InstanceMethods
+
+    available_actions [
+      [ :counts, 0.1666 ]
+    ]
+
+    action_summaries(
+      counts: "show a report of the number of tests per subproduct"
+    )
+
+    def counts
+      infostream, hot_spec_paths = host[ :infostream, :hot_spec_paths ]
+      spdpn = host.subproduct_dir_pathname
+      order_a = [ ]
+      count_h = ::Hash.new do |h, k|
+        order_a << k
+        h[ k ] = 0
+      end
+      res = hot_spec_paths.each do |pn|
+        rel = pn.relative_path_from( spdpn ).to_s
+        dir = rel[ 0 .. rel.index( '/' ) - 1 ]  # or `res.split '/', 2`
+        count_h[ dir ] += 1
+      end
+      if false != res
+        tablify(
+          [ 'subrpoduct', 'num test files' ],
+          ( ::Enumerator.new do |y|
+            total = 0
+            order_a.each do |dir|
+              cnt = count_h.fetch dir
+              total += cnt
+              y.yield dir, cnt
+            end
+            y.yield '(total)', total
+          end ),
+          -> line do
+            infostream.puts line
+          end )
+        res = true
+      end
+      res
+    end
+
+    def num_test_files sp
+      sp.all_spec_paths.length
+    end
+    protected :num_test_files
+  end
+
+  module Plugins::Req
+
+    # `Req` plugin. 'req' is short for 'require', and this ugly name will
+    # stick until [#hl-070-002] we design something better.
+
+    Headless::Plugin.enhance self do
+      eventpoints %i|
+        available_actions
+        action_summaries
+        available_options
+        default_action
+      |
+
+      services %i|
+        infostream
+        hot_spec_paths
+        full_name
+        run_mode
+      |
+    end
+  end
+
+  class Plugins::Req::Client
+
+    include CLI::SubClient::InstanceMethods
+
+    def initialize
+      @do_verbose = nil
+    end
+
+    available_actions [
+      [ :req, 0.8333 ],
+      [ :run, 0.90 ]
+    ]
+
+    action_summaries(
+      req: "require() each file (but do not require 'rspec/autorun')",
+      run: "(the default action - specifying its name is not necessary)"
+    )
+
+    default_action [ :run, 0.5 ]
+
+    available_options do |o, _|
+      o.on '-v', '--verbose', 'things like output filenames' do
+        @do_verbose = true
+      end
+
+      true  # because we took action
+    end
+
+    def req
+      _req -> do
+        Headless::FUN.require_quietly[ 'rspec' ] unless defined? ::RSpec
+          # without this, quickie runs the tests.
+      end, -> { }
+    end
+
+    def run
+      rm = host.run_mode
+      if :cli == rm || :rspec == rm
+        _req -> do
+          if :cli == rm
+            require 'rspec/autorun'  # don't load this till after query ok
+          end
+        end, -> { }
+      else
+        host.infostream.puts "(doing nothing for runmode \"#{ rm }\".)"
+        nil
+      end
+    end
+
+    def _req before, after
+      cache_a = [ ]
+      res = host.hot_spec_paths.each do |p|
+        cache_a << p
+      end
+      if false == res
+        host.infostream.puts "not requiring any files because of this."
+        nil
+      else
+        info = host.infostream
+        before[ ]
+        v = @do_verbose
+        v or info.write '('
+        cache_a.each do |p|
+          if v
+            info.puts "   #{ em '>>>' } #{ p }"
+          else
+            info.write '.'
+          end
+          require p.to_s
+        end
+        if ! v
+          info.write " #{ full_name } loaded #{ cache_a.length} spec files)\n\n"
+        end
+        after[ ]
+      end
+    end
+    protected :_req
+
+    def full_name
+      "#{ host.full_name } #{ plugin_slug }"
+    end
+    protected :full_name
   end
 end
 
