@@ -3,11 +3,12 @@
 require_relative '../lib/skylab'
 require 'skylab/face/core'      # `pretty_path`, Tableize::I_M
 require 'skylab/headless/core'  # only for require_quietly
+require 'skylab/basic/core'     # only for the `counts` report for now..
 require 'optparse'
 
 module Skylab::Test
 
-  %i| Face Headless Test |.each do |i|
+  %i| Basic Face Headless Test |.each do |i|
     const_set i, ::Skylab.const_get( i, false )
   end
 
@@ -36,17 +37,15 @@ module Skylab::Test
       |
       services %i|
         infostream
+        info_y
         paystream
         full_name
         run_mode
-        mutable_argv
         sort
       |
       services_delegated_to :subtree, %i|
-        subproduct_dir_pathname
-        all_subproducts
-        all_spec_paths
         hot_spec_paths
+        hot_subtree
       |
     end
 
@@ -97,6 +96,9 @@ module Skylab::Test
         ( :payload == type  ? o : e ).puts str
       end
       @paystream, @infostream = o, e
+      @info_y = ::Enumerator::Yielder.new do |message_string|
+        @infostream.puts message_string
+      end
     end
 
     def emit type, data
@@ -113,7 +115,7 @@ module Skylab::Test
       nil
     end
 
-    attr_reader :infostream, :paystream  # services
+    attr_reader :infostream, :paystream, :info_y  # services
 
     def option_parser
       @option_parser ||= build_option_parser
@@ -172,7 +174,7 @@ module Skylab::Test
             else
               emit_eventpoint_to_each_client :conclude do |client|
                 ::Enumerator::Yielder.new do |msg|
-                  info.puts "(#{ client.plugin_slug } plugin #{ msg })"
+                  @info_y << "(#{ client.plugin_slug } plugin #{ msg })"
                 end
               end
             end
@@ -185,15 +187,15 @@ module Skylab::Test
     end
 
     def ready
-      ok = true ; info = @infostream
+      ok = true
       emit_eventpoint_to_each_client :ready do |client|
         ::Enumerator::Yielder.new do |msg|
           ok = false
-          info.puts "#{ client.plugin_slug } #{ msg }"
+          @info_y << "#{ client.plugin_slug } #{ msg }"
         end
       end
       if ok then ok else
-        info.puts "won't procede further because of the above."
+        @info_y << "won't procede further because of the above."
         false
       end
     end
@@ -236,7 +238,7 @@ module Skylab::Test
         if :cli == @run_mode && @argv.length.nonzero?
           emit_eventpoint :argument_list, @argv
           if @argv.length.nonzero?
-            @infostream.puts "won't run with unresolved argv - #{ @argv }"
+            @info_y << "won't run with unresolved argv - #{ @argv }"
             ok = false
           end
         end
@@ -253,17 +255,13 @@ module Skylab::Test
         else :none end
     end
 
-    def mutable_argv  # - service (experimental)
-      @argv
-    end
-
     def sort cache_a  # - service
       okay = true
       emit_eventpoint :sort, cache_a do |ea|
         ea.each do |ok, client|
           if ! ok
             okay = false
-            @infostream.puts "#{ client.plugin_slug } plugin failed #{
+            @info_y << "#{ client.plugin_slug } plugin failed #{
               }to sort, not going any further."
             break
           end
@@ -449,14 +447,13 @@ module Skylab::Test
 
       services %i|
         infostream
+        info_y
         sort
       |
 
       plugin_services %i|
-        all_spec_paths
-        all_subproducts
         hot_spec_paths
-        subproduct_dir_pathname
+        hot_subtree
       |
     end
   end
@@ -490,10 +487,6 @@ module Skylab::Test
 
     include Host_InstanceMethods
 
-    def initialize
-      @all_subproducts_cache_a = nil
-    end
-
     available_options do |o, ctx_a|
       ctx_a ||= [ ]
       ctx_a << self  # qualify names
@@ -515,114 +508,146 @@ module Skylab::Test
     end
 
     # ~ in vaguely narrative pre-order with occasional aesthetic pyramiding ~
+    # ~ from the simplest of upstream targets: `files` ~
 
-    def all_spec_paths  # - a service exposed by this plugin
-      ::Enumerator.new do |y|
-        all_subproducts.each do |sp|
-          sp.all_spec_paths.each do |pn|
-            y << pn
-          end
-        end
-      end
-    end
-
-    class Pass_Agent_
-      def pass *_
-        :yes
-      end
-    end
-
-    PASS_ = Pass_Agent_.new
-
-    # `hot_spec_paths` - i spent 24 hours writing the dependency injection
-    # framework just so i could have fun writing this one method ..
+    # `hot_spec_paths` - implement the (plugin) service that is kind of
+    # the central workhorse of this whole nerk.
 
     def hot_spec_paths
-      # what are the hot agents?
-      and_a = nil
-      emit_eventpoint :is_active_boolean_agent do |ea|
-        and_a = ea.reduce [] do |m, (_true, is_active_boolean_agent)|
-          m << is_active_boolean_agent
+      ::Enumerator.new do |y|
+        hot_subtree.flatten.each do |x|
+          y << x
         end
       end
-      and_a << PASS_ if and_a.length.zero?
-      ::Enumerator.new do |y|
+    end
+
+    # `hot_subtree` - both a service and used internally
+
+    def hot_subtree
+      Basic::Tree.new do |y|
         conflict_a = nil
-        cache_a = [ ]  # be atomic. 2D array
+        ag = build_aggregated_agent nil, -> do
+          true
+        end, -> confl_data do
+          ( conflict_a ||= [ ] ) << confl_data
+          false
+        end
+        sp_cache_a = [ ]
         all_subproducts.each do |sp|
-          cache_a << [ sp, cach_a = [ ] ]
+          a = nil
           sp.all_spec_paths.each do |pn|
-            confl_a = nil
-            res = agt = nil
-            and_a.each do |ag|
-              r = ag.pass sp, pn
-              if ! r
-                fail "fix the below logic if you have a `nil` pass response."
-              end
-              if res
-                if res != r
-                  ( confl_a ||= [ ] ) << [ ag, r ]
-                  break  # for now
-                end
-              else
-                res = r
-                agt = ag
-              end
-            end
-            if confl_a
-              ( conflict_a ||= [ ] ) <<
-                [ sp, pn, confl_a.unshift( [ agt, res ] ) ]
-              break
-            elsif :yes == res
-              cach_a << pn
-            elsif :no != res
-              raise "agent `pass` result was invalid ( #{ r.inspect } from #{
-                }#{ ag.to_s })"
+            ag.if_pass sp, pn, -> do
+              ( a ||= [ ] ) << pn
+              true
+            end or break
+          end
+          conflict_a and break
+          sp_cache_a << [ sp, a ]
+        end
+        r = -> do
+          conflict_a and break report_conflicts( conflict_a )
+          postvalidate_children or break false
+          true
+        end.call
+        if r
+          sp_cache_a.each do |sp, a|
+            y << ( Basic::Tree.new sp do |yy|
+              a.each( & yy.method( :<< ) ) if a
+            end )
+          end
+          r
+        end
+        r
+      end
+    end
+    protected :hot_subtree
+
+    -> do  # `all_subproducts`
+
+      white_rx = /\A[-a-z0-9]+\z/
+
+      define_method :all_subproducts do
+        ::Enumerator.new do |y|
+          pn_a = ::Pathname.glob "#{ ::Skylab.dir_pathname }/*"
+          pn_a.each do |pn|
+            slug_s = pn.basename.to_s
+            if white_rx =~ slug_s
+              y << Plugins::Subtree::Subproduct_.new( slug_s, pn )
             end
           end
-          conflict_a and break  # or not..
+          nil
         end
-        if conflict_a
-          report_conflicts conflict_a
+      end
+    end.call
+    protected :all_subproducts
+
+    def build_aggregated_agent( *func_a )
+      a = [ ]
+      emit_eventpoint :is_active_boolean_agent do |ea|
+        ea.each do |_, agent|  # we can't map(& :last ) b.c ..
+          a << agent
+        end
+      end
+      Agent_::And_.new a, *func_a
+    end
+
+    module Agent_
+
+    end
+
+    class Agent_::And_
+
+      class Pass_
+        def pass *_
+          :yes
+        end
+      end
+
+      PASS_ = Pass_.new
+
+      def initialize a, yes=nil, no=nil, conflict=nil
+        @yes, @no, @conflict = yes, no, conflict
+        @a = if a.length.zero?
+          [ PASS_ ]
         else
-          postprocess y, cache_a
+          a.dup
         end
       end
-    end
 
-    def postprocess y, cache_a
-      ok = true ; info = host.infostream
-      emit_eventpoint_to_each_client :postvalidate do |client|
-        ::Enumerator::Yielder.new do |msg|
-          ok = false
-          info.puts "#{ client.plugin_slug } plugin #{ msg }"
+      def if_pass sp, pn, yes=nil, no=nil, conflict=nil
+        confl_a = nil
+        res = agt = nil
+        @a.each do |ag|
+          r = ag.pass sp, pn
+          r or fail "fix the below logic if you have a `nil` pass response."
+          if res
+            if res != r
+              ( confl_a ||= [ ] ) << [ ag, r ]
+              break  # for now
+            end
+          else
+            res = r
+            agt = ag
+          end
+        end
+        if confl_a
+          ( conflict || @conflict ).call(
+            [ sp, pn, confl_a.unshift( [ agt, res ] ) ]
+          )
+        elsif :yes === res
+          ( yes || @yes ).call
+        elsif :no == res
+          ( no || @no ).call
+        else
+          raise "agent `pass` result was invalid ( #{ r.inspect } from #{
+            }#{ ag.to_s })"
         end
       end
-      if ! ok
-        info.puts "won't procede further because of the above."
-        ok
-      else
-        flush y, cache_a
-      end
     end
-    protected :postprocess
-
-    def flush y, cache_a
-      res = host.sort cache_a
-      if false != res  # NOTE is this bad to rely on a svc response?
-        m = y.method :<<
-        cache_a.each do |_sp, pn_a|
-          pn_a.each( & m )
-        end
-        res = nil
-      end
-      res
-    end
-    protected :flush
 
     def report_conflicts conflict_a
-      info = host.infostream
-      info.puts "your search terms didn't make sense to me -"
+      y = host.info_y
+      y << "your search terms didn't make sense to me -"
       conflict_a.each do |sp, pn, confl_a|
         ag_a = [ ] ; resp_a = [ ] ; detail_a = [ ]
         confl_a.each do |ag, resp|
@@ -649,42 +674,21 @@ module Skylab::Test
           m << "#{ ag_a.fetch x } said \"#{ resp_a.fetch x }\""
         end ) * ' and ' ) }"
 
-        info.puts "#{ str_a * '' }. WAT DO"
+        y << "#{ str_a * '' }. WAT DO"
       end
-      false
+      false  # important - becomes `did_run` for some
     end
 
-    # `all_subproducts` - a service exposed by this plugin
-    # consider strongly using `hot_spec_paths` instead if that's what you
-    # really mean - that will enable you to leverage the filtering
-    # facilities.
-
-    -> do
-      white_rx = /\A[-a-z0-9]+\z/
-
-      define_method :all_subproducts do
-        ::Enumerator.new do |y|
-          if @all_subproducts_cache_a
-            @all_subproducts_cache_a.each( & y.method( :<< ) )
-          else
-            ( a = @all_subproducts_cache_a = [ ] )
-            pn_a = ::Pathname.glob "#{ subproduct_dir_pathname }/*"
-            pn_a.each do |pn|
-              slug_s = pn.basename.to_s
-              if white_rx =~ slug_s
-                sp = Plugins::Subtree::Subproduct_.new slug_s, pn
-                a << sp
-                y << sp
-              end
-            end
-          end
-          nil
+    def postvalidate_children
+      ok = true ; info_y = host.info_y
+      emit_eventpoint_to_each_client :postvalidate do |client|
+        ::Enumerator::Yielder.new do |msg|
+          ok = false
+          info_y << "#{ client.plugin_slug } plugin #{ msg }"
         end
       end
-    end.call
-
-    def subproduct_dir_pathname  # svc
-      ::Skylab.dir_pathname
+      ok or info_y << "won't procede further because of the above."
+      ok
     end
   end
 
@@ -758,10 +762,6 @@ module Skylab::Test
 
     end
 
-    module Agent_
-      # (you can hack disable a plugin by renaming its containing module shh..)
-    end
-
     class Agent::Black < Agent
 
       # blacklist-based filtering  ( `--not <subproduct>` )
@@ -770,12 +770,15 @@ module Skylab::Test
         eventpoints %i|
           available_options
           is_active_boolean_agent
+          compile
+          postvalidate
           conclude
         |
       end
 
       def initialize
         @is_hot = nil
+        @do_verbose = nil  # let it get turned on even when we aren't activated
       end
 
       available_options do |o, _|
@@ -811,6 +814,14 @@ module Skylab::Test
       end
       protected :activate_verbose
 
+      compile do |y|
+        if @is_hot
+          @pool_set = Headless::Services::Set[ * @str_a ]
+          @length = @str_a.length
+          true
+        end
+      end
+
       is_active_boolean_agent do
 
         # as an agent, you are hot iff the `--not` option was used
@@ -822,8 +833,9 @@ module Skylab::Test
 
       def pass sp, pn
         yn = @cache_h.fetch( sp.slug ) do |k|
-          r = @skip_rx_a.reduce :yes do |m, rx|
-            if rx =~ k
+          r = @length.times.reduce :yes do |m, idx|
+            if @skip_rx_a.fetch( idx ) =~ k
+              @pool_set.delete @str_a.fetch( idx )  # might repeat
               break :no
             end
             m
@@ -836,21 +848,33 @@ module Skylab::Test
         yn
       end
 
+      postvalidate do |y|
+        if @is_hot
+          if @pool_set.length.nonzero?
+            y << "couldn't find any subproduct with names like #{
+              }#{ @pool_set.to_a.inspect }"
+          end
+          nil
+        end
+      end
+
       conclude do |y|
         if @is_hot && @do_verbose
           y << "skipped #{ @ignored_spec_count } spec file(s) #{
-            }#{ detail_np }"
+            }that had #{ detail_np }"
           true
         end
       end
 
       # `detail_np` - see parent class
+
       def detail_np
         "a subproduct name not starting with #{
-          ( @str_a.reduce [] do |m, x|
+          ( @str_a.reduce nil do |m, x|
+            m ||= [ ]
             m << "\"#{ x }\""
             m
-          end ) * ' or '
+          end or [ 'nothing' ] ) * ' or '
         }"
       end
     end
@@ -909,8 +933,7 @@ module Skylab::Test
         @length = @str_a.length
         @rx_a = @str_a.map { |s| %r{\A#{ ::Regexp.escape s }} }.freeze
         @cache_h = { }
-        require 'set'
-        @pool_set = ::Set[ * @str_a ]
+        @pool_set = Headless::Services::Set[ * @str_a ]
         if @do_verbose
           @ignore_name_a = [ ]
           @ignore_count_h = ::Hash.new do |h, k|
@@ -1132,25 +1155,27 @@ module Skylab::Test
     end
 
     def files
-      paystream, hot_spec_paths = host[ :paystream, :hot_spec_paths ]
+      paystream, hot_spec_paths = host[ :paystream, :hot_spec_paths ]  # grease
 
       block = if @do_pretty
-                -> spec_path do
-                  paystream.puts pretty_path( spec_path )
-                end
-              else
-                -> spec_path do
-                  paystream.puts "#{ spec_path }"
-                end
-              end
+        -> spec_path do
+          paystream.puts pretty_path( spec_path )
+        end
+      else
+        -> spec_path do
+          paystream.puts "#{ spec_path }"
+        end
+      end
       count = 0
-      hot_spec_paths.each do |pn|
+      ok = hot_spec_paths.each do |pn|
         count += 1
         block[ pn ]
       end
-      @last_count = count if @do_verbose  # volume
-      @did_run = true
-      nil
+      if ok
+        @did_run = true
+        @last_count = count if @do_verbose
+      end
+      ok
     end
 
     conclude do |y|
@@ -1165,13 +1190,14 @@ module Skylab::Test
 
     Headless::Plugin.enhance self do
       eventpoints %i|
+        available_options
         available_actions
         action_summaries
+        ready
       |
       services %i|
-        infostream
-        hot_spec_paths
-        subproduct_dir_pathname
+        info_y
+        hot_subtree
       |
     end
   end
@@ -1179,6 +1205,15 @@ module Skylab::Test
   class Plugins::Counts::Client
 
     include CLI::SubClient::InstanceMethods
+
+    available_options do |o, _|
+
+      o.on '-z', '--zero', 'display the zero values (when counting)' do
+        @do_zero = true
+      end
+
+      true
+    end
 
     available_actions [
       [ :counts, 0.1666 ]
@@ -1188,43 +1223,30 @@ module Skylab::Test
       counts: "show a report of the number of tests per subproduct"
     )
 
-    def counts
-      infostream, hot_spec_paths = host[ :infostream, :hot_spec_paths ]
-      spdpn = host.subproduct_dir_pathname
-      order_a = [ ]
-      count_h = ::Hash.new do |h, k|
-        order_a << k
-        h[ k ] = 0
-      end
-      res = hot_spec_paths.each do |pn|
-        rel = pn.relative_path_from( spdpn ).to_s
-        dir = rel[ 0 .. rel.index( '/' ) - 1 ]  # or `res.split '/', 2`
-        count_h[ dir ] += 1
-      end
-      if false != res
-        tablify(
-          [ 'subrpoduct', 'num test files' ],
-          ( ::Enumerator.new do |y|
-            total = 0
-            order_a.each do |dir|
-              cnt = count_h.fetch dir
-              total += cnt
-              y.yield dir, cnt
-            end
-            y.yield '(total)', total
-          end ),
-          -> line do
-            infostream.puts line
-          end )
-        res = true
-      end
-      res
+    ready do |y|
+      @do_zero ||= nil
+      nil
     end
 
-    def num_test_files sp
-      sp.all_spec_paths.length
+    def counts
+      tablify(
+        [ 'subproduct', 'num test files' ],
+        ( ::Enumerator.new do |y|
+          total = 0
+          ok = host.hot_subtree.children.each do |tre|
+            sp = tre.data
+            num = tre.children.count
+            if num.nonzero? or @do_zero
+              total += num
+              y.yield sp.slug, num
+            end
+          end
+          y.yield '(total)', total
+          ok
+        end ),
+        host.info_y.method( :<< )
+      )
     end
-    protected :num_test_files
   end
 
   module Plugins::Req
@@ -1242,9 +1264,9 @@ module Skylab::Test
 
       services %i|
         infostream
-        hot_spec_paths
         full_name
         run_mode
+        hot_spec_paths
       |
     end
   end

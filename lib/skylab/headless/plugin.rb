@@ -427,15 +427,21 @@ module Skylab::Headless
       @plugin_manager.validate_client client, &b
     end
 
-    # `call_plugin_service` - called by host services
+    # `call_plugin_host_service` - called by host services,
+    # assume that access has already been checked.
 
-    def call_plugin_service svc_i, a, b
+    def call_plugin_host_service svc_i, a, b
       send svc_i, *a, &b
     end
-    public :call_plugin_service
+    public :call_plugin_host_service
 
     # `call_delegated_plugin_service` - this extension-like thing we
-    # keep talking about. called from host services.
+    # keep talking about. called from host services. if you look at the
+    # wikipedia illustration and follow an arrow, imagine this going
+    # up from a plugin thru the host proxy into the service and then
+    # into the host app which sends the request thru the plugin manager
+    # back down to another plugin, and then all the way back out again!
+    # #experimental.
 
     def call_delegated_plugin_service plugin_instance_key, service_name, a, b
       @plugin_manager.fetch_client( plugin_instance_key ).
@@ -742,7 +748,7 @@ module Skylab::Headless
     def call_host_service pstory, service_i, a, b
       svc = @story.if_service service_i, -> sv { svc = sv }, -> do
         raise Plugin::Service::NameError, "what service are you #{
-          }talking about willis - #{ sym }"
+          }talking about willis - #{ service_i }"
       end
       if svc
         # what would be neat is rather than doing this at runtime,
@@ -756,7 +762,7 @@ module Skylab::Headless
             @host_application.call_delegated_plugin_service svc.delegates_to,
               svc.normalized_local_name, a, b
           else
-            @host_application.call_plugin_service service_i, a, b
+            @host_application.call_plugin_host_service service_i, a, b
             # (note the confusing name change because we like to keep
             # "plugin" in the name of application code i.m's)
           end
@@ -1093,11 +1099,12 @@ module Skylab::Headless
     end
     # public for hacks
 
-  protected
-
-    # `call_plugin_service` - this is calling the `service` (method)
-    # of self, and can be reached from the outside (for the extension-
-    # like experiment..)  called from the host application.
+    # `call_plugin_service` - this implements the top of the long round-trip
+    # for the expermental "plugin services" (extension-like) facility.
+    # this call probably came in from the host application, and represents
+    # a service call that the host application wants us to fill (weird).
+    # (*that* call may very well have originated from another plugin..)
+    # for now it is our job to validate access.
 
     def call_plugin_service name_sym, a, b
       if @plugin_story.has_plugin_service? name_sym
@@ -1107,7 +1114,6 @@ module Skylab::Headless
           "not a plugin service of #{ self.class } - #{ name_sym }"
       end
     end
-    public :call_plugin_service
   end
 
   module Plugin::ModuleMethods

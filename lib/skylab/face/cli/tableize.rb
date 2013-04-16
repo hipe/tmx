@@ -32,6 +32,8 @@ module Skylab::Face
       nil
     end
 
+    # `tablify` - quick & dirty pretty table hack. NOTE `false` below..
+
     def tablify col_a, row_ea, line, show_header=true, left = '| ',
         sep = '  |  ', right = ' |'
 
@@ -43,20 +45,20 @@ module Skylab::Face
           l > max_h[ x ] and max_h[ x ] = l
         end
       end
-
       max[ *col_a ] if show_header
-      row_ea.each( & max )
+      ok = row_ea.each( & max )
+      if ok
+        fmt = "#{ left }#{ w.times.map do |x|
+          "%#{ max_h.fetch x }s"
+        end * sep }#{ right }"
 
-      fmt = "#{ left }#{ w.times.map do |x|
-        "%#{ max_h.fetch x }s"
-      end * sep }#{ right }"
-
-      row = -> * a do
-        line.call( fmt % a )
+        row = -> * a do
+          line.call( fmt % a )
+        end
+        row[ * col_a ] if show_header
+        row_ea.each( & row )
       end
-      row[ * col_a ] if show_header
-      row_ea.each( & row )
-      nil
+      ok
     end
   end
 end
