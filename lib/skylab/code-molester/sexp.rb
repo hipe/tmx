@@ -126,7 +126,7 @@ module ::Skylab::CodeMolester
 
     # this is not expected to work well if you instantiate it directly
 
-    MetaHell::Pool.enhance( self ).with :with_instance
+    MetaHell::Pool.enhance( self ).with_with_instance
 
     def self.with_scanner sexp, &blk
       with_instance do |scn|
@@ -180,7 +180,7 @@ module ::Skylab::CodeMolester
 
   class Sexp::Scanner_::Bound  # Bound to a search method
 
-    MetaHell::Pool.enhance( self ).with :with_instance
+    MetaHell::Pool.enhance( self ).with_with_instance
 
     def self.with_symbol_scanner sexp, search_symbol, &blk
       with_instance do |scn|

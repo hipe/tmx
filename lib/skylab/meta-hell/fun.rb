@@ -30,11 +30,11 @@ module Skylab::MetaHell
 
   o[:module_mutex] = -> func_for_module do
     mut_h = { }
-    -> do  # self should be a client module.
+    ->( *a ) do  # self should be a client module.
       did = res = nil
       mut_h.fetch object_id do
         mut_h[ object_id ] = did = true
-        res = module_exec( & func_for_module )
+        res = module_exec( *a, & func_for_module )
       end
       did or raise "`module_mutex` failed. called multiple times for - #{ self }"
       res

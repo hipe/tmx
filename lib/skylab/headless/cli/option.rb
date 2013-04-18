@@ -73,20 +73,11 @@ module Skylab::Headless
         @long_sexp = nil
       end
 
-      Long = MetaHell::Formal::Box.const_get(:Struct, false).
+      Long = MetaHell::Formal::Box.const_get( :Struct, false ).
         new :__, :no, :stem, :arg
 
-      class << Long
-        pool_a = [ ]  # pretend that making a new one is expensive, but NOTE
-                      # be _sure_ to re-initialize after you lease!!
-        define_method :lease do
-          if pool_a.length.nonzero? then pool_a.pop else new( '--' ) end
-        end
-
-        define_method :release do |x|
-          pool_a << x
-          nil
-        end
+      MetaHell::Pool.enhance( Long ).with_lease_and_release -> do
+        new '--'
       end
 
       lease_long_sexp_from_matchdata = -> md do

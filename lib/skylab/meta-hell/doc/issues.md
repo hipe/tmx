@@ -1,3 +1,4 @@
+[#023] #open merge the 2 pool enhancements
 [#022]       #tracking-tag boxxy's relationship to a.l
 [#021]       #tracking-tag, #doc-point `base_args` / `base_init`: this
                is an experiment in initting a blank-slate 'dupe'-ish subset.
