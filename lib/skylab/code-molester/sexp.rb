@@ -59,7 +59,7 @@ module ::Skylab::CodeMolester
       children( name_sym ).to_a
     end
 
-    -> do  # `each_child`
+    -> do  # `children`
 
       op_h = {
         0 => -> do
