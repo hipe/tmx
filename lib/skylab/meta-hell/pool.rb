@@ -1,6 +1,6 @@
-module Skylab::CodeMolester
+module Skylab::MetaHell
 
-  module Services::Pool
+  module Pool
 
     # The Pools' `with_instance` enhancement is essentially a partial
     # implementation of a flyweight pattern. It is for when you want to
@@ -11,7 +11,7 @@ module Skylab::CodeMolester
     # example of enhancing a class with `with_instance`:
     #
     #     class Foo
-    #       Bar::Services::Pool.enhance( self ).with :with_instance
+    #       Pool.enhance( self ).with :with_instance
     #     end
     #
     #     Foo.new  # => NoMethodError: protected method `new' called for [..]
