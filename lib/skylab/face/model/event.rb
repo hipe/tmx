@@ -1,9 +1,8 @@
-module Skylab::Cull
+module Skylab::Face
 
-  module Models::Event
+  module Model::Event
 
     build_class = nil
-
     -> do  # `new`
 
       ok = ::Struct.new( :opt ).new
@@ -31,7 +30,7 @@ module Skylab::Cull
         aa = ( 0.upto( a.length - 1 ) ).to_a.freeze
         flip_h = ::Hash[ a.each_with_index.map.to_a ].freeze
         class << self
-          alias_method :cull_build, :[]
+          alias_method :face_build, :[]
         end
         define_singleton_method :[] do |h|
           aaa = aa.dup
