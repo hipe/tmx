@@ -1,6 +1,6 @@
-module Skylab::Cull
+module Skylab::Basic
 
-  class Models::Field
+  class Field
 
     # immutable
 
@@ -61,7 +61,7 @@ module Skylab::Cull
     end.call
   end
 
-  class Models::Field::Box < MetaHell::Formal::Box
+  class Field::Box < MetaHell::Formal::Box
 
     def self.[] * field_a_a
       new field_a_a
@@ -69,7 +69,7 @@ module Skylab::Cull
 
     def self.of host, box
       host.module_exec do
-        include Models::Field::Box::Host::InstanceMethods
+        include Field::Box::Host::InstanceMethods
         define_singleton_method :field_box do box end
         nil
       end
@@ -100,17 +100,17 @@ module Skylab::Cull
       @fields_which_h = { }
       @field_names_which_h = { }
       field_a_a.each do |field_a|
-        field = Models::Field[ * field_a ]
+        field = Field[ * field_a ]
         add field.name, field
       end
       nil
     end
   end
 
-  module Models::Field::Box::Host
+  module Field::Box::Host
   end
 
-  module Models::Field::Box::Host::InstanceMethods
+  module Field::Box::Host::InstanceMethods
 
     def field_box
       self.class.field_box
@@ -120,7 +120,7 @@ module Skylab::Cull
       field_box.field_names
     end
 
-    Models::Field::METAFIELDS_.each do |mf|
+    Field::METAFIELDS_.each do |mf|
 
       pred = mf.predicate
 
@@ -140,14 +140,14 @@ module Skylab::Cull
     def fields_bound_which predicate
       ::Enumerator.new do |y|
         field_box.fields_which( predicate ).each do |fld|
-          y << Models::Field::Bound.new( fld, method( fld.as_method ) )
+          y << Field::Bound.new( fld, method( fld.as_method ) )
         end
         nil
       end
     end
   end
 
-  class Models::Field::Bound
+  class Field::Bound
 
     attr_reader :field
 
