@@ -1,8 +1,9 @@
 module Skylab::Cull
 
-  class API::Client
+  class API::Client < Face::API::Client
 
     def initialize
+      super
       @config_file_search_start_pathname = -> do
         ::Pathname.pwd
       end
@@ -12,11 +13,6 @@ module Skylab::Cull
 
     attr_reader :config_file_search_start_pathname
     attr_reader :config_file_search_num_dirs
-
-    def build_action slug_str, param_h
-      kls = API::Actions.const_fetch slug_str
-      kls.new self, param_h
-    end
 
     -> do  # `model`, `cache!`
       rx = /s$/

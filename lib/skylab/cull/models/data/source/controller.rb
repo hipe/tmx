@@ -46,7 +46,7 @@ module Skylab::Cull
     def _if_valid_fields yes_object, no_event
       res = nil
       begin
-        if @tag_a.length.nonzero?
+        if @tag_a && @tag_a.length.nonzero?
           ok, res = _validate_tags yes_object, no_event
           ok or break
         end

@@ -11,14 +11,22 @@ module Skylab::Face
 
   module Services
 
+    extend MAARS
+
     o = { }
 
     o[:Headless] = -> { require 'skylab/headless/core' ; ::Skylab::Headless }
 
     o[:OptionParser] = -> { require 'optparse' ; ::OptionParser }
 
+    o[:PubSub] = -> { require 'skylab/pub-sub/core' ; ::Skylab::PubSub }
+
     define_singleton_method :const_missing do |const|
-      const_set const, o.fetch( const ).call
+      if o.key? const
+        const_set const, o.fetch( const ).call
+      else
+        super const
+      end
     end
   end
 end

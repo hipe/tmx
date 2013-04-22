@@ -26,7 +26,7 @@ module Skylab::MetaHell
   # function `func_for_module` is also module_exec'd on that module. if any
   # subsequent attempts are made to call this same function on the selfsame
   # argument module (HA) a runtime error is raised. produced function takes
-  # no arguments.
+  # no arguments, but `func_for_module` function may.
 
   o[:module_mutex] = -> func_for_module do
     mut_h = { }

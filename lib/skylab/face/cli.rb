@@ -119,6 +119,14 @@ module Skylab::Face
 
     attr_reader :margin, :in, :out, :err
 
+    def last_child_invocation_string
+      if @last_norm_name
+        "#{ invocation_string } #{ @last_norm_name * ' ' }"
+      elsif last_normalized_child_slug
+        "#{ invocation_string } #{ last_normalized_child_slug }"
+      end
+    end
+
   protected
 
     -> do  # `initialize`
@@ -148,6 +156,86 @@ module Skylab::Face
         @out ||= out
         @err ||= err
         @y = ::Enumerator::Yielder.new(& @err.method( :puts ) )  # `help_yielder`
+      end
+    end.call
+
+    def visit_normalized_name a
+      @last_norm_name = a
+      nil
+    end
+    public :visit_normalized_name
+
+    def api_client
+      @api_client ||= api_client_class.new
+    end
+    public :api_client
+
+    Face::Services::ModuleAccessors.enhance self do
+
+      private_methods do
+
+        module_autovivifier :api_client_class, '../../API/Client' do
+          ::Class.new Face::API::Client
+        end
+
+        module_reader :application_module, '../..'
+
+      end
+    end
+
+    #         ~ experimental API routing & wiring hooks ~
+
+    def set_behaviors action
+      nil
+    end
+
+    def handle_events action
+      stream_h = self.class.stream_h
+      action.with_specificity do
+        self.class.stream_a.each do |stream_name|
+          if action.emits? stream_name
+            action.on stream_name, method( stream_h.fetch( stream_name ) )
+          end
+        end
+      end
+      nil
+    end
+
+    -> do  # `stream_a`, `stream_h` - infer list of streams from
+           # method names that start with 'on_'
+
+      both = nil  # when you're tired -
+
+      define_singleton_method :stream_a do
+        @stream_a ||= begin
+          a, h = class_exec( &both )
+          @stream_h = h
+          a
+        end
+      end
+
+      define_singleton_method :stream_h do
+        @stream_h ||= begin
+          a, h = class_exec( &both )
+          @stream_a = a
+          h
+        end
+      end
+
+      rx = /^on_(.+)/
+
+      both = -> do
+        h = { }
+        a = private_instance_methods.reduce [] do |m, i|
+          if rx =~ i  # eek
+            stream_name = $~[1].intern
+            m << stream_name
+            h[ stream_name ] = i
+          end
+          m
+        end
+        a.freeze ; h.freeze
+        [ a, h ]
       end
     end.call
 
@@ -840,12 +928,6 @@ module Skylab::Face
 
   protected
 
-    def last_child_invocation_string
-      if last_normalized_child_slug
-        "#{ invocation_string } #{ last_normalized_child_slug }"
-      end
-    end
-
     def option_syntax
       if option_parser && has_partially_visible_op
         a = each_option.reduce [] do |m, opt|
@@ -1307,12 +1389,58 @@ module Skylab::Face
     public :error_stream_yielder  # #up-delegator
 
     def initialize request_client, slug_fragment, opt_h=nil
+      @last_norm_name = nil
       if opt_h
         sheet = nil
         opt_h_h = { sheet: -> x { sheet = x } }
         opt_h.each { |k, v| opt_h_h.fetch( k ).call( v ) }
       end
       super request_client, sheet || self.class.story, slug_fragment
+    end
+
+    #         ~ experimental API routing ~
+
+  private
+
+    def api *args
+      a = normalized_child_name
+      param_h = complete_param_h args
+      action = api_client.build_action a, param_h
+      set_behaviors action
+      handle_events action
+      action.execute
+    end
+
+    def normalized_child_name
+      x = @last_normalized_child_slug or fail 'sanity'
+      a = [ x ]
+      visit_normalized_name a
+      if instance_variable_defined? :@parent and @parent
+        @parent.visit_normalized_name a
+      end
+      a
+    end
+
+    def visit_normalized_name a
+      a.unshift @sheet.slug.intern
+      nil
+    end
+    public :visit_normalized_name
+
+    def complete_param_h args
+      @param_h or fail 'sanity'
+      m = method @last_normalized_child_slug
+      m.parameters.each_with_index do | (_, k), i|
+        @param_h[ k ] = args.fetch i
+      end
+      param_h = @param_h ; @param_h = nil
+      param_h
+    end
+
+    %i| api_client set_behaviors handle_events |.each do |i|
+      define_method i do |*a, &b|
+        @parent.send i, *a, &b
+      end
     end
 
     def self.method_added meth  # keep at end!

@@ -34,11 +34,10 @@ module Skylab::Cull
       CLI::Actions::DataSource
     end, aliases: [ 'ds' ]
 
-  protected
+  private
 
     def initialize( * )
       super
-      @last_norm_name = nil
       @pth = -> pn do
         if @action.is_verbose
           pn.to_s
@@ -48,27 +47,14 @@ module Skylab::Cull
       end
     end
 
-    attr_reader :pth
-
-    def api_client
-      @api_client ||= API::Client.new
-    end
-
     def set_behaviors action
       @action = action  # no
       action.pth = @pth
       nil
     end
 
-    def handle_events action
-      action.with_specificity do
-        STREAM_A_.each do |stream_name|
-          if action.emits? stream_name
-            action.on stream_name, method( STREAM_H_.fetch( stream_name ) )
-          end
-        end
-      end
-      nil
+    def pth
+      @pth  # for reading from model events
     end
 
     def on_payload_line e
@@ -97,7 +83,7 @@ module Skylab::Cull
     end
 
     # (during development life is easier if all structrual events
-    # provide a message function so we don't yet have to botehr with
+    # provide a message function so we don't yet have to bother with
     # custom per-action wiring.)
 
     def on_structural e
@@ -114,30 +100,6 @@ module Skylab::Cull
     def on_model_event e
       str = instance_exec( & e.payload_a.fetch( 0 ).message_function )
       @y << "#{ last_child_invocation_string }: #{ str }"
-      nil
-    end
-
-    STREAM_H_ = { }
-    rx = /^on_(.+)/
-    STREAM_A_ = protected_instance_methods.reduce [] do |m, i|
-      if rx =~ i
-        stream_name = $~[1].intern
-        m << stream_name
-        STREAM_H_[ stream_name ] = i
-      end
-      m
-    end
-
-    def last_child_invocation_string
-      if @last_norm_name
-        "#{ invocation_string } #{ @last_norm_name * ' ' }"
-      else
-        super
-      end
-    end
-
-    def visit_normalized_name a
-      @last_norm_name = a
       nil
     end
   end
