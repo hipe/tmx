@@ -3,7 +3,7 @@ module Skylab::Cull
   module Models::Data::Source
 
     -> do  # `self.field_box`
-      field_box = Models::Field::Box[
+      field_box = Basic::Field::Box[
         [ :name, :required ],
         [ :url, :required, :body ],
         [ :tags, :body ]

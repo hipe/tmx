@@ -6,7 +6,7 @@ module Skylab::Cull
       # leave empty block here, fill if needed
     end
 
-    Models::Field::Box.of self, Models::Data::Source.field_box
+    Basic::Field::Box.of self, Models::Data::Source.field_box
 
     def if_init_valid name, url, tag_a, yes_object, no_event
       @name = name.dup.freeze
