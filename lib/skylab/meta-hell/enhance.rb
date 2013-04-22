@@ -6,6 +6,48 @@ module Skylab::MetaHell
 
   end
 
+  class Enhance::Conduit
+
+    class << self
+      alias_method :mh_new, :new
+    end
+
+    def self.raw a
+      ::Class.new( self ).class_exec do
+
+        class << self
+          alias_method :new, :mh_new
+        end
+
+        a.each do |i|
+          define_method i do |*aa, &b|
+            @h.fetch( i )[ *aa, &b ]
+          end
+        end
+
+        const_set :One_Shot_, Enhance::OneShot.new( a )
+
+        const_set :A_, a  # exposed for hacking
+
+        self
+      end
+    end
+
+    def self.new a
+
+      a = a.dup.freeze
+
+      raw( a ).class_exec do
+
+        define_method :initialize do |*aa|
+          @h = ::Hash[ a.zip aa ]
+        end
+
+        self
+      end
+    end
+  end
+
   class Enhance::OneShot
 
     # per the `enhance` pattern, make one-shot conduits easy & paranoid.

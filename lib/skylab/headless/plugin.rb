@@ -44,7 +44,7 @@ module Skylab::Headless
       end
       sty and sty[ story ]
       dslify_svc_a = nil
-      cnd.instance_variable_set :@h, ::Hash[ Conduit_::A.zip( [
+      cnd.instance_variable_set :@h, ::Hash[ Conduit_::A_.zip( [
         -> m { story.add_available_plugins_box_module m },
         -> *a { story.add_ordinary_eventpoints a },
         -> *a { story.add_fuzzy_ordered_aggregation_eventpoints a },
@@ -71,21 +71,15 @@ module Skylab::Headless
       nil
     end
 
-    class Conduit_  # api private
-
-      ( A = %i|
-        add_plugins_box_module
-        eventpoints
-        fuzzy_ordered_aggregation_eventpoint
-        services
-        services_dslified
-        services_delegated_to
-      | ).each do |i|
-        define_method i do |*a|  # no blocks by design
-          @h.fetch( i ).call( *a )
-        end
-      end
-
+    Conduit_ = MetaHell::Enhance::Conduit.raw %i|
+      add_plugins_box_module
+      eventpoints
+      fuzzy_ordered_aggregation_eventpoint
+      services
+      services_dslified
+      services_delegated_to
+    |
+    class Conduit_
       alias_method :plugin_box_module, :add_plugins_box_module  # #experimental
     end
   end
@@ -855,7 +849,7 @@ module Skylab::Headless
       end
       sty and sty[ story ]
 
-      cnd.instance_variable_set :@h, ::Hash[ Conduit_::A.zip( [
+      cnd.instance_variable_set :@h, ::Hash[ Conduit_::A_.zip( [
         -> client_class_function do
           story.set_client_class_function client_class_function
         end, -> *eventpoints do
@@ -890,23 +884,13 @@ module Skylab::Headless
       end
     end
 
-    class Conduit_  # api private
-
-      ( A = %i|
-        client_class
-        eventpoints
-        dslify_eventpoint_names
-        services
-        plugin_services
-      | ).each do |i|
-
-        define_method i do |*a|
-          @h.fetch( i )[ *a ]
-        end
-      end
-
-      One_Shot_ = MetaHell::Enhance::OneShot.new A
-    end
+    Conduit_ = MetaHell::Enhance::Conduit.raw %i|
+      client_class
+      eventpoints
+      dslify_eventpoint_names
+      services
+      plugin_services
+    |
   end
 
   class Plugin::Story

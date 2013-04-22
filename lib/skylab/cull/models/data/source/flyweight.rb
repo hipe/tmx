@@ -2,7 +2,7 @@ module Skylab::Cull
 
   class Models::Data::Source::Flyweight
 
-    Basic::Field::Box.of self, Models::Data::Source.field_box
+    Basic::Field::Box::Host.enhance( self ).with Models::Data::Source.field_box
 
     def initialize
       @box = MetaHell::Formal::Box::Open.new

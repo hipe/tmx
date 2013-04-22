@@ -2,14 +2,13 @@ module Skylab::Cull
 
   module Models::Data::Source
 
-    -> do  # `self.field_box`
-      field_box = Basic::Field::Box[
-        [ :name, :required ],
-        [ :url, :required, :body ],
-        [ :tags, :body ]
-      ]
-      define_singleton_method :field_box do field_box end
-    end.call
+    Basic::Field::Box.enhance self do  # `field_box`
 
+      meta_fields :required, :body
+
+      fields  [ :name, :required ],
+              [ :url,  :required, :body ],
+              [ :tags, :body ]
+    end
   end
 end

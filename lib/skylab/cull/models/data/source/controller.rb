@@ -6,7 +6,7 @@ module Skylab::Cull
       # leave empty block here, fill if needed
     end
 
-    Basic::Field::Box.of self, Models::Data::Source.field_box
+    Basic::Field::Box::Host.enhance( self ).with Models::Data::Source.field_box
 
     def if_init_valid name, url, tag_a, yes_object, no_event
       @name = name.dup.freeze
@@ -85,7 +85,7 @@ module Skylab::Cull
       a = body_fields_bound.reduce [] do |m, b|
         v = b.value
         if ! v.nil?
-          m << [ b.field.name, v ]
+          m << [ b.field.normalized_name, v ]
         end
         m
       end

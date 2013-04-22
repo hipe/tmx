@@ -16,4 +16,10 @@ module Skylab::Basic
   MAARS = ::Skylab::MetaHell::Autoloader::Autovivifying::Recursive
 
   extend MAARS
+
+  module Meta
+
+    # ( just for readability in children )
+
+  end
 end
