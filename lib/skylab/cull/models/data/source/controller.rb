@@ -2,6 +2,10 @@ module Skylab::Cull
 
   class Models::Data::Source::Controller
 
+    Face::Model.enhance self do
+      # leave empty block here, fill if needed
+    end
+
     Models::Field::Box.of self, Models::Data::Source.field_box
 
     def if_init_valid name, url, tag_a, yes_object, no_event
@@ -86,9 +90,6 @@ module Skylab::Cull
         m
       end
       ::Hash[ a ]
-    end
-
-    def initialize _
     end
   end
 end

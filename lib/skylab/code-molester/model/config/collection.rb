@@ -1,26 +1,37 @@
-module Skylab::Cull
+module Skylab::CodeMolester
 
-  class Models::Config::Collection
+  class Model::Config::Collection
 
-    module Events
+    CodeMolester::Services::Face::Model.enhance self do
+      services %i|
+        has_instance
+        set_instance
+        config_filename
+        config_file_search_num_dirs
+        config_file_search_start_pathname
+      |
     end
 
-    def init path, is_dry_run, pth, exists_ev, before, after, info, all
-      if @model.cached? :config
+    def init_model_collection plugin_host_proxy
+      @plugin_host_proxy = plugin_host_proxy
+    end
+
+    def create path, is_dry_run, pth, exists_ev, befor, after, all
+      if host.has_instance :config
         skip[ "won't init when a cached config exists." ]
       else
-        pn = ::Pathname.new( path ).join( Models::Config.filename )
-        conf = @model.cache! :config do |c|
+        pn = ::Pathname.new( path ).join( host.config_filename )
+        conf = host.set_instance :config do |c|
           c.pathname = pn
         end
-        conf.init is_dry_run, pth, exists_ev, before, after, info, all
+        conf.create is_dry_run, pth, exists_ev, befor, after, all
       end
     end
 
     def find_nearest_config_file_path yes, no
-      pn = @model.config_file_search_start_pathname[]
-      remaining_tries = @model.config_file_search_num_dirs
-      fn = Models::Config.filename
+      pn = host.config_file_search_start_pathname
+      remaining_tries = host.config_file_search_num_dirs
+      fn = host.config_filename
       # --*--
       pn.absolute? or pn = pn.expand_path
       pn.absolute? or fail "sanity"  # it is important
@@ -44,17 +55,20 @@ module Skylab::Cull
       end
     end
 
-    Events::No = Models::Event.new do |num_tries, start_pn|
+    module Events
+    end
+
+    Events::No = Model::Event.new do |num_tries, start_pn|
       "no config file in the #{ num_tries } dirs starting #{
       }from #{ pth[ start_pn ] }"
     end
 
     def if_config yes, no
-      if @model.cached? :config
+      if host.has_instance :config
         yes[ ]
       else
         find_nearest_config_file_path -> found_pn do
-          @model.cache! :config do |c|
+          host.set_instance :config do |c|
             c.pathname = found_pn
           end
           yes[ ]
@@ -73,10 +87,6 @@ module Skylab::Cull
           end
         end
       end
-    end
-
-    def initialize client
-      @model = client
     end
   end
 end

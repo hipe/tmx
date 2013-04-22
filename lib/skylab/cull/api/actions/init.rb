@@ -7,14 +7,13 @@ module Skylab::Cull
     emits :before, :after, exists_event: :model_event, info: :all
 
     def execute
-      model( :configs ).init(
+      model( :configs ).create(
         @path || ::ENV[ 'HOME' ] || '.',
         @is_dry_run,
         pth,
         method( :exists_event ),
         method( :before ),
         method( :after ),
-        method( :info ),
         method( :all )
       )
     end

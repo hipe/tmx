@@ -24,47 +24,69 @@ module Skylab::Headless
     # (#todo a unit test that display a normative example.)
 
     def self.enhance host_mod, &blk
+      _enhance host_mod, -> do
+        Plugin::Host::Story.new host_mod
+      end, nil, Conduit_.new, blk
+    end
+
+    # `_enhance` - quietly expose the ever living life out of it for hacks
+    # yes this could stand to be cleaned up. and no it is not used outside
+    # of this library OOPS
+
+    def self._enhance host_mod, build_story, sty, cnd, define
       if ! host_mod.const_defined? :Plugin, false
         host_mod.const_set :Plugin, ::Module.new
       end
       story = if host_mod::Plugin.const_defined? :STORY_, false
         host_mod::Plugin::STORY_
       else
-        host_mod::Plugin::const_set :STORY_, Plugin::Host::Story.new( host_mod )
+        host_mod::Plugin::const_set :STORY_, build_story[]
       end
-      cnd = Conduit_.new(
+      sty and sty[ story ]
+      dslify_svc_a = nil
+      cnd.instance_variable_set :@h, ::Hash[ Conduit_::A.zip( [
         -> m { story.add_available_plugins_box_module m },
         -> *a { story.add_ordinary_eventpoints a },
         -> *a { story.add_fuzzy_ordered_aggregation_eventpoints a },
         -> *a { story.add_services a },
+        -> *a do
+          ( dslify_svc_a ||= [ ] ).concat a.flatten
+          story.add_services a
+        end,
         -> i, a { story.services_delegated_to i, a }
-      )
-      cnd.instance_exec( & blk )
+      ] ) ]
 
-      host_mod.send :include, Plugin::Host::InstanceMethods
+      host_mod.send :include, Plugin::Host::InstanceMethods  # consider order
+
+      cnd.instance_exec( & define ) if define  # allow empty blocks
+
+      if dslify_svc_a
+        dslify_svc_a.each do |i|
+          host_mod.define_singleton_method i do | & def_blk |
+            define_method i, & def_blk
+          end
+        end
+      end
+
+      nil
     end
 
     class Conduit_  # api private
 
       ( A = %i|
         add_plugins_box_module
-        ordinary_eventpoints
+        eventpoints
         fuzzy_ordered_aggregation_eventpoint
         services
+        services_dslified
         services_delegated_to
       | ).each do |i|
-
-        define_method i do |*a|  # LOOK - no blocks by design
+        define_method i do |*a|  # no blocks by design
           @h.fetch( i ).call( *a )
         end
       end
 
-      alias_method :eventpoints, :ordinary_eventpoints  # #experimental
       alias_method :plugin_box_module, :add_plugins_box_module  # #experimental
-
-      def initialize *a
-        @h = ::Hash[ A.zip a ]
-      end
     end
   end
 
@@ -243,8 +265,6 @@ module Skylab::Headless
       if ok then yes[ res ] else no[ ] end
     end
 
-  protected
-
     # (note very little of the story is internal. it is essentially a data
     # conduit.)
 
@@ -287,12 +307,14 @@ module Skylab::Headless
 
   module Plugin::Host::InstanceMethods
 
-    # this I.M module adds no public methods - whether you as a host
+    # this I.M module tries to add adds as few public methods as
+    # is necessary - whether you as a host
     # application want to expose your plugin API as part of your own API
     # is your business but it sounds strange and so is not the default
     # behavior. (exceptions to this will be noted with comments - some
     # of the instances of support classes will need to call some methods
-    # that this module adds.)
+    # that this module adds, or otherwise route calls through this host
+    # application for ease of customizing behavior..)
 
   protected
 
@@ -338,6 +360,14 @@ module Skylab::Headless
       @plugin_manager ||= Plugin::Manager.load_for_host_application self
     end
 
+    # `plugin_services` - ( host i.m edition ) exposed for hacking, only
+    # called outside of this library.
+
+    def plugin_services
+      plugin_manager.plugin_services
+    end
+    public :plugin_services
+
     # `plugin_host_story` - will be called by the plugin manager once
     # when it inits. is a hookpoint for possible future hackery.
 
@@ -350,6 +380,33 @@ module Skylab::Headless
       self.class.const_get( :Plugin ).const_get( :STORY_, false )
     end
     public :plugin_host_story  # called by plugin manager
+
+    # `plugin_host_proxy_aref` - route calls for `host[]` from plugins
+    # thru the host application in case it wants to customize the behavior.
+    # the default behavior is: if one argument, call the service named by
+    # the argument with no arguments or block and our result is its result.
+    #
+    # otherwise, if not 1 argument, result is always an array of the same
+    # length as the number of arguments, with each element corresponding
+    # to the result of that service call (goofy sugar).
+    #
+    # (details:  calls come from host services. the name `aref` is borrowd from
+    # the ruby source as the way they say `[]`, but what does "aref" mean?)
+
+    def plugin_host_proxy_aref i_a, plugin_story
+      if 1 == i_a.length
+        @plugin_manager.plugin_services.call_host_service plugin_story,
+          i_a.fetch( 0 )
+      else
+        m = [ ] ; svc = @plugin_manager.plugin_services
+        # frame-free reduce (tail-call recursion ha) saves 1 frame :/
+        while i_a.length.nonzero?
+          m << svc.call_host_service( plugin_story, i_a.shift )
+        end
+        m
+      end
+    end
+    public :plugin_host_proxy_aref  # called by host services
 
     def plugin_flatten ea, &block
       eac = ::Enumerator.new do |y|
@@ -464,7 +521,7 @@ module Skylab::Headless
       @a = [ ] ; @h = { }  # the plugin manager is a box.
     end
 
-    # `init` - only to be called by a module method in this selfsame class.
+    # `init` - called by a module method in this selfsame class (or elsewhere)
     # in a separate step from our `initialize` call (possibly giving the
     # host application time to think), we memoize the story, which will be
     # used a lot here. for now we always succeed, but result is a success
@@ -500,7 +557,7 @@ module Skylab::Headless
       self
     end
 
-    # `plugin_services`
+    # `plugin_services` ( plugin manager edition )
     # called internally from `load_plugins` - an interface object which
     # facilitates communication from plugin to host application.
     # (based off of a drawing we saw on wikipedia)
@@ -508,7 +565,7 @@ module Skylab::Headless
     def plugin_services
       @plugin_services ||= Plugin::Host::Services.new @host_application
     end
-    protected :plugin_services
+    public :plugin_services  # exposed for hacking, also may be called from host
 
     # `available_plugin_modules`
     # TL;DR: the result is an enumeration of all the available plugins Modules.
@@ -713,22 +770,13 @@ module Skylab::Headless
       # so fancy as yet that we have a dynamic list of services. that
       # sounds like a terrible idea.
 
-      svc = self
+      svc = self ; ha = @host_application
       ::Class.new.class_exec do
         # (this could be made more static but we are avoiding something..)
         define_method :initialize do |plugin|
           pstory = plugin.plugin_story
           define_singleton_method :[] do |*i_a|
-            if 1 == i_a.length
-              svc.call_host_service pstory, i_a.fetch( 0 ), nil, nil
-            else
-              m = [ ]
-              # frame-free reduce (tail-call recursion ha) saves 1 frame :/
-              while i_a.length.nonzero?
-                m << svc.call_host_service( pstory, i_a.shift, nil, nil )
-              end
-              m
-            end
+            ha.plugin_host_proxy_aref i_a, pstory
           end
           service_name_a.each do |i|
             define_singleton_method i do |*a, &b|
@@ -745,7 +793,7 @@ module Skylab::Headless
     # `call_host_service` - this is expected normally to be called
     # from host proxies but here you can have it if you want.
 
-    def call_host_service pstory, service_i, a, b
+    def call_host_service pstory, service_i, a=nil, b=nil
       svc = @story.if_service service_i, -> sv { svc = sv }, -> do
         raise Plugin::Service::NameError, "what service are you #{
           }talking about willis - #{ service_i }"
@@ -791,39 +839,55 @@ module Skylab::Headless
     end
 
     def self.enhance particular_plugin_box_mod, &defn
+      _enhance particular_plugin_box_mod, -> do
+        Plugin::Story.new( particular_plugin_box_mod )
+      end, nil, Conduit_.new, defn
+    end
+
+    # `_enhance` - experiments
+
+    def self._enhance particular_plugin_box_mod, bld_sty, sty, cnd, def_blk
 
       story = if particular_plugin_box_mod.const_defined? :STORY_, false
         particular_plugin_box_mod.const_get :STORY_, false
       else
-        particular_plugin_box_mod.const_set :STORY_,
-          Plugin::Story.new( particular_plugin_box_mod )
+        particular_plugin_box_mod.const_set :STORY_, bld_sty[]
       end
+      sty and sty[ story ]
 
-      cnd = Conduit_.new(
+      cnd.instance_variable_set :@h, ::Hash[ Conduit_::A.zip( [
         -> client_class_function do
           story.set_client_class_function client_class_function
         end, -> *eventpoints do
           story.add_eventpoints eventpoints
-        end, -> do # `use_eventpoint_dsl`
-          story.do_use_eventpoint_dsl = true
+        end, -> do # `dslify_eventpoint_names`
+          story.do_dslify_eventpoint_names = true
         end, -> *services do
           story.add_services services
         end, -> *plugin_service_i_a do
           story.add_plugin_services plugin_service_i_a
         end
-      )
-      cnd.instance_exec( & defn )
+      ] ) ]
+
+      flush = -> do
+
+        # now, kick the plugin client class - users will have had a chance to
+        # override this by now. but typically what happens next is they re-open
+        # the client class and it is convenient to have it auto-vivified first
+        # with the appropriate base class and I.M's (the default behavior).
+
+        story.plugin_client_class  # kick
+      end
 
       particular_plugin_box_mod.extend Plugin::ModuleMethods
 
-      # now, kick the plugin client class - users will have had a chance to
-      # override this by now. but typically what happens next is they re-open
-      # the client class and it is convenient to have it auto-vivified first
-      # with the appropriate base class and I.M's (the default behavior).
-
-      story.plugin_client_class  # kick
-
-      nil
+      if def_blk
+        cnd.instance_exec( & def_blk )
+        flush[ ]
+        nil
+      else
+        cnd.class::One_Shot_.new cnd, flush
+      end
     end
 
     class Conduit_  # api private
@@ -831,7 +895,7 @@ module Skylab::Headless
       ( A = %i|
         client_class
         eventpoints
-        use_eventpoint_dsl
+        dslify_eventpoint_names
         services
         plugin_services
       | ).each do |i|
@@ -841,9 +905,7 @@ module Skylab::Headless
         end
       end
 
-      def initialize *a
-        @h = ::Hash[ A.zip( a ) ]
-      end
+      One_Shot_ = MetaHell::Enhance::OneShot.new A
     end
   end
 
@@ -874,9 +936,9 @@ module Skylab::Headless
       @client_class_function.call
     end
 
-    # `use_eventpoint_dsl` (writer, reader)
+    # `dslify_eventpoint_names` (writer, reader)
 
-    attr_accessor :do_use_eventpoint_dsl
+    attr_accessor :do_dslify_eventpoint_names
 
     # eventpoints-related methods - `add_eventpoints`, `subscribed?`, [..]
 
@@ -923,7 +985,7 @@ module Skylab::Headless
   protected
 
     def initialize particular_plugin_box_module
-      @do_use_eventpoint_dsl = true  # experimental!
+      @do_dslify_eventpoint_names = true  # experimental!
       @particular_plugin_box_module = particular_plugin_box_module
       @client_class_function = -> do
         default_client_class
@@ -970,11 +1032,11 @@ module Skylab::Headless
           if ! kls.method_defined? :plugin_story
             kls.send :include, Plugin::Client::InstanceMethods
           end
-          use_dsl = @do_use_eventpoint_dsl  # ..
+          use_dsl = @do_dslify_eventpoint_names  # ..
         else
           kls = ::Class.new  # NOTE we used to sublcass a base class here, but
           kls.send :include, Plugin::Client::InstanceMethods  # ..no reason to
-          use_dsl = @do_use_eventpoint_dsl  # yes always
+          use_dsl = @do_dslify_eventpoint_names  # yes always
         end
 
         @particular_plugin_box_module.const_set :Client, kls  # yes always
@@ -1062,7 +1124,8 @@ module Skylab::Headless
     # `plugin_story` - called by plugin manager `load_plugins`.
 
     def plugin_story
-      @plugin_story  # like so to trigger warnings
+      @plugin_story or raise "no @plugin_story - call `load_plugin` first? #{
+        }- #{ self.class }"
     end
 
     # `plugin_slug` - an informal way to refer to the plugin by a name.

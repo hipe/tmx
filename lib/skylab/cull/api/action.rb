@@ -8,8 +8,8 @@ module Skylab::Cull
 
   protected
 
-    def model i
-      @client.model i
+    def model *i_a
+      @client.model( *i_a )
     end
   end
 end

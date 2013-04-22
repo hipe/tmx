@@ -8,6 +8,8 @@ module Skylab::CodeMolester
       h[const] = f
     end
 
+    o :Face,          -> { require 'skylab/face/core' ; ::Skylab::Face }
+
     o :FileUtils,     -> { require 'fileutils' ; ::FileUtils }
 
     o :Psych,         -> { require 'psych'    ; ::Psych }
