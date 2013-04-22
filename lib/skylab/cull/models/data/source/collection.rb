@@ -2,8 +2,14 @@ module Skylab::Cull
 
   class Models::Data::Source::Collection
 
+    Face::Model.enhance( self ).services %i|
+      configs
+      config
+      data_source
+    |
+
     def list payload_line, error_event
-      @model[:configs].if_config( -> do
+      host.configs.if_config( -> do
         items = ::Enumerator.new do |y|
           data_sources.each do |ds|
             ds.if_valid -> do
@@ -21,8 +27,7 @@ module Skylab::Cull
         comma = -> cmnt, line do
           no_comma[ cmnt, "#{ line }," ]
         end
-        prev = nil
-        open = nil
+        prev = open = nil
         parse_error_o = items.each do | *pair |
           open or ( open = true and payload_line[ '[' ] )  # sorry
           if prev
@@ -48,19 +53,19 @@ module Skylab::Cull
     end
 
     def add name, url, tag_a, is_dry_run, is_verbose, error_event, info
-      @model[ :configs ].if_config -> do
+      host.configs.if_config( -> do
         res = nil
-        cnt = @model[ :data, :source ].if_init_valid name, url, tag_a, -> cont do
+        host = self.host
+        cnt = host[ :data, :source ].if_init_valid name, url, tag_a, -> cont do
           cont
         end, -> e do
           res = error_event[ e ]
           nil
         end
         if ! cnt then res else
-         add_valid_data_source cnt,
-            is_dry_run, is_verbose, error_event, info
+         add_valid_data_source cnt, is_dry_run, is_verbose, error_event, info
         end
-      end, error_event
+      end, error_event )
     end
 
     module Exists
@@ -78,23 +83,17 @@ module Skylab::Cull
       if exists
         e[ Exists::Already[ name_string: exists.name ] ]
       else
-        @model[ :config ].insert_valid_data_source cnt, d, v, e, i
+        host.config.insert_valid_data_source cnt, d, v, e, i
       end
     end
-    protected :add_valid_data_source
-
-  protected
-
-    def initialize client
-      @model = client
-    end
+    private :add_valid_data_source
 
     -> do  # `data_sources`
       rx = /\Adata-source "([^"]+)"\z/
       fly_weight = Models::Data::Source::Flyweight.new
       define_method :data_sources do
         ::Enumerator.new do |y|
-          @model[:config].file.if_valid( -> f do
+          host.config.file.if_valid( -> f do
             s = f.sections
             if s
               s.each do |sect|
@@ -112,7 +111,7 @@ module Skylab::Cull
           end )
         end
       end
-      protected :data_sources  # just for now probably..
+      private :data_sources  # just for now probably..
     end.call
   end
 end

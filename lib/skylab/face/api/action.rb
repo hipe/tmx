@@ -45,7 +45,6 @@ module Skylab::Face
       nil
     end
 
-
     #         ~ *experimental* event wiring facilities up here ~
 
     extend Face::Services::PubSub::Emitter

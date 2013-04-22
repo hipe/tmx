@@ -33,6 +33,4 @@ module Skylab::Cull
   module Models
     extend MetaHell::Boxxy
   end
-
-  OK = true  # all purpose generic
 end

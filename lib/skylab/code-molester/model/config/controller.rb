@@ -1,21 +1,19 @@
-module Skylab::Cull
+module Skylab::CodeMolester
 
-  class Models::Config::Controller
+  class Model::Config::Controller
 
-    module Events
-    end
+    CodeMolester::Services::Face::Model.enhance self do
 
-    def do_cache  # be careful!
-      true
+      do_memoize
+
     end
 
     -> do  # `new_valid`
 
-      Init_ = ::Struct.new :api_client, :pathname
+      Init_ = ::Struct.new :pathname
       define_singleton_method :new_valid do |init, obj_if_ok, msg_if_not_ok|
         init[ st = Init_.new ]
         -> do
-          st.api_client or break msg_if_not_ok[ '`api_client` is required' ]
           st.pathname or break msg_if_not_ok[ '`pathname` is required' ]
           obj_if_ok[ new( * st.values ) ]
         end.call
@@ -26,22 +24,30 @@ module Skylab::Cull
       private :new
     end
 
-    def initialize api_client, pathname
-      @model = api_client  # as we use it
+    def initialize pathname
       @file = CodeMolester::Config::File::Model.new path: pathname
       freeze
       nil
     end
-    protected :initialize
 
     attr_reader :file
 
-    Events::Exists = Models::Event.new do |pn|
+    module Events
+    end
+
+    Events::Exists = Model::Event.new do |pn|
       "exists, skipping - #{ pth[ pn ] }"
     end
 
-    def init is_dry_run, pth, exists_event, before, after, info, all
-      res = OK ; f = @file
+    # `create` - wrapper for Config::File#write
+    # `pth` is a function is used to escape filesystem pathnames
+    # `exists_event` will be called if the file already exists, it will
+    # be passed an `Events::Exists` object. `befor` and `after` will receive
+    # events with metadata immediately before and after the file is written.
+    # `all` is a catch-all for other eventws.
+
+    def create is_dry_run, pth, exists_event, befor, after, all
+      f = @file
       begin
         if f.exist?
           res = exists_event[ Events::Exists[ pn: f.pathname ] ]
@@ -51,7 +57,7 @@ module Skylab::Cull
         f.sections['foo']['bar'] = 'baz'
         res = f.write do |w|
           w.with_specificity do
-            w.on_before before
+            w.on_before befor
             w.on_after after
             w.on_all all
           end
@@ -68,11 +74,11 @@ module Skylab::Cull
       insert_valid_item 'data-source', src, d, v, e, i
     end
 
-    Collision = Models::Event.new do |section_name|
+    Collision = Model::Event.new do |section_name|
       "name collision with #{ section_name.inspect }"
     end
 
-    Inserted = Models::Event.new do |item|
+    Inserted = Model::Event.new do |item|
       "inserted into list - #{ item.name.inspect }"
     end
 
@@ -101,15 +107,15 @@ module Skylab::Cull
     end
     protected :insert_valid_item
 
-    Wrap = Models::Event.new do |upstream|
+    Wrap = Model::Event.new do |upstream|
       upstream.message_function[]
     end
 
-    Text = Models::Event.new do |text|
+    Text = Model::Event.new do |text|
       text
     end
 
-    Invalid = Models::Event.new do |rsn_o|
+    Invalid = Model::Event.new do |rsn_o|
       rsn_o.render
     end
 

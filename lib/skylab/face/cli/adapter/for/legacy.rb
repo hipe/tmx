@@ -24,8 +24,6 @@ module Skylab::Face
             end
           )
         end
-        require 'debugger' ; debugger ; 1==1||nil
-
         strange
       end
 

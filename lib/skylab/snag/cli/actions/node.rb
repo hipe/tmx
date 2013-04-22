@@ -48,8 +48,7 @@ module Skylab::Snag
       }.merge( param_h ) do |a|
         a.on_error handle_error
         a.on_info do |e|
-          require 'debugger' ; debugger ; 1==1||nil
-
+          fail 'do me'  # #todo
         end
       end
     end
