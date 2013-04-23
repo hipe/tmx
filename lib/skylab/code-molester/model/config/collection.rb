@@ -18,14 +18,13 @@ module Skylab::CodeMolester
 
     def create path, is_dry_run, pth, exists_ev, befor, after, all
       if host.has_instance :config
-        skip[ "won't init when a cached config exists." ]
-      else
-        pn = ::Pathname.new( path ).join( host.config_filename )
-        conf = host.set_instance :config do |c|
-          c.pathname = pn
-        end
-        conf.create is_dry_run, pth, exists_ev, befor, after, all
+        raise "won't create when a cached config exists."
       end
+      pn = ::Pathname.new( path ).join( host.config_filename )
+      conf = host.set_instance :config do |c|
+        c.pathname = pn
+      end
+      conf.create is_dry_run, pth, exists_ev, befor, after, all
     end
 
     def find_nearest_config_file_path yes, no

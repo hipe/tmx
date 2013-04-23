@@ -50,4 +50,38 @@ module Skylab::Face
       st
     end
   end
+
+  class Model::Event::Aggregation
+
+    def initialize
+      @a = nil
+    end
+
+    def << x
+      if x
+        ( @a ||= [ ] ) << x
+      end
+      nil
+    end
+
+    def flush
+      if @a
+        if 1 == @a.length
+          @a.fetch 0
+        else
+          Model::Event::Aggregate[ a: @a ]
+        end
+      end
+    end
+  end
+
+  Model::Event::Aggregate = Model::Event.new do |a|
+    o = ''
+    Face::Services::Basic::List::Evented::Articulation enum do
+      iff_zero_items               ->     { o << '(empty)' }
+      any_first_line               ->   x { o << "#{ x.message_function[] }" }
+      any_subsequent_lines         ->   x { o << " - #{ x.message_function[] }"}
+    end
+    o
+  end
 end

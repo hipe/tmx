@@ -17,6 +17,9 @@ module Skylab::Face
 
     define_singleton_method :params, &
         MetaHell::FUN.module_mutex[ ->( * param_a ) do
+      if param_a.first.respond_to? :each_index
+        param_a = API::Action::Param::Flusher[ param_a, self ]
+      end
       param_a.freeze
       param_h = ::Hash[ param_a.each.with_index.to_a ]
       param_h.default_proc = -> h, k do

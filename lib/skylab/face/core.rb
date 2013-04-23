@@ -15,6 +15,8 @@ module Skylab::Face
 
     o = { }
 
+    o[:Basic] = -> { require 'skylab/basic/core' ; ::Skylab::Basic }
+
     o[:Headless] = -> { require 'skylab/headless/core' ; ::Skylab::Headless }
 
     o[:OptionParser] = -> { require 'optparse' ; ::OptionParser }

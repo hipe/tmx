@@ -4,6 +4,9 @@ module Skylab::Face
 
     # `API::Client` - experimental barebones impl.
 
+    # `define_api_client` - this must be *not* monadic! (same block might
+    # be re-run)
+
     def self.define_api_client &blk
       Face::Services::Headless::Plugin::Host.enhance self do
         services %i|

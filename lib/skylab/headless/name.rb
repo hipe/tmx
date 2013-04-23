@@ -125,8 +125,6 @@ module Skylab::Headless
       @normalized_name ||= @name_a.map(& :normalized_local_name ).freeze
     end
 
-  protected
-
     def initialize a  # please provide an array of name functions
       @name_a = a
       nil

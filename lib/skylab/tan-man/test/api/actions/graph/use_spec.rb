@@ -7,7 +7,7 @@ module Skylab::TanMan::TestSupport::API::Actions
   # you make sure to cd into the tmpdir (blown away and recreated for us
   # on calls to `prepare_tanman_tmpdir`) for now!
 
-  describe "The #{ TanMan::API } action Use", tanman: true,
+  describe "The #{ TanMan::API } action (graph) Use", tanman: true,
                                           api_action: true do
 
     extend Actions_TestSupport
@@ -63,7 +63,7 @@ module Skylab::TanMan::TestSupport::API::Actions
           lone_error( /cannot create, is directory: is-a-directory\.dot/i )
         end
 
-        it 'and you give it a path that is a file - "file exists" ', f:true do
+        it 'and you give it a path that is a file - "file exists" ' do
           prepared_tanman_tmpdir.touch 'hi-im-here.dot'
           from_tmpdir do
             api_invoke path: 'hi-im-here.dot'

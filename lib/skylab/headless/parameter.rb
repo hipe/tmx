@@ -2,6 +2,8 @@ module Skylab::Headless
 
   class Parameter  # at [#049] this might become s/thing like Formal::Parameter
                    # re-opened below
+                   # ( but note the current darling child for stuff like this
+                   # is "Field::Box" [#ba-003] ).
   end
 
   module Parameter::Definer

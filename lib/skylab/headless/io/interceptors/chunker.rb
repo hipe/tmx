@@ -1,5 +1,7 @@
 module Skylab::Headless
+
   class IO::Interceptors::Chunker
+
     # chunker - scan each write of data and emit it in chunks based on separator
 
     def flush                     # emit out any remaining data. any data

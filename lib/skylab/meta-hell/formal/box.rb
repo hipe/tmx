@@ -440,6 +440,14 @@ module Skylab::MetaHell
         name_a.include? k         # was in the list of names. might mutate
       end                         # receiver.
     end
+
+    #        ~ the protected method that prevents future change ~
+
+    def freeze
+      super
+      @hash.freeze ; @order.freeze
+      self
+    end
   end
 
   class Formal::Box
@@ -475,7 +483,7 @@ module Skylab::MetaHell
     end
 
     #   ~ mutators made public (we might just do it whole hog..) ~
-    public :accept, :add, :change, :clear  # #exp
+    public :accept, :add, :change, :clear, :freeze  # #exp
 
     public :partition_by_keys!, :sort_names_by!
 

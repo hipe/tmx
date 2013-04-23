@@ -2,38 +2,16 @@ module Skylab::Cull
 
   class API::Client < Face::API::Client
 
-    define_api_client do
+    CodeMolester::Config::File::API_Client.enhance self do
 
-      services_dslified %i|
-        config_file_search_start_pathname
-        config_file_search_num_dirs
-        config_filename
-        configs
-        config
-      |
+      search_start_pathname do
+        ::Pathname.pwd
+      end
 
-    end
+      search_num_dirs 3
 
-    config_file_search_start_pathname do
-      ::Pathname.pwd
-    end
+      config_filename '.cullconfig'
 
-    config_file_search_num_dirs do
-      3
-    end
-
-    config_filename do
-      Cull::Models::Config.filename
-    end
-
-    # `configs` - readability enhancement?
-
-    configs do
-      model :configs
-    end
-
-    config do
-      model :config
     end
   end
 end
