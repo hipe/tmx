@@ -14,6 +14,7 @@ module Skylab::Cull
 
     option_parser do |o|
       dry_run_option o
+      verbose_option o
 
       @param_h[ :tag_a ] = nil
       o.on '-t', '--tag <name>' do |v|

@@ -1,6 +1,11 @@
 module ::Skylab::MetaHell
 
   module Formal::Attribute
+
+    # (note we accidentallly deprecated this with [#ba-003] Field::Box
+    # but we should somehow merge them if for no other reason than
+    # the below is amusing.)
+
     # What is the esssence of all data in the universe? It starts from
     # within. with metaprogramming.
     #

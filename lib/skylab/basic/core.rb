@@ -17,9 +17,4 @@ module Skylab::Basic
 
   extend MAARS
 
-  module Meta
-
-    # ( just for readability in children )
-
-  end
 end

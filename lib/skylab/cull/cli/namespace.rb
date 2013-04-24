@@ -25,5 +25,13 @@ module Skylab::Cull
       end
       nil
     end
+
+    def verbose_option o
+      @param_h[ :be_verbose ] = nil
+      o.on '-v', '--verbose', 'be verbose.' do
+        @param_h[ :be_verbose ] = true
+      end
+      nil
+    end
   end
 end

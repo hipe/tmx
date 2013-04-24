@@ -1,234 +1,308 @@
-module Skylab::Basic
+class Skylab::Basic::Field
 
-  class Field  # ( re-opened below )
+  Field = self
 
+  %i( Basic MetaHell ).each do |i|
+    const_set i, ::Skylab.const_get( i, false )
   end
 
   #         ~ narrative pre-order with aesthetic pyramiding ~
 
   class Field::Box < MetaHell::Formal::Box::Open
 
+    def self.[] *a
+      b = new
+      a.each do |fld|
+        b.accept fld
+      end
+      b
+    end
+
     def self.enhance host_mod, & def_blk
 
-      box = Field::Box.build_into host_mod, def_blk
+      build_into host_mod, def_blk
 
-      host_mod.define_singleton_method :field_box do box end
+      host_mod.define_singleton_method :field_box do
+        const_get :FIELDS_, false
+      end
 
     end
 
     def self.build_into host_mod, def_blk
 
-      mf_box = host_mod.const_set :METAFIELDS_, MetaHell::Formal::Box::Open.new
-      box = host_mod.const_set :FIELDS_, new( host_mod )
-      fields_a = [ ]
+      flsh = Flusher_.new host_mod, self
 
-      Conduit_.new(
-        ->( * meta_f_a ) do
-          meta_f_a.each do |i|
-            ::Symbol === i or fail "sanity - metafield? - #{ i.class }"
-            mf_box.accept Meta::Field[ i ]
-          end
-          nil
-        end,
-        ->( * flds_a ) do
-          fields_a = flds_a
-          nil
-        end
-      ).instance_exec( & def_blk )
-      mf_box.freeze
+      Conduit_.new( ->( * meta_f_a ) { flsh.concat_metafields meta_f_a },
+                    ->( * fields_a ) { flsh.concat_fields fields_a } ).
+        instance_exec( & def_blk )
 
-      field_class = host_mod.const_set( :FIELD_, Field.produce( mf_box ) )
-      fields_a.each do |field_a|
-        ::Symbol === field_a.fetch( 0 ) or fail "sanity - #{ field_a[0].class }"
-        field = field_class.new( * field_a )
-        host_mod.const_set(
-          "#{ field.normalized_name.to_s.upcase }_FIELD_", field )
-        box.accept field
-      end
-      box
+      flsh.flush
     end
 
     Conduit_ = MetaHell::Enhance::Conduit.new %i| meta_fields fields |
 
-    # ( `Field::Box` reopens below .. )
-  end
+  end   # ( `Field::Box` reopens below .. )
 
-  class Meta::Field
+  class Flusher_
 
-    # ( immutable. )
-
-    class << self
-      alias_method :[], :new
+    def initialize host_mod, box_kls
+      @metafield_a = [ ] ; @field_a = [ ]
+      @target = host_mod ; @box_kls = box_kls
     end
 
-    attr_reader :normalized_name, :ivar, :predicate
+    def concat_metafields a
+      @metafield_a.concat a
+      nil
+    end
 
-    def initialize stem
-      @normalized_name = stem
-      @ivar = "@is_#{ stem }".intern
-      @predicate = "is_#{ stem }".intern
-      freeze
+    def concat_fields a
+      @field_a.concat a
+      nil
+    end
+
+    # `flush` - the fourth center of the universe has been found.
+    # see note at [#ba-fi-001] about an infinite stack of metafields.
+
+    def flush
+      field_a = @field_a ; @field_a = nil
+      metafield_a = @metafield_a ; @metafield_a = nil
+
+      n_meta_resolver = N_Meta_Resolver_.new
+
+      n_meta_resolver.push field_a, -> x do
+        @target.const_set :FIELDS_, x
+      end
+
+      n_meta_resolver.push metafield_a, -> x do
+        @target.const_set :METAFIELDS_, x
+      end, -> x do
+        @target.const_set :METAFIELD_, x
+      end
+
+      n_meta_resolver.seed Meta_Field_
+
+      n_meta_resolver.flush
+    end
+  end
+
+  class N_Meta_Resolver_  # this is the implementation of [#ba-fi-001]
+
+    def initialize
+      @stack = [ ]
+    end
+
+    def push fields_a=nil, box_callback=nil, field_callback=nil
+      @stack << [ fields_a, box_callback, field_callback ]
+      nil
+    end
+
+    def seed up_field
+      @seed = up_field
+    end
+
+    def flush
+      count = 0
+      if @stack.length.nonzero?
+        up_x = @seed ; @seed = nil
+        begin
+          depth = @stack.length
+          fields_a, box_cb, field_cb = @stack.pop ; count += 1
+          box = up_x.make_field_box fields_a, depth
+          box_cb and box_cb[ box ]
+          @stack.length.zero? and break
+          # don't produce a field class for the set of fields (e.g `is_email`)
+          kls = box.produce
+          if field_cb
+            field_cb[ kls ]
+          end
+          up_x = kls
+        end while true
+      end
+      count
+    end
+  end
+
+  module Produce_
+  end
+
+  class Field::Box
+    include Produce_
+
+    def produce
+      produce_field_class Field, self
+    end
+  end
+
+  module Produce_  # #todo - cleanup - (it is hard to follow what the base
+                   # class is)
+
+    def produce_field_class base, box
+      ::Class.new( base ).class_exec do
+        box.frozen? or box = box.dup.freeze  #  ( we don't need `dupe` )
+        const_set :FIELDS_, box
+        box.each do |fld|
+          fld.enhance self
+        end
+        def initialize( (*x_a), depth )
+          super( * x_a[ 0..0 ] )
+          if 1 < x_a.length
+            scn = Basic::List::Scanner[ x_a ]
+            scn.gets  # toss first match that was handled above
+            begin
+              i = scn.gets
+              fld = fields.fetch i do raise( * key_error( depth, i ) ) end
+              fld.mutate self, scn
+            end while ! scn.eos?
+          end
+        end
+        self
+      end
     end
   end
 
   class Field
 
-    def self.produce mf_box
-      ::Class.new( self ).class_exec do
-        mf_box.each do |mf|
-          attr_reader mf.predicate
-        end
-        -> do
-          a = [ ] ; h = { }
-          mf_box.each do |k, mf|
-            a << ( ivar = mf.ivar )
-            h[ k ] = -> do
-              instance_variable_set ivar, true
-            end
-          end
+    def initialize nn
+      @normalized_name = nn
+    end
 
-          define_method :initialize do |normalized_name, *x_a|
-            @normalized_name = normalized_name
-            @as_ivar = "@#{ normalized_name }".intern
-            a.each { |ivar| instance_variable_set ivar, false }  # TODO
-            x_a.each { |k| instance_exec( & h.fetch( k ) ) }
-            freeze
-            nil
-          end
-        end.call
-        self
+    attr_reader :normalized_name
+
+    class << self
+
+      def make_field_box field_a, depth
+        b = Field::Box.new
+        field_a.each do | x |
+          fld = make_field x, depth
+          b.accept fld
+        end
+        b
+      end
+
+      def make_field x, depth
+        new x, depth
       end
     end
 
-    attr_reader :normalized_name, :as_ivar
-    alias_method :as_method, :normalized_name
-
-    def is_exist  # convenience for selecting all fields
-      true
+    def fields
+      self.class.const_get :FIELDS_, false
     end
-  end
 
-  module Field::Box::Host
-
-    def self.enhance host_mod
-      cnd = Conduit_.new( -> fld_bx do
-        host_mod.module_exec do
-          define_singleton_method :field_box do fld_bx end
-        end
-        nil
-      end )
-      flush = -> do
-        build_into host_mod, host_mod.field_box
-        nil
-      end
-      if block_given?
-        raise ::ArgumentError, "this contained DSL only employs the #{
-          }one-off shooter for currently (do not use blocks. call #{
-          }`with` on the result of the enhance() call.)"
+    def key_error depth, x
+      field = "#{ 'meta-' * ( depth ) }field"
+      reason = if fields.length.zero?
+        "this nerk takes no #{ field }s"
       else
-        Conduit_::One_Shot_.new cnd, flush
+        "expecting #{ fields.names.map { |y| "\"#{ y }\""} * ' or ' }"
+      end
+      [ ::KeyError,
+        "no such #{ field } \"#{ x }\" - #{ reason } (#{ self.class }) " ]
+    end
+    private :key_error
+
+    def [] k
+      send fields.fetch( k ).as_is_predicate
+    end
+
+    def as_host_ivar
+      @as_host_ivar ||= :"@#{ @normalized_name }"
+    end
+  end
+
+  module Binary
+  end
+
+  Binary::Field = Field::Box[ ].produce
+  class Binary::Field
+
+    def enhance mod
+      i = as_is_predicate
+      mod.module_exec do
+        attr_reader i
       end
     end
 
-    def self.build_into target_mod, field_box
-      host_mod = field_box.host_module
-      im_mod =
-      if host_mod.const_defined? :FIELD_BOX_HOST_INSTANCE_METHODS_, false
-              host_mod.const_get :FIELD_BOX_HOST_INSTANCE_METHODS_, false
-      else    host_mod.const_set :FIELD_BOX_HOST_INSTANCE_METHODS_, (
-        ::Module.new.module_exec do
-          include Field::Box::Host::InstanceMethods
+    def as_is_predicate
+      @is_predicate ||= :"is_#{ @normalized_name }"
+    end
 
-          host_mod::METAFIELDS_.each do |mf|
+    def mutate inst, _scn
+      ivar = as_is_predicate_ivar
+      inst.instance_exec do
+        instance_variable_set ivar, true
+      end
+      nil
+    end
 
-            pred = mf.predicate
+    def as_is_predicate_ivar
+      @is_predicate_ivar ||= :"@#{ as_is_predicate }"
+    end
+  end
 
-            define_method "#{ mf.normalized_name }_fields" do
-              field_box.fields_which pred
-            end
+  module Property
+  end
 
-            define_method "#{ mf.normalized_name }_field_names" do
-              field_box.field_names_which pred
-            end
+  Property::Field = Field::Box[ ].produce
+  class Property::Field
 
-            define_method "#{ mf.normalized_name }_fields_bound" do
-              fields_bound_which pred
-            end
+    def enhance mod
+      i = as_has_predicate
+      j = as_get_predicate
+      has = as_has_predicate
+      val = as_value_ivar
+      nn = @normalized_name
+      mod.module_exec do
+        attr_reader i
+        define_method j do
+          if send has
+            instance_variable_get val
+          else
+            raise "\"#{ nn }\" is undefined for \"#{ @normalized_name }\" #{
+              }so this call to `#{ j }` is meaningless - #{
+              }use `#{ has }` to check this before calling `#{ j }`."
           end
-          self
-        end )
-      end
-      target_mod.send :include, im_mod
-      nil
-    end
-
-    Conduit_ = MetaHell::Enhance::Conduit.new %i| with |
-  end
-
-  module Field::Box::Host::InstanceMethods
-
-    # (this module augments a module with generated methods.)
-
-    def fields_bound_which predicate
-      ::Enumerator.new do |y|
-        field_box.fields_which( predicate ).each do |fld|
-          y << Field::Bound.new( fld, method( fld.as_method ) )
         end
-        nil
       end
     end
 
-    def field_box
-      self.class.field_box
+    def as_has_predicate
+      @has_predicate ||= :"has_#{ @normalized_name }"
     end
 
-    def field_names
-      field_box.field_names
-    end
-  end
-
-  class Field::Bound
-
-    attr_reader :field
-
-    def value
-      @func.call
+    def as_has_predicate_ivar
+      @as_has_predicate_ivar ||= :"@#{ as_has_predicate }"
     end
 
-    def initialize field, func
-      @field, @func = field, func
+    def as_get_predicate
+      @get_predicate ||= :"get_#{ @normalized_name }"
     end
-  end
 
-  class Field::Box  # ( re-opened with focus on utility methods )
+    def as_value_ivar
+      @value_ivar ||= :"@#{ @normalized_name }_value"
+    end
 
-    def initialize host_module
-      super( )
-      @host_module = host_module
-      @fields_which_h = { }
-      @field_names_which_h = { }
+    def mutate inst, _scn
+      _scn.eos? and raise "expecting a property (any value) after :property"
+      x = _scn.gets
+      ivar, jvar = as_has_predicate_ivar, as_value_ivar
+      inst.instance_exec do
+        instance_variable_set ivar, true
+        instance_variable_set jvar, x
+      end
       nil
     end
+  end
 
-    attr_reader :host_module
-
-    #         ~ implement the reflection, the core of the whole thing ~
-
-    def field_names_which predicate
-      @field_names_which_h.fetch predicate do
-        @field_names_which_h[ predicate ] = which( & predicate ).
-          map( & :name ).freeze
+  Meta_Field_ = Field::Box[ Binary::Field.new :property, 3 ].produce
+  class Meta_Field_
+    def self.make_field( (*x_a), depth )
+      if 1 == x_a.length
+        Binary::Field.make_field x_a, depth
+      elsif 2 == x_a.length && :property == x_a[ 1 ]
+        Property::Field.make_field x_a[ 0 ], depth
+      else
+        super  # fall back to error handling!
       end
-    end
-
-    def fields_which predicate
-      @fields_which_h.fetch predicate do
-        @fields_which_h[ predicate ] = which( & predicate ).to_a.freeze
-      end
-    end
-
-    def field_names
-      field_names_which :is_exist
     end
   end
 end

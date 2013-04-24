@@ -29,6 +29,9 @@ module Skylab::MetaHell
 
         const_set :A_, a  # exposed for hacking
 
+        define_singleton_method :to_struct, & FUN_.to_struct
+        define_singleton_method    :struct, & FUN_.struct
+
         self
       end
     end
@@ -47,6 +50,37 @@ module Skylab::MetaHell
       end
     end
   end
+
+  Enhance::Conduit::FUN_ = -> do
+
+    o = { }
+
+    # `to_struct` - this is defined as a "class method" on the generated
+    # conduit class. pass it a `def_blk` - type function and it will result
+    # in a struct with members corresponding to the members of the conduit,
+    # with each "macro" strictly taking one argument.
+
+    o[:to_struct] = -> f do
+      st = struct.new
+      new( * const_get( :A_, false ).map do |i|
+        -> x do
+          st[ i ] = x
+          nil  # change it if needed
+        end
+      end ).instance_exec( & f )
+      st
+    end
+
+    o[:struct] = -> do
+      if const_defined? :Struct_, false
+              const_get :Struct_, false
+      else    const_set :Struct_, ::Struct.new( * const_get( :A_, false ) )
+      end
+    end
+
+    ::Struct.new( * o.keys ).new( * o.values )
+
+  end.call
 
   class Enhance::OneShot
 

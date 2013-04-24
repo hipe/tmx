@@ -163,7 +163,7 @@ module Skylab::Test
         r = resolve_queue or break
         r = ready or break
         while tok = @queue_a.shift  # not using reduce b.c 1 stack frame
-          action = @action_a.detect { |a| a.normalized_local_name == tok }
+          action = action_a.detect { |a| a.normalized_local_name == tok }
           if action
             plugin_validate_client action.client
             r = action.client.send action.as_method

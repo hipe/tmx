@@ -9,7 +9,7 @@ module Skylab::Slicer::TestSupport
     as :exp, /\AExpecting .*transfer/, :styled
     as :inv, /\ATry wtvr -h \[sub-cmd\] for help\.\z/, :styled
 
-    context "canon", f:true do
+    context "canon" do
 
       it "0" do
         # debug!

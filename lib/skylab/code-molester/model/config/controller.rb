@@ -4,7 +4,7 @@ module Skylab::CodeMolester
 
     CodeMolester::Services::Face::Model.enhance self do
 
-      do_memoize
+      do_memoize  # once you create a config instance, it is *the* config.
 
     end
 
@@ -70,20 +70,10 @@ module Skylab::CodeMolester
       res
     end
 
-    def insert_valid_data_source src, d, v, e, i
-      insert_valid_item 'data-source', src, d, v, e, i
-    end
-
-    Collision = Model::Event.new do |section_name|
-      "name collision with #{ section_name.inspect }"
-    end
-
-    Inserted = Model::Event.new do |item|
-      "inserted into list - #{ item.name.inspect }"
-    end
-
-    def insert_valid_item sect_name, cont, dry, verbose, error_event, info_ev
-      section_name = "#{ sect_name } #{ cont.name.inspect }"
+    def insert_valid_entity ent, opt_h, if_yes, if_no
+      d, _v = Services::Basic::Hash::FUN.unpack[opt_h, :is_dry_run, :be_verbose]
+      section_name = "#{ ent.config_file_section_name } #{
+        }#{ ent.natural_key.inspect }"
       res = nil ; this_before_me = nil
       stay = true
       sct = @file.sections
@@ -99,13 +89,20 @@ module Skylab::CodeMolester
         end
       end
       if ! stay then res else
-        b_h = cont.body_h
-        @file.sections.insert_after section_name, b_h, this_before_me if ! dry
-        info_ev[ Inserted[ item: cont ] ]
-        write dry, error_event, info_ev
+        b_h = ::Hash[ ent.body_field_pairs.to_a ]
+        @file.sections.insert_after section_name, b_h, this_before_me if ! d
+        if_yes[ Inserted[ item: ent ] ]
+        write d, if_no, if_yes
       end
     end
-    protected :insert_valid_item
+
+    Collision = Model::Event.new do |section_name|
+      "name collision with #{ section_name.inspect }"
+    end
+
+    Inserted = Model::Event.new do |item|
+      "inserted into list - #{ item.natural_key.inspect }"
+    end
 
     Wrap = Model::Event.new do |upstream|
       upstream.message_function[]
