@@ -72,7 +72,7 @@ module Skylab::FileMetrics::TestSupport::CLI
         expect_integer num, 17..18  # greetings from the past
         expect_percent pc1
         expect_percent pc2, 100.0
-        expect_pluses lip, floor..100
+        expect_pluses lip, floor..150
       end
 
       it "final" do
@@ -106,7 +106,7 @@ module Skylab::FileMetrics::TestSupport::CLI
         expect_integer nl, 400..520  # hello from the past
         expect_percent ts
         expect_percent ms, 100.0
-        expect_pluses lp, floor..100
+        expect_pluses lp, floor..150
       end
 
       it "sumary" do

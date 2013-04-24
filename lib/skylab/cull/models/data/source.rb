@@ -4,21 +4,20 @@ module Skylab::Cull
 
     # (see also Skylab::Cull::API::Actions::DataSource::Add)
 
-    Basic::Field::Box.enhance self do  # `field_box`
+    CodeMolester::Config::File::Entity.enhance self do
 
-      # meta_meta_fields :property
-
-      meta_fields :required, :body, :list,
-        [ :regex, :property ], [ :rx_fail_predicate_tmpl, :property ]
-
-      fields  [ :name, :required, :regex, /\A[-a-z]+\z/ ],
-              [ :url,  :required, :body ],
-              [ :tag_a, :body, :list, :regex, /\A[-_a-z0-9]+\z/,
-                                  :rx_fail_predicate_tmpl,
-                                  "contains invalid character, must be #{
-                                    }lowercase alphanumeric for now #{
-                                    }(had {{ick}})" ]
+      fields( [ :name,  :required, :regex, /\A[a-z][-a-z0-9]+\z/ ],
+              [ :url,   :required, :body ],
+              [ :tags,  :body, :list,
+                        :ivar, :tag_a,
+                        :regex, /\A[-_a-z0-9]+\z/,
+                        :rx_fail_predicate_tmpl, "contains invalid character, #{
+                                }must be lowercase alphanumeric for now #{
+                                }(had {{ick}})",
+              ],
+      )  # (trailing comma above is intentional)
     end
+
   end
 
   class Models::Data::Source::Collection

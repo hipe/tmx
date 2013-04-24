@@ -1,0 +1,11 @@
+diff --git a/.cullconfig b/.cullconfig
+new file mode 100644
+index 0000000..176dc9b
+--- /dev/null
++++ b/.cullconfig
+@@ -0,0 +1,5 @@
++[data-source "fuz"]
++  url = biff
++  tag_a = false
++[foo]
++  bar = baz

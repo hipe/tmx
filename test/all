@@ -1245,7 +1245,7 @@ module Skylab::Test
         a = pool_a.map do |idx|
           "\"#{ @sexp.fetch( idx ).fetch( 1 ) }\""
         end
-        y << "found no subproducts matching #{ a * ' or ' }"
+        no_y << "found no subproducts matching #{ a * ' or ' }"
         false
       end
     end

@@ -59,19 +59,19 @@ module Skylab::Basic::Field::Reflection
           include Reflection::InstanceMethods
 
           host::METAFIELDS_.each do |mf|
-            i = mf.binary_predicate
-            if i
-              define_method "#{ mf.normalized_name }_fields" do
-                field_box.fields_which i
-              end
+            mf.is_reflective or next
+            i = mf.binary_predicate or next
 
-              define_method "#{ mf.normalized_name }_field_names" do
-                field_box.field_names_which i
-              end
+            define_method "#{ mf.normalized_name }_fields" do
+              field_box.fields_which i
+            end
 
-              define_method "#{ mf.normalized_name }_fields_bound" do
-                fields_bound_which i
-              end
+            define_method "#{ mf.normalized_name }_field_names" do
+              field_box.field_names_which i
+            end
+
+            define_method "#{ mf.normalized_name }_fields_bound" do
+              fields_bound_which i
             end
           end
 
@@ -85,11 +85,11 @@ module Skylab::Basic::Field::Reflection
 
   Field = Basic::Field
 
-  class Field::Binary::Field
+  class Field::Binary::Meta_Field_
     alias_method :binary_predicate, :as_is_predicate
   end
 
-  class Field::Property::Field
+  class Field::Property::Meta_Field_
     alias_method :binary_predicate, :as_has_predicate
   end
 

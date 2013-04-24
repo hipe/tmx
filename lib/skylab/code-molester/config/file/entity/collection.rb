@@ -127,32 +127,37 @@ module Skylab::CodeMolester::Config::File::Entity
 
     include Entity::Collection::Collection_And_Controller_
 
-    def add field_h, opt_h, if_yes, if_no
-      host.configs.if_config( -> do
-        res = nil
-        ok = entity_controller.if_init_valid field_h, opt_h, -> ent do
-          ent
-        end, -> e do
-          res = if_no[ e ]
-          nil
-        end
-        if ! ok then res else
-          add_valid_entity ok, opt_h, if_yes, if_no
-        end
-      end, if_no )
+    # `add` - `event_h[:couldnt]`. please see downstreams for more:
+    #   + ~Entity_Controller#`if_init_valid`
+    #   + ~Config_Controller#`insert_valid_entity`
+
+    def add field_h, opt_h, event_h
+      ent = nil ; alt = [
+        -> { host.configs.if_config -> { }, -> err { -> { err } } },
+        -> {
+          entity_controller.if_init_valid field_h, opt_h,
+            -> e { ent = e ; nil },
+            -> err { -> { err } } },
+        -> {
+          fly = valid_entities.detect do |e|
+            e.natural_key == ent.natural_key
+          end and -> do
+            Exists_::Already_[ existing_fly: fly, new_entity: ent ]
+          end }
+      ].reduce nil do |_, f|
+        x = f.call and break x
+      end
+      if alt
+        event_h.fetch( :couldnt ).call alt.call
+      else
+        host.config.insert_valid_entity ent, opt_h, event_h
+      end
     end
 
-    def add_valid_entity ent, opt_h, if_yes, if_no
-      exists = valid_entities.detect do |e|
-        e.natural_key == ent.natural_key
-      end
-      if exists
-        if_no[ Exists_::Already_[ existing_fly: exists, new_entity: ent ] ]
-      else
-        host.config.insert_valid_entity ent, opt_h, if_yes, if_no
-      end
-    end
-    private :add_valid_entity
+    # (the above style is ridiculous. i have dubbed it "totem pole", but
+    # it's really just a queue that we can break from. it reduced the codeside
+    # and complexity (along one axis) by two thirds. at what expense remains
+    # to be seen..)
 
     module Exists_
     end

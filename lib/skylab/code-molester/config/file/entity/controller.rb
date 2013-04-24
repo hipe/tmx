@@ -17,6 +17,7 @@ module Skylab::CodeMolester::Config::File::Entity
     Conduit_ = MetaHell::Enhance::Conduit.new %i| with add |
 
     class Flusher_
+
       def initialize controller_class, fld_box_host_mod, do_add
         @target = controller_class
         @queue_a = [ ]
@@ -64,6 +65,7 @@ module Skylab::CodeMolester::Config::File::Entity
   end
 
   module Entity::Controller::Common_
+    include Entity::Model::InstanceMethods
   end
 
   module Entity::Controller::Add_
@@ -74,7 +76,7 @@ module Skylab::CodeMolester::Config::File::Entity
       ok = e = nil
       @field_h = field_h ; @opt_h = opt_h
       begin
-        e = extra_fields and break
+        e = normalize_field_keys and break
         e = missing_fields and break
         e = normalize_fields and break
         ok = self
@@ -82,21 +84,86 @@ module Skylab::CodeMolester::Config::File::Entity
       e ? if_no[ e ] : if_yes[ ok ]
     end
 
+    # `rendered_config_pairs` - this is what gets actually written to the
+    # file. the value part of the tuple should be the raw string to be
+    # written after the equals sign -- no further escaping will be
+    # performed.
+
+    -> do
+      a = [ ]
+      define_method :rendered_config_pairs do
+        ::Enumerator.new do |y|
+          skip_me = entity_story.natural_key_field_name
+          @string_box.each do |nn, str|
+            skip_me == nn and next
+            fld = field_box.fetch nn
+            if fld.is_list and str.respond_to? :each
+              str.each do |s|
+                _get_escape_string_token a, fld, s
+              end
+            else
+              _get_escape_string_token a, fld, str
+            end
+            if a.length.nonzero?
+              y.yield nn, "#{ a * ', ' }"
+              a.clear
+            end
+          end
+          nil
+        end
+      end
+    end.call
+
   private
 
-    def extra_fields
-      xtra_a = @field_h.keys - field_box._order
-      if xtra_a.length.nonzero?
-        Extra_[ xtra_a: xtra_a ]
+    -> do
+      rx = /[\"]/
+      define_method :_get_escape_string_token do |a, fld, str|
+        ::String === str or fail "sanity - don't use normalized values here -#{
+          } #{ str.class }"
+        outstr = if rx =~ str
+          "\"#{ str.gsub( rx ) { "\\#{ $~[ 0 ] }" } }\""
+        else
+          str  # even with e.g spaces!
+        end
+        a << outstr
+        nil
       end
+    end.call
+
+    # `normalize_field_keys`
+
+    def normalize_field_keys
+      once_h = ::Hash[ field_box.map do |fld|
+        [ ( fld.has_ivar ? fld.get_ivar : fld.normalized_name ), fld ]
+      end ]
+      xtra_h = nil
+      @field_h.keys.each do |k|
+        if ! once_h.key? k
+          ( xtra_h ||= { } )[ k ] = @field_h[ k ]
+          next
+        end
+        fld = once_h.fetch k
+        if fld.has_ivar
+          @field_h[ fld.normalized_name ] = @field_h.delete k  # eek NOTE
+          k = fld.normalized_name
+        end
+      end
+      if xtra_h
+        Extra_[ xtra_h: xtra_h ]
+      end
+    end
+
+    %i| repack_difference |.each do |i|
+      define_method i, & Basic::Hash::FUN[ i ]
     end
 
     join = -> a do
       a.map { |x| "\"#{ x }\"" } * ', '
     end
 
-    Extra_ = Entity::Event.new do |xtra_a|
-      "unexpected field(s) - #{ join[ xtra_a ] }"
+    Extra_ = Entity::Event.new do |xtra_h|
+      "unexpected field(s) - #{ join[ xtra_h.keys ] }"
     end
 
     def missing_fields
@@ -119,7 +186,7 @@ module Skylab::CodeMolester::Config::File::Entity
 
     def normalize_fields
       did = nil
-      @box ||= ( did = true ) && MetaHell::Formal::Box::Open.new
+      @string_box ||= ( did = true ) && MetaHell::Formal::Box::Open.new
       did or fail "sanity"
       @nerk_a = nil
       a = Entity::Event::Aggregation.new
@@ -137,7 +204,7 @@ module Skylab::CodeMolester::Config::File::Entity
       end
       if ! v.nil?
         # note we might be adding invalid fields!
-        @box.add fld.normalized_name, v
+        @string_box.add fld.normalized_name, v
         @field_h.delete fld.normalized_name
       end
       if a
@@ -211,7 +278,6 @@ module Skylab::CodeMolester::Config::File::Entity
 
   module Entity::Controller::Common_
 
-
     def render_template tmpl_str, fld, x
       h = {
         ick: -> { "\"#{ x }\"" }
@@ -231,21 +297,7 @@ module Skylab::CodeMolester::Config::File::Entity
     end
 
     def natural_key
-      @box.fetch entity_story.natural_key_field_name
-    end
-
-    def body_field_pairs
-      ::Enumerator.new do |y|
-        body_fields.each do |bf|
-          k = bf.normalized_name
-          @box.if? k, -> v do  # it won't have optional fields sometimes
-            if ! v.nil?
-              y.yield k, v
-            end
-          end, -> { }
-        end
-        nil
-      end
+      @string_box.fetch entity_story.natural_key_field_name
     end
   end
 end

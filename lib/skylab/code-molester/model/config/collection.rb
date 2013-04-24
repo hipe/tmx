@@ -16,38 +16,40 @@ module Skylab::CodeMolester
       @plugin_host_proxy = plugin_host_proxy
     end
 
-    # `create` (`field_h`, `option_h`, `event_h`)
-    #   + `field_h`  - `path`
-    #   + `option_h` - `is_dry_run`
-    #   + `event_h`  - (any of the following, but none other than):
-    #                + `pth` - an `escape_path`-like for your modality
-    #                + `exists` - called with an event if file already exists
-    #                + `before` - called with e. immediatly before create/update
-    #                + `after` - called with e. immediatly after create/update
-    #                + `all` - future-proofing catch all not in above
+    # `create`
+    #   + `field_h`  - (exactly):
+    #                + `path`
+    #   + `opt_h`    * (please see downstream ~Config_Controller#`create`)
+    #   + `event_h`  * (idem)
 
-    -> do
 
-      unpack, unpack_inner =
-        Services::Basic::Hash::FUN.at :unpack, :unpack_inner  # heh
-
-      define_method :create do |field_h, option_h, event_h|
-        path, = unpack[ field_h, :path ]
-        is_dry_run, = unpack[ option_h, :is_dry_run ]
-        if host.has_instance :config
-          raise "sanity - won't create when a cached config exists."  # #todo
-        else
+    def create field_h, opt_h, event_h
+      config = nil
+      alt = [
+        -> {
+          if host.has_instance :config
+            raise "sanity - won't create when a cached config exists."  # #todo
+          end },
+        -> {
+          path, = unpack_equal field_h, :path
           pn = ::Pathname.new( path ).join( host.config_filename )
-          host.set_new_valid_instance( :config,
+          config = host.set_new_valid_instance :config,
             -> st { st.pathname = pn },
-            -> ent do
-              ent.create is_dry_run, * unpack_inner[
-                event_h, * %i( pth exists before after all ) ]
-            end, nil  # set no error handler!  # #todo
-          )
-        end
+            -> c  { c },
+            nil  # sets no error handler #todo
+          nil }
+      ].reduce( nil ) { |_, f| x = f.[] and break x }
+      if alt then alt.call else
+        config.create opt_h, event_h
       end
-    end.call
+    end
+
+    Services::Basic::Hash::FUN.tap do |fun|
+      %i| unpack_equal unpack_superset |.each do |i|
+        define_method i, & fun[ i ]
+        private i
+      end
+    end
 
     # `find_nearest_config_file_path`
     #

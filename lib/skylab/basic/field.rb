@@ -79,7 +79,7 @@ class Skylab::Basic::Field
         @target.const_set :METAFIELD_, x
       end
 
-      n_meta_resolver.seed Meta_Field_
+      n_meta_resolver.seed Meta_Field_Factory_
 
       n_meta_resolver.flush
     end
@@ -128,8 +128,8 @@ class Skylab::Basic::Field
   class Field::Box
     include Produce_
 
-    def produce
-      produce_field_class Field, self
+    def produce base=Field
+      produce_field_class base, self
     end
   end
 
@@ -209,23 +209,29 @@ class Skylab::Basic::Field
     end
   end
 
-  module Binary
-  end
+  # each metafield a user defines will be built using one of two classes,
+  # based on the meta meta fields of that meta field: - the meta meta
+  # field in question is `property`. if the meta field takes a property,
+  # its inflection is different (`has_foo` instead of `is_foo`). we implement
+  # this different logic with classes and a simple factory pattern.
 
-  Binary::Field = Field::Box[ ].produce
-  class Binary::Field
-
+  module Binary                          # binary was the first and is still
+  end                                    # the brightest star. this here is
+                                         # its simple base impl.
+                                         # (we need a basic binary field class
+  class Binary::Field < Field            # separate from the metafield class
+                                         # because binary fields are used to..
     def enhance mod
       i = as_is_predicate
       mod.module_exec do
         attr_reader i
       end
-    end
-
+    end                                  # represent the meta meta fields. in
+                                         # other words, binary fields are used..
     def as_is_predicate
       @is_predicate ||= :"is_#{ @normalized_name }"
-    end
-
+    end                                  # for both meta fields and meta meta
+                                         # fields...
     def mutate inst, _scn
       ivar = as_is_predicate_ivar
       inst.instance_exec do
@@ -239,11 +245,28 @@ class Skylab::Basic::Field
     end
   end
 
+  class Meta_Field_Factory_ < Field  # (we just want some of its class methods)
+
+    def self.make_field( (*x_a), depth )  # we need a factory
+      idx = x_a.rindex :property
+      ( if idx && idx.nonzero? then Property::Meta_Field_
+                               else Binary::Meta_Field_
+      end ).make_field x_a, depth
+    end
+  end
+
+  meta_meta_field_box = Field::Box[ *
+    %i| property reflective |.
+      map { |i| Binary::Field.new( i ) }
+  ]  # (the first ever field object is created here)
+
+  Binary::Meta_Field_ = meta_meta_field_box.produce Binary::Field
+
   module Property
   end
 
-  Property::Field = Field::Box[ ].produce
-  class Property::Field
+  Property::Meta_Field_ = meta_meta_field_box.produce
+  class Property::Meta_Field_
 
     def enhance mod
       i = as_has_predicate
@@ -290,19 +313,6 @@ class Skylab::Basic::Field
         instance_variable_set jvar, x
       end
       nil
-    end
-  end
-
-  Meta_Field_ = Field::Box[ Binary::Field.new :property, 3 ].produce
-  class Meta_Field_
-    def self.make_field( (*x_a), depth )
-      if 1 == x_a.length
-        Binary::Field.make_field x_a, depth
-      elsif 2 == x_a.length && :property == x_a[ 1 ]
-        Property::Field.make_field x_a[ 0 ], depth
-      else
-        super  # fall back to error handling!
-      end
     end
   end
 end

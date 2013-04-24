@@ -27,7 +27,7 @@ module Skylab::Basic::TestSupport::Field::Reflection
 
         module SANDBOX::Mod_0_
           Basic::Field::Box.enhance self do
-            meta_fields :required, :list, [ :rx, :property ]
+            meta_fields [ :required, :reflective ], :list, [ :rx, :property ]
             fields [ :email, :required, :rx, /x/], :name
           end
         end

@@ -11,10 +11,6 @@ module Skylab::Cull
 
       dry_run_option o
 
-      @param_h[:be_verbose] = false
-      o.on '-v', '--verbose', 'verbose.' do
-        @param_h[:be_verbose] = true
-      end
       o.banner = @command.usage_line
     end
 
@@ -112,7 +108,7 @@ module Skylab::Cull
       nil
     end
 
-    def on_model_event e
+    def on_entity_event e
       str = instance_exec( & e.payload_a.fetch( 0 ).message_function )
       @y << "#{ last_child_invocation_string }: #{ str }"
       nil

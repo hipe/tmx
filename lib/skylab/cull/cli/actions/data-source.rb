@@ -3,7 +3,7 @@ module Skylab::Cull
   class CLI::Actions::DataSource < CLI::Namespace
 
     option_parser do |o|
-      # (ick for now this is necessary to get `aliases` working)
+      # (ick for now this is necessary to get `aliases` working)  # #todo
     end
 
     aliases :ls
@@ -14,9 +14,8 @@ module Skylab::Cull
 
     option_parser do |o|
       dry_run_option o
-      verbose_option o
 
-      @param_h[ :tag_a ] = false
+      @param_h[ :tag_a ] = nil
       o.on '-t', '--tag <name>' do |v|
         ( @param_h[ :tag_a ] ||= [ ] ) << v
       end

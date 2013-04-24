@@ -13,23 +13,16 @@ module Skylab::Face
       init client_x  # for fun we experiemnt with `prepend` and initting
                      # the different facets.. NOTE we do not keep a handle
                      # on it ourselves, to keep things interesting.
-      par_h = self.class.param_h
-      remain_a = self.class.param_a.dup
-      param_h.each do |k, v|
+      miss_a = self.class.param_a.dup ; par_h = self.class.param_h
+
+      param_h.each do |k, v|  # ([#fa-el-003)
         idx = par_h[ k ] or fail "sanity - default_proc?"
-        if ! v.nil?
-          # if we interpret `nil` always to mean "missing required" then
-          # everything is easier to implement ..
-          remain_a[ idx ] = nil
-          instance_variable_set :"@#{ k }", v
-        end
+        miss_a[ idx ] = nil
+        instance_variable_set :"@#{ k }", v
       end
-      remain_a.compact!
-      if remain_a.length.nonzero?
-        raise ::ArgumentError, "missing argument(s) for #{ self.class } - #{
-          }#{ remain_a.inspect }"
-      end
-      nil
+      miss_a.compact!
+      miss_a.length.nonzero? and raise ::ArgumentError, "missing #{
+        }argument(s) - (#{ miss_a.map( & :to_s ) * ', ' })"
     end
 
     # `init` - this is provided experimentally as a hook for sub-facet

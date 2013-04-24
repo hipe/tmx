@@ -48,105 +48,128 @@ module Skylab::CodeMolester
       end, no
     end
 
-    module Events
+    # `create` - create the formerly nonexistent config file with
+    # some starter data (temporary..)
+    #
+    # `event_h` + `couldnt`
+    #           * (please see downstream `write`)
+    # `opt_h`   * (idem)
+    # result is number of bytes or the relevant event object.
+
+    def create opt_h, event_h
+      f = @file
+      couldnt = event_h.fetch :couldnt
+      alt = [ -> {
+        if f.exist?
+          -> { couldnt[ Exists_[ pn: f.pathname ] ] }
+        end }
+      ].reduce nil do |_, p|
+        x = p[] and break x
+      end
+      if alt then alt.call else
+        f.sections['foo'] = { }
+        f.sections['foo']['bar'] = 'baz'  # #todo
+        write opt_h, event_h
+      end
     end
 
-    Events::Exists = Model::Event.new do |pn|
+    Services::Basic::Hash::FUN.tap do |fun|
+      %i| unpack_equal unpack_superset unpack_subset repack_difference |.
+          each do |i|
+        define_method i, & fun[ i ]
+        private i
+      end
+    end
+
+    Exists_ = Model::Event.new do |pn|
       "exists, skipping - #{ pth[ pn ] }"
     end
 
-    # `create` - wrapper for Config::File#write
-    # `pth` is a function is used to escape filesystem pathnames
-    # `exists_event` will be called if the file already exists, it will
-    # be passed an `Events::Exists` object. `befor` and `after` will receive
-    # events with metadata immediately before and after the file is written.
-    # `all` is a catch-all for other eventws.
+    # `insert_valid_entity` -
+    # `ent`         - the entity to insert (lexically)
+    # `opt_h`       * please see `write` downstream
+    # `event_h` -   + `couldnt` - last stop, receives reason
+    #               + `could` - receives the entity made (before `before`!)
+    #               * please see `write` downstream
 
-    def create is_dry_run, pth, exists_event, befor, after, all
-      f = @file
-      begin
-        if f.exist?
-          res = exists_event[ Events::Exists[ pn: f.pathname ] ]
-          break
+    def insert_valid_entity ent, opt_h, event_h
+      couldnt, could = unpack_subset event_h, :couldnt, :could
+      section_name = "#{ ent.config_file_section_name } #{
+        }#{ ent.natural_key.inspect }"
+      this_before_me, rsn = -> sct do
+        sct or break
+        sct.reduce nil do |(tbm, _), s|
+          cmp = section_name <=> s.section_name
+          if -1 == cmp
+            break
+          elsif 1 == cmp
+            tbm = s
+          else
+            break nil, Collision_[ ent: ent ]
+          end
+          next tbm, _
         end
-        f.sections['foo'] = { }
-        f.sections['foo']['bar'] = 'baz'
-        res = f.write do |w|
+      end.call @file.sections
+      if rsn then couldnt[ rsn ] else
+        @file.sections.insert_after section_name,
+          ::Hash[ ent.rendered_config_pairs.to_a ],
+          this_before_me
+        could[ Inserted_[ item: ent ] ]
+        write opt_h, repack_difference( event_h, :could )
+      end
+    end
+
+    Collision_ = Model::Event.new do |ent|
+      "#{ ent.inflection.lexemes.noun.singular } already exists, #{
+        }won't clobber - #{ ent.natural_key }"
+    end
+
+    Inserted_ = Model::Event.new do |item|
+      "inserted into list - #{ item.natural_key.inspect }"
+    end
+
+    Wrap_ = Model::Event.new do |upstream|
+      upstream.message_function[]
+    end
+
+    Text_ = Model::Event.new do |text|
+      text
+    end
+
+    Invalid_ = Model::Event.new do |rsn_o|
+      rsn_o.render
+    end
+
+    # `write` - wrapper for Config::File#write
+    #
+    #   + `opt_h` - exactly `is_dry_run`- (implemented downstream)
+    #   + `event_h`  - (any of the following, but none other than):
+    #     + `couldnt` - called with an event if file already exists
+    #     + `before` - called with e. immediatly before create/update
+    #     + `after` - called with e. immediatly after create/update
+    #     + `all` - future-proofing catch all not in above
+    #     + `pth` - an `escape_path`-like for your modality
+
+    def write opt_h, event_h
+      couldnt, befor, after, all, pth = unpack_superset event_h,
+        :couldnt, :before, :after, :all, :pth
+      is_dry_run, = unpack_equal opt_h, :is_dry_run ; f = @file
+      alt = [
+        -> {
+          if ! f.valid?
+            -> { couldnt[ Invalid_[ rsn_o: f.invalid_reason ] ] }
+          end }
+      ].reduce( nil ) { |_, p| x = p[] and break x }
+      if alt then alt.call else
+        f.write do |w|
           w.with_specificity do
             w.on_before befor
             w.on_after after
             w.on_all all
           end
-          if is_dry_run
-            w.dry_run = true
-          end
+          w.dry_run = is_dry_run
           w.escape_path = pth
         end
-      end while nil
-      res
-    end
-
-    def insert_valid_entity ent, opt_h, if_yes, if_no
-      d, _v = Services::Basic::Hash::FUN.unpack[opt_h, :is_dry_run, :be_verbose]
-      section_name = "#{ ent.config_file_section_name } #{
-        }#{ ent.natural_key.inspect }"
-      res = nil ; this_before_me = nil
-      stay = true
-      sct = @file.sections
-      sct and sct.each do |s|
-        cmp = section_name <=> s.section_name
-        if -1 == cmp
-          break
-        elsif 1 == cmp
-          this_before_me = s
-        else
-          res = error_event[ Collision[ section_name: section_name ] ]
-          break( stay = false )
-        end
-      end
-      if ! stay then res else
-        b_h = ::Hash[ ent.body_field_pairs.to_a ]
-        @file.sections.insert_after section_name, b_h, this_before_me if ! d
-        if_yes[ Inserted[ item: ent ] ]
-        write d, if_no, if_yes
-      end
-    end
-
-    Collision = Model::Event.new do |section_name|
-      "name collision with #{ section_name.inspect }"
-    end
-
-    Inserted = Model::Event.new do |item|
-      "inserted into list - #{ item.natural_key.inspect }"
-    end
-
-    Wrap = Model::Event.new do |upstream|
-      upstream.message_function[]
-    end
-
-    Text = Model::Event.new do |text|
-      text
-    end
-
-    Invalid = Model::Event.new do |rsn_o|
-      rsn_o.render
-    end
-
-    def write dry, error_event, info_event
-      if @file.valid?
-        @file.write do |w|
-          w.with_specificity do
-            w.on_text do |e|
-              info_event[ Text[ text: e ] ]
-            end
-            w.on_structural do |e|
-              info_event[ Wrap[ upstream: e ] ]
-            end
-          end
-          w.dry_run = dry
-        end
-      else
-        error_event[ Invalid[ rsn_o: @file.invalid_reason ] ]
       end
     end
   end

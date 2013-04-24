@@ -23,7 +23,7 @@ module Skylab::Basic::TestSupport::Field
 
           Basic::Field::Box.enhance self do
 
-            meta_fields :required
+            meta_fields [ :required, :reflective ]
 
             fields [ :email ]
 

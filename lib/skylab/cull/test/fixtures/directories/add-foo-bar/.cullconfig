@@ -1,0 +1,5 @@
+[data-source "foo"]
+  url = bar
+  tag_a = ["baz"]
+[foo]
+  bar = baz
