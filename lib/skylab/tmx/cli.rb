@@ -75,7 +75,7 @@ module Skylab::TMX
     alias_method :tmx_show_version, :show_version
     def show_version
       rs = tmx_show_version
-      if @is_verbose
+      if @be_verbose
         @out.puts ::RUBY_DESCRIPTION
       end
       rs
@@ -84,7 +84,7 @@ module Skylab::TMX
 
     def enable_verbose
       @y << '(verbose mode on.)'
-      @is_verbose = true
+      @be_verbose = true
     end
     protected :enable_verbose
 
@@ -114,14 +114,14 @@ module Skylab::TMX
     Puffer = MetaHell::Proxy::Nice.new :puff
       # it "puffs" a command node (e.g. namespace) into life as it is needed.
 
-    def Puffer.[] box_mod, metadata_h, story, y, is_verbose
+    def Puffer.[] box_mod, metadata_h, story, y, be_verbose
       tug_ns = nil
       res = new( puff: -> do
-        y << "(loading all names.)" if is_verbose
+        y << "(loading all names.)" if be_verbose
         box_mod.names.each do |name|
           norm = name.as_slug.intern  # NOTE this is the convention
           if false == metadata_h[ norm ]
-            y << "(disabled - #{ norm })" if is_verbose
+            y << "(disabled - #{ norm })" if be_verbose
           else
             story.if_element norm, nil, tug_ns
           end
@@ -145,12 +145,12 @@ module Skylab::TMX
         # scream case, which some subproduct names are, hence:
         pn = box_mod.dir_pathname.join "#{ norm }/cli#{ Autoloader::EXTNAME }"
         if pn.exist?
-          y << "(leaf - #{ pth[ pn ] })" if is_verbose
+          y << "(leaf - #{ pth[ pn ] })" if be_verbose
           require pn.sub_ext ''
           pn
         else
           p = pn.dirname
-          y << "(branch - #{ pth[ p ] })" if is_verbose
+          y << "(branch - #{ pth[ p ] })" if be_verbose
           require p
           p
         end
@@ -160,14 +160,14 @@ module Skylab::TMX
 
     def puff  # called by the client libary when it needs everything
       @puffer ||= Puffer[ TMX::Modules, TMX.metadata_h, self.class.story,
-        @y, @is_verbose ]
+        @y, @be_verbose ]
       @puffer.puff
       @is_puffed = true
     end
 
     def initialize( * )
       super
-      @is_verbose = nil
+      @be_verbose = nil
       @is_puffed = false
       @all_names_are_loaded = false
     end

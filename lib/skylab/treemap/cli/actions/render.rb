@@ -49,7 +49,7 @@ module Skylab::Treemap
         @param_h[:do_exec] = v
       end
       o.on '-v', '--verbose', 'verbose output (implemented sparely)' do
-        @param_h[:is_verbose] = true
+        @param_h[:be_verbose] = true
       end
     end
 

@@ -10,7 +10,7 @@ module Skylab::TanMan
     attribute :local_conf_dirname, required: true,
                 default: API.local_conf_dirname
     attribute :path, pathname: true, required: true,
-                default: ->{ TanMan::Services::FileUtils.pwd }
+                default: ->{ ::Dir.getwd }
 
     emits :all, error: :all, info: :all, skip: :info # etc
 

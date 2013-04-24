@@ -147,7 +147,7 @@ module Hipe
         end
         def pretty_path
           if absolute?
-            if FileUtils.pwd == absolute_path
+            if ::Dir.getwd == absolute_path
               resp = '.'
             else
               resp = absolute_path

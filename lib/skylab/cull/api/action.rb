@@ -4,7 +4,7 @@ module Skylab::Cull
 
     attr_accessor :pth
 
-    attr_reader :is_verbose  # accessed by common `api` implementation
+    attr_reader :be_verbose  # accessed by common `api` implementation
 
   protected
 

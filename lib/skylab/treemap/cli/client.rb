@@ -37,8 +37,8 @@ module Skylab::Treemap
         end
       end
       cute_exit_code = ::Fixnum === res ? res : ( false == res ? 1 : 0 )
-      if a and a.has_formal_parameter :is_verbose and  # jus greasing the wheels
-          a.fetch_actual_parameter :is_verbose do end then
+      if a and a.has_formal_parameter :be_verbose and  # jus greasing the wheels
+          a.fetch_actual_parameter :be_verbose do end then
         emit :info, "(resulted in exit status of #{ cute_exit_code })"
       end
       cute_exit_code

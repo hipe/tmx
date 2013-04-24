@@ -220,7 +220,7 @@ module Skylab::CssConvert
 
     def fixture test
       require 'fileutils' # #[ta-042] as service  # #todo
-      _pwd = ::Pathname.new(FileUtils.pwd)
+      _pwd = ::Pathname.pwd
       _basename = "#{test.name}-#{test.value}"
       fixture_path = FIXTURES_DIR.join(_basename).relative_path_from(_pwd)
       _try = "#{program_name} #{fixture_path}"

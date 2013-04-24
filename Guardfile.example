@@ -82,7 +82,7 @@ module Skylab::Guardfile
       @datastore ||= Models::DataFile.new(self)
     end
     def pwd
-      FileUtils.pwd
+      ::Dir.getwd
     end
   end
   module CLI::UpdaterInstanceMethods

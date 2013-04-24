@@ -68,7 +68,7 @@ module Skylab::Snag
     define_method :find_closest_manifest_path do |error|
       res = nil
       begin
-        pn = ::Pathname.new Snag::Services::FileUtils.pwd
+        pn = ::Pathname.pwd
         found = nil
         num_dirs_searched = 0
         seen = []

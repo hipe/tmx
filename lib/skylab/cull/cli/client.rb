@@ -11,9 +11,9 @@ module Skylab::Cull
 
       dry_run_option o
 
-      @param_h[:is_verbose] = nil
+      @param_h[:be_verbose] = nil
       o.on '-v', '--verbose', 'verbose.' do
-        @param_h[:is_verbose] = true
+        @param_h[:be_verbose] = true
       end
     end
 
@@ -39,7 +39,7 @@ module Skylab::Cull
     def initialize( * )
       super
       @pth = -> pn do
-        if @action.is_verbose
+        if @action.be_verbose
           pn.to_s
         else
           Headless::CLI::PathTools::FUN.pretty_path[ pn ]

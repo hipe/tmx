@@ -30,7 +30,7 @@ module Skylab::Headless
     end
 
     pwd__ = -> do
-      Headless::Services::FileUtils.pwd
+      ::Dir.getwd
     end
 
     home_rx__ = -> home do

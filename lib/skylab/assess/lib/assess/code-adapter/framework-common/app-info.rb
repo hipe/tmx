@@ -39,7 +39,7 @@ module Hipe
         end
 
         def init_with_defaults!
-          app_root.absolute_path = FileUtils.pwd
+          app_root.absolute_path = ::Dir.getwd
           model.relative_to = app_root
           model.relative_path = './model'
           model.might_be_plural = true

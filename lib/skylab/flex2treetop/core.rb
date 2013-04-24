@@ -308,7 +308,7 @@ module Skylab::Flex2Treetop
 
     def show_tests
       require 'fileutils'
-      pwd = ::Pathname.new ::FileUtils.pwd
+      pwd = ::Pathname.pwd
       emit :info, "#{ kbd 'some nerks to try:' }"
       FIXTURES.each do |k, path|
         full = ::Skylab.dir_pathname.join path

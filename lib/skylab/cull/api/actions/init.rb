@@ -2,7 +2,7 @@ module Skylab::Cull
 
   class API::Actions::Init < API::Action
 
-    params :path, :is_verbose, :is_dry_run
+    params :path, :be_verbose, :is_dry_run
 
     emits :before, :after, exists_event: :model_event, info: :all
 
