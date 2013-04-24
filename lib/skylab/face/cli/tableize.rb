@@ -33,6 +33,9 @@ module Skylab::Face
     end
 
     # `tablify` - quick & dirty pretty table hack. NOTE `false` below..
+    #
+    # (if `row_ea` is an enumerator we've got to lock it down .. it might
+    # be a randomized functional tree, e.g)
 
     def tablify col_a, row_ea, line, show_header=true, left = '| ',
         sep = '  |  ', right = ' |'
@@ -46,17 +49,22 @@ module Skylab::Face
         end
       end
       max[ *col_a ] if show_header
-      ok = row_ea.each( & max )
+      cache_a = []
+      ok = row_ea.each do |*a|
+        cache_a << a
+        max[ *a ]
+      end
       if ok
         fmt = "#{ left }#{ w.times.map do |x|
           "%#{ max_h.fetch x }s"
         end * sep }#{ right }"
-
         row = -> * a do
           line.call( fmt % a )
         end
         row[ * col_a ] if show_header
-        row_ea.each( & row )
+        cache_a.each do |a|
+          row[ *a ]
+        end
       end
       ok
     end

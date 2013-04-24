@@ -3,10 +3,23 @@
 module Skylab::TestSupport
 
   class Tmpdir < ::Pathname
+
     include TestSupport_::Services::FileUtils
 
-    def clear                    # sugar around `prepare` that results in self.
-      prepare                    # does a `rm -rf` on the temmpdir, creates!
+    def verbose!                  # see also the similar `debug!`
+      @verbose = true
+      self
+    end
+
+    def debug!                    # this compats with our convention org-wide
+      @verbose = true             # this compats with the file utils convention
+    end                           # (but see also `verbose!` chainable variant)
+
+    attr_accessor :verbose        # yes. some clients need to be able to
+                                  # set it using a variable.
+
+    def clear                     # sugar around `prepare` that results in self.
+      prepare                     # does a `rm -rf` on the temmpdir, creates!
       self
     end
 
@@ -16,10 +29,6 @@ module Skylab::TestSupport
       cp source.to_s, dest.to_s, noop: noop, verbose: verbose
       nil # result is undefined for now -- we might turn it into etc
     end
-
-    def debug!                    # this compats with our convention org-wide
-      @verbose = true             # this compats with the file utils convention
-    end                           # (but see also `verbose!` chainable variant)
 
     def mkdir path_end, opts=nil
       res = nil
@@ -43,23 +52,34 @@ module Skylab::TestSupport
 
     define_method :prepare do
       result = nil
-      sanity = -> path do         # IMPORTANT - try to avoid `rm -rf` any paths
-        if safety_rx !~ path.to_s # except those under a /tmp/ or /T/ dir
-          raise ::SecurityError.exception "unsafe tmpdir name - #{ path }"
+      sanity = -> pn do         # IMPORTANT - try to avoid `rm -rf` any paths
+        if safety_rx !~ pn.to_s # except those under a /tmp/ or /T/ dir
+          ::Kernel.raise ::SecurityError, "unsafe tmpdir name - #{ pn }"
         end
       end
       if exist?                   # if this pathname exists
+        path = to_s
         if ! directory?
-          raise ::Errno::ENOTDIR.exception to_s
+          raise ::Errno::ENOTDIR.exception path
         end
-        sanity[ self ]            # IMPORTANT
-        if ::Dir[join '*'].any?   # are there any files in it?
-          verbose and fu_output_message "rm -rf #{ to_s }"
-          remove_entry_secure to_s # GULP
-          result = ::FileUtils.mkdir @path, noop: noop, verbose: verbose
-        else
-          verbose and fu_output_message "(already empty: #{ to_s })"
+        sanity[ self ]            # IMPORTANT, also out here and not down there.
+        a = ::Dir[ "#{ join '{*,.?*}' }" ]  # imagine a dir with only dotfiles!
+        case a.length
+        when 0
+          fail "sanity - this path should always have at least 1 element"
+        when 1
+          '/..' == a.fetch( 0 )[ -3 .. -1 ] or fail "sanity - expecting #{
+            }this to be the '..' path - (filesystem issue?) #{ a[0] }"
+          verbose and fu_output_message "(already empty: #{ path })"
           result = nil
+        else
+          verbose and fu_output_message "rm -rf #{ path }"
+          if safety_rx =~ path  # twice for good measure
+            remove_entry_secure path # GULP
+            result = ::FileUtils.mkdir @path, noop: noop, verbose: verbose
+          else
+            fail "is there no god?"
+          end
         end
       else
         stack = []
@@ -81,7 +101,9 @@ module Skylab::TestSupport
         end
         if ! current.exist?
           raise ::SecurityError.exception(
-            "won't make more than #{max_mkdirs} dirs - #{current} must exist" )
+            "won't make more than #{max_mkdirs} dirs - #{current} must exist #{
+            }(increase your `max_mkdirs` when you construct #{ self.class }?)"
+          )
         end                                    # so current exists,
         while ! stack.empty?
           peek = current.join stack.last
@@ -147,11 +169,6 @@ module Skylab::TestSupport
       res
     end
 
-    def verbose!                  # see also the similar `debug!`
-      @verbose = true
-      self
-    end
-
   protected
 
     o = ::Struct.new( :infostream, :max_mkdirs, :noop, :path, :verbose ).new
@@ -194,6 +211,5 @@ module Skylab::TestSupport
 
     attr_reader :noop
 
-    attr_reader :verbose
   end
 end

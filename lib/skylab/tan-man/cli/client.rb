@@ -50,9 +50,10 @@ module Skylab::TanMan
       fun = Headless::CLI::PathTools::FUN
 
       o.define_singleton_method :escape_path do |str|
-        fun.clear                 # always clear the `pwd` regexen .. it is hell
-        fun.pretty_path[ str ]    # to debug if you don't.  The only reason
+        fun.clear[]               # always clear the `pwd` regexen .. it is hell
+        fun.pretty_path[ str ]    # to debug if you don't. The only reason
       end                         # not to is on a large number of files
+                                  # (test/all --order random:5647873976)
 
       def o.ick x                 # render an invalid value.  compare to
         "\"#{ x }\""              # `val`, we actually want quotes here to make

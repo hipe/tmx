@@ -28,7 +28,7 @@ module Skylab::MetaHell
   # argument module (HA) a runtime error is raised. produced function takes
   # no arguments, but `func_for_module` function may.
 
-  o[:module_mutex] = -> func_for_module do
+  o[:module_mutex] = -> func_for_module, method_name=nil do
     mut_h = { }
     ->( *a ) do  # self should be a client module.
       did = res = nil
@@ -36,7 +36,15 @@ module Skylab::MetaHell
         mut_h[ object_id ] = did = true
         res = module_exec( *a, & func_for_module )
       end
-      did or raise "`module_mutex` failed. called multiple times for - #{ self }"
+      if ! did
+        msg = if method_name
+          "`module_mutex` failure - cannot call `#{ method_name }` more #{
+          }than once on a #{ self }"
+        else
+          "`module_mutex` failure - #{ self }"
+        end
+        raise msg
+      end
       res
     end
   end

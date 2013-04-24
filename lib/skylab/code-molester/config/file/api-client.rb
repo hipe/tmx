@@ -11,6 +11,7 @@ module Skylab::CodeMolester
         define_api_client do
           services %i|
             config_file_search_start_pathname
+            config_file_default_init_path
             config_file_search_num_dirs
             config_filename
             configs
@@ -36,6 +37,9 @@ module Skylab::CodeMolester
           story.set :config_file_search_start_pathname, a, b
         end,
         ->( *a, &b ) do
+          story.set :config_file_default_init_path, a, b
+        end,
+        ->( *a, &b ) do
           story.set :config_file_search_num_dirs, a, b
         end,
         ->( *a, &b ) do
@@ -48,8 +52,9 @@ module Skylab::CodeMolester
 
     Conduit_ = MetaHell::Enhance::Conduit.new %i|
       search_start_pathname
+      default_init_path
       search_num_dirs
-      config_filename
+      filename
     |
 
     class Story_

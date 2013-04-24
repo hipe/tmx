@@ -3,7 +3,7 @@ module Skylab::Headless
   module CLI::PathTools
 
     # **NOTE** pretty_path is designed to scale well to a large number
-    # of filepaths scrolling by, possibly thousands.  It generates regexen
+    # of filepaths scrolling by, possibly thousands. It generates regexen
     # to match paths that contain `pwd` and `$HOME` at their heads.
     # To read the value of `pwd` and build a regex anew each time it needs
     # to prettify a path does not scale well to large numbers of paths
@@ -135,6 +135,11 @@ module Skylab::Headless
     o[:memo] = memo
 
     o[:pretty_path] = -> path do
+      pretty_path[ path ]                     # because the function changes!
+    end
+
+    o[:pretty_path_safe] = -> path do
+      clear[ ]
       pretty_path[ path ]
     end
 

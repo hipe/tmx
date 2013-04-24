@@ -135,14 +135,13 @@ module Skylab::CodeMolester::Config::File::Entity
       if fld.fields.has? :regex and fld.has_regex
         add[ pound_regexp fld ]
       end
+      if ! v.nil?
+        # note we might be adding invalid fields!
+        @box.add fld.normalized_name, v
+        @field_h.delete fld.normalized_name
+      end
       if a
         flush_pound a, fld, v
-      else
-        if ! v.nil?
-          @box.add fld.normalized_name, v
-          @field_h.delete fld.normalized_name
-        end
-        nil  # important
       end
     end
 
@@ -176,7 +175,7 @@ module Skylab::CodeMolester::Config::File::Entity
           end
         end
       else
-        pound[ v, nil ]
+        pound[ v, -> { ' ' } ]  # eek  - allow "foo[0] did .." vs "foo did"
       end
       if error_a
         Invalid_[ pred_a: error_a, field: fld ]
@@ -189,8 +188,8 @@ module Skylab::CodeMolester::Config::File::Entity
       Basic::List::Evented::Articulation pred_a do
         always_at_the_beginning      ->     { o << "#{ lbl }" }
         iff_zero_items               ->     { o << "was fine." }
-        any_first_line               ->   s { o << " #{ s }." }
-        any_subsequent_lines         ->   s { o << " #{ s }." }
+        any_first_line               ->   s { o << "#{ s }." }
+        any_subsequent_lines         ->   s { o << "#{ lbl }#{ s }." }
       end
       o
     end
@@ -198,7 +197,8 @@ module Skylab::CodeMolester::Config::File::Entity
     def pound_regexp fld  # assume `regex`
       -> x, err do
         if fld.get_regex !~ x
-          if fld.fields.has? :rx_fail_predicate_tmpl
+          if fld.fields.has? :rx_fail_predicate_tmpl and
+                      fld.has_rx_fail_predicate_tmpl
             err[ render_template fld.get_rx_fail_predicate_tmpl, fld, x ]
           else
             err[ "was invalid" ]

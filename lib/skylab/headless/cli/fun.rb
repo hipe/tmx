@@ -90,6 +90,12 @@ module Skylab::Headless
       end
     end
 
+    punctuation_character_rx = /[.?!]/
+
+    o[:looks_like_sentence] = -> str do
+      str.length.nonzero? and str[ -1 ] =~ punctuation_character_rx
+    end
+
     FUN = o.to_struct
   end
 end

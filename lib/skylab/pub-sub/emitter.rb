@@ -16,32 +16,45 @@ module Skylab::PubSub
       @event_stream_graph ||= begin
 
         # Traverse up the chain of every ancestor except self (and self is
-        # not in the chain if we are an s.c), (also we (ick) skip ::Kernel
-        # and ::BasicObject which will not fly if etc #todo) and for each
-        # module that `respond_to` `event_stream_graph`, add it to a list,
-        # and if ever one of these nerks is a class stop right then and there
-        # assuming that (if we understand the ancestor chain correctly) that
-        # inheritence itself (in conjunction with this facility) will work.
-        # All of this craziness is to allow the merging of graphs on top
-        # of ancestor graphs, to see if that is a thing that is useful, but
-        # of course, it is all #experimental so use with caution.
+        # not in the chain if we are an s.c), (also we (ick) skip ::Object
+        # and ::Kernel and ::BasicObject for ridiculous OCD reasons) while
+        # searching for module that `respond_to` `event_stream_graph`, and
+        # when one such module is found, add it to a list, and if ever one
+        # of these modules is a class, stop right then and there, assuming
+        # (if we understand the ancestor chain correctly) that inheritence
+        # itself (in conjunction with this facility) will work as expected
+        #
+        # All of this craziness is to allow the merging of graphs atop the
+        # ancestor graphs to see if that is a thing that is useful, but of
+        # course, it is all #experimental so use with caution.
 
-        a = ancestors
-        a = a[ (self == a.first ? 1 : 0) .. -3 ] # (#ick Kernel, BasicObject)
-        found = a.reduce [] do |fnd, mod|
-          if mod.respond_to? :event_stream_graph
-            fnd << mod
-            break fnd if ::Class == mod.class
+        # EDIT - to work with ruby 2.0's `prepend` module, we have to
+        # accomodate some things. in so doing i think we improved it a bit
+
+        scn = Basic::List::Scanner[ ancestors ] ; cur = fnd = nil
+        nil while ( cur = scn.rgets ) && ::Object != cur
+        chk = -> do
+          if cur.respond_to? :event_stream_graph
+            ( fnd ||= [ ] ) << cur
+            scn.terminate if ::Class === cur
           end
-          fnd
         end
-        case found.length
-        when 0
-          PubSub::Stream::Digraph.new  # 2x
-        when 1
-          found.first.event_stream_graph.dupe
+        check = -> do
+          if self == cur
+            check = chk
+          else
+            chk[]
+          end
+        end
+        check[] while cur = scn.gets
+        if fnd
+          if 1 == fnd.length
+            fnd.fetch( 0 ).event_stream_graph.dupe
+          else
+            PubSub::FUN.merge_graphs[ fnd ]
+          end
         else
-          PubSub::FUN.merge_graphs[ found ]
+          PubSub::Stream::Digraph.new  # 2x
         end
       end
     end

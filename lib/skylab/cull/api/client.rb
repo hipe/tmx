@@ -4,13 +4,17 @@ module Skylab::Cull
 
     CodeMolester::Config::File::API_Client.enhance self do
 
+      default_init_path do
+        ::Dir.getwd
+      end
+
+      filename '.cullconfig'
+
       search_start_pathname do
         ::Pathname.pwd
       end
 
       search_num_dirs 3
-
-      config_filename '.cullconfig'
 
     end
   end

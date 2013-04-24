@@ -77,10 +77,18 @@ module Skylab::Face
 
   Model::Event::Aggregate = Model::Event.new do |a|
     o = ''
-    Face::Services::Basic::List::Evented::Articulation enum do
+    Face::Services::Basic::List::Evented::Articulation a do
       iff_zero_items               ->     { o << '(empty)' }
       any_first_line               ->   x { o << "#{ x.message_function[] }" }
-      any_subsequent_lines         ->   x { o << " - #{ x.message_function[] }"}
+
+      any_subsequent_lines -> x do
+        if Services::Headless::CLI::FUN.looks_like_sentence[ o ]
+          sep = ' '
+        else
+          sep ' - '
+        end
+        o << "#{ sep }#{ x.message_function[] }"
+      end
     end
     o
   end

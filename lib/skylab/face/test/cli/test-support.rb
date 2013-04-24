@@ -110,7 +110,8 @@ module Skylab::Face::TestSupport::CLI
 
     include CONSTANTS
 
-    def invoke argv
+    def invoke *argv
+      argv.flatten! 1
       argv = argv.dup  # a) cli parsing is always descructive on ARGV, for
       client.run argv  # agnostic progressive chaining [#hl-056]
       # (note that in our tests we don't actually test that the argv is
@@ -142,7 +143,8 @@ module Skylab::Face::TestSupport::CLI
       @do_debug = true
     end
 
-    def expect exp_a
+    def expect * exp_a
+      exp_a.flatten! 1
       expect_partial exp_a and
         expect_no_more_output
     end

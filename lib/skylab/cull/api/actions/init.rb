@@ -2,20 +2,22 @@ module Skylab::Cull
 
   class API::Actions::Init < API::Action
 
-    params :path, :be_verbose, :is_dry_run
+    params [ :path, :field, :required ],
+           [ :be_verbose, :noop ],
+           [ :is_dry_run, :option ]
+
+    services :configs
 
     emits :before, :after, exists_event: :model_event, info: :all
 
     def execute
-      model( :configs ).create(
-        @path || ::ENV[ 'HOME' ] || '.',
-        @is_dry_run,
-        pth,
-        method( :exists_event ),
-        method( :before ),
-        method( :after ),
-        method( :all )
-      )
+      f_h, o_h = pack_fields_and_options
+      host.configs.create f_h, o_h,
+        exists: method( :exists_event ),
+        before: method( :before ),
+        after: method( :after ),
+        all: method( :all ),
+        pth: pth
     end
   end
 end

@@ -2,23 +2,33 @@ module Skylab::CodeMolester
 
   class Model::Config::Controller
 
+    # immutable
+
     CodeMolester::Services::Face::Model.enhance self do
 
       do_memoize  # once you create a config instance, it is *the* config.
 
     end
 
-    -> do  # `new_valid`
+    # `new_valid` - poka yoke. there is no public `new` (#experimental)
 
-      Init_ = ::Struct.new :pathname
-      define_singleton_method :new_valid do |init, obj_if_ok, msg_if_not_ok|
-        init[ st = Init_.new ]
-        -> do
-          st.pathname or break msg_if_not_ok[ '`pathname` is required' ]
-          obj_if_ok[ new( * st.values ) ]
-        end.call
-      end
-    end.call
+    def self.new_valid init_blk, obj_if_ok, if_no
+      r = nil
+      begin
+        init_blk[ st = New_Valid_.new ]
+        st.pathname or break r = if_no[ Missing_Argument_[ :pathname ] ]
+        inst = new( * st.values )
+        r = inst.if_valid obj_if_ok, if_no
+      end while nil
+      r
+    end
+
+    New_Valid_ = ::Struct.new :pathname
+      # (these member values in order will be flattened and passed to `new` )
+
+    Missing_Argument_ = Model::Event.new do |i|
+      "`#{ i }` is required"
+    end
 
     class << self
       private :new
@@ -31,6 +41,12 @@ module Skylab::CodeMolester
     end
 
     attr_reader :file
+
+    def if_valid yes, no
+      @file.if_valid -> _file do
+        yes[ self ]  # pattern maybe
+      end, no
+    end
 
     module Events
     end

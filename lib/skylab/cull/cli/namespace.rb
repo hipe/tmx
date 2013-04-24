@@ -19,7 +19,7 @@ module Skylab::Cull
     end
 
     def dry_run_option o
-      @param_h[:is_dry_run] = nil
+      @param_h[:is_dry_run] = false
       o.on '-n', '--dry-run', 'dry-run.' do
         @param_h[:is_dry_run] = true
       end
@@ -27,7 +27,7 @@ module Skylab::Cull
     end
 
     def verbose_option o
-      @param_h[ :be_verbose ] = nil
+      @param_h[ :be_verbose ] = false
       o.on '-v', '--verbose', 'be verbose.' do
         @param_h[ :be_verbose ] = true
       end

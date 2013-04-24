@@ -1,0 +1,42 @@
+require_relative 'test-support'
+
+module Skylab::Cull::TestSupport::CLI::Actions::Status
+
+  ::Skylab::Cull::TestSupport::CLI::Actions[ Init_TS_ = self ]
+
+  include CONSTANTS
+
+  extend TestSupport::Quickie
+
+  describe "#{ Cull }::CLI::Actions::Status" do
+
+    extend Init_TS_
+
+    as :no_cull, /\Ano cull config file found in \. or 3 levels up\.\z/, :nonstyled
+
+    it "from inside an empty directory, explains the situation" do
+
+      from_inside_empty_directory do
+
+        invoke 'st'
+
+        expect :no_cull
+
+      end
+    end
+
+    as :active_is,
+      %r{\Aactive config file is: \./\.cullconfig\z}, :nonstyled
+
+    it "from inside a directory with a nerk, explains it all" do
+
+      from_inside_a_directory_with( :some_config_file ) do
+
+        invoke 'st'
+
+        expect :active_is
+
+      end
+    end
+  end
+end

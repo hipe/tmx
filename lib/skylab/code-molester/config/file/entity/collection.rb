@@ -95,6 +95,10 @@ module Skylab::CodeMolester::Config::File::Entity
       @config_section_name ||= name.map( :as_slug ).join( '-' )  # lossy
     end
 
+    def inflection
+      @inflection ||= Headless::Entity::Inflection.new name
+    end
+
     def name
       @name ||= Entity::FUN.hack_model_name_from_constant[ @host_mod ]
     end
@@ -138,25 +142,25 @@ module Skylab::CodeMolester::Config::File::Entity
       end, if_no )
     end
 
-    module Exists_
-    end
-
-    Exists_::Already_ = Entity::Event.new do |existing_entity, new_entity|
-      "#{ existing_entity.inflection.lexemes.noun.singular } #{
-        }already exists, won't clobber - #{ existing_entity.natural_key }"
-    end
-
     def add_valid_entity ent, opt_h, if_yes, if_no
       exists = valid_entities.detect do |e|
         e.natural_key == ent.natural_key
       end
       if exists
-        if_no[ Exists_::Already_[ existing_entity: exists, new_entity: ent ] ]
+        if_no[ Exists_::Already_[ existing_fly: exists, new_entity: ent ] ]
       else
         host.config.insert_valid_entity ent, opt_h, if_yes, if_no
       end
     end
     private :add_valid_entity
+
+    module Exists_
+    end
+
+    Exists_::Already_ = Entity::Event.new do |existing_fly, new_entity|
+      "#{ existing_fly.inflection.lexemes.noun.singular } #{
+        }already exists, won't clobber - #{ existing_fly.natural_key }"
+    end
   end
 
   module Entity::Collection::Collection_And_Controller_
@@ -211,9 +215,9 @@ module Skylab::CodeMolester::Config::File::Entity
   module Entity::Collection::List::Methods
 
     def list payload_line, error_event
-      host.configs.if_config( -> do
+      host.configs.if_config -> do
         _list payload_line
-      end, error_event )
+      end, error_event
     end
 
     def lines_using render

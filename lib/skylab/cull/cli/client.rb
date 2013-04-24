@@ -5,25 +5,33 @@ module Skylab::Cull
     include CLI::Namespace::InstanceMethods
 
     option_parser do |o|
-      o.banner = "#{ hi 'description:' } wanktasktic awesomenesswat"
-      o.separator @command.usage_line
+      o.separator "#{ hi 'description:' } wanktasktic awesomeness"
+
       o.separator "#{ hi 'options:' }"
 
       dry_run_option o
 
-      @param_h[:be_verbose] = nil
+      @param_h[:be_verbose] = false
       o.on '-v', '--verbose', 'verbose.' do
         @param_h[:be_verbose] = true
       end
+      o.banner = @command.usage_line
     end
 
     def init path=nil
+      path ||= api_client.config_file_default_init_path
       api path
     end
 
     option_parser do |o|
-      o.banner = "#{ hi 'description:' } display status of config file"
-      o.separator @command.usage_line
+      o.separator "#{ hi 'description:' } display status of config file"
+
+      o.separator "#{ hi 'option:' }"
+      @param_h[:do_list_file] = false
+      o.on '-l', '--list-file', 'only write the file to stdout.' do
+        @param_h[:do_list_file] = true
+      end
+      o.banner = @command.usage_line
     end
 
     def status
@@ -42,7 +50,7 @@ module Skylab::Cull
         if @action.be_verbose
           pn.to_s
         else
-          Headless::CLI::PathTools::FUN.pretty_path[ pn ]
+          Headless::CLI::PathTools::FUN.pretty_path_safe[ pn ]
         end
       end
     end
@@ -59,6 +67,13 @@ module Skylab::Cull
 
     def on_payload_line e
       @out.puts e.payload_a.fetch( 0 )
+      nil
+    end
+
+    def on_payload_lines e
+      e.payload_lines.each do |line|
+        @out.puts line
+      end
       nil
     end
 

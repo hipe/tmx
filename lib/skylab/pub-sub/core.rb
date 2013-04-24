@@ -1,8 +1,9 @@
 require_relative '../semantic/core' # etc
+require 'skylab/basic/core'
 
 module Skylab::PubSub
 
-  %i[ Autoloader MetaHell PubSub Semantic ].each do |i|
+  %i[ Autoloader Basic MetaHell PubSub Semantic ].each do |i|
     const_set i, ::Skylab.const_get( i )
   end
 

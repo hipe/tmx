@@ -714,7 +714,7 @@ module Skylab::Headless
     # this is how the plugin client typically accesses host services.
 
     def build_host_proxy plugin_client
-      host_proxy_class.new plugin_client
+      host_proxy_class.new plugin_client.plugin_story, @host_application, self
     end
 
   private
@@ -747,7 +747,7 @@ module Skylab::Headless
 
     def resolve_host_proxy_class
       if @host_mod::Plugin.const_defined? :Host_Proxy, false
-        @host_mod::Plugin.const_fetch :Host_Proxy, false
+        @host_mod::Plugin.const_get :Host_Proxy, false
       else
         @host_mod::Plugin.const_set :Host_Proxy, build_host_proxy_class
       end
@@ -757,18 +757,18 @@ module Skylab::Headless
 
     def build_host_proxy_class
 
-      service_name_a = @story.all_service_names
-
       # let's lock the above list down as to mean only those services
       # that exist the at the time we generate this class .. we aren't
       # so fancy as yet that we have a dynamic list of services. that
       # sounds like a terrible idea.
 
-      svc = self ; ha = @host_application
+      service_name_a = @story.all_service_names
+
+      # ( made more dynamic than necessary for one purpose as an exercize )
+      # #todo we should look into how wasteful it is, however
+
       ::Class.new.class_exec do
-        # (this could be made more static but we are avoiding something..)
-        define_method :initialize do |plugin|
-          pstory = plugin.plugin_story
+        define_method :initialize do |pstory, ha, svc|
           define_singleton_method :[] do |*i_a|
             ha.plugin_host_proxy_aref i_a, pstory
           end

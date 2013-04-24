@@ -465,6 +465,7 @@ module Skylab::Test
       |
 
       services %i|
+        sort_mutex
       |
     end
 
@@ -488,6 +489,11 @@ module Skylab::Test
 
     conclude do |y|
       emit_eventpoint( :conclude, y ).nonzero? || nil
+    end
+
+    def initialize( * )
+      super
+      @sort_mutex = nil
     end
 
     # ~ in vaguely narrative pre-order with occasional aesthetic pyramiding ~
@@ -663,6 +669,15 @@ module Skylab::Test
       false  # important - becomes `did_run` for some
     end
 
+    def sort_mutex owner_name, if_yes, if_no
+      if @sort_mutex
+        if_no[ @sort_mutex ]
+      else
+        @sort_mutex = owner_name
+        if_yes[ ]
+      end
+    end
+
     def children_sort sp_cache_a
       _emit_to_children :sort, sp_cache_a
     end
@@ -674,11 +689,14 @@ module Skylab::Test
     def _emit_to_children eventpoint_i, * arg_a
       ok = true ; info_y = host.info_y
       emit_eventpoint_to_each_client eventpoint_i do |client|
-        y = ::Enumerator::Yielder.new do |msg|
+        ok_y = ::Enumerator::Yielder.new do |msg|
+          info_y << "#{ client.plugin_slug } plugin #{ msg }"
+        end
+        no_y = ::Enumerator::Yielder.new do |msg|
           ok = false
           info_y << "#{ client.plugin_slug } plugin #{ msg }"
         end
-        [ * arg_a, y ]
+        [ *arg_a, ok_y, no_y ]
       end
       ok or info_y << "won't procede further because of the above."
       ok
@@ -772,7 +790,7 @@ module Skylab::Test
 
       def initialize
         @is_hot = nil
-        @do_verbose = nil  # let it get turned on even when we aren't activated
+        @be_verbose = nil  # let it get turned on even when we aren't activated
       end
 
       available_options do |o, _|
@@ -785,7 +803,7 @@ module Skylab::Test
         end
 
         o.on '-v', '--verbose', 'report number of skipped files' do
-          @do_verbose or activate_verbose
+          @be_verbose or activate_verbose
         end
 
         true  # ( it is the API standard to return non-nil if actions taken )
@@ -797,13 +815,13 @@ module Skylab::Test
         @str_a = [ ]
         @skip_rx_a = [ ]
         @cache_h = { }
-        @do_verbose ||= nil
+        @be_verbose ||= nil
         nil
       end
       protected :activate
 
       def activate_verbose
-        @do_verbose = true
+        @be_verbose = true
         @ignored_spec_count = 0
       end
       protected :activate_verbose
@@ -836,16 +854,16 @@ module Skylab::Test
           end
           @cache_h[ k ] = r
         end
-        if @do_verbose and :no == yn
+        if @be_verbose and :no == yn
           @ignored_spec_count += 1
         end
         yn
       end
 
-      postvalidate do |y|
+      postvalidate do |ok_y, no_y|
         if @is_hot
           if @pool_set.length.nonzero?
-            y << "couldn't find any subproduct with names like #{
+            no_y << "couldn't find any subproduct with names like #{
               }#{ @pool_set.to_a.inspect }"
           end
           nil
@@ -853,7 +871,7 @@ module Skylab::Test
       end
 
       conclude do |y|
-        if @is_hot && @do_verbose
+        if @is_hot && @be_verbose
           y << "skipped #{ @ignored_spec_count } spec file(s) #{
             }that had #{ detail_np }"
           true
@@ -894,7 +912,7 @@ module Skylab::Test
 
       available_options do |o, _|
         o.on '-v', '--verbose', 'show subproducts that were skipped' do
-          @do_verbose = true
+          @be_verbose = true
         end
         true  # because we have some
       end
@@ -912,7 +930,7 @@ module Skylab::Test
 
       def activate
         @is_hot and fail "sanity - unexpected state transition"
-        @do_verbose ||= nil
+        @be_verbose ||= nil
         @is_hot = true
         nil
       end
@@ -928,7 +946,7 @@ module Skylab::Test
         @rx_a = @str_a.map { |s| %r{\A#{ ::Regexp.escape s }} }.freeze
         @cache_h = { }
         @pool_set = Headless::Services::Set[ * @str_a ]
-        if @do_verbose
+        if @be_verbose
           @ignore_name_a = [ ]
           @ignore_count_h = ::Hash.new do |h, k|
             h[ k ] = 0
@@ -962,17 +980,17 @@ module Skylab::Test
           end
         end
 
-        if @do_verbose && :no == yn  # report stats about nodes ignored
+        if @be_verbose && :no == yn  # report stats about nodes ignored
           @ignore_count_h[ sp.slug ] += 1
         end
 
         yn
       end
 
-      postvalidate do |y|
+      postvalidate do |ok_y, no_y|
         if @is_hot
           if @pool_set.length.nonzero?
-            y << "didn't recognize this/these as subproduct names - #{
+            no_y << "didn't recognize this/these as subproduct names - #{
               }#{ @pool_set.to_a.inspect }"
           end
         end
@@ -980,7 +998,7 @@ module Skylab::Test
       end
 
       conclude do |y|
-        if @is_hot && @do_verbose
+        if @is_hot && @be_verbose
           if @ignore_name_a.length.nonzero?
             first = true
             a = @ignore_name_a.reduce [] do |m, x|
@@ -1043,7 +1061,7 @@ module Skylab::Test
 
         o.on '-v', '--verbose',
           'report details about skipped filenames' do
-            @do_verbose = true
+            @be_verbose = true
         end
 
         true  # we should follow the standard, even if result is ignored
@@ -1057,8 +1075,8 @@ module Skylab::Test
       protected :activate
 
       compile do |y|
-        @do_verbose ||= nil
-        @skipped_spec_count = 0 if @do_verbose
+        @be_verbose ||= nil
+        @skipped_spec_count = 0 if @be_verbose
         nil
       end
 
@@ -1077,7 +1095,7 @@ module Skylab::Test
         if ok
           :yes
         else
-          if @do_verbose
+          if @be_verbose
             @skipped_spec_count += 1
           end
           :no
@@ -1085,7 +1103,7 @@ module Skylab::Test
       end
 
       conclude do |y|
-        if @do_verbose and @is_hot
+        if @be_verbose and @is_hot
           y << "skipped #{ @skipped_spec_count } spec file(s) without #{
             }#{ detail_np }"
         end
@@ -1117,11 +1135,12 @@ module Skylab::Test
       |
 
       services %i|
+        sort_mutex
       |
     end
 
     def initialize
-      @sexp = @do_verbose = nil
+      @sexp = @be_verbose = nil
     end
 
     available_options do |o, _|
@@ -1134,7 +1153,7 @@ module Skylab::Test
       end
 
       o.on '-v', '--verbose', 'be verbose.' do
-        @do_verbose = true
+        @be_verbose = true
       end
 
       true
@@ -1142,20 +1161,27 @@ module Skylab::Test
 
     compile do |y|
       if @sexp
-        bork = -> msg do
-          y << "nonsensical ordering: #{ msg }"
+        ok = false
+        host.sort_mutex '--first / --then', -> do
+          ok = true
+        end, -> other_str do
+          y << "won't do --first / --then when #{ other_str }"
         end
-        x = @sexp.fetch( 0 ).fetch( 0 )
-        x == :first or break bork[ "--#{ x } before --first? NEVER." ]
-        wat = @sexp[ 1..-1 ].detect { |k,| :first == k }
-        wat and break bork[ "did not come first: --first #{ wat.fetch 1 }" ]
-        nil
+        if ok
+          bork = -> msg do
+            y << "nonsensical ordering: #{ msg }"
+          end
+          x = @sexp.fetch( 0 ).fetch( 0 )
+          x == :first or break bork[ "--#{ x } before --first? NEVER." ]
+          wat = @sexp[ 1..-1 ].detect { |k,| :first == k }
+          wat and break bork[ "did not come first: --first #{ wat.fetch 1 }" ]
+        end
       end
       nil
     end
 
     conclude do |y|
-      if @sexp && @do_verbose
+      if @sexp && @be_verbose
         y << "surely did order it"
         true
       end
@@ -1186,13 +1212,13 @@ module Skylab::Test
       end
     end
 
-    sort do |cache_a, y|
+    sort do |cache_a, ok_y, no_y|
       if @sexp
-        _sort cache_a, y
+        _sort cache_a, ok_y, no_y
       end
     end
 
-    def _sort cache_a, y
+    def _sort cache_a, ok_y, no_y
       orig_h = { }
       cache_a.each_with_index do |(sp, _), idx|
         orig_h[ sp.slug ] = idx
@@ -1226,6 +1252,118 @@ module Skylab::Test
     protected :_sort
   end
 
+  class Plugins::Subtree::Agent::Randomize
+
+    Headless::Plugin.enhance self do
+      eventpoints %i|
+        available_options
+        compile
+        sort
+        conclude
+      |
+
+      services %i|
+        sort_mutex
+      |
+    end
+
+    def initialize
+      @be_verbose = nil
+      @is_invoked = @do_random = @do_use_seed = nil
+      @a = [ ]
+    end
+
+    available_options do |o, _|
+      o.on '--order TYPE[:SEED]', 'yup. try --order random (imitate rspec)' do |x|
+        @a << [ :order, x ]
+      end
+      o.on '--seed SEED', '(imitate rspec)' do |x|
+        @a << [ :seed, x ]
+      end
+      o.on '-v', '--verbose', 'verbose output' do
+        @be_verbose = true
+      end
+
+      true
+    end
+
+    compile do |y|
+      if @a.length.nonzero?
+        ok = false
+        host.sort_mutex '--order random', -> do
+          ok = true
+        end, -> other do
+          y << "won't do --order random when #{ other }"
+        end
+        if ok
+          @is_invoked = true
+          if 1 < @a.length
+            y << "we only allow one --order or --seed option"
+          else
+            i, x = @a.shift
+            send "_compile_#{ i }", y, x
+          end
+        end
+      end
+    end
+
+    def _compile_order y, x
+      md =
+      /\A(?:default | (?<random>rand(?:om)? (?::(?<seed>.+))?))\z/x.
+        match( x )
+      if ! md then
+        y << "--order is invalid - #{ x }"
+      elsif md[:random]
+        @do_random = true
+        if md[:seed]
+          _compile_seed y, md[:seed]
+        end
+      end
+      nil
+    end
+
+    def _compile_seed y, x
+      if /\A\d+\z/ =~ x
+        @do_use_seed = true
+        @seed_int = x.to_i
+      else
+        @do_random = false
+        y << "cannot parse seed as integer - #{ x }"
+      end
+      nil
+    end
+
+    sort do |cache_a, ok_y, no_y|
+      if @do_random  # it may have been invoked but asked for default order..
+        _shuffle cache_a, ok_y, no_y
+      end
+    end
+
+    def _shuffle cache_a, ok_y, _no_y
+      seed = if @do_use_seed
+        @seed_int
+      else
+        ( rand * 10 ** 10 ).to_i # a pseudorandom 10-digit integer
+      end
+      if @be_verbose || true
+        pn = ::Skylab.tmpdir_pathname.join( 'last-random.number' )
+        pn.open 'w' do |fh|
+          fh.write "#{ seed }"
+        end
+        ok_y << "( using seed #{ seed } - wrote #{ pn } )"
+      end
+      cache_a.shuffle! random: ::Random.new( seed )
+      nil
+    end
+
+    conclude do |y|
+      if @do_random && @be_verbose
+        y << "surely did randomize it"
+        true
+      end
+    end
+  end
+
   module Plugins::Files
 
     Headless::Plugin.enhance self do
@@ -1247,7 +1385,7 @@ module Skylab::Test
     include CLI::SubClient::InstanceMethods
 
     def initialize
-      @do_pretty = @do_verbose = @did_run = nil
+      @do_pretty = @be_verbose = @did_run = nil
     end
 
     available_actions [
@@ -1264,7 +1402,7 @@ module Skylab::Test
       end
 
       o.on '-v', '--verbose', 'this way you can have everything' do
-        @do_verbose = true
+        @be_verbose = true
       end
 
       true  # when you took action, non-nil
@@ -1289,13 +1427,13 @@ module Skylab::Test
       end
       if ok
         @did_run = true
-        @last_count = count if @do_verbose
+        @last_count = count if @be_verbose
       end
       ok
     end
 
     conclude do |y|
-      if @do_verbose && @did_run
+      if @be_verbose && @did_run
         y << "listed #{ @last_count } spec file(s)"
         true
       end
@@ -1392,7 +1530,7 @@ module Skylab::Test
     include CLI::SubClient::InstanceMethods
 
     def initialize
-      @do_verbose = nil
+      @be_verbose = nil
     end
 
     available_actions [
@@ -1409,7 +1547,7 @@ module Skylab::Test
 
     available_options do |o, _|
       o.on '-v', '--verbose', 'things like output filenames' do
-        @do_verbose = true
+        @be_verbose = true
       end
 
       true  # because we took action
@@ -1447,7 +1585,7 @@ module Skylab::Test
       else
         info = host.infostream
         before[ ]
-        v = @do_verbose
+        v = @be_verbose
         v or info.write '('
         cache_a.each do |p|
           if v

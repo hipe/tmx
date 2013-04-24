@@ -2,7 +2,48 @@ module Skylab::Face
 
   class API::Action
 
+    # experiments in a value-added API action base class with value
+    # propositions for the big dream..
+
+    # `initialize` - experimentally we do a strict unpacking of
+    # `param_h`, setting corresponding ivars. this might easily
+    # fall over one day..
+
+    def initialize client_x, param_h
+      init client_x  # for fun we experiemnt with `prepend` and initting
+                     # the different facets.. NOTE we do not keep a handle
+                     # on it ourselves, to keep things interesting.
+      par_h = self.class.param_h
+      remain_a = self.class.param_a.dup
+      param_h.each do |k, v|
+        idx = par_h[ k ] or fail "sanity - default_proc?"
+        if ! v.nil?
+          # if we interpret `nil` always to mean "missing required" then
+          # everything is easier to implement ..
+          remain_a[ idx ] = nil
+          instance_variable_set :"@#{ k }", v
+        end
+      end
+      remain_a.compact!
+      if remain_a.length.nonzero?
+        raise ::ArgumentError, "missing argument(s) for #{ self.class } - #{
+          }#{ remain_a.inspect }"
+      end
+      nil
+    end
+
+    # `init` - this is provided experimentally as a hook for sub-facet
+    # modules to chain over using `prepend`
+    def init _client_x
+      # (in case you ever put anything here, please not that it will
+      # (hopefully) be called after any facets have run..)
+    end
+    private :init
+
     #         ~ params related declaration & processing ~
+
+    # `self.param_a`, `self.param_h` - hacky simple parameter validation
+    # (the below are defaults for when they are not set explicitly)
 
     -> do
       empty_a = [ ].freeze
@@ -15,11 +56,17 @@ module Skylab::Face
       end
     end.call
 
+    # `self.params` - hacky simple parameter validation with a
+    # rabbit hole to somewhere else .. NOTE #experimental hack
+
     define_singleton_method :params, &
         MetaHell::FUN.module_mutex[ ->( * param_a ) do
       if param_a.first.respond_to? :each_index
         param_a = API::Action::Param::Flusher[ param_a, self ]
       end
+      no = param_a.detect { |x| ! ( ::Symbol === x ) }
+      no and raise "invalid `params` value - #{ no.inpect } (if you meant #{
+        }to use meta-fields, for now the first tuple has to be an array)"
       param_a.freeze
       param_h = ::Hash[ param_a.each.with_index.to_a ]
       param_h.default_proc = -> h, k do
@@ -29,24 +76,52 @@ module Skylab::Face
       param_h.freeze
       define_singleton_method :param_a do param_a end
       define_singleton_method :param_h do param_h end
-    end ]
+    end, :params ]
 
-    def initialize client, param_h
-      @client = client
-      par_h = self.class.param_h
-      remain_a = self.class.param_a.dup
-      param_h.each do |k, v|
-        idx = par_h[ k ] or fail "sanity - default_proc?"
-        remain_a[ idx ] = nil
-        instance_variable_set :"@#{ k }", v
+
+    #         ~ request-time paramater management ~
+
+    # `pack_fields_and_options` - #experimentally many methods in the
+    # entity library take the "sacred four" parameters [#fa-el-001].
+    # freqently requests coming in from the client will munge the
+    # two namespaces (one of business-level fields, (e.g "email") and the
+    # other of controller-level options (e.g `verbose`), however the
+    # entity library insists on more rigidity and structure than this.
+
+    # experimentally your API actions defines parameters (a.k.a fields)
+    # using meta-fields that tag meta-info about each field, e.g whether
+    # the field is a "field" field or an "option" field.
+
+    # So, of each field in this field box reflector, along the categories of:
+    #   `field` and `option`,
+    # when each field falls into one (or more wtf) of these two categories
+    # one hash is made for each category, with its names being the field
+    # name and its values being the field's values.
+    # result is always an array of two hashes.
+
+    -> do
+      a = %i( field option )
+      define_method :pack_fields_and_options do
+        h = ::Hash[ a.map { |k| [ k, { } ] } ]
+        ks = h.keys
+        fields_bound_to_ivars.each do |bf|
+          ks.each do |k|
+            if bf.field[ k ]
+              h.fetch( k )[ bf.field.normalized_name ] = bf.value
+            end
+          end
+        end
+        a.map { |k| h.fetch k }
       end
-      remain_a.compact!
-      if remain_a.length.nonzero?
-        raise ::ArgumentError, "missing argument(s) for #{ self.class } - #{
-          }#{ remain_a.inspect }"
-      end
-      nil
-    end
+    end.call
+
+    #     ~ *experimental* plugin-like services declaration macro here ~
+
+    define_singleton_method :services, & MetaHell::FUN.module_mutex[ ->(*x_a) do
+
+      API::Action::Service::Flusher.new( self, x_a ).flush
+
+    end, :services ]
 
     #         ~ *experimental* event wiring facilities up here ~
 
@@ -68,6 +143,6 @@ module Skylab::Face
         end
       end
       nil
-    end ]
+    end, :emits ]
   end
 end

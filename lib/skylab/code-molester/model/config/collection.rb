@@ -5,7 +5,7 @@ module Skylab::CodeMolester
     CodeMolester::Services::Face::Model.enhance self do
       services %i|
         has_instance
-        set_instance
+        set_new_valid_instance
         config_filename
         config_file_search_num_dirs
         config_file_search_start_pathname
@@ -16,18 +16,55 @@ module Skylab::CodeMolester
       @plugin_host_proxy = plugin_host_proxy
     end
 
-    def create path, is_dry_run, pth, exists_ev, befor, after, all
-      if host.has_instance :config
-        raise "won't create when a cached config exists."
-      end
-      pn = ::Pathname.new( path ).join( host.config_filename )
-      conf = host.set_instance :config do |c|
-        c.pathname = pn
-      end
-      conf.create is_dry_run, pth, exists_ev, befor, after, all
-    end
+    # `create` (`field_h`, `option_h`, `event_h`)
+    #   + `field_h`  - `path`
+    #   + `option_h` - `is_dry_run`
+    #   + `event_h`  - (any of the following, but none other than):
+    #                + `pth` - an `escape_path`-like for your modality
+    #                + `exists` - called with an event if file already exists
+    #                + `before` - called with e. immediatly before create/update
+    #                + `after` - called with e. immediatly after create/update
+    #                + `all` - future-proofing catch all not in above
 
-    def find_nearest_config_file_path yes, no
+    -> do
+
+      unpack, unpack_inner =
+        Services::Basic::Hash::FUN.at :unpack, :unpack_inner  # heh
+
+      define_method :create do |field_h, option_h, event_h|
+        path, = unpack[ field_h, :path ]
+        is_dry_run, = unpack[ option_h, :is_dry_run ]
+        if host.has_instance :config
+          raise "sanity - won't create when a cached config exists."  # #todo
+        else
+          pn = ::Pathname.new( path ).join( host.config_filename )
+          host.set_new_valid_instance( :config,
+            -> st { st.pathname = pn },
+            -> ent do
+              ent.create is_dry_run, * unpack_inner[
+                event_h, * %i( pth exists before after all ) ]
+            end, nil  # set no error handler!  # #todo
+          )
+        end
+      end
+    end.call
+
+    # `find_nearest_config_file_path`
+    #
+    # signature is the "sacred four" [#fa-el-001]:
+    #
+    #   + `_fh` - (ignored. future-proofing placeholder for future parameters.)
+    #   + `_oh` - (ignored. future-proofing placeholder for future options.)
+    #   + `yes` - if found, called with an `x#to_s` => path
+    #   + `no`  - else when not found, called with num_tries, start pathname.
+    #
+    # needs the host services:
+    #
+    #  + `config_file_search_start_pathname`
+    #  + `config_file_search_num_dirs`
+    #  + `config_filename`
+
+    def find_nearest_config_file_path _fh, _oh, yes, no
       pn = host.config_file_search_start_pathname
       remaining_tries = host.config_file_search_num_dirs
       fn = host.config_filename
@@ -63,28 +100,24 @@ module Skylab::CodeMolester
     end
 
     def if_config yes, no
-      if host.has_instance :config
-        yes[ ]
+      if host.has_instance :config then yes[ ]
       else
-        find_nearest_config_file_path -> found_pn do
-          host.set_instance :config do |c|
-            c.pathname = found_pn
-          end
-          yes[ ]
-        end, -> num_tries, start_pn do
-          if ! no then false else
-            if 1 == no.arity
-              no[
-                Events::No[
-                  num_tries: num_tries,
-                  start_pn: start_pn
-                ]
-              ]
-            else
-              no[ ]
+        find_nearest_config_file_path( nil, nil,
+          -> found_pn do
+            host.set_new_valid_instance :config, -> c do
+              c.pathname = found_pn
+            end, yes, no
+          end,
+          -> num_tries, start_pn do
+            no ||= -> { false }
+            if 1 != no.arity then no[] else
+              no[ Events::No[
+                num_tries: num_tries,
+                start_pn: start_pn
+              ] ]
             end
           end
-        end
+        )
       end
     end
   end

@@ -16,7 +16,7 @@ module Skylab::Cull
       dry_run_option o
       verbose_option o
 
-      @param_h[ :tag_a ] = nil
+      @param_h[ :tag_a ] = false
       o.on '-t', '--tag <name>' do |v|
         ( @param_h[ :tag_a ] ||= [ ] ) << v
       end

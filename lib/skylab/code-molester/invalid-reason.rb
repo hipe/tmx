@@ -13,6 +13,9 @@ module Skylab::CodeMolester
     # it is a nice little encapsulation of the parse error message that
     # we can throw around and bubble up.
 
+    # (amusingly in the next screen we pretty much take a tour through the
+    # entire history of event message rendering..)
+
     render_options = ::Struct.new :escape_path
 
     define_method :render do |opts_h=nil|
@@ -24,6 +27,11 @@ module Skylab::CodeMolester
     end
 
     alias_method :to_s, :render
+
+    # `message_function` - implement the unified interface (contemporary
+    # with its date of writing) by wrapping the above.
+
+    attr_reader :message_function  # ( set in `initialize` )
 
   protected
 
@@ -88,6 +96,12 @@ module Skylab::CodeMolester
 
         a.join ' '
       end
+
+      me = self
+      @message_function = -> do
+        me.render
+      end
+
       freeze
     end
   end

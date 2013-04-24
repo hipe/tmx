@@ -26,6 +26,10 @@ module Skylab::CodeMolester::Config::File::Entity
       @miss_a = [ ] ; @xtra_a = [ ]
     end
 
+    def inflection
+      entity_story.inflection
+    end
+
     def set entity_name_x, section_sexp
       @box.clear
       @miss_a.clear

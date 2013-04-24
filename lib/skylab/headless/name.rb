@@ -18,12 +18,16 @@ module Skylab::Headless
       -> x { x.to_s.gsub( rx ) { '_' }.downcase.intern }
     end.call
 
-    o[:slugulate] = -> x do       # for normals only. centralize this nerk
-      x.to_s.gsub '_', '-'
+    o[:slugulate] = -> i do       # for normals only. centralize this nerk
+      i.to_s.gsub '_', '-'
     end
 
-    o[:metholate] = -> x do       # in case your normal is a slug for some rsn.
-      x.to_s.gsub '-', '_'
+    o[:metholate] = -> i do       # in case your normal is a slug for some rsn.
+      i.to_s.gsub '-', '_'
+    end
+
+    o[:naturalize] = -> i do      # for normals only, handles dashy normals
+      i.to_s.gsub '-_', ' '
     end
 
     FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
@@ -60,6 +64,10 @@ module Skylab::Headless
                                                # allow for slug-looking normals
     def as_slug
       Name::FUN.slugulate[ normalized_local_name ]
+    end
+
+    def as_natural
+      Name::FUN.naturalize[ normalized_local_name ]
     end
   end
 

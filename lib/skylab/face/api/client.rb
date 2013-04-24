@@ -11,7 +11,8 @@ module Skylab::Face
       Face::Services::Headless::Plugin::Host.enhance self do
         services %i|
           has_instance
-          set_instance
+          set_new_valid_instance
+          model
         |
         instance_exec( & blk )  # ERMAHGERD
       end
@@ -86,10 +87,11 @@ module Skylab::Face
       @model_manager.has_instance model_ref_a
     end
 
-    # `set_instance` - NOTE signuature might change
+    # `set_new_valid_instance` - NOTE signuature might change
 
-    def set_instance * model_ref_a, & init_blk
-      @model_manager.set_instance model_ref_a, init_blk
+    def set_new_valid_instance( ( * model_ref_a ), init_blk, obj_if_yes, if_no )
+      @model_manager.set_new_valid_instance model_ref_a, init_blk,
+        obj_if_yes, if_no
     end
   end
 end
