@@ -36,9 +36,8 @@ module Skylab::MetaHell
       end
     end
 
-    def self.new a
-
-      a = a.dup.freeze
+    def self.new *a
+      a = a.flatten.freeze
 
       raw( a ).class_exec do
 

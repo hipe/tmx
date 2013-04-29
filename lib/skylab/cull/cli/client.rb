@@ -61,6 +61,17 @@ module Skylab::Cull
       @pth  # for reading from model events
     end
 
+    def invoked( * )
+      res = super
+      if false == res
+        @y << "try #{ hi "#{
+            last_child_invocation_string || invocation_string
+          } -h" } for help."  # a hack for now.. one day we will unify this
+        res = nil  # probably ignored anyway..
+      end
+      res
+    end
+
     def on_payload_line e
       @out.puts e.payload_a.fetch( 0 )
       nil
@@ -75,6 +86,11 @@ module Skylab::Cull
 
     def on_info_line e
       @err.puts e.payload_a.fetch( 0 )
+      nil
+    end
+
+    def on_normalization_failure_line e
+      @y << "#{ last_child_invocation_string }: #{ e.payload_a.fetch 0 }"
       nil
     end
 

@@ -5,12 +5,17 @@ module Skylab::Basic
     def self.[] x
       if x.respond_to? :each_index
         List::Scanner::For::Array.new x
+      elsif x.respond_to? :read
+        List::Scanner::For::Read.new x
+      else
+        raise "#{ self } can't resolve a scanner for ::#{ x.class }"
       end
     end
-
   end
 
   module List::Scanner::For
+
+    extend MAARS
 
   end
 
@@ -22,7 +27,11 @@ module Skylab::Basic
     # at every `gets` or `rgets`.
 
     def initialize a
-      idx = 0 ; ridx = 0
+      idx = nil ; ridx = nil
+      ( @reset = -> do
+        idx = 0 ; ridx = 0
+        nil
+      end ).call
       @eos = -> do
         idx >= ( a.length - ridx )
       end
@@ -71,6 +80,10 @@ module Skylab::Basic
 
     def terminate
       @terminate.call
+    end
+
+    def reset
+      @reset.call
     end
 
     # [#bm-001] you see what the above pattern looks like don't you ..

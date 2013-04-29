@@ -1,3 +1,4 @@
+[#006]       #sub-node "the API library" #initials:`api` ..
 [#005]       #sub-node "entity library" #initials:`el` ..
 [#004]       argument error hack
 [#003] #open Face::Open2 is superseded by Headless::IO::Upstream::Select

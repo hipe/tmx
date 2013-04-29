@@ -13,6 +13,7 @@ module Skylab::Cull::TestSupport::CLI::Actions::Status
     extend Init_TS_
 
     as :no_cull, /\Ano cull config file found in \. or 3 levels up\.\z/, :nonstyled
+    as :invite_specific, /\Atry wtvr status -h for help\.\z/i, :styled
 
     it "from inside an empty directory, explains the situation" do
 
@@ -20,7 +21,7 @@ module Skylab::Cull::TestSupport::CLI::Actions::Status
 
         invoke 'st'
 
-        expect :no_cull
+        expect :no_cull, :invite_specific
 
       end
     end

@@ -97,6 +97,14 @@ module Skylab::Basic::Field::Reflection
 
     # (this module augments a module with generated methods.)
 
+    # `has_field_box` - make it easy for objects of participating classes
+    # to indicate whether or not they have been enhances by fields
+    # (and meta-fields)
+
+    def has_field_box
+      true
+    end
+
     def field_names
       field_box.field_names
     end
@@ -166,7 +174,6 @@ module Skylab::Basic::Field::Reflection
     def field_names
       field_names_which :is_exist
     end
-
   end
 
   # NOTE monkeypatching within the library..

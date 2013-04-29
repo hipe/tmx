@@ -370,8 +370,12 @@ module Skylab::Headless
       # (note we need to search superclasses here because of some
       # headless architectures that define a core app and then modailiy
       # apps that subclass it.)
-
-      self.class.const_get( :Plugin ).const_get( :STORY_, false )
+      if self.class.const_defined? :Plugin
+        self.class.const_get( :Plugin ).const_get( :STORY_, false )
+      else
+        raise "this class has no Plugin constant - did you forget to #{
+          }enhance it with #{ Plugin }::Host? - #{ self.class }"
+      end
     end
     public :plugin_host_story  # called by plugin manager
 

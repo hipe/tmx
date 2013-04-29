@@ -2,6 +2,8 @@ module Skylab::Headless
 
   module Services::String::Lines
 
+    # don't do further development with this without looking at [#ba-004]
+
     Consumer = -> mutable_string do
 
       # The first normalized line consumer ([#060]) -

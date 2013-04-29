@@ -17,4 +17,19 @@ module Skylab::Basic
 
   extend MAARS
 
+  module Services
+
+    o = { }
+
+    o[:StringScanner] = -> { require 'strscan' ; ::StringScanner }
+
+    o[:Headless] = -> { require 'skylab/headless/core' ; ::Skylab::Headless }
+      # (the above is an icky direction to reach, but is only for 1 constant..)
+
+    define_singleton_method :const_missing do |i|
+
+      const_set i, o.fetch( i ).call
+
+    end
+  end
 end

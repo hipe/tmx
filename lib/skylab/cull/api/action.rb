@@ -6,5 +6,8 @@ module Skylab::Cull
 
     attr_reader :be_verbose  # accessed by common `api` implementation
 
+    taxonomic_streams  # none. (but this allows us to check for unhandled
+    # non-taxonomic streams - sorta future-proofing it.)
+
   end
 end

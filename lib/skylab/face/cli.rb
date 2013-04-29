@@ -198,8 +198,22 @@ module Skylab::Face
           end
         end
       end
+      check_for_unhandled_non_taxonomic_streams action
       nil
     end
+
+    # `check_for_unhandled_non_taxonomic_streams` - this might necessitate
+    # that the client class defines an API::Action base class that defines
+    # a list of taxonomic streams.. in which case the client application
+    # must either override this method or define a list of zero or more
+    # taxonomic streams, lest a method missing exception will always be
+    # raised (for now..)
+
+    def check_for_unhandled_non_taxonomic_streams action
+      action.if_unhandled_non_taxonomic_streams method( :raise )
+    end
+
+    private :check_for_unhandled_non_taxonomic_streams
 
     -> do  # `stream_a`, `stream_h` - infer list of streams from
            # method names that start with 'on_'
@@ -1181,7 +1195,7 @@ module Skylab::Face
     end  # an o.p it is because we ourselves are making one for ourself.
 
     def invite y
-      y << "Try #{ hi("#{ invocation_string } -h [sub-cmd]")} for help."
+      y << "try #{ hi("#{ invocation_string } -h [sub-cmd]")} for help."
       nil
     end
 
@@ -1408,7 +1422,10 @@ module Skylab::Face
       action = api_client.build_action a, param_h
       set_behaviors action
       handle_events action
-      action.execute
+      alt, res = api_client.normalize action
+      if alt then res else
+        action.execute
+      end
     end
 
     def normalized_child_name
@@ -1437,7 +1454,7 @@ module Skylab::Face
       param_h
     end
 
-    %i| api_client set_behaviors handle_events |.each do |i|
+    %i| api_client set_behaviors handle_events normalize |.each do |i|
       define_method i do |*a, &b|
         @parent.send i, *a, &b
       end

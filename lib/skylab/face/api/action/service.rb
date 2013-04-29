@@ -31,12 +31,15 @@ module Skylab::Face
   module API::Action::Service::Prepended_Methods_
 
     def init api_client
-
-      load_plugin self.class.plugin_story, api_client.plugin_services
-
+      init_as_plugin api_client
       super  # important!
-
     end
     private :init
+
+    def init_as_plugin api_client
+      # allow this to be overridden for shenanigans
+      load_plugin self.class.plugin_story, api_client.plugin_services
+    end
+    private :init_as_plugin
   end
 end

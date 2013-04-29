@@ -90,11 +90,31 @@ module Skylab::Headless
       end
     end
 
-    punctuation_character_rx = /[.?!]/
+    o[:ellipsify] = -> do
+      ellips = '[..]'
+      -> str, len do
+        if str.length <= len
+          str
+        elsif ellips.length <= len
+          "#{ str[ 0, ( len - ellips.length ) ] }#{ ellips }"
+        else
+          case len   # this is what you get. [#it-001] is much more ambitious
+          when 0 ;   # and much less existant.
+          when 1 ; '.'
+          when 2 ; '[]'
+          when 3 ; '[.]'
+          else ellips[ 0, len ]
+          end
+        end
+      end
+    end.call
 
-    o[:looks_like_sentence] = -> str do
-      str.length.nonzero? and str[ -1 ] =~ punctuation_character_rx
-    end
+    o[:looks_like_sentence] = -> do
+      punctuation_character_rx = /[.?!]/
+      -> str do
+        str.length.nonzero? and str[ -1 ] =~ punctuation_character_rx
+      end
+    end.call
 
     FUN = o.to_struct
   end

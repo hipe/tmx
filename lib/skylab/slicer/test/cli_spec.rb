@@ -7,7 +7,7 @@ module Skylab::Slicer::TestSupport
     extend Slicer_TestSupport
 
     as :exp, /\AExpecting .*transfer/, :styled
-    as :inv, /\ATry wtvr -h \[sub-cmd\] for help\.\z/, :styled
+    as :inv, /\Atry wtvr -h \[sub-cmd\] for help\.\z/i, :styled
 
     context "canon" do
 

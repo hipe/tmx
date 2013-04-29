@@ -31,6 +31,8 @@ module Skylab::Face
       # (currently, more detailed validation-type metafields are defined
       # as part of entity (model) libraries and not in this API facet..)
 
+      [ :normalizer, :property ],
+
       # (trailing comma above is intentional and syntactically valid, but still
       # feels really weird to do without justifying it with this long comment)
     ].tap { |a| a.freeze.each( & :freeze ) }

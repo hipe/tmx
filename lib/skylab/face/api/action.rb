@@ -8,6 +8,9 @@ module Skylab::Face
     # `initialize` - experimentally we do a strict unpacking of
     # `param_h`, setting corresponding ivars. this might easily
     # fall over one day..
+    #
+    # (note that *after* `initialize` and before `execute` we still
+    # expect a call to `normalize`!)
 
     def initialize client_x, param_h
       init client_x  # for fun we experiemnt with `prepend` and initting
@@ -23,6 +26,7 @@ module Skylab::Face
       miss_a.compact!
       miss_a.length.nonzero? and raise ::ArgumentError, "missing #{
         }argument(s) - (#{ miss_a.map( & :to_s ) * ', ' })"
+      nil
     end
 
     # `init` - this is provided experimentally as a hook for sub-facet
@@ -38,7 +42,7 @@ module Skylab::Face
     # `self.param_a`, `self.param_h` - hacky simple parameter validation
     # (the below are defaults for when they are not set explicitly)
 
-    -> do
+    -> do  # `param_a`, `param_h`
       empty_a = [ ].freeze
       define_singleton_method :param_a do empty_a end
       define_singleton_method :param_h do
@@ -137,5 +141,66 @@ module Skylab::Face
       end
       nil
     end, :emits ]
+
+    #                ~ *experimental* normalization api ~
+    #
+    # this API action can assume to receive a call to this `normalize`
+    # method right before the *mode* client would send `execute` to this
+    # receiver. the caller assumes that this receiver will call either
+    # `if_yes` or `if_no` in a monadic mutex fashion (it assumes this
+    # receiver will call one of the two, and exactly once), and as the
+    # result of this call.
+    #
+    # experimentally the API client provides us with the `y` as a future-
+    # proof-y yielder to write (via `<<`) messages about normalization
+    # (e.g validation) failure. For even more tangle, we can call
+    # `y.count` to see how many times we called it!
+    #
+    # (for now, using `y` necessitates that this receiver respond to
+    # `normalization_failure_line`, which the API Action subclass could
+    # do by declaring that it emits an event of the same name..)
+    #
+    # (but see notes at [#fa-api-001] - this is exploratory! NOTE almost
+    # guaranteed to change!)
+    #
+    # (and we also roll `required` into it, which is like a subset of
+    # normalization?)
+
+    def normalize y, call_if_yes, result_if_no
+      ok = true
+      begin
+        has_field_box or break  # some don't opt-in
+        field_box.each do |nn, fld|  # sneak this in, too
+          if fld.is_required
+            if instance_variable_get( fld.as_host_ivar ).nil?
+              y << "needs to know \"#{ nn }\""   # #todo labels
+              next
+            end
+          end
+          fld.has_normalizer or next
+          n_x = fld.get_normalizer
+          if true == n_x
+            n_x = method :"normalize_#{ fld.normalized_name }"
+          end
+          x1 = instance_variable_get fld.as_host_ivar  #eew
+          instance_exec y, x1, -> x2 do
+            instance_variable_set fld.as_host_ivar, x2
+            nil
+          end, & n_x
+        end
+        y.count.zero? and break
+        ok = false
+      end while nil
+      if ok
+        call_if_yes[]
+      else
+        result_if_no[ false ]  # my exit status - build down when needed.
+      end
+    end
+
+    def has_field_box
+      false  # gets overridden by Basic::Field::Reflection::InstanceMethods
+    end
+    private :has_field_box
   end
 end

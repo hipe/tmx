@@ -76,7 +76,7 @@ class Skylab::Basic::Field
       n_meta_resolver.push metafield_a, -> x do
         @target.const_set :METAFIELDS_, x
       end, -> x do
-        @target.const_set :METAFIELD_, x
+        @target.const_set :FIELD_, x
       end
 
       n_meta_resolver.seed Meta_Field_Factory_

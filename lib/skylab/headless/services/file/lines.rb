@@ -1,11 +1,13 @@
 module Skylab::Headless
 
   module Services::File::Lines
+
   end
 
   class Services::File::Lines::Producer < ::Enumerator
                                   # read lines in a more convenient way
                                   # (this is tracked by [#hl-044])
+  # #deprecated by Basic::List::Scanner ([#ba-004]) #todo
 
     def gets
       self.next if @live
