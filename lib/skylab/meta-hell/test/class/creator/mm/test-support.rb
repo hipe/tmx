@@ -1,7 +1,7 @@
 require_relative '../test-support'
 
-module ::Skylab::MetaHell::TestSupport::Klass::Creator::ModuleMethods
-  ::Skylab::MetaHell::TestSupport::Klass::Creator[ self ]
+module ::Skylab::MetaHell::TestSupport::Class::Creator::ModuleMethods
+  ::Skylab::MetaHell::TestSupport::Class::Creator[ self ]
 
   include CONSTANTS
 

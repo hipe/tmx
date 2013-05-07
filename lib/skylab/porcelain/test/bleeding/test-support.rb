@@ -12,8 +12,8 @@ module Skylab::Porcelain::TestSupport::Bleeding
   include CONSTANTS
 
   module ModuleMethods
-    extend MetaHell::Modul::Creator
-    include MetaHell::Klass::Creator
+    extend MetaHell::Module::Creator
+    include MetaHell::Class::Creator
     include CONSTANTS
 
     def base_module!

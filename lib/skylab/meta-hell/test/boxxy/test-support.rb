@@ -11,12 +11,12 @@ module Skylab::MetaHell::TestSupport::Boxxy
   MetaHell = ::Skylab::MetaHell
 
   module ModuleMethods
-    include MetaHell::Klass::Creator::ModuleMethods
+    include MetaHell::Class::Creator::ModuleMethods
   end
 
   module InstanceMethods
     extend MetaHell::Let
-    include MetaHell::Klass::Creator::InstanceMethods
+    include MetaHell::Class::Creator::InstanceMethods
 
     last_num = 0
 

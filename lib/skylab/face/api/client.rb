@@ -24,7 +24,7 @@ module Skylab::Face
     end
     public :build_action  # called e.g by another modality client
 
-    Face::Services::ModuleAccessors.enhance self do
+    MetaHell::Module::Accessors.enhance self do
 
       private_methods do
 

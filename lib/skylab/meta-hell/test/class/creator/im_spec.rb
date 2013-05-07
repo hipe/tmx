@@ -1,7 +1,7 @@
 require_relative 'test-support'
 
-module ::Skylab::MetaHell::TestSupport::Klass::Creator
-  describe "#{MetaHell::Klass::Creator::InstanceMethods}" do
+module ::Skylab::MetaHell::TestSupport::Class::Creator
+  describe "#{MetaHell::Class::Creator::InstanceMethods}" do
     extend Creator_TestSupport
 
     context "minimal" do

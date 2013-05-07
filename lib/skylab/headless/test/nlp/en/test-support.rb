@@ -12,7 +12,7 @@ module Skylab::Headless::TestSupport::NLP::EN
   MetaHell = MetaHell # #annoy
 
   module ModuleMethods
-    include MetaHell::Klass::Creator::ModuleMethods
+    include MetaHell::Class::Creator::ModuleMethods
 
   end
 

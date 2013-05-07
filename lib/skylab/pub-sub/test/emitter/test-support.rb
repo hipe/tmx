@@ -17,7 +17,7 @@ module Skylab::PubSub::TestSupport::Emitter
 
   module ModuleMethods
     include CONSTANTS
-    include MetaHell::Klass::Creator::ModuleMethods
+    include MetaHell::Class::Creator::ModuleMethods
 
     def inside &b                 # define the dsl-ish klass body to be somthing
       b or fail 'give a block'    # other than nothing (below)
@@ -34,7 +34,7 @@ module Skylab::PubSub::TestSupport::Emitter
     include CONSTANTS                          # so we can use the below consts
     extend MetaHell::Let::ModuleMethods        # rspec defines the inst. meths
 
-    include MetaHell::Klass::Creator::InstanceMethods
+    include MetaHell::Class::Creator::InstanceMethods
 
     let :meta_hell_anchor_module do ::Module.new end
 

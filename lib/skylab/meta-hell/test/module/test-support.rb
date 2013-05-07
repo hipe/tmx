@@ -1,9 +1,9 @@
 require_relative '../test-support'
 
-module Skylab::MetaHell::TestSupport::Modul
+module Skylab::MetaHell::TestSupport::Module
   ::Skylab::MetaHell::TestSupport[ self ] # #regret
 
   module CONSTANTS
-    Modul = MetaHell::Modul
+    Module = MetaHell::Module
   end
 end

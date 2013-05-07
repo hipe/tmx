@@ -1,5 +1,5 @@
 module Skylab::MetaHell
-  class Klass::Meta < MetaHell::Modul::Meta
+  class Class::Meta < MetaHell::Module::Meta
     include MetaHell::Let::InstanceMethods # __memoized #impl
 
     # This metadata class (like its parent) has two distinct purposes :

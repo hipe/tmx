@@ -21,7 +21,7 @@ module Skylab::Porcelain::TestSupport
 
   module ModuleMethods
     include CONSTANTS
-    include MetaHell::Klass::Creator::ModuleMethods # klass etc
+    include MetaHell::Class::Creator::ModuleMethods # klass etc
 
     define_method :constantize, & Autoloader::Inflection::FUN.constantize
 
@@ -42,7 +42,7 @@ module Skylab::Porcelain::TestSupport
 
   module InstanceMethods
    include CONSTANTS
-   include MetaHell::Klass::Creator::InstanceMethods # klass!
+   include MetaHell::Class::Creator::InstanceMethods # klass!
 
    define_method :style_free, & Headless::CLI::Pen::FUN.unstylize
 

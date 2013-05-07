@@ -1,6 +1,6 @@
-module Skylab::Face
+module Skylab::MetaHell
 
-  module Services::ModuleAccessors
+  module Module::Accessors
 
     # NOTE requires MAARS for now..
 
