@@ -12,7 +12,7 @@ module Skylab::TanMan::TestSupport::CLI
 
     include CONSTANTS
 
-    include MetaHell::Klass::Creator::ModuleMethods
+    include MetaHell::Class::Creator::ModuleMethods
   end
 
   module InstanceMethods
@@ -21,7 +21,7 @@ module Skylab::TanMan::TestSupport::CLI
 
     extend MetaHell::Let
 
-    include MetaHell::Klass::Creator::InstanceMethods
+    include MetaHell::Class::Creator::InstanceMethods
 
     def meta_hell_anchor_module
       CLI_TestSupport::SANDBOX

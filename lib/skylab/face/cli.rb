@@ -170,7 +170,7 @@ module Skylab::Face
     end
     public :api_client
 
-    Face::Services::ModuleAccessors.enhance self do
+    MetaHell::Module::Accessors.enhance self do
 
       private_methods do
 

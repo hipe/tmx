@@ -1,4 +1,4 @@
-module Skylab::MetaHell::Klass::Creator
+module Skylab::MetaHell::Class::Creator
 
   # DSL for creating classes, for things like testing metaprogramming,
   # or testing libraries that do extensive reflection on class hierarchies,
@@ -8,8 +8,8 @@ module Skylab::MetaHell::Klass::Creator
   #   **very** #experimental
 
   MetaHell = ::Skylab::MetaHell
-  Klass = MetaHell::Klass
-  Modul = MetaHell::Modul
+  Class = MetaHell::Class
+  Module = MetaHell::Module
 
 
   def self.extended mod # #sl-109
@@ -18,7 +18,7 @@ module Skylab::MetaHell::Klass::Creator
   end
 
   module ModuleMethods
-    include Modul::Creator::ModuleMethods # needed for impl. e.g. `M`
+    include Module::Creator::ModuleMethods # needed for impl. e.g. `M`
 
     o = { }
 
@@ -39,7 +39,7 @@ module Skylab::MetaHell::Klass::Creator
                                   # depending on if this is a create or update:
 
       create = -> name do         # Lambda for creating the metadata for the kls
-        m = Klass::Meta.new name  # The only chance in the DSL you can set the
+        m = Class::Meta.new name  # The only chance in the DSL you can set the
         if ! a.empty?             # parent class (symbolically) is now so
           m.optionals! a          # we process it here and then below validate
         end                       # that you're not trying to change it.
@@ -93,7 +93,7 @@ module Skylab::MetaHell::Klass::Creator
   module InstanceMethods
     extend MetaHell::Let::ModuleMethods
 
-    include Modul::Creator::InstanceMethods # M_IM, Memo
+    include Module::Creator::InstanceMethods # M_IM, Memo
 
     K = ModuleMethods::K # hey can *i* borrow *this*
 
@@ -138,7 +138,7 @@ module Skylab::MetaHell::Klass::Creator
 
                                   # Resolve and normalize parent now:
       if ! opts.empty?            # iff you were given a symbolic name for a
-        m = Klass::Meta.new full_name # parent class, any autovivification of it
+        m = Class::Meta.new full_name # parent class, any autovivification of it
         m.optionals! opts         # must come early, in the edge case that the
         if ::Symbol === m.extends # child you will autovivify would be inside
           opts = [ { extends: vivify_parent[ m ] } ] # parent (weird, why?) you
@@ -153,7 +153,7 @@ module Skylab::MetaHell::Klass::Creator
         existing = memo.mod
         ::Class == existing.class or fail ::TypeError.exception "#{
         full_name} is not a class (it's a #{ existing.class })"
-        meta = Klass::Meta.new memo.name # spoof one
+        meta = Class::Meta.new memo.name # spoof one
         parent = existing.ancestors[1..-1].detect { |x| ::Class == x.class }
         meta.extends = (::Object == parent) ? nil : parent # ick ?
         update_meta[ meta ]       # Process `opts`, tripping validation about

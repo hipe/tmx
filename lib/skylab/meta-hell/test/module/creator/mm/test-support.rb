@@ -1,14 +1,14 @@
 require_relative '../test-support'
 
-module ::Skylab::MetaHell::TestSupport::Modul::Creator::ModuleMethods
-  ::Skylab::MetaHell::TestSupport::Modul::Creator[ self ] # #regret
+module ::Skylab::MetaHell::TestSupport::Module::Creator::ModuleMethods
+  ::Skylab::MetaHell::TestSupport::Module::Creator[ self ] # #regret
 
   MM_TestSupport = self # courtesy
 
   include CONSTANTS
 
   MetaHell = MetaHell # #annoying
-  Modul = Modul # #annoying
+  Module = Module # #annoying
 
   FUN = MetaHell::Struct[ {
     :done_f => -> struct do

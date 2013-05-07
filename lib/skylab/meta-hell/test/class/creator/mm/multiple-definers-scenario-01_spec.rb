@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-module ::Skylab::MetaHell::TestSupport::Klass::Creator::ModuleMethods
+module ::Skylab::MetaHell::TestSupport::Class::Creator::ModuleMethods
 
   module MultipleDefiners_Scenario_One
 
@@ -9,7 +9,7 @@ module ::Skylab::MetaHell::TestSupport::Klass::Creator::ModuleMethods
     o[:once] = -> do
 
       module Dingle
-        extend MetaHell::Klass::Creator
+        extend MetaHell::Class::Creator
         extend MetaHell::Let
         klass :Alpha do
           def wrong ; end
@@ -19,7 +19,7 @@ module ::Skylab::MetaHell::TestSupport::Klass::Creator::ModuleMethods
       end
 
       module Fingle
-        extend MetaHell::Klass::Creator
+        extend MetaHell::Class::Creator
         extend MetaHell::Let
         klass :Alpha do
           def right ; end
@@ -28,7 +28,7 @@ module ::Skylab::MetaHell::TestSupport::Klass::Creator::ModuleMethods
 
       class Weiner
         extend MetaHell::Let
-        include MetaHell::Klass::Creator::InstanceMethods
+        include MetaHell::Class::Creator::InstanceMethods
         include Dingle
         include Fingle
         let( :meta_hell_anchor_module ) { ::Module.new }
@@ -40,7 +40,7 @@ module ::Skylab::MetaHell::TestSupport::Klass::Creator::ModuleMethods
 
     FUN = MetaHell::Struct[ o ] # make a struct object out of the hash
 
-    describe "#{MetaHell::Klass::Creator::ModuleMethods} Multiple Definers #{
+    describe "#{MetaHell::Class::Creator::ModuleMethods} Multiple Definers #{
       } Scenario One -- our graph accross a real graph" do
 
       before( :all ) { FUN.once[] }

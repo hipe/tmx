@@ -1,8 +1,8 @@
-module Skylab::MetaHell::Modul::Creator
+module Skylab::MetaHell::Module::Creator
 
   Creator = self
   MetaHell = ::Skylab::MetaHell
-  Modul = MetaHell::Modul
+  Module = MetaHell::Module
   SEP_ = '__'
 
   def self.extended mod # #sl-109
@@ -26,7 +26,7 @@ module Skylab::MetaHell::Modul::Creator
       define_method( "_#{full_module_name}" ) { send full_module_name }
     end
 
-    o[:create_meta] = ->( name ) { Modul::Meta.new name }
+    o[:create_meta] = ->( name ) { Module::Meta.new name }
 
     o[:define_methods] = -> me, name, build_module do
       M.memoize[ me, name, build_module ]

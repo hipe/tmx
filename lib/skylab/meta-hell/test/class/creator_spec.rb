@@ -1,7 +1,7 @@
 require_relative 'creator/test-support'
 
-module ::Skylab::MetaHell::TestSupport::Klass::Creator
-  describe "say, did you know: #{MetaHell::Klass::Creator}" do
+module ::Skylab::MetaHell::TestSupport::Class::Creator
+  describe "say, did you know: #{MetaHell::Class::Creator}" do
     extend Creator_TestSupport
 
     context "lets you define a minimal class with \"klass\" which" do

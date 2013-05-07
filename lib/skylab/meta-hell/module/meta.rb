@@ -1,9 +1,9 @@
 module Skylab::MetaHell
-  class Modul::Meta
+  class Module::Meta
     extend MetaHell::Let
 
     SEP  = '::'
-    SEP_ = Modul::Creator::SEP_
+    SEP_ = Module::Creator::SEP_
 
     attr_reader :name, :children, :blocks
 

@@ -1,7 +1,7 @@
 require_relative 'creator/test-support'
 
-module ::Skylab::MetaHell::TestSupport::Modul::Creator
-  describe "say, did you know that when using #{MetaHell::Modul::Creator}" do
+module ::Skylab::MetaHell::TestSupport::Module::Creator
+  describe "say, did you know that when using #{MetaHell::Module::Creator}" do
     extend Creator_TestSupport
 
 

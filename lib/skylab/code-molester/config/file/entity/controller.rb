@@ -41,7 +41,7 @@ module Skylab::CodeMolester::Config::File::Entity
       end
 
       def module_accessors
-        Face::Services::ModuleAccessors.enhance @target do
+        MetaHell::Module::Accessors.enhance @target do
           private_methods do
             module_reader :collection_module, '../Collection'
           end

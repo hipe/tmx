@@ -1,5 +1,5 @@
 require_relative '../test-support'
 
-module Skylab::MetaHell::TestSupport::Klass
+module Skylab::MetaHell::TestSupport::Class
   ::Skylab::MetaHell::TestSupport[ self ] # #regret
 end

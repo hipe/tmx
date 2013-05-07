@@ -7,7 +7,7 @@ require_relative 'mm/test-support'
 # library itself here, hence they are very ugly, hence in a way, right here
 # in this very file is the darkest of all the circles of meta-hell.
 
-module ::Skylab::MetaHell::TestSupport::Modul::Creator::ModuleMethods
+module ::Skylab::MetaHell::TestSupport::Module::Creator::ModuleMethods
 
 
   module Scenario_One
@@ -19,7 +19,7 @@ module ::Skylab::MetaHell::TestSupport::Modul::Creator::ModuleMethods
     o[:once] = -> do
 
       module Ohai                 # ok so the crazy thing here is that what
-        extend Modul::Creator     # we are doing is making a *module* (not
+        extend Module::Creator     # we are doing is making a *module* (not
         extend MetaHell::Let      # a class) be the module definer here
 
         modul :Wank do            # (this is the crazy crap that was working
@@ -27,7 +27,7 @@ module ::Skylab::MetaHell::TestSupport::Modul::Creator::ModuleMethods
         end                       # totally borked and didn't understand
       end                         # how we borked, and are in the middle
 
-      class Klass                 # of untangling now.  Does this count as
+      class Class                 # of untangling now.  Does this count as
         include Ohai              # literate programming?)
         extend MetaHell::Let::ModuleMethods
 
@@ -44,7 +44,7 @@ module ::Skylab::MetaHell::TestSupport::Modul::Creator::ModuleMethods
     done = FUN.done_f[ F ]         # this absurdity is just a sanity check
 
 
-    describe "#{MetaHell::Modul::Creator::ModuleMethods} (*on* modules, #{
+    describe "#{MetaHell::Module::Creator::ModuleMethods} (*on* modules, #{
       }not classes" do
 
       extend MM_TestSupport
@@ -53,7 +53,7 @@ module ::Skylab::MetaHell::TestSupport::Modul::Creator::ModuleMethods
         it "a klass can include modules that have graphs, and work" do
           # we want more fine-grained control than before(:all) for now ..
           F.once[]
-          Klass.new._Wank.instance_methods.should eql([:worked])
+          Class.new._Wank.instance_methods.should eql([:worked])
         end
       end
     end
@@ -66,12 +66,12 @@ module ::Skylab::MetaHell::TestSupport::Modul::Creator::ModuleMethods
       :once => -> do
 
         module OneGuy
-          extend Modul::Creator, MetaHell::Let
+          extend Module::Creator, MetaHell::Let
           modul :Lawrence__Fishburne
 
         end
         module AnotherGuy
-          extend Modul::Creator, MetaHell::Let
+          extend Module::Creator, MetaHell::Let
           modul :Lawrence__Kasdan
           modul :Lawrence__Arabia
         end
@@ -93,7 +93,7 @@ module ::Skylab::MetaHell::TestSupport::Modul::Creator::ModuleMethods
                                   # the below module name when you run
                                   # this file alone)
 
-    describe "#{MetaHell::Modul::Creator::ModuleMethods} scenario 2 - #{
+    describe "#{MetaHell::Module::Creator::ModuleMethods} scenario 2 - #{
       }this is fucking amazing - composing different module graphs WTF" do
 
       extend MM_TestSupport
