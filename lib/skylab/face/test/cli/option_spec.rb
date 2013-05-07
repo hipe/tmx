@@ -9,7 +9,7 @@ module Skylab::Face::TestSupport::CLI::Option
   extend TestSupport::Quickie
 
   module CONSTANTS
-    SANDBOX = CLI_TestSupport::SANDBOX  # please be careful
+    Sandbox = CLI_TestSupport::Sandbox  # please be careful
   end
 
   describe "#{ Face }::CLI - options, officous" do
@@ -111,7 +111,7 @@ module Skylab::Face::TestSupport::CLI::Option
       context "you can't set the version multiple times per class" do
 
         let :kls do
-          SANDBOX.produce_subclass
+          Sandbox.produce_subclass
         end
 
         def raise_the_error

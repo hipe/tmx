@@ -8,9 +8,9 @@ module Skylab::Basic::TestSupport::Field
 
   extend TestSupport::Quickie
 
-  module SANDBOX
-  end
-
   Basic = Basic
+
+  module CONSTANTS::Sandbox
+  end
 
 end

@@ -6,10 +6,6 @@ module Skylab::Basic::TestSupport::Field
 
     extend Field_TestSupport
 
-    def sandbox_module
-      SANDBOX
-    end
-
     context "foundations" do
       it "(the basics of making sure the classes loaded)" do
         Basic::Field::Box
@@ -18,8 +14,9 @@ module Skylab::Basic::TestSupport::Field
 
     context "introduction" do
 
-      sandbox :Mod_0 do
-        module SANDBOX::Mod_0
+      define_sandbox_constant :Mod_0 do
+
+        module Sandbox::Mod_0
 
           Basic::Field::Box.enhance self do
 
@@ -35,9 +32,9 @@ module Skylab::Basic::TestSupport::Field
         self.Mod_0
       end
 
-      sandbox :Mod_1 do
+      define_sandbox_constant :Mod_1 do
 
-        module SANDBOX::Mod_1
+        module Sandbox::Mod_1
 
           Basic::Field::Box.enhance self do
 
@@ -69,8 +66,8 @@ module Skylab::Basic::TestSupport::Field
 
     context "model integrity" do
 
-      sandbox :Mod_2 do
-        module SANDBOX::Mod_2
+      define_sandbox_constant :Mod_2 do
+        module Sandbox::Mod_2
           Basic::Field::Box.enhance self do
             fields [ :name, :required ]
             meta_fields :gadzooks
@@ -86,8 +83,8 @@ module Skylab::Basic::TestSupport::Field
                      /no such meta-field "required" - expecting "gadzooks/i )
       end
 
-      sandbox :Mod_2_2 do
-        module SANDBOX::Mod_2_2
+      define_sandbox_constant :Mod_2_2 do
+        module Sandbox::Mod_2_2
           Basic::Field::Box.enhance self do
             meta_fields [ :wanktastic, :merbles ]
           end
@@ -105,14 +102,13 @@ module Skylab::Basic::TestSupport::Field
 
     context "fields with properties - the next dimension" do
 
-      sandbox :Mod_3 do
-        module SANDBOX::Mod_3
+      define_sandbox_constant :Mod_3 do
+        module Sandbox::Mod_3
           Basic::Field::Box.enhance self do
 
             meta_fields [ :range, :property ], :urgent
 
             fields :sex, [ :location, :urgent ], [ :age, :range, [1..2] ]
-
 
           end
         end

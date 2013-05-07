@@ -103,6 +103,48 @@ module Skylab::MetaHell
     # above. it is designed below to be "impossible" to hack (HA)
     # and only good for one shot.
 
+    -> do  # `initialize`
+      h = {
+
+        # 2-arg form -
+        # initialize with the conduit object this one shot is a one-shot of,
+        # and a callback function that flushes
+
+        2 => -> cnd, flsh do
+          [ cnd, flsh ]
+        end,
+
+        # 1-arg form -
+        # your one-shot exists to serve exactly one DSL input (method).
+        # `func` will be called with the (necessarily) one argument
+        # that that input (method) receives.
+
+        1 => -> func do
+          cnd_kls = MetaHell::Module::Accessors::FUN.resolve[ self.class, '..' ]
+          ex = nil
+          cnd = cnd_kls.new -> x do
+            ex = x
+          end
+          flsh = -> do
+            func[ ex ]
+            nil
+          end
+          [ cnd, flsh ]
+        end
+      }
+      define_method :initialize do |* conduit_flush_a|
+        conduit, flush = instance_exec( * conduit_flush_a, &
+          h.fetch( conduit_flush_a.length ) )
+        @execute = -> meth_i, arg_a, block_b do
+          @mutex = meth_i
+          freeze
+          r = conduit.send meth_i, * arg_a, & block_b
+          flush.call
+          r
+        end
+      end
+    end.call
+
     class << self
       alias_method :meta_hell_new, :new
     end
@@ -122,16 +164,6 @@ module Skylab::MetaHell
         end
 
         self
-      end
-    end
-
-    def initialize conduit, flush
-      @execute = -> meth_i, arg_a, block_b do
-        @mutex = meth_i
-        freeze
-        r = conduit.send meth_i, * arg_a, & block_b
-        flush.call
-        r
       end
     end
   end

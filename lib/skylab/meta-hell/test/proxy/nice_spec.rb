@@ -2,49 +2,47 @@ require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::Proxy
 
-  module SANDBOX
-  end
-
   describe "#{ MetaHell }::Proxy::Nice is nice" do
 
+    extend Proxy_TestSupport
+
     context "with a straight up-produced class" do
-      once = -> do
-        kls = SANDBOX::Bingo = MetaHell::Proxy::Nice::Basic.new :moo, :mar
-        kls.class_exec do
+
+      define_sandbox_constant :bingo_kls do
+        Sandbox::Bingo = MetaHell::Proxy::Nice::Basic.new :moo, :mar
+        class Sandbox::Bingo
           attr_reader :two
           def initialize one, two
             @two = [ one, two ]
           end
         end
-        ( once = -> { kls } ).call
       end
 
       it "class / construct / inspect" do
-        x = once[].new moo: 'x1', mar: 'x2'
-        ( SANDBOX::Bingo == x.class ).should eql( true )
+        x = bingo_kls.new moo: 'x1', mar: 'x2'
+        ( Sandbox::Bingo == x.class ).should eql( true )
         x.inspect.should eql(
-          '#<Skylab::MetaHell::TestSupport::Proxy::SANDBOX::Bingo moo, mar>' )
+          '#<Skylab::MetaHell::TestSupport::Proxy::Sandbox::Bingo moo, mar>' )
         x.two.should eql( [ 'x1', 'x2' ] )
       end
     end
 
     context "with a subclass of a produced class" do
-      once = -> do
-        class SANDBOX::Fingo < MetaHell::Proxy::Nice::Basic.new :loo
+
+      define_sandbox_constant :fingo_kls do
+        class Sandbox::Fingo < MetaHell::Proxy::Nice::Basic.new :loo
           attr_reader :liu
           def initialize liu
             @liu = liu
           end
         end
-        k = SANDBOX::Fingo
-        ( once = -> { k } ).call
       end
 
       it "construct / class / inspect" do
-        foo = once[].new loo: 'y'
-        ( SANDBOX::Fingo == foo.class ).should eql( true )
+        foo = fingo_kls.new loo: 'y'
+        ( Sandbox::Fingo == foo.class ).should eql( true )
         foo.inspect.should eql(
-          '#<Skylab::MetaHell::TestSupport::Proxy::SANDBOX::Fingo loo>' )
+          '#<Skylab::MetaHell::TestSupport::Proxy::Sandbox::Fingo loo>' )
         foo.liu.should eql( 'y' )
       end
     end

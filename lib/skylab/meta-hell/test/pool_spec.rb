@@ -2,25 +2,32 @@ require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::Pool
 
-  ::Skylab::MetaHell::TestSupport[ self ]
+  ::Skylab::MetaHell::TestSupport[ Pool_TestSupport = self ]
+
+  ::Skylab::TestSupport::Sandbox::Host[ self ]
+
+  module CONSTANTS::Sandbox
+  end
 
   include CONSTANTS
 
+  MetaHell = MetaHell
+  Sandbox = Sandbox
+
   extend TestSupport::Quickie
 
-  module SANDBOX
-
-  end
-
-  MetaHell = MetaHell
-
   describe "#{ MetaHell }::Pool" do
+
+    extend Pool_TestSupport
+
     context "'s block form" do
 
       context "uses the same objects, kept in a pool, for each block" do
 
-        klass = -> do
-          class SANDBOX::Wat
+        define_sandbox_constant :wat_kls do
+
+          class Sandbox::Wat
+
             MetaHell::Pool.enhance( self ).with_with_instance
 
             count = 0
@@ -40,14 +47,13 @@ module Skylab::MetaHell::TestSupport::Pool
 
             attr_reader :count
           end
-          ( klass = -> { SANDBOX::Wat } ).call
         end
 
         # we see that new objects are created as they are needed, and
         # that the pool is used as a stack.
 
         it "we see that the pool is used as a stack" do
-          kls = klass[]
+          kls = wat_kls
 
           kls.with_instance do |o|
             o.count.should eql( 1 )
@@ -70,7 +76,7 @@ module Skylab::MetaHell::TestSupport::Pool
             end
           end
 
-          SANDBOX::Wat.cwc_a.should eql( [ 1, 2, 1, 3, 2, 1 ] )
+          Sandbox::Wat.cwc_a.should eql( [ 1, 2, 1, 3, 2, 1 ] )
         end
       end
     end
@@ -79,7 +85,7 @@ module Skylab::MetaHell::TestSupport::Pool
 
       it "uses `lease` and `release` to yield the same objects from a pool" do
 
-        class SANDBOX::How
+        class Sandbox::How
           count = 0
           MetaHell::Pool.enhance( self ).with_lease_and_release -> do
             o = new( count += 1 )
@@ -100,7 +106,7 @@ module Skylab::MetaHell::TestSupport::Pool
           end
         end
 
-        kls = SANDBOX::How
+        kls = Sandbox::How
 
         o1 = kls.lease
         o1.say.should eql( "i am the 1th nerk which came after 0" )

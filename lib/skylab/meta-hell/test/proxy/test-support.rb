@@ -4,6 +4,15 @@ module Skylab::MetaHell::TestSupport::Proxy
 
   ::Skylab::MetaHell::TestSupport[ Proxy_TestSupport = self ]
 
+  ::Skylab::TestSupport::Sandbox::Host[ self ]
+
+  module Sandbox
+  end
+
+  module CONSTANTS
+    Sandbox = Sandbox
+  end
+
   include CONSTANTS
 
   extend TestSupport::Quickie  # brash

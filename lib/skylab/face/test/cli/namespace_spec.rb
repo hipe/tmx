@@ -7,7 +7,7 @@ module Skylab::Face::TestSupport::CLI::Namespace
   include CONSTANTS
 
   module CONSTANTS
-    SANDBOX = CLI_TestSupport::SANDBOX  # please be careful
+    Sandbox = CLI_TestSupport::Sandbox  # please be careful
   end
 
   extend TestSupport::Quickie
@@ -17,7 +17,7 @@ module Skylab::Face::TestSupport::CLI::Namespace
     extend Namespace_TestSupport
 
     it "the `namespace` \"macro\" needs 1 arg" do
-      kls = SANDBOX.produce_subclass
+      kls = Sandbox.produce_subclass
       -> do
         kls.class_exec do
           namespace
@@ -26,7 +26,7 @@ module Skylab::Face::TestSupport::CLI::Namespace
     end
 
     it "(note you don't have to add a block or mod, it will bork later)" do
-      kls = SANDBOX.produce_subclass
+      kls = Sandbox.produce_subclass
       kls.class_exec do
         namespace :foo
       end

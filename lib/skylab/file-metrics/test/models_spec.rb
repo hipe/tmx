@@ -1,18 +1,11 @@
 require_relative 'test-support'
 
 module Skylab::FileMetrics::TestSupport::Models
+
   ::Skylab::FileMetrics::TestSupport[ Models_TestSupport = self ]
 
-  module SANDBOX
-    -> do
-      last_id = 0
-      define_singleton_method :kls do |x|
-        const_set "KLS_#{ last_id += 1 }", x
-      end
-      class << self
-        alias_method :kiss, :kls
-      end
-    end.call
+  module Sandbox
+    ::Skylab::TestSupport::Sandbox.enhance( self ).kiss_with 'KLS_'
   end
 
   include CONSTANTS
@@ -30,12 +23,12 @@ module Skylab::FileMetrics::TestSupport::Models
     extend MetaHell::Let
 
     let :klass do
-      Models_TestSupport::SANDBOX.kls get_with_klass.call
+      Models_TestSupport::Sandbox.kiss get_with_klass.call
     end
   end
 
   module InstanceMethods
-    SANDBOX = SANDBOX
+    Sandbox = Sandbox
     def klass
       self.class.klass
     end
@@ -110,9 +103,9 @@ module Skylab::FileMetrics::TestSupport::Models
         kls1 = ::Class.new(
           FileMetrics::Model::Node::Structure.new :foo, :bar )
 
-        SANDBOX.kiss kls1
+        Sandbox.kiss kls1
 
-        kls2 = SANDBOX.kiss( kls1.subclass :wing, :wang )
+        kls2 = Sandbox.kiss( kls1.subclass :wing, :wang )
 
         kls2.members.should eql( [ :foo, :bar, :wing, :wang ] )
 

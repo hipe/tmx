@@ -4,36 +4,33 @@ module Skylab::Basic::TestSupport::Field::Reflection
 
   ::Skylab::Basic::TestSupport::Field[ Reflection_TestSupport = self ]
 
+  module CONSTANTS::Sandbox
+  end
+
   include CONSTANTS
 
   extend TestSupport::Quickie
 
-  module SANDBOX
-  end
-
   Basic = Basic
+  Sandbox = Sandbox
 
   describe "#{ Basic::Field }::Reflection enhancement" do
 
     extend Reflection_TestSupport
 
-    def sandbox_module
-      SANDBOX
-    end
-
     context "what about this.." do
 
-      sandbox :Kls_0 do
+      define_sandbox_constant :Kls_0 do
 
-        module SANDBOX::Mod_0_
+        module Sandbox::Mod_0_
           Basic::Field::Box.enhance self do
             meta_fields [ :required, :reflective ], :list, [ :rx, :property ]
             fields [ :email, :required, :rx, /x/], :name
           end
         end
 
-        class SANDBOX::Kls_0
-          Basic::Field::Reflection.enhance( self ).with SANDBOX::Mod_0_
+        class Sandbox::Kls_0
+          Basic::Field::Reflection.enhance( self ).with Sandbox::Mod_0_
         end
       end
 

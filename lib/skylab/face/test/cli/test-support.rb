@@ -3,6 +3,7 @@ require 'skylab/test-support/core'
 require 'skylab/headless/test/test-support'
 
 module Skylab::Face::TestSupport
+
   ::Skylab::TestSupport::Regret[ self ]
 
   module CONSTANTS
@@ -26,8 +27,10 @@ module Skylab::Face::TestSupport::CLI
 
   extend TestSupport::Quickie
 
-  module SANDBOX
+  module Sandbox
   end
+
+  TestSupport::Sandbox.enhance( Sandbox ).produce_subclasses_of -> { Face::CLI }
 
   module ModuleMethods
 
@@ -69,22 +72,11 @@ module Skylab::Face::TestSupport::CLI
     end.call
 
     let :client_class do
-      kls = sandbox_module.produce_subclass
+      kls = Sandbox.produce_subclass
       get_with_body or raise "sanity - `with_body { .. }` expected"
       kls.class_exec(& get_with_body )
       kls
     end
-
-    def sandbox_module
-      SANDBOX
-    end
-
-    -> do
-      last_id = 0
-      SANDBOX.define_singleton_method :produce_subclass do
-        const_set "KLS_#{ last_id += 1 }", ::Class.new( Face::CLI )
-      end
-    end.call
 
     def as sym, rx, modifier, strm=:err
       as = Whereby.new( sym, rx, modifier, strm ).freeze

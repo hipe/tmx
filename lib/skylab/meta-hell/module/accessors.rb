@@ -14,31 +14,11 @@ module Skylab::MetaHell
           if instance_variable_defined? ivar
             instance_variable_get ivar
           else
-            path_a = self.class.name.split '::'
-            delt_a = path.split '/'
-            while part = delt_a.shift
-              if '..' == part
-                path_a.pop
-              else
-                path_a.push part
-              end
+            mod = FUN.resolve[ self.class, path ]
+            if extend_blk
+              mod.module_exec( & extend_blk )  # future i am sorry
             end
-            modul = path_a.reduce ::Object do |m, s|
-              if m.const_defined? s, false
-                m.const_get s, false
-              elsif m.const_probably_loadable? s  # etc
-                mod = m.const_get s, false
-                if extend_blk
-                  mod.module_exec( & extend_blk )  # future i am sorry
-                end
-                mod
-              elsif create_blk
-                m.const_set s, create_blk.call
-              else
-                m.const_get s, false  # trigger the error, presumably
-              end
-            end
-            instance_variable_set ivar, modul
+            instance_variable_set ivar, mod
           end
         end
 
@@ -50,6 +30,31 @@ module Skylab::MetaHell
       end )
       cnd.instance_exec( & enhance_blk  )
       nil
+    end
+
+    o = { }
+
+    o[:resolve] = -> mod, path do
+      path_a = mod.name.split '::'
+      delt_a = path.split '/'
+      while part = delt_a.shift
+        if '..' == part
+          path_a.pop
+        else
+          path_a.push part
+        end
+      end
+      path_a.reduce ::Object do |m, s|
+        if m.const_defined? s, false
+          m.const_get s, false
+        elsif m.const_probably_loadable? s  # etc
+          m.const_get s, false
+        elsif create_blk
+          m.const_set s, create_blk.call
+        else
+          m.const_get s, false  # trigger the error, presumably
+        end
+      end
     end
 
     class Conduit_
@@ -86,5 +91,7 @@ module Skylab::MetaHell
         nil
       end
     end
+
+    FUN = ::Struct.new( * o.keys ).new( * o.values )
   end
 end

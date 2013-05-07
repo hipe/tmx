@@ -14,14 +14,6 @@ module Skylab::FileMetrics::TestSupport::CLI
 
     include CONSTANTS
 
-    def sandbox_module
-      # (we aren't in the business of producing modules (we aren't DSL-y, we
-      # are a subproduct) so we don't need a sandbox module to populate with
-      # generated nerks. Make sure we don't accidentally use the auxiliary
-      # version of this method because it would populate a sandbox in a
-      # strange module (the alternative would be too overwrought).
-    end
-
     def client_class
       FileMetrics::CLI
     end

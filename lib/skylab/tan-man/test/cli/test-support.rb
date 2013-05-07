@@ -24,7 +24,7 @@ module Skylab::TanMan::TestSupport::CLI
     include MetaHell::Class::Creator::InstanceMethods
 
     def meta_hell_anchor_module
-      CLI_TestSupport::SANDBOX
+      CLI_TestSupport::Sandbox
     end
 
     let :action do
@@ -54,7 +54,7 @@ module Skylab::TanMan::TestSupport::CLI
     end
   end
 
-  module SANDBOX
+  module Sandbox
     # do not touch! (we got bit before when we had `Actions` both as a module
     # here and in tests doh!)
   end
