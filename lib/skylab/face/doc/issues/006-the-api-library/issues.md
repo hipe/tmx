@@ -1,2 +1,5 @@
-#002       #doc-point the api action class normalizer instance method ..
-#001       #doc-point (normaliztion API for now documented in api/client.rb )
+#005       #placeholder - api action lifecycle point: `execute`
+#004       #placeholder - api action lifecycle point: `normalize`
+#003       #placeholder - api action lifecycle point: `resolve_services`
+#002       #placeholder - api action lifecycle point: `handle_events`
+#001       #placeholder - api action lifecycle point: `new`

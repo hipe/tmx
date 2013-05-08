@@ -160,7 +160,7 @@ module Skylab::Face
     # `normalization_failure_line`, which the API Action subclass could
     # do by declaring that it emits an event of the same name..)
     #
-    # (but see notes at [#fa-api-001] - this is exploratory! NOTE almost
+    # (but see notes at [#fa-api-004] - this is exploratory! NOTE almost
     # guaranteed to change!)
     #
     # (and we also roll `required` into it, which is like a subset of

@@ -100,7 +100,7 @@ module Skylab::Face
         obj_if_yes, if_no
     end
 
-    #    ~ *experimental* API action normalization API [#fa-api-001:] ~
+    #    ~ *experimental* API action normalization API [#fa-api-004] ~
     #
     # give the API action a chance to run normalization (read: validation)
     # hooks before executing. note we want the specifics of this out of
@@ -124,7 +124,7 @@ module Skylab::Face
     # want to pass a `y` to write to, but we have this nice pub-sub thing
     # built out already..)
     #
-    # (with the above said, please see [#fa-api-002] for more details)
+    # (with the above said, please see [#fa-api-004] for more details)
 
     def normalize action
       y = action.instance_exec do  # emitting call below might be private
