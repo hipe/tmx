@@ -73,11 +73,17 @@ module Skylab::Snag
       @tmpdir_pathname = nil
     end
 
+    # when you are editing a file in vi, it will always append a "\n" to the
+    # last line if there was not one already. we hence follow suit here, when
+    # rewriting the manifest. however the below logic is left in commented-out
+    # ghost form in case we ever want to change it back..
+
     write_f = -> fh do
-      sep = nil
+      # sep = nil
       -> line do
-        fh.write "#{ sep }#{ line }"
-        sep ||= "\n" # meh [#020]
+        # fh.write "#{ sep }#{ line }"
+        # sep ||= "\n" # meh [#020]
+        fh.write "#{ line }\n"
         nil
       end
     end

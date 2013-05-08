@@ -50,8 +50,7 @@ module Skylab::CodeMolester::Config::File::Entity
       end
 
       def register_for_config_services
-        Face::Model.enhance( @target ).services %i|
-
+        Face::Model.enhance( @target ).service_names %i|
           configs
           config
         |

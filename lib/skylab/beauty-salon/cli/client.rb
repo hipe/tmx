@@ -5,7 +5,7 @@ module Skylab::BeautySalon
     Plugin_Host_ = MetaHell::Enhance::Conduit.new :ostream, :estream
     class Plugin_Host_
       Services::Headless::Plugin::Host.enhance self do
-        services :ostream, :estream  # api actions can write directly
+        service_names %i| ostream estream |  # api actions can write directly
       end
     end
 

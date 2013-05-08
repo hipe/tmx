@@ -12,6 +12,14 @@ module Skylab::Face
 
   extend MAARS
 
+  module API
+    extend MAARS
+    def self.[] mod
+      const_get( :Client, false )._enhance mod
+      nil
+    end
+  end
+
   module Services
 
     extend MAARS

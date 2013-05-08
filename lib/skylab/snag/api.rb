@@ -17,6 +17,7 @@ module Skylab::Snag
   end
 
   class API::Client
+
     include Snag::Core::SubClient::InstanceMethods
 
     @setup = nil                  # experimental hackery for .. well ..

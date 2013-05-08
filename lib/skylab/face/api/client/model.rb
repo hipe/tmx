@@ -1,0 +1,62 @@
+module Skylab::Face
+
+  module API::Client::Model
+
+    # having these model facilities is opt-in, and for now activated by sending
+    # `enhance_model_enhanced_api_client` to your API Client class.
+
+  end
+
+  module API::Client::Model::InstanceMethods
+
+    def model *x_a
+      model_manager.aref x_a
+    end
+    private :model
+
+    def model_manager
+      @model_manager ||= begin
+        Face::Model::Manager.new models_module, self
+      end
+    end
+    private :model_manager
+
+    MetaHell::Module::Accessors.enhance( self ).
+        private_module_reader( :models_module, '../../Models' ) do
+      extend MetaHell::Boxxy  # re-affirmable
+    end
+
+    # `plugin_host_proxy_aref` - part of our underlying plugin API -
+    # this is what implements calls to `host[]` from e.g inside the
+    # models.
+    #
+    # (note that `_plugin_story` is ignored because we do not validate
+    # access - we do not require that plugins (e.g models) declare what
+    # models they want to access, with the reasoning that it will be
+    # clunky to need to list every name of every model that every other
+    # model wants access to, but this may change.
+    #
+    # on this subject, this is related to why we don't have pretty
+    # accessor methods for the model names, (e.g we have `host[:config]`, not
+    # `host.config`) so we do not need to eager load our entire model.)
+
+    def plugin_host_proxy_aref x_a, _plugin_story
+      model_manager.aref x_a
+    end
+
+    # `has_model_instance` - called from host proxy - a service we expose to
+    # model clients - note the signature change.
+
+    def has_model_instance * model_ref_a
+      @model_manager.has_instance model_ref_a
+    end
+
+    # `set_new_valid_model_instance` - NOTE signuature might change
+    # this is a service used by clients that employ the face API model API
+
+    def set_new_valid_model_instance( ( * model_ref_a ), init_blk, obj_if_yes, if_no )
+      @model_manager.set_new_valid_instance model_ref_a, init_blk,
+        obj_if_yes, if_no
+    end
+  end
+end

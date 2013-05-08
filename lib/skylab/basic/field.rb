@@ -46,7 +46,7 @@ class Skylab::Basic::Field
   class Flusher_
 
     def initialize host_mod, box_kls
-      @metafield_a = [ ] ; @field_a = [ ]
+      @metafield_a = [ ] ; @field_a = nil
       @target = host_mod ; @box_kls = box_kls
     end
 
@@ -56,7 +56,7 @@ class Skylab::Basic::Field
     end
 
     def concat_fields a
-      @field_a.concat a
+      ( @field_a ||= [ ] ).concat a
       nil
     end
 
@@ -69,6 +69,7 @@ class Skylab::Basic::Field
 
       n_meta_resolver = N_Meta_Resolver_.new
 
+      field_a ||= [ ]  # one day we might try to skip over empty field box..
       n_meta_resolver.push field_a, -> x do
         @target.const_set :FIELDS_, x
       end
@@ -143,7 +144,7 @@ class Skylab::Basic::Field
         box.each do |fld|
           fld.enhance self
         end
-        def initialize( (*x_a), depth )
+        def initialize( (*x_a), depth=1 )
           super( * x_a[ 0..0 ] )
           if 1 < x_a.length
             scn = Basic::List::Scanner[ x_a ]

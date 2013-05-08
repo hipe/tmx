@@ -15,7 +15,7 @@ module ::Skylab::PubSub::TestSupport::Emitter
       context 'gives your class an "emits" method which:' do
 
         it "your class responds to it" do
-          klass.singleton_class.protected_method_defined?( :emits ).
+          klass.singleton_class.private_method_defined?( :emits ).
             should eql( true )
         end
 

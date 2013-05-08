@@ -5,7 +5,7 @@ module Skylab::Cull
     params [ :path, :field, :required ],
            [ :is_dry_run, :option ]
 
-    services :configs
+    services :configs, [ :pth, :ingest ]
 
     emits :before, :after, :all, couldnt_event: :entity_event
 
@@ -16,7 +16,7 @@ module Skylab::Cull
         before: method( :before ),
         after: method( :after ),
         all: method( :all ),
-        pth: pth
+        pth: @pth
     end
   end
 end

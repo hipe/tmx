@@ -2,205 +2,149 @@ module Skylab::Face
 
   class API::Action
 
-    # experiments in a value-added API action base class with value
-    # propositions for the big dream..
-
-    # `initialize` - experimentally we do a strict unpacking of
-    # `param_h`, setting corresponding ivars. this might easily
-    # fall over one day..
+    # this API::Action base class reifies the API API so that in your API
+    # Action you can focus on your business logic and let everything else fit
+    # together like magical greased lego's.
     #
-    # (note that *after* `initialize` and before `execute` we still
-    # expect a call to `normalize`!)
+    # everthing is of course experimental; but note it is a very designed,
+    # thought-out experiment, with both eyes focused squarely on the big dream.
 
-    def initialize client_x, param_h
-      init client_x  # for fun we experiemnt with `prepend` and initting
-                     # the different facets.. NOTE we do not keep a handle
-                     # on it ourselves, to keep things interesting.
-      miss_a = self.class.param_a.dup ; par_h = self.class.param_h
+    # the lifecycle of the API Action happens thusly (ignoring how we got
+    # to an API Action instance for a moment):
+    #
+    # [_this_state_] -> `will_receive_this_message` -> [_and_go_to_this_state_]
+    #
+    #     [primordial] --o          just been created. no ivars at all (as far
+    #                     \         as this API knows). is is probably right
+    #                      \        after a call to `new`     [#fa-api-001]
+    #                       \
+    #                        o->  `handle_events`             [#fa-api-002]
+    #                         /
+    #     [wired]      <-----o      things subscribe to listen to its events:
+    #                  -o           now it has some @event_listeners.
+    #                    \
+    #                     o--->   `resolve_services`          [#fa-api-003]
+    #                        /
+    #     [plugged-in]  <---o        now it may have a @plugin_story and a
+    #                   -o           @plugin_host_proxy, (and/or aribtrary
+    #                     \          ivars if you are using `ingest`..))
+    #                      \
+    #                       o-->  `normalize`                 [#fa-api-004]
+    #                         /
+    #     [executable]  <----o       now basic normalization has been done
+    #                   -o           with parameters, that is, everything that
+    #                     \          can reasonably be done "declaratively"
+    #                      \         (think DSL) instead of imperatively.
+    #                       \        arbitrary business ivars set now.
+    #                        \
+    #                         o-> `execute`                   [#fa-api-005]
+    #                          /
+    #                         /      we now run this method that you wrote,
+    #                        /       with your business logic in it.
+    #     [executed]    <---o        probably we are done with the action now.
+    #
+    # The sequence of the steps above is based (perhaps aesthetically and/or
+    # arbitrarily) on the notion that each successive state might depend on the
+    # state before it: executing of course happens at the end, normalization
+    # may require services, resolving services (and, more likely normalizing)
+    # may require that the action has event listeners wired to it. wiring event
+    # listeners requires nothing.
+    #
+    # Each of these steps may also have corresponding DSL-ish facets that this
+    # class reveals (namely, `emits`, `services` and `params`) which we present
+    # below in the corresponding order and inline with the corresponding
+    # instance method (callbacks) enumerated above. So, any time you wonder
+    # where you might find something here, think to the lifecycle first. yay.
+    #
+    # we break this into numbered sections corresponding to the lifecycle
+    # point. there is for now no "section 1" because we are avoiding
+    # implementing an `initialize` here, wanting to leave that wide open for
+    # the client, which we will one day document at [#fa-api-001].
+    # there will be no "section 5" because that is for you to write.
 
-      param_h.each do |k, v|  # ([#fa-el-003)
-        idx = par_h[ k ] or fail "sanity - default_proc?"
-        miss_a[ idx ] = nil
-        instance_variable_set :"@#{ k }", v
-      end
-      miss_a.compact!
-      miss_a.length.nonzero? and raise ::ArgumentError, "missing #{
-        }argument(s) - (#{ miss_a.map( & :to_s ) * ', ' })"
-      nil
+    #                       ~ events (section 2) ~
+
+    mutex = MetaHell::Module.mutex  # (we frequently want the facet-y DSL
+    # calls to be processed atomic-ly, monadic-ly, er: zero or once each;
+    # for ease of implementation. can be complexified as needed.)
+
+    def self.taxonomic_streams *a, &b
+      API::Action::Emit[ self, :taxonomic_streams, a, b ]
     end
 
-    # `init` - this is provided experimentally as a hook for sub-facet
-    # modules to chain over using `prepend`
-    def init _client_x
-      # (in case you ever put anything here, please not that it will
-      # (hopefully) be called after any facets have run..)
+    def self.emits *a, &b
+      API::Action::Emit[ self, :emits, a, b ]
     end
-    private :init
 
-    #         ~ params related declaration & processing ~
+    #                      ~ services (section 3) ~
 
-    # `self.param_a`, `self.param_h` - hacky simple parameter validation
-    # (the below are defaults for when they are not set explicitly)
-
-    -> do  # `param_a`, `param_h`
-      empty_a = [ ].freeze
-      define_singleton_method :param_a do empty_a end
-      define_singleton_method :param_h do
-        @param_h ||= ::Hash.new do |h, k|
-          raise "undeclared parameter - #{ k }. (none were declared for #{
-            }this action (#{ self }). declare some with `params` ?)"
-        end.freeze
-      end
-    end.call
-
-    # `self.params` - hacky simple parameter validation with a
-    # rabbit hole to somewhere else .. NOTE #experimental hack
-
-    define_singleton_method :params, &
-        MetaHell::FUN.module_mutex[ ->( * param_a ) do
-      if param_a.first.respond_to? :each_index
-        param_a = API::Action::Param::Flusher[ param_a, self ]
-      end
-      no = param_a.detect { |x| ! ( ::Symbol === x ) }
-      no and raise "invalid `params` value - #{ no.inpect } (if you meant #{
-        }to use meta-fields, for now the first tuple has to be an array)"
-      param_a.freeze
-      param_h = ::Hash[ param_a.each.with_index.to_a ]
-      param_h.default_proc = -> h, k do
-        raise "undeclared parameter - #{ k } for #{ self }. #{
-          }(add it to the list at the existing `params` macro?)"
-      end
-      param_h.freeze
-      define_singleton_method :param_a do param_a end
-      define_singleton_method :param_h do param_h end
-    end, :params ]
-
-
-    #         ~ request-time paramater management ~
-
-    # `pack_fields_and_options` - #experimentally many methods in the
-    # entity library take the "sacred four" parameters [#fa-el-001].
-    # freqently requests coming in from the client will munge the
-    # two namespaces (one of business-level fields, (e.g "email") and the
-    # other of controller-level options (e.g `verbose`), however the
-    # entity library insists on more rigidity and structure than this.
-
-    # experimentally your API actions defines parameters (a.k.a fields)
-    # using meta-fields that tag meta-info about each field, e.g whether
-    # the field is a "field" field or an "option" field.
-
-    # So, of each field in this field box reflector, along the categories of:
-    #   `field` and `option`,
-    # when each field falls into one (or more wtf) of these two categories
-    # one hash is made for each category, with its names being the field
-    # name and its values being the field's values.
-    # result is always an array of two hashes.
-
-    -> do
-      a = %i( field option )
-      define_method :pack_fields_and_options do
-        h = ::Hash[ a.map { |k| [ k, { } ] } ]
-        ks = h.keys
-        fields_bound_to_ivars.each do |bf|
-          ks.each do |k|
-            if bf.field[ k ]
-              h.fetch( k )[ bf.field.normalized_name ] = bf.value
-            end
-          end
-        end
-        a.map { |k| h.fetch k }
-      end
-    end.call
-
-    #     ~ *experimental* plugin-like services declaration macro here ~
-
-    define_singleton_method :services, & MetaHell::FUN.module_mutex[ ->(*x_a) do
-
-      API::Action::Service::Flusher.new( self, x_a ).flush
-
+    define_singleton_method :services, & mutex[ -> *a do
+      API::Action::Service::Flusher.new( self, a ).flush
     end, :services ]
 
-    #         ~ *experimental* event wiring facilities up here ~
+    #                ~ parameters & normalization (section 4) ~
 
-    extend Face::Services::PubSub::Emitter
-      # child classes define the event stream graph.
+    o = { }
 
-    public :on, :with_specificity  # from emitter above, hosts like these public
+    # `normalize` - specified in sibling file `client.rb` [#fa-api-004].
+    #
+    # i.e iff normalization failure, write to `y` and result in result.
+    # beyond that:
+    #   + we mutate `param_h`
 
-    class << self
-      alias_method :_face_original_emits, :emits  # #todo
-    end
+    o[:normalize] = -> y, param_h do
+      a = [ ]  # ( break down as needed )
 
-    define_singleton_method :emits, & MetaHell::FUN.module_mutex[ ->( *a ) do
-      _face_original_emits( *a )
-      @event_stream_graph.names.each do |i|
-        define_method i do |x|
-          emit i, x
-          nil
+      a << -> par_h do
+        miss_a = nil
+        field_box.each do |nn, fld|
+          instance_variable_defined? fld.as_host_ivar and fail "sanity - #{
+            } ivar collision: #{ fld.as_host_ivar }"
+          v = ( par_h.delete nn if par_h and par_h.key? nn )
+          instance_variable_set fld.as_host_ivar, v
+          ( miss_a ||= [] ) << fld if fld.is_required and v.nil?
+        end
+        if par_h and par_h.length.nonzero?
+          y << "undeclared parameter(s) - (#{ par_h.keys * ', ' }) for #{
+            }#{ self.class }. (declare it/them with `params` macro?)"
+          break true, false
+        end
+        if miss_a
+          y << "missing required parameter(s) - (#{
+            }#{ miss_a.map( & :normalized_name ) * ', ' }) for #{ self.class }."
+          break true, false
         end
       end
-      nil
-    end, :emits ]
 
-    #                ~ *experimental* normalization api ~
-    #
-    # this API action can assume to receive a call to this `normalize`
-    # method right before the *mode* client would send `execute` to this
-    # receiver. the caller assumes that this receiver will call either
-    # `if_yes` or `if_no` in a monadic mutex fashion (it assumes this
-    # receiver will call one of the two, and exactly once), and as the
-    # result of this call.
-    #
-    # experimentally the API client provides us with the `y` as a future-
-    # proof-y yielder to write (via `<<`) messages about normalization
-    # (e.g validation) failure. For even more tangle, we can call
-    # `y.count` to see how many times we called it!
-    #
-    # (for now, using `y` necessitates that this receiver respond to
-    # `normalization_failure_line`, which the API Action subclass could
-    # do by declaring that it emits an event of the same name..)
-    #
-    # (but see notes at [#fa-api-004] - this is exploratory! NOTE almost
-    # guaranteed to change!)
-    #
-    # (and we also roll `required` into it, which is like a subset of
-    # normalization?)
-
-    def normalize y, call_if_yes, result_if_no
-      ok = true
-      begin
-        has_field_box or break  # some don't opt-in
-        field_box.each do |nn, fld|  # sneak this in, too
-          if fld.is_required
-            if instance_variable_get( fld.as_host_ivar ).nil?
-              y << "needs to know \"#{ nn }\""   # #todo labels
-              next
-            end
-          end
-          fld.has_normalizer or next
-          n_x = fld.get_normalizer
-          if true == n_x
-            n_x = method :"normalize_#{ fld.normalized_name }"
-          end
-          x1 = instance_variable_get fld.as_host_ivar  #eew
-          instance_exec y, x1, -> x2 do
-            instance_variable_set fld.as_host_ivar, x2
-            nil
-          end, & n_x
-        end
-        y.count.zero? and break
-        ok = false
-      end while nil
-      if ok
-        call_if_yes[]
-      else
-        result_if_no[ false ]  # my exit status - build down when needed.
+      a.reduce param_h do |r, f|
+        b, r = instance_exec r, & f
+        b and break r
+        r
       end
     end
 
-    def has_field_box
-      false  # gets overridden by Basic::Field::Reflection::InstanceMethods
-    end
-    private :has_field_box
+    define_method :normalize, & o[:normalize]  # public.
+
+    -> do  # `field_box`          # here because it goes with normalize above.
+      empty_field_box = Services::Basic::Field::Box.new.freeze
+      define_method :field_box do empty_field_box end
+      private :field_box
+    end.call
+
+    # `self.params` - rabbit hole .. er "facet" [#fa-el-002]
+
+    define_singleton_method :params, & mutex[ ->( * a ) do
+                                  # here because it goes with normalize above.
+      if a.length.nonzero?        # otherwise, same as empty box defined above.
+        if ! a.index { |x| ::Symbol != x.class }  # if it is a flat list of
+          a.map! { |x| [ x, :required ] }  # names, that is shorthand for this.
+        end
+        API::Action::Param::Flusher[ a, self ]
+        nil
+      end
+    end, :params ]
+
+    FUN = ::Struct.new( * o.keys ).new( * o.values )
+
   end
 end

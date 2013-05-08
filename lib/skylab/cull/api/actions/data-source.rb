@@ -8,7 +8,7 @@ module Skylab::Cull
 
     params  # no params
 
-    services :model
+    services :model, [ :pth, :ingest ]
 
     emits :payload_line, couldnt: :entity_event
 
@@ -29,7 +29,7 @@ module Skylab::Cull
            [ :tag_a,      :field  ],
            [ :is_dry_run, :option ]
 
-    services :model
+    services :model, [ :pth, :ingest ]
 
     emits  :before, :after, :all,
       could: :entity_event, couldnt: :entity_event
@@ -43,7 +43,7 @@ module Skylab::Cull
         before: method( :before ),
         after: method( :after ),
         all: method( :all ),
-        pth: pth
+        pth: @pth
     end
   end
 end

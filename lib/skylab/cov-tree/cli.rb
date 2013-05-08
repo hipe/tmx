@@ -22,7 +22,7 @@ module Skylab::CovTree
 
     define_method :escape_path, & Headless::CLI::PathTools::FUN.pretty_path # yay
 
-    extend PubSub::Emitter  # do this before you extend legacy, it give you
+    extend PubSub::Emitter  # do this before you extend legacy, it gives you
                             # a graph
   public
 

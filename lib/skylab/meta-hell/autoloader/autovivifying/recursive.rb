@@ -4,7 +4,7 @@ module Skylab::MetaHell
     def self.extended mod
       mod.module_exec do
         extend Autoloader_::Methods
-        @tug_class = Autoloader::Autovivifying::Recursive::Tug
+        @tug_class ||= Autoloader::Autovivifying::Recursive::Tug # multi-entrant
         init_autoloader caller[2]  # the location of the call to `extend` !
       end
     end
@@ -45,6 +45,40 @@ module Skylab::MetaHell
         end
       end
       true  # (in case we ever fail gracefully, future-proof it)
+    end
+  end
+
+  module Autoloader::Autovivifying::Recursive::Upwards
+
+    # turn a module and each of its not-yet enhanced parent modules into a
+    # MAARS module. This works provided that it eventually hits a module that
+    # responds to `dir_pathname` and responds with true-ish.
+    #
+    # (note we can *not* assume that "having"/"knowing" the `dir_pathname`
+    # is isomorphic with `respond_to?` `dir_pathname` - in real life there are
+    # times when the one is true but not the other so we must check for both.)
+    #
+    # #multi-entrant
+
+    def self.[] mod
+      stack_a = [ ]
+      while ! ( mod.respond_to? :dir_pathname and mod.dir_pathname )
+        stack_a.push mod
+        _mod = MetaHell::Module::Accessors::FUN.resolve[ mod, '..' ]
+        _mod or raise "can't - rootmost module (::#{ mod }) has no dir_pathname"
+        mod = _mod
+      end
+      while mod_ = stack_a.pop
+        n = mod_.name
+        mod_.module_exec do
+          @dir_pathname = mod.dir_pathname.join(
+            ::Skylab::Autoloader::Inflection::FUN.
+              pathify[ n[ n.rindex( ':' ) + 1 .. -1 ] ] )
+          extend MAARS
+        end
+        mod = mod_
+      end
+      nil
     end
   end
 end

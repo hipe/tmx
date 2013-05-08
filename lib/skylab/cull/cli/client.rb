@@ -4,6 +4,10 @@ module Skylab::Cull
 
     include CLI::Namespace::InstanceMethods
 
+    Headless::Plugin::Host.enhance self do
+      service_names %i| pth |
+    end
+
     option_parser do |o|
       o.separator "#{ hi 'description:' } wanktasktic awesomeness"
 
@@ -38,8 +42,6 @@ module Skylab::Cull
       CLI::Actions::DataSource
     end, aliases: [ 'ds' ]
 
-  private
-
     def initialize( * )
       super
       @pth = -> pn do
@@ -51,15 +53,10 @@ module Skylab::Cull
       end
     end
 
-    def set_behaviors action
-      @action = action  # no
-      action.pth = @pth
-      nil
-    end
+    attr_reader :pth
+    private :pth
 
-    def pth
-      @pth  # for reading from model events
-    end
+  private
 
     def invoked( * )
       res = super

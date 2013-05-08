@@ -118,7 +118,8 @@ module Skylab::Porcelain::Legacy
 
         # pub-sub is opt-in hence the below conditional --
         # implement `emit` as u like.
-        if singleton_class.method_defined? :emits  # *not* r-espond_to
+        if singleton_class.private_method_defined? :emits or
+            singleton_class.method_defined? :emits  then # *not* r-espond_to
           class_exec(& event_graph_init )
         end
 

@@ -1,3 +1,4 @@
+[#010]       #doc-point - modality clients vs. modal clients..
 [#009] #hm   magic with allowing either CLI or CLI::Client for the client.
 [#008]       expression templates
 [#007]       #sub-node "the API library" #initials:`api` ..

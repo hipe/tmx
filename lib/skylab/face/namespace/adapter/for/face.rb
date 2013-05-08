@@ -14,17 +14,20 @@ module Skylab::Face
     end
 
     Ouroboros_Sheet = MetaHell::Proxy::Nice.new :slug, :options, :command_tree,
-      :default_argv
+      :default_argv, :fetch_element
 
     class Ouroboros_Sheet
       def self.[] inner, strange
-        new                slug: -> do strange.slug end,
+        new(               slug: -> do strange.slug end,
                         options: -> do inner.options end,
                    command_tree: -> do inner.command_tree end,
                    default_argv: -> do
                      strange.default_argv || inner.default_argv
-                   end
-
+                   end,
+                  fetch_element: -> *a, &b do
+                    inner.fetch_element( *a, &b )
+                  end,
+        )
       end
     end
   end

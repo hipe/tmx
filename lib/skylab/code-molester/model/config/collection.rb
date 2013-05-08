@@ -3,9 +3,9 @@ module Skylab::CodeMolester
   class Model::Config::Collection
 
     CodeMolester::Services::Face::Model.enhance self do
-      services %i|
-        has_instance
-        set_new_valid_instance
+      service_names %i|
+        has_model_instance
+        set_new_valid_model_instance
         config_filename
         config_file_search_num_dirs
         config_file_search_start_pathname
@@ -27,13 +27,13 @@ module Skylab::CodeMolester
       config = nil
       alt = [
         -> {
-          if host.has_instance :config
+          if host.has_model_instance :config
             raise "sanity - won't create when a cached config exists."  # #todo
           end },
         -> {
           path, = unpack_equal field_h, :path
           pn = ::Pathname.new( path ).join( host.config_filename )
-          config = host.set_new_valid_instance :config,
+          config = host.set_new_valid_model_instance :config,
             -> st { st.pathname = pn },
             -> c  { c },
             nil  # sets no error handler #todo
@@ -102,11 +102,11 @@ module Skylab::CodeMolester
     end
 
     def if_config yes, no
-      if host.has_instance :config then yes[ ]
+      if host.has_model_instance :config then yes[ ]
       else
         find_nearest_config_file_path( nil, nil,
           -> found_pn do
-            host.set_new_valid_instance :config, -> c do
+            host.set_new_valid_model_instance :config, -> c do
               c.pathname = found_pn
             end, yes, no
           end,

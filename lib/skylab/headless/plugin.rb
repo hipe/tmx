@@ -48,7 +48,7 @@ module Skylab::Headless
         -> m { story.add_available_plugins_box_module m },
         -> *a { story.add_ordinary_eventpoints a },
         -> *a { story.add_fuzzy_ordered_aggregation_eventpoints a },
-        -> *a { story.add_services a },
+        ->  a { story.add_service_names a },
         -> *a do
           ( dslify_svc_a ||= [ ] ).concat a.flatten
           story.add_services a
@@ -75,7 +75,7 @@ module Skylab::Headless
       add_plugins_box_module
       eventpoints
       fuzzy_ordered_aggregation_eventpoint
-      services
+      service_names
       services_dslified
       services_delegated_to
     |
@@ -126,25 +126,23 @@ module Skylab::Headless
 
     o = { }
 
-    o[:_add] = -> aa, h, a, builder=nil do
-      a = a[0] if 1 == a.length and a[0].respond_to? :each_index # allow 2 forms
+    o[:_add] = -> aa, h, a, builder=nil, do_normalize=true do
+      if do_normalize and 1 == a.length and a[0].respond_to? :each_index
+        a = a.fetch 0  # allow use of the 2 forms - e.g add_foo %i| bar baz |
+      end
       if builder
-        a.each do |i|
-          x = builder[ i ]
-          if h.key? i
-            xx = h.fetch i
-            if true != xx
-              fail "merge not yet implemented for #{ x.class }"
-            end
-          end
-          h[ i ] = x
+        a.each do |kx|
+          x = builder[ kx ]  # we don't splat it here
+          i = x.normalized_local_name
+          h.key? i and fail "merge not yet implemented for #{ x.class }"
           aa << i
+          h[ i ] = x
         end
       else
         a.each do |i|
           h.fetch i do
-            h[ i ] = true
             aa << i
+            h[ i ] = true
           end
         end
       end
@@ -161,6 +159,22 @@ module Skylab::Headless
     # ( experimentally we are ordering the below methods as grouped by per-axis,
     # writers then readers. but note that mutability is very much in flux
     # for stories. )
+
+    # (note very little of the story is internal. it is essentially a data
+    # conduit.)
+
+    def initialize host_module
+      @host_module = host_module
+      @available_plugins_box_a = [ ]
+      @eventpoint_a = [ ] ; @eventpoint_h = { }
+      @service_a = [ ] ; @service_h = { }
+    end
+
+    # `host_module_descriptor` - used in error message generation here
+
+    def host_module_descriptor
+      @host_module.name
+    end
 
     def add_available_plugins_box_module mod
       @available_plugins_box_a << [ :module_ref, mod ]
@@ -215,12 +229,10 @@ module Skylab::Headless
       end
     end  # is it better? [#bm-001]
 
-    # `add_services` and related (including readers)
-
-    def add_services a
+    def add_service_names a
       _add @service_a, @service_h, a, -> i do
         Plugin::Host::Service_[ i ]
-      end
+      end, false
     end
 
     def services_delegated_to sym, a
@@ -258,16 +270,6 @@ module Skylab::Headless
       res = @service_h.fetch svc do ok = false end
       if ok then yes[ res ] else no[ ] end
     end
-
-    # (note very little of the story is internal. it is essentially a data
-    # conduit.)
-
-    def initialize host_module
-      @host_module = host_module
-      @available_plugins_box_a = [ ]
-      @eventpoint_a = [ ] ; @eventpoint_h = { }
-      @service_a = [ ] ; @service_h = { }
-    end
   end
 
   module Plugin::Event
@@ -284,6 +286,8 @@ module Skylab::Headless
 
     attr_reader :name, :is_fuzzy, :is_ordered, :is_aggregation,
       :as_method_name
+
+    alias_method :normalized_local_name, :name
 
     -> do  # `initialize`
 
@@ -478,6 +482,7 @@ module Skylab::Headless
 
     # ( sadly this is actually the host application validating the
     # client application. also it is just a debugging feature. )
+
     def plugin_validate_client client, &b
       @plugin_manager.validate_client client, &b
     end
@@ -670,14 +675,16 @@ module Skylab::Headless
     # `validate_client` - experimental & for debugging
 
     def validate_client client, &err
-      miss_a = client.plugin_story.service_a.reduce [] do |m, svc|
-        m << svc if ! @story.has_service? svc
+      ev = client.plugin_story.service_a.reduce nil do |m, svc_i|
+        if ! @story.has_service? svc_i
+          m ||= Plugin::Service::NameEvent
+          m.add @host_application, client, svc_i
+        end
         m
       end
-      if miss_a.length.zero? then true else
-        err ||= -> msg { raise msg }
-        err[ "#{ @host_application.class } has not declared these #{
-          }services requested by #{ client.class } - #{ miss_a * ', ' }" ]
+      if ! ev then true else
+        err ||= -> e { raise instance_exec( & e.message_function ) }
+        err[ ev ]
       end
     end
 
@@ -714,6 +721,26 @@ module Skylab::Headless
     # should never need a handle on these services, so ignore that i said
     # that.)
 
+    extend MAARS  # (so we can load Plugin::Host::Services::Chain)
+
+    def initialize host_application   # assumes `Plugin` sub-mod of its class
+      @host_mod = host_application.class
+      @host_application = host_application
+      @story = host_application.plugin_host_story
+    end
+
+    # `has_service?` - used in validation elsewhere
+
+    def has_service? x
+      @story.has_service? x
+    end
+
+    # `host_descriptor` - used in error message generation elsewhere
+
+    def host_descriptor
+      @host_application.class.name
+    end
+
     # `build_host_proxy` - the client calls this in `load_plugin`.
     # this is how the plugin client typically accesses host services.
 
@@ -740,6 +767,7 @@ module Skylab::Headless
     # (one benefit of the former is that we get more helpful error messages
     # when we have an access error. on the other hand, the latter wouldn't
     # be so bad when you look at how we are doing it anyway below..)
+
 
     def host_proxy_class
       @host_proxy_class ||= resolve_host_proxy_class
@@ -790,11 +818,13 @@ module Skylab::Headless
 
     # `call_host_service` - this is expected normally to be called
     # from host proxies but here you can have it if you want.
+    # (used in #ingestion).
 
     def call_host_service pstory, service_i, a=nil, b=nil
       svc = @story.if_service service_i, -> sv { svc = sv }, -> do
         raise Plugin::Service::NameError, "what service are you #{
-          }talking about willis - #{ service_i }"
+          }talking about willis - no such service \"#{ service_i }\" is #{
+          }declared by the plugin host #{ @story.host_module_descriptor }"
       end
       if svc
         # what would be neat is rather than doing this at runtime,
@@ -820,14 +850,7 @@ module Skylab::Headless
         end
       end
     end
-
-    def initialize host_application   # assumes `Plugin` sub-mod of its class
-      @host_mod = host_application.class
-      @host_application = host_application
-      @story = host_application.plugin_host_story
-    end
   end
-
 
   module Plugin
 
@@ -862,6 +885,8 @@ module Skylab::Headless
           story.do_dslify_eventpoint_names = true
         end, -> *services do
           story.add_services services
+        end, -> service_names do
+          story.add_service_names service_names
         end, -> *plugin_service_i_a do
           story.add_plugin_services plugin_service_i_a
         end
@@ -893,11 +918,32 @@ module Skylab::Headless
       eventpoints
       dslify_eventpoint_names
       services
+      service_names
       plugin_services
     |
   end
 
   class Plugin::Story
+
+    def initialize particular_plugin_box_module
+      @do_dslify_eventpoint_names = true  # experimental!
+      @particular_plugin_box_module = particular_plugin_box_module
+      @client_class_function = -> do
+        default_client_class
+      end
+      @normalized_local_name = -> do
+        # ::Foo::Bar::BiffBaz -> :"biff-baz"
+        name = particular_plugin_box_module.name
+        ::Skylab::Autoloader::Inflection::FUN.pathify[
+          name[ name.rindex( ':' ) + 1 .. -1 ]
+        ].intern
+      end.call
+      @eventpoint_a = [ ] ; @eventpoint_h = { }
+      @service_a = [ ] ; @service_h = { }
+      @plugin_service_a = [ ] ; @plugin_service_h = { }
+    end
+
+    attr_reader :particular_plugin_box_module  # used in error reporting
 
     # experimentally, we present the below public methods grouped by
     # logical aspect (any writer then any reader for each aspect).
@@ -947,7 +993,15 @@ module Skylab::Headless
     # services-related methods
 
     def add_services a
-      _add @service_a, @service_h, a
+      _add @service_a, @service_h, a, -> kx do
+        Plugin::Service_[ * kx ]
+      end, false
+    end
+
+    def add_service_names a
+      _add @service_a, @service_h, a, -> sym do
+        Plugin::Service_[ sym ]
+      end, false
     end
 
     def service_a
@@ -960,6 +1014,19 @@ module Skylab::Headless
       @service_h.key? i
     end
 
+    # `services` - clients want deep reflection on these for things
+    # like ingestion.
+
+    def services
+      ::Enumerator.new do |y|
+        @service_a.each do |i|
+          y.yield i, @service_h.fetch( i )
+          nil
+        end
+        nil
+      end
+    end
+
     # experimental plugin-services (like extensions uh-oh)
 
     def add_plugin_services a
@@ -970,25 +1037,7 @@ module Skylab::Headless
       @plugin_service_h.key? i
     end
 
-  protected
-
-    def initialize particular_plugin_box_module
-      @do_dslify_eventpoint_names = true  # experimental!
-      @particular_plugin_box_module = particular_plugin_box_module
-      @client_class_function = -> do
-        default_client_class
-      end
-      @normalized_local_name = -> do
-        # ::Foo::Bar::BiffBaz -> :"biff-baz"
-        name = particular_plugin_box_module.name
-        ::Skylab::Autoloader::Inflection::FUN.pathify[
-          name[ name.rindex( ':' ) + 1 .. -1 ]
-        ].intern
-      end.call
-      @eventpoint_a = [ ] ; @eventpoint_h = { }
-      @service_a = [ ] ; @service_h = { }
-      @plugin_service_a = [ ] ; @plugin_service_h = { }
-    end
+  private
 
     # `default_client_class` - NOTE this has side-effects on the particular
     # box module (which can be avoided..). this is the default implementation
@@ -1195,6 +1244,60 @@ module Skylab::Headless
     # (one day this might become etc)
   end
 
+  class Plugin::Service_
+
+    # `Plugin::Service_` - this represents the plugin's directed association
+    # (think arrow) pointing towards the host, representing the need of the
+    # service on the part of the plugin, a service that the host has.
+
+    def self.[] *a
+      allocate.instance_exec do
+        init( *a )
+      end
+    end
+
+    -> do  # `init`
+      once = -> do
+        once = nil
+        Headless::Services::Basic::Field::Box.enhance self do
+          meta_fields :ingest, [ :ingest_as_ivar, :property ]
+        end  # we do this nasty dance because otherwise there would be a
+             # circular dependency: this plugin library's flagship subproduct
+        nil  # is test/all, and test/all is of course used when testing fields.
+      end    # i will call it "regressive architecture".
+
+      define_method :init do |name_i, *rest|
+        @normalized_local_name = name_i
+        if rest.length.zero? then
+          @field = nil
+          self
+        else
+          once and once[]
+          @field = Plugin::Service_::FIELD_.new( [ name_i, *rest ] )
+          self
+        end
+      end
+    end.call
+
+    attr_reader :normalized_local_name
+
+    def do_ingest
+      if @field
+        @field.is_ingest || @field.has_ingest_as_ivar
+      end
+    end
+
+    def ingest_to_ivar
+      if @field
+        if @field.has_ingest_as_ivar
+          @field.get_ingest_as_ivar
+        else
+          :"@#{ @field.normalized_name }"
+        end
+      end
+    end
+  end
+
   class Plugin::Service::NameError < Plugin::RuntimeError
 
     # *now* we make a taxonomy out of it, just for fun ..
@@ -1202,6 +1305,48 @@ module Skylab::Headless
     # happens at runtime as opposed to declaration time only when dealing
     # with the experimental delegated services.)
 
+  end
+
+  class Plugin::Service::NameEvent
+
+    def initialize
+      raw_a = @raw_queue_a = [ ]
+      @message_function = -> do  # [#it-002] NLP aggregation experiment
+        Headless::Services::Basic::List::Aggregated::Articulation raw_a do
+          template "{{ host }}{{ adj1 }} has not declared the required #{
+            }{{ service_i }} declared as needed by {{ plugin }}{{ adj2 }}"
+          on_zero_items -> { "everything was ok." }
+          aggregate do
+            service_i -> a do
+              if 1 == a.length then "service \"#{ a.fetch 0 }\""
+              else                  "services (#{ a * ', ' })" end
+            end
+          end
+          on_first_mention do
+            host plugin -> x do
+              x.respond_to?( :ascii_only? ) ? x : x.class.name
+            end
+            _flush -> x { "#{ x }." }
+          end
+          on_subsequent_mentions do
+            host   -> { 'it' }
+            adj1   -> { ' also' }
+            plugin -> { 'that plugin' }
+            adj2   -> { ' either' }
+            _flush -> x { " #{ x }." }
+          end
+        end
+      end
+    end
+
+    def add host, plugin, svc_i
+      @raw_queue_a << Item_[ host, plugin, svc_i ]
+      nil
+    end
+
+    Item_ = ::Struct.new :host, :plugin, :service_i
+
+    attr_reader :message_function
   end
 
   class Plugin::Service::AccessError < Plugin::RuntimeError

@@ -9,7 +9,8 @@ module Skylab::PubSub
     o = { }
 
     o[:looks_like_emitter_module] = -> x do
-      x.singleton_class.method_defined? :emits
+      x.singleton_class.method_defined? :emits or
+        x.singleton_class.private_method_defined? :emits
     end
 
     ::Struct.new( * o.keys ).new( * o.values )

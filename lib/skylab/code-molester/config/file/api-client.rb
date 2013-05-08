@@ -5,11 +5,9 @@ module Skylab::CodeMolester
     # extend an API client with services related to file-based config
 
     def self.enhance host, & def_blk
-
       host.class_exec do
-
-        define_api_client do
-          services %i|
+        enhance_model_enhanced_api_client do
+          service_names %i|
             config_file_search_start_pathname
             config_file_default_init_path
             config_file_search_num_dirs

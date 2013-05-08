@@ -59,8 +59,6 @@ module Skylab::PubSub
       end
     end
 
-  protected  # outside nerks should not berk your derk
-
     def emits *graph_ref
       event_stream_graph.absorb_nodes graph_ref, -> stream_name do
         # (this hookback is called only when a new node is added to the graph)
@@ -74,6 +72,7 @@ module Skylab::PubSub
       end
       nil
     end
+    private :emits   # outside nerks should not berk your derk
 
     def event_class klass                      # on a module it's a writer
       if klass.respond_to? :call
@@ -83,6 +82,7 @@ module Skylab::PubSub
       end
       nil
     end
+    private :event_class
 
     def event_factory callable                 # on a module it's a writer
       if callable.respond_to? :arity and 0 == callable.arity
@@ -96,6 +96,7 @@ module Skylab::PubSub
       end                         # eew 2x)
       nil
     end
+    private :event_factory
 
     #        ~ advanced semantic reflection experiments ~
 
@@ -103,12 +104,39 @@ module Skylab::PubSub
       event_stream_graph.set_taxonomic_stream_names name_a
       nil
     end
+    private :taxonomic_streams
+
+    def is_pub_sub_emitter_module
+      true  # future-proof quack-testing
+    end
   end
 
   class PubSub::Stream < Semantic::Digraph::Node  # (stowaway) used above
   end
 
   class PubSub::Stream::Digraph < Semantic::Digraph
+
+    def initialize
+      @taxonomic_stream_names = nil
+      @node_class = PubSub::Stream
+      super
+    end
+
+    #         ~ dupe support ~
+
+    def base_args
+      super << @taxonomic_stream_names  # careful
+    end
+    private :base_args
+
+    def base_init *a, taxonomic_stream_names
+      super( *a )
+      @taxonomic_stream_names = ( if taxonomic_stream_names
+        taxonomic_stream_names.dup.freeze
+      end )
+      nil
+    end
+    private :base_init
 
     # `ancestors` - the central workhorse of `emit` - if `sym` is in the graph,
     # result is an enumerator of names with `sym` always being the first one,
@@ -133,27 +161,6 @@ module Skylab::PubSub
 
     attr_reader :taxonomic_stream_names
 
-  protected
-
-    def initialize
-      @taxonomic_stream_names = nil
-      @node_class = PubSub::Stream
-      super
-    end
-
-    #         ~ dupe support ~
-
-    def base_args
-      super << @taxonomic_stream_names  # careful
-    end
-
-    def base_init *a, taxonomic_stream_names
-      super( *a )
-      @taxonomic_stream_names = ( if taxonomic_stream_names
-        taxonomic_stream_names.dup.freeze
-      end )
-      nil
-    end
   end
 
   module PubSub::Emitter::InstanceMethods
@@ -161,13 +168,11 @@ module Skylab::PubSub
     # ( for now, it is the policy of this library never to add destructive
     #   public instance methods (e.g something that adds a listener to a
     #   stream, etc.). Those instance methods that have side-effects, e.g. ones
-    #   that add listeners to a stream or emit events, are by default protected.
+    #   that add listeners to a stream or emit events, are by default private.
     #   As appropriate to the design of the application the client must
     #   publicize the desired destructive methods explicitly. )
     #
     # ( however there may be some public *non*-destructive i.m's added below..)
-
-  protected
 
     #         ~ in rougly lifecycle (and then pre-) order ~
 
@@ -179,10 +184,12 @@ module Skylab::PubSub
     def on stream_name, *func, &block
       event_listeners.add_listener stream_name, *func, &block
     end
+    private :on
 
     def with_specificity &blk
       event_listeners.with_specificity( blk )
     end
+    private :with_specificity
 
     -> do
 
@@ -206,7 +213,7 @@ module Skylab::PubSub
           instance_exec(& init )
           send m, *a
         end
-        protected m
+        private m
       end
 
       # `init`
@@ -393,7 +400,7 @@ module Skylab::PubSub
           resolve_callable[ self, a.fetch( 0 ) ].call res
         end
       end
-      protected :_if_unhandled
+      private :_if_unhandled
       resolve_callable = -> me, x do
         if x.respond_to? :call then x else me.method( x ) end
       end
@@ -405,8 +412,6 @@ module Skylab::PubSub
   end
 
   module PubSub::Emitter::InstanceMethods_  # (see big comment above `the_list`)
-
-  protected
 
     # `emit` - this is a sacred and holy workhorse method.
     # it is one of the centers of the universe.
@@ -445,14 +450,17 @@ module Skylab::PubSub
       @event_listeners.emitted                 # notify it
       nil  # (we used to result in a count of listeners but what a smell!)
     end
+    private :emit
 
     #         ~ courtesy accessors and nerkins in alpha. order ~
 
     attr_reader :event_listeners
+    private :event_listeners
 
     def event_stream_graph
       @event_stream_graph.call
     end
+    private :event_stream_graph
   end
 
 
@@ -481,13 +489,49 @@ module Skylab::PubSub
   #
 
   module PubSub::Event
+
     extend MetaHell::Autoloader::Autovivifying::Recursive
-    # (file placement might change.. for now it's a jumble)
+      # (file placement might change.. for now it's a jumble)
+
   end
 
   class PubSub::Event::Unified
 
     extend MetaHell::Autoloader::Autovivifying::Recursive
+
+    # `initialize` - *highly* #experimental args. handling of payload is left
+    # intentionally sparse here, different applications will process and
+    # present payloads differently.
+
+    -> do  # `initialize`
+      next_id = nil
+      define_method :initialize do |esg, stream_name, *payload|
+        @event_id = next_id[ ]
+        @is_touched = false
+        @stream_name = stream_name
+        if esg
+          if esg.respond_to? :call
+            fail 'where'
+          else
+            @event_stream_graph_ref = -> { esg }
+          end
+        elsif esg.nil?
+          fail 'where'
+        else
+          @event_stream_graph_ref = esg  # allow false - intentionally not set
+        end
+        if payload.length.nonzero?
+          @payload_a = payload  # don't confuse subclass instances by setting this
+        end
+        nil
+      end
+
+      next_id = -> do
+        nxt_id = 0
+        -> { nxt_id += 1 }
+      end.call
+
+    end.call
 
     attr_reader :event_id
 
@@ -516,60 +560,34 @@ module Skylab::PubSub
 
     undef_method :to_s  # #todo - remove after integration
 
-  protected
-
-    next_id = -> do
-      nxt_id = 0
-      -> { nxt_id += 1 }
-    end.call
-
-    # *highly* #experimental args. handling of payload is left intentionally
-    # sparse here, different applications will process and present payloads
-    # differently.
-
-    define_method :initialize do |esg, stream_name, *payload|
-      @event_id = next_id[ ]
-      @is_touched = false
-      @stream_name = stream_name
-      if esg
-        if esg.respond_to? :call
-          fail 'where'
-        else
-          @event_stream_graph_ref = -> { esg }
-        end
-      elsif esg.nil?
-        fail 'where'
-      else
-        @event_stream_graph_ref = esg  # allow false - intentionally not set
-      end
-      if payload.length.nonzero?
-        @payload_a = payload  # don't confuse subclass instances by setting this
-      end
-      nil
-    end
-
     def event_stream_graph
       @event_stream_graph_ref.call
     end
+    private :event_stream_graph
   end
 
   class PubSub::Event::Textual < PubSub::Event::Unified
-
-    # (consider also just wiring a factory that creates as an event objects
-    # just pure text ..)
-
-    attr_reader :text
-
-  protected
 
     def initialize esg, stream_name, text
       super esg, stream_name
       @text = text
       nil
     end
+
+    # (consider also just wiring a factory that creates as an event objects
+    # just pure text ..)
+
+    attr_reader :text
   end
 
   class PubSub::Event::Listeners < MetaHell::Formal::Box
+
+    def initialize
+      super
+      @is_in_group =              # are we inside of a specificity block now?
+        @current_group_id =       # used in a closure to identify each spec. blk
+        @group_frame_h = nil      # hash of group id => true per each emit
+    end
 
     def add_listener name, func=nil, &blk
       if func
@@ -618,15 +636,6 @@ module Skylab::PubSub
     def emitted
       @group_frame_h && @group_frame_h.clear
     end
-
-  protected
-
-    def initialize
-      super
-      @is_in_group =              # are we inside of a specificity block now?
-        @current_group_id =       # used in a closure to identify each spec. blk
-        @group_frame_h = nil      # hash of group id => true per each emit
-    end
   end
 
   PubSub::FUN = -> do
@@ -673,16 +682,14 @@ module Skylab::PubSub
           emits(* graph_ref )
         end
 
-        def error msg # provided as a courtesy for this common #pattern #sl-112
-          emit :error, msg
-          false
-        end
-
-      protected
-
         # experimental interface for default constructor: multiple lambdas
         def initialize *blocks
           blocks.each { |b| b.call self }
+        end
+
+        def error msg # provided as a courtesy for this common #pattern #sl-112
+          emit :error, msg
+          false
         end
 
         self

@@ -62,7 +62,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
         invoke '--name', '*.sc', '.'
         output.lines.last.string.should match(
           %r{changed 1 line in \./jeebis\.sc.+we should fix this} )
-        @manifest_pn.read.should eql( <<-O.unindent.strip )
+        @manifest_pn.read.should eql( <<-O.unindent )
           [#003] #open we should fix this
           [#002]       i started at two just to be cute
         O

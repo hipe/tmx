@@ -2,138 +2,219 @@ module Skylab::Face
 
   class API::Client
 
-    # `API::Client` - experimental barebones impl.
+    # `API::Client` - experimental barebones implementation: a base class for
+    # your API client. perhaps the only class you will need. the first last
+    # attempt at this, and the last first one. the light. the way.
 
-    # `define_api_client` - this must be *not* monadic! (same block might
-    # be re-run)
+    # `_enhance` - private experiment. #multi-entrant. this is the experimental
+    # implementation of `Face::API#[]`. this (re-)affirms that you have under
+    # your `anchor_mod`:
+    #
+    # 1) a module called `API` (maybe MAARS-y).
+    # 2) a const `API::Client` that is MAARS-y. (if you do not have such a
+    #   const, one will be provided for you in the form of a subclass of
+    #   Face::API::Client.)
+    # 3) an `invoke` method "on" your `API` module.
+    # 4) an `Actions` box moudule - MAARS-y and Boxxy
+    #
+    # using `puff` for this attempts to load any releveant file first.
 
-    def self.define_api_client &blk
+    -> do
+
+      puff = MetaHell::Module::Accessors::FUN.puff
+
+      define_singleton_method :_enhance do |anchor_mod|
+
+        puff[ anchor_mod, :API, -> { ::Module.new }, -> do
+
+          puff[ self, :Client, -> { ::Class.new Face::API::Client } ]
+
+          if ! respond_to? :invoke
+            define_singleton_method :invoke, & FUN.invoke
+          end
+
+          puff[ self, :Actions, -> { ::Module.new }, -> do
+            respond_to? :const_fetch or extend MetaHell::Boxxy
+          end ]
+        end ]
+        nil
+      end
+    end.call
+
+    o = { }
+
+    # `invoke` - the default implementation. this is the only method that
+    # (either thru adding to ancestor chain, through defining on self, or thru
+    # defining on singleton class) is added in any way to your anchor module
+    # (hence we add it in this strange way rather than adding a whole other
+    # module to your chain). it is in this sense this function is off the chain.
+
+    o[:invoke] = -> i_a, param_h=nil, modal_client=nil do
+      e = ( @api_client ||= const_get( :Client, false ).new ).
+        get_executable i_a, param_h, modal_client
+      e and e.execute
+    end
+
+    # `get_executable` called from above. also may called from modality clients
+    # that create their own API client, rather than rely on the memoized
+    # (read: singleton) one.
+
+    def get_executable i_a, param_h, modal_client
+      r = false
+      begin
+        x = api_actions_module.const_fetch i_a
+        if x.respond_to? :call
+          action = API::Action.const_get( :Proc, false )[ x ]
+        else
+          action = x.new                             # [#fa-api-001]
+          handle_events modal_client, action         # [#fa-api-002]
+          resolve_services modal_client, action      # [#fa-api-003]
+        end
+        b, r = normalize action, param_h             # [#fa-api-004]
+        b and break
+        r = action
+      end while nil
+      r
+    end
+
+    # we have what we'll call "neighbor modules" whom we need to be able to
+    # access at runtime to reflect on, make decisions, and load things to run.
+    # If you really needed to you could change how these modules are accessed
+    # by either overriding the generated method(s) below or setting the ivar
+    # but eew.
+
+    MetaHell::Module::Accessors.enhance( self ).
+      private_module_autovivifier_reader :api_actions_module, '../Actions',
+      -> { ::Module.new },           # if it didn't exist, make it!
+      -> { extend MetaHell::Boxxy }  # sketchily enhance it no matter what
+                                     # uh-oh, this is duplicated above..
+
+    # `handle_events` - [#fa-api-002]
+    # the API client handles no events. when invoking an API action "directly"
+    # through the API, the only thing you get (for now) is the result of the
+    # execute. however, if a `modal_client` is passed, we hook into that.
+    # result is undefined. raise on failure.
+
+    def handle_events modal_client, action
+      if modal_client
+        modal_client.handle_events action  # easy enough
+      end
+      nil
+    end
+    private :handle_events  # called above only
+
+    # `resolve_services` - [#fa-api-003] - result undefined. raises on falure.
+
+    def resolve_services modal_client, action
+      if action.respond_to? :resolve_services
+        addtl_svcs = ( if modal_client and
+            modal_client.respond_to? :plugin_services then
+          modal_client.plugin_services
+        end )
+        action.resolve_services( if addtl_svcs
+          Services::Headless::Plugin::Host::Services::Chain.new [
+            addtl_svcs, plugin_services ]
+        else
+          plugin_services
+        end )
+      end
+      nil
+    end
+    private :resolve_services  # called above only
+
+    #  `normalize` - this is [#fa-api-004], documented here.
+    #
+    # give the API action a chance to run normalization (read: validation,
+    # internalization) hooks before executing. note we want the specifics of
+    # this out of the mode clients.
+    #
+    # our result is a tuple of `alt` (t|f) and `res`. a true-ish `alt` is an
+    # indication that normalization failed for the API action (and we have an
+    # "alternate" ending). sending `execute` to the API action in such
+    # circumstances will have undefined behavior and should *not* be done
+    # by anyone ever for any reason.
+    #
+    # if the mode client wants it, `res` is whatever result the API action
+    # resulted in in response to the normalization failure (e.g it could be an
+    # exit status code, depending on the API action).
+    #
+    # a false-ish `alt` on the other hand is an indicaton that normalization
+    # *succeeded* for the API action. `res` is then undefined and should be
+    # disregarded. the mode client may now procede to send `execute` to the API
+    # action.
+    #
+    # currently writing to `y` just hooks back into the API action instance
+    # (by sending it `normalization_failure_line` with the selfsame arg that
+    # `y#<<` received). this allows for evented handling of the message, e.g
+    # adding meta-information about the action to the message.
+    #
+    # (with the above said, please see [#fa-api-004] for more details)
+
+    def normalize action, param_h
+      if action.respond_to? :normalize or param_h && param_h.length.nonzero?
+        y = action.instance_exec do  # emitting call below might be private
+          Services::Basic::Yielder::Counting.new( &
+            if respond_to? :normalization_failure_line
+              method( :normalization_failure_line )
+            else
+              -> msg do
+                raise ::ArgumentError, msg
+              end
+            end )
+        end
+        r = action.normalize y, param_h
+        [ y.count.nonzero?, r ]
+      end
+    end
+    private :normalize
+
+
+    #                  ~ API client enhancement API ~            ( section 2 )
+
+    # some enhancements enhance your life by enhancing your entire API. the
+    # class method(s?) in this section are created and exposed to be accessed
+    # by enhancements such as these. That is, this is part of the API API.
+
+    # `enhance_model_enhanced_api_client` - runs a block from which
+    # enhancements can add services to the API client. We assume that this is
+    # done in large part through adding particular model controllers to the
+    # model, hence we affirm that we provide the below model-focused services.
+    # this is designed to be re-affirmable - that is, each additional time
+    # the below logic is run on the same API client class, it should have no
+    # additional side-effects.
+
+    def self.enhance_model_enhanced_api_client &blk
+      me = self
       Face::Services::Headless::Plugin::Host.enhance self do
-        services %i|
-          has_instance
-          set_new_valid_instance
+        service_names %i|
+          has_model_instance
+          set_new_valid_model_instance
           model
         |
+
+        me.send :include, API::Client::Model::InstanceMethods  # wedged in here
+          # in case we override above, and get overridden below
+
         instance_exec( & blk )  # ERMAHGERD
       end
     end
 
-    def build_action slug_str, param_h
-      kls = api_actions_module.const_fetch slug_str
-      kls.new self, param_h
-    end
-    public :build_action  # called e.g by another modality client
-
-    MetaHell::Module::Accessors.enhance self do
-
-      private_methods do
-
-        module_reader :api_actions_module, '../Actions' do
-          extend MetaHell::Boxxy  # future i am sorry
-        end
-
-        module_reader :api_module, '..'
-
-        module_reader :application_module, '../..'
-
-        module_reader :models_module, '../../Models' do
-          extend MetaHell::Boxxy
-        end
-      end
-    end
-
-    #         ~ *experimentally* be a plugin host ~
-
     Services::Headless::Plugin::Host.enhance self do
-      # nothing here - that is for your subclass to do
-      # (half the reason we do this is for shenanigans)
+
+      # experimentally our API API is implemented via conceptualizing our
+      # API client as itself a plugin host, as is hinted at above.
+
     end
 
-    #         ~ *experimental* default implementation of model mgr ~
+    #                ~ experimental revelation services ~        ( section 3 )
 
-    # include Face::Services::Headless::Plugin::Host::InstanceMethods
-
-    # because we are overriding some of the above, include it now
-
-    def model *x_a
-      model_manager.aref x_a
+    def revelation_services
+      @revelation_services ||= API::Revelation::Services.new self
     end
-    public :model  # children call it
+    public :revelation_services
 
-    # `plugin_host_proxy_aref` - part of our underlying plugin API -
-    # this is what implements calls to `host[]` from e.g inside the
-    # models.
-    #
-    # (note that `_plugin_story` is ignored because we do not validate
-    # access - we do not require that plugins (e.g models) declare what
-    # models they want to access, with the reasoning that it will be
-    # clunky to need to list every name of every model that every other
-    # model wants access to, but this may change.
-    #
-    # on this subject, this is related to why we don't have pretty
-    # accessor methods for the model names, (e.g we have `host[:config]`, not
-    # `host.config`) so we do not need to eager load our entire model.)
 
-    def plugin_host_proxy_aref x_a, _plugin_story
-      model_manager.aref x_a
-    end
+    FUN = ::Struct.new( * o.keys ).new( * o.values )
 
-  private
-
-    def model_manager
-      @model_manager ||= begin
-        Face::Model::Manager.new models_module, self
-      end
-    end
-
-    # `has_instance` - called from host proxy - a service we expose to
-    # model clients - note the signature change.
-
-    def has_instance * model_ref_a
-      @model_manager.has_instance model_ref_a
-    end
-
-    # `set_new_valid_instance` - NOTE signuature might change
-
-    def set_new_valid_instance( ( * model_ref_a ), init_blk, obj_if_yes, if_no )
-      @model_manager.set_new_valid_instance model_ref_a, init_blk,
-        obj_if_yes, if_no
-    end
-
-    #    ~ *experimental* API action normalization API [#fa-api-004] ~
-    #
-    # give the API action a chance to run normalization (read: validation)
-    # hooks before executing. note we want the specifics of this out of
-    # the mode clients.
-
-    # `normalize` - result is a tuple of `alt` (t|f) and `res`. if `alt`
-    # is true, this inidcates that normalization failed for the API action
-    # (and we have an "alternate" ending). running `execute` in such
-    # circumstances will have undefined behavior and should not be done.
-    # if the mode client want it, `res` is whatever result the API action
-    # resulted in in respnose to the normalization failure (e.g it could
-    # be an exit status code, depending on the API action).
-    #
-    # when `alt` is false this indicates that normalization *succeeded* for
-    # the API action. `res` is undefined and should be disregarded. the mode
-    # client should procede to call `execute` on the API action.
-    #
-    # NOTE the actual event wiring (as it pertain here to normalization)
-    # is an area of active exploration that will almost certainly change
-    # its implementation! you have been warned! (details: we sort of just
-    # want to pass a `y` to write to, but we have this nice pub-sub thing
-    # built out already..)
-    #
-    # (with the above said, please see [#fa-api-004] for more details)
-
-    def normalize action
-      y = action.instance_exec do  # emitting call below might be private
-        Services::Basic::Yielder::Counting.new do |msg|
-          normalization_failure_line msg
-        end
-      end
-      action.normalize y, -> { false }, -> x { [ true, x ] }
-    end
-    public :normalize  # called by mode clients.
   end
 end

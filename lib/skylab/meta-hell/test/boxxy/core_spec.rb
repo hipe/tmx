@@ -42,7 +42,7 @@ module Skylab::MetaHell::TestSupport::Boxxy
             _Boxxy__Zeep.const_fetch [:nerp, :derp]
           rescue ::NameError => e
           end
-          e.message.should eql('unitialized constant Boxxy::Zeep::Nerp')
+          e.message.should eql( 'uninitialized constant Boxxy::Zeep::Nerp' )
           e.module.to_s.should eql('Boxxy::Zeep')
           e.const.should eql(:Nerp)
           e.name.should eql(:nerp)

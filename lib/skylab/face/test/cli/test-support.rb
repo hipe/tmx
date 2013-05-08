@@ -1,29 +1,18 @@
-require_relative '../../core'
-require 'skylab/test-support/core'
+require_relative '../test-support'
 require 'skylab/headless/test/test-support'
-
-module Skylab::Face::TestSupport
-
-  ::Skylab::TestSupport::Regret[ self ]
-
-  module CONSTANTS
-    Face = ::Skylab::Face
-    Headless = ::Skylab::Headless
-    Headless_TestSupport = ::Skylab::Headless::TestSupport
-    MetaHell = ::Skylab::MetaHell
-    TestSupport = ::Skylab::TestSupport
-  end
-end
 
 module Skylab::Face::TestSupport::CLI
 
   ::Skylab::Face::TestSupport[ CLI_TestSupport = self ]
 
-  include CONSTANTS
-
   module CONSTANTS
     CLI_TestSupport = CLI_TestSupport
+    Headless = ::Skylab::Headless
+    Headless_TestSupport = ::Skylab::Headless::TestSupport
+    MetaHell = ::Skylab::MetaHell
   end
+
+  include CONSTANTS
 
   extend TestSupport::Quickie
 
@@ -112,8 +101,12 @@ module Skylab::Face::TestSupport::CLI
 
     let :client do
       g = io_spy_group
-      self.class.client_class.new out: g.outstream, err: g.errstream,
+      client_class.new out: g.outstream, err: g.errstream,
         program_name: program_name
+    end
+
+    def client_class
+      self.class.client_class
     end
 
     -> do  # `program_name` - just to be cute, test for freak accidents

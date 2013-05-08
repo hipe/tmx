@@ -72,7 +72,7 @@ module Skylab::MetaHell
         end
       end
 
-      use_with_instance_instead_of_new = MetaHell::FUN.module_mutex[ -> do
+      use_with_instance_instead_of_new = MetaHell::Module.mutex[ -> do
 
         class << self
 
@@ -91,7 +91,7 @@ module Skylab::MetaHell
       end ]
 
       use_lease_and_release_instead_of_new =
-          MetaHell::FUN::module_mutex[ -> init do
+          MetaHell::Module.mutex[ -> init do
 
         singleton_class.class_exec do  # like `class << self` but inheirt scope
 

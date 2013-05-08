@@ -4,7 +4,7 @@ module Skylab::Cull
 
     params :do_list_file
 
-    services :configs
+    services :configs, [ :pth, :ingest ]
 
     emits yes: :structural, no: :structural,
       hard_yes: :payload_lines
@@ -22,10 +22,10 @@ module Skylab::Cull
 
     def with_yes pn
       if @do_list_file
-        hard_yes payload_lines: [ "#{ pth[ pn ] }" ]
+        hard_yes payload_lines: [ "#{ @pth[ pn ] }" ]
       else
         yes pathname: pn,
-            message_function: -> { "active config file is: #{ pth[ pn ] }" }
+            message_function: -> { "active config file is: #{ @pth[ pn ] }" }
       end
       true
     end
@@ -33,7 +33,7 @@ module Skylab::Cull
     def with_no num, from_pn
       no num: num, from_pn: from_pn,
         message_function: -> do
-          "no cull config file found in #{ pth[ from_pn ] } or #{
+          "no cull config file found in #{ @pth[ from_pn ] } or #{
           }#{ num } levels up."
         end
       false

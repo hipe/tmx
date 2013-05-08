@@ -12,10 +12,13 @@ module Skylab::MetaHell
     # autoloading awareness, filesystem peeking of same, etc
 
     def self.extended mod
-      mod.module_exec do
-        extend Boxxy::ModuleMethods
-        @tug_class = MetaHell::Autoloader::Autovivifying::Recursive::Tug
-        init_boxxy caller[2]
+      if ! mod.respond_to? :const_fetch  # make it safely re-affirmable ..
+        # (the above thinking could be broken out into smaller pieces..)
+        mod.module_exec do
+          extend Boxxy::ModuleMethods
+          @tug_class = MetaHell::Autoloader::Autovivifying::Recursive::Tug
+          init_boxxy caller[2]
+        end
       end
       nil
     end
@@ -103,7 +106,7 @@ module Skylab::MetaHell
           args = []
           if f.arity.nonzero?
             args << Boxxy::NameNotFoundError.exception(
-              message: "unitialized constant #{ box }::#{ const }",
+              message: "uninitialized constant #{ box }::#{ const }",
               const: const, module: box, name: name, seen_a: seen_a
             )
           end

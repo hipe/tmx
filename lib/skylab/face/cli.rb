@@ -23,11 +23,7 @@ module Skylab::Face
   class Command  # (fwd declare)
   end
 
-  module TreeDefiner  # (fwd delcare)
-  end
-
   class Namespace < Command  # (fwd declare)
-    extend TreeDefiner
   end
 
   class CLI < Namespace
@@ -48,13 +44,44 @@ module Skylab::Face
         # (e.g use `reject` or `pop`))
     end
 
+    -> do  # `initialize`
+
+      margin, out, err = '  '.freeze, $stdout, $stderr
+
+      opt_h_h = {
+        in:  -> v { @in  = v },
+        out: -> v { @out = v },
+        err: -> v { @err = v },
+        program_name: -> v { @program_name = v },
+        sheet: -> v do # NOTE EXPERT MODE this shit kray
+          @sheet = v   # passing an arbitrary sheet in can have arbitray results
+        end            # note this call happens right after parent sets sheet
+      }
+
+      define_method :initialize do |opt_h=nil|
+        if block_given?
+          raise ::ArgumentError.new "this crap comes back after #100"
+        end
+        super nil, nil  # request client, slug_fragment
+        if opt_h
+          opt_h.each { |k, v| instance_exec v, & opt_h_h.fetch( k ) }
+        end
+        @program_name ||= nil
+        @margin ||= margin
+        # (we let @in remain unset, it does not get defaulted. it is special)
+        @out ||= out
+        @err ||= err
+        @y = ::Enumerator::Yielder.new(& @err.method( :puts ) )  # `help_yielder`
+      end
+    end.call
+
     #       ~ the existential public workhorse method `run` & support ~
 
     def run argv    # public form that is defined here in superclass,
-      invoked argv  # protected form that child class may override without
+      invoked argv  # private form that child class may override without
     end             # unintentionally creating an action via a public method :/
 
-  protected  # `run` support (pre-order)
+    # `invoked` - run support (pre-order)
 
     def invoked argv  # funny n-ame to distinguish it from `invoke` is important!
       branch = cmd = self ; stay = true
@@ -89,6 +116,7 @@ module Skylab::Face
         end
       end
     end
+    private :invoked
 
     # ick this is legacy and slated for removal # #todo. back then it seemed
     # easier (and indeed had more noveltly) to let this isomorphicism extend
@@ -107,15 +135,16 @@ module Skylab::Face
         nil  # final-result
       end
     end
+    private :argument_error
 
     #            ~ terminal versions of up-delegator methods ~
     #               ( public for children, as in parent )
 
-  public
 
     def invocation_string
       @program_name || ::File.basename( $PROGRAM_NAME )
     end
+    public :invocation_string  # called by children documenting self
 
     attr_reader :margin, :in, :out, :err
 
@@ -126,81 +155,70 @@ module Skylab::Face
         "#{ invocation_string } #{ last_normalized_child_slug }"
       end
     end
-
-  protected
-
-    -> do  # `initialize`
-
-      margin, out, err = '  '.freeze, $stdout, $stderr
-
-      opt_h_h = {
-        in:  -> v { @in  = v },
-        out: -> v { @out = v },
-        err: -> v { @err = v },
-        program_name: -> v { @program_name = v },
-        sheet: -> v do # NOTE EXPERT MODE this shit kray
-          @sheet = v   # passing an arbitrary sheet in can have arbitray results
-        end            # note this call happens right after parent sets sheet
-      }
-      define_method :initialize do |opt_h=nil|
-        if block_given?
-          raise ::ArgumentError.new "this crap comes back after #100"
-        end
-        super nil, nil  # request client, slug_fragment
-        if opt_h
-          opt_h.each { |k, v| instance_exec v, & opt_h_h.fetch( k ) }
-        end
-        @program_name ||= nil
-        @margin ||= margin
-        # (we let @in remain unset, it does not get defaulted. it is special)
-        @out ||= out
-        @err ||= err
-        @y = ::Enumerator::Yielder.new(& @err.method( :puts ) )  # `help_yielder`
-      end
-    end.call
+    private :last_child_invocation_string
 
     def visit_normalized_name a
       @last_norm_name = a
       nil
     end
-    public :visit_normalized_name
+    public :visit_normalized_name  # visited by children when gen'ing norm names
+
+    #        ~ experimental API integration - CLI client edition ~
 
     def api_client
       @api_client ||= api_client_class.new
     end
-    public :api_client
+    public :api_client  # children
 
-    MetaHell::Module::Accessors.enhance self do
+    # `api_client_class` - there is a lot we need to affirm about our
+    # rigging for now.. a little more than just autovivifying some sane
+    # defaults. but also, little more than just that. there is currently no
+    # way to override this without overriding it, but watch for something like
+    # that in spirit sort of maybe near [#fa-008].
 
-      private_methods do
-
-        module_autovivifier :api_client_class, '../../API/Client' do
-          ::Class.new Face::API::Client
+    def api_client_class
+      @api_client_class ||= begin
+        amod = application_module
+        if ! amod.const_defined? :CLI, false
+          fail "sanity - for now we follow convention strictly because of #{
+            }the wide blast radius of our autogeneration .. expected that #{
+            }the CLI Client exist inside of a `CLI` module. no such module#{
+            } - #{ amod }::CLI"  # maybe magic one day - [#fa-008]
         end
-
-        module_reader :application_module, '../..'
-
+        Face::API[ amod ]  # no need to check anything, ok to repeat this.
+        amod.const_get( :API, false ).const_get( :Client, false )
       end
     end
+    private :api_client_class
 
-    #         ~ experimental API routing & wiring hooks ~
+    # `set_last_api_action` - #experimental - modality client might want to
+    # know this for use in implementing service calls.
 
-    def set_behaviors action
-      nil
+    def set_last_api_action action
+      @action = action  # let this be the only place this is set!
     end
+    public :set_last_api_action  # called by children
+
+    MetaHell::Module::Accessors.enhance( self ).private_module_reader(
+      :application_module, '../..' )
+
+    # `handle_events` - a pleasant, straghtforward impl. of [#fa-api-002]
 
     def handle_events action
-      stream_h = self.class.stream_h
-      action.with_specificity do
-        self.class.stream_a.each do |stream_name|
-          if action.emits? stream_name
-            action.on stream_name, method( stream_h.fetch( stream_name ) )
+      if action.respond_to? :with_specificity  # else not a pub-subber.
+        stream_h = self.class.stream_h
+        action.with_specificity do
+          self.class.stream_a.each do |stream_name|
+            if action.emits? stream_name
+              action.on stream_name, method( stream_h.fetch( stream_name ) )
+            end
           end
         end
+        check_for_unhandled_non_taxonomic_streams action
       end
-      check_for_unhandled_non_taxonomic_streams action
       nil
     end
+    public :handle_events  # part of the API API [#fa-api-002]
 
     # `check_for_unhandled_non_taxonomic_streams` - this might necessitate
     # that the client class defines an API::Action base class that defines
@@ -212,28 +230,19 @@ module Skylab::Face
     def check_for_unhandled_non_taxonomic_streams action
       action.if_unhandled_non_taxonomic_streams method( :raise )
     end
-
     private :check_for_unhandled_non_taxonomic_streams
 
     -> do  # `stream_a`, `stream_h` - infer list of streams from
-           # method names that start with 'on_'
+           # method names that start with 'on_'. lazy evaluated and frozen.
 
-      both = nil  # when you're tired -
+      both = nil  # when you're tired - you'l laugh, you'll cry:
 
       define_singleton_method :stream_a do
-        @stream_a ||= begin
-          a, h = class_exec( &both )
-          @stream_h = h
-          a
-        end
+        @stream_a ||= ( _, @stream_h = class_exec( & both ) ).fetch 0
       end
 
       define_singleton_method :stream_h do
-        @stream_h ||= begin
-          a, h = class_exec( &both )
-          @stream_a = a
-          h
-        end
+        @stream_h ||= ( @stream_a, = class_exec( & both ) ).fetch 1
       end
 
       rx = /^on_(.+)/
@@ -241,15 +250,14 @@ module Skylab::Face
       both = -> do
         h = { }
         a = private_instance_methods.reduce [] do |m, i|
-          if rx =~ i  # eek
+          if rx =~ i  # eek, meh
             stream_name = $~[1].intern
             m << stream_name
             h[ stream_name ] = i
           end
           m
         end
-        a.freeze ; h.freeze
-        [ a, h ]
+        [ a.freeze, h.freeze ]
       end
     end.call
 
@@ -297,6 +305,11 @@ module Skylab::Face
 
   class Node_Sheet
 
+    def initialize
+      @name_function = @alias_a = @all_alias_a = @aliases_are_puffed = nil
+      @command_parameters_function = nil
+    end
+
     def is_leaf
       ! is_branch
     end
@@ -337,8 +350,9 @@ module Skylab::Face
       end
     end
 
-    def initialize
-      @name_function = @alias_a = @all_alias_a = @aliases_are_puffed = nil
+    def command_parameters_function= x
+      @command_parameters_function and fail "sanity - clobber mpf?"
+      @command_parameters_function = x
     end
   end
 
@@ -347,8 +361,66 @@ module Skylab::Face
     # the abstract represntation of a namespace. before you build any
     # actual things, you can aggreate the data around it progressively.
 
+    # `initialize` - it became unholy because we had to underload the signature
+    # while trying to reign-in 30 different subproducts and libraries
+    -> do  # `initialize`, `absorb`
+      norm_h = {
+        0 => -> block do
+          # block or raise ::ArgumentError, "block or module ref expected."
+          [ nil, nil, block ]
+        end,
+        1 => -> mod_ref, block do
+          block and raise ::ArgumentError, "can't have block & mod ref"
+          [ mod_ref, nil, nil ]
+        end,
+        2 => -> mod_ref, xtra_h, block do
+          block and raise ::ArgumentError, "can't have block & mod ref"
+          [ mod_ref, xtra_h, nil ]
+        end
+      }
 
-    #   ~ terminal (monadic) constituent nodes, writers & readers ~
+      define_method :initialize do |host_module, norm=nil, *ref_xtra_h, &block|
+        super( )
+        @host_module = host_module
+        @node_open = @default_argv = @is_reified = @hot =
+          @hot_class = @options = nil
+        @box = MetaHell::Formal::Box::Open.new
+        @norm = norm if norm  # else trigger warnings when accessing the ivar
+        @mod_ref, xtra_h, mod_block =  # mutex on @mod_ref vs @mod_block !
+          norm_h.fetch( ref_xtra_h.length )[ *ref_xtra_h, block ]
+        absorb_xtra_h xtra_h if xtra_h
+        @mod_blocks = ( [ mod_block ] if mod_block )
+        self
+      end
+      private :initialize
+
+      xtra_h_h = {
+        aliases: -> v { add_aliases v }
+      }
+
+      define_method :absorb_xtra_h do |xtra_h|
+        xtra_h.each do |k, v|
+          instance_exec v, & xtra_h_h.fetch( k )
+        end
+        nil
+      end
+      private :absorb_xtra_h
+
+      define_method :absorb do |*ref_xtra_h, &block|
+        mod_ref, xtra_h, mod_block =
+          norm_h.fetch( ref_xtra_h.length )[ *ref_xtra_h, block ]
+        if mod_ref
+          self.mod_ref = mod_ref
+        elsif mod_block
+          add_block mod_block
+        end
+        absorb_xtra_h xtra_h if xtra_h
+        nil
+      end
+      private :absorb
+    end.call
+
+    #   ~ terminal (monadic) constituents properties, writers & readers ~
 
     def is_branch
       true
@@ -375,7 +447,9 @@ module Skylab::Face
       end
     end
 
-    #   ~ non-terminal (list-like) constituent nodes, writers & readers ~
+    attr_accessor :default_argv  # easy enough
+
+    #   ~ non-terminal (list-like) constituent properties, writers & readers ~
 
     def add_block block
       if @mod_ref
@@ -402,25 +476,32 @@ module Skylab::Face
     end
 
     def child_option_parser &blk
-      current_leaf!.add_option_parser_block blk
+      node_open!.add_option_parser_block blk
     end
 
-    def current_leaf!
-      if ! @current_leaf
-        @current_leaf = Leaf_Sheet.new nil  # no method name yet.
+    def node_open!
+      if ! @node_open
+        @node_open = Leaf_Sheet.new nil  # no method name yet.
       end
-      @current_leaf
+      @node_open
     end
-    protected :current_leaf!
+    private :node_open!
 
     def add_child_aliases arr
-      current_leaf!.add_aliases arr
+      node_open!.add_aliases arr
     end
 
     def the_method_was_added meth
-      @current_leaf.method_name = meth
-      cl = @current_leaf ; @current_leaf = nil
-      @box.add cl.normalized_local_command_name, cl
+      close_node do |cl|
+        cl.method_name = meth
+      end
+      nil
+    end
+
+    def close_node &blk
+      n = @node_open; @node_open = nil
+      blk[ n ]
+      @box.add n.normalized_local_command_name, n
       nil
     end
 
@@ -435,7 +516,7 @@ module Skylab::Face
     end
 
     def write_ns norm, yes, no  # internally used to create or update n.s
-      if @current_leaf
+      if @node_open
         raise "can't add namespace when command is still open - #{ norm }"
       else
         @box.if? norm, -> ns do
@@ -454,7 +535,7 @@ module Skylab::Face
       end
       nil  # our internal struct is internal
     end
-    protected :write_ns
+    private :write_ns
 
     def add_namespace ns_sheet  # for hacks
       write_ns ns_sheet.normalized_local_command_name, -> ns do
@@ -545,69 +626,20 @@ module Skylab::Face
         end
       end
     end.call
-
-    attr_accessor :default_argv  # easy enough
-
-    # `initialize` - it became unholy because we had to underload the signature
-    # while trying to reign-in 30 different subproducts and libraries
-
-    -> do  # `initialize`, `absorb`
-      norm_h = {
-        0 => -> block do
-          # block or raise ::ArgumentError, "block or module ref expected."
-          [ nil, nil, block ]
-        end,
-        1 => -> mod_ref, block do
-          block and raise ::ArgumentError, "can't have block & mod ref"
-          [ mod_ref, nil, nil ]
-        end,
-        2 => -> mod_ref, xtra_h, block do
-          block and raise ::ArgumentError, "can't have block & mod ref"
-          [ mod_ref, xtra_h, nil ]
-        end
-      }
-
-      define_method :initialize do |host_module, norm=nil, *ref_xtra_h, &block|
-        super( )
-        @host_module = host_module
-        @current_leaf = @default_argv = @is_reified = @hot =
-          @hot_class = @options = nil
-        @box = MetaHell::Formal::Box::Open.new
-        @norm = norm if norm  # else trigger warnings when accessing the ivar
-        @mod_ref, xtra_h, mod_block =  # mutex on @mod_ref vs @mod_block !
-          norm_h.fetch( ref_xtra_h.length )[ *ref_xtra_h, block ]
-        absorb_xtra_h xtra_h if xtra_h
-        @mod_blocks = ( [ mod_block ] if mod_block )
-        self
-      end
-      protected :initialize
-
-      xtra_h_h = {
-        aliases: -> v { add_aliases v }
-      }
-
-      define_method :absorb_xtra_h do |xtra_h|
-        xtra_h.each do |k, v|
-          instance_exec v, & xtra_h_h.fetch( k )
-        end
-        nil
-      end
-
-      define_method :absorb do |*ref_xtra_h, &block|
-        mod_ref, xtra_h, mod_block =
-          norm_h.fetch( ref_xtra_h.length )[ *ref_xtra_h, block ]
-        if mod_ref
-          self.mod_ref = mod_ref
-        elsif mod_block
-          add_block mod_block
-        end
-        absorb_xtra_h xtra_h if xtra_h
-        nil
-      end
-    end.call
   end
 
   class Leaf_Sheet < Node_Sheet # created by N-S_Sheet. probably a command.
+
+    def initialize method_name=nil
+      super( )
+      @options = @option_parser_blocks = nil
+      if method_name
+        @name = :method ; @name_x = method_name
+        # ( imagine this like an opcode sexp then it makes sense )
+      else
+        @name = :none ; @name_x = nil
+      end
+    end
 
     def is_branch
       false
@@ -617,29 +649,59 @@ module Skylab::Face
       ( @option_parser_blocks ||= [ ] ) << blk
     end
 
-    def name_function
-      if @name_function.nil?
-        @name_function = if ! @method_name then false else
-          Services::Headless::Name::Function.new @method_name
-        end
-      end
-      @name_function
-    end
-
      # `hot` - a hot, live action (er, command) is requested
     def hot rc, rc_sheet, alias_used
       Command.new rc, self, alias_used
     end
 
-    attr_reader :block, :method_name  # Command wants to see you in his office
+    attr_reader :block  # Command wants to see you in his office
 
-    def method_name= x
-      if @method_name
-        raise "won't clobber method name"
-      else
-        @method_name = x
+    def method_name
+      if :method == @name
+        @name_x
       end
     end
+
+    def method_name= x
+      :none == @name or raise "won't set name with method when name #{
+        }already set with #{ @name }"
+      @name = :method ; @name_x = x
+      x
+    end
+
+    def get_command_parameters client
+      if @command_parameters_function
+        client.instance_exec( & @command_parameters_function )
+      elsif :method == @name
+        client.method( @name_x ).parameters
+      else
+        fail "sanity - can't get method parameters from client when #{
+          }name is #{ @name } (maybe set `command_parameters_function`?) #{
+          }(for client #{ client.class })"
+      end
+    end
+
+    def normalized_local_name= x
+      :none == @name or raise "won't set name with nln, name already #{
+        }set with #{ @name }"
+      @name = :nln ; @name_x = x
+      x
+    end
+
+    -> do  # `name_function`
+      f = -> x { Services::Headless::Name::Function.new x }
+      h = {
+        none: -> _ { false },
+        method: f,
+        nln: f
+      }
+      define_method :name_function do
+        if @name_function.nil?
+          @name_function = h.fetch( @name ).call( @name_x )
+        end
+        @name_function
+      end
+    end.call
 
     def options
       if @option_parser_blocks && @option_parser_blocks.length.nonzero?
@@ -649,14 +711,6 @@ module Skylab::Face
       end
 
       @options
-    end
-
-  protected
-
-    def initialize method_name=nil
-      super( )
-      @options = @option_parser_blocks = nil
-      @method_name = method_name  # nil ok
     end
   end
 
@@ -680,7 +734,18 @@ module Skylab::Face
 
     # (note the pattern that emerges in the order)
 
-  protected  # something strange is going on..
+    def initialize request_client, sheet, slug_fragment
+      @argv = nil  # only set in one place. usually for command-like options.
+      @did_prerender_help = @op = nil
+      @is_puffed = true  # nerks that want to do some loading can set to false
+      @queue_a = nil  # allows transactional o.p, command-like options.
+      if request_client
+        @parent = request_client
+        @y = @parent.error_stream_yielder
+      end
+      @sheet = sheet if sheet
+      # `slug_fragment` not currently stored. what the user typed is unimportant
+    end
 
     # existential workhorse `process_options` - called from main loop
 
@@ -706,6 +771,7 @@ module Skylab::Face
         end
       end
     end
+    public :process_options  # called in main invocation loop
 
     # `process_options` support
 
@@ -713,9 +779,10 @@ module Skylab::Face
       @op.nil? and init_op
       @op
     end
+    private :option_parser
 
     attr_reader :op
-    protected :op  # experts only
+    public :op  # experts only - might be called from an option parser block
 
     def init_op
       if true
@@ -723,25 +790,25 @@ module Skylab::Face
         @ugly_str, @ugly_id = op.banner.dup, op.banner.object_id
           # the above is for a documenting hack. make a note of these 2 things.
         cmd = self
-        use_options = @sheet.options || FUN.empty_a
+        option_ea = @sheet.options || FUN.empty_a
         option_parser_host.instance_exec do
           op.base.long['help'] = op.class::Switch::NoArgument.new do
             ( @queue_a ||= [ ] ) << [ :show_help, cmd ]
           end  # life is easier. invisible option overrides stdlib, which exits
-          use_options.each do |sheet|
-            if sheet.is_single_option  # (`on`)
-              if sheet.block.arity.zero?
-                op.define(* sheet.args ) do
-                  instance_exec( & sheet.block )
+          option_ea.each do |op_sheet|
+            if op_sheet.is_single_option  # (`on`)
+              if op_sheet.block.arity.zero?
+                op.define(* op_sheet.args ) do
+                  instance_exec( & op_sheet.block )
                 end
               else
-                op.define(* sheet.args ) do |v|
-                  instance_exec v, & sheet.block
+                op.define(* op_sheet.args ) do |v|
+                  instance_exec v, & op_sheet.block
                 end
               end
             else
               @command = cmd  # some o.p blocks want it both ways
-              instance_exec op, & sheet.block  # (`option_parser`)
+              instance_exec op, & op_sheet.block  # (`option_parser`)
               @command = nil
             end
           end
@@ -749,16 +816,19 @@ module Skylab::Face
       end
       nil
     end
+    private :init_op
 
     def build_empty_option_parser
       op = Face::Services::OptionParser.new
       op.base.long.clear  # no builtin -h or -v
       op
     end
+    private :build_empty_option_parser
 
     def option_parser_host  # a command is not the context for its blocks
       @parent
     end
+    private :option_parser_host
 
     -> do  # `highlight_header` (first seen in `process_options`)
 
@@ -769,13 +839,14 @@ module Skylab::Face
           "#{ hi $1 }"
         end
       end
-      protected :highlight_header
+      private :highlight_header
     end.call
 
     #     ~ ( formerly 'Colors` (still '`process_options` support'!) ) ~
     def hi str  # WAS: ohno=red; yelo=yellow, bold=(bright,green);
       style str, :green
     end
+    private :hi
 
     -> do  # `style`
 
@@ -792,7 +863,7 @@ module Skylab::Face
         end
         "#{ esc }[#{ codes * ';' }m#{ str }#{ esc }[0m"
       end
-      protected :style
+      private :style
     end.call
 
     def reason txt  # atypical early exit with reason, first in `proces_opts`
@@ -800,16 +871,19 @@ module Skylab::Face
       invite @y
       nil
     end
+    private :reason
 
     def invite y
       y << "Try #{ hi "#{ @parent.invocation_string } -h #{ slug }" } #{
         }for help."
       nil
     end
+    public :invite  # called by parents documenting children
 
     def slug
       @sheet.slug
     end
+    public :slug  # called by parents documenting children
 
     def process_queue                          # from `process_options`
       if ! @queue_a || @queue_a.length.zero?   # then stay. any opts parsed
@@ -824,6 +898,7 @@ module Skylab::Face
         [ stay, res ]                          # res is last res
       end
     end
+    public :process_queue  # part of your API as an option parser host
 
     # existential workhorse `parse` - requested from main loop
 
@@ -838,6 +913,7 @@ module Skylab::Face
       end
       # only because of [#004] we don't do what is right (for now)
     end
+    public :parse  # used in main invocation loop
 
     FN[:empty_a] = [ ].freeze  # `empty_a` - detect shenanigans, have ocd
 
@@ -849,6 +925,7 @@ module Skylab::Face
         [ @queue_a.length.nonzero?, res ]
       end
     end
+    private :show_help
 
     # `help` - result is a response pair when argv is present.
 
@@ -866,8 +943,7 @@ module Skylab::Face
       # loop decide what to do with them. stay if any args left.
       [ @argv && @argv.length.nonzero?, nil ]
     end
-
-  protected  # `help` support
+    public :help  # called by parents documenting children
 
     # maybe hackishly, maybe not, but our `documenter` is our option parser
     # (the same instance) but with the banner maybe set to an enhanced string.
@@ -879,14 +955,17 @@ module Skylab::Face
         @op
       end
     end
+    private :documenter
 
     def has_fully_visible_op
       @sheet.options && @sheet.options.detect(& :is_fully_visible )
     end
+    private :has_fully_visible_op
 
     def has_partially_visible_op
       @sheet.options && @sheet.options.length.nonzero?
     end
+    private :has_partially_visible_op
 
     def prerender_help
       # we only "enchance" the main o.p if you didn't write or modify your
@@ -902,25 +981,29 @@ module Skylab::Face
       end
       true  # important!
     end
+    private :prerender_help
 
     def usage y
       y << usage_line
       x = additional_usage_lines and y.concat x
       nil
     end
+    public :usage  # called by parents documenting children
 
     def usage_line
       "#{ hi usage_header_text } #{ syntax }"
     end
+    public :usage_line  # may be used by clients to create docs e.g. o.p banners
 
     -> do  # `usage_header_text`
       txt = 'usage:'.freeze
       define_method :usage_header_text do txt end
-      protected :usage_header_text
+      private :usage_header_text
     end.call
 
     def additional_usage_lines
     end  # for now this only happens at branch nodes.
+    private :additional_usage_lines
 
     def syntax
       x = nil
@@ -929,18 +1012,17 @@ module Skylab::Face
       a << x if ( x = argument_syntax )
       a * ' '
     end
-
-  public  # up-delegators
+    private :syntax
 
     def invocation_string
       "#{ @parent.invocation_string } #{ normalized_invocation_slug }"
     end
+    public :invocation_string  # called by children as you can see above
 
     def normalized_invocation_slug
       @sheet.slug.intern
     end
-
-  protected
+    public :normalized_invocation_slug  # called in main invocation loop
 
     def option_syntax
       if option_parser && has_partially_visible_op
@@ -950,6 +1032,7 @@ module Skylab::Face
         a * ' ' if a.length.nonzero?
       end
     end
+    private :option_syntax
 
     def each_option  # assumes that @op (when constructed) will be an o.p
       @op_enum ||= begin
@@ -963,19 +1046,20 @@ module Skylab::Face
         ea
       end
     end
+    private :each_option
 
     -> do  # `argument_syntax`
       reqity_brackets = nil
 
       define_method :argument_syntax do
-        method = @parent.method @sheet.method_name
-        parts = method.parameters.reduce [] do |m, x|
+        parts = @sheet.get_command_parameters( @parent ).reduce [] do |m, x|
           a, z = ( reqity_brackets ||=  # narrow the focus of the dep for now
             Services::Headless::CLI::Argument::FUN.reqity_brackets )[ x[0] ]
           m << "#{ a }<#{ FUN.slugulate[ x[1] ] }>#{ z }"
         end
         parts * ' ' if parts.length.nonzero?
       end
+      private :argument_syntax
     end.call
 
     FN[:slugulate] = -> x do
@@ -984,16 +1068,19 @@ module Skylab::Face
 
     def additional_help y  # (hook for child classes to exploit handily)
     end
+    private :additional_help
 
     # existential workhorses: `method_name`, `summary`
 
     def method_name  # called when the `parse` was successful - remember
       @sheet.method_name  # it is not we who actually execute the implementation
     end
+    public :method_name  # called in main invocation loop
 
     -> do  # `summary` idem. # NOTE **lots** of goofing around here # #todo
 
       hack_excerpt_from_option_parser = -> do
+
         # this terrific hack tries to distill a summary out of the first one
         # or two lines of the option parser -- it strips out all styling from
         # them (b.c it looks wrong in summaries), and indeed strips out the
@@ -1074,26 +1161,13 @@ module Skylab::Face
           [ "usage: #{ syntax }" ]  # like `usage_line` but unstylized
         end
       end
+      public :summary  # called by parents documenting children
     end.call
 
     def out  # here for proximity to `include` b.c it feels right
       @parent.out
     end
-
-  protected
-
-    def initialize request_client, sheet, slug_fragment
-      @argv = nil  # only set in one place. usually for command-like options.
-      @did_prerender_help = @op = nil
-      @is_puffed = true  # nerks that want to do some loading can set to false
-      @queue_a = nil  # allows transactional o.p, command-like options.
-      if request_client
-        @parent = request_client
-        @y = @parent.error_stream_yielder
-      end
-      @sheet = sheet if sheet
-      # `slug_fragment` not currently stored. what the user typed is unimportant
-    end
+    public :out  # called by children
   end
 
   class Namespace  # (re-open)
@@ -1108,6 +1182,7 @@ module Skylab::Face
 
       def inherited cls
         cls.class_exec do
+          @dsl_is_hot = true
           @do_grab_next_method = nil
           @order_a = [ ]
           @story ||= begin
@@ -1141,7 +1216,7 @@ module Skylab::Face
         a
       end
 
-    protected
+    private
 
       def on first, *rest, &b
         @story.on first, *rest, &b
@@ -1163,13 +1238,31 @@ module Skylab::Face
         end
         @story.namespace norm, *ref_xtra_h, &block
       end
+
+      # `reveal` - automatically makes CLI for API action
+      # ( please see downstream for full documentation. )
+
+      def reveal * i_a
+        @order_a << i_a.fetch( 0 )  # (implicitly validates length of `i_a` too)
+        CLI::Revelation[ @story, i_a ]  # (monkey patches classes here too)
+        @do_grab_next_method = nil  # close any open command
+      end
     end
 
-  public
+    def initialize request_client, slug_fragment, opt_h=nil
+      @last_norm_name = nil
+      if opt_h
+        sheet = nil
+        opt_h_h = { sheet: -> x { sheet = x } }
+        opt_h.each { |k, v| opt_h_h.fetch( k ).call( v ) }
+      end
+      super request_client, sheet || self.class.story, slug_fragment
+    end
 
     def default_argv  # from main function
       @sheet.default_argv
     end
+    public :default_argv  # used in main invocation loop
 
     def parse argv  # branches always do this (default argv was covered above)
       if argv.empty?
@@ -1178,8 +1271,11 @@ module Skylab::Face
         super
       end
     end
+    public :parse  # used in main invocation loop
 
     attr_reader :last_normalized_child_slug
+    private :last_normalized_child_slug
+
     def last_normalized_child_slug= x
       if last_normalized_child_slug
         raise "sanity - are you really re-invoking the same branch instance?"
@@ -1187,17 +1283,18 @@ module Skylab::Face
         @last_normalized_child_slug = x
       end
     end
-
-  protected  # (shadow `process_options` support)
+    public :last_normalized_child_slug=  # set in main invocation loop
 
     def option_parser_host
       self  # differnt from command, whose host is parent; when we build
     end  # an o.p it is because we ourselves are making one for ourself.
+    private :option_parser_host
 
     def invite y
       y << "try #{ hi("#{ invocation_string } -h [sub-cmd]")} for help."
       nil
     end
+    public :invite  # called by parents documenting children
 
     # `find_command` - existential workhorse called from main loop.
     # assumes at least 1 element in argv. remove at most 1 element off
@@ -1235,6 +1332,7 @@ module Skylab::Face
       reason "Expecting #{ expecting }."
       [ false, nil ]
     end
+    private :report_expecting
 
     def expecting  # styled
       @is_puffed or puff
@@ -1245,18 +1343,21 @@ module Skylab::Face
         a * ' or '
       end
     end
+    private :expecting
 
     def unrecognized_command given
       reason "Unrecognized command: #{ given.inspect }. #{
         }Expecting: #{ expecting }"
       [ false, nil ]
     end
+    private :unrecognized_command
 
     def ambiguous_command found, given  # #todo not covered
       reason "Ambiguous command: #{ given.inspect }. #{
         }Did you mean #{ found.map{ |c| hi c.slug } * ' or ' }?"
       [ false, nil ]
     end
+    private :ambiguous_command
 
     # `help` support (shadowing the order of parent)
 
@@ -1284,6 +1385,7 @@ module Skylab::Face
         subcmd_help cmd  # just a little hook
       end
     end
+    private :subcommand_help
 
     -> do  # `parameters` - goofing around
       pxy = nil
@@ -1304,7 +1406,7 @@ module Skylab::Face
           end
         )
       end
-      protected :parameters
+      private :parameters
     end.call
 
     -> do  # `options` - goofing around
@@ -1322,7 +1424,7 @@ module Skylab::Face
           )
         end.call
       end
-      protected :options
+      private :options
     end.call
 
     Face::FUN = Face::FN.to_struct
@@ -1332,6 +1434,7 @@ module Skylab::Face
                          # (pre- and postfix forms)
       @argv.length.nonzero? || @queue_a.length.nonzero?
     end
+    private :subcommand_help
 
     def additional_usage_lines
       if @sheet.command_tree && has_partially_visible_op
@@ -1340,6 +1443,7 @@ module Skylab::Face
           }#{ invocation_string } #{ tos }" ]
       end
     end
+    private :additional_usage_lines
 
     def terminal_option_syntax  # assume @op
       a = each_option.reduce [] do |m, opt|
@@ -1347,10 +1451,12 @@ module Skylab::Face
       end
       "{#{ a * '|' }}" if a.length.nonzero?
     end
+    private :terminal_option_syntax
 
     def option_syntax
       super if ! @sheet.command_tree  # otherwise it just gets in the way
     end
+    private :option_syntax
 
     def argument_syntax
       if @sheet.command_tree
@@ -1362,6 +1468,7 @@ module Skylab::Face
         end
       end
     end
+    private :argument_syntax
 
     def additional_help y
       a = @sheet.command_tree
@@ -1390,10 +1497,12 @@ module Skylab::Face
       end
       nil
     end
+    private :additional_help
 
     def margin
       @parent.margin
     end
+    private :margin
 
     Item = ::Struct.new :hdr, :lines
 
@@ -1402,31 +1511,37 @@ module Skylab::Face
     end
     public :error_stream_yielder  # #up-delegator
 
-    def initialize request_client, slug_fragment, opt_h=nil
-      @last_norm_name = nil
-      if opt_h
-        sheet = nil
-        opt_h_h = { sheet: -> x { sheet = x } }
-        opt_h.each { |k, v| opt_h_h.fetch( k ).call( v ) }
-      end
-      super request_client, sheet || self.class.story, slug_fragment
-    end
-
-    #         ~ experimental API routing ~
-
-  private
+    #        ~ experimental API integration - namespace edition ~
 
     def api *args
-      a = normalized_child_name
-      param_h = complete_param_h args
-      action = api_client.build_action a, param_h
-      set_behaviors action
-      handle_events action
-      alt, res = api_client.normalize action
-      if alt then res else
+      api_client_ = api_client  # #todo
+      normalized_child_name_ = normalized_child_name
+      action = api_client_.get_executable normalized_child_name_,
+        finish_param_h( args ), modal_client_for_api_call
+      modality_client.set_last_api_action action
+      if action
         action.execute
       end
     end
+    private :api
+
+    # `modal_client_for_api_call` - please see [#fa-010].
+
+    def modal_client_for_api_call
+      modality_client
+    end
+    private :modal_client_for_api_call
+
+    def modality_client
+      if parent
+        @parent.modality_client
+      else
+        self
+      end
+    end
+
+    attr_reader :parent  # only for avoiding setting the ivar (above)
+    private :parent
 
     def normalized_child_name
       x = @last_normalized_child_slug or fail 'sanity'
@@ -1437,6 +1552,7 @@ module Skylab::Face
       end
       a
     end
+    private :normalized_child_name
 
     def visit_normalized_name a
       a.unshift @sheet.slug.intern
@@ -1444,32 +1560,58 @@ module Skylab::Face
     end
     public :visit_normalized_name
 
-    def complete_param_h args
-      @param_h or fail 'sanity'
-      m = method @last_normalized_child_slug
-      m.parameters.each_with_index do | (_, k), i|
-        @param_h[ k ] = args.fetch i
+    def finish_param_h args
+      par_h = param_h and ( had_some = true and @param_h = nil )
+      par_h ||= { }  # maybe you have no o.p and no arguments, we'll see:
+      child_sheet = @sheet.fetch_element(
+        Services::Headless::Name::FUN.metholate[
+          @last_normalized_child_slug ].intern )
+      child_sheet.get_command_parameters(self).each_with_index do | (_, k), i|
+        par_h[ k ] = args.fetch i
       end
-      param_h = @param_h ; @param_h = nil
-      param_h
+      # if you set @param_h elsewhere you are guaranteed to get it here.
+      # elsewise you only get some if there were some params to be had.
+      par_h if par_h.length.nonzero? || had_some
     end
+    private :finish_param_h
 
-    %i| api_client set_behaviors handle_events normalize |.each do |i|
+    attr_reader :param_h
+    private :param_h
+
+    %i| api_client handle_events normalize |.each do |i|
       define_method i do |*a, &b|
         @parent.send i, *a, &b
       end
+      private i
     end
 
-    def self.method_added meth  # keep at end!
-      @order_a << meth if @order_a  # (the check is just for sing.class & dbg)
-      if @do_grab_next_method
-        @story.the_method_was_added meth
-        @do_grab_next_method = nil
+    def self.dsl_off
+      @dsl_is_hot = false
+      nil
+    end
+
+    def self.with_dsl_off
+      prev = @dsl_is_hot
+      r = yield
+      @dsl_is_hot = prev
+      r
+    end
+
+    @dsl_is_hot = false  # turn off our own dsl for when we get monkeypatched.
+
+    def self.method_added meth # NOTE we like to keep this at the end of the kls
+      if @dsl_is_hot
+        @order_a << meth if @order_a  # (the check is just for sing.class & dbg)
+        if @do_grab_next_method
+          @story.the_method_was_added meth
+          @do_grab_next_method = nil
+        end
       end
+      nil
     end
   end
 
-  class CLI
+  class CLI  # `version`
     -> do
       norm_h = {
         0 => -> a, b do
@@ -1506,7 +1648,7 @@ module Skylab::Face
                 @argv.length.nonzero? || @queue_a.length.nonzero?
                   # stay (keep processing args) if either of these.
               end
-              protected :show_version
+              private :show_version
             end
           end
         end,
