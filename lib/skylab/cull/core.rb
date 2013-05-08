@@ -1,15 +1,16 @@
 require_relative '..'
-require 'skylab/basic/core'
+
 require 'skylab/code-molester/core'  # pub-sub too
 require 'skylab/face/core'
 
 module Skylab::Cull
 
-  %i[ Basic CodeMolester Cull Face Headless PubSub MetaHell ].each do |i|
+  %i[ CodeMolester Cull Face Headless PubSub MetaHell ].each do |i|
     const_set i, ::Skylab.const_get( i )
   end
 
-  MAARS = MetaHell::Autoloader::Autovivifying::Recursive
+  Basic = Face::Services::Basic
+  MAARS = MetaHell::MAARS
 
   extend MAARS
 

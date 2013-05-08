@@ -112,7 +112,7 @@ module Skylab::PubSub::TestSupport
             h[k] = desc_h_h.fetch( k )[ v ]
             h
           end
-          'emit{{pos}}{{type}}{{msg}}'.gsub Headless::CONSTANTS::MUSTACHE_RX do
+          'emit{{pos}}{{type}}{{msg}}'.gsub PubSub::Basic::String::MUSTACHE_RX do
             b = true
             x = use_h.fetch( $1.intern ) do b = false end  # catch metaerrors
             " #{ x }" if b

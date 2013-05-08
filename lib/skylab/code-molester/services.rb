@@ -8,7 +8,7 @@ module Skylab::CodeMolester
       h[const] = f
     end
 
-    o :Basic,         -> { require 'skylab/basic/core' ; ::Skylab::Basic }
+    o :Basic,         -> { Headless::Services::Basic }
 
     o :Face,          -> { require 'skylab/face/core' ; ::Skylab::Face }
 

@@ -7,6 +7,7 @@ require 'skylab/pub-sub/core'
 
 module Skylab::Treemap
   [ :Autoloader,
+    :Basic,
     :Headless,
     :MetaHell,
     :Porcelain,
@@ -19,7 +20,7 @@ module Skylab::Treemap
   Bleeding = Porcelain::Bleeding  # and this might as well be its own subproduct
                                   # it is a legacy f.w that might go away
 
-  MAARS = MetaHell::Autoloader::Autovivifying::Recursive
+  MAARS = MetaHell::MAARS
 
   #         ~ tiny stowaway modules, too small for their own file ~
   #                          (in load order)

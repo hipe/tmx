@@ -33,11 +33,11 @@ module Skylab::TanMan
         equals = _label_sexp[:content][:equals]
         str = equals[:id].normalized_string
 
-        if TanMan::Template.parameter? str, :label
+        if TanMan::Services::Template.parameter? str, :label
           s = equals[:id]._escape_string label_string, error
           s or break( res = s )
 
-          out_s = TanMan::Template.from_string( str )[ label: s ]
+          out_s = TanMan::Services::Template.from_string( str )[ label: s ]
 
           # NOTE you lose information above -- you cannot now go back and re-
           # evaluate the template. What you could do is 1) either hold on to

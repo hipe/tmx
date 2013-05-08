@@ -1,7 +1,7 @@
 require 'strscan'
 
 module Skylab::Slake
-  module Interpolate              # deprecated for TanMan::Template
+  module Interpolate         # deprecated for Basic::String::Template [#ba-005]
     extend self
     def interpolate string, source
       Interpolation.new(source, string).run

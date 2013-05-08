@@ -8,7 +8,7 @@ module Skylab::FileMetrics
     const_set c, ::Skylab.const_get( c, false )
   end
 
-  MAARS = ::Skylab::MetaHell::Autoloader::Autovivifying
+  MAARS = MetaHell::MAARS
 
   # as one alternative to another..
   [ :API, :Common, :Model, :Models ].each do |c|

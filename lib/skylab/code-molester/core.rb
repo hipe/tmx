@@ -1,4 +1,5 @@
 require_relative '..'
+
 require 'skylab/headless/core'
 require 'skylab/pub-sub/core'
 
@@ -8,7 +9,7 @@ module ::Skylab::CodeMolester
     const_set i, ::Skylab.const_get( i, false )
   end
 
-  MAARS = MetaHell::Autoloader::Autovivifying::Recursive
+  MAARS = MetaHell::MAARS
 
   extend MAARS
 

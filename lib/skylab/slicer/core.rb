@@ -8,7 +8,7 @@ module Skylab::Slicer
     const_set i, ::Skylab.const_get( i, false )
   end
 
-  MAARS = MetaHell::Autoloader::Autovivifying::Recursive
+  MAARS = MetaHell::MAARS
 
   extend MAARS
 

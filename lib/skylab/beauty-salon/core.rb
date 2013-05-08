@@ -1,14 +1,14 @@
 require_relative '..'
-require 'skylab/basic/core'
 require 'skylab/face/core'
 
 module Skylab::BeautySalon
 
-  %i| Basic BeautySalon Face MetaHell |.each do |i|
+  %i| BeautySalon Face MetaHell |.each do |i|
     const_set i, ::Skylab.const_get( i, false )
   end
 
-  MAARS = MetaHell::Autoloader::Autovivifying::Recursive
+  Basic = Face::Services::Basic
+  MAARS = MetaHell::MAARS
 
   extend MAARS
 

@@ -1,11 +1,14 @@
 require_relative '..'
+
 require 'skylab/meta-hell/core'
 
 module Skylab::Face
 
-  Face = self
-  MetaHell = ::Skylab::MetaHell
-  MAARS = MetaHell::Autoloader::Autovivifying::Recursive
+  %i| Face MetaHell |.each do |i|
+    const_set i, ::Skylab.const_get( i, false )
+  end
+
+  MAARS = MetaHell::MAARS
 
   extend MAARS
 
@@ -15,7 +18,7 @@ module Skylab::Face
 
     o = { }
 
-    o[:Basic] = -> { require 'skylab/basic/core' ; ::Skylab::Basic }
+    o[:Basic] = -> { Services::Headless::Services::Basic }
 
     o[:Headless] = -> { require 'skylab/headless/core' ; ::Skylab::Headless }
 

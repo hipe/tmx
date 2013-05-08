@@ -15,7 +15,7 @@ module Skylab::TanMan
     define_singleton_method :fetch do |stem|
       pathname = dir_pathname.join stem # (it normalizes dotty paths)
       result = cache.fetch pathname.to_s do |path|
-        cache[path] = TanMan::Template.from_path path
+        cache[path] = TanMan::Services::Template.from_path path
       end
       result
     end

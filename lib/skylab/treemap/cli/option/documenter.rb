@@ -346,7 +346,7 @@ module Skylab::Treemap
       # from the frameworks)
 
       fun = Headless::CLI::Option::Parser::Scanner::FUN
-      mustache_rx = Headless::CONSTANTS::MUSTACHE_RX
+      mustache_rx = Basic::String::MUSTACHE_RX
 
       define_method :summarize_switch do |sw, idx, args, blk|
         sw.summarize(* args ) do |line|  # (no how about *I'll* call it)
