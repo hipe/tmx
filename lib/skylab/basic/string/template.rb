@@ -1,11 +1,10 @@
-module Skylab::TanMan
+module Skylab::Basic
 
-  class Template < ::Struct.new :pathname, :string # hybrid class and namepsace
-                                                   # (#pattern [#sl-109])
-                                  # the stupid-simplest implementation
-                                  # of templating (think mustache, but
-                                  # with *only* parameter interpolation
-                                  # and nothing else.)  also a sandbox for fun.
+  class String::Template
+
+    # `Basic::String::Template` - the stupid-simplest implementation of
+    # templating possible (think mustache but with *only* parameter
+    # interpolation and nothing else). also a sandbox for fun.
 
     def self.[] template_string, param_h           # collapse a template
       from_string( template_string ).call param_h  # in one line
@@ -13,24 +12,29 @@ module Skylab::TanMan
 
     o = { }                       # anonymous functions used all over the place
 
-    update_members = -> members do  # a function (method body) generator exp.
+    # `initialize_ivars_method_body` - generates a function to be a method body
+
+    o[:initialize_ivars_method_body] = -> member_a do
+      ivar_h    = ::Hash[ member_a.map { |i| [ i, :"@#{ i }" ] } ]
+      default_h = ::Hash[ member_a.map { |i| [ i, nil ] } ]
       -> param_h do
-        a = param_h.keys - members
+        a = param_h.keys - member_a
         if a.empty?
+          dflt_h = default_h.dup
           param_h.each do |k, v|
-            send "#{ k }=", v
+            dflt_h.delete k
+            instance_variable_set ivar_h.fetch( k ), v
+          end
+          dflt_h.each do |k, v|
+            instance_variable_set ivar_h.fetch( k ), v
           end
         else
-          str = Headless::NLP::EN::Minitesimal::FUN.inflect[ -> do
+          raise ::NameError, Services::Headless::NLP::EN::Minitesimal::FUN.
+              inflect[ -> do
             "no member#{ s a } #{ or_( a.map { |x| "'#{ x }'" } ) } in struct"
           end ]
-          raise ::NameError.exception str
         end
       end
-    end
-
-    o[:initializer] = -> members do  # a fun stab at a generalized solution
-      update_members[ members ]   # for structs that we use like this
     end
 
     o[:normalize_matched_parameter_name] = -> x do
@@ -41,20 +45,11 @@ module Skylab::TanMan
       "{{#{ name }}}" # super duper non-robust
     end
 
-    FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
+    FUN = ::Struct.new( * o.keys ).new( * o.values ).freeze
 
-  end
+  end  # re-opens below [#sl-109]
 
-
-  module Template::Methods        # used as both m.m's and i.m's
-
-    define_method :parametize, & Template::FUN.parametize
-
-  end
-
-
-  module Template::ModuleMethods
-    include Template::Methods
+  module String::Template::ModuleMethods
 
     def from_path path
       new pathname: ( path ? ::Pathname.new( path.to_s ) : path )
@@ -64,25 +59,20 @@ module Skylab::TanMan
       new string: string
     end
 
-    def initializer
-      Template::FUN.initializer[ members ] # pls follow the rabbit down the hole
-    end
-
     def parameter? str, param_name
       str.include? parametize( param_name )
     end
+
+    define_method :parametize, & String::Template::FUN.parametize
+    private :parametize
+
   end
 
+  module String::Template::InstanceMethods
 
-  module Template::InstanceMethods
-    include Template::Methods
-                                  # generate the output string! (the main thing)
-
-    normalize = Template::FUN.normalize_matched_parameter_name
-
-    define_method :call do |param_h|
+    def call param_h
       template_string.gsub( parameter_rx ) do
-        param = normalize[ $1 ]
+        param = normalize $1
         if param_h.key? param
           param_h[ param ]
         else                      # else we write it back into the string (ick)?
@@ -92,13 +82,27 @@ module Skylab::TanMan
       end                         # kind of thing should probably be done in
     end                           # the controller with template reflection
 
-    alias_method :[], :call       # careful! overrides struct thing
+    -> do  # `parameter_rx`
+      rx = Basic::String::MUSTACHE_RX
+      define_method :parameter_rx do rx end
+      private :parameter_rx
+    end.call
 
-    formal_param_struct = ::Struct.new :surface, :normalized_name, :offset
+    define_method :parametize, & String::Template::FUN.parametize
+    private :parametize
 
-    define_method :formal_parameters do
+    define_method :normalize, &
+      String::Template::FUN.normalize_matched_parameter_name
+    private :normalize
+
+    alias_method :[], :call       # alias the above defined method.  careful!
+                                  # now we look like a function yay.
+
+    Param_ = ::Struct.new :surface, :normalized_name, :offset
+
+    def formal_parameters
       ::Enumerator.new do |y|
-        scn = TanMan::Services::StringScanner.new template_string
+        scn = Basic::Services::StringScanner.new template_string
         skip_rx = /(?: (?! #{ parameter_rx.source } ) . )+/x
         while ! scn.eos?
           blank   = scn.skip skip_rx  # (change to scan if you want the match)
@@ -107,10 +111,9 @@ module Skylab::TanMan
             fail "sanity - parse hack failure" # logic must be wrong
           end
           if surface
-            normalized_name = normalize[ parameter_rx.match(surface)[1] ]
+            normalized_name = normalize parameter_rx.match(surface)[1]
             offset = scn.pos - surface.length
-            fp = formal_param_struct[ surface, normalized_name, offset ]
-            y << fp
+            y << Param_[ surface, normalized_name, offset ]
           end
         end
       end
@@ -121,10 +124,6 @@ module Skylab::TanMan
     end
 
   protected
-
-    rx = Headless::CONSTANTS::MUSTACHE_RX
-
-    define_method( :parameter_rx ) { rx }
 
     def template_string
       if string
@@ -141,12 +140,15 @@ module Skylab::TanMan
     end
   end
 
+  class String::Template
 
-  class Template
-    extend Template::ModuleMethods
-    include Template::InstanceMethods
+    extend String::Template::ModuleMethods
 
-    define_method :initialize, & initializer # sorry, please watch
+    include String::Template::InstanceMethods
 
+    attr_reader( * ( a = %i| pathname string | ) )
+
+    define_method :initialize, &
+      String::Template::FUN.initialize_ivars_method_body[ a ]
   end
 end

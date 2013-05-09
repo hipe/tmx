@@ -3,12 +3,11 @@
 require_relative '../lib/skylab'
 require 'skylab/face/core'      # `pretty_path`, Tableize::I_M
 require 'skylab/headless/core'  # only for require_quietly
-require 'skylab/basic/core'     # only for the `counts` report for now..
 require 'optparse'
 
 module Skylab::Test
 
-  %i| Basic Face Headless Test |.each do |i|
+  %i| Face Headless Test |.each do |i|
     const_set i, ::Skylab.const_get( i, false )
   end
 
@@ -513,7 +512,7 @@ module Skylab::Test
     # `hot_subtree` - both a service and used internally
 
     def hot_subtree
-      Basic::Tree.new do |y|
+      Headless::Services::Basic::Tree.new do |y|
         conflict_a = nil
         ag = build_aggregated_agent nil, -> do
           true
@@ -541,7 +540,7 @@ module Skylab::Test
         end.call
         if r
           sp_cache_a.each do |sp, a|
-            y << ( Basic::Tree.new sp do |yy|
+            y << ( Headless::Services::Basic::Tree.new sp do |yy|
               a.each( & yy.method( :<< ) ) if a
             end )
           end

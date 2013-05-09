@@ -5,6 +5,7 @@ module Skylab::Headless
     h = { }
     define_singleton_method( :o ) { |k, f| h[k] = f }
 
+    o :Basic        , -> { require 'skylab/basic/core' ; ::Skylab::Basic }
     o :CodeMolester , -> { require 'skylab/code-molester/core'
                                                   ::Skylab::CodeMolester }
     o :FileUtils    , -> { require 'fileutils'  ; ::FileUtils }

@@ -1,13 +1,20 @@
 require_relative '..'
+
 require 'skylab/headless/core'
 require 'skylab/pub-sub/core'
 
 module Skylab
+
   module Porcelain
-    Headless = ::Skylab::Headless # i win
-    MAARS    = ::Skylab::MetaHell::Autoloader::Autovivifying::Recursive
-    MetaHell = ::Skylab::MetaHell
-    PubSub   = ::Skylab::PubSub
+
+    %i| Headless MetaHell PubSub |.each do |i|
+      const_set i, ::Skylab.const_get( i, false )
+    end
+
+    # headless in porcelain yes. headles trumps porcelain.
+
+    MAARS = MetaHell::MAARS
+
     extend MAARS
   end
 end

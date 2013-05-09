@@ -155,7 +155,8 @@ module Skylab::TanMan
       # a sound? certainly not.
 
       on_call_to_action do |e|
-        msg = TanMan::Template[ e.template, action: act( e.action_class ) ]
+        msg = TanMan::Services::
+          Template[ e.template, action: act( e.action_class ) ]
         emit :help, msg  # if something else is listening to *this* ..
         nil
       end

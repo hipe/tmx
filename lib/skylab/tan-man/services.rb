@@ -22,6 +22,7 @@ module ::Skylab::TanMan
     o :Open3,         -> { require 'open3'    ; ::Open3 }
     o :StringIO,      -> { require 'stringio' ; ::StringIO }
     o :StringScanner, -> { require 'strscan'  ; ::StringScanner }
+    o :Template,      -> { Headless::Services::Basic::String::Template }
 
     build_service = -> pathname do
       klass = Services.const_fetch pathname.basename.sub_ext('').to_s # BOXXY!!

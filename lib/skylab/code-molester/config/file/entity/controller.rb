@@ -282,7 +282,7 @@ module Skylab::CodeMolester::Config::File::Entity
       h = {
         ick: -> { "\"#{ x }\"" }
       }
-      tmpl_str.gsub( Headless::CONSTANTS::MUSTACHE_RX ) do
+      tmpl_str.gsub Basic::String::MUSTACHE_RX do
         h.fetch( $~[1].intern ).call
       end
     end
