@@ -1,4 +1,8 @@
-[#006]       #sub-node "the API library" #initials:`api` ..
+[#009] #hm   magic with allowing either CLI or CLI::Client for the client.
+[#008]       expression templates
+[#007]       #sub-node "the API library" #initials:`api` ..
+[#006]       #doc-point *finally we give it a name:
+               `isomorphic argument syntax`
 [#005]       #sub-node "entity library" #initials:`el` ..
 [#004]       argument error hack
 [#003] #open Face::Open2 is superseded by Headless::IO::Upstream::Select
