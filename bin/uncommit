@@ -89,9 +89,18 @@ exit_status = 0
 
   page_size = 4096  # meh
 
-  ::Open3.popen3 'git', 'show', i_pn.to_s do |sin, sout, serr|
-    '' != ( e = serr.read ) and break( bork[ "unexpected - #{ e }" ] )
-    chunk = sout.read( page_size )
+  show_cmd_a = [ 'git', 'show', i_pn.to_s ]
+
+  ::Open3.popen3( *show_cmd_a ) do |sin, sout, serr|
+
+    # (if you just `serr.read` right now it blocks. below is nonblock [#hl-048])
+    read_a, _, _ = ::IO.select [ serr ], nil, nil, 0.33
+
+    if read_a
+      break bork[ "unexpected STDERR output - #{ read_a.fetch( 0 ).read }" ]
+    end
+
+    chunk = sout.read page_size
 
     if chunk
       o_fh = o_pn.open 'w+'
@@ -126,7 +135,7 @@ exit_status = 0
 
   y << "(running: #{ kbd[ cmd * ' ' ] })"
 
-  exitstatus = ::Open3.popen3( * cmd ) do |sin, sout, serr, wait_thrd|
+  _exitstatus = ::Open3.popen3( * cmd ) do |sin, sout, serr, wait_thrd|
     saw = nil
     line = sout.read
     while '' != line
