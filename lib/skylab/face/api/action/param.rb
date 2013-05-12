@@ -5,12 +5,12 @@ module Skylab::Face
     # this whole node if for experimenting in the automatic creation of a set
     # of meta-fields that can be recognized by the entity library. tag your
     # fields with these metafields and we can try to make magic happen for you
-    # (#placeholder: [#fa-el-002])
+    # (#placeholder: [#fa-013])
 
     METAFIELDS_ = [
 
       [ :field, :reflective ],
-                # if the parameter is a field and not an option ([#fa-el-001])
+                # if the parameter is a field and not an option
 
       [ :option, :reflective ],
                 # if the parameter is an option and not a field (idem)
@@ -66,7 +66,7 @@ module Skylab::Face
   module API::Action::Param::InstanceMethods
 
     # `pack_fields_and_options` - #experimentally many methods in the
-    # entity library take the "sacred four" parameters [#fa-el-001].
+    # entity library take the "sacred four" parameters [#fa-012].
     # freqently requests coming in from the client will munge the
     # two namespaces (one of business-level fields, (e.g "email") and the
     # other of controller-level options (e.g `verbose`), however the

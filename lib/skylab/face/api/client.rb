@@ -66,11 +66,11 @@ module Skylab::Face
         if x.respond_to? :call
           action = API::Action.const_get( :Proc, false )[ x ]
         else
-          action = x.new                             # [#fa-api-001]
-          handle_events modal_client, action         # [#fa-api-002]
-          resolve_services modal_client, action      # [#fa-api-003]
+          action = x.new                             # [#fa-016]
+          handle_events modal_client, action         # [#fa-017]
+          resolve_services modal_client, action      # [#fa-018]
         end
-        b, r = normalize action, param_h             # [#fa-api-004]
+        b, r = normalize action, param_h             # [#fa-019]
         b and break
         r = action
       end while nil
@@ -89,7 +89,7 @@ module Skylab::Face
       -> { extend MetaHell::Boxxy }  # sketchily enhance it no matter what
                                      # uh-oh, this is duplicated above..
 
-    # `handle_events` - [#fa-api-002]
+    # `handle_events` - [#fa-017]
     # the API client handles no events. when invoking an API action "directly"
     # through the API, the only thing you get (for now) is the result of the
     # execute. however, if a `modal_client` is passed, we hook into that.
@@ -103,7 +103,7 @@ module Skylab::Face
     end
     private :handle_events  # called above only
 
-    # `resolve_services` - [#fa-api-003] - result undefined. raises on falure.
+    # `resolve_services` - [#fa-018] - result undefined. raises on falure.
 
     def resolve_services modal_client, action
       if action.respond_to? :resolve_services
@@ -122,7 +122,7 @@ module Skylab::Face
     end
     private :resolve_services  # called above only
 
-    #  `normalize` - this is [#fa-api-004], documented here.
+    #  `normalize` - this is [#fa-019], documented here.
     #
     # give the API action a chance to run normalization (read: validation,
     # internalization) hooks before executing. note we want the specifics of
@@ -148,7 +148,7 @@ module Skylab::Face
     # `y#<<` received). this allows for evented handling of the message, e.g
     # adding meta-information about the action to the message.
     #
-    # (with the above said, please see [#fa-api-004] for more details)
+    # (with the above said, please see [#fa-019] for more details)
 
     def normalize action, param_h
       if action.respond_to? :normalize or param_h && param_h.length.nonzero?

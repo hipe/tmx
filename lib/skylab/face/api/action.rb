@@ -16,20 +16,20 @@ module Skylab::Face
     #
     #     [primordial] --o          just been created. no ivars at all (as far
     #                     \         as this API knows). is is probably right
-    #                      \        after a call to `new`     [#fa-api-001]
+    #                      \        after a call to `new`     [#fa-016]
     #                       \
-    #                        o->  `handle_events`             [#fa-api-002]
+    #                        o->  `handle_events`             [#fa-017]
     #                         /
     #     [wired]      <-----o      things subscribe to listen to its events:
     #                  -o           now it has some @event_listeners.
     #                    \
-    #                     o--->   `resolve_services`          [#fa-api-003]
+    #                     o--->   `resolve_services`          [#fa-018]
     #                        /
     #     [plugged-in]  <---o        now it may have a @plugin_story and a
     #                   -o           @plugin_host_proxy, (and/or aribtrary
     #                     \          ivars if you are using `ingest`..))
     #                      \
-    #                       o-->  `normalize`                 [#fa-api-004]
+    #                       o-->  `normalize`                 [#fa-019]
     #                         /
     #     [executable]  <----o       now basic normalization has been done
     #                   -o           with parameters, that is, everything that
@@ -37,7 +37,7 @@ module Skylab::Face
     #                      \         (think DSL) instead of imperatively.
     #                       \        arbitrary business ivars set now.
     #                        \
-    #                         o-> `execute`                   [#fa-api-005]
+    #                         o-> `execute`                   [#fa-020]
     #                          /
     #                         /      we now run this method that you wrote,
     #                        /       with your business logic in it.
@@ -59,7 +59,7 @@ module Skylab::Face
     # we break this into numbered sections corresponding to the lifecycle
     # point. there is for now no "section 1" because we are avoiding
     # implementing an `initialize` here, wanting to leave that wide open for
-    # the client, which we will one day document at [#fa-api-001].
+    # the client, which we will one day document at [#fa-016].
     # there will be no "section 5" because that is for you to write.
 
     #                       ~ events (section 2) ~
@@ -86,7 +86,7 @@ module Skylab::Face
 
     o = { }
 
-    # `normalize` - specified in sibling file `client.rb` [#fa-api-004].
+    # `normalize` - specified in sibling file `client.rb` [#fa-019].
     #
     # i.e iff normalization failure, write to `y` and result in result.
     # beyond that:
@@ -131,7 +131,7 @@ module Skylab::Face
       private :field_box
     end.call
 
-    # `self.params` - rabbit hole .. er "facet" [#fa-el-002]
+    # `self.params` - rabbit hole .. er "facet" [#fa-013]
 
     define_singleton_method :params, & mutex[ ->( * a ) do
                                   # here because it goes with normalize above.

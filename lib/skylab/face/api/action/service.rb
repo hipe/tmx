@@ -26,7 +26,7 @@ module Skylab::Face
 
   module API::Action::Service::InstanceMethods
 
-    # `resolve_services` - a point on the api action lifecycle [#fa-api-003]
+    # `resolve_services` - a point on the api action lifecycle [#fa-018]
     # raise on failure, undefined on success  #watch:chain
     # this is where #ingestion is implemented.
 
