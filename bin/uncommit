@@ -91,13 +91,16 @@ exit_status = 0
 
   show_cmd_a = [ 'git', 'show', i_pn.to_s ]
 
+  # NOTE there is a hodgepode of un-dry code below as we explore different
+  # minimally simple ways to get it done.
+
   ::Open3.popen3( *show_cmd_a ) do |sin, sout, serr|
 
     # (if you just `serr.read` right now it blocks. below is nonblock [#hl-048])
     read_a, _, _ = ::IO.select [ serr ], nil, nil, 0.33
-
-    if read_a
-      break bork[ "unexpected STDERR output - #{ read_a.fetch( 0 ).read }" ]
+    read_a and err = read_a.fetch( 0 ).read
+    if err && '' != err
+      break bork[ "unexpected STDERR output -->#{ err }<--" ]
     end
 
     chunk = sout.read page_size

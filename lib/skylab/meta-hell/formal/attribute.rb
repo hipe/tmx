@@ -4,7 +4,7 @@ module ::Skylab::MetaHell
 
     # (note we accidentallly deprecated this with [#ba-003] Field::Box
     # but we should somehow merge them if for no other reason than
-    # the below is amusing.)
+    # the below is amusing. below is tracked with :[#mh-024])
 
     # What is the esssence of all data in the universe? It starts from
     # within. with metaprogramming.
@@ -19,9 +19,10 @@ module ::Skylab::MetaHell
     # Now, when dealing with attributes you might want to speak in terms
     # of them in the abstract -- not those actual values, but other
     # occurences of particular values for those attributes. We use the word
-    # "formal" to distinguish this meaning, in contrast to "actual" attributes.
+    # "formal" to distinguish this meaning, in contrast to "actual" attributes
+    # :[#mh-025].
     #
-    # For example, we might want to defined 'formal attributes' that define
+    # For example, we might want to define 'formal attributes' that define
     # some superset of recognizable or allowable names (and possibly values)
     # for the actual attributes. For each such formal attribute, this
     # library lets you define one `Formal::Attribute::Metadata` that will

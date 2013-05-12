@@ -1,3 +1,7 @@
+[#025]       #doc-point #parent:024 #body-is-inline-in-parent
+               `formal` defined informally.
+[#024]       #doc-node #body-is-inline-in-code:"formal/attribute.rb"
+               `formal attributes` explained. (body is in code for reasons.)
 [#023] #open merge the 2 pool enhancements
 [#022]       #tracking-tag boxxy's relationship to a.l
 [#021]       #tracking-tag, #doc-point `base_args` / `base_init`: this

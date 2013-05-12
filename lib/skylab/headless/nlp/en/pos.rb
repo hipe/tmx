@@ -5,7 +5,7 @@ module Skylab::Headless
     # Welcome to the deep, dark underbelly of Skylab hacked natural language
     # production. At its essence this node is about providing some publicly
     # visible classes and methods thereupon that let you make `productions`
-    # of `phrases` (or just its contituent `lexemes`).
+    # of `phrases` (or just its constituent `lexemes`).
     #
     # The goal of this is simply to get things like subject-verb
     # agreement on-the-fly for a sentence with as much overhead
@@ -225,7 +225,7 @@ module Skylab::Headless
 
     # To *construct* a lexeme finally, we take optionally a string for
     # the lemma form, and then optionally a hash of irregular forms.
-    # the hash related one exponent combination to one surface form.
+    # the hash relates one exponent combination to one surface form.
 
     -> do
 
