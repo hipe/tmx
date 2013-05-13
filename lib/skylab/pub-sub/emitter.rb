@@ -275,6 +275,8 @@ module Skylab::PubSub
 
   public
 
+    # `emits` - part of the reflection API [#ps-014]
+
     def emits? stream_name
       event_stream_graph.has? stream_name
     end

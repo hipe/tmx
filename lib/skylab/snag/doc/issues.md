@@ -1,3 +1,4 @@
+[#034]       #doc-point on doc-node trees and flat numberspaces ..
 [#033]       #tracking-tag non-deterministic smelly tests
 [#032]       see if we can unify find commands org wide #tracking-tag
 [#031]       #done NO. BAD. (horrible event wiring in todo tree) ..

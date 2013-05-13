@@ -51,7 +51,7 @@ module Skylab::BeautySalon
 
   private
 
-    # [#fa-api-002]
+    # [#fa-019]
 
     -> do
       rx = /\A\d+\z/
@@ -71,7 +71,7 @@ module Skylab::BeautySalon
       end
     end.call
 
-    # [#fa-api-002] assume that x is nil or an array.
+    # [#fa-019] assume that x is nil or an array.
 
     def normalize_lines y, x, result_if_ok
       unio = Basic::Range::Positive::Union.new

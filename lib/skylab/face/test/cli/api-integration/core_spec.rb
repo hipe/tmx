@@ -23,7 +23,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Core
     context "some nightclub - request a simple isomorphic call" do
       define_sandbox_constant :application_module do
         module Sandbox::Nightclub_1
-          module CLI  # maybe magic one day [#fa-008]
+          module CLI  # maybe magic one day [#fa-009]
             class Client < Face::CLI
               def fee
                 api

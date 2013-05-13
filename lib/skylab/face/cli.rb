@@ -121,7 +121,7 @@ module Skylab::Face
     # ick this is legacy and slated for removal # #todo. back then it seemed
     # easier (and indeed had more noveltly) to let this isomorphicism extend
     # all the way up to this level but nowadays it looks more ugly than elegant
-    # but who knows it is in the spirit of this whole thing .. [#004]
+    # but who knows it is in the spirit of this whole thing .. [#fa-004]
 
     def argument_error ex, cmd  # result will be final result
       one = ex.backtrace[ 1 ]
@@ -174,7 +174,7 @@ module Skylab::Face
     # rigging for now.. a little more than just autovivifying some sane
     # defaults. but also, little more than just that. there is currently no
     # way to override this without overriding it, but watch for something like
-    # that in spirit sort of maybe near [#fa-008].
+    # that in spirit sort of maybe near [#fa-009].
 
     def api_client_class
       @api_client_class ||= begin
@@ -183,7 +183,7 @@ module Skylab::Face
           fail "sanity - for now we follow convention strictly because of #{
             }the wide blast radius of our autogeneration .. expected that #{
             }the CLI Client exist inside of a `CLI` module. no such module#{
-            } - #{ amod }::CLI"  # maybe magic one day - [#fa-008]
+            } - #{ amod }::CLI"  # maybe magic one day - [#fa-009]
         end
         Face::API[ amod ]  # no need to check anything, ok to repeat this.
         amod.const_get( :API, false ).const_get( :Client, false )
@@ -202,7 +202,9 @@ module Skylab::Face
     MetaHell::Module::Accessors.enhance( self ).private_module_reader(
       :application_module, '../..' )
 
-    # `handle_events` - a pleasant, straghtforward impl. of [#fa-api-002]
+    # `handle_events` - a pleasant, straightforward implementation.
+    # implement this mode client's implementation of this hook
+    # (hook explained in [#fa-017]).
 
     def handle_events action
       if action.respond_to? :with_specificity  # else not a pub-subber.
@@ -218,7 +220,7 @@ module Skylab::Face
       end
       nil
     end
-    public :handle_events  # part of the API API [#fa-api-002]
+    public :handle_events
 
     # `check_for_unhandled_non_taxonomic_streams` - this might necessitate
     # that the client class defines an API::Action base class that defines
@@ -911,7 +913,7 @@ module Skylab::Face
         fail 'test me - you have to try hard not to have an o.p'
         true
       end
-      # only because of [#004] we don't do what is right (for now)
+      # only because of [#fa-004] we don't do what is right (for now)
     end
     public :parse  # used in main invocation loop
 
@@ -1525,7 +1527,7 @@ module Skylab::Face
     end
     private :api
 
-    # `modal_client_for_api_call` - please see [#fa-010].
+    # `modal_client_for_api_call` - explained in [#fa-010].
 
     def modal_client_for_api_call
       modality_client

@@ -1,4 +1,3 @@
-[#058]       #doc-point narrative pre-order ("outside-in") ..
 module Skylab::Face
   # @todo:#100.100.300: eliminate unused code (like this file)
   class Request
