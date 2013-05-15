@@ -22,7 +22,7 @@ until it has incubated somewhat..
 
 ### every facet for now is hard-coded into the system somewhere
 
-every facet is hard-coded into the system now somewhere :[#028]. at present
+every facet is hard-coded into the system now somewhere :[#fa-028]. at present
 there is no way to load dynamically facets as if they were plugins. rather it
 is a conceptual distinction we are making rather than a physical one.
 
@@ -50,7 +50,7 @@ Action lifecycle, namely:
     action into a `wired` state.
 
   `service` corresponds to the `services` DSL method that defines the services
-    the API Action (conceptualized as a plugin) declares asi needing from its
+    the API Action (conceptualized as a plugin) declares as needing from its
     host, which when satisfied bring the action into a `plugged_in` state.
 
   `param` corresonds to the `params` DSL method that defines the parameters

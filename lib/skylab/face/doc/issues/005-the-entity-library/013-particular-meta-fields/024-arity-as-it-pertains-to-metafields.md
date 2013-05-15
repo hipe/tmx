@@ -35,11 +35,11 @@ present, it must (by virtue of the constraints of our made-up
 protocol) as an actual parameter have exactly one argument associated with it.
 
 if the formal parameter is of type `required`, and an actual argument is
-provided, it 'takes' exactly that one argument.  if an optional parameter is
+provided, it 'takes' exactly that one argument. if an optional parameter is
 provided, it also takes exactly one argument. ergo, maybe "parameter"
 is a short way of saying "field with an arity of 1."
 
-(yes, through real life HTTP GET and POST there are ways to "pass"
+(yes, through real life HTTP GET and POST there may be ways to "pass"
 arbitrarily structured data in requests .. but let's stick with
 sublime simplicity of our imagined world for now for the sake
 of making some points..)
@@ -47,7 +47,7 @@ of making some points..)
 To counter-intuit things a bit further, when we speak of an "option":
 from one angle, the arity of the option field *itself*, we could say,
 is 0..1 (the range, an integer between 0 and 1 inclusive, i.e either
-0 or 1.), because "option" meaning "optional", means that there can
+0 or 1.), because "option" (meaning "optional") means that there can
 be zero or one of it, right? Well, wrong. Again arity refers
 to the sensical range for a "number" of "arguments" that a
 "field" may "have".
@@ -56,7 +56,7 @@ we mean arity _of the arguments_ that a field takes, not
 simply the presence or absense of the actual field in a request.
 
 If you are as confused after reading this as the author was after both reading
-it *and* writing it, then we should both revisit it from a different angle:
+*and* writing it, then we should both revisit it from a different angle:
 
 ## what do we know?
 
@@ -66,7 +66,7 @@ an arity is basically a range, right? let's take it a step further and
 say that we're only dealing with "simple" ranges as opposed to "compound"
 ranges. what do we mean by `range`?
 
-  `simple range` - a simple range is a tuple of two elements:
+  `simple range` - a simple range is a `tuple-ish` [#ba-010] of two elements:
     the first element in the tuple is a non-negative integer.
     the second element in the tuple must be either:
       and integer equal to or greater than the first element in the tuple

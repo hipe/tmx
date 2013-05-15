@@ -12,9 +12,9 @@ module Skylab::Basic
 
     # in other worlds this idea is generally referred to as a "hash slice",
     # but here, we go deep on slice. we use set theory on your slice. instead
-    # of one method for this, we give you three functions. FOUR.
+    # of one method for this, we give you four functions. FOUR.
 
-    # all `unpack_*` functions below have the same formof result:
+    # all `unpack_*` functions below have the same form of result:
     # they all result in an array whose length always corresponds to
     # the length of `k_a` (keys array), which is a globbed parameter
     # of args (2..N) that you pass, e.g:
