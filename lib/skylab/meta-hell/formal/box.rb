@@ -4,6 +4,12 @@ module Skylab::MetaHell
                                   # that you can customize the strictness of and
                                   # like other things too. by default none of
                                   # its public members mutate its composition.
+
+    # EDIT: Formal::Box sounds a lot like the "Associative container"
+    #   from http://en.wikipedia.org/wiki/Container_(abstract_data_type)
+    # but is sort of "stable" in the sense used in List_of_data_structures,
+    # except its order is mutable.
+
     FUN = -> do
 
       o = { }

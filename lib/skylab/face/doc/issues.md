@@ -6,7 +6,7 @@
                binary facet reflection
 [#026]       #doc-point #parent:025 #body-is-inline-in-parent
                the facet's `enhance` API
-[#025]       #doc-node #parent:022 facets introducted
+[#025]       #doc-node #parent:022 facets introduced ..
 [#024]       #doc-node #parent:013 arity as it pertains to meta-fields ..
 [#024]       #smell-tracker let's fix this nil / false / not present thing
                #COLLISION
@@ -14,16 +14,16 @@
                the API action formal parameters formal structure syntax ..
 [#022]       #doc-point #parent:007 the API API
 [#021]       #doc-point #parent:007 the API action lifecycle
-[#020]       #doc-point #parent:021 #placeholder
-               API action lifecycle point: `execute`
-[#019]       #doc-point #parent:021
-               API action lifecycle point: `normalize`
                #body-is-inline-in-code:"api/client.rb"
-[#018]       #doc-point #parent:021
+[#020]       #doc-point #parent:021 #body-is-inline-in-parent
+               API action lifecycle point: `execute`
+[#019]       #doc-point #parent:021 #body-is-inline-in-parent
+               API action lifecycle point: `normalize`
+[#018]       #doc-point #parent:021 #body-is-inline-in-parent
                API action lifecycle point: `resolve_services`
-[#017]       #doc-point #parent:021 #placeholder
+[#017]       #doc-point #parent:021 #body-is-inline-in-parent
                API action lifecycle point: `handle_events`
-[#016]       #doc-point #parent:021 #placeholder
+[#016]       #doc-point #parent:021 #body-is-inline-in-parent
                API action lifecycle point: `new`
 [#015]       #doc-point #parent:006
                finally we give it a name: `isomorphic argument syntax` ..
