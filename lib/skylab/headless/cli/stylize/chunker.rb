@@ -1,10 +1,7 @@
 module Skylab::Headless
 
-  class CLI::Stylize::Chunker  # assumes immutable sexp
-
-    def gets
-      @gets[]
-    end
+  CLI::Stylize::Chunker = MetaHell::Function::Class.new :gets
+  class CLI::Stylize::Chunker
 
   protected
 

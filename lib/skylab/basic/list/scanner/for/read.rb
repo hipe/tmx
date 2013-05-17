@@ -1,5 +1,6 @@
 module Skylab::Basic
 
+  List::Scanner::For::Read = MetaHell::Function::Class.new :count, :gets
   class List::Scanner::For::Read
 
     # [#ba-004] without adding or removing newlines, each call to `gets`
@@ -46,14 +47,6 @@ module Skylab::Basic
           line
         end
       end
-    end
-
-    def count
-      @count.call
-    end
-
-    def gets
-      @gets.call
     end
   end
 end

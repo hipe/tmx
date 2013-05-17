@@ -459,10 +459,8 @@ module Skylab::PubSub
     attr_reader :event_listeners
     private :event_listeners
 
-    def event_stream_graph
-      @event_stream_graph.call
-    end
-    private :event_stream_graph
+    MetaHell::Function.enhance( self ).as_private_getter :event_stream_graph
+
   end
 
 
@@ -562,10 +560,9 @@ module Skylab::PubSub
 
     undef_method :to_s  # #todo - remove after integration
 
-    def event_stream_graph
-      @event_stream_graph_ref.call
-    end
-    private :event_stream_graph
+    MetaHell::Function.enhance( self ).
+      as_private_getter :@event_stream_graph_ref, :event_stream_graph
+
   end
 
   class PubSub::Event::Textual < PubSub::Event::Unified

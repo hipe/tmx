@@ -25,6 +25,7 @@ module Skylab::Basic::Field::Reflection
 
   Conduit_ = MetaHell::Enhance::Conduit.new %i| with |
 
+  Flusher_ = MetaHell::Function::Class.new :flush
   class Flusher_
     def initialize target
       @host = nil
@@ -42,10 +43,6 @@ module Skylab::Basic::Field::Reflection
     end
 
     attr_writer :host
-
-    def flush
-      @flush.call
-    end
 
     def build_into target  # assume @host
       host = @host
@@ -135,9 +132,7 @@ module Skylab::Basic::Field::Reflection
       @field.normalized_name
     end
 
-    def value
-      @func.call
-    end
+    MetaHell::Function self, :@func, :value
 
     def initialize field, func
       @field, @func = field, func

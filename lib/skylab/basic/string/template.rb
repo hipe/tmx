@@ -198,6 +198,7 @@ module Skylab::Basic
     end
     private :_margin_cache_h
 
+    Margin_Engine_ = MetaHell::Function::Class.new :give, :take
     class Margin_Engine_   # a would-be plugin to keep this logic out of the
       -> do  # `initialize`
         nl = "\n"
@@ -226,9 +227,6 @@ module Skylab::Basic
           end
         end
       end.call
-
-      def take x ; @take[ x ] ; end
-      def give   ; @give.call ; end  # #todo:during:7
     end
   end
 

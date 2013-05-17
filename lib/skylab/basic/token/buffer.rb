@@ -38,12 +38,7 @@ module Skylab::Basic
       end
     end
 
-    def gets_proc= x
-      @gets_proc[ x ]
-    end
+    MetaHell::Function self, :gets, :@gets_proc, :gets_proc=
 
-    def gets
-      @gets.call
-    end
   end
 end

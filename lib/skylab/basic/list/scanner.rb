@@ -60,32 +60,8 @@ module Skylab::Basic
       end
     end
 
-    def eos?
-      @eos.call
-    end
+    MetaHell::Function self, :@eos, :eos?, :gets, :rgets, :count,
+      :terminate, :reset
 
-    def gets
-      @gets.call
-    end
-
-    # NOTE does not affect `count`.  if
-
-    def rgets
-      @rgets.call
-    end
-
-    def count
-      @count.call
-    end
-
-    def terminate
-      @terminate.call
-    end
-
-    def reset
-      @reset.call
-    end
-
-    # [#bm-001] you see what the above pattern looks like don't you ..
   end
 end

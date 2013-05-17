@@ -70,11 +70,10 @@ module Skylab::Treemap
       nil
     end
 
-    def mode_client
-      @rc.call
-    end
+    MetaHell::Function.enhance( self ).as_public_getter :@rc, :mode_client
 
-    public :actions_const_get, :mode_client  # (child s.c only)
+    public :actions_const_get  # (child s.c only)
+
   end
 
   class Adapter::Mote::Action

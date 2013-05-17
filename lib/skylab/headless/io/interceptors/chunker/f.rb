@@ -1,5 +1,6 @@
 module Skylab::Headless
 
+  IO::Interceptors::Chunker::F = MetaHell::Function::Class.new :flush, :write
   class IO::Interceptors::Chunker::F
 
     # #todo
@@ -43,14 +44,6 @@ module Skylab::Headless
       nil
     end
 
-    def write str
-      @write[ str ]
-    end
-
     alias_method :<<, :write
-
-    def flush
-      @flush[ ]
-    end
   end
 end

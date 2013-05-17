@@ -122,6 +122,7 @@ module ::Skylab::CodeMolester
 
   # NOTE this assumes "strict sexps" [#003]
 
+  Sexp::Scanner_ = MetaHell::Function::Class.new :scan, :gets, :pos
   class Sexp::Scanner_
 
     # this is not expected to work well if you instantiate it directly
@@ -161,23 +162,12 @@ module ::Skylab::CodeMolester
       end
     end
 
-    def scan search_symbol
-      @scan[ search_symbol ]
-    end
-
-    def gets
-      @gets[ ]
-    end
-
-    def pos
-      @pos[ ]
-    end
-
     def clear_for_pool
       @gets = @scan = @pos = nil
     end
   end
 
+  Sexp::Scanner_::Bound = MetaHell::Function::Class.new :gets, :pos, :rgets
   class Sexp::Scanner_::Bound  # Bound to a search method
 
     MetaHell::Pool.enhance( self ).with_with_instance
@@ -230,21 +220,9 @@ module ::Skylab::CodeMolester
       nil
     end
 
-    def gets
-      @gets.call
-    end
-
-    def pos  # used in removing elements
-      @pos.call
-    end
-
     def pos= x
       @wpos[ x ]
       x
-    end
-
-    def rgets
-      @rgets.call
     end
 
     def clear_for_pool

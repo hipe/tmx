@@ -106,7 +106,9 @@ module Skylab::TestSupport::Sandbox
     kiss_with produce_subclasses_of
   |
 
+  # Flusher_ = MetaHell::Function::Class.new :flush  # #todo:after:7
   class Flusher_
+    def flush ; @flush.call end
 
     def initialize sb_mod, kiss_with, superklass
       @flush = -> do
@@ -127,10 +129,6 @@ module Skylab::TestSupport::Sandbox
         nil
       end
     end
-
-    def flush
-      @flush.call
-    end
   end
 
   module Host
@@ -144,7 +142,9 @@ module Skylab::TestSupport::Sandbox
     end
   end
 
+  # Host::Flusher_ = MetaHell::Function::Class.new :flush  # #todo:after:7
   class Host::Flusher_
+    def flush ; @flush.call end
 
     def initialize anchor_mod
 
@@ -164,10 +164,6 @@ module Skylab::TestSupport::Sandbox
 
         nil
       end
-    end
-
-    def flush
-      @flush.call
     end
   end
 
@@ -196,8 +192,12 @@ module Skylab::TestSupport::Sandbox
       end
     end
 
-    def define_sandbox_constant_function
+    def define_sandbox_constant_function  #todo:after:7
       @define_sandbox_constant_function.call
     end
+
+    # MetaHell::Function( self ).
+    #   as_public_getter :define_sandbox_constant_function
+
   end
 end

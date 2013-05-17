@@ -5,17 +5,12 @@ module Skylab::Headless
     # (i mean Basic)
   end
 
+  Services::Array::Lines::Producer = MetaHell::Function::Class.new(
+     :gets, :line_number )
+
   class Services::Array::Lines::Producer
 
     # simple adapter for [#hl-044]
-
-    def gets
-      @gets.call
-    end
-
-    def line_number
-      @line_number.call
-    end
 
     def initialize ary
       pos = -1

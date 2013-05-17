@@ -966,9 +966,7 @@ module Skylab::Headless
       @client_class_function = f
     end
 
-    def plugin_client_class
-      @client_class_function.call
-    end
+    MetaHell::Function self, :@client_class_function, :plugin_client_class
 
     # `dslify_eventpoint_names` (writer, reader)
 

@@ -129,9 +129,7 @@ module Skylab::FileMetrics
         end
       end
 
-      def summary_rows
-        @summary_rows.call
-      end
+      MetaHell::Function self, :summary_rows
 
       def prerender_summary_row h
         @order.map do |sym|

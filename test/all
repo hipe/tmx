@@ -7,6 +7,9 @@ require 'optparse'
 
 module Skylab::Test
 
+  @dir_pathname = ::Skylab.dir_pathname.join '../../test'
+  class << self ; attr_reader :dir_pathname end
+
   %i| Face Headless Test |.each do |i|
     const_set i, ::Skylab.const_get( i, false )
   end
@@ -29,6 +32,7 @@ module Skylab::Test
         action_summaries
         available_options
         default_action
+        argv_hijinx
         argument_list
         ready
         conclude
@@ -39,6 +43,7 @@ module Skylab::Test
         paystream
         full_name
         run_mode
+        full_program_name
       |
       services_delegated_to :subtree, %i|
         hot_spec_paths
@@ -233,7 +238,8 @@ module Skylab::Test
         end
         resolve_default_action_if_necessary or break
         if :cli == @run_mode && @argv.length.nonzero?
-          emit_eventpoint :argument_list, @argv
+          emit_eventpoint :argv_hijinx, @argv
+          emit_eventpoint :argument_list, @argv if @argv.length.nonzero?
           if @argv.length.nonzero?
             @info_y << "won't run with unresolved argv - #{ @argv }"
             ok = false
@@ -291,6 +297,10 @@ module Skylab::Test
       end
 
       o
+    end
+
+    def full_program_name
+      $PROGRAM_NAME
     end
 
     def plugin_slug  # - because we add self to merged o.p
@@ -1444,6 +1454,45 @@ module Skylab::Test
     end
   end
 
+  class Plugins::Divide
+
+    Headless::Plugin.enhance self do
+      eventpoints %i|
+        available_actions
+        action_summaries
+        argv_hijinx
+      |
+      service_names %i|
+        infostream
+        paystream
+        hot_subtree
+        full_program_name
+      |
+    end
+
+    available_actions [ [ :divide, 0.1700 ] ]
+
+    action_summaries( divide: "break it up into smaller pieces (try it)" )
+
+    def initialize
+      @argv = nil
+    end
+
+    argv_hijinx do |argv|
+      @argv = argv.dup
+      argv.clear
+      nil
+    end
+
+    def divide
+      if ! self.class.respond_to? :dir_pathname  # circ.
+        Face::MAARS::Upwards[ self.class ]
+      end
+      self.class.const_get( :Worker_, false )[ host, @argv ]
+      false  # do not continue
+    end
+  end
+
   module Plugins::Counts
 
     Headless::Plugin.enhance self do
@@ -1451,7 +1500,6 @@ module Skylab::Test
         available_options
         available_actions
         action_summaries
-        ready
       |
       service_names %i|
         info_y
@@ -1481,9 +1529,8 @@ module Skylab::Test
       counts: "show a report of the number of tests per subproduct"
     )
 
-    ready do |y|
+    def initialize
       @do_zero ||= nil
-      nil
     end
 
     def counts

@@ -2,13 +2,15 @@ module Skylab::TreetopTools
 
   class Grammar::Reflection
 
+    def initialize name, inpath_f, outdir_f
+      @name, @inpath, @outdir = name, inpath_f, outdir_f
+    end
+
     def inpath
       @inpath[].to_s
     end
 
-    def inpathname
-      @inpath[]
-    end
+    MetaHell::Function self, :@inpath, :inpathname
 
     def outpath
       outpathname.to_s
@@ -68,11 +70,5 @@ module Skylab::TreetopTools
         end
       end
     end.call
-
-  protected
-
-    def initialize name, inpath_f, outdir_f
-      @name, @inpath, @outdir = name, inpath_f, outdir_f
-    end
   end
 end

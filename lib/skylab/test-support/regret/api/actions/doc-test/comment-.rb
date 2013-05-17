@@ -30,14 +30,12 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     end
   end
 
+  Comment_::Scanner_ = MetaHell::Function::Class.new :gets
   class Comment_::Scanner_  # base class
 
-    class << self
-      alias_method :[], :new
+    def self.[] *a  # for debugging something
+      new( *a )
     end
-
-    def gets ; @gets.call ; end  # #todo:during:7
-
   end
 
   class Comment_::Scanner < Comment_::Scanner_

@@ -1,20 +1,12 @@
 module Skylab::Treemap
+
   class Services::File::Lines::Enumerator::From::Array < ::Enumerator
-    def last_number
-      @last_number.call
-    end
-
-    alias_method :orig_next, :next
-
-    def gets
-      @next.call
-    end
 
     def initialize arr
       block_given? and fail('no')
       index = -1
-      @last_number = ->() { index + 1 }
-      @next = ->() do
+      @last_number = -> { index + 1 }
+      @gets = -> do
         if (index + 1) < arr.length
           arr[index += 1]
         else
@@ -27,5 +19,7 @@ module Skylab::Treemap
         end
       end
     end
+
+    MetaHell::Function self, :last_number, :gets
   end
 end

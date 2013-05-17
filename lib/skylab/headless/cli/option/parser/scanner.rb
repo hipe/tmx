@@ -1,5 +1,6 @@
 module Skylab::Headless
 
+  CLI::Option::Parser::Scanner = MetaHell::Function::Class.new :gets
   class CLI::Option::Parser::Scanner  # for quick ::OptionParser hacks
                                   # (emigrated in from ancient tr, aged well)
                                   # this class and idea is tracked by [#053])
@@ -23,10 +24,6 @@ module Skylab::Headless
       end
       reduce_a = [ -> _ { }, -> a { a[0] } ].freeze # distills 1 item from args
     end.call
-
-    def gets
-      @gets[]
-    end
 
   protected
 

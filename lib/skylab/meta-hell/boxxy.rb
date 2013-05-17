@@ -63,6 +63,9 @@ module Skylab::MetaHell
             idx = new_a.index do |cnst|
               tgt == fun.normulate[ cnst ]
             end
+            idx or raise Boxxy::NameNotFoundError.new( const: x, module: modul,
+              message: "coudn't find \"#{ x }\" in #{ modul }. did #{
+              }you mean one of:(#{ new_a * ' '})?", seen_a: new_a )
             crct = new_a.fetch idx
             if try1 != crct
               tug.instance_variable_set :@const, crct  # confers familiarity

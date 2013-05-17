@@ -43,9 +43,7 @@ module Skylab::Basic
       end
     end.call
 
-    def << str ; @add[ str ] ; end  # #todo:during:7
-    def flush ; @flush.call  ; end
-    def count ; @count.call  ; end
+    MetaHell::Function self, :@add, :<<, :flush, :count
 
     Conduit_ = MetaHell::Enhance::Conduit.new %i|
       any_first_item

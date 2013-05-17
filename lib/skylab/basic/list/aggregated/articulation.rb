@@ -33,6 +33,7 @@ module Skylab::Basic
       template on_zero_items aggregate on_first_mention on_subsequent_mentions
     |
 
+    Flusher_ = MetaHell::Function::Class.new :flush
     class Flusher_
 
       def initialize template_str, on_zero_items_f, aggregate_f,
@@ -57,10 +58,6 @@ module Skylab::Basic
             end
           end
         end
-      end
-
-      def flush
-        @flush.call
       end
 
       def build_whens tmpl, aggregate_f, on_first_mention_f,

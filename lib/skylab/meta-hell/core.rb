@@ -28,5 +28,12 @@ module Skylab
 
     extend MAARS                  # which is such a long name you never want
                                   # to have to say it more than once.
+
+    # --*--
+                                  # sugar for this very popular enhancement
+    #
+    def self.Function host, *rest
+      self::Function._make_methods host, :public, :method, rest
+    end
   end
 end

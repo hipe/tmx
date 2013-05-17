@@ -1,5 +1,6 @@
 module Skylab::Headless
 
+  IO::Upstream::Select = MetaHell::Function::Class.new :select
   class IO::Upstream::Select
 
     # Select - a chunking, multstream `select` wrapper
@@ -41,10 +42,6 @@ module Skylab::Headless
         y
       end
       nil
-    end
-
-    def select
-      @select[]
     end
 
     def heartbeat seconds, &block

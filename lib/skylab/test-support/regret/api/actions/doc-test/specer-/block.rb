@@ -1,5 +1,6 @@
 class Skylab::TestSupport::Regret::API::Actions::DocTest
 
+  Specer_::Block = MetaHell::Function::Class.new :accept, :flush
   class Specer_::Block
 
     # what this mess does: within a block of comments there can be N code
@@ -55,10 +56,6 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
         @a = [] ; @notice = notice
       end
     end.call
-
-    def accept i, j ; @accept[ i, j ] ; end   # #todo:during:7
-
-    def flush ; @flush.call ; end
 
     attr_reader :a
 

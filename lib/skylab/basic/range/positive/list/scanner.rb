@@ -89,16 +89,8 @@ module Skylab::Basic
       @set_unexpected_proc = -> x {  up = x }
     end
 
-    def unexpected_proc= x
-      @set_unexpected_proc[ x ]
-    end
+    MetaHell::Function self, :@set_unexpected_proc, :unexpected_proc=,
+      :@set_string, :string=, :gets
 
-    def string= x
-      @set_string[ x ]
-    end
-
-    def gets
-      @gets[]
-    end
   end
 end

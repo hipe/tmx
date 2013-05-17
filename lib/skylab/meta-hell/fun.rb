@@ -31,25 +31,37 @@ module Skylab::MetaHell
   # machine that is created by `h` and `op_a` an argument error will be raised.
   # `args` of length zero always succeeds. `args` of length longer
   # than length of `op_a` will always raise an argument error.
-  # Note that despite the flexibility that is afforded by such a signature
+  #
+  # NOTE that despite the flexibility that is afforded by such a signature
   # the position of the actual arguments still is not freeform - they must
   # occur in the same order with respect to each other as they occur
   # in the formal arguments.
 
   o[:parse] = -> h, args, *op_a do
-    # a = actual  f = formal  i = index  z = length
-    ai = fi = 0 ; az = args.length ; fz = op_a.length
-    res = ::Array.new fz
+    o[:free_parse][ args,
+      -> e do
+        raise ::ArgumentError, e.message_function.call
+      end,
+      op_a, h ]
+  end
 
+  Free_Parse_Failure_ = ::Struct.new :message_function, :index, :value
+
+  o[:free_parse] = -> args, err, order_a, h do
+    # a = actual  f = formal  i = index  z = length
+    ai = fi = 0 ; az = args.length ; fz = order_a.length
+    res = ::Array.new fz
     while ai < az
       v = args[ai]
       stay = true
       begin
         if fi == fz
-          raise ::ArgumentError, "unrecognized argument at index #{ ai } - #{
-            }#{ v.inspect }"
+          err[ Free_Parse_Failure_[
+            -> { "unrecognized argument at index #{ ai } - #{ v.inspect }" },
+            ai, v ] ]
+          break  # sure, let them have whatever was completed.
         end
-        if h[ op_a[fi] ][ v ]
+        if h[ order_a[fi] ][ v ]
           res[fi] = v
           stay = false
         end

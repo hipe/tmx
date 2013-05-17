@@ -49,6 +49,8 @@ module Skylab::MetaHell::DSL_DSL
   #
   # happy hacking!
 
+  MetaHell = ::Skylab::MetaHell
+
   def self.enhance host, &def_blk
     Story_.new( host.singleton_class, host, ENHANCE_ADAPTER_ ).
       instance_exec( & def_blk )
@@ -86,6 +88,8 @@ module Skylab::MetaHell::DSL_DSL
     nil
   end
 
+  Story_ = MetaHell::Function::Class.new( :atom, :atom_accessor,
+                                          :list, :block )
   class Story_
 
     # (the implementation of the DSL DSL)
@@ -153,22 +157,6 @@ module Skylab::MetaHell::DSL_DSL
         super
       end
     end
-
-    def atom name  # #todo:during:7
-      @atom[ name ]
-    end
-
-    def atom_accessor name
-      @atom_accessor[ name ]
-    end
-
-    def list name
-      @list[ name ]
-    end
-
-    def block name
-      @block[ name ]
-    end
   end
 
   # can we use a module to hold and share an entire DSL?
@@ -200,6 +188,8 @@ module Skylab::MetaHell::DSL_DSL
     nil
   end
 
+  Enhance_Module_Adapter_ = MetaHell::Function::Class.new(
+    :add_field, :add_or_change_value )
   class Enhance_Module_Adapter_
     def initialize
       @add_field = -> mm, im, fs do
@@ -214,8 +204,6 @@ module Skylab::MetaHell::DSL_DSL
       end
       nil
     end
-    def add_field( *a ) ; @add_field[ *a ] ; end  # #todo:during:7
-    def add_or_change_value( *a ) ; @add_or_change_value[ *a ] ; end
   end
 
   ENHANCE_MODULE_ADAPTER_ = Enhance_Module_Adapter_.new
