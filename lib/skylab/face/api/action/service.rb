@@ -2,47 +2,42 @@ module Skylab::Face
 
   module API::Action::Service
 
-  end
+    # `self.[]` - enhance the API::Action class with this facet.
+    # fulfill [#fa-026]. assumes it is behind a module mutex.
 
-  class API::Action::Service::Flusher
-
-    # assumes it is behind a module mutex.
-
-    def initialize target, x_a
-      @flush = -> do
-        Services::Headless::Plugin.enhance target do
-          services( * x_a )
-        end
-        target.send :include, API::Action::Service::InstanceMethods
-          # (we used to `prepend` the above)
-        nil
-      end
-    end
-
-    def flush
-      @flush.call
+    def self.[] target_mod, x_a
+      Services::Headless::Plugin.enhance target_mod do
+        services( * x_a )
+       end
+      target_mod.send :include, API::Action::Service::InstanceMethods
+        # (we used to `prepend` the above)
+      nil
     end
   end
 
   module API::Action::Service::InstanceMethods
+
+    def has_service_facet
+      true
+    end
+    # public. fulfill [#fa-027]
 
     # `resolve_services` - a point on the api action lifecycle [#fa-018]
     # raise on failure, undefined on success  #watch:chain
     # this is where #ingestion is implemented.
 
     def resolve_services svcs
-      pstory = self.class.plugin_story
-      load_plugin pstory, svcs
+      load_plugin svcs
       ev = nil
-      pstory.services.each do |nn, svc|  # validate and ingest in one pass!
+      @plugin_story.services.each do |nn, svc|  # validate and ingest in one pass!
         if svcs.has_service? nn
           if svc.do_ingest
-            x = svcs.call_host_service pstory, nn
             ivar = svc.ingest_to_ivar
             if instance_variable_defined? ivar
               fail "sanity - won't clobber existing ivar - #{ ivar }"
             else
-              instance_variable_set ivar, x
+              instance_variable_set ivar,
+                svcs.call_host_service( @plugin_story, nn )
             end
           end
         else

@@ -1,4 +1,5 @@
 class Skylab::Face::CLI
+  # #todo is this used? (if so where?)
   class Interactive
     def self.run ui, opts, request
       new(ui, opts, request).run
@@ -18,7 +19,7 @@ class Skylab::Face::CLI
             break;
           end
         end
-      rescue ::Interrupt => e
+      rescue ::Interrupt
         @terminal.say("\nCancelled #{@request.some_label.downcase}.")
         @request.valid = false
       end

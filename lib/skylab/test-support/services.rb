@@ -7,6 +7,8 @@ module Skylab::TestSupport
       h[name] = block
     end
 
+    o :Face,          -> { require 'skylab/face/core' ; ::Skylab::Face }
+
     o :FileUtils,     -> { require 'fileutils' ; ::FileUtils }
 
     o :Open3,         -> { require 'open3'     ; ::Open3 }

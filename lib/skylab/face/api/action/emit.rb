@@ -2,6 +2,11 @@ module Skylab::Face
 
   module API::Action::Emit
 
+    # `self.[]` - fulfill [#fa-026]. unlike its bretheren it does
+    # *not* assume it is behind a mutex because it can get puffed up from
+    # multiple entrypoints, namely `emits` *and/or* `taxonomic_streams`
+    # (just as two examples)
+
     -> do  # `self.[]`
       emits = nil
       define_singleton_method :[] do |kls, meth_i, a, b|

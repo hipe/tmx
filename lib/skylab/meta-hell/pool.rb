@@ -90,8 +90,7 @@ module Skylab::MetaHell
         end
       end ]
 
-      use_lease_and_release_instead_of_new =
-          MetaHell::Module.mutex[ -> init do
+      use_lease_and_release_instead_of_new = MetaHell::Module.mutex[ -> init do
 
         singleton_class.class_exec do  # like `class << self` but inheirt scope
 
@@ -114,13 +113,16 @@ module Skylab::MetaHell
         end
       end ]
 
-      # The Pool's `lease_and_release` enhancement follows the same idea
+      # The Pool's `with_lease_and_release` enhancement follows the same idea
       # as the `with_with_instance` enhancement, but instead of wrapping
       # the flyweight iteration in a block, it lets you call `lease` and
-      # `release` explicitly. (The two enhancements exist as separate only
-      # because they came from different places. Whenever it is optimal to
-      # merge the other on top of the one we should do so [#mh-023].)
+      # `release` explicitly.
       #
+      # Please see unit test for example.
+      #
+      # (The two enhancements exist as separate only because they came from
+      # different places. Whenever it is optimal to merge the other on top of
+      # the one we should do so [#mh-023].)
 
     end.call
   end

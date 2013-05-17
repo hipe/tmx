@@ -34,6 +34,7 @@ module Skylab::Basic
     |
 
     class Flusher_
+
       def initialize template_str, on_zero_items_f, aggregate_f,
                          on_first_mention_f, on_subsequent_mentions_f
         tmpl = Basic::String::Template.from_string template_str
@@ -66,7 +67,7 @@ module Skylab::Basic
           on_subsequent_mentions_f
 
         flusher = Mention_::Flusher_.new(
-          nn_a = tmpl.formal_parameters.map( & :normalized_name ) )
+          nn_a = tmpl.get_formal_parameters.map( & :normalized_name ) )
         whn = When_[ flusher.flush( on_first_mention_f ),
           flusher.flush( on_subsequent_mentions_f ),
           flusher.flush( aggregate_f ), nn_a ]

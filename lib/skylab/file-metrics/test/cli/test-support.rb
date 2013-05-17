@@ -18,8 +18,6 @@ module Skylab::FileMetrics::TestSupport::CLI
       FileMetrics::CLI
     end
 
-    extend MetaHell::DSL_DSL
-
   end
 
   module InstanceMethods

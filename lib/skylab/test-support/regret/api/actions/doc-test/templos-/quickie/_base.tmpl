@@ -1,0 +1,18 @@
+require_relative 'test-support'
+
+module {{ amod }}::TestSupport{{ bmod }}::{{ cmod }}
+
+  ::{{ amod }}::TestSupport{{ bmod }}[ {{ cmod }}_TestSupport = self ]
+
+  include CONSTANTS
+
+  {{ acon }} = ::{{ amod }}  # increase its visibility for below modules
+
+  extend TestSupport::Quickie
+
+  Sandboxer = TestSupport::Sandbox::Spawner.new
+
+  describe "{{ amod }}{{ bmod }}::{{ cmod }}" do
+{{ body }}
+  end
+end

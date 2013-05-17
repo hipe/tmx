@@ -4,14 +4,9 @@ describe "Skylab::MetaHell::FUN" do
 
   MetaHell = ::Skylab::MetaHell
 
-  class << self
-
-    extend MetaHell::DSL_DSL
-
-    dsl_dsl do
-      atom :h
-      list :op_a
-    end
+  MetaHell::DSL_DSL.enhance self do
+    atom :h
+    list :op_a
   end
 
   def parse *args

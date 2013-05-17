@@ -1,115 +1,223 @@
-module Skylab::MetaHell
+module Skylab::MetaHell::DSL_DSL
 
-  module DSL_DSL
+  # this DSL_DSL is a simple DSL for making simple DSL's.
+  #
+  # you declare fields associated with your module by giving them a name
+  # and picking their simple type - e.g { `atom` | `list` | `block` }.
+  #
+  # the feeling of declaring a DSL is like having an `attr_accessor`
+  # "macro" that is sligtly richer. the feeling of using the DSL on your
+  # domain modules is a lot like using RSpec's `let`, except it makes
+  # sugar for you. I WILL CALL IT SUGAR FACTORY
+  #
+  # it's important to appreciate that like RSpec's `let`, this operates by
+  # creating methods that store your values memoized in method definitions.
+  # the benefit of this is that the values inherit through class and module
+  # inheritance as would be expected.
+  #
+  # a disadvantage (from one perspective) of this approach is that you don't
+  # get a writer instance method out of the box. but you can actually pass
+  # a "container proxy" adapter to take arbitrary actions when the DSL
+  # is engaged if you like.
+  #
+  # introductory example:
+  #
+  #     class Foo
+  #       MetaHell::DSL_DSL.enhance self do
+  #         atom :wiz                     # make an atomic (basic) field
+  #       end                             # called `wiz`
+  #
+  #       wiz :fiz                        # set a default here if you like
+  #     end
+  #
+  #     class Bar < Foo                   # subclass..
+  #       wiz :piz                        # then set the value of `wiz`
+  #     end
+  #                                       # read the value:
+  #     Bar.get_wiz # => :piz
+  #
+  #     # but setters are private by default:
+  #
+  #     Bar.wiz :other  # => NoMethodError: private method `wiz' called..
+  #
+  #     # because this DSL generates only readers and not writers for your
+  #     # instances, you get a public reader of the same name in your
+  #     # instances (not prefixed with "get_").
+  #
+  #                                        # read the value in an instance:
+  #     Bar.new.wiz # => :piz
+  #
+  # happy hacking!
 
-    # extend a `ModuleMethods`-ish module with `DSL_DSL` and call e.g
-    # `dsl_dsl { atom :foo ; atom :bar ; list :baz }` on it. Your module
-    # then has memoizing getter/setters for `foo`, `bar`, `baz` at the module-
-    # level, and getters at the instance level.
-    #
-    # (This is basically like the `let` of ::Rspec fame, except it makes
-    # sugar for you. I WILL CALL IT SUGAR FACTORY)
-    #
-    # `list` type behaves like `atom` type identically except it globs
-    # the incoming args when setting.  `block` works as expected, too,
-    # if you're expecting the right thing
+  def self.enhance host, &def_blk
+    Story_.new( host.singleton_class, host, ENHANCE_ADAPTER_ ).
+      instance_exec( & def_blk )
+    nil
+  end
 
-    def dsl_dsl &block
-      story = Story.new self
-      story.instance_exec(& block )
+  class Enhance_Adapter
+    def add_field mm, im, fs
+      Add_field_[ mm, im, fs ]
       nil
     end
 
-    class Story
+    def add_or_change_value host, fs, x
+      Add_or_change_value_[ host.singleton_class, fs, x ]
+      nil
+    end
+  end
+  ENHANCE_ADAPTER_ = Enhance_Adapter.new
 
-      def atom name
-        @atom[ name ]
+  Add_field_ = -> mm, im, fs do
+    mm.send :private, fs.w1  # make the writer private
+    mm.send :define_method, fs.r1 do end  # if it is never set
+    mg = fs.r1
+    if fs.r2
+      im.send :define_method, fs.r2 do  # one of these
+        self.class.send mg
       end
+    end
+    nil
+  end
 
-      def atom_accessor name
-        @atom_accessor[ name ]
-      end
+  Add_or_change_value_ = -> mm, fs, x do
+    mm.send :undef_method, fs.r1
+    mm.send :define_method, fs.r1 do x end
+    nil
+  end
 
-      def list name
-        @list[ name ]
-      end
+  class Story_
 
-      def block name
-        @block[ name ]
-      end
+    # (the implementation of the DSL DSL)
 
-    protected
+    def initialize mm, im, box
 
-      def initialize mod
-        # crystal clear, yeah? if the module caller says it wants an `atom`
-        # with name <foo>, then, out of the box it will have a "get_<foo>"
-        # that results in nil. If ever you call `foo "wizzle"` on that module,
-        # it will do 2 things: 1) change the definition of `get_<foo>`
-        # to result in that value ("wizzle"), 2) give the module an instance
-        # method that does the same thing, but by the name `foo` (there is
-        # no setter (or setting) `foo` at the instance level with this
-        # facility).
+      @atom, @atom_accessor, @list, @block = mm.module_exec do
 
-        @atom, @list, @block = mod.module_exec do
-          atom = -> name do
-            define_method "get_#{ name }" do end
-            define_method name do |monadic_x|
-              define_singleton_method "get_#{ name }" do monadic_x end
-              define_method name do monadic_x end
-              nil
-            end
+        atom = -> i do
+          fs = Fstory_[ i, :atom ]
+          define_method i do |x|
+            box.add_or_change_value self, fs, x
             nil
           end
-
-          list = -> name do
-            define_method "get_#{ name }" do end  # some might []
-            define_method name do |* x_a|
-              x_a.freeze  # at the instance level we don't want to accidentally
-                          # mutate it (the same *should* apply to the mod-level)
-              define_singleton_method "get_#{ name }" do x_a end
-              define_method name do x_a end
-              nil
-            end
-            nil
-          end
-            # `list` acts same as `atom` but it globs the incoming argument(s)
-            # so that it "just works" "as expected" ("") for a list-like field.
-
-          block = -> name do
-            define_method "get_#{ name }" do end
-            define_method name do |&blk|
-              blk or raise ::ArgumentError, "block required"
-              define_singleton_method "get_#{ name }" do blk end
-              define_method name do blk end
-              nil
-            end
-            nil
-          end
-            # `block` is identical to `atom` except for the "globbing" and the
-            # check that a block was passed.
-
-          [ atom, list, block ]
+          box.add_field self, im, fs
+          nil
         end
 
-        @atom_accessor = -> sym do
-
-          reader = "get_#{ sym }".intern
-          writer = "#{ sym }=".intern
-
-          mod.module_exec do
-
-            attr_accessor sym                  # make the reader and the writer
-            alias_method reader, sym           # reader `foo` becomes `get_foo`
-
-            sig_a = [ reader, writer ]
-
-            define_method sym do |*a|
-              send sig_a.fetch( a.length ), *a
+        atom_accessor = -> i do
+          ivar = "@#{ i }".intern
+          im.class_exec do
+            swi_a = [
+              -> { instance_variable_get ivar },
+              -> x { instance_variable_set ivar, x }
+            ]
+            define_method i do |*a|
+              instance_exec( *a, & swi_a.fetch( a.length ) )
             end
           end
           nil
         end
+
+        list = -> i do
+          fs = Fstory_[ i, :list ]
+          define_method i do | * x_a |
+            x_a.freeze  # at both instance and mod-level don't accid. mutate.
+            box.add_or_change_value self, fs, x_a
+            nil
+          end
+          box.add_field self, im, fs
+          nil
+        end
+
+        block = -> i do
+          fs = Fstory_[ i, :block ]
+          define_method i do |&blk|
+            blk or raise ::ArgumentError, "block required"
+            box.add_or_change_value self, fs, blk
+            nil
+          end
+          box.add_field self, im, fs
+          nil
+        end
+
+        [ atom, atom_accessor, list, block ]
+      end
+      nil
+    end
+
+    Fstory_ = ::Struct.new :nn, :type, :r1, :w1, :r2
+    # `nn` = normalize name ; `r1` = read 1 (the module) ; `w1` = write 1 (
+    # the module) ; `r2` = read 2 (the instance)
+    class Fstory_
+      def initialize nn, type, r1="get_#{ nn }".intern, w1=nn, r2=nn
+        super
       end
     end
+
+    def atom name  # #todo:during:7
+      @atom[ name ]
+    end
+
+    def atom_accessor name
+      @atom_accessor[ name ]
+    end
+
+    def list name
+      @list[ name ]
+    end
+
+    def block name
+      @block[ name ]
+    end
   end
+
+  # can we use a module to hold and share an entire DSL?
+  #
+  #     module Foo
+  #       MetaHell::DSL_DSL.enhance_module self do
+  #         atom :pik
+  #       end
+  #     end
+  #
+  #     class Bar
+  #       extend Foo::ModuleMethods
+  #       include Foo::InstanceMethods
+  #       pik :nic
+  #     end
+  #
+  #     Bar.get_pik # => :nic
+  #     Bar.new.pik # => :nic
+
+  def self.enhance_module amod, &def_blk
+    mm, im = %i| ModuleMethods InstanceMethods |.map do |i|
+      if amod.const_defined? i, false
+        amod.const_get i, false
+      else
+        amod.const_set i, ::Module.new
+      end
+    end
+    Story_.new( mm, im, ENHANCE_MODULE_ADAPTER_ ).instance_exec( & def_blk )
+    nil
+  end
+
+  class Enhance_Module_Adapter_
+    def initialize
+      @add_field = -> mm, im, fs do
+        Add_field_[ mm, im, fs ]
+        nil
+      end
+      @add_or_change_value = -> host, fs, x do
+        # imagine a child class that extended a module methods is changing
+        # the defn for a field.
+        Add_or_change_value_[ host.singleton_class, fs, x ]
+        nil
+      end
+      nil
+    end
+    def add_field( *a ) ; @add_field[ *a ] ; end  # #todo:during:7
+    def add_or_change_value( *a ) ; @add_or_change_value[ *a ] ; end
+  end
+
+  ENHANCE_MODULE_ADAPTER_ = Enhance_Module_Adapter_.new
+
 end

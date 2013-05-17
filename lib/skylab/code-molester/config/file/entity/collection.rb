@@ -208,8 +208,8 @@ module Skylab::CodeMolester::Config::File::Entity
       Basic::List::Evented::Articulation enum do
         always_at_the_beginning      ->     { o << '[' }
         iff_zero_items               ->     { o << ' ]' }
-        any_first_line               ->   s { o << "\n  #{ s }" }
-        any_subsequent_lines         ->   s { o << "#{ comma }\n  #{ s }" }
+        any_first_item               ->   s { o << "\n  #{ s }" }
+        any_subsequent_items         ->   s { o << "#{ comma }\n  #{ s }" }
         at_the_end_iff_nonzero_items ->     { o << "\n]" }
       end
       o.flush

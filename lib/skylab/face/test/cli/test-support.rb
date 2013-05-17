@@ -21,22 +21,20 @@ module Skylab::Face::TestSupport::CLI
 
   TestSupport::Sandbox.enhance( Sandbox ).produce_subclasses_of -> { Face::CLI }
 
+  MetaHell::DSL_DSL.enhance_module self do
+    block :with_body
+    atom :ptrn
+    list :argv
+    atom :desc
+    list :expt
+    atom :expt_desc
+  end
+
   module ModuleMethods
 
     include CONSTANTS
 
     extend MetaHell::Let
-
-    extend MetaHell::DSL_DSL
-
-    dsl_dsl do
-      block :with_body
-      atom :ptrn
-      list :argv
-      atom :desc
-      list :expt
-      atom :expt_desc
-    end
 
     -> do
       fmt = "%-6s %-35s %-12s %s"

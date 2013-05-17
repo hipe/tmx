@@ -57,7 +57,7 @@ module Skylab::Headless
       end
     end
 
-  protected
+  private
 
     def initialize               # no args - mutate exclusively thru the setters
       timeout_seconds = 0.3

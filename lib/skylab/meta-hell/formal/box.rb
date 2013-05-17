@@ -110,9 +110,9 @@ module Skylab::MetaHell
 
     # `if?` - if an entry exists with `name` (if `has?` `name`), call `found`
     # with the value. Otherwise call `not_found`, which will be passed
-    # zero one or two aregs consisting of [box [`name`]] based on its arity.
+    # zero one or two args consisting of [box [`name`]] based on its arity.
 
-    def if? name, found, not_found
+    def if? name, found, not_found=Null_f_
       if @hash.key? name
         found[ @hash.fetch name ] if found
       else
@@ -124,6 +124,8 @@ module Skylab::MetaHell
         not_found[ * a ]
       end
     end
+
+    Null_f_ = -> { }
 
     #                 ~ `each` and its derivatives ~
 

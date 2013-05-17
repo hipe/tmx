@@ -108,10 +108,14 @@ module Skylab::Face
         stay, res = cmd.parse argv
         if ! stay then res else
           branch.last_normalized_child_slug = cmd.normalized_invocation_slug
-          begin
-            branch.send cmd.method_name, * argv
-          rescue ::ArgumentError => ex  # ick this ain't right
-            argument_error ex, cmd  # this position is locked in the stack!
+          if (( f = cmd.invocation_function ))
+            branch.instance_exec argv, & f
+          else
+            begin
+              branch.send cmd.method_name, * argv
+            rescue ::ArgumentError => ex  # ick this ain't right
+              argument_error ex, cmd  # this position is locked in the stack!
+            end
           end
         end
       end
@@ -489,6 +493,9 @@ module Skylab::Face
     end
     private :node_open!
 
+    attr_reader :node_open
+    public :node_open  # facets e.g revelation
+
     def add_child_aliases arr
       node_open!.add_aliases arr
     end
@@ -658,11 +665,19 @@ module Skylab::Face
 
     attr_reader :block  # Command wants to see you in his office
 
-    def method_name
-      if :method == @name
-        @name_x
+    # `method_name`
+    -> do
+      h = {
+        method: -> { @name_x },
+        nln: -> do
+          raise "sanity - it is meaningless to speak of a method name in #{
+            }association with this command - \"#{ @name_function.as_slug }\""
+        end
+      }
+      define_method :method_name do
+        instance_exec( & h.fetch( @name ) )
       end
-    end
+    end.call
 
     def method_name= x
       :none == @name or raise "won't set name with method when name #{
@@ -670,6 +685,8 @@ module Skylab::Face
       @name = :method ; @name_x = x
       x
     end
+
+    attr_accessor :invocation_function  # facets
 
     def get_command_parameters client
       if @command_parameters_function
@@ -809,7 +826,9 @@ module Skylab::Face
                 end
               end
             else
-              @command = cmd  # some o.p blocks want it both ways
+              @command = cmd  # some o.p blocks want it both ways - that is,
+              # the expect their context to be the parent command node
+              # ("namespace"), and they also need access to the command
               instance_exec op, & op_sheet.block  # (`option_parser`)
               @command = nil
             end
@@ -1170,6 +1189,10 @@ module Skylab::Face
       @parent.out
     end
     public :out  # called by children
+
+    def invocation_function
+      @sheet.invocation_function
+    end  # facets
   end
 
   class Namespace  # (re-open)
@@ -1324,7 +1347,7 @@ module Skylab::Face
       end
       case found_a.length
       when 0 ; unrecognized_command given
-      when 1 ; [ true, ( found_a[ 0 ].hot self, @sheet, argv.shift ) ]
+      when 1 ; [ true, found_a[ 0 ].hot( self, @sheet, argv.shift ) ]
       else   ; ambiguous_command found_a, given
       end
     end

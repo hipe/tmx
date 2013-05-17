@@ -254,8 +254,8 @@ module Skylab::CodeMolester::Config::File::Entity
       Basic::List::Evented::Articulation pred_a do
         always_at_the_beginning      ->     { o << "#{ lbl }" }
         iff_zero_items               ->     { o << "was fine." }
-        any_first_line               ->   s { o << "#{ s }." }
-        any_subsequent_lines         ->   s { o << "#{ lbl }#{ s }." }
+        any_first_item               ->   s { o << "#{ s }." }
+        any_subsequent_items         ->   s { o << "#{ lbl }#{ s }." }
       end
       o
     end

@@ -13,6 +13,41 @@ module Skylab::TestSupport::Sandbox
   # but more concise (and de-facto tagged) than writing these kind of things
   # always by hand.
 
+  module Spawner
+
+    #  top secret experiment
+
+    def self.new
+      ::Module.new.module_exec do
+        @_cnt = 0
+        extend Spawner_
+        self
+      end
+    end
+
+    module Spawner_
+      def spawn
+        # const_set "Sandbox_#{ @_cnt += 1 }", ::Module.new
+        ::Module.new.extend Hax_
+      end
+    end
+
+    module Hax_
+      def with ctx
+        @ctx = ctx
+        nil
+      end
+
+      def eql x
+        @ctx.eql x
+      end
+
+      def raise_error *a
+        @ctx.raise_error( *a )
+      end
+    end
+  end
+
   # `enhance` - this is for enhancing your Sandbox module with one
   # or more of these enhancements:
   #

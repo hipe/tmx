@@ -1,6 +1,7 @@
 require_relative '../core'
 
 module Skylab::TestSupport::TestSupport # haha yay
+
   ::Skylab::TestSupport::Regret[ TestSupport_TestSupport = self ]
 
   module CONSTANTS

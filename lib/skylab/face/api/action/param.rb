@@ -5,7 +5,8 @@ module Skylab::Face
     # this whole node if for experimenting in the automatic creation of a set
     # of meta-fields that can be recognized by the entity library. tag your
     # fields with these metafields and we can try to make magic happen for you
-    # (#placeholder: [#fa-013])
+    #
+    # [#fa-014] (for now under the entity node)
 
     METAFIELDS_ = [
 
@@ -15,55 +16,65 @@ module Skylab::Face
       [ :option, :reflective ],
                 # if the parameter is an option and not a field (idem)
 
+      # [ :a-rity, :property ], # [#fa-024]  # #todo:during:arity
+      [ :desc, :property ], # [#fa-030]
+
       :required,  # entity library might interpret this to mean an assertion
                # for non-nil .. ( meaning is #experimental )
 
       # (currently, more detailed validation-type metafields are defined
       # as part of entity (model) libraries and not in this API facet..)
 
-      [ :normalizer, :property ],
+      [ :normalizer, :property ], # [#fa-021]
 
       # (trailing comma above is intentional and syntactically valid, but still
       # feels really weird to do without justifying it with this long comment)
     ].tap { |a| a.freeze.each( & :freeze ) }
 
+    # `self.[]` - enhance the API::Action class with this facet.
+    # fulfill [#fa-026]. assumes it is behind a module mutex.
+    # assumes `param_a` looks right structurally.
+
+    def self.[] host_mod, param_a
+      Services::Basic::Field::Box.enhance host_mod do
+        # extend_field_class_with -> { API::Action::Param::Field_IMs_ }
+        meta_fields( * API::Action::Param::METAFIELDS_ )
+        fields( * param_a )
+      end
+      Services::Basic::Field::Reflection.enhance( host_mod ).with host_mod
+      host_mod.send :include, API::Action::Param::InstanceMethods
+      nil
+    end
   end
 
-  class API::Action::Param::Flusher
+  module API::Action::Param::Field_IMs_
 
-
-    def self.[] param_a, host_mod  # assume param_a looks right structurally
-
-      new( param_a, host_mod ).flush
-
-    end
-
-    def initialize param_a, host_mod
-
-      @flush = -> do
-
-        Services::Basic::Field::Box.enhance host_mod do
-
-          meta_fields( * API::Action::Param::METAFIELDS_ )
-
-          fields( * param_a )
-
+    -> do
+      # implement the idea of a required field by deriving the boolean
+      # of required-ness from the argument arity [#fa-024]
+      is_req_h = {
+        zero: false,
+        zero_or_one: false,
+        zero_or_more: false,
+        one: true,
+        one_or_more: true,
+      }
+      define_method :is_required do
+        if has_arity
+          is_req_h.fetch @arity_value
+        else
+          true  # if e.g a plain simple inline with some complex guys
         end
-
-        Services::Basic::Field::Reflection.enhance( host_mod ).with host_mod
-
-        host_mod.send :include, API::Action::Param::InstanceMethods
-
-        nil
       end
-    end
-
-    def flush
-      @flush[ ]
     end
   end
 
   module API::Action::Param::InstanceMethods
+
+    def has_param_facet
+      true
+    end
+    # public. fulfill [#fa-027].
 
     # `pack_fields_and_options` - #experimentally many methods in the
     # entity library take the "sacred four" parameters [#fa-012].

@@ -27,7 +27,7 @@ module Skylab::Face::TestSupport::API::Normalize
       define_sandbox_constant :nightclub do
         module Sandbox::Nightclub_1
           Face::API[ self ]
-          class API::Actions::W
+          class API::Actions::W < Face::API::Action
             def normalize y, p_h
               if ! p_h
                 y << "no params provided"

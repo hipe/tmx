@@ -13,6 +13,9 @@ module Skylab::Face
     -> do  # `initialize`
 
       h = {
+        # #todo:during:arity
+#        opt: [ :a-rity, :zero_or_one ],
+#        req: [ :a-rity, :one ]
         opt: [ ],
         req: [ :required ]
       }
@@ -21,6 +24,7 @@ module Skylab::Face
         @proc = prok
         @constants = ::Module.new
         Services::Basic::Field::Box.enhance @constants do
+          # extend_field_class_with -> { API::Action::Param::Field_IMs_ }  # #todo:during:arity
           meta_fields( * API::Action::Param::METAFIELDS_ )
           fields( * prok.parameters.map do |orr, nn|
             [ nn, * h.fetch( orr ) ]
@@ -29,9 +33,27 @@ module Skylab::Face
       end
     end.call
 
+    # `has_emit_facet` - fulfill [#fa-027]. override parent.
+    # justification: we do *not* want the event-wiring hook.
+    # Procs are simple and have an atomic, monadic result. if you need
+    # to emit events during the excution of your Proc, you should *not* be
+    # using a Proc to implement your action in the first place ^_^.
+
+    def has_emit_facet
+      false
+    end
+
+    def has_param_facet
+      fail "do me - don't i need some I_M?"
+    end
+
     def normalize y, p_h
       @provided_keys_a = p_h ? p_h.keys : [ ]
       instance_exec y, p_h, & API::Action::FUN.normalize
+    end
+
+    def has_service_facet
+      false
     end
 
     def has_field_box

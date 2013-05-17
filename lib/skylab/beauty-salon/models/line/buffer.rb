@@ -40,6 +40,7 @@ module Skylab::BeautySalon
           line_a.length
           curr_width = 0
         end
+        nil
       end
     end
 

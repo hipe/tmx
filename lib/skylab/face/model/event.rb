@@ -79,9 +79,9 @@ module Skylab::Face
     o = ''
     Face::Services::Basic::List::Evented::Articulation a do
       iff_zero_items               ->     { o << '(empty)' }
-      any_first_line               ->   x { o << "#{ x.message_function[] }" }
+      any_first_item               ->   x { o << "#{ x.message_function[] }" }
 
-      any_subsequent_lines -> x do
+      any_subsequent_items -> x do
         if Services::Headless::CLI::FUN.looks_like_sentence[ o ]
           sep = ' '
         else

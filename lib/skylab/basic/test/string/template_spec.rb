@@ -62,7 +62,7 @@ module Skylab::Basic::TestSupport::String
 
       it "with `formal_paramters`, offset data, surface representation too" do
         o = Basic::String::Template.new string: template_string
-        a = o.formal_parameters.each.to_a
+        a = o.get_formal_parameters.each.to_a
         a.length.should eql(2)
         a.first.surface.should eql('{{ bar_baz }}')
         a.first.normalized_name.should eql(:bar_baz)

@@ -9,8 +9,11 @@ module Skylab::Face
     # everthing is of course experimental; but note it is a very designed,
     # thought-out experiment, with both eyes focused squarely on the big dream.
 
+    # the API Action lifecycle :[#fa-021]:
+    #
     # the lifecycle of the API Action happens thusly (ignoring how we got
     # to an API Action instance for a moment):
+    #
     #
     # [_this_state_] -> `will_receive_this_message` -> [_and_go_to_this_state_]
     #
@@ -68,6 +71,15 @@ module Skylab::Face
     # calls to be processed atomic-ly, monadic-ly, er: zero or once each;
     # for ease of implementation. can be complexified as needed.)
 
+    # `has_emit_facet` - fulfill [#fa-027]. public.
+    # for this facet we default to true to let a modality client decide how /
+    # whether to wire the action for itself (although we override this method
+    # here in a sibling class..)
+
+    def has_emit_facet
+      true
+    end
+
     def self.taxonomic_streams *a, &b
       API::Action::Emit[ self, :taxonomic_streams, a, b ]
     end
@@ -78,23 +90,33 @@ module Skylab::Face
 
     #                      ~ services (section 3) ~
 
+    def has_service_facet  # fullfil [#fa-027].
+      false
+    end
+
     define_singleton_method :services, & mutex[ -> *a do
-      API::Action::Service::Flusher.new( self, a ).flush
+      API::Action::Service[ self, a ]
     end, :services ]
 
     #                ~ parameters & normalization (section 4) ~
 
+    def has_param_facet  # fulfill [#fa-027]
+      false
+    end
+
     o = { }
 
-    # `normalize` - specified in sibling file `client.rb` [#fa-019].
+    # `normalize` - documented in sibling file `client.rb` [#fa-019].
     #
-    # i.e iff normalization failure, write to `y` and result in result.
     # beyond that:
     #   + we mutate `param_h`
 
     o[:normalize] = -> y, param_h do
       a = [ ]  # ( break down as needed )
-
+      bork = -> msg do
+        y << msg
+        false
+      end
       a << -> par_h do
         miss_a = nil
         field_box.each do |nn, fld|
@@ -102,25 +124,27 @@ module Skylab::Face
             } ivar collision: #{ fld.as_host_ivar }"
           v = ( par_h.delete nn if par_h and par_h.key? nn )
           instance_variable_set fld.as_host_ivar, v
+          if fld.has_normalizer
+            v = field_normalize y, fld, v
+          end
           ( miss_a ||= [] ) << fld if fld.is_required and v.nil?
         end
-        if par_h and par_h.length.nonzero?
-          y << "undeclared parameter(s) - (#{ par_h.keys * ', ' }) for #{
-            }#{ self.class }. (declare it/them with `params` macro?)"
-          break true, false
-        end
-        if miss_a
-          y << "missing required parameter(s) - (#{
-            }#{ miss_a.map( & :normalized_name ) * ', ' }) for #{ self.class }."
-          break true, false
-        end
+        par_h and par_h.length.nonzero? and break bork[ "undeclared #{
+          }parameter(s) - (#{ par_h.keys * ', ' }) for #{ self.class }. #{
+          }(declare it/them with `params` macro?)" ]
+        miss_a and break bork[ "missing required parameter(s) - (#{
+          }#{ miss_a.map( & :normalized_name ) * ', ' }) #{
+          }for #{ self.class }." ]
+        true
       end
 
-      a.reduce param_h do |r, f|
-        b, r = instance_exec r, & f
-        b and break r
-        r
-      end
+      a.reduce param_h do |x, f|
+        instance_exec x, & f or break
+      end  # call each function in order, but if ever a function's result is
+      # falseish we break out of the loop. each function's (non-false-ish,
+      # then) result becomes the argument passed to each next fuction's call.
+
+      nil
     end
 
     define_method :normalize, & o[:normalize]  # public.
@@ -131,15 +155,33 @@ module Skylab::Face
       private :field_box
     end.call
 
+    # `field_normalize`
+    def field_normalize y, fld, x1
+      n_x = fld.get_normalizer
+      n_x == true and n_x = method( :"normalize_#{ fld.normalized_name }" )
+      ok = instance_exec y, x1, -> x2 do
+        x1 = x2
+        instance_variable_set fld.as_host_ivar, x1
+        nil
+      end, & n_x
+      x1 if ok
+    end
+    private :field_normalize
+
     # `self.params` - rabbit hole .. er "facet" [#fa-013]
+    # placed here because it fits in semantically with the `normalize`
+    # step of the API Action lifecycle.
 
     define_singleton_method :params, & mutex[ ->( * a ) do
-                                  # here because it goes with normalize above.
-      if a.length.nonzero?        # otherwise, same as empty box defined above.
-        if ! a.index { |x| ::Symbol != x.class }  # if it is a flat list of
-          a.map! { |x| [ x, :required ] }  # names, that is shorthand for this.
+      # if you call this with empty `a`, it is the same as not calling it,
+      # which gives you the empty field box above.
+      if a.length.nonzero?
+        # if it is a flat list of symbol names, that is shorthand for:
+        if ! a.index { |x| ::Symbol != x.class }
+          # a.map! { |x| [ x, :a-rity, :one ] }  # #todo:during:arity
+          a.map! { |x| [ x, :required ] }
         end
-        API::Action::Param::Flusher[ a, self ]
+        API::Action::Param[ self, a ]
         nil
       end
     end, :params ]

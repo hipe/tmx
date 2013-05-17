@@ -33,15 +33,17 @@ module Skylab::Face
     # ancicipates there maybe being e.g an ivar having been set which holds
     # the strange value for that property. But the wrongmost way of all is:
 
-    Ouroboros_Sheet = MetaHell::Proxy::Nice.new :slug, :options, :command_tree,
-      :method_name, :host_module, :default_argv, :normalized_local_command_name
-
+    Ouroboros_Sheet = MetaHell::Proxy::Nice.new( :slug, :options, :command_tree,
+      :fetch_element, :method_name, :host_module, :default_argv,
+      :normalized_local_command_name,
+    )
 
     class Ouroboros_Sheet
       def self.[] tail, head
         new                slug: -> do tail.slug end,
                         options: -> do head.options end,
                    command_tree: -> do head.command_tree end,
+                  fetch_element: -> x do head.fetch_element x end,
                     method_name: -> do tail.method_name end, # NOTE b.c namesp.
                     host_module: -> do head.host_module end,
                    default_argv: -> do head.default_argv end,

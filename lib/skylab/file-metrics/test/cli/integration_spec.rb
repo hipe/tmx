@@ -37,7 +37,7 @@ module Skylab::FileMetrics::TestSupport::CLI
         expect_integer ln, 50 .. 400
         expect_percent pc1
         expect_percent pc2, 100.0
-        expect_pluses lip, floor..100
+        expect_pluses lip, floor..150
       end
 
       it "summary" do

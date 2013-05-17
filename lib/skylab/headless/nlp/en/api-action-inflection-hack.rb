@@ -165,9 +165,7 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
 
     # for setting how to inflect things
 
-    extend MetaHell::DSL_DSL
-
-    dsl_dsl do
+    MetaHell::DSL_DSL.enhance self do
       atom_accessor :noun
       atom_accessor :verb
     end

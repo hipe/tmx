@@ -546,7 +546,7 @@ module Skylab::Headless
       available_plugin_modules.each do |box_mod|
         story = box_mod.plugin_story
         client = story.plugin_client_class.new  # pursuant to #api-point [#002]
-        client = client.load_plugin story, svcs  # give the client a chance etc
+        client = client.load_plugin svcs, story  # give the client a chance etc
         story = client.plugin_story  # give the client a chance to change class
         sym = story.normalized_local_name
         @h.key? sym and fail "sanity: load same plugin more than once? - #{sym}"
@@ -1136,7 +1136,7 @@ module Skylab::Headless
     # feels cleaner. if you need a handle on the services object, by
     # all means override this method in your plugin client.
 
-    def load_plugin plugin_story, plugin_services
+    def load_plugin plugin_services, plugin_story=self.class.plugin_story
       @plugin_story = plugin_story
       @plugin_host_proxy = plugin_services.build_host_proxy self
       self  # important

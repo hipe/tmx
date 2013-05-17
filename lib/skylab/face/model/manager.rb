@@ -33,7 +33,7 @@ module Skylab::Face
         k, is_collection = resolve_ref model_ref_a
         sty = k.plugin_story
         c = k.new
-        c.load_plugin sty, @host.plugin_services
+        c.load_plugin @host.plugin_services, sty
         if sty.do_memoize.nil? && is_collection or sty.do_memoize
           @h[ model_ref_a ] = c
         end

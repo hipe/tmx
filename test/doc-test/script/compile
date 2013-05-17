@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+datadir="test/doc-test/data"
+if [[ ! -d "$datadir" ]] ; then
+  echo "no data dir - $datadir"
+  exit 1
+fi
+
+cat "$datadir/files" | while read line
+do
+  if [[ ! -e "$line" ]] ; then
+    echo "not found - $line"
+  else
+    haha=$( ruby -e "a = \"$line\".split( '/' ) ; puts \"#{a[2]} #{ a[3..-1].join('/')[ 0..-4 ]}\"" )
+    read r1 r2 <<<$(IFS=' '; echo "$haha")
+    i="tmx regret doc-test -vv $line"
+    o="lib/skylab/$r1/test/${r2}_spec.rb"
+    _cmd="$i > $o"
+    eval "$i" > "$o"
+  fi
+done
+
+me="test/doc-test/script/compile: "
+echo "${me}done."
+

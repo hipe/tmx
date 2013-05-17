@@ -10,15 +10,13 @@ module Skylab::FileMetrics::TestSupport::Models
 
   include CONSTANTS
 
+  MetaHell::DSL_DSL.enhance_module self do
+    block :with_klass
+  end
+
   module ModuleMethods
 
     include CONSTANTS
-
-    extend MetaHell::DSL_DSL
-
-    dsl_dsl do
-      block :with_klass
-    end
 
     extend MetaHell::Let
 

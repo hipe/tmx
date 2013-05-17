@@ -2,6 +2,8 @@ module Skylab::Basic
 
   module List::Evented::Articulation
 
+    # (things that make us think of this when we see them :[#015])
+
     def self.[] enum, def_blk
 
       enum.respond_to? :next or enum = List::To::Enum[ enum ]
@@ -25,9 +27,9 @@ module Skylab::Basic
       o = Conduit_.to_struct def_blk
       call[ o.always_at_the_beginning ]
       if gets[]
-        call[ o.any_first_line, line ]
+        call[ o.any_first_item, line ]
         while gets[]
-          call[ o.any_subsequent_lines, line ]
+          call[ o.any_subsequent_items, line ]
         end
       else
         call[ o.iff_zero_items ]
@@ -42,8 +44,8 @@ module Skylab::Basic
     Conduit_ = MetaHell::Enhance::Conduit.new %i|
       always_at_the_beginning
       iff_zero_items
-      any_first_line
-      any_subsequent_lines
+      any_first_item
+      any_subsequent_items
       at_the_end_iff_nonzero_items
     |
   end

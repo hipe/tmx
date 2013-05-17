@@ -155,6 +155,12 @@ differ only by this one argument, and since the one is a subset of the other,
 we can say that in this context an `array~` IS-A `dictionary~` (but not the
 reverse, get it?).
 
+(this relationship in general between two `semantic structure patterns` when,
+given some context of operations we care about, one has all the operations
+(and more) of the other for that context, we refer to the one as a
+`semantic superset` of the other (for that contetxt), and the other as a
+`semantic subset` of the one. we may explore this further later :[#016])
+
 that took a lot of saying to get to that point but this gives you a hint of
 where we're going with this:
 
@@ -167,6 +173,9 @@ where we're going with this:
   different, but in context where all keys are integer keys, (or can be
   `isomorphic` in that context) they can be treated as `logically` the
   same :[#009]
+
+  more broadly, we hope to explore plastic ways we can represent the
+  operations themselves so we can find such equivalencies determinisitically.
 
 ## why behavior is important :[#011]
 
@@ -329,5 +338,11 @@ and more about functions we can use on them to derive other things from them..
 
   axiom: there exists a `dictionary~` that is isomorphic with any `tuple~`
   given a `list~` of the `tuple~`'s keys
+
+
+## appendix of notes, to be worked in one day:
+
+hash and switch statement have `semantic intersect` :[#017]
+a module and a switch statement hve `semantic intersect` :[#018]
 
 ~
