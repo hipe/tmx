@@ -10,7 +10,7 @@ module Skylab::TreetopTools
       @inpath[].to_s
     end
 
-    MetaHell::Function self, :@inpath, :inpathname
+    Headless::MetaHell::Function self, :@inpath, :inpathname
 
     def outpath
       outpathname.to_s

@@ -238,10 +238,10 @@ module Skylab::Test
         end
         resolve_default_action_if_necessary or break
         if :cli == @run_mode && @argv.length.nonzero?
-          emit_eventpoint :argv_hijinx, @argv
+          emit_eventpoint :argv_hijinx, @queue_a.fetch( 0 ), @argv
           emit_eventpoint :argument_list, @argv if @argv.length.nonzero?
           if @argv.length.nonzero?
-            @info_y << "won't run with unresolved argv - #{ @argv }"
+            @info_y << "won't run with un argv - #{ @argv }"
             ok = false
           end
         end
@@ -1478,9 +1478,11 @@ module Skylab::Test
       @argv = nil
     end
 
-    argv_hijinx do |argv|
-      @argv = argv.dup
-      argv.clear
+    argv_hijinx do |cmd_i, argv|
+      if :divide == cmd_i
+        @argv = argv.dup
+        argv.clear
+      end
       nil
     end
 

@@ -39,44 +39,41 @@ module Skylab::MetaHell
     # outside. might go into a rewrite of `const_fetch` #todo
 
     o[:fuzzy_const_get] = -> modul, x do
+      o[:fuzzy_const_get_tuple][ modul, x ].fetch 0
+    end
+
+    o[:fuzzy_const_get_tuple] = -> mod, x do
       if blk_rx =~ x then raise ::NameError, "invalid chars - #{ $~[1] }"
       elsif wht_rx !~ x then raise ::NameError, "invalid name - #{ x }"
       else
-        orig_a = modul.constants
-        tgt = fun.normulate[ x ]
-        idx = ( orig_a.index do |cnst|
-          tgt == fun.normulate[ cnst ]
-        end )
-        res = nil
+        orig_a = mod.constants ; tgt = fun.normulate[ x ]
+        idx = orig_a.index { |cnst| tgt == fun.normulate[ cnst ] }
+        tuple = nil ; res = -> i do
+          tuple = [ mod.const_get( i, false ), i ]
+        end
         begin
-          if idx
-            break( res =  modul.const_get( orig_a[ idx ], false ) )
-          end
-          if ! modul.respond_to? :dir_pathname or ! modul.dir_pathname
-            break( res = modul.const_get x, false )
-          end
+          idx and break res[ orig_a.fetch idx ]
+          mod.respond_to?( :dir_pathname ) && mod.dir_pathname or break res[ x ]
           try1 = MetaHell::Services::Headless::Name::FUN.constantify[ x ].intern
-          tug = MetaHell::Autoloader::Autovivifying::Recursive::Tug.new(
-            try1, modul.dir_pathname, modul )
+          tug = MetaHell::Autoloader::Autovivifying::Recursive::Tug.new try1,
+            mod.dir_pathname, mod
           correction = -> do
-            new_a = modul.constants - orig_a
+            new_a = mod.constants - orig_a
             idx = new_a.index do |cnst|
               tgt == fun.normulate[ cnst ]
             end
-            idx or raise Boxxy::NameNotFoundError.new( const: x, module: modul,
-              message: "coudn't find \"#{ x }\" in #{ modul }. did #{
-              }you mean one of:(#{ new_a * ' '})?", seen_a: new_a )
+            idx or raise Boxxy::NameNotFoundError.new const: x, module: mod,
+              message: "coudn't find \"#{ x }\" in #{ mod }. did #{
+              }you mean one of:(#{ new_a * ' ' })?", seen_a: new_a
             crct = new_a.fetch idx
             if try1 != crct
               tug.instance_variable_set :@const, crct  # confers familiarity
             end
           end
-          tug.send( :load, -> do
-            correction[]
-          end )
-          res = modul.const_get tug.const, false
+          tug.send :load, -> { correction[] }
+          res[ tug.const ]
         end while nil
-        res
+        tuple
       end
     end
 

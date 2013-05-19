@@ -1321,6 +1321,13 @@ module Skylab::Face
     end
     public :invite  # called by parents documenting children
 
+    def invite_for y, normalized_child_slug_i
+      sty = @sheet.fetch_element normalized_child_slug_i  # e.g Leaf_Sheet
+      y << "try #{ hi "#{ invocation_string } #{ sty.slug } -h" } for help."
+      nil
+    end
+    private :invite_for  # experiment for revelation
+
     # `find_command` - existential workhorse called from main loop.
     # assumes at least 1 element in argv. remove at most 1 element off
     # the head of `argv`. result in approriate response pair -

@@ -161,7 +161,7 @@ module Skylab::Face
         end )
         action.resolve_services( if addtl_svcs
           Services::Headless::Plugin::Host::Services::Chain.new [
-            addtl_svcs, plugin_services ]
+            addtl_svcs, plugin_services ], self.class
         else
           plugin_services
         end )

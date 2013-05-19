@@ -1,6 +1,6 @@
-class Skylab::TestSupport::Regret::API::Actions::DocTest
+module Skylab::TestSupport::Regret::API
 
-  class Templos_::Quickie < DocTest::Templo_
+  class Actions::DocTest::Templos_::Quickie < API::Support::Templo_
 
     def initialize base_mod, c_a, b_a
       ctxt = tstt =
@@ -19,7 +19,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
           end
         end )
         snp.a.each do |line|
-          Templos_::Predicates.lines y, line do
+          Actions::DocTest::Templos_::Predicates.lines y, line do
             y << line
           end
         end

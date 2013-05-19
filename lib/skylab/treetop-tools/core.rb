@@ -3,9 +3,8 @@ require 'skylab/headless/core'
 
 module Skylab::TreetopTools
 
-  extend ::Skylab::MetaHell::Autoloader::Autovivifying::Recursive
-
   Headless = ::Skylab::Headless
+  extend Headless::MAARS
 
   const_get :Grammar, false       # ick load this now so we can say 'Grammar'
 
