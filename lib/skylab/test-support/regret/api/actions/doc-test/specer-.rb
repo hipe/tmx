@@ -2,9 +2,9 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
 
   class Specer_
 
-    def initialize tmpl, out, err, path, be_verbose
-      @tmpl_i, @out, @err, @path, @be_verbose =
-        tmpl, out, err, path, be_verbose
+    def initialize tmpl, out, err, path, vtuple
+      @tmpl_i, @out, @err, @path, @vtuple =
+        tmpl, out, err, path, vtuple
 
       @a = [ ]
       @notice = -> x do

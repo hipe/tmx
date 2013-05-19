@@ -1,6 +1,6 @@
-class Skylab::TestSupport::Regret::API::Actions::DocTest
+module Skylab::TestSupport::Regret::API
 
-  class Templo_
+  class Support::Templo_
 
     # it's a goofy name but i wanted it to be short, unique and semantic.
     # a "templo" holds all the ugly, hard-to read, and one-offy logic we

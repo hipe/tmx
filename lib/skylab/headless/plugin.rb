@@ -23,6 +23,9 @@ module Skylab::Headless
     # `confer`, `bestow`, `declare`, `define`, `extend_to` ..)
     # (#todo a unit test that display a normative example.)
 
+    MAARS::Upwards[ self ]  # (because we are defining this module in a
+                            # file, but want it to be able to load children)
+
     def self.enhance host_mod, &blk
       _enhance host_mod, -> do
         Plugin::Host::Story.new host_mod
@@ -849,6 +852,10 @@ module Skylab::Headless
             }plugin's list of desired services?)."
         end
       end
+    end
+
+    def _story  # hacks only (chaining [#072])
+      @story
     end
   end
 

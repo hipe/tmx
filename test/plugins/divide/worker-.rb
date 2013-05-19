@@ -19,8 +19,7 @@ class Skylab::Test::Plugins::Divide
           err.puts "(defaulting to #{ dflt } subdivisions)"
           integer = dflt
         end
-        hst = host.hot_subtree
-        big_a = hst.children.to_a
+        big_a = get_big_a host
         len = big_a.length
         if integer > len
           err.puts "(integer is larger than (#{ len }). subdividing in to 1)"
@@ -102,5 +101,17 @@ class Skylab::Test::Plugins::Divide
     end
 
     def execute ; @execute.call end
+
+    def get_big_a host
+      ::Enumerator.new do |y|
+        host.hot_subtree.children.each do |tree|
+          if tree.children.count.nonzero?
+            y << tree
+          end
+        end
+        nil
+      end.to_a
+    end
+    private :get_big_a
   end
 end

@@ -2,6 +2,7 @@ module Skylab::TestSupport::Regret::API
 
   API = self
   Face = ::Skylab::TestSupport::Services::Face
+  Basic = Face::Services::Basic
   Headless = ::Skylab::Headless
   MetaHell = Face::MetaHell
   Face::API[ self ]
