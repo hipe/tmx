@@ -27,25 +27,23 @@ module Skylab::TestSupport::Regret::API
              [ :err, :ingest ],
              [ :pth, :ingest ]
 
-    params :path, API::Conf::Verbosity.parameter
-
-    API::Conf::Verbosity self
+    params :path, API::Conf::Verbosity[ self ].param( :vtuple )
 
     def execute
-      fh = ::File.open @path, 'r'
-      cs = DocTest::Comment_::Block::Scanner[ fh ]  # yay.
-      sp = DocTest::Specer_.new :quickie, @out, @err, @path, @vtuple
-      while cblock = cs.gets
-        cblock.describe_to @err if @do_verbose_murmur
+      sn = @vtuple.make_snitch @err
+      bs = DocTest::Comment_::Block::Scanner[ sn, ::File.open( @path, 'r' ) ]
+      sp = DocTest::Specer_.new sn, @out, :quickie, @path
+      while cblock = bs.gets
+        cblock.describe_to @err if @vtuple.do_murmur
         if cblock.does_look_testy
           sp.accept cblock
         end
       end
       sp.flush
-      if @do_verbose_medium
-        @err.puts "finished generated output for #{ @path }"
-      elsif @do_verbose_everything
-        @err.puts 'done.'
+      if @vtuple.do_medium
+        sn.puts "finished generated output for #{ @path }"
+      elsif @vtuple.do_notice
+        sn.puts 'done.'
       end
       nil
     end

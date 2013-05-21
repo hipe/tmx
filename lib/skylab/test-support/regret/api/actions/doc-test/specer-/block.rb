@@ -10,11 +10,11 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     # subsequent snippet must have one non-code line preceding it,
     # by virtue of this grammar.
 
+    State_ = ::Struct.new :_name, :h
+
     -> do
 
-      o = ::Struct.new :h
-
-      define_method :initialize do |notice|
+      define_method :initialize do |snitch|
         state = last_other = state_h = nil ; ign = -> _ { }
         store_contentful_last_other = -> md do
           if md[:content]
@@ -36,12 +36,14 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
           state = state_h.fetch :watching
         end
         state_h = {
-          watching: o[
-            { other: store_contentful_last_other,
-              nbcode: code_one,
-              blank: ign
-            } ],
-          code: o[ { bcode: code, nbcode: code, other: shut } ]
+          watching: State_[ :_watching,
+            other: store_contentful_last_other,
+            nbcode: code_one,
+            blank: ign ],
+          code: State_[ :_code,
+            bcode: code,
+            nbcode: code,
+            other: shut ]
         }
         state = state_h.fetch :watching
         @accept = -> i, md do
@@ -53,7 +55,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
             _shut last_other, a
           end
         end
-        @a = [] ; @notice = notice
+        @a = [] ; @snitch = snitch
       end
     end.call
 
@@ -64,7 +66,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
       a.pop while a.length.nonzero? and a.last.length.zero?
       if a.length.nonzero?
         sn = Specer_::Block::Snippet.new last_other, a
-        if sn.validate @notice
+        if sn.validate @snitch
           @a << sn
         end
       end
@@ -87,12 +89,12 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
 
     -> do
       sep_rx = /#{ ::Regexp.escape SEP }/
-      define_method :validate do |notice|
+      define_method :validate do |snitch|
         ln = @a.detect do |l|
           sep_rx =~ l
         end
         if ln then true else
-          notice[ Event_[ -> do
+          snitch[ Event_[ -> do
             "code snippet without magic separator #{ SEP.inspect }"
           end, @a ] ]
           nil

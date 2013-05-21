@@ -186,6 +186,11 @@ module Skylab::Face
       end
     end, :params ]
 
+    def self.flat_exponent  # [#fa-035]
+      const_get :Flat_Exponent_
+    end
+    Flat_Exponent_ = :API_Action_
+
     FUN = ::Struct.new( * o.keys ).new( * o.values )
 
   end

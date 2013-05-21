@@ -2,20 +2,20 @@ module Skylab::TestSupport::Regret::API
 
   class API::Actions::Intermediates < Face::API::Action
 
+    v = API::Conf::Verbosity[ self ]
+
     services [ :out, :ingest ],
              [ :err, :ingest ],
              [ :pth, :ingest ],
              [ :invitation ]
 
-    params :path, API::Conf::Verbosity.parameter,
+    params :path, v.param( :vtuple ),
            [ :is_dry_run ],
            [ :do_preview ]
 
-    API::Conf::Verbosity self
-
     def execute
       r = -> do
-        wlk = @wlk = API::Support::Tree::Walker.new @path, -> e do
+        wlk = @wlk = API::Support::Tree:Walker.new @path, -> e do
           if @vtuple[ e.volume ]
             @err.puts instance_exec( & e.message_function )
             true  # we might do this .. callee chains progressively less
@@ -73,7 +73,7 @@ module Skylab::TestSupport::Regret::API
       if pn.exist?
         fail "sanity - existed: #{ pn }"
       elsif @buff.pos.zero?
-        say :everything, -> do
+        say :notice, -> do
           "strange - template rendered nothing for #{ @pth[ pn ] }"
         end
         false

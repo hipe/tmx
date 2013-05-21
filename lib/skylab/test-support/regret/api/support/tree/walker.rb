@@ -28,7 +28,7 @@ module Skylab::TestSupport::Regret::API
         true
       else
         a = build_difference
-        say :everything, -> do
+        say :notice, -> do
           "did not find any dirs named `#{ path }` around the #{
           }dirs (#{ a * ' ' })"
         end
@@ -108,7 +108,7 @@ module Skylab::TestSupport::Regret::API
         say :medium, -> { "exits: #{ @pth[ pn ] }" }
         true
       else
-        say :everything, -> { "not found: #{ @pth[ pn ] }" }
+        say :notice, -> { "not found: #{ @pth[ pn ] }" }
         false
       end
     end

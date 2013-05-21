@@ -25,43 +25,40 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     def collapse
       otr = self.class.lease
       otr.set @line, @no, @col
-      @line = nil  # just for volume
+      @line = @no = @col = nil  # sanity
       otr
     end
   end
 
   Comment_::Scanner_ = MetaHell::Function::Class.new :gets
   class Comment_::Scanner_  # base class
-
-    def self.[] *a  # for debugging something
-      new( *a )
+    class << self
+      alias_method :[], :new
     end
   end
 
   class Comment_::Scanner < Comment_::Scanner_
 
-    def initialize lines
-      hot = true
-      ci_a = [ Comment_.lease, Comment_.lease ] ; i = 0 ; mode = ci_a.length
-      finish = -> do
-        ci_a.each { |x| Comment_.release x }
-        hot = false
-      end
+    def initialize _snitch, lines
       hack_rx = /[ ][ ]#(?:[ ]|$)/
-      start = -> line do
+      c_a = [ Comment_.lease, Comment_.lease ] ; base = c_a.length ; idx = -1
+      func = -> line do
         if hack_rx =~ line
-          ci = ci_a.fetch( i = ( i + 1 ) % mode )  # it's tivo
-          ci.set line, lines.count, $~.offset( 0 ).last
-          ci
+          r = c_a.fetch( idx = ( idx + 1 ) % base )  # it's tivo
+          r.set line, lines.count, $~.offset( 0 ).last
+          r  # (the offset of the end of the capture is the start of content)
         end
       end
-      current = start
+      hot = true
+      finish = -> do
+        c_a.each { |x| Comment_.release x }
+        hot = false
+      end
       @gets = -> do
         if hot
-          r = nil
           while true
             line = lines.gets or break finish[]
-            r = current[ line ] and break
+            r = func[ line ] and break
           end
           r
         end

@@ -2,19 +2,14 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
 
   class Specer_
 
-    def initialize tmpl, out, err, path, vtuple
-      @tmpl_i, @out, @err, @path, @vtuple =
-        tmpl, out, err, path, vtuple
-
+    def initialize snitch, out, tmpl_i, path
+      @snitch, @out, @tmpl_i, @path = snitch, out, tmpl_i, path
       @a = [ ]
-      @notice = -> x do
-        @err.puts "(notice: #{ nil.instance_exec( & x.message_function )})"
-        nil
-      end
       nil
     end
 
-    # `accept`
+    # `accept( cblock )`
+
     -> do
 
       o = ::Struct.new :rx, :a
@@ -32,9 +27,8 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
 
       verbose_error = nil
       define_method :accept do |cblock|
-
         state = state_h.fetch( state_i = :start )
-        sblock = Specer_::Block.new @notice
+        sblock = Specer_::Block.new @snitch
         cblock.a.each do |cl|
           nxt_i, md = state.a.reduce nil do |_, i|
             d = state_h.fetch( i ).rx.match cl.line, cl.col
@@ -83,18 +77,27 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
       end.call
     end
 
-    def resolve_c_a  # cork
+    def resolve_c_a
       -> do
         c_a = resolve_raw_c_a or break
         const = c_a.reduce @base_mod do |m, c|
           MetaHell::Boxxy::FUN.fuzzy_const_get[ m, c ]
         end
-        const.name[ @base_mod.name.length + 2 .. -1 ].split( '::' ).
-          map( & :intern )
+        if const.respond_to? :name
+          const.name[ @base_mod.name.length + 2 .. -1 ].split( '::' ).
+            map( & :intern )
+        else
+          @snitch.say :notice, -> do
+            "had const that was not a class or module #{
+              }(~\"#{ c_a.fetch( -1  ) }\"). just taking best guess at its #{
+              }name. we could do better.."
+          end
+          [ @base_mod.name.intern, * c_a ]
+        end
       end.call
     end
 
-    -> do
+    -> do  # `resolve_raw_c_a`
 
       rx = %r{[^/]+(?=/)}
 
@@ -121,15 +124,15 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
       private :resolve_raw_c_a
     end.call
 
-
     def resolve_tail  # local, normalized path
       -> do
-        pn = ::Pathname.new( ::File.expand_path @path )
+        pn = ::Pathname.new ::File.expand_path( @path )
         pns = pn.to_s ; bms = @base_mod.dir_pathname.to_s
         idx = pns.index bms
         if ! idx || idx.nonzero?
-          @notice[ Event_[ "expecting to find pathame #{ @path } under #{
-          } base module `dir_pathname` - #{ @base_mod.dir_pathname }" ] ]
+          @snitch.event :notice, Event[ "expecting to find pathname #{
+            }#{ @path } under base module `dir_pathnname` - #{
+            }#{ @base_module.dir_pathname }" ]
           break
         end
         pns[ bms.length + 1 .. -1 ]

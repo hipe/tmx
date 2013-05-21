@@ -12,6 +12,14 @@ group :development do
   gem 'rspec'
   gem 'debugger'
 
+
+  #  auxiliary requirements for auxiliary scripts, by script -
+
+  # script/simplecov
+
+  gem 'simplecov', require: false, group: :test
+
+
   #  by subproduct -
 
   #  `dependency` (for testing only)
@@ -22,4 +30,5 @@ group :development do
 
   #  `xargs-ish-i`
   gem 'ncurses-ruby'
+
 end

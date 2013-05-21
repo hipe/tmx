@@ -43,7 +43,6 @@ module Skylab::Face
       end
     end.call
 
-
     #                       ~ narrative intro ~                   ( section 1 )
 
     o = { }
@@ -101,12 +100,7 @@ module Skylab::Face
     end
 
     def build_primordial_action i_a
-      _conf.if? :action_name_white_rx, -> x do
-        ( no = i_a.detect { |i| x !~ i.to_s } ) and
-          raise MetaHell::Boxxy::NameNotFoundError,
-            message: "no such action - \"#{ no }\"", name: no
-      end
-      const_x = api_actions_module.const_fetch i_a
+      const_x = action_const_fetch i_a
       if const_x.respond_to? :call
         API::Action.const_get( :Proc, false )[ const_x ]
       else
@@ -114,6 +108,16 @@ module Skylab::Face
       end
     end
     private :build_primordial_action  # called above only
+
+    def action_const_fetch i_a, &oth
+      _conf.if? :action_name_white_rx, -> x do
+        ( no = i_a.detect { |i| x !~ i.to_s } ) and
+          raise MetaHell::Boxxy::NameNotFoundError,
+            message: "no such action - \"#{ no }\"", name: no
+      end
+      api_actions_module.const_fetch i_a, &oth
+    end
+    # (public for enhancements like verbosity.)
 
     def _conf
       @_conf ||= module_with_conf._conf
@@ -263,6 +267,10 @@ module Skylab::Face
     end
     public :revelation_services
 
+    def self.flat_exponent  # [#fa-035]
+      const_get :Flat_Exponent_
+    end
+    Flat_Exponent_ = :API_Client_
 
     FUN = ::Struct.new( * o.keys ).new( * o.values )
 

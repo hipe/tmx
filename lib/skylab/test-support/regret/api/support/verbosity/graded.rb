@@ -1,82 +1,252 @@
-module Skylab::TestSupport::Regret::API
+class Skylab::TestSupport::Regret::API::Support::Verbosity::Graded < ::Module
 
-  class Support::Verbosity::Graded < ::Module
+  # the verbosity object created by this node is itself a module - it is
+  # intended to be an immutable constant that is shared accross your
+  # application. (it is a module because it is generally associated with
+  # another constant: something like a static Conf module for your application,
+  # and it generates one or more modules, and as such it is useful to store
+  # these modules under it. :[#fa-032])
 
-    # the verbosity object created by this node is itself a module - it is
-    # intended to be an immutable constant that is shared accross your
-    # application. (it is a module because it is useful to memoize
-    # generated structures as constants under it.) :[#fa-032]
+  Graded = self  # readability
+  MetaHell = ::Skylab::MetaHell
 
-    def self.create grade_i_a  # (leave room for shenanigans by isolating this)
+  class Graded
+    def self.produce_conf_module grade_i_a
       new grade_i_a
     end
 
-    def initialize grade_i_a
-      @a = grade_i_a.dup.freeze
+    class << self
+      private :new
     end
 
-    def self.cli_option_function_for client
-      client.instance_exec do
-        -> _true do
-          @param_h[:verbose_count] ||= 0
-          @param_h[:verbose_count] += 1
+    def initialize grade_i_a
+      @lvl_a = grade_i_a.dup.freeze
+    end
+
+    attr_reader :lvl_a
+
+    def [] mod_x
+      Enhancers_.const_get( mod_x.flat_exponent, false )[ self, mod_x ]
+    end
+  end
+
+  module Enhancers_
+  end
+
+  module Enhancers_::CLI_Client_
+    def self.[] vmod, cli_kls
+      cli_kls.class_exec do
+        include IM_
+        if ! const_defined? :Vmod_, false
+          const_set :Vmod_, vmod
+        end
+        nil
+      end
+    end
+  end
+
+  module Enhancers_::CLI_Client_::IM_
+  private
+    def verbosity_opt_func
+      @verbosity_opt_func ||= child_api_action_const.
+        mutable_verbosity_story.build_opt_func_for( self, 1 )
+    end
+    def deincrement_verbosity_opt_func
+      @deincrement_verbosity_opt_func ||= child_api_action_const.
+        mutable_verbosity_story.build_opt_func_for( self, -1 )
+    end
+  end
+
+  module Enhancers_::API_Action_
+    def self.[] vmod, api_action_class
+      api_action_class.class_exec do
+        if respond_to? :mutable_verbosity_story
+          mutable_verbosity_story
+        else
+          def self.mutable_verbosity_story
+            const_get :Mutable_Verbosity_Story_, false
+          end
+          if const_defined? :Mutable_Verbosity_Story_, false
+            const_get :Mutable_Verbosity_Story_, false
+          else
+            const_set :Mutable_Verbosity_Story_, Mutable_Story_.new( vmod,
+              self )
+          end
+        end
+      end
+    end
+  end
+
+  class Enhancers_::API_Action_::Mutable_Story_ < ::Module
+
+    def initialize vmod, api_application_class
+      @param_i = nil
+      @default_level_integer = 1
+      @vmod, @api_application_class = vmod, api_application_class
+    end
+
+    # `param` - you chose the name, we do the rest.
+
+    def param i
+      @param_i and fail "param ame is write once."
+      @param_i = i
+      [ i, :normalizer,  build_normalizer_function ]
+    end
+
+    def default_level_integer x
+      @default_level_integer = x
+    end
+
+    def build_opt_func_for command, inc
+      param_i = @param_i ; d = @default_level_integer
+      command.instance_exec do
+        -> _ do
+          @param_h[ param_i ] ||= d
+          @param_h[ param_i ] += inc
         end
       end
     end
 
-    def parameter
-      P_
+    def build_normalizer_function
+      sty = self
+      -> y, x, yes do
+        lvl_a = sty.lvl_a ; len = lvl_a.length
+        x = -> do  # actually normalize x ..
+          # 3 things: 1) to report the validation articulations below, we build
+          # a one-off valid vtuple and use *its* snitch! (for grease) 2) we
+          # don't report re. setting a default below but we could and 3)
+          # be ready for one day revealing the below articulation.
+          sn = -> do
+            sty.vtuple_class.new( 0 ).make_snitch @err
+          end
+          if ! x
+            1  # we don't report this change currently but we could..
+          elsif 0 > x
+            sn[] << "(negative verbosity is meaningless - #{
+              }bumping #{ x } up to 0.)"
+            0
+          elsif len < x
+            sn[] << "(verbosity level #{ len } is the highest. #{
+              }ignoring #{ x - len } of the verboses.)"
+            len
+          else
+            x
+          end
+        end.call
+        yes[ sty.vtuple_class.new x ]
+        true
+      end
     end
-    P_ = [ :verbose_count, :normalizer, true ].freeze
+    private :build_normalizer_function
 
-    def enhance_action_class kls
-      f = build_normalizer_function
-      kls.class_exec do
-        method_defined? :normalize_verbose_count and fail "sanity"
-        define_method :normalize_verbose_count, &f
+    def lvl_a
+      @vmod.lvl_a
+    end
+
+    def vtuple_class
+      if const_defined? :Vtuple_, false
+        const_get :Vtuple_, false
+      else
+        const_set :Vtuple_, Vtuple_.new( @vmod.lvl_a, self )
+      end
+    end
+  end
+
+  class Vtuple_
+
+    class << self ; alias_method :orig_new, :new ; end
+
+    def self.new lvl_a, mstory
+      ::Class.new( self ).class_exec do
+        class << self ; alias_method :new, :orig_new end
+        const_set :Mstory_, mstory
+        define_singleton_method :members do lvl_a end
+        lvl_a.each do |i|
+          attr_reader :"do_#{ i }"
+        end
+        self
+      end
+    end
+
+    def self.get_snitch_class
+      if const_defined? :Sn_, false
+        const_get :Sn_, false
+      else
+        const_set :Sn_, Sn_.new( members )
+      end
+    end
+
+    def initialize x
+      ivar_a = members.map { |i| :"@do_#{ i }" }
+      ivar_h = ::Hash[ members.zip ivar_a ]
+      x.times do |i|
+        instance_variable_set ivar_a.fetch( i ), true
+      end
+      ( x ... ivar_a.length ).each do |i|
+        instance_variable_set ivar_a.fetch( i ), false
+      end
+      @aref = -> i do  # named after ruby's internal name for :[]
+        instance_variable_get ivar_h.fetch( i )
       end
       nil
     end
 
-    def build_normalizer_function
-      lvl_a = @a ; len = lvl_a.length ; build_vtuple = get_ivar_a = nil
-      f = -> y, x, yes do
-        x ||= 1
-        if len < x
-          @err.puts "(verbosity level #{ len } is the highest. #{
-            }ignoring #{ x - len } of the verboses.)"
-          x = len
+    def members
+      self.class.members
+    end
+
+    MetaHell::Function self, :@aref, :[]
+
+    # `make_snitch` - (formerly `sc` for "sub-client")
+    # quick and dirty proof of concept, will almost certainly change. the idea
+    # is a simpler alternative to pub-sub. what if you could throw one
+    # listener around throughout your graph? the listener is like a golden
+    # snitch. no it isn't.
+
+    def make_snitch io
+      self.class.get_snitch_class.new self, io
+    end
+  end
+
+  class Sn_ # see Vtuple_IM_#sc
+
+    # the snitch itself is technically "immutable" but it just closes around
+    # the vtuple and relies on the vtuple as the datastore. if the vtuple
+    # changes its state (in terms of its category values, not its categories!)
+    # the snitch will act accordingly.
+
+    class << self ; alias_method :orig_new, :new end
+
+    def self.new a
+      ::Class.new( self ).class_exec do
+        class << self ; alias_method :new, :orig_new end
+        a = a.dup.freeze
+        define_singleton_method :members do a end
+        a.each do |i|
+          define_method :"do_#{ i }" do @is[ i ] end
         end
-        vtuple = build_vtuple[] ; ivar_a = get_ivar_a[]
-        x.times do |i|
-          vtuple[ lvl_a.fetch i ] = true
-          instance_variable_set ivar_a.fetch( i ), true
-        end
-        ( len - 1 ).downto( x ) do |i|
-          instance_variable_set ivar_a.fetch( i ), false
-        end
-        @vtuple = vtuple
-        yes[ x ]
-        true
+        self
       end
-      build_vtuple = -> { vtuple_class.new }
-      get_ivar_a = -> { ivar_a }
-      f
     end
-    private :build_normalizer_function
 
-    def vtuple_class
-      if ! const_defined? :Vtuple_, false
-        const_set :Vtuple_, ::Struct.new( * @a )
+    def initialize vtuple, io
+      @write = -> s { io.write s }
+      @puts = -> s { io.puts s }
+      @say = -> i, f do
+        if @is[ i ]
+          @puts[ nil.instance_exec( & f ) ]  # future-proofing grease
+        end # ( one day we might give it a context but for now we don't want
+        nil #   to give it a misleading context.)
       end
-      const_get :Vtuple_, false
+      @is = -> i { vtuple[ i ] }
+      nil
     end
-    private :vtuple_class
 
-    def ivar_a
-      @ivar_a ||= @a.map { |i| "@do_verbose_#{ i }".intern }.freeze
+    def members
+      self.class.members
     end
-    private :ivar_a
 
+    MetaHell::Function self, :write, :puts, :say, :is, :@puts, :<<, :@is, :[]
+      # ( because we often forget, the above is "use @puts for :<<" etc )
   end
 end

@@ -80,6 +80,7 @@ module Skylab::Face
     def run argv    # public form that is defined here in superclass,
       invoked argv  # private form that child class may override without
     end             # unintentionally creating an action via a public method :/
+    # #todo:during:8  i'm getting sick of the above, aesthetically
 
     # `invoked` - run support (pre-order)
 
@@ -105,9 +106,10 @@ module Skylab::Face
         branch = cmd  # tail-call like
       end
       if ! stay then res else
+        branch.last_normalized_child_slug = (
+          cmd.normalized_invocation_slug if branch != cmd )
         stay, res = cmd.parse argv
         if ! stay then res else
-          branch.last_normalized_child_slug = cmd.normalized_invocation_slug
           if (( f = cmd.invocation_function ))
             branch.instance_exec argv, & f
           else
@@ -267,9 +269,16 @@ module Skylab::Face
       end
     end.call
 
+    def child_api_action_const
+      api_client.action_const_fetch normalized_child_name
+    end
+    private :child_api_action_const
+
     module Adapter
       extend MAARS
     end
+
+    Flat_Exponent_ = :CLI_Client_  # [#fa-035]
   end
 
   class Option_Sheet
@@ -1193,6 +1202,11 @@ module Skylab::Face
     def invocation_function
       @sheet.invocation_function
     end  # facets
+
+    def self.flat_exponent  # [#fa-035]
+      const_get :Flat_Exponent_
+    end
+    Flat_Exponent_ = :CLI_Action_
   end
 
   class Namespace  # (re-open)
@@ -1576,7 +1590,8 @@ module Skylab::Face
     private :parent
 
     def normalized_child_name
-      x = @last_normalized_child_slug or fail 'sanity'
+      x = @last_normalized_child_slug or fail "sanity - can't get #{
+        }`normalized_child_name` without @last_normalized_child_slug"
       a = [ x ]
       visit_normalized_name a
       if instance_variable_defined? :@parent and @parent

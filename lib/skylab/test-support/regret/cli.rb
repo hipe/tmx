@@ -7,6 +7,8 @@ module Skylab::TestSupport::Regret::CLI
 
   class Regret::CLI::Client < Face::CLI
 
+    Regret::API::Conf::Verbosity[ self ]
+
     Face::Services::Headless::Plugin::Host.enhance self do
       service_names %i| out err pth invitation |
     end
@@ -20,8 +22,9 @@ module Skylab::TestSupport::Regret::CLI
 
     option_parser do |o|
       o.separator "#{ hi 'description:' } try it on a file"
-      o.on '-v', '--verbose', 'verbose. (try mutliple.)', &
-        Regret::API::Support::Verbosity::Graded.cli_option_function_for( self )
+      o.on '-v', '--verbose', 'verbose. (try mutliple.)', & verbosity_opt_func
+      o.on '-V', '--less-verbose', 'reduce verbosity.', &
+       deincrement_verbosity_opt_func
       o.banner = @command.usage_line
     end
 
@@ -39,8 +42,9 @@ module Skylab::TestSupport::Regret::CLI
         @param_h[:do_preview] = true
       end
 
-      o.on '-v', '--verbose', 'verbose (try multiple.)', &
-        Regret::API::Support::Verbosity::Graded.cli_option_function_for( self )
+      o.on '-v', '--verbose', 'verbose (try multiple.)', & verbosity_opt_func
+      o.on '-V', '--less-verbose', 'reduce verbosity.', &
+        deincrement_verbosity_opt_func
 
       o.on '-n', '--dry-run', 'dry-run.' do
         @param_h[:is_dry_run] =true

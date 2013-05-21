@@ -37,10 +37,10 @@ w  Sophist, Statesman, Philebus", Transl. Benjamin Jowett
 
 ## introducing `categories` and `exponents` as we see them
 
-this small calculus we are building (ontology more like it) has at its
+this small calculus (ontology more like it) we are buildingas at its
 foundation the concepts of a `category` :[#007] and its `exponents`.
-now, defining words in any robust manner using solely other words is always
-a chore. fortunately for us, our conception of `category` and `exponent` in
+defining words in any robust manner using solely other words is always a
+chore. fortunately for us, our conception of `category` and `exponent` in
 their relationship to each other is (for the sake of the discussion at this
 point) perhaps perfectly isomorphic with the idea from linguistics of a
 "grammatical category"[5] and its "exponents"[6].
@@ -74,8 +74,8 @@ conversely, we will define `category` circularly as:
   a `category` is defined with many (let's say one or more)
   `exponents`. :[#007]
 
-(if there exist two exponents with the same names but in different categories,
-they are different exponents, but see [#it-023])
+(if there exist two exponents with the same "names" but in different
+categories, they are different exponents, but see [#it-023])
 
 ## `categorization` vs `category`
 
@@ -131,10 +131,10 @@ when dealing with expressing the sensical range for a certain count in
 general, we call that `arity` -- a concept that is introduced an explored
 in [#fa-024]. to avoid a confusion that will become evident below, we will
 always call this the `categorization exponent arity` because it represents
-the sensical range for the count of exponents in a categorization.
+the sensical range for the count of exponents in a `categorization`.
 
 so in the example, it does not occur in the 'domain space' of german nouns
-that any noun exists with more than one gender, and never do nouns occur
+that any noun exists with more than one gender, and never does a noun occur
 with no gender (when 'neuter' is a gender), hence the number of genders any
 noun has is always 1, hence `german noun gender` has an arity of 1.
 
@@ -173,7 +173,7 @@ the default asssumption, and that `N-ary` is the "marked" `exponent` of the
 pair: so if the `categorization exponent arity` of the category is not stated,
 it is generally safe to assume it is `unary`.
 
-(note: in the interest of centralizing our theroy into an optimally small
+(note: in the interest of centralizing our theory into an optimally small
 number of "places", we are for now going with this broad definition of
 categorization, that it may be either `unary` or `N-ary`, with `unary` being
 the default but `N-ary` begin possible. however, there is a chance that if
@@ -217,16 +217,15 @@ to paint a facet of this relationship in more detail between `arity`,
 the count of exponents that may be used in a `categorization`) is a property
 of the `category`, not the `categorization` :[#019].
 
-that is, we must define a `category` too by its
-`categorization exponent arity` as well as by its `exponents`. the
-`categorization exponent arity` that `category` has applies to every of its
-`categorizations`.
+that is, we must define a `category` not only by its `exponents` but by its
+`categorization exponent arity`. the `categorization exponent arity` that the
+`category` has applies to every of its `categorizations`.
 
 to take it back to german again, remember that we said that the gender
-category of nouns is `unary`. we couldn't for example decide that there is
-a certain class of words that can have multiple genders, while other cannot.
-we would need to construct a whole new category for that, or redefine the
-original category itself.
+category of nouns is `unary`. with this meta-model, then, we couldn't for
+example decide that there is a certain class of words that can have multiple
+genders, while other cannot. we would need to construct a whole new category
+for that, or redefine the original category itself.
 
 note this this facet (of `categorization exponent arity` being instrinsic to
 `category`) is offered only for the sake of completeness and is not a
@@ -295,7 +294,7 @@ hundred, etc?
 
 if we are using numbers to represent her perceived 'new-ness' of a car (or
 more usefully, her prediction of the perception of the 'new-ness' of any car
-in the eyes of her average customer..) if we are using numbers to represent
+in the eyes of her average customer) .. if we are using numbers to represent
 this metric, we could even decide to use any non-negative real number, or hey,
 it could be *any* real number, if all we were doing was a comparative
 analysis, and maybe we were going to normalize the data later.
@@ -333,8 +332,8 @@ language at this moment in its history.
 
 to frame this in terms of the new additions to our pattern language, we
 say that the `category` of `gender` in german nouns is `discrete` - that is,
-any given noun in german must be *exactly* one gender, not some combination
-of genders, or partially one gender.
+any given noun in german must be *exactly* one gender, not partially one
+gender (and because it is a `unary` category, not some combination of genders).
 
 but when we jump back into the used car lot, we are saying that the 'new-ness'
 of any given car is *not* `discrete` - it will be respresented as some value
@@ -370,7 +369,8 @@ hopefully this won't be too jarring because for each new concept introduced,
 the definition of the concept for all practical purposes will also be in plain
 language with examples. but what we proffer is that we have defined the pattern
 langauge formally enough that we can start using the language formally for
-definitions.
+defining further constructs in the language itself (yes, Gödel might take
+issue with this [9]).
 
 what we are after is to eat our own dogfood that is made of our own body.
 what we are after is auto-trans-substantiation.
@@ -387,7 +387,8 @@ have so far built for ourselves):
 we can model `discrete` and `continuous` as the only two exponents of a
 category that we will call 'continuity'. (we can draw a category and its
 exponents this way - with smaller squares inside of a bigger square. an
-arrow generally means 'IS-A'.)
+arrow generally means 'IS-A', and it a directed association, to borrow
+a key concept from graph theory [10]).
 
 because 'continuity' has exactly two exponents, we can describe it as `binary`.
 
@@ -400,7 +401,8 @@ but they do not. `unary` describes a commonly occuring and interesting count
 for the `categorization exponent arity` of a category. `binary` describes a
 commonly occuring and interesting count for the *number of exponents* of a
 category. we would not use such confusing names were it not for their
-conciseness and the utility of what they represent.
+conciseness, their frequency of occuring in models we tend to make, and the
+utility of what they represent.
 
 when we get confused, it helps to remember that there are different
 counts that we can derive for a `category`: one is the count of its exponents,
@@ -463,8 +465,8 @@ it is lossy. arity representation is explored in [#fa-024].)
   categorization exponent arity modeled (lossfully) as a binary meta-category.
   its two exponents are listed.
 
-so we're saying that `continuity` is a `meta-category` *and*
-`categorization exponent arity` is a `meta-category`. watch what happens now:
+so we're saying that `continuity` and `categorization exponent arity` are
+`meta-categories`. watch what happens now:
 
                               +---------------+    +----------+
                               | meta-category |--->| category |
@@ -479,7 +481,9 @@ so we're saying that `continuity` is a `meta-category` *and*
 how many `categories` appear above? two. (note that 'IS-A' relationshps are
 inherited from parent to child to grandchild, etc. not reflected in the graph
 is the fact that `category` and `meta-category` are effectively abstract
-base classes.)
+base classes, so we we are not counting them in our count of categories..
+but this sort of thing is not formally represented anywhere yet in this
+meta-model.)
 
 how many `meta-categories` appear above? also two (the same two). what do
 meta-catgories apply to? they apply to categories. hence the categories that
@@ -494,10 +498,11 @@ let's start with the easier categorizations - the non-self-referential ones:
 
 1) is 'continuity' 'unary' or 'N-ary'?
 
-well what does continuity describe again? a category. can a category be
+well, what does continuity describe again? a category. can a category be
 both 'unary' and 'N-ary'? modeling with this ontology will be *much easier*
 if we say strictly that `continuity` is `unary`, so until we can think of a
-good counter example, we're gonna say "no, a category cannot be both."
+good counter example, we will play the "principle of parsimony" card and
+say "no, a category cannot be both."
 
 `continuity` is a `unary` `meta-category`. this is, a `category` must be
 either `discrete` or `continuous`, it cannot be both.
@@ -576,7 +581,7 @@ their relationships:
 
 ## all we want is the universe
 
-this document has kicked at but not yet jumped on the idea of `applicability`
+thus far we have kicked at but not yet jumped on the idea of `applicability`
 and `scope`. all this time that we have been making `categories` we have been
 referring to things like its `target instances` and so on.
 
@@ -603,7 +608,7 @@ applied to. it can even be applied to "unforseen kinds of things".
 
 again let's return to our old friend the category of "german noun gender".
 as the name suggests, the "kinds of things" it is meant to be applied to
-is "german nouns". one facet of this that was never stated explicitly is
+are "german nouns". one facet of this that was never stated explicitly is
 whether or not this category is `universal` to all 'german nouns'.
 
 in fact, what we said was, "every noun in german inherently carries one
@@ -800,7 +805,7 @@ so:
   "domain ontology" : people can still be hungry, tired, both or neither.
   also any instance data that we have could still be intact.
 
-  note also that we could losslessly convert those to
+  note also that we could losslessly convert those *each* to
   `universal discrete binary` categories and categorizations if we wanted to.
 
 a corollary exists of the above axiom that states:
@@ -831,5 +836,14 @@ than the equivalent `unary` category (significantly more - a categorization
 with the former could have N possible values, while the different
 combinatorial possibilities of the latter is 2^N). so going one direction
 is lossless, but going the other direction is lossy.
+
+an interesting offshoot of this that that is a bit outside of our scope is
+that the "computation" required above to do the above sort of analysis can
+be useful for data-mining..
+
+(work in progress #todo)
+(if i have died before finishing this and you are just now finding it and
+want to keep reading, part of its purpose was to build a foundational
+framework on top of which we would build the ideas explored in [#ba-006])
 
 ~

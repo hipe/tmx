@@ -1,3 +1,5 @@
+[#035]       #tracking-tag #experiment with a `unary` discrete categorization
+               for our main 3 classes (for which we make two exponents) ..
 [#032]       #tracking-tag i will call it "graded verbosity"
 [#031]       #doc-point trending away from the subclient pattern? ..
 [#030]       #doc-point #parent:013 #body-is-inline-in-parent

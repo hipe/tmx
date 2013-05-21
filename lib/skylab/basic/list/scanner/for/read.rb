@@ -25,25 +25,38 @@ module Skylab::Basic
       line_rx = /.*\n|.+/  # not caring for now
       count = 0 ; buffer = ''
       @count = -> { count }
-      is_hot = true ; has_buffer = nil
-      scn = Services::StringScanner.new ''
+      is_hot = true ; buffer_is_loaded = nil
+      scn = Services::StringScanner.new buffer
+      load_buffer = -> do
+        x = fh.read maxlen, buffer
+        if x
+          scn.string = buffer
+          buffer = ''
+          buffer_is_loaded = true
+          true
+        else
+          is_hot = false
+          false
+        end
+      end
       @gets = -> do
-        if ! has_buffer
-          if is_hot
-            x = fh.read maxlen, buffer
-            if x
-              scn.string = buffer.dup
-              has_buffer = true
+        if is_hot
+          line = nil
+          while true
+            buffer_is_loaded or load_buffer[] or break
+            part = scn.scan line_rx
+            if part
+              if line
+                line.concat part
+              else
+                line = part
+              end
+              part.include? "\n" and break
             else
-              is_hot = false
+              buffer_is_loaded = false
             end
           end
-        end
-        if has_buffer
-          line = scn.scan( line_rx ) and count +=1
-          if scn.eos?
-            has_buffer = nil
-          end
+          count +=1 if line
           line
         end
       end
