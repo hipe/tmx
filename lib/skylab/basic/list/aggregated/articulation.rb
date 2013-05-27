@@ -14,24 +14,36 @@ module Skylab::Basic
     end
 
     def self.build_function def_blk
-      tmpl = on_zero_items_f = aggregate_f =
-        on_first_mention_f = on_subsequent_mentions_f = nil
+      o = St_.new
       Conduit_.new(
-        -> str { tmpl = str },
-        -> ozi { on_zero_items_f = ozi },
-        -> &agg { aggregate_f = agg },
-        -> &ofm { on_first_mention_f = ofm },
-        -> &osm { on_subsequent_mentions_f = osm }
+        -> str { o.template = str },
+        -> ozi { o.on_zero_items = ozi },
+        -> &agg { o.aggregate = agg },
+        -> &ofm { o.on_first_mention = ofm },
+        -> &osm { o.on_subsequent_mentions = osm }
       ).instance_exec( & def_blk )
-      Flusher_.new(
-        tmpl, on_zero_items_f, aggregate_f, on_first_mention_f,
-          on_subsequent_mentions_f
-      ).flush
+      # o.on_subsequent_mentions ||= ( o.aggregate || o.on_first_mention )
+      # o.on_first_mention ||= o.on_subsequent_mentions
+      miss_a = nil
+      Req_.each do |i|
+        if ! o[ i ]
+          ( miss_a ||= [] ) << i
+        end
+      end
+      miss_a and raise ::ArgumentError, "missing required parameter(s) - #{
+        } #{ miss_a * ', ' }"
+      Flusher_.new( * o.to_a ).flush
     end
 
-    Conduit_ = MetaHell::Enhance::Conduit.new %i|
-      template on_zero_items aggregate on_first_mention on_subsequent_mentions
-    |
+    A_ = %i| template on_zero_items aggregate on_first_mention
+               on_subsequent_mentions |
+
+    # Req_ = %i| aggregate on_first_mention on_subsequent_mentions |
+    Req_ = [ ]
+
+    St_ = ::Struct.new( * A_ )
+
+    Conduit_ = MetaHell::Enhance::Conduit.new A_
 
     Flusher_ = MetaHell::Function::Class.new :flush
     class Flusher_
@@ -68,19 +80,26 @@ module Skylab::Basic
         whn = When_[ flusher.flush( on_first_mention_f ),
           flusher.flush( on_subsequent_mentions_f ),
           flusher.flush( aggregate_f ), nn_a ]
-
-        a = trueish_members whn.aggregate
-        case a.length
-        when 0 ; fail "must aggregate on one channel"
-        when 1 ;
-        else   ; fail "for now we can't aggregate one more than one channel #{
-          }(had: #{ a * ', ' })"
-        end
-        k = a.fetch( 0 )
-        whn.aggregate = [ k, whn.aggregate[ k ] ]
+        normalize_aggregation whn
         whn
       end
       private :build_whens
+
+      def normalize_aggregation whn
+        if false
+          a = trueish_members whn.aggregate
+          case a.length
+          when 0 ; fail "must aggregate on one channel"
+          when 1 ;
+          else   ; fail "for now we can't aggregate one more than one channel #{
+            }(had: #{ a * ', ' })"
+          end
+          k = a.fetch( 0 )
+          whn.aggregate = [ k, whn.aggregate[ k ] ]
+        end
+        nil
+      end
+      private :normalize_aggregation
 
       When_ = ::Struct.new :first, :subsequent, :aggregate, :names
 
@@ -93,14 +112,14 @@ module Skylab::Basic
       private :trueish_members
 
       def run yld, x, scn, tmpl, whn
-        k, f = whn.aggregate
         frame_a_a = ( trueish_members( whn.first ) |
           trueish_members( whn.subsequent ) ) & x.members
         frame_a_ = frame_a_a.map { |i| x[ i ] }
         frame_a__ = nil
-        cache_a = [ x[ k ] ]
         count = 0
         flush2 = nil
+        aggo = Aggo_.new whn.aggregate
+        aggo.add x
         flush = -> do
           count += 1
           h = whn.names.reduce( {} ) do |m, i|
@@ -111,8 +130,8 @@ module Skylab::Basic
               else
                 m[ i ] = whn.subsequent[ i ].call  # for now but etc..
               end
-            elsif k == i
-              m[ i ] = f.call cache_a
+            elsif (( f = whn.aggregate[ i ] ))
+              m[ i ] = f.call aggo.value.map( & i )
             else
               f_or_s = whn[ 1 == count ? :first : :subsequent ]
               m[ i ] = ( if (( x = f_or_s[ i ] ))
@@ -127,27 +146,52 @@ module Skylab::Basic
         end
         flush2 = -> str do
           yld << ( if 1 == count
-            whn.first._flush.call str
+            if whn.first._flush
+              whn.first._flush.call str
+            else
+              str
+            end
           else
-            whn.subsequent._flush.call str
+            if whn.subsequent._flush
+              whn.subsequent._flush.call str
+            else
+              str
+            end
           end )
         end
         while (( xx = scn.gets ))
           frame_a = frame_a_a.map { |i| xx[ i ] }
           if frame_a == frame_a_
-            cache_a << xx[ k ]
+            aggo.add xx
           else
             flush[ ]
             frame_a_ = frame_a
-            cache_a.clear.push xx[ k ]
+            aggo.clear.add xx
           end
         end
-        if cache_a.length.nonzero?
+        if aggo.nonempty?
           flush[ ]
         end
         nil
       end
       private :run
+    end
+
+    class Aggo_
+      def initialize f
+        a = [ ]
+        @add = -> x do
+          a << x
+          nil
+        end
+        @nonempty = -> { a.length.nonzero? }
+        @value = -> { a.dup }
+        @clear = -> { a.clear ; self }
+      end
+      def add x ; @add[ x ] end
+      def nonempty? ; @nonempty[ ] end
+      def value ; @value[ ] end
+      def clear ; @clear[] end
     end
 
     module Mention_
@@ -164,20 +208,22 @@ module Skylab::Basic
 
       def flush func
         fs = @conduit_class::FUNC_STRUCT_.new
-        store = -> k, f do
-          fs[ k ] and raise ::ArgumentError, "won't clobber existing #{ k }"
-          fs[ k ] = f
-          nil
-        end
-        kls = @conduit_class ; a = kls::A_
-        kls.new( *
-          a.length.times.map do |x|
-            -> f do
-              store[ a.fetch( x ), f ]
-              f  # important - chaining
-            end
+        if func
+          store = -> k, f do
+            fs[ k ] and raise ::ArgumentError, "won't clobber existing #{ k }"
+            fs[ k ] = f
+            nil
           end
-        ).instance_exec( & func )
+          kls = @conduit_class ; a = kls::A_
+          kls.new( *
+            a.length.times.map do |x|
+              -> f do
+                store[ a.fetch( x ), f ]
+                f  # important - chaining
+              end
+            end
+          ).instance_exec( & func )
+        end
         fs
       end
     end

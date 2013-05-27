@@ -1,3 +1,4 @@
+[#012]       doc-test - setup vs example?
 [#011]       #tracking-tag fix 'test/' - 'TestSupport' for autoloading?
 [#010]       #tracking-tag "dark hack" this one weird old trick makes ..
 [#009]       #subscription - will Quickie ever short-circuit (throw

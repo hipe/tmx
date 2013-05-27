@@ -1,3 +1,4 @@
+[#019] #open move semantic into here #after:cu-001
 [#018]       #doc-point #parent:006 #body-is-inline-in-parent
                a module and a switch statement hve `semantic intersect`
 [#017]       #doc-point #parent:006 #body-is-inline-in-parent
