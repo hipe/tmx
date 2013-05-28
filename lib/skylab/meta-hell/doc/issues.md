@@ -1,3 +1,4 @@
+[#026]       tuple tower defined ..
 [#025]       #doc-point #parent:024 #body-is-inline-in-parent
                `formal` defined informally.
 [#024]       #doc-node #body-is-inline-in-code:"formal/attribute.rb"

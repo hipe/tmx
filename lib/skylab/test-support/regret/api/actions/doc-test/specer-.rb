@@ -92,7 +92,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
               }(~\"#{ c_a.fetch( -1  ) }\"). just taking best guess at its #{
               }name. we could do better.."
           end
-          [ @base_mod.name.intern, * c_a ]
+          c_a
         end
       end.call
     end

@@ -8,7 +8,8 @@ module Skylab::MetaHell
 
   o[:hash2struct] = -> h do
     s = ::Struct.new(* h.keys ).new ; h.each { |k, v| s[k] = v } ; s
-  end
+  end                           # ( for posterity this is left intact but
+                                # we do this a simpler way now )
 
   o[:memoize] = -> func do      # creates a function `func2` from `func`.
     use = -> do                 # the first time `func2` is called, it calls
@@ -70,6 +71,52 @@ module Skylab::MetaHell
       ai += 1
     end
     res
+  end
+
+  # `tuple_tower` - given a stack of functions and one seed value, resolve
+  # one result.. fuller description at [#fa-026].
+  #
+  # opaque but comprehensive example:
+  #
+  #     f_a = [
+  #       -> item do
+  #         if 'cilantro' == item                 # the true-ishness of the 1st
+  #           [ false, 'i hate cilantro' ]        # element in the result tuple
+  #         else                                  # determines short circuit
+  #           [ true, item, ( 'red' == item ? 'tomato' : 'potato' ) ]
+  #         end                                   # three above becomes two
+  #       end, -> item1, item2 do                 # here, b.c the 1st is
+  #         if 'carrots' == item1                 # discarded when true
+  #           "let's have carrots and #{ item2 }" # note no tuple necessary
+  #         elsif 'tomato' == item2               # if it's just one true-ish
+  #           [ false, 'nope i hate tomato' ]     # non-true item
+  #         else
+  #           [ item1, item2 ]
+  #         end
+  #       end ]
+  #     s = MetaHell::FUN.tuple_tower[ 'cilantro',  * f_a ]
+  #     s # => 'i hate cilantro'
+  #     s = MetaHell::FUN::tuple_tower[ 'carrots', * f_a ]
+  #     s # => "let's have carrots and potato"
+  #     s = MetaHell::FUN.tuple_tower[ 'red', * f_a ]
+  #     s # => 'nope i hate tomato'
+  #     x = MetaHell::FUN.tuple_tower[ 'blue', * f_a ]
+  #     x # => [ 'blue', 'potato' ]
+  #
+  # Blue potato. everything should be perfectly clear now.
+
+  o[:tuple_tower] = -> args1, *f_a do
+    f_a.reduce args1 do |args, f|
+      a = [ * f[ * args ] ]  # normalizes
+      tf = a.fetch 0
+      if tf
+        a.shift if true == tf
+        1 == a.length ? a[ 0 ] : a
+      else
+        a.shift if false == tf
+        break( 1 == a.length ? a[ 0 ] : a )
+      end
+    end
   end
 
   FUN = o[:hash2struct][ o ]

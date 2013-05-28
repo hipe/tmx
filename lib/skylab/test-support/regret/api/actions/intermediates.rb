@@ -15,7 +15,7 @@ module Skylab::TestSupport::Regret::API
 
     def execute
       r = -> do
-        wlk = @wlk = API::Support::Tree:Walker.new @path, -> e do
+        wlk = @wlk = API::Support::Tree::Walker.new @path, -> e do
           if @vtuple[ e.volume ]
             @err.puts instance_exec( & e.message_function )
             true  # we might do this .. callee chains progressively less
