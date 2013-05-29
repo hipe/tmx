@@ -82,13 +82,12 @@ module Skylab
 
     o = { }
 
-    o[:without_warning] = -> f do
-      prev = $VERBOSE
-      $VERBOSE = false
+    o[:without_warning] = -> f do  # as seen in [#mh-028]
+      x = $VERBOSE ; $VERBOSE = false
       begin
         r = f.call
       ensure
-        $VERBOSE = prev
+        $VERBOSE = x
       end
       r
     end

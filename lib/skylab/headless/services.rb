@@ -10,7 +10,7 @@ module Skylab::Headless
                                                   ::Skylab::CodeMolester }
     o :FileUtils    , -> { require 'fileutils'  ; ::FileUtils }
     o :Open3        , -> { require 'open3'      ; ::Open3 }
-    o :Open4        , -> { require_quietly 'open4'; ::Open4 }
+    o :Open4        , -> { MetaHell::FUN.require_quietly[ 'open4' ]; ::Open4 }
     o :OptionParser , -> { require 'optparse'   ; ::OptionParser }
     o :PubSub       , -> { require 'skylab/pub-sub/core' ; ::Skylab::PubSub }
     o :Set          , -> { require 'set'        ; ::Set }
@@ -40,10 +40,6 @@ module Skylab::Headless
         const_set k, x                         # stdlib module, now set it
         x                                      # as a constant of yours
       end
-    end
-
-    def self.require_quietly path
-      Headless::FUN.require_quietly[ path ]
     end
 
     def self.load_service const

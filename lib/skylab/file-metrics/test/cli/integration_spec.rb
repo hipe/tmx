@@ -69,7 +69,7 @@ module Skylab::FileMetrics::TestSupport::CLI
         arr.length.should eql( 5 )
         lbl, num, pc1, pc2, lip = arr
         lbl.should eql( '*.rb' )
-        expect_integer num, 17..18  # greetings from the past
+        expect_integer num, 15..18  # greetings from the past
         expect_percent pc1
         expect_percent pc2, 100.0
         expect_pluses lip, floor..150

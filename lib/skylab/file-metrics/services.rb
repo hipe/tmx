@@ -8,7 +8,6 @@ module Skylab::FileMetrics
 
     define_singleton_method( :o ) { |const, block| h[const] = block }
 
-    o :Ncurses       , -> { require 'ncurses'    ; ::Ncurses }
     o :Open3         , -> { require 'open3'      ; ::Open3 }
     o :Shellwords    , -> { require 'shellwords' ; ::Shellwords }
     o :StringIO      , -> { require 'stringio'   ; ::StringIO }

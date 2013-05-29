@@ -30,6 +30,8 @@ module Skylab::Face
 
     o[:Headless] = -> { require 'skylab/headless/core' ; ::Skylab::Headless }
 
+    o[:Ncurses] = -> { require 'ncurses' ; ::Ncurses }
+
     o[:OptionParser] = -> { require 'optparse' ; ::OptionParser }
 
     o[:PubSub] = -> { require 'skylab/pub-sub/core' ; ::Skylab::PubSub }

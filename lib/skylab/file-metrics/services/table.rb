@@ -178,12 +178,12 @@ module Skylab::FileMetrics
             end
           end
 
-          metrics = nil
+          mtx = nil
 
           cook_autonomous = -> idx, align, fld do
             if fld.is_autonomous
-              metrics ||= Metrics_[ max_a, sep ]
-              fld.cook[ metrics ]
+              mtx ||= Metrics_[ max_a, sep ]
+              fld.cook[ mtx.max_a, mtx.sep.length ]
             else
               cook[ idx, align ]
             end

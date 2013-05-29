@@ -25,10 +25,10 @@ group :development do
   #  `dependency` (for testing only)
   gem 'adsf'
 
+  #  `face` ( <- `xargs-ish-i` )
+  gem 'ncurses-ruby'
+
   #  `tan-man`
   gem 'treetop'
-
-  #  `xargs-ish-i`
-  gem 'ncurses-ruby'
 
 end

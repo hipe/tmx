@@ -84,7 +84,7 @@ module Skylab::FileMetrics
             [ :total_share,         prerender: percent ],
             [ :max_share,           prerender: percent ],
             [ :lipstick_float,      :noop ],
-            [ :lipstick,            FileMetrics::CLI::Lipstick::FIELD ]
+            [ :lipstick,            FileMetrics::CLI::Lipstick.instance.field_h ]
           ]
           field[:label].summary -> do
             'Total: '

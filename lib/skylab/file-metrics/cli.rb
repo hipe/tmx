@@ -169,5 +169,21 @@ module Skylab::FileMetrics
         nil
       end
     # lost indent
+
+    Lipstick = Face::CLI::Lipstick.new '+', :green, -> { 80 }
+
+    module Lipstick
+
+      class Class_ < Face::CLI::Lipstick::Class_
+
+        def field_h  # (legacy interface)
+          @field_h ||= {
+            header: '',
+            is_autonomous: true,
+            cook: method( :cook )
+          }
+        end
+      end
+    end
   end
 end

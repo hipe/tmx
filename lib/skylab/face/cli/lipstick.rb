@@ -1,79 +1,92 @@
-module Skylab::FileMetrics
+module Skylab::Face
 
-  module CLI::Lipstick
+  class CLI::Lipstick < ::Module
 
-    # lipstick is the rendering with glyphs of a certain normalized scalar
-    # (a "ratio" between 0.0 and 1.0 incl.), taking into account how
-    # wide the screen is at render time.
+    # a "lipstick" is an abstract rendering entity whose job it is to render
+    # with glyphs (e.g "+" (pluses)) a certain normalized scalar (a "ratio"
+    # between 0.0 and 1.0 inclusive), taking into account how wide the screen
+    # is at some particular time.
+    #
+    # its inspiration is the green and red pluses and minuses that appear in a
+    # typical `git show --stat`.
+    #
+    # although it has gone through three overahauls, the interface is still
+    # obtuse for reasons.
 
-    FIELD = {
-      header: '',
-      is_autonomous: true,
-      cook: -> metrics do
-        CLI::Lipstick.initscr  # here is as good as anywhere. - comment out!
-        CLI::Lipstick[ metrics, -> { 80 } ]  # screen width fallback !
+    def initialize *a
+      @a = a
+      nil
+    end
+
+    def instance
+      if const_defined? :Instance_, false
+        const_get :Instance_, false
+      else
+        const_set :Instance_, self::Class_.new( * @a )
       end
-    }
+    end
 
-    set_cols = get_cols = nil
+    -> do  # `self.cols`
 
-    -> do  # `[]`
-
-      min_room = 4
-      margin = 1
-      norm = stylus = stylize = nil
-
-      define_singleton_method :[] do |metrics, fallback|
-        pane_width = get_cols[] || fallback[]
-        sep = metrics.sep
-        before = metrics.max_a.reduce( :+ ) +
-          ( [ metrics.max_a.length - 1, 0 ].max * sep.length )
-          # (minus one because it's a separator, minus one b.c we don't
-          # count lipstick, and then plus one for the left margin hack
-          # (which happens at exactly [#008]))
-
-        my_room = -> do
-          x = ( before + sep.length ) * -1 + pane_width - margin
-          [ x, min_room ].max
-        end.call
-        -> pxy do
-          if pxy  # allow nil to mean "don't do it"
-            stylize[ "+" * ( norm[ pxy.normalized_scalar ] * my_room ).to_i ]
-          end
+      first = true ; cols = nil
+      define_singleton_method :cols do
+        if first
+          first = false
+          # (we used to rescue ::LoadError, could again)
+          MetaHell::FUN.without_warning[ -> do
+            Services::Ncurses.initscr
+            # snowleopard-ncurses ncurses_wrap.c:1951 @todo easy patch
+          end ]
+          cols = ::Ncurses.COLS
+          ::Ncurses.endwin
         end
+        cols
       end
+    end.call
+  end
+
+  CLI::Lipstick::Class_ = MetaHell::Function::Class.new :cook
+  class CLI::Lipstick::Class_
+
+    def initialize *args  # [glyph-string] [color-symbol] [default-cols-func]
+
+      @glyph, @color, @default_width = MetaHell::FUN.parse_series[ args,
+        -> x { x.respond_to? :ascii_only? },
+        -> x { x.respond_to? :id2name },
+        -> x { x.respond_to? :call } ]
+
+      @glyph ||= '.' ; @default_width ||= -> { 72 }  # meh
+      min_room = 4 ; margin = 1
 
       norm = -> x do
         [ [ x, 0.0 ].max, 1.0 ].min
       end
 
-      stylus = nil
-      stylize = -> s do
-        ( stylus ||= Headless::CLI::Pen::MINIMAL ).stylize s, :green
-      end
+      @cook = -> a, seplen=0 do
+        pane_width = CLI::Lipstick.cols || @default_width[]
+        befor = a.reduce( :+ ) + ( [ a.length - 1, 0 ].max * seplen )
+          # minus one because it's a separator, minus one b.c we don't count
+          # lipstick, and then plus one for the left margin hack [#fm-008]
+        my_room = -> do
+          x = ( befor + seplen ) * -1 + pane_width - margin
+          [ x, min_room ].max
+        end.call
 
-    end.call
+        stylize = -> do
+          if ! @color then -> s { s } else
+            stylus = Services::Headless::CLI::Pen::MINIMAL
+            clr = @color
+            -> s { stylus.stylize s, clr }
+          end
+        end.call
 
-    define_singleton_method :initscr do
-      begin
-        v = $VERBOSE; $VERBOSE = nil
-        Services::Ncurses.initscr
-        $VERBOSE = v # snowleopard-ncurses ncurses_wrap.c:1951 @todo easy patch
-        set_cols[ ::Ncurses.COLS ]
-        ::Ncurses.endwin
-      rescue ::LoadError
+        -> scalar_pxy do
+          if scalar_pxy  # allow nil to mean "don't do it"
+            stylize[ @glyph *
+                ( norm[ scalar_pxy.normalized_scalar ] * my_room ).to_i ]
+          end
+        end
       end
     end
-
-    set_cols, get_cols = -> do
-      num = nil
-      set = -> x do
-        num = x
-      end
-      get = -> do
-        num
-      end
-      [ set, get ]
-    end.call
   end
 end
