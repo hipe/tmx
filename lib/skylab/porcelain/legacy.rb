@@ -351,7 +351,7 @@ module Skylab::Porcelain::Legacy
       nil
     end
 
-  protected
+  private
 
     def initialize story_host_module
       @story_host_module = story_host_module
@@ -521,7 +521,7 @@ module Skylab::Porcelain::Legacy
       @action_subclient[ request_client ]
     end
 
-  protected
+  private
 
     def initialize
       @is_visible = true
@@ -536,20 +536,6 @@ module Skylab::Porcelain::Legacy
     end
   end
 
-  module SubClient_InstanceMethods             # (section 4 of 7 - i.m's)
-
-  protected
-
-    def hdr str
-      @request_client.send :hdr, str
-    end
-
-    def kbd x  # just a cute alternative
-      @kbd ||= @request_client.method :kbd
-      @kbd[ x ]
-    end
-  end
-
   module Adapter
     extend MAARS
   end
@@ -557,8 +543,6 @@ module Skylab::Porcelain::Legacy
   module Action::InstanceMethods
 
     Adapter = Adapter  # [#hl-054]
-
-    include SubClient_InstanceMethods
 
     #         ~ `resolve_argv` the primary public entrypoint ~
 
@@ -585,7 +569,7 @@ module Skylab::Porcelain::Legacy
       end
     end
 
-  protected
+  private
 
     def initialize request_client, action_sheet=nil
       @option_parser = nil
@@ -806,16 +790,11 @@ module Skylab::Porcelain::Legacy
       # hook for e.g namespaces
     end
 
-    def argument_syntax_subclient
-      @argument_syntax_subclient ||= @action_sheet.argument_syntax.
-        argument_syntax_subclient self
-    end
-
     def render_syntax_string
       y = [ didactic_invocation_string ]
       str = render_option_syntax
       y << str if str
-      str = argument_syntax_subclient.render
+      str = argument_syntax_subclient.string
       y << str if str
       y.join ' '
     end
@@ -885,7 +864,7 @@ module Skylab::Porcelain::Legacy
       end
     end
 
-  protected
+  private
 
     def resolve_argv_empty
       if self.class.story.default_action
@@ -996,7 +975,11 @@ module Skylab::Porcelain::Legacy
       method m
     end
 
-  protected
+    def request_client_service x
+      method x
+    end
+
+  private
 
     # `initialize` - etc.. #todo - we should settle down this interface mebbe
 
@@ -1038,9 +1021,13 @@ module Skylab::Porcelain::Legacy
                    & args_length_h.fetch( up_pay_info.length ) )
     end
 
+  public
+
     attr_writer :program_name  # for ouroboros  [#hl-069]
 
     attr_reader :infostream, :paystream  # for sub-cliented cliented, as above
+
+  private
 
     # non-pub-sub variant of `emit` gets "turned on" elsewhere
 
@@ -1070,9 +1057,15 @@ module Skylab::Porcelain::Legacy
 
 
   class Action                      # (section 5 of 7 - and support)
+
     include Action::InstanceMethods
 
-  protected
+    Headless::Plugin::Host.enhance self do
+      services [ :kbd, :use_method, :kbd_as_service ]
+    end
+
+  private
+
     # all this is for dsl-style actions defined as methods on a host client
 
     def emit stream, text
@@ -1081,6 +1074,31 @@ module Skylab::Porcelain::Legacy
 
     def bound_process_method  # this is for a dsl-style method on a host client
       @request_client.get_bound_method @action_sheet.normalized_local_action_name
+    end
+
+    def argument_syntax_subclient
+      @argument_syntax_subclient ||= @action_sheet.argument_syntax.
+        argument_syntax_subclient self
+    end
+
+    def kbd x
+      kbd_as_service.call x
+    end
+
+    def hdr x
+      hdr_as_service.call x
+    end
+
+    def kbd_as_service
+      @kbd ||= request_client_service( :kbd )
+    end
+
+    def hdr_as_service
+      @hdr ||= request_client_service( :hdr )
+    end
+
+    def request_client_service x
+      @request_client.request_client_service x
     end
   end
 
@@ -1095,12 +1113,42 @@ module Skylab::Porcelain::Legacy
 
     define_singleton_method :rx do rx end
 
-    def is_glob
-      @max.nil?
+    def self.new_from_matchdata n1, ub1, n2, ub2
+      new.instance_exec do
+        initialize_from_matchdata n1, ub1, n2, ub2
+        self
+      end
     end
 
+    def self.new_custom nn, arity
+      new.instance_exec do
+        initialize_custom nn, arity
+        self
+      end
+    end
+
+    def initialize_from_matchdata name1, unbound1, name2, unbound2
+      @normalized_parameter_name = ( name1 || name2 ).intern
+      @arity = Headless::Arity[ name1 ?
+        ( unbound1 ? :one_or_more : :one ) :
+        ( unbound2 ? :zero_or_more : :zero_or_one ) ]
+      nil
+    end
+    private :initialize_from_matchdata
+
+    def initialize_custom normalized_parameter_name, arity_o
+      @normalized_parameter_name, @arity = normalized_parameter_name, arity_o
+      nil
+    end
+
+    # the "argument arity" standard - [#fa-024]
+
     def is_required
-      @min > 0
+      ! @arity.includes_zero
+    end
+
+    def is_glob
+      @arity.is_unbounded
     end
 
     attr_reader :normalized_parameter_name  # needed by a `fetch`
@@ -1110,64 +1158,80 @@ module Skylab::Porcelain::Legacy
     end
 
     def string
-      if ! @max
-        ellipsis = " [<#{ slug }>[...]]"
-      end
+      ellipsis = ( " [<#{ slug }>[...]]" if is_glob )
       if is_required
         "<#{ slug }>#{ ellipsis }"
       else
         "[<#{ slug }>#{ ellipsis }]"
       end
     end
-
-  protected
-
-    def initialize name1, max1, name2, max2
-      @normalized_parameter_name = ( name1 || name2 ).intern
-      if name1
-        @min = 1
-        @max = max1 ? nil : 1
-      else
-        @min = 0
-        @max = max2 ? nil : 1
-      end
-    end
   end
 
   # @todo see if we can get this whole class to go away in lieu of the
   # improved reflection of ruby 1.9
+  # (EDIT - we would do above except this becomes useful again for
+  # `revelation`)
 
   class Argument::Syntax
 
-    def self.from_string str
-      new( str ).validate_self
+    def self.new_mutable
+      new.instance_exec do
+        @element_a = [ ]
+        self
+      end
     end
 
-    # --*--
+    def self.from_string str
+      new.instance_exec do
+        init_from_string str
+        validate_self
+      end
+    end
 
-    [
-      :first,
+    -> do  # `init_from_string`
+      argument_rx = Argument.rx
+      define_method :init_from_string do |str|
+        @element_a = [ ]
+        scn = Porcelain::Services::StringScanner.new str
+        while ! scn.eos?
+          scn.skip( / / )
+          matched = scn.scan argument_rx
+          if ! matched
+            raise ::ArgumentError, "failed to parse #{ scn.rest.inspect }#{
+              }#{ " (after #{ @element_a.last.string.inspect })" if
+                @element_a.length.nonzero? }"
+          end
+          md = argument_rx.match matched
+          @element_a << Argument.new_from_matchdata( * md.captures )
+        end
+        @element_a.freeze  # just for sanity - can be changed with design.
+        nil
+      end
+      private :init_from_string
+    end.call
+
+    [ :first,
       :length
     ].each do |meth|
       define_method meth do |*a, &b|
-        @elements.send meth, *a, &b
+        @element_a.send meth, *a, &b
       end
     end
 
     def string
-      if @elements.length.nonzero?
-        @elements.map(& :string ).join ' '
+      if @element_a.length.nonzero?
+        @element_a.map(& :string ).join ' '
       end
     end
 
     def validate_self
       signature = nil
       err = -> do
-        signature = @elements.map do |arg| arg.is_glob ? 'G' : 'g' end.join ''
+        signature = @element_a.map do |arg| arg.is_glob ? 'G' : 'g' end.join ''
         /G.*G/ =~ signature and break "globs cannot be used more than once"
         /\AGg/ =~ signature and break "globs cannot occur at the beginning"
         /gGg/  =~ signature and break "globs cannot occur in the middle"
-        signature = @elements.map do |arg| arg.is_required ? 'o' : 'O' end.join ''
+        signature = @element_a.map { |g| g.is_required ? 'o' : 'O' } * ''
         /\AOo/ =~ signature and break "optionals cannot occur at the beginning"
         /oO+o/ =~ signature and break "optionals cannot occur in the middle"
         nil
@@ -1179,100 +1243,83 @@ module Skylab::Porcelain::Legacy
       end
     end
 
-    def argument_syntax_subclient request_client
-      Argument::Syntax::SubClient.new request_client, @elements
+    def argument_syntax_subclient plugin_host
+      Argument::Syntax::SubClient.new plugin_host, @element_a
     end
 
     #                  ~ reflection & courtesy ~
 
-    def fetch norm, &otr
-      idx = @elements.index do |arg|
+    def fetch norm, opt=nil, *sing, &otr
+      idx = @element_a.index do |arg|
         norm == arg.normalized_parameter_name
       end
-      if idx then @elements.fetch( idx ) else
+      if idx then @element_a.fetch( idx ) else
         otr ||= -> { raise ::KeyError, "argument not found: #{ norm.inspect }" }
         otr[ * [norm][ 0, otr.arity ] ]
       end
     end
 
-  protected
-
-    def initialize str
-      @elements = [ ]
-      scn = Porcelain::Services::StringScanner.new str
-      rx = argument_rx
-      while ! scn.eos?
-        scn.skip( / / )
-        matched = scn.scan rx
-        if ! matched
-          raise ::ArgumentError, "failed to parse #{ scn.rest.inspect }#{
-            }#{ " (after #{ @elements.last.string.inspect })" if
-              @elements.length.nonzero? }"
-        end
-        md = rx.match matched
-        @elements << Argument.new( * md.captures )
+    def as_ruby_parameters_struct
+      @element_a.map do |x|
+        [(if x.is_glob then :rest elsif x.is_required then :req else :opt end),
+          x.normalized_parameter_name ]
       end
-      nil
     end
 
-    def argument_rx
-      Argument.rx
+    #                       ~ mutation ~
+
+    def add_custom nn_i, arity_i
+      @element_a << Argument.new_custom(nn_i, Headless::Arity.fetch( arity_i))
+      nil
     end
   end
 
   class Argument::Syntax::SubClient < Argument::Syntax
 
-    # sane design and elegant argument parameters dictate that we make a
-    # subclass of a.s just for validating argv (the whole point). pub sub
-    # is not the answer, nor is jagged payloads. pls wtach:
+    # adds UI behavior to the parent class, making it an 'action node'.
 
-    include SubClient_InstanceMethods
+    # so that this can play nice with other frameworks, we implement it
+    # as a plugin. (also, trending away from the SubClient pattern [#fa-030])
+    #
 
-    def render
-      if @elements.length.nonzero?
-        @elements.map(& :string ).join ' '
-      end
+    Headless::Plugin.enhance self do
+      services [ :kbd, :ingest ]
+    end
+
+    def initialize plugin_host, elements
+      load_plugin plugin_host.plugin_services, :load_ingestions
+      @element_a = elements
+      nil
     end
 
     # (an earlier incarnation of this gave thanks of inspiration
     # to Davis Frank of pivotal)
 
-    def validate argv, error
-      tokens = Argument::Scanner.new argv
-      params = Argument::Scanner.new @elements
-      saw_glob = false
-      err = nil
-      while ! tokens.eos?
-        p = params.current
-        if ! p
-          break( err = "unexpected argument: #{ tokens.current.inspect }" )
+    def validate argv, yes=nil, no
+      begin
+        ok = -> msg do
+          no = no[ msg ]
+          ok = nil
         end
-        tokens.advance
-        if p.is_glob
-          saw_glob = true
-        else
-          params.advance
+        tokens = Argument::Scanner.new argv
+        params = Argument::Scanner.new @element_a
+        while ! tokens.eos?
+          p = params.current
+          p or break ok[ "unexpected argument: #{ tokens.current.inspect }" ]
+          tokens.advance
+          if p.is_glob
+            saw_glob = true
+          else
+            params.advance
+          end
         end
-      end
-      if ! err
+        ok or break
         p = params.current
         if p && p.is_required && ( ! p.is_glob && ! saw_glob )
-          err = "expecting: #{ kbd p.string }"
+          ok[ "expecting: #{ @kbd[ p.string ] }" ]
         end
-      end
-      if err
-        error[ err ]
-      else
-        true
-      end
-    end
-
-  protected
-
-    def initialize request_client, elements
-      @request_client = request_client
-      @elements = elements
-      @kbd = nil
+      end while nil
+      ok ? ( yes ? yes[] : true ) : no
     end
   end
 
@@ -1290,7 +1337,7 @@ module Skylab::Porcelain::Legacy
       @current >= @length
     end
 
-  protected
+  private
 
     def initialize args
       @current = 0
@@ -1353,9 +1400,9 @@ module Skylab::Porcelain::Legacy
 
     attr_reader :action_sheet
 
-  protected
+  private
 
-    # nothing is protected.
+    # nothing is private.
 
   end
 
@@ -1374,7 +1421,7 @@ module Skylab::Porcelain::Legacy
 
     visible false
 
-  protected
+  private
 
     def resolve_arguments argv  # if you look at our actual signature we take
       # any number of arguments.  in practice we recursively nerk the derk
@@ -1480,7 +1527,7 @@ module Skylab::Porcelain::Legacy
       @name_function.normalized_local_name
     end
 
-  protected
+  private
 
     def initialize is_visible, alias_a, desc_a, name_function,
       ext_ref, inline_def, story_host_module
@@ -1572,7 +1619,7 @@ module Skylab::Porcelain::Legacy
       method meth
     end
 
-  protected
+  private
 
     kls = self
 
@@ -1605,8 +1652,6 @@ module Skylab::Porcelain::Legacy
   end
 
   class Pxy::RequestClient
-
-    include SubClient_InstanceMethods  # we use kbd and hdr
 
     def normalized_invocation_string
       "#{ @request_client.send :normalized_invocation_string }"

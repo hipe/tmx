@@ -26,14 +26,15 @@ class Skylab::TestSupport::Regret::API::Support::Verbosity::Graded < ::Module
     attr_reader :lvl_a
 
     def [] mod_x
-      Enhancers_.const_get( mod_x.flat_exponent, false )[ self, mod_x ]
+      wat = Aggregate_.const_get mod_x.metastory.aggregate_exponent, false
+      wat[ self, mod_x ]
     end
   end
 
-  module Enhancers_
+  module Aggregate_
   end
 
-  module Enhancers_::CLI_Client_
+  module Aggregate_::CLI_Modality_Client_
     def self.[] vmod, cli_kls
       cli_kls.class_exec do
         include IM_
@@ -45,19 +46,23 @@ class Skylab::TestSupport::Regret::API::Support::Verbosity::Graded < ::Module
     end
   end
 
-  module Enhancers_::CLI_Client_::IM_
+  module Aggregate_::CLI_Modality_Client_::IM_
   private
     def verbosity_opt_func
-      @verbosity_opt_func ||= child_api_action_const.
-        mutable_verbosity_story.build_opt_func_for( self, 1 )
+      @verbosity_opt_func ||= begin
+        kls = @mechanics.api_services.hot_api_action_class
+        kls.mutable_verbosity_story.build_opt_func_for self, 1
+      end
     end
     def deincrement_verbosity_opt_func
-      @deincrement_verbosity_opt_func ||= child_api_action_const.
-        mutable_verbosity_story.build_opt_func_for( self, -1 )
+      @deincrement_verbosity_opt_func ||= begin
+        kls = @mechanics.api_services.hot_api_action_class
+        kls.mutable_verbosity_story.build_opt_func_for self, -1
+      end
     end
   end
 
-  module Enhancers_::API_Action_
+  module Aggregate_::API_Action_
     def self.[] vmod, api_action_class
       api_action_class.class_exec do
         if respond_to? :mutable_verbosity_story
@@ -69,7 +74,7 @@ class Skylab::TestSupport::Regret::API::Support::Verbosity::Graded < ::Module
           if const_defined? :Mutable_Verbosity_Story_, false
             const_get :Mutable_Verbosity_Story_, false
           else
-            const_set :Mutable_Verbosity_Story_, Mutable_Story_.new( vmod,
+            const_set :Mutable_Verbosity_Story_, Mutable_Vstory_.new( vmod,
               self )
           end
         end
@@ -77,7 +82,7 @@ class Skylab::TestSupport::Regret::API::Support::Verbosity::Graded < ::Module
     end
   end
 
-  class Enhancers_::API_Action_::Mutable_Story_ < ::Module
+  class Aggregate_::API_Action_::Mutable_Vstory_ < ::Module
 
     def initialize vmod, api_application_class
       @param_i = nil

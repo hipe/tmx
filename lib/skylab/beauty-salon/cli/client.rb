@@ -2,18 +2,24 @@ module Skylab::BeautySalon
 
   class CLI::Client < Face::CLI
 
-    Plugin_Host_ = MetaHell::Enhance::Conduit.new :ostream, :estream
-    class Plugin_Host_
-      Services::Headless::Plugin::Host.enhance self do
-        service_names %i| ostream estream |  # api actions can write directly
-      end
-    end
-
-    def initialize h
-      super h
+    def initialize( * )
+      super
       @param_h = { }
     end
-    private :initialize
+
+    use :api, :hi, [ :last_hot, :as, :command ],
+      [ :normal_last_invocation_string, :as, :last_invocation_string ]
+
+    with_dsl_off do
+      def invoke( * )
+        res = super
+        if false == res
+          @y << "try #{ hi "#{ last_invocation_string  } -h" } for help."
+          res = nil
+        end
+        res
+      end         # (reminder: this won't run when it's under tmx)
+    end
 
     option_parser do |o|
 
@@ -73,7 +79,7 @@ module Skylab::BeautySalon
         @param_h[:be_verbose] = true
       end
 
-      o.banner = "#{ @command.usage_line }"
+      o.banner = "#{ command.usage_line }"
     end
 
     def wrap file
@@ -81,31 +87,21 @@ module Skylab::BeautySalon
     end
 
   private
-  # dsl_off  # #todo after merge
+  dsl_off
 
-    def invoked( * )  # NOTE this won't run when it's under tmx..
-      res = super
-      if false == res
-        @y << "try #{ hi "#{
-            last_child_invocation_string || invocation_string
-          } -h" } for help."
-        res = nil
-      end
-      res
-    end
 
     def on_info e
       msg = e.payload_a.fetch 0
       if '(' == msg[ 0 ]
         a, b = '(', ')' ; msg = msg[ 1 .. -2 ]
       end
-      @y << "#{ a }#{ invocation_string } #{ @last_normalized_child_slug }: #{
-        }#{ msg }#{ b }"
+      y = @last_hot.get_normal_invocation_string_parts
+      @y << "#{ a }#{ y * ' ' }: #{ msg }#{ b }"
       nil
     end
 
     def on_normalization_failure_line e
-      @y << "#{ last_child_invocation_string }: #{ e.payload_a.fetch 0 }"
+      @y << "#{ last_invocation_string }: #{ e.payload_a.fetch 0 }"
       nil
     end
 
@@ -114,11 +110,18 @@ module Skylab::BeautySalon
       nil
     end
 
+    # hack to let children get this
     def on_modality_host_proxy_request plugin_client, f
-      @plugin_host ||= ( Plugin_Host_.new -> { @out }, -> { @err } )
-      host_pxy = @plugin_host.plugin_services.build_host_proxy plugin_client
+      host_pxy = plugin_host.plugin_services.build_host_proxy plugin_client
       f[ host_pxy ]
       nil
+    end
+
+    Headless::Plugin::Host::Proxy.enhance self do  # at the end b.c..
+
+      services [ :ostream, :ivar, :@out ],
+               [ :estream, :ivar, :@err ]
+
     end
   end
 end

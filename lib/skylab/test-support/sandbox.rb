@@ -13,6 +13,8 @@ module Skylab::TestSupport::Sandbox
   # but more concise (and de-facto tagged) than writing these kind of things
   # always by hand.
 
+  MetaHell = ::Skylab::MetaHell
+
   module Spawner
 
     #  top secret experiment
@@ -102,13 +104,12 @@ module Skylab::TestSupport::Sandbox
     end
   end
 
-  Conduit_ = ::Skylab::MetaHell::Enhance::Conduit.new %i|
+  Conduit_ = MetaHell::Enhance::Conduit.new %i|
     kiss_with produce_subclasses_of
   |
 
-  # Flusher_ = MetaHell::Function::Class.new :flush  # #todo:after:7
+  Flusher_ = MetaHell::Function::Class.new :flush
   class Flusher_
-    def flush ; @flush.call end
 
     def initialize sb_mod, kiss_with, superklass
       @flush = -> do
@@ -142,9 +143,8 @@ module Skylab::TestSupport::Sandbox
     end
   end
 
-  # Host::Flusher_ = MetaHell::Function::Class.new :flush  # #todo:after:7
+  Host::Flusher_ = MetaHell::Function::Class.new :flush
   class Host::Flusher_
-    def flush ; @flush.call end
 
     def initialize anchor_mod
 
@@ -191,13 +191,8 @@ module Skylab::TestSupport::Sandbox
         end
       end
     end
-
-    def define_sandbox_constant_function  #todo:after:7
-      @define_sandbox_constant_function.call
-    end
-
-    # MetaHell::Function( self ).
-    #   as_public_getter :define_sandbox_constant_function
+    MetaHell::Function.enhance( self ).
+      as_public_getter :define_sandbox_constant_function   # grease
 
   end
 end

@@ -2,12 +2,12 @@ module Skylab::BeautySalon
 
   class API::Actions::Wrap < API::Action
 
-    params [ :lines, :normalizer, true ],
-           [ :num_chars_wide, :normalizer, true, :required ],
-           :do_preview,
-           :be_verbose,
-           :do_number_the_lines,
-           [ :file, :required ]
+    params [ :lines, :normalizer, true, :arity, :zero_or_one ],
+           [ :num_chars_wide, :normalizer, true, :arity, :one ],
+           [ :do_preview, :arity, :zero_or_one ],
+           [ :be_verbose, :arity, :zero_or_one ],
+           [ :do_number_the_lines, :arity, :zero_or_one ],
+           [ :file, :arity, :one ]
 
     emits :info_line, :info, :normalization_failure_line,
       :modality_host_proxy_request
@@ -55,32 +55,33 @@ module Skylab::BeautySalon
 
     -> do
       rx = /\A\d+\z/
-      define_method :normalize_num_chars_wide do |y, x, result_if_ok|
-        x = x.to_s
+      define_method :normalize_num_chars_wide do |y, x, z|
+        x = x.to_s ; ok = nil
         if rx =~ x
           fixnum = x.to_i
           if 1 <= fixnum  # eek
-            result_if_ok[ fixnum ]
+            z[ fixnum ]
+            ok = true
           else
             y << "needs a positive integer, had: #{ x }"
           end
         else
           y << "can't discern a positive integer from #{ x.inspect }"
         end
-        nil
+        ok
       end
     end.call
 
     # [#fa-019] assume that x is nil or an array.
 
-    def normalize_lines y, x, result_if_ok
-      unio = Basic::Range::Positive::Union.new
+    def normalize_lines y, x, z
+      ok = y.count ; unio = Basic::Range::Positive::Union.new
       if x
         inputs = Basic::List::Scanner[ x ]
         parse = Basic::Range::Positive::List::Scanner.new
         parse.unexpected_proc = -> xx, exp_a do
           y << "didn't understand \"#{
-            Services::Headless::CLI::FUN.ellipsify[ xx , 8 ] }\" in the #{
+            Headless::CLI::FUN.ellipsify[ xx , 8 ] }\" in the #{
             }lines expression - expected a #{ exp_a * ' or ' }"
           nil  # IMPORTANT - it must break the scan loop
         end
@@ -92,18 +93,16 @@ module Skylab::BeautySalon
           while r = parse.gets
             unio.add r or break
           end
-          y.count.zero? or break
+          ok == y.count or break
         end
-        if y.count.zero?
-          result_if_ok[ nil ]  # for clarity we change ivars
+        if ok == y.count
+          z[ nil ]  # for clarity we change the ivar
         else
-          unio = nil  # let's get warned if we access the ivar
+          unio = nil  # fail loudly if we try to access it
         end
       end
-      if unio
-        @line_range_union = unio.prune
-      end
-      nil  # not important
+      @line_range_union = unio.prune if unio
+      true if ok == y.count
     end
 
     def resolve_line_scanner

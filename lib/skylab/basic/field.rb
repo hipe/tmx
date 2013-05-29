@@ -247,9 +247,7 @@ class Skylab::Basic::Field
                                          # fields...
     def mutate inst, _scn
       ivar = as_is_predicate_ivar
-      inst.instance_exec do
-        instance_variable_set ivar, true
-      end
+      inst.instance_variable_set ivar, true
       nil
     end
 

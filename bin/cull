@@ -2,4 +2,4 @@
 
 require_relative '../lib/skylab/cull/core'
 
-Skylab::Cull::CLI.new( out: $stdout, err: $stderr ).run ARGV
+Skylab::Cull::CLI.new( nil, $stdout, $stderr ).invoke ARGV

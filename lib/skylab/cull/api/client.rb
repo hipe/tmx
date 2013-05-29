@@ -4,7 +4,7 @@ module Skylab::Cull
 
     CodeMolester::Config::File::API_Client.enhance self do
 
-      default_init_path do
+      default_init_directory do
         ::Dir.getwd
       end
 

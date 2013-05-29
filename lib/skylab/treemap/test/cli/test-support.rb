@@ -100,7 +100,7 @@ module Skylab::Treemap::TestSupport::CLI
       @tmx_cli ||= begin
         require 'skylab/tmx/cli'
         cli = ::Skylab::TMX::CLI.new( program_name: 'tmx',
-          out: stream.sout, err: stream.serr )
+          sin: nil, out: stream.sout, err: stream.serr )
         cli
       end
     end

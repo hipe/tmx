@@ -4,29 +4,31 @@ module Skylab::Face
 
     module Of
 
-      Hot = -> own_strange_ns_class do
-
-        -> sheet, rc, rc_sheet, slug_fragment do
-          sht = Ouroboros_Sheet[ own_strange_ns_class.story, sheet ]
-          own_strange_ns_class.new rc, slug_fragment, sheet: sht
+      Hot = -> lower_ns_cls, higher_sheet do
+        -> higher_svcs, slug_frag=nil do  # this is `hot` being claled
+          lower_ns_cls.new(
+            Ouroboros_Sheet[ lower_ns_cls.story, higher_sheet ],
+            higher_svcs, slug_frag
+          ).instance_variable_get( :@mechanics )
         end
       end
     end
 
-    Ouroboros_Sheet = MetaHell::Proxy::Nice.new :slug, :options, :command_tree,
-      :default_argv, :fetch_element
+    Ouroboros_Sheet = MetaHell::Proxy::Nice.new :name,
+      :command_tree, :default_argv, :option_sheet_a,
+      :has_default_argv, :has_option_sheets, :fetch_constituent,
+      :has_partially_visible_op
 
     class Ouroboros_Sheet
-      def self.[] inner, strange
-        new(               slug: -> do strange.slug end,
-                        options: -> do inner.options end,
-                   command_tree: -> do inner.command_tree end,
-                   default_argv: -> do
-                     strange.default_argv || inner.default_argv
-                   end,
-                  fetch_element: -> *a, &b do
-                    inner.fetch_element( *a, &b )
-                  end,
+      def self.[] lo, hi
+        new(               name: -> do hi.name end,
+                   command_tree: -> do lo.command_tree end,
+                   default_argv: -> do hi.default_argv || lo.default_argv end,
+                 option_sheet_a: -> do lo.option_sheet_a end,
+               has_default_argv: -> do hi.has_default_argv || lo.has_default_argv end,
+              has_option_sheets: -> do lo.has_option_sheets end,
+              fetch_constituent: -> *a, &b do lo.fetch_constituent( *a, &b ) end,
+       has_partially_visible_op: -> do lo.has_partially_visible_op end
         )
       end
     end

@@ -26,11 +26,12 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Core
           module CLI  # maybe magic one day [#fa-009]
             class Client < Face::CLI
               def fee
-                api
+                @mechanics.api  # one way..
               end
 
+              use :api
               def foo
-                api
+                api  # ..another way
               end
             end
           end
@@ -50,14 +51,11 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Core
       it "for which no action defined - raises boxxy name error" do
         -> do
           invoke 'fee'
-        end.should raise_error(
-          MetaHell::Boxxy::NameNotFoundError,
-          /uninitialized constant .+:API::Actions::Fee/
-        )
+        end.should raise_error(  # the particular class is asserted elsewhere
+          /for token "fee" there is no corresponding module `Fee`/i )
       end
 
       it "that takes no arguments anywhere - works" do
-        debug!
         r = invoke 'foo'
         r.should eql( :foo_it_is )
       end

@@ -1,21 +1,17 @@
 module Skylab::Cull
 
+  # this file is the embodiment of [#fa-042].
+
   class CLI::Namespace < Face::Namespace
-    module InstanceMethods
-    end
-    include InstanceMethods  # built-out below
-
-  protected
-
   end
 
   module CLI::Namespace::InstanceMethods
 
-  protected
+  private
 
-    def initialize( * )
-      super
+    def initialize *a
       @param_h = { }
+      super
     end
 
     def dry_run_option o
@@ -33,5 +29,9 @@ module Skylab::Cull
       end
       nil
     end
+  end
+
+  class CLI::Namespace
+    prepend InstanceMethods
   end
 end

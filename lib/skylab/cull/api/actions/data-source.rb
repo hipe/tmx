@@ -24,10 +24,12 @@ module Skylab::Cull
     # (note that the meta-fields are only used for packing and unpacking
     # requests, and not for validation here. that happens in the model)
 
-    params [ :name,       :field  ],
-           [ :url,        :field  ],
-           [ :tag_a,      :field  ],
-           [ :is_dry_run, :option ]
+    meta_params :ds
+
+    params [ :name,       :arity, :one, :ds ],
+           [ :url,        :arity, :one, :ds ],
+           [ :tag_a,      :arity, :zero_or_more, :ds ],
+           [ :is_dry_run, :arity, :zero ]
 
     services :model, [ :pth, :ingest ]
 
@@ -35,7 +37,7 @@ module Skylab::Cull
       could: :entity_event, couldnt: :entity_event
 
     def execute
-      field_h, opt_h = pack_fields_and_options
+      field_h, opt_h = unpack_params :ds, true
       coll = host.model :data, :sources
       coll.add field_h, opt_h,
         could: method( :could ),

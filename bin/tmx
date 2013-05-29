@@ -2,4 +2,4 @@
 
 require File.expand_path('../../lib/skylab/tmx/cli', __FILE__)
 
-Skylab::TMX::CLI.new( out: $stdout, err: $stderr ).run ARGV
+Skylab::TMX::CLI.new( sin: $stdin, out: $stdout, err: $stderr ).invoke ARGV

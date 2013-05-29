@@ -4,7 +4,7 @@ module Skylab::Dependency
       o do |op, req|
         extend Headless::CLI::PathTools::InstanceMethods
         item_name = @parent.name
-        syntax "#{invocation_string} [opts] [<name> [<name> [..]]]"
+        syntax "#{ normalized_invocation_string } [opts] [<name> [<name> [..]]]"
         op.banner = <<-HERE.gsub(/^ +/, '')
           For attempting to install and/or inspecting installation of #{item_name}.
           #{usage_string}

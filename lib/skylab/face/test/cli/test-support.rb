@@ -92,7 +92,7 @@ module Skylab::Face::TestSupport::CLI
     def invoke *argv
       argv.flatten! 1
       argv = argv.dup  # a) cli parsing is always descructive on ARGV, for
-      client.run argv  # agnostic progressive chaining [#hl-056]
+      client.invoke argv  # agnostic progressive chaining [#hl-056]
       # (note that in our tests we don't actually test that the argv is
       # getting mutated, and we probably shouldn't)
     end

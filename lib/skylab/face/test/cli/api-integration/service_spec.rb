@@ -26,7 +26,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Service
           module CLI
             class Client < Face::CLI
               def fiff x
-                api x
+                @mechanics.api x
               end
             end
           end
@@ -45,7 +45,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Service
             class Client < Face::API::Client
               Face::Services::Headless::Plugin::Host.enhance self do
                 service_names %i| zap |
-              end
+              end  # note that we do *not* use the plugin *proxy* dsl here
 
               def initialize
                 super
@@ -64,15 +64,12 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Service
       end
     end
 
-    context "service in API/CLI is no/yes - " do
+    context "service in API/CLI is .. " do
 
       define_sandbox_constant :application_module do
         module Sandbox::Nightclub_2
           module CLI
             class Client < Face::CLI
-              Face::Services::Headless::Plugin::Host.enhance self do
-                service_names %i| imogen |
-              end
 
               def initialize( * )
                 super
@@ -80,11 +77,21 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Service
               end
 
               def gleep_beep
+                @mechanics.api
+              end
+
+              use :api
+
+              def winkle_tankle
                 api
               end
 
               attr_reader :imogen
               private :imogen
+
+              Face::Services::Headless::Plugin::Host::Proxy.enhance self do
+                service_names %i| imogen |
+              end
             end
           end
           module API
@@ -95,6 +102,13 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Service
                   @imogen.call
                 end
               end
+
+              class WinkleTankle < Face::API::Action
+                services :biffle, [ :baffle ]
+                def execute
+                  fail 'never see'
+                end
+              end
             end
           end
         end
@@ -103,6 +117,15 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Service
       it "service in API/CLI : no/yes - ok" do
         r = invoke 'gleep-beep'
         r.should eql( 'heap' )
+      end
+
+      it "service in API/CLI : no/no - .." do
+        -> do
+          invoke 'winkle-tankle'
+        end.should raise_error(
+          Face::Services::Headless::Plugin::Service::NameError,
+            /has not declared the required services.+biffle.+baffle/
+        )
       end
     end
   end

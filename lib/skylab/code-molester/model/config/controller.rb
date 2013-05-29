@@ -82,7 +82,7 @@ module Skylab::CodeMolester
     end
 
     Exists_ = Model::Event.new do |pn|
-      "exists, skipping - #{ pth[ pn ] }"
+      "exists, skipping - #{ @pth[ pn ] }"
     end
 
     # `insert_valid_entity` -

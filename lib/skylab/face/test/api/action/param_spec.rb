@@ -105,9 +105,9 @@ module Skylab::Face::TestSupport::API::Param
         module Sandbox::Nightclub_3
           Face::API[ self ]
           class API::Actions::W < Face::API::Action
-            params [ :eeny, :required ],
-                     :meeny,
-                   [ :hermione ]
+            params [ :eeny, :arity, :one ],
+                   [ :meeny, :arity, :zero_or_one ],
+                   [ :hermione, :arity, :zero_or_one ]
             def execute
               "<<e:#{ @eeny.inspect }, m:#{ @meeny.inspect }#{
                 }, h:#{ @hermione.inspect }>>"

@@ -1,4 +1,3 @@
-
 module Skylab::TestSupport::Quickie
 
   # Quickie is an attempt at a minimal drop-in ersatz for the simplest/
@@ -56,7 +55,7 @@ module Skylab::TestSupport::Quickie
   # ~ just for fun, below is sometimes defined in a pre-order-ish traversal ~
 
   # (which is supposed to mean that where possible things in the file
-  # are presented in the order there are called during a typical execution,
+  # are presented in the order they are called during a typical execution,
   # so that if you had a stack trace of each first time a function was
   # called, that is ideally the order they will appear in this file.
   # In theory this should make it more of a narrative story to read top
@@ -92,9 +91,9 @@ module Skylab::TestSupport::Quickie
 
                                   # so what is this `service` metioned above?
   service = -> do                 # it is a true service, it gets memoized
-    svc = Quickie::Service.new    # and everything (but could be tested in
-    svc.run                       # isolation)
-    service = -> { svc }
+    svc = Quickie::Service.new $stderr  # (NOTE the only place you see $stderr)
+    svc.run                       # and everything (but it could be tested
+    service = -> { svc }          # in isolation)
     svc
   end
 
@@ -103,6 +102,7 @@ module Skylab::TestSupport::Quickie
     # (`initialize` at end, different concerns are aggregated there)
 
     # `run` - future-proof ourselves as a proper state machine
+
     def run
       if @is_running then raise ::RuntimeError, "service is already running."
       else
@@ -122,12 +122,34 @@ module Skylab::TestSupport::Quickie
 
     attr_reader :quickie_has_reign
 
-  protected
+    def info_stream_line_proc= f
+      if f
+        if @info_stream_line_proc_is_default
+          @y = ::Enumerator::Yielder.new( & f )
+        else
+          @y << "(#{ self.class } won't override custom #{
+            }`info_stream_line_proc` - set it to nil first"
+        end
+      elsif @info_stream_line_proc_is_default
+        @y << "(#{ self.class } - error line proc is already default.)"
+      else
+        @info_stream_line_proc_is_default = true  # brusque, brash
+        self.info_stream_line_proc = @default_info_stream_line_proc
+      end
+      f
+    end
 
-    def initialize
+  private
+
+    def initialize stderr
+      @default_info_stream_line_proc = -> line { stderr.puts line }
+      @info_stream_line_proc_is_default = nil
+      self.info_stream_line_proc = nil  # see
+      @invoke_is_enabled = true ; @did_resolve_invoke = false
       @is_running = false
       @has_seen_one = nil  # to trigger the warning about this not yet impl.
       @kernel_describe_is_enabled = nil
+      nil
     end
   end
 
@@ -173,7 +195,7 @@ module Skylab::TestSupport::Quickie
       rest.unshift desc                        # normalize the desc into an ary
       ctx = ::Class.new Quickie::Context       # 1 desc. always == 1 context
       FUN.context_init[ ctx, rest, nil, b ]    # init the kls, absorb the defn.
-      cli = Client.new ctx                     # WOAH - make a client now
+      cli = Client.new @y, ctx                 # WOAH - make a client now
 
       # for now, per root describe we run the whole show .. this will get you
       # multiple UI's and test runs in one invocation until [#ts-008]
@@ -183,9 +205,17 @@ module Skylab::TestSupport::Quickie
         cli.puts "quickie note - aggregating root describes (and running #{
           }them all at once) is not yet available. running them individually."
       end
-      cli.resolve_invoke ::ARGV   # so that's how it goes for now - a `describe`
-                                  # from a non-context context gets invoked
-    end                           # right away.
+      if @invoke_is_enabled
+        @did_resolve_invoke = true
+        cli.resolve_invoke ::ARGV   # so that's how it goes for now - a
+                                    # `describe` from a non-context context
+      else                          # gets invoked right away.
+        method :noop
+      end
+    end
+
+    def noop  # 2 of 2
+    end
   end
 
   class Quickie::Context
@@ -231,7 +261,7 @@ module Skylab::TestSupport::Quickie
       @__quickie_runtime.failed
     end
 
-  protected
+  private
 
     def initialize rt
       @__quickie_runtime = rt
@@ -322,12 +352,11 @@ module Skylab::TestSupport::Quickie
       @y << line
     end
 
-  protected
+  private
 
-    def initialize root_context_class
+    def initialize y, root_context_class
+      @y = y
       @root_context_class = root_context_class
-      stderr = $stderr
-      @y = ::Enumerator::Yielder.new { |line| stderr.puts line }
       @tag_filter = nil
     end
 
@@ -653,7 +682,7 @@ module Skylab::TestSupport::Quickie
       [ @eg_count, @eg_failed_count, @eg_pending_count ]
     end
 
-  protected
+  private
 
     def initialize emit_passed, emit_failed, emit_pending
       @emit_passed, @emit_failed, @emit_pending =
@@ -688,7 +717,7 @@ module Skylab::TestSupport::Quickie
       kls
     end
 
-  protected
+  private
 
     def initialize runtime, context, *rest
       @runtime = runtime
@@ -771,7 +800,7 @@ module Skylab::TestSupport::Quickie
       nil
     end
 
-  protected
+  private
 
     # ick [class] ( regex | string )
 
@@ -913,5 +942,34 @@ module Skylab::TestSupport::Quickie
       include: [ "includes", "to include" ],
       nil:     [ "is nil", "to be nil" ]
     }
+  end
+
+  #  ~ section N - extrinsic API for hacks ~
+
+  #  ~ section N.1 - `do_not_invoke!`
+
+  # `Quickie.do_not_invoke` - prevents quickie from flushing its tests.
+  # for hacks e.g in your test file. might make noise.
+
+  def self.do_not_invoke!
+    service.do_not_invoke!
+  end
+
+  class Quickie::Service  # #re-open for section N.1
+    def do_not_invoke!
+      me = "`#{ self.class }.do_not_invoke!`"
+      if @invoke_is_enabled
+        if @did_resolve_invoke
+          @y << "(#{ me } called after a `describe` block has already finished #{
+            }- call it earlier if it does not work as expected.)"
+        else
+          @y << "(#{ me } called - won't run tests.)"
+        end
+        @invoke_is_enabled = false
+      else
+        @y << "(#{ me } already called?)"
+      end
+      nil
+    end
   end
 end

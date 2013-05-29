@@ -1,3 +1,13 @@
+[#044]       #doc-point `ouroboros` and "strange modules"
+[#043]       #doc-point feature of `isomorphic api action resolution`
+[#042]       #doc-point this fun problem w/ customizing your clients..
+[#041]       #doc-point `isomorphic command composition` is the formal name
+[#040]       #doc-point the matryoshka doll UI pattern ..
+[#039]       #question in light of [#037], o.p receiver ..?
+[#038]       #doc-point `puffing` is a small API corner of clients that
+               lets you "puff up" your (e.g. branch) client lazily
+[#037]       #eventpoint - fundamentally rearchitect Face to deal with the
+             DSL public instance method namespace problem.
 [#036] #todo replace universe with `tableize` with `tablify`
 [#035]       #tracking-tag #experiment with a `unary` discrete categorization
                for our main 3 classes (for which we make two exponents) ..
@@ -43,7 +53,7 @@
 [#011]       (available, previous node moved to [#it-003])
 [#010]       #doc-point modality clients vs. modal clients ..
 [#009] #hm   magic with allowing either CLI or CLI::Client for the client.
-[#008]       #doc-point expression templates ..
+[#008]       #doc-point expression templates (#i18n)..
 [#007]       #doc-node the API library #initials:`api` ..
 [#006]       #doc-node CLI (API) revelation integration
 [#005]       #doc-node introducing the entity library #initials:`el` ..

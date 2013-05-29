@@ -7,5 +7,7 @@ module Skylab::Cull
     taxonomic_streams  # none. (but this allows us to check for unhandled
     # non-taxonomic streams - sorta future-proofing it.)
 
+    CodeMolester::Config::File::API_Action[ self ]
+
   end
 end

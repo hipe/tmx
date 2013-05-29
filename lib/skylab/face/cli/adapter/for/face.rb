@@ -3,17 +3,19 @@ module Skylab::Face
   module Face::CLI::Adapter::For::Face
 
     module Of
-
-      Hot = -> own_strange_app_class do
-        -> sheet, rc, rc_sheet, slug_fragment do
-          pn = "#{ rc.invocation_string } #{ sheet.name.as_slug }"
-          sht = Ouroboros_Sheet[ sheet, own_strange_app_class.story ]
-          own_strange_app_class.new(
-            out: rc.out,
-            err: rc.err,
-            program_name: pn,
-            sheet: sht
-          )
+      Hot = -> lower_cli_class, higher_sheet do
+        -> higher_svcs, _slug_used_str=nil do
+          pna = higher_svcs.get_normal_invocation_string_parts
+          pna << higher_sheet.name.as_slug
+          h = {
+            out: ( higher_svcs.ostream or fail "sanity - out?" ),
+            err: ( higher_svcs.estream or fail "sanity - err?" ),
+            program_name: ( pna * ' ' ),
+            sheet: Face::Namespace::Adapter::For::Face::Ouroboros_Sheet[
+              lower_cli_class.story, higher_sheet ] }
+          x = lower_cli_class.new h
+          y = x.instance_variable_get :@mechanics
+          y
         end
       end
     end
@@ -33,22 +35,10 @@ module Skylab::Face
     # ancicipates there maybe being e.g an ivar having been set which holds
     # the strange value for that property. But the wrongmost way of all is:
 
-    Ouroboros_Sheet = MetaHell::Proxy::Nice.new( :slug, :options, :command_tree,
-      :fetch_element, :method_name, :host_module, :default_argv,
-      :normalized_local_command_name,
-    )
+    # (NOTE here are the different terms we have used at various times for
+    # the two sides of the duality:
+    #   tail = surface   = extrinsic = outer = higher = upper = hi
+    #   head = intrinsic = intrinsic = inner = lower  = lower = lo )
 
-    class Ouroboros_Sheet
-      def self.[] tail, head
-        new                slug: -> do tail.slug end,
-                        options: -> do head.options end,
-                   command_tree: -> do head.command_tree end,
-                  fetch_element: -> x do head.fetch_element x end,
-                    method_name: -> do tail.method_name end, # NOTE b.c namesp.
-                    host_module: -> do head.host_module end,
-                   default_argv: -> do head.default_argv end,
-  normalized_local_command_name: -> do tail.normalized_local_command_name end
-      end
-    end
   end
 end

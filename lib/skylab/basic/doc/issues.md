@@ -7,7 +7,7 @@
                `semantic subset` / `semantic supeset` loosely defined
 [#015]       #tracking-tag - places that could benefit maybe from something
                like basic list evented articulation
-[#014]       #tracking-tag - "get_" vs. "" (in basic string template)
+[#014]       #tracking-tag - "get_" vs. "_value" (in basic string template)
 [#013]       #doc-point #parent:003
                "an infinite stack of metafields?" ..
 [#012]       #doc-point #parent:006 `node` explained. #body-is-inline-in-parent

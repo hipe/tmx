@@ -54,14 +54,16 @@ module Skylab::Face
     # module to your chain). it is in this sense this function is off the chain.
 
     o[:invoke] = -> i_a, param_h=nil, modal_client=nil do
-      e = ( @api_client ||= const_get( :Client, false ).new ).
-        get_executable i_a, param_h, modal_client
+      @api_client ||= const_get( :Client, false ).new
+      e = @api_client.get_executable i_a, param_h, modal_client
       e and e.execute
     end
 
     # `get_executable` called from above. also may called from modality clients
     # that create their own API client, rather than rely on the memoized
     # (read: singleton) one. compare to `get_reflective_action` below.
+    # `modal_client` may be nil, which might be an indication that this is
+    # a "raw" "unwired" API call.
 
     def get_executable i_a, param_h, modal_client
       before_each_execution
@@ -69,6 +71,23 @@ module Skylab::Face
       handle_events modal_client, action           # [#fa-017]
       resolve_services modal_client, action        # [#fa-018]
       normalize action, param_h                    # [#fa-019]
+    end
+
+    # `get_reflective_action` - called from facets like "reveal" - build an
+    # action instance that can reflect on itself for purposes of documentation
+    # but is not (necessarily) fully wired for full-on execution. (compare to
+    # `get_executable` above). what a "reflective action" entails exactly is
+    # compartmentalized here.
+
+    def get_reflective_action i_a
+      action = build_primordial_action i_a
+      if ! action.has_param_facet
+        API::Action::Param[ action.class, [], nil ]
+        # because we lazy load revelations, ich muss sein, twerk the class..
+      end
+      # we are open to the possibility of needing to wire it further but
+      # let it get only as complex as necessary..
+      action
     end
 
     # `before_each_execution` - this experimental hack has obvious issues with
@@ -82,25 +101,14 @@ module Skylab::Face
     end
     private :before_each_execution
 
-    # `get_reflective_action` - called from facets like "reveal" - build
-    # an action instance that can reflect on itself for purposes of
-    # documentation (compare to `get_executable` above). what a
-    # "reflective action" entails exactly is compartmentalized here.
-
-    def get_reflective_action i_a
-      fail 'yes'
-      action = build_primordial_action i_a
-      if ! action.has_param_facet
-        API::Action::Param[ action.class, [] ]
-        # because we lazy load revelations, ich muss sein, twerk the class..
-      end
-      action
-      # we are oppen to the possibility of needing to wire it further but
-      # let it get only as complex as necessary..
-    end
-
     def build_primordial_action i_a
-      const_x = action_const_fetch i_a
+      const_x = action_const_fetch i_a do |x|
+        raise "isomorphic API action resolution failed - for token #{
+          }\"#{ x.name }\" there is no corresponding module `#{ x.const }` #{
+          }in the module #{ x.module }"  # we could keep it granulated but
+          # this is a hard error. you are not supposed to recover from it.
+          # we articulate it like this just for courtesy towards the dev.
+      end
       if const_x.respond_to? :call
         API::Action.const_get( :Proc, false )[ const_x ]
       else
@@ -147,9 +155,11 @@ module Skylab::Face
     # execute. however, if a `modal_client` is passed, we hook into that.
     # result is undefined. raise on failure.
 
-    def handle_events modal_client, ac
-      if ac.respond_to?( :has_emit_facet ) && ac.has_emit_facet && modal_client
-        modal_client.handle_events ac  # easy enough
+    def handle_events client_pxy, ac
+      if ac.respond_to?( :has_emit_facet ) && ac.has_emit_facet
+        if client_pxy  # #experimentally you get NOTHING if you have NOTHING
+          client_pxy.handle_events ac  # easy enough
+        end
       end
       nil
     end
@@ -157,18 +167,18 @@ module Skylab::Face
 
     # `resolve_services` - [#fa-018] - result undefined. raises on falure.
 
-    def resolve_services modal_client, action
+    def resolve_services modal_services, action
       if action.respond_to?( :has_service_facet ) && action.has_service_facet
-        addtl_svcs = ( if modal_client and
-            modal_client.respond_to? :plugin_services then
-          modal_client.plugin_services
-        end )
-        action.resolve_services( if addtl_svcs
-          Services::Headless::Plugin::Host::Services::Chain.new [
-            addtl_svcs, plugin_services ], self.class
+        if modal_services && modal_services.has_api_plugin_services
+          addtl_svcs = modal_services.api_plugin_services
+        end
+        if addtl_svcs
+          chn = Services::Headless::Plugin::Host::Services::Chain.new(
+            [ addtl_svcs, plugin_services ], self.class )
+          action.resolve_services chn
         else
-          plugin_services
-        end )
+          action.resolve_services plugin_services
+        end
       end
       nil
     end
@@ -202,11 +212,12 @@ module Skylab::Face
     # (with the above said, please see [#fa-019] for information about
     # possible future/possible current features of field-level normalization.)
 
-    def normalize action, param_h
-      if ! action.respond_to?(:normalize) && (! param_h || param_h.length.zero?)
-        action  # effectively skip this step in the lifecycle IFF above is true
+    def normalize ac, param_h
+      if ( ! ac.respond_to? :has_param_facet || ! ac.has_param_facet ) &&
+         ( ! param_h || param_h.length.zero? ) then
+        ac  # effectively skip this step in the lifecycle IFF above is true
       else
-        y = action.instance_exec do  # emitting call below might be private
+        y = ac.instance_exec do  # emitting call below might be private
           Services::Basic::Yielder::Counting.new( &
             if respond_to? :normalization_failure_line
               method :normalization_failure_line
@@ -216,8 +227,8 @@ module Skylab::Face
               end
             end )
         end
-        action.normalize y, param_h  # result is undefined.
-        action if y.count.zero?
+        ac.normalize y, param_h  # result is undefined.
+        ac if y.count.zero?
       end
     end
     private :normalize
@@ -267,10 +278,10 @@ module Skylab::Face
     end
     public :revelation_services
 
-    def self.flat_exponent  # [#fa-035]
-      const_get :Flat_Exponent_
-    end
-    Flat_Exponent_ = :API_Client_
+    #  ~ facet 5.6 - metastories ~  ( was [#fa-035] )
+
+    Magic_Touch_.enhance -> { API::Client::Metastory.touch },
+      [ self, :singleton, :public, :metastory ]
 
     FUN = ::Struct.new( * o.keys ).new( * o.values )
 

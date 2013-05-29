@@ -13,18 +13,15 @@ module Skylab::Face
     -> do  # `initialize`
 
       h = {
-        # #todo:during:arity
-#        opt: [ :a-rity, :zero_or_one ],
-#        req: [ :a-rity, :one ]
-        opt: [ ],
-        req: [ :required ]
+        opt: [ :arity, :zero_or_one ],
+        req: [ :arity, :one ]
       }
 
       define_method :initialize do |prok|
         @proc = prok
         @constants = ::Module.new
         Services::Basic::Field::Box.enhance @constants do
-          # extend_field_class_with -> { API::Action::Param::Field_IMs_ }  # #todo:during:arity
+          field_class_instance_methods -> { API::Action::Param::Field_IMs_ }
           meta_fields( * API::Action::Param::METAFIELDS_ )
           fields( * prok.parameters.map do |orr, nn|
             [ nn, * h.fetch( orr ) ]

@@ -1,13 +1,18 @@
 class Skylab::Face::CLI
+
   # #todo is this used? (if so where?)
+
   class Interactive
-    def self.run ui, opts, request
-      new(ui, opts, request).run
+
+    def self.invoke ui, opts, request
+      new( ui, opts, request ).execute
     end
+
     def initialize ui, opts, request
-      @ui, @opts, @request = [ui, opts, request]
+      @ui, @opts, @request = ui, opts, request
     end
-    def run
+
+    def execute
       require 'highline'
       @terminal = ::HighLine.new($stdin, @ui.err)
       @params = @request.parameters
@@ -25,6 +30,7 @@ class Skylab::Face::CLI
       end
       @request
     end
+
     def ask_for param
       value = @terminal.ask("#{param.label}: ")
       param.set_response(value)

@@ -2,11 +2,33 @@ module Skylab::Cull
 
   class CLI::Client < Face::CLI
 
-    include CLI::Namespace::InstanceMethods
+    # (see i.m's `prepend`'ed at the end!)
 
-    Headless::Plugin::Host.enhance self do
-      service_names %i| pth |
+    def initialize( * )
+      super
+      @param_h = { }  # neither core lib nor n.s facet does this for you
+      @pth = -> pn do
+        if @mechanics.last_api_executable.be_verbose
+          pn.to_s
+        else
+          Headless::CLI::PathTools::FUN.pretty_path_safe[ pn ]
+        end
+      end
     end
+
+    use :hi, :api, [ :last_hot, :as, :command ],
+      [ :normal_last_invocation_string, :as, :last_invocation_string ]
+
+    with_dsl_off do
+      def invoke( * )
+        res = super
+        if false == res
+          @y << "try #{ hi "#{ last_invocation_string } -h" } for help."
+          res = nil
+        end
+        res
+      end
+    end                           # (reminder: this won't run when under tmx)
 
     option_parser do |o|
       o.separator "#{ hi 'description:' } wanktasktic awesomeness"
@@ -15,12 +37,11 @@ module Skylab::Cull
 
       dry_run_option o
 
-      o.banner = @command.usage_line
+      o.banner = command.usage_line
     end
 
-    def init path=nil
-      path ||= api_client.config_file_default_init_path
-      api path
+    def init directory=nil
+      api directory
     end
 
     option_parser do |o|
@@ -31,43 +52,19 @@ module Skylab::Cull
       o.on '-l', '--list-file', 'only write the file to stdout.' do
         @param_h[:do_list_file] = true
       end
-      o.banner = @command.usage_line
+      o.banner = command.usage_line
     end
 
     def status
       api
     end
 
-    namespace :'data-source', -> do
-      CLI::Actions::DataSource
-    end, aliases: [ 'ds' ]
-
-    def initialize( * )
-      super
-      @pth = -> pn do
-        if @action.be_verbose
-          pn.to_s
-        else
-          Headless::CLI::PathTools::FUN.pretty_path_safe[ pn ]
-        end
-      end
-    end
-
-    attr_reader :pth
-    private :pth
+    namespace :'data-source', -> { CLI::Actions::DataSource }, aliases: [ 'ds' ]
 
   private
-
-    def invoked( * )
-      res = super
-      if false == res
-        @y << "try #{ hi "#{
-            last_child_invocation_string || invocation_string
-          } -h" } for help."  # a hack for now.. one day we will unify this
-        res = nil  # probably ignored anyway..
-      end
-      res
-    end
+  dsl_off  # (don't bother tracking the order in which methods are added)
+           # (note that one day `private` might get hacked to do this
+           # automatically but that feels so bad and wrong.)
 
     def on_payload_line e
       @out.puts e.payload_a.fetch( 0 )
@@ -87,7 +84,7 @@ module Skylab::Cull
     end
 
     def on_normalization_failure_line e
-      @y << "#{ last_child_invocation_string }: #{ e.payload_a.fetch 0 }"
+      @y << "#{ last_invocation_string }: #{ e.payload_a.fetch 0 }"
       nil
     end
 
@@ -116,15 +113,22 @@ module Skylab::Cull
     end
 
     def on_all e
-      @y << "#{ last_child_invocation_string } #{ e.stream_name }: #{
+      @y << "#{ last_invocation_string } #{ e.stream_name }: #{
         }#{ e.payload_a.first }"
       nil
     end
 
     def on_entity_event e
       str = instance_exec( & e.payload_a.fetch( 0 ).message_function )
-      @y << "#{ last_child_invocation_string }: #{ str }"
+      @y << "#{ last_invocation_string }: #{ str }"
       nil
+    end
+
+    prepend CLI::Namespace::InstanceMethods  # at end because of [#ri-002]
+
+    Headless::Plugin::Host::Proxy.enhance self do  # ditto [#ri-002]
+      services [ :pth, :ivar ]  # api actions want to know how to render a path
+                                # and we get a private method `plugin_host`
     end
   end
 end

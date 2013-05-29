@@ -40,10 +40,10 @@ module Skylab::Headless::TestSupport::Plugin::Host::Proxy
           cli = CheekyCLI_Client.new
 
           web.class.method_defined?( :plugin_host ).should eql( false )
-          web.class.private_method_defined?( :plugin_host ).should eql( true )
+          web.class.private_method_defined?( :plugin_host ).should eql( false )
 
           webf, clif = [ web, cli ].map do |clnt|
-            ph = clnt.send :plugin_host
+            ph = clnt.instance_variable_get :@plugin_host
             ph.call_plugin_host_service(
               ph.plugin_services._story.fetch_service( :emphasize_text ),
               nil, nil )

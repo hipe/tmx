@@ -17,7 +17,7 @@ module Skylab::Face
         strange = native.instance_exec do
           strng = Conduit_A.new(
             :didactic_invocation_string => -> do
-              invocation_string
+              normalized_invocation_string
             end,
             :send => ->( *a, &b ) do
               strng.__send__( *a, &b )

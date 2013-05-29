@@ -74,5 +74,40 @@ module Skylab::Face::TestSupport::API::Normalize
         x.should eql( 'any:arg, you:want' )
       end
     end
+
+    context "field-level normalization" do
+
+      define_sandbox_constant :nightclub do
+        module Sandbox::Nightclub_2
+          Face::API[ self ]
+          class API::Actions::Weee < Face::API::Action
+            params [ :email, :normalizer, -> y, x, z do
+              if x.length < 3
+                y << "email is too short."
+                false
+              elsif /\A[@a-z.]+\z/ =~ x
+                true
+              else
+                z[ x.capitalize ]
+                true
+              end
+            end ]
+            def execute
+              "okay(#{ @email })"
+            end
+          end
+        end
+      end
+
+      it "is neat" do
+        -> do
+          nightclub::API::invoke :weee, email: '1'
+        end.should raise_error( ::ArgumentError, /email is too short/ )
+        x = nightclub::API::invoke :weee, email: 'foobarbaz'
+        x.should eql( 'okay(foobarbaz)' )
+        x = nightclub::API::invoke :weee, email: 'mINKEL TINKEL'
+        x.should eql( 'okay(Minkel tinkel)' )
+      end
+    end
   end
 end

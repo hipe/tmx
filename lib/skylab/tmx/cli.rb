@@ -10,8 +10,6 @@ module Skylab::TMX
   #
   # (this is the jumping-off point from your sanity - the below amounts to
   # an intimation at the aspirations for what may grow to maybe become .. hl.)
-  #
-
 
   # (although it is antithetical to the intended architecture
   # it is useful during development to be able to focus on one
@@ -21,21 +19,25 @@ module Skylab::TMX
   # really old ones)
 
   metadata_h = ::Hash[ [
-    # :bleed,  # - ok
-    :cli,
-    # :'cov-tree',  # - ok
-    # :'file-metrics',  # - ok
-    :'git-viz',
-    :jshint,
-    :nginx,
-    # :permute, # - ok
-    :php,
-    :schema,
-    # :snag, # - ok
-    :'team-city',
-    # :'tan-man', # - ok
-    # :treemap, # - ok
-    :xpdf
+    # :'beauty-salon',       # good - face
+    :bleed,                  # #todo
+    :cli,                    # 2012
+    # :'cov-tree',           # good - legacy
+    # :cull,                 # good - face
+    # :'file-metrics',       # good - legacy
+    :'git-viz',              # 2012
+    :jshint,                 # 2012
+    :nginx,                  # 2012
+    # :permute,              # good - bleeding
+    :php,                    # 2012
+    # :regret,                 # TODO
+    :schema,                 # 2012
+    :slicer,                 # upcoming
+    # :snag,                 # good - headless
+    :'team-city',            # 2012
+    # :'tan-man',            # good - bleeding
+    # :treemap,              # good - bleeding
+    :xpdf                    # 2012
   ].map { |k| [ k, false ] } ].freeze
 
   define_singleton_method :metadata_h do metadata_h end
@@ -53,7 +55,7 @@ module Skylab::TMX
     const_set c, ::Skylab.const_get( c, false )
   end
 
-  extend MetaHell::Autoloader::Autovivifying::Recursive
+  extend MetaHell::MAARS
     # now any module under `self` will autoload.
 
   module TMX::Modules
@@ -67,32 +69,18 @@ module Skylab::TMX
 
   class CLI < ::Skylab::Face::CLI
 
-    version do                    # (parent class does hackery for this)
+    version do                    # (this is an officious facet of the lib.)
       ::Skylab.dir_pathname.join( '../../VERSION' ).read.strip
     end                           # will do either --version or --verbose
                                   # on -v "correctly" via MAGIC.
 
     alias_method :tmx_show_version, :show_version
-    def show_version
-      rs = tmx_show_version
-      if @be_verbose
-        @out.puts ::RUBY_DESCRIPTION
-      end
-      rs
-    end
-    protected :show_version
-
-    def enable_verbose
-      @y << '(verbose mode on.)'
-      @be_verbose = true
-    end
-    protected :enable_verbose
 
     on '--verbose', 'be verbose.' do
       enable_verbose
     end
 
-    story.option_parser do |o|
+    story.option_parser do |o|    # this enables the MAGIC referred to above.
       na = ::OptionParser::Switch::NoArgument.new do
         if @argv.length.zero?
           ( @queue_a ||= [ ] ) << :show_version  # graceful exit after
@@ -109,30 +97,58 @@ module Skylab::TMX
       :foo                        # a sub-command at this node.)
     end
 
-  protected
+  private
 
-    Puffer = MetaHell::Proxy::Nice.new :puff
+    def initialize( * )
+      super
+      @mechanics.is_not_puffed!
+      @be_verbose = nil
+    end
+
+    def enable_verbose
+      @y << '(verbose mode on.)'
+      @be_verbose = true
+    end
+
+    def show_version
+      rs = tmx_show_version
+      if @be_verbose
+        @out.puts ::RUBY_DESCRIPTION
+      end
+      rs
+    end
+
+    class Mechanics_ < Face::CLI_Mechanics_  # the current way to do this :/
+      def puff  # this is [#fa-038] - we get "puffed" when we need to.
+        eew = parent_shell.instance_variable_get :@be_verbose
+        @puffer ||= Puffer_[ TMX::Modules, TMX.metadata_h, sheet, @y, eew ]
+        @puffer.puff
+        is_puffed!
+      end
+    end
+
+    Puffer_ = MetaHell::Proxy::Nice.new :puff
       # it "puffs" a command node (e.g. namespace) into life as it is needed.
 
-    def Puffer.[] box_mod, metadata_h, story, y, be_verbose
+    def Puffer_.[] box_mod, metadata_h, story, y, be_verbose
       tug_ns = nil
       res = new( puff: -> do
         y << "(loading all names.)" if be_verbose
         box_mod.names.each do |name|
-          norm = name.as_slug.intern  # NOTE this is the convention
-          if false == metadata_h[ norm ]
-            y << "(disabled - #{ norm })" if be_verbose
+          norm_i = name.as_slug.intern  # NOTE this is the convention
+          if false == metadata_h[ norm_i ]
+            y << "(disabled - #{ norm_i })" if be_verbose
           else
-            story.if_element norm, nil, tug_ns
+            story.if_constituent norm_i, nil, tug_ns
           end
         end
       end )
 
       load_it = pth = nil
-      tug_ns = -> bx, norm do
-        pn = load_it[ norm ]
-        story.fetch_element norm do
-          raise ::RuntimeError, "didn't find #{ norm } ns in #{ pth[ pn ] }"
+      tug_ns = -> bx, norm_i do
+        pn = load_it[ norm_i ]
+        story.fetch_constituent norm_i do
+          raise ::RuntimeError, "didn't find #{ norm_i } ns in #{ pth[ pn ] }"
         end
       end
 
@@ -140,10 +156,10 @@ module Skylab::TMX
         pn.relative_path_from ::Skylab.dir_pathname
       end
 
-      load_it = -> norm do
+      load_it = -> norm_i do
         # we cannot use autoloader/autovivifier when the module name is in
         # scream case, which some subproduct names are, hence:
-        pn = box_mod.dir_pathname.join "#{ norm }/cli#{ Autoloader::EXTNAME }"
+        pn = box_mod.dir_pathname.join "#{ norm_i }/cli#{ Autoloader::EXTNAME }"
         if pn.exist?
           y << "(leaf - #{ pth[ pn ] })" if be_verbose
           require pn.sub_ext ''
@@ -156,20 +172,6 @@ module Skylab::TMX
         end
       end
       res
-    end
-
-    def puff  # called by the client libary when it needs everything
-      @puffer ||= Puffer[ TMX::Modules, TMX.metadata_h, self.class.story,
-        @y, @be_verbose ]
-      @puffer.puff
-      @is_puffed = true
-    end
-
-    def initialize( * )
-      super
-      @be_verbose = nil
-      @is_puffed = false
-      @all_names_are_loaded = false
     end
   end
 end

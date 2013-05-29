@@ -18,7 +18,7 @@ module Skylab::CodeMolester
 
     # `create`
     #   + `field_h`  - (exactly):
-    #                + `path`
+    #                + `directory`
     #   + `opt_h`    * (please see downstream ~Config_Controller#`create`)
     #   + `event_h`  * (idem)
 
@@ -31,8 +31,8 @@ module Skylab::CodeMolester
             raise "sanity - won't create when a cached config exists."  # #todo
           end },
         -> {
-          path, = unpack_equal field_h, :path
-          pn = ::Pathname.new( path ).join( host.config_filename )
+          directory, = unpack_equal field_h, :directory
+          pn = ::Pathname.new( directory ).join( host.config_filename )
           config = host.set_new_valid_model_instance :config,
             -> st { st.pathname = pn },
             -> c  { c },
@@ -98,7 +98,7 @@ module Skylab::CodeMolester
 
     Events::No = Model::Event.new do |num_tries, start_pn|
       "no config file in the #{ num_tries } dirs starting #{
-      }from #{ pth[ start_pn ] }"
+      }from #{ @pth[ start_pn ] }"
     end
 
     def if_config yes, no

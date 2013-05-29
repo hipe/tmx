@@ -1,7 +1,9 @@
 # modality client vs modal clients
 
+(a formal definition of `modality client` is in [#040])
+
 At the time of this writing there is an instance method
-`Face::CLI::Namespace#modal_client_for_api_call`. its purpose is to determine
+`Face::CLI_Mechanics_#api_plugin_services`. its purpose is to determine
 what the API will use during the isomorphic [#fa-015] call for its modality
 hookbacks, e.g event wiring and services.
 

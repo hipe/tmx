@@ -44,14 +44,14 @@ module Skylab
         handle o, :head, :tail, :error, :notice, :info
       end
     end
-    protected :set_path
+    private :set_path
 
     def get_path
       api [ :path, :get ] do |o|
         handle o, :path, :error, :notice
       end
     end
-    protected :get_path
+    private :get_path
 
     option_parser do |o|
       o.banner = "#{ hi 'description:' } outputs to stdout the bash #{
@@ -97,11 +97,9 @@ module Skylab
     end
 
     def handle_head e
-      @err.write "#{ invocation_str }: #{ atom e }"
+      @err.write "#{ nis }: #{ atom e }"
       nil
     end
-
-    alias_method :invocation_str, :last_child_invocation_string
 
     def atom e
       e.payload_a.fetch 0
@@ -113,24 +111,24 @@ module Skylab
     end
 
     def handle_error e
-      @err.puts "#{ invocation_str } error: #{ atom e }"
+      @err.puts "#{ nis } error: #{ atom e }"
       false
     end
 
-    def self.define_protected_method a, &b
+    def self.define_private_method a, &b
       define_method a, &b
-      protected a
+      private a
     end
 
     [ :notice, :info ].each do |event_stream_name|
-      define_protected_method "handle_#{ event_stream_name }" do |e|
-        @err.puts "#{ invocation_str } #{ event_stream_name }: #{ atom e }"
+      define_private_method "handle_#{ event_stream_name }" do |e|
+        @err.puts "#{ nis } #{ event_stream_name }: #{ atom e }"
         nil
       end
     end
 
     [ :bash, :path ].each do |event_stream_name|
-      define_protected_method "handle_#{ event_stream_name }" do |e|
+      define_private_method "handle_#{ event_stream_name }" do |e|
         @out.puts atom( e )
         nil
       end

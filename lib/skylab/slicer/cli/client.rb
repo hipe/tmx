@@ -36,7 +36,7 @@ module Skylab::Slicer
     end
 
     def on_info_message e
-      @y << "#{ last_child_invocation_string }: #{ e.payload_a.fetch 0 }"
+      @y << "#{ @mechanics.last_hot_nis }: #{ e.payload_a.fetch 0 }"
       nil
     end
   end

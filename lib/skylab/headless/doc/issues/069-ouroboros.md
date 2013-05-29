@@ -9,7 +9,7 @@ could operate as a "mode client") onto a terminal end of another
 client of the same modality. i.e. any application could be a
 sub-command in any other application.
 
-when it comes to cli, it is temptng to want to set its
+when it comes to cli, it is tempting to want to set its
 `@request_client` to the strange mc because it is after all the
 actual request clien BUT it will have no utility and just confuse
 things: Using the sub-client pattern whole-hog is untenable accross

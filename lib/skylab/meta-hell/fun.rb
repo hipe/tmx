@@ -40,11 +40,11 @@ module Skylab::MetaHell
   #
   # result is always an array of same length as `f_a`, with each element
   # either nil or the positionally corresponding actual argument. if an
-  # argument cannot be processed with this simple state machine, an argument
-  # error will be raised.
+  # argument cannot be processed with this simple state machine an argument
+  # error is raised.
   #
   # (as such, `args` of length zero always succeeds. `args` of length longer
-  # than # length of `f_a` will always raise an argument error.)
+  # than length of `f_a` will always raise an argument error.)
   #
   # NOTE that despite the flexibility that is afforded by such a signature,
   # the position of the actual arguments still is not freeform - they must

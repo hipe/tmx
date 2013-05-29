@@ -49,3 +49,23 @@ that can be reached by the same number adding itself to itself or
 multiplying itself by itself; so in this sense, four is a number whose
 degree of self-reflected-ness inside of it makes it perfect for this
 library.
+
+
+EDIT: (the below is from `pack_fields_and_options`, ancestor of
+`unpack_field_values`. and still seems somewhat relevant but not there.)
+
+experimentally many methods in the entity library take the "sacred four"
+parameters [#fa-012]. freqently requests coming in from the client will munge
+the two namespaces (one of business-level fields, (e.g "email") and the other
+of controller-level options (e.g `verbose`), however the entity library
+insists on more rigidity and structure than this.
+
+experimentally your API actions defines parameters (a.k.a fields) using
+meta-fields that tag meta-info about each field, e.g whether the field is a
+"field" field or an "option" field.
+
+So, of each field in this field box reflector, along the categories of:
+  `field` and `option`,
+when each field falls into one (or more wtf) of these two categories one hash
+is made for each category, with its names being the field name and its values
+being the field's values. result is always an array of two hashes.

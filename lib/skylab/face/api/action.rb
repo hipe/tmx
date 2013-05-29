@@ -112,23 +112,24 @@ module Skylab::Face
     #   + we mutate `param_h`
 
     o[:normalize] = -> y, param_h do
-      a = [ ]  # ( break down as needed )
       bork = -> msg do
         y << msg
         false
       end
+      a = [ ]  # ( break down as needed )
       a << -> par_h do
         miss_a = nil
         field_box.each do |nn, fld|
           instance_variable_defined? fld.as_host_ivar and fail "sanity - #{
             } ivar collision: #{ fld.as_host_ivar }"
-          v = ( par_h.delete nn if par_h and par_h.key? nn )
-          instance_variable_set fld.as_host_ivar, v
-          if fld.has_normalizer
-            v = field_normalize y, fld, v
-          end
-          ( miss_a ||= [] ) << fld if fld.is_required and v.nil?
+          vx = ( par_h.delete nn if par_h and par_h.key? nn )  # watch `vx`!
+          instance_variable_set fld.as_host_ivar, vx           # it is used
+          if fld.has_normalizer || fld.has_default             # for three
+            vx = field_normalize y, fld, vx                    # different
+          end                                                  # axes! [#034]
+          ( miss_a ||= [] ) << fld if fld.is_required and vx.nil?
         end
+
         par_h and par_h.length.nonzero? and break bork[ "undeclared #{
           }parameter(s) - (#{ par_h.keys * ', ' }) for #{ self.class }. #{
           }(declare it/them with `params` macro?)" ]
@@ -155,16 +156,22 @@ module Skylab::Face
       private :field_box
     end.call
 
-    # `field_normalize`
-    def field_normalize y, fld, x1
-      n_x = fld.normalizer_value
-      n_x == true and n_x = method( :"normalize_#{ fld.normalized_name }" )
-      ok = instance_exec y, x1, -> x2 do
-        x1 = x2
-        instance_variable_set fld.as_host_ivar, x1
-        nil
-      end, & n_x
-      x1 if ok
+    # `field_normalize` - result per [#034]
+
+    def field_normalize y, fld, vx
+      if fld.has_default && vx.nil?
+        vx = instance_variable_set fld.as_host_ivar,
+          instance_exec( & fld.default_value )
+      end
+      if fld.has_normalizer
+        true == ( n_x = fld.normalizer_value ) and n_x =
+          method( :"normalize_#{ fld.normalized_name }" )  # #todo cleanup
+        vx = instance_exec y, vx, -> good_val do
+          instance_variable_set fld.as_host_ivar, good_val
+          nil
+        end, & n_x
+      end
+      vx
     end
     private :field_normalize
 
@@ -172,26 +179,35 @@ module Skylab::Face
     # placed here because it fits in semantically with the `normalize`
     # step of the API Action lifecycle.
 
+    def self.meta_params * x_a
+      ( @_meta_param_a ||= [ ] ).concat x_a
+      nil
+    end
+
+    class << self
+      attr_reader :_meta_param_a
+      private :_meta_param_a
+    end
+
     define_singleton_method :params, & mutex[ ->( * a ) do
       # if you call this with empty `a`, it is the same as not calling it,
-      # which gives you the empty field box above.
+      # which gives you The empty field box above.
       if a.length.nonzero?
         # if it is a flat list of symbol names, that is shorthand for:
         if ! a.index { |x| ::Symbol != x.class }
-          # a.map! { |x| [ x, :a-rity, :one ] }  # #todo:during:arity
-          a.map! { |x| [ x, :required ] }
+          a.map! { |x| [ x, :arity, :one ] }
         end
-        API::Action::Param[ self, a ]
+        API::Action::Param[ self, a, _meta_param_a ]
         nil
       end
     end, :params ]
 
-    def self.flat_exponent  # [#fa-035]
-      const_get :Flat_Exponent_
-    end
-    Flat_Exponent_ = :API_Action_
+    #  ~ facet 5.6 - metastories ~  ( was [#fa-035] )
+
+    Magic_Touch_.enhance -> { API::Action::Metastory.touch },
+      [ self, :singleton, :public, :metastory ]
+
 
     FUN = ::Struct.new( * o.keys ).new( * o.values )
-
   end
 end

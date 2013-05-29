@@ -2,6 +2,8 @@ module Skylab::Cull
 
   class CLI::Actions::DataSource < CLI::Namespace
 
+    use :api
+
     option_parser do |o|
       # (ick for now this is necessary to get `aliases` working)  # #todo
     end

@@ -139,6 +139,7 @@ module Skylab::GitStashUntracked
       @param_h = { }
       self.io_adapter = build_io_adapter _, stdout, stderr
       _gsu_sub_client_init nil
+      _headless_cli_box_dsl_init
     end
 
     def api_invoke mixed_action_name, param_h

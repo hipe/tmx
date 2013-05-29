@@ -23,6 +23,22 @@ module Skylab::Headless
       end ).new @a, plugin_client
     end
 
+    def validate_plugin_client client, &err
+      ev = client.plugin_story._service_a.reduce nil do |m, svc_i|
+        if ! provides_service? svc_i
+          m ||= Plugin::Service::NameEvent.new
+          m.add host_descriptor, client, svc_i
+        end
+        m
+      end
+      if ! ev then true else
+        ( err || -> e do
+          raise Plugin::Service::NameError,
+            nil.instance_exec( & e.message_function )
+        end ).call ev
+      end
+    end
+
     def provides_service? i
       _index_for_services_for_service i
     end

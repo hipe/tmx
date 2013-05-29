@@ -387,7 +387,7 @@ module Skylab::Face::TestSupport::CLI
         expt_desc 'works'
         it does do
           c = client
-          arg1, param_h = c.run argv.dup
+          arg1, param_h = c.invoke argv.dup
           expect_no_more_output
           arg1.should eql( 'biz' )
           param_h.fetch( :merf ).should eql( :nerk )

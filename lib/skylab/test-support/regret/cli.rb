@@ -1,18 +1,11 @@
 module Skylab::TestSupport::Regret::CLI
 
-  CLI = self
-  TestSupport = ::Skylab::TestSupport
-  Face = TestSupport::Services::Face
-  Regret = TestSupport::Regret
+  Regret = ::Skylab::TestSupport::Regret
+  Face = ::Skylab::Face
 
   class Regret::CLI::Client < Face::CLI
 
     Regret::API::Conf::Verbosity[ self ]
-
-    Face::Services::Headless::Plugin::Host.enhance self do
-      service_names %i| out err pth invitation |
-    end
-
     def initialize( * )
       super
       @param_h = { }
@@ -20,12 +13,14 @@ module Skylab::TestSupport::Regret::CLI
       nil
     end
 
+    use :api, [ :last_hot, :as, :command ]
+
     option_parser do |o|
       o.separator "#{ hi 'description:' } try it on a file"
       o.on '-v', '--verbose', 'verbose. (try mutliple.)', & verbosity_opt_func
       o.on '-V', '--less-verbose', 'reduce verbosity.', &
-       deincrement_verbosity_opt_func
-      o.banner = @command.usage_line
+        deincrement_verbosity_opt_func
+      o.banner = command.usage_line
     end
 
     def doc_test path
@@ -49,7 +44,8 @@ module Skylab::TestSupport::Regret::CLI
       o.on '-n', '--dry-run', 'dry-run.' do
         @param_h[:is_dry_run] =true
       end
-      o.banner = @command.usage_line
+
+      o.banner = command.usage_line
     end
 
     def intermediates path
@@ -64,8 +60,15 @@ module Skylab::TestSupport::Regret::CLI
     def pth ; @pth end  # avoid `private attribute?` warning
 
     def invitation
-      invite_for @y, @last_normalized_child_slug
+      @mechanics.invite_for @y, @mechanics.last_hot_recursive
       nil
+    end
+
+    Face::Services::Headless::Plugin::Host::Proxy.enhance self do  # at end
+      services [ :out, :ivar ],
+               [ :err, :ivar ],
+               [ :pth, :ivar ],
+               [ :invitation ]
     end
   end
 end

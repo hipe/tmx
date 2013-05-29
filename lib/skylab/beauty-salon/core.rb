@@ -9,6 +9,7 @@ module Skylab::BeautySalon
 
   Basic = Face::Services::Basic
   MAARS = MetaHell::MAARS
+  Headless = Face::Services::Headless
 
   extend MAARS
 
@@ -18,19 +19,6 @@ module Skylab::BeautySalon
 
     def self.new *a
       const_get( :Client ).new( *a )
-    end
-  end
-
-  module Services
-
-    o = { }
-
-    o[:Headless] = -> { Face::Services::Headless }
-
-    define_singleton_method :const_missing do |i|
-
-      const_set i, o.fetch( i ).call
-
     end
   end
 end

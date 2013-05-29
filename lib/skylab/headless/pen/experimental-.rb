@@ -22,9 +22,18 @@ module Skylab::Headless
     #
 
     def initialize pen
+      @pen = -> { pen }
+      @svc_h = { }
     end
 
-    MetaHell::Function self, :build_host_proxy
+    def build_host_proxy _client  # it's just a pen. meh.
+      nil
+    end
 
+    def call_host_service _plugin_story, svc_i
+      @svc_h.fetch svc_i do |k|
+        @svc_h[ k ] = @pen[].method svc_i
+      end
+    end
   end
 end

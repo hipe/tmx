@@ -41,7 +41,7 @@ module Skylab::MetaHell::TestSupport::DSL_DSL
 
           # because this DSL generates only readers and not writers for your
           # instances, you get a public reader of the same name in your
-          # instances (not suffixe with "_value").
+          # instances (not suffixed with "_value").
 
                                              # read the value in an instance:
           Bar.new.wiz.should eql( :piz )

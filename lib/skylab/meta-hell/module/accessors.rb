@@ -50,19 +50,29 @@ module Skylab::MetaHell
 
         ivar = "@#{ meth }".intern
 
-        host_mod.send :define_method, meth do
-          if instance_variable_defined? ivar
-            instance_variable_get ivar
-          else
-            mod = FUN.resolve[ self.class, path, create_blk ]
-            if extend_blk
-              mod.module_exec( & extend_blk )  # future i am sorry
+        f = -> mod do
+          -> do
+            if instance_variable_defined? ivar
+              instance_variable_get ivar
+            else
+              md = FUN.resolve[ mod[ self ], path, create_blk ]
+              if extend_blk
+                md.module_exec( & extend_blk )  # future i am sorry
+              end
+              instance_variable_set ivar, md
             end
-            instance_variable_set ivar, mod
           end
         end
 
-        host_mod.send access, meth if access
+        if ::Class === host_mod
+          host_mod.send :define_method, meth do
+            self.class.send meth
+          end
+          host_mod.send :define_singleton_method, meth, & f[ -> x { x } ]
+          host_mod.send access, meth if access
+        else
+          host_mod.send :define_method, meth, & f[ -> x { x.class } ]
+        end
 
         nil
       end

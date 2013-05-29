@@ -2,7 +2,7 @@ module Skylab::TMX::Modules::CLI
   class CLI < Skylab::Face::CLI
     namespace :cli do
       o :pull do |op, req|
-        syntax "#{invocation_string} [opts] <source>"
+        syntax "#{ normalized_invocation_string } [opts] <source>"
         op.banner = "pull cli source code files from <source>\n#{usage_string}"
         op.on('-d', '--diff', 'Show diffs.') { req[:diff] = true }
         op.on('-n', '--dry-run', 'Dry Run.') { req[:dry_run] = true }
@@ -14,7 +14,7 @@ module Skylab::TMX::Modules::CLI
         API::Pull.run(self, source, req)
       end
       o :push do |op, req|
-        syntax "#{invocation_string} [opts] <target>"
+        syntax "#{ normalized_invocation_string } [opts] <target>"
         op.banner = "push cli source code files to <target>\n#{usage_string}"
         op.on('-d', '--diff', 'Show diffs.') { req[:diff] = true }
         op.on('-n', '--dry-run', 'Dry run.') { req[:dry_run] = true }

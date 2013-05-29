@@ -3,8 +3,10 @@ module Skylab::Headless
   module Plugin::Host::Proxy
 
     # one might want to use this because their modality client (e.g CLI)
-    # is doing cheeky magic and cannot afford to have its plublic method
-    # namespace taken up, yet still it wants the d.  this is :[#fa-010]
+    # is doing cheeky magic and cannot afford to have its method namespace
+    # (public or private) taken up, yet still it wants to appear outwardly
+    # as a plugin host. now you get @plugin_host on initialize always.
+    # this is :[#fa-010].
 
     # usage:
     #
@@ -30,10 +32,10 @@ module Skylab::Headless
     #     cli = CheekyCLI_Client.new
     #
     #     web.class.method_defined?( :plugin_host )  # => false
-    #     web.class.private_method_defined?( :plugin_host )  # => true
+    #     web.class.private_method_defined?( :plugin_host )  # => false
     #
     #     webf, clif = [ web, cli ].map do |clnt|
-    #       ph = clnt.send :plugin_host
+    #       ph = clnt.instance_variable_get :@plugin_host
     #       ph.call_plugin_host_service(
     #         ph.plugin_services._story.fetch_service( :emphasize_text ),
     #         nil, nil )
@@ -55,14 +57,19 @@ module Skylab::Headless
         client_cls.class_exec do
           cls = const_set :Plugin_Host_, ::Class.new( Pxy_ )
           Plugin::Host.enhance cls, &defn_blk
-          define_method :plugin_host do
-            @plugin_host ||= self.class.const_get( :Plugin_Host_ ).new self
-          end
-          private :plugin_host
+          def self.does_bestow_plugin_services ; true end  # meh
+          prepend OMG_
         end
         nil
       end
     end.call
+
+    module OMG_
+      def initialize( * )
+        @plugin_host = self.class.const_get( :Plugin_Host_ ).new self
+        super
+      end
+    end
 
     class Pxy_
       include Plugin::Host::InstanceMethods  # (so we can override)

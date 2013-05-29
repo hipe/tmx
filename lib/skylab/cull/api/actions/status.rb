@@ -2,7 +2,7 @@ module Skylab::Cull
 
   class API::Actions::Status < API::Action
 
-    params :do_list_file
+    params [ :do_list_file, :arity, :zero ]
 
     services :configs, [ :pth, :ingest ]
 

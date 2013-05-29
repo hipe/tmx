@@ -32,7 +32,7 @@ module Skylab::Face::TestSupport::CLI::Option
           [ :fiz, arg1 ]
         end
 
-      protected
+      private
 
         def ex arg1
           [ nil, arg1 ]  # don't stay
@@ -204,7 +204,7 @@ module Skylab::Face::TestSupport::CLI::Option
 
             def blau weeple
               @y << "wepple wopped"
-              out.puts 'weeple weeped'
+              @out.puts 'weeple weeped'
               [ :weeple, weeple ]
             end
           end

@@ -112,7 +112,7 @@ module Skylab::Headless
   # interface for being edited (* at least not as far as you know).
   #
   # conversely, Conduit's only job is to be written to, so it need not
-  # concern itself about maintaining any protected methods or complex
+  # concern itself about maintaining any private methods or complex
   # internal state that must be encapsulated.
   #
   # the separation between Story and Conduit is important - it gives us a
@@ -219,7 +219,7 @@ module Skylab::Headless
       end
       nil
     end
-    protected :add_eventpoints
+    private :add_eventpoints
 
     define_method :_add, & Plugin::Story::FUN._add
 
@@ -261,8 +261,8 @@ module Skylab::Headless
       @service_a.dup
     end
 
-    def provides_service? svc
-      @service_h.key? svc
+    def provides_service? svc_i
+      @service_h.key? svc_i
     end
 
     def fetch_service i, &blk
@@ -387,11 +387,12 @@ module Skylab::Headless
     # that this module adds, or otherwise route calls through this host
     # application for ease of customizing behavior..)
 
-  protected
-
     def is_plugin_host
       true
     end
+    # called from hacks
+
+  private
 
     # `emit_eventpoint` - note we want to keep the signature lithe and
     # minimal here. if plugins need more information about the event
@@ -559,8 +560,8 @@ module Skylab::Headless
     # ( sadly this is actually the host application validating the
     # client application. also it is just a debugging feature. )
 
-    def plugin_validate_client client, &b
-      @plugin_manager.validate_client client, &b
+    def plugin_validate_client client, &err
+      @plugin_manager.validate_client client, &err
     end
 
     # `call_plugin_host_service` - called by host services,
@@ -602,13 +603,29 @@ module Skylab::Headless
 
     # based off of a drawing we saw on wikipedia
 
+
     def self.load_for_host_application host_application, *directive_a
       pm = new host_application
       pm.init and pm.load_plugins directive_a  # NOTE result is `pm` (or ..)
     end
 
+    # ( we experiment with extrinsic / intrinsic here [#073] )
+
     def initialize host_application
-      @host_application = host_application
+      @story = nil
+      @init = -> do
+        @story and fail "sanity - already initted"
+        @story = host_application.plugin_host_story
+        true
+      end
+
+      plugin_services = nil
+      @plugin_services = -> do
+        plugin_services ||= Plugin::Host::Services.new( self, host_application )
+      end
+
+      @host_application = -> { host_application }   # ( only 1 place :/ )
+
       @a = [ ] ; @h = { }  # the plugin manager is a box.
     end
 
@@ -619,8 +636,7 @@ module Skylab::Headless
     # boolean for future-proofing.
 
     def init
-      @story = @host_application.plugin_host_story
-      true
+      @init.call
     end
 
     # `load_plugins` - this is only to be called from a module method in this
@@ -655,7 +671,7 @@ module Skylab::Headless
     # (based off of a drawing we saw on wikipedia)
 
     def plugin_services
-      @plugin_services ||= Plugin::Host::Services.new @host_application
+      @plugin_services.call
     end
     public :plugin_services  # exposed for hacking, also may be called from host
 
@@ -678,14 +694,14 @@ module Skylab::Headless
         nil
       end
     end
-    protected :available_plugin_modules
+    private :available_plugin_modules
 
     #         ~ eventpoint-related stuff happens to happen here ~
 
     def all_eventpoint_names
       @story.all_eventpoint_names
     end
-    protected :all_eventpoint_names
+    private :all_eventpoint_names
 
     # `emit_eventpoint` - a sacred cow flagship workhorse
     # if block is given, it will receive an enumerator of the non-nil
@@ -761,18 +777,27 @@ module Skylab::Headless
       end
     end
 
-    # `validate_client` - experimental & for debugging
+    # `validate_client` - called optionally from various distant upstreams.
+    # #experimental, made for catching signature mismatches early, by checking
+    # that every declared required service is provided e.g when the plugin is
+    # loaded as opposed to (actually, in addition to) when the service is
+    # requested
 
     def validate_client client, &err
-      ev = client.plugin_story.service_a.reduce nil do |m, svc_i|
+      ev = client.plugin_story._service_a.reduce nil do |m, svc_i|
         if ! @story.provides_service? svc_i
           m ||= Plugin::Service::NameEvent.new
-          m.add @host_application, client, svc_i
+          m.add @host_application[], client, svc_i
         end
         m
       end
       if ! ev then true else
-        err ||= -> e { raise instance_exec( & e.message_function ) }
+        err ||= -> e do
+          # (for now we turn the name event into a name error whose message is
+          # the one produced by the event. if you want the event then do etc.)
+          raise Plugin::Service::NameError,
+            nil.instance_exec( & e.message_function )
+        end
         err[ ev ]
       end
     end
@@ -811,10 +836,47 @@ module Skylab::Headless
 
     extend MAARS  # (so we can load Plugin::Host::Services::Chain)
 
-    def initialize host_application   # assumes `Plugin` sub-mod of its class
+    def initialize plugin_mgr, host_application
       @host_mod = host_application.class
-      @host_application = host_application
       @story = host_application.plugin_host_story
+      @host_descriptor = -> do
+        host_application.class.name
+      end
+      @build_host_proxy = -> plugin_client do
+        host_proxy_class.new plugin_client.plugin_story, host_application, self
+      end
+      @plugin_manager = -> { plugin_mgr }
+      @call_host_service = -> do
+        proximity_h = {
+          delegated: -> svc, a, b do
+            host_application.call_delegated_plugin_service svc, a, b
+          end,
+          intrinsic: -> svc, a, b do
+            host_application.call_plugin_host_service svc, a, b
+          end
+        }
+        -> pstory, service_i, a, b do
+          svc = @story.fetch_service service_i do
+            raise Plugin::Service::NameError, "what service are you #{
+              }talking about willis - no such service \"#{ service_i }\" is #{
+              }declared by the plugin host #{ @story.host_module_descriptor }"
+          end
+          if ! pstory.registered_for_service? service_i
+            raise Plugin::Service::AccessError, "the \"#{ service_i }\" #{
+              }service must be but was not registered for by the #{
+              }\"#{ pstory.local_slug }\" plugin (just add it to the #{
+              }plugin's list of desired services?)."
+          end
+          # (what could be neat is rather than doing this at runtime, make the
+          # instance methods dynamically (at plugin load time) that raise the
+          # same errors ERMAGHERD. on the flippy, this approach allows for
+          # (GULP) dynamically changing what services are registered, or some
+          # even just shotgun whitelist.)
+
+          instance_exec svc, a, b, & proximity_h.fetch( svc.proximity )
+        end
+      end.call
+      nil
     end
 
     # `provides_service?` - used in validation elsewhere
@@ -826,14 +888,21 @@ module Skylab::Headless
     # `host_descriptor` - used in error message generation elsewhere
 
     def host_descriptor
-      @host_application.class.name
+      @host_descriptor.call
     end
 
     # `build_host_proxy` - the client calls this in `load_plugin`.
-    # this is how the plugin client typically accesses host services.
+    # this is how the plugin client typically accesses host services
+    # when not thru ingested ivars.
 
     def build_host_proxy plugin_client
-      host_proxy_class.new plugin_client.plugin_story, @host_application, self
+      @build_host_proxy[ plugin_client ]
+    end
+
+    # `validate_plugin_client` - called from the client, convenience wrapper.
+
+    def validate_plugin_client client, &err
+      @plugin_manager[].validate_client client, &err
     end
 
   private
@@ -855,7 +924,6 @@ module Skylab::Headless
     # (one benefit of the former is that we get more helpful error messages
     # when we have an access error. on the other hand, the latter wouldn't
     # be so bad when you look at how we are doing it anyway below..)
-
 
     def host_proxy_class
       @host_proxy_class ||= resolve_host_proxy_class
@@ -907,37 +975,9 @@ module Skylab::Headless
     # `call_host_service` - this is expected normally to be called from host
     # proxies but here you can have it if you want. (used in #ingestion).
 
-    -> do  # `call_host_service`
-      proximity_h = nil
-      define_method :call_host_service do |pstory, service_i, a=nil, b=nil|
-        svc = @story.fetch_service service_i do
-          raise Plugin::Service::NameError, "what service are you #{
-            }talking about willis - no such service \"#{ service_i }\" is #{
-            }declared by the plugin host #{ @story.host_module_descriptor }"
-        end
-        if ! pstory.registered_for_service? service_i
-          raise Plugin::Service::AccessError, "the \"#{ service_i }\" #{
-            }service must be but was not registered for by the #{
-            }\"#{ pstory.local_slug }\" plugin (just add it to the #{
-            }plugin's list of desired services?)."
-        end
-        # what would be neat is rather than doing this at runtime, make the
-        # instance methods dynamically (at plugin load time) that raise the same
-        # errors ERMAGHERD on the flippy, this approach allows for (GULP)
-        # dynamically changing what services are registered, or some even just
-        # a shotgun whitelist.
-
-        instance_exec( svc, a, b, & proximity_h.fetch( svc.proximity ) )
-      end
-      proximity_h = {
-        delegated: -> svc, a, b do
-          @host_application.call_delegated_plugin_service svc, a, b
-        end,
-        intrinsic: -> svc, a, b do
-          @host_application.call_plugin_host_service svc, a, b
-        end
-      }
-    end.call
+    def call_host_service pstory, service_i, a=nil, b=nil
+      @call_host_service[ pstory, service_i, a, b ]
+    end
 
     def _story  # hacks only (chaining [#072])
       @story
@@ -1098,6 +1138,10 @@ module Skylab::Headless
       @service_a.dup  # a conspiring pluing manager might accidentally mutate
     end
 
+    def _service_a
+      @service_a  # but if you insist
+    end
+
     # `registered_for_service?` - used for interface validation at runtime
 
     def registered_for_service? i
@@ -1235,7 +1279,7 @@ module Skylab::Headless
       end
       pi = _load_plugin plugin_services, plugin_story
       rest_a.length.nonzero? and process_plugin_directives(
-       plugin_services, rest_a )
+        plugin_services, rest_a )
       pi
     end
 
@@ -1248,6 +1292,7 @@ module Skylab::Headless
 
     -> do  # `process_plugin_directives`
       op_h = {
+        validate_services: :plugin_validate_services,
         load_ingestions: :plugin_load_ingestions
       }
       define_method :process_plugin_directives do |svcs, i_a|
@@ -1257,6 +1302,13 @@ module Skylab::Headless
         nil
       end
     end.call
+
+    # `plugin_validate_services` (currently (from this library anyway) called
+    # only as a directive so `err` is never yet customized but it could be..)
+
+    def plugin_validate_services svcs, &err
+      svcs.validate_plugin_client self, &err
+    end
 
     def plugin_load_ingestions svcs
       @plugin_story.services.each do |nn, svc|
@@ -1281,7 +1333,7 @@ module Skylab::Headless
     def host
       @plugin_host_proxy
     end
-    protected :host  # but it is inteded to be used internally
+    private :host  # but it is inteded to be used internally
 
     # `is_plugin_host` - this is necessary for some interesting hacks
     # elsewhere. a plugin (client) can certainly be a plugin host itself!

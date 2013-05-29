@@ -25,11 +25,13 @@ module Skylab::Face::TestSupport::CLI::Namespace
       end.should raise_error( ::ArgumentError, /wrong number.+0 for 1/ )
     end
 
-    it "(note you don't have to add a block or mod, it will bork later)" do
+    it "you have to provide a block or a function when you call `namespace`" do
       kls = Sandbox.produce_subclass
-      kls.class_exec do
-        namespace :foo
-      end
+      -> do
+        kls.class_exec do
+          namespace :foo
+        end
+      end.should raise_error( /must have exactly 1.+function.+or.+block/i )
     end
 
     context "namespace as block" do

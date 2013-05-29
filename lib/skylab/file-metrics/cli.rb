@@ -4,9 +4,11 @@ module Skylab::FileMetrics
 
     extend ::Skylab::Autoloader
 
+    use [ :last_hot, :as, :command ]
+
     # lost indent
       def op_common_head
-        op = @command.op
+        op = command.op
 
         req = ( @param_h ||= { } )
 
@@ -161,9 +163,9 @@ module Skylab::FileMetrics
 
       def op_common_tail
         # massive but semi-elegant hack, #goof-on wheel greasing.
-        Headless::Services::String::Lines::Consumer @command.op.banner do |y|
+        Headless::Services::String::Lines::Consumer command.op.banner do |y|
           y << ''
-          @command.usage y
+          command.usage y
           y << "\n#{ hi 'options:' }\n"
         end
         nil

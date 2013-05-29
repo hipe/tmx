@@ -9,12 +9,12 @@ module Skylab::Treemap::TestSupport::CLI
     num_streams 2  # (hack to get debug! compat)
 
     it "is available under the 'tmx' executable" do
-      tmx_cli.run ['-h']
+      tmx_cli.invoke ['-h']
       serr.scan( /^ +treemap\b/ ).length.should eql( 1 )
     end
 
     it "lists render in the help screen" do
-      tmx_cli.run ['treema', '-h']
+      tmx_cli.invoke ['treema', '-h']
       scn = ::StringScanner.new serr
       scn.skip_until( /\nactions:\n/ ) or
         fail 'failed to find "actions:" section'

@@ -10,10 +10,14 @@ module Skylab::TestSupport::Regret::API
              [ :invitation ]
 
     params :path, v.param( :vtuple ),
-           [ :is_dry_run ],
-           [ :do_preview ]
+           [ :is_dry_run, :arity, :zero_or_one ],
+           [ :do_preview, :arity, :zero_or_one ]
 
     def execute
+      host.invitation
+      $stderr.puts "HAPPY EXIT?" ; exit 0
+
+
       r = -> do
         wlk = @wlk = API::Support::Tree::Walker.new @path, -> e do
           if @vtuple[ e.volume ]
