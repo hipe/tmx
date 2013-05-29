@@ -64,7 +64,9 @@ class Skylab::Test::Plugins::Divide
       validate = -> do
         ok = true
         if ! argv then [ nil, nil ] else
-          integer, kw = MetaHell::FUN.free_parse[ argv,
+          integer, kw = MetaHell::FUN._parse_series[ argv,
+            [ -> x { /\A\d+\z/ =~ x },
+              -> x { /\A[a-z]+\z/i =~ x } ],
             -> e do
               if ok # only once
                 err.puts "expecting arguments [ <integer> ] [ random ]"
@@ -72,9 +74,6 @@ class Skylab::Test::Plugins::Divide
               ok = false
               err.puts e.message_function.call
             end,
-            [ :integer, :kw ],
-              integer: -> x { /\A\d+\z/ =~ x },
-              kw: -> x { /\A[a-z]+\z/i =~ x }
           ]
           if ok
             if kw

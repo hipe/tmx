@@ -11,10 +11,6 @@ module Skylab::Headless
       (?<no>\d+) : in [ ] ` (?<meth>[^']+) '
     \z/x
 
-  o[:require_quietly] = -> s do   # Useful to load libraries that are not
-    FUN.quietly { require s }     # warning friendly
-  end
-
   #         ~ functions that pertain to the underlying system ~
 
   o[:home_directory_path] = -> do
@@ -28,10 +24,9 @@ module Skylab::Headless
   FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v }
 
   def FUN.quietly                 # break the convention for readability :/
-    v = $VERBOSE
-    $VERBOSE = nil
+    x = $VERBOSE ; $VERBOSE = nil
     r = yield                     # catching / ensure is beyond this scope
-    $VERBOSE = v
+    $VERBOSE = x
     r
-  end
+  end                             # but [#mh-028] does it all
 end

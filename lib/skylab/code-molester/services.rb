@@ -21,7 +21,7 @@ module Skylab::CodeMolester
     o :StringScanner, -> { require 'strscan'  ; ::StringScanner }
 
     o :Treetop,       -> do
-                           Headless::FUN.require_quietly[ 'treetop' ]
+                           MetaHell::FUN.require_quietly[ 'treetop' ]
                                                 ::Treetop
                          end
 

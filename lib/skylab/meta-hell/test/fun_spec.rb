@@ -10,12 +10,13 @@ describe "Skylab::MetaHell::FUN" do
   end
 
   def parse *args
-    MetaHell::FUN.parse[ h, args, * op_a ]
+    f_a = op_a.map { |i| h.fetch i }
+    MetaHell::FUN.parse_series[ args, * f_a ]
   end
 
-  context "`parse`" do
+  context "`parse_series`" do
 
-    m_f = [:m, :f]
+    m_f = %i( m f )
 
     h( age: -> x { ::Numeric === x },
        sex: -> x { m_f.include? x },

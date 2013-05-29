@@ -20,49 +20,61 @@ module Skylab::MetaHell
     -> { use.call }             # the first time you called it. please be
   end                           # careful.
 
-  # `parse` - For a formal parameter syntax that is made up of one or more
-  # contiguous optional arguments, and we want to determine which actual
+  o[:without_warning] = -> f do
+    x = $VERBOSE; $VERBOSE = nil
+    r = f.call                   # `ensure` is out of scope for now
+    $VERBOSE = x
+    r
+  end
+
+  o[:require_quietly] = -> s do   # load a library that is not warning friendly
+    o[:without_warning][ -> { require s } ]
+  end
+
+  # `parse_series` - For a formal parameter syntax that is made up of one or
+  # more contiguous optional arguments, and we want to determine which actual
   # parameters correspond to which formal parameters not in the usual ruby
   # left-to-right way, but via functions, one function per formal argument
   # (imagine a syntax `[age] [sex] [location]` with its seven possible
-  # signatures); parse actual args `args` using functions in hash `h`
-  # in order `op_a`. Result is always an array of same length as `op_a`
-  # with each element either nil or the positionally corresponding actual
-  # argument. if an argument cannot be processed with the simple state
-  # machine that is created by `h` and `op_a` an argument error will be raised.
-  # `args` of length zero always succeeds. `args` of length longer
-  # than length of `op_a` will always raise an argument error.
+  # signatures); parse actual args `args` using the functions in `f_a`.
   #
-  # NOTE that despite the flexibility that is afforded by such a signature
+  # result is always an array of same length as `f_a`, with each element
+  # either nil or the positionally corresponding actual argument. if an
+  # argument cannot be processed with this simple state machine, an argument
+  # error will be raised.
+  #
+  # (as such, `args` of length zero always succeeds. `args` of length longer
+  # than # length of `f_a` will always raise an argument error.)
+  #
+  # NOTE that despite the flexibility that is afforded by such a signature,
   # the position of the actual arguments still is not freeform - they must
-  # occur in the same order with respect to each other as they occur
-  # in the formal arguments.
+  # occur in the same order with respect to each other as they occur in the
+  # formal arguments. such a grammar would be possible but is beyond this
+  # scope (tracked by [#mh-027]).
 
-  o[:parse] = -> h, args, *op_a do
-    o[:free_parse][ args,
-      -> e do
-        raise ::ArgumentError, e.message_function.call
-      end,
-      op_a, h ]
+  o[:parse_series] = -> args, *f_a do
+    o[:_parse_series][ args, f_a, -> e do
+      raise ::ArgumentError, e.message_function.call
+    end ]
   end
 
-  Free_Parse_Failure_ = ::Struct.new :message_function, :index, :value
+  Parse_Series_Failure_ = ::Struct.new :message_function, :index, :value
 
-  o[:free_parse] = -> args, err, order_a, h do
+  o[:_parse_series] = -> args, f_a, err do
     # a = actual  f = formal  i = index  z = length
-    ai = fi = 0 ; az = args.length ; fz = order_a.length
+    ai = fi = 0 ; az = args.length ; fz = f_a.length
     res = ::Array.new fz
     while ai < az
       v = args[ai]
       stay = true
       begin
         if fi == fz
-          err[ Free_Parse_Failure_[
+          err[ Parse_Series_Failure_[
             -> { "unrecognized argument at index #{ ai } - #{ v.inspect }" },
             ai, v ] ]
           break  # sure, let them have whatever was completed.
         end
-        if h[ order_a[fi] ][ v ]
+        if f_a.fetch( fi ).call( v )
           res[fi] = v
           stay = false
         end

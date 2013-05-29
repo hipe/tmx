@@ -150,10 +150,10 @@ module Skylab::Headless
     end
 
     -> do  # `s`
-      h = { symbol: -> x { x.respond_to? :id2name },
-            numeric: -> x { ! x.respond_to? :id2name } } # defer it
       o[:s] = -> * args do  # [length] [lexeme_sym]
-        numerish, lexeme_sym = MetaHell::FUN.parse[ h, args, :numeric, :symbol ]
+        numerish, lexeme_sym = MetaHell::FUN.parse_series[ args,
+          -> x { ! x.respond_to? :id2name }, # defer it
+          -> x { x.respond_to? :id2name } ]
         lexeme_sym ||= :s  # when `numerish` is nil it means "use memoized"
         instance_exec numerish, -> num do
           fun[].s[ num, lexeme_sym ]

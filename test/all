@@ -2,7 +2,7 @@
 
 require_relative '../lib/skylab'
 require 'skylab/face/core'      # `pretty_path`, Tableize::I_M
-require 'skylab/headless/core'  # only for require_quietly
+require 'skylab/headless/core'  # plugin API
 require 'optparse'
 
 module Skylab::Test
@@ -1608,7 +1608,7 @@ module Skylab::Test
 
     def req
       _req -> do
-        Headless::FUN.require_quietly[ 'rspec' ] unless defined? ::RSpec
+        MetaHell::FUN.require_quietly[ 'rspec' ] unless defined? ::RSpec
           # without this, quickie runs the tests.
       end, -> { }
     end
