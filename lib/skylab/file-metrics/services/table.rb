@@ -142,8 +142,8 @@ module Skylab::FileMetrics
         end
       end
 
-      def bake_manifold out, max_a
-        Manifold_.new self, out, max_a
+      def bake_manifold out, col_width_a
+        Manifold_.new self, out, col_width_a
       end
 
       class Manifold_
@@ -159,7 +159,7 @@ module Skylab::FileMetrics
           end
         end
 
-        def initialize design, out, max_a
+        def initialize design, out, col_width_a
           y = if ! out.respond_to? :puts then out else
             ::Enumerator::Yielder.new { |line| out.puts line }
           end
@@ -172,18 +172,17 @@ module Skylab::FileMetrics
 
           cook = -> idx, align do
             sgn = sign[ align ]
-            fmt = "%#{ sgn }#{ max_a.fetch idx }s"
+            fmt = "%#{ sgn }#{ col_width_a.fetch idx }s"
             -> str do
               fmt % str
             end
           end
 
-          mtx = nil
+          seplen = sep.length
 
           cook_autonomous = -> idx, align, fld do
             if fld.is_autonomous
-              mtx ||= Metrics_[ max_a, sep ]
-              fld.cook[ mtx.max_a, mtx.sep.length ]
+              fld.cook[ col_width_a, seplen ]
             else
               cook[ idx, align ]
             end
@@ -221,8 +220,6 @@ module Skylab::FileMetrics
           end
         end
       end
-
-      Metrics_ = ::Struct.new :max_a, :sep
 
       attr_reader :sep
 

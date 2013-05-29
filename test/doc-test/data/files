@@ -1,4 +1,5 @@
 lib/skylab/basic/pathname/union.rb
+lib/skylab/face/cli/lipstick.rb
 lib/skylab/meta-hell/dsl-dsl.rb
 lib/skylab/meta-hell/function.rb
 lib/skylab/test-support/regret/api/actions/doc-test.rb

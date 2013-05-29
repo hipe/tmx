@@ -172,17 +172,22 @@ module Skylab::FileMetrics
 
     Lipstick = Face::CLI::Lipstick.new '+', :green, -> { 80 }
 
-    module Lipstick
+    class Lipstick::Class_
 
-      class Class_ < Face::CLI::Lipstick::Class_
-
-        def field_h  # (legacy interface)
-          @field_h ||= {
-            header: '',
-            is_autonomous: true,
-            cook: method( :cook )
-          }
-        end
+      def field_h
+        @field_h ||= {
+          header: '',
+          is_autonomous: true,
+          cook: -> col_width_a, seplen do
+            # (our rendering function takes a proxy, and the upstream rendering
+            # function take a normalized float)
+            f = cook_rendering_function col_width_a, nil, seplen
+              # `nil` - use ncurses to determine screen width
+            -> scalar_pxy do
+              f[ scalar_pxy.normalized_scalar ]
+            end
+          end
+        }
       end
     end
   end

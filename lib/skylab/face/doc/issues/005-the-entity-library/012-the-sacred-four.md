@@ -31,7 +31,7 @@ for the options, and well as any structure grammar.
 On the app side, however, we as the framework *must* not assign special
 meaning to the business-level fields' name or composition, duh.
 
-### the output parameters are prefect
+### the output parameters are perfect
 
 One nice thing about the output parameters is that if we follow the
 convention, the user always knows what the end result is of the

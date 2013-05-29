@@ -1,6 +1,6 @@
 [#028]       #tracking-tag `without_warning`
 [#027]       a freeform `parse_series`? basically like minimal packrat parser
-[#026]       tuple tower defined ..
+[#026]       #doc-point "tuple tower" defined ..
 [#025]       #doc-point #parent:024 #body-is-inline-in-parent
                `formal` defined informally.
 [#024]       #doc-node #body-is-inline-in-code:"formal/attribute.rb"
@@ -9,7 +9,7 @@
 [#022]       #tracking-tag boxxy's relationship to a.l
 [#021]       #tracking-tag, #doc-point `base_args` / `base_init`: this
                is an experiment in initting a blank-slate 'dupe'-ish subset.
-[#020] #open box instance methods separate from box class maybe?
+[#020]       #done box instance methods separate from box class maybe?
 [#019]       #done boxxy peeks at fs now, hacks `constants`
 [#018]       #done corral proxies
 [#017]       #done corral tees

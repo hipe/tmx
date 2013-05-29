@@ -1,3 +1,8 @@
+[#009] #idea imagine a facility that let you see every occurence of a
+             semantic construct (like initializing a class with a certain
+             local name, or including a module statically in a class) and
+             displaying its frequency over time. rename this project
+             `meta-metrics`!
 [#008]       #wormhole
 [#007]       #doc-point - during tests, we physically `cd` into (whererver)
                because although ugly, we *really* like the simplicity of

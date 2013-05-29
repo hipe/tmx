@@ -1,5 +1,9 @@
 [#035]       #tracking-tag #experiment with a `unary` discrete categorization
                for our main 3 classes (for which we make two exponents) ..
+[#034]       #doc-point the magical significance of nil ..
+               #smell-tracker
+[#033]       #doc-point #parent:019
+               all about entity-level default fields ..
 [#032]       #tracking-tag i will call it "graded verbosity"
 [#031]       #doc-point trending away from the subclient pattern? ..
 [#030]       #doc-point #parent:013 #body-is-inline-in-parent
@@ -14,8 +18,6 @@
                the facet's `enhance` API
 [#025]       #doc-node #parent:022 facets introduced ..
 [#024]       #doc-node #parent:013 arity as it pertains to meta-fields ..
-[#024]       #smell-tracker let's fix this nil / false / not present thing
-               #COLLISION
 [#023]       #doc-point #parent:007
                the API action formal parameters formal structure syntax ..
 [#022]       #doc-point #parent:007 the API API
