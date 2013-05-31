@@ -1,3 +1,4 @@
+[#036] #todo replace universe with `tableize` with `tablify`
 [#035]       #tracking-tag #experiment with a `unary` discrete categorization
                for our main 3 classes (for which we make two exponents) ..
 [#034]       #doc-point the magical significance of nil ..

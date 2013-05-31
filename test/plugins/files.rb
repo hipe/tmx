@@ -3,22 +3,20 @@ module Skylab::Test
   module Plugins::Files
 
     Headless::Plugin.enhance self do
+
       eventpoints %i|
         available_actions
         action_summaries
         available_options
         conclude
       |
-      service_names %i|
-        paystream
-        hot_spec_paths
-      |
+
+      services :paystream, :hot_spec_paths,
+        [ :pretty_path, :ingest ]
     end
   end
 
   class Plugins::Files::Client
-
-    include CLI::SubClient::InstanceMethods
 
     def initialize
       @do_pretty = @be_verbose = @did_run = nil
@@ -49,7 +47,7 @@ module Skylab::Test
 
       block = if @do_pretty
         -> spec_path do
-          paystream.puts pretty_path( spec_path )
+          paystream.puts @pretty_path[ spec_path ]
         end
       else
         -> spec_path do

@@ -1,15 +1,20 @@
 module Skylab::Test
 
-  # `Subtree` plugin - experimentally, this is more like an "extension".
-  # this whole app is basically useless without it, but we put it down
-  # here as an exercize in compartmentalization. `Subtree` manages determining
-  # the tree of tests to run, and paring down the tree with any options
-  # provided.  (in fact, `Subtree` itself will have plugin modules that
-  # themselves provide different such options.)
+  # `Subtree` plugin - experimentally, this is more like an "extension"
+  # (as it might be called in mozilla culture.) this whole app is basically
+  # useless without it, but we put it down here as an exercize in
+  # compartmentalization. other plugins may rely on this plugin without
+  # knowing it (the not knowing it is important!).
+  #
+  # `Subtree` manages determining the tree of tests to run, and paring down
+  # the tree with any options provided. (in fact, `Subtree` itself will have
+  # plugin modules that themselves provide different such options! plugins
+  # for plugons omg two levels! (relax it's just a tree))
 
   module Plugins::Subtree
 
     Headless::Plugin.enhance self do
+
       eventpoints %i|
         available_options
         argument_list
@@ -17,10 +22,10 @@ module Skylab::Test
         conclude
       |
 
-      service_names %i|
-        infostream
-        info_y
-      |
+      services [ :em, :ingest ],
+        :infostream,
+        :info_y,
+        [ :pretty_path, :ingest ]
 
       plugin_services %i|
         hot_spec_paths
@@ -30,9 +35,6 @@ module Skylab::Test
   end
 
   class Plugins::Subtree::Client
-
-    # this is becoming more of a heavily relied-upon extension than just
-    # # (more of a heavily depended upon extension)
 
     Headless::Plugin::Host.enhance self do
 
@@ -54,11 +56,14 @@ module Skylab::Test
       |
 
       service_names %i|
+        em
         sort_mutex
+        pretty_path
       |
+
     end
 
-    include Host_InstanceMethods
+    include Host_InstanceMethods  # `merge_options`
 
     available_options do |o, ctx_a|
       ctx_a ||= [ ]
@@ -80,13 +85,20 @@ module Skylab::Test
       emit_eventpoint( :conclude, y ).nonzero? || nil
     end
 
+  private
+
+    # ~ in vaguely narrative pre-order with occasional aesthetic pyramiding ~
+    # ~ from the simplest of upstream targets: `files` ~
+
     def initialize( * )
       super
       @sort_mutex = nil
     end
 
-    # ~ in vaguely narrative pre-order with occasional aesthetic pyramiding ~
-    # ~ from the simplest of upstream targets: `files` ~
+    def _ingest_hack
+      Ingest_Hack_[ self ]
+    end
+    public :_ingest_hack
 
     # `hot_spec_paths` - implement the (plugin) service that is kind of
     # the central workhorse of this whole nerk.
@@ -139,7 +151,6 @@ module Skylab::Test
         r
       end
     end
-    protected :hot_subtree
 
     -> do  # `all_subproducts`
 
@@ -158,7 +169,6 @@ module Skylab::Test
         end
       end
     end.call
-    protected :all_subproducts
 
     def build_aggregated_agent( *func_a )
       a = [ ]
@@ -320,8 +330,6 @@ module Skylab::Test
 
       rx = %r|\G[-a-z0-9]+(?=/)|
       build_cache_h = -> do
-        require 'skylab/test-support/fun'
-        # #todo:during:5
         a = ::Pathname.glob ::Skylab.dir_pathname.join(
           "*/test/**/*#{ ::Skylab::TestSupport::FUN._spec_rb[] }" )
         offset = ::Skylab.dir_pathname.to_s.length + 1
@@ -415,13 +423,11 @@ module Skylab::Test
         @be_verbose ||= nil
         nil
       end
-      protected :activate
 
       def activate_verbose
         @be_verbose = true
         @ignored_spec_count = 0
       end
-      protected :activate_verbose
 
       compile do |y|
         if @is_hot
@@ -531,7 +537,6 @@ module Skylab::Test
         @is_hot = true
         nil
       end
-      protected :activate
 
       compile do |y|
         _compile y if @is_hot  # because compile is called whether hot or not
@@ -551,7 +556,6 @@ module Skylab::Test
         end
         nil
       end
-      protected :_compile
 
       is_active_boolean_agent do
 
@@ -632,13 +636,14 @@ module Skylab::Test
 
       # pattern-based whitelisting
 
-      include CLI::SubClient::InstanceMethods
-
       def initialize
         @is_hot = nil
       end
 
       Headless::Plugin.enhance self do
+
+        services [ :pretty_path, :ingest ]
+
         eventpoints %i|
           available_options
           compile
@@ -669,7 +674,6 @@ module Skylab::Test
         @substring_a = [ ]
         nil
       end
-      protected :activate
 
       compile do |y|
         @be_verbose ||= nil
@@ -685,7 +689,7 @@ module Skylab::Test
       # `pass` - see parent class
 
       def pass sp, pn
-        str = pretty_path( pn ).to_s
+        str = @pretty_path[ pn ]
         ok = ! @substring_a.index do |s|
           ! str.include?( s )
         end
@@ -846,7 +850,6 @@ module Skylab::Test
         false
       end
     end
-    protected :_sort
   end
 
   class Plugins::Subtree::Agent::Randomize

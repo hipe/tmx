@@ -1,8 +1,15 @@
 #!/usr/bin/env ruby -w
 
+if (( idx = ::ARGV.index '--coverage' ))
+  require_relative 'plugins/coverage/manager'  # see comments here
+  ok, res = ::Skylab::Test::Plugins::Coverage::Manager.instance.start(
+    ::Enumerator::Yielder.new { |m| $stderr.puts m }, ::ARGV, idx )
+  ok or exit res
+end
+
 require_relative '../lib/skylab'
 require 'skylab/face/core'      # `pretty_path`, Tableize::I_M
-require 'skylab/headless/core'  # plugin API
+require 'skylab/test-support/core'  # headless plugin API, `_spec_rb`
 require 'optparse'
 
 module Skylab::Test
@@ -13,12 +20,11 @@ module Skylab::Test
 
   extend MetaHell::MAARS
 
-  module Core  # `Headless`
+  module Plugins
+    extend MetaHell::MAARS  # only necessary b.c of coverage mgr
   end
 
-  class Core::Client
-
-    # (nothing public declared.)
+  class Core_Client  # a "headless" client, conceptually
 
     Headless::Plugin::Host.enhance self do
       add_plugins_box_module Test::Plugins
@@ -30,21 +36,26 @@ module Skylab::Test
         argv_hijinx
         argument_list
         ready
+        subtree
         conclude
       |
       service_names %i|
-        infostream
-        info_y
-        paystream
+        em
         full_name
-        run_mode
         full_program_name
+        info_y
+        infostream
+        paystream
+        pretty_path
+        run_mode
       |
       services_delegated_to :subtree, %i|
         hot_spec_paths
         hot_subtree
       |
     end
+
+  private
 
     def initialize
       @queue_a = []
@@ -53,49 +64,75 @@ module Skylab::Test
     # `full_name` - a service provided by this host
 
     def full_name
+      self.class.full_name
+    end
+
+    def self.full_name
       #  program_name   # why do this when you could ..
       @full_name ||= ::Pathname.new( __FILE__ ).expand_path.relative_path_from(
         ::Skylab.dir_pathname.dirname.dirname ).to_s
     end
   end
 
-  class CLI < Core::Client  # ( re-opened below )
+  module Host_InstanceMethods  # (re-opened below)
   end
 
-  module CLI::SubClient
-  end
+  class CLI < Core_Client  # (separation of concerns)
 
-  module CLI::SubClient::InstanceMethods
+    include Host_InstanceMethods
 
-    include Face::CLI::Tableize::InstanceMethods
-
-  protected
-
-    def em s
-      "\e[1;32m#{ s }\e[0m"
-    end
-
-    define_method :pretty_path, & Headless::CLI::PathTools::FUN.pretty_path
-
-  end
-
-  module CLI::Client_InstanceMethods
-
-    include CLI::SubClient::InstanceMethods
-
-    # (nothing public declared.)
-
-  protected
-
-    def initialize o = $stdout, e = $stderr
+    def initialize _, sout, serr
       super( )
+      @action_a = nil
       @emit = -> type, str do
-        ( :payload == type  ? o : e ).puts str
+        ( :payload == type  ? sout : serr ).puts str
       end
-      @paystream, @infostream = o, e
+      @paystream, @infostream = sout, serr
       @info_y = ::Enumerator::Yielder.new do |message_string|
         @infostream.puts message_string
       end
+      @em = -> s { "\e[1;32m#{ s }\e[0m" }
+      @pretty_path = Headless::CLI::PathTools::FUN.pretty_path
+      nil
+    end
+
+    def invoke argv
+      begin
+        load_plugin_modules
+        Ingest_Hack_[ self ]
+        @argv = argv
+        r = resolve_queue or break
+        r = ready or break
+        while tok = @queue_a.shift  # not using reduce b.c 1 stack frame
+          action = action_a.detect { |a| a.normalized_local_name == tok }
+          if action
+            plugin_validate_client action.client
+            r = action.client.send action.as_method
+            if false == r
+              break  # meh
+            else
+              emit_eventpoint_to_each_client :conclude do |client|
+                ::Enumerator::Yielder.new do |msg|
+                  @info_y << "(#{ client.plugin_slug } plugin #{ msg })"
+                  nil
+                end
+              end
+            end
+          else
+            send tok  # e.g 'help'
+          end
+        end
+      end while nil
+      r
+    end
+
+  private
+
+    def load_plugin_modules
+      ::Dir[ "#{ Test::Plugins.dir_pathname }/*.rb" ].each do |path|
+        require path
+      end
+      nil
     end
 
     def emit type, data
@@ -112,7 +149,13 @@ module Skylab::Test
       nil
     end
 
-    attr_reader :infostream, :paystream, :info_y  # service_names
+    # (the below group is services. doing it this way and not with
+    # `attr_reader` creates good warnings and avoids dumb ones.)
+
+    def info_y     ; @info_y end
+    def infostream ; @infostream end
+    def paystream  ; @paystream end
+    def em  s      ; @em[ s ] end
 
     def option_parser
       @option_parser ||= build_option_parser
@@ -140,72 +183,27 @@ module Skylab::Test
       "#{ em 'Usage:' } #{ option_parser.program_name } [opts] #{
         }[[#{ action_names * '|' }] [..]] [subproduct [subproduct [..]]]"
     end
-  end
-
-  module Host_InstanceMethods  # (re-opened below)
-  end
-
-  class CLI < Core::Client
-
-    include CLI::Client_InstanceMethods
-    include Host_InstanceMethods
-
-    def initialize
-      super
-      @action_a = nil
-    end
-
-    def invoke argv
-      load_plugins
-      r = nil
-      begin
-        @argv = argv
-        r = resolve_queue or break
-        r = ready or break
-        while tok = @queue_a.shift  # not using reduce b.c 1 stack frame
-          action = action_a.detect { |a| a.normalized_local_name == tok }
-          if action
-            plugin_validate_client action.client
-            r = action.client.send action.as_method
-            if false == r
-              break  # meh
-            else
-              emit_eventpoint_to_each_client :conclude do |client|
-                ::Enumerator::Yielder.new do |msg|
-                  @info_y << "(#{ client.plugin_slug } plugin #{ msg })"
-                end
-              end
-            end
-          else
-            send tok  # e.g 'help'
-          end
-        end
-      end while nil
-      r
-    end
-
-    def load_plugins
-      ::Dir[ "#{ Test::Plugins.dir_pathname }/*.rb" ].each do |path|
-        load path
-      end
-      nil
-    end
-    private :load_plugins
 
     def ready
+
       ok = true
-      emit_eventpoint_to_each_client :ready do |client|
+
+      f = -> client do
         ::Enumerator::Yielder.new do |msg|
           ok = false
           @info_y << "#{ client.plugin_slug } #{ msg }"
         end
       end
+
+      emit_eventpoint_to_each_client :ready, & f
+
+      emit_eventpoint_to_each_client :subtree, & f
+
       if ok then ok else
         @info_y << "won't procede further because of the above."
         false
       end
     end
-    protected :ready
 
     # `resolve_queue` - test/all is expected to be run for at least two
     # purposes - 1) it is a file we can load with `rspec` and have it load
@@ -310,7 +308,6 @@ module Skylab::Test
     def plugin_slug  # - because we add self to merged o.p
       program_name
     end
-    public :plugin_slug
 
     def action_names
       @action_names ||= action_a.map( & :slug )
@@ -378,7 +375,7 @@ module Skylab::Test
 
     # because we are crazy and we have plugins with plugins ..
 
-  protected
+  private
 
     # `merge_options` - comprehend over all plugins and hack an
     # aggregate option parser.
@@ -420,6 +417,22 @@ module Skylab::Test
       end
     end
   end
+
+  Ingest_Hack_ = -> host do  # #todo:during:6
+    host.instance_exec do
+      plugin_manager.hot_plugins.each do |pi|
+        h = pi.plugin_story.instance_variable_get( :@service_h )
+        pi.plugin_story.services.each do |se|
+          if ( svc = h.fetch( se ) ).do_ingest
+            pi.instance_variable_set svc.ingest_to_ivar,
+              ( instance_variable_get svc.ingest_to_ivar )
+          end
+        end
+        pi.respond_to?( :_ingest_hack ) and pi._ingest_hack
+      end
+    end
+    nil
+  end
 end
 
-Skylab::Test::CLI.new.invoke ARGV
+Skylab::Test::CLI.new( $stdin, $stdout, $stderr ).invoke ARGV

@@ -6,6 +6,7 @@ module Skylab::Test
     # stick until [#hl-070-002] we design something better.
 
     Headless::Plugin.enhance self do
+
       eventpoints %i|
         available_actions
         action_summaries
@@ -13,18 +14,13 @@ module Skylab::Test
         default_action
       |
 
-      service_names %i|
-        infostream
-        full_name
-        run_mode
-        hot_spec_paths
-      |
+      services :infostream, :full_name, :run_mode, :hot_spec_paths,
+        [ :em, :ingest ]
+
     end
   end
 
   class Plugins::Req::Client
-
-    include CLI::SubClient::InstanceMethods
 
     def initialize
       @be_verbose = nil
@@ -86,7 +82,7 @@ module Skylab::Test
         v or info.write '('
         cache_a.each do |p|
           if v
-            info.puts "   #{ em '>>>' } #{ p }"
+            info.puts "   #{ @em[ '>>>' ] } #{ p }"
           else
             info.write '.'
           end

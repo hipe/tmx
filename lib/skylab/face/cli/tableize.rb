@@ -6,7 +6,7 @@ module Skylab::Face
 
   module CLI::Tableize::InstanceMethods
 
-    # `tableize` - deprecated for `tablify`
+    # `tableize` - deprecated for `tablify` [#fa-036]
 
     def tableize rows, opts = {}, &line_f
       opts = { show_header: true }.merge(opts)

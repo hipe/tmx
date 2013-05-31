@@ -680,7 +680,7 @@ module Skylab::Headless
     def validate_client client, &err
       ev = client.plugin_story.service_a.reduce nil do |m, svc_i|
         if ! @story.has_service? svc_i
-          m ||= Plugin::Service::NameEvent
+          m ||= Plugin::Service::NameEvent.new
           m.add @host_application, client, svc_i
         end
         m
