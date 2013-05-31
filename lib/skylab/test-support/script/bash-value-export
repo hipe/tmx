@@ -1,0 +1,7 @@
+#! /usr/bin/env ruby -w
+
+# make whatever we need visible from bash
+
+require_relative '../fun'
+
+$stdout.puts "_spec_rb=\"#{ ::Skylab::TestSupport::FUN._spec_rb[] }\""

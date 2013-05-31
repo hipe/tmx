@@ -1,6 +1,6 @@
 require_relative '..'
-require 'skylab/headless/core' # haha the triad is here
-require 'skylab/porcelain/core' # wicked old ways
+require 'skylab/test-support/core'  # and headless
+require 'skylab/porcelain/core'  # wicked old ways
 
 module Skylab::CovTree
 
@@ -10,6 +10,7 @@ module Skylab::CovTree
   MetaHell     = ::Skylab::MetaHell
   Porcelain    = ::Skylab::Porcelain # legacy.rb, TiteColor, Tree
   PubSub       = ::Skylab::PubSub
+  TestSupport  = ::Skylab::TestSupport  # `_spec_rb`
 
   extend MetaHell::Autoloader::Autovivifying::Recursive # we use Svcs now below
 
@@ -34,10 +35,12 @@ module Skylab::CovTree
     out.join ''
   end
 
+  srbg = "*#{ TestSupport::FUN._spec_rb[] }"
+
   globs = o[:globs] = {
     'features' => '*.feature',
-    'spec'     => '*_spec.rb',
-    'test'     => '*_spec.rb'
+    'spec'     => srbg,
+    'test'     => srbg
   }
 
   o[:stop_rx] = Headless::CLI::PathTools::FUN.stop_rx   # matches root pathnames meh

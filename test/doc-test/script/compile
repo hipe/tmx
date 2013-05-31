@@ -6,6 +6,9 @@ if [[ ! -d "$datadir" ]] ; then
   exit 1
 fi
 
+eval $( "lib/skylab/test-support/script/bash-value-export" )
+  # the above sets `_spec_rb`
+
 cat "$datadir/files" | while read line
 do
   if [[ ! -e "$line" ]] ; then
@@ -14,7 +17,7 @@ do
     haha=$( ruby -e "a = \"$line\".split( '/' ) ; puts \"#{a[2]} #{ a[3..-1].join('/')[ 0..-4 ]}\"" )
     read r1 r2 <<<$(IFS=' '; echo "$haha")
     i="tmx regret doc-test -vv $line"
-    o="lib/skylab/$r1/test/${r2}_spec.rb"
+    o="lib/skylab/$r1/test/$r2$_spec_rb"
     _cmd="$i > $o"
     eval "$i" > "$o"
   fi
@@ -22,4 +25,3 @@ done
 
 me="test/doc-test/script/compile: "
 echo "${me}done."
-

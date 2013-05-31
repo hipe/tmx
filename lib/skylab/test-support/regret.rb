@@ -82,7 +82,7 @@ module ::Skylab::TestSupport
     # this is just a proof of concept geared around duplicating and DRY-ing
     # up what's happening in the tests now.)
 
-    spec_tail = "_spec#{ Autoloader::EXTNAME }"
+    spec_tail = TestSupport_::FUN._spec_rb[]
     spec_tail_len = spec_tail.length
     spec_rx = %r| \A  (?<dir>.+[^/])  /
                       (?<stem>[^/]+) #{ ::Regexp.escape spec_tail } \z |x

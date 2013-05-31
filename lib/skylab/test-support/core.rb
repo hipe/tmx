@@ -4,8 +4,6 @@ require File.expand_path('../../../skylab', __FILE__)
 require 'skylab/headless/core'
 require 'skylab/meta-hell/core'
 
-
-
 class ::String                    # this is probably the only extlib you will
                                   # find org wide - give ::String this useful
                                   # thing used a lot in HEREDOCS in tests.
@@ -17,8 +15,6 @@ class ::String                    # this is probably the only extlib you will
   end
 end
 
-
-
 module Skylab::TestSupport
 
   Autoloader = ::Skylab::Autoloader
@@ -28,5 +24,5 @@ module Skylab::TestSupport
                                   # eponymous constant here! there is a
                                   # legitimate other module called SL::TS::TS!)
 
-  extend MetaHell::Autoloader::Autovivifying::Recursive
+  extend MetaHell::MAARS
 end

@@ -13,20 +13,24 @@ describe "#{ CovTree } CLI action: tree" do  # Quickie maybe..
     txt
   end
 
+  srbrx, srbrx2 = -> do
+    rx = ::Regexp.escape TestSupport::FUN._spec_rb[]
+    [ /#{ rx }\z/, %r{\A\./cov-tree/.+#{ rx }\z} ]
+  end.call
+
   it "show a list of matched test files only." do
     cd CovTree.dir_pathname.dirname do         # cd to lib/skylab ..
       argv 'tree', '-l', './cov-tree'          # and ask about this subproduct
     end                                        # itself. (yes this is a self-
                                                # referential test ^_^)
-
                                                # each one of the returned
-    while e = emission_a.shift                    # events that is a payload
+    while e = emission_a.shift                 # events that is a payload
       if :payload == e.stream_name             # should be a "line" that is
-        text[ e ].should match( %r{ \A \./cov-tree\/.+_spec\.rb \z }x ) # a path
+        text[ e ].should match( srbrx2 )       # a path
       else                                     # that is relative to where
         e.stream_name.should eql( :info )      # we ran it from. This last
         text[ e ].should match(/\d test files total/) # event should be an :info
-        emission_a.should be_empty                # that tells us the number of
+        emission_a.should be_empty              # that tells us the number of
         break                                  # files.
       end
     end
@@ -41,7 +45,7 @@ describe "#{ CovTree } CLI action: tree" do  # Quickie maybe..
         if /\A[^ ]/ =~ text[ e ]
           text[ e ].should match(/\/test\/\z/) # silly
         else
-          text[ e ].should match(/_spec\.rb\z/)
+          text[ e ].should match( srbrx )
         end
       else
         e.stream_name.should eql( :info )
