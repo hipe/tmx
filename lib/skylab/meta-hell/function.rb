@@ -52,8 +52,8 @@ module Skylab::MetaHell
           end
         end,
         method: -> ivar, meth do
-          define_method meth do |*a|  # NOTE no &block! because eew.
-            instance_variable_get( ivar ).call( *a )
+          define_method meth do |*a, &b|
+            instance_variable_get( ivar ).call( *a, &b )
           end
         end
       }

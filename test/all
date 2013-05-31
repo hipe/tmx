@@ -1,11 +1,42 @@
 #!/usr/bin/env ruby -w
 
-if (( idx = ::ARGV.index '--coverage' ))
-  require_relative 'plugins/coverage/manager'  # see comments here
-  ok, res = ::Skylab::Test::Plugins::Coverage::Manager.instance.start(
-    ::Enumerator::Yielder.new { |m| $stderr.puts m }, ::ARGV, idx )
-  ok or exit res
-end
+module Skylab  # hold on for a moment & let it get weird because of [#te-002]:
+
+  require 'pathname'
+
+  module Test
+
+    LIB_SKYLAB_PN_ = -> do  # because we don't yet have ::Skylab.dir_pathname
+      pn = nil
+      -> do
+        pn ||= ::Pathname.new( ::File.expand_path '../../lib/skylab', __FILE__ )
+      end
+    end.call
+
+    FULL_NAME_ = -> do  # like `program_name` but normalized to an anchor
+      fn = nil
+      -> do
+        fn ||= ::Pathname.new( __FILE__ ).expand_path.relative_path_from(
+          LIB_SKYLAB_PN_[].dirname.dirname ).to_s
+      end
+    end.call
+
+    module Plugins
+      class Coverage
+        SWITCH_ = '--coverage'
+        if (( idx = ::ARGV.index SWITCH_ ))
+          require_relative 'plugins/coverage/manager'
+          y = ::Enumerator::Yielder.new { |s| $stderr.puts s }
+          ok, res = Manager.instance.start y, ::ARGV, idx
+          if ! ok
+            y << "see '#{ FULL_NAME_[] } --help'."
+            exit res
+          end
+        end
+      end
+    end
+  end
+end  # OK now that coverage agent may have started, we can procede as normal:
 
 require_relative '../lib/skylab'
 require 'skylab/face/core'      # `pretty_path`, Tableize::I_M
@@ -21,13 +52,15 @@ module Skylab::Test
   extend MetaHell::MAARS
 
   module Plugins
-    extend MetaHell::MAARS  # only necessary b.c of coverage mgr
+    extend MetaHell::MAARS  # only necessary b.c of [#te-002] coverage mgr
   end
 
   class Core_Client  # a "headless" client, conceptually
 
     Headless::Plugin::Host.enhance self do
+
       add_plugins_box_module Test::Plugins
+
       eventpoints %i|
         available_actions
         action_summaries
@@ -39,20 +72,19 @@ module Skylab::Test
         subtree
         conclude
       |
-      service_names %i|
-        em
-        full_name
-        full_program_name
-        info_y
-        infostream
-        paystream
-        pretty_path
-        run_mode
-      |
-      services_delegated_to :subtree, %i|
-        hot_spec_paths
-        hot_subtree
-      |
+
+      services [ :em, :ivar ],
+        :full_name,
+        :full_program_name,
+        [ :hot_spec_paths, :delegatee, :subtree ],
+        [ :hot_subtree, :delegatee, :subtree ],
+        :info_y,
+        :infostream,
+        :paystream,
+        [ :pretty_path, :ivar ],
+        [ :run_mode ]
+
+      ingest_early
     end
 
   private
@@ -61,16 +93,8 @@ module Skylab::Test
       @queue_a = []
     end
 
-    # `full_name` - a service provided by this host
-
-    def full_name
-      self.class.full_name
-    end
-
-    def self.full_name
-      #  program_name   # why do this when you could ..
-      @full_name ||= ::Pathname.new( __FILE__ ).expand_path.relative_path_from(
-        ::Skylab.dir_pathname.dirname.dirname ).to_s
+    def full_name  # a service provided by this plugin host
+      FULL_NAME_[]
     end
   end
 
@@ -99,7 +123,6 @@ module Skylab::Test
     def invoke argv
       begin
         load_plugin_modules
-        Ingest_Hack_[ self ]
         @argv = argv
         r = resolve_queue or break
         r = ready or break
@@ -416,22 +439,6 @@ module Skylab::Test
         "#{ a * ' ' } plugin"
       end
     end
-  end
-
-  Ingest_Hack_ = -> host do  # #todo:during:6
-    host.instance_exec do
-      plugin_manager.hot_plugins.each do |pi|
-        h = pi.plugin_story.instance_variable_get( :@service_h )
-        pi.plugin_story.services.each do |se|
-          if ( svc = h.fetch( se ) ).do_ingest
-            pi.instance_variable_set svc.ingest_to_ivar,
-              ( instance_variable_get svc.ingest_to_ivar )
-          end
-        end
-        pi.respond_to?( :_ingest_hack ) and pi._ingest_hack
-      end
-    end
-    nil
   end
 end
 

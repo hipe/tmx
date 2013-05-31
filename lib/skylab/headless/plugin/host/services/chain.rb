@@ -23,7 +23,7 @@ module Skylab::Headless
       end ).new @a, plugin_client
     end
 
-    def has_service? i
+    def provides_service? i
       _index_for_services_for_service i
     end
 
@@ -34,14 +34,14 @@ module Skylab::Headless
     def _index_for_services_for_service i
       @cache_h.fetch i do
         index = @a.length.times.reduce nil do |_, idx|
-          @a.fetch( idx ).has_service? i and break idx
+          @a.fetch( idx ).provides_service? i and break idx
         end
         @cache_h[ i ] = index
       end
     end
     private :_index_for_services_for_service
 
-    # `call_host_service` - assusmes you checked `has_service?`
+    # `call_host_service` - assusmes you checked `provides_service?`
 
     def call_host_service pstory, i
       @a.fetch( _index_for_services_for_service i ).

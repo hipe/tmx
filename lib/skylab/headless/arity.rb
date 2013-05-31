@@ -22,10 +22,17 @@ module Skylab::Headless
     # hackiness, but hopefully this won't affect you if you are e.g making
     # custom arities..
 
-    def initialize i, includes_zero, is_unbounded
-      @normalized_name, @includes_zero, @is_unbounded =
-        i, includes_zero, is_unbounded
+    def initialize i, includes_zero, is_unbounded, desc
+      @normalized_name, @includes_zero, @is_unbounded, @desc =
+        i, includes_zero, is_unbounded, desc.freeze
+      if :zero == i
+        def self.is_zero? ; true end
+      end
       freeze
+    end
+
+    def is_zero?
+      false
     end
 
     define_extent = -> f do
@@ -37,24 +44,24 @@ module Skylab::Headless
         h[ nn ] = o
       end ]
       NAMES_ = name_a.freeze ; EACH_ = obj_a.freeze ; h.freeze
-      define_singleton_method :[] do |i|
-        h[ i ]
-      end
       define_singleton_method :fetch do |i, &b|
         h.fetch i, &b
+      end
+      class << self
+        alias_method :[], :fetch
       end
       nil
     end
 
     define_extent[ -> define do
 
-      attr_reader        :normalized_name, :includes_zero, :is_unbounded
+      attr_reader        :normalized_name, :includes_zero, :is_unbounded, :desc
 
-      ZERO         = define[ :zero,         true,           false ]
-      ZERO_OR_ONE  = define[ :zero_or_one,  true,           false ]
-      ZERO_OR_MORE = define[ :zero_or_more, true,           true  ]
-      ONE          = define[ :one,          false,          false ]
-      ONE_OR_MORE  = define[ :one_or_more,  false,          true  ]
+      ZERO         = define[ :zero,         true,           false, '0' ]
+      ZERO_OR_ONE  = define[ :zero_or_one,  true,           false, '[0..1]' ]
+      ZERO_OR_MORE = define[ :zero_or_more, true,           true , '[0..]' ]
+      ONE          = define[ :one,          false,          false, '1' ]
+      ONE_OR_MORE  = define[ :one_or_more,  false,          true , '[1..]' ]
 
    end ]
 

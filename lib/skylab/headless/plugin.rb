@@ -51,12 +51,14 @@ module Skylab::Headless
         -> m { story.add_available_plugins_box_module m },
         -> *a { story.add_ordinary_eventpoints a },
         -> *a { story.add_fuzzy_ordered_aggregation_eventpoints a },
+        -> *a { story.add_services a },
         ->  a { story.add_service_names a },
         -> *a do
           ( dslify_svc_a ||= [ ] ).concat a.flatten
           story.add_services a
         end,
-        -> i, a { story.services_delegated_to i, a }
+        -> i, a { story.services_delegated_to i, a },
+        -> { story.ingest_early }
       ] ) ]
 
       host_mod.send :include, Plugin::Host::InstanceMethods  # consider order
@@ -73,18 +75,20 @@ module Skylab::Headless
 
       nil
     end
+  end
 
-    Conduit_ = MetaHell::Enhance::Conduit.raw %i|
-      add_plugins_box_module
-      eventpoints
-      fuzzy_ordered_aggregation_eventpoint
-      service_names
-      services_dslified
-      services_delegated_to
-    |
-    class Conduit_
-      alias_method :plugin_box_module, :add_plugins_box_module  # #experimental
-    end
+  Plugin::Host::Conduit_ = MetaHell::Enhance::Conduit.raw %i|
+    add_plugins_box_module
+    eventpoints
+    fuzzy_ordered_aggregation_eventpoint
+    services
+    service_names
+    services_dslified
+    services_delegated_to
+    ingest_early
+  |
+  class Plugin::Host::Conduit_
+    alias_method :plugin_box_module, :add_plugins_box_module  # #experimental
   end
 
   #         ~ a quick note about Stories and Conduits ~
@@ -171,6 +175,7 @@ module Skylab::Headless
       @available_plugins_box_a = [ ]
       @eventpoint_a = [ ] ; @eventpoint_h = { }
       @service_a = [ ] ; @service_h = { }
+      @do_ingest_early = false ; @directive_i_a = nil
     end
 
     # `host_module_descriptor` - used in error message generation here
@@ -234,13 +239,19 @@ module Skylab::Headless
 
     def add_service_names a
       _add @service_a, @service_h, a, -> i do
-        Plugin::Host::Service_[ i ]
+        Plugin::Host::Service_.new i
       end, false
+    end
+
+    def add_services a
+      _add @service_a, @service_h, a, -> x do
+        Plugin::Host::Service_.new( * x )
+      end, false  # always splatted
     end
 
     def services_delegated_to sym, a
       _add @service_a, @service_h, a, -> i do
-        Plugin::Host::Service_[ i, sym ]
+        Plugin::Host::Service_.new i, :delegatee, sym
       end
     end
 
@@ -250,29 +261,88 @@ module Skylab::Headless
       @service_a.dup
     end
 
-    class Plugin::Host::Service_
-      class << self
-        alias_method :[], :new
-      end
-      attr_reader :normalized_local_name, :delegates_to, :is_a_delegation
-      def initialize i, d=nil
-        if d
-          @delegates_to = d
-          @is_a_delegation = true
-        end
-        @normalized_local_name = i
-      end
-    end
-
-    def has_service? svc
+    def provides_service? svc
       @service_h.key? svc
     end
 
-    def if_service svc, yes, no
-      ok = true
-      res = @service_h.fetch svc do ok = false end
-      if ok then yes[ res ] else no[ ] end
+    def fetch_service i, &blk
+      @service_h.fetch i, &blk
     end
+
+    def _service_box # hacks only. (like plugin host proxy)
+      a = @service_a ; h = @service_h
+      @_service_box ||= MetaHell::Formal::Box.allocate.instance_exec do
+        @order = a ; @hash = h  # EGADS
+        base_init nil
+        self
+      end
+    end
+
+    def ingest_early
+      if @do_ingest_early
+        raise "already ingesting early."
+      else
+        ( @directive_i_a ||= [ ] ) << :load_ingestions
+      end
+    end
+
+    attr_reader :directive_i_a
+  end
+
+  class Plugin::Host::Service_
+    -> do  # `initialize`
+      h = nil
+      define_method :initialize do |i, *x_a|
+        @normalized_local_name = i ; @mutex = nil
+        while x = x_a.shift
+          instance_exec x_a, & h[ x ]
+        end
+        @mutex or instance_exec [ i ], & h.fetch( :use_method )
+        freeze
+      end
+      h = {
+        delegatee: -> x_a do
+          mutex :delegation
+          @proximity = :delegated
+          @delegatee_name = x_a.fetch 0
+          x_a.shift
+          nil
+        end,
+        ivar: -> x_a do
+          mutex :ivar
+          @proximity = :intrinsic
+          @technique = :ivar
+          @ivar_name = if x_a.length.nonzero? and '@' == x_a.fetch(0).to_s[0]
+            x_a.shift
+          else
+            :"@#{ @normalized_local_name }"
+          end
+          nil
+        end,
+        use_method: -> x_a do
+          mutex :method
+          @proximity = :intrinsic
+          @technique = :method
+          @method_name = x_a.fetch 0
+          x_a.shift
+          nil
+        end
+      }
+      h.default_proc = -> hh, kk do
+        raise ::KeyError, "no such meta-field \"#{ kk }\" for a host #{
+          }service. valid meta-fields are: (#{ h.keys * ', ' })"
+      end
+    end.call
+
+    def mutex x
+      @mutex and fail "can't do both \"#{ x }\" and \"#{ @mutex }\""
+      @mutex = x
+      nil
+    end
+    private :mutex
+
+    attr_reader :normalized_local_name, :proximity, :technique,
+      :delegatee_name, :method_name, :ivar_name
   end
 
   module Plugin::Event
@@ -358,11 +428,14 @@ module Skylab::Headless
     # particular request.
 
     def plugin_manager
-      @plugin_manager ||= Plugin::Manager.load_for_host_application self
+      @plugin_manager ||= begin
+        Plugin::Manager.load_for_host_application self, *
+          plugin_host_story.directive_i_a
+      end
     end
 
     # `plugin_services` - ( host i.m edition ) exposed for hacking, only
-    # called outside of this library.
+    # called outside of this library (and in specs).
 
     def plugin_services
       plugin_manager.plugin_services
@@ -493,9 +566,21 @@ module Skylab::Headless
     # `call_plugin_host_service` - called by host services,
     # assume that access has already been checked.
 
-    def call_plugin_host_service svc_i, a, b
-      send svc_i, *a, &b
-    end
+    -> do
+      technique_h = nil
+      define_method :call_plugin_host_service do |svc, a, b|
+        instance_exec svc, a, b, & technique_h.fetch( svc.technique )
+      end
+      technique_h = {
+        ivar: -> svc, a, b do
+          a || b and fail "spec me"
+          instance_variable_get svc.ivar_name
+        end,
+        method: -> svc, a, b do
+          send svc.method_name, *a, &b
+        end
+      }
+    end.call
     public :call_plugin_host_service
 
     # `call_delegated_plugin_service` - this extension-like thing we
@@ -503,12 +588,12 @@ module Skylab::Headless
     # wikipedia illustration and follow an arrow, imagine this going
     # up from a plugin thru the host proxy into the service and then
     # into the host app which sends the request thru the plugin manager
-    # back down to another plugin, and then all the way back out again!
     # #experimental.
+    # back down to another plugin, and then all the way back out again!
 
-    def call_delegated_plugin_service plugin_instance_key, service_name, a, b
-      @plugin_manager.fetch_client( plugin_instance_key ).
-        call_plugin_service( service_name, a, b )  # validates name
+    def call_delegated_plugin_service svc, a, b
+      @plugin_manager.fetch_client( svc.delegatee_name ).
+        call_plugin_service( svc.normalized_local_name, a, b ) # validates name
     end
     public :call_delegated_plugin_service  # called by host services
   end
@@ -517,9 +602,9 @@ module Skylab::Headless
 
     # based off of a drawing we saw on wikipedia
 
-    def self.load_for_host_application host_application
+    def self.load_for_host_application host_application, *directive_a
       pm = new host_application
-      pm.init && pm.load_plugins  # NOTE result is `pm` (or ..)
+      pm.init and pm.load_plugins directive_a  # NOTE result is `pm` (or ..)
     end
 
     def initialize host_application
@@ -543,13 +628,14 @@ module Skylab::Headless
     # It is the thing that resolves and initializes a hot Client instance of
     # each plugin.
 
-    def load_plugins
+    def load_plugins directive_a
       svcs = plugin_services
       eventpoints = all_eventpoint_names
       available_plugin_modules.each do |box_mod|
         story = box_mod.plugin_story
         client = story.plugin_client_class.new  # pursuant to #api-point [#002]
-        client = client.load_plugin svcs, story  # give the client a chance etc
+        client = client.load_plugin svcs, story, *directive_a  # gives the
+          # client itself a chance to do whatever
         story = client.plugin_story  # give the client a chance to change class
         sym = story.normalized_local_name
         @h.key? sym and fail "sanity: load same plugin more than once? - #{sym}"
@@ -679,7 +765,7 @@ module Skylab::Headless
 
     def validate_client client, &err
       ev = client.plugin_story.service_a.reduce nil do |m, svc_i|
-        if ! @story.has_service? svc_i
+        if ! @story.provides_service? svc_i
           m ||= Plugin::Service::NameEvent.new
           m.add @host_application, client, svc_i
         end
@@ -703,18 +789,17 @@ module Skylab::Headless
   class Plugin::Host::Services
 
     # `Plugin::Host::Services` - the idea for this is from a drawing that
-    # that we saw on wikipedia. it constitues _the_ interface that each
-    # and every plugin will go through to talk to the host application.
+    # that we saw on wikipedia. it constitues _the_ interface through which
+    # each and every plugin will go to talk to the host application.
     #
-    # By default plugin clients will get a handle on a host proxy,
-    # and not this services instance. but under the hood calls to the proxy
-    # will all end up as calls to this, which can be thought of as
-    # a middleman controller-ish between the host proxy and the actual
-    # host. We keep it around because the host proxy has a necessarily
-    # restricted method namespace, so we aren't going to go adding logic
-    # there; and we don't want to clutter the instance method namespace
-    # of the actual host application with our willy nilly logic, which
-    # hence lives here.
+    # By default plugin clients will get a handle on a host proxy, and not
+    # this services instance. but under the hood calls to the proxy will all
+    # end up as calls to this, which can be thought of as a middleman
+    # controller-ish between the host proxy and the actual host. We keep it
+    # around because the host proxy has a necessarily restricted method
+    # namespace, so we aren't going to go adding logic there; and we don't
+    # want to clutter the instance method namespace of the actual host
+    # application with our willy nilly logic, which hence lives here.
     #
     # for now to keep things simple, by default we give the plugin clients
     # only a host proxy. but if she needs it, the industrious plugin client
@@ -732,10 +817,10 @@ module Skylab::Headless
       @story = host_application.plugin_host_story
     end
 
-    # `has_service?` - used in validation elsewhere
+    # `provides_service?` - used in validation elsewhere
 
-    def has_service? x
-      @story.has_service? x
+    def provides_service? x
+      @story.provides_service? x
     end
 
     # `host_descriptor` - used in error message generation elsewhere
@@ -819,40 +904,40 @@ module Skylab::Headless
 
   public
 
-    # `call_host_service` - this is expected normally to be called
-    # from host proxies but here you can have it if you want.
-    # (used in #ingestion).
+    # `call_host_service` - this is expected normally to be called from host
+    # proxies but here you can have it if you want. (used in #ingestion).
 
-    def call_host_service pstory, service_i, a=nil, b=nil
-      svc = @story.if_service service_i, -> sv { svc = sv }, -> do
-        raise Plugin::Service::NameError, "what service are you #{
-          }talking about willis - no such service \"#{ service_i }\" is #{
-          }declared by the plugin host #{ @story.host_module_descriptor }"
-      end
-      if svc
-        # what would be neat is rather than doing this at runtime,
-        # make the instance methods dynamically (at plugin load time)
-        # that raise the same errors ERMAGHERD
-        # on the flippy, this approach allows for (GULP) dynamically
-        # changing what services are registered, or some even just
-        # a shotgun whitelist.
-        if pstory.registered_for_service? service_i
-          if svc.is_a_delegation
-            @host_application.call_delegated_plugin_service svc.delegates_to,
-              svc.normalized_local_name, a, b
-          else
-            @host_application.call_plugin_host_service service_i, a, b
-            # (note the confusing name change because we like to keep
-            # "plugin" in the name of application code i.m's)
-          end
-        else
+    -> do  # `call_host_service`
+      proximity_h = nil
+      define_method :call_host_service do |pstory, service_i, a=nil, b=nil|
+        svc = @story.fetch_service service_i do
+          raise Plugin::Service::NameError, "what service are you #{
+            }talking about willis - no such service \"#{ service_i }\" is #{
+            }declared by the plugin host #{ @story.host_module_descriptor }"
+        end
+        if ! pstory.registered_for_service? service_i
           raise Plugin::Service::AccessError, "the \"#{ service_i }\" #{
             }service must be but was not registered for by the #{
             }\"#{ pstory.local_slug }\" plugin (just add it to the #{
             }plugin's list of desired services?)."
         end
+        # what would be neat is rather than doing this at runtime, make the
+        # instance methods dynamically (at plugin load time) that raise the same
+        # errors ERMAGHERD on the flippy, this approach allows for (GULP)
+        # dynamically changing what services are registered, or some even just
+        # a shotgun whitelist.
+
+        instance_exec( svc, a, b, & proximity_h.fetch( svc.proximity ) )
       end
-    end
+      proximity_h = {
+        delegated: -> svc, a, b do
+          @host_application.call_delegated_plugin_service svc, a, b
+        end,
+        intrinsic: -> svc, a, b do
+          @host_application.call_plugin_host_service svc, a, b
+        end
+      }
+    end.call
 
     def _story  # hacks only (chaining [#072])
       @story
@@ -919,16 +1004,16 @@ module Skylab::Headless
         cnd.class::One_Shot_.new cnd, flush
       end
     end
-
-    Conduit_ = MetaHell::Enhance::Conduit.raw %i|
-      client_class
-      eventpoints
-      dslify_eventpoint_names
-      services
-      service_names
-      plugin_services
-    |
   end
+
+  Plugin::Conduit_ = MetaHell::Enhance::Conduit.raw %i|
+    client_class
+    eventpoints
+    dslify_eventpoint_names
+    services
+    service_names
+    plugin_services
+  |
 
   class Plugin::Story
 
@@ -970,7 +1055,7 @@ module Skylab::Headless
         }clobber existing client class function."
       f.respond_to? :call or raise Plugin::DeclarationError, "sorry, for #{
         }now we only support functions here (had: #{ f })"
-      @client_class_function = f
+      @client_class_function = f or fail "sanity"
     end
 
     MetaHell::Function self, :@client_class_function, :plugin_client_class
@@ -1130,21 +1215,63 @@ module Skylab::Headless
 
     # unlike e.g Host::InstanceMethods, this hellof adds public methods
 
-    # `load_plugin` - formerly `initialize`, then `init_plugin`,
-    # this sets these crucial ivars, and/or gives the plugin client
-    # "change itself" to an instance of a different class
-    # based on whatever. assume this is the first plugin-related
-    # call this object receives.
+    # `load_plugin` - formerly `initialize`, then `init_plugin`, this sets
+    # these crucial ivars, and/or gives the plugin client "change itself" to
+    # an instance of a different class based on whatever. assume this is the
+    # first plugin-related call this object receives.
     #
     # a note about `@plugin_host_proxy` - we used to set the
     # `@plugin_services` ivar instead, but using the `host proxy` solely
-    # feels cleaner. if you need a handle on the services object, by
-    # all means override this method in your plugin client.
+    # feels cleaner. if you need a handle on the services object, by all
+    # means override this method in your plugin client.
 
-    def load_plugin plugin_services, plugin_story=self.class.plugin_story
+    # syntax is : plugin_services [, plugin_story ] [ , directive_i [..]]
+
+    def load_plugin plugin_services, *rest_a
+      if rest_a.length.nonzero? and ::Symbol != rest_a.first.class  # meh
+        plugin_story = rest_a.shift
+      else
+        plugin_story = self.class.plugin_story
+      end
+      pi = _load_plugin plugin_services, plugin_story
+      rest_a.length.nonzero? and process_plugin_directives(
+       plugin_services, rest_a )
+      pi
+    end
+
+    def _load_plugin plugin_services, plugin_story
       @plugin_story = plugin_story
       @plugin_host_proxy = plugin_services.build_host_proxy self
       self  # important
+    end
+    private :_load_plugin
+
+    -> do  # `process_plugin_directives`
+      op_h = {
+        load_ingestions: :plugin_load_ingestions
+      }
+      define_method :process_plugin_directives do |svcs, i_a|
+        i_a.each do |i|
+          send op_h.fetch( i ), svcs
+        end
+        nil
+      end
+    end.call
+
+    def plugin_load_ingestions svcs
+      @plugin_story.services.each do |nn, svc|
+        if svc.do_ingest
+          ivar = svc.ivar_to_ingest_as
+          if instance_variable_defined? ivar
+            fail "sanity - won't clobber existing ivar - #{ ivar }"
+          else
+            x = svcs.call_host_service @plugin_story, nn
+            x or fail "sanity - for now you cannot ingest false-ish values"
+            instance_variable_set ivar, x
+          end
+        end
+      end
+      nil
     end
 
     # `host` - because it is used so often, this is the *only* instance
@@ -1292,7 +1419,7 @@ module Skylab::Headless
       end
     end
 
-    def ingest_to_ivar
+    def ivar_to_ingest_as
       if @field
         if @field.has_ingest_as_ivar
           @field.ingest_as_ivar_value

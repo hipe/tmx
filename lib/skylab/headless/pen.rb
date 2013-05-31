@@ -39,6 +39,12 @@ module Skylab::Headless
     def omg s                     # style an error (string or msg)
       ick s                       # with excessive emphasis and
     end                           # exuberance. not for use.
+
+    # `plugin_services` - see implementation
+
+    def plugin_services
+      @plugin_services ||= Pen::Experimental_::Plugin_Services_.new self
+    end
   end
 
   Pen::MINIMAL = ::Object.new.extend Pen::InstanceMethods

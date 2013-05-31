@@ -1,23 +1,12 @@
-# as long as we use the test runner to determine (some kind of) coverage for
-# the libraries on top of which the test runner itself depends, for any file
-# that is loaded before we start the coverage library, we cannot determine
-# coverge for that file. we therefor write this file bare, with no
-# dependencies, even though we would otherwise want certain things. i.e:
-#
-# "this is a bootstrap zone! no fun allowed."
-
-module Skylab
-end
-
 module Skylab::Test
 
-  module Plugins
-  end
-
-  class Plugins::Coverage  # yes eew
-  end
-
   class Plugins::Coverage::Manager
+
+    # this is a bootstrap zone! no fun allowed [#te-002]. if you are familiar
+    # with the skylab universe and how perfect, clean and consistent it always
+    # is (i'm lookin' at you, me!) then everything here will look wierd to you.
+
+    SWITCH_ = Plugins::Coverage::SWITCH_
 
     -> do
       the_one_place_where_singleton_should_be_ok = nil
@@ -32,89 +21,146 @@ module Skylab::Test
     end.call
 
     def initialize
-      @state = :initialized ; @is_started = nil  # keep together.
+      @final_conclusions = nil
+      @state = nil
+      state! :initialized
       nil
     end
 
     # `start` - result is tuple. `argv` is argv of caller and must not
-    # be mutated. idx is the index of the `--coverage` switch.
+    # be mutated. idx is the index of the e.g `--c-overage` switch.
 
     def start y, argv, idx
-      :initialized == @state or fail "sanity - bad state transition"
-      @state = :starting
-
-      sn = ::Struct.new( :medium, :murmur ).new( true, false )  # try it
-
-      require_relative '../../../lib/skylab/test-support/fun'
-        # no more requires until we are started.
-
-      yes = n = yc = nc = 0
-
-      -> do
-        p = $VERBOSE ; $VERBOSE = nil ; require 'simplecov' ; $VERBOSE = p
-        sc = ::SimpleCov
-        cache_h = { }
-        sc.add_filter do |x|
-          if ! @is_started
-            ::Kernel.raise "sanity - had state #{ @state.inspect } #{
-              }when tried to load - #{ x.filename }"
-          end
-          did = nil
-          res = cache_h.fetch x.filename do |k|
-            did = true ; r =
-            if @white_x.match( x.filename ) && ! @black_x.match( x.filename )
-              sn.murmur and y << "Y    #{ x.filename }"
-              yes += 1
-              false
-            else
-              sn.murmur and y << "N    #{ x.filename }"
-              n += 1
-              true
-            end
-            cache_h[ k ] = r
-          end
-          if ! did
-            sn.murmur and y << "#{ res ? 'N' : 'Y' }(c) #{ x.filename }"
-            res ? ( nc += 1 ) : ( yc += 1 )
-          end
-          res
-        end
-        sc.start
-        nil
-      end.call
-
-      @black_x = -> do
-        Black_Rx_Matcher_.new(
-          /#{ ::Regexp.escape ::Skylab::TestSupport::FUN._spec_rb[] }\z/
-        )
-      end.call
-
-      @white_x = -> do
-        argv = argv.dup
-        argv[ idx, 1 ] = [ ]
-        if argv.length.zero?
-          OMNI_PASS_MATCHER_
-        else
-          resolve_white_matcher argv
-        end
-      end.call
-
-      @final_conclusions = -> do
-        if sn.medium
-          y << "(cov mgr said yes to #{ yes } files, no to #{ n }, was #{
-            }asked again about any same file #{ yc + nc } times)"
-        end
-      end
-
-      @state = :started ; @is_started = true  # keep together.
-      true
+      require LIB_SKYLAB_PN_[].join( 'test-support/fun' ).to_s
+        # the above is the last require before we (_we_) are started.
+      begin
+        state! :starting
+        sn = ::Struct.new( :medium, :murmur ).new( true, false )  # try it
+        ok, res = resolve_white_matcher y, argv, idx, sn
+        ok or break
+        @white_x = res
+        ok, res = start_simplecov y, sn
+        ok or break
+        @black_x = -> do  # do this after starting above just as grease
+          Black_Rx_Matcher_.new(
+            /#{ ::Regexp.escape ::Skylab::TestSupport::FUN._spec_rb[] }\z/
+          )
+        end.call
+        state! :started
+        ok = true ; res = nil
+      end while false
+      [ ok, res ]
     end
 
-    def final_conclusions ; @final_conclusions[ ] end
+    def final_conclusions
+      @final_conclusions and @final_conclusions[]
+    end
 
     def add_path y, path
       :started == @state or raise "can't add path unless started - #{ @state }"
       @white_x.add_path y, path
+    end
+
+  private
+
+    -> do  # `state!` - cutie little baby state machine
+      h = {
+        initialized: {
+          starting: -> { },
+        },
+        starting: {
+          started: -> { @is_started = true }
+        }
+      }
+      h[ nil ] = {
+        initialized: -> {  @is_started = false }
+      }
+      define_method :state! do |i|
+        instance_exec( & h.fetch( @state ).fetch( i ) )
+        @state = i
+        nil
+      end
+      private :state!
+    end.call
+
+    def resolve_white_matcher y, argv, idx, sn  # result is tuple
+      argv = argv.dup
+      argv[ idx, 1 ] = [ ]
+      if argv.length.zero?
+        [ DO_STAY_, OMNI_PASS_MATCHER_ ]
+      else
+        build_union_matcher y, argv, idx, sn
+      end
+    end
+
+    DO_STAY_ = true ; DO_NOT_STAY_ = false ; GENERIC_ERROR_CODE_ = 1
+
+    def build_union_matcher y, argv, idx, sn
+      # Dir.glob avoids dotfiles unlike Pathname#children
+      h = ::Dir[ LIB_SKYLAB_PN_[].join '*' ].reduce( { } ) do |m, p|
+        pn = ::Pathname.new p
+        m[ pn.basename.to_s ] = pn
+        m
+      end
+      a = [ ] ; miss_a = nil ; argv.each do |x|
+        if h.key? x
+          a << "#{ h.fetch x }/"
+        else
+          ( miss_a ||= [ ] ) << x
+        end
+      end
+      if miss_a
+        y << "when using, #{ SWITCH_ } we can only have subproduct #{
+          }names here (for now), not (#{ miss_a * ', ' })"
+        [ DO_NOT_STAY_, GENERIC_ERROR_CODE_ ]
+      else
+        [ DO_STAY_, Pathname_Union_Matcher_.new( a ) ]
+      end
+    end
+
+    def start_simplecov y, sn
+      yes = n = yc = nc = 0
+      p = $VERBOSE ; $VERBOSE = nil ; require 'simplecov' ; $VERBOSE = p
+      sc = ::SimpleCov ; cache_h = { }
+      sc.add_filter do |x|
+        @is_started or ::Kernel.raise "sanity - had state #{
+          }#{ @state.inspect } when tried to load - #{ x.filename }"
+        did = nil
+        res = cache_h.fetch x.filename do |k|
+          did = true ; r =
+          if @white_x.match( x.filename ) && ! @black_x.match( x.filename )
+            sn.murmur and y << "Y    #{ x.filename }"
+            yes += 1
+            false
+          else
+            sn.murmur and y << "N    #{ x.filename }"
+            n += 1
+            true
+          end
+          cache_h[ k ] = r
+        end
+        if ! did
+          sn.murmur and y << "#{ res ? 'N' : 'Y' }(c) #{ x.filename }"
+          res ? ( nc += 1 ) : ( yc += 1 )
+        end
+        res
+      end
+      begin
+        ok = sc.start
+        if ! ok
+          y << "simplecov was not usable. it may be that the #{ SWITCH_ } #{
+            }option is unavailable to you where you live in your #{
+            }neigbhorhood."
+          break( res = GENERIC_ERROR_CODE_ )
+        end
+        @final_conclusions = -> do
+          if sn.medium
+            y << "(cov mgr said yes to #{ yes } files, no to #{ n }, was #{
+              }asked again about any same file #{ yc + nc } times)"
+          end
+        end
+      end while false
+      [ ok, res ]
     end
 
     class Omni_Pass_Matcher_
@@ -134,7 +180,7 @@ module Skylab::Test
       def match x ; @match[ x ] end
     end
 
-    class Pathname_Union_Mathcer
+    class Pathname_Union_Matcher_
 
       def initialize a
         @match = -> path do
@@ -161,31 +207,7 @@ module Skylab::Test
       def match x ; @match[ x ] end
       def add_path y, x ; @add_path[ y, x ] end
     end
-
-  private
-
-    def resolve_white_matcher argv  # assume nonzero length argv
-      require 'pathname'
-      # Dir.glob avoids dotfiles unlike Pathname#children
-      h = ::Dir[::File.expand_path '../../../../lib/skylab/*', __FILE__].
-          reduce( { } ) do |m, p|
-        pn = ::Pathname.new p
-        m[ pn.basename.to_s ] = pn
-        m
-      end
-      a = [ ] ; miss_a = nil ; argv.each do |x|
-        if h.key? x
-          a << "#{ h.fetch x }/"
-        else
-          ( miss_a ||= [ ] ) << x
-        end
-      end
-      if miss_a
-        raise "for now we must have only subproduct names here - (#{
-          }#{ miss_a * ', ' })"
-      end
-      Pathname_Union_Mathcer.new a
-    end
   end
 end
-      # ::SimpleCov.command_name "#{ Core_Client.full_name } [various]"
+
+# ::SimpleCov.command_name "#{ Core_Client.full_name } [various]"

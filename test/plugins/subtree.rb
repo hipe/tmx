@@ -95,11 +95,6 @@ module Skylab::Test
       @sort_mutex = nil
     end
 
-    def _ingest_hack
-      Ingest_Hack_[ self ]
-    end
-    public :_ingest_hack
-
     # `hot_spec_paths` - implement the (plugin) service that is kind of
     # the central workhorse of this whole nerk.
 

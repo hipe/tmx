@@ -31,6 +31,7 @@ module Skylab::Test
     )
 
     available_options do |o, _|
+
       o.on '-p', '--pretty', '..filenames. (files)' do
         @do_pretty = true
       end

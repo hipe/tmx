@@ -30,9 +30,9 @@ module Skylab::Face
       load_plugin svcs
       ev = nil
       @plugin_story.services.each do |nn, svc|  # validate and ingest in one pass!
-        if svcs.has_service? nn
+        if svcs.provides_service? nn
           if svc.do_ingest
-            ivar = svc.ingest_to_ivar
+            ivar = svc.ivar_to_ingest_as
             if instance_variable_defined? ivar
               fail "sanity - won't clobber existing ivar - #{ ivar }"
             else

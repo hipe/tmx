@@ -1,6 +1,7 @@
 module Skylab::Headless
 
-  class CLI::Option::Parser::Recorder
+  class CLI::Option::Parser::Recorder < MetaHell::Function::Class.new :on,
+    :@on, :define  # ( note this doesn't yet follow exactliy the ::OP API.. )
 
     # (this was written after whatever happens in treemap and that should
     # get merged into this one day..)
@@ -14,17 +15,13 @@ module Skylab::Headless
     #
     # (see also option merge)
 
-    def initialize &emit_option
-      define_singleton_method :define do |*a, &b|
-        emit_option[ CLI::Option.on( *a, &b ) ]
+    def initialize &option_cb
+      option_cb or raise ::ArgumentError, "missing required block."
+      @on = -> *a, &b  do
+        option_cb[ CLI::Option.on( *a, &b ) ]
         # result is undefined for now, but could be changed if needed
         nil
       end
-    end
-
-    def on *a, &b
-      self.define( *a, &b )
-      self
     end
   end
 end
