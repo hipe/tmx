@@ -61,8 +61,7 @@ module Skylab                     # Welcome! :D
 
     o = { }
 
-    o[:call_frame_path_rx] =
-      /^(?<path>.+#{ ::Regexp.escape Autoloader::EXTNAME })(?=:\d+:in[ ]`)/x
+    o[:call_frame_path_rx] = /^(?<path>.+)(?=:\d+:in[ ]`)/x
 
     sanitize_path_rx = %r{ #{::Regexp.escape Autoloader::EXTNAME }\z |
       (?<=/)/+ | (?<=[-_ ])[-_ ]+ | [^-_ /a-z0-9]+ }ix
