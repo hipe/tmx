@@ -44,7 +44,7 @@ module Skylab::Basic::TestSupport::Field::Reflection
         x.length.should eql( 1 )
         x.frozen?.should eql( true )
         x = x.fetch 0
-        ( x.get_rx =~ 'x' ).should eql( 0 )
+        ( x.rx_value =~ 'x' ).should eql( 0 )
       end
 
       it "`field_names`" do

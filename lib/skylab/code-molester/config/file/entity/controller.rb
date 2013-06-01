@@ -134,7 +134,7 @@ module Skylab::CodeMolester::Config::File::Entity
 
     def normalize_field_keys
       once_h = ::Hash[ field_box.map do |fld|
-        [ ( fld.has_ivar ? fld.get_ivar : fld.normalized_name ), fld ]
+        [ ( fld.has_ivar ? fld.ivar_value : fld.normalized_name ), fld ]
       end ]
       xtra_h = nil
       @field_h.keys.each do |k|
@@ -262,10 +262,10 @@ module Skylab::CodeMolester::Config::File::Entity
 
     def pound_regexp fld  # assume `regex`
       -> x, err do
-        if fld.get_regex !~ x
+        if fld.regex_value !~ x
           if fld.fields.has? :rx_fail_predicate_tmpl and
                       fld.has_rx_fail_predicate_tmpl
-            err[ render_template fld.get_rx_fail_predicate_tmpl, fld, x ]
+            err[ render_template fld.rx_fail_predicate_tmpl_value, fld, x ]
           else
             err[ "was invalid" ]
           end

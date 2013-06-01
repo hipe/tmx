@@ -30,7 +30,7 @@ module Skylab::MetaHell::TestSupport::DSL_DSL
             wiz :piz                        # then set the value of `wiz`
           end
                                             # read the value:
-          Bar.get_wiz.should eql( :piz )
+          Bar.wiz_value.should eql( :piz )
 
           # but setters are private by default:
 
@@ -41,7 +41,7 @@ module Skylab::MetaHell::TestSupport::DSL_DSL
 
           # because this DSL generates only readers and not writers for your
           # instances, you get a public reader of the same name in your
-          # instances (not prefixed with "get_").
+          # instances (not suffixe with "_value").
 
                                              # read the value in an instance:
           Bar.new.wiz.should eql( :piz )
@@ -65,7 +65,7 @@ module Skylab::MetaHell::TestSupport::DSL_DSL
             pik :nic
           end
 
-          Bar.get_pik.should eql( :nic )
+          Bar.pik_value.should eql( :nic )
           Bar.new.pik.should eql( :nic )
         end
       end

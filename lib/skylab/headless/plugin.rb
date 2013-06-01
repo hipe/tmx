@@ -1295,7 +1295,7 @@ module Skylab::Headless
     def ingest_to_ivar
       if @field
         if @field.has_ingest_as_ivar
-          @field.get_ingest_as_ivar
+          @field.ingest_as_ivar_value
         else
           :"@#{ @field.normalized_name }"
         end

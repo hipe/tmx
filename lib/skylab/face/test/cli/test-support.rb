@@ -39,19 +39,19 @@ module Skylab::Face::TestSupport::CLI
     -> do
       fmt = "%-6s %-35s %-12s %s"
       define_method :does do
-        ptrn = get_ptrn
+        ptrn = ptrn_value
         ptrn &&= "#{ ptrn })"
         ptrn ||= '<<no pattern>>'
 
-        dsc = get_desc
+        dsc = desc_value
         dsc ||= '<<no desc>>'
 
-        arv = get_argv
+        arv = argv_value
         arv &&= "`#{ arv * ' ' }`"
         arv ||= '<<no argv>>'
 
-        exp = get_expt_desc
-        exp ||= get_expt
+        exp = expt_desc_value
+        exp ||= expt_value
         exp ||= '<<no expt>>'
 
         fmt % [ ptrn, dsc, arv, exp ]
@@ -60,8 +60,8 @@ module Skylab::Face::TestSupport::CLI
 
     let :client_class do
       kls = Sandbox.produce_subclass
-      get_with_body or raise "sanity - `with_body { .. }` expected"
-      kls.class_exec(& get_with_body )
+      with_body_value or raise "sanity - `with_body { .. }` expected"
+      kls.class_exec( & with_body_value )
       kls
     end
 

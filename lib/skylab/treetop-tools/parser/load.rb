@@ -70,7 +70,7 @@ module Skylab::TreetopTools
     def load_or_generate_grammar_files
       summarize grammars
       grammars.each do |g|
-        defined?(::Treetop) or MetaHell::FUN.require_quietly[ 'treetop' ]
+        defined?(::Treetop) or Headless::MetaHell::FUN.require_quietly[ 'treetop' ]
         if force_overwrite or ! g.outpathname.exist?
           recompile(g) or return
         end

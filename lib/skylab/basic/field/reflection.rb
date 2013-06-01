@@ -106,6 +106,14 @@ module Skylab::Basic::Field::Reflection
       field_box.field_names
     end
 
+    def fields_which i
+      field_box.fields_which i
+    end
+
+    def fields_which_not i
+      field_box.fields_which_not i
+    end
+
     def field_box
       self.class.field_reflection_target.field_box
     end
@@ -147,6 +155,7 @@ module Skylab::Basic::Field::Reflection
 
     def init_for_field_reflection_if_necessary
       @fields_which_h ||= begin
+        @fields_which_not_h = { }
         @field_names_which_h = { }
         { }  # egads
       end
@@ -156,6 +165,14 @@ module Skylab::Basic::Field::Reflection
     def fields_which predicate
       @fields_which_h.fetch predicate do
         @fields_which_h[ predicate ] = which( & predicate ).to_a.freeze
+      end
+    end
+
+    def fields_which_not predicate
+      @fields_which_not_h.fetch predicate do
+        @fields_which_not_h[ predicate ] = which do |fld|
+          ! fld.send predicate
+        end.to_a.freeze
       end
     end
 

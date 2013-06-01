@@ -9,6 +9,10 @@ module Skylab::Basic
       freeze
     end
 
+    def include? x
+      x >= @begin
+    end
+
     attr_reader :begin, :end
 
     def describe

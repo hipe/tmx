@@ -33,20 +33,25 @@ class Skylab::Basic::Field
       flsh = Flusher_.new host_mod, self
 
       Conduit_.new( ->( * meta_f_a ) { flsh.concat_metafields meta_f_a },
-                    ->( * fields_a ) { flsh.concat_fields fields_a } ).
+                    ->( * fields_a ) { flsh.concat_fields fields_a },
+                    ->( f          ) { flsh.field_class_instance_methods f },
+                  ).
         instance_exec( & def_blk )
 
       flsh.flush
     end
 
-    Conduit_ = MetaHell::Enhance::Conduit.new %i| meta_fields fields |
-
+    Conduit_ = MetaHell::Enhance::Conduit.new %i|
+      meta_fields
+      fields
+      field_class_instance_methods
+    |
   end   # ( `Field::Box` reopens below .. )
 
   class Flusher_
 
     def initialize host_mod, box_kls
-      @metafield_a = [ ] ; @field_a = nil
+      @metafield_a = [ ] ; @field_a = nil ; @im = nil
       @target = host_mod ; @box_kls = box_kls
     end
 
@@ -57,6 +62,12 @@ class Skylab::Basic::Field
 
     def concat_fields a
       ( @field_a ||= [ ] ).concat a
+      nil
+    end
+
+    def field_class_instance_methods f
+      @im and fail "sanity - collision, already had #{ @im }"
+      @im = f
       nil
     end
 
@@ -77,6 +88,7 @@ class Skylab::Basic::Field
       n_meta_resolver.push metafield_a, -> x do
         @target.const_set :METAFIELDS_, x
       end, -> x do
+        @im and x.send :include, @im.call
         @target.const_set :FIELD_, x
       end
 
@@ -271,7 +283,7 @@ class Skylab::Basic::Field
 
     def enhance mod
       i = as_has_predicate
-      j = as_get_predicate
+      j = as_value_predicate
       has = as_has_predicate
       val = as_value_ivar
       nn = @normalized_name
@@ -297,8 +309,8 @@ class Skylab::Basic::Field
       @as_has_predicate_ivar ||= :"@#{ as_has_predicate }"
     end
 
-    def as_get_predicate
-      @get_predicate ||= :"get_#{ @normalized_name }"
+    def as_value_predicate
+      @value_predicate ||= :"#{ @normalized_name }_value"
     end
 
     def as_value_ivar

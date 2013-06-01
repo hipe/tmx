@@ -85,7 +85,7 @@ module Skylab::MetaHell
     #  ~ readers - presented in categories, and the categories are
     #  ordered by vaguely how `heavy` their gestalt result is, ascending.
     #  (NOTE there are 2 methods here that do actually mutate the
-    #  receiver, but they are protected. can you find them?) ~
+    #  receiver, but they are private. can you find them?) ~
 
     #         ~ high-level aggregate values w/o a lot of mov. parts ~
 
@@ -257,7 +257,7 @@ module Skylab::MetaHell
       Formal::Box::FUN.fuzzy_reduce[ self, ref, tuple ]
     end
 
-    protected :_fuzzy_reduce
+    private :_fuzzy_reduce
 
     def invert                    # (just like ::Hash#invert, but can bork)
       new = produce_offspring_box
@@ -282,7 +282,7 @@ module Skylab::MetaHell
 
     #         ~ methods that assist in producing new boxes ~
 
-  protected
+  private
 
     # `dupe` - if your subclass very carefully overrides (and calls up to!)
     # dupe_args / dupe_init correctly, you could have relatively painless duping
@@ -350,18 +350,18 @@ module Skylab::MetaHell
   module Formal::Box::InstanceMethods::Mutators
 
     #   ~ these are all the nerks that add, change, and remove the
-    # box members that make up its constituency. they a) all all protected
+    # box members that make up its constituency. they a) all all private
     # by default but can be opened up as necessary and b) are here because
     # we might want to make some strictly read-only box-likes. ~
 
-  protected
-      #         ~ protected methods that add to the box's contituency ~
+  private
+      #         ~ private methods that add to the box's contituency ~
 
     def accept item               # convenience `store`-ish for nodes like this
       add item.normalized_name, item  # might go away, hella smell #todo
       nil
     end
-                                  # (note there is not even a protected version
+                                  # (note there is not even a private version
                                   # of `store` ([]=) because it is contrary
                                   # to Box's desire to be explicit about things.
                                   # The equivalent of `store` for a box requires
@@ -375,7 +375,7 @@ module Skylab::MetaHell
       x
     end
 
-    #         ~ protected methods that change existing values ~
+    #         ~ private methods that change existing values ~
 
     def change name, value        # constituent with `name` must exist. replace
       res = @hash.fetch name      # it with `value` and result is the previous
@@ -449,7 +449,7 @@ module Skylab::MetaHell
       end                         # receiver.
     end
 
-    #        ~ the protected method that prevents future change ~
+    #        ~ the private method that prevents future change ~
 
     def freeze
       super
@@ -474,7 +474,7 @@ module Skylab::MetaHell
 
     alias_method :to_a, :values
 
-  protected
+  private
 
     def initialize                # (subclasses call super( ) of course!)
       @order = [ ]
@@ -670,7 +670,7 @@ module Skylab::MetaHell
 
     alias_method :which, :filter  # #experimental
 
-  protected
+  private
 
     alias_method :metahell_original_initialize, :initialize
 

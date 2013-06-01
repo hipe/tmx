@@ -86,7 +86,7 @@ module Skylab::MetaHell
       @order = self.class.names
       @hash = hash_proxy[ self ]
       nil_a = base_init.arity.times.map { }
-      self.base_init(* nil_a )
+      base_init(* nil_a )
       @box_class = Formal::Box
       @strange_base_args = nil_a
       nil
@@ -98,7 +98,7 @@ module Skylab::MetaHell
       struct.instance_exec do
         @order = struct_kls.members
         @hash = hash_pxy  # amazing
-        self.base_init(* base_args.bind( box ).call )  # DODGY
+        base_init(* base_args.bind( box ).call )  # DODGY
         @box_class = box.class
         @strange_base_args = box.send :base_args
         # (ivars in a struct is a smell so don't get carried away)

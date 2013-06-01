@@ -34,7 +34,7 @@ module Skylab::MetaHell::DSL_DSL
   #       wiz :piz                        # then set the value of `wiz`
   #     end
   #                                       # read the value:
-  #     Bar.get_wiz # => :piz
+  #     Bar.wiz_value # => :piz
   #
   #     # but setters are private by default:
   #
@@ -42,7 +42,7 @@ module Skylab::MetaHell::DSL_DSL
   #
   #     # because this DSL generates only readers and not writers for your
   #     # instances, you get a public reader of the same name in your
-  #     # instances (not prefixed with "get_").
+  #     # instances (not suffixed with "_value").
   #
   #                                        # read the value in an instance:
   #     Bar.new.wiz # => :piz
@@ -153,7 +153,7 @@ module Skylab::MetaHell::DSL_DSL
     # `nn` = normalize name ; `r1` = read 1 (the module) ; `w1` = write 1 (
     # the module) ; `r2` = read 2 (the instance)
     class Fstory_
-      def initialize nn, type, r1="get_#{ nn }".intern, w1=nn, r2=nn
+      def initialize nn, type, r1="#{ nn }_value".intern, w1=nn, r2=nn
         super
       end
     end
@@ -173,7 +173,7 @@ module Skylab::MetaHell::DSL_DSL
   #       pik :nic
   #     end
   #
-  #     Bar.get_pik # => :nic
+  #     Bar.pik_value # => :nic
   #     Bar.new.pik # => :nic
 
   def self.enhance_module amod, &def_blk

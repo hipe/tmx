@@ -127,12 +127,12 @@ module Skylab::Basic::TestSupport::Field
         a.has_range.should eql( true )
         s.has_range.should eql( nil )
         l.has_range.should eql( nil )
-        a.get_range.should eql( [1..2] )
+        a.range_value.should eql( [1..2] )
         -> do
-          s.get_range
+          s.range_value
         end.should raise_error( /"range" is undefined for "sex" so #{
-          }this call to `get_range` is meaningless - use `has_range` #{
-          }to check this before calling `get_range`\./ )
+          }this call to `range_value` is meaningless - use `has_range` #{
+          }to check this before calling `range_value`\./ )
       end
     end
   end

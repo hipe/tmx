@@ -21,7 +21,7 @@ module Skylab::FileMetrics::TestSupport::Models
     extend MetaHell::Let
 
     let :klass do
-      Models_TestSupport::Sandbox.kiss get_with_klass.call
+      Models_TestSupport::Sandbox.kiss with_klass_value.call
     end
   end
 
