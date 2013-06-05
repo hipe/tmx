@@ -42,9 +42,14 @@ module Skylab::Test
         ok, res = start_simplecov y, sn
         ok or break
         @black_x = -> do  # do this after starting above just as grease
-          Black_Rx_Matcher_.new(
-            /#{ ::Regexp.escape ::Skylab::TestSupport::FUN._spec_rb[] }\z/
-          )
+          rx = ::Regexp.method :escape ; fun = ::Skylab::TestSupport::FUN
+          Black_Rx_Matcher_.new(  # could stand to be more extensible
+            %r{ (?:
+              #{ rx[ fun._spec_rb[] ] }
+                |
+              (?: \A | / )
+              (?: #{  fun.test_support_filenames[].map( & rx ) * '|' } )
+            )\z }x )
         end.call
         state! :started
         ok = true ; res = nil
@@ -122,6 +127,7 @@ module Skylab::Test
       yes = n = yc = nc = 0
       p = $VERBOSE ; $VERBOSE = nil ; require 'simplecov' ; $VERBOSE = p
       sc = ::SimpleCov ; cache_h = { }
+      sc.command_name "#{ FULL_NAME_[] } [various]"
       sc.add_filter do |x|
         @is_started or ::Kernel.raise "sanity - had state #{
           }#{ @state.inspect } when tried to load - #{ x.filename }"
@@ -209,5 +215,3 @@ module Skylab::Test
     end
   end
 end
-
-# ::SimpleCov.command_name "#{ Core_Client.full_name } [various]"

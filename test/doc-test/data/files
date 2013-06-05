@@ -1,5 +1,6 @@
 lib/skylab/basic/pathname/union.rb
 lib/skylab/face/cli/lipstick.rb
+lib/skylab/face/cli/tableize.rb
 lib/skylab/headless/plugin/host/proxy.rb
 lib/skylab/meta-hell/dsl-dsl.rb
 lib/skylab/meta-hell/function.rb

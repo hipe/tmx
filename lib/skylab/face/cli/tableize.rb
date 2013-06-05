@@ -1,14 +1,24 @@
 module Skylab::Face
 
   module CLI::Tableize
-    # empty
-  end
-
-  module CLI::Tableize::InstanceMethods
 
     # `tableize` - deprecated for `tablify` [#fa-036]
+    #
+    # `tableize` has been deprecated for `tablify`. but here's a demo:
+    #
+    #     y = [ ]
+    #     Face::CLI::Tableize::FUN.tableize[
+    #       [ food: 'donuts', drink: 'coffee' ], -> line { y << line } ]
+    #
+    #     y.shift   # => "|   Food  |   Drink |"
+    #     y.shift   # => "| donuts  |  coffee |"
+    #     y.length  # => 0
+    #
 
-    def tableize rows, opts = {}, &line_f
+    o = { }
+
+    o[:tableize] = ->( rows, opts = {}, f, &blk) do
+      line_f = ( a = [ f, blk ].compact ).fetch( ( a.length - 1 ) * 2 )
       opts = { show_header: true }.merge(opts)
       keys_order = []
       max_h = ::Hash.new { |h, k| keys_order.push(k) ; h[k] = 0 }
@@ -32,27 +42,39 @@ module Skylab::Face
       nil
     end
 
-    # `tablify` - quick & dirty pretty table hack. NOTE `false` below..
+    # `tablify` - quick & dirty pretty table hack.  NOTE `false` below..
     #
     # (if `row_ea` is an enumerator we've got to lock it down .. it might
     # be a randomized functional tree, e.g)
+    #
+    # usage:
+    #
+    #     y = [ ]
+    #     Face::CLI::Tableize::FUN.tablify[
+    #       [ 'food', 'drink' ],
+    #       [[ 'donuts', 'coffee' ]], -> line { y << line } ]
+    #
+    #     y.shift  # => '|   food  |   drink |'
+    #     y.shift  # => '| donuts  |  coffee |'
+    #     y.length # => 0
+    #
 
-    def tablify col_a, row_ea, line, show_header=true, left = '| ',
-        sep = '  |  ', right = ' |'
+    o[:tablify] = -> col_a, row_ea, line, show_header=true, left = '| ',
+        sep = '  |  ', right = ' |' do
 
       w = col_a.length
       max_h = ::Hash.new { |h, k| h[ k ] = 0 }
-      max = -> *a do
+      max = -> a do
         w.times do |x|
-          l = a.fetch( x ).to_s.length
+          l = a.fetch( x ).length
           l > max_h[ x ] and max_h[ x ] = l
         end
       end
-      max[ *col_a ] if show_header
+      max[ col_a ] if show_header
       cache_a = []
-      ok = row_ea.each do |*a|
+      ok = row_ea.each do |a|
         cache_a << a
-        max[ *a ]
+        max[ a ]
       end
       if ok
         fmt = "#{ left }#{ w.times.map do |x|
@@ -67,6 +89,13 @@ module Skylab::Face
         end
       end
       ok
+    end
+
+    FUN = ::Struct.new( * o.keys ).new( * o.values )
+
+    module InstanceMethods
+      define_method :tableize, & FUN.tableize
+      define_method :tablify, & FUN.tablify
     end
   end
 end

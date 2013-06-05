@@ -157,7 +157,7 @@ module Skylab::Face
 
     # `field_normalize`
     def field_normalize y, fld, x1
-      n_x = fld.get_normalizer
+      n_x = fld.normalizer_value
       n_x == true and n_x = method( :"normalize_#{ fld.normalized_name }" )
       ok = instance_exec y, x1, -> x2 do
         x1 = x2
