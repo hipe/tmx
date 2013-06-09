@@ -11,47 +11,11 @@ module Skylab::TMX
   # (this is the jumping-off point from your sanity - the below amounts to
   # an intimation at the aspirations for what may grow to maybe become .. hl.)
 
-  # (although it is antithetical to the intended architecture
-  # it is useful during development to be able to focus on one
-  # sub-node at a time when necessary, by commenting *in* an
-  # item below to *de*activate it. (comment it out to activate it! #todo))
-  # (the ones de-activated below also happen to be the uninteresting,
-  # really old ones)
-
-  metadata_h = ::Hash[ [
-    # :'beauty-salon',       # good - face
-    :bleed,                  # #todo
-    :cli,                    # 2012
-    # :'cov-tree',           # good - legacy
-    # :cull,                 # good - face
-    # :'file-metrics',       # good - legacy
-    :'git-viz',              # 2012
-    :jshint,                 # 2012
-    :nginx,                  # 2012
-    # :permute,              # good - bleeding
-    :php,                    # 2012
-    # :regret,                 # TODO
-    :schema,                 # 2012
-    :slicer,                 # upcoming
-    # :snag,                 # good - headless
-    :'team-city',            # 2012
-    # :'tan-man',            # good - bleeding
-    # :treemap,              # good - bleeding
-    :xpdf                    # 2012
-  ].map { |k| [ k, false ] } ].freeze
-
-  define_singleton_method :metadata_h do metadata_h end
 
   # (for each required internal library and sub-product constant, make a local
   # such constant here under our own for readability and ease of refactoring:)
 
-  [
-    :Autoloader,
-    :Face,
-    :MetaHell,
-    :Porcelain,
-    :TMX  # self too
-  ].each do |c|
+  %i| Autoloader Face MetaHell Porcelain TMX |.each do |c|  # self too
     const_set c, ::Skylab.const_get( c, false )
   end
 
@@ -68,6 +32,8 @@ module Skylab::TMX
   end
 
   class CLI < ::Skylab::Face::CLI
+
+    # TMX::Modules::Arch.touch
 
     version do                    # (this is an officious facet of the lib.)
       ::Skylab.dir_pathname.join( '../../VERSION' ).read.strip
@@ -119,59 +85,71 @@ module Skylab::TMX
     end
 
     class Mechanics_ < Face::CLI_Mechanics_  # the current way to do this :/
+
       def puff  # this is [#fa-038] - we get "puffed" when we need to.
-        eew = parent_shell.instance_variable_get :@be_verbose
-        @puffer ||= Puffer_[ TMX::Modules, TMX.metadata_h, sheet, @y, eew ]
-        @puffer.puff
+        ( @puffer ||= build_puffer ).puff
         is_puffed!
+      end
+
+    private
+
+      def build_puffer
+        eew = parent_shell.instance_variable_get :@be_verbose
+        white = -> _norm_filename { true }  # got replaced by `skip`
+        Puffer_[ TMX::Modules, white, sheet, @y, eew ]
       end
     end
 
     Puffer_ = MetaHell::Proxy::Nice.new :puff
       # it "puffs" a command node (e.g. namespace) into life as it is needed.
 
-    def Puffer_.[] box_mod, metadata_h, story, y, be_verbose
-      tug_ns = nil
-      res = new( puff: -> do
+    def Puffer_.[] box_mod, white, story, y, be_verbose
+      pth = -> pn do
+        pn.relative_path_from ::Skylab.dir_pathname
+      end
+      load_it = -> norm_i do
+        # we cannot use autoloader/autovivifier when the module name is in
+        # scream case, which some subproduct names are, hence:
+        anchor = box_mod.dir_pathname.join "#{ norm_i }"
+        welcome = anchor.sub_ext Autoloader::EXTNAME
+        if welcome.exist?
+          y << "(leaf - #{ pth[ welcome ] })" if be_verbose
+          # require welcome.to_s  ; doing it the below way instead
+          box_mod.const_fetch( norm_i )  # wires them for autoloading
+          true
+        else
+          cli = anchor.join "cli#{ Autoloader::EXTNAME }"
+          if cli.exist?
+            y << "(branch - #{ pth[ cli ] })" if be_verbose
+            # require cli.to_s
+            box_mod.const_fetch( norm_i ).const_get( :CLI, false )
+            true
+          else
+            y << "(nothing loadable for \"#{ norm_i }\")" if be_verbose
+            nil
+          end
+        end
+      end
+      tug_ns = -> bx, norm_i do
+        pn = load_it[ norm_i ]
+        if pn
+          story.fetch_constituent norm_i do
+            y << "(didn't find #{ norm_i } ns in #{ pth[ pn ] })" if be_verbose
+            nil
+          end
+        end
+      end
+      new( puff: -> do
         y << "(loading all names.)" if be_verbose
         box_mod.names.each do |name|
           norm_i = name.as_slug.intern  # NOTE this is the convention
-          if false == metadata_h[ norm_i ]
+          if false == white[ norm_i ]
             y << "(disabled - #{ norm_i })" if be_verbose
           else
             story.if_constituent norm_i, nil, tug_ns
           end
         end
       end )
-
-      load_it = pth = nil
-      tug_ns = -> bx, norm_i do
-        pn = load_it[ norm_i ]
-        story.fetch_constituent norm_i do
-          raise ::RuntimeError, "didn't find #{ norm_i } ns in #{ pth[ pn ] }"
-        end
-      end
-
-      pth = -> pn do
-        pn.relative_path_from ::Skylab.dir_pathname
-      end
-
-      load_it = -> norm_i do
-        # we cannot use autoloader/autovivifier when the module name is in
-        # scream case, which some subproduct names are, hence:
-        pn = box_mod.dir_pathname.join "#{ norm_i }/cli#{ Autoloader::EXTNAME }"
-        if pn.exist?
-          y << "(leaf - #{ pth[ pn ] })" if be_verbose
-          require pn.sub_ext ''
-          pn
-        else
-          p = pn.dirname
-          y << "(branch - #{ pth[ p ] })" if be_verbose
-          require p
-          p
-        end
-      end
-      res
     end
   end
 end

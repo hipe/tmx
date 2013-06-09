@@ -52,7 +52,7 @@
 [#036]       #done format_error -> inflect_failure_reason (and tests!)
 [#035]       #wont delegates_to go away as a smell (meh)
 [#034]       #done sort out root_runtime, client, parent_runtime, etc
-[#033]       #done full_action_name_parts becomes normalized_name (action_name ..?)
+[#033]       #done full_action_name_parts becomes local_normal_name (action_name ..?)
 [#032]       #done rename stdout, stderr
 [#031]       #done regretify all tests
 [#030]       #done reconceive api as a service

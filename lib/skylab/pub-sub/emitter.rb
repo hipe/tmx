@@ -111,7 +111,7 @@ module Skylab::PubSub
     end
   end
 
-  class PubSub::Stream < Semantic::Digraph::Node  # (stowaway) used above
+  class PubSub::Stream < Semantic::Digraph::Node  # (#stowaway) used above
   end
 
   class PubSub::Stream::Digraph < Semantic::Digraph

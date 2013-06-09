@@ -262,7 +262,7 @@ module Skylab::Snag
       begin
         res = Models::Tag.normalize( tag_ref, error, info ) or break
         tag_body = res
-        found = tags.detect { |tg| tg.normalized_name == tag_body }
+        found = tags.detect { |tg| tg.local_normal_name == tag_body }
         rdn = nil ; redundnt = -> msg { rdn = true ; redundant[ msg ] }
         res = if do_add
           if found

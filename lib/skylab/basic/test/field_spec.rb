@@ -118,9 +118,9 @@ module Skylab::Basic::TestSupport::Field
 
         self.Mod_3
         a, s, l = self.Mod_3.field_box.at :age, :sex, :location
-        a.normalized_name.should eql( :age )
-        s.normalized_name.should eql( :sex )
-        l.normalized_name.should eql( :location )
+        a.local_normal_name.should eql( :age )
+        s.local_normal_name.should eql( :sex )
+        l.local_normal_name.should eql( :location )
         a.is_urgent.should eql( nil )
         s.is_urgent.should eql( nil )
         l.is_urgent.should eql( true )

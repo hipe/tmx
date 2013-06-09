@@ -468,7 +468,7 @@ module Skylab::Headless
     end
 
     def leaf_method_name
-      name.normalized_local_name
+      name.local_normal
     end
   end
 end

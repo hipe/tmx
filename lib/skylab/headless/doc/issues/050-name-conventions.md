@@ -20,9 +20,14 @@ Use more specific names for variables or methods that represent names.
   + `foo_label` or `bar_string` is nice, the former suggests that it is
   suitable for display to the user, the latter is at least being explicit.
 
-  + `normalized_name` is better. When I see "normalized" here i think
-  "symbol", which is a step in the right direction. *however*, in some
-  contexts a `normalized_name` is still too vague (..)
+  + `normalized_name` (or `local_normal_name`) is better. When I see "normalized"
+  here i think "symbol", which is a step in the right direction. *however*,
+  in some contexts a `local_normal_name` is still too vague.
+
+  (at present we are trending towards using variously (`foo.name.local_normal`,
+  `foo.name.anchored_normal`, and `foo.local_normal_name` and
+  `foo.anchored_normal_name` as our four universal, unamibguous meta-names.)
+
 
 ### with one exception..
 

@@ -4,6 +4,8 @@ class Skylab::Test::Plugins::Divide
 
   class Worker_
 
+    include Agent_IM_
+
     def self.[] *a
       new( *a ).execute
     end
@@ -34,7 +36,7 @@ class Skylab::Test::Plugins::Divide
           segnum = part_a.fetch i
           segnum.times.map do
             offset += 1
-            big_a.fetch( offset ).data.normalized_local_name
+            big_a.fetch( offset ).data.local_normal_name
           end
         end
         render[ part_b ]

@@ -64,6 +64,7 @@ module Skylab::Test
     end
 
     include Host_InstanceMethods  # `merge_options`
+    include Agent_IM_
 
     available_options do |o, ctx_a|
       ctx_a ||= [ ]
@@ -302,19 +303,19 @@ module Skylab::Test
 
     def initialize slug, dir_pathname
       @dir_pathname = dir_pathname
-      @normalized_local_name = slug.intern
+      @local_normal_name = slug.intern
     end
 
-    attr_reader :normalized_local_name, :dir_pathname
+    attr_reader :local_normal_name, :dir_pathname
 
     def slug
-      @slug ||= @normalized_local_name.to_s
+      @slug ||= @local_normal_name.to_s
     end
 
     -> do  # `all_spec_paths`
       spec_paths_cache = nil
       define_method :all_spec_paths do
-        spec_paths_cache[ @normalized_local_name ]
+        spec_paths_cache[ @local_normal_name ]
       end
 
       cache_h = build_cache_h = nil ; empty_a = [ ].freeze  # ocd
@@ -735,6 +736,8 @@ module Skylab::Test
       |
     end
 
+    include Agent_IM_
+
     def initialize
       @sexp = @be_verbose = nil
     end
@@ -861,6 +864,8 @@ module Skylab::Test
         sort_mutex
       |
     end
+
+    include Agent_IM_
 
     def initialize
       @be_verbose = nil

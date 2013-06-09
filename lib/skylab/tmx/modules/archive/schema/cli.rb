@@ -1,9 +1,12 @@
-require 'skylab/face/cli/external-dependencies'
-
 module Skylab::TMX::Modules::Schema
+
   class CLI < Skylab::Face::CLI
-    namespace :schema do
-      external_dependencies "#{File.dirname(__FILE__)}/data/deps.json"
+
+    set :desc, -> y do
+      y << "part of the big dream, but off for now.."
     end
+
+    # kexternal_dependencies "#{File.dirname(__FILE__)}/data/deps.json"
+
   end
 end

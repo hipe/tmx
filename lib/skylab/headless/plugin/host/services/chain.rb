@@ -16,10 +16,10 @@ module Skylab::Headless
     # `build_host_proxy` - chain-friendly host proxy class omg
 
     def build_host_proxy plugin_client
-      ( if @host_module.const_defined? :Host_Proxy_Chain_
-        @host_module.const_get :Host_Proxy_Chain_
+      ( if @host_module.const_defined? :Host_Services_Chain_
+        @host_module.const_get :Host_Services_Chain_
       else
-        @host_module.const_set :Host_Proxy_Chain_, Hstpxy_.produce( @a )
+        @host_module.const_set :Host_Services_Chain_, Hstpxy_.produce( @a )
       end ).new @a, plugin_client
     end
 
@@ -83,6 +83,7 @@ module Skylab::Headless
           end ) << index
         end
       end
+      h.key?( :[] ) and fail "sanity - `[]` is a reserved name for now"
       # `a` # =>  [[:out, 0], [:err, 0], [:save, 0, 1]] ..
       ::Class.new( self ).class_exec do
         const_set :A_, a ; const_set :H_, h
@@ -99,13 +100,23 @@ module Skylab::Headless
       a, h = self.class::A_, self.class::H_
       pstory = plugin_client.plugin_story
 
-      @dispatch = -> i, ary do
+      @dispatch = -> i, ary=nil do
         # 1) look up the service by name in the ordered service matrix `a`
         # 2) fetch that row, and fetch the first (1) index of the tuple.
         # 3) that index is an index into `svc_a`, the actual host svcs obj.
         # 4) (yes we could cache this)
         svc_a.fetch( a.fetch( h.fetch( i ) ).fetch( 1 ) ).
           call_host_service pstory, i, ary
+      end
+    end
+
+    # `[]` - canonical atomic service aref accessor [#074]
+
+    def [] *i_a
+      if 1 == i_a.length
+        @dispatch[ i_a.fetch 0 ]
+      else
+        i_a.map { |i| @dispatch[ i ] }
       end
     end
   end

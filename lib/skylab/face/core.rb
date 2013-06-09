@@ -12,6 +12,8 @@ module Skylab::Face
 
   extend MAARS
 
+  stowaway :TestSupport, 'test/test-support'  # [#mh-030] for [#045]
+
   module API
     extend MAARS
     def self.[] mod
@@ -53,6 +55,7 @@ module Skylab::Face
   end
 
   module Magic_Touch_  # local metaprogramming tightener for this pattern
+    # (tracked as [#046])
 
     # Magic_Touch_ is an #experimental facility for lazy-loading libraries
     # based on when particular methods are called. how it works is, given:

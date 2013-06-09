@@ -23,7 +23,7 @@ module Skylab::Headless
     # custom arities..
 
     def initialize i, includes_zero, is_unbounded, desc
-      @normalized_name, @includes_zero, @is_unbounded, @desc =
+      @local_normal_name, @includes_zero, @is_unbounded, @desc =
         i, includes_zero, is_unbounded, desc.freeze
       if :zero == i
         def self.is_zero? ; true end
@@ -39,7 +39,7 @@ module Skylab::Headless
       name_a = [ ] ; obj_a = [ ] ;  h = { }
       f[ -> *a do
         o = new( *a )
-        name_a << ( nn = o.normalized_name )
+        name_a << ( nn = o.local_normal_name )
         obj_a << o
         h[ nn ] = o
       end ]
@@ -55,7 +55,7 @@ module Skylab::Headless
 
     define_extent[ -> define do
 
-      attr_reader        :normalized_name, :includes_zero, :is_unbounded, :desc
+      attr_reader        :local_normal_name, :includes_zero, :is_unbounded, :desc
 
       ZERO         = define[ :zero,         true,           false, '0' ]
       ZERO_OR_ONE  = define[ :zero_or_one,  true,           false, '[0..1]' ]
@@ -68,7 +68,7 @@ module Skylab::Headless
     # usage:
     #
     #     Headless::Arity::NAMES_ # => [ :zero, :zero_or_one, :zero_or_more, :one, :one_or_more ]
-    #     Headless::Arity::EACH_.first.normalized_name  # => :zero
+    #     Headless::Arity::EACH_.first.local_normal_name  # => :zero
     #     Headless::Arity[ :one_or_more ].is_unbounded  # => true
 
   end

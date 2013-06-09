@@ -13,6 +13,8 @@ module Skylab::Test
 
     end
 
+    include Agent_IM_
+
     def initialize
       @yep = false
     end

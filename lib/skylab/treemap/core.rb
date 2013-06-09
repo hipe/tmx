@@ -40,7 +40,7 @@ module Skylab::Treemap
     stowaway :Action, :Event, :SubClient  # (load s.c to find action, event)
   end
 
-  module Plugins                  # stowaway
+  module Plugins                  # #stowaway
     extend MetaHell::Boxxy
   end
 

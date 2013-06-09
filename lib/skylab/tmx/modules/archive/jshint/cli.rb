@@ -3,10 +3,13 @@ require 'skylab/face/cli'
 module Skylab::TMX
   module Modules::Jshint
     class CLI < Skylab::Face::CLI
-      namespace :"jshint" do
-        def install *a
-          Plumbing.new.run
-        end
+
+      set :desc, -> y do
+        y << '(woah - heh this tiny thing "works")'
+      end
+
+      def install *a
+        Plumbing.new.run
       end
     end
   end

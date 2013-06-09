@@ -16,7 +16,7 @@ module Skylab::Permute
           y << ( enum_a.map do |enum|
             prev_n = n
             n /= enum.length
-            [ enum.normalized_name, enum.value_a[ prev_n % enum.length ] ]
+            [ enum.local_normal_name, enum.value_a[ prev_n % enum.length ] ]
           end )
         end
       end
@@ -33,7 +33,7 @@ module Skylab::Permute
     def execute
 
       emit :header, ( @enum_a.map do |e|
-        [ e.normalized_name, e.label ]
+        [ e.local_normal_name, e.label ]
       end )
 
       if @enum_a.length.nonzero?

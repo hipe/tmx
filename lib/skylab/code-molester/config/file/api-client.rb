@@ -1,30 +1,29 @@
 module Skylab::CodeMolester
 
-  Config::File::SERVICE_NAMES_ = %i|
-    config_file_search_start_pathname
-    config_default_init_directory
-    config_file_search_num_dirs
-    config_filename
-    configs
-    config
-  |
+  module Config::File::API_Client
+
+    SERVICE_NAMES_ = %i|
+      config_file_search_start_pathname
+      config_default_init_directory
+      config_file_search_num_dirs
+      config_filename
+      configs
+      config
+    |
+  end
 
   module Config::File::API_Action
 
-    # (stowed away here for now, b.c 1) it's trivial and 2) hopefully ok.)
+    # (#stowaway here for now, b.c 1) it's trivial and 2) hopefully ok.)
 
     def self.[] mod
       mod.send :include, self
       nil
     end
 
-    def _dispatch_config_request_to_parent i
-      @plugin_host_proxy.send i
-    end
-
-    Config::File::SERVICE_NAMES_.each do |i|
+    Config::File::API_Client::SERVICE_NAMES_.each do |i|
       define_method i do
-        _dispatch_config_request_to_parent i
+        @plugin_host_services.send i
       end
     end
   end
@@ -36,7 +35,7 @@ module Skylab::CodeMolester
     def self.enhance host, & def_blk
       host.class_exec do
         enhance_model_enhanced_api_client do
-          service_names Config::File::SERVICE_NAMES_
+          service_names Config::File::API_Client::SERVICE_NAMES_
         end
 
         # `configs` / `config` - readability enhancement

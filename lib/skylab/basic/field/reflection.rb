@@ -59,15 +59,15 @@ module Skylab::Basic::Field::Reflection
             mf.is_reflective or next
             i = mf.binary_predicate or next
 
-            define_method "#{ mf.normalized_name }_fields" do
+            define_method "#{ mf.local_normal_name }_fields" do
               field_box.fields_which i
             end
 
-            define_method "#{ mf.normalized_name }_field_names" do
+            define_method "#{ mf.local_normal_name }_field_names" do
               field_box.field_names_which i
             end
 
-            define_method "#{ mf.normalized_name }_fields_bound" do
+            define_method "#{ mf.local_normal_name }_fields_bound" do
               fields_bound_which i
             end
           end
@@ -137,7 +137,7 @@ module Skylab::Basic::Field::Reflection
     attr_reader :field
 
     def name
-      @field.normalized_name
+      @field.local_normal_name
     end
 
     MetaHell::Function self, :@func, :value
@@ -179,7 +179,7 @@ module Skylab::Basic::Field::Reflection
     def field_names_which predicate
       @field_names_which_h.fetch predicate do
         @field_names_which_h[ predicate ] = which( & predicate ).
-          map( & :normalized_name ).freeze
+          map( & :local_normal_name ).freeze
       end
     end
 

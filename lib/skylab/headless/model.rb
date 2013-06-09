@@ -25,8 +25,8 @@ module Skylab::Headless
       Headless::Name::From::Module::Graph self, self::EVENTS_ANCHOR_MODULE
     end
 
-    def normalized_event_name
-      name_function.normalized_name
+    def event_anchored_normal_name
+      name_function.local_normal_name
     end
   end
 
@@ -34,14 +34,14 @@ module Skylab::Headless
 
     def is? sym                   # this has the obvious barrel of the
       if ::Symbol === sym         # obvious shotgun it is staring down,
-        normalized_event_name.last == sym              # maybe several
+        event_anchored_normal_name.last == sym              # maybe several
       else
-        normalized_event_name == sym # ick
+        event_anchored_normal_name == sym # ick
       end
     end
 
-    def normalized_event_name
-      self.class.normalized_event_name
+    def event_anchored_normal_name
+      self.class.event_anchored_normal_name
     end
   end
 end

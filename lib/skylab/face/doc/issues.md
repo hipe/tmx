@@ -1,3 +1,6 @@
+[#046]       #feature-point `Magic_Touch_`
+[#045]       #doc-point Face::TestSupport::CLI and below is part of face's
+             public API. it is used by several other subproducts.
 [#044]       #doc-point `ouroboros` and "strange modules"
 [#043]       #doc-point feature of `isomorphic api action resolution`
 [#042]       #doc-point this fun problem w/ customizing your clients..

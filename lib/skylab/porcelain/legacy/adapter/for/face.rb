@@ -13,7 +13,7 @@ module Skylab::Porcelain::Legacy
 
   class Adapter::For::Face::Of::Hot
 
-    define_singleton_method :[] do |my_cli_class, hi_sheet|
+    define_singleton_method :[] do |hi_sheet, my_cli_class|
       -> hi_svcs, _slug_used=nil do
         real = -> do
           ioe = hi_svcs[ :istream, :ostream, :estream ]

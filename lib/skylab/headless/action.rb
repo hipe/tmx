@@ -27,7 +27,7 @@ module Skylab::Headless
       # have name fuctions that are not full.
 
     def normalized_action_name
-      name_function.normalized_name
+      name_function.anchored_normal
     end
 
     def _headless_init_add x
@@ -75,7 +75,7 @@ module Skylab::Headless
     end
 
     def normalized_local_action_name
-      self.class.name_function.local.normalized_local_name
+      self.class.name_function.local.local_normal
     end
 
     def parameter_label x, idx=nil  # [#036] explains it all

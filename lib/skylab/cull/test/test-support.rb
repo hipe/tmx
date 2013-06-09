@@ -1,18 +1,19 @@
 require_relative '../core'
-require 'skylab/face/test/cli/test-support'
+require 'skylab/test-support/core'
 
 module Skylab::Cull::TestSupport
 
   ::Skylab::TestSupport::Regret[ Cull_TestSupport = self ]
 
-  ::Skylab::Face::TestSupport::CLI[ self ]
-
   module CONSTANTS
     Cull = ::Skylab::Cull
+    Face = ::Skylab::Face
     TestSupport = ::Skylab::TestSupport
   end
 
   include CONSTANTS
+
+  Face::TestSupport::CLI[ self ]
 
   extend TestSupport::Quickie
 

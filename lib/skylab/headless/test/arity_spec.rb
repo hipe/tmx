@@ -19,7 +19,7 @@ module Skylab::Headless::TestSupport::Arity
         Sandbox_1.with self
         module Sandbox_1
           Headless::Arity::NAMES_.should eql( [ :zero, :zero_or_one, :zero_or_more, :one, :one_or_more ] )
-          Headless::Arity::EACH_.first.normalized_name.should eql( :zero )
+          Headless::Arity::EACH_.first.local_normal_name.should eql( :zero )
           Headless::Arity[ :one_or_more ].is_unbounded.should eql( true )
         end
       end

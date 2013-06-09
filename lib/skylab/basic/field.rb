@@ -176,10 +176,10 @@ class Skylab::Basic::Field
   class Field
 
     def initialize nn
-      @normalized_name = nn
+      @local_normal_name = nn
     end
 
-    attr_reader :normalized_name
+    attr_reader :local_normal_name
 
     class << self
 
@@ -218,7 +218,7 @@ class Skylab::Basic::Field
     end
 
     def as_host_ivar
-      @as_host_ivar ||= :"@#{ @normalized_name }"
+      @as_host_ivar ||= :"@#{ @local_normal_name }"
     end
   end
 
@@ -242,7 +242,7 @@ class Skylab::Basic::Field
     end                                  # represent the meta meta fields. in
                                          # other words, binary fields are used..
     def as_is_predicate
-      @is_predicate ||= :"is_#{ @normalized_name }"
+      @is_predicate ||= :"is_#{ @local_normal_name }"
     end                                  # for both meta fields and meta meta
                                          # fields...
     def mutate inst, _scn
@@ -284,14 +284,14 @@ class Skylab::Basic::Field
       j = as_value_predicate
       has = as_has_predicate
       val = as_value_ivar
-      nn = @normalized_name
+      nn = @local_normal_name
       mod.module_exec do
         attr_reader i
         define_method j do
           if send has
             instance_variable_get val
           else
-            raise "\"#{ nn }\" is undefined for \"#{ @normalized_name }\" #{
+            raise "\"#{ nn }\" is undefined for \"#{ @local_normal_name }\" #{
               }so this call to `#{ j }` is meaningless - #{
               }use `#{ has }` to check this before calling `#{ j }`."
           end
@@ -300,7 +300,7 @@ class Skylab::Basic::Field
     end
 
     def as_has_predicate
-      @has_predicate ||= :"has_#{ @normalized_name }"
+      @has_predicate ||= :"has_#{ @local_normal_name }"
     end
 
     def as_has_predicate_ivar
@@ -308,11 +308,11 @@ class Skylab::Basic::Field
     end
 
     def as_value_predicate
-      @value_predicate ||= :"#{ @normalized_name }_value"
+      @value_predicate ||= :"#{ @local_normal_name }_value"
     end
 
     def as_value_ivar
-      @value_ivar ||= :"@#{ @normalized_name }_value"
+      @value_ivar ||= :"@#{ @local_normal_name }_value"
     end
 
     def mutate inst, _scn

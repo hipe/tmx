@@ -245,7 +245,7 @@ module Skylab::Treemap
     # rendering to the target mode.
 
     def param x, render_method=nil             # generic rendering of params
-      ::Symbol === x or x = x.normalized_name
+      ::Symbol === x or x = x.local_normal_name
       opt = option_parser.options.fetch x do end
       if opt
         str = opt.send( render_method || :render )

@@ -13,7 +13,7 @@ module Skylab::Cull
     emits :payload_line, couldnt: :entity_event
 
     def execute
-      host.model( :data, :sources ).
+      plugin_host_services.model( :data, :sources ).
         list method( :payload_line ), method( :couldnt )
     end
   end
@@ -38,7 +38,7 @@ module Skylab::Cull
 
     def execute
       field_h, opt_h = unpack_params :ds, true
-      coll = host.model :data, :sources
+      coll = plugin_host_services.model :data, :sources
       coll.add field_h, opt_h,
         could: method( :could ),
         couldnt: method( :couldnt ),

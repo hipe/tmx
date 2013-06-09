@@ -1,16 +1,19 @@
 require_relative '../core'
-require 'skylab/face/test/cli/test-support'
+require 'skylab/test-support/core'
 
 module Skylab::Slicer::TestSupport
+
   ::Skylab::TestSupport::Regret[ Slicer_TestSupport = self ]
-  ::Skylab::Face::TestSupport::CLI[ self ]
 
   module CONSTANTS
+    Face = ::Skylab::Face
     Slicer = ::Skylab::Slicer
     TestSupport = ::Skylab::TestSupport
   end
 
   include CONSTANTS
+
+  Face::TestSupport::CLI[ self ]
 
   extend TestSupport::Quickie
 

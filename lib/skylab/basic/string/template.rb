@@ -101,7 +101,7 @@ module Skylab::Basic
     define_method :normalize, & fun.normalize_matched_parameter_name
     private :normalize
 
-    Param_ = ::Struct.new :surface, :normalized_name, :offset, :_margin
+    Param_ = ::Struct.new :surface, :local_normal_name, :offset, :_margin
 
     # `get_formal_parameters` - result is an enumerator that yields one ad-hoc
     # tuple with metadata for every first occurence of a parameter-looking
@@ -140,7 +140,7 @@ module Skylab::Basic
     end
 
     def normalized_formal_parameter_names
-      get_formal_parameters.map { |o| o.normalized_name }
+      get_formal_parameters.map { |o| o.local_normal_name }
     end
 
     # `get_template_string` (private) - called "get_" because of [#014] above.
@@ -192,7 +192,7 @@ module Skylab::Basic
 
     def _margin_cache_h
       @_margin_cache_h ||= get_formal_parameters( true ).reduce({}) do |m, fp|
-        m[ fp.normalized_name ] = fp
+        m[ fp.local_normal_name ] = fp
         m
       end
     end

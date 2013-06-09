@@ -40,17 +40,17 @@ module Skylab::Face
     def write_ns norm_i, yes, no  # internally used to create or update n.s
       @node_open and raise "can't add namespace #{
         }when command is still open - #{ norm_i }"
-      @box.if? norm_i, -> ns do
-        ns.class.metastory.is_leaf and raise "attempt to reopen a command #{
+      @box.if? norm_i, -> nss do
+        nss.class.metastory.is_leaf and raise "attempt to reopen a command #{
           }as a namespace - #{ norm_i }"
-        yes[ ns ]
-        ns.do_skip and raise "cannot skip an already opened namespace."
+        yes[ nss ]
+        nss.do_skip and raise "cannot skip an already opened namespace."
         nil
       end, -> do
-        ns = no[] or raise "expecting `no` block to produce namespace"
-        if ns.do_include
+        nss = no[] or raise "expecting `no` block to produce namespace"
+        if nss.do_include
           @surface_mod[].story._scooper.add_name_at_this_point norm_i
-          @box.add norm_i, ns
+          @box.add norm_i, nss
         else
           @skip_h[ norm_i ] = true
         end
@@ -100,11 +100,13 @@ module Skylab::Face
       end
       private :build_child_namespace_sheet
 
+      def has_name
+        @name
+      end
+
       def name  # public like parent
-        if instance_variable_defined? :@name and @name
-          @name
-        else
-          fail "who is ascking NF of #{ @surface_mod[] }?"
+        if @name then @name else
+          fail "who is asking for namefunc of #{ @surface_mod[] }?"
         end
       end
 
@@ -140,6 +142,12 @@ module Skylab::Face
       private :build_into
 
     end.call
+
+    def init_with_normalized_local_name i  # for hacks, exploration
+      @name and fail "won't clobber existing name"
+      @name = Services::Headless::Name::Function.new i
+      self
+    end
 
     def init_with_module_function mf, nf, xtra_pairs
       @surface_mod = mf
@@ -181,7 +189,7 @@ module Skylab::Face
         function: -> _ do
           strange_mod = @surface_mod[]
           if strange_mod
-            strange_mod::Adapter::For::Face::Of::Hot[ strange_mod , self ]
+            strange_mod::Adapter::For::Face::Of::Hot[ self, strange_mod ]
           end
         end,
         blocks: -> parent_svcs do
@@ -258,6 +266,20 @@ module Skylab::Face
     def absorb_xtra_desc x
       ( @desc_proc_a ||= [ ] ) << x
       nil
+    end
+  end
+
+  # ~ 5.2.3 - assorted mutabilities ~
+
+  class NS_Sheet_
+
+    def add_namespace_sheet oro  # #called-by revelation, fun hacks
+      write_ns oro.name.local_normal, -> ns do  # not slug, like method
+        raise "sanity - will not attempt to merge a new namespace #{
+          }sheet into an existing node."
+      end, -> do
+        oro
+      end
     end
   end
 end

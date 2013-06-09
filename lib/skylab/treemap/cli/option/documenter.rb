@@ -218,14 +218,14 @@ module Skylab::Treemap
             norm_name = hack_infer_normalized_name block,
               -> e { @fail[ "#{ opt.weak_identifier } #{ e }" ] }
           else
-            norm_name = opt.normalized_name  # MY GOD BE CAREFUL
+            norm_name = opt.local_normal_name  # MY GOD BE CAREFUL
           end
         else
           opt = @fail[ "can't derive weak identifier for option" ]
         end
       end
       if opt && norm_name
-        opt.normalized_name = norm_name
+        opt.local_normal_name = norm_name
         @flip_box.add opt.weak_identifier, norm_name
         @option_box.add norm_name, opt
       end

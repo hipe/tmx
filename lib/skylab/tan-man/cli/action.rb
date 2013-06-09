@@ -68,7 +68,7 @@ module Skylab::TanMan
     include CLI::Action::InstanceMethods
 
     ACTIONS_ANCHOR_MODULE = -> { CLI::Actions }
-    # the above is our "root" box module, for reflection (e.g. normalized_name)
+    # the above is our "root" box module, for reflection (e.g. local_normal_name)
 
     event_factory CLI::Event::Factory
 

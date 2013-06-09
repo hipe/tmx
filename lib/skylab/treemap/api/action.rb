@@ -31,7 +31,7 @@ module Skylab::Treemap
       end
       def label_string                         # bc. _not_ modality aware!
         fetch :label do                        # future-proofing,
-          normalized_name.to_s.gsub '_', ' '   # if metaattr not exist
+          local_normal_name.to_s.gsub '_', ' '   # if metaattr not exist
         end
       end
     end

@@ -95,25 +95,19 @@ module Skylab::BeautySalon
       if '(' == msg[ 0 ]
         a, b = '(', ')' ; msg = msg[ 1 .. -2 ]
       end
-      y = @last_hot.get_normal_invocation_string_parts
+      y = @mechanics.last_hot.get_normal_invocation_string_parts
       @y << "#{ a }#{ y * ' ' }: #{ msg }#{ b }"
       nil
     end
 
     def on_normalization_failure_line e
-      @y << "#{ last_invocation_string }: #{ e.payload_a.fetch 0 }"
+      @y << "#{ @mechanics.normal_last_invocation_string }: #{
+        }#{ e.payload_a.fetch 0 }"
       nil
     end
 
     def on_info_line e
       @err.puts e.payload_a.fetch( 0 )
-      nil
-    end
-
-    # hack to let children get this
-    def on_modality_host_proxy_request plugin_client, f
-      host_pxy = plugin_host.plugin_services.build_host_proxy plugin_client
-      f[ host_pxy ]
       nil
     end
 

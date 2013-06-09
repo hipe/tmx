@@ -1,7 +1,7 @@
 module Skylab                     # Welcome! :D
 
-  #         ~ the sole function of this file is to provide autoloading ~
-  #         ~ and a handful of universal-ish constant-ish functions ~
+  #      ~ the sole function of this file is to provide autoloading ~
+  #       ~ and a handful of universal-ish constant-ish functions ~
 
   require 'pathname'              # the only stdlib subproducts get for free
 
@@ -107,7 +107,7 @@ module Skylab                     # Welcome! :D
 
   module Autoloader::Methods  # (né ModuleMethods)
 
-  protected  # (here is how the story starts:)
+    # (here is how the story starts:)
 
     #         ~ `init_autoloader` and friends in pre-order-ish ~
 
@@ -138,9 +138,9 @@ module Skylab                     # Welcome! :D
       end
     end.call
 
-    attr_reader :dir_pathname ; public :dir_pathname  # people like this
+    attr_reader :dir_pathname     # people like this
 
-    attr_reader :tug_class ; public :tug_class  # used internally in
+    attr_reader :tug_class        # used internally in
                                   # derivative libraries (3x) but dbg too
 
     guess_dir = -> do
@@ -179,6 +179,7 @@ module Skylab                     # Welcome! :D
       const_tug( const ).load  # offload core implementation
       const_get const, false
     end
+    private :const_missing  # #called-by ruby runtime only
 
     # `const_tug` - a Tug (né ConstMissing then "engine" then
     # "strategy" then "plan" then "policy") is the encapsulation of the core
@@ -188,7 +189,7 @@ module Skylab                     # Welcome! :D
     # a) mitigates our crowding the method and ivar namespace of the particular
     # module object with volatile details of our implementation and
     # b) allows us to customize how we Tug for shenanigans (er, for various
-    # autoloading experimetns) by employing class inheritance, rather than
+    # autoloading experiments) by employing class inheritance, rather than
     # crowding said ivar, method name (and ancestor chain) inheritance of
     # the client module object.
     #
@@ -207,13 +208,10 @@ module Skylab                     # Welcome! :D
           }module?)" # could be pushed down if really need to
       end
     end
-    public :const_tug  # for 2.0.0
 
     def const_probably_loadable? const  # courtesy, used elsewhere
       const_tug( const ).probably_loadable?
     end
-
-    public :const_probably_loadable?
 
     def init_dir_pathname x       # goofy experiment on charging a graph
       dir_pathname and raise ::ArgumentError, "won't clobber existing pn"
@@ -230,8 +228,6 @@ module Skylab                     # Welcome! :D
       nil
     end
 
-    public :init_dir_pathname
-
     attr_reader :dir_pathname_waitlist_a
 
     def dir_pathname_waitlist *a
@@ -239,20 +235,23 @@ module Skylab                     # Welcome! :D
       nil
     end
 
-    public :dir_pathname_waitlist
-
-    # another goofy experiment, not implemented here:
-
-    attr_reader :stowaway_a
+    # `stowaway` - a hook for another goofy experiment [#mh-030].
 
     def stowaway *a
+      @has_stowaways ||= true
       ( @stowaway_a ||= [ ] ) << a
     end
+
+    attr_reader :has_stowaways, :stowaway_a
   end
 
   class Autoloader::Tug
 
     # (see lengthy justification at `const_tug`)
+
+    def initialize const, mod_dir_pathname, mod
+      @const, @mod_dir_pathname, @mod = const, mod_dir_pathname, mod
+    end
 
     def load f=nil                # here is the main entrypoint, usu. why
       if leaf_pathname.exist?     # the tug was created.
@@ -267,11 +266,7 @@ module Skylab                     # Welcome! :D
       leaf_pathname.exist?
     end
 
-  protected
-
-    def initialize const, mod_dir_pathname, mod
-      @const, @mod_dir_pathname, @mod = const, mod_dir_pathname, mod
-    end
+  private
 
     #         ~ support for public methods in pre-order ~
 
@@ -296,8 +291,9 @@ module Skylab                     # Welcome! :D
         # $stderr.puts " >>> AL: #{ normalized_path }" # (2 reasons)
         require normalized_path
         after.call if after
-        @mod.const_defined? @const, false or const_not_defined
-        true  # in case we ever decide to fail gracefully
+        if @mod.const_defined?( @const, false ) then true else
+          const_not_defined  # hackery might happen
+        end
       end
     end
 

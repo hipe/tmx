@@ -36,6 +36,8 @@ module Skylab::Test
       counts: "show a report of the number of tests per subproduct"
     )
 
+    include Agent_IM_
+
     def initialize
       @do_zero ||= nil
     end
@@ -49,10 +51,10 @@ module Skylab::Test
             num = tre.children.count
             if num.nonzero? or @do_zero
               total += num
-              y.yield sp.slug, num
+              y << [ sp.slug, num.to_s ]
             end
           end
-          y.yield '(total)', total
+          y << [ '(total)', total.to_s ]
           ok
         end ),
         host.info_y.method( :<< )

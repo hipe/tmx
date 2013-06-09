@@ -4,7 +4,7 @@ module Skylab::Semantic
     # relevant: http://en.wikipedia.org/wiki/Tree_(data_structure)
   end
 
-  class Semantic::Digraph::Node  # (stowaway)
+  class Semantic::Digraph::Node  # (#stowaway)
 
     extend MetaHell::Autoloader::Autovivifying::Recursive
 
@@ -367,7 +367,7 @@ module Skylab::Semantic
     -> do  # `[]`  #todo remove after integration
       empty_a = [ ].freeze  # ocd
       NodePxy = MetaHell::Proxy::Nice.new :all_ancestor_names,
-        :normalized_local_name, :respond_to?, :is?, :is_names
+        :local_normal_name, :respond_to?, :is?, :is_names
       rt_h = { type: false, payload: false }
       define_method :[] do |sym|
         if @hash.key? sym
@@ -376,7 +376,7 @@ module Skylab::Semantic
               all_ancestor_names: -> do
                 walk_pre_order( sym, 0 ).map { |sm| sm }
               end,
-              normalized_local_name: -> { sym },
+              local_normal_name: -> { sym },
               respond_to?: -> x { rt_h.fetch x },
               is?: -> sm do
                 if sym == sm then true

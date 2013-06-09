@@ -10,7 +10,7 @@ module Skylab::CovTree
   protected
 
     def api_action_class
-      API::Actions.const_fetch normalized_name
+      API::Actions.const_fetch local_normal_name
     end
   end
 end

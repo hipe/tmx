@@ -106,7 +106,7 @@ module Skylab::Face
         fields_bound_to_ivars.each do |bf|
           len.times do |idx|
             if a[ idx ].call bf
-              res_a[ idx ][ bf.field.normalized_name ] = bf.value
+              res_a[ idx ][ bf.field.local_normal_name ] = bf.value
               break
             end
           end

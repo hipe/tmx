@@ -83,6 +83,8 @@ module Skylab::Face
       rx = /s$/
 
       define_method :resolve_ref do |model_ref_a|
+        if ::Array === model_ref_a.first then fail 'where' end
+
         a = model_ref_a.dup
         if rx =~ a.last
           is_collection = true
