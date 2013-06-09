@@ -285,7 +285,7 @@ module Hipe
           deep_enhance! unless deep_enhanced?
           if registered?
             if child.has_parent?
-              debugger("we need to implement this. easy.");'x'
+              fail 'do me'  # we need to implement this. easy.
             end
             child.parent = self
           end
@@ -300,7 +300,7 @@ module Hipe
         def replace_child! child, nu
           idx = index_of_child child
           self[idx] = nu
-          # debugger;  'make sure to_ruby works'
+          fail 'do me'  # make sure to_ruby works
           nil
         end
 

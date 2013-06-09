@@ -163,7 +163,7 @@ module Hipe
           when :dm_many_to_one
             foreign = rel.target_model
           else
-            debugger; 'what is this strange new relationship?'
+            fail 'do me' # what is this strange new relationship?
           end
           foreign
         end

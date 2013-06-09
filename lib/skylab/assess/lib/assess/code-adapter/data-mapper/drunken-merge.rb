@@ -107,12 +107,12 @@ module Hipe
               res = new_from_local_and_strange(model, local_h, strange_h)
             end
           else
-            debugger;
+            fail 'do me'
             'this algorithm apparently hinges on having something strange'
             'but no problem u can just build it from local values, right?'
           end
           if (! res)
-            debugger; 'x'
+            fail 'do me'
           end
           res
         end
@@ -143,9 +143,8 @@ module Hipe
             end
           end
           if no.any?
-            debugger
-            fail("the following structpaths were neither DM resources "<<
-            "nor arrays thereof:"<<oxford_comma(no))
+            fail "the following structpaths were neither DM resources #{
+              } nor arrays thereof - #{ oxford_comma no }"
           end
           nil
         end
@@ -242,7 +241,7 @@ module Hipe
             elsif rel_pat_uniq.size > 1
               :mixed_relationship_crap
             else
-              debugger; 'how many damn uber relationships do you need?'
+              fail 'do me' ; how many damn uber relationships do you need?
               fail('sigh')
             end
           end

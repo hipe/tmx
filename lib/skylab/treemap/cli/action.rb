@@ -196,7 +196,7 @@ module Skylab::Treemap
     end
     # =
     def __legacy_invoke args
-      invoke args  # yes, you could just etc - but this is a debugger entrypoint
+      invoke args  # yes, you could just etc - but this is a d-ebugger entrypoint
                    # takes us into our sanctuary - clean h.l parsing
     end
 

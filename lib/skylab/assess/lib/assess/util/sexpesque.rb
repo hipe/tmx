@@ -50,7 +50,7 @@ module Hipe
           if mixed.kind_of?(Sexpesque)
             mixed.hash_rhs
           else
-            debugger;'x'
+            fail 'do me'
           end
         end
 
@@ -80,7 +80,7 @@ module Hipe
             self[1..size-1]
           end
         else
-          debugger; 'what'
+          fail 'do me'
         end
       end
 

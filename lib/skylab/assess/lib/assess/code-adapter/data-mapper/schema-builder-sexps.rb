@@ -36,7 +36,7 @@ module Hipe
             elsif self[1].first == :const
               self[1][1]
             else
-              debugger; 'x'
+              fail 'do me'
             end
           end
           def my_initialize

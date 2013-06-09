@@ -52,12 +52,12 @@ module Hipe
               block = self
             else
               if has_parent? # @todo this is a common pattern. unprune
-                debugger; "your so clevr"
+                fail 'do me'
               elsif 0 == size
                 push(:block) # kind of crazy
                 block = self
               else
-                debugger; 'you can do it'
+                fail 'do me'
               end
             end
           elsif block_index >= length
