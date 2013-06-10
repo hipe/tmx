@@ -31,10 +31,7 @@ module Skylab::Face::TestSupport::CLI::Namespace::Via_Mod_Func
     end
   end
 
-  if (( idx = ( argv = ::ARGV ).index '-x' ))
-    argv[ idx ] = nil ; argv.compact! ; do_invoke = true
-    TestSupport::Quickie.do_not_invoke!
-  end
+  do_invoke = Do_invoke_[]
 
   describe "#{ Face::CLI }::Namespace via mode func" do
 
@@ -71,6 +68,6 @@ module Skylab::Face::TestSupport::CLI::Namespace::Via_Mod_Func
   end
 
   if do_invoke  # try executing this file directly, passing '-x'
-    Wizzle::CLI::Client.new( nil, $stdout, $stderr ).invoke( ::ARGV )
+    Wizzle::CLI::Client.new( nil, SO_, SE_ ).invoke( ::ARGV )
   end
 end

@@ -10,6 +10,7 @@ module Skylab::Face::TestSupport::CLI
     Headless = ::Skylab::Headless
     Headless_TestSupport = ::Skylab::Headless::TestSupport
     MetaHell = ::Skylab::MetaHell
+    SO_ = $stdout ; SE_ = $stderr
   end
 
   include CONSTANTS
@@ -178,24 +179,23 @@ module Skylab::Face::TestSupport::CLI
       end
     end
 
-    -> do  # `expect_styled`, `convert_whole_err_string_to_unstylized_lines`
+    Headless::CLI::Pen::FUN.tap do |fun|
+      define_method :unstylize_stylized, & fun.unstylize_stylized
+      define_method :unstylize, & fun.unstylize
+    end
 
-      unstylize_stylized = Headless::CLI::Pen::FUN.unstylize_stylized
-
-      define_method :expect_styled do |line|
-        text = unstylize_stylized[ line ]
-        if text then text else
-          fail "line wasn't styled - #{ line.inspect }"
-        end
+    def expect_styled line
+      text = unstylize_stylized line
+      if text then text else
+        fail "line wasn't styled - #{ line.inspect }"
       end
+    end
 
-      define_method :convert_whole_err_string_to_unstylized_lines do
-        x = whole_err_string
-        str = unstylize_stylized[ x ]
-        str.split "\n"
-      end
-
-    end.call
+    def convert_whole_err_string_to_unstylized_lines
+      x = whole_err_string
+      str = unstylize_stylized x
+      str.split "\n"
+    end
 
     def expect_match text, rx
       did_match = rx =~ text
@@ -276,6 +276,14 @@ module Skylab::Face::TestSupport::CLI
     def expect_no_more_output
       stderr_lines.length.should be_zero
       stdout_lines.length.should be_zero
+    end
+  end
+
+  CONSTANTS::Do_invoke_ = -> do
+    if (( idx = ( argv = ::ARGV ).index '-x' ))
+      argv[ idx ] = nil ; argv.compact!
+      TestSupport::Quickie.do_not_invoke!
+      true
     end
   end
 end

@@ -38,10 +38,7 @@ module Skylab::Face::TestSupport::CLI::Namespace::Skip
     end
   end
 
-  if (( idx = ( argv = ::ARGV ).index '-x' ))
-    argv[ idx ] = nil ; argv.compact! ; do_invoke = true
-    TestSupport::Quickie.do_not_invoke!
-  end
+  do_invoke = Do_invoke_[]
 
   describe "#{ Face::CLI }::Namespace desc" do
 
@@ -55,7 +52,7 @@ module Skylab::Face::TestSupport::CLI::Namespace::Skip
         invoke '-h'
         a = []
         2.times do
-          a << Headless::CLI::Pen::FUN.unstylize[ lines[ :err ].pop ]
+          a << unstylize( lines[ :err ].pop )
         end
         down, up = a
         up.should match( /\bcommands?:/i )
@@ -73,6 +70,6 @@ module Skylab::Face::TestSupport::CLI::Namespace::Skip
   end
 
   if do_invoke  # try executing this file directly, passing '-x'
-    Wiffle::CLI::Client.new( nil, $stdout, $stderr ).invoke( ::ARGV )
+    Wiffle::CLI::Client.new( nil, SO_, SE_ ).invoke( ::ARGV )
   end
 end

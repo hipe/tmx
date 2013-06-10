@@ -217,7 +217,7 @@ module Skylab::Face
     # standard error stream line yielder (makes sense, right?).
 
     def pre_execute
-      # we override parent and do what our grandparent does. meh.
+      # we override p-arent and do what our grandparent does. meh.
       @y = parent_services[ :y ]
       @last_hot = nil
       nil
@@ -468,7 +468,7 @@ module Skylab::Face
     end
 
     def pre_execute  # #called-by-main-invocation-loop
-      # (we override this method of parent class (cmd) b.c we need to do kind
+      # (we override this method of p-arent class (cmd) b.c we need to do kind
       # of like what cli does - we need the surface also to have ivars..)
       ps = parent_services
       @y = ps[ :y ]
@@ -686,7 +686,7 @@ module Skylab::Face
     end
   end
 
-  #     ~ 1.4 - implement "parent services" with a new DSL wat ~
+  #     ~ 1.4 - implement "p-arent services" with a new DSL wat ~
 
   class Services_  # ( basically a miniature version of Headless::Plugin )
     Services_Ivar_ = nil
@@ -849,7 +849,7 @@ module Skylab::Face
     # mechanics node to concern itself with the fact that it is topmost here
   end
 
-  class NS_Mechanics_  # #re-open for 4.1. has parent.
+  class NS_Mechanics_  # #re-open for 4.1. has p-arent.
     Services_.enhance self do
       services_ivar :@ns_mechanics_services
       services_accessor_method :[]
@@ -862,7 +862,7 @@ module Skylab::Face
     public :[]
   end
 
-  class CLI_Mechanics_  # #re-open for 1.4. has parent.
+  class CLI_Mechanics_  # #re-open for 1.4. has p-arent.
   private
     def parent_services
       @parent_services ||= CLI_Surface_Pxy_.new @surface.call
@@ -1387,7 +1387,7 @@ module Skylab::Face
     end
 
     def invite y
-      # override parent to include the "[sub-cmd]" part.
+      # override p-arent to include the "[sub-cmd]" part.
       y << "try #{ hi "#{ normal_invocation_string } -h [sub-cmd]" } #{
         }for help."
       nil
@@ -1415,12 +1415,12 @@ module Skylab::Face
     end
 
     def additional_help y
-      a = @sheet.command_tree
-      if a
-        y << hi( "command#{ 's' if 1 != a.length }:" )
-        item_a = a.reduce [] do |row, (_, sht)|
+      pairs = @sheet.command_tree
+      if pairs
+        y << hi( "command#{ 's' if 1 != pairs.length }:" )
+        item_a = pairs.reduce [] do |row, (_, sht)|
           hot = sht.hot self
-          hot and row << Item_[ hot.name.as_slug, hot.summary ]
+          hot and row << Item_[ hot.name.as_slug, hot.summary( sht ) ]
           row
         end
         w = item_a.map { |o| o.hdr.length }.reduce 2 do |m, l| m > l ? m : l end
@@ -1487,7 +1487,7 @@ module Skylab::Face
 
     # `summary` - # #called-by-p-arent documenting child #experimental
     # *lots* of goofing around here - this terrific hack tries to
-    # distill a summary out of the first one or two lines of the option parser
+    # distill a s-ummary out of the first one or two lines of the option parser
     # -- it strips out all styling from them (b.c it looks wrong in summaries),
     # and indeed strips out the styled content all together unless (ICK) that
     # header says "usage:" #experimental proof-of-concept novelty hack.
@@ -1495,82 +1495,136 @@ module Skylab::Face
 
     -> do
 
-      hack_excerpt_from_option_parser = -> do
-
-        hl_is_loaded = load_hl = unstylize_sexp = parse_styles = chunker =
-          header_rx = excerpt_str_h = unstyle_h = first_lines = nil
-
-        hack_exp_fr_op = -> op, usage_header_txt do
-          hl_is_loaded || load_hl[]
-          lines = first_lines[ op, 2 ]
-          excerpt_str_h ||=
-            {  1 => -> a { a[0] },
-               2 => -> a { "#{ a[0] } [..]" } }
-          exrp_s = excerpt_str_h.fetch( lines.length ).call lines
-          sexp = parse_styles[ exrp_s ]
-          if ! sexp then [ exrp_s ] else  # if there was no styling we are done
-            enum = chunker::Enumerator.new sexp
-            unstyle_h ||= {
-              string: -> m, x do
-                m << unstylize_sexp[ x ]
-                nil
-              end,
-              style: -> m, x do
-                s = unstylize_sexp[ x ]
-                # ICK only let a header through if it says "usage:" ICK
-                m << s if usage_header_txt == s || header_rx !~ s
-                nil
-              end
-            }
-            pts = enum.reduce [] do |m, x|
-              unstyle_h.fetch( x[0][0] )[ m, x ]
-              m
-            end
-            [ pts.join( '' ).strip ]
-          end
-        end
-
-        # because we just can't bare the thought of rendering the whole o.p..
-        first_lines = -> op, num do
-          lines = op.banner.split( "\n" )[ 0, num ]
-          if lines.length < num
-            catch :face_hack do
-              op.summarize do |s|
-                lines << s
-                throw :face_hack if num <= lines.length
+      excerpt_lines = -> y, num, producer do  # stop a line producer early
+        count = 0
+        if num.nonzero?
+          catch :face_hack do
+            producer.call do |s|
+              y << s
+              if ( count += 1 ) == num
+                throw :face_hack
               end
             end
           end
-          lines
         end
+        count
+      end
 
-        load_hl = -> do
-          # lazy load these, might be a beast, and the dependency is awkward
-          chunker = Services::Headless::CLI::Stylize::Chunker
-          parse_styles, unstylize_sexp =
-            Services::Headless::CLI::FUN.at :parse_styles, :unstylize_sexp
-          hl_is_loaded = true
+      ellipsify = -> a, num do    # ellipsify final line conditionally
+        if 0 <= num && num < a.length  # assumes a's len is w/in 1 of num
+          a.pop
+          if a.length.nonzero?
+            last = a.length - 1
+            a[ last ] = "#{ a[ last ] } [..]"
+          end
         end
+        nil
+      end
 
+      hl_chunker = hl_parse_styles = hl_unstylize_sexp = nil  # we lazy-
+      hl = -> do                  # load these nerkulouses - they might be a
+        hl_chunker =              # beast, the dependency is awkward.
+          Services::Headless::CLI::Stylize::Chunker
+        hl_parse_styles, hl_unstylize_sexp =
+          Services::Headless::CLI::FUN.at :parse_styles, :unstylize_sexp
+        hl = nil
+      end
+
+      restyle_sexp = -> do  # ..
+
+        header_rx = /\A[^ ]+:[ ]?\z/  # no tabs [#hl-056]
+
+        h = {
+          string: -> m, x, _ do
+            m << hl_unstylize_sexp[ x ]
+            nil
+          end,
+          style: -> m, x, usg_hdr_txt do
+            s = hl_unstylize_sexp[ x ]
+            # ICK only let a header through if it says "usage:" ICK
+            m << s if usg_hdr_txt == s || header_rx !~ s
+            nil
+          end
+        }.freeze
+
+        -> sexp, usg_hdr_txt do  # assumes hl
+          ea = hl_chunker::Enumerator.new sexp
+          a = ea.reduce [] do |m, x|
+            h.fetch( x[0][0] )[ m, x, usg_hdr_txt ]
+            m
+          end
+          ( a * '' ).strip  # (we are re-joining a broken up string)
+        end
+      end.call
+
+      restyle = -> a, usg_hdr_txt do
+        hl and hl[]  # iff..
+        a.length.times do |idx|
+          line = a[ idx ]
+          sexp = hl_parse_styles[ line ]
+          sexp or next  # if there was no styling we are done with line.
+          _new = restyle_sexp[ sexp, usg_hdr_txt ]
+          a[ idx ] = _new
+        end
+        nil
+      end
+
+      get_desc_proc_a_excerpt = -> svcs, proc_a, num_lines do
+        a = [ ] ; num_left = num_lines
+        producer = -> f do
+          -> &blk do
+            f[ ::Enumerator::Yielder.new( &blk ) ]
+            nil
+          end
+        end
+        if num_left.nonzero?
+          proc_a.each do |f|
+            num_did = excerpt_lines[ a, num_left, producer[ f ]  ]
+            num_left -= num_did
+            break if num_left <= 0
+          end
+        end
+        a if a.length.nonzero?
+      end
+
+      hack_excerpt_from_op = -> do  # ..
+
+
+        # rendering multiple non-trivial o.p's on one screen just for summaries
+        # causes noticeable lag. we stop the rendering once we have enough.
+        get_op_excerpt_lines = -> op, num do
+          a = op.banner.split( "\n" )[ 0, num ]
+          if a.length < num
+            excerpt_lines[ a, num - a.length, op.method( :summarize ) ]
+          end
+          a
+        end
         # a_few_lines_rx = /\A[\n]*([^\n]*)(\n+[^\n])?/
         # (in case we ever go back to op.to_s, this is what we used #todo)
 
-        header_rx = /\A[^ ]+:[ ]?\z/  # no tabs [#hl-055]
-
-        hack_exp_fr_op
+        -> op, usage_header_txt, num_lines do  # `hack_excerpt_from_op`
+          hl and hl[]  # load it lazily
+          a = get_op_excerpt_lines[ op, num_lines + 1 ]
+          ellipsify[ a, num_lines ]
+          restyle[ a, usage_header_txt ]
+          a
+        end
       end.call
 
-      define_method :summary do
-        if documenter
-          exrp_a = hack_excerpt_from_option_parser[ @op, usage_header_text ]
+      _NUM_LINES = 1  # a variable that looks like a constant, best of both.
+
+      define_method :summary do |sht|
+        if sht.desc_proc_a
+          exrp_a = get_desc_proc_a_excerpt[ self, sht.desc_proc_a, _NUM_LINES ]
         end
-        if exrp_a then exrp_a else
-          [ "usage: #{ syntax }" ]  # like `usage_line` but unstylized
+        if ! exrp_a && documenter
+          exrp_a = hack_excerpt_from_op[ @op, usage_header_text, _NUM_LINES ]
         end
+        exrp_a or [ "usage: #{ syntax }" ]  # like `usage_line` but unstyled
       end
     end.call
 
-    # `hi` (highlight) #called-by self and possibly from the parent shell
+    # `hi` (highlight) #called-by self and possibly from the p-arent shell
     # (surface).. (we used to have ohno=red, yelo=yellow, bold=(bright,green))
 
     def hi str
@@ -1694,9 +1748,11 @@ module Skylab::Face
 
   # ~ facet 5 - extrinsic features ~
 
-  # ~ 5.1 - default argv ~
+  # ~ 5.1 - facets anchored in this node ~
 
-  class Namespace  # #re-open for 5.1. no parent.
+  # ~ 5.1.1 - default argv ~
+
+  class Namespace  # #re-open for 5.1. no p-arent.
     class << self
     private
       def default_argv *a
@@ -1705,7 +1761,7 @@ module Skylab::Face
     end
   end
 
-  class NS_Sheet_  # #re-open for 5.1
+  class NS_Sheet_  # #re-open for 5.1.1
     def set_default_argv a
       has_default_argv and raise ::ArgumentError,
         "won't overwrite existing `default_argv`"  # for now, but meh..
@@ -1722,7 +1778,7 @@ module Skylab::Face
     end
   end
 
-  class NS_Mechanics_  # #re-open for 5.1
+  class NS_Mechanics_  # #re-open for 5.1.1
     def has_default_argv
       @sheet.has_default_argv
     end
@@ -1732,15 +1788,17 @@ module Skylab::Face
     end
   end
 
-  # ~ 5.2.1 - aliases ~
+  # ~ 5.1.2 - aliases ~
 
-  class Namespace  # #re-open for face 5.2.1
+  class Namespace  # #re-open for face 5.1.2
     def self.aliases * i_a
       @story.node_open!.add_aliases i_a
     end
   end
 
-  class Node_Sheet_  # #re-open for facet 5.2.1
+  class Node_Sheet_  # #re-open for facet 5.1.2
+
+    attr_reader :desc_proc_a  # (sneak this in for facet 5.2.2)
 
     def add_aliases i_a
       @aliases_are_puffed = nil
@@ -1776,6 +1834,8 @@ module Skylab::Face
       nil
     end
   end
+
+  # ( ~ 5.2 is anchored in another node ~ )
 
   # ~ 5.3 - invocation function ~
 

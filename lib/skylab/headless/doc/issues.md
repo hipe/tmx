@@ -18,7 +18,7 @@
 [#056]       #doc-point "parsing argv is (almost) always descructive,
                to facilitate agnostic, progressive chaining .."
 [#055]       #pattern we keep tabs out of regexen not because it
-             wouldn't  make them more powerful, it would. it's becase
+             wouldn't make them more powerful, it would. it's because
              they are unattractive to look at as regegen.
 [#054]       #doc-point this insane pattern for adapters
 [#053]       #tracking-tag for anything related to h.l option scanner

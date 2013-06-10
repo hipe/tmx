@@ -24,7 +24,7 @@ module Skylab::Porcelain::Bleeding
         end
         new(
           name: -> { hi_sheet.name },
-          summary: -> { real[].summary_lines },
+          summary: -> *_ { real[].summary_lines },
           help: -> { real[].help full: true },
           respond_to?: -> i { respond_to_h.fetch i },
           invokee: -> { real[] },

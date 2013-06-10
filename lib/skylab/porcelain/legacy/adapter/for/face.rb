@@ -29,7 +29,7 @@ module Skylab::Porcelain::Legacy
         _send_h = { invoke: true }
         new(
           name: -> { hi_sheet.name },
-          summary: -> { [ "usage: #{ real[].syntax_text }" ] },
+          summary: -> *_ { [ "usage: #{ real[].syntax_text }" ] },
           help: -> { real[].help },
           respond_to?: -> i { send_h.fetch i },
           invokee: -> { real[] },

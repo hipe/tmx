@@ -237,7 +237,7 @@ module Skylab::Face
     end
   end
 
-  # ~ 5.2.2 - skip ~
+  # ~ 5.2.1 - skip ~
 
   class NS_Sheet_  # #re-open
     def do_include
@@ -247,6 +247,16 @@ module Skylab::Face
   private
     def absorb_xtra_skip x
       @do_skip = x
+      nil
+    end
+  end
+
+  # ~ 5.2.2 - desc ~
+
+  class NS_Sheet_
+  private
+    def absorb_xtra_desc x
+      ( @desc_proc_a ||= [ ] ) << x
       nil
     end
   end
