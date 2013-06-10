@@ -25,12 +25,14 @@ module Skylab::Face
     # see private/protected called explicitly after each relevant method.)
 
     def namespace norm_i, *a, &b
-      write_ns norm_i, -> ns do
-        # if one existed by name `norm_i` already, is `ns`
-        ns.absorb_additional_namespace_definition a, b
-        nil
-      end, -> do  # else a namespace does not yet exist as `norm_i`
-        build_child_namespace_sheet norm_i, a, b
+      if ! @skip_h[ norm_i ]
+        write_ns norm_i, -> ns do
+          # if one existed by name `norm_i` already, is `ns`
+          ns.absorb_additional_namespace_definition a, b
+          nil
+        end, -> do  # else a namespace does not yet exist as `norm_i`
+          build_child_namespace_sheet norm_i, a, b
+        end
       end
       nil  # our internal struct is internal
     end
@@ -42,11 +44,16 @@ module Skylab::Face
         ns.class.metastory.is_leaf and raise "attempt to reopen a command #{
           }as a namespace - #{ norm_i }"
         yes[ ns ]
+        ns.do_skip and raise "cannot skip an already opened namespace."
         nil
       end, -> do
         ns = no[] or raise "expecting `no` block to produce namespace"
-        @surface_mod[].story._scooper.add_name_at_this_point norm_i
-        @box.add norm_i, ns
+        if ns.do_include
+          @surface_mod[].story._scooper.add_name_at_this_point norm_i
+          @box.add norm_i, ns
+        else
+          @skip_h[ norm_i ] = true
+        end
         nil
       end
       nil  # our internal struct is internal
@@ -57,7 +64,6 @@ module Skylab::Face
 
     -> do  # (funtions are bottom-up, methods top-down)
 
-      f_a = [ -> x { x.respond_to? :call }, -> x { x.respond_to? :each_pair } ]
       mlf = -> { "module-loading function" } ; db = -> { "definition block" }
       nsm = -> { "namespace module" }
       mutex = -> mf, b do
@@ -71,15 +77,25 @@ module Skylab::Face
           sm.const_set :Commands, ::Module.new
         end
       end
-
+      parse_args = -> a do
+        a.length.nonzero? && a[ 0 ].respond_to?( :call ) and mf = a.shift
+        if a.length.nonzero?
+          if 1 == a.length and a[ 0 ].respond_to? :each_pair
+            xtra_pairs = a.shift
+          else
+            xtra_pairs = Services::Basic::Hash::Pair_Enumerator.new a
+          end
+        end
+        [ mf, xtra_pairs ]
+      end
       define_method :build_child_namespace_sheet do |norm_i, a, b|
         nf = Services::Headless::Name::Function.new norm_i
-        mf, xtra_h = MetaHell::FUN.parse_series[ a, * f_a ]
+        mf, xtra_pairs = parse_args[ a ]
         mutex[ mf, b ]
         if mf
-          self.class.new( nil ).init_with_module_function mf, nf, xtra_h
+          self.class.new( nil ).init_with_module_function mf, nf, xtra_pairs
         else
-          build_into b, nf, xtra_h
+          build_into b, nf, xtra_pairs
         end
       end
       private :build_child_namespace_sheet
@@ -93,9 +109,9 @@ module Skylab::Face
       end
 
       define_method :absorb_additional_namespace_definition do |a, b|
-        mf, xtra_h = MetaHell::FUN.parse_series[ a, * f_a ]
+        mf, xtra_pairs = parse_args[ a ]
         mf || b and mutex[ mf, b ]
-        xtra_h and absorb_xtra xtra_h
+        xtra_pairs and absorb_xtra xtra_pairs
         if mf
           @surface_mod_origin_i and raise "can't set a #{ mlf[] } to a #{
             }#{ nsm[] } already originates with #{ @surface_mod_origin_i }"
@@ -114,34 +130,34 @@ module Skylab::Face
       end
       protected :absorb_additional_namespace_definition
 
-      define_method :build_into do |block, name_func, xtra_h|
+      define_method :build_into do |block, name_func, xtra_pairs|
         bm = box_mod[ @surface_mod[] ]
         co = name_func.as_const
         bm.const_defined?( co, false ) and raise "sanity - don't do this"
         sty = ( bm.const_set co, ::Class.new( Namespace ) ).story
-        sty.init_with_block block, name_func, xtra_h
+        sty.init_with_block block, name_func, xtra_pairs
       end
       private :build_into
 
     end.call
 
-    def init_with_module_function mf, nf, xtra_h
+    def init_with_module_function mf, nf, xtra_pairs
       @surface_mod = mf
-      init_extended_ns_sheet :function, nf, xtra_h
+      init_extended_ns_sheet :function, nf, xtra_pairs
     end
     protected :init_with_module_function
 
-    def init_with_block b, nf, xtra_h
+    def init_with_block b, nf, xtra_pairs
       @block_a = [ b ]
-      init_extended_ns_sheet :blocks, nf, xtra_h  # overwrites `:module`, ok.
+      init_extended_ns_sheet :blocks, nf, xtra_pairs  # overwrites `:module`, ok.
     end
     protected :init_with_block
 
-    def init_extended_ns_sheet i, nf, xtra_h
+    def init_extended_ns_sheet i, nf, xtra_pairs
       @hot = nil
       @surface_mod_origin_i = i
       @name = nf
-      xtra_h and absorb_xtra xtra_h
+      xtra_pairs and absorb_xtra xtra_pairs
       self
     end
     private :init_extended_ns_sheet
@@ -164,7 +180,9 @@ module Skylab::Face
         end,
         function: -> _ do
           strange_mod = @surface_mod[]
-          strange_mod::Adapter::For::Face::Of::Hot[ strange_mod , self ]
+          if strange_mod
+            strange_mod::Adapter::For::Face::Of::Hot[ strange_mod , self ]
+          end
         end,
         blocks: -> parent_svcs do
           if @block_a.length.nonzero?
@@ -183,9 +201,11 @@ module Skylab::Face
         if @hot.nil?
           @hot = instance_exec psvcs, & hot_h.fetch( @surface_mod_origin_i )
         end
-        svcs = @hot.call psvcs, *rest_to_cmd
-        svcs.pre_execute  # placement here is sketchy
-        svcs
+        if @hot
+          svcs = @hot.call psvcs, *rest_to_cmd
+          svcs.pre_execute  # placement here is sketchy
+          svcs
+        end
       end
     end.call
   end
@@ -214,6 +234,20 @@ module Skylab::Face
 
     def self.__enhance surface, sheet, parent_services, slug
       new sheet, surface, parent_services, slug
+    end
+  end
+
+  # ~ 5.2.2 - skip ~
+
+  class NS_Sheet_  # #re-open
+    def do_include
+      ! do_skip
+    end
+    attr_reader :do_skip
+  private
+    def absorb_xtra_skip x
+      @do_skip = x
+      nil
     end
   end
 end

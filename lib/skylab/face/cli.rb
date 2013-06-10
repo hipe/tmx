@@ -205,7 +205,7 @@ module Skylab::Face
     end
 
     # `pre_execute` - #called-by self in main execution loop, #called-by
-    # namespace facet when ouroboros is happening. about it: we "re-puff"
+    # n-amespace facet when ouroboros is happening. about it: we "re-puff"
     # (that is, `pre_execute`) before every execution for fun, sanity, grease,
     # and design - ostensibly so that the p-arent can change the identity of
     # these resources late and during runtime while b) we can still have them
@@ -234,7 +234,7 @@ module Skylab::Face
     # this library - it is the interface entrypoint for employing [#041]
     # `isomorphic command composition`, that is, public methods that you
     # write in your class become commands in your user interface. as such,
-    # except where noted, the "namespace" of instance methods (public, private,
+    # except where noted, the "n-amespace" of instance methods (public, private,
     # and protected) of this class is preserved entirely for "businessland"
     # concerns - that is, the developer user determines them, not this
     # library. again as such, for instance methods, you will only find one
@@ -313,17 +313,17 @@ module Skylab::Face
 
   class NS_Sheet_ < Node_Sheet_  # for facet 1
 
-    # the abstract representation of a namespace. before you build any actual
+    # the abstract representation of a n-amespace. before you build any actual
     # things, you can aggreate the data around it progressively.
 
     # the CLI client class (like many other entities here) internally stores
     # *all* its "businessland data" in a "character-sheet"-ish object
-    # (sometimes called a "story" when it is in regards to a namespace).
-    # A namespace's story consists of properties and constituents. the
-    # properties are things like the namespace's normalized local slug name
-    # and aliases. the constituents represent the namespace's child nodes
+    # (sometimes called a "story" when it is in regards to a n-amespace).
+    # A n-amespace's story consists of properties and constituents. the
+    # properties are things like the n-amespace's normalized local slug name
+    # and aliases. the constituents represent the n-amespace's child nodes
     # (either terminal commands or other namespaces (themselves a special kind
-    # of command)). we say "represents" because actual namespace classes or
+    # of command)). we say "represents" because actual n-amespace classes or
     # command objects are not necessarily built at declaration time. instead,
     # we may have as our constituents one sheet for each of this node's child
     # nodes. (deeply nested namespaces are then stories inside stories yay.)
@@ -331,13 +331,14 @@ module Skylab::Face
     def initialize surface_mod
       if surface_mod  # no surface mod is bound "statically" when e.g we
         # have a strange module loaded by a function lazily, or if an inline
-        # namespace is defined with a block (these all happen elsewhere)
+        # n-amespace is defined with a block (these all happen elsewhere)
         # watch for this becoming a case for two child classes of a shared
         # base class..
         @box = MetaHell::Formal::Box::Open.new
         @surface_mod = -> { surface_mod }
         @surface_mod_origin_i = :module
         @node_open = false ; @methods_need_to_be_indexed = true
+        @skip_h = { }  # sad
         @scooper = Scooper_.new -> m do
           close_node do |cl|
             cl.set_method_name m
@@ -360,8 +361,8 @@ module Skylab::Face
         end
         @box.sort_names_by! do |i|
           white_h.fetch i do
-            raise ::KeyError, "element (namespace?) name not found in order #{
-              }list (#{ i.inspect } in #{ white_h.keys.inspect })"
+            raise ::KeyError, "element (n#{ }amespace?) name not found in #{
+              }order list (#{ i.inspect } in #{ white_h.keys.inspect })"
           end
         end
       end
@@ -409,7 +410,7 @@ module Skylab::Face
           m << h.delete( i )  # (yes it's just a map. but map would bloat?)
           m
         end
-        # (for those of you tuning in at home, namespace/facet.rb might have it)
+        # (for those of you tuning in at home, n-amespace/facet.rb?)
         h.keys.length.nonzero? and raise ::ArgumentError, "is #{
           }#{ self.name } supposed to handle (#{ h.keys * ', ' })?"
         __enhance surface, *a
@@ -417,7 +418,7 @@ module Skylab::Face
     end
 
     def initialize sheet, surface, parent_services, slug_fragment
-      @surface = -> { surface }  # a namespace always has a surface
+      @surface = -> { surface }  # a n-amespace always has a surface
       super sheet, parent_services, slug_fragment
       nil
     end
@@ -450,9 +451,18 @@ module Skylab::Face
           end
         end
       end
-      case found_a.length
+      len = found_a.length
+      if 1 == len
+        sht = found_a[ 0 ]
+        if ! (( @last_hot = sht.hot self, argv.shift ))
+          @y << "(\"#{ sht.name.as_slug }\" command failed to load)"
+          sht.is_ok = false
+          len = 0
+        end
+      end
+      case len
       when 0 ; unrecognized_command given
-      when 1 ; [ true, @last_hot = found_a[ 0 ].hot( self, argv.shift ) ]
+      when 1 ; [ true, @last_hot ]
       else   ; ambiguous_command found_a, given
       end
     end
@@ -637,7 +647,7 @@ module Skylab::Face
   class Node_Sheet_  # open for facet 1
 
     #  ~ section 0 - notes for subclasses ~
-    #    + restricted namespace "set_xtra_*" for class-internal API
+    #    + restricted n-amespace "set_xtra_*" for class-internal API
     #    + must implement a (possibly false-ish resulting) private method
     #      `name` that memoizes its result to `@name`
     #    + there is no `initialize` defined here.
@@ -646,6 +656,16 @@ module Skylab::Face
 
     def normalized_local_command_name
       @name.normalized_local_name if name
+    end
+
+    def is_ok= b
+      @not_ok = ! b
+    end
+
+    attr_reader :not_ok
+
+    def is_ok
+      ! not_ok
     end
 
   private
@@ -658,8 +678,8 @@ module Skylab::Face
     # we use methods and not a function hash (for tacit validation of `k`)
     # for extensibility.
 
-    def absorb_xtra xtra_h
-      xtra_h.each do |k, v|
+    def absorb_xtra xtra_pairs
+      xtra_pairs.each_pair do |k, v|
         send :"absorb_xtra_#{ k }", v
       end
       nil
@@ -1108,7 +1128,7 @@ module Skylab::Face
       svcs.option_parser_receiver.instance_exec do
         @mechanics.set_last_hot svcs  # some o.p blocks want it both ways -
         # that is, they expect their context to be the p-arent command node
-        # ("namespace"), and also they want access to the particular command's
+        # ("n-amespace"), and also they want access to the particular command's
         # services, and that's OKAY.
         instance_exec op, & b  # (`option_parser`)
         @mechanics.set_last_hot nil
@@ -1344,12 +1364,13 @@ module Skylab::Face
 
     def expecting  # #styled
       when_puffed do
-        if ! @sheet.command_tree then 'nothing' else  # cute
+        if @sheet.command_tree
           a = @sheet.command_tree.reduce [] do |m, (_, x)|
-            m << "#{ hi x.name.as_slug }"
+            m << "#{ hi x.name.as_slug }" if x.is_ok
+            m
           end
-          a * ' or '
-        end
+          a * ' or ' if a.length.nonzero?
+        end or 'nothing'
       end
     end
 
@@ -1399,7 +1420,8 @@ module Skylab::Face
         y << hi( "command#{ 's' if 1 != a.length }:" )
         item_a = a.reduce [] do |row, (_, sht)|
           hot = sht.hot self
-          row << Item_[ hot.name.as_slug, hot.summary ]
+          hot and row << Item_[ hot.name.as_slug, hot.summary ]
+          row
         end
         w = item_a.map { |o| o.hdr.length }.reduce 2 do |m, l| m > l ? m : l end
         mar = margin
@@ -1710,15 +1732,15 @@ module Skylab::Face
     end
   end
 
-  # ~ 5.2 - aliases ~
+  # ~ 5.2.1 - aliases ~
 
-  class Namespace  # #re-open for face 5.2
+  class Namespace  # #re-open for face 5.2.1
     def self.aliases * i_a
       @story.node_open!.add_aliases i_a
     end
   end
 
-  class Node_Sheet_  # #re-open for facet 5.2
+  class Node_Sheet_  # #re-open for facet 5.2.1
 
     def add_aliases i_a
       @aliases_are_puffed = nil
@@ -1896,7 +1918,7 @@ module Skylab::Face
 
     # Scooper_ encapsulates *all* of the low-level `method_added` hacking
     # we do for `isomorphic command composition` [#041]. because there is
-    # exactly one scooper per namespace class, it does not really need to
+    # exactly one scooper per n-amespace class, it does not really need to
     # scale out much; hence we write it in the below style for fun and as
     # an experiment.
 

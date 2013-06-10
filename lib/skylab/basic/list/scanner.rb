@@ -35,12 +35,13 @@ module Skylab::Basic
       @eos = -> do
         idx >= ( a.length - ridx )
       end
+      @fetchs = -> do
+        r = a.fetch idx
+        idx += 1
+        r
+      end
       @gets = -> do
-        if ! @eos[]
-          r = a.fetch idx
-          idx += 1
-          r
-        end
+        @fetchs[] if ! @eos[]
       end
       @rgets = -> do
         if ! @eos[]
@@ -60,8 +61,8 @@ module Skylab::Basic
       end
     end
 
-    MetaHell::Function self, :@eos, :eos?, :gets, :rgets, :count,
-      :terminate, :reset
+    MetaHell::Function self, :@eos, :eos?, :gets, :fetchs,
+      :rgets, :count, :terminate, :reset
 
   end
 end
