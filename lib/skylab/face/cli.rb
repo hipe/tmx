@@ -731,6 +731,13 @@ module Skylab::Face
     public :[]
   end
 
+  class Command
+    Services_.enhance self do  # we need to put the class there and have the
+      services_ivar :@cmd_services  # method there for compatability with SET_
+      services_accessor_method :[]
+    end
+  end
+
   class CLI_Mechanics_  # #re-open for 1.4. has p-arent.
   private
     def parent_services
@@ -741,7 +748,7 @@ module Skylab::Face
   CLI::SET_ = Set_.new( [ :top, :middle, :bottom ],
     top: CLI_Surface_Pxy_,
     middle: NS_Mechanics_::Services_,
-    bottom: Command )
+    bottom: Command::Services_ )
 
 
   #            ~ facet 2 - option representation & parsing ~
@@ -1334,10 +1341,13 @@ module Skylab::Face
       when_puffed do
         y = @y
         if documenter
-          y << @op.banner  # (cognizant of hack)
+          y << @op.banner  # (usually usage line(s) - used to have 'options:')
+          description_section y
+          write_options_header y
           @op.summarize y
         else
           y << usage_line
+          description_section y
         end
         additional_help y
         # rather than ignoring args that came after us, we will let the main
@@ -1439,18 +1449,20 @@ module Skylab::Face
         a.length.times do |idx|
           line = a[ idx ]
           sexp = hl_parse_styles[ line ]
-          sexp or next  # if there was no styling we are done with line.
-          _new = restyle_sexp[ sexp, usg_hdr_txt ]
-          a[ idx ] = _new
+          if sexp
+            a[ idx ] = restyle_sexp[ sexp, usg_hdr_txt ]
+          else
+            a[ idx ] = line.strip
+          end
         end
         nil
       end
 
-      get_desc_proc_a_excerpt = -> svcs, proc_a, num_lines do
-        a = [ ] ; num_left = num_lines
+      get_desc_proc_a_excerpt = -> svcs, proc_a, num_lines, usg_hdr_txt do
+        a = [ ] ; num_left = num_lines + 1 ; rcvr = svcs.option_parser_receiver
         producer = -> f do
           -> &blk do
-            f[ ::Enumerator::Yielder.new( &blk ) ]
+            rcvr.instance_exec ::Enumerator::Yielder.new( &blk ), &f  # whew
             nil
           end
         end
@@ -1461,7 +1473,11 @@ module Skylab::Face
             break if num_left <= 0
           end
         end
-        a if a.length.nonzero?
+        if a.length.nonzero?
+          ellipsify[ a, num_lines ]
+          restyle[ a, usg_hdr_txt ]
+          a
+        end
       end
 
       hack_excerpt_from_op = -> do  # ..
@@ -1488,14 +1504,14 @@ module Skylab::Face
         end
       end.call
 
-      _NUM_LINES = 1  # a variable that looks like a constant, best of both.
-
       define_method :summary do |sht|
+        num_lines = self[ :num_summary_lines ]  # call service proxy (go up)
         if sht.desc_proc_a
-          exrp_a = get_desc_proc_a_excerpt[ self, sht.desc_proc_a, _NUM_LINES ]
+          exrp_a = get_desc_proc_a_excerpt[
+            self, sht.desc_proc_a, num_lines, usage_header_text ]
         end
         if ! exrp_a && documenter
-          exrp_a = hack_excerpt_from_op[ @op, usage_header_text, _NUM_LINES ]
+          exrp_a = hack_excerpt_from_op[ @op, usage_header_text, num_lines ]
         end
         exrp_a or [ "usage: #{ syntax }" ]  # like `usage_line` but unstyled
       end
@@ -1559,13 +1575,17 @@ module Skylab::Face
       if @ugly_str == @op.banner && @ugly_id == @op.banner.object_id
         y = [ ]
         usage y
-        sum = @op.base.list.length + @op.top.list.length
-        if sum.nonzero?
-          y << "#{ hi "option#{ 's' if 1 != sum }:" }" # `options:` (#2 of 2)
-        end
+        # write_options_header y
         @op.banner = y * "\n"
       end
       true  # important!
+    end
+
+    def write_options_header y
+      sum = @op.base.list.length + @op.top.list.length
+      if sum.nonzero?
+        y << "#{ hi "option#{ 's' if 1 != sum }:" }" # `options:` (#2 of 2)
+      end
     end
 
     -> do  # `usage_header_text`
@@ -1601,10 +1621,29 @@ module Skylab::Face
 
     end.call
 
+    def description_section y
+      if @sheet.desc_proc_a
+        rcvr = option_parser_receiver
+        @sheet.desc_proc_a.each do |f|
+          rcvr.instance_exec @y, &f
+        end
+      end
+      nil  # ok to change to boolean
+    end
+
     def additional_help y  # (hook for child classes to exploit handily)
     end
 
     def additional_usage_lines  # (hook that is for now only by branch nodes.)
+    end
+  end
+
+  CLI::SET_[ :num_summary_lines, :default, 1 ]  # full stack
+
+  class NS_Sheet_
+  private
+    def absorb_xtra_num_summary_lines x
+      defer_set :num_summary_lines, x
     end
   end
 
