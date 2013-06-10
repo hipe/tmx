@@ -8,7 +8,7 @@ module Skylab::Porcelain::Legacy
 
   Adapter::For::Face::Of::Hot = MetaHell::Proxy::Nice.new(
     :name, :summary, :help, # for doc index
-    :respond_to?, :invokee, :pre_execute  # for `get_executable` and `invoke`
+    :set_a, :respond_to?, :invokee, :pre_execute  # for `get_executable` and `invoke`
   )
 
   class Adapter::For::Face::Of::Hot
@@ -31,6 +31,7 @@ module Skylab::Porcelain::Legacy
           name: -> { hi_sheet.name },
           summary: -> *_ { [ "usage: #{ real[].syntax_text }" ] },
           help: -> { real[].help },
+          set_a: -> { hi_sheet.set_a },
           respond_to?: -> i { send_h.fetch i },
           invokee: -> { real[] },
           pre_execute: -> { } )

@@ -14,7 +14,7 @@ module Skylab::Face
       end
     end
 
-    Ouroboros_Sheet = MetaHell::Proxy::Nice.new :name,
+    Ouroboros_Sheet = MetaHell::Proxy::Nice.new :name, :set_a,
       :command_tree, :default_argv, :option_sheet_a,
       :has_default_argv, :has_option_sheets, :fetch_constituent,
       :has_partially_visible_op
@@ -22,6 +22,10 @@ module Skylab::Face
     class Ouroboros_Sheet
       def self.[] lo, hi
         new(               name: -> do hi.name end,
+                          set_a: -> do  # top trumps bottom (overwrites)
+                                      a = hi.set_a ; b = lo.set_a
+                                      [ *b, *a ] if a || b
+                                    end,
                    command_tree: -> do lo.command_tree end,
                    default_argv: -> do hi.default_argv || lo.default_argv end,
                  option_sheet_a: -> do lo.option_sheet_a end,

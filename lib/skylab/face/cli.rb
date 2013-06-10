@@ -68,18 +68,20 @@ module Skylab::Face
 
   class CLI < Namespace  # open for facet 1
 
-    # and object of a subclass of the `CLI` class is *the* "modality client"
-    # for is an abstract base class - it is the first node to "see" things
-    # like ARGV and $stdin, $stdout, $stderr, and is the only node in this
-    # ecosystem to "be given" such things from the ruby ecosystem directly.
+    # an object of a subclass of the `CLI` class is *the* "modality client".
+    # it is the first node to "see" resources like ARGV and $stdin, $stdout,
+    # $stderr ; and is the only node in this ecosystem to "be given" such
+    # resources from the ruby ecosystem directly.
     #
-    # this `CLI` class itself is not meant to be instantiated directly and to
-    # do so has undefined results. this `CLI` class in its implementation is a
-    # specilization of the `Namespace` class with some extra added
-    # functionality for being the topmost (or rootmost) node (for some context)
-    # in the application tree. except where noted, all description of
-    # `Namespace` below will apply to this class here, so please see that for
-    # further description of the `CLI` class.
+    # this `CLI` class itself is a would-be #abstract-base-class - it is not
+    # meant to be instantiated directly and to do so has undefined results.
+    #
+    # this `CLI` class in its implementation is a specilization of the
+    # `Namespace` class with some extra added functionality for being the
+    # topmost (or rootmost) node (for some context) in the application tree.
+    # except where noted, all description of `Namespace` below will apply to
+    # this class here, so please see that for further description of the `CLI`
+    # class.
 
     #             ~ class section 1 - instance methods ~
 
@@ -147,7 +149,8 @@ module Skylab::Face
 
     #           ~ class section 2 - public instance methods ~
 
-    # `get_executable` - #existential-workhorse #result-is-tuple
+    # `get_executable` - #existential-workhorse #result-is-tuple. this is the
+    # work-horsiest workhorse in this whole fiasco.
     # result tuple: ( ok, result_code_or_receiver, method, args, block, cmd )
 
     def get_executable argv
@@ -213,7 +216,7 @@ module Skylab::Face
     # insomuchas CLI's are not long running processes anyway!)
 
     # in this entire library (without extrinsic facets / extensions), of the
-    # whole matryoshka stack [#040], the only resource we need is @y: the
+    # whole matryoshka stack [#040], the only resource *we* need is @y: the
     # standard error stream line yielder (makes sense, right?).
 
     def pre_execute
@@ -515,6 +518,7 @@ module Skylab::Face
       @queue_a = nil  # allows transactional o.p, command-like options.
       @sheet = sheet
       @parent_services = -> { parent_services } if parent_services
+      process_deferred_set if sheet.set_a
       # (`_slug_fragment` not currently stored insomuch as what the user typed
       # (or which alias was used) to get this command is unimportant to us now.)
     end
@@ -668,6 +672,8 @@ module Skylab::Face
       ! not_ok
     end
 
+    attr_reader :set_a  # sneak this in for facet 6
+
   private
 
     # `absorb_xtra` - #called-by instance of child class : e.g NS_Sheet_
@@ -686,150 +692,14 @@ module Skylab::Face
     end
   end
 
-  #     ~ 1.4 - implement "p-arent services" with a new DSL wat ~
+  #                ~ 1.4 - internal service proxies! ~
+  #
+  # we can't / shouldn't just shoot messages upwards directly with `send`.
+  # for one, because of the pledge to keep the entire method namespace
+  # reserved for businessland (except `invoke` in the case of topmost), we
+  # simply cannot go adding "mechanical" methods willy nilly to there.
 
-  class Services_  # ( basically a miniature version of Headless::Plugin )
-    Services_Ivar_ = nil
-    class << self
-      alias_method :orig, :new
-
-      def enhance host_mod, & defn_blk
-        pxy = ( if host_mod.const_defined? :Services_, false
-          host_mod.const_get :Services_, false
-        else
-          host_mod.const_set :Services_, Services_.new
-        end )
-        pxy.send :absorb_services_defn_blk, defn_blk  # we want to be private
-        sam = pxy::Services_Accessor_Method_
-        siv = pxy::Services_Ivar_ || :@services
-        if ! ( host_mod.method_defined? sam or
-                host_mod.private_method_defined? sam ) then
-          host_mod.module_exec do
-            define_method sam do |*a|
-              svcs = if instance_variable_defined? siv then
-                instance_variable_get siv
-              else
-                instance_variable_set siv, self.class::Services_.new( self )
-              end
-              svcs.send sam, *a
-            end
-            private sam
-          end
-        end
-        nil
-      end
-
-      def new &defn_blk
-        ::Class.new( self ).class_exec do
-          class << self ; alias_method :new, :orig end
-          initialize
-          defn_blk and absorb_services_defn_blk defn_blk
-          self
-        end
-      end
-
-    private
-
-      -> do  # `initialize`
-        mf_h = {
-          ivar: -> i, ivar=nil do
-            ivar ||= "@#{ i }".intern
-            -> { @ivar[ ivar ] }
-          end,
-          method: -> i, method=nil do
-            method ||= i
-            -> { @self_send[ method ] } if method != i
-          end,
-          up: -> i do
-            -> { @up[ i ] }
-          end
-        }
-        define_method :initialize do
-          sam = siv = did_sam = did_siv = nil ; svc_queue_a = [ ]
-          @absorb_services_defn_blk = -> blk do
-            Conduit_.new(
-              -> i do
-                siv and fail "won't clobber existing #{
-                  } services ivar - #{ @svc_ivar }"
-                siv = i
-              end,
-              -> i do
-                sam and fail "won't clobber existing #{
-                  } services accessor method: #{ sam }"
-                sam = i
-              end,
-              -> a { svc_queue_a.concat a ; nil }
-            ).instance_exec( & blk )
-            if ! did_siv && siv
-              did_siv = true
-              const_set :Services_Ivar_, siv
-            end
-            if ! did_sam && sam
-              did_sam = true
-              const_set :Services_Accessor_Method_, sam
-              define_method sam do |*a|
-                if 1 == a.length then __send__ a.fetch( 0 )
-                else a.map { |i| __send__ i } end
-              end
-            end
-            while svc_queue_a.length.nonzero?
-              i, mf, *rest = svc_queue_a.shift
-              if ! mf_h.key? mf
-                AT_ == mf.to_s.getbyte( 0 ) or fail "syntax - ivar? #{ mf }"
-                rest.unshift mf
-                mf = :ivar
-              end
-              blk = mf_h.fetch( mf )[ i, * rest ]
-              define_method i, & blk if blk
-            end
-            nil
-          end
-          nil
-        end
-        AT_ = '@'.getbyte 0
-        class Conduit_
-          def initialize siv, sam, svs
-            @h = { siv: -> i { siv[ i ] },
-                   sam: -> i { sam[ i ] },
-                   svs: -> a { svs[ a ] } }
-          end
-          def services_ivar i ; @h[:siv][ i ] end
-          def services_accessor_method i ; @h[:sam][ i ] end
-          def services *a ; @h[:svs][ a ] end
-        end
-      end.call
-
-      def absorb_services_defn_blk blk
-        @absorb_services_defn_blk[ blk ]
-      end
-    end
-
-    def initialize provider
-      @ivar = -> ivar do
-        if provider.instance_variable_defined? ivar
-          provider.instance_variable_get ivar
-        else
-          raise "will not access ivar that is not defined (#{ ivar }) of #{
-            }#{ provider.class }"
-        end
-      end
-      @self_send = -> meth do
-        __send__ meth, provider
-      end
-      @up = -> i do
-        sam = self.class::Services_Accessor_Method_
-        @up = provider.instance_exec do
-          -> sym do
-            parent_services.__send__ sam, sym
-          end
-        end
-        @up[ i ]
-      end
-      nil
-    end
-  end
-
-  CLI_Surface_Pxy_ = Services_.new do
+  CLI_Surface_Pxy_ = Services_.new do  # declare early, used to make SET_
     services_ivar :@surface_services
     services_accessor_method :[]
     services [ :y, :ivar ],
@@ -837,7 +707,6 @@ module Skylab::Face
              [ :ostream, :@out ],
              [ :estream, :@err ],
              [ :program_name, :method, :_program_name ]
-
   end
   class CLI_Surface_Pxy_
     def _program_name surface
@@ -849,7 +718,7 @@ module Skylab::Face
     # mechanics node to concern itself with the fact that it is topmost here
   end
 
-  class NS_Mechanics_  # #re-open for 4.1. has p-arent.
+  class NS_Mechanics_  # #re-open for 1.4 has p-arent.
     Services_.enhance self do
       services_ivar :@ns_mechanics_services
       services_accessor_method :[]
@@ -868,6 +737,12 @@ module Skylab::Face
       @parent_services ||= CLI_Surface_Pxy_.new @surface.call
     end
   end
+
+  CLI::SET_ = Set_.new( [ :top, :middle, :bottom ],
+    top: CLI_Surface_Pxy_,
+    middle: NS_Mechanics_::Services_,
+    bottom: Command )
+
 
   #            ~ facet 2 - option representation & parsing ~
 
@@ -1282,10 +1157,6 @@ module Skylab::Face
     def get_anchorized_name                    # #in-narrative, for
       [ ]                                      # resolving an action's name.
     end
-    def margin                                 # #buck-stopper (sneaks in here)
-      MARGIN_                                  # one day `set_margin` here, or
-    end                                        # appearance customoziation DSL
-    MARGIN_ = '  '.freeze
   end
 
   #  ~ facet 4.3 - more cosmetic concerns ~
@@ -1424,7 +1295,7 @@ module Skylab::Face
           row
         end
         w = item_a.map { |o| o.hdr.length }.reduce 2 do |m, l| m > l ? m : l end
-        mar = margin
+        mar = self[ :margin ]  # call our own self.class::Services_
         fmt = "%#{ w }s#{ mar }"
         item_a.each do |item|
           if ! item.lines || item.lines.length.zero?
@@ -1442,9 +1313,15 @@ module Skylab::Face
       nil
     end
     Item_ = ::Struct.new :hdr, :lines
+  end
 
-    def margin
-      parent_services.margin
+  CLI::SET_[ :margin, :default, '  '.freeze, :lowest, :middle ]
+  class NS_Sheet_
+    private
+    def absorb_xtra_margin x
+      ::Fixnum === x and x = ( ' ' * x ).freeze  # meh
+      defer_set :margin, x
+      nil
     end
   end
 
@@ -1911,7 +1788,13 @@ module Skylab::Face
     [ NS_Mechanics_, :public, :api, :call_api, :api_services ]
       # may be #called-by surface
 
-  # ~ facet 6 - housekeeping and file finalizing (and consequently DSL mgmt). ~
+  # ~ facet 6 - the `set` API ~
+
+  Magic_Touch_.enhance -> { CLI.const_get( :Set, false ).touch },
+    [ Namespace, :singleton, :public, :set ],
+    [ Node_Sheet_, :private, :defer_set ]
+
+  # ~ facet N - housekeeping and file finalizing (and consequently DSL mgmt). ~
 
   class CLI
     @do_track_method_added = false  # location 2 of 3 -
