@@ -6,7 +6,7 @@ module Skylab::TMX
     end, :desc, -> y do
       y << "#{ hi 'description:' } some ancient scripts, mostly installers"
       y << "  none are working, but we might one day resuscitate them."
-    end
+    end, :skip, true
   end
 
   module Modules::Arch
@@ -16,6 +16,7 @@ module Skylab::TMX
         super
         @mechanics.is_not_puffed!
       end
+      use :hi
     end
 
     class NS::Mechanics_ < ::Skylab::Face::NS_Mechanics_
@@ -61,7 +62,7 @@ module Skylab::TMX
         kls = load_it cli
         if kls
           top_wisp = Face::NS_Sheet_.new( nil ).
-            init_with_normalized_local_name pn.to_s.intern
+            init_with_local_normal_name pn.to_s.intern
           ada = kls::Adapter::For::Face
           oro = ada::Of::Sheet[ top_wisp, kls.story ]
           hotm = ada::Hotmm_[ top_wisp.name.as_slug, kls, -> { oro } ]

@@ -26,43 +26,62 @@ module Skylab::Basic
     # and one from the end, and checks current array length against these two
     # at every `gets` or `rgets`.
 
+    # (leave this line intact, this is when we flipped it back - as soon as
+    # the number of functions outnumbered the number of [i]vars it started
+    # to feel silly. however we might one day go back and compare the one vs.
+    # the other with [#bm-001])
+
     def initialize a
-      idx = nil ; ridx = nil
-      ( @reset = -> do
-        idx = 0 ; ridx = 0
-        nil
-      end ).call
-      @eos = -> do
-        idx >= ( a.length - ridx )
+      @idx = @ridx = 0
+      @a = a
+    end
+    def reset
+      @idx = @ridx = 0
+      nil
+    end
+    def eos?
+      @idx >= ( @a.length - @ridx )
+    end
+    def gets
+      fetchs if ! eos?
+    end
+    def ungets
+      @idx < 0 and raise ::IndexError, "attempt to `ungets` past beginning"
+      @idx -= 1
+    end
+    def fetchs
+      r = @a.fetch @idx
+      @idx += 1
+      r
+    end
+    def fetch_chunk num
+      0 <= num && num <= remaining_count or raise ::IndexError, "at least #{
+        }#{ num } more element#{ 's' if 1 != num } #{
+        }#{ 1 == num ? 'is' : 'are' } expected."
+      r = ( num - 1 ).downto( 0 ).map do |i|
+        @a.fetch( @idx + i )
       end
-      @fetchs = -> do
-        r = a.fetch idx
-        idx += 1
-        r
-      end
-      @gets = -> do
-        @fetchs[] if ! @eos[]
-      end
-      @rgets = -> do
-        if ! @eos[]
-          ridx += 1
-          a.fetch( -1 * ridx )
-        end
-      end
-      @count = -> do
-        idx
-      end
-      @index = -> do
-        ( idx - 1 ) if idx.nonzero?
-      end
-      @terminate = -> do
-        ridx = idx = a.length
-        nil
+      @idx += num
+      r.reverse
+    end
+    def rgets
+      if ! eos?
+        @ridx += 1
+        @a.fetch( -1 * @ridx )
       end
     end
-
-    MetaHell::Function self, :@eos, :eos?, :gets, :fetchs,
-      :rgets, :count, :terminate, :reset
-
+    def count
+      @idx
+    end
+    def remaining_count
+      @a.length - @ridx - @idx
+    end
+    def index
+      @idx - 1 if @idx.nonzero?
+    end
+    def terminate
+      @ridx = @idx = @a.length
+      nil
+    end
   end
 end

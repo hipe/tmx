@@ -13,7 +13,7 @@ module Skylab::TestSupport::Regret::CLI
       nil
     end
 
-    use :api, [ :last_hot, :as, :command ]
+    use :hi, :api, [ :last_hot, :as, :command ]
 
     option_parser do |o|
       o.separator "#{ hi 'description:' } try it on a file"

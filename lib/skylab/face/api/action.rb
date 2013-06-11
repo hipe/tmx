@@ -202,7 +202,7 @@ module Skylab::Face
       end
     end, :params ]
 
-    #  ~ facet 5.6 - metastories ~  ( was [#fa-035] )
+    # ~ facet 5.6x - metastories [#fa-035] ~
 
     Magic_Touch_.enhance -> { API::Action::Metastory.touch },
       [ self, :singleton, :public, :metastory ]

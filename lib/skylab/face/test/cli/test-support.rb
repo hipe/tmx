@@ -277,6 +277,19 @@ module Skylab::Face::TestSupport::CLI
       stderr_lines.length.should be_zero
       stdout_lines.length.should be_zero
     end
+
+    def shift_until_after a, f
+      found = false ; count = 0
+      while a.length.nonzero?
+        count += 1
+        if f[ a.shift ]
+          break( found = true )
+        end
+      end
+      if ! found
+        fail "found no lines matching the function in #{ count } lines."
+      end
+    end
   end
 
   CONSTANTS::Do_invoke_ = -> do

@@ -26,8 +26,8 @@ module Skylab::Basic
 
     def each_pair &blk
       ea = ::Enumerator.new do |y|
-        while ! @eos[]
-          y.yield @fetchs[], @fetchs[]
+        while ! eos?
+          y.yield fetchs, fetchs
         end
       end
       blk ? ea.each( & blk ) : ea

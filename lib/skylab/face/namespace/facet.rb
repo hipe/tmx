@@ -1,6 +1,8 @@
 module Skylab::Face
 
-  class Namespace  # #re-open for facet 5.5
+  # ~ facet 5.3x - recursively nested namespaces and ns properties ~
+
+  class Namespace  # #re-open for 5.3x
 
     module Facet
       def self.touch ; end  # just gets this file to load!
@@ -18,7 +20,7 @@ module Skylab::Face
     Mechanics__ = NS_Mechanics_
   end
 
-  class NS_Sheet_  # #re-open for facet 5.5
+  class NS_Sheet_  # #re-open for 5.3x
 
     # (the way it works out this is nicer structured as a top-down narrative
     # rather than being broken into the traditional sections, hence you will
@@ -80,22 +82,18 @@ module Skylab::Face
       parse_args = -> a do
         a.length.nonzero? && a[ 0 ].respond_to?( :call ) and mf = a.shift
         if a.length.nonzero?
-          if 1 == a.length and a[ 0 ].respond_to? :each_pair
-            xtra_pairs = a.shift
-          else
-            xtra_pairs = Services::Basic::Hash::Pair_Enumerator.new a
-          end
+          xtra_a = a  # still can be one hash or an arg list
         end
-        [ mf, xtra_pairs ]
+        [ mf, xtra_a ]
       end
       define_method :build_child_namespace_sheet do |norm_i, a, b|
         nf = Services::Headless::Name::Function.new norm_i
-        mf, xtra_pairs = parse_args[ a ]
+        mf, xtra_x = parse_args[ a ]
         mutex[ mf, b ]
         if mf
-          self.class.new( nil ).init_with_module_function mf, nf, xtra_pairs
+          self.class.new( nil ).init_with_module_function mf, nf, xtra_x
         else
-          build_into b, nf, xtra_pairs
+          build_into b, nf, xtra_x
         end
       end
       private :build_child_namespace_sheet
@@ -111,9 +109,9 @@ module Skylab::Face
       end
 
       define_method :absorb_additional_namespace_definition do |a, b|
-        mf, xtra_pairs = parse_args[ a ]
+        mf, xtra_x = parse_args[ a ]
         mf || b and mutex[ mf, b ]
-        xtra_pairs and absorb_xtra xtra_pairs
+        xtra_x and absorb_xtra xtra_x
         if mf
           @surface_mod_origin_i and raise "can't set a #{ mlf[] } to a #{
             }#{ nsm[] } already originates with #{ @surface_mod_origin_i }"
@@ -132,44 +130,43 @@ module Skylab::Face
       end
       protected :absorb_additional_namespace_definition
 
-      define_method :build_into do |block, name_func, xtra_pairs|
+      define_method :build_into do |block, name_func, xtra_x|
         bm = box_mod[ @surface_mod[] ]
         co = name_func.as_const
         bm.const_defined?( co, false ) and raise "sanity - don't do this"
         sty = ( bm.const_set co, ::Class.new( Namespace ) ).story
-        sty.init_with_block block, name_func, xtra_pairs
+        sty.init_with_block block, name_func, xtra_x
       end
       private :build_into
 
     end.call
 
-    def init_with_normalized_local_name i  # for hacks, exploration
+    def init_with_local_normal_name i  # for hacks, exploration
       @name and fail "won't clobber existing name"
       @name = Services::Headless::Name::Function.new i
       self
     end
 
-    def init_with_module_function mf, nf, xtra_pairs
+    def init_with_module_function mf, nf, xtra_x
       @surface_mod = mf
-      init_extended_ns_sheet :function, nf, xtra_pairs
+      init_extended_ns_sheet :function, nf, xtra_x
     end
     protected :init_with_module_function
 
-    def init_with_block b, nf, xtra_pairs
+    def init_with_block b, nf, xtra_x
       @block_a = [ b ]
-      init_extended_ns_sheet :blocks, nf, xtra_pairs  # overwrites `:module`, ok.
+      init_extended_ns_sheet :blocks, nf, xtra_x  # overwrites `:module`, ok.
     end
     protected :init_with_block
 
-    def init_extended_ns_sheet i, nf, xtra_pairs
+    def init_extended_ns_sheet i, nf, xtra_x
       @hot = nil
       @surface_mod_origin_i = i
       @name = nf
-      xtra_pairs and absorb_xtra xtra_pairs
+      xtra_x and absorb_xtra xtra_x
       self
     end
     private :init_extended_ns_sheet
-
 
     -> do
 
@@ -218,7 +215,7 @@ module Skylab::Face
     end.call
   end
 
-  class NS_Mechanics_  # #re-open for facet 5.5
+  class NS_Mechanics_  # #re-open for 5.3x
 
     -> do  # `self.enhance` - see subclass version
 
@@ -245,33 +242,7 @@ module Skylab::Face
     end
   end
 
-  # ~ 5.2.1 - skip ~
-
-  class NS_Sheet_  # #re-open
-    def do_include
-      ! do_skip
-    end
-    attr_reader :do_skip
-  private
-    def absorb_xtra_skip x
-      @do_skip = x
-      nil
-    end
-  end
-
-  # ~ 5.2.2 - desc ~
-
-  class NS_Sheet_
-  private
-    def absorb_xtra_desc x
-      ( @desc_proc_a ||= [ ] ) << x
-      nil
-    end
-  end
-
-  # ~ 5.2.3 - assorted mutabilities ~
-
-  class NS_Sheet_
+  class NS_Sheet_   # ~ 5.3x.Nx ~
 
     def add_namespace_sheet oro  # #called-by revelation, fun hacks
       write_ns oro.name.local_normal, -> ns do  # not slug, like method

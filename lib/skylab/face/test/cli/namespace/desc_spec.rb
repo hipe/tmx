@@ -14,8 +14,6 @@ module Skylab::Face::TestSupport::CLI::Namespace::Desc
 
         set :num_summary_lines, 2
 
-        use :hi
-
         option_parser do |o|
           o.banner = "today\ntoday we're gonna"
         end
@@ -29,6 +27,7 @@ module Skylab::Face::TestSupport::CLI::Namespace::Desc
           y << '  a warrior'
           y << nil
         end do
+          use :hi
           def throw_it_in_a_fire
           end
         end

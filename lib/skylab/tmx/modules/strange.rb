@@ -10,7 +10,7 @@ module ::Skylab::TMX
     namespace :cull, -> do
       require 'skylab/cull/core'
       ::Skylab::Cull::CLI::Client
-    end, skip: false
+    end, skip: true
 
     namespace :'cov-tree', -> do
       require 'skylab/cov-tree/core'
@@ -20,7 +20,7 @@ module ::Skylab::TMX
     namespace :'file-metrics', -> do
       require 'skylab/file-metrics/core'
       ::Skylab::FileMetrics::CLI
-    end,  aliases: [ 'fm' ], skip: false
+    end,  aliases: [ 'fm' ], skip: true
 
     namespace :permute, -> do
       require 'skylab/permute/core'

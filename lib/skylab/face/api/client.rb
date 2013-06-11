@@ -278,7 +278,7 @@ module Skylab::Face
     end
     public :revelation_services
 
-    #  ~ facet 5.6 - metastories ~  ( was [#fa-035] )
+    #  ~ facet 5.6x - metastories ~  ( was [#fa-035] )
 
     Magic_Touch_.enhance -> { API::Client::Metastory.touch },
       [ self, :singleton, :public, :metastory ]

@@ -105,7 +105,7 @@ module Skylab::Face
 
   # ( `class CLI::Sheet_` note there is none. we use NS::Sheet_ that node. )
 
-  class CLI_Mechanics_ < NS_Mechanics_   # #re-open for facet 1. has p-arent.
+  class CLI_Mechanics_ < NS_Mechanics_   # #re-open for facet 1
 
     # ~ class section 1 - singleton methods. warning: what you are about to
     # see is extremely clever, elegant, extensible and generally brilliant;
@@ -232,7 +232,7 @@ module Skylab::Face
   class Namespace  # #re-open for facet 1. no superclass.
 
     # the `Namespace` class is an abstract base class - it is meant only to
-    # be subclassed; and to instantiate object from it directly has undefined
+    # be subclassed. to instantiate object from it directly has undefined
     # results. the `Namespace` class is the central embodiment of a DSL in
     # this library - it is the interface entrypoint for employing [#041]
     # `isomorphic command composition`, that is, public methods that you
@@ -265,8 +265,24 @@ module Skylab::Face
         nil
       end
 
-      -> do  # `use` - covered by cli/api-integration/with-namespaces_spec.rb
-        h = { as: -> a, rest { a[ 0 ] = rest.shift } }
+      # `use` - the `use` directive states, "i will be using the following
+      # methods provided by my mechanics layer up here in my surface layer."
+      #
+      # as explained in this class's head comment, we pledge to provide no
+      # instance methods at all to your namespace subclass [#037]. however
+      # in practice it can be convenient to have a few private methods defined
+      # here on your "surface" (or "shell") class for doing things like
+      # creating common o.p options or styling help screen text. the
+      # `@mechanics` object (itself a command) provides such facilities
+      # but it can look ugly (and presents scale issues) to have any trace
+      # of that in your UI code. the `use` facility, then, simply defines
+      # private delgator methods on your shell to services provided by the
+      # mechanics layer.
+
+      # (covered in cli/api-integration/with-namespaces_spec.rb)
+
+      -> do
+        h = { as: -> a, rest { a[ 0 ] = rest.shift } }.freeze
         define_method :use do |*x_a|
           p = @do_track_method_added ; @do_track_method_added = false
           x_a.each do | ( svc_i, *rest ) |
@@ -342,6 +358,7 @@ module Skylab::Face
         @surface_mod = -> { surface_mod }
         @surface_mod_origin_i = :module
         @node_open = false ; @methods_need_to_be_indexed = true
+        @has_prenatals = false
         @skip_h = { }  # sad
         @scooper = Scooper_.new -> m do
           close_node do |cl|
@@ -354,15 +371,24 @@ module Skylab::Face
 
     #               ~ class section 1 - public instance methods ~
 
+    def is_prenatal  # see parent class
+      false
+    end
+
     def command_tree  # #called-by documenters, everything
-      if @methods_need_to_be_indexed
-        @methods_need_to_be_indexed = false  # avoid re-entrancy now & future!
-        sm = @surface_mod.call
+      if @methods_need_to_be_indexed || @has_prenatals
         black_a, white_h = @scooper.get_black_a_and_white_h
-        addme = sm.public_instance_methods( false ) - @box._order - black_a
-        addme.each do |norm_i|
-          @box.add norm_i, Cmd_Sheet_.new( norm_i )
+        existing, add, flush = @has_prenatals ? lift_prenatals : [@box._order]
+        if @methods_need_to_be_indexed
+          @methods_need_to_be_indexed = false
+          addme = @surface_mod.call.public_instance_methods( false ) -
+            existing - black_a
+          addme.each do |i|
+            cs = Cmd_Sheet_.new i
+            add && add[ i, cs ] or @box.add( i, cs )
+          end
         end
+        flush and flush[]
         @box.sort_names_by! do |i|
           white_h.fetch i do
             raise ::KeyError, "element (n#{ }amespace?) name not found in #{
@@ -377,7 +403,15 @@ module Skylab::Face
 
     def close_node &blk
       n = @node_open ; @node_open = nil ; blk[ n ]
-      @box.add n.normalized_local_command_name, n
+      ln = n.name.local_normal
+      otr = @box.fetch ln do end
+      if otr && otr.is_prenatal  # else let the error trigger
+        @box.change ln, nil  # sanity, `natalize`
+        n.subsume otr
+        @box.change ln, n
+      else
+        @box.add ln, n
+      end
       nil
     end
 
@@ -458,7 +492,7 @@ module Skylab::Face
       len = found_a.length
       if 1 == len
         sht = found_a[ 0 ]
-        if ! (( @last_hot = sht.hot self, argv.shift ))
+        if ! (( @last_hot = get_hot sht, argv.shift ))
           @y << "(\"#{ sht.name.as_slug }\" command failed to load)"
           sht.is_ok = false
           len = 0
@@ -502,6 +536,15 @@ module Skylab::Face
     def set_last_hot x  # #called-by Option_Block#build_into
       @last_hot = x     # this replaces the @command ivar we used to use,
       nil               # used when doing o.p hacks
+    end
+
+    #        ~ class section 3 - core private instance methods ~
+
+  private
+
+    def get_hot sht, argv=nil
+      sht.is_prenatal and fail 'where'  # #todo
+      sht.hot self, argv
     end
   end
 
@@ -562,6 +605,10 @@ module Skylab::Face
       nil
     end
 
+    def is_visible  # (sneak this in for facet 5.14x)
+      true
+    end
+
     #          ~ class section 2 - private instance methods ~
 
   private
@@ -600,6 +647,10 @@ module Skylab::Face
     end
 
     #            ~ class section 1 - public instance methods ~
+
+    def is_prenatal  # see parent class
+      false
+    end
 
     # `hot` - #called-by `find_command` - a hot, live action is requested
 
@@ -656,16 +707,22 @@ module Skylab::Face
 
   class Node_Sheet_  # open for facet 1
 
-    #  ~ section 0 - notes for subclasses ~
-    #    + restricted n-amespace "set_xtra_*" for class-internal API
+    #  ~ class section 0 - notes for subclasses ~
+    #    + restricted n-amespace "parse_xtra_*" for class-internal API
     #    + must implement a (possibly false-ish resulting) private method
     #      `name` that memoizes its result to `@name`
-    #    + there is no `initialize` defined here.
+
+    def initialize name_i  # hacks only!
+      @name = Services::Headless::Name::Function.new name_i
+      nil
+    end
 
     #  ~ section 1 - public instance methods ~
 
-    def normalized_local_command_name
-      @name.local_normal if name
+    attr_reader :name  # gets overridden
+
+    def is_prenatal  # `pre-natalism` allows us to collect data about a node
+      true           # before we know whether the node is a branch or a leaf.
     end
 
     def is_ok= b
@@ -678,24 +735,12 @@ module Skylab::Face
       ! not_ok
     end
 
-    attr_reader :set_a  # sneak this in for facet 6
-
-  private
-
-    # `absorb_xtra` - #called-by instance of child class : e.g NS_Sheet_
-    # we do it this way and not with using the attr_writer b.c using `foo=`
-    # is too conceptually limiting - its conventional interface is a) not the
-    # same as ours and b) ambiguous for how to procede with errors and c)
-    # semantically confusing if e.g we are concat'ign and not setting.
-    # we use methods and not a function hash (for tacit validation of `k`)
-    # for extensibility.
-
-    def absorb_xtra xtra_pairs
-      xtra_pairs.each_pair do |k, v|
-        send :"absorb_xtra_#{ k }", v
-      end
-      nil
+    def defers_invisibility  # (sneak this in for facet 5.14x)
+      false
     end
+
+    attr_reader :set_a  # (sneak this in for facet 5.11x)
+
   end
 
   #                ~ 1.4 - internal service proxies! ~
@@ -724,7 +769,7 @@ module Skylab::Face
     # mechanics node to concern itself with the fact that it is topmost here
   end
 
-  class NS_Mechanics_  # #re-open for 1.4 has p-arent.
+  class NS_Mechanics_  # #re-open for 1.4
     Services_.enhance self do
       services_ivar :@ns_mechanics_services
       services_accessor_method :[]
@@ -737,14 +782,14 @@ module Skylab::Face
     public :[]
   end
 
-  class Command
+  class Command  # #re-open for 1.4
     Services_.enhance self do  # we need to put the class there and have the
       services_ivar :@cmd_services  # method there for compatability with SET_
       services_accessor_method :[]
     end
   end
 
-  class CLI_Mechanics_  # #re-open for 1.4. has p-arent.
+  class CLI_Mechanics_  # #re-open for 1.4
   private
     def parent_services
       @parent_services ||= CLI_Surface_Pxy_.new @surface.call
@@ -773,7 +818,7 @@ module Skylab::Face
     end
   end
 
-  class NS_Sheet_  # #re-open for facet 2. has p-arent.
+  class NS_Sheet_  # #re-open for facet 2
 
     def on first, *rest, &blk
       add_option_sheet Option_Sheet.new( rest.unshift( first ), blk )
@@ -879,7 +924,7 @@ module Skylab::Face
         # straight up exits after processing help, which is unacceptable here.
         op.base.long[ 'help' ] = op.class::Switch::NoArgument.new do
           ( @queue_a ||= [ ] ) << [ :show_help, me ]
-        end  # life is then easier with this invisible option overriding it.
+        end  # life is then easier with this i-nvisible option overriding it.
       end
       if @sheet.has_option_sheets
         p = parent_services.last_hot
@@ -1025,7 +1070,7 @@ module Skylab::Face
     end
   end
 
-  # ~ facet 3 - argv processing ~
+  #                      ~ facet 3 - argv processing ~
 
   class CLI_Mechanics_  # #re-open for facet 3
 
@@ -1096,7 +1141,7 @@ module Skylab::Face
     attr_reader :has_command_parameters_function
   end
 
-  # ~ facet 4 - core help & UI ~
+  #                      ~ facet 4 - core help & UI ~
 
   # ~ facet 4.1 - a narrative about `normal_last_invocation_string` ~
 
@@ -1159,17 +1204,9 @@ module Skylab::Face
     end
   end
 
-  #  ~ facet 4.3 - more cosmetic concerns ~
+  #    ~ facet 4.3 - cosmetic concerns (near future #i18n and templating) ~
 
-  class Namespace
-  private
-
-    def hi x  # in violation of [#037] we provide this common nerk for derking
-      @mechanics.hi x
-    end
-  end
-
-  class NS_Mechanics_  # #re-open for facet 4. has p-arent.
+  class NS_Mechanics_  # #re-open for facet 4
 
     # `subcommand_help` - #result-is-tuple #called-by `process_queue`
 
@@ -1237,7 +1274,9 @@ module Skylab::Face
       when_puffed do
         if @sheet.command_tree
           a = @sheet.command_tree.reduce [] do |m, (_, x)|
-            m << "#{ hi x.name.as_slug }" if x.is_ok
+            if x.is_ok and ! x.defers_invisibility  # ick, meh
+              m << "#{ hi x.name.as_slug }" if x.is_ok
+            end
             m
           end
           a * ' or ' if a.length.nonzero?
@@ -1264,21 +1303,10 @@ module Skylab::Face
       nil
     end
 
-    def write_options_header y  # override (empty) parent class impl.
+    def write_options_header y  # override (empty) p-arent class impl.
       sum = @op.base.list.length + @op.top.list.length
       if sum.nonzero?
         y << "#{ hi "option#{ 's' if 1 != sum }:" }"  # option: options:
-      end
-    end
-
-    def argument_syntax
-      if @sheet.command_tree
-        a = @sheet.command_tree.reduce [] do |m, (_, c)|
-          m << c.name.as_slug
-        end
-        if a.length.nonzero?
-          "{#{ a * '|' }} [opts] [args]"
-        end
       end
     end
 
@@ -1292,22 +1320,38 @@ module Skylab::Face
       end
     end
 
-    def additional_help y
-      pairs = @sheet.command_tree
-      if pairs
-        y << hi( "command#{ 's' if 1 != pairs.length }:" )
-        item_a = pairs.reduce [] do |row, (_, sht)|
-          hot = sht.hot self
-          if hot and hot.name.as_slug.include?( 'nginx' )
-            hot.summary sht
-          end
-          hot and row << Item_[ hot.name.as_slug, hot.summary( sht ) ]
-          row
+    # `argument_syntax`
+
+    def argument_syntax
+      # $stderr.puts "ONE FOR DIDDY #{ self.class }"
+      @item_a = @item_w = false
+      # CAREFUL! set in one place, read in one place
+      if (( bx = @sheet.command_tree ))
+        slug_a = [] ; w = 0  # reducee three things at once
+        itma = bx.reduce [] do |m, (_, sht)|
+          hot = get_hot sht
+          if hot && hot.is_visible
+            slug_a << (( slu = hot.name.as_slug ))
+            slu.length > w and w = slu.length
+            m << Item_[ slu, hot.summary( sht ) ]
+          end ; m
         end
-        w = item_a.map { |o| o.hdr.length }.reduce 2 do |m, l| m > l ? m : l end
+        if itma.length.nonzero?
+          @item_a = itma ; @item_w = w
+          "{#{ slug_a * '|' }} [opts] [args]"
+        end
+      end
+    end
+
+    Item_ = ::Struct.new :hdr, :lines
+
+    def additional_help y
+      # $stderr.puts "TWO FOR DADDY #{ self.class }"
+      if false != (( a = @item_a ))  # sneaky grease
         mar = self[ :margin ]  # call our own self.class::Services_
-        fmt = "%#{ w }s#{ mar }"
-        item_a.each do |item|
+        fmt = "%#{ @item_w }s#{ mar }"
+        y << hi( "command#{ 's' if 1 != a.length }:" )
+        a.each do |item|
           if ! item.lines || item.lines.length.zero?
             y << "#{ mar }#{ hi( fmt % item.hdr ) } the #{ item.hdr } command"
           else
@@ -1320,15 +1364,14 @@ module Skylab::Face
         y << "Try #{ hi "#{ normal_invocation_string } -h <sub-cmd>" } #{
           }for help on a particular command."
       end
-      nil
     end
-    Item_ = ::Struct.new :hdr, :lines
   end
 
   CLI::SET_[ :margin, :default, '  '.freeze, :lowest, :middle ]
   class NS_Sheet_
     private
-    def absorb_xtra_margin x
+    def parse_xtra_margin scn
+      x = scn.fetchs
       ::Fixnum === x and x = ( ' ' * x ).freeze  # meh
       defer_set :margin, x
       nil
@@ -1496,7 +1539,6 @@ module Skylab::Face
 
       hack_excerpt_from_op = -> do  # ..
 
-
         # rendering multiple non-trivial o.p's on one screen just for summaries
         # causes noticeable lag. we stop the rendering once we have enough.
         get_op_excerpt_lines = -> op, num do
@@ -1654,8 +1696,8 @@ module Skylab::Face
 
   class NS_Sheet_
   private
-    def absorb_xtra_num_summary_lines x
-      defer_set :num_summary_lines, x
+    def parse_xtra_num_summary_lines scn
+      defer_set :num_summary_lines, scn.fetchs
     end
   end
 
@@ -1674,13 +1716,11 @@ module Skylab::Face
     false
   ).freeze
 
-  # ~ facet 5 - extrinsic features ~
+  #       ~ facet 5 - extrinsic features, properties, and behavior ~
 
-  # ~ 5.1 - facets anchored in this node ~
+  # ~ 5.1x - default argv ~
 
-  # ~ 5.1.1 - default argv ~
-
-  class Namespace  # #re-open for 5.1. no p-arent.
+  class Namespace  # #re-open for 5.1x
     class << self
     private
       def default_argv *a
@@ -1689,7 +1729,7 @@ module Skylab::Face
     end
   end
 
-  class NS_Sheet_  # #re-open for 5.1.1
+  class NS_Sheet_  # #re-open for 5.1x
     def set_default_argv a
       has_default_argv and raise ::ArgumentError,
         "won't overwrite existing `default_argv`"  # for now, but meh..
@@ -1706,7 +1746,7 @@ module Skylab::Face
     end
   end
 
-  class NS_Mechanics_  # #re-open for 5.1.1
+  class NS_Mechanics_  # #re-open for 5.1x
     def has_default_argv
       @sheet.has_default_argv
     end
@@ -1716,17 +1756,17 @@ module Skylab::Face
     end
   end
 
-  # ~ 5.1.2 - aliases ~
+  # ~ 5.2x - aliases ~
 
-  class Namespace  # #re-open for face 5.1.2
+  class Namespace  # #re-open for 5.2x
     def self.aliases * i_a
       @story.node_open!.add_aliases i_a
     end
   end
 
-  class Node_Sheet_  # #re-open for facet 5.1.2
+  class Node_Sheet_  # #re-open for 5.2x
 
-    attr_reader :desc_proc_a  # (sneak this in for facet 5.2.2)
+    attr_reader :desc_proc_a  # (sneak this in for facet 5.12x)
 
     def add_aliases i_a
       @aliases_are_puffed = nil
@@ -1756,38 +1796,16 @@ module Skylab::Face
 
   private
 
-    def absorb_xtra_aliases x
+    def parse_xtra_aliases scn
+      ( @alias_a ||= [ ] ).concat scn.fetchs
       @aliases_are_puffed = nil
-      ( @alias_a ||= [ ] ).concat x
       nil
     end
   end
 
-  # ( ~ 5.2 is the namespace facet, located in another node ~ )
+  # ~ 5.3x - recursively nested namespaces ~
 
-  # ~ 5.3 - invocation function ~
-
-  class Command  # #re-open for 5.3
-    def invocation_function  # #called-by-main-invocation-loop
-      @sheet.invocation_function
-    end
-  end
-
-  class Cmd_Sheet_  # #re-open for 5.3
-    attr_accessor :invocation_function
-  end
-
-  # ~ 5.4 - version officious facet ~
-
-  class CLI
-    def self.version *a, &b
-      CLI::Version[ self, a, b ]
-    end
-  end
-
-  # ~ 5.5 - actual namespacing, mutable ns sheets .. ~
-
-  class Namespace  # #re-open for facet 5.5
+  class Namespace  # #re-open for 5.3x
     extend MetaHell::MAARS
   end
 
@@ -1795,13 +1813,34 @@ module Skylab::Face
     [ Namespace, :singleton, :private, :namespace ],
     [ NS_Sheet_, :public, :add_namespace ]
 
-  # ~ 5.6 - metastories [#fa-035] ~
+
+  # ~ 5.4x - invocation function ~
+
+  class Command  # #re-open for 5.4x
+    def invocation_function  # #called-by-main-invocation-loop
+      @sheet.invocation_function
+    end
+  end
+
+  class Cmd_Sheet_  # #re-open for 5.4x
+    attr_accessor :invocation_function
+  end
+
+  # ~ 5.5x - version officious facet ~
+
+  class CLI
+    def self.version *a, &b
+      CLI::Version[ self, a, b ]
+    end
+  end
+
+  # ~ 5.6x - metastories [#fa-035] ~
 
   Magic_Touch_.enhance -> { CLI::Metastory.touch },
     [ Command, :singleton, :public, :metastory ],
     [ Namespace, :singleton, :public, :metastory ]
 
-  # ~ 5.7 - adapters for when loading namespaces as a "strange module" ~
+  # ~ 5.7x - adapters for when loading namespaces as a "strange module" ~
 
   class CLI
     module Adapter  # (this is actually a bit like "magic touch" pattern..)
@@ -1814,9 +1853,9 @@ module Skylab::Face
     end
   end
 
-  # ~ 5.8 - "puffer" API for populating namespaces lazily [#038] ~
+  # ~ 5.8x - "puffer" API for populating namespaces lazily [#038] ~
 
-  class Command  # #re-open for facet 5.8
+  class Command  # #re-open for 5.8x
 
     def is_not_puffed!
       @is_puffed = false ; nil
@@ -1834,22 +1873,21 @@ module Skylab::Face
     end
   end
 
-  # ~ 5.9 - the Node facet (when you need mutable sheets you manipulate ..)
+  # ~ 5.9x - command parameters as mutable ~
 
-  Magic_Touch_.enhance -> { CLI::Node_Facet.touch },
-    [ Node_Sheet_, :public, :set_command_parameters_function ]
+  Magic_Touch_.enhance -> { CLI.const_get( :Set, false ).touch },
+    [ Node_Sheet_, :public, :set_command_parameters_function ],
+    [ Namespace, :singleton, :public, :set ],  # (this and below is 5.11x)
+    [ Node_Sheet_, :private, :defer_set, :absorb_xtra ],
+    [ NS_Sheet_, :private, :lift_prenatals ]
 
-  # ~ 5.10 - API integration (*non*-revelation style)
+  # ~ 5.10x - API integration (*non*-revelation style)
 
   Magic_Touch_.enhance -> { CLI::API_Integration.touch },
     [ NS_Mechanics_, :public, :api, :call_api, :api_services ]
       # may be #called-by surface
 
-  # ~ facet 6 - the `set` API ~
-
-  Magic_Touch_.enhance -> { CLI.const_get( :Set, false ).touch },
-    [ Namespace, :singleton, :public, :set ],
-    [ Node_Sheet_, :private, :defer_set ]
+  # ~ 5.11x - the `set` API ( munged in with 5.9x above ) ~
 
   # ~ facet N - housekeeping and file finalizing (and consequently DSL mgmt). ~
 

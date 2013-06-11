@@ -15,7 +15,7 @@ module Skylab::Treemap::TestSupport::CLI
 
     it "lists render in the help screen" do
       tmx_cli.invoke ['treema', '-h']
-      scn = ::StringScanner.new serr
+      scn = Treemap::Bleeding::Porcelain::Services::StringScanner.new serr
       scn.skip_until( /\nactions:\n/ ) or
         fail 'failed to find "actions:" section'
       names = []

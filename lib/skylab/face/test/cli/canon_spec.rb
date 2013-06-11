@@ -449,7 +449,6 @@ module Skylab::Face::TestSupport::CLI
         argv 'fiz', '-h'
         expt :usage_line, :options_header_plural, :opt_item_1, :opt_item_2
         it does do
-          debug!
           res = invoke argv
           res.should eql( nil )
           expect expt

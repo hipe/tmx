@@ -16,7 +16,7 @@ module Skylab::Face::TestSupport::CLI::Namespace::Skip
           end
         end
         namespace :lienenkugel, -> do
-
+          # a block that has a false-ish result is defacto `skip`
         end
         namespace :'tsing-tao', -> do
           TT
@@ -39,15 +39,15 @@ module Skylab::Face::TestSupport::CLI::Namespace::Skip
 
       let :client_class do Wiffle::CLI::Client end
 
-      it "skips a) strange ns's with empty yield, b/c) 2 kinds of skip" do
+      it "skip is explicit (hash or list syntax), or defacto" do
         invoke '-h'
         a = []
         2.times do
           a << unstylize( lines[ :err ].pop )
         end
         down, up = a
-        up.should match( /\bcommands?:/i )
-        down.should match( /for help/i )
+        up.should match( /\boptions?:/i )
+        down.should match( /this screen/i )
       end
 
       it "(does thing with load failure, that we snuck in here" do

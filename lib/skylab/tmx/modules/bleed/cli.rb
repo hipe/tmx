@@ -1,7 +1,7 @@
 class Skylab::TMX::CLI
   namespace :bleed, -> do
     ::Skylab::TMX::Modules::Bleed::CLI
-  end
+  end, skip: true
 end
 
 module Skylab
@@ -10,10 +10,13 @@ module Skylab
 
     # summary "run a bleeding edge version of tmx"  # #todo - later or never
 
+    use :hi
+
     default_argv :load
 
     tmxconfig = -> do
-      TMX::Models::Config::PATH
+      # TMX::Models::Config::PATH
+      "<<#todo fixme>>"
     end
 
     option_parser do |o|
@@ -27,7 +30,7 @@ module Skylab
     end
 
     option_parser do |o|
-      o.banner = @command.usage_line
+      o.banner = @mechanics.last_hot.usage_line
 
       o.separator "\n#{ hi 'description:' } Gets or sets path to the #{
         }bleeding-edge tmx codebase.\n#{

@@ -51,22 +51,36 @@ module Skylab::Face::TestSupport::CLI::Option::Help
       end
     end
 
-    module This_TestSupport::Deffer
+    module Deffer
 
       class CLI_Client < Face::CLI
 
-        # set :num_summary_lines, 3
+        set :num_summary_lines, 3
 
         option_parser do |o|
 
           o.banner = "big\nbad\nbeautiful\nbilbo"
 
         end
+
+        def beefus_meefus
+        end
       end
     end
 
     context "more than one summary line per item" do
-      it "hm.."
+
+      let :client_class do Deffer::CLI_Client end
+
+      it "YES" do
+        invoke '-h'
+        a = lines[:err]
+        shift_until_after a, -> ln { ln.include? 'command:' }
+        unstylize_stylized( a.shift ).should match(
+          /\A[ ]+beefus-meefus[ ]+big\z/ )
+        a.shift.should match( /\A[ ]+bad\z/ )
+        a.shift.should match( /\A[ ]+beautiful \[\.\.\]\z/)
+      end
     end
   end
 

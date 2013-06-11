@@ -4,7 +4,7 @@ module Skylab::FileMetrics
 
     extend ::Skylab::Autoloader
 
-    use [ :last_hot, :as, :command ]
+    use :hi, [ :last_hot, :as, :command ]
 
     # lost indent
       def op_common_head

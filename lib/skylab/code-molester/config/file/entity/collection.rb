@@ -176,7 +176,7 @@ module Skylab::CodeMolester::Config::File::Entity
 
   private
 
-    def config  # away at [#hl-075], ditto next #todo:during:4
+    def config  # away at [#hl-075], ditto next #todo:during:5
       @plugin_host_services.config
     end
 

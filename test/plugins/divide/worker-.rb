@@ -4,7 +4,7 @@ class Skylab::Test::Plugins::Divide
 
   class Worker_
 
-    include Agent_IM_
+    include Test::Agent_IM_
 
     def self.[] *a
       new( *a ).execute

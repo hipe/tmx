@@ -15,7 +15,8 @@ module Skylab::Face
     end
 
     Ouroboros_Sheet_ = MetaHell::Proxy::Nice.new :name, :set_a,
-      :all_aliases, :do_include, :desc_proc_a, :command_tree, :option_sheet_a,
+      :do_include, :all_aliases,
+      :desc_proc_a, :command_tree, :option_sheet_a,
       :has_default_argv, :has_option_sheets, :fetch_constituent,
       :default_argv_value
 
@@ -27,8 +28,8 @@ module Skylab::Face
         new(
                            name: -> do hi.name end,
                           set_a: -> do C[ lo.set_a, hi.set_a ] end,
-                    all_aliases: -> do hi.all_aliases | lo.all_aliases end,
                      do_include: -> do hi.do_include && lo.do_include end,
+                    all_aliases: -> do hi.all_aliases | lo.all_aliases end,
                     desc_proc_a: -> do C[ lo.desc_proc_a, hi.desc_proc_a ] end,
                    command_tree: -> do lo.command_tree end,
                  option_sheet_a: -> do lo.option_sheet_a end,

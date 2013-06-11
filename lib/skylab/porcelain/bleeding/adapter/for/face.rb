@@ -23,6 +23,7 @@ module Skylab::Porcelain::Bleeding
           rl
         end
         new(
+          is_visible: -> { ! hi_sheet.defers_invisibility },
           name: -> { hi_sheet.name },
           set_a: -> { hi_sheet.set_a },
           summary: -> *_ { real[].summary_lines },

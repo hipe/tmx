@@ -101,6 +101,9 @@ module Skylab::MetaHell
       @order
     end
 
+    def _raw_constituency         # you must really have a death wish
+      [ @order, @hash ]
+    end
 
     #         ~ inspection of indiv. membership (asc. by complexity) ~
 

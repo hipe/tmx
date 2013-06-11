@@ -1,4 +1,4 @@
-require 'skylab/code-molester/core'
+fail 'cover me'  # #todo:during:6
 
 module Skylab
 
