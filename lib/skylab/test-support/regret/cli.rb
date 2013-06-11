@@ -37,6 +37,11 @@ module Skylab::TestSupport::Regret::CLI
         @param_h[:do_preview] = true
       end
 
+      o.on '--top <top>', "indicate a toplevel node, e.g \"skylab\".",
+        "(only used when disambiguation is necessary)" do |v|
+        @param_h[:top] = v
+      end
+
       o.on '-v', '--verbose', 'verbose (try multiple.)', & verbosity_opt_func
       o.on '-V', '--less-verbose', 'reduce verbosity.', &
         deincrement_verbosity_opt_func

@@ -35,7 +35,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
             d and break i, d
           end
           nxt_i or fail verbose_error[ cl, state_i ]
-          sblock.accept nxt_i, md
+          sblock.accept nxt_i, md, cl
           state = state_h.fetch( state_i =  nxt_i )
         end
         sblock.flush

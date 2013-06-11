@@ -12,7 +12,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
 
     State_ = ::Struct.new :_name, :h
 
-    -> do
+    -> do  # `initialize`
 
       define_method :initialize do |snitch|
         state = last_other = state_h = nil ; ign = -> _ { }
@@ -29,8 +29,9 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
         code = -> md do
           a << md[:content]
         end
+        ctx = nil
         shut = -> md do
-          _shut last_other, a
+          _shut last_other, a, ctx
           last_other = md[:content]
           a = [ ]
           state = state_h.fetch :watching
@@ -46,13 +47,14 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
             other: shut ]
         }
         state = state_h.fetch :watching
-        @accept = -> i, md do
+        @accept = -> i, md, context_eg_comment_line do
+          ctx = context_eg_comment_line
           state.h.fetch( i ).call md
           nil
         end
         @flush = -> do
           if a.length.nonzero?
-            _shut last_other, a
+            _shut last_other, a, ctx
           end
         end
         @a = [] ; @snitch = snitch
@@ -61,11 +63,11 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
 
     attr_reader :a
 
-    def _shut last_other, a
+    def _shut last_other, a, ctx
       # strip trailing blank lines
       a.pop while a.length.nonzero? and a.last.length.zero?
       if a.length.nonzero?
-        sn = Specer_::Block::Snippet.new last_other, a
+        sn = Specer_::Block::Snippet_.new last_other, a, ctx
         if sn.validate @snitch
           @a << sn
         end
@@ -79,24 +81,26 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     end
   end
 
-  class Specer_::Block::Snippet
+  class Specer_::Block::Snippet_
 
-    def initialize last_other, a
-      @last_other, @a = last_other, a
+    def initialize last_other, a, ctx
+      @last_other, @a, @context_x = last_other, a, ctx
     end
 
     attr_reader :last_other, :a
 
-    -> do
+    -> do  # `validate`
       sep_rx = /#{ ::Regexp.escape SEP }/
       define_method :validate do |snitch|
         ln = @a.detect do |l|
           sep_rx =~ l
         end
         if ln then true else
-          snitch[ Event_[ -> do
-            "code snippet without magic separator #{ SEP.inspect }"
-          end, @a ] ]
+          loc_desc = " (in block ending on line #{ @context_x.no })"
+          snitch.event :medium, Event_[ -> do
+            "(warning (?) - code snippet without magic #{
+              }separator #{ SEP.inspect }#{ loc_desc })"
+          end, @a ]
           nil
         end
       end

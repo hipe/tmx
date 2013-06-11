@@ -1264,6 +1264,13 @@ module Skylab::Face
       nil
     end
 
+    def write_options_header y  # override (empty) parent class impl.
+      sum = @op.base.list.length + @op.top.list.length
+      if sum.nonzero?
+        y << "#{ hi "option#{ 's' if 1 != sum }:" }"  # option: options:
+      end
+    end
+
     def argument_syntax
       if @sheet.command_tree
         a = @sheet.command_tree.reduce [] do |m, (_, c)|
@@ -1337,9 +1344,9 @@ module Skylab::Face
       when_puffed do
         y = @y
         if documenter
-          y << @op.banner  # (usually usage line(s) - used to have 'options:')
+          y << @op.banner  # usually usage line(s)
           description_section y
-          write_options_header y
+          write_options_header y  # conditionally
           @op.summarize y
         else
           y << usage_line
@@ -1353,8 +1360,19 @@ module Skylab::Face
     end
 
     def invite y  # #called-by-p-arent documenting this child
-      y << "Try #{ hi "#{ parent_services.normal_invocation_string } -h #{
-        }#{ name.as_slug }" } for help."
+      invite_for y, self
+      nil
+    end
+
+    def invite_for y, svcs
+      name_a = svcs.get_normal_invocation_string_parts
+      if name_a.length <= 1
+        first = name_a.fetch 0
+      else
+        first = name_a[ 0 .. -2 ] * ' '
+        rest = " #{ name_a[ -1 ] }"
+      end
+      y << "Try #{ hi "#{ first } -h#{ rest }" } for help."
       nil
     end
 
@@ -1578,10 +1596,8 @@ module Skylab::Face
     end
 
     def write_options_header y
-      sum = @op.base.list.length + @op.top.list.length
-      if sum.nonzero?
-        y << "#{ hi "option#{ 's' if 1 != sum }:" }" # `options:` (#2 of 2)
-      end
+      # we hackishly don't do this at leaf nodes because we have found it
+      # is best to leave this formatting to the humans. (see regret-intermd.)
     end
 
     -> do  # `usage_header_text`

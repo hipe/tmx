@@ -39,6 +39,7 @@ module Skylab::Face::TestSupport::CLI::Namespace
         end
         namespace :bar do
           option_parser do |o|
+            o.separator "#{ @mechanics.hi 'option:' }"
             o.on '-x'
           end
           def baz wing, wang

@@ -10,16 +10,14 @@ module Skylab::TestSupport::Regret::API
              [ :invitation ]
 
     params :path, v.param( :vtuple ),
+           [ :top, :arity, :zero_or_one ],
            [ :is_dry_run, :arity, :zero_or_one ],
            [ :do_preview, :arity, :zero_or_one ]
 
     def execute
-      host.invitation
-      $stderr.puts "HAPPY EXIT?" ; exit 0
-
-
       r = -> do
-        wlk = @wlk = API::Support::Tree::Walker.new @path, -> e do
+        wlk = @wlk = API::Support::Tree::Walker.new @path, @top, @vtuple,
+            -> e do
           if @vtuple[ e.volume ]
             @err.puts instance_exec( & e.message_function )
             true  # we might do this .. callee chains progressively less
@@ -41,7 +39,7 @@ module Skylab::TestSupport::Regret::API
         true
       end.call
       if ! r
-        host.invitation
+        @plugin_host_services.invitation
         r
       end
     end

@@ -4,7 +4,13 @@ module Skylab::Face::TestSupport::CLI::Lipstick
 
   ::Skylab::Face::TestSupport::CLI[ Lipstick_TestSupport = self ]
 
-  CONSTANTS::Common_setup_[ self, :sandboxer ]
+  include CONSTANTS
+
+  Face = ::Skylab::Face  # increase its visibility for below modules
+
+  extend TestSupport::Quickie
+
+  Sandboxer = TestSupport::Sandbox::Spawner.new
 
   describe "Skylab::Face::CLI::Lipstick" do
     context "context 1" do

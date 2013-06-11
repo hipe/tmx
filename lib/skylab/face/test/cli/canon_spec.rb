@@ -345,6 +345,7 @@ module Skylab::Face::TestSupport::CLI
     context "cmd with 2 opts, and 1 optional arg" do
       with_body do
         option_parser do |o|
+          o.separator "#{ @mechanics.hi "options:" }"
           @param_h ||= { }
           @param_h[:merf] = :nerk
           o.on '-j', '--j-date', 'the website called j-date' do
@@ -448,6 +449,7 @@ module Skylab::Face::TestSupport::CLI
         argv 'fiz', '-h'
         expt :usage_line, :options_header_plural, :opt_item_1, :opt_item_2
         it does do
+          debug!
           res = invoke argv
           res.should eql( nil )
           expect expt
@@ -474,6 +476,7 @@ module Skylab::Face::TestSupport::CLI
       with_body do
 
         option_parser do |o|
+          o.separator "#{ @mechanics.hi "option:" }"
           @param_h = { }
           o.on '-x' do @param_h[:ex] = true end
         end

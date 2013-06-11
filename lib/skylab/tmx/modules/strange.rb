@@ -20,7 +20,7 @@ module ::Skylab::TMX
     namespace :'file-metrics', -> do
       require 'skylab/file-metrics/core'
       ::Skylab::FileMetrics::CLI
-    end,  aliases: [ 'fm' ], skip: true
+    end,  aliases: [ 'fm' ], skip: false
 
     namespace :permute, -> do
       require 'skylab/permute/core'

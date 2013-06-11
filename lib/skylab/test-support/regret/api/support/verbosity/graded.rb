@@ -191,6 +191,7 @@ class Skylab::TestSupport::Regret::API::Support::Verbosity::Graded < ::Module
         instance_variable_set ivar_a.fetch( i ), false
       end
       @aref = -> i do  # named after ruby's internal name for :[]
+        ::Symbol === i or raise "sanity - needed symbol - #{ i.class }"
         instance_variable_get ivar_h.fetch( i )
       end
       nil
@@ -244,6 +245,12 @@ class Skylab::TestSupport::Regret::API::Support::Verbosity::Graded < ::Module
         nil #   to give it a misleading context.)
       end
       @is = -> i { vtuple[ i ] }
+      @event = -> i, e do  # for now this gets flattened right away, but
+        if @is[ i ]        # the emitter does not know that, which is the
+          @puts[ nil.instance_exec( & e.message_function ) ]  # point.
+        end
+        nil  # any result could be confusing (the e? the e iff emitted?)
+      end
       nil
     end
 
@@ -251,7 +258,8 @@ class Skylab::TestSupport::Regret::API::Support::Verbosity::Graded < ::Module
       self.class.members
     end
 
-    MetaHell::Function self, :write, :puts, :say, :is, :@puts, :<<, :@is, :[]
+    MetaHell::Function self, :write, :puts, :say, :is, :@puts, :<<,
       # ( because we often forget, the above is "use @puts for :<<" etc )
+      :event
   end
 end
