@@ -85,7 +85,9 @@ module Skylab::Headless
         end
         technique_h = {
           ivar: -> client, svc, a, b do
-            a || b and fail 'no'
+            if b or a and a.length.nonzero?
+              raise "sanity - no not pass arguments to an ivar-based service"
+            end
             client.instance_variable_get svc.ivar_name
           end,
           method: -> client, svc, a, b do

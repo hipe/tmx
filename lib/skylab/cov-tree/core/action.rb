@@ -13,8 +13,8 @@ module Skylab::CovTree
 
     methodize = Autoloader::Inflection::FUN.methodize
 
-    define_method :normalized_name do # ::Blah::Actions::Foo::X -> [:foo, :x]
-      @normalized_name ||= begin
+    define_method :local_normal_name do # ::Blah::Actions::Foo::X -> [:foo, :x]
+      @local_normal_name ||= begin
         amn = actions_anchor_module.name
         0 == name.index( amn ) or fail 'sanity'
         rest = name[ (amn.length + 2) .. -1 ]
@@ -29,8 +29,8 @@ module Skylab::CovTree
 
   protected
 
-    def normalized_name
-      self.class.normalized_name
+    def local_normal_name
+      self.class.local_normal_name
     end
   end
 end

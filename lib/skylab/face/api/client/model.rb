@@ -9,18 +9,6 @@ module Skylab::Face
 
   module API::Client::Model::InstanceMethods
 
-    def model *x_a
-      model_manager.aref x_a
-    end
-    private :model
-
-    def model_manager
-      @model_manager ||= begin
-        Face::Model::Manager.new models_module, self
-      end
-    end
-    private :model_manager
-
     MetaHell::Module::Accessors.enhance( self ).
         private_module_reader( :models_module, '../../Models' ) do
       extend MetaHell::Boxxy  # re-affirmable
@@ -57,6 +45,19 @@ module Skylab::Face
     def set_new_valid_model_instance( ( * model_ref_a ), init_blk, obj_if_yes, if_no )
       @model_manager.set_new_valid_instance model_ref_a, init_blk,
         obj_if_yes, if_no
+    end
+
+  private
+
+    def model *x_a
+      ::Symbol === x_a.first or fail 'where'
+      model_manager.aref x_a
+    end
+
+    def model_manager
+      @model_manager ||= begin
+        Face::Model::Manager.new models_module, self
+      end
     end
   end
 end

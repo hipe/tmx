@@ -134,7 +134,7 @@ module Skylab::CodeMolester::Config::File::Entity
 
     def normalize_field_keys
       once_h = ::Hash[ field_box.map do |fld|
-        [ ( fld.has_ivar ? fld.ivar_value : fld.normalized_name ), fld ]
+        [ ( fld.has_ivar ? fld.ivar_value : fld.local_normal_name ), fld ]
       end ]
       xtra_h = nil
       @field_h.keys.each do |k|
@@ -144,8 +144,8 @@ module Skylab::CodeMolester::Config::File::Entity
         end
         fld = once_h.fetch k
         if fld.has_ivar
-          @field_h[ fld.normalized_name ] = @field_h.delete k  # eek NOTE
-          k = fld.normalized_name
+          @field_h[ fld.local_normal_name ] = @field_h.delete k  # eek NOTE
+          k = fld.local_normal_name
         end
       end
       if xtra_h
@@ -167,7 +167,7 @@ module Skylab::CodeMolester::Config::File::Entity
 
     def missing_fields
       miss_a = required_fields.reduce [] do |m, fld|
-        k = fld.normalized_name
+        k = fld.local_normal_name
         if fld.is_required and ! @field_h.key?( k ) ||
               @field_h[ k ].nil? # might become option one day.
           m << fld
@@ -180,7 +180,7 @@ module Skylab::CodeMolester::Config::File::Entity
     end
 
     Missing_ = Entity::Event.new do |miss_o_a|
-      "missing required field(s) - #{ join[ miss_o_a.map(& :normalized_name )]}"
+      "missing required field(s) - #{ join[ miss_o_a.map(& :local_normal_name )]}"
     end
 
     def normalize_fields
@@ -203,8 +203,8 @@ module Skylab::CodeMolester::Config::File::Entity
       end
       if ! v.nil?
         # note we might be adding invalid fields!
-        @string_box.add fld.normalized_name, v
-        @field_h.delete fld.normalized_name
+        @string_box.add fld.local_normal_name, v
+        @field_h.delete fld.local_normal_name
       end
       if a
         flush_pound a, fld, v
@@ -250,7 +250,7 @@ module Skylab::CodeMolester::Config::File::Entity
 
     Invalid_ = Entity::Event.new do |pred_a, field|
       o = ''
-      lbl = field.normalized_name.id2name  # #todo
+      lbl = field.local_normal_name.id2name  # #todo
       Basic::List::Evented::Articulation pred_a do
         always_at_the_beginning      ->     { o << "#{ lbl }" }
         iff_zero_items               ->     { o << "was fine." }

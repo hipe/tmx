@@ -29,7 +29,7 @@ module Skylab::Face
     #                     o--->   `resolve_services`          [#fa-018]
     #                        /
     #     [plugged-in]  <---o        now it may have a @plugin_story and a
-    #                   -o           @plugin_host_proxy, (and/or aribtrary
+    #                   -o           @plugin_host_services, (and/or aribtrary
     #                     \          ivars if you are using `ingest`..))
     #                      \
     #                       o-->  `normalize`                 [#fa-019]
@@ -134,7 +134,7 @@ module Skylab::Face
           }parameter(s) - (#{ par_h.keys * ', ' }) for #{ self.class }. #{
           }(declare it/them with `params` macro?)" ]
         miss_a and break bork[ "missing required parameter(s) - (#{
-          }#{ miss_a.map( & :normalized_name ) * ', ' }) #{
+          }#{ miss_a.map( & :local_normal_name ) * ', ' }) #{
           }for #{ self.class }." ]
         true
       end
@@ -165,7 +165,7 @@ module Skylab::Face
       end
       if fld.has_normalizer
         true == ( n_x = fld.normalizer_value ) and n_x =
-          method( :"normalize_#{ fld.normalized_name }" )  # #todo cleanup
+          method( :"normalize_#{ fld.local_normal_name }" )  # #todo cleanup
         vx = instance_exec y, vx, -> good_val do
           instance_variable_set fld.as_host_ivar, good_val
           nil

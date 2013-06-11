@@ -1,3 +1,5 @@
+[#075] #open ingest as method (plugin)
+[#074]       #doc-point #parent:[#070] whether or not `[]` is special
 [#073]       #doc-point extrinsic / intrinsic ..
 [#072]       #tracking-tag #parent:070 chained proxy hosts, chaining in gen.
 [#071] #open the possibility of stateless plugin hosts

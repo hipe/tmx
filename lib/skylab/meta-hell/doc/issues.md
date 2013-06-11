@@ -1,3 +1,6 @@
+[#030]       #doc-point of the `stowaway` facility #documented-inline
+[#029]       #doc-point this is the official docpoint of "autoloading" and
+             the idea of `isomorphic file locations` (yet to be documented)
 [#028]       #tracking-tag `without_warning`
 [#027]       a freeform `parse_series`? basically like minimal packrat parser
 [#026]       #doc-point "tuple tower" defined ..

@@ -492,7 +492,7 @@ module Skylab::Porcelain::Legacy
                                                #   ~ name derivatives ~
 
     def normalized_local_action_name           # used by action box, NOTE -
-      @name_function.normalized_local_name     #   we might s/_action_/_node_/
+      @name_function.local_normal              #   we might s/_action_/_node_/
     end
 
     def slug
@@ -1524,7 +1524,7 @@ module Skylab::Porcelain::Legacy
     end.call
 
     def normalized_local_node_name
-      @name_function.normalized_local_name
+      @name_function.local_normal
     end
 
   private

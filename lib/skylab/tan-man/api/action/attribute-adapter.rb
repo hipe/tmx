@@ -20,7 +20,7 @@ module Skylab::TanMan
 
       klass.attribute_metadata_class do        # (just playing w/ the feature)
         def label_string
-          normalized_name.to_s
+          local_normal_name.to_s
         end
       end
     end

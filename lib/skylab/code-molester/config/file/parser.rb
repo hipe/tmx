@@ -1,7 +1,7 @@
 module Skylab::CodeMolester
 
   module Config
-    Config = self  # stowaway - hiccuping this constant gives us the best
+    Config = self  # #stowaway - hiccuping this constant gives us the best
     # of multiple worlds - it is visible from inside the generated treetop
     # parser symbol actions, we don't need a very deep scope tree there,
     # and it will then transparently autoload lazily the desired node classes.

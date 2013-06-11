@@ -358,7 +358,7 @@ module Skylab::MetaHell
       #         ~ private methods that add to the box's contituency ~
 
     def accept item               # convenience `store`-ish for nodes like this
-      add item.normalized_name, item  # might go away, hella smell #todo
+      add item.local_normal_name, item  # might go away, hella smell #todo
       nil
     end
                                   # (note there is not even a private version
@@ -367,11 +367,11 @@ module Skylab::MetaHell
                                   # The equivalent of `store` for a box requires
                                   # you to state whether you are adding new
                                   # or replacing existing.)
-    def add normalized_name, x
-      @hash.key?( normalized_name ) and raise ::NameError, "already set - #{
-        }#{ normalized_name }"
-      @order << normalized_name
-      @hash[ normalized_name ] = x
+    def add local_normal_name, x
+      @hash.key?( local_normal_name ) and raise ::NameError, "already set - #{
+        }#{ local_normal_name }"
+      @order << local_normal_name
+      @hash[ local_normal_name ] = x
       x
     end
 

@@ -20,6 +20,8 @@ module Skylab::Test
 
     action_summaries( divide: "break it up into smaller pieces (try it)" )
 
+    include Agent_IM_
+
     def initialize
       @argv = nil
     end

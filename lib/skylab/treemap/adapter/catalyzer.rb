@@ -13,7 +13,7 @@ module Skylab::Treemap
         MetaHell::Formal::Box::Enumerator.new( -> normalized_consumer do
           @module::CLI::Actions.constants.each do |const|
             nm = Headless::Name::Function.from_const const
-            normalized_consumer.yield nm.normalized_local_name, nm
+            normalized_consumer.yield nm.local_normal, nm
             nil
           end
         end )
@@ -31,7 +31,7 @@ module Skylab::Treemap
     attr_reader :name  # name function
 
     def normalized_local_adapter_name
-      @name.normalized_local_name
+      @name.local_normal
     end
 
     def slug  # this makes maps much prettier, and is used as the 'against'

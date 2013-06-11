@@ -28,7 +28,7 @@ module ::Skylab::MetaHell::TestSupport::Formal::Attribute::Box
         ea.should be_respond_to( :filter )
         a = ea.to_a
         a.length.should eql(3)
-        a.map(&:normalized_name).should eql( [:one, :three, :four] )
+        a.map(&:local_normal_name).should eql( [:one, :three, :four] )
         box = ea.select { |x| x[:flavor] }
         box.length.should eql( 2 )
       end

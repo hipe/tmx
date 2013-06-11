@@ -65,10 +65,10 @@ module Skylab::Basic::TestSupport::String
         a = o.get_formal_parameters.each.to_a
         a.length.should eql(2)
         a.first.surface.should eql('{{ bar_baz }}')
-        a.first.normalized_name.should eql(:bar_baz)
+        a.first.local_normal_name.should eql(:bar_baz)
         a.first.offset.should eql(4)
         a.last.surface.should eql('{{bongo}}')
-        a.last.normalized_name.should eql(:bongo)
+        a.last.local_normal_name.should eql(:bongo)
         a.last.offset.should eql(23)
       end
     end

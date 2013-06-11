@@ -88,7 +88,7 @@ module Skylab::Treemap
 
     attr_accessor :is_collapsed                # freeform whatever mixed use
 
-    attr_accessor :normalized_name             # be careful
+    attr_accessor :local_normal_name             # be careful
 
     # a monumental hack to try and parse out *one* switch [arg] from an argv
 
@@ -112,7 +112,7 @@ module Skylab::Treemap
     end
 
     def render                    # contrast with `rndr` and see what's missing
-      render_long || render_short || normalized_name.inspect
+      render_long || render_short || local_normal_name.inspect
     end
 
     def render_long
@@ -128,17 +128,17 @@ module Skylab::Treemap
     end
 
     def rndr
-      a = [ render_short || render_long || normalized_name.inspect ]
+      a = [ render_short || render_long || local_normal_name.inspect ]
       a << argmnt_str if takes_argument
       a.join ''
     end
 
-    def set normalized_name, long_stem, short_stem, no_part,
+    def set local_normal_name, long_stem, short_stem, no_part,
                   long_rest, short_rest, opt_h = nil
 
-      @normalized_name, @long_stem, @short_stem, @no_part,
+      @local_normal_name, @long_stem, @short_stem, @no_part,
         @long_rest, @short_rest =
-      normalized_name, long_stem, short_stem, no_part,
+      local_normal_name, long_stem, short_stem, no_part,
         long_rest, short_rest
 
       @has_default = @default_value = nil
@@ -149,12 +149,12 @@ module Skylab::Treemap
       end
     end
 
-    define_method :set_from_args do |args, normalized_name=nil|
+    define_method :set_from_args do |args, local_normal_name=nil|
       md, opt_h = self.class.parse args
-      if ! normalized_name && md[:long_stem]
-        normalized_name = md[:long_stem].intern
+      if ! local_normal_name && md[:long_stem]
+        local_normal_name = md[:long_stem].intern
       end
-      set normalized_name, * arg_a.map { |k| md[k] }, *[opt_h].compact
+      set local_normal_name, * arg_a.map { |k| md[k] }, *[opt_h].compact
       nil
     end
 

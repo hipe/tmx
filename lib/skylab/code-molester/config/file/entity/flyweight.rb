@@ -175,7 +175,7 @@ module Skylab::CodeMolester::Config::File::Entity
 
       define_method :_get_normalized_pairs do |y, ea|
         ea.each do |fld|
-          nn = fld.normalized_name
+          nn = fld.local_normal_name
           @string_box.has? nn or next
           _get_token_pairs @string_box.fetch nn
           if a.length.nonzero?

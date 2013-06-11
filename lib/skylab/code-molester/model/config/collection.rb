@@ -13,7 +13,10 @@ module Skylab::CodeMolester
     end
 
     def init_model_collection plugin_host_proxy
-      @plugin_host_proxy = plugin_host_proxy
+      did = false
+      @plugin_host_services ||= ( did = true and plugin_host_proxy )
+      did or fail "sanity - ivar name collision?"
+      nil
     end
 
     # `create`
@@ -27,13 +30,13 @@ module Skylab::CodeMolester
       config = nil
       alt = [
         -> {
-          if host.has_model_instance :config
+          if model_svcs.has_model_instance :config
             raise "sanity - won't create when a cached config exists."  # #todo
           end },
         -> {
           directory, = unpack_equal field_h, :directory
-          pn = ::Pathname.new( directory ).join( host.config_filename )
-          config = host.set_new_valid_model_instance :config,
+          pn = ::Pathname.new( directory ).join( config_svcs.config_filename )
+          config = model_svcs.set_new_valid_model_instance :config,
             -> st { st.pathname = pn },
             -> c  { c },
             nil  # sets no error handler #todo
@@ -67,9 +70,9 @@ module Skylab::CodeMolester
     #  + `config_filename`
 
     def find_nearest_config_file_path _fh, _oh, yes, no
-      pn = host.config_file_search_start_pathname
-      remaining_tries = host.config_file_search_num_dirs
-      fn = host.config_filename
+      c = config_svcs ; pn = c.config_file_search_start_pathname
+      remaining_tries = c.config_file_search_num_dirs
+      fn = c.config_filename
       # --*--
       pn.absolute? or pn = pn.expand_path
       pn.absolute? or fail "sanity"  # it is important
@@ -102,11 +105,11 @@ module Skylab::CodeMolester
     end
 
     def if_config yes, no
-      if host.has_model_instance :config then yes[ ]
+      if model_svcs.has_model_instance :config then yes[ ]
       else
         find_nearest_config_file_path( nil, nil,
           -> found_pn do
-            host.set_new_valid_model_instance :config, -> c do
+            model_svcs.set_new_valid_model_instance :config, -> c do
               c.pathname = found_pn
             end, yes, no
           end,
@@ -122,5 +125,16 @@ module Skylab::CodeMolester
         )
       end
     end
+
+  private
+
+    def plugin_host_services
+      @plugin_host_services
+    end
+
+    alias_method :model_svcs, :plugin_host_services
+
+    alias_method :config_svcs, :plugin_host_services
+
   end
 end

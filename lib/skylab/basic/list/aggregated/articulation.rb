@@ -76,7 +76,7 @@ module Skylab::Basic
           on_subsequent_mentions_f
 
         flusher = Mention_::Flusher_.new(
-          nn_a = tmpl.get_formal_parameters.map( & :normalized_name ) )
+          nn_a = tmpl.get_formal_parameters.map( & :local_normal_name ) )
         whn = When_[ flusher.flush( on_first_mention_f ),
           flusher.flush( on_subsequent_mentions_f ),
           flusher.flush( aggregate_f ), nn_a ]

@@ -6,7 +6,7 @@ module Skylab::Snag
 
     attr_reader :end
 
-    def normalized_name
+    def local_normal_name
       name_string.intern
     end
 

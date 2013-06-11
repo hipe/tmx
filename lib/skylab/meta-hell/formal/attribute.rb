@@ -187,8 +187,8 @@ module ::Skylab::MetaHell
     def merge_defaults_into_delta attr_delta_metadata
       meta_attributes.each do |k, ma|
         if ma.has_default
-          if ! attr_delta_metadata.has? ma.normalized_name
-            attr_delta_metadata.add_default ma.normalized_name, ma.default_value
+          if ! attr_delta_metadata.has? ma.local_normal_name
+            attr_delta_metadata.add_default ma.local_normal_name, ma.default_value
           end
         end
       end
@@ -262,7 +262,7 @@ module ::Skylab::MetaHell
     public :meta_attributes       # #important - for 2.0.0
 
     def on_attribute_introduced attr
-      attr.normalized_name.tap do |name|
+      attr.local_normal_name.tap do |name|
         if ! method_defined? name
           attr_reader name
           public name
@@ -296,7 +296,7 @@ module ::Skylab::MetaHell
     end
 
     def dupe                      # the definer itself will call this when
-      new = self.class.new @normalized_name # building definitions.
+      new = self.class.new @local_normal_name # building definitions.
       new.hook = @hook
       new.default = @default_value if @has_default
       new
@@ -312,15 +312,15 @@ module ::Skylab::MetaHell
     end
 
     def hook_name
-      "on_#{ @normalized_name }_attribute"
+      "on_#{ @local_normal_name }_attribute"
     end
 
-    attr_reader :normalized_name
+    attr_reader :local_normal_name
 
   protected
 
-    def initialize normalized_name
-      @normalized_name = normalized_name
+    def initialize local_normal_name
+      @local_normal_name = local_normal_name
       @has_default = nil
       @default_value = nil
       @hook = nil
@@ -346,7 +346,7 @@ module ::Skylab::MetaHell
 
     def vivify! attr_ref          # create the new and add it, result is new el
       ma = Formal::Attribute::MetaAttribute.new attr_ref
-      add ma.normalized_name, ma
+      add ma.local_normal_name, ma
       ma
     end
 
@@ -388,9 +388,9 @@ module ::Skylab::MetaHell
     end
 
     def dupe
-      nn = @normalized_name
+      nn = @local_normal_name
       super.instance_exec do
-        @normalized_name = nn
+        @local_normal_name = nn
         self
       end
     end
@@ -419,16 +419,16 @@ module ::Skylab::MetaHell
       nil
     end
 
-    attr_reader :normalized_name  # used here by `accept`, may also be used by
+    attr_reader :local_normal_name  # used here by `accept`, may also be used by
                                   # subclasses by clients e.g to make a custom
                                   # derived property, like a label.
   protected
 
-    def initialize normalized_name
+    def initialize local_normal_name
       fail "sanity - all metadatas must have a sybolic name" if !
-        ( ::Symbol === normalized_name )
+        ( ::Symbol === local_normal_name )
       super()
-      @normalized_name = normalized_name
+      @local_normal_name = local_normal_name
       nil
     end
   end
@@ -451,7 +451,7 @@ module ::Skylab::MetaHell
 #         attr.merge! h                            # OHAI HOW ABOUT THIS:
           attr = Formal::Attribute::Metadata.allocate
           attr.instance_exec do
-            @normalized_name = k
+            @local_normal_name = k
             @order = h.keys
             @hash = h
           end                                      # WAT COULD GO WRONG

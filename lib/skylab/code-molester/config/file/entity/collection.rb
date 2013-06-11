@@ -58,10 +58,9 @@ module Skylab::CodeMolester::Config::File::Entity
       end
 
       def register_for_config_services
-        Face::Model.enhance( @target ).service_names %i|
-          configs
-          config
-        |
+        Face::Model.enhance( @target ).services :configs,
+          :config,
+          :model # arg
       end
 
       private :register_for_config_services
@@ -133,7 +132,7 @@ module Skylab::CodeMolester::Config::File::Entity
 
     def add field_h, opt_h, event_h
       ent = nil ; alt = [
-        -> { host.configs.if_config -> { }, -> err { -> { err } } },
+        -> { configs.if_config -> { }, -> err { -> { err } } },
         -> {
           entity_controller.if_init_valid field_h, opt_h,
             -> e { ent = e ; nil },
@@ -150,7 +149,7 @@ module Skylab::CodeMolester::Config::File::Entity
       if alt
         event_h.fetch( :couldnt ).call alt.call
       else
-        host.config.insert_valid_entity ent, opt_h, event_h
+        config.insert_valid_entity ent, opt_h, event_h
       end
     end
 
@@ -171,7 +170,18 @@ module Skylab::CodeMolester::Config::File::Entity
   module Entity::Collection::Collection_And_Controller_
 
     def entity_controller
-      host[ * entity_story.name.normalized_name ]
+      x = entity_story.name.anchored_normal # #todo
+      @plugin_host_services.model( * x )
+    end
+
+  private
+
+    def config  # away at [#hl-075], ditto next #todo:during:4
+      @plugin_host_services.config
+    end
+
+    def configs
+      @plugin_host_services.configs
     end
   end
 
@@ -220,7 +230,7 @@ module Skylab::CodeMolester::Config::File::Entity
   module Entity::Collection::List::Methods
 
     def list payload_line, error_event
-      host.configs.if_config -> do
+      configs.if_config -> do
         _list payload_line
       end, error_event
     end
@@ -250,7 +260,7 @@ module Skylab::CodeMolester::Config::File::Entity
 
     def hot_entities
       ::Enumerator.new do |y|
-        host.config.file.if_valid( -> f do
+        config.file.if_valid( -> f do
           hot_entities_in_resource y, f
         end, -> invalid_reason_obj do
           # important - when file was invalid, this is the hacky way we

@@ -86,7 +86,7 @@ module Skylab::Permute
 
     class Enum
 
-      attr_reader :normalized_name
+      attr_reader :local_normal_name
 
       attr_reader :value_a
 
@@ -95,12 +95,12 @@ module Skylab::Permute
       end
 
       def label
-        @normalized_name.to_s
+        @local_normal_name.to_s
       end
 
       def initialize norm_name
         @value_a = []
-        @normalized_name = norm_name
+        @local_normal_name = norm_name
       end
     end
 

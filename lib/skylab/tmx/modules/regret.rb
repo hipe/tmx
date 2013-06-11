@@ -1,11 +1,18 @@
-class Skylab::TMX::CLI
+module Skylab::TMX
 
-  namespace :regret, -> do
+  class CLI
 
-    require 'skylab/test-support/core'
+    namespace :regret, -> do
 
-    ::Skylab::TestSupport::Regret::CLI::Client
+      require 'skylab/test-support/core'
+
+      ::Skylab::TestSupport::Regret::CLI::Client
+
+    end
 
   end
 
+  module Modules::Regret
+    # nothing.
+  end
 end

@@ -9,15 +9,15 @@ module Skylab::BeautySalon
            [ :do_number_the_lines, :arity, :zero_or_one ],
            [ :file, :arity, :one ]
 
-    emits :info_line, :info, :normalization_failure_line,
-      :modality_host_proxy_request
+    emits :info_line, :info, :normalization_failure_line
 
     services :ostream, :estream
 
     def execute
-      preexecute
       res = false ; head = nil
       begin
+        ok, res = preexecute
+        ok or break
         @scn = resolve_line_scanner or break
         @token_buffer = Basic::Token::Buffer.new(
           /[[:space:]]*/, /[^[:space:]]+/ )
@@ -123,12 +123,9 @@ module Skylab::BeautySalon
       end
     end
 
-    def preexecute
+    def preexecute  # #result is tuple
+      @ostream, @estream = @plugin_host_services[ :ostream, :estream ]
       @did_engage = nil ; @line_no_fmt = '%4d'  # meh
-
-      # hack access to mode client services:
-      emit :modality_host_proxy_request,  self, -> host_pxy { @host = host_pxy }
-      @ostream, @estream = @host[ :ostream, :estream ]
       if @do_preview
         @paystream = @estream
       else
@@ -139,7 +136,7 @@ module Skylab::BeautySalon
       if @do_preview and @be_verbose and @do_number_the_lines
         @engage_head = "     + "  # ick
       end
-      nil
+      true
     end
 
     def engage line  # assume @scn and `line` and result should be t|f

@@ -24,7 +24,7 @@ module Skylab::CovTree
       @path = p[:path]                         # and maybe defaults and
       @verbose = p[:verbose]                   # validation whatever
 
-      k = CovTree::API::Actions.const_fetch normalized_name # then we build the
+      k = CovTree::API::Actions.const_fetch local_normal_name # then we build the
       o = k.new self                           # corresponding API action,
                                                # with self as its request_client
 

@@ -127,7 +127,7 @@ module Skylab::Test
         r = resolve_queue or break
         r = ready or break
         while tok = @queue_a.shift  # not using reduce b.c 1 stack frame
-          action = action_a.detect { |a| a.normalized_local_name == tok }
+          action = action_a.detect { |a| a.local_normal_name == tok }
           if action
             plugin_validate_client action.client
             r = action.client.send action.as_method
@@ -350,11 +350,11 @@ module Skylab::Test
       @action_a
     end
 
-    Action_ = ::Struct.new :normalized_local_name, :client, :priority
+    Action_ = ::Struct.new :local_normal_name, :client, :priority
     class Action_
-      alias_method :norm, :normalized_local_name
+      alias_method :norm, :local_normal_name
       def slug
-        @slug ||= normalized_local_name.to_s  # important
+        @slug ||= local_normal_name.to_s  # important
       end
       def as_method
         @as_method ||= slug.gsub( '-', '_' ).intern
@@ -440,6 +440,14 @@ module Skylab::Test
       end
     end
   end
+
+  module Agent_IM_
+  private
+    def host
+      @plugin_host_services
+    end
+  end
 end
+
 
 Skylab::Test::CLI.new( $stdin, $stdout, $stderr ).invoke ARGV

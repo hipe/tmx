@@ -20,9 +20,9 @@ module Skylab::Snag
 
 
     # note this gets called from the m.c and modals
-    def api_invoke normalized_name, param_h, *a, &b
+    def api_invoke local_normal_name, param_h, *a, &b
       { 1 => true }.fetch( ( b ? a << b : a ).length )
-      act = api_build_wired_action normalized_name, a[0]
+      act = api_build_wired_action local_normal_name, a[0]
       act and begin
         res = act.invoke param_h
         if false == res           # the placement of this check here is very

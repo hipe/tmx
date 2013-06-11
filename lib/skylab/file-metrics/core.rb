@@ -19,13 +19,13 @@ module Skylab::FileMetrics
 
   const_get :Services, false  # because it is a leaf, meh just load it now
 
-  module API  # stowaway
+  module API  # #stowaway
     module Actions
       extend MetaHell::Boxxy
     end
   end
 
-  FUN = -> do  # stowaway
+  FUN = -> do  # #stowaway
     rx = /[ $']/
     ::Struct.new( :shellescape_path )[
       -> x do

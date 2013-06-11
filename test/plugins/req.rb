@@ -22,6 +22,8 @@ module Skylab::Test
 
   class Plugins::Req::Client
 
+    include Agent_IM_
+
     def initialize
       @be_verbose = nil
     end
@@ -67,6 +69,8 @@ module Skylab::Test
       end
     end
 
+  private
+
     def _req before, after
       cache_a = [ ]
       res = host.hot_spec_paths.each do |p|
@@ -94,11 +98,9 @@ module Skylab::Test
         after[ ]
       end
     end
-    protected :_req
 
     def full_name
       "#{ host.full_name } #{ plugin_slug }"
     end
-    protected :full_name
   end
 end

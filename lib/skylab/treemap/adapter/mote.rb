@@ -104,7 +104,7 @@ module Skylab::Treemap
     attr_reader :name
 
     def normalized_local_action_name
-      @name.normalized_local_name
+      @name.local_normal
     end
 
   protected

@@ -2,21 +2,30 @@ module Skylab::Face
 
   module Face::CLI::Adapter::For::Face
 
+    Hotmm_ = -> slug, lo_class, arg_sht_f do  # hot maker maker
+      -> hi_svcs, _slug_used_str=nil do
+        pna = hi_svcs.get_normal_invocation_string_parts
+        pna << slug
+        h = {
+          out: ( hi_svcs.ostream or fail "sanity - out?" ),
+          err: ( hi_svcs.estream or fail "sanity - err?" ),
+          program_name: ( pna * ' ' ),
+          sheet: arg_sht_f[]
+        }
+        lo_class.new( h ).instance_variable_get :@mechanics
+      end
+    end
+
     module Of
-      Hot = -> lower_cli_class, higher_sheet do
-        -> higher_svcs, _slug_used_str=nil do
-          pna = higher_svcs.get_normal_invocation_string_parts
-          pna << higher_sheet.name.as_slug
-          h = {
-            out: ( higher_svcs.ostream or fail "sanity - out?" ),
-            err: ( higher_svcs.estream or fail "sanity - err?" ),
-            program_name: ( pna * ' ' ),
-            sheet: Face::Namespace::Adapter::For::Face::Ouroboros_Sheet[
-              lower_cli_class.story, higher_sheet ] }
-          x = lower_cli_class.new h
-          y = x.instance_variable_get :@mechanics
-          y
-        end
+
+      Sheet = -> hi_sheet, lo_sheet do
+        Face::Namespace::Adapter::For::Face::Ouroboros_Sheet[
+          hi_sheet, lo_sheet ]
+      end
+
+      Hot = -> hi_sheet, lo_cli_class do
+        Hotmm_[ hi_sheet.name.as_slug, lo_cli_class,
+                 -> { Sheet[ hi_sheet, lo_cli_class.story ] } ]
       end
     end
 

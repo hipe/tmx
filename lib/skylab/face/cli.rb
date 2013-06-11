@@ -332,6 +332,7 @@ module Skylab::Face
     # nodes. (deeply nested namespaces are then stories inside stories yay.)
 
     def initialize surface_mod
+      @name = nil  # (in a couple places now we check if it is set ..)
       if surface_mod  # no surface mod is bound "statically" when e.g we
         # have a strange module loaded by a function lazily, or if an inline
         # n-amespace is defined with a block (these all happen elsewhere)
@@ -626,11 +627,16 @@ module Skylab::Face
           raise "sanity - it is meaningless to speak of a method name in #{
             }association with this command"
         end
-      }
+      }.freeze
       define_method :method_name do
         instance_exec( & h.fetch( @name_origin_i ) )
       end
     end.call
+
+    def has_name
+      @name.nil? and name
+      @name
+    end
 
     -> do  # `name`  # #called-by command and children to be `name`
       f = -> x { Services::Headless::Name::Function.new x }
@@ -638,7 +644,7 @@ module Skylab::Face
         none: -> _ { false },
         method: f,
         nln: f
-      }
+      }.freeze
       define_method :name do
         if @name.nil?
           @name = h.fetch( @name_origin_i ).call( @name_x )
@@ -659,7 +665,7 @@ module Skylab::Face
     #  ~ section 1 - public instance methods ~
 
     def normalized_local_command_name
-      @name.normalized_local_name if name
+      @name.local_normal if name
     end
 
     def is_ok= b
@@ -1086,21 +1092,8 @@ module Skylab::Face
     end
   end
 
-  class Node_Sheet_  # #re-open for face 3
-
-    def set_command_parameters_function f
-      has_command_parameters_function and fail "sanity - clobber cpf?"
-      @has_command_parameters_function = true
-      @command_parameters_function_value = f
-      nil
-    end
-
+  class Node_Sheet_  # #re-open for facet 3
     attr_reader :has_command_parameters_function
-
-    def command_parameters_function_value
-      @has_command_parameters_function or fail "check `has_..` first"
-      @command_parameters_function_value
-    end
   end
 
   # ~ facet 4 - core help & UI ~
@@ -1156,7 +1149,7 @@ module Skylab::Face
       @anchorized_name ||= get_anchorized_name.freeze
     end
     def get_anchorized_name                    # #in-narrative
-      parent_services.get_anchorized_name << name.normalized_local_name
+      parent_services.get_anchorized_name << name.local_normal
     end
   end
   class CLI_Mechanics_                         # #re-open for facet 4.2
@@ -1298,6 +1291,9 @@ module Skylab::Face
         y << hi( "command#{ 's' if 1 != pairs.length }:" )
         item_a = pairs.reduce [] do |row, (_, sht)|
           hot = sht.hot self
+          if hot and hot.name.as_slug.include?( 'nginx' )
+            hot.summary sht
+          end
           hot and row << Item_[ hot.name.as_slug, hot.summary( sht ) ]
           row
         end
@@ -1723,7 +1719,7 @@ module Skylab::Face
     end
 
     def all_aliases
-      if ! name then Empty_A_ else  # otherwise too annoying
+      if ! has_name then Empty_A_ else  # otherwise too annoying
         if ! aliases_are_puffed
           @all_alias_a ||= [ @name.as_slug ]  # NOTE strings important
           if alias_a
@@ -1751,7 +1747,7 @@ module Skylab::Face
     end
   end
 
-  # ( ~ 5.2 is anchored in another node ~ )
+  # ( ~ 5.2 is the namespace facet, located in another node ~ )
 
   # ~ 5.3 - invocation function ~
 
@@ -1773,14 +1769,15 @@ module Skylab::Face
     end
   end
 
-  # ~ 5.5 - actual namespacing ~
+  # ~ 5.5 - actual namespacing, mutable ns sheets .. ~
 
   class Namespace  # #re-open for facet 5.5
     extend MetaHell::MAARS
   end
 
   Magic_Touch_.enhance -> { Namespace::Facet.touch },
-    [ Namespace, :singleton, :private, :namespace ]
+    [ Namespace, :singleton, :private, :namespace ],
+    [ NS_Sheet_, :public, :add_namespace ]
 
   # ~ 5.6 - metastories [#fa-035] ~
 
@@ -1821,7 +1818,12 @@ module Skylab::Face
     end
   end
 
-  # ~ 5.9 - API integration (*non*-revelation style)
+  # ~ 5.9 - the Node facet (when you need mutable sheets you manipulate ..)
+
+  Magic_Touch_.enhance -> { CLI::Node_Facet.touch },
+    [ Node_Sheet_, :public, :set_command_parameters_function ]
+
+  # ~ 5.10 - API integration (*non*-revelation style)
 
   Magic_Touch_.enhance -> { CLI::API_Integration.touch },
     [ NS_Mechanics_, :public, :api, :call_api, :api_services ]
@@ -1946,6 +1948,10 @@ module Skylab::Face
         order_a << x ; nil
       end
     end
+  end
+
+  FUN_[ :concat_2 ] = -> a, b do  # #called-by ouroboros sheet
+    [ *a, *b ] if a || b
   end
 
   FUN = FUN_.to_struct

@@ -58,7 +58,7 @@ module Skylab::Face::TestSupport::API::Service
             services :nerk
 
             def execute
-              host.nerk
+              @plugin_host_services.nerk
             end
           end
         end
@@ -90,7 +90,7 @@ module Skylab::Face::TestSupport::API::Service
             services :nerk
 
             def execute
-              "<yup:#{ host.nerk }>"
+              "<yup:#{ @plugin_host_services.nerk }>"
             end
           end
         end

@@ -4,37 +4,52 @@ module Skylab::Face
 
     module Of
 
-      Hot = -> lower_ns_cls, higher_sheet do
+      Hot = -> higher_sheet, lower_ns_cls do
         -> higher_svcs, slug_frag=nil do  # this is `hot` being claled
           lower_ns_cls.new(
-            Ouroboros_Sheet[ lower_ns_cls.story, higher_sheet ],
+            Ouroboros_Sheet[ higher_sheet, lower_ns_cls.story ],
             higher_svcs, slug_frag
           ).instance_variable_get( :@mechanics )
         end
       end
     end
 
-    Ouroboros_Sheet = MetaHell::Proxy::Nice.new :name, :set_a,
-      :command_tree, :default_argv, :option_sheet_a,
+    Ouroboros_Sheet_ = MetaHell::Proxy::Nice.new :name, :set_a,
+      :all_aliases, :do_include, :desc_proc_a, :command_tree, :option_sheet_a,
       :has_default_argv, :has_option_sheets, :fetch_constituent,
-      :has_partially_visible_op
+      :default_argv_value
 
-    class Ouroboros_Sheet
-      def self.[] lo, hi
-        new(               name: -> do hi.name end,
-                          set_a: -> do  # top trumps bottom (overwrites)
-                                      a = hi.set_a ; b = lo.set_a
-                                      [ *b, *a ] if a || b
-                                    end,
+    class Ouroboros_Sheet < Ouroboros_Sheet_
+
+      def self.[] hi, lo
+                                       # in several places note that
+                                       # top trumps bottom (overwrites)
+        new(
+                           name: -> do hi.name end,
+                          set_a: -> do C[ lo.set_a, hi.set_a ] end,
+                    all_aliases: -> do hi.all_aliases | lo.all_aliases end,
+                     do_include: -> do hi.do_include && lo.do_include end,
+                    desc_proc_a: -> do C[ lo.desc_proc_a, hi.desc_proc_a ] end,
                    command_tree: -> do lo.command_tree end,
-                   default_argv: -> do hi.default_argv || lo.default_argv end,
                  option_sheet_a: -> do lo.option_sheet_a end,
                has_default_argv: -> do hi.has_default_argv || lo.has_default_argv end,
               has_option_sheets: -> do lo.has_option_sheets end,
               fetch_constituent: -> *a, &b do lo.fetch_constituent( *a, &b ) end,
-       has_partially_visible_op: -> do lo.has_partially_visible_op end
+             default_argv_value: -> do ( hi.has_default_argv ? hi : lo ).default_argv_value end
         )
       end
+
+      def initialize h
+        super
+        @hotm = nil
+      end
+      attr_accessor :hotm
+      def hot psvcs, slu=nil
+        if @hotm
+          @hotm[ psvcs, slu ]
+        end
+      end
     end
+    C = Face::FUN.concat_2  # in cli for now :/
   end
 end

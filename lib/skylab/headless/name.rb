@@ -34,40 +34,40 @@ module Skylab::Headless
   end
 
                                                # construct one given a
-  class Name::Function                         # normalized_local_name and you
+  class Name::Function                         # local_normalize_name and you
                                                # get two fabulous methods
 
     def self.from_const const                  # build a new name function
       Name::Function::From::Constant.new const # a constant. convenience
     end                                        # accessor. see.
 
-    attr_reader :normalized_local_name
+    attr_reader :local_normal
 
   protected
 
-    def initialize normalized_local_name       # (consider freezing your n.f)
-      @normalized_local_name = normalized_local_name
+    def initialize local_normal       # (consider freezing your n.f)
+      @local_normal = local_normal
     end
   end
                                                # if you buy-in to the idea of
-                                               # defining normalized_local_name
+                                               # defining local_normal
                                                # as being lower-cased and
   module Name::Function::InstanceMethods       # underscored, we will give
                                                # you these methods. here have
     def as_const                               # them
-      Name::FUN.constantify[ normalized_local_name ].intern
+      Name::FUN.constantify[ local_normal ].intern
     end
 
     def as_method
-      Name::FUN.metholate[ normalized_local_name ].intern  # or even if slug-
+      Name::FUN.metholate[ local_normal ].intern  # or even if slug-
     end                                        # some applications annoyingly
                                                # allow for slug-looking normals
     def as_slug
-      Name::FUN.slugulate[ normalized_local_name ]
+      Name::FUN.slugulate[ local_normal ]
     end
 
     def as_natural
-      Name::FUN.naturalize[ normalized_local_name ]
+      Name::FUN.naturalize[ local_normal ]
     end
   end
 
@@ -100,18 +100,18 @@ module Skylab::Headless
 
     def initialize const # symbol!
       @const = const
-      @normalized_local_name = Headless::Name::FUN.normify[ const ]
+      @local_normal = Headless::Name::FUN.normify[ const ]
       nil
     end
 
-    def base_init const, normalized_local_name
+    def base_init const, local_normal
       @const = const  # symbol!
-      @normalized_local_name = normalized_local_name
+      @local_normal = local_normal
       nil
     end
 
     def base_args
-      [ @const, @normalized_local_name ]
+      [ @const, @local_normal ]
     end
   end
 
@@ -129,8 +129,8 @@ module Skylab::Headless
       @name_a.map(& sym )
     end
 
-    def normalized_name
-      @normalized_name ||= @name_a.map(& :normalized_local_name ).freeze
+    def anchored_normal
+      @anchored_normal ||= @name_a.map(& :local_normal ).freeze
     end
 
     def initialize a  # please provide an array of name functions

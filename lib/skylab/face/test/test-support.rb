@@ -12,6 +12,8 @@ module Skylab::Face::TestSupport
 
   TestSupport::Regret[ self ]
 
+  stowaway :CLI, 'cli/test-support'  # [#mh-030] for [#045]
+
   TestSupport::Sandbox::Host[ self ]
 
 end

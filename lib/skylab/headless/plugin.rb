@@ -140,7 +140,7 @@ module Skylab::Headless
       if builder
         a.each do |kx|
           x = builder[ kx ]  # we don't splat it here
-          i = x.normalized_local_name
+          i = x.local_normal_name
           h.key? i and fail "merge not yet implemented for #{ x.class }"
           aa << i
           h[ i ] = x
@@ -293,7 +293,7 @@ module Skylab::Headless
     -> do  # `initialize`
       h = nil
       define_method :initialize do |i, *x_a|
-        @normalized_local_name = i ; @mutex = nil
+        @local_normal_name = i ; @mutex = nil
         while x = x_a.shift
           instance_exec x_a, & h[ x ]
         end
@@ -315,7 +315,7 @@ module Skylab::Headless
           @ivar_name = if x_a.length.nonzero? and '@' == x_a.fetch(0).to_s[0]
             x_a.shift
           else
-            :"@#{ @normalized_local_name }"
+            :"@#{ @local_normal_name }"
           end
           nil
         end,
@@ -341,7 +341,7 @@ module Skylab::Headless
     end
     private :mutex
 
-    attr_reader :normalized_local_name, :proximity, :technique,
+    attr_reader :local_normal_name, :proximity, :technique,
       :delegatee_name, :method_name, :ivar_name
   end
 
@@ -360,7 +360,7 @@ module Skylab::Headless
     attr_reader :name, :is_fuzzy, :is_ordered, :is_aggregation,
       :as_method_name
 
-    alias_method :normalized_local_name, :name
+    alias_method :local_normal_name, :name
 
     -> do  # `initialize`
 
@@ -460,7 +460,7 @@ module Skylab::Headless
     end
     public :plugin_host_story  # called by plugin manager
 
-    # `plugin_host_proxy_aref` - route calls for `host[]` from plugins
+    # `plugin_host_services_aref` - route calls for `host[]` from plugins
     # thru the host application in case it wants to customize the behavior.
     # the default behavior is: if one argument, call the service named by
     # the argument with no arguments or block and our result is its result.
@@ -472,7 +472,7 @@ module Skylab::Headless
     # (details:  calls come from host services. the name `aref` is borrowd from
     # the ruby source as the way they say `[]`, but what does "aref" mean?)
 
-    def plugin_host_proxy_aref i_a, plugin_story
+    def plugin_host_services_aref i_a, plugin_story
       if 1 == i_a.length
         @plugin_manager.plugin_services.call_host_service plugin_story,
           i_a.fetch( 0 )
@@ -485,7 +485,7 @@ module Skylab::Headless
         m
       end
     end
-    public :plugin_host_proxy_aref  # called by host services
+    public :plugin_host_services_aref  # called by host services
 
     def plugin_flatten ea, &block
       eac = ::Enumerator.new do |y|
@@ -594,7 +594,7 @@ module Skylab::Headless
 
     def call_delegated_plugin_service svc, a, b
       @plugin_manager.fetch_client( svc.delegatee_name ).
-        call_plugin_service( svc.normalized_local_name, a, b ) # validates name
+        call_plugin_service( svc.local_normal_name, a, b ) # validates name
     end
     public :call_delegated_plugin_service  # called by host services
   end
@@ -653,7 +653,7 @@ module Skylab::Headless
         client = client.load_plugin svcs, story, *directive_a  # gives the
           # client itself a chance to do whatever
         story = client.plugin_story  # give the client a chance to change class
-        sym = story.normalized_local_name
+        sym = story.local_normal_name
         @h.key? sym and fail "sanity: load same plugin more than once? - #{sym}"
         a = client.plugin_eventpoints - eventpoints
         a.length.nonzero? and raise Plugin::DeclarationError, "unrecognized #{
@@ -958,7 +958,7 @@ module Skylab::Headless
       ::Class.new.class_exec do
         define_method :initialize do |pstory, ha, svc|
           define_singleton_method :[] do |*i_a|
-            ha.plugin_host_proxy_aref i_a, pstory
+            ha.plugin_host_services_aref i_a, pstory
           end
           service_name_a.each do |i|
             define_singleton_method i do |*a, &b|
@@ -1063,7 +1063,7 @@ module Skylab::Headless
       @client_class_function = -> do
         default_client_class
       end
-      @normalized_local_name = -> do
+      @local_normal_name = -> do
         # ::Foo::Bar::BiffBaz -> :"biff-baz"
         name = particular_plugin_box_module.name
         ::Skylab::Autoloader::Inflection::FUN.pathify[
@@ -1082,10 +1082,10 @@ module Skylab::Headless
     # but note that the mutability of the story is a design consideration
     # that is in flux!
 
-    attr_reader :normalized_local_name  # set during construction
+    attr_reader :local_normal_name  # set during construction
 
     def local_slug
-      @local_slug ||= normalized_local_name.to_s
+      @local_slug ||= local_normal_name.to_s
     end
 
     # `client_class` (writer, reader)
@@ -1260,11 +1260,11 @@ module Skylab::Headless
     # unlike e.g Host::InstanceMethods, this hellof adds public methods
 
     # `load_plugin` - formerly `initialize`, then `init_plugin`, this sets
-    # these crucial ivars, and/or gives the plugin client "change itself" to
+    # these crucial ivars, and/or lets the plugin client "change itself" to
     # an instance of a different class based on whatever. assume this is the
     # first plugin-related call this object receives.
     #
-    # a note about `@plugin_host_proxy` - we used to set the
+    # a note about `@plugin_host_services` - we used to set the
     # `@plugin_services` ivar instead, but using the `host proxy` solely
     # feels cleaner. if you need a handle on the services object, by all
     # means override this method in your plugin client.
@@ -1285,7 +1285,7 @@ module Skylab::Headless
 
     def _load_plugin plugin_services, plugin_story
       @plugin_story = plugin_story
-      @plugin_host_proxy = plugin_services.build_host_proxy self
+      @plugin_host_services = plugin_services.build_host_proxy self
       self  # important
     end
     private :_load_plugin
@@ -1326,14 +1326,12 @@ module Skylab::Headless
       nil
     end
 
-    # `host` - because it is used so often, this is the *only* instance
-    # method that your client plugin class gets that does not have "plugin"
-    # in its name. used to call up to a host service.
+    # `plugin_host_services` used to call up to a host service.
 
-    def host
-      @plugin_host_proxy
+    def plugin_host_services
+      @plugin_host_services
     end
-    private :host  # but it is inteded to be used internally
+    private :plugin_host_services
 
     # `is_plugin_host` - this is necessary for some interesting hacks
     # elsewhere. a plugin (client) can certainly be a plugin host itself!
@@ -1451,7 +1449,7 @@ module Skylab::Headless
       end    # i will call it "regressive architecture".
 
       define_method :init do |name_i, *rest|
-        @normalized_local_name = name_i
+        @local_normal_name = name_i
         if rest.length.zero? then
           @field = nil
           self
@@ -1463,7 +1461,7 @@ module Skylab::Headless
       end
     end.call
 
-    attr_reader :normalized_local_name
+    attr_reader :local_normal_name
 
     def do_ingest
       if @field
@@ -1476,7 +1474,7 @@ module Skylab::Headless
         if @field.has_ingest_as_ivar
           @field.ingest_as_ivar_value
         else
-          :"@#{ @field.normalized_name }"
+          :"@#{ @field.local_normal_name }"
         end
       end
     end
