@@ -4,21 +4,12 @@ module Skylab::Face::TestSupport::CLI::API_Integration::WOU
 
   ::Skylab::Face::TestSupport::CLI::API_Integration[ WOU_TestSupport = self ]
 
-  include CONSTANTS
-
-  extend TestSupport::Quickie
-
-  module Sandbox
-  end
-
-  CONSTANTS::Sandbox = Sandbox
+  CONSTANTS::Common_setup_[ self, :sandbox ]
 
   describe "#{ Face::CLI } API event integration" do
 
     extend CLI_TestSupport
     extend WOU_TestSupport  # so CONSTANTS (Sandbox) is visible in i.m's
-
-    Face = Face
 
     context "make sure ouroborous is ok when doing `api`" do
       define_sandbox_constant :application_module do

@@ -4,13 +4,11 @@ module Skylab::Face::TestSupport::CLI::Namespace
 
   ::Skylab::Face::TestSupport::CLI[ Namespace_TestSupport = self ]
 
-  include CONSTANTS
+  CONSTANTS::Common_setup_[ self ]
 
   module CONSTANTS
     Sandbox = CLI_TestSupport::Sandbox  # please be careful
   end
-
-  extend TestSupport::Quickie
 
   describe "#{ Face }::CLI - namespaces" do
 

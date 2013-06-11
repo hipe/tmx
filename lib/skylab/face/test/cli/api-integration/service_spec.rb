@@ -4,21 +4,12 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Service
 
   ::Skylab::Face::TestSupport::CLI::API_Integration[ Service_TestSupport = self ]
 
-  include CONSTANTS
-
-  extend TestSupport::Quickie
-
-  module Sandbox
-  end
-
-  CONSTANTS::Sandbox = Sandbox
+  CONSTANTS::Common_setup_[ self, :sandbox ]
 
   describe "#{ Face::CLI } API INTEGRATED SERVICES" do
 
     extend CLI_TestSupport
     extend Service_TestSupport  # so CONSTANTS (Sandbox) is visible in i.m's
-
-    Face = Face
 
     context "service in API/CLI is yes/no -" do
       define_sandbox_constant :application_module do

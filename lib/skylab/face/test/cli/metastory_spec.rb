@@ -4,16 +4,7 @@ module Skylab::Face::TestSupport::CLI::Metastory
 
   ::Skylab::Face::TestSupport::CLI[ Metastory_TestSupport = self ]
 
-  include CONSTANTS
-
-  extend TestSupport::Quickie
-
-  module Sandbox
-  end
-
-  CONSTANTS::Sandbox = Sandbox
-
-  Face = Face
+  CONSTANTS::Common_setup_[ self, :sandbox ]
 
   describe "#{ Face }::CLI metastories" do
 

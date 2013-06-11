@@ -4,13 +4,7 @@ module Skylab::Face::TestSupport::CLI::Tableize
 
   ::Skylab::Face::TestSupport::CLI[ Tableize_TestSupport = self ]
 
-  include CONSTANTS
-
-  Face = ::Skylab::Face  # increase its visibility for below modules
-
-  extend TestSupport::Quickie
-
-  Sandboxer = TestSupport::Sandbox::Spawner.new
+  CONSTANTS::Common_setup_[ self, :sandboxer ]
 
   describe "Skylab::Face::CLI::Tableize" do
     context "context 1" do

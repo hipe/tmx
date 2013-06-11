@@ -4,9 +4,7 @@ module Skylab::Face::TestSupport::CLI::Puffer
 
   ::Skylab::Face::TestSupport::CLI[ Puffer_TestSupport = self ]
 
-  include CONSTANTS
-
-  extend TestSupport::Quickie
+  CONSTANTS::Common_setup_[ self ]
 
   describe "#{ Face::CLI } puffer (hooks)" do
 

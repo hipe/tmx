@@ -4,9 +4,7 @@ module Skylab::Face::TestSupport::CLI::Option
 
   ::Skylab::Face::TestSupport::CLI[ Option_TestSupport = self ]
 
-  include CONSTANTS
-
-  extend TestSupport::Quickie
+  CONSTANTS::Common_setup_[ self ]
 
   module CONSTANTS
     Sandbox = CLI_TestSupport::Sandbox  # please be careful

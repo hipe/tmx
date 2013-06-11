@@ -6,16 +6,7 @@ module Skylab::Face::TestSupport::CLI::Option::Help
 
   ::Skylab::Face::TestSupport::CLI::Option[ This_TestSupport = self ]
 
-  include CONSTANTS
-
-  extend TestSupport::Quickie
-
-  module Sandbox
-  end
-
-  CONSTANTS::Sandbox = Sandbox
-
-  Face = Face
+  CONSTANTS::Common_setup_[ self, :sandbox ]
 
   module Beffer
     class CLI_Client < Face::CLI

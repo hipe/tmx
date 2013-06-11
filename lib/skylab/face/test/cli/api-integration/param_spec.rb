@@ -4,21 +4,12 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Param
 
   ::Skylab::Face::TestSupport::CLI::API_Integration[ Param_TestSupport = self ]
 
-  include CONSTANTS
-
-  extend TestSupport::Quickie
-
-  module Sandbox
-  end
-
-  CONSTANTS::Sandbox = Sandbox
+  CONSTANTS::Common_setup_[ self, :sandbox ]
 
   describe "#{ Face::CLI } API event integration" do
 
     extend CLI_TestSupport
     extend Param_TestSupport  # so CONSTANTS (Sandbox) is visible in i.m's
-
-    Face = Face
 
     context "this is testing both API and CLI integration ..." do
       define_sandbox_constant :application_module do

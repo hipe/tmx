@@ -6,16 +6,7 @@ module Skylab::Face::TestSupport::CLI::Set
 
   ::Skylab::Face::TestSupport::CLI[ This_TestSupport = self ]
 
-  include CONSTANTS
-
-  extend TestSupport::Quickie
-
-  module Sandbox
-  end
-
-  CONSTANTS::Sandbox = Sandbox
-
-  Face = Face
+  CONSTANTS::Common_setup_[ self, :sandbox ]
 
   module Awoooga
 

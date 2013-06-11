@@ -6,16 +6,7 @@ module Skylab::Face::TestSupport::CLI::Namespace::Skip
 
   ::Skylab::Face::TestSupport::CLI::Namespace[ This_TestSupport = self ]
 
-  include CONSTANTS
-
-  extend TestSupport::Quickie
-
-  module Sandbox
-  end
-
-  CONSTANTS::Sandbox = Sandbox
-
-  Face = Face
+  CONSTANTS::Common_setup_[ self ]
 
   module Wiffle
     module CLI

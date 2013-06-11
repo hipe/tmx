@@ -4,11 +4,10 @@ module Skylab::Face::TestSupport::CLI::Namespace::NIS
 
   ::Skylab::Face::TestSupport::CLI::Namespace[ NIS_TS = self ]
 
-  include CONSTANTS
-
-  extend TestSupport::Quickie
+  CONSTANTS::Common_setup_[ self ]
 
   describe "#{ Face }::CLI - namespace NIS (normalized invocation strings)" do
+
     extend NIS_TS
 
     context "some context" do
