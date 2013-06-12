@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby -w
 
-require File.expand_path('../../lib/skylab/tmx/cli', __FILE__)
+require_relative '../lib/skylab/tmx/core'
 
 Skylab::TMX::CLI.new( sin: $stdin, out: $stdout, err: $stderr ).invoke ARGV

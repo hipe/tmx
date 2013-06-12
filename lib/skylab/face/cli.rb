@@ -1838,7 +1838,8 @@ module Skylab::Face
 
   Magic_Touch_.enhance -> { CLI::Metastory.touch },
     [ Command, :singleton, :public, :metastory ],
-    [ Namespace, :singleton, :public, :metastory ]
+    [ Namespace, :singleton, :public, :metastory ],
+    [ NS_Sheet_, :singleton, :public, :metastory ]
 
   # ~ 5.7x - adapters for when loading namespaces as a "strange module" ~
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 
-# a folder with a bunch of patches in it, basically do a 
+# a folder with a bunch of patches in it, basically do a
 # tar on it.
 
 dir="$1"

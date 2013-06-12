@@ -13,7 +13,15 @@ module Skylab::Face
     Face::Metastory.enhance self, :CLI_, :Namespace_
   end
 
+  class NS_Sheet_
+    Face::Metastory.enhance self, :CLI_, :Namespace_
+  end
+
   class Command
     Face::Metastory.enhance self, :CLI_, :Action_
   end
+
+  #  class Cmd_Sheet_  # #todo only when needed
+  #    Face::Metastory.enhance self, :CLI_, :Action_
+  #  end
 end

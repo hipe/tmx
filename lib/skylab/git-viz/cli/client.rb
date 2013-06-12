@@ -1,42 +1,52 @@
-require File.expand_path('../api', __FILE__)
-# (requires at bottom!)
-
 module Skylab::GitViz
-  class CLI
-    include API::InstanceMethods
 
-    ROOT = Pathname.new('..').expand_path(__FILE__)
-    extend ::Skylab::Porcelain
+  class CLI::Client
 
-    porcelain do
-      desc 'fun data viz reports on a git project.'
-      emits :payload => :all
-      aliases 'gv'
+    extend Porcelain::Legacy::DSL
+
+    include Core::Client_IM_
+
+    desc 'ping'  # #todo - comment this out and it borks b/c not impl.
+
+    def ping
+      _dispatch
     end
 
-    action do
-      desc "do the foo."
-      aliases 'ht'
-    end
+    desc 'fun data viz reports on a git project.'
 
     argument_syntax '[<path>]'
 
     def hist_tree path=nil
-      porcelain_dispatch(:path => path)
+      _dispatch path: path
+    end
+
+  dsl_off
+
+    # would-be "services"
+
+    attr_reader :y
+
+    def last_hot_local_normal
+      @legacy_last_hot._sheet._name.local_normal
     end
 
   private
 
-    def porcelain_dispatch *a
-      meth = runtime.stack.top.action.name
-      require self.class::ROOT.join("cli/actions/#{meth}").to_s
-      CLI::Actions::const_get(camelize meth).new(runtime).invoke(*a)
+    def initialize( * )
+      super
+      @y = ::Enumerator::Yielder.new( & @infostream.method( :puts ) )
+      nil
     end
-  end
 
-  module CLI::Actions
+    # go FLAT here, this is all blood cleanup
+
+    def _dispatch h=nil
+      i = last_hot_local_normal
+      k = CLI::Actions.const_get camelize( i ), false
+      k.new( self ).invoke h
+    end
   end
 end
 
-require File.expand_path('../cli/action', __FILE__)
-
+# (keep this line for posterity - there was some AMAZING foolishness going
+# on circa early '12 that is a good use case for why autoloader #todo)

@@ -150,7 +150,7 @@ module Skylab::Snag
     #         ~ a fresh take on [#hl-036] `param` ~
 
     def param norm_name
-      @legacy_last_action_subclient.fetch_param norm_name
+      @legacy_last_hot.fetch_param norm_name
     end
 
     #         ~ api nerks ~

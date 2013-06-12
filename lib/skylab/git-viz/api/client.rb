@@ -1,19 +1,29 @@
-# (requires happen at the bottom!)
-
 module Skylab::GitViz
-  class API < ::Struct.new :runtime
-    ROOT = Pathname.new('..').expand_path(__FILE__)
+
+  module API  # b.c stowed away here :/
+    extend MetaHell::MAARS
+  end
+
+  class API::Client < ::Struct.new :runtime
+
+    include Core::Client_IM_
+
     def emit(*a)
       runtime.emit(*a)
     end
+
+    # would-be services:
+    attr_reader :y
+
     def initialize runtime
       super(runtime)
+      @y = runtime.y  # svc now
       @vcs_name = :git
     end
+    alias_method :svcs, :runtime  # idgaf blood
     def invoke req
-      meth = runtime.stack.top.action.name.to_s
-      require ROOT.join("api/actions/#{meth}").to_s
-      k = API::Actions.const_get(camelize meth)
+      i = svcs.last_hot_local_normal
+      k = API::Actions.const_get camelize( i ), false
       k.new(self, req).invoke
     end
     define_method(:root) { ROOT }
@@ -24,27 +34,17 @@ module Skylab::GitViz
       end
     end
     attr_reader :vcs_name
+  end
+  module API
     @instance = Hash.new do |h, k|
       if h.key? k.object_id
         h[k.object_id]
       else
-        h[k.object_id] = new(k)
+        h[ k.object_id ] = API::Client.new k
       end
     end
-  end
-  class << API
-    attr_reader :instance
-  end
-  module API::Actions
-  end
-  module API::Model
-  end
-  module API::InstanceMethods
-    def camelize s
-      s.to_s.gsub(/(?:^|-)([a-z])/) { $1.upcase }
+    class << self
+      attr_reader :instance
     end
   end
-  API.send(:include, API::InstanceMethods)
 end
-
-require File.expand_path('../api/action', __FILE__)

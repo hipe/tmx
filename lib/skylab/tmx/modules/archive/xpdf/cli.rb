@@ -8,6 +8,11 @@ module Skylab::TMX
         y << "idem."
       end
 
+      def ping
+        @y << "hello from xpdf."
+        :hello_from_xpdf
+      end
+
       # external_dependencies File.expand_path('../data/deps.json', __FILE__)
 
     end

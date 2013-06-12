@@ -119,8 +119,10 @@ module Skylab::Face
           @surface_mod = mf
         elsif b
           if @surface_mod_origin_i
-            :blocks == @surface_mod_origin_i or raise "can't add a #{ db[] }#{
-              } to a #{ nsm[] } that originates via #{ @surface_mod_origin_i }"
+            @name and xtra = " \"#{ @name.local_normal }\""
+            :blocks == @surface_mod_origin_i or raise "won't add a #{ db[] }#{
+              } to #{ nsm[] }#{ xtra } that was loaded via #{
+              }#{ @surface_mod_origin_i }"
             @block_a << b
           else
             @surface_mod_origin_i = :blocks

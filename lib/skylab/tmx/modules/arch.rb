@@ -1,12 +1,12 @@
 module Skylab::TMX
 
-  class CLI
+  class CLI::Client
     namespace :arch, -> do
       Modules::Arch::NS
     end, :desc, -> y do
       y << "#{ hi 'description:' } some ancient scripts, mostly installers"
       y << "  none are working, but we might one day resuscitate them."
-    end, :skip, true
+    end, :skip, false
   end
 
   module Modules::Arch

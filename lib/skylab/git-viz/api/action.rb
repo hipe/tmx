@@ -1,10 +1,12 @@
 module Skylab::GitViz
-  fail 'we jangled the below 2 lines a bit but you get to do the rest'
+
   class API::Action < ::Struct.new :api, :params
+
     extend MetaHell::Formal::Attribute::Definer
 
     meta_attribute :pathname
     meta_attribute :default
+
     def emit(*a)
       api.runtime.emit(*a)
     end
@@ -12,6 +14,7 @@ module Skylab::GitViz
       super(api, params)
       self.class.defaults.each { |k, v| send("#{k}=", v) }
     end
+    alias_method :svcs, :api
   end
   class << API::Action
     attr_reader :defaults

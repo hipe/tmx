@@ -1,6 +1,7 @@
 require_relative '../test-support'
 
 module Skylab::Treemap::TestSupport::CLI
+
   ::Skylab::Treemap::TestSupport[ CLI_TestSupport = self ]
 
   include CONSTANTS
@@ -98,7 +99,7 @@ module Skylab::Treemap::TestSupport::CLI
 
     def tmx_cli # (was [#051] legacy test wiring)
       @tmx_cli ||= begin
-        require 'skylab/tmx/cli'
+        require 'skylab/tmx/core'
         cli = ::Skylab::TMX::CLI.new( program_name: 'tmx',
           sin: nil, out: stream.sout, err: stream.serr )
         cli

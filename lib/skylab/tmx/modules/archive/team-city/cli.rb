@@ -9,6 +9,11 @@ module Skylab::TMX
         y << "once were great warriors"
       end
 
+      def ping
+        @y << "hello from team city."
+        :hello_from_team_city
+      end
+
       # external_dependencies File.expand_path('../data/deps.json', __FILE__)
 
     end

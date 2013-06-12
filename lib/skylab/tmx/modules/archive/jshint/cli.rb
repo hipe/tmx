@@ -8,6 +8,11 @@ module Skylab::TMX
         y << '(woah - heh this tiny thing "works")'
       end
 
+      def ping
+        @y << "hello from jshint."
+        :hello_from_jshint
+      end
+
       def install *a
         Plumbing.new.run
       end
