@@ -2,12 +2,26 @@ module Skylab::Slicer
 
   class CLI::Client < Face::CLI
 
+    def initialize( * )
+      super
+      @param_h = { }
+    end
+
+    use :hi, :last_hot
+
+    set :node, :ping, :invisible
+
+    def ping
+      @y << "hello from slicer."
+      :hello_from_slicer
+    end
+
     option_parser do |o|
       o.separator "#{ hi 'description:' } just raw-ass file copy to the slice!"
       o.separator "#{ hi 'options:' }"
       dry_run_option o
 
-      o.banner = @command.usage_line
+      o.banner = last_hot.usage_line
     end
 
     aliases :xfer
@@ -16,12 +30,8 @@ module Skylab::Slicer
       api
     end
 
+  dsl_off
   private
-
-    def initialize( * )
-      super
-      @param_h = { }
-    end
 
     def dry_run_option o
       @param_h[ :dry_run ] = false

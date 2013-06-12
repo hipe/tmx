@@ -6,6 +6,13 @@ module Skylab::FileMetrics
 
     use :hi, [ :last_hot, :as, :command ]
 
+    set :node, :ping, :invisible
+
+    def ping
+      @y << "hello from file metrics."
+      :hello_from_file_metrics
+    end
+
     # lost indent
       def op_common_head
         op = command.op

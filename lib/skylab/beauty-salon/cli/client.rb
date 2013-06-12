@@ -21,6 +21,13 @@ module Skylab::BeautySalon
       end         # (reminder: this won't run when it's under tmx)
     end
 
+    set :node, :ping, :invisible
+
+    def ping
+      @y << "hello from beauty salon."
+      :hello_from_beauty_salon
+    end
+
     option_parser do |o|
 
       o.separator "#{ hi 'description:' }"

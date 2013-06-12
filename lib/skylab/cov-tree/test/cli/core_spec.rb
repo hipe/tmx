@@ -4,7 +4,7 @@ describe "#{ ::Skylab::CovTree } CLI" do
 
   extend ::Skylab::CovTree::TestSupport::CLI
 
-  acts_rx = /\{tree\|rerun\}/
+  acts_rx = /\{ping\|tree\|rerun\}/
   actions = acts_rx.source
   expecting_rx_ = /\AExpecting #{ actions }\.\z/i # look!
   expecting_rx  = /\AExpecting #{ actions }\z/i

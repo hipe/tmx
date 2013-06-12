@@ -30,6 +30,13 @@ module Skylab::Cull
       end
     end                           # (reminder: this won't run when under tmx)
 
+    set :node, :ping, :invisible
+
+    def ping
+      @y << "hello from cull."
+      :hello_from_cull
+    end
+
     option_parser do |o|
       o.separator "#{ hi 'description:' } wanktasktic awesomeness"
 

@@ -276,4 +276,14 @@ module Skylab::TanMan
       api_invoke
     end
   end
+
+  class CLI::Actions::Ping < CLI::Action
+    desc "pings tanman (lowlevel)."  # #todo
+
+    def process
+      @request_client.instance_variable_get( :@io_adapter ).errstream.
+        puts( "hello from tan man." )  # #todo
+      :hello_from_tan_man
+    end
+  end
 end

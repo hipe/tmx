@@ -57,6 +57,12 @@ module Skylab::TestSupport::Regret::CLI
       api path
     end
 
+    set :node, :ping, :invisible
+
+    def ping
+      api
+    end
+
   private
   dsl_off
 

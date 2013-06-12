@@ -30,6 +30,13 @@ module Skylab::CovTree
 
     extend Porcelain::Legacy::DSL
 
+    desc "performs a ping."
+
+    def ping
+      @infostream.puts "hello from cov tree."
+      :hello_from_cov_tree
+    end
+
     desc "see crude unit test coverage with a left-right-middle filetree diff"
     desc "  * test files with corresponding application files appear as green."
     desc "  * application files with no corresponding test files appear as red."

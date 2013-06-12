@@ -8,7 +8,7 @@ module Skylab::TMX
 
       ::Skylab::TestSupport::Regret::CLI::Client
 
-    end, :skip, true
+    end, :skip, false
 
   end
 

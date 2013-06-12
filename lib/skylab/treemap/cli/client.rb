@@ -36,7 +36,10 @@ module Skylab::Treemap
           help_usage( {} ) ; help_invite # (legacy mess, change to `usage_and_invite` then)
         end
       end
-      cute_exit_code = ::Fixnum === res ? res : ( false == res ? 1 : 0 )
+      cute_exit_code = case res
+      when ::Fixnum, ::Symbol ; res
+      else  false == res ? 1 : 0
+      end
       if a and a.has_formal_parameter :be_verbose and  # jus greasing the wheels
           a.fetch_actual_parameter :be_verbose do end then
         emit :info, "(resulted in exit status of #{ cute_exit_code })"

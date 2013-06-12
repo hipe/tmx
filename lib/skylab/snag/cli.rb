@@ -26,7 +26,7 @@ module Skylab::Snag
       res
     end
 
-  protected                       # (DSL happens at bottom half)
+  private                         # (DSL happens at bottom half)
 
     # `initialize` - we are straddling two f.w's: all we want is our (modality)
     # calls to to `emit` to "work". we follow the good standard of [#sl-114],
@@ -260,6 +260,12 @@ module Skylab::Snag
 
     # --*--
 
+    desc "pings snag (lowlevel)."   # #todo you know you want to
+
+    def ping
+      @io_adapter.errstream.puts "hello from snag."
+      :hello_from_snag
+    end
   end
 
   module CLI::Actions             # avoiding an #orphan sorry

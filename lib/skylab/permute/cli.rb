@@ -17,7 +17,7 @@ module Skylab::Permute
       self
     end
 
-  protected
+  private
 
     param_h = {
       0 => -> _, b do
@@ -176,6 +176,20 @@ module Skylab::Permute
 
     def string
       "--a-aspect <val1> -a<v2> --b-aspect <val3> -b<v4> [..]"
+    end
+  end
+
+  class CLI::Actions::Ping < CLI::Action
+
+    emits :info, help: :info
+
+    def on_payload
+      # we don't actually, and we don't want to lie about it.
+    end
+
+    def process
+      emit :info, "hello from permute."
+      :hello_from_permute
     end
   end
 
