@@ -47,6 +47,10 @@ module Skylab::Porcelain::Legacy
       nil
     end
 
+    def dsl_off
+      @dsl_is_hot = false
+    end
+
     #         ~ these are some nerks that affect the whole derk ~
 
     def fuzzy_match b
@@ -96,10 +100,12 @@ module Skylab::Porcelain::Legacy
 
     # (this gets aliased over to `method_added` after init)
     def _porcelain_legacy_method_added method_name
-      @is_collapsed = false
-      @order_a << method_name
-      if @story.is_building_action_sheet
-        @story.accept_method_added method_name
+      if @dsl_is_hot
+        @is_collapsed = false
+        @order_a << method_name
+        if @story.is_building_action_sheet
+          @story.accept_method_added method_name
+        end
       end
       nil
     end
@@ -124,6 +130,7 @@ module Skylab::Porcelain::Legacy
         end
 
         @is_collapsed = nil
+        @dsl_is_hot = true
         @order_a = [ ]
         @story ||= begin
           story = Story.new self
@@ -407,6 +414,10 @@ module Skylab::Porcelain::Legacy
     #           (presented roughly in the order as it might be
     #               read from when presenting a help screen)
 
+    def _name
+      @name_function  # #hax
+    end
+
     attr_accessor :is_visible                  #   ~ visibility ~
 
     def concat_desc a                          #   ~ description ~
@@ -567,6 +578,10 @@ module Skylab::Porcelain::Legacy
         otr ||= -> { raise ::KeyError, "param not found: #{ norm.inspect }" }
         otr[* [ norm ][ 0, otr.arity.abs ] ]
       end
+    end
+
+    def _sheet
+      @action_sheet  # hax
     end
 
   private
@@ -877,12 +892,12 @@ module Skylab::Porcelain::Legacy
     end
 
     def resolve_action argv  # assume nonzero arg length
-      @legacy_last_action_subclient = nil
+      @legacy_last_hot = nil
       action_sheet = fetch_action_sheet argv.first
       if action_sheet
         argv.shift   # NOTE token used is #tossed for now, we used to keep it
         sc = action_sheet.action_subclient self
-        @legacy_last_action_subclient = sc
+        @legacy_last_hot = sc
         sc.resolve_argv argv
       elsif false == action_sheet
         # show the invite now lest it be not fully and accurately qualified.

@@ -1,12 +1,12 @@
-class Skylab::TMX::CLI
-  namespace :bleed, -> do
-    ::Skylab::TMX::Modules::Bleed::CLI
-  end, skip: true
-end
+module Skylab::TMX
 
-module Skylab
+  class CLI::Client
+    namespace :bleed, -> do
+      Modules::Bleed::CLI
+    end, skip: true
+  end
 
-  class TMX::Modules::Bleed::CLI < Face::CLI
+  class Modules::Bleed::CLI < Face::CLI
 
     # summary "run a bleeding edge version of tmx"  # #todo - later or never
 

@@ -1,7 +1,9 @@
 module Skylab::GitViz
+
   class CLI::Action
+
     def api
-      API.instance[@runtime]
+      GitViz::API.instance[@runtime]
     end
     def initialize rt
       @runtime = rt

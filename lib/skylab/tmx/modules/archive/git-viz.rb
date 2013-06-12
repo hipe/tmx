@@ -1,5 +1,15 @@
-class Skylab::TMX::CLI  # grease
+module Skylab::TMX
 
-  namespace :'git-viz', -> { ::Skylab::GitViz::CLI }
+  # this file being here and not in strange.rb is just grease.
 
+  class Modules::Arch::NS  # #re-open!
+
+    namespace :'git-viz', -> do
+
+      require 'skylab/git-viz/core'
+
+      ::Skylab::GitViz::CLI::Client
+
+    end
+  end
 end

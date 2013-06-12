@@ -1,6 +1,6 @@
 module Skylab::TMX
 
-  class CLI
+  class CLI::Client
 
     namespace :regret, -> do
 

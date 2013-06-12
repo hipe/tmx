@@ -14,6 +14,11 @@ module Skylab::TMX::Modules::CLI
       @param_h = { }
     end
 
+    def ping
+      @y << "hello from cli."
+      :hello_from_cli
+    end
+
     option_parser do |op|
       req = @param_h ; usage_string = @mechanics.last_hot.usage_line
       op.banner = "pull cli source code files from <source>\n#{usage_string}"
