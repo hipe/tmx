@@ -13,8 +13,11 @@ module Skylab::Cull
       3, nil, API::Events_ ).method( :event )
       # #todo the above is good but can probably be cleaned up
 
+
+    cfg
+
     def execute
-      plugin_host_services.configs.find_nearest_config_file_path nil, nil,
+      configs.find_nearest_config_file_path nil, nil,
         method( :with_yes ), method( :with_no )
     end
 

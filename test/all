@@ -26,7 +26,7 @@ module Skylab  # hold on for a moment & let it get weird because of [#te-002]:
         SWITCH_ = '--coverage'
         if (( idx = ::ARGV.index SWITCH_ ))
           require_relative 'plugins/coverage/manager'
-          y = ::Enumerator::Yielder.new { |s| $stderr.puts s }
+          y = ::Enumerator::Yielder.new( & $stderr.method( :puts ) )
           ok, res = Manager.instance.start y, ::ARGV, idx
           if ! ok
             y << "see '#{ FULL_NAME_[] } --help'."
@@ -104,9 +104,7 @@ module Skylab::Test
         ( :payload == type  ? sout : serr ).puts str
       end
       @paystream, @infostream = sout, serr
-      @info_y = ::Enumerator::Yielder.new do |message_string|
-        @infostream.puts message_string
-      end
+      @info_y = ::Enumerator::Yielder.new( & @infostream.method( :puts ) )
       @em = -> s { "\e[1;32m#{ s }\e[0m" }
       @pretty_path = Headless::CLI::PathTools::FUN.pretty_path
       nil

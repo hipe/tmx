@@ -7,8 +7,8 @@ module Skylab::CodeMolester
         has_model_instance
         set_new_valid_model_instance
         config_filename
-        config_file_search_num_dirs
-        config_file_search_start_pathname
+        config_search_num_dirs
+        config_search_start_pathname
       |
     end
 
@@ -65,13 +65,13 @@ module Skylab::CodeMolester
     #
     # needs the host services:
     #
-    #  + `config_file_search_start_pathname`
-    #  + `config_file_search_num_dirs`
+    #  + `config_search_start_pathname`
+    #  + `config_search_num_dirs`
     #  + `config_filename`
 
     def find_nearest_config_file_path _fh, _oh, yes, no
-      c = config_svcs ; pn = c.config_file_search_start_pathname
-      remaining_tries = c.config_file_search_num_dirs
+      c = config_svcs ; pn = c.config_search_start_pathname
+      remaining_tries = c.config_search_num_dirs
       fn = c.config_filename
       # --*--
       pn.absolute? or pn = pn.expand_path
@@ -127,10 +127,6 @@ module Skylab::CodeMolester
     end
 
   private
-
-    def plugin_host_services
-      @plugin_host_services
-    end
 
     alias_method :model_svcs, :plugin_host_services
 

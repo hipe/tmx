@@ -149,6 +149,7 @@ module Skylab::MetaHell
           v = c.const_get value_const, false
         elsif c.const_defined? proc_const
           c.const_defined? value_const and raise Msg_[ fld, true ]
+          p = c.const_get proc_const
         elsif c.const_defined? value_const
           v = c.const_get value_const
         end

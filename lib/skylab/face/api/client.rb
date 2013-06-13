@@ -240,36 +240,12 @@ module Skylab::Face
     # class method(s?) in this section are created and exposed to be accessed
     # by enhancements such as these. That is, this is part of the API API.
 
-    # `enhance_model_enhanced_api_client` - runs a block from which
-    # enhancements can add services to the API client. We assume that this is
-    # done in large part through adding particular model controllers to the
-    # model, hence we affirm that we provide the below model-focused services.
-    # this is designed to be re-affirmable - that is, each additional time
-    # the below logic is run on the same API client class, it should have no
-    # additional side-effects.
+     Services::Headless::Plugin::Host.enhance self
 
-    def self.enhance_model_enhanced_api_client &blk
-      me = self
-      Face::Services::Headless::Plugin::Host.enhance self do
-        service_names %i|
-          has_model_instance
-          set_new_valid_model_instance
-          model
-        |
+      # our API API is implemented via conceptualizing our API client as
+      # itself a plugin host, as is hinted at above.
 
-        me.send :include, API::Client::Model::InstanceMethods  # wedged in here
-          # in case we override above, and get overridden below
-
-        instance_exec( & blk )  # ERMAHGERD
-      end
-    end
-
-    Services::Headless::Plugin::Host.enhance self do
-
-      # experimentally our API API is implemented via conceptualizing our
-      # API client as itself a plugin host, as is hinted at above.
-
-    end
+    # end
 
     #                ~ experimental revelation services ~        ( section 3 )
 

@@ -326,6 +326,15 @@ module Skylab::Headless
           @method_name = x_a.fetch 0
           x_a.shift
           nil
+        end,
+        dispatch: -> x_a do
+          mutex :dispatchensation
+          @proximity = :intrinsic
+          @technique = :disptch
+          @method_name = x_a.fetch 0
+          @dispatch_i = x_a.fetch 1
+          x_a.shift ; x_a.shift
+          nil
         end
       }
       h.default_proc = -> hh, kk do
@@ -342,7 +351,7 @@ module Skylab::Headless
     private :mutex
 
     attr_reader :local_normal_name, :proximity, :technique,
-      :delegatee_name, :method_name, :ivar_name
+      :delegatee_name, :method_name, :ivar_name, :dispatch_i
   end
 
   module Plugin::Event
@@ -567,22 +576,34 @@ module Skylab::Headless
     # `call_plugin_host_service` - called by host services,
     # assume that access has already been checked.
 
-    -> do
-      technique_h = nil
-      define_method :call_plugin_host_service do |svc, a, b|
-        instance_exec svc, a, b, & technique_h.fetch( svc.technique )
-      end
-      technique_h = {
-        ivar: -> svc, a, b do
-          a || b and fail "spec me"
-          instance_variable_get svc.ivar_name
-        end,
-        method: -> svc, a, b do
-          send svc.method_name, *a, &b
-        end
-      }
-    end.call
+    def call_plugin_host_service svc, a, b
+      m, args = send Technique_h_.fetch( svc.technique ), svc, a
+      send m, *args, &b
+    end
     public :call_plugin_host_service
+
+    Technique_h_ = {
+      ivar: :resolve_plugin_host_sendable_using_ivar_technique,
+      method: :resolve_plugin_host_sendable_using_method_technique,
+      disptch: :resolve_plugin_host_sendable_using_dispatch_technique
+    } # (keep this line intact - see previous commit for a different way..)
+
+    def resolve_plugin_host_sendable_using_ivar_technique svc, a # #result-is-tuple:2
+      [ :call_plugin_host_service_using_ivar_technique, [ svc, a ] ]
+    end
+
+    def call_plugin_host_service_using_ivar_technique svc, a, &b
+      a || b and fail "spec me"
+      instance_variable_get svc.ivar_name
+    end
+
+    def resolve_plugin_host_sendable_using_method_technique svc, a
+      [ svc.method_name, a ]
+    end
+
+    def resolve_plugin_host_sendable_using_dispatch_technique svc, a
+      [ svc.method_name, ( a || [] ).unshift( svc.dispatch_i ) ]
+    end
 
     # `call_delegated_plugin_service` - this extension-like thing we
     # keep talking about. called from host services. if you look at the
@@ -846,38 +867,36 @@ module Skylab::Headless
         host_proxy_class.new plugin_client.plugin_story, host_application, self
       end
       @plugin_manager = -> { plugin_mgr }
-      @call_host_service = -> do
-        proximity_h = {
-          delegated: -> svc, a, b do
-            host_application.call_delegated_plugin_service svc, a, b
-          end,
-          intrinsic: -> svc, a, b do
-            host_application.call_plugin_host_service svc, a, b
-          end
-        }
-        -> pstory, service_i, a, b do
-          svc = @story.fetch_service service_i do
-            raise Plugin::Service::NameError, "what service are you #{
-              }talking about willis - no such service \"#{ service_i }\" is #{
-              }declared by the plugin host #{ @story.host_module_descriptor }"
-          end
-          if ! pstory.registered_for_service? service_i
-            raise Plugin::Service::AccessError, "the \"#{ service_i }\" #{
-              }service must be but was not registered for by the #{
-              }\"#{ pstory.local_slug }\" plugin (just add it to the #{
-              }plugin's list of desired services?)."
-          end
-          # (what could be neat is rather than doing this at runtime, make the
-          # instance methods dynamically (at plugin load time) that raise the
-          # same errors ERMAGHERD. on the flippy, this approach allows for
-          # (GULP) dynamically changing what services are registered, or some
-          # even just shotgun whitelist.)
-
-          instance_exec svc, a, b, & proximity_h.fetch( svc.proximity )
-        end
-      end.call
-      nil
+      @ha = host_application  # i give up
     end
+
+    # `call_host_service` - this is expected normally to be called from host
+    # proxies but here you can have it if you want. (used in #ingestion).
+
+    def call_host_service pstory, service_i, a=nil, b=nil
+      svc = @story.fetch_service service_i do
+        raise Plugin::Service::NameError, "what service are you #{
+          }talking about willis - no such service \"#{ service_i }\" is #{
+          }declared by the plugin host #{ @story.host_module_descriptor }"
+      end
+      if ! pstory.registered_for_service? service_i
+        raise Plugin::Service::AccessError, "the \"#{ service_i }\" #{
+          }service must be but was not registered for by the #{
+          }\"#{ pstory.local_slug }\" plugin (just add it to the #{
+          }plugin's list of desired services?)."
+      end
+      # (what could be neat is rather than doing this at runtime, make the
+      # instance methods dynamically (at plugin load time) that raise the
+      # same errors ERMAGHERD. on the flippy, this approach allows for
+      # (GULP) dynamically changing what services are registered, or some
+      # even just shotgun whitelist.)
+      @ha.send Pxmty_h_.fetch( svc.proximity ), svc, a, b
+    end
+
+    Pxmty_h_ = {
+      intrinsic: :call_plugin_host_service,
+      delegated: :call_delegated_plugin_service
+    }.freeze
 
     # `provides_service?` - used in validation elsewhere
 
@@ -971,13 +990,6 @@ module Skylab::Headless
     end
 
   public
-
-    # `call_host_service` - this is expected normally to be called from host
-    # proxies but here you can have it if you want. (used in #ingestion).
-
-    def call_host_service pstory, service_i, a=nil, b=nil
-      @call_host_service[ pstory, service_i, a, b ]
-    end
 
     def _story  # hacks only (chaining [#072])
       @story

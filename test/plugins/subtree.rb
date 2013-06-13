@@ -51,6 +51,7 @@ module Skylab::Test
         compile
         is_active_boolean_agent
         sort
+        default_sort
         postvalidate
         conclude
       |
@@ -93,7 +94,7 @@ module Skylab::Test
 
     def initialize( * )
       super
-      @sort_mutex = nil
+      @sort_mtx = Headless::Services::Basic::Mutex.new
     end
 
     # `hot_spec_paths` - implement the (plugin) service that is kind of
@@ -133,6 +134,7 @@ module Skylab::Test
         r = -> do
           conflict_a and break report_conflicts( conflict_a )
           children_sort( sp_cache_a ) or break false
+          @sort_mtx.is_held or ( children_dflt_srt sp_cache_a or break false )
           postvalidate_children or break false
           true
         end.call
@@ -265,16 +267,15 @@ module Skylab::Test
     end
 
     def sort_mutex owner_name, if_yes, if_no
-      if @sort_mutex
-        if_no[ @sort_mutex ]
-      else
-        @sort_mutex = owner_name
-        if_yes[ ]
-      end
+      @sort_mtx.try_hold owner_name, if_yes, if_no
     end
 
     def children_sort sp_cache_a
       _emit_to_children :sort, sp_cache_a
+    end
+
+    def children_dflt_srt sp_cache_a  # assume ! @sort_mtx.is_held
+      _emit_to_children :default_sort, @sort_mtx, sp_cache_a  # result is bool
     end
 
     def postvalidate_children
@@ -285,7 +286,9 @@ module Skylab::Test
       ok = true ; info_y = host.info_y
       emit_eventpoint_to_each_client eventpoint_i do |client|
         ok_y = ::Enumerator::Yielder.new do |msg|
-          info_y << "#{ client.plugin_slug } plugin #{ msg }"
+          info_y << Face::FUN.reparenthesize[ msg, -> ms do
+            "#{ client.plugin_slug } plugin #{ ms }"
+          end ]
         end
         no_y = ::Enumerator::Yielder.new do |msg|
           ok = false
@@ -500,6 +503,7 @@ module Skylab::Test
           arg_list
           compile
           is_active_boolean_agent
+          default_sort
           postvalidate
           conclude
         |
@@ -559,6 +563,33 @@ module Skylab::Test
         # (hence for which there was a nonzero-length list of arguments).
 
         @is_hot
+      end
+
+      default_sort do |mtx, sp_a, info_y, fail_y|
+        if @is_hot
+          mtx.is_held and fail "sanity - don't emit the event when is held."
+          mtx.try_hold '<whitelist>', -> { }, nil
+          norm_a = @str_a.map( & :intern )  # we don't validate this as a
+          # valid whitelist - that happens later.
+          orig_order_a = sp_a.map do |(sp, _)|
+            sp.local_normal_name
+          end
+          addme = norm_a.length
+          sp_a.sort_by! do |(sp, _)|
+            normal = sp.local_normal_name
+            idx = norm_a.index normal
+            if idx
+              idx
+            else
+              orig_order_a.index( normal ) + addme
+              # make nerks not in the lisk come after, but in same
+              # (probably lexical) order (even tho they probably won't stay
+              # there, since this is a whitelist, and they aren't on the list)
+            end
+          end
+          info_y << "(ordered the subproducts in the provided order)"
+        end
+        nil
       end
 
       # `pass` - see parent class

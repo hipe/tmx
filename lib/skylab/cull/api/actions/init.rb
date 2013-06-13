@@ -18,6 +18,8 @@ module Skylab::Cull
 
     emits :before, :after, :all, couldnt_event: :entity_event
 
+    cfg
+
     def execute
       c_h, o_h = unpack_params :cfg, true
       configs.create c_h, o_h,
