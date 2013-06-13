@@ -1,8 +1,9 @@
-require_relative 'test-support'
+#!/usr/bin/env ruby -w
 
+require_relative '../core'
 
-module Skylab::TestSupport::Benchmarking::Struct_Members_Vs_Ivars_Etc
-  alt = Skylab::TestSupport::Benchmarking::Alternative
+module Skylab::Test
+module Benchmarks::Struct_Members_Vs_Ivars_Etc_  # lost indent
 
   TIMES = 14_000_000
 
@@ -42,8 +43,7 @@ module Skylab::TestSupport::Benchmarking::Struct_Members_Vs_Ivars_Etc
     end
   end
 
-
-  ::Benchmark.bmbm do |bm|
+  Test::Benchmark.bmbm do |bm|
     struct = SomeStructSubclass.new 3
     obj = SomeRegularClass.new 3
     bm.report "regular class object ivar" do
@@ -60,3 +60,4 @@ module Skylab::TestSupport::Benchmarking::Struct_Members_Vs_Ivars_Etc
     end
   end
 end
+end  # lost indent

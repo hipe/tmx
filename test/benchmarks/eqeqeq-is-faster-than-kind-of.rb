@@ -1,23 +1,12 @@
-require 'benchmark'
+#!/usr/bin/env ruby -w
 
-class BenchmarkAltertnative < Struct.new(:label, :block)
-  def initialize input
-    case input
-    when Alt
-      (input.class.members | self.class.members).each{ |k| send("#{k}=", input.send(k)) }
-    when Hash
-      input.each { |k, v| send("#{k}=", v) }
-    else
-      raise ArgumentError.new("no: #{input.inspect}")
-    end
-  end
-  def block= block
-    super(block)
-    singleton_class.send(:define_method, :execute) { instance_exec(&block) }
-  end
-end
+require_relative '../core'
 
-class Alt < BenchmarkAltertnative
+module Skylab::Test
+
+module Benchmarks::Eq_Eq_Eq_Vs_Kind_Of_  # losing 2x indent..
+
+class Alt < Test::Benchmark::Alternative
   def val
     if rand >= 0.5
       1
@@ -27,30 +16,24 @@ class Alt < BenchmarkAltertnative
   end
 end
 
-alts = [
-  Alt.new(
-    :label => "kind_of?",
-    :block => ->() { val.kind_of?(Fixnum) }
-  ),
-  Alt.new(
-    :label => "===",
-    :block => ->() { Fixnum === val }
-  ),
-  Alt.new(
-    :label => "==",
-    :block => ->() { Fixnum == val.class }
-  )
-]
+alts = [ ]
+alts << Alt[ "kind_of?", -> { val.kind_of? ::Fixnum } ]
+alts << Alt[ "===",      -> { ::Fixnum === val } ]
+alts << Alt[ "==",       -> { ::Fixnum == val.class } ]
 
-tests = lambda do
-  tester = Class.new(Alt).class_eval do
-    attr_accessor :val
+_tests = lambda do
+
+  alt_ = ::Class.new( Test::Benchmark::Alternative ).class_exec do
+    def initialize alt, val
+      super( * alt.to_a )
+      @val = val
+    end
+    attr_reader :val
     self
   end
 
   assert = ->(alt, input, output) {
-    alt = tester.new(alt)
-    alt.val = input
+    alt = alt_[ alt, input ]
     $stderr.write "#{alt.label} with a val of #{input} executes as #{output.inspect}"
     if (ret = (output == alt.execute))
       $stderr.puts "."
@@ -68,10 +51,14 @@ end
 
 t = 4_000_000
 
-make_bm_jobs = ->(x) {
+_make_bm_jobs = ->(x) {
   alts.each { |a| x.report(a.label) { t.times { a.execute } } }
 }
 
-# tests[]
-Benchmark.bmbm(&make_bm_jobs)
+Test::Benchmark.argparse( -> do
+  _tests[]
+end, -> do
+  Test::Benchmark.bmbm( & _make_bm_jobs )
+end )
 
+end end  # indent lost 2 x

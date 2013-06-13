@@ -38,18 +38,10 @@ module Skylab  # hold on for a moment & let it get weird because of [#te-002]:
   end
 end  # OK now that coverage agent may have started, we can procede as normal:
 
-require_relative '../lib/skylab'
-require 'skylab/face/core'      # `pretty_path`, Tableize::I_M
-require 'skylab/test-support/core'  # headless plugin API, `_spec_rb`
+require_relative 'core'
 require 'optparse'
 
 module Skylab::Test
-
-  %i| Face Headless MetaHell Test |.each do |i|
-    const_set i, ::Skylab.const_get( i, false )
-  end
-
-  extend MetaHell::MAARS
 
   module Plugins
     extend MetaHell::MAARS  # only necessary b.c of [#te-002] coverage mgr

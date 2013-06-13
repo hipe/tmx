@@ -21,9 +21,8 @@ module Skylab::MetaHell::TestSupport::DSL_DSL::Constant_Trouble
     # "fields" of that class..
     #
 
-    context "ctx" do
-
-      it "ok." do
+    context "m1. a normal scenario." do
+      m1 = -> do
         module M1
 
           class Blammo  # blammo is my all powerful class that i will
@@ -54,22 +53,81 @@ module Skylab::MetaHell::TestSupport::DSL_DSL::Constant_Trouble
             end
           end
         end
+        m1 = -> { }
+        nil
+      end
 
-        # step outside that sandbox module with me for a moment here, look
-        # what i gave you:
+      before :each do m1[] end      # hack before( :all ) support for quickie.
 
-        M1::Yours::Blammo_::HIP_HOP_.call.should eql( :family_fun ) # woah
-                                    # note it is still a proc
+      it "first thing's first, with an object, access the values" do
+        o = M1::Yours::Blammo_.new
+        o.hip_hop.should eql( :family_fun )
+        o.horay.should eql( 'HARAY.' )  # note it normalizes them - whether
+        # you set it with a proc or a literal, you get the endvalue here.
+      end
 
-        M1::Yours::Blammo_::HORAY_.should eql( 'HARAY.' )  # note this is not
+      it "also, access the underlying constants. note suffixes." do
+        ( ::Proc === M1::Yours::Blammo_::HIP_HOP_PROC_ ).should eql( true )
+        M1::Yours::Blammo_.const_defined?( :HIP_HIP_VALUE_, false ).
+          should eql( false )
+        M1::Yours::Blammo_::HORAY_VALUE_.should eql( 'HARAY.' )
+        M1::Yours::Blammo_.const_defined?( :HORAY_PROC_, false ).
+          should eql( false )
+      end
 
-        yep = M1::Yours::Blammo_.new
-        yep.hip_hop.should eql( :family_fun )  # calls proc
-        yep.horay.should eql( 'HARAY.' )       # result is value
-        yep.hip_hop = 'otr'                    # discards proc for literal
-        yep.hip_hop.should eql( 'otr' )
-        yep.horay = 'foo'
-        yep.horay.should eql( 'foo' )
+      it "you can change the values (either) in the instance with `foo=`" do
+        foo = M1::Yours::Blammo_.new
+        foo.hip_hop = :klezmer
+        foo.hip_hop.should eql( :klezmer )
+        foo.hip_hop = :polka
+        foo.hip_hop.should eql( :polka )
+        foo.horay = :x
+        foo.horay.should eql( :x )
+        foo.horay = :y
+        foo.horay.should eql( :y )
+      end
+
+      it "you can change the value in the instance with `set_foo_proc`" do
+        foo = M1::Yours::Blammo_.new
+        foo.horay.should eql( 'HARAY.' )
+        foo.set_horay_proc -> { :zing }
+        foo.horay.should eql( :zing )
+      end
+    end
+
+    context "m2. you can set your field value resolvers late, as consts" do
+      m = -> do
+        module M2
+          class Bongo
+            Enhancer_ = MetaHell::DSL_DSL::Constant_Trouble.
+              new :Bongo_, self, [ :wiptastik, :plastik ]
+          end
+          class Yours
+            Bongo::Enhancer_.enhance self
+
+            class Bongo_
+              WIPTASTIK_VALUE_ = -> { :hi }
+              PLASTIK_PROC_ = -> { :hey }
+            end
+          end
+        end
+        m = -> { }
+        nil
+      end
+
+      before :each do m[] end
+
+      it "like so." do
+        y = M2::Yours::Bongo_.new
+        y.wiptastik.call.should eql( :hi )
+        y.plastik.should eql( :hey )
+      end
+
+      it "and still you can set them (but you can't go back.)" do
+        y = M2::Yours::Bongo_.new
+        y.plastik.should eql( :hey )
+        y.plastik = :sure
+        y.plastik.should eql( :sure )
       end
     end
   end

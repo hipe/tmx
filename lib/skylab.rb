@@ -1,7 +1,10 @@
 module Skylab                     # Welcome! :D
 
-  #      ~ the sole function of this file is to provide autoloading ~
-  #       ~ and a handful of universal-ish constant-ish functions ~
+  #    ~ the sole function of this file is to provide the facilities ~
+  #     ~ for opt-in autoloading, facilities that every sub-product ~
+  #      ~ in the skylab universe leverages for market synergies & ~
+  #       ~ also there's a handful of universal-ish, constant-ish ~
+  #        ~ functions that.. well just here have a look:
 
   require 'pathname'              # the only stdlib subproducts get for free
 

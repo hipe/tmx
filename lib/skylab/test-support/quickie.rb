@@ -15,16 +15,17 @@ module Skylab::TestSupport::Quickie
 
   # RSpec-like features it *does* include include:
   #   + arbitrarily deeply nested contexts (can define class methods, i.m's).
-  #   + memoized attr_accessors with `let` (that nest appropriatly)
+  #   + memoized attr_accessors with `let` (that nest appropriately)
   #   + core predicate matchers for `eql`, `match`, `raise_error`,
   #   + the wildcard predicate matcher `be_<foo>` (`be_include`, `be_kind_of`)
   #   + tag filters (only run certain examples tagged a certain way)
   #   + pending examples (and contexts! unlike r.s)
+  #   + limited, experimental support for non-nested before( :each )
   #
   # These are the most salient (to me) features it does *not* ape of RSpec:
   #   + `should_not` (meh)
   #   + run multiple files "at once"
-  #   + `before` and `after` blocks
+  #   + `before` and `after` blocks (except for limited support above)
   #   + `specify`
   #   + custom matchers
   #   + ..and pretty much everything else not in the first list!
@@ -334,8 +335,8 @@ module Skylab::TestSupport::Quickie
   end
 
   # `Client` - one client is created per test run. It manages user interface,
-  # parsing the request to run the tests, creating a test runtime,
-  # and initiating the test run on the object graph.
+  # parsing the request to run the tests, creating a test runtime, and
+  # initiating the test run on the object graph.
 
   class Quickie::Client
 
@@ -443,6 +444,7 @@ module Skylab::TestSupport::Quickie
           if ex.block
             rt.tick_example
             ctx = ex.context.new rt
+            ex.has_before_each and ex.run_before_each ctx
             ctx.instance_exec(& ex.block )
           else
             rt.tick_pending
@@ -694,7 +696,7 @@ module Skylab::TestSupport::Quickie
     end
   end
 
-  #         ~ predicates (core) ! (section 2) ~
+  #         ~ facet 1 - predicates (core) ! ~
 
   class Quickie::Predicate
 
@@ -849,7 +851,7 @@ module Skylab::TestSupport::Quickie
     end
   end
 
-  #         ~ should `be_<foo>( )` method_missing hack (section 3) ~
+  #         ~ facet 2 - should `be_<foo>( )` method_missing hack ~
 
   class Quickie::Context  # re-open it
 
@@ -929,7 +931,8 @@ module Skylab::TestSupport::Quickie
       end
       if takes_args
         pass_msg = -> a, p { "#{ pos } #{ insp[ p.expected ] }" }
-        fail_msg = -> a, p { "expected #{ insp[a] } #{ neg } #{ insp[ p.expected ] }" }
+        fail_msg = -> a, p { "expected #{ insp[a] } #{ neg } #{
+                               }#{ insp[ p.expected ] }" }
       else
         pass_msg = -> a, p { pos.dup }
         fail_msg = -> a, p { "expected #{ insp[a] } #{ neg }" }
@@ -944,9 +947,34 @@ module Skylab::TestSupport::Quickie
     }
   end
 
-  #  ~ section N - extrinsic API for hacks ~
+  #                       ~ facet 3 - before hooks ~
 
-  #  ~ section N.1 - `do_not_invoke!`
+  class Quickie::Context
+    def self.before i, &blk
+      :each == i or raise "sorry - in the interest of simplicity, quickie #{
+        }does not support before(#{ i.inspect }) blocks (can you make do #{
+        }with :each and a clever use of procs?)"
+      const_defined?( :BEFORE_EACH_PROC_ ) and raise "sorry - in the #{
+        }intereset of simplicity there is not yet support for nested #{
+        }before(:each) blocks.."
+      const_set :BEFORE_EACH_PROC_, blk
+      nil
+    end
+  end
+
+  class Quickie::Example
+    def has_before_each
+      @context.const_defined? :BEFORE_EACH_PROC_
+    end
+    def run_before_each ctx  # assume `has_before_each`
+      ctx.instance_exec( & @context::BEFORE_EACH_PROC_ )
+      nil
+    end
+  end
+
+  #                    ~ facet N - extrinsic API for hacks ~
+
+  #  ~ facet N.1 - `do_not_invoke!`
 
   # `Quickie.do_not_invoke` - prevents quickie from flushing its tests.
   # for hacks e.g in your test file. might make noise.
@@ -960,8 +988,8 @@ module Skylab::TestSupport::Quickie
       me = "`#{ self.class }.do_not_invoke!`"
       if @invoke_is_enabled
         if @did_resolve_invoke
-          @y << "(#{ me } called after a `describe` block has already finished #{
-            }- call it earlier if it does not work as expected.)"
+          @y << "(#{ me } called after a `describe` block has already #{
+            }finished - call it earlier if it does not work as expected.)"
         else
           @y << "(#{ me } called - won't run tests.)"
         end
