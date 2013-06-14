@@ -2,9 +2,24 @@ module Skylab::Face
 
   module API::Client::Model
 
-    # having these model facilities is opt-in, and for now activated by sending
-    # `enhance_model_enhanced_api_client` to your API Client class.
+    # the API Client having model facilities is opt-in, and for now activated
+    # by calling the below method `[]` (`enhance` will be added when needed.)
+    # this is designed to be re-affirmable - that is, each additional time
+    # the below logic is run on the same API client class, it should have no
+    # additional side-effects.
 
+    def self.[] host
+      Face::Services::Headless::Plugin::Host.enhance host do
+        service_names %i|
+          has_model_instance
+          set_new_valid_model_instance
+          model
+        |
+        host.send :include, API::Client::Model::InstanceMethods  # wedged in here
+          # in case we override above, and get overridden below
+      end
+      nil
+    end
   end
 
   module API::Client::Model::InstanceMethods

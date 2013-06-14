@@ -89,7 +89,7 @@ module Skylab::Headless
         const_set :A_, a ; const_set :H_, h
         a.each do |i, *_|
           define_method i do |*ary|  # blocks? eew no.
-            @dispatch.call i, ary
+            dispatch i, ary
           end
         end
         self
@@ -97,27 +97,32 @@ module Skylab::Headless
     end
 
     def initialize svc_a, plugin_client
-      a, h = self.class::A_, self.class::H_
-      pstory = plugin_client.plugin_story
-
-      @dispatch = -> i, ary=nil do
-        # 1) look up the service by name in the ordered service matrix `a`
-        # 2) fetch that row, and fetch the first (1) index of the tuple.
-        # 3) that index is an index into `svc_a`, the actual host svcs obj.
-        # 4) (yes we could cache this)
-        svc_a.fetch( a.fetch( h.fetch( i ) ).fetch( 1 ) ).
-          call_host_service pstory, i, ary
-      end
+      @svc_a, @a, @h, @pstory = svc_a, self.class::A_, self.class::H_,
+        plugin_client.plugin_story
+      # this block used to do the clever functional ivar thing, but
+      # we cleaned up functionalism for prettier and shorter call stacks #keep
+      nil
     end
 
     # `[]` - canonical atomic service aref accessor [#074]
 
     def [] *i_a
       if 1 == i_a.length
-        @dispatch[ i_a.fetch 0 ]
+        dispatch i_a.fetch 0
       else
-        i_a.map { |i| @dispatch[ i ] }
+        i_a.map { |i| dispatch i }
       end
+    end
+
+  private
+
+    def dispatch i, ary=nil
+      # 1) look up the service by name in the ordered service matrix `a`
+      # 2) fetch that row, and fetch the first (1) index of the tuple.
+      # 3) that index is an index into `svc_a`, the actual host svcs obj.
+      # 4) (yes we could cache this)
+      @svc_a.fetch( @a.fetch( @h.fetch( i ) ).fetch( 1 ) ).
+        call_host_service @pstory, i, ary
     end
   end
 end

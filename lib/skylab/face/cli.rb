@@ -157,9 +157,8 @@ module Skylab::Face
       node = self ; ok = r = rest = @last_cli_executable = nil ; pre_execute
       catch :break_two do
         while true
-          if argv.length.zero? && node.has_default_argv
-            argv.concat node.default_argv_value
-          end
+          node.apply_default_argv( argv ) if argv.length.zero? &&
+            node.has_default_argv
           argv.length.zero? and break( ok, cmd = true, node )
           if DASH_ == argv.fetch( 0 ).getbyte( 0 )
             ok, _ok, r, *rest = node.process_options argv
@@ -1751,8 +1750,11 @@ module Skylab::Face
       @sheet.has_default_argv
     end
 
-    def default_argv_value
-      @sheet.default_argv_value
+    def apply_default_argv argv
+      argv.length.zero? or fail "sanity"
+      use = @sheet.default_argv_value.map( & :to_s )  # looks prettier as sym.
+      argv.concat use
+      nil
     end
   end
 
@@ -2008,6 +2010,19 @@ module Skylab::Face
   FUN_[ :concat_2 ] = -> a, b do  # #called-by ouroboros sheet
     [ *a, *b ] if a || b
   end
+
+  FUN_[ :reparenthesize ] = -> do  # .. ; #called-by applications (e.g [te])
+    # NOTE we mutate the string, which is also the result.
+    rx = /\A(?<a>\([ ]*)(?<b>.*[^ ]|)(?<c>[ ]*\))\z/
+    -> msg, cb do                  # #todo we do something similar everywhere,
+      if (( md = rx.match msg ))   # but this way is Best.
+        msg.replace "#{ md[:a] }#{ cb[ md[:b] ] }#{ md[:c] }"
+      else
+        msg.replace cb[ msg ]
+      end
+      msg
+    end
+  end.call
 
   FUN = FUN_.to_struct
 

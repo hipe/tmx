@@ -16,7 +16,7 @@ module Skylab::MetaHell
         # (the above thinking could be broken out into smaller pieces..)
         mod.module_exec do
           extend Boxxy::ModuleMethods
-          @tug_class = MetaHell::Autoloader::Autovivifying::Recursive::Tug
+          @tug_class = MetaHell::Autoloader::Autovivifying::Recursive::Tug  # [#mh-031]
           init_boxxy caller[2]
         end
       end
