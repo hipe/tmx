@@ -4,7 +4,7 @@ module Skylab::Cull
 
     params [ :do_list_file, :arity, :zero ]
 
-    services :configs, [ :pth, :ingest ]
+    services :configs, [ :pth, :ivar ]
 
     emits yes: :structural, no: :structural,
       hard_yes: :payload_lines
@@ -12,9 +12,6 @@ module Skylab::Cull
     event_factory PubSub::Event::Factory::Structural.new(
       3, nil, API::Events_ ).method( :event )
       # #todo the above is good but can probably be cleaned up
-
-
-    cfg
 
     def execute
       configs.find_nearest_config_file_path nil, nil,

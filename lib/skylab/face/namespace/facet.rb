@@ -5,7 +5,7 @@ module Skylab::Face
   class Namespace  # #re-open for 5.3x
 
     module Facet
-      def self.touch ; end  # just gets this file to load!
+      def self.touch ; nil end    #kick-the-loading-warninglessly-and-trackably
     end
 
     class << self

@@ -23,9 +23,9 @@ module Skylab::TestSupport::Regret::API
     #
     # happy hacking!
 
-    services [ :out, :ingest ],
-             [ :err, :ingest ],
-             [ :pth, :ingest ]
+    services [ :out, :ivar ],
+             [ :err, :ivar ],
+             [ :pth, :ivar ]
 
     params :path, [ :template_options, :arity, :zero_or_one ],
       API::Conf::Verbosity[ self ].param( :vtuple )

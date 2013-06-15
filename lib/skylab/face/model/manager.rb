@@ -30,14 +30,14 @@ module Skylab::Face
 
     def aref model_ref_a
       @h.fetch model_ref_a do
-        k, is_collection = resolve_ref model_ref_a
-        sty = k.plugin_story
-        c = k.new
-        c.load_plugin @host.plugin_services, sty
-        if sty.do_memoize.nil? && is_collection or sty.do_memoize
-          @h[ model_ref_a ] = c
+        klass, is_collection = resolve_ref model_ref_a
+        o = klass.new
+        o.receive_plugin_attachment_notification @host.plugin_host_metaservices
+        b = o.plugin_metaservices.do_memoize
+        if b or b.nil? && is_collection
+          @h[ model_ref_a ] = 0
         end
-        c
+        o
       end
     end
 

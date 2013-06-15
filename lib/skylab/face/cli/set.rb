@@ -4,7 +4,7 @@ module Skylab::Face
   # on each other.
 
   module CLI::Set
-    def self.touch ; end  # for loading explicitly and without warning
+    def self.touch ; nil end      #kick-the-loading-warninglessly-and-trackably
   end
 
   # ~ 5.9x - command parameters as mutable ~

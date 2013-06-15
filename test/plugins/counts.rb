@@ -3,15 +3,18 @@ module Skylab::Test
   module Plugins::Counts
 
     Headless::Plugin.enhance self do
-      eventpoints %i|
+
+      eventpoints_subscribed_to( * %i|
         available_options
         available_actions
         action_summaries
-      |
-      service_names %i|
-        info_y
-        hot_subtree
-      |
+      | )
+
+      services_used(
+        :info_y,
+        :hot_subtree
+      )
+
     end
   end
 
@@ -45,8 +48,8 @@ module Skylab::Test
     def counts
       _tablify [ 'subproduct', 'num test files' ],
         ( ::Enumerator.new do |y|
-          total = 0
-          ok = host.hot_subtree.children.each do |tre|
+          total = 0 ; hs = hot_subtree
+          ok = hs.children.each do |tre|
             sp = tre.data
             num = tre.children.count
             if num.nonzero? or @do_zero
@@ -57,7 +60,7 @@ module Skylab::Test
           y << [ '(total)', total.to_s ]
           ok
         end ),
-        host.info_y.method( :<< )
+        info_y.method( :<< )
     end
   end
 end

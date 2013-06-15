@@ -21,6 +21,10 @@ module Skylab::Basic::Field::Reflection
         Conduit_::One_Shot_.new cond, -> { flsh.flush }
       end
     end
+
+    def self.[] kls  # i'm sorry
+      self::For::Class[ kls ]
+    end
   end
 
   Conduit_ = MetaHell::Enhance::Conduit.new %i| with |

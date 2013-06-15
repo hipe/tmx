@@ -2,7 +2,7 @@ module Skylab::TestSupport::Regret::API
 
   class API::Actions::Ping < Face::API::Action
 
-    services [ :err, :ingest ]
+    services [ :err, :ivar ]
 
     def execute
       @err.puts "hello from regret."

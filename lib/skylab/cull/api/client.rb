@@ -10,8 +10,8 @@ module Skylab::Cull
 
       filename '.cullconfig'
 
-      search_start_pathname do
-        ::Pathname.pwd
+      search_start_path do
+        ::Dir.getwd
       end
 
       search_num_dirs 3
@@ -19,9 +19,9 @@ module Skylab::Cull
     end
 
     Headless::Plugin::Host.enhance self do
-      services [ :config, :use_method, :config_controller ],
-               [ :configs, :use_method, :config_collection ], *
-               ( API::Client::Config_::DSL::FIELD_A_.map do |fld|
+      services [ :config, :method, :config_controller ],
+               [ :configs, :method, :config_collection ], *
+               ( API::Client::Config_.fields.map do |fld|
                  [ :"config_#{ fld.normal }", :dispatch, :cfgdisp, fld.normal ]
                end )  # #experimental hack - not permanent like this
     end

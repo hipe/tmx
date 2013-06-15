@@ -7,15 +7,20 @@ module Skylab::Test
 
     Headless::Plugin.enhance self do
 
-      eventpoints %i|
+      eventpoints_subscribed_to( * %i|
         available_actions
         action_summaries
         available_options
         default_action
-      |
+      | )
 
-      services :infostream, :full_name, :run_mode, :hot_spec_paths,
-        [ :em, :ingest ]
+      services_used(
+        [ :em, :ivar ],
+        [ :full_name, :proxy ],
+        :hot_spec_paths,
+        :infostream,
+        :run_mode
+      )
 
     end
   end
@@ -38,7 +43,7 @@ module Skylab::Test
       run: "(the default action - specifying its name is not necessary)"
     )
 
-    default_action [ :run, 0.5 ]
+    default_action :run, 0.5
 
     available_options do |o, _|
       o.on '-v', '--verbose', 'things like output filenames' do
@@ -56,7 +61,7 @@ module Skylab::Test
     end
 
     def run
-      rm = host.run_mode
+      rm = run_mode
       if :cli == rm || :rspec == rm
         _req -> do
           if :cli == rm
@@ -64,7 +69,7 @@ module Skylab::Test
           end
         end, -> { }
       else
-        host.infostream.puts "(doing nothing for runmode \"#{ rm }\".)"
+        infostream.puts "(doing nothing for runmode \"#{ rm }\".)"
         nil
       end
     end
@@ -72,15 +77,15 @@ module Skylab::Test
   private
 
     def _req before, after
-      cache_a = [ ]
-      res = host.hot_spec_paths.each do |p|
+      cache_a = [ ] ; info = infostream
+      res = hot_spec_paths.each do |p|
         cache_a << p
       end
       if false == res
-        host.infostream.puts "not requiring any files because of this."
+        info.puts "not requiring any files because of this."
         nil
       else
-        info = host.infostream
+        info = infostream
         before[ ]
         v = @be_verbose
         v or info.write '('
@@ -100,7 +105,7 @@ module Skylab::Test
     end
 
     def full_name
-      "#{ host.full_name } #{ plugin_slug }"
+      "#{ @plugin_parent_services.full_name } #{ local_plugin_moniker }"
     end
   end
 end

@@ -4,15 +4,15 @@ module Skylab::Test
 
     Headless::Plugin.enhance self do
 
-      eventpoints %i|
+      eventpoints_subscribed_to( * %i|
         available_actions
         action_summaries
         available_options
         conclude
-      |
+      | )
 
-      services :paystream, :hot_spec_paths,
-        [ :pretty_path, :ingest ]
+      services_used [ :paystream, :proxy ], [ :hot_spec_paths, :proxy ],
+        [ :pretty_path, :ivar ]
     end
   end
 
@@ -46,7 +46,8 @@ module Skylab::Test
     end
 
     def files
-      paystream, hot_spec_paths = host[ :paystream, :hot_spec_paths ]  # grease
+      paystream, hot_spec_paths =
+        @plugin_parent_services[ :paystream, :hot_spec_paths ]  # grease
 
       block = if @do_pretty
         -> spec_path do

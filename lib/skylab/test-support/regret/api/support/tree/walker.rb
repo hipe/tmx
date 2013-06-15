@@ -38,16 +38,15 @@ module Skylab::TestSupport::Regret::API
     end
     attr_reader :dir_pn
 
-    -> do  # `load_downwards`
-      fun = MetaHell::Boxxy::FUN
-      define_method :load_downwards do
-        path_a = build_difference
+    def load_downwards
+      -> do  # #result-block
+        path_a = build_difference or break path_a
         @module = path_a.reduce @top_mod do |m, x|
-          fun.fuzzy_const_get[ m, x ]  # #todo ui here
+          MetaHell::Boxxy::FUN.fuzzy_const_get[ m, x ]  # #todo ui here
         end
         true
-      end
-    end.call
+      end.call
+    end
     attr_reader :module
 
     def build_difference
@@ -110,7 +109,7 @@ module Skylab::TestSupport::Regret::API
             break
           end
         end while true
-        -> do  # result scope
+        -> do  # #result-block
           if 1 != top_norm_a.length
             instance_exec p_a_, top_norm_a, & report_error
             break false

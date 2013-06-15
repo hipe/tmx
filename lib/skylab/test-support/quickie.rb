@@ -17,6 +17,8 @@ module Skylab::TestSupport::Quickie
   #   + arbitrarily deeply nested contexts (can define class methods, i.m's).
   #   + memoized attr_accessors with `let` (that nest appropriately)
   #   + core predicate matchers for `eql`, `match`, `raise_error`,
+  #     (by design the predicates are added only to the test context, not
+  #      to Kernel, so the places you can make your assertions are limited.)
   #   + the wildcard predicate matcher `be_<foo>` (`be_include`, `be_kind_of`)
   #   + tag filters (only run certain examples tagged a certain way)
   #   + pending examples (and contexts! unlike r.s)

@@ -11,7 +11,17 @@ module Skylab::Headless
     # using `Headless::Plugin::Host::Proxy`:
     # comprehensive example:
     #
-    #     class CheekyWebClient
+    #     class Cheeky_CLI_Client
+    #       Headless::Plugin::Host::Proxy.enhance self do
+    #         services :emphasize_text
+    #       end
+    #     private
+    #       def emphasize_text x
+    #         x.upcase
+    #       end
+    #     end
+    #
+    #     class Cheeky_Web_Client
     #       Headless::Plugin::Host::Proxy.enhance self do
     #         services [ :emphasize_text, :ivar ]
     #       end
@@ -20,82 +30,60 @@ module Skylab::Headless
     #       end                                  # do NOT use in real world.)
     #     end
     #
-    #     class CheekyCLI_Client
-    #       Headless::Plugin::Host::Proxy.enhance self do
-    #         services [ :emphasize_text, :ivar ]
-    #       end
-    #       def initialize
-    #         @emphasize_text = -> x { x.upcase }
-    #       end
-    #     end
+    #     cli = Cheeky_CLI_Client.new
+    #     web = Cheeky_Web_Client.new
     #
-    #     web = CheekyWebClient.new
-    #     cli = CheekyCLI_Client.new
+    #     p = web.instance_variable_get( :@plugin_host ). # sad, nec. evil
+    #       plugin_host_metaservices.call_service( :emphasize_text )
     #
-    #     web.class.method_defined?( :plugin_host )  # => false
-    #     web.class.private_method_defined?( :plugin_host )  # => false
+    #     p.call( 'hi' ) # => '<em>hi</em>'
     #
-    #     webf, clif = [ web, cli ].map do |clnt|
-    #       ph = clnt.instance_variable_get :@plugin_host
-    #       ph.call_plugin_host_service(
-    #         ph.plugin_services._story.fetch_service( :emphasize_text ),
-    #         nil, nil )
-    #     end
+    #     ms = cli.instance_variable_get( :@plugin_host ).
+    #       plugin_host_metaservices
     #
-    #     webf[ 'hi' ]  # => '<em>hi</em>'
-    #     clif[ 'hi' ]  # => 'HI'
+    #     ms.call_service( :emphasize_text, 'hi' ) # => 'HI'
     #
 
-    -> do
-      define_singleton_method :enhance do |client_cls, &defn_blk|
-        if client_cls.const_defined? :Plugin_Host_, false
-          fail "sanity - already exists - #{ client_cls::Plugin_Host_ }"
-        elsif client_cls.private_method_defined? :plugin_host
-          fail "sanity - private method defined - plugin_host"
-        elsif client_cls.method_defined? :plugin_host
-          fail "sanity - method defind - plugin_host"
+    def self.enhance client_class, &blk
+      client_class.class_exec do
+        include Include_
+        prepend Prepend_
+        def self.client_can_broker_plugin_metaservices  # #search-for-it
+          true
         end
-        client_cls.class_exec do
-          cls = const_set :Plugin_Host_, ::Class.new( Pxy_ )
-          Plugin::Host.enhance cls, &defn_blk
-          def self.does_bestow_plugin_services ; true end  # meh
-          prepend OMG_
+        ph_class = if const_defined? :Plugin_Host_, false
+          const_get :Plugin_Host_, false
+        else
+          const_set :Plugin_Host_, ::Class.new( Pxy_ )
         end
-        nil
+        Plugin::Host.enhance ph_class, &blk
       end
-    end.call
+    end
 
-    module OMG_
+    module Prepend_
       def initialize( * )
-        @plugin_host = self.class.const_get( :Plugin_Host_ ).new self
+        @plugin_host = build_plugin_host
         super
       end
     end
 
+    module Include_
+    private
+      def build_plugin_host
+        self.class.const_get( :Plugin_Host_ ).new self
+      end
+    end
+
     class Pxy_
-      include Plugin::Host::InstanceMethods  # (so we can override)
-      -> do
-        technique_h = nil
-        define_method :initialize do |client|
-          @dispatch = -> svc, a, b do
-            technique_h.fetch( svc.technique )[ client, svc, a, b ]
-          end
-        end
-        def call_plugin_host_service svc, a, b
-          @dispatch[ svc, a, b ]
-        end
-        technique_h = {
-          ivar: -> client, svc, a, b do
-            if b or a and a.length.nonzero?
-              raise "sanity - no not pass arguments to an ivar-based service"
-            end
-            client.instance_variable_get svc.ivar_name
-          end,
-          method: -> client, svc, a, b do
-            client.send svc.method_name, *a, &b
-          end
-        }
-      end.call
+
+      include Plugin::Host::InstanceMethods_  # (early so we can override)
+
+      def initialize client
+        @plugin_host_metaservices = plugin_host_metaservices_class.new client
+      end
+
+      attr_reader :plugin_host_metaservices
+
     end
   end
 end

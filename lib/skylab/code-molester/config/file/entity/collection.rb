@@ -58,9 +58,9 @@ module Skylab::CodeMolester::Config::File::Entity
       end
 
       def register_for_config_services
-        Face::Model.enhance( @target ).services :configs,
-          :config,
-          :model # arg
+        Face::Model.enhance @target do
+          services_used :configs, :config, :model
+        end
       end
 
       private :register_for_config_services
@@ -170,18 +170,8 @@ module Skylab::CodeMolester::Config::File::Entity
   module Entity::Collection::Collection_And_Controller_
 
     def entity_controller
-      x = entity_story.name.anchored_normal # #todo
-      @plugin_host_services.model( * x )
-    end
-
-  private
-
-    def config  # away at [#hl-075], ditto next #todo:during:5
-      @plugin_host_services.config
-    end
-
-    def configs
-      @plugin_host_services.configs
+      @plugin_parent_metaservices.call_service :model,
+        entity_story.name.anchored_normal
     end
   end
 

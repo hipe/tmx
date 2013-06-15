@@ -14,7 +14,7 @@ module Skylab::Cull
                  :arity, :zero,
                  :desc, "dry run." ]
 
-    services :configs, [ :pth, :ingest ], :config_default_init_directory
+    services :configs, [ :pth, :ivar ], :config_default_init_directory
 
     emits :before, :after, :all, couldnt_event: :entity_event
 

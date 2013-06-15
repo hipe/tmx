@@ -1,128 +1,161 @@
 module Skylab::Headless
 
-  class Plugin::Host::Services::Chain
+  class Plugin::Host::Metaservices_::Chain_ < Plugin::Host::Metaservices_
 
-    # experimental core of the whole headless world. a proxy.
+    # #experimental core of the whole headless world: this proxy.
+    # (and a fully doubly API-private class to boot.)
     # this is the fifth center of the universe. i don't know how we
     # ended up with so many. (there may only be four..)
+    #
+    # this metaservices chain works a bit like the ancestor chain in ruby,
+    # but instead of a chain of modules, it is a chain of clients (actually,
+    # their metaservices). in the same manner that a ruby object resolves
+    # a message it receives (a "method call") by going up its ancestor chain
+    # looking for a module that has the instance method, this proxy goes up
+    # the elements of the chain looking for a metaservices that fulfills the
+    # service! FSCKING AWESOME
+    #
+    # usage:
+    #
+    #     class API_Client
+    #       Headless::Plugin::Host.enhance self do
+    #         services :show_a_path, :emphasize_text
+    #       end
+    #     private
+    #       def show_a_path x
+    #         "(never see full path) #{ x }"
+    #       end
+    #       def emphasize_text x
+    #         x.upcase
+    #       end
+    #     end
+    #
+    #     class Modality_Client
+    #       Headless::Plugin::Host::Proxy.enhance self do  # proxy, for grease
+    #         services :show_a_path, :do_some_mode_thing
+    #       end
+    #       def _ph ; @plugin_host end
+    #     private
+    #       def show_a_path x
+    #         "(safe path) #{ x.split( '/' ).last }"
+    #       end
+    #       def do_some_mode_thing
+    #         "whatever"
+    #       end
+    #     end
+    #
+    #     Chain_ = Headless::Plugin::Host::Metaservices_::Chain_.new [
+    #       Modality_Client::Plugin_Host_::Plugin_Host_Metaservices_,
+    #       API_Client::Plugin_Host_Metaservices_ ]
+    #
+    #     api = API_Client.new
+    #     web = Modality_Client.new
+    #
+    #     msvcs = Chain_.new [
+    #       web.instance_variable_get(:@plugin_host).plugin_host_metaservices,
+    #       api.plugin_host_metaservices
+    #     ]
+    #
+    #     ( !! ( msvcs.moniker =~ /Modality.+API/ ) )  # => true
+    #
+    #     msvcs.call_service( :do_some_mode_thing )   # => 'whatever'
+    #                                                 # first thing in chain
+    #
+    #     msvcs.call_service( :emphasize_text, 'hi' ) # => 'HI'
+    #                                                 # last thing in chain
+    #
+    #     msvcs.call_service( :show_a_path, '/foo/bar' ) # => '(safe path) bar'
+    #                                                 # earliest thing in chain
+    #
+    #     svcs = msvcs.build_proxy_for Headless::Plugin::Metaservices_::OMNI_
+    #
+    #     svcs.do_some_mode_thing # => 'whatever'
+    #     svcs.emphasize_text( 'hi' ) # => 'HI'
+    #     svcs.show_a_path( 'x/y' ) # => '(safe path) y'
 
-    # `initialize` - `host_module` will get mutated and populated.
-
-    def initialize a, host_module
-      @a, @host_module = a, host_module
-      @cache_h = { }
+    def self.new msvcs_class_a
+      new_kls = super()
+      new_kls.const_set :MSVCS_CLASS_A_, msvcs_class_a
+      new_kls
     end
 
-    # `build_host_proxy` - chain-friendly host proxy class omg
+    def self.services
 
-    def build_host_proxy plugin_client
-      ( if @host_module.const_defined? :Host_Services_Chain_
-        @host_module.const_get :Host_Services_Chain_
-      else
-        @host_module.const_set :Host_Services_Chain_, Hstpxy_.produce( @a )
-      end ).new @a, plugin_client
-    end
+      # there is some hi-level duplication of logic here with below because:
+      # the service proxy class that is made is kept in constant-land instead
+      # of instance-land (for good reasons) hence we cannot cross over from
+      # instance-land to tell the constant-land what the names of the services
+      # are. alternately we could make the entire "services matrix" table here
+      # in constant-land instead of instance-land but that limits us to
+      # deriving our matrix from the state as-is at delcaration time, not
+      # runtime.
+      #
+      # i.e, resolving the composition of the set of all names of all services
+      # is something we should probably do at declaration time (or lazily, but
+      # still in constant-land), while resolving the particular fulfillers of
+      # those services is something we should probably do at runtime.
 
-    def validate_plugin_client client, &err
-      ev = client.plugin_story._service_a.reduce nil do |m, svc_i|
-        if ! provides_service? svc_i
-          m ||= Plugin::Service::NameEvent.new
-          m.add host_descriptor, client, svc_i
-        end
-        m
-      end
-      if ! ev then true else
-        ( err || -> e do
-          raise Plugin::Service::NameError,
-            nil.instance_exec( & e.message_function )
-        end ).call ev
-      end
-    end
-
-    def provides_service? i
-      _index_for_services_for_service i
-    end
-
-    def host_descriptor
-      "(#{ @a.map { |x| x.host_descriptor } * ', ' })"
-    end
-
-    def _index_for_services_for_service i
-      @cache_h.fetch i do
-        index = @a.length.times.reduce nil do |_, idx|
-          @a.fetch( idx ).provides_service? i and break idx
-        end
-        @cache_h[ i ] = index
-      end
-    end
-    private :_index_for_services_for_service
-
-    # `call_host_service` - assusmes you checked `provides_service?`
-
-    def call_host_service pstory, i
-      @a.fetch( _index_for_services_for_service i ).
-        call_host_service( pstory, i )
-    end
-  end
-
-  class Plugin::Host::Services::Chain::Hstpxy_
-
-    # `produce` - internally this creates a "services matrix" that represents
-    # each of the services that each of the modality clients (e.g) offers,
-    # in order of service and then client. for now, a service request to
-    # this proxy resolves itself simply by dispatching the request to the
-    # first client that it found that has the service.
-
-    def self.produce svcs_a
-      a = [ ] ; h = { }
-      svcs_a.each_with_index do |svcs, index|
-        svcs._story.all_service_names.each do |i|
-          a.fetch( h.fetch( i ) do
-            a[ idx = a.length ] = [ i ]
-            h[ i ] = idx
-          end ) << index
-        end
-      end
-      h.key?( :[] ) and fail "sanity - `[]` is a reserved name for now"
-      # `a` # =>  [[:out, 0], [:err, 0], [:save, 0, 1]] ..
-      ::Class.new( self ).class_exec do
-        const_set :A_, a ; const_set :H_, h
-        a.each do |i, *_|
-          define_method i do |*ary|  # blocks? eew no.
-            dispatch i, ary
+      const! :AGGREGATED_SERVICES_ do
+        svcs = Plugin::Host::Metaservices_::Services_.new
+        a, h = svcs._ivars
+        const_get( :MSVCS_CLASS_A_, false ).each do |msvcs|
+          msvcs.services._a.each do |i|
+            h.fetch i do
+              a << i
+              h[ i ] = true
+            end
           end
         end
-        self
+        svcs
       end
     end
 
-    def initialize svc_a, plugin_client
-      @svc_a, @a, @h, @pstory = svc_a, self.class::A_, self.class::H_,
-        plugin_client.plugin_story
-      # this block used to do the clever functional ivar thing, but
-      # we cleaned up functionalism for prettier and shorter call stacks #keep
+    def initialize metasvcs_a
+      @metasvcs_a = metasvcs_a
+      @has_cache_table = false ; @svc_h = { }
       nil
     end
 
-    # `[]` - canonical atomic service aref accessor [#074]
+    def moniker
+      "(#{ @metasvcs_a.map { |x| x.moniker } * ', ' })"
+    end
 
-    def [] *i_a
-      if 1 == i_a.length
-        dispatch i_a.fetch 0
-      else
-        i_a.map { |i| dispatch i }
+    def proc_for_has_service
+      @_pfhs ||= -> i do
+        @has_cache_table or build_cache_table!
+        @svc_h.key? i
       end
+    end
+
+    def call_service i, a=nil, b=nil  # assumes above passed
+      lookup_fulfiller( i ).call_service i, a, b
     end
 
   private
 
-    def dispatch i, ary=nil
-      # 1) look up the service by name in the ordered service matrix `a`
-      # 2) fetch that row, and fetch the first (1) index of the tuple.
-      # 3) that index is an index into `svc_a`, the actual host svcs obj.
-      # 4) (yes we could cache this)
-      @svc_a.fetch( @a.fetch( @h.fetch( i ) ).fetch( 1 ) ).
-        call_host_service @pstory, i, ary
+    def lookup_fulfiller i
+      @has_cache_table or build_cache_table!
+      @metasvcs_a.fetch @svc_h.fetch( i ).fetch( 0 )
+    end
+
+    def build_cache_table!
+
+      # internally we create a "services matrix" that represents each of the
+      # services that each of the modality clients (e.g) offers, in order of
+      # service and then metaservices (think "client"). at present a service
+      # request to this proxy resolves one particular metaservices simply by
+      # dispatching the call to the first it finds that fulfills the service
+
+      @has_cache_table = true
+      @svc_h.clear
+      @metasvcs_a.each_with_index do |msvcs, idx|
+        msvcs.services._a.each do |i|
+          @svc_h.fetch( i ) do
+            @svc_h[ i ] = [ ]
+          end << idx
+        end
+      end
+      nil
     end
   end
 end

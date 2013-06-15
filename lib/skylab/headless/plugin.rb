@@ -1,1558 +1,891 @@
 module Skylab::Headless
 
+  # (chatty historical note: this is the first node in the skylab universe
+  # ever to be [re-] written using the Three Laws of TDD. we couldn't resist
+  # engaging in the exercize in light of both the growing scope of
+  # responsibility for this node and the fact that we had just read martin's
+  # _Clean Code_ [#sl-129]. falling under the spell of its dogma has another
+  # side-effect: we (again) cut back down on method-level comments, limiting
+  # them only to those methods that are part of the node's public API, if that
+  # (something we used to do until the "functional period" whose start
+  # roughly coincides with the birth of metahell). excessive effort has been
+  # expended to make the corresponding spec for this node serve as
+  # comprehensive API documentation (or at least, a source for it).)
+
+  # (here we use "contained DSL's" [#mh-033] implemented using coduits et.
+  # al [#078], API-private modules [#079]. we write in narrative pre-order
+  # [#058], broken into facets [#080].)
+
+  # ~ facet 1 - core, coarse facets, and facet management ~
+
   module Plugin
-
-    # (this whole sub-library experimentally has its own issue namespace,
-    # as a subnode whose root is at [#hl-070].)
-
-    # (name conventions throughout in this file: modules ending with an
-    # `Underscore_` are api private - that is, knowledge of their shape
-    # or existence should not in theory be necessary outside of this
-    # library.)
-
   end
 
   module Plugin::Host
 
-    # `Plugin::Host` is just a namespsce module, but it wraps the main
-    # entrypoint to the whole library - `Plugin::Host.enhance`, which gives
-    # a ruby class the strength and agility of being a host application that
-    # operates with plugins.
+    # `self.enhance` - give a ruby class the strength and agility of being
+    # a host appilcation that operates with plugins.
 
-    # `enhance` (is sticking with a nascent pattern - we tried other names:
-    # `confer`, `bestow`, `declare`, `define`, `extend_to` ..)
-    # (#todo a unit test that display a normative example.)
-
-    MAARS::Upwards[ self ]  # (because we are defining this module in a
-                            # file, but want it to be able to load children)
-
-    def self.enhance host_mod, &blk
-      _enhance host_mod, -> do
-        Plugin::Host::Story.new host_mod
-      end, nil, Conduit_.new, blk
-    end
-
-    # `_enhance` - quietly expose the ever living life out of it for hacks
-    # yes this could stand to be cleaned up. and no it is not used outside
-    # of this library OOPS
-
-    def self._enhance host_mod, build_story, sty, cnd, define
-      if ! host_mod.const_defined? :Plugin, false
-        host_mod.const_set :Plugin, ::Module.new
-      end
-      story = if host_mod::Plugin.const_defined? :STORY_, false
-        host_mod::Plugin::STORY_
+    def self.enhance mod, &blk
+      msvcs = if mod.const_defined? :Plugin_Host_Metaservices_, false
+        mod.const_get :Plugin_Host_Metaservices_, false
       else
-        host_mod::Plugin::const_set :STORY_, build_story[]
+        Metaservices_.new
       end
-      sty and sty[ story ]
-      dslify_svc_a = nil
-      cnd.instance_variable_set :@h, ::Hash[ Conduit_::A_.zip( [
-        -> m { story.add_available_plugins_box_module m },
-        -> *a { story.add_ordinary_eventpoints a },
-        -> *a { story.add_fuzzy_ordered_aggregation_eventpoints a },
-        -> *a { story.add_services a },
-        ->  a { story.add_service_names a },
-        -> *a do
-          ( dslify_svc_a ||= [ ] ).concat a.flatten
-          story.add_services a
-        end,
-        -> i, a { story.services_delegated_to i, a },
-        -> { story.ingest_early }
-      ] ) ]
-
-      host_mod.send :include, Plugin::Host::InstanceMethods  # consider order
-
-      cnd.instance_exec( & define ) if define  # allow empty blocks
-
-      if dslify_svc_a
-        dslify_svc_a.each do |i|
-          host_mod.define_singleton_method i do | & def_blk |
-            define_method i, & def_blk
-          end
-        end
-      end
-
+      Conduit_.new( msvcs ).instance_exec( & blk ) if blk
+      msvcs.flush mod
       nil
     end
   end
 
-  Plugin::Host::Conduit_ = MetaHell::Enhance::Conduit.raw %i|
-    add_plugins_box_module
-    eventpoints
-    fuzzy_ordered_aggregation_eventpoint
-    services
-    service_names
-    services_dslified
-    services_delegated_to
-    ingest_early
-  |
   class Plugin::Host::Conduit_
-    alias_method :plugin_box_module, :add_plugins_box_module  # #experimental
+    def initialize story
+      @story = story
+    end
   end
 
-  #         ~ a quick note about Stories and Conduits ~
-  #
-  # in several places here we make use of these two constructs, so they
-  # bear some explanation - A Conduit object is a short-lived object passed
-  # to a "contained DSL" block. it's only purpose is to be a conduit
-  # of information from the (developer) client to this library. You can
-  # think of it as a method signature to a function call. (Conduit's
-  # earliest recognizable ancestor was called "Joystick".)
-  #
-  # the Story, on the other end, is the model of the information gathered
-  # during that DSL block from the conduit. The story object is the internal
-  # datastructure that keeps track of whatever client-specific customizations
-  # happened during the DSL block. (we have also called this 'Metadata'
-  # elsewhere. you can safely substitute this term anywhere you see "Story"
-  # if you prefer it.)
-  #
-  # unlike the Conduit, the Story is not (or should not) be thought of as
-  # mutable - hence it does not need to concern itself with maintaining an
-  # interface for being edited (* at least not as far as you know).
-  #
-  # conversely, Conduit's only job is to be written to, so it need not
-  # concern itself about maintaining any private methods or complex
-  # internal state that must be encapsulated.
-  #
-  # the separation between Story and Conduit is important - it gives us a
-  # separation of concerns, and a layer of insulation. The Conduit classes
-  # effectively constitute the public API of this library (and is ironically
-  # an api private class .. #todo)
-  #
-  # the separation between Story and the client (user developer) classes
-  # is also important - it externalizes our storage of data so we don't crowd
-  # the ivar namespace, as well as externalizing any support method needed
-  # for (ideally read-only) methods (e.g reflection methods), which in
-  # a plugin architecture, are just about the most important thing! ^_^
-  #
-  class Plugin::Story  # (re-opened below)
+  Plugin::CONST_BANG__ = -> mod, const_i, blk do
+    if mod.const_defined? const_i, false
+      mod.const_get const_i, false
+    else
+      mod.const_set const_i, blk.call
+    end
   end
 
-  Plugin::Story::FUN = -> do  # functions used by stories
-
-    o = { }
-
-    o[:_add] = -> aa, h, a, builder=nil, do_normalize=true do
-      if do_normalize and 1 == a.length and a[0].respond_to? :each_index
-        a = a.fetch 0  # allow use of the 2 forms - e.g add_foo %i| bar baz |
-      end
-      if builder
-        a.each do |kx|
-          x = builder[ kx ]  # we don't splat it here
-          i = x.local_normal_name
-          h.key? i and fail "merge not yet implemented for #{ x.class }"
-          aa << i
-          h[ i ] = x
-        end
-      else
-        a.each do |i|
-          h.fetch i do
-            aa << i
-            h[ i ] = true
-          end
-        end
-      end
-      nil
-    end
-
-    ::Struct.new( * o.keys ).new( * o.values )
-  end.call
-
-  class Plugin::Host::Story
-
-    # all metadata for the plugin host application at compiletime.
-
-    # ( experimentally we are ordering the below methods as grouped by per-axis,
-    # writers then readers. but note that mutability is very much in flux
-    # for stories. )
-
-    # (note very little of the story is internal. it is essentially a data
-    # conduit.)
-
-    def initialize host_module
-      @host_module = host_module
-      @available_plugins_box_a = [ ]
-      @eventpoint_a = [ ] ; @eventpoint_h = { }
-      @service_a = [ ] ; @service_h = { }
-      @do_ingest_early = false ; @directive_i_a = nil
-    end
-
-    # `host_module_descriptor` - used in error message generation here
-
-    def host_module_descriptor
-      @host_module.name
-    end
-
-    def add_available_plugins_box_module mod
-      @available_plugins_box_a << [ :module_ref, mod ]
-      mod
-    end
-
-    def available_plugin_box_modules
-      ::Enumerator.new do |y|
-        @available_plugins_box_a.each do | type, x |
-          if :module_ref == type  # future
-            if x.respond_to? :call
-              y << x.call
-            else
-              y << x
-            end
-          end
-        end
-      end
-    end
-
-    def add_ordinary_eventpoints a
-      add_eventpoints a
-    end
-
-    def add_fuzzy_ordered_aggregation_eventpoints a
-      add_eventpoints a, :is_fuzzy, :is_ordered, :is_aggregation
-    end
-
-    # `add_eventpoints` - and related (including readers)
-
-    def add_eventpoints a, *predicate_a
-      _add @eventpoint_a, @eventpoint_h, a, -> sym do
-        Plugin::Event::Point[ sym, *predicate_a ]
-      end
-      nil
-    end
-    private :add_eventpoints
-
-    define_method :_add, & Plugin::Story::FUN._add
-
-    def all_eventpoint_names
-      @eventpoint_a.dup  # callers can't guarantee that they won't mutate it
-    end
-
-    def fetch_eventpoint x, &b
-      if b
-        @eventpoint_h.fetch x, &b
-      else
-        @eventpoint_h.fetch x do
-          raise Plugin::Event::Point::NameError, "undeclared eventpoint - #{ x}"
-        end
-      end
-    end  # is it better? [#bm-001]
-
-    def add_service_names a
-      _add @service_a, @service_h, a, -> i do
-        Plugin::Host::Service_.new i
-      end, false
-    end
-
-    def add_services a
-      _add @service_a, @service_h, a, -> x do
-        Plugin::Host::Service_.new( * x )
-      end, false  # always splatted
-    end
-
-    def services_delegated_to sym, a
-      _add @service_a, @service_h, a, -> i do
-        Plugin::Host::Service_.new i, :delegatee, sym
-      end
-    end
-
-    # `all_service_names` - used to generate host proxies
-
-    def all_service_names
-      @service_a.dup
-    end
-
-    def provides_service? svc_i
-      @service_h.key? svc_i
-    end
-
-    def fetch_service i, &blk
-      @service_h.fetch i, &blk
-    end
-
-    def _service_box # hacks only. (like plugin host proxy)
-      a = @service_a ; h = @service_h
-      @_service_box ||= MetaHell::Formal::Box.allocate.instance_exec do
-        @order = a ; @hash = h  # EGADS
-        base_init nil
-        self
-      end
-    end
-
-    def ingest_early
-      if @do_ingest_early
-        raise "already ingesting early."
-      else
-        ( @directive_i_a ||= [ ] ) << :load_ingestions
-      end
-    end
-
-    attr_reader :directive_i_a
+  Plugin::CONST_BANG_ = -> const_i, &blk do
+    Plugin::CONST_BANG__[ self, const_i, blk ]
   end
 
-  class Plugin::Host::Service_
-    -> do  # `initialize`
-      h = nil
-      define_method :initialize do |i, *x_a|
-        @local_normal_name = i ; @mutex = nil
-        while x = x_a.shift
-          instance_exec x_a, & h[ x ]
-        end
-        @mutex or instance_exec [ i ], & h.fetch( :use_method )
-        freeze
-      end
-      h = {
-        delegatee: -> x_a do
-          mutex :delegation
-          @proximity = :delegated
-          @delegatee_name = x_a.fetch 0
-          x_a.shift
-          nil
-        end,
-        ivar: -> x_a do
-          mutex :ivar
-          @proximity = :intrinsic
-          @technique = :ivar
-          @ivar_name = if x_a.length.nonzero? and '@' == x_a.fetch(0).to_s[0]
-            x_a.shift
-          else
-            :"@#{ @local_normal_name }"
-          end
-          nil
-        end,
-        use_method: -> x_a do
-          mutex :method
-          @proximity = :intrinsic
-          @technique = :method
-          @method_name = x_a.fetch 0
-          x_a.shift
-          nil
-        end,
-        dispatch: -> x_a do
-          mutex :dispatchensation
-          @proximity = :intrinsic
-          @technique = :disptch
-          @method_name = x_a.fetch 0
-          @dispatch_i = x_a.fetch 1
-          x_a.shift ; x_a.shift
-          nil
-        end
-      }
-      h.default_proc = -> hh, kk do
-        raise ::KeyError, "no such meta-field \"#{ kk }\" for a host #{
-          }service. valid meta-fields are: (#{ h.keys * ', ' })"
-      end
-    end.call
-
-    def mutex x
-      @mutex and fail "can't do both \"#{ x }\" and \"#{ @mutex }\""
-      @mutex = x
-      nil
-    end
-    private :mutex
-
-    attr_reader :local_normal_name, :proximity, :technique,
-      :delegatee_name, :method_name, :ivar_name, :dispatch_i
-  end
-
-  module Plugin::Event
-  end
-
-  class Plugin::Event::Point
-
-    # (see note at Plugin::Host::InstanceMethods#emit_eventpoint about
-    # the eventpoint architecture)
+  class Plugin::Metaservices__
 
     class << self
-      alias_method :[], :new
+      alias_method :orig_new, :new
     end
 
-    attr_reader :name, :is_fuzzy, :is_ordered, :is_aggregation,
-      :as_method_name
-
-    alias_method :local_normal_name, :name
-
-    -> do  # `initialize`
-
-      ivar_h = ::Hash[ %i| fuzzy ordered aggregation |.map do |i|
-        [ "is_#{ i }".intern, "@is_#{ i }".intern ]
-      end ]
-
-      define_method :initialize do |name, * predicate_a|
-        @name = name
-        predicate_a.each { |p| instance_variable_set ivar_h.fetch( p ), true }
-        @as_method_name = "#{ name }_eventpoint".intern
-      end
-    end.call
-  end
-
-  module Plugin::Host::InstanceMethods
-
-    # this I.M module tries to add adds as few public methods as
-    # is necessary - whether you as a host
-    # application want to expose your plugin API as part of your own API
-    # is your business but it sounds strange and so is not the default
-    # behavior. (exceptions to this will be noted with comments - some
-    # of the instances of support classes will need to call some methods
-    # that this module adds, or otherwise route calls through this host
-    # application for ease of customizing behavior..)
-
-    def is_plugin_host
-      true
-    end
-    # called from hacks
-
-  private
-
-    # `emit_eventpoint` - note we want to keep the signature lithe and
-    # minimal here. if plugins need more information about the event
-    # they should query the state of the host application via services
-    # (#experimental!)
-    #
-    # One thing this gains us is simplicity of implementation. we can
-    # litter our host application class with eventpoints and nobody cares.
-    # Another thing is efficiency - if we don't have to build a metadata
-    # payload about the eventpoint in situ, then we didn't waste those
-    # resources in the case where nobody is listening.
-    #
-    # (the flipside of this, of course, is that we have to be careful
-    # to make adequate plugin services etc..)
-    #
-    # But what if i told you "just kidding, maybe we *do* want to have
-    # an argument payload come along with evenpoints -- that's not so bad,
-    # is it?"? So, the takeaway is: we have no idea what we are doing.
-
-    def emit_eventpoint name_symbol, *a, &b
-      plugin_manager.emit_eventpoint name_symbol, a, &b
-    end
-
-    # `emit_eventpoint_to_each_client` see downstream.
-
-    def emit_eventpoint_to_each_client i, &block
-      plugin_manager.emit_eventpoint_to_each_client i, block
-    end
-
-    # `plugin_manager` - central interface point (as an external object)
-    # for the host application to notify the plugins e.g of eventpoints.
-    # lazy-loaded the first time it is used, in case the application is
-    # shortlived and does not need to load (all) its plugins to fulfill its
-    # particular request.
-
-    def plugin_manager
-      @plugin_manager ||= begin
-        Plugin::Manager.load_for_host_application self, *
-          plugin_host_story.directive_i_a
-      end
-    end
-
-    # `plugin_services` - ( host i.m edition ) exposed for hacking, only
-    # called outside of this library (and in specs).
-
-    def plugin_services
-      plugin_manager.plugin_services
-    end
-    public :plugin_services
-
-    # `plugin_host_story` - will be called by the plugin manager once
-    # when it inits. is a hookpoint for possible future hackery.
-
-    def plugin_host_story
-
-      # (note we need to search superclasses here because of some
-      # headless architectures that define a core app and then modailiy
-      # apps that subclass it.)
-      if self.class.const_defined? :Plugin
-        self.class.const_get( :Plugin ).const_get( :STORY_, false )
-      else
-        raise "this class has no Plugin constant - did you forget to #{
-          }enhance it with #{ Plugin }::Host? - #{ self.class }"
-      end
-    end
-    public :plugin_host_story  # called by plugin manager
-
-    # `plugin_host_services_aref` - route calls for `host[]` from plugins
-    # thru the host application in case it wants to customize the behavior.
-    # the default behavior is: if one argument, call the service named by
-    # the argument with no arguments or block and our result is its result.
-    #
-    # otherwise, if not 1 argument, result is always an array of the same
-    # length as the number of arguments, with each element corresponding
-    # to the result of that service call (goofy sugar).
-    #
-    # (details:  calls come from host services. the name `aref` is borrowd from
-    # the ruby source as the way they say `[]`, but what does "aref" mean?)
-
-    def plugin_host_services_aref i_a, plugin_story
-      if 1 == i_a.length
-        @plugin_manager.plugin_services.call_host_service plugin_story,
-          i_a.fetch( 0 )
-      else
-        m = [ ] ; svc = @plugin_manager.plugin_services
-        # frame-free reduce (tail-call recursion ha) saves 1 frame :/
-        while i_a.length.nonzero?
-          m << svc.call_host_service( plugin_story, i_a.shift )
-        end
-        m
-      end
-    end
-    public :plugin_host_services_aref  # called by host services
-
-    def plugin_flatten ea, &block
-      eac = ::Enumerator.new do |y|
-        ea.each do |x_a, client|
-          x_a.each do |rest|
-            y.yield( *rest, client )
-          end
-        end
-      end
-      if block
-        eac.each( & block )
-      else
-        eac
-      end
-    end
-
-    # `plugin_flatten_and_sort` - experimental useful thing.
-    # might become a function. this promises to iterate over the enumerable.
-    # `item` must respond to `[]` and will be passed the flattened data
-    # for each item, including the plugin. its result will be what makes up
-    # your result.
-
-    def plugin_flatten_and_sort ea, func=nil, &block
-      func && block and raise ::ArgumentError, "too much proc (2 for (1..2))"
-      id = 0 ; count_no_priority = 0 ; no_priority_base = - 0.1
-      pri_h = { } ; raw_a = [ ] ; raw_h = { } ; nam_h = { } ; cli_h = { }
-      ea.each do |item_a, client|
-        item_a.each do |name, priority, *rest|
-          id += 1
-          if ! ( 0.0 < priority && priority < 1.0 )   # limit & normalize
-            priority = ( count_no_priority += 1 ) * no_priority_base
-          end
-          pri_h[ id ] = priority
-          raw_a << id
-          raw_h[ id ] = [ *rest, name, client, priority ]
-          if name
-            cli_h[ id ] = client
-            taken_by = nam_h.fetch( name ) do
-              nam_h[ name ] = id
-              nil
-            end
-            if taken_by
-              raise Plugin::RuntimeError, "plugin comprehension sorting #{
-                }conflict - name conflict with #{ name } from #{
-                }both #{ cli_h[ taken_by ].plugin_slug } #{
-                }and #{ client.plugin_slug }"
-            end
-          end
-        end
-      end
-      raw_a.sort_by!( & pri_h.method( :fetch ) )
-      ea = ::Enumerator.new do |y| # WATCHOUT clobber original `ea`
-        if func
-          raw_a.each do |ident|
-            y << func[ * raw_h.fetch( ident ) ]
-          end
-        else
-          raw_a.each do |ident|
-            y.yield( * raw_h.fetch( ident ) )  # structs don't survive this
-          end
-        end
-      end
-      if func
-        ea.to_a
-      elsif block
-        ea.each( & block )
-      else
-        ea
-      end
-    end
-
-    # ( sadly this is actually the host application validating the
-    # client application. also it is just a debugging feature. )
-
-    def plugin_validate_client client, &err
-      @plugin_manager.validate_client client, &err
-    end
-
-    # `call_plugin_host_service` - called by host services,
-    # assume that access has already been checked.
-
-    def call_plugin_host_service svc, a, b
-      m, args = send Technique_h_.fetch( svc.technique ), svc, a
-      send m, *args, &b
-    end
-    public :call_plugin_host_service
-
-    Technique_h_ = {
-      ivar: :resolve_plugin_host_sendable_using_ivar_technique,
-      method: :resolve_plugin_host_sendable_using_method_technique,
-      disptch: :resolve_plugin_host_sendable_using_dispatch_technique
-    } # (keep this line intact - see previous commit for a different way..)
-
-    def resolve_plugin_host_sendable_using_ivar_technique svc, a # #result-is-tuple:2
-      [ :call_plugin_host_service_using_ivar_technique, [ svc, a ] ]
-    end
-
-    def call_plugin_host_service_using_ivar_technique svc, a, &b
-      a || b and fail "spec me"
-      instance_variable_get svc.ivar_name
-    end
-
-    def resolve_plugin_host_sendable_using_method_technique svc, a
-      [ svc.method_name, a ]
-    end
-
-    def resolve_plugin_host_sendable_using_dispatch_technique svc, a
-      [ svc.method_name, ( a || [] ).unshift( svc.dispatch_i ) ]
-    end
-
-    # `call_delegated_plugin_service` - this extension-like thing we
-    # keep talking about. called from host services. if you look at the
-    # wikipedia illustration and follow an arrow, imagine this going
-    # up from a plugin thru the host proxy into the service and then
-    # into the host app which sends the request thru the plugin manager
-    # #experimental.
-    # back down to another plugin, and then all the way back out again!
-
-    def call_delegated_plugin_service svc, a, b
-      @plugin_manager.fetch_client( svc.delegatee_name ).
-        call_plugin_service( svc.local_normal_name, a, b ) # validates name
-    end
-    public :call_delegated_plugin_service  # called by host services
-  end
-
-  class Plugin::Manager
-
-    # based off of a drawing we saw on wikipedia
-
-
-    def self.load_for_host_application host_application, *directive_a
-      pm = new host_application
-      pm.init and pm.load_plugins directive_a  # NOTE result is `pm` (or ..)
-    end
-
-    # ( we experiment with extrinsic / intrinsic here [#073] )
-
-    def initialize host_application
-      @story = nil
-      @init = -> do
-        @story and fail "sanity - already initted"
-        @story = host_application.plugin_host_story
-        true
-      end
-
-      plugin_services = nil
-      @plugin_services = -> do
-        plugin_services ||= Plugin::Host::Services.new( self, host_application )
-      end
-
-      @host_application = -> { host_application }   # ( only 1 place :/ )
-
-      @a = [ ] ; @h = { }  # the plugin manager is a box.
-    end
-
-    # `init` - called by a module method in this selfsame class (or elsewhere)
-    # in a separate step from our `initialize` call (possibly giving the
-    # host application time to think), we memoize the story, which will be
-    # used a lot here. for now we always succeed, but result is a success
-    # boolean for future-proofing.
-
-    def init
-      @init.call
-    end
-
-    # `load_plugins` - this is only to be called from a module method in this
-    # selfsame class. result must be self on success, or falseish on failure.
-    # It is the thing that resolves and initializes a hot Client instance of
-    # each plugin.
-
-    def load_plugins directive_a
-      svcs = plugin_services
-      eventpoints = all_eventpoint_names
-      available_plugin_modules.each do |box_mod|
-        story = box_mod.plugin_story
-        client = story.plugin_client_class.new  # pursuant to #api-point [#002]
-        client = client.load_plugin svcs, story, *directive_a  # gives the
-          # client itself a chance to do whatever
-        story = client.plugin_story  # give the client a chance to change class
-        sym = story.local_normal_name
-        @h.key? sym and fail "sanity: load same plugin more than once? - #{sym}"
-        a = client.plugin_eventpoints - eventpoints
-        a.length.nonzero? and raise Plugin::DeclarationError, "unrecognized #{
-          }eventpoint(s) subscribed to by \"#{ sym }\" #{
-          }plugin (declare it/them?) - #{ a }"
-        @a << sym
-        @h[ sym ] = client
-      end
-      self
-    end
-
-    # `plugin_services` ( plugin manager edition )
-    # called internally from `load_plugins` - an interface object which
-    # facilitates communication from plugin to host application.
-    # (based off of a drawing we saw on wikipedia)
-
-    def plugin_services
-      @plugin_services.call
-    end
-    public :plugin_services  # exposed for hacking, also may be called from host
-
-    # `available_plugin_modules`
-    # TL;DR: the result is an enumeration of all the available plugins Modules.
-    # Details: in a world where every plugin is wrapped in its own (ruby)
-    # module (or more interestingly, referenced by a constant, that perhaps
-    # resides in a plugins box module) - given that there might be multiple
-    # plugin box modules for e.g (plugin collections, plugin sources, whatever),
-    # this function's result is an enumerator that iterates over a *flat*
-    # list of all the (ruby) modules of those boxes.
-
-    def available_plugin_modules
-      ::Enumerator.new do |y|
-        @story.available_plugin_box_modules.each do |box_mod|
-          box_mod.constants.each do |const|
-            y << box_mod.const_get( const, false )
-          end
-        end
-        nil
-      end
-    end
-    private :available_plugin_modules
-
-    #         ~ eventpoint-related stuff happens to happen here ~
-
-    def all_eventpoint_names
-      @story.all_eventpoint_names
-    end
-    private :all_eventpoint_names
-
-    # `emit_eventpoint` - a sacred cow flagship workhorse
-    # if block is given, it will receive an enumerator of the non-nil
-    # responses from the plugins receiving the eventpoint notification.
-    # NOTE - if you use the block from and don't iterate over the resultset,
-    # the plugins don't get notified!
-    # if no block given, each subscribed plugin will get notified of the
-    # event, but result is undefined.
-
-    def emit_eventpoint sym, a, &block
-      ep = fetch_eventpoint sym  # raises custom exception
-      ea = ::Enumerator.new do |y|
-        hot_plugins.each do |client|
-          res = client.plugin_eventpoint ep, a
-          if ! res.nil?
-            y.yield( res, client )   # don't flatten res here
-          end
-        end
-        nil
-      end
-      if block
-        block[ ea ]
-      else
-        ea.count # runs the enumerator - result is shh
-      end
-    end
-
-    # `emit_eventpoint_to_each_client` - compare to the above method,
-    # this form is for when you want to customize either the
-    # client's arguments (don't) or response based on the individual client.
-    # note they grey area of redundancy with above.
-    #
-    # the normative example is decorating each response from a plugin
-    # with the slug (name) of the plugin, for e.g. but NOTE watch for
-    # smells here. the host application should not hav detailed knowlege
-    # of the plugins!
-    #
-    # this form does not provide enumerators nor capture responses from
-    # client (yet) although leave room for the signature of this method
-    # to expand for something like that..
-    #
-
-    def emit_eventpoint_to_each_client i, f
-      ep = fetch_eventpoint i  # raises custom exception
-      count = 0
-      hot_plugins.each do |client|
-        if client.plugin_subscribed? i  # with the cost of calling this twice
-          # per client, we get the benefit of calling `f` only when necessary.
-          a = * f[ client ]  # ERMAHGERD
-          client.plugin_eventpoint ep, a  # RESULT IGNORED NOTE
-          count += 1
-        end
-      end
-      count
-    end
-
-    # `fetch_eventpoint` - used internally and used by client hacks
-
-    def fetch_eventpoint sym, &b
-      @story.fetch_eventpoint sym, &b
-    end
-    # public.
-
-    # `hot_plugins` - a placeholder for etc ([#001])
-    # within the library it is only called from above (for now)
-    # but we expose it as public for hacks.
-
-    def hot_plugins
-      ::Enumerator.new do |y|
-        @a.each do |norm_name|
-          y << ( @h.fetch norm_name )
-        end
-      end
-    end
-
-    # `validate_client` - called optionally from various distant upstreams.
-    # #experimental, made for catching signature mismatches early, by checking
-    # that every declared required service is provided e.g when the plugin is
-    # loaded as opposed to (actually, in addition to) when the service is
-    # requested
-
-    def validate_client client, &err
-      ev = client.plugin_story._service_a.reduce nil do |m, svc_i|
-        if ! @story.provides_service? svc_i
-          m ||= Plugin::Service::NameEvent.new
-          m.add @host_application[], client, svc_i
-        end
-        m
-      end
-      if ! ev then true else
-        err ||= -> e do
-          # (for now we turn the name event into a name error whose message is
-          # the one produced by the event. if you want the event then do etc.)
-          raise Plugin::Service::NameError,
-            nil.instance_exec( & e.message_function )
-        end
-        err[ ev ]
-      end
-    end
-
-    #  `fetch_client` - experimental - not for normal invocation. for hacks
-    # where the host application wants to request a plugin client
-    # by name.
-
-    def fetch_client sym
-      @h.fetch sym
-    end
-  end
-
-  class Plugin::Host::Services
-
-    # `Plugin::Host::Services` - the idea for this is from a drawing that
-    # that we saw on wikipedia. it constitues _the_ interface through which
-    # each and every plugin will go to talk to the host application.
-    #
-    # By default plugin clients will get a handle on a host proxy, and not
-    # this services instance. but under the hood calls to the proxy will all
-    # end up as calls to this, which can be thought of as a middleman
-    # controller-ish between the host proxy and the actual host. We keep it
-    # around because the host proxy has a necessarily restricted method
-    # namespace, so we aren't going to go adding logic there; and we don't
-    # want to clutter the instance method namespace of the actual host
-    # application with our willy nilly logic, which hence lives here.
-    #
-    # for now to keep things simple, by default we give the plugin clients
-    # only a host proxy. but if she needs it, the industrious plugin client
-    # can override `load_plugin` to hold on to a handle on this (however,
-    # plugin clients should only ever be interacting with the host through
-    # the host services, which all should be exposed by the proxy, so they
-    # should never need a handle on these services, so ignore that i said
-    # that.)
-
-    extend MAARS  # (so we can load Plugin::Host::Services::Chain)
-
-    def initialize plugin_mgr, host_application
-      @host_mod = host_application.class
-      @story = host_application.plugin_host_story
-      @host_descriptor = -> do
-        host_application.class.name
-      end
-      @build_host_proxy = -> plugin_client do
-        host_proxy_class.new plugin_client.plugin_story, host_application, self
-      end
-      @plugin_manager = -> { plugin_mgr }
-      @ha = host_application  # i give up
-    end
-
-    # `call_host_service` - this is expected normally to be called from host
-    # proxies but here you can have it if you want. (used in #ingestion).
-
-    def call_host_service pstory, service_i, a=nil, b=nil
-      svc = @story.fetch_service service_i do
-        raise Plugin::Service::NameError, "what service are you #{
-          }talking about willis - no such service \"#{ service_i }\" is #{
-          }declared by the plugin host #{ @story.host_module_descriptor }"
-      end
-      if ! pstory.registered_for_service? service_i
-        raise Plugin::Service::AccessError, "the \"#{ service_i }\" #{
-          }service must be but was not registered for by the #{
-          }\"#{ pstory.local_slug }\" plugin (just add it to the #{
-          }plugin's list of desired services?)."
-      end
-      # (what could be neat is rather than doing this at runtime, make the
-      # instance methods dynamically (at plugin load time) that raise the
-      # same errors ERMAGHERD. on the flippy, this approach allows for
-      # (GULP) dynamically changing what services are registered, or some
-      # even just shotgun whitelist.)
-      @ha.send Pxmty_h_.fetch( svc.proximity ), svc, a, b
-    end
-
-    Pxmty_h_ = {
-      intrinsic: :call_plugin_host_service,
-      delegated: :call_delegated_plugin_service
-    }.freeze
-
-    # `provides_service?` - used in validation elsewhere
-
-    def provides_service? x
-      @story.provides_service? x
-    end
-
-    # `host_descriptor` - used in error message generation elsewhere
-
-    def host_descriptor
-      @host_descriptor.call
-    end
-
-    # `build_host_proxy` - the client calls this in `load_plugin`.
-    # this is how the plugin client typically accesses host services
-    # when not thru ingested ivars.
-
-    def build_host_proxy plugin_client
-      @build_host_proxy[ plugin_client ]
-    end
-
-    # `validate_plugin_client` - called from the client, convenience wrapper.
-
-    def validate_plugin_client client, &err
-      @plugin_manager[].validate_client client, &err
-    end
-
-  private
-
-    # NOTE we either will or won't stabilize the choice between these
-    # two or more alternatives when it comes to the proxy class(es) that
-    # we by default build - 1) once per host application (class) we generate
-    # one proxy class, and somehow use instances of it per plugin client
-    # and still enforce the declared services the plugin says it needs
-    # 2) we enforce this de-facto by generating one proxy class **per
-    # plugin**..
-    #
-    # We will go with the former for now, but note that we might one
-    # one day make a custom proxy class per plugin story based on the
-    # services it declares it needs access to, rather than checking at
-    # runtime as we do below! that's why this is whole schlew is private
-    # for now (that's not a word)..
-    #
-    # (one benefit of the former is that we get more helpful error messages
-    # when we have an access error. on the other hand, the latter wouldn't
-    # be so bad when you look at how we are doing it anyway below..)
-
-    def host_proxy_class
-      @host_proxy_class ||= resolve_host_proxy_class
-    end
-
-    # `resolve_host_proxy_class` - see upstream comments
-    # here, would you like `Plugin::Host_Proxy` to be defined right inside
-    # of your host class?
-
-    def resolve_host_proxy_class
-      if @host_mod::Plugin.const_defined? :Host_Proxy, false
-        @host_mod::Plugin.const_get :Host_Proxy, false
-      else
-        @host_mod::Plugin.const_set :Host_Proxy, build_host_proxy_class
-      end
-    end
-
-    # `build_host_proxy_class` - see upstream comments
-
-    def build_host_proxy_class
-
-      # let's lock the above list down as to mean only those services
-      # that exist the at the time we generate this class .. we aren't
-      # so fancy as yet that we have a dynamic list of services. that
-      # sounds like a terrible idea.
-
-      service_name_a = @story.all_service_names
-
-      # ( made more dynamic than necessary for one purpose as an exercize )
-      # #todo we should look into how wasteful it is, however
-
-      ::Class.new.class_exec do
-        define_method :initialize do |pstory, ha, svc|
-          define_singleton_method :[] do |*i_a|
-            ha.plugin_host_services_aref i_a, pstory
-          end
-          service_name_a.each do |i|
-            define_singleton_method i do |*a, &b|
-              svc.call_host_service pstory, i, a, b
-            end
-          end
+    def self.new
+      ::Class.new( self ).class_exec do
+        class << self
+          alias_method :new, :orig_new
         end
         self
       end
     end
 
-  public
+    define_singleton_method :const!, & Plugin::CONST_BANG_
 
-    def _story  # hacks only (chaining [#072])
-      @story
+    def self.emit_meta_eventpoint method_name, *a
+      if const_defined? :FACET_I_A_, false
+        const_get( :FACET_I_A_, false ).each do |i|
+          const_get( i, false ).send method_name, *a
+        end
+      end
+      nil
+    end
+
+    def emit_meta_eventpoint i, host_metasvcs
+      self.class.emit_meta_eventpoint i, self, host_metasvcs
     end
   end
+
+  class Plugin::Host::Metaservices_ < Plugin::Metaservices__
+
+    def self.flush host_class
+      if host_class.const_defined? :Plugin_Host_Metaservices_, false
+        self == host_class.const_get( :Plugin_Host_Metaservices_, false ) or
+          fail "sanity"
+      else
+        host_class.const_set :Plugin_Host_Metaservices_, self
+      end
+      host_class.send :include, Plugin::Host::InstanceMethods_
+      nil
+    end
+
+    def initialize host
+      @host_f = -> { host }  # hack for prettier dumps
+    end
+
+    def moniker
+      host.class.name
+    end
+
+  private
+
+    def host
+      @host_f.call
+    end
+
+    MAARS::Upwards[ self ]  # autoload plugin/*, plugin/host/*, p/h/msvcs_/*
+
+  end
+
+  module Plugin::Host::InstanceMethods_
+
+    def attach_hot_plugin pi
+      pi.receive_plugin_attachment_notification plugin_host_metaservices
+      ( @hot_plugin_a ||= [ ] ) << pi
+      nil
+    end
+
+    def attach_hot_plugin_with_name pi, local_normal
+      attach_hot_plugin pi  # we break "thread safety" here ..
+      ( @hot_plugin_h ||= { } )[ local_normal ] = @hot_plugin_a.length - 1
+      nil
+    end
+
+    def attach_hot_plugin_with_name_function pi, nf
+      attach_hot_plugin_with_name pi, nf.local_normal
+      pi.plugin_metaservices.set_name_function nf
+      nil
+    end
+
+    def fetch_hot_plugin_by_name local_normal
+      @hot_plugin_a.fetch @hot_plugin_h.fetch( local_normal )
+    end
+
+    def plugin_host_metaservices
+      @plugin_host_metaservices ||= plugin_host_metaservices_class.new self
+    end
+
+  private
+
+    def has_hot_plugins
+      false != hot_plugin_a
+    end
+
+    def hot_plugin_a
+      if ! instance_variable_defined? :@hot_plugin_a
+        @hot_plugin_a = false
+        determine_hot_plugins
+      end
+      @hot_plugin_a
+    end
+
+    def determine_hot_plugins
+      func, arg_x = plugin_host_metaservices.class.any_determiner_func_and_arg
+      if func
+        func[ self, arg_x ]
+        nil
+      end
+    end
+
+    def plugin_host_metaservices_class
+      self.class.const_get :Plugin_Host_Metaservices_
+    end
+
+    alias_method :plugin_host_story, :plugin_host_metaservices_class
+      # it is an implementation detail!
+  end
+
+  # --*--
 
   module Plugin
 
-    def self.[] particular_plugin_box_mod
-      enhance particular_plugin_box_mod do end
-      particular_plugin_box_mod  # allow nesting of different [ ] calls
-    end
-
-    def self.enhance particular_plugin_box_mod, &defn
-      _enhance particular_plugin_box_mod, -> do
-        Plugin::Story.new( particular_plugin_box_mod )
-      end, nil, Conduit_.new, defn
-    end
-
-    # `_enhance` - experiments
-
-    def self._enhance particular_plugin_box_mod, bld_sty, sty, cnd, def_blk
-
-      story = if particular_plugin_box_mod.const_defined? :STORY_, false
-        particular_plugin_box_mod.const_get :STORY_, false
-      else
-        particular_plugin_box_mod.const_set :STORY_, bld_sty[]
-      end
-      sty and sty[ story ]
-
-      cnd.instance_variable_set :@h, ::Hash[ Conduit_::A_.zip( [
-        -> client_class_function do
-          story.set_client_class_function client_class_function
-        end, -> *eventpoints do
-          story.add_eventpoints eventpoints
-        end, -> do # `dslify_eventpoint_names`
-          story.do_dslify_eventpoint_names = true
-        end, -> *services do
-          story.add_services services
-        end, -> service_names do
-          story.add_service_names service_names
-        end, -> *plugin_service_i_a do
-          story.add_plugin_services plugin_service_i_a
-        end
-      ] ) ]
-
-      flush = -> do
-
-        # now, kick the plugin client class - users will have had a chance to
-        # override this by now. but typically what happens next is they re-open
-        # the client class and it is convenient to have it auto-vivified first
-        # with the appropriate base class and I.M's (the default behavior).
-
-        story.plugin_client_class  # kick
-      end
-
-      particular_plugin_box_mod.extend Plugin::ModuleMethods
-
-      if def_blk
-        cnd.instance_exec( & def_blk )
-        flush[ ]
-        nil
-      else
-        cnd.class::One_Shot_.new cnd, flush
-      end
+    def self.enhance mod, &blk
+      cnd = Conduit_.new( fsh = Metaservices_.new )
+      blk and cnd.instance_exec( & blk )
+      fsh.flush mod
+      nil
     end
   end
 
-  Plugin::Conduit_ = MetaHell::Enhance::Conduit.raw %i|
-    client_class
-    eventpoints
-    dslify_eventpoint_names
-    services
-    service_names
-    plugin_services
-  |
+  class Plugin::Conduit_
 
-  class Plugin::Story
+    def initialize story
+      @story = story
+    end
+  end
 
-    def initialize particular_plugin_box_module
-      @do_dslify_eventpoint_names = true  # experimental!
-      @particular_plugin_box_module = particular_plugin_box_module
-      @client_class_function = -> do
-        default_client_class
-      end
-      @local_normal_name = -> do
-        # ::Foo::Bar::BiffBaz -> :"biff-baz"
-        name = particular_plugin_box_module.name
-        ::Skylab::Autoloader::Inflection::FUN.pathify[
-          name[ name.rindex( ':' ) + 1 .. -1 ]
-        ].intern
-      end.call
-      @eventpoint_a = [ ] ; @eventpoint_h = { }
-      @service_a = [ ] ; @service_h = { }
-      @plugin_service_a = [ ] ; @plugin_service_h = { }
+  class Plugin::Metaservices_ < Plugin::Metaservices__
+
+    MAARS::Upwards[ self ]  # autoload ./metaservices-/*
+
+    def self.flush mod
+      mod.const_defined? :Plugin_Metaservices_, false and fail 'no'
+      mod.const_set :Plugin_Metaservices_, self
+      mod.extend Plugin::ModuleMethods_
+      kls = RESOLVE_CLASS_H_.fetch( mod.class )[ mod ]
+      emit_meta_eventpoint :receive_flush_notification, kls
+      kls.send :include, Plugin::InstanceMethods_
+      nil
     end
 
-    attr_reader :particular_plugin_box_module  # used in error reporting
-
-    # experimentally, we present the below public methods grouped by
-    # logical aspect (any writer then any reader for each aspect).
-    # but note that the mutability of the story is a design consideration
-    # that is in flux!
-
-    attr_reader :local_normal_name  # set during construction
-
-    def local_slug
-      @local_slug ||= local_normal_name.to_s
-    end
-
-    # `client_class` (writer, reader)
-
-    def set_client_class_function f
-      @client_class_function and raise Plugin::DeclarationError, "won't #{
-        }clobber existing client class function."
-      f.respond_to? :call or raise Plugin::DeclarationError, "sorry, for #{
-        }now we only support functions here (had: #{ f })"
-      @client_class_function = f or fail "sanity"
-    end
-
-    MetaHell::Function self, :@client_class_function, :plugin_client_class
-
-    # `dslify_eventpoint_names` (writer, reader)
-
-    attr_accessor :do_dslify_eventpoint_names
-
-    # eventpoints-related methods - `add_eventpoints`, `subscribed?`, [..]
-
-    def add_eventpoints a
-      _add @eventpoint_a, @eventpoint_h, a
-    end
-
-    define_method :_add, & Plugin::Story::FUN._add
-
-    def subscribed? eventpoint_name_sym
-      @eventpoint_h[ eventpoint_name_sym ]
-    end
-
-    def plugin_eventpoints
-      @eventpoint_a.dup  # no guarantee that client won't mutate.
-    end
-
-    # services-related methods
-
-    def add_services a
-      _add @service_a, @service_h, a, -> kx do
-        Plugin::Service_[ * kx ]
-      end, false
-    end
-
-    def add_service_names a
-      _add @service_a, @service_h, a, -> sym do
-        Plugin::Service_[ sym ]
-      end, false
-    end
-
-    def service_a
-      @service_a.dup  # a conspiring pluing manager might accidentally mutate
-    end
-
-    def _service_a
-      @service_a  # but if you insist
-    end
-
-    # `registered_for_service?` - used for interface validation at runtime
-
-    def registered_for_service? i
-      @service_h.key? i
-    end
-
-    # `services` - clients want deep reflection on these for things
-    # like ingestion.
-
-    def services
-      ::Enumerator.new do |y|
-        @service_a.each do |i|
-          y.yield i, @service_h.fetch( i )
-          nil
+    RESOLVE_CLASS_H_ = {
+      ::Class => -> kls do
+        kls
+      end,
+      ::Module => -> mod do
+        mod.extend Plugin::ModuleMethods_
+        mod.const_defined? :Client, false and fail "add coverage for me"
+        kls = mod.const_set :Client, ::Class.new
+        if ! kls.const_defined? :Plugin_Metaservices_, false
+          kls.const_set :Plugin_Metaservices_, mod::Plugin_Metaservices_
         end
-        nil
+        kls
+      end
+    }
+
+    def initialize plugin
+      @plugin = plugin
+    end
+
+    attr_reader :plugin
+
+    def moniker
+      @plugin.class.name
+    end
+
+    def set_name_function nf
+      @name_function = nf
+    end
+
+    attr_reader :name_function
+  end
+
+  module Plugin::ModuleMethods_
+
+    def plugin_metaservices_class
+      const_get :Plugin_Metaservices_, false
+    end
+
+    alias_method :plugin_story, :plugin_metaservices_class
+      # it is an implementation detail!
+  end
+
+  module Plugin::InstanceMethods_
+
+    def receive_plugin_attachment_notification host_metasvcs
+      plugin_metaservices.
+        emit_meta_eventpoint :receive_attachment_notification, host_metasvcs
+    end
+
+    def receive_plugin_eventpoint_notification ep, a, &b
+      if plugin_metaservices.subscribed_to_eventpoint? ep.normal
+        send ep.as_method_name, *a, &b
       end
     end
 
-    # experimental plugin-services (like extensions uh-oh)
-
-    def add_plugin_services a
-      _add @plugin_service_a, @plugin_service_h, a
-    end
-
-    def has_plugin_service? i
-      @plugin_service_h.key? i
+    def local_plugin_moniker
+      nf = plugin_metaservices.name_function and nf.as_slug
     end
 
   private
 
-    # `default_client_class` - NOTE this has side-effects on the particular
-    # box module (which can be avoided..). this is the default implementation
-    # for @client_class_function - its job is to resolve the client class for
-    # the plugin (every plugin has to have one). a plugin implementor
-    # can in theory write any arbitrary client class she wants for the
-    # particular plugin, and set it with `client_class` in the DSL block.
-    # However this is not yet tested (#todo) and would at least require
-    # that she include Plugin::Client::InstanceMethods, or worse (strongly
-    # discoured) implement every method in it (just don't do it).
-    #
-    # Most often what happens is that this below function runs, creates
-    # a plugin client class by subclassing our internal stub class,
-    # and then she (the developer) re-opens it and writes the actual
-    # application code in the plugin.
-    #
-    # Experimentally the particular plugin box module and the plugin
-    # client class can be one and the same .. this happens if you call
-    # `Plugin.enhance` on a class instead of a module. It assumes that the
-    # class *is* the implementation for the plugin - and will probably
-    # mutate the hell out of it..
-
-    def default_client_class
-      if @particular_plugin_box_module.const_defined? :Client, false
-        @particular_plugin_box_module.const_get :Client, false
-      else  # ( no matter what, set Client constant. )
-        if ::Class === @particular_plugin_box_module
-          kls = @particular_plugin_box_module
-          if ! kls.method_defined? :plugin_story
-            kls.send :include, Plugin::Client::InstanceMethods
-          end
-          use_dsl = @do_dslify_eventpoint_names  # ..
-        else
-          kls = ::Class.new  # NOTE we used to sublcass a base class here, but
-          kls.send :include, Plugin::Client::InstanceMethods  # ..no reason to
-          use_dsl = @do_dslify_eventpoint_names  # yes always
-        end
-
-        @particular_plugin_box_module.const_set :Client, kls  # yes always
-
-        # (yes for the one case this sets Foo::Client = Foo. When dealing
-        # with constants like modules and classes we like to use the modules
-        # themselves as the datstore, as opposed to hashes or ivars)
-
-        if use_dsl
-          eventpoint_dsl kls
-        end
-        kls
-      end
+    def plugin_metaservices
+      @plugin_metaservices ||= self.class.
+        const_get( :Plugin_Metaservices_, false ).new( self )
     end
 
-    def eventpoint_dsl kls
-      ea = @eventpoint_a
-      kls.class_exec do
-        ea.each do |i|
-          define_singleton_method i do |*a, &b|
-            x = a.length + ( b ? 1 : 0 )
-            x > 1 and raise ::ArgumentError, "too many (#{ x } for 0..1)"
-            m = "#{ i }_eventpoint"
-            if b
-              define_method m, &b
-            else
-              res = a[ 0 ]  # LOOK nil ok
-              define_method m do res end
-            end
-          end
-        end
-      end
-      nil
-    end
+    alias_method :plugin_metaservices, :plugin_metaservices
+    public :plugin_metaservices
   end
 
-  module Plugin::Client
+  # (the remainder of this facet consists of
+  # facilities used by the facets following this one.)
 
-    # `Plugin::Client` - the plugin itself is an abstract floaty etheral
-    # thing. The way that the plugin manager talks to a plugin (the floaty
-    # thing) is through the plugin's client. how can you capture a rainbow?
-
-    # (this used to be a default base class, but then there was
-    # no reason to use it b.c everything moved into the I.M)
-
-  end
-
-  module Plugin::Client::InstanceMethods
-
-    # unlike e.g Host::InstanceMethods, this hellof adds public methods
-
-    # `load_plugin` - formerly `initialize`, then `init_plugin`, this sets
-    # these crucial ivars, and/or lets the plugin client "change itself" to
-    # an instance of a different class based on whatever. assume this is the
-    # first plugin-related call this object receives.
-    #
-    # a note about `@plugin_host_services` - we used to set the
-    # `@plugin_services` ivar instead, but using the `host proxy` solely
-    # feels cleaner. if you need a handle on the services object, by all
-    # means override this method in your plugin client.
-
-    # syntax is : plugin_services [, plugin_story ] [ , directive_i [..]]
-
-    def load_plugin plugin_services, *rest_a
-      if rest_a.length.nonzero? and ::Symbol != rest_a.first.class  # meh
-        plugin_story = rest_a.shift
-      else
-        plugin_story = self.class.plugin_story
-      end
-      pi = _load_plugin plugin_services, plugin_story
-      rest_a.length.nonzero? and process_plugin_directives(
-        plugin_services, rest_a )
-      pi
-    end
-
-    def _load_plugin plugin_services, plugin_story
-      @plugin_story = plugin_story
-      @plugin_host_services = plugin_services.build_host_proxy self
-      self  # important
-    end
-    private :_load_plugin
-
-    -> do  # `process_plugin_directives`
-      op_h = {
-        validate_services: :plugin_validate_services,
-        load_ingestions: :plugin_load_ingestions
-      }
-      define_method :process_plugin_directives do |svcs, i_a|
-        i_a.each do |i|
-          send op_h.fetch( i ), svcs
-        end
+  class Plugin::Metaservices_
+    class << self
+      private
+      def add_facet const_i
+        ( const! :FACET_I_A_ do [ ] end ) << const_i
         nil
       end
-    end.call
+    end
+  end
 
-    # `plugin_validate_services` (currently (from this library anyway) called
-    # only as a directive so `err` is never yet customized but it could be..)
-
-    def plugin_validate_services svcs, &err
-      svcs.validate_plugin_client self, &err
+  class Box_
+    def initialize
+      @a = [ ] ; @h = { }
     end
 
-    def plugin_load_ingestions svcs
-      @plugin_story.services.each do |nn, svc|
-        if svc.do_ingest
-          ivar = svc.ivar_to_ingest_as
-          if instance_variable_defined? ivar
-            fail "sanity - won't clobber existing ivar - #{ ivar }"
-          else
-            x = svcs.call_host_service @plugin_story, nn
-            x or fail "sanity - for now you cannot ingest false-ish values"
-            instance_variable_set ivar, x
-          end
-        end
-      end
+    def has? i
+      @h.key? i
+    end
+
+    def names
+      @a.dup
+    end
+
+    def fetch i, &b
+      @h.fetch i, &b
+    end
+
+    def add i, x
+      @h.key? i and raise ::KeyError, "collision - won't clobber existing #{i}"
+      @a << i
+      @h[ i ] = x
       nil
     end
 
-    # `plugin_host_services` used to call up to a host service.
-
-    def plugin_host_services
-      @plugin_host_services
-    end
-    private :plugin_host_services
-
-    # `is_plugin_host` - this is necessary for some interesting hacks
-    # elsewhere. a plugin (client) can certainly be a plugin host itself!
-
-    def is_plugin_host
-      false
-    end
-
-    # `plugin_story` - called by plugin manager `load_plugins`.
-
-    def plugin_story
-      @plugin_story or raise "no @plugin_story - call `load_plugin` first? #{
-        }- #{ self.class }"
-    end
-
-    # `plugin_slug` - an informal way to refer to the plugin by a name.
-    # NOTE we avoid the use of `plugin_name` because it's too ambiguous
-    # and could cause problems based on what the assumed meaning of "name"
-    # is. (plugins maybe can have local names in the host application.
-    # maybe the same, maybe different is a "plugin instance key" that the
-    # plugin manager in the host application uses to identify the particular
-    # instances. maybe multiple plugin instances come from the same class..
-    # multiple plugin implementations may exist in the unversve with the
-    # same "name" but they may do very different things.. etc.)
-
-    def plugin_slug
-      @plugin_story.local_slug
-    end
-
-    #      ~ eventpoint-related reflection and then notification ~
-
-    def plugin_eventpoints
-      @plugin_story.plugin_eventpoints
-    end
-
-    def plugin_eventpoint ep, a
-      if plugin_subscribed? ep.name
-        send ep.as_method_name, *a
-      end
-    end
-
-    # `plugin_subscribed?`  - *definitely* leave room for this to
-    # change during runtime for the particular plugin client (for now..)
-
-    def plugin_subscribed? name_sym
-      @plugin_story.subscribed? name_sym
-    end
-    # public for hacks
-
-    # `call_plugin_service` - this implements the top of the long round-trip
-    # for the expermental "plugin services" (extension-like) facility.
-    # this call probably came in from the host application, and represents
-    # a service call that the host application wants us to fill (weird).
-    # (*that* call may very well have originated from another plugin..)
-    # for now it is our job to validate access.
-
-    def call_plugin_service name_sym, a, b
-      if @plugin_story.has_plugin_service? name_sym
-        send name_sym, *a, &b
-      else
-        raise Plugin::Service::NameError,
-          "not a plugin service of #{ self.class } - #{ name_sym }"
-      end
-    end
+    def _a ; @a end  # READ ONLY
+    def _h ; @h end  # READ ONLY
+    def _ivars ; [ @a, @h ] end  # HACKS ONLY
   end
-
-  module Plugin::ModuleMethods
-
-    # (this is for the particular plugin box module)
-
-    def plugin_story
-      const_get :STORY_, false
-    end
-  end
-
-  # custom error classes - these are used as sort of a marker for when
-  # a simple `fail "sanity -"` or `raise "foo"` becomes something a bit
-  # more officially part of the API.
 
   class Plugin::DeclarationError < ::RuntimeError
   end
 
-  class Plugin::RuntimeError < ::RuntimeError
+  Plugin::EAT_H_ = -> kls, h do
+    h.default_proc = -> hh, k do
+      raise Plugin::DeclarationError, "unexpected token #{ k.inspect }, #{
+        }expecting #{ Headless::NLP::EN::Minitesimal::FUN.oxford_comma[
+          hh.keys.map( & :inspect ), ' or ' ] } for #{
+        }defining this #{ kls }"
+    end
+    h.freeze
   end
 
-  # (the above two classes intentionally don't share a parent class from this
-  # library because they are mutually exclusive in their scope. the one happens
-  # during declaration (DSL blocks) and the other during "runtime" as the
-  # plugin world sees "runtime".
+  # ~ facet 2 - services ~
 
-  module Plugin::Service
-    # (one day this might become etc)
-  end
-
-  class Plugin::Service_
-
-    # `Plugin::Service_` - this represents the plugin's directed association
-    # (think arrow) pointing towards the host, representing the need of the
-    # service on the part of the plugin, a service that the host has.
-
-    def self.[] *a
-      allocate.instance_exec do
-        init( *a )
-      end
-    end
-
-    -> do  # `init`
-      once = -> do
-        once = nil
-        Headless::Services::Basic::Field::Box.enhance self do
-          meta_fields :ingest, [ :ingest_as_ivar, :property ]
-        end  # we do this nasty dance because otherwise there would be a
-             # circular dependency: this plugin library's flagship subproduct
-        nil  # is test/all, and test/all is of course used when testing fields.
-      end    # i will call it "regressive architecture".
-
-      define_method :init do |name_i, *rest|
-        @local_normal_name = name_i
-        if rest.length.zero? then
-          @field = nil
-          self
-        else
-          once and once[]
-          @field = Plugin::Service_::FIELD_.new( [ name_i, *rest ] )
-          self
-        end
-      end
-    end.call
-
-    attr_reader :local_normal_name
-
-    def do_ingest
-      if @field
-        @field.is_ingest || @field.has_ingest_as_ivar
-      end
-    end
-
-    def ivar_to_ingest_as
-      if @field
-        if @field.has_ingest_as_ivar
-          @field.ingest_as_ivar_value
-        else
-          :"@#{ @field.local_normal_name }"
-        end
-      end
+  class Plugin::Host::Conduit_
+    def services *x_a
+      @story.concat_services x_a
     end
   end
 
-  class Plugin::Service::NameError < Plugin::RuntimeError
+  class Plugin::Host::Metaservices_
 
-    # *now* we make a taxonomy out of it, just for fun ..
-    # raised when an invalid service name is requested (for now this check
-    # happens at runtime as opposed to declaration time only when dealing
-    # with the experimental delegated services.)
-
-  end
-
-  class Plugin::Service::NameEvent
-
-    def initialize
-      raw_a = @raw_queue_a = [ ]
-      @message_function = -> do  # [#it-002] NLP aggregation experiment
-        Headless::Services::Basic::List::Aggregated::Articulation raw_a do
-          template "{{ host }}{{ adj1 }} has not declared the required #{
-            }{{ service_i }} declared as needed by {{ plugin }}{{ adj2 }}"
-          on_zero_items -> { "everything was ok." }
-          aggregate do
-            service_i -> a do
-              if 1 == a.length then "service \"#{ a.fetch 0 }\""
-              else                  "services (#{ a * ', ' })" end
-            end
-          end
-          on_first_mention do
-            host plugin -> x do
-              x.respond_to?( :ascii_only? ) ? x : x.class.name
-            end
-            _flush -> x { "#{ x }." }
-          end
-          on_subsequent_mentions do
-            host   -> { 'it' }
-            adj1   -> { ' also' }
-            plugin -> { 'that plugin' }
-            adj2   -> { ' either' }
-            _flush -> x { " #{ x }." }
-          end
-        end
+    def self.concat_services x_a
+      x_a.each do | (name_i, *rest) |
+        svc = Service_.new name_i, *rest
+        services.add name_i, svc
       end
-    end
-
-    def add host, plugin, svc_i
-      @raw_queue_a << Item_[ host, plugin, svc_i ]
       nil
     end
 
-    Item_ = ::Struct.new :host, :plugin, :service_i
+    def self.services
+      const! :SERVICES_ do Services_.new end
+    end
 
-    attr_reader :message_function
+    def build_proxy_for plugin_metasvcs
+      self.class._proxy_class.new self, plugin_metasvcs
+    end
+
+    def self._proxy_class  # #api-private
+      const! :Proxy_ do
+        msvcs = self
+        ::Class.new( Plugin::Host::Proxy_ ).class_exec do
+          msvcs.services._a.each do |i|
+            define_method i do |*a, &b|
+              _call_host_service i, a, b
+            end
+          end
+          self
+        end
+      end
+    end
+
+    def services
+      self.class.services
+    end
+
+    def proc_for_has_service
+      @_pfhs ||= services._h.method :key?
+    end
+
+    def call_service i, a=nil, b=nil
+      svc = services._h.fetch i do
+        raise Plugin::DeclarationError, "\"#{ i }\" has not been declared #{
+          }as a service of this host (declare it with `services`?) - #{
+          }#{ moniker }"
+      end
+      send VIA_H_.fetch( svc.via_i ), svc, *a, &b
+    end
+
+    VIA_H_ = {
+      method: :fulfill_service_call_via_method,
+      ivar: :fulfill_service_call_via_ivar,
+      delegation: :fulfill_service_call_via_delegation,
+      dispatch: :fulfill_service_call_via_dispatch
+    }.freeze
+
+  private
+
+    def fulfill_service_call_via_method svc, *a, &b
+      host.send svc.method_name, *a, &b
+    end
+
+    def fulfill_service_call_via_ivar svc
+      host.instance_variable_defined? svc.via_ivar or fail "sanity - #{ svc.via_ivar } is not defined in this #{ host.class }"  # #todo-during:4
+      host.instance_variable_get svc.via_ivar
+    end
+
+    def fulfill_service_call_via_delegation svc, *a, &b
+      host.fetch_hot_plugin_by_name( svc.delegatee_local_normal ).
+        plugin_host_metaservices.call_service svc.normal, a, b
+    end
+
+    def fulfill_service_call_via_dispatch svc, *a, &b
+      host.send svc.method_name, * svc.dispatch_args_x, *a, &b
+    end
   end
 
-  class Plugin::Service::AccessError < Plugin::RuntimeError
+  class Plugin::Host::Proxy_
 
-    # if the plugin requests a service that it did not register for
+    def [] * i_a  # #canonical-monadic-service-aref-accessor [#074]
+      if 1 == i_a.length
+        _call_host_service i_a.fetch( 0 )
+      else
+        i_a.map { |i| _call_host_service i }
+      end
+    end
 
+  private
+
+    def initialize host_metasvcs, plugin_metasvcs
+      @proc_for_has_service_used =
+        ( @host_metasvcs, @plugin_metasvcs = host_metasvcs, plugin_metasvcs ).
+          last.proc_for_has_service_used  # #cars-why
+    end
+
+    def _call_host_service i, a=nil, b=nil  # #a-and-b-exist-to-fail
+      @proc_for_has_service_used[ i ] or
+        raise Plugin::DeclarationError, "the \"#{ i }\" service must be but #{
+          }was not declared as subscribed to by the #{
+          }\"#{ @plugin_metasvcs.moniker }\" plugin (just add it to the #{
+          }plugin's list of desired services?)."
+      @host_metasvcs.call_service i, a, b
+    end
   end
 
-  class Plugin::Event::Point::NameError < Plugin::RuntimeError
+  class Plugin::Host::Metaservices_::Services_ < Box_
+  end
 
-    # emitted when a host application emits an eventpoint whose name
-    # was not declared.
+  Plugin::AT_ = -> do
+    at = '@'.freeze
+    -> rest do
+      at == rest.fetch( 0 ).to_s[ 0 ]
+    end
+  end.call
 
+  class Plugin::Host::Metaservices_::Service_
+
+    def initialize name_i, *rest
+      @normal = name_i
+      rest.length.nonzero? and eat rest
+      @via_i ||= begin
+        @method_name = @normal
+        :method
+      end
+    end
+
+    attr_reader :normal, :via_i
+
+    def method_name
+      @method_name
+    end
+
+  private
+
+    def eat rest
+      while rest.length.nonzero?
+        send EAT_H_[ rest.shift ], rest
+      end
+    end
+
+    EAT_H_ = Plugin::EAT_H_[ self,
+      ivar: :eat_ivar,
+      delegatee: :eat_delegatee,
+      method: :eat_method,
+      dispatch: :eat_dispatch
+    ]
+
+    def eat_ivar rest
+      @via_i = :ivar
+      @via_ivar = if rest.length.nonzero? and at? rest
+        rest.shift
+      else
+        :"@#{ @normal }"
+      end
+      nil
+    end
+
+    define_method :at?, & Plugin::AT_
+
+    def via_ivar
+      @via_ivar
+    end
+    public :via_ivar
+
+    def eat_delegatee rest
+      @via_i = :delegation
+      @delegatee_local_normal = rest.fetch 0 ; rest.shift
+      nil
+    end
+
+    def delegatee_local_normal
+      @delegatee_local_normal
+    end
+    public :delegatee_local_normal
+
+    def eat_method rest
+      @via_i = :method
+      @method_name = rest.fetch 0 ; rest.shift
+      nil
+    end
+
+    def eat_dispatch rest
+      @via_i = :dispatch
+      @method_name = rest.fetch 0 ; rest.shift
+      @dispatch_args_x = rest.fetch 0 ; rest.shift
+      nil
+    end
+
+    def dispatch_args_x
+      @dispatch_args_x
+    end
+    public :dispatch_args_x
+  end
+
+  class Plugin::Conduit_
+
+    def services_used *x_a
+      @story.concat_services_used x_a
+    end
+  end
+
+  # --*--
+
+  class Plugin::Metaservices_
+
+    def self.concat_services_used x_a
+      box = const! :SERVICES_SUBSCRIBED_TO_ do
+        add_facet :SERVICES_SUBSCRIBED_TO_
+        Services_Used_.new
+      end
+      x_a.each do | (name_i, *rest) |
+        box.add name_i, Service_Used_.new( name_i, *rest )
+      end
+      nil
+    end
+
+    def self.services_used
+      const_get :SERVICES_SUBSCRIBED_TO_, false
+    end
+
+    def services_used
+      self.class.services_used
+    end
+
+    def proc_for_has_service_used
+      @_pfhsu ||= services_used._h.method :key?
+    end
+
+    def absorb_metaservices_service host_metasvcs, svc
+      send INTO_H_.fetch( svc.into_i ), host_metasvcs, svc
+    end
+
+    INTO_H_ = {
+      instance_method: :absorb_metaservices_service_into_instance_method,
+      proxy: :absorb_metaservices_service_into_proxy,
+      ivar: :absorb_metaservices_service_into_ivar
+    }.freeze
+
+    def absorb_metaservices_service_into_instance_method ms, _svc
+      if ! @plugin.instance_variable_defined? :@plugin_parent_metaservices
+        @plugin.instance_variable_set :@plugin_parent_metaservices, ms
+      end
+      nil
+    end
+
+    def absorb_metaservices_service_into_proxy ms, _
+      if ! @plugin.instance_variable_defined? :@plugin_parent_services
+        @plugin.instance_variable_set :@plugin_parent_services,
+          ms.build_proxy_for( @plugin.plugin_metaservices )
+      end
+      nil
+    end
+
+    def absorb_metaservices_service_into_ivar ms, svc
+      @plugin.instance_variable_set svc.into_ivar,
+        ( ms.call_service svc.normal )
+      nil
+    end
+  end
+
+  class Plugin::Metaservices_::Services_Used_ < Box_
+
+    def receive_flush_notification kls
+      @h.each_value do |svc|
+        if :instance_method == svc.into_i
+          kls.send :define_method, svc.into_method do |*a, &b|
+            @plugin_parent_metaservices.call_service svc.normal, a, b
+          end
+          kls.send :private, svc.into_method
+        end
+      end
+      nil
+    end
+
+    def receive_attachment_notification plugin_metasvcs, host_metasvcs
+      has_service = host_metasvcs.proc_for_has_service ; err = nil
+      @a.each do |i|
+        if has_service[ i ]
+          plugin_metasvcs.absorb_metaservices_service host_metasvcs, @h.fetch(i)
+        else
+          ( err ||= Headless::Plugin::Metaservices_::Service_::Missing_.new ).
+            host_lacks_service_for_plugin host_metasvcs, i, plugin_metasvcs
+        end
+      end
+      err and raise Plugin::DeclarationError, err.message_function[]
+      nil
+    end
+  end
+
+  class Plugin::Metaservices_::Service_Used_
+
+    def initialize name_i, *rest
+      @normal = name_i
+      eat rest
+      @into_i ||= begin
+        @into_method = name_i
+        :instance_method
+      end
+    end
+
+    attr_reader :normal, :into_i
+
+    def into_method
+      @into_method
+    end
+
+  private
+
+    def eat rest
+      while rest.length.nonzero?
+        send EAT_H_[ rest.shift ], rest
+      end
+    end
+
+    EAT_H_ = Plugin::EAT_H_[ self,
+      ivar: :eat_ivar,
+      method: :eat_instance_method,
+      proxy: :eat_proxy
+    ]
+
+    def eat_ivar rest
+      @into_i = :ivar
+      @into_ivar = if rest.length.nonzero? and at? rest
+        rest.shift
+      else
+        :"@#{ @normal }"
+      end
+      nil
+    end
+
+    define_method :at?, & Plugin::AT_
+
+    def into_ivar
+      @into_ivar
+    end
+    public :into_ivar
+
+    def eat_instance_method rest
+      @into_method = rest.fetch( 0 ) ; rest.shift
+      @into_i = :instance_method
+      nil
+    end
+
+    def eat_proxy _
+      @into_i = :proxy
+      nil
+    end
+  end
+
+  # ~ facet 3 - eventpoints ~
+
+  class Plugin::Host::Conduit_
+
+    def eventpoints *x_a
+      @story.concat_eventpoints x_a
+      nil
+    end
+  end
+
+  class Plugin::Host::Metaservices_ < Plugin::Metaservices__
+
+    def self.concat_eventpoints x_a
+      epts = const! :EVENTPOINTS_ do Eventpoints_.new end
+      x_a.each do | (name_i, *rest_xa) |
+        epts.add name_i, Eventpoint_.new( name_i, * rest_xa )
+      end
+      nil
+    end
+
+    def self.eventpoints
+      self::EVENTPOINTS_
+    end
+
+    def self.fetch_eventpoint i
+      eventpoints.fetch i do
+        raise Plugin::DeclarationError, "undeclared eventpoint #{
+          }\"#{ i }\" for this plugin host story. declared evenpoints are #{
+          }(#{ eventpoints.names * ', ' })."
+      end
+    end
+
+    def eventpoints
+      self.class.eventpoints
+    end
+  end
+
+  class Plugin::Host::Metaservices_::Eventpoints_ < Box_
+  end
+
+  class Plugin::Host::Metaservices_::Eventpoint_
+
+    def initialize name_i
+      @normal = name_i
+    end
+
+    attr_reader :normal
+
+    def as_method_name
+      @as_method_name ||= :"receive_#{ @normal }_plugin_eventpoint"
+    end
+  end
+
+  module Plugin::Host::InstanceMethods_
+
+  private
+
+    def emit_eventpoint name_i, *a, &b
+      emit_customized_eventpoint name_i, -> _ { a }, &b
+    end
+
+    def emit_customized_eventpoint name_i, f, &b
+      ep = plugin_host_metaservices_class.fetch_eventpoint name_i
+      if has_hot_plugins
+        @hot_plugin_a.each do |pi|
+          b and bb = -> *aa do
+            b[ pi, *aa ]
+          end
+          pi.receive_plugin_eventpoint_notification ep, f[ pi ], &bb
+        end
+      end
+      nil
+    end
+  end
+
+  # --*--
+
+  class Plugin::Conduit_
+
+    def eventpoints_subscribed_to * x_a
+      @story.concat_eventpoints_subscribed_to x_a
+    end
+  end
+
+  class Plugin::Metaservices_
+
+    def self.concat_eventpoints_subscribed_to x_a
+      box = const! :EVENTPOINTS_SUBSCRIBED_TO_ do
+        add_facet :EVENTPOINTS_SUBSCRIBED_TO_
+        def self.eventpoints
+          const_get :EVENTPOINTS_SUBSCRIBED_TO_, false
+        end
+        Eventpoints_Subscribed_To_.new
+      end
+      x_a.each do | (name_i, *rest) |
+        box.add name_i, Eventpoint_Subscribed_To_.new( name_i, *rest )
+      end
+      nil
+    end
+
+    def subscribed_to_eventpoint? i
+      self.class.eventpoints.has? i
+    end
+  end
+
+  class Plugin::Metaservices_::Eventpoints_Subscribed_To_ < Box_
+
+    def receive_flush_notification kls
+      @a.each do |i|
+        kls.send :define_singleton_method, i do |*a, &b|
+          m = :"receive_#{ i }_plugin_eventpoint"
+          if a.length.zero?
+            define_method m, &b
+          else
+            b and raise DeclarationError, "can't have args and block here."
+            define_method m do |&bb|
+              bb[ * a ]
+            end
+          end
+        end
+      end
+    end
+
+    def receive_attachment_notification plugin, metasvcs
+      if (( miss_a = @a - metasvcs.eventpoints._a )).length.nonzero?
+        raise Plugin::DeclarationError, "unrecognized eventpoint(s) #{
+          }subscribed to by #{ plugin.class }. declare them? - #{
+          }(#{ miss_a * ', ' })"
+      end
+      nil
+    end
+  end
+
+  class Plugin::Metaservices_::Eventpoint_Subscribed_To_
+
+    def initialize normal_i
+      @normal = normal_i
+    end
+
+    attr_reader :normal
+  end
+
+  # ~ facet 4 - determining plugins ~
+
+  class Plugin::Host::Conduit_
+    def plugin_box_module x
+      @story.set_determiner :Plugins_Box_Module_, x
+      nil
+    end
+  end
+
+  class Plugin::Host::Metaservices_  # re-open
+
+    def self.set_determiner i, x
+      const_defined? :DETERMINER_I_, false and fail "determiner already set"
+      const_set :DETERMINER_I_, i
+      const_set :DETERMINER_X_, x
+      nil
+    end
+
+    def self.any_determiner_func_and_arg
+      if const_defined? :DETERMINER_I_, false
+        [ Plugin::Determiners_.const_get(
+            ( const_get :DETERMINER_I_, false ), false ),
+          ( const_get :DETERMINER_X_, false ) ]
+      end
+    end
+  end
+
+  module Plugin::Determiners_
+  end
+
+  Plugin::Determiners_::Plugins_Box_Module_ = -> host, box_f do
+    box = box_f.call
+    box.constants.each do |const|
+      mod = box.const_get const, false  # (below is pursuant to [#077])
+      host.attach_hot_plugin_with_name_function(
+        ( ::Class == mod.class ? mod : mod.const_get( :Client, false ) ).new,
+        Headless::Name::Function::From::Constant.new( const ) )
+    end
+  end
+
+  # ~ facet 5 - metastory ~
+
+  module Plugin
+    METASTORY_METHOD_ = -> do
+      self.class.class_exec( & Plugin::Metastory_::METHOD_ )
+    end
+  end
+
+  module Plugin::InstanceMethods_
+    define_method :plugin_metastory, & Plugin::METASTORY_METHOD_
+  end
+
+  module Plugin::Host::InstanceMethods_
+    define_method :plugin_metastory, & Plugin::METASTORY_METHOD_
   end
 end

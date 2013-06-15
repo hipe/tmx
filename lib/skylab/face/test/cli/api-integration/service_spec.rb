@@ -25,7 +25,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Service
           module API
             module Actions
               class Fiff < Face::API::Action
-                services [ :zap, :ingest ]
+                services [ :zap, :ivar ]
                 params :x
                 def execute
                   @zap.call @x
@@ -35,7 +35,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Service
 
             class Client < Face::API::Client
               Face::Services::Headless::Plugin::Host.enhance self do
-                service_names %i| zap |
+                services :zap
               end  # note that we do *not* use the plugin *proxy* dsl here
 
               def initialize
@@ -81,14 +81,14 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Service
               private :imogen
 
               Face::Services::Headless::Plugin::Host::Proxy.enhance self do
-                service_names %i| imogen |
+                services :imogen
               end
             end
           end
           module API
             module Actions
               class GleepBeep < Face::API::Action
-                services [ :imogen, :ingest ]
+                services [ :imogen, :ivar ]
                 def execute
                   @imogen.call
                 end
@@ -114,7 +114,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Service
         -> do
           invoke 'winkle-tankle'
         end.should raise_error(
-          Face::Services::Headless::Plugin::Service::NameError,
+          Face::Services::Headless::Plugin::DeclarationError,
             /has not declared the required services.+biffle.+baffle/
         )
       end

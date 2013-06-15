@@ -90,6 +90,8 @@ module Skylab::Face
       action
     end
 
+  private
+
     # `before_each_execution` - this experimental hack has obvious issues with
     # it, the same issues you run into when dealing with this in rspec
 
@@ -99,7 +101,6 @@ module Skylab::Face
       end
       nil
     end
-    private :before_each_execution
 
     def build_primordial_action i_a
       const_x = action_const_fetch i_a do |ne|
@@ -115,7 +116,6 @@ module Skylab::Face
         const_x.new
       end
     end
-    private :build_primordial_action  # called above only
 
     def action_const_fetch i_a, &oth
       _conf.if? :action_name_white_rx, -> x do
@@ -125,12 +125,11 @@ module Skylab::Face
       end
       api_actions_module.const_fetch i_a, &oth
     end
-    # (public for enhancements like verbosity.)
+    public :action_const_fetch   # (public for enhancements like verbosity.)
 
     def _conf
       @_conf ||= module_with_conf._conf
     end
-    private :_conf
 
     # we have what we'll call "neighbor modules" whom we need to be able to
     # access at runtime to reflect on, make decisions, and load things to run.
@@ -163,26 +162,29 @@ module Skylab::Face
       end
       nil
     end
-    private :handle_events  # called above only
 
     # `resolve_services` - [#fa-018] - result undefined. raises on falure.
 
     def resolve_services modal_services, action
       if action.respond_to?( :has_service_facet ) && action.has_service_facet
-        if modal_services && modal_services.has_api_plugin_services
-          addtl_svcs = modal_services.api_plugin_services
-        end
-        if addtl_svcs
-          chn = Services::Headless::Plugin::Host::Services::Chain.new(
-            [ addtl_svcs, plugin_services ], self.class )
-          action.resolve_services chn
-        else
-          action.resolve_services plugin_services
-        end
+        action.resolve_services get_metaservices_for( modal_services, action )
       end
       nil
     end
-    private :resolve_services  # called above only
+
+    def get_metaservices_for modal_services, action
+      if modal_services && modal_services.has_api_plugin_metaservices
+        a = [ modal_services.api_plugin_metaservices,
+              plugin_host_metaservices ]
+        Services::Headless::Plugin::CONST_BANG__[ action.class,
+          :Plugin_Metaservices_Chain_, -> do
+            Services::Headless::Plugin::Host::Metaservices_::Chain_.new(
+              a.map( & :class ) )
+          end ].new a
+      else
+        plugin_host_metaservices
+      end
+    end
 
     # `normalize` - :[#fa-019]: give the API action a chance to run
     # normalization (read: validation, internalization) hooks before
@@ -231,7 +233,6 @@ module Skylab::Face
         ac if y.count.zero?
       end
     end
-    private :normalize
 
 
     #                  ~ API client enhancement API ~            ( section 2 )

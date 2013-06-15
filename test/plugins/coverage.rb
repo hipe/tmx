@@ -4,12 +4,12 @@ module Skylab::Test
 
     Headless::Plugin.enhance self do
 
-      eventpoints %i|
+      eventpoints_subscribed_to( * %i|
         available_options
         subtree
-      |
+      | )
 
-      services :hot_subtree
+      services_used :hot_subtree
 
     end
 
@@ -33,7 +33,7 @@ module Skylab::Test
           break
         end
         mgr = Manager.instance
-        host.hot_subtree.children.each do |tre|
+        hot_subtree.children.each do |tre|
           if tre.children.to_a.length.nonzero?
             mgr.add_path y, tre.data.dir_pathname.to_s
           end

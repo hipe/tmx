@@ -50,9 +50,42 @@ module Skylab::CodeMolester::TestSupport::Config::Service
         c = M2::Client.new ; cfg = c.config
         pwd = ::Dir.pwd
         cfg.search_num_dirs.should eql( 3 )
-        cfg.search_start_pathname.should eql( pwd )
+        cfg.search_start_path.should eql( pwd )
         cfg.default_init_directory.should eql( pwd )
         cfg.filename.should eql( 'config' )
+      end
+    end
+
+    context "`search_search_path` vs. `get_search_start_pathname`" do
+      m = -> do
+        module M3
+          class Client
+            CodeMolester::Config::Service.enhance self do
+              search_start_path '/wizzo'
+            end
+          end
+        end
+        m = -> { }
+        nil
+      end
+      before :each do m[] end
+
+      let :cfg do
+        M3::Client.new.config
+      end
+
+      it "the one is derivative of the other" do
+        cfg.search_start_path.should eql( '/wizzo' )
+        cfg.get_search_start_pathname.join( 'pizzo' ).to_s.
+          should eql( '/wizzo/pizzo' )
+      end
+
+      it "the other is not memoized - set the one, changes the other" do
+        pn1 = cfg.get_search_start_pathname
+        cfg.search_start_path = '/foo'
+        pn2 = cfg.get_search_start_pathname
+        pn1.to_s.should eql( '/wizzo' )
+        pn2.to_s.should eql( '/foo' )
       end
     end
   end

@@ -4,6 +4,8 @@ module Skylab::CodeMolester
 
     # extend any class with services related to file-based config
 
+    Services::Basic::Field::Reflection[ self ]
+
     # ~ section 1 - the actual enhancing of your nerklette
 
     DSL = MetaHell::DSL_DSL::Constant_Trouble.
@@ -11,14 +13,20 @@ module Skylab::CodeMolester
       # field values stored in the below constants of its `Service` subclass
       # (called `Config_` and stored in the enhanced class itself.)
       new :Config_, self,
-        [ :search_start_pathname,
+        [ :through_method,
+          :in_ivar,
+          :search_start_path,
           :default_init_directory,
           :search_num_dirs,
           :filename
         ]  # (what this does is amazing)
 
 
-    SEARCH_START_PATHNAME_PROC_ = -> { ::Dir.pwd }
+    THROUGH_METHOD_VALUE_ = 'config'
+
+    IN_IVAR_VALUE_ = nil
+
+    SEARCH_START_PATH_PROC_ = -> { ::Dir.pwd }
 
     DEFAULT_INIT_DIRECTORY_PROC_ = -> { ::Dir.pwd }
 
@@ -35,27 +43,46 @@ module Skylab::CodeMolester
     end
 
     def self._enhance host, publc, blk
-      m = :config
-      host.method_defined? m and raise "won't clobber existing `#{ m }`"
       DSL.enhance host, blk
-      host.send :include, ( publc ? Host_IMs_Public_ : Host_IMs_Private )
+      c = host::Config_
+      m = c::THROUGH_METHOD_VALUE_
+      ivar = c::IN_IVAR_VALUE_ || :"@#{ m }"
+      host.method_defined?( m ) || host.private_method_defined?( m ) and
+        raise "won't clobber existing method - #{ m } of #{ host } #{
+          }(pick a different name with `through_method`?"
+      host.send :define_method, m do
+        instance_variable_defined?( ivar ) ?
+          instance_variable_get( ivar ) :
+          instance_variable_set( ivar, self.class::Config_.new )
+      end
+      publc or host.send :private, m
       nil
     end
 
-    Host_IMs_ = [ [ :config, -> do
-      @config ||= self.class::Config_.new
-    end ] ]
 
-    module Host_IMs_Public_
-      Host_IMs_.each do |m, f|
-        define_method m, &f
-      end
+    # ~ section 3 - public singleton methods ~
+
+    # implement our meta-API compatible with [#ba-020]
+
+    def self.dsl_fields
+      self::DSL::FIELD_A_
     end
 
-    module Host_IMs_Private_
-      Host_IMs_.each do |m, f|
-        define_method m, &f
-        private m
+    # ~ section 4 - let it act like a mini `API services node` ~
+
+    def [] i
+      respond_to?( i ) or raise "`#{ i }` is not part of the public API#{
+        }of #{ self.class }"
+      send i
+    end
+
+    # ~ section 5 - some business additional to the DSL declaration above ~
+
+    derived_fields do
+      def get_search_start_pathname
+        if (( p = search_start_path ))
+          ::Pathname.new p
+        end
       end
     end
   end
