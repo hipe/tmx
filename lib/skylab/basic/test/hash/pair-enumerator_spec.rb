@@ -24,9 +24,12 @@ module Skylab::Basic::TestSupport::Hash::Pair_Enumerator
                        ::Regexp.new( "\\Aodd\\ number\\ of\\ arguments" ) )
         end
       end
+    end
+    context "context 2" do
+      Sandbox_2 = Sandboxer.spawn
       it "`each_pair` as if it were a hash:" do
-        Sandbox_1.with self
-        module Sandbox_1
+        Sandbox_2.with self
+        module Sandbox_2
           ea = Basic::Hash::Pair_Enumerator.new [ :a, :b, :c, :d ]
           ::Hash[ ea.each_pair.to_a ].should eql( { a: :b, c: :d } )
         end

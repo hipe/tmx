@@ -10,6 +10,16 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     # subsequent snippet must have one non-code line preceding it,
     # by virtue of this grammar.
 
+    def is_not_empty
+      @snippet_a.length.nonzero?
+    end
+
+    def snippet_a
+      @snippet_a
+    end
+
+  private
+
     State_ = ::Struct.new :_name, :h
 
     -> do  # `initialize`
@@ -31,7 +41,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
         end
         ctx = nil
         shut = -> md do
-          _shut last_other, a, ctx
+          shut last_other, a, ctx
           last_other = md[:content]
           a = [ ]
           state = state_h.fetch :watching
@@ -54,45 +64,40 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
         end
         @flush = -> do
           if a.length.nonzero?
-            _shut last_other, a, ctx
+            shut last_other, a, ctx
           end
+          # (the outcome of `flush` is that @snippet_a is resolved.)
+          nil
         end
-        @a = [] ; @snitch = snitch
+        @snippet_a = [] ; @snitch = snitch
       end
     end.call
 
-    attr_reader :a
-
-    def _shut last_other, a, ctx
+    def shut last_other, a, ctx
       # strip trailing blank lines
       a.pop while a.length.nonzero? and a.last.length.zero?
       if a.length.nonzero?
         sn = Specer_::Block::Snippet_.new last_other, a, ctx
         if sn.validate @snitch
-          @a << sn
+          @snippet_a << sn
         end
       end
       nil
-    end
-    private :_shut
-
-    def is_not_empty
-      @a.length.nonzero?
     end
   end
 
   class Specer_::Block::Snippet_
 
     def initialize last_other, a, ctx
-      @last_other, @a, @context_x = last_other, a, ctx
+      @last_other, @line_a, @context_x = last_other, a, ctx
     end
 
-    attr_reader :last_other, :a
+    attr_reader :last_other, :line_a
 
     -> do  # `validate`
       sep_rx = /#{ ::Regexp.escape SEP }/
       define_method :validate do |snitch|
-        ln = @a.detect do |l|
+        ln = @line_a.detect do |l|
           sep_rx =~ l
         end
         if ln then true else
@@ -100,12 +105,12 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
           snitch.event :medium, Event_[ -> do
             "(warning (?) - code snippet without magic #{
               }separator #{ SEP.inspect }#{ loc_desc })"
-          end, @a ]
+          end, @line_a ]
           nil
         end
       end
     end.call
 
-    Event_ = ::Struct.new( :message_function, :lines )
+    Event_ = ::Struct.new :message_function, :lines
   end
 end

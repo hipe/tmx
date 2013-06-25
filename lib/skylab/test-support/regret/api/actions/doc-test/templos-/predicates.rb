@@ -1,42 +1,61 @@
 class Skylab::TestSupport::Regret::API::Actions::DocTest
 
-  module Templos_::Predicates
+  class Templos_::Predicates  # a box module and a class.
 
-    # whether or not the line was processed should not be isomorphic with
-    # whether or not any lines were outputted. hence the true-ish/false-ish
-    # ness of our result reflects whether we did or did not match,
-    # respectively.
-    #
-    # downwards because the nodes are for now private to this node, we
-    # can implement them as simple functions, and spare ourselves the
-    # cognitive overhead.
+    def << line
+      @add[ line ]
+      self
+    end
 
-    def self.lines y, line, &otherwise
-      idx = line.index SEP ; matched = nil
-      if idx  # magic separator hack: "# =>" becomes:
-        lef = line[ 0 .. idx - 1 ].strip
-        rig = line[ idx + SEP.length .. -1 ].strip
-        matched = constants.reduce nil do |_, i|
-          # ( module as switch statement [#ba-018] )
-          const_get( i, false ).call y, lef, rig and break true
+    def add line
+      @add[ line ]
+    end
+
+    def flush
+      @flush.call
+    end
+
+    def initialize altered_line=nil, unaltered_line=nil
+      altered_line ||= begin
+        a = [ ]
+        @flush = -> do
+          r = a ; a = [ ] ; r
         end
+        -> line { a << line ; false }
       end
-      if matched then matched else
-        otherwise.call
+      unaltered_line ||= altered_line
+      y = ::Enumerator::Yielder.new( & altered_line )
+      @add = -> line do
+        idx = line.index SEP ; matched = nil
+        if idx   # magic separator hack - "# =>" becomes:
+          lef = line[ 0 .. idx - 1 ].strip
+          rig = line[ idx + SEP.length .. -1 ].strip
+          matched = self.class.each.reduce nil do |_, p|
+            # module as switch statement [#ba-018]
+            p[ y, lef, rig ] and break true
+          end
+        end
+        matched or unaltered_line[ line ] && false
+      end
+    end
+
+    def self.each
+      if const_defined? :EACH_, true then const_get :EACH_, true else
+        const_set :EACH_, constants.map { |i| const_get i, false }.freeze  # !
       end
     end
   end
 
-  Templos_::Predicates::Should_Raise_ = -> do
+  Templos_::Predicates::SHOULD_RAISE_ = -> do
     # e.g "NoMethodError: undefined method `wat` .."
+    cnst = '[A-Z][A-Za-z0-9_]'
     hack_rx = /\A[ ]*
-      (?<const>[A-Z][A-Za-z0-9_]{6,}) [ ]* : [ ]*
+      (?<const> #{ cnst }*(?:::#{ cnst }*)* ) [ ]* : [ ]+
       (?:
-        (?<fullmsg> .+ [^.] \.?   ) |
+        (?<fullmsg> .+ [^.] \.? ) |
         (?: (?<msgfrag> .* [^. ] ) [ ]* \.{2,} )
       ) \z
     /x
-    # (the shortest ruby builtin exception class name is 7 chars long ick.)
 
     -> y, lef, rig do
       hack_rx.match rig do |md|
@@ -55,8 +74,8 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     end
   end.call
 
-  Templos_::Predicates::Should_Eql_ = -> y, lef, rig do
+  Templos_::Predicates::SHOULD_EQL_ = -> y, lef, rig do
     y << "#{ lef }.should eql( #{ rig } )"
-    true
+    true  # important
   end
 end

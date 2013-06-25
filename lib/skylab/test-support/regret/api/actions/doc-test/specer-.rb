@@ -22,7 +22,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
                        [ :bcode, :nbcode, :other ] ],
         blank: o[ /\G[[:space:]]*$/, [ :nbcode, :blank, :other ] ],
         other: o[ /\G(?:|(?<content>.+))$/, [ :nbcode, :blank, :other ]]
-      }
+      }.freeze
       # note in regexen above, use of '$' and not '\z' is intentional
 
       verbose_error = nil

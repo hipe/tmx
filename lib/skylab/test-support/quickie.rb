@@ -949,16 +949,27 @@ module Skylab::TestSupport::Quickie
 
   #                       ~ facet 3 - before hooks ~
 
+  Quickie::BEFORE_H_ = { each: :before_each, all: :before_all }.freeze
+
   class Quickie::Context
     def self.before i, &blk
-      :each == i or raise "sorry - in the interest of simplicity, quickie #{
-        }does not support before(#{ i.inspect }) blocks (can you make do #{
-        }with :each and a clever use of procs?)"
+      send Quickie::BEFORE_H_[ i ], blk
+    end
+    def self.before_each blk
       const_defined?( :BEFORE_EACH_PROC_ ) and raise "sorry - in the #{
         }intereset of simplicity there is not yet support for nested #{
-        }before(:each) blocks.."
+        }before( :each | :all ) blocks.."
       const_set :BEFORE_EACH_PROC_, blk
       nil
+    end
+    def self.before_all blk
+      before_each -> do
+        if blk
+          blk.call
+          blk = nil  # so dirty yet so pure
+        end
+        nil
+      end
     end
   end
 

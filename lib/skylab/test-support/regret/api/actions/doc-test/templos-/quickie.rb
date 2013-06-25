@@ -3,37 +3,46 @@ module Skylab::TestSupport::Regret::API
   class Actions::DocTest::Templos_::Quickie < API::Support::Templo_
 
     def initialize base_mod, c_a, b_a
-      ctxt = tstt =
+      ctxt = tstt = beft =
         rtma = rbma = rlma = nil  # memoize articulators just for the snarks
 
-      render_lines = -> snp do
-        y = ( rlma ||= begin
-          mgn = tstt.first_margin_for :code
-          mgn =~ /\A[ ]+\z/ or fail "sanity - clean margin? #{ mgn.inspect }"
-          Basic::List::Marginated::Articulation.new do
-            any_subsequent_items -> s do
-              if s.length.zero? then "\n" else
-                "\n#{ mgn }#{ s }"  # don't add trailing spaces
-              end
+      rlma = MetaHell::FUN.memoize[ -> do
+        mgn = tstt.first_margin_for :code
+        mgn =~ /\A[ ]+\z/ or fail "sanity - clean margin? #{ mgn.inspect }"
+        Basic::List::Marginated::Articulation.new do
+          any_subsequent_items -> s do
+            if s.length.zero? then "\n" else
+              "\n#{ mgn }#{ s }"  # don't add trailing spaces
             end
           end
-        end )
-        snp.a.each do |line|
-          Actions::DocTest::Templos_::Predicates.lines y, line do
-            y << line
-          end
         end
-        y.flush
+      end ]
+
+      render_before = -> befor, cnum do
+        beft[
+          context_num: cnum,
+          code: befor.indented_code_string
+        ].chomp
       end
+
+      render_example = -> example, cnum do
+        tstt[
+          context_num: cnum,
+          dsc: example.quoted_description_string,
+          code: example.indented_code_string
+        ].chomp
+      end
+
+      template_h = {
+        before: render_before,
+        example: render_example
+      }
 
       render_tests = -> blk, cnum do
         y = ( rtma ||= Basic::List::Marginated::Articulation.new "\n" )
-        blk.a.each do |snp|
-          y << tstt[
-            context_num: cnum,
-            dsc: ( snp.last_other || "test #{ y.count + 1 }" ).inspect,
-            code: render_lines[ snp ]
-          ].chomp
+        part_a = self.class::Context_::Part_.resolve_parts blk, rlma
+        part_a.each do |part|
+          y << template_h.fetch( part.template_i )[ part, cnum ]
         end
         y.flush
       end
@@ -52,7 +61,7 @@ module Skylab::TestSupport::Regret::API
       end
 
       @render_to = -> io do
-        baset, ctxt, tstt = get_templates :_base, :_ctx, :_tst
+        baset, ctxt, tstt, beft = get_templates :_base, :_ctx, :_tst, :_bef
         c_a.length < 2 and fail "sanity - hard-coded for deep paths, #{
           }we need at least 2 elements in this path for the hacking #{
           }to work - #{ c_a * '::' }"

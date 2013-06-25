@@ -6,6 +6,7 @@ module Skylab::TestSupport::Regret::API
   Headless = ::Skylab::Headless
   MetaHell = Face::MetaHell
   Face::API[ self ]
+  EMPTY_A_ = [].freeze
 
   action_name_white_rx( /[a-z0-9]$/ )
 

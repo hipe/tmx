@@ -9,7 +9,7 @@ module Skylab::Basic
     # argument error raisal:
     #
     #     Basic::Hash::Pair_Enumerator.new( [ :a, :b, :c ] ) # => ArgumentError: odd number of arguments..
-    #
+
     # so do it right, and you can iterate over those elements using
     # `each_pair` as if it were a hash:
     #
