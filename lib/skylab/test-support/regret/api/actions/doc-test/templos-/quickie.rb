@@ -2,7 +2,16 @@ module Skylab::TestSupport::Regret::API
 
   class Actions::DocTest::Templos_::Quickie < API::Support::Templo_
 
-    def initialize base_mod, c_a, b_a
+    OPTION_A_ = [
+      [ :cover, -> { @cover = nil }, -> { @cover = true ; true },
+        -> y { y << "adds coverage hack to the end"
+               y << "of the `describe` block" } ],
+      [ :help, -> { }, -> { show_option_help ; nil },
+       -> y { y << 'this screen.' } ] ]
+
+    def initialize snitch, base_mod, c_a, b_a
+      @snitch = snitch
+
       ctxt = tstt = beft =
         rtma = rbma = rlma = nil  # memoize articulators just for the snarks
 
@@ -75,16 +84,24 @@ module Skylab::TestSupport::Regret::API
           }to work - #{ c_a * '::' }"
         acon = c_a.fetch 0
         amod  = [ base_mod.to_s, acon ].join( '::' )
-        bmod = if 2 == c_a.length then '' else
+        bmod = if 2 == c_a.length then nil else
                  "::#{ c_a[ 1 .. -2 ] * '::' }"
                end
         cmod = "#{ c_a.fetch( -1 ) }"
         body = render_body[]
         io.write baset.call( amod: amod, bmod: bmod, cmod: cmod, body: body,
+                             cover: render_cover( acon, bmod, cmod ),
                              acon: acon )
-        nil
+        true
       end
       nil
+    end
+
+    def render_cover *mods
+      if @cover
+        mod = mods.compact.join '::'
+        get_template( :_cover )[ mod: mod ].chomp
+      end
     end
   end
 end

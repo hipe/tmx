@@ -27,25 +27,29 @@ module Skylab::TestSupport::Regret::API
              [ :err, :ingest ],
              [ :pth, :ingest ]
 
-    params :path, API::Conf::Verbosity[ self ].param( :vtuple )
+    params :path, [ :template_options, :arity, :zero_or_one ],
+      API::Conf::Verbosity[ self ].param( :vtuple )
 
     def execute
       sn = @vtuple.make_snitch @err
       bs = DocTest::Comment_::Block::Scanner[ sn, ::File.open( @path, 'r' ) ]
       sp = DocTest::Specer_.new sn, @out, :quickie, @path
-      while cblock = bs.gets
-        cblock.describe_to @err if @vtuple.do_murmur
-        if cblock.does_look_testy
-          sp.accept cblock
+      -> do
+        sp.set_template_options @template_options or break( false )
+        while cblock = bs.gets
+          cblock.describe_to @err if @vtuple.do_murmur
+          if cblock.does_look_testy
+            sp.accept cblock
+          end
         end
-      end
-      sp.flush
-      if @vtuple.do_medium
-        sn.puts "finished generated output for #{ @path }"
-      elsif @vtuple.do_notice
-        sn.puts 'done.'
-      end
-      nil
+        r = sp.flush or break r
+        if @vtuple.do_medium
+          sn.puts "finished generated output for #{ @path }"
+        elsif @vtuple.do_notice
+          sn.puts 'done.'
+        end
+        nil
+      end.call
     end
 
     # this mess is used by our many children, we have a bit of a branch node

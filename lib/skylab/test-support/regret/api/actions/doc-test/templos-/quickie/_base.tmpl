@@ -13,6 +13,6 @@ module {{ amod }}::TestSupport{{ bmod }}::{{ cmod }}
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
   describe "{{ amod }}{{ bmod }}::{{ cmod }}" do
-{{ body }}
+{{ body }}{{ cover }}
   end
 end

@@ -6,6 +6,7 @@ module Skylab::TestSupport::Regret::CLI
   class Regret::CLI::Client < Face::CLI
 
     Regret::API::Conf::Verbosity[ self ]
+
     def initialize( * )
       super
       @param_h = { }
@@ -13,10 +14,13 @@ module Skylab::TestSupport::Regret::CLI
       nil
     end
 
-    use :hi, :api, [ :last_hot, :as, :command ]
+    use :hi, [ :api, :as, :face_api ], [ :last_hot, :as, :command ]
 
     option_parser do |o|
       o.separator "#{ hi 'description:' } try it on a file"
+      o.on '-t', '--template-option <x>', 'template option (try "help")' do |x|
+        ( @param_h[:template_options] ||= [ ] ) << x
+      end
       o.on '-v', '--verbose', 'verbose. (try mutliple.)', & verbosity_opt_func
       o.on '-V', '--less-verbose', 'reduce verbosity.', &
         deincrement_verbosity_opt_func
@@ -47,7 +51,7 @@ module Skylab::TestSupport::Regret::CLI
         deincrement_verbosity_opt_func
 
       o.on '-n', '--dry-run', 'dry-run.' do
-        @param_h[:is_dry_run] =true
+        @param_h[:is_dry_run] = true
       end
 
       o.banner = command.usage_line
@@ -73,6 +77,15 @@ module Skylab::TestSupport::Regret::CLI
     def invitation
       @mechanics.invite_for @y, @mechanics.last_hot_recursive
       nil
+    end
+
+    def api *a
+      r = face_api( *a )
+      if false == r
+        @mechanics.invite_for @y, @mechanics.last_hot
+        r = nil
+      end
+      r
     end
 
     Face::Services::Headless::Plugin::Host::Proxy.enhance self do  # at end

@@ -1949,8 +1949,10 @@ module Skylab::Face
     # methods added. in theory it has no functional effect, it is just to make
     # debugging easier by gathering less data (and is a micronic optimisation.)
 
-      def dsl_off  # #see
-        @story._scooper.dsl_off  # we do it a greasier way than we need to.
+      def dsl_off &blk  # #see
+        if block_given? then with_dsl_off( &blk ) else
+          @story._scooper.dsl_off  # we do it a greasier way than we need to.
+        end
       end
     end
   end

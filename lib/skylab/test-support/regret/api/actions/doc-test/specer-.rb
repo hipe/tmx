@@ -120,8 +120,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
       begin
         t = resolve_templo or break
         t.render_to @out
-      end while nil
-      nil
+      end.call
     end
 
   private  # all narrative-esque
@@ -137,7 +136,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
         c_a = resolve_c_a or break
         tconst = MetaHell::Boxxy::FUN.
           fuzzy_const_get[ DocTest::Templos_, @tmpl_i ]
-        tconst.begin @base_mod, c_a, @block_a
+        tconst.begin @snitch, @base_mod, c_a, @block_a
       end.call
     end
 
