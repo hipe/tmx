@@ -2,7 +2,7 @@ module Skylab::CovTree
 
   module API::Events  # #stowaway - avoiding #orphan
 
-    extend MetaHell::Boxxy  # events box modules are almost always boxified
+    MetaHell::Boxxy[ self ]  # events box modules are almost always boxified
 
     Structural = PubSub::Event::Factory::Structural.new 5  # `structural`
 

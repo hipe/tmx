@@ -92,7 +92,7 @@ module Skylab::Headless::CLI::Table
   end
 
   module Table::Events
-    extend MetaHell::Boxxy  # this gives us `const_fetch`
+    MetaHell::Boxxy[ self ]  # this gives us `const_fetch`
   end
 
   module Table::Events::Datapoint
@@ -202,18 +202,18 @@ module Skylab::Headless::CLI::Table
 
     param_h_h = {
       align: -> v { @align = v },
-      ancestor: -> v { @ancestor_symbol = v },
+      ancestor: -> v { @ancestor_i = v },
       render: -> v { @render = v },
       rx: -> v { @rx = v }
     }
 
     define_method :initialize do |symbol, param_h|
       @symbol = symbol
-      @ancestor_symbol = nil
+      @ancestor_i = nil
       param_h.each do |k, v|
         instance_exec v, & param_h_h.fetch( k )
       end
-      @ancestor = (Table::Cels.const_fetch @ancestor_symbol if @ancestor_symbol)
+      @ancestor = ( Table::Cels.const_fetch @ancestor_i if @ancestor_i )
       freeze
     end
 
@@ -243,7 +243,7 @@ module Skylab::Headless::CLI::Table
 
   module Table::Cels
 
-    extend MetaHell::Boxxy
+    MetaHell::Boxxy[ self ]
 
     parse_styles   = Headless::CLI::FUN.parse_styles
     unparse_styles = Headless::CLI::FUN.unparse_styles

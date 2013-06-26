@@ -2,7 +2,7 @@ module Skylab::TanMan
 
   class CLI::Action::Box < CLI::Action
 
-    # extend MetaHell::Boxxy::ModuleMethods when we need it it is here
+    # MetaHell::Boxxy[ self ]::ModuleMethods when we need it it is here
 
     include Headless::CLI::Box::InstanceMethods
 

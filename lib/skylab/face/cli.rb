@@ -1178,27 +1178,27 @@ module Skylab::Face
     end
   end
 
-  #  ~ facet 4.2 - a related narrative about `anchorized_last` etc ~
+  #  ~ facet 4.2 - a related narrative about `anchored_last` etc ~
 
   class NS_Mechanics_                          # #re-open for facet 4.2
-    def anchorized_last                        # #in-narrative
-      last_hot_recursive.anchorized_name
+    def anchored_last                        # #in-narrative
+      last_hot_recursive.anchored_name
     end
   end
   class Command
-    def anchorized_last                        # when @last_hot is command
-      anchorized_name
+    def anchored_last                        # when @last_hot is command
+      anchored_name
     end
-    def anchorized_name
-      @anchorized_name ||= get_anchorized_name.freeze
+    def anchored_name
+      @anchored_name ||= get_anchored_name.freeze
     end
-    def get_anchorized_name                    # #in-narrative
-      parent_services.get_anchorized_name << name.local_normal
+    def get_anchored_name                    # #in-narrative
+      parent_services.get_anchored_name << name.local_normal
     end
   end
   class CLI_Mechanics_                         # #re-open for facet 4.2
-    undef_method :anchorized_last              # this is only ever for childs
-    def get_anchorized_name                    # #in-narrative, for
+    undef_method :anchored_last              # this is only ever for childs
+    def get_anchored_name                    # #in-narrative, for
       [ ]                                      # resolving an action's name.
     end
   end

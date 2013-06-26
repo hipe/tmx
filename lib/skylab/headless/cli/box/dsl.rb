@@ -56,7 +56,6 @@ module Skylab::Headless
         box = self
         box_mod = const_set :Actions, ::Module.new
         box_mod.module_exec do
-          extend MetaHell::Boxxy::ModuleMethods
           include CLI::Box::InstanceMethods
           @tug_class = MAARS::Tug
           if box.dir_pathname  # see extensive note above about all this noise
@@ -65,8 +64,7 @@ module Skylab::Headless
             @dir_pathname = false  # tells a.l not to try to induce our path
             box.dir_pathname_waitlist :Actions, self
           end
-          init_boxxy nil   # (but no matter what, don't leave dir path nil
-                           # when you send no caller_str up this chain.)
+          MetaHell::Boxxy[ self ]
           self
         end
         box_mod

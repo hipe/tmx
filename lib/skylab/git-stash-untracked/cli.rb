@@ -427,7 +427,7 @@ module Skylab::GitStashUntracked
   #                               --*--
 
   module API::Actions
-    extend MetaHell::Boxxy                     # (`const_fetch`)
+    MetaHell::Boxxy[ self ]                     # (`const_fetch`)
   end
 
   class API::Actions::Save < API::Action

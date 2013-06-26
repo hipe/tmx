@@ -15,7 +15,7 @@ module Skylab::MyTree
   module API
     extend MetaHell::Autoloader::Autovivifying::Recursive
     module Actions
-      extend MetaHell::Boxxy
+      MetaHell::Boxxy[ self ]
     end
   end
 end

@@ -7,7 +7,7 @@ module Skylab
 
   module TMX::Modules::Bleed::API
     module Actions
-      extend MetaHell::Boxxy
+      MetaHell::Boxxy[ self ]
     end
   end
 

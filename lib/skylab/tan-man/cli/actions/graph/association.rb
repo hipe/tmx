@@ -2,7 +2,7 @@ module Skylab::TanMan
 
   module CLI::Actions::Graph::Association::Actions
 
-    extend MetaHell::Boxxy
+    MetaHell::Boxxy[ self ]
 
   end
 

@@ -46,7 +46,7 @@ module Skylab::TanMan::TestSupport::CLI
 
     modul :Actions do
       @dir_pathname = :nope
-      extend MetaHell::Boxxy
+      MetaHell::Boxxy[ self ]
     end
 
     event_struct = ::Struct.new :message

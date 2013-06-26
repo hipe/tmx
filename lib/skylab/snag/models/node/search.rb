@@ -53,7 +53,7 @@ module Skylab::Snag
   protected
 
     module Query_Nodes_
-      extend MetaHell::Boxxy
+      MetaHell::Boxxy[ self ]
       def self.new_valid request_client, query_sexp
         klass = const_fetch query_sexp.first
         klass.new_valid request_client, query_sexp

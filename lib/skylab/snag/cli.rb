@@ -269,6 +269,6 @@ module Skylab::Snag
   end
 
   module CLI::Actions             # avoiding an #orphan sorry
-    extend MetaHell::Boxxy        # (it's as if we are wiring an autoloader)
+    MetaHell::Boxxy[ self ]        # (it's as if we are wiring an autoloader)
   end                             # also BOXXY IS QUEEN
 end

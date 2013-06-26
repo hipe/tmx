@@ -8,6 +8,11 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
       nil
     end
 
+    def set_template_options option_a
+      @templo_opt_a = option_a
+      true
+    end
+
     # this is the first line of a comment block, to become a context desc:
     # this second line of the comment block you will not see.
     # this third line will become the desc for this example:
@@ -117,8 +122,9 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     end.call
 
     def flush
-      begin
-        t = resolve_templo or break
+      -> do
+        t = resolve_templo or break t
+        r = t.set_options( @templo_opt_a ) or break r
         t.render_to @out
       end.call
     end

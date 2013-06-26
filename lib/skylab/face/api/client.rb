@@ -36,7 +36,7 @@ module Skylab::Face
           end
 
           puff[ self, :Actions, -> { ::Module.new }, -> do
-            respond_to? :const_fetch or extend MetaHell::Boxxy
+            respond_to? :const_fetch or MetaHell::Boxxy[ self ]
           end ]
         end ]
         nil
@@ -102,12 +102,12 @@ module Skylab::Face
     private :before_each_execution
 
     def build_primordial_action i_a
-      const_x = action_const_fetch i_a do |x|
-        raise "isomorphic API action resolution failed - for token #{
-          }\"#{ x.name }\" there is no corresponding module `#{ x.const }` #{
-          }in the module #{ x.module }"  # we could keep it granulated but
-          # this is a hard error. you are not supposed to recover from it.
-          # we articulate it like this just for courtesy towards the dev.
+      const_x = action_const_fetch i_a do |ne|
+        raise "isomorphic API action resolution failed - there is no #{
+          }constant that isomorphs with \"#{ ne.name }\" of the constants #{
+          }of #{ ne.module }"  # we could keep it granulated but this is a
+          # hard error. you are not supposed to recover from it. we
+          # articulate it like this just for dev courtesy
       end
       if const_x.respond_to? :call
         API::Action.const_get( :Proc, false )[ const_x ]
@@ -144,7 +144,7 @@ module Skylab::Face
 
       private_module_autovivifier_reader :api_actions_module, '../Actions',
       -> { ::Module.new },           # if it didn't exist, make it!
-      -> { extend MetaHell::Boxxy }  # sketchily enhance it no matter what
+      -> { MetaHell::Boxxy[ self ] }  # sketchily enhance it no matter what
                                      # uh-oh, this is duplicated above..
 
    end

@@ -2,390 +2,537 @@ module Skylab::MetaHell
 
   module Boxxy
 
-    # Boxxy is an #experiment in turning an ordinary module into a "smart"
-    # module that is used a "Box" that holds, retrieves and reflection
-    # on the modules it has (or might have!) to this end.
+    # Boxxy is an #experiment that turns an ordinary module into a "smart"
+    # module with enhanced behavior. When we have a module that is used solely
+    # to hold other constants (e.g sub-modules or arbitrary other values),
+    # we can leverage the module's behavior as an ordered set and augment it
+    # with things like inflection awareness, autoloading awareness, filesystem
+    # peeking..
     #
-    # When there is a module that is used soley as a container to hold
-    # other modules, we can leverage its behavior as an ordered set,
-    # and augment it with things like inflection awareness,
-    # autoloading awareness, filesystem peeking of same, etc
+    # the boxxy module can reflect on its sub-constants that are not yet
+    # loaded but "probably" exist (given `isomorphic file location` [#029]).
+    # the boxxy module can resolve a sub-constant given a name with a variety
+    # of naming schemes to achieve what amounts to fuzzy matching.
+    #
+    # the comments in this document provide comprehensive documentation
+    # for Boxxys's behavior.
 
-    def self.extended mod
-      if ! mod.respond_to? :const_fetch  # make it safely re-affirmable ..
-        # (the above thinking could be broken out into smaller pieces..)
-        mod.module_exec do
-          extend Boxxy::ModuleMethods
-          @tug_class = MetaHell::Autoloader::Autovivifying::Recursive::Tug  # [#mh-031]
-          init_boxxy caller[2]
+    # your boxxy module gets `const_fetch`. you can get the value of a const:
+    #
+    # we create a module with a variety of constants assigned under it.
+    # we can use `const_fetch` to get the value of a const
+    # stored with a simple, conventional name via a lowercase symbol:
+    #
+    #     module Adapters
+    #
+    #       MetaHell::Boxxy[ self ]
+    #
+    #       module Foo
+    #       end
+    #
+    #       module BarBaz
+    #       end
+    #
+    #       BONGO_TONGO = :fiz
+    #     end
+    #
+    #     Adapters.const_fetch( :foo ) # => Adapters::Foo
+    #
+    # the same effect is achieved
+    # by passing it an array of (one) symbol name(s):
+    #
+    #     Adapters.const_fetch( [ :foo ] ) # => Adapters::Foo
+    #
+    # get a compound camel-case const via a `normalized`-looking symbol:
+    #
+    #     Adapters.const_fetch( :bar_baz )  # => Adapters::BarBaz
+    #
+    # you can use dashes in the name:
+    #
+    #     Adapters.const_fetch( 'bar-baz' )  # => Adapters::BarBaz
+    #
+    # or spaces:
+    #
+    #     Adapters.const_fetch( 'bar baz' )  # => Adapters::BarBaz
+    #
+    # wow amazing, it still reolves the name even if it is in all caps:
+    #
+    #     Adapters.const_fetch( :'bongo-tongo' ) # => :fiz
+    #
+
+    # (this spot, file is the poster-child for [#mh-033] context desc. lines.)
+
+    def self.enhance mod, &blk
+      mod.module_exec do
+        @boxxy ||= begin
+          boxxy = Boxxy_.new self
+          blk and boxxy._absorb_block blk
+          boxxy._init_autoloader
+          boxxy
         end
       end
       nil
     end
-  end
 
-  Boxxy::FUN = -> do
-
-    o = { } ; fun = nil
-
-    o[:normulate] = -> const do   # normulating, different from normifying, is
-      const.to_s.gsub(/[^a-z0-9]+/i, '').downcase  # a lossier operation used in
-    end                           # case- and name-function insensitive fuzzy
-                                  # matching. everyone knows about normulating
-    blk_rx = /([^-_a-z0-9]+)/i
-    wht_rx = /\A[a-z][-_a-z0-9]*\z/i
-
-    # experimental alternative, for when you want fuzzy loading from the
-    # outside. might go into a rewrite of `const_fetch` #todo
-
-    o[:fuzzy_const_get] = -> modul, x do
-      o[:fuzzy_const_get_tuple][ modul, x ].fetch 0
+    class << self
+      alias_method :[], :enhance
     end
 
-    o[:fuzzy_const_get_tuple] = -> mod, x do
-      if blk_rx =~ x then raise ::NameError, "invalid chars - #{ $~[1] }"
-      elsif wht_rx !~ x then raise ::NameError, "invalid name - #{ x }"
-      else
-        orig_a = mod.constants ; tgt = fun.normulate[ x ]
-        idx = orig_a.index { |cnst| tgt == fun.normulate[ cnst ] }
-        tuple = nil ; res = -> i do
-          tuple = [ mod.const_get( i, false ), i ]
-        end
-        begin
-          idx and break res[ orig_a.fetch idx ]
-          mod.respond_to?( :dir_pathname ) && mod.dir_pathname or break res[ x ]
-          try1 = MetaHell::Services::Headless::Name::FUN.constantify[ x ].intern
-          tug = MetaHell::Autoloader::Autovivifying::Recursive::Tug.new try1,
-            mod.dir_pathname, mod
-          correction = -> do
-            new_a = mod.constants - orig_a
-            idx = new_a.index do |cnst|
-              tgt == fun.normulate[ cnst ]
-            end
-            idx or raise Boxxy::NameNotFoundError.new const: x, module: mod,
-              message: "coudn't find \"#{ x }\" in #{ mod }. did #{
-              }you mean one of:(#{ new_a * ' ' })?", seen_a: new_a
-            crct = new_a.fetch idx
-            if try1 != crct
-              tug.instance_variable_set :@const, crct  # confers familiarity
-            end
+    class Boxxy_
+      def initialize mod
+        @mod = mod
+        mod.module_exec do
+          class << self
+            alias_method :boxxy_original_constants, :constants
           end
-          tug.send :load, -> { correction[] }
-          res[ tug.const ]
-        end while nil
-        tuple
+          extend ModuleMethods_
+        end
+        nil
       end
     end
 
-    fun = ::Struct.new(* o.keys ).new ; o.each { |k, v| fun[k] = v }; fun.freeze
-  end.call
-
-  module Boxxy::ModuleMethods  # (note that while presently this is coupled
-    # tighly with ::Module it won't necessarily remain that way - we might
-    # one day break parts of it out somehow possibly into an external
-    # controller or something)
-
-    include Autoloader_::Methods  # (making Boxxy an extension of a.l is
-      # convenient but not without its cost .. tracked (quietly) at [#mh-022])
-
-    #         ~ starting at the beginning - `const_fetch` ~
-
-    constantify = inval = valid_const_rx = resolve = nil  # scope
-
-    define_method :const_fetch do |path_a, not_found=nil, invalid=not_found, &b|
-      raise ::ArgumentError, "can't have block + lambdas" if b && not_found
-      path_a = [ path_a ] unless ::Array === path_a
-      seen_a = [ ]
-      path_a.reduce self do |box, name|
-        break inval[ name, (invalid || b) ] if valid_name_rx !~ name.to_s
-        const = constantify[ name ].intern
-        break inval[ const, (invalid || b) ] if valid_const_rx !~ const.to_s
-        bx = resolve[ box, const ]
-        if bx then bx else
-          f = not_found || b || -> e { raise e }
-          args = []
-          if f.arity.nonzero?
-            args << Boxxy::NameNotFoundError.exception(
-              message: "uninitialized constant #{ box }::#{ const }",
-              const: const, module: box, name: name, seen_a: seen_a
-            )
-          end
-          break f[* args ]
+    module ModuleMethods_
+      def const_fetch path_x, otherwise=nil, &blk
+        if blk
+          otherwise and raise ::ArgumentError, "too much proc"
+          otherwise = blk
         end
+        Fuzzy_const_get_name_and_value_recursive_[
+          self, [ * path_x ], otherwise ].last
       end
     end
 
-    # `names` iterate over each constant with a name function
-    #  NOTE this uses flyweighting (only 1 name function).
-    #  you can map(&:dupe) if you need many objects
+    # `FUN.fuzzy_const_get` is supposed to work on any module:
+    # here is one that has three layers of depth, and we use a whacky name:
+    #
+    #     module Foo
+    #       module BarBaz
+    #         module Biffo_Blammo
+    #           WIZ_BANG = :wow
+    #         end
+    #       end
+    #     end
+    #
+    #     MetaHell::Boxxy::FUN.fuzzy_const_get[ Foo,
+    #       [ :'bar-baz', 'bIFFO bLAMMO', :wiz_bang ] ]  # => :wow
+    #
 
-    -> do
-      fly = build_fly = nil
-      define_method :names do
-        fly ||= build_fly[]
-        ::Enumerator.new do |y|
-          constants.each do |const|
-            fly.replace const
-            y << fly
-          end
-        end
-      end
+    fun = { }
 
-      build_fly_class = nil
+    distill = -> do
 
-      build_fly = -> do
-        build_fly_class[] if build_fly_class
-        Boxxy::Name.new
-      end
+      # different than `normify` and `normize`, this is a simple, lossy and
+      # fast(er) operation that produces an internal distillation of a name
+      # for use in e.g fuzzy (case-insensitive) matching.
 
-      build_fly_class = -> do
-        class Boxxy::Name <
-          MetaHell::Services::Headless::Name::Function::From::Constant
-
-          def dupe
-            ba = base_args
-            self.class.allocate.instance_exec do
-              base_init(* ba )
-              self
-            end
-          end
-
-          alias_method :replace, :initialize  # STFU
-          public :replace
-
-          def initialize
-          end
-        end
-        build_fly_class = nil
+      black_rx = /[ _-]+/  # [#bm-002]
+      -> x do
+        x.to_s.gsub( black_rx, '' ).downcase.intern
       end
     end.call
 
-  protected
-
-    #         ~ (support for `const_fetch` in pre-order-ish) ~
-
-    def valid_name_rx             # a hook for a custom validation rx, e.g
-      @valid_name_rx ||= /\A[-_a-z]+\z/i
-    end
-
-    fun = MetaHell::Services::Headless::Name::FUN
-
-    constantify = fun.constantify              # (used above and below)
-
-    inval = -> name, f do
-      o = Boxxy::InvalidNameError.new "wrong constant name #{ name }", name
-      f ||= -> e { raise e }
-      f[ o ]
-    end
-
-    valid_const_rx = /\A[A-Z][_a-zA-Z0-9]*\z/  # `valid_name_rx` is fallible
-
-    normulate = Boxxy::FUN.normulate
-
-    resolve = -> box, const do
-      if box.const_defined? const, false
-        getme = const
-      else
-        mini = normulate[ const ]
-        m = :boxxy_original_constants
-        cfunc = box.method( box.respond_to?( m ) ? m : :constants ) ; m = nil
-        exist_a = cfunc.call
-        cnst = exist_a.detect { |c| mini == normulate[ c ] }
-        if cnst                   # then we found existing w/ a diff. casing
-          getme = cnst
-        elsif box.respond_to? :const_tug
-          tug = box.const_tug const  # just prod the f.s with a tug
-          if tug.probably_loadable?
-            tug.load -> do
-              exist_b = cfunc.call
-              cn = ( exist_b - exist_a ).detect { |c| mini == normulate[ c ] }
-              if ! cn || cn == const then getme = const else
-                # then we loaded a file and the const in it is of diff. casing
-                tug.instance_variable_set :@const, cn  # WONDERHACK
-                getme = cn
-              end
-            end
-            if ! getme # THEN const was probably loadable and load did not fail
-              if box.const_defined? const, false  # but getme was not set in
-                getme = const  # the block above SO **it autovified** omgz
-              end
-            end
+    get_correction_during_tug = -> tug do
+      res = nil ; mod = tug.mod ; const = tug.const
+      is_boxxified = mod.respond_to? :boxxy_original_constants
+      consts = is_boxxified ?
+        -> { mod.boxxy_original_constants } : -> { mod.constants }
+      befor = consts[ ]
+      tug.load( -> do
+        cnst = distill[ const ]
+        ( consts[ ] - befor ).each do |correct_i|
+          if cnst == distill[ correct_i ] && const != correct_i
+            res = correct_i
+            mod._boxxy.correction_notification const, correct_i if is_boxxified
+            tug.correction_notification correct_i
+            break
           end
         end
+      end )
+      res
+    end
+
+    Load_guess_ = -> box, guess do
+      if ! box.const_defined? guess, false and box.respond_to? :const_tug
+        c = box.tug_class
+        tug = c.new guess.intern, box.dir_pathname, box
+        correction = get_correction_during_tug[ tug ]
+        correction and guess = correction
       end
-      box.const_get getme, false if getme
+      box.const_defined?( guess, false ) and guess
     end
 
-    # -- that is how that story goes
-
-    #         ~ `constants` and the social contract ~
-
-    # `constants` - Boxxy does a thing here we will call "optimistic
-    # constant inference" which is a hack that says "if you follow these
-    # rules, you won't have to load a million files to know that you have
-    # these million constants with these million names under this constant."
-    # You can probably guess how it works. This is the part of the social
-    # contract that holds this whole society together.
-                                  # (see `each`)
-    def boxxy_constants           # (this gets swapped in for `constants`)
-      @boxxy_is_hot or hit_fs     # (and feels really sketchy but seems
-      @const_a.dup                # to work ok)
-    end
-
-    public :boxxy_constants       # (yes it's nec. even w/ what we do with it)
-
-    #         ~ (support for `boxxy_constanta` in pre-order-ish) ~
-
-    leaf_or_branch_rx = nil  # scope
-
-    define_method :hit_fs do
-      exist_a = boxxy_original_constants       # because we care
-      if @dir_pathname && @dir_pathname.exist?  # assume a.l and is initted
-        # ::Dir.glob( "#{ dir_pathname }/*.rb" ) was neat, but we want more_a
-        seen_h = ::Hash[ exist_a.map { |k| [ k, true ] } ]
-        more_a = @dir_pathname.children( false ).reduce([]) do |memo, filename|
-          if leaf_or_branch_rx =~ filename.to_s
-            guess = constantify[ filename.sub_ext('').to_s ].intern
-            seen_h.fetch guess do
-              seen_h[guess] = true #  'tree/', 'tree.rb' => 'Tree'
-                # (we here don't care if it's a branch or a leaf, also
-                # casing might be wrong at this point!
-              memo << guess
-            end
+    Get_inferred_constants_ = -> const_a, mod do
+      res_a = nil
+      -> do
+        mod.respond_to? :dir_pathname or break
+        dpn = mod.dir_pathname
+        dpn && dpn.exist? or break
+        seen_h = ::Hash[ const_a.map { |k| [ distill[ k ], true ] } ]
+        guesser = mod.respond_to?( :_boxxy ) ? mod._boxxy.guesser :
+          Guessers_::Default
+        res_a = dpn.children( false ).reduce( [] ) do |memo, file_pn|
+          stem = file_pn.sub_ext( '' ).to_s
+          key = distill[ stem ]
+          seen_h.fetch key do   # don't dupe 'tree/' and 'tree.rb'
+            seen_h[ key ] = true
+            memo << guesser[ stem ]
           end
           memo
         end
-        @const_a = exist_a + more_a
-      else
-        @const_a = exist_a
-      end
-      @boxxy_is_hot = true
-      nil
+      end.call
+      res_a || EMPTY_A_
     end
 
-    extname = Autoloader_::EXTNAME
+    get_constants_including_inferred_constants = -> mod do
+      if mod.respond_to? :boxxy_original_constants
+        mod.constants
+      else
+        a = mod.constants
+        a.concat Get_inferred_constants_[ a, mod ]
+        a
+      end
+    end
 
-    leaf_or_branch_rx = /\A
-      (?<stem>  [a-z][a-z0-9-]* )
-      (?<ext> #{ ::Regexp.escape extname } )?
-    \z/x
+    Fuzzy_const_get_name_and_value_recursive_ =
+                                        -> mod, path_a, value_otherwise=nil do
 
-    #         ~ the story of `each` ~
+      path_a.reduce( [ nil, mod ] ) do | (_constant, box), name_x |
+        nam = distill[ name_x ]
+        const_a = get_constants_including_inferred_constants[ box ]
+        guess = const_a.reduce nil do |_, gues|
+          nam == distill[ gues ] and break gues
+        end
+        guess and const = Load_guess_[ box, guess ]
+        if const
+          [ const, box.const_get( const, false ) ]
+        else
+          f = value_otherwise || method( :raise )
+          v = if f.arity.zero? then f[] else
+            f[ NameError.new name_x, box ]
+          end
+          [ nil, v ]
+        end
+      end
+    end
 
-    # (the below comment is old and not as relevant but left it b.c it's funny:)
-    # this is SUPER #experimental OH MY GOD **SO** #experimental
-    # More than #experimental, this is just a playful, jaunty little proof-
-    # of-concept: If you haven't done it once already per this module, hit
-    # the filesystem once to get a directory listing of all files one level
-    # under dir_path. based on those files that "look like" application
-    # code directories and application filenames per the regexxi below,
-    # trigger the autoloader to load that file, or possibly autovivify
-    # a module for the directory if that's the autoloader hack happening..
-    # whether or not the above happens on this call, result in (or run
-    # if `block` provided) an enumerator that enumerates over these
-    # constants, yielding each of the constants themselves.
+    fun[:fuzzy_const_get] = -> mod, path_x do
+      Fuzzy_const_get_name_and_value_recursive_[ mod, [ * path_x ] ].fetch 1
+    end
+
+    # `const_fetch` deep names, defaults, errors in a nested moudule:
+    #
+    # with an arbitrarily deeply nested { module* constants },
+    # `const_fetch` with an array of names can fetch one such value:
+    #
+    #     module Noodles
+    #
+    #       MetaHell::Boxxy[ self ]
+    #
+    #       module Ramen
+    #         module Shin
+    #           NAME = :ramyun
+    #         end
+    #       end
+    #     end
+    #
+    #     Noodles.const_fetch( [ :ramen, :shin, :name ] ) # => :ramyun
+    #
+    # `const_fetch` out of the box, when not found will raise a ::NameError:
+    #
+    #     Noodles.const_fetch( :and_co ) # => NameError: uninitialized con..
+    #
+    # but since it has `fetch` in the name, it suggests (correctly) that
+    # `const_fetch` can honor a default provided in a block:
+    #
+    #     Noodles.const_fetch( :not_there ) { :derp } # => :derp
+    #
+    # `const_fetch` can honr a default provided in a proc:
+    #
+    #     Noodles.const_fetch( :no_wai, -> { :zerp } ) # => :zerp
+    #
+    # `const_fetch` with both a proc and a block doesn't make sense:
+    #
+    #     Noodles.const_fetch( :ramen, -> { } ) { } # => ArgumentError: too..
+    #
+    # a `const_fetch` NameError has fun metadata:
+    #
+    #     name_error = Noodles.const_fetch( [ :ramen, :maru_chan ] ) { |x| x }
+    #     name_error.const # => :maru_chan
+    #     name_error.module # => Noodles::Ramen
+
+    class NameError < ::NameError
+      def initialize const, modul
+        @module = modul
+        super "uninitialized constant #{ modul }::( ~ #{ const } )", const
+      end
+
+      attr_reader :module
+      alias_method :const, :name
+    end
+
+    # `names` and `const_fetch_all` are 2 kinds of constituent fetchers:
+    # your boxxy module can see the `names` (name functions) of its consts:
+    # `names` results in an enumerator of name functions:
+    #
+    #     module Fazzlebert
+    #       MetaHell::Boxxy[ self ]
+    #       module WizBang
+    #       end
+    #       FROB_BOB = :no_see
+    #     end
+    #
+    #     Fazzlebert.names.map( & :as_slug )  # => [ 'wiz-bang', 'frob-bob' ]
+    #
+    # use caution! the `names` are actually 1 flyweight you might need to dupe
+    #
+    #     a = Fazzlebert.names.to_a
+    #     a.length  # => 2
+    #     a.first.object_id # => a.last.object_id
+    #     a = Fazzlebert.names.map( & :dupe )
+    #     a.length  # => 2
+    #     a.first.as_natural  # => 'wiz bang'
+    #     a.last.as_natural  # => 'frob bob'
+    #
+    # `const_fetch_all` fetches at once the values of a tuple that you specify
+    #
+    #     wb, fb = Fazzlebert.const_fetch_all :wiz_bang, :frob_bob
+    #     wb  # => Fazzlebert::WizBang
+    #     fb  # => Fazzlebert::FROB_BOB
+
+    module ModuleMethods_
+      def names
+        Boxxy::Names_.load
+        names
+      end
+
+      def const_fetch_all *a, &b
+        a.map do |path_x|
+          const_fetch path_x, &b
+        end
+      end
+    end
+
+    # `optimistic constant inference` is something crazy your boxxy module does
+    # which is a social contract that stipulates that if you follow [#mh-029]
+    # `isomorphic file locations` then you won't have to load a million files
+    # to know that you have these million constants under this module. just
+    # know that you won't know until load time what the correct casing is of
+    # the constant, and until then, `constants` may contain guesses!
+    #
+    # here's a fantastic hack that has
+    # `constants` demonstrating `optimisitic constant inference` in action:
+    #
+    #     Flowers = module MetaHell::TestSupport::Boxxy::Fixtures::Flowers
+    #       self
+    #     end
+    #
+    #     Flowers.constants.length # => 0
+    #
+    #     module Flowers
+    #       MetaHell::Boxxy[ self ]  # now it gets super-charged..
+    #     end
+    #
+    #     # ( NOTE - the 'flowers/' folder exists, has 'calla-lily.rb' )
+    #
+    #     Flowers.constants  # => [ :Calla_Lily ]
+    #
+    #     Flowers.const_fetch( :Calla_Lily ) # => :in_bloom_again
+    #
+    #     Flowers.constants # => [ :CALLA_LiLy ]
     #
 
-    load_mutex_h = { }
+    module ModuleMethods_
+      def constants               # ("overwrites" ruby builtin, which should
+        @boxxy.get_constants      # be in `boxxy_original_constants`)
+      end
 
-    define_method :each do |& blk|
-      ea = MetaHell::Formal::Box::Enumerator.new( -> normalized_consumer do
-        load_mutex_h.fetch self do  # yes it's possible, and bad
-          load_mutex_h[ self ] = true
-          @const_a or constants
-          @const_a.length.times do |idx|  # two passes - in one pass load each one, correcting names as you go!
-            const = @const_a[ idx ]
-            if ! const_defined? const, false
-              tug = const_tug const  # we don't check `probably_loadable?` b.c..
-              tug.load -> do
-                if ! const_defined? const, false
-                  mini = normulate[ const ]
-                  otr = boxxy_original_constants - @const_a
-                  corr = otr.detect { |c| mini == normulate[ c ] }
-                  if corr
-                    @const_a[ idx ] = corr   # WONDERHACK
-                    tug.instance_variable_set :@const, corr
-                  end # else tug will raise an exception
-                end
-              end
-            end
+      def _boxxy  # #api-private
+        @boxxy
+      end
+    end
+
+
+    class Conduit_
+      def initialize bxy
+        @bxy = bxy
+      end
+    end
+
+    class Boxxy_
+
+      def _absorb_block blk
+        Conduit_.new( self ).instance_exec( & blk )
+        nil
+      end
+
+      def _init_autoloader
+        @mod.respond_to? :dir_pathname or MetaHell::MAARS::Upwards[ @mod ]
+        nil
+      end
+
+      def get_constants
+        a = @mod.boxxy_original_constants
+        if ( @known_constants_count ||= -1 ) < a.length
+          @known_constants_count = a.length
+          @inferred_a = Get_inferred_constants_[ a, @mod ]
+        end
+        a.concat @inferred_a
+      end
+
+      def correction_notification bad, _good
+        idx = @inferred_a.index( bad ) or fail "sanity"
+        @known_constants_count += 1
+        @inferred_a[ idx ] = nil
+        @inferred_a.compact!
+        nil
+      end
+    end
+
+    # `constants` caches the inferences derived form the filesystem once
+    # but caches the ruby internal `constants` listing not at all.
+    #
+    #     Cafes = module MetaHell::TestSupport::Boxxy::Fixtures::Cafes
+    #       Espresso_Royale_cafe = :erc
+    #       MetaHell::Boxxy[ self ]  # there are 2 in the filesystem, too
+    #       Espresso_bar = :eb
+    #       self
+    #     end
+    #
+    #     Cafes.constants # => [ :Espresso_Royale_cafe, :Espresso_bar, :Lab_Cafe ]
+    #
+    #     module Cafes
+    #       Elixir_Vitae = :el
+    #     end
+    #
+    #     Cafes.constants # => [ :Espresso_Royale_cafe, :Espresso_bar, :Elixir_Vitae, :Lab_Cafe ]
+
+    # boxxy is not recursive.
+    # a boxxy module does NOT make its loaded branch nodes themselves boxxy:
+    #
+    #     Mammals = module MetaHell::TestSupport::Boxxy::Fixtures::Mammals
+    #       MetaHell::Boxxy[ self ]  # (there is a corresponding 'mammals/')
+    #       self
+    #     end
+    #
+    #     Mammals::Bats.constants.length # => 0
+    #     Mammals::Bats::SomeBat.touch
+    #     Mammals::Bats.constants.length # => 1
+    #
+
+    # your boxxy module gets `each` which loads all values while correcting
+    # like so:
+    #
+    #     Spiders = module MetaHell::TestSupport::Boxxy::Fixtures::Spiders
+    #
+    #       MetaHell::Boxxy[ self ]  # (there is a corresponding 'spiders/')
+    #
+    #       Wolf = :wolf
+    #       CAMEL = :camel
+    #
+    #       self
+    #     end
+    #
+    #     a_i = [ ] ; a_x = [ ]
+    #     Spiders.each do |i, x|
+    #       a_i << i ; a_x << x
+    #     end
+    #
+    #     a_i # => [ :Wolf, :CAMEL, :TaranTULA ]
+    #     a_x # => [ :wolf, :camel, :nope ]
+    #
+
+    module ModuleMethods_
+      def each &blk
+        ea = MetaHell::Formal::Box::Enumerator.new( -> pair_y do
+          mod_load_guess = Load_guess_.curry[ self ]
+          constants.each do |guess_i|
+            const = mod_load_guess[ guess_i ]
+            const and pair_y.yield( const, const_get( const, false ) )
           end
-          load_mutex_h.delete self
-        end
-        @const_a.map(& :to_s ).sort.each do |const_s|  # waiting to need it
-          const = const_s.intern
-          normalized_consumer.yield const, const_get( const, false )
-        end
-      end )
-      blk ? ea.each(& blk ) : ea
-    end
-
-    public :each                  # even thought it's a bold statement,
-                                  # it gives us widespread compatibility
-
-    #         ~ tiny convenience nerks (alpha. order) ~
-
-    def const_fetch_all *a, &b
-      a.map do |const_signifier|
-        const_fetch const_signifier, &b
+        end )
+        blk ? ea.each( & blk ) : ea
       end
     end
 
-    public :const_fetch_all
+    # `abbrev` is b.y.o implementation
+    # like so:
+    #
+    #     module Foo
+    #       MetaHell::Boxxy[ self ]
+    #       abbrev f: :Foo, b: [ :Bar, :Baz]
+    #     end
+    #
+    #     Foo.abbrev_box.fetch( :f )  # => :Foo
+    #     Foo.abbrev_box.fetch( :b )  # => [ :Bar, :Baz ]
 
-    #       ~ abbreviations - for now it's byo-implementation ~
-
-    def abbrev h
-      @abbrev_box ||= MetaHell::Formal::Box::Open.new
-      h.each do |k, v|
-        @abbrev_box.add k, v
-      end
-      nil  # or `h` but nothing else
-    end
-
-    attr_reader :abbrev_box
-    public :abbrev_box  # for now, but may change!  (please use it read only!)
-
-  protected
-
-    mutex = { }
-
-    define_method :init_boxxy do |caller_str|
-      mutex.fetch self do
-        mutex[ self ] = true
-        init_autoloader caller_str
-        @boxxy_is_hot = nil       # `hot` means it has hit the fs
-        @const_a = nil
-        class << self
-          alias_method :boxxy_original_constants, :constants  # [#mh-019]
-          alias_method :constants, :boxxy_constants
+    module ModuleMethods_
+    private
+      def abbrev h
+        @abbrev_box ||= MetaHell::Formal::Box::Open.new
+        h.each do |k, v|
+          @abbrev_box.add k, v
         end
+        nil  # or `h` but nothing else
       end
-      nil
+    public
+      attr_reader :abbrev_box
     end
-  end
 
-  class Boxxy::NameError < ::NameError
+    # change your inference naming scheme if you really need to, in `enhance`
+    # like so:
+    #
+    #     module Cafes       # (here we rob the same filesystem fixtures
+    #       @dir_pathname =  # for this, a different module)
+    #         MetaHell::TestSupport::Boxxy::Fixtures::Cafes.dir_pathname
+    #       MetaHell::Boxxy.enhance self do
+    #         inferred_name_scheme :CamelCase
+    #       end
+    #     end
+    #
+    #     Cafes.constants  # => [ :EspressoBar, :LabCafe ]
+    #
 
-    # We throw/pass these below. This becomes useful when it is used as a
-    # metadata struct in the callbacks for name errors.
-
-    def initialize h
-      super( (h = h.dup).delete :message ) if h[:message]
-      h.each { |k, v| send "#{ k }=", v }
+    class Conduit_
+      def inferred_name_scheme i
+        @bxy.set_inferred_name_scheme i
+        nil
+      end
     end
-  end
 
-  class Boxxy::InvalidNameError < Boxxy::NameError
+    class Boxxy_
+      def set_inferred_name_scheme i
+        @guesser = Guessers_.const_get i, false
+      end
 
-    attr_accessor :invalid_name
-
-    def initialize msg, name
-      super message: msg, invalid_name: name
+      def guesser
+        @guesser ||= Guessers_::Default
+      end
     end
-  end
 
-  class Boxxy::NameNotFoundError < Boxxy::NameError
-    attr_accessor :const, :module, :name, :seen_a
+    module Guessers_
+
+      Camel_Case_With_Underscore = -> do   # "-ki-ki-" => :_Ki_Ki_
+        rx = /(?:\A|([-_]))(?:([a-z])|\z)/
+        -> x do
+          x.to_s.gsub( rx ) do
+            "#{ '_' if $~[1] }#{ $~[2].upcase if $~[2] }"
+          end.intern
+        end
+      end.call
+
+      CamelCase = -> do                    # => "-ki-ki-" => :KiKi_
+        rx = /(?:(?:-|\A)([a-z]))|(-)/
+        -> x do
+          x.to_s.gsub( rx ) do
+            "#{ $~[1].upcase if $~[1] }#{ '_' if $~[2] }"
+          end.intern
+        end
+      end.call
+
+      Default = Camel_Case_With_Underscore
+
+    end
+
+    FUN = ::Struct.new( * fun.keys ).new( * fun.values ).freeze
   end
 end

@@ -262,7 +262,7 @@ module ::Skylab::CodeMolester
     end
 
     module Events
-      extend MetaHell::Boxxy
+      MetaHell::Boxxy[ self ]
       Text = PubSub::Event::Factory::Datapoint
       Structural = PubSub::Event::Factory::Structural.new 2, nil, EVENT_
     end

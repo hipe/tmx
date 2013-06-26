@@ -26,7 +26,7 @@ module Skylab::Face
 
     MetaHell::Module::Accessors.enhance( self ).
         private_module_reader( :models_module, '../../Models' ) do
-      extend MetaHell::Boxxy  # re-affirmable
+      MetaHell::Boxxy[ self ]  # re-affirmable
     end
 
     # `plugin_host_proxy_aref` - part of our underlying plugin API -

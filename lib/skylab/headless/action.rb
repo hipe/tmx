@@ -18,7 +18,7 @@ module Skylab::Headless
     end
 
     def name_function
-      @name_function ||= Headless::Name::Function::From::Module::Graph.new(
+      @name_function ||= Headless::Name::Function::From::Module_Anchored.new(
         name, actions_anchor_module.name )  # (one place in particular will be
     end  # upset if not all naming happens via this ivar !)
 

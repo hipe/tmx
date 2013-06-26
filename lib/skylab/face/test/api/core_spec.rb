@@ -10,8 +10,8 @@ module Skylab::Face::TestSupport::API
 
     def raise_this_error  # (let the below be the only place that the
       raise_error( ::RuntimeError,  # <- particular class is asserted)
-        /isomorphic API action resolution failed - for token "foo" #{
-          }there is no corresponding module `Foo`/ )
+        /isomorphic API action resolution failed - #{
+          }.*no.+constant.+isomorph.+"foo"/i )
     end
 
     context "against the minimal case" do

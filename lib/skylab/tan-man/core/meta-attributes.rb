@@ -1,7 +1,7 @@
 module Skylab::TanMan
 
   module Core::MetaAttributes
-    extend MetaHell::Boxxy
+    MetaHell::Boxxy[ self ]
     singleton_class.send :alias_method, :[], :const_fetch_all
   end
 

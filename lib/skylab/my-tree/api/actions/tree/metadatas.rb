@@ -1,5 +1,5 @@
 module Skylab::MyTree
   module API::Actions::Tree::Metadatas
-    extend MetaHell::Boxxy
+    MetaHell::Boxxy[ self ]
   end
 end

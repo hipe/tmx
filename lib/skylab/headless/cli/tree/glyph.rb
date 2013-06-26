@@ -6,7 +6,7 @@ module Skylab::Headless
   end
 
   module CLI::Tree::Glyph::Sets
-    extend MetaHell::Boxxy        # BOXXY IS QUEEN OF METAPROGRAMming
+    MetaHell::Boxxy[ self ]        # BOXXY IS QUEEN OF METAPROGRAMming
 
 
     WIDE = {                      # (these styles came to us later, and are

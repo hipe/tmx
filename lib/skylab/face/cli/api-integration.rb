@@ -166,7 +166,7 @@ module Skylab::Face
 
     def api_executable par_x, nx=nil
       norm_a = if nx then [ * nx ] else
-        @last_hot.anchorized_last
+        @last_hot.anchored_last
       end
       ac = api_client
       ph = if par_x.respond_to? :each_pair then par_x else

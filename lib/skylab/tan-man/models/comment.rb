@@ -5,7 +5,7 @@ module Skylab::TanMan
 
 
   class Models::Comment::LineEnumerator < ::Struct.new :scn
-    extend MetaHell::Boxxy
+    MetaHell::Boxxy[ self ]
 
     def self.for str
       res = nil

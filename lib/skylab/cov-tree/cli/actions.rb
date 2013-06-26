@@ -1,7 +1,7 @@
 module Skylab::CovTree
 
   module CLI::Actions
-    extend MetaHell::Boxxy # BOXXY
+    MetaHell::Boxxy[ self ] # BOXXY
   end
 
   CovTree::Services::Set || nil  # kinda janky here but whatever:

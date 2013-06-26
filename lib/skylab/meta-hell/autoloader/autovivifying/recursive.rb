@@ -15,7 +15,7 @@ module Skylab::MetaHell
 
     attr_reader :const
 
-    protected
+  private
 
     # `load_file` - do what parent does, and (since the load didn't raise an
     # exception, it set the appropriate constant of the appropriate module --
@@ -40,7 +40,7 @@ module Skylab::MetaHell
             init_dir_pathname me.send( :branch_pathname )
           end
           if tug_class.nil?
-            @tug_class = me.class
+            me.class.enhance self
           end
         end
       end
@@ -61,13 +61,16 @@ module Skylab::MetaHell
     # #multi-entrant
 
     def self.[] mod
-      stack_a = [ ]
+      stack_a = [ ] ; top_has_dpn = false
       while ! ( mod.respond_to? :dir_pathname and mod.dir_pathname )
         stack_a.push mod
+        mod.instance_variable_defined? :@dir_pathname and
+          break( top_has_dpn = true )
         _mod = MetaHell::Module::Accessors::FUN.resolve[ mod, '..' ]
         _mod or raise "can't - rootmost module (::#{ mod }) has no dir_pathname"
         mod = _mod
       end
+      top_has_dpn and stack_a.pop.extend MAARS
       while mod_ = stack_a.pop
         n = mod_.name
         mod_.module_exec do

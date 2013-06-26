@@ -1,5 +1,5 @@
 module Skylab::TanMan
   module Models::DotFile::Actions
-    extend MetaHell::Boxxy
+    MetaHell::Boxxy[ self ]
   end
 end

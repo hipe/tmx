@@ -16,6 +16,14 @@ module Skylab::MetaHell
 
   class Autoloader::Autovivifying::Tug < Autoloader_::Tug
 
+    def self.enhance x
+      kls = self
+      x.instance_exec do
+        @tug_class ||= kls
+      end
+      nil
+    end
+
     def load f=nil                # compare to super
       if leaf_pathname.exist?     # we don't expose this to hacking -
         load_file f               # if this file doesn't have the const,
@@ -49,10 +57,10 @@ module Skylab::MetaHell
     end
 
     def build_autovivified_module
-      bpn = branch_pathname ; me = self
+      bpn = branch_pathname ; my_class = self.class
       ::Module.new.module_exec do
         extend Autoloader_::Methods
-        @tug_class = me.class
+        my_class.enhance self
         @dir_pathname = bpn
         self
       end

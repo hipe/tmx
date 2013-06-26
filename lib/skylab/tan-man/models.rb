@@ -1,5 +1,5 @@
 module Skylab::TanMan
   module Models
-    extend MetaHell::Boxxy # sex
+    MetaHell::Boxxy[ self ] # sex
   end
 end

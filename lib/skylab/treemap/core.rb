@@ -41,13 +41,15 @@ module Skylab::Treemap
   end
 
   module Plugins                  # #stowaway
-    extend MetaHell::Boxxy
+    MetaHell::Boxxy.enhance self do  # for legacy reasons and grease ..
+      inferred_name_scheme :CamelCase
+    end
   end
 
   module API
     extend MAARS
     module Actions
-      extend MetaHell::Boxxy
+      MetaHell::Boxxy[ self ]
     end
   end
 

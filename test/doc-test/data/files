@@ -3,6 +3,7 @@ lib/skylab/basic/hash/pair-enumerator.rb
 lib/skylab/face/cli/lipstick.rb
 lib/skylab/face/cli/tableize.rb
 lib/skylab/headless/plugin/host/proxy.rb
+lib/skylab/meta-hell/boxxy.rb
 lib/skylab/meta-hell/dsl-dsl.rb
 lib/skylab/meta-hell/function.rb
 lib/skylab/test-support/regret/api/actions/doc-test.rb

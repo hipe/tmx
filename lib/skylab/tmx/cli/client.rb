@@ -96,7 +96,6 @@ module Skylab::TMX
           cli = anchor.join "cli#{ Autoloader::EXTNAME }"
           if cli.exist?
             y << "(branch - #{ pth[ cli ] })" if be_verbose
-            # require cli.to_s
             box_mod.const_fetch( norm_i ).const_get( :CLI, false )
             true
           else

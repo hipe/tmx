@@ -1,17 +1,15 @@
 module Skylab::TanMan
 
   module CLI::NamespaceModuleMethods
-    # to be audited at [#023] for something boxxy-like
+
     include Bleeding::NamespaceModuleMethods
-    include MetaHell::Boxxy::ModuleMethods
 
     def self.extended mod
-      mod.send :init_boxxy, caller[0]
+      MetaHell::Boxxy[ mod ]  # (satisfying [#023] - use boxxy-like)
     end
 
     def build request_client
-      o = CLI::NamespaceRuntime.new request_client, self
-      o
+      CLI::NamespaceRuntime.new request_client, self
     end
   end
 end

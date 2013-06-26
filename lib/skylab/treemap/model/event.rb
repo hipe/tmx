@@ -11,7 +11,7 @@ module Skylab::Treemap
   end
 
   module Model::Event::Mapping
-    extend MetaHell::Boxxy
+    MetaHell::Boxxy[ self ]
     Annotated = Model::Event::Annotated
     Text = PubSub::Event::Factory::Datapoint
   end

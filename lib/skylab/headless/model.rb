@@ -22,7 +22,7 @@ module Skylab::Headless
     extend MetaHell::Let          # just for memoizing below
 
     let :name_function do
-      Headless::Name::From::Module::Graph self, self::EVENTS_ANCHOR_MODULE
+      Headless::Name::From::Module_Anchored self, self::EVENTS_ANCHOR_MODULE
     end
 
     def event_anchored_normal_name

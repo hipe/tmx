@@ -28,7 +28,7 @@ module Skylab::Treemap::TestSupport::CLI
           end
         end
       end
-      names.should eql( %w(ping render doobie install) )
+      names.should eql( %w(render ping doobie install) )
     end
   end
 end

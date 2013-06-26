@@ -4,7 +4,7 @@ module ::Skylab::TanMan
                                   # being #watched [#mh-011]
     # this is due for a cleanup [#077]
 
-    extend MetaHell::Boxxy
+    MetaHell::Boxxy[ self ]
 
     dbg = nil # $stderr
     fun = ::Skylab::Autoloader::Inflection::FUN

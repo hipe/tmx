@@ -9,9 +9,12 @@ module Skylab::MetaHell::TestSupport::Boxxy
     extend MetaHell::TestSupport::Boxxy
 
     context "minimal case: one item" do
-      modul :Boxxy__Zeep do   # Has to be under Boxxy only b/c our containing
-        extend MetaHell::Boxxy  # folder is called that, and we need
-        module self::Foop     # init_autoloader to work!.  (self necessary !)
+      modul :Boxxy__Zeep do
+        @dir_pathname = false  # #todo all of this changed with the post
+        # _Clean Code_ overhaul of boxxy, and [mh]::Module::Creator is
+        # a hassle to boot [#034]
+        MetaHell::Boxxy[ self ]
+        module self::Foop
         end
       end
 
@@ -31,8 +34,9 @@ module Skylab::MetaHell::TestSupport::Boxxy
           begin _Boxxy__Zeep.const_fetch 'with/a/slash'
           rescue ::NameError => e
           end
-          e.invalid_name.should eql('with/a/slash')
-          e.message.should eql('wrong constant name with/a/slash')
+          e.const.should eql('with/a/slash')
+          e.message.should eql(
+            "uninitialized constant Boxxy::Zeep::( ~ with/a/slash )" )
         end
       end
 
@@ -42,11 +46,10 @@ module Skylab::MetaHell::TestSupport::Boxxy
             _Boxxy__Zeep.const_fetch [:nerp, :derp]
           rescue ::NameError => e
           end
-          e.message.should eql( 'uninitialized constant Boxxy::Zeep::Nerp' )
+          e.message.should match( /uninitialized constant Boxxy::Zeep.+nerp/i )
           e.module.to_s.should eql('Boxxy::Zeep')
-          e.const.should eql(:Nerp)
+          e.const.should eql(:nerp)
           e.name.should eql(:nerp)
-          e.seen_a.should eql([])
         end
       end
 
@@ -58,7 +61,7 @@ module Skylab::MetaHell::TestSupport::Boxxy
           end
           it "which catches invalid name errors" do
             kk = _Boxxy__Zeep.const_fetch('invalid/name') do |e|
-              "wahoo: #{e.invalid_name}"
+              "wahoo: #{ e.name }"
             end
             kk.should eql('wahoo: invalid/name')
             kk = _Boxxy__Zeep.const_fetch('invalid/name') { :yep }
@@ -68,28 +71,24 @@ module Skylab::MetaHell::TestSupport::Boxxy
         context "can be as one lambda" do
           it "which catches not found errors" do
             s = _Boxxy__Zeep.const_fetch([:fliff], ->(e) { "ok: #{e.const}" } )
-            s.should eql('ok: Fliff')
+            s.should eql('ok: fliff')
           end
           it "which catches name errors" do
             s = _Boxxy__Zeep.const_fetch( 'a space',
-              ->(e) { "ok: #{e.invalid_name}" } )
+              ->(e) { "ok: #{ e.name }" } )
             s.should eql('ok: a space')
           end
         end
-        context "can be as two lambdii" do
-          it "which, the appropriate one will catch not found errors" do
-            s = _Boxxy__Zeep.const_fetch( 'x', ->(e){'a'}, ->(e){'b'} )
-            s.should eql('a')
-          end
-          it "which, the appropriate one will catch invalid name errors" do
-            s = _Boxxy__Zeep.const_fetch( 'x x', ->(e){'a'}, ->(e){'b'} )
-            s.should eql('b')
+        context "can be as one proc" do
+          it "which will catch not found errors" do
+            s = _Boxxy__Zeep.const_fetch 'x', -> e { 'a' }
+            s.should eql( 'a' )
           end
         end
         it "cannot be as a lamba and a block" do
           -> do
             _Boxxy__Zeep.const_fetch('a', ->{ }) {  }
-          end.should raise_error( ::ArgumentError, "can't have block + lambdas")
+          end.should raise_error( ::ArgumentError, /too much proc/ )
         end
       end
     end

@@ -21,7 +21,7 @@ module Skylab::TMX
     # this isomorphs with the filesystem and is used to that end.
     # (note that generated namespaces will go in a sister module)
 
-    extend MetaHell::Boxxy
+    MetaHell::Boxxy[ self ]
 
   end
 

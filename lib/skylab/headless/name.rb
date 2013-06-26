@@ -27,7 +27,7 @@ module Skylab::Headless
     end
 
     o[:naturalize] = -> i do      # for normals only, handles dashy normals
-      i.to_s.gsub '-_', ' '
+      i.to_s.gsub( /[-_]/, ' ' )
     end
 
     FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
@@ -98,7 +98,7 @@ module Skylab::Headless
 
   protected
 
-    def initialize const # symbol!
+    def initialize const  # symbol! #api-lock [#032] : this signature.
       @const = const
       @local_normal = Headless::Name::FUN.normify[ const ]
       nil
@@ -121,6 +121,15 @@ module Skylab::Headless
       a.map(& Name::Function.method( :new ) )
     end
 
+    def initialize a  # please provide an array of name functions
+      @name_a = a
+      nil
+    end
+
+    def length
+      @name_a.length
+    end
+
     def local
       @name_a.last
     end
@@ -132,26 +141,21 @@ module Skylab::Headless
     def anchored_normal
       @anchored_normal ||= @name_a.map(& :local_normal ).freeze
     end
-
-    def initialize a  # please provide an array of name functions
-      @name_a = a
-      nil
-    end
   end
 
-  module Name::Function::From::Module
-  end  # no
-
-  class Name::Function::From::Module::Graph < Name::Function::Full
+  class Name::Function::From::Module_Anchored < Name::Function::Full
     # (centralize this hacky fun here.)
-
-  protected
-
+   private
     def initialize n2, n1  # n2 - your module name  n1 - box module name
       0 == n2.index( n1 ) or raise "sanity - #{ n1 } does not contain #{ n2 }"
-      name_a = n2[ n1.length + 2 .. -1 ].split( '::' ).reduce [] do |m, c|
-        m << Name::Function::From::Constant.new( c ).freeze
-      end  # (because we reveal the constituents, we don't want to take chances)
+      name_a = if n2 == n1
+        EMPTY_A_
+      else
+        n2[ n1.length + 2 .. -1 ].split( '::' ).reduce [] do |m, c|
+          m << Name::Function::From::Constant.new( c ).freeze
+        end
+        # (because we reveal the constituents, we don't want to take chances)
+      end
       super name_a
       nil
     end

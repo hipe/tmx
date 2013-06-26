@@ -66,7 +66,7 @@ module Skylab::TestSupport::Regret::API
 
     def show_option_help
       @snitch.puts "available template options:"
-      Face::CLI::Tableize::FUN.tablify[
+      Face::CLI::Tableize::FUN._tablify[
         [ 'option', 'desc' ], ::Enumerator.new do |y|
           available_options.each do |i, _, _, p|
             first = true
@@ -83,9 +83,9 @@ module Skylab::TestSupport::Regret::API
       ]
       nil
     end
-    
+
     # ~ fun ~
-    
+
     fun = { }
 
     fun[ :descify ] = -> do

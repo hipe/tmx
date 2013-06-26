@@ -16,5 +16,7 @@ module Skylab::Headless
                    # used as a heuristic or sanity in a couple places
   end
 
+  EMPTY_A_ = [ ].freeze
+
   extend MAARS
 end

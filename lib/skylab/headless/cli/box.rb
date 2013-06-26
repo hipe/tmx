@@ -47,12 +47,8 @@ module Skylab::Headless
     def fetch action_str
       # #todo: fuzzy find
       action_box_module.const_fetch action_str,
-        -> e do
-          error "there is no #{ ick e.name } action. #{ expecting_string }"
-          usage_and_invite
-        end,
-        ->( e ) do
-          error "invalid action name: #{ e.invalid_name }"
+        -> ne do
+          error "there is no #{ ick ne.const } action. #{ expecting_string }"
           usage_and_invite
         end
     end

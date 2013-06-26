@@ -25,7 +25,7 @@ module Skylab::Cull
   module API
     extend MAARS
     module Actions
-      extend MetaHell::Boxxy
+      MetaHell::Boxxy[ self ]
     end
     module Events_
       # gets filled with generated event classes
@@ -33,6 +33,6 @@ module Skylab::Cull
   end
 
   module Models
-    extend MetaHell::Boxxy
+    MetaHell::Boxxy[ self ]
   end
 end

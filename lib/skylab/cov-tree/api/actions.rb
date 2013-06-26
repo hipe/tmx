@@ -1,5 +1,5 @@
 module Skylab::CovTree
   module API::Actions
-    extend MetaHell::Boxxy # BOXXY
+    MetaHell::Boxxy[ self ] # BOXXY
   end
 end

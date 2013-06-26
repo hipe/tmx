@@ -7,7 +7,7 @@ module Skylab::Face
     def initialize m
       define_singleton_method :hot_api_action_class do
         if (( cmd = m.last_hot ))
-          i_a = cmd.anchorized_last
+          i_a = cmd.anchored_last
           m.api_client.action_const_fetch i_a
         end
       end

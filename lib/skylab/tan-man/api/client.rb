@@ -24,12 +24,10 @@ module Skylab::TanMan
       result = nil
       begin
         k = API::Actions.const_fetch normalized_action_name,
-          -> e do
-            name_error "#{ e.seen_a.last || 'actions' } has no #{
-              }\"#{ e.name }\" action"
-          end,
-          -> e do
-            name_error "invalid action name: #{ e.invalid_name }"
+          -> ne do
+            nf = Headless::Name::Function::From::Module_Anchored.new ne.module.name,  API::Actions.name
+            name_error "#{ nf.length.zero? ? 'actions' : nf.anchored_normal.
+              join(' ') } has no \"#{ ne.const }\" action"
           end
         k or break
         r = k.call self, param_h, events

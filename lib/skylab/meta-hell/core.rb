@@ -10,6 +10,8 @@ module Skylab
                                   # here one day) we will refer to internally
                                   # as this. NOW..
 
+    EMPTY_A_ =  [ ].freeze        # ocd
+
     # ARE YOU READY TO EAT YOUR OWN DOGFOOD THAT IS MADE OF YOUR BODY
 
     #                    ~ auto-trans-substantiation ~

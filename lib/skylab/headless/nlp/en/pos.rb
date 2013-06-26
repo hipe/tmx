@@ -919,7 +919,7 @@ module Skylab::Headless
     # modules. a parts of speech box module may only contain parts of
     # speech constants, or other parts of speech box modules.
 
-    extend MetaHell::Boxxy  # (`abbrev`, `const_fetch`)
+    MetaHell::Boxxy[ self ]  # (`abbrev`, `const_fetch`)
 
     abbrev v: :Verb, n: :Noun, vp: [ :Verb, :Phrase ], np: [ :Noun, :Phrase ]
 

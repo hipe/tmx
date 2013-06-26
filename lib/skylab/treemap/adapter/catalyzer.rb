@@ -79,8 +79,8 @@ module Skylab::Treemap
       res = false
       if has_actions mode
         const = @module.const_get( mode, false )::Actions.
-          const_fetch( tainted_a, -> e do
-            error[ "#{ slug } has no such #{ mode } action - #{ e.name }" ]
+          const_fetch( tainted_a, -> ne do
+              error[ "#{ slug } has no such #{ mode } action - #{ ne.const }" ]
             end
           )
         if const
@@ -100,8 +100,7 @@ module Skylab::Treemap
         else  # for now we jump thru hacking hoops to keep this out of the
           if ! mod.respond_to? :boxxy_original_constants # adapter code
             mod.dir_pathname or fail 'sanity - recursive autloader?'
-            mod.extend MetaHell::Boxxy::ModuleMethods
-            mod.send :init_boxxy, nil
+            MetaHell::Boxxy[ mod ]
           end
           has = mod.constants.length.nonzero?
           catalyze_base_class mode

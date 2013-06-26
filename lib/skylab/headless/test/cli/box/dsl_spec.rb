@@ -17,7 +17,7 @@ module Skylab::Headless::TestSupport::CLI::Box::DSL
     box_class = -> const, block=nil do
       cls = DSL_TestSupport.const_set const, ::Class.new
       cls.class_exec do
-        @name_function = Headless::Name::Function::From::Module::Graph.new(
+        @name_function = Headless::Name::Function::From::Module_Anchored.new(
           "Spoof::#{ const }", "Spoof" )
         extend Headless::CLI::Box::DSL
         class_exec(& block ) if block

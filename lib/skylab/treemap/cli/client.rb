@@ -271,7 +271,7 @@ module Skylab::Treemap
 
   module CLI::Actions
 
-    extend MetaHell::Boxxy
+    MetaHell::Boxxy[ self ]
 
     class << self
       alias_method :treemap_original_each, :each

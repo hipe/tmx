@@ -137,8 +137,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::WNS
         -> do
           invoke 'bee-nee', 'cee'
         end.should raise_error(  # (the particular class is asserted elsehwere)
-          /isomorphic API action resolution failed - for token "cee" #{
-            }there is no corresponding module `Cee`/i )
+          /isomorphic API action resolution failed - .+"cee"/i )
       end
 
       it '3 deep, corresponding api action' do

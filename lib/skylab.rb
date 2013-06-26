@@ -256,6 +256,13 @@ module Skylab                     # Welcome! :D
       @const, @mod_dir_pathname, @mod = const, mod_dir_pathname, mod
     end
 
+    attr_reader :const, :mod
+
+    def correction_notification const
+      @const = const
+      nil
+    end
+
     def load f=nil                # here is the main entrypoint, usu. why
       if leaf_pathname.exist?     # the tug was created.
         load_file f

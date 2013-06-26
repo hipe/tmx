@@ -17,7 +17,8 @@ module Skylab::TestSupport::Regret::API
         cur_a = [ cur_mod.to_s.intern ]
         count = 0
         step = -> do
-          mod, i = fun.fuzzy_const_get_tuple[ cur_mod, loc_a.fetch( 0 ) ]
+          mod, i = fun.
+            fuzzy_const_get_name_and_value[ cur_mod, loc_a.fetch( 0 ) ]
           cur_a.push i
           loc_a.shift
           loc_a.length.zero? and break( step = nil )

@@ -21,7 +21,7 @@ module Skylab::FileMetrics
 
   module API  # #stowaway
     module Actions
-      extend MetaHell::Boxxy
+      MetaHell::Boxxy[ self ]
     end
   end
 

@@ -42,8 +42,8 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Core
       it "for which no action defined - raises boxxy name error" do
         -> do
           invoke 'fee'
-        end.should raise_error(  # the particular class is asserted elsewhere
-          /for token "fee" there is no corresponding module `Fee`/i )
+        end.should raise_error( /"fee"/i )
+          # ( the particular class is asserted elsewhere. )
       end
 
       it "that takes no arguments anywhere - works" do
