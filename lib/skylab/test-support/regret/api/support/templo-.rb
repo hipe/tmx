@@ -29,5 +29,17 @@ module Skylab::TestSupport::Regret::API
     def get_templates *a
       a.map { |i| get_template i }
     end
+
+    fun = { }
+
+    fun[ :descify ] = -> do
+      rx = /:\z/
+      -> str do
+        no_colon = str.gsub rx, ''
+        no_colon.inspect
+      end
+    end.call
+
+    FUN = ::Struct.new( * fun.keys ).new( * fun.values )
   end
 end

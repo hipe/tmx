@@ -2,9 +2,9 @@ module Skylab::Face
 
   module CLI::Tableize
 
-    # `tableize` - deprecated for `tablify` [#fa-036]
+    # `tableize` - deprecated for `_tablify` [#fa-036]
     #
-    # `tableize` has been deprecated for `tablify`. but here's a demo:
+    # `tableize` has been deprecated for `_tablify`. but here's a demo:
     #
     #     y = [ ]
     #     Face::CLI::Tableize::FUN.tableize[
@@ -42,15 +42,17 @@ module Skylab::Face
       nil
     end
 
-    # `tablify` - quick & dirty pretty table hack.  NOTE `false` below..
+    # `_tablify` - quick & dirty pretty table hack (interface in development):
+    #
+    # signature is still #experimental, hence [#048]. (we might use `curry`).
     #
     # (if `row_ea` is an enumerator we've got to lock it down .. it might
     # be a randomized functional tree, e.g)
     #
-    # usage:
+    # here is an example of using `Face::CLI::Tableize::FUN._tablify`:
     #
     #     y = [ ]
-    #     Face::CLI::Tableize::FUN.tablify[
+    #     Face::CLI::Tableize::FUN._tablify[
     #       [ 'food', 'drink' ],
     #       [[ 'donuts', 'coffee' ]], -> line { y << line } ]
     #
@@ -59,7 +61,7 @@ module Skylab::Face
     #     y.length # => 0
     #
 
-    o[:tablify] = -> col_a, row_ea, line, show_header=true, left = '| ',
+    o[:_tablify] = -> col_a, row_ea, line, show_header=true, left = '| ',
         sep = '  |  ', right = ' |' do
 
       w = col_a.length
@@ -95,7 +97,7 @@ module Skylab::Face
 
     module InstanceMethods
       define_method :tableize, & FUN.tableize
-      define_method :tablify, & FUN.tablify
+      define_method :_tablify, & FUN._tablify
     end
   end
 end

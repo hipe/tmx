@@ -2,7 +2,8 @@ module Skylab::MetaHell
 
   module Function
 
-    # usage:
+    # `MetaHell::Function` can act as an enhancer that enhances a class via
+    # enabling ivars that hold procs to act as methods of the object:
     #
     #     class Foo
     #       def initialize
@@ -13,7 +14,8 @@ module Skylab::MetaHell
     #
     #     Foo.new.bar  # => :baz
 
-    # or use different ivars:
+    # You can use ivars with arbitrary names
+    # like so:
     #
     #     class Foo
     #       def initialize
@@ -24,7 +26,8 @@ module Skylab::MetaHell
     #
     #     Foo.new.wahoo  # => :ting
 
-    # or use the DSL to control visibility:
+    # You can use the DSL to control visibility
+    # like so:
     #
     #     class Foo
     #       def initialize
@@ -101,7 +104,8 @@ module Skylab::MetaHell
     end
   end
 
-  # or if you like structs you can have it this way:
+  # Alternately you can use the struct-like producer to create an entire
+  # class with this behavior like so:
   #
   #     Wahoo = MetaHell::Function::Class.new :fief
   #     class Wahoo

@@ -13,9 +13,9 @@ module Skylab::TestSupport::TestSupport::Regret::API::Actions::DocTest
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
   describe "Skylab::TestSupport::Regret::API::Actions::DocTest" do
-    context "context 1" do
+    context "basic usage" do
       Sandbox_1 = Sandboxer.spawn
-      it "basic usage:" do
+      it "basic usage" do
         Sandbox_1.with self
         module Sandbox_1
           class Foo
@@ -28,9 +28,9 @@ module Skylab::TestSupport::TestSupport::Regret::API::Actions::DocTest
         end
       end
     end
-    context "context 2" do
+    context "more advanced usage" do
       Sandbox_2 = Sandboxer.spawn
-      it "more advanced usage:" do
+      it "more advanced usage" do
         Sandbox_2.with self
         module Sandbox_2
           class Foo

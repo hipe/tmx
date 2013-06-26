@@ -17,7 +17,7 @@ module Skylab::Test
 
   class Plugins::Counts::Client
 
-    include Face::CLI::Tableize::InstanceMethods  # `tablify`
+    include Face::CLI::Tableize::InstanceMethods  # `_tablify`
 
     available_options do |o, _|
 
@@ -43,7 +43,7 @@ module Skylab::Test
     end
 
     def counts
-      tablify [ 'subproduct', 'num test files' ],
+      _tablify [ 'subproduct', 'num test files' ],
         ( ::Enumerator.new do |y|
           total = 0
           ok = host.hot_subtree.children.each do |tre|

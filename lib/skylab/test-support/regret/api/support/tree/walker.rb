@@ -116,7 +116,7 @@ module Skylab::TestSupport::Regret::API
             break false
           end
           top_norm, idx = top_norm_a.fetch 0
-          final_result[ c_a, c_h, top_norm, p_a, idx ]
+          final_result[ c_a, c_h, top_norm, p_a_, idx ]
         end.call
       end
 
@@ -179,11 +179,13 @@ module Skylab::TestSupport::Regret::API
           end ]
         xp = @xpn = @pn.expand_path
         p_a = xp.sub_ext( '' ).to_s.split slash
-        if @top
+        mod, pn = if @top
           instance_exec p_a, c_a, c_h, @top, &know_top
         else
           instance_exec p_a, c_a, c_h, & guess_top
         end
+        pn.instance_variable_get( :@path ).length.zero? and fail "sanity"
+        [ mod, pn ]
       end
     end.call
     attr_reader :xpn, :top_pn, :top_mod

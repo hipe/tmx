@@ -13,9 +13,9 @@ module Skylab::Face::TestSupport::CLI::Lipstick
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
   describe "Skylab::Face::CLI::Lipstick" do
-    context "context 1" do
+    context "a \"lipstick\" is an abstract rendering entity whose job it is to render" do
       Sandbox_1 = Sandboxer.spawn
-      it "simple, but are nonetheless separate currently:" do
+      it "an illustration of the steps for building and using a lipstick" do
         Sandbox_1.with self
         module Sandbox_1
           Lipstick = Face::CLI::Lipstick.new '*', :yellow, -> { 20 }
@@ -37,9 +37,9 @@ module Skylab::Face::TestSupport::CLI::Lipstick
         end
       end
     end
-    context "context 2" do
+    context "You can also render compound \"tuple ratios\"" do
       Sandbox_2 = Sandboxer.spawn
-      it "You can also have compound lipstick tuple things:" do
+      it "like so" do
         Sandbox_2.with self
         module Sandbox_2
           Lipstick = Face::CLI::Lipstick.new [['+', :green],['-', :red]]

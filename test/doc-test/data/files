@@ -6,3 +6,4 @@ lib/skylab/headless/plugin/host/proxy.rb
 lib/skylab/meta-hell/dsl-dsl.rb
 lib/skylab/meta-hell/function.rb
 lib/skylab/test-support/regret/api/actions/doc-test.rb
+lib/skylab/test-support/regret/api/actions/doc-test/specer-.rb

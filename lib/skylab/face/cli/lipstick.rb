@@ -22,7 +22,8 @@ module Skylab::Face
     # obtuse for reasons: to get to the rendering of a single "lipstick" series
     # of characters we must do three things: 1) create our own lipstick module.
     # 2) "cook" a rendering function. 3) call the function. The steps can be
-    # simple, but are nonetheless separate currently:
+    # simple, but are nonetheless separate currently. here is
+    # an illustration of the steps for building and using a lipstick:
     #
     #     Lipstick = Face::CLI::Lipstick.new '*', :yellow, -> { 20 }
     #       # we want to render yellow '*' characters. a fallback width
@@ -41,7 +42,8 @@ module Skylab::Face
     #       # the width you get may vary based on your terminal's width when
     #       # you run this!
 
-    # You can also have compound lipstick tuple things:
+    # You can also render compound "tuple ratios"
+    # like so:
     #
     #     Lipstick = Face::CLI::Lipstick.new [['+', :green],['-', :red]]
     #       # first arg is instead an array of "pen tuples"

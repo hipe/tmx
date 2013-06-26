@@ -13,9 +13,9 @@ module Skylab::Face::TestSupport::CLI::Tableize
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
   describe "Skylab::Face::CLI::Tableize" do
-    context "context 1" do
+    context "`tableize` - deprecated for `_tablify` [#fa-036]" do
       Sandbox_1 = Sandboxer.spawn
-      it "`tableize` has been deprecated for `tablify`. but here's a demo:" do
+      it "`tableize` has been deprecated for `_tablify`. but here's a demo" do
         Sandbox_1.with self
         module Sandbox_1
           y = [ ]
@@ -28,13 +28,13 @@ module Skylab::Face::TestSupport::CLI::Tableize
         end
       end
     end
-    context "context 2" do
+    context "`_tablify` - quick & dirty pretty table hack (interface in development)" do
       Sandbox_2 = Sandboxer.spawn
-      it "usage:" do
+      it "here is an example of using `Face::CLI::Tableize::FUN._tablify`" do
         Sandbox_2.with self
         module Sandbox_2
           y = [ ]
-          Face::CLI::Tableize::FUN.tablify[
+          Face::CLI::Tableize::FUN._tablify[
             [ 'food', 'drink' ],
             [[ 'donuts', 'coffee' ]], -> line { y << line } ]
 

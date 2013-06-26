@@ -18,6 +18,8 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
       @snippet_a
     end
 
+    attr_reader :first_other
+
   private
 
     State_ = ::Struct.new :_name, :h
@@ -25,7 +27,15 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     -> do  # `initialize`
 
       define_method :initialize do |snitch|
-        state = last_other = state_h = nil ; ign = -> _ { }
+        state = last_other = state_h = nil
+        ign = -> _ { }
+        store_contentful_hybrid_other = -> md do
+          if md[:content]
+            set_first_other md[:content]
+            last_other = md[:content]
+            state = state_h.fetch :watching
+          end
+        end
         store_contentful_last_other = -> md do
           if md[:content]
             last_other = md[:content]
@@ -46,20 +56,25 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
           a = [ ]
           state = state_h.fetch :watching
         end
+        o = State_
         state_h = {
-          watching: State_[ :_watching,
+          start: o[ :_start,
+            other: store_contentful_hybrid_other,
+            nbcode: code_one,
+            blank: ign ],
+          watching: o[ :_watching,
             other: store_contentful_last_other,
             nbcode: code_one,
             blank: ign ],
-          code: State_[ :_code,
+          code: o[ :_code,
             bcode: code,
             nbcode: code,
             other: shut ]
         }
-        state = state_h.fetch :watching
-        @accept = -> i, md, context_eg_comment_line do
-          ctx = context_eg_comment_line
-          state.h.fetch( i ).call md
+        state = state_h.fetch :start
+        @accept = -> transition do
+          ctx = transition.comment_line
+          state.h.fetch( transition.i ).call transition.md
           nil
         end
         @flush = -> do
@@ -72,6 +87,11 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
         @snippet_a = [] ; @snitch = snitch
       end
     end.call
+
+    def set_first_other x
+      @first_other = x
+      nil
+    end
 
     def shut last_other, a, ctx
       # strip trailing blank lines

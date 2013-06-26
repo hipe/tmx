@@ -13,9 +13,9 @@ module Skylab::MetaHell::TestSupport::DSL_DSL
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
   describe "Skylab::MetaHell::DSL_DSL" do
-    context "context 1" do
+    context "this DSL_DSL is a simple DSL for making simple DSL's." do
       Sandbox_1 = Sandboxer.spawn
-      it "introductory example:" do
+      it "introductory example" do
         Sandbox_1.with self
         module Sandbox_1
           class Foo
@@ -48,9 +48,9 @@ module Skylab::MetaHell::TestSupport::DSL_DSL
         end
       end
     end
-    context "context 2" do
+    context "can we use a module to hold and share an entire DSL?" do
       Sandbox_2 = Sandboxer.spawn
-      it "can we use a module to hold and share an entire DSL?" do
+      it "you can attempt to make a DSL reusable and inheritable like so" do
         Sandbox_2.with self
         module Sandbox_2
           module Foo

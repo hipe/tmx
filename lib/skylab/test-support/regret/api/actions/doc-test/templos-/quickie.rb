@@ -47,13 +47,21 @@ module Skylab::TestSupport::Regret::API
         y.flush
       end
 
+      context_descify = -> blk, num do
+        if blk.first_other
+          API::Support::Templo_::FUN.descify[ blk.first_other ]
+        else
+          "context #{ num }".inspect
+        end
+      end
+
       render_body = -> do
         y = ( rbma ||= Basic::List::Marginated::Articulation.new "\n" )
         b_a.each do |blk|
           num = y.count + 1
           y << ctxt[
             num: num,
-            dsc: "context #{ num }".inspect,
+            dsc: context_descify[ blk, num ],
             body: render_tests[ blk, num ]
           ].chomp
         end

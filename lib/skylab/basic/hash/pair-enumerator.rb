@@ -2,16 +2,13 @@ module Skylab::Basic
 
   class Hash::Pair_Enumerator < Basic::List::Scanner::For::Array
 
-    # usage:
-    #
-    # a `Hash::Pair_Enumerator` must be constructed with an array with an even
-    # number of arguments. failure to do so will result in immediate
-    # argument error raisal:
+    # usage: you must construct it with an array with an even number of args.
+    # failure to do so will result in immediate argument error raisal:
     #
     #     Basic::Hash::Pair_Enumerator.new( [ :a, :b, :c ] ) # => ArgumentError: odd number of arguments..
-
-    # so do it right, and you can iterate over those elements using
-    # `each_pair` as if it were a hash:
+    #
+    # so do it right, and you can
+    # iterate over those elements using `each_pair` as if it were a hash:
     #
     #     ea = Basic::Hash::Pair_Enumerator.new [ :a, :b, :c, :d ]
     #     ::Hash[ ea.each_pair.to_a ] # => { a: :b, c: :d }

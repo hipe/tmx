@@ -160,6 +160,7 @@ module Skylab::MetaHell::DSL_DSL
   end
 
   # can we use a module to hold and share an entire DSL?
+  # you can attempt to make a DSL reusable and inheritable like so:
   #
   #     module Foo
   #       MetaHell::DSL_DSL.enhance_module self do

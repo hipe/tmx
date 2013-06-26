@@ -8,7 +8,8 @@ module Skylab::Headless
     # as a plugin host. now you get @plugin_host on initialize always.
     # this is :[#fa-010].
 
-    # usage:
+    # using `Headless::Plugin::Host::Proxy`:
+    # comprehensive example:
     #
     #     class CheekyWebClient
     #       Headless::Plugin::Host::Proxy.enhance self do

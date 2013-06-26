@@ -13,9 +13,9 @@ module Skylab::Headless::TestSupport::Plugin::Host::Proxy
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
   describe "Skylab::Headless::Plugin::Host::Proxy" do
-    context "context 1" do
+    context "using `Headless::Plugin::Host::Proxy`" do
       Sandbox_1 = Sandboxer.spawn
-      it "usage:" do
+      it "comprehensive example" do
         Sandbox_1.with self
         module Sandbox_1
           class CheekyWebClient

@@ -1,32 +1,42 @@
 module Skylab::Basic
 
-  # comprehensive usage example:
+  # progressive construction:
+  # you can build up the union progressively, one path at at time:
   #
-  #       # you can build up the union progressively, one path at at time:
   #     u = Basic::Pathname::Union.new
-  #     u.length # => 0
+  #     u.length  # => 0
   #     u << ::Pathname.new( '/foo/bar' )  # (internally converted to string)
-  #     u.length # => 1
+  #     u.length  # => 1
   #     u << '/foo'
   #     u << '/biff/baz'
-  #     u.length # => 3
+  #     u.length  # => 3
+
+  # `normalize` eliminates logical redundancies in the union
+  # like so:
   #
-  #       # `normalize` eliminates logical redundancies in the union:
+  #     u = Basic::Pathname::Union[ '/foo/bar', '/foo', '/biff/baz' ]
+  #     u.length  # => 3
   #     e = u.normalize
   #     e.message_function[] # => 'eliminating redundant entry /foo/bar which is covered by /foo'
-  #     u.length # => 2
+  #     u.length  # => 2
+
+  # `match` will result in the first path in the union that 'matches'
+  # like so:
   #
-  #       # `match` will result in the first path in the union that 'matches'
+  #     u = Basic::Pathname::Union[ '/foo/bar', '/foo', '/biff/baz' ]
   #     x = u.match '/no'
   #     x # => nil
   #     x = u.match '/biff/baz'
   #     x.to_s # => '/biff/baz'
+
+  # if you use the result of `match` be aware it may be counter-intuitive.
+  # the constituent paths that make up the union can "act like" files or
+  # folders (leaves or branches) based on how the argument string "treats"
+  # them - maybe better to think of them just as nodes in a tree!
   #
-  #       # the constituent paths that make up the union can "act like"
-  #       # files or folders (leaves or branches) based on how the argument
-  #       # string "treats" them - maybe better to think of them just as
-  #       # nodes in a tree!
+  # result of `match` is the node that matched:
   #
+  #     u = Basic::Pathname::Union[ '/foo/bar', '/foo', '/biff/baz' ]
   #     x = u.match '/biff/baz/other'
   #     x.to_s # => '/biff/baz'
   #
@@ -126,7 +136,8 @@ module Skylab::Basic
 
   Pathname::Union::Elim_ = ::Struct.new :shorter, :longer
 
-  # play with aggregated articulation
+  # for fun, `message_function` may play with `aggregated articulation`
+  # like so:
   #
   #     u = Basic::Pathname::Union[ '/foo/bar', '/foo/baz/bing', '/foo', '/a', '/a/b', '/a/b/c' ]
   #     u.normalize.message_function[] # => "eliminating redundant entries /a/b and /a/b/c and /foo/bar and /foo/baz/bing which are covered by /a and /foo"

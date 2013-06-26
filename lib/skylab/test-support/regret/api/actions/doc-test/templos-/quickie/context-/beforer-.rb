@@ -67,7 +67,8 @@ module Skylab::TestSupport::Regret::API  # [#sl-123] exempt:
             end
             if example_a
               ex = Context_::Part_::Example_.new( y ) do |e|
-                e.quoted_description_string = snip.last_other.inspect
+                e.quoted_description_string =
+                  API::Support::Templo_::FUN.descify[ snip.last_other ]
                 e.local_lines = example_a
               end
             end

@@ -13,9 +13,9 @@ module Skylab::MetaHell::TestSupport::Function
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
   describe "Skylab::MetaHell::Function" do
-    context "context 1" do
+    context "`MetaHell::Function` can act as an enhancer that enhances a class via" do
       Sandbox_1 = Sandboxer.spawn
-      it "usage:" do
+      it "enabling ivars that hold procs to act as methods of the object" do
         Sandbox_1.with self
         module Sandbox_1
           class Foo
@@ -29,9 +29,9 @@ module Skylab::MetaHell::TestSupport::Function
         end
       end
     end
-    context "context 2" do
+    context "You can use ivars with arbitrary names" do
       Sandbox_2 = Sandboxer.spawn
-      it "or use different ivars:" do
+      it "like so" do
         Sandbox_2.with self
         module Sandbox_2
           class Foo
@@ -45,9 +45,9 @@ module Skylab::MetaHell::TestSupport::Function
         end
       end
     end
-    context "context 3" do
+    context "You can use the DSL to control visibility" do
       Sandbox_3 = Sandboxer.spawn
-      it "or use the DSL to control visibility:" do
+      it "like so" do
         Sandbox_3.with self
         module Sandbox_3
           class Foo
@@ -69,9 +69,9 @@ module Skylab::MetaHell::TestSupport::Function
         end
       end
     end
-    context "context 4" do
+    context "Alternately you can use the struct-like producer to create an entire" do
       Sandbox_4 = Sandboxer.spawn
-      it "or if you like structs you can have it this way:" do
+      it "class with this behavior like so" do
         Sandbox_4.with self
         module Sandbox_4
           Wahoo = MetaHell::Function::Class.new :fief

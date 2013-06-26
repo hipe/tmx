@@ -13,9 +13,9 @@ module Skylab::Basic::TestSupport::Hash::Pair_Enumerator
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
   describe "Skylab::Basic::Hash::Pair_Enumerator" do
-    context "context 1" do
+    context "usage: you must construct it with an array with an even number of args." do
       Sandbox_1 = Sandboxer.spawn
-      it "argument error raisal:" do
+      it "failure to do so will result in immediate argument error raisal" do
         Sandbox_1.with self
         module Sandbox_1
           -> do
@@ -24,12 +24,9 @@ module Skylab::Basic::TestSupport::Hash::Pair_Enumerator
                        ::Regexp.new( "\\Aodd\\ number\\ of\\ arguments" ) )
         end
       end
-    end
-    context "context 2" do
-      Sandbox_2 = Sandboxer.spawn
-      it "`each_pair` as if it were a hash:" do
-        Sandbox_2.with self
-        module Sandbox_2
+      it "iterate over those elements using `each_pair` as if it were a hash" do
+        Sandbox_1.with self
+        module Sandbox_1
           ea = Basic::Hash::Pair_Enumerator.new [ :a, :b, :c, :d ]
           ::Hash[ ea.each_pair.to_a ].should eql( { a: :b, c: :d } )
         end
