@@ -2,15 +2,14 @@ module Skylab::Face
 
   module CLI::API_Integration
 
-    def self.touch  # this hack to load the file quietly and explicitly
-    end
+    def self.touch ; nil end      #kick-the-loading-warninglessly-and-trackably
   end
 
   CLI::Metastory.touch
 
   class CLI::Metastory__
-    def bestows_plugin_services
-      @metastory_subject.does_bestow_plugin_services
+    def _can_broker_plugin_metaservices  # #api-private while possible
+      @metastory_subject.client_can_broker_plugin_metaservices
       # this assumes you are using plugin host proxy and not host.
       # essentially it indirectly assumes `isomorphic argument syntax` [#015]
     end
@@ -18,8 +17,8 @@ module Skylab::Face
 
   class CLI  # #re-open for facet
 
-    def self.does_bestow_plugin_services  # used above, gets changed elswhere
-      false
+    def self.client_can_broker_plugin_metaservices  # used above..
+      false                                         #  ..changed elsewhere
     end
   end
 
@@ -29,8 +28,8 @@ module Skylab::Face
 
     #  ~ class section 2 - public instance methods ~
 
-    def has_api_plugin_services
-      parent_shell.class.metastory.bestows_plugin_services
+    def has_api_plugin_metaservices
+      parent_shell.class.metastory._can_broker_plugin_metaservices
         # note we don't call i.m's on parent_shell b.c of [#037]
     end
 
@@ -38,8 +37,9 @@ module Skylab::Face
       self
     end
 
-    def api_plugin_services  # unofficial `modal services` api
-      parent_shell.instance_variable_get( :@plugin_host ).plugin_services
+    def api_plugin_metaservices  # unofficial `modal services` api
+      parent_shell.instance_variable_get( :@plugin_host ).
+        plugin_host_metaservices
     end
 
     def set_last_api_executable exe

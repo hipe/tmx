@@ -2,8 +2,7 @@ module Skylab::Face
 
   module API::Client::Metastory
 
-    def self.touch  # just used for loading the library
-    end
+    def self.touch ; nil end      #kick-the-loading-warninglessly-and-trackably
 
   end
 

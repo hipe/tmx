@@ -28,9 +28,9 @@ module Skylab::Face
     #                    \
     #                     o--->   `resolve_services`          [#fa-018]
     #                        /
-    #     [plugged-in]  <---o        now it may have a @plugin_story and a
-    #                   -o           @plugin_host_services, (and/or aribtrary
-    #                     \          ivars if you are using `ingest`..))
+    #     [plugged-in]  <---o       now it is has resolved fulfillment
+    #                   -o          strategies for the services it uses,
+    #                     \         implemented by the [hl] plugin susbsystem.
     #                      \
     #                       o-->  `normalize`                 [#fa-019]
     #                         /

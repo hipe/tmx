@@ -22,7 +22,7 @@ module Skylab  # hold on for a moment & let it get weird because of [#te-002]:
     end.call
 
     module Plugins
-      class Coverage
+      class Coverage  # we have to pay this back at #this-spot
         SWITCH_ = '--coverage'
         if (( idx = ::ARGV.index SWITCH_ ))
           require_relative 'plugins/coverage/manager'
@@ -44,16 +44,16 @@ require 'optparse'
 module Skylab::Test
 
   module Plugins
-    extend MetaHell::MAARS  # only necessary b.c of [#te-002] coverage mgr
+    MetaHell::Boxxy[ self ]
   end
 
   class Core_Client  # a "headless" client, conceptually
 
     Headless::Plugin::Host.enhance self do
 
-      add_plugins_box_module Test::Plugins
+      plugin_box_module -> { Test::Plugins }
 
-      eventpoints %i|
+      eventpoints( * %i|
         available_actions
         action_summaries
         available_options
@@ -63,7 +63,7 @@ module Skylab::Test
         ready
         subtree
         conclude
-      |
+      | )
 
       services [ :em, :ivar ],
         :full_name,
@@ -74,9 +74,8 @@ module Skylab::Test
         :infostream,
         :paystream,
         [ :pretty_path, :ivar ],
-        [ :run_mode ]
+        :run_mode
 
-      ingest_early
     end
 
   private
@@ -110,25 +109,38 @@ module Skylab::Test
       nil
     end
 
+    def determine_hot_plugins  # becuase we hackishly defined a node outside
+      # of its "home file" in #this-spot, we now have to pay it back here:
+      # "manually" load the file now for any such nodes (because of [#te-002])
+
+      Test::Plugins.boxxy do
+        original_constants.each do |i|
+          load dir_pathname.join( pathify i ).sub_ext( extname ).to_s
+          upwards get_const( i )
+        end
+      end
+
+      super
+    end
+
     def invoke argv
       begin
-        load_plugin_modules
         @argv = argv
         r = resolve_queue or break
         r = ready or break
         while tok = @queue_a.shift  # not using reduce b.c 1 stack frame
-          action = action_a.detect { |a| a.local_normal_name == tok }
-          if action
-            plugin_validate_client action.client
-            r = action.client.send action.as_method
+          act = action_a.detect { |a| a.local_normal_name == tok }
+          if act
+            r = act.client.send act.as_method
             if false == r
               break  # meh
             else
-              emit_eventpoint_to_each_client :conclude do |client|
-                ::Enumerator::Yielder.new do |msg|
-                  @info_y << "(#{ client.plugin_slug } plugin #{ msg })"
+              emit_customized_eventpoint :conclude, -> pi do
+                [ ::Enumerator::Yielder.new do |msg|
+                  @info_y << "(#{ pi.local_plugin_moniker }#{
+                    } plugin #{ msg })"
                   nil
-                end
+                end ]
               end
             end
           else
@@ -140,13 +152,6 @@ module Skylab::Test
     end
 
   private
-
-    def load_plugin_modules
-      ::Dir[ "#{ Test::Plugins.dir_pathname }/*.rb" ].each do |path|
-        require path
-      end
-      nil
-    end
 
     def emit type, data
       @emit[ type, data ]
@@ -201,16 +206,14 @@ module Skylab::Test
 
       ok = true
 
-      f = -> client do
-        ::Enumerator::Yielder.new do |msg|
+      f = -> pi do
+        [ ::Enumerator::Yielder.new do |msg|
           ok = false
-          @info_y << "#{ client.plugin_slug } #{ msg }"
-        end
+          @info_y << "#{ pi.local_plugin_moniker } #{ msg }"
+        end ]
       end
-
-      emit_eventpoint_to_each_client :ready, & f
-
-      emit_eventpoint_to_each_client :subtree, & f
+      emit_customized_eventpoint :ready, f
+      emit_customized_eventpoint :subtree, f
 
       if ok then ok else
         @info_y << "won't procede further because of the above."
@@ -281,17 +284,15 @@ module Skylab::Test
       o.separator(
         "#{em 'Description:'} runs all known tests in the skylab universe.")
 
-      h = { }
-      emit_eventpoint :action_summaries do |ea|
-        ea.each do |hash|
-          h.merge! hash
-        end
+      desc_h = { }
+      emit_eventpoint :action_summaries do |_pi, hh|
+        desc_h.merge! hh
       end
 
       max = 0
       pair_a = action_a.reduce [] do |m, act|
         act.slug.length > max and max = act.slug.length
-        m << [ act.slug, ( h.fetch( act.norm ) do
+        m << [ act.slug, ( desc_h.fetch( act.local_normal_name ) do
           "the #{ em act.slug } action"
         end ) ]
         m
@@ -308,7 +309,7 @@ module Skylab::Test
       merge_options o, -> merger do
         merger.add(Headless::CLI::Option.on( '-h', '--help', 'this screen.' ) do
           @queue_a << :help
-        end )  # when we add self, we've got to define `plugin_slug`
+        end )
       end
 
       o
@@ -318,7 +319,7 @@ module Skylab::Test
       $PROGRAM_NAME
     end
 
-    def plugin_slug  # - because we add self to merged o.p
+    def local_plugin_moniker  # - because we add self to merged o.p
       program_name
     end
 
@@ -332,17 +333,43 @@ module Skylab::Test
 
     def action_a
       if ! @action_a
-        emit_eventpoint :available_actions do |ea|
-          @action_a = plugin_flatten_and_sort ea, Action_
+        omni_a = [ ] ; unique_h = { }
+        normalize_priority = Priority_Normalizer_[ 0.0, 1.0 ]
+        emit_eventpoint :available_actions do |pi, action_a|
+          action_a.each do |normal_i, priority_flot|
+            act = Action_[ normal_i, pi, normalize_priority[ priority_flot ] ]
+            taken = unique_h[ act.local_normal_name ]
+            if taken
+              raise Headless::Plugin::DeclarationError, "plugin #{
+                }comprehension sorting conflict - name conflict with #{
+                }\"#{ act.local_normal_name }\" from both #{
+                }#{ pi.local_plugin_moniker } and #{
+                }#{ taken.local_plugin_moniker }"
+            else
+              unique_h[ act.local_normal_name ] = pi
+              omni_a << act
+            end
+          end
         end
-        @action_a ||= [ ]
+        omni_a.sort_by!( & :priority )
+        @action_a = omni_a
       end
       @action_a
     end
 
+    Priority_Normalizer_ = -> exclusive_min_flot, exclusive_max_flot do
+      without_priority_count = 0
+      -> priority_x do
+        if priority_x && !
+          ( exclusive_min_flot < priority_x && priority_x < exclusive_max_flot )
+          priority_x = nil
+        end
+        priority_x || ( exclusive_max_flot + ( without_priority_count += 1 ) )
+      end
+    end
+
     Action_ = ::Struct.new :local_normal_name, :client, :priority
     class Action_
-      alias_method :norm, :local_normal_name
       def slug
         @slug ||= local_normal_name.to_s  # important
       end
@@ -358,7 +385,7 @@ module Skylab::Test
         act = @action_a.detect { |a| rx =~ a.slug }
         if act
           @argv.shift  # (we lose the actual token used here.)
-          @queue_a << act.norm
+          @queue_a << act.local_normal_name
         else
           break
         end
@@ -368,19 +395,17 @@ module Skylab::Test
 
     def resolve_default_action_if_necessary
       if @queue_a.length.zero?  # could be shortened but meh
-        nam = nil
-        emit_eventpoint :default_action do |ea|
-          wgt = 0.0
-          nam = ea.reduce nil do |m, ((name, weight), _c) |
-            if weight > wgt
-              m, wgt = name, weight
-            end
-            m
+        name_i  = nil
+        weight_flot = 0.0
+        emit_eventpoint :default_action do |pi, nm_i, wt_flot|
+          if wt_flot > weight_flot
+            name_i, weight_flot = nm_i, wt_flot
           end
         end
-        nam && @queue_a << nam
+        name_i && @queue_a << name_i
       end
       @queue_a.length.nonzero?
+      # (result's true-ish-ness = whether we have resolved *any* action.)
     end
   end
 
@@ -394,14 +419,14 @@ module Skylab::Test
     # aggregate option parser.
 
     def merge_options up_op, at_end=nil, ctx_a=nil
-      ep = plugin_manager.fetch_eventpoint :available_options  # (raises custm)
-      merger = Headless::CLI::Option::Merger.new method( :qualified_plugin_slug)
-      @plugin_manager.hot_plugins.each do |client|
-        if client.plugin_subscribed? ep.name  # (as op to `c.plugin_eventpoint`)
+      ep = plugin_host_metaservices.eventpoints.fetch :available_options
+      merger = Headless::CLI::Option::Merger.new ANCHORIZED_MONIKER_
+      hot_plugin_a.each do |pi|
+        if pi.plugin_metaservices.subscribed_to_eventpoint? ep.normal
           rec = Headless::CLI::Option::Parser::Recorder.new do |opt|
-            merger.add opt, * [ * ctx_a, client ]
+            merger.add opt, * [ * ctx_a, pi ]
           end
-          client.send ep.as_method_name, rec, ctx_a
+          pi.send ep.as_method_name, rec, ctx_a
         end
       end
       at_end and at_end[ merger ]
@@ -409,21 +434,14 @@ module Skylab::Test
       nil
     end
 
-    # `qualified_plugin_slug` - this method (as a proc) is passed to the
-    # option merger to tell it how to render the slug-like identifying
-    # string for the plugin (a hacky view template). (the merger makes some
-    # decisions on its own, like adding parenthesis, and putting the slug
-    # string at the end and not the beginning of all the content)
+    ANCHORIZED_MONIKER_ = -> * cx_a do
 
-    def qualified_plugin_slug * cx_a
+      # for a plugin that itself has plugins, its desc lines will qualify
+      # themselves multiple times without the below check #whew
 
-      # the hacky way we get around desc lines qualifiying themselves
-      # multiple times for the final desc line of a plugin that has plugins
-      # (whew) is this (add a `true or` in there to see the difference):
-
-      if ! cx_a.last.is_plugin_host
+      if ! cx_a.last.plugin_metastory.is_host
         a = cx_a.reduce [] do |m, client|
-          m << client.plugin_slug
+          m << client.local_plugin_moniker
           m
         end
         "#{ a * ' ' } plugin"
@@ -432,10 +450,7 @@ module Skylab::Test
   end
 
   module Agent_IM_
-  private
-    def host
-      @plugin_host_services
-    end
+    # used to have things, may have things in the future
   end
 end
 

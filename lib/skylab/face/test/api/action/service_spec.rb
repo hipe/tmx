@@ -37,7 +37,7 @@ module Skylab::Face::TestSupport::API::Service
         -> do
           nc::API.invoke :w, never: :see
         end.should raise_error(
-          Face::Services::Headless::Plugin::Service::NameError,
+          Face::Services::Headless::Plugin::DeclarationError,
           /Client has not declared the required service "nerk" declared #{
             }as needed by .+API::Actions::W\./
         )
@@ -51,14 +51,14 @@ module Skylab::Face::TestSupport::API::Service
           Face::API[ self ]
           class API::Client  # (re-open!)
             Face::Services::Headless::Plugin::Host.enhance self do
-              service_names %i| nerk berk |
+              services :nerk, :blerk
             end
           end
           class API::Actions::W < Face::API::Action
             services :nerk
 
             def execute
-              @plugin_host_services.nerk
+              nerk
             end
           end
         end
@@ -79,7 +79,7 @@ module Skylab::Face::TestSupport::API::Service
           Face::API[ self ]
           class API::Client  # (re-open!)
             Face::Services::Headless::Plugin::Host.enhance self do
-              service_names %i| nerk berk |
+              services :nerk, :blerk
             end
 
             def nerk
@@ -90,7 +90,7 @@ module Skylab::Face::TestSupport::API::Service
             services :nerk
 
             def execute
-              "<yup:#{ @plugin_host_services.nerk }>"
+              "<yup:#{ nerk }>"
             end
           end
         end
@@ -108,7 +108,7 @@ module Skylab::Face::TestSupport::API::Service
           Face::API[ self ]
           class API::Client  # (re-open!)
             Face::Services::Headless::Plugin::Host.enhance self do
-              service_names %i| blerk |
+              services :blerk
             end
 
             def initialize( * )
@@ -121,7 +121,7 @@ module Skylab::Face::TestSupport::API::Service
 
           class API::Actions::W < Face::API::Action
 
-            services [ :blerk, :ingest ]
+            services [ :blerk, :ivar ]
 
             def execute
               "<yup-w:#{ @blerk.call }>"
@@ -130,7 +130,7 @@ module Skylab::Face::TestSupport::API::Service
 
           class API::Actions::X < Face::API::Action
 
-            services [ :blerk, :ingest, :ingest_as_ivar, :@zoidberg ]
+            services [ :blerk, :ivar, :@zoidberg ]
 
             def execute
               "<yup-x:#{ @zoidberg.call }>"

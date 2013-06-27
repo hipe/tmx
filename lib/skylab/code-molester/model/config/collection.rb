@@ -3,20 +3,15 @@ module Skylab::CodeMolester
   class Model::Config::Collection
 
     CodeMolester::Services::Face::Model.enhance self do
-      service_names %i|
+
+      services_used( * %i|
         has_model_instance
         set_new_valid_model_instance
         config_filename
         config_search_num_dirs
-        config_search_start_pathname
-      |
-    end
+        config_get_search_start_pathname
+      | )
 
-    def init_model_collection plugin_host_proxy
-      did = false
-      @plugin_host_services ||= ( did = true and plugin_host_proxy )
-      did or fail "sanity - ivar name collision?"
-      nil
     end
 
     # `create`
@@ -25,18 +20,17 @@ module Skylab::CodeMolester
     #   + `opt_h`    * (please see downstream ~Config_Controller#`create`)
     #   + `event_h`  * (idem)
 
-
     def create field_h, opt_h, event_h
       config = nil
       alt = [
         -> {
-          if model_svcs.has_model_instance :config
+          if has_model_instance :config
             raise "sanity - won't create when a cached config exists."  # #todo
           end },
         -> {
           directory, = unpack_equal field_h, :directory
-          pn = ::Pathname.new( directory ).join( config_svcs.config_filename )
-          config = model_svcs.set_new_valid_model_instance :config,
+          pn = ::Pathname.new( directory ).join( config_filename )
+          config = set_new_valid_model_instance :config,
             -> st { st.pathname = pn },
             -> c  { c },
             nil  # sets no error handler #todo
@@ -65,14 +59,14 @@ module Skylab::CodeMolester
     #
     # needs the host services:
     #
-    #  + `config_search_start_pathname`
+    #  + `config_get_search_start_pathname`
     #  + `config_search_num_dirs`
     #  + `config_filename`
 
     def find_nearest_config_file_path _fh, _oh, yes, no
-      c = config_svcs ; pn = c.config_search_start_pathname
-      remaining_tries = c.config_search_num_dirs
-      fn = c.config_filename
+      pn = config_get_search_start_pathname
+      remaining_tries = config_search_num_dirs
+      fn = config_filename
       # --*--
       pn.absolute? or pn = pn.expand_path
       pn.absolute? or fail "sanity"  # it is important
@@ -105,11 +99,11 @@ module Skylab::CodeMolester
     end
 
     def if_config yes, no
-      if model_svcs.has_model_instance :config then yes[ ]
+      if has_model_instance :config then yes[ ]
       else
         find_nearest_config_file_path( nil, nil,
           -> found_pn do
-            model_svcs.set_new_valid_model_instance :config, -> c do
+            set_new_valid_model_instance :config, -> c do
               c.pathname = found_pn
             end, yes, no
           end,
@@ -125,12 +119,5 @@ module Skylab::CodeMolester
         )
       end
     end
-
-  private
-
-    alias_method :model_svcs, :plugin_host_services
-
-    alias_method :config_svcs, :plugin_host_services
-
   end
 end

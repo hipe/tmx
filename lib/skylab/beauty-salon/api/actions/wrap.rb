@@ -11,7 +11,7 @@ module Skylab::BeautySalon
 
     emits :info_line, :info, :normalization_failure_line
 
-    services :ostream, :estream
+    services [ :ostream, :ivar ] , [ :estream, :ivar ]
 
     def execute
       res = false ; head = nil
@@ -124,7 +124,6 @@ module Skylab::BeautySalon
     end
 
     def preexecute  # #result is tuple
-      @ostream, @estream = @plugin_host_services[ :ostream, :estream ]
       @did_engage = nil ; @line_no_fmt = '%4d'  # meh
       if @do_preview
         @paystream = @estream
@@ -136,7 +135,7 @@ module Skylab::BeautySalon
       if @do_preview and @be_verbose and @do_number_the_lines
         @engage_head = "     + "  # ick
       end
-      true
+      [ true, nil ]
     end
 
     def engage line  # assume @scn and `line` and result should be t|f

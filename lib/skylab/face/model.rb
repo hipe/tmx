@@ -4,37 +4,37 @@ module Skylab::Face
 
     # is it a good idea to extend the plugin library?  let's just see..
 
-    def self.enhance model_class, & def_blk
-
-      story = nil
-      Face::Services::Headless::Plugin._enhance model_class, -> do
-        Story.new model_class
-      end, -> s { story = s },
-      begin
-        cnd = Conduit_.new
-        cnd.instance_variable_set :@face_h, ::Hash[ Conduit_::A.zip( [
-          -> do
-            story.do_memoize = true
-          end
-        ] ) ]
-        cnd
-      end, def_blk
+    def self.enhance mod, & blk
+      cnd = Conduit_.new( fsh = Metaservices_.new )
+      blk and cnd.instance_exec( & blk )
+      fsh.flush mod
+      nil
     end
+  end
 
-    class Conduit_ < Services::Headless::Plugin::Conduit_
-      ( A = %i|
-        do_memoize
-      | ).each do |i|
-        define_method i do |*a|  # no blocks by desing
-          @face_h.fetch( i ).call( *a )
-        end
+  class Model::Conduit_ < Services::Headless::Plugin::Conduit_
+    def do_memoize
+      @story.do_memoize!
+    end
+    def do_not_memoize
+      @story.do_not_memoize!
+    end
+  end
+
+  class Model::Metaservices_ < Services::Headless::Plugin::Metaservices_
+    def self.do_memoize!
+      const_set :DO_MEMOIZE_, true
+    end
+    def self.do_not_memoize!
+      const_set :DO_MEMOIZE_, false
+    end
+    def self.do_memoize
+      if const_defined? :DO_MEMOIZE_, false
+        const_get :DO_MEMOIZE_, false
       end
-
-      # One_Shot_ .. yes we could but we won't yet
     end
-
-    class Story < Services::Headless::Plugin::Story
-      attr_accessor :do_memoize
+    def do_memoize
+      self.class.do_memoize
     end
   end
 end

@@ -12,8 +12,6 @@ module Skylab::Test
     const_set i, ::Skylab.const_get( i, false )
   end
 
-  extend MetaHell::MAARS
-
-  extend MetaHell::MAARS  # make it an autoloader, sure why not.
+  extend MetaHell::MAARS  # autoloading is used downwards deeply
 
 end

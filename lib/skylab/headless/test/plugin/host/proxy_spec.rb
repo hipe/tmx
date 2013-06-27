@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::Headless::TestSupport::Plugin::Host::Proxy
+module Skylab::Headless::TestSupport::Plugin::Host::Proxy_
 
-  ::Skylab::Headless::TestSupport::Plugin::Host[ Proxy_TestSupport = self ]
+  ::Skylab::Headless::TestSupport::Plugin::Host[ Proxy__TestSupport = self ]
 
   include CONSTANTS
 
@@ -12,13 +12,23 @@ module Skylab::Headless::TestSupport::Plugin::Host::Proxy
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::Headless::Plugin::Host::Proxy" do
+  describe "Skylab::Headless::Plugin::Host::Proxy_" do
     context "using `Headless::Plugin::Host::Proxy`" do
       Sandbox_1 = Sandboxer.spawn
       it "comprehensive example" do
         Sandbox_1.with self
         module Sandbox_1
-          class CheekyWebClient
+          class Cheeky_CLI_Client
+            Headless::Plugin::Host::Proxy.enhance self do
+              services :emphasize_text
+            end
+          private
+            def emphasize_text x
+              x.upcase
+            end
+          end
+
+          class Cheeky_Web_Client
             Headless::Plugin::Host::Proxy.enhance self do
               services [ :emphasize_text, :ivar ]
             end
@@ -27,30 +37,18 @@ module Skylab::Headless::TestSupport::Plugin::Host::Proxy
             end                                  # do NOT use in real world.)
           end
 
-          class CheekyCLI_Client
-            Headless::Plugin::Host::Proxy.enhance self do
-              services [ :emphasize_text, :ivar ]
-            end
-            def initialize
-              @emphasize_text = -> x { x.upcase }
-            end
-          end
+          cli = Cheeky_CLI_Client.new
+          web = Cheeky_Web_Client.new
 
-          web = CheekyWebClient.new
-          cli = CheekyCLI_Client.new
+          p = web.instance_variable_get( :@plugin_host ). # sad, nec. evil
+            plugin_host_metaservices.call_service( :emphasize_text )
 
-          web.class.method_defined?( :plugin_host ).should eql( false )
-          web.class.private_method_defined?( :plugin_host ).should eql( false )
+          p.call( 'hi' ).should eql( '<em>hi</em>' )
 
-          webf, clif = [ web, cli ].map do |clnt|
-            ph = clnt.instance_variable_get :@plugin_host
-            ph.call_plugin_host_service(
-              ph.plugin_services._story.fetch_service( :emphasize_text ),
-              nil, nil )
-          end
+          ms = cli.instance_variable_get( :@plugin_host ).
+            plugin_host_metaservices
 
-          webf[ 'hi' ].should eql( '<em>hi</em>' )
-          clif[ 'hi' ].should eql( 'HI' )
+          ms.call_service( :emphasize_text, 'hi' ).should eql( 'HI' )
         end
       end
     end

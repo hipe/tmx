@@ -309,6 +309,64 @@ module Skylab::MetaHell::TestSupport::Boxxy
         end
       end
     end
+    context "`your_module.boxxy.dsl do .. end` - an experimental runtime DSL block" do
+      Sandbox_11 = Sandboxer.spawn
+      before :all do
+        Sandbox_11.with self
+        module Sandbox_11
+          DSL_ = module Foo
+            MetaHell::Boxxy[ self ]
+            ZIP = :zap
+            r = nil
+            boxxy { r = self }
+            r
+          end
+        end
+      end
+      it "`original_constants`" do
+        Sandbox_11.with self
+        module Sandbox_11
+          DSL_.original_constants.should eql( [ :ZIP ] )
+        end
+      end
+      it "`dir_pathname`" do
+        Sandbox_11.with self
+        module Sandbox_11
+          ( !! DSL_.dir_pathname.to_s.match( %r{/foo\z} ) ).should eql( true )
+        end
+      end
+      it "`pathify`" do
+        Sandbox_11.with self
+        module Sandbox_11
+          DSL_.pathify( :'FooBar_' ).should eql( 'foo-bar-' )
+        end
+      end
+      it "`extname`" do
+        Sandbox_11.with self
+        module Sandbox_11
+          DSL_.extname.should eql( ::Skylab::Autoloader::EXTNAME )
+        end
+      end
+      it "`upwards`" do
+        Sandbox_11.with self
+        module Sandbox_11
+          DSL_.upwards( module Fiz ; self end )
+          ( !! Fiz.dir_pathname.to_s.match( /fiz\z/ ) ).should eql( true )
+        end
+      end
+      it "`get_const`" do
+        Sandbox_11.with self
+        module Sandbox_11
+          DSL_.get_const( :ZIP ).should eql( :zap )
+
+          module Zangief ; end
+          -> do
+            DSL_.get_const( :Zangief )
+          end.should raise_error( NameError,
+                       ::Regexp.new( "\\Auninitialized\\ consta" ) )
+        end
+      end
+    end
     TestSupport::Coverage::Muncher.munch -> do
       MetaHell::Boxxy.dir_pathname.to_s
     end, '--cover', $stderr, ::ARGV

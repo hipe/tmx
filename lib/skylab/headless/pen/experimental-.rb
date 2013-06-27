@@ -7,7 +7,7 @@ module Skylab::Headless
 
   end
 
-  class Pen::Experimental_::Plugin_Services_
+  class Pen::Experimental_::Plugin_Host_MetaServices_
 
     # experimental crazy fun hack - the pen can be conceptualized as a plugin
     # host that has services: action nodes that want to render themselves in
@@ -26,13 +26,15 @@ module Skylab::Headless
       @svc_h = { }
     end
 
-    def build_host_proxy _client  # it's just a pen. meh.
-      nil
+    PFHS_ = -> _ { true }
+
+    def proc_for_has_service
+      PFHS_
     end
 
-    def call_host_service _plugin_story, svc_i
-      @svc_h.fetch svc_i do |k|
-        @svc_h[ k ] = @pen[].method svc_i
+    def call_service i, _=nil, _=nil
+      @svc_h.fetch i do |k|
+        @svc_h[ k ] = @pen[].method i
       end
     end
   end

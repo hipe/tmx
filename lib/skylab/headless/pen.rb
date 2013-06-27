@@ -40,10 +40,8 @@ module Skylab::Headless
       ick s                       # with excessive emphasis and
     end                           # exuberance. not for use.
 
-    # `plugin_services` - see implementation
-
-    def plugin_services
-      @plugin_services ||= Pen::Experimental_::Plugin_Services_.new self
+    def plugin_host_metaservices  # see impl.
+      @_phm ||= Pen::Experimental_::Plugin_Host_MetaServices_.new self
     end
   end
 

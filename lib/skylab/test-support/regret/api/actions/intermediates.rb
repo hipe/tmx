@@ -4,9 +4,9 @@ module Skylab::TestSupport::Regret::API
 
     v = API::Conf::Verbosity[ self ]
 
-    services [ :out, :ingest ],
-             [ :err, :ingest ],
-             [ :pth, :ingest ],
+    services [ :out, :ivar ],
+             [ :err, :ivar ],
+             [ :pth, :ivar ],
              [ :invitation ]
 
     params :path, v.param( :vtuple ),

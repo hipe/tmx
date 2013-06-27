@@ -1,8 +1,7 @@
 module Skylab::Face
 
   module CLI::Metastory  # [#fa-035]
-    def self.touch  # just used for loading the library
-    end
+    def self.touch ; nil end      #kick-the-loading-warninglessly-and-trackably
   end
 
   class CLI

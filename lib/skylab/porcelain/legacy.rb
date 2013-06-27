@@ -1076,7 +1076,7 @@ module Skylab::Porcelain::Legacy
     include Action::InstanceMethods
 
     Headless::Plugin::Host.enhance self do
-      services [ :kbd, :use_method, :kbd_as_service ]
+      services [ :kbd, :method, :kbd_as_service ]
     end
 
   private
@@ -1298,11 +1298,12 @@ module Skylab::Porcelain::Legacy
     #
 
     Headless::Plugin.enhance self do
-      services [ :kbd, :ingest ]
+      services_used [ :kbd, :ivar ]
     end
 
     def initialize plugin_host, elements
-      load_plugin plugin_host.plugin_services, :load_ingestions
+      receive_plugin_attachment_notification plugin_host.
+        plugin_host_metaservices
       @element_a = elements
       nil
     end

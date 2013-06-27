@@ -1,6 +1,7 @@
 [#034] #open assess [module|class]-creator infection level, consider removal
-[#033] #open #doc-test: #feature: infer context description lines
-[#032]       #api-lock.
+[#033]       #doc-point - "contained DSL" through `enhance` ..
+[#032]       #api-point constant trouble's fields are immutable (ergo dupable)
+[#031]       #api-lock.
 [#030]       #doc-point of the `stowaway` facility #documented-inline
 [#029]       #doc-point this is the official docpoint of "autoloading" and
              the idea of `isomorphic file locations` (yet to be documented)

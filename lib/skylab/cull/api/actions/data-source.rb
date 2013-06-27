@@ -8,12 +8,12 @@ module Skylab::Cull
 
     params  # no params
 
-    services :model, [ :pth, :ingest ]
+    services :model, [ :pth, :ivar ]
 
     emits :payload_line, couldnt: :entity_event
 
     def execute
-      plugin_host_services.model( :data, :sources ).
+      model( :data, :sources ).
         list method( :payload_line ), method( :couldnt )
     end
   end
@@ -31,14 +31,14 @@ module Skylab::Cull
            [ :tag_a,      :arity, :zero_or_more, :ds ],
            [ :is_dry_run, :arity, :zero ]
 
-    services :model, [ :pth, :ingest ]
+    services :model, [ :pth, :ivar ]
 
     emits  :before, :after, :all,
       could: :entity_event, couldnt: :entity_event
 
     def execute
       field_h, opt_h = unpack_params :ds, true
-      coll = plugin_host_services.model :data, :sources
+      coll = model :data, :sources
       coll.add field_h, opt_h,
         could: method( :could ),
         couldnt: method( :couldnt ),

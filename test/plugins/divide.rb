@@ -5,17 +5,20 @@ module Skylab::Test
     Test = Test  # so visible from children
 
     Headless::Plugin.enhance self do
-      eventpoints %i|
+
+      eventpoints_subscribed_to( * %i|
         available_actions
         action_summaries
         argv_hijinx
-      |
-      service_names %i|
-        infostream
-        paystream
-        hot_subtree
-        full_program_name
-      |
+      | )
+
+      services_used(
+        [ :infostream, :proxy ],
+        [ :paystream, :proxy ],
+        [ :hot_subtree, :proxy ],
+        [ :full_program_name, :proxy ]
+      )
+
     end
 
     available_actions [ [ :divide, 0.1700 ] ]
@@ -40,7 +43,7 @@ module Skylab::Test
       if ! self.class.respond_to? :dir_pathname  # circ.
         Face::MAARS::Upwards[ self.class ]
       end
-      self.class.const_get( :Worker_, false )[ host, @argv ]
+      self.class.const_get( :Worker_, false )[ @plugin_parent_services, @argv ]
       false  # do not continue
     end
   end

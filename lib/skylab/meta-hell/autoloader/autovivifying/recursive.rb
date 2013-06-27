@@ -66,8 +66,8 @@ module Skylab::MetaHell
         stack_a.push mod
         mod.instance_variable_defined? :@dir_pathname and
           break( top_has_dpn = true )
-        _mod = MetaHell::Module::Accessors::FUN.resolve[ mod, '..' ]
-        _mod or raise "can't - rootmost module (::#{ mod }) has no dir_pathname"
+        _mod = MetaHell::Module::Accessors::FUN.resolve[ mod, '..' ] or
+          raise "can't - rootmost module (::#{ mod }) has no dir_pathname"
         mod = _mod
       end
       top_has_dpn and stack_a.pop.extend MAARS

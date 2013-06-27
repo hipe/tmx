@@ -10,11 +10,11 @@ module Skylab::Face
 
     def self.[] host
       Face::Services::Headless::Plugin::Host.enhance host do
-        service_names %i|
+        services( * %i|
           has_model_instance
           set_new_valid_model_instance
           model
-        |
+        | )
         host.send :include, API::Client::Model::InstanceMethods  # wedged in here
           # in case we override above, and get overridden below
       end

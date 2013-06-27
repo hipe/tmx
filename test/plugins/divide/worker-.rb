@@ -10,8 +10,8 @@ class Skylab::Test::Plugins::Divide
       new( *a ).execute
     end
 
-    def initialize host, argv
-      out, err = host[ :paystream, :infostream ]
+    def initialize host_svcs, argv
+      out, err = host_svcs[ :paystream, :infostream ]
       integer = kw = nil ; dflt = 3
 
       validate = partition = render = nil
@@ -21,7 +21,7 @@ class Skylab::Test::Plugins::Divide
           err.puts "(defaulting to #{ dflt } subdivisions)"
           integer = dflt
         end
-        big_a = get_big_a host
+        big_a = get_big_a host_svcs
         len = big_a.length
         if integer > len
           err.puts "(integer is larger than (#{ len }). subdividing in to 1)"
@@ -42,7 +42,7 @@ class Skylab::Test::Plugins::Divide
         render[ part_b ]
       end
       render = -> part_b do
-        pname = host.full_program_name
+        pname = host_svcs.full_program_name
         part_b.each do |rack|
           out.puts "#{ pname } #{ rack * ' ' }"
         end
@@ -103,9 +103,9 @@ class Skylab::Test::Plugins::Divide
 
     def execute ; @execute.call end
 
-    def get_big_a host
+    def get_big_a host_svcs
       ::Enumerator.new do |y|
-        host.hot_subtree.children.each do |tree|
+        host_svcs.hot_subtree.children.each do |tree|
           if tree.children.count.nonzero?
             y << tree
           end

@@ -43,7 +43,7 @@ module Skylab::Headless
 
     attr_reader :local_normal
 
-  protected
+  private
 
     def initialize local_normal       # (consider freezing your n.f)
       @local_normal = local_normal
@@ -81,8 +81,8 @@ module Skylab::Headless
   class Name::Function::From::Constant < Name::Function
 
     # constant names can hold more information than others, so converting
-    # from const to norm can be lossy (e.g `NCSA_Spy` -> `ncsa_spy`. going
-    # in the reverse direction deterministically is impossible!)
+    # from const to norm can be lossy (e.g `NCSA_Spy` -> `ncsa_spy` - it
+    # is impossible to go in the reverse direction deterministically)
 
     def self.from_name name
       new name[ name.rindex( ':' ) + 1 .. -1 ]
@@ -96,7 +96,7 @@ module Skylab::Headless
       # look like a full name function, if you want to future-proof your name
       # function but for now only use a const and not a deep graph.
 
-  protected
+  private
 
     def initialize const  # symbol! #api-lock [#032] : this signature.
       @const = const
@@ -145,7 +145,9 @@ module Skylab::Headless
 
   class Name::Function::From::Module_Anchored < Name::Function::Full
     # (centralize this hacky fun here.)
-   private
+
+  private
+
     def initialize n2, n1  # n2 - your module name  n1 - box module name
       0 == n2.index( n1 ) or raise "sanity - #{ n1 } does not contain #{ n2 }"
       name_a = if n2 == n1

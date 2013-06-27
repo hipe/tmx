@@ -60,8 +60,6 @@ module Skylab::MetaHell
     #     Adapters.const_fetch( :'bongo-tongo' ) # => :fiz
     #
 
-    # (this spot, file is the poster-child for [#mh-033] context desc. lines.)
-
     def self.enhance mod, &blk
       mod.module_exec do
         @boxxy ||= begin
@@ -346,6 +344,10 @@ module Skylab::MetaHell
         @boxxy.get_constants      # be in `boxxy_original_constants`)
       end
 
+      def boxxy &blk
+        @boxxy.dsl blk
+      end
+
       def _boxxy  # #api-private
         @boxxy
       end
@@ -531,6 +533,50 @@ module Skylab::MetaHell
 
       Default = Camel_Case_With_Underscore
 
+    end
+
+    # `your_module.boxxy.dsl do .. end` - an experimental runtime DSL block
+    # `original_constants`:
+    #
+    #     DSL_ = module Foo
+    #       MetaHell::Boxxy[ self ]
+    #       ZIP = :zap
+    #       r = nil
+    #       boxxy { r = self }
+    #       r
+    #     end
+    #
+    #     DSL_.original_constants # => [ :ZIP ]
+    #
+    # `dir_pathname`:
+    #
+    #     ( !! DSL_.dir_pathname.to_s.match( %r{/foo\z} ) )  # => true
+    #
+    # `pathify`:
+    #
+    #     DSL_.pathify( :'FooBar_' )  # => 'foo-bar-'
+    #
+    # `extname`:
+    #
+    #     DSL_.extname  # => ::Skylab::Autoloader::EXTNAME
+    #
+    # `upwards`:
+    #
+    #     DSL_.upwards( module Fiz ; self end )
+    #     ( !! Fiz.dir_pathname.to_s.match( /fiz\z/ ) )  # => true
+    #
+    # `get_const`
+    #
+    #     DSL_.get_const( :ZIP )  # => :zap
+    #
+    #     module Zangief ; end
+    #     DSL_.get_const( :Zangief )  # => NameError: uninitialized consta..
+
+    class Boxxy_
+      def dsl blk
+        Boxxy::DSL_.load
+        dsl blk
+      end
     end
 
     FUN = ::Struct.new( * fun.keys ).new( * fun.values ).freeze

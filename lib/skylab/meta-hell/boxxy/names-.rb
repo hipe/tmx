@@ -7,7 +7,7 @@ module Skylab::MetaHell
 
     class Fly_ < MetaHell::Services::Headless::Name::Function::From::Constant
 
-      alias_method :replace, :initialize ; public :replace  # [#mh-032]
+      alias_method :replace, :initialize ; public :replace  # [#mh-031]
       def initialize ; end  # poof you're a flyweight
 
       def dupe
