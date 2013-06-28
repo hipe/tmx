@@ -14,7 +14,7 @@ module Skylab::PubSub::TestSupport::CLI::Fire
     extend Fire_TestSupport
 
     it "with the ideal case - works" do
-      g = Headless::TestSupport::CLI::IO_Spy_Group.new nil
+      g = TestSupport::IO::Spy::Triad.new nil
       # g.debug!
       c = PubSub::CLI.new( * g.values )
       argv = [ 'fire',

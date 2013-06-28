@@ -348,7 +348,7 @@ module Skylab::Headless
     FUN = fun.to_struct           # people just love using `at`
   end
 
-  class CLI::Option::Enumerator < ::Enumerator  # here b.c of [#sl-124]
+  class CLI::Option::Enumerator < ::Enumerator  # here b.c of [#mh-035]
 
     # an adaptive layer around an optionparser for iterating over its options.
     # Iterate over a collection of option-ishes, be they from a stdlib o.p

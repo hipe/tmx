@@ -1,8 +1,8 @@
-module Skylab::Headless::TestSupport
+module Skylab::TestSupport
 
   # (see also the way more complicated ::Skylab::TestSupport::IO::Spy::Group)
 
-  class CLI::IO_Spy_Group < ::Struct.new :instream, :outstream, :errstream
+  class IO::Spy::Triad < ::Struct.new :instream, :outstream, :errstream
                                   # (the SECOND you do anything funky, change
                                   # this to a class, you hear!?)
 
