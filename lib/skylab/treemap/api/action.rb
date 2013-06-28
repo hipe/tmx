@@ -157,7 +157,7 @@ module Skylab::Treemap
     -> do
 
       norm_h = {
-        1 => -> x { x },
+        1 => IDENTITY_,
         2 => -> a, b { b.merge message: a }
       }
 

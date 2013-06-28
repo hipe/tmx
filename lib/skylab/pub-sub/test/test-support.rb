@@ -25,4 +25,6 @@ module Skylab::PubSub::TestSupport
       PubSub::TestSupport.dir_pathname.join( 'fixtures' )
     end
   end
+
+  IDENTITY_ = -> x { x }
 end

@@ -11,8 +11,6 @@ module Skylab::BeautySalon
   MAARS = MetaHell::MAARS
   Headless = Face::Services::Headless
 
-  extend MAARS
-
   module CLI  # (avoiding orphan file by putting it here.)
 
     extend MAARS
@@ -21,4 +19,8 @@ module Skylab::BeautySalon
       const_get( :Client ).new( *a )
     end
   end
+
+  IDENTITY_ = -> x { x }          # for fun we track this
+
+  extend MAARS
 end

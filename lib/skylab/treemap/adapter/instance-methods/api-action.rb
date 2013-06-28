@@ -11,7 +11,7 @@ module Skylab::Treemap
     end
 
     def adapter_api_action
-      with_adapter_api_action -> x { x }
+      with_adapter_api_action IDENTITY_
     end
 
     def with_adapter_api_action func

@@ -102,7 +102,12 @@ module Skylab::PubSub::TestSupport
 
     -> do
 
-      identity = desc_h_h = nil  # scope
+
+      desc_h_h = {
+        pos:  IDENTITY_,
+        type: IDENTITY_,
+        msg:  IDENTITY_
+      }.freeze
 
       define_method :description do
         if @desc_h.length.zero?
@@ -119,14 +124,6 @@ module Skylab::PubSub::TestSupport
           end
         end
       end
-
-      identity = -> x { x }
-
-      desc_h_h = {
-        pos:  identity,
-        type: identity,
-        msg:  identity
-      }
     end.call
 
     def unstylize_all_stylized!  # courtesy

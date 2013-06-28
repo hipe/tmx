@@ -4,7 +4,6 @@ require 'skylab/headless/core'
 require 'skylab/meta-hell/core'
 require 'skylab/porcelain/core'
 
-
 module Skylab::Snag
 
   Autoloader = ::Skylab::Autoloader
@@ -14,9 +13,11 @@ module Skylab::Snag
   Porcelain = ::Skylab::Porcelain
   PubSub = ::Skylab::PubSub
 
-  extend MetaHell::Autoloader::Autovivifying::Recursive
-
   module Core
-    extend MetaHell::Autoloader::Autovivifying::Recursive
+    extend MetaHell::MAARS
   end
+
+  IDENTITY_ = -> x { x }
+
+  extend MetaHell::MAARS
 end

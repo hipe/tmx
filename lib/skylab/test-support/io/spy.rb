@@ -9,7 +9,7 @@ module Skylab::TestSupport
     # written to it.
     #
     # Typically it's used like this: In places where you are writing to
-    # e.g. $stdout or $stderr, hopefully you have represented it as variable.
+    # e.g. $s-tdout or $s-tderr, hopefully you have represented it as variable.
     # At the beginning of your test, point that variable
     # instead to a IO::Spy that has as its only child member (listener) a
     # :buffer that is a (e.g.) ::StringIO.  Then in your test assertion ensure
@@ -22,9 +22,9 @@ module Skylab::TestSupport
     #   #todo example here using etc
     #
     # Calling debug! on your IO::Spy is another convenience 'macro'
-    # that simply adds $stderr to the list of child listeners.  This can
+    # that simply adds $s-tderr to the list of child listeners.  This can
     # be helpful when developing a test, when you want to spy on the spy
-    # as it were, and have it output to $stderr what is being written to it,
+    # as it were, and have it output to $s-tderr what is being written to it,
     # in addition to writing to the buffer that you will later check.
     #
     # #todo - whether this is on the one hand a pure tee or on the other
@@ -48,7 +48,7 @@ module Skylab::TestSupport
     end
 
     def debug! prepend=nil
-      down_stream = $stderr
+      down_stream = Stderr_.call
       if prepend
         use_stream = Headless::IO::Interceptors::Filter.new down_stream
         if prepend.respond_to? :call

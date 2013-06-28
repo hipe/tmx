@@ -53,6 +53,8 @@ module Skylab::Treemap
     end
   end
 
+  IDENTITY_ = -> x { x }          # just for fun we track where this is used
+
   extend MAARS                    # we put it at the
                                   # bottom as proof that we don't use it here.
 end

@@ -17,6 +17,7 @@ module Skylab::Headless
   end
 
   EMPTY_A_ = [ ].freeze
+  IDENTITY_ = -> x { x }
 
   extend MAARS
 end

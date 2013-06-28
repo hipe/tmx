@@ -24,5 +24,12 @@ module Skylab::TestSupport
                                   # eponymous constant here! there is a
                                   # legitimate other module called SL::TS::TS!)
 
+  Stdout_ = -> { $stdout }        # littering our code with hard-coded globals
+  Stderr_ = -> { $stderr }        # (or constants, that albeit point to a
+                                  # resource like this (an IO stream)) is a
+                                  # smell. we instead reference thme thru
+                                  # these, which will at least point back to
+                                  # this comment.
+
   extend MetaHell::MAARS
 end

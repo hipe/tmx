@@ -59,7 +59,7 @@ module Skylab::Snag
       end
     end
 
-    nothing = result = nil
+    nothing = -> { }
 
     # for each :foo make a `foo_reason` that results in nil iff valid,
     # else string with a failure reason *sentence phrase*.
@@ -69,10 +69,6 @@ module Skylab::Snag
         send m, nothing, -> predicate { "#{ m } #{ predicate }" }
       end
     end
-
-    nothing = -> { }
-
-    result = -> x { x }
 
     nonzero_length = nil  # scope
 

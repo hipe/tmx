@@ -1,4 +1,5 @@
 module Skylab::Treemap
+
   module Adapter::InstanceMethods::Action
     #
     # (please sdon't confuse these with adapter action instance-methods --
@@ -24,7 +25,7 @@ module Skylab::Treemap
             }#{ and_ a.map(& method(:pre)) }".strip
           nil
         end,
-        -> x { x },
+        IDENTITY_,
         -> match_box do
           a = match_box.map { |md| md.item.as_slug }
           msg = "is ambiguous -- did you mean #{ or_ a.map(& method(:pre)) }?"

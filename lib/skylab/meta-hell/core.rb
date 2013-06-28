@@ -11,6 +11,7 @@ module Skylab
                                   # as this. NOW..
 
     EMPTY_A_ =  [ ].freeze        # ocd
+    IDENTITY_ = -> x { x }
 
     # ARE YOU READY TO EAT YOUR OWN DOGFOOD THAT IS MADE OF YOUR BODY
 

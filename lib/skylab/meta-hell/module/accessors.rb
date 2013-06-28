@@ -68,7 +68,7 @@ module Skylab::MetaHell
           host_mod.send :define_method, meth do
             self.class.send meth
           end
-          host_mod.send :define_singleton_method, meth, & f[ -> x { x } ]
+          host_mod.send :define_singleton_method, meth, & f[ IDENTITY_ ]
           host_mod.send access, meth if access
         else
           host_mod.send :define_method, meth, & f[ -> x { x.class } ]

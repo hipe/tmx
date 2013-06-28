@@ -31,7 +31,7 @@ module Skylab::Headless::CLI::Table
     attr_writer :head, :tail, :separator
 
     def field! symbol
-      @field_box.if? symbol, -> x { x }, -> box do
+      @field_box.if? symbol, Headless::IDENTITY_, -> box do
         box.add symbol, Table::Field::Conduit.new
       end
     end

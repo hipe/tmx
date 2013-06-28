@@ -299,7 +299,7 @@ module Skylab::Treemap
     end
 
     def write_more k, &b
-      a = @more_box.if?( k, -> x { x }, -> box { a = [ ] ; box.add k, a ; a } )
+      a = @more_box.if?( k, IDENTITY_, -> box { a = [ ] ; box.add k, a ; a } )
       # (a = (h[k] ||= []))
       a << b
       nil

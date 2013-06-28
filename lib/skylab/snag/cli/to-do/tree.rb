@@ -1,4 +1,5 @@
 module Skylab::Snag
+
   class CLI::ToDo::Tree
     # [#sl-109] class as namespace
   end
@@ -18,7 +19,7 @@ module Skylab::Snag
     end
 
     tree_lines_producer_basic = -> tree do
-      lines = Porcelain::Tree.lines tree, node_formatter: -> x { x }
+      lines = Porcelain::Tree.lines tree, node_formatter: IDENTITY_
       enum = ::Enumerator.new do |y|
         lines.each do |line|
           if line.node.is_leaf
@@ -45,7 +46,7 @@ module Skylab::Snag
       stylize = fun.stylize # here is where you could un-color it if not tty
       lines = Porcelain::Tree.lines tree,
         glyph_set: :wide, # :narrow is fine too ..
-        node_formatter: -> x { x }
+        node_formatter: IDENTITY_
 
       cache_a = [ ]
       lines.each do |line|

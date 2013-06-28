@@ -141,7 +141,7 @@ module Skylab::Headless
     alias_method :known?, :has?  # this one feels ok
 
     def fetch! name
-      if? name, -> x { x },
+      if? name, IDENTITY_,
       -> do
         x = @host.formal_parameter_class.new @host, name
         add name, x

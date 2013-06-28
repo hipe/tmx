@@ -341,7 +341,7 @@ module ::Skylab::MetaHell
     public :dupe                  # used in definer logic
 
     def vivify attr_ref
-      if? attr_ref, -> x { x }, -> { vivify! attr_ref }
+      if? attr_ref, IDENTITY_, -> { vivify! attr_ref }
     end
 
     def vivify! attr_ref          # create the new and add it, result is new el
