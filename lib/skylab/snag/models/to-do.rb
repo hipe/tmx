@@ -3,7 +3,7 @@ module Skylab::Snag
   class Models::ToDo
     # imagine that parts of this are frozen
 
-    require_relative 'to-do/enumerator' # [#sl-124] preload bc toplevel exists
+    require_relative 'to-do/enumerator' # [#mh-035] preload bc toplevel exists
 
     attr_reader :full_source_line
 

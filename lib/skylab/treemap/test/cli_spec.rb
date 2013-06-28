@@ -28,7 +28,7 @@ module Skylab::Treemap::TestSupport::CLI
           end
         end
       end
-      names.should eql( %w(render ping doobie install) )
+      names.sort.should eql( %w(doobie install ping render) )  # [#mh-036] for now, plugins have non-deterministic order
     end
   end
 end

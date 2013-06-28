@@ -1,7 +1,6 @@
 module Skylab::TestSupport
 
-  # (see also the comparable but simpler
-  #   Headless::TestSupport::CLI::IO::Spy::Group
+  # (see also the comparable but simpler TestSupport::IO::Spy::Triad
   # which may be a good fit for testing specifically CLI apps)
 
   # manages a group of special stream spies, creating each one in turn with

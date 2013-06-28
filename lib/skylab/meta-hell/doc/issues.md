@@ -1,3 +1,6 @@
+[#036]       #boxxy #doc-point constants order is non-deterministic
+[#035]       #tracking-tag autoloader won't work when there is toplevel name..
+               (was [#sl-124])
 [#034] #open assess [module|class]-creator infection level, consider removal
 [#033]       #doc-point - "contained DSL" through `enhance` ..
 [#032]       #api-point constant trouble's fields are immutable (ergo dupable)
@@ -13,11 +16,11 @@
 [#024]       #doc-node #body-is-inline-in-code:"formal/attribute.rb"
                `formal attributes` explained. (body is in code for reasons.)
 [#023] #open merge the 2 pool enhancements
-[#022]       #tracking-tag boxxy's relationship to a.l
+[#022]       #tracking-tag #boxxy's relationship to a.l
 [#021]       #tracking-tag, #doc-point `base_args` / `base_init`: this
                is an experiment in initting a blank-slate 'dupe'-ish subset.
 [#020]       #done box instance methods separate from box class maybe?
-[#019]       #done boxxy peeks at fs now, hacks `constants`
+[#019]       #done #boxxy peeks at fs now, hacks `constants`
 [#018]       #done corral proxies
 [#017]       #done corral tees
 [#016]       #tracking-tag wow hash-like iterators are sure annoying

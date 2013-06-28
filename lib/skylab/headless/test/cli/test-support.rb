@@ -23,7 +23,7 @@ module Skylab::Headless::TestSupport::CLI
       end ]
 
       streams = memoize[ -> do
-        Headless_TestSupport::CLI::IO_Spy_Group.new
+        TestSupport::IO::Spy::Triad.new
       end ]
 
       instance = memoize[ -> do

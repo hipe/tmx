@@ -17,6 +17,8 @@ module Skylab::Face::TestSupport::CLI
 
   extend TestSupport::Quickie
 
+  TestSupport = TestSupport
+
   module Sandbox
   end
 
@@ -114,7 +116,7 @@ module Skylab::Face::TestSupport::CLI
     end.call
 
     let :io_spy_group do
-      sg = Headless_TestSupport::CLI::IO_Spy_Group.new nil
+      sg = TestSupport::IO::Spy::Triad.new nil
       if do_debug
         sg.debug!
       end

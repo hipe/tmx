@@ -1,17 +1,17 @@
-[#080]       #doc-point `facet`s are like IoC/dependency injection plugins ..
+[#080]       #doc-point `facet`s are like IoC/dependency injection #plugins ..
 [#079]       #name-convention: modules whose name ends in an `Underscore_`
              are API private - knowledge of their shape or existence must not
              be necessary outside of the node they reside in.
 [#078]       #doc-point conduits, stories and flushers
-[#077]       #api-point #parent:070 - track how `initialize` looks in plugins
+[#077]       #api-point #parent:070 - track how `initialize` looks in #plugins
 [#076]       #parent:070 #future-feature enable/disable a particular plugin
              (don't start on this until we actually need it)
 [#075] #open ingest as method (plugin)
 [#074]       #doc-point #parent:[#070] whether or not `[]` is special
 [#073]       #doc-point extrinsic / intrinsic ..
 [#072]       #tracking-tag #parent:070 chained proxy hosts, chaining in gen.
-[#071] #open the possibility of stateless plugin hosts
-[#070]       plugins!
+[#071] #open the possibility of stateless #plugin hosts
+[#070]       #plugins!
 [#069]       #doc-point (sorry to jump ahead) "ouroboros"
 [#068]       track this redundancy during a hack
 [#067]       merge this into that
@@ -51,7 +51,7 @@
 [#037]       #tracking-tag box classes that build their own option parsers
 [#036]       #behavior-point `par`, `parameter_label` etc -- gather it up ..
                also: there's room for nonsense here.. big nonsense..
-[#035]       #doc-point : the boxxy cluttered namespace problem (Actions)
+[#035]       #doc-point : the #boxxy cluttered namespace problem (Actions)
 [#034]       #tracking-tag for #function-point `program_name` -
               `normalized_invocation_string`
 [#033]       #function-point #tracking-tag `desc`

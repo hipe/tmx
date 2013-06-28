@@ -52,7 +52,7 @@ module Skylab::Treemap::TestSupport::CLI
     end
 
     def streams
-      @streams ||= Headless::TestSupport::CLI::IO_Spy_Group.new nil  # no $stdin
+      @streams ||= TestSupport::IO::Spy::Triad.new nil  # no $stdin
     end
 
     def styled str
