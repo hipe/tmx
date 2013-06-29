@@ -367,8 +367,5 @@ module Skylab::MetaHell::TestSupport::Boxxy
         end
       end
     end
-    TestSupport::Coverage::Muncher.munch -> do
-      MetaHell::Boxxy.dir_pathname.to_s
-    end, '--cover', $stderr, ::ARGV
   end
 end
