@@ -11,15 +11,19 @@ eval $( "lib/skylab/test-support/script/bash-value-export" )
 
 cat "$datadir/files" | while read line
 do
-  if [[ ! -e "$line" ]] ; then
-    echo "not found - $line"
+  read file out <<<$(IFS=' '; echo "$line")
+  if [[ ! -e "$file" ]] ; then
+    echo "not found - $file"
   else
-    haha=$( ruby -e "a = \"$line\".split( '/' ) ; puts \"#{a[2]} #{ a[3..-1].join('/')[ 0..-4 ]}\"" )
+    haha=$( ruby -e "a = \"$file\".split( '/' ) ; puts \"#{a[2]} #{ a[3..-1].join('/')[ 0..-4 ]}\"" )
     read r1 r2 <<<$(IFS=' '; echo "$haha")
-    i="tmx regret doc-test -vv $line"
-    o="lib/skylab/$r1/test/$r2$_spec_rb"
-    _cmd="$i > $o"
-    eval "$i" > "$o"
+    i="tmx regret doc-test -vv $file"
+    if [ -z "$out" ] ; then
+      out="lib/skylab/$r1/test/$r2$_spec_rb"
+    fi
+    _cmd="$i > $out"
+    echo "$_cmd"
+    eval "$i" > "$out"
   fi
 done
 
