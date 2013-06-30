@@ -2,14 +2,12 @@ module Skylab::MetaHell
 
   module Services
 
-    h = { }
+    o = { }
+    subproduct = MetaHell::FUN.require_subproduct
+    o[:Headless] = subproduct
 
-    define_singleton_method( :o ) { |const, block| h[const] = block }
-
-    o :Headless     , -> { require 'skylab/headless/core' ; ::Skylab::Headless }
-
-    define_singleton_method :const_missing do |k|
-      const_set k, h.fetch( k ).call
+    define_singleton_method :const_missing do |const_i|
+      const_set const_i, o.fetch( const_i )[ const_i ]
     end
   end
 end

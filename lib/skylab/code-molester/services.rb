@@ -2,37 +2,25 @@ module Skylab::CodeMolester
 
   module Services # being #watched [#mh-011] (this is instance four)
 
-    h = { }
-
-    define_singleton_method :o do |const, f|
-      h[const] = f
+    o = { }
+    stdlib, subproduct = MetaHell::FUN.at :require_stdlib, :require_subproduct
+    o[:Basic] = subproduct
+    o[:Face] = subproduct
+    o[:FileUtils] = stdlib
+    o[:Psych] = stdlib
+    o[:StringIO] = stdlib
+    o[:StringScanner] = -> _ { require 'strscan' ; ::StringScanner }
+    o[:Treetop] = -> _ do
+      MetaHell::FUN.require_quietly[ 'treetop' ]
+      ::Treetop
     end
-
-    o :Basic,         -> { Headless::Services::Basic }
-
-    o :Face,          -> { require 'skylab/face/core' ; ::Skylab::Face }
-
-    o :FileUtils,     -> { require 'fileutils' ; ::FileUtils }
-
-    o :Psych,         -> { require 'psych'    ; ::Psych }
-
-    o :StringIO,      -> { require 'stringio' ; ::StringIO }
-
-    o :StringScanner, -> { require 'strscan'  ; ::StringScanner }
-
-    o :Treetop,       -> do
-                           MetaHell::FUN.require_quietly[ 'treetop' ]
-                                                ::Treetop
-                         end
-
-    o :YAML,          -> { require 'yaml'     ; ::YAML }
-
+    o[:YAML] = stdlib
 
     extend MAARS  # LOOK.
 
-    define_singleton_method :const_missing do |const|
-      if h.key? const
-        const_set const, h.fetch( const ).call
+    define_singleton_method :const_missing do |const_i|
+      if o.key? const_i
+        const_set const_i, o.fetch( const_i )[ const_i ]
       else
         super const  # KRAY!
       end

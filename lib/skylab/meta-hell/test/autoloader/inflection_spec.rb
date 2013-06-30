@@ -42,8 +42,6 @@ module Skylab::MetaHell::TestSupport::Autoloader::Inflection
 
       o "FB", 'fb', 'atomic adjacent upcase'
 
-      o "CSV::API", 'csv/api', 'this is what acronyms look like'
-
       o "HTTPAuth", "http-auth", 'but wait, look at this, magic! TLA at beginning'
 
       o 'topSecretNSA', 'top-secret-nsa', 'TLA at end'
@@ -52,9 +50,24 @@ module Skylab::MetaHell::TestSupport::Autoloader::Inflection
 
       o "Catch22Pickup", 'catch22pickup', 'numbers whatever this might change'
 
+    end
+
+    context "`pathify_name`" do
+
+      pn = nil
+      define_singleton_method :o do |const, exp_path, desc, *a|
+        it "#{ format % [ desc, const.inspect, exp_path.inspect ] }", *a do
+          pn ||= MetaHell::FUN.pathify_name
+          pn[ const ].should eql( exp_path )
+        end
+      end
+
+      o "CSV::API", 'csv/api', 'this is what acronyms look like'
+
       o "a::b", 'a/b', 'atomic separators case'
 
       o "Foo::BarBaz:::Biff", 'foo/bar-baz/:biff', 'garbage in garbage out'
+
     end
 
     context "`constantize` tries to turn path framents #{

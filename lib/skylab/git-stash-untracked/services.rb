@@ -1,17 +1,17 @@
-module Skylab::GitStashUntracked               # centralize std-lib deps,
-  module Services                              # and lazy-load them as-needed.
+module Skylab::GitStashUntracked
 
-    h = { }
-    define_singleton_method( :o ) { |k, f| h[k] = f }
+  module Services
 
-    o :FileUtils   , -> { require 'fileutils'   ; ::FileUtils }
-    o :Open3       , -> { require 'open3'       ; ::Open3 }
-    o :OptionParser, -> { require 'optparse'    ; ::OptionParser }
-    o :Shellwords  , -> { require 'shellwords'  ; ::Shellwords }
-    o :StringIO    , -> { require 'stringio'    ; ::StringIO }
+    o = { }
+    stdlib = MetaHell::FUN.require_stdlib
+    o[:FileUtils] = stdlib
+    o[:Open3] = stdlib
+    o[:OptionParser] = -> _ { require 'optparse' ; ::OptionParser }
+    o[:Shellwords] = stdlib
+    o[:StringIO] = stdlib
 
-    define_singleton_method :const_missing do |k|
-      const_set k, h.fetch( k ).call
+    define_singleton_method :const_missing do |const_i|
+      const_set const_i, o.fetch( const_i )[ const_i ]
     end
   end
 end

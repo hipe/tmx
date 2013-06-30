@@ -20,18 +20,13 @@ module Skylab::Basic
   module Services
 
     o = { }
+    stdlib, subproduct = MetaHell::FUN.at :require_stdlib, :require_subproduct
+    o[:Headless] = subproduct # icky to reach in this direction, but only for 1
+    o[:StringIO] = stdlib
+    o[:StringScanner] = -> _ { require 'strscan' ; ::StringScanner }
 
-    o[:StringIO]      = -> { require 'stringio' ; ::StringIO }
-
-    o[:StringScanner] = -> { require 'strscan' ; ::StringScanner }
-
-    o[:Headless]   = -> { require 'skylab/headless/core' ; ::Skylab::Headless }
-      # (the above is an icky direction to reach, but is only for 1 constant..)
-
-    define_singleton_method :const_missing do |i|
-
-      const_set i, o.fetch( i ).call
-
+    define_singleton_method :const_missing do |const_i|
+      const_set const_i, o.fetch( const_i )[ const_i ]
     end
   end
 end

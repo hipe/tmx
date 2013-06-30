@@ -2,16 +2,12 @@ module Skylab::Porcelain
 
   module Services
 
-    h = { }
+    o = { }
+    o[:OptionParser] = -> _ { require 'optparse' ; ::OptionParser }
+    o[:StringScanner] = -> _ { require 'strscan' ; ::StringScanner }
 
-    define_singleton_method( :o ) { |const, block| h[const] = block }
-
-    o :OptionParser  , -> { require 'optparse'   ; ::OptionParser  }
-    o :StringScanner , -> { require 'strscan'    ; ::StringScanner }
-
-    # (if you need to, check out my-tree)
     define_singleton_method :const_missing do |k|
-      const_set k, h.fetch( k ).call
+      const_set k, o.fetch( k )[ k ]
     end
   end
 end

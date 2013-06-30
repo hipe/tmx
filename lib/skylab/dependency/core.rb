@@ -6,7 +6,8 @@ require 'skylab/porcelain/core'
 require 'skylab/slake/core'
 
 module Skylab::Dependency
-  extend ::Skylab::MetaHell::Autoloader::Autovivifying::Recursive
+
+  extend ::Skylab::MetaHell::MAARS
 
   CodeMolester = ::Skylab::CodeMolester
   Dependency = self

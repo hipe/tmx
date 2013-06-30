@@ -31,6 +31,24 @@ module Skylab::MetaHell
     o[:without_warning][ -> { require s } ]
   end
 
+  o[:require_subproduct] = -> const_i do
+    if ! ::Skylab.const_defined? const_i, false
+      require "skylab/#{ ::Skylab::Autoloader::Inflection::FUN.
+        pathify[ const_i ] }/core"
+    end
+    ::Skylab.const_get const_i, false
+  end
+
+  o[:require_stdlib] = -> const_i do
+    require const_i.downcase.to_s
+    ::Object.const_get const_i
+  end
+
+  o[:pathify_name] = -> const_name_s do
+    ::Skylab::Autoloader::Inflection::FUN.
+      pathify[ const_name_s.gsub( '::', '/' ) ]
+  end
+
   # `tuple_tower` - given a stack of functions and one seed value, resolve
   # one result.. fuller description at [#fa-026].
   #
@@ -119,5 +137,9 @@ module Skylab::MetaHell
   x[:_parse_series]          = 'parse/series'
   x[:parse_from_set]         = 'parse/from-set'
   x[:parse_from_ordered_set] = 'parse/from-ordered-set'
+
+  def FUN.at *a
+    a.map( & method( :send ) )
+  end
 
 end

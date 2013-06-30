@@ -2,5 +2,9 @@ require_relative '..'
 require 'skylab/meta-hell/core'
 
 module Skylab::InformationTactics
-  extend ::Skylab::MetaHell::Autoloader::Autovivifying::Recursive
+
+  MetaHell = ::Skylab::MetaHell
+
+  extend MetaHell::MAARS
+
 end

@@ -2,23 +2,22 @@ module Skylab::Headless
 
   module Services                 # just lazy-loading of stdlib nerks
 
-    h = { }
-    define_singleton_method( :o ) { |k, f| h[k] = f }
-
-    o :Basic        , -> { require 'skylab/basic/core' ; ::Skylab::Basic }
-    o :CodeMolester , -> { require 'skylab/code-molester/core'
-                                                  ::Skylab::CodeMolester }
-    o :FileUtils    , -> { require 'fileutils'  ; ::FileUtils }
-    o :Open3        , -> { require 'open3'      ; ::Open3 }
-    o :Open4        , -> { MetaHell::FUN.require_quietly[ 'open4' ]; ::Open4 }
-    o :OptionParser , -> { require 'optparse'   ; ::OptionParser }
-    o :PubSub       , -> { require 'skylab/pub-sub/core' ; ::Skylab::PubSub }
-    o :Set          , -> { require 'set'        ; ::Set }
-    o :Shellwords   , -> { require 'shellwords' ; ::Shellwords }
-    o :StringIO     , -> { require 'stringio'   ; ::StringIO }
-    o :StringScanner, -> { require 'strscan'    ; ::StringScanner }
-    o :TreetopTools , -> { require 'skylab/treetop-tools/core'
+    o = { }
+    stdlib, subproduct = MetaHell::FUN.at :require_stdlib, :require_subproduct
+    o[:Basic] = subproduct
+    o[:CodeMolester] = subproduct
+    o[:FileUtils] = stdlib
+    o[:Open3] = stdlib
+    o[:Open4] = -> { MetaHell::FUN.require_quietly[ 'open4' ]; ::Open4 }
+    o[:OptionParser] = -> _ { require 'optparse' ; ::OptionParser }
+    o[:PubSub] = subproduct
+    o[:Set] = stdlib
+    o[:Shellwords] = stdlib
+    o[:StringIO] = stdlib
+    o[:StringScanner] = -> _ { require 'strscan' ; ::StringScanner }
+    o[:TreetopTools] = -> _ { require 'skylab/treetop-tools/core'
                                                   ::Skylab::TreetopTools }
+    o.freeze
 
     extend Autoloader::Methods  # you need it in your chain now
     class << self               # because of this, used below
@@ -26,8 +25,7 @@ module Skylab::Headless
     end
 
     define_singleton_method :const_missing do |k|
-      func = h.fetch k do load_service k end
-      x = instance_exec(& func )
+      x = o.fetch( k ) { load_service k }.call( k )
       if true == x                             # (this makes a sketchy
         if const_defined? k, false             # assumption..)
           const_get k, false
@@ -49,7 +47,7 @@ module Skylab::Headless
       if core_pn.exist?
         load core_pn.to_s  # change to require as necessary
       end
-      -> { true }
+      -> _ { true }
     end
   end
 end

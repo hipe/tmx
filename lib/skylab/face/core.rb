@@ -27,29 +27,19 @@ module Skylab::Face
     extend MAARS
 
     o = { }
+    stdlib, subproduct = MetaHell::FUN.at :require_stdlib, :require_subproduct
+    o[:Basic] = subproduct     # `fields` used extensively by API API
+    o[:Headless] = subproduct  # used extensively everywhere
+    o[:Ncurses] = stdlib
+    o[:OptionParser] = -> _ { require 'optparse' ; ::OptionParser } # crucial
+    o[:Porcelain] = subproduct # option parser abtract modelling
+    o[:PubSub] = subproduct    # engaged by the API Action API's `emit` facet.
 
-    o[:Basic] = -> { Services::Headless::Services::Basic }
-      # (its fields are used extensively by the API API)
-
-    o[:Headless] = -> { require 'skylab/headless/core' ; ::Skylab::Headless }
-      # (used extensively everywhere)
-
-    o[:Ncurses] = -> { require 'ncurses' ; ::Ncurses }
-
-    o[:OptionParser] = -> { require 'optparse' ; ::OptionParser }
-      # (crucial but used in a small number of places)
-
-    o[:Porcelain] = -> { require 'skylab/porcelain/core' ; ::Skylab::Porcelain }
-      # (experimentally leveraged for option parser abstract modelling)
-
-    o[:PubSub] = -> { require 'skylab/pub-sub/core' ; ::Skylab::PubSub }
-      # (engaged by the API Action API's `emit` facet.)
-
-    define_singleton_method :const_missing do |const|
-      if o.key? const
-        const_set const, o.fetch( const ).call
+    define_singleton_method :const_missing do |const_i|
+      if o.key? const_i
+        const_set const_i, o.fetch( const_i )[ const_i ]
       else
-        super const
+        super const_i
       end
     end
   end

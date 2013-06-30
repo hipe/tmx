@@ -369,7 +369,7 @@ module Skylab::TestSupport::Quickie
       if parse_opts argv
         parse_args argv
       end
-    rescue ::OptionParser::ParseError => e
+    rescue TestSupport::Services::OptionParser::ParseError => e
       @y << "#{ e }"
       @y << "try #{ kbd "ruby #{ $PROGRAM_NAME } -h" } for help"
       false

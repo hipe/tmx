@@ -1,5 +1,5 @@
-require_relative '../semantic/core' # etc
-
+require_relative '..'
+require 'skylab/semantic/core'
 require 'skylab/basic/core'
 
 module Skylab::PubSub

@@ -94,7 +94,7 @@ module Skylab                     # Welcome! :D
     end
 
     o[:pathify] = -> const do
-      const.to_s.gsub('::', '/').
+      const.to_s.
         gsub(/(?<=[a-z])([A-Z])|(?<=[A-Z])([A-Z][a-z])/) { "-#{$1 || $2}" }.
         gsub('_', '-').downcase
     end

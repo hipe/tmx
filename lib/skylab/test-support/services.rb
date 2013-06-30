@@ -2,25 +2,23 @@ module Skylab::TestSupport
 
   module Services
 
-    h = { }
-    define_singleton_method :o do |name, block|
-      h[name] = block
+    def self.touch i
+      const_defined? i, false or const_get i, false
+      nil
     end
 
-    o :Face,          -> { require 'skylab/face/core' ; ::Skylab::Face }
+    o = { }
+    subproduct, stdlib = MetaHell::FUN.at :require_subproduct, :require_stdlib
+    o[:DRb] = -> _ { require 'drb/drb' ; ::DRb },
+    o[:Face] = subproduct,
+    o[:FileUtils] = stdlib,
+    o[:Open3] = stdlib,
+    o[:OptionParser] = -> _ { require 'optparse' ; ::OptionParser },
+    o[:StringIO] = stdlib,
+    o[:Tmpdir] = -> _ { require 'tmpdir' ; ::Dir }  # Dir.tmpdir
 
-    o :FileUtils,     -> { require 'fileutils' ; ::FileUtils }
-
-    o :Open3,         -> { require 'open3'     ; ::Open3 }
-
-    o :OptionParser,  -> { require 'optparse'  ; ::OptionParser }
-
-    o :StringIO,      -> { require 'stringio'  ; ::StringIO }
-
-    o :Tmpdir,        -> { require 'tmpdir'    ; ::Dir } # Dir.tmpdir
-
-    define_singleton_method :const_missing do |name|
-      const_set name, h[name].call
+    define_singleton_method :const_missing do |const_i|
+      const_set const_i, o.fetch( const_i )[ const_i ]
     end
   end
 end

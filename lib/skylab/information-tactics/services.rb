@@ -1,13 +1,13 @@
-module Skylab::InformationTactics              # centralize std-lib deps,
-  module Services                              # and lazy-load them as-needed.
+module Skylab::InformationTactics
 
-    h = { }
-    define_singleton_method( :o ) { |k, f| h[k] = f }
+  module Services
 
-    o :Time,         -> { require 'time'        ; ::Time }
+    o = { }
+    stdlib = MetaHell::FUN.require_stdlib
+    o[:Time] = stdlib
 
-    define_singleton_method :const_missing do |k|
-      const_set k, h.fetch( k ).call
+    define_singleton_method :const_missing do |const_i|
+      const_set const_i, o.fetch( const_i )[ const_i ]
     end
   end
 end

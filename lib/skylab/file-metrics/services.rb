@@ -4,21 +4,19 @@ module Skylab::FileMetrics
 
     extend MAARS
 
-    h = { }
+    o = { }
+    stdlib = MetaHell::FUN.require_stdlib
+    o[:Open3] = stdlib
+    o[:Shellwords] = stdlib
+    o[:StringIO] = stdlib
+    o[:StringScanner] = -> _ { require 'strscan' ; ::StringScanner }
 
-    define_singleton_method( :o ) { |const, block| h[const] = block }
-
-    o :Open3         , -> { require 'open3'      ; ::Open3 }
-    o :Shellwords    , -> { require 'shellwords' ; ::Shellwords }
-    o :StringIO      , -> { require 'stringio'   ; ::StringIO }
-    o :StringScanner , -> { require 'strscan'    ; ::StringScanner }
-
-    define_singleton_method :const_missing do |k|
-      if h.key? k
-        const_set k, h.fetch( k ).call
+    define_singleton_method :const_missing do |const_i|
+      if o.key? const_i
+        const_set const_i, o.fetch( const_i )[ const_i ]
       else
-        ohai = super( k )
-        if ! const_defined? k, false
+        ohai = super const_i
+        if ! const_defined? const_i, false
           fail "scott whallan"
         end
         ohai
