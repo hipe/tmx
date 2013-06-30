@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::MetaHell::TestSupport::FUN_
+module Skylab::MetaHell::TestSupport::FUN
 
-  ::Skylab::MetaHell::TestSupport[ FUN__TestSupport = self ]
+  ::Skylab::MetaHell::TestSupport[ FUN_TestSupport = self ]
 
   include CONSTANTS
 
@@ -12,7 +12,7 @@ module Skylab::MetaHell::TestSupport::FUN_
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::MetaHell::FUN_" do
+  describe "Skylab::MetaHell::FUN" do
     context "`tuple_tower` - given a stack of functions and one seed value, resolve" do
       Sandbox_1 = Sandboxer.spawn
       it "opaque but comprehensive example" do

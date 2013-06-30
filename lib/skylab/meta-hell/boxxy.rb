@@ -123,7 +123,7 @@ module Skylab::MetaHell
       # fast(er) operation that produces an internal distillation of a name
       # for use in e.g fuzzy (case-insensitive) matching.
 
-      black_rx = /[ _-]+/  # [#bm-002]
+      black_rx = /(?:[ _-](?=.))+/  # [#bm-002]
       -> x do
         x.to_s.gsub( black_rx, '' ).downcase.intern
       end

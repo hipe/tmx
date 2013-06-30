@@ -6,13 +6,146 @@ module Skylab::TestSupport::Regret::API
 
     # experimental interface, pub-sub-like, *somewhat*
 
-    def initialize start_path, top, vtuple, listener
-      @pn, @top, @vt, @listener = ::Pathname.new( start_path ), top,
-        vtuple, listener
+    CONDUIT_ = {
+      pth: -> a { @pth = a.fetch 0 ; a.shift },
+      path: -> a { set_path a.fetch 0 ; a.shift },
+      top: -> a { @top = a.fetch 0 ; a.shift },
+      vtuple: -> a { @vtuple = a.fetch 0 ; a.shift },
+      listener: -> a { @listener = a.fetch 0 ; a.shift }
+    }.freeze
+
+    def initialize *a
+      while a.length.nonzero?
+        instance_exec( a, & CONDUIT_.fetch( a.shift ) )
+      end
     end
     attr_reader :pn, :top
 
+    def set_path x
+      @path = x  # #todo:during:3
+      @pn = ::Pathname.new x
+      @pn.absolute? or fail "we don't want to mess with relpaths here #{
+        } for now - \"#{ x }\""
+      nil
+    end
+
     #                     ~ steps. (section 1) ~
+
+    def expect_upwards relative
+      found, count = search_upwards relative
+      -> do
+        found and break found
+        p = @pn
+        say :notice, -> do
+          "\"#{ relative }\" not found within #{ count } dirs of #{
+            }#{ pth[ p ] }"
+        end
+        nil
+      end.call
+    end
+
+    def search_upwards relative
+      pn = @pn
+      pn.absolute? or fail "sanity - #{ pn }"
+      count = -1
+      while true
+        count += 1
+        try = pn.join relative
+        try.exist? and break( found = try )
+        TOP_ == pn.instance_variable_get( :@path ) and break
+        pn = pn.dirname
+      end
+      found and maybe_set_top_pn found, relative
+      [ found, count ]
+    end
+
+    TOP_ = '/'.freeze
+
+    def maybe_set_top_pn pn, relative
+      if ! top_pn
+        p = pn.instance_variable_get :@path
+        is_at_the_end_of relative, p or fail "sanity - #{ relative } in #{ p }"
+        @top_pn = ::Pathname.new p[ 0 ... -1 * relative.length - 1 ]  # '/'
+      end
+    end
+
+    def is_at_the_end_of relative, p
+      p.rindex( relative ) == p.length - relative.length
+    end
+
+    def expect_files_file pn
+      if pn.exist?
+        @files_file_pn = pn
+        true
+      else
+        @files_file_pn = nil
+        say :notice, -> do
+          "expected files file not found: #{ pth[ pn ] }"
+        end
+        nil
+      end
+    end
+
+    attr_reader :files_file_pn
+
+    def pathnames
+      ::Enumerator.new do |y|
+        files_file_pn && top_pn or fail "sanity"
+        tpn = Pathname_.new( @top_pn )
+        @files_file_pn.open do |fh|
+          while (( line = fh.gets ))
+            line.chomp!
+            if line.include? SPACE_
+              line, rest = line.split SPACE_, 2
+              pn = tpn._join line
+              pn.add_note :notice, "line had space", :line_had_space,
+                :rest, rest
+            else
+              pn = tpn._join line
+            end
+            y << pn
+          end
+        end
+        nil
+      end
+    end
+
+    SPACE_ = ' '
+
+    class Pathname_ < ::Pathname
+
+      attr_reader :has_notes, :note_a
+
+      def add_note severity, message, *rest
+        @has_notes ||= true
+        @note_a ||= [ ]
+        @note_a << [ severity, message, * rest ]
+        nil
+      end
+
+      def _join x
+        p = join( x ).instance_variable_get :@path
+        self.class.allocate.instance_exec do
+          @path = p
+          self
+        end
+      end
+    end
+
+    def subtree_pathnames
+      ::Enumerator.new do |y|
+        p = @pn.instance_variable_get :@path ; len = p.length - SEPWIDTH_
+        pathnames.each do |pn|
+          pt = pn.instance_variable_get( :@path )[ 0 .. len ]
+          if pt == p
+            y << pn
+          end
+        end
+        nil
+      end
+    end
+
+    SEPWIDTH_ = 1
 
     def find_first_dir path
       @dir_pn = nil

@@ -1,5 +1,7 @@
 module Skylab::MetaHell
 
+  FUN::Parse.const_set :From_Ordered_Set, nil  # #loading-handle
+
   class FUN_
 
     # `parse_from_ordered_set` result is array of same length as `set_a`.
@@ -62,10 +64,6 @@ module Skylab::MetaHell
         res_a[ index ] = res
       end
       res_a
-    end
-
-    module Parse
-      From_Ordered_Set = nil  # #a-load-handle-for-doc-test
     end
   end
 end

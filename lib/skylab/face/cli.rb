@@ -504,6 +504,11 @@ module Skylab::Face
       end
     end
 
+    def change_command name_i  # #hacks-only
+      @last_hot.change_command_notification name_i
+      nil
+    end
+
     def pre_execute  # #called-by-main-invocation-loop
       # (we override this method of p-arent class (cmd) b.c we need to do kind
       # of like what cli does - we need the surface also to have ivars..)
@@ -597,6 +602,12 @@ module Skylab::Face
 
     def method_name  # called when the `parse` was successful - remember
       @sheet.method_name  # it is not we who actually execute the implementation
+    end
+
+    def change_command_notification i  # #hacks-only
+      @sheet = Cmd_Sheet_.new i
+      @anchored_name = nil
+      nil
     end
 
     def pre_execute  # #called-by-main-invocation-loop
@@ -2028,4 +2039,7 @@ module Skylab::Face
 
   FUN = FUN_.to_struct
 
+  class CLI
+    FUN = FUN  # #loading-handle
+  end
 end

@@ -1,103 +1,69 @@
 module Skylab::Face
 
-  module CLI::Tableize
-
-    # `tableize` - deprecated for `_tablify` [#fa-036]
-    #
-    # `tableize` has been deprecated for `_tablify`. but here's a demo:
-    #
-    #     y = [ ]
-    #     Face::CLI::Tableize::FUN.tableize[
-    #       [ food: 'donuts', drink: 'coffee' ], -> line { y << line } ]
-    #
-    #     y.shift   # => "|   Food  |   Drink |"
-    #     y.shift   # => "| donuts  |  coffee |"
-    #     y.length  # => 0
-    #
+  class CLI::Table
 
     o = { }
 
-    o[:tableize] = ->( rows, opts = {}, f, &blk) do
-      line_f = ( a = [ f, blk ].compact ).fetch( ( a.length - 1 ) * 2 )
-      opts = { show_header: true }.merge(opts)
-      keys_order = []
-      max_h = ::Hash.new { |h, k| keys_order.push(k) ; h[k] = 0 }
-      rows.each do |row|
-        row.each { |k, v| (l = v.to_s.length) > max_h[k] and max_h[k] = l }
-      end
-      if opts[:show_header]
-        label_f = ->(k) do
-          l = k.to_s.gsub('_', ' ').capitalize
-          l.length > max_h[k] and max_h[k] = l.length
-          l
-        end
-        rows = [::Hash[ keys_order.map{ |k| [ k, label_f[k] ] } ]] + rows.to_a
-      end
-      left = '| ' ; sep = '  |  ' ; right = ' |'
-      rows.each do |row|
-        line_f.call("#{left}#{
-          keys_order.map{ |k| "%#{max_h[k]}s" % row[k].to_s }.join(sep)
-        }#{right}")
-      end
-      nil
-    end
-
-    # `_tablify` - quick & dirty pretty table hack (interface in development):
+    # `tablify` is a quick & dirty pretty table hack
     #
-    # signature is still #experimental, hence [#048]. (we might use `curry`).
+    # (`curry` friendly (was [#048])
     #
-    # (if `row_ea` is an enumerator we've got to lock it down .. it might
-    # be a randomized functional tree, e.g)
-    #
-    # here is an example of using `Face::CLI::Tableize::FUN._tablify`:
+    # like so:
     #
     #     y = [ ]
-    #     Face::CLI::Tableize::FUN._tablify[
-    #       [ 'food', 'drink' ],
-    #       [[ 'donuts', 'coffee' ]], -> line { y << line } ]
     #
-    #     y.shift  # => '|   food  |   drink |'
-    #     y.shift  # => '| donuts  |  coffee |'
+    #     Face::CLI::Table::FUN.tablify[
+    #       [[ :fields, [ 'food', 'drink']],
+    #        [ :show_header, true ]],
+    #       -> line { y << line },
+    #       [[ 'donuts', 'coffee' ]]]
+    #
+    #     y.shift  # => '|    food |   drink |'
+    #     y.shift  # => '|  donuts |  coffee |'
     #     y.length # => 0
     #
 
-    o[:_tablify] = -> col_a, row_ea, line, show_header=true, left = '| ',
-        sep = '  |  ', right = ' |' do
-
-      w = col_a.length
-      max_h = ::Hash.new { |h, k| h[ k ] = 0 }
-      max = -> a do
-        w.times do |x|
-          l = a.fetch( x ).length
-          l > max_h[ x ] and max_h[ x ] = l
+    o[:tablify] = -> do
+      struct = ::Struct.new :left, :sep, :right, :fields, :show_header
+      d =        struct.new '|  ',  ' |  ',  ' |'
+      parse_opts = -> opt_a do
+        i = nil ; o = struct.new ; opt_a = opt_a ? opt_a.dup : [ ]
+        while opt_a.length.nonzero?
+          opt = opt_a.shift
+          i = opt.fetch( 0 ) ; opt.shift ;  v = opt.fetch( 0 ) ; opt.shift
+          o[ i ] = v
         end
+        [ o.left || d[:left], o.sep || d[:sep], o.right || d[:right],
+          o.fields, o.show_header ]
       end
-      max[ col_a ] if show_header
-      cache_a = []
-      ok = row_ea.each do |a|
-        cache_a << a
-        max[ a ]
-      end
-      if ok
+      -> option_a, output_p, row_ea do # (curry friendly)
+        left, sep, right, fields, show_header = parse_opts[ option_a ]
+        w = fields.length ; labels = fields
+        max_h = ::Hash.new { |h, k| h[ k ] = 0 }
+        max = -> a do
+          w.times do |x|
+            ( l = a.fetch( x ).length ) > max_h[ x ] and max_h[ x ] = l
+          end
+        end
+        show_header and max[ labels ]
+        # lock down `row_ea` now - it might be an enumerator that is a
+        # randomized functional tree, e.g
+        cache_a = [ ] ; ok = row_ea.each do |a|
+          cache_a << a
+          max[ a ]
+        end
+        ok or break ok
         fmt = "#{ left }#{ w.times.map do |x|
           "%#{ max_h.fetch x }s"
         end * sep }#{ right }"
-        row = -> * a do
-          line.call( fmt % a )
-        end
-        row[ * col_a ] if show_header
-        cache_a.each do |a|
-          row[ *a ]
-        end
+        row = -> a { output_p[ fmt % a ] }
+        show_header and row[ labels ]
+        cache_a.each( & row )
+        ok
       end
-      ok
-    end
+    end.call
 
     FUN = ::Struct.new( * o.keys ).new( * o.values )
 
-    module InstanceMethods
-      define_method :tableize, & FUN.tableize
-      define_method :_tablify, & FUN._tablify
-    end
   end
 end

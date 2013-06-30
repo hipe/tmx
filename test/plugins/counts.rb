@@ -20,8 +20,6 @@ module Skylab::Test
 
   class Plugins::Counts::Client
 
-    include Face::CLI::Tableize::InstanceMethods  # `_tablify`
-
     available_options do |o, _|
 
       o.on '-z', '--zero', 'display the zero values (when counting)' do
@@ -46,8 +44,10 @@ module Skylab::Test
     end
 
     def counts
-      _tablify [ 'subproduct', 'num test files' ],
-        ( ::Enumerator.new do |y|
+      Face::CLI::Table::FUN.tablify[
+        [[ :fields, [ 'subproduct', 'num test files' ]]],
+        info_y.method( :<< ),
+        ::Enumerator.new do |y|
           total = 0 ; hs = hot_subtree
           ok = hs.children.each do |tre|
             sp = tre.data
@@ -59,8 +59,7 @@ module Skylab::Test
           end
           y << [ '(total)', total.to_s ]
           ok
-        end ),
-        info_y.method( :<< )
+        end  ]
     end
   end
 end

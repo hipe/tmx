@@ -1,6 +1,6 @@
 module Skylab::TestSupport::Regret::API
 
-  class API::Actions::DocTest < Face::API::Action
+  class API::Actions::DocTest < API::Action
 
     # basic usage:
     #
@@ -27,10 +27,12 @@ module Skylab::TestSupport::Regret::API
              [ :err, :ivar ],
              [ :pth, :ivar ]
 
-    params :path, [ :template_options, :arity, :zero_or_one ],
+    params :path,
+      [ :template_options, :arity, :zero_or_one ],
       API::Conf::Verbosity[ self ].param( :vtuple )
 
     def execute
+      puts "OK: #{ @path.to_s.inspect }"
       sn = @vtuple.make_snitch @err
       bs = DocTest::Comment_::Block::Scanner[ sn, ::File.open( @path, 'r' ) ]
       sp = DocTest::Specer_.new sn, @out, :quickie, @path

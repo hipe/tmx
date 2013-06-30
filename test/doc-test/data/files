@@ -1,6 +1,7 @@
 lib/skylab/basic/pathname/union.rb
 lib/skylab/basic/hash/pair-enumerator.rb
 lib/skylab/face/cli/lipstick.rb
+lib/skylab/face/cli/table.rb
 lib/skylab/face/cli/tableize.rb
 lib/skylab/headless/plugin/host/metaservices-/chain-.rb
 lib/skylab/headless/plugin/host/proxy.rb
