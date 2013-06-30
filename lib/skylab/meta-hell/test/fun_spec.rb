@@ -1,77 +1,48 @@
 require_relative 'test-support'
 
-describe "Skylab::MetaHell::FUN" do
+module Skylab::MetaHell::TestSupport::FUN_
 
-  MetaHell = ::Skylab::MetaHell
+  ::Skylab::MetaHell::TestSupport[ FUN__TestSupport = self ]
 
-  MetaHell::DSL_DSL.enhance self do
-    atom :h
-    list :op_a
-  end
+  include CONSTANTS
 
-  def parse *args
-    f_a = op_a.map { |i| h.fetch i }
-    MetaHell::FUN.parse_series[ args, * f_a ]
-  end
+  MetaHell = ::Skylab::MetaHell  # increase its visibility for below modules
 
-  context "`parse_series`" do
+  extend TestSupport::Quickie
 
-    m_f = %i( m f )
+  Sandboxer = TestSupport::Sandbox::Spawner.new
 
-    h( age: -> x { ::Numeric === x },
-       sex: -> x { m_f.include? x },
-       loc: -> _ { }  # left here to prove that op_a != h.keys
-    )
-
-    context "against one" do
-
-      op_a :sex
-
-      it "zero" do
-        parse.should eql( [ nil ] )
-      end
-
-      it "one valid" do
-        parse( :m ).should eql( [ :m ] )
-      end
-
-      it "one invalid" do
-        -> do
-          parse 'blah'
-        end.should raise_error( ::ArgumentError, /unrecog.+index 0.+blah/i )
-      end
-
-      it "one valid then one invalid" do
-        -> do
-          parse :m, :f
-        end.should raise_error( ::ArgumentError, /unrecog.+index 1.+:f/i )
-      end
-    end
-
-    context "against two" do
-
-      op_a :age, :sex
-
-      it "zero" do
-        parse.should eql( [ nil, nil ] )
-      end
-
-      it "one (a)" do
-        parse( 12 ).should eql( [ 12, nil ] )
-      end
-
-      it "one (b)" do
-        parse( :m ).should eql( [ nil, :m ] )
-      end
-
-      it "two" do
-        parse( 12, :m ).should eql( [ 12, :m ] )
-      end
-
-      it "wrong order" do
-        -> do
-          parse :m, 12
-        end.should raise_error( ::ArgumentError, /unrec.+index 1.+\b12\b/i )
+  describe "Skylab::MetaHell::FUN_" do
+    context "`tuple_tower` - given a stack of functions and one seed value, resolve" do
+      Sandbox_1 = Sandboxer.spawn
+      it "opaque but comprehensive example" do
+        Sandbox_1.with self
+        module Sandbox_1
+          f_a = [
+            -> item do
+              if 'cilantro' == item                 # the true-ishness of the 1st
+                [ false, 'i hate cilantro' ]        # element in the result tuple
+              else                                  # determines short circuit
+                [ true, item, ( 'red' == item ? 'tomato' : 'potato' ) ]
+              end                                   # three above becomes two
+            end, -> item1, item2 do                 # here, b.c the 1st is
+              if 'carrots' == item1                 # discarded when true
+                "let's have carrots and #{ item2 }" # note no tuple necessary
+              elsif 'tomato' == item2               # if it's just one true-ish
+                [ false, 'nope i hate tomato' ]     # non-true item
+              else
+                [ item1, item2 ]
+              end
+            end ]
+          s = MetaHell::FUN.tuple_tower[ 'cilantro',  * f_a ]
+          s.should eql( 'i hate cilantro' )
+          s = MetaHell::FUN::tuple_tower[ 'carrots', * f_a ]
+          s.should eql( "let's have carrots and potato" )
+          s = MetaHell::FUN.tuple_tower[ 'red', * f_a ]
+          s.should eql( 'nope i hate tomato' )
+          x = MetaHell::FUN.tuple_tower[ 'blue', * f_a ]
+          x.should eql( [ 'blue', 'potato' ] )
+        end
       end
     end
   end
