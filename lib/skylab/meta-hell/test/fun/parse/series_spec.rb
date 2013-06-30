@@ -1,6 +1,6 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-describe "Skylab::MetaHell::FUN" do
+describe "Skylab::MetaHell::FUN `parse_series`" do
 
   MetaHell = ::Skylab::MetaHell
 
