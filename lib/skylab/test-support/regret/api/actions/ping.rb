@@ -1,6 +1,6 @@
 module Skylab::TestSupport::Regret::API
 
-  class API::Actions::Ping < Face::API::Action
+  class API::Actions::Ping < API::Action
 
     services [ :err, :ivar ]
 

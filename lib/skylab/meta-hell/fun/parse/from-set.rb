@@ -1,5 +1,7 @@
 module Skylab::MetaHell
 
+  FUN::Parse.const_set :From_Set, nil  # #loading-handle
+
   class FUN_
 
     # more flexible, powerful and complex pool-based deterministic parsing
@@ -163,10 +165,6 @@ module Skylab::MetaHell
         end
       end
       [ did_parse_any, did_spend_all || false ]
-    end
-
-    module Parse
-      From_Set = nil  # #a-load-handle-for-doc-test
     end
   end
 end

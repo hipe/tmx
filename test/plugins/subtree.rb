@@ -235,7 +235,7 @@ module Skylab::Test
         end
         [ * arg_a,
           ::Enumerator::Yielder.new do |msg|
-            iy << Face::FUN.reparenthesize[ msg, say ]
+            iy << Face::CLI::FUN.reparenthesize[ msg, say ]
           end,
           ::Enumerator::Yielder.new do |msg|
             ok = false

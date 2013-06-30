@@ -1,6 +1,6 @@
 module Skylab::TestSupport::Regret::API
 
-  class API::Actions::Intermediates < Face::API::Action
+  class API::Actions::Intermediates < API::Action
 
     v = API::Conf::Verbosity[ self ]
 
@@ -16,13 +16,9 @@ module Skylab::TestSupport::Regret::API
 
     def execute
       r = -> do
-        wlk = @wlk = API::Support::Tree::Walker.new @path, @top, @vtuple,
-            -> e do
-          if @vtuple[ e.volume ]
-            @err.puts instance_exec( & e.message_function )
-            true  # we might do this .. callee chains progressively less
-          end  # detailed nerks.
-        end
+        wlk = @wlk = API::Support::Tree::Walker.new(
+          :path, @path, :top, @top, :vtuple, @vtuple,
+          :listener, generic_listener )
         if ! wlk.current_path_exists
           @err.puts "can't make intermediate test files without start node."
           break

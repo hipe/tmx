@@ -1,5 +1,7 @@
 module Skylab::MetaHell
 
+  FUN::Parse.const_set :Series, nil  # #loading-handle
+
   class FUN_
 
     # `parse_series` - For a formal parameter syntax that is made up of one or

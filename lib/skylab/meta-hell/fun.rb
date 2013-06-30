@@ -95,14 +95,14 @@ module Skylab::MetaHell
     end
   end
 
-  o[:_enhance_fun_with_autoloading] = -> klass, object do  # interface is #experimental
+  o[:_enhance_fun_with_stowaways] = -> klass, object do  # interface is #experimental
     klass.class_exec do
-      @subnode_path_h = { }
+      @subnode_location_h = { }
       @dir_pathname_p = -> { object.dir_pathname }
-      @x = -> i, path do
-        @subnode_path_h[ i ] = path
+      @x = -> i, i_a do
+        @subnode_location_h[ i ] = i_a
         define_method i do
-          self.class.load_function i
+          self.class.load_the_function i
           send i
         end
       end
@@ -111,11 +111,13 @@ module Skylab::MetaHell
       end
       class << self
         attr_reader :x, :o
-        def load_function i
-          load @dir_pathname_p.call.join( @subnode_path_h.fetch( i ) ).
-            sub_ext( ::Skylab::Autoloader::EXTNAME ).to_s
-          nil
+      end
+      define_singleton_method :load_the_function do |func_i|
+        i_a = @subnode_location_h.fetch func_i
+        i_a.reduce object do |m, i|
+          m.const_get i, false
         end
+        nil
       end
       @o = -> i, p do
         remove_method i if method_defined? i  # some sub-nodes add api private functions
@@ -129,14 +131,20 @@ module Skylab::MetaHell
     nil
   end
 
-  FUN = ( FUN_ = ::Struct.new( * o.keys ) ).new( * o.values )
-  o[:_enhance_fun_with_autoloading][ FUN_, FUN ]
+  ( FUN_ = ::Class.new ::Module ).class_exec do
+    o.each do |k, v|
+      define_method k do v end
+    end
+  end
+
+  FUN = FUN_.new
+
+  o[:_enhance_fun_with_stowaways][ FUN_, FUN ]
 
   x = FUN_.x
-  x[:parse_series]           = 'parse/series'
-  x[:_parse_series]          = 'parse/series'
-  x[:parse_from_set]         = 'parse/from-set'
-  x[:parse_from_ordered_set] = 'parse/from-ordered-set'
+  x[:parse_series] = x[:_parse_series] = [ :Parse, :Series ]
+  x[:parse_from_set]                   = [ :Parse, :From_Set ]
+  x[:parse_from_ordered_set]           = [ :Parse, :From_Ordered_Set ]
 
   def FUN.at *a
     a.map( & method( :send ) )

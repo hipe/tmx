@@ -9,12 +9,13 @@ module Skylab::TestSupport
 
     o = { }
     subproduct, stdlib = MetaHell::FUN.at :require_subproduct, :require_stdlib
-    o[:DRb] = -> _ { require 'drb/drb' ; ::DRb },
-    o[:Face] = subproduct,
-    o[:FileUtils] = stdlib,
-    o[:Open3] = stdlib,
-    o[:OptionParser] = -> _ { require 'optparse' ; ::OptionParser },
-    o[:StringIO] = stdlib,
+    o[:DRb] = -> _ { require 'drb/drb' ; ::DRb }
+    o[:Face] = subproduct
+    o[:FileUtils] = stdlib
+    o[:JSON] = stdlib
+    o[:Open3] = stdlib
+    o[:OptionParser] = -> _ { require 'optparse' ; ::OptionParser }
+    o[:StringIO] = stdlib
     o[:Tmpdir] = -> _ { require 'tmpdir' ; ::Dir }  # Dir.tmpdir
 
     define_singleton_method :const_missing do |const_i|

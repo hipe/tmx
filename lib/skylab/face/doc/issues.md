@@ -1,4 +1,4 @@
-[#048] #open `tablify_` - need to clean up signature
+[#048]       #done `tablify` - cleanup signature
 [#047]       #doc-point visibility of the node is *not* in the domain ..
 [#046]       #feature-point `Magic_Touch_`
 [#045]       #doc-point Face::TestSupport::CLI and below is part of face's
@@ -13,7 +13,7 @@
                lets you "puff up" your (e.g. branch) client lazily
 [#037]       #eventpoint - fundamentally rearchitect Face to deal with the
              DSL public instance method namespace problem.
-[#036] #todo replace universe with `tableize` with `_tablify`
+[#036] #todo replace universe with `tableize` with [ face cli table ]
 [#035]       #tracking-tag #experiment with a `unary` discrete categorization
                for our main 3 classes (for which we make two exponents) ..
 [#034]       #doc-point the magical significance of nil ..

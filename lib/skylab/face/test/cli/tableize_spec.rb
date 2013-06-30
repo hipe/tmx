@@ -13,9 +13,9 @@ module Skylab::Face::TestSupport::CLI::Tableize
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
   describe "Skylab::Face::CLI::Tableize" do
-    context "`tableize` - deprecated for `_tablify` [#fa-036]" do
+    context "`tableize` - deprecated, see  [#fa-036]" do
       Sandbox_1 = Sandboxer.spawn
-      it "`tableize` has been deprecated for `_tablify`. but here's a demo" do
+      it "`tableize` has been deprecated.  but here's a demo" do
         Sandbox_1.with self
         module Sandbox_1
           y = [ ]
@@ -24,22 +24,6 @@ module Skylab::Face::TestSupport::CLI::Tableize
 
           y.shift.should eql( "|   Food  |   Drink |" )
           y.shift.should eql( "| donuts  |  coffee |" )
-          y.length.should eql( 0 )
-        end
-      end
-    end
-    context "`_tablify` - quick & dirty pretty table hack (interface in development)" do
-      Sandbox_2 = Sandboxer.spawn
-      it "here is an example of using `Face::CLI::Tableize::FUN._tablify`" do
-        Sandbox_2.with self
-        module Sandbox_2
-          y = [ ]
-          Face::CLI::Tableize::FUN._tablify[
-            [ 'food', 'drink' ],
-            [[ 'donuts', 'coffee' ]], -> line { y << line } ]
-
-          y.shift.should eql( '|   food  |   drink |' )
-          y.shift.should eql( '| donuts  |  coffee |' )
           y.length.should eql( 0 )
         end
       end

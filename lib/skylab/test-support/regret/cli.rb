@@ -24,11 +24,32 @@ module Skylab::TestSupport::Regret::CLI
       o.on '-v', '--verbose', 'verbose. (try mutliple.)', & verbosity_opt_func
       o.on '-V', '--less-verbose', 'reduce verbosity.', &
         deincrement_verbosity_opt_func
+
+      o.on '-r', '--recursive [check] [-- <path>]',
+          'experimental: regenerate all under path recursively.',
+          "(assumes the existence of \"#{
+            Regret::API::Conf[:doc_test_dir] }\" somewhere above)" do |x|
+        @param_h[:recursive] = Regret::CLI::Actions::DocTest::
+          Parse_auto_[ @y, @argv, x ]
+        @mechanics.change_command :recursive
+        nil
+      end
+
+      o.on '-F', '--force', "confirms file overwrite (for use with -r)" do
+        @param_h[:do_force] = true
+      end
+
       o.banner = command.usage_line
     end
 
     def doc_test path
       api path
+    end
+
+    set :node, :recursive, :invisible
+
+    def recursive
+      api
     end
 
     option_parser do |o|
