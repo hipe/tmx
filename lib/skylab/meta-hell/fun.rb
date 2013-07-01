@@ -97,6 +97,7 @@ module Skylab::MetaHell
 
   o[:_enhance_fun_with_stowaways] = -> klass, object do  # interface is #experimental
     klass.class_exec do
+      @mutex_h = { }
       @subnode_location_h = { }
       @dir_pathname_p = -> { object.dir_pathname }
       @x = -> i, i_a do
@@ -114,6 +115,9 @@ module Skylab::MetaHell
       end
       define_singleton_method :load_the_function do |func_i|
         i_a = @subnode_location_h.fetch func_i
+        (( @mutex_h.fetch( func_i ) { |k| @mutex_h[k] = true ; nil } )) and
+          raise "circular dependency detected with `#{ func_i }` - are you #{
+           }sure it is defined here? - #{ object }::#{ i_a * '::' }"
         i_a.reduce object do |m, i|
           m.const_get i, false
         end
@@ -145,7 +149,8 @@ module Skylab::MetaHell
   o[:_enhance_fun_with_stowaways][ FUN_, FUN ]
 
   x = FUN_.x
-  x[:parse_series] = x[:_parse_series] = [ :Parse, :Series ]
+  x[:parse_curry]                      = [ :Parse, :Curry ]
+  x[:parse_series]                     = [ :Parse, :Series ]
   x[:parse_from_set]                   = [ :Parse, :From_Set ]
   x[:parse_from_ordered_set]           = [ :Parse, :From_Ordered_Set ]
 

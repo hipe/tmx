@@ -15,7 +15,15 @@ module Skylab::MetaHell
     # running. the parse is finished and the function yields a result when
     # either `argv` is empty or there are no more unmatched elements in `set_a`
     # *or* a matching function could not be found for the current front element
-    # of `argv`.  (this function is [#027].)
+    # of `argv`. (this function is [#027].)
+    #
+    # in contrast to the similar acting `parse_series`, this algorithm treats
+    # the parsers in the running as a set - any one can match the current
+    # state of input; whereas with the other function, the input symbols
+    # must occur in the order they appear in the grammar. our set is called
+    # "ordered" because the order the symbols appear in determines the order
+    # of the result.
+    #
     # like so:
     #
     #     PARSER = MetaHell::FUN.parse_from_ordered_set.curry[ [

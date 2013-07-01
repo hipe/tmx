@@ -96,7 +96,7 @@ module Skylab::MetaHell
           otherwise = blk
         end
         Fuzzy_const_get_name_and_value_recursive_[
-          self, [ * path_x ], otherwise ].last
+          self, path_x, otherwise ].last
       end
     end
 
@@ -117,7 +117,7 @@ module Skylab::MetaHell
 
     fun = { }
 
-    distill = -> do
+    distill = fun[:distill] = -> do  # #part-of-public-FUN-libary
 
       # different than `normify` and `normize`, this is a simple, lossy and
       # fast(er) operation that produces an internal distillation of a name
@@ -125,9 +125,13 @@ module Skylab::MetaHell
 
       black_rx = /(?:[ _-](?=.))+/  # [#bm-002]
       -> x do
-        x.to_s.gsub( black_rx, '' ).downcase.intern
+        s = x.to_s.gsub( black_rx, '' )
+        DASH_ == s.getbyte( -1 ) and s.setbyte( -1, UNDR_ )
+        s.downcase.intern
       end
     end.call
+
+    DASH_ = '-'.getbyte 0 ; UNDR_ = '_'.getbyte 0
 
     get_correction_during_tug = -> tug do
       res = nil ; mod = tug.mod ; const = tug.const
@@ -191,10 +195,11 @@ module Skylab::MetaHell
       end
     end
 
-    Fuzzy_const_get_name_and_value_recursive_ =
-                                        -> mod, path_a, value_otherwise=nil do
+    Fuzzy_const_get_name_and_value_recursive_ =  # #part-of-public-FUN-library
+      fun[:fuzzy_const_get_name_and_value_recursive] =
+                                        -> mod, path_x, value_otherwise=nil do
 
-      path_a.reduce( [ nil, mod ] ) do | (_constant, box), name_x |
+      [ * path_x ].reduce( [ nil, mod ] ) do | (_constant, box), name_x |
         nam = distill[ name_x ]
         const_a = get_constants_including_inferred_constants[ box ]
         guess = const_a.reduce nil do |_, gues|
@@ -214,7 +219,7 @@ module Skylab::MetaHell
     end
 
     fun[:fuzzy_const_get] = -> mod, path_x do
-      Fuzzy_const_get_name_and_value_recursive_[ mod, [ * path_x ] ].fetch 1
+      Fuzzy_const_get_name_and_value_recursive_[ mod, path_x ].fetch 1
     end
 
     # `const_fetch` deep names, defaults, errors in a nested moudule:

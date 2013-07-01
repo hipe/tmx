@@ -1,7 +1,13 @@
 require_relative '../test-support'
 
-module Skylab::MetaHell::TestSupport::FUN
+module Skylab::MetaHell::TestSupport
 
-  ::Skylab::MetaHell::TestSupport[ FUN_TestSupport = self ]
+  module FUN
+
+    ::Skylab::MetaHell::TestSupport[ FUN_TestSupport = self ]
+
+  end
+
+  Fun = FUN  # #todo
 
 end

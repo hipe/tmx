@@ -292,7 +292,7 @@ module Skylab::Headless
     end
   end
 
-  class Box_
+  class Plugin::Box_
     def initialize
       @a = [ ] ; @h = { }
     end
@@ -447,7 +447,7 @@ module Skylab::Headless
     end
   end
 
-  class Plugin::Host::Metaservices_::Services_ < Box_
+  class Plugin::Host::Metaservices_::Services_ < Plugin::Box_
   end
 
   Plugin::AT_ = -> do
@@ -602,7 +602,7 @@ module Skylab::Headless
     end
   end
 
-  class Plugin::Metaservices_::Services_Used_ < Box_
+  class Plugin::Metaservices_::Services_Used_ < Plugin::Box_
 
     def receive_flush_notification kls
       @h.each_value do |svc|
@@ -728,7 +728,7 @@ module Skylab::Headless
     end
   end
 
-  class Plugin::Host::Metaservices_::Eventpoints_ < Box_
+  class Plugin::Host::Metaservices_::Eventpoints_ < Plugin::Box_
   end
 
   class Plugin::Host::Metaservices_::Eventpoint_
@@ -796,7 +796,7 @@ module Skylab::Headless
     end
   end
 
-  class Plugin::Metaservices_::Eventpoints_Subscribed_To_ < Box_
+  class Plugin::Metaservices_::Eventpoints_Subscribed_To_ < Plugin::Box_
 
     def receive_flush_notification kls
       @a.each do |i|

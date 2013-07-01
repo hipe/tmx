@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::Headless::TestSupport::Plugin::Host::Proxy_
+module Skylab::Headless::TestSupport::Plugin::Host::Proxy
 
-  ::Skylab::Headless::TestSupport::Plugin::Host[ Proxy__TestSupport = self ]
+  ::Skylab::Headless::TestSupport::Plugin::Host[ Proxy_TestSupport = self ]
 
   include CONSTANTS
 
@@ -12,7 +12,7 @@ module Skylab::Headless::TestSupport::Plugin::Host::Proxy_
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::Headless::Plugin::Host::Proxy_" do
+  describe "Skylab::Headless::Plugin::Host::Proxy" do
     context "using `Headless::Plugin::Host::Proxy`" do
       Sandbox_1 = Sandboxer.spawn
       it "comprehensive example" do

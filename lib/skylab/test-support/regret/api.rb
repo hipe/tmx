@@ -1,25 +1,50 @@
-module Skylab::TestSupport::Regret::API
+module Skylab::TestSupport
 
-  API = self
-  Face = ::Skylab::TestSupport::Services::Face
-  Basic = Face::Services::Basic
-  Headless = ::Skylab::Headless
-  MetaHell = Face::MetaHell
-  TestSupport = ::Skylab::TestSupport
-  Face::API[ self ]
-  EMPTY_A_ = [].freeze
+  module Regret
 
-  action_name_white_rx( /[a-z0-9]$/ )
+    module API
+      API = self
 
-  before_each_execution do Headless::CLI::PathTools.clear end
+      TestSupport = TestSupport_
 
-  class API::Action < Face::API::Action
-  private
-    def generic_listener
-      @generic_listener ||= -> e do
-        if @vtuple[ e.volume ]
-          @err.puts instance_exec( & e.message_function )
-          true
+      %i| Basic Face Headless MetaHell |.each do |i|
+        const_set i, TestSupport::Services.const_get( i, false )
+      end
+
+      EMPTY_A_ = [].freeze
+    end
+
+    TestSupport_::Services::Face::API[ self ]
+
+    action_name_white_rx( /[a-z0-9]$/ )
+
+    before_each_execution do Headless::CLI::PathTools.clear end
+
+    module API
+      class Client
+        Headless::Plugin::Host.enhance self do
+          services :pth, :invitation
+        end
+
+        def pth
+          @pth ||= -> p { p }
+        end
+
+        def invitation
+          # we don't have output resources on hand, so we cannot.
+          nil
+        end
+      end
+
+      class Action < Face::API::Action
+      private
+        def generic_listener
+          @generic_listener ||= -> e do
+            if @vtuple[ e.volume ]
+              @err.puts instance_exec( & e.message_function )
+              true
+            end
+          end
         end
       end
     end

@@ -1,8 +1,8 @@
 require_relative 'test-support'
 
-module Skylab::MetaHell::TestSupport::Fun::Parse::Series
+module Skylab::MetaHell::TestSupport::FUN::Parse::Series
 
-  ::Skylab::MetaHell::TestSupport::Fun::Parse[ Series_TestSupport = self ]
+  ::Skylab::MetaHell::TestSupport::FUN::Parse[ Series_TestSupport = self ]
 
   include CONSTANTS
 
@@ -12,28 +12,24 @@ module Skylab::MetaHell::TestSupport::Fun::Parse::Series
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::MetaHell::Fun::Parse::Series" do
-    context "`parse_series` - parse out (a fixed) N values from (0..N) args" do
+  describe "Skylab::MetaHell::FUN::Parse::Series" do
+    context "`parse_series` - parse out (a fixed) N values from M args" do
       Sandbox_1 = Sandboxer.spawn
       before :all do
         Sandbox_1.with self
         module Sandbox_1
-          P_ = MetaHell::FUN._parse_series.curry[
-            [
+          P = MetaHell::FUN.parse_series.curry[
+            :matcher_a, [
               -> age do
-                /\A\d+\z/ =~ age
+                /\A\d+\z/ =~ age and age.to_i
               end,
               -> sex do
-                /\A(?:m(?:ale)?|f(?:emale)?|o(?:ther)?)\z/i =~ sex
+                /\A(?:m(?:ale)?|f(?:emale)?|o(?:ther)?)\z/i =~ sex and sex
               end,
               -> location do
-                /\A[A-Z]/ =~ location  # must start with capital
+                /\A[A-Z]/ =~ location and location # must start with capital
               end
-            ] ]
-
-          P = P_.curry[
-            -> e { raise ::ArgumentError, e.message_function.call }
-          ]
+          ] ]
         end
       end
       it "(with lowlevel interface) parse all three things" do
@@ -60,15 +56,16 @@ module Skylab::MetaHell::TestSupport::Fun::Parse::Series
           P[ [ 'M' ] ].should eql( [ nil, 'M', nil ] )
         end
       end
-      it "but now here's the rub: if you pass `false` for the error handler" do
+      it "if you set `exhaustion` to `false`, it terminates at first non-parsable" do
         Sandbox_1.with self
         module Sandbox_1
           argv = [ '30', 'm', "Mom's", "Mom's again" ]
-          P_[ false, argv ].should eql( [ '30', 'm', "Mom's" ] )
+          omg = P.curry[ :exhaustion, false ]
+          omg[ argv ].should eql( [ '30', 'm', "Mom's" ] )
           argv.should eql( [ "Mom's again" ] )
         end
       end
-      it "(for contrast, here's the same thing, but with an error handler:)" do
+      it "(for contrast, here's the same thing, but with errors:)" do
         Sandbox_1.with self
         module Sandbox_1
           argv = [ '30', 'm', "Mom's", "Mom's again" ]

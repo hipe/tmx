@@ -6,9 +6,20 @@ module Skylab::Test
 
       include Test::Agent_IM_
 
+      Field_ = Test::Field_
+
       def self.[] *a
         new( *a ).execute
       end
+
+      Syntax_ = MetaHell::FUN.parse_series.curry[
+        :syntax, :monikizer, -> a { a * ' ' },
+        :field, :monikizer, -> s { "[ #{ s } ]" },
+        :field, :moniker, '<integer>',
+          :token_scanner, Field_::Int_::Scan_token,
+        :field, * Field_::Flag_[ :random ].to_a,
+        :prepend_to_curry_queue, :exhaustion
+      ]
 
       def initialize host_svcs, argv
         out, err = host_svcs[ :paystream, :infostream ]
@@ -18,23 +29,11 @@ module Skylab::Test
             err.puts msg
             ok &&= false
           end
-          integer, kw = MetaHell::FUN._parse_series[
-            [ -> x { /\A\d+\z/ =~ x },
-              -> x { /\A[a-z]+\z/i =~ x } ],
-            -> e do
-              ok and bork[  # only once
-                "expecting arguments [ <integer> ] [ random ]" ]
-              bork[ e.message_function.call ]
-            end,
-            argv
-          ]
+          integer, kw = Syntax_[ -> e do
+            ok and bork[ "expecting arguments #{ e.syntax_proc.call }" ]  # once
+            bork[ e.message_function.call ]
+          end, argv ]
           ok or break bork[ "please correct the above and try again." ]
-          if kw
-            ( idx = 'random'.index kw ) && ( idx.zero? ) or break bork[
-              "for now, only 'random' is supported, not #{ kw.inspect }" ]
-            kw = :random
-          end
-          integer and integer = integer.to_i
           [ ok, integer, kw ]
         end
 
@@ -50,7 +49,8 @@ module Skylab::Test
         @execute = -> do
           ok, integer, kw = validate[]
           ok or break ok
-          divs = Divide::Divider_.new( err, host_svcs, integer, kw ).divide
+          divs = Divide::Divider_.new( err: err, subtree_provider: host_svcs,
+                                       is_random: kw, count: integer ).divide
           render[ divs ]
         end
       end

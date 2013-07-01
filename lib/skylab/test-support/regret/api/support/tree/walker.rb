@@ -188,8 +188,10 @@ module Skylab::TestSupport::Regret::API
     end
     private :build_difference
 
+    Distill_ = MetaHell::Boxxy::FUN.distill
+
     -> do  # `find_top_toplevel
-      fun = MetaHell::Boxxy::FUN ; slash = ::Pathname::SEPARATOR_LIST
+      slash = ::Pathname::SEPARATOR_LIST
 
       define_method :find_toplevel_module do
         top_mod, top_pn = find_top
@@ -201,7 +203,7 @@ module Skylab::TestSupport::Regret::API
       report_error = -> p_a_, top_norm_a do
         _big = -> do  # #todo:for:release
           p_a_.reduce( [] ) do |m, x|
-            m << fun.normulate[ x ] if '' != x ; m
+            m << Distill_[ x ] if '' != x ; m
           end * ' '
         end
         case top_norm_a.length
@@ -233,7 +235,7 @@ module Skylab::TestSupport::Regret::API
         p_a = p_a_.dup
         top_norm_a = []
         begin
-          top_norm = fun.normulate[ p_a.fetch( -1 ) ]
+          top_norm = Distill_[ p_a.fetch( -1 ) ]
           if c_h.key? top_norm
             top_norm_a << [ top_norm, p_a.length - 1 ]
           end
@@ -261,7 +263,7 @@ module Skylab::TestSupport::Regret::API
       end
 
       know_top = -> p_a, c_a, c_h, top do
-        nerk = fun.normulate[ top ]
+        nerk = Distill_[ top ]
         bork = -> f do
           do_big = nil
           say :notice, -> do
@@ -284,7 +286,7 @@ module Skylab::TestSupport::Regret::API
                 }was not found in #{ c_a_[ me, c_a ] }"
             end ]
           end
-          npa = p_a.map( & fun.normulate )
+          npa = p_a.map( & Distill_ )
           a = npa.length.times.reduce [] do |m, x|
             m << x if nerk == npa[ x ] ; m
           end
@@ -307,7 +309,7 @@ module Skylab::TestSupport::Regret::API
         c_a = ::Object.constants.freeze
         c_h = ::Hash[
           c_a.each_with_index.map do |i, idx|
-            [ fun.normulate[ i ], idx ]
+            [ Distill_[ i ], idx ]
           end ]
         xp = @xpn = @pn.expand_path
         p_a = xp.sub_ext( '' ).to_s.split slash

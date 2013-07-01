@@ -9,10 +9,13 @@ module Skylab::TestSupport
 
     o = { }
     subproduct, stdlib = MetaHell::FUN.at :require_subproduct, :require_stdlib
+    o[:Basic] = subproduct
     o[:DRb] = -> _ { require 'drb/drb' ; ::DRb }
     o[:Face] = subproduct
     o[:FileUtils] = stdlib
+    o[:Headless] = subproduct
     o[:JSON] = stdlib
+    o[:MetaHell] = -> _ { require 'skylab/meta-hell/core' ; ::Skylab::MetaHell }
     o[:Open3] = stdlib
     o[:OptionParser] = -> _ { require 'optparse' ; ::OptionParser }
     o[:StringIO] = stdlib

@@ -4,9 +4,17 @@ module Skylab::Test
 
     class Divider_
 
-      def initialize err, subtree_provider, num, is_random
-        @err, @num, @is_random = err, num, is_random
-        @subtree_provider = subtree_provider
+      H_ = {
+        count: -> x { @num = x },
+        err: -> x { @err = x },
+        is_random: -> x { @is_random = x },
+        subtree_provider: -> x { @subtree_provider = x }
+      }.freeze
+
+      def initialize h
+        h.each do |k, v|
+          instance_exec v, & H_.fetch( k )
+        end
         nil
       end
 
@@ -82,7 +90,7 @@ module Skylab::Test
         end
 
         def map &blk
-          each.map( & blk )
+          blk ? each.map( & blk ) : each.to_a
         end
       end
     end
