@@ -32,7 +32,6 @@ module Skylab::TestSupport::Regret::API
       API::Conf::Verbosity[ self ].param( :vtuple )
 
     def execute
-      puts "OK: #{ @path.to_s.inspect }"
       sn = @vtuple.make_snitch @err
       bs = DocTest::Comment_::Block::Scanner[ sn, ::File.open( @path, 'r' ) ]
       sp = DocTest::Specer_.new sn, @out, :quickie, @path

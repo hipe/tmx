@@ -1,118 +1,61 @@
-class Skylab::Test::Plugins::Divide
+module Skylab::Test
 
-  MetaHell = ::Skylab::MetaHell
+  class Plugins::Divide
 
-  class Worker_
+    class Worker_
 
-    include Test::Agent_IM_
+      include Test::Agent_IM_
 
-    def self.[] *a
-      new( *a ).execute
-    end
+      def self.[] *a
+        new( *a ).execute
+      end
 
-    def initialize host_svcs, argv
-      out, err = host_svcs[ :paystream, :infostream ]
-      integer = kw = nil ; dflt = 3
-
-      validate = partition = render = nil
-      @execute = -> do
-        validate[] or break
-        if ! integer
-          err.puts "(defaulting to #{ dflt } subdivisions)"
-          integer = dflt
-        end
-        big_a = get_big_a host_svcs
-        len = big_a.length
-        if integer > len
-          err.puts "(integer is larger than (#{ len }). subdividing in to 1)"
-          integer = 1
-        end
-        if :random == kw
-          big_a.shuffle!
-        end
-        part_a = partition[ len ]
-        offset = -1
-        part_b = integer.times.map do |i|
-          segnum = part_a.fetch i
-          segnum.times.map do
-            offset += 1
-            big_a.fetch( offset ).data.local_normal_name
+      def initialize host_svcs, argv
+        out, err = host_svcs[ :paystream, :infostream ]
+        validate = -> do
+          argv or break true  # defaults..
+          ok = true ; bork = -> msg do
+            err.puts msg
+            ok &&= false
           end
-        end
-        render[ part_b ]
-      end
-      render = -> part_b do
-        pname = host_svcs.full_program_name
-        part_b.each do |rack|
-          out.puts "#{ pname } #{ rack * ' ' }"
-        end
-        false
-      end
-      partition = -> len do
-        small_int = len / integer
-        part_a = integer.times.map { small_int }
-        sum = part_a.reduce :+
-        idx = 0
-        while sum < len
-          part_a[ idx ] += 1
-          sum += 1
-          idx += 1
-          if idx == integer
-            idx = 0
-          end
-        end
-        part_a
-      end
-      validate = -> do
-        ok = true
-        if ! argv then [ nil, nil ] else
-          integer, kw = MetaHell::FUN._parse_series[ argv,
+          integer, kw = MetaHell::FUN._parse_series[
             [ -> x { /\A\d+\z/ =~ x },
               -> x { /\A[a-z]+\z/i =~ x } ],
             -> e do
-              if ok # only once
-                err.puts "expecting arguments [ <integer> ] [ random ]"
-              end
-              ok = false
-              err.puts e.message_function.call
+              ok and bork[  # only once
+                "expecting arguments [ <integer> ] [ random ]" ]
+              bork[ e.message_function.call ]
             end,
+            argv
           ]
-          if ok
-            if kw
-              i = 'random'.index kw
-              if i && i.zero?
-                kw = :random
-              else
-                err.puts "for now, only 'random' is supported, #{
-                  }not #{ kw.inspect }"
-                ok = false
-              end
-            end
-            if integer
-              integer = integer.to_i
-            end
+          ok or break bork[ "please correct the above and try again." ]
+          if kw
+            ( idx = 'random'.index kw ) && ( idx.zero? ) or break bork[
+              "for now, only 'random' is supported, not #{ kw.inspect }" ]
+            kw = :random
           end
-          if ! ok
-            err.puts "please correct the above and try again."
-            break false
-          end
+          integer and integer = integer.to_i
+          [ ok, integer, kw ]
         end
-        ok
+
+        render = -> divs do
+          pname = host_svcs.full_program_name
+          divs.each do |div|
+            out.puts "#{ pname } #{
+              }#{ div.map { |subpro| subpro.local_normal_name } * ' ' }"
+          end
+          nil
+        end
+
+        @execute = -> do
+          ok, integer, kw = validate[]
+          ok or break ok
+          divs = Divide::Divider_.new( err, host_svcs, integer, kw ).divide
+          render[ divs ]
+        end
       end
-    end
 
-    def execute ; @execute.call end
-
-    def get_big_a host_svcs
-      ::Enumerator.new do |y|
-        host_svcs.hot_subtree.children.each do |tree|
-          if tree.children.count.nonzero?
-            y << tree
-          end
-        end
-        nil
-      end.to_a
+      def execute ; @execute.call end
     end
-    private :get_big_a
   end
 end
