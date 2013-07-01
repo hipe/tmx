@@ -4,6 +4,10 @@ module Skylab::Test
 
     Test = Test  # so visible from children
 
+    MetaHell = ::Skylab::MetaHell
+
+    Divide = self
+
     Headless::Plugin.enhance self do
 
       eventpoints_subscribed_to( * %i|
@@ -40,9 +44,6 @@ module Skylab::Test
     end
 
     def divide
-      if ! self.class.respond_to? :dir_pathname  # circ.
-        Face::MAARS::Upwards[ self.class ]
-      end
       self.class.const_get( :Worker_, false )[ @plugin_parent_services, @argv ]
       false  # do not continue
     end

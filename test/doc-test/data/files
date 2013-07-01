@@ -10,6 +10,7 @@ lib/skylab/meta-hell/dsl-dsl.rb
 lib/skylab/meta-hell/fun.rb
 lib/skylab/meta-hell/fun/parse/from-ordered-set.rb
 lib/skylab/meta-hell/fun/parse/from-set.rb
+lib/skylab/meta-hell/fun/parse/series.rb
 lib/skylab/meta-hell/function.rb
 lib/skylab/test-support/regret/api/actions/doc-test.rb
 lib/skylab/test-support/regret/api/actions/doc-test/specer-.rb

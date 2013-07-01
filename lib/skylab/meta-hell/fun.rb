@@ -125,7 +125,10 @@ module Skylab::MetaHell
         nil
       end
       class << @o
-        alias_method :[]=, :[]
+        def []= i, p
+          self[ i, p ]
+          p
+        end
       end
     end
     nil
