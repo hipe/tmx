@@ -131,6 +131,6 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
       end
     end.call
 
-    Event_ = ::Struct.new :message_function, :lines
+    Event_ = ::Struct.new :message_proc, :lines
   end
 end

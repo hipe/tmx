@@ -128,7 +128,7 @@ exit( -> sin, sout, serr, argv, program_name do
       f = -> do
         tbl_width = ( fmt % [ 0, 0.0, '', ''] ).length
         ::Skylab::Face::CLI::Lipstick.new([[ '+', :green ], [ '-', :red  ]]).
-          instance.cook_rendering_function( [ tbl_width ], nil, sp.length )
+          instance.cook_rendering_proc( [ tbl_width ], nil, sp.length )
           # (if you want it to be `git diff --stat`-like, change `nil` to `80`)
       end.call
       -> node do

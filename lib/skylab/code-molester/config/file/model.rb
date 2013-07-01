@@ -362,7 +362,7 @@ module ::Skylab::CodeMolester
       begin
         w.emit :before_create,
           resource: self,
-          message_function: -> { "creating #{ w.escape_path[ @pathname ] }" }
+          message_proc: -> { "creating #{ w.escape_path[ @pathname ] }" }
 
         # because the below are not considered porcelain-level errors, they
         # use neither the emitter nor `escape_path` (for now..)
@@ -384,7 +384,7 @@ module ::Skylab::CodeMolester
 
         w.emit :after_create,
           bytes: bytes,
-          message_function: -> do
+          message_proc: -> do
             "created #{ w.escape_path[ @pathname ] } (#{ bytes } bytes)"
           end
 
@@ -408,7 +408,7 @@ module ::Skylab::CodeMolester
 
         w.emit :before_update,
           resource: self,
-          message_function: -> { "updating #{ w.escape_path[ @pathname ] }" }
+          message_proc: -> { "updating #{ w.escape_path[ @pathname ] }" }
 
         @pathname.writable? or
           raise "path is not writable, cannot write - #{ @pathname }"
@@ -423,7 +423,7 @@ module ::Skylab::CodeMolester
 
         w.emit :after_update,
           bytes: bytes,
-          message_function: -> do
+          message_proc: -> do
             "updated #{ w.escape_path[ @pathname ] } (#{ bytes } bytes)"
           end
 

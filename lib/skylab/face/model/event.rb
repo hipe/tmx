@@ -21,7 +21,7 @@ module Skylab::Face
       a.freeze
       st = ::Struct.new( *a )
       st.class_exec do
-        define_method :message_function do
+        define_method :message_proc do
           vals = -> { values }
           -> do
             instance_exec( * vals[], &blk )
@@ -79,7 +79,7 @@ module Skylab::Face
     o = ''
     Face::Services::Basic::List::Evented::Articulation a do
       iff_zero_items               ->     { o << '(empty)' }
-      any_first_item               ->   x { o << "#{ x.message_function[] }" }
+      any_first_item               ->   x { o << "#{ x.message_proc[] }" }
 
       any_subsequent_items -> x do
         if Services::Headless::CLI::FUN.looks_like_sentence[ o ]
@@ -87,7 +87,7 @@ module Skylab::Face
         else
           sep ' - '
         end
-        o << "#{ sep }#{ x.message_function[] }"
+        o << "#{ sep }#{ x.message_proc[] }"
       end
     end
     o

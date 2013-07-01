@@ -36,7 +36,7 @@ module Skylab::Basic::TestSupport::Pathname::Union
           u = Basic::Pathname::Union[ '/foo/bar', '/foo', '/biff/baz' ]
           u.length.should eql( 3 )
           e = u.normalize
-          e.message_function[].should eql( 'eliminating redundant entry /foo/bar which is covered by /foo' )
+          e.message_proc[].should eql( 'eliminating redundant entry /foo/bar which is covered by /foo' )
           u.length.should eql( 2 )
         end
       end
@@ -65,13 +65,13 @@ module Skylab::Basic::TestSupport::Pathname::Union
         end
       end
     end
-    context "for fun, `message_function` may play with `aggregated articulation`" do
+    context "for fun, `message_proc` may play with `aggregated articulation`" do
       Sandbox_5 = Sandboxer.spawn
       it "like so" do
         Sandbox_5.with self
         module Sandbox_5
           u = Basic::Pathname::Union[ '/foo/bar', '/foo/baz/bing', '/foo', '/a', '/a/b', '/a/b/c' ]
-          u.normalize.message_function[].should eql( "eliminating redundant entries /a/b and /a/b/c and /foo/bar and /foo/baz/bing which are covered by /a and /foo" )
+          u.normalize.message_proc[].should eql( "eliminating redundant entries /a/b and /a/b/c and /foo/bar and /foo/baz/bing which are covered by /a and /foo" )
         end
       end
     end

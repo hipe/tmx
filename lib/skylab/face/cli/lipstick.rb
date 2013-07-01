@@ -29,12 +29,12 @@ module Skylab::Face
     #       # we want to render yellow '*' characters. a fallback width
     #       # is the (quite narrow) 20 characters, for the whole pane "screen"
     #
-    #     rendering_function = Lipstick.instance.cook_rendering_function([12])
+    #     rendering_proc = Lipstick.instance.cook_rendering_proc([12])
     #       # to "cook" a rendering function, we tell it that we will have a
     #       # table on the left half of the screen that has one column that
     #       # is 12 characters wide.
     #
-    #     ohai = rendering_function[ 0.50 ]
+    #     ohai = rendering_proc[ 0.50 ]
     #       # to render we pass one float that is supposed to be a normalized
     #       # scalar between 0.0 and 1.0 inclusive.
     #
@@ -49,7 +49,7 @@ module Skylab::Face
     #       # first arg is instead an array of "pen tuples"
     #       # we chose not to provide a 2nd arg (default width function).
     #
-    #     f = Lipstick.instance.cook_rendering_function [ 28 ], 60
+    #     f = Lipstick.instance.cook_rendering_proc [ 28 ], 60
     #       # existing table is 1 column, 28 chars wide. explicitly set
     #       # the "panel" width to 60 (overriding any attempt at ncurses).
     #
@@ -105,7 +105,7 @@ module Skylab::Face
   end
 
   CLI::Lipstick::Class__ =
-      MetaHell::Function::Class.new :cook_rendering_function
+      MetaHell::Function::Class.new :cook_rendering_proc
 
   class CLI::Lipstick::Class__
 
@@ -160,7 +160,7 @@ module Skylab::Face
       end
       default_width ||= -> { PANE_WIDTH_FALLBACK }
       min_room = 4 ; margin = 1 ; penlen = pen_a.length
-      @cook_rendering_function = -> col_width_a, cols=nil, seplen=nil do
+      @cook_rendering_proc = -> col_width_a, cols=nil, seplen=nil do
         seplen ||= 0
         render_a = -> do
           my_room = -> do

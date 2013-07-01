@@ -518,11 +518,11 @@ module Skylab::Porcelain::Legacy
       end
     end
 
-    def full_name_function
+    def full_name_proc
       # (this will be borked if ever you actually need truly deep names -
       # h.l has to be better at something! (just kidding, it's better at a lot!)
 
-      @full_name_function ||=
+      @full_name_proc ||=
         Headless::Name::Function::Full.new [ @name_function ]
     end
 

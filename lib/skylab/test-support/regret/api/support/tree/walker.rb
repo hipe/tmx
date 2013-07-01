@@ -352,7 +352,7 @@ module Skylab::TestSupport::Regret::API
     end
     private :say
 
-    Event_ = ::Struct.new :volume, :message_function
+    Event_ = ::Struct.new :volume, :message_proc
 
 
     def vtuple  # #called-by self internally

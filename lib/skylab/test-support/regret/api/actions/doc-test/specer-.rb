@@ -218,9 +218,9 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     end
 
     def initialize mf
-      @message_function = mf
+      @message_proc = mf
     end
 
-    attr_reader :message_function
+    attr_reader :message_proc
   end
 end

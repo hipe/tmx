@@ -101,7 +101,7 @@ module Skylab::Cull
     end
 
     def on_before e
-      @err.write "#{ e.payload_a.fetch( 0 ).message_function[] } .."
+      @err.write "#{ e.payload_a.fetch( 0 ).message_proc[] } .."
       nil
     end
 
@@ -115,7 +115,7 @@ module Skylab::Cull
     # custom per-action wiring.)
 
     def on_structural e
-      @err.puts e.message_function.call
+      @err.puts e.message_proc.call
       nil
     end
 
@@ -126,7 +126,7 @@ module Skylab::Cull
     end
 
     def on_entity_event e
-      str = instance_exec( & e.payload_a.fetch( 0 ).message_function )
+      str = instance_exec( & e.payload_a.fetch( 0 ).message_proc )
       @y << "#{ last_invocation_string }: #{ str }"
       nil
     end

@@ -129,7 +129,7 @@ module Skylab::CodeMolester
     end
 
     Wrap_ = Model::Event.new do |upstream|
-      upstream.message_function[]
+      upstream.message_proc[]
     end
 
     Text_ = Model::Event.new do |text|

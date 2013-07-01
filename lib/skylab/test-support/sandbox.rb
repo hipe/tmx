@@ -159,7 +159,7 @@ module Skylab::TestSupport::Sandbox
         if ! mod.method_defined? :define_sandbox_constant
           engine ||= Host::Engine_.new anchor_mod
           mod.send :define_method, :define_sandbox_constant, &
-            engine.define_sandbox_constant_function
+            engine.define_sandbox_constant_proc
         end
 
         nil
@@ -171,7 +171,7 @@ module Skylab::TestSupport::Sandbox
 
     def initialize anchor_mod
 
-      @define_sandbox_constant_function = -> do
+      @define_sandbox_constant_proc = -> do
         -> i, &b do
           x = nil
           f = -> do
@@ -192,7 +192,7 @@ module Skylab::TestSupport::Sandbox
       end
     end
     MetaHell::Function.enhance( self ).
-      as_public_getter :define_sandbox_constant_function   # grease
+      as_public_getter :define_sandbox_constant_proc   # grease
 
   end
 end

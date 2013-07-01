@@ -48,7 +48,7 @@ module Skylab
           u = ::Skylab::Basic::Pathname::Union[ * a ]
           u.normalize -> e do
             @y << "(#{ program_name } #{
-              }#{ nil.instance_exec( & e.message_function ) })"
+              }#{ nil.instance_exec( & e.message_proc ) })"
             nil
           end
           u

@@ -232,7 +232,7 @@ module Skylab::CodeMolester::Config::File::Entity
             y.yield nil, "  #{ render[ e ] }"
           end, -> invalid_o do
             y.yield "  /* next item may be invalid. it #{
-              invalid_o.message_function[] } */", "  #{ render[ e ] }"
+              invalid_o.message_proc[] } */", "  #{ render[ e ] }"
           end
         end
       end

@@ -2,31 +2,31 @@ module Skylab::Headless
 
   class Entity::Inflection
 
-    def initialize full_name_function
-      @full_name_function = full_name_function
+    def initialize full_name_proc
+      @full_name_proc = full_name_proc
     end
 
     def lexemes
-      @lexemes ||= Lexemes_.new @full_name_function
+      @lexemes ||= Lexemes_.new @full_name_proc
 
     end
   end
 
   class Entity::Inflection::Lexemes_
 
-    def initialize full_name_function
-      @full_name_function = full_name_function
+    def initialize full_name_proc
+      @full_name_proc = full_name_proc
     end
 
     def noun
-      @noun ||= Production_Proxy_.new( @full_name_function )
+      @noun ||= Production_Proxy_.new( @full_name_proc )
     end
   end
 
   class Entity::Inflection::Lexemes_::Production_Proxy_
 
-    def initialize full_name_function
-      stem = full_name_function.map( :as_natural ) * ' '
+    def initialize full_name_proc
+      stem = full_name_proc.map( :as_natural ) * ' '
       @production = Headless::NLP::EN::POS::Noun.produce stem
     end
 

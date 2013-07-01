@@ -180,7 +180,7 @@ module Skylab::Face
           ok or break
           ok, _ok, r, *rest = cmd.parse argv
           _ok or break
-          ( f = cmd.invocation_function ) and
+          ( f = cmd.invocation_proc ) and
             break( r, rest = node, [ :instance_exec, [ argv ], f ] )
           r, rest = node.surface_receiver, [ cmd.method_name, argv, nil, cmd ]
         end while nil
@@ -1118,14 +1118,14 @@ module Skylab::Face
     end
 
     def get_command_parameters sheet  # #called-by-child when documenting
-      if sheet.has_command_parameters_function
+      if sheet.has_command_parameters_proc
         sheet.command_parameters_function_value.call
       elsif :method == sheet.name_origin_i
         parent_shell.method( sheet.name_x ).parameters
       else
         fail "sanity - can't get method parameters from client when #{
           }name is #{ sheet.name_origin_i } (maybe set #{
-          }`command_parameters_function`?) (for client #{
+          }`command_parameters_proc`?) (for client #{
           }#{ surface_receiver.class })"
       end
     end
@@ -1148,7 +1148,7 @@ module Skylab::Face
   end
 
   class Node_Sheet_  # #re-open for facet 3
-    attr_reader :has_command_parameters_function
+    attr_reader :has_command_parameters_proc
   end
 
   #                      ~ facet 4 - core help & UI ~
@@ -1830,13 +1830,13 @@ module Skylab::Face
   # ~ 5.4x - invocation function ~
 
   class Command  # #re-open for 5.4x
-    def invocation_function  # #called-by-main-invocation-loop
-      @sheet.invocation_function
+    def invocation_proc  # #called-by-main-invocation-loop
+      @sheet.invocation_proc
     end
   end
 
   class Cmd_Sheet_  # #re-open for 5.4x
-    attr_accessor :invocation_function
+    attr_accessor :invocation_proc
   end
 
   # ~ 5.5x - version officious facet ~
@@ -1890,7 +1890,7 @@ module Skylab::Face
   # ~ 5.9x - command parameters as mutable ~
 
   Magic_Touch_.enhance -> { CLI.const_get( :Set, false ).touch },
-    [ Node_Sheet_, :public, :set_command_parameters_function ],
+    [ Node_Sheet_, :public, :set_command_parameters_proc ],
     [ Namespace, :singleton, :public, :set ],  # (this and below is 5.11x)
     [ Node_Sheet_, :private, :defer_set, :absorb_xtra ],
     [ NS_Sheet_, :private, :lift_prenatals ]

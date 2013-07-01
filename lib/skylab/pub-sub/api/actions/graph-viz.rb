@@ -176,7 +176,7 @@ module Skylab::PubSub
       if am_doing_one_job
         @job_a[0].outpathname = ::Pathname.new @outfile_name
       else
-        outpathname = build_outpathname_function
+        outpathname = build_outpathname_proc
         @job_a.each_with_index do |job, index|
           job.outpathname = outpathname[ index ]
         end
@@ -188,7 +188,7 @@ module Skylab::PubSub
       1 == @job_a.length
     end
 
-    def build_outpathname_function
+    def build_outpathname_proc
       num_digits = 1
       current_figure = @job_a.length
       loop do

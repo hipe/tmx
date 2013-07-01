@@ -41,7 +41,7 @@ module Skylab::TestSupport
         def generic_listener
           @generic_listener ||= -> e do
             if @vtuple[ e.volume ]
-              @err.puts instance_exec( & e.message_function )
+              @err.puts instance_exec( & e.message_proc )
               true
             end
           end

@@ -190,7 +190,7 @@ module Skylab::FileMetrics
           cook: -> col_width_a, seplen do
             # (our rendering function takes a proxy, and the upstream rendering
             # function take a normalized float)
-            f = cook_rendering_function col_width_a, nil, seplen
+            f = cook_rendering_proc col_width_a, nil, seplen
               # `nil` - use ncurses to determine screen width
             -> scalar_pxy do
               f[ scalar_pxy.normalized_scalar ]

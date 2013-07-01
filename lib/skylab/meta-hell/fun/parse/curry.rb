@@ -104,7 +104,7 @@ module Skylab::MetaHell
         end
         nil
       end
-      Exhausted_ = ::Struct.new :message_function, :index, :value, :syntax_proc
+      Exhausted_ = ::Struct.new :message_proc, :index, :value, :syntax_proc
     protected
       def base_args
         [ @op_h, @algorithm_p, @exhaustion_p, @abstract_field_list,

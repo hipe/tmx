@@ -18,7 +18,7 @@ module Skylab::CodeMolester::Config::File::Entity
 
     def jsonesque
       @jsonesque_renderer ||= -> do
-        f = build_jsonesque_field_function
+        f = build_jsonesque_field_proc
         render_f_h = @fld_box.reduce( { } ) do |h, (nn,fld)|
           if fld.is_list
             h[ nn ] = build_function_for_list_field( f )
@@ -39,7 +39,7 @@ module Skylab::CodeMolester::Config::File::Entity
       @jsonesque_renderer.call
     end
 
-    def build_jsonesque_field_function
+    def build_jsonesque_field_proc
 
       #         ~ MWHAAAA HAAAA HAAAHAAHAHAHAHAHHA igaf ~
       #    (let's please just try for some normality around here)
@@ -61,7 +61,7 @@ module Skylab::CodeMolester::Config::File::Entity
         h.fetch( vx.class )[ vx ]
       end
     end
-    private :build_jsonesque_field_function
+    private :build_jsonesque_field_proc
 
     def build_function_for_list_field f
       -> x do
@@ -79,6 +79,6 @@ module Skylab::CodeMolester::Config::File::Entity
         end
       end
     end
-    private :build_jsonesque_field_function
+    private :build_jsonesque_field_proc
   end
 end

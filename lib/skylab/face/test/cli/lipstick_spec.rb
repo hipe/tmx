@@ -22,12 +22,12 @@ module Skylab::Face::TestSupport::CLI::Lipstick
             # we want to render yellow '*' characters. a fallback width
             # is the (quite narrow) 20 characters, for the whole pane "screen"
 
-          rendering_function = Lipstick.instance.cook_rendering_function([12])
+          rendering_proc = Lipstick.instance.cook_rendering_proc([12])
             # to "cook" a rendering function, we tell it that we will have a
             # table on the left half of the screen that has one column that
             # is 12 characters wide.
 
-          ohai = rendering_function[ 0.50 ]
+          ohai = rendering_proc[ 0.50 ]
             # to render we pass one float that is supposed to be a normalized
             # scalar between 0.0 and 1.0 inclusive.
 
@@ -46,7 +46,7 @@ module Skylab::Face::TestSupport::CLI::Lipstick
             # first arg is instead an array of "pen tuples"
             # we chose not to provide a 2nd arg (default width function).
 
-          f = Lipstick.instance.cook_rendering_function [ 28 ], 60
+          f = Lipstick.instance.cook_rendering_proc [ 28 ], 60
             # existing table is 1 column, 28 chars wide. explicitly set
             # the "panel" width to 60 (overriding any attempt at ncurses).
 

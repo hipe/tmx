@@ -122,7 +122,7 @@ module Skylab::Snag
     end
 
     def issue_an_invitation_to_sheet action_sheet
-      parts = action_sheet.full_name_function.map :as_slug
+      parts = action_sheet.full_name_proc.map :as_slug
       parts.unshift program_name
       parts << '-h'
       emit :ui, "#{ kbd parts.join( ' ' ) } might have more information"

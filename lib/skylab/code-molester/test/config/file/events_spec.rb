@@ -161,11 +161,11 @@ module Skylab::CodeMolester::TestSupport::Config::File
                 w.escape_path = ->( pn ) { "~~{ #{ pn.basename } }~~" }
                 w.on_before_create do |e|
                   ohai = e.resource.pathname.basename.to_s
-                  str1 << e.message_function[]
+                  str1 << e.message_proc[]
                 end
                 w.on_after_create do |e|
                   str1 << " .. done (#{ e.bytes } bytes)."
-                  str2 = e.message_function[]
+                  str2 = e.message_proc[]
                 end
               end
               ohai.should eql('some.conf')
@@ -184,7 +184,7 @@ module Skylab::CodeMolester::TestSupport::Config::File
               bytes = o.write do |w|
                 w.dry_run = true
                 w.on_after_create do |e|
-                  yep = e.message_function[]
+                  yep = e.message_proc[]
                 end
               end
               bytes.should eql( nil )

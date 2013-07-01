@@ -103,7 +103,7 @@ module Skylab::MetaHell
       @x = -> i, i_a do
         @subnode_location_h[ i ] = i_a
         define_method i do
-          self.class.load_the_function i
+          self.class.load_the_proc i
           send i
         end
       end
@@ -113,7 +113,7 @@ module Skylab::MetaHell
       class << self
         attr_reader :x, :o
       end
-      define_singleton_method :load_the_function do |func_i|
+      define_singleton_method :load_the_proc do |func_i|
         i_a = @subnode_location_h.fetch func_i
         (( @mutex_h.fetch( func_i ) { |k| @mutex_h[k] = true ; nil } )) and
           raise "circular dependency detected with `#{ func_i }` - are you #{

@@ -22,7 +22,7 @@ module Skylab::Headless
         name, actions_anchor_module.name )  # (one place in particular will be
     end  # upset if not all naming happens via this ivar !)
 
-    alias_method :full_name_function, :name_function  # this is necessary
+    alias_method :full_name_proc, :name_function  # this is necessary
       # to give some crossover compatibilty with legacy action sheets, which
       # have name fuctions that are not full.
 

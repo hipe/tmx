@@ -91,7 +91,7 @@ module Skylab::Face
         mf, xtra_x = parse_args[ a ]
         mutex[ mf, b ]
         if mf
-          self.class.new( nil ).init_with_module_function mf, nf, xtra_x
+          self.class.new( nil ).init_with_module_proc mf, nf, xtra_x
         else
           build_into b, nf, xtra_x
         end
@@ -149,11 +149,11 @@ module Skylab::Face
       self
     end
 
-    def init_with_module_function mf, nf, xtra_x
+    def init_with_module_proc mf, nf, xtra_x
       @surface_mod = mf
       init_extended_ns_sheet :function, nf, xtra_x
     end
-    protected :init_with_module_function
+    protected :init_with_module_proc
 
     def init_with_block b, nf, xtra_x
       @block_a = [ b ]

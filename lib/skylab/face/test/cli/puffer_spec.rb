@@ -24,7 +24,7 @@ module Skylab::Face::TestSupport::CLI::Puffer
             @sheet.node_open!
             @sheet.close_node do |a|
               a.set_method_name :haxxville
-              a.set_command_parameters_function -> do
+              a.set_command_parameters_proc -> do
                 [ [ :opt, :foo ], [ :req, :bar ] ]
               end
             end

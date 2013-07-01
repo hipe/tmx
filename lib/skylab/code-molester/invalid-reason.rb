@@ -28,10 +28,10 @@ module Skylab::CodeMolester
 
     alias_method :to_s, :render
 
-    # `message_function` - implement the unified interface (contemporary
+    # `message_proc` - implement the unified interface (contemporary
     # with its date of writing) by wrapping the above.
 
-    attr_reader :message_function  # ( set in `initialize` )
+    attr_reader :message_proc  # ( set in `initialize` )
 
   protected
 
@@ -98,7 +98,7 @@ module Skylab::CodeMolester
       end
 
       me = self
-      @message_function = -> do
+      @message_proc = -> do
         me.render
       end
 

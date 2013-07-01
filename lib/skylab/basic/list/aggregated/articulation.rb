@@ -5,7 +5,7 @@ module Skylab::Basic
     # [#it-002]
 
     def self.[] enum=nil, def_blk
-     f = build_function def_blk
+     f = build_proc def_blk
      if enum
        f.call enum
      else
@@ -13,7 +13,7 @@ module Skylab::Basic
      end
     end
 
-    def self.build_function def_blk
+    def self.build_proc def_blk
       o = St_.new
       Conduit_.new(
         -> str { o.template = str },

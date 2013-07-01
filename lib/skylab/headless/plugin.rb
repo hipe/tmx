@@ -132,9 +132,9 @@ module Skylab::Headless
       nil
     end
 
-    def attach_hot_plugin_with_name_function pi, nf
+    def attach_hot_plugin_with_name_proc pi, nf
       attach_hot_plugin_with_name pi, nf.local_normal
-      pi.plugin_metaservices.set_name_function nf
+      pi.plugin_metaservices.set_name_proc nf
       nil
     end
 
@@ -234,7 +234,7 @@ module Skylab::Headless
       @plugin.class.name
     end
 
-    def set_name_function nf
+    def set_name_proc nf
       @name_function = nf
     end
 
@@ -626,7 +626,7 @@ module Skylab::Headless
             host_lacks_service_for_plugin host_metasvcs, i, plugin_metasvcs
         end
       end
-      err and raise Plugin::DeclarationError, err.message_function[]
+      err and raise Plugin::DeclarationError, err.message_proc[]
       nil
     end
   end
@@ -867,7 +867,7 @@ module Skylab::Headless
     box = box_f.call
     box.constants.each do |const|
       mod = box.const_get const, false  # (below is pursuant to [#077])
-      host.attach_hot_plugin_with_name_function(
+      host.attach_hot_plugin_with_name_proc(
         ( ::Class == mod.class ? mod : mod.const_get( :Client, false ) ).new,
         Headless::Name::Function::From::Constant.new( const ) )
     end

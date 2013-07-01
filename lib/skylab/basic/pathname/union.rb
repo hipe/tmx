@@ -17,7 +17,7 @@ module Skylab::Basic
   #     u = Basic::Pathname::Union[ '/foo/bar', '/foo', '/biff/baz' ]
   #     u.length  # => 3
   #     e = u.normalize
-  #     e.message_function[] # => 'eliminating redundant entry /foo/bar which is covered by /foo'
+  #     e.message_proc[] # => 'eliminating redundant entry /foo/bar which is covered by /foo'
   #     u.length  # => 2
 
   # `match` will result in the first path in the union that 'matches'
@@ -112,8 +112,8 @@ module Skylab::Basic
       @a << x
     end
 
-    def message_function
-      @message_function ||= begin
+    def message_proc
+      @message_proc ||= begin
         arr = @a
         -> do
           Basic::List::Aggregated::Articulation arr do
@@ -136,10 +136,10 @@ module Skylab::Basic
 
   Pathname::Union::Elim_ = ::Struct.new :shorter, :longer
 
-  # for fun, `message_function` may play with `aggregated articulation`
+  # for fun, `message_proc` may play with `aggregated articulation`
   # like so:
   #
   #     u = Basic::Pathname::Union[ '/foo/bar', '/foo/baz/bing', '/foo', '/a', '/a/b', '/a/b/c' ]
-  #     u.normalize.message_function[] # => "eliminating redundant entries /a/b and /a/b/c and /foo/bar and /foo/baz/bing which are covered by /a and /foo"
+  #     u.normalize.message_proc[] # => "eliminating redundant entries /a/b and /a/b/c and /foo/bar and /foo/baz/bing which are covered by /a and /foo"
 
 end

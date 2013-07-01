@@ -4,7 +4,7 @@ module Skylab::Headless
 
     def initialize
       raw_a = @raw_queue_a = [ ]
-      @message_function = -> do  # [#it-002] NLP aggregation experiment
+      @message_proc = -> do  # [#it-002] NLP aggregation experiment
         Headless::Services::Basic::List::Aggregated::Articulation raw_a do
           template "{{ hst }}{{ adj1 }} has not declared the required #{
             }{{ service_i }} declared as needed by {{ pi }}{{ adj2 }}"
@@ -37,6 +37,6 @@ module Skylab::Headless
 
     Item_ = ::Struct.new :hst, :service_i, :pi
 
-    attr_reader :message_function
+    attr_reader :message_proc
   end
 end

@@ -25,14 +25,14 @@ module Skylab::Cull
         hard_yes payload_lines: [ "#{ @pth[ pn ] }" ]
       else
         yes pathname: pn,
-            message_function: -> { "active config file is: #{ @pth[ pn ] }" }
+            message_proc: -> { "active config file is: #{ @pth[ pn ] }" }
       end
       true
     end
 
     def with_no num, from_pn
       no num: num, from_pn: from_pn,
-        message_function: -> do
+        message_proc: -> do
           "no cull config file found in #{ @pth[ from_pn ] } or #{
           }#{ num } levels up."
         end

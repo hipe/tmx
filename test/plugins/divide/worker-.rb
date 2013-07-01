@@ -31,7 +31,7 @@ module Skylab::Test
           end
           integer, kw = Syntax_[ -> e do
             ok and bork[ "expecting arguments #{ e.syntax_proc.call }" ]  # once
-            bork[ e.message_function.call ]
+            bork[ e.message_proc.call ]
           end, argv ]
           ok or break bork[ "please correct the above and try again." ]
           [ ok, integer, kw ]

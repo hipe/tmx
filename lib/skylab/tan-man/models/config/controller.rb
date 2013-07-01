@@ -155,7 +155,7 @@ module Skylab::TanMan
         w.on_error(& method( :error ) ) # propagate the text msg up
 
         w.on_before_create w.on_before_update -> o do  # first part of msg
-          serr.write o.message_function[]
+          serr.write o.message_proc[]
         end
 
         w.on_after_create w.on_after_update -> o do  # last part

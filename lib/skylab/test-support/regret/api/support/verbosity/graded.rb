@@ -95,7 +95,7 @@ class Skylab::TestSupport::Regret::API::Support::Verbosity::Graded < ::Module
     def param i
       @param_i and fail "param ame is write once."
       @param_i = i
-      [ i, :normalizer,  build_normalizer_function ]
+      [ i, :normalizer,  build_normalizer_proc ]
     end
 
     def default_level_integer x
@@ -112,7 +112,7 @@ class Skylab::TestSupport::Regret::API::Support::Verbosity::Graded < ::Module
       end
     end
 
-    def build_normalizer_function
+    def build_normalizer_proc
       sty = self
       -> y, x, yes do
         lvl_a = sty.lvl_a ; len = lvl_a.length
@@ -142,7 +142,7 @@ class Skylab::TestSupport::Regret::API::Support::Verbosity::Graded < ::Module
         true
       end
     end
-    private :build_normalizer_function
+    private :build_normalizer_proc
 
     def lvl_a
       @vmod.lvl_a
@@ -247,7 +247,7 @@ class Skylab::TestSupport::Regret::API::Support::Verbosity::Graded < ::Module
       @is = -> i { vtuple[ i ] }
       @event = -> i, e do  # for now this gets flattened right away, but
         if @is[ i ]        # the emitter does not know that, which is the
-          @puts[ nil.instance_exec( & e.message_function ) ]  # point.
+          @puts[ nil.instance_exec( & e.message_proc ) ]  # point.
         end
         nil  # any result could be confusing (the e? the e iff emitted?)
       end

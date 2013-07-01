@@ -14,16 +14,16 @@ module Skylab::Face
 
   class Node_Sheet_  # #re-open for facet 3
 
-    undef_method :set_command_parameters_function
-    def set_command_parameters_function f  # spec'd
-      has_command_parameters_function and fail "sanity - clobber cpf?"
-      @has_command_parameters_function = true
+    undef_method :set_command_parameters_proc
+    def set_command_parameters_proc f  # spec'd
+      has_command_parameters_proc and fail "sanity - clobber cpf?"
+      @has_command_parameters_proc = true
       @command_parameters_function_value = f
       nil
     end
 
     def command_parameters_function_value
-      @has_command_parameters_function or fail "check `has_..` first"
+      @has_command_parameters_proc or fail "check `has_..` first"
       @command_parameters_function_value
     end
   end

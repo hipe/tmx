@@ -121,7 +121,7 @@ module Skylab::MetaHell
         res
       end,
       :exhaustion, -> e do
-        raise ::ArgumentError, e.message_function[]
+        raise ::ArgumentError, e.message_proc[]
       end,
       :curry_queue, [ :matcher_a, :argv ],
       :call, -> argv, * p_a do
