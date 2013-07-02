@@ -30,7 +30,7 @@ module Skylab::TestSupport
           Recursive_Field_Values_ = ::Struct.new( * a.map( & :i ) )
 
           PARSER_ = MetaHell::FUN.parse_from_ordered_set.curry[
-            a.map( & :parse ) ]
+            :argv_scanners, a.map( & :parse ) ]
 
           Parse_auto_ = -> y, argv, x do
             x and argv.unshift x

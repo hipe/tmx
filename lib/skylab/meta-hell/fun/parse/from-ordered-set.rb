@@ -1,11 +1,9 @@
 module Skylab::MetaHell
 
-  FUN::Parse.const_set :From_Ordered_Set, nil  # #loading-handle
-
-  class FUN_
+  module FUN::Parse::From_Ordered_Set
 
     # `parse_from_ordered_set` result is array of same length as `set_a`.
-    # consider using `curry` on it to create a parser object.
+    #
     # sorta like the packrat parser algorithm, `argv` (if any) will be evaluated
     # against each remaining element in `set_a`. each element of `set_a` is
     # assumed to be a function that takes one arg: `argv`. if that function's
@@ -26,9 +24,10 @@ module Skylab::MetaHell
     #
     # like so:
     #
-    #     PARSER = MetaHell::FUN.parse_from_ordered_set.curry[ [
-    #       -> args { args.shift if args.first =~ /bill/i },
-    #       -> args { if :hi == args.first then args.shift and :hello end } ] ]
+    #     PARSER = MetaHell::FUN.parse_from_ordered_set.curry[
+    #       :argv_scanners, [
+    #         -> args { args.shift if args.first =~ /bill/i },
+    #         -> args { if :hi == args.first then args.shift and :hello end }]]
     #
     #     1  # => 1
     #
@@ -55,23 +54,28 @@ module Skylab::MetaHell
     #     argv.length  # => 3
     #
 
-    o[:parse_from_ordered_set] = -> set_a, argv do
-      len = set_a.length
-      running_a = len.times.to_a
-      res_a = ::Array.new len
-      while argv.length.nonzero? and running_a.length.nonzero?
-        index, res = running_a.each_with_index.reduce nil do |_, (idx, idx_idx)|
-          x = set_a.fetch( idx ).call argv
-          if ! x.nil?
-            running_a[ idx_idx ] = nil
-            running_a.compact!
-            break [ idx, x ]
+    o = FUN_.o
+
+    o[:parse_from_ordered_set] = FUN.parse_curry[
+      :algorithm, -> parse, argv do
+        set_a = parse.normal_argv_proc_a
+        len = set_a.length
+        running_a = len.times.to_a
+        res_a = ::Array.new len
+        while argv.length.nonzero? and running_a.length.nonzero?
+          index, res = running_a.each_with_index.reduce nil do |_, (idx, idx_idx)|
+            b, x = set_a.fetch( idx ).call argv
+            if b
+              running_a[ idx_idx ] = nil
+              running_a.compact!
+              break[ idx, x ]
+            end
           end
+          index or break
+          res_a[ index ] = res
         end
-        index or break
-        res_a[ index ] = res
-      end
-      res_a
-    end
+        res_a
+      end,
+      :curry_queue, [ :argv_scanners, :argv ] ]
   end
 end

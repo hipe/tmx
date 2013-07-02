@@ -1,3 +1,7 @@
+[#038]       #experimental hack - when the set of all local `private` methods
+               in a class is one-to-one isomorphic with the set of all DSL
+               entrypoint keywords. makes things concise, but is a hack.
+[#037]       #doc-node different parsing terms defined ..
 [#036]       #boxxy #doc-point constants order is non-deterministic
 [#035]       #tracking-tag autoloader won't work when there is toplevel name..
                (was [#sl-124])

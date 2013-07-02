@@ -1,8 +1,6 @@
 module Skylab::MetaHell
 
-  FUN::Parse.const_set :From_Set, nil  # #loading-handle
-
-  class FUN_
+  module FUN::Parse::From_Set
 
     # more flexible, powerful and complex pool-based deterministic parsing
     #
@@ -31,7 +29,7 @@ module Skylab::MetaHell
     # absolute as this.
     #
     # the *arguments* to `parse` are the reminder of whatever arguments you
-    # pass to the entrypoin function. e.g typically they would be two
+    # pass to the entrypoint function. e.g typically they would be two
     # arguments, the first being a `memo` #output-argument, and the second
     # begin e.g `argv`.
     #
@@ -44,7 +42,7 @@ module Skylab::MetaHell
     # regardless of the input,
     # a parser with no nodes in it will always report 'no parse' and 'spent':
     #
-    #     P = MetaHell::FUN.parse_from_set.curry[[ ]]
+    #     P = MetaHell::FUN.parse_from_set.curry[ :pool_procs, [ ] ]
     #
     #     P[ argv = [] ]  # => [ false, true ]
     #     argv # => []
@@ -57,7 +55,7 @@ module Skylab::MetaHell
     # with parser with one node that reports it always matches & always spends
     # it always reports the same as a final result:
     #
-    #     P = MetaHell::FUN.parse_from_set.curry[[
+    #     P = MetaHell::FUN.parse_from_set.curry[ :pool_procs, [
     #      -> _input {  [ true, true ] }
     #     ]]
     #
@@ -66,7 +64,7 @@ module Skylab::MetaHell
     # with a parser with one node that reports it never matches & always spends
     # it always reports the same as a final result:
     #
-    #     P = MetaHell::FUN.parse_from_set.curry[[
+    #     P = MetaHell::FUN.parse_from_set.curry[ :pool_procs, [
     #       -> _input {  [ false, true ] }
     #     ]]
     #
@@ -85,7 +83,7 @@ module Skylab::MetaHell
     #       end
     #     end
     #
-    #     P = MetaHell::FUN.parse_from_set.curry[[
+    #     P = MetaHell::FUN.parse_from_set.curry[ :pool_procs, [
     #       keyword[ 'foo' ],
     #       keyword[ 'bar' ],
     #       -> memo, argv do
@@ -139,32 +137,40 @@ module Skylab::MetaHell
     #     memo[ :foo  ]  # => true
     #     memo[ :bar  ]  # => nil
 
-    o[:parse_from_set] = -> set_a, first, *a do
-      did_parse_any = false ; pool_a = set_a.dup
-      parsed_none_last_pass = false
-      while true
-        if ( len = pool_a.length ).zero?
-          did_spend_all = true
-          break
-        end
-        parsed_none_last_pass and break
-        spent_this_pass = parsed_this_pass = false
-        len.times do |i|
-          parsed, spent = pool_a.fetch( i )[ first, *a ]
-          parsed and parsed_this_pass ||= true
-          if spent
-            spent_this_pass ||= true
-            pool_a[ i ] = nil
+    o = FUN_.o
+
+    o[:parse_from_set] = FUN.parse_curry[
+      :algorithm, -> parse, input_x_a do
+        did_parse_any = parsed_none_last_pass = false
+        pool_a = parse.get_pool_proc_a
+        while true
+          if ( len = pool_a.length ).zero?
+            did_spend_all = true
+            break
+          end
+          parsed_none_last_pass and break
+          spent_this_pass = parsed_this_pass = false
+          len.times do |i|
+            parsed, spent = pool_a.fetch( i )[ * input_x_a ]
+            parsed and parsed_this_pass ||= true
+            if spent
+              spent_this_pass ||= true
+              pool_a[ i ] = nil
+            end
+          end
+          spent_this_pass and pool_a.compact!
+          if parsed_this_pass
+            did_parse_any ||= true
+          else
+            parsed_none_last_pass = true
           end
         end
-        spent_this_pass and pool_a.compact!
-        if parsed_this_pass
-          did_parse_any ||= true
-        else
-          parsed_none_last_pass = true
-        end
+        [ did_parse_any, did_spend_all || false ]
+      end,
+      :curry_queue, [ :argv ],
+      :call, -> * input_x_a do
+        absorb_along_curry_queue_and_execute input_x_a
       end
-      [ did_parse_any, did_spend_all || false ]
-    end
+    ]
   end
 end

@@ -16,15 +16,15 @@ module Skylab::MetaHell
         p = @parse.dupe
         p.call_notify a
       end
+      alias_method :call, :[]
       def curry
         -> *a do
           p = @parse.dupe
           p.curry_notify a
         end
       end
-      alias_method :call, :[]
       def _p
-        @parse  # #shh
+        @parse  # #shh - you can ruin everything
       end
     end
 
@@ -32,13 +32,25 @@ module Skylab::MetaHell
       a = kls.private_instance_methods false
       hsh = ::Hash[ a.zip a ]
       hsh.default_proc = -> h, k do
-        raise ::ArgumentError, "no: \"#{ k }\". yes: (#{ h.keys * ', '})"
+        no = k.respond_to?( :id2name ) ? "\"#{ k }\"" : "(#{ k.class })"
+        raise ::ArgumentError, "no: #{ no }. yes: (#{ h.keys * ', '})"
       end
       hsh
     end
 
+    Op_h_memoized_in_constant_ = -> const_i do
+      -> do
+        # NOTE - whenver this is called, the set gets locked down in perpetuity
+        if const_defined? const_i, false
+          const_get const_i, false
+        else
+          const_set const_i, Op_h_via_private_instance_methods_[ self ].freeze
+        end
+      end
+    end
+
     Absorb_ = -> *a do
-      op_h = @op_h
+      op_h = self.op_h
       while a.length.nonzero?
         m = op_h[ a.shift ]
         send m, a
@@ -60,9 +72,10 @@ module Skylab::MetaHell
     class Parse_
       def initialize input_a
         @abstract_field_list = @call_p = @syntax = nil
-        @op_h = Op_h_via_private_instance_methods_[ self.class ]
+        @exhaustion_p = nil
         absorb( * input_a )
       end
+      protected :initialize  # because [#038]
       def get_conduit
         @conduit ||= Conduit_.new self
       end
@@ -77,17 +90,26 @@ module Skylab::MetaHell
         instance_exec( *a, & @call_p )  # result!
       end
       def curry_notify a  # assume was already duped. will mutate self, a
-        op_h = @op_h ; did = nil
+        op_h = self.op_h
         while a.length.nonzero?
           m = op_h[ i = a.shift ]
-          did ||= remove_from_curry_queue i
+          remove_from_curry_queue i
           send m, a
         end
-        did and standardize_call_p!
         get_conduit
       end
+      def op_h
+        self.class.get_op_h
+      end
+      define_singleton_method :get_op_h, & Op_h_memoized_in_constant_[ :OP_H_ ]
       def normal_token_proc_a
         @abstract_field_list.get_normal_token_proc_a
+      end
+      def normal_argv_proc_a
+        @abstract_field_list.get_normal_argv_proc_a
+      end
+      def get_pool_proc_a
+        @abstract_field_list.get_pool_proc_a
       end
       def exhaustion_notification argv, ai
         p = @exhaustion_p
@@ -107,11 +129,10 @@ module Skylab::MetaHell
       Exhausted_ = ::Struct.new :message_proc, :index, :value, :syntax_proc
     protected
       def base_args
-        [ @op_h, @algorithm_p, @exhaustion_p, @abstract_field_list,
+        [ @algorithm_p, @exhaustion_p, @abstract_field_list,
           @curry_queue_a, @call_p, @syntax ]
       end
-      def base_init op_h, algo_p, exhaus_p, afl, cqa, calp, syn
-        @op_h = op_h
+      def base_init algo_p, exhaus_p, afl, cqa, calp, syn
         @algorithm_p = algo_p
         @exhaustion_p = exhaus_p
         @abstract_field_list = afl
@@ -119,6 +140,18 @@ module Skylab::MetaHell
         @call_p = calp
         @syntax = syn
         @field = nil
+        nil
+      end
+      def set_abstract_field_list class_i, a
+        # this just clobbers whatever is there without warning (which
+        # presumably is acceptable behavior, to e.g a currying user).
+        fields_being_added_notification
+        @abstract_field_list = Abstract_Field_List_.new class_i, a
+        nil
+      end
+      def fields_being_added_notification
+        remove_from_curry_queue :token_matchers, :token_scanners,
+          :argv_scanners
         nil
       end
       def absorb_along_curry_queue_and_execute *a
@@ -129,7 +162,8 @@ module Skylab::MetaHell
         cq = @curry_queue_a
         if cq.length < a.length
           raise ::ArgumentError, "too many arguments (#{ a.length } for #{
-            }#{ cq.length })"
+            }#{ cq.length } ((#{ a.map( & :class ) }) for (#{
+            }#{ @curry_queue_a * ', ' }))"
         end
         aa = [ ]
         while a.length.nonzero?
@@ -143,12 +177,18 @@ module Skylab::MetaHell
         instance_variable_defined? :@argv_a or fail 'where'
         @algorithm_p[ self, @argv_a ]
       end
-      def remove_from_curry_queue i
-        if (( idx = @curry_queue_a.index i ))
-          @curry_queue_a[ idx ] = nil
-          @curry_queue_a.compact!
+      def remove_from_curry_queue * i_a  # [#bm-001]
+        found = @curry_queue_a & i_a
+        if found.length.nonzero?
+          @curry_queue_a -= found
+          curry_queue_changed_notification
           true
         end
+        nil
+      end
+      def curry_queue_changed_notification
+        standardize_call_p!
+        nil
       end
       def standardize_call_p!
         @call_p = Standard_call_p_
@@ -186,16 +226,31 @@ module Skylab::MetaHell
       end
       def prepend_to_curry_queue a
         @curry_queue_a.unshift a.fetch 0 ; a.shift
-        standardize_call_p!
+        curry_queue_changed_notification
         nil
       end
       def call a
         @call_p = a.fetch 0 ; a.shift
         nil
       end
-      def matcher_a input_a
-        a = input_a.fetch 0 ; input_a.shift
-        @abstract_field_list = Abstract_Field_List_.new :Matcher_, a
+      def token_matchers a
+        set_abstract_field_list :Token_Matcher_, ( a.fetch 0 )
+        a.shift
+        nil
+      end
+      def token_scanners a
+        set_abstract_field_list :Token_Scanner_, ( a.fetch 0 )
+        a.shift
+        nil
+      end
+      def argv_scanners a
+        set_abstract_field_list :Argv_Scanner_, ( a.fetch 0 )
+        a.shift
+        nil
+      end
+      def pool_procs a
+        set_abstract_field_list :Pool_Proc_, ( a.fetch 0 )
+        a.shift
         nil
       end
       def argv a
@@ -218,7 +273,7 @@ module Skylab::MetaHell
           @default_field = field
         else
           ( @abstract_field_list ||= begin
-            remove_from_curry_queue :matcher_a
+            fields_being_added_notification
             Mutable_Concrete_Field_List_.new
           end ).add_field field
         end
@@ -227,7 +282,7 @@ module Skylab::MetaHell
 
     class Field_
       def initialize
-        @monikizer_p  = @moniker = nil
+        @monikizer_p = @moniker = nil
       end
       define_method :absorb_notify, & Absorb_notify_
       def looks_like_default?
@@ -314,6 +369,14 @@ module Skylab::MetaHell
         @did_collapse or collapse!
         @deep_a.map( & :normal_token_proc )
       end
+      def get_normal_argv_proc_a
+        @did_collapse or collapse!
+        @deep_a.map( & :normal_argv_proc )
+      end
+      def get_pool_proc_a
+        @did_collapse or collapse!
+        @deep_a.map( & :pool_proc )
+      end
     private
       def collapse!
         clas = FUN::Parse::Curry.const_get @class_i, false
@@ -339,18 +402,34 @@ module Skylab::MetaHell
       end
     end
 
-    class Matcher_
+    Token_Matcher_ = ::Struct.new :normal_token_proc
+    class Token_Matcher_
       def initialize p
-        @p = p
+        super -> tok do
+          [ true, tok ] if p[ tok ]
+        end
       end
-      def normal_token_proc
-        @ntp ||= begin
-          p = @p
-          -> tok do
-            [ true, tok ] if p[ tok ]
+    end
+
+    Normal_Scanner__ = ::Struct.new :_normal_proc
+    class Normal_Scanner__
+      def initialize p
+        super -> tok do
+          if ! (( x = p[ tok ] )).nil?
+            [ true, x ]
           end
         end
       end
     end
+
+    class Token_Scanner_ < Normal_Scanner__
+      alias_method :normal_token_proc, :_normal_proc
+    end
+
+    class Argv_Scanner_ < Normal_Scanner__
+      alias_method :normal_argv_proc, :_normal_proc
+    end
+
+    Pool_Proc_ = ::Struct.new :pool_proc
   end
 end
