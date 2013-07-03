@@ -6,7 +6,7 @@ module Skylab::Test
 
       include Test::Agent_IM_
 
-      Field_ = Test::Field_
+      Field_ = MetaHell::FUN::Parse::Field_
 
       def self.[] *a
         new( *a ).execute

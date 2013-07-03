@@ -2,9 +2,8 @@ module Skylab::Test
 
   module Adapters::Relish
 
-    # (we use a name other than "R-Spec" only for clarity and to ensure
-    # that we are accessing the vendor entity in the right way - in production
-    # code you should see neither references to "R-elish" nor "R-Spec".)
+    # we use a strange name as an exercise in modularity, and so we don't
+    # get false-positives when searching for the real ::R-Spec/r-spec
 
     Test::Adapter::Anchor_Module[ self ]  # do all the common things
 

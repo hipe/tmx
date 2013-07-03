@@ -4,7 +4,7 @@ module Skylab::MetaHell::TestSupport
 
   module FUN
 
-    ::Skylab::MetaHell::TestSupport[ FUN_TestSupport = self ]
+    ::Skylab::MetaHell::TestSupport[ self ]
 
   end
 
