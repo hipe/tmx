@@ -2,6 +2,8 @@ module Skylab::MetaHell
 
   module FUN::Parse::Curry
 
+    Parse = FUN::Parse
+
     o = MetaHell::FUN_.o
 
     o[:parse_curry] = -> * input_a do
@@ -23,19 +25,12 @@ module Skylab::MetaHell
           p.curry_notify a
         end
       end
+      def get_parse
+        @parse.dupe
+      end
       def _p
         @parse  # #shh - you can ruin everything
       end
-    end
-
-    Op_h_via_private_instance_methods_ = -> kls do
-      a = kls.private_instance_methods false
-      hsh = ::Hash[ a.zip a ]
-      hsh.default_proc = -> h, k do
-        no = k.respond_to?( :id2name ) ? "\"#{ k }\"" : "(#{ k.class })"
-        raise ::ArgumentError, "no: #{ no }. yes: (#{ h.keys * ', '})"
-      end
-      hsh
     end
 
     Op_h_memoized_in_constant_ = -> const_i do
@@ -49,21 +44,13 @@ module Skylab::MetaHell
       end
     end
 
+    Op_h_via_private_instance_methods_ =
+      FUN::Parse::Op_h_via_private_instance_methods_
+
     Absorb_ = -> *a do
       op_h = self.op_h
       while a.length.nonzero?
         m = op_h[ a.shift ]
-        send m, a
-      end
-      nil
-    end
-
-    Absorb_notify_ = -> a do
-      op_h = self.op_h
-      while a.length.nonzero?
-        m = op_h.fetch( a.first ) { }
-        m or break
-        a.shift
         send m, a
       end
       nil
@@ -127,6 +114,10 @@ module Skylab::MetaHell
         nil
       end
       Exhausted_ = ::Struct.new :message_proc, :index, :value, :syntax_proc
+    # #hacks-only
+      def _field_a
+        @abstract_field_list._field_a
+      end
     protected
       def base_args
         [ @algorithm_p, @exhaustion_p, @abstract_field_list,
@@ -266,8 +257,12 @@ module Skylab::MetaHell
       end
       def field a
         dflt = ( @default_field if instance_variable_defined? :@default_field )
-        field = Field_.new
-        field.absorb_notify a
+        if a.first.respond_to? :id2name
+          field = Parse::Field_.new
+          field.absorb_notify a
+        else
+          field = a.fetch 0 ; a.shift
+        end
         dflt and field.merge_defaults! dflt
         if field.looks_like_default?
           @default_field = field
@@ -280,64 +275,8 @@ module Skylab::MetaHell
       end
     end
 
-    class Field_
-      def initialize
-        @monikizer_p = @moniker = nil
-      end
-      define_method :absorb_notify, & Absorb_notify_
-      def looks_like_default?
-        ! looks_like_particular_field
-      end
-      def merge_defaults! dflt
-        p = dflt.monikizer_p and ( @monikizer_p ||= p )
-        nil
-      end
-      attr_reader :monikizer_p
-      def normal_token_proc
-        @ntp ||= begin
-          -> tok do
-            x = @token_scanner_p[ tok ]
-            if ! x.nil?
-              [ true, x ]
-            end
-          end
-        end
-      end
-      def get_monikers_proc
-        me = self
-        -> { [ me.get_moniker ] }
-      end
-
-      Mnkzr_p_ = -> s { "<<**#{ s }**>>" }
-
-      def get_moniker
-        ( @monikizer_p || Mnkzr_p_ )[ @moniker ]
-      end
-    protected
-      attr_reader :looks_like_particular_field
-      def op_h
-        self.class.const_get :OP_H_, false
-      end
-    private
-      def monikizer a
-        @monikizer_p = a.shift
-        nil
-      end
-      def moniker a
-        @looks_like_particular_field = true
-        @moniker = a.shift
-        nil
-      end
-      def token_scanner a
-        @looks_like_particular_field = true
-        @token_scanner_p = a.shift
-        nil
-      end
-      OP_H_ = Op_h_via_private_instance_methods_[ self ]
-    end
-
     class Syntax_
-      define_method :absorb_notify, & Absorb_notify_
+      define_method :absorb_notify, & FUN::Parse::Absorb_notify_
       def build_syntax_proc afl
         mk = @monikizer_p
         -> do

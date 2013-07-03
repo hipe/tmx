@@ -260,6 +260,10 @@ module Skylab::Test
       @slug ||= @local_normal_name.to_s
     end
 
+    def test_dir_pn
+      @test_dir_pn ||= @dir_pathname.join( TEST_DIR_ )
+    end
+
     -> do  # `all_spec_paths`
       spec_paths_cache = nil
       define_method :all_spec_paths do
@@ -275,7 +279,7 @@ module Skylab::Test
       rx = %r|\G[-a-z0-9]+(?=/)|
       build_cache_h = -> do
         a = ::Pathname.glob ::Skylab.dir_pathname.join(
-          "*/test/**/*#{ ::Skylab::TestSupport::FUN._spec_rb[] }" )
+          "*/#{ TEST_DIR_ }/**/*#{ ::Skylab::TestSupport::FUN._spec_rb[] }" )
         offset = ::Skylab.dir_pathname.to_s.length + 1
         prev = oa = nil
         a.reduce( { } ) do |h, pn|
