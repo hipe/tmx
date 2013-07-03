@@ -2,10 +2,11 @@
 
 require_relative '../core'
 
-module Skylab::Test
-module Benchmarks::Struct_Members_Vs_Ivars_Etc_  # lost indent
+module Skylab::Test::Struct_Members_Vs_Ivars_Etc_
 
-  TIMES = 14_000_000
+  TIMES = 7_000_000  # this number has been adjusted down so that we can
+  # see results "right away" (and make sure that the benchmark itself still
+  # works.). when results with more rigor are needed, please increase this.
 
   class SomeStructSubclass < ::Struct.new :foo
     def go_member
@@ -43,7 +44,14 @@ module Benchmarks::Struct_Members_Vs_Ivars_Etc_  # lost indent
     end
   end
 
-  Test::Benchmark.bmbm do |bm|
+  Test = ::Skylab::Test
+
+  if ::ARGV.length.nonzero?
+    Test::TestSupport::Stderr_.call.puts "unpexpected argument(s), #{
+      }skipping benchmark: #{ ::ARGV * ' ' } (from #{ self })"
+  else
+
+  ::Skylab::Test::Benchmark.bmbm do |bm|
     struct = SomeStructSubclass.new 3
     obj = SomeRegularClass.new 3
     bm.report "regular class object ivar" do
@@ -59,5 +67,6 @@ module Benchmarks::Struct_Members_Vs_Ivars_Etc_  # lost indent
       struct.go_reader
     end
   end
+
+  end  # indent broken to preserve history :/
 end
-end  # lost indent

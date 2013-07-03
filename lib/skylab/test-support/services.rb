@@ -10,6 +10,7 @@ module Skylab::TestSupport
     o = { }
     subproduct, stdlib = MetaHell::FUN.at :require_subproduct, :require_stdlib
     o[:Basic] = subproduct
+    o[:Benchmark] = stdlib
     o[:DRb] = -> _ { require 'drb/drb' ; ::DRb }
     o[:Face] = subproduct
     o[:FileUtils] = stdlib

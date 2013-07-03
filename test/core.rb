@@ -16,4 +16,6 @@ module Skylab::Test
 
   extend MetaHell::MAARS  # autoloading is used downwards deeply
 
+  stowaway :Benchmark, -> { TestSupport::Benchmark }
+
 end

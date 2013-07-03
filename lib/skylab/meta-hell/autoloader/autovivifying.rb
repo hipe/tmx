@@ -113,7 +113,9 @@ module Skylab::MetaHell
       define_singleton_method :has_stowaway_location do get_loc[] end
       define_singleton_method :get_stowaway_location do get_loc[] end
       define_singleton_method :load_stowaway do |loc_x|
-        if loc_x.respond_to? :ascii_only?
+        if loc_x.respond_to? :call
+          @mod.const_set @const, loc_x.call
+        elsif loc_x.respond_to? :ascii_only?
           require "#{ @mod.dir_pathname.join loc_x }"
         else
           [ * loc_x ].reduce( @mod ) do |m, x|

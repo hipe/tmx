@@ -5,6 +5,9 @@ require_relative '../core'
 module Skylab::Test
 module Benchmarks::Split_vs_rx_  # losing 2x indent
 
+TIMES = 200_000  # this amount is few enough to see it working right away.
+  # increase the number for more precise results.
+
 module Foo
   module BarBaz
     module BiffoBazzo
@@ -30,10 +33,10 @@ test_that_benchmark_blocks_are_correct = -> do
   end
 end
 
-Test::Benchmark.argparse( -> do
+Test::Benchmark.selftest_argparse[ -> do
   test_that_benchmark_blocks_are_correct[]
 end, -> do
-  t = 2_000_000
+  t = TIMES
   Test::Benchmark.bmbm do |bm|
      alts.each do |a|
        bm.report a.label do
@@ -43,6 +46,6 @@ end, -> do
        end
      end
    end
-end )
+end ]
 
 end end  # lost 2x indent

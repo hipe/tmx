@@ -6,6 +6,10 @@ module Skylab::Test
 
 module Benchmarks::Eq_Eq_Eq_Vs_Kind_Of_  # losing 2x indent..
 
+TIMES = 400_000  # this number is few enough so that you can see this
+  # thing working right away and get a rough sense for the comparision.
+  # a larger number will yield more precision.
+
 class Alt < Test::Benchmark::Alternative
   def val
     if rand >= 0.5
@@ -49,16 +53,16 @@ _tests = lambda do
   end
 end
 
-t = 4_000_000
+t = TIMES
 
 _make_bm_jobs = ->(x) {
   alts.each { |a| x.report(a.label) { t.times { a.execute } } }
 }
 
-Test::Benchmark.argparse( -> do
+Test::Benchmark.selftest_argparse[ -> do
   _tests[]
 end, -> do
   Test::Benchmark.bmbm( & _make_bm_jobs )
-end )
+end ]
 
 end end  # indent lost 2 x
