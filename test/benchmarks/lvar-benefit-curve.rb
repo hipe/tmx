@@ -6,10 +6,12 @@ module Skylab::Test
 
   module Benchmarks::Lvar_Bennies
 
-    T_ = 10_000_000
+    TIMES = 1_000_000  # this number has been made low enough so that we can
+    # see the benchmark working "immediately". for more rigorous results you
+    # should increase the number.
 
     t_factor = -> num do
-      ( T_ * num ).to_i
+      ( TIMES * num ).to_i
     end
 
     class G_
@@ -61,22 +63,8 @@ module Skylab::Test
       end ]
     end
 
-    class Mock_
-      def initialize y
-        @y = y
-      end
-      def bmbm
-        yield self
-        nil
-      end
-      def report label
-        @y << "mock label: #{ label }"
-        yield
-      end
-    end
-
-    common = -> y, is_real do
-      bmrk = is_real ? Test::Benchmark : Mock_.new( y )
+    invoke = -> y, is_real do
+      bmrk = is_real ? Test::Benchmark : Test::Benchmark::Mock_.new( y )
       GROUP_A_.each_with_index do |g, idx|
         g.do_skip and next
         y << nil << nil
@@ -94,10 +82,10 @@ module Skylab::Test
       end
     end
 
-    Test::Benchmark.argparse( -> y do
-      common[ y, false ]
+    Test::Benchmark.selftest_argparse[ -> y do
+      invoke[ y, false ]
     end, -> y do
-      common[ y, true ]
-    end )
+      invoke[ y, true ]
+    end ]
   end
 end

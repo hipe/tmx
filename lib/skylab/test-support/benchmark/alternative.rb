@@ -1,9 +1,9 @@
 module Skylab::TestSupport
 
-  class Benchmarking::Alternative
+  class Benchmark::Alternative
 
-    def self.[] *a
-      new( *a )
+    class << self
+      alias_method :[], :new
     end
 
     def initialize label, block
