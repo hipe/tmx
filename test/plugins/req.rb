@@ -39,7 +39,7 @@ module Skylab::Test
     ]
 
     action_summaries(
-      req: "require() each file (but do not require 'rspec/autorun')",
+      req: "require() each file (but do not require 'r#{}spec/autorun')",
       run: "(the default action - specifying its name is not necessary)"
     )
 
@@ -55,9 +55,9 @@ module Skylab::Test
 
     def req
       _req -> do
-        MetaHell::FUN.require_quietly[ 'rspec' ] unless defined? ::RSpec
+        Test::Adapters[ :rspec ].load_core_if_necessary
           # without this, quickie runs the tests.
-      end, -> { }
+      end
     end
 
     def run
@@ -67,7 +67,7 @@ module Skylab::Test
           if :cli == rm
             require 'rspec/autorun'  # don't load this till after query ok
           end
-        end, -> { }
+        end
       else
         infostream.puts "(doing nothing for runmode \"#{ rm }\".)"
         nil
@@ -76,7 +76,7 @@ module Skylab::Test
 
   private
 
-    def _req before, after
+    def _req before
       cache_a = [ ] ; info = infostream
       res = hot_spec_paths.each do |p|
         cache_a << p
@@ -100,7 +100,6 @@ module Skylab::Test
         if ! v
           info.write " #{ full_name } loaded #{ cache_a.length} spec files)\n\n"
         end
-        after[ ]
       end
     end
 

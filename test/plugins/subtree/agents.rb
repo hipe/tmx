@@ -561,10 +561,12 @@ module Skylab::Test::Plugins::Subtree
     end
 
     available_options do |o, _|
-      o.on '--order TYPE[:SEED]', 'yup. try --order random (imitate rspec)' do |x|
+      like_vendor = "(imitate r#{}spec)"
+      o.on '--order TYPE[:SEED]',
+          "yup. try --order random #{ like_vendor }" do |x|
         @a << [ :order, x ]
       end
-      o.on '--seed SEED', '(imitate rspec)' do |x|
+      o.on '--seed SEED', like_vendor do |x|
         @a << [ :seed, x ]
       end
       o.on '-v', '--verbose', 'verbose output' do

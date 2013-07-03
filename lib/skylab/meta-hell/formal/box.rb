@@ -31,7 +31,8 @@ module Skylab::MetaHell
       # Result is a new box with zero or more `Formal::Box::MatchData`.
       # *NOTE* this implementation is ignorant of the idea of an exact match,
       # so for a ref of "fo" against ["fo", "foo"], result is 2 matches.
-      #
+      # # #todo - investiage a possible bug where the input token is longer
+      # than the surface name but still matches
 
       o[:fuzzy_reduce] = -> box, ref, tuple, collapse=nil do
         rx = /\A#{ ::Regexp.escape ref.to_s.downcase }/

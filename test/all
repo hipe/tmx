@@ -222,10 +222,10 @@ module Skylab::Test
     end
 
     # `resolve_queue` - test/all is expected to be run for at least two
-    # purposes - 1) it is a file we can load with `rspec` and have it load
+    # purposes - 1) it is a file we can load with `r-spec` and have it load
     # "every" spec file in our universe.  2) it is an executable we can run
     # standalone utilizing several options, including but not limited to
-    # invoking `rspec` *while* having warnings turned on on our tests.
+    # invoking `r-spec` *while* having warnings turned on on our tests.
     # `run_mode` exists to determine and represent that distinction.
 
     # NOTE - it bears pointing out that the grammar for this utility is
