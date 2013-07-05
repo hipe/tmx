@@ -3,8 +3,10 @@ module Skylab::CovTree
   module Services
 
     o = { }
-    stdlib = MetaHell::FUN.require_stdlib
+    stdlib, subsys = MetaHell::FUN.at( :require_stdlib, :require_subproduct )
+    o[:Face] = subsys
     o[:FileUtils] = stdlib
+    o[:Ncurses] = stdlib  # gemlib
     o[:Open3] = stdlib
     o[:Set] = stdlib
     o[:Shellwords] = stdlib

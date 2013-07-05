@@ -1,9 +1,17 @@
-#!/usr/bin/env ruby -w
+module Skylab::CovTree
 
-# the point of this one-off-ish is to show for a given changeset how much
-# changes are in which subproducts. but it has been generalized out of that..
+  class API::Actions::Dirstat
 
-exit( -> sin, sout, serr, argv, program_name do
+    def self.get_desc
+
+      "the point of this one-off-ish is to show for a given changeset\n#{
+        }how much changes are in which subproducts. but it has #{
+        }generalized out from that.."
+
+    end
+
+    Money_ = -> sin, sout, serr, argv, program_name do
+    # lose 2
 
   no = 1 ; yes = 0  # exit statii
 
@@ -116,14 +124,13 @@ exit( -> sin, sout, serr, argv, program_name do
   stk = -> do
     if true  # if we ever make lipstick an option
       begin
-        require 'ncurses'
+        CovTree::Services::Ncurses.class # # below
         nc_ok = true
       rescue ::LoadError
       end
     end
     if ! nc_ok then -> _ { } else
-      require_relative '../lib/skylab'
-      require 'skylab/face/core'
+      CovTree::Services::Face.class  # #todo:during:0-subsystem, and above
       sp = '  '
       f = -> do
         tbl_width = ( fmt % [ 0, 0.0, '', ''] ).length
@@ -145,4 +152,14 @@ exit( -> sin, sout, serr, argv, program_name do
   instream.close  # whether stdin or filehandle, there is always 1 open stream
 
   yes
-end.call $stdin, $stdout, $stderr, ::ARGV, $PROGRAM_NAME )
+
+    # gain 2
+    end
+
+    API::FUN.fields[ self, * Money_.parameters.map( & :last ) ]
+
+    def execute
+      Money_[ @sin, @sout, @serr, @argv, @program_name ]
+    end
+  end
+end

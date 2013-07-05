@@ -1024,6 +1024,7 @@ module Skylab::Porcelain::Legacy
             on_info( on_error do |e| info.puts e.text end )
           end
         else
+          @instream = up
           @paystream, @infostream = pay, info
         end
         nil
