@@ -154,6 +154,9 @@ module Skylab::MetaHell
   x[:parse_from_set]                   = [ :Parse, :From_Set ]
   x[:parse_from_ordered_set]           = [ :Parse, :From_Ordered_Set ]
 
+
+  x[:fields]                           = [ :Fields_ ]
+
   def FUN.at *a
     a.map( & method( :send ) )
   end
