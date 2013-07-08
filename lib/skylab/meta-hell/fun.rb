@@ -33,23 +33,6 @@ module Skylab::MetaHell
     r
   end
 
-  o[:require_quietly] = -> s do   # load a library that is not warning friendly
-    o[:without_warning][ -> { require s } ]
-  end
-
-  o[:require_subproduct] = -> const_i do
-    if ! ::Skylab.const_defined? const_i, false
-      require "skylab/#{ ::Skylab::Autoloader::Inflection::FUN.
-        pathify[ const_i ] }/core"
-    end
-    ::Skylab.const_get const_i, false
-  end
-
-  o[:require_stdlib] = -> const_i do
-    require const_i.downcase.to_s
-    ::Object.const_get const_i
-  end
-
   o[:pathify_name] = -> const_name_s do
     ::Skylab::Autoloader::Inflection::FUN.
       pathify[ const_name_s.gsub( '::', '/' ) ]

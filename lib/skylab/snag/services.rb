@@ -4,8 +4,8 @@ module Skylab::Snag
 
     extend MetaHell::MAARS
 
+    stdlib = ::Skylab::Subsystem::FUN.require_stdlib
     o = { }
-    stdlib = MetaHell::FUN.require_stdlib
     o[:DateTime] = stdlib
     o[:FileUtils] = stdlib
     o[:Open3] = stdlib

@@ -2,13 +2,10 @@
 
 require_relative '../../core'
 
-k = ::Skylab::Dependency::StaticFileServer
+clas = ::Skylab::TestSupport::Servers::Static_File_Server
 
-# sfs = k.new './doc_root', '.', log_level: :info
+doc_root = ::Skylab::dir_pathname.join( 'dependency/test/fixtures' ).to_s
 
-sfs = k.new(
-  ::Skylab::Dependency.dir_pathname.join('test/fixtures'),
-  '.'
-)
+server = clas.new doc_root, pid_path: '.', log_level_i: :info
 
-sfs.run
+server.run

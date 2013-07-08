@@ -4,7 +4,7 @@ require 'skylab/headless/core'
 require 'optparse'
 require 'strscan'
 
-::Skylab::MetaHell::FUN.require_quietly[ 'treetop' ]
+::Skylab::Subsystem::FUN.require_quietly[ 'treetop' ]
 
 module Skylab::Flex2Treetop
   extend ::Skylab::Autoloader # only for dir_path for now!

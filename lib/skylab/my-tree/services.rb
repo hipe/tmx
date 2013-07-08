@@ -3,7 +3,7 @@ module Skylab::MyTree
   module Services
 
     o = { }
-    stdlib = MetaHell::FUN.require_stdlib
+    stdlib = ::Skylab::Subsystem::FUN.require_stdlib
     o[:Find] = -> _ { require_relative 'services/find' }
     o[:Open3] = stdlib
     o[:OptionParser] = -> _ { require 'optparse' ; ::OptionParser }

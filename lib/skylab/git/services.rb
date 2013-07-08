@@ -2,10 +2,11 @@ module Skylab::Git
 
   module Services
 
+    stdlib, subsys = ::Skylab::Subsystem::FUN.
+      at :require_stdlib, :require_subsystem
     o = { }
-    stdlib = MetaHell::FUN.require_stdlib
     o[:FileUtils] = stdlib
-    o[:Headless] = MetaHell::FUN.require_subproduct
+    o[:Headless] = subsys
     o[:Open3] = stdlib
     o[:OptionParser] = -> _ { require 'optparse' ; ::OptionParser }
     o[:Shellwords] = stdlib

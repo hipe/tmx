@@ -26,21 +26,22 @@ module Skylab::Face
 
     extend MAARS
 
+    stdlib, subsys = ::Skylab::Subsystem::FUN.
+      at :require_stdlib, :require_subsystem
     o = { }
-    stdlib, subproduct = MetaHell::FUN.at :require_stdlib, :require_subproduct
-    o[:Basic] = subproduct     # `fields` used extensively by API API
-    o[:Headless] = subproduct  # used extensively everywhere
+    o[:Basic] = subsys # `fields` used extensively by API API
+    o[:Headless] = subsys # used extensively everywhere
     o[:Ncurses] = stdlib
-    o[:OptionParser] = -> _ { require 'optparse' ; ::OptionParser } # crucial
+    o[:OptionParser] = -> _ { require 'optparse' ; ::OptionParser }  # crucial
     o[:Open3] = stdlib
-    o[:Porcelain] = subproduct # option parser abtract modelling
-    o[:PubSub] = subproduct    # engaged by the API Action API's `emit` facet.
+    o[:Porcelain] = subsys  # option parser abtract modelling
+    o[:PubSub] = subsys  # engaged by the API Action API's `emit` facet.
 
-    define_singleton_method :const_missing do |const_i|
-      if o.key? const_i
-        const_set const_i, o.fetch( const_i )[ const_i ]
+    define_singleton_method :const_missing do |c|
+      if o.key? c
+        const_set c, o.fetch( c )[ c ]
       else
-        super const_i
+        super c
       end
     end
   end

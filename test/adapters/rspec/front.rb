@@ -8,7 +8,7 @@ module Skylab::Test
     Test::Adapter::Anchor_Module[ self ]  # do all the common things
 
     def self.load_core_if_necessary
-      MetaHell::FUN.require_quietly[ 'rspec' ] unless defined? ::RSpec
+      defined? ::RSpec or ::Skylab::Subsystem::FUN.require_quietly[ 'rspec' ]
       nil
     end
   end

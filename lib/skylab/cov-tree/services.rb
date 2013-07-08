@@ -2,8 +2,9 @@ module Skylab::CovTree
 
   module Services
 
+    stdlib, subsys = ::Skylab::Subsystem::FUN.
+      at :require_stdlib, :require_subsystem
     o = { }
-    stdlib, subsys = MetaHell::FUN.at( :require_stdlib, :require_subproduct )
     o[:Basic] = subsys
     o[:Face] = subsys
     o[:FileUtils] = stdlib
@@ -14,8 +15,8 @@ module Skylab::CovTree
     o[:StringScanner] = -> _ { require 'strscan' ; ::StringScanner }
     o[:TestSupport] = subsys
 
-    define_singleton_method :const_missing do |const_i|
-      const_set const_i, o.fetch( const_i )[ const_i ]
+    define_singleton_method :const_missing do |c|
+      const_set c, o.fetch( c )[ c ]
     end
   end
 end
