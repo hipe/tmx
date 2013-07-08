@@ -1,7 +1,7 @@
 module Skylab::Test::Plugins::Subtree
 
   include ::Skylab::Test
-  Headless = Headless ; Agent_IM_ = Agent_IM_
+  Headless = Headless
 
   class Agent_
     # search agents classes go here
@@ -423,8 +423,6 @@ module Skylab::Test::Plugins::Subtree
 
     end
 
-    include Agent_IM_
-
     def initialize
       @sexp = @be_verbose = nil
     end
@@ -551,8 +549,6 @@ module Skylab::Test::Plugins::Subtree
       services_used :sort_mutex
 
     end
-
-    include Agent_IM_
 
     def initialize
       @be_verbose = nil

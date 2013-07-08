@@ -29,8 +29,8 @@ module Skylab::TestSupport
       end
 
       Match_test_dir_ = -> do
-        require 'skylab/cov-tree/constants'  # special case, avoid loading core
-        ::Skylab::CovTree::Constants::TEST_DIR_NAME_A.method :include?
+        require 'skylab/sub-tree/constants'  # special case, avoid loading core
+        ::Skylab::SubTree::Constants::TEST_DIR_NAME_A.method :include?
       end.call
 
       SEP_ = '/'.freeze

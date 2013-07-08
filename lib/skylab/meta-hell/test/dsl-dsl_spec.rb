@@ -48,11 +48,52 @@ module Skylab::MetaHell::TestSupport::DSL_DSL
         end
       end
     end
-    context "can we use a module to hold and share an entire DSL?" do
+    context "`block` define the value with a block" do
       Sandbox_2 = Sandboxer.spawn
-      it "you can attempt to make a DSL reusable and inheritable like so" do
+      it "but note you use `foo.call` from the instance" do
         Sandbox_2.with self
         module Sandbox_2
+          class Foo
+            MetaHell::DSL_DSL.enhance self do
+              block :zinger
+            end
+          end
+
+          class Bar < Foo
+            ohai = 0
+            zinger do
+              ohai += 1
+            end
+          end
+
+          bar = Bar.new
+          bar.zinger.call.should eql( 1 )
+          bar.zinger.call.should eql( 2 )
+        end
+      end
+    end
+    context "`atom_accessor` lets you access the field" do
+      Sandbox_3 = Sandboxer.spawn
+      it "in the instance in the same DSL-y way as in the class" do
+        Sandbox_3.with self
+        module Sandbox_3
+          class Foo
+            MetaHell::DSL_DSL.enhance self do
+              atom_accessor :with_name
+            end
+          end
+
+          foo = Foo.new
+          foo.with_name :x
+          foo.with_name.should eql( :x )
+        end
+      end
+    end
+    context "can we use a module to hold and share an entire DSL?" do
+      Sandbox_4 = Sandboxer.spawn
+      it "you can attempt to make a DSL reusable and inheritable like so" do
+        Sandbox_4.with self
+        module Sandbox_4
           module Foo
             MetaHell::DSL_DSL.enhance_module self do
               atom :pik

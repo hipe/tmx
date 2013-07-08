@@ -27,8 +27,6 @@ module Skylab::Test
 
   class Plugins::Req::Client
 
-    include Agent_IM_
-
     def initialize
       @be_verbose = nil
     end

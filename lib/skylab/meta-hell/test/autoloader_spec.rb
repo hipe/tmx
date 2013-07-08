@@ -1,3 +1,7 @@
+# (below comment is kept for #posterity although we have since broken
+# the regressibility of this test in the interest of getting complete
+# coverage testing thru quickie)
+
 # NOTE this file tests skylab.rb (specifically the central workhorse
 # method of all of autoloading for the entire universe org-wide)
 # and as such we cannot easily use lots of nerks that we otherwise
@@ -5,12 +9,9 @@
 # in general). But alas, the center of the universe has to be
 # somewhere. TADA:
 
-require_relative '../..'
+require_relative 'test-support'
 
-module Skylab::MetaHell  # we borrow this name but nothing in it
-end
-
-module Skylab::MetaHell::TestSupport  # likewise this name
+module Skylab::MetaHell::TestSupport::AL_
 
   module InstanceMethods
     def cleanpath x
@@ -18,15 +19,12 @@ module Skylab::MetaHell::TestSupport  # likewise this name
     end
   end
 
+  Guess_dir_ = ::Skylab::Autoloader::Guess_dir_
+
   # ( [#041] explains why we have fully qualified names below )
 
   describe "#{ ::Skylab::Autoloader } [..] `guess_dir`" do
 
-    guess_dir = ::Skylab::Autoloader::Guess_dir_
-
-    let :subject do
-      guess_dir[ const, path, -> e { fail e } ]
-    end
 
     context "infers a path based on simple heuristics." do
 
@@ -34,16 +32,9 @@ module Skylab::MetaHell::TestSupport  # likewise this name
 
       def self.with path, const, dir, desc, *a
 
-        describe "The dirpath for #{ const } calling from #{
-            }#{ path } #{ desc }", *a do
-
-          let :path do cleanpath path end
-
-          let :const do const end
-
-          it do
-            should eql( dir )
-          end
+        it "The dirpath for #{ const } called from #{ path } #{ desc }", *a do
+          act = Guess_dir_[ const, cleanpath( path ), -> e { fail e } ]
+          act.should eql( dir )
         end
       end
 
@@ -83,24 +74,15 @@ module Skylab::MetaHell::TestSupport  # likewise this name
 
       include InstanceMethods
 
-      let :subject do
-        -> do
-          guess_dir[ const, path, -> e { fail e } ]
-        end
-      end
-
       def self.bunk path, const, failmsg, *a
 
-        describe "The msg of the exception thrown for #{ const } #{
-            }from #{ path }", *a do
+        it "The msg of the exception thrown for #{ const } from #{ path }", *a do
 
-          let :path do cleanpath path end
+          -> do
 
-          let :const do const end
+            Guess_dir_[ const, cleanpath( path ), -> e { fail e } ]
 
-          it do
-            should raise_error( failmsg )
-          end
+          end.should raise_error( failmsg )
         end
       end
 

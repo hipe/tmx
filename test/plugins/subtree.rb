@@ -62,7 +62,6 @@ module Skylab::Test
     end
 
     include Host_InstanceMethods  # `merge_options`
-    include Agent_IM_
 
     available_options do |op, ctx_a|
       ctx_a ||= [ ]
@@ -92,7 +91,7 @@ module Skylab::Test
 
     def initialize( * )
       super
-      @sort_mtx = Headless::Services::Basic::Mutex.new
+      @sort_mtx = Headless::Services::Basic::Mutex::Write_Once.new
     end
 
     def hot_spec_paths

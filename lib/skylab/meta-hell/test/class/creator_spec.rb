@@ -19,7 +19,7 @@ module ::Skylab::MetaHell::TestSupport::Class::Creator
         object = o.object
         object.should be_kind_of(klass)
         object2 = klass.new
-        object2.object_id.should_not eql(object.object_id)
+        ( object2.object_id == object.object_id ).should eql( false )
         object2.class.should eql(object.class)
         object.class.should eql(klass)
         o.object.object_id.should eql(object.object_id)

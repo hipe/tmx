@@ -2,6 +2,30 @@ module Skylab::MetaHell
 
   module FUN::Fields_
 
+    # using the basic fields facility out of the box only gives you
+    # a readable way to set instance methods via a constructor
+    #
+    #     class Foo
+    #       MetaHell::FUN.fields[ self, :ding, :bat ]
+    #     end
+    #
+    #     (( FOO = Foo.new )).instance_variables.sort  # => [ :@bat, :@ding ]
+    #
+    # it does not, however, give you attr readers
+    #
+    #     FOO.respond_to?( :bat )  # => false
+    #     FOO.class.private_method_defined?( :bat )  # => false
+    #
+    # it sets *all* field ivars to nil, and then sets the values given
+    #
+    #     foo = Foo.new( :bat, :x )
+    #     foo.instance_variable_get( :@bat )  # => :x
+    #     foo.instance_variable_get( :@ding )  # => nil
+    #
+    # although it does not enforce required fields, it enforces the valid set
+    #
+    #     Foo.new( :ding, :x, :bat, :y, :bazzle, :z )  # => KeyError: key not found: :bazzle
+
     Metafields_ = ::Struct.new :client, :method, :scan_method,
       :do_super, :struct_like, :field_i_a
 
@@ -104,5 +128,12 @@ module Skylab::MetaHell
         i == a[ idx * 2 ] and break a[ idx * 2 + 1 ]
       end
     end
+
+    # Iambic_detect_
+    # is a hack that lets to peek into iambic arrays:
+    #
+    #   a = [ :one, 'two', :three, 'four' ]
+    #   Iambic_detect_[ :three, a ]  # => 'four'
+
   end
 end

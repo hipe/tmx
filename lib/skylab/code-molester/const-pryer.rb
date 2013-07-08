@@ -88,6 +88,7 @@ module Skylab::CodeMolester
       end
       @path
     end
+    alias_method :path, :inpath  # can be more readable when no outpaths
 
     def outpath
       if @outpath.nil?

@@ -76,6 +76,6 @@ module Skylab::MetaHell
         end
         res_a
       end,
-      :curry_queue, [ :argv_scanners, :argv ] ]
+      :uncurried_queue, [ :argv_scanners, :argv ] ]
   end
 end

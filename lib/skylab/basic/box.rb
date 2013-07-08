@@ -28,6 +28,10 @@ module Skylab::Basic
       @h.fetch i, &b
     end
 
+    def [] i  # should be used to trigger the default_proc only
+      @h[ i ]
+    end
+
     def to_a
       @a.map { |i| [ i , @h.fetch( i ) ] }
     end

@@ -5,8 +5,8 @@ module Skylab::TestSupport
     ::Skylab::TMX::Front_Loader::One_shot_adapter_[ self,
       -> progname, i, o, e, argv do
         if '--ping' == argv[ 0 ]
-          e.puts 'hello from quickie-recursive.'
-          return :'hello_from_quickie-recursive'
+          e.puts 'hello from quickie.'
+          return :'hello_from_quickie'
         end
         run = ::Skylab::TestSupport::Quickie::service.run
         run.set_three_streams i, o, e

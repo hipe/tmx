@@ -5,7 +5,7 @@ module ::Skylab::TMX
     # this is where sausage is made
 
     SKIP_H_ = {
-      :'quickie-recursive' => :hop
+      :'quickie' => :hop
     }.freeze
 
     BIN_PN_, PREFIX_ = ::Skylab::Subsystem::PATHNAMES.at :bin, :binfile_prefix
@@ -106,9 +106,9 @@ module ::Skylab::TMX
       ::Skylab::TestSupport::Regret::CLI::Client
     end, :skip, false
 
-    namespace :'quickie-recursive', -> do
+    namespace :'quickie', -> do
       require 'skylab/test-support/core'
       ::Skylab::TestSupport::Quickie::Recursive_Runner
-    end, :aliases, [ 'qr' ]
+    end
   end
 end

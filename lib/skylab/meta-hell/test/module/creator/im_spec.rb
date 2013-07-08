@@ -58,7 +58,7 @@ module ::Skylab::MetaHell::TestSupport::Module::Creator
         m1 = o1.meta_hell_anchor_module
         m2 = o2.meta_hell_anchor_module
         m1.constants.should be_empty
-        m1.object_id.should_not eql(m2.object_id)
+        ( m1.object_id == m2.object_id ).should eql( false )
         o1.modul! :Home__Girl
         m1.constants.length.should eql(1)
         m2.constants.length.should eql(0)

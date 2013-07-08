@@ -12,13 +12,17 @@ module Skylab::Headless::TestSupport::Services::File
 
     tmpdir = File_TestSupport.tmpdir
 
-    it "when build with pathname - `gets` - works as expected" do
-      if false
-      pn = tmpdir.clear.write 'foo.txt', <<-O.unindent
-        one
-        two
-      O
+    before :all do
+      if ! tmpdir.exist?
+        tmpdir.prepare
+        tmpdir.write 'foo.txt', <<-O.unindent
+          one
+          two
+        O
       end
+    end
+
+    it "when build with pathname - `gets` - works as expected" do
       pn = tmpdir.join 'foo.txt'
       l = Headless::Services::File::Lines::Producer.new pn
       l.line_number.should eql( nil )

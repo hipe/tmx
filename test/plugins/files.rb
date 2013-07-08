@@ -18,8 +18,6 @@ module Skylab::Test
 
   class Plugins::Files::Client
 
-    include Agent_IM_
-
     def initialize
       @do_pretty = @be_verbose = @did_run = nil
     end

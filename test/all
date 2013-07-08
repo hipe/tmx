@@ -74,7 +74,8 @@ module Skylab::Test
         :infostream,
         :paystream,
         [ :pretty_path, :ivar ],
-        :run_mode
+        :run_mode,
+        :get_expression_agent
 
     end
 
@@ -448,11 +449,6 @@ module Skylab::Test
       end
     end
   end
-
-  module Agent_IM_
-    # used to have things, may have things in the future
-  end
 end
-
 
 Skylab::Test::CLI.new( $stdin, $stdout, $stderr ).invoke ARGV

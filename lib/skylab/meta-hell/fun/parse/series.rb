@@ -142,7 +142,7 @@ module Skylab::MetaHell
       :exhaustion, -> e do
         raise ::ArgumentError, e.message_proc[]
       end,
-      :curry_queue, [ :token_matchers, :argv ],
+      :uncurried_queue, [ :token_matchers, :argv ],
       :call, -> argv, * p_a do
         absorb_along_curry_queue_and_execute p_a, argv
       end

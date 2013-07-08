@@ -28,45 +28,31 @@ module Skylab::MetaHell
       def get_parse
         @parse.dupe
       end
+      def syntax_string
+        @parse.render_syntax_string
+      end
+      def lookup_field i
+        @parse.lookup_field_notify i
+      end
       def _p
         @parse  # #shh - you can ruin everything
       end
-    end
-
-    Op_h_memoized_in_constant_ = -> const_i do
-      -> do
-        # NOTE - whenver this is called, the set gets locked down in perpetuity
-        if const_defined? const_i, false
-          const_get const_i, false
-        else
-          const_set const_i, Op_h_via_private_instance_methods_[ self ].freeze
-        end
+      def _field_a
+        @parse._field_a
       end
-    end
-
-    Op_h_via_private_instance_methods_ =
-      FUN::Parse::Op_h_via_private_instance_methods_
-
-    Absorb_ = -> *a do
-      op_h = self.op_h
-      while a.length.nonzero?
-        m = op_h[ a.shift ]
-        send m, a
-      end
-      nil
     end
 
     class Parse_
       def initialize input_a
         @abstract_field_list = @do_glob_extra_args = @exhaustion_p =
           @syntax = nil
-        @state_mutex = MetaHell::Services::Basic::Mutex.new :state_mutex
+        @state_mutex =
+            MetaHell::Services::Basic::Mutex::Write_Once.new :state_mutex
           # state encompasses input and output. various algorithms may handle
           # input and output together or separately, but we ensure that etc.
         absorb( * input_a )
       end
-      protected :initialize  # #protected-not-private because [#038]
-    protected
+    private
       def base_args
         [ @algorithm_p, @exhaustion_p, @abstract_field_list,
           @curry_queue_a, @call_p, @syntax, @state_mutex, @do_glob_extra_args ]
@@ -98,18 +84,25 @@ module Skylab::MetaHell
         instance_exec( *a, & @call_p )  # result!
       end
       def curry_notify a  # assume was already duped. will mutate self, a
-        op_h = self.op_h
+        op_h = field_op_h
+        last = nil
         while a.length.nonzero?
-          m = op_h[ i = a.shift ]
-          remove_from_curry_queue i
+          x = a.shift
+          m = op_h.fetch x do
+            raise ::ArgumentError, "unrecognized element: #{ Parse::
+              Strange_[ x ] }#{ " after \"#{ last }\"" if last }#{
+              }#{ Lev_[ op_h.keys, x ] if x.respond_to? :id2name }"
+          end
+          last = x
+          remove_from_curry_queue x
           send m, a
         end
         get_conduit
       end
-      def op_h
-        self.class.get_op_h
+      Lev_ = -> item_a, outside_x do
+        " - did you mean #{ MetaHell::Services::Headless::NLP::EN::
+          Levenshtein_::Templates_::Or_[ item_a, outside_x ] }?"
       end
-      define_singleton_method :get_op_h, & Op_h_memoized_in_constant_[ :OP_H_ ]
       def normal_token_proc_a
         @abstract_field_list.get_normal_token_proc_a
       end
@@ -135,11 +128,19 @@ module Skylab::MetaHell
         nil
       end
       Exhausted_ = ::Struct.new :message_proc, :index, :value, :syntax_proc
+      def render_syntax_string
+        get_syntax_proc.call
+      end
+      def lookup_field_notify predicate_i
+        @abstract_field_list._field_a.reduce nil do |_, fld|
+          fld.predicates.include?( predicate_i ) and break fld
+        end
+      end
     # #hacks-only
       def _field_a
         @abstract_field_list._field_a
       end
-    protected  # #protected-not-private because of [#038] hack
+    private
       def set_abstract_field_list class_i, a
         # this just clobbers whatever is there without warning (which
         # presumably is acceptable behavior, to e.g a currying user).
@@ -176,7 +177,6 @@ module Skylab::MetaHell
         "too many arguments (#{ a.length } for #{ cq.length } #{
         }((#{ a.map( & :class ) }) for (#{ @curry_queue_a * ', ' }))"
       end
-      define_method :absorb, & Absorb_
       def execute
         @state_mutex.is_held or fail "sanity - there is no e.g `parse_a` or #{
           }or `state_x_a` to pass to the algorithm"
@@ -211,7 +211,7 @@ module Skylab::MetaHell
           MetaHell::EMPTY_P_
         end
       end
-    private
+    FUN::Fields_::From_.methods do  # (borrow one indent)
       def algorithm a
         @algorithm_p = a.fetch 0 ; a.shift
         nil
@@ -225,12 +225,17 @@ module Skylab::MetaHell
         argv[ 0, ai ] = MetaHell::EMPTY_A_  # "consume" the amount that
         nil                                 # was matched
       end
-      def curry_queue a
+      def uncurried_queue a
         @curry_queue_a = a.fetch 0 ; a.shift
         nil
       end
-      def prepend_to_curry_queue a
+      def prepend_to_uncurried_queue a
         @curry_queue_a.unshift a.fetch 0 ; a.shift
+        curry_queue_changed_notification
+        nil
+      end
+      def append_to_uncurried_queue a
+        @curry_queue_a.push a.fetch 0 ; a.shift
         curry_queue_changed_notification
         nil
       end
@@ -281,12 +286,7 @@ module Skylab::MetaHell
       end
       def field a
         dflt = ( @default_field if instance_variable_defined? :@default_field )
-        if a.first.respond_to? :id2name
-          field = Parse::Field_.new
-          field.absorb_notify a
-        else
-          field = a.fetch 0 ; a.shift
-        end
+        field = Resolve_field_[ a ]
         dflt and field.merge_defaults! dflt
         if field.looks_like_default?
           @default_field = field
@@ -297,12 +297,26 @@ module Skylab::MetaHell
           end ).add_field field
         end
       end
+      Resolve_field_ = -> a do
+        x = a.fetch( 0 ) ; a.shift
+        if x.respond_to? :id2name
+          field = Parse::Field_.new
+          do_absorb = true
+        elsif x.respond_to? :superclass
+          field = x.new
+          do_absorb = true
+        else
+          field = x
+        end
+        do_absorb and field.absorb_notify a
+        field
+      end
+      end  # (pay one back)
     end
 
     class Syntax_
-      define_method :absorb_notify, & FUN::Parse::Absorb_notify_
       def build_syntax_proc afl
-        mk = @monikizer_p
+        mk = @monikate_p
         -> do
           a = afl.reduce [ ] do |m, fld|
             m.concat instance_exec( & fld.get_monikers_proc )
@@ -310,17 +324,12 @@ module Skylab::MetaHell
           mk[ a ]
         end
       end
-    protected  # #protected-not-private
-      def op_h
-        self.class.const_get :OP_H_, false
-      end
-    private
-      def monikizer a
-        @monikizer_p = a.fetch 0 ; a.shift
+    FUN::Fields_::From_.methods do
+      def monikate a
+        @monikate_p = a.fetch 0 ; a.shift
         nil
       end
-
-      OP_H_ = Op_h_via_private_instance_methods_[ self ]
+    end
     end
 
     class Abstract_Field_List_  # externally immutable! shared.
@@ -360,8 +369,14 @@ module Skylab::MetaHell
       def get_normal_token_proc_a
         @field_a.map( & :normal_token_proc )
       end
+      def get_pool_proc_a
+        @field_a.map( & :pool_proc )
+      end
       def reduce m, &b
         @field_a.reduce m, &b
+      end
+      def _field_a  # #hacks-only
+        @field_a
       end
     end
 

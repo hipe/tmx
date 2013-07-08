@@ -73,7 +73,7 @@ module Skylab::MetaHell::TestSupport::FUN::Fields_::Contoured_
         Sandbox_2.with self
         module Sandbox_2
           -> do
-            Foo.new
+            Foo.new( :foo, nil )
           end.should raise_error( ArgumentError,
                        ::Regexp.new( "\\Amissing\\ required\\ argument\\ \\-\\ foo\\z" ) )
         end
