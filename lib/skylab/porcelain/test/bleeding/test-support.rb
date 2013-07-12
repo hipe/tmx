@@ -45,7 +45,7 @@ module Skylab::Porcelain::TestSupport::Bleeding
   end
 
   module InstanceMethods
-    include Headless::CLI::Stylize::Methods
+    include Headless::CLI::Pen::Methods
     include CONSTANTS
 
     attr_reader :base_module

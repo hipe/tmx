@@ -183,7 +183,7 @@ module Skylab::Treemap
       val opt.default_value
     end
 
-    #         ~ parameter reflection ~
+    #         ~ #parameter-reflection-API ~
 
     def has_formal_parameter norm
       option_documenter.has_formal_parameter norm

@@ -18,7 +18,7 @@ module Skylab::Dependency
     event_class PubSub::Event::Textual  # can be made more complicated..
 
     include Headless::CLI::PathTools::InstanceMethods
-    include Headless::CLI::Stylize::Methods # `stylize`
+    include Headless::CLI::Pen::Methods # `stylize`
 
     def hi str ; stylize str, :strong, :green end
 

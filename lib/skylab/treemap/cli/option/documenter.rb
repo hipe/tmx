@@ -4,7 +4,7 @@ module Skylab::Treemap
 
   public
 
-    #         ~ parameter reflection API ~
+    #         ~ #parameter-reflection-API ~
 
     # Kind of a big deal to the rest of the system, reflection on
     # all of the nerks. Note this frequently gets requested as the option

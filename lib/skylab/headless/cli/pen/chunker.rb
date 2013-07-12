@@ -1,7 +1,7 @@
 module Skylab::Headless
 
-  CLI::Stylize::Chunker = MetaHell::Function::Class.new :gets
-  class CLI::Stylize::Chunker
+  CLI::Pen::Chunker = MetaHell::Function::Class.new :gets
+  class CLI::Pen::Chunker
 
   protected
 
@@ -102,13 +102,13 @@ module Skylab::Headless
     end.call
   end
 
-  class Headless::CLI::Stylize::Chunker::Enumerator < ::Enumerator
+  class Headless::CLI::Pen::Chunker::Enumerator < ::Enumerator
 
   protected
 
     def initialize sexp
       super(& -> y do
-        scn = CLI::Stylize::Chunker.new sexp
+        scn = CLI::Pen::Chunker.new sexp
         while x = scn.gets
           y << x
         end

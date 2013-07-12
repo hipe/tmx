@@ -7,7 +7,7 @@ module Skylab::CovTree
 
   module CLI::Styles
     include Headless::NLP::EN::Methods
-    include Headless::CLI::Stylize::Methods # `stylize`
+    include Headless::CLI::Pen::Methods  # `stylize`
 
     def pre x
       stylize x.to_s, :green

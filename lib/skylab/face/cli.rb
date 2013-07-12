@@ -1478,7 +1478,7 @@ module Skylab::Face
       hl_chunker = hl_parse_styles = hl_unstylize_sexp = nil  # we lazy-
       hl = -> do                  # load these nerkulouses - they might be a
         hl_chunker =              # beast, the dependency is awkward.
-          Services::Headless::CLI::Stylize::Chunker
+          Services::Headless::CLI::Pen::Chunker
         hl_parse_styles, hl_unstylize_sexp =
           Services::Headless::CLI::FUN.at :parse_styles, :unstylize_sexp
         hl = nil

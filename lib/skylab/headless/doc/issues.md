@@ -1,3 +1,4 @@
+[#081]       #doc-point the norm* family of functions..
 [#080]       #doc-point `facet`s are like IoC/dependency injection #plugins ..
 [#079]       #name-convention: modules whose name ends in an `Underscore_`
              are API private - knowledge of their shape or existence must not
@@ -78,7 +79,7 @@
 [#018]       #tracking-tag api action inflection
 [#017] #open API architecture - is frontier app at odds with assumptions?
 [#016] #open #low-priority dynamic uncolorize payload stream when ! tty?
-[#015]       rename *::IO::Pen -> *::Pen, rename IO::Adapter -> IO_Adapter
+[#015]       rename *::IO::Pen -> *::Pen, rename IO::Adapter -> I-O_Adapter
 [#014]       yacc2treetop
 [#013] #open IGNORE_THIS_CONSTANT haha no
 [#012] #open redesign this with_client nonsense
