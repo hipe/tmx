@@ -187,7 +187,8 @@ module Skylab::Face
       end
       [ ok, r, *rest ]
     end
-    DASH_ = '-'.getbyte 0
+
+    DASH_ = MetaHell::DASH_
 
     # `init_cli_surface` #called-by self.class only. [#040] explains it all.
     # so this is that weird place where we fan-out these resources upwards

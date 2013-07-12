@@ -131,7 +131,7 @@ module Skylab::MetaHell
       end
     end.call
 
-    DASH_ = '-'.getbyte 0 ; UNDR_ = '_'.getbyte 0
+    UNDR_ = '_'.getbyte 0
 
     get_correction_during_tug = -> tug do
       res = nil ; mod = tug.mod ; const = tug.const

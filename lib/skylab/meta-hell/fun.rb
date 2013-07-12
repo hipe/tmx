@@ -95,7 +95,7 @@ module Skylab::MetaHell
     end
   end
 
-  o[:_enhance_fun_with_stowaways] = -> klass, object do  # interface is #experimental
+  enhance_fun_with_stowaways = -> klass, object do  # interface is #experimental
     klass.class_exec do
       @mutex_h = { }
       @subnode_location_h = { }
@@ -138,15 +138,19 @@ module Skylab::MetaHell
     nil
   end
 
-  ( FUN_ = ::Class.new ::Module ).class_exec do
-    o.each do |k, v|
-      define_method k do v end
+  alf = o[:autoloadize_fun] = -> oo do
+    kls = ::Class.new ::Module
+    kls.class_exec do
+      oo.each do |k, v|
+        define_method k do v end
+      end
     end
+    obj = kls.new
+    enhance_fun_with_stowaways[ kls, obj ]
+    [ obj, kls ]
   end
 
-  FUN = FUN_.new
-
-  o[:_enhance_fun_with_stowaways][ FUN_, FUN ]
+  FUN, FUN_ = alf[ o ]
 
   x = FUN_.x
   x[:parse_curry]                      = [ :Parse, :Curry ]

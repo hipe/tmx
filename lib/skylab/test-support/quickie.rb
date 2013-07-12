@@ -24,12 +24,13 @@ module Skylab::TestSupport::Quickie
   #   + pending examples (and contexts! unlike r.s)
   #   + limited, experimental support for non-nested before( :each )
   #
-  # These are the most salient (to me) features it does *not* ape of RSpec:
+  # These are the most salient (to the author) features of RSpec that
+  # quickie offers limited or NO support for:
   #   + `should_not` (meh)
-  #   + run multiple files "at once"
-  #   + `before` and `after` blocks (except for limited support above)
+  #   + run multiple files "at once" - experimental recursive runner exists
+  #   + `before` and `after` blocks - limited support per above
   #   + `specify`
-  #   + custom matchers
+  #   + custom matchers - except for the `be_<foo>` wildcard per above
   #   + ..and pretty much everything else not in the first list!
   #
   # Strange behaviors (features not bugs!):
@@ -95,28 +96,34 @@ module Skylab::TestSupport::Quickie
                                   # so what is this `service` metioned above?
   service = -> do                 # it is a true service, it gets memoized
     svc = Quickie::Service.new $stderr  # (NOTE the only place you see $stderr)
-    svc.run                       # and everything (but it could be tested
+    svc.listen                    # and everything (but it could be tested
     service = -> { svc }          # in isolation)
     svc
   end
 
-  class Quickie::Service          # (we will re-open this progressively as nec.)
+  define_singleton_method :service do service.call end
 
-    # (`initialize` at end, different concerns are aggregated there)
+  class Quickie::Service          # ( re-opens as necessary for narrative )
 
-    # `run` - future-proof ourselves as a proper state machine
+    def initialize stderr
+      @default_info_stream_line_proc = -> line { stderr.puts line }
+      @info_stream_line_proc_is_default = nil
+      self.info_stream_line_proc = nil  # see
+      @invoke_is_enabled = true ; @did_resolve_invoke = false
+      @is_listening = false
+      @has_seen_one = nil  # to trigger the warning about this not yet impl.
+      @kernel_describe_is_enabled = nil
+      @client = nil
+      nil
+    end
 
-    def run
-      if @is_running then raise ::RuntimeError, "service is already running."
-      else
-        @is_running = true
-        @quickie_has_reign = ! defined? ::RSpec  # IMPORTANT - everything will
-                                  # suck if they both load
-        if @quickie_has_reign     # (no reason not to do this now i suppose)
-          ::Kernel.module_exec do
-            def should predicate  # define `should` for the whole world
-              predicate.match self
-            end
+    def listen
+      @is_listening and raise ::RuntimeError, "service is already listening."
+      @is_listening = true        # state machine-esque
+      if (( @quickie_has_reign = ! defined? ::RSpec ))
+        ::Kernel.module_exec do
+          def should predicate    # define `should` for the whole world
+            predicate.match self
           end
         end
       end
@@ -125,10 +132,10 @@ module Skylab::TestSupport::Quickie
 
     attr_reader :quickie_has_reign
 
-    def info_stream_line_proc= f
-      if f
+    def info_stream_line_proc= p
+      if p
         if @info_stream_line_proc_is_default
-          @y = ::Enumerator::Yielder.new( & f )
+          @y = ::Enumerator::Yielder.new( & p )
         else
           @y << "(#{ self.class } won't override custom #{
             }`info_stream_line_proc` - set it to nil first"
@@ -139,20 +146,7 @@ module Skylab::TestSupport::Quickie
         @info_stream_line_proc_is_default = true  # brusque, brash
         self.info_stream_line_proc = @default_info_stream_line_proc
       end
-      f
-    end
-
-  private
-
-    def initialize stderr
-      @default_info_stream_line_proc = -> line { stderr.puts line }
-      @info_stream_line_proc_is_default = nil
-      self.info_stream_line_proc = nil  # see
-      @invoke_is_enabled = true ; @did_resolve_invoke = false
-      @is_running = false
-      @has_seen_one = nil  # to trigger the warning about this not yet impl.
-      @kernel_describe_is_enabled = nil
-      nil
+      p
     end
   end
 
@@ -174,6 +168,7 @@ module Skylab::TestSupport::Quickie
   end
 
   class Quickie::Service
+
     def enable_kernel_describe
       if ! @kernel_describe_is_enabled
         @kernel_describe_is_enabled = true
@@ -188,36 +183,36 @@ module Skylab::TestSupport::Quickie
         end
       end
     end
-  end
 
-  define_singleton_method :service do service[] end  # `Quickie.service`
-
-  class Quickie::Service
-
-    def resolve_describe desc, *rest, &b
-      rest.unshift desc                        # normalize the desc into an ary
-      ctx = ::Class.new Quickie::Context       # 1 desc. always == 1 context
-      FUN.context_init[ ctx, rest, nil, b ]    # init the kls, absorb the defn.
-      cli = Client.new @y, ctx                 # WOAH - make a client now
-
-      # for now, per root describe we run the whole show .. this will get you
-      # multiple UI's and test runs in one invocation until [#ts-008]
-      # unless you load only one file and it has only one root describe.
-
-      if ! @has_seen_one then @has_seen_one = true else
-        cli.puts "quickie note - aggregating root describes (and running #{
-          }them all at once) is not yet available. running them individually."
+    def resolve_describe first_desc_line, * desc_a, &b
+      desc_a.unshift first_desc_line
+      ctx = ::Class.new Quickie::Context       # 1 desc always == 1 context
+      FUN.context_init[ ctx, desc_a, nil, b ]
+      if @client
+        r = @client.add_context_class_and_resolve ctx
+      else
+        cli = Client.new @y, ctx
+        touch_multiple_describes cli
+        if @invoke_is_enabled
+          @did_resolve_invoke = true
+          r = cli.resolve_invoke ::ARGV
+        end
       end
-      if @invoke_is_enabled
-        @did_resolve_invoke = true
-        cli.resolve_invoke ::ARGV   # so that's how it goes for now - a
-                                    # `describe` from a non-context context
-      else                          # gets invoked right away.
-        method :noop
-      end
+      r || FUN.noop[]
     end
 
-    def noop  # 2 of 2
+    def touch_multiple_describes cli
+      if @has_seen_one
+        # until [#ts-008] one root `describe` gets you one real-time
+        # invocation.
+        cli.puts "quickie note - if you want to have multiple root-level #{
+          }`describe`s aggregated into one test run, you should try #{
+          }the undocumented, experimental recursive test runner. running #{
+          }them individually."
+      else
+        @has_seen_one = true
+      end
+      nil
     end
   end
 
@@ -275,7 +270,12 @@ module Skylab::TestSupport::Quickie
   # both a context's class methods and its instance methods, we do certain
   # things with "pure functions" below to get true encapsulation.
 
-  o = { }  # (this turns into `FUN` below)
+  o = { }
+
+  o[:noop] = -> do
+    MetaHell::EMPTY_P_.method :call
+    # ( distinct from the empty proc, noop must be a bound method )
+  end
 
   o[:context_init] = -> c, desc_a, inherited_tagset, b do
     c.class_exec do
@@ -342,26 +342,28 @@ module Skylab::TestSupport::Quickie
 
   class Quickie::Client
 
+    def initialize y, root_context_class
+      @y = y
+      @root_context_class = root_context_class
+      @desc_h = @example_producer_p = @or_a = @tag_filter_p = nil
+    end
+
+    attr_writer :tag_filter_p, :example_producer_p  # #hacks-only
+
     def resolve_invoke argv
       ok = parse_argv argv  # totally absorbed on success
       if ok
-        [ method( :execute ), [] ]
+        method :execute
       else
-        [ method( :noop ), [] ]
+        FUN.noop[]
       end
     end
 
-    def puts line  # (svc wants this)
+    def puts line  # ( svc wants this )
       @y << line
     end
 
   private
-
-    def initialize y, root_context_class
-      @y = y
-      @root_context_class = root_context_class
-      @tag_filter = nil
-    end
 
     #         ~ pre-order ~
 
@@ -370,10 +372,28 @@ module Skylab::TestSupport::Quickie
         parse_args argv
       end
     rescue TestSupport::Services::OptionParser::ParseError => e
-      @y << "#{ e }"
-      @y << "try #{ kbd "ruby #{ $PROGRAM_NAME } -h" } for help"
-      false
+      usage_and_invite "#{ e }"
+      nil
     end
+
+  public
+
+    def usage_and_invite msg
+      msg and @y << msg
+      invite
+      nil
+    end
+
+    def invite
+      @y << "try #{ kbd "ruby #{ program_name } -h" } for help"
+      nil
+    end
+
+    def program_name
+      @program_name ||= ::File.basename( $PROGRAM_NAME )
+    end
+
+  private
 
     def kbd x  # (proximity to use)
       stylize x, :green
@@ -381,10 +401,11 @@ module Skylab::TestSupport::Quickie
 
     def parse_opts argv
       option_parser.parse! argv
+      @tag_filter_p and fail "sanity - optparse and tag filter are mutex"
       if @or_a
-        @tag_filter = -> tag_h { @or_a.detect { |f| f[ tag_h ] } }
+        @tag_filter_p = -> x { @or_a.detect { |f| f[ x ] } }
       else
-        @tag_filter = -> x { true }
+        @tag_filter_p = -> x { true }
       end
       true
     end
@@ -395,7 +416,6 @@ module Skylab::TestSupport::Quickie
 
     def build_option_parser
       o = TestSupport::Services::OptionParser.new
-      @or_a = @desc_h = nil
       o.on '-t', '--tag TAG[:VALUE]',
           '(tries to be like the option in rspec)' do |v|
         process_tag_argument v
@@ -437,12 +457,12 @@ module Skylab::TestSupport::Quickie
       branch, leaf, passed, failed, pended, skip, flush =
         build_rendering_functions
       rt = Quickie::Runtime.new passed, failed, pended
-      commence  # above `example_producer` call
-      producer = FUN.example_producer[ @root_context_class, branch, leaf ]
+      commence
+      producer = get_producer branch, leaf
       @t1 = ::Time.now
       while ex = producer.call
         # puts "#{ ind[] }<<#{ ex.description }>>"
-        if @tag_filter[ ex.tagset ]
+        if @tag_filter_p[ ex.tagset ]
           if ex.block
             rt.tick_example
             ctx = ex.context.new rt
@@ -460,7 +480,12 @@ module Skylab::TestSupport::Quickie
       nil
     end
 
-    def noop
+    def get_producer branch, leaf
+      if @example_producer_p
+        @example_producer_p[ branch, leaf ]
+      else
+        FUN.example_producer[ @root_context_class, branch, leaf ]
+      end
     end
 
     # `build_rendering_functions` - this is kind of derky mostly because
@@ -646,7 +671,7 @@ module Skylab::TestSupport::Quickie
       @tagset = FUN.tagset[ desc, inherited_tagset ]
       @desc = desc
       @block = b
-      @tag_filter = @desc_h = nil
+      @tag_filter_p = @desc_h = nil
       nil
     end
   end
@@ -1011,6 +1036,23 @@ module Skylab::TestSupport::Quickie
         @y << "(#{ me } already called?)"
       end
       nil
+    end
+  end
+
+  #  ~ facet N.2 - the runner experiment ~
+
+  class Quickie::Service
+    def run
+      @run ||= Quickie::Run_.new self
+    end
+    attr_reader :y
+    def attach_client_notify client
+      @client and fail "sanity - client is already attached"
+      @client = client
+      nil
+    end
+    def out
+      TestSupport::Stdout_.call
     end
   end
 end

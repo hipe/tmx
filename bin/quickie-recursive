@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby -w
+
+require_relative '../lib/skylab'
+require 'skylab/test-support/core'
+
+run = Skylab::TestSupport::Quickie::service.run
+run.do_recursive = true
+run.invoke ::ARGV

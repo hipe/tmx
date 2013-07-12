@@ -10,9 +10,12 @@ module Skylab
                                   # here one day) we will refer to internally
                                   # as this. NOW..
 
-    EMPTY_A_ =  [ ].freeze        # ocd
-    EMPTY_P_ =  ->   {   }
-    IDENTITY_ = -> x { x }
+    EMPTY_A_       = [ ].freeze   # ocd
+    EMPTY_P_       = ->   {   }
+    IDENTITY_      = -> x { x }
+    MONADIC_TRUTH_ = -> _ { true }
+
+    DASH_          = '-'.getbyte 0
 
     # ARE YOU READY TO EAT YOUR OWN DOGFOOD THAT IS MADE OF YOUR BODY
 
