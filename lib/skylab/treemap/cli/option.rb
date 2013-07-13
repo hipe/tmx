@@ -13,7 +13,8 @@ module Skylab::Treemap
 
       o[:parse] = -> do
 
-        long_rx, short_rx = Headless::CLI::Option::FUN.at :long_rx, :short_rx
+        long_rx, short_rx = Headless::CLI::Option::CONSTANTS.
+          at :long_rx, :short_rx
 
         -> args do
           if ::Hash === args.last

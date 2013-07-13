@@ -1,6 +1,6 @@
 require_relative '../test-support'
 
-module Skylab::Headless::TestSupport::CLI::Stylize
+module Skylab::Headless::TestSupport::CLI::Pen
 
   ::Skylab::Headless::TestSupport::CLI[ self ]
 
@@ -8,7 +8,7 @@ module Skylab::Headless::TestSupport::CLI::Stylize
 
   extend TestSupport::Quickie
 
-  describe "#{ Headless }::CLI::Stylize::Chunker" do
+  describe "#{ Headless }::CLI::Pen::Chunker" do
 
     stylize = Headless::CLI::Pen::FUN.stylize
 
@@ -22,7 +22,7 @@ module Skylab::Headless::TestSupport::CLI::Stylize
 
       sexp = parse_styles[ styl ]
 
-      enum = Headless::CLI::Stylize::Chunker::Enumerator.new sexp
+      enum = Headless::CLI::Pen::Chunker::Enumerator.new sexp
       parts = enum.to_a
       types, strings = parts.reduce [[],[]] do |(tp, st), pt|
         tp << pt[0][0]

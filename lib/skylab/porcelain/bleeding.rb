@@ -12,7 +12,7 @@ module Skylab::Porcelain::Bleeding
 
   module Styles
     include Headless::NLP::EN::Methods
-    include Headless::CLI::Stylize::Methods
+    include Headless::CLI::Pen::Methods
     extend self
     def em(s)  ; stylize(s, :green         )   end
     def hdr(s) ; stylize(s, :strong, :green)   end

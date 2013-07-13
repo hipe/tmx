@@ -16,7 +16,7 @@ module Skylab::Headless
     o[:normify] = -> do           # make a const-looking string be normalized.
       rx = /(?<=[a-z])(?=[A-Z])|_|(?<=[A-Z])(?=[A-Z][a-z])/
       -> x { x.to_s.gsub( rx ) { '_' }.downcase.intern }
-    end.call
+    end.call                      # ( part of the [#hl-081] family )
 
     o[:slugulate] = -> i do       # for normals only. centralize this nerk
       i.to_s.gsub '_', '-'
