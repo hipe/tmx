@@ -1,4 +1,4 @@
-load File.expand_path('../../../../../bin/yacc2treetop', __FILE__)
+load File.expand_path('../../../../../bin/tmx-yacc2treetop', __FILE__)
 
 require_relative('../..')
 
