@@ -1,20 +1,21 @@
-require_relative '../core'
-require File.expand_path('../../../test-support/core', __FILE__)
+require_relative 'test-support'
 
-# #posterity above
+module Skylab::Git::TestSupport::Actions::Stash_Untracked
 
+  ::Skylab::Git::TestSupport::Actions[ self ]
 
-module ::Skylab::GitStashUntracked::Tests
-  include ::Skylab
+  include CONSTANTS
 
-  TestSupport = ::Skylab::TestSupport
+  # ( no Q_uickie because of `.stub`-ing below )
 
   tdpn = ::Skylab.tmpdir_pathname.join 'gsu-xyzzy'
 
   gsu_tmpdir = TestSupport::Tmpdir.new tdpn.to_s
 
-  describe ::Skylab::GitStashUntracked do
-    include ::Skylab
+  const_set :GitStashUntracked,
+    ( gsu = Git::CLI::Actions::Stash_Untracked )
+
+  describe gsu do
 
     describe "has an action called" do
 
@@ -23,7 +24,7 @@ module ::Skylab::GitStashUntracked::Tests
       end
 
       def cd path, block
-        GitStashUntracked::Services::FileUtils.cd path.to_s, &block
+        Git::Services::FileUtils.cd path.to_s, &block
       end
 
       attr_accessor :cmd_spy
@@ -61,9 +62,9 @@ module ::Skylab::GitStashUntracked::Tests
       define_method :unstylize, & Headless::CLI::Pen::FUN.unstylize
 
       def with_popen3_out_as str
-        GitStashUntracked::Services::Open3.stub :popen3 do |cmd, &block|
+        Git::Services::Open3.stub :popen3 do |cmd, &block|
           self.cmd_spy = cmd
-          serr = GitStashUntracked::Services::StringIO.new ''
+          serr = Git::Services::StringIO.new ''
           sout = ::StringIO.new str
           block[ nil, sout, serr ]
         end

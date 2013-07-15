@@ -1,6 +1,3 @@
-#!/usr/bin/env ruby
-#
-
 require 'fileutils'
 require 'optparse'
 require 'json'
@@ -65,7 +62,6 @@ module TmxGit
         filter = lambda do |str|
           str.gsub!(/(?<=\n)(?=.)/, prefix) # newlines followed by something, put it in between
         end
-        newline_replace = opts[:prefix]
       end
       streams = {
         :out => { :buffer => StringIO.new, :stream => ui.out, :trailing => false, :during => false },
@@ -95,7 +91,7 @@ module TmxGit
                   o[:stream].write(use_string)
                   o[:buffer].write(str)
                 end
-              rescue EOFError => e
+              rescue ::EOFError
                 closed = true
               end
               if closed
@@ -478,7 +474,7 @@ module TmxGit
       attr_accessor :last_push_attempt_succeeded
       alias_method :last_push_attempt_succeeded?, :last_push_attempt_succeeded
       attr_reader :path
-      attr_accessor :req
+      attr_writer :req
       attr_accessor :skip
       alias_method :skip?, :skip
       def update_attributes hash
@@ -561,7 +557,7 @@ module TmxGit
       end
       def _push
         (host = req[:host]) or _invalid("can't push without a host")
-        url = "#{req[:host]}:#{id}"
+        url = "#{ host }:#{ id }"
         push_branches = _which_branches_to_push or return false
         push_branches.each { |b| _push_branch b, url }
       end
@@ -700,8 +696,4 @@ module TmxGit
       end
     end
   end
-end
-
-if __FILE__ == $PROGRAM_NAME
-  TmxGit::Push::CLI.new.run ARGV
 end

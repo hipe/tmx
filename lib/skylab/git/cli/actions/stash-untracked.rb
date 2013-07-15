@@ -1,13 +1,10 @@
-require_relative '..'
-
-require 'skylab/headless/core'
-
-module Skylab::GitStashUntracked
+module Skylab::Git::CLI::Actions::Stash_Untracked
 
   Autoloader = ::Skylab::Autoloader  # (doing these explicitly is actually
-  GitStashUntracked = self        # less typing and less ambiguous than
-  Headless = ::Skylab::Headless   # including ::Skylab all over the place)
+  Git = ::Skylab::Git             # less typing and less ambiguous than
+  Headless = Git::Services::Headless  # including ::Skylab all over the place)
   MetaHell = ::Skylab::MetaHell
+                                  # (above lines kept for #posterity)
 
   extend Autoloader               # for our one other file..
 
@@ -42,7 +39,7 @@ module Skylab::GitStashUntracked
     end
 
     def shellesc x                # shorhand, just a wrapper - allows you
-      GitStashUntracked::Services::Shellwords || nil # load :/
+      Git::Services::Shellwords || nil # load :/
       x.to_s.shellescape          # to have stash names with spaces in them!
     end
 
@@ -161,7 +158,7 @@ module Skylab::GitStashUntracked
     end
 
     def create_option_parser
-      GitStashUntracked::Services::OptionParser.new
+      Git::Services::OptionParser.new
     end
 
     def create_leaf_option_parser
@@ -369,7 +366,7 @@ module Skylab::GitStashUntracked
     end
 
     def popen3 cmd, &block
-      GitStashUntracked::Services::Open3.popen3 cmd, &block
+      Git::Services::Open3.popen3 cmd, &block
     end
 
     def set! param_h
@@ -606,7 +603,7 @@ module Skylab::GitStashUntracked
   end
 
   class Stash
-    include GitStashUntracked::Services::FileUtils
+    include Git::Services::FileUtils
     include SubClient_InstanceMethods
     include Color_InstanceMethods
 
@@ -710,10 +707,10 @@ module Skylab::GitStashUntracked
     end
 
     def filenames verbose
-      ::Enumerator.new do |o|
+     ::Enumerator.new do |o|
         cmd = "cd #{ shellesc pathname }; find . -type f"
         info( cmd ) if verbose
-        GitStashUntracked::Services::Open3.popen3( cmd ) do |_, sout, serr|
+        Git::Services::Open3.popen3( cmd ) do |_, sout, serr|
           '' != (s = serr.read) and fail("uh-oh: #{s}")
           while s = sout.gets
             o << %r{^\./(.*)$}.match(s)[1]
@@ -734,7 +731,7 @@ module Skylab::GitStashUntracked
       stack = []
       cmd = "find #{ shellesc pathname } -type d"
       info( cmd ) if verbose
-      GitStashUntracked::Services::Open3.popen3 cmd do |_, sout, serr|
+      Git::Services::Open3.popen3 cmd do |_, sout, serr|
         while s = sout.gets                    # depth-first
           stack.push s.strip
         end
@@ -834,7 +831,7 @@ module Skylab::GitStashUntracked
   end
 
   class << MakePatch
-    include GitStashUntracked::Services::FileUtils
+    include Git::Services::FileUtils
 
     def call path, emit
       ::File.directory?( path ) or raise "not a directory: #{ path }"
@@ -855,7 +852,7 @@ module Skylab::GitStashUntracked
         end
       end
       cd(path) do
-        GitStashUntracked::Services::Open3.popen3('find . -type f') do |_, sout, serr|
+        Git::Services::Open3.popen3('find . -type f') do |_, sout, serr|
           '' != (s = serr.read) and raise("nope: #{s}")
           while s = sout.gets do each_path[s.strip] end
         end
