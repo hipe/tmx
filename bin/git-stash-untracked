@@ -1,0 +1,3 @@
+#!/usr/bin/env ruby -w
+
+require ::File.expand_path( '../../lib/skylab/git/version-wall', __FILE__ )

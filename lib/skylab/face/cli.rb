@@ -62,7 +62,7 @@ module Skylab::Face
   class Node_Sheet_  # #forward-declared-for-narrative. re-opens below.
   end
 
-  FUN_ = MetaHell::Formal::Box::Open.new
+  CLI::FUN_ = MetaHell::Formal::Box::Open.new
 
   #           ~ 1.2 - `CLI` (the "modality client") & support ~
 
@@ -1674,13 +1674,13 @@ module Skylab::Face
             reduce [] do |m, x|
           a, z = ( reqity_brackets ||=  # narrow the focus of the dep for now
             Services::Headless::CLI::Argument::FUN.reqity_brackets )[ x[0] ]
-          m << "#{ a }<#{ FUN.slugulate[ x[1] ] }>#{ z }"
+          m << "#{ a }<#{ CLI::FUN.slugulate[ x[1] ] }>#{ z }"
         end
         part_a * ' ' if part_a.length.nonzero?
       end
       private :argument_syntax
 
-      FUN_[:slugulate] = -> x do
+      CLI::FUN_[:slugulate] = -> x do
         Services::Headless::Name::FUN.slugulate[ x ]
       end  # (narrow focus of the dependency for now (but trivial))
 
@@ -2021,11 +2021,11 @@ module Skylab::Face
     end
   end
 
-  FUN_[ :concat_2 ] = -> a, b do  # #called-by ouroboros sheet
+  CLI::FUN_[ :concat_2 ] = -> a, b do  # #called-by ouroboros sheet
     [ *a, *b ] if a || b
   end
 
-  FUN_[ :reparenthesize ] = -> do  # .. ; #called-by applications (e.g [te])
+  CLI::FUN_[ :reparenthesize ] = -> do  # .. ; #called-by applications (e.g [te])
     # NOTE we mutate the string, which is also the result.
     rx = /\A(?<a>\([ ]*)(?<b>.*[^ ]|)(?<c>[ ]*\))\z/
     -> msg, cb do                  # #todo we do something similar everywhere,
@@ -2038,9 +2038,6 @@ module Skylab::Face
     end
   end.call
 
-  FUN = FUN_.to_struct
+  CLI::FUN = CLI::FUN_.to_struct
 
-  class CLI
-    FUN = FUN  # #loading-handle
-  end
 end

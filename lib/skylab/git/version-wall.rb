@@ -1,5 +1,4 @@
-#!/usr/bin/env ruby -w
-                     # (today we are being super OCD about loading this because
+                     # (today we are being super OCD about loading this
                      # because of thorny issues encountered in the past with
                      # the git environment not being the same the as the
                      # environment we develop in. we want to be really explicit
@@ -78,14 +77,15 @@ begin
 end while nil
 
 
-
-if res
-  require_relative '../lib/skylab/git-stash-untracked/core'
-  ::Skylab::GitStashUntracked::CLI.new( nil, $stdout, $stderr ).invoke ::ARGV
-
-elsif false == res
+if false == res
   error[ "sorry, #{ program_name[ ] } couldn't load because of #{
     }the above issue(s)." ]
   exit 1 # just being cute
+elsif res
 
+  require_relative 'core'
+  module ::Skylab::Git
+    Git::CLI.new( nil, Stdout_[], Stderr_[] ).
+      invoke( [ 'stash-untracked', * ::ARGV ] )
+  end
 end

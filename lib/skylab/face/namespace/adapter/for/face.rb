@@ -54,6 +54,6 @@ module Skylab::Face
         end
       end
     end
-    C = Face::FUN.concat_2  # in cli for now :/
+    C = Face::CLI::FUN.concat_2  # in cli for now :/
   end
 end
