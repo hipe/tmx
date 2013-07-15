@@ -1,10 +1,10 @@
-module Skylab::Semantic
+module Skylab::Basic
 
-  class Semantic::Digraph  # (reopens below)
+  class Basic::Digraph  # (reopens below)
     # relevant: http://en.wikipedia.org/wiki/Tree_(data_structure)
   end
 
-  class Semantic::Digraph::Node  # (#stowaway)
+  class Basic::Digraph::Node  # (#stowaway)
 
     extend MetaHell::Autoloader::Autovivifying::Recursive
 
@@ -70,7 +70,7 @@ module Skylab::Semantic
 
   end
 
-  class Semantic::Digraph  # #todo - don't you wish you were a box!?
+  class Basic::Digraph  # #todo - don't you wish you were a box!?
 
     def self.[] *a                # convenience constructor
       g = new
@@ -281,7 +281,7 @@ module Skylab::Semantic
       @node_controller_h ||= { }
       @node_controller_h.fetch name do |k|
         @node_controller_h[ k ] =
-          Semantic::Digraph::Node::Bound.new( self, k )
+          Basic::Digraph::Node::Bound.new( self, k )
       end
     end
 
@@ -436,7 +436,7 @@ module Skylab::Semantic
     def initialize
       @order = [ ]
       @hash = { }
-      @node_class ||= Semantic::Digraph::Node
+      @node_class ||= Basic::Digraph::Node
     end
 
     #         ~ dupe support ~

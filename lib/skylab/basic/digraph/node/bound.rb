@@ -1,6 +1,6 @@
-module Skylab::Semantic
+module Skylab::Basic
 
-  class Semantic::Digraph::Node::Bound
+  class Basic::Digraph::Node::Bound
 
     # represent a node as an external entity capable of reflecting on
     # itself vis-a-vis its graph.
