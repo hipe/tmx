@@ -1,32 +1,13 @@
 # encoding: utf-8
 
-require_relative '../test-support'
+require_relative 'test-support'
 
 module Skylab::Porcelain::TestNamespace
   # (above line left intact for posterity)
 
-  module ArrayExtension
-    class << self
-      def extend_to el
-        el.extend self
-        el.children and el.children.each do |_el|
-          extend_to _el
-        end
-        el
-      end
-      alias_method :[], :extend_to
-    end
-    def name     ; self[:name] end
-    def children ; self[:children] end
-    def has_children; !! self[:children] end
-    def children_length ; self[:children] ? self[:children].length : 0 end
-  end
-
-  include ::Skylab
-
   describe Porcelain::Tree do
     it "renders a pretty tree" do
-      foo = ArrayExtension[
+      node = Porcelain::Tree.from :hash,
         { :name => "document",
           :children => [
             { :name => "head" },
@@ -54,9 +35,8 @@ module Skylab::Porcelain::TestNamespace
             { :name => "foot" }
           ]
         }
-      ]
-      output = subject.text foo
-      DERP = <<-HERE.gsub(/^        /, '')
+
+      exp = <<-HERE.gsub %r|^        |, ''
         document
          ├head
          ├body
@@ -71,7 +51,8 @@ module Skylab::Porcelain::TestNamespace
          │   └sub4
          └foot
       HERE
-      output.should == DERP # use this form with --diff option
+      act = node.to_text
+      act.should eql( exp ) # use this form with --diff option
     end
   end
 end

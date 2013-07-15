@@ -1,17 +1,18 @@
-require File.expand_path('../../test-support', __FILE__)
-require File.expand_path('../../../tree/node', __FILE__)
+require_relative 'test-support'
 
 module Skylab::Porcelain::TestNamespace
-  include Skylab::Porcelain
-  describe Tree::Node do
+
+  describe Porcelain::Tree do
+
     let(:paths) { [
       'a',
       'bb/cc/dd',
       'bb/cc',
       'bb/cc/dd/ee'
     ] }
+
     it "does paths to tree and vice-versa" do
-      node = Tree.from_paths(paths)
+      node = Porcelain::Tree.from :paths, paths
       paths_ = node.to_paths
       want = <<-HERE.unindent
        a
@@ -25,8 +26,8 @@ module Skylab::Porcelain::TestNamespace
     end
 
     context "with regards to longest common base path" do
-      let(:tree) { Tree.from_paths paths }
-      subject { tree.longest_common_base_path }
+      let(:tree) { Porcelain::Tree.from :paths, paths }
+      let :subject do tree.longest_common_base_path end
       context "when empty" do
         let(:paths) { %w() }
         it("nil")   { subject.should be_nil }
@@ -70,4 +71,3 @@ module Skylab::Porcelain::TestNamespace
     end
   end
 end
-

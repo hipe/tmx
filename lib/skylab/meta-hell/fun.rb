@@ -165,6 +165,8 @@ module Skylab::MetaHell
 
   FUN, FUN_ = alf[ o ]
 
+  FUN::Fc_ = fc
+
   x = FUN_.x
   x[:parse_curry]                      = [ :Parse, :Curry ]
   x[:parse_series]                     = [ :Parse, :Series ]

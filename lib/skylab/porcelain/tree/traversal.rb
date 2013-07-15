@@ -1,115 +1,113 @@
 module ::Skylab::Porcelain
 
-  class Tree::Locus
+  class Tree::Traversal
 
-    Headless::CLI::Tree::Glyphs.each do |g|
-      attr_accessor g.normalized_glyph_name # blank crook pipe separator tee
+    # Tree::Fields_[ self, :crook, :pipe, :tee ]
+
+    def initialize
+      @glyphset_x = nil
     end
 
-    attr_accessor :branch
+    def traverse root, &b
+      @level = 0 ; @each = b ; ( @prefix_stack_a ||= [] ).clear
+      @glyphset_x ||= DEFAULT_GLYPHSET_
+      normalize_glyphset
+      work root, MutableCard_.new( root )
+    end
 
-    attr_accessor :empty
+    DEFAULT_GLYPHSET_ = :narrow  # e.g :narrow | :wide
 
-    attr_reader :node_formatter
-
-    def node_formatter= x
-      if ::Symbol === x
-        @node_formatter = -> n { n.send x }
-      else
-        @node_formatter = x
+    class MutableCard_
+      FIELD_A_ = [ :node, :level, :is_first, :is_last ].freeze
+      IVAR_H_ = ::Hash[ FIELD_A_.map { |i| [ i, :"@#{ i }" ] } ]
+      def initialize node, level=nil, is_first=nil, is_last=nil
+        @node = node ; @level = level
+        @is_first = is_first ; @is_last = is_last
       end
-      x
-    end
-
-    def traverse root, &block
-      @level = 0
-      @block = block
-      @prefix_stack = []
-      _traverse root
-    end
-
-    def prefix meta
-      if meta[:level]
-        "#{ @prefix_stack * '' }#{ meta[:is_last] ? crook : tee }"
+      attr_reader( * FIELD_A_ )
+      attr_accessor :prefix
+      def keys
+        FIELD_A_
       end
-    end
-
-    def parent_prefix meta
-      if meta[:level]
-        meta[:is_last] ? blank : pipe
+      def fetch i
+        instance_variable_get IVAR_H_.fetch( i )
       end
     end
 
   protected
 
-    param_h_h = {
-      crook: -> v { self.crook = v },
-      node: -> v { self.node = v },
-      node_formatter: -> v { self.node_formatter = v },
-      pipe: -> v { self.pipe = v },
-      tee: -> v { self.tee = v }
-    }
-
-    default_glyph_set = :narrow # try :wide
-
-    define_method :initialize do |param_h=nil|
-      # param_h = param_h.dup if param_h
-      _glyph_set!(( param_h && param_h.delete(:glyph_set) or default_glyph_set))
-        # (because the client might want to start with a glyph set,
-        # and then override certain glyphs, we set it here and not there.)
-        # (because the client might weirdly want to set some of the glyphs
-        # as nil, we set defaults this way and not the other way.)
-      if param_h
-        param_h.each { |k, v| instance_exec v, & param_h_h.fetch( k ) }
+    def normalize_glyphset
+      if @glyphset_x.respond_to? :id2name
+        @glyphset_x = Headless::CLI::Tree::Glyph::Sets.
+          const_fetch @glyphset_x
       end
-      self.node_formatter ||= :name
+      safe_name_p = get_safe_name_p
+      @glyphset_x.each do |i, x|
+        safe_name_p[ i ] or raise ::NameError, "bad glyph name - #{ i }"
+        instance_variable_set :"@#{ i }", x
+      end
+      nil
     end
 
-    safe_names_h = nil
-
-    define_method :_glyph_set! do |x|
-      if ::Symbol === x
-        x = Headless::CLI::Tree::Glyph::Sets.const_fetch x
-      end
-      safe_names_h ||= ::Hash[
-        Headless::CLI::Tree::Glyphs.each.map do |g|
+    -> do
+      p = nil
+      define_method :get_safe_name_p do
+        p ||= ::Hash[ Headless::CLI::Tree::Glyphs.each.map do |g|
           [ g.normalized_glyph_name, true ]
-       end
-      ]
-      x.each do |n, v|
-        if safe_names_h[ n ]
-          instance_variable_set "@#{ n }", v
-        else
-          raise ::NameError.new "bad glyph name - #{ n }"
-        end
+        end ].freeze
       end
-    end
+      private :get_safe_name_p
+    end.call
 
-    def _push meta
-      @level += 1
-      @prefix_stack.push parent_prefix( meta )
-    end
-
-    def _pop meta
-      @level -= 1
-      @prefix_stack.pop
-    end
-
-    def _traverse root, meta={ }
-      @block.call root, meta
+    def work node, card
+      @each[ card ]
       sum = 1
-      if root.has_children
-        _push meta
-        last = root.children_length - 1
-        root.children.each_with_index do |child, idx|
-          sm = _traverse child, is_first: ( 0 == idx ),
-                                 is_last: ( last == idx ),
-                                   level: @level
-          sum += sm
+      if node.has_children
+        push card
+        last = node.children_count - 1
+        node.children.each_with_index do |child, idx|
+          sum += work child,
+            MutableCard_.new( child, @level, idx.nil?, last==idx )
         end
-        _pop meta
+        pop
       end
       sum
+    end
+
+    def push card
+      @level += 1
+      @prefix_stack_a.push parent_prefix( card )
+      nil
+    end
+
+    def pop
+      @level -= 1
+      @prefix_stack_a.pop
+      nil
+    end
+
+  public
+
+    #  ~ `service` methods called from the outside for rendering ~
+
+    def prefix card
+      if card.level  # no card on root node
+        "#{ @prefix_stack_a * '' }#{ card.is_last ? crook : tee }"
+      end
+    end
+
+    def render_node node
+      node.slug if node.has_slug
+    end
+
+    def parent_prefix card
+      if card.level
+        card.is_last ? blank : pipe
+      end
+    end
+
+    Headless::CLI::Tree::Glyphs.each do |g|
+      attr_reader g.normalized_glyph_name  # blank crook pipe separator tee
     end
   end
 end
