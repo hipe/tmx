@@ -13,7 +13,7 @@ module Skylab::MetaHell::TestSupport::FUN
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
   describe "Skylab::MetaHell::FUN" do
-    context "`tuple_tower` - given a stack of functions and one seed value, resolve" do
+    context "`seeded_function_chain` - given a stack of functions and one seed value, resolve" do
       Sandbox_1 = Sandboxer.spawn
       it "opaque but comprehensive example" do
         Sandbox_1.with self
@@ -34,13 +34,13 @@ module Skylab::MetaHell::TestSupport::FUN
                 [ item1, item2 ]
               end
             end ]
-          s = MetaHell::FUN.tuple_tower[ 'cilantro',  * f_a ]
+          s = MetaHell::FUN.seeded_function_chain[ 'cilantro',  * f_a ]
           s.should eql( 'i hate cilantro' )
-          s = MetaHell::FUN::tuple_tower[ 'carrots', * f_a ]
+          s = MetaHell::FUN::seeded_function_chain[ 'carrots', * f_a ]
           s.should eql( "let's have carrots and potato" )
-          s = MetaHell::FUN.tuple_tower[ 'red', * f_a ]
+          s = MetaHell::FUN.seeded_function_chain[ 'red', * f_a ]
           s.should eql( 'nope i hate tomato' )
-          x = MetaHell::FUN.tuple_tower[ 'blue', * f_a ]
+          x = MetaHell::FUN.seeded_function_chain[ 'blue', * f_a ]
           x.should eql( [ 'blue', 'potato' ] )
         end
       end

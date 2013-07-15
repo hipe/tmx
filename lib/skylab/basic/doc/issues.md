@@ -1,3 +1,4 @@
+[#021]       #digraph #redundancy-point
 [#020]       #api-point (the etheral notion of meta-api's for basic field)
 [#019]       #done move semantic into here #after:cu-001
 [#018]       #doc-point #parent:006 #body-is-inline-in-parent

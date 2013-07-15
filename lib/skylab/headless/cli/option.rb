@@ -29,8 +29,8 @@ module Skylab::Headless
     MetaHell::MAARS::Upwards[ FUN ]
 
     x = FUN_.x
-    x[:basic_switch_match_curry] =
-      x[:basic_switch_scan_curry] = [ :Basic_ ]
+
+    x[:basic_switch_index_curry] = [ :Basic_ ]
 
   end
 end

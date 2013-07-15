@@ -55,10 +55,14 @@ module Skylab::CovTree
 
     def process_pair in_pn, out_pn
       -> do  # #result-block
-        if ! ( dn = out_pn.dirname ).exist?
-          mkdir_p dn, verbose: true, noop: @is_dry_run
+        if in_pn.exist?
+          if ! ( dn = out_pn.dirname ).exist?
+            mkdir_p dn, verbose: true, noop: @is_dry_run
+          end
+          cp in_pn.to_s, out_pn.to_s, verbose: true, noop: @is_dry_run
+        else
+          @err.puts "(DID NOT EXIST, SKIPPING: #{ in_pn })"
         end
-        cp in_pn.to_s, out_pn.to_s, verbose: true, noop: @is_dry_run
         true
       end.call
     end

@@ -48,13 +48,16 @@ module Skylab::CovTree
   o[:test_basename_rx] =
     %r{ ^ (?: #{ globs.values.uniq.map { |x| glob_to_rx[ x ] }.join '|' } ) $ }x
 
-  test_dir_names = o[:test_dir_names] = %w(test spec features)
 
-  def test_dir_names.string # kinda goofy
-    "[#{ join '|' }]"
+  o[:test_dir_names_moniker] = -> do
+    "[#{ FUN.test_dir_names[] * '|' }]"
   end
 
-  FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
+  o[:test_dir_names] = -> do
+    CovTree::Constants::TEST_DIR_NAME_A
+  end
 
+
+  FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
 
 end

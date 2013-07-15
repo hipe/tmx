@@ -199,6 +199,7 @@ module Skylab::Basic
 
     # `invert` - produce a new graph with the same members and the same
     # associations but all the directions reversed.
+    # ( this algorithm or one like it is repeated elsewhere [#021] )
 
     def invert
       # (in one pass accumulate the associations per node, in a second

@@ -63,6 +63,20 @@ module Skylab::Face
       end
     end.call
 
+    o[:multiline_column_b] = -> row_a, cel_a, a do
+      col_a = [ cel_a ]
+      if a.length.zero?
+        col_a << ''
+      else
+        col_a << a.fetch( 0 )
+      end
+      row_a << col_a
+      if 1 < a.length
+        row_a.concat a[ 1 .. -1 ].map { |s| [ '', s ] }
+      end
+      nil
+    end
+
     FUN = ::Struct.new( * o.keys ).new( * o.values )
 
   end

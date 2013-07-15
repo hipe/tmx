@@ -28,7 +28,7 @@ module Skylab::MetaHell
 
   o[:without_warning] = -> f do
     x = $VERBOSE; $VERBOSE = nil
-    r = f.call                   # `ensure` is out of scope for now
+    r = f.call                  # `ensure` is out of scope for now
     $VERBOSE = x
     r
   end
@@ -55,8 +55,8 @@ module Skylab::MetaHell
       pathify[ const_name_s.gsub( '::', '/' ) ]
   end
 
-  # `tuple_tower` - given a stack of functions and one seed value, resolve
-  # one result.. fuller description at [#fa-026].
+  # `seeded_function_chain` - given a stack of functions and one seed value,
+  # resolve one result.. fuller description at [#mh-026].
   #
   # opaque but comprehensive example:
   #
@@ -76,29 +76,36 @@ module Skylab::MetaHell
   #           [ item1, item2 ]
   #         end
   #       end ]
-  #     s = MetaHell::FUN.tuple_tower[ 'cilantro',  * f_a ]
-  #     s # => 'i hate cilantro'
-  #     s = MetaHell::FUN::tuple_tower[ 'carrots', * f_a ]
-  #     s # => "let's have carrots and potato"
-  #     s = MetaHell::FUN.tuple_tower[ 'red', * f_a ]
-  #     s # => 'nope i hate tomato'
-  #     x = MetaHell::FUN.tuple_tower[ 'blue', * f_a ]
-  #     x # => [ 'blue', 'potato' ]
+  #     s = MetaHell::FUN.seeded_function_chain[ 'cilantro',  * f_a ]
+  #     s  # => 'i hate cilantro'
+  #     s = MetaHell::FUN::seeded_function_chain[ 'carrots', * f_a ]
+  #     s  # => "let's have carrots and potato"
+  #     s = MetaHell::FUN.seeded_function_chain[ 'red', * f_a ]
+  #     s  # => 'nope i hate tomato'
+  #     x = MetaHell::FUN.seeded_function_chain[ 'blue', * f_a ]
+  #     x  # => [ 'blue', 'potato' ]
   #
   # Blue potato. everything should be perfectly clear now.
 
-  o[:tuple_tower] = -> args1, *f_a do
-    f_a.reduce args1 do |args, f|
-      a = [ * f[ * args ] ]  # normalizes
-      tf = a.fetch 0
-      if tf
-        a.shift if true == tf
-        1 == a.length ? a[ 0 ] : a
+  fc = -> f_a, first_arg_a do
+    res_a = f_a.reduce first_arg_a do |arg_a, f|
+      ok, *rest = f[ * arg_a ]
+      if ok
+        true == ok or rest.unshift( ok )  # "double-duty" term
+        rest
       else
-        a.shift if false == tf
-        break( 1 == a.length ? a[ 0 ] : a )
+        break rest
       end
     end
+    res_a.length < 2 ? res_a[ 0 ] : res_a
+  end
+
+  o[:function_chain] = -> * f_a do
+    fc[ f_a, nil ]
+  end
+
+  o[:seeded_function_chain] = -> arg_x, *f_a do
+    fc[ f_a, [ arg_x ] ]
   end
 
   enhance_fun_with_stowaways = -> klass, object do  # interface is #experimental
@@ -164,8 +171,10 @@ module Skylab::MetaHell
   x[:parse_from_set]                   = [ :Parse, :From_Set ]
   x[:parse_from_ordered_set]           = [ :Parse, :From_Ordered_Set ]
 
-
   x[:fields]                           = [ :Fields_ ]
+
+  x[:private_attr_reader]              = deprecated = [ :Deprecated ]
+  x[:private_attr_accessor]            = deprecated
 
   def FUN.at *a
     a.map( & method( :send ) )

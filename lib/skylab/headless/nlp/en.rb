@@ -31,7 +31,7 @@ module Skylab::Headless
       end
     end
 
-    o[:oxford_comma] = -> a, ult = " and ", sep = ", " do
+    coc = o[:curriable_oxford_comma] = -> ult, sep, a do
       if a.length.nonzero?
         res = ( 1 .. ( a.length - 2 ) ).reduce [ a[0] ] do |ar, idx|
           ar << sep << a[idx]
@@ -41,6 +41,10 @@ module Skylab::Headless
         end
         res * ''
       end
+    end
+
+    o[:oxford_comma] = -> a, ult = " and ", sep = ", " do
+      coc[ ult, sep, a ]
     end
 
     inflected = {

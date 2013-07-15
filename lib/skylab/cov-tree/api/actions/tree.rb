@@ -103,7 +103,7 @@ module Skylab::CovTree
     attr_reader :pathname
 
     fun = CovTree::FUN                         # (i anticipate needing to un-
-    test_dir_names = fun.test_dir_names        # memoize these things when
+    test_dir_names = fun.test_dir_names[]      # memoize these things when
                                                # they become configurable ..)
 
     soft_rx = %r{(?:#{ test_dir_names.map{ |x| ::Regexp.escape x }.join '|' })}
@@ -204,7 +204,7 @@ module Skylab::CovTree
         anchors_a = self.anchors.to_a
         case anchors_a.length
         when 0
-          path = pathname.join test_dir_names.string
+          path = pathname.join CovTree::FUN.test_dir_names_moniker[]
           error "Couldn't find test directory: #{ pre escape_path( path ) }"
           break
         when 1

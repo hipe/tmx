@@ -1,3 +1,7 @@
+[#042]       #doc-point introducting tagged argument lists ..
+[#041]       #autoloading: ghost modules explained..
+[#040]       #autoloading: convenient to have `const_missing` result in value
+[#039]       #deprecated `private_attr_reader`
 [#038]       #experimental hack - when the set of all local `private` methods
                in a class is one-to-one isomorphic with the set of all DSL
                entrypoint keywords. makes things concise, but is a hack.
@@ -10,7 +14,7 @@
 [#032]       #api-point constant trouble's fields are immutable (ergo dupable)
 [#031]       #api-lock.
 [#030]       #doc-point of the `stowaway` facility #documented-inline
-[#029]       #doc-point this is the official docpoint of "autoloading" and
+[#029]       #doc-point this is the official docpoint of :[#autoloading] and
              the idea of `isomorphic file locations` (yet to be documented)
 [#028]       #tracking-tag `without_warning`
 [#027]       a freeform `parse_series`? basically like minimal packrat parser

@@ -19,6 +19,7 @@ module Skylab::TestSupport
     o[:MetaHell] = -> _ { require 'skylab/meta-hell/core' ; ::Skylab::MetaHell }
     o[:Open3] = stdlib
     o[:OptionParser] = -> _ { require 'optparse' ; ::OptionParser }
+    o[:Porcelain] = subproduct
     o[:StringIO] = stdlib
     o[:Tmpdir] = -> _ { require 'tmpdir' ; ::Dir }  # Dir.tmpdir
 

@@ -30,6 +30,10 @@ module Skylab::Headless
       i.to_s.gsub( /[-_]/, ' ' )
     end
 
+    Const_basename_ = o[:const_basename] = -> name_s do
+      name_s[ name_s.rindex( ':' ) + 1 .. -1 ]
+    end
+
     FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
   end
 
@@ -85,7 +89,7 @@ module Skylab::Headless
     # is impossible to go in the reverse direction deterministically)
 
     def self.from_name name
-      new name[ name.rindex( ':' ) + 1 .. -1 ]
+      new Name::Const_basename_[ name ]
     end
 
     def as_const

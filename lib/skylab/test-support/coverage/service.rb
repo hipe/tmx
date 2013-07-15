@@ -2,8 +2,8 @@ module Skylab::TestSupport
 
   class Coverage::Service
 
-    def self.start infostream, path_prefix_f
-      new( infostream ).start path_prefix_f
+    def self.start infostream, path_prefix_p
+      new( infostream ).start path_prefix_p
     end
 
     def initialize infostream
