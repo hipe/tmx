@@ -111,10 +111,10 @@ module Skylab::PubSub
     end
   end
 
-  class PubSub::Stream < Semantic::Digraph::Node  # (#stowaway) used above
+  class PubSub::Stream < Basic::Digraph::Node  # (#stowaway) used above
   end
 
-  class PubSub::Stream::Digraph < Semantic::Digraph
+  class PubSub::Stream::Digraph < Basic::Digraph
 
     def initialize
       @taxonomic_stream_names = nil

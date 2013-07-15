@@ -86,7 +86,7 @@ module Skylab::TanMan
       looks_like_terminal = nil  # scope
 
       define_method :initialize do |meaning_controller, meaning_enumerator|
-        @graph = ::Skylab::Semantic::Digraph.new  # (loaded by p.s. monadic)
+        @graph = ::Skylab::Basic::Digraph.new  # (loaded by p.s. monadic)
         @terminal_h = ::Hash.new { |h, k| h[k] = [ ] }
         meaning_enumerator.each do |fly|
           if looks_like_terminal[ fly.value ]

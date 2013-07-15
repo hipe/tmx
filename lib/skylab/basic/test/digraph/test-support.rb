@@ -1,11 +1,7 @@
-require_relative '../core'
-require 'skylab/test-support/core'
+require_relative '../test-support'
 
-module Skylab::Semantic::TestSupport
-  # ::Skylab::TestSupport::Regret[ self ] (not actually necessary yet)
+module Skylab::Basic::TestSupport::Digraph
 
-  include ::Skylab # e.g `TestSupport`, `Semantic`
-
-  extend TestSupport::Quickie
+  ::Skylab::Basic::TestSupport[ self ]
 
 end
