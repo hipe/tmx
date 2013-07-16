@@ -1,3 +1,4 @@
+[#082]       #done adapter for face of hot (kind of [#054])
 [#081]       #doc-point the norm* family of functions..
 [#080]       #doc-point `facet`s are like IoC/dependency injection #plugins ..
 [#079]       #name-convention: modules whose name ends in an `Underscore_`

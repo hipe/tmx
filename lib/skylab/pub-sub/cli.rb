@@ -21,8 +21,15 @@ module Skylab::PubSub
       o << "  <file>   file(s) to #{ em '`require`' }d in order"
     end
 
+    Client = self  # #tmx-compat
+
     extend Headless::CLI::Client::DSL # before below
     extend Headless::CLI::Box::DSL    # after above, to override o.p things
+
+    def ping
+      @io_adapter.errstream.puts "hello from pub-sub."
+      :'hello_from_pub-sub'
+    end
 
     desc 'visualize a pub-sub event stream graph for a particular module'
 

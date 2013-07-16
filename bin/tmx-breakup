@@ -40,6 +40,11 @@ exit_status = 0
       break
     end
 
+    if '--ping' == fn
+      y << "hello from breakup."
+      break
+    end
+
     require 'pathname'
 
     s_pn = ::Pathname.new fn
@@ -148,7 +153,7 @@ exit_status = 0
 
     did_say_something = nil
 
-    exitstatus = ::Open3.popen3( * cmd ) do |sin, sout, serr, wait_thr|
+    _exitstatus = ::Open3.popen3( * cmd ) do |sin, sout, serr, wait_thr|
       sin.close  # helps to be clear, also another way to write
       '' == ( e = serr.read ) or break( bork[ "did not expect - #{ e }" ] )
       while ( line = sout.gets )
@@ -224,10 +229,9 @@ exit_status = 0
 
     ::Open3.popen3( * cmd ) do |sin, sout, serr, wait_thrd|
       sin.close
-      x =  wait_thrd.value.exitstatus  # aww too bad, FileMerge doesn't block
+      wait_thrd.value.exitstatus  # aww too bad, FileMerge doesn't block
     end
   end.call
-
 
 end.call
 

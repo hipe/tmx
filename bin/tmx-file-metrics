@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby -w
+
+require_relative '../lib/skylab/file-metrics/core'
+
+::Skylab::FileMetrics::CLI.
+  new( * ::Skylab::Face::FUN.three_streams[] ).
+    invoke ::ARGV

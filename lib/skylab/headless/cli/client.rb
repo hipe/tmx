@@ -8,9 +8,17 @@ module Skylab::Headless
     include CLI::Action::ModuleMethods
   end
 
+  module CLI::Client::Adapter                  # for [#054] ouroboros
+    extend MetaHell::MAARS
+  end
+
   module CLI::Client::InstanceMethods
     include CLI::Action::InstanceMethods
     include Headless::Client::InstanceMethods
+
+    Adapter = CLI::Client::Adapter             # for now it is "for free"
+
+    attr_writer :program_name                  # public for ouroboros [#054]
 
   protected
 
@@ -91,9 +99,6 @@ module Skylab::Headless
     def program_name
       program_name_ivar or ::File.basename $PROGRAM_NAME
     end
-
-    attr_writer :program_name
-
 
     def resolve_instream # (the probable destination of [#hl-022], in flux)
 

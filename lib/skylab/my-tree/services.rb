@@ -4,7 +4,7 @@ module Skylab::MyTree
 
     o = { }
     stdlib = MetaHell::FUN.require_stdlib
-    o[:Find] = -> { require_relative 'services/find' }
+    o[:Find] = -> _ { require_relative 'services/find' }
     o[:Open3] = stdlib
     o[:OptionParser] = -> _ { require 'optparse' ; ::OptionParser }
     o[:Set] = stdlib

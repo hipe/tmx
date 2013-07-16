@@ -1,7 +1,7 @@
 module Skylab::TestSupport::Regret::CLI
 
+  Face = ::Skylab::TestSupport::Services::Face
   Regret = ::Skylab::TestSupport::Regret
-  Face = ::Skylab::Face
 
   class Regret::CLI::Client < Face::CLI
 

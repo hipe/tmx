@@ -1,7 +1,8 @@
 module Skylab::MyTree
-  class API::Actions::Nerk < API::Action
 
-    desc "this is nerk, only one line of description."
+  class API::Actions::Ping < API::Action
+
+    desc "this is ping, only one line of description."
 
   protected
 
@@ -9,7 +10,8 @@ module Skylab::MyTree
     end
 
     def process
-      emit :info, "sure"
+      emit :info, "hello from my-tree."
+      :'hello_from_my-tree'
     end
   end
 end

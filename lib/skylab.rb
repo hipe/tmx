@@ -322,4 +322,8 @@ module Skylab                     # Welcome! :D
       fail "#{@mod}::#{@const} was not defined, must be, in #{leaf_pathname}"
     end
   end
+
+  module Subsystem
+    extend Autoloader
+  end
 end

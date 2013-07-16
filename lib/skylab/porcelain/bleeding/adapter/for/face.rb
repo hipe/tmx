@@ -26,11 +26,11 @@ module Skylab::Porcelain::Bleeding
           is_visible: -> { ! hi_sheet.defers_invisibility },
           name: -> { hi_sheet.name },
           set_a: -> { hi_sheet.set_a },
-          summary: -> *_ { real[].summary_lines },
+          get_summary_a_from_sheet: -> _sht { real[].summary_lines },
           help: -> { real[].help full: true },
           respond_to?: -> i { respond_to_h.fetch i },
           invokee: -> { real[] },
-          pre_execute: -> { } )
+          pre_execute: -> { true } )
       end
     end
   end

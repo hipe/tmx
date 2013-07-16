@@ -20,24 +20,63 @@ module Skylab::TMX::TestSupport::CLI::L2P
       define_singleton_method :with_value do i end
     end
 
+    FLAG_ = '--ping'.freeze
+    PING_ARG_ = 'ping'.freeze
+
     it "beauty salon" do
       go :beauty_salon
     end
 
-    it "cull" do
-      go :cull
+    it "bnf2treetop" do
+      go :bnf2treetop, FLAG_
+    end
+
+    it "breakup - capture3" do
+      capture3 :breakup, FLAG_, 0
+    end
+
+    it "citxt - capture3" do
+      capture3 :citxt, FLAG_, 0
     end
 
     it "cov tree" do
       go :cov_tree
     end
 
+    it "css-convert" do
+      go :'css-convert', FLAG_
+    end
+
+    it "cull" do
+      go :cull
+    end
+
     it "file metrics" do
       go :file_metrics
     end
 
+    it "flex2treetop" do
+      go :flex2treetop, FLAG_
+    end
+
+    it "git" do
+      go :git
+    end
+
+    it "my-tree" do
+      go :'my-tree'
+    end
+
     it "permute" do
       go :permute
+    end
+
+    it "pub-sub" do
+      go :'pub-sub'
+    end
+
+    it "quickie-recursive" do
+      go :'quickie-recursive', FLAG_
     end
 
     it "regret" do
@@ -60,30 +99,68 @@ module Skylab::TMX::TestSupport::CLI::L2P
       go :treemap
     end
 
-    def go i
-      _hack_write i
-      _go i
+    it "uncommit - capture3" do
+      capture3 :uncommit, FLAG_, 0
     end
 
-    def _go i
-      x = invoke "#{ i.to_s.gsub '_', '-' }", "ping"
-      x.should eql( :"hello_from_#{ i }" )
+    it "unsplit - capture3 - FROM BASH" do
+      capture3 :unsplit, FLAG_, 0
+    end
 
+    it "xargs-ish-i" do
+      capture3 :'xargs-ish-i', FLAG_, 0
+    end
+
+    it "yacc2treetop" do
+      go :'yacc2treetop', FLAG_
+    end
+
+    def go i, *a
+      _hack_write i if a.length.zero?
+      _go i, *a
+    end
+
+    def _go i, *a
+      x = _confirm_out_and_err_streams i, *a
+      x.should eql( :"hello_from_#{ i }" )
+      nil
+    end
+
+    def capture3 i, ping_arg, exitstatus
+      argv = ::Skylab::Subsystem::PATHNAMES.calculate do
+        [ bin.join( supernode_binfile ).to_s , i.to_s, ping_arg ]
+      end
+      o, e, st = TestSupport::Services::Open3.capture3( * argv )
+      o.should eql ''
+      e.should eql( "#{ hellomsg i }\n" )
+      st.exitstatus.should eql( exitstatus )
+      nil
+    end
+
+    def _confirm_out_and_err_streams i, arg=PING_ARG_
+      x = invoke "#{ i.to_s.gsub '_', '-' }", arg
       iog = @__memoized.fetch :io_spy_group  # dear future - i am sorry:
       # calling `lines` does hackery that won't work with our hackery, maybe.
 
       oa, ea = [ :outstream, :errstream ].map do |ii|
         io = iog[ ii ]
+        if MetaHell::Proxy::Tee === io  # omg eew allow debug!
+          io = io[ :buffer ]
+        end
         str = io.string
         a = str.split "\n"  # then:
         io.rewind
         io.truncate 0
         a
       end
-
-      ea.fetch( 0 ).should eql( "hello from #{ i.to_s.gsub( '_', ' ' ) }." )
+      ea.fetch( 0 ).should eql( hellomsg i )
       ea.length.should eql( 1 )
       oa.length.should eql( 0 )
+      x
+    end
+
+    def hellomsg i
+      "hello from #{ i.to_s.gsub( '_', ' ' ) }."
     end
 
     -> do  # hacklund..

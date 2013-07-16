@@ -83,15 +83,28 @@ module Skylab::Bnf2Treetop
   end
 
   module CLI::Client_InstanceMethods
+
     include Headless::Client_InstanceMethods
+
     def invoke argv
-      parse_argv!(argv) and headless_client.execute
+      if parse_argv! argv
+        headless_client.execute
+      else
+        result
+      end
     end
+
     attr_writer :program_name
+
   protected
+
+    attr_reader :result
+
     # the grand experiment revisited
     def build_option_parser
       op = ::OptionParser.new
+      op.base.long[ 'ping' ] = ::OptionParser::Switch::NoArgument.
+          new( & method( :ping ) )
       op.separator em('options:')
       args = [] ; arg_label = nil
       desc_f = ->(p) do
@@ -151,7 +164,9 @@ module Skylab::Bnf2Treetop
         usage e.message
         queue.clear.push :noop # indicates that all necessary action is complete
       end
-      if queue.empty?
+      if @is_finished
+        nil
+      elsif queue.empty?
         true # continue on to parse_args! and execute
       else
         begin ; send(queue.shift) end until queue.empty?
@@ -182,6 +197,7 @@ module Skylab::Bnf2Treetop
                                    :headless_client)
     include CLI::Client_InstanceMethods
     def initialize paystream=$stdout, infostream=$stderr
+      @is_finished = false
       super paystream, infostream, nil, Headless::Client.new(self)
     end
     def emit type, string
@@ -208,6 +224,12 @@ module Skylab::Bnf2Treetop
       "#{em 'usage'}: #{program_name} [options] { #{INFILE} | - }"
     end
     def version_string ; '0.0.0' end
+    def ping _
+      @is_finished = true
+      infostream.puts "hello from bnf2treetop."
+      @result = :hello_from_bnf2treetop
+      nil
+    end
   end
 
   module API

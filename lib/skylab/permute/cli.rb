@@ -39,6 +39,8 @@ module Skylab::Permute
     define_method :initialize do |*a, &b|      # please pardon our blood
       instance_exec a, b, & param_h.fetch( a.length )
     end
+
+    Client = self  # #tmx-compat
   end
 
   class CLI::Action

@@ -21,6 +21,7 @@ module Skylab::CI_Txt
         begin
           begin
             option_parser.parse! argv
+            is_finished and break( ok = true )
             if argv.any?
               self.dir_path = argv.shift
             end
@@ -38,7 +39,7 @@ module Skylab::CI_Txt
           emit :help, invite_line
           break
         end
-        res = execute
+        res = execute unless is_finished
         if false == res
           emit :help, invite_line
         end
@@ -48,6 +49,7 @@ module Skylab::CI_Txt
 
   protected
 
+    attr_reader :is_finished
 
     ref_rx = /\Aref: ([^\n]+)\n\z/
 
@@ -74,6 +76,9 @@ module Skylab::CI_Txt
       require 'optparse'
       o = ::OptionParser.new
 
+      o.base.long[ 'ping' ] = ::OptionParser::Switch::NoArgument.
+        new( & method( :ping ) )
+
       o.on '-n', '--dry-run', 'dry run.' do
         self.dry_run = true
       end
@@ -92,6 +97,11 @@ module Skylab::CI_Txt
       o
     end
 
+    def ping _
+      @infostream.puts "hello from citxt."
+      @is_finished = true
+      nil
+    end
 
     define_method :create_initial_file do
       res = nil
@@ -165,7 +175,7 @@ module Skylab::CI_Txt
           existing or break( res = existing )
         end
         editor = ::ENV['EDITOR'] || 'vi'
-        cmd = "vi #{ escape_path existing }"
+        cmd = "#{ editor } #{ escape_path existing }"
         if dry_run
           info "would have executed `#{ cmd }`"
         else

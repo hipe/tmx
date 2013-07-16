@@ -266,6 +266,8 @@ module Skylab::Snag
       @io_adapter.errstream.puts "hello from snag."
       :hello_from_snag
     end
+
+    Client = self  # #tmx-compat
   end
 
   module CLI::Actions             # avoiding an #orphan sorry

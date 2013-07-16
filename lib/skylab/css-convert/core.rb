@@ -102,6 +102,7 @@ module Skylab::CssConvert
 
     def initialize sin, sout, serr
       super( )
+      @default_action = nil
       @io_adapter = build_io_adapter sin, sout, serr
       nil
     end
@@ -112,6 +113,10 @@ module Skylab::CssConvert
 
     def build_option_parser
       o = ::OptionParser.new
+
+      o.base.long[ 'ping' ] = ::OptionParser::Switch::NoArgument.
+        new( & method( :ping ) )
+
       o.on('-f', '--force', 'overwrite existing generated grammars') do
         actual_parameters.force_overwrite!
       end
@@ -128,7 +133,20 @@ module Skylab::CssConvert
       o
     end
 
-    def default_action ; :convert end
+    def ping _
+      @io_adapter.errstream.puts "hello from css-convert."
+      @default_action = :noop
+      @noop_result = :'hello_from_css-convert'
+      nil
+    end
+
+    def noop
+      @noop_result
+    end
+
+    def default_action
+      @default_action || :convert
+    end
 
     DUMPABLE = {
       'directives' => -> {

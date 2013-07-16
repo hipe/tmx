@@ -12,6 +12,7 @@ module Skylab::TestSupport
       end
 
       def resolve argv
+        if 1 == argv.length and '--ping' == argv[0] then return ping end  # this will change soon anyway
         a, b = find_contiguous_range_of_paths argv
         if ! a then
           @y << "expecting #{ usage_string }"
@@ -41,6 +42,11 @@ module Skylab::TestSupport
       end
 
     private
+
+      def ping
+        @y << "hello from quickie-recursive."
+        nil
+      end
 
       def find_contiguous_range_of_paths argv
         scn = Basic::List::Scanner[ argv ]

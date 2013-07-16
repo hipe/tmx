@@ -68,8 +68,8 @@ module Skylab::Face
 
       mlf = -> { "module-loading function" } ; db = -> { "definition block" }
       nsm = -> { "namespace module" }
-      mutex = -> mf, b do
-        ( mf && b and i = 2 ) or ( ! ( mf || b ) and i = 0 )
+      mutex = -> mp, b do
+        ( mp && b and i = 2 ) or ( ! ( mp || b ) and i = 0 )
         i and raise ::ArgumentError, "must have exactly 1 (#{ mlf[] }#{
           } OR #{ db[] }) - had #{ i }"
       end
@@ -80,18 +80,18 @@ module Skylab::Face
         end
       end
       parse_args = -> a do
-        a.length.nonzero? && a[ 0 ].respond_to?( :call ) and mf = a.shift
+        a.length.nonzero? && a[ 0 ].respond_to?( :call ) and mp = a.shift
         if a.length.nonzero?
           xtra_a = a  # still can be one hash or an arg list
         end
-        [ mf, xtra_a ]
+        [ mp, xtra_a ]
       end
       define_method :build_child_namespace_sheet do |norm_i, a, b|
         nf = Services::Headless::Name::Function.new norm_i
-        mf, xtra_x = parse_args[ a ]
-        mutex[ mf, b ]
-        if mf
-          self.class.new( nil ).init_with_module_proc mf, nf, xtra_x
+        mp, xtra_x = parse_args[ a ]
+        mutex[ mp, b ]
+        if mp
+          self.class.new( nil ).init_with_module_proc mp, nf, xtra_x
         else
           build_into b, nf, xtra_x
         end
@@ -109,14 +109,14 @@ module Skylab::Face
       end
 
       define_method :absorb_additional_namespace_definition do |a, b|
-        mf, xtra_x = parse_args[ a ]
-        mf || b and mutex[ mf, b ]
+        mp, xtra_x = parse_args[ a ]
+        mp || b and mutex[ mp, b ]
         xtra_x and absorb_xtra xtra_x
-        if mf
+        if mp
           @surface_mod_origin_i and raise "can't set a #{ mlf[] } to a #{
             }#{ nsm[] } already originates with #{ @surface_mod_origin_i }"
           @surface_mod_origin_i = :function
-          @surface_mod = mf
+          @surface_mod = mp
         elsif b
           if @surface_mod_origin_i
             @name and xtra = " \"#{ @name.local_normal }\""
@@ -149,8 +149,8 @@ module Skylab::Face
       self
     end
 
-    def init_with_module_proc mf, nf, xtra_x
-      @surface_mod = mf
+    def init_with_module_proc mp, nf, xtra_x
+      @surface_mod = mp
       init_extended_ns_sheet :function, nf, xtra_x
     end
     protected :init_with_module_proc
@@ -210,7 +210,7 @@ module Skylab::Face
         end
         if @hot
           svcs = @hot.call psvcs, *rest_to_cmd
-          svcs.pre_execute  # placement here is sketchy
+          r = svcs.pre_execute or svcs = r
           svcs
         end
       end

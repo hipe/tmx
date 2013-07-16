@@ -6,7 +6,7 @@ module Skylab::MyTree::TestSupport
     extend ::Skylab::MyTree::TestSupport
 
     let( :action_summary_line_rx ) { /\A  [^ ].*\z/ }
-    let( :_expecting_rx ) { /expecting {tree\|nerk}/ }
+    let( :_expecting_rx ) { /expecting {tree\|ping}/ }
     let( :expecting_rx ) { /\A#{_expecting_rx.source}\z/ }
     let( :invite_rx ) { /\Ause mt -h \[<action>\] for help/ }
     let( :multiline_desc_line_rx ) { /\A  [^ ].*\z/ }

@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby -w
+
+require_relative '../lib/skylab/slicer/core'
+
+::Skylab::Slicer::CLI::Client.
+  new( * ::Skylab::Face::FUN.three_streams[] ).
+    invoke ::ARGV

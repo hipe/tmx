@@ -123,5 +123,7 @@ module Skylab::CovTree
       end
       res
     end
+
+    Client = self  # #tmx-compat
   end
 end

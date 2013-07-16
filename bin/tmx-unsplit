@@ -6,20 +6,48 @@
 
 dir="$1"
 
+pn="$0"
+
+program_name(){
+  echo $( basename "$pn" )
+}
+
+help(){
+  echo "usage: $( program_name ) <directory-with-patches>"
+  echo "description: a folder with a bunch of patches in it, basically \
+do a tar on it."
+}
+
+invite(){
+  echo "$1"
+  echo "see $( program_name ) --help"
+}
+
+case "$1" in
+--ping)
+  echo "hello from unsplit." 1>&2
+  exit 0
+  ;;
+-h | --help)
+  help
+  exit 0
+  ;;
+esac
+
 if [ -z "$dir" ] ; then
-  echo "please provide a directory name"
+  invite "please provide a directory name"
   exit 0
 fi
 
 if [ ! -d "$dir" ] ; then
-  echo "expecting a directory with patches in it - $dir"
+  invite "expecting a directory with patches in it - $dir"
   exit 0
 fi
 
 tgt="${dir}.big-patch.patch"
 
 if [ -e "$tgt" ] ; then
-  echo "won't overwrite existing big patch - $tgt"
+  invite "won't overwrite existing big patch - $tgt"
   exit 0
 fi
 
