@@ -1,7 +1,4 @@
-load File.expand_path('../../../../../bin/tmx-yacc2treetop', __FILE__)
-
-require_relative('../..')
-
+require_relative '../load'
 require 'skylab/test-support/core'
 require 'skylab/headless/core' # unstylize
 

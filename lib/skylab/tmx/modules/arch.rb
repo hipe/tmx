@@ -68,7 +68,7 @@ module Skylab::TMX
           hotm = ada::Hotmm_[ top_wisp.name.as_slug, kls, -> { oro } ]
           oro.hotm = -> psvcs, _=nil do
             hot = hotm[ psvcs, _ ]
-            hot.pre_execute
+            r = hot.pre_execute or hot = r
             hot
           end
           @puff_story.add_namespace_sheet oro

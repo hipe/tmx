@@ -44,23 +44,28 @@ module Skylab::Yacc2Treetop
 
   class CliBase # experimental keep low level cli away from business logic
     def run argv
+      @result = nil
       @argv = argv
       @c = build_context
       @exit_ok = nil
       @queue = []
       begin
         option_parser.parse!(argv)
-        @queue.push default_action
-        catch(:early_exit){ @queue.each{ |meth| send meth } }
       rescue OptionParser::ParseError => e
+        @exit_ok = true
         error e.message
       end
+      if ! @exit_ok
+        @queue.push default_action
+        catch(:early_exit){ @queue.each{ |meth| send meth } }
+      end
+      @result
     end
     attr_writer :program_name
   protected
     def initialize o=$stdout, e=$stderr
       @errstream = e ; @outstream = o
-      @program_name = nil
+      @program_name = @is_finished = nil
     end
     Codes = {:bold=>1,:red=>31,:green=>32,:yellow=>33,:blue=>34,
       :purple=>35,:cyan=>36,:white=>37}
@@ -138,6 +143,10 @@ module Skylab::Yacc2Treetop
     def option_parser
       @op ||= OptionParser.new do |o|
         o.banner = usage
+
+        o.base.long[ 'ping' ] = ::OptionParser::Switch::NoArgument.
+          new( & method( :ping ) )
+
         o.on('-g=<grammar>', '--grammar=<grammar>',
         "Wrap output in grammar declaration (e.g. \"Mod1::Mod2::Grammar\")"
         ) { |g| @c[:grammar] = g }
@@ -162,6 +171,14 @@ module Skylab::Yacc2Treetop
         ){ @queue.push :run_version }
       end
     end
+
+    def ping _
+      @errstream.puts "hello from yacc2treetop."
+      @exit_ok = true
+      @result = :hello_from_yacc2treetop
+      nil
+    end
+
     def agent
       @ag ||= Translator.new(@c)
     end

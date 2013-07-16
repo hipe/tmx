@@ -7,8 +7,9 @@ module Skylab::Porcelain::Legacy
   end
 
   Adapter::For::Face::Of::Hot = MetaHell::Proxy::Nice.new(
-    :is_visible, :name, :summary, :help,  # for doc index
-    :set_a, :respond_to?, :invokee, :pre_execute  # for `get_executable` and `invoke`
+    :is_visible, :name, :get_summary_a_from_sheet, :help,  # for doc index
+    :set_a, :respond_to?, :invokee, :pre_execute
+      # for `get_executable` and `invoke`
   )
 
   class Adapter::For::Face::Of::Hot
@@ -30,12 +31,13 @@ module Skylab::Porcelain::Legacy
         new(
           is_visible: -> { ! hi_sheet.defers_invisibility },
           name: -> { hi_sheet.name },
-          summary: -> *_ { [ "usage: #{ real[].syntax_text }" ] },
+          get_summary_a_from_sheet:
+            -> *_ { [ "usage: #{ real[].syntax_text }" ] },
           help: -> { real[].help },
           set_a: -> { hi_sheet.set_a },
           respond_to?: -> i { send_h.fetch i },
           invokee: -> { real[] },
-          pre_execute: -> { } )
+          pre_execute: -> { true } )
       end
     end
   end

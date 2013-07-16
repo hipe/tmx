@@ -234,7 +234,15 @@ module Skylab::Flex2Treetop
 
 
   class CLI::Client < Core::Client
+
+    extend ::Skylab::Autoloader
+
     include Headless::CLI::Client::InstanceMethods
+
+    def initialize( * )
+      super
+      @default_action = nil
+    end
 
     public :info                  # translation uses it directly, at odds with
                                   # [#008]
@@ -244,6 +252,9 @@ module Skylab::Flex2Treetop
 
     def build_option_parser
       o = ::OptionParser.new
+
+      o.base.long[ 'ping' ] = ::OptionParser::Switch::NoArgument.
+        new( & method( :ping ) )
 
       o.on('-g=<grammar>', '--grammar=<grammar>',
         "nest treetop output in this grammar declaration",
@@ -292,8 +303,18 @@ module Skylab::Flex2Treetop
       o
     end
 
+    def ping _
+      @io_adapter.errstream.puts "hello from flex2treetop."
+      @noop_result = :hello_from_flex2treetop
+      @default_action = :noop
+    end
+
+    def noop
+      @noop_result
+    end
+
     def default_action
-      :translate
+      @default_action || :translate
     end
 
     def formal_parameters_class
@@ -335,6 +356,8 @@ module Skylab::Flex2Treetop
       end
       res
     end
+
+
   end
 
 

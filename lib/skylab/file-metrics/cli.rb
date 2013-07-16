@@ -199,5 +199,7 @@ module Skylab::FileMetrics
         }
       end
     end
+
+    Client = self  # #tmx-compat
   end
 end

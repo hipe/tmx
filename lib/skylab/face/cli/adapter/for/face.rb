@@ -23,10 +23,13 @@ module Skylab::Face
           hi_sheet, lo_sheet ]
       end
 
-      Hot = -> hi_sheet, lo_cli_class do
+      class Hot
+      end
+      def Hot.[] hi_sheet, lo_cli_class
         Hotmm_[ hi_sheet.name.as_slug, lo_cli_class,
                  -> { Sheet[ hi_sheet, lo_cli_class.story ] } ]
       end
+      Hot.singleton_class.send :alias_method, :call, :[]
     end
 
     # here we have "ouroboros" - a particular hot action's particular sheet
@@ -49,5 +52,53 @@ module Skylab::Face
     #   tail = surface   = extrinsic = outer = higher = upper = hi
     #   head = intrinsic = intrinsic = inner = lower  = lower = lo )
 
+    class Of::Hot  # this is a generic base class used elsewhere
+
+      # def `get_summary_a_from_sheet` - you do this one
+
+      def initialize ns_sheet, my_client_class, mechanics
+        @ns_sheet, @my_client_class, @mechanics =
+          ns_sheet, my_client_class, mechanics
+      end
+
+      def pre_execute
+        did = false
+        @actual ||= begin
+          did = true
+          cli = @my_client_class.new( * @mechanics.three_streams )
+          cli.program_name = get_anchored_program_name
+          cli
+        end
+        did or fail "sanity - pre-execute should not be called > once"
+        true
+      end
+
+      def is_visible  # when would you want an invisible ouroboros agent
+        true
+      end
+
+      def invokee  # short-circuit the face CLI API early
+        @actual
+      end
+
+      def help
+        @actual.invoke [ '--help' ]
+      end
+
+      def name
+        @ns_sheet.name
+      end
+
+    private
+
+      def get_anchored_program_name
+        get_anchored_program_name_separated_by ' '
+      end
+
+      def get_anchored_program_name_separated_by sep
+        [ * @mechanics.get_normal_invocation_string_parts,
+          @ns_sheet.name.local_normal ] * sep
+      end
+    end
   end
 end

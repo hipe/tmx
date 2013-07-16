@@ -68,7 +68,7 @@ module Skylab::Face::TestSupport::CLI::Option::Help
       end
     end
 
-    context "more than one summary line per item" do
+    context "more than one s#{}ummary line per item" do
 
       let :client_class do Deffer::CLI_Client end
 

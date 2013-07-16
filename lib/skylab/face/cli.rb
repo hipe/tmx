@@ -154,8 +154,9 @@ module Skylab::Face
     # result tuple: ( ok, result_code_or_receiver, method, args, block, cmd )
 
     def get_executable argv
-      node = self ; ok = r = rest = @last_cli_executable = nil ; pre_execute
+      node = self ; ok = r = rest = @last_cli_executable = nil
       catch :break_two do
+        r = pre_execute or break
         while true
           node.apply_default_argv( argv ) if argv.length.zero? &&
             node.has_default_argv
@@ -223,7 +224,7 @@ module Skylab::Face
       # we override p-arent and do what our grandparent does. meh.
       @y = parent_services[ :y ]
       @last_hot = nil
-      nil
+      true
     end
   end
 
@@ -519,11 +520,19 @@ module Skylab::Face
         @out, @err, @y = ps[ :ostream, :estream, :y ]
       end
       @last_hot = nil
-      nil
+      true
+    end
+
+    def info_line_yielder  # #hacks
+      @y
     end
 
     def parent_shell
       @surface.call
+    end
+
+    def three_streams
+      parent_services.three_streams
     end
 
     def istream
@@ -613,7 +622,7 @@ module Skylab::Face
 
     def pre_execute  # #called-by-main-invocation-loop
       @y = parent_services[ :y ]
-      nil
+      true
     end
 
     def is_visible  # (sneak this in for facet 5.14x)
@@ -668,7 +677,7 @@ module Skylab::Face
     def hot parent_services, *rest_to_command
       # (`alias_used` nil e.g in the case of a command tree index listing)
       cmd = Command.new self, parent_services, *rest_to_command
-      cmd.pre_execute
+      r = cmd.pre_execute or cmd = r
       cmd
     end
 
@@ -778,6 +787,12 @@ module Skylab::Face
     end
     def last_hot ; end ; def set_last_hot _ ; end  # we don't want the topmost
     # mechanics node to concern itself with the fact that it is topmost here
+
+    def three_streams
+      @provider[].instance_exec do
+        [ @sin, @out, @err ]
+      end
+    end
   end
 
   class NS_Mechanics_  # #re-open for 1.4
@@ -1344,7 +1359,7 @@ module Skylab::Face
           if hot && hot.is_visible
             slug_a << (( slu = hot.name.as_slug ))
             slu.length > w and w = slu.length
-            m << Item_[ slu, hot.summary( sht ) ]
+            m << Item_[ slu, hot.get_summary_a_from_sheet( sht ) ]
           end ; m
         end
         if itma.length.nonzero?
@@ -1440,7 +1455,7 @@ module Skylab::Face
       "#{ hi usage_header_text } #{ syntax }"
     end
 
-    # `summary` - # #called-by-p-arent documenting child #experimental
+    # `get_summary_a_from_sheet` - # #called-by-p-arent documenting child #experimental
     # *lots* of goofing around here - this terrific hack tries to
     # distill a s-ummary out of the first one or two lines of the option parser
     # -- it strips out all styling from them (b.c it looks wrong in summaries),
@@ -1571,7 +1586,7 @@ module Skylab::Face
         end
       end.call
 
-      define_method :summary do |sht|
+      define_method :get_summary_a_from_sheet do |sht|
         num_lines = self[ :num_summary_lines ]  # call service proxy (go up)
         if sht.desc_proc_a
           exrp_a = get_desc_proc_a_excerpt[

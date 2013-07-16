@@ -15,19 +15,39 @@ exit_status = 0
     ::Enumerator::Yielder.new { |msg| stderr.puts msg }
   end.call
 
+  moniker = 'uncommit'.freeze
+
+  program_name = -> do
+    pn = ::File.basename $PROGRAM_NAME
+    me = ::File.basename __FILE__
+    if me == pn then me else
+      "#{ pn } #{ moniker }"
+    end
+  end
+
   usage = -> do
-    y << "usage: #{ ::File.basename $PROGRAM_NAME } some/file.rb"
+    y << "usage: #{ program_name[] } some/file.rb"
     exit_status = 1
     stay = false
   end
 
-  if ! ARGV[0]
+  if 1 != (( argv = ::ARGV )).length
+    break usage[]
+  end
+
+  tok = argv.fetch 0
+
+  if '-' == tok[ 0, 1 ]
+    if '--ping' == tok
+      y << "hello from #{ moniker }."
+      break( stay = false )
+    end
     break usage[]
   end
 
   require 'pathname'
 
-  i_pn = ::Pathname.new ARGV[0]
+  i_pn = ::Pathname.new tok
 
   bork = -> msg=nil do
     y << msg if msg

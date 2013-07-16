@@ -32,10 +32,10 @@ module Skylab::TMX
       o.top.short['v'] = na
     end
 
-    def foo                       # (for debugging purposes we keep at least
-      out.puts "foo."             # one of these lying around to test the
-      @y << '(foo)'               # DSL out, if we hypothetically needed
-      :foo                        # a sub-command at this node.)
+    def ping                      # (for debugging purposes we keep at least
+      @out.puts "hello from tmx." # one of these lying around to test the
+      @y << '(ping)'              # DSL out, if we hypothetically needed
+      :ping                       # a sub-command at this node.)
     end
 
   private
@@ -91,13 +91,13 @@ module Skylab::TMX
           y << "(leaf - #{ pth[ welcome ] })" if be_verbose
           # require welcome.to_s  ; doing it the below way instead
           box_mod.const_fetch( norm_i )  # wires them for autoloading
-          true
+          welcome
         else
           cli = anchor.join "cli#{ Autoloader::EXTNAME }"
           if cli.exist?
             y << "(branch - #{ pth[ cli ] })" if be_verbose
             box_mod.const_fetch( norm_i ).const_get( :CLI, false )
-            true
+            cli
           else
             y << "(nothing loadable for \"#{ norm_i }\")" if be_verbose
             nil

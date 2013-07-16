@@ -14,10 +14,11 @@ exit_code = -> do
 
   do_stay = true ; do_not_stay = false
   ok = 0 ; not_ok = 1
+  moniker = 'xargs-ish-i'
 
   #         ~ asssign global-ishes to locals ~
 
-  argv = ARGV
+  argv = ::ARGV
 
   y = -> do
     stderr = $stderr
@@ -43,8 +44,18 @@ exit_code = -> do
     undr = styl[ 4 ]
 
     program_name = -> do
-      ::File.basename $PROGRAM_NAME
-    end
+      pn = nil
+      get = -> do
+        me = ::File.basename __FILE__
+        pg = ::File.basename $PROGRAM_NAME
+        if me == pg then me else
+          "#{ pg } #{ moniker }"
+        end
+      end
+      -> do
+        pn ||= get[]
+      end
+    end.call
 
     ltgt = -> str { "<#{ str }>" }
 
@@ -505,6 +516,11 @@ exit_code = -> do
       [ do_not_stay, not_ok ]
     end
 
+    ping = -> do
+      y << "hello from #{ moniker }."
+      [ do_not_stay, ok ]
+    end
+
     procede = -> do
       cm_a = argv.dup
       argv.clear
@@ -515,6 +531,7 @@ exit_code = -> do
       if argv.empty?
         break expecting[]
       end
+      1 == argv.length and '--ping' == argv[ 0 ] and break ping[]
       nxt = current_state.to.reduce nil do |m, s|
         stat = state_h.fetch s
         break stat if stat.rx =~ argv[ 0 ]
