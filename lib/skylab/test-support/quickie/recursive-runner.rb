@@ -8,7 +8,6 @@ module Skylab::TestSupport
           e.puts 'hello from quickie-recursive.'
           return :'hello_from_quickie-recursive'
         end
-        fail 'do me'  # #todo
         run = ::Skylab::TestSupport::Quickie::service.run
         run.set_three_streams i, o, e
         run.program_name = progname

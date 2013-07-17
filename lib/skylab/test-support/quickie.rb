@@ -95,7 +95,8 @@ module Skylab::TestSupport::Quickie
 
                                   # so what is this `service` metioned above?
   service = -> do                 # it is a true service, it gets memoized
-    svc = Quickie::Service.new $stderr  # (NOTE the only place you see $stderr)
+    svc = Quickie::Service.
+      new nil, TestSupport::Stdout_[], TestSupport::Stderr_[]
     svc.listen                    # and everything (but it could be tested
     service = -> { svc }          # in isolation)
     svc
@@ -105,8 +106,9 @@ module Skylab::TestSupport::Quickie
 
   class Quickie::Service          # ( re-opens as necessary for narrative )
 
-    def initialize stderr
-      @default_info_stream_line_proc = -> line { stderr.puts line }
+    def initialize _, o, e
+      @paystream, @infostream = o, e
+      @default_info_stream_line_proc = -> line { @infostream.puts line }
       @info_stream_line_proc_is_default = nil
       self.info_stream_line_proc = nil  # see
       @invoke_is_enabled = true ; @did_resolve_invoke = false
@@ -1045,14 +1047,11 @@ module Skylab::TestSupport::Quickie
     def run
       @run ||= Quickie::Run_.new self
     end
-    attr_reader :y
+    attr_reader :paystream, :infostream
     def attach_client_notify client
       @client and fail "sanity - client is already attached"
       @client = client
       nil
-    end
-    def out
-      TestSupport::Stdout_.call
     end
   end
 end
