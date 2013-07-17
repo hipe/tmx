@@ -120,6 +120,9 @@ module Skylab::TestSupport
         def each &blk
           @a.each( & blk )
         end
+        def get_a
+          @a.dup
+        end
         def << x
           @a << x
           nil

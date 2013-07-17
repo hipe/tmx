@@ -33,7 +33,7 @@ module Skylab::TestSupport::TestSupport::Quickie::Possible_
     end
 
     def recon_plus from_i, to_i, sig_a
-      possible_graph.reconcile_with_story_or_failure y, from_i, to_i, sig_a
+      possible_graph.reconcile_with_path_or_failure y, from_i, to_i, sig_a
     end
 
     def y

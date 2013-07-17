@@ -106,7 +106,7 @@ module Skylab::TestSupport
 
         Transition_ = o[ -> fep, tep do
           x = if (( a = fep.to_a ))
-            " (#{ Ep_[ fep ] } goes to #{ And_[ a.map( & :i ) ] })"
+            " (#{ Ep_[ fep ] } goes to #{ And_[ a.map( & :node_i ) ] })"
               else
             " (#{ Ep_[ fep ] } does not transition to any other nodes)"
               end

@@ -8,7 +8,8 @@ module Skylab::FileMetrics::TestSupport::CLI
 
     extend CLI_TestSupport
 
-    floor = 14
+    floor = 4 #  OMG this test fails if you run them in a
+      # terminal screen that is too narrow  # #todo
 
     context "lc" do
 
@@ -29,7 +30,7 @@ module Skylab::FileMetrics::TestSupport::CLI
         )
       end
 
-      it "body" do
+      it "body" do  # see OMG above
         arr = cels_hack output_lines[ 1 ]
         arr.length.should eql( 5 )
         fl, ln, pc1, pc2, lip = arr

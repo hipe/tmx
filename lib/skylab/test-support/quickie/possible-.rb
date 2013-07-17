@@ -38,8 +38,8 @@ module Skylab::TestSupport
                 cache_a << "#{ i } -> #{ i_ }"
               end
             elsif ! seen_h[ i ]
-              maybe_single_h[ n.i ] = cache_a.length
-              cache_a << n.i.to_s
+              maybe_single_h[ n.node_i ] = cache_a.length
+              cache_a << n.node_i.to_s
             end
           end
           cache_a.compact!
@@ -55,7 +55,7 @@ module Skylab::TestSupport
           Reconciliation_.new( y, self, from_i, to_i, sig_a ).execute
         end
 
-        def reconcile_with_story_or_failure y, from_i, to_i, sig_a
+        def reconcile_with_path_or_failure y, from_i, to_i, sig_a
           Reconciliation_.new( y, self, from_i, to_i, sig_a ).
             execute_with_story_or_failure
         end
@@ -165,6 +165,10 @@ module Skylab::TestSupport
               x.node_i == i
             end
           end
+        end
+
+        def eventpoint_notify_method_name
+          @enmn ||= :"#{ @node_i.downcase }_eventpoint_notify"
         end
       end
 
@@ -336,6 +340,22 @@ module Skylab::TestSupport
 
         def rely i
           depend pred::Depend_Hard_, i
+        end
+
+        def subscribed_to? ep
+          @subscribed_to_cache_h ||= begin
+            h = { }
+            @a.each do |node_i|
+              @h.fetch( node_i ).each do |pred|
+                case pred.predicate_i
+                when :from, :depend
+                  h[ pred.node_i ] = true
+                end
+              end
+            end
+            h
+          end
+          @subscribed_to_cache_h[ ep.node_i ]
         end
 
       private

@@ -2,45 +2,49 @@ module Skylab::TestSupport
 
   module Quickie
 
-    class Multi_::Run_
+    class Executor_
 
-      def initialize svc, path_a
-        @svc = svc ; @y = @svc.y
-        @path_a = path_a
-        @context_class_a = [ ]
+      def initialize y, test_file_path_a
+        @y = y
+        @test_file_path_a = test_file_path_a
+        @ctx_class_a = []
+        @be_verbose = nil
       end
 
-      def resolve argv
-        @svc.attach_client_notify self
-        load_paths
-        cli = build_client
-        if argv.length.nonzero?
-          @svc.argument_error argv
-        else
-          cli.method :execute
-        end
+      attr_accessor :be_verbose
+
+      def resolve
+        begin
+          r = load_test_files or break
+          r = build_client or break
+          r = r.method :execute
+        end while nil
+        r
       end
 
-      def add_context_class_and_resolve ctx
-        @context_class_a << ctx
+      def add_context_class_and_resolve_notify ctx_class
+        @ctx_class_a << ctx_class
         nil
       end
 
     private
 
-      def load_paths
-        a = @path_a ; @path_a = nil
-        while path = a.shift
-          load path
+      def load_test_files
+        if ! (( a = @test_file_path_a )) then a else
+          a.each do |path_s|
+            @y << "(loading : #{ path_s })" if @be_verbose
+            load path_s  # these attach context classes to the hookback above
+          end
+          true
         end
-        nil
       end
 
       def build_client
-        cli = Quickie::Client.new @svc.y, :no_root_context
+        a = @ctx_class_a ; @ctx_class_a = nil
+        cli = Quickie::Client.new @y, :no_root_context
         cli.tag_filter_p = MetaHell::MONADIC_TRUTH_
         cli.example_producer_p = -> branch, leaf do
-          p = nil ; a = @context_class_a ; @context_class_a = nil
+          p = nil
           pp = -> do
             if p
               true
