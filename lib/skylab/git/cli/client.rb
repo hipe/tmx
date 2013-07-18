@@ -35,6 +35,10 @@ module Skylab::Git
       @hi ||= Face::FUN.stylize.curry[ [ :green ] ]
     end
 
+    def progname_for str
+      "#{ program_name } #{ str }"
+    end
+
     a = [ ]
 
     define_singleton_method :method_added do |i|
@@ -42,14 +46,15 @@ module Skylab::Git
       nil
     end
 
-    def ping argv
-      @err.puts "hello from git."
-      :hello_from_git
+    def spread argv
+      cli = Git::CLI::Actions::Spread.new( @sin, @out, @err )
+      cli.program_name = progname_for 'spread'
+      cli.invoke argv
     end
 
     def stash_untracked argv
       cli = Git::CLI::Actions::Stash_Untracked::CLI.new( @sin, @out, @err )
-      cli.program_name = "#{ program_name } stash-untracked"
+      cli.program_name = progname_for 'stash-untracked'
       cli.invoke argv
     end
 
@@ -57,6 +62,11 @@ module Skylab::Git
       require_relative 'actions/push'
       ::TmxGit::Push::CLI.new.run argv
       nil
+    end
+
+    def ping argv
+      @err.puts "hello from git."
+      :hello_from_git
     end
 
     const_set :A_, [ ] ; const_set :H_, { }

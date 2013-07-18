@@ -32,6 +32,7 @@ module Skylab::Face
     o[:Headless] = subproduct  # used extensively everywhere
     o[:Ncurses] = stdlib
     o[:OptionParser] = -> _ { require 'optparse' ; ::OptionParser } # crucial
+    o[:Open3] = stdlib
     o[:Porcelain] = subproduct # option parser abtract modelling
     o[:PubSub] = subproduct    # engaged by the API Action API's `emit` facet.
 
