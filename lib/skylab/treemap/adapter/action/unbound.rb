@@ -87,7 +87,7 @@ module Skylab::Treemap
       @sections ||= nil  # etc
       y = [ ]
       a = @adapter_a.map(& :slug )
-      y << "there exist#{ s a, :_s } #{ an slug, a }`#{ slug }` #{
+      y << "there exist#{ s a, :_s } #{ an_ slug, a }`#{ slug }` #{
         }action#{ s } for the #{ and_ a.map(& method(:em)) } plugin#{ s }."
       y
     end

@@ -17,10 +17,10 @@ module ::Skylab::Headless::TestSupport::SubClient
     end ]
 
     it "an - matches a/an, case" do
-      sc.instance_exec{ an 'apple' }.should eql( 'an ' )
-      sc.instance_exec{ an 'PEAR' }.should eql( 'A ' )
-      sc.instance_exec{ an 'beef', 0 }.should eql( 'no ' )
-      sc.instance_exec{ an 'wing', 2 }.should eql( nil )
+      sc.instance_exec{ an 'apple' }.should eql( 'an apple' )
+      sc.instance_exec{ an 'PEAR' }.should eql( 'A PEAR' )
+      sc.instance_exec{ an 'beef', 0 }.should eql( 'no beef' )
+      sc.instance_exec{ an 'wing', 2 }.should eql( 'wing' )
     end
 
     it "`s` - memoizes last numeric" do

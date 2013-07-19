@@ -16,7 +16,7 @@ module Skylab::CovTree
 
   class CLI
 
-  protected
+  private
 
     include CLI::Styles
 
@@ -24,7 +24,18 @@ module Skylab::CovTree
 
     extend PubSub::Emitter  # do this before you extend legacy, it gives you
                             # a graph
+
+    def mutex name_i, value_i
+      @param_h[ name_i ] ||= [ ]
+      @param_h[ name_i ] << value_i
+      nil
+    end
+
   public
+
+    def pen
+      Headless::CLI::Pen::MINIMAL
+    end
 
     # --*--                         DSL ZONE                              --*--
 
@@ -78,23 +89,34 @@ module Skylab::CovTree
     argument_syntax '[<path>]'
 
     option_parser do |o|
-      param_h = @param_h
+
       o.on '-l', '--list', "show a list of matched test files only." do
-        param_h[:list_as] = :list
+        mutex :list_as, :list
       end
-      o.on '-t', '--tree', "show a shallow tree of matched test files only." do
-        param_h[:list_as] = :tree
+
+      o.on '-s', '--shallow', "show a shallow tree of matched test #{
+          }files only." do
+        mutex :list_as, :test_tree_shallow
       end
+
+      -> do
+        h = { 'c' => :code, 't' => :test }.freeze
+        o.on '-t', '--tree <c|t>', "show a debugging tree of the raw #{
+            }[c]ode and/or [t]est only." do |tc|
+          mutex :list_as, h.fetch( tc, & :intern )
+        end
+      end.call
+
       o.on '-v', '--verbose', 'verbose (debugging) output' do
-        param_h[:verbose] = true
+        @param_h[:be_verbose] = true
       end
     end
 
-    def tree path=nil, opts
+    def cov path=nil, opts
       param_h = opts.merge path: path
-      klass = CLI::Actions.const_fetch :tree  # grease the gears
-      live_action = klass.new self  # BOOM
-      res = live_action.subinvoke param_h
+      klass = CLI::Actions.const_fetch :cov  # grease the gears
+      hot = klass.new self
+      res = hot.invoke param_h
       if false == res
         invite
         res = status_error

@@ -292,34 +292,7 @@ module Skylab::Headless
     end
   end
 
-  class Plugin::Box_
-    def initialize
-      @a = [ ] ; @h = { }
-    end
-
-    def has? i
-      @h.key? i
-    end
-
-    def names
-      @a.dup
-    end
-
-    def fetch i, &b
-      @h.fetch i, &b
-    end
-
-    def add i, x
-      @h.key? i and raise ::KeyError, "collision - won't clobber existing #{i}"
-      @a << i
-      @h[ i ] = x
-      nil
-    end
-
-    def _a ; @a end  # READ ONLY
-    def _h ; @h end  # READ ONLY
-    def _ivars ; [ @a, @h ] end  # HACKS ONLY
-  end
+  Plugin::Box_ = Headless::Services::Basic::Box
 
   class Plugin::DeclarationError < ::RuntimeError
   end
@@ -719,7 +692,7 @@ module Skylab::Headless
       eventpoints.fetch i do
         raise Plugin::DeclarationError, "undeclared eventpoint #{
           }\"#{ i }\" for this plugin host story. declared evenpoints are #{
-          }(#{ eventpoints.names * ', ' })."
+          }(#{ eventpoints.get_names * ', ' })."
       end
     end
 

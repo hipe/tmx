@@ -1,32 +1,306 @@
-require_relative '..'
-
 module Skylab::Porcelain
+
   module Tree
-    extend ::Skylab::Autoloader
-    DEFAULT_PATH_SEPARATOR = '/'
-  end
-  class << Tree
-    def from_paths paths
-      Tree::Node.from_paths paths
+
+    Fields__ = MetaHell::FUN.fields
+
+    Fields_ = -> mod, *a do
+      Fields__[ mod, *a ]
+      mod.send :define_singleton_method, :[] do |*aa|
+        new( * aa ).execute
+      end
     end
-    Result = Struct.new(:node_count)
-    def lines root, opts=nil
-      fly = Tree::TextLine.new # flyweighting can be turned into an option if needed to
-      loc = Tree::Locus.new(opts)
-      ::Enumerator.new do |y|
-        node_count = loc.traverse(root) do |node, meta|
-          y << fly.reset!(loc.prefix(meta), loc.node_formatter.call(node))
+
+    DEFAULT_PATH_SEPARATOR_ = '/'
+
+    def self.new *a
+      Node_.new( *a )
+    end
+
+    def self.from *a
+      Node_.from( *a )
+    end
+
+    module ModuleMethods
+
+      def from *a
+        Tree::From_[ :client, self, *a ]
+      end
+
+      def path_separator
+        Tree::DEFAULT_PATH_SEPARATOR_
+      end
+    end
+
+    module InstanceMethods
+
+      class Construction_
+        Fields__[ self, :slug, :name_services ]
+        attr_reader :slug, :name_services
+      end
+
+      def initialize *a
+        o = Construction_.new( *a )
+        if (( ns = o.name_services ))
+          @node_id = ns.attach_notify self
+          @name_services = ns
         end
-        Result.new(node_count)
+        s = o.slug and append_isomorphic_key s
+        @box_multi = nil
+      end
+
+      #  ~ as parent and/or child ~
+
+      def path_separator
+        self.class.path_separator
+      end
+
+      def is_leaf
+        ! is_branch
+      end
+
+      def is_branch
+        children_count.nonzero?
+      end
+
+      #  ~ as child, simple readers ~
+
+      def isomorphic_key_count
+        @name_services.count_keys @node_id
+      end
+
+      def any_slug
+        slug if has_slug
+      end
+
+      def first_isomorphic_key
+        @name_services.fetch_first_key @node_id
+      end
+
+      def slug
+        first_isomorphic_key
+      end
+
+      def has_slug
+        @name_services.count_keys( @node_id ).nonzero?
+      end
+
+      def is_under_isomorphic_key key_x
+        @name_services.is_child_under_key @node_id, key_x
+      end
+
+      def last_isomorphic_key
+        @name_services.fetch_last_key @node_id
+      end
+
+      #  ~ as child, simple mutators ~
+
+      def prepend_isomorphic_key x
+        @name_services.prepend_isomorphic_key_notify @node_id, x
+        nil
+      end
+
+      def append_isomorphic_key x
+        @name_services.append_isomorphic_key_notify @node_id, x
+        nil
+      end
+
+      def add_isomorphic_key_with_metakey x, mk_x
+        @name_services.add_metakeyed_key_notify @node_id, mk_x, x
+      end
+
+      def index_isomorphic_key_with_metakey x, mk_x
+        @name_services.add_metakey_to_existing_key_notify @node_id, mk_x, x
+      end
+
+      def fetch_isomorphic_key_with_metakey mk_x, &blk
+        @name_services.
+          fetch_isomorphic_key_with_metakey_notify @node_id, mk_x, blk
+      end
+
+      def detach_and_release_keyset
+        @name_services.detach_and_release_keyset_notify @node_id
+      end
+
+      # ~ as parent ~
+
+      def has_children
+        children_count.nonzero?
+      end
+
+      def children_count
+        @box_multi ? @box_multi.count : 0
+      end
+
+      def fetch path
+        Tree::Fetch_or_create_[ :client, self, :do_create, false, :path, path ]
+      end
+
+      def fetch_or_create *a  # ( may mutate )
+        Tree::Fetch_or_create_[ :client, self, :do_create, true, *a ]
+      end
+
+      def fetch_first_child
+        @box_multi.fetch_first_item
+      end
+
+      def fetch_child_at_index idx
+        @box_multi.fetch_item_at_index idx
+      end
+
+      def [] k_x
+        @box_multi[ k_x ]
+      end
+
+      def children
+        @box_multi.get_enumerator
+      end
+
+      def get_child_scanner_p
+        @box_multi.get_scanner_p
+      end
+
+      def get_some_child_scanner_p
+        has_children ? get_child_scanner_p : MetaHell::EMPTY_P_
+      end
+
+      def to_text
+        Tree::To_text_[ :client, self ]
+      end
+
+      def to_paths
+        Tree::To_paths_[ :client, self ]
+      end
+
+      def get_traversal_scanner *a
+        Tree::Traversal::Scanner_[ self, *a ]
+      end
+
+      def longest_common_base_path
+        if (( child = any_only_child ))
+          res = [ child.slug ]
+          ( r = child.longest_common_base_path ) and res.concat r
+        end
+        res
+      end
+
+      def any_only_child
+        @box_multi and @box_multi.any_only_item
+      end
+
+      def fetch_only_child
+        @box_multi.fetch_only_item
+      end
+
+      #  ~ as parent, name services ~
+
+      def attach_notify node
+        ( @box_multi ||= Tree::Box_Multi_.new ).add node
+      end
+
+      def detach_and_release_keyset_notify node_id
+        @box_multi.delete_item_and_release_keyset_for node_id
+      end
+
+      def fetch_first_key node_id
+        @box_multi.fetch_first_key_for node_id
+      end
+
+      def fetch_last_key node_id
+        @box_multi.fetch_last_key_for node_id
+      end
+
+      def _fetch_key_a node_id
+        @box_multi._fetch_key_a node_id
+      end
+
+      def count_keys node_id
+        @box_multi.count_keys_for node_id
+      end
+
+      def is_child_under_key node_id, key_x
+        @box_multi.is_item_under_key node_id, key_x
+      end
+
+      #  ~ as parent, mutators ~
+
+      def prepend_isomorphic_key_notify node_id, x
+        @box_multi.prepend_key_to_item x, node_id
+        nil
+      end
+
+      def append_isomorphic_key_notify node_id, x
+        @box_multi.append_key_to_item x, node_id
+        nil
+      end
+
+      def add_metakeyed_key_notify node_id, mk_x, x
+        @box_multi.add_metakeyed_key_to_item mk_x, x, node_id
+      end
+
+      def add_metakey_to_existing_key_notify node_id, mk_x, x
+        @box_multi.add_metakey_to_existing_key_of_item mk_x, x, node_id
+      end
+
+      def merge_keys_notify node_id, keys
+        @box_multi.merge_keyset_to_item keys, node_id
+      end
+
+      def fetch_isomorphic_key_with_metakey_notify node_id, mk_x, blk
+        @box_multi.with_metakey_fetch_node_key mk_x, node_id, &blk
+      end
+
+      #  ~ facet specific: merging (post-order, covered) ~
+
+      def destructive_merge otr, *a
+        Tree::Merge_[
+          :client, self,
+          :key_proc, -> node do
+             node.last_isomorphic_key
+           end,
+          :other, otr, *a ]
+      end
+
+      def merge_attr_a
+        self.class::MERGE_ATTR_A_  # #inherit-ok
+      end
+
+      MERGE_ATTR_A_ = [ :children, :keys ].freeze
+
+      def destructive_merge_children_notify other, algo
+        Tree::Merge_::Destructive_merge_children_[ self, other, algo ]
+        nil
+      end
+
+      def destructive_merge_keys_notify otr, algo
+        ks = otr.detach_and_release_keyset
+        @name_services.merge_keys_notify @node_id, ks
+      end
+
+      # #hacks-only -
+      def _node_id ; @node_id end
+      def _bm ; @box_multi end
+      def _isomorphic_key_a
+        @name_services._fetch_key_a @node_id
+      end
+      alias_method :_iks, :_isomorphic_key_a
+
+      def transplant_notify_and_release_keyset new_id, new_name_services
+        ks = @name_services.detach_and_release_keyset_notify @node_id
+        @node_id = new_id ; @name_services = new_name_services
+        ks
+      end
+
+      # #hacks-only - from another mother
+      def multibox_ownership_transfer_notify wat
+        @name_services = wat
+        nil
       end
     end
-    def text root, opts=nil, &block
-      enum = lines(root, opts)
-      if block_given?
-        enum.each(&block)
-      else
-        ::StringIO.new.tap { |o| enum.each { |s| o.puts(s) } }.string
-      end
+
+    class Node_
+      extend ModuleMethods
+      include InstanceMethods
     end
   end
 end

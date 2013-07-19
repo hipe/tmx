@@ -7,7 +7,7 @@ module Skylab
 
   module Porcelain
 
-    %i| Headless MetaHell PubSub |.each do |i|
+    %i| Headless MetaHell Porcelain PubSub |.each do |i|
       const_set i, ::Skylab.const_get( i, false )
     end
 

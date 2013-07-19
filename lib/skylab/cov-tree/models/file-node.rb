@@ -1,75 +1,92 @@
 module Skylab::CovTree
 
+  class Models::FileNode
 
-  class Models::FileNode < ::Struct.new :isomorphic_slugs, :types, :children
-                                                                # (biggest last)
-    extend  Porcelain::Tree::Node::ModuleMethods
-    include Porcelain::Tree::Node::InstanceMethods
+    extend  Porcelain::Tree::ModuleMethods
 
-    def children
-      super or self.children = Porcelain::Tree::Children.new
+    include Porcelain::Tree::InstanceMethods
+
+    def initialize( * )
+      super
+      @tag_a = [ ]
+      nil
     end
 
-    def children_length
-      children.length
+    attr_reader :tag_a
+
+    def has_tag x
+      @tag_a.include? x
     end
 
-    def isomorphic_slugs
-      super or self.isomorphic_slugs = []
+    def type= i
+      @tag_a.length.zero? or fail '`type` is write once'
+      @tag_a[ 0 ] = i
+      index_self
+      i
     end
 
-    attr_accessor :slug_dirname
-
-    def type= t
-      0 == types.length or fail 'types is clobberproof'
-      types[0] = t
-      isomorphic_slugs.length > 0 and isomorphs!
-      t
+    def slug= x
+      has_slug and fail "sanity - slug collision"
+      prepend_isomorphic_key x
+      x
     end
 
-    def types
-      super or self.types = []
+    def destructive_merge_tag_a_notify otr, algo
+      tag_a = otr.release_tag_a
+      new_tag_a = algo.merge_union @tag_a, tag_a
+      @tag_a = new_tag_a
+      nil
     end
 
+    def release_tag_a
+      r = @tag_a ; @tag_a = nil ; r
+    end
+
+    def squash_only_child
+      child = @box_multi.fetch_only_item
+      destructive_merge child
+      nil
+    end
 
   protected
 
-    test_basename_rx = CovTree::FUN.test_basename_rx
+    def transplant_box_multi_ownership_to otr
+      r = @box_multi ; @box_multi = false ; @name_services = false
+      r.ownership_transplant_notify otr
+      r
+    end
 
-    define_method :isomorphs! do
-      if ! has_children and 1 == types.length and 1 == isomorphic_slugs.length
-        case types.first
-        when :test
-          md = slug.match test_basename_rx
-          if md
-            isomorphic_slugs.push "#{ md.captures.detect { |x| x } }.rb"
-          end
-        when :code
-          # going the other direction would be too computationally annoying
-        else
-          fail 'sanity'
-        end
-      else
-        fail "hory sheet wat to do here?"
+  private
+
+    MERGE_ATTR_A_ = ( MERGE_ATTR_A_ + [ :tag_a ] ).freeze
+
+    Corresponding_business_filename_ = -> test_filename do
+      # (to go in the other direction - to detect a corresponding test file
+      # for a given business file, would be annoying and require filesystem
+      # hits - the transformation we do above is a deterministic one-way
+      # lossy one.)
+      if (( md = PATH.test_basename_rx.match test_filename ))
+        "#{ md.captures.detect( & MetaHell::IDENTITY_ )}#{
+          }#{ Autoloader::EXTNAME }"
       end
     end
 
-
-    merge_attributes = [:root, :types, :isomorphic_slugs].freeze
-
-    define_method :merge_attributes do
-      merge_attributes
-    end
-
-
-    attr_accessor :root
-    alias_method :root?, :root
-
-
-    def slug= s
-      super s
-      types.length > 0 and isomorphs!
-      s
+    def index_self
+      if has_tag :test
+        if ! has_slug
+          append_isomorphic_key '<ROOT>'
+        else
+          # (it would be nice if we could just check has_children but we aren't finished building yet..)
+          if (( file = Corresponding_business_filename_[ slug ] ))
+            # corresponding codefile
+            add_isomorphic_key_with_metakey file, :codeish
+          else
+            # you look like not a test file so we assume you are a directory -
+            # your c-odeish key is the same as your not codeish key:
+            # (we used to add a metakey but no need for folders)
+          end
+        end
+      end
     end
   end
 end

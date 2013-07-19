@@ -42,5 +42,11 @@ module Skylab
     def self.Function host, *rest
       self::Function._make_methods host, :public, :method, rest
     end
+
+    Funcy = -> cls do             # a class that is interfaced with like a proc
+      def cls.[] * x_a
+        new( * x_a ).execute
+      end
+    end
   end
 end

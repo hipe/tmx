@@ -171,11 +171,6 @@ module Skylab::Headless
       rs
     end
 
-    o[:stop_rx] = %r{ \A \. | / \z }x          # all pathnames have such a root
-                                               # hackishly (?) used to determine
-    # this for relative or absolute pn's until something better comes along..
-    # maybe `pn == pn.dirname` instead?
-
     FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
 
   end

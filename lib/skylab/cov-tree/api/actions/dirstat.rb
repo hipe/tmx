@@ -156,7 +156,7 @@ module Skylab::CovTree
     # gain 2
     end
 
-    API::FUN.fields[ self, * Money_.parameters.map( & :last ) ]
+    MetaHell::FUN.fields[ self, * Money_.parameters.map( & :last ) ]
 
     def execute
       Money_[ @sin, @sout, @serr, @argv, @program_name ]

@@ -11,23 +11,24 @@ module Skylab::Headless
 
     o = { }
 
-    initial_vowel_rx = /\A[a-e]/i
-
-    all_caps_rx = /\A[A-Z]+\z/
-
     # `an` - crude hack-guess at 'a' vs. 'an'
 
     o[:an] = -> lemma_x, cnt=nil do
-      lemma = lemma_x.to_s
-      if lemma.length.nonzero?
-        res = o[:s][
-          cnt || 1,
-          initial_vowel_rx =~ lemma ? :an : :a
-        ]
-        if res && all_caps_rx =~ lemma
-          res = res.upcase
+      "#{ An_[ lemma_x, cnt ] }#{ lemma_x }" if lemma_x
+    end
+
+    initial_vowel_rx = /\A[aeiou]/i
+
+    all_caps_rx = /\A[A-Z]+\z/
+
+    An_ = o[:an_] = -> lemma_x, cnt=nil do
+      lemma_s = lemma_x.to_s
+      if lemma_s.length.nonzero?
+        r = S_[ cnt || 1, initial_vowel_rx =~ lemma_s ? :an : :a ]
+        if r && all_caps_rx =~ lemma_s
+          r = r.upcase
         end
-        res
+        r
       end
     end
 
@@ -61,7 +62,7 @@ module Skylab::Headless
 
     ( norm = { 0 => 0, 1 => 1 } ).default = 2
 
-    o[:s] = -> a, v=:s do
+    S_ = o[:s] = -> a, v=:s do
       count = ::Numeric === a ? a : a.length  # if float, watch what happens
       zero_one_two = norm[ count ]
       inflected.fetch( v )[ zero_one_two ]
@@ -85,6 +86,7 @@ module Skylab::Headless
       end
     end
 
-    FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
+    FUN = ::Struct.new( * o.keys ).new( * o.values ).freeze
+
   end
 end

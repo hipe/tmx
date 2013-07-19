@@ -136,7 +136,7 @@ module Skylab::Headless::TestSupport::Plugin
       end
 
       it "reflects - `names`" do
-        svcs.names.should eql( [ :c, :d ] )
+        svcs.get_names.should eql( [ :c, :d ] )
       end
     end
 
@@ -400,7 +400,7 @@ module Skylab::Headless::TestSupport::Plugin
       end
 
       it "which gets names through `names`" do
-        M12::X.plugin_story.services_used.names.should eql( [ :a, :b ] )
+        M12::X.plugin_story.services_used.get_names.should eql( [ :a, :b ] )
       end
     end
 
@@ -643,7 +643,7 @@ module Skylab::Headless::TestSupport::Plugin
       end
 
       it "reflects" do
-        plugin_class.plugin_story.eventpoints.names.
+        plugin_class.plugin_story.eventpoints.get_names.
           should eql( [ :zip, :zap ] )
       end
     end

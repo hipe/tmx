@@ -104,9 +104,9 @@ module Skylab::Treemap
           end
         end
         break( res = false ) if ! ok
-        fail "sanity" if 1 != @stack.first.children_length
+        fail "sanity" if 1 != @stack.first.children_count
         @tree = @stack.first.first
-        if 1 == @tree.children_length # prune lone roots
+        if 1 == @tree.children_count # prune lone roots
           @tree = @tree.first
         end
         @stack = nil

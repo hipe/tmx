@@ -2,7 +2,8 @@ require_relative '../test-support'
 require 'skylab/pub-sub/test/test-support'
 
 module Skylab::CovTree::TestSupport::CLI
-  ::Skylab::CovTree::TestSupport[ self ] # #regret
+
+  ::Skylab::CovTree::TestSupport[ self ]  # #regret
 
   module CONSTANTS
     CovTree = ::Skylab::CovTree
