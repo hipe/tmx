@@ -22,15 +22,7 @@ module Skylab::GitViz::API::Model
       o
     end
 
-    def from_files files
-      _root = new
-      files.reduce(new) do |root, native_status_file|
-        root.find!(native_status_file.path.to_s.split(SEPARATOR)) do |node|
-          node.file = native_status_file
-        end
-        root
-      end
-    end
+    # [ `from_files` #tombstone ]
   end
 end
 

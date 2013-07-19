@@ -1,6 +1,6 @@
 module Skylab::CovTree
 
-  class CLI::Actions::Rerun < CLI::Actions::Tree
+  class CLI::Actions::Rerun < CLI::Actions::Cov
 
     @sides = [:all, :rerun] # left one gets the "plus"
 

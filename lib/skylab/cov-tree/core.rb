@@ -1,63 +1,32 @@
 require_relative '..'
-require 'skylab/test-support/core'  # and headless
-require 'skylab/porcelain/core'  # wicked old ways
+require 'skylab/face/core'
+require 'skylab/headless/core'
+require 'skylab/porcelain/core'
 
 module Skylab::CovTree
 
-  Autoloader   = ::Skylab::Autoloader
-  CovTree      = self
-  Headless     = ::Skylab::Headless # NLP::EN::Methods
-  MetaHell     = ::Skylab::MetaHell
-  Porcelain    = ::Skylab::Porcelain # legacy.rb, TiteColor, Tree
-  PubSub       = ::Skylab::PubSub
-  TestSupport  = ::Skylab::TestSupport  # `_spec_rb`
+  ::Skylab::MetaHell::FUN.import[ self, ::Skylab, [
+    :Autoloader,
+    :CovTree,
+    :Headless,  # styles
+    :MetaHell,
+    :Porcelain,  # level-1 is this
+    :PubSub
+  ] ]
 
-  extend MetaHell::Autoloader::Autovivifying::Recursive # we use Svcs now below
+  extend MetaHell::MAARS
 
   module Core
-    extend MetaHell::Autoloader::Autovivifying::Recursive # b/c this file req'd
+    MetaHell::MAARS::Upwards[ self ]
   end
 
-  o = { }
+  DOT_ = '.'.freeze
+  SEP_ = '/'.freeze
 
-  glob_to_rx = o[:glob_to_rx] = -> glob do # a hack
-    scn = CovTree::Services::StringScanner.new glob
-    out = []
-    until scn.eos?
-      if scn.scan(/\*/)
-        out.push '(.*)'
-      elsif s = scn.scan(/[^\*]+/)
-        out.push "(#{ ::Regexp.escape s })"
-      else
-        fail "Unexpected rest of string (don't use '**'): #{ scn.rest.inspect }"
-      end
+  Stop_at_pathname_ = -> do  # #todo
+    rx = %r{\A[./]\z}  # hackishly - for all pn, parent eventually is this
+    -> pn do
+      rx =~ pn.instance_variable_get( :@path )
     end
-    out.join ''
-  end
-
-  srbg = "*#{ TestSupport::FUN._spec_rb[] }"
-
-  globs = o[:globs] = {
-    'features' => '*.feature',
-    'spec'     => srbg,
-    'test'     => srbg
-  }
-
-  o[:stop_rx] = Headless::CLI::PathTools::FUN.stop_rx   # matches root pathnames meh
-
-  o[:test_basename_rx] =
-    %r{ ^ (?: #{ globs.values.uniq.map { |x| glob_to_rx[ x ] }.join '|' } ) $ }x
-
-
-  o[:test_dir_names_moniker] = -> do
-    "[#{ FUN.test_dir_names[] * '|' }]"
-  end
-
-  o[:test_dir_names] = -> do
-    CovTree::Constants::TEST_DIR_NAME_A
-  end
-
-
-  FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
-
+  end.call
 end

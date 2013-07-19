@@ -14,7 +14,7 @@ module Skylab::Treemap
       end
     end
 
-    def children_length
+    def children_count
       @children ? @children.length : 0
     end
 
@@ -23,7 +23,7 @@ module Skylab::Treemap
     end
 
     def has_children
-      children_length.nonzero?
+      children_count.nonzero?
     end
 
     def indent_length

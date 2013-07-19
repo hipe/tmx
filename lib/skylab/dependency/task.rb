@@ -92,11 +92,13 @@ module Skylab::Dependency
     def optimistic_dry_run? ; request[:optimistic_dry_run] end
 
     def _view_tree
-      raise "refactor me (below has moved)"
+      raise "refactor me (below has moved)"  # #todo:before:now
       loc = Porcelain::Tree::Locus.new
       color = ui.out.tty?
-      loc.traverse(self) do |node, meta|
-        ui.out.puts "#{loc.prefix(meta)}#{node.styled_name(:color => color)} (#{node.object_id.to_s(16)})"
+      loc.traverse self do |card|
+        ui.out.puts "#{ loc.prefix card }#{
+          }#{ card.node.styled_name color: color }#{
+          } (#{ card.node.object_id.to_s 16 })"
       end
     end
   end

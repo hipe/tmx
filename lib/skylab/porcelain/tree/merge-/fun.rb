@@ -40,10 +40,15 @@ module Skylab::Porcelain
           merge[ :merge_one_dimensional, x1, x2 ]
         end
 
+        o[:merge_union] = -> x1, x2 do
+          merge[ :merge_union, x1, x2 ]
+        end
+
         class Modus_Operandus_
 
           MetaHell::FUN.fields[ self, :type_ish_i, :match, :dupe,
-                                :merge_atomic, :merge_one_dimensional ]
+                                :merge_atomic, :merge_one_dimensional,
+                                :merge_union ]
 
           class << self ; private :new end
 
@@ -53,7 +58,7 @@ module Skylab::Porcelain
           end
 
           attr_reader :type_ish_i, :match, :dupe, :merge_atomic,
-            :merge_one_dimensional
+            :merge_one_dimensional, :merge_union
 
         end
 
@@ -87,7 +92,7 @@ module Skylab::Porcelain
                :match, -> x { x.nil? },
                :merge_atomic, -> _, mo, y do
                          mo.dupe[ y ]
-               end,
+                       end,
                :dupe, identity
             ],
             o[ :bool,
@@ -120,17 +125,25 @@ module Skylab::Porcelain
             o[ :list,
                :match, -> x do x.respond_to? :each_index end,
                :merge_one_dimensional, -> x, mo, y do
-                         :list == mo.type_ish_i or raise "#{ MC_ }#{
-                           }no strategy yet created for merging a #{
-                           }#{ mo.type_ish_i }into this list."
+                         List_check_[ mo, y ]
                          x + y
-                        end
+                       end,
+               :merge_union, -> x, mo, y do
+                         List_check_[ mo, y ]
+                         x | y
+                       end
             ],
             o[ :no_match,
                :match, -> _ do true end
             ]
           ]
         end.call
+
+        List_check_ =  -> mo, y do
+                         :list == mo.type_ish_i or raise "#{ MC_ }#{
+                         }no strategy yet created for merging a #{
+                         }#{ mo.type_ish_i }into this list."
+                       end
 
         Get_MO_ = -> do
           f_a = MODI_OPERANDI_A_.map do |mo|

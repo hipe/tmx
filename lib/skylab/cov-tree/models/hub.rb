@@ -1,130 +1,158 @@
 module Skylab::CovTree
 
-  class Models::Anchor
+  class Models::Hub
 
-    attr_reader :dir_pathname
+    MetaHell::FUN::Fields_[ :client, self, :method, :absorb,
+     :field_i_a, [ :test_dir_pn, :sub_path_a, :local_test_pathname_ea,
+                   :lister_p, :info_tree_p ] ]
+
+    def initialize *a
+      absorb( *a )
+      @did_show_debubbing_output = false
+      @sub_hub_pn = nil
+    end
+
+    def get_tree_combined
+      prepare
+      code_tree_notify(( c = build_code_tree ))
+      test_tree_notify(( t = build_test_tree c ))
+      if ! @did_show_debubbing_output
+        perform_destructive_merge c, t
+        c
+      end
+    end
+
+  private
+
+    def prepare
+      @did_show_debugging_output = false
+      @lister = @lister_p.call
+    end
+
+    def code_tree_notify t
+      tree_notify :code_tree, t
+    end
+
+    def test_tree_notify t
+      tree_notify :test_tree, t
+    end
+
+    def tree_notify i, t
+      if (( @lister && @lister.do_list_tree( i ) ))
+        @did_show_debubbing_output = true
+        @info_tree_p[ LABEL_H_.fetch( i ), t ]
+      end
+      nil
+    end
+
+    LABEL_H_ = {
+      code_tree: 'code tree',
+      test_tree: 'test tree'
+    }.freeze
+
+    def build_code_tree
+      code_path_a = get_code_path_a
+      ct = Models::FileNode.from :paths, code_path_a,
+        :init_node, -> n { n.type = :code }
+      case ct.children_count
+      when 0
+        ct.slug = '(no code)'
+      when 1
+        ct = ct.fetch_first_child
+      else
+        fail "sanity - not a stem tree?"
+      end
+      ct
+    end
+
+    def get_code_path_a
+      self.class::Code_glob_[ :app_hub_pn, app_hub_pn,
+        :test_dir_pn, @test_dir_pn, :sub_path_a, @sub_path_a ]
+    end
+
+    def app_hub_pn
+      @app_hub_pn ||= @test_dir_pn.dirname
+    end
+
+    def build_test_tree code_tree
+      ct = code_tree
+      test_path_a = get_test_path_a
+      t = Models::FileNode.from :paths, test_path_a,
+        :init_node, -> n { n.type = :test }
+      case t.children_count
+      when 0
+        t.slug = '(no tests)'
+      when 1
+        t = self.class::Test_squash_[
+          :app_hub_pn, app_hub_pn, :test_dir_pn, @test_dir_pn, :tree, t ]
+      else
+        fail "sanity - non-stem tree?"
+      end
+      s = ct.slug
+      if ! t.is_under_isomorphic_key s
+        fail 'where?'  # #todo
+        t.add_isomorphic_key_with_metakey s, :codeish
+          # hack an association of the two trees if necessary
+      end
+      t
+    end
+
+    def get_test_path_a
+      self.class::Test_glob_[
+        @test_dir_pn, @sub_path_a, local_test_pathname_a ]
+    end
+
+    def local_test_pathname_a
+      @local_test_pathname_a ||= @local_test_pathname_ea.to_a.freeze
+    end
+
+    EXTNAME_ = Autoloader::EXTNAME
+
+    def perform_destructive_merge c, t
+      c.destructive_merge t, :key_proc, KEY_PROC_
+      nil
+    end
+
+    KEY_PROC_ = -> n do
+      if ! n.has_tag :test
+        n.slug
+      else
+        slug = n.fetch_isomorphic_key_with_metakey( :codeish ){ }  # tricky point
+        if slug
+          slug
+        else
+          n.slug  # assume node is test subdirectory
+        end
+      end
+    end
+
+  public  #   ~ auxiliary services ~
+
+    def get_sub_hub_pn
+      if @sub_path_a
+        @test_dir_pn.join @sub_path_a.join( SEP_ )
+      else
+        @test_dir_pn
+      end
+    end
+
+    #  ~ dubious services ~
+
+    def path_moniker_stem
+      @test_dir_pn.to_s
+    end
+
+    def _local_test_pathname_a
+      local_test_pathname_a
+    end
 
     def relative_path_to short_pathname
-      res = nil
-      if @sub_path
-        res = [ * @sub_path, short_pathname.to_s ].join '/'
+      if @sub_path_a
+        r = [ * @sub_path_a, short_pathname.to_s ].join SEP_
       else
-        res = short_pathname.to_s
+        r = short_pathname.to_s
       end
-      res
-    end
-
-    def sub_anchor
-      @sub_anchor ||= begin
-        sub_anchor = nil
-        if @sub_path
-          sub_anchor = @dir_pathname.join @sub_path.join( '/' )
-        else
-          sub_anchor = @dir_pathname
-        end
-        sub_anchor
-      end
-    end
-
-    attr_reader :test_file_short_pathnames
-
-    def tree_combined
-      @tree_combined ||= begin
-
-        toc = tree_of_code
-        tot = tree_of_tests
-
-        tree = Models::FileNode.combine toc, tot do |node|
-          # test files "isomorph" to code files with their last slug
-          node.isomorphic_slugs.last
-        end
-
-        tree
-      end
-    end
-
-  protected
-
-    def initialize dir_pathname, sub_path, short_paths
-      @dir_pathname = dir_pathname
-      @sub_anchor = nil
-      @sub_path = sub_path
-      @test_file_short_pathnames = short_paths.to_a
-    end
-
-
-    fun = CovTree::FUN
-    extname = Autoloader::EXTNAME  # '.rb'
-    stop_rx = fun.stop_rx
-
-    define_method :tree_of_code do
-      @tree_of_code ||= begin
-        stop_rx =~ @dir_pathname.to_s and fail "sanity - anchor is '.' or / ?"
-        some_anchor = @dir_pathname.dirname    # the app anchor is the parent
-        if @sub_path                           # of the test dir. jump down
-          some_anchor = some_anchor.join( @sub_path.join '/' ) # with the sub
-        end                                    # path if you've got one.
-
-                                               # find *all* '*.rb' under the
-        glob = "#{ some_anchor }/**/*#{ extname }" # this anchor (maybe app
-        paths = ::Dir[ glob ]                  # anchor maybe app subdir)
-
-        if ! @sub_path                         # Tricky: filter out all the
-          rx = %r{ \A #{ ::Regexp.escape @dir_pathname.to_s } / }x # paths that
-          paths.keep_if { |path| rx !~ path }  # were under the test dir (but
-        end                                    # this is only nec. when no sub-
-                                               # path because test dir itself
-                                               # a sub-path.
-                                               # Make and clean the tree:
-        tree = Models::FileNode.from_paths( paths ) { |n| n.type = :code }
-        case tree.children_length
-        when 0                                 # @_hack = true
-          tree.slug = '(no code)'
-        when 1                                 # slough off the empty root node
-          tree = tree.children.first
-        else
-          fail "sanity - not expecting trees with more than one root"
-        end
-        tree
-      end
-    end
-
-
-    define_method :tree_of_tests do
-      @tree_of_tests ||= begin
-        paths = -> do
-          @sub_anchor || sub_anchor # kick :/
-          @test_file_short_pathnames.map { |pn| @sub_anchor.join( pn ).to_s }
-        end.call
-        tree = Models::FileNode.from_paths( paths ) { |n| n.type = :test }
-        case tree.children_length
-        when 0
-          t.slug = '(no tests)'
-        when 1
-          is_shallow_path = ! (@dir_pathname.to_s.include? tree.path_separator)
-          if is_shallow_path
-            tree.isomorphic_slugs.push '.'
-            anchorpoint = tree
-          else
-            anchorpoint = tree.find @dir_pathname.dirname.to_s
-          end
-          1 == anchorpoint.children_length or fail "sanity"
-          testdir = anchorpoint.children.first
-          anchorpoint.children = testdir.children
-          anchorpoint.isomorphic_slugs[0,0] =
-            [ "#{ anchorpoint.slug }/#{ testdir.slug }" ] # retain old name
-          if ! is_shallow_path                 # *now* we can slough off
-            tree = tree.children.first         # the empty root node
-          end
-        else
-          fail "sanity - not expecting test trees with more than one root"
-        end
-        # hack an association of the two trees if necessary
-        if tree.isomorphic_slugs.last != tree_of_code.slug
-          tree.isomorphic_slugs.push tree_of_code.slug
-        end
-        tree
-      end
+      r
     end
   end
 end

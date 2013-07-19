@@ -17,6 +17,7 @@ module Skylab::Porcelain
         @order_a = [ ]
         @key_to_item = { }
         @item_to_keys = { }
+        @item_to_metakey_to_key = nil
       end
 
       attr_reader :count
@@ -28,7 +29,11 @@ module Skylab::Porcelain
       #  ~ items retrievers ~
 
       def fetch_first_item
-        @item_h.fetch @order_a.fetch( 0 )
+        fetch_item_at_index 0
+      end
+
+      def fetch_item_at_index idx
+        @item_h.fetch @order_a.fetch( idx )
       end
 
       def [] k_x                  # retrieve an item by (one of its) keys
@@ -102,6 +107,10 @@ module Skylab::Porcelain
         @item_to_keys.fetch( item_id )
       end
 
+      def is_item_under_key item_id, key_x
+        (( item_id_ = @key_to_item[ key_x ] )) && item_id_ == item_id
+      end
+
       #  ~ mutators ~
 
       def add item_x
@@ -111,56 +120,185 @@ module Skylab::Porcelain
         item_id
       end
 
-      def delete_and_release_keys_with_item_id item_id
-        oi = @order_a.index item_id
-        it = @item_h[ item_id ]
-        ks = @item_to_keys[ item_id ]
-        ia = ks.map { |k| @key_to_item[ k ] }
-        oi && it && @count.nonzero? or fail "sanity"
-        ia.uniq.length == 1 && ia.first == item_id or fail "sanity"
-        @order_a[ oi ] = nil ; @order_a.compact!
-        @item_h.delete item_id
-        ks = @item_to_keys.delete item_id
-        ks.each { |k| @key_to_item.delete k }
-        @count -= 1
-        ks
-      end
-
       def prepend_key_to_item key_x, item_id
-        get_item_keys( item_id, key_x ).unshift key_x
+        a = _add_key_to_item_and_get_list key_x, item_id
+        a.unshift key_x
         nil
       end
 
       def append_key_to_item key_x, item_id
-        get_item_keys( item_id, key_x ) << key_x
+        a = _add_key_to_item_and_get_list key_x, item_id
+        a << key_x
         nil
       end
 
-      def merge_keys_to_item key_a, item_id
-        a = ( @item_to_keys[ item_id ] ||= [ ] )
-        a.concat( key_a - a )
+      def add_metakeyed_key_to_item metakey_x, key_x, item_id
+        check_item_metakey_collision item_id, metakey_x
+        @item_to_metakey_to_key[ item_id ][ metakey_x ] = key_x
+        append_key_to_item key_x, item_id
         nil
       end
 
-      def delete_by_item_id item_id
-        idx = @order_a.index( item_id ) or raise ::KeyError, "- #{ item_id }"
-        @order_a[ idx ] = nil ; @order_a.compact!
-        @count -= 1
-        @item_h.delete item_id
-        ks = @item_to_keys.delete item_id
-        ks.each do |k|
-          @key_to_item.delete k
+      def add_metakeys_and_key_to_item metakey_a, key_x, item_id
+        append_key_to_item key_x, item_id
+        metakey_a.each do |metakey_x|
+          check_item_metakey_collision item_id, metakey_x
+          @item_to_metakey_to_key[ item_id ][ metakey_x ] = key_x
         end
-        ks
+        nil
+      end
+
+      def merge_metakeys_and_add_key_to_item metakey_a, key_x, item_id
+        append_key_to_item key_x, item_id
+        mk_to_k = item_to_metakey_to_key[ item_id ]
+        metakey_a.each do |metakey_x|
+          if (( kx = mk_to_k[ metakey_x ] ))
+            fail "what: #{ kx } <-> #{ key_x } (#{ metakey_x.inspect })"
+          else
+            mk_to_k[ metakey_x ] = key_x
+          end
+        end
+        nil
+      end
+
+      def add_metakey_to_existing_key_of_item metakey_x, key_x, item_id
+        check_item_metakey_collision item_id, metakey_x
+        check_that_item_is_under_key item_id, key_x
+        @item_to_metakey_to_key[ item_id ][ metakey_x ] = key_x
+        nil
+      end
+
+      def merge_metakeys_to_existing_key_of_item metakey_a, key_x, item_id
+        check_that_item_is_under_key item_id, key_x
+        mk_to_k = item_to_metakey_to_key[ item_id ]
+        metakey_a.each do |metakey_x|
+          if (( kx = mk_to_k[ metakey_x ] ))
+            kx == key_x or fail "merge collision - #{ kx }, #{ key_x }"
+          else
+            mk_to_k[ metakey_x ] = key_x
+          end
+        end
+        nil
+      end
+
+      def _of_interest
+        Of_Interest_[ @order_a, @key_to_item, @item_to_keys, @item_to_metakey_to_key ]
+      end
+
+      Of_Interest_ = ::Struct.new :order_a, :key_to_item, :item_to_keys, :item_to_metakey_to_key
+
+      def with_metakey_fetch_node_key mk_x, node_id, &blk
+        item_to_metakey_to_key[ node_id ].fetch( mk_x, &blk )
       end
 
     private
 
-      def get_item_keys item_id, key_x
+      def check_that_item_is_under_key item_id, key_x
+        @key_to_item[ key_x ] == item_id or fail "no it is not."
+      end
+
+      def check_item_metakey_collision item_id, metakey_x
+        item_to_metakey_to_key[ item_id ].key? metakey_x and
+          fail "metakey collision - #{ metakey_x }"
+      end
+
+      def item_to_metakey_to_key
+        @item_to_metakey_to_key ||= ::Hash.new { |h, node_id| h[node_id] = { } }
+      end
+
+    public
+
+      class Keyset_
+        def initialize key_a, mkey_h
+          @key_a, @mkey_h = key_a, mkey_h
+        end
+        attr_reader :key_a, :mkey_h
+        def _any_multikeys_for key_x
+          if @mkey_h
+            @mkey_rev ||= begin
+              mks = @mkey_h.keys.sort   # eew
+              rev_h = ::Hash.new { |h, k| h[ k ] = [ ] }
+              mks.each do |k|
+                kx = @mkey_h[ k ]
+                rev_h[ kx ] << k
+              end
+              rev_h
+            end
+            @mkey_rev.fetch key_x do end
+          end
+        end
+      end
+
+      def merge_keyset_to_item keys, item_id
+        if keys.key_a  # empty keysets are legit, they appen
+          exist_a = ( @item_to_keys[ item_id ] ||= [ ] )
+          delta_a = keys.key_a - exist_a
+          delta_a.each do |key_x|
+            merge_key_to_item keys._any_multikeys_for( key_x ), key_x, item_id
+          end
+        end
+        nil
+      end
+
+      def merge_key_to_item mkey_a, key_x, item_id
+        if (( item_id_ = @key_to_item[ key_x ] ))
+          if item_id_ == item_id
+            mkey_a and
+              merge_metakeys_to_existing_key_of_item mkey_a, key_x, item_id
+            # ok.
+          else
+            fail "wat do"
+          end
+        elsif mkey_a
+          merge_metakeys_and_add_key_to_item mkey_a, key_x, item_id
+        else
+          @item_h[ item_id ] or fail "huh?"
+          append_key_to_item key_x, item_id
+        end
+        nil
+      end
+      private :merge_key_to_item
+
+      def delete_item_and_release_keyset_for item_id  # item may have no keys
+        oi = @order_a.index item_id
+        it = @item_h[ item_id ]
+        oi && it && @count.nonzero? or fail "sanity"
+        @order_a[ oi ] = nil ; @order_a.compact!
+        @item_h.delete item_id
+        if (( ks = @item_to_keys[ item_id ] ))
+          ia = ks.map { |k| @key_to_item[ k ] }
+          ia.uniq.length == 1 && ia.first == item_id or fail "sanity"
+          @item_to_keys.delete item_id
+          ks.each { |k| @key_to_item.delete k }
+        end
+        @count -= 1
+        mkey_h = ( item_to_metakey_to_key.delete( item_id ) if
+          @item_to_metakey_to_key )
+        Keyset_.new ks, mkey_h
+      end
+
+      def ownership_transplant_notify new_owner
+        @order_a.each do |item_id|
+          item = @item_h.fetch( item_id )
+          item.multibox_ownership_transfer_notify new_owner
+        end
+        nil
+      end
+
+    private
+
+      def _add_key_to_item_and_get_list key_x, item_id
         @item_h.key?( item_id ) or raise ::KeyError, "no item \"#{ item_id }\""
-        @key_to_item.key? key_x and raise ::KeyError, "occupied \"#{ key_x }\""
+        @key_to_item.key? key_x and raise ::KeyError,
+          say_collision( key_x, item_id )
         @key_to_item[ key_x ] = item_id
-        @item_to_keys[ item_id ] ||= [ ]
+        @item_to_keys[ item_id ] ||= [ ]  # IS RESULT
+      end
+
+      def say_collision key_x, item_id
+        "cannot associate key '#{ key_x }' to item with item_id #{ item_id }#{
+          }, that key is already associated with item with item_id #{
+          }#{ @key_to_item[ key_x ] }"
       end
     end
   end

@@ -4,8 +4,14 @@ module Skylab::Snag
     # [#sl-109] class as namespace
   end
 
-  class CLI::ToDo::Tree::Node < Porcelain::Tree::Node
+  class CLI::ToDo::Tree::Node
+
+    extend  Porcelain::Tree::ModuleMethods
+
+    include Porcelain::Tree::InstanceMethods
+
     attr_accessor :todo
+
   end
 
   class CLI::ToDo::Tree
@@ -19,22 +25,22 @@ module Skylab::Snag
     end
 
     tree_lines_producer_basic = -> tree do
-      lines = Porcelain::Tree.lines tree, node_formatter: IDENTITY_
-      enum = ::Enumerator.new do |y|
-        lines.each do |line|
-          if line.node.is_leaf
-            a = [ "#{ line.prefix } #{ line.node.slug }" ]
-            if line.node.todo
-              a.push line.node.todo.full_source_line
+      ea = ::Enumerator.new do |y|
+        trav = Porcelain::Tree::Traversal.new
+        trav.traverse tree do |card|
+          prefix = trav.prefix card
+          if (( n = card.node )).is_leaf
+            a = [ "#{ prefix } #{ n.slug }" ]
+            if n.todo
+              a << n.todo.full_source_line
             end
             y << a.join( ' ' )
           else
-            y << "#{ line.prefix } #{ line.node.slug }"
+            y << "#{ prefix } #{ n.slug }"
           end
         end
-        nil
       end
-      Headless::Services::Producer.new enum
+      Headless::Services::Producer.new ea
     end
 
     fun = Headless::CLI::Pen::FUN
@@ -44,23 +50,24 @@ module Skylab::Snag
 
     tree_lines_producer_pretty = -> tree do
       stylize = fun.stylize # here is where you could un-color it if not tty
-      lines = Porcelain::Tree.lines tree,
-        glyph_set: :wide, # :narrow is fine too ..
-        node_formatter: IDENTITY_
+
+      scn = tree.get_traversal_scanner :glyphset_x, :wide  # :narrow too
 
       cache_a = [ ]
-      lines.each do |line|
-        if line.node.is_branch
-          line_node_slug = stylize[ line.node.slug, * path_style_a ]
+      while (( card = scn.gets ))
+        n = card.node
+        if n.is_branch
+          line_node_slug = stylize[ n.slug, * path_style_a ]
         else
-          line_node_slug = stylize[ line.node.slug, * line_num_style_a ]
+          line_node_slug = stylize[ n.slug, * line_num_style_a ]
         end
-        cache_a << ( row = ["#{ line.prefix } #{ line_node_slug }" ] )
-        row << fun.unstylize[ row[0] ].length
-        if line.node.is_leaf && line.node.todo
-          row << line.node.todo
+        cache_a << (( ro = ["#{ card.prefix[] } #{ line_node_slug }" ] ))
+        ro << fun.unstylize[ ro[0] ].length
+        if n.is_leaf && n.todo
+          ro << n.todo
         end
       end
+
       col_a_width = cache_a.reduce( 0 ) do |m, row|
         m > row[1] ? m : row[1]
       end
@@ -78,18 +85,14 @@ module Skylab::Snag
     end
 
     define_method :render do
-      _root = CLI::ToDo::Tree::Node.new slug: :root
-      tree = @todos.reduce _root do |node, todo|
-        path_a = todo.path.split( '/' ).push todo.line_number_string
-        node.find! path_a do |nd|
-          if nd.is_leaf
-            nd.todo = todo
-          end
-        end
-        node
+      tree = CLI::ToDo::Tree::Node.new
+      @todos.each do |todo|
+        tree.fetch_or_create(
+          :path, ( todo.path.split( '/' ) << todo.line_number_string ),
+          :init_node, -> nod do nod.is_leaf and nod.todo = todo end )
       end
 
-      if 1 == tree.children_length
+      if 1 == tree.children_count
         tree = tree.children.first # comment out and see
       end
 

@@ -1,3 +1,5 @@
+# [#bs-001] 'reaction-to-assembly-language-phase' phase
+
 module Skylab::Git::CLI::Actions::Stash_Untracked
 
   Autoloader = ::Skylab::Autoloader  # (doing these explicitly is actually
@@ -6,9 +8,15 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
   MetaHell = ::Skylab::MetaHell
                                   # (above lines kept for #posterity)
 
+  module Deprecated_
+    define_method :private_attr_reader, & MetaHell::FUN.private_attr_reader
+    define_method :private_attr_accessor, & MetaHell::FUN.private_attr_accessor
+  end
+
   extend Autoloader               # for our one other file..
 
   module SubClient_InstanceMethods
+
     include Headless::SubClient::InstanceMethods
 
     # (no public methods defined in this module)
@@ -55,6 +63,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
   end
 
   module PathInfo_InstanceMethods
+    extend Deprecated_
 
   protected
 
@@ -707,7 +716,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
 
     def filenames verbose
-     ::Enumerator.new do |o|
+      ::Enumerator.new do |o|
         cmd = "cd #{ shellesc pathname }; find . -type f"
         info( cmd ) if verbose
         Git::Services::Open3.popen3( cmd ) do |_, sout, serr|

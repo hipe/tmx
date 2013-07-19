@@ -21,7 +21,7 @@ module Skylab::Headless
 
     all_caps_rx = /\A[A-Z]+\z/
 
-    An_ = -> lemma_x, cnt=nil do
+    An_ = o[:an_] = -> lemma_x, cnt=nil do
       lemma_s = lemma_x.to_s
       if lemma_s.length.nonzero?
         r = S_[ cnt || 1, initial_vowel_rx =~ lemma_s ? :an : :a ]
@@ -86,6 +86,7 @@ module Skylab::Headless
       end
     end
 
-    FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
+    FUN = ::Struct.new( * o.keys ).new( * o.values ).freeze
+
   end
 end

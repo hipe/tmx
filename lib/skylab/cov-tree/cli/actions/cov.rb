@@ -1,108 +1,120 @@
+# [#bs-001]  # post-assembly-language-phase-phase
+
 module Skylab::CovTree
 
-  class CLI::Actions::Tree < CLI::Action
+  class CLI::Actions::Cov < CLI::Action
 
-    @sides = [:test, :code] # order matters, left one gets the "plus"
+    SIDE_A = [ :test, :code ].freeze
 
-    @colors = {
-      [:branch].to_set      => :white,
-      [:test, :code].to_set => :green,
-      [:test].to_set        => :cyan,
-      [:code].to_set        => :red,
-    }
+    COLOR_H = {
+      [ :branch ].to_set      => :white,
+      [ :code, :test ].to_set => :green,  # order matters, see comment below
+      [ :test ].to_set        => :cyan,
+      [ :code ].to_set        => :red,
+    }.tap { |h| h.values.map( & :freeze ) ; h.freeze }
 
-    params = ::Struct.new :list_as, :path, :verbose
+    # order matters above - since test nodes get merged destructively into
+    # code nodes, the order is as such and never the reverse.
 
+    MetaHell::FUN::Fields_[ :client, self, :method, :absorb_params,
+      :field_i_a, [ :list_as, :path, :be_verbose ] ]
 
-    define_method :subinvoke do |params_h|     # quintessence of headless-like
-                                               # pattern (hopefully), all
-                                               # unpacked:
-
-      p = params.new                           # we validate and internalize
-      params_h.each { |k, v| p[k] = v }        # the params, turning them
-      @list_as = p[:list_as]                   # into ivars or getters or w/e
-      @path = p[:path]                         # and maybe defaults and
-      @verbose = p[:verbose]                   # validation whatever
-
-      k = CovTree::API::Actions.const_fetch local_normal_name # then we build the
-      o = k.new self                           # corresponding API action,
-                                               # with self as its request_client
-
-      o.on_error { |e| error e }               # then for this particular action
-                                               # we do lots of crazy
-      o.on_info { |e| info e }                 # cockameme wiring ..
-
-      case list_as
-      when :tree
-        o.on_anchor_point do |ap|
-          payload "#{ ap.dir_pathname }/"
+    def invoke param_h
+      absorb_params( * param_h.flatten )
+      o = CovTree::API::Actions.const_fetch( local_normal_name ).new self
+      o.on_error method( :error )
+      o.on_info method( :info )
+      o.prepare :list_as, @list_as, :path, @path, :be_verbose, @be_verbose
+      r = false
+      begin
+        @error_count.zero? or break
+        if (( i = o.get_mutex_list_as ))
+          @card_a = nil
+          send LIST_AS_H_.fetch( i ), o
+        else
+          wire_to_render_trees o
         end
-        o.on_test_file do |e|
-          test_file_relative_pathname =
-            e.anchor.relative_path_to e.short_pathname
-          payload "  #{ test_file_relative_pathname }" # indented with '  '
+        r = o.execute or break
+        r = if @card_a.nil? then true
+        elsif @card_a.length.nonzero?
+          r = render_tree_lines
         end
-
-      when :list
-        o.on_test_file do |e|
-          full_pathname = e.anchor.sub_anchor.join e.short_pathname
-          payload "#{ full_pathname }"         # (why use escape_path? it
-        end                                    # looks fine just to use the path
-      end                                      # header that the user provided.)
-
-      if list_as
-        o.on_number_of_test_files do |num|
-          info "(#{ num } test file#{ s num } total)"
-        end
-      end
-
-      tree_lines = [ ]
-
-      o.on_tree_line_meta do |e|
-        tree_lines.push e
-      end
-
-                                               # now that it is all wired,
-      res = o.invoke list_as: list_as,         # we invoke it, passing
-        path: path, verbose: verbose           # it the appropriate params
-
-      if ! tree_lines.empty?
-        res = render_tree_lines tree_lines
-      end
-
-      res
+      end while nil
+      r
     end
 
-  protected
+    LIST_AS_H_ = {
+      list: :list_as_list,
+      test_tree_shallow: :list_as_test_tree_shallow
+    }.freeze
 
-    attr_accessor :list_as
+  private
 
-    attr_accessor :path
+    def list_as_list o
+      o.on_test_file do |e|
+        full_pathname = e.hub.get_sub_hub_pn.join e.short_pathname
+        payload "#{ full_pathname }"           # (why use escape_path? it
+      end                                      # looks fine just to use the path
+      show_number o                            # header that the user provided.)
+      nil
+    end
 
-    def prerender_tree_line d
-      n = d[:node]
-      a, b = self.class.sides.map { |s| n.types.include? s }
+    def list_as_test_tree_shallow o
+      o.on_hub_point do |ap|
+        payload "#{ ap.path_moniker_stem }/"
+      end
+      o.on_test_file do |e|
+        test_file_relative_pathname =
+          e.hub.relative_path_to e.short_pathname
+        payload "  #{ test_file_relative_pathname }"  # indented with '  '
+      end
+      show_number o
+      nil
+    end
+
+    def show_number o
+      o.on_number_of_test_files do |num|
+        info "(#{ num } test file#{ s num } total)"
+      end
+    end
+
+    def wire_to_render_trees o
+      o.on_info_tree do |st|
+        @infostream.puts "#{ em "#{ st.label }:" }"
+        @infostream.puts st.tree.to_text
+        nil
+      end
+      card_a = [ ]
+      o.on_tree_line_card( & card_a.method( :<< ) )
+      @card_a = card_a
+      nil
+    end
+
+    BRANCH_A = [ :branch ].freeze
+
+    def prerender_tree_line card
+      n = card.node
+      a, b = self.class.side_a.map { |s| n.tag_a.include? s }
       indicator = "[#{a ? '+':' '}|#{b ? '-':' '}]"
-      use_types = n.is_leaf ? n.types : [:branch]
-      color = self.class.color use_types
+      use_types = n.is_leaf ? n.tag_a : BRANCH_A
+      color = self.class.lookup_color_for_tag_a use_types
       indicator = send(color, indicator) if color
-      use_slugs = if 2 > n.isomorphic_slugs.length then n.isomorphic_slugs
-                  elsif 1 < n.types.length         then n.isomorphic_slugs
-                  else # n.types size is zero or one, in such cases we only
-                    # want the main slug, not the isomorphic slugs
-                    [n.slug] # (whose files don't exist)
-                  end
-      slug = use_slugs.join ', '
-      dn = n.slug_dirname
-      if dn
-        a, b = use_slugs.length > 1 ? ['{', '}'] : ['', '']
-        slug = "#{ dn }#{ n.path_separator }#{ a }#{ slug }#{ b }"
+      if 1 < n.tag_a.length
+        case (( a = n._isomorphic_key_a )).length
+        when 0, 1, 2
+          slug_s = a * ', '
+        else
+          slug_s = "#{ a.first }, #{ a.last }"
+        end
+      else
+        slug_s = n.slug
       end
-      ["#{ d[:prefix] }#{ slug }", indicator] # careful! escape codes have width
+      [ "#{ card.prefix }#{ slug_s }", indicator ]  # (escape codes have width)
     end
 
-    def render_tree_lines events
-      matrix = events.map { |e| prerender_tree_line e }
+    def render_tree_lines
+      event_a = @card_a
+      matrix = event_a.map( & method( :prerender_tree_line ) )
       max = matrix.reduce( 0 ) { |m, x| (y = x.first.length) > m ? y : m }
       fmt = "%-#{ max }s  %s"
       matrix.each do |a|
@@ -110,20 +122,21 @@ module Skylab::CovTree
       end
       true
     end
-
-    attr_reader :verbose
   end
 
+  class << CLI::Actions::Cov
 
-
-  class << CLI::Actions::Tree
-
-    attr_reader :colors
-
-    def color types
-      @colors[types.to_set] # nil ok
+    def color_h
+      self::COLOR_H
     end
 
-    attr_reader :sides
+    def lookup_color_for_tag_a tag_a
+      as_set = tag_a.to_set
+      color_h.fetch( as_set ) { }
+    end
+
+    def side_a
+      self::SIDE_A
+    end
   end
 end

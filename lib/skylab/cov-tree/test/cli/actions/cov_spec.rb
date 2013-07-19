@@ -1,9 +1,25 @@
 # encoding: utf-8
-require_relative '../test-support'
 
-module Skylab  # [#ts-010]
-# ..
-describe "#{ CovTree } CLI action: tree" do  # Quickie maybe..
+require_relative 'test-support'
+
+module Skylab::CovTree::TestSupport::CLI::Actions::Cov
+
+  ::Skylab::CovTree::TestSupport::CLI::Actions[ self ]
+
+  include CONSTANTS
+
+  CMD_ = 'cov'.freeze
+
+  RELATIVE_TESTDIR_NO_DOT_ = 'cov-tree/test'
+
+  Abs_testdir_ = -> do
+    CovTree.dir_pathname.join( 'test' ).to_s
+  end
+
+  # (this used to be home to "dark hack" [#ts-010] but we modernized it)
+
+# lose indent 1x
+describe "#{ CovTree } CLI action: tree" do   # Quickie compatible !
 
   extend CovTree::TestSupport::CLI
 
@@ -20,7 +36,7 @@ describe "#{ CovTree } CLI action: tree" do  # Quickie maybe..
 
   it "show a list of matched test files only." do
     cd CovTree.dir_pathname.dirname do         # cd to lib/skylab ..
-      argv 'tree', '-l', './cov-tree'          # and ask about this subproduct
+      argv CMD_, '-l', './cov-tree/test'       # and ask about this subproduct
     end                                        # itself. (yes this is a self-
                                                # referential test ^_^)
                                                # each one of the returned
@@ -39,7 +55,7 @@ describe "#{ CovTree } CLI action: tree" do  # Quickie maybe..
   end
 
   it "show a shallow tree of matched test files only." do
-    argv 'tree', '-t', CovTree.dir_pathname.to_s
+    argv CMD_, '-s', Abs_testdir_[]
     while e = emission_a.shift
       if :payload == e.stream_name
         if /\A[^ ]/ =~ text[ e ]
@@ -55,27 +71,46 @@ describe "#{ CovTree } CLI action: tree" do  # Quickie maybe..
   end
 
   it "Couldn't find test directory: foo/bar/[test|spec|features]" do
-    argv 'tree', CovTree.dir_pathname.join('models').to_s
+    argv CMD_, CovTree.dir_pathname.join('models').to_s
     line.should match(/\ACouldn't find test directory.+\[test\|spec\|features/)
     result.should eql( 1 )
   end
 
+  FIXTRS_ = CovTree.dir_pathname.join( 'test-fixtures' )
+
+  context "basic" do
+
+    it "one" do
+      cd FIXTRS_.to_s do
+        argv CMD_, 'one'
+      end
+      line = shift_raw_line
+      line.should match( /\Aone, test[ ]+\e\[#{ WHITE_ }m\[\+\|-\]\e\[0m\z/ )
+      line = shift_raw_line
+      line.should eql( " └foo.rb, foo_spec.rb  \e[#{ GREEN_ }m[+|-]\e[0m" )
+    end
+
+    WHITE_ = 37 ; GREEN_ = 32
+
+    def shift_raw_line
+      @emit_spy.emission_a.shift.payload_x
+    end
+  end
 
   it "LOOK AT THAT BEAUTIFUL COV TREE" do
     cd CovTree.dir_pathname.dirname.to_s do
-      argv 'tree', 'cov-tree'
+      argv CMD_, RELATIVE_TESTDIR_NO_DOT_
     end
-    line.should match(/\Acov-tree, cov-tree\/test +\[\+\|-\]\z/)
+    line.should match(/\Acov-tree, (?:cov-tree\/)?test +\[\+\|-\]\z/)
     line.should match(/\A ├api +\[ \|-\]\z/)
     l = line
     loop do
-      l.include? 'tree_spec.rb' and break
+      l.include? 'cov_spec.rb' and break
       l = line or fail("didn't find tree_spec.rb anywhere in tree")
     end
-    l.should eql( ' │ │ └tree.rb, tree_spec.rb  [+|-]' ) # we hate happiness
-    names.uniq.should eql([:payload])
+    names.uniq.should eql( [ :payload ] )
     result.should eql( 0 )
   end
 end
-# ..
+# gain indent 1x
 end

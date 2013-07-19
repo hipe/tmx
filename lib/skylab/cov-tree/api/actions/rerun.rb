@@ -1,16 +1,18 @@
+fail 'not on your life'  # #todo
+
 module Skylab::CovTree
 
-  class API::Actions::Rerun < API::Actions::Tree
+  class API::Actions::Rerun < API::Actions::Cov
 
     attr_writer :rerun
 
-
-    fun = CovTree::FUN
-    globs = fun.globs
+    glob_h = CovTree::PATH.glob_h
 
     define_method :tree_to_render do
       rerun_ = rerun_file_paths or return false
-      rerun = Node.from_paths(rerun_){ |n| n[:type] = :rerun }
+
+      rerun = Node.from :paths, rerun_, :init_node, -> n { n.type = :rerun }
+
       path = rerun.longest_common_base_path or begin
         return error("Sorry, the test files must share a single common base path for now. " <<
                      "(had: #{rerun.children.map(&:key).join(', ')})")
@@ -19,15 +21,17 @@ module Skylab::CovTree
       dir.exist? or
         return error("Sorry, expecting directory to exist: #{dir}")
 
-      glob = globs[path.first] or
+      glob = glob_h[path.first] or
         return error("Sorry, expecting beginning of test path (#{path.first})" <<
                      " to be one of: (#{GLOB.keys.join(', ')})")
 
       all_ = Dir[dir.join('**').join(glob)]
-      all = Node.from_paths(all_) { |n| n[:type] = :all }
 
-      both = Node.combine([all, rerun])
-      both[:slug] ||= '.' # avoid warning about unable to make slug
+      all = Node.from :paths, all_, :init_noe, -> n { n.type = :all }
+
+      both = Node.combine :nodes, [ all, rerun ]
+
+      both[:slug] ||= DOT_  # avoid warning about unable to make slug
       both
     end
 

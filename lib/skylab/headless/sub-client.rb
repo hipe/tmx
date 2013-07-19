@@ -53,7 +53,7 @@ module Skylab::Headless
       request_client.send :actual_parameters
     end
 
-    def emit *a                   # (don't get into the habbit of expecting
+    def emit *a                   # (don't get into the habit of expecting
       request_client.send :emit, *a # meaninful results from `emit` --
       nil                         # it's just never a good idea.  ever.)
     end
@@ -137,10 +137,12 @@ module Skylab::Headless
 
     bump_numerish = fun = nil
 
-    o[:an] = -> lemma, numerish=false do
-      instance_exec numerish, -> nmrsh do
-        fun[].an[ lemma, nmrsh ]
-      end, & bump_numerish
+    %i| an an_ |.each do |i|
+      o[ i ] = -> lemma, numerish=false do
+        instance_exec numerish, -> nmrsh do
+          fun[][ i ][ lemma, nmrsh ]
+        end, & bump_numerish
+      end
     end
 
     o[:_non_one] = -> numerish=nil do  # for nlp hacks, leading space iff not 1

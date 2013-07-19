@@ -63,9 +63,11 @@ describe "#{ ::Skylab::CovTree } CLI" do
     result.should eql( 1 )
   end
 
+  _CMD = 'cov'
+
   it "2.2 : `-h rec`       : 1) usage 2) desc 3) opts" do
-    argv '-h', 'tree'
-    line.should match(/\Ausage: cov-tree tree/i)
+    argv '-h', _CMD
+    line.should match(/\Ausage: cov-tree #{ _CMD }/i)
     line.should match( /^$/ )
     line.should match(/\Adescription:?\z/i)
     line.should match(/\A *see crude/i)
@@ -83,7 +85,7 @@ describe "#{ ::Skylab::CovTree } CLI" do
   end
 
   it "2.3 : `-h rec more`  : msg / usage / invite" do
-    argv '-h', 'tree', 'wat'
+    argv '-h', _CMD, 'wat'
     line.should match( /\bignoring: "wat"/ )
     line.should match( /\Ausage: cov-tree / )
     # ..meh

@@ -21,7 +21,7 @@ module Skylab::TestSupport::Regret::CLI
       o.on '-t', '--template-option <x>', 'template option (try "help")' do |x|
         ( @param_h[:template_options] ||= [ ] ) << x
       end
-      o.on '-v', '--verbose', 'verbose. (try mutliple.)', & verbosity_opt_func
+      o.on '-v', '--verbose', 'verbose. (try multiple.)', & verbosity_opt_func
       o.on '-V', '--less-verbose', 'reduce verbosity.', &
         deincrement_verbosity_opt_func
 

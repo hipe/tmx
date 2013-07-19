@@ -8,13 +8,13 @@ module Skylab::Porcelain
 
       def execute
         @attr_a ||= @client.merge_attr_a
-        work @client, @other
+        descend @client, @other
         nil
       end
 
       attr_reader :key_proc
 
-      def work client, other
+      def descend client, other
         @attr_a.each do |attr_i|
           client.send METH_H_[ attr_i ], other, self
         end
@@ -67,7 +67,7 @@ module Skylab::Porcelain
           key = keyp[ remote_child ]
           if (( local_id = use_h[ key ] ))
             local_child = bm.fetch_item_by_id local_id
-            Destructive_merge_children_[ local_child, remote_child, algo ]
+            algo.descend local_child, remote_child
           else
             Into_parent_transplant_child_[ local, remote_child ]
           end
@@ -94,15 +94,21 @@ module Skylab::Porcelain
         bm = local_parent._bm
         lka = bm.keys
         rka = remote_child._isomorphic_key_a
-        (( int = lka & rka )).length.nonzero? and raise "merge conflict -#{
-          } remote child to be transplanted in has same keys as existin #{
-          } child in local node - (#{ int * ', ' })"
+        (( int = lka & rka )).length.nonzero? and raise "merge conflict - #{
+          }remote child to be transplanted in has same keys as existing #{
+          }child in local node - (#{ int * ', ' })"
         new_remote_id = bm.add remote_child
-        rka_ = remote_child.
-          transplant_notify_and_release_keys new_remote_id, local_parent
-        rka_.object_id == rka.object_id or fail "sanity"
-        bm.merge_keys_to_item rka, new_remote_id
+        ks = remote_child.
+          transplant_notify_and_release_keyset( new_remote_id, local_parent )
+        ks.key_a.object_id == rka.object_id or fail "sanity"
+        bm.merge_keyset_to_item ks, new_remote_id
         nil
+      end
+
+      # ~ services this this provides as an "algorithm" strucure
+
+      def merge_union a1, a2
+        Merge_::FUN.merge_union[ a1, a2 ]
       end
     end
   end

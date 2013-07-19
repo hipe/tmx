@@ -34,29 +34,43 @@ module ::Skylab::Porcelain
       end
     end
 
-  protected
+  private
 
     def normalize_glyphset
-      if @glyphset_x.respond_to? :id2name
-        @glyphset_x = Headless::CLI::Tree::Glyph::Sets.
-          const_fetch @glyphset_x
+      Normalize_and_absorb_glyphset_x[ self ]
+    end
+
+    Normalize_and_absorb_glyphset_x = -> client do
+      client.instance_exec do
+        gs = @glyphset_x
+        x = Resolve_glyphset_[ gs ] and @glyphset_x = gs = x
+        Absorb_glyphs_into_ivars_[ self, gs ]
       end
-      safe_name_p = get_safe_name_p
-      @glyphset_x.each do |i, x|
-        safe_name_p[ i ] or raise ::NameError, "bad glyph name - #{ i }"
-        instance_variable_set :"@#{ i }", x
+    end
+
+    Resolve_glyphset_ = -> x do
+      if x.respond_to? :id2name
+        Headless::CLI::Tree::Glyph::Sets.const_fetch x
+      end
+    end
+
+    Absorb_glyphs_into_ivars_ = -> client, gs do
+      client.instance_exec do
+        safe_name_p = Get_safe_glyph_p_[]
+        gs.each do |i, x|
+          safe_name_p[ i ] or raise ::NameError, "bad glyph name - #{ i }"
+          instance_variable_set :"@#{ i }", x
+        end
       end
       nil
     end
 
-    -> do
-      p = nil
-      define_method :get_safe_name_p do
-        p ||= ::Hash[ Headless::CLI::Tree::Glyphs.each.map do |g|
+    Get_safe_glyph_p_ = -> do
+      p = -> do
+        p = ::Hash[ Headless::CLI::Tree::Glyphs.each.map do |g|
           [ g.normalized_glyph_name, true ]
         end ].freeze
       end
-      private :get_safe_name_p
     end.call
 
     def work node, card
@@ -67,7 +81,7 @@ module ::Skylab::Porcelain
         last = node.children_count - 1
         node.children.each_with_index do |child, idx|
           sum += work child,
-            MutableCard_.new( child, @level, idx.nil?, last==idx )
+            MutableCard_.new( child, @level, idx.zero?, last==idx )
         end
         pop
       end
@@ -91,7 +105,7 @@ module ::Skylab::Porcelain
     #  ~ `service` methods called from the outside for rendering ~
 
     def prefix card
-      if card.level  # no card on root node
+      if card.level  # no prefix on root node
         "#{ @prefix_stack_a * '' }#{ card.is_last ? crook : tee }"
       end
     end

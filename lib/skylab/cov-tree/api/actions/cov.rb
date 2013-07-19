@@ -1,238 +1,173 @@
 module Skylab::CovTree
 
-  class API::Actions::Tree < API::Action
+  class API::Actions::Cov < API::Action
 
-    emits    anchor_point: :datapoint,
+    emits       hub_point: :datapoint,
                     error: :datapoint,
                      info: :datapoint,
      number_of_test_files: :datapoint,
                 test_file: :structural,
-           tree_line_meta: :structural
+           tree_line_card: :datapoint,
+                info_tree: :structural
 
-    params = ::Struct.new :list_as, :path, :verbose
 
-    define_method :invoke do |params_h|
-      p = params.new
-      params_h.each { |k, v| p[k] = v }
-      @list_as = p[:list_as] # nil ok
-      self.path = p[:path] || '.'
-      @verbose = p[:verbose]
-      res = nil
-      if last_error_message # #todo vodoo?
-        res = false
-      elsif list_as
-        res = list
-      else
-        res = tree
-      end
-      res
-    end
-
-  protected
+    MetaHell::FUN::Fields_[ :client, self, :method, :absorb, :field_i_a,
+                            [ :list_as, :path, :be_verbose ] ]
 
     def initialize request_client
-      @last_error_message = nil
-      super request_client
+      super
+      @last_error_message = @sub_path_a = @lister = nil
     end
 
-    globs = CovTree::FUN.globs
-
-    define_method :anchors do
-      ::Enumerator.new do |y|
-        test_dirs.each do |dir|
-          baseglob = globs[ dir.basename.to_s ]
-          baseglob or fail "unexepected: #{ dir.basename }"
-          sub_dir = dir
-          if sub_path
-            sub_dir = dir.join( sub_path.join '/' )
-          end
-          glob = sub_dir.join( "**/#{ baseglob }" ).to_s
-          ee = ::Enumerator.new do |yy|
-            ::Dir[ glob ].each do |path|
-              spec_pathname = ::Pathname.new path
-              shortpath = spec_pathname.relative_path_from sub_dir
-              yy << shortpath
-            end
-          end
-          y << CovTree::Models::Anchor.new( dir, sub_path, ee )
-        end
-      end
-    end
-
-    attr_reader :last_error_message
-
-    def list
-      num = 0
-      anchors.each do |anchor|
-        emit :anchor_point, anchor
-        anchor.test_file_short_pathnames.each do |shpn|
-          num += 1
-          emit :test_file, anchor: anchor, short_pathname: shpn
-        end
-      end
-      res = nil
-      if last_error_message
-        res = false
-      else
-        emit :number_of_test_files, num
-        res = true
-      end
-      res
-    end
-
-    attr_accessor :list_as
-
-    strip_trailing_rx = %r{ \A (?<no_trailing> / | .* [^/] ) /* \z }x
-
-    define_method :path= do |x|   # strip trailing slashes from paths.
-      begin                       # allows you to set the path to nil or false,
-        if ! x                    # but fails on the empty string.
-          @pathname = x
-          break
-        end
-        md = strip_trailing_rx.match x.to_s
-        if ! md
-          error "Your path looks funny: #{ x.inspect }"
-          break
-        end
-        @pathname = ::Pathname.new md[:no_trailing]
-      end while nil
-      x
-    end
-
-    attr_reader :pathname
-
-    fun = CovTree::FUN                         # (i anticipate needing to un-
-    test_dir_names = fun.test_dir_names[]      # memoize these things when
-                                               # they become configurable ..)
-
-    soft_rx = %r{(?:#{ test_dir_names.map{ |x| ::Regexp.escape x }.join '|' })}
-    hard_rx = %r{ \A #{ soft_rx.source } \z }x
-    stop_rx = fun.stop_rx
-
-    define_method :pathname_is_subtree_of_test_dir! do # this has side effects..
-      res = nil                                # does our pathname look like
-      begin                                    # it might contain a test-dir
-        soft_rx =~ pathname.to_s or break      # in it? (short-circuiting this
-        current = pathname                     # might be silly)
-        seen = []
-        found = true
-        while stop_rx !~ current.to_s
-          basename = current.basename
-          if hard_rx =~ basename.to_s
-            found = true
-            break
-          end
-          seen.push basename.to_s
-          current = current.dirname
-        end
-        found or break
-        @sub_path = seen.reverse                # (empty iff test dir was first
-        res = current                           # the first one we saw)
-      end while nil
-      res
-    end
-
-    attr_reader :sub_path
-
-    define_method :test_dir_names do
-      test_dir_names
-    end
-
-    def test_dirs                              # result is an enumerator that
-                                               # will enumerate every pathname
-      ::Enumerator.new do |y|                  # that looks like it is a test
-                                               # directory from our `path`
-        begin
-          if ! pathname.exist?
-            error "no such directory: #{ escape_path pathname }"
-            break
-          end
-          if ! pathname.directory?
-            error "single file trees not yet implemented #{
-              }(for #{ escape_path pathname })"
-            break
-          end
-          if test_dir_names.include? pathname.basename.to_s # this pathname
-            y << pathname                      # itself looks like a test dir,
-            break                              # e.g. it is named /foo/bar/test
-          end
-          pathnm = pathname_is_subtree_of_test_dir! # if our pathname is inside
-          if pathnm                            # of what looks like a testdir,
-            y << pathnm                        # e.g. "test/api/actions", then
-            break                              # we do something special..
-          end
-          test_dirs_using_find y               # last resort, use find
-        end while nil
-      end # ::Enumerator.new
-    end
-
-    def test_dirs_using_find y    # Now we can assume we are a directory that
-                                  # itself is not a test directory. So what we
-                                  # want to do is find those nerks! with
-      # a find command (which [#sl-118] might get unified but not today)
-
-      CovTree::Services::Shellwords || nil # ick load it our way
-
-      cmd = -> do
-        ors = test_dir_names.map { |x| "-name #{ x.to_s.shellescape }" }
-        ors = ors.join ' -o '
-        "find #{ pathname.to_s.shellescape } -type dir \\( #{ ors } \\)"
-      end.call
-
-      if verbose
-        emit :info, cmd
-      end
-
-      CovTree::Services::Open3.popen3 cmd do |_, sout, serr|
-        e = serr.read
-        if '' == e
-          sout.each_line do |line|
-            o = ::Pathname.new line.chomp
-            y << o
-          end
-        else
-          error e
-        end
+    def prepare *a
+      absorb( *a )
+      normalize_arg_pn @path
+      if ! @last_error_message && @list_as
+        normalize_list_as
       end
       nil
     end
 
-    def tree
-      res = false
-      begin
-        anchors_a = self.anchors.to_a
-        case anchors_a.length
-        when 0
-          path = pathname.join CovTree::FUN.test_dir_names_moniker[]
-          error "Couldn't find test directory: #{ pre escape_path( path ) }"
-          break
-        when 1
-          uber_tree = anchors_a.first.tree_combined
+    def execute
+      if ! @last_error_message
+        if @list_as
+          r = execute_lister_and_resolve
+          r and r = send( r )  # e.g `tree` - same as below
         else
-          tt = anchors_a.map(& :tree_combined)
-          a = pathname.to_s.split tt.first.path_separator
-          need = a.first
-          tt.each do |t|
-            if t.isomorphic_slugs.last != need
-              t.isomorphic_slugs.push need
-            end
-          end
-          uber_tree = tt.first.class.combine(* tt) do |t|
-            t.isomorphic_slugs.last
-          end
+          r = tree
         end
-        loc = Porcelain::Tree::Locus.new
-        loc.traverse uber_tree do |node, meta|
-          meta[:prefix] = loc.prefix meta
-          meta[:node] = node
-          emit :tree_line_meta, meta
-        end
-        res = true
-      end while nil
-      res
+      end
+      r
     end
 
-    attr_reader :verbose
+    def get_mutex_list_as
+      @lister and @lister.get_mutex_list_as
+    end
+
+  private
+
+    def normalize_arg_pn x
+      use_x = x || ''
+      begin
+        (( md = STRIP_TRAILING_RX_.match use_x )) or break error "your #{
+            }path looks funny - #{ x.inspect }"
+        @arg_pn = ::Pathname.new md[ :no_trailing ]
+      end while nil
+      nil
+    end
+
+    STRIP_TRAILING_RX_ = %r{ \A (?<no_trailing> / | .* [^/] ) /* \z }x
+
+    def normalize_list_as
+      @lister = self.class::Lister_.new :emit_p, method( :emit ),
+        :list_as, @list_as, :hubs, hub_a,
+        :did_error_p, -> { @last_error_message }
+      @lister.normalize
+    end
+
+    def execute_lister_and_resolve
+      @lister.execute_and_resolve
+    end
+
+    def hub_a
+      @hub_a ||= get_hubs.to_a
+    end
+
+    def get_hubs
+      ::Enumerator.new do |y|
+        test_dir_a = test_dirs.to_a
+        test_dir_a.each do |dir|
+          baseglob = GLOB_H_.fetch dir.basename.to_s
+          sub_dir = dir
+          @sub_path_a and sub_dir = dir.join( @sub_path_a * SEP_ )
+          glob = sub_dir.join( "**/#{ baseglob }" ).to_s
+          y << CovTree::Models::Hub.new(
+            :test_dir_pn, dir,
+            :sub_path_a, @sub_path_a,
+            :lister_p, -> { @lister },
+            :info_tree_p, -> label, tree do
+              emit :info_tree, label: label, tree: tree
+            end,
+            :local_test_pathname_ea, ::Enumerator.new do |yy|
+              ::Dir[ glob ].each do |path|
+                spec_pathname = ::Pathname.new path
+                shortpath = spec_pathname.relative_path_from sub_dir
+                yy << shortpath
+              end
+            end )
+          nil
+        end
+        nil
+      end
+    end
+
+    GLOB_H_ = CovTree::PATH.glob_h
+
+    # result is an enumerator over every pathname that looks like it is
+    # a test directory from our `path`
+
+    def test_dirs
+      ::Enumerator.new do |y|
+        begin
+          (( pn = @arg_pn )).exist? or break error "no such #{
+            }directory: #{ escape_path pn }"
+
+          pn.directory? or break error "single file trees not yet #{
+            }implemented (for #{ escape_path pn })"
+
+          TEST_DIR_NAME_A_.include?( pn.basename.to_s ) and break( y << pn )
+            # if pn looks like foo/bar/test then we are done
+
+          (( pn_ = mutate_if_test_subnode )) and break( y << pn_ )
+            # if pn looks like test/cli then
+
+          find_with_find y
+
+        end while nil
+      end
+    end
+
+    TEST_DIR_NAME_A_ = CovTree::Constants::TEST_DIR_NAME_A
+
+    def mutate_if_test_subnode
+      begin
+        SOFT_RX_ =~ @arg_pn.to_s or break    # is test dir in the path?
+        curr = @arg_pn ; seen_a = [ ] ; found = false
+        until Stop_at_pathname_[ curr ]
+          bn = curr.basename
+          HARD_RX_ =~ bn.to_s and break( found = true )  # is the test dir?
+          seen_a << bn.to_s
+          curr = curr.dirname
+        end
+        found or break
+        @sub_path_a and fail "sanity"  # #todo - when?
+        @sub_path_a = seen_a.reverse # empty iff test dir was first dir
+        r = curr
+      end while nil
+      r
+    end
+
+    def find_with_find y
+      self.class::Finder_[ :yielder, y, :error_p, method( :error ),
+        :info_p, -> s { emit :info, s } , :find_in_pn, @arg_pn,
+        :be_verbose, @be_verbose ]
+    end
+
+    SOFT_RX_ = %r{(?:#{
+      TEST_DIR_NAME_A_.map( & ::Regexp.method( :escape ) ) * '|'
+    })}
+
+    HARD_RX_ = %r{ \A #{ SOFT_RX_.source } \z }x
+
+    def tree
+      if hub_a.length.zero?
+        error "Couldn't find test directory: #{ pre escape_path(
+          @arg_pn.join CovTree::PATH.test_dir_names_moniker ) }"
+        false
+      else
+        self.class::Treeer_[ :hub_a, hub_a, :arg_pn, @arg_pn,
+          :card_p, -> card { emit :tree_line_card, card } ]
+      end
+    end
   end
 end

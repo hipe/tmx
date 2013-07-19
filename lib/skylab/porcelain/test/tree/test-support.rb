@@ -9,3 +9,18 @@ module Skylab::Porcelain::TestNamespace
   extend ::Skylab::TestSupport::Quickie
 
 end
+
+module Skylab::Porcelain::TestSupport
+end
+
+module Skylab::Porcelain::TestSupport::Tree
+
+  ::Skylab::TestSupport::Regret[ self ]
+
+  module CONSTANTS
+    TestSupport = ::Skylab::TestSupport
+    Porcelain = ::Skylab::Porcelain
+    Tree = Porcelain::Tree
+  end
+
+end
