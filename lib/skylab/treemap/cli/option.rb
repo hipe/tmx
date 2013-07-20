@@ -159,7 +159,7 @@ module Skylab::Treemap
       nil
     end
 
-    attr_reader :switch  # #experimental - watch for smells!
+    attr_accessor :switch  # #experimental - watch for smells!
 
     def takes_no
       @no_part
@@ -179,7 +179,7 @@ module Skylab::Treemap
       render_long_no_no || render_short
     end
 
-  protected
+  private
 
     alias_method :initialize, :set # expand if needed
 
@@ -253,7 +253,5 @@ module Skylab::Treemap
       end
       [ res, knock ]
     end
-
-    attr_writer :switch  # experimental - watch for smells
   end
 end

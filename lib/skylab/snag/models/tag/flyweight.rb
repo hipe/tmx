@@ -31,7 +31,7 @@ module Skylab::Snag
       nil
     end
 
-  protected
+  private
 
     def initialize node_body_string
       @node_body_string = node_body_string

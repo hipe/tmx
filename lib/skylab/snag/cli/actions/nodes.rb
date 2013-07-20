@@ -22,7 +22,7 @@ module Skylab::Snag
                  be_verbose: false,
                     dry_run: false,
                     message: message,
-      }.merge( param_h ) ) do |a|
+      }.merge( @param_h ) ) do |a|
         a.on_error handle_error
         a.on_info handle_info
         a.on_raw_info handle_raw_info
@@ -43,7 +43,7 @@ module Skylab::Snag
     option_parser do |o|
 
       o.on '-a', '--all', 'show all (even invalid) issues' do
-        param_h[:include_all] = true
+        @param_h[:include_all] = true
       end
 
       o.regexp_replace_tokens %r(^-(?<num>\d+)$) do |md|   # replace -1, -2 etc
@@ -52,16 +52,16 @@ module Skylab::Snag
                                                            # (AMAZING HACK)
       o.on '-n', '--max-count <num>',
         "limit output to N nodes (also -<n>)" do |n|
-        param_h[:max_count] = n
+        @param_h[:max_count] = n
       end
 
       o.on '-v', '--[no-]verbose',
         "`verbose` means yml-like output (default: verbose)" do |v|
-        param_h[:be_verbose] = v
+        @param_h[:be_verbose] = v
       end
 
       o.on '-V', '(same as `--no-verbose`)' do
-        param_h[:be_verbose] = false
+        @param_h[:be_verbose] = false
       end
     end
 
@@ -72,7 +72,7 @@ module Skylab::Snag
     def list identifier_ref=nil
       api_invoke( [ :nodes, :reduce ],
         {     be_verbose: true,
-          identifier_ref: identifier_ref }.merge!( param_h ) ) do |a|
+          identifier_ref: identifier_ref }.merge!( @param_h ) ) do |a|
         a.on_output_line handle_payload
         a.on_info        handle_info
         a.on_error       handle_error

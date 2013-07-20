@@ -18,7 +18,7 @@ module Skylab::Treemap
       @legacy_proxy ||= build_legacy_proxy
     end
 
-  protected
+  private
 
     def initialize mc, adapter_a, name_func
       init_treemap_sub_client -> { mc }

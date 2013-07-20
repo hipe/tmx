@@ -33,7 +33,7 @@ module Skylab::Treemap
       super
     end
 
-  protected
+  private
 
     def initialize mc
       super nil  # init the box, by way of h.l s.c
@@ -107,7 +107,7 @@ module Skylab::Treemap
       @name.local_normal
     end
 
-  protected
+  private
 
     def initialize rc, const, nf=nil
       init_treemap_sub_client( rc.respond_to?(:call) ? rc : -> { rc } )

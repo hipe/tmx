@@ -36,7 +36,7 @@ module Skylab::Snag
       true
     end
 
-  protected
+  private
 
     def initialize body_string
       @fly = Snag::Models::Tag::Flyweight.new body_string

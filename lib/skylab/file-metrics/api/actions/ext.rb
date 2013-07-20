@@ -15,7 +15,7 @@ module Skylab::FileMetrics
       define_method :run do ||
         res = false
         begin
-          ext_count_h = self.ext_count_h or break
+          ext_count_h = get_ext_count_h or break
           count = Count.new 'Extension Counts'
           single_a = nil
           ext_count_h.values.each do |cnt|
@@ -50,19 +50,19 @@ module Skylab::FileMetrics
 
     end.call
 
-  protected
+  private
 
     Count = Models::Count.subclass :total_share, :max_share, :lipstick_float,
       :lipstick
 
     Count_ = ::Struct.new :extension, :count
 
-    -> do  # `ext_count_h`
+    -> do  # `get_ext_count_h`
 
-      define_method :ext_count_h do
+      define_method :get_ext_count_h do
         res = false
         begin
-          file_a = self.file_a or break
+          file_a = get_file_a or break
           pat_a = []
           pat_a << Pattern_h.fetch( :git_object ) if @req[:git]  # eew
           pat_a << Pattern_h.fetch( :dotfile )
@@ -85,7 +85,7 @@ module Skylab::FileMetrics
         end while nil
         res
       end
-      protected :ext_count_h
+      private :get_ext_count_h
 
       Pattern_ = ::Struct.new :rx, :label
 
@@ -98,7 +98,7 @@ module Skylab::FileMetrics
     end.call
 
     # this does things wierdly as an experiment for massively progressive output
-    def file_a
+    def get_file_a
       res = false
       begin
         cmd = build_find_files_command( @req[:paths] ) or break
@@ -149,7 +149,7 @@ module Skylab::FileMetrics
           ]
         end
       end
-      protected :render_table
+      private :render_table
     end.call
   end
 end

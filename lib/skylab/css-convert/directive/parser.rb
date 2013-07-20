@@ -7,7 +7,7 @@ module Skylab::CssConvert
   class Directive::Parser
     include CssConvert::Parser::InstanceMethods # sub-client
     ENTITY_NOUN_STEM = 'directives file'
-  protected
+  private
     def load_parser_class
       load_parser_class_with do |o|
         o.enhance_parser_with(

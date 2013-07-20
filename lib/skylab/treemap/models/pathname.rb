@@ -10,7 +10,7 @@ module Skylab::Treemap
       ::Pathname.new( self ).relative_path_from( *a ) # shiny constructors..
     end                           # then for now we want obtrusive errors
 
- protected
+ private
 
     def initialize path_x, is_missing_required_force
       super path_x

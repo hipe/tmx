@@ -107,7 +107,7 @@ module Skylab::Snag
       end
     end
 
-  protected
+  private
 
     def initialize client, do_pretty
       _snag_sub_client_init client

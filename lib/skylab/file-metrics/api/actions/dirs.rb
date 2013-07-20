@@ -55,7 +55,7 @@ module Skylab::FileMetrics
 
     LineCount = Models::Count
 
-  protected
+  private
 
     def build_find_dirs_command
       Services::Find.valid( -> c do
@@ -101,6 +101,6 @@ module Skylab::FileMetrics
         end
       end
     end.call
-    protected :render_table
+    private :render_table
   end
 end

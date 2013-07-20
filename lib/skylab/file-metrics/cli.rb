@@ -78,7 +78,7 @@ module Skylab::FileMetrics
 
         req
       end
-      protected :op_common_head
+      private :op_common_head
 
       option_parser do |op|
 
@@ -114,7 +114,7 @@ module Skylab::FileMetrics
           kls = API::Actions.const_fetch name_sym
           kls.run @ui, @param_h
         end
-        protected :api_call
+        private :api_call
       end.call
 
       option_parser do |op|
@@ -166,7 +166,7 @@ module Skylab::FileMetrics
         api_call :ext
       end
 
-    protected
+    private
 
       def op_common_tail
         # massive but semi-elegant hack, #goof-on wheel greasing.

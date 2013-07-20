@@ -9,7 +9,7 @@ module Skylab::Snag
 
     def execute
       if nodes
-        all = nodes.manifest.build_enum( nil, nil, nil ).with_count!
+        all = nodes.manifest.curry_enum.with_count!
         valid = all.valid.with_count!
         valid.each do |node|
           emit :output_line, node.rendered_identifier

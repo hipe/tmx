@@ -125,7 +125,7 @@ module Skylab::Treemap
       res
     end
 
-  protected
+  private
 
     # (the below solves [#011] - tree grows down) **NOTE** api actions do
     # *not* typically wire themselves to the client -- it is for the (modal)

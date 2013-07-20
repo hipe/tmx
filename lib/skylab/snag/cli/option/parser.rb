@@ -41,7 +41,7 @@ module Skylab::Snag
       o
     end
 
-  protected
+  private
 
     def initialize( * )
       @regexp_filters = nil

@@ -31,12 +31,12 @@ module Skylab::Snag
     # `initialize` - we are straddling two f.w's: all we want is our (modality)
     # calls to to `emit` to "work". we follow the good standard of [#sl-114],
     # which among other things makes testing easier. Even though `legacy` gets
-    # priority on the chain, it won't overwrit the (io adapter-based) `emit`
+    # priority on the chain, it won't overwrite the (io adapter-based) `emit`
     # we get from h.l, which is good.
 
     def initialize up, pay, info  # (only strictifies the signature)
       super nil, nil, nil                      # lets legacy know we do it
-      init_headless_cli_client up, pay, info  # i mean h.l does it
+      init_headless_cli_client up, pay, info   # i mean h.l does it
       nil
     end
 
@@ -192,7 +192,7 @@ module Skylab::Snag
 
       o.on '-n', '--max-count <num>',
         "limit output to N nodes (list only)" do |n|
-        param_h[:max_count] = n
+        @param_h[:max_count] = n
       end
 
       o.regexp_replace_tokens %r{\A-(?<num>\d+)\z} do |md|  # [#030]

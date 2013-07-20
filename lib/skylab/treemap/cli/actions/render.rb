@@ -19,7 +19,6 @@ module Skylab::Treemap
     desc "render a treemap from a text-based tree structure"
 
     option_parser do |o|
-      # $stderr.puts "NERK : #{ self.class } : #{ o.class } : #{ @param_h.class }"
 
       @param_h[:char] = '+'
       @param_h[:do_exec] = true
@@ -73,7 +72,7 @@ module Skylab::Treemap
       nil
     end
 
-  protected
+  private
 
     def initialize( * )
       super
@@ -124,7 +123,6 @@ module Skylab::Treemap
             if e.path.exist?
               info "calling exec() to open the pdf (!) - #{ escape_path e.path }"
               cmd = "open #{ e.path }"
-              # $stderr.puts "(would have done: #{ cmd })"
               exec cmd
             else
               error "expected pdf output not found: #{ escape_path e.path }"

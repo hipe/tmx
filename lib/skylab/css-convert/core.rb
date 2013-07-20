@@ -21,7 +21,7 @@ module Skylab::CssConvert
   module Core::SubClient::InstanceMethods
     include Headless::SubClient::InstanceMethods
 
-  protected
+  private
 
     def _css_convert_sub_client_init request_client
       init_headless_sub_client request_client
@@ -58,7 +58,7 @@ module Skylab::CssConvert
     include Core::SubClient::InstanceMethods
     include Headless::Parameter::Controller::InstanceMethods
 
-  protected
+  private
 
     def version
       emit :payload, "#{ program_name } #{ CssConvert::VERSION }"
@@ -98,17 +98,19 @@ module Skylab::CssConvert
       exit_status_for result
     end
 
-  protected
+  protected  # #protected-not-private
+
+    def actual_parameters
+      @actual_parameters ||= formal_parameters_class.new
+    end
+
+  private
 
     def initialize sin, sout, serr
       super( )
       @default_action = nil
       @io_adapter = build_io_adapter sin, sout, serr
       nil
-    end
-
-    def actual_parameters
-      @actual_parameters ||= formal_parameters_class.new
     end
 
     def build_option_parser
@@ -220,7 +222,7 @@ module Skylab::CssConvert
 
 
   module CLI::VisualTest::InstanceMethods
-  protected
+  private
     def color_test _
       pen = io_adapter.pen ; width = 50
       code_names = Headless::CLI::Pen::FUN.code_names

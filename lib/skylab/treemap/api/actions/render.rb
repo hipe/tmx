@@ -66,7 +66,7 @@ module Skylab::Treemap
 
     public :formal_attributes     # documentors use this to determine defaults
 
-  protected
+  private
 
     def initialize modal_rc
       super

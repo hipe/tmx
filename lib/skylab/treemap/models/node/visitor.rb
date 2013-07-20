@@ -25,7 +25,7 @@ module Skylab::Treemap
       end
     end
 
-  protected
+  private
 
     def initialize root
       @func = nil # careful
@@ -57,7 +57,7 @@ module Skylab::Treemap
       nil
     end
 
-  protected
+  private
 
     alias_method :initialize, :clear
   end

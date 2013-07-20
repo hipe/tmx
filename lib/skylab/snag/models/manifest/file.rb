@@ -72,7 +72,7 @@ module Skylab::Snag
     # (from stack overflow #3024372, thank you molf for a tail-like
     # implementation if we ever need it)
 
-  protected
+  private
 
     def initialize pathname
       @file_mutex = false

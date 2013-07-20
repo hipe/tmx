@@ -2,6 +2,13 @@ module Skylab::Headless
 
   module CLI::PathTools
 
+    def self.clear
+      FUN.clear[]
+    end
+  end
+
+  module CLI::PathTools::FUN
+
     # **NOTE** pretty_path is designed to scale well to a large number
     # of filepaths scrolling by, possibly thousands. It generates regexen
     # to match paths that contain `pwd` and `$HOME` at their heads.
@@ -113,15 +120,22 @@ module Skylab::Headless
 
     # -- * --
 
-    o = { }
+    ABSOLUTE_PATH_HACK_RX =
+      rx = %r{ (?<= \A | [[:space:]'",] )  (?: / [^[:space:]'",]+ )+ }x
+      # used hackishly by some subproducs. see spec
 
-    o[:absolute_path_hack_rx] =                            # see spec, hackishly
-      %r{ (?<= \A | [[:space:]'",] )  (?: / [^[:space:]'",]+ )+ }x     # used in
-                                                                   # subproducts
+    member_a = [ ]
+    o = -> member_i, p do
+      define_singleton_method member_i do p end
+      member_a << member_i
+      nil
+    end
+
+    class << o
+      alias_method :[]=, :[]
+    end
 
     o[:clear] = clear
-
-    define_singleton_method :clear, &clear
 
     o[:escape_path] = -> path do
       path = path.to_s
@@ -171,11 +185,10 @@ module Skylab::Headless
       rs
     end
 
-    FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
+    member_a.freeze
+    define_singleton_method :members do member_a end
 
   end
-
-
 
   module CLI::PathTools::InstanceMethods
 

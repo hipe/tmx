@@ -15,7 +15,7 @@ module Skylab::Snag
     inflection.inflect.noun :plural
     inflection.lexemes.noun.plural = "todo's"
 
-  protected
+  private
 
     def execute
       res = nil

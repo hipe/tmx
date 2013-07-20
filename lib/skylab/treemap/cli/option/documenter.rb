@@ -141,7 +141,7 @@ module Skylab::Treemap
       end
     end.call
 
-  protected
+  private
 
     # act like an action, but do 'census' style things
 
@@ -254,7 +254,7 @@ module Skylab::Treemap
       end
     end
 
-    # (experimentally we do "higher level" (albeit protected) section higher)
+    # (experimentally we do "higher level" (albeit private) section higher)
 
     #        ~ The Option Reflection API (backend) ~
 

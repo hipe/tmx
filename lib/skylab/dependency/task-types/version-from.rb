@@ -72,7 +72,7 @@ module Skylab::Dependency
       end
     end
 
-  protected
+  private
 
     def initialize( * )
       super

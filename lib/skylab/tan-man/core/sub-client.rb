@@ -101,7 +101,7 @@ module Skylab::TanMan  # (leave extra whitespacing below for [#bs-010])
       em s                        # tables?)
     end
 
-    rx = Headless::CLI::PathTools::FUN.absolute_path_hack_rx
+    rx = Headless::CLI::PathTools::FUN::ABSOLUTE_PATH_HACK_RX
     define_method :gsub_path_hack do |str|
       res = str.gsub rx do
         escape_path "#{ $~[0] }" # (delegates to the modality-specific pen)

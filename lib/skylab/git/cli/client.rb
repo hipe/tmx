@@ -17,9 +17,9 @@ module Skylab::Git
         argv.shift
         send m, argv
       else
-        @err.puts "#{ hi[ 'usage: '] }#{ program_name } #{
+        @err.puts "#{ hi 'usage: ' }#{ program_name } #{
           }[ #{ self.class::A_ * ' | ' } ] [..]"
-        @err.puts "see #{ hi[ "#{ program_name } <cmd> -h" ] } for help on #{
+        @err.puts "see #{ hi "#{ program_name } <cmd> -h" } for help on #{
           }that command"
         nil
       end
@@ -31,12 +31,16 @@ module Skylab::Git
       @program_name || Face::FUN.program_basename[]
     end
 
-    def hi
-      @hi ||= Face::FUN.stylize.curry[ [ :green ] ]
+    def hi msg
+      ( @hi ||= Face::FUN.stylize.curry[ [ :green ] ] )[ msg ]
     end
 
     def progname_for str
       "#{ program_name } #{ str }"
+    end
+
+    def get_y
+      ::Enumerator::Yielder.new( & @err.method( :puts ) )
     end
 
     a = [ ]
@@ -44,6 +48,10 @@ module Skylab::Git
     define_singleton_method :method_added do |i|
       a and ( a << i )
       nil
+    end
+
+    def head argv
+      Git::CLI::Actions::Head[ self, argv ]
     end
 
     def spread argv

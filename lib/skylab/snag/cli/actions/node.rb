@@ -16,7 +16,7 @@ module Skylab::Snag
                  be_verbose: false,
                     dry_run: false,
                    node_ref: node_ref
-        }.merge( param_h ) do |a|
+        }.merge( @param_h ) do |a|
         a.on_info handle_info
         a.on_error handle_error
       end
@@ -33,7 +33,7 @@ module Skylab::Snag
       dry_run_option o
 
       o.on '-p', '--prepend', "prepend, as opposed to append, the tag #{
-        }to the message" do param_h[:do_append] = false end
+        }to the message" do @param_h[:do_append] = false end
 
       verbose_option o
     end
@@ -45,7 +45,7 @@ module Skylab::Snag
                     dry_run: false,
                    node_ref: node_ref,
                    tag_name: tag_name
-      }.merge( param_h ) do |a|
+      }.merge( @param_h ) do |a|
         a.on_error handle_error
         a.on_info do |e|
           fail 'do me'  # #todo
@@ -78,7 +78,7 @@ module Skylab::Snag
     def rm node_ref, tag_name
       api_invoke( [ :node, :tags, :rm ],
         { dry_run: false, node_ref: node_ref, tag_name: tag_name,
-          verbose: false }.merge( param_h ) ) do |a|
+          verbose: false }.merge( @param_h ) ) do |a|
           fail 'ok'
         end
     end

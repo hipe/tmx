@@ -8,7 +8,7 @@ module Skylab::Treemap
 
     # emits :payload_line, :info, :info_line, :error, :help
 
-  protected
+  private
 
     def process arg1, arg2, arg3=nil
       emit :payload_line, "CERNGRETERLERTIONS: #{ arg1 } #{ arg2 } #{ arg3 }"

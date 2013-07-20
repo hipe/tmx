@@ -5,35 +5,23 @@ module Skylab::Snag
     include Snag::Core::SubClient::InstanceMethods
 
     def add message, do_prepend_open_tag, dry_run, verbose_x, new_node=nil
-      res = false
+      r = false
       begin
         node = Models::Node::Controller.new request_client
-        node.date_string = todays_date if false # off for now
+        node.date_string = todays_date if false  # off for now
         node.message = message
         node.do_prepend_open_tag = do_prepend_open_tag
-        r = node.valid or break( res = r )
-        res = manifest.add_node node,
-          dry_run,
-          verbose_x,
-          method( :escape_path ),
-          method( :error ),
-          method( :info ),
-          -> raw_info do  # let's try not to style these..
-            @request_client.send :emit, :raw_info, raw_info
-          end
-        new_node[ node ] if res
+        r = node.valid or break
+        r = manifest.add_node_notify node, * my_callbacks_a,
+          :is_dry_run, dry_run, :verbose_x, verbose_x
+        r and new_node[ node ]
       end while nil
-      res
+      r
     end
 
-    def changed node, dry_run, verbose_x
-      manifest.change_node node, dry_run, verbose_x,
-        method( :escape_path ),
-        method( :error ),
-        method( :info ),
-        -> raw_info do
-          @request_client.send :emit, :raw_info, raw_info
-        end
+    def changed node, is_dry_run, verbose_x
+      manifest.change_node_notify node, * my_callbacks_a,
+        :is_dry_run, is_dry_run, :verbose_x, verbose_x
     end
 
     def fetch_node node_ref, not_found=nil
@@ -61,7 +49,8 @@ module Skylab::Snag
         break if ! search
 
         enum = Models::Node::Enumerator.new do |y|
-          enu = manifest.build_enum flyweight, -> m { error m }, -> m { info m }
+          enu = manifest.curry_enum :flyweight, flyweight, :error_p,
+            method( :error ), :info_p, method( :info )
 
           enu = enu.filter! -> yy, xx do
             if search.match? xx
@@ -81,7 +70,7 @@ module Skylab::Snag
 
     attr_reader :manifest # used in actions for now!
 
-  protected
+  private
 
     def initialize request_client, manifest
       _snag_sub_client_init request_client
@@ -99,6 +88,17 @@ module Skylab::Snag
 
     define_method :todays_date do
       Snag::Services::DateTime.now.strftime date_format
+    end
+
+    def my_callbacks_a
+      @my_callbacks_a ||= [ :escape_path_p, method( :escape_path ),
+        :error_p, method( :error ), :info_p, method( :info ),
+        :raw_info_p, method( :on_raw_info ) ]
+    end
+
+    def on_raw_info raw_info
+      @request_client.send :emit, :raw_info, raw_info  # #todo
+      nil
     end
   end
 end

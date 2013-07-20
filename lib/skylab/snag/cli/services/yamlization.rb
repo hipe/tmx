@@ -31,7 +31,7 @@ module Skylab::Snag
       m.bind( self ).call( *a, &b )
     end
 
-  protected
+  private
 
     def initialize field_names
       maxlen = field_names.reduce( 0 ) do |m, sym|

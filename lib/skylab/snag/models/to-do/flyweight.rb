@@ -38,7 +38,7 @@ module Skylab::Snag
       end
     end
 
-  protected
+  private
 
     def initialize pattern
       @upstream_output_line = nil  # e.g ffrom find, e.g "path:line:source"

@@ -14,7 +14,7 @@ module Skylab::Headless::TestSupport::CLI
       end
 
       it "in '#{ str }' it #{ vp }", *tags do
-        md = fun.absolute_path_hack_rx.match str
+        md = fun::ABSOLUTE_PATH_HACK_RX.match str
         if capture
           md[0].should eql( capture )
         else

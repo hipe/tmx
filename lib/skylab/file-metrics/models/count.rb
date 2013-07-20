@@ -36,7 +36,7 @@ module Skylab::FileMetrics
         # we act like a string during the pre-render, and don't ever add
         :length => -> { 0 },  # any width, you are strictly a decoration.
 
-        :respond_to? => -> x { true },  # catch errors
+        :respond_to? => MetaHell::MONADIC_TRUTH_,  # catch errors
 
         :normalized_scalar => -> do
           @lipstick_float

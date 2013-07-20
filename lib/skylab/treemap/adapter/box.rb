@@ -14,7 +14,7 @@ module Skylab::Treemap
         end
     end
 
-  protected
+  private
 
     def initialize box_module, client_filename
       super( )

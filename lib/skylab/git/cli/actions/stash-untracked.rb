@@ -21,7 +21,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
 
     # (no public methods defined in this module)
 
-  protected # (protected before public this file only to reduce "strain" on DSL)
+  private # (private before public this file only to reduce "strain" on DSL)
 
     def initialize request_client
       _gsu_sub_client_init request_client
@@ -65,7 +65,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
   module PathInfo_InstanceMethods
     extend Deprecated_
 
-  protected
+  private
 
     relpath = '../Stashes'
     define_method :find_closest_path_info do
@@ -106,7 +106,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       res
     end
 
-    attr_reader :path_info
+    private_attr_reader :path_info
 
     def resolve_path_info! param_h
       res = nil
@@ -136,10 +136,11 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
   end
 
   class CLI
+    extend Deprecated_
     include SubClient_InstanceMethods          # *before* cli client mechanics
                                                # if you want to override them.
 
-  protected                                    # (meh before we load DSL)
+  private                                    # (meh before we load DSL)
 
     def initialize _, stdout, stderr
       @param_h = { }
@@ -175,14 +176,14 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
 
     define_method :escape_path, & Headless::CLI::PathTools::FUN.pretty_path
-    protected :escape_path
+    private :escape_path
 
-    attr_reader :param_h          # this moves a lot
+    private_attr_reader :param_h # this moves a lot
 
     pen = Headless::CLI::Pen::MINIMAL
 
     define_method( :pen ) { pen }
-    protected :pen
+    private :pen
 
     # --*--
 
@@ -314,6 +315,9 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
   end
 
   class API::Action
+
+    extend Deprecated_
+
     include SubClient_InstanceMethods
 
     pathify = Autoloader::Inflection::FUN.pathify
@@ -334,12 +338,12 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       res
     end
 
-  protected
+  private
 
     # (initialize defined in sub-client i.m)
 
     fun = Headless::CLI::PathTools::FUN
-    absolute_path_hack_rx = fun.absolute_path_hack_rx
+    absolute_path_hack_rx = fun::ABSOLUTE_PATH_HACK_RX
 
     define_method :collection do
       @collection_cache ||= { }                # (using `path_info` struct as
@@ -441,7 +445,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
 
     PARAMS = [ :dry_run, :stash_name, :stashes_path, :verbose ]
 
-  protected
+  private
 
     def execute
       show_info if verbose
@@ -464,9 +468,9 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       result
     end
 
-  protected
+  private
 
-    attr_accessor :dry_run, :stash_name, :verbose
+    private_attr_accessor :dry_run, :stash_name, :verbose
 
     command_s = 'git ls-files --others --exclude-standard'
 
@@ -493,7 +497,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
 
     PARAMS = [ :stashes_path, :verbose ]
 
-  protected
+  private
 
     def execute
       res = nil
@@ -518,7 +522,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
 
     PARAMS = [ :stashes_path, :verbose ]
 
-  protected
+  private
 
     def execute
       res = nil
@@ -539,7 +543,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
 
     # --*--
 
-    attr_accessor :verbose
+    private_attr_accessor :verbose
 
   end
 
@@ -548,7 +552,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
 
     PARAMS = [ :color, :show_patch, :show_stat, :stash_name,
                  :stashes_path, :verbose ]
-  protected
+  private
 
     def execute
       res = nil
@@ -578,9 +582,11 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       res
     end
 
-  protected
+  private
 
-    attr_accessor :color, :stash_name, :show_patch, :show_stat, :verbose
+    private_attr_accessor :color, :stash_name, :show_patch, :show_stat,
+      :verbose
+
     alias_method :color?, :color # api compat
 
   end
@@ -591,7 +597,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
 
     PARAMS = [ :dry_run, :stash_name, :stashes_path, :verbose ]
 
-  protected
+  private
 
     def execute
       res = nil
@@ -603,7 +609,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       res
     end
 
-    attr_accessor :dry_run, :stash_name, :verbose
+    private_attr_accessor :dry_run, :stash_name, :verbose
   end
 
   # --*--
@@ -612,6 +618,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
   end
 
   class Stash
+    extend Deprecated_
     include Git::Services::FileUtils
     include SubClient_InstanceMethods
     include Color_InstanceMethods
@@ -703,7 +710,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       @valid_for_writing
     end
 
-  protected
+  private
 
     def initialize request_client, path_info, stash_name, emit
       _gsu_sub_client_init request_client
@@ -732,9 +739,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       @emit[ :info, "#{ msg }" ]
     end
 
-    attr_reader :path_info
-
-    attr_reader :pathname
+    private_attr_reader :path_info, :pathname
 
     def prune_directories dry_run, verbose
       stack = []
@@ -779,6 +784,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
 
 
   class Stash::Collection
+    extend Deprecated_
     include SubClient_InstanceMethods
     include Color_InstanceMethods
 
@@ -819,7 +825,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       res
     end
 
-  protected
+  private
 
     def initialize request_client, path_info, emit
       _gsu_sub_client_init request_client
@@ -828,7 +834,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       @path_info = path_info
     end
 
-    attr_reader :path_info
+    private_attr_reader :path_info
 
     def pathname
       @path_info.stashes_pathname
@@ -920,7 +926,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       _render _calculate
     end
 
-  protected
+  private
 
     def initialize request_client, pathname, emit
       _gsu_sub_client_init request_client

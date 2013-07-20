@@ -13,12 +13,12 @@ module Skylab::Headless
 
   protected
 
-    def initialize f
-      @f = f
+    def initialize p
+      @p = p
     end
 
     def fu_output_message msg
-      @f[ msg ]
+      @p[ msg ]
     end
   end
 end

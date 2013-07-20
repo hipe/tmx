@@ -29,7 +29,7 @@ module Skylab::Treemap
 
     attr_reader :is_active
 
-  protected
+  private
 
     def initialize &wire
       @executable_name = 'R'

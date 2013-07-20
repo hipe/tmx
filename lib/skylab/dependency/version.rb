@@ -41,7 +41,7 @@ module Skylab::Dependency
 
     def has_patch_version? ; !! child(:patch) end
 
-  protected
+  private
 
     def initialize str
       replace str

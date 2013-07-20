@@ -1,7 +1,8 @@
 module Skylab::MyTree
+
   class API::Actions::Tree < API::Action
 
-  protected
+  private
 
     def initialize request_client
       super
@@ -31,7 +32,7 @@ module Skylab::MyTree
         add_metadata :mtime
       end
 
-      o.on('-P <pattern>', 'meh') { |x| self.file_pattern = x }
+      o.on('-P <pattern>', 'meh') { |x| @file_pattern = x }
 
       -> do
 
@@ -65,14 +66,6 @@ module Skylab::MyTree
       end while nil
       res
     end
-
-    #         ~ simple setters for options etc ~
-
-    attr_writer :do_verbose_find_command
-
-    attr_writer :do_verbose_lines
-
-    attr_writer :file_pattern
 
     #         ~ complicated setters for options ~
 

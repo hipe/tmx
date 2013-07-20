@@ -223,7 +223,7 @@ module Skylab::FileMetrics
 
       attr_reader :sep
 
-    protected
+    private
 
       # `initialize` a grandiose function that builds an immutable structure
 

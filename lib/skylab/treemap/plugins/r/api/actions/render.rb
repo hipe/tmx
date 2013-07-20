@@ -9,7 +9,7 @@ module Skylab::Treemap
 
     # (public `invoke` defined below)
 
-  protected
+  private
 
     def initialize rc             # (this is the upstream api action but
                                   # we avoid coupling to it in favor of

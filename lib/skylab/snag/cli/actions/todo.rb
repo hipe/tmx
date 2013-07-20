@@ -11,8 +11,8 @@ module Skylab::Snag
       pattern_option o
       name_option o
       o.on '-t', '--tree', 'experimental tree rendering (try -t -t)' do
-        param_h[:tree_level] ||= 0
-        param_h[:tree_level] += 1
+        @param_h[:tree_level] ||= 0
+        @param_h[:tree_level] += 1
       end
       verbose_option o
       nil
@@ -88,7 +88,7 @@ module Skylab::Snag
       api_invoke [ :to_do, :melt ],
         {           dry_run: false,
                       paths: path,
-                 be_verbose: false }.merge!( param_h ), -> a do
+                 be_verbose: false }.merge!( @param_h ), -> a do
         a.on_payload handle_payload
         a.on_info handle_info
         a.on_raw_info handle_raw_info
@@ -96,7 +96,7 @@ module Skylab::Snag
       end
     end
 
-  protected
+  private
 
     dsl_off
 
@@ -110,7 +110,7 @@ module Skylab::Snag
     define_method :command_option do |o|
       o.on '--cmd', 'just show the internal grep / find command',
         'that would be used (debugging).' do
-        param_h[:show_command_only] = true
+        @param_h[:show_command_only] = true
       end
     end
 
@@ -119,14 +119,14 @@ module Skylab::Snag
         "the filename patterns to search, can be specified",
         "multiple times to broaden the search #{
           }(default: '#{ default[][:names] * "', '" }')" do |n|
-            ( param_h[:names] ||= [] ).push n
+            ( @param_h[:names] ||= [] ).push n
       end
     end
 
     define_method :pattern_option do |o|
       o.on '-p', '--pattern <PATTERN>',
         "the todo pattern to use (default: '#{ default[][:pattern] }')" do |p|
-        param_h[:pattern] = p
+        @param_h[:pattern] = p
       end
     end
   end

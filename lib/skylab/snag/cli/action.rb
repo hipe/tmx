@@ -14,7 +14,7 @@ module Skylab::Snag
 
     include Headless::CLI::Action::InstanceMethods
 
-  protected
+  private
 
     #         ~ api invocation and wiring support (pre-order) ~
 
@@ -107,7 +107,7 @@ module Skylab::Snag
       [ nil, method( :invoke ), [ argv ] ]  # compat legacy
     end
 
-  protected
+  private
 
     def initialize request_client
       super
@@ -116,17 +116,15 @@ module Skylab::Snag
 
     #         ~ common optparse options ~
 
-    attr_reader :param_h
-
     def dry_run_option o
       o.on '-n', '--dry-run', 'dry run.' do
-        param_h[:dry_run] = true
+        @param_h[:dry_run] = true
       end
     end
 
     def verbose_option o
       o.on '-v', '--verbose', 'verbose output.' do
-        param_h[:be_verbose] = true
+        @param_h[:be_verbose] = true
       end
     end
 

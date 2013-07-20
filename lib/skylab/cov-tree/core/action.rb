@@ -27,7 +27,7 @@ module Skylab::CovTree
   module Core::Action::InstanceMethods
     include Core::SubClient::InstanceMethods
 
-  protected
+  private
 
     def local_normal_name
       self.class.local_normal_name

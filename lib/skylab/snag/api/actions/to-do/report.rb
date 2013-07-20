@@ -19,7 +19,7 @@ module Skylab::Snag
                   command: :datapoint,  # only for `show_command_only`
              number_found: :datapoint
 
-  protected
+  private
 
     def execute
       ea = Snag::Models::ToDo::Enumerator.new @paths, @names, @pattern

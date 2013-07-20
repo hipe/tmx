@@ -46,7 +46,7 @@ module Skylab::Treemap
       ( @children ||= [] ).push node
     end
 
-  protected
+  private
 
     prop_h_h = ::Hash[ prop_a.map { |p| [ p,
       -> v { instance_variable_set "@#{ p }", v } ] } ]

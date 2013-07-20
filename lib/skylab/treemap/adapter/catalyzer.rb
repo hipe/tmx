@@ -46,7 +46,7 @@ module Skylab::Treemap
       resolve_action_class :CLI, tainted_a, error
     end
 
-  protected
+  private
 
     def initialize const, mod
       @const, @module = const, mod

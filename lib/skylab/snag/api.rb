@@ -106,7 +106,7 @@ module Skylab::Snag
 
     attr_writer :max_num_dirs_to_search_for_manifest_file
 
-  protected
+  private
 
     def initialize modality_client
       _snag_sub_client_init modality_client

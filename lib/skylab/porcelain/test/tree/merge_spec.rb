@@ -22,7 +22,7 @@ module Skylab::Porcelain::TestNamespace
       t1.to_paths.should eql( %w| sky | )
     end
 
-    it "merge 2-deep stem-trees, totally different", f:true do
+    it "merge 2-deep stem-trees, totally different" do
       t1 = tree_from_paths %w| sky/lab |
       t2 = tree_from_paths %w| bot/noise |
       t1.destructive_merge t2

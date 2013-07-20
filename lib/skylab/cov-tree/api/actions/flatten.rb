@@ -8,7 +8,7 @@ module Skylab end
 module Skylab::FlattenFiles
   class Headless < ::Struct.new(:indir, :outdir, :dry)
     include ::FileUtils::Verbose
-  protected
+  private
     def error msg
       emit(:error, msg)
       false
@@ -49,7 +49,7 @@ module Skylab::FlattenFiles
       parse_argv(argv) or return
       super()
     end
-    protected
+    private
     def info msg
       emit(:info, "(#{program_name} #{msg})")
       true

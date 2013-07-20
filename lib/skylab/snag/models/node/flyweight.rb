@@ -20,7 +20,7 @@ module Skylab::Snag
         @identifier_body.clear
         @body.clear
       end
-    protected
+    private
       def initialize
         @identifier_prefix = Index_.new
         @integer = Index_.new
@@ -40,7 +40,7 @@ module Skylab::Snag
       def range
         @begin .. @end
       end
-    protected
+    private
       alias_method :initialize, :clear
     end
 
@@ -81,7 +81,7 @@ module Skylab::Snag
         if gets[ ]
           if scn.match?( /[ \t]/ )                           # extra lines
             loop do
-              @extra_lines.push line
+              @extra_line_a.push line
               gets[ ] or break
               scn.match?( /[ \t]+/ ) or break
             end
@@ -100,10 +100,10 @@ module Skylab::Snag
       end
     end
 
-    attr_reader :extra_lines
+    attr_reader :extra_line_a
 
     def extra_lines_count
-      @extra_lines.length
+      @extra_line_a.length
     end
 
     attr_reader :first_line                    # used in some reports, comp next
@@ -155,14 +155,14 @@ module Skylab::Snag
       a
     end
 
-  protected
+  private
 
     def initialize request_client, manifest_pathname
       # experimentally ignore request client for now!
 
       @valid = nil
       @first_line = nil
-      @extra_lines = []
+      @extra_line_a = []
       @indexes = Indexes_.new
       @manifiset_pathname = manifest_pathname
       @parse_failure = nil
@@ -171,7 +171,7 @@ module Skylab::Snag
     def clear
       @valid = nil
       @first_line = nil
-      @extra_lines.clear
+      @extra_line_a.clear
       @indexes.clear
     end
 

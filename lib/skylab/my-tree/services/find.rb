@@ -84,7 +84,7 @@ module Skylab::MyTree
       @is_valid
     end
 
-  protected
+  private
 
     def initialize error
       @error = error

@@ -2,8 +2,22 @@ module Skylab::Snag
 
   class Models::Node::Enumerator < ::Enumerator
 
-    # thanks to brian chandler from issue 707
-    def each &b
+    def initialize &b
+      b or raise ::ArgumentError.new 'block is required'
+      @spy = nil
+      block = -> y do
+        if @spy && ! @spy.empty?
+          z = spy_begin y
+          b[ z ]
+          spy_end
+        else
+          b[ y ]
+        end
+      end
+      super( & block )
+    end
+
+    def each &b  # ( thanks to brian chandler from issue 707 )
       o = catch :last_item do
         super(& b)
         nil
@@ -11,10 +25,10 @@ module Skylab::Snag
       o and b[ o ]
     end
 
-    def filter! f
+    def filter! p
       self.class.new do |y|
         each do |x|
-          f[ y, x ]
+          p[ y, x ]
         end
       end
     end
@@ -48,22 +62,7 @@ module Skylab::Snag
       self
     end
 
-  protected
-
-    def initialize &b
-      b or raise ::ArgumentError.new 'block is required'
-      @spy = nil
-      block = -> y do
-        if @spy && ! @spy.empty?
-          z = spy_begin y
-          b[ z ]
-          spy_end
-        else
-          b[ y ]
-        end
-      end
-      super(& block)
-    end
+  private
 
     def spy_begin y
       @spy.values.each { |e| e.begin[ ] }
@@ -79,21 +78,18 @@ module Skylab::Snag
     end
   end
 
-
-
   class Models::Node::Enumerator::Spy_
+
+    def initialize y, &b
+      @b = b or raise ::ArgumentError.new 'block required'
+      @y = y
+    end
+
     def yield piece
       @b[ piece ]
       @y.yield piece
     end
 
     alias_method :<<, :yield
-
-  protected
-
-    def initialize y, &b
-      @b = b or raise ::ArgumentError.new 'block required'
-      @y = y
-    end
   end
 end

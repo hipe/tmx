@@ -51,7 +51,10 @@ module Skylab::Treemap
       CLI::Actions.const_get k, false
     end
 
-  protected
+  private
+
+    define_singleton_method :private_attr_reader,
+      & MetaHell::FUN.private_attr_reader
 
     -> do
 
@@ -106,6 +109,7 @@ module Skylab::Treemap
         ]
       end
     end
+    protected :actions  # #protected-not-private
 
     def normalized_invocation_string # #forward-fit #buck-stop
       program_name
@@ -116,7 +120,8 @@ module Skylab::Treemap
       self.class
     end
 
-    attr_accessor :stylus   # you have an obligation to make the buck stop here
+    module_exec :stylus, & MetaHell::FUN.private_attr_accessor
+      # you have an obligation to make the buck stop here
 
     #         ~ fun with events ~
 
@@ -227,7 +232,7 @@ module Skylab::Treemap
       end
     end.call
 
-    attr_reader :infostream  # deep deep down something wants it
+    private_attr_reader :infostream  # deep deep down something wants it
 
     #         ~ adapter services & buckstop experiments ~
 

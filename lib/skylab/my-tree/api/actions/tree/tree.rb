@@ -38,7 +38,7 @@ module Skylab::MyTree
     nil
     end
 
-  protected
+  private
 
     # (note: `do_verbose_lines` is so verbose we recommend you only use
     # it when you are troubleshooting the flushing behavior. it's neat

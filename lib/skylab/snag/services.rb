@@ -2,6 +2,8 @@ module Skylab::Snag
 
   module Services
 
+    extend MetaHell::MAARS
+
     o = { }
     stdlib = MetaHell::FUN.require_stdlib
     o[:DateTime] = stdlib
@@ -11,21 +13,14 @@ module Skylab::Snag
     o[:Shellwords] = stdlib
     o[:StringScanner] = -> _ { require 'strscan' ; ::StringScanner }
 
-    # --*--
-
-    pathify = Autoloader::Inflection::FUN.pathify
-
-    define_singleton_method :const_missing do |k|
-      if o[k]
-        const_set k, o.fetch( k )[ k ]
+    def self.const_missing c
+      if (( p = self::H_[ c ] ))
+        const_set c, p[ c ]
       else
-        require_relative "services/#{ pathify[ k ] }"
-        if const_defined? k, false
-          const_get k, false
-        else
-          raise ::NameError.new "no such service: #{ k.inspect }"
-        end
+        super
       end
     end
+
+    H_ = o.freeze
   end
 end

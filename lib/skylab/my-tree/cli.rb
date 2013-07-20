@@ -23,7 +23,7 @@ module Skylab::MyTree
       API::Actions
     end
 
-  protected
+  private
 
     def build_option_parser       # #frontier
       o = MyTree::Services::OptionParser.new

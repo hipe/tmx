@@ -67,7 +67,7 @@ module Skylab::Snag
 
     include Core::SubClient::InstanceMethods
 
-  protected
+  private
 
     def initialize request_client, event
       _snag_sub_client_init request_client

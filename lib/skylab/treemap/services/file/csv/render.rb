@@ -18,7 +18,7 @@ module Skylab::Treemap
       io.read
     end
 
-  protected
+  private
 
     def initialize tree
       super(& method( :visit ) )

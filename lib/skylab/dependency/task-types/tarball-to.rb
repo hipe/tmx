@@ -11,7 +11,7 @@ module Skylab::Dependency
       TARBALL_EXT = /\.tar\.(?:gz|bz2)|\.tgz/ # #bound
       TARBALL_EXTENSION = /(?:#{TARBALL_EXT.source})\z/ # #bound
     end
-  protected
+  private
     def pairs
       md = %r{(^[^/]+:/{2,3}[^/]+)/(.+)$}.match(@from) or
         raise("Failed to hack-parse as url: #{@from}")

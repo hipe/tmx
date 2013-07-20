@@ -57,7 +57,7 @@ module Skylab::Snag
       range :tag
     end
 
-  protected
+  private
 
     define_method :initialize do
       |path, line_number_string, full_source_line, pattern|

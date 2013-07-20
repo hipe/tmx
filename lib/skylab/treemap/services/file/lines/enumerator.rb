@@ -20,7 +20,7 @@ module Skylab::Treemap
       end
     end
 
-  protected
+  private
 
     def initialize fh, &blk
       blk and raise ArgumentError("not today.  not today.")

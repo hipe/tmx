@@ -48,7 +48,7 @@ module Skylab::CovTree
       nil
     end
 
-  protected
+  private
 
     def transplant_box_multi_ownership_to otr
       r = @box_multi ; @box_multi = false ; @name_services = false

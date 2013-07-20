@@ -59,7 +59,9 @@ module Skylab::Treemap
       end
     end
 
-  protected
+    attr_reader :_option_parser_ridiculous_host_is_initted
+
+  private
 
     #         ~ host initialization (hooked into elsewhere) ~
 
@@ -77,7 +79,6 @@ module Skylab::Treemap
       # above two.  #todo might be overcomplicated in lieu of what h.l does
     end
 
-    attr_reader :_option_parser_ridiculous_host_is_initted
 
 
     #         ~ compat & hook into headless ~

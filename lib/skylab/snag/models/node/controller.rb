@@ -50,14 +50,14 @@ module Skylab::Snag
       @do_prepend_open_tag = b
     end
 
-    def extra_lines
+    def extra_line_a
       @delineated or delineate
-      @extra_lines.dup
+      @extra_line_a.dup
     end
 
     def extra_lines_count
       @delineated or delineate
-      @extra_lines.length
+      @extra_line_a.length
     end
 
     def first_line_body
@@ -99,7 +99,7 @@ module Skylab::Snag
       @valid
     end
 
-  protected
+  private
 
     def initialize request_client, flyweight=nil
       super request_client
@@ -108,7 +108,7 @@ module Skylab::Snag
       @do_prepend_open_tag = nil
       @do_prepend_open_tag_ws = true
       @extra_line_header = nil
-      @extra_lines = []
+      @extra_line_a = []
       @first_line_body = nil
       @identifier = nil
       @line_width = nil
@@ -123,7 +123,7 @@ module Skylab::Snag
       @delineated and fail 'test me'
       @identifier = flyweight.build_identifier
       reduce = [ flyweight.first_line_body ]
-      reduce.concat( flyweight.extra_lines.map do |el|
+      reduce.concat( flyweight.extra_line_a.map do |el|
         if 0 == el.index( extra_lines_header )
           use = el[ extra_lines_header.length .. -1 ]
         else
@@ -222,7 +222,7 @@ module Skylab::Snag
           if lines.length.nonzero?
             @first_line_body = lines.shift.freeze
           end
-          @extra_lines.concat lines.map(&:freeze)
+          @extra_line_a.concat lines.map(&:freeze)
           res = @delineated = true
         end while nil
         res
@@ -241,6 +241,7 @@ module Skylab::Snag
     def line_width
       @line_width || Models::Manifest.line_width  # don't memoize it
     end
+    protected :line_width  # #protected-not-private
 
     def max_lines
       @max_lines ||= Models::Node.max_lines_per_node
@@ -286,7 +287,7 @@ module Skylab::Snag
 
     def undelineate
       @delineated = nil
-      @extra_lines.clear
+      @extra_line_a.clear
       @first_line_body = nil
       @valid = nil
     end

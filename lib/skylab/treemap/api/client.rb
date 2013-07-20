@@ -8,7 +8,7 @@ module Skylab::Treemap
       @adapter_box ||= Treemap::Adapter::Box.new Treemap::Plugins, 'client.rb'
     end
 
-  protected
+  private
 
     def initialize
       @adapter_box = nil

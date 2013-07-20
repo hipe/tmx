@@ -1,3 +1,4 @@
+[#035] #open throwing is always ugly. just don't
 [#034]       #doc-point on doc-node trees and flat numberspaces ..
 [#033]       #tracking-tag non-deterministic smelly tests
 [#032]       see if we can unify find commands org wide #tracking-tag
@@ -24,7 +25,8 @@
 [#013]       #done shortcut to open issue
 [#012]       #done rename to snag
 [#011]       #workflow #doc-point tags defined
-[#010] #open either do or don't do something about horrible all.rb dep now
+[#010]       #done either do or don't do something about horrible all.rb d
+             ep now
 [#009] #open awesome semantic open tag search - ("smart twitter")
 [#008]       #done -n on all destructive actions
 [#007]       #done autoloadify

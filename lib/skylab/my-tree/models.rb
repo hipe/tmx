@@ -35,9 +35,9 @@ module Skylab::MyTree
       @stat ||= ::File::Stat.new @path
     end
 
-  protected
+  private
 
-    # (no protected methods yet defined for this class)
+    # (no private methods yet defined for this class)
 
   end
 end

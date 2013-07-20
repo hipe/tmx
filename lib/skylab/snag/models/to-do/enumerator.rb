@@ -8,7 +8,7 @@ module Skylab::Snag
 
     event_factory Snag::API::Events::Datapoint
 
-    # (primary public method is `each` whose protected impl is `visit`)
+    # (primary public method is `each` whose private impl is `visit`)
 
     #         ~ courtesy reflection & rendering (in asc. complexity) ~
 
@@ -16,7 +16,7 @@ module Skylab::Snag
 
     attr_reader :seen_count
 
-  protected
+  private
 
     def initialize paths, names, pattern
       @seen_count = nil

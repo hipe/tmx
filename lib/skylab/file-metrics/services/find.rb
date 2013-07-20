@@ -3,7 +3,7 @@ module Skylab::FileMetrics
   class Services::Find # [#sl-118] one day they will be unified
 
     class << self
-      protected :new
+      private :new
 
       def valid build, reasons
         new.instance_exec do
@@ -38,7 +38,7 @@ module Skylab::FileMetrics
       x
     end
 
-  protected
+  private
 
     def initialize
       @path_a = @skip_dir_a = @extra = @name_a = nil

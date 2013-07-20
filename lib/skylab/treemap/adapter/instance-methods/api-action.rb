@@ -4,7 +4,7 @@ module Skylab::Treemap
 
     include Adapter::InstanceMethods::Action
 
-  protected
+  private
 
     def _adapter_init
       @adapter_action_cache = { }

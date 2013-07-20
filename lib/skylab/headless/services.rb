@@ -15,6 +15,7 @@ module Skylab::Headless
     o[:Shellwords] = stdlib
     o[:StringIO] = stdlib
     o[:StringScanner] = -> _ { require 'strscan' ; ::StringScanner }
+    o[:Tmpdir] = -> _ { require 'tmpdir' ; ::Dir }
     o[:TreetopTools] = -> _ { require 'skylab/treetop-tools/core'
                                                   ::Skylab::TreetopTools }
     o.freeze

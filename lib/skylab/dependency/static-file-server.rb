@@ -27,7 +27,7 @@ module Skylab::Dependency
       start_unless_running
     end
 
-  protected
+  private
 
     default_log_level = :info
     default_port = 1324

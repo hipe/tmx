@@ -1,264 +1,106 @@
 module Skylab::Snag
+
   class Services::Manifest
 
-    def build_enum node_flyweight, error, info
-      Models::Node::Enumerator.new do |y|
-        begin
-          if ! pathname?
-            error[ "manifest pathname was not resolved" ]
-            break
-          end
-          if ! pathname.exist?
-            info[ "manifest file didn't exist - no issues." ]
-            break
-            # (if pathname is resolved (i.e. we know what it *should* be)
-            # and it doesn't exist, there are simply no issues.)
-          end
-          node_flyweight ||= Models::Node::Flyweight.new nil, pathname
-          last_item = catch :last_item do
-            node_flyweight.each_node file.normalized_line_producer, y
-            nil
-          end
-          if last_item
-            file.release_early if file.open? # might be last one.
-            throw :last_item, last_item
-          end
-          nil
-        end while nil
-      end
-    end
-
-    def add_node node, dry_run, verbose_x, escape_path, error, info, raw_info
-      res = false
-      begin
-        greatest, extern_h = greatest_node_integer_and_externals
-        int = greatest
-        loop do
-          int += 1
-          if extern_h[ int ]
-            info[ "avoiding confusing number collision #{
-            }with #{ extern_h[int] }" ]
-          else
-            break
-          end
-        end
-        res = edit_lines 0, render_lines( node, int ), dry_run, escape_path,
-          verbose_x, error, info, raw_info
-        break if ! res
-        info[ "done." ]
-      end while nil
-      res
-    end
-
-    def change_node node, dry_run, verbose_x, escape_path, error, info, raw_info
-      lines = render_lines node
-      edit_lines node.identifier.render, lines, dry_run, escape_path,
-        verbose_x, error, info, raw_info
+    def initialize pathname
+      @pathname = ( ::Pathname.new pathname if pathname )
+      @manifest_file = @tmpdir_pathname = nil
     end
 
     def pathname
-      @pathname or fail 'sanity - pathname is not known. use `pathname?`'
-      @pathname
+      @pathname or fail "sanity - no pathname"
     end
 
-    def pathname?
-      !! @pathname
+    def curry_enum *a
+      ea = self.class::Enum_.new  @pathname, -> { manifest_file }
+      ea.absorb( * a )
+      ea
     end
 
-  protected
-
-    def initialize pathname
-      @file = nil
-      @pathname = ::Pathname.new pathname
-      @tmpdir_pathname = nil
+    def add_node_notify node, *a
+      self::class::Adder_[ node, :callbacks, get_callbacks, *a ]
     end
 
-    # when you are editing a file in vi, it will always append a "\n" to the
-    # last line if there was not one already. we hence follow suit here, when
-    # rewriting the manifest. however the below logic is left in commented-out
-    # ghost form in case we ever want to change it back..
-
-    write_f = -> fh do
-      # sep = nil
-      -> line do
-        # fh.write "#{ sep }#{ line }"
-        # sep ||= "\n" # meh [#020]
-        fh.write "#{ line }\n"
-        nil
-      end
+    def change_node_notify node, *a
+      self::class::Changer_[ node, :callbacks, get_callbacks, *a ]
     end
 
-    change_lines = -> error, file, info, raw_info, lines, rendered_identifier do
-      -> fh do
-        write = write_f[ fh ]
-        res = nil
-        found = false
-        existing = file.normalized_line_producer
-        line = existing.gets
-        while line
-          if 0 == line.index( rendered_identifier )
-            found = true
-            begin                 # discard old lines
-              line = existing.gets
-            end while line && /^[[:space:]]/ =~ line # eek
-            lines.each do |new_line|
-              write[ new_line ]
-            end
-          else
-            write[ line ]
-            line = existing.gets
-          end
-        end
-        if found
-          res = true
-        else
-          res = error[ "node lines not found for node with identifier #{
-            }#{ rendered_identifier }" ]
-        end
-        res
-      end
+  private
+
+    def get_callbacks
+      self.class::Callbacks_.new :render_lines_p, method( :render_line_a ),
+        :manifest_file_p, method( :manifest_file ), :pathname, @pathname,
+          :file_utils_p, get_file_utils_p, :tmpdir_p, get_tmpdir_p,
+            :curry_enum_p, method( :curry_enum )
     end
 
-    prepend_lines = -> file, info, raw_info, lines do
-      -> fh do
-        write = write_f[ fh ]
-        if lines.length.nonzero?
-          if lines.length == 1
-            info[ "new line: #{ lines[0] }" ]
-          else
-            info[ "new lines:" ]
-            many = true
-          end
-        end
-        lines.each do |l|                      # ~ put the newlines at the top ~
-          raw_info[ l ] if many
-          write[ l ]
-        end
-        file.normalized_lines.each do |lin|    # (#open-filehandle)
-          write[ lin ]
-        end
-      end
+    def render_line_a node, identifier_d=nil
+      identifier_d and node.build_identifier! identifier_d, ID_NUM_DIGITS_
+      line_a = [ "#{ node.identifier.render } #{ node.first_line_body }" ]
+      line_a.concat node.extra_line_a
+      line_a
     end
 
-    class DevNull_                # hehe the sneaky hops we jump thru to get
-      def puts *a                 # a good dry run. (class for sing. [#sl-126])
-      end
-      def write s
-      end
-    end
+    ID_NUM_DIGITS_ = 3
 
-    dev_null = DevNull_.new
-
-    # when `lines_ref` is zero it means "insert `lines` at the beginning"
-    # else `lines_ref` is expected to be a rendered identifier, for which
-    # `lines` will replace the existing lines for that node. `error` is
-    # called when the node lines are not found for a `node_ref`.
-
-    define_method :edit_lines do
-      |lines_ref, lines, dry_run, escape_path, be_verbose, error, info,
-        raw_info|
-
-      res = false
-      begin
-        fail "implement me - create file" if ! pathname.exist?
-        fu = self.fu escape_path, be_verbose, info
-        tmpdir_pathname = self.tmpdir_pathname dry_run, fu, error
-        break if ! tmpdir_pathname
-        tmpold = tmpdir_pathname.join 'issues-prev.md'
-        tmpnew = tmpdir_pathname.join 'issues-next.md'
-        if tmpnew.exist?
-          fu.rm tmpnew, noop: dry_run
-        end
-        write = if 0 == lines_ref
-          prepend_lines[ file, info, raw_info, lines ]
-        else
-          change_lines[ error, file, info, raw_info, lines, lines_ref ]
-        end
-        if dry_run
-          write[ dev_null ]                    # sneaky
-        else
-          tmpnew.open( 'w+' ) do |fh|
-            write[ fh ]
-          end
-        end
-        if tmpold.exist?
-          fu.rm tmpold, noop: dry_run
-        end
-        fu.mv pathname, tmpold, noop: dry_run
-        fu.mv tmpnew, pathname, noop: dry_run
-        res = true
-      end while nil
-      res
-    end
-
-    def file
-      @file ||= begin
-        @pathname or fail 'sanity'
+    def manifest_file
+      @manifest_file ||= begin
+        @pathname or fail "sanity - pathname should be set by now"
         Models::Manifest::File.new @pathname
       end
     end
 
-                                               # Using a hacky regex, scan
-    def fu escape_path, be_verbose, info       # all messages emitted
-      rx = Headless::CLI::PathTools::FUN.absolute_path_hack_rx
-      fu = Headless::IO::FU.new( -> str do     # from the file utils client,
-        s = str.gsub( rx ) do                  # and run everything that looks
-          escape_path[ $~[0] ]                 # like an absolute path thru
-        end                                    # the `escape_path` implemen.
-        info[ s ] if be_verbose                # *of the modality client*
-      end )                                    # In turn, emit this messages
-      fu                                       # as info to the same client.
+    def get_file_utils_p
+
+      # using a hacky regex, scan all msgs emitted by the file utils client
+      # and with any string that looks like an aboslute path run it through
+      # `escape_path_p` proc (*of the modality client*, e.g). in turn, emit
+      # these messages as info to `info_p`, presumably to the same modality
+      # client. This hack grants us the novelty of letting FileUtils render
+      # its own messages (which it does heartily) while attempting possibly
+      # to mask full filenames for security reasons. but at the end of day,
+      # it is still a hack!
+
+      FU_curry_.method( :[] )
     end
 
-    def greatest_node_integer_and_externals
-      enum = build_enum nil, nil, nil
-      enum = enum.valid
-      prefixed_h = { }
-      greatest = enum.reduce( -1 ) do |m, node|
-        if node.identifier_prefix
-          prefixed_h[ node.integer ] = Snag::Models::Identifier.render(
-            node.identifier_prefix, node.identifier_body )
-          m
-        else
-          x = node.integer
-          m > x ? m : x
+    class FU_curry_
+      MetaHell::Funcy[ self ]
+      MetaHell::FUN.fields[ self, :escape_path_p, :be_verbose, :info_p ]
+      def execute
+        rx = Headless::CLI::PathTools::FUN::ABSOLUTE_PATH_HACK_RX
+        Headless::IO::FU.new -> s do
+          @info_p[ s.gsub( rx ) { @escape_path_p[ $~[ 0 ] ] } ] if @be_verbose
         end
       end
-      [ greatest, prefixed_h ]
     end
 
-    -> do
+    def get_tmpdir_p
+      -> *a do
+        @tmpdir_pathname ||= ::Skylab.tmpdir_pathname.join TMP_DIRNAME_
+        Tmpdir_Curry_[ :tmpdir_pathname, @tmpdir_pathname, *a ]
+      end
+    end
 
-      id_num_digits = 3
+    TMP_DIRNAME_ = 'snag-production-tmpdir'
 
-      define_method :render_lines do |node, int=nil|
-        if int
-          node.build_identifier! int, id_num_digits
-        end
-        lines = [ "#{ node.identifier.render } #{ node.first_line_body }" ]
-        lines.concat node.extra_lines
-        lines
+    class Funcy_
+
+      MetaHell::Funcy[ self ]
+
+    private
+
+      def bork msg
+        @error_p[ msg ]
+        false
       end
 
-    end.call
-
-    def tmpdir_pathname dry_run, fu, error
-      res = false
-      begin
-        break( res = @tmpdir_pathname ) if @tmpdir_pathname
-        pn = ::Skylab.tmpdir_pathname.join 'snag-PROD' # heh
-        if ! pn.dirname.exist?
-          error and error[ "won't create more than one directory. #{
-            }Parent directory of our tmpdir (#{ pn.basename }) must exist: #{
-            }#{ escape_path pn.dirname }" ]
-          break
-        end
-        if ! pn.exist?
-          fu.mkdir( pn, noop: dry_run )
-        end
-        res = @tmpdir_pathname = pn
-      end while nil
-      res
+      def info msg
+        @info_p[ msg ]
+        nil
+      end
     end
+
+    Manifest = self
   end
 end

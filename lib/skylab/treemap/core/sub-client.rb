@@ -9,7 +9,7 @@ module Skylab::Treemap
 
     include Headless::SubClient::InstanceMethods  # floodgates!
 
-  protected
+  private
 
     def init_treemap_sub_client x
       init_headless_sub_client x # sets @error_count, e.g and..

@@ -1,26 +1,49 @@
-module ::Skylab::Subsystem
+module ::Skylab
 
-  module PATHNAMES
+  module Subsystem
 
-    class << self
+    module PATHNAMES
 
-      def at * i_a
-        i_a.map( & method( :send ) )
-      end
+      class << self
 
-      alias_method :calculate, :instance_exec
+        def at * i_a
+          i_a.map( & method( :send ) )
+        end
 
-      def bin
-        @bin ||= ::Skylab.dir_pathname.join( '../../bin' )
-      end
+        alias_method :calculate, :instance_exec
 
-      def binfile_prefix
-        @binfile_prefix ||= 'tmx-'.freeze
-      end
+        def bin
+          @bin ||= ::Skylab.dir_pathname.join( '../../bin' )
+        end
 
-      def supernode_binfile
-        @supernode_binfile ||= 'tmx'.freeze
+        def binfile_prefix
+          @binfile_prefix ||= 'tmx-'.freeze
+        end
+
+        def supernode_binfile
+          @supernode_binfile ||= 'tmx'.freeze
+        end
+
+        def tmpdir
+          @tmpdir ||= ::Pathname.new(
+            Subsystems_::Headless::Services::Tmpdir.tmpdir )
+        end
       end
     end
+  end
+
+  module Subsystems_
+
+    def self.const_missing c
+      if ! ::Skylab.const_defined? c, false
+        require ::Skylab.dir_pathname.join( "#{ Quick_[ c ] }/core" ).to_s
+      end
+      const_set c, ::Skylab.const_get( c, false )
+    end
+
+    Quick_ = -> c do
+      c.to_s.gsub( /(?<=[a-z])([A-Z])/ ) { "-#{ $1 }" }.downcase
+    end
+
   end
 end

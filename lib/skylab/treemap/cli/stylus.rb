@@ -49,7 +49,7 @@ module Skylab::Treemap
       pre x.inspect
     end
 
-  protected
+  private
 
     def initialize
       @is_hot = true              # a cli stylus that is not hot does not use

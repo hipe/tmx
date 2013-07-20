@@ -45,7 +45,7 @@ module Skylab::Snag
 
     alias_method :to_s, :render
 
-  protected
+  private
 
     def initialize name
       super

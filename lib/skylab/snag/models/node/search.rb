@@ -50,7 +50,7 @@ module Skylab::Snag
       0 == error_count ? self : false
     end
 
-  protected
+  private
 
     module Query_Nodes_
       MetaHell::Boxxy[ self ]
@@ -82,7 +82,7 @@ module Skylab::Snag
       def phrase
         @elements.map(&:phrase).join ' and '
       end
-    protected
+    private
       def initialize request_client, a
         @elements = a
       end
@@ -100,7 +100,7 @@ module Skylab::Snag
       def phrase
         "either validity or no validity"
       end
-    protected
+    private
       def initialize request_client
       end
     end
@@ -122,14 +122,14 @@ module Skylab::Snag
         if node.valid
           @tag_rx =~ node.first_line_body or
           if node.extra_lines_count > 0
-            node.extra_lines.index { |x| @tag_rx =~ x }
+            node.extra_line_a.index { |x| @tag_rx =~ x }
           end
         end
       end
       def phrase
         "tag ##{ @tag }"
       end
-    protected
+    private
       def initialize request_client, tag
         @tag = tag
         @tag_rx = /(?:^|[[:space:]])##{ ::Regexp.escape tag }\b/
@@ -156,7 +156,7 @@ module Skylab::Snag
       def phrase
         "identifier starting with \"#{ @identifier.body }\""
       end
-    protected
+    private
       def initialize request_client, identifier_struct
         @identifier = identifier_struct
         @identifier_rx = /\A#{ ::Regexp.escape @identifier.body }/ # [#019]
@@ -173,7 +173,7 @@ module Skylab::Snag
       def phrase
         'validity'
       end
-    protected
+    private
       def initialize request_client, _
       end
     end

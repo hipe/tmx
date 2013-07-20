@@ -8,7 +8,7 @@ module Skylab::Snag
 
       # straightforward subclient - emits PIE upwards
 
- protected
+ private
 
     #        ~ all methods/procs listed in pre-order traversal ~
 

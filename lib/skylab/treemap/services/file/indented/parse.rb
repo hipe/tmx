@@ -17,7 +17,7 @@ module Skylab::Treemap
 
     # --*--
 
-  protected
+  private
 
     def initialize attributes, char, pathname, stylus, error
       block_given? and fail 'no'

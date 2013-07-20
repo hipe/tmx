@@ -18,7 +18,7 @@ module Skylab::FileMetrics
 
   module API::Common::InstanceMethods
 
-  protected
+  private
 
     def initialize ui, req
       @ui, @req = ui, req
@@ -236,7 +236,7 @@ module Skylab::FileMetrics
     end
 
     define_method :shellescape_path, & FUN.shellescape_path
-    protected :shellescape_path
+    private :shellescape_path
 
     def rndr_tbl out, count, design
       if count.zero_children?

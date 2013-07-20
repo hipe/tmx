@@ -67,7 +67,7 @@ module Skylab::TestSupport::TestSupport::Quickie::Possible_
         x.should eql( true )
       end
 
-      it "reconcile with ambiguous nudges - soft failure", f:true do
+      it "reconcile with ambiguous nudges - soft failure" do
         (( sig1 = new_sig :beavis   )).nudge :A, :B
         (( sig2 = new_sig :butthead )).nudge :A, :B
         ok, grid = recon_plus :A, :B, [ sig1, sig2 ]

@@ -205,7 +205,7 @@ module TmxGit
         _info "Done looking at or pushing #{cnt} repos."
         true
       end
-    protected
+    private
       def init_manifest
         dir = @req[:paths].first
         File.directory?(dir) or dir = File.dirname(dir)

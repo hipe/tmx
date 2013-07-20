@@ -24,7 +24,7 @@ module Skylab::Snag::TestSupport::Models::Node
         node.message = _109_chars
         node.first_line_body.length.should eql( 68 )
         node.first_line_body[ -7 .. -1 ].should eql( ' X Ravi' )
-        el = node.extra_lines
+        el = node.extra_line_a
         el.length.should eql( 1 )
         el.first.should eql( 'Remix)" by Zedd - TableTurner started playing' )
       end
@@ -37,10 +37,10 @@ module Skylab::Snag::TestSupport::Models::Node
         long_line = "ABC_one_line_-two-line-_tre_line_"
         node.message = long_line
         node.first_line_body.should eql( 'ABC' )
-        node.extra_lines[0].should eql( '_one_line_' )
-        node.extra_lines[1].should eql( '-two-line-' )
-        node.extra_lines[2].should eql( '_tre_line_' )
-        node.extra_lines.length.should eql(3)
+        node.extra_line_a[0].should eql( '_one_line_' )
+        node.extra_line_a[1].should eql( '-two-line-' )
+        node.extra_line_a[2].should eql( '_tre_line_' )
+        node.extra_line_a.length.should eql(3)
       end
     end
 

@@ -17,7 +17,7 @@ module Skylab::Snag
 
     inflection.inflect.noun :singular
 
-  protected
+  private
 
     def execute
       if nodes
@@ -46,7 +46,7 @@ module Skylab::Snag
 
     inflection.inflect.noun :plural
 
-  protected
+  private
 
     def execute
       res = nil
@@ -87,7 +87,7 @@ module Skylab::Snag
       m = @lines.method( :<< )
       ::Enumerator::Yielder.new do |n|
         @lines << n.first_line
-        n.extra_lines.each(& m ) if n.extra_lines_count.nonzero?
+        n.extra_line_a.each(& m ) if n.extra_lines_count.nonzero?
         nil
       end
     end

@@ -18,7 +18,7 @@ module Skylab::CssConvert
       emit(:info, "IMPLEMENT ME merge")
     end
     attr_reader :sexp
-  protected
+  private
     def css_parser
       @css_parser ||= CssConvert::CSS::Parser.new request_client
     end

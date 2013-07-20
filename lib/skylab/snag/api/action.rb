@@ -67,7 +67,7 @@ module Skylab::Snag
       res
     end
 
-  protected
+  private
 
     def initialize api
       @nodes = nil

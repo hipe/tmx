@@ -10,7 +10,7 @@ module Skylab::FileMetrics
       res = false
       begin
         @path_a = @req[:paths]
-        file_a = self.file_a or break
+        file_a = get_file_a or break
         @ui.err.puts file_a if @req[:show_file_list]
         if ! @req[:show_report]
           break( res = true )
@@ -30,9 +30,9 @@ module Skylab::FileMetrics
     LineCount = Models::Count.subclass :total_share, :max_share, :lipstick,
       :lipstick_float
 
-  protected
+  private
 
-    def file_a
+    def get_file_a
       res_a = [ ]
       y = ::Enumerator::Yielder.new do |line|  # (just grease the wheels..)
         res_a << line
@@ -88,7 +88,7 @@ module Skylab::FileMetrics
           field[:lipstick].summary nil
         end
       end
-      protected :render_table
+      private :render_table
     end.call
   end
 end

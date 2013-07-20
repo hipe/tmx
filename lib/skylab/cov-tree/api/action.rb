@@ -23,7 +23,7 @@ module Skylab::CovTree
 
     event_factory PubSub::Event::Factory::Isomorphic.new( API::Events )
 
-  protected
+  private
 
     def error msg
       @last_error_message = msg

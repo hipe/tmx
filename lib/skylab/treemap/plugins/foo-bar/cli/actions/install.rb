@@ -3,7 +3,7 @@ module Skylab::Treemap
 
     desc "yerp"
 
-  protected
+  private
 
     def build_option_parser
       ::OptionParser.new do |op|

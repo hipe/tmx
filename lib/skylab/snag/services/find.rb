@@ -137,7 +137,7 @@ module Skylab::Snag
       end
     end
 
-  protected
+  private
 
     def initialize paths, names, pattern
       ech = -> x { "each? - #{ x.inspect }" if ! x.respond_to? :each }

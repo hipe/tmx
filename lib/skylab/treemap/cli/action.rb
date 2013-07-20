@@ -46,7 +46,7 @@ module Skylab::Treemap
       y
     end
 
-  protected
+  private
 
     #         ~ custom event building ~
 
@@ -135,7 +135,7 @@ module Skylab::Treemap
         end
       end
       @actual_parameters_box
-    end ; protected :actual_parameters_box
+    end ; private :actual_parameters_box
 
 
     #         ~ public methods called by the legacy f.w ~
@@ -208,7 +208,7 @@ module Skylab::Treemap
 
     # --*--
 
-  protected
+  private
 
 
     def initialize mc

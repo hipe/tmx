@@ -4,7 +4,7 @@ module Skylab::MyTree
 
     desc "this is ping, only one line of description."
 
-  protected
+  private
 
     def build_option_parser
     end

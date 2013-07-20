@@ -39,7 +39,7 @@ module Skylab::Treemap
       @is_normalized = res
     end
 
-  protected
+  private
 
     def initialize path, &wire
       wire or raise ::ArgumentError, 'block required'
