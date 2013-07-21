@@ -1,15 +1,19 @@
 require_relative 'test-support'
 
-describe "#{ ::Skylab::CovTree } CLI" do
+describe "#{ ::Skylab::SubTree } CLI" do
 
-  extend ::Skylab::CovTree::TestSupport::CLI
+  ts = ::Skylab::SubTree::TestSupport
+
+  extend ts::CLI
+
+  _PN = ts::CLI::CONSTANTS::PN_
 
   acts_rx = /\{ping.+rerun\}/
   actions = acts_rx.source
   expecting_rx_ = /\AExpecting #{ actions }\.\z/i # look!
   expecting_rx  = /\AExpecting #{ actions }\z/i
-  usage_rx = /\AUsage: cov-tree #{ actions } \[opts\] \[args\]\z/i
-  invite_rx = /\ATry cov-tree -h for help\.\z/
+  usage_rx = /\AUsage: #{ _PN } #{ actions } \[opts\] \[args\]\z/i
+  invite_rx = /\ATry #{ _PN } -h for help\.\z/
 
   it "0   : no args        : expecting / invite" do
     argv
@@ -46,7 +50,7 @@ describe "#{ ::Skylab::CovTree } CLI" do
     line.should match( usage_rx )
     line.should match( /^$/ )
     line.should match(
-    /\AFor help on a particular subcommand, try cov-tree <subcommand> -h\.\z/i
+    /\AFor help on a particular subcommand, try #{ _PN } <subcommand> -h\.\z/i
     )
     emission_a.should be_empty
     names.detect{ |x| :help != x }.should be_nil
@@ -67,7 +71,7 @@ describe "#{ ::Skylab::CovTree } CLI" do
 
   it "2.2 : `-h rec`       : 1) usage 2) desc 3) opts" do
     argv '-h', _CMD
-    line.should match(/\Ausage: cov-tree #{ _CMD }/i)
+    line.should match(/\Ausage: #{ _PN } #{ _CMD }/i)
     line.should match( /^$/ )
     line.should match(/\Adescription:?\z/i)
     line.should match(/\A *see crude/i)
@@ -87,7 +91,7 @@ describe "#{ ::Skylab::CovTree } CLI" do
   it "2.3 : `-h rec more`  : msg / usage / invite" do
     argv '-h', _CMD, 'wat'
     line.should match( /\bignoring: "wat"/ )
-    line.should match( /\Ausage: cov-tree / )
+    line.should match( /\Ausage: #{ _PN } / )
     # ..meh
     names.uniq.should eql( [ :info, :help ] )
     result.should eql( 0 )

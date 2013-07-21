@@ -1,12 +1,12 @@
 fail 'not on your life'  # #todo
 
-module Skylab::CovTree
+module Skylab::SubTree
 
   class API::Actions::Rerun < API::Actions::Cov
 
     attr_writer :rerun
 
-    glob_h = CovTree::PATH.glob_h
+    glob_h = SubTree::PATH.glob_h
 
     define_method :tree_to_render do
       rerun_ = rerun_file_paths or return false

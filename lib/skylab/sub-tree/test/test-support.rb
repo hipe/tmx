@@ -5,7 +5,7 @@ require 'skylab/test-support/core'
   # then we don't need to extend quick explicitly per test module ..
   # but this is just for easy legacy bridge-refactoring
 
-module Skylab::CovTree::TestSupport
+module Skylab::SubTree::TestSupport
 
   ::Skylab::TestSupport::Regret[ CovTree_TestSupport = self ]
 

@@ -1,4 +1,4 @@
-module Skylab::CovTree
+module Skylab::SubTree
 
   # these constants are used by coverage testing facilities so put no logic
   # in here.

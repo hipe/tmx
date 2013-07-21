@@ -3,11 +3,11 @@ require 'skylab/face/core'
 require 'skylab/headless/core'
 require 'skylab/porcelain/core'
 
-module Skylab::CovTree
+module Skylab::SubTree
 
   ::Skylab::MetaHell::FUN.import[ self, ::Skylab, [
     :Autoloader,
-    :CovTree,
+    :SubTree,
     :Headless,  # styles
     :MetaHell,
     :Porcelain,  # level-1 is this

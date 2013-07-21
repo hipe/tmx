@@ -1,6 +1,6 @@
-module Skylab::CovTree
+module Skylab::SubTree
 
-  CovTree::Services::Shellwords.class  # #kick
+  SubTree::Services::Shellwords.class  # #kick
 
   class API::Actions::Cov
 
@@ -14,7 +14,7 @@ module Skylab::CovTree
       def execute
         ok = true ; cmd = build_command
         @be_verbose and @info_p[ cmd ]
-        CovTree::Services::Open3.popen3 cmd do |_, sout, serr|
+        SubTree::Services::Open3.popen3 cmd do |_, sout, serr|
           e = serr.read
           if '' != e then
             ok = false

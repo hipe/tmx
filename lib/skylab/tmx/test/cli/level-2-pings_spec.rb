@@ -39,10 +39,6 @@ module Skylab::TMX::TestSupport::CLI::L2P
       capture3 :citxt, FLAG_, 0
     end
 
-    it "cov tree" do
-      go :cov_tree
-    end
-
     it "css-convert" do
       go :'css-convert', FLAG_
     end
@@ -89,6 +85,10 @@ module Skylab::TMX::TestSupport::CLI::L2P
 
     it "snag" do
       go :snag
+    end
+
+    it "sub tree" do
+      go :sub_tree
     end
 
     it "tan man" do

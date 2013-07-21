@@ -1015,7 +1015,9 @@ module Skylab::Porcelain::Legacy
       end,
       3 => -> up, pay, info, blk do
         blk and raise ::ArgumentError, "won't take block and args"
-        if singleton_class.method_defined? :event_listeners  # if pub sub
+        if MetaHell::FUN.
+          module_defines_method_in_some_manner[
+            singleton_class, :event_listeners ]  # if pub sub eew  #todo
           if pay  # (may have intentionally passed nil)
             on_payload        do |e| pay.puts  e.text end
           end

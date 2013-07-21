@@ -2,26 +2,28 @@
 
 require_relative 'test-support'
 
-module Skylab::CovTree::TestSupport::CLI::Actions::Cov
+module Skylab::SubTree::TestSupport::CLI::Actions::Cov
 
-  ::Skylab::CovTree::TestSupport::CLI::Actions[ self ]
+  ::Skylab::SubTree::TestSupport::CLI::Actions[ self ]
 
   include CONSTANTS
 
+  PN_.class
+
   CMD_ = 'cov'.freeze
 
-  RELATIVE_TESTDIR_NO_DOT_ = 'cov-tree/test'
+  RELATIVE_TESTDIR_NO_DOT_ = "#{ PN_ }/test"
 
   Abs_testdir_ = -> do
-    CovTree.dir_pathname.join( 'test' ).to_s
+    SubTree.dir_pathname.join( 'test' ).to_s
   end
 
   # (this used to be home to "dark hack" [#ts-010] but we modernized it)
 
 # lose indent 1x
-describe "#{ CovTree } CLI action: tree" do   # Quickie compatible !
+describe "#{ SubTree } CLI action: tree" do   # Quickie compatible !
 
-  extend CovTree::TestSupport::CLI
+  extend SubTree::TestSupport::CLI
 
   text = -> x do
     txt = x.payload_x
@@ -31,12 +33,12 @@ describe "#{ CovTree } CLI action: tree" do   # Quickie compatible !
 
   srbrx, srbrx2 = -> do
     rx = ::Regexp.escape TestSupport::FUN._spec_rb[]
-    [ /#{ rx }\z/, %r{\A\./cov-tree/.+#{ rx }\z} ]
+    [ /#{ rx }\z/, %r{\A\./#{ PN_ }/.+#{ rx }\z} ]
   end.call
 
   it "show a list of matched test files only." do
-    cd CovTree.dir_pathname.dirname do         # cd to lib/skylab ..
-      argv CMD_, '-l', './cov-tree/test'       # and ask about this subproduct
+    cd SubTree.dir_pathname.dirname do         # cd to lib/skylab ..
+      argv CMD_, '-l', "./#{ PN_ }/test"       # and ask about this subproduct
     end                                        # itself. (yes this is a self-
                                                # referential test ^_^)
                                                # each one of the returned
@@ -71,12 +73,12 @@ describe "#{ CovTree } CLI action: tree" do   # Quickie compatible !
   end
 
   it "Couldn't find test directory: foo/bar/[test|spec|features]" do
-    argv CMD_, CovTree.dir_pathname.join('models').to_s
+    argv CMD_, SubTree.dir_pathname.join('models').to_s
     line.should match(/\ACouldn't find test directory.+\[test\|spec\|features/)
     result.should eql( 1 )
   end
 
-  FIXTRS_ = CovTree.dir_pathname.join( 'test-fixtures' )
+  FIXTRS_ = SubTree.dir_pathname.join( 'test-fixtures' )
 
   context "basic" do
 
@@ -98,10 +100,10 @@ describe "#{ CovTree } CLI action: tree" do   # Quickie compatible !
   end
 
   it "LOOK AT THAT BEAUTIFUL COV TREE" do
-    cd CovTree.dir_pathname.dirname.to_s do
+    cd SubTree.dir_pathname.dirname.to_s do
       argv CMD_, RELATIVE_TESTDIR_NO_DOT_
     end
-    line.should match(/\Acov-tree, (?:cov-tree\/)?test +\[\+\|-\]\z/)
+    line.should match(/\A#{ PN_ }, (?:#{ PN_ }\/)?test +\[\+\|-\]\z/)
     line.should match(/\A ├api +\[ \|-\]\z/)
     l = line
     loop do

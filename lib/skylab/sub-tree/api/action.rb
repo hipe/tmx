@@ -1,4 +1,4 @@
-module Skylab::CovTree
+module Skylab::SubTree
 
   module API::Events  # #stowaway - avoiding #orphan
 
@@ -15,9 +15,9 @@ module Skylab::CovTree
 
   class API::Action
 
-    extend CovTree::Core::Action
+    extend SubTree::Core::Action
 
-    ACTIONS_ANCHOR_MODULE = CovTree::API::Actions
+    ACTIONS_ANCHOR_MODULE = SubTree::API::Actions
 
     extend PubSub::Emitter
 

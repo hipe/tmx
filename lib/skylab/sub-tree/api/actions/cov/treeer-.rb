@@ -1,4 +1,4 @@
-module Skylab::CovTree
+module Skylab::SubTree
 
   class API::Actions::Cov
 
@@ -45,7 +45,7 @@ module Skylab::CovTree
         begin
           t = tt.shift
           uber_t.destructive_merge t,
-            :key_proc, CovTree::Models::Hub::KEY_PROC_
+            :key_proc, SubTree::Models::Hub::KEY_PROC_
         end while tt.length.nonzero?
         uber_t
       end

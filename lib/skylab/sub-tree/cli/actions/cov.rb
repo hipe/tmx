@@ -1,6 +1,6 @@
 # [#bs-001]  # post-assembly-language-phase-phase
 
-module Skylab::CovTree
+module Skylab::SubTree
 
   class CLI::Actions::Cov < CLI::Action
 
@@ -21,7 +21,7 @@ module Skylab::CovTree
 
     def invoke param_h
       absorb_params( * param_h.flatten )
-      o = CovTree::API::Actions.const_fetch( local_normal_name ).new self
+      o = SubTree::API::Actions.const_fetch( local_normal_name ).new self
       o.on_error method( :error )
       o.on_info method( :info )
       o.prepare :list_as, @list_as, :path, @path, :be_verbose, @be_verbose

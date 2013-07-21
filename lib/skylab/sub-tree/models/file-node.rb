@@ -1,4 +1,4 @@
-module Skylab::CovTree
+module Skylab::SubTree
 
   class Models::FileNode
 

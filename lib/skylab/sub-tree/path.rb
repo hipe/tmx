@@ -1,4 +1,4 @@
-module Skylab::CovTree
+module Skylab::SubTree
 
   module PATH
 
@@ -14,7 +14,7 @@ module Skylab::CovTree
     end
 
     Glob_to_rx_ = -> glob do  # a hack
-      scn = CovTree::Services::StringScanner.new glob
+      scn = SubTree::Services::StringScanner.new glob
       out_a = []
       until scn.eos?
         if scn.scan( /\*/ )
@@ -30,12 +30,12 @@ module Skylab::CovTree
     end
 
     o[:test_dir_names_moniker] = -> do
-      "[#{ CovTree::Constants::TEST_DIR_NAME_A * '|' }]"
+      "[#{ SubTree::Constants::TEST_DIR_NAME_A * '|' }]"
     end
 
     o[:glob_h] = -> do
       p = -> do
-        srbg = "*#{ CovTree::Services::TestSupport::FUN._spec_rb[] }"
+        srbg = "*#{ SubTree::Services::TestSupport::FUN._spec_rb[] }"
         r = { 'features' => '*.feature',
               'spec'     => srbg,
               'test'     => srbg

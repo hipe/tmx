@@ -1,4 +1,4 @@
-module Skylab::CovTree
+module Skylab::SubTree
 
   class API::Actions::Cov
 
@@ -21,7 +21,7 @@ module Skylab::CovTree
         r
       end
 
-      class Box_ < CovTree::Services::Basic::Box
+      class Box_ < SubTree::Services::Basic::Box
         def render
           case length
           when 0 ;

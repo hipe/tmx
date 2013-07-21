@@ -1,4 +1,4 @@
-module Skylab::CovTree
+module Skylab::SubTree
 
   class CLI::Actions::Rerun < CLI::Actions::Cov
 

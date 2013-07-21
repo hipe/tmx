@@ -1,19 +1,20 @@
 require_relative '../test-support'
 require 'skylab/pub-sub/test/test-support'
 
-module Skylab::CovTree::TestSupport::CLI
+module Skylab::SubTree::TestSupport::CLI
 
-  ::Skylab::CovTree::TestSupport[ self ]  # #regret
+  ::Skylab::SubTree::TestSupport[ self ]  # #regret
 
   module CONSTANTS
-    CovTree = ::Skylab::CovTree
+    SubTree = ::Skylab::SubTree
     PubSub_TestSupport = ::Skylab::PubSub::TestSupport
     TestSupport = ::Skylab::TestSupport
+    PN_ = 'sub-tree'.freeze
   end
 
   module InstanceMethods
 
-    include CONSTANTS # access CovTree from within i.m's in the specs
+    include CONSTANTS # access SubTree from within i.m's in the specs
 
     # (in pre-order from the first test.)
 
@@ -46,15 +47,17 @@ module Skylab::CovTree::TestSupport::CLI
       @client ||= begin
         @names ||= [ ]
         es = emit_spy
-        client = CovTree::CLI.new do |clnt|
+        client = SubTree::CLI.new do |clnt|
           clnt.on_all do |e|
             es.emit e.stream_name, e.text
           end
         end
-        client.instance_variable_set :@program_name, 'cov-tree'
+        client.instance_variable_set :@program_name, PN_
         client
       end
     end
+
+    PN_ = 'sub-tree'.freeze
 
     def emit_spy
       @emit_spy ||= begin
@@ -90,8 +93,8 @@ module Skylab::CovTree::TestSupport::CLI
     attr_reader :names
 
     def cd path, &block
-      CovTree::Headless::CLI::PathTools.clear
-      CovTree::Services::FileUtils.cd path, verbose: do_debug, &block
+      SubTree::Headless::CLI::PathTools.clear
+      SubTree::Services::FileUtils.cd path, verbose: do_debug, &block
     end
   end
 end

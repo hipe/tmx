@@ -1,7 +1,7 @@
 require_relative '../test-support'
 
-module Skylab::CovTree::TestSupport::CLI::Actions
+module Skylab::SubTree::TestSupport::CLI::Actions
 
-  ::Skylab::CovTree::TestSupport::CLI[ self ]
+  ::Skylab::SubTree::TestSupport::CLI[ self ]
 
 end

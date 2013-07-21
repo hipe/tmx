@@ -1,12 +1,12 @@
-module Skylab::CovTree
+module Skylab::SubTree
 
   class CLI::Action
 
-    extend CovTree::Core::Action
+    extend SubTree::Core::Action
 
     include CLI::Styles
 
-    ACTIONS_ANCHOR_MODULE = CovTree::CLI::Actions
+    ACTIONS_ANCHOR_MODULE = SubTree::CLI::Actions
 
     def initialize supernode
       @infostream = supernode.infostream

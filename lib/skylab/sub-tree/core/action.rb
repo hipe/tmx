@@ -1,4 +1,4 @@
-module Skylab::CovTree
+module Skylab::SubTree
 
   module Core::Action
     def self.extended mod # good ol' [#sl-111]

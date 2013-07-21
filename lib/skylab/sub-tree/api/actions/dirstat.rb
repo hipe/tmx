@@ -1,4 +1,4 @@
-module Skylab::CovTree
+module Skylab::SubTree
 
   class API::Actions::Dirstat
 
@@ -124,13 +124,13 @@ module Skylab::CovTree
   stk = -> do
     if true  # if we ever make lipstick an option
       begin
-        CovTree::Services::Ncurses.class # # below
+        SubTree::Services::Ncurses.class # # below
         nc_ok = true
       rescue ::LoadError
       end
     end
     if ! nc_ok then -> _ { } else
-      CovTree::Services::Face.class  # #todo:during:0-subsystem, and above
+      SubTree::Services::Face.class  # #todo:during:0-subsystem, and above
       sp = '  '
       f = -> do
         tbl_width = ( fmt % [ 0, 0.0, '', ''] ).length

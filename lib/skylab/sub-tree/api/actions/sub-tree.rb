@@ -1,4 +1,4 @@
-module Skylab::CovTree
+module Skylab::SubTree
 
   class API::Actions::Sub_Tree
 
@@ -51,7 +51,7 @@ module Skylab::CovTree
       false
     end
 
-    include CovTree::Services::FileUtils
+    include SubTree::Services::FileUtils
 
     def process_pair in_pn, out_pn
       -> do  # #result-block

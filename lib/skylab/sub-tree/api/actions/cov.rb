@@ -1,4 +1,4 @@
-module Skylab::CovTree
+module Skylab::SubTree
 
   class API::Actions::Cov < API::Action
 
@@ -81,7 +81,7 @@ module Skylab::CovTree
           sub_dir = dir
           @sub_path_a and sub_dir = dir.join( @sub_path_a * SEP_ )
           glob = sub_dir.join( "**/#{ baseglob }" ).to_s
-          y << CovTree::Models::Hub.new(
+          y << SubTree::Models::Hub.new(
             :test_dir_pn, dir,
             :sub_path_a, @sub_path_a,
             :lister_p, -> { @lister },
@@ -101,7 +101,7 @@ module Skylab::CovTree
       end
     end
 
-    GLOB_H_ = CovTree::PATH.glob_h
+    GLOB_H_ = SubTree::PATH.glob_h
 
     # result is an enumerator over every pathname that looks like it is
     # a test directory from our `path`
@@ -127,7 +127,7 @@ module Skylab::CovTree
       end
     end
 
-    TEST_DIR_NAME_A_ = CovTree::Constants::TEST_DIR_NAME_A
+    TEST_DIR_NAME_A_ = SubTree::Constants::TEST_DIR_NAME_A
 
     def mutate_if_test_subnode
       begin
@@ -162,7 +162,7 @@ module Skylab::CovTree
     def tree
       if hub_a.length.zero?
         error "Couldn't find test directory: #{ pre escape_path(
-          @arg_pn.join CovTree::PATH.test_dir_names_moniker ) }"
+          @arg_pn.join SubTree::PATH.test_dir_names_moniker ) }"
         false
       else
         self.class::Treeer_[ :hub_a, hub_a, :arg_pn, @arg_pn,

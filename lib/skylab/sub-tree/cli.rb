@@ -1,6 +1,6 @@
 require_relative 'core'
 
-module Skylab::CovTree
+module Skylab::SubTree
 
   class CLI # (fwd decl. of a class also used as a namespace [#sl-109])
   end
@@ -44,8 +44,8 @@ module Skylab::CovTree
     desc "performs a ping."
 
     def ping
-      @infostream.puts "hello from cov tree."
-      :hello_from_cov_tree
+      emit :info, "hello from sub tree."
+      :hello_from_sub_tree
     end
 
     desc "(\"sub-tree\") from <in-dir> copy the files in <list> to <out-dir>. always safe."
@@ -58,13 +58,13 @@ module Skylab::CovTree
     argument_syntax '<in-dir> <out-dir> <list>'
 
     def st in_dir, out_dir, list, param_h
-      CovTree::API::Actions::Sub_Tree.new( :err, @infostream,
+      SubTree::API::Actions::Sub_Tree.new( :err, @infostream,
         :is_dry_run, false, :do_force, param_h[:do_force],
         :in_dir, in_dir, :out_dir, out_dir, :list, list ).execute
     end
 
     p = -> do
-      CovTree::API::Actions::Dirstat.get_desc
+      SubTree::API::Actions::Dirstat.get_desc
     end
 
     p.singleton_class.send :alias_method, :to_s, :call
@@ -76,7 +76,7 @@ module Skylab::CovTree
     def dirstat prefix, file=nil
       argv = [ prefix ]
       file and argv.push file
-      CovTree::API::Actions::Dirstat.new(
+      SubTree::API::Actions::Dirstat.new(
         :sin, @instream, :sout, @paystream, :serr, @infostream, :argv, argv,
         :program_name, @legacy_last_hot.send( :normalized_invocation_string ) ).
           execute
