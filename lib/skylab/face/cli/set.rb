@@ -120,7 +120,7 @@ module Skylab::Face
       end until scn.eos?
       nil
     end
-    protected :absorb_xtra_scn
+    protected :absorb_xtra_scn  # #protected-not-private
 
     def subsume prenatal  # #called-by parent sheets *and* mecahnics
       a = prenatal.instance_variables

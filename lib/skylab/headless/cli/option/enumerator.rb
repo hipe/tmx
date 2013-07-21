@@ -19,7 +19,7 @@ module Skylab::Headless
 
     attr_writer :filter  # this is a pass-filter, like ::Array#map
 
-  protected
+  private
 
     -> do
 

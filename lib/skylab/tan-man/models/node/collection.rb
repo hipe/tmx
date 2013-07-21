@@ -59,8 +59,9 @@ module Skylab::TanMan
       res
     end
 
+    attr_reader :graph_sexp
 
-  protected
+  private
 
     def initialize request_client, graph_sexp
       super request_client
@@ -109,8 +110,6 @@ module Skylab::TanMan
     def graph_noun
       request_client.graph_noun
     end
-
-    attr_reader :graph_sexp
 
     def node_controller node_stmt
       Models::Node::Controller.new request_client, node_stmt

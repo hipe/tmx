@@ -77,7 +77,7 @@ module Skylab::TanMan
     o[:valid_name_rx] = valid_name_rx
     FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
 
-  protected
+  private
 
     def initialize request_client, name, value
       _tan_man_sub_client_init request_client

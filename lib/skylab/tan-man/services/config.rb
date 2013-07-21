@@ -18,7 +18,7 @@ module Skylab::TanMan
 
     attr_accessor :local
 
-    protected :'local='
+    private :'local='
 
                        # (The below used to be a more sophisticated and hard-
                        # to understand event graph but we have flattened it
@@ -112,7 +112,7 @@ module Skylab::TanMan
       resources.count # what's one more filesystem call? :P
     end
 
-  protected
+  private
 
     def initialize
       # at this stage it is not determined that these files exist

@@ -148,7 +148,7 @@ module Skylab::MetaHell
       end
 
       def protected_methods &blk
-        with_access :protected, blk
+        with_access :private, blk
       end
 
       def public_methods &blk
@@ -198,9 +198,9 @@ module Skylab::MetaHell
         if ! mod_.instance_variable_defined? :@dir_pathname
           n = mod_.name
           mod_.instance_variable_set :@dir_pathname, mod.dir_pathname.join(
-            ::Skylab::Autoloader::Inflection::FUN.
+            ::Skylab::Autoloader::FUN.
               pathify[ n[ n.rindex( ':' ) + 1 .. -1 ] ] )
-          mod_.extend MAARS
+          MAARS[ mod_ ]
         end
         mod_
       end

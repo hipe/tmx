@@ -1,10 +1,6 @@
 module ::Skylab::TanMan
 
-  class Services::Starters
-
-    extname = '.dot'
-
-  public
+  class Services::Starters::Starters
 
     def starter                   # get the value from config
       fetch services.config.fetch 'starter' do 'holy-smack.dot' end
@@ -16,6 +12,8 @@ module ::Skylab::TanMan
 
     # `error` if one occurs will get called with a hash of metadata,
     # including one `message`.
+
+    extname = '.dot'
 
     define_method :normalize do |name, error|
       tries = []
@@ -49,7 +47,7 @@ module ::Skylab::TanMan
       res
     end
 
-  protected
+  private
 
     def box_module
       TanMan::Starters

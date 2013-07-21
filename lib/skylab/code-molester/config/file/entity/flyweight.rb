@@ -74,9 +74,9 @@ module Skylab::CodeMolester::Config::File::Entity
     # point at which you have outgrown this library!)
 
     -> do  # `if_valid` -
-      no = -> { nil }
+      no = MetaHell::EMPTY_P_
       sig_h = {
-        [ 0, true ] => -> _blk { [ -> { true }, no ] },
+        [ 0, true ] => -> _blk { [ MetaHell::MONADIC_TRUTH_, no ] },
         [ 0, false ] => -> blk { [ blk, no ] },
         [ 1, true ] => -> if_yes, _blk { [ if_yes, no ] },
         [ 2, true ] => -> if_yes, if_no, _blk { [ if_yes, if_no ] }

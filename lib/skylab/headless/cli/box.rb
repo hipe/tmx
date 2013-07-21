@@ -9,7 +9,7 @@ module Skylab::Headless
 
     include CLI::Action::InstanceMethods # makes dsl hacks easier, not nec. here
 
-  protected
+  private
 
     #                 ~ core controller-like methods ~
 
@@ -98,6 +98,7 @@ module Skylab::Headless
       end
       nil
     end
+    protected :help_screen  # #protected-not-private
 
     # `build_desc_lines` - this hackishly results in the array *and* has
     # side-effects (#todo) (here b.c called by `help_screen` in parent).

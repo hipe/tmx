@@ -148,16 +148,14 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
       x
     end
 
-  protected
+  private
 
     def initialize klass
       @klass = klass
     end
 
-    attr_reader :klass
-
     def name_pieces
-      @name_pieces ||= klass.to_s.split '::'
+      @name_pieces ||= @klass.to_s.split '::'
     end
   end
 
@@ -188,7 +186,7 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
       @inflection.lexemes.verb.send @inflection.inflect.verb
     end
 
-  protected
+  private
 
     def initialize inflection
       @inflection = inflection
@@ -212,7 +210,7 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
       @lexemes ||= Lexemes.new @klass
     end
 
-  protected
+  private
 
     def initialize klass
       @klass = klass

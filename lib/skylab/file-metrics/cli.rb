@@ -2,7 +2,7 @@ module Skylab::FileMetrics
 
   class CLI < ::Skylab::Face::CLI
 
-    extend ::Skylab::Autoloader
+    ::Skylab::Autoloader[ self ]
 
     use :hi, [ :last_hot, :as, :command ]
 

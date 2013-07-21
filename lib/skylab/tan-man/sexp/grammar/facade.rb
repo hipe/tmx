@@ -1,5 +1,7 @@
 module Skylab::TanMan
+
   class Sexp::Grammar::Facade < ::Struct.new :anchor_module, :grammar_const
+
     # experimental wrapper around a grammar with possibly useful svcs added.
 
     def build_parser_for_rule rule_name
@@ -8,7 +10,7 @@ module Skylab::TanMan
       p
     end
 
-    def has_rule? name # name e.g. "stmt_list", :stmt_list
+    def has_rule name  # name e.g. "stmt_list", :stmt_list
       self.module.instance_methods.include? "_nt_#{ name }".intern
     end
 
@@ -28,7 +30,7 @@ module Skylab::TanMan
       anchor_module.const_get "#{ grammar_const }Parser", false
     end
 
-  protected
+  private
 
     # none
 

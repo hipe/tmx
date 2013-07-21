@@ -26,10 +26,8 @@ module Skylab::Headless
       @svc_h = { }
     end
 
-    PFHS_ = -> _ { true }
-
     def proc_for_has_service
-      PFHS_
+      MetaHell::MONADIC_TRUTH_
     end
 
     def call_service i, _=nil, _=nil

@@ -5,7 +5,7 @@ module Skylab::TanMan
     param :path, pathname: true, accessor: true, required: true
 
 
-  protected
+  private
 
     extname = '.dot'
 

@@ -10,7 +10,7 @@ module Skylab::TanMan
       file_not_found: :negative,
       remote_not_found: :negative
 
-  protected
+  private
 
     def execute
       error 'cover me' ; true and return false

@@ -42,7 +42,7 @@ module Skylab::TanMan
       result
     end
 
-  protected
+  private
 
     pen = -> do
       o = Headless::CLI::Pen::Minimal.new
@@ -76,7 +76,7 @@ module Skylab::TanMan
     end.call
 
 
-    define_method :initialize do |sin=$stdin, sout=$stdout, serr=$stderr|
+    define_method :initialize do |sin, sout, serr|
       _tan_man_sub_client_init nil  # get it? # [#sl-114] above
 
       # self.io_adapter = build_io_adapter sin, sout, serr, pen # after [#018]
@@ -92,7 +92,7 @@ module Skylab::TanMan
       CLI::Actions
     end
 
-    attr_accessor :io_adapter # away at [#022]
+    module_exec :io_adapter, & MetaHell::FUN.private_attr_reader  # [#022]
 
     def infostream                # it is reasonable for some actions to
       io_adapter.errstream        # want to write certain kind of messages

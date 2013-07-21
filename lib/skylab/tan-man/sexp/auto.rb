@@ -10,7 +10,8 @@ module Skylab::TanMan
       alias_method :debug?, :do_debug
     end
 
-    self.debug_stream = $stderr
+    self.debug_stream = Headless::CLI::IO.stderr
+
     self.do_debug = true          # true until you know enough to find this line
 
 
@@ -38,7 +39,7 @@ module Skylab::TanMan
     end
 
 
-    constantize = Autoloader::Inflection::FUN.constantize
+    constantize = Autoloader::FUN.constantize
 
     define_method :add_instance_methods do |tree_class|
       if instance_methods_module

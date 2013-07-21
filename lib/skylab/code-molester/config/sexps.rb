@@ -18,14 +18,14 @@ module Skylab::CodeMolester::Config
       end
     end
 
-  protected
+  private
 
     def initialize host, &blk
       @host = host
       super( & blk )
     end
 
-    attr_reader :host
+    def host ; @host end
   end
 
   class Sexps::Enumerator::Hashish < Sexps::Enumerator

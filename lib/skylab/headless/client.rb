@@ -4,9 +4,10 @@ module Skylab::Headless
   end
 
   module Client::InstanceMethods
+
     include Headless::SubClient::InstanceMethods
 
-  protected
+  private
 
     def initialize                # (remember this is the base module for those
                                   # clients that fall all the way back to this
@@ -36,7 +37,9 @@ module Skylab::Headless
       @io_adapter ||= build_io_adapter
     end
 
-    attr_writer :io_adapter       # e.g. from tests
+    def io_adapter= x
+      @io_adapter = x             # e.g from tests
+    end
 
     def pen                       # bound to sub-client (#sc-bound)
       io_adapter.pen

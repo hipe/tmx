@@ -21,7 +21,7 @@ module Skylab::TanMan
       end
     end
 
-  protected
+  private
 
     def initialize param_h
       @normalized_resource_name = param_h.delete :normalized_resource_name
@@ -58,7 +58,7 @@ module Skylab::TanMan
                                                # portable in its way,
                                                # less portable in another way
 
-  protected
+  private
 
     def anchor_pathname                        # if the config file is
       pathname.join '../..'                    # .tanman/config, the anchor

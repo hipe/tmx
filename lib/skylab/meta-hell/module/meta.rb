@@ -34,7 +34,7 @@ module Skylab::MetaHell
     def _locked? ; @locked end
     def _unlock! ; @locked or fail('sanity') ; @locked = false end
 
-  protected
+  private
 
     def initialize name
       @locked = false

@@ -12,7 +12,7 @@ module Skylab::TestSupport
       #  ~ mechanics, reflection & services ~
 
       def plugin_i
-        @plugin_i ||= Autoloader::Inflection::FUN.methodize[ @const_i ]
+        @plugin_i ||= Autoloader::FUN.methodize[ @const_i ]
       end
 
       def intern  # compat with the `client_x` articulation API of possible-

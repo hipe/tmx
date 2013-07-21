@@ -15,7 +15,7 @@ module Skylab::Headless
   class DEV::Client
     include Headless::Client::InstanceMethods
 
-  protected
+  private
 
     def initialize sin=nil, sout=$stdout, serr=$stderr, pen=DEV::Pen.new
       self.io_adapter = Headless::CLI::IO_Adapter::Minimal.new(

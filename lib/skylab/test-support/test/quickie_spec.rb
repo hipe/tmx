@@ -52,7 +52,7 @@ module ::Skylab::TestSupport::TestSupport::Quickie
 
     def add_output e
       if do_debug
-        $stderr.puts "GOT OUTPUT: #{ e.inspect }"
+        TestSupport::Stderr_[].puts "GOT OUTPUT: #{ e.inspect }"
       end
       ( @output ||= [ ] ) << e
     end

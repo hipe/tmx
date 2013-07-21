@@ -31,21 +31,24 @@ module Skylab::TestSupport
 
     debug = ::Struct.new :condition, :emit
 
-    define_method :debug! do |stderr|          # each time a line is parsed out
-      @debug ||= debug.new                     # of any stream we will `puts`
-      @debug[:condition] ||= -> { true }       # to your `stderr` a line in a
-      @debug[:emit] = -> line do               # format of our choosing showing
-        stderr.puts [ line.stream_name, line.string ].inspect # both the stream
-      end                                      # name and the string content
-      stderr                                   # after any filters have been
-    end                                        # applied
+    define_method :debug! do |stderr|
+      # each time a line is parsed out  of any stream we will `puts` to your
+      # `stderr` a line in a  format of our choosing showing both the stream
+      # name and the string content after any filters have been applied
+      @debug ||= debug.new
+      @debug[:condition] ||= MetaHell::MONADIC_TRUTH_
+      @debug[:emit] = -> line do
+        stderr.puts [ line.stream_name, line.string ].inspect
+      end
+      stderr
+    end
 
     attr_reader :debug                         # (some tests want to know)
 
     define_method :debug= do |f|  # expert mode
       @debug ||= debug.new
       @debug[:condition] = f
-      debug!( $stderr ) if ! @debug[:emit]
+      debug!( Stderr_[] ) if ! @debug[:emit]
       f
     end
 
@@ -63,7 +66,7 @@ module Skylab::TestSupport
 
     define_method :stream_spy_for do |name|
       @streams.fetch name do
-        downstream = TestSupport_::Services::StringIO.new
+        downstream = Subsys::Services::StringIO.new
         filter = Headless::IO::Interceptors::Filter.new downstream
         filter.line_end = -> do
           downstream.rewind
@@ -104,7 +107,7 @@ module Skylab::TestSupport
       [names, strings].extend names_strings_hack
     end
 
-  protected
+  private
 
     def initialize
       @debug = nil

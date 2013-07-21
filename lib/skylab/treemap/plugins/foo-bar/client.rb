@@ -1,6 +1,7 @@
 module Skylab::Treemap
+
   module Plugins::FooBar
-    extend MetaHell::Autoloader::Autovivifying
+    MetaHell::Autoloader::Autovivifying[ self ]
   end
 
   class Plugins::FooBar::Client
@@ -15,7 +16,7 @@ module Skylab::Treemap
   end
 
   module Plugins::FooBar::CLI::Actions
-    extend MetaHell::Autoloader::Autovivifying
+    MetaHell::Autoloader::Autovifiying[ self ]
     MetaHell::Boxxy[ self ]
   end
 end

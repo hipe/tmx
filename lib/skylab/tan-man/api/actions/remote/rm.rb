@@ -6,7 +6,7 @@ module Skylab::TanMan
     attribute :remote_name, required: true
     attribute :resource_name, mutex_boolean_set: [:local, :global]
 
-  protected
+  private
 
     def execute
       result = nil

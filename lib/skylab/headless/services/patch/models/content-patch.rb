@@ -86,7 +86,7 @@ module Skylab::Headless
 
     end.call
 
-  protected
+  private
 
     def initialize content_string
       @chunks = [ ]

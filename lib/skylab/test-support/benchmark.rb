@@ -3,7 +3,7 @@ module Skylab::TestSupport
   module Benchmark
 
     def self.bmbm *a, &b
-      TestSupport_::Services::Benchmark.bmbm( *a, &b )
+      Subsys::Services::Benchmark.bmbm( *a, &b )
     end
 
     def self.selftest_argparse

@@ -24,7 +24,7 @@ module Skylab::TanMan
       }
     end
 
-  protected
+  private
 
     def initialize a, b, c=nil
       super a, b

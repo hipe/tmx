@@ -18,7 +18,7 @@ module Skylab::Headless
 
     attr_reader :pathname
 
-  protected
+  private
 
     def initialize pathname
       @fh = nil

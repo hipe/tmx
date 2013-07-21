@@ -3,9 +3,8 @@ module Skylab::Headless
   class Plugin::Metaservices_::Omni_
 
     def proc_for_has_service_used
-      P_
+      MetaHell::MONADIC_TRUTH_
     end
-    P_ = -> _ { true }
 
   end
 

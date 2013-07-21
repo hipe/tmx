@@ -1,7 +1,7 @@
 module Skylab::GitViz
 
   module API  # b.c stowed away here :/
-    extend MetaHell::MAARS
+    MetaHell::MAARS[ self ]
   end
 
   class API::Client < ::Struct.new :runtime

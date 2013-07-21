@@ -8,7 +8,7 @@ module Skylab::Headless
       @live = nil
     end
 
-  protected
+  private
 
     def initialize enum
       @live = true

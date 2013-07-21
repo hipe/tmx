@@ -39,7 +39,7 @@ module Skylab
       end ]
     end
 
-  protected
+  private
 
     def initialize
       yield self

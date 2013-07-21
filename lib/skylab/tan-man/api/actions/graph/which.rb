@@ -4,7 +4,7 @@ module Skylab::TanMan
 
     PARAMS = []
 
-  protected
+  private
 
     def execute
       res = nil

@@ -9,7 +9,7 @@ module Skylab::TanMan
     PARAMS = [ :dry_run, :label, :source_ref, :target_ref ] # verbose hard-coded
                                                             # below!
 
-  protected
+  private
 
     def execute
       res = nil

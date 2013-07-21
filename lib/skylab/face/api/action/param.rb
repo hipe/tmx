@@ -86,7 +86,7 @@ module Skylab::Face
 
     -> do
 
-      truefunc = -> _ { true }
+      truefunc = MetaHell::MONADIC_TRUTH_
       symfunc = -> i do
         -> bf do
           bf.field[ i ]

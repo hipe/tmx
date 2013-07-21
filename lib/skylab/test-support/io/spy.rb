@@ -34,7 +34,7 @@ module Skylab::TestSupport
     #
 
     def self.standard
-      new( buffer: TestSupport_::Services::StringIO.new ).tty!
+      new( buffer: Subsys::Services::StringIO.new ).tty!
     end
 
     # --*--

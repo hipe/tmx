@@ -1,7 +1,7 @@
 module Skylab::PubSub
 
   module API
-    extend MAARS
+    MAARS[ self ]
   end
 
   API::FUN = -> do

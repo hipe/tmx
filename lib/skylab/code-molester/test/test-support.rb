@@ -3,12 +3,13 @@ require_relative '../core'
 require 'skylab/test-support/core'
 
 module ::Skylab::CodeMolester::TestSupport
+
   include ::Skylab # TestSupport
 
   TestSupport::Regret[ CodeMolester_TestSupport = self ]
 
   TMPDIR = TestSupport::Tmpdir.new(
-    ::Skylab.tmpdir_pathname.join( 'co-mo' ),
+    Headless::System.defaults.tmpdir_pathname.join( 'co-mo' ),
     verbose: false
   )
 

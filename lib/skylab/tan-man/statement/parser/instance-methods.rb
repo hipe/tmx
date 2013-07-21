@@ -5,7 +5,7 @@ module Skylab::TanMan
 
     ENTITY_NOUN_STEM = 'statement'
 
-  protected
+  private
 
     # (we used to use the below for --force but we do it better now)
     define_method :absorb_parse_opts! do |o_h| # #compat ttt

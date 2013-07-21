@@ -23,7 +23,7 @@ module Skylab::Headless
       nil
     end
 
-  protected
+  private
 
     def initialize func
       @buffer = Headless::Services::StringIO.new

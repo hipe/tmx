@@ -5,7 +5,7 @@ module Skylab::TestSupport
     module API
       API = self
 
-      TestSupport = TestSupport_
+      TestSupport = Subsys
 
       %i| Basic Face Headless MetaHell |.each do |i|
         const_set i, TestSupport::Services.const_get( i, false )
@@ -14,7 +14,7 @@ module Skylab::TestSupport
       EMPTY_A_ = [].freeze
     end
 
-    TestSupport_::Services::Face::API[ self ]
+    Subsys::Services::Face::API[ self ]
 
     action_name_white_rx( /[a-z0-9]$/ )
 

@@ -62,7 +62,7 @@ module Skylab::MetaHell
         @exhaustion_p = nil
         absorb( * input_a )
       end
-      protected :initialize  # because [#038]
+      private :initialize  # because [#038]
       def get_conduit
         @conduit ||= Conduit_.new self
       end
@@ -118,7 +118,7 @@ module Skylab::MetaHell
       def _field_a
         @abstract_field_list._field_a
       end
-    protected
+    private
       def base_args
         [ @algorithm_p, @exhaustion_p, @abstract_field_list,
           @curry_queue_a, @call_p, @syntax ]
@@ -286,7 +286,7 @@ module Skylab::MetaHell
           mk[ a ]
         end
       end
-    protected
+    protected  # #protected-not-private
       def op_h
         self.class.const_get :OP_H_, false
       end

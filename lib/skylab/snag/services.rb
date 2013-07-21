@@ -2,7 +2,7 @@ module Skylab::Snag
 
   module Services
 
-    extend MetaHell::MAARS
+    MetaHell::MAARS[ self ]
 
     stdlib = ::Skylab::Subsystem::FUN.require_stdlib
     o = { }

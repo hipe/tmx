@@ -54,7 +54,7 @@ module Skylab::Headless
 
     # include CLI::Box::DSL::InstanceMethods WAS
 
-  protected
+  private
 
     # `build_option_parser` -- different than the other two (e.g) same-named
     # instance methods defined in another dsl module elsewhere, this is a

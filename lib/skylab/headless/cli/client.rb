@@ -1,7 +1,7 @@
 module Skylab::Headless
 
   module CLI::Client
-    extend Autoloader                          # (lazy-load files under client/)
+    Autoloader[ self ]                         # (lazy-load files under client/)
   end
 
   module CLI::Client::ModuleMethods            # future-proofing, aesthetics
@@ -9,7 +9,7 @@ module Skylab::Headless
   end
 
   module CLI::Client::Adapter                  # for [#054] ouroboros
-    extend MetaHell::MAARS
+    MetaHell::MAARS[ self ]
   end
 
   module CLI::Client::InstanceMethods
@@ -20,7 +20,7 @@ module Skylab::Headless
 
     attr_writer :program_name                  # public for ouroboros [#054]
 
-  protected
+  private
 
     param_h = {
       0 => -> _ { },
@@ -37,6 +37,10 @@ module Skylab::Headless
       end
       nil
     end
+
+  private
+
+    define_singleton_method :private_attr_reader, & Private_attr_reader_
 
     alias_method :init_headless_cli_client, :initialize
       # (`initialize` rarely gets left alone)
@@ -94,7 +98,8 @@ module Skylab::Headless
       CLI::Pen::Minimal
     end
 
-    attr_reader :program_name ; alias_method :program_name_ivar, :program_name
+    private_attr_reader :program_name
+    alias_method :program_name_ivar, :program_name
 
     def program_name
       program_name_ivar or ::File.basename $PROGRAM_NAME

@@ -13,11 +13,12 @@ module Skylab::TanMan
     inflection.inflect.noun :singular
 
     option_parser do |o|
+      @param_h ||= { }
       dry_run_option o
       help_option o
       o.on '--label <lbl>',
         'experimentally include a label in the created association' do |v|
-          param_h[:label] = v
+          @param_h[:label] = v
       end
     end
 
@@ -27,7 +28,7 @@ module Skylab::TanMan
              label: false,
         source_ref: source_ref,
         target_ref: target_ref
-      }.merge param_h )
+      }.merge @param_h )
     end
   end
 end

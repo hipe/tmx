@@ -8,8 +8,6 @@ module Skylab::Headless
     const_set i, ::Skylab.const_get( i, false )
   end
 
-  MAARS = MetaHell::MAARS
-
   module CONSTANTS
 
     MAXLEN = 4096  # (2 ** 12), the number of bytes in about 50 lines
@@ -19,5 +17,9 @@ module Skylab::Headless
   EMPTY_A_ = [ ].freeze
   IDENTITY_ = -> x { x }
 
-  extend MAARS
+  Private_attr_reader_ = MetaHell::FUN.private_attr_reader
+
+  ::Skylab::Subsystem[ self ]
+
+  MetaHell::MAARS[ self ]
 end

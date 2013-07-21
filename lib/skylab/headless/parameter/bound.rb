@@ -45,7 +45,7 @@ module Skylab::Headless
       when [:props, :select] ; ->(p) { props_f.call(p) && select_f.call(p) }
       when [:props]          ; props_f
       when [:select]         ; select_f
-      when []                ; ->(param) { true }
+      when []                ; MetaHell::MONADIC_TRUTH_
       end
       dupe(params_f: ->() do
         ::Enumerator.new do |y|
@@ -53,7 +53,7 @@ module Skylab::Headless
         end
       end)
     end
-  protected
+  private
     meta_param :inherit, boolean: true, writer: true
     param :known_f, accessor: true, inherit: true
     param :label_f, accessor: true, inherit: true

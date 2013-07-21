@@ -6,6 +6,9 @@ module Skylab::Porcelain::Legacy
   MetaHell = ::Skylab::MetaHell
   Porcelain = ::Skylab::Porcelain
 
+  Module_defines_method_ = MetaHell::FUN.
+    module_defines_method_in_some_manner
+
   module DSL                      # (section 1 of 7)
     def self.extended mod  # [#sl-111]
       mod.extend DSL::ModuleMethods
@@ -113,22 +116,19 @@ module Skylab::Porcelain::Legacy
     mutex_h = { } ; event_graph_init = nil  # open up as needed
 
     define_method :_porcelain_legacy_dsl_init do
+
       # (this may get called multiple times per module object if for
       # example a class descends from a charged class and itself extends
       # the DSL. So we arrive here from one or both of 2 ways. Either way
       # or both is fine, but we want to be sure that we never init a module
       # more than once. Break this up as needed.)
-      #
+
       mutex_h.fetch self do
         mutex_h[ self ] = true
-
-        # pub-sub is opt-in hence the below conditional --
-        # implement `emit` as u like.
-        if singleton_class.private_method_defined? :emits or
-            singleton_class.method_defined? :emits  then # *not* r-espond_to
-          class_exec(& event_graph_init )
-        end
-
+        # pub-sub is opt-in, implement `emit` however you want. still this sux
+        do_wire = Module_defines_method_[ singleton_class, :emits ]
+        has_emit_method = Module_defines_method_[ self, :emit ]
+        do_wire and class_exec( & event_graph_init )
         @is_collapsed = nil
         @dsl_is_hot = true
         @order_a = [ ]
@@ -138,10 +138,8 @@ module Skylab::Porcelain::Legacy
           # ancestor chain right now, to produce the order this is expected.
           story
         end
-        if ! method_defined? :emit  # don't overwrite pub-sub version, e.g
-          alias_method :emit, :_porcelain_legacy_emit
-        end
-        class << self
+        has_emit_method or alias_method :emit, :_porcelain_legacy_emit
+        class << self  # hack to avoid triggering this hook "early". sux
           alias_method :method_added, :_porcelain_legacy_method_added
         end
       end
@@ -548,7 +546,7 @@ module Skylab::Porcelain::Legacy
   end
 
   module Adapter
-    extend MAARS
+    MAARS[ self ]
   end
 
   module Action::InstanceMethods
@@ -1003,7 +1001,8 @@ module Skylab::Porcelain::Legacy
         blk or raise ::ArgumentError, "this #{ self.class } - a legacy #{
           } CLI client - requires that you construct it with 1 block or #{
           }3 args for io wiring (no arguments given) (nils or empty block ok)"
-        blk[ self ]
+        cnd = Event_Wiring_Conduit_.new method( :on )
+        blk[ cnd ]
         nil
       end,
       2 => -> rc, as, blk do  # experimental - one class plugs this in as..
@@ -1024,8 +1023,7 @@ module Skylab::Porcelain::Legacy
             on_info( on_error do |e| info.puts e.text end )
           end
         else
-          @instream = up
-          @paystream, @infostream = pay, info
+          @instream, @paystream, @infostream = up, pay, info
         end
         nil
       end
@@ -1035,6 +1033,23 @@ module Skylab::Porcelain::Legacy
       @program_name = @request_client = @action_sheet = nil
       instance_exec(* up_pay_info, wire,
                    & args_length_h.fetch( up_pay_info.length ) )
+    end
+
+    class Event_Wiring_Conduit_ < ::BasicObject
+      def initialize on_p
+        @on_p = on_p
+      end
+      def on *a, &b
+        @on_p[ *a, &b ]
+      end
+      def method_missing i, *a, &b
+        if (( md = ON_RX_.match i ))
+          @on_p[ md[1].intern, *a, &b ]
+        else
+          super
+        end
+      end
+      ON_RX_ = /\Aon_(.+)\z/
     end
 
   public
@@ -1379,7 +1394,7 @@ module Skylab::Porcelain::Legacy
       mutex_h.fetch self do
         mutex_h[ self ] = true
         @action_sheet ||= Action::Sheet.for_action_class( self )
-        if ! method_defined? :emit  # don't overwrite pub-sub version, e.g
+        if ! Module_defines_method_[ self, :emit ]
           alias_method :emit, :_porcelain_legacy_emit
         end
       end

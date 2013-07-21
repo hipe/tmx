@@ -14,7 +14,7 @@ module Skylab::CovTree
     :PubSub
   ] ]
 
-  extend MetaHell::MAARS
+  MetaHell::MAARS[ self ]
 
   module Core
     MetaHell::MAARS::Upwards[ self ]

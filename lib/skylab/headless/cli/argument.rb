@@ -97,7 +97,7 @@ module Skylab::Headless
       end
     end
 
-  protected
+  private
 
     def initialize                # child classes must set @elements
     end
@@ -151,7 +151,7 @@ module Skylab::Headless
       res
     end
 
-  protected
+  private
 
     def initialize ruby_param_a, formals
       @elements = ruby_param_a.reduce [] do |m, (opt_req_rest, name)|

@@ -9,10 +9,6 @@ module ::Skylab::CodeMolester
     const_set i, ::Skylab.const_get( i, false )
   end
 
-  MAARS = MetaHell::MAARS
-
-  extend MAARS
-
-  const_get :Services, false
+  ::Skylab::Subsystem[ self ]
 
 end

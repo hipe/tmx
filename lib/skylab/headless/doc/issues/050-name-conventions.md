@@ -78,7 +78,7 @@ what is in that particular name.
 
   + `render`, `render_foo` -
   (at one point we thought .. but then we were like ..)
-  rendering freqently happens internally (read: protected methods).
+  rendering freqently happens internally (read: private methods).
   the optimal shape for the method depends largely on what is being done;
   e.g a table might render its each row which would involve rendering each cel.
   memory might be prohibitve to join all the rows into one big string,

@@ -14,7 +14,7 @@ module Skylab::TanMan
 
     emits :all, error: :all, info: :all, skip: :info # etc
 
-  protected
+  private
 
     def dir
       @dir ||= path.join(local_conf_dirname)

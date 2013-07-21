@@ -5,7 +5,7 @@ module Skylab::TanMan
     param :path, pathname: true, accessor: true
     param :verbose, accessor: true
 
-  protected
+  private
 
     def execute # loooks like [#bs-022] file services below, might get dried
       res = nil

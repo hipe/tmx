@@ -38,13 +38,13 @@ module Skylab::TreetopTools
 
         # we want to hold on to the string representation of the path exactly
         # as the user provided it before we normalize it
-        @grammars = treetop_grammar.each_with_index.map do |pn, i|
+        @grammar_a = treetop_grammar.each_with_index.map do |pn, i|
           Grammar::Reflection.new(pn.to_s, ->{ treetop_grammar[i] },
                                   -> { generated_grammar_dir })
         end
         normalize_and_validate_paths_to :root_for_relative_paths or break
         load_or_generate_grammar_files or break
-        a = grammars.last.nested_const_names or break
+        a = @grammar_a.last.nested_const_names or break
         a[a.length - 1] = "#{ a.last }Parser"
         klass = a.reduce(::Object) { |m, c| m.const_get c, false }
         a = enhance_parser_with and a.each { |mod| klass = subclass klass, mod }
@@ -53,7 +53,7 @@ module Skylab::TreetopTools
       result
     end
 
-  protected
+  private
 
     def compiler
       @compiler ||= ::Treetop::Compiler::GrammarCompiler.new
@@ -64,12 +64,9 @@ module Skylab::TreetopTools
       ::FileUtils
     end
 
-    attr_reader :grammars
-
-    STACK_RE = %r{\A(?<file>[^:]+):(?<line>\d+)(?::in `(?<method>[^']+)')?\z/}
     def load_or_generate_grammar_files
-      summarize grammars
-      grammars.each do |g|
+      summarize @grammar_a
+      @grammar_a.each do |g|
         defined? ::Treetop or ::Skylab::Subsystem::FUN.
           require_quietly[ 'treetop' ]
         if force_overwrite or ! g.outpathname.exist?
@@ -78,7 +75,7 @@ module Skylab::TreetopTools
         begin
           require g.outpathname.sub_ext('').to_s
         rescue ::NameError => e
-          _context = (md = STACK_RE.match e.backtrace[0]) ?
+          _context = (md = STACK_RX_.match e.backtrace[0]) ?
             "in #{ File.basename(md[:file]) }:#{ md[:line] }" :
             "(#{ e.backtrace[0] })"
           raise RuntimeError.new( [e.message, _context].join(' ') )
@@ -86,6 +83,8 @@ module Skylab::TreetopTools
       end
       true
     end
+
+    STACK_RX_ = %r{\A(?<file>[^:]+):(?<line>\d+)(?::in `(?<method>[^']+)')?\z/}
 
     def mkdir_safe g
       # don't make any new directories deeper than the amt of dirs in grammar
@@ -179,14 +178,14 @@ module Skylab::TreetopTools
       newconst
     end
 
-    def summarize grammars
+    def summarize grammar_a
       exists = []; creates = []
-      grammars.each { |g| (g.outpathname.exist? ? exists : creates).push g }
+      grammar_a.each { |g| (g.outpathname.exist? ? exists : creates).push g }
       exists.empty? or emit(:info, "#{force_overwrite ? 'overwrit' : 'us'
         }ing: #{exists.map(&:outpath).join(', ')}")
       creates.empty? or
         emit(:info, "creating: #{creates.map(&:outpath).join(', ')}")
-      grammars.empty? and emit(:info, "none.")
+      grammar_a.length.zero? and emit :info, "none."
       true
     end
   end

@@ -1,7 +1,9 @@
 module Skylab::TanMan
 
   module API::Action::Attribute_Adapter
+
     def self.extended klass
+
       # this apparently has to happen on the parent class or the class
       # and can't simply be mixed in via plain old m.m and i.m modules
 
@@ -27,6 +29,7 @@ module Skylab::TanMan
   end
 
   module API::Action::Attribute_Adapter::InstanceMethods
+
     include Core::Attribute::Reflection::InstanceMethods
 
     # the below used to be a combination of update_attributes!, `valid?`,
@@ -56,9 +59,9 @@ module Skylab::TanMan
       result
     end
 
-  protected
+  private
 
-    attr_reader :invalid_reasons
+    class_exec :invalid_reasons, & MetaHell::FUN.private_attr_reader
     alias_method :invalid_reasons_ivar, :invalid_reasons
 
     def invalid_reasons

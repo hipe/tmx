@@ -43,7 +43,7 @@ module Skylab::TanMan
 
     attribute :local_conf_startpath, proc: true, default: ->{ ::Pathname.pwd }
 
-    attr_accessor :debug          # set to $stderr, for e.g
+    attr_accessor :debug          # set to $s-tderr, for e.g
 
   end
 

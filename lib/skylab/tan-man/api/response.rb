@@ -20,7 +20,7 @@ module Skylab::TanMan
       json
     end
 
-  protected
+  private
 
     def initialize
       super nil, [ ]

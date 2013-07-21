@@ -1,23 +1,19 @@
 require_relative '..'
 
-require 'skylab/headless/core'
-require 'skylab/meta-hell/core'
 require 'skylab/porcelain/core'
 
 module Skylab::Snag
 
-  Autoloader = ::Skylab::Autoloader
-  Headless = ::Skylab::Headless
-  Snag = self # #hiccup
-  MetaHell = ::Skylab::MetaHell
-  Porcelain = ::Skylab::Porcelain
-  PubSub = ::Skylab::PubSub
+  %i| Autoloader Headless MetaHell Porcelain PubSub Snag |.each do |i|
+    const_set i, ::Skylab.const_get( i, false )
+  end
 
   module Core
-    extend MetaHell::MAARS
+    MetaHell::MAARS[ self ]
   end
 
   IDENTITY_ = -> x { x }
 
-  extend MetaHell::MAARS
+  ::Skylab::Subsystem[ self ]
+
 end

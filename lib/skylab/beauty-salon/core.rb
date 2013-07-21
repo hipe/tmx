@@ -13,7 +13,7 @@ module Skylab::BeautySalon
 
   module CLI  # (avoiding orphan file by putting it here.)
 
-    extend MAARS
+    MAARS[ self ]
 
     def self.new *a
       const_get( :Client ).new( *a )
@@ -22,5 +22,5 @@ module Skylab::BeautySalon
 
   IDENTITY_ = -> x { x }          # for fun we track this
 
-  extend MAARS
+  MAARS[ self ]
 end

@@ -90,7 +90,7 @@ module Skylab::Headless
   end
 
   module Parameter::Definer::InstanceMethods::IvarsAdapter
-  protected
+  protected  # #protected-not-private
 
     def [] k
       if ! instance_variable_defined? "@#{ k }"
@@ -110,7 +110,7 @@ module Skylab::Headless
   end
 
   module Parameter::Definer::InstanceMethods::ActualParametersIvar
-    protected
+    private
     def []  (k)     ; @actual_parameters[k]        end
     def []= (k, v)  ; @actual_parameters[k] = v    end
     def known?(k)   ; @actual_parameters.known?(k) end
@@ -160,7 +160,7 @@ module Skylab::Headless
       nil
     end
 
-  protected
+  private
 
     def initialize host
       super( )  # init box!
@@ -248,7 +248,7 @@ module Skylab::Headless
 
     attr_reader :normalized_parameter_name
 
-  protected
+  private
 
     # this badboy bears some explanation: so many of these method definitions
     # need the same variables to be in scope that it is tighter to define

@@ -8,7 +8,7 @@ module Skylab::TanMan
     attr_reader :name  # ICK override ..
     attribute :resource, default: :local, mutex_boolean_set: [:local, :global]
 
-  protected
+  private
 
     def execute
       result = nil

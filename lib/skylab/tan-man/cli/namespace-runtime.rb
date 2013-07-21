@@ -7,7 +7,7 @@ module Skylab::TanMan
     # or core action i.m's
     #
 
-  protected
+  private
 
     def initialize request_client, module_with_actions
       # this was the site of a lot of blood
@@ -15,7 +15,7 @@ module Skylab::TanMan
       init_headless_sub_client request_client
       _namespace_inferred_init module_with_actions
       parent              or fail 'sanity - parent?'
-      self.request_client or fail 'sanity - req cli?'
+      @request_client     or fail 'sanity - req cli?'
     end
 
     def normalized_invocation_string # #compat-headless #compat-bleeding

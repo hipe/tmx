@@ -490,14 +490,14 @@ module Skylab::PubSub
 
   module PubSub::Event
 
-    extend MetaHell::Autoloader::Autovivifying::Recursive
+    MetaHell::MAARS[ self ]
       # (file placement might change.. for now it's a jumble)
 
   end
 
   class PubSub::Event::Unified
 
-    extend MetaHell::Autoloader::Autovivifying::Recursive
+    MetaHell::MAARS[ self ]
 
     # `initialize` - *highly* #experimental args. handling of payload is left
     # intentionally sparse here, different applications will process and

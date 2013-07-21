@@ -8,7 +8,7 @@ module Skylab::Git::TestSupport::Actions::Stash_Untracked
 
   # ( no Q_uickie because of `.stub`-ing below )
 
-  tdpn = ::Skylab.tmpdir_pathname.join 'gsu-xyzzy'
+  tdpn = Headless::System.defaults.tmpdir_pathname.join 'gsu-xyzzy'
 
   gsu_tmpdir = TestSupport::Tmpdir.new tdpn.to_s
 

@@ -15,7 +15,7 @@ module Skylab::TanMan
     option_parser do |o|
       dry_run_option o
       o.on '-f', '--force', 'required to overcome fuzzy match dupe check.' do
-        param_h[:force] = true
+        @param_h[:force] = true
       end
       help_option o
       verbose_option o
@@ -23,7 +23,7 @@ module Skylab::TanMan
 
     def process name
       api_invoke( { dry_run: false, force: false, name: name, verbose: false }.
-                 merge param_h )
+                 merge @param_h )
     end
   end
 
@@ -38,7 +38,7 @@ module Skylab::TanMan
     end
 
     def process
-      api_invoke( { verbose: false }.merge param_h )
+      api_invoke( { verbose: false }.merge @param_h )
     end
   end
 
@@ -56,7 +56,7 @@ module Skylab::TanMan
 
     def process name
       api_invoke( { dry_run: false, node_ref: name, verbose: false }.
-                 merge param_h )
+                 merge @param_h )
     end
   end
 end

@@ -15,7 +15,7 @@ module Skylab::Flex2Treetop::MyTestSupport
     end
     _tmpdir_f = -> do
       t = ::Skylab::TestSupport::Tmpdir.new(
-        ::Skylab.tmpdir_pathname.join 'f2tt'
+        ::Skylab::Headless::System.defaults.tmpdir_pathname.join 'f2tt'
       )
       (_tmpdir_f = ->{t}).call
     end

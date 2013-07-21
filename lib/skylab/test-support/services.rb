@@ -1,7 +1,5 @@
 module Skylab::TestSupport
 
-  Services = ::Skylab::Subsystem::Services.new @dir_pathname
-
   module Services
 
     stdlib, subsys, gemlib =

@@ -36,7 +36,7 @@ module Skylab::TestSupport
       def beginning_eventpoint_notify
         usage
         @y << "options:"
-        fun = TestSupport_::Services::Face::CLI::Table::FUN
+        fun = Subsys::Services::Face::CLI::Table::FUN
         fun.tablify[
           [[ :fields, [ :arg, :desc ]],
            [ :show_header, false ],

@@ -82,7 +82,7 @@ module ::Skylab::TestSupport
     # this is just a proof of concept geared around duplicating and DRY-ing
     # up what's happening in the tests now.)
 
-    spec_tail = TestSupport_::FUN._spec_rb[]
+    spec_tail = Subsys::FUN._spec_rb[]
     spec_tail_len = spec_tail.length
     spec_rx = %r| \A  (?<dir>.+[^/])  /
                       (?<stem>[^/]+) #{ ::Regexp.escape spec_tail } \z |x
@@ -186,7 +186,7 @@ module ::Skylab::TestSupport
 
       nil
     end
-    protected :init_regret
+    private :init_regret
 
     module_bumper = -> host_module do
       -> const, func=nil do
@@ -224,7 +224,7 @@ module ::Skylab::TestSupport
 
     def tmpdir
       @tmpdir ||= begin
-        TestSupport_::Tmpdir.new path: tmpdir_pathname,
+        Subsys::Tmpdir.new path: tmpdir_pathname,
           max_mkdirs: ( count_to_top + 1 ) # one for tmp/your-sub-product
       end
     end
@@ -234,7 +234,7 @@ module ::Skylab::TestSupport
         parent_anchor_module or raise "You better set #{
           }@tmpdir_pathname in #{ self } because somebody is looking for it."
         par = parent_anchor_module.tmpdir_pathname
-        dir = Autoloader::Inflection::FUN.pathify[
+        dir = Autoloader::FUN.pathify[
           name[ name.rindex( ':' ) + 1 .. -1 ] ]
         par.join dir
       end
@@ -242,9 +242,9 @@ module ::Skylab::TestSupport
 
     attr_writer :tmpdir_pathname
 
-  protected
+  private
 
-    # nothing is protected.
+    # nothing is private.
 
   end
 end

@@ -10,7 +10,7 @@ module Skylab::TanMan
 
     include TanMan::Statement::Parser::InstanceMethods
 
-  protected
+  private
 
     def execute
       res = nil

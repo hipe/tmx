@@ -2,7 +2,9 @@ require_relative '..' # skylab.rb
 require 'skylab/porcelain/core' # attr definer, table
 
 module Skylab
+
   module TanMan
+
     Autoloader   = ::Skylab::Autoloader
     Bleeding     = ::Skylab::Porcelain::Bleeding
     Headless     = ::Skylab::Headless
@@ -10,18 +12,26 @@ module Skylab
     PubSub       = ::Skylab::PubSub
     TanMan       = self #sl-107 (pattern)
 
-    extend MetaHell::Autoloader::Autovivifying::Recursive
+    MetaHell::MAARS[ self ]
+
+    CUSTOM_PARSE_TREE_METHOD_NAME_ = :tree
+
   end
 
   module TanMan::Core
-    extend MetaHell::Autoloader::Autovivifying::Recursive
+
+    MetaHell::MAARS[ self ]
 
     module Event  # #stowaway all of this
+
       module LingualMethods
+
         attr_accessor :message  # k.i.w.f (i think) [#076]
         attr_accessor :is_inflected_with_action_name  # k.i.w.f (i think) [#076]
         attr_accessor :is_inflected_with_failure_reason  # [#076] k.i.w.f
-      protected
+
+      private
+
         def init_lingual x
           @message = x
         end

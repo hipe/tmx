@@ -12,10 +12,10 @@ module Skylab::Cull
   Basic = Face::Services::Basic
   MAARS = MetaHell::MAARS
 
-  extend MAARS
+  MAARS[ self ]
 
   module CLI
-    extend MAARS
+    MAARS[ self ]
 
     def self.new *a, &b
       self::Client.new( *a, &b )
@@ -23,7 +23,7 @@ module Skylab::Cull
   end
 
   module API
-    extend MAARS
+    MAARS[ self ]
     module Actions
       MetaHell::Boxxy[ self ]
     end

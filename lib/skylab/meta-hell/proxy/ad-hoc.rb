@@ -22,7 +22,7 @@ module Skylab::MetaHell
       alias_method :[], :new
     end
 
-  protected
+  private
 
     def initialize h
       singleton_class = class << self

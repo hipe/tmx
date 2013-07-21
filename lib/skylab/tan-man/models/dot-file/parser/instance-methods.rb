@@ -8,7 +8,7 @@ module Skylab::TanMan
 
     ENTITY_NOUN_STEM = 'dot file'
 
-  protected
+  private
 
     def load_parser_class
 

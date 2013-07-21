@@ -21,9 +21,9 @@ module Skylab::TanMan
       block_given? and fail 'sanity - no blocks here!'
       action = new request_client, events
       result = action.set! param_h
-      if result                         # we violate the protected nature of
+      if result                         # we violate the private nature of
         result = action.send :execute   # it only b/c we are the class!
-      end                               # it is protected for the usual reasons
+      end                               # it is private for the usual reasons
       result
     end
 
@@ -31,7 +31,13 @@ module Skylab::TanMan
 
     # none
 
-  protected
+  protected  # #protected-not-private
+
+    attr_reader :collections
+
+    attr_reader :controllers
+
+  private
 
     define_method :initialize do |request_client, events|
       init_headless_sub_client request_client
@@ -66,9 +72,5 @@ module Skylab::TanMan
       o.define_singleton_method :method_missing, & method_missing[ :Controller ]
 
     end
-
-    attr_reader :collections
-
-    attr_reader :controllers
   end
 end

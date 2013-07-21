@@ -16,7 +16,7 @@ module Skylab::TanMan
 
     attr_reader :tmpdir
 
-  protected
+  private
 
     def initialize
       @tmpdir = ::Skylab::TestSupport::Tmpdir.new(

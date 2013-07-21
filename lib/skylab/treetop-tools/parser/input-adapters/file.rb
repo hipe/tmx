@@ -44,7 +44,7 @@ module Skylab::TreetopTools
       Parser::InputAdapter::Types::FILE
     end
 
-  protected
+  private
 
     EVENTS = Headless::Parameter::Definer.new do
       param :on_file_is_dir,    hook: true, writer: true

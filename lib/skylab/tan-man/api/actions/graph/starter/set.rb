@@ -8,7 +8,7 @@ module Skylab::TanMan
     param :resource_name, accessor: true, default: :local,
       enum: [:local, :global], required: true
 
-  protected
+  private
 
     def execute
       res = nil

@@ -3,11 +3,12 @@ require 'skylab/headless/core'
 require 'optparse'
 
 module Skylab::CssConvert
-  extend ::Skylab::MetaHell::Autoloader::Autovivifying
 
+  ::Skylab::MetaHell::Autoloader::Autovivifying[ self ]
+
+  Autoloader = ::Skylab::Autoloader
   CssConvert = self
   Headless = ::Skylab::Headless
-  Inflection = ::Skylab::Autoloader::Inflection
 
   module Core
     # a namespace to hold modality-agnositc stuff

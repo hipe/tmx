@@ -33,7 +33,7 @@ module Skylab::CodeMolester
 
     attr_reader :message_proc  # ( set in `initialize` )
 
-  protected
+  private
 
     # result : start_idx_of_line, line_number (1-indexed), line_width
     line_info = -> string, seek_idx do

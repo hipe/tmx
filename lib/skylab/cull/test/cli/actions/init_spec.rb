@@ -13,7 +13,7 @@ module Skylab::Cull::TestSupport::CLI::Actions::Init
     extend Init_TS_
 
     as :creating_done,
-      %r{creating \./\.cullconfig \.\. done \(\d\d bytes\)\.\z}i, :nonstyled
+      %r{creating #{ PN_ } \.\. done \(\d\d bytes\)\.\z}i, :nonstyled
 
     it "from inside an empty directory, explains the situation" do
 
@@ -27,7 +27,7 @@ module Skylab::Cull::TestSupport::CLI::Actions::Init
     end
 
     as :exists,
-      %r{\Awtvr init: exists, skipping - \./\.cullconfig\z}, :nonstyled
+      %r{\Awtvr init: exists, skipping - #{ PN_ }\z}, :nonstyled
 
     it "from inside a directory with a nerk, explains it all" do
 

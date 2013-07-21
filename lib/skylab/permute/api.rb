@@ -47,7 +47,7 @@ module Skylab::Permute
 
     attr_reader :enum_a
 
-  protected
+  private
 
     def initialize enum_a
       @enum_a = enum_a

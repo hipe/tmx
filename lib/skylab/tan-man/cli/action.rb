@@ -28,7 +28,7 @@ module Skylab::TanMan
         while x = a.shift
           mod = mod.const_get x, false
           if use
-            o.push Autoloader::Inflection::FUN.methodize[ x ]
+            o.push Autoloader::FUN.methodize[ x ]
           else
             use = true
           end
@@ -111,7 +111,7 @@ module Skylab::TanMan
         end
       end while nil
       if false == res
-        $stderr.puts "WAT: #{ o.inspect }"
+        fail 'wat'  # #todo
         res = nil
       end
       res
@@ -141,7 +141,7 @@ module Skylab::TanMan
       res
     end
 
-  protected
+  private
 
     # ---------------- jawbreak blood begin --------------------
 
@@ -185,7 +185,6 @@ module Skylab::TanMan
       end
 
        on_all do |e|
-        # $stderr.puts "OK: #{ [e.stream_name, e.message].inspect }"
         if ! e.touched?
           # we are re-emitting to parent the event #todo is this ok?
           request_client.send :emit,  e
@@ -202,20 +201,18 @@ module Skylab::TanMan
     end
 
     def api_invoke *args          # [normalized acton name] [param_h]
-      if ::Hash === args.last
-        param_h = args.pop       # else nil ok for these
-      end
-      if ::Array === args.last
-        normalized_action_name = args.pop
+      args.last.respond_to? :each_pair and any_param_h = args.pop
+      norm_act_name = if args.last.respond_to? :each_index
+        args.pop
       else
-        normalized_action_name = self.normalized_action_name
+        normalized_action_name
       end
-      if args.any?
-        raise ::ArgumentError.exception "[normalized acton name] [param_h]"
-      end
+      args.length.zero? or raise ::ArgumentError,
+        "[normalized acton name] [param_h]"
 
-      services.api.invoke normalized_action_name, param_h, self, -> o do
-        o.on_all { |event| emit event }
+      services.api.invoke norm_act_name, any_param_h, self, -> o do
+        o.on_all { |e| emit e }  # do NOT change this to method(..) .. arity!
+        # o.on_all( & method( :emit ) )
       end
     end
 
@@ -287,8 +284,6 @@ module Skylab::TanMan
       words = sentence[ parts ]
       "#{ words.join ' '} - #{ e.message }"
     end
-
-    attr_reader :param_h
 
     def program_name # #compat-bleeding (tracked as [#hl-034])
       normalized_invocation_string

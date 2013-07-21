@@ -344,7 +344,7 @@ module Skylab::MetaHell::TestSupport::Boxxy
       it "`extname`" do
         Sandbox_11.with self
         module Sandbox_11
-          DSL_.extname.should eql( ::Skylab::Autoloader::EXTNAME )
+          DSL_.extname.should eql( MetaHell::Autoloader::EXTNAME )
         end
       end
       it "`upwards`" do
@@ -354,7 +354,7 @@ module Skylab::MetaHell::TestSupport::Boxxy
           ( !! Fiz.dir_pathname.to_s.match( /fiz\z/ ) ).should eql( true )
         end
       end
-      it "`get_const`" do
+      it "`get_const`", f:true do
         Sandbox_11.with self
         module Sandbox_11
           DSL_.get_const( :ZIP ).should eql( :zap )
@@ -362,7 +362,7 @@ module Skylab::MetaHell::TestSupport::Boxxy
           module Zangief ; end
           -> do
             DSL_.get_const( :Zangief )
-          end.should raise_error( NameError,
+          end.should raise_error( ::LoadError,
                        ::Regexp.new( "\\Auninitialized\\ consta" ) )
         end
       end

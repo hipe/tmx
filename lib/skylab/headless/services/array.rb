@@ -22,7 +22,7 @@ module Skylab::Headless
 
     attr_reader :arr, :pos, :length
 
-  protected
+  private
 
     def initialize arr
       @arr = arr

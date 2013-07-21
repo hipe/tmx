@@ -1,6 +1,6 @@
 module Skylab::TanMan
   class Models::DotFile::Actions::Forget < Models::DotFile::Action
-  protected
+  private
     def execute
       name = statement.target.words.join ' '
       api_invoke [:graph, :meaning, :forget],  dry_run: dry_run,

@@ -47,7 +47,7 @@ module Skylab::TanMan
       message
     end
 
-  protected
+  private
 
     def initialize request_client, *a
       @message = nil

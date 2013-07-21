@@ -4,7 +4,7 @@ module Skylab::Headless
     attr_reader :left
     attr_reader :right
 
-  protected
+  private
 
     def initialize
       @left = Side.new
@@ -34,7 +34,7 @@ module Skylab::Headless
 
     attr_reader :range
 
-  protected
+  private
 
     def initialize
       @range = Range.new
@@ -57,7 +57,7 @@ module Skylab::Headless
       @end += 1
     end
 
-  protected
+  private
     def initialize
       @begin = nil
       @end = nil

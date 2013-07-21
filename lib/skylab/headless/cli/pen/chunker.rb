@@ -3,7 +3,7 @@ module Skylab::Headless
   CLI::Pen::Chunker = MetaHell::Function::Class.new :gets
   class CLI::Pen::Chunker
 
-  protected
+  private
 
     -> do
 
@@ -104,7 +104,7 @@ module Skylab::Headless
 
   class Headless::CLI::Pen::Chunker::Enumerator < ::Enumerator
 
-  protected
+  private
 
     def initialize sexp
       super(& -> y do

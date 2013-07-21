@@ -40,7 +40,7 @@ module Skylab::TanMan
       result
     end
 
-  protected
+  private
 
     def initialize resource
       block_given? and raise ArgumentError.new(

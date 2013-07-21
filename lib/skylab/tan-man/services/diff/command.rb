@@ -11,7 +11,7 @@ module Skylab::TanMan
        ].join ' '
     end
 
-  protected
+  private
 
     def initialize file_path_before, file_path_after
       self[:file_path_before] = ::Pathname.new( file_path_before.to_s )

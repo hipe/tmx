@@ -13,7 +13,8 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     define_method :private_attr_accessor, & MetaHell::FUN.private_attr_accessor
   end
 
-  extend Autoloader               # for our one other file..
+  Autoloader[ self ]              # for our one other file..
+
 
   module SubClient_InstanceMethods
 
@@ -320,7 +321,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
 
     include SubClient_InstanceMethods
 
-    pathify = Autoloader::Inflection::FUN.pathify
+    pathify = Autoloader::FUN.pathify
 
     define_singleton_method :normalized_action_name do
       name[ API::Actions.name.length + 2  .. -1 ].

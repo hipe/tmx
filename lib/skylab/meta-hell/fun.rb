@@ -34,7 +34,7 @@ module Skylab::MetaHell
   end
 
   o[:pathify_name] = -> const_name_s do
-    ::Skylab::Autoloader::Inflection::FUN.
+    ::Skylab::Autoloader::FUN.
       pathify[ const_name_s.gsub( '::', '/' ) ]
   end
 
@@ -160,6 +160,7 @@ module Skylab::MetaHell
 
   x[:private_attr_reader]              = deprecated = [ :Deprecated ]
   x[:private_attr_accessor]            = deprecated
+  x[:module_defines_method_in_some_manner] = deprecated
 
   def FUN.at *a
     a.map( & method( :send ) )

@@ -4,129 +4,138 @@ module Skylab::TestSupport
 
   class Tmpdir < ::Pathname
 
-    include TestSupport_::Services::FileUtils
+    include Subsys::Services::FileUtils
 
-    def verbose!                  # see also the similar `debug!`
-      @verbose = true
-      self
+    def debug!
+      @be_verbose = true
+      nil
     end
 
-    def debug!                    # this compats with our convention org-wide
-      @verbose = true             # this compats with the file utils convention
-    end                           # (but see also `verbose!` chainable variant)
+    def verbose!
+      @be_verbose = true
+      self  # chainable variant of above
+    end
 
-    attr_accessor :verbose        # yes. some clients need to be able to
-                                  # set it using a variable.
+    def verbose= x
+      @be_verbose = x
+    end
 
-    def clear                     # sugar around `prepare` that results in self.
-      prepare                     # does a `rm -rf` on the temmpdir, creates!
+    def clear
+      prepare
       self
     end
 
     def copy pathname, dest_basename = nil
       source = ::Pathname.new pathname.to_s
       dest = join( dest_basename || source.basename ) # where to? (basename)
-      cp source.to_s, dest.to_s, noop: noop, verbose: verbose
+      cp source.to_s, dest.to_s, noop: @is_noop, verbose: @be_verbose
       nil # result is undefined for now -- we might turn it into etc
     end
 
-    def mkdir path_end, opts=nil
-      res = nil
-      use_opts = { noop: noop, verbose: verbose }
-      use_opts.merge!( opts ) if opts
-      use_path = join( path_end ).to_s
-      arr = ::FileUtils.mkdir use_path, use_opts
-      if ::Array === arr and 1 == arr.length
-        res = self.class.new arr.first
+    def mkdir path_tail, opt_h=nil
+      o_h = { noop: @is_noop, verbose: @be_verbose }
+      o_h.merge!( opt_h ) if opt_h
+      use_path = join( path_tail ).to_s
+      a = ::FileUtils.mkdir use_path, o_h
+      if a.respond_to?( :each_index ) and 1 == a.length
+        self.class.new a.first   # result is undefined, this is a secret experiment
       end
-      res # result is undefined for now -- the above is experimental!
     end
 
     def patch str
-      Headless::Services::Patch.directory str, to_s, noop, verbose,
+      Headless::Services::Patch.directory str, to_s, @is_noop, @be_verbose,
         -> e { info e }
       # (result is exit_status)
     end
 
-    safety_rx = %r{ / (?: tmp | T ) (?: / | \z ) }x # IMPORTANT
+    safety_rx = %r{ / (?: tmp | T ) (?: / | \z ) }x
+
+    # IMPORTANT see if we can avoid doing a `rm -rf` on any directory except
+    # those that match the above rx.
+
+    raise = -> *a do
+      ::Kernel.raise( *a )
+    end
+
+    sanity_check_pathname = -> pn do
+      safety_rx =~ pn.to_s or
+        raise[ ::SecurityError, "unsafe tmpdir name - #{ pn }" ]
+    end
 
     define_method :prepare do
-      result = nil
-      sanity = -> pn do         # IMPORTANT - try to avoid `rm -rf` any paths
-        if safety_rx !~ pn.to_s # except those under a /tmp/ or /T/ dir
-          ::Kernel.raise ::SecurityError, "unsafe tmpdir name - #{ pn }"
-        end
-      end
-      if exist?                   # if this pathname exists
+
+      exist_notify = -> do
         path = to_s
-        if ! directory?
-          raise ::Errno::ENOTDIR.exception path
-        end
-        sanity[ self ]            # IMPORTANT, also out here and not down there.
-        a = ::Dir[ "#{ join '{*,.?*}' }" ]  # imagine a dir with only dotfiles!
+        directory? or raise[ ::Errno::ENOTDIR, path ]
+        sanity_check_pathname[ self ]
+        a = ::Dir[ "#{ join '{*,.?*}' }" ]  # imagine a dir with only dotfiles
         case a.length
         when 0
-          fail "sanity - this path should always have at least 1 element"
+          raise[ "sanity - this path should always have at least 1 element" ]
         when 1
-          '/..' == a.fetch( 0 )[ -3 .. -1 ] or fail "sanity - expecting #{
-            }this to be the '..' path - (filesystem issue?) #{ a[0] }"
-          verbose and fu_output_message "(already empty: #{ path })"
-          result = nil
+          '/..' == a.fetch( 0 )[ -3 .. -1 ] or raise[ "sanity - expecting #{
+            }this to be the '..' path - (filesystem issue?) #{ a[0] }" ]
+          @be_verbose and fu_output_message "(already empty: #{ path })"
         else
-          verbose and fu_output_message "rm -rf #{ path }"
-          if safety_rx =~ path  # twice for good measure
-            remove_entry_secure path # GULP
-            result = ::FileUtils.mkdir @path, noop: noop, verbose: verbose
-          else
-            fail "is there no god?"
+          @be_verbose and fu_output_message "rm -rf #{ path }"
+          if (( safety_rx =~ path or raise[ "is there no god?" ] ))  # 2x
+            remove_entry_secure path  # GULP
+            r = ::FileUtils.mkdir path, noop: @is_noop, verbose: @be_verbose
           end
         end
-      else
-        stack = []
+        r
+      end
+
+      not_exist_notify = -> do
+        stack_a = []
         pop = -> do
-          currnt = self
+          curr = self
           -> do
-            if ! currnt.root? && '.' != currnt.to_s
-              s = currnt.basename.to_s
-              stack.push s
-              currnt = currnt.dirname
+            if ! ( curr.root? || '.' == curr.instance_variable_get(:@path) )
+              stack_a << curr.basename.to_s
+              curr = curr.dirname
             end
           end
         end.call
-        0 < max_mkdirs or fail "max_mkdirs must be at least 1."
-        current = self
-        max_mkdirs.times do
-          x = pop[ ] or break
-          current = x
+
+        0 < @max_mkdirs or raise[ "max_mkdirs must be at least 1." ]
+
+        curr = @max_mkdirs.times.reduce self do |m, _|
+          ( x = pop[] ) ? x : ( break m )
         end
-        if ! current.exist?
-          raise ::SecurityError.exception(
-            "won't make more than #{max_mkdirs} dirs - #{current} must exist #{
-            }(increase your `max_mkdirs` when you construct #{ self.class }?)"
-          )
-        end                                    # so current exists,
-        while ! stack.empty?
-          peek = current.join stack.last
-          peek.exist? or break
-          stack.pop
-          current = peek
-        end                                    # and now current still exists.
-        sanity[ current ]                      # be sure this is a /tmp/
-        result = mkdir_p to_s, noop: noop, verbose: verbose
+
+        curr.exist? or raise[ ::SecurityError, "won't make more than #{
+          }#{ @max_mkdirs } dirs - #{ curr } must exist (increase your #{
+          }`max_mkdirs` when you construct #{ self.class }?)" ]
+
+        while ! stack_a.empty?
+          (( peek = curr.join stack_a.last )).exist? or break
+          stack_a.pop
+          curr = peek
+        end
+
+        sanity_check_pathname[ curr ]
+        mkdir_p to_s, noop: @is_noop, verbose: @be_verbose
       end
-      result
+
+      r = if exist?
+        exist_notify[]
+      else
+        not_exist_notify[]
+      end
+      r
     end
 
     alias_method :tmpdir_original_touch, :touch
 
     def touch file
       pathname = join file
-      tmpdir_original_touch pathname.to_s, noop: noop, verbose: verbose
+      tmpdir_original_touch pathname.to_s, noop: @is_noop, verbose: @be_verbose
       pathname
     end
 
     def touch_r files
-      single_path = ! (::Array === files )
+      single_path = ! files.respond_to?( :each_index )
       if single_path
         files = [ files ]
         last_pathname = nil
@@ -146,10 +155,10 @@ module Skylab::TestSupport
           last_pathname = dest_file if single_path
         end
         if ! dest_dir.exist?
-          mkdir_p dest_dir, noop: noop, verbose: verbose
+          mkdir_p dest_dir, noop: @is_noop, verbose: @be_verbose
         end
         if dest_file
-          tmpdir_original_touch dest_file, noop: noop, verbose: verbose
+          tmpdir_original_touch dest_file, noop: @is_noop, verbose: @be_verbose
         end
       end
       if single_path
@@ -169,32 +178,33 @@ module Skylab::TestSupport
       res
     end
 
-  protected
+  private
 
-    o = ::Struct.new( :infostream, :max_mkdirs, :noop, :path, :verbose ).new
-    o[:infostream] = $stderr
-    o[:max_mkdirs] = 1
-    o[:noop] = false
-    o[:verbose] = false
+    defaults = -> do
+      o = ::Struct.new( :infostream, :max_mkdirs, :noop, :path, :verbose ).new
+      o[:infostream] = Subsys::Stderr_[]
+      o[:max_mkdirs] = 1
+      o[:noop] = false
+      o[:verbose] = false
+      o.freeze
+    end.call
 
     # [path] [opts]
-    define_method :initialize do |*args|
-      x = o.dup
-      if ::Hash === args.last
-        args.pop.each { |k, v| x[k] = v }
+
+    define_method :initialize do |*a|
+      o = defaults.dup
+      a.last.respond_to?( :each_pair ) and a.pop.each { |k, v| o[k] = v }
+      if (( x = a.last )) and
+          ( x.respond_to? :ascii_only? or x.respond_to? :sub_ext )
+        o[:path] = a.pop
       end
-      if ::String === args.last or ::Pathname === args.last # ack
-        x[:path] = args.pop
-      end
-      args.empty? or raise ::ArgumentError.exception "no"
-      if ! x[:path]
-        x[:path] = TestSupport_::Services::Tmpdir.tmpdir
-      end
-      @infostream = x[:infostream]
-      @max_mkdirs = x[:max_mkdirs]
-      @noop = x[:noop]
-      @verbose = x[:verbose]
-      super x[:path]
+      a.empty? or raise[ ::ArgumentError, "#{ a.length } unparsed args."  ]
+      o[:path] ||= Subsys::Services::Tmpdir.tmpdir
+      @infostream = o[:infostream]
+      @max_mkdirs = o[:max_mkdirs]
+      @is_noop = o[:noop]
+      @be_verbose = o[:verbose]
+      super o[:path]
     end
 
     def fu_output_message msg
@@ -202,14 +212,7 @@ module Skylab::TestSupport
     end
 
     def info msg
-      infostream.puts msg
+      @infostream.puts msg
     end
-
-    attr_reader :infostream # make it writable whenever
-
-    attr_reader :max_mkdirs
-
-    attr_reader :noop
-
   end
 end

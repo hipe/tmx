@@ -73,7 +73,7 @@ module Skylab::CodeMolester
       end
     end
 
-    Services::Basic::Hash::FUN.tap do |fun|
+    CodeMolester::Services::Basic::Hash::FUN.tap do |fun|
       %i| unpack_equal unpack_superset unpack_subset repack_difference |.
           each do |i|
         define_method i, & fun[ i ]

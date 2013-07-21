@@ -21,10 +21,11 @@ module Skylab::Headless::TestSupport
       io_adapter.emission_a
     end
 
-  protected
+  private
 
     def initialize
-      @debug = -> { true }        # loud until proved quiet
+      @debug = NILADIC_TRUTH_  # loud until proven quiet
+      @use_this_pen = nil
     end
 
     def io_adapter
@@ -36,15 +37,8 @@ module Skylab::Headless::TestSupport
       end
     end
 
-    attr_reader :use_this_pen
-
     def resolve_pen
-      pen = use_this_pen
-      if ! pen
-        pen = self.class::USE_THIS_PEN
-        pen &&= pen.call
-      end
-      pen
+      @use_this_pen or ( p = self.class::USE_THIS_PEN and p.call )
     end
 
     def parameter_label x, idx=nil  # ICK

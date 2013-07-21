@@ -7,7 +7,7 @@ module Skylab::TanMan
     param :resource_name, accessor: true, default: :all,
       enum: [ :local, :global, :all ], required: true
 
-  protected
+  private
 
     # (for now, experimentally this api call is very porcelain-y,
     # but additionally it tries to emit useful metadata)

@@ -123,7 +123,7 @@ module Skylab::TanMan
 
     attr_accessor :sexp
 
-  protected
+  private
 
     def initialize _ # to prove that we know what we are doing (however wrongly)
                      # we don't keep connection with our parent, which is

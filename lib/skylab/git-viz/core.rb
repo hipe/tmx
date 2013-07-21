@@ -6,12 +6,12 @@ module Skylab::GitViz
     const_set i, ::Skylab.const_get( i, false )
   end
 
-  extend MetaHell::MAARS
+  MetaHell::MAARS[ self ]
 
   stowaway :API, 'api/client'
 
   module CLI
-    extend MetaHell::MAARS
+    MetaHell::MAARS[ self ]
   end
 
   module Core

@@ -4,44 +4,31 @@ module Skylab
 
   module MetaHell                 # welcome to meta hell
 
-    MetaHell = self               # (so we can reach up then down from below)
+    MetaHell = self
 
-    Autoloader_ = Autoloader      # the toplevel one (which will probably move
-                                  # here one day) we will refer to internally
-                                  # as this. NOW..
-
-    EMPTY_A_       = [ ].freeze   # ocd
+    EMPTY_A_       =  [ ].freeze  # #ocd
     EMPTY_P_       = ->   {   }
     IDENTITY_      = -> x { x }
     MONADIC_TRUTH_ = -> _ { true }
+
+    def self.Function host, *rest
+      self::Function._make_methods host, :public, :method, rest
+    end
 
     DASH_          = '-'.getbyte 0
 
     # ARE YOU READY TO EAT YOUR OWN DOGFOOD THAT IS MADE OF YOUR BODY
 
-    #                    ~ auto-trans-substantiation ~
+    #                  ~ auto-trans-substantiation ~
 
-    module Autoloader             # we have our own module called this.
-      extend Autoloader_          # confusingly extend it with this,
-    end                           # now it itself is a basic autoloader.
-
-                                  # but what we really want is not to ourselves
-                                  # be a basic autoloader and not to ourselves
-                                  # be an autovivifing autoloader, but for us
-                                  # ourselves to be a full-on, balls-out,
-                                  # recusive auto-vivifying autoloader.
-
-    MAARS = Autoloader::Autovivifying::Recursive
-
-    extend MAARS                  # which is such a long name you never want
-                                  # to have to say it more than once.
-
-    # --*--
-                                  # sugar for this very popular enhancement
-    #
-    def self.Function host, *rest
-      self::Function._make_methods host, :public, :method, rest
+    module Autoloader
+      include ::Skylab::Autoloader  # explained in depth at [#041]
+      ::Skylab::Autoloader[ self ]
     end
+
+    ( MAARS = Autoloader::Autovivifying::Recursive )[ self ]
+
+      # a name so long that is used so often deserves its own acronym.
 
     Funcy = -> cls do             # a class that is interfaced with like a proc
       def cls.[] * x_a

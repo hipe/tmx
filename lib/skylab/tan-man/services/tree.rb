@@ -1,5 +1,11 @@
 module Skylab::TanMan
+
   class Services::Tree
+
+    def initialize
+      @cache = { }
+    end
+
     # experimentally holds parse trees in memory for different controllers
     # to use! #experimental
     # (thread safety is a boggling thought.)
@@ -34,10 +40,6 @@ module Skylab::TanMan
       nil
     end
 
-  protected
-
-    def initialize
-      @cache = { }
-    end
+    # (nothing is private)
   end
 end

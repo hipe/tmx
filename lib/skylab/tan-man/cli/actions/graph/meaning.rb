@@ -21,7 +21,7 @@ module Skylab::TanMan
     def process name, value
       api_invoke [:graph, :meaning, :learn],
         { create: true, dry_run: false, name: name,
-          value: value, verbose: false }.merge( param_h )
+          value: value, verbose: false }.merge( @param_h )
     end
   end
 
@@ -40,7 +40,7 @@ module Skylab::TanMan
     def process name, value
       api_invoke [:graph, :meaning, :learn],
         { create: false, dry_run: false, name: name,
-          value: value, verbose: false }.merge( param_h )
+          value: value, verbose: false }.merge( @param_h )
     end
   end
 
@@ -54,7 +54,7 @@ module Skylab::TanMan
     option_parser do |o|
       dry_run_option o
 
-      o.on '-f', '--force', "sometimes necessary." do param_h[:force] = true end
+      o.on '-f', '--force', "sometimes necessary." do @param_h[:force] = true end
 
       help_option o
       verbose_option o
@@ -63,7 +63,7 @@ module Skylab::TanMan
     def process name
       api_invoke [:graph, :meaning, :forget],
         { dry_run: false, force: false, name: name, verbose: false }.
-          merge( param_h )
+          merge( @param_h )
     end
   end
 
@@ -79,7 +79,7 @@ module Skylab::TanMan
     end
 
     def process
-      api_invoke [:graph, :meaning, :list], { verbose: false }.merge( param_h )
+      api_invoke [:graph, :meaning, :list], { verbose: false }.merge( @param_h )
     end
   end
 end

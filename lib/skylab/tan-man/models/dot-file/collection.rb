@@ -58,7 +58,7 @@ module Skylab::TanMan
 
     attr_accessor :verbose # compat
 
-  protected
+  private
 
     def initialize request_client
       super

@@ -58,7 +58,7 @@ module Skylab::MetaHell
       @upstream = upstream
     end
 
-  protected
+  private
 
     def initialize upstream=nil
       @upstream = upstream # nil ok

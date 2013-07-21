@@ -8,16 +8,12 @@ module Skylab::FileMetrics
     const_set c, ::Skylab.const_get( c, false )
   end
 
-  MAARS = MetaHell::MAARS
+  ::Skylab::Subsystem[ self ]
 
   # as one alternative to another..
   [ :API, :Common, :Model, :Models ].each do |c|
-    ( const_set c, ::Module.new ).extend MAARS
+    MAARS[ const_set c, ::Module.new ]
   end
-
-  extend MAARS  # because CLI is a class
-
-  const_get :Services, false  # because it is a leaf, meh just load it now
 
   module API  # #stowaway
     module Actions

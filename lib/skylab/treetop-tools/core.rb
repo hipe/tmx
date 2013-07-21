@@ -6,7 +6,7 @@ module Skylab::TreetopTools
   Headless = ::Skylab::Headless
   TreetopTools = self
 
-  extend Headless::MAARS
+  Headless::MAARS[ self ]
 
   const_get :Grammar, false       # ick load this now so we can say 'Grammar'
 
@@ -17,8 +17,8 @@ module Skylab::TreetopTools
     param :dir, boolean: true
     param :exist, enum: [:must], accessor: true
 
-    public :[]                    # the Definer::I_M of this is protected
-    public :known?                # the Definer::I_M of this is protected
+    public :[]                    # the Definer::I_M of this is private
+    public :known?                # the Definer::I_M of this is private
 
     def pathname= x
       super x

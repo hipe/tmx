@@ -8,8 +8,7 @@ module ::Skylab::TMX
 
         ::Class.new( Binfile_Stub_ ).class_exec do
 
-          box_mod.const_set(
-            Autoloader::Inflection::FUN.constantize[ stem ], self )
+          box_mod.const_set Autoloader::FUN.constantize[ stem ], self
 
           self::BIN_PN_ = bin_pn ; self::PREFIX_ = prefix ; self::STEM_ = stem
           self::Adapter = self

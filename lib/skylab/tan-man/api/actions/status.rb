@@ -16,7 +16,7 @@ module Skylab::TanMan
       local_found: :local_positive,
       global_found: :global_positive
 
-  protected
+  private
 
     def execute
       events = -> do

@@ -21,7 +21,9 @@ module Skylab::Headless
       res
     end
 
-  protected
+  private
+
+    define_singleton_method :private_attr_reader, & Private_attr_reader_
 
     # (no initter method but ivars get set in `invoke`!)
 
@@ -102,13 +104,14 @@ module Skylab::Headless
     # the parsing pass from the subsequent processing pass, i.e atomicly.
     #
 
-    attr_reader :param_queue ; alias_method :param_queue_ivar, :param_queue
+    private_attr_reader :param_queue
+    alias_method :param_queue_ivar, :param_queue
 
     def param_queue               # (experimental atomic processing of .e.g
       @param_queue ||= []         # options -- see warnings at
     end                           # `absorb_param_queue`)
 
-    attr_reader :queue            # (internal use - this is for action graphs
+    private_attr_reader :queue    # (internal use - this is for action graphs
                                   # that will use `argument_syntax` on objects
                                   # that haven't been invoked yet.)
 
@@ -152,6 +155,7 @@ module Skylab::Headless
       help_sections y, max_width if @sections
       nil
     end
+    protected :help_screen  # #protected-not-private
 
     def help_description y # assume desc_lines is nonzero-length array
       y << ''                     # assumes there was content above!
@@ -287,7 +291,7 @@ module Skylab::Headless
     #  + This implementation must not and should not be married tightly to
     #    the module methods -- they should be opt-in.
 
-    attr_reader :desc_lines  # watch:
+    private_attr_reader :desc_lines  # watch:
 
     alias_method :desc_lines_ivar, :desc_lines
 
@@ -408,7 +412,7 @@ module Skylab::Headless
       sections
     end
 
-    attr_reader :sections  # look:
+    private_attr_reader :sections  # look:
 
     alias_method :sections_ivar, :sections
 
@@ -443,7 +447,7 @@ module Skylab::Headless
     #   + your o.p must have a `visit` that works like stdlib o.p
     #   + each switch must have a `long`, `short` and `arg` that look like o.p
 
-    attr_reader :option_parser    # look:
+    private_attr_reader :option_parser  # look:
 
     alias_method :option_parser_ivar, :option_parser
 
@@ -453,6 +457,7 @@ module Skylab::Headless
       end
       @option_parser
     end
+    protected :option_parser      # #protected-not-private
                                   # mutate `argv` (which is probably also @argv)
     def parse_opts argv           # what you do with the data is your business.
       res = true                  # result in true on success, other on failure

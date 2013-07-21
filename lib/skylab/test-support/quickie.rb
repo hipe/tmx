@@ -407,7 +407,7 @@ module Skylab::TestSupport::Quickie
       if @or_a
         @tag_filter_p = -> x { @or_a.detect { |f| f[ x ] } }
       else
-        @tag_filter_p = -> x { true }
+        @tag_filter_p = MetaHell::MONADIC_TRUTH_
       end
       true
     end
@@ -588,7 +588,7 @@ module Skylab::TestSupport::Quickie
       end
 
       skip = -> do
-        # $stderr.puts "#{ ind[ d ] }(#{ eg.description } SKIPPED)"
+        # Stderr_[].puts "#{ ind[ d ] }(#{ eg.description } SKIPPED)"
         eg = nil
       end
 
@@ -804,7 +804,7 @@ module Skylab::TestSupport::Quickie
     def match actual
       begin
         actual.call
-      rescue ::StandardError => e
+      rescue ::StandardError, ::ScriptError => e
       end
       if ! e
         failed "expected lambda to raise, didn't raise anything."

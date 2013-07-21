@@ -10,6 +10,6 @@ module Skylab::Slicer
 
   MAARS = MetaHell::MAARS
 
-  extend MAARS
+  MAARS[ self ]
 
 end

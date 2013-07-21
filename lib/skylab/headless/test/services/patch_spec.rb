@@ -1,6 +1,7 @@
 require_relative 'test-support'
 
 module Skylab::Headless::TestSupport::Services::Patch
+
   ::Skylab::Headless::TestSupport::Services[ Patch_TestSupport = self ]
 
   include CONSTANTS

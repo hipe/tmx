@@ -11,7 +11,7 @@ module Skylab::CovTree
   module Core::Action::ModuleMethods
     include Headless::Action::ModuleMethods
 
-    methodize = Autoloader::Inflection::FUN.methodize
+    methodize = Autoloader::FUN.methodize
 
     define_method :local_normal_name do # ::Blah::Actions::Foo::X -> [:foo, :x]
       @local_normal_name ||= begin

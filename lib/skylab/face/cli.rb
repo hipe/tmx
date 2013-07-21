@@ -239,7 +239,7 @@ module Skylab::Face
     # `isomorphic command composition`, that is, public methods that you
     # write in your class become commands in your user interface. as such,
     # except where noted, the "n-amespace" of instance methods (public, private,
-    # and protected) of this class is preserved entirely for "businessland"
+    # and p-rotected) of this class is preserved entirely for "businessland"
     # concerns - that is, the developer user determines them, not this
     # library. again as such, for instance methods, you will only find one
     # defined here - `initialize`.
@@ -1835,7 +1835,7 @@ module Skylab::Face
   # ~ 5.3x - recursively nested namespaces ~
 
   class Namespace  # #re-open for 5.3x
-    extend MetaHell::MAARS
+    MetaHell::MAARS[ self ]
   end
 
   Magic_Touch_.enhance -> { Namespace::Facet.touch },
@@ -1874,12 +1874,12 @@ module Skylab::Face
 
   class CLI
     module Adapter  # (this is actually a bit like "magic touch" pattern..)
-      extend MAARS
+      MAARS[ self ]
     end
   end
   class Namespace
     module Adapter  # intermediate n.s's use a different adapter
-      extend MAARS  # than level-1 clients
+      MAARS[ self ]  # than level-1 clients
     end
   end
 

@@ -221,7 +221,7 @@ module Skylab::Headless
       end
     end
 
-  protected
+  private
 
     # To *construct* a lexeme finally, we take optionally a string for
     # the lemma form, and then optionally a hash of irregular forms.
@@ -354,7 +354,7 @@ module Skylab::Headless
         @monadic_lemma_box = MetaHell::Formal::Box::Open.new
         @last_lemmaless_id = 0
       end
-      protected :initialize
+      private :initialize
 
       # `[]=` Add the lemma to the lexicon NOTE this is DSL-ish and it
       # mutates the lexeme by setting its lemma if it is not yet set!
@@ -386,7 +386,7 @@ module Skylab::Headless
           Form_.new( surface_form, lemma_ref, combination )
         nil
       end
-      protected :add_monadic_form
+      private :add_monadic_form
 
         # `Lexeme_::Lexicon_::Form_` -
       Form_ = ::Struct.new :surface_form, :lemma_ref, :combination
@@ -538,13 +538,13 @@ module Skylab::Headless
         end
         nil
       end
-      protected :clear_combination
+      private :clear_combination
 
       def commit_change_exponent k, v
         @combination[ k ] = v
         nil
       end
-      protected :commit_change_exponent
+      private :commit_change_exponent
 
       def trickle_down_exponent k, v
         cat = lexeme_class.category_box.fetch( k ) do end
@@ -566,7 +566,7 @@ module Skylab::Headless
       def get_exponent category_sym
         @combination[ category_sym ]
       end
-      protected :get_exponent
+      private :get_exponent
 
       def render y
         str = string
@@ -578,7 +578,7 @@ module Skylab::Headless
         resolve_lexeme.semicollapse @combination
       end
 
-    protected
+    private
 
       def initialize lemma_ref, combination
         @lemma_ref = lemma_ref
@@ -697,7 +697,7 @@ module Skylab::Headless
         end
       end
     end
-    protected :forms
+    private :forms
 
     class << self
       attr_reader :form_box
@@ -896,7 +896,7 @@ module Skylab::Headless
       end
     end
 
-  protected
+  private
 
     def initialize h
       if h.respond_to? :each

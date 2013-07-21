@@ -43,7 +43,7 @@ module Skylab::MetaHell
         ( @monikizer_p || Mnkzr_p_ )[ @moniker ]
       end
 
-    protected
+    protected  # #protected-not-private
 
       attr_reader :looks_like_particular_field
 

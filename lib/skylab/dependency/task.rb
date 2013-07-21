@@ -1,5 +1,7 @@
 module Skylab::Dependency
 
+  ::Skylab::Slake::Task.class
+
   class Task < Slake::Task
     attribute_metadata_class do
       def [] k ; fetch( k ) { } end # soften it

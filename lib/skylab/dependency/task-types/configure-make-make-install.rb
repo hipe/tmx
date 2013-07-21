@@ -108,7 +108,7 @@ module Skylab::Dependency
         _show_bash cmd
       end
       # multiplex two output streams into a total of four things
-      Dependency::Services.const_get :StringIO, false  # #kick, ick
+      Dependency::Services.kick :StringIO
       out = MetaHell::Proxy::Tee.new out: ui.out, buffer: ::StringIO.new
       err = MetaHell::Proxy::Tee.new out: ui.err, buffer: ::StringIO.new
       open2(cmd, out, err)

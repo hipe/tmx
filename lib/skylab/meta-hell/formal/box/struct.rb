@@ -77,7 +77,7 @@ module Skylab::MetaHell
       )
     end
 
-  protected
+  private
 
     base_args = base_init = nil
 

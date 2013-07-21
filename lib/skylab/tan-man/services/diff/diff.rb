@@ -1,6 +1,6 @@
 module Skylab::TanMan
 
-  class Services::Diff
+  class Services::Diff::Diff
 
   public
 
@@ -24,11 +24,6 @@ module Skylab::TanMan
         popen3_ok or break
       end while nil
       changeset
-    end
-
-  protected
-
-    def initialize
     end
   end
 end

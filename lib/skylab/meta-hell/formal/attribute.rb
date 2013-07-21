@@ -75,14 +75,18 @@ module ::Skylab::MetaHell
 
                                   # note this is the only method that is
                                   # public out of the box (also your attributes
-                                  # are mutable and not themselves protected.)
+                                  # are mutable and not themselves private.)
     def attributes
       @attributes ||= dupe_ancestor_attr :attributes do
         Formal::Attribute::Box.new
       end
     end
 
-  protected
+  private
+
+    define_singleton_method :private_attr_reader, &
+      MetaHell::FUN.private_attr_reader
+
                                   # define an attribute in detail, or the
                                   # existence of several attributes by name.
     def attribute sym, meta_attributes_h=nil
@@ -116,7 +120,7 @@ module ::Skylab::MetaHell
       nil
     end
 
-    attr_reader :attribute_metadata_class_is_defined
+    private_attr_reader :attribute_metadata_class_is_defined
 
                                   # set the attribute metadata class.
     class_and_block_are_mutex = -> do
@@ -317,7 +321,7 @@ module ::Skylab::MetaHell
 
     attr_reader :local_normal_name
 
-  protected
+  private
 
     def initialize local_normal_name
       @local_normal_name = local_normal_name
@@ -422,7 +426,7 @@ module ::Skylab::MetaHell
     attr_reader :local_normal_name  # used here by `accept`, may also be used by
                                   # subclasses by clients e.g to make a custom
                                   # derived property, like a label.
-  protected
+  private
 
     def initialize local_normal_name
       fail "sanity - all metadatas must have a sybolic name" if !
@@ -500,8 +504,8 @@ module ::Skylab::MetaHell
 
     alias_method :which, :filter
 
-  protected
+  private
 
-    # nothing is protected. constructor takes 0 arguments.
+    # nothing is private. constructor takes 0 arguments.
   end
 end

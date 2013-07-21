@@ -10,10 +10,12 @@ module Skylab::MyTree
   MetaHell = ::Skylab::MetaHell
   MyTree = self
 
-  extend MetaHell::Autoloader::Autovivifying::Recursive
+  MetaHell::MAARS[ self ]
 
   module API
-    extend MetaHell::Autoloader::Autovivifying::Recursive
+
+    MetaHell::MAARS[ self ]
+
     module Actions
       MetaHell::Boxxy[ self ]
     end

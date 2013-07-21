@@ -7,7 +7,7 @@ module Skylab::TanMan
 
     PARAMS = [ :dry_run, :force, :name, :verbose ]
 
-  protected
+  private
 
     def execute
       res = nil
@@ -37,7 +37,7 @@ module Skylab::TanMan
 
     PARAMS = [ :verbose ]
 
-  protected
+  private
 
     def execute
       res = nil
@@ -60,7 +60,7 @@ module Skylab::TanMan
 
     PARAMS = [ :dry_run, :node_ref, :verbose ]
 
-  protected
+  private
 
     def execute
       res = nil

@@ -86,7 +86,7 @@ module Skylab::TanMan
       res                                      # list tree we made or maybe
     end                                        # something else..
 
-  protected
+  private
 
     attr_accessor :active_hub                  # for now the 'hub' is the
                                                # enhanced sexp (either existing
@@ -107,7 +107,7 @@ module Skylab::TanMan
         name_tokens.empty? and break           # it is not a match.
         # 'example' [ name_token [..]] rule_name { ':' | eol }
 
-        if ! grammar.has_rule? name_tokens.last
+        if ! grammar.has_rule name_tokens.last
           debug? and info "#{ grammar.grammar_const } grammar has no #{
             }#{ name_tokens.last.inspect } rule" # given how far we've come, it
           break                                # might be useful to get feedback
@@ -260,7 +260,7 @@ module Skylab::TanMan
 
     # no public methods defined here.
 
-  protected
+  private
 
     fun = Sexp::Prototype::FUN
     blank_rx = fun.blank_rx
@@ -331,7 +331,7 @@ module Skylab::TanMan
 
     # (nothing public defined here.)
 
-  protected
+  private
 
     fun = Sexp::Prototype::FUN
     rex = fun.rex

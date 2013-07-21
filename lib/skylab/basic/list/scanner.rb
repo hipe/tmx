@@ -15,7 +15,7 @@ module Skylab::Basic
 
   module List::Scanner::For
 
-    extend MAARS
+    MAARS[ self ]
 
   end
 

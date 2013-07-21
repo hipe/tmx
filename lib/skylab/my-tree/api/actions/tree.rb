@@ -91,7 +91,7 @@ module Skylab::MyTree
       end
     end
 
-    methodize = ::Skylab::Autoloader::Inflection::FUN.methodize
+    methodize = ::Skylab::Autoloader::FUN.methodize
 
     define_method :set_verbose do |chars|
       bads = nil

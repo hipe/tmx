@@ -24,19 +24,20 @@ module Skylab::Headless
       # be bad design via tight coupling of our implementation and the bool fact
     end
 
-  protected
+  private
 
     def agent_string                           # this saved my hide a few times
       @agent_string ||= begin                  # but you should of course
         a = self.class.to_s.split '::'         # override it w/ sthing prettier
         a = a[ [ a.length, 2 ].min * -1 .. -1 ] # get last 2 or last one
-        a.map { |s| Autoloader::Inflection::FUN.pathify[ s ] }.join ' '
+        a.map { |s| Autoloader::FUN.pathify[ s ] }.join ' '
       end
     end
 
     def actual_parameters # for compatibility with the ever-flexible set!
       self           # but it is only a default -- parameter controllers are
     end              # not necessarily the actual parameters container!
+    protected :actual_parameters  # #protected-not-private
 
     def defaults actual_h        # #pattern [#sl-117]
       formal_parameters.each do |o|

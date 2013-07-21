@@ -13,7 +13,7 @@ module Skylab::TMX
     const_set c, ::Skylab.const_get( c, false )
   end
 
-  extend MetaHell::MAARS
+  MetaHell::MAARS[ self ]
     # now any module under `self` will autoload.
 
   module TMX::Modules
@@ -27,7 +27,7 @@ module Skylab::TMX
 
   module CLI  # #stowaway this tiny thing here
 
-    extend MetaHell::MAARS
+    MetaHell::MAARS[ self ]
 
     def self.new *a
       self::Client.new( *a )

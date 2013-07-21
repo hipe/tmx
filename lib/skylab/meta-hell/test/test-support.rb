@@ -7,7 +7,6 @@ module Skylab::MetaHell::TestSupport
   ::Skylab::TestSupport::Quickie.enable_kernel_describe
 
   module CONSTANTS
-    Autoloader_ = ::Skylab::Autoloader  # org-wide and sub-lib wide avoid confus
     MetaHell = ::Skylab::MetaHell
     TestSupport = ::Skylab::TestSupport
   end

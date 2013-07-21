@@ -85,7 +85,7 @@ module Skylab::Headless
       end
     end
 
-  protected
+  private
 
     handlers_struct = ::Struct.new :line_begin, :line_end, :puts_wrap
 

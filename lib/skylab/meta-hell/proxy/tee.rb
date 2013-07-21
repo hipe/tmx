@@ -98,7 +98,7 @@ module Skylab::MetaHell
       "#<#{ @tee_class.to_s }:(tee #{ @tee_id })>"
     end
 
-  protected
+  private
 
     def initialize tee, tee_class, tee_id, tee_args  # mutates tee_args
       @tee, @tee_class, @tee_id = tee, tee_class, tee_id

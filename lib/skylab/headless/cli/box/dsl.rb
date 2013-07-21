@@ -62,7 +62,7 @@ module Skylab::Headless
             @dir_pathname = box.dir_pathname.join 'actions'  # eew sorry
           else
             @dir_pathname = false  # tells a.l not to try to induce our path
-            box.dir_pathname_waitlist :Actions, self
+            box.add_dir_pathname_listener :Actions, self
           end
           MetaHell::Boxxy[ self ]
           self
@@ -167,7 +167,7 @@ module Skylab::Headless
     def method_added meth         # #doc-point [#hl-040]
       if ! dsl_is_disabled
         action_class_in_progress!
-        const = Autoloader::Inflection::FUN.constantize[ meth ]
+        const = Autoloader::FUN.constantize[ meth ]
         action_box_module.const_set const, @action_class_in_progress
         @action_class_in_progress = nil
       end
@@ -188,14 +188,16 @@ module Skylab::Headless
 
     include CLI::Box::InstanceMethods
 
-  protected
-
-    def initialize request_client
+    def initialize request_client  # #!
       super request_client
       _headless_cli_box_dsl_init
     end
 
     alias_method :init_headless_cli_box_dsl, :initialize
+
+  private
+
+    define_singleton_method :private_attr_reader, & Private_attr_reader_
 
     def _headless_cli_box_dsl_init  # revealed for hybrids w/ client
       @downstream_action ||= nil
@@ -276,7 +278,7 @@ module Skylab::Headless
                                   # don't ever as a module have a clean way to
                                   # initialize ivars what with our being a
                                   # module by exploiting 2 ruby-ish things..
-    attr_reader :is_leaf          # (out of box is nil and we are branch)
+    private_attr_reader :is_leaf  # (out of box is nil and we are branch)
                                   # This is intimately depenedant on impl's
                                   # above it in the chain. (ok the 2 things
                                   # are: 1. attr_reader creates a reader
@@ -392,7 +394,7 @@ module Skylab::Headless
       nil
     end
 
-    attr_reader :prev_frame
+    private_attr_reader :prev_frame
   end
 
   module CLI::Box::DSL::Leaf_ModuleMethods

@@ -14,7 +14,7 @@ module Skylab::TanMan::TestSupport::Sexp
 
     include CONSTANTS
 
-    extend Autoloader             # we need it now for next line
+    Autoloader[ self ]            # we need it now for next line
     extend self::ModuleMethods    # (autoloads the eponymous file here)
 
     extend MetaHell::Let
@@ -37,7 +37,7 @@ module Skylab::TanMan::TestSupport::Sexp
     end
 
 
-  protected
+  private
 
     pen = Headless::CLI::Pen::Minimal.new
     def pen.escape_path str
@@ -55,7 +55,7 @@ module Skylab::TanMan::TestSupport::Sexp
 
 
 
-    #        ----*-  protected methods, alphabetical  -*----
+    #        ----*-  private methods, alphabetical  -*----
 
 
     let :anchor_dir_pathname do
@@ -201,7 +201,7 @@ module Skylab::TanMan::TestSupport::Sexp
       /\A  #{ anchor_module_head }  (.+)  \z/x
     end
 
-    fun = Autoloader::Inflection::FUN
+    fun = Autoloader::FUN
 
     let :stem_path do
       fun.pathify[ stem_const_rx.match(self.class.to_s)[1] ]

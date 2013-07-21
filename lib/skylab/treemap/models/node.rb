@@ -1,6 +1,8 @@
 module Skylab::Treemap
+
   class Models::Node
-    extend Autoloader
+
+    Autoloader[ self ]
 
     prop_a = [ :indent, :content, :line_number ].freeze
 

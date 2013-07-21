@@ -4,14 +4,12 @@ module Skylab::TestSupport::TestSupport::Tmpdir
 
   include ::Skylab::TestSupport::TestSupport::CONSTANTS
 
-  TestSupport = TestSupport       # #annoying
-  Tmpdir = TestSupport::Tmpdir
-
   extend TestSupport::Quickie     # rspec-like testing w/o rspec - try loading
                                   # this file with 'ruby -w this/file.rb'
 
-  describe "#{ TestSupport::Tmpdir }" do
-    extend Skylab::MetaHell::Let
+  describe "#{ Tmpdir = TestSupport::Tmpdir }" do
+
+    extend TestSupport::MetaHell::Let
 
     it "with no pathname - you get ::Dir.tmpdir for your system" do
       tmpdir = Tmpdir.new
@@ -134,7 +132,7 @@ module Skylab::TestSupport::TestSupport::Tmpdir
     # --*--
 
     def anchor
-      ::Skylab.tmpdir_pathname
+      TS_TS::SYSTEM_.tmpdir_pathname
     end
 
     def fu

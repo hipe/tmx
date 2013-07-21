@@ -11,7 +11,7 @@ module Skylab::Headless
       end
     end
 
-  protected
+  private
 
     def initialize p
       @p = p

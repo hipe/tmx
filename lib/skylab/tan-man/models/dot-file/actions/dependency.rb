@@ -1,6 +1,6 @@
 module Skylab::TanMan
   class Models::DotFile::Actions::Dependency < Models::DotFile::Action
-  protected
+  private
     def execute
       agent = statement.agent.words.join ' '
       target = statement.target.words.join ' '

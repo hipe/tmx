@@ -9,6 +9,7 @@ module Skylab::Cull::TestSupport
     Cull = ::Skylab::Cull
     Face = ::Skylab::Face
     TestSupport = ::Skylab::TestSupport
+    PN_ = '(?:\./)?\.cullconfig'
   end
 
   include CONSTANTS
@@ -34,7 +35,8 @@ module Skylab::Cull::TestSupport
     tmpdir = nil
     define_singleton_method :sandboxed_tmpdir do
       tmpdir ||= TestSupport::Tmpdir.new(
-        path: ::Skylab.tmpdir_pathname.join( 'cull-sandboxes/cull-sandbox' ),
+        path: ::Skylab::Headless::System.
+          defaults.tmpdir_pathname.join( 'cull-sandboxes/cull-sandbox' ),
         max_mkdirs: 2  # we go deep, we have to escape the 3 dir limit
       )
     end

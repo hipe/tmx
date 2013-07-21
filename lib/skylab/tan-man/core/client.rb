@@ -22,7 +22,7 @@ module Skylab::TanMan
     emits payload: :all, info: :all, error: :all # the PIE convention [#hl-037]
                                   # note that clients will add their own events
 
-  protected
+  private
 
     def services
       TanMan::Services.services   # this line should be duplicated only once,

@@ -102,7 +102,7 @@ module Skylab::Cull::TestSupport::CLI::Actions::DataSource
       :nonstyled
 
     as :updating,
-      %r{\Aupdating \./\.cullconfig \.\. done \(\d\d\d? bytes\)\.\z},
+      %r{\Aupdating #{ PN_ } \.\. done \(\d\d\d? bytes\)\.\z},
       :nonstyled
 
     it "`add` valid to empty collection" do

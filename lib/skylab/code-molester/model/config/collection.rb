@@ -41,7 +41,7 @@ module Skylab::CodeMolester
       end
     end
 
-    Services::Basic::Hash::FUN.tap do |fun|
+    CodeMolester::Services::Basic::Hash::FUN.tap do |fun|
       %i| unpack_equal unpack_superset |.each do |i|
         define_method i, & fun[ i ]
         private i

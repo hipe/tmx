@@ -9,7 +9,7 @@ module Skylab::Snag
     #       something, i'm not sure what
     #   + legacy DSL gets turned on below and that's when it hits the fan
 
-    extend MetaHell::MAARS
+    MetaHell::MAARS[ self ]
                                   # we autoload during load of this file
 
     include CLI::Action::InstanceMethods

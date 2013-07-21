@@ -28,7 +28,7 @@ module Skylab::TanMan  # (leave extra whitespacing below for [#bs-010])
     include Headless::SubClient::InstanceMethods # mostly delegators
 
 
-  protected
+  private
 
     def initialize request_client              # have fun with this!
       _tan_man_sub_client_init request_client

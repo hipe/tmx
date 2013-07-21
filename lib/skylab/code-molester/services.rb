@@ -1,7 +1,5 @@
 module Skylab::CodeMolester
 
-  Services = ::Skylab::Subsystem::Services.new @dir_pathname
-
   module Services # being #watched [#mh-011] (this is instance four)
 
     stdlib, subsystem = FUN.at :require_stdlib, :require_subsystem
@@ -16,7 +14,7 @@ module Skylab::CodeMolester
     o[:Treetop] = -> _ { FUN.require_quietly[ 'treetop' ] ; ::Treetop }
     o[:YAML] = stdlib
 
-    extend MAARS  # LOOK.
+    MAARS[ self ]  # LOOK.
 
     def self.const_missing c
       if H_.key? c

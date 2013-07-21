@@ -39,7 +39,7 @@ module Skylab::Snag::TestSupport::CLI::Actions
         end
       end
       infos.length.should eql(1)
-      infos.first.should match( %r{ \./doc/issues\.md }x ) # has this in it
+      infos.first.should match( %r{ doc/issues\.md }x ) # has this in it
       pays.length.should eql(3)
       o = -> { pays.shift }
       o[].should eql('---')

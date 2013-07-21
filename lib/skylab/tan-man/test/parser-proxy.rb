@@ -17,7 +17,7 @@ module Skylab::TanMan
 
     attr_writer :verbose
 
-  protected
+  private
 
     def initialize rc
       @verbose = nil

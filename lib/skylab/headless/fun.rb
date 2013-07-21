@@ -7,7 +7,7 @@ module Skylab::Headless
   # #todo:ruby-2.0.0-ify - the below can be cleaned up
 
   o[:call_frame_rx] = /
-      #{ Autoloader::Inflection::FUN.call_frame_path_rx.source } :
+      #{ Autoloader::CALLFRAME_PATH_RX.source } :
       (?<no>\d+) : in [ ] ` (?<meth>[^']+) '
     \z/x
 

@@ -20,7 +20,7 @@ module ::Skylab::TanMan::TestSupport
 
       rx = /\AGrammar(?<num>[0-9]+)(?:_(?<rest>.+))?\z/
 
-      pathify = ::Skylab::Autoloader::Inflection::FUN.pathify
+      pathify = ::Skylab::Autoloader::FUN.pathify
 
       define_method :const_missing do |const|
         md = rx.match const.to_s

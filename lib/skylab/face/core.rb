@@ -8,14 +8,12 @@ module Skylab::Face
     const_set i, ::Skylab.const_get( i, false )
   end
 
-  MAARS = MetaHell::MAARS
-
-  extend MAARS
+  ::Skylab::Subsystem[ self ]
 
   stowaway :TestSupport, 'test/test-support'  # [#mh-030] for [#045]
 
   module API
-    extend MAARS
+    MAARS[ self ]
     def self.[] mod
       const_get( :Client, false )._enhance mod
       nil
@@ -24,7 +22,7 @@ module Skylab::Face
 
   module Services
 
-    extend MAARS
+    MAARS[ self ]
 
     stdlib, subsys = ::Skylab::Subsystem::FUN.
       at :require_stdlib, :require_subsystem

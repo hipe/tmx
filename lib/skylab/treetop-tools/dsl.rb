@@ -1,18 +1,18 @@
 # encoding: UTF-8
 
 module Skylab::TreetopTools
+
   # #abstraction-candidate: this (in some form) might one day go up
   # if it ever isn't painful to look at.
 
   module DSL
   end
 
-
   module DSL::Client
   end
 
-
   class DSL::Joystick
+
     # A "Joystick" is our cute moniker for the object that forms the
     # sole point of interface for a DSL. The entirety of the DSL
     # consists of messages that can be sent to the object.  (Conversely,
@@ -39,7 +39,7 @@ module Skylab::TreetopTools
     end
 
 
-  protected
+  private
 
     def initialize
       @actual_parameters = # (per ActualParametersIvar it must be this name)
@@ -78,38 +78,35 @@ module Skylab::TreetopTools
                                   # use this for reflection
 
 
-  protected
+  private
 
-    def initialize request_client, dsl_body, events
+    def initialize request_client, dsl_body_p, event_p
       init_headless_sub_client request_client
-      self.body = dsl_body
-      self.events = events
+      @dsl_body_p, @event_p = dsl_body_p, event_p
     end
 
     def absorb! struct
       struct.members.each do |name|
-        instance_variable_set("@#{name}", struct[name])
+        instance_variable_set "@#{ name }", struct[ name ]
       end
       true
     end
-
-    attr_accessor :body           # user-provided callable body of the DSL
 
     def build_joystick
       joystick_class.new
     end
 
     def call_body_and_absorb!     # the heart of the DSL pattern
-      result = false
+      r = false
       begin
-        joystick = (self.joystick ||= build_joystick) # persist accross bodies
-        body.call joystick
-        actuals = joystick.__actual_parameters
+        @joystick ||= build_joystick  # persist across bodies
+        @dsl_body_p[ @joystick ]
+        actuals = @joystick.__actual_parameters
         set! nil, actuals or break # defaults, validation etc
         absorb! actuals           # now they are our ivars
-        result = true
+        r = true
       end while false
-      result
+      r
     end
 
     def callbacks
@@ -119,32 +116,32 @@ module Skylab::TreetopTools
           param :info,  hook: true, writer: true
           alias_method :on_error, :error # hm ..
           alias_method :on_info, :info
-        end.new(& events)
-        self.events = nil
+        end.new( & @event_p )
+        @event_p = nil
         o.on_error ||= ->(msg) { fail("Couldn't #{verb} #{noun} -- #{msg}") }
-        o.on_info  ||= ->(msg) { $stderr.puts("(⌒▽⌒)☆  #{msg}  ლ(́◉◞౪◟◉‵ლ)") }
+        o.on_info  ||= ->(msg) { infostream.puts("(⌒▽⌒)☆  #{msg}  ლ(́◉◞౪◟◉‵ლ)") }
         o
       end
     end
 
-    attr_accessor :events         # gets absorbed into callbacks
+    def infostream
+      @infostream ||= Headless::CLI::IO.stderr
+    end
 
     def emit type, payload
-      callbacks[type][ payload ]  # to be cute we did this a different way
+      callbacks[ type ][ payload ]  # to be cute we did this a different way
     end
 
     def formal_parameters         # you betcha those are our formal parameters
       joystick_class.parameters
     end
 
-    attr_accessor :joystick
-
     def joystick_class
       self.class.const_get :DSL, false # descendent classes should define this
     end
 
-    def noun ; 'grammar' end      # used in callbacks for val'n messages
+    def noun ; 'grammar' end      # used in callback_h for val'n messages
 
-    def verb ; 'load' end         # used in callbacks for val'n messages
+    def verb ; 'load' end         # used in callback_h for val'n messages
   end
 end

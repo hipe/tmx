@@ -7,13 +7,13 @@ require 'skylab/slake/core'
 
 module Skylab::Dependency
 
-  extend ::Skylab::MetaHell::MAARS
+  ::Skylab::MetaHell::MAARS[ self ]
 
+  Autoloader = ::Skylab::Autoloader
   CodeMolester = ::Skylab::CodeMolester
   Dependency = self
   Face = ::Skylab::Face
   Headless = ::Skylab::Headless
-  Inflection = ::Skylab::Autoloader::Inflection
   Porcelain = ::Skylab::Porcelain
   PubSub = ::Skylab::PubSub
   Slake = ::Skylab::Slake

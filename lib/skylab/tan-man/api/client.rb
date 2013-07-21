@@ -39,7 +39,9 @@ module Skylab::TanMan
       result
     end
 
-  protected
+    attr_reader :pen              # overwrite `super` which is e.g. delegating
+                                  # to io_adapter.  see our `initialize`
+  private
 
     pen = Headless::API::Pen::Minimal.new
 
@@ -78,9 +80,6 @@ module Skylab::TanMan
       end
       _tan_man_sub_client_init nil # ***DO NOT KEEP*** the modality client here
     end
-
-    attr_reader :pen              # overwrite `super` which is e.g. delegating
-                                  # to io_adapter.  see our `initialize`
 
     # a quick and dirty (and fun!) proof of concept to show that we can buffer
     # and then emit events in the API that originated as data from controllers

@@ -3,7 +3,8 @@ require 'skylab/headless/core' # here til legacy.rb is away, Headless::NLP::EN::
 require 'optparse'
 
 module Skylab::Porcelain::Bleeding
-  extend ::Skylab::Autoloader
+
+  ::Skylab::Autoloader[ self ]
 
   Headless = ::Skylab::Headless
   MetaHell = ::Skylab::MetaHell
@@ -175,7 +176,7 @@ module Skylab::Porcelain::Bleeding
       r
     end
 
-  protected
+  private
 
     def build_option_syntax
       self.class.option_syntax.dupe
@@ -559,7 +560,7 @@ module Skylab::Porcelain::Bleeding
       parameters.map { |o| parameter_string[ o ] }.join ' '
     end
 
-  protected
+  private
 
     def initialize *a
       @__memoized = { } # ick, before the freeze
@@ -676,7 +677,7 @@ module Skylab::Porcelain::Bleeding
       res
     end
 
-  protected
+  private
 
     def initialize definitions=[], documentor_class=::OptionParser,
       parser_class=::OptionParser, do_help=nil
@@ -703,7 +704,8 @@ module Skylab::Porcelain::Bleeding
   end
 
   module Adapter   # for "ouroboros" ([#hl-069]).
-    extend MetaHell::Autoloader::Autovivifying::Recursive
+
+    MetaHell::MAARS[ self ]
   end
 
   class Runtime
@@ -741,7 +743,7 @@ module Skylab::Porcelain::Bleeding
 
     attr_writer :program_name
 
-  protected
+  private
 
     def initialize *a
       @program_name = nil

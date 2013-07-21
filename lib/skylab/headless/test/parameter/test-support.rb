@@ -15,7 +15,7 @@ module Skylab::Headless::TestSupport::Parameter
         include Headless::SubClient::InstanceMethods
         extend Parameter::Definer
         class_exec(&b)
-      protected
+      private
         # A definition of formal_parameters is needed for compat. with
         # bound params.  currently its home definition is in
         # Parameter::Controller::InstanceMethods, however pulling all of that in

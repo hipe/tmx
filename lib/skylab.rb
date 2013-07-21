@@ -1,97 +1,36 @@
 module Skylab                     # Welcome! :D
 
-  #    ~ the sole function of this file is to provide the facilities ~
-  #     ~ for opt-in autoloading, facilities that every sub-product ~
-  #      ~ in the skylab universe leverages for market synergies & ~
-  #       ~ also there's a handful of universal-ish, constant-ish ~
-  #        ~ functions that.. well just here have a look:
+  # facilities for bootstrapping subsystems - mostly autoloading
 
-  require 'pathname'              # the only stdlib subproducts get for free
+  require 'pathname'              # this is the only stdlib loaded at this tier
 
   here = ::Pathname.new __FILE__  # one of the three centers of the universe
 
   $:.include?( o = here.join('..').to_s ) or $:.unshift o # add to include path
 
-  dir_pathname = here.sub_ext ''  # chop of extension and ..
+  dir_pathname = here.sub_ext ''
 
-  define_singleton_method :dir_pathname do  # expose it to rest of the system.
+  define_singleton_method :dir_pathname do
     dir_pathname
   end
 
-  -> do  # `tmpdir_pathname` - hellof used in testing, but see below
-    tmpdir_pathname = nil
-    define_singleton_method :tmpdir_pathname do
-      tmpdir_pathname ||= dir_pathname.join '../../tmp'
-      # #todo why can't you be more like your brother `cache_pathname`?
-      # because you need a deep audit and small redesign [#128]
-    end
-  end.call
+  module Autoloader                # const_missing hax can be dodgy - be careful
 
-  # `cache_pathname` - experimentally for caching things in production -
-  # it should only be used with the utmost OCD-fueled hyper-extreme caution
-  # and over-engineering you can muster, because nothing puts a turd in
-  # your easter basket worse than an epic bughunt caused by a stale cache
-  # save for actually doing that.
+    EXTNAME = '.rb'.freeze
 
-  -> do
-    cache_pathname = nil
-    define_singleton_method :cache_pathname do
-      cache_pathname ||= begin
-        require 'tmpdir'
-        pn = ::Pathname.new( ::Dir.tmpdir ).join( 'sl.skylab' )
-        if ! pn.exist?
-          ::Dir.mkdir pn.to_s, 0766  # same perms as `TemporaryItems`
-        end
-        pn
+    Enhance_ = -> mod, callr=nil do
+      autoloader = self
+      mod.module_exec do
+        @tug_class ||= autoloader::Tug
+        extend autoloader::Methods
+        init_autoloader callr.nil? ? caller[2] : callr
       end
-    end
-  end.call
-
-  module Autoloader
-    # const_missing hax can suck - use this iff it's compelling. #experimental
-
-    EXTNAME = '.rb'
-
-    def self.extended mod
-      mod.extend Autoloader::Methods
-      mod.init_autoloader caller[ 0 ]
-    end
-  end
-
-  module Autoloader::Inflection
-
-    extend Methods = ::Module.new # sorry  #todo decide the correct interface
-
-    o = { }
-
-    o[:call_frame_path_rx] = /^(?<path>.+)(?=:\d+:in[ ]`)/x
-
-    sanitize_path_rx = %r{ #{::Regexp.escape Autoloader::EXTNAME }\z |
-      (?<=/)/+ | (?<=[-_ ])[-_ ]+ | [^-_ /a-z0-9]+ }ix
-
-    o[:constantize] = -> path do
-      path.to_s.gsub( sanitize_path_rx, '' ).    # remove some strings
-        split( '/', -1 ).map do |const|          # each filename as const name
-          const.gsub( /([^-_ ]+)([-_ ]+)?/ ).each do # each part at a separator
-            const, sep = $~.captures
-            const.gsub!( /(?<=[0-9]|\A)([a-z])/ ) { $1.upcase } # "99x" -> "99X"
-            if sep
-              if const.length > 1                # "foo_bar" --> "FooBar"
-                sep = nil
-              else
-                sep = '_'                        # "c_style" --> "C_Style"
-              end
-            end
-            "#{ const }#{ sep }"
-          end
-        end.join '::'
+      nil
     end
 
-    o[:methodize] = -> str do
-      str.to_s.
-        gsub(/(?<=[a-z])([A-Z])|(?<=[A-Z])([A-Z][a-z])/) { "_#{$1 || $2}" }.
-        gsub(/[^a-z0-9]+/i, '_').downcase.intern # munge-in above underscores
-    end
+    define_singleton_method :[], & Enhance_
+
+    FUN = o = ::Struct.new( :pathify, :methodize, :constantize ).new
 
     o[:pathify] = -> const do
       const.to_s.
@@ -99,58 +38,65 @@ module Skylab                     # Welcome! :D
         gsub('_', '-').downcase
     end
 
-    Methods.module_exec do  # away at [#127]
-      [ :constantize, :methodize, :pathify ].each do |m|
-        define_method m, o.fetch( m )
-      end
+    o[:methodize] = -> str do
+      str.to_s.
+        gsub(/(?<=[a-z])([A-Z])|(?<=[A-Z])([A-Z][a-z])/) { "_#{$1 || $2}" }.
+        gsub(/[^a-z0-9]+/i, '_').downcase.intern  # munge-in above underscores
     end
 
-    FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
-  end
+    o[:constantize] = -> do
 
-  module Autoloader::Methods  # (né ModuleMethods)
+      sanitize_path_rx = %r{ #{::Regexp.escape EXTNAME }\z |
+        (?<=/)/+ | (?<=[-_ ])[-_ ]+ | [^-_ /a-z0-9]+ }ix
 
-    # (here is how the story starts:)
-
-    #         ~ `init_autoloader` and friends in pre-order-ish ~
-
-    #  a.l methods does not want to give you any methods you do not want.
-    #  you get: init_autoloader, dir_pathname, const_missing[_tug]
-
-    guess_dir = nil               # (below)
-
-    -> do  # `init_autoloader`
-      rx = Autoloader::Inflection::FUN.call_frame_path_rx
-
-      define_method :init_autoloader do |caller_str|
-        if dir_pathname.nil?
-          pn = ::Pathname.new caller_str.match( rx )[ :path ]  # gigo
-          if '/' != pn.instance_variable_get( :@path )[ 0 ]
-            # pn.relative? looks dodgy (look at it!) how many ms #todo
-            pn = pn.expand_path   # although this is a filesystme hit,
-          end                     # you cannot reliable autoload with a relpath
-          guess = guess_dir[ name, pn.sub_ext( '' ).to_s, -> e do
-            raise ::LoadError, "Autoloader hack failed: #{ e }"
-          end ]
-          if guess  # sanity
-            @dir_pathname = ::Pathname.new guess
-          end
+      -> path do
+        path.to_s.gsub( sanitize_path_rx, '' ).# remove some strings
+          split( '/', -1 ).map do |const|      # each filename as const name
+            const.gsub( /([^-_ ]+)([-_ ]+)?/ ).each do # each part at a sep
+              const, sep = $~.captures
+              const.gsub!( /(?<=[0-9]|\A)([a-z])/ ) { $1.upcase } # "99x" -> "99X"
+              if sep
+                if const.length > 1            # "foo_bar" --> "FooBar"
+                  sep = nil
+                else
+                  sep = '_'                    # "c_style" --> "C_Style"
+                end
+              end
+              "#{ const }#{ sep }"
+            end
+          end * '::'
         end
-        @tug_class ||= Autoloader::Tug
-        nil
-      end
     end.call
 
-    attr_reader :dir_pathname     # people like this
+    o.freeze ; o = nil
 
-    attr_reader :tug_class        # used internally in
-                                  # derivative libraries (3x) but dbg too
+    module Methods
 
-    guess_dir = -> do
+      def init_autoloader caller_string
+        if dir_pathname.nil?
+          pn = ::Pathname.new caller_string.match( CALLFRAME_PATH_RX )[:path ]
+          # #todo pn.relative? is expensive and bloaty
+          '/' == pn.instance_variable_get( :@path )[ 0 ] or
+            pn = pn.expand_path # although this is a filesystme hit,
+              # you cannot reliably autoload with a relpath
+          guess = Guess_dir_[ name, pn.sub_ext( '' ).to_s, -> e do
+            raise ::LoadError, "Autoloader hack failed: #{ e }"
+          end ]
+          guess and @dir_pathname = ::Pathname.new( guess )  # sanity
+        end
+        nil
+      end
+
+      attr_reader :dir_pathname, :tug_class
+    end
+
+    CALLFRAME_PATH_RX = /^(?<path>.+)(?=:\d+:in[ ]`)/x
+
+    Guess_dir_ = -> do
 
       tok_rx = %r{\A(?:(?<rest>(?:(?!=::).)+)::)?(?:::)?(?<curr>[^:]+)\z}
 
-      pathify = Autoloader::Inflection::FUN.pathify
+      pathify = FUN.pathify
 
       tokenizer = -> s do         # "A::B::C" => "c", "b", "a", nil
         -> { m = tok_rx.match( s ) and ( s, x = m.captures ) and pathify[ x ] }
@@ -172,158 +118,150 @@ module Skylab                     # Welcome! :D
       end
     end.call
 
-    FUN = ::Struct.new( :guess_dir ).new guess_dir  # exposed for testing
+    module Methods
 
-    # -- that is what happens during init.
+      def const_probably_loadable? const
+        const_tug( const ).probably_loadable?
+      end
 
-    #         ~ here is the `const_missing` hack (central thesis) ~
+    private
 
-    def const_missing const
-      const_tug( const ).load  # offload core implementation
-      const_get const, false
-    end
-    private :const_missing  # #called-by ruby runtime only
+      def const_missing const
+        const_tug( const ).load_and_get  # [#mh-040] result is value
+      end
 
-    # `const_tug` - a Tug (né ConstMissing then "engine" then
-    # "strategy" then "plan" then "policy") is the encapsulation of the core
-    # logic for autoloading when a particular const is missing.
-    #
-    # Offloading it like this to an external instance of an external class
-    # a) mitigates our crowding the method and ivar namespace of the particular
-    # module object with volatile details of our implementation and
-    # b) allows us to customize how we Tug for shenanigans (er, for various
-    # autoloading experiments) by employing class inheritance, rather than
-    # crowding said ivar, method name (and ancestor chain) inheritance of
-    # the client module object.
-    #
-    # Exposing the construction of the tug like this below with 2 methods
-    # is our sole implement-y hook into that precious namespace, to give the
-    # particular module (or more likely modules in its own chain) a chance
-    # to change how we "tug" when we hit a const missing.
+    public
 
-    def const_tug const
-      if @dir_pathname
+      def const_tug const
+        @dir_pathname or raise LoadError, "Autoloader hack failed: attempt #{
+          }to autoload #{ name }::#{ const } when dir_path of that anchor #{
+          }module not yet known (do you need to extend an Autoloader #{
+          }explicitly on that module?)"
         @tug_class.new const.intern, @dir_pathname, self
-      else
-        fail "Autoloader hack failed: attempt to autoload #{
-          }#{ name }::#{ const } when dir_path of that anchor module not #{
-          }yet known (do you need to extend an Autoloader explicitly on that #{
-          }module?)" # could be pushed down if really need to
       end
-    end
 
-    def const_probably_loadable? const  # courtesy, used elsewhere
-      const_tug( const ).probably_loadable?
-    end
+      #  ~ `add_dir_pathname_listener` - goofy experiment on charging a graph ~
 
-    def init_dir_pathname x       # goofy experiment on charging a graph
-      dir_pathname and raise ::ArgumentError, "won't clobber existing pn"
-      @dir_pathname = x
-      if dir_pathname_waitlist_a
-        @dir_pathname_waitlist_a.length.times do |i|
-          const, mod = @dir_pathname_waitlist_a[ i ]
-          mod.init_dir_pathname(
-            x.join Autoloader::Inflection::FUN.pathify[ const ] )
-          @dir_pathname_waitlist_a[ i ] = nil
+      def add_dir_pathname_listener *a
+        ( @dir_pathname_listener_a ||= [ ] ) << a
+        nil
+      end
+
+      def init_dir_pathname x
+        dir_pathname and raise ::ArgumentError, "won't clobber existing pn"
+        @dir_pathname = x
+        if instance_variable_defined? :@dir_pathname_listener_a
+          ( a = @dir_pathname_listener_a ).length.times do |i|
+            const, mod = a[ i ]
+            mod.init_dir_pathname(
+              x.join Autoloader::FUN.pathify[ const ] )
+            a[ i ] = nil
+          end
+          a.compact!
         end
-        @dir_pathname_waitlist_a.compact!
+        nil
       end
-      nil
-    end
 
-    attr_reader :dir_pathname_waitlist_a
+      # `stowaway` - a hook for another goofy experiment [#mh-030].
 
-    def dir_pathname_waitlist *a
-      ( @dir_pathname_waitlist_a ||= [ ] ) << a
-      nil
-    end
+    public
 
-    # `stowaway` - a hook for another goofy experiment [#mh-030].
+      attr_reader :has_stowaways, :stowaway_a
 
-    def stowaway *a
-      @has_stowaways ||= true
-      ( @stowaway_a ||= [ ] ) << a
-    end
+    private
 
-    attr_reader :has_stowaways, :stowaway_a
-  end
-
-  class Autoloader::Tug
-
-    # (see lengthy justification at `const_tug`)
-
-    def initialize const, mod_dir_pathname, mod
-      @const, @mod_dir_pathname, @mod = const, mod_dir_pathname, mod
-    end
-
-    attr_reader :const, :mod
-
-    def correction_notification const
-      @const = const
-      nil
-    end
-
-    def load f=nil                # here is the main entrypoint, usu. why
-      if leaf_pathname.exist?     # the tug was created.
-        load_file f
-      else
-        raise ::LoadError, "no such file to load - #{ @leaf_pathname }"
+      def stowaway *a
+        @has_stowaways ||= true
+        ( @stowaway_a ||= [ ] ) << a
       end
-      # (result is result of callee)
     end
 
-    def probably_loadable?
-      leaf_pathname.exist?
-    end
+    class Tug  # the embodiment of the `const_missing` resolution.
 
-  private
+      def initialize const, mod_dir_pathname, mod
+        @const, @mod_dir_pathname, @mod = const, mod_dir_pathname, mod
+      end
 
-    #         ~ support for public methods in pre-order ~
+      attr_reader :const, :mod
 
-    pathify = Autoloader::Inflection::FUN.pathify
+      def correction_notification const
+        @const = const
+        nil
+      end
 
-    ext = Autoloader::EXTNAME
+      def probably_loadable?
+        leaf_pathname.exist?
+      end
 
-    define_method :leaf_pathname do
-      @leaf_pathname ||= @mod_dir_pathname.join "#{ pathify[@const] }#{ ext }"
-    end
-
-    def load_file after=nil
-      # if ever you get to a point where you are requiring the same string
-      # more than once, certainly something went wrong..
-      if mutex
-        bn = @leaf_pathname.basename
-        fail "circular autoload dependency detected in #{ leaf_pathname } #{
-          }while trying to autoload `#{ @const }` there - did you forget #{
-          }actually to set `[..]::#{ @const }` in #{ bn }? You know, #{ bn }?#{
-          } #{ @const }? #{ bn } <-> #{ @const }? eh? a little of that, eh?"
-      else
-        # $stderr.puts " >>> AL: #{ normalized_path }" # (2 reasons)
+      def load_and_get correction=nil
+        # requiring the same string more than once is never right -
+        mutex normalized_path and raise "circular autoload dependency #{
+          }detected - probably from within file node #{
+          }`#{ leaf_pathname.basename }` an autoload was triggered for the #{
+          }selfsame corresponding const node `#{ @const }` - make sure that #{
+          }that constant is actually set there - #{ @leaf_pathname }."
         require normalized_path
-        after.call if after
-        if @mod.const_defined?( @const, false ) then true else
+        correction and correction[]
+        if @mod.const_defined? @const, false
+          @mod.const_get @const, false
+        else
           const_not_defined  # hackery might happen
         end
       end
-    end
 
-    -> do
-      mutex_h = ::Hash.new { |h, k| h[k] = true ; nil }
-      define_method :mutex do
-        mutex_h[ normalized_path ]
+    private
+
+      define_method :mutex, &
+        ::Hash.new { | h, k| h[ k ] = true ; nil }.method( :[] )
+      private :mutex
+
+      def normalized_path
+        @normalized_path ||= leaf_pathname.sub_ext( '' ).to_s
       end
-    end.call
 
-    def normalized_path
-      @normalized_path ||= leaf_pathname.sub_ext( '' ).to_s
+      -> do
+        ext, pathify = Autoloader::EXTNAME, Autoloader::FUN.pathify
+
+        define_method :leaf_pathname do
+          @leaf_pathname ||= @mod_dir_pathname.
+            join "#{ pathify[@const] }#{ ext }"
+        end
+      end.call
+
+      def const_not_defined
+        raise ::LoadError, "#{ @mod }::#{ @const } was not defined, #{
+          }must be, in #{ leaf_pathname }"
+      end
     end
+  end
 
-    def const_not_defined
-      fail "#{@mod}::#{@const} was not defined, must be, in #{leaf_pathname}"
+  # below this line, "reachdowns" occur..
+
+  module Subsystem
+
+    Autoloader[ self ]
+
+    def self.[] mod
+      mod.module_exec do
+        ( const_set :MAARS, const_get( :MetaHell, false )::MAARS )[
+         self, caller[2] ]
+        const_defined? :Services, false or
+          stowaway :Services, -> do
+            svcs = Subsystem::Services.new @dir_pathname
+            const_set :Services, svcs
+            load svcs.pathname
+            nil
+          end
+      end
+      nil
     end
   end
 
   module Subsystem
-    extend Autoloader
+    Autoloader[ self ]
+  end
+
+  def self.cache_pathname
+    Subsystem::Subsystems_::Headless::System.defaults.cache_pathname
   end
 end

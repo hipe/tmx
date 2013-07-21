@@ -5,6 +5,6 @@ module Skylab::InformationTactics
 
   MetaHell = ::Skylab::MetaHell
 
-  extend MetaHell::MAARS
+  MetaHell::MAARS[ self ]
 
 end

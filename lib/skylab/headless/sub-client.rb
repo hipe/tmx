@@ -9,7 +9,9 @@ module Skylab::Headless
     # some i.m modules try to be. The participating object _must_ call
     # `init_headless_sub_client`
 
-  protected
+  private
+
+    define_singleton_method :private_attr_reader, & Private_attr_reader_
 
     def initialize request_client # this is the heart of it all [#004] (see)
       block_given? and raise ::ArgumentError.new 'blocks are not honored here'
@@ -26,7 +28,9 @@ module Skylab::Headless
       self.request_client = request_client  # (some environments employ
     end                           # alternatives to the ivar for storing r.c)
 
-    attr_writer :request_client
+    def request_client= x  # #private-attr-writer
+      @request_client = x
+    end
 
     def request_client
       @request_client or begin
@@ -65,7 +69,9 @@ module Skylab::Headless
     end                           # "perfect abstraction" but may still cause
                                   # you pain if you're not careful.
 
-    attr_reader :error_count      # there is no absolutely no guarantee that
+    private_attr_reader :error_count
+
+                                  # there is no absolutely no guarantee that
                                   # that out of the box this is reflective
                                   # of anything that you think it is.  caution!
 
@@ -77,9 +83,9 @@ module Skylab::Headless
       request_client.send :io_adapter # the streams, e.g. the instream
     end
 
-    def info s                    # provided as a convenience for this
-      emit :info, s               # extremely common implementation
-      nil
+    def info x                    # provided as a convenience for this
+      emit :info, x               # extremely common implementation
+      nil                         # (note that `x` might be an `h`)
     end
 
     def parameter_label x, *rest  # [#036] explains it all
@@ -224,7 +230,7 @@ module Skylab::Headless
 
     Headless::SubClient::EN_FUN.each do |method_name, body|
       define_method method_name, &body
-      protected method_name
+      protected method_name  # #protected-not-private
     end
   end
 end

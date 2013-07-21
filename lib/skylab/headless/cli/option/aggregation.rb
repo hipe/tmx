@@ -26,7 +26,7 @@ module Skylab::Headless
         ) ]
       end
     end
-    protected :two_sets
+    private :two_sets
 
     def err
       @err || -> m { fail m }
@@ -57,7 +57,7 @@ module Skylab::Headless
       @a << [ opt, info_a ]
       nil
     end
-    protected :_add
+    private :_add
 
     # `write` - write out an aggregate list of description strings in the form
     # of:

@@ -5,7 +5,7 @@ module Skylab::TanMan
 
     attribute :verbose, :boolean => true, :default => false
 
-  protected
+  private
 
     def execute
       result = nil

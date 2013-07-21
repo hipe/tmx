@@ -51,7 +51,7 @@ module Skylab::Basic
         # it is important that you propagate the result of child's `each` here.
       end
     end
-    protected :flatten_  # not private
+    protected :flatten_  # #protected-not-private
 
     # `children` - each yielded item is always a node it is never
     # the local data or leaf data.

@@ -7,7 +7,8 @@ require 'strscan'
 ::Skylab::Subsystem::FUN.require_quietly[ 'treetop' ]
 
 module Skylab::Flex2Treetop
-  extend ::Skylab::Autoloader # only for dir_path for now!
+
+  ::Skylab::Autoloader[ self ]  # only for dir_path for now!
 
   FIXTURES = {
     mini:     'flex2treetop/test/fixtures/mini.flex',
@@ -235,7 +236,7 @@ module Skylab::Flex2Treetop
 
   class CLI::Client < Core::Client
 
-    extend ::Skylab::Autoloader
+    ::Skylab::Autoloader[ self ]
 
     include Headless::CLI::Client::InstanceMethods
 

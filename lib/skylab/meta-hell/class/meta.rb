@@ -31,7 +31,7 @@ module Skylab::MetaHell
       nil
     end
 
-  protected
+  private
 
     def _option! k, v
       if respond_to?( m = "_set_#{k}!" )

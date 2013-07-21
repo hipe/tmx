@@ -2,7 +2,7 @@ module Skylab::TestSupport
 
   class Servers::Static_File_Server
 
-    PubSub = TestSupport_::Services::PubSub
+    PubSub = Subsys::Services::PubSub
 
     extend PubSub::Emitter
 
@@ -10,10 +10,10 @@ module Skylab::TestSupport
 
     emits info: :all, warn: :all, error: :all  # used internally
 
-    include TestSupport_::Services::FileUtils
+    include Subsys::Services::FileUtils
 
     def initialize *a, &b  # [ doc_root_str ] [ opt_hash ] <<no blocks>>
-      TestSupport_::Services.kick :Adsf, :Rack
+      Subsys::Services.kick :Adsf, :Rack
       init_event_handling
       Parse_args_[ h = { }, a, b ]
       h = { log_level_i: DEFAULT_LOG_LEVEL_, port: DEFAULT_PORT_ }.merge h

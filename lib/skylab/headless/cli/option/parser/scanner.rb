@@ -25,7 +25,7 @@ module Skylab::Headless
       reduce_a = [ -> _ { }, -> a { a[0] } ].freeze # distills 1 item from args
     end.call
 
-  protected
+  private
 
     def initialize enum
       ea = if enum.respond_to?( :each ) then enum else

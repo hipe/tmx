@@ -156,7 +156,7 @@ module Skylab::TanMan
       res
     end
 
-  protected
+  private
 
     alias_method :dotfile_controller, :request_client
 

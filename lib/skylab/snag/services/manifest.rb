@@ -77,7 +77,7 @@ module Skylab::Snag
 
     def get_tmpdir_p
       -> *a do
-        @tmpdir_pathname ||= ::Skylab.tmpdir_pathname.join TMP_DIRNAME_
+        @tmpdir_pathname ||= Headless::System.defaults.tmpdir_pathname.join TMP_DIRNAME_
         Tmpdir_Curry_[ :tmpdir_pathname, @tmpdir_pathname, *a ]
       end
     end

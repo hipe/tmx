@@ -5,8 +5,6 @@ module Skylab::Headless::TestSupport
 
   ::Skylab::TestSupport::Regret[ Headless_TestSupport = self ]
 
-  self.tmpdir_pathname = ::Skylab.tmpdir_pathname.join 'hl'
-
   module CONSTANTS
     Headless = ::Skylab::Headless
     Headless_TestSupport = Headless_TestSupport
@@ -15,6 +13,9 @@ module Skylab::Headless::TestSupport
   end
 
   Headless = ::Skylab::Headless  # covered
+
+  self.tmpdir_pathname = Headless::System.defaults.dev_tmpdir_pathname.join 'hl'
+  # #todo - when you take out the `dev_` above it fails
 
   module ModuleMethods
     def debug!
@@ -55,5 +56,7 @@ module Skylab::Headless::TestSupport
 
     ::Struct.new( * o.keys ).new( * o.values )
   end.call
+
+  NILADIC_TRUTH_ = -> { true }
 
 end

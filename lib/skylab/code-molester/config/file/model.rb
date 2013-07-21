@@ -335,7 +335,9 @@ module ::Skylab::CodeMolester
       res
     end
 
-  protected
+    attr_reader :entity_noun_stem
+
+  private
 
     opts_struct = ::Struct.new :path, :string, :entity_noun_stem
 
@@ -345,7 +347,7 @@ module ::Skylab::CodeMolester
       if param_h
         param_h.each { |k, v| o[k] = v }
       end
-      @content = o[:string] # expecting nil or string here
+      @content = o[:string]  # expecting nil or string here
       @entity_noun_stem = o[:entity_noun_stem]
       @invalid_reason = nil
       @pathname = o[:path] ? ::Pathname.new( o[:path].to_s ) : nil
@@ -392,8 +394,6 @@ module ::Skylab::CodeMolester
       end while nil
       res
     end
-
-    attr_reader :entity_noun_stem
 
     def update w
       res = nil

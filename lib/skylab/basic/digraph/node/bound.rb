@@ -18,7 +18,7 @@ module Skylab::Basic
 
     attr_reader :normalized_local_node_name
 
-  protected
+  private
 
     def initialize graph, name
       @graph_ref = -> { graph }

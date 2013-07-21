@@ -15,7 +15,7 @@ module Skylab::Headless
       @hot = nil
     end
 
-  protected
+  private
 
     def initialize
       super

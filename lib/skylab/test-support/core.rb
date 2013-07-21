@@ -2,7 +2,6 @@ require File.expand_path('../../../skylab', __FILE__)
 # above is [#bs-010]
 
 require 'skylab/headless/core'
-require 'skylab/meta-hell/core'
 
 class ::String                    # this is probably the only extlib you will
                                   # find org wide - give ::String this useful
@@ -20,9 +19,9 @@ module Skylab::TestSupport
   Autoloader = ::Skylab::Autoloader
   Headless = ::Skylab::Headless
   MetaHell = ::Skylab::MetaHell
-  TestSupport_ = self             # (do *not* set the convenience "hiccup"
-                                  # eponymous constant here! there is a
-                                  # legitimate other module called SL::TS::TS!)
+  Subsys = self                   # gotcha: we cannot set the eponymous
+                                  # #hiccup constant because there is a
+                                  # legitimate other module ::SL::TS::TS.
 
   Stdout_ = -> { $stdout }        # littering our code with hard-coded globals
   Stderr_ = -> { $stderr }        # (or constants, that albeit point to a
@@ -31,5 +30,6 @@ module Skylab::TestSupport
                                   # these, which will at least point back to
                                   # this comment.
 
-  extend MetaHell::MAARS
+  ::Skylab::Subsystem[ self ]
+
 end

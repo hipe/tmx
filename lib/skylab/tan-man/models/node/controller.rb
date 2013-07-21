@@ -1,13 +1,20 @@
 module Skylab::TanMan
+
   class Models::Node::Controller
+
     include Core::SubClient::InstanceMethods
+
+    def initialize dot_file_controller, node_stmt
+      super dot_file_controller
+      @node_stmt = node_stmt
+    end
 
     def destroy error, success
       res = nil
       begin
         assocs = dot_file.send :associations # give it here now
-        assocs.destroy_all_associations node_stmt.node_id, error, success
-        list = dot_file.sexp.stmt_list._remove! node_stmt # raises if not found
+        assocs.destroy_all_associations @node_stmt.node_id, error, success
+        list = dot_file.sexp.stmt_list._remove! @node_stmt # raises if not found
         stmt = list.stmt
         @node_stmt = nil # avoid shenanigans - also, prob the same as above
         if success
@@ -21,32 +28,25 @@ module Skylab::TanMan
 
     # result is always true - no errors yet to emit. always emits event
     def update_attributes attrs, _, success # no errors to emit yet
-      a_list = node_stmt.attr_list.content
+      a_list = @node_stmt.attr_list.content
       a_list._prototype ||= a_list_prototype
       added = [] ; changed = []
       a_list._update_attributes! attrs,
         -> name, val { added << [name, val] },
         -> name, old, new { changed << [name, old, new] }
       success[ Models::Node::Events::Attributes_Updated.new self,
-        node_stmt, added, changed ]
+        @node_stmt, added, changed ]
       true
     end
 
-  protected
-
-    def initialize dot_file_controller, node_stmt
-      super dot_file_controller
-      @node_stmt = node_stmt
-    end
+  private
 
     a_list_proto = nil
 
-    define_method :a_list_prototype do # [#054], [#071]
-      a_list_proto ||= node_stmt.class.parse :a_list, 'a=b, c=d'
+    define_method :a_list_prototype do  # [#054], [#071]
+      a_list_proto ||= @node_stmt.class.parse :a_list, 'a=b, c=d'
     end
 
     alias_method :dot_file, :request_client
-
-    attr_reader :node_stmt
   end
 end

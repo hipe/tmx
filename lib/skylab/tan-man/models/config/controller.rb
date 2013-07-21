@@ -198,7 +198,7 @@ module Skylab::TanMan
       result
     end
 
-  protected
+  private
 
     def initialize request_client
       @remotes = nil

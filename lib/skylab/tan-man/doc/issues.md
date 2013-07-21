@@ -1,5 +1,5 @@
 [#078]       #tracking-tag this spot with `const_set`
-[#077] #open services.rb wat
+[#077]       #done services.rb wat
 [#076] #open events need to be modernized
 [#075]       #tracking-tag of hiccup skip Actions module `ANCHOR_BOX_MODULE`
 [#074]       #doc-point numerics in sexps #sexp-auto

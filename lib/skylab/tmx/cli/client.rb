@@ -70,7 +70,7 @@ module Skylab::TMX
 
       def build_puffer
         eew = parent_shell.instance_variable_get :@be_verbose
-        white = -> _norm_filename { true }  # got replaced by `skip`
+        white = ::Skylab::MetaHell::MONADIC_TRUTH_  # got replaced by `skip`
         Puffer_[ TMX::Modules, white, sheet, @y, eew ]
       end
     end

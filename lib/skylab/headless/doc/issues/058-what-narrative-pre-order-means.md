@@ -10,7 +10,7 @@ one by one (which themselves are generally written in an order of
 increasing complexity). This is done solely for ease of comprehension
 and human scanning, specifically for ease of refactoring.
 
-(we used to go strictly alphabeticaly within public and protected
+(we used to go strictly alphabeticaly within public and private
 sections, but this proved sub-optimal because of both a) a spaghetti
 effect when reading and b) it was prohibitive to refactoring, during
 which method frequently get renamed.)

@@ -7,10 +7,10 @@ require_relative '../core'
 
 module Skylab::Porcelain::TestSupport
 
+
+
   describe "The #{Porcelain::Legacy} module" do
     extend Porcelain_TestSupport
-    let(:debug_ui) {   }
-
     def _stderr  # wind this back to see an even messier version
       @_stderr ||= ::StringIO.new
     end
@@ -23,12 +23,19 @@ module Skylab::Porcelain::TestSupport
 
     let(:instance) do
       kls = klass
-      if kls.respond_to? :emits  # test both ways of event wiring
-        inst = kls.new do |o|  # (below left intentionally dirty)
-          o.on_all { |e| _stderr.puts style_free(e.text) ; debug_ui and $stderr.puts("DBG-->#{e.text}<--") }
+      if MetaHell::FUN.module_defines_method_in_some_manner[
+          kls.singleton_class, :emits ]
+        # test both ways of event wiring..
+        inst = kls.new do |o|
+          # (tombstone of a great [#bm-008] vector)
+          o.on_all do |e|
+            _stderr.puts e.text  # might be styled
+            do_debug and TestSupport::Stderr_[].puts "(dbg:#{ e.text })"
+            nil
+          end
         end
       else
-        if debug_ui
+        if do_debug
           @_stderr ||= TestSupport::IO::Spy.standard.debug!
         end
         inst = kls.new nil, _stderr, _stderr
@@ -360,8 +367,8 @@ module Skylab::Porcelain::TestSupport
         Class.new.class_eval do
           extend Porcelain::Legacy::DSL
           attr_reader :argv, :touched
-          protected :argv, :touched
-        protected
+          private :argv, :touched
+        private
           def initialize( * )
             super
             @touched = nil
@@ -414,7 +421,7 @@ module Skylab::Porcelain::TestSupport
         Class.new.class_eval do
           extend Porcelain::Legacy::DSL
           class_eval(&this.definition_block)
-        protected
+        private
           def initialize( * )
             super
             @program_name = 'yourapp'
@@ -524,7 +531,7 @@ module Skylab::Porcelain::TestSupport
             end
           end
           def duckle ; end
-        protected
+        private
           def initialize( * )
             super
             @program_name = 'wahoo'
@@ -655,7 +662,7 @@ module Skylab::Porcelain::TestSupport
         Class.new.class_eval do
           extend ::Skylab::Porcelain::Legacy::DSL
           module_eval(& o.body)
-        protected
+        private
           def initialize( * )
             super
             @program_name = 'doipus'

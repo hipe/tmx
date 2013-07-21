@@ -23,7 +23,7 @@ module Skylab::TanMan
       num.lines_removed
     end
 
-  protected
+  private
 
     num_struct = ::Struct.new :lines_removed, :lines_added
 

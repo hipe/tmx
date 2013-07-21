@@ -2,4 +2,4 @@
 
 require_relative '../lib/skylab/tan-man/cli'
 
-Skylab::TanMan::CLI.new.invoke ARGV
+Skylab::TanMan::CLI.new( $stdin, $stdout, $stderr ).invoke ARGV

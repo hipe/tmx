@@ -5,13 +5,13 @@ Skylab::TanMan::API || nil                     # #preload here, prettier below
 module Skylab::TanMan
 
   module CLI
+
     Adapter = Bleeding::Adapter  # "ouroboros" ([#hl-069])
 
-    extend MetaHell::Autoloader::Autovivifying::Recursive
-                                  # (we need the above to be so before this file
-                                  # finishes loading!)
-    def self.new *a, &b
-      CLI::Client.new( *a, &b )
+    MetaHell::MAARS[ self ]      # this must happens before the file loads
+
+    def self.new i, o, e, &b
+      CLI::Client.new i, o, e, &b
     end
   end
 
@@ -26,7 +26,7 @@ module Skylab::TanMan
                                   # in this file to keep them all centralized.
 
     def dry_run_option o
-      o.on '-n', '--dry-run', 'dry run.' do param_h[:dry_run] = true end
+      o.on '-n', '--dry-run', 'dry run.' do @param_h[:dry_run] = true end
     end
 
     def help_option o
@@ -36,7 +36,7 @@ module Skylab::TanMan
     end
 
     def verbose_option o
-      o.on '-v', '--verbose', 'verbose output.' do param_h[:verbose] = true end
+      o.on '-v', '--verbose', 'verbose output.' do @param_h[:verbose] = true end
     end
   end
 
@@ -84,7 +84,7 @@ module Skylab::TanMan
     end
 
     def process path=nil
-      api_invoke param_h.merge( path: path,
+      api_invoke @param_h.merge( path: path,
                                 local_conf_dirname: API.local_conf_dirname )
     end
   end
@@ -101,13 +101,13 @@ module Skylab::TanMan
 
     option_parser do |o|
       o.on '-g', '--global', 'add it to the global config file.' do
-        param_h[:global] = true
+        @param_h[:global] = true
       end
       help_option o
     end
 
     def process name, host
-      args = param_h.merge( name: name, host: host )
+      args = @param_h.merge( name: name, host: host )
       args[:resource] = args.delete(:global) ? :global : :local
       result = api_invoke args
       result
@@ -121,14 +121,14 @@ module Skylab::TanMan
     option_parser do |o|
       help_option o
       o.on '-v', '--verbose', 'show more fields.' do
-        param_h[:verbose] = true
+        @param_h[:verbose] = true
       end
     end
 
     def process
       result = nil # not false - we never do convention [#hl-109] invite
       begin
-        table = api_invoke( param_h ) or break
+        table = api_invoke( @param_h ) or break
         Headless::CLI::Table.render table, separator: '  ' do |o|
           o.field!( :resource_label ).style = -> x { "(resource: #{ x })" }
           o.on_empty do |txt|
@@ -153,12 +153,12 @@ module Skylab::TanMan
       help_option o
       o.on '-r', '--resource NAME',
         'which config file (e.g. global, local) (default: first found)' do |v|
-        param_h[:resource_name] = v
+        @param_h[:resource_name] = v
       end
     end
 
     def process remote_name
-      result = api_invoke param_h.merge( remote_name: remote_name )
+      result = api_invoke @param_h.merge( remote_name: remote_name )
       result
     end
   end
@@ -185,17 +185,17 @@ module Skylab::TanMan
     option_parser do |o|
       dry_run_option o
       o.on '-f', '--force', 'sometimes required by the action' do
-        param_h[:force] = true
+        @param_h[:force] = true
       end
       o.on '-g', 'rebuilds the Tell grammar (#dev)' do
-        param_h[:rebuild_tell_grammar] = true
+        @param_h[:rebuild_tell_grammar] = true
       end
       help_option o
       verbose_option o
     end
 
     def process *word
-      api_invoke( { words: word }.merge param_h )
+      api_invoke( { words: word }.merge @param_h )
     end
   end
 
@@ -207,7 +207,7 @@ module Skylab::TanMan
     @option_parser_blocks = CLI::Actions::Graph::Tell.option_parser_blocks
 
     def process *word
-      api_invoke [:graph, :tell], { words: word }.merge( param_h )
+      api_invoke [:graph, :tell], { words: word }.merge( @param_h )
     end
   end
 
@@ -227,7 +227,7 @@ module Skylab::TanMan
     end
 
     def process dotfile=nil
-      api_invoke( { path: dotfile, verbose: false }.merge param_h )
+      api_invoke( { path: dotfile, verbose: false }.merge @param_h )
     end
   end
 
@@ -242,7 +242,7 @@ module Skylab::TanMan
     end
 
     def process remote_name, file
-      api_invoke param_h.merge( remote_name: remote_name, file_path: file )
+      api_invoke @param_h.merge( remote_name: remote_name, file_path: file )
     end
   end
 

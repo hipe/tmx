@@ -1,6 +1,6 @@
 module Skylab::TanMan
   class Models::DotFile::Actions::Copula < Models::DotFile::Action
-  protected
+  private
     def execute
       node = statement.agent.words.join ' '
       meaning = statement.target.words.join ' '

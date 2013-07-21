@@ -58,7 +58,7 @@ module Skylab::Headless
       end
     end
 
-  protected
+  private
 
     def initialize string
       @lines = string.split "\n"

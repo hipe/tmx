@@ -26,7 +26,7 @@ module Skylab::Treemap
   #                          (in load order)
 
   module CLI
-    extend MAARS
+    MAARS[ self ]
     Adapter = Porcelain::Bleeding::Adapter  # "ouroboros" ([#hl-069])
 
     def self.new *a, &b
@@ -35,7 +35,7 @@ module Skylab::Treemap
   end
 
   module Core
-    extend MAARS
+    MAARS[ self ]
 
     stowaway :Action, :Event, :SubClient  # (load s.c to find action, event)
   end
@@ -47,7 +47,7 @@ module Skylab::Treemap
   end
 
   module API
-    extend MAARS
+    MAARS[ self ]
     module Actions
       MetaHell::Boxxy[ self ]
     end
@@ -55,6 +55,6 @@ module Skylab::Treemap
 
   IDENTITY_ = -> x { x }          # just for fun we track where this is used
 
-  extend MAARS                    # we put it at the
+  MAARS[ self ]                   # we put it at the
                                   # bottom as proof that we don't use it here.
 end

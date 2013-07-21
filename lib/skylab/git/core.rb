@@ -16,12 +16,12 @@ module Skylab::Git
 
   module CLI
 
-    extend MAARS
+    MAARS[ self ]
 
     def self.new sin, sout, serr
       CLI::Client.new sin, sout, serr
     end
   end
 
-  extend MAARS
+  MAARS[ self ]
 end

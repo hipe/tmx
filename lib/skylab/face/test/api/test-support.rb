@@ -16,7 +16,7 @@ module Skylab::Face::TestSupport::API
   MAARS = MAARS
 
   module Sandbox
-    extend MAARS
+    MAARS[ self ]
   end
 
   CONSTANTS::Sandbox = Sandbox

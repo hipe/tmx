@@ -27,7 +27,7 @@ module Skylab::Cull::TestSupport::CLI::Actions::Status
     end
 
     as :active_is,
-      %r{\Aactive config file is: \./\.cullconfig\z}, :nonstyled
+      %r{\Aactive config file is: #{ PN_ }\z}, :nonstyled
 
     it "from inside a directory with a nerk, explains it all" do
 

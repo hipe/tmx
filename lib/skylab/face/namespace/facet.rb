@@ -24,7 +24,7 @@ module Skylab::Face
 
     # (the way it works out this is nicer structured as a top-down narrative
     # rather than being broken into the traditional sections, hence you will
-    # see private/protected called explicitly after each relevant method.)
+    # see private/p-rotected called explicitly after each relevant method.)
 
     def namespace norm_i, *a, &b
       if ! @skip_h[ norm_i ]
@@ -130,7 +130,7 @@ module Skylab::Face
           end
         end
       end
-      protected :absorb_additional_namespace_definition
+      private :absorb_additional_namespace_definition
 
       define_method :build_into do |block, name_func, xtra_x|
         bm = box_mod[ @surface_mod[] ]
@@ -149,17 +149,17 @@ module Skylab::Face
       self
     end
 
+  protected  # #protected not private
+
     def init_with_module_proc mp, nf, xtra_x
       @surface_mod = mp
       init_extended_ns_sheet :function, nf, xtra_x
     end
-    protected :init_with_module_proc
 
     def init_with_block b, nf, xtra_x
       @block_a = [ b ]
       init_extended_ns_sheet :blocks, nf, xtra_x  # overwrites `:module`, ok.
     end
-    protected :init_with_block
 
     def init_extended_ns_sheet i, nf, xtra_x
       @hot = nil
@@ -168,7 +168,8 @@ module Skylab::Face
       xtra_x and absorb_xtra xtra_x
       self
     end
-    private :init_extended_ns_sheet
+
+  public
 
     -> do
 

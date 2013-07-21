@@ -1,13 +1,19 @@
 require_relative '../core'
 
-module Skylab::TestSupport::TestSupport # haha yay
 
-  ::Skylab::TestSupport::Regret[ TestSupport_TestSupport = self ]
+module Skylab::TestSupport::TestSupport
+
+  TS_TS = self
 
   module CONSTANTS
-    TestSupport = ::Skylab::TestSupport # this might be really asking for it
+    TS_TS = TS_TS
+    TestSupport = ::Skylab::TestSupport
   end
 
-  include CONSTANTS # see note above about really asking for it
+  include CONSTANTS
+
+  TestSupport::Regret[ self ]
+
+  SYSTEM_ = TestSupport::Headless::System.defaults
 
 end

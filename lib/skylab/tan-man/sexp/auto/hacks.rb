@@ -14,7 +14,7 @@ module Skylab::TanMan
       res
     end
 
-  protected
+  private
 
     def initialize &b
       self.block = b

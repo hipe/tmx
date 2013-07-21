@@ -139,7 +139,7 @@ module Skylab::MetaHell
       consts = is_boxxified ?
         -> { mod.boxxy_original_constants } : -> { mod.constants }
       befor = consts[ ]
-      tug.load( -> do
+      tug.load_and_get( -> do
         cnst = distill[ const ]
         ( consts[ ] - befor ).each do |correct_i|
           if cnst == distill[ correct_i ] && const != correct_i
@@ -563,7 +563,7 @@ module Skylab::MetaHell
     #
     # `extname`:
     #
-    #     DSL_.extname  # => ::Skylab::Autoloader::EXTNAME
+    #     DSL_.extname  # => MetaHell::Autoloader::EXTNAME
     #
     # `upwards`:
     #
@@ -575,7 +575,7 @@ module Skylab::MetaHell
     #     DSL_.get_const( :ZIP )  # => :zap
     #
     #     module Zangief ; end
-    #     DSL_.get_const( :Zangief )  # => NameError: uninitialized consta..
+    #     DSL_.get_const( :Zangief )  # => ::LoadError: uninitialized consta..
 
     class Boxxy_
       def dsl blk

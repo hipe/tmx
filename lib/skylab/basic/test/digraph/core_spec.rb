@@ -35,7 +35,7 @@ module Skylab::Basic::TestSupport::Digraph::Core
         should eql( false )
     end
 
-    it "hay your nodes can point to multiple parents" do
+    it "hay your nodes can point to multiple parents", f:true do
       d = Basic::Digraph[ :fing, bing: :bong, bing_2: :bong,
                                      sing: [:song], wing: [:wrong, :dong] ]
       d.node_count.should eql( 9 )  # it didn't somehow double on on 'bong'

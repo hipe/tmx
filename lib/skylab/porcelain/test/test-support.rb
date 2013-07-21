@@ -23,10 +23,10 @@ module Skylab::Porcelain::TestSupport
     include CONSTANTS
     include MetaHell::Class::Creator::ModuleMethods # klass etc
 
-    define_method :constantize, & Autoloader::Inflection::FUN.constantize
+    define_method :constantize, & Autoloader::FUN.constantize
 
     def incrementing_anchor_module!  # so ridiculous
-      head = Autoloader::Inflection::FUN.constantize[ description ]
+      head = Autoloader::FUN.constantize[ description ]
       if /\A[A-Z][_a-zA-Z0-9]*\z/ !~ head
         fail "oops - #{ head }"
       else
@@ -49,7 +49,7 @@ module Skylab::Porcelain::TestSupport
    define_method :unstylize_stylized,
      & Headless::CLI::Pen::FUN.unstylize_stylized
 
-   define_method :constantize, & Autoloader::Inflection::FUN.constantize
+   define_method :constantize, & Autoloader::FUN.constantize
 
    attr_accessor :do_debug
 

@@ -6,26 +6,26 @@ module Skylab::Basic
 
   class Basic::Digraph::Node  # (#stowaway)
 
-    extend MetaHell::Autoloader::Autovivifying::Recursive
+    MetaHell::MAARS[ self ]
+
+    def initialize nln
+      @has_associations = nil
+      @normalized_local_node_name = nln
+    end
 
     def absorb_association sym
+      @has_associations ||= true
       @associations ||= MetaHell::Formal::Box::Open.new
-      if ! @associations.has? sym
-        @associations.add sym, true
-      end
+      @associations.has? sym or @associations.add sym, true
       nil
     end
 
     def direct_association_targets_include sym
-      if associations
-        @associations.has? sym
-      end
+      @has_associations and @associations.has? sym
     end
 
     def direct_association_target_names
-      if associations
-        @associations.names
-      end
+      @has_associations and @associations.names
     end
 
     def dupe
@@ -37,37 +37,29 @@ module Skylab::Basic
     end
 
     def has_association_to sym
-      if associations
-        @associations.has? sym
-      end
+      @has_associations and @associations.has? sym
     end
 
     attr_reader :normalized_local_node_name
 
-  protected
-
-    def initialize nln
-      @normalized_local_node_name = nln
-    end
+  private
 
     #         ~ dupe support ~
 
     def base_args
-      [ @normalized_local_node_name, associations ]
+      [ @normalized_local_node_name, ( @associations if @has_associations ) ]
     end
 
     def base_init normalized_local_node_name, associations
       @normalized_local_node_name = normalized_local_node_name
-      if associations
+      @has_associations = if associations
         @associations = associations.send :dupe
+        true
+      else
+        false
       end
       nil
     end
-
-    # --*--
-
-    attr_reader :associations  # not public (it's an open box)
-
   end
 
   class Basic::Digraph  # #todo - don't you wish you were a box!?
@@ -432,7 +424,7 @@ module Skylab::Basic
       nil
     end
 
-  protected
+  private
 
     def initialize
       @order = [ ]
@@ -462,7 +454,7 @@ module Skylab::Basic
     # and target symbols (in that order). The order that the associations will
     # arrive in is based on the order of the datastructure, not e.g a pre-order
     # walk (so just a loop inside a loop, not recursive).
-    # (This method is protected in part because we anticipate possibly having
+    # (This method is private in part because we anticipate possibly having
     # named associations one day, in which case we might want e.g 3 params!?)
     # Also (and perhaps strangely), for orphan nodes that both have no
     # outgoing associations of their own and are not pointed to by an

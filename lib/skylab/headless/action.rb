@@ -49,13 +49,15 @@ module Skylab::Headless
     end                           # about the local (tail) element of the
                                   # action class's name function.
 
-  protected
+  private
 
     def formal_attributes         # hook for this experiment - [#049], [#036]
     end
 
     def formal_parameters         # idem
     end
+
+  protected  # #protected-not-private
 
     def is_branch                 # brach == non terminal == box. bc it has far
       ! is_leaf                   # reaching consequences for request processing
@@ -70,12 +72,14 @@ module Skylab::Headless
       true                        # a terminal action and not a box action
     end
 
-    def normalized_action_name
-      self.class.normalized_action_name
-    end
-
     def normalized_local_action_name
       self.class.name_function.local.local_normal
+    end
+
+  private
+
+    def normalized_action_name
+      self.class.normalized_action_name
     end
 
     def parameter_label x, idx=nil  # [#036] explains it all

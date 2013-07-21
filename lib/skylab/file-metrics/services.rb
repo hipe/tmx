@@ -2,7 +2,7 @@ module Skylab::FileMetrics
 
   module Services
 
-    extend MAARS
+    MAARS[ self ]
 
     o = { }
     stdlib = ::Skylab::Subsystem::FUN.require_stdlib

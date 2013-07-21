@@ -9,10 +9,6 @@ module Skylab::PubSub
 
   MAARS = MetaHell::MAARS
 
-  extend MAARS
-
-  self.const_get :Emitter, false
-
-  # (note `FUN` is a #stowaway module in emitter.rb)
+  MAARS[ self ]
 
 end

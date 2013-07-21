@@ -8,7 +8,7 @@ module Skylab::Headless::TestSupport
 
     attr_accessor :pen
 
-  protected
+  private
 
     def initialize pen=Headless::Pen::MINIMAL
       super(  )

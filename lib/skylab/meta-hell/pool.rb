@@ -14,7 +14,7 @@ module Skylab::MetaHell
     #       Pool.enhance( self ).with_with_instance
     #     end
     #
-    #     Foo.new  # => NoMethodError: protected method `new' called for [..]
+    #     Foo.new  # => NoMethodError: private method `new' called for [..]
     #
     #     Foo.with_instance do |f|
     #       # .. ( use f )
@@ -76,7 +76,7 @@ module Skylab::MetaHell
 
         class << self
 
-          protected :new
+          private :new
 
           pool_a = [ ]
 
@@ -94,7 +94,7 @@ module Skylab::MetaHell
 
         singleton_class.class_exec do  # like `class << self` but inheirt scope
 
-          protected :new
+          private :new
 
           pool_a = [ ]
 

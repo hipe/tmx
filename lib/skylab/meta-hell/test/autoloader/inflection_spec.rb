@@ -7,10 +7,6 @@
 require_relative '../test-support'
 
 module Skylab::MetaHell::TestSupport::Autoloader
-  # just leave brittany alone - it's not used yet but it likely will be
-end
-
-module Skylab::MetaHell::TestSupport::Autoloader::Inflection
   # confusingly we are testing s.l::a.l from where we would test s.l::m.h::a.l
   # please bear with me -- it will probably move here
 
@@ -20,13 +16,13 @@ module Skylab::MetaHell::TestSupport::Autoloader::Inflection
 
   extend TestSupport::Quickie
 
-  describe "#{ Autoloader_ }::Inflection - IT IS TIME TO BOOGIE" do
+  describe "#{ MetaHell::Autoloader } inflection - IT IS TIME TO BOOGIE" do
 
     format = "%-48s %18s => %s"
 
     context "`pathify` - tries to turn constants into path fragments:" do
 
-      pathify = Autoloader_::Inflection::FUN.pathify
+      pathify = MetaHell::Autoloader::FUN.pathify
 
       define_singleton_method :o do |const, exp_path, desc, *a|
         it "#{ format % [ desc, const.inspect, exp_path.inspect ] }", *a do
@@ -73,7 +69,7 @@ module Skylab::MetaHell::TestSupport::Autoloader::Inflection
     context "`constantize` tries to turn path framents #{
         }into constants-looking strings" do
 
-      constantize = Autoloader_::Inflection::FUN.constantize
+      constantize = MetaHell::Autoloader::FUN.constantize
 
       define_singleton_method :o do |path, exp_const, desc, *a|
         it "#{ format % [ desc, path.inspect, exp_const.inspect ] }", *a do
@@ -104,7 +100,7 @@ module Skylab::MetaHell::TestSupport::Autoloader::Inflection
     context "`constantize` tries to turn method-looking #{
       }symbols into constants" do
 
-      constantize = Autoloader_::Inflection::FUN.constantize
+      constantize = MetaHell::Autoloader::FUN.constantize
 
       define_singleton_method :o do |in_str, out_str, desc, *tags|
         it "#{ format % [ desc, in_str, out_str ] }", *tags do
@@ -120,7 +116,7 @@ module Skylab::MetaHell::TestSupport::Autoloader::Inflection
 
     context "`methodize` - tries to make whatevers look like method names" do
 
-      methodize = Autoloader_::Inflection::FUN.methodize
+      methodize = MetaHell::Autoloader::FUN.methodize
 
       fmt = "%20s => %s"
 

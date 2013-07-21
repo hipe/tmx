@@ -14,8 +14,10 @@ module Skylab::Test
 
   TEST_DIR_ = 'test'
 
-  extend MetaHell::MAARS  # autoloading is used downwards deeply
+  ::Skylab::Subsystem[ self ]
 
   stowaway :Benchmark, -> { TestSupport::Benchmark }
+
+  SYSTEM_ = Headless::System.defaults
 
 end

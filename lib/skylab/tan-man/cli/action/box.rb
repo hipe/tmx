@@ -33,7 +33,7 @@ module Skylab::TanMan
       end
     end
 
-  protected
+  private
 
     def build_option_parser       # #frontier, tracked by [#hl-037]
       o = TanMan::Services::OptionParser.new

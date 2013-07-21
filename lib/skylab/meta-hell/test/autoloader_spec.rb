@@ -10,9 +10,7 @@ require_relative '../..'
 module Skylab::MetaHell  # we borrow this name but nothing in it
 end
 
-module ::Skylab::MetaHell::TestSupport  # likewise this name
-
-  Autoloader_ = ::Skylab::Autoloader
+module Skylab::MetaHell::TestSupport  # likewise this name
 
   module InstanceMethods
     def cleanpath x
@@ -20,9 +18,11 @@ module ::Skylab::MetaHell::TestSupport  # likewise this name
     end
   end
 
-  describe "#{ Autoloader_ } [..] `guess_dir`" do
+  # ( [#041] explains why we have fully qualified names below )
 
-    guess_dir = Autoloader_::Methods::FUN.guess_dir
+  describe "#{ ::Skylab::Autoloader } [..] `guess_dir`" do
+
+    guess_dir = ::Skylab::Autoloader::Guess_dir_
 
     let :subject do
       guess_dir[ const, path, -> e { fail e } ]

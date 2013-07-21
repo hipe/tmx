@@ -128,7 +128,7 @@ module Skylab::Headless::CLI::Table
       end
     end
 
-  protected
+  private
 
     def initialize conduit, census, rows, sio
       conduit.instance_variables.each do |ivar|
@@ -175,7 +175,7 @@ module Skylab::Headless::CLI::Table
       nil
     end
 
-  protected
+  private
 
     def initialize
       @hash = { }
@@ -198,7 +198,7 @@ module Skylab::Headless::CLI::Table
 
     attr_reader :symbol
 
-  protected
+  private
 
     param_h_h = {
       align: -> v { @align = v },
@@ -339,7 +339,7 @@ module Skylab::Headless::CLI::Table
       end
     end
 
-  protected
+  private
 
     def initialize idx
       @num_non_nil_seen = 0
@@ -362,7 +362,7 @@ module Skylab::Headless::CLI::Table
       @render[ str ]
     end
 
-  protected
+  private
 
     def initialize index, stats
       @index = index

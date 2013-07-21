@@ -1,7 +1,9 @@
 require 'skylab/headless/core'
 
 module Skylab::TreetopTools
+
   module Parser::InstanceMethods
+
     include Headless::SubClient::InstanceMethods
 
     def parse_file pn, o=nil, &b
@@ -31,7 +33,11 @@ module Skylab::TreetopTools
       r
     end
 
-  protected
+    def parse_time_elapsed_seconds
+      @parse_time_elapsed_seconds
+    end
+
+  private
 
     def absorb_parse_opts! opts   # for the children
       true
@@ -66,29 +72,24 @@ module Skylab::TreetopTools
       self.class::ENTITY_NOUN_STEM # not const_get(.., false)
     end
 
-    attr_reader :input_adapter
-
     def parse input_adapter, o=nil
-      result = nil
+      r = nil
       begin
-        if o
-          result = absorb_parse_opts! o
-          result or break
-        end
+        o and (( r = absorb_parse_opts! o )) || break
         @parse_time_elapsed_seconds = nil
         @input_adapter = input_adapter
         string = input_adapter.resolve_whole_string or break
-        parser = self.parser or break
+        p = parser or break
         t1 = ::Time.now
-        r = parser.parse string
+        r = p.parse string
         @parse_time_elapsed_seconds = ::Time.now - t1
         if r
-          result = parser_result r
+          r = parser_result r
         else
-          result = parser_failure
+          r = parser_failure
         end
       end while nil
-      result
+      r
     end
 
     def parser
@@ -111,7 +112,5 @@ module Skylab::TreetopTools
     def parser_result result
       result.tree
     end
-
-    attr_reader :parse_time_elapsed_seconds
   end
 end

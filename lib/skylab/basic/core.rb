@@ -13,9 +13,7 @@ module Skylab::Basic
     const_set i, ::Skylab.const_get( i, false )
   end
 
-  MAARS = MetaHell::MAARS
-
-  extend MAARS
+  ::Skylab::Subsystem[ self ]
 
   module Services
 

@@ -47,7 +47,7 @@ module Skylab::TanMan
       response
     end
 
-  protected
+  private
 
     # none
 

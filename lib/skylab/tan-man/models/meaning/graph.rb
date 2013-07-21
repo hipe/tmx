@@ -79,7 +79,7 @@ module Skylab::TanMan
       end
     end
 
-  protected
+  private
 
     -> do
 

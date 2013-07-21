@@ -2,65 +2,54 @@ module Skylab::MetaHell
 
   module Autoloader::Autovivifying
 
-    extend Autoloader_            # myself? i'm a basic autoloader.
+    ::Skylab::Autoloader[ self ]
 
-    def self.extended mod
-      mod.module_exec do
-        extend Autoloader_::Methods
-        @tug_class = Autoloader::Autovivifying::Tug
-        init_autoloader caller[2]  # location of call to `extend`!
-      end
-      nil
-    end
+    Methods = Autoloader::Methods
+
+    define_singleton_method :[], & Autoloader::Enhance_
+
   end
 
-  class Autoloader::Autovivifying::Tug < Autoloader_::Tug
+  class Autoloader::Autovivifying::Tug < Autoloader::Tug
 
     def self.enhance x
-      kls = self
+      tug_class = self
       x.instance_exec do
-        @tug_class ||= kls
+        @tug_class ||= tug_class
       end
       nil
-    end
-
-    def load f=nil                # compare to super
-      if leaf_pathname.exist?     # we don't expose this to hacking -
-        load_file f               # if this file doesn't have the const,
-                                  # it very likely should.
-      elsif @mod.has_stowaways and (( loc_x = get_stowaway_location ))
-        load_stowaway loc_x       # stowaways need to trump autovivification
-                                  # of branch-node ("box") type modules
-
-      elsif branch_pathname.exist?
-        @mod.const_set @const, build_autovivified_module
-        true
-      else
-        raise ::NameError, "uninitialized constant #{ @mod }::#{ @const } #{
-          }and no such directory [file] to autoload -- #{
-          }#{ pth @branch_pathname }[#{ Autoloader_::EXTNAME }]"
-      end
     end
 
     def probably_loadable?
-      super or
-        @mod.has_stowaways && has_stowaway_location or
+      super or @mod.has_stowaways && has_stowaway_resolver or
         branch_pathname.exist?
     end
-
-  private
-
-    #         ~ private method support, pre order ~
 
     def branch_pathname
       @branch_pathname ||= leaf_pathname.sub_ext ''
     end
 
+    def load_and_get correction=nil
+      if @mod.has_stowaways && (( res_x = get_stowaway_resolver ))
+        load_stowaway_and_get res_x
+      elsif leaf_pathname.exist?
+        super
+      elsif branch_pathname.exist?
+        @mod.const_set @const, build_autovivified_module
+      else
+        raise ::LoadError, "uninitialized constant #{ @mod }::#{ @const } #{
+          }and no such directory [file] to autoload -- #{
+          }#{ pth @branch_pathname }[#{ Autoloader::EXTNAME }]"
+      end
+    end
+
+  private
+
     def build_autovivified_module
-      bpn = branch_pathname ; my_class = self.class
+      bpn = branch_pathname ; tug_class = self.class
       ::Module.new.module_exec do
-        extend Autoloader_::Methods
-        my_class.enhance self
+        extend Autoloader::Methods
+        tug_class.enhance self
         @dir_pathname = bpn
         self
       end
@@ -70,7 +59,7 @@ module Skylab::MetaHell
       pathname.relative_path_from ::Skylab.dir_pathname
     end
 
-    #                       ~ the stowaway experiment ~
+    #                    ~ the stowaway experiment ~
 
     # the `stowaway` facility :[#030] facilitates the dubious behavior of
     # "defining" a given module in a file other than the file you would expect
@@ -89,7 +78,7 @@ module Skylab::MetaHell
     #                         # `require "#{ dirpn }/luhrman"`
 
 
-    [ :has_stowaway_location, :get_stowaway_location ].each do |i|
+    [ :has_stowaway_resolver, :get_stowaway_resolver ].each do |i|
       define_method i do
         enhance_self_for_stowaways
         send i  # ( this is distinct from `Magic_Touch_` [#fa-046] in that
@@ -102,32 +91,34 @@ module Skylab::MetaHell
 
       stow_a = @mod.stowaway_a or fail "sanity - no stowaways in #{ @mod }"
 
-      get_loc = -> do             # find the correct "record" of `stow`
-        location_x = stow_a.reduce nil do | _, ( *guest_a, loc_x ) |
+      get_res = -> do             # find the correct "record" of `stow`
+        resolver_x = stow_a.reduce nil do | _, ( *guest_a, loc_x ) |
           break loc_x if guest_a.include? @const
         end
-        get_loc = -> { location_x }
-        location_x
+        get_res = -> { resolver_x }
+        resolver_x
       end
 
-      define_singleton_method :has_stowaway_location do get_loc[] end
-      define_singleton_method :get_stowaway_location do get_loc[] end
-      define_singleton_method :load_stowaway do |loc_x|
-        if loc_x.respond_to? :call
-          @mod.const_set @const, loc_x.call
-        elsif loc_x.respond_to? :ascii_only?
-          require "#{ @mod.dir_pathname.join loc_x }"
+      define_singleton_method :has_stowaway_resolver do get_res[] end
+
+      define_singleton_method :get_stowaway_resolver do get_res[] end
+
+      define_singleton_method :load_stowaway_and_get do |res_x|
+        m = @mod ; c = @const
+        if res_x.respond_to? :call
+          x = res_x.call
+          m.const_defined? c, false or m.const_set c, x
+        elsif res_x.respond_to? :ascii_only?
+          require "#{ m.dir_pathname.join res_x }"
         else
-          [ * loc_x ].reduce( @mod ) do |m, x|
-            m.const_get x, false
+          [ * res_x ].reduce( m ) do |mod, i|
+            mod.const_get i, false
           end
         end
-        # (for now we avoid using c-onst_defined? out of deference for
-        # one possible spot [#ta-078])
-        if @mod.constants.include? @const then true else
-          raise ::NameError, "`#{ @mod }::#{ @const }` as a stowaway #{
-            }under \"#{ loc_x }\" was expected but not found there."
-        end
+        m.const_defined?( c, false ) or raise ::LoadError, "`#{ m }::#{ c }` #{
+          }as a stowaway loaded via \"#{ res_x }\" was expected but not#{
+          }resolved via that means."
+        m.const_get c, false
       end
     end
   end
