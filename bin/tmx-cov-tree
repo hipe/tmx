@@ -1,5 +1,0 @@
-#!/usr/bin/env ruby -w
-
-require_relative '../lib/skylab/cov-tree/core'
-
-Skylab::CovTree::CLI.new( $stdin, $stdout, $stderr ).invoke ARGV
