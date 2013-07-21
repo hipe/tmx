@@ -4,6 +4,7 @@ module Skylab::TanMan
 
     param :path, pathname: true, accessor: true, required: true
 
+    attr_reader :verbose # compat
 
   private
 
@@ -71,7 +72,5 @@ module Skylab::TanMan
       end while nil
       result
     end
-
-    attr_reader :verbose # compat
   end
 end

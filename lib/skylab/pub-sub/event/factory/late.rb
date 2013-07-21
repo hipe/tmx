@@ -19,7 +19,7 @@ module Skylab::PubSub
 
     alias_method :[], :call  # look like a ::Proc
 
-  protected
+  private
 
     def initialize const_getter, rewrap = nil
       @const_getter = const_getter

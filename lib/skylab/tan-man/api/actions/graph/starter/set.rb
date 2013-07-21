@@ -8,6 +8,8 @@ module Skylab::TanMan
     param :resource_name, accessor: true, default: :local,
       enum: [:local, :global], required: true
 
+    attr_reader :verbose # compat
+
   private
 
     def execute
@@ -22,7 +24,5 @@ module Skylab::TanMan
       end while nil
       res
     end
-
-    attr_reader :verbose # compat
   end
 end

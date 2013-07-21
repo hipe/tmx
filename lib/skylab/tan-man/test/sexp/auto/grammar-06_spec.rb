@@ -1,6 +1,7 @@
 require_relative 'test-support'
 
 describe "#{::Skylab::TanMan::Sexp::Auto} list pattern (grammar 06)" do
+
   extend ::Skylab::TanMan::TestSupport::Sexp::Auto
 
   using_grammar '06' do
@@ -10,12 +11,12 @@ describe "#{::Skylab::TanMan::Sexp::Auto} list pattern (grammar 06)" do
         b = client.parse_string input_string
         a.class.rule.should eql(:nerks)
         a.class.should eql(b.class)
-        a.object_id.should_not eql(b.object_id)
+        ( a.object_id == b.object_id ).should eql( false )
       end
       it_unparses_losslessly
       it 'result lets you get the nerk' do
         o = result.nerk
-        o.class.should_not be_respond_to(:expression)
+        o.class.respond_to?( :expression ).should eql( false )
         o.should eql('aaaa')
       end
     end
@@ -24,7 +25,7 @@ describe "#{::Skylab::TanMan::Sexp::Auto} list pattern (grammar 06)" do
       it_unparses_losslessly
       it 'the second element is array-like' do
         o = rest
-        o.should respond_to(:each)
+        o.should be_respond_to( :each )
         o.length.should eql(1)
       end
       it 'the first element of the above array looks like this' do

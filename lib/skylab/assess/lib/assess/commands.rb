@@ -11,7 +11,7 @@ module Hipe
     module Commands
       include CommonInstanceMethods # @todo if u remove this this depencency
                                     # this will be very resusable
-      protected(*CommonInstanceMethods.instance_methods)
+      private(*CommonInstanceMethods.instance_methods)
 
       extend self
       @help = {}

@@ -132,7 +132,7 @@ module Skylab::PubSub::TestSupport
 
     attr_writer :textify  # how do you want to convert your events to text?
 
-  protected
+  private
 
     def initialize expected
       @actual_index = nil

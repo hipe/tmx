@@ -22,7 +22,7 @@ module Skylab::PubSub
       nil
     end
 
-  protected
+  private
 
     #         ~ housekeeping & basic ui ~
 

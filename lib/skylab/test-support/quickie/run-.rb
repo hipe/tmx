@@ -78,7 +78,7 @@ module Skylab::TestSupport
       end
 
       def get_test_path_a  # #reach-down
-        @plugins[ :run_recursive ].client.get_test_path_a
+        @plugins[ :run_recursive ].client.get_any_test_path_a
       end
 
       def add_context_class_and_resolve ctx
@@ -196,7 +196,8 @@ module Skylab::TestSupport
         @plugins._a.each do |pi|
           (( sig = pi.signature )) or next
           if sig.subscribed_to? ep
-            false == pi.eventpoint_notify( ep ) and break( ok = false )
+            r = pi.eventpoint_notify ep
+            false == r and break( ok = false )
           end
         end
         ok

@@ -48,7 +48,7 @@ module Skylab::PubSub
 
     alias_method :[], :call  # quack like a ::Proc
 
-  protected
+  private
 
     def initialize box_module
       @stream_name_to_event_class_cache_h = { }  # yes there is danger

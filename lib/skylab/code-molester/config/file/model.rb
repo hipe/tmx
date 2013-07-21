@@ -123,7 +123,10 @@ module ::Skylab::CodeMolester
       ev = Read.new
       block[ ev ] if block
       escape_path = -> pathname do
-        ( ev[:escape_path] || default_escape_path )[ pathname ]
+        ep = ev[ :escape_path ]
+        ep && ep.respond_to?( :escape_path ) and ep = ep.escape_path  # #todo
+        ep ||= default_escape_path
+        ep[ pathname ]
       end
       @pathname or
         raise "cannot read - no pathname associated with this #{ noun }"

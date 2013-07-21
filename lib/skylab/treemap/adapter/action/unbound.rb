@@ -18,6 +18,8 @@ module Skylab::Treemap
       @legacy_proxy ||= build_legacy_proxy
     end
 
+    attr_reader :name  # important - override h.l! our name is dynamiic
+
   private
 
     def initialize mc, adapter_a, name_func
@@ -50,8 +52,6 @@ module Skylab::Treemap
     end
 
     #         your help screen is composed of (in order)
-
-    attr_reader :name  # important - override h.l! our name is dynamiic
 
     option_parser do |o|
       o.on '-a', '--adapter <NAME>',

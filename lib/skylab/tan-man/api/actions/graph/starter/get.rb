@@ -7,6 +7,8 @@ module Skylab::TanMan
     param :resource_name, accessor: true, default: :all,
       enum: [ :local, :global, :all ], required: true
 
+    attr_reader :verbose #compat
+
   private
 
     # (for now, experimentally this api call is very porcelain-y,
@@ -25,7 +27,5 @@ module Skylab::TanMan
         info message: str, meta: m
       end
     end
-
-    attr_reader :verbose #compat
   end
 end

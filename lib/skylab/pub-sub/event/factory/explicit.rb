@@ -39,7 +39,7 @@ module Skylab::PubSub
 
     alias_method :[], :call  # compat to look ::Proc-like
 
-  protected
+  private
 
     def initialize logical_h, physical_h
       @logical_h, @physical_h = logical_h, physical_h

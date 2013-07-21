@@ -439,8 +439,8 @@ module Skylab::PubSub
           if 1 == func.arity                   # ( tied to [#ps-013] )
             func[ event ]
           elsif event
-            if event.respond_to? :payload_a    # #todo remove if never used
-              func[ * event.payload_a ]
+            if event.respond_to? :payload_a
+              func[ * event.payload_a ]  # nil ok!
             else
               func[ * payload_a ]
             end

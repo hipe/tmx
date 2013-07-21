@@ -1,5 +1,6 @@
 require_relative 'test-support'
 
+::Skylab::TestSupport::Quickie.enable_kernel_describe
 
 module Skylab::TanMan::TestSupport::API::Actions
 
@@ -12,7 +13,7 @@ module Skylab::TanMan::TestSupport::API::Actions
 
     context "when there is no local conf directory" do
 
-      before do
+      before :each do
         prepare_tanman_tmpdir
       end
 
@@ -32,7 +33,7 @@ module Skylab::TanMan::TestSupport::API::Actions
 
     context "when you have a local config dir" do
 
-      before do
+      before :each do
         prepare_local_conf_dir
       end
 

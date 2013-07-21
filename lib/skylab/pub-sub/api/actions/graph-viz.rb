@@ -29,7 +29,7 @@ module Skylab::PubSub
       res
     end
 
-  protected
+  private
 
     #         ~ implementation in order ~
 

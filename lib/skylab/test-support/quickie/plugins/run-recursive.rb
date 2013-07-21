@@ -52,9 +52,11 @@ module Skylab::TestSupport
 
       def beginning_eventpoint_notify
         # at our notification of the beginning, we do the work that needs
-        # to be available for the next eventpoint
+        # to be available for the next eventpoint. if we fail to resolve the
+        # test path, we must alert the system to halt normal flow by resulting
+        # in false.
         ready_test_path_a
-        nil
+        false if false == @test_path_a
       end
 
       def test_files_eventpoint_notify
@@ -67,7 +69,7 @@ module Skylab::TestSupport
 
       # ~ services that this node provides upwards (for siblings!) ~
 
-      def get_test_path_a
+      def get_any_test_path_a
         # assume that pathfinder worked and the eventpoint path is working..
         (( a = @test_path_a )) ? a.dup : a
       end
@@ -94,21 +96,24 @@ module Skylab::TestSupport
       end
 
       def ready_test_path_a
-        @test_path_a.nil? and @test_path_a = my_get_test_path_a
+        @test_path_a.nil? and @test_path_a = my_get_any_test_path_a
         nil
       end
 
-      def my_get_test_path_a
+      def my_get_any_test_path_a
         found_all = true ; lg = local_glob
         p = Basic::String::FUN.string_is_at_end_of_string_curry[ _spec_rb ]
         path_a = @input_path_a.reduce [] do |m, path|
           if p[ path ]
             m << path
-          elsif (( a = ::Dir[ "#{ path }/**/#{ lg }" ] )).length.zero?
-            files_not_found path
-            found_all &&= false
           else
-            m.concat a.reverse  # ::Dir.glob is pre-order, we need post-order
+            a = ::Dir[ "#{ path }/**/#{ lg }" ]
+            if a.length.zero?
+              files_not_found path
+              found_all &&= false
+            else
+              m.concat a.reverse  # ::Dir.glob is pre-order, we need post-order
+            end
           end
           m
         end

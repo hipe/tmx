@@ -1,12 +1,15 @@
 module Skylab::TanMan
 
   class API::Actions::Remote::Add < API::Action
+
     extend API::Action::Attribute_Adapter
 
     attribute :host, required: true
     attribute :name, required: true
     attr_reader :name  # ICK override ..
     attribute :resource, default: :local, mutex_boolean_set: [:local, :global]
+
+    attr_reader :verbose # compat
 
   private
 
@@ -18,7 +21,5 @@ module Skylab::TanMan
       end while nil
       result
     end
-
-    attr_reader :verbose # compat
   end
 end

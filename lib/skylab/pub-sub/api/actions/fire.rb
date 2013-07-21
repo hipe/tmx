@@ -20,7 +20,7 @@ module Skylab::PubSub
       res
     end
 
-  protected
+  private
 
     -> do  # `crux`
 

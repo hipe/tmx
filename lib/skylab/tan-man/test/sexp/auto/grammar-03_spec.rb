@@ -1,6 +1,7 @@
 require_relative 'test-support'
 
 describe "#{::Skylab::TanMan::Sexp::Auto} list pattern (grammar 03)" do
+
   extend ::Skylab::TanMan::TestSupport::Sexp::Auto
 
   using_grammar '03' do

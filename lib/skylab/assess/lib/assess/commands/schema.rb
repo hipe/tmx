@@ -14,7 +14,7 @@ module Hipe
         subcommand_dispatch SchemaSubs, opts, args
       end
 
-    protected
+    private
 
       o "#{app} schema analyze [JSON_FILE]"
       x( 'Show statistics and type guesses for each field in the data. '<<

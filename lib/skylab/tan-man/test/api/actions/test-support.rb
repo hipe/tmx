@@ -35,7 +35,7 @@ module Skylab::TanMan::TestSupport::API::Actions
 
     def lone_error regex
       r = api_last_response or fail 'sanity - where is api response?'
-      r.should_not be_success
+      r.success?.should eql( false )
       r.events.length.should eql(1)
       r.events.first.message.should match(regex)
     end

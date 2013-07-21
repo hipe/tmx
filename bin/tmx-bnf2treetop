@@ -65,7 +65,7 @@ module Skylab::Bnf2Treetop
 
   module Headless end
   module Headless::Client_InstanceMethods
-  protected
+  private
     def error msg ; emit(:error, msg) ; false end
     def info msg ; emit(:info, msg) end
     def or_  list ; oxford_comma(list, ' or ') end
@@ -96,9 +96,11 @@ module Skylab::Bnf2Treetop
 
     attr_writer :program_name
 
-  protected
+    attr_reader :program_name ; alias_method :program_name_ivar, :program_name
 
     attr_reader :result
+
+  private
 
     # the grand experiment revisited
     def build_option_parser
@@ -140,7 +142,7 @@ module Skylab::Bnf2Treetop
                else "--#{ label }=#{ arg_label }"
                end )
         p.desc and desc_f.call p
-        op.on(*args) { |v| invocation_parameters.push([p.name, v]) }
+        op.on( * args ) { |v| invocation_parameters.push( [ p.name, v ] ) }
       end
       op.on('-h', '--help', 'Show this message') { queue.push :help }
       op.on('--version', 'Show version') { queue.push :version }
@@ -173,7 +175,6 @@ module Skylab::Bnf2Treetop
         nil # do not parse_args!, all action is complete
       end
     end
-    attr_reader :program_name ; alias_method :program_name_ivar, :program_name
     def program_name
       program_name_ivar || ::File.basename( $PROGRAM_NAME )
     end
@@ -203,14 +204,13 @@ module Skylab::Bnf2Treetop
     def emit type, string
       (:payload == type ? paystream : infostream).puts string
     end
-  protected
+  private
     def formal_parameters ; PARAMS end
-    attr_reader :in_pathname
     INFILE = '<bnf-file>'
     def parse_args! argv
       1 == argv.length or
         return usage("expecting #{INFILE} had #{argv.length} args")
-      @in_pathname = ::Pathname.new(argv.shift)
+      in_pathname = ::Pathname.new(argv.shift)
       if '-' == in_pathname.to_s
         $stdin.tty? and return usage("Expecting STDIN to be a stream.")
         self.upstream = $stdin
@@ -288,7 +288,7 @@ module Skylab::Bnf2Treetop
         grammar and grammar_write_treetop_end
       end
     end
-  protected
+  private
     # --*--
     def emit(type, data) ; request_client.emit(type, data) end
     def formal_parameters ; PARAMS end
@@ -297,7 +297,7 @@ module Skylab::Bnf2Treetop
     def upstream ; request_client.upstream end
     # --*--
     def absorb!
-      [modeline_parameters, invocation_parameters].compact.each do |params|
+      [ @modeline_parameters, invocation_parameters].compact.each do |params|
         params.each do |name, value|
           if PARAM[name].list
             self[name] ||= []
@@ -352,7 +352,6 @@ module Skylab::Bnf2Treetop
       @modeline_parameters = modelines
       true
     end
-    attr_reader :modeline_parameters
     # An attempt at a faithful re-implementation of vim's modeline syntax.
     # (See vim's ":help modeline" --  we are using "The second form".)
     def modeline_parse!
@@ -391,7 +390,7 @@ module Skylab::Bnf2Treetop
     def new_rule!
       sexp = [:rule]
       push sexp                 # append sexp to sexp at the top of stack
-      stack.push sexp           # make new sexp be new top of stack
+      @stack.push sexp           # make new sexp be new top of stack
     end
     def one_of_or_fail &block
       reset_expecting!
@@ -403,12 +402,11 @@ module Skylab::Bnf2Treetop
       end
     end
     def push sexp
-      stack.last.push sexp
+      @stack.last.push sexp
     end
     def reset_expecting!
       expecting.clear
     end
-    attr_reader :stack
     # --*--
     const_rx = '[A-Z][A-Za-z0-9_]*'
     CONST_RX = /\A#{const_rx}\z/
@@ -496,10 +494,10 @@ module Skylab::Bnf2Treetop
     def rule_rhs!
       sexp = [:rhs]
       push sexp
-      stack.push sexp
+      @stack.push sexp
       rhs!
-      stack.pop # pop the rhs
-      stack.pop # pop the rule!!
+      @stack.pop # pop the rhs
+      @stack.pop # pop the rule!!
     end
     def rhs!
       got = one_of_or_fail {
@@ -535,7 +533,7 @@ module Skylab::Bnf2Treetop
 
       noted = scn.pos
       if (! need_moar && got = _rule_name! && white! &&
-          _equals_thingy! && stack[stack.size-2].first == :rule )
+          _equals_thingy! && @stack[ @stack.length - 2 ].first == :rule )
       then
         scn.pos = noted # if a symbol name followed by a '::=', rewind, done
         return
@@ -548,7 +546,7 @@ module Skylab::Bnf2Treetop
       if scn.scan(/\(/) or squares && (b = scn.scan(/\[/))
         nu = [:parenthesized_group]
         # push nu sort of up in the air about whether to do this early or late
-        stack.push nu
+        @stack.push nu
         white!
         rhs!
         white!
@@ -557,7 +555,7 @@ module Skylab::Bnf2Treetop
         else
           one_of_or_fail { expecting << ')'; scn.scan(/\)/) }
         end
-        have = stack.pop
+        have = @stack.pop
         if b
           if 2 == have.length # one child in a parenthesized group
             have = have.last  # ick
@@ -612,7 +610,7 @@ module Skylab::Bnf2Treetop
     end
     class Node < ::Struct.new(:tree, :params, :paystream, :infostream)
       include Helper_InstanceMethods
-    protected
+    private
       def write string ; paystream.write(string) end
     end
     class Rules < Node
@@ -636,8 +634,8 @@ module Skylab::Bnf2Treetop
         paystream.puts "#{margin}rule #{rule_name}"
         paystream.write "#{margin}#{TAB_STR}"
         tree[2] or return false
-        rhs.tree = tree[2]
-        rhs.write_treetop
+        @rhs.tree = tree[2]
+        @rhs.write_treetop
         paystream.write "\n#{margin}end"
         nil
       end
@@ -647,8 +645,6 @@ module Skylab::Bnf2Treetop
         params.rule_prefix and str = "#{params.rule_prefix}#{str}"
         str
       end
-    protected
-      attr_reader :rhs
     end
     class RHS < Node
       def write_treetop

@@ -16,7 +16,7 @@ module Skylab::PubSub
       res
     end
 
-  protected
+  private
 
     def initialize prefix, paystream, infostream, path
       @prefix, @paystream, @infostream = prefix, paystream, infostream

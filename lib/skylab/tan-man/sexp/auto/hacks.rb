@@ -108,7 +108,7 @@ module Skylab::TanMan
         use_stem = md[:stem].intern
       else
         head_inference = Sexp::Auto::Inference.get head, tree_class, :head
-        if head_inference.expression?
+        if head_inference.the_expression_name_is_inferrable
           use_stem = head_inference.rule
         else
           fail "for this hack to work your rule name must end in _list #{

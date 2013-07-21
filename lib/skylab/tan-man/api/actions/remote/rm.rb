@@ -6,6 +6,8 @@ module Skylab::TanMan
     attribute :remote_name, required: true
     attribute :resource_name, mutex_boolean_set: [:local, :global]
 
+    attr_reader :verbose
+
   private
 
     def execute
@@ -17,7 +19,5 @@ module Skylab::TanMan
       end while nil
       result
     end
-
-    attr_reader :verbose
   end
 end

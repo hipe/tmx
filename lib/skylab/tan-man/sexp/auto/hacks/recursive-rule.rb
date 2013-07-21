@@ -13,7 +13,7 @@ module Skylab::TanMan
     list_rx = Sexp::Auto::Hack::FUN.list_rx  # ( any name that ends in "_list" )
 
     define_singleton_method :match do |i|
-      if i.members_of_interest?
+      if i.has_members_of_interest
         md = list_rx.match i.rule.to_s
         if i.members_of_interest.include? i.rule # "foo" rule with "foo" element
           Sexp::Auto::Hack.new do

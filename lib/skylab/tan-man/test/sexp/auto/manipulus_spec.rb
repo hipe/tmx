@@ -1,21 +1,26 @@
 require_relative 'test-support'
 
 describe "#{::Skylab::TanMan::Sexp::Auto} MANIPULULS" do
+
   extend ::Skylab::TanMan::TestSupport::Sexp::Auto
 
   using_grammar '70-75-minimal-recursive-list' do
+
     # adopts language from XML DOM API: insertBefore, appendChild, removeChild
+
     using_input_string 'fip ;  ', 'a one element input string' do
+
       context 'adds' do
         it 'before first' do
-          -> { result._insert_before!('fap', 'fip') }.should raise_exception(
+          -> { result._insert_before!('fap', 'fip') }.should raise_error(
             /cannot insert into a list with less than 2 items/i )
         end
         it 'before nil (append)' do
-          -> { result._insert_before!('fap', 'fip') }.should raise_exception(
+          -> { result._insert_before!('fap', 'fip') }.should raise_error(
             /cannot insert into a list with less than 2 items/i )
         end
       end
+
       context 'removes' do
         it 'the only (and hence last) element, yielding a stub' do
           removed = result._remove! 'fip'
@@ -25,6 +30,7 @@ describe "#{::Skylab::TanMan::Sexp::Auto} MANIPULULS" do
         end
       end
     end
+
     using_input_string "feep ; forp ; \n", 'two items' do
       context 'adds' do
         it 'before first, uses first as prototype, and unparsey' do
@@ -46,6 +52,7 @@ describe "#{::Skylab::TanMan::Sexp::Auto} MANIPULULS" do
           inserted.unparse.should eql("zap ; \n")
         end
       end
+
       context 'removes' do
         it 'first, gives removed node, both unparse ok' do
           removed = result._remove!('feep')
@@ -61,7 +68,9 @@ describe "#{::Skylab::TanMan::Sexp::Auto} MANIPULULS" do
         end
       end
     end
+
     using_input_string "fap;fep ; fip ;\n ", 'three items' do
+
       context 'adds' do
         it 'before first using 1st as prototype' do
           result._insert_before! 'fapp', 'fap'
@@ -80,6 +89,7 @@ describe "#{::Skylab::TanMan::Sexp::Auto} MANIPULULS" do
           result.unparse.should eql("fap;fep ; fip ;\n fapp ; ")
         end
       end
+
       context 'removes' do
         it 'first, gives removed node, both unparse ok' do
           removed = result._remove!('fap')

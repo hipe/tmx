@@ -26,6 +26,24 @@ module Skylab::TanMan::TestSupport::Sexp
                                   # porcelain-y we end up needing below is a
                                   # goofy experiment and possibly an
                                   # abstraction candidate.
+    -> do
+      pen = Headless::CLI::Pen::Minimal.new
+      def pen.escape_path str
+        "«#{ str }»"                # "guillemets" just for fun and practice
+      end
+
+      define_method :initialize do |sin=$stdin, sout=$stdout, serr=$stderr|
+        # observe pattern [#sl-114]
+
+        @stdin = sin                # we keep this stream on deck but don't set
+                                    # upstream yet. it takes logix. [#hl-022]
+        self.io_adapter = build_io_adapter nil, sout, serr, pen
+        init_headless_sub_client nil
+      end
+    end.call
+
+    attr_accessor :force_overwrite
+
 
     def invoke argv               # enhance headless with invite at the end
       res = super
@@ -36,27 +54,9 @@ module Skylab::TanMan::TestSupport::Sexp
       res
     end
 
-
   private
 
-    pen = Headless::CLI::Pen::Minimal.new
-    def pen.escape_path str
-      "«#{ str }»"                # "guillemets" just for fun and practice
-    end
-
-    define_method :initialize do
-      |sin=$stdin, sout=$stdout, serr=$stderr| # observe pattern [#sl-114]
-
-      @stdin = sin                # we keep this stream on deck but don't set
-                                  # upstream yet. it takes logix. [#hl-022]
-      self.io_adapter = build_io_adapter nil, sout, serr, pen
-      init_headless_sub_client nil
-    end
-
-
-
     #        ----*-  private methods, alphabetical  -*----
-
 
     let :anchor_dir_pathname do
       self.class.grammars_module.dir_pathname.join stem_path
@@ -104,8 +104,6 @@ module Skylab::TanMan::TestSupport::Sexp
       :execute
     end
 
-    attr_accessor :eval_string    # used by param_queue
-
     def eval_string_run result
       unless /\A[a-z_]+[a-z0-9_]*\z/ =~ eval_string
         fail "must be a valid method name: #{eval_string.inspect}"
@@ -131,10 +129,6 @@ module Skylab::TanMan::TestSupport::Sexp
       end
     end
 
-    attr_accessor :force_overwrite # in flux --
-                                  # sometimes we want to blow away tmpdir once
-
-
     def grammars o
       o.treetop_grammar 'g1.treetop'
     end
@@ -156,8 +150,6 @@ module Skylab::TanMan::TestSupport::Sexp
         end
       ).invoke
     end
-
-    attr_reader :pathname
 
     define_method :resolve_upstream do   # #watch'ed by [#hl-022] for dry
       ok = false                  # [#hl-023] exit-code aware, [#019] invite

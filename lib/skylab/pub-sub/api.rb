@@ -25,7 +25,7 @@ module Skylab::PubSub
 
     attr_reader :sym
 
-  protected
+  private
 
     def initialize name
       @sym = name

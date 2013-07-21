@@ -19,7 +19,7 @@ module Skylab::PubSub
       @event[ esg, sn, payload_x ]
     end
 
-  protected
+  private
 
     def initialize sanity, base_class=nil, box_module=nil
 

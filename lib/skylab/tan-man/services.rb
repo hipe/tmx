@@ -2,10 +2,11 @@ module ::Skylab::TanMan
 
   module Services
 
-    stdlib, _subsys = ::Skylab::Subsystem::FUN.
+    stdlib, subsys = ::Skylab::Subsystem::FUN.
       at :require_stdlib, :require_subsystem
 
     o = H_ = { }
+    o[ :Basic ] = subsys
     o[ :OptionParser ] = -> _ { require 'optparse' ; ::OptionParser }
     o[ :PP ] = stdlib
     o[ :Open3 ] = stdlib

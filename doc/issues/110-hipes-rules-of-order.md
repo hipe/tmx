@@ -5,7 +5,7 @@
 1. the dsl section: the extension clauses, with any dsl calls
 2. include modules in alpha order
 3. public instance methods in alpha order
-4. protected instance methods, alpha order but initialize first
+4. p-rotected, private instance methods, alpha order but initialize first
 
 
 ## In Detail,

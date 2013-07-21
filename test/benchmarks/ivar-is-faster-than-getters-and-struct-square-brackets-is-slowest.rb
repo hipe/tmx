@@ -23,6 +23,10 @@ module Skylab::Test::Struct_Members_Vs_Ivars_Etc_
 
   class SomeRegularClass
 
+    def initialize foo
+      @foo = foo
+    end
+
     attr_reader :foo
 
     def go_ivar
@@ -35,12 +39,6 @@ module Skylab::Test::Struct_Members_Vs_Ivars_Etc_
       TIMES.times do
         1 + foo
       end
-    end
-
-  protected
-
-    def initialize foo
-      @foo = foo
     end
   end
 

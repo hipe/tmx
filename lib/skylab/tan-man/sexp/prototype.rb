@@ -86,13 +86,15 @@ module Skylab::TanMan
       res                                      # list tree we made or maybe
     end                                        # something else..
 
-  private
 
     attr_accessor :active_hub                  # for now the 'hub' is the
                                                # enhanced sexp (either existing
                                                # in the doc or created here)
                                                # that winds up holding the
                                                # prototypes!
+
+  private
+
     name_rx = /[_a-z][_a-z0-9]*/i
 
     define_method :attempt_to_process_example! do # you have been advanced to

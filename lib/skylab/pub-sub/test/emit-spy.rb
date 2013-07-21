@@ -76,7 +76,7 @@ module Skylab::PubSub::TestSupport
       res
     end
 
-  protected
+  private
 
     def initialize &format_for_debug
       @debug = nil

@@ -62,7 +62,7 @@ module Skylab::Yacc2Treetop
       @result
     end
     attr_writer :program_name
-  protected
+  private
     def initialize o=$stdout, e=$stderr
       @errstream = e ; @outstream = o
       @program_name = @is_finished = nil
@@ -669,7 +669,7 @@ module Skylab::Yacc2Treetop
   class Templatiny # a tiny fraction of ERB in one screen of code
     class << self
       alias_method :go, :new
-      protected :new
+      private :new
       def render str, datasrc
         require 'stringio'
         out = StringIO.new
@@ -683,7 +683,7 @@ module Skylab::Yacc2Treetop
       @out = out;  @datasource = datasource
       parsed.each { |meth, *a| send(meth, *a) }
     end
-  protected
+  private
     def initialize str
       @str = str
     end

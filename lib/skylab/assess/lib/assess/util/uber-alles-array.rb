@@ -30,14 +30,14 @@ module Hipe
     class AssArr < Array
 
       #
-      # make every array method protected except ones
+      # make every array method p-rotected except ones
       # that don't affect our @names property.
       #
       except = %w( [] size each inspect pretty_print )
       all = ancestors[1].instance_methods(false)
       these = all - except
       these.each do |name|
-        protected name
+        private name
       end
       def initialize()
         super()

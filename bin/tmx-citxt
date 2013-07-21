@@ -5,14 +5,18 @@
 module Skylab
 end
 
-
 module Skylab::CI_Txt
 
   module CLI
   end
 
-
   class CLI::Client
+
+    def initialize *a
+      super
+      @is_finished = @pwd = @git_dir_pathname = @dir_pathname_raw = nil
+      @is_dry_run = @be_verbose = nil
+    end
 
     def invoke argv
       res = nil
@@ -21,7 +25,7 @@ module Skylab::CI_Txt
         begin
           begin
             option_parser.parse! argv
-            is_finished and break( ok = true )
+            @is_finished and break( ok = true )
             if argv.any?
               self.dir_path = argv.shift
             end
@@ -39,7 +43,7 @@ module Skylab::CI_Txt
           emit :help, invite_line
           break
         end
-        res = execute unless is_finished
+        res = execute unless @is_finished
         if false == res
           emit :help, invite_line
         end
@@ -47,16 +51,14 @@ module Skylab::CI_Txt
       res
     end
 
-  protected
-
-    attr_reader :is_finished
+  private
 
     ref_rx = /\Aref: ([^\n]+)\n\z/
 
     define_method :branch_name do
       res = nil
       begin
-        head_pathname = git_dir_pathname.join 'HEAD'
+        head_pathname = @git_dir_pathname.join 'HEAD'
         content = head_pathname.read
         unless ref_rx =~ content
           error "failed to read content of #{ escape_path head_pathanme }"
@@ -69,7 +71,6 @@ module Skylab::CI_Txt
       res
     end
 
-
     filename = 'ci.txt'
 
     define_method :build_option_parser do
@@ -80,11 +81,11 @@ module Skylab::CI_Txt
         new( & method( :ping ) )
 
       o.on '-n', '--dry-run', 'dry run.' do
-        self.dry_run = true
+        @is_dry_run = true
       end
 
       o.on '-v', '--verbose', 'be verbose.' do
-        self.verbose = true
+        @be_verbose = true
       end
 
       o.banner = <<-HERE.gsub( /^        /, '' )
@@ -107,20 +108,20 @@ module Skylab::CI_Txt
       res = nil
       begin
         use_dir = nil
-        if dir_pathname_raw
+        if @dir_pathname_raw
           if ! dir_pathname_expanded.directory?
-            error "#{ em param_label } must be directory: #{ dir_pathname_raw }"
+            error "#{ em param_label } must be directory: #{ @dir_pathname_raw }"
             break( res = false )
           end
           inside = dir_pathname_expanded.to_s
-          outside = git_dir_pathname.dirname.to_s
+          outside = @git_dir_pathname.dirname.to_s
           if 0 != inside.index( outside )
             error "#{ inside } must be inside #{ outside }"
             break( res = false )
           end
           use_dir = dir_pathname_expanded
         else
-          use_dir = git_dir_pathname.dirname
+          use_dir = @git_dir_pathname.dirname
         end
         pathname = use_dir.join filename
         if pathname.exist?
@@ -128,9 +129,9 @@ module Skylab::CI_Txt
         end
         branch_name = self.branch_name or break
         first_line = "[##{ branch_name }]"
-        info( first_line ) if verbose
+        info( first_line ) if @be_verbose
         bytes = nil
-        if dry_run
+        if @is_dry_run
           bytes = 0
         else
           pathname.open( 'w+' ) do |fh|
@@ -149,13 +150,9 @@ module Skylab::CI_Txt
       str
     end
 
-    def dir_pathname_expanded # assumes `dir_pathname_raw`
+    def dir_pathname_expanded  # assumes `dir_pathname_raw`
       @dir_pathname_expanded ||= dir_pathname_raw.expand_path
     end
-
-    attr_reader :dir_pathname_raw # exactly as the use provided it
-
-    attr_accessor :dry_run
 
     define_method :execute do
       res = nil
@@ -163,7 +160,7 @@ module Skylab::CI_Txt
         @git_dir_pathname = find_git_dir or break
         existing = find_existing
         if existing
-          if dir_pathname_raw
+          if @dir_pathname_raw
             if ! reconcile_dir_pathname_with_existing existing
               res = false
               break
@@ -176,7 +173,7 @@ module Skylab::CI_Txt
         end
         editor = ::ENV['EDITOR'] || 'vi'
         cmd = "#{ editor } #{ escape_path existing }"
-        if dry_run
+        if @is_dry_run
           info "would have executed `#{ cmd }`"
         else
           exec cmd
@@ -186,9 +183,9 @@ module Skylab::CI_Txt
     end
 
     define_method :find_existing do
-      curr = pwd
-      stop = git_dir_pathname.dirname
-      if ! pwd.to_s.index( stop.to_s )  # is pwd equal to or under stop dir?
+      curr = @pwd
+      stop = @git_dir_pathname.dirname
+      if ! @pwd.to_s.index( stop.to_s )  # is pwd equal to or under stop dir?
         fail 'sanity'
       end
       found = nil
@@ -205,7 +202,6 @@ module Skylab::CI_Txt
       end
       found
     end
-
 
     git_dir_basename = '.git'
 
@@ -235,20 +231,16 @@ module Skylab::CI_Txt
       found
     end
 
-    attr_reader :git_dir_pathname
-
     param_label = '<dir_to_create_file_in>'
 
     define_method :param_label do param_label end
-
-    attr_reader :pwd
 
     define_method :reconcile_dir_pathname_with_existing do |existing|
       if dir_pathname_expanded == existing.dirname
         true
       else
         error "couldn't reconcile filenames - #{
-        }you specified a #{ em param_label } (#{ dir_pathname_raw }), #{
+        }you specified a #{ em param_label } (#{ @dir_pathname_raw }), #{
         }but an existing #{ filename } was found (#{ escape_path existing }) #{
         }and it was not in that directory. Either don't specify the path or #{
         }move the file to where you want it."
@@ -259,9 +251,6 @@ module Skylab::CI_Txt
     define_method :usage_line do
       "#{ em 'usage:' } #{ program_name } [-h] [-v] [ #{ param_label } ]"
     end
-
-    attr_accessor :verbose
-
   end
 
 
@@ -274,9 +263,9 @@ module Skylab::CI_Txt
 
   module CLI::Client::InstanceMethods
 
-  protected
+  private
 
-    def initialize _=nil, paystream=$stdout, infostream=$stderr
+    def initialize _, paystream, infostream
       @infostream = infostream
       @paystream = paystream
     end
@@ -286,7 +275,8 @@ module Skylab::CI_Txt
     end
 
     def emit type=:info, str
-      send( :payload == type ? :paystream : :infostream ).puts str
+      instance_variable_get( :payload == type ? :@paystream : :@infostream ).
+        puts str
       nil
     end
 
@@ -296,7 +286,7 @@ module Skylab::CI_Txt
     end
 
     def escape_path pathname
-      pathname.relative_path_from( pwd ).to_s
+      pathname.relative_path_from( @pwd ).to_s
     end
 
     def info msg
@@ -315,11 +305,6 @@ module Skylab::CI_Txt
     def program_name
       ::File.basename $PROGRAM_NAME
     end
-
-    attr_reader :infostream
-
-    attr_reader :paystream
-
   end
 
   class CLI::Client
@@ -327,4 +312,4 @@ module Skylab::CI_Txt
   end
 end
 
-Skylab::CI_Txt::CLI.new.invoke ARGV
+Skylab::CI_Txt::CLI.new( $stdin, $stdout, $stderr ).invoke ARGV
