@@ -5,7 +5,7 @@ module Skylab::FileMetrics
     extend MAARS
 
     o = { }
-    stdlib = MetaHell::FUN.require_stdlib
+    stdlib = ::Skylab::Subsystem::FUN.require_stdlib
     o[:Open3] = stdlib
     o[:Shellwords] = stdlib
     o[:StringIO] = stdlib

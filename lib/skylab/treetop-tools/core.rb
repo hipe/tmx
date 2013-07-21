@@ -30,10 +30,10 @@ module Skylab::TreetopTools
 
     o = { }
 
-    o[ :Basic ] = ::Skylab::MetaHell::FUN.require_subproduct
+    o[ :Basic ] = ::Skylab::Subsystem::FUN.require_subsystem
 
-    define_singleton_method :const_missing do |i|
-      const_set i, o.fetch( i )[ i ]
+    define_singleton_method :const_missing do |c|
+      const_set c, o.fetch( c )[ c ]
     end
   end
 end

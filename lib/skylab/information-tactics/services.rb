@@ -2,8 +2,8 @@ module Skylab::InformationTactics
 
   module Services
 
+    stdlib = ::Skylab::Subsystem::FUN.require_stdlib
     o = { }
-    stdlib = MetaHell::FUN.require_stdlib
     o[:Time] = stdlib
 
     define_singleton_method :const_missing do |const_i|

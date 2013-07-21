@@ -14,7 +14,7 @@ module Skylab::Git
         r = -> do  # #result-block
           @fu = build_fu
           @pathname = ::Pathname.new @path
-          @tdpn = ::Skylab::Subsystem::PATHNAMES.tmpdir
+          @tdpn = Git::Services::Headless::System.defaults.tmpdir_pathname
           @tpn = get_temp_pathname
           confirm_source_and_move or break false
           git_checkout_head or break false

@@ -1,30 +1,33 @@
 module Skylab::TestSupport
 
+  Services = ::Skylab::Subsystem::Services.new @dir_pathname
+
   module Services
 
-    def self.touch i
-      const_defined? i, false or const_get i, false
-      nil
-    end
-
+    stdlib, subsys, gemlib =
+      FUN.at :require_stdlib, :require_subsystem, :require_gemlib
     o = { }
-    subproduct, stdlib = MetaHell::FUN.at :require_subproduct, :require_stdlib
-    o[:Basic] = subproduct
+    o[:Adsf] = gemlib
+    o[:Basic] = subsys
     o[:Benchmark] = stdlib
     o[:DRb] = -> _ { require 'drb/drb' ; ::DRb }
-    o[:Face] = subproduct
+    o[:Face] = subsys
     o[:FileUtils] = stdlib
-    o[:Headless] = subproduct
+    o[:Headless] = subsys
     o[:JSON] = stdlib
-    o[:MetaHell] = -> _ { require 'skylab/meta-hell/core' ; ::Skylab::MetaHell }
+    o[:MetaHell] = subsys
     o[:Open3] = stdlib
     o[:OptionParser] = -> _ { require 'optparse' ; ::OptionParser }
-    o[:Porcelain] = subproduct
+    o[:Porcelain] = subsys
+    o[:PubSub] = subsys
+    o[:Rack] = gemlib
     o[:StringIO] = stdlib
     o[:Tmpdir] = -> _ { require 'tmpdir' ; ::Dir }  # Dir.tmpdir
 
-    define_singleton_method :const_missing do |const_i|
-      const_set const_i, o.fetch( const_i )[ const_i ]
+    def self.const_missing c
+      const_set c, H_.fetch( c )[ c ]
     end
+
+    H_ = o.freeze
   end
 end

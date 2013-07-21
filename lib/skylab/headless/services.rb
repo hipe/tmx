@@ -2,22 +2,23 @@ module Skylab::Headless
 
   module Services                 # just lazy-loading of stdlib nerks
 
+    stdlib, subsys = ::Skylab::Subsystem::FUN.
+      at :require_stdlib, :require_subsystem
     o = { }
-    stdlib, subproduct = MetaHell::FUN.at :require_stdlib, :require_subproduct
-    o[:Basic] = subproduct
-    o[:CodeMolester] = subproduct
+    o[:Basic] = subsys
+    o[:CodeMolester] = subsys
     o[:FileUtils] = stdlib
     o[:Open3] = stdlib
-    o[:Open4] = -> { MetaHell::FUN.require_quietly[ 'open4' ]; ::Open4 }
+    o[:Open4] = -> { ::Skylab::Subsystem::FUN.require_quietly[ 'open4' ]; ::Open4 }
     o[:OptionParser] = -> _ { require 'optparse' ; ::OptionParser }
-    o[:PubSub] = subproduct
+    o[:PubSub] = subsys
     o[:Set] = stdlib
     o[:Shellwords] = stdlib
     o[:StringIO] = stdlib
     o[:StringScanner] = -> _ { require 'strscan' ; ::StringScanner }
     o[:Tmpdir] = -> _ { require 'tmpdir' ; ::Dir }
-    o[:TreetopTools] = -> _ { require 'skylab/treetop-tools/core'
-                                                  ::Skylab::TreetopTools }
+    o[:TreetopTools] = subsys
+
     o.freeze
 
     extend Autoloader::Methods  # you need it in your chain now

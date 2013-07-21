@@ -19,14 +19,16 @@ module Skylab::Basic
 
   module Services
 
+    subsystem, stdlib = ::Skylab::Subsystem::FUN.
+      at :require_subsystem, :require_stdlib
+
     o = { }
-    stdlib, subproduct = MetaHell::FUN.at :require_stdlib, :require_subproduct
-    o[:Headless] = subproduct # icky to reach in this direction, but only for 1
+    o[:Headless] = subsystem
     o[:StringIO] = stdlib
     o[:StringScanner] = -> _ { require 'strscan' ; ::StringScanner }
 
-    define_singleton_method :const_missing do |const_i|
-      const_set const_i, o.fetch( const_i )[ const_i ]
+    define_singleton_method :const_missing do |c|
+      const_set c, o.fetch( c )[ c ]
     end
   end
 end

@@ -23,27 +23,7 @@ module ::Skylab
         def supernode_binfile
           @supernode_binfile ||= 'tmx'.freeze
         end
-
-        def tmpdir
-          @tmpdir ||= ::Pathname.new(
-            Subsystems_::Headless::Services::Tmpdir.tmpdir )
-        end
       end
     end
-  end
-
-  module Subsystems_
-
-    def self.const_missing c
-      if ! ::Skylab.const_defined? c, false
-        require ::Skylab.dir_pathname.join( "#{ Quick_[ c ] }/core" ).to_s
-      end
-      const_set c, ::Skylab.const_get( c, false )
-    end
-
-    Quick_ = -> c do
-      c.to_s.gsub( /(?<=[a-z])([A-Z])/ ) { "-#{ $1 }" }.downcase
-    end
-
   end
 end

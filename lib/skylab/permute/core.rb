@@ -10,5 +10,5 @@ module Skylab::Permute
   Permute = self
   PubSub = ::Skylab::PubSub
 
-  extend ::Skylab::MetaHell::Autoloader::Autovivifying::Recursive
+  extend ::Skylab::MetaHell::MAARS
 end

@@ -25,7 +25,7 @@ other one-off front-files under bin/ do. left to its own devices, when
 run under `tmx`, this suproduct loads and then finishes - that is,
 blank screen of death.
 
-this sup-product is a bit of a special hybrid, then (for now) because it
+this sub-product is a bit of a special hybrid, then (for now) because it
 doesn't define a CLI client in a traditional place, yet it doesn't run
 simply by loading its front file under bin/. putting the below lines in
 allow `tmx` to find and build the client.

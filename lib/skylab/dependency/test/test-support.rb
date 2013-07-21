@@ -2,6 +2,7 @@ require_relative '../core'
 require 'skylab/test-support/core'
 
 module Skylab::Dependency::TestSupport
+
   ::Skylab::TestSupport::Regret[ Dependency_TestSupport = self ]
 
   module CONSTANTS
@@ -18,14 +19,14 @@ module Skylab::Dependency::TestSupport
 
   extend TestSupport::Quickie  # if you dare..
 
-  tmpdir = ::Skylab::TestSupport::Tmpdir.new ::Skylab.tmpdir_pathname.to_s
+  tmpdir = TestSupport::Tmpdir.new Headless::System.defaults.tmpdir_path
 
-  build_dir = ::Skylab::TestSupport::Tmpdir.new tmpdir.join('build-dependency')
+  build_dir = TestSupport::Tmpdir.new tmpdir.join('build-dependency')
 
   fixtures_dir = Dependency_TestSupport.dir_pathname.join 'fixtures'
 
-  file_server = Dependency::StaticFileServer.new fixtures_dir,
-    log_level: :info, # (:info | :warn) e.g.
+  file_server = TestSupport::Servers::Static_File_Server.new fixtures_dir,
+    log_level_i: :info, # (:info | :warn) e.g.
     pid_path: tmpdir
 
   CONSTANTS::BUILD_DIR = build_dir # #bound

@@ -1,29 +1,30 @@
 module Skylab::CodeMolester
 
+  Services = ::Skylab::Subsystem::Services.new @dir_pathname
+
   module Services # being #watched [#mh-011] (this is instance four)
 
+    stdlib, subsystem = FUN.at :require_stdlib, :require_subsystem
+
     o = { }
-    stdlib, subproduct = MetaHell::FUN.at :require_stdlib, :require_subproduct
-    o[:Basic] = subproduct
-    o[:Face] = subproduct
+    o[:Basic] = subsystem
+    o[:Face] = subsystem
     o[:FileUtils] = stdlib
     o[:Psych] = stdlib
     o[:StringIO] = stdlib
     o[:StringScanner] = -> _ { require 'strscan' ; ::StringScanner }
-    o[:Treetop] = -> _ do
-      MetaHell::FUN.require_quietly[ 'treetop' ]
-      ::Treetop
-    end
+    o[:Treetop] = -> _ { FUN.require_quietly[ 'treetop' ] ; ::Treetop }
     o[:YAML] = stdlib
 
     extend MAARS  # LOOK.
 
-    define_singleton_method :const_missing do |const_i|
-      if o.key? const_i
-        const_set const_i, o.fetch( const_i )[ const_i ]
+    def self.const_missing c
+      if H_.key? c
+        const_set c, H_.fetch( c )[ c ]
       else
         super const  # KRAY!
       end
     end
+    H_ = o
   end
 end
