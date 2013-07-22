@@ -157,6 +157,7 @@ module Skylab::MetaHell
           attr_accessor :is_memoized
           def absorb client, a
             prock = a.fetch( 0 ) ; a.shift
+            prock.respond_to? :call or fail "sanity - #{ prock.class }"
             client.instance_variable_set @ivar, prock
             nil
           end

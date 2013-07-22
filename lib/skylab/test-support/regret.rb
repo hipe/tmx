@@ -229,15 +229,29 @@ module ::Skylab::TestSupport
       end
     end
 
+    def set_tmpdir_pathname &blk
+      const_defined?( :TMPDIR_PN_P_, false ) and raise "sanity"
+      const_set :TMPDIR_PN_P_, blk
+      nil
+    end
+
     def tmpdir_pathname
       @tmpdir_pathname ||= begin
-        parent_anchor_module or raise "You better set #{
-          }@tmpdir_pathname in #{ self } because somebody is looking for it."
-        par = parent_anchor_module.tmpdir_pathname
-        dir = Autoloader::FUN.pathify[
-          name[ name.rindex( ':' ) + 1 .. -1 ] ]
-        par.join dir
+        if const_defined?(:TMPDIR_PN_P_, false)
+          self::TMPDIR_PN_P_.call
+        else
+          build_tmpdir_pathname
+        end
       end
+    end
+
+    def build_tmpdir_pathname
+      (( pam = parent_anchor_module )) or raise "You better set #{
+        }@tmpdir_pathname in #{ self } because somebody is looking for it."
+      par = pam.tmpdir_pathname
+      dir = Autoloader::FUN.pathify[
+        name[ name.rindex( ':' ) + 1 .. -1 ] ]
+      par.join dir
     end
 
     attr_writer :tmpdir_pathname
