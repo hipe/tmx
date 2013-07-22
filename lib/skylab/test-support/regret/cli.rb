@@ -82,6 +82,21 @@ module Skylab::TestSupport::Regret::CLI
       api path
     end
 
+    set :node, :simplecov, :autonomous
+
+    def simplecov * arg
+      kls = Regret::CLI::Actions::Simplecov
+      cli = kls.new @sin, @out, @err
+      s_a = @mechanics.get_normal_invocation_string_parts << 'simplecov'
+      cli.program_name = s_a * ' '
+      # the client uses `load` to load the target file, hence it expects to
+      # be passed the global `argv` so that it can parse it destructively
+      # so that the target file gets only the arguments intended for it.
+      argv = @mechanics.last_hot.release_argv
+      argv == arg or fail "sanity"
+      cli.invoke argv
+    end
+
     set :node, :ping, :invisible
 
     def ping

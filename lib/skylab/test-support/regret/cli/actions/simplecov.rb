@@ -15,6 +15,7 @@ module Skylab
     # standard use, please see the simplecov gem's README.md
 
     def initialize sin, sout, serr
+      @program_name = nil
       @y = ::Enumerator::Yielder.new { |msg| serr.puts msg ; nil }
       @invoke = -> argv do
         argv.length.zero? and break usage
@@ -32,6 +33,8 @@ module Skylab
       @invoke[ argv ]
     end
 
+    attr_writer :program_name
+
   private
 
     def resolve_matcher argv  # result is tuple
@@ -41,7 +44,7 @@ module Skylab
         true
       else
         # special circumstances here: we might be bootstrapping.
-        require_relative '../lib/skylab'
+        require_relative calculate_lib_skylab_absolute_path
         require 'skylab/basic/core'
         @matcher = -> a do
           a.map! { |x| ::File.expand_path x }
@@ -64,6 +67,11 @@ module Skylab
 
     MOCK_ = Mock_.new
 
+    def calculate_lib_skylab_absolute_path
+      ::File.expand_path(
+        ::Array.new( HOST_C_A_.length, '..' ) * '/', __FILE__ )
+    end
+
     def execute argv
       FUN.without_warning[ -> { require 'simplecov' } ]
       # we assume that the first arg element is a loadable path. we shift it
@@ -71,13 +79,23 @@ module Skylab
       # script would have seen if it were invoked with ruby or as an exeuctable.
       pth = argv.shift or fail "sanity - empty argv?"
       @y << "(#{ program_name } about to run: #{ ( [ pth ] + argv ) * ' ' })"
-      ::SimpleCov.command_name 'xyzzy (custom)'
+      ::SimpleCov.command_name "#{ ::File.basename pth } (skylab simplecov)"
       ::SimpleCov.add_filter do |x|
         ! @matcher.match( x.filename )
       end
       ::SimpleCov.start
-      load pth
-      $VERBOSE = false  # let simplecov go quietly on exit ([#sc-002])
+      load_path_somehow pth
+      # $VERBOSE = false  # let simplecov go quietly on exit ([#sc-002])
+    end
+
+    def load_path_somehow pth
+      # this kind of sucks : apparently the simplecov hooks into `require`
+      # and not `load` (from the looks of it), so if a standalone file itself
+      # is what you're covering, we cannot use load, hence it must end
+      # with an `.rb`. in other words for now it appears impossible to
+      # cover a standalone executable ruby script.
+      xp = ::File.expand_path pth
+      require xp  # we used to use `load`
     end
 
     o = { }
@@ -129,11 +147,32 @@ module Skylab
     end
 
     def program_name
-      $PROGRAM_NAME
+      @program_name || $PROGRAM_NAME
     end
 
     FUN = ::Struct.new( * o.keys ).new( * o.values )
+
+    def self.load_into_host
+      # assume we have just been autoloaded by the parent node
+      # place ourselves in the appropriate location in that graph
+      mod = HOST_C_A_.reduce( ::Object ) do |m, c|
+        m.const_get c, false
+      end
+      mod.const_set :Simplecov, self
+      # the casing changes only because our filename has no '-' or '_'
+      nil
+    end
+
+    HOST_C_A_ = %i| Skylab TestSupport Regret CLI Actions |
+
   end
 end
 
-Skylab::SimpleCov.new( $stdin, $stdout, $stderr ).invoke ::ARGV
+# this hybridization allows us to run this file directly if any parent
+# nodes are in a broken state.
+
+if __FILE__ == $PROGRAM_NAME
+  Skylab::SimpleCov.new( $stdin, $stdout, $stderr ).invoke ::ARGV
+else
+  Skylab::SimpleCov.load_into_host
+end

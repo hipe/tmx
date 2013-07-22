@@ -222,43 +222,33 @@ module ::Skylab::TestSupport
       const_get :ModuleMethods, false
     end
 
-    def tmpdir
-      @tmpdir ||= begin
-        Subsys::Tmpdir.new path: tmpdir_pathname,
-          max_mkdirs: ( count_to_top + 1 ) # one for tmp/your-sub-product
-      end
-    end
-
-    def set_tmpdir_pathname &blk
-      const_defined?( :TMPDIR_PN_P_, false ) and raise "sanity"
-      const_set :TMPDIR_PN_P_, blk
-      nil
-    end
-
-    def tmpdir_pathname
-      @tmpdir_pathname ||= begin
-        if const_defined?(:TMPDIR_PN_P_, false)
-          self::TMPDIR_PN_P_.call
-        else
-          build_tmpdir_pathname
-        end
-      end
-    end
-
-    def build_tmpdir_pathname
-      (( pam = parent_anchor_module )) or raise "You better set #{
-        }@tmpdir_pathname in #{ self } because somebody is looking for it."
-      par = pam.tmpdir_pathname
-      dir = Autoloader::FUN.pathify[
-        name[ name.rindex( ':' ) + 1 .. -1 ] ]
-      par.join dir
-    end
-
-    attr_writer :tmpdir_pathname
+    # ~ extension experiment - extensions ~
 
   private
 
-    # nothing is private.
+    def set_tmpdir_pathname &blk
+      load_extension_and_recall :Tmpdir_, nil, blk
+    end
 
+    def set_command_parts_for_system_under_test *a, &b
+      load_extension_and_recall :SUT_Command_, a, b
+    end
+
+    def add_command_parts_for_system_under_test *a, &b
+      load_extension_and_recall :SUT_Command_, a, b
+    end
+
+    # extension experiment - support
+
+    def load_extension_and_recall extension_name_i, a=nil, b=nil
+      Regret::Extensions_.const_get extension_name_i, false
+      loc = caller_locations( 1, 1 )[ 0 ]
+      send loc.base_label, *a, &b  # OMG LOOKOUT
+    end
+
+    def topless_errmsg msg
+      "top not found - you'd better #{ msg } in #{ self } because #{
+        }somebody is looking for it"
+    end
   end
 end

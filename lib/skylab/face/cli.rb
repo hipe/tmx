@@ -169,9 +169,9 @@ module Skylab::Face
           ok, r = node.find_command argv
           ok or break
           cmd = r
-          if cmd.respond_to? :invokee
-            r = cmd.invokee
-            rest = [ :invoke, [ argv ], nil, r ]
+          do_short_circuit, *_rest = determine_short_circuit cmd, argv
+          if do_short_circuit
+            r, *rest = _rest
             throw :break_two
           end
           cmd.respond_to? :find_command or break
@@ -187,6 +187,15 @@ module Skylab::Face
         end while nil
       end
       [ ok, r, *rest ]
+    end
+
+    def determine_short_circuit cmd, argv
+      # <is-short-circuit> <receiver> <method> <args> <block> <cmd-for-syntax>
+      if cmd.respond_to? :invokee
+        [ true, cmd.invokee, :invoke, [ argv ], nil, cmd ]
+      elsif cmd.is_autonomous
+        [ true, * cmd.get_autonomous_quad( argv ), cmd ]
+      end
     end
 
     DASH_ = MetaHell::DASH_
@@ -571,7 +580,7 @@ module Skylab::Face
     # (note the pattern that emerges in the order)
 
     def initialize sheet, parent_services, _slug_fragment=nil
-      @argv = nil  # only set in one place. usually for command-like options.
+      @argv = nil  # is write once. see `argv_notify`
       @op = nil
       @queue_a = nil  # allows transactional o.p, command-like options.
       @sheet = sheet
@@ -625,8 +634,21 @@ module Skylab::Face
       true
     end
 
-    def is_visible  # (sneak this in for facet 5.14x)
+    def is_visible  # ( sneak these in for facet 5.14x + )
       true
+    end
+    def is_autonomous
+      false
+    end
+
+    def argv_notify argv
+      # for non-standard activities, like command-like options or autonomy.
+      @argv and fail "sanity - argv is write once"
+      @argv = argv
+      nil
+    end
+    def release_argv  # #hacks-only
+      r = @argv ; @argv = nil ; r
     end
 
     #          ~ class section 2 - private instance methods ~
@@ -903,9 +925,8 @@ module Skylab::Face
     def process_options argv, do_permute=false
       begin
         option_parser_receiver.instance_exec do
-          instance_variable_defined? :@argv and fail "sanity - test me"
-          @argv = argv  # #monadic #experimental some switches do custom
-        end             # parsing.
+          @argv = argv  # some switches do ad-hoc parsing
+        end
         option_parser or break( r = [ true, true ] )  # pass the buck
         begin                                  # parse destructively, in order
           if do_permute                        # (permute is typically used

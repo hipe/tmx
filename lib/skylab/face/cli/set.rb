@@ -210,4 +210,28 @@ module Skylab::Face
       nil
     end
   end
+
+  # ~ 5.16x - autonomy
+
+  class Command
+    undef_method :is_autonomous
+    def is_autonomous
+      is_autonomous_value
+    end
+    attr_reader :is_autonomous_value
+    def get_autonomous_quad argv  # <receiver> <method_name> <args> <block>
+      argv_notify argv
+      [ parent_services.surface_receiver,
+        name.as_method,
+        argv,  # passing this raw and not in an array becaue we opt to mandate
+        nil ]  # that the host still write a [#015] isomorphic parameters
+    end
+  end
+  class Node_Sheet_
+  private
+    def parse_xtra_autonomous scn
+      defer_set :is_autonomous, true
+      nil
+    end
+  end
 end
