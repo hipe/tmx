@@ -26,6 +26,16 @@ module Skylab::MetaHell
     -> { use.call }             # the first time you called it. please be
   end                           # careful.
 
+  o[:memoize_to_const] = -> c, p do
+    -> do
+      if const_defined? c, false
+        const_get c
+      else
+        const_set c, p.call
+      end
+    end
+  end
+
   o[:without_warning] = -> f do
     x = $VERBOSE; $VERBOSE = nil
     r = f.call                  # `ensure` is out of scope for now

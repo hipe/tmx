@@ -14,8 +14,10 @@ module Skylab::Headless::TestSupport
 
   Headless = ::Skylab::Headless  # covered
 
-  self.tmpdir_pathname = Headless::System.defaults.dev_tmpdir_pathname.join 'hl'
-  # #todo - when you take out the `dev_` above it fails
+  set_tmpdir_pathname do
+    Headless::System.defaults.dev_tmpdir_pathname.join 'hl'
+    #todo - when you take out the `dev_` above it fails
+  end
 
   module ModuleMethods
     def debug!

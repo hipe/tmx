@@ -35,7 +35,7 @@ module Skylab::Headless
     def request_client
       @request_client or begin
         caller_a = caller
-        md = Headless::FUN.call_frame_rx.match caller_a[ 0 ]
+        md = Headless::FUN.call_frame_rx[].match caller_a[ 0 ]
         desc = if md
           if 0 == md[:meth].index( 'block ' )
             pth = md[:path]

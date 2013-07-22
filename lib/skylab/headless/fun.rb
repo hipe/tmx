@@ -14,11 +14,11 @@ module Skylab::Headless
   #         ~ functions that pertain to the underlying system ~
 
   o[:home_directory_path] = -> do
-    ::ENV['HOME']
+    Headless::System.system.any_home_directory_path
   end
 
   o[:home_directory_pathname] = -> do
-     s = FUN.home_directory_path[] and ::Pathname.new( s )
+    Headless::System.system.any_home_directory_pathname
   end
 
   FUN = ::Struct.new(* o.keys).new ; o.each { |k, v| FUN[k] = v }

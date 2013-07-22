@@ -16,13 +16,14 @@ module Skylab::Headless::TestSupport::System
       oid1.should eql( oid2 )
     end
 
-    it "tmpdir_path", f:true do
+    it "tmpdir_path" do
       sys_defaults.tmpdir_path.should eql( sys_defaults.tmpdir_pathname.to_s )
     end
 
     it "cache_pathname" do
+      bad_test = Headless::System::Defaults_::CACHE_FILE_
       sys_defaults.cache_pathname.join( "FOO" ).to_s.
-        should be_include( "#{ Headless::System::CACHE_FILE_ }/FOO" )
+        should be_include( "#{ bad_test }/FOO" )
     end
 
     def sys_defaults
@@ -41,6 +42,22 @@ module Skylab::Headless::TestSupport::System
       end
     end
 
-    THE_STANDARD_EDITOR_ = 'ed'
+    THE_STANDARD_EDITOR_ = 'ed'.freeze
+
+    context "#{ Headless }::System.system", f:true do
+
+      it "any_home_directory_path" do
+        # #bad-test
+        x1 = ::ENV[ 'HOME' ]
+        x2 = Headless::System.system.any_home_directory_path
+        x2.should eql( x1 )
+      end
+
+      it "any_home_directory_pathname" do
+        s1 = Headless::System.system.any_home_directory_pathname.join( 'X' ).to_s
+        s2 = "#{ ::ENV[ 'HOME' ] }/X"
+        s1.should eql( s2 )
+      end
+    end
   end
 end
