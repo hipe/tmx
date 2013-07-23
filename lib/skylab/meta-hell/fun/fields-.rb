@@ -42,7 +42,7 @@ module Skylab::MetaHell
           instance_variable_set h.fetch( i ), a.fetch( 0 )
           a.shift
         end
-        Nil_out_the_rest_[ self, i_a ]
+        Nil_out_the_rest_[ h, self, i_a ]
         super() if do_super  # imagine prepend, imagine block given
         nil
       end
@@ -57,16 +57,15 @@ module Skylab::MetaHell
           i_a << i
           a.shift ; instance_variable_set ivar, a.fetch( 0 ) ; a.shift
         end
-        Nil_out_the_rest_[ self, i_a ]
+        Nil_out_the_rest_[ h, self, i_a ]
         nil  # you can figure it out if you try
       end
     end
 
-    Nil_out_the_rest_ = -> obj, i_a do
+    Nil_out_the_rest_ = -> ivar_h, obj, i_a do
       obj.instance_exec do
-        h = self.class::BASIC_FIELDS_H_
-        ( h.keys - i_a ).each do |ii|
-          instance_variable_set h.fetch( ii ), nil
+        ( ivar_h.keys - i_a ).each do |ii|
+          instance_variable_set ivar_h.fetch( ii ), nil
         end
       end
     end

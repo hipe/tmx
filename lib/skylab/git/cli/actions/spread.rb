@@ -6,18 +6,21 @@ module Skylab::Git
 
     def initialize i, o, e
       @y = ::Enumerator::Yielder.new( & e.method( :puts ) )
-      @o = o
+      @snitch = Support_::Snitch_.new @y, self
+      @o = o  # the output stream
       @program_name = @is_finished = nil
     end
 
     attr_writer :program_name
 
     def invoke argv
+      @do_evenulate = nil
       begin
-        parse_args argv or break
-        normalize or break
-        work
+        r = parse_args( argv ) or break
+        r = normalize or break
+        r = work
       end while nil
+      false == r and invite
       nil
     end
 
@@ -49,17 +52,28 @@ module Skylab::Git
     end
 
     def help
-      @y << "#{ hi 'usage:' } #{ program_name } [opts] #{ NUM_NUM_ }"
-      @y << "#{ hi 'description:' } if you have git branches numbered like"
-      @y << "  01-foo-bar, 02-fiz-baz, 03-frank-banger, etc - and you say"
-      @y << " `spread 3 7` then 03 becomes 07, 01 becomes 02, and 02 becomes"
-      @y << " 04. it's obvious what's happening here."
+
+      @y << "#{ hi 'usage:' } #{ program_name } [opts] #{ NUM_NUM_ }#{ DBL_ }"
+
+      @y << "#{ hi 'description:' }#{ <<-HERE.gsub( /^[ ]+/, ' ' )
+        if you have git branches numbered like
+        "01-foo-bar", "02-fiz-baz", "03-frank-banger" etc - and you say
+        `spread 3 7` then 03 becomes 07, 01 becomes 02, and 02 becomes
+        04. it's obvious what's happening here.
+
+        (experimental: '#{ EL_ }' will kick every number that is
+        not already even up to the next number, and so on.)\n
+
+        HERE
+      }"
       @y << "#{ hi 'options:' }"
       @op.summarize @y
       @is_finished = true
     end
 
-    NUM_NUM_ = '<num> <num>'
+    DBL_ = "\n\n".freeze
+    EL_ = 'evenulate'.freeze
+    NUM_NUM_ = "( <num> <num> | #{ EL_ } )"
 
     Hi_ = -> msg do
       ( @hi ||= Face::FUN.stylize.curry[ [ :green ] ] )[ msg ]
@@ -87,137 +101,51 @@ module Skylab::Git
           break
         end
         @is_finished and break nil
-        a = [ ]
-        while argv.length.nonzero? && (( NUM_RX_ =~ argv[ 0 ] ))
-          a << argv.shift.to_i
-        end
-        argv.length.zero? and break normalize_numbers( a )
-        bork "unexpected argument(s) #{ argv.inspect }"
+        resolve_something_from_argv argv
       end.call
+    end
+
+    def resolve_something_from_argv argv
+      if argv.length.nonzero? and Match_[ argv[ 0 ] ]
+        argv.shift
+        @do_evenulate = true
+      else
+        d_a = get_parsed_contiguous_integers argv
+      end
+      if argv.length.nonzero?
+        bork "unexpected argument(s) #{ argv.inspect }"
+      elsif @do_evenulate
+        true
+      else
+        resolve_move_request_from_integers d_a
+      end
+    end
+    Match_ = MetaHell::FUN::Parse::Fuzzy_Matcher_[ EL_, 1 ]  # fuzzy match 'e'
+
+    def get_parsed_contiguous_integers argv
+      a = [ ]
+      while argv.length.nonzero? && (( NUM_RX_ =~ argv[ 0 ] ))
+        a << argv.shift.to_i
+      end
+      a
     end
 
     NUM_RX_ = /\A\d+\z/
 
-    def normalize_numbers a
+    def resolve_move_request_from_integers d_a
       -> do
-        a.length.zero? and break bork( "expecting #{ NUM_NUM_ }" )
-        2 == (( len = a.length )) or break bork( "for now, need 2, had #{
+        d_a.length.zero? and break bork( "expecting #{ NUM_NUM_ }" )
+        2 == (( len = d_a.length )) or break bork( "for now, need 2, had #{
           }#{ len } numbers" )
-        @move_a =
-          a.each_slice( 2 ).map { |from, to| Move_[ from.to_i, to.to_i ] }
+        @move_request_a = d_a.each_slice( 2 ).map do |from, to|
+          Move_Request_[ from.to_i, to.to_i ]
+        end
         true
       end.call
     end
 
-    def normalize
-      if @from_file
-        normalize_from_file
-      else
-        normalize_from_git
-      end
-    end
-
-    def normalize_from_file
-      fh = ::File.open( @from_file, 'r' )
-      normalize_from_stream fh
-    end
-
-    def normalize_from_git
-      _i, o, _e = Face::Services::Open3.popen3 "git branch | cut -c 3-"
-      _e.close ; _i.close
-      normalize_from_stream o
-    end
-
-    def normalize_from_stream io
-      @scn = Basic::List::Scanner[ io ]
-    end
-
-    def work
-      begin
-        normalize_some_lines or break
-        p = Preparer_.new( @y, @item_a, @move_a )
-        r = p.prepare or break
-        n = Renamer_.new( @y, @o, p.get_state, p.get_workorder )
-        n.is_dry_run = @is_dry_run
-        r = n.execute
-      end while nil
-      false == r and r = invite
-      nil
-    end
-
-    def normalize_some_lines
-      first_line = @scn.gets or fail "sanity"
-      p = get_line_cleaner first_line
-      @item_a = [ ]
-      x = p[ first_line ] and accept x
-      while (( line = @scn.gets ))
-        x = p[ line ] and accept x
-      end
-      if @item_a.length.nonzero? then true else
-        @y << "none of the #{ @scn.count } input line(s) matched #{ @use_rx }"
-        invite
-        false
-      end
-    end
-
-    margin = '\A[* ] '
-    SEP_ = '-'
-    HACK_RX_ = /#{ margin }/
-    rest = "(?<num>[0-9]+)(?<body>#{ SEP_ }[^\\n]+)\n?\\z"
-    RAW_RX_ = /#{ margin }#{ rest }/
-    CUT_RX_ = /\A#{ rest }/
-
-    def get_line_cleaner first_line
-      @use_rx = if HACK_RX_ =~ first_line
-        RAW_RX_
-      else
-        CUT_RX_
-      end
-      @use_rx.method :match
-    end
-
-    def accept md
-      @item_a << Item_[ * md.captures ]
-      nil
-    end
-
-    class Item_
-
-      class << self ; alias_method :[], :new end
-
-      def initialize num, body
-        @num_s = num ; @body = body
-        @num_d = num.to_i
-        nil
-      end
-
-      attr_reader :num_s, :num_d, :body
-
-      attr_accessor :new_num_d
-
-      def get_new_name_using_number num_d
-        num_s = "%0#{ @num_s.length }d" % num_d
-        self.class.render num_s, @body
-      end
-
-      def render
-        self.class.render @num_s, @body
-      end
-
-      def self.render num_s, body
-        "#{ num_s }#{ body }"
-      end
-    end
-
-    class Move_
-
-      class << self ; alias_method :[], :new end
-
-      def initialize from_d, to_d
-        @from_d, @to_d = from_d, to_d
-      end
-
-      attr_reader :from_d, :to_d
+    Move_Request_ = Basic::Struct[ :from_d, :to_d ]
+    class Move_Request_
 
       def factor
         @factor ||= ( 1.0 * @to_d / @from_d )
@@ -232,187 +160,353 @@ module Skylab::Git
       end
     end
 
-    class Preparer_
+    def normalize
+      r = false
+      begin
+        r = get_branches_stream_line_scanner or break
+        r = API_Model::Branches.from_line_scanner( r, @snitch ) or break
+        @branches = r
+        true
+      end while nil
+      false == r and @y << "could not complete request because of above."
+      r
+    end
 
-      def initialize y, item_a, move_a
-        @pair_a = nil
-        @y, @item_a, @move_a = y, item_a, move_a
-      end
+    def get_branches_stream_line_scanner
+      r = get_branches_stream
+      r && Basic::List::Scanner[ r ]
+    end
 
-      attr_reader :pair_a
-
-      def prepare
-        @pair_a and fail "sanity"
-        begin
-          r = index or break
-          scn = Basic::List::Scanner[ @move_a ]
-          while (( mv = scn.gets ))
-            r = move( mv ) or break
-          end
-        end while nil
-        if false == r
-          r = bork "won't procede because of the above."
-        end
-        r
-      end
-
-      def get_state
-        @pair_a or fail "sanity"
-        State_.new( @item_a, @input_num_to_idx_h )
-      end
-
-      class State_
-
-        def initialize item_a, input_num_to_idx_h
-          @item_a, @input_num_to_idx_h =
-            item_a, input_num_to_idx_h
-        end
-
-        attr_reader :item_a, :input_num_to_idx_h
-
-        def fetch_item_by_number num_d
-          idx = @input_num_to_idx_h.fetch num_d
-          @item_a.fetch idx
-        end
-      end
-
-      def get_workorder
-        @pair_a or fail "sanity"
-        Workorder_.new( @pair_a )
-      end
-
-      Workorder_ = ::Struct.new :pair_a
-
-    private
-
-      define_method :hi, & Hi_
-
-      def bork msg
-        @y << msg
-        false
-      end
-
-      def index
-        begin
-          r = index_num or break
-        end while nil
-        r
-      end
-
-      def index_num
-        -> do  # #result-block
-          num_to_idx_h = { } ; a = [ ]
-          ok = true
-          @item_a.each_with_index do |item, idx|
-            did = false
-            found_idx = num_to_idx_h.fetch( item.num_d ) do |d|
-              did = true
-              a << d
-              num_to_idx_h[ d ] = idx
-            end
-            if ! did
-              ok = false
-              @y << "#{ hi 'duplicates:' }"
-              @y << "  #{ @item_a[ found_idx ].render }"
-              @y << "  #{ item.render }"
-            end
-          end
-          if ok
-            @input_num_to_idx_h = num_to_idx_h
-            a.sort!
-            @pair_a = a.map( & Pair_.method( :new ) ).freeze
-          end
-          ok
-        end.call
-      end
-
-      class Pair_
-        def initialize d0
-          @d0 = d0
-        end
-        attr_reader :d0
-        attr_accessor :d1
-      end
-
-      def move move
-        -> do  # #result-block
-          from_d = move.from_d ; h = @input_num_to_idx_h
-          h.key? from_d or
-            break bork( "no such starting number: #{ from_d }" )
-          s = move.get_invalid_factor_reason and break bork s
-          idx = @pair_a.index { |p| from_d == p.d0 }
-          r = prepare_low( move, idx ) or break r
-          r = prepare_hi( move, idx ) or break r
-          true
-        end.call
-      end
-
-      def prepare_low move, idx1
-        d1_h = { } ; r = true ; col_a = nil
-        ( 0 .. idx1 ).each do |idx|
-          pair = @pair_a.fetch idx
-          d1 = ( pair.d0 * move.factor ).to_i
-          if d1_h[ d1 ]
-            ( col_a ||= [ ] ) << d1
-          else
-            d1_h[ d1 ] = true
-            pair.d1 = d1
-          end
-        end
-        col_a and r = bork( "number collision - after transision, the #{
-          }number(s) occur more than once - (#{ col_a * ', ' })" )
-        r
-      end
-
-      def prepare_hi move, idx1
-        -> do
-          handle = @pair_a.fetch idx1
-          ( dx = handle.d1 - handle.d0 ).zero? and
-            break bork( "there was no change in the \"handle\" element" )
-          ( @pair_a.length - 1 ).downto( idx1 + 1 ).each do |idx|
-            pair = @pair_a.fetch idx
-            pair.d1 = pair.d0 + dx  # negative dx ok , but expect it to ..
-          end
-          true
-        end.call
+    def get_branches_stream
+      if @from_file
+        get_branches_stream_from_file
+      else
+        get_branches_stream_from_git
       end
     end
 
-    class Renamer_
+    def get_branches_stream_from_file
+      ::File.open @from_file, 'r'
+    end
 
-      def initialize y, o, state, workorder
-        @is_dry_run = true
-        @y, @o, @state, @workorder = y, o, state, workorder
+    def get_branches_stream_from_git # #hack-alert
+      _i, o, _e = Face::Services::Open3.popen3 "git branch | cut -c 3-"
+      _i.close
+      if '' != (( s = _e.read ))
+        bork "huh? - #{ s }"
+      else
+        o
+      end
+    end
+
+    def work
+      if @do_evenulate
+        @branches.invoke :evenulate, :snitch, @snitch, :outstream, @o
+      else
+        @branches.invoke :spread, :snitch, @snitch, :outstream, @o,
+          :move_request_a, @move_request_a
+      end
+    end
+
+    module Support_
+      class Snitch_
+        def initialize y, expression_agent
+          @y = y
+          @expression_agent = expression_agent
+        end
+        attr_reader :y
+        def info &blk
+          @y << render_line( blk )
+          nil  # important
+        end
+        def warn &blk
+          @y << "warning - #{ render_line blk }"
+          nil  # important
+        end
+        def error &blk
+          @y  << "error - #{ render_line blk }"
+          false  # important
+        end
+        def multiline_note &blk
+          @expression_agent.instance_exec @y, &blk
+          nil
+        end
+      private
+        def render_line blk
+          @expression_agent.instance_exec( & blk )  # see snitches elsewhere
+        end
+      end
+    end
+
+    module API_Model
+
+      Branches = Basic::Struct[ :branch_a ]
+      class Branches
+
+        class << self
+          private :new
+        end
+
+        def self.from_line_scanner scn, snitch
+          -> do  # #result-block
+            # we use the first line to determine whether the input list has
+            # the margin that git puts there #hack-alert or is some (e.g
+            # hand-written) list
+            line = scn.gets or
+              break( snitch.error { "there were no input lines" } )
+            parse = Line_parser_[ line ]
+            branch_a = [ ]
+            begin
+              a = parse[ line ] and branch_a << Branch_[ * a ]
+            end while (( line = scn.gets ))
+            branch_a.length.zero? and break snitch.error { "no lines matched" }
+            allocate.instance_exec do
+              initialize snitch
+              init_from_branch_a branch_a
+            end
+          end.call
+        end
+        Line_parser_ = -> do
+          margin = '\A[* ] ' ; sep = '-'
+          rest = "(?<num>[0-9]+)(?<body>#{ sep }[^\\n]+)\n?\\z"
+          hack_rx = /#{ margin }/
+          raw_rx = /#{ margin }#{ rest }/
+          cut_rx = /\A#{ rest }/
+          -> first_line do
+            match = ( hack_rx =~ first_line ? raw_rx : cut_rx ).method :match
+            -> line { md = match[ line ] and md.captures }
+          end
+        end.call
+
+        def invoke i, *a
+          clas = API_Model::Actions.fuzzy_const_get i
+          a << :branches << self << :snitch << @snitch
+          clas.new( * a ).execute
+        end
+
+        def fetch_item_by_number num_d
+          idx = @number_to_idx_h.fetch num_d
+          @branch_a.fetch idx
+        end
+
+        def _number_to_idx_h
+          @number_to_idx_h
+        end
+
+        def _sorted_number_a
+          @sorted_number_a
+        end
+
+      private
+
+        def init_from_branch_a branch_a
+          -> do  # #result-block
+            a = [ ] ; num_to_idx_h = { }
+            ok = true
+            branch_a.each_with_index do |item, idx|
+              did = false
+              found_idx = num_to_idx_h.fetch( item.num_d ) do |d|
+                did = true ; a << d
+                num_to_idx_h[ d ] = idx
+              end
+              if ! did
+                ok = false
+                @snitch.multiline_note do |y|
+                  y << "#{ hi 'duplicates:' }"
+                  y << "  #{ branch_a[ found_idx ].render }"
+                  y << "  #{ item.render }"
+                end
+              end
+            end
+            if ! ok then false else
+              @branch_a = branch_a
+              @number_to_idx_h = num_to_idx_h.freeze
+              a.sort!
+              @sorted_number_a = a.freeze
+              self
+            end
+          end.call
+        end
+
+        def initialize snitch
+          @snitch = snitch  # not used here but used as a parameter
+          @y = snitch.y
+        end
       end
 
-      attr_writer :is_dry_run
+      Branch_ = Basic::Struct[ :num_s, :body, :num_d ]
+      class Branch_
+        def initialize num_s, body
+          @num_s = num_s ; @body = body
+          @num_d = num_s.to_i
+          nil
+        end
 
-      def execute
-        if @is_dry_run
-          flush
-        else
-          @y << "for now, only --dry-run is supported:"
-          @y << "run the command with --dry-run (-n) and redirect its"
-          @y << "its output to a file and run the file with `source`"
-          false
+        def render
+          self.class.render @num_s, @body
+        end
+
+        def self.render num_s, body
+          "#{ num_s }#{ body }"
+        end
+
+        def get_new_name_using_number num_d
+          num_s = "%0#{ @num_s.length }d" % num_d
+          self.class.render num_s, @body
         end
       end
 
-    private
-
-      def flush
-        state = @state
-        y = if @is_dry_run
-          @o.method( :puts )
+      late = { }
+      define_singleton_method :const_missing do |c|
+        if (( p = late[ c ] ))
+          p[]
+          const_defined?( c, false ) or fail "sanity - #{ c }"
+          const_get c
         else
-          fail 'no'
+          super c
         end
-        @workorder.pair_a.reverse_each do |pair|
-          item = state.fetch_item_by_number pair.d0
-          name = item.get_new_name_using_number pair.d1
-          y[ "git branch -m #{ item.render } #{ name }" ]
+      end
+      define_singleton_method :[]=, & late.method( :[]= )
+    end
+
+    module API_Model
+
+      self[ :Actions ] = -> do
+
+        module Actions
+          define_singleton_method :fuzzy_const_get, &
+            MetaHell::Boxxy::FUN.fuzzy_const_get.curry[ self ]
         end
-        true
+
+        class Branch_Mungulator_
+
+        private
+
+          def bork msg
+            @snitch.error { msg }
+            false
+          end
+
+          def flush_work
+            r = false
+            @work_a.each do |unit|
+              r ||= true
+              item = @branches.fetch_item_by_number unit.from_d
+              name = item.get_new_name_using_number unit.to_d
+              @outstream.puts "git branch -m #{ item.render } #{ name }"
+            end
+            r
+          end
+        end
+
+        Work_Unit_ = Basic::Struct[ :from_d, :to_d ]
+
+        class Actions::Evenulate < Branch_Mungulator_
+
+          MetaHell::Funcy[ self ]
+
+          MetaHell::FUN.fields[ self, :branches, :outstream, :snitch ]
+
+          def execute
+            @work_a = determine_work_a
+            flush_work
+          end
+
+          def determine_work_a
+            bubble = Git::Services::Set.new ; work_a = [ ]
+            do_number = -> d do
+              is_even = ( d % 2 ).zero?
+              d_ = is_even ? d : d + 1
+              d_ += 2 while bubble.include?( d_ )
+              bubble.add d_  # d_ is the either the new number it should have
+              # or the good number it has and will continue to have,
+              d_ == d or work_a << Work_Unit_[ d, d_ ]
+              # but obv we only have to do work if the number chnaged.
+            end
+            @branches._sorted_number_a.each( & do_number )
+            # failure is impossible because the set of integers is unbounded
+            work_a
+          end
+        end
+
+        class Actions::Spread < Branch_Mungulator_
+
+          MetaHell::Funcy[ self ]
+
+          MetaHell::FUN.fields[ self, :branches, :move_request_a,
+            :outstream, :snitch ]
+
+          def execute
+            r = false
+            begin
+              r = determine_work or break
+              r = flush_work
+            end while nil
+            r
+          end
+
+        private
+
+          def determine_work
+            @branch_number_to_idx_h = @branches._number_to_idx_h
+            @work_a = @branches._sorted_number_a.
+              map( & Work_Unit_.method( :new ) ).freeze
+            scn = Basic::List::Scanner[ @move_request_a ]
+            r = true
+            while (( move_request = scn.gets ))
+              r = process_single_move_request( move_request ) or break
+            end
+            r
+          end
+
+          def process_single_move_request move
+            -> do  # #result-block
+              from_d = move.from_d
+              @branch_number_to_idx_h.key? from_d or
+                break bork( "no such starting number: #{ from_d }" )
+              s = move.get_invalid_factor_reason and break bork s
+              idx = @work_a.index{ |p| from_d == p.from_d }
+              r = prepare_low( move, idx ) or break r
+              r = prepare_hi( move, idx ) or break r
+              true
+            end.call
+          end
+
+          def prepare_low move, idx1
+            d1_h = { } ; r = true ; col = nil
+            ( 0 .. idx1 ).each do |idx|
+              pair = @work_a.fetch idx
+              d1 = ( pair.from_d * move.factor ).to_i
+              if d1_h[ d1 ]
+                # when a collision is detected, the number has occurred 2 times.
+                ( col ||= Basic::Box.new ).
+                  add_or_modify d1, -> { 2 }, -> i { i + 1 }
+              else
+                d1_h[ d1 ] = true
+                pair.to_d = d1
+              end
+            end
+            col and r = bork( "number collision - after transision, the #{
+              }number(s) occur more than once - (#{ col.to_a.map do |i, d|
+                if 2 == d then "#{ i }" else "#{ i } (#{ d } times)" end
+              end * ', ' })" )
+            r
+          end
+          Count_ = Basic
+
+          def prepare_hi move, idx1
+            -> do
+              handle = @work_a.fetch idx1
+              ( dx = handle.to_d - handle.from_d ).zero? and
+                break bork( "there was no change in the \"handle\" element" )
+              ( @work_a.length - 1 ).downto( idx1 + 1 ).each do |idx|
+                pair = @work_a.fetch idx
+                pair.to_d = pair.from_d + dx  # negative dx ok , but expect it to ..
+              end
+              true
+            end.call
+          end
+        end
       end
     end
   end

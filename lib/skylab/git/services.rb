@@ -9,6 +9,7 @@ module Skylab::Git
     o[:Headless] = subsys
     o[:Open3] = stdlib
     o[:OptionParser] = -> _ { require 'optparse' ; ::OptionParser }
+    o[:Set] = stdlib
     o[:Shellwords] = stdlib
     o[:StringIO] = stdlib
 

@@ -28,6 +28,10 @@ module Skylab::Basic
       @h.fetch i, &b
     end
 
+    def to_a
+      @a.map { |i| [ i , @h.fetch( i ) ] }
+    end
+
     #  ~ mutators ~
 
     def touch k
@@ -39,6 +43,20 @@ module Skylab::Basic
       @h.key? i and raise ::KeyError, "collision - won't clobber existing #{i}"
       @a << i
       @h[ i ] = x
+      nil
+    end
+
+    def modify i, p
+      @h[ i ] = p[ @h.fetch( i ) ]
+      nil
+    end
+
+    def add_or_modify i, p, p_
+      if @h.key? i
+        modify i, p_
+      else
+        add i, p[]
+      end
       nil
     end
 

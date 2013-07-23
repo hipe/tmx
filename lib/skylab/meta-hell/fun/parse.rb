@@ -27,6 +27,7 @@ module Skylab::MetaHell
       len = moniker.length
       -> tok do
         (( tlen = tok.length )) > len and break
+        tlen < min && len >= min and break
         moniker[ 0, tlen ] == tok
       end
     end
