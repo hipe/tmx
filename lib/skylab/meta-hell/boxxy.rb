@@ -153,10 +153,9 @@ module Skylab::MetaHell
       res
     end
 
-    Load_guess_ = -> box, guess do
+    Load_to_get_any_correct_name_ = -> box, guess do
       if ! box.const_defined? guess, false and box.respond_to? :const_tug
-        c = box.tug_class
-        tug = c.new guess.intern, box.dir_pathname, box
+        tug = box.tug_class.new guess.intern, box.dir_pathname, box
         correction = get_correction_during_tug[ tug ]
         correction and guess = correction
       end
@@ -200,12 +199,14 @@ module Skylab::MetaHell
                                         -> mod, path_x, value_otherwise=nil do
 
       [ * path_x ].reduce( [ nil, mod ] ) do | (_constant, box), name_x |
-        nam = distill[ name_x ]
         const_a = get_constants_including_inferred_constants[ box ]
+        nam = distill[ name_x ]
         guess = const_a.reduce nil do |_, gues|
           nam == distill[ gues ] and break gues
         end
-        guess and const = Load_guess_[ box, guess ]
+        if guess
+          const = Load_to_get_any_correct_name_[ box, guess ]
+        end
         if const
           [ const, box.const_get( const, false ) ]
         else
@@ -217,6 +218,8 @@ module Skylab::MetaHell
         end
       end
     end
+
+    RIGHT_CONSTANT_NAME_RX = /\A[A-Z][A-Za-z0-9_]*\z/  # near [#043], not used yet
 
     fun[:fuzzy_const_get] = -> mod, path_x do
       Fuzzy_const_get_name_and_value_recursive_[ mod, path_x ].fetch 1
@@ -358,7 +361,6 @@ module Skylab::MetaHell
       end
     end
 
-
     class Conduit_
       def initialize bxy
         @bxy = bxy
@@ -451,7 +453,7 @@ module Skylab::MetaHell
     module ModuleMethods_
       def each &blk
         ea = MetaHell::Formal::Box::Enumerator.new( -> pair_y do
-          mod_load_guess = Load_guess_.curry[ self ]
+          mod_load_guess = Load_to_get_any_correct_name_.curry[ self ]
           constants.each do |guess_i|
             const = mod_load_guess[ guess_i ]
             const and pair_y.yield( const, const_get( const, false ) )
@@ -575,7 +577,7 @@ module Skylab::MetaHell
     #     DSL_.get_const( :ZIP )  # => :zap
     #
     #     module Zangief ; end
-    #     DSL_.get_const( :Zangief )  # => ::LoadError: uninitialized consta..
+    #     DSL_.get_const( :Zangief )  # => LoadError: uninitialized consta..
 
     class Boxxy_
       def dsl blk

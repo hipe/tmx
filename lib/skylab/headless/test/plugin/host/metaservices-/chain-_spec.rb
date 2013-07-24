@@ -6,7 +6,7 @@ module Skylab::Headless::TestSupport::Plugin::Host::Metaservices_::Chain_
 
   include CONSTANTS
 
-  Headless = ::Skylab::Headless  # increase its visibility for below modules
+  Headless = ::Skylab::Headless
 
   extend TestSupport::Quickie
 

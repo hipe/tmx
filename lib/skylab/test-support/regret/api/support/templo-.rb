@@ -8,7 +8,7 @@ module Skylab::TestSupport::Regret::API
     # partly because what we're doing is so cool we need ad-hoc classes for
     # it. Sure call it a view controller but eew.
 
-    EXT = '.tmpl'
+    EXT_ = '.tmpl'.freeze
 
     class << self
       alias_method :begin, :new
@@ -24,7 +24,7 @@ module Skylab::TestSupport::Regret::API
 
     def get_template i
       Face::Services::Basic::String::Template.from_string(
-        self.class.dir_pathname.join( "#{ i }#{ EXT }" ).read
+        self.class.dir_pathname.join( "#{ i }#{ EXT_ }" ).read
       )
     end
 
@@ -37,7 +37,7 @@ module Skylab::TestSupport::Regret::API
   public
 
     def set_options option_a  # mutates
-      res = true ; avail_a = available_options
+      res = true ; avail_a = available_option_a
       avail_a.each do |i, not_provided, provided|
         if option_a and (( idx = option_a.index i.to_s ))
           option_a[ idx ] = nil
@@ -60,27 +60,33 @@ module Skylab::TestSupport::Regret::API
 
   private
 
-    def available_options
+    def available_option_a
       self.class::OPTION_A_
     end
 
     def show_option_help
       @snitch.puts "available template options:"
-      Face::CLI::Table::FUN.___tablify[
-        [ 'option', 'desc' ], ::Enumerator.new do |y|
-          available_options.each do |i, _, _, p|
-            first = true
-            p[ ::Enumerator::Yielder.new do |line|
-              if first
-                y << [ i.to_s, line ]
-                first = false
-              else
-                y << [ '', line ]
-              end
-            end ]
+      build_section_yielder = -> y, name_i do
+        first = true
+        ::Enumerator::Yielder.new do |line|
+          if first
+            y << [ name_i.to_s, line ]
+            first = false
+          else
+            y << [ '', line ]
           end
-        end, @snitch.method( :puts ), false  # don't show header
-      ]
+        end
+      end
+      ea = ::Enumerator.new do |y|
+        available_option_a.each do | name_i, _, _, p|
+          p[ build_section_yielder[ y, name_i ] ]
+        end
+      end
+      Face::CLI::Table::FUN.tablify[
+        [ [ :fields, [ 'option', 'desc' ] ],
+          [ :show_header, false ] ],
+        @snitch.method( :puts ),
+        ea ]
       nil
     end
 

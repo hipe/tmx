@@ -2,7 +2,7 @@ module Skylab::Face
 
   module API::Action::Param
 
-    # this whole node if for experimenting in the automatic creation of a set
+    # this whole node is for experimenting in the automatic creation of a set
     # of meta-fields that can be recognized by the entity library. tag your
     # fields with these metafields and we can try to make magic happen for you
     #
@@ -15,6 +15,22 @@ module Skylab::Face
       [ :desc, :property ],  # [#fa-030]
 
       [ :normalizer, :property ],  # [#fa-021]
+
+      # hack a specialized sub "class" of normalizer - the 'set' macro:
+      [ :set, :property, :hook, :mutate, -> fld do  # #experimental
+        fld.instance_exec do
+          @has_normalizer = true ; set_x = @set_value
+          @normalizer_value = -> y, x, _ do
+            set_x.include? x or begin
+              y << ( @expression_agent.instance_exec do
+                "invalid #{ lbl fld.local_normal_name } value #{
+                  }#{ ick x }. expecting #{ or_ set_x }"
+              end )
+            end  # (always result in received value - additional notices e.g
+            x  # about this as a missing required field sound redundant)
+          end
+        end
+      end ],
 
       [ :default, :property ],  # [#fa-033]
 
@@ -83,6 +99,7 @@ module Skylab::Face
     # the true-ish-ness of that result determines whether it is a match. if
     # you pass `true`, the true function will be used (matches everything),
     # which is useful only at the end as a catch-all base case.
+    # #todo wtf test-case documentation hello
 
     -> do
 

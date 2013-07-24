@@ -38,7 +38,7 @@ module Skylab::TestSupport::Regret::API
         p = @pn
         say :notice, -> do
           "\"#{ relative }\" not found within #{ count } dirs of #{
-            }#{ pth[ p ] }"
+            }#{ @pth[ p ] }"
         end
         nil
       end.call
@@ -80,7 +80,7 @@ module Skylab::TestSupport::Regret::API
       else
         @files_file_pn = nil
         say :notice, -> do
-          "expected files file not found: #{ pth[ pn ] }"
+          "expected files file not found: #{ @pth[ pn ] }"
         end
         nil
       end
@@ -110,7 +110,7 @@ module Skylab::TestSupport::Regret::API
       end
     end
 
-    SPACE_ = ' '
+    SPACE_ = ' '.freeze
 
     class Pathname_ < ::Pathname
 

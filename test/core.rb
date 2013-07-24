@@ -20,4 +20,6 @@ module Skylab::Test
 
   SYSTEM_ = Headless::System.defaults
 
+  Stderr_ = -> { $stderr }  # resources should not be accessed as contants
+                            # or globals from within application code
 end

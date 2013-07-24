@@ -7,7 +7,8 @@ module Skylab::Headless::TestSupport::NLP
   number = fun.number
   num2ord = fun.num2ord
   method = nil
-  print = ->(x) { $stderr.puts("#{'%9d' % [x]}:-->#{ method[ x ] }<--") }
+  stderr = Stderr_[]
+  print = ->(x) { stderr.puts("#{'%9d' % [x]}:-->#{ method[ x ] }<--") }
   [
     ->(x) { number[ x ] },
     ->(x) { num2ord[ x ] }

@@ -6,7 +6,7 @@ module Skylab::Basic::TestSupport::Pathname::Union
 
   include CONSTANTS
 
-  Basic = ::Skylab::Basic  # increase its visibility for below modules
+  Basic = ::Skylab::Basic
 
   extend TestSupport::Quickie
 

@@ -41,13 +41,15 @@ compare = -> a, b do  # `a` and `b` are arrays of comparables.  find which
   res
 end
 
+stderr = $stderr     # (avoid accessing resources as globals/constants)
+
 error = -> msg do
-  $stderr.puts msg
+  stderr.puts msg
   nil
 end
 
 notice = -> msg do
-  $stderr.puts "notice: #{ msg }"
+  stderr.puts "notice: #{ msg }"
   nil
 end
 

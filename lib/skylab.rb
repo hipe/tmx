@@ -45,27 +45,26 @@ module Skylab                     # Welcome! :D
     end
 
     o[:constantize] = -> do
-
-      sanitize_path_rx = %r{ #{::Regexp.escape EXTNAME }\z |
+      sanitize_path_rx = %r{ #{ ::Regexp.escape EXTNAME }\z |
         (?<=/)/+ | (?<=[-_ ])[-_ ]+ | [^-_ /a-z0-9]+ }ix
 
       -> path do
-        path.to_s.gsub( sanitize_path_rx, '' ).# remove some strings
-          split( '/', -1 ).map do |const|      # each filename as const name
-            const.gsub( /([^-_ ]+)([-_ ]+)?/ ).each do # each part at a sep
-              const, sep = $~.captures
-              const.gsub!( /(?<=[0-9]|\A)([a-z])/ ) { $1.upcase } # "99x" -> "99X"
-              if sep
-                if const.length > 1            # "foo_bar" --> "FooBar"
-                  sep = nil
-                else
-                  sep = '_'                    # "c_style" --> "C_Style"
-                end
-              end
-              "#{ const }#{ sep }"
-            end
-          end * '::'
+        path.to_s.gsub( sanitize_path_rx, '' ).  # remove some strings
+          split( '/', -1 ).map( & Constantize_sanitized_file_ ) * '::'
         end
+    end.call
+
+    Constantize_sanitized_file_ = -> do
+      rx = / (?<const>[^-_ ]+) (?<sep>[-_ ]+ (?<is_last>\z) ?)? /x
+      -> part do
+        part.gsub( rx ).each do  # for each part along with its separator,
+          const, sep, is_last = $~.captures
+          const.gsub!( /(?<=[0-9]|\A)([a-z])/ ) { $1.upcase } # "99x" -> "99X"
+          sep &&= ( is_last || 2 > const.length ) ? '_' : nil
+            # "c-style" --> "C_Style", "foo-bar" --> "FooBar", "x-" -> "X_"
+          "#{ const }#{ sep }"
+        end
+      end
     end.call
 
     o.freeze ; o = nil
@@ -88,6 +87,10 @@ module Skylab                     # Welcome! :D
       end
 
       attr_reader :dir_pathname, :tug_class
+
+      def pathname
+        @pathname ||= dir_pathname.sub_ext EXTNAME  # ymmv
+      end
     end
 
     CALLFRAME_PATH_RX = /^(?<path>.+)(?=:\d+:in[ ]`)/x

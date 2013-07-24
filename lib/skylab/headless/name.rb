@@ -86,7 +86,7 @@ module Skylab::Headless
 
     # constant names can hold more information than others, so converting
     # from const to norm can be lossy (e.g `NCSA_Spy` -> `ncsa_spy` - it
-    # is impossible to go in the reverse direction deterministically)
+    # is impossible to go in the reverse direction deterministically) :[#083]
 
     def self.from_name name
       new Name::Const_basename_[ name ]

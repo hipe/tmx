@@ -234,4 +234,22 @@ module Skylab::Face
       nil
     end
   end
+
+  # ~ 5.17x - this:
+
+  class Node_Sheet_
+    def parse_xtra_render_argument_syntax_as scn
+      defer_set :render_argument_syntax_as, scn.fetchs
+      nil
+    end
+  end
+
+  # ~ 5.18x - this:
+
+  class Node_Sheet_
+    def parse_xtra_additional_help_proc scn
+      defer_set :additional_help_proc, scn.fetchs
+      nil
+    end
+  end
 end

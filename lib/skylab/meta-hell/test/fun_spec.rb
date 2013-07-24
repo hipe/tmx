@@ -6,14 +6,14 @@ module Skylab::MetaHell::TestSupport::FUN
 
   include CONSTANTS
 
-  MetaHell = ::Skylab::MetaHell  # increase its visibility for below modules
+  MetaHell = ::Skylab::MetaHell
 
   extend TestSupport::Quickie
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
   describe "Skylab::MetaHell::FUN" do
-    context "`seeded_function_chain` - given a stack of functions and one seed value, resolve" do
+    context "`seeded_function_chain` - given a stack of functions and one seed value," do
       Sandbox_1 = Sandboxer.spawn
       it "opaque but comprehensive example" do
         Sandbox_1.with self

@@ -1,77 +1,89 @@
 module Skylab::Face
 
-  API::Action::Proc = -> prok do
-    # make a proxy to wrap around a proc. make it quack like an API action.
-    API::Action::Proc_::Isomorphic_.new prok
-  end
+  class API::Action
 
-  module API::Action::Proc_
-  end
+    module Proc_
 
-  class API::Action::Proc_::Isomorphic_
+      class Isomorphic_
 
-    -> do  # `initialize`
-
-      h = {
-        opt: [ :arity, :zero_or_one ],
-        req: [ :arity, :one ]
-      }
-
-      define_method :initialize do |prok|
-        @proc = prok
-        @constants = ::Module.new
-        Services::Basic::Field::Box.enhance @constants do
-          field_class_instance_methods -> { API::Action::Param::Field_IMs_ }
-          meta_fields( * API::Action::Param::METAFIELDS_ )
-          fields( * prok.parameters.map do |orr, nn|
-            [ nn, * h.fetch( orr ) ]
-          end )
+        def initialize p
+          @keys_provided_set = @param_h = nil
+          @proc = p ; @mod = Module.new
+          Services::Basic::Field::Box.enhance @mod do
+            field_class_instance_methods -> { API::Action::Param::Field_IMs_ }
+            meta_fields( * API::Action::Param::METAFIELDS_ )
+            fields( * p.parameters.map do |opt_req_rest, i|
+              [ i, * H_.fetch( opt_req_rest ) ]
+            end )
+          end
         end
+        H_ = {  # map parameters as ruby reports them to fields as we
+          opt: [ :arity, :zero_or_one ],  # describe them
+          req: [ :arity, :one ]
+        }.freeze
+
       end
-    end.call
-
-    # `has_emit_facet` - fulfill [#fa-027]. override parent.
-    # justification: we do *not* want the event-wiring hook.
-    # Procs are simple and have an atomic, monadic result. if you need
-    # to emit events during the excution of your Proc, you should *not* be
-    # using a Proc to implement your action in the first place ^_^.
-
-    def has_emit_facet
-      false
     end
 
-    def has_param_facet
-      fail "do me - don't i need some I_M?"
-    end
+    Proc = Proc_::Isomorphic_.method :new  # sneak this in there
 
-    def normalize y, p_h
-      @provided_keys_a = p_h ? p_h.keys : [ ]
-      instance_exec y, p_h, & API::Action::FUN.normalize
-    end
+    class Proc_::Isomorphic_
 
-    def has_service_facet
-      false
-    end
+      def execute
+        # in theory, if the validaton of the normalization worked correctly
+        # w/ re: to required fields, the below algo should be ok but note
+        # it needs more testing.
+        args = [ ] ; bx = field_box ; p_h = @param_h ; set = @keys_provided_set
+        bx._order.each do |i|
+          set && set.include?( i ) or next
+          args << p_h[ i ]
+        end
+        @proc[ * args ]
+      end
 
-    def has_field_box
-      true
-    end
-    private :has_field_box
+      def has_emit_facet  # fulfill [#fa-027] - we do *not* want the event-
+        # wiring hook. Procs are simple and have an atomic, monadic result.
+        # if you need to do something like emitting events during the
+        # execution of your proc you could attempt something convoluted
+        # in its parameters, but you probably not *not* be using a proc
+        # to implement your action in the first place ^_^
+        false
+      end
 
-    def field_box
-      @constants.field_box
-    end
-    private :field_box
+      def has_service_facet
+        false
+      end
 
-    def normalization_failure_line msg
-      raise ::ArgumentError, msg
-    end
-    private :normalization_failure_line
+      def has_param_facet
+        true  # so we receive the call to normalize below
+      end
 
-    def execute
-      @proc.call( * @provided_keys_a.map do |k|
-        instance_variable_get field_box.fetch( k ).as_host_ivar
-      end )
+      define_method :super_normalize, & Normalize_
+
+      def normalize y, par_h
+        par_h and @keys_provided_set = Face::Services::Set.new( par_h.keys )
+        super_normalize y, par_h
+      end
+
+      def accept_field_value fld, x
+        @param_h ||= { }
+        @param_h[ fld.local_normal_name ] = x
+        nil
+      end
+
+    private
+
+      def has_field_box
+        true
+      end
+
+      def field_box
+        @mod.field_box
+      end
+
+      def normalization_failure_line_notify msg
+        raise ::ArgumentError, msg
+      end
     end
   end
 end

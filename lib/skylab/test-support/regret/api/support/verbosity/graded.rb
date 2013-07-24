@@ -209,12 +209,12 @@ class Skylab::TestSupport::Regret::API::Support::Verbosity::Graded < ::Module
     # listener around throughout your graph? the listener is like a golden
     # snitch. no it isn't.
 
-    def make_snitch io
-      self.class.get_snitch_class.new self, io
+    def make_snitch io, *expression_agent
+      self.class.get_snitch_class.new self, io, *expression_agent
     end
   end
 
-  class Sn_ # see Vtuple_IM_#sc
+  class Sn_  # see Vtuple_IM_#sc
 
     # the snitch itself is technically "immutable" but it just closes around
     # the vtuple and relies on the vtuple as the datastore. if the vtuple
@@ -230,19 +230,27 @@ class Skylab::TestSupport::Regret::API::Support::Verbosity::Graded < ::Module
         define_singleton_method :members do a end
         a.each do |i|
           define_method :"do_#{ i }" do @is[ i ] end
+          define_method i do | &blk |
+            @say[ i, blk ]
+          end
         end
         self
       end
     end
 
-    def initialize vtuple, io
+    def initialize vtuple, io, expression_agent=nil
       @write = -> s { io.write s }
       @puts = -> s { io.puts s }
-      @say = -> i, f do
-        if @is[ i ]
-          @puts[ nil.instance_exec( & f ) ]  # future-proofing grease
-        end # ( one day we might give it a context but for now we don't want
-        nil #   to give it a misleading context.)
+      @say = -> i, p do  # if we are at or above verbosity threshhold `i`
+        # then invoke proc `p` and send its output to the `puts` function.
+        # in other words, conditionally say something. passing the rendering
+        # as a proc is useful because in cases where we wouldn't output the
+        # resuling string anyway, we save the overhead of building it.
+        # your expression proc will be executed in the context of your
+        # expression agent (if any) that you build the snitch with, which
+        # allows for dynamic styling of expressions where desired.
+        @is[ i ] and @puts[ expression_agent.instance_exec( & p ) ]
+        nil
       end
       @is = -> i { vtuple[ i ] }
       @event = -> i, e do  # for now this gets flattened right away, but
@@ -250,6 +258,11 @@ class Skylab::TestSupport::Regret::API::Support::Verbosity::Graded < ::Module
           @puts[ nil.instance_exec( & e.message_proc ) ]  # point.
         end
         nil  # any result could be confusing (the e? the e iff emitted?)
+      end
+      @y = -> do
+        y = ::Enumerator::Yielder.new( & y.method( :puts ) )
+        @y = -> { y }
+        y
       end
       nil
     end
@@ -260,6 +273,6 @@ class Skylab::TestSupport::Regret::API::Support::Verbosity::Graded < ::Module
 
     MetaHell::Function self, :write, :puts, :say, :is, :@puts, :<<,
       # ( because we often forget, the above is "use @puts for :<<" etc )
-      :event
+      :event, :y
   end
 end

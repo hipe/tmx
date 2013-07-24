@@ -11,7 +11,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Event
     extend CLI_TestSupport
     extend Event_TestSupport  # so CONSTANTS (Sandbox) is visible in i.m's
 
-    context "does the thing with even names and the `on_` pattern" do
+    context "does the thing with event names and the `on_` pattern" do
       define_sandbox_constant :application_module do
         module Sandbox::Nightclub_1
           module CLI
@@ -49,6 +49,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration::Event
       end
 
       it "you event handling solution is nothing short of sheer ginus" do
+        debug!
         x = invoke 'barf'
         lines[:err].shift.should eql( '<t.>' )
         lines[:err].shift.should eql( '<<H.>>' )

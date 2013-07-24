@@ -2,39 +2,70 @@ module Skylab::TestSupport
 
   module Regret
 
-    module CLI
+    module CLI::Actions
 
-      module Actions
+      module DocTest
 
-        module DocTest
+        Parse_Recursive_ = Subsys::Services::Basic::Struct[ :y, :v, :argv ]
 
-          a = -> do
-            y = []
-            f = ::Struct.new :i, :parse
-            y << f[ :do_check, -> argv do
-              rx = /\A#{ ::Regexp.escape argv.fetch 0 }/
-              if rx =~ 'check'
-                argv.shift
-                true
+        # the things we do for love. **necessary** to support argv's like:
+        #
+        #   foo -r   some-path     # ordinary recursive
+        #   foo -rn  some-path     # dry run
+        #   foo -r n some-path     # same
+        #   foo -r list list       # e.g use the "list" sub-opt on path "list"
+        #
+
+        class Parse_Recursive_
+
+          MetaHell::Funcy[ self ]
+
+          def execute
+            if @argv.length.nonzero?
+              did = P_[ @v, @argv ]
+              if ! did && (( t = @argv[ 0 ] )) && REST_RX_.match( t )
+                if P_[ @v, [ $~[:stem] ] ]
+                  @argv.shift
+                else
+                  @v[ :did_error ] = true
+                  @y << "did not recognize \"#{ t }\" as a valid argument #{
+                  }to -r (expected #{
+                  }#{ Or_[ A_.reduce [] { |m, fld| fld.name_monikers m }]}#{
+                  }). if you intended \"#{ t }\" as other option(s), please#{
+                  } use \"--\" to sepearate them from -r."
+                  @argv.shift  # it may or may not be a valid option - but
+                    # just in case, this way we avoid triggering 2 notices
+                end
               end
-            end ]
-            y << f[ :from_path, -> argv do
-              if '--' == argv.fetch( 0 ) && 2 <= argv.length
-                argv.shift
-                argv.shift
+            end
+            nil
+          end
+
+          o = MetaHell::FUN::Parse::Field_::Exponent_
+
+          A_ = [ o[ :do_list, 'list', nil, "just list the files" ],
+                 o[ :do_check, 'check', nil, "write to stdout all output" ],
+                 o[ :is_dry_run, 'dry-run', 'n' ],
+                 o[  nil, '--' ] ]
+
+          P_ = MetaHell::FUN.parse_alternation.
+            curry[ :pool_procs, A_.map(& :p ) ]
+
+          Or_ = Headless::NLP::EN::Minitesimal::FUN.curriable_oxford_comma.
+            curry[ ' or ', ', ' ]
+
+          REST_RX_ = /\A-(?<stem>[^-].*)\z/
+
+          Value_ = CLI::Face::Services::Basic::Struct[ :did_error, *
+            A_.reduce( [] ) { |m, x| x.i and m << x.i ; m } ]
+          class Value_
+            def to_i
+              @did_error and fail "sanity"
+              one = A_.reduce nil do |_, fld|
+                fld.i and self[ fld.i ] and break fld.i
               end
-            end ]
-            y.freeze
-          end.call
-
-          Recursive_Field_Values_ = ::Struct.new( * a.map( & :i ) )
-
-          PARSER_ = MetaHell::FUN.parse_from_ordered_set.curry[
-            :argv_scanners, a.map( & :parse ) ]
-
-          Parse_auto_ = -> y, argv, x do
-            x and argv.unshift x
-            Recursive_Field_Values_[ * PARSER_[ argv ] ]
+              one || :do_execute
+            end
           end
         end
       end

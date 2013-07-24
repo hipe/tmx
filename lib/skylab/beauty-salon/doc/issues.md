@@ -1,3 +1,4 @@
+[#013]       the problem with functions ..
 [#012]       #doc-point "private fold method" defined and explored..
 [#011]       #idea - terrible: results of rcov used to eliminate
                branches of unused code from sourcecode, programattically!
@@ -13,5 +14,5 @@
 [#002] #open 2012-08-19 #feature be able to rename a symbol
                (following conventions)
 [#001] #open 2012-08-19 #feature be able to detect and omit nonzero ranges of
-               trailing newlines and whietespace
+               trailing newlines and whitespace
 [#sl-104] 2012-08-18 beauty-salon : a code-molester application #bad-idea

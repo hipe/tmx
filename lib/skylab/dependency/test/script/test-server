@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby -w
+
+require_relative '../test-support'
+
+module Skylab::Dependency::TestSupport
+
+  module CONSTANTS
+
+    FILE_SERVER.run
+
+  end
+end

@@ -93,8 +93,11 @@ module Skylab::MetaHell::TestSupport::Autoloader
 
       o 'one/////two', 'One::Two', 'corrects multiple slashes'
 
-      o 'path Here This::Is::This', 'PathHereThisIsThis', 'but what about this BS'
+      o 'path Here This::Is::This', 'PathHereThisIsThis', 'sure spaces why not'
 
+      o 'levenshtein-', 'Levenshtein_', 'an API private constant'
+
+      o 'what-about-bob-', 'WhatAboutBob_', 'a typical multi-part API private constant'
     end
 
     context "`constantize` tries to turn method-looking #{

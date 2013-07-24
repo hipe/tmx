@@ -7,39 +7,26 @@ module Skylab::Face
 
   CLI::Metastory.touch
 
-  class CLI::Metastory__
-    def _can_broker_plugin_metaservices  # #api-private while possible
-      @metastory_subject.client_can_broker_plugin_metaservices
-      # this assumes you are using plugin host proxy and not host.
-      # essentially it indirectly assumes `isomorphic argument syntax` [#015]
-    end
-  end
-
-  class CLI  # #re-open for facet
-
-    def self.client_can_broker_plugin_metaservices  # used above..
-      false                                         #  ..changed elsewhere
-    end
-  end
-
   class CLI_Mechanics_  # #re-open for facet
 
-    #  ~ class section 1 - singleton methods (none currently) ~
+    #  ~ class section 1 - singleton methods ~
+
+    def self.client_can_broker_plugin_metaservices
+      false
+    end
 
     #  ~ class section 2 - public instance methods ~
 
-    def has_api_plugin_metaservices
-      parent_shell.class.metastory._can_broker_plugin_metaservices
-        # note we don't call i.m's on parent_shell b.c of [#037]
-    end
-
-    def api_modality_proxy  # override parent, [#fa-010] explains why
+    def event_listener_for_api_executable  # the magic thing with on_* methods
       self
     end
 
-    def api_plugin_metaservices  # unofficial `modal services` api
-      parent_shell.instance_variable_get( :@plugin_host ).
-        plugin_host_metaservices
+    def service_provider_for_api_executable _hot_action
+      @surface[].instance_variable_get :@plugin_host
+    end
+
+    def control_hub_for_api_executable  # get notified of last executable
+      self
     end
 
     def set_last_api_executable exe
@@ -49,11 +36,12 @@ module Skylab::Face
 
     attr_reader :last_api_executable  # #called-by `cull` #todo
 
-    # `handle_events` - #called-by API client as a hookback to our
-    # `get_executable`, straightforward implementation. implement this mode
-    # client's implementation of this hook (hook explained in [#fa-017]).
+    def api_plugin_metaservices  # unofficial `modal services` api
+      parent_shell.instance_variable_get( :@plugin_host ).
+        plugin_host_metaservices
+    end
 
-    def handle_events action
+    def handle_events action  # hookback [#fa-017] #called-by API client
       if action.respond_to? :with_specificity  # else not a pub-subber.
         a, h = parent_shell_module.api_stream_box
         action.with_specificity do
@@ -144,35 +132,47 @@ module Skylab::Face
 
   class NS_Mechanics_  # #re-open for facet
 
-    undef_method :api  # was a loader stub.
+    undef_method :api  # #loader-stub
 
     def api *args
-      action = api_executable args
-      action.execute if action
+      action = get_api_executable_with :param_x, args
+      action && action.execute
     end
 
     undef_method :call_api  # was a loader stub.
 
     def call_api nx, par_h=nil
-      action = api_executable par_h, nx
-      action.execute if action
+      a =  [ :name_x, nx ]
+      par_h and a << :param_x << par_h
+      action = get_api_executable_with( * a )
+      action && action.execute
     end
 
-    undef_method :api_services  # was a loader stub.
+    undef_method :api_services  # #loader-stub
 
     def api_services
       @api_services ||= CLI::API_Integration::Services_.new self
     end
 
-    def api_executable par_x, nx=nil
-      norm_a = if nx then [ * nx ] else
-        @last_hot.anchored_last
+    class Executable_Request_
+      MetaHell::FUN::Fields_[ :client, self, :struct_like, :field_i_a,
+                             [ :name_x, :param_x, :expression_agent_p ] ]
+    end
+
+    def get_api_executable_with *a
+      o = Executable_Request_[ *a ]
+      norm_a = (( nx = o.name_x )) ? [ * nx ] : @last_hot.anchored_last
+      y = [ :name_i_a, norm_a,
+            :event_listener, event_listener_for_api_executable ]
+      par_h = if (( ph = o.param_x )).respond_to? :each_pair then ph else
+        finish_param_h_for_api ph
       end
+      par_h and y << :param_h << par_h
+      (( eap = o.expression_agent_p )) and y << :expression_agent_p << eap
+      y << :service_provider_p << method(:service_provider_for_api_executable)
       ac = api_client
-      ph = if par_x.respond_to? :each_pair then par_x else
-                finish_param_h_for_api par_x end
-      exe = ac.get_executable norm_a, ph, api_modality_proxy
-      exe and api_modality_proxy.set_last_api_executable exe
+      exe = ac.get_executable_with( * y )
+      exe and control_hub_for_api_executable.set_last_api_executable exe
       exe
     end
 
@@ -180,9 +180,18 @@ module Skylab::Face
       parent_services.api_client
     end
 
-    def api_modality_proxy   # see same method in child class
-      parent_services.api_modality_proxy
+    def event_listener_for_api_executable
+      parent_services.event_listener_for_api_executable
     end
+
+    def service_provider_for_api_executable hot
+      parent_services.service_provider_for_api_executable hot
+    end
+
+    def control_hub_for_api_executable
+      parent_services.control_hub_for_api_executable
+    end
+
 
   private
 

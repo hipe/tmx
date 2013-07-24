@@ -2,6 +2,8 @@ module Skylab::Face
 
   # ~ facet 5.3x - recursively nested namespaces and ns properties ~
 
+  CLI.const_get :Set, false
+
   class Namespace  # #re-open for 5.3x
 
     module Facet

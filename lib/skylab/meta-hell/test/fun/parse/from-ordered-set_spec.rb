@@ -6,7 +6,7 @@ module Skylab::MetaHell::TestSupport::FUN::Parse::From_Ordered_Set
 
   include CONSTANTS
 
-  MetaHell = ::Skylab::MetaHell  # increase its visibility for below modules
+  MetaHell = ::Skylab::MetaHell
 
   extend TestSupport::Quickie
 

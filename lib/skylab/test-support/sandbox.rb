@@ -174,8 +174,8 @@ module Skylab::TestSupport::Sandbox
       @define_sandbox_constant_proc = -> do
         -> i, &b do
           x = nil
-          f = -> do
-            f = nil
+          p = -> do
+            p = nil
             sb = self::Sandbox
             list_a = sb.constants
             b.call  # execute this in its original context.
@@ -185,7 +185,7 @@ module Skylab::TestSupport::Sandbox
             x = sb.const_get( list_b.fetch( -1 ), false )
           end
           define_method i do
-            f && f[]
+            p && p[]
             x
           end
         end

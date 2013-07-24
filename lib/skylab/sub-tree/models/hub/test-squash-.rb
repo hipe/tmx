@@ -23,7 +23,6 @@ module Skylab::SubTree
           # case the 'c-odeish' key for this node is also cwd. it is "near"
           truncate_and_frobulate_near_test_tree
         else
-          # require 'debugger' ; debugger ; $stderr.puts nil
           truncate_and_frobulate_deep_test_tree
         end
       end

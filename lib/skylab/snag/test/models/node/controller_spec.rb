@@ -49,7 +49,7 @@ module Skylab::Snag::TestSupport::Models::Node
 
     class Controller_RC_Mock
       def emit name, pay
-        $stderr.puts "WAT: #{ [name, pay].inspect }"
+        Stderr_[].puts "WAT: #{ [name, pay].inspect }"
       end
     end
 

@@ -2,10 +2,29 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
 
   class Specer_
 
-    def initialize snitch, out, tmpl_i, path
-      @snitch, @out, @tmpl_i, @path = snitch, out, tmpl_i, path
+    # the specer accepts a sequence of Comment_::Block-s one by one and for
+    # for each one it parses it line-by-line, chunking it into runs of 'code'
+    # and 'other'. it always holds on to the last 0 to 2 contiguous lines of
+    # 'other' so that they can be associated with 'code' runs, for possible
+    # use in their example and description strings.
+    #
+    # when it encounters a blank comment line, it associates it with the
+    # preceding run of 'code' or 'other' as appropriate.
+    #
+    # for now, this is where the logic is seated the you need 4 (four)
+    # blank lines (more is ok) to look like a 'code' line; and for now this
+    # is hard-coded but etc.
+    #
+    # (a second pass of parsing happens in the child nodes from this file.)
+    #
+
+    MetaHell::FUN::Fields_[ :client, self, :method, :absorb, :field_i_a,
+      [ :snitch, :outstream, :templo_name, :path, :load_file, :load_module ] ]
+
+    def initialize *a
+      absorb( *a )
+      @base_mod = nil
       @block_a = [ ]
-      nil
     end
 
     def set_template_options option_a
@@ -125,7 +144,9 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
       -> do
         t = resolve_templo or break t
         r = t.set_options( @templo_opt_a ) or break r
-        t.render_to @out
+        if @path
+          t.render_to @outstream
+        end
       end.call
     end
 
@@ -137,77 +158,118 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
 
     def resolve_templo
       -> do
-        @base_mod = ::Skylab
-        @tail = resolve_tail or break
-        c_a = resolve_c_a or break
-        tconst = MetaHell::Boxxy::FUN.
-          fuzzy_const_get[ DocTest::Templos_, @tmpl_i ]
-        tconst.begin @snitch, @base_mod, c_a, @block_a
+        if @path
+          r = resolve_base_mod or break r
+          @tail_path = resolve_tail_path or break
+          c_a = resolve_loaded_anchorized_const_a or break c_a
+        end
+        tmod = MetaHell::Boxxy::FUN.
+          fuzzy_const_get[ DocTest::Templos_, @templo_name ]
+        tmod.begin @snitch, @base_mod, c_a, @block_a
       end.call
     end
 
-    def resolve_c_a
+    def resolve_base_mod
+      @base_mod = ::Skylab  # #etc
+      if @load_file
+        path = ::File.expand_path @load_file
+        require path  # or load it..
+      end
+      true
+    end
+
+    def resolve_loaded_anchorized_const_a
+
+      # the `const_a` looks something like [ :Foo, "Bar", :Baz ] (it is
+      # indiscriminate of strings vs. symbols), to stand for the value
+      # represented by the constant ::Foo::Bar::Baz (or perhaps Foo::BAR::BaZ,
+      # etc). at this point, that value hasn't necessarity been 'loaded' yet..
+
       -> do
-        c_a = resolve_raw_c_a or break
-        const = c_a.reduce @base_mod do |m, c|
-          MetaHell::Boxxy::FUN.fuzzy_const_get[ m, c ]
-        end
+        c_a = infer_unloaded_anchorized_const_a_from_tail_path or break
+        make_any_name_corrections c_a
+        const = reduce_const_array_down_to_some_value c_a
+        const or break const
         if const.respond_to? :name
-          const.name[ @base_mod.name.length + 2 .. -1 ].split( '::' ).
-            map( & :intern )
+          r = const.name[ @base_mod.name.length + 2 .. -1 ].
+            split( SEP_ ).map( & :intern )
         else
-          @snitch.say :notice, -> do
+          @snitch.notice do
             "had const that was not a class or module #{
               }(~\"#{ c_a.fetch( -1  ) }\"). just taking best guess at its #{
               }name. we could do better.."
           end
-          c_a
+          r = c_a
         end
+        r
       end.call
     end
 
-    -> do  # `resolve_raw_c_a`
+    SEP_ = '::'.freeze
 
-      rx = %r{[^/]+(?=/)}
+    def infer_unloaded_anchorized_const_a_from_tail_path
+      API::Support::Tree::Walker_::Const_inferer_[
+        :tail_path, @tail_path, :notice_p, -> s { @snitch.notice { s } } ]
+    end
 
-      file_rx = /\A (?<noext> [-_a-z0-9]+ ) #{
-        }#{ ::Regexp.escape ::Skylab::Autoloader::EXTNAME } \z/x
+    def make_any_name_corrections c_a
+      @load_module and make_any_name_corrections_via_load_module c_a
+    end
 
-      constantify = Face::Services::Headless::Name::FUN.constantify
-      define_method :resolve_raw_c_a do
-        -> do
-          scn = Face::Services::Headless::Services::StringScanner.new @tail
-          c_a = [ ]
-          while tok = scn.scan( rx )
-            scn.pos = scn.pos + 1
-            c_a << constantify[ tok ].intern
-          end
-          md = file_rx.match scn.rest
-          if ! md
-            @notice[ Event_[ "sanity - expecting ruby file - #{ scn.rest }"]]
-            break
-          end
-          c_a << constantify[ md[:noext] ].intern
-        end.call
+    def make_any_name_corrections_via_load_module c_a
+      c_a_ = get_another_correct_anchorized_name_via_the_load_module
+      c_a_.length.times do |idx|
+        ths = c_a[ idx ].intern
+        otr = c_a_[ idx ].intern
+        if ths != otr
+          c_a[ idx ] = otr
+        end
       end
-      private :resolve_raw_c_a
-    end.call
+      nil
+    end
 
-    def resolve_tail  # local, normalized path
+    def get_another_correct_anchorized_name_via_the_load_module
+      c_a = @load_module.split SEP_
+      top = ::Object.const_get c_a.shift
+      name, _ = MetaHell::Boxxy::FUN.
+        fuzzy_const_get_name_and_value_recursive[ top, c_a ]
+      c_a[ -1 ] = name  # any correction to last part only
+      c_a
+    end
+
+    def reduce_const_array_down_to_some_value c_a
+      c_a.reduce @base_mod do |m, c|
+        name, value = Const_fetch_[ m, c, -> err do
+          @snitch.notice { "'#{ m }' does not have #{
+            }'#{ err.name }' loaded as one of its #{ m.constants.length } #{
+            }contant(s)" }
+          @snitch.notice { "trying passing a second #{
+            }<load-file> argument that loads it."  }
+          false
+        end ]
+        name or break( false )
+        value
+      end
+    end
+
+    Const_fetch_ = MetaHell::Boxxy::FUN.fuzzy_const_get_name_and_value_recursive
+
+    def resolve_tail_path  # local, normalized path
       -> do
         pn = ::Pathname.new ::File.expand_path( @path )
         pns = pn.to_s ; bms = @base_mod.dir_pathname.to_s
         idx = pns.index bms
         if ! idx || idx.nonzero?
-          @snitch.event :notice, Event[ "expecting to find pathname #{
-            }#{ @path } under base module `dir_pathnname` - #{
-            }#{ @base_module.dir_pathname }" ]
+          p = @path ; bm = @base_module
+          @snitch.notice { "expecting to find pathname #{
+            }#{ p } under base module `dir_pathnname` - #{
+            }#{ bm.dir_pathname }" }
           break
         end
         pns[ bms.length + 1 .. -1 ]
       end.call
     end
-    private :resolve_tail
+    private :resolve_tail_path
 
   end
 
@@ -217,8 +279,8 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
       new -> { msg }
     end
 
-    def initialize mf
-      @message_proc = mf
+    def initialize mp
+      @message_proc = mp
     end
 
     attr_reader :message_proc

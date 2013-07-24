@@ -2,8 +2,22 @@ module Skylab::Headless
 
   module NLP
 
-    module EN
-      # forward declarations should be flattened as needed
+    en_inflector = ::Class.new( ::Module ).class_exec do
+      Headless::SubClient::EN_FUN.each do |m, f|
+        define_method m, &f
+      end
+      self
+    end
+
+    EN = en_inflector.new
+
+    module EN::Minitesimal
+    end
+
+    EN::Minitesimal.const_set :Inflector_, en_inflector
+
+    class << EN
+      alias_method :calculate, :instance_exec
     end
   end
 
@@ -79,12 +93,6 @@ module Skylab::Headless
         res
       end
     end.call
-
-    class Inflector_
-      Headless::SubClient::EN_FUN.each do |m, f|
-        define_method m, &f
-      end
-    end
 
     FUN = ::Struct.new( * o.keys ).new( * o.values ).freeze
 

@@ -100,7 +100,7 @@ module Skylab::Face::TestSupport::API::Normalize
       end
 
       it "is neat" do
-        -> do
+         -> do
           nightclub::API::invoke :weee, email: '1'
         end.should raise_error( ::ArgumentError, /email is too short/ )
         x = nightclub::API::invoke :weee, email: 'foobarbaz'

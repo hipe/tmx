@@ -65,7 +65,8 @@ module Skylab::Dependency
     def self.loud_singleton
       @loud ||= Dependency::Version::Parse.new( -> o do
         o.on_informational do |e|
-          $stderr.puts "#{ Dependency::Version }:#{ e.stream_name }: #{ e.text }"
+          fail "find me an outstream"  # #todo
+          # "#{ Dependency::Version }:#{ e.stream_name }: #{ e.text }"
         end
       end )
     end

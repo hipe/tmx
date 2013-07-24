@@ -36,13 +36,15 @@ _tests = lambda do
     self
   end
 
+  stderr = Stderr_[]
+
   assert = ->(alt, input, output) {
     alt = alt_[ alt, input ]
-    $stderr.write "#{alt.label} with a val of #{input} executes as #{output.inspect}"
+    stderr.write "#{alt.label} with a val of #{input} executes as #{output.inspect}"
     if (ret = (output == alt.execute))
-      $stderr.puts "."
+      stderr.puts "."
     else
-      $stderr.puts " .. FAILED"
+      stderr.puts " .. FAILED"
     end
     ret
   }

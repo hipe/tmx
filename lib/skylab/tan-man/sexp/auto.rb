@@ -182,7 +182,7 @@ module Skylab::TanMan
         if err
           res = err[ parser ]
         else
-          $stderr.puts "#{ self } parse failed - #{ parser.failure_reason }"
+          Stderr_[].puts "#{ self } parse failed - #{ parser.failure_reason }"
           res = false
         end
       end

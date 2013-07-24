@@ -4,6 +4,8 @@ require_relative '../test-support'
 
 module Skylab::Headless::TestSupport::IO::Upstream::Select
 
+  stderr = ::Skylab::TestSupport::Stderr_[]
+
   from_dir = Select_TestSupport.dir_pathname.join( 'visual' ).to_s
 
   Headless::Services::FileUtils.cd from_dir, verbose: true do
@@ -16,16 +18,16 @@ module Skylab::Headless::TestSupport::IO::Upstream::Select
       sin.close
 
       select.on sout do |ln|
-        $stderr.puts "SOUT:-->#{ ln.inspect }<--"
+        stderr.puts "SOUT:-->#{ ln.inspect }<--"
       end
 
       select.on serr do |ln|
-        $stderr.puts "SERR:-->#{ ln.inspect }<--"
+        stderr.puts "SERR:-->#{ ln.inspect }<--"
       end
 
       beat = 0
       select.heartbeat 0.4 do
-        $stderr.puts "(beat #{ beat += 1 })"
+        stderr.puts "(beat #{ beat += 1 })"
       end
 
       loop do

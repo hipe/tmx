@@ -34,6 +34,7 @@ module Skylab::Face
     o[:Open3] = stdlib
     o[:Porcelain] = subsys  # option parser abtract modelling
     o[:PubSub] = subsys  # engaged by the API Action API's `emit` facet.
+    o[:Set ] = stdlib
 
     define_singleton_method :const_missing do |c|
       if o.key? c
@@ -43,6 +44,8 @@ module Skylab::Face
       end
     end
   end
+
+  Some_ = -> x { x && x.length.nonzero? }
 
   module Magic_Touch_  # local metaprogramming tightener for this pattern
     # (tracked as [#046])

@@ -6,7 +6,7 @@ module Skylab::TestSupport::TestSupport::Regret::API::Actions::DocTest::Specer_
 
   include CONSTANTS
 
-  TestSupport = ::Skylab::TestSupport  # increase its visibility for below modules
+  TestSupport = ::Skylab::TestSupport
 
   extend TestSupport::Quickie
 

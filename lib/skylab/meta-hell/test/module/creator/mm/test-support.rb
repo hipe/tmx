@@ -18,7 +18,7 @@ module ::Skylab::MetaHell::TestSupport::Module::Creator::ModuleMethods
     end,
     :done_msg_f => -> name do
       -> do
-        $stderr.puts "NEVER AGAIN: #{name}"  # just a sanity check
+        Stderr_[].puts "NEVER AGAIN: #{name}"  # just a sanity check
       end
     end
   } ]

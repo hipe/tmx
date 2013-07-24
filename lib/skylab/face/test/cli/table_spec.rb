@@ -6,7 +6,7 @@ module Skylab::Face::TestSupport::CLI::Table
 
   include CONSTANTS
 
-  Face = ::Skylab::Face  # increase its visibility for below modules
+  Face = ::Skylab::Face
 
   extend TestSupport::Quickie
 

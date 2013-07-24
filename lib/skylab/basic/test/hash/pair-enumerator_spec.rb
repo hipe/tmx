@@ -6,7 +6,7 @@ module Skylab::Basic::TestSupport::Hash::Pair_Enumerator
 
   include CONSTANTS
 
-  Basic = ::Skylab::Basic  # increase its visibility for below modules
+  Basic = ::Skylab::Basic
 
   extend TestSupport::Quickie
 

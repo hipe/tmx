@@ -8,7 +8,7 @@ module Skylab::TestSupport::Regret::API
 
       def self.resolve_parts blk, y
         case blk.snippet_a.length
-        when 0 ; EMPTY_A_
+        when 0 ; MetaHell::EMPTY_A_
         when 1 ; [ build_example( blk.snippet_a.fetch( 0 ), y ) ]
         else   ; Context_::Beforer_.build_parts blk, y
         end

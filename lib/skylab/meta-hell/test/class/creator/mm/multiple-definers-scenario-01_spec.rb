@@ -34,7 +34,7 @@ module ::Skylab::MetaHell::TestSupport::Class::Creator::ModuleMethods
         let( :meta_hell_anchor_module ) { ::Module.new }
       end
 
-      FUN[:once] = -> { $stderr.puts "NOPE: scenario one is done" }
+      FUN[:once] = -> { Stderr_[].puts "NOPE: scenario one is done" }
 
     end
 

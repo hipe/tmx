@@ -33,6 +33,14 @@ module Skylab::Basic::TestSupport::Struct
           Foo.new( :bleep ).nerp.should eql( :bleep )
         end
       end
+      it "bingo" do
+        Sandbox_1.with self
+        module Sandbox_1
+          foo = Foo.new
+          foo.nerp = :dango
+          foo.nerp.should eql( :dango )
+        end
+      end
       it "django unchained" do
         Sandbox_1.with self
         module Sandbox_1

@@ -44,7 +44,7 @@ module Skylab::Headless
     end
   end
 
-  Plugin::CONST_BANG__ = -> mod, const_i, blk do
+  Plugin::Const_bang__ = -> mod, const_i, blk do
     if mod.const_defined? const_i, false
       mod.const_get const_i, false
     else
@@ -52,8 +52,8 @@ module Skylab::Headless
     end
   end
 
-  Plugin::CONST_BANG_ = -> const_i, &blk do
-    Plugin::CONST_BANG__[ self, const_i, blk ]
+  Plugin::Const_bang_ = -> const_i, &blk do
+    Plugin::Const_bang__[ self, const_i, blk ]
   end
 
   class Plugin::Metaservices__
@@ -71,7 +71,7 @@ module Skylab::Headless
       end
     end
 
-    define_singleton_method :const!, & Plugin::CONST_BANG_
+    define_singleton_method :const!, & Plugin::Const_bang_
 
     def self.emit_meta_eventpoint method_name, *a
       if const_defined? :FACET_I_A_, false
@@ -89,14 +89,17 @@ module Skylab::Headless
 
   class Plugin::Host::Metaservices_ < Plugin::Metaservices__
 
-    def self.flush host_class
-      if host_class.const_defined? :Plugin_Host_Metaservices_, false
-        self == host_class.const_get( :Plugin_Host_Metaservices_, false ) or
+    def self.flush mod
+      if mod.const_defined? :Plugin_Host_Metaservices_, false
+        self == mod.const_get( :Plugin_Host_Metaservices_, false ) or
           fail "sanity"
       else
-        host_class.const_set :Plugin_Host_Metaservices_, self
+        mod.const_set :Plugin_Host_Metaservices_, self
+        def mod.client_can_broker_plugin_metaservices
+          true
+        end
       end
-      host_class.send :include, Plugin::Host::InstanceMethods_
+      mod.send :include, Plugin::Host::InstanceMethods_
       nil
     end
 
@@ -225,6 +228,7 @@ module Skylab::Headless
     }
 
     def initialize plugin
+      @need_met_h = nil
       @plugin = plugin
     end
 
@@ -239,6 +243,15 @@ module Skylab::Headless
     end
 
     attr_reader :name_function
+
+    def need_met_notify i
+      @need_met_h ||= { }
+      @need_met_h[ i ] = true
+    end
+
+    def has_already_met_need i
+      @need_met_h && @need_met_h[ i ]
+    end
   end
 
   module Plugin::ModuleMethods_
@@ -594,6 +607,8 @@ module Skylab::Headless
       @a.each do |i|
         if has_service[ i ]
           plugin_metasvcs.absorb_metaservices_service host_metasvcs, @h.fetch(i)
+        elsif plugin_metasvcs.has_already_met_need i
+          # (we aniticipate needing this to supercede above)
         else
           ( err ||= Headless::Plugin::Metaservices_::Service_::Missing_.new ).
             host_lacks_service_for_plugin host_metasvcs, i, plugin_metasvcs

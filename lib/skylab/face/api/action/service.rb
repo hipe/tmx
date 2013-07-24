@@ -9,26 +9,39 @@ module Skylab::Face
       Services::Headless::Plugin.enhance target_mod do
         services_used( * x_a )
       end
-      target_mod.send :include, API::Action::Service::InstanceMethods
+      target_mod.send :include, API::Action::Service::Instance_Methods_
         # (we used to `prepend` the above)
       nil
     end
   end
 
-  module API::Action::Service::InstanceMethods
+  module API::Action::Service
 
-    def has_service_facet
-      true
-    end
-    # public. fulfill [#fa-027]
+    module Instance_Methods_
 
-    # `resolve_services` - a point on the api action lifecycle [#fa-018]
-    # raise on failure, undefined on success  #watch:chain
-    # this is close to where #ingestion happens.
+      def has_service_facet  # fulfill [#fa-027]
+        true
+      end
 
-    def resolve_services metasvcs_x
-      receive_plugin_attachment_notification metasvcs_x
-      nil
+      def absorb_any_services_from_parameters_notify param_h  # #hacks-only
+      end
+
+      def resolve_services metasvcs_x  # a point on the api action lifecycle
+        # [#fa-018], raise on failure, undefined on success
+        receive_plugin_attachment_notification metasvcs_x
+        nil
+      end
+
+      def absorb_services *a  # a lower-level alternative to the above
+        bx = plugin_metaservices.services_used
+        while a.length.nonzero?
+          i = a.shift ; x = a.fetch 0 ; a.shift
+          svc = bx.fetch i
+          :ivar == svc.into_i or fail "sanity - service is not ivar-based."
+          instance_variable_set svc.into_ivar, x
+        end
+        nil
+      end
     end
   end
 end

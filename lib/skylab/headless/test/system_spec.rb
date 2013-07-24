@@ -44,7 +44,7 @@ module Skylab::Headless::TestSupport::System
 
     THE_STANDARD_EDITOR_ = 'ed'.freeze
 
-    context "#{ Headless }::System.system", f:true do
+    context "#{ Headless }::System.system" do
 
       it "any_home_directory_path" do
         # #bad-test

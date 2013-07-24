@@ -9,7 +9,7 @@ module Skylab::BeautySalon
            [ :do_number_the_lines, :arity, :zero_or_one ],
            [ :file, :arity, :one ]
 
-    emits :info_line, :info, :normalization_failure_line
+    emits :info_line, :info, :normalization_failure_line_notify
 
     services [ :ostream, :ivar ] , [ :estream, :ivar ]
 
@@ -118,8 +118,8 @@ module Skylab::BeautySalon
       begin
         ::File.open @file
       rescue ::Errno::ENOENT => e
-       normalization_failure_line e.message
-       nil
+        normalization_failure_line_notify e.message
+        nil
       end
     end
 

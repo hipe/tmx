@@ -192,8 +192,8 @@ class Skylab::Basic::Field
         b
       end
 
-      def make_field x, depth
-        new x, depth
+      def make_field x_a, depth
+        new x_a, depth
       end
     end
 
@@ -246,8 +246,7 @@ class Skylab::Basic::Field
     end                                  # for both meta fields and meta meta
                                          # fields...
     def mutate inst, _scn
-      ivar = as_is_predicate_ivar
-      inst.instance_variable_set ivar, true
+      inst.instance_variable_set as_is_predicate_ivar, true
       nil
     end
 
@@ -256,20 +255,26 @@ class Skylab::Basic::Field
     end
   end
 
-  class Meta_Field_Factory_ < Field  # (we just want some of its class methods)
+  class Hook_Meta_Meta_Field_ < Binary::Field
 
-    def self.make_field( (*x_a), depth )  # we need a factory
-      idx = x_a.rindex :property
-      ( if idx && idx.nonzero? then Property::Meta_Field_
-                               else Binary::Meta_Field_
-      end ).make_field x_a, depth
+    def initialize
+      super :hook
+    end
+
+    def mutate property_metafield, scn
+      :mutate == (( i = scn.fetchs )) or fail "sanity - for now #{
+         }there is only one hookpoint - #{ i }"
+      (( p = scn.fetchs )).respond_to?( :call ) or fail "sanity - proc? #{ p }"
+      property_metafield.hook_notify :mutate, p
+      nil
     end
   end
 
-  meta_meta_field_box = Field::Box[ *
-    %i| property reflective |.
-      map { |i| Binary::Field.new( i ) }
-  ]  # (the first ever field object is created here)
+  meta_meta_field_box = Field::Box[
+    Binary::Field.new( :reflective ),  # this is the first ever Field instance
+    Binary::Field.new( :property ),
+    Hook_Meta_Meta_Field_.new
+  ]
 
   Binary::Meta_Field_ = meta_meta_field_box.produce Binary::Field
 
@@ -297,6 +302,7 @@ class Skylab::Basic::Field
           end
         end
       end
+      nil
     end
 
     def as_has_predicate
@@ -315,15 +321,44 @@ class Skylab::Basic::Field
       @value_ivar ||= :"@#{ @local_normal_name }_value"
     end
 
-    def mutate inst, _scn
-      _scn.eos? and raise "expecting a property (any value) after :property"
-      x = _scn.gets
+    def mutate inst, scn
+      scn.eos? and raise "expecting a property (any value) after :property"
+      x = scn.gets  # if scn is not eos then e.g. hook
       ivar, jvar = as_has_predicate_ivar, as_value_ivar
       inst.instance_exec do
         instance_variable_set ivar, true
         instance_variable_set jvar, x
       end
+      if has_hooks && (( p = @hook_box.fetch :mutate do end ))
+        p[ inst ]
+      end
       nil
     end
+
+    def hook_notify name_x, p
+      (( @hook_box ||= begin
+        @has_hooks = true
+        Basic::Box.new
+      end )).add name_x, p
+      nil
+    end
+
+    attr_reader :has_hooks
+  end
+
+  class Meta_Field_Factory_ < Field  # (we just want some of its class methods)
+
+    def self.make_field( (*x_a), depth )  # we need a factory
+      H_[ x_a[ 1 ] || :binary ].make_field x_a, depth
+    end
+    H_ = {
+      binary: Binary::Meta_Field_,
+      reflective: Binary::Meta_Field_,
+      property: Property::Meta_Field_
+    }
+    H_.default_proc = -> _, k do
+      raise ::KeyError, "no such meta-meta-field \"#{ k }\""
+    end
+    H_.freeze
   end
 end

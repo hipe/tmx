@@ -26,10 +26,12 @@ alts << alt[ "3 lvl split pop", -> { mod_str.split('::').last } ]
 alts << alt[ "inline regex", -> { /[^:]+\z/.match(mod_str)[0] } ]
 alts << alt[ "regex var in outer scope", -> { re.match(mod_str)[0] } ]
 
+stderr = Stderr_
+
 test_that_benchmark_blocks_are_correct = -> do
   alts.each do |a|
     s = a.proc.call
-    $stderr.puts "OK?:#{ "%30s:------->%s<-------" % [a.label, s] }"
+    stderr[].puts "OK?:#{ "%30s:------->%s<-------" % [a.label, s] }"
   end
 end
 

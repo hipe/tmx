@@ -515,6 +515,10 @@ module Skylab::Face
       end
     end
 
+    def fetch_node_documenter name_i
+      get_hot @sheet.command_tree.fetch name_i
+    end
+
     def change_command name_i  # #hacks-only
       @last_hot.change_command_notification name_i
       nil
@@ -911,7 +915,8 @@ module Skylab::Face
 
     def terminal_option_syntax  # assume @op
       a = each_option.reduce [] do |m, opt|
-        m << opt.as_shortest_full_parameter_signifier
+        x = opt.as_shortest_full_parameter_signifier or next m
+        m << x
       end
       "{#{ a * '|' }}" if a.length.nonzero?
     end
@@ -1016,7 +1021,8 @@ module Skylab::Face
     def option_syntax
       if option_parser && has_partially_visible_op
         a = each_option.reduce [] do |m, opt|
-          m << "[#{ opt.as_shortest_full_parameter_signifier }]"
+          x = opt.as_shortest_full_parameter_signifier or next m
+          m << "[#{ x }]"
         end
         a * ' ' if a.length.nonzero?
       end
@@ -1229,24 +1235,24 @@ module Skylab::Face
   #  ~ facet 4.2 - a related narrative about `anchored_last` etc ~
 
   class NS_Mechanics_                          # #re-open for facet 4.2
-    def anchored_last                        # #in-narrative
+    def anchored_last                          # #in-narrative
       last_hot_recursive.anchored_name
     end
   end
   class Command
-    def anchored_last                        # when @last_hot is command
+    def anchored_last                          # when @last_hot is command
       anchored_name
     end
     def anchored_name
       @anchored_name ||= get_anchored_name.freeze
     end
-    def get_anchored_name                    # #in-narrative
+    def get_anchored_name                      # #in-narrative
       parent_services.get_anchored_name << name.local_normal
     end
   end
   class CLI_Mechanics_                         # #re-open for facet 4.2
-    undef_method :anchored_last              # this is only ever for childs
-    def get_anchored_name                    # #in-narrative, for
+    undef_method :anchored_last                # this is only ever for childs
+    def get_anchored_name                      # #in-narrative, for
       [ ]                                      # resolving an action's name.
     end
   end
@@ -1370,7 +1376,6 @@ module Skylab::Face
     # `argument_syntax`
 
     def argument_syntax
-      # $stderr.puts "ONE FOR DIDDY #{ self.class }"
       @item_a = @item_w = false
       # CAREFUL! set in one place, read in one place
       if (( bx = @sheet.command_tree ))
@@ -1393,7 +1398,6 @@ module Skylab::Face
     Item_ = ::Struct.new :hdr, :lines
 
     def additional_help y
-      # $stderr.puts "TWO FOR DADDY #{ self.class }"
       if false != (( a = @item_a ))  # sneaky grease
         mar = self[ :margin ]  # call our own self.class::Services_
         fmt = "%#{ @item_w }s#{ mar }"
@@ -1455,6 +1459,7 @@ module Skylab::Face
     end
 
     def invite_for y, svcs
+      svcs.respond_to? :id2name and svcs = fetch_node_documenter( svcs )
       name_a = svcs.get_normal_invocation_string_parts
       if name_a.length <= 1
         first = name_a.fetch 0
@@ -1645,6 +1650,9 @@ module Skylab::Face
       private :style
     end.call
 
+    attr_reader :render_argument_syntax_as_value
+    attr_reader :additional_help_proc_value
+
   private
 
     -> do  # `highlight_header` (first seen in `process_options`)
@@ -1703,23 +1711,33 @@ module Skylab::Face
       a * ' '
     end
 
-    -> do  # `argument_syntax`
-      reqity_brackets = nil
-      define_method :argument_syntax do
-        part_a = parent_services.get_command_parameters( @sheet ).
-            reduce [] do |m, x|
-          a, z = ( reqity_brackets ||=  # narrow the focus of the dep for now
-            Services::Headless::CLI::Argument::FUN.reqity_brackets )[ x[0] ]
-          m << "#{ a }<#{ CLI::FUN.slugulate[ x[1] ] }>#{ z }"
-        end
-        part_a * ' ' if part_a.length.nonzero?
+    def argument_syntax
+      if render_argument_syntax_as_value
+        @render_argument_syntax_as_value
+      else
+        build_any_isomorphic_argument_syntax
       end
-      private :argument_syntax
+    end
 
-      CLI::FUN_[:slugulate] = -> x do
-        Services::Headless::Name::FUN.slugulate[ x ]
-      end  # (narrow focus of the dependency for now (but trivial))
+    def build_any_isomorphic_argument_syntax
+      para_a = parent_services.get_command_parameters @sheet
+      part_a = para_a.reduce [] do |m, x|
+        a, z = Requity_brackets_[ x[ 0 ] ]
+        m << "#{ a }<#{ CLI::FUN.slugulate[ x[1] ] }>#{ z }"
+      end
+      part_a * ' ' if part_a.length.nonzero?
+    end
 
+    CLI::FUN_[:slugulate] = -> x do
+      Services::Headless::Name::FUN.slugulate[ x ]
+    end  # (narrow focus of the dependency for now (but trivial))
+
+    Requity_brackets_ = -> do  # ditto
+      p = -> orr do
+        p = Services::Headless::CLI::Argument::FUN.reqity_brackets
+        p[ orr ]
+      end
+      -> x { p[ x ] }
     end.call
 
     def description_section y
@@ -1732,7 +1750,10 @@ module Skylab::Face
       nil  # ok to change to boolean
     end
 
-    def additional_help y  # (hook for child classes to exploit handily)
+    def additional_help y
+      if (( p = additional_help_proc_value ))
+        instance_exec( y, & p )
+      end
     end
 
     def additional_usage_lines  # (hook that is for now only by branch nodes.)

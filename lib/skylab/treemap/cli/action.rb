@@ -168,7 +168,7 @@ module Skylab::Treemap
     def __option_syntax_help_legacy f
       # the legacy nerk invoke straight up help..
       y = ::Enumerator::Yielder.new do |x|
-        $stderr.puts "OK NEAT:-->#{ x }<--"  # #todo
+        Stderr_[].puts "OK NEAT:-->#{ x }<--"  # #todo
       end
       help_options y
       nil

@@ -6,7 +6,7 @@ module Skylab::MetaHell::TestSupport::Boxxy
 
   include CONSTANTS
 
-  MetaHell = ::Skylab::MetaHell  # increase its visibility for below modules
+  MetaHell = ::Skylab::MetaHell
 
   extend TestSupport::Quickie
 
@@ -354,7 +354,7 @@ module Skylab::MetaHell::TestSupport::Boxxy
           ( !! Fiz.dir_pathname.to_s.match( /fiz\z/ ) ).should eql( true )
         end
       end
-      it "`get_const`", f:true do
+      it "`get_const`" do
         Sandbox_11.with self
         module Sandbox_11
           DSL_.get_const( :ZIP ).should eql( :zap )
@@ -362,7 +362,7 @@ module Skylab::MetaHell::TestSupport::Boxxy
           module Zangief ; end
           -> do
             DSL_.get_const( :Zangief )
-          end.should raise_error( ::LoadError,
+          end.should raise_error( LoadError,
                        ::Regexp.new( "\\Auninitialized\\ consta" ) )
         end
       end

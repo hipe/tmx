@@ -90,7 +90,7 @@ module Skylab::Cull
       nil
     end
 
-    def on_normalization_failure_line e
+    def on_normalization_failure_line_notify e
       @y << "#{ last_invocation_string }: #{ e.payload_a.fetch 0 }"
       nil
     end

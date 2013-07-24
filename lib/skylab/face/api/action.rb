@@ -21,24 +21,25 @@ module Skylab::Face
     #                     \         as this API knows). is is probably right
     #                      \        after a call to `new`     [#fa-016]
     #                       \
-    #                        o->  `handle_events`             [#fa-017]
+    #                        o->   expression/event wiring    [#fa-017]
     #                         /
-    #     [wired]      <-----o      things subscribe to listen to its events:
-    #                  -o           now it has some @event_listeners.
+    #                        /      resolves how to express itself: any
+    #     [wired]      <---o        listeners subscribe to its events, and/or
+    #                  -o           it gets an expression agent set.
     #                    \
     #                     o--->   `resolve_services`          [#fa-018]
     #                        /
-    #     [plugged-in]  <---o       now it is has resolved fulfillment
-    #                   -o          strategies for the services it uses,
+    #     [plugged-in]  <---o       it resolves fulfillment strategies for
+    #                   -o          the services it declared as using, e.g
     #                     \         implemented by the [hl] plugin susbsystem.
     #                      \
     #                       o-->  `normalize`                 [#fa-019]
     #                         /
-    #     [executable]  <----o       now basic normalization has been done
-    #                   -o           with parameters, that is, everything that
-    #                     \          can reasonably be done "declaratively"
-    #                      \         (think DSL) instead of imperatively.
-    #                       \        arbitrary business ivars set now.
+    #     [executable]  <----o       with its formal and/or actual parameters,
+    #                   -o           with all its field-level assertions of
+    #                     \          correctness that can be represented
+    #                      \         declaratively (think DSL), assert them
+    #                       \        now, result is soft failure or ivars.
     #                        \
     #                         o-> `execute`                   [#fa-020]
     #                          /
@@ -64,6 +65,8 @@ module Skylab::Face
     # implementing an `initialize` here, wanting to leave that wide open for
     # the client, which we will one day document at [#fa-016].
     # there will be no "section 5" because that is for you to write.
+    #
+    # [1] - and/or it get an expression agent set
 
     #                       ~ events (section 2) ~
 
@@ -88,6 +91,19 @@ module Skylab::Face
       API::Action::Emit[ self, :emits, a, b ]
     end
 
+    def set_expression_agent x
+      did = false
+      @expression_agent ||= begin ; did = true ; x end
+      did or fail "sanity - expression agent is write once."
+      nil
+    end
+
+    def some_expression_agent
+      @expression_agent or fail "sanity - expression agent was not set #{
+        }set for this intance of #{ self.class }"
+    end
+    private :some_expression_agent
+
     #                      ~ services (section 3) ~
 
     def has_service_facet  # fullfil [#fa-027].
@@ -104,76 +120,91 @@ module Skylab::Face
       false
     end
 
-    o = { }
+    Normalize_ = -> y, par_h do
 
-    # `normalize` - documented in sibling file `client.rb` [#fa-019].
-    #
-    # beyond that:
-    #   + we mutate `param_h`
+      # mutates par_h. see client.rb [#fa-019]. [#bs-013] this func wants
+      # to be a method, but we let it stay funcy for one hack for now..
+      # this is a bit like [#sl-116] the one true algorithm.
 
-    o[:normalize] = -> y, param_h do
-      bork = -> msg do
-        y << msg
-        false
-      end
-      a = [ ]  # ( break down as needed )
-      a << -> par_h do
-        miss_a = nil
-        field_box.each do |nn, fld|
-          instance_variable_defined? fld.as_host_ivar and fail "sanity - #{
-            } ivar collision: #{ fld.as_host_ivar }"
-          vx = ( par_h.delete nn if par_h and par_h.key? nn )  # watch `vx`!
-          instance_variable_set fld.as_host_ivar, vx           # it is used
-          if fld.has_normalizer || fld.has_default             # for three
-            vx = field_normalize y, fld, vx                    # different
-          end                                                  # axes! [#034]
-          ( miss_a ||= [] ) << fld if fld.is_required and vx.nil?
+      miss_a = nil ; r = false ; before = y.count
+      field_box.each do |i, fld|
+        x = ( par_h.delete i if par_h and par_h.key? i )
+        accept_field_value fld, x
+        if fld.has_normalizer || fld.has_default  # yes after
+          x = field_normalize y, fld, x
         end
-
-        par_h and par_h.length.nonzero? and break bork[ "undeclared #{
-          }parameter(s) - (#{ par_h.keys * ', ' }) for #{ self.class }. #{
-          }(declare it/them with `params` macro?)" ]
-        miss_a and break bork[ "missing required parameter(s) - (#{
-          }#{ miss_a.map( & :local_normal_name ) * ', ' }) #{
-          }for #{ self.class }." ]
-        true
+        fld.is_required && x.nil? and ( miss_a ||= [] ) << fld
       end
+      begin
+        Some_[ par_h ] and break( y << "undeclared #{
+          }parameter(s) - (#{ par_h.keys * ', ' }) for #{ self.class }. #{
+          }(declare it/them with `params` macro?)" )
+        miss_a and break( y << "missing required parameter(s) - (#{
+          }#{ miss_a.map( & :local_normal_name ) * ', ' }) #{
+          }for #{ self.class }." )
+        y.count > before and break
+        r = true
+      end while nil
+      r
+    end
 
-      a.reduce param_h do |x, f|
-        instance_exec x, & f or break
-      end  # call each function in order, but if ever a function's result is
-      # falseish we break out of the loop. each function's (non-false-ish,
-      # then) result becomes the argument passed to each next fuction's call.
+    # (predecessor to the function chain was removed with this line #posterity)
 
+    define_method :normalize, & Normalize_
+
+  private
+
+    def field_box
+      EMPTY_FIELD_BOX_
+    end
+    EMPTY_FIELD_BOX_ = Services::Basic::Field::Box.new.freeze
+
+    def accept_field_value fld, x
+      ivar = fld.as_host_ivar
+      instance_variable_defined? ivar and !
+        instance_variable_get( ivar ).nil? and
+          fail "sanity - ivar collision: #{ ivar }"
+      instance_variable_set ivar, x
       nil
     end
 
-    define_method :normalize, & o[:normalize]  # public.
+    def field_normalize y, fld, x  # result per [#034]
 
-    -> do  # `field_box`          # here because it goes with normalize above.
-      empty_field_box = Services::Basic::Field::Box.new.freeze
-      define_method :field_box do empty_field_box end
-      private :field_box
-    end.call
+      # any notices/errors written to `y`.
+      # `x` is the input value and then result value of field `fld`.
 
-    # `field_normalize` - result per [#034]
+      ivar = fld.as_host_ivar
 
-    def field_normalize y, fld, vx
-      if fld.has_default && vx.nil?
-        vx = instance_variable_set fld.as_host_ivar,
-          instance_exec( & fld.default_value )
-      end
+      fld.has_default && x.nil? and
+        x = instance_variable_set( ivar,
+          instance_exec( & fld.default_value ) )  # always a proc
+
       if fld.has_normalizer
-        true == ( n_x = fld.normalizer_value ) and n_x =
-          method( :"normalize_#{ fld.local_normal_name }" )  # #todo cleanup
-        vx = instance_exec y, vx, -> good_val do
-          instance_variable_set fld.as_host_ivar, good_val
+        true == (( p = fld.normalizer_value )) and
+          p = method( :"normalize_#{ fld.local_normal_name }" )
+
+        x = instance_exec y, x, -> normalized_x do
+          instance_variable_set ivar, normalized_x
           nil
-        end, & n_x
+        end, & p
       end
-      vx
+
+      x  # the system wants to know the particular nil-ish-ness of x
     end
-    private :field_normalize
+
+  public
+
+    def absorb_params_using_message_yielder y, *a
+      yy = Services::Basic::Yielder::Counting.new( & y.method( :<< ) )
+      bx = field_box
+      while a.length.nonzero?
+        i = a.shift ; x = a.fetch 0 ; a.shift
+        fld = bx.fetch i
+        accept_field_value fld, x
+        fld.has_normalizer and field_normalize yy, fld, x
+      end
+      yy.count.zero?
+    end
 
     # `self.params` - rabbit hole .. er "facet" [#fa-013]
     # placed here because it fits in semantically with the `normalize`
@@ -207,7 +238,5 @@ module Skylab::Face
     Magic_Touch_.enhance -> { API::Action::Metastory.touch },
       [ self, :singleton, :public, :metastory ]
 
-
-    FUN = ::Struct.new( * o.keys ).new( * o.values )
   end
 end

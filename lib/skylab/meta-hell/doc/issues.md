@@ -1,3 +1,5 @@
+[#043]       #boxxy the stemmy tree issue - try autoloading the value corresp.
+               to the path "headless/nlp/en/levenshtein-.rb"
 [#042]       #doc-point introducting tagged argument lists ..
 [#041]       #autoloading: ghost modules explained..
 [#040]       #autoloading: convenient to have `const_missing` result in value

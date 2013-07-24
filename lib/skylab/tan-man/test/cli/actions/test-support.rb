@@ -16,7 +16,7 @@ module Skylab::TanMan::TestSupport::CLI::Actions
     def cd pathname, &block
       fu = Headless::IO::FU.new -> msg do
         if do_debug
-          $stderr.puts "    (tanmun vreeboze: #{ msg })"
+          Stderr_[].puts "    (tanmun vreeboze: #{ msg })"
         end
       end
       fu.cd pathname, &block
@@ -60,7 +60,7 @@ module Skylab::TanMan::TestSupport::CLI::Actions
         lines.each do |line|
           fh.puts line
           if do_debug
-            $stderr.puts "local-conf.d/config: #{ line }"
+            Stderr_[].puts "local-conf.d/config: #{ line }"
           end
         end
       end
