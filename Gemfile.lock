@@ -39,6 +39,7 @@ GEM
     json (1.7.7)
     jwt (0.1.8)
       multi_json (>= 1.5)
+    levenshtein (0.2.2)
     multi_json (1.7.2)
     multi_xml (0.5.3)
     multipart-post (1.2.0)
@@ -79,6 +80,7 @@ DEPENDENCIES
   adsf
   debugger
   jeweler!
+  levenshtein
   ncurses-ruby
   rake
   rspec

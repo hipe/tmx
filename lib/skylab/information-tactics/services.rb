@@ -2,8 +2,9 @@ module Skylab::InformationTactics
 
   module Services
 
-    stdlib = ::Skylab::Subsystem::FUN.require_stdlib
+    stdlib, gemlib = FUN.at :require_stdlib, :require_gemlib
     o = { }
+    o[:Levenshtein] = gemlib
     o[:Time] = stdlib
 
     define_singleton_method :const_missing do |const_i|

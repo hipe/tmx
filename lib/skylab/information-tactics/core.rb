@@ -3,8 +3,11 @@ require 'skylab/meta-hell/core'
 
 module Skylab::InformationTactics
 
-  MetaHell = ::Skylab::MetaHell
+  ::Skylab::MetaHell::FUN.import[ self, ::Skylab,
+    %i| MetaHell InformationTactics | ]
 
   MetaHell::MAARS[ self ]
+
+  ::Skylab::Subsystem[ self ]
 
 end

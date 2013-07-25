@@ -8,27 +8,28 @@ group :development do
                  ref: 'be5ddc35db350e2f0180f165a3129e2833a93072'
                  # #todo - watch / contribute to above effort
 
-  #  for testing, universe-wide (necessary for more than one sub-product)
+  #  for testing, universe-wide (necessary for many subsystems)
   gem 'rspec'
   gem 'debugger'
 
 
-  #  auxiliary requirements for auxiliary scripts, by script -
-
-  # script/simplecov
+  #  needed (possibly non-essentially) by subsystems and common libraries:
 
   gem 'simplecov', require: false, group: :test
-
-
-  #  by subproduct -
-
-  #  `dependency` (for testing only)
+    #  [ts] (test-runner, regret, quickie-recursive-runner)
   gem 'adsf'
+    #  [ts] (the static file server)
 
-  #  `face` ( <- `xargs-ish-i` )
   gem 'ncurses-ruby'
+    #  [fa] (in turn used by `xargs-ish-i`, 'sub-tree cov')
 
-  #  `tan-man`
+  gem 'levenshtein'
+    #  [hl]
+
+
+  #  needed by subproducts:
+
   gem 'treetop'
+    #  [ta]
 
 end
