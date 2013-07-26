@@ -165,6 +165,7 @@ module Skylab::MetaHell
   x[:parse_series]                     = [ :Parse, :Series ]
   x[:parse_from_set]                   = [ :Parse, :From_Set ]
   x[:parse_from_ordered_set]           = [ :Parse, :From_Ordered_Set ]
+  x[:parse_alternation]                = [ :Parse, :Alternation_ ]
 
   x[:fields]                           = [ :Fields_ ]
 

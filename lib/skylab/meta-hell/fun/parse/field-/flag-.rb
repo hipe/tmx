@@ -63,8 +63,8 @@ module Skylab::MetaHell
 
       def head_fuzzy_matches argv
         if argv.length.nonzero?
-          @fuzzy ||= Parse::Fuzzy_Matcher_[
-            moniker, self.class.const_get( :FUZZY_MIN_, false ) ]
+          @fuzzy ||= Parse::Fuzzy_matcher_[
+            self.class.const_get( :FUZZY_MIN_, false ), moniker ]
           @fuzzy[ argv.fetch 0 ]
         end
       end

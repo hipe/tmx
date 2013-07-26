@@ -58,11 +58,32 @@ module Skylab::MetaHell
 
     class Parse_
       def initialize input_a
-        @abstract_field_list = @call_p = @syntax = nil
-        @exhaustion_p = nil
+        @abstract_field_list = @do_glob_extra_args = @exhaustion_p =
+          @syntax = nil
+        @state_mutex = MetaHell::Services::Basic::Mutex.new :state_mutex
+          # state encompasses input and output. various algorithms may handle
+          # input and output together or separately, but we ensure that etc.
         absorb( * input_a )
       end
-      private :initialize  # because [#038]
+      protected :initialize  # #protected-not-private because [#038]
+    protected
+      def base_args
+        [ @algorithm_p, @exhaustion_p, @abstract_field_list,
+          @curry_queue_a, @call_p, @syntax, @state_mutex, @do_glob_extra_args ]
+      end
+      def base_init algo_p, exhaus_p, afl, cqa, calp, syn, state_mutex, dgxa
+        @algorithm_p = algo_p
+        @exhaustion_p = exhaus_p
+        @abstract_field_list = afl
+        @curry_queue_a = ( cqa.dup if cqa )  # LOOK
+        @call_p = calp
+        @syntax = syn
+        @field = nil
+        @state_mutex = state_mutex.dupe
+        @do_glob_extra_args = dgxa
+        nil
+      end
+    public
       def get_conduit
         @conduit ||= Conduit_.new self
       end
@@ -118,21 +139,7 @@ module Skylab::MetaHell
       def _field_a
         @abstract_field_list._field_a
       end
-    private
-      def base_args
-        [ @algorithm_p, @exhaustion_p, @abstract_field_list,
-          @curry_queue_a, @call_p, @syntax ]
-      end
-      def base_init algo_p, exhaus_p, afl, cqa, calp, syn
-        @algorithm_p = algo_p
-        @exhaustion_p = exhaus_p
-        @abstract_field_list = afl
-        @curry_queue_a = ( cqa.dup if cqa )  # LOOK
-        @call_p = calp
-        @syntax = syn
-        @field = nil
-        nil
-      end
+    protected  # #protected-not-private because of [#038] hack
       def set_abstract_field_list class_i, a
         # this just clobbers whatever is there without warning (which
         # presumably is acceptable behavior, to e.g a currying user).
@@ -152,21 +159,28 @@ module Skylab::MetaHell
       def absorb_along_curry_queue *a
         cq = @curry_queue_a
         if cq.length < a.length
-          raise ::ArgumentError, "too many arguments (#{ a.length } for #{
-            }#{ cq.length } ((#{ a.map( & :class ) }) for (#{
-            }#{ @curry_queue_a * ', ' }))"
+          @do_glob_extra_args or raise ::ArgumentError, say_too_many( cq, a )
+          a[ cq.length - 1 .. -1 ] = [ a[ cq.length - 1 .. -1 ] ]
+            # starting from the spot on `a` that is the last "OK" spot, turn
+            # that spot into an array of the remaining elements of `a`,
+            # including that spot.
         end
         aa = [ ]
-        while a.length.nonzero?
+        a.length.times do
           aa << cq.shift << a.shift
         end
         absorb( *aa )
         nil
       end
+      def say_too_many cq, a
+        "too many arguments (#{ a.length } for #{ cq.length } #{
+        }((#{ a.map( & :class ) }) for (#{ @curry_queue_a * ', ' }))"
+      end
       define_method :absorb, & Absorb_
       def execute
-        instance_variable_defined? :@argv_a or fail 'where'
-        @algorithm_p[ self, @argv_a ]
+        @state_mutex.is_held or fail "sanity - there is no e.g `parse_a` or #{
+          }or `state_x_a` to pass to the algorithm"
+        @algorithm_p[ self, @state_x ]
       end
       def remove_from_curry_queue * i_a  # [#bm-001]
         found = @curry_queue_a & i_a
@@ -224,6 +238,10 @@ module Skylab::MetaHell
         @call_p = a.fetch 0 ; a.shift
         nil
       end
+      def glob_extra_args _
+        @do_glob_extra_args = true
+        nil
+      end
       def token_matchers a
         set_abstract_field_list :Token_Matcher_, ( a.fetch 0 )
         a.shift
@@ -245,7 +263,13 @@ module Skylab::MetaHell
         nil
       end
       def argv a
-        @argv_a = a.fetch 0 ; a.shift
+        @state_mutex.hold :argv
+        @state_x = a.fetch 0 ; a.shift
+        nil
+      end
+      def state_x_a a
+        @state_mutex.hold :state_x_a
+        @state_x = a.fetch 0 ; a.shift
         nil
       end
       def syntax a

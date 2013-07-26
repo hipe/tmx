@@ -120,7 +120,7 @@ module Skylab::Git
         resolve_move_request_from_integers d_a
       end
     end
-    Match_ = MetaHell::FUN::Parse::Fuzzy_Matcher_[ EL_, 1 ]  # fuzzy match 'e'
+    Match_ = MetaHell::FUN::Parse::Fuzzy_matcher_[ 1, EL_ ]  # fuzzy match 'e'
 
     def get_parsed_contiguous_integers argv
       a = [ ]

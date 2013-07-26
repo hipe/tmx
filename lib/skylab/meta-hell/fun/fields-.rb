@@ -2,24 +2,40 @@ module Skylab::MetaHell
 
   module FUN::Fields_
 
-    Metafields_ = ::Struct.new :client, :method, :field_i_a, :do_super,
-                                 :scan_method
+    Metafields_ = ::Struct.new :client, :method, :scan_method,
+      :do_super, :struct_like, :field_i_a
 
-    op_h = ::Hash[ Metafields_.members.map do |i|
-      [ i, -> o, a do
-        o[ i ] = a.shift
-        nil
-      end ]
-    end ].freeze
+    arg = -> o, i, a do
+      o[ i ] = a.fetch 0 ; a.shift ; nil
+    end
 
-    fields = -> * i_a do
+    flag = -> o, i, _ do
+      o[ i ] = true ; nil
+    end
+
+    arg_h = {
+      client: arg,
+      method: arg,
+      scan_method: arg,
+      do_super: flag,
+      struct_like: flag,
+      field_i_a: arg }.freeze
+
+    fields = -> * a do
       o = Metafields_.new
-      op_h.fetch( i_a.shift )[ o, i_a ] while i_a.length.nonzero?
-      mod, method_i, field_i_a, do_super, scan_method_i = o.to_a
+      while a.length.nonzero?
+        ii = a.shift
+        arg_h.fetch( ii )[ o, ii, a ]
+      end
+      mod = o.client
       mod.const_set :BASIC_FIELDS_H_,
-        ::Hash[ field_i_a.map { |i| [ i, :"@#{ i }" ] } ].freeze
-      method_i &&  Define_method_[ mod, method_i, do_super ]
-      scan_method_i && Define_scan_method_[ mod, scan_method_i ]
+        ::Hash[ o.field_i_a.map { |i| [ i, :"@#{ i }" ] } ].freeze
+      if o.struct_like
+        o.method ||= :initialize
+        Define_struct_like_methods_[ mod, o.field_i_a ]
+      end
+      o.method && Define_method_[ mod, o.method, o.do_super ]
+      o.scan_method && Define_scan_method_[ mod, o.scan_method ]
       nil
     end
     define_singleton_method :[], &fields
@@ -30,7 +46,7 @@ module Skylab::MetaHell
       fields[ :client, mod,
               :method, :initialize,
               :field_i_a, field_i_a,
-              :do_super, true ]
+              :do_super ]
       nil
     end
 
@@ -45,6 +61,19 @@ module Skylab::MetaHell
         Nil_out_the_rest_[ h, self, i_a ]
         super() if do_super  # imagine prepend, imagine block given
         nil
+      end
+      nil
+    end
+
+    Define_struct_like_methods_ = -> mod, field_i_a do
+      field_i_a.freeze  # we take what is not ours
+      mod.class_exec do
+        const_set :BASIC_FIELD_A_, field_i_a
+        class << self
+          alias_method :[], :new  # if you aren't using `initialize` then ??
+        end
+        def members ; self.class::BASIC_FIELD_A_ end
+        attr_accessor( * field_i_a )
       end
       nil
     end

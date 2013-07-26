@@ -23,11 +23,13 @@ module Skylab::MetaHell
       hsh
     end
 
-    Fuzzy_Matcher_ = -> moniker, min do
+    Fuzzy_matcher_ = -> min, moniker do
+      min ||= 1
       len = moniker.length
+      use_min = len >= min
       -> tok do
         (( tlen = tok.length )) > len and break
-        tlen < min && len >= min and break
+        use_min && tlen < min and break
         moniker[ 0, tlen ] == tok
       end
     end
