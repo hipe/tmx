@@ -145,7 +145,7 @@ module ::Skylab::CodeMolester
       len = str.length
       len == 0 and return 0 # don't create empty files (for now)
       str =~ /\n\Z/ or str = "#{str}\n" # add newline to end of file if necessary
-      pathname.open 'w+' do |fh|
+      pathname.open WRITEMODE_ do |fh|
         fh.write str
         bytes = len
       end

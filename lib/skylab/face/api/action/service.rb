@@ -26,6 +26,16 @@ module Skylab::Face
       def absorb_any_services_from_parameters_notify param_h  # #hacks-only
       end
 
+      def accept_value_as_service value_x, service_i  # used e.g to allow
+        # for resources to be passed in as params (super low-level API's)
+        pms = plugin_metaservices
+        ivar = pms.services_used.fetch( service_i ).into_ivar
+        plugin_metaservices.need_met_notify service_i
+        instance_variable_set ivar, value_x
+        nil
+      end
+      private :accept_value_as_service
+
       def resolve_services metasvcs_x  # a point on the api action lifecycle
         # [#fa-018], raise on failure, undefined on success
         receive_plugin_attachment_notification metasvcs_x

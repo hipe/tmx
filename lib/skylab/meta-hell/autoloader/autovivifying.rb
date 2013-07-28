@@ -12,6 +12,11 @@ module Skylab::MetaHell
 
   class Autoloader::Autovivifying::Tug < Autoloader::Tug
 
+    def initialize( * )
+      super
+      @autovivify_proc = nil
+    end
+
     def self.enhance x
       tug_class = self
       x.instance_exec do
@@ -19,6 +24,10 @@ module Skylab::MetaHell
       end
       nil
     end
+
+    attr_reader :mod_dir_pathname
+
+    attr_writer :autovivify_proc
 
     def probably_loadable?
       super or @mod.has_stowaways && has_stowaway_resolver or
@@ -35,15 +44,17 @@ module Skylab::MetaHell
       elsif leaf_pathname.exist?
         super
       elsif branch_pathname.exist?
-        @mod.const_set @const, build_autovivified_module
+        if @autovivify_proc
+          @autovivify_proc.call
+        else
+          @mod.const_set @const, build_autovivified_module
+        end
       else
         raise ::LoadError, "uninitialized constant #{ @mod }::#{ @const } #{
           }and no such directory [file] to autoload -- #{
           }#{ pth @branch_pathname }[#{ Autoloader::EXTNAME }]"
       end
     end
-
-  private
 
     def build_autovivified_module
       bpn = branch_pathname ; tug_class = self.class
@@ -54,6 +65,8 @@ module Skylab::MetaHell
         self
       end
     end
+
+  private
 
     def pth pathname
       pathname.relative_path_from ::Skylab.dir_pathname

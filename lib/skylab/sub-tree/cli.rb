@@ -58,29 +58,74 @@ module Skylab::SubTree
     argument_syntax '<in-dir> <out-dir> <list>'
 
     def st in_dir, out_dir, list, param_h
+      ensure_three_streams
       SubTree::API::Actions::Sub_Tree.new( :err, @infostream,
         :is_dry_run, false, :do_force, param_h[:do_force],
         :in_dir, in_dir, :out_dir, out_dir, :list, list ).execute
     end
 
-    p = -> do
-      SubTree::API::Actions::Dirstat.get_desc
+    option_parser do |o|
+      pn = -> { @program_name }
+      clr = -> x { hdr x }
+
+      o.separator "#{ hdr 'stdin usage:' }"
+      o.separator "   or: <git-command> | #{ pn[] } <prefix>"
+      o.separator ''
+      o.separator "#{ hdr 'typical usage:' }"
+      o.separator "    #{ clr[ "git diff --numstat HEAD~1 | #{ pn[] } lib/skylab" ] }"
+      o.separator ''
+      o.separator "#{ hdr 'options:' }"
+
+      o.on '-- HEAD[~N]', 'will become `git diff HEAD~<n> --numstat' do |x|
+        old = @param_h[ :mode_a ]
+        @param_h[ :mode_a ] = [ :git_diff, x ]
+        old and emit( :error, "(clobbering \"#{ old.last }\")" )
+      end
+
     end
 
-    p.singleton_class.send :alias_method, :to_s, :call
-
-    desc p
+    desc( -> do
+      p = -> do
+        SubTree::API::Actions::Dirstat.get_desc
+      end
+      p.singleton_class.send :alias_method, :to_s, :call
+      p
+    end.call )
 
     argument_syntax '<prefix> [<file>]'
 
-    def dirstat prefix, file=nil
-      argv = [ prefix ]
-      file and argv.push file
-      SubTree::API::Actions::Dirstat.new(
-        :sin, @instream, :sout, @paystream, :serr, @infostream, :argv, argv,
-        :program_name, @legacy_last_hot.send( :normalized_invocation_string ) ).
-          execute
+    def dirstat prefix, file=nil, _par_h
+      a = parse_dirstat( prefix, file ) and execute_dirstat a
     end
+
+  private
+
+    def parse_dirstat prefix, file
+      ensure_three_streams
+      @param_h[ :prefix ] = prefix
+      if file && (( x = @param_h[ :mode_a ] ))
+        bork "can't have both <file> and \"#{ x.last }\""
+      else
+        file and @param_h[ :mode_a ] = [ :file, file ]
+        @param_h.reduce( [] ) { |m, (k, v)| m << k << v }
+      end
+    end
+
+    def execute_dirstat a
+      SubTree::API::Actions::Dirstat.new(
+        :sin, @instream, :sout, @paystream, :serr, @infostream,
+        :program_name, @legacy_last_hot.send( :normalized_invocation_string ),
+        * a
+      ).execute
+    end
+
+    def bork msg
+      emit :error, msg
+      invite
+      nil
+    end
+
+  public
 
     desc "see crude unit test coverage with a left-right-middle filetree diff"
     desc "  * test files with corresponding application files appear as green."

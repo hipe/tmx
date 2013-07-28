@@ -1024,6 +1024,7 @@ module Skylab::Porcelain::Legacy
           if info  # (may have intentionally passed nil)
             on_info( on_error do |e| info.puts e.text end )
           end
+          @three_streams_p = -> { [ up, pay, info ] }
         else
           @instream, @paystream, @infostream = up, pay, info
         end
@@ -1061,6 +1062,14 @@ module Skylab::Porcelain::Legacy
     attr_reader :infostream, :paystream  # for sub-cliented cliented, as above
 
   private
+
+    def ensure_three_streams
+      i, o, e = @three_streams_p[]
+      @instream ||= i
+      @paystream ||= o
+      @infostream ||= e
+      nil
+    end
 
     # non-pub-sub variant of `emit` gets "turned on" elsewhere
 

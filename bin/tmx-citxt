@@ -7,6 +7,8 @@ end
 
 module Skylab::CI_Txt
 
+  WRITEMODE_ = 'w'.freeze
+
   module CLI
   end
 
@@ -134,7 +136,7 @@ module Skylab::CI_Txt
         if @is_dry_run
           bytes = 0
         else
-          pathname.open( 'w+' ) do |fh|
+          pathname.open( WRITEMODE_ ) do |fh|
             bytes = fh.write "#{ first_line }\n\n  + " # etc
           end
         end

@@ -145,7 +145,7 @@ module Skylab::Snag
       end
 
       def flush_lines flush_p
-        ( @is_dry_run ? DEV_NULL_ : @tmpnew ).open WP_ do |fh|
+        ( @is_dry_run ? DEV_NULL_ : @tmpnew ).open WRITEMODE_ do |fh|
           @write_line_p = Build_context_sensitive_line_writer_[ fh ]
           flush_p[]
         end
@@ -160,7 +160,7 @@ module Skylab::Snag
       end
 
       DEV_NULL_ = Headless::IO::DRY_STUB
-      WP_ = Headless::IO::Dry_Stub_::WRITE_PLUS_
+      WRITEMODE_ = Headless::WRITEMODE_
 
     end
   end

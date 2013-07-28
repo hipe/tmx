@@ -39,10 +39,11 @@ module Hipe
       def finalize
         current_json = JSON.pretty_generate(self)
         if current_json != @before_json
-          File.open(@path, 'w+'){|fh| fh.write(current_json)}
+          File.open( @path, WRITEMODE_ ){ |fh| fh.write current_json }
           puts("wrote session data to #{@path}")
         end
       end
+      WRITEMODE_ = Headless::WRITEMODE_
     end
   end
 end

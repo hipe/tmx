@@ -10,7 +10,8 @@ module Skylab::SubTree
 
     end
 
-    Money_ = -> sin, sout, serr, argv, program_name do
+    Money_ = -> sin, sout, serr, program_name, prefix, mode_a do
+
     # lose 2
 
   no = 1 ; yes = 0  # exit statii
@@ -22,41 +23,43 @@ module Skylab::SubTree
     nil
   end
 
-  clr = sin.tty? ? ( -> s do "\e[32m#{ s }\e[0m" end ) : -> s { s }
+  # _clr = sin.tty? ? ( -> s do "\e[32m#{ s }\e[0m" end ) : -> s { s }
 
-  invite = -> msg do
+  bork = -> msg do
     y << msg
     y << "see '#{ pn[] } --help'"
-    [ false, no ]
+    false
   end
 
-  help = -> do
-    y << "usage: #{ pn[] } <prefix> <file>"
-    y << "   or: <git-command> | #{ pn[] } <prefix>"
-    y << ''
-    y << "typical usage:"
-    y << "    #{ clr[ "git diff --numstat HEAD~1 | #{ pn[] } lib/skylab" ] }"
-    [ false, yes ]
-  end
+  mode_a ||= [ :stdin ]
 
-  prefix, instream = -> do  # resolve these or do standard ui things
-    case argv.length
-    when 0
-      break invite[ "missing argument: <prefix>" ]
-    when 1
-      /\A-(?:h|-help)\z/ =~ argv.fetch( 0 ) and break help[]
-      sin.tty? and break invite[ "when no <file> argument provided, #{
-        }expecting input from non-interactive terminal (pipe)." ]
-      [ argv.fetch( 0 ), sin ]
-    when 2
-      sin.tty? or break invite[ "when <file> provided, must be run from #{
+  instream = -> i, x=nil do
+    case i
+    when :stdin
+      sin.tty? and break bork[ "when no <file> argument provided, #{
+        }expecting input from non-interactive terminal (pipe) #{
+        }or -- arg" ]
+      sin
+    when :file
+      sin.tty? or break bork[ "when <file> provided, must be run from #{
         }interactive terminal." ]
-      [ argv.fetch( 0 ), ::File.open( argv.fetch( 1 ), 'r' ) ]
+      ::File.open( file, 'r' )
+    when :git_diff
+      /\AHEAD(:?~(\d+))?\z/ =~ x or break bork[ "expecting HEAD[~<n>]#{
+        }, had #{ x.inspect }" ]
+      $~[1] or x = "HEAD~1"  # meh
+      cmd = "git diff --numstat #{ x }"
+      _, o, e, w = SubTree::Services::Open3.popen3 cmd
+      es = w.value.exitstatus ; 0 == es or break bork[ "got exitstatus #{
+        }#{ es } from command - #{ cmd }" ]
+      err_s = e.read
+      err_s.length.nonzero? and break bork[ "unexpected - #{ err_s }" ]
+      o
     else
-      invite[ "too many arguments (#{ argv.length }) - expecting 1..2" ]
+      fail "sanity - #{ i }?"
     end
-  end.call
-  prefix or break instream  # abuse - result was a standard result tuple.
+  end.call( * mode_a )
+  instream or break no  # abuse - result was a standard result tuple.
 
   in_rx = /\A(\d+)\t(\d+)\t(.+)\n?\z/
 
@@ -159,7 +162,9 @@ module Skylab::SubTree
     MetaHell::FUN.fields[ self, * Money_.parameters.map( & :last ) ]
 
     def execute
-      Money_[ @sin, @sout, @serr, @argv, @program_name ]
+
+      Money_[ @sin, @sout, @serr, @program_name, @prefix, @mode_a ]
+
     end
   end
 end

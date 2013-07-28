@@ -5,10 +5,10 @@ module Skylab::Headless
     class Dry_Stub_  # getting a good dry run
 
       def open mode
-        WRITE_PLUS_ == mode or fail "sanity"
+        WRITEMODE_ == mode or
+          fail "sanity - expected #{ WRITEMODE_ } had #{ mode }"
         yield self
       end
-      WRITE_PLUS_ = 'w+'.freeze
 
       def puts *a
       end

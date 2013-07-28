@@ -15,6 +15,7 @@ module Skylab
     MetaHell::MAARS[ self ]
 
     CUSTOM_PARSE_TREE_METHOD_NAME_ = :tree
+    WRITEMODE_ = Headless::WRITEMODE_
 
   end
 

@@ -42,7 +42,7 @@ module Skylab::TestSupport::Regret::API
     #     ( stat.ctime == ctime1 )  # => false
     #       # but the ctimes should be different
     #
-    # (if that worked, that's just ridculous. to see that this is working,
+    # (if that worked, that's just ridiculous. to see that this is working,
     # add e.g a blank like to the generated test file and re-run it again.
     # it should fail only the first time it is re-run. see [#ts-015])
 
@@ -59,8 +59,8 @@ module Skylab::TestSupport::Regret::API
 
     def absorb_any_services_from_parameters_notify param_h
       if (( outpath_x = param_h.delete :output_path ))
-        plugin_metaservices.need_met_notify :out
-        @out = ::File.open "#{ outpath_x }", 'w+'
+        fh = ::File.open "#{ outpath_x }", WRITEMODE_
+        accept_value_as_service fh, :out
       end
     end
 

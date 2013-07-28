@@ -13,6 +13,8 @@ exit_status = 0
 
 -> do  # meh
 
+  writemode = 'w'.freeze
+
   stay = true
 
   y = kbd = program_name = nil
@@ -112,7 +114,7 @@ exit_status = 0
         break bork[]
       end
 
-      ptch_fh = ptch_pn.open 'w+'
+      ptch_fh = ptch_pn.open writemode
       cnt = 0
       begin
         ptch_fh.write line
