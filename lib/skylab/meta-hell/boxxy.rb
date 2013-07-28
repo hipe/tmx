@@ -90,13 +90,31 @@ module Skylab::MetaHell
     end
 
     module ModuleMethods_
-      def const_fetch path_x, otherwise=nil, &blk
-        if blk
-          otherwise and raise ::ArgumentError, "too much proc"
-          otherwise = blk
+      def const_fetch path_x, else_value_p=nil, &blk
+        blk and else_value_p and raise ::ArgumentError, "too much proc"
+        P_[ false, ( else_value_p || blk ), self, path_x ].last
+      end
+    end
+
+    P_ = -> do_advanced_hack, else_value_p, mod, path_x do  # #curry-friendly
+      [ * path_x ].reduce( [ nil, mod ] ) do | (_constant, box), name_x |
+        const_a = Get_constants_including_inferred_constants_[ box ]
+        nam = Distill_[ name_x ]
+        guess = const_a.reduce nil do |_, gues|
+          nam == Distill_[ gues ] and break gues
         end
-        Fuzzy_const_get_name_and_value_recursive_[
-          self, path_x, otherwise ].last
+        if guess
+          const = Load_to_get_any_correct_name_[ do_advanced_hack, box, guess ]
+        end
+        if const
+          [ const, box.const_get( const, false ) ]
+        else
+          f = else_value_p || method( :raise )
+          v = if f.arity.zero? then f[] else
+            f[ NameError.new name_x, box ]
+          end
+          [ nil, v ]
+        end
       end
     end
 
@@ -117,7 +135,52 @@ module Skylab::MetaHell
 
     fun = { }
 
-    distill = fun[:distill] = -> do  # #part-of-public-FUN-libary
+    fun[ :fuzzy_const_get ] = -> mod, path_x do
+      P_[ nil, nil, mod, path_x ].fetch 1
+    end
+
+    fun[ :fuzzy_const_get_name_and_value_recursive ] =
+        -> mod, path_x, else_value_p=nil do
+      P_[ nil, else_value_p, mod, path_x ]
+    end
+
+    fun[ :fuzzy_const_get_name_and_value_with_prying_hack ] =
+        -> mod, path_s, else_value_p do
+      P_[ true, else_value_p, mod, path_s ]
+    end
+
+    Get_constants_including_inferred_constants_ = -> mod do
+      if mod.respond_to? :boxxy_original_constants
+        mod.constants
+      else
+        a = mod.constants
+        a.concat Get_inferred_constants_[ a, mod ]
+        a
+      end
+    end
+
+    Get_inferred_constants_ = -> const_a, mod do
+      res_a = -> do
+        mod.respond_to? :dir_pathname or break
+        dpn = mod.dir_pathname
+        dpn && dpn.exist? or break
+        seen_h = ::Hash[ const_a.map { |k| [ Distill_[ k ], true ] } ]
+        guesser = mod.respond_to?( :_boxxy ) ? mod._boxxy.guesser :
+          Guessers_::Default
+        dpn.children( false ).reduce( [] ) do |memo, file_pn|
+          stem = file_pn.sub_ext( '' ).to_s
+          key = Distill_[ stem ]
+          seen_h.fetch key do   # don't dupe 'tree/' and 'tree.rb'
+            seen_h[ key ] = true
+            memo << guesser[ stem ]
+          end
+          memo
+        end
+      end.call
+      res_a || EMPTY_A_
+    end
+
+    Distill_ = fun[ :distill ] = -> do  # #part-of-public-FUN-libary
 
       # different than `normify` and `normize`, this is a simple, lossy and
       # fast(er) operation that produces an internal distillation of a name
@@ -130,99 +193,40 @@ module Skylab::MetaHell
         s.downcase.intern
       end
     end.call
-
     UNDR_ = '_'.getbyte 0
 
-    get_correction_during_tug = -> tug do
-      res = nil ; mod = tug.mod ; const = tug.const
+    Load_to_get_any_correct_name_ = -> do_advanced_hack, box, guess do
+      if ! box.const_defined? guess, false and box.respond_to? :const_tug
+        tug = box.tug_class.new guess.intern, box.dir_pathname, box
+        correction = if do_advanced_hack
+          Boxxy::Peeker_::Tug_[ tug ]
+        else
+          Tug_and_get_any_correction_[ tug ]
+        end
+        correction and guess = correction
+      end
+      box.const_defined?( guess, false ) and guess
+    end
+
+    Tug_and_get_any_correction_ = -> tug do
+      mod = tug.mod ; const = tug.const
       is_boxxified = mod.respond_to? :boxxy_original_constants
       consts = is_boxxified ?
         -> { mod.boxxy_original_constants } : -> { mod.constants }
       befor = consts[ ]
+      any_correction = nil
       tug.load_and_get( -> do
-        cnst = distill[ const ]
+        cnst = Distill_[ const ]
         ( consts[ ] - befor ).each do |correct_i|
-          if cnst == distill[ correct_i ] && const != correct_i
-            res = correct_i
+          if cnst == Distill_[ correct_i ] && const != correct_i
+            any_correction = correct_i
             mod._boxxy.correction_notification const, correct_i if is_boxxified
             tug.correction_notification correct_i
             break
           end
         end
       end )
-      res
-    end
-
-    Load_to_get_any_correct_name_ = -> box, guess do
-      if ! box.const_defined? guess, false and box.respond_to? :const_tug
-        tug = box.tug_class.new guess.intern, box.dir_pathname, box
-        correction = get_correction_during_tug[ tug ]
-        correction and guess = correction
-      end
-      box.const_defined?( guess, false ) and guess
-    end
-
-    Get_inferred_constants_ = -> const_a, mod do
-      res_a = nil
-      -> do
-        mod.respond_to? :dir_pathname or break
-        dpn = mod.dir_pathname
-        dpn && dpn.exist? or break
-        seen_h = ::Hash[ const_a.map { |k| [ distill[ k ], true ] } ]
-        guesser = mod.respond_to?( :_boxxy ) ? mod._boxxy.guesser :
-          Guessers_::Default
-        res_a = dpn.children( false ).reduce( [] ) do |memo, file_pn|
-          stem = file_pn.sub_ext( '' ).to_s
-          key = distill[ stem ]
-          seen_h.fetch key do   # don't dupe 'tree/' and 'tree.rb'
-            seen_h[ key ] = true
-            memo << guesser[ stem ]
-          end
-          memo
-        end
-      end.call
-      res_a || EMPTY_A_
-    end
-
-    get_constants_including_inferred_constants = -> mod do
-      if mod.respond_to? :boxxy_original_constants
-        mod.constants
-      else
-        a = mod.constants
-        a.concat Get_inferred_constants_[ a, mod ]
-        a
-      end
-    end
-
-    Fuzzy_const_get_name_and_value_recursive_ =  # #part-of-public-FUN-library
-      fun[:fuzzy_const_get_name_and_value_recursive] =
-                                        -> mod, path_x, value_otherwise=nil do
-
-      [ * path_x ].reduce( [ nil, mod ] ) do | (_constant, box), name_x |
-        const_a = get_constants_including_inferred_constants[ box ]
-        nam = distill[ name_x ]
-        guess = const_a.reduce nil do |_, gues|
-          nam == distill[ gues ] and break gues
-        end
-        if guess
-          const = Load_to_get_any_correct_name_[ box, guess ]
-        end
-        if const
-          [ const, box.const_get( const, false ) ]
-        else
-          f = value_otherwise || method( :raise )
-          v = if f.arity.zero? then f[] else
-            f[ NameError.new name_x, box ]
-          end
-          [ nil, v ]
-        end
-      end
-    end
-
-    RIGHT_CONSTANT_NAME_RX = /\A[A-Z][A-Za-z0-9_]*\z/  # near [#043], not used yet
-
-    fun[:fuzzy_const_get] = -> mod, path_x do
-      Fuzzy_const_get_name_and_value_recursive_[ mod, path_x ].fetch 1
+      any_correction
     end
 
     # `const_fetch` deep names, defaults, errors in a nested moudule:
@@ -267,6 +271,7 @@ module Skylab::MetaHell
     #     name_error.module # => Noodles::Ramen
 
     class NameError < ::NameError
+
       def initialize const, modul
         @module = modul
         super "uninitialized constant #{ modul }::( ~ #{ const } )", const
@@ -453,7 +458,7 @@ module Skylab::MetaHell
     module ModuleMethods_
       def each &blk
         ea = MetaHell::Formal::Box::Enumerator.new( -> pair_y do
-          mod_load_guess = Load_to_get_any_correct_name_.curry[ self ]
+          mod_load_guess = Load_to_get_any_correct_name_.curry[ false, self ]
           constants.each do |guess_i|
             const = mod_load_guess[ guess_i ]
             const and pair_y.yield( const, const_get( const, false ) )

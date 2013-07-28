@@ -16,6 +16,7 @@ module Skylab::Headless
 
   EMPTY_A_ = [ ].freeze
   IDENTITY_ = -> x { x }
+  WRITEMODE_ = 'w'.freeze
 
   Private_attr_reader_ = MetaHell::FUN.private_attr_reader
 

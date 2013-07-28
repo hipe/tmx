@@ -232,7 +232,7 @@ module Skylab::PubSub
     def render_graph job
       pay = if @do_write_files
         @infostream.write "(#{ prefix }writing #{ job.outpathname } .."
-        job.outpathname.open 'w+'
+        job.outpathname.open WRITEMODE_
       else
         @paystream
       end
@@ -266,6 +266,7 @@ module Skylab::PubSub
       end
       nil
     end
+    WRITEMODE_ = Headless::WRITEMODE_
 
     def conclude_jobs
       if @error_count.zero?  # just to be sure

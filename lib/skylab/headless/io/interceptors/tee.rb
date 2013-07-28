@@ -25,5 +25,9 @@ module Skylab::Headless
         kls.method_names.include? m.intern
       end
     end.call
+
+    def nil?
+      false
+    end
   end
 end

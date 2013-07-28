@@ -16,6 +16,7 @@ exit_status = 0
   end.call
 
   moniker = 'uncommit'.freeze
+  writemode = 'w'.freeze
 
   program_name = -> do
     pn = ::File.basename $PROGRAM_NAME
@@ -126,7 +127,7 @@ exit_status = 0
     chunk = sout.read page_size
 
     if chunk
-      o_fh = o_pn.open 'w+'
+      o_fh = o_pn.open writemode
     else
       break bork[ "had no changes in most recent commit - #{ i_pn }" ]
     end

@@ -24,8 +24,8 @@ module Skylab::TestSupport::Regret::API
     def set_path x
       @path = x  # #todo:during:3
       @pn = ::Pathname.new x
-      @pn.absolute? or fail "we don't want to mess with relpaths here #{
-        } for now - \"#{ x }\""
+      @pn.absolute? or raise "we don't want to mess with relpaths here #{
+        }for now - \"#{ x }\""
       nil
     end
 
@@ -174,10 +174,16 @@ module Skylab::TestSupport::Regret::API
     def load_downwards
       -> do  # #result-block
         path_a = build_difference or break path_a
-        @module = path_a.reduce @top_mod do |m, x|
-          MetaHell::Boxxy::FUN.fuzzy_const_get[ m, x ]  # #todo ui here
+        @module = path_a.reduce @top_mod do |m, file_s|
+          _i, m = MetaHell::Boxxy::FUN.
+            fuzzy_const_get_name_and_value_with_prying_hack[
+              m, file_s, -> name_er do
+                say :notice, -> { name_er.message }
+                nil
+              end ]
+          m or break( false )
         end
-        true
+        @module ? true : @module
       end.call
     end
     attr_reader :module
@@ -231,7 +237,7 @@ module Skylab::TestSupport::Regret::API
         [ top_mod, top_pn ]
       end
 
-      guess_top = -> p_a_, c_a, c_h do # #result-is-tuple of `mod` / `pn`
+      guess_top = -> p_a_, c_a, c_h do  # #result-is-tuple of `mod` / `pn`
         p_a = p_a_.dup
         top_norm_a = []
         begin
@@ -353,7 +359,6 @@ module Skylab::TestSupport::Regret::API
     private :say
 
     Event_ = ::Struct.new :volume, :message_proc
-
 
     def vtuple  # #called-by self internally
       @vt

@@ -479,9 +479,10 @@ module Skylab::Flex2Treetop
 
     def write_grammar_file
       bytes = nil
-      @f2tt_tt.open( 'w+' ) { |fh| bytes = fh.write(TREETOP_GRAMMAR) }
+      @f2tt_tt.open( WRITEMODE_ ) { |fh| bytes = fh.write(TREETOP_GRAMMAR) }
       bytes
     end
+    WRITEMODE_ = Headless::WRITEMODE_
   end
 end
 

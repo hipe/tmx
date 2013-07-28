@@ -8,8 +8,6 @@ module Skylab::TreetopTools
 
   Headless::MAARS[ self ]
 
-  const_get :Grammar, false       # ick load this now so we can say 'Grammar'
-
   class RuntimeError < ::RuntimeError
   end
 
@@ -30,7 +28,10 @@ module Skylab::TreetopTools
 
     o = { }
 
-    o[ :Basic ] = ::Skylab::Subsystem::FUN.require_subsystem
+    subsys = ::Skylab::Subsystem::FUN.require_subsystem
+
+    o[ :Basic ] = subsys
+    o[ :CodeMolester ] = subsys
 
     define_singleton_method :const_missing do |c|
       const_set c, o.fetch( c )[ c ]

@@ -53,7 +53,8 @@ module Skylab::Treemap
     end
   end
 
-  IDENTITY_ = -> x { x }          # just for fun we track where this is used
+  IDENTITY_ = MetaHell::IDENTITY_
+  WRITEMODE_ = Headless::WRITEMODE_
 
   MAARS[ self ]                   # we put it at the
                                   # bottom as proof that we don't use it here.

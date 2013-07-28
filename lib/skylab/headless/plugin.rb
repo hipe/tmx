@@ -605,14 +605,14 @@ module Skylab::Headless
     def receive_attachment_notification plugin_metasvcs, host_metasvcs
       has_service = host_metasvcs.proc_for_has_service ; err = nil
       @a.each do |i|
+        plugin_metasvcs.has_already_met_need( i ) and next
         if has_service[ i ]
-          plugin_metasvcs.absorb_metaservices_service host_metasvcs, @h.fetch(i)
-        elsif plugin_metasvcs.has_already_met_need i
-          # (we aniticipate needing this to supercede above)
-        else
-          ( err ||= Headless::Plugin::Metaservices_::Service_::Missing_.new ).
-            host_lacks_service_for_plugin host_metasvcs, i, plugin_metasvcs
+          plugin_metasvcs.
+            absorb_metaservices_service host_metasvcs, @h.fetch( i )
+          next
         end
+        ( err ||= Headless::Plugin::Metaservices_::Service_::Missing_.new ).
+          host_lacks_service_for_plugin host_metasvcs, i, plugin_metasvcs
       end
       err and raise Plugin::DeclarationError, err.message_proc[]
       nil

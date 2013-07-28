@@ -171,8 +171,12 @@ module Skylab::TestSupport::Regret::CLI
     end
 
     def intermediates path
+      if path and SEP_ != path.getbyte( 0 )
+        path = ::File.expand_path path
+      end
       api path
     end
+    SEP_ = '/'.getbyte 0
 
     set :node, :simplecov, :autonomous
 

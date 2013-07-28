@@ -44,13 +44,14 @@ module Hipe
               FileUtils.mkdir_p(dir_path, opts2)
             end
             if ! opts.dry_run?
-              File.open(path,'w+'){|fh| bytes = fh.write(contents)}
+              File.open( path, WRITMODE_ ){ |fh| bytes = fh.write contents }
             end
             ui.puts("#{path_str} - wrote %#{b}s of %#{c}d bytes" %
               [bytes.inspect, len1]
             )
           end
         end
+        WRITEMODE_ = Headless::WRITEMODE_
       end
     end
   end

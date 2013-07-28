@@ -1956,8 +1956,8 @@ module Skylab::Face
   # ~ 5.10x - API integration (*non*-revelation style)
 
   Magic_Touch_.enhance -> { CLI::API_Integration.touch },
-    [ NS_Mechanics_, :public, :api, :call_api, :api_services ]
-      # may be #called-by surface
+    [ NS_Mechanics_, :public, :api, :call_api, :api_services,
+      :get_api_executable_with ]  # may be #called-by surface
 
   # ~ 5.11x - the `set` API ( munged in with 5.9x above ) ~
 

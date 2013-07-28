@@ -433,7 +433,7 @@ module TmxGit
           lines.push repo.to_json
         end
         bytes = 0
-        File.open(path, clobber ? 'w+' : 'w') do |fh|
+        File.open(path, clobber ? WRITEMODE_ : 'a+' ) do |fh|
           lines.each do |line|
             bytes += line.size
             fh.puts line

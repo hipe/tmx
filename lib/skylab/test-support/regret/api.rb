@@ -10,6 +10,9 @@ module Skylab::TestSupport
       %i| Basic Face Headless MetaHell |.each do |i|
         const_set i, TestSupport::Services.const_get( i, false )
       end
+
+      WRITEMODE_ = Headless::WRITEMODE_
+
     end
 
     Subsys::Services::Face::API[ self ]
