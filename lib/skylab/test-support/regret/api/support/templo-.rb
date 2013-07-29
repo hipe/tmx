@@ -82,11 +82,13 @@ module Skylab::TestSupport::Regret::API
           p[ build_section_yielder[ y, name_i ] ]
         end
       end
-      Face::CLI::Table::FUN.tablify[
-        [ [ :fields, [ 'option', 'desc' ] ],
-          [ :show_header, false ] ],
-        @snitch.method( :puts ),
-        ea ]
+      Face::CLI::Table[
+        :field, :id, :name,
+        :field, :id, :desc, :left,
+        :show_header, false,
+        :left, '| ', :sep, '    ',
+        :write_lines_to, @snitch.method( :puts ),
+        :read_rows_from, ea ]
       nil
     end
 

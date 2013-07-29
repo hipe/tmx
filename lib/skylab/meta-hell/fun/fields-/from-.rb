@@ -47,7 +47,7 @@ module Skylab::MetaHell
     #     end
     #
     #     Baz.new( :four, "frick" ).four_value  # => 'frick'
-    #     Foo.new( :four, "frick" )  # => ArgumentError: unrecognized argument name "four" - did you mean two?
+    #     Foo.new( :four, "frick" )  # => ArgumentError: unrecognized keyword "four" - did you mean two?
     #
 
     def self.methods &blk
@@ -102,7 +102,7 @@ module Skylab::MetaHell
       def initialize
         super()
         @h.default_proc = -> h, k do
-          raise ::ArgumentError, "unrecognized argument name #{ FUN::Parse::
+          raise ::ArgumentError, "unrecognized keyword #{ FUN::Parse::
             Strange_[ k ] } - did you mean #{ Lev__[ @a, k ] }?"
         end
       end

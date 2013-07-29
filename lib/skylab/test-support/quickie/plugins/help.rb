@@ -36,14 +36,13 @@ module Skylab::TestSupport
       def beginning_eventpoint_notify
         usage
         @y << "options:"
-        fun = Subsys::Services::Face::CLI::Table::FUN
-        fun.tablify[
-          [[ :fields, [ :arg, :desc ]],
-           [ :show_header, false ],
-           [ :left, '  ' ], [ :right, '' ], [ :sep, ' |  ' ]],
-          @y.method( :<< ),
-          @svc.plugins._a.reduce( [] ) do |row_a, p|
-            fun.multiline_column_b[ row_a, p.syntax_moniker, p.some_desc_a ]
+        (( tbl = Subsys::Services::Face::CLI::Table ))[
+          :field, :field, :left, :show_header, false,
+          :left, '  ', :sep, '     ', :right, '',
+          :write_lines_to, @y.method( :<< ),
+          :read_rows_from, @svc.plugins._a.reduce( [] ) do |row_a, p|
+            tbl::FUN.
+              multiline_column_b[ row_a, p.syntax_moniker, p.some_desc_a ]
             row_a
           end ]
         nil

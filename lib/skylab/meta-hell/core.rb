@@ -10,6 +10,7 @@ module Skylab
     EMPTY_P_       = ->   {   }
     IDENTITY_      = -> x { x }
     MONADIC_TRUTH_ = -> _ { true }
+    MONADIC_EMPTINESS_ = -> _ { }
 
     def self.Function host, *rest
       self::Function._make_methods host, :public, :method, rest

@@ -42,10 +42,11 @@ module Skylab::Test
     end
 
     def counts
-      Face::CLI::Table::FUN.tablify[
-        [[ :fields, [ 'subproduct', 'num test files' ]]],
-        info_y.method( :<< ),
-        ::Enumerator.new do |y|
+      Face::CLI::Table[
+        :field, 'subproduct',
+        :field, 'num test files',
+        :write_lines_to, info_y.method( :<< ),
+        :read_rows_from, ::Enumerator.new do |y|
           total = 0 ; hs = hot_subtree
           ok = hs.children.each do |tre|
             sp = tre.data

@@ -71,7 +71,7 @@ module Skylab::MetaHell::TestSupport::FUN::Fields_::From_
           -> do
             Foo.new( :four, "frick" )
           end.should raise_error( ArgumentError,
-                       ::Regexp.new( "\\Aunrecognized\\ argument\\ name\\ \"four\"\\ \\-\\ did\\ you\\ mean\\ two\\?\\z" ) )
+                       ::Regexp.new( "\\Aunrecognized\\ keyword\\ \"four\"\\ \\-\\ did\\ you\\ mean\\ two\\?\\z" ) )
         end
       end
     end

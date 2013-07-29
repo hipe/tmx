@@ -1,4 +1,4 @@
-[#048]       #done `tablify` - cleanup signature
+[#048]       #done `t-ablify` - cleanup signature (#rip)
 [#047]       #doc-point visibility of the node is *not* in the domain ..
 [#046]       #feature-point `Magic_Touch_`
 [#045]       #doc-point Face::TestSupport::CLI and below is part of face's

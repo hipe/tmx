@@ -26,7 +26,6 @@ module Skylab::MetaHell
           end
         end
         Fm_ = MetaHell::FUN::Parse::Fuzzy_matcher_.curry[ 1 ]  # min length
-        MONADIC_EMPTINESS_ = -> _ { }
 
         def name_monikers y
           y << @long.inspect

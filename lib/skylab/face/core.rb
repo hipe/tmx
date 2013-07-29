@@ -35,6 +35,7 @@ module Skylab::Face
     o[:Porcelain] = subsys  # option parser abtract modelling
     o[:PubSub] = subsys  # engaged by the API Action API's `emit` facet.
     o[:Set ] = stdlib
+    o[:StringIO] = stdlib
 
     define_singleton_method :const_missing do |c|
       if o.key? c

@@ -36,6 +36,10 @@ module Skylab::Basic
       @a.map { |i| [ i , @h.fetch( i ) ] }
     end
 
+    def map &p
+      @a.map { |i| p[ @h.fetch i ] }
+    end
+
     #  ~ mutators ~
 
     def touch k
