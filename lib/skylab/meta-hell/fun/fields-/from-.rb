@@ -63,7 +63,7 @@ module Skylab::MetaHell
         else
           define_method :absorb, & Absorb_ ; private :absorb
           define_method :absorb_notify, & Absorb_notify_
-          define_method :field_op_h , & Field_op_h_ ; private :field_op_h
+          define_method :field_op_box , & Field_op_box_ ; private :field_op_box
           const_set CONST_, Box_.new
         end
       end
@@ -76,24 +76,25 @@ module Skylab::MetaHell
     CONST_ = :FIELDS_FROM_METHODS_BOX_
 
     Absorb_ = -> *a do
-      op_h = field_op_h
+      op_box = field_op_box
       while a.length.nonzero?
-        send op_h[ a.shift ], a
+        send op_box[ a.shift ], a
       end
       nil
     end
 
     Absorb_notify_ = -> a do
-      op_h = field_op_h
+      op_box = field_op_box
+      @last_x = nil
       while a.length.nonzero?
-        (( m = op_h.fetch( a.first ) { } )) or break
-        a.shift
+        (( m = op_box.fetch( a.first ) { } )) or break
+        @last_x = a.shift
         send m, a
       end
       nil
     end
 
-    Field_op_h_ = -> do
+    Field_op_box_ = -> do
       self.class.const_get CONST_  # if the class added no
       # fields of its own to the box, ascend up to parent
     end

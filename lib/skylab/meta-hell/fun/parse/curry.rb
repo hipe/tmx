@@ -84,16 +84,16 @@ module Skylab::MetaHell
         instance_exec( *a, & @call_p )  # result!
       end
       def curry_notify a  # assume was already duped. will mutate self, a
-        op_h = field_op_h
-        last = nil
+        op_box = field_op_box
+        clear_last
         while a.length.nonzero?
           x = a.shift
-          m = op_h.fetch x do
+          m = op_box.fetch x do
             raise ::ArgumentError, "unrecognized element: #{ Parse::
-              Strange_[ x ] }#{ " after \"#{ last }\"" if last }#{
-              }#{ Lev_[ op_h.keys, x ] if x.respond_to? :id2name }"
+              Strange_[ x ] }#{ any_context }#{
+              }#{ Lev_[ op_box.get_names, x ] if x.respond_to? :id2name }"
           end
-          last = x
+          set_last_x x
           remove_from_curry_queue x
           send m, a
         end
@@ -102,6 +102,27 @@ module Skylab::MetaHell
       Lev_ = -> item_a, outside_x do
         " - did you mean #{ MetaHell::Services::Headless::NLP::EN::
           Levenshtein_::Templates_::Or_[ item_a, outside_x ] }?"
+      end
+      def clear_last
+        @prev_x = @last_x = nil
+      end
+      def set_last_x x
+        @prev_x = @last_x
+        @last_x = x
+        nil
+      end
+      def any_context
+        y = [ ]
+        @prev_x and y << say_prev( @prev_x )
+        @last_x and y << say_prev( @last_x )
+        y.length.nonzero? and y * ', '
+      end
+      def say_prev x
+        if x.respond_to? :id2name
+          " after \"#{ x }\""
+        else
+          @last_x.any_context
+        end
       end
       def normal_token_proc_a
         @abstract_field_list.get_normal_token_proc_a
@@ -287,6 +308,7 @@ module Skylab::MetaHell
       def field a
         dflt = ( @default_field if instance_variable_defined? :@default_field )
         field = Resolve_field_[ a ]
+        set_last_x field
         dflt and field.merge_defaults! dflt
         if field.looks_like_default?
           @default_field = field
@@ -298,15 +320,15 @@ module Skylab::MetaHell
         end
       end
       Resolve_field_ = -> a do
-        x = a.fetch( 0 ) ; a.shift
+        x = a.fetch 0  # DID NOT SHIFT YET
         if x.respond_to? :id2name
           field = Parse::Field_.new
           do_absorb = true
         elsif x.respond_to? :superclass
-          field = x.new
+          field = x.new ; a.shift
           do_absorb = true
         else
-          field = x
+          field = x ; a.shift
         end
         do_absorb and field.absorb_notify a
         field

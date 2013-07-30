@@ -3,7 +3,13 @@ module Skylab::MetaHell
   module FUN::Parse
 
     Strange_ = -> x do
-      x.respond_to?( :id2name ) ? "\"#{ x }\"" : "(#{ x.class })"
+      if x.respond_to? :id2name
+        "\"#{ x }\""
+      elsif ::Proc === x
+        x.inspect
+      else
+        "(#{ x.class })"
+      end
     end
 
     # fuzzy matcher
