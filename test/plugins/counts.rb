@@ -37,8 +37,6 @@ module Skylab::Test
       counts: "show a report of the number of tests per subproduct"
     )
 
-    include Agent_IM_
-
     def initialize
       @do_zero ||= nil
     end

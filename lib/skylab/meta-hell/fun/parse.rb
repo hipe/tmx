@@ -2,26 +2,21 @@ module Skylab::MetaHell
 
   module FUN::Parse
 
-    Absorb_notify_ = -> a do
-      op_h = self.op_h
-      while a.length.nonzero?
-        m = op_h.fetch( a.first ) { }
-        m or break
-        a.shift
-        send m, a
-      end
-      nil
+    Strange_ = -> x do
+      x.respond_to?( :id2name ) ? "\"#{ x }\"" : "(#{ x.class })"
     end
 
-    Op_h_via_private_instance_methods_ = -> kls do
-      a = kls.private_instance_methods false
-      hsh = ::Hash[ a.zip a ]
-      hsh.default_proc = -> h, k do
-        no = k.respond_to?( :id2name ) ? "\"#{ k }\"" : "(#{ k.class })"
-        raise ::ArgumentError, "no: #{ no }. yes: (#{ h.keys * ', '})"
-      end
-      hsh
-    end
+    # fuzzy matcher
+    # is a currier - it's a proc that generates other procs
+    #
+    #     P = MetaHell::FUN::Parse::Fuzzy_matcher_
+    #     Q = P[ 3, 'foobie' ]
+    #
+    #     Q[ 'f' ] # => nil
+    #     Q[ 'foo' ]  # => true
+    #     Q[ 'foob' ]  # => true
+    #     Q[ 'foobie-doobie' ]  # => nil
+    #
 
     Fuzzy_matcher_ = -> min, moniker do
       min ||= 1

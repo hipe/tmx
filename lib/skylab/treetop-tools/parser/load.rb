@@ -91,7 +91,7 @@ module Skylab::TreetopTools
     def mkdir_safe g
       # don't make any new directories deeper than the amt of dirs in grammar
       parent = g.outpathname.dirname
-      g.name.scan(%r</>).size.times{ parent = parent.dirname }
+      g.path.scan(%r</>).size.times{ parent = parent.dirname }
       if parent.directory?
         file_utils.mkdir_p(g.outpathname.dirname.to_s, verbose: true)
         true

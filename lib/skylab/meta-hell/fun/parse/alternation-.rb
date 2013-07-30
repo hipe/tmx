@@ -30,7 +30,7 @@ module Skylab::MetaHell
           break x if x
         end
       end,
-      :curry_queue, [ :pool_procs, :state_x_a ],
+      :uncurried_queue, [ :pool_procs, :state_x_a ],
       :call, -> parser_a, * state_x_a do
         absorb_along_curry_queue_and_execute parser_a, state_x_a
       end,

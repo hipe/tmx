@@ -157,6 +157,42 @@ module Skylab::MetaHell::DSL_DSL
         super
       end
     end
+
+    # `block` define the value with a block
+    # but note you use `foo.call` from the instance:
+    #
+    #     class Foo
+    #       MetaHell::DSL_DSL.enhance self do
+    #         block :zinger
+    #       end
+    #     end
+    #
+    #     class Bar < Foo
+    #       ohai = 0
+    #       zinger do
+    #         ohai += 1
+    #       end
+    #     end
+    #
+    #     bar = Bar.new
+    #     bar.zinger.call  # => 1
+    #     bar.zinger.call  # => 2
+    #
+
+    # `atom_accessor` lets you access the field
+    # in the instance in the same DSL-y way as in the class
+    #
+    #     class Foo
+    #       MetaHell::DSL_DSL.enhance self do
+    #         atom_accessor :with_name
+    #       end
+    #     end
+    #
+    #     foo = Foo.new
+    #     foo.with_name :x
+    #     foo.with_name  # => :x
+    #
+
   end
 
   # can we use a module to hold and share an entire DSL?

@@ -259,7 +259,7 @@ module Skylab::MetaHell
     #
     # passing nil is considered the same as not passing an argument
     #
-    #     Foo.new  # => ArgumentError: missing required argument - foo
+    #     Foo.new( :foo, nil )  # => ArgumentError: missing required argument - foo
     #
     # passing false is not the same as passing nil, passing false is valid.
     #

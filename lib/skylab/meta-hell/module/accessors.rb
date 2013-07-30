@@ -2,19 +2,28 @@ module Skylab::MetaHell
 
   module Module::Accessors
 
-    # `Module::Accessors` is a concise, lightweight enhancement that is a totes
-    # awesome way to generate instance methods on a module that each access a
-    # different "neighbor module" based on the *relative path* (in the sense of
-    # constant names, in the sense of the constant tree in a ruby runtime) of
-    # each significant neighbor module.
+    # a lightweight enhancer that for the module using it generates instance
+    # methods for that module each of which access a particular "significant
+    # neighbor module" of that module when defined in terms of the *relative
+    # path* to that module (where a "relative path" is given in terms of the
+    # constant name "parts" interspersed with '..' as desired in the context
+    # of the ruby constant "graph" in the ruby runtime):
     #
     # imagine a constant tree with the below five modules:
     #
-    # MyApp
-    #   CLI
-    #     Client
-    #   API
-    #     Client
+    #     module MyApp
+    #       module CLI
+    #         class Client
+    #         end
+    #       end
+    #
+    #       module API
+    #         class Client
+    #         end
+    #       end
+    #     end
+    #
+    #     MyApp::CLI::Client.class  # => ::Class
     #
     # There is a class MyApp::CLI::Client and a class MyApp::API::Client.
     # There are the modules MyApp, MyApp::CLI and MyApp::API.
@@ -26,23 +35,78 @@ module Skylab::MetaHell
     #     module MyApp
     #       class CLI::Client
     #         MetaHell::Module::Accessors.enhance self do
-    #           private_methods do
+    #           public_methods do
     #             module_reader :api_client, '../../API/Client'
     #           end
     #         end
     #       end
     #     end
     #
+    #     cli = MyApp::CLI::Client.new
+    #     cli.api_client  # => MyApp::API::Client
+    #
+    #
     # The above says, "define on MyAppp::CLI::Client a private instance method
     # called `api_client` that when called will result in the class
     # `MyApp::API::Client`."
-    #
+
     # There are also undocumented facilities for auto-vivifying the constants
     # (that is, creating them when they don't already exist (or aren't
     # loaded!)); *and* */* *or* "initializing" them (*super*-sketchy!!)
     # the first time they are accessed by that instance (egads!).
     # ("initializing" a module might mean enhancing it with some nonsense
     # before you use it, e.g boxxy-fying it.)
+    #
+    # here's the autovivifying hack -
+    # like so
+    #
+    #     class Foo
+    #      ::Skylab::Autoloader[ self ]  # for now
+    #       MetaHell::Module::Accessors.enhance self do
+    #         private_module_autovivifier_reader :zapper, 'Ohai_',
+    #           -> do  # when didn't exist
+    #             m = ::Module.new
+    #             m.instance_variable_set :@counter, 0
+    #             m
+    #           end,
+    #           -> do  # whether did or didn't exist, on first access
+    #             @counter += 1
+    #           end
+    #       end
+    #
+    #       def touch
+    #         zapper
+    #         zapper
+    #         zapper
+    #       end
+    #     end
+    #
+    #     Foo.const_defined?( :Ohai_, false )  # => false
+    #
+    # the first time the thing is accessed, the two procs are called:
+    #
+    #     foo = Foo.new
+    #     foo.touch
+    #     Foo::Ohai_.instance_variable_get( :@counter )  # => 1
+    #
+    # if you create the thing before it is accessed, etc:
+    #
+    #     class Bar < Foo
+    #       module Ohai_
+    #         @counter = 10
+    #       end
+    #
+    #       def run
+    #         zapper
+    #         zapper
+    #         zapper
+    #       end
+    #     end
+    #
+    #     bar = Bar.new
+    #     bar.run
+    #     Bar::Ohai_.instance_variable_get( :@counter )  # => 11
+
 
     def self.enhance host_mod, &enhance_blk
 
@@ -210,6 +274,13 @@ module Skylab::MetaHell
         if with_it then mod_.module_exec( & with_it ) else mod_ end
       end
     end.call
+
+    # puffer
+    # works like this
+
+
+
+
 
     FUN = ::Struct.new( * o.keys ).new( * o.values )
   end

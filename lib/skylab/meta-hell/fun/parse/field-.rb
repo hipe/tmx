@@ -5,23 +5,21 @@ module Skylab::MetaHell
     class Field_
 
       def initialize
-        @monikizer_p = @moniker = nil
+        @normal_parse_p = nil
       end
-
-      define_method :absorb_notify, & FUN::Parse::Absorb_notify_
 
       def looks_like_default?
         ! looks_like_particular_field
       end
 
       def merge_defaults! dflt
-        p = dflt.monikizer_p and ( @monikizer_p ||= p )
+        p = dflt.monikate_p and ( @monikate_p ||= p )
         nil
       end
 
-      attr_reader :monikizer_p
+      attr_reader :monikate_p
 
-      def normal_token_proc
+      def normal_token_proc  # assumes `token_scanner`
         @ntp ||= begin
           -> tok do
             x = @token_scanner_p[ tok ]
@@ -37,24 +35,27 @@ module Skylab::MetaHell
         -> { [ me.get_moniker ] }
       end
 
-      Mnkzr_p_ = -> s { "<<**#{ s }**>>" }
-
       def get_moniker
-        ( @monikizer_p || Mnkzr_p_ )[ @moniker ]
+        ( @monikate_p || Mkt_p_ )[ @moniker ]
       end
+      Mkt_p_ = -> s { "<<**#{ s }**>>" }
 
-    protected  # #protected-not-private
+      def get_agent
+        @agent_p.call
+      end
 
       attr_reader :looks_like_particular_field
 
-      def op_h
-        self.class.const_get :OP_H_, false
-      end
-
     private
 
-      def monikizer a
-        @monikizer_p = a.shift
+      def normal_parse memo, argv
+        instance_exec memo, argv, & @normal_parse_p
+      end
+
+    FUN::Fields_::From_.methods do  # borrow 1 indent
+
+      def monikate a
+        @monikate_p = a.shift
         nil
       end
 
@@ -70,7 +71,18 @@ module Skylab::MetaHell
         nil
       end
 
-      OP_H_ = FUN::Parse::Op_h_via_private_instance_methods_[ self ]
+      def parse a
+        @looks_like_particular_field = true
+        @normal_parse_p = a.fetch 0 ; a.shift
+        nil
+      end
+
+      def agent a
+        p = a.fetch 0 ; a.shift ; p.respond_to?( :call ) or raise "proc? #{ p }"
+        @agent_p = p
+        nil
+      end
+    end  # (pay 1 back)
     end
   end
 end

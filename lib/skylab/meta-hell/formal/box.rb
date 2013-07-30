@@ -23,7 +23,7 @@ module Skylab::MetaHell
       end
 
       # `fuzzy_reduce` -
-      # `ref` with be turned into a regex with the usual simple algorithm.
+      # `ref` will be turned into a regex with the usual simple algorithm.
       # your tuple is called with (k, x, y) once for each item in `box`.
       # with `k` being each key and `x` being each corresponding value.
       # in your tuple, yield to `y` with `<<` each string name from `x`
@@ -35,7 +35,7 @@ module Skylab::MetaHell
       # than the surface name but still matches
 
       o[:fuzzy_reduce] = -> box, ref, tuple, collapse=nil do
-        rx = /\A#{ ::Regexp.escape ref.to_s.downcase }/
+        rx = /\A#{ ::Regexp.escape ref.to_s.downcase }/i
         match = nil
         matched_name = nil
         name_consumer = ::Enumerator::Yielder.new do |name|
@@ -76,6 +76,17 @@ module Skylab::MetaHell
       end
       box
     end
+
+    def self.from_iambic *a
+      box = new
+      ( a.length % 2 ).zero? or fail 'sanity - odd number of args'
+      box.instance_exec do
+        0.step( a.length - 1, 2 ).each do |i|
+          add a[ i ], a[ i + 1 ]
+        end
+      end
+      box
+    end
   end
 
   module Formal::Box::InstanceMethods
@@ -99,7 +110,7 @@ module Skylab::MetaHell
     end
 
     def _order                    # tiny optimization ..? BE CAREFUL FOO
-      @order
+      @order                      # #hacks-only
     end
 
     def _raw_constituency         # you must really have a death wish
@@ -171,22 +182,14 @@ module Skylab::MetaHell
     # (the above is probably aliased to '[]' in the box class.)
 
     def fetch_at_position ref, &els
-      res = nil
-      begin
-        ok = true
-        key = @order.fetch ref do
-          ok = false
-          els ||= -> { @order.fetch ref }  # ick but meh
-          res = els[ * [ ref ][ 0, els.arity.abs ] ]
-        end
-        ok or break
-        res = @hash.fetch key do
-          ok = false
-          els ||= -> { @hash.fetch key }  # ick but meh
-          res = els[ * [ key ][ 0, els.arity.abs ] ]
-        end
-      end while nil
-      res
+      ok = true ; r = nil
+      key = @order.fetch ref do
+        ok = false
+        els ||= -> { @order.fetch ref }  # ick but meh
+        r = els[ * [ ref ][ 0, els.arity.abs ] ]
+      end
+      ok and r = @hash.fetch( key )
+      r
     end
 
     def first &b
@@ -448,7 +451,7 @@ module Skylab::MetaHell
     end
 
     def partition_by_keys! *name_a  # convenience wrapper - slice out a sub-box
-      partition! do |k, _|        # composed of any of the members whoe name
+      partition! do |k, _|        # composed of any of the members whose name
         name_a.include? k         # was in the list of names. might mutate
       end                         # receiver.
     end

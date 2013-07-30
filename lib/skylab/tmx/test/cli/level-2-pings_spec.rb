@@ -71,8 +71,8 @@ module Skylab::TMX::TestSupport::CLI::L2P
       go :'pub-sub'
     end
 
-    it "quickie-recursive" do
-      go :'quickie-recursive', FLAG_
+    it "quickie" do
+      go :'quickie', FLAG_
     end
 
     it "regret" do

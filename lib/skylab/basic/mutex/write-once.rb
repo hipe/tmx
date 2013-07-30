@@ -1,9 +1,6 @@
 module Skylab::Basic
 
-  class Mutex
-
-    # (for now this is write-once but might be changed to be re-mutable
-    # if ever needed.)
+  class Mutex::Write_Once
 
     def initialize name_x=nil
       @name_x = name_x

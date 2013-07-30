@@ -167,7 +167,7 @@ module Skylab::MetaHell
         end
         [ did_parse_any, did_spend_all || false ]
       end,
-      :curry_queue, [ :argv ],
+      :uncurried_queue, [ :argv ],
       :call, -> * input_x_a do
         absorb_along_curry_queue_and_execute input_x_a
       end

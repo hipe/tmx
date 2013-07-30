@@ -2,54 +2,57 @@ require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::FUN::Fields_
 
-  ::Skylab::MetaHell::TestSupport::FUN[ self ]
+  ::Skylab::MetaHell::TestSupport::FUN[ Fields__TestSupport = self ]
 
   include CONSTANTS
 
+  MetaHell = ::Skylab::MetaHell
+
   extend TestSupport::Quickie
 
-  Subject = MetaHell::FUN::Fields_::Contoured_
+  Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "#{ MetaHell }::FUN::Fields_::Contoured_" do
-
-    it "whines on weirdness" do
-      -> do
-        module Foo
-          Subject[ self, :weirdness ]
+  describe "Skylab::MetaHell::FUN::Fields_" do
+    context "using the basic fields facility out of the box only gives you" do
+      Sandbox_1 = Sandboxer.spawn
+      before :all do
+        Sandbox_1.with self
+        module Sandbox_1
+          class Foo
+            MetaHell::FUN.fields[ self, :ding, :bat ]
+          end
         end
-      end.should raise_error( ::KeyError, /key not found: :weirdness/ )
-    end
-
-    it "makes a non-memoized proc" do
-      class Bar
-        Subject[ self, :proc, :jimmy ]
       end
-      b = Bar.new( :jimmy, -> { 'whales' } )
-      (( s1 = b.jimmy )).should eql( 'whales' )
-      (( s2 = b.jimmy )).should eql( 'whales' )
-      ( s1.object_id == s2.object_id ).should eql( false )
-    end
-
-    it "makes a memoizing proc" do
-      class Baz
-        Subject[ self, :memoized, :proc, :jimmy ]
+      it "a readable way to set instance methods via a constructor" do
+        Sandbox_1.with self
+        module Sandbox_1
+          (( FOO = Foo.new )).instance_variables.sort.should eql( [ :@bat, :@ding ] )
+        end
       end
-      b = Baz.new( :jimmy, -> { 'whales' } )
-      (( s1 = b.jimmy )).should eql( 'whales' )
-      (( s2 = b.jimmy )).should eql( 'whales' )
-      ( s1.object_id == s2.object_id ).should eql( true )
-    end
-
-    it "one memoized and one not" do
-      class Biff
-        Subject[ self, :proc, :jimmy, :memoized, :proc, :jammy ]
+      it "it does not, however, give you attr readers" do
+        Sandbox_1.with self
+        module Sandbox_1
+          FOO.respond_to?( :bat ).should eql( false )
+          FOO.class.private_method_defined?( :bat ).should eql( false )
+        end
       end
-      b = Biff.new( :jimmy, -> { 'whiles' }, :jammy, -> { 'whales' } )
-      s1, s2, s3, s4 = b.jimmy, b.jammy, b.jimmy, b.jammy
-      [ s1, s3 ].uniq.should eql( [ 'whiles' ] )
-      [ s2, s4 ].uniq.should eql( [ 'whales' ] )
-      ( s1.object_id == s3.object_id ).should eql( false )
-      ( s2.object_id == s4.object_id ).should eql( true )
+      it "it sets *all* field ivars to nil, and then sets the values given" do
+        Sandbox_1.with self
+        module Sandbox_1
+          foo = Foo.new( :bat, :x )
+          foo.instance_variable_get( :@bat ).should eql( :x )
+          foo.instance_variable_get( :@ding ).should eql( nil )
+        end
+      end
+      it "although it does not enforce required fields, it enforces the valid set" do
+        Sandbox_1.with self
+        module Sandbox_1
+          -> do
+            Foo.new( :ding, :x, :bat, :y, :bazzle, :z )
+          end.should raise_error( KeyError,
+                       ::Regexp.new( "\\Akey\\ not\\ found:\\ :bazzle\\z" ) )
+        end
+      end
     end
   end
 end

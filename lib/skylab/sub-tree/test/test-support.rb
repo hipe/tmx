@@ -7,7 +7,7 @@ require 'skylab/test-support/core'
 
 module Skylab::SubTree::TestSupport
 
-  ::Skylab::TestSupport::Regret[ CovTree_TestSupport = self ]
+  ::Skylab::TestSupport::Regret[ self ]
 
   # (move things up to here as appropriate if we ever build out the
   # non-cli portion of the app)

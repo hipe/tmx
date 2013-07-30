@@ -8,11 +8,12 @@ module Skylab::MetaHell::TestSupport::Class::Creator
 
   module ModuleMethods
     include CONSTANTS
-    def borks msg                  # this one is pretty but hard to debug
-      specify { should( raise_error msg ) }
-    end
-    def borks_ msg                 # this one is easier to debug, but throws
-      it( "fuck my life" ) { subject.call } # the exception w/o catching it
+    def borks msg
+      it "raises error with message - #{ msg }" do
+        -> do
+          subject.call
+        end.should raise_error( msg )
+      end
     end
     def doing &f
       let :subject do

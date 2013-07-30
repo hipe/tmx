@@ -4,8 +4,6 @@ module Skylab::Test
 
     class Worker_
 
-      include Test::Agent_IM_
-
       Field_ = MetaHell::FUN::Parse::Field_
 
       def self.[] *a
@@ -13,12 +11,12 @@ module Skylab::Test
       end
 
       Syntax_ = MetaHell::FUN.parse_series.curry[
-        :syntax, :monikizer, -> a { a * ' ' },
-        :field, :monikizer, -> s { "[ #{ s } ]" },
+        :syntax, :zapple, :monikate, -> a { a * ' ' },
+        :field, :monikate, -> s { "[ #{ s } ]" },
         :field, :moniker, '<integer>',
           :token_scanner, Field_::Int_::Scan_token,
         :field, * Field_::Flag_[ :random ].to_a,
-        :prepend_to_curry_queue, :exhaustion
+        :prepend_to_uncurried_queue, :exhaustion
       ]
 
       def initialize host_svcs, argv

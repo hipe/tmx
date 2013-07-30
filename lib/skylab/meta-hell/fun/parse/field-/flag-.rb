@@ -12,10 +12,15 @@ module Skylab::MetaHell
         VM_
       end
 
-      def initialize i, predicate_x=nil, desc_line_x=nil
+      def initialize i=nil, predicate_x=nil, desc_line_x=nil
+        super()
         @i = i
         @predicates = [ * predicate_x ]
         @desc_lines = [ * desc_line_x ]
+      end
+
+      def looks_like_particular_field
+        true
       end
 
       attr_reader :i, :predicates, :desc_lines
@@ -24,7 +29,7 @@ module Skylab::MetaHell
         self.class.visible_members.map { |i| send i }
       end
 
-      def moniker
+      def get_moniker
         @i.to_s
       end
 
@@ -32,12 +37,18 @@ module Skylab::MetaHell
         @desc_lines.fetch 0
       end
 
-      def parse memo, argv
-        if head_matches argv
-          argv.shift
-          memo[ @predicates.fetch 0 ] = true
-          [ true, true ]
+      def normal_parse memo, argv
+        if @normal_parse_p then super else
+          if head_matches argv
+            argv.shift
+            memo[ @predicates.fetch 0 ] = true
+            [ true, true ]
+          end
         end
+      end
+
+      def pool_proc
+        @pool_proc ||= method( :normal_parse )
       end
 
       def scan_token token  # result must be true or nil
@@ -56,6 +67,7 @@ module Skylab::MetaHell
       end
 
     private
+    FUN::Fields_::From_.methods do  # (borrow one indent)
 
       def head_matches argv
         argv.length.nonzero? && head_matches_token( argv.fetch 0 )
@@ -68,6 +80,19 @@ module Skylab::MetaHell
           @fuzzy[ argv.fetch 0 ]
         end
       end
+
+      def moniker a
+        super
+        @i ||= @moniker
+        nil
+      end
+
+      def predicate a
+        @predicates.push a.fetch( 0 ) ; a.shift
+        nil
+      end
+
+    end  # (pay one back)
     end
   end
 end
