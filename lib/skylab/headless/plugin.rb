@@ -158,12 +158,12 @@ module Skylab::Headless
     def hot_plugin_a
       if ! instance_variable_defined? :@hot_plugin_a
         @hot_plugin_a = false
-        determine_hot_plugins
+        determine_hot_plugins_notify
       end
       @hot_plugin_a
     end
 
-    def determine_hot_plugins
+    def determine_hot_plugins_notify
       func, arg_x = plugin_host_metaservices.class.any_determiner_func_and_arg
       if func
         func[ self, arg_x ]

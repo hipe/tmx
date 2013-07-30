@@ -47,7 +47,7 @@ module Skylab::Test
     MetaHell::Boxxy[ self ]
   end
 
-  class Core_Client  # a "headless" client, conceptually
+  class Front_Mechanics_  # a "headless" client, conceptually
 
     Headless::Plugin::Host.enhance self do
 
@@ -82,37 +82,13 @@ module Skylab::Test
   private
 
     def initialize
-      @queue_a = []
+      @action_a = nil ; @queue_a = []
     end
 
-    def full_name  # a service provided by this plugin host
-      FULL_NAME_[]
-    end
-  end
-
-  module Host_InstanceMethods  # (re-opened below)
-  end
-
-  class CLI < Core_Client  # (separation of concerns)
-
-    include Host_InstanceMethods
-
-    def initialize _, sout, serr
-      super( )
-      @action_a = nil
-      @emit = -> type, str do
-        ( :payload == type  ? sout : serr ).puts str
-      end
-      @paystream, @infostream = sout, serr
-      @info_y = ::Enumerator::Yielder.new( & @infostream.method( :puts ) )
-      @em = -> s { "\e[1;32m#{ s }\e[0m" }
-      @pretty_path = Headless::CLI::PathTools::FUN.pretty_path
-      nil
-    end
-
-    def determine_hot_plugins  # becuase we hackishly defined a node outside
-      # of its "home file" in #this-spot, we now have to pay it back here:
-      # "manually" load the file now for any such nodes (because of [#te-002])
+    def determine_hot_plugins_notify  # because we hackishly defined a node
+      # outside of its "home file" in #this-spot, we now have to pay it back
+      # here "manually" load the file now for any such nodes
+      # (because of [#te-002])
 
       Test::Plugins.boxxy do
         original_constants.each do |i|
@@ -120,242 +96,60 @@ module Skylab::Test
           upwards get_const( i )
         end
       end
-
       super
     end
 
-    def invoke argv
-      begin
-        @argv = argv
-        r = resolve_queue or break
-        r = ready or break
-        while tok = @queue_a.shift  # not using reduce b.c 1 stack frame
-          act = action_a.detect { |a| a.local_normal_name == tok }
-          if act
-            r = act.client.send act.as_method
-            if false == r
-              break  # meh
-            else
-              emit_customized_eventpoint :conclude, -> pi do
-                [ ::Enumerator::Yielder.new do |msg|
-                  @info_y << "(#{ pi.local_plugin_moniker }#{
-                    } plugin #{ msg })"
-                  nil
-                end ]
-              end
-            end
-          else
-            send tok  # e.g 'help'
-          end
-        end
-      end while nil
-      r
-    end
-
-  private
-
-    def emit type, data
-      @emit[ type, data ]
-    end
-
-    def help
-      info option_parser.banner
-      option_parser.summarize { |s| info s }
-    end
-
-    def info msg
-      emit :info, msg
-      nil
-    end
-
-    # (the below group is services. doing it this way and not with
-    # `attr_reader` creates good warnings and avoids dumb ones.)
-
-    def info_y     ; @info_y end
-    def infostream ; @infostream end
-    def paystream  ; @paystream end
-    def em  s      ; @em[ s ] end
-
-    def option_parser
-      @option_parser ||= build_option_parser
-    end
-
-    def parse_opts
-      option_parser.parse! @argv
-      true
-    rescue ::OptionParser::ParseError => e
-      usage e
-    end
-
-    def program_name
-      @option_parser.program_name
-    end
-
-    def usage msg
-      emit :error, msg
-      info usage_line
-      info "See #{ em "#{ program_name } -h" } for more help."
-      false
-    end
-
-    def usage_line
-      "#{ em 'Usage:' } #{ option_parser.program_name } [opts] #{
-        }[[#{ action_names * '|' }] [..]] [subproduct [subproduct [..]]]"
-    end
-
     def ready
-
-      ok = true
-
-      f = -> pi do
+      ok = true ; p = -> pi do
         [ ::Enumerator::Yielder.new do |msg|
           ok = false
           @info_y << "#{ pi.local_plugin_moniker } #{ msg }"
         end ]
       end
-      emit_customized_eventpoint :ready, f
-      emit_customized_eventpoint :subtree, f
-
+      emit_customized_eventpoint :ready, p
+      emit_customized_eventpoint :subtree, p
       if ok then ok else
         @info_y << "won't procede further because of the above."
         false
       end
     end
 
-    # `resolve_queue` - test/all is expected to be run for at least two
-    # purposes - 1) it is a file we can load with `r-spec` and have it load
-    # "every" spec file in our universe.  2) it is an executable we can run
-    # standalone utilizing several options, including but not limited to
-    # invoking `r-spec` *while* having warnings turned on on our tests.
-    # `run_mode` exists to determine and represent that distinction.
-
-    # NOTE - it bears pointing out that the grammar for this utility is
-    # ambiguous. it draws symbols from both the set of available action names
-    # and the set of existing subproduct names, such that how your command is
-    # interpreted will depend on both of these at the time it is run, with
-    # tokens you intend as subproduct names possibly getting masked by (and
-    # interpreted as) action names.
-    #
-    # there is no solution yet implemented for this problem (for whenever there
-    # exists as an input token a token that looks like an action name that
-    # action will be popped off the input stream and added to the action queue
-    # as long as such tokens exist at the front of the input stream), but at
-    # present the problem is not a problem because there is no set union between
-    # the exponents of the two namespaces, (that is, there is no name that is
-    # shared by both action and subproduct name) hence the grammar is de-facto
-    # unambiguous, but only by sheer dumb luck.
-    #
-    # the solution (if ever needed) will likely be adding the one line of code
-    # necessary to let "--" separate these two nonterminal symbols.
-
-    def resolve_queue
-      ok = true
-      begin
-        if :cli == run_mode
-          parse_opts or break
-          parse_any_explicit_actions_off_of_argv or break
-        end
-        resolve_default_action_if_necessary or break
-        if :cli == @run_mode && @argv.length.nonzero?
-          emit_eventpoint :argv_hijinx, @queue_a.fetch( 0 ), @argv
-          emit_eventpoint :argument_list, @argv if @argv.length.nonzero?
-          if @argv.length.nonzero?
-            @info_y << "won't run with un argv - #{ @argv }"
-            ok = false
-          end
-        end
-      end while nil
-      ok && @queue_a.length.nonzero?
-    end
-
-    # `run_mode` - see notes at `resolve_queue`.
-    # result is { :cli | :rspec | :none }
-
-    def run_mode  # - service
-      @run_mode ||= if __FILE__ == $PROGRAM_NAME then :cli
-        elsif %r{/rspec$} =~ $PROGRAM_NAME then :rspec  # ick
-        else :none end
-    end
-
-    # (called by the framework from `parse_opts`)
-
-    def build_option_parser
-      @option_parser = o = ::OptionParser.new
-      o.banner = usage_line
-      o.separator(
-        "#{em 'Description:'} runs all known tests in the skylab universe.")
-
-      desc_h = { }
-      emit_eventpoint :action_summaries do |_pi, hh|
-        desc_h.merge! hh
-      end
-
-      max = 0
-      pair_a = action_a.reduce [] do |m, act|
-        act.slug.length > max and max = act.slug.length
-        m << [ act.slug, ( desc_h.fetch( act.local_normal_name ) do
-          "the #{ em act.slug } action"
-        end ) ]
-        m
-      end
-
-      fmt = "    %-#{ max }s    %s"
-      a = pair_a.reduce [] do |m, (one, two)|
-        m << fmt % [ one, two ]
-      end
-      o.separator "#{ em 'Actions:' }\n#{ a * "\n" }"
-
-      o.separator "#{ em 'Options:' }"
-
-      merge_options o, -> merger do
-        merger.add(Headless::CLI::Option.on( '-h', '--help', 'this screen.' ) do
-          @queue_a << :help
-        end )
-      end
-
-      o
-    end
-
-    def full_program_name
-      $PROGRAM_NAME
-    end
-
     def local_plugin_moniker  # - because we add self to merged o.p
       program_name
     end
 
-    def action_names
-      @action_names ||= action_a.map( & :slug )
+    def execute_each_action_on_queue
+      act_a = action_a
+      while act_i = @queue_a.shift  # not using reduce b.c 1 stack frame
+        @last_action_name_i = act_i
+        r = if (( act = act_a.detect { |a| act_i == a.local_normal_name } ))
+          execute_particular_action_on_queue act
+        else
+          send act_i  # e.g 'help'
+        end
+        r or break( early_exit_notice r )
+      end
+      nil
     end
 
-    # `action_a` - this is where we aggregate and sort the action metadata
-    # from all our plugins and line it up into a neat little row (note it
-    # is in a determinsistic way, to boot).
-
     def action_a
-      if ! @action_a
-        omni_a = [ ] ; unique_h = { }
-        normalize_priority = Priority_Normalizer_[ 0.0, 1.0 ]
-        emit_eventpoint :available_actions do |pi, action_a|
-          action_a.each do |normal_i, priority_flot|
-            act = Action_[ normal_i, pi, normalize_priority[ priority_flot ] ]
-            taken = unique_h[ act.local_normal_name ]
-            if taken
-              raise Headless::Plugin::DeclarationError, "plugin #{
-                }comprehension sorting conflict - name conflict with #{
-                }\"#{ act.local_normal_name }\" from both #{
-                }#{ pi.local_plugin_moniker } and #{
-                }#{ taken.local_plugin_moniker }"
-            else
-              unique_h[ act.local_normal_name ] = pi
-              omni_a << act
-            end
-          end
+      @action_a ||= get_action_a
+    end
+
+    def get_action_a  # reduce & sort all action metadata from each plugin
+      omni_a = [ ] ; unique_h = { }
+      cut = Priority_Normalizer_[ 0.0, 1.0 ]
+      emit_eventpoint :available_actions do |pi, action_a|
+        action_a.each do |normal_i, priority_flot|
+          act = Action_[ normal_i, pi, cut[ priority_flot ] ]
+          taken = unique_h[ act.local_normal_name ]
+          taken and raise build_action_collision_error( act, pi, taken )
+          unique_h[ act.local_normal_name ] = pi
+          omni_a << act
         end
-        omni_a.sort_by!( & :priority )
-        @action_a = omni_a
       end
-      @action_a
+      omni_a.sort_by!( & :priority )
+      omni_a
     end
 
     Priority_Normalizer_ = -> exclusive_min_flot, exclusive_max_flot do
@@ -379,38 +173,325 @@ module Skylab::Test
       end
     end
 
-    def parse_any_explicit_actions_off_of_argv
-      while @argv.length.nonzero?
-        tok = @argv.fetch 0
-        rx = /\A#{ ::Regexp.escape tok }/i
-        act = @action_a.detect { |a| rx =~ a.slug }
-        if act
-          @argv.shift  # (we lose the actual token used here.)
-          @queue_a << act.local_normal_name
-        else
-          break
-        end
-      end
-      true
+    def build_action_collision_error act, pi, taken
+      Headless::Plugin::DeclarationError.new "plugin #{
+        }comprehension sorting conflict - name conflict with #{
+        }\"#{ act.local_normal_name }\" from both #{
+        }#{ pi.local_plugin_moniker } and #{
+        }#{ taken.local_plugin_moniker }"
     end
 
-    def resolve_default_action_if_necessary
-      if @queue_a.length.zero?  # could be shortened but meh
-        name_i  = nil
-        weight_flot = 0.0
-        emit_eventpoint :default_action do |pi, nm_i, wt_flot|
+    def execute_particular_action_on_queue act
+      begin
+        r = act.client.send act.as_method
+        false == r and break
+        emit_customized_eventpoint :conclude, -> pi do
+          [ ::Enumerator::Yielder.new do |msg|
+            @info_y << "(#{ pi.local_plugin_moniker } plugin #{ msg })"
+            nil
+          end ]
+        end
+      end while nil
+      r
+    end
+
+    def early_exit_notice r
+      if @queue_a.length.nonzero? and false != r
+        i = @last_action_name_i ; a = @queue_a
+        @info_y << Headless::NLP::EN.calculate do
+          "(notice - the #{ Lbl_[ i ] } action issued an early exit #{
+            }before the #{ or_ a.map( & Lbl_ ) } action#{ s } had #{
+            }a chance to run.)"
+        end
+      end
+      nil
+    end
+
+    Lbl_ = -> i do
+      i.to_s.gsub( '_', ' ' ).inspect
+    end
+
+    #  ~ services (both "raw" and managed) ~
+
+    public :emit_eventpoint
+
+    def full_name  # a service provided by this plugin host
+      FULL_NAME_[]
+    end
+  end
+
+  module Merge_Options_  # (re-opens below)
+  end
+
+  class CLI < Front_Mechanics_  # (separation of concerns)
+
+    include Merge_Options_
+
+    def initialize _, sout, serr
+      super( )
+      @emit = -> type, str do
+        ( :payload == type  ? sout : serr ).puts str
+      end
+      @paystream, @infostream = sout, serr
+      @info_y = ::Enumerator::Yielder.new( & @infostream.method( :puts ) )
+      @em = -> s { "\e[1;32m#{ s }\e[0m" }
+      @pretty_path = Headless::CLI::PathTools::FUN.pretty_path
+      nil
+    end
+
+    def invoke argv
+      begin
+        @argv = argv
+        r = Queue_Resolver_.new( self ).execute or break
+        r = ready or break
+        r = execute_each_action_on_queue
+      end while nil
+      r
+    end
+
+  private  # (short and uninteresting cosmetic methods are at the end)
+
+    def run_mode  # result is { :cli | :rspec | :none }. see #notes-here
+      @run_mode ||= if __FILE__ == $PROGRAM_NAME then :cli
+        elsif %r{/rspec$} =~ $PROGRAM_NAME then :rspec  # ick
+        else :none end
+    end
+
+    def build_option_parser
+      @option_parser = o = ::OptionParser.new
+      o.banner = usage_line
+      o.separator(
+        "#{em 'Description:'} runs all known tests in the skylab universe.")
+      desc_h = { } ; emit_eventpoint :action_summaries do |_pi, hh|
+        desc_h.merge! hh
+      end
+      max = 0 ; pair_a = action_a.reduce [] do |m, act|
+        act.slug.length > max and max = act.slug.length
+        m << [ act.slug, ( desc_h.fetch( act.local_normal_name ) do
+          "the #{ em act.slug } action"
+        end ) ]
+      end
+      fmt = "    %-#{ max }s    %s"
+      a = pair_a.reduce [] do |m, (one, two)|
+        m << fmt % [ one, two ]
+      end
+      o.separator "#{ em 'Actions:' }\n#{ a * "\n" }"
+      o.separator "#{ em 'Options:' }"
+      merge_options o, -> merger do
+        merger.add(
+          Headless::CLI::Option.on( '-h', '--help', 'this screen.' ) do
+            @queue_a << :help
+          end )
+      end
+      o
+    end
+
+    def help  # via :help
+      info option_parser.banner
+      option_parser.summarize { |s| info s }
+    end
+
+    #  ~ the boring ones ~
+
+    def option_parser
+      @option_parser ||= build_option_parser
+    end
+
+    def usage msg
+      emit :error, msg
+      info usage_line
+      info "See #{ em "#{ program_name } -h" } for more help."
+      false
+    end
+
+    def emit type, data
+      @emit[ type, data ]
+    end
+
+    def info msg
+      emit :info, msg
+      nil
+    end
+
+    def usage_line
+      "#{ em 'Usage:' } #{ option_parser.program_name } [opts] #{
+        }[[#{ action_names * '|' }] [..]] [subproduct [subproduct [..]]]"
+    end
+
+    def action_names
+      @action_names ||= action_a.map( & :slug )
+    end
+
+    def program_name
+      @option_parser.program_name
+    end
+
+    # --*--
+
+    #  ~ services implementations ~
+
+  public
+
+    attr_reader :argv, :queue_a ; public :run_mode, :action_a
+
+  private
+
+    # catch errors earlier by triggering warnings for missing ivars)
+    def em  s      ; @em[ s ] end
+    def info_y     ; @info_y end
+    def infostream ; @infostream end
+    def paystream  ; @paystream end
+
+    def full_program_name
+      $PROGRAM_NAME
+    end
+
+    def get_expression_agent
+      Expression_Agent_.new
+    end
+
+    class Expression_Agent_
+      def ick msg
+        "\"#{ msg }\""
+      end
+      def kbd msg
+        "`#{ msg }`"
+      end
+      alias_method :calculate, :instance_exec
+    end
+  end
+
+  class Queue_Resolver_  # parsing argv and resolving an "action queue" for
+    # this thing is super annoying because some plugins are passive (they
+    # do *not* assume responsibility for processing all of the request) or
+    # they are active (they must be able to short-circuit the parent node's
+    # further processing of the request). also, run_mode comes into play:
+    #
+    # test/all is expected to be run for at least two purposes - 1) it is a
+    # file we can load with `r-spec` and have it load "every" spec file in our
+    # universe.  2) it is an executable we can run standalone utilizing
+    # several options, including but not limited to invoking `r-spec` *while*
+    # having warnings turned on on our tests. `run_mode` exists to determine
+    # and represent that distinction. :[#notes-here]
+
+    # (also, see "confessions of an ambiguous grammar" [#005])
+
+    def initialize svc
+      @run_mode = svc.run_mode ; @queue_a = svc.queue_a
+      @argv = svc.argv ; @action_a = svc.action_a
+      @op_p = svc.method :option_parser
+      @usage_p = svc.method :usage
+      @info_y_p = svc.method :info_y
+      @ep_p = -> name_i, *a, &p do
+        svc.emit_eventpoint name_i, *a, &p
+      end
+    end
+
+    def execute
+      mode = @run_mode
+      ok = true
+      :cli == mode and (( ok = first_pass ))
+      if ok
+        middle_pass
+        :cli == mode and last_pass
+      end
+      @result
+    end
+
+  private
+
+    def first_pass
+      ok = true
+      if @argv.length.nonzero?
+        if (( action = fuzzy_match_action @argv.fetch( 0 ) ))
+          accept_head_parsed_action action
+          emit_ep :argv_hijinx, @queue_a.fetch( 0 ), @argv
+        end
+        ok = first_pass_post_hijinx
+      end
+      ok
+    end
+
+    def emit_ep name_i, *rest, &blk
+      @ep_p[ name_i, *rest, &blk ]
+    end
+
+    def accept_head_parsed_action action
+      @argv.shift  # (we lose the particular token used here - meh)
+      @queue_a << action.local_normal_name
+      nil
+    end
+
+    def first_pass_post_hijinx
+      if @argv.length.zero? then true else
+        stack_up_remaining_leading_actions
+        ok, r = parse_all_options_now_or_display_usage
+        ok or @result = r
+        ok
+      end
+    end
+
+    def stack_up_remaining_leading_actions  # assume some nonzero argv
+      while true
+        (( action = fuzzy_match_action @argv.fetch( 0 ) )) or break
+        accept_head_parsed_action action
+        @argv.length.zero? and break
+      end
+      nil
+    end
+
+    def fuzzy_match_action tok
+      rx = /\A#{ ::Regexp.escape tok }/i  # consider input string of length 1!
+      @action_a.detect { |a| rx =~ a.slug }
+    end
+
+    def parse_all_options_now_or_display_usage
+      @op_p[].parse! @argv
+      true
+    rescue ::OptionParser::ParseError => e
+      r = @usage_p[ e ]
+      [ false, r ]
+    end
+
+    def middle_pass
+      if @queue_a.length.zero?
+        name_i  = nil ; weight_flot = 0.0
+        emit_ep :default_action do |pi, nm_i, wt_flot|
           if wt_flot > weight_flot
             name_i, weight_flot = nm_i, wt_flot
           end
         end
         name_i && @queue_a << name_i
       end
-      @queue_a.length.nonzero?
-      # (result's true-ish-ness = whether we have resolved *any* action.)
+      @result = @queue_a.length.nonzero?  # in case no last pass
+      nil
+    end
+
+    def last_pass
+      if @argv.length.nonzero?
+        stack_up_remaining_leading_actions  # we do this a second time after
+        # all options have been parsed and the head is cleared. (it still
+        # works ok without this - this is to generate warnings of actions being
+        # ignored when e.g help in invoked before an action name - because the
+        # white plugin will passively absorb the rest and silently not do
+        # anything otherwise)
+      end
+      @result = ensure_that_plugins_parse_any_remaining_argv
+      nil
+    end
+
+    def ensure_that_plugins_parse_any_remaining_argv
+      if @argv.length.zero? then true else
+        emit_ep :argument_list, @argv
+        if @argv.length.zero? then true else
+          @info_y_p[] << "won't run with unparsed argv - #{ @argv }"
+          false
+        end
+      end
     end
   end
 
-  module Host_InstanceMethods
+  module Merge_Options_
 
     # because we are crazy and we have plugins with plugins ..
 
@@ -421,7 +502,7 @@ module Skylab::Test
 
     def merge_options up_op, at_end=nil, ctx_a=nil
       ep = plugin_host_metaservices.eventpoints.fetch :available_options
-      merger = Headless::CLI::Option::Merger.new ANCHORIZED_MONIKER_
+      merger = Headless::CLI::Option::Merger.new Anchorized_moniker_
       hot_plugin_a.each do |pi|
         if pi.plugin_metaservices.subscribed_to_eventpoint? ep.normal
           rec = Headless::CLI::Option::Parser::Recorder.new do |opt|
@@ -434,18 +515,13 @@ module Skylab::Test
       merger.write up_op
       nil
     end
-
-    ANCHORIZED_MONIKER_ = -> * cx_a do
+    Anchorized_moniker_ = -> * cx_a do
 
       # for a plugin that itself has plugins, its desc lines will qualify
       # themselves multiple times without the below check #whew
 
       if ! cx_a.last.plugin_metastory.is_host
-        a = cx_a.reduce [] do |m, client|
-          m << client.local_plugin_moniker
-          m
-        end
-        "#{ a * ' ' } plugin"
+        "#{ cx_a.map( & :local_plugin_moniker ) * ' ' } plugin"
       end
     end
   end

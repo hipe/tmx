@@ -61,7 +61,7 @@ module Skylab::Test
 
     end
 
-    include Host_InstanceMethods  # `merge_options`
+    include Merge_Options_
 
     available_options do |op, ctx_a|
       ctx_a ||= [ ]

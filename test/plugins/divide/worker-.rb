@@ -4,20 +4,9 @@ module Skylab::Test
 
     class Worker_
 
-      Field_ = MetaHell::FUN::Parse::Field_
-
       def self.[] *a
         new( *a ).execute
       end
-
-      Syntax_ = MetaHell::FUN.parse_series.curry[
-        :syntax, :zapple, :monikate, -> a { a * ' ' },
-        :field, :monikate, -> s { "[ #{ s } ]" },
-        :field, :moniker, '<integer>',
-          :token_scanner, Field_::Int_::Scan_token,
-        :field, * Field_::Flag_[ :random ].to_a,
-        :prepend_to_uncurried_queue, :exhaustion
-      ]
 
       def initialize host_svcs, argv
         out, err = host_svcs[ :paystream, :infostream ]
@@ -53,7 +42,20 @@ module Skylab::Test
         end
       end
 
-      def execute ; @execute.call end
+      Field_ = MetaHell::FUN::Parse::Field_
+
+      Syntax_ = MetaHell::FUN.parse_series.curry[
+        :syntax, :monikate, -> a { a * ' ' },
+        :field, :monikate, -> s { "[ #{ s } ]" },
+        :field, :moniker, '<integer>',
+        :token_scanner, Field_::Int_::Scan_token,
+        :field, * Field_::Flag_[ :random ].to_a,
+        :prepend_to_uncurried_queue, :exhaustion
+      ]
+
+      def execute
+        @execute.call
+      end
     end
   end
 end

@@ -46,6 +46,14 @@ module Skylab::MetaHell
 
       attr_reader :looks_like_particular_field
 
+      def any_context
+        if @last_x
+          " after \"#{ @last_x }\""
+        else
+          " at beginning of field sub-parse"
+        end
+      end
+
     private
 
       def normal_parse memo, argv

@@ -61,12 +61,19 @@ module Skylab::MetaHell
 
       def to_a
         a = [ ]
-        s = moniker and a << :moniker << s
+        s = get_moniker and a << :moniker << s
         a << :token_scanner << method( :scan_token )
         a
       end
 
     private
+
+      def moniker a
+        super
+        @i ||= @moniker
+        nil
+      end
+
     FUN::Fields_::From_.methods do  # (borrow one indent)
 
       def head_matches argv
@@ -80,13 +87,6 @@ module Skylab::MetaHell
           @fuzzy[ argv.fetch 0 ]
         end
       end
-
-      def moniker a
-        super
-        @i ||= @moniker
-        nil
-      end
-
       def predicate a
         @predicates.push a.fetch( 0 ) ; a.shift
         nil
