@@ -120,37 +120,7 @@ module Skylab::Face
       false
     end
 
-    Normalize_ = -> y, par_h do
-
-      # mutates par_h. see client.rb [#fa-019]. [#bs-013] this func wants
-      # to be a method, but we let it stay funcy for one hack for now..
-      # this is a bit like [#sl-116] the one true algorithm.
-
-      miss_a = nil ; r = false ; before = y.count
-      field_box.each do |i, fld|
-        x = ( par_h.delete i if par_h and par_h.key? i )
-        accept_field_value fld, x
-        if fld.has_normalizer || fld.has_default  # yes after
-          x = field_normalize y, fld, x
-        end
-        fld.is_required && x.nil? and ( miss_a ||= [] ) << fld
-      end
-      begin
-        Some_[ par_h ] and break( y << "undeclared #{
-          }parameter(s) - (#{ par_h.keys * ', ' }) for #{ self.class }. #{
-          }(declare it/them with `params` macro?)" )
-        miss_a and break( y << "missing required parameter(s) - (#{
-          }#{ miss_a.map( & :local_normal_name ) * ', ' }) #{
-          }for #{ self.class }." )
-        y.count > before and break
-        r = true
-      end while nil
-      r
-    end
-
     # (predecessor to the function chain was removed with this line #posterity)
-
-    define_method :normalize, & Normalize_
 
   private
 
@@ -158,39 +128,6 @@ module Skylab::Face
       EMPTY_FIELD_BOX_
     end
     EMPTY_FIELD_BOX_ = Services::Basic::Field::Box.new.freeze
-
-    def accept_field_value fld, x
-      ivar = fld.as_host_ivar
-      instance_variable_defined? ivar and !
-        instance_variable_get( ivar ).nil? and
-          fail "sanity - ivar collision: #{ ivar }"
-      instance_variable_set ivar, x
-      nil
-    end
-
-    def field_normalize y, fld, x  # result per [#034]
-
-      # any notices/errors written to `y`.
-      # `x` is the input value and then result value of field `fld`.
-
-      ivar = fld.as_host_ivar
-
-      fld.has_default && x.nil? and
-        x = instance_variable_set( ivar,
-          instance_exec( & fld.default_value ) )  # always a proc
-
-      if fld.has_normalizer
-        true == (( p = fld.normalizer_value )) and
-          p = method( :"normalize_#{ fld.local_normal_name }" )
-
-        x = instance_exec y, x, -> normalized_x do
-          instance_variable_set ivar, normalized_x
-          nil
-        end, & p
-      end
-
-      x  # the system wants to know the particular nil-ish-ness of x
-    end
 
   public
 
@@ -200,7 +137,7 @@ module Skylab::Face
       while a.length.nonzero?
         i = a.shift ; x = a.fetch 0 ; a.shift
         fld = bx.fetch i
-        accept_field_value fld, x
+        field_value_notify fld, x
         fld.has_normalizer and field_normalize yy, fld, x
       end
       yy.count.zero?
@@ -228,10 +165,13 @@ module Skylab::Face
         if ! a.index { |x| ::Symbol != x.class }
           a.map! { |x| [ x, :arity, :one ] }
         end
-        API::Action::Param[ self, a, _meta_param_a ]
+        API::Action::Param.enhance_client_with_param_a_and_meta_param_a(
+          self, a, _meta_param_a )
         nil
       end
     end, :params ]
+
+    API::Normalizer_.enhance_client_class self  # needed whether params or no
 
     # ~ facet 5.6x - metastories [#fa-035] ~
 

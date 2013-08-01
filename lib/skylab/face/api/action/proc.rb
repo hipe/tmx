@@ -58,14 +58,14 @@ module Skylab::Face
         true  # so we receive the call to normalize below
       end
 
-      define_method :super_normalize, & Normalize_
+      define_method :super_normalize, & API::Normalizer_::Normalize_method_
 
       def normalize y, par_h
         par_h and @keys_provided_set = Face::Services::Set.new( par_h.keys )
         super_normalize y, par_h
       end
 
-      def accept_field_value fld, x
+      def field_value_notify fld, x
         @param_h ||= { }
         @param_h[ fld.local_normal_name ] = x
         nil

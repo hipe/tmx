@@ -52,6 +52,9 @@ module Skylab::Face
       host_mod.send :include, API::Action::Param::InstanceMethods
       nil
     end
+    class << self
+      alias_method :enhance_client_with_param_a_and_meta_param_a, :[]
+    end
   end
 
   module API::Action::Param::Field_IMs_

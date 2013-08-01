@@ -91,7 +91,8 @@ module Skylab::Face
     def get_reflective_action i_a  # for documentation, not execution
       action = build_primordial_action i_a
       if ! action.has_param_facet
-        API::Action::Param[ action.class, [], nil ]
+        API::Action::Param.enhance_client_with_param_a_and_meta_param_a[
+          action.class, [], nil ]
         # because we lazy load revelations, ich muss sein, twerk the class..
       end
       # we are open to the possibility of needing to wire it further but
