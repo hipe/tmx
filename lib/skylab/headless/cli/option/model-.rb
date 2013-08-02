@@ -18,6 +18,20 @@ module Skylab::Headless
         end
       end
 
+      def self.new_semi_mutable_from_normal_name i
+        m = Semi_Mutable_.new Normal_to_long_[ i ]
+        m.set_norm_short_str Normal_to_short_[ i ]
+        m
+      end
+
+      Normal_to_long_ = -> i do
+        "--#{ i.to_s.gsub '_', '-' }"
+      end
+
+      Normal_to_short_ = -> i do
+        "-#{ i[ 0 ] }"
+      end
+
       def self.on *a, &b
         allocate.instance_exec do
           @norm_short_str = @long_sexp = @sexp = nil
@@ -59,7 +73,7 @@ module Skylab::Headless
         false
       end
 
-      def args  # where available
+      def get_args  # where available
         @args.dup
       end
 
@@ -199,6 +213,53 @@ module Skylab::Headless
       end
 
       EMPTY_S_ = ''.freeze
+    end
+
+    class Semi_Mutable_ < Model_
+
+      class << self
+        public :new
+      end
+
+      def initialize norm_long_str
+        @desc_a = @long_sexp = nil
+        @norm_long_str = norm_long_str
+      end
+
+      def append_arg s
+        @long_sexp = nil
+        @norm_long_str.concat s  # yikes
+        nil
+      end
+
+      def set_norm_short_str x
+        @norm_short_str = x
+        nil
+      end
+
+      def set_single_letter s
+        @norm_short_str = "-#{ s }"
+        nil
+      end
+
+      def set_desc_a x
+        @desc_a = x
+        nil
+      end
+
+      attr_reader :desc_a
+
+      def single_letter_i
+        @norm_short_str[ 1 ].intern
+      end
+
+      def to_a
+        a = [ ]
+        (( s = @norm_short_str )) and a << s
+        (( s = @norm_long_str )) and a << s
+        @desc_a and a.concat @desc_a
+        a
+      end
     end
   end
 end

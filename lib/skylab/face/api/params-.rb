@@ -1,16 +1,19 @@
 module Skylab::Face
 
-  module API::Action::Param
+  module API::Params_
 
-    # this whole node is for experimenting in the automatic creation of a set
-    # of meta-fields that can be recognized by the entity library. tag your
-    # fields with these metafields and we can try to make magic happen for you
-    #
-    # [#fa-014] (for now under the entity node)
+    # this whole node is for an #experiment with the automatic creation of a
+    # set of meta-fields that can be recognized by the entity library. tag
+    # your fields with these metafields and we can try to make magic happen
+    # for you. but note it is only the beginning. within e.g a given action
+    # class you can create arbitrary new meta-fields to describe your fields
+    # with, and use them however you want in that action :[#fa-014].
 
-    METAFIELDS_ = [
+    METAFIELD_A_A_ = [
 
       [ :arity, :property ],  # [#fa-024]
+
+      [ :argument_arity, :property ],  # #experimental
 
       [ :desc, :property ],  # [#fa-030]
 
@@ -34,55 +37,191 @@ module Skylab::Face
 
       [ :default, :property ],  # [#fa-033]
 
-      # (trailing comma above is intentional and syntactically valid, but still
-      # feels really weird to do without justifying it with this long comment)
+      [ :single_letter, :property ],
+
+      [ :argument_string, :property ]
+
     ].tap { |a| a.freeze.each( & :freeze ) }
 
-    # `self.[]` - enhance the API::Action class with this facet.
-    # fulfill [#fa-026]. assumes it is behind a module mutex.
-    # assumes `param_a` looks right structurally.
+    -> do
 
-    def self.[] host_mod, param_a, meta_param_a
-      Services::Basic::Field::Box.enhance host_mod do
-        field_class_instance_methods -> { API::Action::Param::Field_IMs_ }
-        meta_fields( * API::Action::Param::METAFIELDS_, * meta_param_a )
+      fld = (( Field = Services::Basic::Field ))
+      r = fld::N_Meta_Resolver_.new
+      r.push nil  # [#049] - sadly necessary to get the field class for now
+      r.push METAFIELD_A_A_, nil, -> x do
+        Param_ = x
+      end
+      r.seed fld::Meta_Field_Factory_
+      r.flush or fail "sanity"  # (result is stack size)
+
+    end.call
+
+    def self.enhance_client_with_param_a_and_meta_param_a client, param_a,
+        meta_param_a  # fulfill [#fa-026]
+      # assume behind module mutex & `param_a` looks right structurally.
+
+      Field::Box.enhance client do
+        field_class_instance_methods -> { Param_IMs_ }
+        meta_fields( * METAFIELD_A_A_, * meta_param_a )
         fields( * param_a )
       end
-      Services::Basic::Field::Reflection.enhance( host_mod ).with host_mod
-      host_mod.send :include, API::Action::Param::InstanceMethods
+
+      Field::Reflection.enhance( client ).with client
+
+      client.send :include, Action_IMs_
+
       nil
     end
-    class << self
-      alias_method :enhance_client_with_param_a_and_meta_param_a, :[]
+
+    module Param_IMs_
+
+      def is_required *a
+        # isomorph the idea of required-ness from the arity [#fa-024]
+        if has_arity
+          ! arity_o.includes_zero
+        else
+          true
+        end
+      end
+
+      def arity_o
+        if @has_arity
+          @arity_o ||= Services::Headless::Arity[ @arity_value ]
+        end
+      end
+
+      def some_argument_arity_value
+        has_argument_arity ? @argument_arity_value : :one
+      end
+
+      def some_argument_arity_value_is_zero
+        :zero == some_argument_arity_value
+      end
+
+    private
+
+      def desc a  # "override" one that is higher up on the chain to let this
+        if (( str = a.first )).respond_to? :ascii_only?  # sugar through
+          a[ 0 ] = -> y { y << str }
+        end
+        super
+      end
     end
-  end
 
-  module API::Action::Param::Field_IMs_
+    def self.[] * x_a
+      # (in the spirit of MetaHell::FUN::Fields_::Countoured_)
+      mod = (( contour = Contour_Parse_.new( * x_a ) )).client_mod
+      mod.const_set :FIELDS_, contour.params  # gotta compat with fields lib
+      nil
+    end
 
-    # isomorph the idea of required-ness from the arity - resolve a
-    # range-like into a boolean [#fa-024]
+    class Contour_Parse_
 
-    def is_required
-      if has_arity
-        ! arity.includes_zero
-      else
+      def initialize *a
+        @meta_param_x_a = @param_class = nil
+        @params = Field::Box.new
+        absorb( * a )
+      end
+
+      attr_reader :params
+
+      def client_mod
+        @client_mod
+      end
+
+      private
+      MetaHell::FUN::Fields_::From_.methods do
+
+        def client a
+          @client_mod = a.shift
+          nil
+        end
+
+        def meta_param a
+          ( @meta_param_x_a ||= [ ] ) << a.shift
+          nil
+        end
+
+        def param a
+          @param_class || bake_param_class
+          param = @param_class.new( a.fetch 0 ) ; a.shift
+          param.absorb_notify a
+          @params.add param.local_normal_name, param
+          nil
+        end
+      end
+
+      def bake_param_class
+        @param_class = @meta_param_x_a ? produce_param_class : Param_
+      end
+
+      def produce_param_class
+        param_class = nil
+        r = Field::N_Meta_Resolver_.new
+        r.push nil  # [#049]
+        r.push [ * METAFIELD_A_A_, * @meta_param_x_a ], nil, -> x do
+          param_class = x
+        end
+        r.seed Field::Meta_Field_Factory_
+        r.flush
+        @client_mod.const_set :PARAM_, param_class
+        Make_Include_and_or_Stow_2_Contour_IMs_[ param_class ]
+        param_class
+      end
+    end
+
+    Make_Include_and_or_Stow_2_Contour_IMs_ = -> client do
+      im_mod = ::Module.new
+      client.class_exec do
+        const_set :Autogenerated_Contour_Parse_IMs_, im_mod
+        include im_mod
+        include Param_IMs_
+      end
+      Contour_[ client::FIELDS_, im_mod ]
+      nil
+    end
+
+    Contour_ = -> field_box, im_mod do
+      im_mod.module_exec do
+        MetaHell::FUN::Fields_::From_.methods do
+          field_box.each do |fld|
+            if fld.is_property
+              Contour_with_property_[ im_mod, fld ]
+            else
+              Contour_with_flag_[ im_mod, fld ]
+            end
+          end
+        end
+      end
+      nil
+    end
+
+    Contour_with_property_ = -> im_mod, fld do
+      m = fld.local_normal_name
+      im_mod.send :define_method, m do |a|
+        instance_variable_set fld.as_has_predicate_ivar, true
+        instance_variable_set fld.as_value_ivar, a.fetch( 0 ) ; a.shift
+        nil
+      end
+      im_mod.send :private, m
+    end
+
+    Contour_with_flag_ = -> im_mod, fld do
+      m = fld.local_normal_name
+      im_mod.send :define_method, m do |_|
+        instance_variable_set fld.as_is_predicate_ivar, true
+        nil
+      end
+      im_mod.send :private,  m
+    end
+
+    Make_Include_and_or_Stow_2_Contour_IMs_[ Param_ ]
+
+    module Action_IMs_
+
+      def has_param_facet  # fulfill [#fa-027].
         true
       end
-    end
-
-    def arity
-      if @has_arity
-        @arity ||= Services::Headless::Arity[ @arity_value ]
-      end
-    end
-  end
-
-  module API::Action::Param::InstanceMethods
-
-    def has_param_facet
-      true
-    end
-    # public. fulfill [#fa-027].
 
     # `unpack_params` (what it was formerly is described in [#fa-012]) result
     # is a tuple (fixed length array) of the same number as the number of
@@ -104,23 +243,15 @@ module Skylab::Face
     # which is useful only at the end as a catch-all base case.
     # #todo wtf test-case documentation hello
 
-    -> do
-
-      truefunc = MetaHell::MONADIC_TRUTH_
-      symfunc = -> i do
-        -> bf do
-          bf.field[ i ]
-        end
-      end
-      define_method :unpack_params do |ix, *a|
+      def unpack_params ix, *a
         a.unshift ix ; res_a = ::Array.new( len = a.length )
         len.times do |idx|
-          res_a[ idx ] = { } # sneak this in here
+          res_a[ idx ] = { }  # sneak this in here
           v = a[idx]
-          if ::Symbol == v.class  # meh
-            a[idx] = symfunc[ v ]
+          if v.respond_to? :id2name
+            a[ idx ] = Get_aref_proc_[ v ]
           elsif true == v
-            a[idx] = truefunc
+            a[ idx ] = MetaHell::MONADIC_TRUTH_
           end
         end
         fields_bound_to_ivars.each do |bf|
@@ -133,6 +264,12 @@ module Skylab::Face
         end
         res_a
       end
-    end.call
+
+      Get_aref_proc_ = -> i do  # (`aref` as in ruby source - hash.c)
+        -> bound_field do
+          bound_field.field[ i ]
+        end
+      end
+    end
   end
 end
