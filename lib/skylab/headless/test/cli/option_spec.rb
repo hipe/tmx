@@ -53,7 +53,7 @@ module Skylab::Headless::TestSupport::CLI::Option
 
         op = Headless::CLI::Option.on( '-a', '--apple <x>' ) { |x| touched = x }
 
-        op.args.should eql( [ '-a', '--apple <x>' ] )
+        op.get_args.should eql( [ '-a', '--apple <x>' ] )
 
         op.block[ :hi ]
         touched.should eql( :hi )

@@ -165,7 +165,7 @@ module Skylab::Face
         if ! a.index { |x| ::Symbol != x.class }
           a.map! { |x| [ x, :arity, :one ] }
         end
-        API::Action::Param.enhance_client_with_param_a_and_meta_param_a(
+        API::Params_.enhance_client_with_param_a_and_meta_param_a(
           self, a, _meta_param_a )
         nil
       end

@@ -64,7 +64,7 @@ module Skylab::Headless
         @write = -> op do
           a.each_with_index do |x, idx|
             if x.is_option
-              op.define( * x.args, & x.block )  # ( it's ::OptionParser's API )
+              op.define( * x.get_args, & x.block )  # ( it's ::OptionParser's API )
             else
               x.write op
             end

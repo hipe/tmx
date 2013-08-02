@@ -118,7 +118,8 @@ module Skylab::MetaHell
     Nil_out_the_rest_ = -> ivar_h, obj, i_a do
       obj.instance_exec do
         ( ivar_h.keys - i_a ).each do |ii|
-          instance_variable_set ivar_h.fetch( ii ), nil
+          ivar = ivar_h.fetch ii
+          instance_variable_defined? ivar or instance_variable_set ivar, nil
         end
       end
     end
