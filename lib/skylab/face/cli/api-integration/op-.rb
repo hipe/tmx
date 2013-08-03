@@ -28,7 +28,7 @@ module Skylab::Face
         opt = Option.new_semi_mutable_from_normal_name i
         if fld.has_argument_string
           opt.append_arg fld.argument_string_value
-        elsif TAKES_ARG_H_[ fld.some_argument_arity_value ]
+        elsif fld.some_argument_arity.is_one
           opt.append_arg Normal2arg_[ i ]
         end
         fld.has_single_letter and opt.set_single_letter fld.single_letter_value
@@ -47,13 +47,6 @@ module Skylab::Face
         opt
       end
 
-      TAKES_ARG_H_ = { :zero => false, :one => true }.tap do |h|
-        h.default_proc = -> _h, k do
-          raise ::ArgumentError, "unsupported argument arity - #{ k }"
-        end
-        h.freeze
-      end
-
       Normal2arg_ = -> i do
         s = i.to_s
         stem = s[ ( (( i = s.rindex '_' )) ? i + 1 : 0 ) .. -1 ]
@@ -67,10 +60,10 @@ module Skylab::Face
         nil
       end
 
-      def build_proc fld  # assume has arity_o b.c assume is not required b.c
+      def build_proc fld
         name_i = fld.local_normal_name  # assume all opts are not required
-        if fld.arity_o.is_unbounded
-          if fld.some_argument_arity_value_is_zero
+        if fld.some_arity.is_polyadic
+          if fld.some_argument_arity.is_zero
             -> _ do
               @param_h[ name_i ] ||= 0
               @param_h[ name_i ] += 1
@@ -82,7 +75,7 @@ module Skylab::Face
               nil
             end
           end
-        elsif fld.some_argument_arity_value_is_zero
+        elsif fld.some_argument_arity.is_zero
           -> _true do
             if @param_h.key? name_i
               handle_clobber_by_upgrading_to_integer name_i
@@ -113,7 +106,7 @@ module Skylab::Face
       end
 
       def handle_clobber_by_upgrading_to_integer name_i
-        if (( v = @param_h[ name_i ] )).respond_to? :numerator
+        if (( v = @param_h[ name_i ] )).respond_to? :even?
           @param_h[ name_i ] = v + 1
         else
           @param_h[ name_i ] = 2

@@ -1,3 +1,4 @@
+[#050]       #doc-point when mono mono and we get an array..
 [#049]       #in-situ
 [#048]       #done `t-ablify` - cleanup signature (#rip)
 [#047]       #doc-point visibility of the node is *not* in the domain ..
@@ -26,7 +27,7 @@
 [#030]       #doc-point #parent:013 #body-is-inline-in-parent
                the `desc` meta-field
 [#029]       #doc-point #parent:024 #body-is-inline-in-parent
-               the sacred 5 argument arities
+               the "useful five" argument arities
 [#028]       #doc-point #parent:025 #body-is-inline-in-parent
                facets are hard-coded
 [#027]       #doc-point #parent:025 #body-is-inline-in-parent

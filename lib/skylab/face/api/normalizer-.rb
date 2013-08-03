@@ -28,10 +28,10 @@ module Skylab::Face
         x = ( par_h.delete i if par_h and par_h.key? i )
         fld_val_notify[ fld, x ]
         if fld.has_normalizer || fld.has_default  # yes after
-
           x = fld_normalize[ y, fld, x ]
         end
         fld.is_required && x.nil? and ( miss_a ||= [] ) << fld
+        Validate_arities_[ y, fld, x ]
       end
       begin
         Some_[ par_h ] and break( y << "undeclared #{
@@ -47,6 +47,68 @@ module Skylab::Face
     end
     M_or_p_ = -> obj, meth_i, proc_p do
       obj.respond_to?( meth_i ) ? obj.method( meth_i ) : proc_p.curry[ obj ]
+    end
+
+    Validate_arities_ = -> y, fld, x do
+      if fld.some_arity.is_polyadic
+        Validate_arity_many_[ y, fld, x ]
+      elsif fld.some_argument_arity.is_zero
+        ( ! x ) or true == x or Detailed_monadic_niladic_errmsg_[ y, fld, x ]
+      elsif x.respond_to? :each_with_index
+        y << "multiple arguments were provided for #{ Fld_[ fld ] } but #{
+          }only one can be accepted"  # note at [#050]
+      end
+      nil  # keep life simple and let the erronity be reflected in y.count
+    end
+    #
+    Validate_arity_many_ = -> y, fld, x do
+      befor = y.count
+      if fld.some_argument_arity.is_zero
+        x.nil? or x.respond_to? :even? or y << "strange shape for #{
+        }#{ Fld_[ fld ] } - when arity is many and argument arity is #{
+        } zero, the value should be an integer, had #{ Ick_[ x ] }"
+      else
+        x.nil? or x.respond_to? :each_with_index or y << "strange #{
+        }shape for #{ Fld_[ fld ] } - when arity is many and argument #{
+        }arity is one, expected array-like, had #{ Ick_[ x ] }"
+      end
+      ( befor == y.count && ! fld.some_arity.includes_zero && ! Some_[x] ) and
+        y << "must have #{ Hack_label_[ fld.some_arity.local_normal_name ] }#{
+          } #{ Fld_[ fld ] }"
+      nil
+    end
+    #
+    Detailed_monadic_niladic_errmsg_ = -> y, fld, x do
+      if x.respond_to? :even?
+        y << "#{ Fld_[ fld ] } was specified #{ x } times but is not #{
+          }meaninful to be specified more than once"  # take a chance
+      else
+        y << "strange shape for #{ Fld_[ fld ] } - when arity is max one #{
+          }and argument arity is zero, the only valid value value is #{
+          }`true`, had #{ Ick_[ x ] }"
+      end
+      nil
+    end
+
+    Fld_ = -> fld do
+      Hack_label_[ fld.local_normal_name ]
+    end
+
+    Ick_ = -> x do  # ( a trivial instance of [#it-001] summarization )
+      if case x
+      when ::NilClass, ::FalseClass, ::TrueClass, ::Numeric, ::Module ; true
+      when ::String ; x.length < A_REASONABLY_SHORT_LENGTH_FOR_A_STRING_
+      end then
+        x.inspect
+      else
+        "< a #{ x.class } >"
+      end
+    end
+
+    A_REASONABLY_SHORT_LENGTH_FOR_A_STRING_ = 10
+
+    Hack_label_ = -> name_i do
+      name_i.to_s.gsub '_', ' '
     end
 
     Normalize_method_ = -> y, par_h do
@@ -95,6 +157,16 @@ module Skylab::Face
     end
 
     Field_normalize_ = Functionalize_meth_proc_[ Field_normalize_method_ ]
+
+    Flush_method_ = -> do  # #experimental new interface for API actions ..
+      # like `invoke` but takes no arguments. assume @infostream
+
+      @y ||= ::Enumerator::Yielder.new( & @infostream.method( :puts ) )
+      cy = Face::Services::Basic::Yielder::Counting.new( & @y.method( :<< ) )
+      ok = Normalize_[ self, self.class::FIELDS_, cy, @param_h ]
+      ok &&= execute
+      ok
+    end
 
   end
 end

@@ -1,3 +1,5 @@
+[#030]       #doc-point #parent:003 #body-is-inline-in-parent an optional
+             kleene-plus is equivalent to a non-optional kleene-star.
 [#029]       #doc-point #parent:003 #body-is-inline-in-parent
                `sparse tag` category defined
 [#028]       #doc-point #parent:003 #body-is-inline-in-parent

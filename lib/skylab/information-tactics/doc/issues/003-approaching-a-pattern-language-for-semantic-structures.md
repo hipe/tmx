@@ -682,7 +682,7 @@ because (for now) a categorization with zero constituents (exponents)
 in it is isomorphic with having no categorization applied to it at all;
 but this is experimental.  e.g a pizza with a list of topings that is zero
 items long is isomorphic with a pizza that has no 'toppings' categorization -
-neither carries any more or less information than the other.)
+neither carries any more or less information than the other. :[#030])
 
 all of this is fine and good but it is getting kind of boring.
 

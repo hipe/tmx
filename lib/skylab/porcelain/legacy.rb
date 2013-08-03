@@ -1171,9 +1171,9 @@ module Skylab::Porcelain::Legacy
 
     def initialize_from_matchdata name1, unbound1, name2, unbound2
       @normalized_parameter_name = ( name1 || name2 ).intern
-      @arity = Headless::Arity[ name1 ?
+      @arity = Arities_.fetch( name1 ?
         ( unbound1 ? :one_or_more : :one ) :
-        ( unbound2 ? :zero_or_more : :zero_or_one ) ]
+        ( unbound2 ? :zero_or_more : :zero_or_one ) )
       nil
     end
     private :initialize_from_matchdata
@@ -1190,7 +1190,7 @@ module Skylab::Porcelain::Legacy
     end
 
     def is_glob
-      @arity.is_unbounded
+      @arity.is_polyadic
     end
 
     attr_reader :normalized_parameter_name  # needed by a `fetch`
@@ -1207,6 +1207,13 @@ module Skylab::Porcelain::Legacy
         "[<#{ slug }>#{ ellipsis }]"
       end
     end
+  end
+
+  Arities_ = Headless::Arity::Space.create do
+    self::ZERO_OR_ONE = new 0, 1
+    self::ZERO_OR_MORE = new 0, nil
+    self::ONE = new 1, 1
+    self::ONE_OR_MORE = new 1, nil
   end
 
   # @todo see if we can get this whole class to go away in lieu of the
@@ -1311,7 +1318,7 @@ module Skylab::Porcelain::Legacy
     #                       ~ mutation ~
 
     def add_custom nn_i, arity_i
-      @element_a << Argument.new_custom(nn_i, Headless::Arity.fetch( arity_i))
+      @element_a << Argument.new_custom( nn_i, Arities_.fetch( arity_i ) )
       nil
     end
   end

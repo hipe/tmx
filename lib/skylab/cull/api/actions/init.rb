@@ -11,7 +11,8 @@ module Skylab::Cull
                  end,
                  :default, -> { config_default_init_directory } ],
            [ :is_dry_run,
-                 :arity, :zero,
+                 :arity, :zero_or_one,
+                 :argument_arity, :zero,
                  :desc, "dry run." ]
 
     services :configs, [ :pth, :ivar ], :config_default_init_directory

@@ -29,7 +29,7 @@ module Skylab::Cull
     params [ :name,       :arity, :one, :ds ],
            [ :url,        :arity, :one, :ds ],
            [ :tag_a,      :arity, :zero_or_more, :ds ],
-           [ :is_dry_run, :arity, :zero ]
+           [ :is_dry_run, :arity, :zero_or_one, :argument_arity, :zero ]
 
     services :model, [ :pth, :ivar ]
 

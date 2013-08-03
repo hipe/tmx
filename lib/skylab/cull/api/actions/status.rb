@@ -2,7 +2,7 @@ module Skylab::Cull
 
   class API::Actions::Status < API::Action
 
-    params [ :do_list_file, :arity, :zero ]
+    params [ :do_list_file, :arity, :zero_or_one, :argument_arity, :zero ]
 
     services :configs, [ :pth, :ivar ]
 

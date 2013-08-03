@@ -14,7 +14,7 @@ library.
 A challenger appears when it comes time to customize or DRY things up:
 take for example the entity relationship diagram presented below, modeling
 (in part conceptually) a typical single-classed CLI application, and what
-is happening underneat. Take the arrow to mean "inherits from" (i.e
+is happening underneath. Take the arrow to mean "inherits from" (i.e
 is a subclass of:)
 
                                         +---------+
@@ -34,7 +34,7 @@ is a subclass of:)
 
     fig 1 - an ERD showing a typical simple 1-class app using the library.
 
-The above reads, "in the framework-ish, there is a command called `command`
+The above reads, "in the framework-ish, there is a class called `command`
 of which `namespace` (ns) is a subclass (sort of / conceptually), and
 `cli` in turn subclasses `namespace`. in your application, then,
 ("businessland",) you will almost certainly subclass `cli` to make your own

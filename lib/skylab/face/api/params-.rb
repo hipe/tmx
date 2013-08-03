@@ -77,25 +77,23 @@ module Skylab::Face
 
       def is_required *a
         # isomorph the idea of required-ness from the arity [#fa-024]
+        ! some_arity.includes_zero
+      end
+
+      def some_arity
         if has_arity
-          ! arity_o.includes_zero
+          Parameter_Arities_.fetch @arity_value
         else
-          true
+          Parameter_Arities_.fetch :one
         end
       end
 
-      def arity_o
-        if @has_arity
-          @arity_o ||= Services::Headless::Arity[ @arity_value ]
+      def some_argument_arity
+        if has_argument_arity
+          Argument_Arities_.fetch @argument_arity_value
+        else
+          Argument_Arities_.fetch :one
         end
-      end
-
-      def some_argument_arity_value
-        has_argument_arity ? @argument_arity_value : :one
-      end
-
-      def some_argument_arity_value_is_zero
-        :zero == some_argument_arity_value
       end
 
     private
@@ -106,6 +104,18 @@ module Skylab::Face
         end
         super
       end
+    end
+
+    Parameter_Arities_ = Face::Services::Headless::Arity::Space.create do
+      self::ZERO_OR_ONE = new 0, 1
+      self::ZERO_OR_MORE = new 0, nil
+      self::ONE = new 1, 1
+      self::ONE_OR_MORE = new 1, 1
+    end
+
+    Argument_Arities_ = Face::Services::Headless::Arity::Space.create do
+      self::ZERO = new 0, 0
+      self::ONE = new 1, 1
     end
 
     def self.[] * x_a

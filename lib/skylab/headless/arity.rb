@@ -2,74 +2,76 @@ module Skylab::Headless
 
   class Arity < ::Module
 
-    # i am pleased to offer an awesome addition to headless, emigrated in
-    # from face, and documented (heavily) at [#fa-024] and some supporting
-    # essays. this moved here basically because we found ourselves making
-    # lookup hashes with the same metadata in multiple places.
+    # (the spec provides comprehensive documentation and 100% coverage)
 
-    # part of the point of this is to reduce the scope of arity: to think
-    # of it as less than an unbounded range and more of: what are the fewest
-    # number of questions we can ask of an arity to get most of the utility
-    # from it. we are looking for the global maxima on the derivative between
-    # effort and utility. we are looking for multiplier effects.
+    class Space < ::Module
 
-    # the particular implementation of this relatively simple thing is a point
-    # of some experimentation, however. suffice it to say the only part of
-    # its public API that is semi-stable (for some definition of stable) is
-    # what is covered by the specs.
-
-    # a dirty secret is that Arity subclasses ::Module for fun awesome
-    # hackiness, but hopefully this won't affect you if you are e.g making
-    # custom arities..
-
-    def initialize i, includes_zero, is_unbounded, desc
-      @local_normal_name, @includes_zero, @is_unbounded, @desc =
-        i, includes_zero, is_unbounded, desc.freeze
-      if :zero == i
-        def self.is_zero? ; true end
+      def self.create &blk
+        mod = new
+        mod.module_exec( & blk )
+        mod
       end
-      freeze
+
+      def initialize
+        @indexed = false
+      end
+
+      def new lo, hi
+        Arity.new lo, hi
+      end
+
+      def members
+        box.map( & :local_normal_name )
+      end
+
+      def [] nn
+        box[ nn ]
+      end
+
+      def fetch nn, &b
+        box.fetch nn, &b
+      end
+
+    private
+
+      def box
+        @indexed or index
+        @box
+      end
+
+      def index
+        bx = Headless::Services::Basic::Box.new
+        constants.each do |c|
+          ar = const_get c, false
+          bx.add ar.local_normal_name, ar
+        end
+        @indexed = true
+        @box = bx
+        freeze
+        nil
+      end
     end
 
-    def is_zero?
-      false
-    end
-
-    define_extent = -> f do
-      name_a = [ ] ; obj_a = [ ] ;  h = { }
-      f[ -> *a do
-        o = new( *a )
-        name_a << ( nn = o.local_normal_name )
-        obj_a << o
-        h[ nn ] = o
-      end ]
-      NAMES_ = name_a.freeze ; EACH_ = obj_a.freeze ; h.freeze
-      define_singleton_method :fetch do |i, &b|
-        h.fetch i, &b
-      end
-      class << self
-        alias_method :[], :fetch
-      end
+    def initialize lo, hi
+      @begin = lo ; @end = hi
+      @includes_zero = lo.zero?
+      @is_polyadic = hi.nil?
+      @is_zero = lo.zero? && ( hi && hi.zero? )
+      @is_one = @is_zero ? false : ( 1 == lo && 1 == hi )
       nil
     end
 
-    define_extent[ -> define do
+    attr_reader :begin, :end, :includes_zero, :is_polyadic, :is_zero,  :is_one
 
-      attr_reader        :local_normal_name, :includes_zero, :is_unbounded, :desc
+    def local_normal_name
+      @local_normal_name ||= begin
+        n = name
+        n[ n.rindex( '::' ) + 2 .. -1 ].downcase.intern
+      end
+    end
 
-      ZERO         = define[ :zero,         true,           false, '0' ]
-      ZERO_OR_ONE  = define[ :zero_or_one,  true,           false, '[0..1]' ]
-      ZERO_OR_MORE = define[ :zero_or_more, true,           true , '[0..]' ]
-      ONE          = define[ :one,          false,          false, '1' ]
-      ONE_OR_MORE  = define[ :one_or_more,  false,          true , '[1..]' ]
-
-   end ]
-
-    # usage:
-    #
-    #     Headless::Arity::NAMES_ # => [ :zero, :zero_or_one, :zero_or_more, :one, :one_or_more ]
-    #     Headless::Arity::EACH_.first.local_normal_name  # => :zero
-    #     Headless::Arity[ :one_or_more ].is_unbounded  # => true
-
+    def include? d
+      @begin <= d and @end.nil? || @end >= d
+    end
   end
 end
