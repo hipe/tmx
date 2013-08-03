@@ -104,7 +104,7 @@ module Skylab::Headless
     end
 
     def initialize host
-      @host_f = -> { host }  # hack for prettier dumps
+      @host_p = -> { host }  # hack for prettier dumps
     end
 
     def moniker
@@ -114,7 +114,7 @@ module Skylab::Headless
   private
 
     def host
-      @host_f.call
+      @host_p.call
     end
 
     MAARS::Upwards[ self ]  # autoload plugin/*, plugin/host/*, p/h/msvcs_/*
@@ -851,8 +851,8 @@ module Skylab::Headless
   module Plugin::Determiners_
   end
 
-  Plugin::Determiners_::Plugins_Box_Module_ = -> host, box_f do
-    box = box_f.call
+  Plugin::Determiners_::Plugins_Box_Module_ = -> host, box_p do
+    box = box_p.call
     box.constants.each do |const|
       mod = box.const_get const, false  # (below is pursuant to [#077])
       host.attach_hot_plugin_with_name_proc(

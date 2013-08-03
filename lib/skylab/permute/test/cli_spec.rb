@@ -20,10 +20,10 @@ describe "#{ Permute::CLI }" do
 
   attr_reader :cli, :spy
 
-  unstylize = Headless::CLI::Pen::FUN.unstylize
+  unstyle = Headless::CLI::Pen::FUN.unstyle
 
   let :out do
-    spy.emission_a.map do |e| unstylize[ e.payload_x ] end
+    spy.emission_a.map do |e| unstyle[ e.payload_x ] end
   end
 
   USAGE_RX = /usage.+permoot.+opts.+args/

@@ -63,7 +63,7 @@ module Skylab::TestSupport::TestSupport::Regret::CLI::Actions::Recursiv
       cd_and_invoke '-r', './regret/api/actions/doc-test.rb'
       stderr_gets.should match( /won't overwrite without force -#{
         }.+doc-test_spec.rb/ )
-      content = unstylize_stylized( stderr_gets )
+      content = unstyle_styled( stderr_gets )
       content.should match( /try wtvr -h recursive for help/i )
         # because of the `change_command` hack, this reports what to
         # the surface should be a non-existant command, but meh.

@@ -27,7 +27,7 @@ module Skylab::MetaHell::Class::Creator
       create, update = K.create_and_update[ a ] # create *these* two lambdas
 
       build = -> name do          # build the metadata node and define the meths
-        M.define_methods[ me, name, M.get_product_f[ kg, name ] ] #copy-pasta
+        M.define_methods[ me, name, M.get_product_p[ kg, name ] ] #copy-pasta
         create[ name ]            # call the closure created above
       end
 
@@ -80,7 +80,7 @@ module Skylab::MetaHell::Class::Creator
                                   # Process every token in `full_name` in a
       M.reduce[ full_name, Memo[ kg ], # reduce operation, branch vs leaf ..
         -> m, o  do               # For each branch node of the path (not last)
-          M.meta_bang[ me, m, o,  M.build_meta_f[ me, kg ], nil, nil ]
+          M.meta_bang[ me, m, o,  M.build_meta_p[ me, kg ], nil, nil ]
         end,                      # we just duplicate the other guy's version.
         -> m, o  do               # When we get to the leaf node (the last)
           M.meta_bang[ me, m, o, build, update, class_body ] # is the only
@@ -169,8 +169,8 @@ module Skylab::MetaHell::Class::Creator
       end
 
       M.reduce[ full_name, Memo.new(meta_hell_anchor_module),   # At each branch
-        M_IM.bang_f[ self ],             # same behavior as M:C:IM, for branches
-        M_IM._bang_f[ self, build, update ]    # and similar behavior for leaves
+        M_IM.bang_p[ self ],             # same behavior as M:C:IM, for branches
+        M_IM._bang_p[ self, build, update ]    # and similar behavior for leaves
       ].mod
     end
   end

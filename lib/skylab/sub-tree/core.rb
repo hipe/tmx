@@ -8,7 +8,7 @@ module Skylab::SubTree
   ::Skylab::MetaHell::FUN.import[ self, ::Skylab, [
     :Autoloader,
     :SubTree,
-    :Headless,  # styles
+    :Headless,  # styles, parameter controller
     :MetaHell,
     :Porcelain,  # level-1 is this
     :PubSub

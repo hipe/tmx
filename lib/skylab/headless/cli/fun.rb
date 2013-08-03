@@ -41,7 +41,7 @@ module Skylab::Headless
       end
     end.call
 
-    o[:unstylize_sexp] = -> sx do
+    o[:unstyle_sexp] = -> sx do
       sx.reduce [] do |m, x|
         m << x[1] if :string == x[0]
         m

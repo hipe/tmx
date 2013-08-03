@@ -13,11 +13,11 @@ module Skylab::FileMetrics
     def collapse_and_distribute &ping_each_child
       # all your children are in. tell them now which one is your favorite.
       if nonzero_children?
-        max_f = @child_a.reduce { |a, b| b.count > a.count ? b : a }.count.to_f
-        total_f = @child_a.reduce 0 do |m, x| m += x.count ; m end.to_f
+        max_p = @child_a.reduce { |a, b| b.count > a.count ? b : a }.count.to_f
+        total_p = @child_a.reduce 0 do |m, x| m += x.count ; m end.to_f
         @child_a.each do |c|
-          c.set_field :total_share, c.count.to_f / total_f
-          share_of_max = c.count.to_f / max_f
+          c.set_field :total_share, c.count.to_f / total_p
+          share_of_max = c.count.to_f / max_p
           c.set_field :max_share, share_of_max
           c.set_field :lipstick_float, share_of_max
           ping_each_child and ping_each_child[ c ]

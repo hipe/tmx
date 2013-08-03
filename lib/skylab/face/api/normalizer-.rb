@@ -108,7 +108,7 @@ module Skylab::Face
     A_REASONABLY_SHORT_LENGTH_FOR_A_STRING_ = 10
 
     Hack_label_ = -> name_i do
-      name_i.to_s.gsub '_', ' '
+      name_i.to_s.sub( /_[a-z]\z/, '' ).gsub '_', ' '
     end
 
     Normalize_method_ = -> y, par_h do
@@ -160,7 +160,6 @@ module Skylab::Face
 
     Flush_method_ = -> do  # #experimental new interface for API actions ..
       # like `invoke` but takes no arguments. assume @infostream
-
       @y ||= ::Enumerator::Yielder.new( & @infostream.method( :puts ) )
       cy = Face::Services::Basic::Yielder::Counting.new( & @y.method( :<< ) )
       ok = Normalize_[ self, self.class::FIELDS_, cy, @param_h ]

@@ -827,6 +827,7 @@ module Skylab::Porcelain::Legacy
       "#{ @request_client.send( :normalized_invocation_string ) } #{
         }#{ @action_sheet.slug }"
     end
+    public :normalized_invocation_string
 
     def render_option_syntax
       if option_parser
@@ -857,6 +858,7 @@ module Skylab::Porcelain::Legacy
     def invite
       emit :ui, "Try #{ kbd "#{ normalized_invocation_string } -h"} for help."
     end
+    public :invite
   end
 
   class Namespace < Action  # used as namespace here, class below
@@ -996,13 +998,29 @@ module Skylab::Porcelain::Legacy
 
     # `initialize` - etc.. #todo - we should settle down this interface mebbe
 
+    Init_Mapper_ = ::Struct.new :sin, :out, :err, :program_name, :wire_p
+
+    wire_me = -> me, blk do
+      cnd = Event_Wiring_Conduit_.new me.method( :on )
+      blk[ cnd ]
+      nil
+    end
+
     args_length_h = {
       0 => -> blk do
         blk or raise ::ArgumentError, "this #{ self.class } - a legacy #{
           } CLI client - requires that you construct it with 1 block or #{
           }3 args for io wiring (no arguments given) (nils or empty block ok)"
-        cnd = Event_Wiring_Conduit_.new method( :on )
-        blk[ cnd ]
+        wire_me[ self, blk ]
+        nil
+      end,
+      1 => -> h, blk do
+        blk and raise ::ArgumentError, "won't wire when constructing with hash"
+        st = Init_Mapper_.new
+        h.each { |k, x| st[ k ] = x }
+        i, o, e, @program_name, wire_p = st.to_a
+        @three_streams_p = -> { [ i, o, e ] }
+        wire_p and wire_me[ self, wire_p ]
         nil
       end,
       2 => -> rc, as, blk do  # experimental - one class plugs this in as..
@@ -1030,7 +1048,7 @@ module Skylab::Porcelain::Legacy
         end
         nil
       end
-    }
+    }.freeze
 
     define_method :initialize do |*up_pay_info, &wire|
       @program_name = @request_client = @action_sheet = nil
@@ -1087,6 +1105,7 @@ module Skylab::Porcelain::Legacy
         @program_name || ::File.basename( $PROGRAM_NAME )
       end
     end
+    public :normalized_invocation_string
 
     alias_method :didactic_invocation_string, :normalized_invocation_string
 

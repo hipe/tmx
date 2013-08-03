@@ -6,13 +6,13 @@ module Skylab::CssConvert::TestSupport
 
     extend CssConvert_TestSupport
 
-    alias_method :u, :unstylize
+    alias_method :u, :unstyle
 
     let :client do cli_instance end
 
     let :stderr do
       raw = client.send( :io_adapter ).errstream[ :buffer ].string
-      clean = Headless::CLI::Pen::FUN.unstylize[ raw ]
+      clean = Headless::CLI::Pen::FUN.unstyle[ raw ]
       clean.split "\n"
     end
 

@@ -4,15 +4,15 @@ describe 'If you have an object "object" that has a ' <<
   "#{::Skylab::Headless::Parameter} \"foo\"" do
 
   extend ::Skylab::Headless::TestSupport::Parameter
-  context 'and "foo" has the property of e.g. "builder: :foo_f"' do
+  context 'and "foo" has the property of e.g. "builder: :foo_p"' do
     with do
-      param :roland_808, builder: :roland_808_f
-      attr_accessor :roland_808_f
+      param :roland_808, builder: :roland_808_p
+      attr_accessor :roland_808_p
     end
     frame do
       before do
         @num_times = 0
-        object.roland_808_f = -> { "lawrence fishburne #{@num_times += 1}" }
+        object.roland_808_p = -> { "lawrence fishburne #{@num_times += 1}" }
       end
       context 'when the parameter value is falseish' do
         it '"object.foo" will call the builder proc (lazily) (once) ' <<

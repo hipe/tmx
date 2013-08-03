@@ -36,7 +36,7 @@ module Skylab::Dependency::TestSupport
   module InstanceMethods
 
     extend MetaHell::Let::ModuleMethods
-    include Headless::CLI::Pen::Methods # `unstylize`
+    include Headless::CLI::Pen::Methods # `unstyle`
 
     def debug!
       @do_debug = true

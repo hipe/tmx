@@ -13,13 +13,13 @@ module Skylab::Flex2Treetop::MyTestSupport
     def fixture name
       ::Skylab.dir_pathname.join( Flex2Treetop::FIXTURES.fetch( name ) ).to_s
     end
-    _tmpdir_f = -> do
+    _tmpdir_p = -> do
       t = ::Skylab::TestSupport::Tmpdir.new(
         ::Skylab::Headless::System.defaults.tmpdir_pathname.join 'f2tt'
       )
-      (_tmpdir_f = ->{t}).call
+      (_tmpdir_p = ->{t}).call
     end
-    TMPDIR_F = -> { _tmpdir_f.call }
+    TMPDIR_F = -> { _tmpdir_p.call }
     def tmpdir
       TMPDIR_F.call
     end
@@ -37,7 +37,7 @@ module Skylab::Flex2Treetop::MyTestSupport
     end
     def an_invite *a
       it "shows an invite line" do
-        s = unstylize err.last
+        s = unstyle err.last
         s.should eql('use xyzzy -h for help')
       end
     end
@@ -110,8 +110,8 @@ module Skylab::Flex2Treetop::MyTestSupport
     def out
       frame[:out].call
     end
-    def unstylize str
-      result = ::Skylab::Headless::CLI::Pen::FUN.unstylize[ str ] # full
+    def unstyle str
+      result = ::Skylab::Headless::CLI::Pen::FUN.unstyle[ str ] # full
       result.should_not be_nil
       result
     end

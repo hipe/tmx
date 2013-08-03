@@ -38,7 +38,7 @@ module Skylab::Face::TestSupport::CLI::Set
 
       it "business time - only at level 1" do
         invoke '-h'
-        line = unstylize_stylized lines[ :err ][ -2 ]
+        line = unstyle_styled lines[ :err ][ -2 ]
         a, b = /\A([ ]+)meeper([ ]+)/.match( line ).captures
         a.length.should eql( 12 )
         a.should eql( b )

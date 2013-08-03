@@ -41,7 +41,7 @@ module Skylab::Face::TestSupport::CLI::Puffer
         invoke '-h'
         rx = /\A[ ]+([^ ]+)(?=[ ])/
         two = lines[:err][-3..-2]
-        two.map do |line| rx.match( unstylize line )[ 1 ]
+        two.map do |line| rx.match( unstyle line )[ 1 ]
         end.should eql( [ 'foo', 'haxxville' ] )
         two[1].include?( '[<foo>] <bar>' ).should eql( true )  # snark
         wat._order.should eql( [:foo, :haxxville] )

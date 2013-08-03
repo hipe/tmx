@@ -63,7 +63,7 @@ module Skylab::Face::TestSupport::CLI
 
     let :client_class do
       kls = Sandbox.produce_subclass
-      with_body_value or raise "sanity - `with_body { .. }` expected"
+      with_body_value or raise "sanity - `client_class` or `with_body { .. }` expected"
       kls.class_exec( & with_body_value )
       kls
     end
@@ -79,7 +79,7 @@ module Skylab::Face::TestSupport::CLI
         did or begin
           did = true
           instance_exec(& block )
-          res = convert_whole_err_string_to_unstylized_lines
+          res = convert_whole_err_string_to_unstyled_lines
         end
         res
       end
@@ -101,8 +101,8 @@ module Skylab::Face::TestSupport::CLI
     end
 
     let :client do
-      g = io_spy_group
-      client_class.new out: g.outstream, err: g.errstream,
+      t = io_spy_triad
+      client_class.new sin: t.instream, out: t.outstream, err: t.errstream,
         program_name: program_name
     end
 
@@ -115,12 +115,12 @@ module Skylab::Face::TestSupport::CLI
       define_method :program_name do pn end
     end.call
 
-    let :io_spy_group do
-      sg = TestSupport::IO::Spy::Triad.new nil
+    let :io_spy_triad do
+      t = TestSupport::IO::Spy::Triad.new nil  # making a fake stdin is on u
       if do_debug
-        sg.debug!
+        t.debug!
       end
-      sg
+      t
     end
 
     attr_reader :do_debug
@@ -182,20 +182,20 @@ module Skylab::Face::TestSupport::CLI
     end
 
     Headless::CLI::Pen::FUN.tap do |fun|
-      define_method :unstylize_stylized, & fun.unstylize_stylized
-      define_method :unstylize, & fun.unstylize
+      define_method :unstyle_styled, & fun.unstyle_styled
+      define_method :unstyle, & fun.unstyle
     end
 
     def expect_styled line
-      text = unstylize_stylized line
+      text = unstyle_styled line
       if text then text else
         fail "line wasn't styled - #{ line.inspect }"
       end
     end
 
-    def convert_whole_err_string_to_unstylized_lines
+    def convert_whole_err_string_to_unstyled_lines
       x = whole_err_string
-      str = unstylize_stylized x
+      str = unstyle_styled x
       str.split "\n"
     end
 
@@ -242,8 +242,8 @@ module Skylab::Face::TestSupport::CLI
     let :lines do
       # (the below noize is simply grinding up the stream spy and turning
       # it into two arrrays of lines.)
-      isg = @__memoized.fetch :io_spy_group
-      @__memoized[:io_spy_group] = nil  # careful - we are 'digesting' it
+      isg = @__memoized.fetch :io_spy_triad
+      @__memoized[:io_spy_triad] = nil  # careful - we are 'digesting' it
       o, e = [ :outstream, :errstream ].map do |x|
         str = isg[x].string
         isg[ x ] = nil
@@ -253,8 +253,8 @@ module Skylab::Face::TestSupport::CLI
     end
 
     let :whole_string do
-      isg = io_spy_group
-      { out: isg[:outstream].string, err: isg[:errstream].string }
+      t = io_spy_triad
+      { out: t[:outstream].string, err: t[:errstream].string }
     end
 
     let :whole_err_string do

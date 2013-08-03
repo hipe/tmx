@@ -22,32 +22,36 @@ module Skylab::Headless
 
     simple_style_rx = o[:simple_style_rx] = /\e  \[  \d+  (?: ; \d+ )*  m  /x
 
-    unstylize_stylized = o[:unstylize_stylized] = -> str do # nil when `str`
-      str.to_s.dup.gsub! simple_style_rx, ''   # is not already stylized
+    unstyle_styled = o[:unstyle_styled] = -> str do # nil when `str`
+      str.to_s.dup.gsub! simple_style_rx, ''   # is not already styled
     end
 
-    o[:unstylize] = -> str do                  # the safer alternative, for when
-      unstylize_stylized[ str ] || str         # you don't care whether it was
+    o[:unstyle] = -> str do                  # the safer alternative, for when
+      unstyle_styled[ str ] || str         # you don't care whether it was
     end                                        # stylzed in the first place
 
     # (see also CLI::FUN - there is extended support for e.g turning styled
     # text back and forth into s-expressions)
 
-    FUN = ::Struct.new( * o.keys ).new( * o.values ).freeze
+    FUN = ::Struct.new( * o.keys ).new( * o.values )
+    def FUN.at *a
+      a.map { |i| self[ i ] }
+    end
+    FUN.freeze
 
     Define_stylize_methods_ = -> do
 
       define_method :stylize, & FUN.stylize
 
-      define_method :unstylize, & FUN.unstylize
+      define_method :unstyle, & FUN.unstyle
 
-      define_method :unstylize_stylized, & FUN.unstylize_stylized
+      define_method :unstyle_styled, & FUN.unstyle_styled
 
     end
 
     module Methods  # API-public access to what amounts to instance-method-
       # versions of a subset of the FUN functions - if for e.g. you want
-      # `stylize` or `unstylize` and you don't want to pollute your namespace
+      # `stylize` or `unstyle` and you don't want to pollute your namespace
       # or coupling with all of the view-y-style names of Pen::I_M. note,
       # however, that this is still low-level: avoid calling `stylize` in
       # application code when you can instead use existing, modality-portable
@@ -85,6 +89,10 @@ module Skylab::Headless
         x = x.to_s                             #  excessive & exuberant emphasis
         x = x.inspect unless x.index ' '       # (opposite human_escape)
         stylize x, :strong, :red               # may be overkill
+      end
+
+      def par x                                # simplified variant of [#036]
+        kbd "<#{ x.to_s.gsub '_', '-' }>"
       end
 
       # def `val` - how may votes? (1: sg) [#hl-051]

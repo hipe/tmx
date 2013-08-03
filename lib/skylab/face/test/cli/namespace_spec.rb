@@ -164,7 +164,7 @@ module Skylab::Face::TestSupport::CLI::Namespace
         it "works" do
           res = invoke []
           res.should eql( :yep )
-          io_spy_group.errstream.string.chop.should eql( '<<["foo", "bar"]>>' )
+          io_spy_triad.errstream.string.chop.should eql( '<<["foo", "bar"]>>' )
         end
       end
 
@@ -187,7 +187,7 @@ module Skylab::Face::TestSupport::CLI::Namespace
 
         it "works" do
           res = invoke [ 'bar' ]
-          io_spy_group.errstream.string.chop.should eql( 'WOOF:woof' )
+          io_spy_triad.errstream.string.chop.should eql( 'WOOF:woof' )
           res.should eql( :yup )
         end
       end

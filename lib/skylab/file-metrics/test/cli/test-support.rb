@@ -53,12 +53,12 @@ module Skylab::FileMetrics::TestSupport::CLI
 
     -> do  # `expect_percent`
       rx = /\A\d{1,3}\.\d\d%\z/
-      define_method :expect_percent do |x, pct_f=nil|
+      define_method :expect_percent do |x, pct_p=nil|
         if rx !~ x then
           fail "expecting this to look like percent - #{ x.inspect }"
-        elsif pct_f
+        elsif pct_p
           f = $~[0].to_f
-          f.should eql( pct_f )
+          f.should eql( pct_p )
         end
         nil
       end

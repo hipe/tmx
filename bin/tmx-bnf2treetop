@@ -109,7 +109,7 @@ module Skylab::Bnf2Treetop
           new( & method( :ping ) )
       op.separator em('options:')
       args = [] ; arg_label = nil
-      desc_f = ->(p) do
+      desc_p = ->(p) do
         a = (::Array === p.desc ? p.desc : [p.desc]).reduce([]) do |m, s|
           m.concat s.split("\n")
           m
@@ -141,7 +141,7 @@ module Skylab::Bnf2Treetop
                  end
                else "--#{ label }=#{ arg_label }"
                end )
-        p.desc and desc_f.call p
+        p.desc and desc_p.call p
         op.on( * args ) { |v| invocation_parameters.push( [ p.name, v ] ) }
       end
       op.on('-h', '--help', 'Show this message') { queue.push :help }
@@ -318,8 +318,8 @@ module Skylab::Bnf2Treetop
       info msg
       after = scn.peek CONTEXT
       before = scn.string[ [0, scn.pos - CONTEXT].max ... scn.pos ]
-      clean_f = ->(s) { s.gsub("\n", ' ') }
-      before = clean_f[before] ; after = clean_f[after]
+      clean_p = ->(s) { s.gsub("\n", ' ') }
+      before = clean_p[before] ; after = clean_p[after]
       info "at: #{ before }#{ after }"
       info "----#{ '-' * before.length }^"
       scn.eos? and info("(before end of input)")
@@ -331,12 +331,12 @@ module Skylab::Bnf2Treetop
     def modeline!
       (modelines = modeline_parse!) == false and return false
       if modelines
-        list_f = ->(a) do
+        list_p = ->(a) do
           a.map do |n, v|
             true == v ? n : "#{ n }=#{ /[ \t=:]/ =~ v ? v.inspect : v }"
           end.join(' ')
         end
-        info "(using file's modeline parameters: #{ list_f[modelines] })"
+        info "(using file's modeline parameters: #{ list_p[modelines] })"
         begin # this is all porcelain, grouped only for semantics
           order = [ ]
           values = (modelines + invocation_parameters).reduce(
@@ -345,7 +345,7 @@ module Skylab::Bnf2Treetop
           a = order.select{|k| 1 < values[k].length}.map{|k| [k, values[k][1]]}
           if ! a.empty?
             info( "(modeline parameter#{s_ a} overridden by #{
-              }invocation parameter#{s_ a}: #{ list_f[a] })" )
+              }invocation parameter#{s_ a}: #{ list_p[a] })" )
           end
         end
       end
@@ -359,7 +359,7 @@ module Skylab::Bnf2Treetop
       scn = ::StringScanner.new(line) # sure why not
       scn.skip(COMMENT_BEGIN_RX) or return # first line is not a comment
       scn.skip_until(/[ \t]bnf2treetop:[ \t]*set?[ \t]/) or return
-      fail_f = ->(msg) do
+      fail_p = ->(msg) do
         error("failed to parse modeline: #{msg} at #{scn.peek(10).inspect}")
       end
       sexp = []
@@ -367,12 +367,12 @@ module Skylab::Bnf2Treetop
         scn.skip(/[ \t]+/)
         scn.skip(/:/) and break
         name = scn.scan(/[_a-z]+/) or
-          return fail_f["expecing ':' or option name"]
+          return fail_p["expecing ':' or option name"]
         sexp.push([name])
         if scn.skip(/=/)
           if (q = scn.scan(/['"]/))
             content = scn.scan(/(?:\\#{q}|[^#{q}])*/) or fail('sanity')
-            scn.skip(/#{q}/) or return fail_f["expecting #{q.inspect}"]
+            scn.skip(/#{q}/) or return fail_p["expecting #{q.inspect}"]
           else
             content = scn.scan(/[^ \t:]+/) # failed match ok, means nillify
           end

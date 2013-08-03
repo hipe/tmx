@@ -1517,12 +1517,12 @@ module Skylab::Face
         nil
       end
 
-      hl_chunker = hl_parse_styles = hl_unstylize_sexp = nil  # we lazy-
+      hl_chunker = hl_parse_styles = hl_unstyle_sexp = nil  # we lazy-
       hl = -> do                  # load these nerkulouses - they might be a
         hl_chunker =              # beast, the dependency is awkward.
           Services::Headless::CLI::Pen::Chunker
-        hl_parse_styles, hl_unstylize_sexp =
-          Services::Headless::CLI::FUN.at :parse_styles, :unstylize_sexp
+        hl_parse_styles, hl_unstyle_sexp =
+          Services::Headless::CLI::FUN.at :parse_styles, :unstyle_sexp
         hl = nil
       end
 
@@ -1532,11 +1532,11 @@ module Skylab::Face
 
         h = {
           string: -> m, x, _ do
-            m << hl_unstylize_sexp[ x ]
+            m << hl_unstyle_sexp[ x ]
             nil
           end,
           style: -> m, x, usg_hdr_txt do
-            s = hl_unstylize_sexp[ x ]
+            s = hl_unstyle_sexp[ x ]
             # ICK only let a header through if it says "usage:" ICK
             m << s if usg_hdr_txt == s || header_rx !~ s
             nil

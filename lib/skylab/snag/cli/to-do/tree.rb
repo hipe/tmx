@@ -62,7 +62,7 @@ module Skylab::Snag
           line_node_slug = stylize[ n.slug, * line_num_style_a ]
         end
         cache_a << (( ro = ["#{ card.prefix[] } #{ line_node_slug }" ] ))
-        ro << fun.unstylize[ ro[0] ].length
+        ro << fun.unstyle[ ro[0] ].length
         if n.is_leaf && n.todo
           ro << n.todo
         end

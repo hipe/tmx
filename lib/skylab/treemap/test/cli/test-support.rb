@@ -56,7 +56,7 @@ module Skylab::Treemap::TestSupport::CLI
     end
 
     def styled str
-      Headless::CLI::Pen::FUN.unstylize_stylized[ str ]
+      Headless::CLI::Pen::FUN.unstyle_styled[ str ]
     end
 
     def styld exp
@@ -77,15 +77,15 @@ module Skylab::Treemap::TestSupport::CLI
     #         ~ for the 2-stream form ~
 
     def serr
-      _unstylize :serr
+      _unstyle :serr
     end
 
     def sout
-      _unstylize :sout
+      _unstyle :sout
     end
 
-    def _unstylize k
-      Headless::CLI::Pen::FUN.unstylize[ stream[k].string ]
+    def _unstyle k
+      Headless::CLI::Pen::FUN.unstyle[ stream[k].string ]
     end
 
     Stream_ = ::Struct.new :sout, :serr

@@ -2,11 +2,11 @@
 
 module Skylab::Headless
 
-  class Parameter::Bound < Struct.new(:parameter, :read_f, :write_f, :label_f)
+  class Parameter::Bound < Struct.new(:parameter, :read_p, :write_p, :label_p)
     def normalized_parameter_name ; parameter.normalized_parameter_name end
-    def label ; label_f.call(parameter) end
-    def value ; read_f.call end
-    def value=(x) ; write_f.call(x) end
+    def label ; label_p.call(parameter) end
+    def value ; read_p.call end
+    def value=(x) ; write_p.call(x) end
   end
 
   class Parameter::Bound::Enumerator < ::Enumerator
@@ -20,49 +20,49 @@ module Skylab::Headless
     end
     def at *parameter_names
       dupe(
-        params_f: ->() do          # Override the default to be more map-like,
+        params_p: ->() do          # Override the default to be more map-like,
           ::Enumerator.new do |y|  # and use only the desired names.
             parameter_names.each do |parameter_name| # But still, we lazy eval
-              y << set_f.call.fetch(parameter_name)  # and fail late (for now).
-            end                    # Also override the default visit_f which
+              y << set_p.call.fetch(parameter_name)  # and fail late (for now).
+            end                    # Also override the default visit_p which
           end                      # flattens list-like parameters.  We do
         end,                       # not want to flatten it.
-        visit_f: ->(y, param) { y << bound(param) } # Do not flatten it.
+        visit_p: ->(y, param) { y << bound(param) } # Do not flatten it.
       )                            # Don't do that to anyone.
     end
     def fetch parameter_name
       init
-      bound set_f.call.fetch(parameter_name)
+      bound set_p.call.fetch(parameter_name)
     end
-    def where props_h=nil, &select_f
-      props_h and props_f = ->(prop) do
+    def where props_h=nil, &select_p
+      props_h and props_p = ->(prop) do
         ! props_h.detect do |k, v|
           ! prop.known?(k) || prop[k] != v
         end
       end
-      _filter_f =
-      case [(:props if props_f), (:select if select_f)].compact
-      when [:props, :select] ; ->(p) { props_f.call(p) && select_f.call(p) }
-      when [:props]          ; props_f
-      when [:select]         ; select_f
+      _filter_p =
+      case [(:props if props_p), (:select if select_p)].compact
+      when [:props, :select] ; ->(p) { props_p.call(p) && select_p.call(p) }
+      when [:props]          ; props_p
+      when [:select]         ; select_p
       when []                ; MetaHell::MONADIC_TRUTH_
       end
-      dupe(params_f: ->() do
+      dupe(params_p: ->() do
         ::Enumerator.new do |y|
-          params_f.call.each { |p| _filter_f.call(p) and y << p }
+          params_p.call.each { |p| _filter_p.call(p) and y << p }
         end
       end)
     end
   private
     meta_param :inherit, boolean: true, writer: true
-    param :known_f, accessor: true, inherit: true
-    param :label_f, accessor: true, inherit: true
-    param :params_f, accessor: true, inherit: true
-    param :read_f, accessor: true, inherit: true
-    param :set_f, accessor: true, inherit: true
-    param :upstream_f, accessor: true, inherit: true
-    param :visit_f, writer: true, inherit: true
-    param :write_f, accessor: true, inherit: true
+    param :known_p, accessor: true, inherit: true
+    param :label_p, accessor: true, inherit: true
+    param :params_p, accessor: true, inherit: true
+    param :read_p, accessor: true, inherit: true
+    param :set_p, accessor: true, inherit: true
+    param :upstream_p, accessor: true, inherit: true
+    param :visit_p, writer: true, inherit: true
+    param :write_p, accessor: true, inherit: true
     def init
       @mixed &&= begin
         if ::Hash === @mixed then @mixed.each { |k, v| send("#{k}=", v) }
@@ -73,8 +73,8 @@ module Skylab::Headless
     end
     def bound parameter
       Parameter::Bound.new(parameter,
-        ->{ read_f.call(parameter) if known_f.call(parameter) },
-        ->(val) { write_f.call(parameter, val) }, label_f)
+        ->{ read_p.call(parameter) if known_p.call(parameter) },
+        ->(val) { write_p.call(parameter, val) }, label_p)
     end
     def dupe changes
       init # should be ok to call multiple times
@@ -86,11 +86,11 @@ module Skylab::Headless
     def process_host_instance host_instance
       f = {}
       host_instance.instance_exec do
-        f[:set_f] = ->{ formal_parameters }
-        f[:params_f] = -> { formal_parameters.each.to_a }
-        f[:known_f] = ->(param) { known? param.normalized_parameter_name }
+        f[:set_p] = ->{ formal_parameters }
+        f[:params_p] = -> { formal_parameters.each.to_a }
+        f[:known_p] = ->(param) { known? param.normalized_parameter_name }
 
-        f[:label_f] = -> param, i=nil do
+        f[:label_p] = -> param, i=nil do
           if request_client
             parameter_label param, i
           else
@@ -98,36 +98,36 @@ module Skylab::Headless
           end
         end
 
-        f[:read_f] = ->(param) do
+        f[:read_p] = ->(param) do
           m = method(param.normalized_parameter_name) # catch these errors here, they are sneaky
           m.arity <= 0 or fail("You do not have a reader for #{param.normalized_parameter_name}")
           m.call
         end
-        f[:upstream_f] = ->(param, val, &valid_f) do
-          param.apply_upstream_filter(self, val, &valid_f)
+        f[:upstream_p] = ->(param, val, &valid_p) do
+          param.apply_upstream_filter(self, val, &valid_p)
         end
-        f[:write_f] = ->(param, val) do
+        f[:write_p] = ->(param, val) do
           param.apply_upstream_filter(self, val) { |v| self[param.normalized_parameter_name] = v }
         end
       end
       f.each { |k, v| send("#{k}=", v) }
     end
     def visit y
-      params_f.call.each { |p| visit_f.call(y, p) }
+      params_p.call.each { |p| visit_p.call(y, p) }
     end
-    # The builtin implementation for visit_f flattens list-like parameters
+    # The builtin implementation for visit_p flattens list-like parameters
     # into each their own bound parameter.
-    def visit_f
-      @visit_f ||= (->(y, param) do
+    def visit_p
+      @visit_p ||= (->(y, param) do
         # Note that the below implementation for processing list-likes relies
         # on the lists being implemented as array-like.  Also note that
         # it might fail variously if there are not readers / writers in place.
         if param.list?
-          a = read_f.call(param) and a.length.times do |i| # nil iff zero items
+          a = read_p.call(param) and a.length.times do |i| # nil iff zero items
             y << Parameter::Bound.new(param,
               ->{ a[i] }, # ok iff there is no lazy evaluation
-              ->(val) { upstream_f.call(param, val) { |_val| a[i] = _val } },
-              ->(_) { label_f.call(param, i) })
+              ->(val) { upstream_p.call(param, val) { |_val| a[i] = _val } },
+              ->(_) { label_p.call(param, i) })
           end
         else
           y << bound(param)

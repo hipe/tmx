@@ -13,8 +13,8 @@ describe "#{::Skylab::Yacc2Treetop} CLI integration" do
     it 'writes specific complaint, usage, invite to stderr' do
       out.length.should eql(0)
       err.shift.should match(/missing <yaccfile> argument/i)
-      unstylize(err.shift).should match(USAGE_RE)
-      unstylize(err.shift).should match(INVITE_RE)
+      unstyle(err.shift).should match(USAGE_RX)
+      unstyle(err.shift).should match(INVITE_RX)
       err.length.should eql(0)
     end
   end
@@ -23,7 +23,7 @@ describe "#{::Skylab::Yacc2Treetop} CLI integration" do
     invoke '-h'
     it 'writes usage, option listing to stderr' do
       out.length.should eql(0)
-      unstylize(err.shift).should match(USAGE_RE)
+      unstyle(err.shift).should match(USAGE_RX)
       (5..15).should  cover(err.length)
       err.last.should match(/\A    [ ]*[^ ]/) # any option listing
     end
@@ -34,8 +34,8 @@ describe "#{::Skylab::Yacc2Treetop} CLI integration" do
     it "writes specific complaint, usage, invite to stderr" do
       out.length.should eql(0)
       err.shift.should match(/\btoo many args\. +expecting 1 .*file/i)
-      unstylize(err.shift).should match(USAGE_RE)
-      unstylize(err.shift).should match(INVITE_RE)
+      unstyle(err.shift).should match(USAGE_RX)
+      unstyle(err.shift).should match(INVITE_RX)
       err.length.should eql(0)
     end
   end
@@ -45,8 +45,8 @@ describe "#{::Skylab::Yacc2Treetop} CLI integration" do
     it 'writes specific complaint, usage, invite to stderr' do
       out.length.should eql(0)
       err.shift.should match(/file.+not found.+not-there\.yacc/i)
-      unstylize(err.shift).should match(USAGE_RE)
-      unstylize(err.shift).should match(INVITE_RE)
+      unstyle(err.shift).should match(USAGE_RX)
+      unstyle(err.shift).should match(INVITE_RX)
       err.length.should eql(0)
     end
   end

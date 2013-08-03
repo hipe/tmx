@@ -60,7 +60,7 @@ module Skylab::TanMan
       tree_class.send :include,
                           Sexp::Auto::Hacks::RecursiveRule::SexpInstanceMethods
 
-      match_f = -> search_item do              # a function to make matcher
+      match_p = -> search_item do              # a function to make matcher
         if ::String === search_item            # functions for matching nodes
           -> node { search_item == node[item] }  # that new nodes are
         else                                   # supposed to come before / after
@@ -106,7 +106,7 @@ module Skylab::TanMan
                                                # to be inserted?
       idx_left_right = -> new_before_this, existing_a do        # #single-call
         if new_before_this
-          match = match_f[ new_before_this ]
+          match = match_p[ new_before_this ]
           right, idx = existing_a.each.with_index.detect { |x, _| match[ x ] }
           right or fail "node to insert before not found."
           left = 0 == idx ? nil : existing_a[ idx - 1 ]
@@ -139,7 +139,7 @@ module Skylab::TanMan
       end
 
 
-      tail_f = -> right, proto do                               # #multi-call
+      tail_p = -> right, proto do                               # #multi-call
         # nasty : we ned to do this before we reassign any members of "left"
         # because left itself may be the prototype node!
         #
@@ -167,7 +167,7 @@ module Skylab::TanMan
                                   # of separator or whitespace-like elements
                                   # that is true-ish in both the head and tail
                                   # prototypes?
-      inner_f = -> me, proto_0, proto_n do # experimental for hacks!
+      inner_p = -> me, proto_0, proto_n do # experimental for hacks!
         ( me.class._members - [ item, tail ] ).reduce( [] ) do |memo, m|
           if proto_0[m] && proto_n[m]
             memo << m
@@ -201,7 +201,7 @@ module Skylab::TanMan
 
         proto_0, proto_n = [ proto_a.first, proto_a.last ]
 
-        inner = inner_f[ me, proto_0, proto_n ] # see
+        inner = inner_p[ me, proto_0, proto_n ] # see
 
         xfer = ::Hash.new -> m do
           if me[m]                # if there was already *anything* there, just
@@ -362,7 +362,7 @@ module Skylab::TanMan
         end                                    # new node
 
         if ! xfer.key? tail                    # the default strategy for
-          xfer[tail] = tail_f[ right, proto_a.last ] # populating the
+          xfer[tail] = tail_p[ right, proto_a.last ] # populating the
         end                                    # "next self" part        #
 
         self.class._members.each do |m|
@@ -404,7 +404,7 @@ module Skylab::TanMan
 
         parent = res = nil
 
-        match = match_f[ search_item ]
+        match = match_p[ search_item ]
         target = _nodes.detect do |node|
           rs = match[ node ] || nil
           if ! rs

@@ -2,7 +2,7 @@ module Skylab::Face
 
   module Face::CLI::Adapter::For::Face
 
-    Hotmm_ = -> slug, lo_class, arg_sht_f do  # hot maker maker
+    Hotmm_ = -> slug, lo_class, arg_sht_p do  # hot maker maker
       -> hi_svcs, _slug_used_str=nil do
         pna = hi_svcs.get_normal_invocation_string_parts
         pna << slug
@@ -10,7 +10,7 @@ module Skylab::Face
           out: ( hi_svcs.ostream or fail "sanity - out?" ),
           err: ( hi_svcs.estream or fail "sanity - err?" ),
           program_name: ( pna * ' ' ),
-          sheet: arg_sht_f[]
+          sheet: arg_sht_p[]
         }
         lo_class.new( h ).instance_variable_get :@mechanics
       end

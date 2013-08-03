@@ -1,7 +1,7 @@
 require_relative '../core'
 
 require 'skylab/headless/test/test-support' # gives us h.l core and t.s core
-                                            # unstylize
+                                            # unstyle
 
 
 module Skylab::CssConvert::TestSupport
@@ -57,6 +57,6 @@ module Skylab::CssConvert::TestSupport
       build_parser(CssConvert::Directive::Parser).parse_string pathname.read
     end
 
-    define_method :unstylize, & Headless::CLI::Pen::FUN.unstylize
+    define_method :unstyle, & Headless::CLI::Pen::FUN.unstyle
   end
 end

@@ -1,6 +1,6 @@
 require_relative '../core'
 require 'skylab/test-support/core'
-require 'skylab/headless/core'  # unstylize etc
+require 'skylab/headless/core'  # unstyle etc
 
 module Skylab::PubSub::TestSupport
   ::Skylab::TestSupport::Regret[ self ]

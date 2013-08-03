@@ -79,7 +79,7 @@ module Skylab::Dependency::TestSupport::Tasks
           let(:version_from) { 'echo "version 0.0.1"' }
           it "says that is doesn't match" do
             subject.invoke( context ).should eql( false )
-            unstylize( log.string ).should match(
+            unstyle( log.string ).should match(
               /\bversion mismatch: needed 1\.2\+ had 0\.0\.1\b/i
             )
           end

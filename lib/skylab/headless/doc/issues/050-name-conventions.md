@@ -68,11 +68,11 @@ what is in that particular name.
 
   + `line`, `foo_line` -
   like above, but of course implies that it probably should not have
-  newlines in it. this might be stylized for the particular modality.
+  newlines in it. this might be styled for the particular modality.
 
   + `lines`, `foo_lines` -
   must result in enumerable, e.g. array. usually (always?) takes no args.
-  this might be stylized for the particular modality.
+  this might be styled for the particular modality.
 
   (saying "line" or "lines" usually implies a certain mode..)
 

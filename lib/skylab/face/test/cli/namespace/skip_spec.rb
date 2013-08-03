@@ -43,7 +43,7 @@ module Skylab::Face::TestSupport::CLI::Namespace::Skip
         invoke '-h'
         a = []
         2.times do
-          a << unstylize( lines[ :err ].pop )
+          a << unstyle( lines[ :err ].pop )
         end
         down, up = a
         up.should match( /\boptions?:/i )

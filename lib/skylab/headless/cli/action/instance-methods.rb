@@ -248,10 +248,10 @@ module Skylab::Headless
         elsif option_parser
           first = @option_parser.top.list.first  # NOTE not base()
           if ::String === first     # 2) else use o.p banner if that
-            str = CLI::Pen::FUN.unstylize[ first ]
+            str = CLI::Pen::FUN.unstyle[ first ]
             str.gsub strip_description_label_rx, '' # (#hack!)
           else
-            CLI::Pen::FUN.unstylize[ usage_line ] # 3) else this, unstylized
+            CLI::Pen::FUN.unstyle[ usage_line ] # 3) else this, unstyled
           end
         end
       end

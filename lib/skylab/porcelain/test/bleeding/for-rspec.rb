@@ -34,7 +34,7 @@ module Skylab::Porcelain::TestSupport::Bleeding
 
     nub = PubSub::TestSupport::Event::Predicate::Nub.new expected
     nub.textify = -> emission { emission.payload_x }
-    nub.unstylize_all_stylized!
+    nub.unstyle_all_styled!
     match(& nub.handle_match )
     failure_message_for_should(& nub.handle_failure_message_for_should )
     description(& nub.handle_description )

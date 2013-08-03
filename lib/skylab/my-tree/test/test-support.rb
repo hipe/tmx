@@ -56,14 +56,14 @@ module Skylab::MyTree::TestSupport
 
     -> do  # `line`
 
-      unstylize = Headless::CLI::Pen::FUN.unstylize
+      unstyle = Headless::CLI::Pen::FUN.unstyle
 
       expect_text = FUN.expect_text
 
       define_method :line do
         e = @emission_queue.shift
         if e
-          unstylize[ expect_text[ e ] ]
+          unstyle[ expect_text[ e ] ]
         end
       end
     end.call

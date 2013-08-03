@@ -107,7 +107,7 @@ module Skylab::Face::TestSupport::CLI::Invisible
       end
       it "when reporting expecting" do
         invoke 'meep'
-        unstylize_stylized( lines[:err].fetch 0 ).should match(
+        unstyle_styled( lines[:err].fetch 0 ).should match(
           /unrec.+meep.+expect.+glouchester or worchester/i )
       end
       it "when invoking the invisible" do

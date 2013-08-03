@@ -5,8 +5,8 @@ module Skylab::TanMan
 
     # `bound` means "is it bound to a sexp?" .. might go away
 
-    NAME_RE = /^[^"]+$/
-    URL_RE = /^[^ ]+$/
+    NAME_RX = /^[^"]+$/
+    URL_RX = /^[^ ]+$/
     SECTION_NAME_RX = /^remote "([^"]+)"$/
 
     meta_attribute(* Core::MetaAttributes[:regex, :required] )
@@ -93,7 +93,7 @@ module Skylab::TanMan
       true
     end
 
-    attribute :name, :regex => NAME_RE, :required => true, :bound => true
+    attribute :name, :regex => NAME_RX, :required => true, :bound => true
 
     delegates_to :enumerator, :resource # will fail when etc
 
@@ -110,7 +110,7 @@ module Skylab::TanMan
       str
     end
 
-    attribute :url, :regex => URL_RE, :required => true, :bound => true
+    attribute :url, :regex => URL_RX, :required => true, :bound => true
 
     def url_read
       sexp['url']

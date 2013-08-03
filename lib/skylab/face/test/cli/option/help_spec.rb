@@ -40,7 +40,7 @@ module Skylab::Face::TestSupport::CLI::Option::Help
 
       it "summarizing optparse content works" do
         invoke '-h'
-        _dn, up = 2.times.map { unstylize lines[:err].pop }
+        _dn, up = 2.times.map { unstyle lines[:err].pop }
         up.should match( /\A[ ]*foo [ ]+beauford \[\.\./ )
       end
 
@@ -76,7 +76,7 @@ module Skylab::Face::TestSupport::CLI::Option::Help
         invoke '-h'
         a = lines[:err]
         shift_until_after a, -> ln { ln.include? 'command:' }
-        unstylize_stylized( a.shift ).should match(
+        unstyle_styled( a.shift ).should match(
           /\A[ ]+beefus-meefus[ ]+big\z/ )
         a.shift.should match( /\A[ ]+bad\z/ )
         a.shift.should match( /\A[ ]+beautiful \[\.\.\]\z/)

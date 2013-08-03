@@ -57,7 +57,7 @@ module Skylab::FileMetrics::TestSupport::CLI
       it does do
         invoke argv
         x = whole_err_string
-        str = Headless::CLI::Pen::FUN.unstylize_stylized[ x ]
+        str = Headless::CLI::Pen::FUN.unstyle_styled[ x ]
         str.should match( /^usage: fm line-count (?:\[[^\[]+){7,}/ )
         str.should match( /^description:.+usage:.+options:.+/m )
       end

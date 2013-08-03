@@ -70,7 +70,7 @@ module Skylab::TanMan
 
       def o.val x                 # render a business value
         x                         # (for cli we render as-is.  looks good
-      end                         # next to the stylized `lbl` labels. looks
+      end                         # next to the styled `lbl` labels. looks
                                   # cluttered to do more.
       o
     end.call

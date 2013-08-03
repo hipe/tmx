@@ -20,7 +20,7 @@ module Skylab::Dependency::TestSupport::Tasks
       o.context = context
       o.on_all do |e|
         debug_event e if do_debug
-        fingers[ e.stream_name ] << unstylize( e.text )
+        fingers[ e.stream_name ] << unstyle( e.text )
       end
     end
 

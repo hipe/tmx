@@ -15,9 +15,9 @@ module Skylab::MetaHell::Module::Creator
 
     o = ::Hash.new
 
-    o[:build_meta_f] = -> me, known_graph do
+    o[:build_meta_p] = -> me, known_graph do
       -> name do
-        M.define_methods[ me, name, M.get_product_f[ known_graph, name ] ]
+        M.define_methods[ me, name, M.get_product_p[ known_graph, name ] ]
         M.create_meta[ name ]
       end
     end
@@ -34,7 +34,7 @@ module Skylab::MetaHell::Module::Creator
       nil
     end
 
-    o[:get_product_f] = -> kg, name do
+    o[:get_product_p] = -> kg, name do
       -> do
         M.graph_bang[ self, kg, self.meta_hell_anchor_module, name ]
       end
@@ -139,17 +139,17 @@ module Skylab::MetaHell::Module::Creator
 
     o[:parts] = -> full_name { full_name.to_s.split SEP_ }
 
-    o[:reduce] = -> full_name, memo, branch_f, leaf_f=nil do
-      leaf_f ||= branch_f
+    o[:reduce] = -> full_name, memo, branch_p, leaf_p=nil do
+      leaf_p ||= branch_p
       parts = M.parts[ full_name ]
       done = parts.empty?
       until done
         const = parts.shift.intern
         done = parts.empty?
         if done
-          memo = leaf_f[ memo, const ]
+          memo = leaf_p[ memo, const ]
         else
-          memo = branch_f[ memo, const ]
+          memo = branch_p[ memo, const ]
         end
       end
       memo
@@ -175,7 +175,7 @@ module Skylab::MetaHell::Module::Creator
       kg = __metahell_known_graph # (maybe try to avoid spreading this around)
       me = self
 
-      build_meta = M.build_meta_f[ me, kg ]
+      build_meta = M.build_meta_p[ me, kg ]
 
       M.reduce[ full_name, ModuleMethods::Memo[ kg ],
         -> m, o  do               # for each branch node of the path (not last)
@@ -208,13 +208,13 @@ module Skylab::MetaHell::Module::Creator
 
     o = { }
 
-    o[:bang_f] = -> client do    # make a lambda used for banging modules.
-      M_IM._bang_f[ client,      # ('bang' means '[create] retrieve')
+    o[:bang_p] = -> client do    # make a lambda used for banging modules.
+      M_IM._bang_p[ client,      # ('bang' means '[create] retrieve')
         ->( memo ) { M.create_meta[ memo.name ].build_product client }
       ]
     end
 
-    o[:_bang_f] = -> client, build, update=nil do # an abstract bang maker
+    o[:_bang_p] = -> client, build, update=nil do # an abstract bang maker
       -> memo, const do
         memo.seen.push const      # Necessary to update this at each step.
         if client.respond_to? memo.name  # (Elsewhere like above or client
@@ -249,7 +249,7 @@ module Skylab::MetaHell::Module::Creator
       # get this module by name now, autovivifying any modules necessary to
       # get there.  once you get to it, run any `module_body` on it.
 
-      bang = M_IM.bang_f[ self ]  # 'bang' means "retrieve, creating if nec."
+      bang = M_IM.bang_p[ self ]  # 'bang' means "retrieve, creating if nec."
 
                                   # break the name into tokens, which each one:
       m = M.reduce[ full_name, Memo.new(meta_hell_anchor_module),

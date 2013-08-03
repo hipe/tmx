@@ -44,10 +44,10 @@ module Skylab::Porcelain::TestSupport
    include CONSTANTS
    include MetaHell::Class::Creator::InstanceMethods # klass!
 
-   define_method :style_free, & Headless::CLI::Pen::FUN.unstylize
+   define_method :style_free, & Headless::CLI::Pen::FUN.unstyle
 
-   define_method :unstylize_stylized,
-     & Headless::CLI::Pen::FUN.unstylize_stylized
+   define_method :unstyle_styled,
+     & Headless::CLI::Pen::FUN.unstyle_styled
 
    define_method :constantize, & Autoloader::FUN.constantize
 

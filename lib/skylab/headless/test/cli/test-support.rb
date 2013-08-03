@@ -53,7 +53,7 @@ module Skylab::Headless::TestSupport::CLI
   module InstanceMethods
     include CONSTANTS
 
-    define_method :styled, & Headless::CLI::Pen::FUN.unstylize_stylized
+    define_method :styled, & Headless::CLI::Pen::FUN.unstyle_styled
 
     expect_text = FUN.expect_text
 

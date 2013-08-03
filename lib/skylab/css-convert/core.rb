@@ -231,7 +231,7 @@ module Skylab::CssConvert
         [[c], [:strong, c]].each do |a|
           s = "would you like some " <<
             "#{pen.stylize(a.map(&:to_s).join(' '), *a)} with that?"
-          u = pen.unstylize(s)
+          u = pen.unstyle(s)
           fill = ' ' * [width - u.length, 0].max
           emit(:payload, "#{fill}#{s} - #{u}")
         end

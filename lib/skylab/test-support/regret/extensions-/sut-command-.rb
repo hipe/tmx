@@ -2,6 +2,11 @@ module ::Skylab::TestSupport
 
   module Regret
 
+    Get_SUT_command_a_method_ = -> do  # this is not meant to be autoloaded..
+      ts = self.class::SUT_TEST_SUPPORT_MODULE_HANDLE_
+      ts.get_command_parts_for_system_under_test_notify
+    end
+
     module AnchorModuleMethods
 
       # this seems like it should be easy .. what is so complicated about it?

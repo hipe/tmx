@@ -45,7 +45,7 @@ module Skylab::Headless::TestSupport::CLI::Box::DSL
     _expect_strings = -> me, ioa, strings do
       strs = ioa.emission_a.map(& me.expect_text )
       while str = strs.shift
-        str = Headless::CLI::Pen::FUN.unstylize[ str ]
+        str = Headless::CLI::Pen::FUN.unstyle[ str ]
         expecting = strings.shift or fail "unexpected string - #{ str }"
         if ::Regexp === expecting
           str.should me.match( expecting )
@@ -79,7 +79,7 @@ module Skylab::Headless::TestSupport::CLI::Box::DSL
     end
 
     def expect_styled str
-      x = Headless::CLI::Pen::FUN.unstylize_stylized[ str ]
+      x = Headless::CLI::Pen::FUN.unstyle_styled[ str ]
       x or fail( "expected this to have some styling in it - #{ str }" )
     end
 

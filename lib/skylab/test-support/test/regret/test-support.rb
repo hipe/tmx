@@ -14,11 +14,9 @@ module Skylab::TestSupport::TestSupport::Regret
 
   module InstanceMethods
 
-    TS_HANDLE_ = TS_
+    SUT_TEST_SUPPORT_MODULE_HANDLE_ = TS_  # makes the below method work
 
-    def sut_cmd_a
-      ts = nearest_indexed_test_support_module
-      ts.get_command_parts_for_system_under_test_notify
-    end
+    define_method :sut_cmd_a, ::Skylab::TestSupport::Regret::Get_SUT_command_a_method_
+
   end
 end

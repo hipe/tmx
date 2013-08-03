@@ -38,8 +38,8 @@ module Skylab::Headless
 
     def parameters &block
       if block_given? # this "feature" may be removed after benchmarking (@todo)
-        fail 'sanity' if parameters_f or parameters_ivar
-        @parameters_f = block
+        fail 'sanity' if parameters_p or parameters_ivar
+        @parameters_p = block
         return
       end
       @parameters ||= begin
@@ -57,10 +57,10 @@ module Skylab::Headless
           end
         end
         mods.reverse.each { |mod| p.merge!(mod.parameters) }
-        if parameters_f
+        if parameters_p
           @parameters = p # prevent inf. recursion, the below call may need this
-          instance_exec(&@parameters_f)
-          @parameters_f = nil
+          instance_exec(&@parameters_p)
+          @parameters_p = nil
         end
         if const_defined? :PARAMS, false       # this is an ugly little
           self::PARAMS.each do |name|          # #experimental shorthand
@@ -71,7 +71,7 @@ module Skylab::Headless
       end
     end
 
-    attr_reader :parameters_f
+    attr_reader :parameters_p
   end
 
   module Parameter::Definer::InstanceMethods
@@ -261,12 +261,12 @@ module Skylab::Headless
       @has_tail_queue = nil
       @property_keys = []
       class << self
-        define_method_f = ->(meth, &b) { define_method(meth, &b) }
-        define_method(:def!) { |meth, &b| define_method_f.call(meth, &b) }
+        define_method_p = ->(meth, &b) { define_method(meth, &b) }
+        define_method(:def!) { |meth, &b| define_method_p.call(meth, &b) }
       end
       upstream_queue = []
-      def!(:apply_upstream_filter) do |host_obj, val, &final_f|
-        mutated = [* upstream_queue[0..-2], ->(v, _) { final_f.call(v) } ]
+      def!(:apply_upstream_filter) do |host_obj, val, &final_p|
+        mutated = [* upstream_queue[0..-2], ->(v, _) { final_p.call(v) } ]
         (f = ->(o, v, i=0) do
           o.instance_exec(v, ->(_v) { f[o, _v, i+1] }, &mutated[i])
         end).call(host_obj, val)
@@ -281,9 +281,9 @@ module Skylab::Headless
         tail_queue = nil
       end
       def!(:filter_upstream!) { |&node| upstream_queue.unshift node }
-      upstream_f = ->(host_obj, val, i = 0) do
+      upstream_p = ->(host_obj, val, i = 0) do
         host_obj.instance_exec(val,
-          ->(_val) { upstream_f.call(host_obj, _val, i+1) }, &upstream_queue[i])
+          ->(_val) { upstream_p.call(host_obj, _val, i+1) }, &upstream_queue[i])
       end
       def!(:filter_upstream_last!) do |&node|
         upstream_last_mutex and
@@ -304,8 +304,8 @@ module Skylab::Headless
       def! :builder= do |builder_f_method_name|
         host_def(name) do
           unless known?(name)
-            _f = send(builder_f_method_name) or fail("no builder: #{name}")
-            self[name] = _f.call
+            _p = send(builder_f_method_name) or fail("no builder: #{name}")
+            self[name] = _p.call
           end
           self[name]
         end
@@ -325,10 +325,10 @@ module Skylab::Headless
           host_def(name, & (if reader then
             ->(*a) do
               if a.length.zero? then known?(name) ? self[name] : nil
-              else a.each { |val| upstream_f.call(self, val) } end
+              else a.each { |val| upstream_p.call(self, val) } end
             end
           else
-            ->(v, *a) { a.unshift(v).each { |_v| upstream_f.call(self, _v) } }
+            ->(v, *a) { a.unshift(v).each { |_v| upstream_p.call(self, _v) } }
           end))
         when :value
           filter_upstream_last! { |val, _| self[name] = val } # buck stops here
@@ -336,21 +336,21 @@ module Skylab::Headless
             ->(*v) do
               case v.length
               when 0 ; self[name] # trigger warnings in some implementations
-              when 1 ; upstream_f.call(self, v.first)
+              when 1 ; upstream_p.call(self, v.first)
               else   ; raise ::ArgumentError.new(
                   "wrong number of arguments (#{v.length} for 1)")
               end
             end
           else
-            ->(v) { upstream_f.call(self, v) }
+            ->(v) { upstream_p.call(self, v) }
           end))
         else fail('no')
         end
       end
       def! :enum= do |enum|
-        filter_upstream! do |val, valid_f|
+        filter_upstream! do |val, valid_p|
           if enum.include? val
-            valid_f[ val ]
+            valid_p[ val ]
           else
            _with_client do # slated to be improved [#012]
              error("#{ val.inspect } is an invalid value " <<
@@ -365,11 +365,11 @@ module Skylab::Headless
       def!(:reader=) { |_| host_def(name) { self[name] if known? name } }
       def!(:upstream_passthru_filter) do |&f|
         on_tail { assert_writer("passthru filter found with no writer!") }
-        filter_upstream! { |val, valid_f| valid_f.call(f.call val) }
+        filter_upstream! { |val, valid_p| valid_p.call(f.call val) }
       end
       def! :writer= do |_|
         filter_upstream_last! { |val, _| self[name] = val } # buck stops here
-        host_def("#{name}=") { |val| upstream_f.call(self, val) }
+        host_def("#{name}=") { |val| upstream_p.call(self, val) }
       end
       @normalized_parameter_name = name ; @host = host
     end

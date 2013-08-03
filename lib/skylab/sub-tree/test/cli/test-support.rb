@@ -6,15 +6,17 @@ module Skylab::SubTree::TestSupport::CLI
   ::Skylab::SubTree::TestSupport[ self ]  # #regret
 
   module CONSTANTS
-    SubTree = ::Skylab::SubTree
+    ::Skylab::MetaHell::FUN.
+      import[ self, ::Skylab, %i( MetaHell SubTree TestSupport ) ]
     PubSub_TestSupport = ::Skylab::PubSub::TestSupport
-    TestSupport = ::Skylab::TestSupport
     PN_ = 'sub-tree'.freeze
   end
 
   module InstanceMethods
 
     include CONSTANTS # access SubTree from within i.m's in the specs
+
+    extend MetaHell::Let
 
     # (in pre-order from the first test.)
 
@@ -36,7 +38,7 @@ module Skylab::SubTree::TestSupport::CLI
     end
 
     -> do
-      stderr = $stderr
+      stderr = TestSupport::Stderr_[]
 
       define_method :dputs do |x|
         stderr.puts x
@@ -67,7 +69,7 @@ module Skylab::SubTree::TestSupport::CLI
       end
     end
 
-    unstylize = unstylize_stylized = nil
+    unstyle = unstyle_styled = nil
 
     define_method :line do
       e = emission_a.shift
@@ -75,7 +77,7 @@ module Skylab::SubTree::TestSupport::CLI
         names.push e.stream_name
         txt = e.payload_x
         ::String === txt or fail 'blearg'
-        unstylize[ txt ] or txt
+        unstyle[ txt ] or txt
       end
     end
 
@@ -83,9 +85,9 @@ module Skylab::SubTree::TestSupport::CLI
       emit_spy.emission_a
     end
 
-    unstylize, unstylize_stylized =
+    unstyle, unstyle_styled =
       ::Skylab::Headless::CLI::Pen::FUN.instance_exec do
-        [ self.unstylize, self.unstylize_stylized ]
+        [ self.unstyle, self.unstyle_styled ]
       end
 
     attr_reader :result

@@ -49,11 +49,11 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime
       let( :argv ) { a }
     end
 
-    def frame description, *tags, &body_f
+    def frame description, *tags, &body_p
       context(description, *tags) do
         f = -> { r = _build_frame ; f = -> { r } ; r }
         let( :frame ) { instance_exec(& f ) }
-        module_eval(& body_f)
+        module_eval(& body_p)
       end
     end
 

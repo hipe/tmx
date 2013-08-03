@@ -11,12 +11,12 @@ module ::Skylab::MetaHell::TestSupport::Module::Creator::ModuleMethods
   Module = Module # #annoying
 
   FUN = MetaHell::Struct[ {
-    :done_f => -> struct do
+    :done_p => -> struct do
       -> name do
-        struct[name] = FUN.done_msg_f[ name ]
+        struct[name] = FUN.done_msg_p[ name ]
       end
     end,
-    :done_msg_f => -> name do
+    :done_msg_p => -> name do
       -> do
         Stderr_[].puts "NEVER AGAIN: #{name}"  # just a sanity check
       end

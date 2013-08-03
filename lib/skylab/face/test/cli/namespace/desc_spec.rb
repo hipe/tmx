@@ -47,7 +47,7 @@ module Skylab::Face::TestSupport::CLI::Namespace::Desc
 
       it "the index screen - how this works into summaries.." do
         invoke '-h'
-        a = lines[ :err ][ -5 .. -2 ].map( & method( :unstylize ) ).reverse
+        a = lines[ :err ][ -5 .. -2 ].map( & method( :unstyle ) ).reverse
         a.pop.should eql( "           live-like  today" )
         a.pop.should eql( "                      today we're gonna" )
         a.pop.should eql( "  throw-it-in-a-fire  live" )
@@ -57,7 +57,7 @@ module Skylab::Face::TestSupport::CLI::Namespace::Desc
       it "the help screen - the *surface* context is used!" do
         invoke 'throw', '-h'
         a = lines[ :err ][ 2 .. 5 ].reverse
-        unstylize_stylized( a.pop ).should eql( 'description: live' )
+        unstyle_styled( a.pop ).should eql( 'description: live' )
         a.pop.should eql( '  like' )
         a.pop.should eql( '  a warrior' )
         a.pop.should eql( '' )

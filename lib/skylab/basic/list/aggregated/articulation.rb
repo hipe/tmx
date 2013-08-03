@@ -48,18 +48,18 @@ module Skylab::Basic
     Flusher_ = MetaHell::Function::Class.new :flush
     class Flusher_
 
-      def initialize template_str, on_zero_items_f, aggregate_f,
-                         on_first_mention_f, on_subsequent_mentions_f
+      def initialize template_str, on_zero_items_p, aggregate_p,
+                         on_first_mention_p, on_subsequent_mentions_p
         tmpl = Basic::String::Template.from_string template_str
-        whn = build_whens tmpl, aggregate_f, on_first_mention_f,
-          on_subsequent_mentions_f
+        whn = build_whens tmpl, aggregate_p, on_first_mention_p,
+          on_subsequent_mentions_p
 
         @flush = -> do
           -> ea_x do
             scn = Basic::List::Scanner[ ea_x ]
             x = scn.gets
             if ! x
-              on_zero_items_f.call if on_zero_items_f
+              on_zero_items_p.call if on_zero_items_p
             else
               sio = Basic::Services::StringIO.new
               yld = ::Enumerator::Yielder.new do |data|
@@ -72,14 +72,14 @@ module Skylab::Basic
         end
       end
 
-      def build_whens tmpl, aggregate_f, on_first_mention_f,
-          on_subsequent_mentions_f
+      def build_whens tmpl, aggregate_p, on_first_mention_p,
+          on_subsequent_mentions_p
 
         flusher = Mention_::Flusher_.new(
           nn_a = tmpl.get_formal_parameters.map( & :local_normal_name ) )
-        whn = When_[ flusher.flush( on_first_mention_f ),
-          flusher.flush( on_subsequent_mentions_f ),
-          flusher.flush( aggregate_f ), nn_a ]
+        whn = When_[ flusher.flush( on_first_mention_p ),
+          flusher.flush( on_subsequent_mentions_p ),
+          flusher.flush( aggregate_p ), nn_a ]
         normalize_aggregation whn
         whn
       end

@@ -14,7 +14,7 @@ module Skylab::Headless::TestSupport::CLI::Pen
 
     parse_styles = Headless::CLI::FUN.parse_styles
 
-    unstylize_sexp = Headless::CLI::FUN.unstylize_sexp
+    unstyle_sexp = Headless::CLI::FUN.unstyle_sexp
 
     it "look, wow" do
 
@@ -26,7 +26,7 @@ module Skylab::Headless::TestSupport::CLI::Pen
       parts = enum.to_a
       types, strings = parts.reduce [[],[]] do |(tp, st), pt|
         tp << pt[0][0]
-        st << unstylize_sexp[ pt ]
+        st << unstyle_sexp[ pt ]
         [ tp, st ]  # just cute not good
       end
       types.should eql( [ :string, :style, :string] )

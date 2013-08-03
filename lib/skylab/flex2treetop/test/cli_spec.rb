@@ -24,9 +24,9 @@ module Skylab::Flex2Treetop::MyTestSupport
         argv '-h'
         it "displays the help screen" do
           err = self.err # necessary because we mutate it
-          unstylize( err.shift ).should match(/usage: xyzzy .{24,} <flexfile>/i)
+          unstyle( err.shift ).should match(/usage: xyzzy .{24,} <flexfile>/i)
           err.shift.should eql('')
-          unstylize( err.shift ).should match(/\Aoptions:\z/i)
+          unstyle( err.shift ).should match(/\Aoptions:\z/i)
           bad = err.select { |s| s !~ /\A[[:space:]]+/ }
           bad.should eql([])
         end

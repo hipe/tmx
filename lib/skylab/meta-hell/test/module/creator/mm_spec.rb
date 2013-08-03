@@ -41,7 +41,7 @@ module ::Skylab::MetaHell::TestSupport::Module::Creator::ModuleMethods
 
     F = MetaHell::Struct[ o ]
 
-    done = FUN.done_f[ F ]         # this absurdity is just a sanity check
+    done = FUN.done_p[ F ]         # this absurdity is just a sanity check
 
 
     describe "#{MetaHell::Module::Creator::ModuleMethods} (*on* modules, #{
@@ -85,7 +85,7 @@ module ::Skylab::MetaHell::TestSupport::Module::Creator::ModuleMethods
         X.done[ :once ]
       end,
 
-     :done => ->( name ) { X[name] = FUN.done_msg_f[ name ] }
+     :done => ->( name ) { X[name] = FUN.done_msg_p[ name ] }
 
     } ]
 

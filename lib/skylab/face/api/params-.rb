@@ -110,7 +110,7 @@ module Skylab::Face
       self::ZERO_OR_ONE = new 0, 1
       self::ZERO_OR_MORE = new 0, nil
       self::ONE = new 1, 1
-      self::ONE_OR_MORE = new 1, 1
+      self::ONE_OR_MORE = new 1, nil
     end
 
     Argument_Arities_ = Face::Services::Headless::Arity::Space.create do

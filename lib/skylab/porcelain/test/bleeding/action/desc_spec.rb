@@ -97,7 +97,7 @@ module Skylab::Porcelain::TestSupport::Bleeding::Action # #po-008
         app = self.CLI.new emit_spy
         app.invoke [ '-h' ]
         a = emit_spy.delete_emission_a
-        styled = Headless::CLI::Pen::FUN.unstylize_stylized
+        styled = Headless::CLI::Pen::FUN.unstyle_styled
         line = -> { styled[ a.shift.payload_x ] }
         line[].should match( /ferp.+derp/ )  # usage line
         line[].should match( /^ *actions\b/i )

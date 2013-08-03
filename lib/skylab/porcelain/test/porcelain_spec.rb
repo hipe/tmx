@@ -18,7 +18,7 @@ module Skylab::Porcelain::TestSupport
     let(:stderr) { _stderr.string }
 
     let :styled_stderr do
-      unstylize_stylized _stderr.string
+      unstyle_styled _stderr.string
     end
 
     let(:instance) do
@@ -395,7 +395,7 @@ module Skylab::Porcelain::TestSupport
         it "1.1) if you pass it some arguments, it reports a syntax error and shows usage and invites for help" do
           i = instance
           i.invoke(%w(takes-no-arguments first-arg)).should eql(1)
-          s = unstylize_stylized( stderr ).split("\n")
+          s = unstyle_styled( stderr ).split("\n")
           s.shift.should match(/unexpected argument[: ]+"first-arg"/i)
           s.shift.should match(/usage: yourapp takes-no-arguments/i)
           s.shift.should match(/try .* for help/i)
@@ -440,7 +440,7 @@ module Skylab::Porcelain::TestSupport
       context "help screens" do
         it "will use optparse's rendering of help screen for the options" do
           instance.invoke(%w(whatever-is-clever -h))
-          help_screen = unstylize_stylized stderr
+          help_screen = unstyle_styled stderr
           help_screen.should match(/usage: yourapp whatever-is-clever/i)
           help_screen.should match(/-a, --apple +an apple/)
         end
@@ -495,7 +495,7 @@ module Skylab::Porcelain::TestSupport
           context "against an argv with [baz]" do
             let(:argv) { ['baz'] }
             let(:subject) do
-              unstylize_stylized first_line
+              unstyle_styled first_line
             end
             context "it does not invoke the default action - the output" do
               specify { should match(/Invalid action\: baz/i) }

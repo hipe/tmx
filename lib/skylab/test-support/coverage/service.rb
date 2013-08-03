@@ -11,8 +11,8 @@ module Skylab::TestSupport
       nil
     end
 
-    def start path_prefix_f
-      Coverage::Coverer.new( @y, path_prefix_f ).cover
+    def start path_prefix_p
+      Coverage::Coverer.new( @y, path_prefix_p ).cover
       nil
     end
   end

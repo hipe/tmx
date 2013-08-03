@@ -59,7 +59,7 @@ module Skylab::Git::TestSupport::Actions::Stash_Untracked
         o
       end
 
-      define_method :unstylize, & Headless::CLI::Pen::FUN.unstylize
+      define_method :unstyle, & Headless::CLI::Pen::FUN.unstyle
 
       def with_popen3_out_as str
         Git::Services::Open3.stub :popen3 do |cmd, &block|
@@ -170,7 +170,7 @@ module Skylab::Git::TestSupport::Actions::Stash_Untracked
             flop/floop.tx | 4 ++++
             2 files changed, 6 insertions(+), 0 deletions(-)
           HERE
-          unstylize(stderr.string).should eql(expected)
+          unstyle(stderr.string).should eql(expected)
         end
 
         it "it can also do the --patch format" do
@@ -192,7 +192,7 @@ module Skylab::Git::TestSupport::Actions::Stash_Untracked
             +foour
             +
           HERE
-          unstylize(stderr.string).should eql(expected)
+          unstyle(stderr.string).should eql(expected)
         end
       end
 

@@ -247,7 +247,7 @@ module Skylab::Headless::CLI::Table
 
     parse_styles   = Headless::CLI::FUN.parse_styles
     unparse_styles = Headless::CLI::FUN.unparse_styles
-    unstylize      = Headless::CLI::Pen::FUN.unstylize
+    unstyle      = Headless::CLI::Pen::FUN.unstyle
     hackable_a = [ :style, :string, :style ]
 
     common = -> fld do
@@ -259,7 +259,7 @@ module Skylab::Headless::CLI::Table
             sexp[1][1] = fmt % sexp[1][1]
             unparse_styles[ sexp ]
           else
-            unstylize[ str ]  # glhf
+            unstyle[ str ]  # glhf
           end
         else
           fmt % str
@@ -313,7 +313,7 @@ module Skylab::Headless::CLI::Table
     # --*--
 
     blank_rx = Table::Cels::BLANK.rx
-    unstylize = Headless::CLI::Pen::FUN.unstylize
+    unstyle = Headless::CLI::Pen::FUN.unstyle
     start_type = Table::Cels::INTEGER
     float_detail_rx = Table::Cel::FLOAT_DETAIL_RX
 
@@ -322,7 +322,7 @@ module Skylab::Headless::CLI::Table
         ::String === cel_x or raise ::ArgumentError, "table cels *must* #{
           }be nil or string for reasons - #{ cel_x.class }"
         @num_non_nil_seen += 1
-        raw = unstylize[ cel_x ]
+        raw = unstyle[ cel_x ]
         @max_h[:full] = raw.length if raw.length > @max_h[:full]
         if blank_rx =~ raw
           @type_h[:blank] += 1

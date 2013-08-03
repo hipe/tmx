@@ -8,12 +8,12 @@ describe "#{Skylab::Bnf2Treetop} CLI integration" do
   end
 
   def usage
-    unstylize(err.shift).should eql(
+    unstyle(err.shift).should eql(
       'usage: bnf2treetop [options] { <bnf-file> | - }')
   end
 
   def invite
-    unstylize(err.shift).should eql('bnf2treetop -h for help')
+    unstyle(err.shift).should eql('bnf2treetop -h for help')
   end
 
   def no_payload
@@ -21,7 +21,7 @@ describe "#{Skylab::Bnf2Treetop} CLI integration" do
   end
 
   def options_listing
-    unstylize(err.shift).should eql('options:')
+    unstyle(err.shift).should eql('options:')
     (10..17).should cover(err.length)
     err.detect { |s| /\A[[:space:]]/ !~ s }.should eql(nil)
   end

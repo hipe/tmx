@@ -126,8 +126,8 @@ module Skylab::PubSub::TestSupport
       end
     end.call
 
-    def unstylize_all_stylized!  # courtesy
-      @do_unstylize_all_stylized = true
+    def unstyle_all_styled!  # courtesy
+      @do_unstyle_all_styled = true
     end
 
     attr_writer :textify  # how do you want to convert your events to text?
@@ -142,7 +142,7 @@ module Skylab::PubSub::TestSupport
       @desc_h = { }
       @do_continue = true  # (use it to short-circuit processing expect_a)
       @did_complain_about_no_event = nil
-      @do_unstylize_all_stylized = nil
+      @do_unstyle_all_styled = nil
       @textify = -> x { x.text }
     end
 
@@ -281,12 +281,12 @@ module Skylab::PubSub::TestSupport
 
     -> do
 
-      unstylize = Headless::CLI::Pen::FUN.unstylize
+      unstyle = Headless::CLI::Pen::FUN.unstyle
 
       define_method :get_matchable_text do |e|
         txt = @textify[ e ]
-        if @do_unstylize_all_stylized
-          txt = unstylize[ txt ]
+        if @do_unstyle_all_styled
+          txt = unstyle[ txt ]
         end
         txt
       end

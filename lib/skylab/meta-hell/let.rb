@@ -10,10 +10,10 @@ module Skylab::MetaHell
   end
 
   module Let::ModuleMethods
-    def let name, &initial_f
+    def let name, &initial_p
       define_method name do
         __memoized.fetch name do |k|
-          __memoized[k] = instance_exec(& initial_f)
+          __memoized[k] = instance_exec(& initial_p)
         end
       end
     end

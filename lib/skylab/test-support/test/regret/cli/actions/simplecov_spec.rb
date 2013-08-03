@@ -7,7 +7,7 @@ module Skylab::TestSupport::TestSupport::Regret::CLI_Actions_Simplecov
   add_command_parts_for_system_under_test 'regret', 'simplecov'
 
   module InstanceMethods
-    TS_HANDLE_ = TS_
+    SUT_TEST_SUPPORT_MODULE_HANDLE_ = TS_
   end
 
   include CONSTANTS

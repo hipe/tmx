@@ -16,10 +16,10 @@ describe "Skylab::MetaHell::FUN `parse_series`" do
 
   context "`parse_series`" do
 
-    m_f = %i( m f )
+    m_p = %i( m f )
 
     h( age: -> x { ::Numeric === x },
-       sex: -> x { m_f.include? x },
+       sex: -> x { m_p.include? x },
        loc: -> _ { }  # left here to prove that op_a != h.keys
     )
 

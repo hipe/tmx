@@ -151,7 +151,7 @@ module Skylab::Headless::TestSupport::CLI::Table
       render_table row_enum, separator: "\t" do |o|
         o.field!( :header ).style = Headless::CLI::Pen::MINIMAL.method(:hdr)
         o.on_row do |txt|
-          a << Headless::CLI::Pen::FUN.unstylize[ txt ]
+          a << Headless::CLI::Pen::FUN.unstyle[ txt ]
         end
       end
       lengths = a.map { |s| s.match(/^[^\t]*/)[0].length }
