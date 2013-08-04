@@ -1,19 +1,12 @@
-require_relative '../../../../test-support'
+require_relative '../test-support'
 
-module ::Skylab::MyTree::TestSupport
-  module API
-    module Actions
-      module Tree
-        # forward delcarations for possible future nerks
-      end
-    end
-  end
-end
+module Skylab::SubTree::TestSupport::API::Actions::My_Tree::Rendering
 
-module ::Skylab::MyTree::TestSupport::API::Actions::Tree::Tree
-  ::Skylab::MyTree::TestSupport[ self ] # #regret
+  ::Skylab::SubTree::TestSupport::API::Actions::My_Tree[ TS_ = self ]
 
   include CONSTANTS
+
+  SubTree = SubTree
 
   extend TestSupport::Quickie
 
@@ -21,28 +14,29 @@ module ::Skylab::MyTree::TestSupport::API::Actions::Tree::Tree
 
     include CONSTANTS
 
-    attr_accessor :debug
+    attr_reader :do_debug
 
     def debug!
-      self.debug = true
-    end
-
-    def makes str
-      spy = Headless::TestSupport::Client_Spy.new
-      spy.debug = -> { self.debug }
-      o = MyTree::API::Actions::Tree::Tree.new spy, nil # not verbose
-      @with.split( "\n" ).each do |s|
-        o.puts s
-      end
-      o.flush
-      actual = spy.emission_a.map(& FUN.expect_text ).join "\n"
-      expected = str.unindent.chomp
-      actual.should eql(expected)
-      nil
+      @do_debug = true
     end
 
     def with str
       @with = str.unindent.chomp
+      nil
+    end
+
+    def makes str
+      o = TestSupport::IO::Spy.new
+      e = ( do_debug and TestSupport::Stderr_[] )
+      do_debug and o.debug! "s-tdout: "
+      t = SubTree::API::Actions::My_Tree::Traversal_.new(
+        :out_p, o.method( :puts ),
+        :do_verbose_lines, do_debug,
+        :info_p, ( do_debug and e.method( :puts ) ) )
+      @with.split( "\n" ).each do |s|
+        t.puts s
+      end
+      t.flush_notify
       nil
     end
   end

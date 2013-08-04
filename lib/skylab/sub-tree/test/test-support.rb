@@ -9,7 +9,8 @@ module Skylab::SubTree::TestSupport
 
   ::Skylab::TestSupport::Regret[ self ]
 
-  # (move things up to here as appropriate if we ever build out the
-  # non-cli portion of the app)
-
+  module CONSTANTS
+    ::Skylab::MetaHell::FUN.
+      import[ self, ::Skylab, %i( MetaHell SubTree TestSupport ) ]
+  end
 end

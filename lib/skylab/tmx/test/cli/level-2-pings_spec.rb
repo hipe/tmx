@@ -59,10 +59,6 @@ module Skylab::TMX::TestSupport::CLI::L2P
       go :git
     end
 
-    it "my-tree" do
-      go :'my-tree'
-    end
-
     it "permute" do
       go :permute
     end

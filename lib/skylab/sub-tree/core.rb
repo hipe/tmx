@@ -29,4 +29,7 @@ module Skylab::SubTree
       rx =~ pn.instance_variable_get( :@path )
     end
   end.call
+
+  ::Skylab::Subsystem[ self ]
+
 end

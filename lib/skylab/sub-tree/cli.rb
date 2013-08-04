@@ -37,16 +37,41 @@ module Skylab::SubTree
       Headless::CLI::Pen::MINIMAL
     end
 
+    alias_method :expression_agent, :pen
+    private :expression_agent
+
     # --*--                         DSL ZONE                              --*--
 
     extend Porcelain::Legacy::DSL
 
-    desc "performs a ping."
+    desc "inspired by unix builtin `tree`"
+    desc "but adds custom features geared towards development"
 
-    def ping
-      emit :info, "hello from sub tree."
-      :hello_from_sub_tree
+    option_parser do |o|
+      my_tree_front.absorb( :expression_agent, expression_agent,
+                            :param_h, @param_h ).write_option_parser_to o
     end
+    argument_syntax '[<path> [..]]'
+
+    def my_tree *path, _
+      path.length.zero? and path << ::Dir.pwd
+      @param_h[ :path_a ] = path
+      i, o, e = @three_streams_p.call ; f = my_tree_front
+      f.absorb :upstream, i, :paystream, o, :infostream, e, :program_name,
+        @legacy_last_hot.normalized_invocation_string
+      r = f.flush
+      if false == r
+        @legacy_last_hot.invite
+        status_error
+      else
+        status_normal
+      end
+    end
+
+    def my_tree_front
+      @my_tree_front ||= SubTree::API::Actions::My_Tree.new
+    end
+    private :my_tree_front
 
     desc "(\"sub-tree\") from <in-dir> copy the files in <list> to <out-dir>. always safe."
 
@@ -189,6 +214,13 @@ module Skylab::SubTree
         res = invite_fuck_me :rerun
       end
       res
+    end
+
+    desc "performs a ping."
+
+    def ping
+      emit :info, "hello from sub tree."
+      :hello_from_sub_tree
     end
 
     Client = self  # #tmx-compat

@@ -1,111 +1,56 @@
-require_relative 'test-support'
+require_relative 'my-tree/test-support'
 
-module Skylab::MyTree::TestSupport
+module Skylab::SubTree::TestSupport::CLI::Actions::My_Tree
 
-  describe "#{MyTree} CLI (this is frontier for headless push-up)" do
-    extend ::Skylab::MyTree::TestSupport
+  describe "#{ SubTree }::CLI::Actions::My_Tree" do
 
-    let( :action_summary_line_rx ) { /\A  [^ ].*\z/ }
-    let( :_expecting_rx ) { /expecting {tree\|ping}/ }
-    let( :expecting_rx ) { /\A#{_expecting_rx.source}\z/ }
-    let( :invite_rx ) { /\Ause mt -h \[<action>\] for help/ }
-    let( :multiline_desc_line_rx ) { /\A  [^ ].*\z/ }
-    let( :option_summary_first_line_rx ) { action_summary_line_rx }
-    let( :usage_rx ) { /\Ausage: mt \[-h\] \[<action>\] \[<args> \[..\]\]\z/ }
+    extend TS_
 
-    it "0   : no args : expecting / usage / invite" do
-      result = invoke
-      line.should match( expecting_rx )
-      line.should match( usage_rx )
-      line.should match( invite_rx )
-      @emission_queue.should be_empty
-      result.should be_nil
-    end
+    FULL_PN_ = ( [ PN_, * TS_::SUT_CMD_SETTING_.value ] * ' ' ).freeze
 
-    it "1.1 : one unrec arg : msg / usage / invite" do
-      result = invoke 'gah'
-      line.should match( /\Athere is no "gah" action\. #{
-                                _expecting_rx.source }\z/ )
-      line.should match( usage_rx )
-      line.should match( invite_rx )
-      @emission_queue.should be_empty
-      result.should be_nil
-    end
+    INVITE_RX_ = /\ATry #{ FULL_PN_ } -h for help\.\z/i
+
+    USAGE_RX_ = /\Ausage: #{ FULL_PN_ }.* \[-f <file\>\] .*#{
+      }\[<path> \[<path>\[\.\.\.\]\]\]\z/
 
     it "1.2 : one unrec opt : msg / usage / invite" do
       result = invoke '-x'
-      line.should match(/\Ainvalid option: -x\z/)
-      line.should match( usage_rx )
-      line.should match( invite_rx )
-      @emission_queue.should be_empty
-      result.should be_nil
+      nonstyled.should match(/\Ainvalid option: -x\z/)
+      styled.should match( USAGE_RX_ )
+      styled.should match( INVITE_RX_ )
+      no_more_lines
+      result.should eql( 1 )
     end
 
-    it "1.3 : one opt: -h :  1) usage  2) desc  3) opts #{
-        }4) action list  5) custom invite" do
-      result = invoke '-h'       # (for now help screens allow
-      result.should eql( true )  # further processing after)
-      line.should match( usage_rx )
-      line.should eql('')
-      line.should match( /\Adescription:\z/ )
-      l = line
-      begin
-        l.should match( /\A[[:space:]]{2,}[^[:space:]]/ )
-        l = line
-      end while ( l && '' != l )
-
-      line.should match( /\Aoptions:\z/ )
-      line.should match( option_summary_first_line_rx )
-      loop do
-        '' == (l = line) and break
-        l.should match( option_summary_first_line_rx )
-      end
-
-      line.should match( /\Aactions:\z/ )
-      line.should match( action_summary_line_rx ) # one or more of these
-      loop do
-        '' == (l = line) and break
-        l.should match( action_summary_line_rx )
-      end
-      line.should match(
-        /\Ause mt -h <action> for help on that action\z/ )
-      @emission_queue.should be_empty
+    it "1.4 one rec opt : -h (as prefix) - beautiful help screen" do
+      cmd_a = '-h', "#{ TS_::SUT_CMD_SETTING_.value * ' ' }"
+      r = super_invoke( * cmd_a )
+      expect_beautiful_help
+      r.should eql( 0 )
     end
 
-    # #todo: single line desc       #todo: no-line descs
-
-    it "2.2 : -h rec (leaf) arg : 1) usage 2) desc 3) opts descs 4) args desc" do
-      result = invoke '-h', 'tree'
-      ( nil == result || true == result ).should eql( true )  # see above
-      line.should match( /\Ausage: mt tree/ )
-      line.should eql('')
-      line.should match(/\Aoptions:\z/)
-      line.should match( option_summary_first_line_rx )
-      while l = line
-        if l != '' # allow blank lines within this last section
-          l.should match( option_summary_first_line_rx )
-        end
-      end
-      @emission_queue.should be_empty
+    it "1.4 one rec opt : -h (as postfix) - beautiful help screen" do
+      r = invoke '-h'
+      expect_beautiful_help
+      r.should eql( 0 )
     end
 
-    # #todo: -h rec branch arg
+    OPT_SUMMARY_FIRST_LINE_RX_ =
+      /\A[ ]{3,}-[a-zA-Z], --(?:(?!>  ).)+[^ ][ ]{2,}[^ ]/  # ensure some desc
 
-    it "2.1 : -h unrec arg : just like (1.1)" do
-      result = invoke '-h', 'florp'
-      ( nil == result || true == result ).should eql( true )  # see above
-      line.should match( /\Athere is no "florp" action. #{
-                                 _expecting_rx.source }\z/ )
-      line.should match( usage_rx )
-      line.should match( invite_rx )
-      @emission_queue.should be_empty
-    end
-
-    it "3.1 : -h rec arg <rest> : rest is ignored" do
-      result = invoke '-h', 'tree', 'bleep'
-      ( nil == result || true == result ).should eql( true )  # see above
-      line.should match(/\A\(ignoring: "bleep"/)
-      ( 5..15 ).should be_include( @emission_queue.length )
+    def expect_beautiful_help
+      styled.should match( USAGE_RX_ )
+      any_blanks
+      header 'description'
+      nonstyled.should match( /\A[ ].+\binspired\b.+\btree\b/i )
+      nonstyled.should match( /\A[ ]+[a-z ]{10,}\z/ )
+      any_blanks
+      header 'options'
+      one_or_more_styled OPT_SUMMARY_FIRST_LINE_RX_
+      any_blanks
+      styled.should match( /it can also read paths from STDIN/ )
+      styled.should match( /this screen/ )
+      no_more_lines
     end
   end
 end

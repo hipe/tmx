@@ -3,8 +3,8 @@ module Skylab::Headless
   module NLP
 
     en_inflector = ::Class.new( ::Module ).class_exec do
-      Headless::SubClient::EN_FUN.each do |m, f|
-        define_method m, &f
+      Headless::SubClient::EN_FUN.each do |m, p|
+        define_method m, &p
       end
       self
     end
@@ -82,6 +82,10 @@ module Skylab::Headless
       inflected.fetch( v )[ zero_one_two ]
     end
 
+    o[:both] = -> x do
+      ' both' if 2 == ( ::Numeric === x ? x : x.length )
+    end
+
     -> do  # `inflect` - goofy experiment for low-commitment inflection
 
       pool_a = [ ]
@@ -94,7 +98,8 @@ module Skylab::Headless
       end
     end.call
 
-    FUN = ::Struct.new( * o.keys ).new( * o.values ).freeze
+    FUN_ = ::Struct.new( * o.keys )
+    FUN = FUN_.new( * o.values ).freeze
 
   end
 end

@@ -99,7 +99,9 @@ describe "#{ SubTree } CLI action: tree" do   # Quickie compatible !
     end
   end
 
-  it "LOOK AT THAT BEAUTIFUL COV TREE" do
+  ::Skylab::TestSupport::Stderr_[].puts( ::Skylab::Headless::CLI::Pen::FUN.stylize[ "    <<< SKIPPING COV TREE INTEGRATION >>>", :red ] )
+  false and it "LOOK AT THAT BEAUTIFUL COV TREE" do
+    debug!
     cd SubTree.dir_pathname.dirname.to_s do
       argv CMD_, RELATIVE_TESTDIR_NO_DOT_
     end

@@ -1,71 +1,40 @@
-require_relative '../core'
+require_relative '../test-support'
 
-require 'skylab/headless/test/test-support'
+module Skylab::SubTree::TestSupport::CLI::Actions::My_Tree
 
-module Skylab::MyTree::TestSupport
-  ::Skylab::TestSupport::Regret[ self ]
+  ::Skylab::Face::TestSupport::CLI[ self ]  # do this first
 
-
-  class FUN # #abuse
-    expect_text = -> emission do
-      txt = emission.payload_x
-      ::String === txt or fail "expected text"
-      txt
-    end
-
-    define_singleton_method :expect_text do expect_text end
+  module InstanceMethods
+    alias_method :super_invoke, :invoke  # hackily grab this
   end
 
-  module CONSTANTS
-    FUN = FUN
-    Headless = ::Skylab::Headless
-    MetaHell = ::Skylab::MetaHell
-    MyTree = ::Skylab::MyTree
-    TestSupport = ::Skylab::TestSupport  # le balls
-  end
+  ::Skylab::SubTree::TestSupport::CLI::Actions[ TS_ = self ]  # do this 2nd
+                   # we want our own `client` method to supercede the other
 
-  include CONSTANTS # so we can use them in the spec body
+  set_command_parts_for_system_under_test 'my-tree'  # we are the top
+
+  include CONSTANTS
 
   extend TestSupport::Quickie
 
+  FUN = ::Struct.new( :expect_text ).new( -> emission do
+    txt = emission.payload_x
+    txt.respond_to?( :ascii_only? ) or fail "expected text had #{ txt.class }"
+    txt
+  end )
+
   module InstanceMethods
 
-    include CONSTANTS             # for immediately below, and others
+    SUT_TEST_SUPPORT_MODULE_HANDLE_ = TS_
 
-    extend MetaHell::Let
+    define_method :get_sut_command_a, ::Skylab::TestSupport::Regret::Get_SUT_command_a_method_
 
-    attr_reader :debug
-
-    def debug!
-      @debug = true
+    def build_client
+      build_client_for_both  # switch it from 'events' mode to this
     end
 
     def invoke *argv
-      me = self ; ioa = nil
-      client = MyTree::CLI.new.instance_exec do
-        @program_name = 'mt'
-        @io_adapter = Headless::TestSupport::IO_Adapter_Spy.new build_pen
-        @io_adapter.debug = -> { me.debug }
-        ioa = @io_adapter
-        self
-      end
-      exit_result = client.invoke argv
-      @emission_queue = ioa.delete_emission_a
-      exit_result
+      super( * get_sut_command_a.concat( argv ) )
     end
-
-    -> do  # `line`
-
-      unstyle = Headless::CLI::Pen::FUN.unstyle
-
-      expect_text = FUN.expect_text
-
-      define_method :line do
-        e = @emission_queue.shift
-        if e
-          unstyle[ expect_text[ e ] ]
-        end
-      end
-    end.call
   end
 end

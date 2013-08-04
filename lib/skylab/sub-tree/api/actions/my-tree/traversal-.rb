@@ -1,97 +1,97 @@
-module Skylab::MyTree
+module Skylab::SubTree
 
-  class API::Actions::Tree::Tree  # will likely be moved [#mt-004]
-    # extend Headless::Parameter::Definer
+  class API::Actions::My_Tree::Traversal_
 
-    include Headless::Parameter::Controller::InstanceMethods
+    MetaHell::FUN::Fields_[ :client, self, :method, :absorb, :field_i_a,
+      [ :out_p, :sep, :do_verbose_lines, :info_p ] ]
 
-    def flush                     # tell it you are not adding more lines
+    def initialize * a
+      absorb( * a )
+      @curr_a = [] ; @matrix_a = [] ; @sep ||= SEP_
+      @glyph_set = Headless::CLI::Tree::Glyph::Sets::WIDE
+    end
+
+    def puts line, extra_x=nil
+      a = line.split @sep ; xtra_x = nil
+      a.reduce [] do |seen_a, s|  # note this effectively skips blank lines!
+        seen_a << s
+        idx = ( 0 ... @curr_a.length ).detect { |i| @curr_a[i] != seen_a[i] }
+        if idx
+          if idx < seen_a.length
+            ( @curr_a.length - idx ).times { @curr_a.pop } # pop the curr_a
+            do_push = true        # stack down to a place where it matches
+          end                     # else seen_a is already covered by curr_a
+        elsif @curr_a.length != seen_a.length
+          do_push = true          # seen_a is one level deeper than curr_a
+        end                       # else they are identical
+        extra_x and xtra_x = a.length == seen_a.length ? extra_x : nil
+        if do_push                # then seen_a is one level under curr_a
+          @curr_a << seen_a.last
+          row seen_a, xtra_x
+        else
+          xtra_x and fail "sanity - extra info on a redundant row?"
+        end
+        seen_a
+      end
+      nil
+    end
+
+    def flush_notify  # to say you are done adding lines
       row nil
       nil
     end
 
-    def puts line, extra=nil
-      a = line.split separator
-      use_extra = nil
-      a.reduce [] do |seen, s|    # note this effectively skips blank lines!
-        seen.push s
-        idx = (0 ... @current.length).detect { |i| @current[i] != seen[i] }
-        if idx
-          if idx < seen.length
-            (@current.length - idx).times { @current.pop } # pop the current ..
-            push = true           # stack down to a place where it matches seen
-          end                     # else seen is already covered by current
-        elsif @current.length != seen.length
-          push = true             # seen is one level deeper than current
-        end                       # else they are identical
-        if extra
-          use_extra = a.length == seen.length ? extra : nil
-        end
-        if push                   # then seen is one level under current
-          @current.push seen.last
-          row seen, use_extra
-        elsif use_extra
-          fail "sanity - had extra info on a redundant row"
-        end
-        seen
-      end
-    nil
-    end
-
   private
 
-    # (note: `do_verbose_lines` is so verbose we recommend you only use
-    # it when you are troubleshooting the flushing behavior. it's neat
-    # to see, once.)
-
-    def initialize request_client, do_verbose_lines
-      init_headless_sub_client request_client
-      @current = []
-      @glyph_set = Headless::CLI::Tree::Glyph::Sets::WIDE
-      @matrix = []
-      @do_verbose_lines = do_verbose_lines
-    end
-
-    def row seen, extra=nil
-      if seen
-        if @do_verbose_lines
-          emit :info, "(adding row: #{ seen.inspect }#{ '..' if extra })"
-        end
-        minimal = ::Array.new seen.length
-        seen.empty? or minimal[-1] = [seen.last, extra].compact.join(' ')
-        @matrix.push minimal
-        pipe = seen.length - 2                 # the imainary pipe is last nil
-        y = @matrix.length - 1
-      else # the flush run
-        pipe = -1                              # the imaginary pipe would go
-        y = @matrix.length                     # off the chart
+    def row seen_a, extra_x=nil
+      if seen_a
+        @do_verbose_lines and say_row( seen_a, extra_x )
+        min_a = ::Array.new seen_a.length
+        seen_a.empty? or min_a[ -1 ] = [ seen_a.last, extra_x ].compact * ' '
+        @matrix_a << min_a
+        pipe_d = seen_a.length - 2             # the imainary pipe is last nil
+        d = @matrix_a.length - 1
+      else                                     # a flush run
+        pipe_d = -1                            # the imaginary pipe would go
+        d = @matrix_a.length                   # off the chart
       end
-      while (y -= 1) >= 0                      # from bottom row to top
-        row = @matrix[y]
-        crook = row.length - 2                 # this is where the 'L' would go
-        case pipe <=> crook
-        when  0                                # pipe and crook in same spot,
-          row[crook] ||= self.tee if crook >= 0  # which makes a tee
-        when -1
-          trueish = (0 ... row.length).detect { |x| row[x] } || -1
-          row[pipe] ||= self.pipe if pipe >= 0
-          (pipe + 1 ... [trueish, crook].min).each { |x| row[x] = self.blank }
-          row[crook] ||= self.crook if crook >= 0
-        end
-      end
-      if ! @matrix.empty? and @matrix.first.first # empty when nothing to flush
+      sub_flush d, pipe_d
+      if @matrix_a.length.nonzero? and @matrix_a.first.first  # if flushable
         loop do                                # flush each contiguous row
-          emit :out, @matrix.shift.join(' ')   # starting from the first one
-          @matrix.first && @matrix.first.first or break
+          @out_p[ @matrix_a.shift * ' ' ]      # starting from the first one
+          @matrix_a.first && @matrix_a.first.first or break
         end
       end
       nil
     end
 
-    Headless::CLI::Tree::Glyphs.each do |glyph|
-      # blank crook pipe separator tee
-      n = glyph.normalized_glyph_name
-      define_method( n ) { @glyph_set[ n ] }
+    def sub_flush d, pipe_d
+      while (( d -= 1 )) >= 0                  # from bottom row to top
+        cel_a = @matrix_a[ d ]
+        crook_d = cel_a.length - 2             # this is where the 'L' would go
+        case pipe_d <=> crook_d
+        when  0                                # pipe and crook in same
+          crook_d >= 0 and cel_a[ crook_d ] ||= tee  # spot which makes a tee
+        when -1
+          idx = ( 0 ... cel_a.length ).detect( & cel_a.method( :[] ) ) || -1
+          pipe_d >= 0 and cel_a[ pipe_d ] ||= pipe
+          ( pipe_d + 1 ... [ idx, crook_d ].min ).each do |dd|
+            cel_a[ dd ] = blank
+          end
+          crook_d >= 0 and cel_a[ crook_d ] ||= crook
+        end
+      end
+      nil
     end
+
+    def say_row seen_a, extra_x
+      @info_p[ "(adding row: #{ seen_a.inspect }#{ '..' if extra_x })" ]
+    end
+
+    Headless::CLI::Tree::Glyphs.each do |glyph|
+      m = glyph.normalized_glyph_name
+      define_method m do @glyph_set[ m ] end
+      private m
+    end  # blank crook pipe separator tee
   end
 end

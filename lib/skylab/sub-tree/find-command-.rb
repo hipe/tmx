@@ -1,25 +1,15 @@
-module Skylab::MyTree
+module Skylab::SubTree
 
-  MyTree::Services::Shellwords || nil
+  SubTree::Services.kick :Shellwords
 
-  class Services::Find  # [#sl-118] - unify find cmds mebbem
+  class Find_Command_  # [#sl-118]
 
-    def string                    # didactic
-      if is_valid
-        y = [ "find #{ @path_a.map { |p| p.to_s.shellescape } * ' ' }" ]
-        if @type
-          y << "-type #{ @type }"
-        end
-        if @pattern
-          y << "-name #{ pattern.shellescape }"
-        end
-        y.join ' '
-      end
+    def initialize
+      @error_p ||= -> msg { raise msg }
+      @pattern_s = nil
+      @path_a = [ ] ; @type_i = :file
+      nil
     end
-
-    #         ~ setters for you, and their getters ~
-
-    #         ~ ~ path ~ ~
 
     def add_path path_s
       @path_a.push path_s
@@ -31,73 +21,41 @@ module Skylab::MyTree
       nil
     end
 
-    def path_a
+    def get_path_a
       @path_a.dup
     end
 
-    #         ~ ~ pattern ~ ~
-
-    def pattern= x
-      if @pattern
-        error "pattern already set"
-      else
-        @pattern = x
-      end
-      x
+    def set_pattern_s s
+      @pattern_s and raise ::ArgumentError, "pattern_s is write once"
+      @pattern_s = s
+      nil
     end
 
-    attr_reader :pattern
+    attr_reader :pattern_s
 
-    # `each` - make an enumerator out of the result of the `find` command,
-    # one line per line written to stdout.
-
-    def each  # result is nil if invalid or block given, else enumerator
+    def string
       if is_valid
-        ea = ::Enumerator.new do |y|
-          MyTree::Services::Open3.popen3 string do |_, sout, serr|
-            err = serr.read
-            if '' == err
-              sout.each_line do |line|
-                y << line.chomp
-              end
-            else
-              err.split( "\n" ).each do |line|
-                error line.chomp
-              end
-            end
-          end
-          nil
+        y = [ "find #{ @path_a.map { |p| p.to_s.shellescape } * ' ' }" ]
+        if @type_i
+          y << "-type #{ @type_i }"
         end
-        block_given? ? ea.each { |x| yield x } : ea
+        if @pattern_s
+          y << "-name #{ pattern_s.shellescape }"
+        end
+        y * ' '
       end
     end
 
     def is_valid
-      if @is_valid.nil?  # one way street..
-        if @path_a.length.zero?
-          error "find command has no paths"
-        end
-        if @is_valid.nil?
-          @is_valid = true
-        end
+      if @path_a.length.zero?
+        bork "find command has no paths"
+      else
+        true  # note we don't set the ivar
       end
-      @is_valid
     end
 
-  private
-
-    def initialize error
-      @error = error
-      @is_valid = nil
-      @path_a = [ ]
-      @pattern = nil
-      @type = :file  # meh for now
-      nil
-    end
-
-    def error text
-      @is_valid = false
-      @error[ text ]
+    def bork msg
+      @error_p[ msg ]
       false
     end
   end
