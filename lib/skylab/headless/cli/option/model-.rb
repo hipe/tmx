@@ -212,7 +212,7 @@ module Skylab::Headless
         nil
       end
 
-      EMPTY_S_ = ''.freeze
+      EMPTY_S_ = Headless::EMPTY_S_  # catch issues early
     end
 
     class Semi_Mutable_ < Model_

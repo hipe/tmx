@@ -1,10 +1,12 @@
-module Skylab::Headless
+module Skylab::Headless::SubClient
 
-  module SubClient
-    # this used to be more complicated, but you see what it has become now
-  end
+  Headless = ::Skylab::Headless
+  include Headless
+  MetaHell = MetaHell
+  Private_attr_reader_ = Private_attr_reader_
 
-  module SubClient::InstanceMethods
+  module InstanceMethods
+
     # **NOTE** the below are not all unobtrusive and auto-vivifying like
     # some i.m modules try to be. The participating object _must_ call
     # `init_headless_sub_client`
@@ -34,21 +36,22 @@ module Skylab::Headless
 
     def request_client
       @request_client or begin
-        caller_a = caller
-        md = Headless::FUN.call_frame_rx[].match caller_a[ 0 ]
-        desc = if md
-          if 0 == md[:meth].index( 'block ' )
-            pth = md[:path]
-            pth.sub! %r|\A#{ ::Regexp.escape ::Skylab.dir_pathname.to_s }/|, ''
-            " in block at #{ pth }:#{ md[:no] }"
-          else
-            " of `#{ md[:meth] }`"
-          end
+        loc = caller_locations( 1, 1 )[ 0 ]
+        desc = if BLOCK_ == loc.label[ BLK_R_ ]
+          pth = loc.absolute_path
+          pth.sub! %r|\A#{ ::Regexp.escape ::Skylab.dir_pathname.to_s }/|, ''
+          " in block at #{ pth }:#{ loc.lineno }"
+        else
+          " of `#{ loc.base_label }`"
         end
         fail "#{ self.class } cannot delegate call#{ desc } #{
           }upwards to request client - request client is human (#{
           }do you need to implement it for that class)?"
       end
+    end
+    module Headless::SubClient    # we can't define constants here
+      BLOCK_ = 'block '.freeze    # it might be a box module.
+      BLK_R_ = 0 ... BLOCK_.length
     end
 
     #         ~ an alphabetical list of things ~
@@ -119,7 +122,7 @@ module Skylab::Headless
 
   end
 
-  SubClient::EN_FUN = -> do
+  EN_FUN = -> do
 
     # things about nlp here: 1) we put our nlp-ish subclient instance methods
     # *first* in a struct-box and then distribute the definitions to this i.m
@@ -225,10 +228,9 @@ module Skylab::Headless
 
   end.call
 
+  module InstanceMethods
 
-  module Headless::SubClient::InstanceMethods
-
-    Headless::SubClient::EN_FUN.each do |method_name, body|
+    EN_FUN.each do |method_name, body|
       define_method method_name, &body
       protected method_name  # #protected-not-private
     end

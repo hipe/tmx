@@ -36,8 +36,8 @@ module Skylab::Treemap
     end
 
     def no_request_client         # special hack for nice error msgs
-      meth = Headless::FUN.call_frame_rx.match( caller[1] )[:meth]
-      fail "can't delegate #{ self.class }##{ meth } up to request client #{
+      fail "can't delegate #{ self.class }##{ caller_locations( 1, 1 )[ 0 ].
+        base_label } up to request client #{
         }because request client is human - implement it?"
     end
                                   #      ~ pen delegators are popular ~

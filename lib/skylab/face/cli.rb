@@ -1134,8 +1134,8 @@ module Skylab::Face
     # spirit of this thing. meh who cares its just CLI [#fa-004].
 
     def argument_error ex, cmd  # result will be final result
-      md = Services::Headless::FUN.call_frame_rx.match ex.backtrace.fetch( 1 )
-      if __FILE__ == md[:path] && 'invoke' == md[:meth]  # #todo that one thing
+      md = CALL_FRAME_RX_.match ex.backtrace.fetch( 1 )
+      if __FILE__ == md[:path] && 'invoke' == md[:meth]
         @y << ex.message
         cmd.usage @y
         cmd.invite @y
@@ -1144,6 +1144,12 @@ module Skylab::Face
         raise ex  # then it didn't originate from the above spot .. ICK
       end
     end
+    #
+    CALL_FRAME_RX_ = /
+      #{ ::Skylab::Autoloader::CALLFRAME_PATH_RX.source } :
+      (?<no>\d+) : in [ ] ` (?<meth>[^']+) '\z
+    /x
+
   end
 
   class NS_Mechanics_  # #re-open for facet 3

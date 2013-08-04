@@ -7,7 +7,7 @@ module Skylab::TanMan
     include Headless::CLI::Box::InstanceMethods
 
     def self.inherited klass
-      klass.send :init_autoloader, caller[0]
+      klass.send :init_autoloader, caller_locations( 1, 1 )[ 0 ]
     end
 
     # `action_box_module` - this is the centerpiece of this class: this load

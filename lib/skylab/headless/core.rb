@@ -14,6 +14,7 @@ module Skylab::Headless
                    # used as a heuristic or sanity in a couple places
   end
 
+  EMPTY_S_ = ''.freeze
   EMPTY_A_ = [ ].freeze
   IDENTITY_ = -> x { x }
   WRITEMODE_ = 'w'.freeze

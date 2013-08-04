@@ -2,7 +2,7 @@ module ::Skylab::TestSupport
 
   module Regret
 
-    module AnchorModuleMethods
+    module Anchor_ModuleMethods
 
       def tmpdir
         @tmpdir ||= begin

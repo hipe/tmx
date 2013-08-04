@@ -154,8 +154,7 @@ module Skylab::MetaHell
         end
 
         def curry_branch h
-          loc = caller_locations( 1, 1 )[ 0 ]
-          define_singleton_method loc.base_label, &
+          define_singleton_method caller_locations( 1, 1 )[ 0 ].base_label, &
             Branch_.curry[ self, h ]
           nil
         end
@@ -166,8 +165,7 @@ module Skylab::MetaHell
         end
 
         def curry_field_builder field_class
-          bn = caller_locations( 1, 1 )[ 0 ].base_label
-          define_singleton_method bn, &
+          define_singleton_method caller_locations( 1, 1 )[ 0 ].base_label, &
             Add_to_fields_with_class_and_name_.curry[ @fields, field_class ]
           nil
         end

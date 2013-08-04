@@ -12,7 +12,8 @@ module Skylab::Headless
         include CLI::Client::DSL::InstanceMethods
         @tug_class = MAARS::Tug
         extend CLI::Client::DSL::ModuleMethods # `method_added` avoid trouble
-        init_autoloader caller[2] # extensive note about this in box/dsl.rb
+        init_autoloader caller_locations( 3, 1 )[ 0 ]
+          # extensive note about this in box/dsl.rb
       end
       nil
     end

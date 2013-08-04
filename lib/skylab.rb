@@ -23,7 +23,7 @@ module Skylab                     # Welcome! :D
       mod.module_exec do
         @tug_class ||= autoloader::Tug
         extend autoloader::Methods
-        init_autoloader callr.nil? ? caller[2] : callr
+        init_autoloader callr.nil? ? caller_locations( 3, 1 )[ 0 ] : callr
       end
       nil
     end
@@ -71,9 +71,11 @@ module Skylab                     # Welcome! :D
 
     module Methods
 
-      def init_autoloader caller_string
+      def init_autoloader caller_x  # takes multiform args until [#mh-044]
         if dir_pathname.nil?
-          pn = ::Pathname.new caller_string.match( CALLFRAME_PATH_RX )[:path ]
+          pn = ::Pathname.new( caller_x.respond_to?( :absolute_path ) ?
+            caller_x.absolute_path :
+            caller_x.match( CALLFRAME_PATH_RX )[ :path ] )
           # #todo pn.relative? is expensive and bloaty
           '/' == pn.instance_variable_get( :@path )[ 0 ] or
             pn = pn.expand_path # although this is a filesystme hit,
@@ -93,7 +95,7 @@ module Skylab                     # Welcome! :D
       end
     end
 
-    CALLFRAME_PATH_RX = /^(?<path>.+)(?=:\d+:in[ ]`)/x
+    CALLFRAME_PATH_RX = /^(?<path>.+)(?=:\d+:in[ ]`)/x  # everywhere this is used [#mh-044]
 
     Guess_dir_ = -> do
 

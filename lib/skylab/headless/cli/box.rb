@@ -105,7 +105,7 @@ module Skylab::Headless
     # When we collapse the descs we build the sections too.
 
     def build_desc_lines
-      res = super
+      r = super
       a = action_box_module.each.reduce [] do |m, (_, c)|
         m << ( c.new self )       # ich muss sein - we need a charged graph
       end
@@ -116,7 +116,7 @@ module Skylab::Headless
           section.lines << [ :item, act.name.as_slug, act.summary_line ]
         end
       end
-      res
+      r
     end
 
     def help_screen_for_child y, action_ref

@@ -8,10 +8,9 @@ module ::Skylab::TanMan::TestSupport
     include ::Skylab::Autoloader::Methods # does not #trigger
 
     def self.extended mod
-      clr = caller[0]
       mod.module_exec do
         @tug_class = MetaHell::Autoloader::Autovivifying::Recursive::Tug
-        init_autoloader clr
+        init_autoloader caller_locations( 3, 1 )[ 0 ]
       end
       nil
     end

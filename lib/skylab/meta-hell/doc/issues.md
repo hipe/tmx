@@ -1,3 +1,4 @@
+[#044] #open #autoloading: swap-in caller_locations( 1, 1 )[ 0 ].base_label
 [#043]       #boxxy the stemmy tree issue - try autoloading the value corresp.
                to the path "headless/nlp/en/levenshtein-.rb"
 [#042]       #doc-point introducting tagged argument lists ..

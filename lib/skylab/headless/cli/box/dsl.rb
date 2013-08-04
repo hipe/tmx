@@ -10,7 +10,7 @@ module Skylab::Headless
         @tug_class = MAARS::Tug
         extend CLI::Box::DSL::ModuleMethods  # `method_added` - avoid troubl
         _headless_init_add :_headless_cli_box_dsl_init
-        init_autoloader caller[2]
+        init_autoloader caller_locations( 3, 1 )[ 0 ]
       end
       nil
     end

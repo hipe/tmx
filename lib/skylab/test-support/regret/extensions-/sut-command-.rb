@@ -7,7 +7,7 @@ module ::Skylab::TestSupport
       ts.get_command_parts_for_system_under_test_notify
     end
 
-    module AnchorModuleMethods
+    module Anchor_ModuleMethods
 
       # this seems like it should be easy .. what is so complicated about it?
 
