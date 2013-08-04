@@ -8,7 +8,7 @@ describe "#{ ::Skylab::SubTree } CLI" do
 
   _PN = ts::CLI::CONSTANTS::PN_
 
-  acts_rx = /\{ping.+rerun\}/
+  acts_rx = /\{.+rerun\|ping\}/
   actions = acts_rx.source
   expecting_rx_ = /\AExpecting #{ actions }\.\z/i # look!
   expecting_rx  = /\AExpecting #{ actions }\z/i

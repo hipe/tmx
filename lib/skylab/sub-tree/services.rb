@@ -2,8 +2,7 @@ module Skylab::SubTree
 
   module Services
 
-    stdlib, subsys = ::Skylab::Subsystem::FUN.
-      at :require_stdlib, :require_subsystem
+    stdlib, subsys = FUN.at :require_stdlib, :require_subsystem
     o = { }
     o[:Basic] = subsys
     o[:Face] = subsys

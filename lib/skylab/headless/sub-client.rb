@@ -124,10 +124,10 @@ module Skylab::Headless::SubClient
 
   EN_FUN = -> do
 
-    # things about nlp here: 1) we put our nlp-ish subclient instance methods
+    # things about NLP here: 1) we put our NLP-ish subclient instance methods
     # *first* in a struct-box and then distribute the definitions to this i.m
     # module so that a) they can be re-used elsewhere independent of s.c but
-    # b) our ancester chain doesn't get annoyingly long. 2) for those nlp
+    # b) our ancester chain doesn't get annoyingly long. 2) for those NLP
     # functions that inflect based on number (most of them) what we do here
     # different from our downstream (dependees) is we memoize the last used
     # numeric expressors (for the 'number' grammatical category) so that they
@@ -216,6 +216,9 @@ module Skylab::Headless::SubClient
       fun[].oxford_comma[ a, ' or ' ]
     end ]
 
+    o[:both] = memoize_length[ -> a do
+      fun[].both[ a ]
+    end ]
 
     fun = -> do
       # ( we've got to lazy-load it b.c of a circular dependency in the files )

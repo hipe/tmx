@@ -1,11 +1,12 @@
 # encoding: utf-8
 
-require_relative 'tree/test-support'
+require_relative 'rendering/test-support'
 
-module ::Skylab::MyTree::TestSupport::API::Actions::Tree::Tree  # (indentation hiccup sorry)
-  describe ::Skylab::MyTree::API::Actions::Tree::Tree do  # will move with [#mt-004]
+module ::Skylab::SubTree::TestSupport::API::Actions::My_Tree::Rendering
 
-  extend ::Skylab::MyTree::TestSupport::API::Actions::Tree::Tree
+describe "#{ SubTree }::API::Actions::My_Tree" do  # historic hiccup borrow one
+
+  extend TS_
 
   it "this magic example that brought it all home (the pink paper sessions)" do
 
@@ -92,5 +93,5 @@ module ::Skylab::MyTree::TestSupport::API::Actions::Tree::Tree  # (indentation h
     HERE
 
   end
+end  # pay one back
 end
-end  # hiccup sorry

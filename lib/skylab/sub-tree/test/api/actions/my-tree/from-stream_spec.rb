@@ -1,0 +1,95 @@
+require_relative 'test-support'
+
+module Skylab::SubTree::TestSupport::API::Actions::My_Tree
+
+  describe "#{ SubTree }::API::Actions::My_Tree from stream" do
+
+    extend TS_
+
+    it "reads from an open filehandle" do
+      io = fixtures_dir_pn.join( OFO_ ).open( 'r' )
+      f = start_front_with_upstream io
+      f.absorb_params :path_a, NIL_A_, :verbose, ( 3 if do_debug )
+      r = f.flush
+      r.should eql( true )
+      @o.string.should eql( PRETTY_ )
+      io.should be_closed
+    end
+
+    NIL_A_ = [ nil ].freeze
+
+    OFO_ = 'one-find.output'.freeze
+
+    PRETTY_ = <<-HERE.unindent
+      one
+      ├── foo.rb
+      └── test
+          └── foo_spec.rb
+    HERE
+
+    it "reads from a file" do
+      f = start_front
+      f.absorb_params :path_a, NIL_A_, :file, fixtures_dir_pn.join( OFO_ )
+      r = f.flush
+      r.should eql( true )
+      @o.string.should eql( PRETTY_ )
+    end
+
+    it "fake stdin and file - can't read from both stdin and file" do
+      f = start_front_with_upstream MOCK_IO_
+      f.absorb_params :path_a, NIL_A_, :file, :fake_file
+      r = f.flush
+      r.should eql( false )
+      @e.string.should eql( "can't read input from both <stdin> and <file>\n" )
+      @o.string.length.should be_zero
+    end
+
+    it "file and one path - can't read from both path and file" do
+      f = start_front
+      f.absorb_params :path_a, [ :fake_path ], :file, :fake_file
+      r = f.flush
+      r.should eql( false )
+      @e.string.should match( /can't.+both.+path.+and.+file/ )
+    end
+
+    it "all three - can't read from a, b, and c" do
+      r = start_front_with_upstream( MOCK_IO_ ).absorb_params(
+        :path_a, [ :fake_path ], :file, :Fake_file
+      ).flush
+      r.should eql( false )
+      @e.string.
+        should eql( "can't read input from <stdin>, <path> and <file>\n" )
+    end
+
+    it "from path (using find) with funky path" do
+      f = start_front.absorb_params( :path_a, [ 'not-there' ] )
+      r = f.flush
+      @o.string.should be_empty
+      @e.string.should match(
+        /\Afind: not-there: No such file or directory \(exitstatus 1\)\n\z/ )
+      r.should eql( false )
+    end
+
+    it "from good path (using find) - pretty (well done)" do
+      f = start_front.absorb_params( :path_a, [ 'one' ] ) ; r = nil
+      SubTree::Services::FileUtils.cd fixtures_dir_pn do
+        r = f.flush
+      end
+      @e.string.should be_empty
+      @o.string.should eql( PRETTY_ )
+      r.should eql( true )
+    end
+
+    class Mock_IO_
+      def closed?
+        false
+      end
+      def close
+      end
+      def tty?
+        false
+      end
+    end
+    MOCK_IO_ = Mock_IO_.new
+  end
+end
