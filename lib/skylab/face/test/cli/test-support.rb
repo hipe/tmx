@@ -263,7 +263,7 @@ module Skylab::Face::TestSupport::CLI
 
     -> do  # `expect_nonstyled_line`
 
-      simple_style_rx = Headless::CLI::Pen::FUN.simple_style_rx
+      simple_style_rx = Headless::CLI::Pen::SIMPLE_STYLE_RX_
 
       define_method :expect_nonstyled_line do |rx, idx_ref=true, sn=:err|
         line = expect_line idx_ref, sn

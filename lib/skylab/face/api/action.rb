@@ -31,7 +31,7 @@ module Skylab::Face
     #                        /
     #     [plugged-in]  <---o       it resolves fulfillment strategies for
     #                   -o          the services it declared as using, e.g
-    #                     \         implemented by the [hl] plugin susbsystem.
+    #                     \         implemented by the [hl] plugin subsystem,
     #                      \
     #                       o-->  `normalize`                 [#fa-019]
     #                         /
@@ -98,11 +98,19 @@ module Skylab::Face
       nil
     end
 
+    attr_reader :expression_agent
+
+  private
+
     def some_expression_agent
       @expression_agent or fail "sanity - expression agent was not set #{
         }set for this intance of #{ self.class }"
     end
-    private :some_expression_agent
+
+    private :expression_agent
+    alias_method :any_expression_agent, :expression_agent
+
+  public
 
     #                      ~ services (section 3) ~
 
@@ -171,7 +179,8 @@ module Skylab::Face
       end
     end, :params ]
 
-    API::Normalizer_.enhance_client_class self  # needed whether params or no
+    API::Normalizer_.enhance_client_class self, :conventional
+      # needed whether params or no
 
     # ~ facet 5.6x - metastories [#fa-035] ~
 

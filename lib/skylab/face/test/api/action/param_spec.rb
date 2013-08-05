@@ -77,25 +77,25 @@ module Skylab::Face::TestSupport::API::Param
       end
 
       def same
-        rais( /missing required parameter\(s\) - \(hurf, gurf\)/ )
+        rais( /missing required parameters "hurf" and "gurf"/ )
       end
 
       it "left partial" do
         -> do
           nc::API.invoke :w, hurf: :x
-        end.should rais( /missing.+\(gurf\)/ )
+        end.should rais( /missing required parameter "gurf"/ )
       end
 
       it "right" do
         -> do
           nc::API.invoke :w, zip: :zap
-        end.should rais( /undeclared param.+\(zip\)/ )
+        end.should rais( /undeclared parameter "zip"/ )
       end
 
       it "left and right - right wins" do
         -> do
           nc::API.invoke :w, hurf: :x, gurf: :y, berf: :z, derf: :a
-        end.should rais( /undeclared parameter\(s\) - \(berf, derf\)/ )
+        end.should rais( /undeclared parameters "berf" and "derf"/ )
       end
     end
 
@@ -119,7 +119,7 @@ module Skylab::Face::TestSupport::API::Param
       it "left clean" do
         -> do
           nc::API.invoke :w
-        end.should rais( /missing.+\(eeny\)/ )
+        end.should rais( /missing required parameter "eeny"/ )
       end
 
       it "center inner" do
@@ -136,7 +136,7 @@ module Skylab::Face::TestSupport::API::Param
       it "right" do
         -> do
           nc::API.invoke( :w, { nope: nil } )
-        end.should rais( /undeclared.+\(nope\)/ )
+        end.should rais( /undeclared parameter "nope"/ )
       end
     end
   end

@@ -2,6 +2,8 @@ module Skylab::SubTree
 
   class API::Actions::My_Tree
 
+    SubTree::Services::Face::API::Normalizer_.enhance_client_class self, :all
+
     MetaHell::FUN::Fields_[ :client, self, :method, :absorb_iambic,
       :field_i_a, [ :expression_agent, :program_name, :param_h,
                     :upstream, :paystream, :infostream ] ]
@@ -66,8 +68,6 @@ module Skylab::SubTree
       end
       self  # allow chaining
     end
-
-    define_method :flush, Face::API::Normalizer_::Flush_method_
 
   private
 
@@ -159,8 +159,14 @@ module Skylab::SubTree
       nil
     end
 
+    def field_box
+      self.class::FIELDS_
+    end
+
     def expression_agent
       @expression_agent ||= self.class::EXPRESSION_AGENT_
     end
+
+    alias_method :any_expression_agent, :expression_agent
   end
 end

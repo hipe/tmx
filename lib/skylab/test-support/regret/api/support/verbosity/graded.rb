@@ -207,14 +207,14 @@ class Skylab::TestSupport::Regret::API::Support::Verbosity::Graded < ::Module
     # quick and dirty proof of concept, will almost certainly change. the idea
     # is a simpler alternative to pub-sub. what if you could throw one
     # listener around throughout your graph? the listener is like a golden
-    # snitch. no it isn't.
+    # snitch. no it isn't. :~[#fa-051]
 
     def make_snitch io, *expression_agent
       self.class.get_snitch_class.new self, io, *expression_agent
     end
   end
 
-  class Sn_  # see Vtuple_IM_#sc
+  class Sn_  # snitches are tracked by [#fa-051]
 
     # the snitch itself is technically "immutable" but it just closes around
     # the vtuple and relies on the vtuple as the datastore. if the vtuple

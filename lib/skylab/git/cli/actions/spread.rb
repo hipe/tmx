@@ -209,7 +209,7 @@ module Skylab::Git
     end
 
     module Support_
-      class Snitch_
+      class Snitch_  # snitches are tracked by [#fa-051]
         def initialize y, expression_agent
           @y = y
           @expression_agent = expression_agent

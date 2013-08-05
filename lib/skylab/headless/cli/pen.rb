@@ -14,20 +14,22 @@ module Skylab::Headless
 
     o = { }
 
-    o[:code_names] = code_h.keys
-
-    o[:stylize] = -> str, * style_a do
+    curriable_stylize = o[ :curriable_stylize ] = -> style_a, str do
       "\e[#{ style_a.map { |s| code_h[s] }.compact * ';' }m#{ str }\e[0m"
     end
 
-    simple_style_rx = o[:simple_style_rx] = /\e  \[  \d+  (?: ; \d+ )*  m  /x
-
-    unstyle_styled = o[:unstyle_styled] = -> str do # nil when `str`
-      str.to_s.dup.gsub! simple_style_rx, ''   # is not already styled
+    o[ :stylize ] = -> str, * style_a do
+      curriable_stylize[ style_a, str ]
     end
 
-    o[:unstyle] = -> str do                  # the safer alternative, for when
-      unstyle_styled[ str ] || str         # you don't care whether it was
+    unstyle_styled = o[ :unstyle_styled ] = -> str do # nil when `str`
+      str.to_s.dup.gsub! SIMPLE_STYLE_RX_, ''  # is not already styled
+    end
+
+    SIMPLE_STYLE_RX_ = /\e  \[  \d+  (?: ; \d+ )*  m  /x
+
+    o[:unstyle] = -> str do                    # the safer alternative, for when
+      unstyle_styled[ str ] || str             # you don't care whether it was
     end                                        # stylzed in the first place
 
     # (see also CLI::FUN - there is extended support for e.g turning styled
@@ -49,6 +51,8 @@ module Skylab::Headless
 
     end
 
+    CODE_NAME_A_ = code_h.keys.freeze
+
     module Methods  # API-public access to what amounts to instance-method-
       # versions of a subset of the FUN functions - if for e.g. you want
       # `stylize` or `unstyle` and you don't want to pollute your namespace
@@ -59,7 +63,7 @@ module Skylab::Headless
 
       module_exec( & Define_stylize_methods_ )
 
-      ( FUN.code_names - [:strong] ).each do |c|   # away at [#pl-013]
+      ( CODE_NAME_A_ - [ :strong ] ).each do |c|   # away at [#pl-013]
         define_method c do |s| stylize s, c end
         define_method c.to_s.upcase do |s| stylize s, :strong, c end
       end

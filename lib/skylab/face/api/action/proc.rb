@@ -84,6 +84,9 @@ module Skylab::Face
       def normalization_failure_line_notify msg
         raise ::ArgumentError, msg
       end
+
+      def any_expression_agent
+      end
     end
   end
 end

@@ -71,7 +71,8 @@ module Skylab::Headless
         s: ['s', nil, 's'],
        _s: [ nil, 's' ],               # it requires, they require
      this: ['these', 'this', 'these'],
-      was: ['were', 'was', 'were']
+      was: ['were', 'was', 'were'],
+     them: ['them', 'it', 'them']
     }
 
     ( norm = { 0 => 0, 1 => 1 } ).default = 2

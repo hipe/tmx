@@ -1,8 +1,8 @@
-require_relative '../test-support'
+require_relative 'test-support'
 
-module Skylab::Face::TestSupport::API::Normalize
+module Skylab::Face::TestSupport::API::Action::Normalize
 
-  ::Skylab::Face::TestSupport::API[ Normalize_TestSupport = self ]
+  ::Skylab::Face::TestSupport::API::Action[ Normalize_TestSupport = self ]
 
   module Sandbox
     # mine.

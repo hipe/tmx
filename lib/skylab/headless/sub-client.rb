@@ -160,17 +160,15 @@ module Skylab::Headless::SubClient
       end, & bump_numerish
     end
 
-    -> do  # `s`
-      o[:s] = -> * args do  # [length] [lexeme_sym]
-        numerish, lexeme_sym = MetaHell::FUN.parse_series[ args,
-          -> x { ! x.respond_to? :id2name }, # defer it
-          -> x { x.respond_to? :id2name } ]
-        lexeme_sym ||= :s  # when `numerish` is nil it means "use memoized"
-        instance_exec numerish, -> num do
-          fun[].s[ num, lexeme_sym ]
-        end, & bump_numerish
-      end
-    end.call
+    o[:s] = -> * args do  # [length] [lexeme_sym]
+      numerish, lexeme_sym = MetaHell::FUN.parse_series[ args,
+        -> x { ! x.respond_to? :id2name }, # defer it
+        -> x { x.respond_to? :id2name } ]
+      lexeme_sym ||= :s  # when `numerish` is nil it means "use memoized"
+      instance_exec numerish, -> num do
+        fun[].s[ num, lexeme_sym ]
+      end, & bump_numerish
+    end
 
     bump_numerish = -> numerish_x, func do
       if numerish_x
@@ -183,7 +181,7 @@ module Skylab::Headless::SubClient
       elsif false == numerish_x
         numerish = false
       else
-        numerish = self.nlp_last_length
+        numerish = nlp_last_length
       end
       instance_exec numerish, &func
     end
@@ -196,10 +194,10 @@ module Skylab::Headless::SubClient
       @nlp_last_length = x              # and setters for each of its methods
     end                                 # you can't have your nerk end with '=')
 
-    memoize_length = -> f do
+    memoize_length = -> p do
       -> a do
         set_nlp_last_length a.length
-        instance_exec a, &f
+        instance_exec a, &p
       end
     end
 

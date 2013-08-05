@@ -3,169 +3,324 @@ module Skylab::Face
   module API::Normalizer_  # experiment - can you make an extension
     # module where you get to cherry-pick which instance methods you want?
 
-    def self.enhance_client_class client
-      puff = If_not_defined_.curry[ client ]
-      puff[ :public, :normalize, Normalize_method_ ]
-      puff[ :public, :field_normalize, Field_normalize_method_ ]
-      puff[ :public, :field_value_notify, Field_value_notify_method_ ]
-    end
-
-    If_not_defined_ = -> client, pub_priv, m, proc_p do
-      if ! ( client.method_defined? m or client.private_method_defined? m )
-        client.instance_exec do
-          define_method m, & proc_p
+    def self.enhance_client_class client, *which_a
+      which_a.length.zero? and which_a << :conventional
+      (( a = SET_H_[ which_a.fetch 0 ] )) and which_a[ 0..1 ] = a  # wow neato
+      me = self
+      client.module_exec do
+        while (( m = which_a.shift ))
+          pub_priv, c = H_.fetch m
+          define_method m, & me.const_get( c )
           :private == pub_priv and private m
         end
       end
+      nil
     end
-
-    Normalize_ = -> obj, field_box, y, par_h do
-      # mutates par_h [#fa-019] [#bl-013] [#sl-116]
-      miss_a = nil ; r = false ; before = y.count
-      fld_val_notify = M_or_p_[ obj, :field_value_notify, Field_value_notify_ ]
-      fld_normalize = M_or_p_[ obj, :field_normalize, Field_normalize_ ]
-      field_box.each do |i, fld|
-        x = ( par_h.delete i if par_h and par_h.key? i )
-        fld_val_notify[ fld, x ]
-        if fld.has_normalizer || fld.has_default  # yes after
-          x = fld_normalize[ y, fld, x ]
-        end
-        fld.is_required && x.nil? and ( miss_a ||= [] ) << fld
-        Validate_arities_[ y, fld, x ]
-      end
-      begin
-        Some_[ par_h ] and break( y << "undeclared #{
-          }parameter(s) - (#{ par_h.keys * ', ' }) for #{ obj.class }. #{
-          }(declare it/them with `params` macro?)" )
-        miss_a and break( y << "missing required parameter(s) - (#{
-          }#{ miss_a.map( & :local_normal_name ) * ', ' }) #{
-          }for #{ obj.class }." )
-        y.count > before and break
-        r = true
-      end while nil
-      r
-    end
-    M_or_p_ = -> obj, meth_i, proc_p do
-      obj.respond_to?( meth_i ) ? obj.method( meth_i ) : proc_p.curry[ obj ]
-    end
-
-    Validate_arities_ = -> y, fld, x do
-      if fld.some_arity.is_polyadic
-        Validate_arity_many_[ y, fld, x ]
-      elsif fld.some_argument_arity.is_zero
-        ( ! x ) or true == x or Detailed_monadic_niladic_errmsg_[ y, fld, x ]
-      elsif x.respond_to? :each_with_index
-        y << "multiple arguments were provided for #{ Fld_[ fld ] } but #{
-          }only one can be accepted"  # note at [#050]
-      end
-      nil  # keep life simple and let the erronity be reflected in y.count
+    H_ = {
+      normalize: [ :public, :Normalize_method_ ],
+      field_normalize: [ :public, :Field_normalize_method_ ],
+      field_value_notify: [ :public, :Field_value_notify_method_ ],
+      flush: [ :public, :Flush_method_ ]
+    }.tap{ |h| h.values.each( & :freeze ) }.freeze
+    SET_H_ = -> do
+      o = { }
+      o[ :all ] = (( o[ :conventional ] =
+        %i( normalize field_normalize field_value_notify ) )).dup << :flush
+      o.freeze
+    end.call
+    #
+    Normalize_method_ = -> y, par_h do  # assume `any_expression_agent`
+      Normalization_.new( :field_box, field_box, :notifiee, self,
+        :any_expression_agent, any_expression_agent, :notice_yielder, y,
+        :param_h, par_h ).execute
     end
     #
-    Validate_arity_many_ = -> y, fld, x do
-      befor = y.count
-      if fld.some_argument_arity.is_zero
-        x.nil? or x.respond_to? :even? or y << "strange shape for #{
-        }#{ Fld_[ fld ] } - when arity is many and argument arity is #{
-        } zero, the value should be an integer, had #{ Ick_[ x ] }"
-      else
-        x.nil? or x.respond_to? :each_with_index or y << "strange #{
-        }shape for #{ Fld_[ fld ] } - when arity is many and argument #{
-        }arity is one, expected array-like, had #{ Ick_[ x ] }"
+    Field_normalize_method_ = -> y, fld, x do  # assume `field_value_notify`
+      # assume `y` and `x` as [#019]. assume `fld` has one or more of default
+      # proc, normalizer
+      is_missing = x.nil?
+      if fld.has_default && is_missing
+        x = instance_exec( & fld.default_value )
+        field_value_notify fld, x
+        is_missing = x.nil?
       end
-      ( befor == y.count && ! fld.some_arity.includes_zero && ! Some_[x] ) and
-        y << "must have #{ Hack_label_[ fld.some_arity.local_normal_name ] }#{
-          } #{ Fld_[ fld ] }"
-      nil
-    end
-    #
-    Detailed_monadic_niladic_errmsg_ = -> y, fld, x do
-      if x.respond_to? :even?
-        y << "#{ Fld_[ fld ] } was specified #{ x } times but is not #{
-          }meaninful to be specified more than once"  # take a chance
-      else
-        y << "strange shape for #{ Fld_[ fld ] } - when arity is max one #{
-          }and argument arity is zero, the only valid value value is #{
-          }`true`, had #{ Ick_[ x ] }"
-      end
-      nil
-    end
-
-    Fld_ = -> fld do
-      Hack_label_[ fld.local_normal_name ]
-    end
-
-    Ick_ = -> x do  # ( a trivial instance of [#it-001] summarization )
-      if case x
-      when ::NilClass, ::FalseClass, ::TrueClass, ::Numeric, ::Module ; true
-      when ::String ; x.length < A_REASONABLY_SHORT_LENGTH_FOR_A_STRING_
-      end then
-        x.inspect
-      else
-        "< a #{ x.class } >"
-      end
-    end
-
-    A_REASONABLY_SHORT_LENGTH_FOR_A_STRING_ = 10
-
-    Hack_label_ = -> name_i do
-      name_i.to_s.sub( /_[a-z]\z/, '' ).gsub '_', ' '
-    end
-
-    Normalize_method_ = -> y, par_h do
-      Normalize_[ self, field_box, y, par_h ]
-    end
-
-    Field_value_notify_method_ = -> fld, x do
-      ivar = fld.as_host_ivar
-      instance_variable_defined? ivar and !
-        instance_variable_get( ivar ).nil? and
-          fail "sanity - ivar collision: #{ ivar }"
-      instance_variable_set ivar, x
-      nil
-    end
-
-    Functionalize_meth_proc_ = -> p do
-      case p.arity
-      when 2 ; -> o, a, b    { o.instance_exec a, b, &p }
-      when 3 ; -> o, a, b, c { o.instance_exec a, b, c, &p }
-      else   ; fail "unhack or pro-hack me"
-      end      # sadly this is the cleanest way to preserve absolute arity
-    end        # which is necessary for curry to work without coupling
-
-    Field_value_notify_ = Functionalize_meth_proc_[Field_value_notify_method_]
-
-    Field_normalize_method_ = -> y, fld, x do # result per [#034]. write
-      # notices to `y`. `x` is the input and then result value of field `fld`.
-
-      ivar = fld.as_host_ivar
-
-      fld.has_default && x.nil? and
-        x = instance_variable_set( ivar,
-          instance_exec( & fld.default_value ) )  # always a proc
-
       if fld.has_normalizer
-        true == (( p = fld.normalizer_value )) and
-          p = method( :"normalize_#{ fld.local_normal_name }" )
-
-        x = instance_exec y, x, -> normalized_x do
-          instance_variable_set ivar, normalized_x
+        true == (( normalizer_p = fld.normalizer_value )) and
+          normalizer_p = method( :"normalize_#{ fld.local_normal_name }" )
+        is_missing = ! ( instance_exec y, x, -> valid_x do
+          field_value_notify fld, valid_x
           nil
-        end, & p
+        end, & normalizer_p )  # tome at [#019]
       end
-
-      x  # the system wants to know the particular nil-ish-ness of x
+      ! is_missing
+    end
+    #
+    Field_value_notify_method_ = -> fld, x do
+      instance_variable_set fld.as_host_ivar, x
+      nil
     end
 
-    Field_normalize_ = Functionalize_meth_proc_[ Field_normalize_method_ ]
+    module Sayer_
 
-    Flush_method_ = -> do  # #experimental new interface for API actions ..
-      # like `invoke` but takes no arguments. assume @infostream
+    private
+
+      def say &blk
+        @y << some_expression_agent.instance_exec( & blk )
+        nil
+      end
+
+      def some_expression_agent
+        @any_expression_agent || EXPRESSION_AGENT_P_[]
+      end
+    end
+
+    class Normalization_ ; include Sayer_
+
+      # mutates param_h [#fa-019] [#bl-013] [#sl-116]
+
+      MetaHell::FUN::Fields_[ :client, self, :method, :initialize, :field_i_a,
+        [ :field_box, :notice_yielder, :any_expression_agent,
+          :notifiee, :param_h ] ]
+
+      def execute
+        resolve_notifiers
+        @y = @notice_yielder ; par_h = @param_h ; miss_a = nil
+        av = Arity_Validator_.new @y, @any_expression_agent
+        r = false ; befor = @y.count
+        @field_box.each do |i, fld|
+          x = ( par_h.delete i if par_h and par_h.key? i )
+          @field_value_notify_p[ fld, x ]
+          if fld.has_normalizer || fld.has_default  # yes after
+            x = @field_normalize_p[ @y, fld, x ]
+          end
+          fld.is_required && x.nil? and ( miss_a ||= [] ) << fld
+          av.validate_field_against_value fld, x
+        end
+        begin
+          Some_[ par_h ] and break say_undeclared( par_h )
+          miss_a and break say_missing miss_a
+          @y.count > befor and break
+          r = true
+        end while nil
+        r
+      end
+
+    private
+
+      def resolve_notifiers
+        @field_value_notify_p = Method_or_proc_[
+          @notifiee, :field_value_notify, Field_value_notify_ ]
+        @field_normalize_p = Method_or_proc_[
+          @notifiee, :field_normalize, Field_normalize_ ]
+        nil
+      end
+      #
+      Method_or_proc_ = -> obj, meth_i, proc_p do
+        obj.respond_to?( meth_i ) ? obj.method( meth_i ) : proc_p.curry[ obj ]
+      end
+      #
+      Functionalize_meth_proc_ = -> p do
+        case p.arity
+        when 2 ; -> o, a, b    { o.instance_exec a, b, &p }
+        when 3 ; -> o, a, b, c { o.instance_exec a, b, c, &p }
+        else   ; fail "unhack or pro-hack me"
+        end      # sadly this is the cleanest way to preserve absolute arity
+      end        # which is necessary for curry to work without coupling
+      #
+      Field_value_notify_ = Functionalize_meth_proc_[Field_value_notify_method_]
+      #
+      Field_normalize_ = Functionalize_meth_proc_[ Field_normalize_method_ ]
+
+      def say_undeclared par_h
+        a = par_h.keys ; mon = moniker
+        say do
+          "undeclared parameter#{ s a } #{ and_ a.map( & method( :ick ) ) } #{
+            }for #{ mon }. (declare #{ s :them } with `params` macro?)"
+        end
+        nil
+      end
+
+      def say_missing a
+        mon = moniker
+        say do
+          "missing required parameter#{ s a } #{
+            }#{ and_ a.map( & method( :par ) ) } for #{ mon }"
+        end
+        nil
+      end
+
+      def moniker
+        @notifiee.class
+      end
+    end
+
+    class Arity_Validator_ ; include Sayer_
+
+      def initialize notice_yielder, any_expression_agent
+        @y = notice_yielder ; @any_expression_agent = any_expression_agent
+      end
+
+      def validate_field_against_value fld, x
+        @fld = fld ; @x = x
+        if fld.some_arity.is_polyadic  # be careful foo
+          validate_many_against_value
+        elsif fld.some_argument_arity.is_zero
+          ( ! x ) or true == x or detailed_monadic_niladic_errmsg
+        elsif x.respond_to? :each_with_index
+          say_multiple
+        end
+        nil  # keep life simple and let the erronity be reflected in y.count
+      end
+
+    private
+
+      def say_multiple
+        fld = @fld
+        say do
+          "multiple arguments were provided for #{ par fld } but #{
+            }only one can be accepted"  # note at [#050]
+        end
+      end
+
+      def validate_many_against_value
+        bfr = @y.count
+        if @fld.some_argument_arity.is_zero
+          @x.nil? or @x.respond_to? :even? or say_not_integer
+        else
+          @x.nil? or @x.respond_to? :each_with_index or say_not_array
+        end
+        if (bfr == @y.count && ! @fld.some_arity.includes_zero && ! Some_[@x])
+          say_must_have
+        end
+        nil
+      end
+
+      def say_not_integer
+        fld = @fld ; x = @x
+        say do
+          "strange shape for #{ par fld } - when arity is many and #{
+            }argument arity is zero, the value should be an integer, #{
+            }had #{ ick x }"
+        end
+      end
+
+      def say_not_array
+        fld = @fld ; x = @x
+        say do
+          "strange shape for #{ par fld } - when arity is many and argument #{
+            }arity is one, expected array-like, had #{ ick x }"
+        end
+      end
+
+      def say_must_have
+        fld = @fld
+        say do
+          "must have #{ hack_label fld.some_arity.local_normal_name }#{
+            } #{ par fld }"
+        end
+      end
+
+      def detailed_monadic_niladic_errmsg
+        if @x.respond_to? :even?
+          say_too_many
+        else
+          say_not_true
+        end
+        nil
+      end
+
+      def say_too_many
+        fld = @fld ; x = @x
+        say do
+          "#{ par fld } was specified #{ x } times but is not #{
+            }meaninful to be specified more than once"  # take a chance
+        end
+      end
+
+      def say_not_true
+        fld = @fld ; x = @x
+        say do
+          "strange shape for #{ par fld } - when arity is max one #{
+            }and argument arity is zero, the only valid value value is #{
+            }`true`, had #{ ick x }"
+
+        end
+      end
+    end
+
+    #                  ~ various ways to employ validation ~
+
+    Flush_method_ = -> do  # #experimental new interface for API actions
+      # assume `field_box` @infostream `any_expression_agent` @param_h
+      # normalize and then (maybe) execute. like an `invoke` but takes no
+      # arguments, to facilitate progressive request building and then one
+      # final flushing.
+
       @y ||= ::Enumerator::Yielder.new( & @infostream.method( :puts ) )
       cy = Face::Services::Basic::Yielder::Counting.new( & @y.method( :<< ) )
-      ok = Normalize_[ self, self.class::FIELDS_, cy, @param_h ]
+      ok = Normalization_.new( :field_box, field_box, :notifiee, self,
+        :any_expression_agent, any_expression_agent, :notice_yielder, cy,
+        :param_h, @param_h ).execute
       ok &&= execute
       ok
     end
 
+    Hack_label = -> name_i do
+      name_i.to_s.sub( /_[a-z]\z/, '' ).gsub '_', ' '
+    end
+
+    Expression_agent_class_p_ = -> do
+      # (while we figure out who we are we procede very cautiously and
+      # a) lazy load to avoid problems and b) cherry-pick only what we need)
+      p = -> do
+        class Expression_Agent_
+
+          fun = Face::Services::Headless::SubClient::EN_FUN
+
+          %i| nlp_last_length set_nlp_last_length s and_ |.each do |i|
+            define_method i, & fun[ i ]
+            private i
+          end
+
+        private
+
+          def par fld
+            "\"#{ hack_label fld.local_normal_name }\""
+          end
+
+          define_method :hack_label, & Hack_label
+
+          def ick x  # ( a trivial instance of [#it-001] summarization )
+            if case x
+            when ::NilClass, ::FalseClass, ::TrueClass, ::Numeric, ::Module
+              true
+            when ::String
+              x.length < A_REASONABLY_SHORT_LENGTH_FOR_A_STRING_
+            end then
+              x.inspect
+            elsif ::Symbol === x
+              "\"#{ x }\""
+            else
+              "< a #{ x.class } >"
+            end
+          end
+          #
+          A_REASONABLY_SHORT_LENGTH_FOR_A_STRING_ = 10
+
+        end
+        p = -> { Expression_Agent_ }
+        Expression_Agent_
+      end
+      -> { p[] }
+    end.call
+
+    EXPRESSION_AGENT_P_ = -> do
+      p = -> do
+        EXPRESSION_AGENT_ = Expression_agent_class_p_[].new
+        p = -> { EXPRESSION_AGENT_ }
+        EXPRESSION_AGENT_
+      end
+      -> { p[] }
+    end.call
   end
 end

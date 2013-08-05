@@ -10,8 +10,6 @@ module Skylab::SubTree
 
     private
 
-      # fun = Headless::NLP::EN::Minitesimal::FUN
-
       Headless::SubClient::EN_FUN.each do |m, p|
         define_method m, &p
       end
@@ -19,7 +17,7 @@ module Skylab::SubTree
       def par i
         "<#{ Hak_lbl_[ i ] }>"
       end
-      Hak_lbl_ = Face::API::Normalizer_::Hack_label_
+      Hak_lbl_ = Face::API::Normalizer_::Hack_label
 
     end
 
