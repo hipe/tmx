@@ -2,14 +2,49 @@ module Skylab::SubTree
 
   class API::Actions::My_Tree::Traversal_
 
-    MetaHell::FUN::Fields_[ :client, self, :method, :absorb, :field_i_a,
-      [ :out_p, :sep, :do_verbose_lines, :info_p ] ]
+    MetaHell::FUN::Fields_::Contoured_[ self,
+      :absorb_method, [ :public, :absorb ],
+      :field, :sep,
+      :field, :do_verbose_lines,
+      :field, :info_p ]
+
+  private
+
+    MetaHell::FUN::Fields_::From_.methods do
+      def out_p a
+        p = a.shift
+        @out_p = case p.arity
+        when 3 ; -> row_a do                   # glyphs, slug, extra
+          node = row_a.pop
+          p[ row_a, * node.to_a ]
+        end
+        when 2 ; -> row_a do                   # glyphs-slug, extra
+          node = row_a.pop
+          slug, extra_a = node.to_a
+          p[ "#{ "#{ row_a * ' ' } " if row_a.length.nonzero? }#{
+               }#{ slug }", extra_a ]
+        end
+        when -1, 1 ; -> row_a do               # glyphs-slug-extra
+          node = row_a.pop
+          p[ "#{ "#{ row_a * ' ' } " if row_a.length.nonzero? }#{
+               }#{ node.to_a.compact * ' ' }" ]
+          nil
+        end
+        else
+          raise ::ArgumentError, "unsupported `out_p` arity - #{ p.arity }"
+        end
+        nil
+      end
+    end
 
     def initialize * a
       absorb( * a )
       @curr_a = [] ; @matrix_a = [] ; @sep ||= SEP_
       @glyph_set = Headless::CLI::Tree::Glyph::Sets::WIDE
+      nil
     end
+
+  public
 
     def puts line, extra_x=nil
       a = line.split @sep ; xtra_x = nil
@@ -36,6 +71,10 @@ module Skylab::SubTree
       nil
     end
 
+    def puts_with_free_cel line, any_free_cel
+      puts line, any_free_cel
+    end
+
     def flush_notify  # to say you are done adding lines
       row nil
       nil
@@ -46,10 +85,11 @@ module Skylab::SubTree
     def row seen_a, extra_x=nil
       if seen_a
         @do_verbose_lines and say_row( seen_a, extra_x )
-        min_a = ::Array.new seen_a.length
-        seen_a.empty? or min_a[ -1 ] = [ seen_a.last, extra_x ].compact * ' '
+        len = seen_a.length
+        min_a = ::Array.new len
+        len.zero? or min_a[ -1 ] = Node_.new( seen_a.last, extra_x )
         @matrix_a << min_a
-        pipe_d = seen_a.length - 2             # the imainary pipe is last nil
+        pipe_d = len - 2                       # the imainary pipe is last nil
         d = @matrix_a.length - 1
       else                                     # a flush run
         pipe_d = -1                            # the imaginary pipe would go
@@ -58,12 +98,14 @@ module Skylab::SubTree
       sub_flush d, pipe_d
       if @matrix_a.length.nonzero? and @matrix_a.first.first  # if flushable
         loop do                                # flush each contiguous row
-          @out_p[ @matrix_a.shift * ' ' ]      # starting from the first one
+          @out_p[ @matrix_a.shift ]            # starting from the first one
           @matrix_a.first && @matrix_a.first.first or break
         end
       end
       nil
     end
+    #
+    Node_ = ::Struct.new :slug, :extra_x
 
     def sub_flush d, pipe_d
       while (( d -= 1 )) >= 0                  # from bottom row to top

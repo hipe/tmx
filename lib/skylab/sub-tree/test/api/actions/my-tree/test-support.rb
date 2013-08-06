@@ -14,6 +14,19 @@ module Skylab::SubTree::TestSupport::API::Actions::My_Tree
 
   include CONSTANTS
 
+  module CONSTANTS
+
+    NIL_A_ = [ nil ].freeze
+
+    PRETTY_ = <<-HERE.unindent
+      one
+      ├── foo.rb
+      └── test
+          └── foo_spec.rb
+    HERE
+
+  end
+
   extend TestSupport::Quickie
 
   SubTree = SubTree
@@ -48,6 +61,14 @@ module Skylab::SubTree::TestSupport::API::Actions::My_Tree
     end
     Fixtures_dir_pn_ = -> do
       SubTree::Test_Fixtures.dir_pathname
+    end
+
+    def line
+      @a.shift or fail "expected more lines, had none"
+    end
+
+    def expect_no_more_lines
+      @a.length.zero? or fail "expected no more lines - #{ @a[ 0 ] }"
     end
   end
 end

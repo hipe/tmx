@@ -4,9 +4,7 @@ module Skylab::SubTree
 
     class Expression_Agent_
 
-      def calculate blk
-        instance_exec( & blk )
-      end
+      alias_method :calculate, :instance_exec
 
     private
 

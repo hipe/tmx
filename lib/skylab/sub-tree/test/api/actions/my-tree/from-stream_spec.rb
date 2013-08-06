@@ -6,6 +6,8 @@ module Skylab::SubTree::TestSupport::API::Actions::My_Tree
 
     extend TS_
 
+    NIL_A_ = NIL_A_
+
     it "reads from an open filehandle" do
       io = fixtures_dir_pn.join( OFO_ ).open( 'r' )
       f = start_front_with_upstream io
@@ -16,16 +18,7 @@ module Skylab::SubTree::TestSupport::API::Actions::My_Tree
       io.should be_closed
     end
 
-    NIL_A_ = [ nil ].freeze
-
     OFO_ = 'one-find.output'.freeze
-
-    PRETTY_ = <<-HERE.unindent
-      one
-      ├── foo.rb
-      └── test
-          └── foo_spec.rb
-    HERE
 
     it "reads from a file" do
       f = start_front
