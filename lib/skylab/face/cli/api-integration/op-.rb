@@ -1,13 +1,13 @@
 module Skylab::Face
 
-  class CLI
+  module CLI::API_Integration
 
-    class API_Integration::OP_
+    class OP_
 
       MetaHell::Funcy[ self ]
 
-      MetaHell::FUN.fields[ self,
-                            :op, :field_box, :expression_agent, :param_h ]
+      MetaHell::FUN.fields[ self, :field_box, :any_expression_agent, :param_h,
+        :op ]
 
       def execute
         @short_h = { }
@@ -29,7 +29,7 @@ module Skylab::Face
         if fld.has_argument_string
           opt.append_arg fld.argument_string_value
         elsif fld.some_argument_arity.is_one
-          opt.append_arg Normal2arg_[ i ]
+          opt.append_arg " #{ Normal_to_opt_arg_[ i ] }"
         end
         fld.has_single_letter and opt.set_single_letter fld.single_letter_value
         single_i = opt.single_letter_i
@@ -46,16 +46,21 @@ module Skylab::Face
         end
         opt
       end
-
-      Normal2arg_ = -> i do
-        s = i.to_s
-        stem = s[ ( (( i = s.rindex '_' )) ? i + 1 : 0 ) .. -1 ]
-        " <#{ stem }>"
+      #
+      Normal_to_opt_arg_ = -> i do
+        # hack :foo_bar_s into "<bar>", e.g. :primary_email_s # => "<email>"
+        s = Chmp_sing_ltr_sfx_[ i ]
+        As_arg_raw_[ s[ ( (( i = s.rindex '_' )) ? i + 1 : 0 ) .. -1 ] ]
       end
+      #
+      Chmp_sing_ltr_sfx_, As_arg_raw_ = Face::API::Procs.
+        at :Chomp_single_letter_suffix, :Local_normal_name_as_argument_raw
+      #
+      Option = Headless::CLI::Option::Model_
 
       def add_desc opt, fld
         y = [ ]
-        @expression_agent.instance_exec y, & fld.desc_value
+        @any_expression_agent.instance_exec y, & fld.desc_value
         opt.set_desc_a y
         nil
       end
@@ -114,7 +119,17 @@ module Skylab::Face
         nil
       end
 
-      Option = Face::Services::Headless::CLI::Option::Model_
+      #                  ~ helpers for integration ~
+
+      Write_op_to_method_ = -> op do
+        OP_[ :field_box, field_box,
+             :any_expression_agent, any_expression_agent,
+             :param_h, @param_h,
+             :op, op ]
+        nil
+      end
+
+      OP_ = self
     end
   end
 end

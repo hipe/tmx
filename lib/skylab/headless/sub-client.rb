@@ -61,7 +61,7 @@ module Skylab::Headless::SubClient
     end
 
     def emit *a                   # (don't get into the habit of expecting
-      request_client.send :emit, *a # meaninful results from `emit` --
+      request_client.send :emit, *a # meaningful results from `emit` --
       nil                         # it's just never a good idea.  ever.)
     end
 

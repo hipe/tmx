@@ -174,7 +174,7 @@ module Skylab::Face
         end
         r.seed Field::Meta_Field_Factory_
         r.flush
-        @client_mod.const_set :PARAM_, param_class
+        @client_mod.const_set :Param_, param_class
         Make_Include_and_or_Stow_2_Contour_IMs_[ param_class ]
         param_class
       end

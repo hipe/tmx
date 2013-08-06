@@ -37,27 +37,40 @@ module Skylab::Face
     #
     Field_normalize_method_ = -> y, fld, x do  # assume `field_value_notify`
       # assume `y` and `x` as [#019]. assume `fld` has one or more of default
-      # proc, normalizer
-      is_missing = x.nil?
-      if fld.has_default && is_missing
+      # proc, normalizer. RESULT IS TUPLE OF: (is_invalid, is_absent, use_x)
+
+      is_absent = x.nil?
+      if fld.has_default && is_absent
         x = instance_exec( & fld.default_value )
         field_value_notify fld, x
-        is_missing = x.nil?
+        is_absent = x.nil?
       end
       if fld.has_normalizer
+        befor = y.count
         true == (( normalizer_p = fld.normalizer_value )) and
           normalizer_p = method( :"normalize_#{ fld.local_normal_name }" )
-        is_missing = ! ( instance_exec y, x, -> valid_x do
+        is_absent = ! ( instance_exec y, x, -> valid_x do
           field_value_notify fld, valid_x
+          x = valid_x
           nil
         end, & normalizer_p )  # tome at [#019]
+        is_invalid = befor != y.count
       end
-      ! is_missing
+      [ is_invalid, is_absent, x ]
     end
     #
     Field_value_notify_method_ = -> fld, x do
       instance_variable_set fld.as_host_ivar, x
       nil
+    end
+
+    Build_say_method_ = -> topic_expression_agent_p do
+      -> &blk do
+        topic_expression_agent = instance_exec( & topic_expression_agent_p )
+        r = topic_expression_agent.instance_exec( & blk )
+        r and fail "sanity - no support for `say` that has result yet"
+        nil
+      end
     end
 
     module Sayer_
@@ -91,9 +104,14 @@ module Skylab::Face
           x = ( par_h.delete i if par_h and par_h.key? i )
           @field_value_notify_p[ fld, x ]
           if fld.has_normalizer || fld.has_default  # yes after
-            x = @field_normalize_p[ @y, fld, x ]
+            is_invalid, is_absent, x = @field_normalize_p[ @y, fld, x ]
+            is_invalid and next
+          else
+            is_absent = x.nil?
           end
-          fld.is_required && x.nil? and ( miss_a ||= [] ) << fld
+          if fld.is_required && is_absent
+            next( ( miss_a ||= [] ) << fld )
+          end
           av.validate_field_against_value fld, x
         end
         begin
@@ -233,7 +251,7 @@ module Skylab::Face
         fld = @fld ; x = @x
         say do
           "#{ par fld } was specified #{ x } times but is not #{
-            }meaninful to be specified more than once"  # take a chance
+            }meaningful to be specified more than once"  # take a chance
         end
       end
 
@@ -266,18 +284,24 @@ module Skylab::Face
     end
 
     Hack_label = -> name_i do
-      name_i.to_s.sub( /_[a-z]\z/, '' ).gsub '_', ' '
+      Chomp_sing_ltr_sfx_[ name_i ].gsub '_', ' '
     end
+    #
+    Chomp_sing_ltr_sfx_ = API::Procs::Chomp_single_letter_suffix
 
-    Expression_agent_class_p_ = -> do
+    Expression_agent_class_ = -> do
       # (while we figure out who we are we procede very cautiously and
       # a) lazy load to avoid problems and b) cherry-pick only what we need)
+      # [#084]
+
       p = -> do
         class Expression_Agent_
 
           fun = Face::Services::Headless::SubClient::EN_FUN
 
-          %i| nlp_last_length set_nlp_last_length s and_ |.each do |i|
+          %i|
+            nlp_last_length set_nlp_last_length s and_ or_ both
+          |.each do |i|
             define_method i, & fun[ i ]
             private i
           end
@@ -316,11 +340,35 @@ module Skylab::Face
 
     EXPRESSION_AGENT_P_ = -> do
       p = -> do
-        EXPRESSION_AGENT_ = Expression_agent_class_p_[].new
+        EXPRESSION_AGENT_ = Expression_agent_class_[].new
         p = -> { EXPRESSION_AGENT_ }
         EXPRESSION_AGENT_
       end
       -> { p[] }
     end.call
+
+    class Field_Front_Exp_Ag_  # a HUGE experiment VERY primordial! (and messy)
+      def initialize field_box, down_expression_agent
+        @field_box = field_box
+        @down_expression_agent = down_expression_agent
+      end
+
+      alias_method :calculate, :instance_exec
+
+    private
+
+      def par fld
+        if fld.respond_to? :id2name
+          (( field = @field_box.fetch fld do end )) and fld = field
+        end
+        @down_expression_agent.par fld
+      end
+
+      %i| hack_label ick kbd s or_ and_ both |.each do |m|  # etc mm proxy
+        define_method m do |*a|
+          @down_expression_agent.send m, *a
+        end
+      end
+    end
   end
 end

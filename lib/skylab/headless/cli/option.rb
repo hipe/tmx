@@ -14,6 +14,10 @@ module Skylab::Headless
 
     o = { }
 
+    Local_normal_name_as_long = -> i do
+      "--#{ i.to_s.gsub '_', '-' }"
+    end
+
     o[:normize] = -> x do  # part of [#hl-081] family
       x.gsub( '-', '_' ).downcase.intern
     end

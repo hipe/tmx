@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Face::TestSupport::API::Normalizer_
 
-  ::Skylab::Face::TestSupport::API[ self ]
+  ::Skylab::Face::TestSupport::API[ TS_ = self ]
 
   include CONSTANTS
 
@@ -11,6 +11,8 @@ module Skylab::Face::TestSupport::API::Normalizer_
   extend TestSupport::Quickie
 
   describe "#{ Face }::API::Normalizer_" do
+
+    extend TS_
 
     context "with one (defacto) required field" do
 
@@ -90,7 +92,6 @@ module Skylab::Face::TestSupport::API::Normalizer_
 
       it "no args at all - borks" do
         r = build.flush
-        line.should match( /\Amust have one or more "arr"\z/i )
         only_line.should match( /\Amissing required parameter "arr" for / )
         r.should eql( false )
       end
@@ -136,36 +137,6 @@ module Skylab::Face::TestSupport::API::Normalizer_
 
     def build cls=agent_class
       cls.new infostream
-    end
-
-    def there_should_be_no_lines
-      info_lines.length.zero? or fail "expected no lines had #{ info_lines[0]}"
-    end
-
-    def line
-      info_lines.shift or fail "expected at least one more line, had none"
-    end
-
-    def only_line
-      a = info_lines
-      1 == a.length or
-        fail "expected 1 had #{ a.length } lines (#{ a[ 1 ].inspect })"
-      a.shift
-    end
-
-    def info_lines
-      @info_lines ||= begin
-        io = @infostream ; @infostream = :spent
-        io.string.split "\n"
-      end
-    end
-
-    def infostream
-      @infostream ||= begin
-        io = TestSupport::IO::Spy.standard
-        do_debug and io.debug! 'info >>> '
-        io
-      end
     end
 
     attr_reader :do_debug

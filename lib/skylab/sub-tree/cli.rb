@@ -37,8 +37,8 @@ module Skylab::SubTree
       Headless::CLI::Pen::MINIMAL
     end
 
-    alias_method :expression_agent, :pen
-    private :expression_agent
+    alias_method :some_expression_agent, :pen
+    private :some_expression_agent
 
     # --*--                         DSL ZONE                              --*--
 
@@ -48,7 +48,7 @@ module Skylab::SubTree
     desc "but adds custom features geared towards development"
 
     option_parser do |o|
-      my_tree_front.absorb( :expression_agent, expression_agent,
+      my_tree_front.absorb( :expression_agent, some_expression_agent,
                             :param_h, @param_h ).write_option_parser_to o
     end
     argument_syntax '[<path> [..]]'

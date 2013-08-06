@@ -3,6 +3,9 @@ module Skylab::Face
   module CLI::API_Integration
 
     def self.touch ; nil end      #kick-the-loading-warninglessly-and-trackably
+
+    Headless = Face::Services::Headless  # it's used often enough to warrant this
+
   end
 
   CLI::Metastory.touch
@@ -206,7 +209,7 @@ module Skylab::Face
 
     def finish_param_h_for_api args, cmd_i=nil
       sht = @sheet.fetch_constituent( cmd_i ||
-        Services::Headless::Name::FUN.metholate[
+        ::Skylab::Headless::Name::FUN.metholate[
           @last_hot.name.as_slug ].intern )
       p_a = get_command_parameters sht
       len = args ? args.length : 0

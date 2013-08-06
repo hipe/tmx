@@ -5,7 +5,7 @@ module Skylab::Headless
   end                             # of interface-level string decorating
                                   # functions so that the same utterances can
                                   # be articulated across multiple modalities
-                                  # to whatever extent possible.
+                                  # to whatever extent possible :[#084]
   module Pen::InstanceMethods
                                   # (trying to use these when appropriate:
                         # http://www.w3schools.com/tags/tag_phrase_elements.asp)

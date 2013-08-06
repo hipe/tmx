@@ -1,3 +1,4 @@
+[#084]       #doc-point :#pen. #body-is-inline-in-code
 [#083]       #in-situ
 [#082]       #done adapter for face of hot (kind of [#054])
 [#081]       #doc-point the norm* family of functions..

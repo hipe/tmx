@@ -154,12 +154,27 @@ module Skylab::MetaHell
     # and is capable of producing filtered offspring, whatever i mean
     # by that.)
 
-    def each &b
+    def each &p
+      if p && 2 == p.arity && ! @enumerator_class
+        # avoid overhead of processor, memory, cognition and avoid ugly tall
+        # stack frames; for this 95% case. #todo benchmark looping alternatives
+        d = 0 ; len = @order.length
+        while d < len
+          p[ (( kx = @order.fetch d )), @hash.fetch( kx ) ]
+          d += 1
+        end
+        nil
+      else
+        _deep_each p
+      end
+    end
+
+    def _deep_each p  # this has bells and whistles at the expense of frames
       ( @enumerator_class || Formal::Box::Enumerator ).new( -> y do
         @order.each do |k|
           y.yield k, @hash.fetch( k ) # always give the yielder 3 args (norm'd)
         end
-      end, self )._each( &b )
+      end, self )._each( &p )
     end
 
     [ :detect, :defectch, :filter, :map, :reduce, :select, :which ].each do |m|

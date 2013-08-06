@@ -15,7 +15,7 @@ module Skylab::MetaHell
     end
 
     def extends # non-normalized .. we use a hash to hold this so we can have
-      __memoized[:extends]        # meaninful nils, i.e. "this was set and is
+      __memoized[:extends]        # meaningful nils, i.e. "this was set and is
     end                           # known not to exist.", which is used below.
 
     def _freeze!

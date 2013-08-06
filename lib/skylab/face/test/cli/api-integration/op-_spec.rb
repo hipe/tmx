@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Face::TestSupport::CLI::API_Integration::OP_
 
-  ::Skylab::Face::TestSupport::CLI::API_Integration[ self ]
+  ::Skylab::Face::TestSupport::CLI::API_Integration[ TS_ = self ]
 
   include CONSTANTS
 
@@ -10,16 +10,9 @@ module Skylab::Face::TestSupport::CLI::API_Integration::OP_
 
   extend TestSupport::Quickie
 
-  module Build_Op_
-    def build_op param_h
-      op = Face::Services::OptionParser.new
-      Face::CLI::API_Integration::OP_[ :op, op,
-        :field_box, self::FIELDS_, :param_h, param_h ]
-      op
-    end
-  end
-
   describe "#{ Face }::CLI::API_Integration::OP_" do
+
+    extend TS_
 
     before :all do
 
@@ -40,8 +33,8 @@ module Skylab::Face::TestSupport::CLI::API_Integration::OP_
           :param, :dry_run, :single_letter, 'n', :arity, :zero_or_one,
             :argument_arity, :zero ]
 
-        extend Build_Op_
-
+        define_singleton_method :build_op, &
+          CONSTANTS::Curriable_build_.curry[ self::FIELDS_ ]
       end
     end
 
@@ -53,13 +46,6 @@ module Skylab::Face::TestSupport::CLI::API_Integration::OP_
       rx %r(\A +-I, --load-path <path> +note autogenned.+more than once\)\z)
       rx %r(\A {6,}--nerculous <nerculous> +note.+gets overridden\z)
       rx %r(\A +-n, --dry-run\z)  # this is what overrode the autogenned short
-    end
-
-    def rx rx
-      (( line = @a.shift )) or fail "expecting line, had none (at #{ rx })"
-      line.chomp!
-      line.should match( rx )
-      nil
     end
 
     def parse * args
@@ -165,7 +151,8 @@ module Skylab::Face::TestSupport::CLI::API_Integration::OP_
         Face::API::Params_[ :client, self,
           :param, :wiffle, :arity, :zero_or_one, :desc, "one", :desc, "two" ]
 
-        extend Build_Op_
+        define_singleton_method :build_op, &
+          CONSTANTS::Curriable_build_.curry[ self::FIELDS_ ]
       end
 
       it "what happens? - the second overwrites the first" do

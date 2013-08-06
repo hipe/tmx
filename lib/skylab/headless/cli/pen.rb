@@ -1,9 +1,6 @@
 module Skylab::Headless
 
-  module CLI::Pen
-
-    # the pen node - stylizing facilities and default styling behavior.
-    # see manifesto at H_L::Pen.
+  module CLI::Pen  # [#084]
 
     #                   ~ ansi escape sequences ~
 

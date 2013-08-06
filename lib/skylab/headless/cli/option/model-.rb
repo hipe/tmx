@@ -19,16 +19,12 @@ module Skylab::Headless
       end
 
       def self.new_semi_mutable_from_normal_name i
-        m = Semi_Mutable_.new Normal_to_long_[ i ]
-        m.set_norm_short_str Normal_to_short_[ i ]
+        m = Semi_Mutable_.new Local_normal_name_as_long[ i ]
+        m.set_norm_short_str Local_normal_name_as_short_[ i ]
         m
       end
 
-      Normal_to_long_ = -> i do
-        "--#{ i.to_s.gsub '_', '-' }"
-      end
-
-      Normal_to_short_ = -> i do
+      Local_normal_name_as_short_ = -> i do
         "-#{ i[ 0 ] }"
       end
 

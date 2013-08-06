@@ -48,17 +48,12 @@ module Skylab::SubTree
     ]
 
     def write_option_parser_to o
-
-      Face::CLI::API_Integration::OP_[ :op, o, :param_h, @param_h,
-        :field_box, self.class::FIELDS_, :expression_agent, @expression_agent ]
-
+      instance_exec o, & Face::CLI::API_Integration::OP_::Write_op_to_method_
       o.separator ''
-
-      @expression_agent.instance_exec do
+      some_expression_agent.instance_exec do
         o.separator "  (it can also read paths from STDIN instead of #{
           }#{ par :file } or #{ par :path })"
       end
-
       nil
     end
 
@@ -154,7 +149,7 @@ module Skylab::SubTree
 
     def mention x
       p = x.respond_to?( :call ) ? x : -> { x }
-      msg = expression_agent.calculate p
+      msg = some_expression_agent.calculate p
       @infostream.puts msg
       nil
     end
@@ -163,10 +158,11 @@ module Skylab::SubTree
       self.class::FIELDS_
     end
 
-    def expression_agent
-      @expression_agent ||= self.class::EXPRESSION_AGENT_
+    def some_expression_agent
+      @expression_agent || self.class::EXPRESSION_AGENT_
     end
 
-    alias_method :any_expression_agent, :expression_agent
+    alias_method :any_expression_agent, :some_expression_agent
+
   end
 end

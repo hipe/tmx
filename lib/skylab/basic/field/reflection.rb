@@ -140,14 +140,14 @@ module Skylab::Basic::Field::Reflection
 
     attr_reader :field
 
-    def name
+    def local_normal_name
       @field.local_normal_name
     end
 
-    MetaHell::Function self, :@func, :value
+    MetaHell::Function self, :@value_p, :value
 
-    def initialize field, func
-      @field, @func = field, func
+    def initialize field, value_p
+      @field, @value_p = field, value_p
     end
   end
 
