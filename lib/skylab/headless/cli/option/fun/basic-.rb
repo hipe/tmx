@@ -4,7 +4,7 @@ module Skylab::Headless
 
     module FUN::Basic_
 
-      o = FUN_.o
+      o = FUN.redefiner
 
       full_basic_switch_match = -> do
         rx = /\A--([a-z]).+\z/i

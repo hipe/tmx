@@ -137,7 +137,7 @@ module Skylab::MetaHell
     #     memo[ :foo  ]  # => true
     #     memo[ :bar  ]  # => nil
 
-    o = FUN_.o
+    o = FUN.redefiner
 
     o[:parse_from_set] = FUN.parse_curry[
       :algorithm, -> parse, input_x_a do

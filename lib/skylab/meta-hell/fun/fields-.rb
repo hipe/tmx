@@ -64,7 +64,7 @@ module Skylab::MetaHell
     end
     define_singleton_method :[], &fields
 
-    o = FUN_.o
+    o = FUN.redefiner
 
     o[:fields] = -> mod, *field_i_a do
       fields[ :client, mod,

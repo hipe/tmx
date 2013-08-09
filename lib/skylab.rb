@@ -205,7 +205,7 @@ module Skylab                     # Welcome! :D
           }`#{ leaf_pathname.basename }` an autoload was triggered for the #{
           }selfsame corresponding const node `#{ @const }` - make sure that #{
           }that constant is actually set there - #{ @leaf_pathname }."
-        require normalized_path
+        require @normalized_path
         correction and correction[]
         if @mod.const_defined? @const, false
           @mod.const_get @const, false

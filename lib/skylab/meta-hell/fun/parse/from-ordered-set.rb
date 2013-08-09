@@ -54,7 +54,7 @@ module Skylab::MetaHell
     #     argv.length  # => 3
     #
 
-    o = FUN_.o
+    o = FUN.redefiner
 
     o[:parse_from_ordered_set] = FUN.parse_curry[
       :algorithm, -> parse, argv do

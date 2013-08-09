@@ -21,7 +21,7 @@ module Skylab::MetaHell
     # processing. in fact, forget we said anything about two parameters -
     # it's just `state_x_a`.
 
-    o = FUN_.o
+    o = FUN.redefiner
 
     o[:parse_alternation] = FUN.parse_curry[
       :algorithm, -> parse, state_x_a do

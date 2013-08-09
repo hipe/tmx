@@ -152,7 +152,7 @@ module Skylab::Porcelain
             end
           end
           -> x do
-            MetaHell::FUN::Fc_[ f_a, [ x ] ]
+            MetaHell::FUN::Function_chain_[ f_a, [ x ] ]
           end
         end.call
       end

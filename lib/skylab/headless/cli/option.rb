@@ -12,7 +12,8 @@ module Skylab::Headless
       const_get( :Model_, false ).new_flyweight
     end
 
-    o = { }
+    MetaHell::MAARS::Upwards[ FUN = MetaHell::FUN::Module.new ]
+    o = FUN.send :definer
 
     Local_normal_name_as_long = -> i do
       "--#{ i.to_s.gsub '_', '-' }"
@@ -25,14 +26,10 @@ module Skylab::Headless
     o[:starts_with_dash] = -> tok do
       DASH_ == tok.getbyte( 0 )
     end
-
+    #
     DASH_ = MetaHell::DASH_
 
-    FUN, FUN_ = MetaHell::FUN.autoloadize_fun[ o ]
-
-    MetaHell::MAARS::Upwards[ FUN ]
-
-    x = FUN_.x
+    x = FUN.send :predefiner
 
     # hack to see if a basic switch is present
     # like this
@@ -43,6 +40,7 @@ module Skylab::Headless
     #     P[ [ '--foomer', '-fap', '-f', '--foom' ] ]  # => 2
 
     x[:basic_switch_index_curry] = [ :Basic_ ]
+
 
   end
 end

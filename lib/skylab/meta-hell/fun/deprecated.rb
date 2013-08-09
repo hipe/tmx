@@ -2,7 +2,7 @@ module Skylab::MetaHell
 
   module FUN::Deprecated
 
-    o = FUN_.o
+    o = FUN.redefiner
 
     # deprecation for the below two explained [#039]
 

@@ -111,7 +111,7 @@ module Skylab::MetaHell
     #     P[ argv ]  # => ArgumentError: unrecognized argument at index 3..
     #
 
-    o = FUN_.o
+    o = FUN.redefiner
 
     o[:parse_series] = FUN.parse_curry[
       :algorithm, -> parse, argv do

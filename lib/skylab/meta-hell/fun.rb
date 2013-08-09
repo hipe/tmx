@@ -1,180 +1,210 @@
 module Skylab::MetaHell
 
-  o = { }
+  (( FUN = ::Class.new( ::Module ).new )).const_set :Module, FUN.class
 
-  o[:import] = -> to_mod, from_mod, i_a do
-    i_a.each do |i|
-      to_mod.const_set i, from_mod.const_get( i, false )
+  class FUN::Module
+
+  private
+
+    def definer
+      @definer ||= begin
+        bx = box
+        Aset_.new do |i, p|
+          define_singleton_method i do @h.fetch i end
+          bx.add i, p
+        end
+      end
+    end
+
+    class Aset_ < ::Proc  # (from ruby source, `rb_hash_aset` is []=)
+      alias_method :[]=, :call
+    end
+
+    def box
+      @box ||= Box_[ @a = [ ], @h = { } ]
+    end
+
+    Box_ = -> a, h do
+      Add_.new do |i, x|
+        did = false
+        h.fetch i do |_|
+          did = true ; a << i ; h[ i ] = x
+        end
+        did or raise ::KeyError, "won't clobber existing \"#{ i }\""
+        x  # #{ result must be input argument in case the []= form was used }
+      end
+    end
+    class Add_ < ::Proc
+      alias_method :add, :call
+    end
+
+  public
+
+    def members
+      @a.dup
+    end
+
+    def at *a
+      a.map( & @h.method( :fetch ) )
     end
   end
 
-  o[:hash2instance] = -> h do  # (this is here for symmetry with the below
-    MetaHell::Proxy::Ad_Hoc[ h ]  # but it somewhat breaks the spirit of FUN)
-  end                          # although have a look it's quite simple
+  module FUN
 
-  o[:hash2struct] = -> h do
-    s = ::Struct.new(* h.keys ).new ; h.each { |k, v| s[k] = v } ; s
-  end                           # ( for posterity this is left intact but
-                                # we do this a simpler way now )
+    o = definer
 
-  o[:memoize] = -> func do      # creates a function `func2` from `func`.
-    use = -> do                 # the first time `func2` is called, it calls
-      x = func.call             # `func` and stores its result in memory,
-      use = -> { x }            # and also uses that result as its result.
-      x                         # each subsequent time you call `func2` it
-    end                         # uses that same result stored in memory from
-    -> { use.call }             # the first time you called it. please be
-  end                           # careful.
+    o[:import] = -> to_mod, from_mod, i_a do
+      i_a.each do |i|
+        to_mod.const_set i, from_mod.const_get( i, false )
+      end
+    end
 
-  o[:memoize_to_const] = -> c, p do
-    -> do
-      if const_defined? c, false
-        const_get c
+    o[:hash2struct] = -> h do     # ( the simplest, oldest way to make a FUN )
+      ::Struct.new( * h.keys ).new( * h.values )
+    end
+
+    o[:memoize] = -> func do      # creates a function `func2` from `func`.
+      use = -> do                 # the first time `func2` is called, it calls
+        x = func.call             # `func` and stores its result in memory,
+        use = -> { x }            # and also uses that result as its result.
+        x                         # each subsequent time you call `func2` it
+      end                         # uses that same result stored in memory from
+      -> { use.call }             # the first time you called it. please be
+    end                           # careful.
+
+    o[:memoize_to_const] = -> c, p do  # use with `define_method`
+      mod = self
+      -> do
+        Const_get_or_create_local_[ mod, p, c ]
+      end
+    end
+
+    Const_get_or_create_ = -> do_inherit, mod, p, c do  # #curry-friendly
+      if mod.const_defined? c, do_inherit
+        mod.const_get c
       else
-        const_set c, p.call
+        mod.const_set c, p.call
       end
     end
-  end
 
-  o[:without_warning] = -> f do
-    x = $VERBOSE; $VERBOSE = nil
-    r = f.call                  # `ensure` is out of scope for now
-    $VERBOSE = x
-    r
-  end
+    Const_get_or_create_local_ = Const_get_or_create_.curry[ true ]
 
-  o[:pathify_name] = -> const_name_s do
-    ::Skylab::Autoloader::FUN.
-      pathify[ const_name_s.gsub( '::', '/' ) ]
-  end
-
-  # `seeded_function_chain` - given a stack of functions and one seed value,
-  # resolve one result.. fuller description at [#mh-026].
-  #
-  # opaque but comprehensive example:
-  #
-  #     f_a = [
-  #       -> item do
-  #         if 'cilantro' == item                 # the true-ishness of the 1st
-  #           [ false, 'i hate cilantro' ]        # element in the result tuple
-  #         else                                  # determines short circuit
-  #           [ true, item, ( 'red' == item ? 'tomato' : 'potato' ) ]
-  #         end                                   # three above becomes two
-  #       end, -> item1, item2 do                 # here, b.c the 1st is
-  #         if 'carrots' == item1                 # discarded when true
-  #           "let's have carrots and #{ item2 }" # note no tuple necessary
-  #         elsif 'tomato' == item2               # if it's just one true-ish
-  #           [ false, 'nope i hate tomato' ]     # non-true item
-  #         else
-  #           [ item1, item2 ]
-  #         end
-  #       end ]
-  #     s = MetaHell::FUN.seeded_function_chain[ 'cilantro',  * f_a ]
-  #     s  # => 'i hate cilantro'
-  #     s = MetaHell::FUN::seeded_function_chain[ 'carrots', * f_a ]
-  #     s  # => "let's have carrots and potato"
-  #     s = MetaHell::FUN.seeded_function_chain[ 'red', * f_a ]
-  #     s  # => 'nope i hate tomato'
-  #     x = MetaHell::FUN.seeded_function_chain[ 'blue', * f_a ]
-  #     x  # => [ 'blue', 'potato' ]
-  #
-  # Blue potato. everything should be perfectly clear now.
-
-  fc = -> f_a, first_arg_a do
-    res_a = f_a.reduce first_arg_a do |arg_a, f|
-      ok, *rest = f[ * arg_a ]
-      if ok
-        true == ok or rest.unshift( ok )  # "double-duty" term
-        rest
-      else
-        break rest
-      end
+    o[:without_warning] = -> f do
+      x = $VERBOSE; $VERBOSE = nil
+      r = f.call                  # `ensure` is out of scope for now
+      $VERBOSE = x
+      r
     end
-    res_a.length < 2 ? res_a[ 0 ] : res_a
-  end
 
-  o[:function_chain] = -> * f_a do
-    fc[ f_a, nil ]
-  end
+    o[:pathify_name] = -> const_name_s do
+      # (one extra rarely-used step added to the often-used function)
+      ::Skylab::Autoloader::FUN.pathify[ const_name_s.gsub( '::', '/' ) ]
+    end
 
-  o[:seeded_function_chain] = -> arg_x, *f_a do
-    fc[ f_a, [ arg_x ] ]
-  end
+    # `seeded_function_chain` - given a stack of functions and one seed value,
+    # resolve one result.. fuller description at [#mh-026].
+    #
+    # opaque but comprehensive example:
+    #
+    #     f_a = [
+    #       -> item do
+    #         if 'cilantro' == item            # the true-ishness of the 1st
+    #           [ false, 'i hate cilantro' ]   # element in the result tuple
+    #         else                             # determines short circuit
+    #           [ true, item, ( 'red' == item ? 'tomato' : 'potato' ) ]
+    #         end                              # three above becomes two
+    #       end, -> item1, item2 do            # here, b.c the 1st is
+    #         if 'carrots' == item1            # discarded when true
+    #           "let's have carrots and #{ item2 }" # note no tuple necessary
+    #         elsif 'tomato' == item2          # if it's just one true-ish
+    #           [ false, 'nope i hate tomato' ]  # non-true item
+    #         else
+    #           [ item1, item2 ]
+    #         end
+    #       end ]
+    #     s = MetaHell::FUN.seeded_function_chain[ 'cilantro',  * f_a ]
+    #     s  # => 'i hate cilantro'
+    #     s = MetaHell::FUN::seeded_function_chain[ 'carrots', * f_a ]
+    #     s  # => "let's have carrots and potato"
+    #     s = MetaHell::FUN.seeded_function_chain[ 'red', * f_a ]
+    #     s  # => 'nope i hate tomato'
+    #     x = MetaHell::FUN.seeded_function_chain[ 'blue', * f_a ]
+    #     x  # => [ 'blue', 'potato' ]
+    #
+    # Blue potato. everything should be perfectly clear now.
 
-  enhance_fun_with_stowaways = -> klass, object do  # interface is #experimental
-    klass.class_exec do
-      @mutex_h = { }
-      @subnode_location_h = { }
-      @dir_pathname_p = -> { object.dir_pathname }
-      @x = -> i, i_a do
-        @subnode_location_h[ i ] = i_a
-        define_method i do
-          self.class.load_the_proc i
-          send i
+    o[:function_chain] = -> * p_a do
+      Function_chain_[ p_a, nil ]
+    end
+
+    o[:seeded_function_chain] = -> arg_x, * p_a do
+      Function_chain_[ p_a, [ arg_x ] ]
+    end
+
+    Function_chain_ = -> p_a, first_arg_a do
+      res_a = p_a.reduce first_arg_a do |arg_a, p|
+        ok, *rest = p[ * arg_a ]
+        if ok
+          true == ok or rest.unshift( ok )  # "double-duty" term
+          rest
+        else
+          break rest
         end
       end
-      class << @x
-        alias_method :[]=, :[]
-      end
-      class << self
-        attr_reader :x, :o
-      end
-      define_singleton_method :load_the_proc do |func_i|
-        i_a = @subnode_location_h.fetch func_i
-        (( @mutex_h.fetch( func_i ) { |k| @mutex_h[k] = true ; nil } )) and
-          raise "circular dependency detected with `#{ func_i }` - are you #{
-           }sure it is defined here? - #{ object }::#{ i_a * '::' }"
-        i_a.reduce object do |m, i|
-          m.const_get i, false
+      res_a.length < 2 ? res_a[ 0 ] : res_a
+    end
+
+    class Module  # LOOK
+    private
+      def predefiner
+        @predefiner ||= begin
+          bx = box ; mutex = MetaHell::Services::Basic::
+              Mutex::Hash.new do |key, c_a, _|
+            raise "circular dependence detected with `#{ key }` - are you #{
+              }sure it is defined in #{ self }::#{ c_a * '::' }?"
+          end
+          Aset_.new do |i, c_a|
+            bx.add i, c_a
+            define_singleton_method i do
+              mutex.hold_notify i, c_a
+              c_a = @h.fetch i
+              c_a.reduce self do |m, c|
+                m.const_get c, false
+              end
+              c_a.object_id == @h.fetch( i ).object_id and raise "#{
+                }#{ self }::#{ c_a * '::' } failed to redefine `#{ i }`"
+              send i
+            end
+          end
         end
-        nil
       end
-      @o = -> i, p do
-        remove_method i if method_defined? i  # some sub-nodes add api private functions
-        define_method i do p end
-        nil
-      end
-      class << @o
-        def []= i, p
-          self[ i, p ]
-          p
+   public
+      def redefiner
+        @redefiner ||= begin
+          Aset_.new do |i, p|
+           @h.key?( i ) or raise "`#{ i }` was not [pre]defined in #{ self }"
+           singleton_class.send :remove_method, i
+           define_singleton_method i do @h.fetch i end
+           @h[ i ] = p
+           p  # #{ result must be input argument in case the []= form was used }
+          end
         end
       end
     end
-    nil
+
+    x = predefiner
+
+    x[:parse_curry]                      = [ :Parse, :Curry ]
+    x[:parse_series]                     = [ :Parse, :Series ]
+    x[:parse_from_set]                   = [ :Parse, :From_Set ]
+    x[:parse_from_ordered_set]           = [ :Parse, :From_Ordered_Set ]
+    x[:parse_alternation]                = [ :Parse, :Alternation_ ]
+
+    x[:fields]                           = [ :Fields_ ]
+
+    x[:private_attr_reader]              =
+    x[:private_attr_accessor]            =
+    x[:module_defines_method_in_some_manner] = [ :Deprecated ]
+
   end
-
-  alf = o[:autoloadize_fun] = -> oo do
-    kls = ::Class.new ::Module
-    kls.class_exec do
-      oo.each do |k, v|
-        define_method k do v end
-      end
-    end
-    obj = kls.new
-    enhance_fun_with_stowaways[ kls, obj ]
-    [ obj, kls ]
-  end
-
-  FUN, FUN_ = alf[ o ]
-
-  FUN::Fc_ = fc
-
-  x = FUN_.x
-  x[:parse_curry]                      = [ :Parse, :Curry ]
-  x[:parse_series]                     = [ :Parse, :Series ]
-  x[:parse_from_set]                   = [ :Parse, :From_Set ]
-  x[:parse_from_ordered_set]           = [ :Parse, :From_Ordered_Set ]
-  x[:parse_alternation]                = [ :Parse, :Alternation_ ]
-
-  x[:fields]                           = [ :Fields_ ]
-
-  x[:private_attr_reader]              = deprecated = [ :Deprecated ]
-  x[:private_attr_accessor]            = deprecated
-  x[:module_defines_method_in_some_manner] = deprecated
-
-  def FUN.at *a
-    a.map( & method( :send ) )
-  end
-
 end

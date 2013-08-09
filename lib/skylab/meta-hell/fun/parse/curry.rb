@@ -4,7 +4,7 @@ module Skylab::MetaHell
 
     Parse = FUN::Parse
 
-    o = MetaHell::FUN_.o
+    o = FUN.redefiner
 
     o[:parse_curry] = -> * input_a do
       Parse_.new( input_a ).get_conduit
@@ -14,10 +14,12 @@ module Skylab::MetaHell
       def initialize parse
         @parse = parse
       end
+
       def [] *a
         p = @parse.dupe
         p.call_notify a
       end
+
       alias_method :call, :[]
       def curry
         -> *a do
@@ -25,18 +27,23 @@ module Skylab::MetaHell
           p.curry_notify a
         end
       end
+
       def get_parse
         @parse.dupe
       end
+
       def syntax_string
         @parse.render_syntax_string
       end
+
       def lookup_field i
         @parse.lookup_field_notify i
       end
+
       def _p
         @parse  # #shh - you can ruin everything
       end
+
       def _field_a
         @parse._field_a
       end
