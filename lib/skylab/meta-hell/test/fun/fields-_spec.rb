@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::FUN::Fields_
 
-  ::Skylab::MetaHell::TestSupport::FUN[ Fields__TestSupport = self ]
+  ::Skylab::MetaHell::TestSupport::FUN[ self ]
 
   include CONSTANTS
 
@@ -23,7 +23,7 @@ module Skylab::MetaHell::TestSupport::FUN::Fields_
           end
         end
       end
-      it "a readable way to set instance methods via a constructor" do
+      it "a readable way to set instance variables via a constructor" do
         Sandbox_1.with self
         module Sandbox_1
           (( FOO = Foo.new )).instance_variables.sort.should eql( [ :@bat, :@ding ] )

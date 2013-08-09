@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Basic::TestSupport::Hash::Order_Proxy
 
-  ::Skylab::Basic::TestSupport::Hash[ Order_Proxy_TestSupport = self ]
+  ::Skylab::Basic::TestSupport::Hash[ self ]
 
   include CONSTANTS
 

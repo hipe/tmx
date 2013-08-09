@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Headless::TestSupport::NLP::EN::Levenshtein_
 
-  ::Skylab::Headless::TestSupport::NLP::EN[ Levenshtein__TestSupport = self ]
+  ::Skylab::Headless::TestSupport::NLP::EN[ self ]
 
   include CONSTANTS
 

@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Face::TestSupport::CLI::Table
 
-  ::Skylab::Face::TestSupport::CLI[ Table_TestSupport = self ]
+  ::Skylab::Face::TestSupport::CLI[ self ]
 
   include CONSTANTS
 

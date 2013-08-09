@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::FUN::Parse::Series
 
-  ::Skylab::MetaHell::TestSupport::FUN::Parse[ TS_ = self ]
+  ::Skylab::MetaHell::TestSupport::FUN::Parse[ self ]
 
   include CONSTANTS
 

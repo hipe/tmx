@@ -743,5 +743,9 @@ module Skylab::MetaHell
         self
       end
     end
+
+    def self.kick c
+      const_get c, false
+    end
   end
 end

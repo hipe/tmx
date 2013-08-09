@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::FUN::Fields_::Contoured_
 
-  ::Skylab::MetaHell::TestSupport::FUN::Fields_[ Contoured__TestSupport = self ]
+  ::Skylab::MetaHell::TestSupport::FUN::Fields_[ self ]
 
   include CONSTANTS
 
@@ -25,7 +25,7 @@ module Skylab::MetaHell::TestSupport::FUN::Fields_::Contoured_
               :memoized, :proc, :bar,
               :method, :bif,
               :memoized, :method, :baz ]
-            public :absorb
+              public :absorb
           end
         end
       end

@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::InformationTactics::TestSupport::Levenshtein_
 
-  ::Skylab::InformationTactics::TestSupport[ Levenshtein__TestSupport = self ]
+  ::Skylab::InformationTactics::TestSupport[ self ]
 
   include CONSTANTS
 

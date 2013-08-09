@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Basic::TestSupport::Hash::Pair_Enumerator
 
-  ::Skylab::Basic::TestSupport::Hash[ Pair_Enumerator_TestSupport = self ]
+  ::Skylab::Basic::TestSupport::Hash[ self ]
 
   include CONSTANTS
 

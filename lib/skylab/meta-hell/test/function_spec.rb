@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::Function
 
-  ::Skylab::MetaHell::TestSupport[ Function_TestSupport = self ]
+  ::Skylab::MetaHell::TestSupport[ self ]
 
   include CONSTANTS
 

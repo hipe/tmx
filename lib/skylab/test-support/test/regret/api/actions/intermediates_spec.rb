@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::TestSupport::TestSupport::Regret::API::Actions::Intermediates
 
-  ::Skylab::TestSupport::TestSupport::Regret::API::Actions[ Intermediates_TestSupport = self ]
+  ::Skylab::TestSupport::TestSupport::Regret::API::Actions[ self ]
 
   include CONSTANTS
 
