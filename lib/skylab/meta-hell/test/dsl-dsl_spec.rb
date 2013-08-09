@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::DSL_DSL
 
-  ::Skylab::MetaHell::TestSupport[ DSL_DSL_TestSupport = self ]
+  ::Skylab::MetaHell::TestSupport[ self ]
 
   include CONSTANTS
 

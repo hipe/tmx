@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::FUN::Fields_::From_
 
-  ::Skylab::MetaHell::TestSupport::FUN::Fields_[ From__TestSupport = self ]
+  ::Skylab::MetaHell::TestSupport::FUN::Fields_[ self ]
 
   include CONSTANTS
 

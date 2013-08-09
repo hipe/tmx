@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Basic::TestSupport::Struct
 
-  ::Skylab::Basic::TestSupport[ Struct_TestSupport = self ]
+  ::Skylab::Basic::TestSupport[ self ]
 
   include CONSTANTS
 

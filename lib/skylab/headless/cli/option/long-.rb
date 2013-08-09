@@ -2,7 +2,7 @@ module Skylab::Headless
 
   module CLI::Option
 
-    Long_ = MetaHell::Formal::Box::Struct.new :__, :no, :stem, :arg
+    Long_ = MetaHell::Formal::Box::kick( :Struct ).new :__, :no, :stem, :arg
     class Long_
 
       MetaHell::Pool.enhance( self ).with_lease_and_release -> do

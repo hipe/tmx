@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::Boxxy
 
-  ::Skylab::MetaHell::TestSupport[ Boxxy_TestSupport = self ]
+  ::Skylab::MetaHell::TestSupport[ self ]
 
   include CONSTANTS
 

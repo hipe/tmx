@@ -34,6 +34,14 @@ module Skylab::Headless
 
     x = FUN_.x
 
+    # hack to see if a basic switch is present
+    # like this
+    #
+    #     P = Headless::CLI::Option::FUN.basic_switch_index_curry[ '--foom' ]
+    #     P[ [ 'abc' ] ]  # => nil
+    #     P[ [ 'abc', '--fo', 'def' ] ]  # => 1
+    #     P[ [ '--foomer', '-fap', '-f', '--foom' ] ]  # => 2
+
     x[:basic_switch_index_curry] = [ :Basic_ ]
 
   end

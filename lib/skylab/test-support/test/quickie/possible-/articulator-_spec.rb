@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::TestSupport::TestSupport::Quickie::Possible_::Articulator_
 
-  ::Skylab::TestSupport::TestSupport::Quickie::Possible_[ Articulator__TestSupport = self ]
+  ::Skylab::TestSupport::TestSupport::Quickie::Possible_[ self ]
 
   include CONSTANTS
 

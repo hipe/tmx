@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Headless::TestSupport::Plugin::Host::Metaservices_::Chain_
 
-  ::Skylab::Headless::TestSupport::Plugin::Host::Metaservices_[ Chain__TestSupport = self ]
+  ::Skylab::Headless::TestSupport::Plugin::Host::Metaservices_[ self ]
 
   include CONSTANTS
 

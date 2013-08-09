@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::MetaHell::TestSupport::FUN::Parse::Alternation_
 
-  ::Skylab::MetaHell::TestSupport::FUN::Parse[ Alternation__TestSupport = self ]
+  ::Skylab::MetaHell::TestSupport::FUN::Parse[ self ]
 
   include CONSTANTS
 

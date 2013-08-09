@@ -1,5 +1,5 @@
 [#048]       #doc-point what are puffers and when should you use them ..
-[#047] #open #doc-test do TS_ not Foo_TestSupport in spec nodes
+[#047]       (open)
 [#046]       #doc-point extension nodes?
 [#045]       #tracking-tag track various #puffers in the wild
 [#044] #open #autoloading: swap-in caller_locations( 1, 1 )[ 0 ].base_label

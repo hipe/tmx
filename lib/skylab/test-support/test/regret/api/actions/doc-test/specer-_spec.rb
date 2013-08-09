@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::TestSupport::TestSupport::Regret::API::Actions::DocTest::Specer_
 
-  ::Skylab::TestSupport::TestSupport::Regret::API::Actions::DocTest[ Specer__TestSupport = self ]
+  ::Skylab::TestSupport::TestSupport::Regret::API::Actions::DocTest[ self ]
 
   include CONSTANTS
 

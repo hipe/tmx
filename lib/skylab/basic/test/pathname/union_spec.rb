@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Basic::TestSupport::Pathname::Union
 
-  ::Skylab::Basic::TestSupport::Pathname[ Union_TestSupport = self ]
+  ::Skylab::Basic::TestSupport::Pathname[ self ]
 
   include CONSTANTS
 

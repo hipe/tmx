@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Face::TestSupport::CLI::Tableize
 
-  ::Skylab::Face::TestSupport::CLI[ Tableize_TestSupport = self ]
+  ::Skylab::Face::TestSupport::CLI[ self ]
 
   include CONSTANTS
 
