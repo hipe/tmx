@@ -27,7 +27,7 @@ module Skylab::Headless
       o = (( defn_a = [ ] )).method( :push )
       a = [ ]
 
-      defn_a << :absorber_method_name << :absorb
+      defn_a << :absorb_method << :absorb
 
       o[ :memoized, :proc, :any_home_directory_path ]
 

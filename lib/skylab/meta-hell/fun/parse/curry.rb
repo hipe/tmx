@@ -84,18 +84,18 @@ module Skylab::MetaHell
         instance_exec( *a, & @call_p )  # result!
       end
       def curry_notify a  # assume was already duped. will mutate self, a
-        op_box = field_op_box
+        op_box = field_box
         clear_last
         while a.length.nonzero?
           x = a.shift
-          m = op_box.fetch x do
+          fld = op_box.fetch x do
             raise ::ArgumentError, "unrecognized element: #{ Parse::
               Strange_[ x ] }#{ any_context }#{
               }#{ Lev_[ op_box.get_names, x ] if x.respond_to? :id2name }"
           end
           set_last_x x
           remove_from_curry_queue x
-          send m, a
+          send fld.method_i, a
         end
         get_conduit
       end

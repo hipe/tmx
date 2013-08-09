@@ -20,11 +20,12 @@ module Skylab::MetaHell::TestSupport::FUN::Fields_::Contoured_
         module Sandbox_1
           class Foo
             MetaHell::FUN::Fields_::Contoured_[ self,
-              :absorber_method_name, :absorb,
+              :absorb_method, :absorb,
               :proc, :foo,
               :memoized, :proc, :bar,
               :method, :bif,
               :memoized, :method, :baz ]
+            public :absorb
           end
         end
       end

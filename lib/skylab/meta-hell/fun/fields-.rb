@@ -3,7 +3,7 @@ module Skylab::MetaHell
   module FUN::Fields_
 
     # using the basic fields facility out of the box only gives you
-    # a readable way to set instance methods via a constructor
+    # a readable way to set instance variables via a constructor
     #
     #     class Foo
     #       MetaHell::FUN.fields[ self, :ding, :bat ]

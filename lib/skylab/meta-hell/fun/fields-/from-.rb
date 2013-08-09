@@ -1,6 +1,6 @@
 module Skylab::MetaHell
 
-  module FUN::Fields_::From_
+  module FUN::Fields_
 
     # let a class define its fields via particular methods it defines
     # in a special DSL block
@@ -50,105 +50,24 @@ module Skylab::MetaHell
     #     Foo.new( :four, "frick" )  # => ArgumentError: unrecognized keyword "four" - did you mean two?
     #
 
-    def self.methods &blk
-      mod = eval 'self', blk.binding
-      box = mod.module_exec do
-        if const_defined? CONST_
-          existing = const_get CONST_
-          if const_defined? CONST_, false
-            existing
-          else
-            const_set CONST_, existing.dupe
-          end
-        else
-          define_method :absorb, & Absorb_ ; private :absorb
-          define_method :absorb_notify, & Absorb_notify_
-          define_method :field_op_box , & Field_op_box_ ; private :field_op_box
-          const_set CONST_, Box_.new
+    self::Mechanics_.touch
+
+    module From_
+
+      def self.methods &blk
+        client = eval 'self', blk.binding
+        box = Puff_client_and_give_box_[ :absorb, client ]
+        Method_Added_Muxer_[ client ].in_block_each_method_added blk do |m|
+          box.add m, Field_From_Method_.new( m )
         end
-      end
-      Method_Added_Muxer_[ mod ].for_each_method_in_block_do_this blk do |m|
-        box.add m, m  # field names and method names are one and the same
         nil
       end
-    end
 
-    CONST_ = :FIELDS_FROM_METHODS_BOX_
-
-    Absorb_ = -> *a do
-      op_box = field_op_box
-      while a.length.nonzero?
-        send op_box[ a.shift ], a
-      end
-      nil
-    end
-
-    Absorb_notify_ = -> a do
-      op_box = field_op_box
-      @last_x = nil
-      while a.length.nonzero?
-        (( m = op_box.fetch( a.first ) { } )) or break
-        @last_x = a.shift
-        send m, a
-      end
-      nil
-    end
-
-    Field_op_box_ = -> do
-      self.class.const_get CONST_  # if the class added no
-      # fields of its own to the box, ascend up to parent
-    end
-
-    class Box_ < MetaHell::Services::Basic::Box
-      def initialize
-        super()
-        @h.default_proc = -> h, k do
-          raise ::ArgumentError, "unrecognized keyword #{ FUN::Parse::
-            Strange_[ k ] } - did you mean #{ Lev__[ @a, k ] }?"
+      class Field_From_Method_ < Aspect_
+        def absorb agent, a
+          agent.send @method_i, a
+          nil
         end
-      end
-      Lev__ = -> a, x do
-        MetaHell::Services::Headless::NLP::EN::Levenshtein_::Templates_::
-          Or_[a, x]
-      end
-      def dupe
-        a = @a ; h = @h
-        self.class.allocate.instance_exec  do
-          @a = a.dup ; @h = h.dup
-          self
-        end
-      end
-    end
-
-    class Method_Added_Muxer_
-      # imagine having multiple subscribers to one method added event
-      def self.[] mod
-        me = self
-        mod.module_exec do
-          @method_added_muxer ||= begin  # ivar not const! boy howdy watch out
-            muxer = me.new self
-            singleton_class.instance_method( :method_added ).owner == self and
-              fail "sanity - won't overwrite existing method_added hook"
-            define_singleton_method :method_added, &
-              muxer.method( :method_added_notify )
-            muxer
-          end
-        end
-      end
-      def initialize mod
-        @p = nil
-        @mod = mod
-      end
-      def for_each_method_in_block_do_this blk, &do_this
-        @p and fail "implement me - you expected this to actually mux?"
-        @p = do_this
-        @mod.module_exec( & blk )
-        @p = nil
-      end
-    private
-      def method_added_notify i
-        @p && @p[ i ]
-        nil
       end
     end
   end
