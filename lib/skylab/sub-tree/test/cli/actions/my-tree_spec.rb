@@ -48,6 +48,7 @@ module Skylab::SubTree::TestSupport::CLI::Actions::My_Tree
       header 'options'
       one_or_more_styled OPT_SUMMARY_FIRST_LINE_RX_
       any_blanks
+      styled.should match( /add.+volume/ )
       styled.should match( /it can also read paths from STDIN/ )
       styled.should match( /this screen/ )
       no_more_lines

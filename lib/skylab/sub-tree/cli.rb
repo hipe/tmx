@@ -37,9 +37,6 @@ module Skylab::SubTree
       Headless::CLI::Pen::MINIMAL
     end
 
-    alias_method :some_expression_agent, :pen
-    private :some_expression_agent
-
     # --*--                         DSL ZONE                              --*--
 
     extend Porcelain::Legacy::DSL
@@ -48,15 +45,23 @@ module Skylab::SubTree
     desc "but adds custom features geared towards development"
 
     option_parser do |o|
-      my_tree_front.absorb( :expression_agent, some_expression_agent,
-                            :param_h, @param_h ).write_option_parser_to o
+      front = my_tree_front ; face = SubTree::Services::Face
+      front.absorb( :param_h, @param_h, :expression_agent,
+        face::API::Normalizer_::Field_Front_Exp_Ag_.new(
+          front.field_box,
+          face::CLI::API_Integration::EXPRESSION_AGENT_ )
+      ).write_option_parser_to o
+      nil
     end
+
     argument_syntax '[<path> [..]]'
 
     def my_tree *path, _
-      path.length.zero? and path << ::Dir.pwd
-      @param_h[ :path_a ] = path
       i, o, e = @three_streams_p.call ; f = my_tree_front
+      if path.length.zero?
+        path << ( ::Dir.pwd if i.tty? && ! @param_h[ :file ] )  # yes nil
+      end
+      @param_h[ :path_a ] = path
       f.absorb :upstream, i, :paystream, o, :infostream, e, :program_name,
         @legacy_last_hot.normalized_invocation_string
       r = f.flush
@@ -68,10 +73,13 @@ module Skylab::SubTree
       end
     end
 
+  private
+
     def my_tree_front
       @my_tree_front ||= SubTree::API::Actions::My_Tree.new
     end
-    private :my_tree_front
+
+  public
 
     desc "(\"sub-tree\") from <in-dir> copy the files in <list> to <out-dir>. always safe."
 

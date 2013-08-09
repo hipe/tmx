@@ -7,6 +7,7 @@ module Skylab::SubTree
     o[:Basic] = subsys
     o[:Face] = subsys
     o[:FileUtils] = stdlib
+    o[:InformationTactics] = subsys
     o[:Ncurses] = stdlib  # gemlib
     o[:Open3] = stdlib
     o[:OptionParser] = -> _ { require 'optparse' ; ::OptionParser }
