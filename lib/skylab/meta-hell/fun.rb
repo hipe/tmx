@@ -72,22 +72,20 @@ module Skylab::MetaHell
       -> { use.call }             # the first time you called it. please be
     end                           # careful.
 
-    o[:memoize_to_const] = -> c, p do  # use with `define_method`
-      mod = self
+    o[:memoize_to_const_method] = -> p, c do  # use with `define_method`
+      puff = Puff_constant_.curry[ false, -> _ { p.call }, c ]
       -> do
-        Const_get_or_create_local_[ mod, p, c ]
+        puff[ self, nil ]
       end
     end
-
-    Const_get_or_create_ = -> do_inherit, mod, p, c do  # #curry-friendly
+    #
+    Puff_constant_ = -> do_inherit, p, c, mod, arg do  # #curry-friendly
       if mod.const_defined? c, do_inherit
         mod.const_get c
       else
-        mod.const_set c, p.call
+        mod.const_set c, p[ arg ]
       end
     end
-
-    Const_get_or_create_local_ = Const_get_or_create_.curry[ true ]
 
     o[:without_warning] = -> f do
       x = $VERBOSE; $VERBOSE = nil

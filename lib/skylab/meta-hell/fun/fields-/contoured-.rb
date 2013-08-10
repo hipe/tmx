@@ -65,11 +65,11 @@ module Skylab::MetaHell
 
         def flush
           @field_box or field_box
-          Puff_const_[ :CONTOURED_REQUIRED_CHECK_, -> _ do
+          Puff_const_with_dupe_for_[ -> _ do
             p = Required_fields_check_[ @field_box ]
             @client.facet_muxer.add_hook_listener :post_absorb, p
             Required_fields_check_
-          end, @client ]
+          end, :CONTOURED_REQUIRED_CHECK_, @client ]
           nil
         end
         #

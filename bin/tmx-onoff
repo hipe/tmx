@@ -1,0 +1,89 @@
+#!/usr/bin/env ruby -w
+
+argv = ARGV
+
+if (( idx = argv.index '-n' ))
+  argv[ idx, 1 ] = [ ]
+  is_dry_run = true
+end
+
+dir, file = argv[ 0, 2 ]
+
+y = ::Enumerator::Yielder.new( & $stderr.method( :puts ) )
+
+progname = -> do
+  ::File.basename $PROGRAM_NAME
+end
+
+bork = -> msg do
+  y << msg
+  exit 0
+end
+
+file or bork[ "usage: #{ progname[] } <dir> <file>" ]
+
+require 'pathname'
+
+file_pn = ::Pathname.new file
+
+file_pn.extname.length.zero? and
+  bork[ "please provide a file with an extension (had: #{ file.inspect })" ]
+
+off_dir_pn = ::Pathname.new "#{ dir }-off"
+on_dir_pn = ::Pathname.new dir
+
+off_leaf_pn = off_dir_pn.join file
+on_leaf_pn = on_dir_pn.join file
+
+if on_leaf_pn.exist?
+  off_leaf_pn.exist? and bork[ "wat do - both exist" ]
+  from_dir_pn = on_dir_pn
+  to_dir_pn = off_dir_pn
+  say_did = 'OFF'
+elsif off_leaf_pn.exist?
+  from_dir_pn = off_dir_pn
+  to_dir_pn = on_dir_pn
+  say_did = 'ON'
+else
+  bork[ "neither leaf exists - #{ on_leaf_pn }, #{ off_leaf_pn }" ]
+end
+
+is_dry_run and y << "(dry run. nothing will occur.)"
+
+fu = ::Object.new
+require 'fileutils'
+fu.extend ( is_dry_run ? ::FileUtils::DryRun : ::FileUtils::Verbose )
+sc = fu.singleton_class
+sc.send :public, :mv, :mkdir, :rmdir
+sc.send :define_method, :fu_output_message do |msg|
+  y << "(#{ progname[] }: #{ msg })"
+end
+
+if ! to_dir_pn.exist?
+  fu.mkdir to_dir_pn
+end
+
+stem = file_pn.sub_ext ''
+
+src_leaf_pn = from_dir_pn.join file
+dest_leaf_pn = to_dir_pn.join file
+src_branch_pn = from_dir_pn.join stem
+dest_branch_pn = to_dir_pn.join stem
+
+[ dest_leaf_pn, dest_branch_pn ].each do |pn|
+  pn.exist? and bork[ "sanity - target exists, aborting - #{ pn }" ]
+end
+
+fu.mv src_leaf_pn, dest_leaf_pn
+
+if src_branch_pn.exist?
+  fu.mv src_branch_pn, dest_branch_pn
+else
+  y << "(there is no branch node to move, only leaf.)"
+end
+
+if from_dir_pn.children.empty?
+  fu.rmdir from_dir_pn
+end
+
+y << "turned #{ stem } #{ say_did }."

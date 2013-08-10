@@ -60,6 +60,13 @@ module Skylab::MetaHell
         instance_exec memo, argv, & @normal_parse_p
       end
 
+      def ivar_mutex ivar, a
+        instance_variable_defined? ivar and raise "sanity - can have only #{
+          }one #{ Hack_label_[ ivar ] } for now"
+        instance_variable_set ivar, a.fetch( 0 ) ; a.shift
+        nil
+      end
+
     FUN::Fields_::From_.methods do  # borrow 1 indent
 
       def monikate a

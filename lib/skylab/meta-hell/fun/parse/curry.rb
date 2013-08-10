@@ -7,10 +7,19 @@ module Skylab::MetaHell
     o = FUN.redefiner
 
     o[:parse_curry] = -> * input_a do
-      Parse_.new( input_a ).get_conduit
+      Parse_.new( input_a ).shell
     end
 
-    class Conduit_
+    class Shell_  # a higher-level interface to the lower-level mechanics
+      # of the parser. because they are curriable executable objects, parsers
+      # must remain mutable but should only be mutated when they are created
+      # or spawned. the shell exists to insulate the parser in its mutability
+      # to the rest of the system. more than just a simple conduit, however,
+      # the shell also has mechanics of its own for wrapping up the details
+      # of a higher-level parse, as opposed to a normalized parse. note the
+      # shell is 1-to-1 with a parser, and should hold no volatile state
+      # information of its own.
+
       def initialize parse
         @parse = parse
       end
@@ -21,6 +30,22 @@ module Skylab::MetaHell
       end
 
       alias_method :call, :[]
+
+      def parse_argv argv
+        value = get_value
+        did_parse, _is_spent = @parse.dupe.
+          call_notify [ value, argv || EMPTY_A_ ]
+        value if did_parse
+      end
+
+      def get_value
+        Puff_value_class_[ @parse.some_constantspace_mod, @parse ].new
+      end
+      #
+      Puff_value_class_ = FUN::Puff_constant_.curry[ false, -> parse do
+        Parse::Field_::Values_.new parse._field_a
+      end, :Parse_Value_ ]
+
       def curry
         -> *a do
           p = @parse.dupe
@@ -52,7 +77,7 @@ module Skylab::MetaHell
     class Parse_
       def initialize input_a
         @abstract_field_list = @do_glob_extra_args = @exhaustion_p =
-          @syntax = nil
+          @syntax = @constantspace_mod = nil
         @state_mutex =
             MetaHell::Services::Basic::Mutex::Write_Once.new :state_mutex
           # state encompasses input and output. various algorithms may handle
@@ -62,9 +87,11 @@ module Skylab::MetaHell
     private
       def base_args
         [ @algorithm_p, @exhaustion_p, @abstract_field_list,
-          @curry_queue_a, @call_p, @syntax, @state_mutex, @do_glob_extra_args ]
+          @curry_queue_a, @call_p, @syntax, @state_mutex, @do_glob_extra_args,
+          @constantspace_mod ]
       end
-      def base_init algo_p, exhaus_p, afl, cqa, calp, syn, state_mutex, dgxa
+      def base_init algo_p, exhaus_p, afl, cqa, calp, syn, state_mutex, dgxa,
+          csm
         @algorithm_p = algo_p
         @exhaustion_p = exhaus_p
         @abstract_field_list = afl
@@ -74,11 +101,12 @@ module Skylab::MetaHell
         @field = nil
         @state_mutex = state_mutex.dupe
         @do_glob_extra_args = dgxa
+        @constantspace_mod = csm
         nil
       end
     public
-      def get_conduit
-        @conduit ||= Conduit_.new self
+      def shell
+        @shell ||= Shell_.new self
       end
       def dupe
         ba = base_args
@@ -104,7 +132,7 @@ module Skylab::MetaHell
           remove_from_curry_queue x
           send fld.method_i, a
         end
-        get_conduit
+        shell
       end
       Lev_ = -> item_a, outside_x do
         " - did you mean #{ MetaHell::Services::Headless::NLP::EN::
@@ -128,7 +156,7 @@ module Skylab::MetaHell
         if x.respond_to? :id2name
           " after \"#{ x }\""
         else
-          @last_x.any_context
+          x.any_context
         end
       end
       def normal_token_proc_a
@@ -167,6 +195,10 @@ module Skylab::MetaHell
     # #hacks-only
       def _field_a
         @abstract_field_list._field_a
+      end
+      attr_reader :constantspace_mod
+      def some_constantspace_mod
+        constantspace_mod or raise "use `constantspace` to define a module"
       end
     private
       def set_abstract_field_list class_i, a
@@ -339,6 +371,10 @@ module Skylab::MetaHell
         end
         do_absorb and field.absorb_notify a
         field
+      end
+      def constantspace a
+        @constantspace_mod = a.fetch 0 ; a.shift
+        nil
       end
       end  # (pay one back)
     end

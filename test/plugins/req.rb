@@ -98,6 +98,7 @@ module Skylab::Test
         if ! v
           info.write " #{ full_name } loaded #{ cache_a.length} spec files)\n\n"
         end
+        true  # per [#006]
       end
     end
 

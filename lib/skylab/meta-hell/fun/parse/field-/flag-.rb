@@ -19,11 +19,17 @@ module Skylab::MetaHell
         @desc_lines = [ * desc_line_x ]
       end
 
+      def with *a
+        absorb( * a )
+        self
+      end
+
       def looks_like_particular_field
         true
       end
 
-      attr_reader :i, :predicates, :desc_lines
+      attr_reader :i, :predicates, :desc_lines, :short_s, :long_s,
+        :fuzzy_min_d
 
       def visible_values
         self.class.visible_members.map { |i| send i }
@@ -55,27 +61,6 @@ module Skylab::MetaHell
         true if head_matches_token token
       end
 
-      def head_matches_token tok  # result is treated as true-ish
-        ( @literal ||= @i.to_s ) == tok
-      end
-
-      def to_a
-        a = [ ]
-        s = get_moniker and a << :moniker << s
-        a << :token_scanner << method( :scan_token )
-        a
-      end
-
-    private
-
-      def moniker a
-        super
-        @i ||= @moniker
-        nil
-      end
-
-    FUN::Fields_::From_.methods do  # (borrow one indent)
-
       def head_matches argv
         argv.length.nonzero? && head_matches_token( argv.fetch 0 )
       end
@@ -87,9 +72,54 @@ module Skylab::MetaHell
           @fuzzy[ argv.fetch 0 ]
         end
       end
+
+      def head_matches_token tok  # result is treated as true-ish
+        r = true
+        begin
+          ( @literal ||= @i.to_s ) == tok and break
+          short_s and @short_s == tok and break
+          long_s and @long_s == tok and break
+          fuzzy_min_d or break( r = false )
+          Fuzzy_matcher_[ @fuzzy_min_d, get_moniker ][ tok ] and break
+          long_s and  # kind of ridiculous
+            Fuzzy_matcher_[ @fuzzy_min_d + 2, @long_s ][ tok ] and break
+          r = false
+        end while nil
+        r
+      end
+
+      def to_a
+        a = [ ]
+        s = get_moniker and a << :moniker << s
+        a << :token_scanner << method( :scan_token )
+        a
+      end
+
+    private
+
+      def moniker a  # this is how we override a field defined in parent
+        super
+        @i ||= @moniker
+        nil
+      end
+
+    FUN::Fields_::From_.methods do  # (borrow one indent)
+
       def predicate a
         @predicates.push a.fetch( 0 ) ; a.shift
         nil
+      end
+
+      def short a
+        ivar_mutex :@short_s, a
+      end
+
+      def long a
+        ivar_mutex :@long_s, a
+      end
+
+      def fuzzy_min a
+        ivar_mutex :@fuzzy_min_d, a
       end
 
     end  # (pay one back)

@@ -88,19 +88,6 @@ module Skylab::MetaHell
       nil
     end
 
-    Puff_const_ = -> const, p, client do  # #curry-friendly
-      if client.const_defined? const
-        found = client.const_get const
-        if client.const_defined? const, false
-          found
-        else
-          client.const_set const, found.dupe_for( client )
-        end
-      else
-        client.const_set const, p[ client ]
-      end
-    end
-
     Puff_client_and_give_box__ =
         -> field_box_const, absorb_method_x, client do
       Puff_field_box_method_[ field_box_const, client ]
@@ -109,8 +96,9 @@ module Skylab::MetaHell
       Puff_absorb_notify_[ client ]
       Puff_facet_muxer_[ client ]
       Puff_post_absorb_[ client ]
-      Puff_const_[ field_box_const, -> _ { Box_.new }, client ]
+      Puff_const_with_dupe_for_[ -> _ { Box_.new }, field_box_const, client ]
     end
+    #
     Puff_field_box_method_ = -> field_box_const, client do
       Puff_method_[
         :field_box, -> { self.class.const_get field_box_const }, client ]
@@ -142,10 +130,22 @@ module Skylab::MetaHell
       nil
     end ]
     #
-    Puff_facet_muxer_ = Puff_const_.curry[ :FIELD_FACET_MUXER_, -> cli do
-      Puff_facet_muxer_reader_[ cli ]
-      Free_Muxer_.new cli
-    end ]
+    Puff_const_with_dupe_for_ = -> p, c, mod do
+      FUN::Puff_constant_[ false, -> _ do
+        if mod.const_defined? c
+          mod.const_get( c ).dupe_for mod
+        else
+          p[ mod ]
+        end
+      end, c, mod, nil ]
+    end
+    #
+    Puff_facet_muxer_ = Puff_const_with_dupe_for_.curry[
+      -> cli do
+        Puff_facet_muxer_reader_[ cli ]
+        Free_Muxer_.new cli
+      end,
+      :FIELD_FACET_MUXER_ ]
     #
     Puff_facet_muxer_reader_ = Puff_singleton_method_.
         curry[ :public, :facet_muxer, -> do
@@ -168,6 +168,7 @@ module Skylab::MetaHell
 
     class Box_ < MetaHell::Services::Basic::Box
       def initialize
+        @field_attributes = nil
         super()
         @h.default_proc = -> h, k do
           raise ::ArgumentError, "unrecognized keyword #{ FUN::Parse::
@@ -181,6 +182,7 @@ module Skylab::MetaHell
       def dupe
         a = @a ; h = @h
         self.class.allocate.instance_exec  do
+          @field_attributes = nil
           @a = a.dup ; @h = h.dup
           self
         end
@@ -188,18 +190,40 @@ module Skylab::MetaHell
       def dupe_for _
         dupe
       end
+      def set next_field, *a
+        :next_field == next_field or raise ::ArgumentError, 'no'
+        @field_attributes and fail "sanity - clobber field attributes?"
+        @field_attributes = Field_Attributes_.new( *a )
+        nil
+      end
+      def delete_field_attributes
+        if (( fa = @field_attributes ))
+          @field_attributes = nil
+          fa
+        end
+      end
+      def has_field_attributes
+        @field_attributes
+      end
+    end
+    #
+    class Field_Attributes_
+      MetaHell::FUN.fields[ self, :desc ]
+      attr_reader :desc
     end
 
     class Aspect_  # (apprentice/redux of Basic::Field)
       def initialize method_i, block=nil
         @method_i = method_i
         @ivar = :"@#{ method_i }"
+        @as_slug = method_i.to_s.gsub '_', '-'
         block and block[ self ]
         freeze  # dupe with impunity
       end
-      attr_reader :method_i, :ivar
+      attr_reader :method_i, :ivar, :as_slug
       alias_method :local_normal_name, :method_i
       attr_reader :is_required  # where available
+      attr_accessor :desc_p
     end
 
     class Free_Muxer_

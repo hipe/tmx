@@ -58,7 +58,15 @@ module Skylab::MetaHell
         client = eval 'self', blk.binding
         box = Puff_client_and_give_box_[ :absorb, client ]
         Method_Added_Muxer_[ client ].in_block_each_method_added blk do |m|
-          box.add m, Field_From_Method_.new( m )
+          if box.has_field_attributes
+            fa = box.delete_field_attributes
+            p = -> fld do
+              if (( x = fa.desc ))
+                fld.desc_p = x.respond_to?( :call ) ? x : -> y { y << x }
+              end
+            end
+          end
+          box.add m, Field_From_Method_.new( m, p )
         end
         nil
       end
@@ -70,5 +78,20 @@ module Skylab::MetaHell
         end
       end
     end
+
+    # an extreme hack exists that lets you add metadata to these nodes
+    # like so (for now)
+    #
+    #     class Foo
+    #       MetaHell::FUN::Fields_::From_.methods do
+    #         FIELDS_.set :next_field, :desc, -> y { y << "ok." }
+    #         def bar
+    #         end
+    #       end
+    #     end
+    #
+    #     Foo::FIELDS_[:bar].desc_p[ a = [ ] ]
+    #     a.first  # => "ok."
+
   end
 end

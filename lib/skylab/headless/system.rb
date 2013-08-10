@@ -18,8 +18,8 @@ module Skylab::Headless
       end
     end
 
-    define_singleton_method :system, MetaHell::FUN.memoize_to_const[
-      :SYSTEM_CLIENT_, -> { System::Client_.new } ]
+    define_singleton_method :system, MetaHell::FUN.memoize_to_const_method[
+      -> { System::Client_.new }, :SYSTEM_CLIENT_ ]
 
     def self.defaults
       System::DEFAULTS_

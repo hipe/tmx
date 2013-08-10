@@ -75,5 +75,23 @@ module Skylab::MetaHell::TestSupport::FUN::Fields_::From_
         end
       end
     end
+    context "an extreme hack exists that lets you add metadata to these nodes" do
+      Sandbox_2 = Sandboxer.spawn
+      it "like so (for now)" do
+        Sandbox_2.with self
+        module Sandbox_2
+          class Foo
+            MetaHell::FUN::Fields_::From_.methods do
+              FIELDS_.set :next_field, :desc, -> y { y << "ok." }
+              def bar
+              end
+            end
+          end
+
+          Foo::FIELDS_[:bar].desc_p[ a = [ ] ]
+          a.first.should eql( "ok." )
+        end
+      end
+    end
   end
 end

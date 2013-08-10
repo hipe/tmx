@@ -75,7 +75,7 @@ module Skylab::Test
         :paystream,
         [ :pretty_path, :ivar ],
         :run_mode,
-        :get_expression_agent
+        :some_expression_agent
 
     end
 
@@ -119,7 +119,7 @@ module Skylab::Test
     end
 
     def execute_each_action_on_queue
-      act_a = action_a
+      r = nil ; act_a = action_a
       while act_i = @queue_a.shift  # not using reduce b.c 1 stack frame
         @last_action_name_i = act_i
         r = if (( act = act_a.detect { |a| act_i == a.local_normal_name } ))
@@ -127,9 +127,13 @@ module Skylab::Test
         else
           send act_i  # e.g 'help'
         end
-        r or break( early_exit_notice r )
+        if r
+          true == r or break process_takeover_notice
+        else
+          break early_exit_notice r
+        end
       end
-      nil
+      r
     end
 
     def action_a
@@ -197,13 +201,31 @@ module Skylab::Test
 
     def early_exit_notice r
       if @queue_a.length.nonzero? and false != r
-        i = @last_action_name_i ; a = @queue_a
-        @info_y << Headless::NLP::EN.calculate do
+        say_nonempty_queue do |i, a|
           "(notice - the #{ Lbl_[ i ] } action issued an early exit #{
             }before the #{ or_ a.map( & Lbl_ ) } action#{ s } had #{
             }a chance to run.)"
         end
+        nil
       end
+    end
+
+    def process_takeover_notice
+      if @queue_a.length.nonzero?
+        say_nonempty_queue do |i, a|
+          "(notice  - the #{ Lbl_[ i ] } action issued a process takeover #{
+            }before the #{ or_ a.map( & Lbl_ ) } action#{ s } had #{
+            }a chance to run.)"
+        end
+        nil
+      end
+    end
+
+    def say_nonempty_queue &blk
+      i = @last_action_name_i ; a = @queue_a
+      @info_y << ( Headless::NLP::EN.calculate do
+        instance_exec i, a, &blk
+      end )
       nil
     end
 
@@ -245,6 +267,9 @@ module Skylab::Test
         r = Queue_Resolver_.new( self ).execute or break
         r = ready or break
         r = execute_each_action_on_queue
+        if r and true != r  # :[#007] the significance of the result value
+          r = r.receiver.send r.method_name, * r.arguments
+        end
       end while nil
       r
     end
@@ -289,6 +314,7 @@ module Skylab::Test
     def help  # via :help
       info option_parser.banner
       option_parser.summarize { |s| info s }
+      nil  # <- whether you do nil or true here determines queue etc
     end
 
     #  ~ the boring ones ~
@@ -346,18 +372,40 @@ module Skylab::Test
       $PROGRAM_NAME
     end
 
-    def get_expression_agent
-      Expression_Agent_.new
+    def some_expression_agent
+      EXP_AG_P_[ nil ]
     end
 
+    EXP_AG_P_ = MetaHell::FUN::Puff_constant_.
+      curry[ false, -> _ { Expression_Agent_.new }, :EXPR_AGENT_, self ]
+
     class Expression_Agent_
+      alias_method :calculate, :instance_exec
       def ick msg
         "\"#{ msg }\""
       end
-      def kbd msg
+      def kb msg
         "`#{ msg }`"
       end
-      alias_method :calculate, :instance_exec
+      def kbd msg
+        ( @kbd ||= curry :green )[ msg ]
+      end
+      def hdr msg
+        ( @hdr ||= curry :green )[ msg ]
+      end
+      def multiline a
+        1 == a.length ? " #{ a[0] }" : "\n#{ a * "\n" }"
+      end
+      def or_ a
+        Headless::NLP::EN::Minitesimal::FUN.oxford_comma[ a, ' or ' ]
+      end
+      def par i
+        "<#{ i.to_s.gsub '_', '-' }>"
+      end
+    private
+      def curry x
+        Headless::CLI::Pen::FUN.curriable_stylize.curry[ [ * x ] ]
+      end
     end
   end
 

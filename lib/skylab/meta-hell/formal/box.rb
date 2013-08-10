@@ -33,11 +33,11 @@ module Skylab::MetaHell
       # so for a ref of "fo" against ["fo", "foo"], result is 2 matches.
       # # #todo - investiage a possible bug where the input token is longer
       # than the surface name but still matches
+      # (algorithms in this family are tracked by [#049])
 
       o[:fuzzy_reduce] = -> box, ref, tuple, collapse=nil do
         rx = /\A#{ ::Regexp.escape ref.to_s.downcase }/i
-        match = nil
-        matched_name = nil
+        match = matched_name = nil
         name_consumer = ::Enumerator::Yielder.new do |name|
           if rx =~ name.to_s
             match = true

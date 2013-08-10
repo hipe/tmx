@@ -12,6 +12,17 @@ module Skylab::MetaHell
       end
     end
 
+    # hack label
+    # like so -
+    #
+    #     P = MetaHell::FUN::Parse::Hack_label_
+    #     P[ :@foo_bar_x ] # => "foo bar"
+    #     P[ :some_method ]  # => "some method"
+
+    Hack_label_ = -> ivar_i do
+      ivar_i.to_s.gsub( /\A@|_[a-z]\z/, '' ).gsub( '_', ' ' )
+    end
+
     # fuzzy matcher
     # is a currier - it's a proc that generates other procs
     #
