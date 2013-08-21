@@ -534,178 +534,171 @@ module Skylab::Flex2Treetop
     end
     WRITEMODE_ = Headless::WRITEMODE_
   end
-end
 
-
-class Skylab::Flex2Treetop::Sexpesque < ::Array # class Sexpesque
-  class << self
-    def add_hook whenn, &what
-      @hooks ||= ::Hash.new{ |h,k| h[k] = [] }
-      @hooks[whenn].push(what)
-    end
-
-    def guess_node_name
-      m = to_s.match(/([^:]+)Sexp$/) and
-        m[1].gsub(/([a-z])([A-Z])/){ "#{$1}_#{$2}" }.downcase.intern
-    end
-
-    def hooks_for(whenn)
-      instance_variable_defined?('@hooks') ? @hooks[whenn] : []
-    end
-
-    def from_syntax_node name, node
-      new(name, node).extend SyntaxNodeHaver
-    end
-
-    def traditional name, *rest
-      new(name, *rest)
-    end
-
-    def hashy name, hash
-      new(name, hash).extend Hashy
-    end
-
-    attr_writer :node_name
-
-    def node_name *a
-      a.any? ? (@node_name = a.first) :
-      (instance_variable_defined?('@node_name') ? @node_name :
-        (@node_name = guess_node_name))
-    end
-
-    def list list
-      traditional(node_name, *list)
-    end
-
-    def terminal!
-      add_hook(:post_init){ |me| me.stringify_terminal_syntax_node! }
-    end
-  end
-
-  # all around here has been marked for confusion [#002]
-
-  def initialize name, *rest
-    super [name, *rest]
-    self.class.hooks_for(:post_init).each{ |h| h.call(self) }
-  end
-
-  def stringify_terminal_syntax_node!
-    self[1] = self[1].text_value
-    @syntax_node = nil
+  class Sexpesque < ::Array
     class << self
-      alias_method :my_text_value, :last
+      def add_hook whenn, &what
+        @hooks ||= ::Hash.new{ |h,k| h[k] = [] }
+        @hooks[whenn].push(what)
+      end
+
+      def guess_node_name
+        m = to_s.match(/([^:]+)Sexp$/) and
+          m[1].gsub(/([a-z])([A-Z])/){ "#{$1}_#{$2}" }.downcase.intern
+      end
+
+      def hooks_for(whenn)
+        instance_variable_defined?('@hooks') ? @hooks[whenn] : []
+      end
+
+      def from_syntax_node name, node
+        new(name, node).extend SyntaxNodeHaver
+      end
+
+      def traditional name, *rest
+        new(name, *rest)
+      end
+
+      def hashy name, hash
+        new(name, hash).extend Hashy
+      end
+
+      attr_writer :node_name
+
+      def node_name *a
+        a.any? ? (@node_name = a.first) :
+        (instance_variable_defined?('@node_name') ? @node_name :
+          (@node_name = guess_node_name))
+      end
+
+      def list list
+        traditional(node_name, *list)
+      end
+
+      def terminal!
+        add_hook(:post_init){ |me| me.stringify_terminal_syntax_node! }
+      end
     end
-  end
 
+    # all around here has been marked for confusion [#002]
 
-  module SyntaxNodeHaver
-    def syntax_node
-      instance_variable_defined?('@syntax_node') ? @syntax_node : last
+    def initialize name, *rest
+      super [name, *rest]
+      self.class.hooks_for(:post_init).each{ |h| h.call(self) }
     end
-  end
 
+    def stringify_terminal_syntax_node!
+      self[1] = self[1].text_value
+      @syntax_node = nil
+      class << self
+        alias_method :my_text_value, :last
+      end
+    end
 
-  module Hashy
-    class << self
-      def extended obj
-        class << obj
-          alias_method :children, :last
+    module SyntaxNodeHaver
+      def syntax_node
+        instance_variable_defined?('@syntax_node') ? @syntax_node : last
+      end
+    end
+
+    module Hashy
+      class << self
+        def extended obj
+          class << obj
+            alias_method :children, :last
+          end
         end
       end
     end
-  end
-end
+  end  # Sexpesque
 
-
-module Skylab::Flex2Treetop::CommonNodey
-  Sexpesque = ::Skylab::Flex2Treetop::Sexpesque
-  def at(str); ats(str).first end
-  def ats path
-    path = at_compile(path) if path.kind_of?(::String)
-    here = path.first
-    cx = (here == '*') ? elements : (elements[here] ? [elements[here]] : [])
-    if path.size > 1 && cx.any?
-      child_path = path[1..-1]
-      cx = cx.map do |c|
-        c.extend(::Skylab::Flex2Treetop::CommonNodey) unless
-          c.respond_to?(:ats)
-        c.ats(child_path)
-      end.flatten
-    end
-    cx
-  end
-  def at_compile str
-    res = []
-    s = ::StringScanner.new(str)
-    begin
-      if s.scan(/\*/)
-        res.push '*'
-      elsif s.scan(/\[/)
-        d = s.scan(/\d+/) or fail("expecting digit had #{s.rest.inspect}")
-        s.scan(/\]/) or fail("expecting ']' had #{s.rest.inspect}")
-        res.push d.to_i
-      else
-        fail("expecting '*' or '[' near #{s.rest.inspect}")
+  module CommonNodey
+    def at(str); ats(str).first end
+    def ats path
+      path = at_compile(path) if path.kind_of?(::String)
+      here = path.first
+      cx = (here == '*') ? elements : (elements[here] ? [elements[here]] : [])
+      if path.size > 1 && cx.any?
+        child_path = path[1..-1]
+        cx = cx.map do |c|
+          c.extend(::Skylab::Flex2Treetop::CommonNodey) unless
+            c.respond_to?(:ats)
+          c.ats(child_path)
+        end.flatten
       end
-    end until s.eos?
-    res
-  end
-  def sexp_at str
-    # (n = at(str)) ? n.sexp : nil
-    n = at(str) or return nil
-    n.respond_to?(:sexp) and return n.sexp
-    n.text_value == '' and return nil
-    fail("where is sexp for n")
-  end
-  def sexps_at str
-    ats(str).map(&:sexp)
-  end
-  def composite_sexp my_name, *children
-    with_names = {}
-    children.each do |name|
-      got = send(name)
-      sexp =
-        if got.respond_to?(:sexp)
-          got.sexp
+      cx
+    end
+    def at_compile str
+      res = []
+      s = ::StringScanner.new(str)
+      begin
+        if s.scan(/\*/)
+          res.push '*'
+        elsif s.scan(/\[/)
+          d = s.scan(/\d+/) or fail("expecting digit had #{s.rest.inspect}")
+          s.scan(/\]/) or fail("expecting ']' had #{s.rest.inspect}")
+          res.push d.to_i
         else
-          fail('why does "got" have no sexp')
+          fail("expecting '*' or '[' near #{s.rest.inspect}")
         end
-      with_names[name] = sexp
+      end until s.eos?
+      res
     end
-    if my_name.kind_of? ::Class
-      my_name.hashy(my_name.node_name, with_names)
-    else
-      Sexpesque.hashy(my_name, with_names)
+    def sexp_at str
+      # (n = at(str)) ? n.sexp : nil
+      n = at(str) or return nil
+      n.respond_to?(:sexp) and return n.sexp
+      n.text_value == '' and return nil
+      fail("where is sexp for n")
+    end
+    def sexps_at str
+      ats(str).map(&:sexp)
+    end
+    def composite_sexp my_name, *children
+      with_names = {}
+      children.each do |name|
+        got = send(name)
+        sexp =
+          if got.respond_to?(:sexp)
+            got.sexp
+          else
+            fail('why does "got" have no sexp')
+          end
+        with_names[name] = sexp
+      end
+      if my_name.kind_of? ::Class
+        my_name.hashy(my_name.node_name, with_names)
+      else
+        Sexpesque.hashy(my_name, with_names)
+      end
+    end
+    def list_sexp *foos
+      foos.compact!
+      foos # yeah, that's all this does
+    end
+    def auto_sexp
+      if respond_to?(:sexp_class)
+        sexp_class.from_syntax_node(sexp_class.node_name, self)
+      elsif ! elements.nil? && elements.index{ |n| n.respond_to?(:sexp) }
+        cx = elements.map{ |n| n.respond_to?(:sexp) ? n.sexp : n.text_value }
+        ::Skylab::Flex2Treetop::AutoSexp.traditional(guess_node_name, *cx)
+      else
+        ::Skylab::Flex2Treetop::AutoSexp.traditional(guess_node_name, text_value)
+      end
+    end
+    def guess_node_name
+      m = singleton_class.ancestors.first.to_s.match(/([^:0-9]+)\d+$/)
+      if m
+        m[1].gsub(/([a-z])([A-Z])/){ "#{$1}_#{$2}" }.downcase.intern
+      else
+        fail("what happen")
+      end
+    end
+    def singleton_class
+      @sc ||= class << self; self end
     end
   end
-  def list_sexp *foos
-    foos.compact!
-    foos # yeah, that's all this does
-  end
-  def auto_sexp
-    if respond_to?(:sexp_class)
-      sexp_class.from_syntax_node(sexp_class.node_name, self)
-    elsif ! elements.nil? && elements.index{ |n| n.respond_to?(:sexp) }
-      cx = elements.map{ |n| n.respond_to?(:sexp) ? n.sexp : n.text_value }
-      ::Skylab::Flex2Treetop::AutoSexp.traditional(guess_node_name, *cx)
-    else
-      ::Skylab::Flex2Treetop::AutoSexp.traditional(guess_node_name, text_value)
-    end
-  end
-  def guess_node_name
-    m = singleton_class.ancestors.first.to_s.match(/([^:0-9]+)\d+$/)
-    if m
-      m[1].gsub(/([a-z])([A-Z])/){ "#{$1}_#{$2}" }.downcase.intern
-    else
-      fail("what happen")
-    end
-  end
-  def singleton_class
-    @sc ||= class << self; self end
-  end
-end
 
-module Skylab::Flex2Treetop
   class CommonNode < ::Treetop::Runtime::SyntaxNode
     include CommonNodey
   end
@@ -716,9 +709,7 @@ module Skylab::Flex2Treetop
   class AutoNode < CommonNode
     include AutoNodey
   end
-end
 
-module Skylab::Flex2Treetop
   module RuleWriter
   end
   class RuleWriter::Rule < ::Struct.new :request_client, :rule_name,
@@ -926,9 +917,6 @@ module Skylab::Flex2Treetop
       end
     end
   end
-end
-
-module Skylab::Flex2Treetop
 
   class ProgressiveOutputAdapter
     def initialize out
@@ -960,34 +948,33 @@ module Skylab::Flex2Treetop
       @ruby.<<(*a)
     end
   end
-end
 
+  PARSER_EXTLIB = lambda do |_|
+    # CompiledParser#failure_reason overridden for less context
+    def failure_reason
+      return nil unless (tf = terminal_failures) && tf.size > 0
+      "Expected " +
+        ( tf.size == 1 ?
+          tf[0].expected_string.inspect :
+          "one of #{tf.map{|f| f.expected_string.inspect}.uniq*', '}"
+        ) + " at line #{failure_line}, column #{failure_column} " +
+        "(byte #{failure_index+1}) after#{my_input_excerpt}"
+    end
 
-Skylab::Flex2Treetop::PARSER_EXTLIB = lambda do |_|
-  # CompiledParser#failure_reason overridden for less context
-  def failure_reason
-    return nil unless (tf = terminal_failures) && tf.size > 0
-    "Expected " +
-      ( tf.size == 1 ?
-        tf[0].expected_string.inspect :
-        "one of #{tf.map{|f| f.expected_string.inspect}.uniq*', '}"
-      ) + " at line #{failure_line}, column #{failure_column} " +
-      "(byte #{failure_index+1}) after#{my_input_excerpt}"
-  end
+    def num_lines_ctx; 4 end
 
-  def num_lines_ctx; 4 end
-
-  def my_input_excerpt
-    num = num_lines_ctx
-    slicey = input[index...failure_index]
-    all_lines = slicey.split("\n", -1)
-    lines = all_lines.slice(-1 * [all_lines.size, num].min, all_lines.size)
-    nums = failure_line.downto(
-      [1, failure_line - num + 1].max).to_a.reverse
-    w = nums.last.to_s.size # greatest line no as string, how wide?
-    ":\n" + nums.zip(lines).map do |no, line|
-      ("%#{w}i" % no) + ": #{line}"
-    end.join("\n")
+    def my_input_excerpt
+      num = num_lines_ctx
+      slicey = input[index...failure_index]
+      all_lines = slicey.split("\n", -1)
+      lines = all_lines.slice(-1 * [all_lines.size, num].min, all_lines.size)
+      nums = failure_line.downto(
+        [1, failure_line - num + 1].max).to_a.reverse
+      w = nums.last.to_s.size # greatest line no as string, how wide?
+      ":\n" + nums.zip(lines).map do |no, line|
+        ("%#{w}i" % no) + ": #{line}"
+      end.join("\n")
+    end
   end
 end
 
@@ -1168,4 +1155,3 @@ end
 end
 end
 GRAMMAR
-#erase me
