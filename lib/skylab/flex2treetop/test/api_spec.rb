@@ -3,6 +3,7 @@ require_relative 'my-test-support'
 module Skylab::Flex2Treetop::MyTestSupport
 
   describe Skylab::Flex2Treetop do
+
     extend API::ModuleMethods ; include API::InstanceMethods # kept for poster.
 
     context "has an API that" do
@@ -15,7 +16,6 @@ module Skylab::Flex2Treetop::MyTestSupport
         end
       end
 
-
       context "1.2 : when you request the 'version' action" do
         it "returns the version string" do
           promise = Flex2Treetop::API.invoke :version
@@ -23,7 +23,6 @@ module Skylab::Flex2Treetop::MyTestSupport
           promise.should match( /\A[ 0-9a-z]+ \d+(?:\.\d+)*\z/i )
         end
       end
-
 
       context "when you request the 'translate' action" do
 
