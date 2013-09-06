@@ -271,6 +271,7 @@ module Skylab::MetaHell
       otr.initialize_base_copy self
       otr
     end
+  public
     define_method :get_box_base_copy, Formal::Box::Get_base_copy__
   protected
     def initialize_base_copy otr

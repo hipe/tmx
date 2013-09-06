@@ -51,13 +51,15 @@ module Skylab::Bnf2Treetop::TestSupport
       end
     end
   end
+
   module CLI::InstanceMethods
-    include ::Skylab::Headless::CLI::Pen::InstanceMethods
 
     FIXTURES = ::Pathname.new(File.expand_path('../../fixtures', __FILE__))
 
     def debug! ; _frame.debug_p.call end
     def err    ; _frame.err_p.call   end
     def out    ; _frame.out_p.call   end
+
+    define_method :unstyle, & ::Skylab::Headless::CLI::Pen::FUN.unstyle
   end
 end

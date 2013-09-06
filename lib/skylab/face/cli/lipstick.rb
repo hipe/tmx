@@ -85,23 +85,9 @@ module Skylab::Face
       @instance
     end
 
-    -> do  # `self.cols`
-
-      first = true ; cols = nil
-      define_singleton_method :cols do
-        if first
-          first = false
-          # (we used to rescue ::LoadError, could again)
-          MetaHell::FUN.without_warning do
-            Services::Ncurses.initscr
-            # snowleopard-ncurses ncurses_wrap.c:1951 @todo easy patch
-          end
-          cols = ::Ncurses.COLS
-          ::Ncurses.endwin
-        end
-        cols
-      end
-    end.call
+    def self.cols
+      80  # #ncurses
+    end
   end
 
   CLI::Lipstick::Class__ =

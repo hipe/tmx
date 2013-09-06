@@ -188,10 +188,10 @@ module Skylab::Bnf2Treetop
     def version ; infostream.puts("#{program_name} #{version_string}") end
     # --*--
     CODES = { bold: 1, green: 32 }
-    def stylize str, *a           # away at [#bn-005]
-      "\e[#{ a.map{ |s| CODES[s] }.compact.join(';') }m#{str}\e[0m"
+    Stylize_ = -> a, str do  # #redundant [#hl-029]:[#007]
+      "\e[#{ a.map( & CODES.method( :[] ) ).compact * ';' }m#{ str }\e[0m"
     end
-    def em str ; stylize(str, :bold, :green ) end
+    define_method :em, & Stylize_.curry[ [ :bold, :green ] ]
   end
 
   class CLI::Client < ::Struct.new(:paystream, :infostream, :upstream,

@@ -29,7 +29,7 @@ module Skylab::Face
     o = { }
     o[:Basic] = subsys # `fields` used extensively by API API
     o[:Headless] = subsys # used extensively everywhere
-    o[:Ncurses] = stdlib
+    # o[:Ncurses] = stdlib  # #ncurses
     o[:OptionParser] = -> _ { require 'optparse' ; ::OptionParser }  # crucial
     o[:Open3] = stdlib
     o[:Porcelain] = subsys  # option parser abtract modelling

@@ -1,3 +1,4 @@
+[#007]       #redundant s-tylize method
 [#006]       #defined-in-situ
 [#005]       #doc-point this strange hybrid explained..
 [#004] #open hl upfactor
