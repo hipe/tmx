@@ -29,6 +29,17 @@ module Skylab::Test
     end
   end
 
+  class Plugins::Subtree::Services__
+
+    def initialize p
+      @p = p
+    end
+
+    def any_test_pn_a_for_subproject_i i
+      @p[ i ]
+    end
+  end
+
   class Plugins::Subtree::Client
 
     Headless::Plugin::Host.enhance self do
@@ -61,6 +72,10 @@ module Skylab::Test
 
     end
 
+    def services
+      @services ||= Plugins::Subtree::Services__.new any_test_pn_a_for_subproject_i_p
+    end
+
     include Merge_Options_
 
     available_options do |op, ctx_a|
@@ -84,15 +99,28 @@ module Skylab::Test
       emit_eventpoint :conclude, y
     end
 
-  private
-
-    # ~ in vaguely narrative pre-order with occasional aesthetic pyramiding ~
-    # ~ from the simplest of upstream targets: `files` ~
-
     def initialize( * )
       super
       @sort_mtx = Headless::Services::Basic::Mutex::Write_Once.new
     end
+
+  private
+
+    def any_test_pn_a_for_subproject_i_p
+      subproject_cache.any_test_pn_a_for_subproject_i_p
+    end
+
+    def all_subproducts
+      subproject_cache.all_subproject_a
+    end
+
+    def subproject_cache
+      @subproject_cache ||= Subtree::Subproject_Cache_.new project_hub_pathname
+    end
+
+    def project_hub_pathname  # hardcoded currently but we would like for this
+      ::Skylab.dir_pathname   # to be mutable so it could be used for strange
+    end                       # projects, but that will require design.
 
     def hot_spec_paths
       # implement the (plugin) service that is kind of the central workhorse
@@ -119,15 +147,15 @@ module Skylab::Test
         end
         sp_cache_a = [ ]
         all_subproducts.each do |sp|
-          a = nil
-          sp.all_spec_paths.each do |pn|
+          nil_or_a = sp.some_test_paths.reduce nil do |m, pn|
             ag.if_pass sp, pn, -> do
-              ( a ||= [ ] ) << pn
+              ( m ||= [ ] ) << pn
               true
-            end or break
+            end or break( m )  # short circuit when `conflict_a` touched
+            m
           end
           conflict_a and break
-          sp_cache_a << [ sp, a ]
+          sp_cache_a << [ sp, nil_or_a ]
         end
         r = -> do
           conflict_a and break report_conflicts( conflict_a )
@@ -147,24 +175,6 @@ module Skylab::Test
         r
       end
     end
-
-    -> do  # `all_subproducts`
-
-      white_rx = /\A[-a-z0-9]+\z/
-
-      define_method :all_subproducts do
-        ::Enumerator.new do |y|
-          pn_a = ::Pathname.glob "#{ ::Skylab.dir_pathname }/*"
-          pn_a.each do |pn|
-            slug_s = pn.basename.to_s
-            if white_rx =~ slug_s
-              y << Plugins::Subtree::Subproduct_.new( slug_s, pn )
-            end
-          end
-          nil
-        end
-      end
-    end.call
 
     def build_aggregated_agent * func_tuple
       y = [ ]
@@ -244,55 +254,93 @@ module Skylab::Test
       ok or iy << "won't procede further because of the above."
       ok
     end
+
+    Subtree = Plugins::Subtree
   end
 
-  class Plugins::Subtree::Subproduct_
+  module Plugins::Subtree
 
-    def initialize slug, dir_pathname
-      @dir_pathname = dir_pathname
-      @local_normal_name = slug.intern
-    end
+    class Subproject_Cache_  # wrap this up: we get the full tree via two
+      # filesystem hits exposed by two respective surface members neither
+      # of which is prerequisite for the other: 1) we will glob only once
+      # for *all* test paths in the whole project, even if those for only
+      # one subproject are requested; behind the rationale that the extra
+      # filesystem overhead is neglible, and hopefully the extra storage/
+      # construction overhead too (with our big hash), with the rationale
+      # in turn that in practice we more often do operations accross sub-
+      # project boundaries than within any one subproject. the second hit
+      # is to glob for all the subproject dirs (& here is the main point)
+      # which is necessary in addition to the first hit when one wants to
+      # reveal all subproject names including those with no tests in them
 
-    attr_reader :local_normal_name, :dir_pathname
-
-    def slug
-      @slug ||= @local_normal_name.to_s
-    end
-
-    def test_dir_pn
-      @test_dir_pn ||= @dir_pathname.join( TEST_DIR_ )
-    end
-
-    -> do  # `all_spec_paths`
-      spec_paths_cache = nil
-      define_method :all_spec_paths do
-        spec_paths_cache[ @local_normal_name ]
+      def initialize project_hub_pathname
+        @project_hub_pn = project_hub_pathname
       end
 
-      cache_h = build_cache_h = nil ; empty_a = [ ].freeze  # ocd
-      spec_paths_cache = -> norm do
-        cache_h ||= build_cache_h[ ]
-        cache_h.fetch norm do empty_a end
+      def all_subproject_a
+        @all_subproject_a ||= get_subproject_a.freeze
       end
 
-      rx = %r|\G[-a-z0-9]+(?=/)|
-      build_cache_h = -> do
-        a = ::Pathname.glob ::Skylab.dir_pathname.join(
-          "*/#{ TEST_DIR_ }/**/*#{ ::Skylab::TestSupport::FUN::Spec_rb[] }" )
-        offset = ::Skylab.dir_pathname.to_s.length + 1
-        prev = oa = nil
-        a.reduce( { } ) do |h, pn|
-          md = rx.match( pn.to_s, offset ) or fail "wat - #{ pn }"
-          slug = md[0].intern
-          if prev != slug
-            oa.freeze if oa
-            prev = slug
-            h[ slug ] = ( oa = [ ] )
-          end
-          oa << pn
-          h
+      def any_test_pn_a_for_subproject_i_p
+        @p ||= build_p
+      end
+
+    private
+
+      def get_subproject_a  # 2 dimensional "get" (in the ObjectiveC sense)
+        p = any_test_pn_a_for_subproject_i_p ; ppn = @project_hub_pn
+        all_subproject_i_a.map do |dir_i|
+          Plugins::Subtree::Subproduct_.new ppn, p, dir_i
         end
       end
-    end.call
+
+      def all_subproject_i_a
+        @all_subproject_i_a ||=
+          ::Pathname.glob( "#{ @project_hub_pn }/*" ).reduce( [] ) do |m, pn|
+          WHITE_RX_ =~ (( stem_s = pn.basename.to_s )) or break m
+          m << stem_s.intern
+        end.freeze
+      end
+      #
+      WHITE_RX_ = /\A[-a-z0-9]+\z/
+
+      def build_p
+        hublen = (( hub_pn = @project_hub_pn )).to_s.length + 1
+        ::Pathname.glob( hub_pn.join(
+          "*/#{ UNIVERSAL_TEST_DIR_RELPATH_ }/**/*#{ ::Skylab::TestSupport::FUN::Spec_rb[] }"
+        )).group_by do |pn|
+          FIRST_DIR_RX_.match( pn.to_s, hublen ).to_s.intern
+        end.method :[]
+      end
+      #
+      FIRST_DIR_RX_ = %r|\G[-a-z0-9]+(?=/)|
+    end
+
+    class Subproduct_
+
+      def initialize project_hub_pn, any_test_pn_a_p, dir_i
+        @any_test_pn_a_p = any_test_pn_a_p
+        @local_normal_name = dir_i
+        @dir_pathname = project_hub_pn.join dir_i.to_s
+      end
+
+      attr_reader :local_normal_name, :dir_pathname
+
+      def slug
+        @slug ||= @local_normal_name.to_s
+      end
+
+      def test_dir_pn
+        @test_dir_pn ||= @dir_pathname.join UNIVERSAL_TEST_DIR_RELPATH_
+      end
+
+      def any_test_pn_a
+        @any_test_pn_a_p[ @local_normal_name ]
+      end
+
+      def some_test_paths
+        any_test_pn_a || MetaHell::EMPTY_A_
+      end
+    end
   end
 end

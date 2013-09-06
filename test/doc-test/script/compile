@@ -7,7 +7,7 @@ if [[ ! -d "$datadir" ]] ; then
 fi
 
 eval $( "lib/skylab/test-support/script/bash-value-export" )
-  # the above sets `_spec_rb`
+  # the above sets `test_file_tail`
 
 cat "$datadir/files" | while read line
 do
@@ -19,7 +19,7 @@ do
     read r1 r2 <<<$(IFS=' '; echo "$haha")
     i="tmx regret doc-test -vv $file"
     if [ -z "$out" ] ; then
-      out="lib/skylab/$r1/test/$r2$_spec_rb"
+      out="lib/skylab/$r1/test/$r2$test_file_tail"
     fi
     _cmd="$i > $out"
     echo "$_cmd"

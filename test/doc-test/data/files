@@ -2,6 +2,7 @@ lib/skylab/basic/hash/order-proxy.rb
 lib/skylab/basic/hash/pair-enumerator.rb
 lib/skylab/basic/list/scanner.rb
 lib/skylab/basic/method.rb
+lib/skylab/basic/method/curry/unbound-.rb
 lib/skylab/basic/pathname/union.rb
 lib/skylab/test/rotating-buffer_spec.rb
 lib/skylab/basic/struct.rb

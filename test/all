@@ -75,7 +75,8 @@ module Skylab::Test
         :paystream,
         [ :pretty_path, :ivar ],
         :run_mode,
-        :some_expression_agent
+        :some_expression_agent,
+        :any_adapter_services_for
 
     end
 
@@ -404,7 +405,17 @@ module Skylab::Test
       end
     private
       def curry x
-        Headless::CLI::Pen::FUN.curriable_stylize.curry[ [ * x ] ]
+        Headless::CLI::Expression::FUN.curriable_stylize.curry[ [ * x ] ]
+      end
+    end
+
+    def any_adapter_services_for adapter_i
+      (( @adapter_mod_h ||= { } )).fetch adapter_i do |i|
+        if (( adapter_mod = ::Skylab::Test::Adapters[ adapter_i ] ))
+          any_client = adapter_mod.const_get( :Services_, false ).
+            new adapter_mod, fetch_hot_plugin_by_name( :subtree ).services
+        end
+        @adapter_mod_h[ i ] = any_client
       end
     end
   end

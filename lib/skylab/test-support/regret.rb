@@ -57,11 +57,13 @@ module ::Skylab::TestSupport
 
         o[ :ModuleMethods, -> do
           pam and include pam.module_methods_module
-          define_method :nearest_test_node do test_module_me end
+          method_defined? :nearest_test_node or
+            define_method :nearest_test_node do test_module_me end
+          # (2 reasons one of which is this triggers warnings when multiparent)
         end ]
 
         o[ :InstanceMethods, -> do
-          extend ::Skylab::MetaHell::Let::ModuleMethods # or fly solo .. #rspec
+          extend ::Skylab::MetaHell::Let::ModuleMethods  # or fly solo .. #rspec
           pam and include pam.instance_methods_module
         end ]
 

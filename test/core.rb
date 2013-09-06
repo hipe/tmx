@@ -12,7 +12,7 @@ module Skylab::Test
     const_set i, ::Skylab.const_get( i, false )
   end
 
-  TEST_DIR_ = 'test'
+  UNIVERSAL_TEST_DIR_RELPATH_ = 'test'.freeze
 
   ::Skylab::Subsystem[ self ]
 
