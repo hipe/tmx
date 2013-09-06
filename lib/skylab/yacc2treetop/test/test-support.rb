@@ -1,4 +1,5 @@
-require_relative '../load'
+load ::File.expand_path( '../../../../../bin/tmx-yacc2treetop', __FILE__ )
+require_relative '../..'
 require 'skylab/test-support/core'
 require 'skylab/headless/core' # unstyle
 
@@ -34,8 +35,8 @@ module Skylab::Yacc2Treetop::TestSupport
       end
     end
   end
+
   module CLI::InstanceMethods
-    include ::Skylab::Headless::CLI::Pen::InstanceMethods # unstyle
 
     FIXTURES = ::Pathname.new(File.expand_path('../fixtures', __FILE__))
     INVITE_RX = /\Ayacc2treetop -h for help\z/
@@ -48,5 +49,7 @@ module Skylab::Yacc2Treetop::TestSupport
       err.shift.should match(USAGE_RX)
       err.size.should eql(0)
     end
+
+    define_method :unstyle, & ::Skylab::Headless::CLI::Pen::FUN.unstyle
   end
 end

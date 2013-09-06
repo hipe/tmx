@@ -546,15 +546,17 @@ module Skylab::Yacc2Treetop
     def sexp_class
       nil # ovverride in the grammar or syntax node if necessary
     end
-    def sexp_class_guess(name)
-      mod = Standardy.modules[ self.singleton_class.ancestors[0].to_s.
-        match(/\A(.+)::[^:]+::[^:]+\Z/)[1] ]
+    def sexp_class_guess name
+      modul = Resolve_some_descriptive_module_[ self ]
+      _thing = modul.name.match( RX__ )[1]
+      mod = Standardy.modules[ _thing ]
       cls = name.to_s.gsub(/([a-z])_([a-z])/){ "#{$1}#{$2.upcase}" }.
         sub(/^([a-z])/){ $1.upcase } << "Sexp"
       mod.const_defined?(cls) and return mod.const_get(cls)
       mod.const_defined?(:MySexp) and return mod.const_get(:MySexp)
       return Sexpesque
     end
+    RX__ = /\A(.+)::[^:]+::[^:]+\Z/
     def sexp_node_name
       guess_node_name
     end
@@ -581,7 +583,8 @@ module Skylab::Yacc2Treetop
       sexps
     end
     def guess_node_name
-      m = singleton_class.ancestors.first.to_s.match(/([^:]*[^:0-9])\d+$/)
+      mod = Resolve_some_descriptive_module_[ self ]
+      m = mod.name.match %r(([^:]*[^:0-9])\d+$)
       m[1].gsub(/([a-zA-Z])([A-Z])/){ "#{$1}_#{$2}" }.downcase.intern if m
     end
   # alternate version below, does last not first. keep it lying around for now
@@ -809,7 +812,7 @@ module Skylab::Yacc2Treetop
         b.rule_declaration(use_name) do
           q = PpRhs.new(c.out, c[:width] || 79, c)
           q.guard_inspect_key do # very very unlikely to be necessary but meh
-            b.write "".indent(b.level)
+            b.write ONE_SINGLE_SPACE__ * b.level
             q.nest(b.level) do
               until_end { |ch| q.pp_rhs(ch) }
             end
@@ -819,6 +822,7 @@ module Skylab::Yacc2Treetop
         end
       end
     end
+    ONE_SINGLE_SPACE__ = ' '.freeze
     class SequenceSexp < MySexp
       def pretty_print_rhs q
         q.group(1) {
@@ -877,6 +881,11 @@ module Skylab::Yacc2Treetop
         }
       end
     end
+  end
+
+  Resolve_some_descriptive_module_ = -> modul do
+    a = modul.singleton_class.ancestors
+    a.detect { |mod| ::Module == mod.class } or self._WAT
   end
 end
 

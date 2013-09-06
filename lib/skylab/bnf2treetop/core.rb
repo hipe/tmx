@@ -1,7 +1,10 @@
 
 #                     ~ [#bn-005] explains it all ~
 
-load ::File.expand_path( '../../../../bin/tmx-bnf2treetop', __FILE__ )
+if ! defined? ::Skylab::Bnf2Treetop
+  load ::File.expand_path( '../../../../bin/tmx-bnf2treetop', __FILE__ )
+  # we won't know if the tmx specs run before our own do
+end
 
 module Skylab::BNF_2_Treetop
   module CLI
