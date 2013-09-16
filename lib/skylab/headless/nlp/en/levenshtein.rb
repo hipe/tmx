@@ -4,36 +4,35 @@ module Skylab::Headless
 
     module EN
 
-      module Levenshtein_
+      module Levenshtein
 
         # we love levenshtein
         # reduce a big list to a small list
         #
-        #     Or_ = Headless::NLP::EN::Levenshtein_::Templates_::Or_
+        #     Closest_items_to_item = Headless::NLP::EN::Levenshtein::
+        #       With_conj_s_render_p_closest_n_items_a_item_x.
+        #         curry[ ' or ', -> x { x.inspect }, 3 ]
         #     a = [ :zepphlyn, :beefer, :bizzle, :bejonculous, :wangton ]
         #     strange_x = :bajofer
-        #     or_s = Or_[ a, strange_x, 3, -> x { x.inspect } ]
+        #     or_s = Closest_items_to_item[ a, strange_x ]
         #
         #     msg = "'#{ strange_x }' was not found. did you mean #{ or_s }?"
         #     msg # => "'bajofer' was not found. did you mean :beefer, :bizzle or :wangton?"
 
-        module Templates_
-
-          p = -> conj, render_p, closest_n, item_a, outside_x do
-            if (( a = Lev_[ closest_n, item_a, outside_x ] ))
-              a.map!( & render_p )
-              EN::Minitesimal::FUN.oxford_comma[ a, conj ]
-            end
-          end
-
-          inner_or = p.curry[ ' or ' ]
-
-          Or_ = -> item_a, outside_x, closest_n=3, rndr_p=MetaHell::IDENTITY_ do
-            inner_or[ rndr_p, closest_n, item_a, outside_x ]
+        With_conj_s_render_p_closest_n_items_a_item_x =
+            -> conj, render_p, closest_n, item_a, outside_x do
+          if (( a = Closest_n_items_to_item__[ closest_n, item_a, outside_x ] ))
+            a.map!( & render_p )
+            EN::Minitesimal::FUN.oxford_comma[ a, conj ]  # glob `conj` when ready
           end
         end
+        #
+        Closest_n_items_to_item__ = Headless::Services::InformationTactics::
+          Levenshtein::Closest_n_items_to_item
 
-        Lev_ = Headless::Services::Levenshtein_
+        Or_with_closest_n_items_to_item =
+          With_conj_s_render_p_closest_n_items_a_item_x.
+            curry[ ' or ', MetaHell::IDENTITY_ ]
       end
     end
   end

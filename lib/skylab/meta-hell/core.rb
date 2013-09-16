@@ -63,9 +63,7 @@ module Skylab::MetaHell
     private
 
       def build_indexed_bundles_callable
-        h = ::Hash.new do |_h, k|
-          raise ::KeyError, "not found '#{ k }' - did you mean #{ _h.keys * ' or ' }?"   # #todo lev
-        end
+        h = ::Hash.new( & method( :handle_bundle_not_found ) )
         constants.each do |const_i|
           x = const_get const_i, false
           k = if x.respond_to? :bundles_key then x.bundles_key
@@ -77,6 +75,17 @@ module Skylab::MetaHell
       end
       #
       UCASE_RANGE__ = 'A'.getbyte( 0 ) .. 'Z'.getbyte( 0 )
+      #
+      def handle_bundle_not_found h, k
+        raise ::KeyError, say_bundle_not_found( h, k )
+      end
+      def say_bundle_not_found h, k
+        _s = MetaHell::Services::Headless::NLP::EN::Levenshtein::
+          Or_with_closest_n_items_to_item[ FOUR__, h.keys, k ]
+        "not found #{ MetaHell::Services::Basic::FUN::Inspect[ k ] } - #{
+          } did you mean #{ _s }?"
+      end
+      FOUR__ = 4
     end
 
     class Item_Grammar  # implementation of "the item grammar" [#050]

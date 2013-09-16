@@ -57,7 +57,7 @@ module Skylab::Face::TestSupport::API::Proc
 
       def raise_same_error
         raise_error( ::ArgumentError,
-          /missing required parameter "wing"/ )
+          /missing required parameter ['"]wing['"]/ )
       end
 
       it "none 1 - barks" do
@@ -76,7 +76,7 @@ module Skylab::Face::TestSupport::API::Proc
         -> do
           nightclub::API::invoke :wah_hoo, waz: :x, taz: :y, wing: :z
         end.should raise_error( ::ArgumentError,
-          /undeclared parameters "waz" and "taz"/ )
+          /undeclared parameters ['"]waz['"] and ['"]taz['"]/ )
       end
 
       it "just right 1 (USES DEFAULTS) - works" do

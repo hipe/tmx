@@ -12,7 +12,7 @@ module Skylab::Basic
       end then
         x.inspect
       elsif ::Symbol === x
-        "\"#{ x }\""
+        "'#{ x }'"
       else
         "< a #{ x.class } >"
       end

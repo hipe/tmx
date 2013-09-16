@@ -176,8 +176,8 @@ module Skylab::MetaHell
         end
       end
       Lev__ = -> a, x do
-        MetaHell::Services::Headless::NLP::EN::Levenshtein_::Templates_::
-          Or_[ a, x ]
+        MetaHell::Services::Headless::NLP::EN::Levenshtein::
+          Or_with_closest_n_items_to_item.curry[ 3, a, x ]
       end
       def dupe
         a = @a ; h = @h

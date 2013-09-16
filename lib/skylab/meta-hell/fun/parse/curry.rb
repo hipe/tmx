@@ -126,7 +126,7 @@ module Skylab::MetaHell
           fld = op_box.fetch x do
             raise ::ArgumentError, "unrecognized element: #{ Parse::
               Strange_[ x ] }#{ any_context }#{
-              }#{ Lev_[ op_box.get_names, x ] if x.respond_to? :id2name }"
+              }#{ Lev__[ op_box.get_names, x ] if x.respond_to? :id2name }"
           end
           set_last_x x
           remove_from_curry_queue x
@@ -134,9 +134,14 @@ module Skylab::MetaHell
         end
         shell
       end
-      Lev_ = -> item_a, outside_x do
-        " - did you mean #{ MetaHell::Services::Headless::NLP::EN::
-          Levenshtein_::Templates_::Or_[ item_a, outside_x ] }?"
+      #
+      Lev__ = -> a, x do
+        " - did you mean #{ Lev___[ a, x ] }?"
+      end
+      #
+      Lev___ = -> a, x do
+        MetaHell::Services::Headless::NLP::EN::Levenshtein::
+          Or_with_closest_n_items_to_item[ 3, a, x ]
       end
       def clear_last
         @prev_x = @last_x = nil

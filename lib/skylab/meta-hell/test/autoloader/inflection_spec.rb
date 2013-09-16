@@ -95,7 +95,7 @@ module Skylab::MetaHell::TestSupport::Autoloader
 
       o 'path Here This::Is::This', 'PathHereThisIsThis', 'sure spaces why not'
 
-      o 'levenshtein-', 'Levenshtein_', 'an API private constant'
+      o 'levensherp-', 'Levensherp_', 'an API private constant'
 
       o 'what-about-bob-', 'WhatAboutBob_', 'a typical multi-part API private constant'
     end

@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-module Skylab::Headless::TestSupport::NLP::EN::Levenshtein_
+module Skylab::Headless::TestSupport::NLP::EN::Levenshtein
 
   ::Skylab::Headless::TestSupport::NLP::EN[ self ]
 
@@ -12,16 +12,18 @@ module Skylab::Headless::TestSupport::NLP::EN::Levenshtein_
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::Headless::NLP::EN::Levenshtein_" do
+  describe "Skylab::Headless::NLP::EN::Levenshtein" do
     context "we love levenshtein" do
       Sandbox_1 = Sandboxer.spawn
       it "reduce a big list to a small list" do
         Sandbox_1.with self
         module Sandbox_1
-          Or_ = Headless::NLP::EN::Levenshtein_::Templates_::Or_
+          Closest_items_to_item = Headless::NLP::EN::Levenshtein::
+            With_conj_s_render_p_closest_n_items_a_item_x.
+              curry[ ' or ', -> x { x.inspect }, 3 ]
           a = [ :zepphlyn, :beefer, :bizzle, :bejonculous, :wangton ]
           strange_x = :bajofer
-          or_s = Or_[ a, strange_x, 3, -> x { x.inspect } ]
+          or_s = Closest_items_to_item[ a, strange_x ]
 
           msg = "'#{ strange_x }' was not found. did you mean #{ or_s }?"
           msg.should eql( "'bajofer' was not found. did you mean :beefer, :bizzle or :wangton?" )

@@ -30,7 +30,7 @@ module Skylab::Face::TestSupport::API::Normalizer_
         ag = X_Requirer.new infostream
         r = ag.flush
         only_line.should match(
-          /\Amissing required parameter "x" for .+::X_Requirer\z/ )
+          /\Amissing required parameter ['"]x['"] for .+::X_Requirer\z/ )
         r.should eql( false )
       end
 
@@ -39,7 +39,7 @@ module Skylab::Face::TestSupport::API::Normalizer_
         ag.param_h[ :foo ] = nil
         r = ag.flush
         only_line.should match(
-          /\Aundeclared parameter "foo" for .+X_Requirer.+macro\?\)\z/ )
+          /\Aundeclared parameter ['"]foo['"] for .+X_Requirer.+macro\?\)\z/ )
         r.should eql( false )
       end
 
@@ -47,7 +47,7 @@ module Skylab::Face::TestSupport::API::Normalizer_
         r = build( X_Requirer ).with( :foo, :bar, :bing, :bang ).flush
         r.should eql( false )
         only_line.should match(
-          /\Aundeclared parameters "foo" and "bing" for.+X.+them with `pa/ )
+          /\Aundeclared parameters ['"]foo['"] and ['"]bing['"] for.+X.+them with `pa/ )
       end
 
       let :agent_class do X_Requirer end
@@ -92,15 +92,15 @@ module Skylab::Face::TestSupport::API::Normalizer_
 
       it "no args at all - borks" do
         r = build.flush
-        only_line.should match( /\Amissing required parameter "arr" for / )
+        only_line.should match( /\Amissing required parameter ['"]arr['"] for / )
         r.should eql( false )
       end
 
       it "one non-array" do
         r = build.with( :arr, :zippers ).flush
-        only_line.should match( /\Astrange shape for "arr" - when arity #{
+        only_line.should match( /\Astrange shape for ['"]arr['"] - when arity #{
           }is many and argument arity is one, expected array-like, had #{
-          }"zippers"\z/ )
+          }['"]zippers['"]\z/ )
         r.should eql( false )
       end
 

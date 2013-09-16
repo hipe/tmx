@@ -9,7 +9,6 @@ module Skylab::Headless
     o[:CodeMolester] = subsys
     o[:FileUtils] = stdlib
     o[:InformationTactics] = subsys
-    o[:Levenshtein_] = -> _ { Services::InformationTactics::Levenshtein_ }
     o[:Open3] = stdlib
     o[:Open4] = -> { ::Skylab::Subsystem::FUN.require_quietly[ 'open4' ]; ::Open4 }
     o[:OptionParser] = -> _ { require 'optparse' ; ::OptionParser }
