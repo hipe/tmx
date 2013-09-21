@@ -133,7 +133,7 @@ module Skylab::Headless
     end
 
     def help_screen y                          # (pre-order for the big ones)
-      y << usage_line
+      render_usage_lines_to y
       help_description y if desc_lines
       # (Find the narrowest we can make column A of all sections (including
       # any options) such that we accomodate the widest content there!)
@@ -267,9 +267,13 @@ module Skylab::Headless
     def usage_and_invite msg=nil, z=nil
       y = help_yielder
       y << msg if msg
-      y << usage_line
+      render_usage_lines_to y
       y << invite_line( z )
       nil
+    end
+
+    def render_usage_lines_to y
+      y << usage_line ; nil
     end
 
     def usage_line

@@ -221,6 +221,28 @@ module Skylab::Headless
       end
     end
 
+    attr_reader :has_lemma_proc, :lemma_proc
+
+    def bind_to_exponent i
+      Bound__.new self, i
+    end
+    #
+    class Bound__
+      def initialize lexeme, i
+        @lexeme = lexeme ; @exponent_i = i
+      end
+      attr_reader :lexeme
+      attr_accessor :exponent_i
+      def string
+        @lexeme[ @exponent_i ]
+      end
+    end
+
+    def [] i
+      self.class.form_box.has?( i ) or raise ::NameError, "no such form '#{ i }' - has (#{ self.class.form_box.names * ', ' })"
+      send i
+    end
+
   private
 
     # To *construct* a lexeme finally, we take optionally a string for
@@ -232,13 +254,15 @@ module Skylab::Headless
       match_h = {
         string: -> x { x.respond_to? :ascii_only? },
         hash:   -> x { x.respond_to? :each },
-        fixnum: -> x { x.respond_to? :even? }
+        fixnum: -> x { x.respond_to? :even? },
+        proc:   -> x { x.respond_to? :call }
       }
 
       op_h = {
         string: -> str { set_lemma str },
         hash:   -> hash { add_irregular_forms hash },
-        fixnum: -> fix { accept_lemma fix }
+        fixnum: -> fix { accept_lemma fix },
+        proc:   -> prc { accept_lemma_proc prc }
       }
 
       tick_h = ::Hash[ match_h.keys.map { |k| [ k, true ] } ]
@@ -276,6 +300,20 @@ module Skylab::Headless
       did or raise ::ArgumentError, "won't clobber existing lemma - #{ @lemma }"
       nil
     end
+
+    def accept_lemma_proc prc
+      @has_lemma_proc = true
+      @lemma_proc = prc
+      nil
+    end
+
+    def determine_pos_for x
+      if has_lemma_proc
+        self.class[ x.instance_exec( & @lemma_proc ).to_s ]
+      else
+        self
+      end
+    end ; public :determine_pos_for
 
     # (watch for similarities with `self.as`)
     def add_irregular_forms form_h
@@ -959,12 +997,14 @@ module Skylab::Headless
     end
 
     as :progressive do
-      if ends_with_e_rx =~ @lemma
-        "#{ $~.pre_match }ing"
-      else
-        "#{ @lemma }ing"
+      case @lemma
+      when ends_with_e_rx ; "#{ $~.pre_match }ing"  # "mate" -> "mating"
+      when TEE_TEE_RX__   ; "#{ @lemma }ting"       # "set" -> "setting"
+      else                ; "#{ @lemma }ing"
       end
     end
+    #
+    TEE_TEE_RX__ = /[aeiou]t\z/  # #todo - bring the others up to convention
 
     as :singular_third_present do
       "#{ @lemma }s"
