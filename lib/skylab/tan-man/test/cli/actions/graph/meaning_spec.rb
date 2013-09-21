@@ -24,7 +24,7 @@ module Skylab::TanMan::TestSupport::CLI::Actions::Graph
       exp = <<-O.gsub( /^        /, '' )
                        money : honey
                        funny : bunny
-        (while timmin graph was listing meanings: found 2 total in ./floo.dot)
+        (while timmin was listing graph meanings: found 2 total in ./floo.dot)
       O
       strings.join.should eql( exp )
     end

@@ -143,8 +143,6 @@ module Skylab::TanMan
 
   private
 
-    # ---------------- jawbreak blood begin --------------------
-
     def initialize request_client
       @do_hack_normalize_callable = nil
       @param_h = { }
@@ -194,10 +192,12 @@ module Skylab::TanMan
 
     end
 
-    # ---------------- jawbreak blood end --------------------
-
     def act action_class
       kbd( full_invocation_parts( action_class ).join ' ' )
+    end
+    #
+    def full_invocation_parts cls
+      [ program_name, * cls.normalized_action_name ]
     end
 
     def api_invoke *args          # [normalized acton name] [param_h]
@@ -207,6 +207,7 @@ module Skylab::TanMan
       else
         normalized_action_name
       end
+      @last_api_action_name_a = norm_act_name
       args.length.zero? or raise ::ArgumentError,
         "[normalized acton name] [param_h]"
 
@@ -220,71 +221,6 @@ module Skylab::TanMan
       :process
     end
 
-    def full_invocation_parts action_class=self.class
-      [ program_name_hack, * action_class.normalized_action_name ]
-    end
-
-    def inflect_action_name e
-      inflection = self.class.inflection
-      prepositional_phrase = [ 'while' ]                             # "while"
-      progressive = inflection.lexemes.verb.progressive
-      subject = [ ]
-      verb = [ progressive ]                                        # "adding"
-      object = [ ]
-      a = full_invocation_parts[ 0 .. -2 ] # the last item is handled by above.
-      if a.length.nonzero?   # ( we should at least have the program_name )
-        subject.push a.shift                                        # "tan-man"
-        verb.unshift 'was'                                       # "was adding"
-      end
-      if a.length.nonzero?
-        a.pop # we used many elements in the line above, but we pop only 1 here
-        subject.concat a # you could just as soon go object
-        a.clear
-        object.push inflection.inflected.noun
-      end
-      pp = [ *prepositional_phrase, *subject, *verb, *object ].join ' '
-      msg = e.message
-      if '(' == msg[0]
-        "(#{ pp }: #{ msg[1..-1] }"
-      else
-        "#{ pp }: #{ e.message }"
-      end
-    end
-
-    # ""                          -> ""
-    # "tanman"                    -> "tanman failed"
-    # "tanman/add"                -> "tanman failed to add"
-    # "tanman/remote/add"         -> "tanman failed to add remote"
-    # "tanman/graph/starter/set"  -> "tanman graph failed to set starter"
-    # "tanman/internationalization/language/preference/set" -> [...]
-    #
-    # this looks like [#hl-018], Headless::NLP::EN::API_Action_Inflection_Hack
-
-    sentence = -> a do
-      o = []
-      begin
-        a.empty? and break
-        a = a.dup
-        o.push a.shift
-        if a.empty?
-          o.push 'failed'
-          break
-        end
-        o.concat a[0 .. -3].reverse # crazy , frivolous fun
-        a[0 .. -3] = []
-        o.concat [ 'failed', 'to', *a.reverse ]
-      end while nil
-      o
-    end
-
-    define_singleton_method( :failed_sentence ) { sentence } # for testing! meh
-
-    define_method :inflect_failure_reason do |e|
-      parts = full_invocation_parts
-      words = sentence[ parts ]
-      "#{ words.join ' '} - #{ e.message }"
-    end
-
     def program_name # #compat-bleeding (tracked as [#hl-034])
       normalized_invocation_string
     end
@@ -294,6 +230,132 @@ module Skylab::TanMan
       # 'program name' as being the full path, but is broken for deep
       # graphs. or not
       program_name.split( ' ' ).first  # #ick
+    end
+
+    def inflect_action_name e
+      msg, redress_p = undress e.message
+      redress_p[ "#{ get_succeeded_a * ' ' }: #{ msg }" ]
+    end
+
+    def undress s
+      if 2 < s.length and (( a = A_A__.detect do |l, r|
+        l == s[ 0 ] and r == s[ -1 ]
+      end ))
+        l, r = a
+        [ s[ 1 .. -2 ], -> s_ { "#{ l }#{ s_ }#{ r }" } ]
+      else
+        [ s, MetaHell::IDENTITY_ ]
+      end
+    end
+    #
+    A_A__ = [ %w( ( ) ) ]
+
+    def inflect_failure_reason e
+      "#{ get_failed_a * ' ' } - #{ e.message }"
+    end
+
+    def get_succeeded_a
+      self.class.assemble_succeeded_a get_part_a
+    end
+
+    def get_failed_a
+      self.class.assemble_failed_a get_part_a
+    end
+
+    def get_part_a
+      y = [ ] ; x = program_name_hack and y << x
+      len = (( name_a = self.class.normalized_action_name )).length
+      if 0 < len
+        y << get_bound_pos( :verb )
+        if 1 < len
+          y[ 1, 0 ] = [ get_bound_pos( :noun ) ]
+          if 2 < len
+            y[ 1, 0 ] = name_a[ 0 .. -3 ]  # adjectives
+          end
+        end
+      end
+      y
+    end
+
+    def get_bound_pos i
+      lex_ = (( inf = self.class.inflection )).lexemes[ i ]
+      lex = lex_.determine_pos_for self
+      lex.bind_to_exponent inf.inflect[ i ]
+    end
+
+    def self.assemble_succeeded_a a
+      y = [ ]
+      if a.length.nonzero?
+        y << 'while'
+        (( w = Writer__.new y, a )).write_any_subject_noun_phrase
+        w.write_any_passed_progressive_verb or y << 'was processing request'
+        w.write_any_adjectives ; w.write_any_object_noun
+      end
+      y
+    end
+
+    def self.assemble_failed_a a
+      y = [ ]
+      if a.length.nonzero?
+        (( w = Writer__.new y, a )).write_any_subject_noun_phrase
+        w.prefix_any_verb( 'failed to' ) or y << 'failed'
+        w.write_any_adjectives ; w.write_any_object_noun
+      end
+      y
+    end
+
+    class Writer__
+      def initialize y, a
+        @y = y ; @a = a ; @len = a.length
+      end
+      def write_any_subject_noun_phrase
+        if 0 < @len
+          @y << @a[ 0 ]
+          if has_many_adjectives
+            @y.concat @a[ 1 .. -3 ].reverse
+          end
+          true
+        end
+      end
+      def write_any_passed_progressive_verb
+        if (( v = any_bound_verb ))
+          @y << "was #{ v.lexeme.progressive }" ; true
+        end
+      end
+      def prefix_any_verb x
+        if (( v = any_bound_verb ))
+          @y << "#{ x } #{ v.lexeme.lemma }" ; true
+        end
+      end
+    private
+      def any_bound_verb
+        if 1 < @len
+          x = @a[ -1 ]
+          if x.respond_to? :ascii_only?
+            x = Headless::NLP::EN::POS::Verb[ x ].bind_to_exponent :lemma
+          end
+          x
+        end
+      end
+    public
+      def write_any_adjectives
+        if 3 < @len and ! has_many_adjectives
+          a = @a[ 1 .. -3 ]
+          @y.concat a ; true
+        end
+      end
+      def has_many_adjectives
+        5 < @len
+      end ; private :has_many_adjectives
+      def write_any_object_noun
+        if 2 < @len
+          x = @a[ -2 ]
+          if x.respond_to? :ascii_only?
+            x = Headless::NLP::EN::POS::Noun[ x ].bind_to_exponent :singular
+          end
+          @y << x.string ; true
+        end
+      end
     end
   end
 end

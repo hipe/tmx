@@ -4,36 +4,34 @@ module Skylab::TanMan::TestSupport::CLI
 
   describe "#{ TanMan::CLI::Action } failed_sentence" do
 
-    sentence = TanMan::CLI::Action.failed_sentence
-
-    define_singleton_method :o do |a, s, *t|
+    def self.o a, s, *t
       it "#{ s }", *t do
-        ao = sentence[ a ]
-        so = ao.join ' '
-        so.should eql s
+        out_a = TanMan::CLI::Action.assemble_failed_a a
+        out_s = out_a * ' '
+        out_s.should eql( s )
       end
     end
 
-    o ['tanman', 'services', 'external', 'trepidatious', 'connection', 'delete'],
-       "tanman trepidatious external services failed to delete connection"
-
-    o ['tanman', 'internationalization', 'language', 'preference', 'set'],
-       "tanman language internationalization failed to set preference"
-
-    o ['tanman', 'graph', 'starter', 'set'],
-       "tanman graph failed to set starter"
-
-    o ['tanman', 'remote', 'add'],
-      "tanman failed to add remote"
-
-    o ['taman', 'add'],
-      "taman failed to add"
-
-    o ['tanman'],
-      "tanman failed"
-
     o [],
       ''
+
+    o ['tanman'],
+       "tanman failed"
+
+    o ['taman', 'add'],
+       "taman failed to add"
+
+    o ['tanman', 'remote', 'add'],
+       "tanman failed to add remote"
+
+    o ['tanman', 'graph', 'starter', 'set'],
+       "tanman failed to set graph starter"
+
+    o ['tanman', 'internationalization', 'language', 'preference', 'set'],
+       "tanman failed to set internationalization language preference"
+
+    o ['tanman', 'services', 'external', 'trepidatious', 'connection', 'delete'],
+       "tanman trepidatious external services failed to delete connection"
   end
 
   describe "#{ TanMan::CLI::Action } inflect_failure_reason" do
@@ -60,7 +58,7 @@ module Skylab::TanMan::TestSupport::CLI
 
       it "tanmun failed to add - derp" do
         action = self.action
-        s = action.inflect_failure_reason event
+        s = action.send :inflect_failure_reason, event
         s.should eql('tanmun failed to add - derp')
       end
     end
@@ -74,7 +72,7 @@ module Skylab::TanMan::TestSupport::CLI
 
       it expect do
         action = self.action
-        s = action.inflect_failure_reason event
+        s = action.send :inflect_failure_reason, event
         s.should eql(expect)
       end
     end
