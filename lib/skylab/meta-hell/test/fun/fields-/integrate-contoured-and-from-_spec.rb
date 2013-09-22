@@ -46,7 +46,7 @@ module Skylab::MetaHell::TestSupport::FUN::Fields_::ICAF_
       [ foo.foo, foo.bar, foo.biz_x ].should eql( %i| F A B | )
     end
 
-    it "works with one", f:true do
+    it "works with one" do
       foo = Foo.new :bar, :A
       [ foo.foo, foo.bar, foo.biz_x ].should eql( [ nil, :A, nil ] )
     end

@@ -113,7 +113,7 @@ module Skylab::MetaHell
           v = if f.arity.zero? then f[] else
             f[ NameError.new name_x, box ]
           end
-          [ nil, v ]
+          break [ nil, v ]
         end
       end
     end

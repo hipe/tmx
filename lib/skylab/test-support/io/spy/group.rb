@@ -29,6 +29,10 @@ module Skylab::TestSupport
 
   class IO::Spy::Group
 
+    def keys
+      @streams.keys
+    end
+
     debug = ::Struct.new :condition, :emit
 
     define_method :debug! do |stderr|

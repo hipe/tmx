@@ -40,6 +40,10 @@ module Skylab::Basic
       @a.map { |i| p[ @h.fetch i ] }
     end
 
+    def each_pair &p
+      @a.each { |i| p[ i, @h.fetch( i ) ] }
+    end
+
     #  ~ mutators ~
 
     def touch k
