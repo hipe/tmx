@@ -157,6 +157,32 @@ module Skylab::TanMan
 
     attr_reader :verbose_dotfile_parsing # compat
 
+    def add_remote_notify * x_a
+      remotes.add_notify x_a
+    end
+    #
+    def remotes
+      @remotes ||= Models::DotFile::Remotes__.new client_services
+    end ; private :remotes
+    #
+    TanMan::Sub_Client[ self, :client_services ]
+    #
+    Client_Services_Proc = -> do
+      delegate :controllers
+      delegating :with_suffix, :_for_subclient,
+        %i( emit expression_agent full_dotfile_pathname )
+    end
+    private
+    def emit_for_subclient i, x
+      emit i, x
+    end
+    def expression_agent_for_subclient
+      @request_client.expression_agent
+    end
+    def full_dotfile_pathname_for_subclient
+      @pathname
+    end
+
     nl_rx = /\n/ # meh
     num_lines = -> str do
       scn = TanMan::Services::StringScanner.new str

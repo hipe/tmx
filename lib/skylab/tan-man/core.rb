@@ -39,4 +39,23 @@ module Skylab
       end
     end
   end
+
+  module TanMan
+
+    Sub_Client = -> client, * x_a do
+      Bundles__.apply_iambic_to_client x_a, client
+    end
+
+    module Bundles__
+
+      Client_Services = -> a do
+        module_exec a, & Headless::Client_Services.to_proc
+      end
+
+      Headless::Bundle::Multiset[ self ]
+    end
+
+    class Event_ < Headless::Event_
+    end
+  end
 end

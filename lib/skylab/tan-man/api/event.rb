@@ -69,7 +69,9 @@ module Skylab::TanMan
 
   end
 
-  API::Event::Rewrap = -> esg, stream_name, e do
+  module API
+    module Event
+      Rewrap = -> esg, stream_i, e do
 
     # we want the same metadata values (and we will probably use the
     # same produced class) (or if it's a textual event, we want the
@@ -80,7 +82,26 @@ module Skylab::TanMan
     # (note this will break when you get a textual event. consider
     # actually routing through the `late` factory!)
 
-    API::Event::Mappings::Hash.event esg, stream_name, e.to_hash
+        if e.respond_to? :members
+          Struct_Wrap__.new esg, stream_i, e
+        else
+          API::Event::Mappings::Hash.event esg, stream_i, e.to_hash
+        end
+      end
+      #
+      class Struct_Wrap__
+        def initialize _esg, stream_i, st
+          @stream_i = stream_i ; @struct = st
+          nil
+        end
+        def is_event ; true end
+        def stream_name ; @stream_i end
+        def touched? ; false end
+        def render_under expr_ag
+          expr_ag.calculate( * @struct.to_a, & @struct.some_message_proc )
+        end
+      end
+    end
   end
 
   API::Event::Factory = PubSub::Event::Factory::Late.new(

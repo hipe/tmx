@@ -7,6 +7,10 @@ module Skylab::TanMan
 
     include Core::SubClient::InstanceMethods # yay
 
+    def local
+      resources[ :local ]
+    end
+
     def [] k # is ready? and k is string - result is first found
       res = nil
       resources.each do |resrc| # order matters here, should be local -> global

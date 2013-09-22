@@ -297,6 +297,10 @@ module Skylab::TanMan
     end
   end
 
+  class CLI::Actions::Graph::Remote < CLI::Action::Box
+    desc "add/remove/list data { sources | destinations }"
+  end
+
   class CLI::Actions::Graph::Meaning < CLI::Action::Box
     desc "associate words with node attributes"
 

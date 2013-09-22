@@ -16,13 +16,17 @@ module Skylab::TanMan::TestSupport::CLI::Actions
     def cd pathname, &block
       fu = Headless::IO::FU.new -> msg do
         if do_debug
-          Stderr_[].puts "    (tanmun vreeboze: #{ msg })"
+          TestSupport::Stderr_[].puts "    (tanmun vreeboze: #{ msg })"
         end
       end
       fu.cd pathname, &block
     end
 
-    let :client do # todo how do the other clients function?
+    def client
+      @client ||= build_client
+    end
+
+    def build_client
       spy = output # IO::Spy::Group
       o = TanMan::CLI.new nil, spy.for( :paystream ), spy.for( :infostream )
       o.program_name = 'timmin'
@@ -60,7 +64,7 @@ module Skylab::TanMan::TestSupport::CLI::Actions
         lines.each do |line|
           fh.puts line
           if do_debug
-            Stderr_[].puts "local-conf.d/config: #{ line }"
+            TestSupport::Stderr_[].puts "local-conf.d/config: #{ line }"
           end
         end
       end
