@@ -10,12 +10,7 @@ module ::Skylab::TanMan
       box_module.fetch basename
     end
 
-    # `error` if one occurs will get called with a hash of metadata,
-    # including one `message`.
-
-    extname = '.dot'
-
-    define_method :normalize do |name, error|
+    def normalize name, error_info_hash_p
       tries = []
       found = -> do
         try = -> p do
@@ -29,7 +24,7 @@ module ::Skylab::TanMan
         pathname = box_module_dir_pathname.join name
         r = try[ pathname ]
         if ! r and '' == pathname.extname
-          r = try[ pathname.sub_ext extname ]
+          r = try[ pathname.sub_ext EXTNAME__ ]
         end
         r
       end.call
@@ -37,8 +32,8 @@ module ::Skylab::TanMan
         res = found.relative_path_from box_module_dir_pathname
       else
         a = tries.map(& :basename )
-        b = box_module_dir_pathname.children.map(& :basename )
-        res = error[
+        b = get_scanner.map( & :basename )
+        res = error_info_hash_p[
           message:
             "not found: #{ a.join ', ' }. Known starters: (#{ b.join ', ' })",
           valid_names: b.map(& :to_s )
@@ -46,15 +41,62 @@ module ::Skylab::TanMan
       end
       res
     end
+    #
+    EXTNAME__ = '.dot'.freeze
+
+    def get_scanner
+      p = -> do
+        fly = Fly__.new box_module_dir_pathname
+        d = -1 ; last = (( cx = box_module_dir_pathname.children )).length - 1
+        (( p = -> do
+          if last == d
+            p = MetaHell::EMPTY_P_
+            nil
+          else
+            fly.set cx[ d += 1 ]
+          end
+        end )).call
+      end
+      Scanner__.new do p.call end
+    end
+    #
+    class Fly__
+      def initialize base_pn
+        @base_pn = base_pn
+      end
+      def set pn
+        @pn = pn
+        self
+      end
+      def basename
+        @pn.basename
+      end
+      def label
+        @pn.relative_path_from( @base_pn ).to_s
+      end
+    end
+    #
+    class Scanner__ < ::Proc
+      alias_method :gets, :call
+      def map &p
+        a = [ ] ; x = nil
+        a << p[ x ] while (( x = gets ))
+        a
+      end
+      def to_a
+        map( & MetaHell::IDENTITY_ )
+      end
+    end
 
   private
+
+    def box_module_dir_pathname
+      box_module.dir_pathname
+    end
 
     def box_module
       TanMan::Starters
     end
 
-    def box_module_dir_pathname
-      box_module.dir_pathname
-    end
   end
 end

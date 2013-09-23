@@ -31,7 +31,7 @@ module Skylab::TanMan
 
     attribute :global_conf_path, proc: true,
                 default: -> do
-                  Headless::System.any_home_directory_pathname.
+                  Headless::System.system.any_home_directory_pathname.
                     join( 'tanman-config' ).to_s
                 end
 

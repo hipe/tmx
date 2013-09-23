@@ -83,6 +83,17 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
     end
   end
 
+  Brackets_method__ = -> mod do
+    mod.module_exec do
+      def [] i
+        send self.class::H__.fetch( i )
+      end
+      #
+      self::H__ = H__
+    end
+  end
+  H__ = { noun: :noun, verb: :verb }.freeze
+
   class Lexemes # this is the core of the hack
 
     extend Dupe
@@ -129,7 +140,7 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
     def noun= x
       self.dupes |= [:noun] # duplicate this setting down to subclasses
       use = if x.respond_to? :plural then x else
-        NLP::EN::POS::Noun[ x.to_s ]
+        NLP::EN::POS::Noun[ x ]
       end
       @noun = use
       x
@@ -147,6 +158,8 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
       @verb = use
       x
     end
+
+    Brackets_method__[ self ]
 
   private
 
@@ -172,6 +185,8 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
       @noun = :singular
       @verb = :lemma
     end
+
+    Brackets_method__[ self ]
   end
 
   class Inflected
@@ -208,6 +223,12 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
 
     def lexemes
       @lexemes ||= Lexemes.new @klass
+    end
+
+    def get_bound_pos_for_exponent_i i
+      _lex = lexemes[ i ]
+      _inf_i = inflect[ i ]
+      _lex.bind_to_exponent _inf_i
     end
 
   private

@@ -248,13 +248,51 @@ module Skylab::TanMan
 
   class CLI::Actions::Graph::Starter < CLI::Action
 
-    desc "what graph starter file to use? (gets or sets it)"
+    desc "what graph starter file to use? (gets, sets, lists)"
+
+    inflection.lexemes
+    inflection.lexemes.noun = -> do
+      @last_api_action_name_a[ -2 ]
+    end
+
+    inflection.lexemes.verb = -> do
+      @last_api_action_name_a[ -1 ]
+    end
 
     def process name=nil
-      if name
+
+      # api_invoke %i( graph starter get )
+      if @do_list
+        api_invoke [ :graph, :starter, :list ]
+      elsif name
         api_invoke [:graph, :starter, :set], name: name
       else
         api_invoke [:graph, :starter, :get]
+      end
+    end
+
+  private
+
+    def render_usage_lines_to y
+      super
+      y << "#{ ' ' * LEN__ }#{ normalized_invocation_string } #{
+        }[-] { ls | list }"
+    end
+    LEN__ = 'usage: '.length ; RX__ = /\A-?(?:ls|list)\z/
+
+    def parse_opts a
+      @do_list = false
+      if RX__ =~ a[ 0 ]
+        a.shift
+        if a.length.nonzero?
+          help_yielder << "\"list\" subcommand takes no arguments"
+          help_yielder << invite_line
+          false
+        else
+          @do_list = true
+        end
+      else
+        super
       end
     end
   end
