@@ -232,7 +232,7 @@ module Skylab::Headless
 
     def invite_line z=nil
       render_invite_line "#{ normalized_invocation_string } -h", z
-    end                           # (this like so is used by cli-client too)
+    end ; public :invite_line
 
     def render_invite_line inner_string, z=nil
       "use #{ kbd inner_string } for help#{ " #{ z }" if z }"
@@ -561,10 +561,25 @@ module Skylab::Headless
       a.join ' ' if a.length.nonzero?
     end
 
+  public
     def render_argument arg       # (no styling just text)
       a, b = reqity_brackets arg.reqity
-      "#{ a }<#{ arg.formal.name.as_slug }>#{ b }"
+      if arg.is_atomic_variable
+        "#{ a }<#{ arg.as_slug }>#{ b }"
+      elsif arg.is_collection
+        "#{ a }#{ arg.render_under self }#{ b }"
+      else
+        "#{ a }#{ arg.as_moniker }#{ b }"
+      end
     end
+    #
+    def render_group_with_i_and_a i, a
+      sep = CLI::Action::SEPARATOR_GLYPH_H__.fetch( i )
+      a * sep
+    end
+    #
+    CLI::Action::SEPARATOR_GLYPH_H__ = { series: ' ', alternation: '|' }.freeze
+  private
 
     -> do
       reqity_brackets = nil  # load it wherever it is only when you need it
@@ -572,26 +587,69 @@ module Skylab::Headless
         ( reqity_brackets ||= CLI::Argument::FUN.reqity_brackets )[ reqity ]
       end
     end.call
-                                  # `meth_ref` is symbol or string method name
-                                  # result is true or exit status
-    def validate_arity_for meth_ref, args
-      res = nil                   # assuming below is true, always re-assigned
-      syn = argument_syntax_for_method meth_ref # (this will almost certainly
-      if syn                      # raise on failure, but it could change.)
-        res = syn.validate_arity args do |o|
-          o.on_unexpected do |a|
-            usage_and_invite "unexpected argument#{ s a }: #{ ick a[0] }#{
-              }#{" [..]" if a.length > 1 }"
-            exit_status_for :argv_parse_failure_unexpected_arguments
-          end
-          o.on_missing do |fragment|
-            a = fragment[ 0 .. fragment.index { |x| :req == x.reqity } ]
-            usage_and_invite "expecting: #{ render_argument_syntax a, 0..0 }"
-            exit_status_for :argv_parse_failure_missing_required_arguments
-          end
-        end
+
+    def validate_arity_for meth_i, args
+      r = argument_syntax_for_method meth_i
+      r &&= with_argument_syntax_process_args( r, args )
+      r
+    end
+
+    def with_argument_syntax_process_args syn, args
+      syn.process_args args do |o|
+        o.on_missing method :handle_missing_args
+        o.on_result_struct method :handle_args_result_struct
+        o.on_unexpected method :handle_unexpected_args
       end
-      res
+    end
+
+    def handle_missing_args e
+      send handle_missing_args_op_h.fetch( e.orientation ), e
+    end
+    #
+    def handle_missing_args_op_h
+      CLI::Action::HMA_OP_H__
+    end
+    #
+    CLI::Action::HMA_OP_H__ = { vertical: :handle_missing_args_vertical,
+      horizontal: :handle_missing_args_horizontal }.freeze
+
+    def handle_missing_args_vertical e
+      fragment = e.argument_a
+      a = fragment[ 0 .. fragment.index { |x| :req == x.reqity } ]
+      usage_and_invite "expecting: #{ render_argument_syntax a, 0..0 }"
+      exit_status_for :argv_parse_failure_missing_required_arguments
+    end
+
+    def handle_missing_args_horizontal e
+      y = [ ]
+      e.argument_a.each do |arg|
+        x = if arg.is_literal then  "`#{ arg.as_moniker }`"
+        else render_argument arg end
+        x and y << x
+      end
+      _s = render_group_with_i_and_a :alternation, y
+      if (( token_set = e.any_at_token_set ))
+        1 == token_set.length or fail 'test me'
+        _near_s = " at #{ ick token_set.to_a.first }"
+      end
+      usage_and_invite "expecting { #{ _s } }#{ _near_s }"
+      exit_status_for :argv_parse_failure_missing_required_arguments
+    end
+
+    def handle_args_result_struct st
+      absorb_result_struct_into_param_h st
+    end
+
+    def absorb_result_struct_into_param_h st
+      st.members.each { |i| @param_h[ i ] = st[ i ] }
+      nil
+    end
+
+    def handle_unexpected_args e
+      a = e.s_a
+      usage_and_invite "unexpected argument#{ s a }: #{ ick a[0] }#{
+        }#{" [..]" if a.length > 1 }"
+      exit_status_for :argv_parse_failure_unexpected_arguments
     end
 
     #         ~ `parameters` - abstract reflection and rendering ~

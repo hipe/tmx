@@ -6,6 +6,8 @@ module Skylab::TanMan::TestSupport::CLI
 
   include CONSTANTS # so we can say TanMan in the spec's module
 
+  Headless = Headless
+
   extend TestSupport::Quickie
 
   module ModuleMethods
@@ -22,6 +24,31 @@ module Skylab::TanMan::TestSupport::CLI
     extend MetaHell::Let
 
     include MetaHell::Class::Creator::InstanceMethods
+
+    def invoke * argv
+      if 1 == argv.length and argv[ 0 ].respond_to?( :each_with_index )
+        argv = argv[ 0 ]
+      end
+      do_debug and some_debug_stream.puts "(argv: #{ argv.inspect })"
+      @result = simplified_client.invoke argv
+    end
+
+    def expect_section *a, &p
+      require_relative 'expect-section'
+      expect_section( *a, &p )
+    end
+
+    def expect_oldschool_result_for_ui_success
+      @result.should eql( true )
+    end
+
+    def expect_oldschool_result_for_ui_failure
+      @result.should eql( nil )
+    end
+
+    def expect_newschool_result_for_ui_success
+      @result.should eql( nil )
+    end
 
     def meta_hell_anchor_module
       CLI_TestSupport::Sandbox
@@ -44,13 +71,118 @@ module Skylab::TanMan::TestSupport::CLI
       o
     end
 
-    let :client do
-      o = TanMan::CLI.new :tanman_nosee_1, :tanman_nosee_2, :tanman_nosee_3
-      o.program_name = 'tanmun'
+    def client
+      @client ||= build_client
+    end
+
+    def simplified_client
+      @client ||= build_simplified_client
+    end
+
+    def build_client
       ioa = Headless::TestSupport::IO_Adapter_Spy.new
       ioa.debug = -> { do_debug }
-      o.send :io_adapter=, ioa
+      build_client_wired_with ioa
+    end
+
+    def build_simplified_client
+      ioa = Spy__.new
+      do_debug and ioa.debug!
+      build_client_wired_with ioa
+    end
+    #
+    class Spy__ < TestSupport::IO::Spy::Triad
+      def initialize
+        super nil
+      end
+      attr_accessor :pen
+
+      def emit i, x
+        :payload == i and fail 'do me'
+        ::String === x or fail 'do me'
+        errstream.puts x
+        nil
+      end
+    end
+
+    def build_client_wired_with ioa
+      o = TanMan::CLI.new :tanman_nosee_1, :tanman_nosee_2, :tanman_nosee_3
+      o.program_name = 'tanmun'
+      ioa_ = o.io_adapter
+      ioa.pen = ioa_.pen
+      o.io_adapter_notify ioa
       o
+    end
+
+    def peek_any_next_info_line
+      baked.peek_any_next_line_in :errstream
+    end
+
+    def nonstyled_info_line
+      expect_line_is_not_styled some_info_line
+    end
+
+    def styled_info_line
+      expect_line_is_styled some_info_line
+    end
+
+    def some_info_line
+      baked.some_line_in :errstream
+    end
+
+    def expect_no_more_info_lines
+      baked.num_lines_remaining_in( :errstream ).should be_zero
+    end
+
+    def expect_line_is_styled line
+      unstyled = Headless::CLI::Pen::FUN.unstyle_styled[ line ]
+      unstyled or fail "expecting styled line, had - #{ line.inspect }"
+      unstyled
+    end
+
+    def expect_line_is_not_styled line
+      unstyled = Headless::CLI::Pen::FUN.unstyle_styled[ line ]
+      unstyled and fail "expecting non-styled line, had - #{ line.inspect }"
+      line
+    end
+
+    def baked
+      @baked ||= bake
+    end
+
+    def bake
+      instance_variable_defined? :@__memoized and @__memoized and
+        @__memoized.key?( :output ) and fail "sanity - use simplified client."
+      ioa = @client.send :io_adapter
+      @client.instance_variable_set :@io_adapter, :was_baked
+      Baked__.new ioa.members, ioa.to_a
+    end
+    #
+    class Baked__
+      def initialize i_a, val_a
+        @a = i_a
+        @h = ::Hash[ i_a.length.times.map do |d|
+          if (( x = val_a.fetch d ))
+            x = x.string.split( "\n" )
+          end
+          [ i_a.fetch( d ), x ]
+        end ]
+        nil
+      end
+
+      def peek_any_next_line_in stream_i
+        @h.fetch( stream_i )[ 0 ]
+      end
+
+      def some_line_in stream_i
+        @h[ stream_i ].length.zero? and
+          fail "expected line in '#{ stream_i }' - had no lines"
+        @h[ stream_i ].shift
+      end
+
+      def num_lines_remaining_in stream_i
+        @h[ stream_i ].length
+      end
     end
   end
 

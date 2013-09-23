@@ -21,6 +21,28 @@ module Skylab::TanMan
       end
     end
 
+    def into_entity_merge_properties_emitting_to_p section_s, x_a, p
+      sections[ section_s ] ||= { }
+      o = sections[ section_s ]
+      while x_a.length.nonzero?
+        v_x = x_a.fetch( 1 ) ; k_x = x_a.shift ; x_a.shift
+        v_s = v_x.to_s ; k_s = k_x.to_s
+        if o.key? k_s
+          v_s_ = o[ k_s ]
+          if v_s == v_s_
+            p[ :same, k_x, v_x ]
+          else
+            p[ :change, k_x, v_s_, v_x ]
+            o[ k_s ] = v_s
+          end
+        else
+          p[ :add, k_x, v_x ]
+          o[ k_s ] = v_x
+        end
+      end
+      true
+    end
+
   private
 
     def initialize param_h
@@ -57,8 +79,6 @@ module Skylab::TanMan
     end                                        # in the config file, and more
                                                # portable in its way,
                                                # less portable in another way
-
-  private
 
     def anchor_pathname                        # if the config file is
       pathname.join '../..'                    # .tanman/config, the anchor

@@ -17,6 +17,10 @@ module Skylab::Headless
       @name ||= Headless::Name::Function.new @formal.normalized_parameter_name
     end
 
+    def as_slug
+      @formal.name.as_slug
+    end
+
     attr_reader :reqity
 
     #  ~ for #parameter-reflection-API ~
@@ -29,6 +33,14 @@ module Skylab::Headless
       false
     end
 
+    def is_atomic_variable
+      true
+    end
+
+    def is_collection
+      false
+    end
+
     def initialize formal, reqity
       @formal, @reqity = formal, reqity
     end
@@ -38,7 +50,8 @@ module Skylab::Headless
         arg_string_h = {
           opt:  [ '[', ']'      ],
           req:  [ '',  ''       ],
-          rest: [ '[', ' [..]]' ]
+          rest: [ '[', ' [..]]' ],
+          req_group: [ '{', '}' ]
           # block: - not represented here. we trigger the error on purpose -
         }.each { |_, a| a.each(& :freeze).freeze }.freeze  # block parameters
                                   # arge not isomorphic
@@ -49,6 +62,8 @@ module Skylab::Headless
   end
 
   class CLI::Argument::Syntax     # abstract
+
+    MetaHell::MAARS::Upwards[ self ]
 
     # For error reporting it is useful to speak in terms of sub-slices of
     # argument syntaxes (used at least 2x here). (In fact, this was originally
@@ -107,16 +122,21 @@ module Skylab::Headless
     def base_args                 # compat with our `slice`. add parameters
       []                          # that you want to copy-by-reference to
     end                           # a nerk result of slice
+
+    def self.DSL & p
+      self::DSL.DSL_notify_with_p p
+    end
   end
 
   class CLI::Argument::Syntax::Inferred < CLI::Argument::Syntax
 
     Validate = Headless::Parameter::Definer.new do
-      param :on_missing,    hook: true
+      param :on_missing, hook: true
       param :on_unexpected, hook: true
+      param :on_result_struct, hook: true  # we won't use it but others might
     end
 
-    def validate_arity arg_a, &events  # result is true or hook result
+    def process_args arg_a, &events  # result is true or hook result
       hooks = Validate.new(& events )
       formal_idx = actual_idx = 0
       formal_end = @elements.length - 1
@@ -125,7 +145,8 @@ module Skylab::Headless
 
       while actual_idx <= actual_end
         if formal_idx > formal_end
-          res = hooks.on_unexpected[ arg_a[ actual_idx .. -1 ] ]
+          res = hooks.on_unexpected[ CLI::Argument::Extra_[
+            arg_a[ actual_idx .. -1 ] ] ]
           break
         end
         if :rest == @elements[ formal_idx ].reqity
@@ -145,15 +166,21 @@ module Skylab::Headless
         num_unseen_formal = formal_end - formal_idx + 1
         num_unseen_actual = actual_end - actual_idx + 1
         if num_unseen_formal > num_unseen_actual
-          res = hooks.on_missing[ self[ unseen_req_idx .. -1 ] ]
+          res = hooks.on_missing[ CLI::Argument::Missing_[
+            self[ unseen_req_idx .. -1 ], :vertical ] ]
         end
       end
       res
     end
+    #
+    CLI::Argument::Extra_ = Headless::Event_.new :s_a
+    #
+    CLI::Argument::Missing_ = Headless::Event_.
+      new :argument_a, :orientation, :any_at_token_set
 
   private
 
-    def initialize ruby_param_a, formals
+    def initialize ruby_param_a, formals=nil
       @elements = ruby_param_a.reduce [] do |m, (opt_req_rest, name)|
         if formals
           fp = formals[ name ]

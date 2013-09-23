@@ -360,7 +360,13 @@ module Skylab::Headless
         end
       end
       def! :hook= do |_|
-        host_def(name) { |&b| b ? (self[name] = b) : self[name] }
+        host_def name do | *a, &p |
+          case ( p ? a <<  p : a ).length
+          when 0 ; self[ name ]
+          when 1 ; self[ name ] = a[ 0 ]
+          else   ; raise ::ArgumentError, "no - (#{ a.length } for 0..1)"
+          end
+        end
       end
       def!(:reader=) { |_| host_def(name) { self[name] if known? name } }
       def!(:upstream_passthru_filter) do |&f|

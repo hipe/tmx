@@ -13,6 +13,37 @@ module Skylab::TanMan
 
     event_factory CLI::Event::Factory
 
+    emits event_structure: :all
+
+    def initialize i, o, e
+      _tan_man_sub_client_init nil  # get it? # [#sl-114] above
+      @io_adapter = Headless::CLI::IO_Adapter::Minimal.
+        new i, o, e, Pen__.new
+      on_all do |ev|
+        _msg = if ev.respond_to? :render_under
+          ev.render_under expression_agent
+        else
+          ev.message
+        end
+        io_adapter.emit ev.stream_name, _msg
+      end
+      nil
+    end
+
+    public :io_adapter
+
+    def io_adapter= x
+      never  # #todo
+    end
+
+    def io_adapter_notify ioa
+      @io_adapter = ioa ; nil
+    end
+
+    def expression_agent
+      @io_adapter.pen or never
+    end ; private :expression_agent
+
     # This is the reasonable place to put the idea that for cli actions,
     # when an action's invoke() method results in false, we typically
     # want to display an invite for more help.  #convention [#hl-019]
@@ -28,6 +59,7 @@ module Skylab::TanMan
     # and we've got our naming #convention down pretty well ([#hl-020])
     #
     def invoke argv
+      @io_adapter.pen.invoke_notify
       result = super argv # watch for this to break at [#018]
       if false == result
         bound_method, = resolve argv.dup # re-resolve, ick!!!
@@ -44,55 +76,9 @@ module Skylab::TanMan
 
   private
 
-    pen = -> do
-      o = Headless::CLI::Pen::Minimal.new
-
-      fun = Headless::CLI::PathTools::FUN
-
-      o.define_singleton_method :escape_path do |str|
-        fun.clear[]               # always clear the `pwd` regexen .. it is hell
-        fun.pretty_path[ str ]    # to debug if you don't. The only reason
-      end                         # not to is on a large number of files
-                                  # (test/all --order random:5647873976)
-
-      def o.ick x                 # render an invalid value.  compare to
-        "\"#{ x }\""              # `val`, we actually want quotes here to make
-      end                         # it look clinical, and like we are referring
-                                  # to some foreign other object
-
-      def o.lbl str               # render a business parameter name
-        kbd str
-      end
-
-      def o.par sym               # [#sl-036] will be gathered up in the future
-        kbd "--#{ sym.to_s.gsub('_', '-') }" # super hacked for
-      end
-
-      def o.val x                 # render a business value
-        x                         # (for cli we render as-is.  looks good
-      end                         # next to the styled `lbl` labels. looks
-                                  # cluttered to do more.
-      o
-    end.call
-
-
-    define_method :initialize do |sin, sout, serr|
-      _tan_man_sub_client_init nil  # get it? # [#sl-114] above
-
-      # self.io_adapter = build_io_adapter sin, sout, serr, pen # after [#018]
-      self.io_adapter = Headless::CLI::IO_Adapter::Minimal.new(
-        sin, sout, serr, pen )
-
-      on_all { |e| io_adapter.emit e.stream_name, e.message }
-        # saying e.to_s is probably not what you want -- you will get a hash
-        # if the message has been changed via message=
-    end
-
     def action_anchor_module      # gone at [#022] maybe..
       CLI::Actions
     end
-
-    module_exec :io_adapter, & MetaHell::FUN.private_attr_reader  # [#022]
 
     def infostream                # it is reasonable for some actions to
       io_adapter.errstream        # want to write certain kind of messages
@@ -104,6 +90,47 @@ module Skylab::TanMan
 
     def paystream
       io_adapter.outstream        # note the intentional name-change
+    end
+
+    class Pen__ < Headless::CLI::Pen::Minimal
+
+      def invoke_notify
+        FUN__.clear[]
+      end
+      #
+      FUN__ = Headless::CLI::PathTools::FUN
+
+      def escape_path path_x
+        FUN__.pretty_path[ path_x ]
+      end
+
+      def ick x  # render an invalid value.  compare to `val`, we actually
+        # want quotes here to make it look clinical, and like we are referring
+        # to some foreign other object
+        "\"#{ x }\""
+      end
+
+      def lbl x  # render a business parameter name
+        kbd x
+      end
+
+      def par i  # [#sl-036] - super hacked for now
+        kbd "--#{ i.to_s.gsub '_', '-' }"
+      end
+
+      def val x  # render a business value. for CLI we render as-sis. looks
+        x  # good next to styled `lbl` phrases. looks cluttered to do more
+      end
+
+      def and_ a
+        a * ' and '  # #todo
+      end
+
+      def s *a
+        a.last if a.last.respond_to? :id2name  # #todo
+      end
+
+      alias_method :calculate, :instance_exec
     end
   end
 end

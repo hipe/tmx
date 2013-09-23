@@ -27,6 +27,10 @@ module Skylab::TanMan
       result
     end
 
+    def expression_agent
+      @request_client.expression_agent
+    end
+
   public
 
     # none

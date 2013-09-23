@@ -41,6 +41,11 @@ module Skylab::TanMan
 
     attr_reader :pen              # overwrite `super` which is e.g. delegating
                                   # to io_adapter.  see our `initialize`
+
+    def expression_agent
+      @pen or never
+    end
+
   private
 
     pen = Headless::API::Pen::Minimal.new
@@ -74,7 +79,7 @@ module Skylab::TanMan
 
     define_method :initialize do |modality_client=nil|
       if modality_client           # if we are running under some mysterious
-        @pen = modality_client.send :pen # client for some other strange new
+        @pen = modality_client.pen # client for some other strange new
       else                         # modality .. note that we do *not* call super(mc) for now, to check how narrow we can make this coupling
         @pen = pen
       end

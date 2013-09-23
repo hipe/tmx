@@ -76,5 +76,11 @@ module Skylab::Basic
         self.class.members
       end
     end
+
+    def self.new * i_a, & p
+      cls = self[ * i_a ]
+      cls.class_exec( & p )
+      cls
+    end
   end
 end

@@ -129,7 +129,11 @@ module Skylab::TanMan::TestSupport
       api
     end
 
-    let :client do
+    def client
+      client ||= build_client
+    end
+
+    def build_client
       client = Headless::DEV::Client.new
       o = TanMan::TestSupport::ParserProxy.new client
       o.verbose = -> { do_debug }
@@ -149,6 +153,10 @@ module Skylab::TanMan::TestSupport
     alias_method :tanman_debug!, :debug!
 
     attr_accessor :do_debug
+
+    def some_debug_stream
+      TestSupport::Stderr_[]
+    end
 
     attr_accessor :do_debug_parser_loading
 

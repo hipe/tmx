@@ -10,6 +10,8 @@ module Skylab::TanMan
     include Core::SubClient::InstanceMethods
     extend Headless::Parameter::Controller::StructAdapter
 
+    public :pen
+
   private
 
     def graph_noun

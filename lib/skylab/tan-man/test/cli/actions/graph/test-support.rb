@@ -12,9 +12,10 @@ module Skylab::TanMan::TestSupport::CLI::Actions::Graph
 
   module InstanceMethods
 
-    def invoke_from_dotfile_dir *args
+    def invoke_from_dotfile_dir *a
+      1 == a.length and a[ 0 ].respond_to?( :each_with_index ) and a = a[ 0 ]
       cd dotfile_pathname.dirname do
-        client.invoke args
+        @result = client.invoke a
       end
     end
 

@@ -72,6 +72,8 @@ module Skylab::TanMan
 
     event_factory CLI::Event::Factory
 
+    emits event_structure: :all
+
     empty_array = [ ].freeze
 
     define_singleton_method :desc do |*a| # compare to [#hl-033]
@@ -101,7 +103,7 @@ module Skylab::TanMan
           if ::Hash === a.first   # legacy library emits only a limited set of
             case a.first.reduce( [ ] ) { |m, x| m.concat x ; m } # option states
             when [:full, true]
-              help_screen
+              help_screen help_yielder
               res = true # just for fun, continue screening other option things
             when [:invite_only, true]
               emit :help, invite_line
@@ -140,6 +142,8 @@ module Skylab::TanMan
       end
       res
     end
+
+    public :pen
 
   private
 
@@ -182,7 +186,7 @@ module Skylab::TanMan
         end
       end
 
-       on_all do |e|
+      on_all do |e|
         if ! e.touched?
           # we are re-emitting to parent the event #todo is this ok?
           request_client.send :emit,  e
