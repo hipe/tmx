@@ -38,13 +38,7 @@ module Skylab::TanMan::TestSupport::CLI::Actions
 
 
     def using_dotfile str
-                                  # HUGE TEARDOWN BEGIN:
-      if ! api_was_cleared        # ACK sorry we have no nested before hooks
-        TanMan::Services.services.api.clear_all_services # when using Quicike!!
-      end
-      tanman_tmpdir.prepare
-                                  # huge teardown END
-
+      clear_and_prepare
       pathname = tanman_tmpdir.touch 'floo.dot'
       pathname.open( 'w' ) { |fh| fh.write str }
       with_config  using_dotfile: 'floo.dot'
@@ -52,6 +46,18 @@ module Skylab::TanMan::TestSupport::CLI::Actions
       nil
     end
 
+    def using_config whole_string  # will clear tmpdir too
+      clear_and_prepare
+      with_config_file_handle_and_get_pathname do |fh|
+        fh.write whole_string
+      end
+    end
+
+    def clear_and_prepare
+      clear_api_if_necessary
+      tanman_tmpdir.prepare
+      nil
+    end
 
     def with_config hash         # assume tmpdir has been cleared
       lines = hash.reduce( [ ] ) do |m, (k, v)|
@@ -59,14 +65,20 @@ module Skylab::TanMan::TestSupport::CLI::Actions
         m << "#{ k }= #{ v }"
         m
       end
-      pathname = tanman_tmpdir.touch_r 'local-conf.d/config'
-      pathname.open( 'w' ) do |fh|
+      with_config_file_handle_and_get_pathname do |fh|
         lines.each do |line|
           fh.puts line
           if do_debug
             TestSupport::Stderr_[].puts "local-conf.d/config: #{ line }"
           end
         end
+      end
+    end
+
+    def with_config_file_handle_and_get_pathname
+      pathname = tanman_tmpdir.touch_r 'local-conf.d/config'
+      pathname.open( 'w' ) do |fh|
+        yield fh
       end
       pathname
     end

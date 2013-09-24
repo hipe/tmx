@@ -40,8 +40,6 @@ module ::Skylab::CodeMolester
 
     #         ~ readers for children ~
 
-    #         The below method names changes often!
-
     def child name_sym
       with_scanner_for_symbol name_sym do |scn|
         scn.gets
@@ -52,6 +50,37 @@ module ::Skylab::CodeMolester
       with_scanner_for_symbol name_sym do |scn|
         scn.pos = -1
         scn.rgets
+      end
+    end
+
+    def get_scanner_with_map_reduce_p p
+      Scanner_With_Map_Reduce_P__.new self, p
+    end
+    #
+    class Scanner_With_Map_Reduce_P__
+      def initialize sexp, p
+        @sexp = sexp ; @filter_p = p
+        @gets_p = -> do
+          d = 0 ; last = @sexp.length - 1 ; @count = 0
+          @rewind_p = -> { d = 0 ; @count = 0 }
+          (( @gets_p = -> do
+            while d < last
+              sexp = @sexp[ d += 1 ]
+              if (( r_ = p[ sexp ] ))
+                @count += 1 ; break r = r_
+              end
+            end
+            r
+          end )).call
+        end
+      end
+      def gets ; @gets_p.call end
+      def rewind ; @rewind_p.call ; nil end
+      attr_reader :count
+      def to_a  # where available. from current state onwards. has side-effects.
+        a = [ ] ; while (( x = gets ))
+          a << x.collapse
+        end ; a
       end
     end
 

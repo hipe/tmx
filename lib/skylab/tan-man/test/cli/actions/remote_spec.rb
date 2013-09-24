@@ -21,7 +21,7 @@ module Skylab::TanMan::TestSupport::CLI::Actions
           output_shift_is infostream,
             "ferp failed to add remote - couldn't find local-conf.d in #{
               }this or any parent directory"
-          output_shift_only_is infostream, 'use ferp remote add init to create it', false  # #todo
+          output_shift_only_is infostream, 'use ferp init to create it', false
         end
 
         it 'cannot get listed, whines the same' do

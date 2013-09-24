@@ -48,6 +48,24 @@ module Skylab
 
     module Bundles__
 
+      Anchored_program_name = -> _ do
+        define_method :anchored_program_name do
+          @request_client.anchored_program_name_for_subclient
+        end ; private :anchored_program_name
+        define_method :anchored_program_name_for_subclient do
+          anchored_program_name
+        end
+      end
+
+      Expression_agent = -> _ do
+        define_method :expression_agent_for_subclient do
+          expression_agent
+        end
+        define_method :expression_agent do
+          @request_client.expression_agent_for_subclient  # #todo this is written assuming that "client services" have NOT yet replaced all the joints in the graph
+        end ; private :expression_agent
+      end
+
       Client_Services = -> a do
         module_exec a, & Headless::Client_Services.to_proc
       end

@@ -7,6 +7,8 @@ module ::Skylab::TanMan
 
     o = H_ = { }
     o[ :Basic ] = subsys
+    o[ :Face ] = subsys
+    o[ :JSON ] = -> _ { require 'json' ; ::JSON }
     o[ :OptionParser ] = -> _ { require 'optparse' ; ::OptionParser }
     o[ :PP ] = stdlib
     o[ :Open3 ] = stdlib

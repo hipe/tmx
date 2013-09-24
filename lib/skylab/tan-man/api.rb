@@ -43,8 +43,13 @@ module Skylab::TanMan
 
     attribute :local_conf_startpath, proc: true, default: ->{ ::Pathname.pwd }
 
-    attr_accessor :debug          # set to $s-tderr, for e.g
+    attr_reader :do_debug, :debug_stream
 
+    def debug!
+      @do_debug = true
+      @debug_stream = ::Skylab::TestSupport::Stderr_[]
+      nil
+    end
   end
 
   API.set_defaults_if_nil!

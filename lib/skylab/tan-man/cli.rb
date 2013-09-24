@@ -298,7 +298,11 @@ module Skylab::TanMan
   end
 
   class CLI::Actions::Graph::Remote < CLI::Action::Box
+
+    TanMan::Sub_Client[ self, :expression_agent ]
+
     desc "add/remove/list data { sources | destinations }"
+
   end
 
   class CLI::Actions::Graph::Meaning < CLI::Action::Box

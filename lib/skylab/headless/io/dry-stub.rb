@@ -5,7 +5,7 @@ module Skylab::Headless
     class Dry_Stub_  # getting a good dry run
 
       def open mode
-        WRITEMODE_ == mode or
+        WRITEMODE_ == mode || APPENDMODE__ == mode or
           fail "sanity - expected #{ WRITEMODE_ } had #{ mode }"
         yield self
       end
@@ -17,6 +17,8 @@ module Skylab::Headless
         "#{ s }".length
       end
     end
+
+    APPENDMODE__ = 'a'.freeze
 
     DRY_STUB = Dry_Stub_.new  # class as singleton [#sl-126]
 

@@ -40,6 +40,10 @@ module Skylab::TanMan
       @io_adapter = ioa ; nil
     end
 
+    def expression_agent_for_subclient  # #todo - until client services
+      expression_agent
+    end
+
     def expression_agent
       @io_adapter.pen or never
     end ; private :expression_agent
@@ -72,6 +76,10 @@ module Skylab::TanMan
         result = nil
       end
       result
+    end
+
+    def anchored_program_name_for_subclient  # #todo - client services
+      program_name
     end
 
   private
@@ -126,8 +134,11 @@ module Skylab::TanMan
         a * ' and '  # #todo
       end
 
-      def s *a
-        a.last if a.last.respond_to? :id2name  # #todo
+      def s *a  # #todo
+        if a.last.respond_to? :id2name then a.last
+        elsif a[ 0 ].respond_to? :upto
+          's' if 1 != a[ 0 ]
+        end
       end
 
       alias_method :calculate, :instance_exec

@@ -22,7 +22,6 @@ module Skylab::TanMan::TestSupport
 
   Autoloader = Autoloader ; TanMan = TanMan ; TMPDIR = TMPDIR  # #annoy
 
-
   # this is dodgy but should be ok as long as you accept that:
   # 1) you are assuming meta-attributes work and 2) the below is universe-wide!
   # 3) the below presents holes that need to be tested manually
@@ -115,7 +114,15 @@ module Skylab::TanMan::TestSupport
     include CONSTANTS # to use MetaHell here ?
     include Tmpdir::InstanceMethods
 
-    attr_accessor :api_was_cleared # brings it all together
+    def clear_api_if_necessary
+      if ! api_was_cleared
+        @api_was_cleared = true
+        TanMan::Services.services.api.clear_all_services
+      end
+      nil
+    end
+
+    attr_reader :api_was_cleared
 
     def _build_normalized_input_pathname stem
       __input_fixtures_dir_pathname.join stem
@@ -124,7 +131,7 @@ module Skylab::TanMan::TestSupport
     let :api do
       api = TanMan::Services.services.api
       if do_debug
-        TanMan::API.debug = $stderr
+        TanMan::API.debug!
       end
       api
     end

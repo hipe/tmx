@@ -147,6 +147,10 @@ module Skylab::TanMan
     attr_accessor :verbose # compat
 
     def write_resource resource
+      write_resource_with_is_dry resource, false
+    end
+
+    def write_resource_with_is_dry resource, is_dry
 
       if ! resource.exist?
         load_default_content resource
@@ -154,7 +158,7 @@ module Skylab::TanMan
 
       serr = infostream # a special case
 
-      resource.write do |w|
+      resource.write_with_is_dry is_dry do |w|
 
         w.on_error(& method( :error ) ) # propagate the text msg up
 
@@ -163,7 +167,7 @@ module Skylab::TanMan
         end
 
         w.on_after_create w.on_after_update -> o do  # last part
-          serr.puts " .. done (#{ o.bytes } bytes.)"
+          serr.puts " .. done (#{ o.bytes }#{ ' (dry run)' if o.is_dry } bytes.)"
         end
 
         w.on_no_change do |txt|

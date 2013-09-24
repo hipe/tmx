@@ -1,7 +1,8 @@
 module Skylab::TanMan
 
   class CLI::Action
-    # forward-declaration for this class-as-namespace #pattern [#sl-109]
+
+    TanMan::Sub_Client[ self, :anchored_program_name ]
   end
 
   module CLI::Action::ModuleMethods
@@ -157,9 +158,12 @@ module Skylab::TanMan
       # a sound? certainly not.
 
       on_call_to_action do |e|
-        msg = TanMan::Services::
-          Template[ e.template, action: act( e.action_class ) ]
-        emit :help, msg  # if something else is listening to *this* ..
+        if ! e.touched?
+          e.touch!
+          msg = TanMan::Services::
+            Template[ e.template, action: act( e.action_class ) ]
+          emit :help, msg  # if something else is listening to *this* ..
+        end
         nil
       end
 
@@ -201,7 +205,7 @@ module Skylab::TanMan
     end
     #
     def full_invocation_parts cls
-      [ program_name, * cls.normalized_action_name ]
+      [ anchored_program_name, * cls.normalized_action_name ]
     end
 
     def api_invoke *args          # [normalized acton name] [param_h]
