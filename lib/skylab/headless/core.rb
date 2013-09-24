@@ -26,23 +26,28 @@ module Skylab::Headless
   MetaHell::MAARS[ self ]
 
   module New_method_produces_subclasses_with_members__
-    def self.[] client, p
+    def self.[] client, * x_a
+      st = Params__.new ; st[ x_a.shift ] = x_a.shift while x_a.length.nonzero?
+      new_class_notify_p, args_notify_p = st.to_a
       client.class_exec do
         class << self
           alias_method :orig_new, :new
         end
-        define_singleton_method :new do | * i_a, & p_ |
+        define_singleton_method :new do | * i_a, & p |
+          args_notify_p and args_notify_p[ i_a, p ]
           ::Class.new( self ).class_exec do
             extend MM__ ; include IM__
             class << self ; alias_method :new, :orig_new end
             const_set :MEMBER_I_A__, i_a.freeze
-            module_exec( * p_, & p )
+            module_exec( * p, & new_class_notify_p )
             self
           end
         end
       end
       nil
     end
+    #
+    Params__ = ::Struct.new :with_new_class, :with_args
     module MM__
       def members ; self::MEMBER_I_A__ end
     end
@@ -53,7 +58,7 @@ module Skylab::Headless
   end
 
   class Hooks_
-    New_method_produces_subclasses_with_members__[ self, -> do
+    New_method_produces_subclasses_with_members__[ self, :with_new_class, -> do
       members.each do |i|
         _p = :"#{ i }_p"
         define_method :"on_#{ i }" do |*a, &p|
@@ -66,11 +71,20 @@ module Skylab::Headless
   end
 
   class Event_
-    New_method_produces_subclasses_with_members__[ self, -> p=nil do
-      const_set :IVAR_A__, members.map { |i| :"@#{ i }" }
-      p and const_set( :MESSAGE_P__, p )
-      attr_reader( * members )
-    end ]
+    New_method_produces_subclasses_with_members__[ self,
+      :with_args, -> x_a, p do
+        if p
+          x_a.length.zero? or raise ::ArgumentError, "for now you cannot #{
+            }pass both a block and args (block proc's parameters will be #{
+            }used to determine the member list)"
+          x_a.concat p.parameters.map( & :last )
+        end ; nil
+      end,
+      :with_new_class, -> p=nil do
+        const_set :IVAR_A__, members.map { |i| :"@#{ i }" }
+        p and const_set( :MESSAGE_P__, p )
+        attr_reader( * members )
+      end ]
     def self.[] * x_a
       new( * x_a )
     end

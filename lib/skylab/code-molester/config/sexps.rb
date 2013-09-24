@@ -220,6 +220,11 @@ module Skylab::CodeMolester::Config
     def sections
       child( :sections ).enumerator
     end
+
+    def get_section_scanner_with_map_reduce_p p
+      child( :sections ).get_scanner_with_map_reduce_p p
+    end
+
     def _update_value assmt, value
       assmt.set_item_value value
     end
@@ -276,6 +281,11 @@ module Skylab::CodeMolester::Config
   end
 
   class Sexps::Section < Sexps::ContentItemBranch
+
+    def key
+      item_name
+    end
+
     Sexp[:section] = self
     def content_items
       self[2].select_children :assignment_line

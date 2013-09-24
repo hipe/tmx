@@ -114,18 +114,18 @@ module ::Skylab::CodeMolester
 
     attr_reader :pathname
 
-    default_escape_path = -> pn { pn.basename } # a nice safe common denom.
+    Default_escape_path__ = -> pn { pn.basename } # a nice safe common denom.
 
     Read = ::Struct.new :error, :read_error, :no_ent, :is_not_file,
       :invalid, :escape_path
 
-    define_method :read do |&block|  # ( b.c uses `default_escape_path` )
+    def read &block
       ev = Read.new
       block[ ev ] if block
       escape_path = -> pathname do
         ep = ev[ :escape_path ]
         ep && ep.respond_to?( :escape_path ) and ep = ep.escape_path  # #todo
-        ep ||= default_escape_path
+        ep ||= Default_escape_path__
         ep[ pathname ]
       end
       @pathname or
@@ -166,6 +166,8 @@ module ::Skylab::CodeMolester
     end
 
     delegates_to :sexp, :sections, -> { valid? }
+
+    delegates_to :sexp, :get_section_scanner_with_map_reduce_p, -> { valid? }
 
     delegates_to :sexp, :set_mixed, -> { valid? }
 
@@ -254,10 +256,14 @@ module ::Skylab::CodeMolester
 
       # a dubious and experimental way to pass in parameters -
 
-      attr_accessor :dry_run
+      attr_accessor :dry_run  # #todo this is terrible
       alias_method :is_dry_run, :dry_run
 
-      attr_accessor :escape_path
+      attr_accessor :escape_path  # #todo this is terrible
+
+      def is_dry_notify
+        @dry_run = true
+      end
     end
 
     module EVENT_
@@ -315,27 +321,29 @@ module ::Skylab::CodeMolester
     # is becoming the poster-child wet-dream of [#hl-022], which seeks
     # - possibly in vain - to dry up this prevalent pattern..)
 
-    define_method :write do |&block|  # ( because uses `default_escape_path`)
-      res = nil
-      w = Write.new
-      block[ w ] if block
-      w.escape_path ||= default_escape_path
+    def write &p
+      write_with_is_dry false, &p
+    end
+
+    def write_with_is_dry is_dry, &p
+      w = Write.new ; p and p[ w ] ; is_dry and w.is_dry_notify
+      w.escape_path ||= Default_escape_path__
       @pathname or
         raise "cannot write - no pathname associated with this #{ noun }"
       if valid?
         if exist?
           if @pathname_was_read
-            res = update w
+            r = update_with_struct w
           else
             fail "won't overwrite a pathname that was not first read"  # stub
           end
         else
-          res = create w
+          r = create_with_struct w
         end
       else
         raise "attempt to write invalid #{ noun } - check if valid? first"
       end
-      res
+      r
     end
 
     attr_reader :entity_noun_stem
@@ -362,9 +370,9 @@ module ::Skylab::CodeMolester
       @content = @invalid_reason = @pathname = @pathname_was_read = @valid = nil
     end
 
-    def create w  # ( assumes valid? and @pathname which not exist? )
-      res = nil
+    def create_with_struct w
       begin
+        is_dry = w.is_dry_run
         w.emit :before_create,
           resource: self,
           message_proc: -> { "creating #{ w.escape_path[ @pathname ] }" }
@@ -380,28 +388,25 @@ module ::Skylab::CodeMolester
             }#{ @pathname }"
 
         bytes = nil
-
-        if ! w.is_dry_run              # (contrast with `update`)
-          @pathname.open 'a' do |fh|   # ('a' not 'w' to fail gloriously)
-            bytes = fh.write string
-          end
+        ( is_dry ? Headless::IO::DRY_STUB : @pathname ).open 'a' do |fh|
+          bytes = fh.write string  # 'a' not 'w' to fail gloriously
         end
 
         w.emit :after_create,
           bytes: bytes,
+          is_dry: is_dry,
           message_proc: -> do
-            "created #{ w.escape_path[ @pathname ] } (#{ bytes } bytes)"
+            "created #{ w.escape_path[ @pathname ] } (#{ bytes }#{
+              }#{ " dry" if is_dry } bytes)"
           end
-
-        res = bytes
+        r = bytes
       end while nil
-      res
+      r
     end
 
-    def update w
-      res = nil
+    def update_with_struct w
       begin
-        string = self.string      # thread safety HA
+        string = self.string ; is_dry = w.is_dry_run  # thread safety HA
 
         if string == @pathname.read # #twice
           w.emit :no_change,
@@ -418,22 +423,21 @@ module ::Skylab::CodeMolester
 
         bytes = nil
 
-        pathname.open 'w' do |fh|
-          if ! w.is_dry_run  # ( contrast with `create` )
-            bytes = fh.write string
-          end
+        ( is_dry ? Headless::IO::DRY_STUB : @pathname ).open 'w' do |fh|
+          bytes = fh.write string
         end
 
         w.emit :after_update,
           bytes: bytes,
+          is_dry: is_dry,
           message_proc: -> do
-            "updated #{ w.escape_path[ @pathname ] } (#{ bytes } bytes)"
+            "updated #{ w.escape_path[ @pathname ] } (#{ bytes }#{
+              }#{ ' dry' if is_dry } bytes)"
           end
 
-        res = bytes
-
+        r = bytes
       end while nil
-      res
+      r
     end
   end
 end

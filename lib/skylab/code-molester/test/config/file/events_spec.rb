@@ -187,8 +187,8 @@ module Skylab::CodeMolester::TestSupport::Config::File
                   yep = e.message_proc[]
                 end
               end
-              bytes.should eql( nil )
-              yep.should match( /created some.conf \( bytes\)/ )
+              bytes.should be_kind_of( ::Fixnum )
+              yep.should match( /created some.conf \(\d+ dry bytes\)/ )
               path.exist?.should eql( false )
             end
           end
