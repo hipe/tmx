@@ -14,16 +14,16 @@ module Skylab::TanMan
 
     define_method :invoke do |name_a, param_h=nil, upstream_client=nil,
                                                                      events=nil|
-
-      debug = API.debug           # just for this request, within this call
+      do_debug = API.do_debug ; debug_stream = API.debug_stream
+                                  # just for this request, within this call
 
       response = nil              # if an events callable was not provided,
       if ! events                 # then caller gets all the events as result
         response = API::Response.new # (stream and tree are mutex for now).
         events = -> o do          # this will hook into the action and, for
           o.on_all do |e|         # low-level invalid things, the client itself
-            if debug
-              debug.puts "  >>> (api preview: #{[e.stream_name, e.message].inspect })"
+            if do_debug
+              debug_stream.puts "  >>> (api preview: #{[e.stream_name, e.message].inspect })"
             end
             response.add_event e
             nil

@@ -27,6 +27,49 @@ module Skylab::TanMan
           r
         end
       end
+
+      class List < API::Action
+
+        emits event_structure: :all
+
+        def set! _
+          _ ? never : true
+        end
+
+        attr_reader :verbose
+
+      private
+
+        def execute
+          begin
+            controllers.config.ready? or break
+            cnt = collections.dot_file.currently_using or break
+            r = cnt.get_remote_scanner
+          end while nil
+          r
+        end
+      end
+
+      class Remove < API::Action
+
+        extend API::Action::Attribute_Adapter
+
+        attribute :dry_run, default: nil
+        attribute :locator, required: true
+
+        attr_accessor :verbose
+
+      private
+
+        def execute
+          begin
+            controllers.config.ready? or break
+            cnt = collections.dot_file.currently_using or break
+            r = cnt.remove_remote_with_dry_run_and_locator @dry_run, @locator
+          end while nil
+          r
+        end
+      end
     end
   end
 end

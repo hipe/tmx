@@ -13,7 +13,7 @@ module Skylab::TanMan::TestSupport::API
     def debug!                                 # (aliased to tanman_api_debug!)
       tanman_debug!
       TMPDIR.debug!
-      TanMan::API.debug = $stderr # ok here i hope
+      TanMan::API.debug!
     end
     alias_method :tanman_api_debug!, :debug!
   end

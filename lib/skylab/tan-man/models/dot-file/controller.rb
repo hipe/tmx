@@ -160,7 +160,16 @@ module Skylab::TanMan
     def add_remote_notify * x_a
       remotes.add_notify x_a
     end
-    #
+
+    def get_remote_scanner
+      remotes.get_remote_scanner_notify
+    end
+
+    def remove_remote_with_dry_run_and_locator dry_run, locator
+      remotes.remove_with_dry_run_and_locator_notify dry_run, locator
+    end
+
+  private
     def remotes
       @remotes ||= Models::DotFile::Remotes__.new client_services
     end ; private :remotes
@@ -172,16 +181,17 @@ module Skylab::TanMan
       delegating :with_suffix, :_for_subclient,
         %i( emit expression_agent full_dotfile_pathname )
     end
-    private
     def emit_for_subclient i, x
       emit i, x
     end
     def expression_agent_for_subclient
-      @request_client.expression_agent
+      @request_client.expression_agent_for_subclient
     end
     def full_dotfile_pathname_for_subclient
       @pathname
     end
+  public
+
 
     nl_rx = /\n/ # meh
     num_lines = -> str do

@@ -50,6 +50,10 @@ module Skylab::TanMan::TestSupport::CLI
       @result.should eql( nil )
     end
 
+    def expect_newschool_result_for_success
+      @result.should eql( nil )
+    end
+
     def meta_hell_anchor_module
       CLI_TestSupport::Sandbox
     end
@@ -98,9 +102,8 @@ module Skylab::TanMan::TestSupport::CLI
       attr_accessor :pen
 
       def emit i, x
-        :payload == i and fail 'do me'
         ::String === x or fail 'do me'
-        errstream.puts x
+        ( :payload == i ? outstream : errstream ).puts x
         nil
       end
     end
@@ -122,6 +125,10 @@ module Skylab::TanMan::TestSupport::CLI
       expect_line_is_not_styled some_info_line
     end
 
+    def nonstyled_pay_line
+      expect_line_is_not_styled some_pay_line
+    end
+
     def styled_info_line
       expect_line_is_styled some_info_line
     end
@@ -130,8 +137,21 @@ module Skylab::TanMan::TestSupport::CLI
       baked.some_line_in :errstream
     end
 
+    def some_pay_line
+      baked.some_line_in :outstream
+    end
+
+    def expect_no_more_lines
+      expect_no_more_info_lines
+      expect_no_more_pay_lines
+    end
+
     def expect_no_more_info_lines
       baked.num_lines_remaining_in( :errstream ).should be_zero
+    end
+
+    def expect_no_more_pay_lines
+      baked.num_lines_remaining_in( :outstream ).should be_zero
     end
 
     def expect_line_is_styled line

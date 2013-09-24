@@ -32,8 +32,8 @@ module Skylab::TanMan
         k or break
         r = k.call self, param_h, events
         result = r
-        if API.debug
-          API.debug.puts "OK API GOT: #{ r.class }"
+        if API.do_debug
+          API.debug_stream.puts "OK API GOT: #{ r.class }"
         end
       end while nil
       result
@@ -44,6 +44,10 @@ module Skylab::TanMan
 
     def expression_agent
       @pen or never
+    end
+
+    def expression_agent_for_subclient
+      expression_agent  # until etc
     end
 
   private

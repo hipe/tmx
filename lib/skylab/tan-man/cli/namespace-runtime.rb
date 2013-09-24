@@ -3,6 +3,8 @@ module Skylab::TanMan
   class CLI::NamespaceRuntime < Bleeding::Namespace::Inferred
     # to be refactored at [#023]
 
+    TanMan::Sub_Client[ self, :anchored_program_name, :expression_agent ]
+
     include Core::SubClient::InstanceMethods
     # or core action i.m's
     #

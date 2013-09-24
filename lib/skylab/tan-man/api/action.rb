@@ -2,6 +2,8 @@ module Skylab::TanMan
 
   class API::Action
 
+    TanMan::Sub_Client[ self, :expression_agent ]
+
     extend Core::Action::ModuleMethods
 
     include Core::Action::InstanceMethods
@@ -25,10 +27,6 @@ module Skylab::TanMan
         result = action.send :execute   # it only b/c we are the class!
       end                               # it is private for the usual reasons
       result
-    end
-
-    def expression_agent
-      @request_client.expression_agent
     end
 
   public

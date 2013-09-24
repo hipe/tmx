@@ -43,6 +43,31 @@ module Skylab::TanMan
       true
     end
 
+    Remove_hooks__ = -> do
+      p = -> do
+        Remove_Hooks__ = Headless::Hooks_.new :not_found, :success
+        p = -> { Remove_Hooks__ }
+        Remove_Not_Found__ = TanMan::Event_.new do |section_name_s|
+          "no such section [#{ section_name_s }]"
+        end
+        Remove_Success__ = TanMan::Event_.new do |section_name_s|
+          "removed section [#{ section_name_s }]"
+        end
+        Remove_Hooks__
+      end
+      -> { p.call }
+    end.call
+
+    def remove_entity_by_section_name name_s, & event_p
+      event_p[ on = Remove_hooks__[].new ]
+      if (( section = sections[ name_s ] ))
+        sections.remove( section ) or never  # raises on failure, sexp on OK
+        on.success_p[ Remove_Success__[ name_s ] ]
+      else
+        on.not_found_p[ Remove_Not_Found__[ name_s ] ]
+      end
+    end
+
   private
 
     def initialize param_h

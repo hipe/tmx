@@ -21,7 +21,7 @@ module Skylab::TanMan
     def initialize
       @tmpdir = ::Skylab::TestSupport::Tmpdir.new(
         "#{ ::Dir.tmpdir }/tanny-manny" )
-      @tmpdir.debug! if TanMan::API.debug
+      @tmpdir.debug! if TanMan::API.do_debug
       @tmpdir.prepare
     end
   end

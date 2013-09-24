@@ -30,8 +30,10 @@ module Skylab::TanMan::TestSupport::CLI::Actions::Graph::Remote::Core
       expect_section 'options' do
         expect_exactly_one_line
       end
-      expect_section 'action' do
+      expect_section 'actions' do
         expect_item 'add', /adds a remote.+source.+for syncing/
+        expect_item 'list', /./
+        expect_item 'remove', /./
         expect_no_more_items
       end
     end
