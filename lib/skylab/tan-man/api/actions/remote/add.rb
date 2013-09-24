@@ -2,12 +2,14 @@ module Skylab::TanMan
 
   class API::Actions::Remote::Add < API::Action
 
-    extend API::Action::Attribute_Adapter
+    TanMan::Sub_Client[ self,
+      :attributes,
+        :required, :attribute, :host,
+        :required, :attribute, :name,
+        :attribute, :resource, :default, :local,
+          :mutex_boolean_set, [ :local, :global ] ]
 
-    attribute :host, required: true
-    attribute :name, required: true
-    attr_reader :name  # ICK override ..
-    attribute :resource, default: :local, mutex_boolean_set: [:local, :global]
+      attr_reader :name  # covered, hacky
 
     attr_reader :verbose # compat
 

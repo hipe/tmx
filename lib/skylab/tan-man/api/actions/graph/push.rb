@@ -1,10 +1,11 @@
 module Skylab::TanMan
   class API::Actions::Graph::Push < API::Action
-    extend API::Action::Attribute_Adapter
 
-    attribute :dry_run, boolean: true, default: false
-    attribute :file_path, required: true, pathname: true
-    attribute :remote_name, required: true
+    TanMan::Sub_Client[ self,
+      :attributes,
+        :boolean, :attribute, :dry_run, :default, true,
+        :required, :pathname, :attribute, :file_path,
+        :required, :attribute, :remote_name ]
 
     emits :all, negative: :all, info: :all,
       file_not_found: :negative,

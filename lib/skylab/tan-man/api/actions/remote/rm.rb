@@ -1,10 +1,11 @@
 module Skylab::TanMan
 
   class API::Actions::Remote::Rm < API::Action
-    extend API::Action::Attribute_Adapter
 
-    attribute :remote_name, required: true
-    attribute :resource_name, mutex_boolean_set: [:local, :global]
+    TanMan::Sub_Client[ self,
+      :attributes,
+        :required, :attribute, :remote_name,
+        :attribute, :resource_name, :mutex_boolean_set, [ :local, :global ] ]
 
     attr_reader :verbose
 

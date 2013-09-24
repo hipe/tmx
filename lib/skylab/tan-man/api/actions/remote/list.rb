@@ -1,9 +1,9 @@
 module Skylab::TanMan
 
   class API::Actions::Remote::List < API::Action
-    extend API::Action::Attribute_Adapter
 
-    attribute :verbose, :boolean => true, :default => false
+    TanMan::Sub_Client[ self, :attributes,
+      :boolean, :attribute, :verbose, :default, false ]
 
   private
 

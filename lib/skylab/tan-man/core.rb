@@ -48,6 +48,14 @@ module Skylab
 
     module Bundles__
 
+      Attributes = -> a do
+        module_exec a, & TanMan::API::Action::Attribute_Adapter.to_proc
+      end
+
+      Client_Services = -> a do
+        module_exec a, & Headless::Client_Services.to_proc
+      end
+
       Anchored_program_name = -> _ do
         define_method :anchored_program_name do
           @request_client.anchored_program_name_for_subclient
@@ -66,11 +74,7 @@ module Skylab
         end ; private :expression_agent
       end
 
-      Client_Services = -> a do
-        module_exec a, & Headless::Client_Services.to_proc
-      end
-
-      Headless::Bundle::Multiset[ self ]
+      MetaHell::Bundle::Multiset[ self ]
     end
 
     class Event_ < Headless::Event_

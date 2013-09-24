@@ -1,16 +1,15 @@
 module Skylab::TanMan
 
   class API::Actions::Init < API::Action
-    extend API::Action::Attribute_Adapter
-
 
     include TanMan::Services::FileUtils::InstanceMethods
 
-    attribute :dry_run, boolean: true
-    attribute :local_conf_dirname, required: true,
-                default: API.local_conf_dirname
-    attribute :path, pathname: true, required: true,
-                default: ->{ ::Dir.getwd }
+    TanMan::Sub_Client[ self,
+      :attributes,
+        :boolean, :attribute, :dry_run,
+        :required, :attribute, :local_conf_dirname,
+          :default, API.local_conf_dirname,
+        :required, :pathname, :attribute, :path, :default, -> { ::Dir.getwd } ]
 
     emits :all, error: :all, info: :all, skip: :info # etc
 

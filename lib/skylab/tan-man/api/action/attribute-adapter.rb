@@ -2,33 +2,51 @@ module Skylab::TanMan
 
   module API::Action::Attribute_Adapter
 
-    def self.extended klass
+    def self.to_proc ; BUNDLE_P__ end
 
-      # this apparently has to happen on the parent class or the class
-      # and can't simply be mixed in via plain old m.m and i.m modules
+    BUNDLE_P__ = -> a do
 
-      klass.extend MetaHell::Formal::Attribute::Definer::Methods # so it can say
-                                       # `attribute` and `meta_attribute`
+      extend MetaHell::Formal::Attribute::Definer::Methods
+        # class can now say `attribute` and `meta_attribute`
+      include IM__
 
-      klass.send :include, API::Action::Attribute_Adapter::InstanceMethods
-
-
-      # where as we used to do it "in one place" on the action base
-      # class we now do the below as a hook for each child that extends
-      # the legacy adapter.  ich muss sein!
-
-      klass.meta_attribute(* Core::MetaAttributes[ :boolean, :default,
-                         :mutex_boolean_set, :pathname, :required, :regex ] )
-
-      klass.attribute_metadata_class do        # (just playing w/ the feature)
+      meta_attribute( * META_ATTRIBUTE_A__ )
+      attribute_metadata_class do
         def label_string
           local_normal_name.to_s
+        end
+      end
+      p = Attr_parser__[ self, a ]
+      nil while a.length.nonzero? && p[]
+    end
+
+    META_ATTRIBUTE_A__ = Core::MetaAttributes[ :boolean, :default,
+      :mutex_boolean_set, :pathname, :required, :regex ]
+    -> do
+      h = -> *a { ::Hash[ a.map { |i| [ i , true ] } ].freeze }
+      MONADIC_H__ = h[ :boolean, :pathname, :required ]
+      DIADIC_H__ = h[ :default, :mutex_boolean_set ]
+    end.call
+    Attr_parser__ = -> cls, a do
+      cls.class_eval do
+        -> do  # assume nonzero length
+          h = { }
+          h[ a.shift ] = true while MONADIC_H__[ a[ 0 ] ]
+          if :attribute == a[ 0 ]
+            a.shift ; attr_name_i = a.shift
+            h[ a.shift ] = a.shift while DIADIC_H__[ a[ 0 ] ]
+            attribute attr_name_i, h
+            true
+          elsif h.length.nonzero?
+            raise ::ArgumentError, "expected `attribute` at '#{ a[ 0 ] }' #{
+              }after #{ h.keys * ', ' }"
+          end
         end
       end
     end
   end
 
-  module API::Action::Attribute_Adapter::InstanceMethods
+  module API::Action::Attribute_Adapter::IM__
 
     include Core::Attribute::Reflection::InstanceMethods
 

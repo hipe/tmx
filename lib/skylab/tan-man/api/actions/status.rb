@@ -4,9 +4,9 @@ module Skylab::TanMan
     # (as it is it's a nifty proof of concept of complex event graphs,
     # but let's get that ee.push b.s out of here and make it headless)
 
-    extend API::Action::Attribute_Adapter
-
-    attribute :path, pathname: true, required: true
+    TanMan::Sub_Client[ self,
+      :attributes,
+        :required, :pathname, :attribute, :path ]
 
     emits :all, negative: :all, positive: :all, global: :all, local: :all,
       local_positive: [:local, :positive],

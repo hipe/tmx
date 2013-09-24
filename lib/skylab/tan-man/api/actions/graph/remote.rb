@@ -8,11 +8,11 @@ module Skylab::TanMan
 
         emits event_structure: :all
 
-        extend API::Action::Attribute_Adapter
-
-        attribute :node_names, default: nil
-        attribute :script, required: true
-        attribute :verbose, default: nil
+        TanMan::Sub_Client[ self,
+          :attributes,
+            :attribute, :node_names, :default, nil,
+            :required, :attribute, :script,
+            :attribute, :verbose, :default, nil ]
 
       private
 
@@ -52,10 +52,10 @@ module Skylab::TanMan
 
       class Remove < API::Action
 
-        extend API::Action::Attribute_Adapter
-
-        attribute :dry_run, default: nil
-        attribute :locator, required: true
+        TanMan::Sub_Client[ self,
+          :attributes,
+            :attribute, :dry_run, :default, nil,
+            :required, :attribute, :locator ]
 
         attr_accessor :verbose
 
@@ -69,6 +69,10 @@ module Skylab::TanMan
           end while nil
           r
         end
+      end
+
+      class Sync < API::Action
+
       end
     end
   end
