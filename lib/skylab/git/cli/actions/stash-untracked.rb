@@ -880,7 +880,8 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
 
   # the below is so wrong but we are doing it for posterity to make the
   # old code work below it
-  define_singleton_method :stylize, & Headless::CLI::Pen::FUN[:stylize]
+
+  define_singleton_method :stylize, & Headless::CLI::Pen::FUN.stylize
 
   PATCH_STYLES = [
     ->(s) { stylize(s, :strong, :red) },

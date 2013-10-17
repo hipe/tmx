@@ -4,7 +4,7 @@ module Skylab::Headless
 
     class IO_ < ::Module
 
-      def stdin
+      def stdin  # #todo - these should be renamed to "*_proc" or changed so that they do not result in procs but IO's
         IO::Stdin_
       end
 

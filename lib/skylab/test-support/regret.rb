@@ -2,7 +2,7 @@ module ::Skylab::TestSupport
 
   module Regret  # full introduction at [#017], notes at [#016]
 
-    def self.embellish mod
+    def self.[] mod
       mod.module_exec do
         extend Regret::Anchor_ModuleMethods
         init_regret caller_locations( 3, 1 )[ 0 ], nil
@@ -10,24 +10,19 @@ module ::Skylab::TestSupport
       nil
     end
 
-    class << self
-      alias_method :[], :embellish
-    end
-
     module Anchor_ModuleMethods
 
       include Autoloader::Methods
 
-      def edify child_mod
+      def [] child_mod, loc=nil
+        loc ||= caller_locations( 1, 1 )[ 0 ]
         parent_anchor_module = self
         child_mod.module_exec do
           extend Anchor_ModuleMethods
-          init_regret caller_locations( 3, 1 )[ 0 ], parent_anchor_module
+          init_regret loc, parent_anchor_module
         end
         nil
       end
-
-      alias_method :[], :edify
 
     private
 

@@ -1,19 +1,12 @@
 module Skylab::Headless
 
-  module API
+  module API  # was [#010], [#017]
 
-    # (we assume this is for the most part deprecated by Face::API! #todo)
+    module Client
 
-    # (this used to not know about actions and clients! [#hl-010])
-    # the frontier sub-product for this is flex2treetop - make sure to
-    # cross-test the two! changes anticipated near [#017]
-
-    class RuntimeError < ::RuntimeError
     end
-  end
 
-  module API::Client
-    # what did you think we were going to write it for you? :P
+    RuntimeError = ::Class.new ::RuntimeError
   end
 
   module API::Client::InstanceMethods

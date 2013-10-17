@@ -1,5 +1,5 @@
 [#021]       #digraph #redundancy-point
-[#020]       #api-point (the etheral notion of meta-api's for basic field)
+[#020]       #open
 [#019]       #done move semantic into here #after:cu-001
 [#018]       #doc-point #parent:006 #body-is-inline-in-parent
                a module and a switch statement hve `semantic intersect`
@@ -28,6 +28,6 @@
 [#006]       #doc-node developing a pattern language for abstract structures ..
 [#005]       #track-node all String Templating-like nerks
 [#004]       #track-node basic list file lines (duplication in universe)
-[#003]       #branch-node, field sub-node
+[#003]       #branch-node, field sub-node (#meta-fields)
 [#002]       #branch-node, list sub-node
 [#001]       #branch-node, tree sub-node

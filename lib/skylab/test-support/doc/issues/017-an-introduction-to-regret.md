@@ -44,12 +44,77 @@ depending on the application/library being tested, a TestSupport module
   (these are hot-loaded extensions)
 
 For our implementation of Regret itself as it will be used in the field,
-we use the `embellish` (`[]`) method to enhance the topmost TestSupport
-module in the subproduct.
+pass your topmost TestSupport module to the Regret module itself thru its
+`[]` method.
 
 To cascade the regretfullness downward at each successive level (directory)
-in the test/ directory, nodes in the graph will call `edify` (also `[]`) of
-the parent node, which is supposed to enhance the node appropriately.
+in the test/ directory, each successive TestSupport module downward will pass
+itself to the parent node (also a TestSupport module) via the parent node's
+`[]` method, which is supposed to enhance the node appropriately.
+
+in practice this absolutely should *not* be in one file, but for a schematic
+illustration of above, the below is an example graph illustrating nested
+business modules with the appropriate test support module built for each
+such module. for clarity we use fully qualified constant names where
+appropriate.
+
+    module ::MyApp
+      module TestSupport
+        Regret[ self ]
+      end
+
+      module Sub_Component_to_My_App
+      end
+      module TestSupport::Sub_Component_to_My_App
+        ::MyApp::TestSupport[ self ]
+      end
+
+      module Sub_Component_to_My_App::Sub_Sub
+      end
+      module TestSupport::Sub_Component_to_My_App::Sub_Sub
+        ::MyApp::TestSupport::Sub_Component_to_My_App[ self ]
+      end
+    end
+
+above we have three business modules nested within one another matryoshka-
+doll style. each business node has a corresponding test support node. note
+however that the test support modules are nested matryoska-doll-style under
+the topmost test-support node (which itself is nested in the topmost business
+moduele); that is, each test support module is *not* nested within its
+corresponding business node.
+
+(not pictured is the useful content - the instance method module and module
+method modules that we write under each test support node that have the
+business-specific test support code.)
+
+a condensed way of expressing this same taxonomy with two paths is:
+
+  B1::B2::B3
+  B1::T1::T2::T3
+
+or as a tree:
+
+  B1
+  ├── B2
+  │   └── B3
+  └── T1
+      └── T2
+          └── T3
+
+the reason that the test nodes are not nested under their corresponding
+business nodes (except incidentially T1 under B1) is twofold: for one, almost
+by necessity our module tree follows the filesystem tree; and the universal
+convention seems to be to have a dedicated "test" (or "spec") directory per
+project that holds all unit tests (as opposed to one "test" directory for each
+business directory).
+
+for two, some business modules have a sensitive namespace ("box modules"):
+the constants that exist within these modules constitute a collection with
+busines value. we can't have test modules coming in and polluting those
+namespaces. also we don't want any autoloading hacks to cross-contaminate
+the two domains (business, and testing).
+
+..
 
 for better or worse, the above steps have been repeated hundreds of times
 in our test graph, in effort to provide some magic while avoiding other

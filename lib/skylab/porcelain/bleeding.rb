@@ -176,6 +176,11 @@ module Skylab::Porcelain::Bleeding
       r
     end
 
+    def absorb_iambic x_a
+      x_a.length.zero? or fail "do me - you need to implement your own `absorb_iambic` for this #{ self.class } (for e.g '#{ x_a[ 0 ] }')"
+      true
+    end
+
   private
 
     def build_option_syntax
@@ -410,8 +415,6 @@ module Skylab::Porcelain::Bleeding
       syntax = (false == o[:syntax]) ? '<action>' : self.syntax
       emit :help, "#{hdr 'usage:'} #{program_name} #{syntax} [opts] [args]"
     end
-
-    attr_reader :last_live_action
 
     def resolve argv # mutates argv .. here is the secret to our tail call rec.
       res = nil
@@ -721,16 +724,24 @@ module Skylab::Porcelain::Bleeding
       self.class::Actions
     end
 
-    def invoke argv  # (signatre is in accordance with [#hl-020])
-      res = nil
-      method, args = resolve argv.dup
-      @last_live_action = if method
-        res = method.receiver.send method.name, *args
-        method.receiver
-      else
-        res = method
+    def invoke argv  # signature #comport with [#hl-020]
+      invoke_with_iambic [ :argv, argv ]
+    end
+
+    def invoke_with_iambic x_a  # mutates. for now redundant with above.
+      @last_hot_action = nil
+      a = 0.step( x_a.length - 2, 2 ).select do |idx| :argv == x_a[ idx ] end
+      idx = a.pop ; begin
+        argv = x_a.fetch idx + 1
+        x_a[ idx, 2 ] = MetaHell::EMPTY_A_
+      end while (( idx = a.pop ))
+      r, args = resolve argv.dup
+      if r
+        hot = @last_hot_action = (( method = r )).receiver
+        ok, r = hot.absorb_iambic x_a
+        ok and r = hot.send( method.name, * args )
       end
-      res
+      r
     end
 
     attr_reader :program_name

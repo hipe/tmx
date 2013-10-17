@@ -13,6 +13,10 @@ module Skylab::Headless
       -> x { x.to_s.gsub( rx ) { $~[1].upcase } }
     end.call
 
+    Labelize = -> i do
+      Naturalize[ i ].sub( /\A[a-z]/, & :upcase )
+    end
+
     o[:normify] = -> do           # make a const-looking string be normalized.
       rx = /(?<=[a-z])(?=[A-Z])|_|(?<=[A-Z])(?=[A-Z][a-z])/
       -> x { x.to_s.gsub( rx ) { '_' }.downcase.intern }
@@ -26,7 +30,7 @@ module Skylab::Headless
       i.to_s.gsub '-', '_'
     end
 
-    o[:naturalize] = -> i do      # for normals only, handles dashy normals
+    Naturalize = o[:naturalize] = -> i do      # for normals only, handles dashy normals
       i.to_s.gsub( /[-_]/, ' ' )
     end
 

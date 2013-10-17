@@ -59,20 +59,25 @@ module Skylab::PubSub
       end
     end
 
-    def emits *graph_ref
-      event_stream_graph.absorb_nodes graph_ref, -> stream_name do
+  private
+
+    def emits * graph_x_a
+      event_stream_graph.absorb_nodes graph_x_a, -> stream_name do
         # (this hookback is called only when a new node is added to the graph)
         m = "on_#{ stream_name }"
         if ! method_defined? m
-          define_method m do |*a, &b|          # (a/b - func or block, exclusive)
-            on stream_name, *a, &b
+          define_method m do |*a, &p|          # (a/b - func or block, exclusive)
+            if p || a.length.nonzero?
+              on stream_name, *a, &p
+            else
+              read_handler_for_event_stream_notify m  # you're on your own
+            end
           end
         end
         nil
       end
       nil
     end
-    private :emits   # outside nerks should not berk your derk
 
     def event_class klass                      # on a module it's a writer
       if klass.respond_to? :call
@@ -82,7 +87,6 @@ module Skylab::PubSub
       end
       nil
     end
-    private :event_class
 
     def event_factory callable                 # on a module it's a writer
       if callable.respond_to? :arity and 0 == callable.arity
@@ -96,7 +100,11 @@ module Skylab::PubSub
       end                         # eew 2x)
       nil
     end
-    private :event_factory
+
+    def use_default_event_factory  # e.g if the superclass customized it
+      alias_method :build_event_factory, :default_build_event_factory
+      nil
+    end
 
     #        ~ advanced semantic reflection experiments ~
 
@@ -104,11 +112,10 @@ module Skylab::PubSub
       event_stream_graph.set_taxonomic_stream_names name_a
       nil
     end
-    private :taxonomic_streams
 
     def is_pub_sub_emitter_module
       true  # future-proof quack-testing
-    end
+    end ; public :is_pub_sub_emitter_module
   end
 
   class PubSub::Stream < Basic::Digraph::Node  # (#stowaway) used above
@@ -203,6 +210,7 @@ module Skylab::PubSub
       # that we don't have to check for whether the thing is initted each
       # time we for e.g. call `emit`, and in theory it will only get us in
       # to trouble if we use alias_method on the below three #experimental
+      # # #todo this is a truly terrible way to do this and should be swapped out with an `initialize` hook if possible
 
       the_list = [ :emit, :event_listeners, :event_stream_graph ]  # used 2x
 
@@ -266,6 +274,7 @@ module Skylab::PubSub
         event_class.new esg, stream_name, *payload_a
       end
     end
+    alias_method :default_build_event_factory, :build_event_factory
 
     def event_class
       PubSub::Event::Unified  # a default
@@ -411,6 +420,16 @@ module Skylab::PubSub
     def unhandled_stream_graph
       event_stream_graph.minus event_listeners.names
     end
+
+  private  #  ~ misc reflective services
+
+    def build_contextualized_stream_name_from_channel_i channel_i
+      Contextualized_Stream_Name__.new channel_i, some_event_stream_graph
+    end
+
+    def some_event_stream_graph
+      event_stream_graph or raise "no event stream graph"
+    end
   end
 
   module PubSub::Emitter::InstanceMethods_  # (see big comment above `the_list`)
@@ -509,16 +528,12 @@ module Skylab::PubSub
         @event_id = next_id[ ]
         @is_touched = false
         @stream_name = stream_name
-        if esg
-          if esg.respond_to? :call
-            fail 'where'
-          else
-            @event_stream_graph_ref = -> { esg }
-          end
-        elsif esg.nil?
-          fail 'where'
+        @event_stream_graph_ref = if esg
+          esg.respond_to?( :call ) and fail 'where'
+          -> { esg }
         else
-          @event_stream_graph_ref = esg  # allow false - intentionally not set
+          esg.nil? and fail 'where'  # esg must be trueish or false,
+          false  # false meaning "intentionally not set"
         end
         if payload.length.nonzero?
           @payload_a = payload  # don't confuse subclass instances by setting this
@@ -539,15 +554,14 @@ module Skylab::PubSub
       true
     end
 
-    def is? sym
-      !! event_stream_graph.walk_pre_order( @stream_name, 0 ).detect do |sm|
-        sym == sm
-      end
-    end
-
     attr_reader :payload_a
 
     attr_reader :stream_name
+
+    def is? stream_i
+      (( @cs ||= Contextualized_Stream_Name__.
+        new( @stream_name, event_stream_graph ) )).is? stream_i
+    end
 
     def touch!
       @is_touched = true
@@ -563,6 +577,24 @@ module Skylab::PubSub
     MetaHell::Function.enhance( self ).
       as_private_getter :@event_stream_graph_ref, :event_stream_graph
 
+  end
+  #
+  class Contextualized_Stream_Name__
+
+    def initialize stream_i, esg
+      esg or never
+      @esg_p = -> { esg } ; @stream_i = stream_i
+    end
+
+    attr_reader :stream_i
+
+    def is? stream_i
+      esg.x_is_kind_of_y @stream_i, stream_i
+    end
+  private
+    def esg
+      @esg_p.call
+    end
   end
 
   class PubSub::Event::Textual < PubSub::Event::Unified
@@ -664,7 +696,7 @@ module Skylab::PubSub
 
   module PubSub::Emitter  # ad-hoc emitter class producer.
 
-    def self.new *graph_ref
+    def self.new *graph_ref, &p
 
       ::Class.new.class_exec do
 
@@ -690,6 +722,8 @@ module Skylab::PubSub
           emit :error, msg
           false
         end
+
+        p and class_exec( & p )
 
         self
       end

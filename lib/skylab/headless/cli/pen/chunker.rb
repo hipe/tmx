@@ -1,6 +1,6 @@
 module Skylab::Headless
 
-  CLI::Pen::Chunker = MetaHell::Function::Class.new :gets
+  CLI::Pen::Chunker = MetaHell::Function::Class.new :gets  # :[#085]
   class CLI::Pen::Chunker
 
   private

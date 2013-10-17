@@ -8,6 +8,14 @@ module ::Skylab::CodeMolester
     #
     # `def self.[] *a` it is left as-is from parent, but see `Registrar`
 
+    def members
+      self.class.members
+    end
+
+    def self.members
+      const_defined?( :MEMBER_I_A__, true ) and self::MEMBER_I_A__
+    end
+
     #         ~ readers for core attributes ~
 
     # `symbol_name` - NOTE no, we do not mean `name_symbol` here.
@@ -21,12 +29,28 @@ module ::Skylab::CodeMolester
 
     #         ~ readers for derived attributes ~
 
+    def has_content  # so you don't have to unparse the whole structure
+      d = 1 ; len = length
+      while d < len
+        x = self[ d ]
+        r = if x.respond_to? :has_content
+          x.has_content
+        else
+          x.respond_to? :ascii_only? or fail "no - #{ x.class }"
+          x.length.nonzero?
+        end
+        r and break
+        d += 1
+      end
+      r
+    end
+
     def unparse
       sio = CodeMolester::Services::StringIO.new
       unparse_to sio
       sio.string
     end
-
+    #
     def unparse_to sio
       self[ 1 .. -1 ].each do |x|
         if x.respond_to? :unparse_to
@@ -58,10 +82,13 @@ module ::Skylab::CodeMolester
     end
     #
     class Scanner_With_Map_Reduce_P__
-      def initialize sexp, p
-        @sexp = sexp ; @filter_p = p
+      def initialize sexp, p, init_p=nil
+        @sexp = sexp ; @filter_p = p ; @count = 0
         @gets_p = -> do
-          d = 0 ; last = @sexp.length - 1 ; @count = 0
+          d = 0 ; last = @sexp.length - 1
+          if init_p
+            init_p[] ; init_p = nil
+          end
           @rewind_p = -> { d = 0 ; @count = 0 }
           (( @gets_p = -> do
             while d < last
@@ -77,10 +104,11 @@ module ::Skylab::CodeMolester
       def gets ; @gets_p.call end
       def rewind ; @rewind_p.call ; nil end
       attr_reader :count
-      def to_a  # where available. from current state onwards. has side-effects.
-        a = [ ] ; while (( x = gets ))
-          a << x.collapse
-        end ; a
+      def to_a
+        to_enum.to_a
+      end
+      def each  # #comport with ruby for `to_enum`, public for upstream
+        x = nil ; yield x while x = gets ; nil
       end
     end
 
@@ -116,7 +144,6 @@ module ::Skylab::CodeMolester
         b ? ea.each( &b ) : ea
       end
     end.call
-
 
     #         ~ lower-level access to the underlying scanning ~
 

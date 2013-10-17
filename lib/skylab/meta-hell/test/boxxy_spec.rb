@@ -136,8 +136,7 @@ module Skylab::MetaHell::TestSupport::Boxxy
         module Sandbox_3
           -> do
             Noodles.const_fetch( :ramen, -> { } ) { }
-          end.should raise_error( ArgumentError,
-                       ::Regexp.new( "\\Atoo" ) )
+          end.should raise_error( ::IndexError )
         end
       end
       it "a `const_fetch` NameError has fun metadata" do

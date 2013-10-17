@@ -33,27 +33,27 @@ module Skylab::TestSupport
       @streams.keys
     end
 
-    debug = ::Struct.new :condition, :emit
-
-    define_method :debug! do |stderr|
+    def debug! stderr
       # each time a line is parsed out  of any stream we will `puts` to your
       # `stderr` a line in a  format of our choosing showing both the stream
       # name and the string content after any filters have been applied
-      @debug ||= debug.new
+      @debug ||= Debug__.new
       @debug[:condition] ||= MetaHell::MONADIC_TRUTH_
       @debug[:emit] = -> line do
         stderr.puts [ line.stream_name, line.string ].inspect
       end
       stderr
     end
+    #
+    Debug__ = ::Struct.new :condition, :emit
 
     attr_reader :debug                         # (some tests want to know)
 
-    define_method :debug= do |f|  # expert mode
-      @debug ||= debug.new
-      @debug[:condition] = f
+    def debug= p  # #todo rename
+      @debug ||= Debug__.new
+      @debug[:condition] = p
       debug!( Stderr_[] ) if ! @debug[:emit]
-      f
+      p
     end
 
     def do_debug
@@ -66,9 +66,7 @@ module Skylab::TestSupport
                                   # on the string, the line having the result.
     attr_reader :lines
 
-    line_struct = ::Struct.new :stream_name, :string # #duplicated at [#ts-007]
-
-    define_method :stream_spy_for do |name|
+    def stream_spy_for name
       @streams.fetch name do
         downstream = Subsys::Services::StringIO.new
         filter = Headless::IO::Interceptors::Filter.new downstream
@@ -77,7 +75,7 @@ module Skylab::TestSupport
           str = downstream.string.dup # you gotta
           downstream.truncate 0
           @line_filters and str = @line_filters.reduce( str ) { |x, f| f[x] }
-          line = line_struct.new name, str
+          line = Line__.new name, str
           if @debug and @debug.condition[ ]
             @debug.emit[ line ]
           end
@@ -90,25 +88,25 @@ module Skylab::TestSupport
         spy
       end
     end
+    #
+    Line__ = ::Struct.new :stream_name, :string # #duplicated at [#ts-007]
 
     def for *a                    # (i don't generally like aliases for aliases'
       stream_spy_for(* a)         # sake  but this one in particular can help
     end                           # make tests concise and readable)
 
-
-    names_strings_hack = ::Module.new.module_eval do
-      def names   ; self[0] end
-      def strings ; self[1] end
-      self
-    end
-
-    define_method :unzip do       # goofy fun. result: 2 parallel arrays:
-      names = [ ] ; strings = [ ]              # names and strings
-      lines.each do |o|                        # this is of dubious value,
-        names.push o.stream_name                      # but is fun
-        strings.push o.string
+    def unzip  # goofy fun. result: 2 parallel arrays: names and strings
+      r = Names_And_Strings__.new 2
+      name_i_a = r[ 0 ] = [ ] ; string_a = r[ 1 ] = [ ]
+      lines.each do |o|
+        name_i_a << o.stream_name
+        string_a << o.string
       end
-      [names, strings].extend names_strings_hack
+      r
+    end
+    class Names_And_Strings__ < ::Array
+      def names   ; self[ 0 ] end
+      def strings ; self[ 1 ] end
     end
 
   private

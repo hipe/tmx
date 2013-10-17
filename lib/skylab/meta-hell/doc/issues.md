@@ -1,3 +1,8 @@
+[#054]       (#move '041-ghost-modules-explained..md')
+[#053]       #doc-point "discussion of all the meta-properties.."
+[#052]       #in-situ
+[#051]       #in-situ
+[#050]       #doc-point this class of grammars, and this parser..
 [#049]       #tracking-tag :#fuzzy
 [#048]       #doc-point what are puffers and when should you use them ..
 [#047]       (open)

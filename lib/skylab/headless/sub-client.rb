@@ -35,20 +35,22 @@ module Skylab::Headless::SubClient
     end
 
     def request_client
-      @request_client or begin
-        loc = caller_locations( 1, 1 )[ 0 ]
-        desc = if BLOCK_ == loc.label[ BLK_R_ ]
-          pth = loc.absolute_path
-          pth.sub! %r|\A#{ ::Regexp.escape ::Skylab.dir_pathname.to_s }/|, ''
-          " in block at #{ pth }:#{ loc.lineno }"
-        else
-          " of `#{ loc.base_label }`"
-        end
-        fail "#{ self.class } cannot delegate call#{ desc } #{
-          }upwards to request client - request client is human (#{
-          }do you need to implement it for that class)?"
-      end
+      @request_client or no_request_client_notify caller_locations( 1, 1 )[ 0 ]
     end
+
+    def no_request_client_notify loc
+      desc = if BLOCK_ == loc.label[ BLK_R_ ]
+        pth = loc.absolute_path
+        pth.sub! %r|\A#{ ::Regexp.escape ::Skylab.dir_pathname.to_s }/|, ''
+        " in block at #{ pth }:#{ loc.lineno }"
+      else
+        " of `#{ loc.base_label }`"
+      end
+      fail "#{ self.class } cannot delegate call#{ desc } #{
+        }upwards to request client - request client is human (#{
+        }do you need to implement it for that class)?"
+    end
+
     module Headless::SubClient    # we can't define constants here
       BLOCK_ = 'block '.freeze    # it might be a box module.
       BLK_R_ = 0 ... BLOCK_.length
@@ -122,7 +124,23 @@ module Skylab::Headless::SubClient
 
   end
 
-  EN_FUN = -> do
+  EN_FUN = MetaHell::FUN::Module.new
+
+  module EN_FUN
+
+    def self.[] mod, * x_a
+      :private == x_a[ 0 ] or fail "only `private` is supported for now (had #{ Headless::Services::Basic::FUN::Inspect[ x_a[ 0 ] ] })"
+      x_a.shift
+      1 == x_a.length or fail "expecting exactly one element, an array"
+      meth_i_a = [ * x_a.shift, :nlp_last_length, :set_nlp_last_length ]
+      h = @h
+      mod.module_exec do
+        meth_i_a.each do |meth_i|
+          define_method meth_i, & h.fetch( meth_i )
+        end
+        private( * meth_i_a )
+      end ; nil
+    end
 
     # things about NLP here: 1) we put our NLP-ish subclient instance methods
     # *first* in a struct-box and then distribute the definitions to this i.m
@@ -142,7 +160,7 @@ module Skylab::Headless::SubClient
     # iff this is is a terminal node in the callstack, otherwise propagate
     # the value `false`).
 
-    o = MetaHell::Formal::Box::Open.new
+    o = definer
 
     bump_numerish = fun = nil
 
@@ -160,17 +178,22 @@ module Skylab::Headless::SubClient
       end, & bump_numerish
     end
 
-    o[:s] = -> * args do  # [length] [lexeme_sym]
-      numerish, lexeme_sym = MetaHell::FUN.parse_series[ args,
+    o[:s] = -> * args do  # [length] [lexeme_i]
+      len_x, lexeme_i = MetaHell::FUN.parse_series[ args,
         -> x { ! x.respond_to? :id2name }, # defer it
         -> x { x.respond_to? :id2name } ]
-      lexeme_sym ||= :s  # when `numerish` is nil it means "use memoized"
-      instance_exec numerish, -> num do
-        fun[].s[ num, lexeme_sym ]
-      end, & bump_numerish
+      lexeme_i ||= :s  # when `len_x` is nil it means "use memoized"
+      p = if :identity == lexeme_i
+        MetaHell::IDENTITY_
+      else
+        -> len_x_ do
+          fun[].s[ len_x_, lexeme_i ]
+        end
+      end
+      instance_exec len_x, p, & bump_numerish
     end
 
-    bump_numerish = -> numerish_x, func do
+    bump_numerish = -> numerish_x, p do
       if numerish_x
         if numerish_x.respond_to? :length
           numerish = numerish_x.length
@@ -183,7 +206,7 @@ module Skylab::Headless::SubClient
       else
         numerish = nlp_last_length
       end
-      instance_exec numerish, &func
+      instance_exec numerish, & p
     end
 
     o[:nlp_last_length] = -> do
@@ -225,12 +248,9 @@ module Skylab::Headless::SubClient
       x
     end
 
-    o.to_struct
-
-  end.call
+  end
 
   module InstanceMethods
-
     EN_FUN.each do |method_name, body|
       define_method method_name, &body
       protected method_name  # #protected-not-private

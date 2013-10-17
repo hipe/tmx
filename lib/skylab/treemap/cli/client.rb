@@ -29,7 +29,7 @@ module Skylab::Treemap
       res = super
       if false == res
         # (the engine doesn't and shouldn't assume this following behavior)
-        a = last_live_action
+        a = @last_hot_action
         if a
           a.usage_and_invite  # this is [#035], annotated invite
         else

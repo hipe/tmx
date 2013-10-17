@@ -9,6 +9,7 @@ module Skylab::MetaHell
     o[:CodeMolester] =
     o[:Headless] = subsys
     o[:Open3] =
+    o[:Set] =
     o[:Shellwords] = stdlib
 
     define_singleton_method :const_missing do |const_i|

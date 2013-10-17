@@ -1,3 +1,6 @@
+[#087] #open paramter controllers show strain with changing event model
+[#086]       #node-identity
+[#085]       #node-identity
 [#084]       #doc-point :#pen. #body-is-inline-in-code
 [#083]       #in-situ
 [#082]       #done adapter for face of hot (kind of [#054])
@@ -88,7 +91,7 @@
 [#012] #open redesign this with_client nonsense
 [#011]       #done regrettify all tests in this subproduct
 [#010]       #done refactor API support to take into acct actions & clients
-[#009]       #tracking-tag places where HL::Parameters show signs of strain
+[#009]       #tracking-tag places where HL::Parameters show signs of strain; also general tracking of the node
 [#008]       P::C::I_M --> SC::I_M
 [#007]       #done use of Parameter::Set#list, unify with Boxxy interface
 [#006]       #done #tracking-tag errors_count, settle it down eventually (rel. [#sl-116])

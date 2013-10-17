@@ -8,7 +8,9 @@ module Skylab::CodeMolester
     o[:Basic] = subsystem
     o[:Face] = subsystem
     o[:FileUtils] = stdlib
+    o[:Headless] = subsystem
     o[:Psych] = stdlib
+    o[:Set] = stdlib
     o[:StringIO] = stdlib
     o[:StringScanner] = -> _ { require 'strscan' ; ::StringScanner }
     o[:Treetop] = -> _ { FUN.require_quietly[ 'treetop' ] ; ::Treetop }
@@ -20,7 +22,7 @@ module Skylab::CodeMolester
       if H_.key? c
         const_set c, H_.fetch( c )[ c ]
       else
-        super const  # KRAY!
+        super c
       end
     end
     H_ = o

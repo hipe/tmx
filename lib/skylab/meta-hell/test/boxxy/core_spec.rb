@@ -85,10 +85,10 @@ module Skylab::MetaHell::TestSupport::Boxxy
             s.should eql( 'a' )
           end
         end
-        it "cannot be as a lamba and a block" do
+        it "cannot be as a lambda and a block" do
           -> do
             _Boxxy__Zeep.const_fetch('a', ->{ }) {  }
-          end.should raise_error( ::ArgumentError, /too much proc/ )
+          end.should raise_error( ::IndexError, /outside of array bounds/ )
         end
       end
     end

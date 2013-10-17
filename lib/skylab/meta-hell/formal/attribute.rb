@@ -1,10 +1,8 @@
 module ::Skylab::MetaHell
 
-  module Formal::Attribute
+  module Formal::Attribute  # :[#024]
 
-    # (note we accidentallly deprecated this with [#ba-003] Field::Box
-    # but we should somehow merge them if for no other reason than
-    # the below is amusing. below is tracked with :[#mh-024])
+    # (the fate of this node is discussed at [#mh-053] "discussion of the..")
 
     # What is the esssence of all data in the universe? It starts from
     # within. with metaprogramming.
@@ -60,12 +58,65 @@ module ::Skylab::MetaHell
     # It may be confusing, but the library is pretty lightweight
     # for what it does.  Remember this is metahell!
     #
-  end
 
-  module Formal::Attribute::Definer
-    def self.extended mod # per pattern [#sl-111]
+    module Definer
+
+      def self.[] mod
+        DSL[ mod ]
+        mod.module_exec EMPTY_A_, & Bundles::Attributes.to_proc
+        nil
+      end
+
+      def self.extended mod
+        DSL[ mod ]
+        nil
+      end
+    end
+
+    module Bundles
+      Meta_attributes = -> a do
+        DSL[ self ]  # for now
+        meta_attribute( * a.shift )
+        nil
+      end
+
+      Attributes = -> a do
+        include Reflection_IM__
+        if a.length.nonzero?
+          module_exec a,  & Parse_the_attributes__
+        end
+      end
+    end
+    #
+    Parse_the_attributes__ = -> a do
+      g = if const_defined? :Item_Grammar__, false
+        self::Item_Grammar__
+      else
+        const_set :Item_Grammar__, module_exec( & Build_item_grammar__ )
+      end
+      p = g.build_parser_for a
+      while (( sp = p[] ))
+        h = { }
+        sp.adj and sp.adj.keys.each { |i| h[ i ] = true }
+        sp.pp and sp.pp.each_pair { |i, x| h[ i ] = x }
+        attribute sp.keyword_value_x, h
+      end
+      nil
+    end
+    #
+    Build_item_grammar__ = -> do
+      which_h = { 1 => (( mono_i_a = [ ] )), 2 => (( diad_i_a = [ ] )) }
+      meta_attributes.each do |matr|
+        _arity = (( h = matr.hook )) ? h.arity : 1
+        which_h.fetch( _arity ) << matr.local_normal_name
+      end
+      MetaHell::Bundle::Item_Grammar.new mono_i_a, :attribute, diad_i_a
+    end
+
+    DSL = -> mod do
       mod.extend Formal::Attribute::Definer::Methods
-      # no instance methods (that is what metaattribute hooks are for)
+      # no instance methods - that is what meta-attributes are for
+      nil
     end
   end
 
@@ -114,7 +165,11 @@ module ::Skylab::MetaHell
       end
       delta.each do |k, v|
         if respond_to?( m = "on_#{ k }_attribute" )
-          send m, sym, existing
+          a = [ sym ]
+          if ! (( hook = meta_attributes[ k ].hook and 2 != hook.arity ))
+            a << existing
+          end
+          send m, * a
         end
       end
       nil
@@ -255,6 +310,8 @@ module ::Skylab::MetaHell
       end
       nil
     end
+
+  public
                                   # retrieve the box that represents the
                                   # metaattributes defined for this definer
                                   # creating it lazily.
@@ -263,7 +320,6 @@ module ::Skylab::MetaHell
         Formal::Attribute::MetaAttribute::Box.new
       end
     end
-    public :meta_attributes       # #important - for 2.0.0
 
     def on_attribute_introduced attr
       attr.local_normal_name.tap do |name|
@@ -279,9 +335,7 @@ module ::Skylab::MetaHell
       attributes.accept attr
       nil
     end
-    public :on_attribute_introduced
   end
-
                                   # a meta attribute is of course an attribute's
                                   # attribute. users can define them.
                                   # e.g. `default`, `required`, these are
@@ -380,10 +434,27 @@ module ::Skylab::MetaHell
       end while nil
       mattr
     end
+
+    def remove_attribute atr_atr_i
+      remove atr_atr_i
+      nil
+    end
   end
                                   # metadata about an attribute is itself a
                                   # box, it is a box of meta-attributes.
   class Formal::Attribute::Metadata < Formal::Box
+
+    def is? i
+      has?( i ) and self[ i ]
+    end
+
+    def reader_method_name
+      @local_normal_name
+    end
+
+    def writer_method_name
+      @writer_method_name ||= :"#{ local_normal_name }="
+    end
 
     def add_default name, val     # this is internal
       x = dupe_constituent_value val
@@ -426,6 +497,17 @@ module ::Skylab::MetaHell
     attr_reader :local_normal_name  # used here by `accept`, may also be used by
                                   # subclasses by clients e.g to make a custom
                                   # derived property, like a label.
+
+    def add_attribute_attribute atr_atr_i, atr_atr_x
+      add atr_atr_i, atr_atr_x
+      nil
+    end
+
+    def change_attribute_attribute_value atr_atr_i, atr_atr_x
+      change atr_atr_i, atr_atr_x
+      nil
+    end
+
   private
 
     def initialize local_normal_name
@@ -497,6 +579,11 @@ module ::Skylab::MetaHell
       block ? ea.each(& block ) : ea
     end
 
+    def remove_attribute atr_atr_i
+      delete atr_atr_i
+      nil
+    end
+
     # `which` - #experimental (we are considering adding a `with`-like ability
     # to use a mattr name instead of a block, so it would be like a `with`
     # with an extra true-ish check. but only if necessary)
@@ -507,5 +594,109 @@ module ::Skylab::MetaHell
   private
 
     # nothing is private. constructor takes 0 arguments.
+  end
+
+  module Formal::Attribute
+
+    module Reflection_IM__
+
+      def names  # #comport to #box-API
+        attribute_definer.attributes.names
+      end
+      #
+      def fetch i, &p
+        # in case nil is returned from the reader, we don't behave as if we
+        # "have" the value unless it has a default (which presumably is nil)
+        if (( atr = attribute_definer.attributes.fetch( i ) { } ))
+          x = send atr.reader_method_name
+          did = if x.nil?
+            atr.has? :default
+          else
+            true
+          end
+        end
+        if did then x elsif p then p.call else
+          raise ::KeyError.exception "key not found: #{ i.inspect }"
+        end
+      end
+
+    private
+
+      def get_bound_attribute i
+        Bound_Attribute__.
+          new get_bound_attribute_reader, formal_attributes.fetch( i )
+      end
+
+      def bound_attributes
+        to_enum :each_bound_attribute
+      end
+
+      def each_bound_attribute
+        scn = get_bound_attribute_scanner
+        while (( ent = scn.gets ))
+          yield ent
+        end
+        nil
+      end
+
+      def get_bound_attribute_scanner
+        Bound_Attributes_Scanner__.
+          new formal_attributes, get_bound_attribute_reader
+      end
+
+      def get_bound_attribute_reader
+        @bound_attr_reader_p ||= -> atr do
+          send atr.reader_method_name
+        end
+      end
+
+      def formal_attributes
+        attribute_definer.attributes
+      end
+
+      def attribute_definer  # the default attribute definer for a typical
+        # object is its ordinary class. in some cases -- e.g. if you are
+        # dealing with a class or module object and want to use attribute
+        # definer for *that* -- you will want to redefine this method to
+        # result in the singleton class instead, for reflection to work
+        # (which is required for some kind of meta-attribute setters, etc)
+        self.class
+      end
+    end
+
+    class Bound_Attributes_Scanner__
+      def initialize atr_box, reader_p
+        @p = -> do
+          a, h = atr_box._raw_constituency ; d = 0 ; len = a.length
+          (( @p = -> do
+            if d < len
+              atr = h.fetch( a.fetch d ) ; d += 1
+              Bound_Attribute__.new reader_p, atr
+            end
+          end )).call
+        end
+      end
+      def gets ; @p.call end
+    end
+
+    class Bound_Attribute__
+      def initialize reader_p, atr
+        @reader_p = reader_p ; @atr = atr
+      end
+
+      def attribute
+        @atr
+      end
+
+      def value
+        @reader_p[ @atr ]
+      end
+
+      %i( [] fetch has? local_normal_name ).each do |i|
+        define_method i do |*a, &p|
+          @atr.send i, *a, &p
+        end
+      end
+    end
   end
 end

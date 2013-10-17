@@ -1,6 +1,6 @@
 class Skylab::Basic::Field
 
-  Field = self
+  Field = self  # :[#003]
 
   %i( Basic MetaHell ).each do |i|
     const_set i, ::Skylab.const_get( i, false )

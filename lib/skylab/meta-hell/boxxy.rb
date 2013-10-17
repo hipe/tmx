@@ -90,9 +90,9 @@ module Skylab::MetaHell
     end
 
     module ModuleMethods_
-      def const_fetch path_x, else_value_p=nil, &blk
-        blk and else_value_p and raise ::ArgumentError, "too much proc"
-        P_[ false, ( else_value_p || blk ), self, path_x ].last
+      def const_fetch path_x, *a, &p
+        ( p ? a << p : a ).length.nonzero? and p = a.fetch( a.length - 1 << 1 )
+        P_[ false, p, self, path_x ].last
       end
     end
 

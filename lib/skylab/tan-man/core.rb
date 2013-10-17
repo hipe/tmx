@@ -43,7 +43,7 @@ module Skylab
   module TanMan
 
     Sub_Client = -> client, * x_a do
-      Bundles__.apply_iambic_to_client x_a, client
+      Bundles__.apply_iambic_on_client x_a, client
     end
 
     module Bundles__

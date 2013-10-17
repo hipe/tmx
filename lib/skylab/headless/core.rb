@@ -57,33 +57,45 @@ module Skylab::Headless
     end
   end
 
+  def self.Hooks_ * i_a, &p
+    Hooks_.new( * i_a, &p )
+  end
+
   class Hooks_
-    New_method_produces_subclasses_with_members__[ self, :with_new_class, -> do
-      members.each do |i|
-        _p = :"#{ i }_p"
-        define_method :"on_#{ i }" do |*a, &p|
-          instance_variable_set :"@#{ _p }",
-            ( p ? a << p : a ).fetch( a.length - 1 << 2 )
+    New_method_produces_subclasses_with_members__[ self,
+      :with_new_class, -> cls_p=nil do
+        members.each do |i|
+          _p = :"#{ i }_p"
+          define_method(( m = :"on_#{ i }")) do |*a, &p|
+            instance_variable_set :"@#{ _p }",
+              ( p ? a << p : a ).fetch( a.length - 1 << 2 )
+          end
+          alias_method i, m
+          attr_reader _p
         end
-        attr_reader _p
-      end
+        cls_p and class_exec( & cls_p )
     end ]
   end
 
   class Event_
     New_method_produces_subclasses_with_members__[ self,
       :with_args, -> x_a, p do
-        if p
-          x_a.length.zero? or raise ::ArgumentError, "for now you cannot #{
-            }pass both a block and args (block proc's parameters will be #{
-            }used to determine the member list)"
-          x_a.concat p.parameters.map( & :last )
-        end ; nil
+        x_a.length.zero? && p &&
+          (( i_a = p.parameters.map( & :last ) )).length.nonzero? and
+            x_a.concat i_a
+        nil
       end,
       :with_new_class, -> p=nil do
         const_set :IVAR_A__, members.map { |i| :"@#{ i }" }
-        p and const_set( :MESSAGE_P__, p )
         attr_reader( * members )
+        if p
+          if p.arity.zero?
+            class_exec( & p )
+          else
+            const_set :MESSAGE_P__, p
+          end
+        end
+        nil
       end ]
     def self.[] * x_a
       new( * x_a )
@@ -92,8 +104,7 @@ module Skylab::Headless
       x_a.length > self.class::IVAR_A__.length and raise ::ArgumentError, "no"
       self.class::IVAR_A__.each_with_index do |ivar, idx|
         instance_variable_set ivar, x_a[ idx ]  # defaults to nil
-      end
-      nil
+      end ; nil
     end
     def any_message_proc
       self.class.const_defined?( :MESSAGE_P__ ) and self.class::MESSAGE_P__
@@ -103,41 +114,6 @@ module Skylab::Headless
     end
     def some_message_proc
       any_message_proc or fail "no message proc defined for #{ self.class }"
-    end
-  end
-
-  module Bundle
-
-    module Multiset
-      def self.[] mod
-        mod.extend self
-      end
-
-      def apply_iambic_to_client x_a, client
-        b_h = ( @ibc ||= build_indexed_bundles_callable )
-        begin
-          client.module_exec x_a, & b_h[ x_a.shift ].to_proc
-        end while x_a.length.nonzero?
-        nil
-      end
-
-    private
-
-      def build_indexed_bundles_callable
-        h = ::Hash.new do |_h, k|
-          raise ::KeyError, "not found '#{ k }' - did you mean #{ _h.keys * ' or ' }?"   # #todo lev
-        end
-        constants.each do |const_i|
-          x = const_get const_i, false
-          k = if x.respond_to? :bundles_key then x.bundles_key
-          elsif UCASE_RANGE__.include? const_i.to_s.getbyte( 1 ) then const_i
-          else const_i.downcase end
-          h[ k ] = x
-        end
-        h
-      end
-      #
-      UCASE_RANGE__ = 'A'.getbyte( 0 ) .. 'Z'.getbyte( 0 )
     end
   end
 
@@ -179,10 +155,16 @@ module Skylab::Headless
 
     module MM__
       def client_services_class_notify name
-        if const_defined? name.as_const, false
-          const_get name.as_const
+        const_i = name.as_const
+        if const_defined? const_i, false
+          const_get const_i
         else
-          r = const_set name.as_const, ::Class.new( Client_Services )  # no up
+          _base_class = if const_defined? const_i
+            const_get const_i
+          else
+            Client_Services
+          end
+          r = const_set const_i, ::Class.new( _base_class )
           if const_defined? name.as_proc_const, false
             r.class_exec( & const_get( name.as_proc_const ) )
           end
@@ -217,21 +199,44 @@ module Skylab::Headless
         i_a.each { |i| meth_i_delegates_to_up_meth_i i, i  }
       end
       #
-      def delegating * x_a, i_a
-        st = Delegating__.new
-        st[ x_a.shift ] = x_a.shift while x_a.length.nonzero?
-        w_sfx_i, = st.to_a
-        if w_sfx_i
-          name_p = -> i { :"#{ i }#{ w_sfx_i }" }
-        end
-        i_a.each do |i|
-          meth_i_delegates_to_up_meth_i i, name_p[ i ]
+      def delegating * x_a, i_a  # must use options
+        opt_st = Delegating_Opt_St__.new
+        opt_st[ :name_p ] = []
+        begin
+          OPT_PROTO_H__.fetch( x_a.shift )[ opt_st, x_a ]
+        end while x_a.length.nonzero?
+        name_p_a, is_single = opt_st.to_a
+        1 == name_p_a.length or fail "syntax error - non-one name_p"
+        name_p = name_p_a[ 0 ]
+        if is_single
+          i_a.respond_to?( :id2name ) or fail "syntax - expected single"
+          meth_i_delegates_to_up_meth_i i_a, name_p[ i_a ]
+        else
+          i_a.each do |i|
+            meth_i_delegates_to_up_meth_i i, name_p[ i ]
+          end
         end
         nil
       end
       #
-      Delegating__ = ::Struct.new :with_suffix
+      Delegating_Opt_St__ = ::Struct.new :name_p, :is_single
       #
+      OPT_PROTO_H__ = {
+        to: -> st, a do
+          st[ :is_single ] = true
+          as_i = a.shift
+          st[ :name_p ] << -> _ { as_i }
+        end,
+        with_suffix: -> st, a do
+          suffix_i = a.shift
+          st[ :name_p ] << -> i { :"#{ i }#{ suffix_i }" }
+        end,
+        with_infix: -> st, a do
+          prefix_i = a.shift ; suffix_i = a.shift
+          st[ :name_p ] << -> i { :"#{ prefix_i }#{ i }#{ suffix_i }" }
+        end
+      }.freeze
+
       def meth_i_delegates_to_up_meth_i i, up_meth_i
         @member_i_a__ << i
         define_method i do | *a, &p |

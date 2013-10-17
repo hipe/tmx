@@ -2,6 +2,8 @@ module Skylab::Headless
   module Parameter::Controller::InstanceMethods
     include Headless::SubClient::InstanceMethods
 
+    # #todo this is not in line with structured event emission. needs design [#087]
+
     # Put request parameters from `actual_h' (if any) into `actual`
     # while doing the usual validation, normalization, defaultation, and
     # emitting of any resulting errors (#pattern [#sl-116]).

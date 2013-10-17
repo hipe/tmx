@@ -292,4 +292,9 @@ module Skylab::Treemap
       [ method( :invoke ), [ argv ] ]
     end
   end
+  class CLI::Action  # #todo this will need to get integrated into a past future branch
+    def absorb_iambic x_a
+      x_a.length.zero? or fail 'do me' ; true
+    end
+  end
 end

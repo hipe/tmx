@@ -1,8 +1,10 @@
 module Skylab::Headless
 
-  module CLI
+  CLI::FUN = MetaHell::FUN::Module.new
 
-    o = MetaHell::Formal::Box::Open.new
+  module CLI::FUN
+
+    o = definer
 
     o[:parse_styles] = -> do
       # Parse a string with ascii styles into an S-expression.
@@ -90,24 +92,27 @@ module Skylab::Headless
       end
     end
 
-    o[:ellipsify] = -> do
-      ellips = '[..]'
-      -> str, len do
-        if str.length <= len
-          str
-        elsif ellips.length <= len
-          "#{ str[ 0, ( len - ellips.length ) ] }#{ ellips }"
-        else
-          case len   # this is what you get. [#it-001] is much more ambitious
-          when 0 ;   # and much less existant.
-          when 1 ; '.'
-          when 2 ; '[]'
-          when 3 ; '[.]'
-          else ellips[ 0, len ]
-          end
+    Ellipsify___ = -> glyph, limit, string do
+      if string.length <= limit
+        string
+      elsif glyph.length <= limit
+        "#{ string[ 0, ( limit - glyph.length ) ] }#{ glyph }"
+      else
+        case limit  # this is what you get. [#it-001] is much more ambitious
+        when 0 ;  # and much less existant.
+        when 1 ; '.'
+        when 2 ; '[]'
+        when 3 ; '[.]'
+        else glyph[ 0, limit ]
         end
       end
-    end.call
+    end
+
+    Ellipsify__ = Ellipsify___.curry[ '[..]'.freeze ]
+
+    o[ :ellipsify ] = -> str, len do
+      Ellipsify__[ len, str ]
+    end
 
     o[:looks_like_sentence] = -> do
       punctuation_character_rx = /[.?!]/
@@ -115,7 +120,5 @@ module Skylab::Headless
         str.length.nonzero? and str[ -1 ] =~ punctuation_character_rx
       end
     end.call
-
-    FUN = o.to_struct
   end
 end

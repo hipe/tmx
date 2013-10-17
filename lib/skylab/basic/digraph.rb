@@ -13,15 +13,15 @@ module Skylab::Basic
       @normalized_local_node_name = nln
     end
 
-    def absorb_association sym
+    def absorb_association name_i
       @has_associations ||= true
       @associations ||= MetaHell::Formal::Box::Open.new
-      @associations.has? sym or @associations.add sym, true
+      @associations.has? name_i or @associations.add name_i, true
       nil
     end
 
-    def direct_association_targets_include sym
-      @has_associations and @associations.has? sym
+    def direct_association_targets_include name_i
+      @has_associations and @associations.has? name_i
     end
 
     def direct_association_target_names
@@ -36,8 +36,8 @@ module Skylab::Basic
       end
     end
 
-    def has_association_to sym
-      @has_associations and @associations.has? sym
+    def has_association_to name_i
+      @has_associations and @associations.has? name_i
     end
 
     attr_reader :normalized_local_node_name
@@ -95,9 +95,9 @@ module Skylab::Basic
         end
       end
       sep = tight ? '->' : ' -> '
-      associations.each do |source_sym, target_sym|
-        tgt_solo_h[ target_sym ] if target_sym && ! tight
-        line[ "#{ source_sym }#{ "#{ sep }#{ target_sym }" if target_sym }" ]
+      associations.each do |source_i, target_i|
+        target_i && ! tight and tgt_solo_h[ target_i ]  # kick default proc
+        line[ "#{ source_i }#{ "#{ sep }#{ target_i }" if target_i }" ]
       end
       if ! seen  # i don't love this, but you could always check `node_count`
         line[ "# (empty)" ]
@@ -112,17 +112,25 @@ module Skylab::Basic
       describe nil, true
     end
 
-    def fetch sym, &b
-      @hash.fetch sym, &b
+    def fetch name_i, &b
+      @hash.fetch name_i, &b
     end
 
-    def has? sym
-      @hash.key? sym
+    def has? name_i
+      @hash.key? name_i
+    end
+
+    def x_is_kind_of_y x, y
+      walk_from_d_x_to_y_detect_equal_key 0, x, y
     end
 
     def indirect_association_targets_include source, target
-      !! walk_pre_order( source, 2 ).detect { |s| target == s }
+      walk_from_d_x_to_y_detect_equal_key 2, source, target
     end
+
+    def walk_from_d_x_to_y_detect_equal_key d, x, y
+      !! walk_pre_order( x, d ).detect( & y.method( :== ) )
+    end ; private :walk_from_d_x_to_y_detect_equal_key
 
     def names
       @order.dup
@@ -139,10 +147,10 @@ module Skylab::Basic
       if ! seen_h || ! seen_h[ start ]
         ::Enumerator.new do |y|
           seen_h ||= {  }
-          visit = -> curr_level, sym do
-            cx = fetch( sym ).direct_association_target_names
-            seen_h[ sym ] = true
-            y << sym if curr_level >= min_level
+          visit = -> curr_level, name_i do
+            cx = fetch( name_i ).direct_association_target_names
+            seen_h[ name_i ] = true
+            y << name_i if curr_level >= min_level
             if cx
               cx.each do |sm|
                 seen_h.fetch sm do
@@ -161,9 +169,9 @@ module Skylab::Basic
       if ! seen_h || ! seen_h[ start ]
         ::Enumerator.new do |y|
           seen_h ||= {  }
-          visit = -> sym do
-            cx = fetch( sym ).direct_association_target_names
-            seen_h[ sym ] = true  # etc
+          visit = -> name_i do
+            cx = fetch( name_i ).direct_association_target_names
+            seen_h[ name_i ] = true  # etc
             if cx
               cx.each do |sm|
                 seen_h.fetch sm do
@@ -171,7 +179,7 @@ module Skylab::Basic
                 end
               end
             end
-            y << sym
+            y << name_i
           end
           visit[ start ]
           nil
@@ -291,16 +299,15 @@ module Skylab::Basic
     # `accum` if provided will be called with, for each new node that is
     # created in the process of this absorption, one *symbol* name of the node.
 
-    def absorb_nodes a, accum=nil
-      i = 0
-      len = a.length
+    def absorb_nodes x_a, accum=nil
+      idx = 0 ; len = x_a.length
       aa = [ ]
-      while i < len && ::Symbol === a[i]
-        aa << [ a[i], nil ]
-        i += 1
+      while idx < len && ::Symbol === x_a[ idx ]
+        aa << [ x_a[ idx ], nil ]
+        idx += 1
       end
-      if i < len && ::Hash === a[i]
-        a[i].each do |k, v|
+      if idx < len && ::Hash === x_a[ idx ]
+        x_a[ idx ].each do |k, v|
           if ::Symbol === k
             case v
             when ::Symbol
@@ -317,10 +324,10 @@ module Skylab::Basic
             raise ::ArgumentError, "no - #{ k.inspect }"
           end
         end
-        i += 1
+        idx += 1
       end
-      if i < len
-        raise ::ArgumentError, "no - #{ a[i].class }"
+      if idx < len
+        raise ::ArgumentError, "no - #{ x_a[ idx ].class }"
       else
         acum = ::Enumerator::Yielder.new(& accum ) if accum
         aa.each do |aaa|
@@ -331,9 +338,9 @@ module Skylab::Basic
     end
 
     def nodes! x  # #todo remove post integration
-      sym_a = [ ]
-      absorb_nodes x, -> sym { sym_a << sym }
-      sym_a
+      i_a = [ ]
+      absorb_nodes x, -> name_i { i_a << name_i }
+      i_a
     end
 
     # `flatten` - NOTE #todo remove post integration
@@ -343,11 +350,11 @@ module Skylab::Basic
     # already are skipped on subsequent visits.  #todo: find out why this is
     # useful to have this not be recursive.  It may not be.
 
-    def flatten sym_a  # #todo remove post integration
+    def flatten i_a  # #todo remove post integration
       seen_h = { }
       res_a = [ ]
-      sym_a.each do |sym|
-        ea = walk_post_order sym, seen_h
+      i_a.each do |name_i|
+        ea = walk_post_order name_i, seen_h
         if ea
           ea.each do |sm|
             res_a << sm
@@ -362,30 +369,30 @@ module Skylab::Basic
       NodePxy = MetaHell::Proxy::Nice.new :all_ancestor_names,
         :local_normal_name, :respond_to?, :is?, :is_names
       rt_h = { type: false, payload: false }
-      define_method :[] do |sym|
-        if @hash.key? sym
-          ( @ghetto_h ||= { } ).fetch sym do
+      define_method :[] do |name_i|
+        if @hash.key? name_i
+          ( @ghetto_h ||= { } ).fetch name_i do
             pxy = NodePxy.new(
               all_ancestor_names: -> do
-                walk_pre_order( sym, 0 ).map { |sm| sm }
+                walk_pre_order( name_i, 0 ).map { |sm| sm }
               end,
-              local_normal_name: -> { sym },
+              local_normal_name: -> { name_i },
               respond_to?: -> x { rt_h.fetch x },
               is?: -> sm do
-                if sym == sm then true
+                if name_i == sm then true
                 else
-                  if @hash.fetch( sym ).direct_association_targets_include sm
+                  if @hash.fetch( name_i ).direct_association_targets_include sm
                     true
                   else
-                    indirect_association_targets_include sym, sm
+                    indirect_association_targets_include name_i, sm
                   end
                 end
               end,
               is_names: -> do
-                @hash.fetch( sym ).direct_association_target_names || empty_a
+                @hash.fetch( name_i ).direct_association_target_names || empty_a
               end
             )
-            @ghetto_h[ sym ] = pxy
+            @ghetto_h[ name_i ] = pxy
           end
         end
       end
@@ -398,17 +405,17 @@ module Skylab::Basic
     # will be yeilded (with '<<') each symbolc name that is added
     # to the graph as a result of this operation.
 
-    def absorb_node sym, target_a=nil, accum=nil
-      if ! @hash.key? sym
-        node = @node_class.new sym
-        @order << sym
-        @hash[ sym ] = node
-        accum << sym if accum
+    def absorb_node name_i, target_a=nil, accum=nil
+      if ! @hash.key? name_i
+        node = @node_class.new name_i
+        @order << name_i
+        @hash[ name_i ] = node
+        accum and accum << name_i
       end
       if target_a
         target_a.each do |tsym|
           absorb_node( tsym, nil, accum ) if ! @hash.key? tsym
-          @hash[ sym ].absorb_association tsym
+          @hash[ name_i ].absorb_association tsym
         end
       end
       nil

@@ -366,4 +366,10 @@ module Skylab::TanMan
       end
     end
   end
+
+  class CLI::Action
+    def absorb_iambic x_a  # #todo - this will need to get integrated into a past future branch
+      x_a.length.zero? or fail 'do me' ; true
+    end
+  end
 end

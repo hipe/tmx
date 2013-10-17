@@ -2,54 +2,51 @@ module Skylab::Headless
 
   module CLI::Pen  # [#084]
 
-    #                   ~ ansi escape sequences ~
+    FUN = MetaHell::FUN::Module.new
+    module FUN
 
-    code_h = ::Hash[ [ [ :strong, 1 ], [ :reverse, 7 ] ].
-      concat [ :red, :green, :yellow, :blue, :purple, :cyan, :white ].
-        each.with_index.map { |v, i| [ v, i + 31 ] } ]
-          # ascii-table.com/ansi-escape-sequences.php  (red = 31, etc)
+      o = definer
 
-    o = { }
+      o[ :stylize ] = -> str, * style_a do
+        Stylize[ style_a, str ]
+      end
+      #
+      Stylize = -> style_a, str do
+        "\e[#{ style_a.map { |s| CODE_H__[s] }.compact * ';' }m#{ str }\e[0m"
+      end
+      o[ :curriable_stylize ] = Stylize
+      #
+      CODE_H__ = ::Hash[ [ [ :strong, 1 ], [ :reverse, 7 ] ].
+        concat [ :red, :green, :yellow, :blue, :purple, :cyan, :white ].
+          each.with_index.map { |v, i| [ v, i + 31 ] } ]
+            # ascii-table.com/ansi-escape-sequences.php  (red = 31, etc)
 
-    curriable_stylize = o[ :curriable_stylize ] = -> style_a, str do
-      "\e[#{ style_a.map { |s| code_h[s] }.compact * ';' }m#{ str }\e[0m"
-    end
+      o[ :unstyle ] = -> str do                # the safer alternative, for when
+        Unstyle_styled[ str ] || str           # you don't care whether it was
+      end                                      # stylzed in the first place
+      #
+      Unstyle_styled = -> str do  # nil IFF str.to_s is not already styled
+        str.to_s.dup.gsub! SIMPLE_STYLE_RX_, ''
+      end
+      o[ :unstyle_styled ] = Unstyle_styled
 
-    o[ :stylize ] = -> str, * style_a do
-      curriable_stylize[ style_a, str ]
-    end
-
-    unstyle_styled = o[ :unstyle_styled ] = -> str do # nil when `str`
-      str.to_s.dup.gsub! SIMPLE_STYLE_RX_, ''  # is not already styled
+      # see also CLI::FUN for extended support for working with styles
     end
 
     SIMPLE_STYLE_RX_ = /\e  \[  \d+  (?: ; \d+ )*  m  /x
 
-    o[:unstyle] = -> str do                    # the safer alternative, for when
-      unstyle_styled[ str ] || str             # you don't care whether it was
-    end                                        # stylzed in the first place
-
-    # (see also CLI::FUN - there is extended support for e.g turning styled
-    # text back and forth into s-expressions)
-
-    FUN = ::Struct.new( * o.keys ).new( * o.values )
-    def FUN.at *a
-      a.map { |i| self[ i ] }
-    end
-    FUN.freeze
-
-    Define_stylize_methods_ = -> do
+    Define_stylize_methods__ = -> do
 
       define_method :stylize, & FUN.stylize
 
       define_method :unstyle, & FUN.unstyle
 
-      define_method :unstyle_styled, & FUN.unstyle_styled
+      define_method :unstyle_styled, & FUN::Unstyle_styled
 
     end
-
-    CODE_NAME_A_ = code_h.keys.freeze
-
+    #
+    CODE_NAME_A = FUN::CODE_H__.keys.freeze
+    #
     module Methods  # API-public access to what amounts to instance-method-
       # versions of a subset of the FUN functions - if for e.g. you want
       # `stylize` or `unstyle` and you don't want to pollute your namespace
@@ -58,9 +55,9 @@ module Skylab::Headless
       # application code when you can instead use existing, modality-portable
       # styles.
 
-      module_exec( & Define_stylize_methods_ )
+      module_exec( & Define_stylize_methods__ )
 
-      ( CODE_NAME_A_ - [ :strong ] ).each do |c|   # away at [#pl-013]
+      ( CODE_NAME_A - [ :strong ] ).each do |c|   # away at [#pl-013]
         define_method c do |s| stylize s, c end
         define_method c.to_s.upcase do |s| stylize s, :strong, c end
       end
@@ -98,7 +95,7 @@ module Skylab::Headless
 
       # def `val` - how may votes? (1: sg) [#hl-051]
 
-      module_exec( & Define_stylize_methods_ )
+      module_exec( & Define_stylize_methods__ )
 
     end
 

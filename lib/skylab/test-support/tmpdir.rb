@@ -2,27 +2,39 @@
 
 module Skylab::TestSupport
 
-  class Tmpdir < ::Pathname
+  class Tmpdir < ::Pathname  # #todo this should probably move to e.g [hl] IO b.c it is no longer used exclusively in testing
 
     include Subsys::Services::FileUtils
 
-    def debug!
-      @be_verbose = true
-      nil
+    def initialize * x_a  # [ <path_x> ] [ <opt_h> ]
+      st = ST__.dup
+      x_a[ -1 ].respond_to? :each_pair and
+        x_a.pop.each { |i, x| st[ i ] = x }
+      if (( x = x_a[ -1 ] )) &&
+          ( x.respond_to? :ascii_only? or x.respond_to? :sub_ext )
+        st[ :path ] and raise ::ArgumentError, "collision - `path`"
+        st[ :path ] = x_a.pop
+      end
+      x_a.length.zero? or raise ::ArgumentError, "#{ a.length } unparsed"
+      @infostream, @max_mkdirs, @is_noop, pth, @be_verbose = st.to_a
+      super pth || Subsys::Services::Tmpdir.tmpdir
     end
+
+    St__ = ::Struct.new :infostream, :max_mkdirs, :noop, :path, :verbose
+
+    ST__ = St__.new( nil, 1, false, nil, false ).freeze
 
     def verbose!
-      @be_verbose = true
-      self  # chainable variant of above
+      debug! ; self
     end
-
+    #
+    def debug!
+      self.verbose = true
+      nil
+    end
+    #
     def verbose= x
       @be_verbose = x
-    end
-
-    def clear
-      prepare
-      self
     end
 
     def copy pathname, dest_basename = nil
@@ -48,84 +60,6 @@ module Skylab::TestSupport
       # (result is exit_status)
     end
 
-    safety_rx = %r{ / (?: tmp | T ) (?: / | \z ) }x
-
-    # IMPORTANT see if we can avoid doing a `rm -rf` on any directory except
-    # those that match the above rx.
-
-    raise = -> *a do
-      ::Kernel.raise( *a )
-    end
-
-    sanity_check_pathname = -> pn do
-      safety_rx =~ pn.to_s or
-        raise[ ::SecurityError, "unsafe tmpdir name - #{ pn }" ]
-    end
-
-    define_method :prepare do
-
-      exist_notify = -> do
-        path = to_s
-        directory? or raise[ ::Errno::ENOTDIR, path ]
-        sanity_check_pathname[ self ]
-        a = ::Dir[ "#{ join '{*,.?*}' }" ]  # imagine a dir with only dotfiles
-        case a.length
-        when 0
-          raise[ "sanity - this path should always have at least 1 element" ]
-        when 1
-          '/..' == a.fetch( 0 )[ -3 .. -1 ] or raise[ "sanity - expecting #{
-            }this to be the '..' path - (filesystem issue?) #{ a[0] }" ]
-          @be_verbose and fu_output_message "(already empty: #{ path })"
-        else
-          @be_verbose and fu_output_message "rm -rf #{ path }"
-          if (( safety_rx =~ path or raise[ "is there no god?" ] ))  # 2x
-            remove_entry_secure path  # GULP
-            r = ::FileUtils.mkdir path, noop: @is_noop, verbose: @be_verbose
-          end
-        end
-        r
-      end
-
-      not_exist_notify = -> do
-        stack_a = []
-        pop = -> do
-          curr = self
-          -> do
-            if ! ( curr.root? || '.' == curr.instance_variable_get(:@path) )
-              stack_a << curr.basename.to_s
-              curr = curr.dirname
-            end
-          end
-        end.call
-
-        0 < @max_mkdirs or raise[ "max_mkdirs must be at least 1." ]
-
-        curr = @max_mkdirs.times.reduce self do |m, _|
-          ( x = pop[] ) ? x : ( break m )
-        end
-
-        curr.exist? or raise[ ::SecurityError, "won't make more than #{
-          }#{ @max_mkdirs } dirs - #{ curr } must exist (increase your #{
-          }`max_mkdirs` when you construct #{ self.class }?)" ]
-
-        while ! stack_a.empty?
-          (( peek = curr.join stack_a.last )).exist? or break
-          stack_a.pop
-          curr = peek
-        end
-
-        sanity_check_pathname[ curr ]
-        mkdir_p to_s, noop: @is_noop, verbose: @be_verbose
-      end
-
-      r = if exist?
-        exist_notify[]
-      else
-        not_exist_notify[]
-      end
-      r
-    end
-
     alias_method :tmpdir_original_touch, :touch
 
     def touch file
@@ -143,7 +77,7 @@ module Skylab::TestSupport
       files.each do |file|
         dest_file = dest_dir = nil
         if '/' == file.to_s[0]
-          raise ::ArgumentError.new "must be relative - #{ file }"
+          Raise__[ ::ArgumentError.new "must be relative - #{ file }" ]
         end
         dest_path = join file
         if %r{/\z} =~ dest_path.to_s
@@ -167,52 +101,125 @@ module Skylab::TestSupport
     end
 
     def write local_path, file_contents
-      res = nil
       pathname = touch_r local_path
       if pathname
         pathname.open 'w' do |fh|
           fh.write file_contents
         end
-        res = pathname
+        pathname
       end
-      res
+    end
+
+    def clear
+      prepare ; self
+    end
+
+    def prepare  # by this selfsame definition a "preapared" testing tmpdir
+      # is one that is guaranteed to start out as empty (empty even of
+      # dotfiles (i.e "hidden files")). to this end if the path of this tmpdir
+      # object exists at the time this method is called it is asserted to be
+      # a directory and if that directory has a nonzero number of entries
+      # (including dotfiles) *** IT WILL BE `rm -rf`'d !! ***. all of this is
+      # of course contingent on filesystem permissions of which this facility
+      # is currently ignorant.
+      @path_s ||= to_s
+      if exist? then prepare_when_exist else prepare_when_not_exist end
     end
 
   private
 
-    defaults = -> do
-      o = ::Struct.new( :infostream, :max_mkdirs, :noop, :path, :verbose ).new
-      o[:infostream] = Subsys::Stderr_[]
-      o[:max_mkdirs] = 1
-      o[:noop] = false
-      o[:verbose] = false
-      o.freeze
-    end.call
-
-    # [path] [opts]
-
-    define_method :initialize do |*a|
-      o = defaults.dup
-      a.last.respond_to?( :each_pair ) and a.pop.each { |k, v| o[k] = v }
-      if (( x = a.last )) and
-          ( x.respond_to? :ascii_only? or x.respond_to? :sub_ext )
-        o[:path] = a.pop
+    def prepare_when_exist
+      if ! directory?
+        Raise__[ ::Errno::ENOTDIR, @path_s ]
+      elsif Sanity_check_pathname__[ self ]
+        @path_a = ::Dir[ "#{ join '{*,.?*}' }" ]  # include dotfiles and '..'
+        (( len = @path_a.length )).zero? and
+          Raise__[ "sanity - should always have at least 1 element" ]
+        if 1 == len
+          prepare_when_directory_appears_empty
+        else
+          prepare_when_directory_has_entries
+        end
       end
-      a.empty? or raise[ ::ArgumentError, "#{ a.length } unparsed args."  ]
-      o[:path] ||= Subsys::Services::Tmpdir.tmpdir
-      @infostream = o[:infostream]
-      @max_mkdirs = o[:max_mkdirs]
-      @is_noop = o[:noop]
-      @be_verbose = o[:verbose]
-      super o[:path]
+    end
+    #
+    def prepare_when_directory_appears_empty
+      '/..' == @path_a.fetch( 0 )[ -3 .. -1 ] or Raise__[ "sanity - #{
+        }expecting '..' (strange filesysteme?) - #{ @path_a[ 0 ] }" ]
+      if_verbose_say { "(already empty: #{ @path_s })" } ; nil
+    end
+    #
+    def prepare_when_directory_has_entries
+      if_verbose_say { "rm -rf #{ @path_s }" }
+      if (( SAFETY_RX__ =~ @path_s or Raise__[ "is there no god?" ] ))  # 2x
+        remove_entry_secure @path_s  # TERRIFYING
+        ::FileUtils.mkdir @path_s, noop: @is_noop, verbose: @be_verbose  # result is array of selfsame path
+      end
+    end
+    #
+    def prepare_when_not_exist
+      sanity_check_self_for_mkdir and
+        mkdir_p @path_s, noop: @is_noop, verbose: @be_verbose
+    end
+    #
+    def sanity_check_self_for_mkdir
+      0 < @max_mkdirs or Raise__[ "max_mkdirs must be at least 1." ]
+
+      stack_a = [ ] ; pop_p = -> do
+        curr_pn = self
+        -> do
+          if ! ( curr_pn.root? || '.' == curr_pn.instance_variable_get( :@path ) )
+            stack_a << curr_pn.basename.to_s
+            curr_pn = curr_pn.dirname
+          end
+        end
+      end.call
+
+      curr_pn = @max_mkdirs.times.reduce self do |m, _|
+        ( x = pop_p[] ) ? x : ( break m )
+      end
+
+      curr_pn.exist? or Raise__[ ::SecurityError, "won't make more than #{
+        }#{ @max_mkdirs } dirs - #{ curr_pn } must exist (increase your #{
+          }`max_mkdirs` when you construct #{ self.class }?)" ]
+
+      while ! stack_a.empty?
+        (( peek_pn = curr_pn.join stack_a.last )).exist? or break
+        stack_a.pop_p
+        curr_pn = peek_pn
+      end
+      Sanity_check_pathname__[ curr_pn ]
+    end
+    #
+    Sanity_check_pathname__ = -> pn do
+      SAFETY_RX__ =~ pn.to_s or
+        Raise__[ ::SecurityError, "unsafe tmpdir name - #{ pn }" ]
+    end
+    #
+    SAFETY_RX__ = %r{ / (?: tmp | T ) (?: / | \z ) }x
+    # avoid doing 'rm -rf' on directories other than ones that match this rx
+    Raise__ = -> *a do  # it is possible that `raise` could be overridden
+      # (as ill-advised as that would be). to get "absolute certainty" in
+      # ruby is perhaps impossible, for even constants can be re-defined at
+      # runtime with only a warning (rendering this whole technique
+      # vulnerable); however we use this proc in a constant as a magical
+      # talisman aginst these concerns; because if we send a `raise` that
+      # does not cause a return, consequences could be disastrous, e.g
+      # doing an 'rm -rf' on the wrong directory.
+      nil.send :raise, * a  # ::Kernel can even be overridden, meh so can this method :/
+      false  # in case something is spectacularly wrong we check the result too
     end
 
+    def if_verbose_say &p
+      @be_verbose and fu_output_message( p.call ) ; nil
+    end
+    #
     def fu_output_message msg
       info msg
     end
-
+    #
     def info msg
-      @infostream.puts msg
+      (( @infostream ||= Subsys::Stderr_[] )).puts msg
     end
   end
 end

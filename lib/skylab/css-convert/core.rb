@@ -226,7 +226,7 @@ module Skylab::CssConvert
   private
     def color_test _
       pen = io_adapter.pen ; width = 50
-      code_names = Headless::CLI::Pen::CODE_NAME_A_
+      code_names = Headless::CLI::Pen::CODE_NAME_A
       ( code_names - [ :strong ] ).each do |c|
         [[c], [:strong, c]].each do |a|
           s = "would you like some " <<

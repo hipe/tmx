@@ -1,6 +1,6 @@
-module Skylab::CodeMolester::Config
+module Skylab::CodeMolester
 
-  MetaHell = ::Skylab::MetaHell
+module Config  # #borrow x 1
                                   # if you somehow got here without sexp
   S = self::Sexp                  # load it here and now / shorten it
                                   # we especially need it for registering
@@ -133,18 +133,26 @@ module Skylab::CodeMolester::Config
 
     def [] kx, *kxa  # ::Array supports arguments like arr[ 0, 1 ]
       if kxa.length.zero? and kx.respond_to? :ascii_only?
-        sx = content_items.detect { |sexp| kx == sexp.item_name }
-        if sx
-          if sx.item_leaf?
-            sx.item_value
-          else
-            sx
-          end
-        else
-          _no_value kx
-        end
+        lookup_with_s_else_p kx, false
       else
         super
+      end
+    end
+
+    def lookup_with_s_else_p key_s, any_else_p  # like fetch, but leave it alone (for ary)
+      sx = content_items.detect do |sexp|
+        key_s == sexp.item_name
+      end
+      if sx
+        if sx.item_leaf?
+          sx.item_value
+        else
+          sx
+        end
+      elsif any_else_p
+        any_else_p[]
+      elsif false != any_else_p
+        raise ::KeyError.exception "key not found: #{ key_s.inspect }"
       end
     end
 
@@ -163,9 +171,6 @@ module Skylab::CodeMolester::Config
 
     def key? name
       !! content_items.detect { |ii| name == ii.item_name }
-    end
-
-    def _no_value name
     end
 
     def set_mixed name_str, x
@@ -189,6 +194,14 @@ module Skylab::CodeMolester::Config
           y << sx
         end
       end
+    end
+
+    def any_names_notify
+      set = CodeMolester::Services::Set.new
+      value_items.each do |sx|
+        set.add? sx.item_name
+      end
+      if set.length.nonzero? then set.to_a end
     end
   end
 
@@ -228,6 +241,8 @@ module Skylab::CodeMolester::Config
     def _update_value assmt, value
       assmt.set_item_value value
     end
+
+    MEMBER_I_A__ = %i( nosecs sections ).freeze
   end
 
   class Sexps::Nosecs < Sexps::ContentItemBranch
@@ -243,6 +258,8 @@ module Skylab::CodeMolester::Config
       self[ 1, 0 ] = [o] # supreme hackery
       o
     end
+
+    MEMBER_I_A__ = %i( content_items ).freeze
   end
 
   class Sexps::Sections < Sexp
@@ -278,6 +295,8 @@ module Skylab::CodeMolester::Config
       self[ pos + 1 , 0 ] = [ item ]
       nil
     end
+
+    MEMBER_I_A__ = %i( content_items ).freeze
   end
 
   class Sexps::Section < Sexps::ContentItemBranch
@@ -310,6 +329,8 @@ module Skylab::CodeMolester::Config
     def _update_value assmt, value # c/p
       assmt.set_item_value value
     end
+
+    MEMBER_I_A__ = %i( section_name content_items )
   end
 
   class Sexps::Section
@@ -338,6 +359,7 @@ module Skylab::CodeMolester::Config
     def set_item_value value
       self[VALUE][1] = value.to_s
     end
+    MEMBER_I_A__ = %i( item_name item_value ).freeze
   end
 
   class << Sexps::AssignmentLine
@@ -364,4 +386,5 @@ module Skylab::CodeMolester::Config
     Sexp[:comment] = self
     # node_reader :body
   end
+end
 end

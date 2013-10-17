@@ -1,5 +1,7 @@
 module Skylab::Headless
+
   module Parameter::Controller::StructAdapter
+
   # an experimental that asks:  what if you want your parameter superset
   # defined only by a ::Struct?  There can be no superset definitions of
   # specific parameters.  Merely it is that each member of the struct is
@@ -18,15 +20,16 @@ module Skylab::Headless
   end
 
   module Parameter::Controller::StructAdapter::InstanceMethods
+
     include Parameter::Controller::InstanceMethods
 
     def invoke param_h
-      res = nil
+      r = nil
       begin
-        res = set!( param_h ) or break
-        res = execute
+        r = set!( param_h ) or break
+        r = execute
       end while nil
-      res
+      r
     end
   end
 end

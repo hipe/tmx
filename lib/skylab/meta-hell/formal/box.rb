@@ -77,12 +77,16 @@ module Skylab::MetaHell
       box
     end
 
-    def self.from_iambic *a
+    def self.from_iambic *x_a
+      from_iambic_a x_a
+    end
+
+    def self.from_iambic_a x_a
       box = new
-      ( a.length % 2 ).zero? or fail 'sanity - odd number of args'
+      ( x_a.length % 2 ).zero? or fail 'sanity - odd number of args'
       box.instance_exec do
-        0.step( a.length - 1, 2 ).each do |i|
-          add a[ i ], a[ i + 1 ]
+        0.step( x_a.length - 1, 2 ).each do |i|
+          add x_a[ i ], x_a[ i + 1 ]
         end
       end
       box
@@ -158,7 +162,7 @@ module Skylab::MetaHell
       if p && 2 == p.arity && ! @enumerator_class
         # avoid overhead of processor, memory, cognition and avoid ugly tall
         # stack frames; for this 95% case. #todo benchmark looping alternatives
-        d = 0 ; len = @order.length
+        d = 0 ; len = @order.length  # :[#051]: length is determined at beginning of traversal, not during
         while d < len
           p[ (( kx = @order.fetch d )), @hash.fetch( kx ) ]
           d += 1
@@ -219,7 +223,7 @@ module Skylab::MetaHell
 
     # `fuzzy_fetch` - This is a higher-level, porcelain-y convenience method,
     # written as an #experimental attempt to corral repetitive code like
-    # this into one place (was [#mh-020]).
+    # this into one place (was near [#ba-003]).
     # To use it your box subclass must implement `fuzzy_reduce` (usually in
     # about one line) (see). Internally, `fuzzy_fetch` produces a subset
     # box of the items that match the _string_ per your fuzzy_reduce
@@ -448,6 +452,10 @@ module Skylab::MetaHell
       box
     end
 
+    def delete i
+      delete_multiple( [ i ] )[ 0 ]
+    end
+
     empty_a = [ ].freeze          # (ocd)
 
                                   # batch-delete, bork on key not found.
@@ -499,8 +507,7 @@ module Skylab::MetaHell
   private
 
     def initialize                # (subclasses call super( ) of course!)
-      @order = [ ]
-      @hash = { }
+      @order = [ ] ; @hash = { }
       @enumerator_class = nil
       # (don't change the above without looking carefully at `base_args` et. al)
     end

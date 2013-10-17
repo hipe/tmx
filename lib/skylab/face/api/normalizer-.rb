@@ -295,16 +295,11 @@ module Skylab::Face
       # [#084]
 
       p = -> do
+
         class Expression_Agent_
 
-          fun = Face::Services::Headless::SubClient::EN_FUN
-
-          %i|
-            nlp_last_length set_nlp_last_length s and_ or_ both
-          |.each do |i|
-            define_method i, & fun[ i ]
-            private i
-          end
+          Face::Services::Headless::SubClient::EN_FUN[ self,
+            :private, %i( s and_ or_ both ) ]
 
         private
 
@@ -314,23 +309,9 @@ module Skylab::Face
 
           define_method :hack_label, & Hack_label
 
-          def ick x  # ( a trivial instance of [#it-001] summarization )
-            if case x
-            when ::NilClass, ::FalseClass, ::TrueClass, ::Numeric, ::Module
-              true
-            when ::String
-              x.length < A_REASONABLY_SHORT_LENGTH_FOR_A_STRING_
-            end then
-              x.inspect
-            elsif ::Symbol === x
-              "\"#{ x }\""
-            else
-              "< a #{ x.class } >"
-            end
+          def ick x
+            Face::Services::Basic::FUN::Inspect[ x ]
           end
-          #
-          A_REASONABLY_SHORT_LENGTH_FOR_A_STRING_ = 10
-
         end
         p = -> { Expression_Agent_ }
         Expression_Agent_

@@ -1,42 +1,62 @@
 module Skylab::CodeMolester
 
-  class InvalidReason
+  class Invalid_Reason__  # #interesting-history
 
-    # This class has a background shrouded in mystery and is of dubious utility,
-    # but has nonethelss been rewritten several times as an exercize.
-    #
-    # If ever we have really kinky requirements for rendering parse
-    # error messages, this would be a place to start.
-    #
-    # EDIT: no actually i take that back. this class *is* used and it *is*
-    # useful - it is the first hint an event object as we use them today -
-    # it is a nice little encapsulation of the parse error message that
-    # we can throw around and bubble up.
-
-    # (amusingly in the next screen we pretty much take a tour through the
-    # entire history of event message rendering..)
-
-    render_options = ::Struct.new :escape_path
-
-    define_method :render do |opts_h=nil|
-      o = render_options.new
-      opts_h and opts_h.each { |k, v| o[k] = v }
-      o[:escape_path] ||= -> pn { pn.basename }
-
-      @render[ o ]
+    def initialize parser, pn
+      @input_s = parser.input ; @pn = pn
+      @terminal_failure_a = parser.terminal_failures ; nil
     end
 
-    alias_method :to_s, :render
+    attr_reader( * MEMBER_I_A__ = %i( input_s pn terminal_failure_a ).freeze )
 
-    # `message_proc` - implement the unified interface (contemporary
-    # with its date of writing) by wrapping the above.
+    def to_s
+      render
+    end
+    #
+    def render opt_h=nil
+      x_a = if opt_h
+        opt_h.each_pair.reduce( [] ) do |m, (k,v)| m << k << v ; m end
+      else MetaHell::EMPTY_A_ end
+      render_with( * x_a )
+    end
+    #
+    def render_with * x_a
+      CodeMolester::Expression_Agent__.new( x_a ).
+        instance_exec( * to_a, & message_proc )
+    end
+    #
+    def to_a
+      members.map( & method( :send ) )
+    end
+    def members ; self.class.members end
+    def self.members ; const_get( :MEMBER_I_A__, false ) end
 
-    attr_reader :message_proc  # ( set in `initialize` )
-
-  private
+    def message_proc ; self.class.const_get( :MESSAGE_PROC__, true ) end
+    #
+    MESSAGE_PROC__ = -> input_s, pn, terminal_failure_a do
+      min_index, expected = Min_index__expected__[ terminal_failure_a ]
+      line_number, line_begin_idx, = Line_info__[ input_s, min_index ]
+      y = [ "Expecting #{ or_ expected.map( & :inspect ) }" ]
+      if line_begin_idx != min_index
+        excerpt = input_s[ line_begin_idx .. min_index ].inspect
+      end
+      if pn
+        y << "in #{ escape_path pn }:#{ line_number }"
+        if excerpt
+          y << "at the end of #{ excerpt }"
+        else
+          y << "at the beginning of the line"
+        end
+      elsif excerpt
+        y << "in line #{ line_number } at the end of #{ excerpt }"
+      else
+        y << "at the beginning of line #{ line_number }"
+      end
+      y * ' '
+    end
 
     # result : start_idx_of_line, line_number (1-indexed), line_width
-    line_info = -> string, seek_idx do
+    Line_info__ = -> string, seek_idx do
       scn = CodeMolester::Services::StringScanner.new string
       at_idx = -1
       line_idx = 0
@@ -56,7 +76,7 @@ module Skylab::CodeMolester
     # this might be stupid, it warrants further testing
     # tt parser gives us a `max_terminal_failure_index`, are we trying to
     # be clever and get the min?
-    min_index__expected = -> terminal_failures do
+    Min_index__expected__ = -> terminal_failures do
       min_index = terminal_failures.first.index
       expected = [terminal_failures.first.expected_string]
       terminal_failures[ 1 .. -1 ].reduce nil do |_, o|
@@ -65,44 +85,6 @@ module Skylab::CodeMolester
         _
       end
       [min_index, expected]
-    end
-
-    include Headless::NLP::EN::Methods # or_
-
-    define_method :initialize do |parser, pathname|
-
-      @render = -> params do
-        min_index, expected = min_index__expected[ parser.terminal_failures ]
-        line_number, line_begin_idx, = line_info[ parser.input, min_index ]
-
-        a = [ "Expecting #{ or_ expected.map(& :inspect) }" ]
-
-        excerpt = if line_begin_idx != min_index
-                    parser.input[ line_begin_idx .. min_index ].inspect
-                  end
-
-        if pathname
-          a << "in #{ params.escape_path[ pathname ] }:#{ line_number }"
-          if excerpt
-            a << "at the end of #{ excerpt }"
-          else
-            a << "at the beginning of the line"
-          end
-        elsif excerpt
-          a << "in line #{ line_number } at the end of #{ excerpt }"
-        else
-          a << "at the beginning of line #{ line_number }"
-        end
-
-        a.join ' '
-      end
-
-      me = self
-      @message_proc = -> do
-        me.render
-      end
-
-      freeze
     end
   end
 end

@@ -1,4 +1,4 @@
-module ::Skylab::CodeMolester
+module Skylab::CodeMolester
 
   class Config::File::Model
 
@@ -11,433 +11,419 @@ module ::Skylab::CodeMolester
       emits wizzle: :paazle
     end
 
-    # custom `delegates_to` -- contrast with MetaHell::DelegatesTo
-    # #watch'ing this for push up potential.
-
-    def self.delegates_to implementor, method_name, condition=nil
-      if ! condition                        # the default condition is that the
-        condition = -> { send implementor } # implementor result must be trueish
-      end
-      defn = ->( *a, &b ) do
-        result = nil
-        if instance_exec(& condition)
-          result = send( implementor ).send method_name, *a, &b
-        end
-        result
-      end
-      define_method method_name, &defn
-    end
-
-    delegates_to :sexp, :[], -> { valid? }
-
-    def []= k, x
-      set_mixed k, x
-    end
-
-    def content= str
-      @valid = nil
-      @content = str
-    end
-
-    delegates_to :sexp, :content_items, -> { valid? }
-
-    delegates_to :pathname, :dirname
-
-    delegates_to :pathname, :exist?
-
-    def invalid_reason
-      valid? if @valid.nil?
-      @invalid_reason
-    end
-
-    delegates_to :sexp, :key?, -> { valid? }
-
-    # **NOTE** the meaning of `modified?` may have changed since we last used
-    # it: it *used* to mean: "does the file that is currently on disk have
-    # an `mtime` that is greater than the `mtime` was when we last read it?"
-    # whereas *now* it means "are the bytes we have in memory different
-    # than the the bytes that are on disk?".
-    #
-    # The old sense of the meaning may prove useful in the future to protect
-    # against accidental overwrites, (as vi does for e.g) which is why
-    # we keep this note here.
-    #
-    # For those instances that are not (yet?) associated with a pathname,
-    # the question of if it is `modified?` is meaningless and potentially
-    # hazardous if misunderstood. In such cases we raise a sanity check
-    # exception.
-    #
-    # For those instances that are not valid, the question of whether the
-    # object is `modified?` should not be asked, because this library will
-    # try to prevent you from writing such objects to disk. Likewise a runtime
-    # error is raised in such cases.
-
-    def modified?
-      result = nil
-      if ! @pathname
-        fail "sanity - it is meaningless to ask if `modified?` on #{
-          }a #{ noun } not associated with any pathname."
-      elsif ! valid?
-        raise "sanity - invalid files should not be written to disk and hence #{
-          }whether such files are modified is the wrong question to ask."
+    def initialize * x_a
+      st = normalize_initialize_args x_a
+      path, @content_x, @entity_noun_stem = st.to_a
+      if path
+        @pathname = nil ; self.path = path
       else
-        if @pathname.exist?
-          result = string == @pathname.read # #twice
-        elsif '' ==  string       # in cases where the file has not (yet) been
-          result = false          # written to disk, consider our structure as
-        else                      # modified IFF we flatten as anything other
-          result = true           # than the empty string, to avoid writing
-        end                       # empty files to disk.
+        @cached_pn_exist = nil
+        @pathname = path
       end
-      result
+      @invalid_reason = nil ; @pathname_was_read = nil ; @is_valid = nil
+      nil
+    end
+  private
+    def normalize_initialize_args x_a
+      st = St__.new
+      case x_a.length
+      when 0
+      when 1 ; x_a[ 0 ].each_pair do |i, x| st[ i ] = x end
+      else   ; begin st[ x_a.shift ] = x_a.shift end while x_a.length.nonzero?
+      end
+      st
+    end
+    #
+    St__ = ::Struct.new :path, :string, :entity_noun_stem
+  public
+
+    attr_reader :entity_noun_stem, :pathname
+
+    module Delegate__  # maybe push up to [#mh-052]
+      def self.[] mod, * x_a
+        begin
+          st = St__.new
+          :to == x_a.shift or fail '`to`' ; st[ :to ] = x_a.shift
+          :if == x_a.shift or fail '`if`' ; st[ :if ] = x_a.shift
+          :methods == x_a.shift or fail '`methods`' ; st[ :methods ] = x_a.shift
+          mod.module_exec st, & Flush__ ; nil
+        end while x_a.length.nonzero?
+      end
+      #
+      St__ = ::Struct.new :to, :if, :methods
+      #
+      Flush__ = -> st do
+        receiver_i, cond_p, meth_i_a = st.to_a
+        meth_p = if AT__ == receiver_i[ 0 ]
+          -> meth_i do
+            -> *a, &p do
+              instance_variable_get( receiver_i ).send meth_i, *a, &p if
+                instance_exec( & cond_p )
+            end
+          end
+        else
+          -> meth_i do
+            -> *a, &p do
+              send( receiver_i ).send meth_i, *a, &p if instance_exec( & cond_p )
+            end
+          end
+        end
+        meth_i_a.each do |meth_i|
+          define_method meth_i, & meth_p[ meth_i ]
+        end ; nil
+      end
+      #
+      AT__ = '@'.freeze
     end
 
-    def noun                      # clients may find this useful in e.g.
-      @entity_noun_stem || 'config file'  # reflection (thing `git status`)
+    Delegate__[ self,
+      :to, :sexp, :if, -> { valid? }, :methods,
+        %i( [] content_items get_section_scanner_with_map_reduce_p
+            key? sections set_mixed value_items ),
+      :to, :@pathname, :if, -> { @pathname },
+        :methods, %i( dirname exist? writable? ) ]
+
+    def fetch name_i_or_s, &p  # #comport to #box-API
+      name_s = name_i_or_s.to_s
+      if valid?
+        r = @content_x.lookup_with_s_else_p name_s, false
+      end
+      if r then r elsif p then p.call else
+        raise ::KeyError.exception "key not found: #{ name_i_or_s.inspect }"
+      end
+    end
+
+    def []= kx, vx
+      sexp.set_mixed kx, vx
+      vx
+    end
+
+    def noun
+      @entity_noun_stem || 'config file'
     end
 
     def path
       @pathname.to_s if @pathname # a simpler, perhaps more familiar interface
     end                           # for the outside world
 
-    def path= str                 # with this class we try to create objects
-      if @pathname                # that are "semi-immutable", however for some
-        raise "won't overwrite existing path"  # applications it is useful to
-      end                         # be able to build the instancep progressively
-      if str                      # hence we experiment with this.
-        @pathname = ::Pathname.new str.to_s
-        str
+    def cached_pathname_exist  # assumes pathname
+      if @cached_pn_exist.nil?
+        @cached_pn_exist = !! @pathname.exist?
+      end
+      @cached_pn_exist
+    end
+
+    def path= x
+      @pathname and raise "semi-immutable - won't overwrite existing path"
+      @pathname = x ? ::Pathname.new( x.to_s ) : x
+      @cached_pn_exist = nil
+      x
+    end
+
+    def has_content  # unaware of validity. *may* false positive
+      if @content_x
+        @content_x.has_content
       else
-        @pathname = str
+        cached_pathname_exist  # may false-positive on empty string
       end
     end
 
-    attr_reader :pathname
-
-    Default_escape_path__ = -> pn { pn.basename } # a nice safe common denom.
-
-    Read = ::Struct.new :error, :read_error, :no_ent, :is_not_file,
-      :invalid, :escape_path
-
-    def read &block
-      ev = Read.new
-      block[ ev ] if block
-      escape_path = -> pathname do
-        ep = ev[ :escape_path ]
-        ep && ep.respond_to?( :escape_path ) and ep = ep.escape_path  # #todo
-        ep ||= Default_escape_path__
-        ep[ pathname ]
-      end
-      @pathname or
-        raise "cannot read - no pathname associated with this #{ noun }"
-      res = nil
-      if @pathname.exist?
-        stat = @pathname.stat
-        if 'file' == stat.ftype
-          content = @pathname.read  # change state only after this succeeds
-          pn_ = @pathname         # clear everythihng but the pathname - ick
-          clear
-          @pathname = pn_
-          @pathname_was_read = true  # used e.g by InvalidReason for l.g.
-          @content = content      # avoid circular dependency inf. loop here by
-          if valid?               # setting @content before calling `valid?`
-            res = true
-          elsif( f = ev[:invalid] || ev[:error] )
-            res = f[ invalid_reason ]
-          else
-            res = false
-          end
-        else
-          f = ev[:is_not_file] || ev[:read_error] || ev[:error]
-          f ||= -> pn, ftype do
-            raise "expected #{ noun } to be of type 'file', had #{ ftype } #{
-              }- #{ escape_path[ pn ] }"
-          end
-          res = f[ @pathname, stat.ftype ]
-        end
-      else
-        f = ev[:no_ent] || ev[:read_error] || ev[:error] || -> pn do
-          raise ::Errno::ENOENT.exception( escape_path[ pn ].to_s )
-          # the class itself writes "No such file or directory - #{ .. }" for us
-        end
-        res = f[ @pathname ]
-      end
-      res
+    def content= str
+      @is_valid = nil
+      @content_x = str
     end
-
-    delegates_to :sexp, :sections, -> { valid? }
-
-    delegates_to :sexp, :get_section_scanner_with_map_reduce_p, -> { valid? }
-
-    delegates_to :sexp, :set_mixed, -> { valid? }
 
     def sexp
-      valid? if @valid.nil?
-      if @valid
-        @content
-      else
-        @valid # (presumably false)
-      end
+      @is_valid.nil? and valid?
+      @is_valid and @content_x
     end
 
     def string
-      valid? if @valid.nil?
-      if @valid
-        @content.unparse
-      else
-        @content
-      end
+      @is_valid.nil? and valid?
+      @is_valid and @content_x.unparse
     end
 
-    # `to_s` - don't define or alias this. It is so ambiguous for such an
-    # object as this that it should not be assigned any special behavior,
-    # nor used in application code.
-
-    delegates_to :sexp, :value_items, -> { valid? }
+    def if_valid yes_p, no_p
+      if valid? then yes_p[ self ] else no_p[ @invalid_reason ] end
+    end
 
     def valid?
-      if @valid.nil?
-        if @content.nil?
-          if @pathname and @pathname.exist?
-            reading = true        # avoid circular dependency inf. loop here
-            read                  # when `read` calls `valid?`
-          else
-            @content = ''
-          end
-        end
-        if ! reading
-          parser = Config::File::Parser.instance
-          result = parser.parse @content
-          if result
-            @content = result.sexp # @content goes from being a string to a sexp
-            @invalid_reason = nil
-            @valid = true
-          else
-            # (leave content as the invalid string)
-            use_pn = (@pathname and @pathname_was_read) ? @pathname : nil
-            @invalid_reason = CodeMolester::InvalidReason.new parser, use_pn
-            @valid = false
-          end
-        end
-      end
-      @valid
+      @is_valid.nil? and determine_valid
+      @is_valid
     end
 
-    # the new way - looks atomic to the outside, might be from immutable object
+    def invalid_reason
+      @is_valid.nil? and valid?
+      @invalid_reason
+    end
 
-    def if_valid if_yes_have_self, if_no_have_this_error_metadata
-      if valid?
-        if_yes_have_self[ self ]
+  private
+
+    def determine_valid  # assume valid is nil
+      if @content_x
+        descend = true
+      elsif @content_x.nil?
+        if @pathname and cached_pathname_exist
+          read  # will set @content_x, call valid?, come back here from #here
+        else
+          @content_x = ''
+          descend = true
+        end
       else
-        if_no_have_this_error_metadata[ @invalid_reason ]
+        @is_valid = false
       end
-    end
-
-    delegates_to :pathname, :writable?
-
-    Write = PubSub::Emitter.new  # see `write`
-    class Write
-
-      # (this class is file-private but so-named for friendlier debugging)
-
-      # the world'd most interesting graph - see `write`
-
-      taxonomic_streams :all, :structural, :text, :notice, :before, :after
-
-      emits error: [ :text, :all ],
-        notice: [ :text, :all ], before: :all, after: :all,
-        before_update:   [ :structural, :before, :notice ],
-        after_update:    [ :structural, :after, :notice ],
-        before_create: [ :structural, :before, :notice ],
-        after_create:  [ :structural, :after, :notice ],
-        no_change:     [ :notice, :text ]
-
-      event_factory -> { PubSub::Event::Factory::Isomorphic.new Events }
-
-      # a dubious and experimental way to pass in parameters -
-
-      attr_accessor :dry_run  # #todo this is terrible
-      alias_method :is_dry_run, :dry_run
-
-      attr_accessor :escape_path  # #todo this is terrible
-
-      def is_dry_notify
-        @dry_run = true
+      if descend
+        determine_valid_via_execute_parse
       end
+      nil
     end
 
-    module EVENT_
-      # filled with joy
+    def determine_valid_via_execute_parse
+      parser = Config::File::Parser.instance
+      r = parser.parse @content_x
+      if r
+        @content_x = r.sexp  # goes from being a string to a sexp
+        @invalid_reason = nil
+        @is_valid = true
+      else
+        # (leave content as the invalid string)
+        ( @pathname && @pathname_was_read ) and use_pn = @pathname
+        @invalid_reason = CodeMolester::Invalid_Reason__.new parser, use_pn
+        @is_valid = false
+      end
+      nil
     end
 
-    module Events
-      MetaHell::Boxxy[ self ]
-      Text = PubSub::Event::Factory::Datapoint
-      Structural = PubSub::Event::Factory::Structural.new 2, nil, EVENT_
+    def read & p
+      @pathname or raise "cannot read - no pathname associated with this #{ noun }"
+      st = Read__.new ; p and p[ st ]
+      esc_p = st.escape_path
+      st.escape_path = -> pn_x do
+        esc_p && esc_p.respond_to?( :escape_path ) and never  # #todo
+        esc_p ||= Default_escape_path__
+        esc_p[ pn_x ]
+      end
+      if cached_pathname_exist
+        r = read_when_path_exist st
+      else
+        r = read_when_path_not_exist st
+      end
+      r
+    end ; public :read
+    #
+    Read__ = ::Struct.new :error, :read_error, :no_ent, :is_not_file,
+      :invalid, :escape_path
+    #
+    Default_escape_path__ = -> pn { pn.basename }  # a nice safe common denom.
+
+    def read_when_path_exist st
+      stat = @pathname.stat
+      if 'file' == stat.ftype
+        r = read_when_is_file st
+      else
+        r = read_when_is_not_file st, stat
+      end
+      r
     end
 
-    # `write` - because so many different interesting things can happen when
-    # we set out to write a file, we have a custom emitter class that models
-    # this event graph that callers can use to hook into these event streams.
-    #
-    # For one thing the file either does or does not already exist,
-    # and for these two states we will variously use the verbs `update`
-    # or `create` respectively in various symbols below.
-    #
-    # We emit separate events immediately `before` and immediately `after`
-    # the file is written to, which, when events on such streams are received
-    # by the caller that has a CLI modality, they are frequently written
-    # out as one line in two parts, with the reasoning that it is useful to
-    # see separately that the file writing *began* at all and that the file
-    # writing *completed* (successfully) -- and doing this in two separate
-    # lines may be considered too noisy -- however having the first half
-    # of the line written out e.g. to a logfile might be nice so that you
-    # have the filename recorded right before e.g a permission error was
-    # thrown by the filesystem.)
-    #
-    # The four symbols introduced above (`create`, `update`, `before`,
-    # `after`) exist as taxonomic streams, and then additionally one stream
-    # each for the four permutations of the two "exponents" for each of the
-    # two "categories" exists ("before_create", "after_update") etc.
-    #
-    # ("taxonomic streams" are streams that exist only to categories other
-    # streams (kind of like folders, more like tags). they are useful if
-    # you wanted subscribe only to certain sub-streams of events -
-    # e.g only the "after-" related events or only the "update-" related
-    # events.)
-    #
-    # Other taxonomic streams used include `text` v.s `structural` (whether
-    # the event is a string or a struct-ish of metadata (in the inheritence
-    # chain of a given stream, first one wins here) -- this may help you
-    # decide programmatically how to handle the event); and `notice` vs.
-    # `error` i.e. the severity -- e.g you may only want to act on events
-    # when they are at a certain level of severity to you.
-    #
-    # This big graph of streams is best viewed with `pub-sub viz`, a command-
-    # line tool that is part of pub-sub and works in conjunction with graph-viz
-    # to display this graph visually.
-    #
-    # (incidentally this and its two constituent implementation methods
-    # is becoming the poster-child wet-dream of [#hl-022], which seeks
-    # - possibly in vain - to dry up this prevalent pattern..)
+    def read_when_is_file st
+      content_s = @pathname.read
+      clear_everything_but_pathname_identity_related
+      @pathname_was_read = true
+      @content_x = content_s  # lest infinite call stack, set this ..
+      r = if valid?  # .. before you call this, per #here
+        true
+      elsif (( p = st.invalid || st.error ))
+        p[ @invalid_reason ]
+      else
+        false
+      end
+      r
+    end
+
+    def clear
+      clear_everything_but_pathname_identity_related
+      @cached_pn_exist = @pathname = nil
+    end
+
+    def clear_everything_but_pathname_identity_related
+      @content_x = @invalid_reason = @pathname_was_read = @is_valid = nil
+    end
+
+    def read_when_is_not_file st, stat
+      p = st.is_not_file || st.read_error || st.error
+      p ||= -> pn, ftype do
+        raise "expected #{ noun } to be of type 'file', had #{ ftype } #{
+          }- #{ st.escape_path[ pn ] }"
+      end
+      p[ @pathname, stat.ftype ]
+    end
+
+    def read_when_path_not_exist st
+      p = st.no_ent || st.read_error || st.error || -> pn do
+        raise ::Errno::ENOENT.exception "#{ st.escape_path[ pn ] }"
+        # the class itself writes "No such file or directory - #{ .. }" for us
+      end
+      p[ @pathname ]
+    end
+
+  public
 
     def write &p
       write_with_is_dry false, &p
     end
 
     def write_with_is_dry is_dry, &p
-      w = Write.new ; p and p[ w ] ; is_dry and w.is_dry_notify
+      w = Write__.new ; p and p[ w ] ; is_dry and w.is_dry_notify
       w.escape_path ||= Default_escape_path__
-      @pathname or
-        raise "cannot write - no pathname associated with this #{ noun }"
-      if valid?
-        if exist?
-          if @pathname_was_read
-            r = update_with_struct w
-          else
-            fail "won't overwrite a pathname that was not first read"  # stub
-          end
-        else
-          r = create_with_struct w
-        end
+      @pathname or raise "cannot write - #{
+        }no pathname associated with this #{ noun }"
+      valid? or raise "attempt to write invalid #{ noun } - check if valid? first"
+      if cached_pathname_exist
+        @pathname_was_read or fail "sanity - won't overwrite a pathname #{
+          }that was not first read"
+        r = write_when_update w
       else
-        raise "attempt to write invalid #{ noun } - check if valid? first"
+        r = write_when_create w
       end
       r
     end
 
-    attr_reader :entity_noun_stem
+    Write__ = PubSub::Emitter.new
+    class Write__  # `write` is very evented [#006]
+
+      taxonomic_streams :all, :structural, :text, :notice, :before, :after
+
+      emits error: [ :text, :all ],
+        notice: [ :text, :all ], before: :all, after: :all,
+        before_update: [ :structural, :before, :notice ],
+        after_update: [ :structural, :after, :notice ],
+        before_create: [ :structural, :before, :notice ],
+        after_create: [ :structural, :after, :notice ],
+        no_change: [ :notice, :text ]
+
+      event_factory -> { PubSub::Event::Factory::Isomorphic.new Events__ }
+
+      attr_accessor :dry_run
+      alias_method :is_dry_run, :dry_run
+      attr_accessor :escape_path
+
+      def is_dry_notify
+        @dry_run = true
+      end
+
+      module Events___
+        # filled with joy
+      end
+
+      module Events__
+        MetaHell::Boxxy[ self ]
+        Text = PubSub::Event::Factory::Datapoint
+        Structural = PubSub::Event::Factory::Structural.new 2, nil, Events___
+      end
+    end
 
   private
 
-    opts_struct = ::Struct.new :path, :string, :entity_noun_stem
-
-    define_method :initialize do |param_h=nil|
-      block_given? and raise 'where?'
-      o = opts_struct.new
-      if param_h
-        param_h.each { |k, v| o[k] = v }
-      end
-      @content = o[:string]  # expecting nil or string here
-      @entity_noun_stem = o[:entity_noun_stem]
-      @invalid_reason = nil
-      @pathname = o[:path] ? ::Pathname.new( o[:path].to_s ) : nil
-      @pathname_was_read = nil
-      @valid = nil
-    end
-
-    def clear
-      @content = @invalid_reason = @pathname = @pathname_was_read = @valid = nil
-    end
-
-    def create_with_struct w
+    def write_when_create w
       begin
-        is_dry = w.is_dry_run
-        w.emit :before_create,
-          resource: self,
-          message_proc: -> { "creating #{ w.escape_path[ @pathname ] }" }
+        @cached_pn_exist = nil
+        before_create w
 
-        # because the below are not considered porcelain-level errors, they
-        # use neither the emitter nor `escape_path` (for now..)
-        @pathname.dirname.exist? or
-          raise "parent directory does not exist, cannot write - #{
-            }#{ @pathname.dirname }"
+        (( dn = @pathname.dirname )).exist? or raise "parent directory #{
+          }does not exist, cannot write - #{ @pathname.dirname }"
 
-        @pathname.dirname.writable? or
-          raise "parent directory is not writable, cannot write - #{
-            }#{ @pathname }"
+        dn.writable? or raise "parent directory is not writable, #{
+          }cannot write - #{ @pathname }"
+
+          # somewhat arbitrarily the above are not considered UI-level errors
+          # hence they use neither the emitter nor `escape_path` (for now)
 
         bytes = nil
-        ( is_dry ? Headless::IO::DRY_STUB : @pathname ).open 'a' do |fh|
+        ( w.is_dry_run ? Headless::IO::DRY_STUB : @pathname ).open 'a' do |fh|
           bytes = fh.write string  # 'a' not 'w' to fail gloriously
         end
+        @cached_pn_exist = true  # hopefully ok, might bite
 
-        w.emit :after_create,
-          bytes: bytes,
-          is_dry: is_dry,
-          message_proc: -> do
-            "created #{ w.escape_path[ @pathname ] } (#{ bytes }#{
-              }#{ " dry" if is_dry } bytes)"
-          end
+        after_create w, bytes
         r = bytes
       end while nil
       r
     end
 
-    def update_with_struct w
+    def before_create w
+      w.emit :before_create, resource: self,
+        message_proc: -> { "creating #{ w.escape_path[ @pathname ] }" } ; nil
+    end
+
+    def after_create w, bytes
+      w.emit :after_create, bytes: bytes, is_dry: w.is_dry_run,
+        message_proc: -> do
+          "created #{ w.escape_path[ @pathname ] } (#{ bytes }#{
+            }#{ " dry" if w.is_dry_run } bytes)"
+        end ; nil
+    end
+
+    def write_when_update w
       begin
-        string = self.string ; is_dry = w.is_dry_run  # thread safety HA
-
-        if string == @pathname.read # #twice
-          w.emit :no_change,
-            "no change: #{ w.escape_path[ @pathname ] }"
-          break
-        end
-
-        w.emit :before_update,
-          resource: self,
-          message_proc: -> { "updating #{ w.escape_path[ @pathname ] }" }
-
-        @pathname.writable? or
-          raise "path is not writable, cannot write - #{ @pathname }"
-
+        str = string ; is_dry = w.is_dry_run  # thread safety HA
+        str == @pathname.read and break( update_when_no_change w )  # #twice
+        before_update w
+        @pathname.writable? or raise "path is not writable, cannot #{
+          }write - #{ @pathname }"
         bytes = nil
-
         ( is_dry ? Headless::IO::DRY_STUB : @pathname ).open 'w' do |fh|
-          bytes = fh.write string
+          bytes = fh.write str
         end
-
-        w.emit :after_update,
-          bytes: bytes,
-          is_dry: is_dry,
-          message_proc: -> do
-            "updated #{ w.escape_path[ @pathname ] } (#{ bytes }#{
-              }#{ ' dry' if is_dry } bytes)"
-          end
-
+        after_update w, bytes
         r = bytes
       end while nil
       r
+    end
+
+    def update_when_no_change w
+      w.emit :no_change, "no change: #{ w.escape_path[ @pathname ] }" ; nil
+    end
+
+    def before_update w
+      w.emit :before_update, resource: self,
+        message_proc: -> { "updating #{ w.escape_path[ @pathname ] }" } ; nil
+    end
+
+    def after_update w, bytes
+      w.emit :after_update, bytes: bytes, is_dry: w.is_dry_run,
+        message_proc: -> do
+          "updated #{ w.escape_path[ @pathname ] } (#{ bytes }#{
+            }#{ ' dry' if w.is_dry_run } bytes)"
+        end ; nil
+    end
+
+  public
+
+    def modified?  # explained at [#004]
+      @pathname or fail "sanity - it is meaningless to ask if `modified?` #{
+        } on a #{ noun } not associated with any pathname."
+      valid? or fail "sanity - invalid files should not be written to disk #{
+        }hence whether such files are modified is the wrong question to ask."
+      # in cases where the file has not yet been written to disk consider
+      # our structure as modified IFF we flatten down into anything other
+      # than the empty string so that we avoid writing empty file to disk
+      str = string
+      if cached_pathname_exist
+        r = str == @pathname.read  # #twice
+      elsif str.length.zero?
+        r = false
+      else
+        r = true
+      end
+      r
+    end
+
+    def some_names_notify
+      if valid?
+        res_a = @content_x.any_names_notify
+      end
+      res_a || MetaHell::EMPTY_A_
     end
   end
 end

@@ -1,5 +1,5 @@
 module Skylab::Headless
-  class IO::Interceptors::Filter <
+  class IO::Interceptors::Filter <  # :[#085]
     ::Struct.new :downstream, :previous_newline, :handlers
 
     # intercept write-like messages intended for an ::IO, but do something

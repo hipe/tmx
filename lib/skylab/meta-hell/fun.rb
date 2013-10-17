@@ -9,23 +9,23 @@ module Skylab::MetaHell
     def definer
       @definer ||= begin
         bx = box
-        Aset_.new do |i, p|
+        Aset__.new do |i, p|
           define_singleton_method i do @h.fetch i end
           bx.add i, p
         end
       end
     end
 
-    class Aset_ < ::Proc  # (from ruby source, `rb_hash_aset` is []=)
+    class Aset__ < ::Proc  # (from ruby source, `rb_hash_aset` is []=)
       alias_method :[]=, :call
     end
 
     def box
-      @box ||= Box_[ @a = [ ], @h = { } ]
+      @box ||= Box__[ @a = [ ], @h = { } ]
     end
 
-    Box_ = -> a, h do
-      Add_.new do |i, x|
+    Box__ = -> a, h do
+      Add__.new do |i, x|
         did = false
         h.fetch i do |_|
           did = true ; a << i ; h[ i ] = x
@@ -34,7 +34,7 @@ module Skylab::MetaHell
         x  # #{ result must be input argument in case the []= form was used }
       end
     end
-    class Add_ < ::Proc
+    class Add__ < ::Proc
       alias_method :add, :call
     end
 
@@ -42,6 +42,16 @@ module Skylab::MetaHell
 
     def members
       @a.dup
+    end
+
+    def each
+      if block_given?
+        @a.each do |i|
+          yield( i, @h.fetch( i ) )
+        end
+      else
+        to_enum
+      end
     end
 
     def at *a
@@ -63,13 +73,13 @@ module Skylab::MetaHell
       ::Struct.new( * h.keys ).new( * h.values )
     end
 
-    o[:memoize] = -> func do      # creates a function `func2` from `func`.
-      use = -> do                 # the first time `func2` is called, it calls
-        x = func.call             # `func` and stores its result in memory,
-        use = -> { x }            # and also uses that result as its result.
+    o[:memoize] = -> p do         # creates a function `func2` from `func`.
+      p_ = -> do                  # the first time `func2` is called, it calls
+        x = p.call                # `func` and stores its result in memory,
+        p_ = -> { x }             # and also uses that result as its result.
         x                         # each subsequent time you call `func2` it
       end                         # uses that same result stored in memory from
-      -> { use.call }             # the first time you called it. please be
+      -> { p_.call }              # the first time you called it. please be
     end                           # careful.
 
     o[:memoize_to_const_method] = -> p, c do  # use with `define_method`
@@ -97,6 +107,12 @@ module Skylab::MetaHell
     o[:pathify_name] = -> const_name_s do
       # (one extra rarely-used step added to the often-used function)
       ::Skylab::Autoloader::FUN.pathify[ const_name_s.gsub( '::', '/' ) ]
+    end
+
+    Is_primitive_esque = -> x do
+      ! x or case x
+      when ::TrueClass, ::Numeric, ::Symbol, ::String, ::Module ; true
+      end
     end
 
     # `seeded_function_chain` - given a stack of functions and one seed value,
@@ -161,7 +177,7 @@ module Skylab::MetaHell
             raise "circular dependence detected with `#{ key }` - are you #{
               }sure it is defined in #{ self }::#{ c_a * '::' }?"
           end
-          Aset_.new do |i, c_a|
+          Aset__.new do |i, c_a|
             bx.add i, c_a
             define_singleton_method i do
               mutex.hold_notify i, c_a
@@ -179,7 +195,7 @@ module Skylab::MetaHell
    public
       def redefiner
         @redefiner ||= begin
-          Aset_.new do |i, p|
+          Aset__.new do |i, p|
            @h.key?( i ) or raise "`#{ i }` was not [pre]defined in #{ self }"
            singleton_class.send :remove_method, i
            define_singleton_method i do @h.fetch i end
