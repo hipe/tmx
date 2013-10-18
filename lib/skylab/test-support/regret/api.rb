@@ -4,7 +4,7 @@ module Skylab::TestSupport
 
     module API
       API = self
-
+      Regret = Regret
       TestSupport = Subsys
 
       %i| Basic Face Headless MetaHell |.each do |i|
@@ -107,6 +107,15 @@ module Skylab::TestSupport
             end
           end
         end
+      end
+    end
+
+    module Services  # #stowaway
+      define_singleton_method :Walker do
+        require 'skylab/sub-tree/walker' ; ::Skylab::SubTree::Walker
+      end
+      def self.const_missing i
+        const_set i, send( i )
       end
     end
   end

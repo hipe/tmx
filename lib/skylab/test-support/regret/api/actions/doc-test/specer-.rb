@@ -208,7 +208,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     SEP_ = '::'.freeze
 
     def infer_unloaded_anchorized_const_a_from_tail_path
-      API::Support::Tree::Walker_::Const_inferer_[
+      Regret::FUN::Const_inferer__[
         :tail_path, @tail_path, :notice_p, -> s { @snitch.notice { s } } ]
     end
 

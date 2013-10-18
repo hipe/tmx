@@ -45,7 +45,7 @@ module Skylab::TestSupport::Regret::API
     end
 
     def build_walker
-      API::Support::Tree::Walker.new :path, @normalized_argument_path,
+      Regret::Services::Walker.new :path, @normalized_argument_path,
         :vtuple, @vtuple, :listener, generic_listener
     end
 

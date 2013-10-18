@@ -145,6 +145,7 @@ module Skylab::TestSupport::Regret::API
     Basic = Basic
     DocTest = self ; Face = Face
     MetaHell = MetaHell
+    Regret = ::Skylab::TestSupport::Regret
     SEP = '# =>'.freeze
 
   end

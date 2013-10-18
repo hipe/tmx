@@ -1,6 +1,8 @@
-module Skylab::TestSupport::Regret::API
+module Skylab
 
-  class API::Support::Tree::Walker
+module SubTree  # borrow x 1 - load this solo but it needs meta hell
+
+  class Walker
 
     # unifying something we've done in three places.
 
@@ -44,22 +46,22 @@ module Skylab::TestSupport::Regret::API
       end.call
     end
 
-    def search_upwards relative
-      pn = @pn
-      pn.absolute? or fail "sanity - #{ pn }"
-      count = -1
-      while true
-        count += 1
+    def search_upwards relative, limit=nil
+      (( pn = @pn )).absolute? or fail "sanity - #{ pn }"
+      count = 0
+      limit_ok = limit ? -> { count < limit } : -> { true }
+      while limit_ok[]
         try = pn.join relative
         try.exist? and break( found = try )
-        TOP_ == pn.instance_variable_get( :@path ) and break
+        count += 1
+        TOP__ == pn.instance_variable_get( :@path ) and break
         pn = pn.dirname
       end
       found and maybe_set_top_pn found, relative
       [ found, count ]
     end
 
-    TOP_ = '/'.freeze
+    TOP__ = '/'.freeze
 
     def maybe_set_top_pn pn, relative
       if ! top_pn
@@ -91,7 +93,7 @@ module Skylab::TestSupport::Regret::API
     def pathnames
       ::Enumerator.new do |y|
         files_file_pn && top_pn or fail "sanity"
-        tpn = Pathname_.new( @top_pn )
+        tpn = Pathname__.new( @top_pn )
         @files_file_pn.open do |fh|
           while (( line = fh.gets ))
             line.chomp!
@@ -112,7 +114,7 @@ module Skylab::TestSupport::Regret::API
 
     SPACE_ = ' '.freeze
 
-    class Pathname_ < ::Pathname
+    class Pathname__ < ::Pathname
 
       attr_reader :has_notes, :note_a
 
@@ -194,8 +196,6 @@ module Skylab::TestSupport::Regret::API
     end
     private :build_difference
 
-    Distill_ = MetaHell::Boxxy::FUN.distill
-
     -> do  # `find_top_toplevel
       slash = ::Pathname::SEPARATOR_LIST
 
@@ -209,7 +209,7 @@ module Skylab::TestSupport::Regret::API
       report_error = -> p_a_, top_norm_a do
         _big = -> do  # #todo:for:release
           p_a_.reduce( [] ) do |m, x|
-            m << Distill_[ x ] if '' != x ; m
+            m << Distill__[ x ] if '' != x ; m
           end * ' '
         end
         case top_norm_a.length
@@ -241,7 +241,7 @@ module Skylab::TestSupport::Regret::API
         p_a = p_a_.dup
         top_norm_a = []
         begin
-          top_norm = Distill_[ p_a.fetch( -1 ) ]
+          top_norm = Distill__[ p_a.fetch( -1 ) ]
           if c_h.key? top_norm
             top_norm_a << [ top_norm, p_a.length - 1 ]
           end
@@ -269,7 +269,7 @@ module Skylab::TestSupport::Regret::API
       end
 
       know_top = -> p_a, c_a, c_h, top do
-        nerk = Distill_[ top ]
+        nerk = Distill__[ top ]
         bork = -> f do
           do_big = nil
           say :notice, -> do
@@ -292,7 +292,7 @@ module Skylab::TestSupport::Regret::API
                 }was not found in #{ c_a_[ me, c_a ] }"
             end ]
           end
-          npa = p_a.map( & Distill_ )
+          npa = p_a.map( & Distill__ )
           a = npa.length.times.reduce [] do |m, x|
             m << x if nerk == npa[ x ] ; m
           end
@@ -315,7 +315,7 @@ module Skylab::TestSupport::Regret::API
         c_a = ::Object.constants.freeze
         c_h = ::Hash[
           c_a.each_with_index.map do |i, idx|
-            [ Distill_[ i ], idx ]
+            [ Distill__[ i ], idx ]
           end ]
         xp = @xpn = @pn.expand_path
         p_a = xp.sub_ext( '' ).to_s.split slash
@@ -329,6 +329,8 @@ module Skylab::TestSupport::Regret::API
       end
     end.call
     attr_reader :xpn, :top_pn, :top_mod
+    #
+    Distill__ = MetaHell::Boxxy::FUN.distill
 
     def current_path_exists
       pn = @pn
@@ -353,15 +355,16 @@ module Skylab::TestSupport::Regret::API
     #               ~ non-topical private (section 3) ~
 
     def say volume, msg_func
-      @listener.call Event_.new( volume, msg_func )
+      @listener.call Event__.new( volume, msg_func )
       nil
     end
     private :say
 
-    Event_ = ::Struct.new :volume, :message_proc
+    Event__ = ::Struct.new :volume, :message_proc
 
     def vtuple  # #called-by self internally
       @vt
     end
   end
+end  # give back x 1
 end

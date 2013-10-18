@@ -2,9 +2,9 @@ module Skylab::TestSupport
 
   module Regret
 
-    module API
+    module FUN
 
-      class Support::Tree::Walker_::Const_inferer_
+      class Const_inferer__
 
         # given an anchorized locally absolute path to a ruby file, infer
         # what the constant array to it might be, e.g for "foo/bar-baz/bif.rb"
