@@ -44,25 +44,23 @@ module Skylab::MetaHell
   module Bundle
 
     module Multiset
+
       def self.[] mod
         mod.extend self
       end
 
       def apply_iambic_on_client x_a, client
-        b_h = bundle_hash
+        h = hard_bundle_fetcher
         begin
-          client.module_exec x_a, & b_h[ x_a.shift ].to_proc
+          client.module_exec x_a, & h[ x_a.shift ].to_proc
         end while x_a.length.nonzero?
         nil
       end
-
-      def bundle_hash  # hacks only
-        @ibc ||= build_indexed_bundles_callable.freeze
-      end
-
     private
-
-      def build_indexed_bundles_callable
+      def hard_bundle_fetcher
+        @hard_bundle_fetcher ||= build_hard_bundle_fetcher
+      end
+      def build_hard_bundle_fetcher  # :+#bundle-multiset-API
         h = ::Hash.new( & method( :handle_bundle_not_found ) )
         constants.each do |const_i|
           x = const_get const_i, false
@@ -76,16 +74,39 @@ module Skylab::MetaHell
       #
       UCASE_RANGE__ = 'A'.getbyte( 0 ) .. 'Z'.getbyte( 0 )
       #
-      def handle_bundle_not_found h, k
-        raise ::KeyError, say_bundle_not_found( h, k )
+      def handle_bundle_not_found h, k  # :+#bundle-multiset-API
+        raise ::KeyError, say_bundle_not_found( h.keys, k )
       end
-      def say_bundle_not_found h, k
-        _s = MetaHell::Services::Headless::NLP::EN::Levenshtein::
-          Or_with_closest_n_items_to_item[ FOUR__, h.keys, k ]
-        "not found #{ MetaHell::Services::Basic::FUN::Inspect[ k ] } - #{
-          } did you mean #{ _s }?"
+      #
+      def say_bundle_not_found a, k  # :+#bundle-multiset-API
+        MetaHell::FUN::Say_not_found[ a, k ]
       end
-      FOUR__ = 4
+
+    public
+      def to_proc
+        @to_proc ||= build_to_proc_proc
+      end
+    private
+      def build_to_proc_proc  # :+#bundle-multiset-API
+        h = soft_bundle_fetcher
+        -> a do
+          while a.length.nonzero?
+            any_to_procable = h[ a[ 0 ] ]
+            any_to_procable or break
+            a.shift
+            module_exec a, & any_to_procable.to_proc
+          end ; nil
+        end
+      end
+      def soft_bundle_fetcher
+        @soft_bundle_fetcher ||= build_soft_bundle_fetcher
+      end
+      def build_soft_bundle_fetcher  # :+#bundle-multiset-API
+        hard_h = hard_bundle_fetcher
+        -> i do
+          hard_h.fetch i do end
+        end
+      end
     end
 
     class Item_Grammar  # implementation of "the item grammar" [#050]

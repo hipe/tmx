@@ -27,6 +27,8 @@ to cram every meta-attribute that would ever be used into one scope, thinking
 mistakenly that it would somehow make life easier. it did not. a longterm
 goal is to absorb all the good parts of this into the above.
 
+(further discussion of this library is in [#ta-045] - tan-man at the time
+of this writing straddled far into both libraries)
 
 ## then came the N-meta experiment with [ba] field
 

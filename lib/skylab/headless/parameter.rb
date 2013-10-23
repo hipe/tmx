@@ -2,8 +2,28 @@ module Skylab::Headless
 
   class Parameter  # :[#009]
 
-    # the fate of this node is discusses at [#mh-053] "discussion of the .."
+    # the fate of this node is discussed at [#mh-053] "discussion of the .."
 
+    def self.[] mod, * x_a
+      Bundles__.apply_iambic_on_client x_a, mod
+    end
+
+    module Bundles__
+      Oldschool_parameter_error_structure_handler = -> _ do
+        private
+        def parameter_error_structure ev
+          _msg = instance_exec( * ev.to_a, & ev.message_proc )
+          error _msg
+        end
+      end
+      Parameter_controller = -> a do
+        module_exec a, & Parameter::Controller__.to_proc
+      end
+      Parameter_controller_struct_adapter = -> a do
+        module_exec a, & Parameter::Controller__::Struct_Adapter.to_proc
+      end
+      MetaHell::Bundle::Multiset[ self ]
+    end
   end
 
   module Parameter::Definer
@@ -247,6 +267,14 @@ module Skylab::Headless
     end
 
     attr_reader :normalized_parameter_name
+
+    def reader_method_name
+      @normalized_parameter_name
+    end
+
+    def writer_method_name
+      @writer_method_name ||= :"#{ @normalized_parameter_name }="
+    end
 
   private
 

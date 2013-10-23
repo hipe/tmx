@@ -1,4 +1,4 @@
-[#087] #open paramter controllers show strain with changing event model
+[#087]       updated parameter controller event model
 [#086]       #node-identity
 [#085]       #node-identity
 [#084]       #doc-point :#pen. #body-is-inline-in-code

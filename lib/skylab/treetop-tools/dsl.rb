@@ -71,7 +71,7 @@ module Skylab::TreetopTools
     # other end with a `actual_parameters` structure that holds the client's
     # (semi valid) request
 
-    include Headless::Parameter::Controller::InstanceMethods # for set!
+    Headless::Parameter[ self, :parameter_controller, :oldschool_parameter_error_structure_handler ]
 
     include Headless::Parameter::Definer::InstanceMethods::IvarsAdapter
                                   # once we absorb the dsl actuals, we might

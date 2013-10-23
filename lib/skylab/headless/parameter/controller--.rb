@@ -1,103 +1,150 @@
 module Skylab::Headless
-  module Parameter::Controller::InstanceMethods
-    include Headless::SubClient::InstanceMethods
 
-    # #todo this is not in line with structured event emission. needs design [#087]
+  class Parameter
+
+    module Controller__  # assumes `parameter_error_structure`
+
+      p = -> a do
+        include IM__
+        if :without == a[ 0 ]
+          :headless_sub_client == a[ 1 ] or fail "no - #{ a[ 1 ] }"
+          a[ 0, 2 ] = MetaHell::EMPTY_A_
+        else
+          include Headless::SubClient::InstanceMethods
+        end ; nil
+      end
+      define_singleton_method :to_proc do p end
+
+      Struct_Adapter = -> a do
+
+        # an experimental that asks:  what if you want your parameter superset
+        # defined only by a ::Struct?  There can be no superset definitions of
+        # specific parameters.  Merely it is that each member of the struct is
+        # a required parameter (and it follows that no actual parameters could
+        # be added that are not in the parameter superset, which is the point)
+
+        extend Parameter::Definer # gets m.m and appropriate i.m
+
+        include IM__
+
+        members.each { |m| param m, required: true }
+
+        def invoke param_h
+          r = set! param_h
+          r &&= execute
+          r
+        end
+      end
+
+      Ev__ = ::Module.new
+      Event__ = Headless::Event_
+
+      module IM__  # (changed event model at [#087])
 
     # Put request parameters from `actual_h' (if any) into `actual`
     # while doing the usual validation, normalization, defaultation, and
     # emitting of any resulting errors (#pattern [#sl-116]).
     # Result is a boolean indicating whether no errors occured.
     #
-    def set! actual_h=nil, actual=self.actual_parameters # [#sl-116]
-      actual_h = actual_h ? actual_h.dup : { } # don't change original
-      error_count_before = error_count
-      prune_bad_keys actual_h
-      defaults actual_h
-      actual_h.each do |name, value|
-        if actual.respond_to? "#{ name }="
-          actual.send "#{ name }=", value # not atomic with above as es muss sein
-        else
-          error "not writable: #{ name }"
+
+        def set! actual_h=nil, actual=self.actual_parameters # [#sl-116]
+
+          # process depth first in order - actual_h might be a proxy for
+          # an ordered collection whose elements target subsequent behavior
+
+          befor = error_count
+          write_p = -> par, x do
+            m_i = par.writer_method_name
+            ok = actual.respond_to? m_i
+            ok or break parameter_error_structure Ev__::Not_Writable__[ par ]  # todo go this away
+            actual.send m_i, x
+          end
+          actual_h and write_valid_actual_to_p actual_h, write_p
+          write_defaults_against_actual_to_p actual, write_p
+          check_missing_required_against_actual actual
+          befor == error_count
         end
-      end
-      missing_required actual
-      error_count_before == error_count # returning anything otherwise would
-      # be bad design via tight coupling of our implementation and the bool fact
-    end
 
-  private
-
-    def agent_string                           # this saved my hide a few times
-      @agent_string ||= begin                  # but you should of course
-        a = self.class.to_s.split '::'         # override it w/ sthing prettier
-        a = a[ [ a.length, 2 ].min * -1 .. -1 ] # get last 2 or last one
-        a.map { |s| Autoloader::FUN.pathify[ s ] }.join ' '
-      end
-    end
-
-    def actual_parameters # for compatibility with the ever-flexible set!
-      self           # but it is only a default -- parameter controllers are
-    end              # not necessarily the actual parameters container!
-    protected :actual_parameters  # #protected-not-private
-
-    def defaults actual_h        # #pattern [#sl-117]
-      formal_parameters.each do |o|
-        if o.has_default? and actual_h[o.normalized_parameter_name].nil?
-          actual_h[o.normalized_parameter_name] = o.default_value
+        Ev__::Not_Writable__ = Event__.new do | par_ |
+          "not writable: #{ par par_.normalized_parameter_name }"
         end
-      end
-      nil
-    end
 
-    def formal_parameters
-      formal_parameters_class.parameters
-    end
+      private
+        def write_valid_actual_to_p actual_h, write_p
+          fp = formal_parameters ; extra_i_a = intern_o_a = nil
+          actual_h.each_pair do |i, x|
+            par = fp[ i ]
+            par or next( ( extra_i_a ||= [ ] ) << i )
+            par.internal? and next( ( intern_o_a ||= [ ] ) << par )
+            write_p[ par, x ]
+          end
+          extra_i_a and parameter_error_structure Ev__::Not_Param__[ extra_i_a ]
+          intern_o_a and parameter_error_structure Ev__::Internal__[ intern_o_a ]
+          nil
+        end
 
-    def formal_parameters_class   # feel free to override!
-      self.class
-    end
-
-    def missing_required actual
-      missing_a = formal_parameters.reduce [] do |m, (k, v)|
-        if v.required?
-          if ! actual.known?( k ) || actual[ k ].nil?
-            m << v
+        def write_defaults_against_actual_to_p actual, write_p  # :+#defaults [#sl-117]
+          formal_parameters.each do |par|
+            par.has_default? or next
+            i = par.normalized_parameter_name
+            actual.known?( i ) && ! actual[ i ].nil? and next
+            write_p[ par, par.default_value ]
           end
         end
-        m
-      end
-      if missing_a.length.nonzero?
-        missing_required_failure missing_a.map(& method( :parameter_label ) )
-      end
-      nil
-    end
+        #
+        Ev__::Not_Param__ = Event__.new do |param_i_a|
+          _s_a = param_i_a.map( & method( :em ) )
+          "#{ and_ _s_a } #{ s :is } not #{ s :a }parameter#{ s }"
+        end
+        #
+        Ev__::Internal__ = Event_.new do |param_a|
+          _s_a = param_a.map( & method( :parameter_label ) )
+          "#{ and_ _s_a } #{ s :is } #{ s :an }internal parameter#{ s }"
+        end
 
-    def missing_required_failure a
-      as = agent_string
-      as = "#{ as } " if as
-      error "#{ as }missing the required parameter#{ s a } #{ and_ a }"
-      nil
-    end
-
-    def prune_bad_keys actual_h # internal defaults may exist hence ..
-      bad = ->(k) { actual_h.delete(k) } # for non-atomic aggretation of errors
-      not_param = intern = nil
-      actual_h.keys.each do |key|
-        param = formal_parameters[key]
-        if param
-          if param.internal?
-            (intern ||= []).push parameter_label( param )
-            bad.call key
+        def check_missing_required_against_actual actual
+          miss_a = formal_parameters.reduce [ ] do |m, (i, par)|
+            par.required? or next m
+            actual.known?( i ) && ! actual[ i ].nil? and next m
+            m << par
           end
-        else
-          (not_param ||= []).push em(key)
-          bad.call key
+          miss_a.length.zero? or missing_required_failure miss_a ; nil
+        end
+        #
+        def missing_required_failure param_o_a
+          _ev = Ev__::Missing__[ agent_string, param_o_a ]
+          parameter_error_structure _ev ; nil
+        end
+        #
+        Ev__::Missing__ = Event__.new do |any_agent_string, param_o_a|
+          a = param_o_a.map( & method( :parameter_label ) )
+          any_agent_string and as = "#{ any_agent_string } "
+          "#{ as }missing the required parameter#{ s a } #{ and_ a }"
+        end
+
+        def agent_string
+          @agent_string ||= get_parameter_controller_moniker
+        end
+        #
+        def get_parameter_controller_moniker
+          a = self.class.to_s.split '::'
+          a = a[ [ a.length, 2 ].min * -1 .. -1 ]
+          a.reverse!  # assume Noun::Verb -> 'verb noun'
+          a.map { |s| Autoloader::FUN.pathify[ s ] } * ' '
+        end
+
+        def formal_parameters
+          formal_parameters_class.parameters
+        end
+        #
+        def formal_parameters_class   # feel free to override!
+          self.class
+        end
+      protected  # #protected-not-private
+        def actual_parameters
+          self  # the param controller is not necessarily the param container
         end
       end
-      not_param and error("#{and_ not_param} #{s :is} not #{s :a}parameter#{s}")
-      intern and error("#{and_ intern} #{s :is} #{s :an}internal parameter#{s}")
-      nil
     end
   end
 end

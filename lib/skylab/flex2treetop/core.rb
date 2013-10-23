@@ -27,9 +27,9 @@ module Skylab::Flex2Treetop
 
   class Core::Client
     include Headless::Client::InstanceMethods # get ancestor chain right
-    include Headless::Parameter::Controller::InstanceMethods # although
-                                  # cli might not use it we have things
-                                  # we need to override below
+
+    Headless::Parameter[ self, :parameter_controller, :oldschool_parameter_error_structure_handler ]
+      # whether or not the sub-client uses this, we need the chain right so we can override
 
     def actual_parameters         # more compartmentalized than the default
       @actual_parameters ||= formal_parameters_class.new self

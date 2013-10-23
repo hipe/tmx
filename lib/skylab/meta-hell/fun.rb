@@ -115,6 +115,23 @@ module Skylab::MetaHell
       end
     end
 
+    Say_not_found_ = -> d, a, k do
+      _s = MetaHell::Services::Headless::NLP::EN::Levenshtein::
+        Or_with_closest_n_items_to_item[ d, a, k ]
+      "not found #{ MetaHell::Services::Basic::FUN::Inspect[ k ] } - #{
+        }did you mean #{ _s }?"
+    end
+
+    A_HANDFUL__ = 5
+
+    Say_not_found = Say_not_found_.curry[ A_HANDFUL__ ]
+
+    Levenshtein_default_proc_ = -> d, h, k do
+      raise ::KeyError, Say_not_found_[ d, h.keys, k ]
+    end
+
+    Levenshtein_default_proc = Levenshtein_default_proc_.curry[ A_HANDFUL__ ]
+
     # `seeded_function_chain` - given a stack of functions and one seed value,
     # resolve one result.. fuller description at [#mh-026].
     #

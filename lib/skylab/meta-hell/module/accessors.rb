@@ -151,7 +151,7 @@ module Skylab::MetaHell
 
     o = { }
 
-    o[:resolve] = -> mod, path, create_blk=nil do
+    o[:resolve] = -> mod, path, create_blk=nil, else_p=nil do
       path_a = mod.name.split '::'
       delt_a = path.split '/'
       while part = delt_a.shift
@@ -169,6 +169,8 @@ module Skylab::MetaHell
             m.const_get s, false
           elsif create_blk
             m.const_set s, create_blk.call
+          elsif else_p
+            break else_p[]
           else
             m.const_get s, false  # trigger the error, presumably
           end

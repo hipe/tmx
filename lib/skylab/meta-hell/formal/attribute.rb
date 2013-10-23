@@ -80,10 +80,10 @@ module ::Skylab::MetaHell
         nil
       end
 
-      Attributes = -> a do
+      Attributes = -> a do  # #re-entrant
         include Reflection_IM__
         if a.length.nonzero?
-          module_exec a,  & Parse_the_attributes__
+          module_exec a, & Parse_the_attributes__
         end
       end
     end

@@ -4,7 +4,7 @@ module Skylab::TanMan
 
     def self.extended klass # [#sl-111]
       klass.extend Headless::Parameter::Definer # at [#045] (this and below)
-      klass.send :include, Headless::Parameter::Controller::InstanceMethods
+      Headless::Parameter[ klass, :parameter_controller, :oldschool_parameter_error_structure_handler ]
     end
   end
 end

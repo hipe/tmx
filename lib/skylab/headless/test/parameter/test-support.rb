@@ -18,7 +18,7 @@ module Skylab::Headless::TestSupport::Parameter
       private
         # A definition of formal_parameters is needed for compat. with
         # bound params.  currently its home definition is in
-        # Parameter::Controller::InstanceMethods, however pulling all of that in
+        # [#hl-009] ("parameters"), however pulling all of that in
         # is out of scope here, hence we redundantly define this here, but if
         def formal_parameters     # this moves up to e.g some I_M::Core,
           self.class.parameters   # then by all means get rid of it here!

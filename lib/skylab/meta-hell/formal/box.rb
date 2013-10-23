@@ -109,6 +109,16 @@ module Skylab::MetaHell
       @order.length
     end
 
+    def count
+      if block_given?
+        @order.count do |i|
+          yield @hash.fetch i
+        end
+      else
+        length
+      end
+    end
+
     def names
       @order.dup
     end

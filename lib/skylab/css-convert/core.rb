@@ -56,8 +56,10 @@ module Skylab::CssConvert
 
 
   module Core::Client::InstanceMethods
+
     include Core::SubClient::InstanceMethods
-    include Headless::Parameter::Controller::InstanceMethods
+
+    Headless::Parameter[ self, :parameter_controller, :oldschool_parameter_error_structure_handler ]
 
   private
 
