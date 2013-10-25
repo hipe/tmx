@@ -1,0 +1,112 @@
+#!/usr/bin/env ruby -w
+
+# do a 'git rest HEAD~1' IFF the top commit has the string "wip" in it
+
+require 'open3'
+
+y = ::Enumerator::Yielder.new( & $stderr.method( :puts ) )
+
+_OK = 0
+_INPUT_ISSUE = 1
+_SCRIPT_ISSUE = 2
+
+exitstatus = -> do
+
+  _exitstatus = nil ; did_bork = false
+  say_bork = -> msg do
+    "stopping because #{ msg }"
+  end
+  bork = -> issue_d, msg do
+    y << say_bork[ msg ] ; issue_d
+  end
+  _bork = -> issue_d, msg do
+    y << say_bork[ msg ]
+    did_bork = true ; _exitstatus = issue_d ; false
+  end
+
+  if ::ARGV.length.nonzero?
+    y << "usage: #{ ::File.basename $PROGRAM_NAME }"
+    y << "description: does 'git reset HEAD~1' IFF \"wip\" appears in HEAD commit"
+    break bork[ _INPUT_ISSUE, "unexpected argument #{ ::ARGV[ 0 ].inspect }" ]
+  end
+
+  process3 = -> o, e, w, p do
+    had_errput = nil
+    while (( line = e.gets ))
+      had_errput ||= true
+      y << "  (git errput: #{ line.chomp })"
+    end
+    ok = true
+    while (( line = o.gets ))
+      ok = p[ line.chomp ]
+      ok or break
+    end
+    if ! ok
+      while (( line = o.gets ))
+        y << "  (skipped: #{ line.chomp })"
+      end
+    end
+    d = w.value.exitstatus
+    if had_errput
+      _bork[ d, "had errput from git" ]
+    end
+    if d.nonzero?
+      _bork[ d, "got error code from git - #{ d }" ]
+    end
+    ! did_bork && ok
+  end
+
+  y << (( cmd = 'git log --oneline -2' ))
+
+  _i, o, e, w = ::Open3.popen3 cmd
+
+  commit = ::Struct.new :sha, :msg
+  commit_a = [ ]
+  rx = /\A(?<sha>[a-f0-9]{7})[ ](?<comment>.+)\z/
+  process3[ o, e, w, -> line do
+    y << "  (git output: #{ line })"
+    md = rx.match line
+    md or break _bork[ _SCRIPT_ISSUE, "did not match regex - #{ line.inspect }" ]
+    commit_a << commit.new( * md.captures ) ; true
+  end ]
+  did_bork and break _exitstatus
+
+  if 2 != commit_a.length
+    fail "sanity - expected 2 had #{ commit_a.length } commits"
+  end
+
+  require 'strscan'
+
+  scn = ::StringScanner.new (( ci = commit_a[ 0 ] )).msg
+
+  keyword = 'wip'
+
+  scn.skip( /[[:space:](]/ )
+
+  word = scn.scan( /[[:alnum:]]*/ )
+
+  if /\A#{ ::Regexp.escape keyword }\z/i !~ word
+    y << "HEAD commit comment: #{ ci.msg.inspect }"
+    break bork[ _INPUT_ISSUE, "we won't do a 'git reset' unless #{
+      }the first word is #{ keyword.inspect } #{
+        }(had #{ word.inspect })" ]
+  end
+
+  y << (( cmd = "git reset #{ commit_a.fetch( 1 ).sha }" ))
+  _i, o, e, w = ::Open3.popen3 cmd
+  process3[ o, e, w, -> line do
+    y << "  (git output: #{ line })"
+  end ]
+  did_bork and break _exitstatus
+  y << "stepped HEAD backwards by one commit. done."
+  _OK
+end.call
+
+case exitstatus
+when _OK ; # nothing
+when _SCRIPT_ISSUE ; y << "please fix this script and try again."
+when _INPUT_ISSUE ; y << "please try again with correct input."
+else y << "sorry about the error (exitstatus #{ exitstatus })."
+end
+
+exit exitstatus
