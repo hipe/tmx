@@ -63,7 +63,7 @@ module Skylab::MetaHell
     def self.enhance mod, &blk
       mod.module_exec do
         @boxxy ||= begin
-          boxxy = Boxxy_.new self
+          boxxy = Boxxy__.new self
           blk and boxxy._absorb_block blk
           boxxy._init_autoloader
           boxxy
@@ -76,35 +76,58 @@ module Skylab::MetaHell
       alias_method :[], :enhance
     end
 
-    class Boxxy_
+    class Boxxy__
       def initialize mod
         @mod = mod
         mod.module_exec do
           class << self
             alias_method :boxxy_original_constants, :constants
           end
-          extend ModuleMethods_
+          extend MM__
         end
         nil
       end
     end
 
-    module ModuleMethods_
+    module MM__
       def const_fetch path_x, *a, &p
         ( p ? a << p : a ).length.nonzero? and p = a.fetch( a.length - 1 << 1 )
-        P_[ false, p, self, path_x ].last
+        P__[ false, p, self, path_x ].last
       end
     end
 
-    P_ = -> do_advanced_hack, else_value_p, mod, path_x do  # #curry-friendly
+    Resolve_name_and_value = ::Struct.
+      new :do_peeking_hack, :else_p, :from_module, :path_x
+    class Resolve_name_and_value
+      class << self
+        remove_method :[]
+      end
+      def self.[] * x_a
+        st = new
+        OP_H__.fetch( x_a.shift )[ st, x_a ] while x_a.length.nonzero?
+        st[ :from_module ] or fail "from module?"
+        P__[ * st.to_a ]
+      end
+      OP_H__ = -> do
+        h = ::Hash[ members.map { |i| [ i, -> st, x_a do
+          st[ i ] = x_a.shift
+        end ] } ]
+        h[ :use_deep_paths_peeking_hack ] = -> st, x_a do
+          st[ :do_peeking_hack ] = true
+        end
+        h.freeze
+      end.call
+    end
+
+    P__ = -> do_peek_hack, else_value_p, mod, path_x do  # #curry-friendly
       [ * path_x ].reduce( [ nil, mod ] ) do | (_constant, box), name_x |
-        const_a = Get_constants_including_inferred_constants_[ box ]
-        nam = Distill_[ name_x ]
+        const_a = Get_constants_including_inferred_constants__[ box ]
+        nam = Distill[ name_x ]
         guess = const_a.reduce nil do |_, gues|
-          nam == Distill_[ gues ] and break gues
+          nam == Distill[ gues ] and break gues
         end
         if guess
-          const = Load_to_get_any_correct_name_[ do_advanced_hack, box, guess ]
+          const = Load_to_get_any_correct_name_[ do_peek_hack, box, guess ]
         end
         if const
           [ const, box.const_get( const, false ) ]
@@ -118,7 +141,7 @@ module Skylab::MetaHell
       end
     end
 
-    # `FUN.fuzzy_const_get` is supposed to work on any module:
+    # Fuzzy_const_get is supposed to work on any module:
     # here is one that has three layers of depth, and we use a whacky name:
     #
     #     module Foo
@@ -129,27 +152,17 @@ module Skylab::MetaHell
     #       end
     #     end
     #
-    #     MetaHell::Boxxy::FUN.fuzzy_const_get[ Foo,
+    #     MetaHell::Boxxy::Fuzzy_const_get[ Foo,
     #       [ :'bar-baz', 'bIFFO bLAMMO', :wiz_bang ] ]  # => :wow
     #
 
-    fun = { }
+    Fuzzy_const_get_name_and_value__ = P__.curry[ nil, nil ]
 
-    fun[ :fuzzy_const_get ] = -> mod, path_x do
-      P_[ nil, nil, mod, path_x ].fetch 1
+    Fuzzy_const_get = -> mod, path_x do
+      Fuzzy_const_get_name_and_value__[ mod, path_x ].fetch 1
     end
 
-    fun[ :fuzzy_const_get_name_and_value_recursive ] =
-        -> mod, path_x, else_value_p=nil do
-      P_[ nil, else_value_p, mod, path_x ]
-    end
-
-    fun[ :fuzzy_const_get_name_and_value_with_prying_hack ] =
-        -> mod, path_s, else_value_p do
-      P_[ true, else_value_p, mod, path_s ]
-    end
-
-    Get_constants_including_inferred_constants_ = -> mod do
+    Get_constants_including_inferred_constants__ = -> mod do
       if mod.respond_to? :boxxy_original_constants
         mod.constants
       else
@@ -164,12 +177,12 @@ module Skylab::MetaHell
         mod.respond_to? :dir_pathname or break
         dpn = mod.dir_pathname
         dpn && dpn.exist? or break
-        seen_h = ::Hash[ const_a.map { |k| [ Distill_[ k ], true ] } ]
+        seen_h = ::Hash[ const_a.map { |k| [ Distill[ k ], true ] } ]
         guesser = mod.respond_to?( :_boxxy ) ? mod._boxxy.guesser :
-          Guessers_::Default
+          Guessers__::Default
         dpn.children( false ).reduce( [] ) do |memo, file_pn|
           stem = file_pn.sub_ext( '' ).to_s
-          key = Distill_[ stem ]
+          key = Distill[ stem ]
           seen_h.fetch key do   # don't dupe 'tree/' and 'tree.rb'
             seen_h[ key ] = true
             memo << guesser[ stem ]
@@ -180,7 +193,7 @@ module Skylab::MetaHell
       res_a || EMPTY_A_
     end
 
-    Distill_ = fun[ :distill ] = -> do  # #part-of-public-FUN-libary
+    Distill = -> do  # #part-of-public-FUN-libary
 
       # different than `normify` and `normize`, this is a simple, lossy and
       # fast(er) operation that produces an internal distillation of a name
@@ -189,17 +202,17 @@ module Skylab::MetaHell
       black_rx = /(?:[ _-](?=.))+/  # [#bm-002]
       -> x do
         s = x.to_s.gsub( black_rx, '' )
-        DASH_ == s.getbyte( -1 ) and s.setbyte( -1, UNDR_ )
+        DASH_ == s.getbyte( -1 ) and s.setbyte( -1, UNDR__ )
         s.downcase.intern
       end
     end.call
-    UNDR_ = '_'.getbyte 0
+    UNDR__ = '_'.getbyte 0
 
-    Load_to_get_any_correct_name_ = -> do_advanced_hack, box, guess do
+    Load_to_get_any_correct_name_ = -> do_peek_hack, box, guess do
       if ! box.const_defined? guess, false and box.respond_to? :const_tug
         tug = box.tug_class.new guess.intern, box.dir_pathname, box
-        correction = if do_advanced_hack
-          Boxxy::Peeker_::Tug_[ tug ]
+        correction = if do_peek_hack
+          Boxxy::Peeker_::Tug[ tug ]
         else
           Tug_and_get_any_correction_[ tug ]
         end
@@ -216,9 +229,9 @@ module Skylab::MetaHell
       befor = consts[ ]
       any_correction = nil
       tug.load_and_get( -> do
-        cnst = Distill_[ const ]
+        cnst = Distill[ const ]
         ( consts[ ] - befor ).each do |correct_i|
-          if cnst == Distill_[ correct_i ] && const != correct_i
+          if cnst == Distill[ correct_i ] && const != correct_i
             any_correction = correct_i
             mod._boxxy.correction_notification const, correct_i if is_boxxified
             tug.correction_notification correct_i
@@ -262,7 +275,7 @@ module Skylab::MetaHell
     #
     # `const_fetch` with both a proc and a block doesn't make sense:
     #
-    #     Noodles.const_fetch( :ramen, -> { } ) { } # => ArgumentError: too..
+    #     Noodles.const_fetch( :ramen, -> { } ) { } # => IndexError: index 2..
     #
     # a `const_fetch` NameError has fun metadata:
     #
@@ -310,9 +323,9 @@ module Skylab::MetaHell
     #     wb  # => Fazzlebert::WizBang
     #     fb  # => Fazzlebert::FROB_BOB
 
-    module ModuleMethods_
+    module MM__
       def names
-        Boxxy::Names_.load
+        Boxxy::Names_.class
         names
       end
 
@@ -352,7 +365,7 @@ module Skylab::MetaHell
     #     Flowers.constants # => [ :CALLA_LiLy ]
     #
 
-    module ModuleMethods_
+    module MM__
       def constants               # ("overwrites" ruby builtin, which should
         @boxxy.get_constants      # be in `boxxy_original_constants`)
       end
@@ -366,16 +379,16 @@ module Skylab::MetaHell
       end
     end
 
-    class Conduit_
+    class Conduit__
       def initialize bxy
         @bxy = bxy
       end
     end
 
-    class Boxxy_
+    class Boxxy__
 
       def _absorb_block blk
-        Conduit_.new( self ).instance_exec( & blk )
+        Conduit__.new( self ).instance_exec( & blk )
         nil
       end
 
@@ -455,7 +468,7 @@ module Skylab::MetaHell
     #     a_x # => [ :wolf, :camel, :nope ]
     #
 
-    module ModuleMethods_
+    module MM__
       def each &blk
         ea = MetaHell::Formal::Box::Enumerator.new( -> pair_y do
           mod_load_guess = Load_to_get_any_correct_name_.curry[ false, self ]
@@ -479,7 +492,7 @@ module Skylab::MetaHell
     #     Foo.abbrev_box.fetch( :f )  # => :Foo
     #     Foo.abbrev_box.fetch( :b )  # => [ :Bar, :Baz ]
 
-    module ModuleMethods_
+    module MM__
     private
       def abbrev h
         @abbrev_box ||= MetaHell::Formal::Box::Open.new
@@ -506,24 +519,24 @@ module Skylab::MetaHell
     #     Cafes.constants  # => [ :EspressoBar, :LabCafe ]
     #
 
-    class Conduit_
+    class Conduit__
       def inferred_name_scheme i
         @bxy.set_inferred_name_scheme i
         nil
       end
     end
 
-    class Boxxy_
+    class Boxxy__
       def set_inferred_name_scheme i
-        @guesser = Guessers_.const_get i, false
+        @guesser = Guessers__.const_get i, false
       end
 
       def guesser
-        @guesser ||= Guessers_::Default
+        @guesser ||= Guessers__::Default
       end
     end
 
-    module Guessers_
+    module Guessers__
 
       Camel_Case_With_Underscore = -> do   # "-ki-ki-" => :_Ki_Ki_
         rx = /(?:\A|([-_]))(?:([a-z])|\z)/
@@ -584,13 +597,11 @@ module Skylab::MetaHell
     #     module Zangief ; end
     #     DSL_.get_const( :Zangief )  # => LoadError: uninitialized consta..
 
-    class Boxxy_
+    class Boxxy__
       def dsl blk
         Boxxy::DSL_.load
         dsl blk
       end
     end
-
-    FUN = ::Struct.new( * fun.keys ).new( * fun.values ).freeze
   end
 end

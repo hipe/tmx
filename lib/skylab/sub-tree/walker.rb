@@ -177,12 +177,10 @@ module SubTree  # borrow x 1 - load this solo but it needs meta hell
       -> do  # #result-block
         path_a = build_difference or break path_a
         @module = path_a.reduce @top_mod do |m, file_s|
-          _i, m = MetaHell::Boxxy::FUN.
-            fuzzy_const_get_name_and_value_with_prying_hack[
-              m, file_s, -> name_er do
-                say :notice, -> { name_er.message }
-                nil
-              end ]
+          _i, m = MetaHell::Boxxy::Resolve_name_and_value[
+            :use_deep_paths_peeking_hack,
+            :from_module, m, :path_x, file_s, :else_p, -> name_er do
+              say :notice, -> { name_er.message } ; nil end ]
           m or break( false )
         end
         @module ? true : @module
@@ -330,7 +328,7 @@ module SubTree  # borrow x 1 - load this solo but it needs meta hell
     end.call
     attr_reader :xpn, :top_pn, :top_mod
     #
-    Distill__ = MetaHell::Boxxy::FUN.distill
+    Distill__ = MetaHell::Boxxy::Distill
 
     def current_path_exists
       pn = @pn

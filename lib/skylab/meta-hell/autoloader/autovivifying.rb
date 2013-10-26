@@ -17,6 +17,10 @@ module Skylab::MetaHell
       @autovivify_proc = nil
     end
 
+    def autovivify_proc_notify p
+      @autovivify_proc = p ; nil
+    end
+
     def self.enhance x
       tug_class = self
       x.instance_exec do
@@ -26,8 +30,6 @@ module Skylab::MetaHell
     end
 
     attr_reader :mod_dir_pathname
-
-    attr_writer :autovivify_proc
 
     def probably_loadable?
       super or @mod.has_stowaways && has_stowaway_resolver or

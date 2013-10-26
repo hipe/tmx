@@ -20,16 +20,16 @@ module Skylab::MetaHell::TestSupport::FUN
         module Sandbox_1
           f_a = [
             -> item do
-              if 'cilantro' == item                 # the true-ishness of the 1st
-                [ false, 'i hate cilantro' ]        # element in the result tuple
-              else                                  # determines short circuit
+              if 'cilantro' == item            # the true-ishness of the 1st
+                [ false, 'i hate cilantro' ]   # element in the result tuple
+              else                             # determines short circuit
                 [ true, item, ( 'red' == item ? 'tomato' : 'potato' ) ]
-              end                                   # three above becomes two
-            end, -> item1, item2 do                 # here, b.c the 1st is
-              if 'carrots' == item1                 # discarded when true
+              end                              # three above becomes two
+            end, -> item1, item2 do            # here, b.c the 1st is
+              if 'carrots' == item1            # discarded when true
                 "let's have carrots and #{ item2 }" # note no tuple necessary
-              elsif 'tomato' == item2               # if it's just one true-ish
-                [ false, 'nope i hate tomato' ]     # non-true item
+              elsif 'tomato' == item2          # if it's just one true-ish
+                [ false, 'nope i hate tomato' ]  # non-true item
               else
                 [ item1, item2 ]
               end

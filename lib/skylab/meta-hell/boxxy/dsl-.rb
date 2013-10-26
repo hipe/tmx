@@ -37,7 +37,7 @@ module Skylab::MetaHell
       end
     end
 
-    class Boxxy_
+    class Boxxy__
 
       undef_method :dsl
 

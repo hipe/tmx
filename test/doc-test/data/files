@@ -8,10 +8,10 @@ lib/skylab/face/cli/lipstick.rb
 lib/skylab/face/cli/table.rb
 lib/skylab/face/cli/tableize.rb
 lib/skylab/headless/cli/option.rb
-lib/skylab/headless/nlp/en/levenshtein-.rb
+lib/skylab/headless/nlp/en/levenshtein.rb
 lib/skylab/headless/plugin/host/metaservices-/chain-.rb
 lib/skylab/headless/plugin/host/proxy.rb
-lib/skylab/information-tactics/levenshtein-.rb
+lib/skylab/information-tactics/levenshtein.rb
 lib/skylab/meta-hell/boxxy.rb
 lib/skylab/meta-hell/dsl-dsl.rb
 lib/skylab/meta-hell/fun.rb

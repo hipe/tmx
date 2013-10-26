@@ -69,7 +69,7 @@ module Skylab::MetaHell::TestSupport::Boxxy
         end
       end
     end
-    context "`FUN.fuzzy_const_get` is supposed to work on any module" do
+    context "Fuzzy_const_get is supposed to work on any module" do
       Sandbox_2 = Sandboxer.spawn
       it "here is one that has three layers of depth, and we use a whacky name" do
         Sandbox_2.with self
@@ -82,7 +82,7 @@ module Skylab::MetaHell::TestSupport::Boxxy
             end
           end
 
-          MetaHell::Boxxy::FUN.fuzzy_const_get[ Foo,
+          MetaHell::Boxxy::Fuzzy_const_get[ Foo,
           [ :'bar-baz', 'bIFFO bLAMMO', :wiz_bang ] ].should eql( :wow )
         end
       end
@@ -136,7 +136,8 @@ module Skylab::MetaHell::TestSupport::Boxxy
         module Sandbox_3
           -> do
             Noodles.const_fetch( :ramen, -> { } ) { }
-          end.should raise_error( ::IndexError )
+          end.should raise_error( IndexError,
+                       ::Regexp.new( "\\Aindex\\ 2" ) )
         end
       end
       it "a `const_fetch` NameError has fun metadata" do

@@ -3,7 +3,6 @@ module Skylab::TestSupport::Regret::API
   class API::Actions::Intermediates::Templo < API::Support::Templo_
 
     def initialize wlk, pn
-      fun = MetaHell::Boxxy::FUN
       @render_to = -> io do
 
         local_pn = wlk.class.subtract pn , wlk.top_pn
@@ -17,8 +16,7 @@ module Skylab::TestSupport::Regret::API
         cur_a = [ cur_mod.to_s.intern ]
         count = 0
         step = -> do
-          i, mod = fun.fuzzy_const_get_name_and_value_recursive[
-            cur_mod, loc_a.fetch( 0 ) ]
+          i, mod = MetaHell::Boxxy::Resolve_name_and_value[ :from_module, cur_mod, :path_x, loc_a.fetch( 0 ) ]
           cur_a.push i
           loc_a.shift
           loc_a.length.zero? and break( step = nil )

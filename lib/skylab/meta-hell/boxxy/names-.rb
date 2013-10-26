@@ -2,10 +2,7 @@ module Skylab::MetaHell
 
   module Boxxy::Names_
 
-    def self.load
-    end
-
-    class Fly_ < MetaHell::Services::Headless::Name::Function::From::Constant
+    class Fly__ < MetaHell::Services::Headless::Name::Function::From::Constant
 
       alias_method :replace, :initialize ; public :replace  # [#mh-031]
       def initialize ; end  # poof you're a flyweight
@@ -20,12 +17,12 @@ module Skylab::MetaHell
     end
   end
 
-  module Boxxy::ModuleMethods_
+  module Boxxy::MM__
 
     undef_method :names
 
     the_only_fly = -> do
-      fly = Boxxy::Names_::Fly_.new
+      fly = Boxxy::Names_::Fly__.new
       the_only_fly = -> { fly }
       fly
     end

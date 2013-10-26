@@ -8,10 +8,13 @@ module Skylab::MetaHell
       # break autoloading) to determine the correct casing of its constants.
       # dark hacks only.
 
-      Tug_ = -> tug do
+      Tug = -> tug do
         any_expensive_correction = nil
-        tug.autovivify_proc = -> do
-          cmd_s = Build_find_command_[ tug ]
+        tug.respond_to? :autovivify_proc_notify or fail ::ArgumentError,
+          "your module has an unsupported tug class (do you need MAARS?) - #{
+            }#{ tug.mod }"
+        tug.autovivify_proc_notify -> do
+          cmd_s = Build_find_command__[ tug ]
           _, o, e, w = MetaHell::Services::Open3.popen3 cmd_s
           d = w.value.exitstatus
           0 == d or fail "sanity - exitstatus from cmd? #{ d.inspect }"
@@ -19,12 +22,12 @@ module Skylab::MetaHell
           err_s.length.zero? or fail "sanity - err from cmd? #{err_s.inspect}"
           if out_s.length.nonzero?
             any_expensive_correction =
-              Any_correction_from_massive_hack_[ tug, out_s.chomp ]
+              Any_correction_from_massive_hack__[ tug, out_s.chomp ]
           end
           # then do what parent does
           tug.mod.const_set tug.const, tug.build_autovivified_module
         end
-        any_other_correction = Boxxy::Tug_and_get_any_correction_[ tug ]
+        any_other_correction = Tug_and_get_any_correction_[ tug ]
         if any_expensive_correction
           any_other_correction and fail "sanity - why did the other correct it?"
           any_expensive_correction
@@ -33,18 +36,18 @@ module Skylab::MetaHell
         end
       end
 
-      Build_find_command_ = -> tug do
+      Build_find_command__ = -> tug do
         MetaHell::Services.kick :Shellwords
         "find #{ tug.branch_pathname.to_s.shellescape } -type f #{
           }-name #{ "*#{ Autoloader::EXTNAME }".shellescape } | head -n 1"
       end
 
-      Any_correction_from_massive_hack_ = -> tug, path do
+      Any_correction_from_massive_hack__ = -> tug, path do
         c_a = MetaHell::Services::CodeMolester::Const_Pryer[ path ]
         # the file that was found with `find` is of arbitrary depth.
         shorter = tug.branch_pathname.to_s
         path[ 0, shorter.length ] == shorter or fail "sanity"
-        depth = Number_of_occurences_in_haystack_of_needle_[
+        depth = Number_of_occurences_in_haystack_of_needle__[
           path[ shorter.length .. -1 ], '/' ]
         depth.times { c_a.pop }
         c_a.length.zero? and fail "sanity"
@@ -55,7 +58,7 @@ module Skylab::MetaHell
         any_expensive_correction
       end
 
-      Number_of_occurences_in_haystack_of_needle_ = -> str, char do
+      Number_of_occurences_in_haystack_of_needle__ = -> str, char do
         # because `scan` wastes memory HA
         d = 0 ; cnt = 0 ; len = str.length ; ln = char.length
         while d < len

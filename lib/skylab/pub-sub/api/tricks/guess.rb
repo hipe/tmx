@@ -59,7 +59,7 @@ module Skylab::PubSub
       else
         parts = [ @subp, * @tok_a ]
         parts.reduce ::Skylab do |modul, part|
-          MetaHell::Boxxy::FUN.fuzzy_const_get[ modul, part ]
+          MetaHell::Boxxy::Fuzzy_const_get[ modul, part ]
         end
       end
     end

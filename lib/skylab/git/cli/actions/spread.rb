@@ -375,7 +375,7 @@ module Skylab::Git
 
         module Actions
           define_singleton_method :fuzzy_const_get, &
-            MetaHell::Boxxy::FUN.fuzzy_const_get.curry[ self ]
+            MetaHell::Boxxy::Fuzzy_const_get.curry[ self ]
         end
 
         class Branch_Mungulator_

@@ -163,8 +163,7 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
           @tail_path = resolve_tail_path or break
           c_a = resolve_loaded_anchorized_const_a or break c_a
         end
-        tmod = MetaHell::Boxxy::FUN.
-          fuzzy_const_get[ DocTest::Templos_, @templo_name ]
+        tmod = MetaHell::Boxxy::Fuzzy_const_get[ DocTest::Templos_, @templo_name ]
         tmod.begin @snitch, @base_mod, c_a, @block_a
       end.call
     end
@@ -231,15 +230,14 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     def get_another_correct_anchorized_name_via_the_load_module
       c_a = @load_module.split SEP_
       top = ::Object.const_get c_a.shift
-      name, _ = MetaHell::Boxxy::FUN.
-        fuzzy_const_get_name_and_value_recursive[ top, c_a ]
+      name, _ = MetaHell::Boxxy::Resove_name_and_value[ :from_module, top, :path_x, c_a ]
       c_a[ -1 ] = name  # any correction to last part only
       c_a
     end
 
     def reduce_const_array_down_to_some_value c_a
       c_a.reduce @base_mod do |m, c|
-        name, value = Const_fetch_[ m, c, -> err do
+        name, value = MetaHell::Boxxy::Resolve_name_and_value[ :from_module, m, :path_x, c, :else_p, -> err do
           @snitch.notice { "'#{ m }' does not have #{
             }'#{ err.name }' loaded as one of its #{ m.constants.length } #{
             }contant(s)" }
@@ -251,8 +249,6 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
         value
       end
     end
-
-    Const_fetch_ = MetaHell::Boxxy::FUN.fuzzy_const_get_name_and_value_recursive
 
     def resolve_tail_path  # local, normalized path
       -> do
