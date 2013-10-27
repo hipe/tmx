@@ -97,9 +97,9 @@ module Skylab::TestSupport::Regret::API
       nil
     end
 
-    def render_cover *mods
+    def render_cover a, any_b, c
       if @cover
-        mod = mods.compact.join '::'
+        mod = "#{ a }#{ any_b }::#{ c }"
         get_template( :_cover )[ mod: mod ].chomp
       end
     end

@@ -123,7 +123,8 @@ module Skylab::TestSupport::Regret::API
         w.current_path_exists or break bork "can't make intermediate #{
           }test files without a start node."
         w.find_toplevel_module or break
-        w.load_downwards or break
+        ok = w.load_downwards :core_basename, API::DEFAULT_CORE_BASENAME_
+        ok or break
         w.find_first_dir 'test' or break
         r = true
       end while nil

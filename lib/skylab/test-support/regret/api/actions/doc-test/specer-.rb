@@ -19,7 +19,8 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     #
 
     MetaHell::FUN::Fields_[ :client, self, :method, :absorb, :field_i_a,
-      [ :snitch, :outstream, :templo_name, :path, :load_file, :load_module ] ]
+      %i( core_basename load_file load_module
+        outstream path snitch templo_name ) ]
 
     def initialize *a
       absorb( *a )
@@ -230,19 +231,21 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     def get_another_correct_anchorized_name_via_the_load_module
       c_a = @load_module.split SEP_
       top = ::Object.const_get c_a.shift
-      name, _ = MetaHell::Boxxy::Resove_name_and_value[ :from_module, top, :path_x, c_a ]
+      name, _ = MetaHell::Boxxy::Resolve_name_and_value[ :from_module, top, :path_x, c_a ]
       c_a[ -1 ] = name  # any correction to last part only
       c_a
     end
 
     def reduce_const_array_down_to_some_value c_a
       c_a.reduce @base_mod do |m, c|
-        name, value = MetaHell::Boxxy::Resolve_name_and_value[ :from_module, m, :path_x, c, :else_p, -> err do
+        name, value = MetaHell::Boxxy::Resolve_name_and_value[
+          :from_module, m, :path_x, c, :core_basename, @core_basename,
+            :else_p, -> err do
           @snitch.notice { "'#{ m }' does not have #{
             }'#{ err.name }' loaded as one of its #{ m.constants.length } #{
-            }contant(s)" }
-          @snitch.notice { "trying passing a second #{
-            }<load-file> argument that loads it."  }
+            }constant(s)" }
+          @snitch.notice { "try passing a 2nd #{ code '<load-file>' } argument #{
+            }that loads it, or try the #{ par :core_basename } option" }
           false
         end ]
         name or break( false )

@@ -8,9 +8,10 @@ module Skylab::TestSupport::Regret::API
              [ :err, :ivar ],
              [ :pth, :ivar ]
 
-    params [ :mode, :set, [ :do_list, :do_check, :is_dry_run, :do_execute ] ],
-      [ :path, :arity, :zero_or_one ],
+    params [ :core_basename, :arity, :zero_or_one ],
       [ :do_force, :arity, :zero_or_one ],
+      [ :mode, :set, [ :do_list, :do_check, :is_dry_run, :do_execute ] ],
+      [ :path, :arity, :zero_or_one ],
       v.param( :vtuple )
 
     def execute
@@ -146,9 +147,13 @@ module Skylab::TestSupport::Regret::API
       ex.absorb_services :out, @o, :err, @err, :pth, @pth
         # NOTE this litte `o` above is e.g our selfsame @out *OR* a
         # handle on the little `@io` nerklette (depending on 'check')
-      r = ex.absorb_params_using_message_yielder snitch.y, :path, pn,
-        :load_module, nil, :load_file, nil, :template_option_a, nil,
-        :do_close_output_stream, false
+      r = ex.absorb_params_using_message_yielder snitch.y,
+        :core_basename, @core_basename,
+        :do_close_output_stream, false,
+        :load_file, nil,
+        :load_module, nil,
+        :path, pn,
+        :template_option_a, nil
       r&&= ex
       r
     end
@@ -171,6 +176,19 @@ module Skylab::TestSupport::Regret::API
     end
 
     def flush
+      if @opn.dirname.exist?
+        do_flush
+      else
+        dn = @opn.dirname
+        @sn.say :notice, -> do
+          ">>> directory does not exist - you must create it yourself: #{
+            }#{ escape_path dn }"
+        end
+        false
+      end
+    end
+
+    def do_flush
       bytes = nil
       @io.rewind
       opener = @is_dry_run ? DEV_NULL_ : @opn

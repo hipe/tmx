@@ -92,12 +92,12 @@ module Skylab::MetaHell
     module MM__
       def const_fetch path_x, *a, &p
         ( p ? a << p : a ).length.nonzero? and p = a.fetch( a.length - 1 << 1 )
-        P__[ false, p, self, path_x ].last
+        P__[ nil, false, p, self, path_x ].last
       end
     end
 
     Resolve_name_and_value = ::Struct.
-      new :do_peeking_hack, :else_p, :from_module, :path_x
+      new :core_basename, :do_peeking_hack, :else_p, :from_module, :path_x
     class Resolve_name_and_value
       class << self
         remove_method :[]
@@ -119,7 +119,7 @@ module Skylab::MetaHell
       end.call
     end
 
-    P__ = -> do_peek_hack, else_value_p, mod, path_x do  # #curry-friendly
+    P__ = -> cbn, do_peek_hack, else_value_p, mod, path_x do  # #curry-friendly
       [ * path_x ].reduce( [ nil, mod ] ) do | (_constant, box), name_x |
         const_a = Get_constants_including_inferred_constants__[ box ]
         nam = Distill[ name_x ]
@@ -127,14 +127,14 @@ module Skylab::MetaHell
           nam == Distill[ gues ] and break gues
         end
         if guess
-          const = Load_to_get_any_correct_name_[ do_peek_hack, box, guess ]
+          const = Resolve_name__[ cbn, do_peek_hack, box, guess ]
         end
         if const
           [ const, box.const_get( const, false ) ]
         else
-          f = else_value_p || method( :raise )
-          v = if f.arity.zero? then f[] else
-            f[ NameError.new name_x, box ]
+          p = else_value_p || method( :raise )
+          v = if p.arity.zero? then p[] else
+            p[ NameError.new name_x, box ]
           end
           break [ nil, v ]
         end
@@ -156,7 +156,7 @@ module Skylab::MetaHell
     #       [ :'bar-baz', 'bIFFO bLAMMO', :wiz_bang ] ]  # => :wow
     #
 
-    Fuzzy_const_get_name_and_value__ = P__.curry[ nil, nil ]
+    Fuzzy_const_get_name_and_value__ = P__.curry[ nil, nil, nil ]
 
     Fuzzy_const_get = -> mod, path_x do
       Fuzzy_const_get_name_and_value__[ mod, path_x ].fetch 1
@@ -194,31 +194,52 @@ module Skylab::MetaHell
     end
 
     Distill = -> do  # #part-of-public-FUN-libary
+      # different than `normify` and `normize` this is a lossy operation
+      # that produces an internal distillation of a name for use in e.g
+      # fuzzy (case-insensitive) matching, while preserving meaningful
+      # trailing dashes or underscores from e.g a filename or constant
 
-      # different than `normify` and `normize`, this is a simple, lossy and
-      # fast(er) operation that produces an internal distillation of a name
-      # for use in e.g fuzzy (case-insensitive) matching.
-
-      black_rx = /(?:[ _-](?=.))+/  # [#bm-002]
+      black_rx = /[-_ ]+(?=[^-_])/  # preserve final trailing underscores & dashes ; [#bm-002]
       -> x do
-        s = x.to_s.gsub( black_rx, '' )
-        DASH_ == s.getbyte( -1 ) and s.setbyte( -1, UNDR__ )
+        s = x.to_s.gsub black_rx, ''
+        d = 0 ; s.setbyte d, UNDR__ while DASH_ == s.getbyte( d -= 1 )
         s.downcase.intern
       end
     end.call
     UNDR__ = '_'.getbyte 0
 
-    Load_to_get_any_correct_name_ = -> do_peek_hack, box, guess do
-      if ! box.const_defined? guess, false and box.respond_to? :const_tug
-        tug = box.tug_class.new guess.intern, box.dir_pathname, box
-        correction = if do_peek_hack
-          Boxxy::Peeker_::Tug[ tug ]
-        else
-          Tug_and_get_any_correction_[ tug ]
-        end
-        correction and guess = correction
+    Resolve_name__ = -> cbn, do_peek_hack, box, guess do
+      if box.const_defined? guess, false
+        guess
+      elsif box.respond_to? :const_tug
+        Resolve_name_with_tug__[ do_peek_hack, box, guess ]
+      elsif cbn
+        Resolve_name_with_core_file__[ cbn, box, guess ]
       end
+    end
+
+    Resolve_name_with_tug__ = -> do_peek_hack, box, guess do
+      tug = box.tug_class.new guess.intern, box.dir_pathname, box
+      correction = if do_peek_hack
+        Boxxy::Peeker_::Tug[ tug ]
+      else
+        Tug_and_get_any_correction_[ tug ]
+      end
+      correction and guess = correction
       box.const_defined?( guess, false ) and guess
+    end
+
+    Resolve_name_with_core_file__ = -> basename, box, guess do  # #edge-hack
+      _dir = Autoloader::FUN.pathify[ guess ]
+      pn = box.dir_pathname.join "#{ _dir }/#{ basename }"
+      if pn.exist?
+        require pn.sub_ext ''
+        [ -> { guess }, -> { guess.to_s.gsub( '_', '' ).intern } ].
+            reduce nil do |_, p|
+          i_ = p[]
+          box.const_defined?( i_, false ) and break i_
+        end
+      end
     end
 
     Tug_and_get_any_correction_ = -> tug do
@@ -471,7 +492,7 @@ module Skylab::MetaHell
     module MM__
       def each &blk
         ea = MetaHell::Formal::Box::Enumerator.new( -> pair_y do
-          mod_load_guess = Load_to_get_any_correct_name_.curry[ false, self ]
+          mod_load_guess = Resolve_name__.curry[ nil, false, self ]
           constants.each do |guess_i|
             const = mod_load_guess[ guess_i ]
             const and pair_y.yield( const, const_get( const, false ) )
@@ -539,19 +560,21 @@ module Skylab::MetaHell
     module Guessers__
 
       Camel_Case_With_Underscore = -> do   # "-ki-ki-" => :_Ki_Ki_
-        rx = /(?:\A|([-_]))(?:([a-z])|\z)/
+        rx = /(?:\A|([-_]+))(?:([a-z])|\z)/
         -> x do
-          x.to_s.gsub( rx ) do
-            "#{ '_' if $~[1] }#{ $~[2].upcase if $~[2] }"
+          x.to_s.gsub rx do
+            "#{ $~[ 1 ] and UNDRSCR__ * $~[ 1 ].length }#{
+              }#{ $~[ 2 ] and $~[ 2 ].upcase }"
           end.intern
         end
       end.call
 
       CamelCase = -> do                    # => "-ki-ki-" => :KiKi_
-        rx = /(?:(?:-|\A)([a-z]))|(-)/
+        rx = /(?:(?:-|\A)([a-z]))|(-+)/
         -> x do
           x.to_s.gsub( rx ) do
-            "#{ $~[1].upcase if $~[1] }#{ '_' if $~[2] }"
+            "#{ $~[ 1 ] and $~[ 1 ].upcase }#{
+              }#{ $~[ 2 ] and UNDRSCR__ * $~[ 2 ].length }"
           end.intern
         end
       end.call
@@ -559,6 +582,8 @@ module Skylab::MetaHell
       Default = Camel_Case_With_Underscore
 
     end
+
+    UNDRSCR__ = '_'.freeze
 
     # `your_module.boxxy.dsl do .. end` - an experimental runtime DSL block
     # `original_constants`:

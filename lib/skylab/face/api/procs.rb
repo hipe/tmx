@@ -7,7 +7,7 @@ module Skylab::Face
     end
 
     Chomp_single_letter_suffix = -> x do
-      x.to_s.sub %r{_[a-z]\z}, ''
+      x.to_s.sub %r{_[a-z]\z}, ''  # contrast with [hl] name labelize [#hl-088]
     end
 
     Local_normal_name_as_argument_raw = -> x do

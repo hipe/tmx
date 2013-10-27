@@ -13,8 +13,9 @@ module Skylab::TestSupport
 
         MetaHell::Funcy[ self ]
 
-        MetaHell::FUN::Fields_::Contoured_[ self, :required, :field,
-          :tail_path, :required, :field, :notice_p ]
+        MetaHell::FUN::Fields_::Contoured_[ self,
+          :required, :field, :tail_path,
+          :required, :field, :notice_p ]
 
         def execute
           -> do  # #result-block

@@ -200,7 +200,7 @@ module Skylab::CodeMolester::TestSupport::Config::File
 
             it "raises runtime error" do
               ->{ o.write }.should raise_error( ::RuntimeError,
-               /parent directory does not exist, cannot write.+co-mo/ )
+               /parent directory does not exist, will not write.+co-mo/ )
             end
           end
         end

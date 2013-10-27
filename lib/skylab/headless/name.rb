@@ -13,8 +13,9 @@ module Skylab::Headless
       -> x { x.to_s.gsub( rx ) { $~[1].upcase } }
     end.call
 
-    Labelize = -> i do
-      Naturalize[ i ].sub( /\A[a-z]/, & :upcase )
+    Labelize = -> i do  # #tracked with [#088]
+      i.to_s.gsub( /\A@|_[a-z]\z/, '' ).
+        gsub( '_', ' ' ).sub( /\A[a-z]/, & :upcase )
     end
 
     o[:normify] = -> do           # make a const-looking string be normalized.

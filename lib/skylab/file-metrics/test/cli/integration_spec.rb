@@ -11,6 +11,8 @@ module Skylab::FileMetrics::TestSupport::CLI
     floor = 4 #  OMG this test fails if you run them in a
       # terminal screen that is too narrow  # #todo
 
+    MAX_NUM_PLUSES__ = 204
+
     context "lc" do
 
       desc 'give me `lc` here and now'
@@ -38,7 +40,7 @@ module Skylab::FileMetrics::TestSupport::CLI
         expect_integer ln, 50 .. 400
         expect_percent pc1
         expect_percent pc2, 100.0
-        expect_pluses lip, floor..150
+        expect_pluses lip, floor..MAX_NUM_PLUSES__
       end
 
       it "summary" do
@@ -73,7 +75,7 @@ module Skylab::FileMetrics::TestSupport::CLI
         expect_integer num, 15..18  # greetings from the past
         expect_percent pc1
         expect_percent pc2, 100.0
-        expect_pluses lip, floor..150
+        expect_pluses lip, floor..MAX_NUM_PLUSES__
       end
 
       it "final" do
@@ -107,7 +109,7 @@ module Skylab::FileMetrics::TestSupport::CLI
         expect_integer nl, 400..520  # hello from the past
         expect_percent ts
         expect_percent ms, 100.0
-        expect_pluses lp, floor..150
+        expect_pluses lp, floor..MAX_NUM_PLUSES__
       end
 
       it "sumary" do

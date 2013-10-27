@@ -50,12 +50,18 @@ module Skylab::TestSupport::Regret::API
              [ :err, :ivar ],
              [ :pth, :ivar ]
 
-    params [ :path, :arity, :zero_or_one ],
+    params [ :core_basename, :arity, :zero_or_one ],
+      [ :do_close_output_stream, :arity, :zero_or_one, :default, -> { true } ],
       [ :load_file, :arity, :zero_or_one ],
       [ :load_module, :arity, :zero_or_one ],
+      [ :path, :arity, :zero_or_one ],
       [ :template_option_a, :arity, :zero_or_one ],
-      [ :do_close_output_stream, :arity, :zero_or_one, :default, -> { true } ],
       API::Conf::Verbosity[ self ].param( :vtuple )
+
+    def initialize( * )
+      @core_basename = nil  # until we figure out something
+      super
+    end
 
     def absorb_any_services_from_parameters_notify param_h
       if (( outpath_x = param_h.delete :output_path ))
@@ -126,9 +132,10 @@ module Skylab::TestSupport::Regret::API
     end
 
     def build_specer snitch
-      DocTest::Specer_.new :snitch, snitch, :outstream, @out,
-        :templo_name, :quickie, :path, @path, :load_file, @load_file,
-        :load_module, @load_module
+      DocTest::Specer_.new :core_basename, @core_basename,
+        :load_file, @load_file, :load_module, @load_module,
+        :outstream, @out, :snitch, snitch, :templo_name, :quickie,
+        :path, @path
     end
 
     def say_done

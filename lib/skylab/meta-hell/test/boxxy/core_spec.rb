@@ -31,7 +31,8 @@ module Skylab::MetaHell::TestSupport::Boxxy
 
       context "with a name that is invalid" do
         it "raises a ::NameError with some metadata" do
-          begin _Boxxy__Zeep.const_fetch 'with/a/slash'
+          begin
+            _Boxxy__Zeep.const_fetch 'with/a/slash'
           rescue ::NameError => e
           end
           e.const.should eql('with/a/slash')

@@ -331,10 +331,10 @@ module Skylab::CodeMolester
         before_create w
 
         (( dn = @pathname.dirname )).exist? or raise "parent directory #{
-          }does not exist, cannot write - #{ @pathname.dirname }"
+          }does not exist, will not write - #{ @pathname.dirname }"
 
         dn.writable? or raise "parent directory is not writable, #{
-          }cannot write - #{ @pathname }"
+          }will not write - #{ @pathname }"
 
           # somewhat arbitrarily the above are not considered UI-level errors
           # hence they use neither the emitter nor `escape_path` (for now)

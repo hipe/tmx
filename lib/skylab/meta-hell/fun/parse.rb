@@ -20,7 +20,7 @@ module Skylab::MetaHell
     #     P[ :some_method ]  # => "some method"
 
     Hack_label_ = -> ivar_i do
-      ivar_i.to_s.gsub( /\A@|_[a-z]\z/, '' ).gsub( '_', ' ' )
+      MetaHell::Services::Headless::Name::Labelize[ ivar_i ].downcase
     end
 
     # fuzzy matcher

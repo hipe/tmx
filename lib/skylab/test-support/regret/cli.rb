@@ -48,6 +48,15 @@ module Skylab::TestSupport::Regret::CLI
         @param_h[:do_force] = true
       end
 
+      ext = ::Skylab::Autoloader::EXTNAME
+      core = API::DEFAULT_CORE_BASENAME_
+
+      o.on '-c', "--core[=foo#{ ext }]",
+        "try to load missing constants by first looking for a #{ core }",
+        "(for e.g) file under a corresponding inferred directory" do |s|
+        @param_h[ :core_basename ] = s || core
+      end
+
       o.on '-t', '--template-option <x>',
           "template option (try \"-t help\")" do |x|
         ( @param_h[:template_option_a] ||= [ ] ) << x
@@ -120,18 +129,18 @@ module Skylab::TestSupport::Regret::CLI
   private
 
     def recursive_check_bad_keys
-      if (( bad_a = @param_h.keys - WHITE_A_ )).length.nonzero?
+      if (( bad_a = @param_h.keys - WHITE_A__ )).length.nonzero?
         omg = Face::Services::Headless::NLP::EN.calculate do
-          "the #{ and_ bad_a.map( & Cleanup_hack_ ) } option#{ s } #{
+          "the #{ and_ bad_a.map( & Cleanup_hack__ ) } option#{ s } #{
             }#{ s :is } not supported with the recursive option."
         end
         @y << omg
         false
       else true end
     end
-    WHITE_A_ = [ :recursive_o, :do_force, :vtuple ].freeze
-    Cleanup_hack_ = -> i do
-      "'#{ i.to_s.sub( /_[a-z]\z/, '' ).gsub( '_', ' ' ) }'"
+    WHITE_A__ = %i( core_basename do_force recursive_o vtuple ).freeze
+    Cleanup_hack__ = -> i do
+      "'#{ Headless::Name::Labelize[ i ].downcase }'"
     end
 
     def recursive_dissolve_subcommand
@@ -229,8 +238,9 @@ module Skylab::TestSupport::Regret::CLI
       @mechanics.get_api_executable_with( * a )
     end
 
-    def get_expression_agent _
-      CLI::Expression_Agent_.new self
+    def get_expression_agent hot_api_action
+      CLI::Expression_Agent_.new :hot_API_action, hot_api_action,
+        :procs, [ :hi, method( :hi ) ]
     end
 
     def execute ex

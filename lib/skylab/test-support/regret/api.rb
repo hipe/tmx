@@ -13,6 +13,8 @@ module Skylab::TestSupport
 
       WRITEMODE_ = Headless::WRITEMODE_
 
+      DEFAULT_CORE_BASENAME_ = "core#{ ::Skylab::Autoloader::EXTNAME }"
+
     end
 
     Subsys::Services::Face::API[ self ]

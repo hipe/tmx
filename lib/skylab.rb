@@ -60,7 +60,10 @@ module Skylab                     # Welcome! :D
         part.gsub( rx ).each do  # for each part along with its separator,
           const, sep, is_last = $~.captures
           const.gsub!( /(?<=[0-9]|\A)([a-z])/ ) { $1.upcase } # "99x" -> "99X"
-          sep &&= ( is_last || 2 > const.length ) ? '_' : nil
+          if sep
+            sep = if is_last then '_' * sep.length
+            elsif 2 > const.length then '_' end
+          end
             # "c-style" --> "C_Style", "foo-bar" --> "FooBar", "x-" -> "X_"
           "#{ const }#{ sep }"
         end
