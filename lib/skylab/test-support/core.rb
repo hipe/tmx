@@ -3,9 +3,7 @@ require File.expand_path('../../../skylab', __FILE__)
 
 require 'skylab/headless/core'
 
-class ::String                    # this is probably the only extlib you will
-                                  # find org wide - give ::String this useful
-                                  # thing used a lot in HEREDOCS in tests.
+class ::String  # [#021] "to extlib or not to extlib.."
 
   def unindent                    # (has been called `deindent` in the past)
     gsub(/^#{::Regexp.escape(match(/\A(?<margin>[[:space:]]+)/)[:margin])}/, '')

@@ -4,4 +4,4 @@
 
 require_relative '../fun'
 
-$stdout.puts "_spec_rb=\"#{ ::Skylab::TestSupport::FUN._spec_rb[] }\""
+$stdout.puts "test_file_tail=\"#{ ::Skylab::TestSupport::FUN._spec_rb[] }\""

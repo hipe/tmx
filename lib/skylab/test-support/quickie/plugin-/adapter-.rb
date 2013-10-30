@@ -15,7 +15,7 @@ module Skylab::TestSupport
         @plugin_i ||= Autoloader::FUN.methodize[ @const_i ]
       end
 
-      def intern  # compat with the `client_x` articulation API of possible-
+      def intern  # #comport with the `client_x` articulation API of possible-
         plugin_i
       end
 

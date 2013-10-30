@@ -2,7 +2,7 @@ module Skylab
 
 module SubTree  # borrow x 1 - load this solo but it needs meta hell
 
-  class Walker
+  class Walker  # (used to be :[#ts-019])
 
     # unifying something we've done in three places.
 
@@ -322,8 +322,11 @@ module SubTree  # borrow x 1 - load this solo but it needs meta hell
         else
           instance_exec p_a, c_a, c_h, & guess_top
         end
-        pn.instance_variable_get( :@path ).length.zero? and fail "sanity"
-        [ mod, pn ]
+        if false != mod
+          pn.instance_variable_defined?( :@path ) or fail "where is path?"
+          pn.instance_variable_get( :@path ).length.zero? and fail "sanity"
+          [ mod, pn ]
+        end
       end
     end.call
     attr_reader :xpn, :top_pn, :top_mod

@@ -46,7 +46,7 @@ module Skylab::Headless
       end
     end
 
-    coc = o[:curriable_oxford_comma] = -> ult, sep, a do
+    Oxford_comma = -> sep, ult, a do
       if a.length.nonzero?
         res = ( 1 .. ( a.length - 2 ) ).reduce [ a[0] ] do |ar, idx|
           ar << sep << a[idx]
@@ -56,6 +56,10 @@ module Skylab::Headless
         end
         res * ''
       end
+    end
+
+    coc = o[:curriable_oxford_comma] = -> ult, sep, a do
+      Oxford_comma[ sep, ult, a ]  # #todo:after-the-fire
     end
 
     o[:oxford_comma] = -> a, ult = " and ", sep = ", " do

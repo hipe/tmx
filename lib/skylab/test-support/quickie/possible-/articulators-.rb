@@ -39,9 +39,9 @@ module Skylab::TestSupport
             }#{ The_state_[ ep ] }"
         end ]
 
-        Headless::NLP::EN::Minitesimal::FUN.curriable_oxford_comma.tap do |p|
-          And_ = p.curry[ ' and ', ', ' ]
-          Or_  = p.curry[ ' or ', ', ' ]
+        Headless::NLP::EN::Minitesimal::Oxford_comma.tap do |p|
+          And_ = p.curry[ ', ', ' and ' ]
+          Or_  = p.curry[ ', ', ' or ' ]
         end
 
         Bring_ = o[ -> ep, a, inclusion_i do

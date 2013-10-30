@@ -29,7 +29,7 @@ module Skylab::TestSupport::Quickie
   #   + `should_not` (meh)
   #   + run multiple files "at once" - experimental recursive runner exists
   #   + `before` and `after` blocks - limited support per above
-  #   + `specify`
+  #   + `specify` (but experiments in the universe exist at [#017])
   #   + custom matchers - except for the `be_<foo>` wildcard per above
   #   + ..and pretty much everything else not in the first list!
   #
@@ -397,9 +397,17 @@ module Skylab::TestSupport::Quickie
 
   private
 
-    def kbd x  # (proximity to use)
-      stylize x, :green
-    end
+    Stylize__ = -> do  # the stylize diaspora :[#005] of [#hl-029]
+      h = ::Hash[ %i| red green yellow blue magenta cyan white |.
+        each_with_index.map do |i, d| [ i, 31 + d ] end ]
+      h[ :strong ] = 1 ; p = h.method :fetch
+      -> i, s do
+        "\e[#{ p[ i ] }m#{ s }\e[0m"
+      end
+    end.call
+
+    define_method :kbd, & Stylize__.curry[ :green ]
+    private :kbd
 
     def parse_opts argv
       option_parser.parse! argv
@@ -507,7 +515,7 @@ module Skylab::TestSupport::Quickie
 
       render_branch = -> depth, ctx do
         if ctx.__quickie_is_pending  # experimental non-rspec feature
-          y << "#{ ind[ depth ] }#{ stylize ctx.description, :yellow }"
+          y << "#{ ind[ depth ] }#{ stylize :yellow, ctx.description }"
         else
           y << "#{ ind[ depth ] }#{ ctx.description }"
         end
@@ -535,14 +543,14 @@ module Skylab::TestSupport::Quickie
 
       flush_h = {
         pass: -> do
-          y << "#{ ind[ d ] }#{ stylize eg.description, :green }"
+          y << "#{ ind[ d ] }#{ stylize :green, eg.description }"
         end,
         fail: -> do
           y << "#{ ind[ d ] }#{
-            }#{ stylize( "#{ eg.description } (FAILED - #{ ordinal })", :red )}"
+            }#{ stylize :red, "#{ eg.description } (FAILED - #{ ordinal })" }"
         end,
         pend: -> do
-          y << "#{ ind[ d ] }#{ stylize "#{ eg.description }", :yellow }"
+          y << "#{ ind[ d ] }#{ stylize :yellow, "#{ eg.description }" }"
         end
       }
 
@@ -562,7 +570,7 @@ module Skylab::TestSupport::Quickie
       failed = -> errmsg, ord do
         state = :fail
         flush[] if eg  # now it's safe to emit it
-        y << "#{ ind[ d ] }  #{ stylize errmsg, :red }"
+        y << "#{ ind[ d ] }  #{ stylize :red, errmsg }"
       end
 
       pended = -> do
@@ -599,19 +607,8 @@ module Skylab::TestSupport::Quickie
       [ branch, leaf, passed, failed, pended, skip, outer_flush ]
     end
 
-    -> do  # `stylize` - map colors to numbers, make strs like "\e[36mhi\e[0m"
-
-      h = -> do
-        a = [ nil, :strong, * ::Array.new( 29 ), :red, :green, :yellow,
-              :blue, :magenta, :cyan, :white ]
-        ::Hash[* a.each_with_index.map { |k, i| [ k, i ] if k }.compact.flatten]
-      end.call
-
-      define_method :stylize do |str, *styles|
-        "\e[#{ styles.map{ |s| h[s] }.compact.join( ';' ) }m#{ str }\e[0m"
-      end  # [#ts-005] - tracking the redundancy of this
-
-    end.call
+    define_method :stylize, & Stylize__
+    private :stylize
 
     def commence
       if @desc_h
@@ -651,7 +648,7 @@ module Skylab::TestSupport::Quickie
 
       txt = "#{ e } example#{ s e }, #{ f } failure#{ s f }#{ pnd }"
 
-      y << stylize( txt, (f.nonzero? ? :red : ( p.nonzero? ? :yellow : :green)))
+      y << stylize( f.zero? ? p.zero? ? :green : :yellow : :red, txt )
 
       nil
     end

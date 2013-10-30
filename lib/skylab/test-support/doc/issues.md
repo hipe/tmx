@@ -1,3 +1,9 @@
+[#023]       #doc-node #parent-node: [#020] "the IO spy"
+[#022]       #parent: [#021] "when to extlib and not to extlib.."
+[#021]       #doc-node "micro notes"
+[#020]       #family-tag - io spy triad, io spy, io spy group (and "..")
+[#019]       #node-point "tree walker"
+[#018]       #quickie #in-situ
 [#017]       #doc-node #regret introduction..
 [#016]       #doc-point #regret why we do not include parent anchor module..
 [#015]       #doc-test - ridiculous implications of self-generating test..
@@ -11,7 +17,7 @@
 [#008]       #tracking-tag quickie root invocation (runtime/context)
 [#007]       #tracking tag of simlar places with line / emit structs
 [#006] #open test/all: redundancy points, maybe waits for [#ta-056]
-[#005] #open quickie: redundancy points #upfactor
+[#005] #open #quickie #redundant s-tylize
 [#004] #open quickie: module names into fashion
 [#003]       #done rename all_specs.rb -> all
 [#002]       #done CONSTANTS too

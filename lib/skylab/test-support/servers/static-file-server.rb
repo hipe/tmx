@@ -71,7 +71,7 @@ module Skylab::TestSupport
       nil
     end
 
-    def fu_output_message msg # compat with fileutils
+    def fu_output_message msg  # #comport with ruby stdlib file utils
       info msg
     end
 

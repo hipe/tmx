@@ -51,8 +51,8 @@ module Skylab::TestSupport
           P_ = MetaHell::FUN.parse_alternation.
             curry[ :pool_procs, A_.map(& :p ) ]
 
-          Or_ = Headless::NLP::EN::Minitesimal::FUN.curriable_oxford_comma.
-            curry[ ' or ', ', ' ]
+          Or_ = Headless::NLP::EN::Minitesimal::Oxford_comma.
+            curry[ ', ', ' or ' ]
 
           REST_RX_ = /\A-(?<stem>[^-].*)\z/
 

@@ -68,37 +68,38 @@ module Skylab::TestSupport
       pathname
     end
 
-    def touch_r files
-      single_path = ! files.respond_to?( :each_index )
-      if single_path
-        files = [ files ]
-        last_pathname = nil
-      end
-      files.each do |file|
-        dest_file = dest_dir = nil
-        if '/' == file.to_s[0]
-          Raise__[ ::ArgumentError.new "must be relative - #{ file }" ]
-        end
+    def touch_r files_x
+      last_pathname = last_was_dir = true
+      touch_file = -> file do
+        SLASH__ == file.to_s.getbyte( 0 ) and
+          Raise__[ ::ArgumentError, "must be relative - #{ file }" ]
         dest_path = join file
-        if %r{/\z} =~ dest_path.to_s
-          dest_dir = dest_path
-          last_pathname = dist_dir if single_path
+        if SLASH__ == dest_path.to_s.getbyte( -1 )
+          last_pathname = dest_dir = dest_path
+          last_was_dir = true
         else
           dest_dir = dest_path.dirname
-          dest_file = dest_path
-          last_pathname = dest_file if single_path
+          last_pathname = dest_file = dest_path
+          last_was_dir = false
         end
-        if ! dest_dir.exist?
+        dest_dir.exist? or
           mkdir_p dest_dir, noop: @is_noop, verbose: @be_verbose
-        end
-        if dest_file
+        dest_file and
           tmpdir_original_touch dest_file, noop: @is_noop, verbose: @be_verbose
-        end
+        nil
       end
-      if single_path
-        last_pathname # (we could of course adopt this to do etc)
+      if files_x.respond_to? :each_index
+        files_x.each( & touch_file ) ; nil
+      else
+        touch_file[ files_x ]
+        if last_was_dir
+          self.class.new last_pathname
+        else
+          last_pathname
+        end
       end
     end
+    SLASH__ = '/'.getbyte 0
 
     def write local_path, file_contents
       pathname = touch_r local_path

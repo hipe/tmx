@@ -239,19 +239,36 @@ class Skylab::TestSupport::Regret::API::Actions::DocTest
     def reduce_const_array_down_to_some_value c_a
       c_a.reduce @base_mod do |m, c|
         name, value = MetaHell::Boxxy::Resolve_name_and_value[
-          :from_module, m, :path_x, c, :core_basename, @core_basename,
-            :else_p, -> err do
-          @snitch.notice { "'#{ m }' does not have #{
-            }'#{ err.name }' loaded as one of its #{ m.constants.length } #{
-            }constant(s)" }
-          @snitch.notice { "try passing a 2nd #{ code '<load-file>' } argument #{
-            }that loads it, or try the #{ par :core_basename } option" }
-          false
-        end ]
-        name or break( false )
+          :from_module, m, :path_x, c,
+            :core_basename, @core_basename,
+              :else_p, -> err do
+                say_no_such_constant m, c, err
+              end ]
+        name or break false
         value
       end
     end
+
+    def say_no_such_constant m, c, err
+      a = m.constants ; sac = say_any_constants a
+      @snitch.notice do
+        "'#{ m }' does not have #{ err.name } loaded (or loadable?) as #{
+          }#{ s a, :one_of }its #{ a.length } constant#{ s }#{ sac }"
+      end
+      @snitch.notice do
+        "try passing a second #{ par :load_file } argument that loads it."
+      end
+      false
+    end
+
+    def say_any_constants a
+      if A_REASONABLE_LENGTH_FOR_A_FEW_ITEMS_ >= a.length && a.length.nonzero?
+        " (#{ a * ' ' })"
+      end
+    end
+    #
+    A_REASONABLE_LENGTH_FOR_A_FEW_ITEMS_ = 3
+
 
     def resolve_tail_path  # local, normalized path
       -> do
