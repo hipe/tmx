@@ -3,7 +3,7 @@ module Skylab::MetaHell
                                   # functionial proxies like this )
   module Proxy::Nice
 
-    def self.new *member_a
+    def self.new *member_a, &blk
 
       Proxy::Functional.new( *member_a ).class_exec do
 
@@ -24,6 +24,9 @@ module Skylab::MetaHell
           end
           o
         end
+
+        blk and class_exec( & blk )
+
         self
       end
     end
@@ -45,7 +48,7 @@ module Skylab::MetaHell
     # just produces a glorified ::BasicObject subclass that does the two
     # nice things and does the constructor arg parsing.
 
-    def self.new *member_a
+    def self.new *member_a, &blk
 
       if member_a.length.nonzero?
         has_members = true
@@ -96,6 +99,8 @@ module Skylab::MetaHell
             obj
           end
         end
+
+        blk and class_exec( & blk )
 
         self
       end

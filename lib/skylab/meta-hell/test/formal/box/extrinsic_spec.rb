@@ -48,9 +48,9 @@ module ::Skylab::MetaHell::TestSupport::Formal::Box::Extr_
       end.should raise_error( /can't modify frozen Array/ )
     end
 
-    it "partition_by_keys!" do
+    it "partition_where_name_in!" do
       one = Box::Open.from_iambic :eeny, :E, :meeny, :M, :miney, :I, :moe, :O
-      two = one.partition_by_keys! :eeny, :miney
+      two = one.partition_where_name_in! :eeny, :miney
       one._order.should eql( [ :meeny, :moe ] )
       one.values.should eql( [ :M, :O ] )
       two._order.should eql( [ :eeny, :miney ] )

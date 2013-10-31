@@ -2,44 +2,86 @@ require_relative '..'
 
 module Skylab
 
-  module MetaHell                 # welcome to meta hell
+  module MetaHell  # welcome to meta hell
 
     MetaHell = self
 
-    EMPTY_A_       =  [ ].freeze  # #ocd
-    EMPTY_P_       = ->   {   }
-    IDENTITY_      = -> x { x }
-    MONADIC_TRUTH_ = -> _ { true }
-    MONADIC_EMPTINESS_ = -> _ { }
+    EMPTY_A_            =  [ ].freeze  # #ocd
+    EMPTY_P_            = ->   { }
+    MONADIC_EMPTINESS_  = -> _ { }
+    MONADIC_TRUTH_      = -> _ { true }
+    IDENTITY_           = -> x { x }
+    DASH_               = '-'.getbyte 0
 
-    def self.Function host, *rest
-      self::Function._make_methods host, :public, :method, rest
+    class Aset_ < ::Proc  # "aset" = "array set" ("[]="), from ruby source
+      alias_method :[]=, :call
     end
-
-    DASH_          = '-'.getbyte 0
 
     # ARE YOU READY TO EAT YOUR OWN DOGFOOD THAT IS MADE OF YOUR BODY
 
     #                  ~ auto-trans-substantiation ~
 
     module Autoloader
-      include ::Skylab::Autoloader  # explained in depth at [#041]
+      include ::Skylab::Autoloader  # [#041]
       ::Skylab::Autoloader[ self ]
     end
 
     ( MAARS = Autoloader::Autovivifying::Recursive )[ self ]
+      # a name this long that is used this often gets its own weird acronym
 
-      # a name so long that is used so often deserves its own acronym.
+    def self.Function host, *rest
+      self::Function._make_methods host, :public, :method, rest
+    end
 
-    Funcy = -> cls do             # a class that is interfaced with like a proc
+    Funcy = -> cls do  # apply on a class whose interface is stricly proc-like
       def cls.[] * x_a
         new( * x_a ).execute
       end
     end
+
+    stowaway :Method_Added_Muxer, %i( FUN Fields_ Mechanics_ )  # for now
+
   end
 end
 
 module Skylab::MetaHell
+
+  class Method_Added_Muxer
+    # imagine having multiple subscribers to one method added event
+    def self.[] mod
+      me = self
+      mod.module_exec do
+        @method_added_muxer ||= begin  # ivar not const! boy howdy watch out
+          muxer = me.new self
+          singleton_class.instance_method( :method_added ).owner == self and
+            fail "sanity - won't overwrite existing method_added hook"
+          define_singleton_method :method_added, &
+            muxer.method( :method_added_notify )
+          muxer
+        end
+      end
+    end
+    def initialize mod
+      @mod = mod ; @p = nil
+    end
+    def in_block_each_method_added blk, & do_this
+      add_listener do_this
+      @mod.module_exec( & blk )
+      remove_listener do_this ; nil
+    end
+    def add_listener p
+      @p and fail "implement me - you expected this to actually mux?"
+      @p = p
+    end
+    def remove_listener _
+      @p = nil
+    end
+  private
+    def method_added_notify i
+      @p && @p[ i ]
+      nil
+    end
+  end
 
   module Bundle
 

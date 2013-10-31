@@ -8,7 +8,7 @@ module Skylab::MetaHell
     # EDIT: Formal::Box sounds a lot like the "Associative container"
     #   from http://en.wikipedia.org/wiki/Container_(abstract_data_type)
     # but is sort of "stable" in the sense used in List_of_data_structures,
-    # except its order is mutable.
+    # except its order is mutable :[#020].
 
     FUN = -> do
 
@@ -202,6 +202,17 @@ module Skylab::MetaHell
     end                           # which weirdly only works with ints.
                                   # (also uses hash "risc" b.c ..)
 
+    def at_with_name name_a, &p   # supposed to sound like "each_with_index"
+      ::Enumerator.new do |y|
+        name_a.each do |i|
+          y.yield fetch( i ), i
+        end
+        nil
+      end.instance_exec do
+        p ? each( & p ) : self
+      end
+    end
+
     #         ~ `fetch` and its derivatives (pre-order-ish) ~
 
     def fetch key, &otherwise     # just like ::Hash#fetch (see)
@@ -306,14 +317,19 @@ module Skylab::MetaHell
       new
     end
 
-    #         ~ methods that produce new box-like non-boxes ~
+    #     ~ methods that produce new box-like non-boxes ( & support ) ~
 
     def to_hash
       @hash.dup
     end
 
-    def to_struct                 # (see implementor for justification)
-      Formal::Box.const_get( :Struct, false ).produce self
+    def to_struct  # caveat [#052], full doc [#054]
+      produce_struct_class.new( * values )
+    end
+
+    def produce_struct_class
+      Formal::Box.const_get( :Struct, false ).
+        produce_struct_class_from_box self
     end
 
     #         ~ methods that assist in producing new boxes ~
@@ -356,6 +372,8 @@ module Skylab::MetaHell
       [ @enumerator_class ]       # the same constitent data (elements).
     end
 
+    alias_method :get_base_args, :base_args ; public :get_base_args
+
     def base_init enumerator_class  # (see `base_args`) receiver is expected
       @order ||= [ ]              # to be coherent (can function as a box)
       @hash ||= { }               # after `base_args` was called on it.
@@ -377,8 +395,8 @@ module Skylab::MetaHell
       end
     end
 
-    # like `dupe` but don't bring over any of # the constituent elements.
-    # Used all over the place for methods that result in # a new box.
+    # like `dupe` but don't bring over any of the constituent elements.
+    # Used all over the place for methods that result in a new box.
 
     define_method :produce_offspring_box, & Formal::Box::FUN.produce_offspring
   end
@@ -483,10 +501,10 @@ module Skylab::MetaHell
       end
     end
 
-    def partition_by_keys! *name_a  # convenience wrapper - slice out a sub-box
+    def partition_where_name_in! *name_a  # convenience wrapper - slice out sub-box
       partition! do |k, _|        # composed of any of the members whose name
-        name_a.include? k         # was in the list of names. might mutate
-      end                         # receiver.
+        name_a.include? k         # is in the list of names. mutates receiver
+      end                         # when any matches as with partition!
     end
 
     #        ~ the private method that prevents future change ~
@@ -509,7 +527,7 @@ module Skylab::MetaHell
     # over there.)
 
     def values                    # (here so as not to overwrite struct's v.)
-      @order.map { |n| @hash.fetch n }  # (use "hash risc" for 2 reasons)
+      @order.map { |n| @hash.fetch n }  # (use #hash-risc for 2 reasons)
     end
 
     alias_method :to_a, :values
@@ -532,7 +550,7 @@ module Skylab::MetaHell
     #   ~ mutators made public (we might just do it whole hog..) ~
     public :accept, :add, :change, :clear, :freeze  # #exp
 
-    public :partition_by_keys!, :sort_names_by!
+    public :partition_where_name_in!, :sort_names_by!
 
     #    ~ simple aliases ~
     alias_method :[]=, :add  # #exp  use wisely! it's more strict
@@ -561,7 +579,7 @@ module Skylab::MetaHell
         _box_map Formal::Box, func
       else
         self # why would you pass no block i don't know but this is just
-      end    # for compat. with Enumerable.
+      end    # for #comport. with Enumerable.
     end
 
     def _box_map box_class, func

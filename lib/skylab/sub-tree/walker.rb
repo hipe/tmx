@@ -8,17 +8,22 @@ module SubTree  # borrow x 1 - load this solo but it needs meta hell
 
     # experimental interface, pub-sub-like, *somewhat*
 
-    CONDUIT_ = {
-      pth: -> a { @pth = a.fetch 0 ; a.shift },
-      path: -> a { set_path a.fetch 0 ; a.shift },
+    CONDUIT__ = {
+      listener: -> a { @listener = a.shift ; nil },
+      pth: -> a { @pth = a.shift ; nil },
+      path: -> a { @path_to_set = a.shift ; nil },
       top: -> a { @top = a.fetch 0 ; a.shift },
-      vtuple: -> a { @vtuple = a.fetch 0 ; a.shift },
-      listener: -> a { @listener = a.fetch 0 ; a.shift }
+      when_relative: -> a { @convert_relpath_p = a.shift ; nil },
+      vtuple: -> a { @vtuple = a.shift ; nil }
     }.freeze
 
     def initialize *a
+      @convert_relpath_p = @path_set = nil
       while a.length.nonzero?
-        instance_exec( a, & CONDUIT_.fetch( a.shift ) )
+        instance_exec( a, & CONDUIT__.fetch( a.shift ) )
+      end
+      if (( x = @path_to_set ))  # absorb whole iambic before setting path
+        @path_to_set = nil ; set_path x ; nil
       end
     end
     attr_reader :pn, :top
@@ -26,10 +31,15 @@ module SubTree  # borrow x 1 - load this solo but it needs meta hell
     def set_path x
       @path = x  # #todo:during:3
       @pn = ::Pathname.new x
-      @pn.absolute? or raise "we don't want to mess with relpaths here #{
-        }for now - \"#{ x }\""
-      nil
+      @pn.absolute? or resolve_some_absolute_path ; nil
     end
+  private
+    def resolve_some_absolute_path
+      @convert_relpath_p and @pn = @convert_relpath_p[ @pn ]
+      @pn.absolute? or raise "we don't want to mess with relpaths here #{
+        }for now - \"#{ @pn }\"" ; nil
+    end
+  public
 
     #                     ~ steps. (section 1) ~
 

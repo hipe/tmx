@@ -68,12 +68,20 @@ module Skylab::MetaHell
           Puff_const_with_dupe_for_[ -> _ do
             p = Required_fields_check_[ @field_box ]
             @client.facet_muxer.add_hook_listener :post_absorb, p
-            Required_fields_check_
+            p
           end, :CONTOURED_REQUIRED_CHECK_, @client ]
           nil
         end
         #
-        Required_fields_check_ = -> field_box do
+        Required_fields_check_ = -> field_box do  # on dupe, rewrite the func
+          on_dupe_for = -> client do
+            Dupable_Proc_.new on_dupe_for, &
+              Req_check_[ client.const_get CONST_ ]
+          end
+          Dupable_Proc_.new on_dupe_for, & Req_check_[ field_box ]
+        end
+        #
+        Req_check_ = -> field_box do
           -> agent do
             miss_a = field_box._a.reduce [] do |m, method_i|
               (( fld = field_box.fetch method_i )).is_required or next m
@@ -87,8 +95,16 @@ module Skylab::MetaHell
           end
         end
         #
-        def Required_fields_check_.dupe_for _
-          fail 'implement me'  # #todo
+        class Dupable_Proc_ < ::Proc
+          class << self ; alias_method :[], :new end
+          def initialize on_dupe_for, &blk
+            super( &blk )
+            @on_dupe_for = on_dupe_for
+            nil
+          end
+          def dupe_for x
+            @on_dupe_for[ x ]
+          end
         end
         #
         Missing_required_fields_notify_ = -> agent, miss_a do  # etc

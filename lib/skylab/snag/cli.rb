@@ -222,7 +222,7 @@ module Skylab::Snag
         "sorry - #{ and_ a } #{ s :is } used for #{ a_b.first}, not #{a_b.last}"
       end
       if message
-        p = pbox.partition_by_keys! :dry_run, :be_verbose  # p has the <= 2 eles
+        p = pbox.partition_where_name_in! :dry_run, :be_verbose  # p has the <= 2 eles
         if pbox.length.nonzero? then res = error msg[ true ] else
           res = api_invoke [ :nodes, :add ],
             p.to_hash.merge!(
@@ -236,7 +236,7 @@ module Skylab::Snag
             end
         end
       else
-        p = pbox.partition_by_keys! :max_count, :be_verbose
+        p = pbox.partition_where_name_in! :max_count, :be_verbose
         if pbox.length.nonzero? then res = error msg[ false ] else
           p.add( :be_verbose, false ) if ! p.has? :be_verbose # decide dflt here
           p.add :query_sexp, [ :and, [ :has_tag, :open ] ]

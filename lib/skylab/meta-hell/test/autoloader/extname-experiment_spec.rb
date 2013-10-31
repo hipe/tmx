@@ -1,31 +1,27 @@
-require_relative 'test-support'
+require_relative '../test-support'
 
-module Skylab::Treemap::TestSupport
+module Skylab::MetaHell::TestSupport::Autoloader_Extname_Experiment
 
-  describe "#{ Skylab::Treemap::Adapter } whackily hand-written sub_ext" do
+  include ::Skylab::MetaHell::TestSupport::CONSTANTS
 
-    # #todo this isn't even used anywhere anymore
+  describe "#{ MetaHell } autoloader extname experiment" do
 
-    rx = /\A (?: (?<stem>|.*[^\.]|\.+)
+    # #todo this isn't used anywhere. but we are keeping it around
+    # in case we we ever decide to raw-dog the extname logic
+
+    RX__ = /\A (?: (?<stem>|.*[^\.]|\.+)
       (?<extname>\.[^\.]*)
       |(?<stem>[^\.]*)
     ) \z/x
 
-    let( :match_data ) { rx.match input }
-
-    null_a = [ nil, nil ]
-
-    let :subject do
-      ( md = match_data ) ? [ md[:stem], md[:extname] ] : null_a
-    end
-
-    def self.o input, output, *rest
-      context "#{ input.inspect }" do
-        let :input do
-          input
-        end
-        specify do
-          should eql( output )
+    def self.o input_s, output_a, *a
+      it "#{ input_s.inspect } -> #{ output_a.inspect }", *a do
+        if (( md = RX__.match( input_s  ) ))
+          stem, extname = output_a
+          md[ :stem ].should eql( stem )
+          md[ :extname ].should eql( extname )
+        else
+          fail "did not match - #{ input_s.inspect }"
         end
       end
     end

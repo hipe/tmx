@@ -63,10 +63,20 @@ module Skylab::MetaHell
 
     o = definer
 
-    o[:import] = -> to_mod, from_mod, i_a do
+    Import_constants = -> from_mod, i_a, to_mod do
       i_a.each do |i|
         to_mod.const_set i, from_mod.const_get( i, false )
       end
+    end
+
+    Import_methods = -> from, i_a, priv_pub, to_mod do  # #todo-no longer used?
+      to_mod.module_exec do
+        i_a.each do |i|
+          define_method i, & from[ i ]
+        end
+        :private == priv_pub and private( * i_a )
+      end
+      nil
     end
 
     o[:hash2struct] = -> h do     # ( the simplest, oldest way to make a FUN )
@@ -95,6 +105,11 @@ module Skylab::MetaHell
       else
         mod.const_set c, p[ arg ]
       end
+    end
+    # ~
+    Puff_constant_reader_ = -> do_inherit, p, c, mod, arg do
+      p = Puff_constant_.curry[ do_inherit, p, c, mod ]
+      -> { p[ arg ] }
     end
 
     o[:without_warning] = -> f do
@@ -187,6 +202,10 @@ module Skylab::MetaHell
 
     class Module  # LOOK
     private
+
+      def initialize
+        @index_of_next_flush_names = 0  # (not built for this node)
+      end
       def predefiner
         @predefiner ||= begin
           bx = box ; mutex = MetaHell::Services::Basic::
@@ -220,6 +239,14 @@ module Skylab::MetaHell
            p  # #{ result must be input argument in case the []= form was used }
           end
         end
+      end
+      def flush_names
+        if (( idx = @index_of_next_flush_names )) < (( len = @a.length ))
+          @a[ idx ... len ]
+        end
+      end
+      def [] i
+        @h.fetch i
       end
     end
 

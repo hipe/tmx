@@ -13,10 +13,33 @@ module ::Skylab::MetaHell::TestSupport::Formal::Box::Struct
     extend Struct_TestSupport
 
     define_method :struct, & MetaHell::FUN.memoize[ -> do
-      o = { sure: :whaver, this: :that, ming: :mang }
-      box = MetaHell::Formal::Box.from_hash o
-      box.to_struct
+      build_box_notify.to_struct
     end ]
+
+    def self.build_box_notify
+      MetaHell::Formal::Box.
+        from_hash( sure: :whaver, this: :that, ming: :mang )
+    end
+
+    def build_box
+      self.class.build_box_notify
+    end
+
+    context "buidling the struct class" do
+      it "win" do
+        box = build_box
+        cls = box.produce_struct_class
+        st1 = cls.new( * box.values )
+        st2 = build_box.to_struct
+        ( st1.class == st2.class ).should eql( false )
+        st1.names.length.zero?.should eql( false )
+        st2.names.length.zero?.should eql( false )
+        st1.names.should eql( st2.members )
+        st1.members.should eql( st2.names )
+        st1.to_a.should eql( box.values )
+        st2.to_a.should eql( box.values )
+      end
+    end
 
     context "looks and works basically like a stuct (b.c it is)" do
 

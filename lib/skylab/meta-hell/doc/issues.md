@@ -1,8 +1,13 @@
 [#054]       (#move '041-ghost-modules-explained..md')
+[#054]       #formal-box:struct #doc-point (all notes)..
 [#053]       #doc-point "discussion of all the meta-properties.."
+[#053]       #in-situ
 [#052]       #in-situ
+[#052] #open #formal-box #doc-point #in-situ `to_struct` caveat. spec this ..
 [#051]       #in-situ
+[#051]       #doc-point #experimental-pattern :#method-cherry-picker..
 [#050]       #doc-point this class of grammars, and this parser..
+[#050]       #family 'Strage_'
 [#049]       #tracking-tag :#fuzzy
 [#048]       #doc-point what are puffers and when should you use them ..
 [#047]       (open)
@@ -40,7 +45,8 @@
 [#022]       #tracking-tag #boxxy's relationship to a.l
 [#021]       #tracking-tag, #doc-point `base_args` / `base_init`: this
                is an experiment in initting a blank-slate 'dupe'-ish subset.
-[#020]       #done box instance methods separate from box class maybe?
+[#020]       #done #formal-box instance methods separate from box class maybe?
+               this issue has been co-opted to represent the box in general.
 [#019]       #done #boxxy peeks at fs now, hacks `constants`
 [#018]       #done corral proxies
 [#017]       #done corral tees

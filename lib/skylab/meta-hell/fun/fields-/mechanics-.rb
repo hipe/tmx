@@ -65,19 +65,28 @@ module Skylab::MetaHell
         yes = true
       end
       if yes
+        meth.do_chainable and p = Make_chainable_[ p ]
         client.send :define_method, m, & p
         :private == meth.priv_pub and client.send :private, m
       end
       nil
     end
     #
-    Method_Attributes_ = ::Struct.new :priv_pub, :do_override
+    Method_Attributes_ = ::Struct.new :priv_pub, :do_override, :do_chainable
     #
     PUFF_METHOD_OP_H_ = {
       private: -> method { method.priv_pub = :private },
       public: -> method { method.priv_pub = :public },
-      override: -> method { method.do_override = true }
+      override: -> method { method.do_override = true },
+      chainable: -> method { method.do_chainable = true },
     }.freeze
+    #
+    Make_chainable_ = -> p do
+      -> *a do
+        instance_exec( *a, & p )
+        self
+      end
+    end
 
     Puff_singleton_method_ = -> priv_pub, m, p, client do  # #curry-friendly
       sc = client.singleton_class
@@ -237,7 +246,7 @@ module Skylab::MetaHell
       end
 
       def base_init client, h
-        @h = ( h.dupe if h )
+        @h = ( h.dup if h )
         @client = client
         self
       end
@@ -254,38 +263,6 @@ module Skylab::MetaHell
 
       def add_hook_listener i, p
         ( ( @h ||= { } )[ i ] ||= [ ] ) << p
-        nil
-      end
-    end
-
-    class Method_Added_Muxer_
-      # imagine having multiple subscribers to one method added event
-      def self.[] mod
-        me = self
-        mod.module_exec do
-          @method_added_muxer ||= begin  # ivar not const! boy howdy watch out
-            muxer = me.new self
-            singleton_class.instance_method( :method_added ).owner == self and
-              fail "sanity - won't overwrite existing method_added hook"
-            define_singleton_method :method_added, &
-              muxer.method( :method_added_notify )
-            muxer
-          end
-        end
-      end
-      def initialize mod
-        @p = nil
-        @mod = mod
-      end
-      def in_block_each_method_added blk, &do_this
-        @p and fail "implement me - you expected this to actually mux?"
-        @p = do_this
-        @mod.module_exec( & blk )
-        @p = nil
-      end
-    private
-      def method_added_notify i
-        @p && @p[ i ]
         nil
       end
     end

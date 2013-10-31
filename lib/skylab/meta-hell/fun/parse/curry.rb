@@ -76,8 +76,8 @@ module Skylab::MetaHell
 
     class Parse_
       def initialize input_a
-        @abstract_field_list = @do_glob_extra_args = @exhaustion_p =
-          @syntax = @constantspace_mod = nil
+        @abstract_field_list = @call_p = @constantspace_mod =
+          @do_glob_extra_args = @exhaustion_p = @syntax = nil
         @state_mutex =
             MetaHell::Services::Basic::Mutex::Write_Once.new :state_mutex
           # state encompasses input and output. various algorithms may handle

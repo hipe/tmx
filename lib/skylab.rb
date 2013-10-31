@@ -2,30 +2,29 @@ module Skylab                     # Welcome! :D
 
   # facilities for bootstrapping subsystems - mostly autoloading
 
-  require 'pathname'              # this is the only stdlib loaded at this tier
+  require 'pathname'
 
-  here = ::Pathname.new __FILE__  # one of the three centers of the universe
+  here = ::Pathname.new __FILE__
 
-  $:.include?( o = here.join('..').to_s ) or $:.unshift o # add to include path
+  $:.include?( _ = here.join('..').to_s ) or $:.unshift _
 
   dir_pathname = here.sub_ext ''
 
-  define_singleton_method :dir_pathname do
-    dir_pathname
-  end
+  define_singleton_method :dir_pathname do dir_pathname end
 
-  module Autoloader                # const_missing hax can be dodgy - be careful
+  module Autoloader
 
-    EXTNAME = '.rb'.freeze
-
-    Enhance_ = -> mod, callr=nil do
+    Enhance_ = -> mod, loc=:auto do
+      case loc
+      when :auto ; loc = caller_locations( 2, 1 )[ 0 ]
+      when :deferred ; loc = false
+      end
       autoloader = self
       mod.module_exec do
         @tug_class ||= autoloader::Tug
         extend autoloader::Methods
-        init_autoloader callr.nil? ? caller_locations( 3, 1 )[ 0 ] : callr
-      end
-      nil
+        loc and init_autoloader loc
+      end ; nil
     end
 
     define_singleton_method :[], & Enhance_
@@ -43,6 +42,8 @@ module Skylab                     # Welcome! :D
         gsub(/(?<=[a-z])([A-Z])|(?<=[A-Z])([A-Z][a-z])/) { "_#{$1 || $2}" }.
         gsub(/[^a-z0-9]+/i, '_').downcase.intern  # munge-in above underscores
     end
+
+    EXTNAME = '.rb'.freeze
 
     o[:constantize] = -> do
       sanitize_path_rx = %r{ #{ ::Regexp.escape EXTNAME }\z |
@@ -80,7 +81,7 @@ module Skylab                     # Welcome! :D
             caller_x.absolute_path :
             caller_x.match( CALLFRAME_PATH_RX )[ :path ] )
           # #todo pn.relative? is expensive and bloaty
-          '/' == pn.instance_variable_get( :@path )[ 0 ] or
+          SLASH__ == pn.instance_variable_get( :@path ).getbyte( 0 ) or
             pn = pn.expand_path # although this is a filesystme hit,
               # you cannot reliably autoload with a relpath
           guess = Guess_dir_[ name, pn.sub_ext( '' ).to_s, -> e do
@@ -90,6 +91,7 @@ module Skylab                     # Welcome! :D
         end
         nil
       end
+      SLASH__ = '/'.getbyte 0
 
       attr_reader :dir_pathname, :tug_class
 
@@ -106,7 +108,7 @@ module Skylab                     # Welcome! :D
 
       pathify = FUN.pathify
 
-      tokenizer = -> s do         # "A::B::C" => "c", "b", "a", nil
+      tokenizer = -> s do  # "A::B::C" => "c", "b", "a", nil
         -> { m = tok_rx.match( s ) and ( s, x = m.captures ) and pathify[ x ] }
       end
 
@@ -184,7 +186,7 @@ module Skylab                     # Welcome! :D
       end
     end
 
-    class Tug  # the embodiment of the `const_missing` resolution.
+    class Tug  # the implementation of the `const_missing` hack
 
       def initialize const, mod_dir_pathname, mod
         @const, @mod_dir_pathname, @mod = const, mod_dir_pathname, mod
@@ -193,8 +195,7 @@ module Skylab                     # Welcome! :D
       attr_reader :const, :mod
 
       def correction_notification const
-        @const = const
-        nil
+        @const = const ; nil
       end
 
       def probably_loadable?
@@ -243,33 +244,26 @@ module Skylab                     # Welcome! :D
     end
   end
 
-  # below this line, "reachdowns" occur..
+  def self.cache_pathname
+    Subsystem::Subsystems_::Headless::System.defaults.cache_pathname
+  end
 
   module Subsystem
 
     Autoloader[ self ]
 
     def self.[] mod
+      loc = caller_locations( 1, 1 )[ 0 ]
       mod.module_exec do
-        ( const_set :MAARS, const_get( :MetaHell, false )::MAARS )[
-         self, caller[2] ]
+        ( const_set :MAARS, const_get( :MetaHell, false )::MAARS )[ self, loc ]
         const_defined? :Services, false or
           stowaway :Services, -> do
             svcs = Subsystem::Services.new @dir_pathname
             const_set :Services, svcs
-            load svcs.pathname
-            nil
+            load svcs.pathname ; nil
           end
       end
       nil
     end
-  end
-
-  module Subsystem
-    Autoloader[ self ]
-  end
-
-  def self.cache_pathname
-    Subsystem::Subsystems_::Headless::System.defaults.cache_pathname
   end
 end

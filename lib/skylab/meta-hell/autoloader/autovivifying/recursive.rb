@@ -4,8 +4,39 @@ module Skylab::MetaHell
 
     Methods = Autoloader::Methods
 
-    class << self
-      define_method :[], & Autoloader::Enhance_
+    def self.[] mod, *a
+      loc = if a.length.zero?
+        caller_locations( 1, 1 )[ 0 ]
+      elsif (( x = a[ 0 ] )) and x.respond_to? :base_label
+        a.shift
+      else
+        :deferred
+      end
+      _enhance mod, * loc
+      if a.length.nonzero?
+        1 == a.length and :deferred == a[ 0 ] or fail "sanity - currently #{
+          }'deferred' is the only bundle option - had #{ a[ 0 ] }"
+        mod.module_exec( & Bundles__::Deferred )
+      end
+      nil
+    end
+    define_singleton_method :_enhance, & Autoloader::Enhance_
+
+    module Bundles__
+      Deferred = -> do
+        singleton_class.class_exec do
+          alias_method :_, :dir_pathname
+          undef_method :dir_pathname
+          define_method :dir_pathname do
+            singleton_class.class_exec do
+              undef_method :dir_pathname
+              alias_method :dir_pathname, :_
+            end
+            Upwards[ self ]
+            @dir_pathname
+          end
+        end
+      end
     end
   end
 
@@ -23,8 +54,8 @@ module Skylab::MetaHell
       if yes
         tug = self
         x.instance_exec do
-          if dir_pathname.nil?  # allow shenanigans
-            init_dir_pathname tug.branch_pathname
+          if dir_pathname.nil?  # let module graphs charge passively
+            init_dir_pathname tug.branch_pathname  # just after file load
           end
           if tug_class.nil?
             tug.class.enhance self

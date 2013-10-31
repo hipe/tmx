@@ -24,7 +24,7 @@ module Skylab::Headless
 
     @o = o
 
-    MetaHell::MAARS[ self, false ]
+    MetaHell::MAARS[ self, :deferred ]
 
     def self.const_missing i
       if (( p = @o[ i ] ))

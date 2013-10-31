@@ -10,8 +10,8 @@ module Skylab::Git::TestSupport
 
     module CONSTANTS
 
-      ::Skylab::MetaHell::FUN.import[ self, ::Skylab,
-        %i| Git Headless TestSupport | ]
+      ::Skylab::MetaHell::FUN::Import_constants[ ::Skylab,
+        %i| Git Headless TestSupport |, self ]
 
     end
   end

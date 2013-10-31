@@ -19,7 +19,7 @@ module Skylab::MetaHell
 
     me = self
 
-    define_singleton_method :new do |*name_a|
+    define_singleton_method :new do |*name_a, &blk|
       me == self or ::Kernel.raise "must not be subclassed directly - #{ me }"
       ::Class.new( self ).class_exec do
         member_a = self::MEMBER_A_ = name_a.freeze
@@ -52,6 +52,8 @@ module Skylab::MetaHell
             }(#{ rmn_a.map { |idx| member_a.fetch idx } * ', ' })"
           nil
         end
+
+        blk and class_exec( & blk )
 
         self
       end

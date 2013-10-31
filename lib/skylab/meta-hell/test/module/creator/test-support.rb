@@ -11,7 +11,7 @@ module ::Skylab::MetaHell::TestSupport::Module::Creator
     def snip &f
       let :klass do
         ::Class.new.class_eval do
-          extend MetaHell::Let # compat
+          extend MetaHell::Let  # #comport
           extend MetaHell::Module::Creator
           let( :meta_hell_anchor_module ) { ::Module.new }
           class_exec(& f) if f

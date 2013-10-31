@@ -5,14 +5,14 @@ require 'skylab/porcelain/core'
 
 module Skylab::SubTree
 
-  ::Skylab::MetaHell::FUN.import[ self, ::Skylab, [
+  ::Skylab::MetaHell::FUN::Import_constants[ ::Skylab, [
     :Autoloader,
     :SubTree,
     :Headless,  # styles, parameter controller
     :MetaHell,
     :Porcelain,  # level-1 is this
     :PubSub
-  ] ]
+  ], self ]
 
   MetaHell::MAARS[ self ]
 

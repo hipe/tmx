@@ -60,12 +60,12 @@ module Skylab::MetaHell
     #     Adapters.const_fetch( :'bongo-tongo' ) # => :fiz
     #
 
-    def self.enhance mod, &blk
+    def self.enhance mod, * al_i_a, &blk  # autloader intern array
       mod.module_exec do
         @boxxy ||= begin
           boxxy = Boxxy__.new self
           blk and boxxy._absorb_block blk
-          boxxy._init_autoloader
+          boxxy._init_autoloader al_i_a
           boxxy
         end
       end
@@ -413,8 +413,14 @@ module Skylab::MetaHell
         nil
       end
 
-      def _init_autoloader
-        @mod.respond_to? :dir_pathname or MetaHell::MAARS::Upwards[ @mod ]
+      def _init_autoloader al_i_a
+        @mod.respond_to? :dir_pathname or begin
+          if al_i_a.length.zero?
+            MetaHell::MAARS::Upwards[ @mod ]
+          else
+            MetaHell::MAARS[ @mod, * al_i_a ]
+          end
+        end
         nil
       end
 

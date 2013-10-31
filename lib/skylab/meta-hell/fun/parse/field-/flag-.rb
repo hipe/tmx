@@ -61,6 +61,17 @@ module Skylab::MetaHell
         true if head_matches_token token
       end
 
+      def any_index_of_consumed_token_anywhere_in_argv argv
+        if (( idx = any_index_of_token_anywhere_in_argv argv ))
+          argv[ idx, 1 ] = MetaHell::EMPTY_A_
+          idx
+        end
+      end
+
+      def any_index_of_token_anywhere_in_argv argv
+        argv.index( & method( :head_matches_token ) )
+      end
+
       def head_matches argv
         argv.length.nonzero? && head_matches_token( argv.fetch 0 )
       end

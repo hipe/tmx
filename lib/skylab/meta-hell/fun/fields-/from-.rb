@@ -52,12 +52,12 @@ module Skylab::MetaHell
 
     self::Mechanics_.touch
 
-    module From_
+    module From_  # :[#053]
 
       def self.methods &blk
         client = eval 'self', blk.binding
         box = Puff_client_and_give_box_[ :absorb, client ]
-        Method_Added_Muxer_[ client ].in_block_each_method_added blk do |m|
+        Method_Added_Muxer[ client ].in_block_each_method_added blk do |m|
           if box.has_field_attributes
             fa = box.delete_field_attributes
             p = -> fld do
