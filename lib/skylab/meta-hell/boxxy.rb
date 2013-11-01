@@ -185,6 +185,8 @@ module Skylab::MetaHell
           key = Distill[ stem ]
           seen_h.fetch key do   # don't dupe 'tree/' and 'tree.rb'
             seen_h[ key ] = true
+            const_candidate = guesser[ stem ]
+            VALID_CONST_RX__ =~ const_candidate or next memo
             memo << guesser[ stem ]
           end
           memo
@@ -193,11 +195,14 @@ module Skylab::MetaHell
       res_a || EMPTY_A_
     end
 
+    VALID_CONST_RX__ = /\A[A-Z][A-Za-z0-9_]*\z/
+
     Distill = -> do  # #part-of-public-FUN-libary
       # different than `normify` and `normize` this is a lossy operation
       # that produces an internal distillation of a name for use in e.g
       # fuzzy (case-insensitive) matching, while preserving meaningful
       # trailing dashes or underscores from e.g a filename or constant
+      # note it is not always suitable as a const name
 
       black_rx = /[-_ ]+(?=[^-_])/  # preserve final trailing underscores & dashes ; [#bm-002]
       -> x do

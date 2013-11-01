@@ -143,7 +143,7 @@ module Skylab::CodeMolester::Config::File::Entity
       @is_raw = false
     end
 
-    # `get_normalized_head_and_body_pairs` - compat for `jsonesque`:
+    # `get_normalized_head_and_body_pairs` - #comport for `jsonesque`:
     # the idea is there is a valid universal internal representation of
     # the data that we will use so that we can share behavior btwn e.g
     # flyweight and controller (flyweight data will usually e.g have been

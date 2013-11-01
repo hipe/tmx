@@ -96,6 +96,10 @@ module Skylab::Headless
           _s_a = param_i_a.map( & method( :em ) )
           "#{ and_ _s_a } #{ s :is } not #{ s :a }parameter#{ s }"
         end
+        class Ev__::Not_Param__  # #todo - remove this once h.l events are modernized, ibid below
+          def self.local_normal_name ; :not_param end
+        end
+
         #
         Ev__::Internal__ = Event_.new do |param_a|
           _s_a = param_a.map( & method( :parameter_label ) )
@@ -120,6 +124,9 @@ module Skylab::Headless
           a = param_o_a.map( & method( :parameter_label ) )
           any_agent_string and as = "#{ any_agent_string } "
           "#{ as }missing the required parameter#{ s a } #{ and_ a }"
+        end
+        class Ev__::Missing__  # #todo - ibid above
+          def self.local_normal_name ; :missing end
         end
 
         def agent_string

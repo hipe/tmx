@@ -156,8 +156,8 @@ module Skylab::TestSupport::Quickie
   # of non-context, like a quickie-empowered module (empowering revealed above):
 
   module Quickie::ModuleMethods
-    def describe desc, *rest, &b  # (same as 1 below)
-      m, a = Quickie.service.resolve_describe desc, *rest, &b
+    def describe desc, *rest, &p  # (same as 1 below)
+      m, a = Quickie.service.resolve_describe desc, *rest, &p
       m.receiver.send m.name, *a
     end
   end
@@ -176,8 +176,8 @@ module Skylab::TestSupport::Quickie
         @kernel_describe_is_enabled = true
         if ::Kernel.method_defined? :describe then nil else  # just don't mess
           ::Kernel.module_exec do
-            def describe desc, *rest, &b  # (same as 1 above)
-              m, a = Quickie.service.resolve_describe desc, *rest, &b
+            def describe desc, *rest, &p  # (same as 1 above)
+              m, a = Quickie.service.resolve_describe desc, *rest, &p
               m.receiver.send m.name, *a
             end
           end
@@ -186,10 +186,10 @@ module Skylab::TestSupport::Quickie
       end
     end
 
-    def resolve_describe first_desc_line, * desc_a, &b
+    def resolve_describe first_desc_line, * desc_a, &p
       desc_a.unshift first_desc_line
       ctx = ::Class.new Quickie::Context       # 1 desc always == 1 context
-      FUN.context_init[ ctx, desc_a, nil, b ]
+      Context_init__[ ctx, desc_a, nil, p ]
       if @client
         r = @client.add_context_class_and_resolve ctx
       else
@@ -200,7 +200,7 @@ module Skylab::TestSupport::Quickie
           r = cli.resolve_invoke ::ARGV
         end
       end
-      r || FUN.noop[]
+      r || Noop__[]
     end
 
     def touch_multiple_describes cli
@@ -227,31 +227,34 @@ module Skylab::TestSupport::Quickie
 
     include MetaHell::Let::InstanceMethods
 
-    def self.describe desc, *rest, &b
-      context desc, *rest, &b
+    def self.describe desc, *rest, &p
+      context desc, *rest, &p
     end
 
     def self.description
       @desc_a.fetch( 0 ) if @desc_a.length.nonzero?  # e.g
     end
 
-    def self.context *desc_a, &b
+    def self.context *desc_a, &p
       c = ::Class.new self
-      FUN.context_init[ c, desc_a, @tagset, b ]
+      Context_init__[ c, desc_a, @tagset_h, p ]
       @elements << [ :branch, c ]
       nil
     end
 
-    def self.it desc, *rest, &b
-      rest.unshift desc
-      @elements << [ :leaf, Quickie::Example.new( self, rest, @tagset, b ) ]
+    def self.it desc, * a, & p
+      @elements << [ :leaf, Quickie::Example.new( self, a.unshift( desc ),
+        Tagset__.new( Build_tagset_h__[ a, @tagset_h ],
+          caller_locations( 1, 1 )[ 0 ].lineno ), p ) ] ; nil
     end
 
-    def self.__quickie_is_pending  # hm..  this ain't even in RSpec..
+    def self.__quickie_is_pending
       @is_pending
     end
 
-    #         ~ instance methods - we try to preserve yr namespace ~
+    def initialize rt
+      @__quickie_runtime = rt
+    end
 
     def __quickie_passed
       @__quickie_runtime.passed
@@ -260,33 +263,31 @@ module Skylab::TestSupport::Quickie
     def __quickie_failed
       @__quickie_runtime.failed
     end
+  end  # (re-opened below)
 
-  private
-
-    def initialize rt
-      @__quickie_runtime = rt
+  class Tagset__
+    def initialize ts_h, lineno
+      @lineno = lineno ; @ts_h = ts_h ; nil
     end
-  end  # (we will open this up and add more detail below..)
+    attr_reader :lineno
+    def [] i
+      @ts_h && @ts_h[ i ]
+    end
+  end
 
-  # `FUN` - especially because we don't want to crowd the namespaces of
-  # both a context's class methods and its instance methods, we do certain
-  # things with "pure functions" below to get true encapsulation.
-
-  o = { }
-
-  o[:noop] = -> do
+  Noop__ = -> do
     MetaHell::EMPTY_P_.method :call
     # ( distinct from the empty proc, noop must be a bound method )
   end
 
-  o[:context_init] = -> c, desc_a, inherited_tagset, b do
+  Context_init__ = -> c, desc_a, inherited_tagset, p do
     c.class_exec do
-      @tagset = FUN.tagset[ desc_a, inherited_tagset ]
+      @tagset_h = Build_tagset_h__[ desc_a, inherited_tagset ]
       @desc_a = desc_a
       @elements = [ ]
-      if b
+      if p
         @is_pending = false
-        class_exec(& b )
+        class_exec( & p )
       else
         @is_pending = true
       end
@@ -294,19 +295,19 @@ module Skylab::TestSupport::Quickie
     nil
   end
 
-  o[:tagset] = -> desc, inherited_tagset do
-    tagset = ( desc.pop if ::Hash === desc.last ) # meh
-    if inherited_tagset
-      if tagset
-        tagset = inherited_tagset.merge tagset
+  Build_tagset_h__ = -> desc, inherited_tagset_h do
+    tagset_h = ( desc.pop if ::Hash === desc.last ) # meh
+    if inherited_tagset_h
+      if tagset_h
+        tagset_h = inherited_tagset_h.merge tagset_h
       else
-        tagset = inherited_tagset
+        tagset_h = inherited_tagset_h
       end
     end
-    tagset
+    tagset_h
   end
 
-  o[:example_producer] = -> ctx_class, branch, leaf do  # i love this
+  Example_producer__ = -> ctx_class, branch, leaf do  # i love this
     stack = [ ] ; cur = ctx_class
     push = -> do
       els = cur.instance_variable_get :@elements
@@ -338,16 +339,14 @@ module Skylab::TestSupport::Quickie
     poptop
   end
 
-  # `Client` - one client is created per test run. It manages user interface,
-  # parsing the request to run the tests, creating a test runtime, and
-  # initiating the test run on the object graph.
-
-  class Quickie::Client
+  class Quickie::Client  # one client is creted per test run. it manages
+    # UI, parsing the request to run the tests, creating a test runtime,
+    # and initiating the test run on the object graph.
 
     def initialize y, root_context_class
-      @y = y
+      @tag_desc_h = @example_producer_p = @line_set = @or_p_a = nil
       @root_context_class = root_context_class
-      @desc_h = @example_producer_p = @or_a = @tag_filter_p = nil
+      @tag_filter_p = nil ; @y = y
     end
 
     attr_writer :tag_filter_p, :example_producer_p  # #hacks-only
@@ -357,7 +356,7 @@ module Skylab::TestSupport::Quickie
       if ok
         method :execute
       else
-        FUN.noop[]
+        Noop__[]
       end
     end
 
@@ -387,8 +386,7 @@ module Skylab::TestSupport::Quickie
     end
 
     def invite
-      @y << "try #{ kbd "ruby #{ program_name } -h" } for help"
-      nil
+      @y << "try #{ kbd "ruby #{ program_name } -h" } for help" ; nil
     end
 
     def program_name
@@ -412,8 +410,8 @@ module Skylab::TestSupport::Quickie
     def parse_opts argv
       option_parser.parse! argv
       @tag_filter_p and fail "sanity - optparse and tag filter are mutex"
-      if @or_a
-        @tag_filter_p = -> x { @or_a.detect { |f| f[ x ] } }
+      if @or_p_a
+        @tag_filter_p = -> tagset { @or_p_a.detect { |p| p[ tagset ] } }
       else
         @tag_filter_p = MetaHell::MONADIC_TRUTH_
       end
@@ -430,29 +428,52 @@ module Skylab::TestSupport::Quickie
           '(tries to be like the option in rspec)' do |v|
         process_tag_argument v
       end
+      o.on '-l', '--line NUMBER', '(experiment)' do |v|
+        process_line_argument v
+      end
       o
     end
 
-    tag_rx = /\A(?<not>~)?(?<tag>[^:]+)(?::(?<val>.+))?\z/
-
-    define_method :process_tag_argument do |val|
-      md = tag_rx.match val
+    def process_tag_argument val
+      md = TAG_RX__.match val
       if ! md
         raise ::OptionParser::InvalidArgument
       else
-        no, tag, val = md.captures
-        tag = tag.intern
-        val = val ? val.intern : true
-        @desc_h ||= { }
-        @or_a ||= [ ]
-        ( @desc_h[ no ? :exclude : :include ] ||= [ ] ) << [ tag, val ]
-        if no
-          @or_a << -> tag_h { ! ( val == tag_h[ tag ] if tag_h ) }
-        else
-          @or_a << -> tag_h {   ( val == tag_h[ tag ] if tag_h ) }
-        end
+        accept_tag_argument md
       end
-      nil
+    end
+    TAG_RX__ = /\A(?<not>~)?(?<tag>[^:]+)(?::(?<val>.+))?\z/
+
+    def accept_tag_argument md
+      no, tag_s, val_s = md.captures
+      tag_i = tag_s.intern
+      val_x = val_s ? val_s.intern : true
+      @or_p_a ||= [ ] ; @tag_desc_h ||= { }
+      ( @tag_desc_h[ no ? :exclude : :include ] ||= [ ] ) << [ tag_i, val_x ]
+      if no
+        @or_p_a << -> tagset { val_x != tagset[ tag_i ] }
+      else
+        @or_p_a << -> tagset { val_x == tagset[ tag_i ] }
+      end ; nil
+    end
+
+    def process_line_argument s
+      if LINE_RX__ !~ s
+        @y << "(not a valid line number, expecting integer - #{ s.inspect })"
+        raise ::OptionParser::InvalidArgument
+      else
+        accept_line_argument s.to_i
+      end
+    end
+    LINE_RX__ = /\A\d+\z/
+
+    def accept_line_argument d
+      @line_set ||= (( begin
+        (( @or_p_a ||= [] )) << -> tagset do
+          @line_set.include? tagset.lineno
+        end
+        require 'set' ; ::Set.new
+      end )) << d ; nil
     end
 
     def parse_args argv
@@ -494,7 +515,7 @@ module Skylab::TestSupport::Quickie
       if @example_producer_p
         @example_producer_p[ branch, leaf ]
       else
-        FUN.example_producer[ @root_context_class, branch, leaf ]
+        Example_producer__[ @root_context_class, branch, leaf ]
       end
     end
 
@@ -611,29 +632,43 @@ module Skylab::TestSupport::Quickie
     private :stylize
 
     def commence
-      if @desc_h
+      if @tag_desc_h || @line_set
         @y << "Run options:#{ render_run_options }\n\n"
       end
       nil
     end
 
-    -> do
-      order_a = [ :include, :exclude ].freeze
-
-      define_method :render_run_options do
-        a = @desc_h.sort_by do |k, v|
-          order_a.index( k ) || order_a.length
-        end
-        a2 = a.map { |k, v| "#{ k } #{ ::Hash[* v.flatten ].inspect }" }
-        1 == a2.length ? " #{ a2.first }" : ( [ '', * a2 ] * "\n  " )
+    def render_run_options  # (eew)
+      y = []
+      @tag_desc_h and render_tag_run_options y
+      @line_set and render_line_run_options y
+      if 1 == y.length
+        " #{ y[ 0 ] }"
+      else
+        [ '', * y ] * "\n  "
       end
-    end.call
+    end
+
+    def render_tag_run_options y
+      _a = @tag_desc_h.sort_by do |k, v|
+        ORDER_A__.index( k ) || ORDER_A__.length
+      end
+      _a.each do |k, v|
+        y << "#{ k } #{ ::Hash[* v.flatten ].inspect }"
+      end ; nil
+    end
+    #
+    ORDER_A__ = [ :include, :exclude ].freeze
+
+    def render_line_run_options y
+      @line_set.each do |d| y << "--line #{ d }" end ; nil
+    end
 
     def conclude y, rt
       e, f, p = rt.counts   # total [e]xamples, failed, pending
 
       if e.zero?
-        if @or_a
+        if @or_p_a
           y << "All examples were filtered out"
         else
           y << "No examples found.\n\n"  # <- trying to look like r.s there
@@ -658,59 +693,21 @@ module Skylab::TestSupport::Quickie
     end
   end
 
-  class Quickie::Example          # just a simple data-structure for holding
-    def description               # e.g. `it` and its block
-      @desc.first
+  class Quickie::Example  # just a simple data-structure for holding e.g
+    # `it` and its block
+
+    def initialize ctx, desc, tagset, p
+      @block = p ; @context = ctx ; @desc = desc ; @tagset = tagset ; nil
     end
-    attr_reader :block
-    attr_reader :context
-    attr_reader :tagset
-    def initialize ctx, desc, inherited_tagset, b
-      @context = ctx
-      @tagset = FUN.tagset[ desc, inherited_tagset ]
-      @desc = desc
-      @block = b
-      @tag_filter_p = @desc_h = nil
-      nil
+
+    attr_reader :block, :context, :tagset
+
+    def description
+      @desc.first
     end
   end
 
   class Quickie::Runtime
-
-    def tick_example
-      @eg_is_failed = nil
-      @eg_count += 1
-      nil
-    end
-
-    def tick_pending
-      @eg_is_failed = nil
-      @eg_pending_count += 1
-      @emit_pending[ ]
-      nil
-    end
-
-    def passed msg_func
-      @emit_passed[ msg_func ]
-      nil
-    end
-
-    def failed failmsg
-      if ! @eg_is_failed
-        @eg_is_failed = true
-        @eg_failed_count += 1  # before below (render e.g "(FAILED - 2)")
-      end
-      @emit_failed[ failmsg, @eg_failed_count ]
-      nil
-    end
-
-    attr_reader :eg_failed_count
-
-    def counts  # careful
-      [ @eg_count, @eg_failed_count, @eg_pending_count ]
-    end
-
-  private
 
     def initialize emit_passed, emit_failed, emit_pending
       @emit_passed, @emit_failed, @emit_pending =
@@ -719,6 +716,35 @@ module Skylab::TestSupport::Quickie
       @eg_failed_count = 0
       @eg_pending_count = 0
       @eg_is_failed = nil
+    end
+
+    attr_reader :eg_failed_count
+
+    def counts  # careful
+      [ @eg_count, @eg_failed_count, @eg_pending_count ]
+    end
+
+    def tick_example
+      @eg_is_failed = nil
+      @eg_count += 1 ;  nil
+    end
+
+    def tick_pending
+      @eg_is_failed = nil
+      @eg_pending_count += 1
+      @emit_pending[ ] ; nil
+    end
+
+    def passed msg_func
+      @emit_passed[ msg_func ] ; nil
+    end
+
+    def failed failmsg
+      if ! @eg_is_failed
+        @eg_is_failed = true
+        @eg_failed_count += 1  # before below (render e.g "(FAILED - 2)")
+      end
+      @emit_failed[ failmsg, @eg_failed_count ] ; nil
     end
   end
 
@@ -730,9 +756,8 @@ module Skylab::TestSupport::Quickie
       alias_method :quickie_original_new, :new
     end
 
-    def self.new *args
-      kls = ::Class.new self
-      kls.class_exec do
+    def self.new *args, &p
+      ::Class.new( self ).class_exec do
         class << self
           alias_method :new, :quickie_original_new
         end
@@ -741,8 +766,9 @@ module Skylab::TestSupport::Quickie
         end
         ivars = args.map{ |x| "@#{ x }".intern }.freeze
         define_singleton_method :ivars do ivars end
+        p and class_exec( & p )
+        self
       end
-      kls
     end
 
   private
@@ -856,21 +882,17 @@ module Skylab::TestSupport::Quickie
   # (which, each one is expected to be a predicate class), define the
   # corresponding instance method for contexts omgz
 
-  # set phasers to `FUN`
-
-  o[:methify_const] = -> const do # FooBar NCSASpy CrackNCSACode FOO
+  Methify_const__ = -> const do # FooBar NCSASpy CrackNCSACode FOO
     const.to_s.gsub( /
      (    (?<= [a-z] )[A-Z] |
           (?<= . ) [A-Z] (?=[a-z]))
      /x ) { "_#{ $1 }" }.downcase.intern
   end
 
-  FUN = ::Struct.new(* o.keys ).new ; o.each { |k, v| FUN[k] = v } ; FUN.freeze
-
   class Quickie::Context  # re-open it
     Quickie::Predicates.constants.each do |const|
       klass = Quickie::Predicates.const_get const, false
-      meth = FUN.methify_const[ const ]
+      meth = Methify_const__[ const ]
       define_method meth do |*expected|
         klass.new @__quickie_runtime, self, *expected
       end
@@ -883,12 +905,12 @@ module Skylab::TestSupport::Quickie
 
     be_rx = /\Abe_(?<be_what>[a-z][_a-z0-9]*)\z/
 
-    define_method :method_missing do |meth, *args, &b|
+    define_method :method_missing do |meth, *args, &p|
       md = be_rx.match meth.to_s
       if md
-        _be_the_prediate_you_wish_to_see md, args, b
+        _be_the_prediate_you_wish_to_see md, args, p
       else
-        super meth, *args, &b
+        super meth, *args, &p
       end
     end
 
@@ -896,7 +918,7 @@ module Skylab::TestSupport::Quickie
 
     predicates = Quickie::Predicates ; empty_a = [ ].freeze  # ocd
 
-    define_method :_be_the_prediate_you_wish_to_see do |md, args, b|
+    define_method :_be_the_prediate_you_wish_to_see do |md, args, p|
       const = constantize_meth[ md.string ]
       if predicates.const_defined? const, false
         klass = predicates.const_get const, false

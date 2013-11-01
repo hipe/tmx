@@ -30,15 +30,12 @@ module Skylab::Headless
       st = Params__.new ; st[ x_a.shift ] = x_a.shift while x_a.length.nonzero?
       new_class_notify_p, args_notify_p = st.to_a
       client.class_exec do
-        class << self
-          alias_method :orig_new, :new
-        end
+        class << self ; alias_method :orig_new, :new end
         define_singleton_method :new do | * i_a, & p |
           args_notify_p and args_notify_p[ i_a, p ]
           ::Class.new( self ).class_exec do
-            extend MM__ ; include IM__
             class << self ; alias_method :new, :orig_new end
-            const_set :MEMBER_I_A__, i_a.freeze
+            Members[ self, i_a ]
             module_exec( * p, & new_class_notify_p )
             self
           end
@@ -48,6 +45,15 @@ module Skylab::Headless
     end
     #
     Params__ = ::Struct.new :with_new_class, :with_args
+  end
+
+  module Members
+    def self.[] mod, i_a=nil
+      mod.module_exec do
+        extend MM__ ; include IM__
+        i_a and const_set :MEMBER_I_A__, i_a.freeze
+      end ; nil
+    end
     module MM__
       def members ; self::MEMBER_I_A__ end
     end
@@ -159,12 +165,15 @@ module Skylab::Headless
         if const_defined? const_i, false
           const_get const_i
         else
-          _base_class = if const_defined? const_i
-            const_get const_i
+          _class = if const_defined? const_i
+            ::Class.new const_get const_i
           else
-            Client_Services
+            ::Class.new( Client_Services ).class_exec do
+              class << self ; alias_method :new, :orig_new end
+              self
+            end
           end
-          r = const_set const_i, ::Class.new( _base_class )
+          r = const_set const_i, _class
           if const_defined? name.as_proc_const, false
             r.class_exec( & const_get( name.as_proc_const ) )
           end
@@ -191,58 +200,130 @@ module Skylab::Headless
 
     class << self
 
+      alias_method :orig_new, :new
+
+      def new * two_or_more_i_a, & required_defn_p
+        1 < two_or_more_i_a.length or raise ::ArgumentError, "calling 'new' #{
+          }directly on this class is only for creating compound service clss"
+        ::Class.new( self ).class_exec do
+          class << self ; alias_method :new, :orig_new end
+          const_set :DEEP_STREAM_IVAR_A__, two_or_more_i_a.
+            map { |i| :"@#{ i }" }
+          const_set :DEEP_STREAM_H__,
+            ::Hash[ two_or_more_i_a.map { |i| [ i, :"@#{ i }" ] } ]
+          class_exec( & required_defn_p )
+          def initialize * deep_a
+            ivar_a = self.class::DEEP_STREAM_IVAR_A__
+            ( 0 ... [ deep_a.length, ivar_a.length ].max ).each do |d|
+              instance_variable_set ivar_a.fetch( d ), deep_a.fetch( d )
+            end ; nil
+          end
+          self
+        end
+      end
+
       def inherited otr
         otr.instance_variable_set :@member_i_a__, [ ]
       end
 
       def delegate * i_a
-        i_a.each { |i| meth_i_delegates_to_up_meth_i i, i  }
+        dele = build_delegated_method_builder
+        i_a.each do |i|
+          accept_delegated_method i, dele.build_method( i )
+        end
       end
       #
-      def delegating * x_a, i_a  # must use options
-        opt_st = Delegating_Opt_St__.new
-        opt_st[ :name_p ] = []
-        begin
-          OPT_PROTO_H__.fetch( x_a.shift )[ opt_st, x_a ]
-        end while x_a.length.nonzero?
-        name_p_a, is_single = opt_st.to_a
-        1 == name_p_a.length or fail "syntax error - non-one name_p"
-        name_p = name_p_a[ 0 ]
-        if is_single
-          i_a.respond_to?( :id2name ) or fail "syntax - expected single"
-          meth_i_delegates_to_up_meth_i i_a, name_p[ i_a ]
+      def delegating * x_a, x  # some iambic is required
+        dele = build_delegated_method_builder x_a
+        if dele.for_single_method
+          accept_delegated_method dele.single_method_name( x ),
+            dele.build_single_method
         else
-          i_a.each do |i|
-            meth_i_delegates_to_up_meth_i i, name_p[ i ]
+          x.each do |i|
+            accept_delegated_method i, dele.build_method( i )
           end
         end
         nil
       end
-      #
-      Delegating_Opt_St__ = ::Struct.new :name_p, :is_single
-      #
-      OPT_PROTO_H__ = {
-        to: -> st, a do
-          st[ :is_single ] = true
-          as_i = a.shift
-          st[ :name_p ] << -> _ { as_i }
-        end,
-        with_suffix: -> st, a do
-          suffix_i = a.shift
-          st[ :name_p ] << -> i { :"#{ i }#{ suffix_i }" }
-        end,
-        with_infix: -> st, a do
-          prefix_i = a.shift ; suffix_i = a.shift
-          st[ :name_p ] << -> i { :"#{ prefix_i }#{ i }#{ suffix_i }" }
-        end
-      }.freeze
-
-      def meth_i_delegates_to_up_meth_i i, up_meth_i
+    private
+      def accept_delegated_method i, p
         @member_i_a__ << i
-        define_method i do | *a, &p |
-          @up_p[].send up_meth_i, *a, &p
+        define_method i, & p
+      end
+      def build_delegated_method_builder x_a=nil
+        Delegating__.new( x_a ).execute
+      end
+      class Delegating__
+        def initialize x_a
+          @for_single_method = @name_p = @receiver_i = nil ; @x_a = x_a
+          if x_a
+            begin
+              send :"#{ @x_a.shift }="
+            end while x_a.length.nonzero?
+          end
         end
-      end ; private :meth_i_delegates_to_up_meth_i
+      private
+        def to=
+          @receiver_i = @x_a.shift
+        end
+        def to_method=
+          @for_single_method = true
+          as_i = @x_a.shift
+          name_p_notify -> _ { as_i }
+        end
+        def with_infix=
+          prefix_i = @x_a.shift ; suffix_i = @x_a.shift
+          name_p_notify -> i { :"#{ prefix_i }#{ i }#{ suffix_i }" }
+        end
+        def with_suffix=
+          suffix_i = @x_a.shift
+          name_p_notify -> i { :"#{ i }#{ suffix_i }" }
+        end
+        def name_p_notify p
+          @name_p and raise ::ArgumentError, "definition error: > 1 name proc"
+          @name_p = p
+        end
+      public
+        def execute
+          ( @receiver_i ? Compound : Monadic ).new @for_single_method,
+            @name_p, @receiver_i
+        end
+        class Builder
+          def initialize s, n
+            @for_single_method = s ; @name_p = n || MetaHell::IDENTITY_
+          end
+          attr_reader :for_single_method
+          def single_method_name x
+            x.respond_to?( :id2name ) or raise ::ArgumentError,
+             "using 'to_method' is for single methods only. no implicit #{
+              }conversion from #{ x.class } to symbol"
+            self.do_me  # #todo
+          end
+        end
+        class Monadic < Builder
+          def initialize s, n, _
+            super s, n
+          end
+          def build_method i
+            up_i = @name_p[ i ]
+            -> *a, &p do
+              @up_p[].send up_i, *a, &p
+            end
+          end
+        end
+        class Compound < Builder
+          def initialize s, n, r
+            super s, n
+            @receiver_ivar = :"@#{ r }"
+          end
+          def build_method i
+            ivar = @receiver_ivar ; up_i = @name_p[ i ]
+            -> *a, &p do
+              instance_variable_get( ivar ).send up_i, *a, &p
+            end
+          end
+        end
+      end
     end
 
     def initialize c

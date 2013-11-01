@@ -351,11 +351,11 @@ module Config  # #borrow x 1
     def item_value
       self[VALUE][1]
     end
-    alias_method :value, :item_value # compat
+    alias_method :value, :item_value  # #comport
     def item_name
       self[NAME][1]
     end
-    alias_method :key, :item_name # compat
+    alias_method :key, :item_name  # #comport
     def set_item_value value
       self[VALUE][1] = value.to_s
     end

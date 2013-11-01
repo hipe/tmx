@@ -321,19 +321,14 @@ module ::Skylab::MetaHell
       end
     end
 
-    def on_attribute_introduced attr
-      attr.local_normal_name.tap do |name|
-        if ! method_defined? name
-          attr_reader name
-          public name
-        end
-        if ! method_defined? "#{ name }="
-          attr_writer name
-          public "#{ name }="
-        end
+    def on_attribute_introduced atr
+      i = atr.local_normal_name
+      w_i = atr.writer_method_name
+      method_defined? i or attr_reader i
+      if ! ( method_defined? w_i or atr.is? :reader )
+        attr_writer i
       end
-      attributes.accept attr
-      nil
+      attributes.accept atr ; nil
     end
   end
                                   # a meta attribute is of course an attribute's

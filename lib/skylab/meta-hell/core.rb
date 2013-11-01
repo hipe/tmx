@@ -151,6 +151,46 @@ module Skylab::MetaHell
       end
     end
 
+    module Directory
+
+      def self.[] mod
+        loc = caller_locations( 1, 1 )[ 0 ]
+        MetaHell::MAARS[ mod, loc ]
+        Multiset[ mod ]
+        mod.extend self ; nil
+      end
+
+    private
+
+      def build_hard_bundle_fetcher  # #bundle-multiset-API
+        soft_bundle_fetcher  # kick
+        -> i do
+          const_i = @h[ i ] or raise ::KeyError, say_bundle_not_found( @a, i )
+          const_get const_i, false
+        end
+      end
+
+      def build_soft_bundle_fetcher  # #bundle-multiset-API
+        @a = [ ] ; @h = { }
+        @dir_pathname.children( false ).each do |pn|
+          stem = pn.sub_ext( '' ).to_s
+          WHITE_STEM_RX__ =~ stem or next
+          stem.gsub! '-', '_'
+          meth_i = stem.intern
+          @a << meth_i
+          @h[ meth_i ] = Constify__[ stem ]
+        end
+        -> i do
+          const_i = @h[ i ]
+          const_i and const_get const_i, false
+        end
+      end
+      WHITE_STEM_RX__ = /[^-]\z/
+      Constify__ = -> stem do
+        "#{ stem[ 0 ].upcase }#{ stem[ 1 .. -1 ] }".intern
+      end
+    end
+
     class Item_Grammar  # implementation of "the item grammar" [#050]
       class << self
         alias_method :orig_new, :new

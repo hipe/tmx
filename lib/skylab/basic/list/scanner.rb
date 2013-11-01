@@ -248,7 +248,7 @@ module Skylab::Basic
           r
         end
       private
-        def push p
+        def push_callable p
           @p_a << p ; nil
         end
       end

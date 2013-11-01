@@ -39,7 +39,7 @@ module Skylab::CodeMolester
         nil
       end
       errmsg = -> exp_s do
-        fail "expected #{ exp_s } near #{ scn.rest[ 0, CTX_LEN_ ].inspect }"
+        "expected #{ exp_s } near #{ Inspct_[ scn.rest ] }"
       end
       fetch = -> rx do
         scn.scan( rx ) or raise errmsg[ rx.inspect ]
@@ -52,8 +52,29 @@ module Skylab::CodeMolester
         end while scn.scan( /::/ )
         nil
       end
-      while (( line = file.gets ))
-        set_scanner_to_line[ line ]
+      pushed_back = nil
+      gets = -> do
+        line = if pushed_back
+          r = pushed_back ; pushed_back = nil ; r
+        else
+          file.gets
+        end
+        if line
+          set_scanner_to_line[ line ]
+          true
+        end
+      end
+      if gets[]  # so bad ..
+        did = false ; have = true
+        while scn.skip( /[ \t]*require(_relative)?[ \t(]/ )
+          did = true
+          have = gets[] or break
+        end
+        if have
+          pushed_back = scn.string
+        end
+      end
+      while gets[]
         scn.skip SPACE_RX_
         scn.eos? and next
         part = scn.scan( /(?:module|class|grammar)(?=[ \t]+)/ )
@@ -76,7 +97,9 @@ module Skylab::CodeMolester
 
     SPACE_RX_ = /[ \t]*(#.*)?\n?/
 
-    CTX_LEN_ = 12  # heuristic
+    CTX_LEN_ = 40  # heuristic
+
+    Inspct_ = MetaHell::Services::Basic::FUN::Inspect__.curry[ CTX_LEN_ ]
 
     T_MODULE_ = 'module'.freeze
 

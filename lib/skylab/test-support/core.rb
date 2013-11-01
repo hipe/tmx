@@ -3,12 +3,11 @@ require File.expand_path('../../../skylab', __FILE__)
 
 require 'skylab/headless/core'
 
-class ::String  # [#021] "to extlib or not to extlib.."
+class ::String  # [#022] "to extlib or not to extlib.."
 
-  def unindent                    # (has been called `deindent` in the past)
-    gsub(/^#{::Regexp.escape(match(/\A(?<margin>[[:space:]]+)/)[:margin])}/, '')
-                                  # note you will still have a trailing newline,
-                                  # for which u could chop
+  def unindent  # (formerly 'deindent')
+    gsub! %r<^#{ ::Regexp.escape match( /\A[[:space:]]+/ )[ 0 ] }>, ''
+    self
   end
 end
 

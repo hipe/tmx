@@ -55,6 +55,14 @@ module Skylab::Basic
       @a.each { |k| p[ k, @h.fetch( k ) ] }
     end
 
+    def get_value_scanner  # only useful when all vals are known to be trueish
+      d = -1 ; last = @a.length - 1
+      Scn__.new do
+        @h[ @a[ d += 1 ] ] if d < last
+      end
+    end
+    class Scn__ < ::Proc ; alias_method :gets, :call end
+
     #  ~ mutators ~
 
     def touch k
@@ -92,12 +100,21 @@ module Skylab::Basic
     end
 
     def add k, x
-      if_has k, -> _ do
-        raise ::KeyError, "collision - won't clobber existing #{ k }"
-      end, -> { x } ; nil
+      if_has k,
+        -> _ do no_clobber_existing k end,
+        -> { x } ; nil
+    end
+
+    def prepend k, x
+      if @h.key? k
+        no_clobber_existing k
+      else
+        @a.unshift k ; @h[ k ] = x ; nil
+      end
     end
 
   private
+
     def if_has k, yes_p, no_p
       if @h.key? k
         if yes_p
@@ -107,6 +124,11 @@ module Skylab::Basic
         @a << k ; @h[ k ] = no_p[]
       end ; nil
     end
+
+    def no_clobber_existing k
+      raise ::KeyError, "collision - won't clobber existing #{ k }"
+    end
+
   public
 
     def delete k
