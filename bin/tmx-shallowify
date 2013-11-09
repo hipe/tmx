@@ -1,0 +1,297 @@
+#!/usr/bin/env ruby -w
+
+exit -> argv, stdin, stdout, stderr, program_name do
+
+  y = ::Enumerator::Yielder.new( & stderr.method( :puts ) )
+  _OK = 0 ; _NO = 1 ; done = nil
+
+  lbl = -> s { "\e[32m#{ s }\e[0m" }
+
+  progname = -> { ::File.basename program_name }
+
+  syntax_for_stdin_mode = -> do
+    " [-]"
+  end
+
+  syntax_for_interactive_mode = -> do
+    " [opts] FILE"
+  end
+
+  stdin_mode = false
+
+  usage_line = -> do
+    s_ = ( stdin_mode ? syntax_for_stdin_mode : syntax_for_interactive_mode )[]
+    "#{ lbl[ 'usage:' ] } #{ progname[] }#{ s_ }"
+  end
+
+  invite_line = -> do
+    "see '#{ progname[] } -h' for help"
+  end
+
+  invite = -> msg do
+    y << msg
+    y << invite_line[]
+    done = _NO
+  end
+
+  usage = -> msg do
+    y << msg
+    y << usage_line[]
+    y << invite_line[]
+    done = _NO
+  end
+
+  nothing = -> msg do
+    y << msg
+    y << "nothing to do."
+    done = _OK
+  end
+
+  wont_procede = nil
+  exitstatus = -> es do
+    wont_procede[ "had a nonzero exit status: #{ es }" ]
+  end
+
+  wont_procede = -> msg=nil do
+    msg and y << msg
+    y << "will not procede because of the above"
+    y << invite_line[]
+    done = _NO
+  end
+
+  require 'optparse'
+
+  is_dry = false ; do_forward = true ;
+  op = ::OptionParser.new do |o|
+
+    o.on '-R', '--reverse',
+        'attempt the reverse (not foolproof - must make guesses)',
+        '(for one thing it is eager matching with no lookahead)' do
+      do_forward = false
+    end
+
+    o.on '-n', '--dry-run', 'preview what will be done' do
+      is_dry = true
+    end
+
+    o.on '-h', '--help', 'this screen' do
+
+      _USAGE = 'usage:'
+      y << "#{ lbl[ _USAGE ] } #{
+        }#{ progname[] }#{ syntax_for_interactive_mode[] }"
+      y << "#{ ' ' * _USAGE.length } #{
+        }#{ progname[] }#{ syntax_for_stdin_mode[] } #{
+         }(stdin mode - outputs dashified versions of input only)"
+      y << nil
+
+      y << "#{ lbl[ "description:" ] }#{
+        } move a file with/a-path/like-this to-a-path-like-this"
+      y << nil
+
+      y << lbl[ "options:" ]
+      op.summarize( y )
+      done = _OK
+    end
+  end
+
+  op.parse! argv
+  done and break done
+
+  resolve_arg_for_interactive = -> do
+    case argv.length
+    when 0 ; es_ = usage[ "expecting FILE" ]
+    when 1 ; arg_ = argv[ 0 ]
+    else   ; es_ = usage[ "unexpected argument: #{ argv[ 1 ].inspect }" ]
+    end
+    [ es_, arg_ ]
+  end
+
+  resolve_arg_for_pipe = -> do
+    argv.length.nonzero? and '-' == argv[ 0 ] and argv.shift
+    argv.length.nonzero? and
+      usage[ "unexpected argument (stdin mode): #{ argv[0].inspect }"]
+  end
+
+  es, arg = if stdin.tty?
+    resolve_arg_for_interactive[]
+  else
+    stdin_mode = true
+    resolve_arg_for_pipe[]
+  end
+
+  es and break es
+
+  _SLASH = '/'.freeze ; _DASH = '-'.freeze
+
+  dashify = -> s do
+    s.gsub _SLASH, _DASH
+  end
+
+  if stdin_mode
+    is_dry and break invite[ "'dry_run' doesn't make sense for stdin mode" ]
+    do_forward or break invite[ "revese mode not yet implemented for stdin" ]
+    while (( line = stdin.gets ))
+      line.chomp!
+      stdout.puts dashify[ line ]
+    end
+    break _OK
+  end
+
+  require 'pathname'
+  pn = ::Pathname.new arg
+  begin
+    stat = pn.stat
+  rescue ::Errno::ENOTDIR => nd
+  rescue ::SystemCallError => e
+  end
+
+  e and break invite[ e.message ]
+
+  nd and break invite[ "directory won't be accepted, also: #{ nd }" ]
+
+  'file' == stat.ftype or break invite[ "argument is #{ stat.ftype } - #{ arg }" ]
+
+  s='(?! \.{1,2} (?: / |\z) ) [^/]+'
+  _rx = %r(\A #{ s } (?: / #{ s }  )* \z)x
+
+  if _rx !~ arg
+    y << "path contains an invalid '.' or '..' or starts with a '/' - #{ arg }"
+    y << "please try again with a valid path"
+    break _NO
+  end
+
+  move = nil
+
+  forward = -> do
+
+    arg.include? _SLASH or
+      break nothing[ "argument does not include slash - #{ arg }" ]
+
+    tgt_s = dashify[ arg ]
+
+    move[ arg, tgt_s ]
+  end
+
+
+  open_3 = nil
+  move = -> src_s, tgt_s do
+
+    if File.exist? tgt_s
+      break wont_procede[ "target file already exists - #{ tgt_s }" ]
+    end
+
+    y << " moving: #{ src_s }"
+    y << "     to: #{ tgt_s }"
+
+    require 'open3'
+
+    cmd_a = [ 'mv', '-n', arg, tgt_s ]
+
+    y << "#{ cmd_a * ' ' }"
+
+    if ! is_dry
+      open_3[ cmd_a ]
+    end
+  end
+
+  open_3 = -> cmd_a do
+
+    _, o, e, w = ::Open3.popen3( * cmd_a )
+    while (( s = e.gets ))
+      y << "(err: #{ s.chomp })"
+    end
+
+    while (( s = o.gets ))
+      y << "(out: #{ s.chomp })"
+    end
+
+    es = w.value.exitstatus
+    if es.nonzero?
+      exitstatus[ es ] ; es
+    end
+  end
+
+  _PWD_PN = nil
+  relativize = -> pathname do
+    pathname.relative_path_from _PWD_PN
+  end
+
+  apply_reverse = nil
+  reverse = -> do  # assume extant path that passed _rx
+
+    if arg.include? _SLASH
+      anchor_pn = pn.dirname
+      tail_pn = pn.basename
+    else
+      anchor_pn = _PWD_PN = ::Pathname.pwd
+      tail_pn = pn
+    end
+
+    part_a = tail_pn.to_s.split _DASH
+    2 > part_a.length and
+      break nothing[ "argument does not include a dash - #{ tail_pn }" ]
+
+    apply_reverse[ anchor_pn, part_a ]
+  end
+
+  build_guesser_and_flusher = nil
+  apply_reverse = -> anchor_pn, part_a do  # assume multiple part_a
+    g, f = build_guesser_and_flusher[ anchor_pn ]
+    begin
+      rs = g[ part_a.shift ] and break
+    end while part_a.length.nonzero?
+    rs and break rs
+    tgt_pn = f[]
+    _t_pn = relativize[ tgt_pn ]
+    move[ arg, _t_pn.to_s ]
+  end
+
+  _DIRECTORY = 'directory'.freeze
+
+  build_guesser_and_flusher = -> anchor_pn do
+    guess_a = []
+    anch_pn = anchor_pn ; anchor_pn = nil
+    g = -> tok do
+      guess_a << tok
+      guess_s = guess_a * _DASH
+      guess_pn = anch_pn.join guess_s
+      stat = nil
+      begin
+        stat = guess_pn.stat
+      rescue ::SystemCallError => e
+      end
+      if stat
+        if _DIRECTORY == stat.ftype
+          anch_pn = guess_pn
+          guess_a.clear
+          nil
+        else
+          y << "confused, don't know what to do:"
+          y << "my simple algorithm expected a directory but had a #{
+            }#{ stat.ftype }: #{ relativize[ guess_pn ] }"
+          wont_procede[]
+        end
+      elsif Errno::ENOENT == e.class
+        nil
+      else
+        wont_procede[ "totally unaccounted for #{ e.class }" ]
+      end
+    end
+    f = -> do
+      anch_pn.join guess_a * _DASH
+    end
+    [ g, f ]
+  end
+
+  es = if do_forward
+    forward[]
+  else
+    reverse[]
+  end
+
+  es and break es
+
+  y << "done."
+
+  _OK
+end[ ::ARGV, $stdin, $stdout, $stderr, $PROGRAM_NAME ]
