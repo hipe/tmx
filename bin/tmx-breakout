@@ -1,0 +1,608 @@
+#!/usr/bin/env ruby -w
+
+exit -> argv, stdin, stdout, stderr, program_name do
+
+  y = ::Enumerator::Yielder.new( & stderr.method( :puts ) )
+
+  progname = -> { ::File.basename program_name }
+
+  es = nil ; _OK = 0 ; _NO = 1  # exit statii
+
+  _PROCEDE = nil  # not an exit stautus - the absence of one
+
+  lbl = kbd = -> s { "\e[32m#{ s }\e[0m" }
+
+  _NEUTRAL = "\e[34m•\e[0m " ; _YEP = "\e[32m➜\e[0m "
+
+  uncolorize = -> do
+    kbd = lbl = -> s { s } ; _NEUTRAL = _YEP = nil
+  end
+
+  add_syntax = -> { "add [opts] PATH" }
+
+  status_syntax = -> { "status [opts]" }
+
+  commit_syntax = -> { "commit [opts]" }
+
+  clean_syntax = -> { "clean [opts]" }
+
+  syntaces = -> do
+    [ add_syntax, status_syntax, commit_syntax, clean_syntax ]
+  end
+
+  # ~ declarations for shared lib (defined at below)
+
+  no_more_args = nothing_to_do = nil
+
+  # ~
+
+  require 'optparse'
+  build_indenter = ignoring = nil
+  be_verbose = false
+  do_color_indicated_explicitly = false ; do_color = nil ; is_dry = false
+  op = ::OptionParser.new do |o|
+    o.on '-n', '--dry-run', 'dry run.' do
+      is_dry = true
+    end
+    o.on '--[no-]color', "the default is for color to be on when interactive,",
+        "off when not. this will override that" do |x|
+      do_color_indicated_explicitly = true
+      do_color = x
+    end
+    o.on '-v', '--verbose', 'verbose output' do
+      be_verbose = true
+    end
+    o.on '-h', '--help', 'this screen.' do ||
+      argv.length.nonzero? and ignoring[]
+      p_a = syntaces[] ; p = p_a.shift
+      y << "#{ lbl[ 'usage:' ] } #{ progname[] } #{ p[] }"
+      while (( p = p_a.shift ))
+        y << "       #{ progname[] } #{ p[] }"
+      end
+      y << nil
+      y << "#{ lbl[ 'description:' ] } 'add' files progressively. they are then"
+      yy = build_indenter[ ' ' * 7, y ]
+      yy << "(breakout) staged. check your status with (breakout) 'status'"
+      yy << "if you like. (breakout) 'commit'ting this will add a git commit"
+      yy << "thta UNDOES whatever changes occurred to those files in the"
+      yy << "HEAD commit. and THEN breakout will re-apply the changes back"
+      yy << "again to those files and 'git add' those files, so they are"
+      yy << "(git) staged for a (git) commit. if you commit this with git"
+      yy << "you will have effectively created two commits: one that reverses"
+      yy << "the changes and one that re-applies them. if you squash the"
+      yy << "HEAD~1 commit onto the previous, you will then be left with one"
+      yy << "commit that contains only those changes to those files having"
+      yy << "been isolated from the commit you started with. IT'S EASY!"
+
+      y << lbl[ 'options:' ]
+      op.summarize y
+      es = _OK
+    end
+  end
+
+  build_indenter = -> ind_s, y_ do
+    ::Enumerator::Yielder.new do |msg|
+      y_ << "#{ ind_s }#{ msg }"
+    end
+  end
+
+  ignoring = -> do
+    y << "(ignoring: \"#{ argv.shift( argv.length ) * ' ' }\")" ; nil
+  end
+
+  invite_string = -> do
+    "see #{ kbd[ "#{ progname[] } -h" ] } for help"
+  end
+
+  usage = -> msg do
+    y << msg
+    y << invite_string[]
+    _NO
+  end
+
+  usage_for = -> p, msg=nil do
+    msg and y << msg
+    y << "usage: #{ p[] }"
+    y << invite_string[]
+    _NO
+  end
+
+  begin
+    op.parse! argv
+  rescue ::OptionParser::ParseError => e
+  end
+
+  if ! do_color_indicated_explicitly
+    do_color = stdin.tty?
+  end
+  do_color or uncolorize[]
+
+  e and break usage[ e.message ]
+
+  if es
+    argv.length.nonzero? and ignoring[]
+    break es
+  end
+
+  cmd_h = { }
+
+  manifest_for_write = parse_for_add = system = nil
+  cmd_h[ :add ] = -> do
+    es, args = parse_for_add[ argv ]
+    es and break es
+    es, box = manifest_for_write[]
+    es and break es
+    y_a = [ ]
+    es = system[ %w( git ls-files -- ).concat( args ), -> s do
+      y_a << s
+    end, false ]
+    es and break es
+    y_a.length.zero? and break nothing_to_do[ "not under version control: #{
+      }#{ args * ' ' }" ]
+    box.merge y_a
+    _OK
+  end
+
+  parse_for_add = -> argv_ do
+    argv_.length.zero? and break usage_for[ add_syntax, "expecting PATH" ]
+    [ nil, argv_.shift( argv_.length ) ]
+  end
+
+  _MANIFEST = 'tmp.breakout.manifest'.freeze ; _Scn = nil
+
+  get_cached_manifest_scanner_for_read_p = box_and_cache_from_extant_path = nil
+  manifest_scanner_for_read = -> do
+    p = -> do
+      path = _MANIFEST
+      if ! ::File.exist? path
+        r = [ nil, _Scn.new { || } ]
+        p = -> { r } ; r
+      else
+        scn, cache_a = box_and_cache_from_extant_path[ path ]
+        p = get_cached_manifest_scanner_for_read_p[ cache_a ]
+        [ nil, scn ]
+      end
+    end
+    -> { p.call }
+  end.call
+
+  box_and_cache_from_extant_path = -> path do
+    fh = ::File.open path, 'r'
+    cache_a = []
+    scn = _Scn.new do
+      if fh
+        if (( s = fh.gets ))
+          s.chomp! ; s.freeze
+          cache_a << s
+          s
+        else
+          fh.close ; fh = nil ; nil
+        end
+      end
+    end
+    [ scn, cache_a ]
+  end
+
+  get_cached_manifest_scanner_for_read_p = -> cache_a do
+    -> do
+      d = -1 ; last = cache_a.length - 1
+      _scn = _Scn.new { if d < last then cache_a[ d += 1 ] end }
+      [ nil, _scn ]
+    end
+  end
+
+  _Scn = ::Class.new( ::Proc ).class_exec do
+    alias_method :gets, :call
+    self
+  end
+
+  filehandle_for = box_for_write_with_fh = nil
+  manifest_for_write = -> do
+    _es, fh = filehandle_for[ 'a+' ]
+    if _es then _es else
+      pair = box_for_write_with_fh[ fh ]
+      manifest_for_write = -> { pair } ; pair
+    end
+  end
+  #
+  mock_fh_wrapper = nil
+  filehandle_for = -> flags do
+    fh = ::File.open _MANIFEST, flags
+    if is_dry
+      fh = mock_fh_wrapper[ fh ]
+    end
+    [ nil, fh ]
+  end
+  #
+  mock_fh_wrapper = -> fh do
+    ::Object.new.instance_exec do
+      define_singleton_method :gets do
+        fh.gets
+      end
+      define_singleton_method :puts do |s|
+        nil
+      end
+      define_singleton_method :close do
+        fh.close
+      end
+      self
+    end
+  end
+  #
+  box_for_write_with_fh = -> fh do
+    a = [ ] ; h = { }
+    while (( line = fh.gets ))
+      line.chomp!
+      a << line ; h[ line ] = true
+    end
+    o = ::Object.new.instance_exec do
+      define_singleton_method :merge do |relpath_s_a|
+        relpath_s_a.each do |path|
+          did_have = h.fetch path do
+            h[ path ] = true
+            a << path
+            fh.puts path
+            nil
+          end
+          if did_have
+            y << "#{ _NEUTRAL }already added, skipping: #{ path }"
+          else
+            y << "#{ _YEP }                  adding: #{ path }"
+          end ; nil
+        end
+      end
+      self
+    end
+
+    [ nil, o ]
+  end
+
+  aborting = system_exitstatus = nil
+  require 'open3'
+  system = -> cmd_a, out_p=nil, err_p=nil do
+    be_verbose and y << "(command: #{ cmd_a * ' ' })"
+    _, o, e, w = ::Open3.popen3( * cmd_a )
+
+    did_stderr = false
+    if false != err_p
+      err_p ||= -> line do
+        did_stderr ||= true
+        y << "(stderr: #{ line })" ; nil
+      end
+    end
+
+    if err_p
+      while (( s = e.gets ))
+        s.chomp!
+        err_p[ s ]
+      end
+    end
+
+    did_unexpectd_stdout = nil
+    out_p ||= -> s_ do
+      did_unexpectd_stdout = true
+      y << "(stdout: #{ s_ })"
+    end
+
+    while (( s = o.gets ))
+      out_p[ s.chomp ]
+    end
+
+    es_ = w.value.exitstatus
+    es_.nonzero? and break system_exitstatus[ es_, cmd_a ]
+
+    if did_stderr
+      y << "unexpected stderr output was received"
+      break aborting[]
+    end
+
+    if did_unexpectd_stdout
+      y << "unexpected stdout output was received"
+      break aborting[]
+    end
+    _PROCEDE
+  end
+  #
+  system_exitstatus = -> es_, cmd_a do
+    y << "got nonzero exit status (#{ es_ }) from: #{ cmd_a * ' ' }"
+    aborting[] ; es_
+  end
+  #
+  aborting = -> do
+    y << "will not continue because of this."
+    y << invite_string[]
+    _NO
+  end
+
+  no_files_added_string = -> do
+    "(no files added, use 'add' - #{ invite_string[] })"
+  end
+
+  check_for_clean_status = nil
+  cmd_h[ :status ] = -> do
+    es = no_more_args[] and break es
+
+    es, o = manifest_scanner_for_read[]
+    es and break es
+    count = 0
+    while (( line = o.gets ))
+      count += 1
+      y << "(#{ line })"
+    end
+    if count.zero?
+      y << no_files_added_string[]
+    else
+      y << "(#{ count } total staged for breakout. you can try 'commit' now.)"
+    end
+    _ = check_for_clean_status[]
+    _OK
+  end
+
+  _QQ = '??'.freeze
+
+  require 'shellwords'
+  _FWD = 'tmp.breakout.forward.patch'.freeze
+  _REV = 'tmp.breakout.reverse.patch'.freeze
+  check_for_empty_patch = patch_this_mother = nil
+  cmd_h[ :commit ] = -> do
+    es = no_more_args[] and break es
+    es, o = manifest_scanner_for_read[] ; es and break es
+    entry = nil ; a = [ ] ; a << entry while (( entry = o.gets ))
+    a.length.zero? and break nothing_to_do[ no_files_added_string[] ]
+    es = check_for_clean_status[] and break es
+    a.map!( & :shellescape )
+    es = system[ [ "git diff -R HEAD~1 -- #{ a * ' ' } > #{ _REV }" ] ]
+    es and break
+    es = check_for_empty_patch[ _REV ] and break es
+    es = system[ [ "git diff    HEAD~1 -- #{ a * ' ' } > #{ _FWD }" ] ]
+    es and break
+    patch_this_mother[]
+  end
+
+  not_clean_status = nil
+  check_for_clean_status = -> do
+    a_a = []
+    es = system[ %w( git status --porcelain ), -> s do
+      code = s[ 0, 2 ]
+      if _QQ != code
+        file = s[ 3 .. -1 ]
+        a_a << [ file, code ]
+      end
+    end ]
+    es and break es
+    a_a.length.nonzero? and break not_clean_status[ a_a ]
+    _PROCEDE
+  end
+
+  check_for_empty_patch = -> path do
+    stat = ::File.stat path
+    if stat.size.zero?
+      y << "no changes exist in the previous commit for those files"
+      nothing_to_do[ "(patch file is empty: #{ path })" ]
+    end
+  end
+
+  explain_status = nil
+  not_clean_status = -> a_a do
+    _h = a_a.reduce( ::Hash.new { |h_, k| h_[ k ] = [ ] } ) do |m, (file, code)|
+      m[ code ] << file ; m
+    end
+    _h.each_pair do |code, file_a|
+      _name_a = code.strip.split( '' ).map{ |s| explain_status[ s.intern ] }
+      _verb = 1 == file_a.length ? 'is' : 'are'
+      y << "#{ file_a * ' and ' } #{ _verb } #{ _name_a * ' and ' }."
+    end
+    y << "will not apply to a dirty working tree, #{
+      }please commit, throwaway, or otherwise stash your changes"
+    _NO
+  end
+
+  explain_status = -> do
+    p = -> s do
+      h = {  # :s/^ \+o \+\([A-Z]\) = \(.\+\)/\1: "\2",/
+        M: "modified",
+        A: "added",
+        D: "deleted",
+        R: "renamed",
+        C: "copied",
+        U: "updated but unmerged" }
+      h[ :' ' ] = 'unmodified'
+      h.default_proc = -> _, k do
+        "with \"#{ k }\" status"
+      end
+      p = h ; h[ s ]
+    end
+    -> s { p[ s ] }
+  end.call
+
+  add_or_remove_every_file = add_and_commit_every_file = patch_runner = nil
+  summarize = nil
+  patch_this_mother = -> do
+    pr = patch_runner[]
+    es = pr.status and break es
+    es = pr.run_this_patch _REV
+    es and break es
+    es = add_and_commit_every_file[]
+    es and break es
+    es = pr.run_this_patch _FWD
+    es and break es
+    es, a_a, r_a = add_or_remove_every_file[]
+    es and break es
+    summarize[ a_a, r_a ]
+    y << 'done.'
+    _OK
+  end
+
+  determine_depth = _Patch_Run = nil
+  patch_runner = -> do
+    es, d = determine_depth[]
+    ::Object.new.instance_exec do
+      define_singleton_method :status do es end
+      if ! es
+        d += 1  # you always remove one level of context from patches ("a"/"b")
+        define_singleton_method :run_this_patch do |path|
+          _Patch_Run.new( path, d ).execute
+        end
+      end
+      self
+    end
+  end
+
+  _Patch_Run = ::Class.new.class_exec do
+    def initialize path, d
+      @depth = d ; @path = path
+    end
+    define_method :execute do
+      cmd_a = [ 'patch', "-p#{ @depth }", "--input", @path ]
+      is_dry and cmd_a << '--dry-run'
+      es = system[ cmd_a, -> s do
+        y << "(patch says: #{ s })"
+      end ]
+      es || dry_check
+    end
+  private
+    define_method :dry_check do
+      if is_dry
+        y << "cannot procede any further when --dry-run is on."
+        _OK
+      end
+    end
+    self
+  end
+
+  _DOT_GIT = '.git'.freeze
+  determine_depth = -> do
+    require 'pathname'
+    start_pn = pn = ::Pathname.pwd
+    depth = 0
+    begin
+      attempt = pn.join _DOT_GIT
+      if attempt.exist?
+        break( found = attempt )
+      end
+      pn_ = pn.dirname
+      pn == pn_ and break
+      depth += 1 ; pn = pn_
+    end while true
+    if ! found
+      y << "very strange: no #{ _DOT_GIT } file found in or #{ depth } #{
+        }levels above #{ start_pn }. aborting."
+      _NO
+    else
+      [ nil, depth ]
+    end
+  end
+
+  _CI = 'tmp.breakout.commit-msg'.freeze
+  add_and_commit_every_file = -> do
+    es, add_a, rm_a = add_or_remove_every_file[]
+    es and break es
+    ::File.open _CI, 'w+' do |fh|
+      fh.write <<-HERE.gsub( /^[ ]{8}/, '' )
+        (this commit created by breakout. DO NOT PUSH TO ANY REMOTE..)
+
+        this commit created by breakout from adding a reverse patch to
+        the previous commit. if the next step goes well and the forward
+        patch is added successfully, fixup this commit on to the previous
+        one ("git rebase -i HEAD~3", for example)
+      HERE
+
+      fh.puts "these are the file(s) that should be affected:"
+      count = 0
+      if add_a
+        count += add_a.length
+        fh.puts "(undid changes to #{ add_a * ' ' })"
+      end
+      if rm_a
+        count += rm_a.length
+        fh.puts "(removed previously addef file(s) #{ rm_a * ' ' })"
+      end
+      fh.puts "(#{ count } file(s) in total affected.)"
+    end
+    es = system[ [ 'git', 'commit', '-F', _CI ], -> s do
+      y << "(YAY: #{ s })"
+    end ]
+    es and break es
+    _PROCEDE
+  end
+
+  add_or_remove_every_file = -> do
+    es, scn = manifest_scanner_for_read[]
+    es and break es
+    add_a = [ ] ; rm_a = [ ]
+    while (( path = scn.gets ))
+      if ::File.exist? path
+        add_a << path
+      else
+        rm_a << path
+      end
+    end
+    if add_a.length.nonzero?
+      es = system[ %w( git add ).concat( add_a ) ]
+      es and break es
+    end
+    if rm_a.length.nonzero?
+      es = system[ %w( git rm ).concat( rm_a ), -> s do
+        be_verbose and y << "(yep, removed: #{ s })"
+      end ]
+      es and break es
+    end
+    [ nil, ( add_a if add_a.length.nonzero? ), ( rm_a if rm_a.length.nonzero?) ]
+  end
+
+  summarize = -> added_a, removed_a do
+    if added_a
+      y << "(reverse patch applied and committed. forward patch applied #{
+        }and changes staged. (for the file(s): #{ added_a * ', ' }))"
+    end
+    if removed_a
+      y << "(removed and commited, created and added (staged) #{
+       }(for the file(s): #{ removed_a * ', ' }))"
+    end
+    nil
+  end
+
+  cmd_h[ :clean ] = -> do
+    require 'fileutils'
+    es = no_more_args[] and break es
+    _file_a = [ _MANIFEST, _FWD, _REV, _CI ]
+    _file_a.each do |file|
+      if ::File.exist? file
+        ::FileUtils.rm file, verbose: be_verbose, noop: is_dry
+      elsif be_verbose
+        y << "(not there? - #{ file })"
+      end
+    end
+    y << "done."
+    _OK
+  end
+
+  # ~ shared lib - functions used in more than one region
+
+  no_more_args = -> do
+    if argv.length.nonzero?
+      usage[ "unexpected argument \"#{ argv[ 0 ] }\"" ]
+    end
+  end
+
+  nothing_to_do = -> msg=nil do
+    msg and y << msg
+    y << "nothing to do."
+   _OK
+  end
+
+  # ~ run
+
+  abbrev_h = { ci: :commit, st: :status }.freeze
+  if argv.length.nonzero?
+    i = argv[ 0 ].intern
+    i_ = abbrev_h[ i ] and i = i_
+    p = cmd_h[ i ]
+  end
+  p or break usage[
+    "#{ "unexpected argument \"#{ argv[ 0 ] }\". " if argv.length.nonzero? }#{
+     }expecting {#{ ( cmd_h.keys - %i( flush ) ) * '|' }}" ]
+  argv.shift
+  p.call
+
+end[ ::ARGV, $stdin, $stdout, $stderr, $PROGRAM_NAME ]
