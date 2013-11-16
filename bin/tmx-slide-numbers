@@ -1,0 +1,589 @@
+#!/usr/bin/env ruby -w
+
+exit -> argv, stdin, stdout, stderr, program_name do
+
+  y = ::Enumerator::Yielder.new( & stderr.method( :puts ) )
+
+  progname = -> { ::File.basename program_name }
+
+  es = nil ; _OK = 0 ; _NO = 1  # exit statii
+
+  _PROCEDE = nil  # not an exit stautus - the absence of one
+
+  lbl = kbd = -> s { "\e[32m#{ s }\e[0m" }
+
+  kw = -> s { "\e[04m#{ s }\e[0m" }
+
+  repl_str = '%d'
+  _1 = 'digit-1' ; _2 = 'digit-2'
+
+  require 'optparse'
+  build_wrapping_indenter = ignoring = pen = syntax = _COLS = nil
+  _DEFAULT_COLS = 80 ; _MAX_COLS = 120
+  be_verbose = is_dry = false
+  match_whole_words = true
+
+  op = ::OptionParser.new do |o|
+
+    o.on '-J str', "will use <str> as the digit placeholder in",
+        "your template expression (default: #{ repl_str })" do |x|
+      repl_str = x
+    end
+    o.on '-W', "turns match whole words off." do
+      match_whole_words = true
+    end
+    o.on '-n', '--dry-run', 'dry run' do
+      is_dry = true
+    end
+    o.on '-v', '--verbose', 'verbose output' do
+      be_verbose = true
+    end
+    o.on '-h', '--help', 'this screen.' do ||
+      argv.length.nonzero? and ignoring[]
+      pen[].instance_exec do
+        _USAGE = 'usage: '
+        _IND = ' ' * _USAGE.length
+        y << "#{ lbl _USAGE } #{ progname[] } #{ syntax[] }"
+        y << nil
+
+        _cols = [ _COLS[], _MAX_COLS ].min
+
+        yy = build_wrapping_indenter[ _cols, '', y ]
+        yy << "#{ lbl 'description:' } #{ kw 'search' } is any string that #{
+          }contains exactly one occurrence of #{ kw 'replstr' }."
+        yy.indent = _IND
+        yy << "for each line of input (from the #{ kw 'file' }(s) or from"
+        yy << "each line of stdin), for every occurrence of #{ kw 'search' }"
+        yy << "found in the input lines, the purpose of this utility is to"
+        yy << "change selectively such digits based on the following:"
+        yy << nil
+        yy << "the matched digit may be either increased, decreased or"
+        yy << "left as-is based on the relationship"
+        yy << "between #{ kw _1 } and #{ kw _2 }: if #{ kw _2 } is greater"
+        yy << "than #{ kw _1 }, this is a \"slide to the right\" to"
+        yy << "\"make room\". conversely if #{ kw _2 } is smaller than"
+        yy << "#{ kw _1 }, this is a \"slide to the left\" to \"plug holes\"."
+        yy << nil
+        yy << "when \"making room\", only those matches whose digit is"
+        yy << "greater than or equal to #{ kw _1 } are increased. when it is"
+        yy <<  "a \"slide to the left\", only those strings are affected"
+        yy << "(decreased this time) whose digits are greater than or equal"
+        yy << "to #{ kw _2 }. the amount of increase or decrease is determined"
+        yy << "by to the distance between #{ kw _1 } and #{ kw _2 }."
+        yy << nil
+        yy << "when input is stdin, output lines (1 for 1) are to stdout."
+        yy << nil
+        yy << "when input comes in the form of filenames **changes are always"
+        yy << "edit in place**. but for now this will call out to git to"
+        yy << "confirm that the files are under version control and in a"
+        yy << "pristine state before any changes are made."
+        yy.flush
+
+        y << nil
+        y << "#{ lbl 'example:' }"
+        y << "            #{ progname[] } -J '%x' -w '#foo-%x' 4 5 file.txt"
+        y << nil
+        yy.indent = _IND
+        yy << 'the above will find any occurrences of "#foo-100" and change'
+        yy << 'it to "#foo-101" and so on. an occurrence of "#foo-3" will'
+        yy << "not be affected."
+        yy.flush
+        y << nil
+
+        y << "#{ lbl 'options:' }"
+        o.summarize( & y.method( :<< ) )
+
+        es = _OK
+      end
+    end
+  end
+
+  pen = -> do
+    o = ::Object.new
+    [ [ :lbl, lbl ], [ :kw, kw ] ].each do |i, p|
+      o.send :define_singleton_method, i, -> s { p[ s ] }
+    end
+    pen = -> { o } ; o
+  end
+
+  syntax = -> do
+    pen[].instance_exec do
+      "[-n] [-v] [-J #{ kw 'replstr' }] #{ kw 'search' } #{
+        }#{ kw _1 } #{ kw _2 } #{
+         }[#{ kw 'file' } #{ kw '..' }]"
+    end
+  end
+
+  _COLS = -> do
+    begin require 'ncurses' ; rescue ::LoadError => e ; end
+    cols = if e then _DEFAULT_COLS else
+       v = $VERBOSE ; $VERBOSE = nil
+      ::Ncurses.initscr
+      # #todo easy patch snowleopard-ncurses ncurses_wrap.c:1951
+      $VERBOSE = v
+      _cols = ::Ncurses.COLS
+      ::Ncurses.endwin
+      _cols
+    end
+    _COLS = -> { cols } ; cols
+  end
+
+  build_word_scanner = build_word_pool = build_indenter = nil
+  build_wrapping_indenter = -> width_d, indent_s, downstream_y do
+    require 'skylab/headless/core'
+    process_input_line = flush_full_lines = flush_hard = nil
+    indenter = build_indenter[ indent_s, downstream_y ]
+    word_pool = build_word_pool[ width_d - indent_s.length ]
+    windenter = ::Enumerator::Yielder.new do |input_line|
+      if input_line
+        process_input_line[ input_line ]
+      else
+        flush_hard[]
+        indenter << input_line
+      end
+    end
+    windenter.singleton_class.send :alias_method, :def, :define_singleton_method
+    windenter.def :indent= do |s|
+      if word_pool.buffered_word_count.zero?
+        indenter.change_indent s
+      else
+        indenter.change_subsequent_indent s
+      end
+      word_pool.change_cols( width_d - s.length )
+    end
+    windenter.def :flush do
+      flush_hard[]
+    end
+    process_input_line = -> input_line do
+      input_line or fail 'never'
+      _sx = ::Skylab::Headless::CLI::FUN.parse_styles[ input_line ]
+      _sx ||= [[ :string, input_line ]]
+      scn = build_word_scanner[ _sx ]
+      while (( word = scn.gets ))
+        word_pool << word
+      end
+      flush_full_lines[]
+    end
+    flush_hard = -> do
+      flush_full_lines[]
+      fragment_s = word_pool.flush_any_line_in_progress
+      fragment_s and indenter << fragment_s ; nil
+    end
+    flush_full_lines = -> do
+      while (( line = word_pool.gets ))
+        indenter << line
+      end ; nil
+    end
+    windenter
+  end
+
+  _WORD_SEPARATOR_RX = /[ ]/
+
+  _LEADING_PUNCT_RX = /\A[.,:;!?]/
+
+  _Word = ::Struct.new :any_style_d, :string, :is_space
+
+  _SPACE_WORD = _Word.new nil, ' '.freeze, true
+
+  scan_string = scan_style = skip_final_style = nil
+  build_word_scanner = -> sx do
+    buffer_a = []
+    if sx
+      begin
+        befor = buffer_a.length
+        if :string == sx[ 0 ][ 0 ]
+          string = scan_string[ sx ]
+          word_a = string.split _WORD_SEPARATOR_RX
+          word_a.each do |s|
+            buffer_a << _Word.new( nil, s )
+          end
+          sx.length.zero? and break
+        end
+        if :style == sx[ 0 ][ 0 ]
+          _style_d = scan_style[ sx ]
+          _string = scan_string[ sx ]
+          skip_final_style[ sx ]
+          _word = _Word.new _style_d, _string
+          buffer_a << _word
+          sx.length.zero? and break
+        end
+        befor == buffer_a.length and fail "unexpected '#{ sx[ 0 ][ 0 ] }'"
+      end while true
+    end
+    p = -> do
+      buffer_a.shift
+    end
+    class << p
+      alias_method :gets, :call
+    end ; p
+  end
+  scan_string = -> sx do
+    i, x = sx.shift
+    :string == i or fail "sanity - expected 'string' had '#{ i }'"
+    x
+  end
+  scan_style = -> sx do
+    i, x = sx.shift
+    :style == i or fail "sanity - expected 'style' had '#{ i }'"
+    x
+  end
+  skip_final_style = -> sx do
+    d = scan_style[ sx ]
+    d.zero? or fail "sanity - expected '0' had '#{ d }'" ; nil
+  end
+
+  word_pool_class = nil
+  build_word_pool = -> local_width_limit do
+    word_pool_class[].new local_width_limit
+  end
+
+  word_pool_class = -> do
+    cls = ::Class.new.class_exec do
+      def initialize cols
+        @cols = sanitize cols ; @line_a = [] ; @width = 0 ; @word_a = []
+      end
+    private
+      def sanitize cols
+        5 > cols ? 80 : cols
+      end
+    public
+      def << word
+        @word = word
+        @wlen = word.string.length
+        @wlen.zero? or accept ; nil
+      end
+    private
+      define_method :accept do
+        @next_width = @width + @wlen
+        if @word_a.length.nonzero? && _LEADING_PUNCT_RX !~ @word.string
+          @sep = _SPACE_WORD ; @next_width += 1
+        else
+          @sep = nil
+        end
+        place ; nil
+      end
+      def place
+        case @next_width <=> @cols
+        when -1 ; add_word
+        when  0 ; add_word_and_flush_line
+        when  1 ; flush_line_and_add_word
+        end     ; nil
+      end
+      def flush_line_and_add_word
+        if @width.zero?
+          add_word_and_flush_line  # rather than breaking up an indiv. word
+        else
+          flush_line ; add_word
+        end
+      end
+      def add_word_and_flush_line
+        add_word ; flush_line
+      end
+      def add_word
+        w = @wlen
+        if @word_a.length.nonzero? and @sep
+          w += @sep.string.length
+          @word_a << @sep
+        end
+        @word_a << @word
+        @width += w ; nil
+      end
+      def flush_line
+        _line = get_flushed_line
+        @line_a << _line ; nil
+      end
+      def get_flushed_line
+        @word_a.length.zero? and fail 'sanity'
+        line = @word_a.map do |word|
+          if (( d = word.any_style_d ))
+            "\e[#{ d }m#{ word.string }\e[0m"
+          else
+            word.string
+          end
+        end * ''
+        @word_a.clear ; @width = 0
+        line
+      end
+    public
+      def gets
+        @line_a.length.nonzero? and @line_a.shift
+      end
+      def change_cols d
+        case d <=> @cols
+        when -1 ; reduce_cols d
+        when  1 ; increase_cols d
+        end ; nil
+      end
+    private
+      def reduce_cols d
+        d = sanitize d
+        case @width <=> d
+        when -1 ; @cols = d
+        when  0 ; @cols = d ; flush_line
+        when  1 ; reduce_cols_when_under_current_word_buffer d
+        end ; nil
+      end
+      def increase_cols d
+        @cols = d ; nil
+      end
+      def reduce_cols_when_under_current_word_buffer d  # #todo
+        stack = [] ; d_ = 0
+        begin
+          stack << ( word = @word_a.pop )
+          d_ += word.string.length
+          if @word_a.length.nonzero? and @word_a.last.is_space
+            sp = @word_a.pop  # not placed on stack
+            d_ += sp.string.length
+          end
+          curr_width = @width - d_
+        end while curr_width > d
+        @word_a.length.nzero? or flush_line
+        stack.each do |word_|
+          @word = word_
+          accept
+        end ; nil
+      end
+    public
+      def buffered_word_count
+        @word_a.length
+      end
+      def flush_any_line_in_progress
+        if @word_a.length.nonzero?
+          get_flushed_line
+        end
+      end
+      self
+    end
+    word_pool_class = -> { cls } ; cls
+  end
+
+  build_indenter = -> ind_s, lowstream_y do
+    ind = -> { ind_s }
+    e = ::Enumerator::Yielder.new do |midstream_s|
+      if midstream_s
+        lowstream_y << "#{ ind[] }#{ midstream_s }"
+      else
+        lowstream_y << midstream_s
+      end ; e
+    end
+    e.singleton_class.send :alias_method, :def, :define_singleton_method
+    e.def :change_indent do |s|
+      ind_s = s ; nil
+    end
+    e.def :change_subsequent_indent do |s|
+      one_time = ind_s ; ind_s = s
+      ind = -> do
+        ind = -> { ind_s }
+        one_time
+      end ; nil
+    end
+    e
+  end
+
+  ignoring = -> do
+    y << "(ignoring: \"#{ argv.shift( argv.length ) * ' ' }\")" ; nil
+  end
+
+  invite_string = -> do
+    "see #{ kbd[ "#{ progname[] } -h" ] } for help"
+  end
+
+  usage = -> msg do
+    y << msg
+    y << invite_string[]
+    _NO
+  end
+
+  begin
+    op.parse! argv
+  rescue ::OptionParser::ParseError => e
+  end
+
+  e and break usage[ e.message ]
+
+  if es
+    argv.length.nonzero? and ignoring[]
+    break es
+  end
+
+  scm_check = -> file_a do
+    require 'open3'
+    cmd_a = [ * %w( git status --porcelain ), * file_a ]
+    be_verbose and y << "(#{ cmd_a * ' ' })"
+    _, o, e, w = ::Open3.popen3( * cmd_a )
+    while (( s = e.gets ))
+      y << "(err: #{ s })" ; did = true
+    end
+    a = []
+    while (( s = o.gets ))
+      s.chomp! ; a << s
+    end
+    _es = w.value.exitstatus
+    if _es.nonzero?
+      y << "nonzero result status from git, exiting: #{ _es }"
+      break _es
+    end
+    if did
+      y << "unexpected errput, exiting"
+      break _NO
+    end
+    a.each do |_s|
+      status, file = _s.split ' ', 2
+      desc = case status
+             when 'M'  ; "has a 'modified' status"
+             when '??' ; "is not under version control"
+             else      ; "has a status of '#{ status }'"
+             end
+      y << "according to git, '#{ file }' #{ desc }"
+    end
+    if a.length.zero? then _PROCEDE else
+      y << "#{ progname[] } will not procede because of the above."
+      _NO
+    end
+  end
+
+  argv.length.zero? and break usage[ "expecting #{ kw[ 'search' ] }" ]
+  search = argv.shift
+  _DIGIT = /\A\d+\z/ ; _NEGDIGIT = /\A-?\d+\z/
+  _DIGIT.match(( from = argv.shift )) or break usage[ "expecting digit #{
+    }had #{ from.inspect } for #{ kw[ _1 ] }" ]
+  from = from.to_i
+  _NEGDIGIT.match(( to = argv.shift )) or break usage[ "expecting digit #{
+    }had #{ to.inspect } for #{ kw[ _2 ] }" ]
+  to = to.to_i
+
+  file_a = argv ; argv = nil
+  if stdin.tty?
+    file_a.length.zero? and break usage[ "expecting #{ kw[ 'file' ] } #{
+      }or input from stdin" ]
+
+    es = scm_check[ file_a ] and break es
+
+    require 'fileutils' ; require 'pathname' ; require 'tmpdir'
+
+    input_output_p_a_a = file_a.map do |file|
+      _input = -> do
+        ::File.open file, 'r'
+      end
+      opn = fh = nil
+      _output = -> do
+        opn = ::Pathname.new "#{ ::Dir.tmpdir }/_my_foo_"
+        fh = opn.open 'w'
+        fh
+      end
+      _conclude = -> lines_d do
+        fh.close
+        if lines_d.zero?
+          stderr.puts "no change, skipping: #{ file }"
+        else
+          ::FileUtils.mv opn.to_s, file, verbose: be_verbose, noop: is_dry
+          if be_verbose
+            y << "(#{ lines_d } lines changed#{ ' (dry run)' if is_dry })"
+          end
+        end
+        _PROCEDE
+      end
+      [ _input, _output, _conclude ]
+    end
+  else
+    file_a.length.nonzero? and break usage[ "cannot accept #{ kw[ 'file'] } #{
+      }in stdin mode - #{ file_a[ 0 ] }" ]
+    _conclude = -> d do
+      be_verbose and stderr.puts "(#{ d } line(s) matched)"
+      _PROCEDE
+    end
+    input_output_p_a_a = [ [ -> { stdin }, -> { stdout }, _conclude ] ]
+  end
+
+  require 'strscan'
+  scn = ::StringScanner.new search
+
+  d = scn.skip_until %r(#{ ::Regexp.escape repl_str })
+  d or break usage[ "did not find #{ kw[ 'replstr' ] } \"#{ repl_str }\" #{
+   }anywhere in #{ kw[ 'search' ] } \"#{ search }\"" ]
+
+  if 0 < d
+    first_part = search[ 0, ( d - repl_str.length ) ]
+  end
+  if d < search.length
+    last_part = search[ d .. -1 ]
+  end
+
+  _STARTS_WITH_WORD_CHAR = /\A\w/
+  _ENDS_WITH_WORD_CHAR = /\w\z/
+  if match_whole_words
+    _STARTS_WITH_WORD_CHAR =~ first_part and w0 = '\\b'
+    _ENDS_WITH_WORD_CHAR =~ last_part and wz = '\\b'
+  end
+
+  rx = %r(#{ w0 }#{ ::Regexp.escape "#{ first_part }" }(\d+)#{
+    }#{ ::Regexp.escape "#{ last_part }" }#{ wz })
+
+  rx_ = /\A(?:(?!#{ rx.source }).)+/
+
+  be_verbose and y << "(regex: /#{ rx.source }/)"
+
+  delta = to - from
+  is_in_range = if 0 < delta then
+    -> digit do
+      from <= digit
+    end
+  else
+    -> digit do
+      to <= digit
+    end
+  end
+
+  process_stream_pair = -> input_lines, output_stream, final_p do
+    _y = [] ; lineno = 1 ; num_lines_changed = 0
+    while (( line = input_lines.gets ))
+      lineno += 1
+      scn.string = line ; did_change = false
+      begin
+        befor = _y.length
+        s = scn.scan rx_
+        s and _y << s
+        s = scn.scan rx
+        if s
+          md = rx.match s
+          d = md[ 1 ].to_i
+          if is_in_range[ d ]
+            did_change = true
+            d += delta
+            _repl = "#{ first_part }#{ d }#{ last_part }"
+            _y << _repl
+          else
+            _y << s
+          end
+        end
+        scn.eos? and break
+      end until befor == _y.length
+      if did_change
+        num_lines_changed += 1
+        s = scn.rest and _y << s
+        newline = "#{ _y * '' }".chomp
+        if be_verbose
+          hdr = "(line %d)" % lineno
+          stderr.puts "#{ hdr } < #{ line }"
+          stderr.puts "#{ ' ' * hdr.length } > #{ newline }"
+        end
+        output_stream.puts newline
+      else
+        _y.clear
+        output_stream.puts line
+      end
+    end
+    final_p[ num_lines_changed ]
+  end
+
+  input_output_p_a_a.each do |input_pn_p, output_pn_p, finalize_p|
+    input_stream = input_pn_p[]
+    output_stream = output_pn_p[]
+    es = process_stream_pair[ input_stream, output_stream, finalize_p ]
+    es and break
+  end
+  es and break es
+  y << 'done.'
+  _OK
+
+end[ ::ARGV, $stdin, $stdout, $stderr, $PROGRAM_NAME ]
