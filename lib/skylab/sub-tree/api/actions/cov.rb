@@ -14,22 +14,28 @@ module Skylab::SubTree
     MetaHell::FUN::Fields_[ :client, self, :method, :absorb, :field_i_a,
                             [ :list_as, :path, :be_verbose ] ]
 
-    def initialize request_client
-      super
-      @last_error_message = @sub_path_a = @lister = nil
+    def initialize
+      @error_was_emitted = @sub_path_a = @lister = nil
+    end
+
+    def init_for_invocation_with_services svcs
+      ep, ip = svcs.at :error, :info
+      ip and on_info ip
+      ep and on_error ep
+      self
     end
 
     def prepare *a
       absorb( *a )
       normalize_arg_pn @path
-      if ! @last_error_message && @list_as
+      if ! @error_was_emitted && @list_as
         normalize_list_as
       end
       nil
     end
 
     def execute
-      if ! @last_error_message
+      if ! @error_was_emitted
         if @list_as
           r = execute_lister_and_resolve
           r and r = send( r )  # e.g `tree` - same as below
@@ -50,7 +56,7 @@ module Skylab::SubTree
       use_x = x || ''
       begin
         (( md = STRIP_TRAILING_RX_.match use_x )) or break error "your #{
-            }path looks funny - #{ x.inspect }"
+          }path looks funny - #{ x.inspect }"
         @arg_pn = ::Pathname.new md[ :no_trailing ]
       end while nil
       nil
@@ -61,7 +67,7 @@ module Skylab::SubTree
     def normalize_list_as
       @lister = self.class::Lister_.new :emit_p, method( :emit ),
         :list_as, @list_as, :hubs, hub_a,
-        :did_error_p, -> { @last_error_message }
+        :did_error_p, -> { @error_was_emitted }
       @lister.normalize
     end
 
@@ -75,8 +81,7 @@ module Skylab::SubTree
 
     def get_hubs
       ::Enumerator.new do |y|
-        test_dir_a = test_dirs.to_a
-        test_dir_a.each do |dir|
+        err = upstream.test_dir_pathnames.each do |dir|
           baseglob = GLOB_H_.fetch dir.basename.to_s
           sub_dir = dir
           @sub_path_a and sub_dir = dir.join( @sub_path_a * SEP_ )
@@ -97,77 +102,73 @@ module Skylab::SubTree
             end )
           nil
         end
+        error err if err
         nil
       end
     end
-
+    #
     GLOB_H_ = SubTree::PATH.glob_h
 
-    # result is an enumerator over every pathname that looks like it is
-    # a test directory from our `path`
-
-    def test_dirs
-      ::Enumerator.new do |y|
-        begin
-          (( pn = @arg_pn )).exist? or break error "no such #{
-            }directory: #{ escape_path pn }"
-
-          pn.directory? or break error "single file trees not yet #{
-            }implemented (for #{ escape_path pn })"
-
-          TEST_DIR_NAME_A_.include?( pn.basename.to_s ) and break( y << pn )
-            # if pn looks like foo/bar/test then we are done
-
-          (( pn_ = mutate_if_test_subnode )) and break( y << pn_ )
-            # if pn looks like test/cli then
-
-          find_with_find y
-
-        end while nil
+    def upstream
+      @upstream ||= begin
+        if @arg_pn
+          self.class::Upstream_::From_::Filesystem_.new :arg_pn, @arg_pn,
+            :info_p, get_info_p, :be_verbose, ( @be_verbose || false )
+        else
+          fail "implement me"
+        end
       end
     end
 
-    TEST_DIR_NAME_A_ = SubTree::Constants::TEST_DIR_NAME_A
-
-    def mutate_if_test_subnode
-      begin
-        SOFT_RX_ =~ @arg_pn.to_s or break    # is test dir in the path?
-        curr = @arg_pn ; seen_a = [ ] ; found = false
-        until Stop_at_pathname_[ curr ]
-          bn = curr.basename
-          HARD_RX_ =~ bn.to_s and break( found = true )  # is the test dir?
-          seen_a << bn.to_s
-          curr = curr.dirname
-        end
-        found or break
-        @sub_path_a and fail "sanity"  # #todo - when?
-        @sub_path_a = seen_a.reverse # empty iff test dir was first dir
-        r = curr
-      end while nil
-      r
+    def get_info_p
+      -> s { emit :info, s }
     end
-
-    def find_with_find y
-      self.class::Finder_[ :yielder, y, :error_p, method( :error ),
-        :info_p, -> s { emit :info, s } , :find_in_pn, @arg_pn,
-        :be_verbose, @be_verbose ]
-    end
-
-    SOFT_RX_ = %r{(?:#{
-      TEST_DIR_NAME_A_.map( & ::Regexp.method( :escape ) ) * '|'
-    })}
-
-    HARD_RX_ = %r{ \A #{ SOFT_RX_.source } \z }x
 
     def tree
       if hub_a.length.zero?
-        error "Couldn't find test directory: #{ pre escape_path(
-          @arg_pn.join SubTree::PATH.test_dir_names_moniker ) }"
+        error No_Directory__.new @arg_pn
         false
       else
         self.class::Treeer_[ :hub_a, hub_a, :arg_pn, @arg_pn,
           :card_p, -> card { emit :tree_line_card, card } ]
       end
     end
+
+    class Message_
+      class << self ; alias_method :orig_new, :new end
+      def self.new &p
+        ::Class.new self do
+          const_set :P__, p
+          class << self ; alias_method :new, :orig_new end
+          self
+        end
+      end
+      def initialize * a
+        @a = a ; nil
+      end
+      attr_reader :a
+      def p ; self.class::P__ end
+    end
+
+    No_Directory__ = Message_.new do |pn|
+      "Couldn't find test directory: #{ ick escape_path(
+        pn.join SubTree::PATH.test_dir_names_moniker ) }"
+    end
+
+    def say * actual_arg_a, & p
+      fail 'whet'
+      Messages_[ p ].new( * actual_arg_a )
+    end
+
+    TEST_DIR_NAME_A_ = SubTree::Constants::TEST_DIR_NAME_A
+    #
+    SOFT_RX_ = %r{(?:#{
+      TEST_DIR_NAME_A_.map( & ::Regexp.method( :escape ) ) * '|'
+    })}
+    #
+    HARD_RX_ = %r{ \A #{ SOFT_RX_.source } \z }x
+
+    Cov = self
+
   end
 end

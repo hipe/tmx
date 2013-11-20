@@ -21,7 +21,7 @@ module Skylab::SubTree
       end
 
       def add_attribute i, x
-        (( @attribute_box ||= SubTree::Services::Basic::Box.new )).
+        (( @attribute_box ||= Basic::Box.new )).
           add i, x
         nil
       end

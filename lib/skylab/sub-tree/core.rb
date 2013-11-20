@@ -7,6 +7,7 @@ module Skylab::SubTree
 
   ::Skylab::MetaHell::FUN::Import_constants[ ::Skylab, [
     :Autoloader,
+    :Basic,
     :SubTree,
     :Headless,  # styles, parameter controller
     :MetaHell,

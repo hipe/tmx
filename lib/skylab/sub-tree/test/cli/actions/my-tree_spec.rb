@@ -2,7 +2,7 @@ require_relative 'my-tree/test-support'
 
 module Skylab::SubTree::TestSupport::CLI::Actions::My_Tree
 
-  describe "#{ SubTree }::CLI::Actions::My_Tree" do
+  describe "[st] CLI actions my-tree" do
 
     extend TS_
 
@@ -16,30 +16,30 @@ module Skylab::SubTree::TestSupport::CLI::Actions::My_Tree
     it "1.2 : one unrec opt : msg / usage / invite" do
       result = invoke '-x'
       nonstyled.should match(/\Ainvalid option: -x\z/)
-      styled.should match( USAGE_RX_ )
-      styled.should match( INVITE_RX_ )
+      styled.should match USAGE_RX_
+      styled.should match INVITE_RX_
       no_more_lines
-      result.should eql( 1 )
+      result.should eql 1
     end
 
     it "1.4 one rec opt : -h (as prefix) - beautiful help screen" do
       cmd_a = '-h', "#{ TS_::SUT_CMD_SETTING_.value * ' ' }"
       r = super_invoke( * cmd_a )
       expect_beautiful_help
-      r.should eql( 0 )
+      r.should be_zero
     end
 
     it "1.4 one rec opt : -h (as postfix) - beautiful help screen" do
       r = invoke '-h'
       expect_beautiful_help
-      r.should eql( 0 )
+      r.should be_zero
     end
 
     OPT_SUMMARY_FIRST_LINE_RX_ =
       /\A[ ]{3,}-[a-zA-Z], --(?:(?!>  ).)+[^ ][ ]{2,}[^ ]/  # ensure some desc
 
     def expect_beautiful_help
-      styled.should match( USAGE_RX_ )
+      styled.should match USAGE_RX_
       any_blanks
       header 'description'
       nonstyled.should match( /\A[ ].+\binspired\b.+\btree\b/i )

@@ -21,7 +21,7 @@ module Skylab::SubTree::TestSupport::CLI::Actions::Cov
   # (this used to be home to "dark hack" [#ts-010] but we modernized it)
 
 # lose indent 1x
-describe "#{ SubTree } CLI action: tree" do   # Quickie compatible !
+describe "[st] CLI actions cov" do
 
   extend SubTree::TestSupport::CLI
 
@@ -35,6 +35,10 @@ describe "#{ SubTree } CLI action: tree" do   # Quickie compatible !
     rx = ::Regexp.escape TestSupport::FUN._spec_rb[]
     [ /#{ rx }\z/, %r{\A\./#{ PN_ }/.+#{ rx }\z} ]
   end.call
+
+  def expect_no_more_lines
+    @emit_spy.emission_a.length.zero? or fail "expected no more lines"
+  end
 
   it "show a list of matched test files only." do
     cd SubTree.dir_pathname.dirname do         # cd to lib/skylab ..
@@ -73,9 +77,10 @@ describe "#{ SubTree } CLI action: tree" do   # Quickie compatible !
   end
 
   it "Couldn't find test directory: foo/bar/[test|spec|features]" do
-    argv CMD_, SubTree.dir_pathname.join('models').to_s
+    a = CMD_, SubTree.dir_pathname.join( 'models' ).to_s
+    argv( * a )
     line.should match(/\ACouldn't find test directory.+\[test\|spec\|features/)
-    result.should eql( 1 )
+    result.should eql SubTree::CLI::EXITSTATUS_FOR_ERRROR__
   end
 
   FIXTRS_ = SubTree.dir_pathname.join( 'test-fixtures' )
@@ -90,6 +95,7 @@ describe "#{ SubTree } CLI action: tree" do   # Quickie compatible !
       line.should match( /\Aone, test[ ]+\e\[#{ WHITE_ }m\[\+\|-\]\e\[0m\z/ )
       line = shift_raw_line
       line.should eql( " └foo.rb, foo_spec.rb  \e[#{ GREEN_ }m[+|-]\e[0m" )
+      expect_no_more_lines
     end
 
     WHITE_ = 37 ; GREEN_ = 32
@@ -99,7 +105,7 @@ describe "#{ SubTree } CLI action: tree" do   # Quickie compatible !
     end
   end
 
-  ::Skylab::TestSupport::Stderr_[].puts( ::Skylab::Headless::CLI::Pen::FUN.stylize[ "    <<< SKIPPING COV TREE INTEGRATION >>>", :red ] )
+  ::Skylab::TestSupport::Stderr_[].puts( ::Skylab::Headless::CLI::Pen::FUN::Stylize[ [ :red ], "    <<< SKIPPING COV TREE INTEGRATION >>>" ] )
   false and it "LOOK AT THAT BEAUTIFUL COV TREE" do
     debug!
     cd SubTree.dir_pathname.dirname.to_s do
@@ -114,6 +120,10 @@ describe "#{ SubTree } CLI action: tree" do   # Quickie compatible !
     end
     names.uniq.should eql( [ :payload ] )
     result.should eql( 0 )
+  end
+
+  def build_client
+    build_client_for_both
   end
 end
 # gain indent 1x

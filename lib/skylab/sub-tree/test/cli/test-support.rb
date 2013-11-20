@@ -118,9 +118,12 @@ module Skylab::SubTree::TestSupport::CLI
       e = emission_a.shift
       if e
         @names.push e.stream_name
-        txt = e.payload_x
-        ::String === txt or fail "::String? - #{ txt.class }"
-        p[ txt ]
+        ev = e.payload_x
+        _s = if ev.respond_to? :ascii_only? then ev else
+          _exag = SubTree::CLI.some_expression_agent
+          _exag.calculate( * ev.a, & ev.p )
+        end
+        p[ _s ]
       end
     end
 
@@ -163,6 +166,8 @@ module Skylab::SubTree::TestSupport::CLI
     def emission_a
       @emission_a ||= begin
         case @io_mode
+        when :three_streams
+          digest_triad_into_emission_a
         when :event
           @emit_spy.emission_a
         when :both
@@ -173,13 +178,23 @@ module Skylab::SubTree::TestSupport::CLI
     end
 
     def digest_both_into_emission_a
-      m = @emit_spy.emission_a
+      a = @emit_spy.emission_a
+      digest_triad_into a
+      a
+    end
+
+    def digest_triad_into_emission_a
+      digest_triad_into(( y = [ ] ))
+      y
+    end
+
+    def digest_triad_into y
       t = @triad_spy ; @triad_spy = :digested
       o = t.outstream ; e = t.errstream ; t[ :outstream ] = t[ :errstream ] = nil
       [ [ :out, o ], [ :err, e ] ].each do |(i, io)|
-        m.concat io.string.split( "\n" ).map { |s| Emission_[ i, s ] }
+        y.concat io.string.split( "\n" ).map { |s| Emission_[ i, s ] }
       end
-      m
+      nil
     end
 
     Emission_ = ::Struct.new :stream_name, :payload_x

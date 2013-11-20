@@ -1081,12 +1081,24 @@ module Skylab::Porcelain::Legacy
 
   private
 
-    def ensure_three_streams
-      i, o, e = @three_streams_p[]
-      @instream ||= i
-      @paystream ||= o
-      @infostream ||= e
-      nil
+    def some_instream
+      @three_streams_p and collapse_three_streams
+      @instream
+    end
+
+    def some_paystream
+      @three_streams_p and collapse_three_streams
+      @paystream
+    end
+
+    def some_infostream
+      @three_streams_p and collapse_three_streams
+      @infostream
+    end
+
+    def collapse_three_streams
+      i, o, e = @three_streams_p[] ; @three_streams_p = nil
+      @instream ||= i ; @paystream ||= o ; @infostream ||= e ; nil
     end
 
     # non-pub-sub variant of `emit` gets "turned on" elsewhere
@@ -1114,6 +1126,16 @@ module Skylab::Porcelain::Legacy
       # yes a modality client *could* have its own action sheet but i thought
       # we did this already over there in h.l. yes we did. meearrg.
     end
+
+    def exitstatus_for_error
+      self.class::EXITSTATUS_FOR_ERRROR__
+    end
+    EXITSTATUS_FOR_ERRROR__ = 42  # for findability, douglas adams tribute
+
+    def exitstatus_for_normal
+      self.class::EXITSTATUS_FOR_NORMAL__
+    end
+    EXITSTATUS_FOR_NORMAL__ = 0
   end
 
 

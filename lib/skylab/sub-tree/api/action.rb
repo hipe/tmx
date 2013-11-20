@@ -15,7 +15,7 @@ module Skylab::SubTree
 
   class API::Action
 
-    extend SubTree::Core::Action
+    SubTree::Core::Action::Anchored_Normal_Name_[ self ]
 
     ACTIONS_ANCHOR_MODULE = SubTree::API::Actions
 
@@ -23,11 +23,16 @@ module Skylab::SubTree
 
     event_factory PubSub::Event::Factory::Isomorphic.new( API::Events )
 
+    def initialize
+      @error_was_emitted = false
+      nil
+    end
+
   private
 
-    def error msg
-      @last_error_message = msg
-      emit :error, msg
+    def error message_x
+      @error_was_emitted ||= true
+      emit :error, message_x
       false
     end
   end

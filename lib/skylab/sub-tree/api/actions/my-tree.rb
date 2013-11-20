@@ -240,8 +240,6 @@ module Skylab::SubTree
       is_valid
     end
 
-    Basic = Face::Services::Basic
-
     #  ~ abstraction candidates ~
 
   public
@@ -284,7 +282,7 @@ module Skylab::SubTree
         when 0 ; bork "no input"
         when 1 ; from_one( have_a.fetch 0 )
         else   ; bork -> do
-            "can't read input from#{ both have_a } #{
+            "can't read input from #{ both have_a }#{
               }#{ and_ have_a.map( & method( :par ) ) }"
           end
         end

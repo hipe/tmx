@@ -19,11 +19,19 @@ module Skylab::SubTree
     MetaHell::FUN::Fields_[ :client, self, :method, :absorb_params,
       :field_i_a, [ :list_as, :path, :be_verbose ] ]
 
+    def initialize
+      @error_count = 0
+    end
+
+    def init_for_invocation svcs
+      @infostream, @cli_client_emit_p = svcs.at :errstream, :emit_proc
+      self
+    end
+
     def invoke param_h
       absorb_params( * param_h.flatten )
-      o = SubTree::API::Actions.const_fetch( local_normal_name ).new self
-      o.on_error method( :error )
-      o.on_info method( :info )
+      o = corresponding_api_action_class.new.
+        init_for_invocation_with_services get_services
       o.prepare :list_as, @list_as, :path, @path, :be_verbose, @be_verbose
       r = false
       begin
@@ -50,10 +58,34 @@ module Skylab::SubTree
 
   private
 
+    def get_services
+      Services_For_API_Action_.new self
+    end
+    #
+    Services_For_API_Action_ = SubTree::Services::Face::Services_::Iambic_.
+      new :error, -> { method :error_notify },
+          :info,  -> { method :info_notify }
+    #
+    p = Basic::Method::Curry::Unbound.new instance_method :emit_from_parent
+    #
+    define_method :_error_notify, & p.curry[ :error ]
+    #
+    def error_notify message_x
+      @error_count += 1
+      _error_notify message_x
+      nil
+    end
+    #
+    define_method :info_notify, & p.curry[ :info ]
+
+    def some_expression_agent
+      SubTree::CLI.some_expression_agent
+    end
+
     def list_as_list o
       o.on_test_file do |e|
         full_pathname = e.hub.get_sub_hub_pn.join e.short_pathname
-        payload "#{ full_pathname }"           # (why use escape_path? it
+        payload "#{ full_pathname }"           # (why use e-scape_path? it
       end                                      # looks fine just to use the path
       show_number o                            # header that the user provided.)
       nil
@@ -73,32 +105,48 @@ module Skylab::SubTree
     end
 
     def show_number o
-      o.on_number_of_test_files do |num|
-        info "(#{ num } test file#{ s num } total)"
-      end
-    end
-
-    def wire_to_render_trees o
-      o.on_info_tree do |st|
-        @infostream.puts "#{ em "#{ st.label }:" }"
-        @infostream.puts st.tree.to_text
+      o.on_number_of_test_files do |d|
+        info_notify( some_expression_agent.calculate do
+          "(#{ d } test file#{ s d } total)"
+        end )
         nil
       end
-      card_a = [ ]
-      o.on_tree_line_card( & card_a.method( :<< ) )
-      @card_a = card_a
       nil
     end
 
-    BRANCH_A = [ :branch ].freeze
+    def wire_to_render_trees o
+      io = @infostream
+      some_expression_agent.calculate do
+        o.on_info_tree do |st|
+          io.puts "#{ em "#{ st.label }:" }"
+          io.puts st.tree.to_text
+        end
+      end
+      o.on_tree_line_card( & (( @card_a = [ ] )).method( :<< ) )
+      nil
+    end
 
-    def prerender_tree_line card
+    def render_tree_lines
+      event_a = @card_a
+      @expression_agent ||= some_expression_agent
+      a_a = event_a.map( & method( :treeline_and_glyphage_for_card ) )
+      max = a_a.reduce 0 do |m, x| m < (( y = x.first.length )) ? y : m end
+      fmt = "%-#{ max }s  %s"
+      a_a.each do |a|
+        payload fmt % a
+      end
+      true
+    end
+    #
+    define_method :payload, & p.curry[ :payload ]
+    #
+    def treeline_and_glyphage_for_card card
       n = card.node
       a, b = self.class.side_a.map { |s| n.tag_a.include? s }
-      indicator = "[#{a ? '+':' '}|#{b ? '-':' '}]"
-      use_types = n.is_leaf ? n.tag_a : BRANCH_A
-      color = self.class.lookup_color_for_tag_a use_types
-      indicator = send(color, indicator) if color
+      glyphage = "[#{ a ? '+' : ' '}|#{ b ? '-' : ' ' }]"
+      use_types = n.is_leaf ? n.tag_a : BRANCH_A_
+      color_i = self.class.lookup_color_for_tag_a( use_types ) and
+        glyphage = @expression_agent.stylize( color_i, glyphage )
       if 1 < n.tag_a.length
         case (( a = n._isomorphic_key_a )).length
         when 0, 1, 2
@@ -109,19 +157,10 @@ module Skylab::SubTree
       else
         slug_s = n.slug
       end
-      [ "#{ card.prefix }#{ slug_s }", indicator ]  # (escape codes have width)
+      [ "#{ card.prefix }#{ slug_s }", glyphage ]  # (escape codes have width)
     end
-
-    def render_tree_lines
-      event_a = @card_a
-      matrix = event_a.map( & method( :prerender_tree_line ) )
-      max = matrix.reduce( 0 ) { |m, x| (y = x.first.length) > m ? y : m }
-      fmt = "%-#{ max }s  %s"
-      matrix.each do |a|
-        payload( fmt % a )
-      end
-      true
-    end
+    #
+    BRANCH_A_ = [ :branch ].freeze
   end
 
   class << CLI::Actions::Cov

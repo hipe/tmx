@@ -243,9 +243,7 @@ module Skylab::Headless::SubClient
 
     fun = -> do
       # ( we've got to lazy-load it b.c of a circular dependency in the files )
-      x = Headless::NLP::EN::Minitesimal::FUN
-      fun = -> { x }
-      x
+      x = Headless::NLP::EN::Minitesimal::FUN ; fun = -> { x } ; x
     end
 
   end

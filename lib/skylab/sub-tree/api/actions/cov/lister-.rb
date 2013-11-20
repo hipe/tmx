@@ -21,7 +21,7 @@ module Skylab::SubTree
         r
       end
 
-      class Box_ < SubTree::Services::Basic::Box
+      class Box_ < Basic::Box
         def render
           case length
           when 0 ;

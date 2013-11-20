@@ -90,6 +90,24 @@ module Skylab::Basic
       def get_arity
         Arity.from_parameters parameters
       end
+
+      class Unbound
+        def initialize um
+          0 < um.arity or raise ::ArgumentError, "for now, arity must be #{
+            }greater than or equal to 1 (had #{ um.arity }) for method #{
+             }'#{ um.name }'"
+          @unbound_method = um
+          @curry = method :build_curried_method
+        end
+        attr_reader :curry
+      private
+        def build_curried_method * a
+          um = @unbound_method
+          -> * a_ do
+            um.bind( self ).call( * a, * a_ )
+          end
+        end
+      end
     end
 
     class Arity

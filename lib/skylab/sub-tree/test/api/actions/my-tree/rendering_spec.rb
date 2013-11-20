@@ -4,7 +4,7 @@ require_relative 'rendering/test-support'
 
 module ::Skylab::SubTree::TestSupport::API::Actions::My_Tree::Rendering
 
-describe "#{ SubTree }::API::Actions::My_Tree" do  # historic hiccup borrow one
+describe "[st] API actions my-tree" do  # historic hiccup borrow one
 
   extend TS_
 

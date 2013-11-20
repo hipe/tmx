@@ -1,36 +1,24 @@
 module Skylab::SubTree
 
   module Core::Action
-    def self.extended mod # good ol' [#sl-111]
-      mod.extend Core::Action::ModuleMethods
-      mod.send :include, Core::Action::InstanceMethods
-    end
-  end
 
-
-  module Core::Action::ModuleMethods
-    include Headless::Action::ModuleMethods
-
-    methodize = Autoloader::FUN.methodize
-
-    define_method :local_normal_name do # ::Blah::Actions::Foo::X -> [:foo, :x]
-      @local_normal_name ||= begin
-        amn = actions_anchor_module.name
-        0 == name.index( amn ) or fail 'sanity'
-        rest = name[ (amn.length + 2) .. -1 ]
-        rest.split( '::' ).map { |s| methodize[ s ] }
+    Anchored_Normal_Name_ = -> mod do  # ::Blah::Actions::Foo::X -> [:foo, :x]
+      mod.module_exec do
+        def anchored_normal_name
+          self.class.anchored_normal_name
+        end
+        define_singleton_method :anchored_normal_name, & Anchored_normal_name__
       end
+      nil
     end
-  end
-
-
-  module Core::Action::InstanceMethods
-    include Core::SubClient::InstanceMethods
-
-  private
-
-    def local_normal_name
-      self.class.local_normal_name
+    #
+    Anchored_normal_name__ = -> do
+      @anchored_normal_name ||= begin
+        head_s = self::ACTIONS_ANCHOR_MODULE.name ; my_s = name
+        0 == my_s.index( head_s ) or fail "sanity"
+        my_s[ head_s.length + 2 .. -1 ].split( '::' ).
+          map( & Autoloader::FUN.methodize ).freeze
+      end
     end
   end
 end

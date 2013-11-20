@@ -1,6 +1,6 @@
 require_relative 'test-support'
 
-describe "#{ ::Skylab::SubTree } CLI" do
+describe "[st] CLI core" do
 
   ts = ::Skylab::SubTree::TestSupport
 

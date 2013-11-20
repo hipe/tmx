@@ -4,7 +4,6 @@ module Skylab::SubTree
 
     stdlib, subsys = FUN.at :require_stdlib, :require_subsystem
     o = { }
-    o[:Basic] = subsys
     o[:Face] = subsys
     o[:FileUtils] = stdlib
     o[:InformationTactics] = subsys

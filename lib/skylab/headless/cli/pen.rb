@@ -116,7 +116,7 @@ module Skylab::Headless
       include InstanceMethods
     end
 
-    MINIMAL = Minimal.new
+    SERVICES = MINIMAL = Minimal.new
 
   end
 end

@@ -86,9 +86,11 @@ module Skylab
 
     _ = [nil, :strong, * Array.new(29), :red, :green, * Array.new(3), :cyan]
     MAP = Hash[ * _.each_with_index.map { |sym, idx| [sym, idx] if sym }.compact.flatten ]
-    def stylize str, *styles ; "\e[#{styles.map{ |s| MAP[s] }.compact.join(';')}m#{str}\e[0m" end # [#sc-001]
-    def pre s ; stylize(s, :green)  end
-    def hdr s ; stylize(s, :strong, :green) end
+    o = -> x, s do  # [#hl-029]
+      "\e[#{ [ * x ].map( & MAP.method( :[] ) ).compact * ';' }m#{ s }\e[0m"
+    end.curry
+    define_method :pre, & o[ :green ]
+    define_method :hdr, & o[ [ :strong, :green ] ]
   end
 end
 

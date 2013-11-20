@@ -2,22 +2,22 @@ module Skylab::SubTree
 
   class CLI::Action
 
-    extend SubTree::Core::Action
-
-    include CLI::Styles
+    SubTree::Core::Action::Anchored_Normal_Name_[ self ]
 
     ACTIONS_ANCHOR_MODULE = SubTree::CLI::Actions
 
-    def initialize supernode
-      @infostream = supernode.infostream
-      @pen = supernode.pen
-      super
-    end
-
   private
 
-    def api_action_class
-      API::Actions.const_fetch local_normal_name
+    def corresponding_api_action_class
+      SubTree::API::Actions.const_fetch anchored_normal_name
+    end
+
+    def emit_from_parent stream_i, message_x
+      if message_x.respond_to? :render_with
+        message_x = message_x.render_with some_expression_agent
+      end
+      @cli_client_emit_p[ stream_i, message_x ]
+      nil
     end
   end
 end

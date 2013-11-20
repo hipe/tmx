@@ -2,25 +2,9 @@ require_relative 'core'
 
 module Skylab::SubTree
 
-  class CLI # (fwd decl. of a class also used as a namespace [#sl-109])
-  end
-
-  module CLI::Styles
-    include Headless::NLP::EN::Methods
-    include Headless::CLI::Pen::Methods  # `stylize`
-
-    def pre x
-      stylize x.to_s, :green
-    end
-  end
-
   class CLI
 
   private
-
-    include CLI::Styles
-
-    define_method :escape_path, & Headless::CLI::PathTools::FUN.pretty_path # yay
 
     extend PubSub::Emitter  # do this before you extend legacy, it gives you
                             # a graph
@@ -31,11 +15,45 @@ module Skylab::SubTree
       nil
     end
 
+    def get_services
+      Client_Services_.new self
+    end
+
+    Client_Services_ = SubTree::Services::Face::Services_::Iambic_.
+      new :emit_proc, -> { method :emit },
+          :instream, -> { some_upstream },
+          :errstream, -> { some_infostream },
+          :outstream, -> { some_paystream }
+
   public
 
     def pen
-      Headless::CLI::Pen::MINIMAL
+      Headless::CLI::Pen::SERVICES
     end
+
+    -> do
+      p = -> do
+        class Expression_Agent__
+          def initialize _ ; end
+          alias_method :calculate, :instance_exec
+        private
+          Headless::SubClient::EN_FUN[ self, :private, %i( s ) ]
+          o = Headless::CLI::Pen::FUN::Stylize.curry
+          define_method :em, o[ %i( green ) ]
+          define_method :escape_path, Headless::CLI::PathTools::FUN.pretty_path
+          define_method :ick, Basic::FUN::Inspect__.curry[ 60 ]
+        public
+          def stylize *a
+            _s = a.pop
+            Headless::CLI::Pen::FUN::Stylize[ a, _s ]
+          end
+        end
+        r = Expression_Agent__.method :new ; p = -> { r } ; r
+      end
+      define_singleton_method :some_expression_agent,
+        MetaHell::FUN::Puff_constant_reader_[
+          true, p[], :EXPRESSION_AGENT__, self, :_no_arg_ ]
+    end.call
 
     # --*--                         DSL ZONE                              --*--
 
@@ -57,7 +75,7 @@ module Skylab::SubTree
     argument_syntax '[<path> [..]]'
 
     def my_tree *path, _
-      i, o, e = @three_streams_p.call ; f = my_tree_front
+      i = @instream ; o = @outstream ; e = @errstream ; f = my_tree_front
       if path.length.zero?
         path << ( ::Dir.pwd if i.tty? && ! @param_h[ :file ] )  # yes nil
       end
@@ -67,9 +85,9 @@ module Skylab::SubTree
       r = f.flush
       if false == r
         @legacy_last_hot.invite
-        status_error
+        exitstatus_for_error
       else
-        status_normal
+        exitstatus_for_normal
       end
     end
 
@@ -91,8 +109,7 @@ module Skylab::SubTree
     argument_syntax '<in-dir> <out-dir> <list>'
 
     def st in_dir, out_dir, list, param_h
-      ensure_three_streams
-      SubTree::API::Actions::Sub_Tree.new( :err, @infostream,
+      SubTree::API::Actions::Sub_Tree.new( :err, some_infostream,
         :is_dry_run, false, :do_force, param_h[:do_force],
         :in_dir, in_dir, :out_dir, out_dir, :list, list ).execute
     end
@@ -134,7 +151,6 @@ module Skylab::SubTree
   private
 
     def parse_dirstat prefix, file
-      ensure_three_streams
       @param_h[ :prefix ] = prefix
       if file && (( x = @param_h[ :mode_a ] ))
         bork "can't have both <file> and \"#{ x.last }\""
@@ -146,7 +162,7 @@ module Skylab::SubTree
 
     def execute_dirstat a
       SubTree::API::Actions::Dirstat.new(
-        :sin, @instream, :sout, @paystream, :serr, @infostream,
+        :sin, @instream, :sout, @paystream, :serr, @errstream,
         :program_name, @legacy_last_hot.send( :normalized_invocation_string ),
         * a
       ).execute
@@ -190,16 +206,15 @@ module Skylab::SubTree
       end
     end
 
-    def cov path=nil, opts
-      param_h = opts.merge path: path
-      klass = CLI::Actions.const_fetch :cov  # grease the gears
-      hot = klass.new self
-      res = hot.invoke param_h
-      if false == res
+    def cov path=nil, _opts
+      @param_h[ :path ] = path
+      hot = CLI::Actions.const_fetch( :cov ).new.
+        init_for_invocation get_services
+      if false == (( r = hot.invoke @param_h ))
         invite
-        res = status_error
+        r = exitstatus_for_error
       end
-      res
+      r
     end
 
     # --*--
@@ -231,6 +246,6 @@ module Skylab::SubTree
       :hello_from_sub_tree
     end
 
-    Client = self  # #tmx-compat
+    Client = self  # #comport:tmx
   end
 end

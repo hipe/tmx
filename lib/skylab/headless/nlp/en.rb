@@ -89,7 +89,7 @@ module Skylab::Headless
     end
 
     o[:both] = -> x do
-      ' both' if 2 == ( ::Numeric === x ? x : x.length )
+      'both ' if 2 == ( ::Numeric === x ? x : x.length )
     end
 
     -> do  # `inflect` - goofy experiment for low-commitment inflection
