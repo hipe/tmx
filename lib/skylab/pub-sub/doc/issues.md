@@ -1,5 +1,10 @@
+[#019]       #storypoints
+[#018]       #parent-node: [#017] "this node in its scope.."
+[#017]       #doc-node "micro-notes.."
+[#016] #open iambify extension interface
+[#015]       #nichepoint "event factory structural" (there are others..)
 [#014]       #doc-node the reflection API
-[#013]       #codepoint #wormhole
+[#013]       #hole
 [#012]       #done #tracking-tag - can the idea of "specificity" be built ..
 [#011]       #tickler consider renaming pub-sub to 'stream'
 [#010]       #done cover pub-sub-viz

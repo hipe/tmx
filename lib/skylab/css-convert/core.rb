@@ -112,7 +112,7 @@ module Skylab::CssConvert
     def initialize sin, sout, serr
       super( )
       @default_action = nil
-      @io_adapter = build_io_adapter sin, sout, serr
+      @io_adapter = build_IO_adapter sin, sout, serr
       nil
     end
 

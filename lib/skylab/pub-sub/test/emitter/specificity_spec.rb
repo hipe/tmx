@@ -6,9 +6,9 @@ module ::Skylab::PubSub::TestSupport::Emitter::Specificity
 
   include CONSTANTS
 
-  extend TestSupport::Quickie  # Quickie.
+  extend TestSupport::Quickie
 
-  describe "#{ PubSub }::Emitter specificity" do
+  describe "[ps] emitter specificity" do
 
     extend Specificity_TestSupport
 

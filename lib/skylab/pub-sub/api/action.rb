@@ -14,6 +14,14 @@ module Skylab::PubSub
       end
     end
 
+    def initialize prefix, paystream, infostream
+      @error_count = 0 ; @infostream = infostream ; @paystream = paystream
+      @request_client_prefix = prefix
+      formal_parameters.each do |p|
+        instance_variable_set p.ivar, nil
+      end ; nil
+    end
+
     def absorb param_h
       param_h_h = ::Hash[ formal_parameters.map { |p| [ p.sym, p ] } ]
       param_h.each do |k, v|
@@ -25,15 +33,6 @@ module Skylab::PubSub
   private
 
     #         ~ housekeeping & basic ui ~
-
-    def initialize prefix, paystream, infostream
-      formal_parameters.each do |p|
-        instance_variable_set p.ivar, nil
-      end
-      @error_count = 0
-      @request_client_prefix = prefix
-      @paystream, @infostream = paystream, infostream
-    end
 
     def formal_parameters
       self.class.formal_parameters

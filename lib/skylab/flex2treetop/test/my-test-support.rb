@@ -99,7 +99,7 @@ module Skylab::Flex2Treetop::MyTestSupport
     end
     def io_adapter_spy #  away at [#005]
       @spy ||= begin
-        o = cli_client.send :build_io_adapter, inspy, outspy, errspy
+        o = cli_client.send :build_IO_adapter, inspy, outspy, errspy
         def o.debug!
           instream.debug! ; outstream.debug! ; errstream.debug!
           self

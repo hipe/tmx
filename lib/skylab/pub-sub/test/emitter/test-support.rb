@@ -2,6 +2,7 @@ require_relative '../test-support'
 require 'skylab/meta-hell/core'
 
 module Skylab::PubSub::TestSupport::Emitter
+
   ::Skylab::PubSub::TestSupport[ Emitter_TestSupport = self ] # #regret
 
   module CONSTANTS

@@ -3,27 +3,31 @@ require 'skylab/test-support/core'
 require 'skylab/headless/core'  # unstyle etc
 
 module Skylab::PubSub::TestSupport
+
   ::Skylab::TestSupport::Regret[ self ]
 
   module CONSTANTS
-    %i| Headless PubSub TestSupport MetaHell |.each do |i|
-      const_set i, ::Skylab.const_get( i )
-    end
-  end
 
-  Headless = CONSTANTS::Headless  # so that h.l is visible in all modules
-                                  # lexically scoped under this one.
-                                  # (necessary for e.g in Nub)
+    ::Skylab::MetaHell::FUN::Import_constants[
+      ::Skylab, %i( Headless PubSub TestSupport MetaHell ), self ]
+
+  end
 
   include CONSTANTS
 
-  PubSub = PubSub  # yeah
+  Headless = Headless ; PubSub = PubSub
 
   module InstanceMethods
 
-    def fixtures_dir_pn
-      PubSub::TestSupport.dir_pathname.join( 'fixtures' )
-    end
+    -> do
+      p = -> do
+        pn = PubSub::TestSupport.dir_pathname.join 'fixtures'
+        p = -> { pn } ; pn
+      end
+      define_method :fixtures_dir_pn do
+        p[]
+      end
+    end.call
   end
 
   IDENTITY_ = -> x { x }

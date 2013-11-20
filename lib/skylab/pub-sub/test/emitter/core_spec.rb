@@ -1,10 +1,10 @@
-require_relative 'emitter/test-support'
+require_relative 'test-support'
 
 module ::Skylab::PubSub::TestSupport::Emitter
 
   # Quickie.
 
-  describe "#{ PubSub }::Emitter" do
+  describe "[ps] emitter" do
 
     extend Emitter_TestSupport
 
@@ -15,16 +15,16 @@ module ::Skylab::PubSub::TestSupport::Emitter
       context 'gives your class an "emits" method which:' do
 
         it "your class responds to it" do
-          klass.singleton_class.private_method_defined?( :emits ).
-            should eql( true )
+          klass.singleton_class.should be_private_method_defined :emits
         end
 
         it "when called with an event graph, adds those types to the #{
             }types associated with the class" do
 
-          klass.event_stream_graph.node_count.should eql( 0 )
-          klass.send :emits, scream: :sound, yell: :sound
-          klass.event_stream_graph.node_count.should eql( 3 )
+          cls = klass
+          cls.event_stream_graph.node_count.should be_zero
+          cls.send :emits, scream: :sound, yell: :sound
+          cls.event_stream_graph.node_count.should eql 3
         end
       end
     end
@@ -48,20 +48,20 @@ module ::Skylab::PubSub::TestSupport::Emitter
       it "the well-formed call to `on_foo` will result in #{
           }the same proc you gave it, for chaining" do
         nerk = -> { }
-        x = emitter.on_foo(& nerk )
-        x.object_id.should eql( nerk.object_id )
+        x = emitter.on_foo( & nerk )
+        x.object_id.should eql nerk.object_id
       end
 
       it "the call to emit( :foo ) - invokes the block." do
         touch_me[:touched].should eql( :was_not_touched )
         res = emitter.emit :foo
         touch_me[:touched].should eql( :it_was_touched )
-        res.should eql( nil )
+        res.should be_nil
       end
 
       it "with `emits?` - you can see if it emits something" do
-        emitter.emits?( :baz ).should eql( false )
-        emitter.emits?( :foo ).should eql( true )
+        emitter.emits?( :baz ).should eql false
+        emitter.emits?( :foo ).should eql true
       end
     end
 
@@ -78,7 +78,7 @@ module ::Skylab::PubSub::TestSupport::Emitter
           error -> informational
           info -> informational
         HERE
-        act.should eql( exp )
+        act.should eql exp
       end
 
       it "notifies subscribers of its child events" do
@@ -87,7 +87,7 @@ module ::Skylab::PubSub::TestSupport::Emitter
           msg = event.payload_a.first
         end
         emitter.emit :error, 'yes'
-        msg.should eql( 'yes' )
+        msg.should eql 'yes'
       end
 
       it "notifies subscribers of parent events about child events" do
@@ -96,7 +96,7 @@ module ::Skylab::PubSub::TestSupport::Emitter
           msg = "#{ e.stream_name }: #{ e.payload_a.first }"
         end
         emitter.emit :error, 'yes'
-        msg.should eql( 'error: yes' )
+        msg.should eql 'error: yes'
       end
 
       it "will double-notify a single subscriber if it subscribes #{
@@ -106,8 +106,8 @@ module ::Skylab::PubSub::TestSupport::Emitter
         emitter.on_informational { |e| prnt = "#{e.stream_name}: #{e.payload_a.first}" }
         emitter.on_info          { |e| chld = "#{e.stream_name}: #{e.payload_a.first}" }
         emitter.emit :info, 'foo'
-        chld.should eql( 'info: foo' )
-        prnt.should eql( 'info: foo' )
+        chld.should eql 'info: foo'
+        prnt.should eql 'info: foo'
       end
 
       it "but the listener can check the event-id of the event if it #{
@@ -115,10 +115,10 @@ module ::Skylab::PubSub::TestSupport::Emitter
         id_one = id_two = nil
         emitter.on_informational { |e| id_one = e.event_id }
         emitter.on_info          { |e| id_two = e.event_id }
-        emitter.emit( :info )
-        ( !! id_one ).should eql( true )
-        id_one.should eql( id_two )
-        id_two.should be_kind_of( ::Fixnum )
+        emitter.emit :info
+        ( !! id_one ).should eql true
+        id_one.should eql id_two
+        id_two.should be_kind_of ::Fixnum
       end
     end
 
@@ -146,11 +146,11 @@ module ::Skylab::PubSub::TestSupport::Emitter
           c.e += 1
         end
         o.emit :informational
-        c.values.should eql( [1, 0, 0] )
+        c.values.should eql [ 1, 0, 0 ]
         o.emit :info
-        c.values.should eql( [1, 1, 0] )
+        c.values.should eql [ 1, 1, 0 ]
         o.emit :error
-        c.values.should eql( [2, 1, 1] )
+        c.values.should eql [ 2, 1, 1 ]
       end
 
       context "A touch will NOT happen automatically when payload is #{
@@ -163,7 +163,7 @@ module ::Skylab::PubSub::TestSupport::Emitter
           o.on_informational { |e| lines << "inform:#{ e.payload_a.first }" }
           o.on_info          { |e| lines << "info:#{ e.payload_a.first }" }
           o.emit :info, "A"
-          lines.should eql( %w(info:A inform:A) )
+          lines.should eql %w( info:A inform:A )
         end
 
         it 'with touch check' do
@@ -171,7 +171,7 @@ module ::Skylab::PubSub::TestSupport::Emitter
           o.on_informational { |e| lines << "inform:#{ e.payload_a.first }" unless e.touched? }
           o.on_info          { |e| lines << "info:#{ e.payload_a.first }"   unless e.touched? }
           o.emit :info, "A"
-          lines.should eql( %w( info:A inform:A ) )
+          lines.should eql %w( info:A inform:A )
         end
 
         it 'but with an explicit touch' do
@@ -183,7 +183,7 @@ module ::Skylab::PubSub::TestSupport::Emitter
             lines << "info:#{ e.touch!.payload_a.first }" unless e.touched?
           end
           o.emit :info, "A"
-          lines.should eql( %w(info:A ) )
+          lines.should eql %w( info:A )
         end
       end
     end
@@ -207,12 +207,12 @@ module ::Skylab::PubSub::TestSupport::Emitter
         ] end
 
         it "triggering an event on a deepest child will trigger #{
-            } the root event" do
+            }the root event" do
           o = emitter
           touched = 0
           o.on_all { |e| touched += 1 }
           o.emit :hello
-          touched.should eql( 1 )
+          touched.should eql 1
         end
       end
 
@@ -226,16 +226,16 @@ module ::Skylab::PubSub::TestSupport::Emitter
         ] end
 
         def same which
-          @counts = Hash.new { |h, k| h[k] = 0 }
+          @counts = Hash.new { |h, k| h[ k ] = 0 }
           o = emitter
-          o.on_father { |e| @counts[:father] += 1 }
-          o.on_son    { |e| @counts[:son]    += 1 }
-          o.on_ghost  { |e| @counts[:ghost]  += 1 }
+          o.on_father { |e| @counts[ :father ] += 1 }
+          o.on_son    { |e| @counts[ :son ]    += 1 }
+          o.on_ghost  { |e| @counts[ :ghost ]  += 1 }
 
           emitter.emit which
-          s = @counts.keys.map(& :to_s ).sort.join ' '
-          s.should eql( 'father ghost son' )
-          @counts.values.count{ |v| 1 == v }.should eql( 3 )
+          s = @counts.keys.map( & :to_s ).sort.join ' '
+          s.should eql 'father ghost son'
+          @counts.values.count{ |v| 1 == v }.should eql 3
         end
 
         it "an emit to father emits to all three" do
@@ -269,11 +269,11 @@ module ::Skylab::PubSub::TestSupport::Emitter
         s = nil
         o.on_one { |x| s = x.payload_a.first }
         o.emit :one, 'sone'
-        s.should eql( 'sone' )
+        s.should eql 'sone'
         o = shorthand_class.new
         o.on_all { |e| s = e.payload_a.first.to_s }
         o.emit :error, 'serr'
-        s.should eql( 'serr' )
+        s.should eql 'serr'
       end
     end
 
@@ -292,7 +292,7 @@ module ::Skylab::PubSub::TestSupport::Emitter
         o = child_class.new
         o.on_informational { |e| ok = e }
         o.emit :info, "wankers"
-        ok.payload_a.first.should eql( 'wankers' )
+        ok.payload_a.first.should eql 'wankers'
       end
     end
   end

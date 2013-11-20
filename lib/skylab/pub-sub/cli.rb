@@ -1,33 +1,30 @@
 require 'skylab/headless/core'
 
-# **NOTE** this is decidedly *not* something that is part of the typical
-# day-to-day use of pub-sub. This is an experimental one-off-esque report
-# for visualizations of graphs. You can happily ignore this little hack!
-
 module Skylab::PubSub
 
   Headless = ::Skylab::Headless   # be very careful that this only happens in
     # 1 place! this dependency must be downwards-only from this node.
 
-  class CLI
+  class CLI  # NOTE "this node in its scope is not related to pub-s.." [#018]
 
-    def initialize *a             # necessary when you have a client and a box
-      init_headless_cli_client( * a )
-      @param_h = { }
-      @opendata = nil
+    Headless::CLI::Client[ self,
+      :three_streams_notify, :expressive_controller,
+      :DSL ]  # don't add DSL till end b.c of it's method_added hook
+
+    def initialize *a
+      @opendata = nil ; @param_h = { }
+      three_streams_notify( * a )
+      super()
     end
 
-    def file_argument o
-      o << "  <file>   file(s) to #{ em '`require`' }d in order"
+    def file_argument y
+      y << say do
+        "  <file>   file(s) to #{ em '`require`' }d in order"
+      end
     end
-
-    Client = self  # #tmx-compat
-
-    extend Headless::CLI::Client::DSL # before below
-    extend Headless::CLI::Box::DSL    # after above, to override o.p things
 
     def ping
-      @io_adapter.errstream.puts "hello from pub-sub."
+      errstream.puts "hello from pub-sub."
       :'hello_from_pub-sub'
     end
 
@@ -74,12 +71,12 @@ module Skylab::PubSub
       end
     end
 
-    desc do |o|
-      o << "write the output to stdout by default."
-      o << "arguments:"
-      file_argument o
-      o << "  <module>  show the event stream graph for this module"
-      o << '    if not provided (i.e 1 filename), will do something tricky'
+    desc do |y|
+      y << "write the output to stdout by default."
+      y << "arguments:"
+      file_argument y
+      y << "  <module>  show the event stream graph for this module"
+      y << '    if not provided (i.e 1 filename), will do something tricky'
     end
 
     append_syntax '[<module>]'
@@ -93,10 +90,11 @@ module Skylab::PubSub
         do_guess_mod = false
       end
       additional_file.unshift file
-      o = PubSub::API::Actions::GraphViz.new( program_name, * io_adapter.two )
-      o.absorb @param_h.merge!( files: additional_file, modul: modul,
+      _, o, e = three_streams
+      gv = PubSub::API::Actions::GraphViz.new program_name, o, e
+      gv.absorb @param_h.merge!( files: additional_file, modul: modul,
         do_guess_mod: do_guess_mod )
-      x = o.execute
+      x = gv.execute
       usage_and_invite if false == x
       x ? x : ( false == x ? 1 : 0 )
     end
@@ -121,12 +119,16 @@ module Skylab::PubSub
     end
 
     def fire file, klass, stream_name
-      o = PubSub::API::Actions::Fire.new( program_name, * io_adapter.two )
-      o.absorb @param_h.merge!( files: [ file ], modul: klass,
+      _, o, e = three_streams
+      fi = PubSub::API::Actions::Fire.new program_name, o, e
+      fi.absorb @param_h.merge!( files: [ file ], modul: klass,
         opendata: ( @opendata || false ), stream_name: stream_name.intern )
-      x = o.execute
+      x = fi.execute
       usage_and_invite if false == x
       x ? x : ( false == x ? 1 : 0 )
     end
+
+    Client = self  # #comport:tmx
+
   end
 end

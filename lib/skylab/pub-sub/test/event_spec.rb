@@ -1,21 +1,26 @@
 require_relative 'test-support'
 
-module Skylab::PubSub::TestSupport::TestSupport
+module Skylab::PubSub::TestSupport::Event_Tests__
 
-  # Quickie.
+  ::Skylab::PubSub::TestSupport[ self ]
 
-  describe "#{ PubSub }::TestSupport::Event::Predicate::Nub" do
+  include CONSTANTS
 
-    extend TestSupport_TestSupport
+  PubSub = PubSub
 
-    # (instance methods defined at the end.)
+  extend TestSupport::Quickie
+
+  describe "[ps] event" do
 
     it "you must construct it with 1 arg" do
       -> do
         subject_class.new
-      end.should raise_error( ::ArgumentError,
+      end.should raise_error ::ArgumentError,
         'wrong number of arguments (0 for 1)'
-      )
+    end
+
+    def subject_class
+      PubSub::TestSupport::Event::Predicate::Nub
     end
 
     context "the empty assertion against" do
@@ -238,21 +243,6 @@ module Skylab::PubSub::TestSupport::TestSupport
       end
     end
 
-    TestSupport_TestSupport.module_exec do
-      class TextEvent < PubSub::Event::Unified
-        attr_reader :text
-
-        def initialize esg, stream_name, text
-          super esg, stream_name
-          @text = text
-        end
-      end
-    end
-
-    let :subject_class do
-      PubSub::TestSupport::Event::Predicate::Nub
-    end
-
     def debug!
       @do_debug = true
     end
@@ -279,17 +269,17 @@ module Skylab::PubSub::TestSupport::TestSupport
     end
 
     def expect_result x
-      __memoized.fetch( :last_result ).should eql( x )
+      __memoized.fetch( :last_result ).should eql x
       nil
     end
 
     def expect_description x
-      nub.description.should eql( x )
+      nub.description.should eql x
       nil
     end
 
     def expect_fmfs x
-      nub.failure_message_for_should.should eql( x )
+      nub.failure_message_for_should.should eql x
     end
 
     def build_event stream_name, *rest
@@ -298,7 +288,17 @@ module Skylab::PubSub::TestSupport::TestSupport
     end
 
     def build_text_event stream_name, text
-      TextEvent.new false, stream_name, text
+      TextEvent__.new false, stream_name, text
+    end
+    #
+    class TextEvent__ < PubSub::Event::Unified
+
+      def initialize esg, stream_name, text
+        super esg, stream_name
+        @text = text
+      end
+
+      attr_reader :text
     end
   end
 end

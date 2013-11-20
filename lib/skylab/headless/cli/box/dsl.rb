@@ -4,6 +4,13 @@ module Skylab::Headless
 
     #                         ~ never say never ~                          #
 
+    To_proc = -> _ do
+      MetaHell::MAARS::Upwards[ self ]
+      extend CLI::Box::DSL::ModuleMethods
+      include CLI::Box::DSL::InstanceMethods
+      _headless_init_add :_headless_cli_box_dsl_init ; nil
+    end
+
     def self.extended mod # [#sl-111]
       mod.module_exec do
         include CLI::Box::DSL::InstanceMethods

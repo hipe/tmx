@@ -145,7 +145,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
 
     def initialize _, stdout, stderr
       @param_h = { }
-      self.io_adapter = build_io_adapter _, stdout, stderr
+      self.io_adapter = build_IO_adapter _, stdout, stderr
       _gsu_sub_client_init nil
       _headless_cli_box_dsl_init
     end

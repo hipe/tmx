@@ -1,17 +1,16 @@
 require_relative 'test-support'
-require 'skylab/headless/test/test-support'
 
 module Skylab::PubSub::TestSupport::CLI::Fire
 
-  ::Skylab::PubSub::TestSupport::CLI[ Fire_TestSupport = self ]
+  ::Skylab::PubSub::TestSupport::CLI[ TS__ = self ]
 
   include CONSTANTS
 
   extend TestSupport::Quickie
 
-  describe "#{ PubSub::CLI } fire" do
+  describe "[ps] CLI fire" do
 
-    extend Fire_TestSupport
+    extend TS__
 
     it "with the ideal case - works" do
       g = TestSupport::IO::Spy::Triad.new nil
@@ -20,10 +19,9 @@ module Skylab::PubSub::TestSupport::CLI::Fire
       argv = [ 'fire',
         PubSub.dir_pathname.join( 'core.rb' ),
         'Skylab::PubSub::Test::Fixtures::ZigZag',
-        'hacking'
-      ]
+        'hacking' ]
       rs = c.invoke argv
-      rs.should eql( true )
+      rs.should eql true
       line_a = g.errstream.string.split "\n"
       line_a.last.should match( /\AOK: #<Skylab::PubSub::Event::Unified/ )
     end

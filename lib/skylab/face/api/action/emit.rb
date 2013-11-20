@@ -10,7 +10,6 @@ module Skylab::Face
     -> do  # `self.[]`
       emits = nil
       define_singleton_method :[] do |kls, meth_i, a, b|
-
         kls.class_exec do
           if ! respond_to? :is_pub_sub_emitter_module or
               ! is_pub_sub_emitter_module  # unlikely

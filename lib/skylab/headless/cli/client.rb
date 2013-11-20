@@ -1,7 +1,43 @@
 module Skylab::Headless
 
   module CLI::Client
+
     Autoloader[ self ]                         # (lazy-load files under client/)
+
+    def self.[] mod, * x_a
+      Bundles__.apply_iambic_on_client x_a, mod
+    end
+
+    module Bundles__
+
+      DSL = -> _ do
+        module_exec _, & CLI::Client::DSL::To_proc
+      end
+
+      Expressive_controller = -> _ do
+        module_exec _, & CLI::Pen::Bundles::Expressive_controller.to_proc
+      private
+        def expression_agent
+          @io_adapter.pen
+        end
+      end
+
+      Three_streams_notify = -> _ do
+      private
+        def errstream  # let this be the only one in the universe
+          @io_adapter.errstream
+        end
+        def three_streams
+          @io_adapter.to_three
+        end
+        def three_streams_notify i, o, e
+          instance_variable_defined? :@io_adapter and raise "write once"
+          @io_adapter = build_IO_adapter i, o, e, build_pen ; nil
+        end
+      end
+
+      MetaHell::Bundle::Multiset[ self ]
+    end
   end
 
   module CLI::Client::ModuleMethods            # future-proofing, aesthetics
@@ -25,7 +61,7 @@ module Skylab::Headless
     param_h = {
       0 => -> _ { },
       3 => -> a do
-        @io_adapter = build_io_adapter(* a )
+        @io_adapter = build_IO_adapter(* a )
       end
     }
 
@@ -45,7 +81,7 @@ module Skylab::Headless
     alias_method :init_headless_cli_client, :initialize
       # (`initialize` rarely gets left alone)
 
-    def build_io_adapter sin=$stdin, sout=$stdout, serr=$stderr, pen=build_pen
+    def build_IO_adapter sin=$stdin, sout=$stdout, serr=$stderr, pen=build_pen
       # What is really nice is if you observe [#sl-114] and specify what
       # actual streams you want to use for these formal streams.  However
       # we grant ourself this one indulgence of specifying these most

@@ -2,6 +2,19 @@ module Skylab::Headless
 
   module CLI::Pen  # [#084]
 
+    module Bundles
+      module Expressive_controller
+        p = -> _ do
+          include Expressive_controller
+        end
+        define_singleton_method :to_proc do p end
+      private
+        def say &p
+          expression_agent.calculate( & p )
+        end
+      end
+    end
+
     FUN = MetaHell::FUN::Module.new
     module FUN
 

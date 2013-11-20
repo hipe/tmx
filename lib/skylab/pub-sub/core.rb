@@ -88,4 +88,6 @@ module Skylab::PubSub
 
   MAARS[ self ]
 
+  stowaway :TestSupport, 'test/test-support'  # [hl]
+
 end

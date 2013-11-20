@@ -14,6 +14,7 @@ module Skylab::PubSub
     # optionally you can provide a base class at which point all
     # hell breaks loose, also a box module to put them in.
     #
+    # #not-most-recent of #nichepoint [#ps-015] (newer might be better)
 
     def event esg, sn, payload_x
       @event[ esg, sn, payload_x ]

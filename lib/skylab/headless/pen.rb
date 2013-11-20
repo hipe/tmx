@@ -43,6 +43,8 @@ module Skylab::Headless
     def plugin_host_metaservices  # see impl.
       @_phm ||= Pen::Experimental_::Plugin_Host_MetaServices_.new self
     end
+
+    alias_method :calculate, :instance_exec
   end
 
   Pen::MINIMAL = ::Object.new.extend Pen::InstanceMethods

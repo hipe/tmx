@@ -37,7 +37,7 @@ module Skylab::PubSub
         arg1, stream_name, arg3 )
     end
 
-    alias_method :[], :call  # compat to look ::Proc-like
+    alias_method :[], :call  # #comport to look ::Proc-like
 
   private
 

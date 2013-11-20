@@ -25,15 +25,19 @@ module Skylab::Headless
 
     attr_writer :instream  # it gets modified from the cli client s/times
 
+    def to_two
+      [ @outstream, @errstream ]
+    end
+
+    def to_three
+      [ @instream, @outstream, @errstream ]
+    end
+
     def emit type_i, msg
       # life is easier with this behavior written-in as a default.
       instance_variable_get( :payload == type_i ? :@outstream : :@errstream ).
         puts msg
       nil  # undefined
-    end
-
-    def two
-      [ @outstream, @errstream ]
     end
   end
 end

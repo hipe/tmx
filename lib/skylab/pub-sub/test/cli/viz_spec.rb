@@ -1,16 +1,16 @@
 require_relative 'test-support'
-require 'skylab/headless/test/test-support'
 
 module Skylab::PubSub::TestSupport::CLI::Viz
-  ::Skylab::PubSub::TestSupport::CLI[ Viz_TestSupport = self ]
+
+  ::Skylab::PubSub::TestSupport::CLI[ TS__ = self ]
 
   include CONSTANTS
 
   extend TestSupport::Quickie
 
-  describe "#{ PubSub::CLI } viz" do
+  describe "[ps] viz" do
 
-    extend Viz_TestSupport
+    extend TS__
 
     it "with the ideal case - works" do
       g = TestSupport::IO::Spy::Triad.new nil

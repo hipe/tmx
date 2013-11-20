@@ -2,9 +2,7 @@ require_relative 'test-support'
 
 module ::Skylab::PubSub::TestSupport::Emitter
 
-  describe "#{ PubSub }::Emitter params - when your handler takes" do
-
-    # Quickie.
+  describe "[ps] emitter params - when your handler takes" do
 
     extend Emitter_TestSupport
 

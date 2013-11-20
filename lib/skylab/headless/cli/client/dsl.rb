@@ -7,6 +7,12 @@ module Skylab::Headless
     # subcommands (i.e isn't a "box"). Everything is experimental and subject
     # to change and will definately break your app. Everything.
 
+    To_proc = -> _ do
+      module_exec _, & CLI::Box::DSL::To_proc
+      extend CLI::Client::DSL::ModuleMethods
+      include CLI::Client::DSL::InstanceMethods ; nil
+    end
+
     def self.extended mod  # [#sl-111]
       mod.module_eval do
         include CLI::Client::DSL::InstanceMethods

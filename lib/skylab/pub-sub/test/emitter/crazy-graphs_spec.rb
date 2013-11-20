@@ -2,9 +2,7 @@ require_relative 'test-support'
 
 module ::Skylab::PubSub::TestSupport::Emitter
 
-  # Quickie.
-
-  describe "#{ Skylab::PubSub::Emitter } Crazy Graphs:" do
+  describe "[ps] emitter crazy graphs" do
 
     extend ::Skylab::PubSub::TestSupport::Emitter
 

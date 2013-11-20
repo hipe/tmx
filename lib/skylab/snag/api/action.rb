@@ -141,7 +141,7 @@ module Skylab::Snag
 
     def build_event stream_name, pay_x
 
-      @event_factory.call @event_stream_graph.call, stream_name, self, pay_x
+      @event_factory.call @event_stream_graph_p.call, stream_name, self, pay_x
     end
   end
 end

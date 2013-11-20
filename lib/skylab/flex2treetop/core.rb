@@ -151,7 +151,7 @@ module Skylab::Flex2Treetop
 
     # (`initialize` defined in h.l api client i.m!)
 
-    def build_io_adapter
+    def build_IO_adapter
       API::IO_Adapter.new
     end
 
