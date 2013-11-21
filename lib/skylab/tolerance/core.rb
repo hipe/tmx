@@ -2,15 +2,18 @@ require 'optparse'
 
 module Skylab ; end
 module Skylab::Tolerance
-  module My_TiteColor
-    _ = [nil, :strong, * Array.new(29), :red, :green, :yellow, :blue, :magenta, :cyan, :white]
-    MAP = Hash[ * _.each_with_index.map { |sym, idx| [sym, idx] if sym }.compact.flatten ]
-    def stylize str, *styles ; "\e[#{styles.map{ |s| MAP[s] }.compact.join(';')}m#{str}\e[0m" end # [#to-005]
-  end
+  Stylize_ = -> do
+    _ = [ nil, :strong, * ::Array.new( 29 ), :red, :green, :yellow, :blue, :magenta, :cyan, :white ]
+    map = ::Hash[ * _.each_with_index.map { |sym, idx| [ sym, idx ] if sym }.compact.flatten ]
+    -> a, str do
+      "\e[#{ a.map( & map.method( :[] ) ).compact * ';' }m#{ s }\e[0m"  # [#hl-029]
+    end
+  end.call
   module Styles
     include My_TiteColor
-    def pre(s) ; stylize(s, :green         ) end
-    def hdr(s) ; stylize(s, :strong, :green) end
+    o = Stylize_.curry
+    define_method :pre, & o[ %i| green | ]
+    define_method :hdr, & o[ %| strong green | ]
   end
   module ActionInstanceMethods
     include Styles
@@ -90,7 +93,7 @@ module Skylab::Tolerance
     def option_parser
       option_syntax? or return nil
       @option_parser ||= ::OptionParser.new do |o|
-        @opts = opts = {}
+        @opts = { }
         o.banner = "#{usage}\n#{hdr 'options:'}"
         option_syntax o
         o.on('-h', '--help', 'this screen.') { help }

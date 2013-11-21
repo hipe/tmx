@@ -2,7 +2,7 @@ module Skylab::Face
 
   module CLI::API_Integration  # [#052]
 
-    class Expression_Agent_ < Face::API::Normalizer_::Expression_agent_class_[]
+    class Expression_Agent__ < Face::API::Normalizer_::Expression_agent_class[]
 
       def par fld
         kbd par_nonstyled fld
@@ -10,8 +10,7 @@ module Skylab::Face
 
     private  # ( make things public as necessary )
 
-      define_method :kbd, &
-        Headless::CLI::Pen::FUN.curriable_stylize.curry[ [ :green ] ]
+      define_method :kbd, Face::CLI::FUN.stylify.curry[ %i( green ) ]
 
       def par_nonstyled fld
         if fld.respond_to? :id2name
@@ -36,6 +35,6 @@ module Skylab::Face
       As_long__ = Headless::CLI::Option::Local_normal_name_as_long
     end
 
-    EXPRESSION_AGENT_ = Expression_Agent_.new
+    EXPRESSION_AGENT_ = Expression_Agent__.new
   end
 end

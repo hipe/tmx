@@ -25,7 +25,10 @@ module Skylab::Face
     end
 
     def service_provider_for_api_executable _hot_action
-      @surface[].instance_variable_get :@plugin_host
+      sf = @surface[]
+      if sf.instance_variable_defined? :@plugin_host
+        sf.instance_variable_get :@plugin_host
+      end  # covered
     end
 
     def control_hub_for_api_executable  # get notified of last executable

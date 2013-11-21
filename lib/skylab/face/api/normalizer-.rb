@@ -1,7 +1,6 @@
 module Skylab::Face
 
-  module API::Normalizer_  # experiment - can you make an extension
-    # module where you get to cherry-pick which instance methods you want?
+  module API::Normalizer_  # #method-cherry-bushel [#mh-051]
 
     def self.enhance_client_class client, *which_a
       which_a.length.zero? and which_a << :conventional
@@ -83,7 +82,7 @@ module Skylab::Face
       end
 
       def some_expression_agent
-        @any_expression_agent || EXPRESSION_AGENT_P_[]
+        @any_expression_agent || Expr_ag__[]
       end
     end
 
@@ -289,14 +288,14 @@ module Skylab::Face
     #
     Chomp_sing_ltr_sfx_ = API::Procs::Chomp_single_letter_suffix
 
-    Expression_agent_class_ = -> do
+    Expression_agent_class = -> do
       # (while we figure out who we are we procede very cautiously and
       # a) lazy load to avoid problems and b) cherry-pick only what we need)
       # [#084]
 
       p = -> do
 
-        class Expression_Agent_
+        class Expression_Agent__
 
           Face::Services::Headless::SubClient::EN_FUN[ self,
             :private, %i( s and_ or_ both ) ]
@@ -309,21 +308,28 @@ module Skylab::Face
 
           define_method :hack_label, & Hack_label
 
-          def ick x
-            Face::Services::Basic::FUN::Inspect[ x ]
+          def ick x  # [#mh-050] family
+            if x.respond_to? :id2name
+              "'#{ x }'"
+            else
+              Inspct__[ x ]
+            end
           end
+          #
+          Inspct__ = Face::Services::Basic::FUN::Inspect__.
+            curry[ A_REASONABLY_SHORT_LENGTH_FOR_A_STRING__ = 10 ]
         end
-        p = -> { Expression_Agent_ }
-        Expression_Agent_
+        p = -> { Expression_Agent__ }
+        Expression_Agent__
       end
       -> { p[] }
     end.call
 
-    EXPRESSION_AGENT_P_ = -> do
+    Expr_ag__ = -> do
       p = -> do
-        EXPRESSION_AGENT_ = Expression_agent_class_[].new
-        p = -> { EXPRESSION_AGENT_ }
-        EXPRESSION_AGENT_
+        expag = Expression_agent_class[].new
+        p = -> { expag }
+        expag
       end
       -> { p[] }
     end.call

@@ -103,9 +103,13 @@ module Skylab::Guardfile
       existeds.each { |c| seen[c.path] or taggeds.push([:stale, c]) }
       taggeds.sort_by { |c| c.last.path }
     end
-    def new     str ; stylize str, :green               end
-    def ok      str ; stylize str, :blue                end
-    def stale   str ; stylize str, :yellow              end
+    Stylize_ = -> do
+      h = ::Hash[  %i( green blue yellow ).each_with_index.map { |i, d| [ i, d + 32 ] } ]
+      -> a, str { "\e[#{ a.map( & h.method( :[] ) ).compact * ';' }m#{ str }\e[0m" }
+    end.call
+    define_method :new, & Stylize_.curry[ %i( green ) ]
+    define_method :ok, & Stylize_.curry[ %i( blue ) ]
+    define_method :stale, & Stylize_.curry[ %i( yellow ) ]
   end
   class CLI::Actions::List < CLI::Action
     def option_syntax o ; end

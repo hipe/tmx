@@ -123,13 +123,12 @@ module Skylab::Face
         end
         @cook = -> my_room do
           # `normalized_float` below must be nil or btwn 0.0 and 1.0 inclusive
-          stylize = if ! color then -> s { s } else
-            stylus = Services::Headless::CLI::Pen::MINIMAL
-            -> s { stylus.stylize s, color }
-          end
+          styliz = if color
+            Face::CLI::FUN.stylify.curry[ [ color ] ]
+          else MetaHell::IDENTITY_ end
           -> normalized_float do
             if normalized_float  # allow nil to mean "don't do it"
-              stylize[ glyph * ( norm[ normalized_float ] * my_room ).to_i ]
+              styliz[ glyph * ( norm[ normalized_float ] * my_room ).to_i ]
             end
           end
         end

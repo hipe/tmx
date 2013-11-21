@@ -21,7 +21,7 @@ module Skylab::Face::TestSupport::CLI::API_Integration
 
   module InstanceMethods
 
-    def client_class  # wide riggings here. compat with above.
+    def client_class  # wide riggings here. #comport with above.
       application_module.const_get( :CLI, false ).const_get( :Client, false )
     end
 

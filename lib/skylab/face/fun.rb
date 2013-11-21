@@ -1,6 +1,6 @@
 module Skylab::Face
 
-  class FUN_ < ::Module  # buckle up - shit's about to get awesome #yolo
+  class FUN_ < ::Module
 
     def stdin
       FUN::Stdin_
@@ -21,15 +21,6 @@ module Skylab::Face
     def program_basename
       @program_basename ||= -> { ::File.basename $PROGRAM_NAME }
     end
-
-    def stylize  # #curriable
-      @stylize ||= begin
-        up = Face::Services::Headless::CLI::Pen::FUN.stylize
-        -> a, s do
-          up[ s, *a ]
-        end
-      end
-    end
   end
 
   FUN = FUN_.new
@@ -39,7 +30,7 @@ module Skylab::Face
     Stdout_ = -> { $stdout }
     Stderr_ = -> { $stderr }
     Three_streams_ = -> { [ Stdin_[], Stdout_[], Stderr_[] ] }
-    At_ = -> *i_a { i_a.map { |i| send i } }
-    define_singleton_method :at, & At_
+    At__ = -> *i_a { i_a.map { |i| send i } }
+    define_singleton_method :at, & At__
   end
 end

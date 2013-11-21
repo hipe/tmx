@@ -182,8 +182,9 @@ module Skylab::Face::TestSupport::CLI
     end
 
     Headless::CLI::Pen::FUN.tap do |fun|
-      define_method :unstyle_styled, & fun.unstyle_styled
-      define_method :unstyle, & fun.unstyle
+      %i( unstyle_styled unstyle ).each do |i|
+        define_method i, fun[ i ]
+      end
     end
 
     def expect_styled line

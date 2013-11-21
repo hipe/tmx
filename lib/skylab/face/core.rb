@@ -213,7 +213,7 @@ module Skylab::Face
     # because it is used by CLI and we want to use it in API we put it here,
     # elsewise why are you using face !? ^_^)
 
-    Services_Ivar_ = nil
+    SERVICES_IVAR_ = nil
     class << self
       alias_method :orig, :new
 
@@ -225,7 +225,7 @@ module Skylab::Face
         end )
         pxy.send :absorb_services_defn_blk, defn_blk  # we want to be private
         sam = pxy::Services_Accessor_Method_
-        siv = pxy::Services_Ivar_ || :@services
+        siv = pxy::SERVICES_IVAR_ || :@services
         if ! ( host_mod.method_defined? sam or
                 host_mod.private_method_defined? sam ) then
           host_mod.module_exec do
@@ -290,7 +290,7 @@ module Skylab::Face
             ).instance_exec( & blk )
             if ! did_siv && siv
               did_siv = true
-              const_set :Services_Ivar_, siv
+              const_set :SERVICES_IVAR_, siv
             end
             if ! did_sam && sam
               did_sam = true
@@ -355,6 +355,67 @@ module Skylab::Face
       end
       @provider = -> { provider }
       nil
+    end
+  end
+  class Services_  # the shortest, tightest way to do services yet
+    class Iambic_
+      class << self
+        alias_method :orig_new, :new
+      private
+        def collapse ; end
+      end
+      def self.new * formal_a
+        ::Class.new( self ).class_exec do
+          @formal_arg_a = formal_a
+          def self.collapse
+            super
+            a = @formal_arg_a ; @formal_arg_a = nil
+            box = const_set :SERVICES_, Services::Basic::Box.new
+            begin
+              box.add (( i = a.shift )), a.shift
+              define_method( i ) { self[ i ] }
+            end while a.length.nonzero?
+            class << self
+              remove_method :collapse
+              def collapse ; end
+              remove_method :new
+              alias_method :new, :orig_new
+            end
+            nil
+          end
+          def self.new kernel, * actual_a
+            collapse
+            new kernel, * actual_a
+          end
+          self
+        end
+      end
+
+      def initialize kernel
+        @kernel_p = -> { kernel }
+        nil
+      end
+
+      def [] i
+        @kernel_p[].instance_exec( & self.class::SERVICES_.fetch( i ) )
+      end
+
+      def at * i_a
+        k = @kernel_p[]
+        i_a.map { |i| k.instance_exec( & self.class::SERVICES_.fetch( i ) ) }
+      end
+
+      def to_a
+        at( * self.class::SERVICES_._a )
+      end
+
+      def members
+        self.class.members
+      end
+
+      def self.members
+        self::SERVICES_._a.dup
+      end
     end
   end
 end

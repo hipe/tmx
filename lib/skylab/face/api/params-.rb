@@ -121,7 +121,7 @@ module Skylab::Face
     def self.[] * x_a
       # (in the spirit of MetaHell::FUN::Fields_::Countoured_)
       mod = (( contour = Contour_Parse_.new( * x_a ) )).client_mod
-      mod.const_set :FIELDS_, contour.params  # gotta compat with fields lib
+      mod.const_set :FIELDS_, contour.params  # gotta #comport with fields lib
       nil
     end
 

@@ -1734,7 +1734,7 @@ module Skylab::Face
       part_a * ' ' if part_a.length.nonzero?
     end
 
-    CLI::FUN_[:slugulate] = -> x do
+    CLI::FUN_[ :slugulate ] = -> x do
       Services::Headless::Name::FUN.slugulate[ x ]
     end  # (narrow focus of the dependency for now (but trivial))
 
@@ -2101,6 +2101,18 @@ module Skylab::Face
     end
   end.call
 
-  CLI::FUN = CLI::FUN_.to_struct
+  class CLI
+    FUN = (( Fun_ = FUN_.produce_struct_class )).new( * FUN_.values )
+  end
 
+  class CLI::Fun_
+    def stylify
+      p = Face::Services::Headless::CLI::Pen::FUN::Stylize
+      CLI::Fun_.class_exec do
+        remove_method :stylify
+        define_method :stylify do p end
+      end
+      p
+    end
+  end
 end

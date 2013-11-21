@@ -1,3 +1,6 @@
+[#132]       #bibliographic-reference: xUnit Test Patterns: Refactoring
+               Test Code, Gerard Meszaros, 2007
+[#131]       #tracking-tag all extlib - we are trying to avoiding these.
 [#130]       #doc-point  all the letters of the alphabet ..
 [#129]       #bibliographic-reference: _Clean Code_, Robert C. Martin, 2009
 [#128] #open this is strictly a development, pre-alpha version
@@ -14,6 +17,7 @@
 [#118] #open unify find command in multiple places
 [#117]       #pattern of defaults (if not nil, etc)
 [#116]       #pattern of set!, update_attributes! etc (w/ error_count)
+               #normalization #algorithm
 [#115]       #pattern of functionalizing things
 [#114]       #pattern of "stdin, stdout, stderr" as constructor to CLI clients
 [#113]       #pattern of PIE standard
