@@ -10,8 +10,9 @@ module Skylab::SubTree
     o[:Ncurses] = stdlib  # gemlib
     o[:Open3] = stdlib
     o[:OptionParser] = -> _ { require 'optparse' ; ::OptionParser }
-    o[:Set] = stdlib
-    o[:Shellwords] = stdlib
+    o[ :Set ] =
+      o[ :Shellwords] =
+      o[ :StringIO ] = stdlib
     o[:StringScanner] = -> _ { require 'strscan' ; ::StringScanner }
     o[:TestSupport] = subsys
     o[:Time] = stdlib

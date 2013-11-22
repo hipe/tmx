@@ -14,12 +14,6 @@ module Skylab::SubTree::TestSupport::API::Actions::My_Tree::Rendering
 
     include CONSTANTS
 
-    attr_reader :do_debug
-
-    def debug!
-      @do_debug = true
-    end
-
     def with str
       @with = str.unindent.chomp
       nil
@@ -27,7 +21,7 @@ module Skylab::SubTree::TestSupport::API::Actions::My_Tree::Rendering
 
     def makes str
       o = TestSupport::IO::Spy.new
-      e = ( do_debug and TestSupport::Stderr_[] )
+      e = ( do_debug and debug_stream )
       do_debug and o.debug! "s-tdout: "
       t = SubTree::API::Actions::My_Tree::Traversal_.new(
         :out_p, o.method( :puts ),
@@ -36,7 +30,7 @@ module Skylab::SubTree::TestSupport::API::Actions::My_Tree::Rendering
       @with.split( "\n" ).each do |s|
         t.puts s
       end
-      t.flush_notify
+      t.flush
       nil
     end
   end

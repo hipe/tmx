@@ -34,12 +34,6 @@ module Skylab::SubTree::TestSupport::API::Actions::My_Tree
 
   module InstanceMethods
 
-    def debug!
-      @do_debug = true
-    end
-
-    attr_reader :do_debug
-
     def start_front_with_upstream io
       start_front io
     end

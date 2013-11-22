@@ -29,12 +29,6 @@ module Skylab::SubTree::TestSupport::CLI
     #
     attr_reader :result
 
-    attr_accessor :do_debug
-
-    def debug!
-      @do_debug = true
-    end
-
     -> do
       stderr = TestSupport::Stderr_[]
 

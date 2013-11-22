@@ -7,10 +7,27 @@ Skylab::TestSupport::Quickie.enable_kernel_describe
 
 module Skylab::SubTree::TestSupport
 
-  ::Skylab::TestSupport::Regret[ self ]
-
   module CONSTANTS
     ::Skylab::MetaHell::FUN::
       Import_constants[ ::Skylab, %i( MetaHell SubTree TestSupport ), self ]
+  end
+
+  include CONSTANTS
+
+  TestSupport = TestSupport
+
+  TestSupport::Regret[ self ]
+
+  module InstanceMethods
+
+    def debug_stream
+      TestSupport::Stderr_[]
+    end
+
+    attr_reader :do_debug
+
+    def debug!
+      @do_debug = true
+    end
   end
 end

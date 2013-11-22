@@ -47,7 +47,12 @@ module Skylab::SubTree
   public
 
     def puts line, extra_x=nil
-      a = line.split @sep ; xtra_x = nil
+      a = line.split @sep
+      self.<<( a, extra_x )
+    end
+
+    def << a, extra_x=nil
+      xtra_x = nil
       a.reduce [] do |seen_a, s|  # note this effectively skips blank lines!
         seen_a << s
         idx = ( 0 ... @curr_a.length ).detect { |i| @curr_a[i] != seen_a[i] }
@@ -75,9 +80,8 @@ module Skylab::SubTree
       puts line, any_free_cel
     end
 
-    def flush_notify  # to say you are done adding lines
-      row nil
-      nil
+    def flush  # to say you are done adding lines
+      row nil ; nil
     end
 
   private

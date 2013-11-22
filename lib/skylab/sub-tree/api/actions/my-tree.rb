@@ -162,8 +162,7 @@ module Skylab::SubTree
 
     def close_upstream_and_flush_traversal
       close_upstream
-      @traversal.flush_notify
-      nil
+      @traversal.flush ; nil
     end
 
     def close_upstream
