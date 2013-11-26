@@ -6,7 +6,7 @@ module Skylab::Headless
 
     o = definer
 
-    o[:parse_styles] = -> do
+    Parse_styles = o[ :parse_styles ] = -> do
       # Parse a string with ascii styles into an S-expression.
 
       sexp = Headless::Services::CodeMolester::Sexp
@@ -119,6 +119,22 @@ module Skylab::Headless
       -> str do
         str.length.nonzero? and str[ -1 ] =~ punctuation_character_rx
       end
+    end.call
+
+    Cols = -> do
+      cols_p = -> else_p do
+        begin require 'ncurses' ; rescue ::LoadError => e ; end
+        if e then else_p[] else
+          v = $VERBOSE ; $VERBOSE = nil
+          ::Ncurses.initscr
+          # #todo easy patch snowleopard-ncurses ncurses_wrap.c:1951
+          $VERBOSE = v
+          cols = ::Ncurses.COLS
+          ::Ncurses.endwin
+          cols_p = -> { cols } ; cols
+        end
+      end
+      -> else_p { cols_p[ else_p ] }
     end.call
   end
 end

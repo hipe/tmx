@@ -1,0 +1,347 @@
+#!/usr/bin/env ruby -w
+
+exit( -> sin, sout, serr, argv, program_name do
+
+  es = nil ; _OK = 0 ; _NOPE = 1
+
+  _DEFAULT_COLS = 80 ; _MAX_COLS = 120
+
+  _PD = '%d'.freeze
+
+  y = ::Enumerator::Yielder.new( & serr.method( :puts ) )
+
+  subsystem = -> i do
+    defined? ::Skylab or require_relative '../lib/skylab'
+    ::Skylab.const_defined?( i, false ) or
+      require "skylab/#{ i.downcase }/core"
+    ::Skylab.const_get i, false
+  end
+
+  pen = -> do
+    pen_ = ::Class.new.class_exec do
+      alias_method :calculate, :instance_exec
+      def kbd s
+        "\e[32m#{ s }\e[0m"
+      end
+      def lbl s
+        em s.upcase
+      end
+      def o s  # option
+        em s
+      end
+    private
+      def em s
+        "\e[31m#{ s }\e[0m"
+      end
+    public
+      def ph s  # placeholder
+        "\e[04m#{ s }\e[0m"
+      end
+      self
+    end.new
+    pen = -> { pen_ } ; pen_
+  end
+
+  prog_name = -> do
+    ::File.basename program_name
+  end
+
+  _ARGS = %w( replstr file-1 file-2 ).freeze
+
+  usage_syntax = -> do
+    pen[].calculate do
+      "[#{ o '-n'}] #{ _ARGS.map( & method( :ph ) ) * ' ' } #{ ph '[..]' }"
+    end
+  end
+
+  require 'optparse'
+
+  is_dry = false
+
+  op = ::OptionParser.new do |op_|
+    op_.on '-h', '--help', 'this screen.' do
+      pen[].calculate do
+        _USAGE = 'usage: '
+        _INDENT = ' ' * _USAGE.length
+        y << "#{ lbl _USAGE }#{ prog_name[] } #{ usage_syntax[] }"
+
+        y << nil
+
+        require_relative '../lib/skylab'
+        fun = subsystem[ :Headless ]::CLI::FUN
+        cols = [ fun::Cols[ -> { _DEFAULT_COLS } ], _MAX_COLS ].min
+        yy = fun::Wrapping_indenter[ cols, '', y ]
+
+        y << "#{ lbl 'description:' }"
+        yy.indent = _INDENT
+        yy << "#{ ph 'replstr' } is a reference #{
+          }pattern with a digit placeholder \"#{ _PD }\" in it, #{
+          }e.g 'foo-#{ _PD }' #{
+          }matches \"foo-1\", \"foo-2\", \"foo-013\" and so forwardly."
+        yy << nil
+        yy << "for each instance of the #{
+          }#{ ph 'replstr' } pattern in any of the lines of #{ ph 'file-1' } #{
+          }, its location in the file is noted along with the order #{
+          }of each first occurrence of these bytes."
+        yy << nil
+        yy << "each such byte sequence will be associated with a new byte #{
+          }sequence whose number reflects the ordinal number of the first #{
+          }occurrence of the initial sequence: \"foo-1 foo-3 foo-2\" will #{
+          }become \"foo-1 foo-2 foo-3\" by this mapping: (foo-1 -> #{
+          }foo1, foo-3 -> foo2, foo-2 -> foo3) such that the input byte #{
+          }sequence is replaced with one that reflects the order of #{
+          }first appearance."
+        yy << nil
+        yy << "this same mapping that was derived from the first file #{
+          }will also be applied against #{ ph 'file-2' } #{
+          }and the rest. at least one such file is necessary to prevent you #{
+          }from forgetting to include the separate file that surely exists #{
+          }with the referrants of all the references from #{ ph 'file-1' }."
+        yy << nil
+        yy << "files are changed in-place and no backups are made so this #{
+          }will consult your SCM (which currently must be 'git') to be sure #{
+          }that there are no uncommitted changes in the relevant files."
+        yy.flush
+
+        y << nil
+        y << "#{ lbl 'options:' }"
+        op.summarize y
+
+      end
+      es = _OK
+    end
+
+    op_.on '-n', '--dry-run', 'dry-run' do
+      is_dry = true
+    end
+  end
+
+  begin
+    op.parse! argv
+  rescue ::OptionParser::InvalidOption => e
+  end
+
+  invite_message = -> do
+    pen[].calculate do
+      "use #{ kbd "#{ prog_name[] } -h" } for help"
+    end
+  end
+
+  invite = -> msg=nil do
+    msg and y << msg
+    y << invite_message[]
+    _NOPE
+  end
+
+  if e
+    y << e.message
+    y << invite_message[]
+    break _NOPE
+  end
+
+  if es
+    if _OK == es and argv.length.nonzero?
+      y << "(ignoring #{ argv[ 0 ].inspect }#{ ' [..]' if 1 < argv.length })"
+    end
+    break es
+  end
+
+  es and break es
+
+  if 3 > argv.length
+    y << pen[].calculate { "expecting #{ kbd _ARGS[ argv.length ] } " }
+    y << "usage: #{ prog_name[] } #{ usage_syntax[] }"
+    y << invite_message[]
+    break _NOPE
+  end
+
+  replstr, file_1 = argv.shift 2 ; file_a = argv ; argv = nil
+
+  require 'strscan'
+
+  rxe = ::Regexp.method :escape
+
+  build_rx = -> do
+    scn = ::StringScanner.new replstr
+    head = scn.scan %r{(?:(?!#{ _PD }).)*}
+    if ! scn.skip %r{#{ rxe[ _PD ] }}
+      break invite[ "'#{ _PD }' must occur in #{ replstr.inspect }" ]
+    end
+    tail = scn.rest
+    if tail.include? _PD
+      break invite[ "'#{ _PD }' cannot occure more than once in replstr" ]
+    end
+    head.length.zero? and head = nil
+    tail.length.zero? and tail = nil
+
+    _rx = /#{ head and "\\b#{ rxe[ head ] }" }#{
+            }(?<num>\d+)#{
+           }#{ tail and "#{ rxe[ tail ] }\\b" }/
+    [ nil, _rx, head, tail ]
+  end
+
+  es, regex, head, tail = build_rx[]
+  es and break es
+
+  file_a_ = [ file_1, * file_a ]
+
+  _ALWAYS_VERBOSE = true
+  be_verbose = _ALWAYS_VERBOSE
+
+  check_SCM = -> do
+   subsystem[ :Git ]::FUN::SCM_check[ y, file_a_,
+    :be_verbose, be_verbose, :when_status, -> do
+      y << "#{ prog_name[] } will not procede because of this."
+      _NOPE
+    end ]
+  end
+  es = check_SCM[] and break es
+
+  begin
+    file_a = file_a_.map do |path|
+      ::File.open path, 'r'
+    end
+  rescue ::Errno::ENOENT => e
+    break invite[ e.message ]
+  end
+
+  fh_0 = file_a[ 0 ]
+  occurrences_by_lineno, map_h = -> do
+    scn = subsystem[ :Headless ]::CLI::FUN::Occurrence_scanner[ regex, fh_0 ]
+    seen_h = { } ; mp_h = { }
+    occ_by_lineno = ::Hash.new { |h, k| h[ k ] = [] }
+    while (( occ = scn.call ))
+      (( match = occ.match )) or next
+      occ_by_lineno[ occ.lineno ] << occ
+      md = regex.match match
+      d = md[ :num ].to_i
+      seen_h.fetch d do
+        seen_h[ d ] = true
+        mp_h[ d ] = seen_h.length
+      end
+    end
+    [ occ_by_lineno, mp_h ]
+  end.call
+  fh_0.rewind
+
+  _File_Edit = ::Class.new.class_exec do
+    def initialize * x_a
+      @occurrences_by_lineno = nil
+      absorb_x_a x_a ; nil
+    end
+    def new * x_a
+      otr = dup
+      otr.absorb_x_a x_a
+      otr
+    end
+  protected
+    def absorb_x_a x_a
+      @x_a = x_a
+      begin
+        send :"#{ x_a.shift }="
+      end while x_a.length.nonzero?
+      @x_a = nil
+    end
+  private
+    def be_verbose= ; @be_verbose = @x_a.shift end
+    def build_OC= ; @oc_p = @x_a.shift end
+    def input_lines= ; @fh = @x_a.shift end
+    def map_h= ; @map_h = @x_a.shift end
+    def occurrences_by_lineno= ; @occ_by_ln = @x_a.shift end
+    def output_line= ; @out_line_p = @x_a.shift end
+    def regex= ; @regex = @x_a.shift end
+    def replacement= ; @replacement_p = @x_a.shift end
+    def y= ; @y = @x_a.shift end
+  public
+    def execute
+      @occ_by_ln ||= build_occurrences_by_lineno
+      @fh.pos.zero? or raise ::ArgumentError, "file is not rewound"
+      lineno = 0
+      while (( line = @fh.gets ))
+        lineno += 1
+        a = @occ_by_ln.fetch lineno do end
+        a or next( @out_line_p[ line ] )
+        prev_line = line.dup
+        while top = a.pop
+          lineno == top.lineno or fail "sanity"
+          d = @regex.match( top.match )[ :num ].to_i
+          d_ = @map_h[ d ]
+          d_ or next
+          repl = @replacement_p[ d_ ]
+          idx = top.colno - 1
+          top.before and idx += top.before.length
+          line[ idx,  top.match.length ] = repl
+        end
+        @out_line_p[ line ]
+        @be_verbose and report_line_change lineno, prev_line, line
+      end ; nil
+    end
+  private
+    def build_occurrences_by_lineno
+      @fh.pos.zero? or raise ::ArgumentError, "file is not rewound"
+      scn = @oc_p[ @regex, @fh ]
+      h = ::Hash.new { |_h, k| _h[ k ] = [ ] }
+      while (( occ = scn.gets ))
+        occ.match or next
+        h[ occ.lineno ] << occ
+      end
+      @fh.rewind
+      h
+    end
+    def report_line_change lineno, prev, new
+      hdr = "(line #{ lineno })"
+      @y << "#{ hdr } < #{ prev }"
+      @y << "#{ ' ' * hdr.length } > #{ new }" ; nil
+    end
+    self
+  end
+
+  tmp_a = -> do
+    require 'tmpdir'
+    pn = ::Pathname.new ::Dir.tmpdir
+    file_a.length.times.map do |d|
+      ::File.open pn.join( "resequence.tmp.#{ d + 1 }" ).to_s, 'w+'
+    end
+  end.call
+
+  edit = _File_Edit.new(
+    :be_verbose, be_verbose,
+    :build_OC, subsystem[ :Headless ]::CLI::FUN::Occurrence_scanner,
+    :map_h, map_h,
+    :regex, regex,
+    :replacement, -> d { "#{ head }#{ d }#{ tail }" },
+    :y, y )
+
+  es = edit.new(
+    :input_lines, fh_0,
+    :occurrences_by_lineno, occurrences_by_lineno,
+    :output_line, tmp_a[ 0 ].method( :write ),
+  ).execute
+
+  es and break es
+
+  ( 1 ... file_a.length ).each do |d|
+    file = file_a.fetch d
+    tmp = tmp_a.fetch d
+    if be_verbose
+      y << "\n(file #{ file.path })"
+    end
+    es = edit.new(
+      :input_lines, file,
+      :output_line, tmp.method( :write ),
+    ).execute
+    es and break
+  end
+  es and break es
+
+  require 'fileutils'
+  file_a.length.times do |d|
+    tmp = tmp_a.fetch d ; file = file_a.fetch d
+    tmp.close ; file.close
+    FileUtils.mv tmp.path, file.path, verbose: true, noop: is_dry
+  end
+
+  y << "done changing #{ file_a.length } files#{ ' (dry)' if is_dry }."
+
+  _OK
+end.call $stdin, $stdout, $stderr, ::ARGV, $PROGRAM_NAME )
