@@ -8,7 +8,7 @@ module Skylab::PubSub
   class CLI  # NOTE "this node in its scope is not related to pub-s.." [#018]
 
     Headless::CLI::Client[ self,
-      :three_streams_notify, :expressive_controller,
+      :three_streams_notify, :expressive_client,
       :DSL ]  # don't add DSL till end b.c of it's method_added hook
 
     def initialize *a

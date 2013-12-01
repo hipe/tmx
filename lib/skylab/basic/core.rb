@@ -21,9 +21,10 @@ module Skylab::Basic
       at :require_subsystem, :require_stdlib
 
     o = { }
-    o[:Headless] = subsystem
-    o[:StringIO] = stdlib
-    o[:StringScanner] = -> _ { require 'strscan' ; ::StringScanner }
+    o[ :Headless ] = subsystem
+    o[ :Set ] =
+      o[ :StringIO ] = stdlib
+    o[ :StringScanner ] = -> _ { require 'strscan' ; ::StringScanner }
 
     define_singleton_method :const_missing do |c|
       const_set c, o.fetch( c )[ c ]

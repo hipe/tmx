@@ -4,6 +4,10 @@ module Skylab::Headless
 
   module FUN
 
+    Inspect = -> x do
+      Headless::Services::Basic::FUN::Inspect[ x ]
+    end
+
     class Scn < ::Proc
       alias_method :gets, :call
       def self.[] p

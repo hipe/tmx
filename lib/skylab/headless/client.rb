@@ -1,6 +1,18 @@
 module Skylab::Headless
 
   module Client
+
+    def self.[] mod, * x_a
+      x_a.length.zero? and raise ::ArgumentError, "cherry-picking only"
+      Bundles.apply_iambic_on_client x_a, mod ; nil
+    end
+
+    module Bundles
+      Client_services = -> x_a do
+        module_exec x_a, & Client_Services.to_proc ; nil
+      end
+      MetaHell::Bundle::Multiset[ self ]
+    end
   end
 
   module Client::InstanceMethods

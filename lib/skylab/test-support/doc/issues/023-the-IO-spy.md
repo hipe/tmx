@@ -1,4 +1,8 @@
-# the IO spy
+# the IO spy :[#023]
+
+the IO spy is part of (#parent-node) [#020] the family of IO spy
+aggregations ..
+
 
 ## how to use it
 
@@ -7,7 +11,10 @@ objects of this class constitute the member of both the members (sic) of the
 expected that you can leverage this node via those nodes rather than needing
 to interface with this node directly.
 
+
 ## what it is
+
+(a sizeable introduction occurs in [#020] IO spy aggregations compared ..)
 
 A IO::Spy is a simple multiplexer that multiplexes out a subset of the
 instance methods of the IO module out to an ordered hash of listeners. IO::Spy
@@ -45,3 +52,8 @@ have no effect on the data written to the buffer that you will test against.
 consisting of at least an IO buffer, it is confusing and showing strain.
 survey if ever we do not make a s.s that is standard, and if not then bake it
 in and if so then subclass.
+
+
+## advantages that this holds over simpler alternatives ..
+
+.. are discussed in [#020] IO spy aggregations compared ..

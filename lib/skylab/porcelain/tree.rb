@@ -2,6 +2,10 @@ module Skylab::Porcelain
 
   module Tree
 
+    def self.[] mod
+      mod.extend ModuleMethods ; mod.send :include, InstanceMethods ; nil
+    end
+
     Fields__ = MetaHell::FUN.fields
 
     Fields_ = -> mod, *a do

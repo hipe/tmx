@@ -38,14 +38,14 @@ module Skylab::SubTree
           alias_method :calculate, :instance_exec
         private
           Headless::SubClient::EN_FUN[ self, :private, %i( s ) ]
-          o = Headless::CLI::Pen::FUN::Stylize.curry
+          o = Headless::CLI::Pen::FUN::Stylify.curry
           define_method :em, o[ %i( green ) ]
           define_method :escape_path, Headless::CLI::PathTools::FUN.pretty_path
           define_method :ick, Basic::FUN::Inspect__.curry[ 60 ]
         public
           def stylize *a
             _s = a.pop
-            Headless::CLI::Pen::FUN::Stylize[ a, _s ]
+            Headless::CLI::Pen::FUN::Stylify[ a, _s ]
           end
         end
         r = Expression_Agent__.method :new ; p = -> { r } ; r

@@ -3,11 +3,10 @@ module Skylab::Headless
   module CLI::Pen  # [#084]
 
     module Bundles
-      module Expressive_controller
+      module Expressive_agent
         p = -> _ do
-          include Expressive_controller
-        end
-        define_singleton_method :to_proc do p end
+          include Expressive_agent
+        end ; define_singleton_method :to_proc do p end
       private
         def say &p
           expression_agent.calculate( & p )
@@ -21,13 +20,13 @@ module Skylab::Headless
       o = definer
 
       o[ :stylize ] = -> str, * style_a do
-        Stylize[ style_a, str ]
+        Stylify[ style_a, str ]
       end
       #
-      Stylize = -> style_a, str do
+      Stylify = -> style_a, str do
         "\e[#{ style_a.map { |s| CODE_H__[s] }.compact * ';' }m#{ str }\e[0m"
       end
-      o[ :curriable_stylize ] = Stylize
+      o[ :curriable_stylize ] = Stylify
       #
       CODE_H__ = ::Hash[ [ [ :strong, 1 ], [ :reverse, 7 ] ].
         concat [ :red, :green, :yellow, :blue, :purple, :cyan, :white ].
@@ -39,14 +38,14 @@ module Skylab::Headless
       end                                      # stylzed in the first place
       #
       Unstyle_styled = -> str do  # nil IFF str.to_s is not already styled
-        str.to_s.dup.gsub! SIMPLE_STYLE_RX_, ''
+        str.to_s.dup.gsub! SIMPLE_STYLE_RX, ''
       end
       o[ :unstyle_styled ] = Unstyle_styled
 
       # see also CLI::FUN for extended support for working with styles
     end
 
-    SIMPLE_STYLE_RX_ = /\e  \[  \d+  (?: ; \d+ )*  m  /x
+    SIMPLE_STYLE_RX = /\e  \[  \d+  (?: ; \d+ )*  m  /x
 
     Define_stylize_methods__ = -> do
 

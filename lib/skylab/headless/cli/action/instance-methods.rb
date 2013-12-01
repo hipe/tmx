@@ -279,9 +279,13 @@ module Skylab::Headless
     def usage_line
       a = [ em( 'usage:' ) ]      # (yes everything here does result in 1 line)
       a << normalized_invocation_string
-      x = render_option_syntax                   ; a << x if x
-      x = render_argument_syntax argument_syntax ; a << x if x
+      x = render_option_syntax ; x and a << x
+      x = render_argument_syntax_term ; x and a << x
       a.compact.join ' '
+    end
+
+    def render_argument_syntax_term
+      render_argument_syntax argument_syntax
     end
 
     #         ~ the `desc_lines` facility ~
@@ -533,12 +537,16 @@ module Skylab::Headless
       @argument_syntax_cache_h ||= { }  # gained by this but watch out near
     end                           # box / dsl)
 
-    def argument_syntax_for_method method_ref
-      argument_syntax_cache.fetch method_ref.intern do |meth_ref|
-        @argument_syntax_cache_h[ meth_ref ] =
-          Headless::CLI::Argument::Syntax::Inferred.new(
-            method( meth_ref ).parameters, formal_parameters ) # nil ok, f.p
+    def argument_syntax_for_method meth_x
+      meth_i = meth_x.intern
+      argument_syntax_cache.fetch meth_i do
+        @argument_syntax_cache_h[ meth_i ] = build_arg_stx meth_i
       end
+    end
+
+    def build_arg_stx meth_i
+      Headless::CLI::Argument::Syntax::Inferred.
+        new method( meth_i ).parameters, formal_parameters  # f.p nil ok
     end
 
     # a #view-template-ish for rendering a particular argument syntax object
@@ -547,18 +555,28 @@ module Skylab::Headless
     # you can emphasize a contiguous subset of the elements. (there is
     # significance that this happens here and not in an auxiliary object)
 
-    def render_argument_syntax syn, em_range=nil  # of the elements.
-      a = syn.each.with_index.reduce [] do |m, (arg, idx)|
+    def render_argument_syntax stx, em_range=nil  # of the elements.
+      y = []
+      render_base_arg_syntax_parts y, stx, em_range
+      append_syntax y
+      y * ' ' if y.length.nonzero?
+    end
+
+    def render_base_arg_syntax_parts y, stx, em_range=nil
+      stx.each.with_index do |arg, d|
         s = render_argument arg
-        if em_range and em_range.include? idx
+        if em_range and em_range.include? d
           s = em s
         end
-        m << s
+        y << s
+      end ; nil
+    end
+
+    def append_syntax y  # for custom hacky syntaxes
+      if self.class.respond_to? :append_syntax_a
+        a = self.class.append_syntax_a
       end
-      if self.class.respond_to? :append_syntax_a and self.class.append_syntax_a
-        a.concat self.class.append_syntax_a  # for custom hacky syntaxes
-      end
-      a.join ' ' if a.length.nonzero?
+      a and y.concat a ; nil
     end
 
   public
@@ -614,10 +632,14 @@ module Skylab::Headless
       horizontal: :handle_missing_args_horizontal }.freeze
 
     def handle_missing_args_vertical e
-      fragment = e.argument_a
-      a = fragment[ 0 .. fragment.index { |x| :req == x.reqity } ]
-      usage_and_invite "expecting: #{ render_argument_syntax a, 0..0 }"
+      usage_and_invite "expecting: #{ render_expecting_term e }"
       exit_status_for :argv_parse_failure_missing_required_arguments
+    end
+
+    def render_expecting_term e
+      fragment = e.argument_a
+      _a = fragment[ 0 .. fragment.index { |x| :req == x.reqity } ]
+      render_argument_syntax _a, 0..0
     end
 
     def handle_missing_args_horizontal e

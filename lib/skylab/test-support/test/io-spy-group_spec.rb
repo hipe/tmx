@@ -1,6 +1,7 @@
 require_relative 'test-support'
 
 module Skylab::TestSupport::TestSupport::IO
+
   ::Skylab::TestSupport::TestSupport[ IO_TestSupport = self ]
 
   include CONSTANTS
@@ -10,8 +11,8 @@ module Skylab::TestSupport::TestSupport::IO
   describe "#{ TestSupport::IO::Spy::Group }" do
     it "aggregates emissions from multiple streams onto the same ordered queue" do
       g = TestSupport::IO::Spy::Group.new
-      red = g.stream_spy_for :red
-      blue = g.stream_spy_for :blue
+      red = g.for :red
+      blue = g.for :blue
       red.puts "r1"
       blue.puts "b1\nb2"
       red.write "r2\nnever see"

@@ -129,7 +129,8 @@ module Skylab::Headless::SubClient
   module EN_FUN
 
     def self.[] mod, * x_a
-      :private == x_a[ 0 ] or fail "only `private` is supported for now (had #{ Headless::Services::Basic::FUN::Inspect[ x_a[ 0 ] ] })"
+      :private == x_a[ 0 ] or fail "only `private` is supported for now #{
+        }(had #{ Headless::FUN::Inspect[ x_a[ 0 ] ] })"
       x_a.shift
       1 == x_a.length or fail "expecting exactly one element, an array"
       meth_i_a = [ * x_a.shift, :nlp_last_length, :set_nlp_last_length ]
@@ -249,7 +250,7 @@ module Skylab::Headless::SubClient
   end
 
   module InstanceMethods
-    EN_FUN.each do |method_name, body|
+    EN_FUN.each_pair do |method_name, body|
       define_method method_name, &body
       protected method_name  # #protected-not-private
     end

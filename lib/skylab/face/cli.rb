@@ -2107,7 +2107,7 @@ module Skylab::Face
 
   class CLI::Fun_
     def stylify
-      p = Face::Services::Headless::CLI::Pen::FUN::Stylize
+      p = Face::Services::Headless::CLI::Pen::FUN::Stylify
       CLI::Fun_.class_exec do
         remove_method :stylify
         define_method :stylify do p end

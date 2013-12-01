@@ -1,37 +1,39 @@
 module Skylab::TestSupport
 
-  class IO::Spy < ::Skylab::Headless::IO::Interceptors::Tee  # :[#023] ".."
+  class IO::Spy < ::Skylab::Headless::IO::Interceptors::Tee  # :[#023] ..
 
     def self.standard
-      new( buffer: Subsys::Services::StringIO.new ).tty!
+      new( BUFFER_I__ => Subsys::Services::StringIO.new ).tty!
+    end
+
+    def string  # assumes this constituent
+      self[ BUFFER_I__ ].string
     end
 
     def clear_buffer
-      self[:buffer].instance_exec do
+      self[ BUFFER_I__ ].instance_exec do
         rewind
         truncate 0
-      end
-      nil
+      end ; nil
     end
 
-    def debug! prepend=nil
-      down_stream = Stderr_.call
-      if prepend
-        use_stream = Headless::IO::Interceptors::Filter.new down_stream
-        if prepend.respond_to? :call
-          use_stream.puts_filter! prepend
+    def debug! prepend_x=nil
+      down_IO = Stderr_[]
+      if prepend_x
+        io = Headless::IO::Interceptors::Filter.new down_IO
+        if prepend_x.respond_to? :call
+          io.puts_filter! prepend_x
         else
-          use_stream.line_begin_string = prepend
+          io.line_begin_string = prepend_x
         end
       else
-        use_stream = down_stream
+        io = down_IO
       end
-      self[:debug] = use_stream
+      self[ DEBUG_I__ ] = io
       self
     end
 
-    def string  # assumes :buffer is a member. a "convenience macro"
-      self[ :buffer ].string
-    end
+    BUFFER_I__ = :buffer ; DEBUG_I__ = :debug  # ok to open up if needed
+
   end
 end

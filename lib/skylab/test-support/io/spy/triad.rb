@@ -2,7 +2,7 @@ module Skylab::TestSupport
 
   class IO::Spy::Triad < ::Struct.new :instream, :outstream, :errstream
 
-    # see [#023] for a comparison of different IO spy aggregations
+    # see [#020] a comparison of different IO spy aggregations ..
 
     def initialize *three
       @do_debug = nil

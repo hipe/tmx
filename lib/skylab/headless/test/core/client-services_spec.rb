@@ -8,7 +8,7 @@ module Skylab::Headless::TestSupport::CS__
 
   extend TestSupport::Quickie
 
-  describe "[hl] client services" do
+  describe "[hl] core client services" do
 
     context "compound" do
 

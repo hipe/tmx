@@ -2,7 +2,43 @@ require_relative '..'
 
 require 'skylab/meta-hell/core'
 
+class ::Object  # :2:[#sl-131] - experiment. this is the last extlib.
+private
+  def notificate i
+  end
+end
+
 module Skylab::Headless
+
+  module Notificate
+    def self.[] mod
+      mod.extend MM__ ; mod.send :include, IM__ ; nil
+    end
+    module MM__
+      attr_reader :notificiation_listener_p_a_h
+    private
+      def add_notification_listener event_i, & subroutine_p
+        ( @notificiation_listener_p_a_h ||= { } ).fetch event_i do
+          @notificiation_listener_p_a_h[ event_i ] = [ ]
+        end.push subroutine_p ; nil
+      end
+    end
+    module IM__
+    private
+      def notificate i
+        h = self.class.notificiation_listener_p_a_h
+        if h
+          p_a = h[ i ]
+          if p_a
+            p_a.each do |p|
+              instance_exec( & p )
+            end
+          end
+        end
+        super
+      end
+    end
+  end
 
   %i| Autoloader Headless MetaHell |.each do |i|
     const_set i, ::Skylab.const_get( i, false )
@@ -83,7 +119,7 @@ module Skylab::Headless
     end ]
   end
 
-  class Event_
+  class Event_  # :[#089] the magical, multipurpose Event base class
     New_method_produces_subclasses_with_members__[ self,
       :with_args, -> x_a, p do
         x_a.length.zero? && p &&
@@ -124,12 +160,7 @@ module Skylab::Headless
   end
 
   class Client_Services
-
-    def self.to_proc
-      BUNDLE__
-    end
-
-    BUNDLE__ = -> a do
+    to_proc = -> a do
       extend MM__ ; include IM__
       did = nil ; p = -> i do
         name = Name__.new i
@@ -145,7 +176,7 @@ module Skylab::Headless
       end
       did or p[ :client_services ]
       nil
-    end
+    end ; define_singleton_method :to_proc do to_proc end
 
     class Name__
       def initialize i ; @i = i end
@@ -183,6 +214,7 @@ module Skylab::Headless
     end
 
     module IM__
+
     private
 
       def client_services_notify name
@@ -221,10 +253,200 @@ module Skylab::Headless
           self
         end
       end
+    end
+
+    # ~ experiment
+
+    def resolve_service i
+      if self.class.has_delegated_member? i
+        Service_Resolved_As_Bound_Method__.new method i
+      else
+        @up_p[].resolve_service_notify i
+      end
+    end
+  end
+
+  module Service_Terminal
+    to_proc = -> x_a do  # NOT re-entrant
+      profile = Profile__.new
+      if :intermediate == x_a[ 0 ]
+        profile.is_intermediate = true ; x_a.shift
+      end
+      if :service_module == x_a[ 0 ]
+        profile.has_service_module = true ; x_a.shift
+        const_set :SVC_MOD_P__, x_a.shift
+      end
+      profile.freeze
+    private
+      include Service_Teriminal_IMs__
+      define_method :svc_profile do profile end ; private :svc_profile ; nil
+    end ; define_singleton_method :to_proc do to_proc end
+    Profile__ = ::Struct.new :has_service_module, :is_intermediate
+  end
+  Service_Resolution__ = ::Struct.new :i, :c_i, :cls
+  module Service_Teriminal_IMs__
+    def resolve_service_notify i
+      if (( svc = any_cached_svc i ))
+        svc
+      else
+        rslv_svc i
+      end
+    end
+  private
+    def any_cached_svc i
+      (( @svc_h ||= { } )).fetch i do end
+    end
+    def rslv_svc i
+      sr = Service_Resolution__.new i
+      @svc_profile ||= svc_profile
+      if @svc_profile.has_service_module && (( svc = rslv_svc_via_module sr ))
+        svc
+      elsif @svc_profile.is_intermediate
+        rslv_svc_as_intermediate sr
+      else
+        rslv_svc_as_terminal sr
+      end
+    end
+    def rslv_svc_via_module sr
+      @svc_mod ||= self.class::SVC_MOD_P__.call
+      sr.c_i = c_i = sr.i.to_s.gsub( /(?<=^|_)[a-z]/, & :upcase ).intern
+      if @svc_mod.const_defined? c_i
+        sr.cls = @svc_mod.const_get c_i
+        rslv_svc_via_cls sr
+      end
+    end
+    def rslv_svc_via_cls sr
+      svc = sr.cls.new client_services ; @svc_h[ sr.i ] = svc ; svc
+    end
+    def rslv_svc_as_intermediate sr
+      cs = client_services
+      if cs.class.has_delegated_member? sr.i
+        cs.resolve_service sr.i
+      else
+        @client.resolve_service sr.i
+      end
+    end
+    def rslv_svc_as_terminal sr
+      r = rslv_svc_via_method sr.i
+      r and @svc_h[ i ] = r ; r
+    end
+    def rslv_svc_via_method i
+      Service_Resolved_As_Bound_Method__.new method i
+    end
+  end
+
+  class Service_Resolved_As_Bound_Method__
+    def initialize bm
+      @bound_method = bm
+    end
+    def invoke a, p
+      @bound_method.call( * a, & p )
+    end
+  end
+
+  module Delegating
+
+    def self.[] mod, * x_a
+      mod.module_exec x_a, & to_proc
+      x_a.length.zero? or raise ::ArgumentError, "unexpected #{
+        }#{ Inspect__[ x_a[ 0 ] ] }" ; nil
+    end
+
+    Inspect__ = -> x do
+      Headless::FUN::Inspect[ x ]
+    end
+
+    to_proc = -> x_a=nil do
+      if ! const_defined? :DELEGATING_MEMBER_I_A__, false
+        const_set :DELEGATING_MEMBER_I_A__, []  # 1 of 2
+      end
+      extend MM__ ; include IM__
+      if x_a and x_a.length.nonzero?
+        if x_a[ 0 ].respond_to? :each_with_index
+          Iambic_Parse__.new( x_a.shift, self ).deleg
+        elsif 1 < x_a.length and JAM_H__.key? x_a[ 1 ]
+          Iambic_Parse__.new( x_a, self ).deleging
+        end
+      end ; nil
+    end ; define_singleton_method :to_proc do to_proc end
+
+    St__ = ::Struct.new :as, :high_name, :to, :to_method, :with_infix,
+      :with_suffix
+
+    JAM_H__ = {
+      as: -> st, x_a do
+        st.as = x_a.shift
+      end,
+      to: -> st, x_a do
+        st.to = x_a.shift
+      end,
+      to_method: -> st, x_a do
+        st.to_method = x_a.shift
+      end,
+      with_infix: -> st, x_a do
+        st.with_infix = x_a.shift 2
+      end,
+      with_suffix: -> st, x_a do
+        st.with_suffix = x_a.shift
+      end
+    }.freeze
+
+    class Iambic_Parse__  # implement older (lost in fire) iambic with newer DSL
+      def initialize x_a, mod
+        @mod = mod ; @x_a = x_a
+      end
+
+      def deleg
+        @mod.send :delegate, * @x_a ; nil
+      end
+
+      def deleging
+        p = JAM_H__[ @x_a[ 1 ] ] or raise ::ArgumentError, "unexpected #{
+          }#{ Inspect__[ @x_a[ 1 ] ] }, expecting (#{ JAM_H__.keys * '|' })"
+        begin
+          st = St__.new
+          st.high_name = @x_a.shift
+          @x_a.shift
+          begin
+            p[ st, @x_a ]
+            p = JAM_H__[ @x_a[ 0 ] ] and @x_a.shift
+          end while p
+          a = []
+          x = st.with_infix and a.push :with_infix, * x
+          x = st.with_suffix and a.push :with_suffix, x
+          if (( x = st.as ))
+            st.to_method and raise ::ArgumentError, "'as' and 'to_method' #{
+              }are mutually exclusive"
+            a.push :to_method, st.high_name
+            a.push x
+          elsif (( x = st.to_method ))
+            a.push :to_method, x
+            a.push st.high_name
+          else
+            a << [ st.high_name ]
+          end
+          @mod.send :delegating, * a
+          p = ( 1 < @x_a.length && JAM_H__[ @x_a[ 1 ] ] )
+        end while p
+      end
+    end
+
+    module MM__
+
+      def has_delegated_member? i
+        self::DELEGATING_MEMBER_I_A__.include? i
+      end
+
+      def members
+        self::DELEGATING_MEMBER_I_A__.dup
+      end
 
       def inherited otr
-        otr.instance_variable_set :@member_i_a__, [ ]
+        _a = otr::DELEGATING_MEMBER_I_A__.dup
+        otr.const_set :DELEGATING_MEMBER_I_A__, _a  # 2 of 2
       end
+
+   private
 
       def delegate * i_a
         dele = build_delegated_method_builder
@@ -237,7 +459,7 @@ module Skylab::Headless
         dele = build_delegated_method_builder x_a
         if dele.for_single_method
           accept_delegated_method dele.single_method_name( x ),
-            dele.build_single_method
+            dele.build_method( nil )
         else
           x.each do |i|
             accept_delegated_method i, dele.build_method( i )
@@ -245,10 +467,10 @@ module Skylab::Headless
         end
         nil
       end
-    private
+
       def accept_delegated_method i, p
-        @member_i_a__ << i
-        define_method i, & p
+        const_get( :DELEGATING_MEMBER_I_A__, false ) << i
+        define_method i, p
       end
       def build_delegated_method_builder x_a=nil
         Delegating__.new( x_a ).execute
@@ -256,7 +478,7 @@ module Skylab::Headless
       class Delegating__
         def initialize x_a
           @for_single_method = @name_p = @receiver_i = nil ; @x_a = x_a
-          if x_a
+          if x_a && x_a.length.nonzero?
             begin
               send :"#{ @x_a.shift }="
             end while x_a.length.nonzero?
@@ -297,7 +519,7 @@ module Skylab::Headless
             x.respond_to?( :id2name ) or raise ::ArgumentError,
              "using 'to_method' is for single methods only. no implicit #{
               }conversion from #{ x.class } to symbol"
-            self.do_me  # #todo
+            x
           end
         end
         class Monadic < Builder
@@ -323,17 +545,31 @@ module Skylab::Headless
             end
           end
         end
+      end  # Delegating__
+    end  # MM__
+
+    module IM__
+
+      def _up
+        @up_p.call
+      end
+
+      def initialize c
+        notificate :initialization
+        @up_p = -> { c }
+      end
+
+      def members
+        self.class.members
       end
     end
+  end  # Delegating
 
-    def initialize c
-      @up_p = -> { c }
-    end
+  class Client_Services
+    module_exec nil, & Delegating.to_proc
+  end
 
-    def members ; self.class.members end
-
-    def self.members ;  @member_i_a__.dup end
-
-    def _up ; @up_p.call end
+  module Bundles
+    Delegating = Delegating
   end
 end

@@ -1,3 +1,4 @@
+[#089]       #in-situ the magical, multipurpose Event base class and variants
 [#088]       #track labelize
 [#087]       updated parameter controller event model
 [#086]       #node-identity

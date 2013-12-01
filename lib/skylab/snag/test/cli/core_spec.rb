@@ -48,7 +48,7 @@ module Skylab::Snag::TestSupport::CLI
       it "2.3x4H (good arg/good opt) (help postfix) (param api)" do
         client_invoke 'todo', '-h'
         c = output.class::Composite.of output.lines
-        c.unique_stream_name_order.should eql( [ :info ] )
+        c.unique_stream_name_order_i_a.should eql %i( info )
         c.full_text.should be_include(
           'usage: sn0g todo [<action>] [<args> [..]]' )
         c.full_text.should be_include( 'sub-action help' )

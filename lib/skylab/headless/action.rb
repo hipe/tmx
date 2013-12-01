@@ -1,6 +1,35 @@
 module Skylab::Headless
 
   module Action
+
+    def self.[] mod, * x_a
+      Bundles.apply_iambic_on_client x_a, mod
+    end
+
+    module Bundles
+
+      Anchored_names = -> x_a do
+        :with == x_a[ 0 ] or fail "expecting 'with'" ; x_a.shift
+        :name_waypoint_module == x_a[ 0 ] or fail "expecting 'n..'" ; x_a.shift
+        _p = x_a.shift
+        const_set :ACTIONS_ANCHOR_MODULE, _p ; nil  # #todo
+      end
+
+      Client_services = -> x_a do
+        module_exec x_a, & Headless::Client_Services.to_proc
+      end
+
+      Expressive_agent = -> _ do
+        module_exec _, & CLI::Pen::Bundles::Expressive_agent.to_proc
+      end
+
+      Inflection = -> _ do
+        extend Headless::NLP::EN::API_Action_Inflection_Hack ; nil
+      end
+
+      MetaHell::Bundle::Multiset[ self ]
+
+    end
   end
 
   module Action::ModuleMethods

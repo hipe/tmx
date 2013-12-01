@@ -2,6 +2,12 @@ module Skylab::Headless
 
   module CLI::Box::DSL
 
+    def self.[] mod, * x_a
+      x_a.length.nonzero? and raise ::ArgumentError,
+        "wat - #{ Headless::FUN::Inspect[ x_a[ 0 ] ] }"
+      mod.module_exec x_a, & To_proc
+    end
+
     #                         ~ never say never ~                          #
 
     To_proc = -> _ do
@@ -195,9 +201,9 @@ module Skylab::Headless
 
     include CLI::Box::InstanceMethods
 
-    def initialize request_client  # #!
-      super request_client
+    def initialize * x_a
       _headless_cli_box_dsl_init
+      super( * x_a )
     end
 
     alias_method :init_headless_cli_box_dsl, :initialize
@@ -343,11 +349,19 @@ module Skylab::Headless
 
     def argument_syntax           # [#063] hybridized
       if is_collapsed
-        argument_syntax_for_method(
-          @downstream_action.normalized_local_action_name )
+        argument_syntax_when_collapsed
       else
-        argument_syntax_for_method :dispatch
+        argument_syntax_when_not_collapsed
       end
+    end
+
+    def argument_syntax_when_collapsed
+      argument_syntax_for_method(
+        @downstream_action.normalized_local_action_name )
+    end
+
+    def argument_syntax_when_not_collapsed
+      argument_syntax_for_method :dispatch
     end
 
     def render_argument_syntax syn, em_range=nil  # [#063] hybridized

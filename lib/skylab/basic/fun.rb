@@ -2,8 +2,7 @@ module Skylab::Basic
 
   module FUN
 
-    Inspect__ = -> length_d, x do
-      # ( a trivial instance of [#it-002] summarization )
+    Inspect__ = -> length_d, x do  # :+[#it-002] summarization (trivial)
       if case x
       when ::NilClass, ::FalseClass, ::TrueClass, ::Numeric, ::Module
         true
@@ -18,7 +17,9 @@ module Skylab::Basic
       end
     end
 
-    Inspect = Inspect__.curry[ 10 ]  # a reasonably short length for a string
+    A_REASONABLY_SHORT_LENGTH_FOR_A_STRING__ = 10
+
+    Inspect = Inspect__.curry[ A_REASONABLY_SHORT_LENGTH_FOR_A_STRING__ ]
 
   end
 end

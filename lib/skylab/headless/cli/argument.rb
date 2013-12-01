@@ -81,17 +81,17 @@ module Skylab::Headless
       end
     end
 
-    def slice ref
-      if ::Range === ref
+    def slice x
+      if x.respond_to? :exclude_end?
         new = self.class.allocate
         ba = base_args ; e = @elements
         new.instance_exec do
-          base_init(* ba )
-          @elements = e[ref]
+          base_init( * ba )
+          @elements = e[x]
         end
         new
       else
-        @elements.fetch range
+        @elements.fetch x
       end
     end
 
@@ -99,7 +99,7 @@ module Skylab::Headless
 
     # (we once had a `string` but it was a smell here - pls render it yrself)
 
-    #        ~ reflection api (as a courtesy for experiments) ~
+    #        ~ reflection API (as a courtesy for experiments) ~
 
     def fetch_parameter norm_name, &otr
       parm = @elements.detect do |x|
@@ -114,9 +114,6 @@ module Skylab::Headless
 
   private
 
-    def initialize                # child classes must set @elements
-    end
-
     alias_method :base_init, :initialize
 
     def base_args                 # compat with our `slice`. add parameters
@@ -129,6 +126,17 @@ module Skylab::Headless
   end
 
   class CLI::Argument::Syntax::Inferred < CLI::Argument::Syntax
+
+    def initialize ruby_param_a, formals=nil
+      @elements = ruby_param_a.reduce [] do |m, (opt_req_rest, name)|
+        if formals
+          fp = formals[ name ]
+        end
+        fp ||= Headless::Parameter.new nil, name
+        m << CLI::Argument.new( fp, opt_req_rest )
+      end
+      super()
+    end
 
     Validate = Headless::Parameter::Definer.new do
       param :on_missing, hook: true
@@ -178,16 +186,5 @@ module Skylab::Headless
     CLI::Argument::Missing_ = Headless::Event_.
       new :argument_a, :orientation, :any_at_token_set
 
-  private
-
-    def initialize ruby_param_a, formals=nil
-      @elements = ruby_param_a.reduce [] do |m, (opt_req_rest, name)|
-        if formals
-          fp = formals[ name ]
-        end
-        fp ||= Headless::Parameter.new nil, name
-        m << CLI::Argument.new( fp, opt_req_rest )
-      end
-    end
   end
 end

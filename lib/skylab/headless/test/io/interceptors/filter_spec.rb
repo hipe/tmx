@@ -16,7 +16,7 @@ module Skylab::Headless::TestSupport::IO::Interceptors
       let(:downstream) { ::StringIO.new }
       let(:stream) do
         f = Headless::IO::Interceptors::Filter.new downstream
-        f.line_begin = -> { f.downstream.write 'Z ' }
+        f.line_begin = -> { f.downstream_IO.write 'Z ' }
         f
       end
       def self.assert input, output, *tags

@@ -10,16 +10,36 @@ module Skylab::Headless
 
     module Bundles__
 
+      Actions_anchor_module = -> x_a do
+        extend Headless::Action::ModuleMethods
+        x = x_a.shift
+        _p = if x.respond_to? :call then x
+             elsif x.respond_to? :id2name then
+               -> { const_get x }
+             else
+               -> { x }
+             end
+        const_set :ACTIONS_ANCHOR_MODULE, _p ; nil
+      end
+
+      Client_services = -> x_a do
+        module_exec x_a, & Headless::Client::Bundles::Client_services.to_proc
+      end
+
       DSL = -> _ do
         module_exec _, & CLI::Client::DSL::To_proc
       end
 
-      Expressive_controller = -> _ do
-        module_exec _, & CLI::Pen::Bundles::Expressive_controller.to_proc
+      Expressive_client = -> _ do
+        module_exec _, & CLI::Pen::Bundles::Expressive_agent.to_proc
       private
         def expression_agent
           @io_adapter.pen
         end
+      end
+
+      Instance_methods = -> _ do
+        include CLI::Client::InstanceMethods ; nil
       end
 
       Three_streams_notify = -> _ do

@@ -35,7 +35,7 @@ module Skylab::TestSupport
         end
 
         def code x
-          Headless::CLI::Pen::FUN::Stylize[ [ :green ], x ]
+          Headless::CLI::Pen::FUN::Stylify[ [ :green ], x ]
         end
 
         def par i  # proof of concept - has problems

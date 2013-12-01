@@ -161,6 +161,29 @@ exit( -> sin, sout, serr, argv, program_name do
 
   rxe = ::Regexp.method :escape
 
+  is_word_character = /\A\w\z/.method :=~
+
+  insert_h = {
+    0 => -> needle, haystack do
+      haystack[ 0, 0 ] = needle ; nil
+    end,
+    -1 => -> needle, haystack do
+      haystack.concat needle ; nil
+    end }
+
+  boundarize = -> d, str do
+    str.length.zero? and break
+    yes = is_word_character[ str[ d ] ]
+    r = rxe[ str ]
+    if yes
+      insert_h.fetch( d )[ '\\b', r ]
+    end
+    r
+  end
+
+  build_boundarized_head_regex_string = boundarize.curry[ 0 ]
+  build_boundarized_tail_regex_string = boundarize.curry[ -1 ]
+
   build_rx = -> do
     scn = ::StringScanner.new replstr
     head = scn.scan %r{(?:(?!#{ _PD }).)*}
@@ -169,14 +192,11 @@ exit( -> sin, sout, serr, argv, program_name do
     end
     tail = scn.rest
     if tail.include? _PD
-      break invite[ "'#{ _PD }' cannot occure more than once in replstr" ]
+      break invite[ "'#{ _PD }' cannot occur more than once in replstr" ]
     end
-    head.length.zero? and head = nil
-    tail.length.zero? and tail = nil
-
-    _rx = /#{ head and "\\b#{ rxe[ head ] }" }#{
-            }(?<num>\d+)#{
-           }#{ tail and "#{ rxe[ tail ] }\\b" }/
+    _head_rxs = build_boundarized_head_regex_string[ head ]
+    _tail_rxs = build_boundarized_tail_regex_string[ tail ]
+    _rx = /#{ _head_rxs }(?<num>\d+)#{ _tail_rxs }/
     [ nil, _rx, head, tail ]
   end
 
@@ -247,6 +267,7 @@ exit( -> sin, sout, serr, argv, program_name do
     def build_OC= ; @oc_p = @x_a.shift end
     def input_lines= ; @fh = @x_a.shift end
     def map_h= ; @map_h = @x_a.shift end
+    def nope_exitstatus= ; @nope_exitstatus = @x_a.shift end
     def occurrences_by_lineno= ; @occ_by_ln = @x_a.shift end
     def output_line= ; @out_line_p = @x_a.shift end
     def regex= ; @regex = @x_a.shift end
@@ -256,6 +277,19 @@ exit( -> sin, sout, serr, argv, program_name do
     def execute
       @occ_by_ln ||= build_occurrences_by_lineno
       @fh.pos.zero? or raise ::ArgumentError, "file is not rewound"
+      if @occ_by_ln.length.zero?
+        no_occurrences
+      else
+        execute_normal
+      end
+    end
+  private
+    def no_occurrences
+      @y << "found no occurrences of /#{ @regex.source }/ in #{ @fh.path }"
+      @y << "nothing to do."
+      @nope_exitstatus
+    end
+    def execute_normal
       lineno = 0
       while (( line = @fh.gets ))
         lineno += 1
@@ -308,6 +342,7 @@ exit( -> sin, sout, serr, argv, program_name do
     :be_verbose, be_verbose,
     :build_OC, subsystem[ :Headless ]::CLI::FUN::Occurrence_scanner,
     :map_h, map_h,
+    :nope_exitstatus, _NOPE,
     :regex, regex,
     :replacement, -> d { "#{ head }#{ d }#{ tail }" },
     :y, y )
@@ -318,7 +353,13 @@ exit( -> sin, sout, serr, argv, program_name do
     :output_line, tmp_a[ 0 ].method( :write ),
   ).execute
 
-  es and break es
+  close_all = -> _es do
+    file_a.each do |file|
+      file.close
+    end
+    _es
+  end
+  es and break close_all[ es ]
 
   ( 1 ... file_a.length ).each do |d|
     file = file_a.fetch d
@@ -332,7 +373,8 @@ exit( -> sin, sout, serr, argv, program_name do
     ).execute
     es and break
   end
-  es and break es
+  es and break close_all[ es ]
+  close_all = nil
 
   require 'fileutils'
   file_a.length.times do |d|

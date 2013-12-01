@@ -44,18 +44,25 @@ module Skylab::MetaHell
       @a.dup
     end
 
-    def each
-      if block_given?
-        @a.each do |i|
-          yield( i, @h.fetch( i ) )
-        end
-      else
-        to_enum
-      end
-    end
-
     def at *a
       a.map( & @h.method( :fetch ) )
+    end
+
+    def each_pair &p
+      ech_pr_for_a_and_p @a, p
+    end
+
+    def each_pair_at i_a, & p
+      ech_pr_for_a_and_p i_a, p
+    end
+  private
+    def ech_pr_for_a_and_p i_a, p
+      ea = ::Enumerator.new do |y|
+        i_a.each do |i|
+          y.yield i, @h.fetch( i )
+        end ; nil
+      end
+      p ? ea.each( & p ) : ea
     end
   end
 

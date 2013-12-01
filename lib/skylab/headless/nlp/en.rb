@@ -3,7 +3,7 @@ module Skylab::Headless
   module NLP
 
     en_inflector = ::Class.new( ::Module ).class_exec do
-      Headless::SubClient::EN_FUN.each do |m, p|
+      Headless::SubClient::EN_FUN.each_pair do |m, p|
         define_method m, &p
       end
       self

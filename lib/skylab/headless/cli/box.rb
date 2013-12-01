@@ -1,7 +1,9 @@
 module Skylab::Headless
 
   module CLI::Box
-    # (will get twerked by autoloader)
+
+    ALTERNATION_SEPARATOR_GLYPH__ = '|'.freeze
+
   end
 
   module CLI::Box::InstanceMethods
@@ -75,10 +77,21 @@ module Skylab::Headless
     end
 
     def expecting_string
-      a = action_box_module.each.reduce [] do |m, (_, x)|
+      "expecting #{ action_argument_syntax_string }"
+    end
+
+    def render_argument_syntax_term_with_alternation  # pure service method
+      stx = argument_syntax_for_method :dispatch
+      y = [ action_argument_syntax_string ]
+      render_base_arg_syntax_parts y, stx[ 1 .. -1 ]
+      y * ' ' if y.length.nonzero?
+    end
+
+    def action_argument_syntax_string sep=CLI::Box::ALTERNATION_SEPARATOR_GLYPH__
+      _a = action_box_module.each.reduce [] do |m, (_, x)|
         m << x.name_function.local.as_slug
       end
-      "expecting {#{ a.map(& method( :kbd ) ) * '|' }}"
+      "{#{ _a.map( & method( :kbd ) ) * sep }}"
     end
                                   # a "porcelain-visible" toplevel entrypoint
                                   # method/action for help of *box* actions!

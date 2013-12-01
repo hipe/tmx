@@ -1,5 +1,22 @@
 module Skylab::Headless
 
+  module CLI::Action
+
+    def self.[] mod, * x_a
+      Bundles__.apply_iambic_on_client x_a, mod
+    end
+
+    module Bundles__
+
+      MetaHell::FUN::Import_constants[
+        Headless::Action::Bundles,
+        %i( Anchored_names Client_services Expressive_agent Inflection ),
+        self ]
+
+      MetaHell::Bundle::Multiset[ self ]
+    end
+  end
+
   module CLI::Action::ModuleMethods
 
     include Headless::Action::ModuleMethods
