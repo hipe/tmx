@@ -5,6 +5,7 @@ module Skylab::Git
     stdlib, subsys = ::Skylab::Subsystem::FUN.
       at :require_stdlib, :require_subsystem
     o = { }
+    o[:Basic] = subsys
     o[:FileUtils] = stdlib
     o[:Headless] = subsys
     o[:Open3] = stdlib

@@ -32,7 +32,7 @@ module Skylab::Git
     end
 
     def hi msg
-      ( @hi ||= Face::FUN.stylize.curry[ [ :green ] ] )[ msg ]
+      ( @hi ||= Face::CLI::FUN.stylify.curry[ [ :green ] ] )[ msg ]
     end
 
     def progname_for str

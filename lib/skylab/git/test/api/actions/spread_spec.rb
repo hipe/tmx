@@ -10,7 +10,7 @@ module Skylab::Git::TestSupport::API::Actions::Spread
 
   Spread = Git::CLI::Actions::Spread
 
-  describe "#{ Git }::API::Spread" do
+  describe "[gi] API actions spread" do
 
     extend TS_
 

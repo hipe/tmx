@@ -1,160 +1,246 @@
-# [#bs-001] 'reaction-to-assembly-language-phase' phase
-
 module Skylab::Git::CLI::Actions::Stash_Untracked
 
-  Autoloader = ::Skylab::Autoloader  # (doing these explicitly is actually
-  Git = ::Skylab::Git             # less typing and less ambiguous than
-  Headless = Git::Services::Headless  # including ::Skylab all over the place)
+  # read [#010] #storypoint-1 "introduction..", #storypoint-2 "local idioms"
+
+  Autoloader = ::Skylab::Autoloader  # #storypoint-3 "these constant ass.."
+  Git = ::Skylab::Git
   MetaHell = ::Skylab::MetaHell
-                                  # (above lines kept for #posterity)
+  Basic = Git::Services::Basic
+  Headless = Git::Services::Headless
 
-  module Deprecated_
-    define_method :private_attr_reader, & MetaHell::FUN.private_attr_reader
-    define_method :private_attr_accessor, & MetaHell::FUN.private_attr_accessor
-  end
+  module Sub_client__  # #storypoint-4 "the way sub-clients are used in t.."
 
-  Autoloader[ self ]              # for our one other file..
-
-
-  module SubClient_InstanceMethods
-
-    include Headless::SubClient::InstanceMethods
-
-    # (no public methods defined in this module)
-
-  private # (private before public this file only to reduce "strain" on DSL)
-
-    def initialize request_client
-      _gsu_sub_client_init request_client
+    def self.[] mod, * x_a  # re-entrant
+      mod.send :include, Sub_client_universal_IMs__
+      x_a.length.zero? and raise ::ArgumentError, "cherry-pick only."
+      apply_iambic_on_client x_a, mod ; nil
     end
 
-    def _gsu_sub_client_init request_client
-      @emit = nil
-      init_headless_sub_client request_client
-      nil
+    As_basic_set = -> x_a do
+      module_exec x_a, & Basic::Set.to_proc
     end
 
-    def emit type, msg            # experimental customizable emit
-      if @emit
-        @emit[ type, msg ]
-      else
-        request_client.send :emit, type, msg
+    As_basic_set_via_params_const = -> x_a do
+      x_a.unshift :with_members, -> do
+        self.class::PARAMS
+      end
+      module_exec x_a, & Basic::Set.to_proc
+    end
+
+    Color_inquisitor = -> _ do
+    private
+      def is_in_color
+        resolve_service( :color_inquisition ).invoke nil, nil
       end
     end
 
-    def info msg                  # (just like ancestor but decorated)
-      emit :info, "# #{ msg }"
-      nil
+    Emit_payload_line_to_listener = -> _ do
+    private
+      def emit_payload_line s
+        @listener_p[ s ]
+      end
     end
 
-    def shellesc x                # shorhand, just a wrapper - allows you
-      Git::Services::Shellwords || nil # load :/
-      x.to_s.shellescape          # to have stash names with spaces in them!
+    Emitters = -> _ do  # #storypoint-5 the sub-client implementation of..
+      include Sub_client_emitters_IMs__
     end
 
-    def stylize *a                # away at [#hl-029]
-      pen.stylize(* a )
+    File_utils = -> x_a do
+      module_exec x_a, & FU_Bundle_and_IMs__.to_proc
+    end
+
+    Funcy = -> _ do
+      MetaHell::Funcy[ self ] ; nil
+    end
+
+    Popener3 = -> x_a do
+    private
+      def popen3 *a, &p
+        _svc = @client.resolve_service :popen3
+        _svc.invoke a, p
+      end
+    end
+
+    Say = -> _ do
+      # ~ :storypoint-6 - the default way that s.c interface with the exag.
+    private
+      def say & p
+        _exag = resolve_service( :some_expression_agent ).invoke nil, nil
+        _exag.calculate( & p )
+      end
+    end
+
+    Service_terminal = -> x_a do
+      module_exec x_a, & Headless::Service_Terminal.to_proc
+    end
+
+    Shellesc = -> _ do
+    private
+      def shellesc x
+        Git::Services::Shellwords.shellescape x
+      end
+    end
+
+    Verb_lemma_hack = -> _ do
+      def self.verb_lemma_s
+        Verb_lemma_hack_[ self ]
+      end ; nil
+    end
+
+    MetaHell::Bundle::Multiset[ self ]
+  end
+
+  Verb_lemma_hack_ = -> mod do
+    s = mod.name ; base_s = s[ s.rindex( COLON__ ) + 1 .. -1 ]
+    base_s.downcase
+  end
+  COLON__ = ':'.freeze
+
+  module Sub_client_universal_IMs__
+  private
+    def client_notify x
+      @client = x
+    end
+    def resolve_service i
+      @client.resolve_service i
     end
   end
 
-  module Color_InstanceMethods
-    def color?
-      request_client.send :color?
-    end
-  end
-
-  module PathInfo_InstanceMethods
-    extend Deprecated_
-
+  module Sub_client_emitters_IMs__  # :#storypoint-5 the sub-client imple..
   private
 
-    relpath = '../Stashes'
-    define_method :find_closest_path_info do
-      res = nil
-      begin
-        curr = pwd = ::Pathname.pwd
-        found = nil
-        max_dirs_looked = nil                  # #placeholder for possible feat.
-        num_dirs_looked = 0
-        loop do
-          if max_dirs_looked && max_dirs_looked >= num_dirs_looked
-            break
-          end
-          num_dirs_looked += 1
-          if curr.join( relpath ).exist?
-            found = curr
-            break
-          end
-          parent = curr.parent
-          if parent == curr
-            break
-          end
-          curr = parent
-        end
-        if found
-          res = PathInfo.new curr, curr.join( relpath )
-          break
-        end
-        reason = case 1 <=> num_dirs_looked
-        when -1 ; " and the #{ num_dirs_looked - 1 } dirs above it"
-        when  0 ; nil
-        when  1 ; " num_dirs_looked was #{ num_dirs_looked }!" # (strange)
-        end
-        error "couldn't find #{ relpath } in #{ escape_path pwd }#{
-          }#{ reason }"
-        res = false
-      end while nil
-      res
+    def emit_payload_line s
+      @client.emit_payload_line s
     end
 
-    private_attr_reader :path_info
-
-    def resolve_path_info! param_h
-      res = nil
-      begin
-        fail 'sanity - path info already set' if path_info
-        sp = param_h.fetch :stashes_path       # yep, it must exist as a key
-        param_h.delete :stashes_path           # mutate now, sure why not #atom
-        if sp
-          res = PathInfo.new ::Pathname.new( '.' ), ::Pathname.new( sp )
-                                               # this is the "old way" where
-                                               # anchor is pwd, both relative
-        else
-          res = find_closest_path_info         # this is the "new way", anchor
-                                               # will be based on where stashes
-        end                                    # was found.
-        res or break
-        @path_info = res
-        res = true
-      end while nil
-      res
+    def emit_inner_error_string s
+      @client.emit_inner_error_string s
     end
 
-    def stashes_path                          # for compat. with invoke impl,
-      path_info.stashes_pathname.to_s         # we've got to be able to return
-                                              # a non-nil value for any of these
-    end                                       # that we absorb early (for now)
+    def emit_error_line s
+      @client.emit_error_line s
+    end
+
+    def emit_inner_info_string s
+      @client.emit_inner_info_string s
+    end
+
+    def emit_info_line s
+      @client.emit_info_line s
+    end
   end
 
   class CLI
-    extend Deprecated_
-    include SubClient_InstanceMethods          # *before* cli client mechanics
-                                               # if you want to override them.
 
-  private                                    # (meh before we load DSL)
+    Sub_client__[ self,
+      :service_terminal, :service_module, -> { Services__ } ]
 
-    def initialize _, stdout, stderr
+    Headless::CLI::Client[ self, :client_services, :expressive_client,
+                           :three_streams_notify, :instance_methods ]
+
+    def initialize i, o, e
       @param_h = { }
-      self.io_adapter = build_IO_adapter _, stdout, stderr
-      _gsu_sub_client_init nil
-      _headless_cli_box_dsl_init
+      three_streams_notify i, o, e
+      super
     end
 
-    def api_invoke mixed_action_name, param_h
-      klass = API::Actions.const_fetch mixed_action_name
-      o = klass.new self
-      res = o.invoke param_h
-      res
+  private
+    def pen_class
+      Expression_Agent__
+    end
+    class Expression_Agent__ < Headless::CLI::Pen::Minimal
+      def escape_path x
+        _s = x.to_s
+        Headless::CLI::PathTools::FUN.pretty_path[ _s ]
+      end
+    end
+  public
+
+    client_services_class
+    class Client_Services
+      delegating :with_suffix, :_notify, %i( emit_info_line
+        emit_error_line emit_payload_line
+        is_in_color popen3 some_expression_agent )
+    end
+    # top-client #storypoint-5 is just straightforward pass-in here
+    def emit_error_line_notify s
+      emit_error_line s
+    end
+    def emit_info_line_notify s
+      emit_info_line s
+    end
+    def emit_payload_line_notify s
+      emit_payload_line s
+    end
+    # (#storypoint-6 again - buckstopper)
+    def some_expression_agent_notify
+      @io_adapter.pen
+    end
+
+    define_method :popen3_notify, & Git::Services::Open3.method( :popen3 )
+    # gets stubed by tests, hence at top # :#storypoint-7: this?
+
+  private
+
+    # ~ CLI action support - options
+
+    def stashes_option o
+      @param_h[ :stashes_path ] = nil
+      o.on '-s', '--stashes <path>',
+          "use <path> as stashes path and pwd as hub dir" do |s|
+        @param_h[ :stashes_path ] = s
+      end
+    end
+
+    def dry_run_option o
+      @param_h[ :dry_run ] = false
+      o.on '-n', '--dry-run', "Dry run." do
+        @param_h[ :dry_run ] = true
+      end
+      nil
+    end
+
+    def verbose_option o
+      @param_h[:be_verbose] = false
+      o.on '-v', '--verbose', 'verbose output' do
+        @param_h[:be_verbose] = true
+      end
+      nil
+    end
+
+    def help_option o
+      o.on '-h', '--help', 'this screen' do
+        enqueue_help
+      end
+      nil
+    end
+
+    # ~ support for interfacing with API
+
+    def invoke_API action_locator_x, par_h
+      cls = API::Actions.const_fetch action_locator_x
+      hot = cls.new client_services
+      r = hot.invoke par_h
+      case r
+      when true ; r = nil
+      when false ; r = invt
+      end
+      EXITCODE_H__.fetch r do r end
+    end
+    SUCCESS_EXITSTATUS = 0
+    GENERAL_FAILURE_EXITSTATUS = 8
+    EXITCODE_H__ = {
+      false => GENERAL_FAILURE_EXITSTATUS,
+      nil => SUCCESS_EXITSTATUS }
+
+    def invt
+      progname = last_hot_prgm_name
+      emit_info_line say { "try #{ kbd "#{ progname } -h" } for help" }
+      false
+    end
+
+    def last_hot_prgm_name
+      "#{ program_name } #{ Verb_lemma_hack_[ @downstream_action.class ] }"
     end
 
     def build_option_parser
@@ -167,68 +253,86 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       o.summary_indent = '  '     # two spaces, down from four
       o
     end
-
     def create_option_parser
       Git::Services::OptionParser.new
     end
-
-    def create_leaf_option_parser
+    def create_option_parser_for_leaf
       create_option_parser
     end
 
-    define_method :escape_path, & Headless::CLI::PathTools::FUN.pretty_path
-    private :escape_path
+    # ~ CLI "the buck stops here" topper-stoppers
 
-    private_attr_reader :param_h # this moves a lot
+    # top-client #storypoint-5 is :#storypoint-8:
+    # emitters at the top-client level merely write..
 
-    pen = Headless::CLI::Pen::MINIMAL
+    def emit_payload_line s
+      emit :payload, s
+    end
 
-    define_method( :pen ) { pen }
-    private :pen
+    def emit_error_line s
+      emit :_other_, s ; false
+    end
+
+    def emit_info_line s
+      emit :_other_, s
+    end
 
     # --*--
-
-    def dry_run_option o
-      param_h[:dry_run] = false
-      o.on '-n', '--dry-run', "Dry run." do
-        param_h[:dry_run] = true
-      end
-      nil
-    end
-
-    def help_option o
-      o.on '-h', '--help', 'this screen' do
-        enqueue_help
-      end
-      nil
-    end
-
-    def verbose_option o
-      param_h[:verbose] = false
-      o.on '-v', '--verbose', 'verbose output' do
-        param_h[:verbose] = true
-      end
-      nil
-    end
-
-    def stashes_option o
-      param_h[:stashes_path] = nil
-      o.on '-s', '--stashes <path>',
-        "use <path> as stashes path and pwd as anchor dir" do |v|
-        param_h[:stashes_path] = v
-      end
-    end
 
   public
 
     #                 ~ DSL line of demarcation ~
-    # methods defined below the two extends calls make up the extend of the
-    # CLI's actions.
 
-    extend Headless::CLI::Client::DSL   # is a client, we need 1 mode client
-    extend Headless::CLI::Box::DSL      # is a box b.c has child actions
-      # this comes after above because e.g o.p calls below
+    Headless::CLI::Client[ self, :DSL ]
 
+    option_parser do |o|
+      o.separator " description: ping."
+      o.on '--API' do
+        @param_h[ :do_API ] = true
+      end
+      stashes_option o
+      help_option o
+    end
+
+    def ping a, b=nil
+      @param_h[ :_a ] = a ; @param_h[ :_b ] = b
+      if @param_h[ :do_API ]
+        ping_API
+      else
+        ping_CLI
+      end
+    end
+  private
+    def ping_CLI
+      a, b = @param_h.values_at :_a, :_b
+      if b
+        emit_info_line "(#{ a }, #{ b })"
+      elsif 'wrong' == a
+        emit_error_line "this was wrong: #{ a.inspect }"
+      else
+        emit_payload_line "(#{ a })"
+      end
+      :ping_from_GSU
+    end
+    def ping_API
+      @param_h.delete :do_API
+      @param_h[ :zip ] = @param_h.delete :_a
+      @param_h[ :zap ] = ( @param_h.delete :_b ) || false
+      invoke_API :ping, @param_h
+    end
+  public
+
+    option_parser do |o|
+      o.separator " description: Shows the files that would be stashed."
+      help_option o
+      stashes_option o
+      verbose_option o
+      o
+    end
+
+    def status
+      invoke_API :status, @param_h
+    end
 
     option_parser do |o|
       o.separator " description: move all untracked files to #{
@@ -241,7 +345,36 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
 
     def save stash_name
-      api_invoke :save, param_h.merge( stash_name: stash_name )
+      invoke_API :save, @param_h.merge( stash_name: stash_name )
+    end
+
+    option_parser do |o|
+
+      o.separator " description: In the spirit of `git stash show`, #{
+        }reports on contents of stashes."
+
+      @param_h[ :is_in_color ] = true
+      o.on( '--no-color', "No color." ) { @param_h[ :is_in_color ] = false }
+
+      help_option o
+
+      @param_h[ :do_show_patch ] = false
+      o.on( '-p', '-u', '--patch', "Generate patch (can be used with --stat)."
+        ) { @param_h[ :do_show_patch ] = true }
+
+      stashes_option o
+
+      @param_h[ :do_show_stat ] = false
+      o.on( '--stat', "Show diffstat format (default) #{
+        }(can be used with --patch)." ) { @param_h[ :do_show_stat ] = true }
+
+      verbose_option o
+
+      o
+    end
+
+    def show stash_name
+      invoke_API :show, @param_h.merge( stash_name: stash_name )
     end
 
     option_parser do |o|
@@ -253,36 +386,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
 
     def list
-      api_invoke :list, param_h
-    end
-
-    option_parser do |o|
-
-      o.separator " description: In the spirit of `git stash show`, #{
-        }reports on contents of stashes."
-
-      param_h[:color] = true
-      o.on( '--no-color', "No color." ) { param_h[:color] = false }
-
-      help_option o
-
-      param_h[:show_patch] = nil
-      o.on( '-p', '-u', '--patch', "Generate patch (can be used with --stat)."
-        ) { param_h[:show_patch] = true }
-
-      stashes_option o
-
-      param_h[:show_stat] = nil
-      o.on( '--stat', "Show diffstat format (default) #{
-        }(can be used with --patch)." ) { param_h[:show_stat] = true }
-
-      verbose_option o
-
-      o
-    end
-
-    def show stash_name
-      api_invoke :show, param_h.merge( stash_name: stash_name )
+      invoke_API :list, @param_h
     end
 
     option_parser do |o|
@@ -295,595 +399,768 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
 
     def pop stash_name
-      api_invoke :pop, param_h.merge( stash_name: stash_name )
+      invoke_API :pop, @param_h.merge( stash_name: stash_name )
     end
 
-    option_parser do |o|
-      o.separator " description: Shows the files that would be stashed."
-      help_option o
-      stashes_option o
-      verbose_option o
-      o
-    end
-
-    def status
-      api_invoke :status, param_h
+    module Services__
+      class Find_Nearest_Hub  # this precededs "tree walker" [#ts-019]
+        def initialize _
+        end
+        def call
+          max_dirs = HARDCODED_MAX_DIRS__
+          num_dirs_looked = 0
+          pn = pwd_pn = ::Pathname.pwd
+          while true
+            max_dirs && num_dirs_looked >= max_dirs and break
+            num_dirs_looked += 1
+            (( pn_ = pn.join RELPATH__ )).exist? and break(( found_pn = pn ))
+            parent_pn = pn.parent
+            parent_pn == pn and break
+            pn = parent_pn
+          end
+          if found_pn
+            _relpath = pn_.relative_path_from pwd_pn
+            hub = Hub_.new
+            hub.hub_pathname = found_pn
+            hub.stashes_pathname = _relpath
+            hub
+          else
+            yield Not_Found__[ RELPATH__, pwd_pn, num_dirs_looked ]
+          end
+        end
+        HARDCODED_MAX_DIRS__ = 5
+        RELPATH__ = '../Stashes'.freeze
+        Not_Found__ = ::Struct.new :relpath, :pwd, :d
+      end
     end
   end
+  Hub_ = ::Struct.new :hub_pathname, :stashes_pathname
 
-  module API
-    # empty.
-  end
+  API = ::Module.new
 
   class API::Action
 
-    extend Deprecated_
+    Sub_client__[ self,
+      :as_basic_set_via_params_const,
+        :initialize_basic_set_with_hash,
+        :basic_set_bork_event_listener_p, -> ev do
+          emit_inner_error_string ev.string
+        end,
+      :emitters,
+      :service_terminal, :intermediate,
+      :verb_lemma_hack ]
 
-    include SubClient_InstanceMethods
+    Headless::Client[ self, :client_services ]
 
-    pathify = Autoloader::FUN.pathify
-
-    define_singleton_method :normalized_action_name do
-      name[ API::Actions.name.length + 2  .. -1 ].
-        split( '::' ).map{ |x| pathify[ x ].intern }
+    def initialize client
+      @be_verbose = false ; @error_count = 0 ; @hub = nil
+      client_notify client
+      super()
     end
 
-    def invoke param_h
-      res = nil
-      begin
-        res = resolve_path_info!( param_h ) or break
-        res = set!( param_h ) or break
-        Headless::CLI::PathTools.clear # see notes at `pretty_path` - danger
-        res = execute
-      end while nil
-      res
+    client_services_class
+    class Client_Services
+      delegating :with_suffix, :_notify, %i(
+        emit_inner_error_string emit_payload_line color_inquisition )
+    end
+    def emit_inner_error_string_notify s  # extreme emergencies
+      emit_inner_error_string s
+    end
+    def emit_payload_line_notify s
+      @client.emit_payload_line s
+    end
+    def color_inquisition_notify
+      @is_in_color
+    end
+
+    def invoke par_h
+      r = resolve_hub par_h
+      r &&= initialize_basic_set_with_hash par_h
+      if r
+        Headless::CLI::PathTools.clear  # see notes at `pretty_path` - danger
+        r = execute
+      end ; r
     end
 
   private
 
-    # (initialize defined in sub-client i.m)
-
-    fun = Headless::CLI::PathTools::FUN
-    absolute_path_hack_rx = fun::ABSOLUTE_PATH_HACK_RX
-
-    define_method :collection do
-      @collection_cache ||= { }                # (using `path_info` struct as
-      @collection_cache.fetch( path_info ) do |k| # a key works as expected.)
-        c = Stash::Collection.new self, path_info, -> type, str do # define emit
-          use = str.gsub absolute_path_hack_rx do # as: scan for strings that
-            escape_path $~[0]                  # look like paths and escape them
-          end                                  # using oure escape_path method
-          emit type, use                       # and emit thru our emit method
-        end
-        @collection_cache[k] = c               # (smell [#hl-027]: it could
-      end                                      # use model/view split. but
-    end                                        # only important if we ever
-                                               # have multiple api actions
-                                               # happen in one process)
-
-    def escape_path x                          # if in verbose mode,
-      res = nil                                # do not do the fancy
-      if verbose                               # path escaping, just show raw,
-        res = x                                # long paths.
+    def resolve_hub par_h
+      @hub and fail "sanity - hub is write once"
+      stashes_s = par_h.fetch :stashes_path ; par_h.delete :stashes_path
+      r = if stashes_s  # the old way - hub is pwd, both paths might be relative
+        Hub_.new ::Pathname.new( '.' ), ::Pathname.new( stashes_s )
       else
-        res = request_client.send :escape_path, x # otherwise, let the modality
-      end                                      # client (e.g.) decide how
-      res
+        resolve_service( :find_nearest_hub ).call( & method( :nrst_hb_nt_fnd ) )
+
+      end  # first, then derive hub abspath from it
+      r and accept_normalized_hub r
     end
 
-    def formal_param_a
-      self.class.const_get :PARAMS, false
+    def accept_normalized_hub hub
+      @hub = hub
+      @stashes_path = @hub.stashes_pathname.to_s
+      true
     end
 
-    def normalized_action_name
-      self.class.normalized_action_name
-    end
-
-    def popen3 cmd, &block
-      Git::Services::Open3.popen3 cmd, &block
-    end
-
-    def set! param_h
-      res = nil
-      begin
-        before = error_count
-        missing_a = formal_param_a - param_h.keys
-        invalid_a = param_h.keys - formal_param_a
-        error = -> msg do
-          self.error "can't invoke api action \"#{
-            }#{ normalized_action_name.join ' ' }\" - #{ msg }"
-        end
-        if invalid_a.length.nonzero?
-          error[ "invalid parameter(s): (#{ invalid_a.join ', ' })" ]
-          break( res = false )
-        end
-        if missing_a.length.nonzero?           # #experimental addition to the
-          missing_a.each_with_index do |k, i|  # canonical algorithm: allow
-            if ! send( "#{ k }" ).nil?         # these to be previously set
-              missing_a[i] = nil
-            end
-          end
-          missing_a.compact!
-        end
-        if missing_a.length.nonzero?
-          error[ "missing required parameter(s): (#{ missing_a.join ', ' })" ]
-          break( res = false )
-        end
-        param_h.each { |k, v| send "#{ k }=", v } # might trigger error()
-        res = error_count == before            # (better to keep it strict)
-      end while nil
-      res
-    end
-
-    def show_info
-      path_info.members.each do |member|
-        info "#{ member }: #{ path_info[member] }"
+    def nrst_hb_nt_fnd ev
+      relpath, pwd, d = ev.to_a
+      reason_s = case 1 <=> d
+      when -1 ; " and the #{ d - 1 } dirs above it"
+      when  0 ; nil
+      when  1 ; " (num dirs looked was #{ d }?)"  # (strange)
       end
-      nil
+      emit_inner_error_string say {
+        "couldn't find #{ relpath } in #{ escape_path pwd }#{ reason_s }" }
     end
 
-    def stashes_path= str
-      if path_info
-        fail "sanity - attempt to set stashes_path after path_info set."
+  public
+
+  private
+
+    # API action customizations of #storypoint-5
+
+    def emit_inner_error_string s
+      _l_s = self.class.verb_lemma_s
+      a, s_, b = unparenthesize s
+      emit_error_line "#{ a }failed to #{ _l_s } stash(es) - #{ s_ }#{ b }"
+    end
+
+    def emit_error_line s
+      @error_count += 1
+      super
+    end
+
+    def emit_inner_info_string s
+      a, s_, b = unparenthesize s
+      _l_s = self.class.verb_lemma_s
+      emit_info_line "#{ a }while #{ _l_s }ing stash(es), #{ s_ }#{ b }"
+    end
+
+    def unparenthesize s
+      md = PARENTHESES_RX__.match s
+      if md
+        [ md[ :a ], md[ :s ], md[ :b ] ]
+      else
+        [ nil, s, nil ]
       end
-      self.path_info = StashesPathInfo.new str
-      str
+    end
+    PARENTHESES_RX__ = %r{\A(?:
+      (?<a>\() (?<s>.+) (?<b>\))  |
+      (?<a>[#][ ]*) (?<s>.+) (?<b>)
+    )\n?\z}x
+
+    Headless::Action[ self,
+      :anchored_names, :with, :name_waypoint_module, -> { API::Actions } ]
+
+    $stderr.puts "TO DO THESE NAMES"
+
+    def render_hub_info
+      @hub.members.each do | i |
+        emit_info_line "#{ i }: #{ @hub[ i ] }"
+      end ; nil
     end
 
-    def verbose                                # if a given action doesn't
-      true                                     # support this, we fallback to
-    end                                        # "loud" for the above
+    # ~ API action business support
+
+    def collection
+      (( @collection_h ||= { } )).fetch @hub do |hub|
+        # (`hub` struct generates keys as expected)
+        @collection_h[ hub ] = build_collection
+      end
+    end
+    # smell [#hl-027]: it could use model/view split. but only matters if we
+    # ever have more than one API request processed in the same process
+
+    def build_collection
+      Stash__::Collection.new client_services,
+        :stashes_pathname, @hub.stashes_pathname,
+        :hub_pathname, @hub.hub_pathname,
+        :channel_string_listener_p, -> i, str do
+          fail self.do_me
+          # define emit to sanitize paths from strings
+          emit i, str.gsub( RX__ ) { escape_path $~[ 0 ] }
+        end
+    end
+    RX__ = Headless::CLI::PathTools::FUN::ABSOLUTE_PATH_HACK_RX
+
+  end
+
+  # ~ :#storypoint-9 - experiments with extensions ..
+
+  module FU_Bundle_and_IMs__
+    Cd = -> _ do
+      include Git::Services::FileUtils
+    end
+    Move = -> _ do
+      include FU_Bundle_and_IMs__
+    end
+    Mkdir_p = Move
+    Rmdir = Move
+  private
+    def move x1, x2, h
+      _FU_agent.move x1, x2, h
+    end
+    def mkdir_p path_s, h
+      _FU_agent.mkdir_p path_s, h
+    end
+    def rmdir path_s, h
+      _FU_agent.rmdir path_s, h
+    end
+    def _FU_agent
+      resolve_service( :FU_agent ).invoke nil, nil
+    end
+    MetaHell::Bundle::Multiset[ self ]
+  end
+  class API::Action
+    class Client_Services
+      delegating :to_method, :FU_agent_notify, :FU_agent
+    end
+    def FU_agent_notify
+      @FU_agent ||= build_FU_agent
+    end
+  private
+    def build_FU_agent
+      Headless::IO::FU.new -> msg do
+        emit_info_line "# #{ msg }"
+      end
+    end
   end
 
   #                               --*--
 
   module API::Actions
-    MetaHell::Boxxy[ self ]                     # (`const_fetch`)
+    MetaHell::Boxxy[ self, :deferred ]  # :#storypoint-10 placeholder
   end
 
-  class API::Actions::Save < API::Action
-    include PathInfo_InstanceMethods
+  class API::Actions::Ping < API::Action
 
-    PARAMS = [ :dry_run, :stash_name, :stashes_path, :verbose ]
+    Sub_client__[ self, :say ]
 
-  private
+    PARAMS = %i( zip zap )
 
     def execute
-      show_info if verbose
-      result = nil
-      begin
-        stash = collection.stash_valid_for_writing stash_name
-        if ! stash
-          break( result = stash )
-        end
-        any = false
-        normalized_relative_others.each do |file_name|
-          stash.stash_file file_name, dry_run
-          any = true
-        end
-        if ! any
-          info "no files to stash!"
-        end
-        result = true
-      end while nil
-      result
+      if @zap
+        emit_inner_info_string "(#{ @zip })"
+        zap = @zap
+        _s = say { em zap }
+        emit_inner_error_string "(pretending this was wrong: #{ _s })"
+      else
+        emit_payload_line "(out:#{ @zip })"
+      end
+      :pingback_from_API
     end
+  end
 
+  class Collecty__ < API::Action
+    Sub_client__[ self, :popener3 ]
   private
-
-    private_attr_accessor :dry_run, :stash_name, :verbose
-
-    command_s = 'git ls-files --others --exclude-standard'
-
-    define_method :normalized_relative_others do
+    def normalized_relative_others
+      cmd_s = CMD__
       ::Enumerator.new do |y|
-        info command_s
-        popen3 command_s do |_, sout, serr|
+        @be_verbose and emit_info_line cmd_s
+        popen3 cmd_s do |_, sout, serr|
           loop do
             e = serr.read
-            if '' != e
-              error e
-              break
-            end
-            line = sout.gets
-            break if ! line
-            y << line.strip
+            '' == e or break emit_error_string( "unexpected errput: #{ s }" )
+            s = sout.gets
+            s or break
+            y << s.strip
           end
         end
       end
     end
+    CMD__ = 'git ls-files --others --exclude-standard'
   end
 
-  class API::Actions::Status < API::Actions::Save
+  class API::Actions::Status < Collecty__
 
-    PARAMS = [ :stashes_path, :verbose ]
+    Sub_client__[ self, :say ]
+
+    PARAMS = %i( be_verbose stashes_path )
 
   private
 
     def execute
-      res = nil
+      @be_verbose and render_hub_info
+      num = 0
+      normalized_relative_others.each do |file_s|
+        num += 1
+        emit_payload_line file_s
+      end
+      num.zero? and emit_inner_info_string "(found no untracked files)"
+      true
+    end
+  end
+
+  class API::Actions::Save < Collecty__
+
+    Sub_client__[ self, :popener3 ]
+
+    PARAMS = %i( be_verbose dry_run stash_name stashes_path )
+
+  private
+
+    def execute
+      @be_verbose and render_hub_info
       begin
-        show_info if verbose
-        num = 0
+        stash = collection.puff_stash_expected_to_be_writable @stash_name
+        stash or break( r = stash )
+        yes = false
         normalized_relative_others.each do |file_name|
-          num += 1
-          payload file_name
+          stash.stash_file file_name, @dry_run
+          yes = true
         end
-        if 0 == num
-          info "(no untracked files)"
-        end
-        res = true
+        yes or emit_inner_info_string "found no files to stash."
+        r = true
       end while nil
-      res
+      r
+    end
+
+    def normalized_relative_others
+      cmd_s = CMD__
+      ::Enumerator.new do |y|
+        emit_info_line "# #{ cmd_s }"
+        popen3 cmd_s do |_, sout, serr|
+          loop do
+            s = serr.read
+            s.length.zero? or
+              break emit_inner_error_string "unexpected errput: #{ s }"
+            s = sout.gets
+            s or break
+            y << s.strip
+          end
+        end
+      end
+    end
+    CMD__ = 'git ls-files --others --exclude-standard'
+  end
+
+  class API::Actions::Show < API::Action
+
+    PARAMS = %i( be_verbose is_in_color do_show_patch do_show_stat
+      stash_name stashes_path )
+
+  private
+
+    def execute
+      stash = collection.puff_stash @stash_name
+      @be_verbose and emit_inner_info_string "#{
+        }(had stash path: #{ stash.pathname })"
+      stash = stash.stash_expected_to_exist
+      stash and with_extant_stash stash
+    end
+
+    def with_extant_stash stash
+      ( @do_show_stat || @do_show_patch ) or @do_show_stat = true
+      p = -> s do
+        emit_payload_line s
+      end
+      @do_show_stat and stash.stat_lines.each( & p )
+      @do_show_patch and stash.patch_lines.each( & p )
+      true
     end
   end
 
   class API::Actions::List < API::Action
-    include PathInfo_InstanceMethods
 
-    PARAMS = [ :stashes_path, :verbose ]
+    Sub_client__[ self, :say ]
 
-  private
-
-    def execute
-      res = nil
-      begin
-        show_info if verbose
-        if ! collection.validate_existence
-          break( res = false )
-        end
-        count = 0
-        collection.stashes( verbose ).each do |stash|
-          count += 1
-          emit :payload, stash.stash_name
-        end
-        res = count
-      end while nil
-      res
-    end
-
-    # --*--
-
-    private_attr_accessor :verbose
-
-  end
-
-  class API::Actions::Show < API::Action
-    include PathInfo_InstanceMethods
-
-    PARAMS = [ :color, :show_patch, :show_stat, :stash_name,
-                 :stashes_path, :verbose ]
-  private
+    PARAMS = %i( be_verbose stashes_path )
 
     def execute
-      res = nil
-      begin
-        stash = collection.stash stash_name
-        if verbose
-          info "(stash path: #{ stash.send :pathname })"
-        end
-        stash = stash.validate_existence
-        if ! stash
-          break( res = stash )
-        end
-        if ! (show_stat || show_patch)
-          self.show_stat = true
-        end
-        if show_stat
-          stash.stat_lines.each do |type, string|
-            emit type, string
-          end
-        end
-        if show_patch
-          stash.patch_lines.each do |type, string|
-            emit type, string
-          end
-        end
-      end while nil
-      res
+      @be_verbose and render_hub_info
+      @col = collection
+      @col.expect_collection_exists and with_extant_collection
     end
-
   private
-
-    private_attr_accessor :color, :stash_name, :show_patch, :show_stat,
-      :verbose
-
-    alias_method :color?, :color # api compat
-
+    def with_extant_collection
+      @count = 0
+      @col.stashes( @be_verbose ).each do |stash|
+        @count += 1
+        emit_payload_line stash.stash_name
+      end
+      @count.zero? ? none : some
+    end
+    def none
+      pn = @stashes_path
+      emit_inner_info_string say {
+        "(no stashes found in #{ escape_path pn })"
+      } ; nil
+    end
+    def some
+      true
+    end
   end
 
   class API::Actions::Pop < API::Action
-    include Color_InstanceMethods
-    include PathInfo_InstanceMethods
 
-    PARAMS = [ :dry_run, :stash_name, :stashes_path, :verbose ]
-
-  private
+    PARAMS = %i( be_verbose dry_run stash_name stashes_path )
 
     def execute
-      res = nil
-      begin
-        stash = collection.stash( stash_name ).validate_existence
-        break( res = false ) if ! stash
-        stash.pop dry_run, verbose, method( :emit )
-      end while nil
-      res
+      @stash = collection.puff_stash( @stash_name ).stash_expected_to_exist
+      @stash and with_stash
     end
-
-    private_attr_accessor :dry_run, :stash_name, :verbose
+  private
+    def with_stash
+      @stash.pop_stash @be_verbose, @dry_run
+    end
   end
 
-  # --*--
+  #  ~ models / agents ~
 
-  class PathInfo < ::Struct.new :anchor_pathname, :stashes_pathname
-  end
+  class Stash__
 
-  class Stash
-    extend Deprecated_
-    include Git::Services::FileUtils
-    include SubClient_InstanceMethods
-    include Color_InstanceMethods
+    Sub_client__[ self,
+      :as_basic_set,
+        :with_members, %i( hub_pathname stash_name stash_pathname ).freeze,
+        :initialize_basic_set_with_iambic,
+      :color_inquisitor ]
 
-    def patch_lines
-      ::Enumerator.new do |y|
-        emit = -> type, line do
-          y <<  [type, line]
-        end
-        if color?
-          emit = ColorizedPatch[ emit ]
-        end
-        MakePatch[ pathname, emit ]
-      end
-    end
-
-    def stat_lines
-      ::Enumerator.new do |y|
-        MakeStat[ self, pathname, -> type, msg { y << [type, msg] } ]
-      end
-    end
-
-    move_struct = ::Struct.new :source_pathname, :dest_pathname
-    define_method :pop do |dry_run, verbose, emit|
-      res = nil
-      begin
-        existed = nil
-        moves = filenames( verbose ).map do |filename|
-          o = move_struct.new
-          o.source_pathname = pathname.join filename
-          o.dest_pathname = path_info.anchor_pathname.join filename
-          if o.dest_pathname.exist?
-            ( existed ||= [] ).push o.dest_pathname
-          end
-          o
-        end
-        if existed
-          emit[ :error, "Can't pop, destination file(s) exist:" ]
-          existed.each { |pn| emit[ :error, pn.to_s ] }
-          break( res = false )
-        end
-        moves.each do |o|
-          if ! o.dest_pathname.dirname.directory? # (always verbose when pop)
-            mkdir_p o.dest_pathname.dirname, noop: dry_run, verbose: true
-          end
-          mv o.source_pathname, o.dest_pathname, noop: dry_run, verbose: true
-            # might fail during a dry run (if a dry mkdir_p above)
-        end
-        prune_directories dry_run, verbose
-        res = true
-      end while nil
-      res
-    end
-
-    def stash_file normalized_relative_file_name, dry_run
-      res = nil
-      begin
-        if ! valid_for_writing?
-          break( res = false )
-        end
-        dest = pathname.join normalized_relative_file_name
-        if ! dest.dirname.exist?
-          @quiet.fetch dest.dirname.to_s do |dir_path|
-            mkdir_p dir_path, verbose: true, noop: dry_run
-            @quiet[dir_path] = true
-          end
-        end
-        res = move normalized_relative_file_name, dest.to_s, verbose: true, noop: dry_run
-      end while nil
-      res
+    def initialize client, * x_a
+      initialize_basic_set_with_iambic x_a
+      @quiet_h = { }
+      client_notify client
+      super()
+      freeze
     end
 
     attr_reader :stash_name
 
-    # save below as-is for #posterity /slash/ you-know-what
-    def validate_existence
-      res = false
-      begin
-        break( res = self ) if pathname.exist?
-        error "Stash does not exist: #{ stash_name }"
-      end while nil
-      res
+    def pathname
+      @stash_pathname
     end
 
-    def valid_for_writing?
-      if @valid_for_writing.nil?
-        validate_for_writing!
+    def stash_expected_to_exist
+      if @stash_pathname.exist? then self else
+        emit_error_string "Stash does not exist: #{ @stash_name }"
       end
-      @valid_for_writing
+    end
+
+    def stash_expected_to_be_writable
+      calculate_writing_validity ? self : false
+    end
+  private
+    def calculate_writing_validity
+      if @stash_pathname.exist?
+        if (( dir_a = ::Dir[ "#{ @stash_pathname }/*" ] )).length.nonzero?
+          emit_inner_error_string "destination dir must be empty #{
+            }(\"stash\" already exists?). found files:\n#{ dir_a * "\n" }"
+        else
+          true  # empty dirs are valid for writing
+        end
+      elsif (( dir_pn = @stash_pathname.dirname )).exist?  # parent path must
+        true  # exist. the child dir needs to be made, but not yet
+      else
+        emit_inner_error_string "stashes directory must exist: #{ dir_pn }"
+      end
+    end
+  public
+
+    def stat_lines
+      ::Enumerator.new do |y|
+        _p = -> line do
+          y << line
+        end
+        Make_stat__[ @client, :stash_pn, @stash_pathname, :listener_p, _p ]
+      end
+    end
+
+    def patch_lines
+      ::Enumerator.new do |y|
+        _p = -> line do
+          y << line
+        end
+        is_in_color and _p = Add_colorizer__[ _p ]
+        Make_patch__[ @client, @stash_pathname, _p ]
+      end
+    end
+
+    def stash_file normalized_relative_file_name, is_dry_run
+      Stash_file__[ @client, :filename_s, normalized_relative_file_name,
+        :is_dry, is_dry_run, :quiet_h, @quiet_h, :stash_pn, @stash_pathname ]
+    end
+
+    def pop_stash be_verbose, dry_run
+      Pop_stash__[ @client, :be_verbose, be_verbose, :dry_run, dry_run,
+        :hub_pathname, @hub_pathname, :stash_pathname, @stash_pathname ]
+    end
+  end
+
+  class Stash_file__
+
+    Sub_client__[ self,
+      :as_basic_set,
+        :initialize_basic_set_with_iambic,
+        :with_members, %i( filename_s is_dry quiet_h stash_pn ).freeze,
+      :emitters,
+      :funcy,
+      :file_utils, :mkdir_p, :move
+    ]
+
+    def initialize client, * x_a
+      initialize_basic_set_with_iambic x_a
+      client_notify client
+      super()
+    end
+
+    def execute
+      @dest_pn = @stash_pn.join @filename_s
+      if @dest_pn.exist?
+        when_exist
+      else
+        when_not_exist
+      end
+    end
+  private
+    def when_exist
+      emit_inner_error_string "destination file already existed in stash #{
+        }location - #{ dest_pn }"
+    end
+    def when_not_exist
+      @dn_pn = @dest_pn.dirname
+      @dn_pn.exist? or quietly_mkdir_p
+      r = move @filename_s, @dest_pn.to_s, verbose: true, noop: @is_dry
+      r
+    end
+    def quietly_mkdir_p
+      key_s = @dn_pn.to_s
+      @quiet_h.fetch key_s do
+        mkdir_p key_s, verbose: true, noop: @is_dry
+        @quiet_h[ key_s ] = true
+      end  ; nil
+    end
+  end
+
+  class Pop_stash__
+
+    Sub_client__[ self,
+      :as_basic_set,
+        :with_members, %i( be_verbose dry_run
+          stash_pathname hub_pathname ).freeze,
+        :initialize_basic_set_with_iambic,
+      :file_utils,
+        :mkdir_p, :move, :rmdir,
+      :funcy, :popener3, :shellesc ]
+
+    def initialize client, * x_a
+      initialize_basic_set_with_iambic x_a
+      client_notify client
+      super()
+    end
+
+    def execute
+      @existed_pn_a = nil
+      @move_a = build_move_a
+      if @existed_pn_a
+        files_existed
+      else
+        target_paths_are_available
+      end
     end
 
   private
 
-    def initialize request_client, path_info, stash_name, emit
-      _gsu_sub_client_init request_client
-      @emit = emit
-      @path_info = path_info
-      @pathname = path_info.stashes_pathname.join stash_name
-      @quiet = { }
-      @stash_name = stash_name
-      @valid_for_writing = nil
-    end
-
-    def filenames verbose
-      ::Enumerator.new do |o|
-        cmd = "cd #{ shellesc pathname }; find . -type f"
-        info( cmd ) if verbose
-        Git::Services::Open3.popen3( cmd ) do |_, sout, serr|
-          '' != (s = serr.read) and fail("uh-oh: #{s}")
-          while s = sout.gets
-            o << %r{^\./(.*)$}.match(s)[1]
-          end
-        end
+    def build_move_a
+      stashed_filenames.map do |fn_s|
+        mov = Move__.new
+        mov.source_pathname = @stash_pathname.join fn_s
+        mov.dest_pathname = @hub_pathname.join fn_s
+        mov.dest_pathname.exist? and
+          (( @existed_pn_a ||= [] )) << mov.dest_pathname
+        mov
       end
     end
+    Move__ = ::Struct.new :source_pathname, :dest_pathname
 
-    def fu_output_message msg
-      @emit[ :info, "#{ msg }" ]
+    def stashed_filenames
+      ::Enumerator.new do |y|
+        cmd_s = "cd #{ shellesc @stash_pathname }; find . -type f"
+        @be_verbose and emit_info_line "# #{ cmd_s }"
+        _i, o, e, w = popen3 cmd_s
+        s = e.gets and fail "wat: #{ s.inspect }"
+        while (( s = o.gets ))
+          y << DOT_SLASH_RX__.match( s )[ 0 ]
+        end
+       (( es = w.value.exitstatus )).zero? or fail "wat: #{ es }" ; nil
+      end
+    end
+    DOT_SLASH_RX__ = %r{ (?<= \A \. / ) .* (?= \n\z ) }x
+
+    def files_existed
+      emit_inner_error_string "destination file(s) exist:"
+      @existed_pn_a.each do |pn|
+        emit_error_line "  #{ pn }"
+      end
+      false
     end
 
-    private_attr_reader :path_info, :pathname
-
-    def prune_directories dry_run, verbose
-      stack = []
-      cmd = "find #{ shellesc pathname } -type d"
-      info( cmd ) if verbose
-      Git::Services::Open3.popen3 cmd do |_, sout, serr|
-        while s = sout.gets                    # depth-first
-          stack.push s.strip
-        end
+    def target_paths_are_available
+      opt_h = { noop: @dry_run, verbose: true } # pop is always verbose
+      @move_a.each do |mov|
+        mov.dest_pathname.dirname.directory? or  # (always verbose when pop)
+          mkdir_p mov.dest_pathname.dirname, opt_h
+        move mov.source_pathname, mov.dest_pathname, opt_h
+          # might fail during a dry run (if a dry mkdir_p above)
       end
+      prune_directories
+    end
 
-      while s = stack.pop                      # depth-first reversed, so that
-        rmdir s, verbose: verbose, noop: dry_run # we remove child dirs before
-      end                                      # the parent dir that
-    end                                        # contains them
+    def prune_directories  # depth-first in reverse so we remove child dirs
+      # before the parent dir that contains them
+      stack_a = build_dirs_to_remove_s_stack_a
+      opt_h = { noop: @dry_run, verbose: @be_verbose }
+      while (( s = stack_a.pop ))
+        rmdir s, opt_h
+      end
+      true
+    end
 
-    def validate_for_writing!
-      valid = nil
-      begin
-        dir_pathname = pathname.dirname
-        if pathname.exist?
-          dir = ::Dir[ "#{ pathname }/*" ]
-          if dir.any?
-            error "Destination dir must be empty (\"stash\" already exists?).#{
-              } Found files:\n#{ dir.join "\n" }"
-            valid = false
-          else
-            valid = true          # empty dirs are valid for writing, sure
-          end
-        elsif dir_pathname.exist? # parent path must exist
-          valid = true            # the child dir needs to be made, but not yet
-        else
-          error "Stashes directory must exist: #{ dir_pathname }"
-          valid = false
-        end
-      end while nil
-      @valid_for_writing = valid
-      nil
+    def build_dirs_to_remove_s_stack_a
+      stack_a = [] ; cmd_s = "find #{ shellesc @stash_pathname } -type d"
+      @be_verbose and emit_info_line "# #{ cmd_s }"
+      _i, o, e, w = popen3 cmd_s
+      s = e.gets and fail "wat: #{ s.inspect }"
+      while (( s = o.gets ))  # depth-first
+        stack_a << s.strip!
+      end
+      (( es = w.value.exitstatus )).zero? or raise "no: #{ es.inspect }"
+      stack_a
     end
   end
 
+  class Stash__::Collection
 
+    Sub_client__[ self,
+      :as_basic_set,
+        :initialize_basic_set_with_iambic,
+        :with_members, %i(
+          channel_string_listener_p hub_pathname stashes_pathname
+        ).freeze ]
 
-  class Stash::Collection
-    extend Deprecated_
-    include SubClient_InstanceMethods
-    include Color_InstanceMethods
-
-    def stash stash_name
-      @cache[stash_name] ||= Stash.new self, path_info, stash_name, @emit
+    def initialize client, * x_a
+      initialize_basic_set_with_iambic x_a
+      @cache_h = { }
+      client_notify client
+      super()
+      freeze
     end
 
-    def stash_valid_for_writing stash_name
-      stash = self.stash stash_name
-      if stash.valid_for_writing?
-        stash
-      else
+    def expect_collection_exists
+      if (( pn = @stashes_pathname )).exist? then true else
+        emit_inner_error_string say {
+          "stashes directory does not exist: #{ escape_path pn }" }
         false
       end
     end
 
-    def stashes verbose
+    def puff_stash_expected_to_be_writable stash_name
+      puff_stash( stash_name ).stash_expected_to_be_writable
+    end
+
+    def puff_stash name_x
+      @cache_h[ name_x ] ||= build_stash name_x
+    end
+    def build_stash name_x
+      Stash__.new( @client,
+        :hub_pathname, @hub_pathname,
+        :stash_name, name_x,
+        :stash_pathname, @stashes_pathname.join( name_x ) )
+    end
+
+    def stashes be_verbose
       ::Enumerator.new do |y|
-        pathname.children( true ).each do |child| # or e.g. Errno::ENOENT
-          if child.directory?
-            stash = self.stash child.basename.to_s
-            y << stash
-          else
-            info "(not a directory: #{ escape_path child })" if verbose
-          end
+        @stashes_pathname.children( true ).each do |pn|  # or e.g. Errno::ENOENT
+          if pn.directory?
+            y << puff_stash( pn.basename.to_s )
+          elsif be_verbose
+            emit_inner_info_string say {
+              "(not a directory: #{ escape_path pn })" }
+          end ; nil
         end
       end
     end
+  end
 
-    def validate_existence
-      res = nil
-      if pathname.exist?
-        res = true
-      else
-        @emit[ :error, "Stashes dir does not exist: #{ pathname }" ]
-        res = false
-      end
-      res
+  class Make_patch__
+
+    Sub_client__[ self,
+      :file_utils, :cd,
+      :funcy,
+      :popener3 ]
+
+    class << self
+      alias_method :call, :[]
     end
 
+    def initialize client, stash_pn, listener_p
+      @listener_p = listener_p ; @stash_pn = stash_pn
+      client_notify client
+      super()
+    end
+
+    def execute
+      pn = @stash_pn
+      ::File.directory? pn or raise "not a directory: #{ pn }"
+      i, o, e, w = nil
+      cd pn do
+        i, o, e, w = popen3 'find . -type f'
+        s = e.gets and raise "nope: #{ s }"
+        while (( s = o.gets ))
+          s.chomp!
+          emit_patch s
+        end
+        w.value.exitstatus.zero? or fail "uh-oh: #{ w.value.exitstatus }"
+      end
+      nil
+    end
   private
-
-    def initialize request_client, path_info, emit
-      _gsu_sub_client_init request_client
-      @cache = { }
-      @emit = emit
-      @path_info = path_info
-    end
-
-    private_attr_reader :path_info
-
-    def pathname
-      @path_info.stashes_pathname
+    def emit_patch file_s
+      Make_patch_for_file__[ @client, file_s, @listener_p ]
     end
   end
 
-  module MakePatch
-    # singleton hack! (is a module only so the name shows up appropriately)
-  end
-
-  class << MakePatch
-    include Git::Services::FileUtils
-
-    def call path, emit
-      ::File.directory?( path ) or raise "not a directory: #{ path }"
-      each_path = ->(file) do
-        begin
-          lines = File.read(file).split("\n", -1)
-          emit[:payload, '--- /dev/null']
-          emit[:payload, "+++ #{file.sub(/^\./, 'b')}"]
-          if '' == lines.last
-            lines.pop
-          else
-            # ...
-          end
-          emit[:payload, "@@ -0,0 +1,#{lines.count} @@"]
-          lines.each { |line| emit[:payload, "+#{line}"] }
-        rescue ::ArgumentError
-          emit[:error, "failed to hack a diff for file. binary file? (#{path})"]
-        end
-      end
-      cd(path) do
-        Git::Services::Open3.popen3('find . -type f') do |_, sout, serr|
-          '' != (s = serr.read) and raise("nope: #{s}")
-          while s = sout.gets do each_path[s.strip] end
-        end
+  class Make_patch_for_file__
+    Sub_client__[ self, :emit_payload_line_to_listener, :funcy, :popener3 ]
+    def initialize client, file_s, listener_p
+      @file_s = file_s ; @listener_p = listener_p
+      client_notify client
+      super()
+    end
+    def execute
+      _i, o, e, _w = popen3 'file', '--brief', @file_s
+      s = e.gets and fail "no: #{ s.inspect }"
+      @s = o.gets ; @s.chop!
+      s_ = o.gets and fail "no: #{ s_.inspect }"
+      if ASCII_RX__ =~ @s
+        money
+      else
+        no
       end
     end
-
-    alias_method :[], :call       # `call` for multiline, `[]` for single
+    ASCII_RX__ = /\AASCII\b/
+  private
+    def no
+      @client.emit_inner_error_string "# skipping #{ @file_s }: #{ @s }"
+    end
+    def money
+      line_a = File.read( @file_s ).split "\n", -1
+      emit_payload_line '--- /dev/null'
+      emit_payload_line "+++ #{ @file_s.sub %r(^\.), 'b' }"
+      if '' == line_a.last
+        line_a.pop
+      else
+        # ...
+      end
+      emit_payload_line "@@ -0,0 +1,#{ line_a.length } @@"
+      line_a.each do |line|
+        emit_payload_line "+#{ line }"
+      end ; nil
+    end
   end
 
-  # the below is so wrong but we are doing it for posterity to make the
-  # old code work below it
+  define_singleton_method :stylize, & Headless::CLI::Pen::FUN.stylize  # #posterity for below ancient lines
 
-  define_singleton_method :stylize, & Headless::CLI::Pen::FUN.stylize
-
-  PATCH_STYLES = [
+  PATCH_STYLE_P_A__ = [
     ->(s) { stylize(s, :strong, :red) },
     ->(s) { s.sub(/(@@[^@]+@@)/) { stylize($1, :cyan) } },
     ->(s) { stylize(s, :green) },
@@ -891,7 +1168,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     ->(s) { s }
   ]
 
-  PATCH_LINE = %r{\A
+  PATCH_LINE_RX__ = %r{\A
     (--|\+\+|[^- @+]) |
     (@)               |
     (\+)              |
@@ -899,57 +1176,50 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     ( )
   }x
 
-  PATCH_LINE_TYPES = [
-    :file_info,
-    :chunk_numbers,
-    :add,
-    :remove,
-    :context
-  ]
+  PATCH_LINE_TYPE_I_A__ = %i( file_info chunk_numbers add remove context )
 
-  ColorizedPatch = -> lamb do
-    -> type, line do
-      lamb[type, PATCH_STYLES[PATCH_LINE.match(line).captures.each_with_index.detect{ |s, i| ! s.nil? }[1]][line]]
+  Add_colorizer__ = -> lamb do  # stay ugly for [#bs-010] for now, also at this commit we removed another similar ugly
+    -> line do
+      lamb[ PATCH_STYLE_P_A__[ PATCH_LINE_RX__.match(line).captures.each_with_index.detect{ |s, i| ! s.nil? }[1]][line]]
     end
   end
 
-  class MakeStat
-    include SubClient_InstanceMethods
-    include Color_InstanceMethods
+  class Make_stat__
 
-    def self.[] pathname, pen, emit
-      o = new pathname, pen, emit
-      o.run
+    Sub_client__[ self,
+      :as_basic_set,
+        :with_members, %i( listener_p stash_pn ).freeze,
+        :initialize_basic_set_with_iambic,
+      :color_inquisitor,
+      :emit_payload_line_to_listener,
+      :funcy,
+      :say ]
+
+    def initialize client, * x_a
+      initialize_basic_set_with_iambic x_a
+      client_notify client
+      super()
     end
 
-  public
-
-    def run
-      _render _calculate
+    def execute
+      render_file_a build_file_a
     end
 
   private
 
-    def initialize request_client, pathname, emit
-      _gsu_sub_client_init request_client
-      @emit = emit
-      @pathname = pathname
-    end
-
-    def _calculate
-      filecount = Struct.new :name, :insertions, :deletions, :combined
+    def build_file_a
       files = []
-      MakePatch.call @pathname, -> type, line do
-        md = PATCH_LINE.match line
-        type = PATCH_LINE_TYPES[md.captures.each_with_index.detect{ |s, i| ! s.nil? }[1]]
-        case type
+      Make_patch__.call @client, @stash_pn, -> line do
+        md = PATCH_LINE_RX__.match line
+        type_i = PATCH_LINE_TYPE_I_A__[md.captures.each_with_index.detect{ |s, | ! s.nil? }[1]]
+        case type_i
         when :file_info
           if md = /^(?:(---)|(\+\+\+)) (.+)/.match(line)
             if md[1]
               '/dev/null' == md[3] or fail("hack failed: #{md[3].inspect}")
             else
               md2 = /^b\/(.+)$/.match(md[3]) or fail("hack failed: #{md[3].inspect}")
-              files.push filecount.new(md2[1], 0, 0, 0)
+              files.push Filecount__.new( md2[1], 0, 0, 0 )
             end
           end # else ignored some kinds of fileinfo
         when :chunk_numbers
@@ -957,13 +1227,14 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
           files.last.deletions += md[1].to_i
           files.last.insertions += md[2].to_i
         when :add, :remove, :context # ignored
-        else fail("unhandled line pattern or type (line type: #{type.inspect})")
+        else fail("unhandled line pattern or type (line type: #{type_i.inspect})")
         end
       end
       files
     end
+    Filecount__ = Struct.new :name, :insertions, :deletions, :combined
 
-    def _render files
+    def render_file_a files
       name_max = combined_max = 0
       plusminus_width = 40
       total_inserts = total_deletes = 0
@@ -983,13 +1254,17 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
         num_minuses = (f.deletions.to_f / combined_max * plusminus_width).ceil
         pluses =  '+' * num_pluses
         minuses = '-' * num_minuses
-        if color?
-          pluses = stylize pluses, :green
-          minuses = stylize minuses, :red
+        if is_in_color
+          pluses = say{ stylize pluses, :green }
+          minuses = say{ stylize minuses, :green }
         end
-        @emit[:payload, (format % [f.name, f.combined, "#{pluses}#{minuses}"])]
+        emit_payload_line format %
+          [ f.name, f.combined, "#{ pluses }#{ minuses }" ]
       end
-      @emit[:payload, ("%s files changed, %d insertions(+), %d deletions(-)" % [files.count, total_inserts, total_deletes])]
+      emit_payload_line "%s files changed, %d insertions(+), %d deletions(-)" %
+        [ files.count, total_inserts, total_deletes ]
     end
   end
 end
+
+# [#bs-001] 'reaction-to-assembly-language-phase' phase

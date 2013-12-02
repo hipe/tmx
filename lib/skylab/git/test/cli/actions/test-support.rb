@@ -1,18 +1,7 @@
-require_relative '../../../core'
+require_relative '../test-support'
 
-require 'skylab/test-support/core'
+module Skylab::Git::TestSupport::CLI::Actions
 
-module Skylab::Git::TestSupport
+  ::Skylab::Git::TestSupport::CLI[ self ]
 
-  module Actions
-
-    ::Skylab::TestSupport::Regret[ self ]
-
-    module CONSTANTS
-
-      ::Skylab::MetaHell::FUN::Import_constants[ ::Skylab,
-        %i| Git Headless TestSupport |, self ]
-
-    end
-  end
 end

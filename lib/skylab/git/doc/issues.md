@@ -1,3 +1,5 @@
+[#010]       #doc-point storypoints ..
+[#009] #open we have our own s-tylize #in-situ
 [#008]       #done stashe names with spaces duh
 [#007]       #done when you fix DSL, do *not* make it instance exec'y b/c of these
                you could also unscream them
