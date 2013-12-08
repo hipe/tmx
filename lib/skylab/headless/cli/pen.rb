@@ -2,18 +2,6 @@ module Skylab::Headless
 
   module CLI::Pen  # [#084]
 
-    module Bundles
-      module Expressive_agent
-        p = -> _ do
-          include Expressive_agent
-        end ; define_singleton_method :to_proc do p end
-      private
-        def say &p
-          expression_agent.calculate( & p )
-        end
-      end
-    end
-
     FUN = MetaHell::FUN::Module.new
     module FUN
 
@@ -38,7 +26,7 @@ module Skylab::Headless
       end                                      # stylzed in the first place
       #
       Unstyle_styled = -> str do  # nil IFF str.to_s is not already styled
-        str.to_s.dup.gsub! SIMPLE_STYLE_RX, ''
+        str.to_s.dup.gsub! SIMPLE_STYLE_RX, EMPTY_STRING_
       end
       o[ :unstyle_styled ] = Unstyle_styled
 
@@ -97,7 +85,7 @@ module Skylab::Headless
 
       def omg x                                # style an error with
         x = x.to_s                             #  excessive & exuberant emphasis
-        x = x.inspect unless x.index ' '       # (opposite human_escape)
+        x = x.inspect unless x.index TERM_SEPARATOR_STRING_ # (opposite human_escape)
         stylize x, :strong, :red               # may be overkill
       end
 
@@ -105,7 +93,7 @@ module Skylab::Headless
         kbd "<#{ x.to_s.gsub '_', '-' }>"
       end
 
-      # def `val` - how may votes? (1: sg) [#hl-051]
+      # def `val` - how may votes? (1: sg) [#051]
 
       module_exec( & Define_stylize_methods__ )
 

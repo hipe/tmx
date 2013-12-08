@@ -471,8 +471,8 @@ module Skylab::Headless
       res = true                  # result in true on success, other on failure
       begin
         break if argv.length.zero? # don't even build option parser.
-        break if is_branch && Headless::CLI::Option::CONSTANTS.
-          opt_rx !~ argv.first # ambig. grammars [#024]
+        break if is_branch && Headless::CLI::Option::Constants::
+          OPT_RX !~ argv.first # ambig. grammars [#024]
         break if ! option_parser  # leave brittany alone, downstream gets argv
         # `option_parser` can be some fancy arbitrary thing, but it needs to
         # conform to at least these two parts of stdlib ::O_P..

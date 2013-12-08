@@ -1,4 +1,4 @@
-fail 'NO' # this is just old scraps that will possibly be used for [#hl-022]
+fail 'NO' # this is just old scraps that will possibly be used for [#022]
 require 'skylab/slake/muxer'
 
 module Skylab::CodeMolester

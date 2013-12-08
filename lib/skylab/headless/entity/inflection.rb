@@ -26,7 +26,7 @@ module Skylab::Headless
   class Entity::Inflection::Lexemes_::Production_Proxy_
 
     def initialize full_name_proc
-      stem = full_name_proc.map( :as_natural ) * ' '
+      stem = full_name_proc.map( :as_natural ) * TERM_SEPARATOR_STRING_
       @production = Headless::NLP::EN::POS::Noun.produce stem
     end
 

@@ -16,11 +16,11 @@ module Skylab::Headless
       def which exe_name
         SAFE_NAME_RX_ =~ exe_name or "invalid name: #{ exe_name }"
         out = Headless::Services::Open3.popen3 'which', exe_name do |_, o, e|
-          '' == (( err = e.read )) or raise ::SystemCallError, "unexpected #{
-            }response from `which` - #{ err }"
+          EMPTY_STRING_ == (( err = e.read )) or raise ::SystemCallError,
+            "unexpected response from `which` - #{ err }"
           o.read.strip
         end
-        out if '' != out
+        out if EMPTY_STRING_ != out
       end
       SAFE_NAME_RX_ = /\A[-a-z0-9_]+\z/i
 

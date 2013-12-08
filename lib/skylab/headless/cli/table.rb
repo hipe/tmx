@@ -12,6 +12,7 @@ module Skylab::Headless::CLI::Table
   MetaHell = ::Skylab::MetaHell
   PubSub = Headless::Services::PubSub
   Table = self  # partly b.c PubSub is not part of headless proper
+  TERM_SEPARATOR_STRING_ = Headless::TERM_SEPARATOR_STRING_
 
   class Table::Conduit
     # here have a goofy experiment - the public methods here (direct and
@@ -52,7 +53,7 @@ module Skylab::Headless::CLI::Table
         conduit.on_text { |txt| res.puts txt }
       end
       conduit.instance_exec do
-        @head ||=nil ; @tail ||= nil ; @separator ||= ' '
+        @head ||=nil ; @tail ||= nil ; @separator ||= TERM_SEPARATOR_STRING_
       end
       [ conduit, res ]
     end

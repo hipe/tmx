@@ -16,7 +16,7 @@ module Skylab::Headless
             cache_a << str.dup
           else
             cache_a << str[ 0 .. idx ]  # including separator
-            f[ cache_a * '' ]
+            f[ cache_a * EMPTY_STRING_ ]
             cache_a.clear
             off = idx + 1
             while off < len
@@ -35,7 +35,7 @@ module Skylab::Headless
       end
       @flush = -> do
         if cache_a.length.nonzero?
-          s = cache_a * ''
+          s = cache_a * EMPTY_STRING_
           cache_a.clear
           f[ s ]
           s.length

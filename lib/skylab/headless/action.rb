@@ -20,7 +20,7 @@ module Skylab::Headless
       end
 
       Expressive_agent = -> _ do
-        module_exec _, & CLI::Pen::Bundles::Expressive_agent.to_proc
+        module_exec _, & Headless::Pen::Bundles::Expressive_agent.to_proc
       end
 
       Inflection = -> _ do

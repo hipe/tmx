@@ -14,14 +14,14 @@ module Skylab::Headless
     end.call
 
     Labelize = -> i do  # #tracked with [#088]
-      i.to_s.gsub( /\A@|_[a-z]\z/, '' ).
-        gsub( '_', ' ' ).sub( /\A[a-z]/, & :upcase )
+      i.to_s.gsub( /\A@|_[a-z]\z/, EMPTY_STRING_ ).
+        gsub( '_', TERM_SEPARATOR_STRING_ ).sub( /\A[a-z]/, & :upcase )
     end
 
     o[:normify] = -> do           # make a const-looking string be normalized.
       rx = /(?<=[a-z])(?=[A-Z])|_|(?<=[A-Z])(?=[A-Z][a-z])/
       -> x { x.to_s.gsub( rx ) { '_' }.downcase.intern }
-    end.call                      # ( part of the [#hl-081] family )
+    end.call                      # ( part of the [#081] family )
 
     o[:slugulate] = -> i do       # for normals only. centralize this nerk
       i.to_s.gsub '_', '-'
@@ -32,7 +32,7 @@ module Skylab::Headless
     end
 
     Naturalize = o[:naturalize] = -> i do      # for normals only, handles dashy normals
-      i.to_s.gsub( /[-_]/, ' ' )
+      i.to_s.gsub( /[-_]/, TERM_SEPARATOR_STRING_ )
     end
 
     Const_basename_ = o[:const_basename] = -> name_s do
@@ -94,7 +94,12 @@ module Skylab::Headless
     # is impossible to go in the reverse direction deterministically) :[#083]
 
     def self.from_name name
-      new Name::Const_basename_[ name ]
+      new Name::Const_basename_[ name ].intern
+    end
+
+    def initialize const  # symbol! #api-lock [#032] : this signature.
+      @const = const
+      @local_normal = Headless::Name::FUN.normify[ const ] ; nil
     end
 
     def as_const
@@ -106,12 +111,6 @@ module Skylab::Headless
       # function but for now only use a const and not a deep graph.
 
   private
-
-    def initialize const  # symbol! #api-lock [#032] : this signature.
-      @const = const
-      @local_normal = Headless::Name::FUN.normify[ const ]
-      nil
-    end
 
     def base_init const, local_normal
       @const = const  # symbol!

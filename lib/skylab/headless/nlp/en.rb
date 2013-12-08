@@ -54,7 +54,7 @@ module Skylab::Headless
         if 1 < a.length
           res << ult << a[-1]
         end
-        res * ''
+        res * EMPTY_STRING_
       end
     end
 

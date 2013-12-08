@@ -1,6 +1,6 @@
 module Skylab::Headless
 
-  class CLI::FUN::Occurrence_scanner < Headless::FUN::Scn
+  class CLI::FUN::Occurrence_scanner < Scn_
 
     Occurrence__ = ::Struct.new :before, :match, :lineno, :colno, :byte
 

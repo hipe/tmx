@@ -20,7 +20,7 @@ module Skylab::Headless
 
     def puts *a  # route everything through write()
       a = a.flatten
-      a.length.zero? and a << ''
+      a.length.zero? and a << EMPTY_STRING_
       a.each do |s|
         if @puts_wrap_p_a
           s = @puts_wrap_p_a.reduce( s ) { |m, p| p[ m ] }

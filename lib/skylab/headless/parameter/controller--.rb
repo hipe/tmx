@@ -137,7 +137,7 @@ module Skylab::Headless
           a = self.class.to_s.split '::'
           a = a[ [ a.length, 2 ].min * -1 .. -1 ]
           a.reverse!  # assume Noun::Verb -> 'verb noun'
-          a.map { |s| Autoloader::FUN.pathify[ s ] } * ' '
+          a.map { |s| Autoloader::FUN.pathify[ s ] } * TERM_SEPARATOR_STRING_
         end
 
         def formal_parameters

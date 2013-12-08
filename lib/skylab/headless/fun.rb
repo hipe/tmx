@@ -8,13 +8,6 @@ module Skylab::Headless
       Headless::Services::Basic::FUN::Inspect[ x ]
     end
 
-    class Scn < ::Proc
-      alias_method :gets, :call
-      def self.[] p
-        new( & p )
-      end
-    end
-
     o = definer
 
     # ~ the host system

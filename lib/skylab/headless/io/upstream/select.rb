@@ -19,7 +19,7 @@ module Skylab::Headless
     # the result - possibly 0, possibly a billiondy.
     #
     # For now, the input is always chunked into single lines (except the last
-    # flush). Work in progres! (tracked by [#hl-048])
+    # flush). Work in progres! (tracked by [#048])
 
     def timeout_seconds= x
       normalize_time x do |flot|
@@ -58,7 +58,7 @@ module Skylab::Headless
 
     def initialize               # no args - mutate exclusively thru the setters
       timeout_seconds = 0.3
-      maxlen = Headless::CONSTANTS::MAXLEN
+      maxlen = Headless::Constants::MAXLEN
       @accept_timeout_seconds = -> x do timeout_seconds = x end
       up_a = [ ] ; down_h = { }
       @add_pair = -> io, line do

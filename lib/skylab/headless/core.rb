@@ -44,13 +44,13 @@ module Skylab::Headless
     const_set i, ::Skylab.const_get( i, false )
   end
 
-  module CONSTANTS
+  module Constants
 
     MAXLEN = 4096  # (2 ** 12), the number of bytes in about 50 lines
                    # used as a heuristic or sanity in a couple places
   end
 
-  EMPTY_S_ = ''.freeze
+  EMPTY_STRING_ = ''.freeze
   EMPTY_A_ = [ ].freeze
   IDENTITY_ = -> x { x }
   WRITEMODE_ = 'w'.freeze

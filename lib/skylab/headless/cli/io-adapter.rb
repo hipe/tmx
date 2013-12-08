@@ -13,12 +13,10 @@ module Skylab::Headless
     # are used in the POSIX standard way of having a standard in, standard
     # out, and standard error stream.
 
-
     def initialize sin, sout, serr, pen=CLI::Pen::MINIMAL
       # per edict [#sl-114] we keep explicit mentions of the streams out at
       # this level -- they can be nightmarish to adapt otherwise.
-      @instream, @outstream, @errstream, @pen = sin, sout, serr, pen
-      nil
+      @instream, @outstream, @errstream, @pen = sin, sout, serr, pen ; nil
     end
 
     attr_reader :instream, :outstream, :errstream, :pen
@@ -36,8 +34,7 @@ module Skylab::Headless
     def emit type_i, msg
       # life is easier with this behavior written-in as a default.
       instance_variable_get( :payload == type_i ? :@outstream : :@errstream ).
-        puts msg
-      nil  # undefined
+        puts msg ; nil
     end
   end
 end

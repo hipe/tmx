@@ -54,7 +54,7 @@ module Skylab::Headless
       parameters.fetch!( name ).merge! props, &b
     end
 
-    attr_reader :parameters ; alias_method :parameters_ivar, :parameters
+    attr_reader :parameters ; alias_method :any_parameters, :parameters
 
     def parameters &block
       if block_given? # this "feature" may be removed after benchmarking (@todo)
@@ -341,7 +341,8 @@ module Skylab::Headless
       param = self
       def! :dsl= do |flags| # ( :list | :value ) [ :reader ]
         flags = [flags] if ::Symbol === flags
-        list_or_value = ([:value, :list] & flags).join('').intern # ick
+        list_or_value = ( %i( value list ) & flags ).
+          join( EMPTY_STRING_ ).intern  # ick
         reader = flags.include?(:reader)
         case list_or_value
         when :list

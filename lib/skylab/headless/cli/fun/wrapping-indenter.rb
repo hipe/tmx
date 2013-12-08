@@ -68,7 +68,7 @@ module Skylab::Headless
 
       _Word = ::Struct.new :any_style_d, :string, :is_space
 
-      _SPACE_WORD = _Word.new nil, ' '.freeze, true
+      _SPACE_WORD = _Word.new nil, TERM_SEPARATOR_STRING_, true
 
       scan_string = scan_style = skip_final_style = nil
       build_word_scanner = -> sx do
@@ -185,7 +185,7 @@ module Skylab::Headless
               else
                 word.string
               end
-            end * ''
+            end.join EMPTY_STRING_
             @word_a.clear ; @width = 0
             line
           end

@@ -70,7 +70,7 @@ module Skylab::Headless
     # to know about it.
 
     def box_enqueue_help cmd=nil
-      if ! cmd && Headless::CLI::Option::CONSTANTS.opt_rx !~ @argv.first
+      if ! cmd && Headless::CLI::Option::Constants::OPT_RX !~ @argv.first
         cmd = @argv.shift
       end
       enqueue [ :help, cmd ]

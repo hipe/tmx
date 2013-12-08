@@ -46,7 +46,8 @@ module Skylab::Headless
 
     FUN = -> do
 
-      long_rx, short_rx = CLI::Option::CONSTANTS.at :long_rx, :short_rx
+      long_rx, short_rx = CLI::Option::Constants.
+        values_at :LONG_RX, :SHORT_RX
 
       # (used elsewhere, here as courtesy and for proper semantic taxonomy)
 

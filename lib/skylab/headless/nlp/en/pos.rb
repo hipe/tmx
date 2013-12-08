@@ -1135,7 +1135,7 @@ module Skylab::Headless
     def string  # 2x [#068] (sort of)
       y = [ ]
       render y
-      y * ' ' if y.length.nonzero?
+      y * TERM_SEPARATOR_STRING_ if y.length.nonzero?
     end
 
     -> do  # `render` (le hack)

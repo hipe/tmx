@@ -83,7 +83,7 @@ module Skylab::Headless
       def normal_long_string
         @long_sexp.nil? && @args and puff
         if @long_sexp
-          ( @long_sexp.at :__, :no, :stem, :arg ) * EMPTY_S_
+          ( @long_sexp.at :__, :no, :stem, :arg ) * EMPTY_SEP__
         else
           @long_sexp  # #meaningful-false
         end
@@ -104,7 +104,7 @@ module Skylab::Headless
           else
             @long_sexp = if @norm_long_str
               Option::Long_.lease_from_matchdata(
-                Option::CONSTANTS.long_rx.match( @norm_long_str ) )
+                Option::Constants::LONG_RX.match( @norm_long_str ) )
             else
               false
             end
@@ -115,7 +115,7 @@ module Skylab::Headless
 
       def as_parameter_signifier
         if long_sexp
-          ( @long_sexp.at :__, :stem ) * EMPTY_S_
+          ( @long_sexp.at :__, :stem ) * EMPTY_SEP__
         else
           false
         end
@@ -130,14 +130,14 @@ module Skylab::Headless
           end
         elsif long_sexp
           # (sure why not, have the entire monty)
-          y << @long_sexp.at( :__, :no, :stem, :arg ).join( EMPTY_S_ )
+          y << @long_sexp.at( :__, :no, :stem, :arg ).join( EMPTY_SEP__ )
         end
-        y.length.nonzero? and y * EMPTY_S_
+        y.length.nonzero? and y * EMPTY_SEP__
       end
 
       def as_longest_nonfull_signifier
         if long_sexp
-          ( @long_sexp.at :__, :stem ) * EMPTY_S_
+          ( @long_sexp.at :__, :stem ) * EMPTY_SEP__
         else
           @norm_short_str
         end
@@ -169,7 +169,7 @@ module Skylab::Headless
         if @sexp
           ::Enumerator.new do |y|
             @sexp.children( :long_sexp ).each do |sx|
-              y << ( sx.last.values * EMPTY_S_ )
+              y << ( sx.last.values * EMPTY_SEP__ )
             end
             nil
           end
@@ -187,9 +187,9 @@ module Skylab::Headless
         end
         @args.each do |x|
           if x.respond_to? :ascii_only?
-            if Option::CONSTANTS.simple_short_rx =~ x
+            if Option::Constants::SIMPLE_SHORT_RX =~ x
               add[ :short_full, x ]
-            elsif Option::CONSTANTS.long_rx =~ x
+            elsif Option::Constants::LONG_RX =~ x
               add[ :long_sexp, Option::Long_.lease_from_matchdata( $~ ) ]
             else
               add[ :desc, x ]
@@ -207,8 +207,7 @@ module Skylab::Headless
         @sexp = sexp
         nil
       end
-
-      EMPTY_S_ = Headless::EMPTY_S_  # catch issues early
+      EMPTY_SEP__ = EMPTY_STRING_
     end
 
     class Semi_Mutable_ < Model_

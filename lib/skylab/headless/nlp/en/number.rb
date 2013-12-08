@@ -18,6 +18,9 @@ module Skylab::Headless::NLP::EN::Number
       %w(twelve twelf)
     ]
 
+    _TERM_SEPARATOR_STRING = ::Skylab::Headless::TERM_SEPARATOR_STRING_
+
+
     big = [nil, nil, nil, 'hundred',
            'thousand', nil, nil, 'million', nil, nil, 'billion'] # and so on
 
@@ -34,7 +37,7 @@ module Skylab::Headless::NLP::EN::Number
          d = 0 ; n = x.to_int ; (n /= 10) while ( n > 0 && d += 1 )
          b = [big.length - 1, d].min ; b -= 1 until big[b] ; div = 10 ** (b-1)
          ["#{number[ x / div ]} #{big[b]}", number[ x % div ]]
-      end.compact.join ' '
+      end.compact * _TERM_SEPARATOR_STRING
     end
 
     o[:number] = number
@@ -48,7 +51,7 @@ module Skylab::Headless::NLP::EN::Number
       if mod < arr.length && arr[mod].length >= 2
         [ number[ x / m * m ],
           arr[mod][2] ? arr[mod][1] : "#{arr[mod].last}th"
-        ].compact.join ' '
+        ].compact * _TERM_SEPARATOR_STRING
       else
         number[ x ].sub(/ty$/, 'tie').concat 'th'
       end

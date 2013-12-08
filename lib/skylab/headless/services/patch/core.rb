@@ -12,7 +12,7 @@ module Skylab::Headless
       res = nil
       cmd = [ 'patch' ]
       exec = -> do
-        command = cmd.join ' '
+        command = cmd * TERM_SEPARATOR_STRING_
         if dry_run
           info[ "#{ command } < -\n#{ patch_str }" ] if verbose
           break( res = 0 )
@@ -21,7 +21,7 @@ module Skylab::Headless
           sin.write patch_str
           sin.close
           s = serr.read
-          if '' != s
+          if EMPTY_STRING_ != s
             raise "patch failed(?): #{ s.inspect }"
           end
           if verbose

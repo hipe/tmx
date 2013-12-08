@@ -9,7 +9,7 @@ module Skylab::Headless
                                   # so it is guaranteed not to have newlines.
       string = flush_both
       if string.length.nonzero?
-        @scn.string = ''
+        @scn.string = EMPTY_STRING_
         @func[ string ]
       end
       nil
@@ -29,7 +29,7 @@ module Skylab::Headless
       @buffer = Headless::Services::StringIO.new
       @separator = "\n"
       @separator_rx = /#{ ::Regexp.escape @separator }/
-      @scn = Headless::Services::StringScanner.new ''
+      @scn = Headless::Services::StringScanner.new EMPTY_STRING_
       @func = func
     end
 

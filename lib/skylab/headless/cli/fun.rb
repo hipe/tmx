@@ -38,16 +38,15 @@ module Skylab::Headless
       }
       -> sexp do
         sexp.reduce [] do |m, sxp|
-          m << h.fetch( sxp[0] ).call( sxp )
-        end.join ''
+          m << h.fetch( sxp.first ).call( sxp )
+        end.join EMPTY_STRING_
       end
     end.call
 
-    o[:unstyle_sexp] = -> sx do
+    o[ :unstyle_sexp ] = -> sx do
       sx.reduce [] do |m, x|
-        m << x[1] if :string == x[0]
-        m
-      end.join ''
+        :string == x.first and m << x[ 1 ] ; m
+      end.join EMPTY_STRING_
     end
 
     left_peeker_hack = -> summary_width do     # i'm sorry -- there was no
@@ -66,8 +65,11 @@ module Skylab::Headless
           lopts.each do |s|
             l = left.last.length + s.length
             l += x.arg.length if 1 == left.length && x.arg
-            left.push '' if l >= max && sopts.length.nonzero?
-            left.last << (left.last.length.zero? ? (' ' * 4) : ', ') << s
+            l >= max and sopts.length.nonzeor? and
+              left << EMPTY_STRING_
+            _sep = left.last.length.zero? ? ( TERM_SEPARATOR_STRING_ * 4 ) :
+              ', '
+            left.last << _sep << s
           end
           x.arg and left.first.concat(
             left[1] ? "#{ x.arg.sub(/\A(\[?)=/, '\1') }," : x.arg )
@@ -77,10 +79,8 @@ module Skylab::Headless
       end
     end
 
-    # Find the width of the widest content that will go in column A
-    # in the help screen of this `option_parser`
-
-    o[:summary_width] = -> option_parser, max = 0 do
+    Summary_width = -> option_parser, max=0 do  # find the width of the widest
+      # content that will go in column A in the help screen of this o.p
       left_peek = left_peeker_hack[ option_parser.summary_width ]
       CLI::Option::Enumerator.new( option_parser ).reduce max do |m, x|
         if x.respond_to? :summarize

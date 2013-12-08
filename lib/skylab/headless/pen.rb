@@ -1,11 +1,16 @@
 module Skylab::Headless
 
-  module Pen                      # `Pen` (at this level) is an experimental
-    # pure namespace.             # attempt to generalize and unify a subset
-  end                             # of interface-level string decorating
-                                  # functions so that the same utterances can
-                                  # be articulated across multiple modalities
-                                  # to whatever extent possible :[#084]
+  module Pen  # [#084] what is the deal with expression agents..
+    module Bundles
+      Expressive_agent = -> _ do  # :+[#121] bundle as def macro
+      private
+        def say &p
+          expression_agent.calculate( & p )
+        end
+      end
+    end
+  end
+
   module Pen::InstanceMethods
                                   # (trying to use these when appropriate:
                         # http://www.w3schools.com/tags/tag_phrase_elements.asp)
@@ -45,7 +50,11 @@ module Skylab::Headless
     end
 
     alias_method :calculate, :instance_exec
+
+    Headless::SubClient::EN_FUN[ self, :private, %i( s ) ]
+
   end
 
   Pen::MINIMAL = ::Object.new.extend Pen::InstanceMethods
+
 end

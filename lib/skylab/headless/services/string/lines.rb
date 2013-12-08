@@ -43,7 +43,7 @@ module Skylab::Headless
     end
 
     def self.factory string
-      if string.length > Headless::CONSTANTS::MAXLEN
+      if string.length > Headless::Constants::MAXLEN
         fail 'implement me - fun!'
       else
         new string
