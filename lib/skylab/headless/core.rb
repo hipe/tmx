@@ -573,3 +573,4 @@ module Skylab::Headless
     Delegating = Delegating
   end
 end
+::Skylab::Headless::TERM_SEPARATOR_STRING_ = ' '.freeze  # before merge

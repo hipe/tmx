@@ -90,14 +90,17 @@ module Skylab::MetaHell
       ::Struct.new( * h.keys ).new( * h.values )
     end
 
-    o[:memoize] = -> p do         # creates a function `func2` from `func`.
-      p_ = -> do                  # the first time `func2` is called, it calls
-        x = p.call                # `func` and stores its result in memory,
-        p_ = -> { x }             # and also uses that result as its result.
-        x                         # each subsequent time you call `func2` it
-      end                         # uses that same result stored in memory from
-      -> { p_.call }              # the first time you called it. please be
-    end                           # careful.
+    Memoize = -> p do  # create a proc (suitable for use in 'define_method')
+      # that, any first time you call it, its result will be the result of
+      # a call to proc 'p'. any subsequent call to this proc will also be
+      # that same result from the first time you called it. be careful.
+      p_ = -> do
+        x = p.call ; p_ = -> { x } ; x
+      end
+      -> { p_.call }
+    end
+
+    o[ :memoize ] = Memoize
 
     o[:memoize_to_const_method] = -> p, c do  # use with `define_method`
       puff = Puff_constant_.curry[ false, -> _ { p.call }, c ]

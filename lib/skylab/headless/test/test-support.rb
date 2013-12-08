@@ -12,7 +12,8 @@ module Skylab::Headless::TestSupport
     TestSupport = ::Skylab::TestSupport
   end
 
-  Headless = ::Skylab::Headless  # covered
+  include CONSTANTS
+  Headless = Headless ; TestSupport = TestSupport
 
   set_tmpdir_pathname do
     Headless::System.defaults.dev_tmpdir_pathname.join 'hl'
@@ -26,10 +27,14 @@ module Skylab::Headless::TestSupport
   end
 
   module InstanceMethods
-    attr_accessor :do_debug
 
     def debug!
       self.do_debug = true
+    end
+    attr_accessor :do_debug
+
+    def debug_IO
+      TestSupport::Stderr_[]
     end
   end
 

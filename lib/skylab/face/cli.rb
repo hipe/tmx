@@ -1740,7 +1740,7 @@ module Skylab::Face
 
     Requity_brackets_ = -> do  # ditto
       p = -> orr do
-        p = Services::Headless::CLI::Argument::FUN.reqity_brackets
+        p = Services::Headless::CLI::Argument::FUN::Reqity_brackets
         p[ orr ]
       end
       -> x { p[ x ] }

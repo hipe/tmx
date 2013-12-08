@@ -119,7 +119,7 @@ module Skylab::Headless
         end
 
         def as_moniker
-          @node_a.map( & :as_moniker ) * ' '
+          @node_a.map( & :as_moniker ) * TERM_SEPARATOR_STRING_
         end
 
         def length
@@ -240,7 +240,11 @@ module Skylab::Headless
         attr_reader :value_name_i
 
         def render_under client
-          client.render_argument self
+          client.render_argument_text self
+        end
+
+        def as_moniker
+          "<#{ as_slug }>"
         end
 
         def as_slug
@@ -391,7 +395,7 @@ module Skylab::Headless
 
       on_rx = /(?<=\Aon_)/
       Hooks__ = Headless::Hooks_.new( *
-        CLI::Argument::Syntax::Inferred::Validate.parameters.names.map do |i|
+        CLI::Argument::Syntax::Validate.parameters.names.map do |i|
           on_rx.match( i ).post_match.intern
         end )
 

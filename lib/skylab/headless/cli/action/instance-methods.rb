@@ -564,7 +564,7 @@ module Skylab::Headless
 
     def render_base_arg_syntax_parts y, stx, em_range=nil
       stx.each.with_index do |arg, d|
-        s = render_argument arg
+        s = render_argument_text arg
         if em_range and em_range.include? d
           s = em s
         end
@@ -580,7 +580,7 @@ module Skylab::Headless
     end
 
   public
-    def render_argument arg       # (no styling just text)
+    def render_argument_text arg       # (no styling just text)
       a, b = reqity_brackets arg.reqity
       if arg.is_atomic_variable
         "#{ a }<#{ arg.as_slug }>#{ b }"
@@ -602,7 +602,7 @@ module Skylab::Headless
     -> do
       reqity_brackets = nil  # load it wherever it is only when you need it
       define_method :reqity_brackets do |reqity|
-        ( reqity_brackets ||= CLI::Argument::FUN.reqity_brackets )[ reqity ]
+        ( reqity_brackets ||= CLI::Argument::FUN::Reqity_brackets )[ reqity ]
       end
     end.call
 
@@ -646,7 +646,7 @@ module Skylab::Headless
       y = [ ]
       e.argument_a.each do |arg|
         x = if arg.is_literal then  "`#{ arg.as_moniker }`"
-        else render_argument arg end
+        else render_argument_text arg end
         x and y << x
       end
       _s = render_group_with_i_and_a :alternation, y
@@ -681,7 +681,7 @@ module Skylab::Headless
       if parm.is_option
         parm.as_parameter_signifier
       elsif parm.is_argument
-        render_argument parm
+        render_argument_text parm
       end
     end
 

@@ -6,57 +6,111 @@ module Skylab::Headless::TestSupport::CLI
 
   include CONSTANTS
 
+  MetaHell = MetaHell ; TestSupport = TestSupport
+
+  extend TestSupport::Quickie  # e.g sibling 'path tools'
+
   module ModuleMethods
 
     # we are flagrantly breaking the fundamental rules of unit testing for fun:
 
-    include CONSTANTS  # necessary - to speak of m.h below
+    def klass cls_i, & cls_p
 
-    memoize = MetaHell::FUN.memoize
+      instance_p = nil ; memoize = MetaHell::FUN::Memoize
+      norm_argv_p = serr_a_p = streams_p = nil
+      define_method :invoke do |*x_a|
+        a = norm_argv_p[ x_a ]
+        streams_p[].clear_buffers
+        serr_a_p = memoize[ -> do
+          streams_p[].errstream.string.split "\n"
+        end ]
+        _client = instance_p[]
+        @result = _client.invoke a
+      end
 
-    define_method :klass do |name, &block|
+      norm_argv_p = -> x_a do
+        1 == x_a.length and a = ::Array.try_convert( x_a.first )
+        a || x_a
+      end
 
-      klass = memoize[ -> do
-        kls = CLI_TestSupport.const_set name, ::Class.new
-        kls.class_exec(& block )
-        kls
-      end ]
-
-      streams = memoize[ -> do
+      streams_p = memoize[ -> do
         TestSupport::IO::Spy::Triad.new
       end ]
 
-      instance = memoize[ -> do
-        klass[].new(* streams[].values )
+      class_p = nil
+      instance_p = memoize[ -> do
+        _cls = class_p[]
+        _3 = streams_p[].values
+        _cls.new( * _3 )
       end ]
 
+      class_p = memoize[ -> do
+        cls = CLI_TestSupport.const_set cls_i, ::Class.new
+        cls.instance_variable_set :@dir_pathname, false
+        cls.class_exec( & cls_p )
+        cls
+      end ]
+
+      define_method :serr_a do
+        serr_a_p[]
+      end
+
       define_method :debug! do
-        streams[].debug!
-      end
-
-      serr = nil
-
-      define_method :invoke do |argv|
-        streams[].clear_buffers
-        serr = memoize[ -> do
-          streams[].errstream.string.split "\n"
-        end ]
-        instance[].invoke argv
-      end
-
-      define_method :serr do
-        serr[]
+        streams_p[].debug!
       end
     end
   end
 
   module InstanceMethods
+
     include CONSTANTS
 
-    define_method :styled, & Headless::CLI::Pen::FUN.unstyle_styled
+    def expect_usage_line_with s
+      expect :styled, "usage: #{ s }"
+    end
 
-    expect_text = FUN.expect_text
+    def expect_invite_line_with s
+      expect :styled, "use #{ s } -h for help"
+    end
 
-    define_method :expect_text do expect_text end
+    def expect * x_a
+      line = serr_a.shift or fail "expected more serr lines, had none"
+      if :styled == x_a[ 0 ]
+        x_a.shift
+        line_ = Headless::CLI::Pen::FUN::Unstyle_styled[ line ]
+        line_ or raise "expected line to be styled, was not: #{ line.inspect }"
+        line = line_
+      end
+      x = x_a.shift
+      x_a.length.zero? or raise ::ArgumentError, "unexpected: #{ x_a[0].class }"
+      if x.respond_to? :named_captures
+        line.should match x
+      else
+        line.should eql x
+      end
+    end
+
+    def expect_no_more_serr_lines
+      number_of_reamaining_stderr_lines.zero? or fail "expected no more lines#{
+        }, had: #{ serr_a.fetch( 0 ).inspect }"
+    end
+
+    def expect_a_few_more_serr_lines
+      a_few_more.should be_include number_of_reamaining_stderr_lines
+    end
+
+    define_method :a_few_more, MetaHell::FUN::Memoize[ -> { 1..2 } ]
+
+    def number_of_reamaining_stderr_lines
+      serr_a.length
+    end
+
+    def expect_neutral_result
+      @result.should be_nil
+    end
+
+    def expect_text
+      FUN.expect_text
+    end
   end
 end

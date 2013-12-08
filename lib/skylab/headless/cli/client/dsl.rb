@@ -96,3 +96,16 @@ module Skylab::Headless
     end
   end
 end
+module Skylab::Headless  # #during-transition-only #todo
+  module CLI::Client::DSL
+    def self.[] mod
+      _loc = caller_locations( 1, 1 )[ 0 ]
+      mod.module_exec do
+        include CLI::Client::DSL::InstanceMethods
+        @tug_class = MAARS::Tug
+        extend CLI::Client::DSL::ModuleMethods # `method_added` avoid trouble
+        init_autoloader _loc
+      end
+    end
+  end
+end
