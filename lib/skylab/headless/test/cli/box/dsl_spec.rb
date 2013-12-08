@@ -2,10 +2,9 @@ require_relative 'dsl/test-support'
 
 module Skylab::Headless::TestSupport::CLI::Box::DSL
 
-  # Quickie compatible. just load this file with `ruby -w` if you want
+  describe "[hl] CLI box DSL" do
 
-  describe "the #{ Headless }::CLI::Box::DSL - generated action instance" do
-    extend DSL_TestSupport
+    extend TS__
 
     # ~ In this file we will be experimenting with some nerks: ~
 
@@ -15,11 +14,11 @@ module Skylab::Headless::TestSupport::CLI::Box::DSL
     memoize = MetaHell::FUN.memoize
 
     box_class = -> const, block=nil do
-      cls = DSL_TestSupport.const_set const, ::Class.new
+      cls = TS__.const_set const, ::Class.new
       cls.class_exec do
         @name_function = Headless::Name::Function::From::Module_Anchored.new(
           "Spoof::#{ const }", "Spoof" )
-        extend Headless::CLI::Box::DSL
+        Headless::CLI::Box::DSL[ self ]
         class_exec(& block ) if block
       end
       cls
@@ -60,7 +59,7 @@ module Skylab::Headless::TestSupport::CLI::Box::DSL
     end
 
     # ~ Part 2. test DSL m.m's (if any) ~
-                                  # they are more readable that `let`s
+                                  # they are more readable than `let`s
 
     def self.using cls_func
       let :cls_func do cls_func end
@@ -68,8 +67,6 @@ module Skylab::Headless::TestSupport::CLI::Box::DSL
 
     # ~ Part 3. i.m's that synthesize parts 1 & 2 ~
                                   # a tight little spaghetti bowl -- look!
-    include Headless  # we refer to it by name below..
-
     let :box do
       build_box[ self, cls_func ]
     end

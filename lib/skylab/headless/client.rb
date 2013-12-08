@@ -21,11 +21,8 @@ module Skylab::Headless
 
   private
 
-    def initialize                # (remember this is the base module for those
-                                  # clients that fall all the way back to this
-                                  # and as such it must be modality-agnostic
-                                  # here. anything fancy belongs elsewhere.)
-      init_headless_sub_client nil                      # (part of [#hl-004])
+    def initialize
+      super  # #transitional #todo
     end
 
     def actual_parameters         # not all stacks use this. #sc-bound

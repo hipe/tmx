@@ -53,8 +53,8 @@ module Skylab::Headless
 
   private
 
-    def initialize                # example rudimentary implementation
-      init_headless_sub_client nil # modality clients are always this way
+    def initialize
+      super  # #transisional #todo
     end
   end
 

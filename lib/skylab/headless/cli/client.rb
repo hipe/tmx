@@ -86,12 +86,11 @@ module Skylab::Headless
     }
 
     define_method :initialize do |*a|
-      init_headless_sub_client nil  # modality clients are always this way
       instance_exec( a, & param_h.fetch( a.length ) )
       if self.class.respond_to? :_headless_inits and self.class._headless_inits
         _headless_inits_run  # [#052]
       end
-      nil
+      super()
     end
 
   private

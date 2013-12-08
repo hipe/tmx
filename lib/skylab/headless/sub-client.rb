@@ -15,9 +15,26 @@ module Skylab::Headless::SubClient
 
     define_singleton_method :private_attr_reader, & Private_attr_reader_
 
-    def initialize request_client # this is the heart of it all [#004] (see)
+    def initialize client_x=nil  # XXX #transitional only #todo
+      @error_count = 0
+      client_x and headless_client_notify client_x
+      super()
+    end
+
+    def init_headless_sub_client x  # #deprecated #todo, waiting for [tr]
+      @error_count = 0
+      headless_client_notify x ; nil
+    end
+
+    def headless_client_notify client_x
+      self.request_client = client_x ; nil
+    end
+
+if false  # XXX these changes are just an integration joist #todo
+
+    def initialize request_client=nil # this is the heart of it all [#004] (see)
       block_given? and raise ::ArgumentError.new 'blocks are not honored here'
-      init_headless_sub_client request_client
+      request_client and init_headless_sub_client request_client
       super(   )
     end
 
@@ -29,6 +46,8 @@ module Skylab::Headless::SubClient
                                   # to you. why would u call init 2x?)
       self.request_client = request_client  # (some environments employ
     end                           # alternatives to the ivar for storing r.c)
+
+end
 
     def request_client= x  # #private-attr-writer
       @request_client = x
