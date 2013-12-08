@@ -80,9 +80,9 @@ module Skylab::TreetopTools
 
   private
 
-    def initialize request_client, dsl_body_p, event_p
-      init_headless_sub_client request_client
+    def initialize client_x, dsl_body_p, event_p
       @dsl_body_p, @event_p = dsl_body_p, event_p
+      super client_x
     end
 
     def absorb! struct

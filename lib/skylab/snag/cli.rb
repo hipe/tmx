@@ -14,7 +14,7 @@ module Skylab::Snag
 
     include CLI::Action::InstanceMethods
 
-    include Headless::CLI::Client::InstanceMethods
+    Headless::CLI::Client[ self, :instance_methods, :three_streams_notify ]
 
     def invoke argv               # modify at [#010]
       Headless::CLI::PathTools.clear # see
@@ -35,9 +35,8 @@ module Skylab::Snag
     # we get from h.l, which is good.
 
     def initialize up, pay, info  # (only strictifies the signature)
-      super nil, nil, nil                      # lets legacy know we do it
-      init_headless_cli_client up, pay, info   # i mean h.l does it
-      nil
+      three_streams_notify up, pay, info
+      super nil, nil, nil
     end
 
     #         ~ event handling and emitting ~

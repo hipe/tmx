@@ -12,8 +12,7 @@ module Skylab::Treemap
   private
 
     def init_treemap_sub_client x
-      init_headless_sub_client x # sets @error_count, e.g and..
-      nil
+      init_headless_sub_client x ; nil
     end
 
     def request_client= x         # .. calls this (overriden), which:
@@ -77,6 +76,7 @@ module Skylab::Treemap
   module Core::Action::ModuleMethods
 
     include Headless::Action::ModuleMethods  # we use its name inference
+    # Headless::Action[ self, :anchored_names ]  # #todo for integration
 
     def define_methods_for_emitters *stream_name_a
       stream_name_a.each do |stream_name|
@@ -94,6 +94,7 @@ module Skylab::Treemap
   module Core::Action::InstanceMethods
 
     include Headless::Action::InstanceMethods
+    # Headless::Action[ self, :IMs ]  # #todo for integration
 
     include Core::SubClient::InstanceMethods
 

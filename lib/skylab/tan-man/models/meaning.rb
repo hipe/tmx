@@ -6,9 +6,9 @@ module Skylab::TanMan
     include Core::SubClient::InstanceMethods
 
 
-    def collapse request_client                # we are not a flyweight, hack
+    def collapse client_x  # we are not a flyweight, hack
       @request_client and fail 'sanity'
-      _tan_man_sub_client_init request_client
+      client_notify client_x
       self
     end
 
@@ -79,12 +79,13 @@ module Skylab::TanMan
 
   private
 
-    def initialize request_client, name, value
-      _tan_man_sub_client_init request_client
+    def initialize client_x, name, value
       self[:name] = name
       @symbol = name.intern
       self[:value] = value
       @e0 = @e2 = @e4 = nil
+      init_headless_sub_client client_x  # we can't call to super b.c struct
+      nil
     end
   end
 end

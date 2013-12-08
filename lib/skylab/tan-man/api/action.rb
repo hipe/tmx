@@ -41,8 +41,8 @@ module Skylab::TanMan
 
   private
 
-    define_method :initialize do |request_client, events|
-      init_headless_sub_client request_client
+    define_method :initialize do |client_x, events|
+      super client_x
       events[ self ]
 
       # We cautiouly and experimentally re-introduce the idea of "knobs"

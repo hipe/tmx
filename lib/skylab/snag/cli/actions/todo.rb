@@ -98,7 +98,7 @@ module Skylab::Snag
 
   private
 
-    dsl_off
+    turn_DSL_off
 
     default = -> do
       box = Snag::API::Actions::ToDo::Report.attributes.

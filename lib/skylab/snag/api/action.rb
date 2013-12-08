@@ -72,7 +72,7 @@ module Skylab::Snag
     def initialize api
       @nodes = nil
       @param_h = nil
-      _snag_sub_client_init api
+      super
     end
 
     def absorb_param_h            # [#hl-047] this kind of algo, sort of

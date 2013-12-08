@@ -24,10 +24,6 @@ module Skylab::CssConvert
 
   private
 
-    def _css_convert_sub_client_init request_client
-      init_headless_sub_client request_client
-    end
-
     def escape_path x
       request_client.escape_path x
     end

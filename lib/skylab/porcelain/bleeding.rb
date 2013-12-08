@@ -822,8 +822,9 @@ module Skylab::Porcelain::Bleeding
       self
     end
 
-    def initialize module_with_actions
-      _namespace_inferred_init module_with_actions
+    def initialize module_with_actions=nil
+      module_with_actions and _namespace_inferred_init module_with_actions
+      super()
     end
 
     alias_method :reflector, :action_anchor_module # for documentors

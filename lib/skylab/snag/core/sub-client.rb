@@ -9,10 +9,6 @@ module Skylab::Snag
                                   # (no public methods declared here)
   private
 
-    def _snag_sub_client_init request_client
-      init_headless_sub_client request_client
-    end
-
     def api_invoke norm_name, param_h, *a, &b
       request_client.send :api_invoke, norm_name, param_h, *a, &b
     end

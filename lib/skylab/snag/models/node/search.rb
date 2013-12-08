@@ -179,7 +179,7 @@ module Skylab::Snag
     end
 
     def initialize emitter, max_count, query_sexp
-      _snag_sub_client_init emitter
+      super emitter
       @counter = nil
       @max_count = nil
       self.max_count = max_count if max_count

@@ -208,9 +208,9 @@ module Skylab::TanMan
 
   private
 
-    def initialize request_client
+    def initialize client_x
       @remotes = nil
-      init_headless_sub_client request_client
+      super
     end
 
     def resources

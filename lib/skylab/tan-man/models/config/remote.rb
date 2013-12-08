@@ -13,10 +13,6 @@ module Skylab::TanMan
 
   class Models::Config::Remote::Collection < ::Enumerator
 
-    alias_method :config_original_initialize, :initialize # ick, enumerator
-                                  # subclients will be annoying unless we are
-                                  # less aggressive somewhere
-
     include Core::SubClient::InstanceMethods # don't need m.m yet
 
     # below line is kept for #posterity as the #birth of the sub-client pattern
@@ -39,8 +35,7 @@ module Skylab::TanMan
       result
     end
 
-    def initialize request_client, &block
-      init_headless_sub_client request_client
+    def initialize client_x, &block
       @num_resources_seen = 0
       block ||= -> y do
         seen = { }
@@ -55,7 +50,7 @@ module Skylab::TanMan
           end
         end
       end
-      config_original_initialize(& block)
+      super client_x, & block
     end
 
     attr_reader :num_resources_seen

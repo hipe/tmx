@@ -15,8 +15,7 @@ module Skylab::TanMan
 
     emits event_structure: :all
 
-    def initialize i, o, e
-      _tan_man_sub_client_init nil  # get it? # [#sl-114] above
+    def initialize i, o, e  # [#sl-114] these three are the convention
       @io_adapter = Headless::CLI::IO_Adapter::Minimal.
         new i, o, e, Pen__.new
       on_all do |ev|
@@ -27,7 +26,7 @@ module Skylab::TanMan
         end
         io_adapter.emit ev.stream_name, _msg
       end
-      nil
+      super()
     end
 
     public :io_adapter

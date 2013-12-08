@@ -150,11 +150,11 @@ module Skylab::PubSub
 
     #         ~ in rougly lifecycle (and then pre-) order ~
 
-  private
-
     def on stream_name, * a_p, & block  # #storypoint-5
       event_listeners.add_listener stream_name, * a_p, & block
     end
+
+  private
 
     def with_specificity & p
       event_listeners.with_specificity p

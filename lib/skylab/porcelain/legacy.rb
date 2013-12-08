@@ -585,12 +585,17 @@ module Skylab::Porcelain::Legacy
   private
 
     def initialize request_client, action_sheet=nil
+      if request_client
+        init_chld request_client, action_sheet
+      end
+      super()
+    end
+    def init_chld request_client, action_sheet  #jump-1 wtf something in here is preventing .. #todo
       @option_parser = nil
       @option_parser_scanner = nil
       @request_client = request_client
       @action_sheet = action_sheet if action_sheet
       @borrowed_queue = nil
-      nil
     end
 
     def _porcelain_legacy_emit stream, text
@@ -1001,9 +1006,12 @@ module Skylab::Porcelain::Legacy
     Init_Mapper_ = ::Struct.new :sin, :out, :err, :program_name, :wire_p
 
     wire_me = -> me, blk do
-      cnd = Event_Wiring_Conduit_.new me.method( :on )
-      blk[ cnd ]
-      nil
+      if me.respond_to? :on  # [#ps-020] part of its public API
+        cnd = Event_Wiring_Conduit_.new me.method( :on )
+        blk[ cnd ]
+      else
+        me.instance_exec( & blk )
+      end ; nil
     end
 
     args_length_h = {
@@ -1011,8 +1019,7 @@ module Skylab::Porcelain::Legacy
         blk or raise ::ArgumentError, "this #{ self.class } - a legacy #{
           } CLI client - requires that you construct it with 1 block or #{
           }3 args for io wiring (no arguments given) (nils or empty block ok)"
-        wire_me[ self, blk ]
-        nil
+        wire_me[ self, blk ] ; nil
       end,
       1 => -> h, blk do
         blk and raise ::ArgumentError, "won't wire when constructing with hash"
@@ -1054,6 +1061,7 @@ module Skylab::Porcelain::Legacy
       @program_name = @request_client = @action_sheet = nil
       instance_exec(* up_pay_info, wire,
                    & args_length_h.fetch( up_pay_info.length ) )
+      super( nil, & nil) # #jump-1 wtf
     end
 
     class Event_Wiring_Conduit_ < ::BasicObject

@@ -30,12 +30,12 @@ module Skylab::TanMan  # (leave extra whitespacing below for [#bs-010])
 
   private
 
-    def initialize request_client              # have fun with this!
-      _tan_man_sub_client_init request_client
+    def initialize client_x=nil
+      super( * client_x )
     end
 
-    def _tan_man_sub_client_init request_client
-      init_headless_sub_client request_client
+    def client_notify client_x
+      headless_client_notify client_x ; nil
     end
 
     def api_invoke normalized_action_name, param_h # *EXPERIMENTAL*

@@ -2,15 +2,11 @@ module Skylab::Snag
 
   class CLI::Action::Box < CLI::Action
 
-    include Headless::CLI::Box::DSL::InstanceMethods
+    Headless::CLI::Box::DSL[ self, :leaf_action_base_class, -> { CLI::Action } ]
 
-    def initialize request_client, _=nil  # (namespace sheet, not interesting)
-      init_headless_cli_box_dsl request_client
+    def initialize client_x, _=nil  # (namespace sheet, not interesting)
+      super client_x
     end                           # rc is nil when box needs a charged graph
                                   # of children to describe
-
-    extend Headless::CLI::Box::DSL::ModuleMethods  # `method_added`, keep at end
-
-    cli_box_dsl_leaf_action_superclass CLI::Action  # but this after above
   end
 end
