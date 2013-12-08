@@ -1739,9 +1739,8 @@ module Skylab::Face
     end  # (narrow focus of the dependency for now (but trivial))
 
     Requity_brackets_ = -> do  # ditto
-      p = -> orr do
-        p = Services::Headless::CLI::Argument::FUN::Reqity_brackets
-        p[ orr ]
+      p = -> i do
+        (( p = Services::Headless::CLI::Argument::FUN::Reqity_brackets ))[ i ]
       end
       -> x { p[ x ] }
     end.call

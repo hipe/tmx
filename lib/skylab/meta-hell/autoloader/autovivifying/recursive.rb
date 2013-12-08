@@ -78,37 +78,37 @@ module Skylab::MetaHell
     #
     # #multi-entrant
 
-    def self.[] mod
-      Flush_stack_[ Build_stack_from_mod_[ mod ] ]
+    def self.[] mod  # #re-entrant
+      Flush_stack__[ Build_stack_from_mod__[ mod ] ]
     end
 
     def self.to mod  # in contrast to above, this form mutates client module
       # regardless of whether it already responds to dir_pathname
       Flush_stack_[
-        Build_stack_from_2_mods_[ mod, Surrounding_module_[ mod ] ] ]
+        Build_stack_from_2_mods__[ mod, Surrounding_module__[ mod ] ] ]
     end
 
-    Build_stack_from_2_mods_ = -> mod1, mod do
+    Build_stack_from_2_mods__ = -> mod1, mod do
       stack_a = [ * mod1 ] ; top_has_dpn = false
       while ! ( mod.respond_to? :dir_pathname and mod.dir_pathname )
         stack_a.push mod
         mod.instance_variable_defined? :@dir_pathname and
           break( top_has_dpn = true )
-        mod = Surrounding_module_[ mod ]
+        mod = Surrounding_module__[ mod ]
       end
       top_has_dpn and MAARS[ stack_a.pop ]
       stack_a << mod
     end
 
-    Build_stack_from_mod_ = Build_stack_from_2_mods_.curry[ nil ]
+    Build_stack_from_mod__ = Build_stack_from_2_mods__.curry[ nil ]
 
-    Surrounding_module_ = -> mod do
+    Surrounding_module__ = -> mod do
       _mod = MetaHell::Module::Accessors::FUN.resolve[ mod, '..' ] or
         raise "can't - rootmost module (::#{ mod }) has no dir_pathname"
       _mod
     end
 
-    Flush_stack_ = -> stack_a do
+    Flush_stack__ = -> stack_a do
       mod = stack_a.pop
       while mod_ = stack_a.pop
         n = mod_.name

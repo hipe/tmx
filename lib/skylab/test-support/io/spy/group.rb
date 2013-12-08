@@ -123,7 +123,7 @@ module Skylab::TestSupport
       def strings ; self[ 1 ] end
     end
 
-    class Composite
+    class Composite  # :+#public-API
 
       def self.of enum
         me = new

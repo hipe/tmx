@@ -129,13 +129,13 @@ module Skylab::SubTree::TestSupport::CLI
     def any_blanks
       while @emission_a.length.nonzero?
         e = @emission_a.fetch 0
-        EMPTY_S_ == e.payload_x or break
+        EMPTY_STRING_ == e.payload_x or break
         @emission_a.shift
       end
       nil
     end
     #
-    EMPTY_S_ = ::Skylab::Headless::EMPTY_S_  # track it just for fun
+    EMPTY_STRING_ = ''.freeze
 
     def header str
       styled.should eql( str )

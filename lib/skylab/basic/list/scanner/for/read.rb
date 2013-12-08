@@ -21,7 +21,7 @@ module Skylab::Basic
 
     def initialize fh
       fh.closed? and raise "expected open filehandle."
-      maxlen = Services::Headless::CONSTANTS::MAXLEN
+      maxlen = Services::Headless::Constants::MAXLEN
       line_rx = /.*\n|.+/  # not caring for now
       count = 0 ; buffer = ''
       @count = -> { count }

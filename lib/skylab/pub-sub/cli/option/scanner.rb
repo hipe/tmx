@@ -27,7 +27,8 @@ module Skylab::PubSub
     #         ~ what does it look like? ~
     -> do
 
-      opt_rx, long_rx = Headless::CLI::Option::CONSTANTS.at :opt_rx, :long_rx
+      opt_rx, long_rx = Headless::CLI::Option::Constants.
+        values_at :OPT_RX, :LONG_RX
 
       [ [ :long, -> do
             md = long_rx.match current
