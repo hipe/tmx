@@ -283,7 +283,7 @@ module Skylab::Headless::TestSupport::CLI::Box::DSL
           end ]
 
           it "- it does not run them for you" do
-            kls = box.send :fetch, :bizzo
+            kls = box.fetch_action_class_notify :bizzo
             act = kls.new box
             op = act.send :option_parser
             op.top.list.length.should eql( 1 )

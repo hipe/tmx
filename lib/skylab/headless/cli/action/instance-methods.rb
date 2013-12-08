@@ -97,6 +97,51 @@ module Skylab::Headless
         end
       end
     end
+  end
+  module CLI
+    module Action
+      module InstanceMethods
+        def say * a, &p  # #storypoint-18 (pinned to first occurrence of 'say')
+          if p
+            expression_agent.calculate( * a, & p )
+          else
+            say_w_lxcn( * a )
+          end
+        end
+
+        def expression_agent
+          pen
+        end
+
+        def say_w_lxcn i
+          lxcn.fetch_default i
+        end
+
+        def lxcn  # stub implementation
+          LEXICON__  # defined near at first write
+        end
+
+        Action::LEXICON__ = (( class Action::Lexicon__
+          def initialize
+            @bx = Headless::Services::Basic::Box.new ; nil
+          end
+          def fetch_default i, &p
+            @bx.fetch i, &p
+          end
+          def add_entry_with_default i, s
+            @bx.add i, s.freeze ; nil
+          end
+          self
+        end )).new
+
+        def format_header header_s
+          "#{ header_s }:"
+        end
+      end
+    end
+  end
+
+  module CLI::Action::InstanceMethods
 
     # param_queue - a param queue is an experimental solution to the problem
     # of wanting to process options and arguments in an order-sensitive way,
@@ -384,7 +429,7 @@ module Skylab::Headless
       state_h[ :subitem ] = state[ nil, # (<- guess what will happen here)
                                         [ :subitem, :item, :section, :normal ] ]
 
-      module CLI::Desc
+      module CLI::Action::Desc
         Section = ::Struct.new :header, :lines
       end
 
@@ -393,7 +438,7 @@ module Skylab::Headless
       -> lines, sections do
         stat = state_h[ :initial ]  # (var meaning change!!)
         section = line = nil
-        push = -> { sections << ( section = CLI::Desc::Section.new nil, [] )  }
+        push = -> { sections << ( section = CLI::Action::Desc::Section.new nil, [] )  }
         trigger_h = {
           desc:    -> { push[] ; section.lines << [ :line, line ] },
           section: -> { push[] ; section.header = line },

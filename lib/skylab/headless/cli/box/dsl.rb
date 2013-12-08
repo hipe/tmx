@@ -187,7 +187,7 @@ module Skylab::Headless
       end
 
       def rslv_task_with_action_x_and_args x, a
-        cls = fetch x  # #after-merge: rename
+        cls = fetch_action_class_notify x
         cls and rslv_task_with_action_class_and_args cls, a
       end
 
@@ -263,7 +263,7 @@ module Skylab::Headless
         op = create_box_option_parser
         sw = op.define '-h', '--help [<sub-action>]',
             'this screen [or sub-action help]' do |x|
-          box_enqueue_help x ; true
+          enqueue_help_as_box x ; true
         end
         do_not_render_switch_in_syntax_string sw
         op
@@ -331,7 +331,7 @@ module Skylab::Headless
         norm_i = @downstream_action.normalized_local_action_name
         @queue.first == norm_i or fail 'sanity'
         @queue.shift  # done processing the name, shift it off
-        box_enqueue_help norm_i
+        enqueue_help_as_box norm_i
         @downstream_action = nil ; nil
       end
     end

@@ -135,7 +135,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     Sub_client__[ self,
       :service_terminal, :service_module, -> { Services__ } ]
 
-    Headless::CLI::Client[ self, :client_services, :expressive_client,
+    Headless::CLI::Client[ self, :client_services,
                            :three_streams_notify, :instance_methods ]
 
     def initialize i, o, e
@@ -248,7 +248,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       o.version = '0.0.1'         # avoid warnings from calling the builtin '-v'
       o.release = 'blood'         # idem
       o.on '-h', '--help', 'this screen, or help for particular action' do
-        box_enqueue_help
+        enqueue_help_as_box
       end
       o.summary_indent = '  '     # two spaces, down from four
       o

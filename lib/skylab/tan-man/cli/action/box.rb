@@ -38,7 +38,7 @@ module Skylab::TanMan
     def build_option_parser       # #frontier, tracked by [#hl-037]
       o = TanMan::Services::OptionParser.new
       o.on '-h', '--help', 'this screen, or help for particular sub-action' do
-        box_enqueue_help
+        enqueue_help_as_box
       end
       o
     end

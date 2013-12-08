@@ -30,14 +30,6 @@ module Skylab::Headless
         module_exec _, & CLI::Client::DSL::To_proc
       end
 
-      Expressive_client = -> _ do
-        module_exec _, & Headless::Pen::Bundles::Expressive_agent.to_proc
-      private
-        def expression_agent
-          @io_adapter.pen
-        end
-      end
-
       Instance_methods = -> _ do
         include CLI::Client::InstanceMethods ; nil
       end

@@ -2,167 +2,191 @@ module Skylab::Headless
 
   module CLI::Box
 
-    ALTERNATION_SEPARATOR_GLYPH__ = '|'.freeze
+    module InstanceMethods  # read [#137] the CLI box.. #storypoint-1
 
-  end
+      include CLI::Action::InstanceMethods
 
-  module CLI::Box::InstanceMethods
-    # (for now the main coverage of this is in frontier product "my-tree")
+      def is_leaf  # #hook-in to the o.p facility
+        false
+      end
 
-    include CLI::Action::InstanceMethods # makes dsl hacks easier, not nec. here
+    private
 
-  private
+      def default_action  # #hook-out
+        :dispatch
+      end
 
-    #                 ~ core controller-like methods ~
-
-    def action_box_module
-      self.class.action_box_module
+      def dispatch action=nil, *args  # #storypoint-2, NOTE names are UI labels
+        @curried = Dispatch__.new( self, action, args ).execute
+        @curried and flush_curry
+      end
+      def flush_curry
+        r = @curried.hot.invoke @curried.arg_a
+        false == r and r = on_ht_faild
+        @curried = nil ; r
+      end
+      def on_ht_faild
+        s = @curried.hot.invite_line
+        s and help_yielder << s ; nil
+      end
+    public
+      def no_action_notify disp
+        error say_expting
+        usage_and_invite
+      end
+    private
+      # [#119] intentionally ugly names are used here
+      def say_expting
+        "expecting #{ act_arg_stx_s }"
+      end
+    public
+      def fetch_action_class_notify action_s  # storypoint-3
+        action_box_module.const_fetch action_s, method( :on_no_act )
+      end
+    private
+      def action_box_module
+        self.class.action_box_module
+      end
+      def on_no_act name_err
+        exp_s = say_expting
+        error say { "there is no #{ ick name_err.const } action. #{ exp_s }" }
+        usage_and_invite
+      end
     end
 
-    def default_action
-      :dispatch
+    class Dispatch__
+      def initialize client, action_s, arg_a
+        @action_s = action_s ; @arg_a = arg_a ; @client = client ; nil
+      end
+      attr_reader :arg_a, :hot
+      def execute
+        if @action_s
+          when_action
+        else
+          when_no_action
+        end
+      end
+    private
+      def when_no_action
+        @client.no_action_notify self
+      end
+      def when_action
+        @cls = @client.fetch_action_class_notify @action_s
+        @cls and when_class
+      end
+      def when_class
+        @hot = @cls.new @client
+        self
+      end
     end
 
-    # (because `dispatch` is named as our default action, the variable names
-    # and method signature that appears below is both designed that way
-    # *and* appears in help screens -- weird!)
+    module InstanceMethods
 
-    def dispatch action=nil, *args  # (**NOTE** param names are cosmetic!)
-      res = nil
-      if action
-        klass = fetch action
-        if klass
-          o = klass.new self
-          res = o.invoke args
-          if false == res                      # this cluster here is what
-            help_yielder << o.invite_line      # gives us the terminal action
-            res = nil                          # node in the invite line
+    private  # ~ private #hook-in's to self
+
+      def help *action  #hook-in # #storypoint-9
+        @queue[ 0 ] = default_action
+        help_screen help_yielder, *action
+        true
+      end
+
+      def help_screen y, action=nil  # :+#public-API (overrides parent)
+        if action
+          hlp_scrn_fr_chld y, action
+        else
+          super y
+          if s = nvt_ln_about_act
+            y << EMPTY_STRING_ # assume there is some section above
+            y << s
           end
+        end ; nil
+      end ; protected :help_screen  # #protected-not-private
+
+      def nvt_ln_about_act  # #storypoint-99
+        render_invite_line "#{ normalized_invocation_string } -h <action>",
+          "on that action"
+      end
+
+      def hlp_scrn_fr_chld y, action_x
+        @argv.length.zero? or on_ignrd_argv y
+        hot = rslv_hot_action_fr_hlp action_x
+        hot and hot.help_screen y ; nil
+      end
+
+      def on_ignrd_argv y
+        y << "(ignoring: \"#{ @argv.first }\"#{
+          }#{ ' .. ' if 1 < @argv.length })" ; nil
+      end
+
+      def rslv_hot_action_fr_hlp action_cls_x
+        if action_cls_x.respond_to? :call
+          action_cls_x.call
+        else
+          cls = fetch_action_class_notify action_cls_x
+          cls and cls.new self
         end
-      else
-        error expecting_string
-        res = usage_and_invite
       end
-      res
-    end
 
-    def fetch action_str
-      # #todo: fuzzy find
-      action_box_module.const_fetch action_str,
-        -> ne do
-          error "there is no #{ ick ne.const } action. #{ expecting_string }"
-          usage_and_invite
+      def build_desc_lines  #hook-in to our own API  # #storypoint-11
+        r = super
+        a = gt_hot_child_a
+        a.length.zero? or add_sect_w_one_line_per_child a
+        r
+      end
+
+      def gt_hot_child_a
+        action_box_module.each.reduce [] do |m, (_, cls)|
+          m << ( cls.new self )  # ich muss sein - we need a charged graph
         end
-    end
-
-    def is_leaf                   # a box is always a branch and we must define
-      false                       # this like so (see `is_branch`)
-    end
-
-    #   ~ core help-, string-, ui-msg-rendering methods and support ~
-
-    # `box_enqueue_help` - a convenience -h / --help handler to be used in
-    # an o.p block for the option. `cmd` is typically the arg passed to your
-    # -h (you have to pass it in the handler block to here.)  Hackishly we
-    # also just straight up rob @argv of its next token if a) it doesn't look
-    # like an option and b) if you didn't pass one in explicitly. For better
-    # or worse what this gets you is 'foo -h' handled without `foo` needing
-    # to know about it.
-
-    def box_enqueue_help cmd=nil
-      if ! cmd && Headless::CLI::Option::Constants::OPT_RX !~ @argv.first
-        cmd = @argv.shift
       end
-      enqueue [ :help, cmd ]
-    end
 
-    def expecting_string
-      "expecting #{ action_argument_syntax_string }"
-    end
-
-    def render_argument_syntax_term_with_alternation  # pure service method
-      stx = argument_syntax_for_method :dispatch
-      y = [ action_argument_syntax_string ]
-      render_base_arg_syntax_parts y, stx[ 1 .. -1 ]
-      y * ' ' if y.length.nonzero?
-    end
-
-    def action_argument_syntax_string sep=CLI::Box::ALTERNATION_SEPARATOR_GLYPH__
-      _a = action_box_module.each.reduce [] do |m, (_, x)|
-        m << x.name_function.local.as_slug
-      end
-      "{#{ _a.map( & method( :kbd ) ) * sep }}"
-    end
-                                  # a "porcelain-visible" toplevel entrypoint
-                                  # method/action for help of *box* actions!
-    def help *action              # (the var name you use here appears in the
-      @queue[ 0 ] = default_action  # always this is the action we show
-      help_screen help_yielder, *action  # the interface!)
-      true                        # (just for fun we result in true instead of
-    end                           # nil which may have a strange effect..)
-
-    def help_screen y, action=nil
-      if action
-        help_screen_for_child y, action
-      else
-        super y
-        y << ''                   # assume there is some section above
-        y << invite_line_about_action
-      end
-      nil
-    end
-    protected :help_screen  # #protected-not-private
-
-    # `build_desc_lines` - this hackishly results in the array *and* has
-    # side-effects (#todo) (here b.c called by `help_screen` in parent).
-    # When we collapse the descs we build the sections too.
-
-    def build_desc_lines
-      r = super
-      a = action_box_module.each.reduce [] do |m, (_, c)|
-        m << ( c.new self )       # ich muss sein - we need a charged graph
-      end
-      if a.length.nonzero?
-        section = CLI::Desc::Section.new "action#{ s a }:", [ ]
-        ( @sections ||= [] ) << section
+      def add_sect_w_one_line_per_child a
+        (( @sections ||= [] )) << (( section = start_sect a.length ))
+        line_a = section.lines
         a.each do |act|
-          section.lines << [ :item, act.name.as_slug, act.summary_line ]
-        end
+          line_a << [ :item, act.name.as_slug, act.summary_line ]
+        end ; nil
       end
-      r
-    end
 
-    def help_screen_for_child y, action_ref
-      if @argv.length.nonzero?
-        y << "(ignoring: \"#{ @argv.shift }\"#{ ' .. ' if @argv.any? })"
+      def start_sect d
+        hdr_s = say :chld_acts
+        _plural_s = say { "#{ hdr_s }#{ s d }" }
+        _hdr_s_ = format_header _plural_s
+        CLI::Action::Desc::Section.new _hdr_s_, []
       end
-      if action_ref.respond_to? :call
-        action = action_ref.call
-      else
-        klass = fetch action_ref
-        if klass
-          action = klass.new self
-        end
-      end
-      if action
-        action.help_screen y
-      end
-      nil
-    end
 
-    def invite_line z=nil  # override parent because we are box, we take action!
-      render_invite_line "#{ normalized_invocation_string } -h [<action>]", z
-    end
-                                  # (in contrast to above, once the user is
-                                  # already looking at the full help screen it
-                                  # is redundant to again invite her to the
-    def invite_line_about_action  # same screen!)
-      render_invite_line "#{ normalized_invocation_string } -h <action>",
-        "on that action"
+      CLI::Action::LEXICON__.add_entry_with_default :chld_acts, 'action'
+
+      def invite_line z=nil  # #hook-in #storypoint-12
+        render_invite_line "#{ normalized_invocation_string } -h [<action>]", z
+      end
+
+    # ~ private #hook-out's for client
+
+      def enqueue_help_as_box cmd_s=nil  # #storypoint-7
+        if ! cmd_s && CLI::Option::Constants::OPT_RX !~ @argv.first
+          cmd_s = @argv.shift
+        end
+        enqueue [ :help, cmd_s ]
+      end
+
+      def render_argument_syntax_term_with_alternation  # #todo - in branch?
+        stx = argument_syntax_for_method :dispatch
+        y = [ act_arg_stx_s ]
+        render_base_arg_syntax_parts y, stx[ 1 .. -1 ]
+        y * TERM_SEPARATOR_STRING_ if y.length.nonzero?
+      end
+      #
+      def act_arg_stx_s sep_s=ALTERNATION_SEPARATOR_GLYPH__
+        _a = action_box_module.each.reduce [] do |m, (_, x)|
+          m << x.name_function.local.as_slug
+        end
+        kbd_p = say { method :kbd }
+        "{#{ _a.map( & kbd_p ) * sep_s }}"
+      end
+
+      CLI::Box::ALTERNATION_SEPARATOR_GLYPH__ = '|'.freeze
+
     end
   end
-
-  CLI::Box::Proxy = MetaHell::Proxy::Functional.new :desc
-    # (used for shenanigans elsewhere..)
-
 end

@@ -1,4 +1,6 @@
-# the box DSL collapse hack
+# the box DSL collapse hack :[#038]
+
+(#parent-node: #040. this is a #storypoint there.)
 
 (this documents relatively old ideas. we have edited it for maintenence and
  to aide in refactoring legacy apps etc. but note that these ideas pre-date
