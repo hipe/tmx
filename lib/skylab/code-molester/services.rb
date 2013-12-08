@@ -1,6 +1,6 @@
 module Skylab::CodeMolester
 
-  module Services # being #watched [#mh-011] (this is instance four)
+  module Services  # :+[#su-001]
 
     stdlib, subsystem = FUN.at :require_stdlib, :require_subsystem
 

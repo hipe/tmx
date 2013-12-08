@@ -3,7 +3,7 @@ module Skylab::Subsystem
   class Services < ::Module
 
     # an experimental playground for DRY-ing up this popular pattern
-    # among subproduct-level nodes.
+    # among subproduct-level nodes :[#001]
 
     def initialize parent_dir_pn
       @dir_pathname = parent_dir_pn.join SVCS__

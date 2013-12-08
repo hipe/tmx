@@ -1,6 +1,6 @@
 module Skylab::TestSupport
 
-  module Services
+  module Services  # :+[#su-001]
 
     stdlib, subsys, gemlib =
       FUN.at :require_stdlib, :require_subsystem, :require_gemlib

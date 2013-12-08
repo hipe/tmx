@@ -60,9 +60,13 @@ however we may still add some *non-destructive* public i.m's below
 # #storypoint-5
 
 this method adds a listener to a stream. for any stream `foo` it is more
-idiomatic to use the `on_foo` method rather than this one. this was created
-to be employed when the particular identity of `foo` is determined
-programmatically.
+readable and hence idiomatic to use the `on_foo` method rather than this one.
+this method was created to be employed when the particular identity of `foo`
+is determined programmatically.
+
+it must be public both because its typical sender will be an outside agent
+attempting to wire this one, and because the outside frameworks may depend on
+its public existence; hence it is part of our fixed, public API :[#020].
 
 
 # #storypoint-6

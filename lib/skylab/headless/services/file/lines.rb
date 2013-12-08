@@ -6,7 +6,7 @@ module Skylab::Headless
 
   class Services::File::Lines::Producer < ::Enumerator
                                   # read lines in a more convenient way
-                                  # (this is tracked by [#hl-044])
+                                  # (this is tracked by [#044])
   # #deprecated by Basic::List::Scanner ([#ba-004]) #todo
 
     def gets

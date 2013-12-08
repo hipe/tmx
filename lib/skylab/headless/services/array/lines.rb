@@ -10,7 +10,7 @@ module Skylab::Headless
 
   class Services::Array::Lines::Producer
 
-    # simple adapter for [#hl-044]
+    # simple adapter for [#044]
 
     def initialize ary
       pos = -1

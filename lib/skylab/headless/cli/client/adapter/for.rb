@@ -6,7 +6,7 @@ module Skylab::Headless
 
       module Of
 
-        # this is adapter for face of hot :[#hl-082]
+        # this is adapter for face of hot :[#082]
 
         Hot = -> ns_sheet, client_mod do
           -> mechanics, _token_used do

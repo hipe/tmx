@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Headless::TestSupport::CLI
 
-  describe "#{ Headless::CLI::PathTools }::FUN absolute_path_hack_rx" do
+  describe "[hl] CLI path-tools" do
 
     fun = Headless::CLI::PathTools::FUN
 

@@ -1,6 +1,6 @@
 module Skylab::FileMetrics
 
-  module Services
+  module Services  # :+[#su-001]
 
     MAARS[ self ]
 

@@ -55,7 +55,7 @@
 [#014]       #tracking-tag #attr #doc-point dup[e]ing behavior
 [#013]       #done move porcelain attribtues to here, then clean up
 [#012]       #done foo/ and foo.rb should be automagic, no declaration of module
-[#011]       #watch services
+[#011]       #hole (was 'Services' watcher, moved to subsystem)
 [#010]       #done pull in DelegatesTo from porcelain!
 [#009]       #done hen you made plastic you didn't know about `define_singleton_method`
 [#008]       #done after etc, consider pulling in Let

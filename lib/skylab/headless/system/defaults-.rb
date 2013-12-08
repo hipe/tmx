@@ -19,7 +19,7 @@ module Skylab::Headless
     a << :dev_tmpdir_pathname << -> do
       ::Skylab.dir_pathname.join DEV_TMPDIR_PATH_
     end
-    DEV_TMPDIR_PATH_ = '../../tmp'.freeze  # [#128]
+    DEV_TMPDIR_PATH_ = '../../tmp'.freeze  # [#128] this devil's work
 
     a << :cache_pathname << -> do  # experimentally for caching things in
       # production - it should only be used with the utmost OCD-fueled hyper-

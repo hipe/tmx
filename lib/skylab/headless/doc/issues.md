@@ -1,9 +1,60 @@
+[#138]       #parent-node: [#125] the Action narrative ..
+[#137]       #parent-node: [#126] the CLI box narrative ..
+[#136]       #test-node
+[#135]       #parent-node: [#126] the CLI argument node narrative ..
+[#134]       #parent-node: [#133] "the canonical numbers for CLI arguments.."
+[#133]       #parent-node: [#125] headless testing conventions ..
+[#132]       #parent-node: [#126] the CLI client narrative ..
+[#131]       #parent-node: [#125] the notificate narrative ..
+[#130]       the Services const_missing hack (#todo document)
+[#129]       #parent-node: [#126] headless CLI client DSL narrative
+[#128]       #in-situ (?)
+[#126]       #parent-node: [#125] headless CLI component narratives
+[#125]       #doc-point headless component narratives
+[#124]       #i18n thought and touch tracker
+[#123]       one-line / multi-line #behavior-tracker
+[#122]       #parent-node: [#050] a list of hash tags and their tentative m..
+[#121]       #parent-node: [#120] "bundle as method definitions macro.."
+[#120]       #parent-node: [#090] patterns for developing bundles ..
+[#119]       #parent-node: [#095] the method naming shibboleth (#placeholder)
+[#118]       #parent-node: [#092] "memberhood" defined
+[#117]       #parent-node: [#069] what does "application" even mean?
+[#116]       #parent-node: [#050] "vectors of concern defined.."
+[#115]       #biliographic-reference: the Wikipedia page on _Idiom_
+            (the text cited is from user Glane23 from 2010-03-11)
+[#114]       #parent-node: [#097] name conventions for constant values ..
+[#113]       #parent-node: [#091] "the meaning of node in this context.."
+[#112]       #parent-node: [#106] "a list of idioms.."
+[#111]       #parent-node: [#093] "the idiomacy of plural noun phrases.."
+[#110]       #parent-node: [#101] "exception to the verb pattern.."
+[#109]       #parent-node: [#050] "noise.."
+[#108]       #parent-node: [#093] on structural isomorphicisms to the
+              natural language syntactic structures ..
+[#107]       #parent-ndoe: [#095] the relationship btwn verb phrases and ..
+[#106]       #parent-node: [#050] idioms grow from ubiquity ..
+[#105]       #parent-node: [#093] "the rule of business object variable.."
+[#104]       #parent-node: [#093] "list of variable name patterns.."
+[#103]       #parent-node: [#095] "list of method prefixes and suffixes.."
+[#102]       #parent-node: [#097] (our discussion of shape ..)
+[#101]       #parent-node: [#095] name conventions for function constants ..
+[#100]       #parent-node: [#101] "multiple trailing underscores in.."
+[#099]       #parent-node: [#098] module visibility thru architected ..
+[#098]       #parent-node: [#097] module name conventions ..
+[#097]       #parent-node: [#050] name conventions for constants ..
+[#096]       #parent-node: [#098] "verbish names are used for verbish.."
+[#095]       #parent-node: [#050] name conventions for functions and ..
+[#094]       #parent-node: [#095] ObjectiveC/Cocoa semantics for get_* ..
+[#093]       #parent-node: [#050] name conventions for variables ..
+[#092]       #doc-node POS .. (historically, lost in fire: "change is certain")
+[#091]       #doc-point precedence rules for logical taxonomies ..
+[#090]       #doc-point what is the deal with bundles ..
+[#089]       #doc-point #COLLISION "assorted CLI things explained.."
 [#089]       #in-situ the magical, multipurpose Event base class and variants
 [#088]       #track labelize
 [#087]       updated parameter controller event model
 [#086]       #node-identity
 [#085]       #node-identity
-[#084]       #doc-point :#pen. #body-is-inline-in-code
+[#084]       #doc-point :#pen what is the deal with expression agents
 [#083]       #in-situ
 [#082]       #done adapter for face of hot (kind of [#054])
 [#081]       #doc-point the norm* family of functions..
@@ -26,16 +77,16 @@
 [#067]       merge this into that
 [#066]       track this combinatorial dichototmy
 [#065]       how / when are things added to the lexicon
-[#064]       #spot a wicked tricky thing
-[#063] #open it smells because of hybridization
+[#064]       #parent-node: [#126] the CLI action narrative ..
+[#063] #open track the smells because of CLI action hybridization
 [#062] #open the sweeping architecture change to accomodate homonyms
 [#061]       flyweight the architecture of language production
 [#060]       #doc-point: normalized line producers / consumers
 [#059]       #tracking places where we nerk with detecting o.p dflt --help -h
 [#058]       #doc-point narrative pre-order ("outside-in") ..
 [#057] #open see how throwing a :terminate could help with o.p deep graphs
-[#056]       #doc-point "parsing argv is (almost) always descructive,
-               to facilitate agnostic, progressive chaining .."
+[#056]       #doc-point "parsing argv is (almost) always destructive,
+               to facilitate agnostic, progressive chaining.."
 [#055]       #pattern we keep tabs out of regexen not because it
              wouldn't make them more powerful, it would. it's because
              they are unattractive to look at as regegen.
@@ -54,23 +105,24 @@
 [#044]       file services, #tracking-tag for nerks that will push up.
 [#043]       #tracking-tag newlines (DOS line endings) be damned!
 [#042]       #done spec for cli box dsl
-[#040]       #doc-point: when using dsl, what methods should become actions?..
+[#040]       #parent-node: [#126] the CLI box DSL narrative ..
 [#039]       #done clean up smell of @foo ||= nil everywhere
-[#038]       #done change hackiness to the concept of `collapse` in DSL
+[#038]       #parent-node: [#040] the box DSL collapse hack ..
 [#037]       #tracking-tag box classes that build their own option parsers
 [#036]       #behavior-point `par`, `parameter_label` etc -- gather it up ..
                also: there's room for nonsense here.. big nonsense..
 [#035]       #doc-point : the #boxxy cluttered namespace problem (Actions)
 [#034]       #tracking-tag for #function-point `program_name` -
               `normalized_invocation_string`
-[#033]       #function-point #tracking-tag `desc`
-[#032]       #open #low-priority do we care about our call-stack height for cli?
+[#033]       #function-point #tracking-tag `desc` (and docs)
+[#032]       #done #low-priority do we care about our call-stack height for cli?
 [#031]       #done a petition to get escape_path pushed up here
 [#030]       #done the raw dog experiment
 [#029] #open `stylize` as any of two of these happen: [#gs-004] [#bn-005]
                [#to-001] [#sc-001] [#ts-005] (low level nerks)
 [#028]       #future [#bn-004]
-[#027]       #tracking-tag #smell "the sub-client smell number 027" ..
+[#027]       #parent-node: [#004] #tracking-tag #smell
+               the sub-client smell number 027 ..
 [#026]       #done english unification
 [#025]       #tracking for that cli weird old trick of dynamic help
 [#024]       #tracking-tag we only parse options at beginning in case we
@@ -82,7 +134,7 @@
                option when looking at a branch help screen!
 [#020]       #convention `invoke` `execute` `run` `call` have distinct meanings
                and consistent signatures within modalities
-[#019]       #pattern #convention iff cli action invoke is false, invite
+[#019]       #pattern #convention iff CLI action invoke is false, invite
                (referred to now as the "common triad" #doc-point) ..
 [#018]       #tracking-tag api action inflection
 [#017] #open API architecture - is frontier app at odds with assumptions?
@@ -98,8 +150,7 @@
 [#007]       #done use of Parameter::Set#list, unify with Boxxy interface
 [#006]       #done #tracking-tag errors_count, settle it down eventually (rel. [#sl-116])
 [#005]       unify concepts let sub-client trump rename parent_runtime par_clien
-[#004]       #pattern #tracking-tag the sub-client initialize() in modules thing
-               (see document)
+[#004]       #doc-point the deprecation and rebirth of the sub-client pattern ..
 [#003]       #done #refactor: use en.rb in sub-client fo
 [#002]       #done 2012-08-29 #refactor : interceptors under one roof
 [#001] #open 2012-08-18 #feature : term2html (and architecture)

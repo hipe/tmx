@@ -1,6 +1,6 @@
 module Skylab::SubTree
 
-  module Services
+  module Services  # :+[#su-001]
 
     stdlib, subsys = FUN.at :require_stdlib, :require_subsystem
     o = { }

@@ -20,7 +20,7 @@ module Skylab::Face
     end
   end
 
-  module Services
+  module Services  # :+[#su-001]
 
     MAARS[ self ]
 

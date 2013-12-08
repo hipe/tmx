@@ -8,7 +8,7 @@ module Skylab::Headless::TestSupport::CLI::Option::Manual
 
   extend TestSupport::Quickie
 
-  describe "#{ Headless }::CLI::Option" do
+  describe "[hl] CLI option (manual)" do
 
     context "for now an option will derive things from long opt (..)" do
 

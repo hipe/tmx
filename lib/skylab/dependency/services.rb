@@ -1,6 +1,6 @@
 module Skylab::Dependency
 
-  module Services # being #watched [#mh-011]
+  module Services  # :+[#su-001]
 
     load_method = ->(const) { "load_#{ Autoloader::FUN.methodize[ const ] }" }
 

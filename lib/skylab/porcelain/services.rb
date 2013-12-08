@@ -1,6 +1,6 @@
 module Skylab::Porcelain
 
-  module Services
+  module Services  # :+[#su-001]
 
     o = { }
     o[:OptionParser] = -> _ { require 'optparse' ; ::OptionParser }

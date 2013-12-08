@@ -18,7 +18,7 @@ module Skylab::Headless
     # colletions of functions per modality (and/or per application), and
     # managing a list of listeners to eventpoints for a pen is silly and
     # meaningless. hence we hack a relevant subset of the interface for a
-    # host services that may one day get merged in. :[#hl-071]
+    # host services that may one day get merged in. :[#071]
     #
 
     def initialize pen

@@ -1,19 +1,16 @@
 require_relative 'test-support'
 
 module Skylab::Headless::TestSupport::CLI::Table
-  ::Skylab::Headless::TestSupport::CLI[ Table_TestSupport = self ]
+
+  ::Skylab::Headless::TestSupport::CLI[ self ]
 
   include CONSTANTS
 
-  Table = Headless::CLI::Table
+  Headless = Headless ; Table = Headless::CLI::Table
 
   extend TestSupport::Quickie
 
-  describe "#{ Table } (the RenderTable i.m)" do
-
-    include CONSTANTS  # so we can say h.l e.g in i.m
-
-    # --*--
+  describe "[hl] CLI table" do
 
     def outstream
       @outstream ||= Headless::Services::StringIO.new

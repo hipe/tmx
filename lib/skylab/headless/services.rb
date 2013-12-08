@@ -1,6 +1,6 @@
 module Skylab::Headless
 
-  module Services
+  module Services  # :+[#su-001]
 
     stdlib, subsys = ::Skylab::Subsystem::FUN.
       at :require_stdlib, :require_subsystem

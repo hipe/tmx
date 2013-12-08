@@ -1,6 +1,6 @@
 module Skylab::InformationTactics
 
-  module Services
+  module Services  # :+[#su-001]
 
     stdlib, gemlib = FUN.at :require_stdlib, :require_gemlib
     o = { }
