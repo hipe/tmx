@@ -60,29 +60,17 @@ module Skylab::Headless::TestSupport::CLI::Client
       end
     end
 
-    def invoke * argv
-      argv.flatten!
-      @result = client.invoke argv ; nil
-    end
+    context "small facets" do
 
-    def client
-      @client ||= client_class.new( * triad.to_a )
-    end
-
-    def triad
-      @triad ||= begin
-        t = TestSupport::IO::Spy::Triad.new
-        do_debug and t.debug!
-        t
+      before :all do
+        class Bezzer
+          Headless::CLI::Client[ self ]
+        end
       end
-    end
 
-    def errstring
-      triad.errstream.string
-    end
-
-    def errstr
-      errstring.strip
+      it "for ouroborous support, 'Adapter' constant must be included" do
+        Bezzer.should be_const_defined :Adapter
+      end
     end
   end
 end

@@ -44,11 +44,11 @@ module Skylab::Headless
     end
 
     def io_adapter                # bound to sub-client (#sc-bound)
-      @io_adapter ||= build_IO_adapter
+      @IO_adapter ||= build_IO_adapter
     end
 
     def io_adapter= x
-      @io_adapter = x             # e.g from tests
+      @IO_adapter = x             # e.g from tests
     end
 
     def pen                       # bound to sub-client (#sc-bound)

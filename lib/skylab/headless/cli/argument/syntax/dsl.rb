@@ -14,7 +14,7 @@ module Skylab::Headless
           @series = series
         end
 
-        def each
+        def each_argument
           block_given? and never
           ::Enumerator.new do |y|
             scn = get_node_scanner ; node = nil

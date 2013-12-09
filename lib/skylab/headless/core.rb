@@ -573,4 +573,7 @@ module Skylab::Headless
     Delegating = Delegating
   end
 end
-::Skylab::Headless::TERM_SEPARATOR_STRING_ = ' '.freeze  # before merge
+module ::Skylab::Headless  # #todo:during-merge
+  LINE_SEPARATOR_STRING_ = "\n".freeze
+  TERM_SEPARATOR_STRING_ = ' '.freeze
+end

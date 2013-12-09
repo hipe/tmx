@@ -61,9 +61,34 @@ module Skylab::Headless::TestSupport::CLI
     end
   end
 
+  Probably_existant_tmpdir__ = -> do
+    p = -> do_debug do
+      td = CLI_TestSupport.tmpdir
+      do_debug and td.debug!
+      td.exist? or td.prepare
+      p = -> _ { td } ; td  # not failsafe
+    end
+    -> yes { p[ yes ] }
+  end.call
+
   module InstanceMethods
 
     include CONSTANTS
+
+    # ~ test-phase support
+
+    def from_workdir &p
+      r = nil
+      Headless::Services::FileUtils.cd workdir do
+        r = p[]
+      end ; r
+    end
+
+    def workdir
+      Probably_existant_tmpdir__[ do_debug ]
+    end
+
+    # ~ assertion-phase support
 
     def expect_usage_line_with s
       expect :styled, "usage: #{ s }"
@@ -105,8 +130,17 @@ module Skylab::Headless::TestSupport::CLI
       serr_a.length
     end
 
+    let :serr_a do
+      bake_serr_a
+    end
+
     def expect_neutral_result
       @result.should be_nil
+    end
+
+    def expect_failed
+      expect_no_more_serr_lines
+      @result.should eql false
     end
 
     def expect_text

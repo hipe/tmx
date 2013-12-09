@@ -1,17 +1,22 @@
 module Skylab::Headless
 
-  module CLI::Client
-
-    Autoloader[ self ]                         # (lazy-load files under client/)
+  module CLI::Client  # read [#132] the CLI client narrative #storypoint-10
 
     def self.[] mod, * x_a
+      was_empty = x_a.length.zero?
       x_a.unshift :location_of_residence, caller_locations( 1, 1 ).first
+      if was_empty
+        x_a.concat DEFAULT_BUNDLES_X_A__
+      end
       Bundles_.apply_iambic_on_client x_a, mod
     end
+
+    DEFAULT_BUNDLES_X_A__ = %i( instance_methods )
 
     module Bundles_
 
       Actions_anchor_module = -> x_a do
+        # module_exec x_a, & Headless::Action::Actions_anchor_module.to_proc  # #todo:during-merge
         extend Headless::Action::ModuleMethods
         x = x_a.shift
         _p = if x.respond_to? :call then x
@@ -32,7 +37,7 @@ module Skylab::Headless
       end
 
       Instance_methods = -> _ do
-        include CLI::Client::InstanceMethods ; nil
+        include IMs__ ; nil
       end
 
       Location_of_residence = -> x_a do
@@ -42,204 +47,105 @@ module Skylab::Headless
       Three_streams_notify = -> _ do
       private
         def errstream  # let this be the only one in the universe
-          @io_adapter.errstream
+          @IO_adapter.errstream
         end
         def three_streams
-          @io_adapter.to_three
+          @IO_adapter.to_three
         end
         def three_streams_notify i, o, e
-          instance_variable_defined? :@io_adapter and raise "write once"
-          @io_adapter = build_IO_adapter i, o, e, build_pen ; nil
+          instance_variable_defined? :@IO_adapter and raise "write once"
+          @IO_adapter = build_IO_adapter i, o, e, build_pen ; nil
         end
       end
 
       MetaHell::Bundle::Multiset[ self ]
     end
-  end
 
-  module CLI::Client::ModuleMethods            # future-proofing, aesthetics
-    include CLI::Action::ModuleMethods
-  end
+    module IMs__
 
-  module CLI::Client::Adapter                  # for [#054] ouroboros
-    MetaHell::MAARS[ self ]
-  end
+      include Headless::Client::InstanceMethods, CLI::Action::InstanceMethods
 
-  module CLI::Client::InstanceMethods
-    include CLI::Action::InstanceMethods
-    include Headless::Client::InstanceMethods
-
-    Adapter = CLI::Client::Adapter             # for now it is "for free"
-
-    attr_writer :program_name                  # public for ouroboros [#054]
-
-  private
-
-    param_h = {
-      0 => -> _ { },
-      3 => -> a do
-        @io_adapter = build_IO_adapter(* a )
-      end
-    }
-
-    define_method :initialize do |*a|
-      instance_exec( a, & param_h.fetch( a.length ) )
-      if self.class.respond_to? :_headless_inits and self.class._headless_inits
-        _headless_inits_run  # [#052]
-      end
-      super()
-    end
-
-  private
-
-    define_singleton_method :private_attr_reader, & Private_attr_reader_
-
-    alias_method :init_headless_cli_client, :initialize
-      # (`initialize` rarely gets left alone)
-
-    def build_IO_adapter sin=$stdin, sout=$stdout, serr=$stderr, pen=build_pen
-      # What is really nice is if you observe [#sl-114] and specify what
-      # actual streams you want to use for these formal streams.  However
-      # we grant ourself this one indulgence of specifying these most
-      # conventional of defaults here, provided that this is the only place
-      # library-wide that we will see a mention of these globals.
-
-      io_adapter_class.new sin, sout, serr, pen
-    end
-
-    def infile_noun               # a bit of a hack to go with resolve_instream
-      name = nil
-      begin
-        ref = @queue.first
-        if ref && ::Symbol === ref && :help != ref  # BLEARG
-          as = argument_syntax_for_method ref
-          if as.length.nonzero?
-            name = as.first.normalized_parameter_name
-            break
-          end
-        end
-        name = :infile  # sketchy..
-      end while nil
-      parameter_label name
-    end
-
-    def normalized_invocation_string  # #buck-stops: here
-      program_name
-    end
-
-    def io_adapter_class
-      Headless::CLI::IO_Adapter::Minimal
-    end
-
-    def info msg                  # barebones implementation as a convenience
-      emit :info, msg             # for this shorthand commonly used in
-      nil                         # debugging and verbose modes
-    end
-
-    def parameter_label x, idx=nil  # [#036] explains it all, somewhat
-      idx = "[#{ idx }]" if idx
-      if ::Symbol === x
-        stem = Headless::Name::FUN.slugulate[ x ]
-      else
-        stem = x.name.as_slug  # errors please
-      end
-      em "<#{ stem }#{ idx }>"
-    end
-
-    def pen_class
-      CLI::Pen::Minimal
-    end
-
-    private_attr_reader :program_name
-    alias_method :program_name_ivar, :program_name
-
-    def program_name
-      program_name_ivar or ::File.basename $PROGRAM_NAME
-    end
-
-    def resolve_instream # (the probable destination of [#hl-022], in flux)
-
-      # #experimental: Figure out which of several possible datasources should
-      # be the stream for reading from based on whether the instream (stdin) is
-      # a tty (interactive terminal) or not, and whether arguments exist in
-      # argv, and if so, whether the number of those argv arguments is one, and
-      # if so, if it is a filename that can be read (whew!)
-      #
-      # If it gets to this last case, (**NOTE**) it will mutate argv by shifting
-      # this one arg off of it, it will open this filehandle (!!),
-      # **and** reassign io_adapter.instream with this handle, possibly
-      # releasing the original handle!! (For now, manifestations of this are
-      # tracked org-wide with the tag #open-filehandle-1)
-      #
-      # This is an #experimental attempt to generalize this stuff, but is
-      # probably premature in its current state, hence [#hl-022] will be
-      # expected to be active for a while.
-      #
-      # The confusingly similarly named `resolve_upstream` is the same idea,
-      # but we let that be a stub function that clients can opt-in to,
-      # possibly implementing it simply by calling this.
-
-      res = false                 # must be true on success per [#hl-023]
-                                  # (imagine that false signifies a request
-                                  # to display usage, invite after the error(s))
-                                  # it is the default value b/c so common!
-
-      try_instream = -> do
-        res = true                # nothing to to.
+      def initialize *a
+        @program_name = nil
+        instance_exec a, & INITIALIZE_OP_H__.fetch( a.length )
+        super()  # (headless inits tombstone [#052] #todo:during-merge)
       end
 
-      ambiguous = -> do
-        error "cannot resolve ambiguous instream modality paradigms --#{
-          } both STDIN and #{ infile_noun } appear to be present."
+      attr_writer :program_name  # public for ouroboros [#054]
+
+      CLI::Client::INITIALIZE_OP_H__ = {
+        0 => MetaHell::MONADIC_EMPTINESS_,
+        3 => -> a do
+          @IO_adapter = build_IO_adapter( * a )
+        end }.freeze
+
+    private
+
+      def build_IO_adapter i=$stdin, o=$stdout, e=$stderr, pen=build_pen
+        # #storypoint-940 what is really nice is if you observe [#sl-114] a..
+        _IO_adapter_class.new i, o, e, pen
       end
 
-      try_argv = -> do
-        case @argv.length
-        when 0
-          error "expecting: #{ infile_noun }"
-          res = false
-        when 1
-          o = ::Pathname.new @argv.shift
-          if o.exist?
-            if o.directory?
-              error "#{ infile_noun } is directory: #{ o }"
-            else
-              io_adapter.instream = o.open 'r'
-              # (the above is #open-filehandle-1 --  don't loose track!)
-              res = true
-            end
-          else
-            error "#{ infile_noun } not found: #{ o }"
-          end
+      def pen_class  # #hook-out for the above method
+        CLI::Pen::Minimal
+      end
+
+      def _IO_adapter_class
+        Headless::CLI::IO_Adapter::Minimal
+      end
+
+      # #todo:during-merge (action i.m should use these exclusively)
+
+      def emit_error_line s
+        @IO_adapter.errstream.puts s ; nil
+      end
+      def emit_info_line s
+        @IO_adapter.errstream.puts s ; nil
+      end
+
+      # ~ :#hook-out #todo:during-merge (action i.m will do this one day)
+
+      def build_option_parser
+      end
+
+      # ~ :#hook-in's #topper-stopper's #buck-stop whatever
+
+      def normalized_invocation_string
+        program_name
+      end
+
+      def program_name
+        @program_name or ::File.basename $PROGRAM_NAME
+      end
+
+      # ~ things that will turn into services  # #todo:during-merge
+
+      def resolve_instream  # (the probable destination of [#022], in flux)
+        CLI::Client::Bundles__::Resolve_upstream[ self ]
+      end
+
+      def parameter_label x, idx=nil  # [#036] explains it all, somewhat
+        idx = "[#{ idx }]" if idx
+        if ::Symbol === x
+          stem = Headless::Name::FUN.slugulate[ x ]
         else
-          error "expecting: #{ infile_noun } had: (#{ @argv.join ' ' })"
+          stem = x.name.as_slug  # errors please
         end
+        em "<#{ stem }#{ idx }>"
       end
 
-      argv = @argv.length.zero?   ? :argv_empty  : :some_argv
-      term = io_adapter.instream.tty? ? :interactive : :noninteractive
-
-      case [term, argv]
-      when [:interactive,    :argv_empty] ; try_argv[ ]
-      when [:interactive,    :some_argv]  ; try_argv[ ]
-      when [:noninteractive, :argv_empty] ; try_instream[ ]
-      when [:noninteractive, :some_argv]  ; ambiguous[ ]
+      def info msg  # barebones implementation as a convenience for this
+        # shorthand commonly used in debugging and verbose modes
+        emit :info, msg ; nil
       end
-
-      res
     end
-  end
-end
-module Skylab::Headless
-
-  module CLI::Client
 
     module DSL__ # read [#129] (in [#132]) the CLI client D.. #storypoint-950
       to_proc = -> x_a do  # #storypoint-960 the order here matters
         module_exec( & Wire_autoloader__ )
         module_exec x_a, & CLI::Box::DSL.to_proc  # NOTE 'method_added' hook
         module_exec nil, & Bundles_::Instance_methods.to_proc
-        singleton_class.module_exec( & MMs__ ) ; module_exec( & IMs__ ) ; nil
+        singleton_class.module_exec( & MMs__ ) ; include IMs__ ; nil
       end ; define_singleton_method :to_proc do to_proc end
 
       Wire_autoloader__ = -> do
@@ -256,8 +162,7 @@ module Skylab::Headless
         end
       end
 
-      IMs__ = -> do
-        with_DSL_off do
+        module IMs__
         private
           def build_option_parser  # #storypoint-990
             op = Headless::Services::OptionParser.new
@@ -281,7 +186,18 @@ module Skylab::Headless
             op
           end
         end
-      end
     end
+
+    module Adapter  # for [#054] ouroboros
+      MetaHell::MAARS::Upwards[ self ]
+    end
+
+    module IMs__
+      Adapter = Adapter  # covered
+    end
+
+    # ~ some API-private consts as "services"
+
+    CEASE_X_ = false ; PROCEDE_X_ = true
   end
 end

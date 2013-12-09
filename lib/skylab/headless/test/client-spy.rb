@@ -29,7 +29,7 @@ module Skylab::Headless::TestSupport
     end
 
     def io_adapter
-      @io_adapter ||= begin
+      @IO_adapter ||= begin
         pen = resolve_pen
         o = Headless::TestSupport::IO_Adapter_Spy.new( * [ pen ].compact )
         o.debug = -> { @debug.call }

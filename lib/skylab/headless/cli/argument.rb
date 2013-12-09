@@ -63,25 +63,33 @@ module Skylab::Headless
 
       # #storypoint-3 for error reporting it is useful to speak in terms of..
 
-      [ :detect,  # used by reflection API
-        :each,    # here
-        :first,   # CLI client
-        :index,   # here
-        :length   # CLI client
-      ].each do |i|
-        define_method i do |*a, &p|
-          @item_a.send i, *a, &p
-        end
+      def detect_argument &p  # used by #reflection-API
+        @item.detect( & p )
+      end
+      def each_argument &p
+        @item_a.each( & p )
+      end
+      def fetch_argument_at_index i, &p
+        @item_a.fetch i, &p
+      end
+      def first_argument
+        @item_a.first
+      end
+      def index_of_argument *a, &p
+        @item_a.index( * a, & p )
+      end
+      def argument_term_count
+        @item_a.length
       end
 
-      def slice x
+      def argument_slice x
         if x.respond_to? :exclude_end?
           build_slice_from_range x
         else
           @item_a.fetch x
         end
       end
-      alias_method :[], :slice
+      alias_method :[], :argument_slice
     private
       def build_slice_from_range range
         x_a = base_args ; item_a = @item_a

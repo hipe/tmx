@@ -76,6 +76,7 @@ module Skylab::Headless
     end
 
     def normalize_callable_symbol sym, args
+      @last_action_i = sym  # #todo:during-merge
       cmp = 1 <=> args.length
       if -1 == cmp then raise ::ArgumentError, "#{ args.length } for 1..2" end
       if 0 == cmp                 # (args were provided internally to the item
@@ -600,7 +601,7 @@ module Skylab::Headless
     end
 
     def render_base_arg_syntax_parts y, stx, em_range=nil
-      stx.each.with_index do |arg, d|
+      stx.each_argument.with_index do |arg, d|
         s = render_argument_text arg
         if em_range and em_range.include? d
           s = em s
@@ -675,7 +676,7 @@ module Skylab::Headless
 
     def render_expecting_term e
       fragment = e.argument_a
-      _a = fragment[ 0 .. fragment.index { |x| :req == x.reqity } ]
+      _a = fragment[ 0 .. fragment.index_of_argument { |x| :req == x.reqity } ]
       render_argument_syntax _a, 0..0
     end
 
