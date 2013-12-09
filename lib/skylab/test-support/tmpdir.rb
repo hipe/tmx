@@ -186,7 +186,7 @@ module Skylab::TestSupport
 
       while ! stack_a.empty?
         (( peek_pn = curr_pn.join stack_a.last )).exist? or break
-        stack_a.pop_p
+        stack_a.pop
         curr_pn = peek_pn
       end
       Sanity_check_pathname__[ curr_pn ]

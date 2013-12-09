@@ -174,7 +174,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
     # (#storypoint-6 again - buckstopper)
     def some_expression_agent_notify
-      @io_adapter.pen
+      @IO_adapter.pen
     end
 
     define_method :popen3_notify, & Git::Services::Open3.method( :popen3 )

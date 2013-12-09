@@ -1,4 +1,4 @@
-# api action formal parameters formal structure syntax
+# API action formal parameters formal structure syntax
 
 ## what's with the ridiculous name?
 

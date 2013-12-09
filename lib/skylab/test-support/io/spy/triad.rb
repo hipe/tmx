@@ -30,15 +30,32 @@ module Skylab::TestSupport
       nil
     end
 
-    class Mock_Interactive_STDIN__
+    MOCK_INTERACTIVE_STDIN =
+    class Stub_Interactive_STDIN__
       def tty?
         true
       end
       def debug! _=nil
       end
+      self
+    end.new
+
+
+    MOCK_NONINTERACTIVE_STDIN =
+    class Stub_Noninteractive_STDIN__ < Stub_Interactive_STDIN__
+      def tty?
+        false
+      end
+      self
+    end.new
+
+    class Mock_Noninteractive_STDIN < Stub_Noninteractive_STDIN__
+      def initialize a  # mutates a
+        @a = a ; nil
+      end
+      def gets
+        @a.shift
+      end
     end
-
-    MOCK_INTERACTIVE_STDIN = Mock_Interactive_STDIN__.new
-
   end
 end

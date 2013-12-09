@@ -30,7 +30,8 @@ module Skylab::CssConvert::TestSupport
     def cli_instance
       @cli_instance ||= begin
         streams = TestSupport::IO::Spy::Triad.new
-        app = CssConvert::CLI.new(* streams.values )
+        _a = streams.values
+        app = CssConvert::CLI.new( * _a )
         app.send :program_name=, 'nerk'
         if do_debug
           streams.values.each { |io| io.debug! if io }

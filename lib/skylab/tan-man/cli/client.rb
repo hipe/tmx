@@ -16,7 +16,7 @@ module Skylab::TanMan
     emits event_structure: :all
 
     def initialize i, o, e  # [#sl-114] these three are the convention
-      @io_adapter = Headless::CLI::IO_Adapter::Minimal.
+      @io_adapter = @IO_adapter = Headless::CLI::IO_Adapter::Minimal. # #todo:during-ta-merge
         new i, o, e, Pen__.new
       on_all do |ev|
         _msg = if ev.respond_to? :render_under
@@ -36,7 +36,7 @@ module Skylab::TanMan
     end
 
     def io_adapter_notify ioa
-      @io_adapter = ioa ; nil
+      @io_adapter = @IO_adapter = ioa ; nil  # #todo:during-ta-merge
     end
 
     def expression_agent_for_subclient  # #todo - until client services

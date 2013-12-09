@@ -262,7 +262,7 @@ module Skylab::Snag
     desc "pings snag (lowlevel)."   # #todo you know you want to
 
     def ping
-      @io_adapter.errstream.puts "hello from snag."
+      @IO_adapter.errstream.puts "hello from snag."
       :hello_from_snag
     end
 

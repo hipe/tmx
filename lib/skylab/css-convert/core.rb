@@ -72,7 +72,9 @@ module Skylab::CssConvert
   end
 
   class CLI::Client
-    include Headless::CLI::Client::InstanceMethods
+
+    Headless::CLI::Client[ self ]
+
     include Core::Client::InstanceMethods
 
     def convert directives_file
@@ -108,8 +110,7 @@ module Skylab::CssConvert
     def initialize sin, sout, serr
       super( )
       @default_action = nil
-      @io_adapter = build_IO_adapter sin, sout, serr
-      nil
+      @IO_adapter = build_IO_adapter sin, sout, serr ; nil
     end
 
     def build_option_parser
@@ -135,7 +136,7 @@ module Skylab::CssConvert
     end
 
     def ping _
-      @io_adapter.errstream.puts "hello from css-convert."
+      @IO_adapter.errstream.puts "hello from css-convert."
       @default_action = :noop
       @noop_result = :'hello_from_css-convert'
       nil

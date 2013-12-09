@@ -238,7 +238,7 @@ module Skylab::Flex2Treetop
 
     ::Skylab::Autoloader[ self ]
 
-    include Headless::CLI::Client::InstanceMethods
+    Headless::CLI::Client[ self ]
 
     def initialize( * )
       super
@@ -305,7 +305,7 @@ module Skylab::Flex2Treetop
     end
 
     def ping _
-      @io_adapter.errstream.puts "hello from flex2treetop."
+      @IO_adapter.errstream.puts "hello from flex2treetop."
       @noop_result = :hello_from_flex2treetop
       @default_action = :noop
     end

@@ -22,10 +22,8 @@ module Skylab::TanMan::TestSupport::Sexp
     include TanMan::Models::DotFile::Parser::InstanceMethods # err msg porcelain
     include TanMan::TestSupport::Tmpdir::InstanceMethods #prepared_tanman_tmpdir
 
-    include Headless::CLI::Client::InstanceMethods # as a fun excercise anything
-                                  # porcelain-y we end up needing below is a
-                                  # goofy experiment and possibly an
-                                  # abstraction candidate.
+    Headless::CLI::Client[ self ]
+
     -> do
       pen = Headless::CLI::Pen::Minimal.new
       def pen.escape_path str
