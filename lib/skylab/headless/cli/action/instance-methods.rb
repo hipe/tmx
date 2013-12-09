@@ -101,6 +101,7 @@ module Skylab::Headless
   module CLI
     module Action
       module InstanceMethods
+      private
         def say * a, &p  # #storypoint-18 (pinned to first occurrence of 'say')
           if p
             expression_agent.calculate( * a, & p )
@@ -113,29 +114,20 @@ module Skylab::Headless
           pen
         end
 
+        def lexical_values_at * i_a
+          lxcn.fetch_default_values_at_i_a i_a
+        end
+
+        def fetch_lexical_value i
+          lxcn.fetch_default i
+        end
+
         def say_w_lxcn i
           lxcn.fetch_default i
         end
 
         def lxcn  # stub implementation
-          LEXICON__  # defined near at first write
-        end
-
-        Action::LEXICON__ = (( class Action::Lexicon__
-          def initialize
-            @bx = Headless::Services::Basic::Box.new ; nil
-          end
-          def fetch_default i, &p
-            @bx.fetch i, &p
-          end
-          def add_entry_with_default i, s
-            @bx.add i, s.freeze ; nil
-          end
-          self
-        end )).new
-
-        def format_header header_s
-          "#{ header_s }:"
+          LEXICON_
         end
       end
     end
@@ -742,6 +734,19 @@ module Skylab::Headless
         ( otr || -> { raise ::KeyError,
                       "parameter not found: #{ norm_name.inspect }" } ).call
       end
+    end
+  end
+end
+module Skylab::Headless  # #todo:during-merge
+  module CLI::Action::InstanceMethods
+    private
+    def apply_p_a_on_op p_a, op
+      p_a.each do |p|
+        instance_exec op, & p
+      end ; nil
+    end
+    def format_header header_s
+      "#{ header_s }:"
     end
   end
 end

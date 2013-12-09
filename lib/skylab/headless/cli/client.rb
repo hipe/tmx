@@ -5,10 +5,11 @@ module Skylab::Headless
     Autoloader[ self ]                         # (lazy-load files under client/)
 
     def self.[] mod, * x_a
-      Bundles__.apply_iambic_on_client x_a, mod
+      x_a.unshift :location_of_residence, caller_locations( 1, 1 ).first
+      Bundles_.apply_iambic_on_client x_a, mod
     end
 
-    module Bundles__
+    module Bundles_
 
       Actions_anchor_module = -> x_a do
         extend Headless::Action::ModuleMethods
@@ -27,11 +28,15 @@ module Skylab::Headless
       end
 
       DSL = -> _ do
-        module_exec _, & CLI::Client::DSL::To_proc
+        module_exec _, & DSL__.to_proc
       end
 
       Instance_methods = -> _ do
         include CLI::Client::InstanceMethods ; nil
+      end
+
+      Location_of_residence = -> x_a do
+        @location_of_residence = x_a.shift ; nil  # clobber ok
       end
 
       Three_streams_notify = -> _ do
@@ -222,6 +227,61 @@ module Skylab::Headless
       end
 
       res
+    end
+  end
+end
+module Skylab::Headless
+
+  module CLI::Client
+
+    module DSL__ # read [#129] (in [#132]) the CLI client D.. #storypoint-950
+      to_proc = -> x_a do  # #storypoint-960 the order here matters
+        module_exec( & Wire_autoloader__ )
+        module_exec x_a, & CLI::Box::DSL.to_proc  # NOTE 'method_added' hook
+        module_exec nil, & Bundles_::Instance_methods.to_proc
+        singleton_class.module_exec( & MMs__ ) ; module_exec( & IMs__ ) ; nil
+      end ; define_singleton_method :to_proc do to_proc end
+
+      Wire_autoloader__ = -> do
+        loc = @location_of_residence ; @location_of_residence = nil
+        MetaHell::MAARS[ self, loc ] ; nil
+      end
+
+      # #storypoint-970 "we may implement bundles as procs below.."
+
+      MMs__ = -> do
+      private
+        def default_action foo  # #storypoint-980
+          define_method :default_action do foo end ; nil
+        end
+      end
+
+      IMs__ = -> do
+        with_DSL_off do
+        private
+          def build_option_parser  # #storypoint-990
+            op = Headless::Services::OptionParser.new
+            p_a = self.class.any_option_parser_blocks
+            p_a and apply_p_a_on_op p_a, op
+            _yes = op_looks_like_it_defines_its_own_help op
+            _yes or add_hlp_to_op op
+            op
+          end
+          def op_looks_like_it_defines_its_own_help op
+            match_p = fetch_lexical_value( :SHRT_HLP_SW ).method :==
+            op.top.list.detect do |sw|
+              sw.respond_to? :short and match_p[ sw.short.first ]
+            end
+          end
+          def add_hlp_to_op op
+            _a = lexical_values_at :SHRT_HLP_SW, :LNG_HLP_SW, :THS_SCRN
+            op.on( * _a ) do
+              enqueue :help
+            end
+            op
+          end
+        end
+      end
     end
   end
 end

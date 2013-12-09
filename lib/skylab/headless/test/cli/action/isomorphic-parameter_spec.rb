@@ -17,7 +17,7 @@ module Skylab::Headless::TestSupport::CLI::Action::Iso_Param__
     context "the zero arg syntax ()" do
 
       klass :Syn_O do
-        Headless::CLI::Client::DSL[ self ]
+        Headless::CLI::Client[ self, :DSL ]
         default_action :noink
         def noink
           :ok
@@ -41,7 +41,7 @@ module Skylab::Headless::TestSupport::CLI::Action::Iso_Param__
     context "the one arg req syntax (foo)" do
 
       klass :Syn_req do
-        Headless::CLI::Client::DSL[ self ]
+        Headless::CLI::Client[ self, :DSL ]
         default_action :naples
         def naples mono_arg
           "->#{ mono_arg }<-"
@@ -72,7 +72,7 @@ module Skylab::Headless::TestSupport::CLI::Action::Iso_Param__
     context "the simple glob syntax (*args)" do
 
       klass :Syn_rest do
-        Headless::CLI::Client::DSL[ self ]
+        Headless::CLI::Client[ self, :DSL ]
         default_action :zeeple
         def zeeple *parts
           "{{ #{ parts.join ' -- ' } }}"
@@ -101,7 +101,7 @@ module Skylab::Headless::TestSupport::CLI::Action::Iso_Param__
     context "the trailing glob syntax (a, *b)" do
 
       klass :Syn_req_rest do
-        Headless::CLI::Client::DSL[ self ]
+        Headless::CLI::Client[ self, :DSL ]
         default_action :liffe
         def liffe apple, *annanes
           "_#{ annanes.unshift( apple ).join '*' }_"
@@ -137,7 +137,7 @@ module Skylab::Headless::TestSupport::CLI::Action::Iso_Param__
     context "weird syntax (*a, b)" do
 
       klass :Syn_rest_req do
-        Headless::CLI::Client::DSL[ self ]
+        Headless::CLI::Client[ self, :DSL ]
         default_action :feeples
         def feeples *lip, nip
           ( lip.push nip ).join '.'
@@ -161,7 +161,7 @@ module Skylab::Headless::TestSupport::CLI::Action::Iso_Param__
     context "weird syntax (a, *b, c)" do
 
       klass :Syn_req_rest_req do
-        Headless::CLI::Client::DSL[ self ]
+        Headless::CLI::Client[ self, :DSL ]
         default_action :fooples
         def fooples zing, *zang, zhang
           "(#{ [ zing, *zang, zhang ].join '|' })"

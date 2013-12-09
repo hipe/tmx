@@ -61,3 +61,49 @@ module Skylab::Headless
     attr_reader :desc_blocks
   end
 end
+module ::Skylab::Headless  # #todo:during-merge
+  module CLI::Action
+    LEXICON_ = (( class Lexicon__
+      def initialize
+        @bx = Headless::Services::Basic::Box.new
+        @is_collapsed = false ; @p_a = [] ; nil
+      end
+      def fetch_default_values_at_i_a i_a
+        @is_collapsed or collapse
+        i_a.map( & @bx.method( :fetch ) )
+      end
+      def fetch_default i, &p
+        @is_collapsed or collapse
+        @bx.fetch i, &p
+      end
+      def add &p
+        @is_collapsed = false ; @p_a << p ; nil
+      end
+      def add_entry_with_default i, s
+        @bx.add i, s.freeze ; nil
+      end
+    private
+      def collapse
+        @is_collapsed = true
+        d = -1 ; len = @p_a.length ; last = len - 1  # assume..
+        while d < last
+          @p_a.fetch( d += 1 )[ self ]
+        end
+        @p_a[ 0, len ] = MetaHell::EMPTY_A_ ; nil
+      end
+      self
+    end )).new
+
+    LEXICON_.add do |lx|
+      lx.add_entry_with_default :SHRT_HLP_SW, '-h'
+      lx.add_entry_with_default :LNG_HLP_SW, '--help'
+      lx.add_entry_with_default :THS_SCRN, 'this screen'
+    end
+
+    module ModuleMethods
+      def any_option_parser_blocks
+        option_parser_blocks
+      end
+    end
+  end
+end

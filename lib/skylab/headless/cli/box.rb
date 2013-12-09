@@ -80,6 +80,8 @@ module Skylab::Headless
       end
     end
 
+    LEXICON_ = CLI::Action::LEXICON_  # for now
+
     module InstanceMethods
 
     private  # ~ private #hook-in's to self
@@ -155,7 +157,9 @@ module Skylab::Headless
         CLI::Action::Desc::Section.new _hdr_s_, []
       end
 
-      CLI::Action::LEXICON__.add_entry_with_default :chld_acts, 'action'
+      LEXICON_.add do |lx|
+        lx.add_entry_with_default :chld_acts, 'action'
+      end
 
       def invite_line z=nil  # #hook-in #storypoint-12
         render_invite_line "#{ normalized_invocation_string } -h [<action>]", z

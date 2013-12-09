@@ -2,15 +2,19 @@ module Skylab::Headless
 
   module API  # was [#010], [#017]
 
-    module Client
-
-    end
+    Client = ::Module.new
 
     RuntimeError = ::Class.new ::RuntimeError
   end
 
   module API::Client::InstanceMethods
+
     include Headless::Client::InstanceMethods
+
+    def initialize
+      # just saying hello
+      super
+    end
 
     def invoke meth, params_h=nil
       API::Promise.new do
@@ -49,12 +53,6 @@ module Skylab::Headless
 
     def runtime_error_class
       API::RuntimeError
-    end
-
-  private
-
-    def initialize
-      super  # #transisional #todo
     end
   end
 

@@ -234,3 +234,17 @@ This is the DSL so we've gotta provide a `bop` implementation -- there is a
 delicate, fragile dance that happens below because we want to be able to
 leverage instance methods defined in the parent and have this work both as a
 documentng and parsing pass.
+
+
+
+:#storypoint-101
+
+method visibiliy does not API visibility equal. this is a public method that
+is API-private. because we only ever call it directly from this same node
+(file), we give it an intentionally ugly name to make refactoring easier and
+discourage its use otherwise (without renaming it.)
+
+understand that there are two agents: there is the child "hot action" and
+the parent "hot action". the child is expected to build an option parser,
+but when that option parser parses options, it's got to write them into
+to the parent. that is why there is a lot of context switching here.

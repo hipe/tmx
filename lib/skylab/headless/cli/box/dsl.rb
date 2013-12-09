@@ -2,17 +2,21 @@ module Skylab::Headless
 
   module CLI::Box::DSL
 
-    # ~ never say never
+    # ~ never say never - read [#040] the CLI box DSL narra.. #storypoint-88
 
     def self.[] mod, * x_a
-      mod.module_exec x_a, & To_proc
+      mod.module_exec x_a, & To_proc__
+      x_a.length.zero? or raise ::ArgumentError, "unexpected argument: #{
+        }#{ Headless::FUN::Inspect[ x_a.first ] }" ; nil
     end
 
-    To_proc = -> x_a do
-      MetaHell::MAARS::Upwards[ self ]  # #re-entrant
+    def self.to_proc ; To_proc__ end  # :+#private-API
+
+    To_proc__ = -> x_a do
+      MetaHell::MAARS::Upwards[ self ]  # #re-entrant, #storypoint-77
       extend MMs__ ; include IMs__  # NOTE 'method_added' hook
       x_a && x_a.length.nonzero? and
-        Bundles__.apply_iambic_on_client x_a, self ; nil
+        module_exec x_a, & Bundles__.to_proc ; nil
     end
 
     module Bundles__
@@ -20,9 +24,9 @@ module Skylab::Headless
       MetaHell::Bundle::Multiset[ self ]
     end
 
-    module MMs__  # read [#040] - #storypoint-1
+    module MMs__
 
-      include Autoloader::Methods
+      include Autoloader::Methods  # read [#040] - #storypoint-1
 
       include CLI::Action::ModuleMethods  # #reach-up!
 
@@ -70,27 +74,30 @@ module Skylab::Headless
       end
 
       def method_added meth_i  # #storypoint-8  #hook-in to ruby.
-        if ! dsl_is_disabled
+        self.DSL_is_disbld or begin
           _const_i = Autoloader::FUN.constantize[ meth_i ]
           action_box_module.const_set _const_i, some_act_cls
-          @action_class_in_progress = nil
+          @act_cls_in_progress = nil
         end
       end
     public
-      attr_reader :dsl_is_disabled
+      attr_reader :DSL_is_disbld
     private
-      def turn_DSL_off  # (not used or covered #todo)
-        @dsl_is_disabled = true ; nil
+      def turn_DSL_off  # :#public-API "service method" (this cluster)
+        @DSL_is_disbld = true ; nil
       end
-      #
       def turn_DSL_on
-        @dsl_is_disabled = false ; nil
+        @DSL_is_disbld = false ; nil
+      end
+      def with_DSL_off &p
+        _DSL_was_disabled = self.DSL_is_disbld ; @DSL_is_disbld = true
+        r = module_exec( & p ) ; @DSL_is_disbld = _DSL_was_disabled ; r
       end
 
       # ~ #storypoint-7 (the next several methods)
 
       def some_act_cls
-        @action_class_in_progress ||= bld_act_cls
+        @act_cls_in_progress ||= bld_act_cls
       end
       def bld_act_cls
         box = self
@@ -216,7 +223,7 @@ module Skylab::Headless
 
     private
 
-      def collapse_to hot  # #storypoint-96, :#jump-3
+      def collapse_to hot  # #storypoint-96, #hybridized, :#jump-3
         if @queue.length.nonzero?
           :dispatch == @queue.fetch( 0 ) or fail 'sanity'
         end
@@ -261,12 +268,20 @@ module Skylab::Headless
 
       def build_option_parser  # popular default, :+[#037] box who builds own
         op = create_box_option_parser
-        sw = op.define '-h', '--help [<sub-action>]',
-            'this screen [or sub-action help]' do |x|
+        _short, _long, _sub_action, _this_screen, _or_sub_action_help =
+          lexical_values_at :SHRT_HLP_SW, :LNG_HLP_SW, :sb_actn,
+            :THS_SCRN, :osah
+        _sw = op.define _short, "#{ _long } [<#{ _sub_action }>]",
+          "#{ _this_screen } [#{ _or_sub_action_help }]" do |x|
           enqueue_help_as_box x ; true
         end
-        do_not_render_switch_in_syntax_string sw
+        do_not_render_switch_in_syntax_string _sw
         op
+      end
+
+      CLI::Action::LEXICON_.add do |lx|  # for now
+        lx.add_entry_with_default :osah, 'or sub-action help'
+        lx.add_entry_with_default :sb_actn, 'sub-action'
       end
 
       def do_not_render_switch_in_syntax_string sw  # #todo this goes away after merge
@@ -386,19 +401,20 @@ module Skylab::Headless
       def option_parser_class  # :#hook-in for custom o.p class
       end
     public
-      def wrt_any_op_blks_p  # (method visibiliy does not API visibility eql)
-        leaf = self
-        -> op do
-          p_a = leaf.class.option_parser_blocks
-          p_a and p_a.each do |p|
-            instance_exec op, &p
-          end ; nil
+      def wrt_any_op_blks_p  # #storypoint-101
+        if (( p_a = self.class.any_option_parser_blocks ))  # i am the leaf
+          -> op do  # i am the branch
+            apply_p_a_on_op p_a, op
+          end
+        else
+          MetaHell::MONADIC_EMPTINESS_
         end
       end
       def wrt_any_help_option_p
         leaf = self
         -> op do
-          op.on '-h', '--help', 'this screen' do
+          _a = lexical_values_at :SHRT_HLP_SW, :LNG_HLP_SW, :THS_SCRN
+          op.on( * _a ) do
             leaf_i = leaf.normalized_local_action_name
             @prev_frame and uncollapse_from leaf_i  # else hackery
             if @queue.length.nonzero?
