@@ -1,5 +1,76 @@
+# the CLI box DSL narrative :[#040]
 
-# the CLI box DSL narrative :[#129]
+:#storypoint-88
+
+welcome to the CLI box DSL. familiarity will be assumed with any concepts
+presented in any [#137] CLI box narrative.
+
+the "never say never" rubric has lived at the head of this file for more than
+a year now because when we started this node, we liked the idea that it would
+be the last ever ground-up rewrite of such a thing, but we knew that to
+entertain such a notion was just wishful thinking.
+
+in the context of our "client tree" model, a component called "box" is
+concerned with managing children nodes in terms of operations like rendering
+the collection to screen, dispatching requests by resolving a particular one,
+and handing when one such child cannot be resolved (in terms of actuaing UI
+behavior).
+
+as for the "DSL" part such a box, the essential concept behind this is
+twofold: one, we will expose an API of private "class methods" that are
+used to define each particular child node at this level. two (and most
+essentially), the central thesis statement of this experiment is: "can a
+clean isomorphicism be drawn between the public methods of a particular
+class and its collection of supported "commands"?". this remains a space
+of active inquiry in this universe.
+
+to get pseudo-formal for a second, the grammar ends up looking something
+like:
+
+    class Foo
+      Headless::CLI::Box[ self, :DSL ]  # EXAMPLE - not yet implemetned #todo
+
+      NODE_DEFINITION *
+
+      NODE_DEFINITON : NODE_MODIFIER * COMMAND
+
+      COMMAND: ( a public method definition )
+    end
+
+the above is to say, a DSL-enhanced box class contains zero or more node
+definitions. a node defintion is be zero or more node modifiers followed
+by one command. a command is (simply) a public method definition.
+
+so note that by this defintion, the empty class by itself is still a valid
+box node, as is one with only one public method definition..
+
+
+
+:#storypoint-77
+
+(this point may be simply an improved restatement of the issue behind
+#storypoint-1, which is legacy and needs review after this the close
+of this broad topic #todo:before-merge).
+
+when it comes to wiring a class for autoloading from within the `[]` enhancer
+implementation such we are, the most "straightforward" way this typically
+accomplished is to call caller_locations( 1, 1 ) within this first callframe,
+and pass ourselves with that location object to someone like MetaHell::MAARS[].
+
+(the core function of the autoloader is to turn missing constants into
+pathnames using this location structure as the 'dir_pathname' to infer paths
+for constants).
+
+when this works, it works because the assumption is made that wherever the
+`[]` call was made, that line of code lives in the file that is the
+"home" path for that node (and in fact we allow some flexibiilty here:
+the module in question may even call this method from a parent node (that
+is, as a '#stowaway') and the autoloader will attempt to infer the correct
+path still).
+
+in the case of the node seeking to employ this "box DSL" enhancement,
+[#todo:befor-merge this actually belongs in the outstream]
+
 
 
 :#storypoint-1
@@ -31,32 +102,11 @@ the module graph with autoloading only if it has signed on for it.
 for you too if that fits your app.)
 
 
-:#storypoint-2
-
-this is some gymnastics: the implementation method is not defined in the
-action class but in the semantic container class.
-
-
 
 :#storypoint-6
 
 the bread and butter of this module is the following methods that simply
 dispatch the method calls to a terminal action class being built.
-
-
-
-:#storypoint-8 (method)
-
-the essence of this module is this 'method_added' hook
-
-
-
-:#storypoint-7 (several methods)
-
-what you're looking at here is one big narrative block that makes both
-the terminal action class and the box module to hold the actions.
-this storyblock ends when the surrounding block ends.
-
 
 
 
@@ -74,10 +124,24 @@ which isn't complete yet! hence hacks to check against collapsed stae).
 
 
 
-:#storypoint-96 (method)
+:#storypoint-8 (method)
 
-#hybridized. our invocation string is dynamic based on whether we have yet
-mutated or not.
+the essence of this module is this 'method_added' hook
+
+
+
+:#storypoint-7 (several methods)
+
+what you're looking at here is one big narrative block that makes both
+the terminal action class and the box module to hold the actions.
+this storyblock ends when the surrounding block ends.
+
+
+
+:#storypoint-2
+
+this is some gymnastics: the implementation method is not defined in the
+action class but in the semantic container class.
 
 
 
@@ -86,14 +150,6 @@ mutated or not.
 this is an experimental way to get through to the box class itself, because
 otherwise we can't use some DSL methods on the box class itself because
 they have been re-assigned to write to the child class we build.
-
-
-
-:#storypoint-50
-
-these two are "hard aliases" and not "soft" ones so if you need to
-customize how the o.p is created you have to override them individually.
-this is for a box creating its child leaf o.p
 
 
 
@@ -123,8 +179,10 @@ is how it works.
 
 :#storypoint-96 (method)
 
-'hot' is a local idoiom that means "live action". we hate this method.
-note we need to put the method name of the particular action on the queue.
+we hate this method. the particular surface form for our invocation invocation
+string is dynamic based on whether we have yet mutated or not. this is awful.
+'hot' is a local idoiom that means "live action". note we need to put the
+method name of the particular action on the queue.
 
 
 
@@ -138,6 +196,15 @@ corroborating with us in our crimes.
 :#storypoint-80
 
 #hook-ins to facilities to customize them. in render order then call order.
+
+
+
+:#storypoint-50
+
+these two are "hard aliases" and not "soft" ones so if you need to
+customize how the o.p is created you have to override them individually.
+this is for a box creating its child leaf o.p
+
 
 
 :#storypoint-98 the worst thing ever. (permanntly tracked in file with #jump-2)
