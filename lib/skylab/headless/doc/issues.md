@@ -1,6 +1,7 @@
+[#139]       #doc-node the perfect agent interaction model
 [#138]       #parent-node: [#125] the Action narrative ..
 [#137]       #parent-node: [#126] the CLI box narrative ..
-[#136]       #test-node
+[#136]       #test-node #in-situ
 [#135]       #parent-node: [#126] the CLI argument node narrative ..
 [#134]       #parent-node: [#133] "the canonical numbers for CLI arguments.."
 [#133]       #parent-node: [#125] headless testing conventions ..

@@ -1,7 +1,12 @@
 # the CLI client narrative :[#132]
 
+:#storypoint-10 introduction
 
-:#storypoint-1
+welcome to the CLI client. if you are reading this you may also enjoy
+an explanation of [#010] the client tree model.
+
+
+:#storypoint-940
 
 what is really nice is if you observe [#sl-114] and specify what actual
 streams you want to use for these formal streams. however we grant ourself

@@ -7,7 +7,7 @@ to be used as an exit status for the whole process to the operating
 system. We also want to accomodate the different but overlapping
 sets of results that come from methods participating in
 "the common triad", which is an associaton of particular meanings to
-results variously of `nil`, `false`, and "other" [#hl-019].
+results variously of `nil`, `false`, and "other" [#019].
 
 Now imagine a venn diagram between the two: To strike a compromise between
 these two without resorting to too much shenanigans, participating
