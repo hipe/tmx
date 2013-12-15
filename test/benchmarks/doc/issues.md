@@ -1,3 +1,5 @@
+[#009] #open #in-situ (in skylab.rb) finally get to benchmarking this thing
+               "pn.relative? is expensive and bloaty"
 [#008]       bitfield vs. tuple as result of method call
 [#007]       [ will retrofit historical benchmark 4 of 5 ]
 [#006]       [ will retrofit historical benchmark 3 of 5 ]

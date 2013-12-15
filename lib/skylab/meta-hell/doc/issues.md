@@ -47,7 +47,7 @@
                is an experiment in initting a blank-slate 'dupe'-ish subset.
 [#020]       #done #formal-box instance methods separate from box class maybe?
                this issue has been co-opted to represent the box in general.
-[#019]       #done #boxxy peeks at fs now, hacks `constants`
+[#019]       #node-tracker: #boxxy
 [#018]       #done corral proxies
 [#017]       #done corral tees
 [#016]       #tracking-tag wow hash-like iterators are sure annoying

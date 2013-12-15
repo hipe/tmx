@@ -16,8 +16,8 @@
 [#039]       #question in light of [#037], o.p receiver ..?
 [#038]       #doc-point `puffing` is a small API corner of clients that
                lets you "puff up" your (e.g. branch) client lazily
-[#037]       #eventpoint - fundamentally rearchitect Face to deal with the
-             DSL public instance method namespace problem.
+[#037]       #eventpoint, #parent-node: [#040]: fundamentally rearchitect Face
+               to deal with the DSL public instance method namespace problem.
 [#036] #todo replace universe with `tableize` with [ face cli table ]
 [#035]       #tracking-tag #experiment with a `unary` discrete categorization
                for our main 3 classes (for which we make two exponents) ..
@@ -54,8 +54,8 @@
                API action lifecycle point: `handle_events`
 [#016]       #doc-point #parent:021 #body-is-inline-in-parent
                API action lifecycle point: `new`
-[#015]       #doc-point #parent:006
-               finally we give it a name: `isomorphic argument syntax` ..
+[#015]       #doc-point #parent:006 #isomorphic argument syntax (this same
+               behavior is implemented in [#hl-146] where it is documented)
 [#014]       #doc-point CLI revelation integration intro #parent:006
 [#013]       #doc-point #parent:005 #initials:mf
                metafields are the light, they are the way ..
