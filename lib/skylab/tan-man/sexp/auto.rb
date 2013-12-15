@@ -32,7 +32,7 @@ module Skylab::TanMan
       node2tree syntax_node, nil, nil # no class, no member_name
     end
 
-    constantize = Autoloader::FUN.constantize
+    constantize = Autoloader::FUN::Constantize
 
     define_method :add_instance_methods do |tree_class|
       if instance_methods_module

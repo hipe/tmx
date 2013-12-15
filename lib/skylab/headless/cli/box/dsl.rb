@@ -75,7 +75,7 @@ module Skylab::Headless
 
       def method_added meth_i  # #storypoint-8  #hook-in to ruby.
         self.DSL_is_disbld or begin
-          _const_i = Autoloader::FUN.constantize[ meth_i ]
+          _const_i = Autoloader::FUN::Constantize[ meth_i ]
           action_box_module.const_set _const_i, some_act_cls
           @act_cls_in_progress = nil
         end

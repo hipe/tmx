@@ -22,9 +22,10 @@ module Skylab::MetaHell::TestSupport::Autoloader
 
     context "`pathify` - tries to turn constants into path fragments:" do
 
-      pathify = MetaHell::Autoloader::FUN.pathify
+      pathify = MetaHell::Autoloader::FUN::Pathify
 
       define_singleton_method :o do |const, exp_path, desc, *a|
+
         it "#{ format % [ desc, const.inspect, exp_path.inspect ] }", *a do
           pathify[ const ].should eql( exp_path )
         end
@@ -45,6 +46,8 @@ module Skylab::MetaHell::TestSupport::Autoloader
       o 'WillIAm', 'will-i-am', 'ok, really guys?'
 
       o "Catch22Pickup", 'catch22pickup', 'numbers whatever this might change'
+
+      o 'IMs', 'ims', "OH MY GOD THIS IS SO DIRTY"
 
     end
 
@@ -69,7 +72,7 @@ module Skylab::MetaHell::TestSupport::Autoloader
     context "`constantize` tries to turn path framents #{
         }into constants-looking strings" do
 
-      constantize = MetaHell::Autoloader::FUN.constantize
+      constantize = MetaHell::Autoloader::FUN::Constantize
 
       define_singleton_method :o do |path, exp_const, desc, *a|
         it "#{ format % [ desc, path.inspect, exp_const.inspect ] }", *a do
@@ -103,7 +106,7 @@ module Skylab::MetaHell::TestSupport::Autoloader
     context "`constantize` tries to turn method-looking #{
       }symbols into constants" do
 
-      constantize = MetaHell::Autoloader::FUN.constantize
+      constantize = MetaHell::Autoloader::FUN::Constantize
 
       define_singleton_method :o do |in_str, out_str, desc, *tags|
         it "#{ format % [ desc, in_str, out_str ] }", *tags do
@@ -119,7 +122,7 @@ module Skylab::MetaHell::TestSupport::Autoloader
 
     context "`methodize` - tries to make whatevers look like method names" do
 
-      methodize = MetaHell::Autoloader::FUN.methodize
+      methodize = MetaHell::Autoloader::FUN::Methodize
 
       fmt = "%20s => %s"
 
@@ -131,7 +134,7 @@ module Skylab::MetaHell::TestSupport::Autoloader
 
       o 'a b', :a_b
 
-      o 'AbcDef', :abc_def
+      o 'AbcDef', :abc_def, f: true
 
       o 'NASASpaceStation', :nasa_space_station
 

@@ -139,7 +139,7 @@ module ::Skylab::TestSupport
       end
     end
     #
-    SPEC_TAIL_ = Subsys::FUN._spec_rb[]
+    SPEC_TAIL_ = Subsys::FUN::Spec_rb[]
     SPEC_TAIL_POS_ = - SPEC_TAIL_.length
     TS_NAME_ = 'test-support'.freeze
     #

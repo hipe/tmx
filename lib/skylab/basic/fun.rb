@@ -17,9 +17,9 @@ module Skylab::Basic
       end
     end
 
-    A_REASONABLY_SHORT_LENGTH_FOR_A_STRING__ = 10
+    A_REASONABLY_SHORT_LENGTH_FOR_A_STRING = 10
 
-    Inspect = Inspect__.curry[ A_REASONABLY_SHORT_LENGTH_FOR_A_STRING__ ]
+    Inspect = Inspect__.curry[ A_REASONABLY_SHORT_LENGTH_FOR_A_STRING ]
 
   end
 end

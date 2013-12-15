@@ -6,17 +6,16 @@ module Skylab::TestSupport
       @y = y
       @path_prefix_p = path_prefix_p
       @stat_a = a = [ ]
-      @stat_h = ::Hash.new { |hh, k| a << k ; hh[ k ] = Stat_.new( k ) }
+      @stat_h = ::Hash.new { |hh, k| a << k ; hh[ k ] = Stat__.new( k ) }
     end
 
-    class Stat_
+    class Stat__
       def initialize i
-        @normal = i ; @count = 1
+        @count = 1 ; @normal = i
       end
       attr_reader :count, :normal
       def touch
-        @count += 1
-        nil
+        @count += 1 ; nil
       end
     end
 

@@ -263,7 +263,7 @@ module Skylab::TestSupport
         end
 
         Internen_ = -> mod_x do
-          Headless::Name::FUN.const_basename[ mod_x.to_s ].gsub( /_+\z/, '' ).
+          Headless::Name::FUN::Const_basename[ mod_x.to_s ].gsub( /_+\z/, '' ).
             downcase
         end
 

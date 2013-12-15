@@ -80,8 +80,8 @@ module Skylab::BeautySalon
         inputs = Basic::List::Scanner[ x ]
         parse = Basic::Range::Positive::List::Scanner.new
         parse.unexpected_proc = -> xx, exp_a do
-          y << "didn't understand \"#{
-            Headless::CLI::FUN.ellipsify[ xx , 8 ] }\" in the #{
+          _excerpt = Ellipsulate__[ xx ]
+          y << "didn't understand \"#{ _excerpt }\" in the #{
             }lines expression - expected a #{ exp_a * ' or ' }"
           nil  # IMPORTANT - it must break the scan loop
         end
@@ -104,6 +104,10 @@ module Skylab::BeautySalon
       @line_range_union = unio.prune if unio
       true if ok == y.count
     end
+
+    A_RATHER_SHORT_LEN__ = 8
+
+    Ellipsulate__ = Headless::CLI::FUN::Ellipsify_.curry[ A_RATHER_SHORT_LEN__ ]
 
     def resolve_line_scanner
       res = nil

@@ -39,7 +39,7 @@ module Skylab::TestSupport
         FILE_RX_ = /\A (?<noext> [-_a-z0-9]+ ) #{
           }#{ ::Regexp.escape ::Skylab::Autoloader::EXTNAME } \z/x
 
-        Constantify_ = ::Skylab::Autoloader::Constantize_sanitized_file_
+        Constantify_ = ::Skylab::Autoloader::FUN::Constantize::Sanitized_file
       end
     end
   end

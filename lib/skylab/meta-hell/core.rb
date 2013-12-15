@@ -23,6 +23,7 @@ module Skylab
 
     module Autoloader
       include ::Skylab::Autoloader  # [#041]
+      Enhance_ = Enhance_
       ::Skylab::Autoloader[ self ]
     end
 

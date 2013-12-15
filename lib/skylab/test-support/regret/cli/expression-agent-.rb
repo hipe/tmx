@@ -40,7 +40,7 @@ module Skylab::TestSupport
 
         def par i  # proof of concept - has problems
           par = @client.fetch_parameter i
-          stem = Headless::Name::Labelize[ par.local_normal_name ].downcase
+          stem = Headless::Name::FUN::Labelize[ par.local_normal_name ].downcase
           if par.has_arity
             if %i( zero_or_one zero_or_more ).include? par.arity_value
               code "--#{ stem.gsub ' ', '-' }"
@@ -48,7 +48,7 @@ module Skylab::TestSupport
               code "<#{ stem.gsub ' ', '-' }>"
             end
           else
-            "'#{ Headless::Name::Labelize[ par.local_normal_name ].downcase }'"
+            "'#{ Headless::Name::FUN::Labelize[ par.local_normal_name ].downcase }'"
           end
         end
 

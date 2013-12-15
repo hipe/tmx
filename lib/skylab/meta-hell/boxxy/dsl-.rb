@@ -29,7 +29,7 @@ module Skylab::MetaHell
       end
 
       def pathify x
-        Autoloader::FUN.pathify[ x ]
+        Autoloader::FUN::Pathify[ x ]
       end
 
       def upwards mod

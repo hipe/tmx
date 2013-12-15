@@ -140,7 +140,7 @@ module Skylab::TestSupport::Regret::CLI
     end
     WHITE_A__ = %i( core_basename do_force recursive_o vtuple ).freeze
     Cleanup_hack__ = -> i do
-      "'#{ Headless::Name::Labelize[ i ].downcase }'"
+      "'#{ Headless::Name::FUN::Labelize[ i ].downcase }'"
     end
 
     def recursive_dissolve_subcommand

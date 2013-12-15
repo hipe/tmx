@@ -35,7 +35,7 @@ module Skylab::SubTree
 
     o[:glob_h] = -> do
       p = -> do
-        srbg = "*#{ SubTree::Services::TestSupport::FUN._spec_rb[] }"
+        srbg = "*#{ SubTree::Services::TestSupport::FUN::Spec_rb[] }"
         r = { 'features' => '*.feature',
               'spec'     => srbg,
               'test'     => srbg

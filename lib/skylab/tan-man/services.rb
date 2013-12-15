@@ -54,7 +54,7 @@ module ::Skylab::TanMan
     Build_services_client_class_ = -> host, const do  # e.g Services, Client_
       kls = host.const_set const, ::Class.new
       host.dir_pathname.children( false ).each do |pn|
-        stem = Autoloader::FUN.methodize[ pn.sub_ext( '' ) ].intern
+        stem = Autoloader::FUN::Methodize[ pn.sub_ext( '' ) ].intern
         ivar = :"@#{ stem }"
         i_a = ::Array.new ( pn.extname.empty? ? 2 : 1 ), stem
         kls.send :define_method, stem do

@@ -27,7 +27,7 @@ module Skylab::Basic
                 res = scn.scan word_rx
                 if ! res
                   fail "sanity - expecting word (#{ word_rx }) near \"#{
-                    Services::Headless::CLI::FUN.ellipsify[ scn.rest, 8 ] }\""
+                    Ellipsatize__[ scn.rest ] }\""
                 end
                 stay = false
               end
@@ -37,6 +37,11 @@ module Skylab::Basic
         end
       end
     end
+
+    A_RATHER_SHORT_LENGTH_FOR_A_STRING__ = 8
+
+    Ellipsatize__ = Services::Headless::CLI::FUN::Ellipsify_.
+      curry[ A_RATHER_SHORT_LENGTH_FOR_A_STRING__ ]
 
     MetaHell::Function self, :gets, :@gets_proc, :gets_proc=
 

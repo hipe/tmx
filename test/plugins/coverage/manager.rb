@@ -45,10 +45,10 @@ module Skylab::Test
           rx = ::Regexp.method :escape ; fun = ::Skylab::TestSupport::FUN
           Black_Rx_Matcher_.new(  # could stand to be more extensible
             %r{ (?:
-              #{ rx[ fun._spec_rb[] ] }
+              #{ rx[ fun::Spec_rb[] ] }
                 |
               (?: \A | / )
-              (?: #{  fun.test_support_filenames[].map( & rx ) * '|' } )
+              (?: #{  fun::Test_support_filenames[].map( & rx ) * '|' } )
             )\z }x )
         end.call
         state! :started

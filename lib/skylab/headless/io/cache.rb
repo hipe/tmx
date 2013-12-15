@@ -122,7 +122,7 @@ module Skylab::Headless
             idx = const_a.length - 1
             mod = mod_a.fetch idx
           end while ! mod.respond_to? :cache_pathname
-          filename ||= Autoloader::FUN.pathify[ last_base ]
+          filename ||= Autoloader::FUN::Pathify[ last_base ]
           [ mod.cache_pathname.join( filename ), mod.cache_pathname.stat.mode ]
         end
 

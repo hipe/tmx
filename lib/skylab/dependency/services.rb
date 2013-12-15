@@ -2,7 +2,7 @@ module Skylab::Dependency
 
   module Services  # :+[#su-001]
 
-    load_method = ->(const) { "load_#{ Autoloader::FUN.methodize[ const ] }" }
+    load_method = ->(const) { "load_#{ Autoloader::FUN::Methodize[ const ] }" }
 
     define_singleton_method :const_missing do |const|
       if respond_to?( m = load_method[ const ] )

@@ -246,8 +246,8 @@ module Skylab::Headless::CLI::Table
 
     MetaHell::Boxxy[ self ]
 
-    parse_styles   = Headless::CLI::FUN.parse_styles
-    unparse_styles = Headless::CLI::FUN.unparse_styles
+    parse_styles   = Headless::CLI::FUN::Parse_styles
+    unparse_styles = Headless::CLI::FUN::Unparse_styles
     unstyle      = Headless::CLI::Pen::FUN.unstyle
     hackable_a = [ :style, :string, :style ]
 

@@ -1,35 +1,36 @@
 module Skylab::MetaHell
 
-  module Autoloader::Autovivifying
+  module Autoloader
 
-    ::Skylab::Autoloader[ self ]
+    module Autovivifying
 
-    Methods = Autoloader::Methods
+      define_singleton_method :[], Enhance_
 
-    define_singleton_method :[], & Autoloader::Enhance_
+      Methods = Autoloader::Methods
 
+      ::Skylab::Autoloader[ self ]
+    end
   end
 
   class Autoloader::Autovivifying::Tug < Autoloader::Tug
-
-    def initialize( * )
-      super
-      @autovivify_proc = nil
-    end
-
-    def autovivify_proc_notify p
-      @autovivify_proc = p ; nil
-    end
 
     def self.enhance x
       tug_class = self
       x.instance_exec do
         @tug_class ||= tug_class
-      end
-      nil
+      end ; nil
+    end
+
+    def initialize( * )
+      @autovivify_proc = nil
+      super
     end
 
     attr_reader :mod_dir_pathname
+
+    def autovivify_proc_notify p
+      @autovivify_proc = p ; nil
+    end
 
     def probably_loadable?
       super or @mod.has_stowaways && has_stowaway_resolver or

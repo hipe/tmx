@@ -105,8 +105,8 @@ module Skylab::SubTree::TestSupport::CLI
         }not have been - #{ x }"
       s
     end
-    #
-    Parse_styles_ = ::Skylab::Headless::CLI::FUN.parse_styles
+
+    Parse_styles_ = ::Skylab::Headless::CLI::FUN::Parse_styles
 
     def line_thru p
       e = emission_a.shift

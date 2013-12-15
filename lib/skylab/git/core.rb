@@ -12,7 +12,7 @@ module Skylab::Git
 
   MAARS = MetaHell::MAARS
 
-  p[ Face::FUN, %i| Stdin_ Stdout_ Stderr_ | ]
+  Stdin_, Stdout_, Stderr_ = Face::FUN.const_values_at :Stdin, :Stdout, :Stderr
 
   module CLI
 

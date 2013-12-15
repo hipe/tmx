@@ -1,6 +1,6 @@
-module Skylab                     # Welcome! :D
+module Skylab  # Welcome! :D
 
-  # facilities for bootstrapping subsystems - mostly autoloading
+  # ~ facilities for bootstrapping subsystems - mostly autoloading
 
   require 'pathname'
 
@@ -14,90 +14,112 @@ module Skylab                     # Welcome! :D
 
   module Autoloader
 
-    Enhance_ = -> mod, loc=:auto do
-      case loc
-      when :auto ; loc = caller_locations( 2, 1 )[ 0 ]
-      when :deferred ; loc = false
-      end
+    Enhance_ = -> mod, loc_x=:auto do
+      case loc_x
+      when :auto ; loc_x = caller_locations( 2, 1 )[ 0 ]
+      when :deferred ; loc_x = false end
       autoloader = self
       mod.module_exec do
         @tug_class ||= autoloader::Tug
         extend autoloader::Methods
-        loc and init_autoloader loc
+        loc_x and init_autoloader loc_x
       end ; nil
     end
 
     define_singleton_method :[], & Enhance_
 
-    FUN = o = ::Struct.new( :pathify, :methodize, :constantize ).new
-
-    o[:pathify] = -> const do
-      const.to_s.
-        gsub(/(?<=[a-z])([A-Z])|(?<=[A-Z])([A-Z][a-z])/) { "-#{$1 || $2}" }.
-        gsub('_', '-').downcase
-    end
-
-    o[:methodize] = -> str do
-      str.to_s.
-        gsub(/(?<=[a-z])([A-Z])|(?<=[A-Z])([A-Z][a-z])/) { "_#{$1 || $2}" }.
-        gsub(/[^a-z0-9]+/i, '_').downcase.intern  # munge-in above underscores
-    end
-
     EXTNAME = '.rb'.freeze
 
-    o[:constantize] = -> do
-      sanitize_path_rx = %r{ #{ ::Regexp.escape EXTNAME }\z |
-        (?<=/)/+ | (?<=[-_ ])[-_ ]+ | [^-_ /a-z0-9]+ }ix
+    module FUN
 
-      -> path do
-        path.to_s.gsub( sanitize_path_rx, '' ).  # remove some strings
-          split( '/', -1 ).map( & Constantize_sanitized_file_ ) * '::'
-        end
-    end.call
+      module Constantize
 
-    Constantize_sanitized_file_ = -> do
-      rx = / (?<const>[^-_ ]+) (?<sep>[-_ ]+ (?<is_last>\z) ?)? /x
-      -> part do
-        part.gsub( rx ).each do  # for each part along with its separator,
-          const, sep, is_last = $~.captures
-          const.gsub!( /(?<=[0-9]|\A)([a-z])/ ) { $1.upcase } # "99x" -> "99X"
-          if sep
-            sep = if is_last then '_' * sep.length
-            elsif 2 > const.length then '_' end
+        p = -> path_x do
+          path_x.to_s.gsub( BLACK_RX__, EMPTY_STRING__ ).
+            split( FILE_SEP_, -1 ).
+              map( & Sanitized_file ) * CONST_SEP__
+        end ; define_singleton_method :to_proc do p end
+        define_singleton_method :[], p
+
+        BLACK_RX__ = %r{ #{ ::Regexp.escape EXTNAME }\z |
+          (?<=/)/+ | (?<=[-_ ])[-_ ]+ | [^-_ /a-z0-9]+ }ix
+
+        EMPTY_STRING__ = ''.freeze
+        CONST_SEP__ = '::'.freeze
+
+        Sanitized_file = -> part_s do
+          part_s.gsub( PART_RX__ ).each do
+            # for each parts (still being attached to any separator)
+            const, sep, is_last = $~.captures
+            const.gsub!( LETTER_AFTER_DIGIT_RX__ ) { $1.upcase }  # "99x"->"99X"
+            sep and _sep = Resolve_any_term_separator__[ const, sep, is_last ]
+            "#{ const }#{ _sep }"
           end
-            # "c-style" --> "C_Style", "foo-bar" --> "FooBar", "x-" -> "X_"
-          "#{ const }#{ sep }"
+        end
+        PART_RX__ = / (?<const>[^-_ ]+) (?<sep>[-_ ]+ (?<is_last>\z) ?)? /x
+        LETTER_AFTER_DIGIT_RX__ = /(?<=[0-9]|\A)([a-z])/
+
+        Resolve_any_term_separator__ = -> const, sep, is_last do
+          if is_last
+            CONST_PART_SEP_ * sep.length  # foo-- => Foo__
+          elsif 2 > const.length
+            CONST_PART_SEP_  # c-style => C_Style, foo-bar => FooBar, x- => X_
+          end
         end
       end
-    end.call
 
-    o.freeze ; o = nil
+      CONST_PART_SEP_ = '_'.freeze
+      FILE_SEP_ = '/'.freeze
+
+      module Methodize
+        p = -> str do
+          str.to_s.gsub( PART_RX__ ) { "#{ SEP__ }#{ $1 || $2 }" }.
+            gsub( BLACK_RX__, SEP__ ).downcase.intern
+        end ; define_singleton_method :to_proc do p end
+        define_singleton_method :[], p
+        PART_RX__ = /(?<=[a-z])([A-Z])|(?<=[A-Z])([A-Z][a-z])/
+        SEP__ = '_'.freeze
+        BLACK_RX__ = /[^a-z0-9]+/i
+      end
+
+      module Pathify
+        p = -> const_x do
+          const_x.to_s.gsub( PART_RX__ ) { "-#{ $1 || $2 }" }.
+            gsub( CONST_PART_SEP_, PART_SEP__ ).downcase
+        end ; define_singleton_method :to_proc do p end
+        define_singleton_method :[], p
+        PART_RX__ = /(?<=[a-z])([A-Z])|(?<=[A-Z])([A-Z][a-rt-z])/
+        PART_SEP__ = '-'.freeze
+      end
+    end
 
     module Methods
-
       def init_autoloader caller_x  # takes multiform args until [#mh-044]
-        if dir_pathname.nil?
-          pn = ::Pathname.new( caller_x.respond_to?( :absolute_path ) ?
-            caller_x.absolute_path :
-            caller_x.match( CALLFRAME_PATH_RX )[ :path ] )
-          # #todo pn.relative? is expensive and bloaty
-          SLASH__ == pn.instance_variable_get( :@path ).getbyte( 0 ) or
-            pn = pn.expand_path # although this is a filesystme hit,
-              # you cannot reliably autoload with a relpath
-          guess = Guess_dir_[ name, pn.sub_ext( '' ).to_s, -> e do
-            raise ::LoadError, "Autoloader hack failed: #{ e }"
-          end ]
-          guess and @dir_pathname = ::Pathname.new( guess )  # sanity
-        end
-        nil
+        dir_pathname.nil? and init_atldr_when_dir_pn_nil caller_x ; nil
       end
-      SLASH__ = '/'.getbyte 0
-
-      attr_reader :dir_pathname, :tug_class
-
       def pathname
         @pathname ||= dir_pathname.sub_ext EXTNAME  # ymmv
       end
+      attr_reader :dir_pathname, :tug_class
+    private
+      def init_atldr_when_dir_pn_nil caller_x
+        _path_s = nrmlz_caller_x_for_autoloading caller_x
+        guess = Guess_dir_[ name, _path_s, -> e do
+          raise ::LoadError, "Autoloader hack failed: #{ e }"
+        end ]
+        guess and @dir_pathname = ::Pathname.new( guess ) ; nil
+      end
+      def nrmlz_caller_x_for_autoloading caller_x
+        _path = caller_x.respond_to?( :absolute_path ) ?
+          caller_x.absolute_path :
+          caller_x.match( CALLFRAME_PATH_RX )[ :path ]
+        pn = ::Pathname.new _path
+        SLASH__ == pn.instance_variable_get( :@path ).getbyte( 0 ) or
+          pn = pn.expand_path # although this is a filesystme hit,
+            # you cannot reliably autoload with a relpath
+        pn.sub_ext( '' ).to_s
+      end
+      SLASH__ = '/'.getbyte 0  # [#bm-009] (open)
     end
 
     CALLFRAME_PATH_RX = /^(?<path>.+)(?=:\d+:in[ ]`)/x  # everywhere this is used [#mh-044]
@@ -106,7 +128,7 @@ module Skylab                     # Welcome! :D
 
       tok_rx = %r{\A(?:(?<rest>(?:(?!=::).)+)::)?(?:::)?(?<curr>[^:]+)\z}
 
-      pathify = FUN.pathify
+      pathify = FUN::Pathify
 
       tokenizer = -> s do  # "A::B::C" => "c", "b", "a", nil
         -> { m = tok_rx.match( s ) and ( s, x = m.captures ) and pathify[ x ] }
@@ -130,116 +152,116 @@ module Skylab                     # Welcome! :D
 
     module Methods
 
-      def const_probably_loadable? const
-        const_tug( const ).probably_loadable?
-      end
-
-    private
-
       def const_missing const
         const_tug( const ).load_and_get  # [#mh-040] result is value
       end
 
-    public
-
-      def const_tug const
-        @dir_pathname or raise LoadError, "Autoloader hack failed: attempt #{
-          }to autoload #{ name }::#{ const } when dir_path of that anchor #{
-          }module not yet known (do you need to extend an Autoloader #{
-          }explicitly on that module?)"
-        @tug_class.new const.intern, @dir_pathname, self
+      def const_probably_loadable? const
+        const_tug( const ).probably_loadable?
       end
 
-      #  ~ `add_dir_pathname_listener` - goofy experiment on charging a graph ~
-
-      def add_dir_pathname_listener *a
-        ( @dir_pathname_listener_a ||= [ ] ) << a
-        nil
+      def const_tug const
+        @dir_pathname or raise LoadError, say_autoloader_hack_failed( const )
+        @tug_class.new const.intern, @dir_pathname, self
+      end
+    private
+      def say_autoloader_hack_failed const
+        "Autoloader hack failed: attempt to autoload #{ name }::#{ const } #{
+          }when dir_path of that anchor module not yet known (do you need #{
+           }to enhance that module explicitly with Autoloader?)"
+      end
+    public
+      def add_dir_pathname_listener *a  # goofy experiment on charging a graph
+        ( @dir_pathname_listener_a ||= [ ] ) << a ; nil
       end
 
       def init_dir_pathname x
         dir_pathname and raise ::ArgumentError, "won't clobber existing pn"
         @dir_pathname = x
-        if instance_variable_defined? :@dir_pathname_listener_a
-          ( a = @dir_pathname_listener_a ).length.times do |i|
-            const, mod = a[ i ]
-            mod.init_dir_pathname(
-              x.join Autoloader::FUN.pathify[ const ] )
-            a[ i ] = nil
-          end
-          a.compact!
-        end
-        nil
+        a = dir_pathname_listener_a and Notify_d_pn_listrs__[ x, a ] ; nil
       end
 
-      # `stowaway` - a hook for another goofy experiment [#mh-030].
+      attr_reader :dir_pathname_listener_a
 
-    public
-
-      attr_reader :has_stowaways, :stowaway_a
+      Notify_d_pn_listrs__ = -> pn, a do
+        a.length.times do |d|
+          const_i, mod = a[ d ]
+          mod.init_dir_pathname pn.join Autoloader::FUN::Pathify[ const_i ]
+          a[ d ] = nil
+        end
+        a.compact! ; nil
+      end
 
     private
-
-      def stowaway *a
+      def stowaway *a  # [#mh-030] another goofy experiment
         @has_stowaways ||= true
-        ( @stowaway_a ||= [ ] ) << a
+        ( @stowaway_a ||= [ ] ) << a ; nil
       end
+    public
+      attr_reader :has_stowaways, :stowaway_a
     end
 
     class Tug  # the implementation of the `const_missing` hack
 
       def initialize const, mod_dir_pathname, mod
-        @const, @mod_dir_pathname, @mod = const, mod_dir_pathname, mod
+        @const = const ; @mod = mod ; @mod_dir_pathname = mod_dir_pathname
       end
 
       attr_reader :const, :mod
-
-      def correction_notification const
-        @const = const ; nil
-      end
 
       def probably_loadable?
         leaf_pathname.exist?
       end
 
-      def load_and_get correction=nil
+      def leaf_pathname
+        @leaf_pathname ||= bld_leaf_pathname
+      end
+
+      -> do
+        _EXTNAME = Autoloader::EXTNAME
+        pathify_p = Autoloader::FUN::Pathify
+        define_method :bld_leaf_pathname do
+          @mod_dir_pathname.join "#{ pathify_p[ @const ] }#{ _EXTNAME  }"
+        end
+      end.call
+
+      def load_and_get any_correction_p=nil
         # requiring the same string more than once is never right -
-        mutex normalized_path and raise "circular autoload dependency #{
-          }detected - probably from within file node #{
-          }`#{ leaf_pathname.basename }` an autoload was triggered for the #{
-          }selfsame corresponding const node `#{ @const }` - make sure that #{
-          }that constant is actually set there - #{ @leaf_pathname }."
+        mutex normalized_path and raise say_circular
         require @normalized_path
-        correction and correction[]
+        any_correction_p and any_correction_p[]
         if @mod.const_defined? @const, false
           @mod.const_get @const, false
         else
           const_not_defined  # hackery might happen
         end
       end
-
     private
-
-      define_method :mutex, &
-        ::Hash.new { | h, k| h[ k ] = true ; nil }.method( :[] )
-      private :mutex
-
       def normalized_path
         @normalized_path ||= leaf_pathname.sub_ext( '' ).to_s
       end
 
-      -> do
-        ext, pathify = Autoloader::EXTNAME, Autoloader::FUN.pathify
+      define_method :mutex, &
+        ::Hash.new { | h, k| h[ k ] = true ; nil }.method( :[] )
 
-        define_method :leaf_pathname do
-          @leaf_pathname ||= @mod_dir_pathname.
-            join "#{ pathify[@const] }#{ ext }"
-        end
-      end.call
+      def say_circular
+        "circular autoload dependency detected - probably from within file #{
+          }node `#{ leaf_pathname.basename }` an autoload was triggered for #{
+           }the selfsame corresponding const node `#{ @const }` - make sure #{
+            }that that constant is actually set there - #{ @leaf_pathname }."
+      end
 
       def const_not_defined
-        raise ::LoadError, "#{ @mod }::#{ @const } was not defined, #{
+        raise ::LoadError, say_const_not_defined
+      end
+
+      def say_const_not_defined
+        "#{ @mod }::#{ @const } was not defined, #{
           }must be, in #{ leaf_pathname }"
+      end
+   public
+      def correction_notification const
+        @const = const ; nil
       end
     end
   end
@@ -252,18 +274,24 @@ module Skylab                     # Welcome! :D
 
     Autoloader[ self ]
 
-    def self.[] mod
+    def self.[] subsystem_mod
       loc = caller_locations( 1, 1 )[ 0 ]
-      mod.module_exec do
-        ( const_set :MAARS, const_get( :MetaHell, false )::MAARS )[ self, loc ]
-        const_defined? :Services, false or
-          stowaway :Services, -> do
-            svcs = Subsystem::Services.new @dir_pathname
-            const_set :Services, svcs
-            load svcs.pathname ; nil
-          end
-      end
+      subsystem_mod.module_exec loc, & Enhance_subsystem_module__ ; nil
+    end
+
+    Enhance_subsystem_module__ = -> loc do
+      _mh = const_get :MetaHell, false
+      const_set( :MAARS, _mh::MAARS )[ self, loc ]
+      const_defined? :Services, false or module_exec( & Make_svcs_stowaway__ )
       nil
+    end
+
+    Make_svcs_stowaway__ = -> do
+      stowaway :Services, -> do
+        svcs = Subsystem::Services.new @dir_pathname
+        const_set :Services, svcs
+        load svcs.pathname ; nil
+      end
     end
   end
 end

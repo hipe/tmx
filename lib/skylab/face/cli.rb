@@ -1528,7 +1528,7 @@ module Skylab::Face
         hl_chunker =              # beast, the dependency is awkward.
           Services::Headless::CLI::Pen::Chunker
         hl_parse_styles, hl_unstyle_sexp =
-          Services::Headless::CLI::FUN.at :parse_styles, :unstyle_sexp
+          Services::Headless::CLI::FUN.constants_at :Parse_styles, :Unstyle_sexp
         hl = nil
       end
 
@@ -1735,7 +1735,7 @@ module Skylab::Face
     end
 
     CLI::FUN_[ :slugulate ] = -> x do
-      Services::Headless::Name::FUN.slugulate[ x ]
+      Services::Headless::Name::FUN::Slugulate[ x ]
     end  # (narrow focus of the dependency for now (but trivial))
 
     Requity_brackets_ = -> do  # ditto

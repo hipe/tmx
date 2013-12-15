@@ -128,7 +128,7 @@ module TmxGit
       def run argv
         argv = argv.dup
         req = {}
-        @ui = ui = DefaultUi
+        @ui = ui = Default_UI
         op = OptionParser.new do |o|
           o.banner = <<-HERE.gsub(/^ {12}/, '')
             #{hi 'description:'} Pushes many git repos at once (possibly for use in replication).

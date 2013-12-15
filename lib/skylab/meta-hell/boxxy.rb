@@ -1,6 +1,6 @@
 module Skylab::MetaHell
 
-  module Boxxy
+  module Boxxy  # :[#019]
 
     # Boxxy is an #experiment that turns an ordinary module into a "smart"
     # module with enhanced behavior. When we have a module that is used solely
@@ -198,7 +198,7 @@ module Skylab::MetaHell
     VALID_CONST_RX__ = /\A[A-Z][A-Za-z0-9_]*\z/
 
     Distill = -> do  # #part-of-public-FUN-libary
-      # different than `normify` and `normize` this is a lossy operation
+      # different than `Normify` and `normize` this is a lossy operation
       # that produces an internal distillation of a name for use in e.g
       # fuzzy (case-insensitive) matching, while preserving meaningful
       # trailing dashes or underscores from e.g a filename or constant
@@ -235,7 +235,7 @@ module Skylab::MetaHell
     end
 
     Resolve_name_with_core_file__ = -> basename, box, guess do  # #edge-hack
-      _dir = Autoloader::FUN.pathify[ guess ]
+      _dir = Autoloader::FUN::Pathify[ guess ]
       pn = box.dir_pathname.join "#{ _dir }/#{ basename }"
       if pn.exist?
         require pn.sub_ext ''

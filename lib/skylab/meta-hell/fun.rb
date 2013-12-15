@@ -48,6 +48,12 @@ module Skylab::MetaHell
       a.map( & @h.method( :fetch ) )
     end
 
+    def constants_at * i_a
+      i_a.map do |i|
+        const_get i, false
+      end
+    end
+
     def each_pair &p
       ech_pr_for_a_and_p @a, p
     end
@@ -131,7 +137,7 @@ module Skylab::MetaHell
 
     o[:pathify_name] = -> const_name_s do
       # (one extra rarely-used step added to the often-used function)
-      ::Skylab::Autoloader::FUN.pathify[ const_name_s.gsub( '::', '/' ) ]
+      ::Skylab::Autoloader::FUN::Pathify[ const_name_s.gsub( '::', '/' ) ]
     end
 
     Is_primitive_esque = -> x do

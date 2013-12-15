@@ -16,7 +16,11 @@ module Skylab::MetaHell
         super()
         @i = i
         @predicates = [ * predicate_x ]
-        @desc_lines = [ * desc_line_x ]
+        @dsc_line_a = [ * desc_line_x ]
+      end
+
+      def get_desc_line_a
+        @dsc_line_a && @desc_line_a.dup
       end
 
       def with *a
@@ -28,8 +32,7 @@ module Skylab::MetaHell
         true
       end
 
-      attr_reader :i, :predicates, :desc_lines, :short_s, :long_s,
-        :fuzzy_min_d
+      attr_reader :i, :predicates, :short_s, :long_s, :fuzzy_min_d
 
       def visible_values
         self.class.visible_members.map { |i| send i }
@@ -40,7 +43,7 @@ module Skylab::MetaHell
       end
 
       def first_desc_line
-        @desc_lines.fetch 0
+        @dsc_line_a.fetch 0
       end
 
       def normal_parse memo, argv

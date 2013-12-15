@@ -73,7 +73,7 @@ module Skylab::Snag::TestSupport::CLI
     end
 
     let :output do  # careful - this gets rewritten by `use_memoized_client`
-      output = CLI_TestSupport::FUN.output[]
+      output = CLI_TestSupport::FUN::output[]
       output.debug = -> { do_debug }
       output
     end

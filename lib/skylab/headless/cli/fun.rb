@@ -4,9 +4,7 @@ module Skylab::Headless
 
   module CLI::FUN
 
-    o = definer
-
-    Parse_styles = o[ :parse_styles ] = -> do
+    Parse_styles = -> do
       # Parse a string with ascii styles into an S-expression.
 
       sexp = Headless::Services::CodeMolester::Sexp
@@ -31,7 +29,7 @@ module Skylab::Headless
       end
     end.call
 
-    o[:unparse_styles] = -> do
+    Unparse_styles = -> do
       h = {
         string: -> sexp { sexp[1] },
         style: -> sexp {  "\e[#{ sexp[1..-1].join ';' }m" }
@@ -43,7 +41,7 @@ module Skylab::Headless
       end
     end.call
 
-    o[ :unstyle_sexp ] = -> sx do
+    Unstyle_sexp = -> sx do
       sx.reduce [] do |m, x|
         :string == x.first and m << x[ 1 ] ; m
       end.join EMPTY_STRING_
@@ -51,7 +49,7 @@ module Skylab::Headless
 
     left_peeker_hack = -> summary_width do     # i'm sorry -- there was no
       max = summary_width - 1                  # other way
-      sdone, ldone = {}, {}
+      sdone = {} ; ldone = {}
       -> x, &y do
         sopts, lopts = [], []   # short and long opts that have not been done
         if x.short
@@ -92,7 +90,9 @@ module Skylab::Headless
       end
     end
 
-    Ellipsify___ = -> glyph, limit, string do
+    # ( the below curry chain exemplifies [#101] name conventioons for.. )
+
+    Ellipsify__ = -> glyph, limit, string do
       if string.length <= limit
         string
       elsif glyph.length <= limit
@@ -108,13 +108,12 @@ module Skylab::Headless
       end
     end
 
-    Ellipsify__ = Ellipsify___.curry[ '[..]'.freeze ]
+    Ellipsify_ = Ellipsify__.curry[ '[..]'.freeze ]
 
-    o[ :ellipsify ] = -> str, len do
-      Ellipsify__[ len, str ]
-    end
+    Ellipsify = Ellipsify_.curry[
+      Headless::Services::Basic::FUN::A_REASONABLY_SHORT_LENGTH_FOR_A_STRING ]
 
-    o[:looks_like_sentence] = -> do
+    Looks_like_sentence = -> do
       punctuation_character_rx = /[.?!]/
       -> str do
         str.length.nonzero? and str[ -1 ] =~ punctuation_character_rx

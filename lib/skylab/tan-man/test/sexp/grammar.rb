@@ -193,10 +193,10 @@ module Skylab::TanMan::TestSupport::Sexp
       /\A  #{ anchor_module_head }  (.+)  \z/x
     end
 
-    fun = Autoloader::FUN
+    pathify_p = Autoloader::FUN::Pathify
 
     let :stem_path do
-      fun.pathify[ stem_const_rx.match(self.class.to_s)[1] ]
+      pathify_p[ stem_const_rx.match(self.class.to_s)[1] ]
     end
 
     def tmpdir_prepared

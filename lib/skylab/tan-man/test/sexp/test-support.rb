@@ -48,7 +48,7 @@ module Skylab::TanMan::TestSupport::Sexp
 
     -> do
 
-      constantize = Autoloader::FUN.constantize
+      constantize = Autoloader::FUN::Constantize
 
       rx = /\A(?<num>\d+(?:-\d+)*)(?:-(?<rest>.+))?\z/
 

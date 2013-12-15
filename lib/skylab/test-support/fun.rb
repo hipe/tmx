@@ -7,25 +7,31 @@ module Skylab
     # is a "no fun" zone - we can't assume anything else has been loaded,
     # nor should we load anything else.
 
+    FUN = class Fun__ < ::Module  # #transitional
+      self
+    end.new
+
+    module FUN
+
+      # these are just here for now as logical placeholders..
+      # it could be made more extensible. as they are now they are just one
+      # step up from duplicating the literals througout the universe.
+
+      Spec_rb = -> do
+        s = '_spec.rb'.freeze
+        -> { s }
+      end.call
+      class TestSupport::Fun__  # #transitional
+        def _spec_rb ; Spec_rb end
+      end
+
+      Test_support_filenames = -> do  # #transitional
+        a = %w( test-support.rb' ).freeze
+        -> { a }
+      end.call
+      class TestSupport::Fun__
+        def test_support_filenames ; Test_support_filenames end
+      end
+    end
   end
-
-  TestSupport::FUN = -> do
-
-    o = { }  # these are just here for now as logical placeholders..
-    # it could be made more extensible. as they are now they are just one
-    # step up from duplicating the literals througout the universe.
-
-    o[:_spec_rb] = -> do
-      _spec_rb = '_spec.rb'.freeze
-      -> { _spec_rb }
-    end.call
-
-    o[:test_support_filenames] = -> do
-      a = [ 'test-support.rb' ].freeze
-      -> { a }
-    end.call
-
-    ::Struct.new( * o.keys ).new( * o.values )
-
-  end.call
 end

@@ -12,9 +12,9 @@ module Skylab::Headless::TestSupport::CLI::Pen
 
     stylize = Headless::CLI::Pen::FUN.stylize
 
-    parse_styles = Headless::CLI::FUN.parse_styles
+    parse_styles = Headless::CLI::FUN::Parse_styles
 
-    unstyle_sexp = Headless::CLI::FUN.unstyle_sexp
+    unstyle_sexp = Headless::CLI::FUN::Unstyle_sexp
 
     it "look, wow" do
 

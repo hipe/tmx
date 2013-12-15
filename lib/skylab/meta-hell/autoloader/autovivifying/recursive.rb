@@ -103,9 +103,8 @@ module Skylab::MetaHell
     Build_stack_from_mod__ = Build_stack_from_2_mods__.curry[ nil ]
 
     Surrounding_module__ = -> mod do
-      _mod = MetaHell::Module::Accessors::FUN.resolve[ mod, '..' ] or
+      MetaHell::Module::Accessors::FUN.resolve[ mod, '..' ] or
         raise "can't - rootmost module (::#{ mod }) has no dir_pathname"
-      _mod
     end
 
     Flush_stack__ = -> stack_a do
@@ -114,8 +113,8 @@ module Skylab::MetaHell
         n = mod_.name
         mod_.module_exec do
           @dir_pathname = mod.dir_pathname.join(
-            ::Skylab::Autoloader::FUN.
-              pathify[ n[ n.rindex( ':' ) + 1 .. -1 ] ] )
+            ::Skylab::Autoloader::FUN::Pathify[
+              n[ n.rindex( ':' ) + 1 .. -1 ] ] )
           MAARS[ self ]
         end
         mod = mod_

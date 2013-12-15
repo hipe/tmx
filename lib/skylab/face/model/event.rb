@@ -82,7 +82,7 @@ module Skylab::Face
       any_first_item               ->   x { o << "#{ x.message_proc[] }" }
 
       any_subsequent_items -> x do
-        if Services::Headless::CLI::FUN.looks_like_sentence[ o ]
+        if Services::Headless::CLI::FUN::Looks_like_sentence[ o ]
           sep = ' '
         else
           sep ' - '

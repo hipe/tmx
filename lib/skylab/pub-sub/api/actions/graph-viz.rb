@@ -39,8 +39,8 @@ module Skylab::PubSub
 
     -> do  # `resolve_root_const`
 
-      pathify = Autoloader::FUN.pathify
-      constantize = Autoloader::FUN.constantize
+      pathify = Autoloader::FUN::Pathify
+      constantize = Autoloader::FUN::Constantize
 
       define_method :resolve_root_const do
         @mod_a = nil

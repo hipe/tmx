@@ -7,7 +7,7 @@ module Skylab::Snag
     -> do  # `taxonomic_streams`
       memo = nil
       define_singleton_method :taxonomic_streams do
-        memo ||= constants.map( & Headless::Name::FUN.normify )
+        memo ||= constants.map( & Headless::Name::FUN::Normify )
         #  e.g [:datapoint, :lingual, :structural ]
       end
     end.call

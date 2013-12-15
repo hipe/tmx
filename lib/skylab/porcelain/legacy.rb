@@ -919,7 +919,7 @@ module Skylab::Porcelain::Legacy
       if ::Array === ref
         fail "implement me - deep paths" if 1 < ref.length
         ref = ref.first
-        ref = Headless::Name::FUN.slugulate[ ref ]
+        ref = Headless::Name::FUN::Slugulate[ ref ]
       end
       self.class.story.fetch_action_sheet ref, self.class.story.do_fuzzy,
         -> do
@@ -1245,7 +1245,7 @@ module Skylab::Porcelain::Legacy
     attr_reader :normalized_parameter_name  # needed by a `fetch`
 
     def slug
-      Headless::Name::FUN.slugulate[ @normalized_parameter_name ]
+      Headless::Name::FUN::Slugulate[ @normalized_parameter_name ]
     end
 
     def string

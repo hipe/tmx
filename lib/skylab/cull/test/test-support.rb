@@ -54,7 +54,7 @@ module Skylab::Cull::TestSupport
 
     def from_inside_fixture_directory i, &blk
       _from_inside blk, Cull_TestSupport::Fixtures::Directories.dir_pathname.
-        join( Headless::Name::FUN.slugulate[ i ] ), false
+        join( Headless::Name::FUN::Slugulate[ i ] ), false
     end
 
     def _from_inside blk, dir_pn, do_use_fixture, fixture_i=nil
@@ -88,7 +88,7 @@ module Skylab::Cull::TestSupport
 
     def _load_fixture fixture_i
       pn = Cull_TestSupport::Fixtures::Patches.
-        dir_pathname.join "#{ Headless::Name::FUN.slugulate[ fixture_i ] }.patch"
+        dir_pathname.join "#{ Headless::Name::FUN::Slugulate[ fixture_i ] }.patch"
 
       st = sandboxed_tmpdir.patch( pn.read ).exitstatus
       st.zero? or fail "sanity - patch failed? (exited with status #{ st })"

@@ -264,8 +264,8 @@ module Skylab::MetaHell
         if ! mod_.instance_variable_defined? :@dir_pathname
           n = mod_.name
           mod_.instance_variable_set :@dir_pathname, mod.dir_pathname.join(
-            ::Skylab::Autoloader::FUN.
-              pathify[ n[ n.rindex( ':' ) + 1 .. -1 ] ] )
+            ::Skylab::Autoloader::FUN::Pathify[
+              n[ n.rindex( ':' ) + 1 .. -1 ] ] )
           MAARS[ mod_ ]
         end
         mod_

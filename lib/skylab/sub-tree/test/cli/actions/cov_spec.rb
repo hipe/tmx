@@ -32,7 +32,7 @@ describe "[st] CLI actions cov" do
   end
 
   srbrx, srbrx2 = -> do
-    rx = ::Regexp.escape TestSupport::FUN._spec_rb[]
+    rx = ::Regexp.escape TestSupport::FUN::Spec_rb[]
     [ /#{ rx }\z/, %r{\A\./#{ PN_ }/.+#{ rx }\z} ]
   end.call
 

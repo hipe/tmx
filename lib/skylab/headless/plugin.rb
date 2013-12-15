@@ -346,7 +346,7 @@ module Skylab::Headless
       self.class._proxy_class.new self, plugin_metasvcs
     end
 
-    def self._proxy_class  # #api-private
+    def self._proxy_class  # #API-private
       const! :Proxy_ do
         msvcs = self
         ::Class.new( Plugin::Host::Proxy_ ).class_exec do

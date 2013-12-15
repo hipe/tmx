@@ -1,36 +1,53 @@
 module Skylab::Face
 
-  class FUN_ < ::Module
+  FUN = (( class FUN__ < ::Module
+
+    def three_streams
+      self::Three_streams
+    end
 
     def stdin
-      FUN::Stdin_
+      self::Stdin
     end
 
     def stdout
-      FUN::Stdout_
+      self::Stdout
     end
 
     def stderr
-      FUN::Stderr_
-    end
-
-    def three_streams
-      FUN::Three_streams_
+      self::Stderr
     end
 
     def program_basename
-      @program_basename ||= -> { ::File.basename $PROGRAM_NAME }
+      @program_bn_p ||= -> { ::File.basename $PROGRAM_NAME }
     end
-  end
 
-  FUN = FUN_.new
+    def const_values_at * i_a
+      i_a.map { |i| const_get i, false }
+    end
+
+    self
+  end )).new
 
   module FUN
-    Stdin_  = -> { $stdin  }      # (these is slogging their way upwards)
-    Stdout_ = -> { $stdout }
-    Stderr_ = -> { $stderr }
-    Three_streams_ = -> { [ Stdin_[], Stdout_[], Stderr_[] ] }
-    At__ = -> *i_a { i_a.map { |i| send i } }
-    define_singleton_method :at, & At__
+
+    _Headless = Face::Services::Headless
+
+    Stdin = -> do
+      _Headless::System::IO.some_stdin_IO
+    end
+
+    Stdout = -> do
+      _Headless::System::IO.some_stdout_IO
+    end
+
+    Stderr = -> do
+      _Headless::System::IO.some_stderr_IO
+    end
+
+    Three_streams = -> do
+      [ Stdin[], Stdout[], Stderr[] ]
+    end
+
   end
 end

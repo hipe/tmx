@@ -94,7 +94,7 @@ module Skylab::PubSub
 
     -> do
 
-      constantify = MetaHell::Services::Headless::Name::FUN.constantify
+      constantify = MetaHell::Services::Headless::Name::FUN::Constantify
 
       define_method :box_module= do |box_mod|
         @produce_event_class_hookback = -> key_a, kls do
