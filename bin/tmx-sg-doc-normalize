@@ -1,0 +1,340 @@
+#!/usr/bin/env ruby -w
+
+exit( -> sin, sout, serr, argv, program_name do
+
+  y = ::Enumerator::Yielder.new( & serr.method( :puts ) )
+  _OK = 0 ; _NOPE = 1
+
+  subsystem = -> i do
+    defined? ::Skylab or require_relative '../lib/skylab'
+    ::Skylab.const_defined?( i, false ) or
+      require "skylab/#{ i.downcase }/core"
+    ::Skylab.const_get i, false
+  end
+
+  _Hi = hi = -> s do "\e[32m#{ s }\e[0m" end
+  hdr = _Hi
+  kw = -> s { "\e[32m<#{ s }>\e[0m" }
+
+  prgnm = -> do
+    ::File.basename $PROGRAM_NAME
+  end
+
+  require 'highline/import' ; require 'set'
+
+  # imaginary module begin
+
+    _Indenter = -> ind_s, y_ do
+      ::Enumerator::Yielder.new do |s|
+        y_ << "#{ ind_s }#{ s }"
+      end
+    end
+
+    _Currier = ::Class.new.class_exec do
+      class << self ; alias_method :orig_new, :new end
+      def self.new * i_a
+        ::Class.new( self ).class_exec do
+          class << self ; alias_method :new, :orig_new end
+          const_set :I_A__, i_a.freeze
+          ivar_a = nil
+          _Thin_Sheet = ::Module.new.module_exec do
+            ivar_a = i_a.map do |i|
+              ivar =  :"@#{ i }" ; meth = :"#{ i }="
+              define_method meth do
+                instance_variable_set ivar, @_x_a.shift ; nil
+              end ; private meth
+              ivar
+            end.freeze
+            self
+          end
+          const_set :IVAR_A__, ivar_a
+          include _Thin_Sheet
+          self
+        end
+      end
+      def self.[] * x_a
+        new.initial_iambic_notify x_a
+      end
+      def initialize
+      end
+      def initial_iambic_notify x_a
+        @_remaining = ::Set.new self.class::I_A__
+        absorb_iambic x_a
+        step
+      end
+    private
+      def step
+        @_remaining.length.zero? ? execute : self
+      end
+    public
+      def initialize_copy set, ivar_x_a
+        @_remaining = set
+        while ivar_x_a.length.nonzero?
+          instance_variable_set ivar_x_a.shift, ivar_x_a.shift
+        end ; nil
+      end  ; protected :initialize_copy  # upgrade it
+    protected
+      def absorb_iambic x_a
+        @_x_a = x_a ; while x_a.length.nonzero?
+          i = x_a.shift
+          @_remaining.delete i
+          send :"#{ i }="
+        end ; @_x_a = nil ; nil
+      end
+    public
+      def curry * x_a
+        otr = dupe
+        otr.absorb_iambic x_a
+        otr
+      end
+      def [] * x_a
+        otr = dupe
+        otr.absorb_iambic x_a
+        otr.execute
+      end
+    private
+      def dupe
+        otr = self.class.new
+        _ivar_x_a = get_ivars_for_dupe
+        _set = @_remaining.dup
+        otr.initialize_copy _set, _ivar_x_a
+        otr
+      end
+      def get_ivars_for_dupe
+        self.class::IVAR_A__.reduce [] do |m, i|
+          instance_variable_defined? i or next m
+          m << i << instance_variable_get( i )
+        end
+      end
+      self
+    end
+
+    _Yes_No_Prompt = _Currier.new( :y, :msg ).class_exec do
+      def execute
+        @do_show_choices = true ; @is_hot = true ; begin
+          @input_s = ask "#{ @msg }#{ any_yes_no_cancel_s }"
+          try_resolve
+        end while @is_hot
+        @result_x
+      rescue ::Interrupt => e
+        interrupted
+      rescue ::EOFError => e
+        _EOFed e
+      end
+    private
+      def any_yes_no_cancel_s
+        if @do_show_choices
+          yes_no_cancel_s
+        else
+          ": "
+        end
+      end
+      def yes_no_cancel_s
+        " (#{ styled_choice_s_a * '/' }): "
+      end
+      def styled_choice_s_a
+        [ "#{ hi 'y' }es", "#{ hi 'n' }o", "#{ hi 'c' }ancel" ]
+      end
+      define_method :hi, _Hi
+      def try_resolve
+        case @input_s
+        when /\Ay(?:e(?:s)?)?\z/i ; when_yes
+        when /\An(?:o)?\z/ ; when_no
+        when /\Ac(?:a(?:n(?:c(?:e(?:l)?)?)?)?)?\z/i ; when_cancel
+        else when_other end
+      end
+      def when_yes
+        @is_hot = false ; @result_x = [ nil, true ] ; nil
+      end
+      def when_no
+        @is_hot = false ; @result_x = [ nil, false ] ; nil
+      end
+      def when_cancel
+        @is_hot = false ; @result_x = 0
+        @y << "cancelled. ceasing further processing. goodbye." ; nil
+      end
+      def when_other
+        @do_show_choices = false
+        @y << "unrecognized input: #{ @input_s.inspect } - #{
+          }please enter #{ styled_choice_s_a * ' or ' }." ; nil
+      end
+      def interrupted
+        @y << "\ngoodbye." ; 0
+      end
+      def _EOFed e
+        @y << e.message ; 0
+      end
+      self
+    end
+
+    _Process_Docfile = _Currier.new( :be_verbose, :is_dry, :pn, :y
+                                   ).class_exec do
+      def get_ivars_for_dupe
+        a = super()
+        a.push :@check_SCM, @check_SCM
+        a.push :@yn, @yn
+        a
+      end
+      define_method :y= do
+        super()
+        @yn = _Yes_No_Prompt[ :y, @y ]
+        prepare_SCM_checker
+      end
+      def execute
+        yes = file_has_appropriate_looking_pathname
+        yes ? when_pathname_did_match : when_pathname_did_not_match
+      end
+    private
+      def file_has_appropriate_looking_pathname
+        @md = /\A\d{3}(?=[-a-zA-Z]+\.md\z)/.match @pn.basename.to_s
+      end
+      def when_pathname_did_not_match
+        @y << "does not look like documentation doc, skipping: #{ @pn }"
+        nil
+      end
+      def when_pathname_did_match
+        @identifier_digits_s = @md[ 0 ] ; @md = nil
+        @identifier_s = "[##{ @identifier_digits_s }]"
+        @identifier_placed_correctly_rx =
+          / :#{ ::Regexp.escape @identifier_s }\z/
+        look_at_first_line_and_maybe_alter_the_file
+      end
+      def look_at_first_line_and_maybe_alter_the_file
+        @fh = @pn.open 'r+'  # #open-filehandle NOTE
+        ( @first_line = @fh.gets ).chomp!
+        if @identifier_placed_correctly_rx =~ @first_line
+          when_first_line_looks_good
+        elsif @first_line.include? @identifier_s
+          when_first_line_is_incorrect_but_unfixable
+        else
+          when_first_line_is_a_fixit_candidate
+        end
+      end
+      def when_first_line_looks_good
+        @fh.close ; @y << "(looks good: #{ @pn })" ; nil
+      end
+      def when_first_line_is_incorrect_but_unfixable
+        @fh.close
+        @y << "notice: identifier #{ @identifier_s } may be #{
+          }formatted unconventionally:"
+        @y << " in #{ @pn }"
+        @y << "    #{ @first_line }" ; nil
+      end
+      def when_first_line_is_a_fixit_candidate
+        @new_line = "#{ @first_line } :#{ @identifier_s }"
+        r = it_is_OK_to_change_according_to_the_SCM
+        r and ask_to_make_that_change_and_then_make_it
+      end
+      def it_is_OK_to_change_according_to_the_SCM
+        es = @check_SCM[ @pn.to_s ]
+        es ? nil : true
+      end
+      define_method :prepare_SCM_checker do
+        p = subsystem[ :Git ]::FUN::SCM_check
+        @check_SCM = -> file_s do
+          p[ @y, [ file_s ], :be_verbose, true, :when_status, -> do
+            @y << "skipping: #{ prgnm[] } cannot make the following change #{
+              }because of the above:"
+            @y << "        in: #{ @pn }"
+            @y << "  new line: #{ @new_line }"
+            y << "##{ prgnm[] } will not procede because of this."
+            _NOPE
+          end ]
+        end ; nil
+      end
+      def ask_to_make_that_change_and_then_make_it
+        @y << " in file: #{ @pn }"
+        @y << "old line: #{ @first_line }"
+        @y << "new line: #{ @new_line }"
+        es, yes = @yn[ :msg, "OK to make that change?" ]
+        es or ( yes && make_that_change )
+      end
+      def make_that_change
+        tpn = ::Pathname.new( ::Dir.tmpdir ).join 'SEMUFOR.txt'
+        ofh = tpn.open 'w'
+        ofh.puts @new_line
+        count = 1
+        while (( line = @fh.gets ))
+          count += 1
+          ofh.write line
+        end
+        ofh.close
+        @fh.close
+        @y << "changed first line of #{ @pn } (#{ count } line(s))"
+        if @be_verbose
+          @y << "(tmpfile: #{ tpn })"
+        end
+        ::FileUtils.mv tpn, @pn, verbose: @be_verbose, noop: @is_dry
+        nil
+      end
+      require 'tmpdir' ; require 'fileutils'
+      self
+    end
+  # imaginary module end
+
+  invite = -> do
+    y << "try #{ hi[ "#{ prgnm[] } -h" ] } for help"
+    _OK
+  end
+  usage_string = -> do
+    "#{ prgnm[] } [-n] <dir>"
+  end
+  usage = -> do
+    y << "#{ hi[ 'usage:' ] } #{ usage_string[] }" ; _NOPE
+  end
+
+  require 'optparse'
+  op = ::OptionParser.new
+  es = nil ; be_verbose = is_dry = nil
+  op.on '-n', '--dry-run', 'dry run.' do
+    is_dry = true
+  end
+  op.on '-v', '--verbose', 'be verbose.' do
+    be_verbose = true
+  end
+  op.on '-h', '--help' do
+    usage[]
+    y << nil
+    y << "#{ hdr[ 'description:' ] } for the files in #{ kw[ 'dir' ] } that #{
+      }look like \"documents\","
+    yy = _Indenter[ '  ', y ]
+    yy << "append its marker to the first line of the file. it is always"
+    yy << "edit-in-place, so the file must be in a pristine state in your"
+    yy << "SCM (git for now)."
+    y << nil
+    y << "#{ hdr[ 'options:' ] }"
+    op.summarize( & y.method( :<< ) )
+    es = _OK
+  end
+  begin
+    op.parse! argv
+  rescue ::OptionParser::ParseError => e
+    y << "#{ e }"
+    break invite[]
+  end
+  es and break es
+
+  es = case argv.length
+  when 0 ; y << "expecting #{ kw[ 'dir' ] }" ; usage[] ; invite[]
+  when 1 ;
+  else   ; y << "unexpected argument: #{ argv.fetch( 1 ).inspect }"
+          usage[] ; invite[]
+  end
+  es and break es
+  dir_s = argv.shift
+
+  require 'pathname'
+  pathname = ::Pathname.new dir_s
+  process_child = _Process_Docfile[ :y, y, :is_dry, is_dry,
+                                    :be_verbose, be_verbose ]
+  pathname.children.each do |pn_|
+    es = process_child[ :pn, pn_ ]
+    es and break
+  end
+  es and break es
+
+  y << "done."
+
+  _OK
+
+end.call $stdin, $stdout, $stderr, ::ARGV, $PROGRAM_NAME )
