@@ -3,7 +3,7 @@
 :#storypoint-1
 
 this node is little more than a struct that wraps together one formal
-parametr and one "reqity" value.
+parameter and one "reqity" value.
 
 "reqity" is a term we straight up invented to refer to that property that is
 either :req, :opt or :rest, as seen in the result structure of ruby's
@@ -13,7 +13,14 @@ a lot of this node is concerned with making the argument object jive with
 the #parameter-reflection-API.
 
 the children nodes of this node (in this same file) is where it gets more
-interesting..
+interesting: the 'Syntax' child has an 'Isomorphic' subclass that implements
+the [#149] "argument syntax isomorphicism".
+
+this node's original (original) inspiration was is getting ruby to generate
+::ArgumentError exceptions that would contain useful messages in them
+"(wrong number of arguments (2 for 3)" but this isomorphicism soon leaked
+(it was mechanically stupid to do it this way, however fun). what it turned
+into is much, much more stupid and much more fun..
 
 
 :#storypoint-2

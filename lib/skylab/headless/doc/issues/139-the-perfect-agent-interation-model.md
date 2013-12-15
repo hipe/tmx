@@ -60,7 +60,7 @@ mechanisms include:
   iambic parameter lists. they are both more readable an more flexible.
 
 • ### schlurp
-  a nearby upcoming commit will explain and mark this #todo:before-merge
+  a nearby upcoming commit will explain and mark this #todo:during-merge
 
 • ### pass yourself in
   just pass yourself in and you (the child agent) just hack out what you

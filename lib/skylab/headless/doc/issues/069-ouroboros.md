@@ -1,5 +1,12 @@
 ## ouroboros - a snake eating its own tail is a thing in cultures :[#069]
 
+([#fa-044] is the official home for description of the ouroboros pattern.
+it is what facilates our oft-cited but never fully explained "turtles"
+analogy.)
+
+
+(EDIT: the below is historical only)
+
         ~ the following abbreviations will be used ~
 
 `rc` = request client  `mc` = mode (root-ish) client `c` = client

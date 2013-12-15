@@ -1,5 +1,8 @@
 # conduits, their collaborators, and their downstream by-products :[#078]
 
+(EDIT: most of this has been superceded by bundles, but it's still
+interesting, if you're me)
+
 the goal of this node is to present the folowing terms, and relate them to
 each other: `conduit`, `flusher`, `story`, `kernel`, `metaservices`.
 

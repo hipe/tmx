@@ -31,8 +31,9 @@ still premature in its current state, hence [#022] will be
 expected to be active for a while.
 
 at this time there exists in headless CLI code an empty stub method
-`resolve_upstream` that always results in true. human clients
-may want to rewrite that method simply to call this method for e.g.
+for resolving the upstream status (maybe a tuple?) that always results
+in a success value (probably `true`). human clients may want to rewrite
+that method simply to call this method, for e.g.
 
 we wanted to use the name `r-esolve_upstream` for the below method
 but that name is in common use already by other applications hand-

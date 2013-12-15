@@ -2,14 +2,26 @@
 
 we're putting this down here now as a point of reference without intending
 to articulate fully the tree model in its complete scope and vision, in
-all of the glory and splendor it radiates.
-
+all of the glory and splendor it radiates. but here's a summary:
 
 ## TL;DR:
 
 an application tree is just what it sounds like. but as a matter of principle
 we try to blur all kinds of lines in terms of what it means to be a root node.
-vs. a branch node vs. a leaf node.
+vs. a branch node vs. a leaf node; so tht we can build trees of trees, and
+so on.
+
+if nothing else, look at fig.2 of [#fa-044], which is an ASCII drawing
+of a client tree.
+
+
+
+## ground already covered here
+
+reading our [#069] piece on ouroboros will set you off chasing a rabbit
+(but you might catch a snake (and if you are the snake, you might catch
+yourself)).
+
 
 
 ## ground is already covered in [fa]
