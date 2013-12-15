@@ -31,7 +31,7 @@ module Skylab::Treemap
       end
     end
 
-    attr_reader :option_parser_blocks          # publicize it
+    attr_reader :any_option_parser_p_a          # publicize it
 
     attr_reader :option_parser_extension_blocks
 
@@ -72,7 +72,7 @@ module Skylab::Treemap
       @had_help = nil
       @option_documenter ||= nil
       @parsing_option_parser ||= nil
-      @option_parser_blocks ||= nil
+      @any_option_parser_p_a ||= nil
       @option_parser_extension_blocks ||= nil
 
       # what gets stored in @option_parser will dispatch requests to the
@@ -86,7 +86,7 @@ module Skylab::Treemap
     def build_option_parser
       _option_parser_ridiculous_host_is_initted and fail 'sanity'
       _option_parser_ridiculous_host_init
-      if option_parser_blocks
+      if any_option_parser_p_a
         CLI::Option::Ridiculous::Dispatch.new(
           :add_definition_block => method( :dispatch_definition_block ),
           :nil?                 => -> { false },
@@ -97,8 +97,8 @@ module Skylab::Treemap
     end
 
     def dispatch_definition_block block
-      option_parser_blocks
-      @option_parser_blocks.push block
+      any_option_parser_p_a
+      @any_option_parser_p_a.push block
       if @parsing_option_parser
         instance_exec @parsing_option_parser, & block
       else
@@ -106,7 +106,7 @@ module Skylab::Treemap
       end
       if @option_documenter
         @option_documenter.absorb_unseen_definition_blocks(
-          @option_parser_blocks, nil )
+          @any_option_parser_p_a, nil )
       else
         @option_documenter = nil
       end
@@ -115,7 +115,7 @@ module Skylab::Treemap
 
     def option_documenter
       if @option_documenter.nil?
-        a, b = option_parser_blocks, option_parser_extension_blocks
+        a, b = any_option_parser_p_a, option_parser_extension_blocks
         if a || b
           od = @option_documenter = CLI::Option::Documenter.new( self )
           # (note it is very important that you set the ivar right away.
@@ -132,7 +132,7 @@ module Skylab::Treemap
       @option_documenter
     end
 
-    [ :option_parser_blocks, :option_parser_extension_blocks ].each do |m|
+    [ :any_option_parser_p_a, :option_parser_extension_blocks ].each do |m|
       ivar = "@#{ m }".intern
       define_method m do
         a = instance_variable_get ivar
@@ -148,7 +148,7 @@ module Skylab::Treemap
 
     def parsing_option_parser
       if @parsing_option_parser.nil?
-        a = option_parser_blocks
+        a = any_option_parser_p_a
         if a
           op = @parsing_option_parser = ::OptionParser.new  # see note above
           a.each { |b| instance_exec op, &b } # (will change at etc.)

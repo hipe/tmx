@@ -60,7 +60,7 @@ module Skylab::Porcelain::Legacy
       @story.do_fuzzy = b
     end
 
-    def default_action norm_name, argv=nil
+    def default_action_i norm_name, argv=nil
       @story.set_default_action norm_name, argv
     end
 
@@ -230,14 +230,14 @@ module Skylab::Porcelain::Legacy
     Default_Action = ::Struct.new :normalized_name_path, :argv
 
     def set_default_action norm_name, argv=nil
-      @default_action and fail "won't clobber default action"
+      @default_action_i and fail "won't clobber default action"
       norm_name = [ norm_name ] if ! ( ::Array === norm_name )
       argv ||= [ ]
-      @default_action = Default_Action.new( norm_name, argv ).freeze
+      @default_action_i = Default_Action.new( norm_name, argv ).freeze
       nil
     end
 
-    attr_reader :default_action
+    attr_reader :default_action_i
 
     # `fetch_action_sheet` - result in one of three possible outcomes
     # (the third only possible when `do_fuzzy`):
@@ -365,7 +365,7 @@ module Skylab::Porcelain::Legacy
       @action_box.enumerator_class = Action::Enumerator
       @ancestors_seen_h = { }
       @do_fuzzy = true  # note this isn't used internally by this class
-      @default_action = nil
+      @default_action_i = nil
     end
   end
 
@@ -887,8 +887,8 @@ module Skylab::Porcelain::Legacy
   private
 
     def resolve_argv_empty
-      if self.class.story.default_action
-        da = self.class.story.default_action
+      if self.class.story.default_action_i
+        da = self.class.story.default_action_i
         # NOTE watch this, it is a bit of an abuse:
         resolve_action [ da.normalized_name_path, * da.argv ]
       else

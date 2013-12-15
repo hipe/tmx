@@ -61,7 +61,7 @@ module Skylab::Treemap
     end
 
     def build_option_parser       # rudimentary impl. that reads these defs,
-      a = self.class.option_parser_blocks  # if you're not using ridiculous
+      a = self.class.any_option_parser_p_a  # if you're not using ridiculous
       if a && a.length.nonzero?   # and etc. (e.g. adapter actions)
         @param_h ||= { }          # a common choice
         op = ::OptionParser.new
@@ -162,7 +162,7 @@ module Skylab::Treemap
     def __option_syntax_any_legacy
       # err on the side of futurism and assume we could have an option_parser
       # but have a zero length set of definitions for it
-      !! option_parser_blocks  # relies upon the sweetening from [#tr-009]
+      !! any_option_parser_p_a  # relies upon the sweetening from [#tr-009]
     end
 
     def __option_syntax_help_legacy f
@@ -262,7 +262,7 @@ module Skylab::Treemap
 
     #         ~ compat h.l ~
 
-    def default_action            # compat h.l
+    def default_action_i  # #hook-out [hl]
       :process                    # (`invoke` belongs to the framework
     end                           #  `execute` is for when we take no args)
 

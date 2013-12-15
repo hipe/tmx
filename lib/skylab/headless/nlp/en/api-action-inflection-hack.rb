@@ -122,8 +122,8 @@ module Skylab::Headless::NLP::EN::API_Action_Inflection_Hack # [#sl-123] exempt
           res = seen[-2]          # semantics - that is, they sometimes do *not*
           begin                   # have a meaningful name as far as we're
             o = seen[-3] or break # concerned here. So if there is such a
-            o.respond_to?( :action_box_module ) or break # module, we want to
-            o.action_box_module == res or break # `hop` over it, thereby
+            o.respond_to?( :unbound_action_box ) or break # module, we want to
+            o.unbound_action_box == res or break # `hop` over it, thereby
             hop = true            # not using it as a basis for our
           end while nil           # noun stem, but rather the const above it
           true

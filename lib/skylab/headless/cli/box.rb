@@ -12,7 +12,7 @@ module Skylab::Headless
 
     private
 
-      def default_action  # #hook-out
+      def default_action_i  # #hook-out
         :dispatch
       end
 
@@ -41,11 +41,11 @@ module Skylab::Headless
       end
     public
       def fetch_action_class_notify action_s  # storypoint-3
-        action_box_module.const_fetch action_s, method( :on_no_act )
+        unbound_action_box.const_fetch action_s, method( :on_no_act )
       end
     private
-      def action_box_module
-        self.class.action_box_module
+      def unbound_action_box
+        self.class.unbound_action_box
       end
       def on_no_act name_err
         exp_s = say_expting
@@ -87,7 +87,7 @@ module Skylab::Headless
     private  # ~ private #hook-in's to self
 
       def help *action  #hook-in # #storypoint-9
-        @queue[ 0 ] = default_action
+        @queue[ 0 ] = default_action_i
         help_screen help_yielder, *action
         true
       end
@@ -137,7 +137,7 @@ module Skylab::Headless
       end
 
       def gt_hot_child_a
-        action_box_module.each.reduce [] do |m, (_, cls)|
+        unbound_action_box.each.reduce [] do |m, (_, cls)|
           m << ( cls.new self )  # ich muss sein - we need a charged graph
         end
       end
@@ -175,14 +175,14 @@ module Skylab::Headless
       end
 
       def render_argument_syntax_term_with_alternation  # #todo - in branch?
-        stx = argument_syntax_for_method :dispatch
+        stx = argument_syntax_for_action_i :dispatch
         y = [ act_arg_stx_s ]
         render_base_arg_syntax_parts y, stx[ 1 .. -1 ]
         y * TERM_SEPARATOR_STRING_ if y.length.nonzero?
       end
       #
       def act_arg_stx_s sep_s=ALTERNATION_SEPARATOR_GLYPH__
-        _a = action_box_module.each.reduce [] do |m, (_, x)|
+        _a = unbound_action_box.each.reduce [] do |m, (_, x)|
           m << x.name_function.local.as_slug
         end
         kbd_p = say { method :kbd }

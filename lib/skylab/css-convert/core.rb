@@ -81,7 +81,7 @@ module Skylab::CssConvert
       result = :error
       begin
         set! or break
-        resolve_instream or break
+        resolve_instream_status_tuple or break
         p = CssConvert::Directive::Parser.new self
         d = p.parse_stream( io_adapter.instream ) or break
         if ! dump_directives d
@@ -96,7 +96,7 @@ module Skylab::CssConvert
         emit :help, usage_line
         emit :help, invite_line
       end
-      exit_status_for result
+      exitstatus_for_i result
     end
 
   protected  # #protected-not-private
@@ -108,9 +108,9 @@ module Skylab::CssConvert
   private
 
     def initialize sin, sout, serr
+      @default_action_i = nil
+      @IO_adapter = build_IO_adapter sin, sout, serr
       super( )
-      @default_action = nil
-      @IO_adapter = build_IO_adapter sin, sout, serr ; nil
     end
 
     def build_option_parser
@@ -137,7 +137,7 @@ module Skylab::CssConvert
 
     def ping _
       @IO_adapter.errstream.puts "hello from css-convert."
-      @default_action = :noop
+      @default_action_i = :noop
       @noop_result = :'hello_from_css-convert'
       nil
     end
@@ -146,8 +146,8 @@ module Skylab::CssConvert
       @noop_result
     end
 
-    def default_action
-      @default_action || :convert
+    def default_action_i
+      @default_action_i || :convert
     end
 
     DUMPABLE = {
@@ -187,8 +187,8 @@ module Skylab::CssConvert
 
     define_method :escape_path, & Headless::CLI::PathTools::FUN.pretty_path
 
-    def exit_status_for sym
-      :ok == sym ? 0 : -1
+    def exitstatus_for_i i
+      :ok == i ? 0 : -1
     end
 
     def formal_parameters_class

@@ -479,7 +479,7 @@ module Skylab::Porcelain::TestSupport
           end
         end
         context "that specifies a default of :foo" do
-          let(:body) { ->(_) { default_action :foo } }
+          let(:body) { ->(_) { default_action_i :foo } }
           context 'against an argv with no arguments' do
             let(:argv) { [] }
             context "it will run foo - the output" do
@@ -503,7 +503,7 @@ module Skylab::Porcelain::TestSupport
           end
         end
         context "that specifies a multi-argument default" do
-          let(:body) { ->(_) { default_action :foo, ['-x'] } }
+          let(:body) { ->(_) { default_action_i :foo, ['-x'] } }
           context "it works" do
             let(:argv) { [] }
             specify { should match(/unexpected argument.+-x/i) }

@@ -100,7 +100,7 @@ module Skylab::TanMan::TestSupport::Sexp
     end
 
 
-    def default_action
+    def default_action_i  # #hook-out [hl]
       :execute
     end
 
@@ -151,7 +151,7 @@ module Skylab::TanMan::TestSupport::Sexp
       ).invoke
     end
 
-    define_method :resolve_upstream do   # #watch'ed by [#hl-022] for dry
+    define_method :resolve_upstream_status_tuple do  # #watch'ed by [#hl-022] for dry
       ok = false                  # [#hl-023] exit-code aware, [#019] invite
       begin
         if upstream

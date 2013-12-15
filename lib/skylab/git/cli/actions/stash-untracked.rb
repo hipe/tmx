@@ -240,7 +240,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
 
     def last_hot_prgm_name
-      "#{ program_name } #{ Verb_lemma_hack_[ @downstream_action.class ] }"
+      "#{ program_name } #{ Verb_lemma_hack_[ @bound_downtree_action.class ] }"
     end
 
     def build_option_parser

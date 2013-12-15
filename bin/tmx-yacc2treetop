@@ -43,7 +43,7 @@ module Skylab::Yacc2Treetop
   end
   # end visual testing
 
-  class CliBase # experimental keep low level cli away from business logic
+  class CLI_Base # experimental keep low level cli away from business logic
     def run argv
       @result = nil
       @argv = argv
@@ -57,7 +57,7 @@ module Skylab::Yacc2Treetop
         error e.message
       end
       if ! @exit_ok
-        @queue.push default_action
+        @queue.push default_action_i
         catch(:early_exit){ @queue.each{ |meth| send meth } }
       end
       @result
@@ -133,10 +133,10 @@ module Skylab::Yacc2Treetop
     :progressive           => true
   }
 
-  class CLI < CliBase
+  class CLI < CLI_Base
   private
     def build_context;        ExecutionContext.new(@outstream, @errstream) end
-    def default_action;       :run_translate                               end
+    def default_action_i;       :run_translate                               end
     def usage_syntax_string; "#{program_name} [opts] {<yaccfile>|\"-\"}"   end
     def version_string;       VERSION                                      end
 

@@ -10,13 +10,13 @@ module Skylab::TanMan
       klass.send :init_autoloader, caller_locations( 1, 1 )[ 0 ]
     end
 
-    # `action_box_module` - this is the centerpiece of this class: this load
+    # `unbound_action_box` - this is the centerpiece of this class: this load
     # hack allows us to define only the barebones stuff in cli.rb and then
     # load the contents only lazily. (to be clear, we could do the above
     # with the autoloader alone but then we would have a deep, narrow
     # filetree (?).)
 
-    def self.action_box_module
+    def self.unbound_action_box
       if ! const_defined? :Actions, false
         require dir_pathname.to_s
       end

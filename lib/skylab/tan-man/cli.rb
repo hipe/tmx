@@ -202,9 +202,9 @@ module Skylab::TanMan
   class CLI::Actions::Tell < CLI::Action       # YIKES look how ridiculous
                                                # this "shortcut" is! (neat too)
 
-    @desc_blocks = CLI::Actions::Graph::Tell.desc_blocks
+    @desc_p_a = CLI::Actions::Graph::Tell.any_description_p_a
 
-    @option_parser_blocks = CLI::Actions::Graph::Tell.option_parser_blocks
+    @any_option_parser_p_a = CLI::Actions::Graph::Tell.any_option_parser_p_a
 
     def process *word
       api_invoke [:graph, :tell], { words: word }.merge( @param_h )

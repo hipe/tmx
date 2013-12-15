@@ -33,7 +33,7 @@ module Skylab::TanMan
           else
             use = true
           end
-          if mod.respond_to? :action_box_module  # #icky-reflection
+          if mod.respond_to? :unbound_action_box  # #icky-reflection
             use = false
           end
         end
@@ -50,7 +50,7 @@ module Skylab::TanMan
 
     def build_option_parser
       o = TanMan::Services::OptionParser.new
-      a = self.class.option_parser_blocks
+      a = self.class.any_option_parser_p_a
       if a
         a.each do |b|
           instance_exec o, &b
@@ -87,7 +87,7 @@ module Skylab::TanMan
     end
 
     def self.unbound_invocation_method # #compat-bleeding
-      instance_method default_action
+      instance_method default_action_i
     end
 
     # --*--
@@ -225,7 +225,7 @@ module Skylab::TanMan
       end
     end
 
-    def default_action # #compat-headless
+    def default_action_i # #compat-headless
       :process
     end
 

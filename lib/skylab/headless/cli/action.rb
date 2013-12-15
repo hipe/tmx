@@ -24,11 +24,11 @@ module Skylab::Headless
     #         ~ option parser facility - module methods ~
 
     def option_parser &block      # dsl-ish that just accrues these for you.
-      ( @option_parser_blocks ||= [ ] ) << block # turning it into an o.p.
+      ( @any_option_parser_p_a ||= [ ] ) << block # turning it into an o.p.
       nil                         # is *your* responsibility. depends on what
     end                           # happens in your `build_option_parser` if any
 
-    attr_reader :option_parser_blocks  # nil when none yet added.
+    attr_reader :any_option_parser_p_a  # nil when none yet added.
 
     #         ~ argument syntax rendering - module methods ~
 
@@ -54,11 +54,11 @@ module Skylab::Headless
           lines.each(& y.method( :yield ) )
         end
       end
-      ( @desc_blocks ||= [ ] ) << block
+      ( @any_description_p_a ||= [ ] ) << block
       nil
     end
 
-    attr_reader :desc_blocks
+    attr_reader :any_description_p_a
   end
 end
 module ::Skylab::Headless  # #todo:during-merge
@@ -102,7 +102,7 @@ module ::Skylab::Headless  # #todo:during-merge
 
     module ModuleMethods
       def any_option_parser_blocks
-        option_parser_blocks
+        any_option_parser_p_a
       end
     end
   end

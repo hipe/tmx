@@ -16,7 +16,7 @@ module Skylab::TanMan
 
   private
 
-    def argument_syntax_for_method i
+    def argument_syntax_for_action_i i
       if :process == i then argument_syntax else super end
     end
 

@@ -13,7 +13,7 @@ module Skylab::Face
         if a.length.nonzero? && ! b
           external_depedencies_ivar
         elsif external_dependencies_ivar.nil?
-          self.class_eval(& Skylab::Dependency::Interface::CliCommands)
+          self.class_eval(& Skylab::Dependency::Interface::CLI_Commands)
           @external_dependencies = nil
           # @todo in #099 Skylab::Dependency::Primordial.new
         end

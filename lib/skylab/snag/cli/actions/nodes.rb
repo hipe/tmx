@@ -79,7 +79,7 @@ module Skylab::Snag
         a.on_invalid_node do |e|
           info '---'
           e2 = Snag::API::Events::Lingual.new :esg, # hack  # #todo
-            nil, @downstream_action,  # no stream name / what we collapsed to
+            nil, @bound_downtree_action,  # no stream name / what we collapsed to
             "##{ invalid_node_message e }"
           handle_error[ e2 ]  # whether or not it is an error is sort of a
         end                   # soft design concern

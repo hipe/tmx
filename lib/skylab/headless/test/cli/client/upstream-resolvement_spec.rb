@@ -12,7 +12,7 @@ module Skylab::Headless::TestSupport::CLI::Client
         class Foo_UR
           Headless::CLI::Client[ self ]
         private
-          def default_action ; :hi end
+          def default_action_i ; :hi end
           def hi flerp
             @IO_adapter.errstream.puts "ok: #{ flerp }"
             :_ok_
@@ -46,7 +46,7 @@ module Skylab::Headless::TestSupport::CLI::Client
       with_client_class do
         class Bar_UR
           Headless::CLI::Client[ self ]
-          def default_action ; :gerp end
+          def default_action_i ; :gerp end
           def gerp input_file_nombre=nil
             io = @IO_adapter.instream  ; m = []
             while (( line = io.gets ))
@@ -56,8 +56,8 @@ module Skylab::Headless::TestSupport::CLI::Client
             :_wazzle_
           end
         private
-          def resolve_upstream
-            resolve_instream
+          def resolve_upstream_status_tuple
+            resolve_instream_status_tuple
           end
           self
         end

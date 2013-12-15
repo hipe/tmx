@@ -120,7 +120,7 @@ module Skylab::Headless
 
       # ~ things that will turn into services  # #todo:during-merge
 
-      def resolve_instream  # (the probable destination of [#022], in flux)
+      def resolve_instream_status_tuple  # (the probable destination of [#022], in flux)
         CLI::Client::Bundles__::Resolve_upstream[ self ]
       end
 
@@ -158,7 +158,7 @@ module Skylab::Headless
       MMs__ = -> do
       private
         def default_action foo  # #storypoint-980
-          define_method :default_action do foo end ; nil
+          define_method :default_action_i do foo end ; nil
         end
       end
 

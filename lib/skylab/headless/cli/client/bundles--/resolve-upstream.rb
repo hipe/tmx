@@ -10,7 +10,7 @@ module Skylab::Headless
         # #todo:during-merge use schlurp
         @argv = client.instance_variable_get :@argv
         @err_p = client.method :emit_error_line
-        @get_stx_p = client.method :argument_syntax_for_method
+        @get_stx_p = client.method :argument_syntax_for_action_i
         @par_lbl_p = client.method :parameter_label
         @IO_adptr = client.instance_variable_get :@IO_adapter
         @instream = @IO_adptr.instream

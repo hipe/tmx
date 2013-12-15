@@ -114,7 +114,7 @@ module Skylab::SubTree
 
     def execute
       begin
-        r = resolve_upstream or break
+        r = resolve_upstream_from_i_and_OK or break
         r = resolve_extensions or break
         @traversal = self.class::Traversal_.new(
           :info_p, @infostream.method( :puts ),
@@ -126,7 +126,7 @@ module Skylab::SubTree
       r
     end
 
-    def resolve_upstream
+    def resolve_upstream_from_i_and_OK
       i = Upstream_resolver_[ @upstream, @path_a, @file, @pattern,
         method( :mention ),
         -> io { @upstream = io },

@@ -62,8 +62,8 @@ module Skylab::Headless
         some_act_cls.desc do |y|
           me = self
           @request_client.instance_exec do
-            if @downstream_action
-              me.object_id == @downstream_action.object_id or
+            if @bound_downtree_action
+              me.object_id == @bound_downtree_action.object_id or
                 change_to me
             else
               collapse_to me  # #jump-3
@@ -76,7 +76,7 @@ module Skylab::Headless
       def method_added meth_i  # #storypoint-8  #hook-in to ruby.
         self.DSL_is_disbld or begin
           _const_i = Autoloader::FUN::Constantize[ meth_i ]
-          action_box_module.const_set _const_i, some_act_cls
+          unbound_action_box.const_set _const_i, some_act_cls
           @act_cls_in_progress = nil
         end
       end
@@ -103,7 +103,7 @@ module Skylab::Headless
         box = self
         ::Class.new( leaf_act_supercls ).class_exec do
           extend Leaf_MMs__
-          const_set :ACTIONS_ANCHOR_MODULE, box.action_box_module  # #jump-1
+          const_set :ACTIONS_ANCHOR_MODULE, box.unbound_action_box  # #jump-1
           include Leaf_IMs__
           @tug_class = MAARS::Tug
           define_method :argument_syntax do  # #storypoint-2
@@ -130,7 +130,7 @@ module Skylab::Headless
       end
     end
     module MMs__  # (still in #storypoint-7)
-      def action_box_module  # :#jump-1. must be public
+      def unbound_action_box  # :#jump-1. must be public
         if const_defined? ACTIONS_CONST_I__, false
           const_get ACTIONS_CONST_I__, false
         else
@@ -177,7 +177,7 @@ module Skylab::Headless
       include CLI::Box::InstanceMethods
 
       def initialize * _
-        @downstream_action = @is_leaf = @option_parser = @prev_frame = nil
+        @bound_downtree_action = @is_leaf = @option_parser = @prev_frame = nil
         @queue = []
         super( * _ )
       end
@@ -234,36 +234,36 @@ module Skylab::Headless
       end
 
       def change_to hot
-        @downstream_action = hot
+        @bound_downtree_action = hot
         @is_leaf = hot.is_leaf
         @option_parser = hot.option_parser
         @queue[ 0 ] = hot.leaf_method_name ; nil
       end
 
       def uncollapse_from leaf_i  # #storypoint-60
-        leaf_i == @downstream_action.normalized_local_action_name or
+        leaf_i == @bound_downtree_action.normalized_local_action_name or
           raise "sanity - expected '#{ i }' had .."
         @is_leaf = @prev_frame.is_leaf
         @prev_frame.is_leaf = nil
         @option_parser = @prev_frame.option_parser
         @prev_frame.option_parser = nil
-        @downstream_action = nil ; nil
+        @bound_downtree_action = nil ; nil
       end
 
-      def default_action  # #hook-out
-        @default_action ||= :dispatch
+      def default_action_i  # #hook-out
+        @default_action_i ||= :dispatch
       end
 
       # ~ #storypoint-80 #hook-in to facilities to customize them
 
       def normalized_invocation_string as_collapsed=true
         a = [ super() ]
-        is_collapsed && as_collapsed and a << @downstream_action.name.as_slug
+        is_collapsed && as_collapsed and a << @bound_downtree_action.name.as_slug
         a * TERM_SEPARATOR_STRING_
       end
 
       def is_collapsed
-        @downstream_action
+        @bound_downtree_action
       end
 
       def build_option_parser  # popular default, :+[#037] box who builds own
@@ -306,16 +306,16 @@ module Skylab::Headless
       end
 
       def argument_syntax_when_collapsed
-        argument_syntax_for_method @downstream_action.
+        argument_syntax_for_action_i @bound_downtree_action.
           normalized_local_action_name
       end
 
       def argument_syntax_when_not_collapsed
-        argument_syntax_for_method :dispatch
+        argument_syntax_for_action_i :dispatch
       end
 
       def render_argument_syntax syn, em_range=nil  # [#063] a hybrid'n smell
-        if is_collapsed && @downstream_action.class.append_syntax_a
+        if is_collapsed && @bound_downtree_action.class.append_syntax_a
           "#{ super } #{ render_downstream_action_append_syntax_a }"
         else
           super
@@ -323,13 +323,13 @@ module Skylab::Headless
       end
 
       def render_downstream_action_append_syntax_a
-        @downstream_action.class.append_syntax_a * TERM_SEPARATOR_STRING_
+        @bound_downtree_action.class.append_syntax_a * TERM_SEPARATOR_STRING_
       end
 
       def invite_line z=nil  # [#063] a smell from hybridiaztion
         if is_collapsed
           render_invite_line "#{ normalized_invocation_string false } -h #{
-            }#{ @downstream_action.name.as_slug }", z
+            }#{ @bound_downtree_action.name.as_slug }", z
         else
           super
         end
@@ -338,16 +338,16 @@ module Skylab::Headless
       def build_desc_lines  # #storypoint-98, :#jump-2, [#063] smell
         x = super
         if is_collapsed
-          uncollapse_from @downstream_action.normalized_local_action_name
+          uncollapse_from @bound_downtree_action.normalized_local_action_name
         end ; x
       end
 
       def enqueue_help  # #storypoint-99
-        norm_i = @downstream_action.normalized_local_action_name
+        norm_i = @bound_downtree_action.normalized_local_action_name
         @queue.first == norm_i or fail 'sanity'
         @queue.shift  # done processing the name, shift it off
         enqueue_help_as_box norm_i
-        @downstream_action = nil ; nil
+        @bound_downtree_action = nil ; nil
       end
     end
 
@@ -361,7 +361,7 @@ module Skylab::Headless
       attr_reader :build_option_parser_p
       def build_option_parser &p  # this is the DSL block writer, gets called
         p or raise ::ArgumentError, "block required."
-        option_parser_blocks and raise ::ArgumentError, "bop must be before op"
+        any_option_parser_p_a and raise ::ArgumentError, "bop must be before op"
         @build_option_parser_p = p ; nil
       end
       def option_parser_class x

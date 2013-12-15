@@ -9,7 +9,7 @@ module Skylab::Headless
       @queue ||= []               # essential here, must can be set elsewhere
       res = parse_opts @argv      # passed as arg so descendents can play dumb
       if true == res              # we check this a lot for [#hl-019], [#hl-023]
-        @queue.push default_action if @queue.length.zero?
+        @queue.push default_action_i if @queue.length.zero?
         begin                     # for each item on the queue, execute it but
           res, meth, args = normalize_callable @queue.first
           true == res or break
@@ -42,7 +42,7 @@ module Skylab::Headless
       @queue.push mixed_callable
     end
 
-    def exit_status_for sym       # [#hl-023] hook for exit statii if u want
+    def exitstatus_for_i sym       # [#hl-023] hook for exit statii if u want
     end
 
     def normalize_callable x
@@ -83,7 +83,7 @@ module Skylab::Headless
         [ true, method( sym ), args.first ]  # that was on the queue.)
       else
         @upstream_is_collapsed ||= begin  # experimental one-time hook [#hl-022]
-          @upstream_status = resolve_upstream  # clients can define this to get
+          @upstream_status = resolve_upstream_status_tuple  # clients can define this to get
           true                    # this hook called once, used in execution
         end                       # here as a prerequisite for below.
         if true == @upstream_status
@@ -153,7 +153,7 @@ module Skylab::Headless
                                   # that will use `argument_syntax` on objects
                                   # that haven't been invoked yet.)
 
-    def resolve_upstream          # out of the box we make no assumtions about
+    def resolve_upstream_status_tuple  # out of the box we make no assumtions about
       true                        # what your upstream should be, but per
     end                           # [#hl-023] this must be literally true for ok
 
@@ -165,7 +165,7 @@ module Skylab::Headless
     # have a strange effect..)
 
     def help
-      @queue[ 0 ] = default_action  # always this is the action we show.
+      @queue[ 0 ] = default_action_i  # always this is the action we show.
       help_screen help_yielder
       true
     end
@@ -367,9 +367,9 @@ module Skylab::Headless
     end
 
     def raw_desc_lines
-      if self.class.respond_to?( :desc_blocks ) and self.class.desc_blocks
+      if self.class.respond_to?( :any_description_p_a ) and self.class.any_description_p_a
         Headless::Services::Enumerator::Lines::Producer.new do |y|
-          self.class.desc_blocks.each do |blk|
+          self.class.any_description_p_a.each do |blk|
             instance_exec y, &blk
           end
         end
@@ -518,7 +518,7 @@ module Skylab::Headless
           option_parser.parse!( argv ) { |b| instance_exec(& b ) } # hack
         rescue Headless::Services::OptionParser::ParseError => e
           usage_and_invite e.message
-          res = exit_status_for :parse_opts_failed
+          res = exitstatus_for_i :parse_opts_failed
         end
       end while nil
       if true == res && param_queue_ivar
@@ -566,16 +566,16 @@ module Skylab::Headless
       sym = if queue && @queue.length.nonzero? && ::Symbol === @queue.first
         @queue.first  # (it looks wrong, but does it need fixing?)
       else
-        default_action
+        default_action_i
       end
-      argument_syntax_for_method sym
+      argument_syntax_for_action_i sym
     end
 
     def argument_syntax_cache     # (right now little is lost and little is
       @argument_syntax_cache_h ||= { }  # gained by this but watch out near
     end                           # box / dsl)
 
-    def argument_syntax_for_method meth_x
+    def argument_syntax_for_action_i meth_x
       meth_i = meth_x.intern
       argument_syntax_cache.fetch meth_i do
         @argument_syntax_cache_h[ meth_i ] = build_arg_stx meth_i
@@ -645,7 +645,7 @@ module Skylab::Headless
     end.call
 
     def validate_arity_for meth_i, args
-      r = argument_syntax_for_method meth_i
+      r = argument_syntax_for_action_i meth_i
       r &&= with_argument_syntax_process_args( r, args )
       r
     end
@@ -671,7 +671,7 @@ module Skylab::Headless
 
     def handle_missing_args_vertical e
       usage_and_invite "expecting: #{ render_expecting_term e }"
-      exit_status_for :argv_parse_failure_missing_required_arguments
+      exitstatus_for_i :argv_parse_failure_missing_required_arguments
     end
 
     def render_expecting_term e
@@ -693,7 +693,7 @@ module Skylab::Headless
         _near_s = " at #{ ick token_set.to_a.first }"
       end
       usage_and_invite "expecting { #{ _s } }#{ _near_s }"
-      exit_status_for :argv_parse_failure_missing_required_arguments
+      exitstatus_for_i :argv_parse_failure_missing_required_arguments
     end
 
     def handle_args_result_struct st
@@ -709,7 +709,7 @@ module Skylab::Headless
       a = e.s_a
       usage_and_invite "unexpected argument#{ s a }: #{ ick a[0] }#{
         }#{" [..]" if a.length > 1 }"
-      exit_status_for :argv_parse_failure_unexpected_arguments
+      exitstatus_for_i :argv_parse_failure_unexpected_arguments
     end
 
     #         ~ `parameters` - abstract reflection and rendering ~

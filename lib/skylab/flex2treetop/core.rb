@@ -241,8 +241,8 @@ module Skylab::Flex2Treetop
     Headless::CLI::Client[ self ]
 
     def initialize( * )
+      @default_action_i = nil
       super
-      @default_action = nil
     end
 
     public :info                  # translation uses it directly, at odds with
@@ -307,15 +307,15 @@ module Skylab::Flex2Treetop
     def ping _
       @IO_adapter.errstream.puts "hello from flex2treetop."
       @noop_result = :hello_from_flex2treetop
-      @default_action = :noop
+      @default_action_i = :noop
     end
 
     def noop
       @noop_result
     end
 
-    def default_action
-      @default_action || :translate
+    def default_action_i
+      @default_action_i || :translate
     end
 
     def formal_parameters_class
@@ -347,7 +347,7 @@ module Skylab::Flex2Treetop
     end
 
     def translate flexfile
-      res = resolve_instream
+      res = resolve_instream_status_tuple
       if res
         res = Translation.new( self ).invoke
       end

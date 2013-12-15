@@ -76,7 +76,7 @@ module Skylab::TestSupport::Regret::API
         # can display without there needing to be a valid input stream.)
         snitch
         r = validate_appearances or break r
-        ok, up = resolve_upstream
+        ok, up = resolve_upstream_status_tuple
         ok or break up
         up and bs = DocTest::Comment_::Block::Scanner[ @sn, up ]
         sp = build_specer @sn
@@ -111,7 +111,7 @@ module Skylab::TestSupport::Regret::API
       DocTest::Models_
     end
 
-    def resolve_upstream
+    def resolve_upstream_status_tuple
       if ! @path then [ true, nil ] else
         up, e = get_up_or_error
         if up then [ true, up ]

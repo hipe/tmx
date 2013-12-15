@@ -1,6 +1,6 @@
 module Skylab::Dependency
   module Interface
-    CliCommands = lambda do |_|
+    CLI_Commands = lambda do |_|
       o do |op, req|
         extend Headless::CLI::PathTools::InstanceMethods
         item_name = @parent.name
