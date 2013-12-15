@@ -39,14 +39,31 @@ orthogonality of API's, all other things being equal, tree-like interface /
 controller structures should pass relevant resources and information from
 outside-in.
 
-at its surface (pun intended) it sounds simple and straightforward, much like
-the DOM event model in a web browser (you click on a thing, e.g, and it bubbles
-from outside in until something intercepts it).
+at its surface (pun intended) it sounds simple and straightforward.  it is
+bit like the reverse of the DOM event model in a web brower, where a component
+(like a button) receives an event (like a click), and may indicate a handler
+("callback") make to handle such events, and if it does not handle the event
+the event "bubbles up" out to larger and larger components until it finds
+one (if any) that wants the event.
 
-however when brass tacks are put down to where the rubber hits the road, it's
+in our case (what we now call the [#hl-010] "client tree model"), the event
+is received by the outermost component and gets "bubbled in" to successive
+layers of component whereby at each level, all the component needs to to
+is either ignore the incoming event, respond to to the incoming event, or
+dispatch it downwards (and the the the response is typically bubbled back
+upwards in a similar manner).
+
+this is illustrated in [#hl-028] "the stratified event production model".
+
+
+
+## stratified event handling, production and distribution applied
+
+when brass tacks are put down to where the rubber hits the road, it's
 possible to cut off your nose on a grindstone to spite your face. er ..
 
-the "mechanics" node is controller-y so it is tempting to have that be the
+to jump ahead for a second, the "mechanics" node (or "kernel" if you like)
+has a domain of concern that is controller-y so it's tempting to have that be the
 "source" of things like @y, for e.g. But we write this note here for ourselves
 to remind ourselves that that's not how we want face CLI to work. the API user
 should be able to customize the value of a relevant resource by setting it as
@@ -99,9 +116,37 @@ avoid having our implementation methods bump into our business action methods.
 We like exploiting the isomorphicism of public methods as business actions
 (it is not only an elegant and cute-sy hack, but it mirrors the deeper spirit
 of the whole project); yet in practice the design can feel kludgy and does
-not scale (a class with a restricted public method namespace makes objects
+not scale: a class with a restricted public method namespace makes objects
 that are quite hard to design interactions with at levels lower than the one
-of human interaction). To address this we further granulate our mother with
+of human interaction.
+
+to restate it in more formal (if not clear) terms, the issue with :[#037] is
+this: you cannot both exploit the 'method_added' hack and have a class that is
+useful and future-proof without reconciling the fact that your business
+namespace will always be at odds with the API namespace if they are both
+drawing from the same method namespace.
+
+indeed this same problem is illustrated in the dynamic of using a ::Struct
+class: look at every instance method that ::Struct defines. what if you want
+to define a struct member with that same name? what should happend? what does
+happen is that your member name trumps that instance method name, and you
+simply can no longer access that method, with this being the only consequence.
+
+in the case of facilities like ours that have exploited the 'method_added'
+hook, to date we do not fail so gracefully. the simplest way to appreciate
+this is to take this case: two methods that are a part of our public API
+for CLI clients are the `initialize` method (it takes three arguments for
+the three streams) and the invoke method.
+
+but what if in your business box action you want to use the verb 'initialize'
+or 'invoke' for your action names? you really can't with just the method
+added hack alone. there are of course a number of ways around this..
+
+
+
+## the matryoshka doll as one experimental solution to this.
+
+To address this we further granulate our mother with
 the idea that the DSL-ly nodes be broken into two parts, one "surface" and one
 "mechanics":
 
