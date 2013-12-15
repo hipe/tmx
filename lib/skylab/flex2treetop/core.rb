@@ -224,7 +224,7 @@ module Skylab::Flex2Treetop
   private
 
     def initialize
-      super [], [], $stderr, nil, nil, API::Pen.new
+      super [], [], :_not_stderr_, nil, nil, API::Pen.new
     end
   end
 

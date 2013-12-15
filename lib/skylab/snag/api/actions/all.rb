@@ -8,7 +8,7 @@ nerps = ::Pathname.glob(root.join('lib/skylab/*/doc/issues.md').to_s)
 
 re = %r{\A#{::Regexp.escape(root.to_s)}/lib/skylab/([^/]+)}
 
-err = $stderr
+err = STDERR
 
 nerps.each do |path|
   title = re.match(path.to_s)[1]

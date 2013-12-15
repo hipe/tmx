@@ -20,6 +20,7 @@ module Skylab::Face
     NUM_BYTES = 4096
 
     def open2 cmd, sout=nil, serr=nil, &b
+      _STDOUT = ::STDOUT ; _STDERR = ::STDERR
       on = Handler.new
       sout and on.out { |s| sout.write(s) }
       serr and on.err { |s| serr.write(s) }
@@ -36,8 +37,8 @@ module Skylab::Face
         on.out { |s| omnibuffer.write(s) }
         on.err { |s| omnibuffer.write(s) }
       else
-        on._out.nil? and on.out { |s| $stdout.write(s) ; $stdout.flush }
-        on._err.nil? and on.err { |s| $stderr.write(s) ; $stderr.flush }
+        on._out.nil? and on.out { |s| _STDOUT.write(s) ; _STDERR.flush }
+        on._err.nil? and on.err { |s| _STDERR.write(s) ; _STDERR.flush }
       end
       bytes = 0
       time = Time.now

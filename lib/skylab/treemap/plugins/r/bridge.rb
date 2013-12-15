@@ -39,7 +39,7 @@ module Skylab::Treemap
       nil
     end
 
-    include Headless::System::InstanceMethods # `system.which`
+    include Headless::System::InstanceMethods  # `system.which`
 
     def error msg
       emit :error, msg

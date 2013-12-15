@@ -38,8 +38,8 @@ module Skylab::TanMan::TestSupport::Sexp
       o
     end
 
-    let :infostream do
-      $stderr # #kiss
+    def infostream
+      Headless::System::IO.some_stderr_IO
     end
 
     let :_input_fixtures_dir_pathname do

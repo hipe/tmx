@@ -1054,7 +1054,7 @@ module Skylab::Headless::TestSupport::Plugin
       end
     end
 
-    TestSupport::Coverage::Muncher.munch '--cover', $stderr,
+    TestSupport::Coverage::Muncher.munch '--cover', ::STDERR,
       -> do
         Headless::Headless::Plugin.dir_pathname.to_s
       end, ::ARGV

@@ -20,8 +20,8 @@ module Skylab::TestSupport
                                   # #hiccup constant because there is a
                                   # legitimate other module ::SL::TS::TS.
 
-  Stdout_ = -> { $stdout }        # littering our code with hard-coded globals
-  Stderr_ = -> { $stderr }        # (or constants, that albeit point to a
+  Stdout_ = -> { ::STDOUT }       # littering our code with hard-coded globals
+  Stderr_ = -> { ::STDERR }       # (or constants, that albeit point to a
                                   # resource like this (an IO stream)) is a
                                   # smell. we instead reference thme thru
                                   # these, which will at least point back to

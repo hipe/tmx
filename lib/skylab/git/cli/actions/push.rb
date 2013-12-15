@@ -110,7 +110,7 @@ module TmxGit
   end
 end
 module TmxGit
-  DefaultUi = Struct.new(:out, :err).new($stdout, $stderr)
+  Default_UI = ::Struct.new( :out, :err ).new ::STDOUT, ::STDERR
   module Push
     class InvalidRequestError < RuntimeError; end
     class CLI

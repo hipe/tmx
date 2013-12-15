@@ -70,7 +70,7 @@ module Skylab::Face
 
     # an object of a subclass of the `CLI` class is *the* "modality client".
     # it is the first node to "see" resources like ARGV and $stdin, $stdout,
-    # $stderr ; and is the only node in this ecosystem to "be given" such
+    # stderr ; and is the only node in this ecosystem to "be given" such
     # resources from the ruby ecosystem directly.
     #
     # this `CLI` class itself is a would-be #abstract-base-class - it is not
@@ -1512,7 +1512,7 @@ module Skylab::Face
         count
       end
 
-      ellipsify = -> a, num do    # ellipsify final line conditionally
+      ellipsify = -> a, num do    # ellipsify final line conditionally  #todo this is redundant with [#hl-045]
         if 0 <= num && num < a.length  # assumes a's len is w/in 1 of num
           a.pop
           if a.length.nonzero?

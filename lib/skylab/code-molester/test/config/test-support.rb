@@ -5,7 +5,7 @@ module Skylab::CodeMolester::TestSupport::Config
   ::Skylab::CodeMolester::TestSupport[ self ]
 
   module CONSTANTS
-    SE_ = $stderr
+    SE_ = ::STDERR
     Do_invoke_ = -> do
       a = ::ARGV
       if (( idx = a.index '-x' ))

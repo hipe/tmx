@@ -11,7 +11,7 @@ module Hipe
       def process_generate_dotfile_request ui, opts, model_file=nil
         @ui = ui
         @app_info = nil
-        ui.err = $stderr if ui.err == ui
+        ui.err == ui and ui.err = ::STDERR  # wat
         if model_file
           load_model_file_from_path model_file
         else

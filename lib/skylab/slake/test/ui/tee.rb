@@ -29,8 +29,8 @@ module Skylab::Slake::TestSupport
     define_method :initialize do |opt_h=nil|
       @silent = nil
       opt_h.each { |k, v| instance_exec( v, & opt_h_h.fetch( k ) ) } if opt_h
-      @out ||= new_tee[ silent, $stdout ]
-      @err ||= new_tee[ silent, $stderr ]
+      @out ||= new_tee[ silent, STDOUT ]
+      @err ||= new_tee[ silent, STDERR ]
     end
   end
 end

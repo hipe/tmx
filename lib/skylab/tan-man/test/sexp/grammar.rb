@@ -30,12 +30,14 @@ module Skylab::TanMan::TestSupport::Sexp
         "«#{ str }»"                # "guillemets" just for fun and practice
       end
 
-      define_method :initialize do |sin=$stdin, sout=$stdout, serr=$stderr|
+      sin, sout, serr = Headless::System::IO.to_three
+
+      define_method :initialize do |i=sin, o=sout, e=serr|
         # observe pattern [#sl-114]
 
-        @stdin = sin                # we keep this stream on deck but don't set
+        @stdin = i                  # we keep this stream on deck but don't set
                                     # upstream yet. it takes logix. [#hl-022]
-        self.io_adapter = build_IO_adapter nil, sout, serr, pen
+        self.io_adapter = build_IO_adapter nil, o, e, pen
         super()
       end
     end.call

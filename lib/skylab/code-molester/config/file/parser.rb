@@ -128,7 +128,7 @@ module Skylab::CodeMolester
       end
 
       y = -> do
-        stderr = Headless::CLI::IO.stderr
+        stderr = Headless::CLI::IO.some_errstream_IO
         ::Enumerator::Yielder.new { |msg| stderr.puts "cm: #{ msg }" }
       end.call
 

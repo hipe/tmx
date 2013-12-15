@@ -26,7 +26,7 @@ module Skylab
     end
     def parse_argv argv
       lines = nil
-      if $stdin.tty?
+      if instream.tty?
         if argv.empty?
           usage_error "expecting input from either STDIN or as <file1> [<file2] .."
         else
@@ -35,7 +35,7 @@ module Skylab
         end
       elsif argv.empty?
         lines = Enumerator.new do |y|
-          $stdin.each_line { |l| l.chomp! ; y << l }
+          instream.each_line { |l| l.chomp! ; y << l }
         end
       else
         usage_error "can't take input from both STDIN and as arguments <file1> [<file2] .."
@@ -50,8 +50,20 @@ module Skylab
       emit :info, msg
     end
     def emit type, msg
-      (:out == type ? $stdout : $stderr).puts msg
+      _IO[ :out == type ? :outstream : :errstream  ].puts msg ; nil
     end
+  private
+    def instream
+      _IO.instream
+    end
+    def _IO
+      @IO ||= omg_really
+    end
+    def omg_really
+      require_relative '../../core'
+      Headless::CLI::IO
+    end
+  public
     def help
       usage
       description
@@ -95,4 +107,3 @@ module Skylab
 end
 
 Skylab::QuiltModified.new.execute(ARGV)
-

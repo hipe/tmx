@@ -172,7 +172,7 @@ end
 # nodes are in a broken state.
 
 if __FILE__ == $PROGRAM_NAME
-  Skylab::SimpleCov.new( $stdin, $stdout, $stderr ).invoke ::ARGV
+  Skylab::SimpleCov.new( STDIN, STDOUT, STDERR ).invoke ::ARGV
 else
   Skylab::SimpleCov.load_into_host
 end

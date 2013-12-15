@@ -119,13 +119,13 @@ module Skylab::TreetopTools
         end.new( & @event_p )
         @event_p = nil
         o.on_error ||= ->(msg) { fail("Couldn't #{verb} #{noun} -- #{msg}") }
-        o.on_info  ||= ->(msg) { infostream.puts("(⌒▽⌒)☆  #{msg}  ლ(́◉◞౪◟◉‵ლ)") }
+        o.on_info  ||= ->(msg) { some_infostream.puts("(⌒▽⌒)☆  #{ msg }  ლ(́◉◞౪◟◉‵ლ)") }
         o
       end
     end
 
-    def infostream
-      @infostream ||= Headless::CLI::IO.stderr
+    def some_infostream
+      Headless::CLI::IO.some_errstream_IO
     end
 
     def emit type, payload

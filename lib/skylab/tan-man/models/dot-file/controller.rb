@@ -36,11 +36,8 @@ module Skylab::TanMan
       begin
         sexp = self.sexp or break # emitted
         if verbose
-          # this is strictly a debugging thing expected to be used from the
-          # command line.  using the `infostream` (which here in the api
-          # is a facade to an event emitter) is really icky and overkill here,
-          # hence we just use $s-tderr directly :/
-          TanMan::Services::PP.pp sexp, $stderr # (note above)
+          TanMan::Services::PP.pp sexp,
+            TanMan::Services::Headless::System::IO.some_stderr_IO
           s = ::Pathname.new( __FILE__ ).relative_path_from TanMan.dir_pathname
           info "(from #{ s })"
         else

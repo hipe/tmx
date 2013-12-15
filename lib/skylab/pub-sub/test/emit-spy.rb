@@ -19,7 +19,7 @@ module Skylab::PubSub::TestSupport
     #
     # When debugging is on (when `do_debug` resolves to trueish), each
     # call to `emit` will result in a `puts` to the `stdinfo` stream
-    # ($stderr by default), with an inspectified version of the emission.
+    # (stderr by default), with an inspectified version of the emission.
     #
 
     #         ~ the primary public method ~
@@ -46,7 +46,7 @@ module Skylab::PubSub::TestSupport
 
     def debug= callable
       raise ::ArgumentError.new('callable?') if ! callable.respond_to?( :call )
-      @stdinfo ||= $stderr
+      @stdinfo ||= ::STDERR
       @debug = callable
     end
 

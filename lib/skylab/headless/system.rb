@@ -24,5 +24,22 @@ module Skylab::Headless
     def self.defaults
       System::DEFAULTS_
     end
+
+    System = self
+  end
+end
+module Skylab::Headless  # #todo:during-merge
+  module System::System
+    module IO
+      def self.some_stderr_IO
+        Headless::CLI::IO.some_errstream_IO
+      end
+      def self.to_two
+        [ Headless::CLI::IO.some_outstream_IO, Headless::CLI::IO.some_errstream_IO ]
+      end
+      def self.to_three
+        [ Headless::CLI::IO.some_instream_IO, Headless::CLI::IO.some_outstream_IO, Headless::CLI::IO.some_errstream_IO ]
+      end
+    end
   end
 end

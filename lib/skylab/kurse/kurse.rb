@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env ruby -w
 
 require 'ncurses'
 
@@ -14,7 +14,7 @@ module Skylab::Kurse
   end
   class DefaultUi < Struct.new(:out, :err)
     def self.singleton
-      @singleton ||= new($stdout, $stderr)
+      @singleton ||= new ::STDOUT, ::STDERR
     end
   end
   module Common
@@ -24,7 +24,7 @@ module Skylab::Kurse
     end
   end
   module MyAttributeDefiner # @todo etc
-   def float *names
+    def float *names
       names.each do |attr|
         attr_reader attr
         define_method("#{attr}=") do |mixed|
@@ -266,8 +266,9 @@ module Skylab::Kurse
   end
 end
 
-if __FILE__ == $PROGRAM_NAME
+if __FILE__ == (( pn = $PROGRAM_NAME ))
   include Skylab
+  y = ::Enumerator::Yielder.new( & ::STDERR.method( :puts ) )
   opts = {}; idx = 0; last = (argv = ARGV.dup).length - 1
   while idx <= last
     if md = /\A--([-a-z0-9]{2,})(?:=(.*))?\z/.match(argv[idx])
@@ -277,7 +278,16 @@ if __FILE__ == $PROGRAM_NAME
     idx += 1
   end
   argv.compact!
-  argv.any? and fail("unparsable argument(s): #{argv.map(&:inspect).join(' ')}")
-  Kurse.run_progress_bar opts
+  if argv.length.nonzero?
+    if /\A--?h(?:elp)?\z/ =~ argv.first
+      y << "usage: #{ ::File.basename pn }"
+      y << "description: ASCII ANIMATION IS THE LIGHT IT IS THE WAY"
+    else
+      y << "unexpected argument(s): #{ argv.map( & :inspect ) * ' ' }"
+      y << "use '#{ pn } -h' for help"
+      exit 1
+    end
+  else
+    Kurse.run_progress_bar opts
+  end
 end
-

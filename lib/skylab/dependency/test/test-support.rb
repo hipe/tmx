@@ -45,7 +45,7 @@ module Skylab::Dependency::TestSupport
     attr_reader :do_debug
 
     -> do
-      sdbg = $stderr
+      sdbg = ::STDERR
       define_method :dputs do |x|
         sdbg.puts x
       end

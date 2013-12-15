@@ -250,7 +250,7 @@ module Skylab::PubSub::TestSupport::Event_Tests__
     attr_reader :do_debug
 
     -> do
-      stderr = $stderr
+      stderr = ::STDERR
       define_method :stdinfo do stderr end
     end.call
 

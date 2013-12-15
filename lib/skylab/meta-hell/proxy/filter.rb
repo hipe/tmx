@@ -49,7 +49,7 @@ module Skylab::MetaHell
       if @upstream
         @upstream.send m, *a, &b
       else
-        $stderr.send :raise, "no upstream set yet! can't #{
+        nil.send :raise, "no upstream set yet! can't #{
           }do anything - (#{ m })"
       end
     end

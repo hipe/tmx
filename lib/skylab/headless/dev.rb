@@ -11,15 +11,17 @@ module Skylab::Headless
     end
   end
 
-
   class DEV::Client
+
     include Headless::Client::InstanceMethods
 
   private
 
-    def initialize sin=nil, sout=$stdout, serr=$stderr, pen=DEV::Pen.new
-      self.io_adapter = Headless::CLI::IO_Adapter::Minimal.new(
-        sin, sout, serr, pen )
+    O__, E__= Headless::System::IO.to_two
+
+    def initialize i=nil, o=O__, e=E__, pen=DEV::Pen.new
+      self.io_adapter = Headless::CLI::IO_Adapter::Minimal.
+        new i, o, e, pen ; nil
     end
   end
 end

@@ -5,8 +5,8 @@ module Skylab::TMX::Modules::CLI
     extend Skylab::Face::Colors
     class << self
       def run cmd, opts={}
-        out = opts[:stdout] || $stdout
-        err = opts[:stderr] || $stderr
+        out = opts.fetch :stdout do Headless::CLI::IO.some_outstream_IO end
+        err = opts.fetch :stderr do Headless::CLI::IO.some_errstream_IO end
         colors = opts.key?(:colors) ? opts[:colors] : true
         colors and (! out.tty? || ! err.tty?) and colors = false
         true == colors and colors = [

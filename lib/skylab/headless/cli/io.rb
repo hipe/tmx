@@ -30,3 +30,10 @@ module Skylab::Headless
     end
   end
 end
+module Skylab::Headless::CLI  # #todo:during-merge
+  class IO_
+    def some_instream_IO ; IO::Stdin_[] end
+    def some_outstream_IO ; IO::Stdout_[] end
+    def some_errstream_IO ; IO::Stderr_[] end
+  end
+end

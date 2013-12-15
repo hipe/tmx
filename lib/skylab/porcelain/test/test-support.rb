@@ -57,7 +57,7 @@ module Skylab::Porcelain::TestSupport
      @do_debug = true
    end
 
-   infostream = $stderr
+   infostream = ::STDERR
 
    define_method :infostream do infostream end
   end

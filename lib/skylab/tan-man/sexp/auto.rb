@@ -12,7 +12,7 @@ module Skylab::TanMan
       alias_method :debug?, :do_debug
     end
 
-    self.debug_stream = Headless::CLI::IO.stderr
+    self.debug_stream = Headless::CLI::IO.some_errstream_IO
 
     self.do_debug = true          # true until you know enough to find this line
 

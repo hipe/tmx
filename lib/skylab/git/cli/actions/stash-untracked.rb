@@ -552,8 +552,6 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     Headless::Action[ self,
       :anchored_names, :with, :name_waypoint_module, -> { API::Actions } ]
 
-    $stderr.puts "TO DO THESE NAMES"
-
     def render_hub_info
       @hub.members.each do | i |
         emit_info_line "#{ i }: #{ @hub[ i ] }"

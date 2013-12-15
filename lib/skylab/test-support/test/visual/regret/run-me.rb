@@ -9,7 +9,7 @@ module ::Skylab::SimpleCov::TestSupport
 
   module Run_Me
 
-    Y = ::Enumerator::Yielder.new( & $stderr.method( :puts ) )
+    Y = ::Enumerator::Yielder.new( & STDERR.method( :puts ) )
 
     def blizzo run_this_color
       if :orange == run_this_color

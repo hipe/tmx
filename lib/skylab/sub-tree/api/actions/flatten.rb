@@ -55,7 +55,7 @@ module Skylab::FlattenFiles
       true
     end
     def initialize
-      @errstream = $stderr
+      @errstream = ::STDERR
       @fileutils_output = errstream
       @fileutils_label = "#{program_name}: "
       @option_parser = nil
