@@ -6,70 +6,32 @@ module Skylab::Headless::TestSupport::CLI
 
   include CONSTANTS
 
-  MetaHell = MetaHell ; TestSupport = TestSupport
+  Headless = Headless ; MetaHell = MetaHell
 
   extend TestSupport::Quickie  # e.g sibling 'path tools'
 
-  module ModuleMethods
+  module InstanceMethods
 
-    # we are flagrantly breaking the fundamental rules of unit testing for fun:
-
-    def klass cls_i, & cls_p
-
-      instance_p = nil ; memoize = MetaHell::FUN::Memoize
-      norm_argv_p = serr_a_p = streams_p = nil
-      define_method :invoke do |*x_a|
-        a = norm_argv_p[ x_a ]
-        streams_p[].clear_buffers
-        serr_a_p = memoize[ -> do
-          streams_p[].errstream.string.split "\n"
-        end ]
-        _client = instance_p[]
-        @result = _client.invoke a
-      end
-
-      norm_argv_p = -> x_a do
-        1 == x_a.length and a = ::Array.try_convert( x_a.first )
-        a || x_a
-      end
-
-      streams_p = memoize[ -> do
-        TestSupport::IO::Spy::Triad.new
-      end ]
-
-      class_p = nil
-      instance_p = memoize[ -> do
-        _cls = class_p[]
-        _3 = streams_p[].values
-        _cls.new( * _3 )
-      end ]
-
-      class_p = memoize[ -> do
-        cls = CLI_TestSupport.const_set cls_i, ::Class.new
-        cls.instance_variable_set :@dir_pathname, false
-        cls.class_exec( & cls_p )
-        cls
-      end ]
-
-      define_method :serr_a do
-        serr_a_p[]
-      end
-
-      define_method :debug! do
-        streams_p[].debug!
-      end
+    CONSTANTS::Normalize_argv = -> x_a do
+      1 == x_a.length and a = ::Array.try_convert( x_a.first )
+      a || x_a
     end
   end
 
-  Probably_existant_tmpdir__ = -> do
-    p = -> do_debug do
-      td = CLI_TestSupport.tmpdir
-      do_debug and td.debug!
-      td.exist? or td.prepare
-      p = -> _ { td } ; td  # not failsafe
+  module ModuleMethods
+
+    # ~ DSL-phase support
+
+    def sandbox_module
+      mod = nearest_test_node
+      if mod.const_defined? SANDBOX_I__, false
+        mod.const_get SANDBOX_I__
+      else
+        mod.const_set SANDBOX_I__, ::Module.new
+      end
     end
-    -> yes { p[ yes ] }
-  end.call
+    SANDBOX_I__ = :Sbx
+  end
 
   module InstanceMethods
 
@@ -86,6 +48,24 @@ module Skylab::Headless::TestSupport::CLI
 
     def workdir
       Probably_existant_tmpdir__[ do_debug ]
+    end
+
+    Probably_existant_tmpdir__ = -> do
+      p = -> do_debug do
+        td = CLI_TestSupport.tmpdir
+        do_debug and td.debug!
+        td.exist? or td.prepare
+        p = -> _ { td } ; td  # not failsafe
+      end
+      -> yes { p[ yes ] }
+    end.call
+
+    def mock_client
+      @mock_client ||= build_mock_client
+    end
+
+    def build_mock_client
+      Mock_Client__.new do_debug && debug_IO
     end
 
     # ~ assertion-phase support
@@ -130,12 +110,22 @@ module Skylab::Headless::TestSupport::CLI
       serr_a.length
     end
 
-    let :serr_a do
-      bake_serr_a
+    def expect_neutralled
+      expect_no_more_serr_lines
+      expect_neutral_result
     end
 
     def expect_neutral_result
       @result.should be_nil
+    end
+
+    def expect_succeeded
+      expect_no_more_serr_lines
+      expect_result_for_success
+    end
+
+    def expect_result_for_success
+      @result.should eql true
     end
 
     def expect_failed
@@ -143,8 +133,38 @@ module Skylab::Headless::TestSupport::CLI
       @result.should eql false
     end
 
-    def expect_text
+    let :serr_a do
+      serr_a_bake_notify
+    end
+
+    def expect_text  # #todo:narratize-this
       FUN.expect_text
+    end
+  end
+
+  class Mock_Client__  # (newer smaller version of [#144] client spy)
+    def initialize debug_IO
+      @a = [] ; @debug_IO = debug_IO
+    end
+    attr_reader :a
+    def pen
+      Headless::CLI::Pen::MINIMAL
+    end
+    def emit_help_line_p
+      emit_info_line_p
+    end
+    def emit_info_line_p
+      @emit_info_line_p ||= method :emit_info_line
+    end
+    def emit_info_line s
+      @debug_IO and @debug_IO.puts [ :info, s ].inspect
+      @a << s ; nil
+    end
+    def normalized_invocation_string
+      'yerp'
+    end
+    def release
+      r = @a ; @a = :_released_ ; r
     end
   end
 end

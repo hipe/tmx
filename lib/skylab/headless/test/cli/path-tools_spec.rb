@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Headless::TestSupport::CLI
 
-  describe "[hl] CLI path-tools" do
+  describe "[hl] CLI path-tools", ok: true do
 
     fun = Headless::CLI::PathTools::FUN
 

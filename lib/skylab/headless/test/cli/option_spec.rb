@@ -12,7 +12,7 @@ module Skylab::Headless::TestSupport::CLI::Option
 
   Sandboxer = TestSupport::Sandbox::Spawner.new
 
-  describe "Skylab::Headless::CLI::Option" do
+  describe "Skylab::Headless::CLI::Option", ok: true do  # NOTE this is a generated file
     context "hack to see if a basic switch is present" do
       Sandbox_1 = Sandboxer.spawn
       it "like this" do

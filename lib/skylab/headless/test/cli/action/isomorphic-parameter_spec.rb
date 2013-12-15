@@ -8,20 +8,29 @@ module Skylab::Headless::TestSupport::CLI::Action::Iso_Param__
 
   Headless = Headless
 
-  extend TestSupport::Quickie  # :[#136] also covers arg syntax
+  extend TestSupport::Quickie
 
-  describe "[hl] CLI action isomorphic params spec" do
+  # :[#136] also covers arg syntax
+
+  describe "[hl] CLI action isomorphic params spec", ok: true do
 
     extend TS__
 
     context "the zero arg syntax ()" do
 
-      klass :Syn_O do
-        Headless::CLI::Client[ self, :DSL ]
+      action_class_with_DSL :Syn_O do
         default_action :noink
         def noink
           :ok
         end
+      end
+
+      it "loads" do
+        action_class
+      end
+
+      it "builds" do
+        action
       end
 
       it "0 args - no output, result is result" do
@@ -34,14 +43,13 @@ module Skylab::Headless::TestSupport::CLI::Action::Iso_Param__
         invoke 'foo'
         expect %r(\bunexpected argument[^a-z]+foo[^a-z]*\z)i
         expect_a_few_more_serr_lines
-        expect_neutral_result
+        expect_result_for_arg_parse_failure
       end
     end
 
     context "the one arg req syntax (foo)" do
 
-      klass :Syn_req do
-        Headless::CLI::Client[ self, :DSL ]
+      action_class_with_DSL :Syn_req do
         default_action :naples
         def naples mono_arg
           "->#{ mono_arg }<-"
@@ -52,7 +60,7 @@ module Skylab::Headless::TestSupport::CLI::Action::Iso_Param__
         invoke
         expect :styled, /\bexpecting[^a-z]+mono-arg[^a-z]*\z/
         expect_a_few_more_serr_lines
-        expect_neutral_result
+        expect_result_for_arg_parse_failure
       end
 
       it "1 args - no output, result is result" do
@@ -65,14 +73,13 @@ module Skylab::Headless::TestSupport::CLI::Action::Iso_Param__
         invoke 'aa', 'bb'
         expect %r(\bunexpected argument[^a-z]+bb[^a-z]*\z)
         expect_a_few_more_serr_lines
-        expect_neutral_result
+        expect_result_for_arg_parse_failure
       end
     end
 
     context "the simple glob syntax (*args)" do
 
-      klass :Syn_rest do
-        Headless::CLI::Client[ self, :DSL ]
+      action_class_with_DSL :Syn_rest do
         default_action :zeeple
         def zeeple *parts
           "{{ #{ parts.join ' -- ' } }}"
@@ -100,8 +107,7 @@ module Skylab::Headless::TestSupport::CLI::Action::Iso_Param__
 
     context "the trailing glob syntax (a, *b)" do
 
-      klass :Syn_req_rest do
-        Headless::CLI::Client[ self, :DSL ]
+      action_class_with_DSL :Syn_req_rest do
         default_action :liffe
         def liffe apple, *annanes
           "_#{ annanes.unshift( apple ).join '*' }_"
@@ -112,7 +118,7 @@ module Skylab::Headless::TestSupport::CLI::Action::Iso_Param__
         invoke
         expect :styled, /\bexpecting[^a-z]+apple[^a-z]*\z/
         expect_a_few_more_serr_lines
-        expect_neutral_result
+        expect_result_for_arg_parse_failure
       end
 
       it "1 args - o" do
@@ -136,19 +142,18 @@ module Skylab::Headless::TestSupport::CLI::Action::Iso_Param__
 
     context "weird syntax (*a, b)" do
 
-      klass :Syn_rest_req do
-        Headless::CLI::Client[ self, :DSL ]
+      action_class_with_DSL :Syn_rest_req do
         default_action :feeples
         def feeples *lip, nip
           ( lip.push nip ).join '.'
         end
       end
 
-      it "0 args - whines of missing" do
+      it "0 args - whines of missing (**INCLUDES OPTIONAL**)" do
         invoke
-        expect :styled, /\bexpecting[^a-z]+nip[^a-z]*\z/i
+        expect :styled, "expecting: [<lip> [..]] <nip>"
         expect_a_few_more_serr_lines
-        expect_neutral_result
+        expect_result_for_arg_parse_failure
       end
 
       it "1 arg - o" do
@@ -160,8 +165,7 @@ module Skylab::Headless::TestSupport::CLI::Action::Iso_Param__
 
     context "weird syntax (a, *b, c)" do
 
-      klass :Syn_req_rest_req do
-        Headless::CLI::Client[ self, :DSL ]
+      action_class_with_DSL :Syn_req_rest_req do
         default_action :fooples
         def fooples zing, *zang, zhang
           "(#{ [ zing, *zang, zhang ].join '|' })"
@@ -172,14 +176,14 @@ module Skylab::Headless::TestSupport::CLI::Action::Iso_Param__
         invoke
         expect :styled, /\bexpecting[^a-z]+zing[^a-z]*\z/i
         expect_a_few_more_serr_lines
-        expect_neutral_result
+        expect_result_for_arg_parse_failure
       end
 
       it "1 arg - whines of missing" do
         invoke 'win'
-        expect :styled, /\bexpecting[^a-z]+zhang[^a-z]*\z/i
+        expect :styled, "expecting: [<zang> [..]] <zhang>"
         expect_a_few_more_serr_lines
-        expect_neutral_result
+        expect_result_for_arg_parse_failure
       end
 
       it "2 args - o" do
@@ -193,6 +197,10 @@ module Skylab::Headless::TestSupport::CLI::Action::Iso_Param__
         expect_no_more_serr_lines
         @result.should eql '(A|B|C)'
       end
+    end
+
+    def expect_result_for_arg_parse_failure
+      @result.should eql false
     end
   end
 end

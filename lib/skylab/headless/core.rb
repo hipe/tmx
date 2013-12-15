@@ -576,4 +576,7 @@ end
 module ::Skylab::Headless  # #todo:during-merge
   LINE_SEPARATOR_STRING_ = "\n".freeze
   TERM_SEPARATOR_STRING_ = ' '.freeze
+  class Scn_ < ::Proc
+    alias_method :gets, :call
+  end
 end

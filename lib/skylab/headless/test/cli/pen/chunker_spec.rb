@@ -8,7 +8,7 @@ module Skylab::Headless::TestSupport::CLI::Pen
 
   extend TestSupport::Quickie
 
-  describe "[hl] CLI pen chunkder" do
+  describe "[hl] CLI pen chunker", ok: true do
 
     stylize = Headless::CLI::Pen::FUN.stylize
 

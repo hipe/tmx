@@ -2,7 +2,7 @@ module Skylab::Headless
 
   class CLI::Argument::Syntax
 
-    module DSL
+    module DSL  # read [#142] the CLI argument syntax DSL  #storypoint-5
 
       def self.DSL_notify_with_p p
         (( srs = Series__.new )).p_notify p
@@ -71,7 +71,7 @@ module Skylab::Headless
           @node_a.each do |node|
             (( x = node.render_under client )) and y << x
           end
-          client.render_group_with_i_and_a collection_type_i, y
+          client.render_grp_s_a_as_i collection_type_i, y
         end
 
         def get_node_scanner
@@ -136,6 +136,7 @@ module Skylab::Headless
       end
 
       class Terminal__
+
         class << self
           alias_method :orig_new, :new
           def new a
@@ -174,11 +175,11 @@ module Skylab::Headless
           elsif is_optional
             true
           else
-            if any_tok
-              any_at_token_set = Headless::Services::Set[ any_tok ]
-            end
-            parse.trigger_missing( CLI::Argument::Missing_[
-              [ self ], :verticle, any_at_token_set ] )
+            # #storypoint-105
+            any_tok and _any_at_token_set = Headless::Services::Set[ any_tok ]
+            _stx = CLI::Argument::Syntax.new [ self ]
+            _ev = CLI::Argument::Missing_[ :vertical, _stx, _any_at_token_set ]
+            parse.trigger_missing _ev
           end
         end
 
@@ -333,13 +334,15 @@ module Skylab::Headless
             1 == emit_a.length or fail 'test me'
             emit_a.each do |i, e|
               :missing == i or fail 'test me'
-              :verticle == e.orientation or fail 'test me'
-              big_a.concat e.argument_a
+              :vertical == e.orientation_i or fail 'test me'
+              big_a.concat e.syntax_slice.to_a
               (( ats = e.any_at_token_set )) and tok_set.merge ats
             end
           end
-          parse.trigger_missing CLI::Argument::Missing_[
-            big_a, :horizontal, ( tok_set if tok_set.length.nonzero? ) ]
+          _stx_slice = CLI::Argument::Syntax.new big_a
+          _tok_set = ( tok_set if tok_set.length.nonzero? )
+          _ev = CLI::Argument::Missing_[ :horizontal, _stx_slice, _tok_set ]
+          parse.trigger_missing _ev
         end
       end
 

@@ -10,7 +10,7 @@ module Skylab::Headless::TestSupport::CLI::Table
 
   extend TestSupport::Quickie
 
-  describe "[hl] CLI table" do
+  describe "[hl] CLI table", ok:true do
 
     def outstream
       @outstream ||= Headless::Services::StringIO.new

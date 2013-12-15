@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Headless::TestSupport::CLI::Argument::Syntax
 
-  describe "[hl] CLI argument syntax DSL" do
+  describe "[hl] CLI argument syntax DSL", ok: true do
 
     extend TS__
 
@@ -93,7 +93,7 @@ module Skylab::Headless::TestSupport::CLI::Argument::Syntax
         if (( set = @missing.any_at_token_set ))
           _at = " at #{ set.first }"
         end
-        "expecting #{ @missing.argument_a[ 0 ].as_moniker }#{ _at }"
+        "expecting #{ @missing.syntax_slice[ 0 ].as_moniker }#{ _at }"
       end
 
       def render_any_xtra
@@ -113,7 +113,7 @@ module Skylab::Headless::TestSupport::CLI::Argument::Syntax
           @missing = x
           false
         end
-        o.on_unexpected do |x|
+        o.on_extra do |x|
           do_debug and debug_IO.puts "got undexpected: #{ x.inspect }"
           @extra = x
           false

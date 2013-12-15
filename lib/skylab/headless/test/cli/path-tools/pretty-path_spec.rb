@@ -1,8 +1,9 @@
 require_relative '../test-support'
 require_relative 'for-rspec' # sorry
 
+# NOTE rspec-only currently :/ #todo
 
-describe "#{ Skylab::Headless::CLI::PathTools }#pretty_path" do
+describe "[hl] CLI path-tools pretty-path", o:true do
 
   include ::Skylab::Headless # constants
 
