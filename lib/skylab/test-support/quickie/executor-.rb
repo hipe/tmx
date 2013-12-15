@@ -49,7 +49,7 @@ module Skylab::TestSupport
             if p
               true
             elsif a.length.nonzero?
-              p = Quickie::FUN.example_producer[ a.shift, branch, leaf ]
+              p = Quickie::API::Example_producer[ a.shift, branch, leaf ]
               true
             end
           end

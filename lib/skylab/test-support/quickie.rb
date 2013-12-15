@@ -339,6 +339,10 @@ module Skylab::TestSupport::Quickie
     poptop
   end
 
+  module API  # :#public-API
+    Example_producer = Example_producer__
+  end
+
   class Quickie::Client  # one client is creted per test run. it manages
     # UI, parsing the request to run the tests, creating a test runtime,
     # and initiating the test run on the object graph.

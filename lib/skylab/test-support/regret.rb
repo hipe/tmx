@@ -42,19 +42,22 @@ module ::Skylab::TestSupport
         tug_class.nil? and  # if you set it to false you are crazy
           @tug_class = MetaHell::Autoloader::Autovivifying::Recursive::Tug
 
-        dpn = Twerk_dir_pathname_[ loc, pam, -> x do
+        dpn = Twerk_dir_pathname__[ loc, pam, -> x do
           init_autoloader x ; @dir_pathname
         end ]
         dpn and @dir_pathname = dpn  # ( you can witness the change here )
 
-        o = Bump_module_.curry[ self ]
+        o = Bump_module__.curry[ self ]
 
         o[ :CONSTANTS, -> do
           pam and include pam.constants_module
         end ]
 
+        test_module_me = self
+
         o[ :ModuleMethods, -> do
           pam and include pam.module_methods_module
+          define_method :nearest_test_node do test_module_me end
         end ]
 
         o[ :InstanceMethods, -> do
@@ -120,7 +123,7 @@ module ::Skylab::TestSupport
       public :count_to_top
     end
     #
-    Bump_module_ = -> host_module, const, p=nil do
+    Bump_module__ = -> host_module, const, p=nil do
       mod = if host_module.const_defined? const, false
         host_module.const_get const, false
       else
@@ -130,25 +133,29 @@ module ::Skylab::TestSupport
       mod
     end
     #
-    Twerk_dir_pathname_ = -> loc, pam, init_al_p do
-      if pam && SPEC_TAIL_ == loc.path[ SPEC_TAIL_POS_ .. -1 ]
-        Dir_pn_from_strange_location_[ loc, pam ]
+    Twerk_dir_pathname__ = -> loc, pam, init_al_p do
+      if pam && SPEC_TAIL__ == loc.path[ SPEC_TAIL_POS__ .. -1 ]
+        Dir_pn_from_strange_location__[ loc, pam ]
       else
         dir_pn = init_al_p[ loc ]
-        TS_NAME_ == dir_pn.basename.to_s and dir_pn.dirname
+        TS_NAME__ == dir_pn.basename.to_s and dir_pn.dirname
       end
     end
     #
-    SPEC_TAIL_ = Subsys::FUN::Spec_rb[]
-    SPEC_TAIL_POS_ = - SPEC_TAIL_.length
-    TS_NAME_ = 'test-support'.freeze
+    SPEC_TAIL__ = Subsys::FUN::Spec_rb[]
+    SPEC_TAIL_POS__ = - SPEC_TAIL__.length
+    TS_NAME__ = 'test-support'.freeze
     #
-    Dir_pn_from_strange_location_ = -> loc, pam do
-      pam.dir_pathname.join SPEC_RX_.match( loc.path )[ :stem ]
+    Dir_pn_from_strange_location__ = -> loc, pam do
+      path_s = "#{ loc.path }"
+      path_s.gsub! %r(//+), '/'
+      _md = SPEC_RX__.match path_s
+      _md or raise "failed to match against #{ SPEC_RX__ } - #{ path_s }"
+      pam.dir_pathname.join _md[ :stem ]
     end
     #
-    SPEC_RX_ = %r{\A
-      (?<dir>.+[^/]) / (?<stem>[^/]+) #{ ::Regexp.escape SPEC_TAIL_ }
+    SPEC_RX__ = %r{\A
+      (?<dir>.+[^/]) / (?<stem>[^/]+) #{ ::Regexp.escape SPEC_TAIL__ }
     \z}x
   end
 end
