@@ -21,7 +21,7 @@ module Skylab::Headless::TestSupport::System
     end
 
     it "cache_pathname" do
-      bad_test = Headless::System::Defaults_::CACHE_FILE_
+      bad_test = Headless::System::Defaults__::CACHE_FILE__
       sys_defaults.cache_pathname.join( "FOO" ).to_s.
         should be_include( "#{ bad_test }/FOO" )
     end

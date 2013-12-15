@@ -10,7 +10,7 @@ module Skylab::Face::TestSupport::CLI
     Headless = ::Skylab::Headless
     Headless_TestSupport = ::Skylab::Headless::TestSupport
     MetaHell = ::Skylab::MetaHell
-    SO_, SE_ = Headless::System::IO.to_two
+    SO_, SE_ = Headless::System::IO.some_two_IOs
   end
 
   include CONSTANTS

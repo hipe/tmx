@@ -31,7 +31,7 @@ module Skylab::Permute
         if b
           fail "block and args?"
         else
-          self.parent = Headless::CLI::IO_Adapter::Minimal.new(* a )
+          self.parent = Headless::CLI::IO::Adapter::Minimal.new(* a )
         end
       end
     }

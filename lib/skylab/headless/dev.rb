@@ -17,10 +17,10 @@ module Skylab::Headless
 
   private
 
-    O__, E__= Headless::System::IO.to_two
+    O__, E__= Headless::System::IO.some_two_IOs
 
     def initialize i=nil, o=O__, e=E__, pen=DEV::Pen.new
-      self.io_adapter = Headless::CLI::IO_Adapter::Minimal.
+      self.io_adapter = Headless::CLI::IO::Adapter::Minimal.
         new i, o, e, pen ; nil
     end
   end

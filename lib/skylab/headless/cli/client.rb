@@ -91,7 +91,7 @@ module Skylab::Headless
       end
 
       def _IO_adapter_class
-        Headless::CLI::IO_Adapter::Minimal
+        Headless::CLI::IO::Adapter::Minimal
       end
 
       # #todo:during-merge (action i.m should use these exclusively)

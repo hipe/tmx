@@ -30,7 +30,7 @@ module Skylab::TanMan::TestSupport::Sexp
         "«#{ str }»"                # "guillemets" just for fun and practice
       end
 
-      sin, sout, serr = Headless::System::IO.to_three
+      sin, sout, serr = Headless::System::IO.some_three_IOs
 
       define_method :initialize do |i=sin, o=sout, e=serr|
         # observe pattern [#sl-114]

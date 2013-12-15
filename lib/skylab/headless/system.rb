@@ -1,45 +1,39 @@
 module Skylab::Headless
 
-  module System
-
-    # provides system reflection and environment info in a zero-configuration
-    # manner, e.g things like where a cache dir or a temp dir that can be
-    # used is, for whatever specific system we are running on.
-    #
-    # the whole premise of this node is dubious; but its implementation is so
-    # neato that it makes it worth it. at worst it puts tracking leashes on
-    # all of its uses throughout the system until we figure out what the
-    # 'Right Way' is.
+  module System  # read [#140] the headless system narrative #section-1
 
     module InstanceMethods
     private
       def system
-        @system ||= System::Client_.new
+        @system ||= System::Client__.new  # see
       end
     end
 
-    define_singleton_method :system, MetaHell::FUN.memoize_to_const_method[
-      -> { System::Client_.new }, :SYSTEM_CLIENT_ ]
+    define_singleton_method :system,
+      MetaHell::FUN.memoize_to_const_method[
+        -> { System::Client__.new }, :SYSTEM_CLIENT__ ]
 
     def self.defaults
-      System::DEFAULTS_
+      System::DEFAULTS__  # see
     end
 
-    System = self
-  end
-end
-module Skylab::Headless  # #todo:during-merge
-  module System::System
-    module IO
-      def self.some_stderr_IO
-        Headless::CLI::IO.some_errstream_IO
+    IO = (( class IO__ < ::Module  # #section-4 of the node narrative
+
+      def some_two_IOs
+        [ some_stdout_IO, some_stderr_IO ]
       end
-      def self.to_two
-        [ Headless::CLI::IO.some_outstream_IO, Headless::CLI::IO.some_errstream_IO ]
+
+      def some_three_IOs
+        [ some_stdin_IO, some_stdout_IO, some_stderr_IO ]
       end
-      def self.to_three
-        [ Headless::CLI::IO.some_instream_IO, Headless::CLI::IO.some_outstream_IO, Headless::CLI::IO.some_errstream_IO ]
-      end
-    end
+
+      i = $stdin ; o = $stdout ; e = $stderr
+
+      define_method :some_stdin_IO do i end
+      define_method :some_stdout_IO do o end
+      define_method :some_stderr_IO do e end
+
+      self
+    end )).new
   end
 end
