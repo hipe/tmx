@@ -1,4 +1,4 @@
-# the ghost modules of autoloader explained
+# the ghost modules of autoloader explained :[#041]
 
 basic autoloading is the first and only facility to be made available out of
 the box to all nodes in the skylab universe. as such, its module is put one

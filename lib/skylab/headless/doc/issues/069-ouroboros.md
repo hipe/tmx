@@ -1,4 +1,4 @@
-## ouroboros - a snake eating its own tail is a thing in cultures
+## ouroboros - a snake eating its own tail is a thing in cultures :[#069]
 
         ~ the following abbreviations will be used ~
 

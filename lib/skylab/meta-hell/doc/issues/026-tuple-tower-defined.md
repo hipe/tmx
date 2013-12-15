@@ -1,4 +1,4 @@
-# function chain ( né "tuple tower" ) defined
+# function chain ( né "tuple tower" ) defined :[#026]
 
 in the same manner that we explore the isomorphicism between switch statements
 and e.g hashes, we here are amusing ourselves with something ..

@@ -1,4 +1,4 @@
-# 012 - can the idea of specificity be built into the graph?
+# can the idea of specificity be built into the graph? :[#012]
 
 in the really old days we used to resort to `touch!` / `touched?` hacks
 to accomplish this thing we're after.

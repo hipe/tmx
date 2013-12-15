@@ -1,4 +1,4 @@
-# the facet's `enhance` API
+# the facet's `enhance` API :[#026]
 
 each facet, in order to ehance the API Action class, will be sent a message
 to enhance the particular API Action class via its `[]` method.

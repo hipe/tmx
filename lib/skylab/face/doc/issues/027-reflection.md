@@ -1,4 +1,4 @@
-# binary facet reflection
+# binary facet reflection :[#027]
 
 Any given API Action instance either does or doesn't "have" any given facet.
 In this sense each facet in its relationship to each action is binary because

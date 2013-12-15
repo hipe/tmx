@@ -1,4 +1,6 @@
-# #storypoint-1
+# the pub-sub emitter narrative :[#019]
+
+## :#storypoint-1  introduction
 
 Welcome to pub-sub emitter. this was the first "really cool" event model in
 the skylab universe, but it has now fallen by the wayside. it continues to be
@@ -16,7 +18,7 @@ this library took is that it ever concerned itself with the production of
 event objects.
 
 
-# #storypoint-2
+## :#storypoint-2
 
 Traverse up the chain of every ancestor except self (and self is not in the
 chain if we are an s.c), (also we (ick) skip ::Object and ::Kernel and
@@ -34,7 +36,7 @@ EDIT - to work with ruby 2.0's `prepend` module, we have to accomodate some
 things. in so doing i think we improved it a bit.
 
 
-# #storypoint-3
+## :#storypoint-3
 
 this method is the central workhorse of `emit`. if the argument symbol is not
 in the graph, result is undefined.
@@ -45,7 +47,7 @@ unique set of all the association target names (direct and indirect) of the
 argument symbol.
 
 
-# #storypoint-4
+## :#storypoint-4
 
 for now it is the policy of this library never to add destructive public
 instance methods (e.g something that adds a listener to a stream, etc.). those
@@ -57,7 +59,7 @@ explicitly.
 however we may still add some *non-destructive* public i.m's below
 
 
-# #storypoint-5
+## :#storypoint-5
 
 this method adds a listener to a stream. for any stream `foo` it is more
 readable and hence idiomatic to use the `on_foo` method rather than this one.
@@ -69,7 +71,7 @@ attempting to wire this one, and because the outside frameworks may depend on
 its public existence; hence it is part of our fixed, public API :[#020].
 
 
-# #storypoint-6
+## :#storypoint-6
 
 NOTE we try something here as one of many different attempts at a solution for
 a familiar design problem that yet has no name - the below 3 methods trigger a
@@ -83,7 +85,7 @@ trouble if we use alias_method on the below three #experimental
  an `initialize` hook if possible
 
 
-# #storypoint-7
+## :#storypoint-7
 
 about this `init` method:
 
@@ -96,7 +98,7 @@ about this `init` method:
   conduit / engine pattern omg)
 
 
-# #storypoint-8
+## :#storypoint-8
 
 `build_event` - this is both a convenience for clients that want to
 build an event for whatever reason, *and* it can be extended and
@@ -105,7 +107,7 @@ it cann even be re-written completely, for e.g to pass more or different
 info to your factory, or whatever.
 
 
-# #storypoint-9
+## :#storypoint-9
 
 `if_unhandled[_non_taxonomic]_stream[_name]s` - a suite of *instance* methods
 as a facility for checking that you are handling all of the event streams that
@@ -178,7 +180,7 @@ to be about as ornate as possible:
 everything there is to know, in an albeit condensed form.)
 
 
-# #storypoint-10
+## :#storypoint-10
 
 `PubSub::Event::Unified` - when you want your events to be just simple
 datapoints like strings or numbers (or any single arbitrary object),
@@ -204,14 +206,14 @@ stream graphs, and custom (and lightweight) event classes per-application
 .. let's see..)
 
 
-# #storypoint-11
+## :#storypoint-11
 
 `initialize` - *highly* #experimental args. handling of payload is left
 intentionally sparse here, different applications will process and
 present payloads differently.
 
 
-# #storypoint-12
+## :#storypoint-12
 
 consider also just wiring a factory that creates as an event objects just
 pure text ..

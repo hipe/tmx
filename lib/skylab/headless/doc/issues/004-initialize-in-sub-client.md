@@ -1,4 +1,4 @@
-## initializing in the sub-client?
+## initializing in the sub-client? :[#004]
 
 it's generally (probably) considered bad practice to have a module
 that has an initialize method. SubClient thinks it is special:

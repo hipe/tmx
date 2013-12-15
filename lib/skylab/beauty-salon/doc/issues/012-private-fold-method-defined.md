@@ -1,4 +1,4 @@
-# "private fold method" defined
+# "private fold method" defined :[#012]
 
 a "private fold method" means: a private method that is all of:
   + only called from one other "place" (i.e line of code in the codebase)

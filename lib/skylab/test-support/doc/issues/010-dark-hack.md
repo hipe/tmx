@@ -1,4 +1,4 @@
-# dark hack
+# dark hack :[#010]
 
 during the transition from ruby 1.9.2 to 1.9.3 tons of tests broke
 because of a change in the way constant scope works in a manner I

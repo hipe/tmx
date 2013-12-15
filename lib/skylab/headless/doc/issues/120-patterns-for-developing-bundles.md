@@ -1,4 +1,4 @@
-# patterns for developing bundles
+# patterns for developing bundles :[#120]
 
 (the content here may get merged into the parent node after a futre branch merge)
 

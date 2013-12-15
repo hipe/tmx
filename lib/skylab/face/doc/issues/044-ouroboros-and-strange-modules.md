@@ -1,4 +1,4 @@
-# ouroboros and strange modules
+# ouroboros and strange modules :[#044]
 
 the original description of the `ouroboros` phenomenon first appears in
 "cli/adapter/for/face.rb" which is left intact for historical reasons. we then

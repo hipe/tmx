@@ -1,4 +1,4 @@
-# on doc node trees and flat numberspaces
+# on doc node trees and flat numberspaces :[#034]
 
 (this "essay" evolved from a commit message (ha), explaining a commit where
 we were flattening a deep doc-node tree, in a certain way. the commit in

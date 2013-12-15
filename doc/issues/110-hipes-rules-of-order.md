@@ -1,4 +1,4 @@
-# working draft of "rules of order" for declaring things
+# working draft of "rules of order" for declaring things :[#110]
 
 ## In summary, when defining a class (and module where applicable):
 

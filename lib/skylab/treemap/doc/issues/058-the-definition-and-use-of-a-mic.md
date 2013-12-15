@@ -1,4 +1,4 @@
-# the definition and use of a mic
+# the definition and use of a mic :[#058]
 
 a `mic` (short for "microphone", pronounced "mike") is an object whose purpose
 is to record the arguments (probably in the order in which they arrive) to

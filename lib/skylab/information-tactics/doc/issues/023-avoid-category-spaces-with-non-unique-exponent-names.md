@@ -1,4 +1,4 @@
-# avoid category-spaces with non-unique exponents
+# avoid category-spaces with non-unique exponents :[#023]
 
 if there exist two exponents with the same names but in different categories,
 they are different exponents. but to avoid confusion, we recommend that you

@@ -1,4 +1,4 @@
-# this strange hybrid explained
+# this strange hybrid explained :[#005]
 
 unlike most other subprodcuts, `bnf2tretop` "ships" as a standalone file
 yet integrates with the `tmx` supernode *and* has an extensive test suite,

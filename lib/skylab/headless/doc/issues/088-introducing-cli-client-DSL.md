@@ -1,4 +1,4 @@
-# introducing CLI client DSL
+# introducing CLI client DSL :[#088]
 
 (these are somewhat archival - they were a bit to verbose to be inline
 with the code)

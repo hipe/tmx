@@ -1,4 +1,4 @@
-# what are puffers and when should you use them?
+# what are puffers and when should you use them? :[#048]
 
 puffers are an experimental new way to extend modules. we don't know if
 they're a good way.

@@ -1,4 +1,4 @@
-# determining the visibility of a node
+# determining the visibility of a node :[#047]
 
 within the context of the face universe it is decidedly *not* within the
 domain of responsibility of the node sheet (e.g command or namespace) to

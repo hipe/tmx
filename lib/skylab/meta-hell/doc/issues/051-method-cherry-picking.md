@@ -1,4 +1,4 @@
-# method cherry picking - experimental pattern
+# method cherry picking - experimental pattern :[#051]
 
 (historical note, this was written just before the huge bundle revolution,
 at the beginning of the headless earthquake)

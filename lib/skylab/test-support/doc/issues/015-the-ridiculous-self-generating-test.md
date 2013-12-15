@@ -1,4 +1,4 @@
-# notes from the self-generating test
+# notes from the self-generating test :[#015]
 
 note that this is a test that
 rewrites itself, so it is only useful when it does not fail, and is

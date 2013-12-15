@@ -1,4 +1,4 @@
-# why use private methods block?
+# why use private methods block? :[#057]
 
 ruby doesn't apply any previous `private` declaration (call) to methods that
 are created "dynamically" with e.g `define_method`. if you have the special

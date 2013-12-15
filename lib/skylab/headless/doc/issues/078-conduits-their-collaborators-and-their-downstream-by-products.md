@@ -1,4 +1,4 @@
-# conduits, their collaborators, and their downstream by-products
+# conduits, their collaborators, and their downstream by-products :[#078]
 
 the goal of this node is to present the folowing terms, and relate them to
 each other: `conduit`, `flusher`, `story`, `kernel`, `metaservices`.

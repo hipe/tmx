@@ -1,4 +1,4 @@
-# trending away from the sub-client pattern?
+# trending away from the sub-client pattern? :[#030]
 
 we may be. sub-client was a huge jump forward when we created it for
 headless. conceiving the application stack as a huge tree with nodes that

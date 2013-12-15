@@ -1,4 +1,4 @@
-# approaching a pattern langauge for semantic structures
+# approaching a pattern langauge for semantic structures :[#003]
 
 in the treatise _Categories_, Aristotle analyzed the differences between
 classes and objects. woah. mind blown. Aristotle was an information

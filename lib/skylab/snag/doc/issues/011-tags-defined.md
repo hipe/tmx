@@ -1,4 +1,4 @@
-# About Tags in tmx code
+# About Tags in tmx code :[#011]
 
 
 Tags are used to mark definitively a certain kind of thing (1) at a

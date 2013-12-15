@@ -1,4 +1,4 @@
-# towards an event wiring pattern..
+# towards an event wiring pattern.. :[#056]
 
 How about this: some modality nerk, let's say the modality client,
 defines methods named for the common types of events:

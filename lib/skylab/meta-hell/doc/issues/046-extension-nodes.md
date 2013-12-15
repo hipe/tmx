@@ -1,4 +1,4 @@
-# extension nodes?
+# extension nodes? :[#046]
 
 experimentally an "extension node" is a module that, when loaded, adds
 constants to its surrounding ("parent") module!

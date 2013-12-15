@@ -1,4 +1,4 @@
-# all the letters of the alphabet
+# all the letters of the alphabet :[#130]
 
 a - array! used often as a variable suffix and standalone.
 b - rarely used. not used for boolean or block, because of the confusion

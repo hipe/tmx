@@ -1,4 +1,4 @@
-# things to change about o.p here (all DONE)
+# things to change about o.p here (all DONE) :[#014]
 
 [#014.1] - there is some fun novelty in the dynamic op but change the
    setters of functions!

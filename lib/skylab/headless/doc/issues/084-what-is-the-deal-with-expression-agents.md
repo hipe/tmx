@@ -1,4 +1,4 @@
-# what is the deal with expression agents
+# what is the deal with expression agents :[#084]
 
 `Pen` (at this level) is an experimental attempt to generalize and unify a
 subset of interface-level string decorating functions so that the same

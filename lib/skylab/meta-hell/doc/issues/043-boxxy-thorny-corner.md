@@ -1,10 +1,11 @@
-# thorny corner
+# thorny corner :[#043]
 
 ## the problem
 
 a tug made unto an auto-vivifying node will of course auto-vivify the node
 being requested in cases where the branch node exists (folder). the problem
-is that because under the combination of our conventions and ruby syntax,
+is that because under the combination of ruby syntax and our conventions
+for file naming,
 (and related but not the same as [#hl-083] "constants can hold more
 information"), there is not a perfect isomorphicism between constant names
 and filesystem names -

@@ -1,4 +1,4 @@
-# making some sense of the architecture
+# making some sense of the architecture :[#059]
 
 this application has gone through at least three almost ground-up rewrites,
 yet it is still almost untenably confusing to understand without some

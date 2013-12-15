@@ -1,4 +1,4 @@
-## exit statuses
+## exit statuses :[#023]
 
 This stands at the intersection of [#019] (the common triad) and
 [#023] (exit statii): As a throwback to our humble roots, we want to

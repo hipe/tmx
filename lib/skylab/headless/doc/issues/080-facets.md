@@ -1,4 +1,4 @@
-# facets are..
+# facets are.. :[#080]
 
 facets are like inversion of control / dependency injection 'plugins', but
 not always as clean. we leverage ruby's re-openable classes for dependency

@@ -1,4 +1,4 @@
-# Towards an event wiring pattern
+# Towards an event wiring pattern :[#102]
 
 (this originally appeared in a comment in a sub-product. although the
 issue was resolved in the source code at that location, the spirit of

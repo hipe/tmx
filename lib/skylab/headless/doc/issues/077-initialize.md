@@ -1,4 +1,4 @@
-# the `initialize` method in plugin clients
+# the `initialize` method in plugin clients :[#077]
 
 it makes life much easier for the plugin implementor to know that there
 is no hidden magic specifically with the `initialize` method of her
