@@ -9,8 +9,8 @@ module Skylab::Headless
         include Headless::Action::IMs
 
         def initialize * _
-          @desc_s_a = @has_od = @option_parser = @sect_a =
-            @param_queue_a = @upstrm_is_collapsed = nil
+          @has_od = @option_parser = @param_queue_a = nil
+          @upstrm_is_collapsed = nil
           @q_x_a = nil  # #storypoint-10
           super
         end
@@ -24,11 +24,15 @@ module Skylab::Headless
             while true
               task = scn.gets
               task or break
-              r = task.receiver.send task.method_name, * task.arguments
-              OK_ == r or break
+              r = task.receiver.send task.task_method_name, * task.arguments
+              unless OK_ == r
+                CEASE_X_ == r and r = exitstatus_for_i( :task_ceased )
+                break
+              end
               task.close
             end
-          end ; r
+          end
+          r
         end
         Action::OK_ = true  # #storypoint-20 because our namespace is sens.
         Action::INVOKE_METHOD_I = :invoke
@@ -49,6 +53,25 @@ module Skylab::Headless
           @option_parser
         end
         def build_option_parser
+          if self.class.respond_to? :any_option_parser_p_a and
+              (( p_a = self.class.any_option_parser_p_a ))
+            op = begin_option_parser
+            apply_p_a_on_op p_a, op
+            op
+          end
+        end
+        def apply_p_a_on_op p_a, op
+          p_a.each do |p|
+            instance_exec op, & p
+          end ; nil
+        end
+        def begin_option_parser
+          op = option_parser_cls.new
+          op.base.long.clear  # never use builtin 'officious' -v, -h  # [#059]
+          op
+        end
+        def option_parser_cls
+          Headless::Services::OptionParser
         end
         def prs_opts_from_nonzero_length_argv_when_op a
           @option_parser.parse! a do |p|
@@ -67,7 +90,7 @@ module Skylab::Headless
         def usage_and_invite msg=nil, z=nil  # #storypoint-50, :#hook-in
           y = help_yielder
           msg and y << msg
-          rndr_usg_lns y
+          render_usg_lns y
           y << invite_line( z )
           CEASE_X_
         end
@@ -96,7 +119,7 @@ module Skylab::Headless
           @emit_info_line_p ||= @request_client.emit_info_line_p
         end
 
-        def rndr_usg_lns y
+        def render_usg_lns y
           s = usage_line and y << s ; nil
         end
 
@@ -115,8 +138,9 @@ module Skylab::Headless
         alias_method :stylize_hdr, :stlz_hdr  # #storypoint-100
 
         def frmt_hdr_s header_s
-          "#{ header_s }:"
+          "#{ header_s }#{ COLON__ unless COLON__ == header_s[ -1 ] }"
         end
+        Action::COLON__ = ':'.freeze
 
         #  ~ stepping into expressing agent facility for a moment
 
@@ -124,7 +148,7 @@ module Skylab::Headless
           if p
             expression_agent.calculate( * a, & p )
           else
-            say_w_lxcn( * a )
+            say_with_lxcn( * a )
           end
         end
 
@@ -136,7 +160,7 @@ module Skylab::Headless
           lxcn.fetch_default_values_at_i_a i_a
         end
 
-        def say_w_lxcn i
+        def say_with_lxcn i
           lxcn.fetch_default i
         end
 
@@ -184,16 +208,22 @@ module Skylab::Headless
 
         # ~ stepping out of exag. facility and into the name facility
 
+      public  # #todo:during-client-services
+
         def normalized_invocation_string  # #storypoint-205 (placeholder)
-          _s = request_client.normalized_invocation_string
-          _s_ = name.as_slug
-          "#{ _s }#{ TERM_SEPARATOR_STRING_ }#{ _s_ }"
-        end ; public :normalized_invocation_string  # #todo:during-client-services
+          normalized_invocation_string_prts( y = [] )
+          y * TERM_SEPARATOR_STRING_
+        end
+
+        def normalized_invocation_string_prts y
+          request_client.normalized_invocation_string_prts y
+          y << name.as_slug ; nil
+        end
 
         def name  # see also the 'anchored-name' bundle
           @name_function ||= bld_name_func
-        end ; public :name   # within this API it is needed
-
+        end
+      private
         def bld_name_func
           Headless::Name::Function::From::Constant.from_name self.class.name
         end
@@ -251,9 +281,13 @@ module Skylab::Headless
         end
 
         def argument_stx  # #storypoint-410
-          _i = peek_any_queue_elmnt_i
-          _i ||= default_action_i
-          _i and argument_syntax_for_action_i _i
+          i = peek_any_last_queue_elmnt_i
+          i ||= default_action_i
+          i and argument_syntax_for_action_i i
+        end
+
+        def peek_any_last_queue_elmnt_i
+          q_for_rd.peek_any_last_element_i
         end
 
         def peek_any_queue_elmnt_i
@@ -266,6 +300,10 @@ module Skylab::Headless
 
         def q_for_rd
           @queue ||= bld_q_for_rd
+        end
+
+        def queue_len
+          ds_have_any_q ? @q_x_a.length : 0
         end
 
         def ds_have_any_q
@@ -440,6 +478,7 @@ module Skylab::Headless
           def initialize bm, arg_a, p
             super bm, arg_a ; @p = p ; nil
           end
+          alias_method :task_method_name, :method_name
           def close
             @p.call
           end
@@ -454,16 +493,19 @@ module Skylab::Headless
 
         def resolve_call_tuple_from_queue_element_x x  # #storypoint-815
           if x.respond_to? :id2name
-            _a = th_q_has_exactly_one_item ? release_argv : MetaHell::EMPTY_A_
-            rslv_call_tuple_from_method_i_and_args x, _a
+            th_q_has_exactly_one_item and a = release_any_argv
+            a ||= MetaHell::EMPTY_A_
+            rslv_call_tuple_from_method_i_and_args x, a
           else
             q_for_rd.begin_dequeue self
           end
         end
 
-        def release_argv  # :#API-private
-          a = @argv.dup ; @argv.clear ; @argv = :_argv_released_ ; a
-        end ; public :release_argv
+        def release_any_argv  # :#API-private
+          if @argv
+            a = @argv.dup ; @argv.clear ; @argv = nil ; a
+          end
+        end ; public :release_any_argv
 
         def rslv_call_tuple_from_method_i_and_args i, a
           r = vldt_arity_for i, a
@@ -580,70 +622,56 @@ module Skylab::Headless
         end
 
         def help_screen y  # :+#public-API
-          rndr_usg_lns y
-          rndr_any_hlp_dsc y
-          rndr_any_hlp_opts y
-          rndr_any_hlp_sects y
+          render_usg_lns y
+          render_any_hlp_dsc y
+          render_any_hlp_opts y
+          render_any_hlp_sects y
+          render_any_hlp_addtn y
           PROCEDE_X_
         end ; protected :help_screen  # #protected-not-private
 
-        def rndr_any_hlp_dsc y
+        def render_any_hlp_addtn y
+        end
+
+        def render_any_hlp_dsc y
           has_dsc_lines and help_description y
         end
 
         def has_dsc_lines  # #storypoint-1020
-          @desc_s_a.nil? and @desc_s_a = build_any_dsc_s_a || false
-          !! @desc_s_a
+          node_stry.has_nonzero_desc_lines
         end
 
-        def build_any_dsc_s_a  # #storypoint-1025
-          @sect_a = false  # just to be safe
-          lines = raw_dsc_lines
-          lines and pst_prcss_lns lines
+        def node_stry
+          @node_stry ||= build_node_stry
         end
 
-        def raw_dsc_lines
+        def build_node_stry
+          CLI::Action::Desc::Story[ self ]
+        end
+
+      public
+
+        def any_description_p_a_for_stry
           if self.class.respond_to? :any_description_p_a
-            p_a = self.class.any_description_p_a
-          end
-          p_a and rw_dsc_lns_fr_blks p_a
-        end
-
-        def rw_dsc_lns_fr_blks p_a
-          Headless::Services::Enumerator::Lines::Producer.new do |y|
-            p_a.each do |p|
-              instance_exec y, & blk
-            end ; nil
+            self.class.any_description_p_a
           end
         end
 
-        def pst_prcss_lns lines
-          sect_a = parse_sections lines
-          if sect_a.length.nonzero?
-            sect_a.first.header or
-              r = sect_a.shift.lines.map( & :first )  # always nonzero
-            sect_a.length.zero? or @sect_a = sect_a
-          end
-          r
+        def add_any_supplemental_sections_for_stry _
         end
 
-        def parse_sections lines
-          Action::Desc::Parse_sections[ section_a = [], lines ]
-          section_a
-        end
+      private
 
         def help_description y  # #storypoint-1050
           y << EMPTY_STRING_  # #assume-previous-line-above
-          if 1 == @desc_s_a.length
-            s = render_single_description_line and y << s
-          else
-            render_multiline_description y
-          end ; nil
+          case @node_stry.desc_lines_count <=> 1
+          when  0 ; s = render_single_description_line and y << s
+          when  1 ; render_multiline_description y ; nil ; end
         end
 
         def render_single_description_line  # assume the ivar
           render_single_line_with_header_and_string(
-            say( :dsc ), @desc_s_a.fetch( 0 ) )
+            say( :dsc ), @node_stry.fetch_first_desc_line )
         end
 
         LEXICON__.add_entry_with_default :dsc, 'description'
@@ -657,10 +685,10 @@ module Skylab::Headless
 
         def render_multiline_description y  # assume the ivar
           render_multiline_section_with_header_and_lines y,
-            say( :dsc ), @desc_s_a
+            say( :dsc ), @node_stry.desc_lines
         end
 
-        def render_multiline_section_with_header_and_lines header_s, lines
+        def render_multiline_section_with_header_and_lines y, header_s, lines
           indent_s = some_summary_indent_s
           header_s and y << stlz_hdr( header_s )
           lines.each do |line|
@@ -679,7 +707,7 @@ module Skylab::Headless
 
         Action::DEFAULT_SUMMARY_INDENT__ = ( TERM_SEPARATOR_STRING_ * 2 ).freeze
 
-        def rndr_any_hlp_opts y
+        def render_any_hlp_opts y
           if has_op_docmtr
             rndr_hlp_opts y
           end ; nil
@@ -697,12 +725,14 @@ module Skylab::Headless
         end
 
         def rslv_col_A_mx_wdth  # #storypoint-1085
-          if @sect_a then rslv_col_A_mx_wdth_when_sections else 0 end
+          if node_stry.has_nonzero_sections
+            rslv_col_A_mx_wdth_when_sections
+          else 0 end
         end
 
         def rslv_col_A_mx_wdth_when_sections
-          @sect_a.reduce 1 do |m, sect|
-            if (( a = sect.lines )).length.nonzero?
+          @node_stry.sections.reduce 1 do |m, sect|
+            if (( a = sect.any_nonzero_length_line_a ))
               m = a.reduce m do |m_, row_a|
                 row = row_a.first
                 ( row && row.length > m_ ) ? row.length : m_
@@ -729,14 +759,16 @@ module Skylab::Headless
           lxc.add_entry_with_default :optns, 'options'
         end
 
-        def rndr_any_hlp_sects y
-          @sect_a and help_sections y ; nil
+        def render_any_hlp_sects y
+          if node_stry.has_nonzero_sections
+            rndr_some_help_sections y ; nil
+          end
         end
 
-        def help_sections y
-          rnd = nil
-          @sect_a.each do |section|
-            rnd ||= bld_hlp_sct_rndrr( y )
+        def rndr_some_help_sections y
+          rnd = bld_hlp_sct_rndrr y
+          scn = @node_stry.get_section_scanner
+          while (( section = scn.gets ))
             rnd << section
           end ; nil
         end
@@ -798,15 +830,16 @@ module Skylab::Headless
         # ~ #storypoint-1105 acting like a child
 
         def some_summary_ln  #storypoint-1110 :+#API-private
-          if @desc_s_a
-            @desc_s_a.fetch 0
-          elsif option_parser
+          if node_stry.has_nonzero_desc_lines
+            @node_stry.fetch_first_desc_line
+          elsif has_op_docmtr
             smry_ln_from_op
           end
         end ; public :some_summary_ln
 
         def smry_ln_from_op
-          if (( s = ::String.try_convert @option_parser.top.list.first ))
+          od = option_documenter
+          if (( s = ::String.try_convert od.top.list.first ))
             s_ = CLI::Pen::FUN.unstyle[ s ]
             s_.gsub STRIP_DESCRIPTION_LABEL_RX__, EMPTY_STRING_
           else
@@ -843,12 +876,6 @@ module Skylab::Headless
         end
 
         # ~ :#private-API methods not used by this node
-
-        def apply_p_a_on_op p_a, op  # :#private-API
-          p_a.each do |p|
-            instance_exec op, & p
-          end ; nil
-        end
 
         def enqueue_with_args i, * arg_a
           q_for_wrt.enqueue_with_args_notify i, arg_a ; nil

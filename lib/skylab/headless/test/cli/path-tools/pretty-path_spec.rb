@@ -3,7 +3,7 @@ require_relative 'for-rspec' # sorry
 
 # NOTE rspec-only currently :/ #todo
 
-describe "[hl] CLI path-tools pretty-path", o:true do
+describe "[hl] CLI path-tools pretty-path" do
 
   include ::Skylab::Headless # constants
 

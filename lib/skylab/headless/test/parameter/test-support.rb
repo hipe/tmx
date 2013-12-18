@@ -14,7 +14,7 @@ module Skylab::Headless::TestSupport::Parameter
     def with &b                   # define the class body you will use in
       @klass = ::Class.new.class_exec do      # the frame
         include Headless::SubClient::InstanceMethods
-        extend Parameter::Definer
+        Parameter::Definer[ self ]
         class_exec(&b)
       private
         # A definition of formal_parameters is needed for compat. with
@@ -35,7 +35,7 @@ module Skylab::Headless::TestSupport::Parameter
       klass = @klass
       let :_frame do
         client = Headless_TestSupport::Client_Spy.new
-        client.debug = -> { do_debug }
+        client.do_debug_proc = -> { do_debug }
         object = klass.new client
         emit_lines = -> do
           if client.emission_a

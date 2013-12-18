@@ -4,7 +4,7 @@ module Skylab::Headless::TestSupport::CLI::Argument::Syntax
 
   # (before we had this test, we got coverage from [#136] test node)
 
-  describe "[hl] CLI argument synatax goofy", ok: true do
+  describe "[hl] CLI argument synatax goofy" do
 
     extend TS__
 

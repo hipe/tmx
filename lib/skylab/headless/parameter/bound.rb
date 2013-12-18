@@ -10,7 +10,7 @@ module Skylab::Headless
   end
 
   class Parameter::Bound::Enumerator < ::Enumerator
-    extend Parameter::Definer
+    Parameter::Definer[ self ]
     def self.[](param) ; Parameter::Bound::Enumerator::Proxy.new(param) end
     def initialize host_instance
       super() { |y| init ; visit(y) }

@@ -17,7 +17,7 @@ module Skylab::Headless
         class Hot_Adapter_ < ::Skylab::Face::CLI::Adapter::For::Face::Of::Hot
 
           def get_summary_a_from_sheet _ns_sheet
-            [ @actual.summary_line ]
+            [ @actual.some_summary_ln ]
           end
         end
       end

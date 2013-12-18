@@ -10,7 +10,7 @@ module Skylab::Headless::TestSupport::CLI::Action::OP__
 
   extend TestSupport::Quickie
 
-  describe "[hl] CLI action OP integration", ok: true do
+  describe "[hl] CLI action OP integration" do
 
     extend TS__
 

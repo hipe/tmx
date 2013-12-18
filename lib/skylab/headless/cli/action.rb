@@ -2,6 +2,8 @@ module Skylab::Headless
 
   module CLI::Action  # #storypoint-5 in [#039] the CLI action narrative
 
+    CEASE_X = false ; PROCEDE_X = true  # #storypoint-7
+
     def self.[] mod, * x_a
       Bundles__.apply_iambic_on_client x_a, mod
     end
@@ -35,6 +37,13 @@ module Skylab::Headless
     end
 
     module DSL_Meths  # #storypoint-10
+
+      def option_parser_class x
+        p_ = x.respond_to?( :call ) ? x : -> { x }
+        define_method :option_parser_cls, p_
+        private :option_parser_cls ; nil
+      end ; private :option_parser_class
+
       def option_parser &p  # #storypoint-15, #storypoint-16
         (( @any_option_parser_p_a ||= [] )) << p ; nil
       end ; private :option_parser
@@ -71,9 +80,7 @@ module Skylab::Headless
       private :default_action_i ; nil
     end
 
-    CEASE_X_ = false
-    DASH_ = '-'.getbyte 0
-    PROCEDE_X_ = true
+    CEASE_X_ = CEASE_X ; DASH_ = '-'.getbyte 0 ; PROCEDE_X_ = PROCEDE_X
 
     # ~ #orphanage
 

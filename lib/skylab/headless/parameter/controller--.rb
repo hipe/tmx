@@ -4,7 +4,7 @@ module Skylab::Headless
 
     module Controller__  # assumes `parameter_error_structure`
 
-      p = -> a do
+      to_proc = -> a do
         include IM__
         if :without == a[ 0 ]
           :headless_sub_client == a[ 1 ] or fail "no - #{ a[ 1 ] }"
@@ -12,8 +12,7 @@ module Skylab::Headless
         else
           include Headless::SubClient::InstanceMethods
         end ; nil
-      end
-      define_singleton_method :to_proc do p end
+      end ; define_singleton_method :to_proc do to_proc end
 
       Struct_Adapter = -> a do
 

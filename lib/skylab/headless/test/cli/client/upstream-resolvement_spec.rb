@@ -31,7 +31,7 @@ module Skylab::Headless::TestSupport::CLI::Client
       it "0)   invokes - x" do
         invoke
         expect :styled, "expecting: <flerp>"
-        expect_neutral_result
+        expect_result_for_failure
       end
 
       it "1.3) invokes - o" do

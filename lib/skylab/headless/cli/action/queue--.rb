@@ -27,6 +27,10 @@ module Skylab::Headless
         @a.first if @a.length.nonzero? and @a.first.respond_to? :id2name
       end
 
+      def peek_any_last_element_i
+        @a.last if @a.length.nonzero? and @a.last.respond_to? :id2name
+      end
+
       def is_on_last_frame
         1 == @a.length
       end
@@ -80,7 +84,8 @@ module Skylab::Headless
         end
 
         def resolve_for_proc_when_on_last_frame
-          use_client_to_validate_proc_syntax_against @client.release_argv
+          _argv = @client.release_any_argv || MetaHell::EMPTY_A_
+          use_client_to_validate_proc_syntax_against _argv
         end
 
         def resolve_for_proc_when_not_on_last_frame

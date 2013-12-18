@@ -12,20 +12,17 @@ module Skylab::Headless
       rx = /\A (?<string>[^\e]+)?  \e\[
         (?<digits> \d+  (?: ; \d+ )* )  m  (?<rest> .*) \z/mx
 
-      -> str do
-        res = nil
-        loop do
-          md = rx.match str
-          md or break
-          res ||= [ ]
-          res << sexp[:string, md[:string]] if md[:string]
-          res << sexp[:style, * md[:digits].split( ';' ).map(& :to_i )]
-          str = md[:rest]
+      -> s do
+        y = [] ; begin
+          md = rx.match( s ) or break
+          md[ :string ] and y << sexp[ :string, md[ :string ] ]
+          y << sexp[ :style, * md[ :digits ].split( ';' ).map( & :to_i ) ]
+          s = md[ :rest ]
+        end while true
+        if y.length.nonzero?
+          s.length.nonzero? and y << sexp[ :string, s ]
+          y
         end
-        if res && str.length.nonzero?
-          res << sexp[:string, str]
-        end
-        res
       end
     end.call
 

@@ -1,6 +1,6 @@
 module Skylab::Headless::TestSupport
 
-  class Client_Spy
+  class Client_Spy  # go this away? [#144]
 
     # use for emit-spy-style testing of application code (e.g controllers)
     # in a *generic* (modality agnostic) way
@@ -10,11 +10,32 @@ module Skylab::Headless::TestSupport
 
     USE_THIS_PEN = nil
 
+    def initialize
+      @debug = NILADIC_TRUTH_  # loud until proven quiet
+      @use_this_pen = nil
+    end
+
     attr_reader :debug
 
-    def debug= callable
+    def do_debug_proc= callable
       fail ::ArgumentError.new( 'callable?' ) if ! callable.respond_to?( :call )
       @debug = callable
+    end
+
+    def emit_help_line_p
+      @ehlp ||= method :emit_help_line
+    end
+
+    def emit_help_line s
+      emit :help, s
+    end
+
+    def emit_info_line_p
+      @eilp ||= method :emit_info_line
+    end
+
+    def emit_info_line s
+      emit :info, s  # #todo:during-merge
     end
 
     def emission_a
@@ -22,11 +43,6 @@ module Skylab::Headless::TestSupport
     end
 
   private
-
-    def initialize
-      @debug = NILADIC_TRUTH_  # loud until proven quiet
-      @use_this_pen = nil
-    end
 
     def io_adapter
       @IO_adapter ||= begin

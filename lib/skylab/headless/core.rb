@@ -119,7 +119,7 @@ module Skylab::Headless
     end ]
   end
 
-  class Event_  # :[#089] the magical, multipurpose Event base class
+  class Event_  # :[#132] the magical, multipurpose Event base class
     New_method_produces_subclasses_with_members__[ self,
       :with_args, -> x_a, p do
         x_a.length.zero? && p &&

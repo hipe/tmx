@@ -8,7 +8,7 @@ module Skylab::Headless::TestSupport::CLI::Action::Queue_Args__
 
   extend TestSupport::Quickie
 
-  describe "[hl] CLI action queue - args", ok: true do
+  describe "[hl] CLI action queue - args" do
 
     extend TS__
 

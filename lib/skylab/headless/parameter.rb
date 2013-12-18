@@ -26,20 +26,23 @@ module Skylab::Headless
     end
   end
 
-  module Parameter::Definer
+  module Parameter::Definer  # this is an abuse
+
     class << self
-      map = -> k do               # sugar, #experimental
-        (map = {
-          ::Class  => Parameter::Definer::InstanceMethods::IvarsAdapter,
-          ::Hash   => Parameter::Definer::InstanceMethods::HashAdapter,
-          ::Struct => Parameter::Definer::InstanceMethods::StructAdapter
-        })[ k ]
+
+      def [] mod
+        mod.extend ModuleMethods
+        mod.send :include, ( if mod.method_defined? :keys
+          InstanceMethods::HashAdapter
+        elsif mod.method_defined? :members
+          InstanceMethods::StructAdapter
+        else
+          InstanceMethods::IvarsAdapter
+        end ) ; nil
       end
 
-      define_method :extended do |mod| # #[#sl-111] and more .. #experimental !
-        mod.extend Parameter::Definer::ModuleMethods
-        mod.send :include,
-          map[ ( [::Struct, ::Hash] & mod.ancestors ).fetch(0) { ::Class } ]
+      def extended mod
+        fail "'extend' is deprecated NOW - use '[]' which has identical behavior"  # #todo:during-merge
       end
     end
   end

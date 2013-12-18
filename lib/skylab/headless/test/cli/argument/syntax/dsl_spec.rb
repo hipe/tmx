@@ -2,7 +2,7 @@ require_relative 'test-support'
 
 module Skylab::Headless::TestSupport::CLI::Argument::Syntax
 
-  describe "[hl] CLI argument syntax DSL", ok: true do
+  describe "[hl] CLI argument syntax DSL" do
 
     extend TS__
 

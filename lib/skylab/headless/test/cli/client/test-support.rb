@@ -23,9 +23,12 @@ module Skylab::Headless::TestSupport::CLI::Client
 
   module InstanceMethods
 
-    def invoke * argv
-      argv.flatten!
-      @result = client.invoke argv ; nil
+    # ~ test phase
+
+    def invoke * x_a
+      _a = CONSTANTS::Normalize_argv[ x_a ]
+      _cli = client
+      @result = _cli.invoke _a ; nil
     end
 
     def client
@@ -33,37 +36,43 @@ module Skylab::Headless::TestSupport::CLI::Client
     end
 
     def build_client
-      _a = triad.to_a
-      cli = client_class.new( * _a )
+      _three = three_streams_triad.to_a
+      _cls = client_class
+      cli = _cls.new( * _three )
       cli.program_name = HERP__
       cli
     end
-
     HERP__ = 'herp'.freeze
 
-    def bake_serr_a  #hook-out
-      t = triad
-      @triad = :_spent_
-      t.errstream.string.split Headless::LINE_SEPARATOR_STRING_
+    def three_streams_triad
+      @three_streams_triad ||= build_three_streams_triad
     end
 
-    def triad
-      @triad ||= begin
-        t = TestSupport::IO::Spy::Triad.new( * stdin_spy )
-        do_debug and t.debug!
-        t
-      end
+    def build_three_streams_triad
+      t = TestSupport::IO::Spy::Triad.new( * stdin_spy )
+      do_debug and t.debug!
+      t
     end
 
     def stdin_spy  # :#hook-in
     end
 
-    def errstring
-      triad.errstream.string
-    end
+    # ~ assertion phase
 
     def errstr
       errstring.strip
+    end
+
+    def errstring
+      three_streams_triad.errstream.string
+    end
+
+    def serr_a_bake_notify  #hook-out
+      t = three_streams_triad
+      @three_streams_triad = :_spent_
+      t.outstream.string.length.zero? or fail "there was output to stderr? #{
+        } (\"#{ Headless::CLI::FUN::Ellipsify[ t.outstream.string ] }\")"
+      t.errstream.string.split Headless::LINE_SEPARATOR_STRING_
     end
   end
 end

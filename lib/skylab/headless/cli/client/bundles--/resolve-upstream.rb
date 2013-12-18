@@ -9,14 +9,16 @@ module Skylab::Headless
       def initialize client
         # #todo:during-merge use schlurp
         @argv = client.instance_variable_get :@argv
+        @argv or fail 'sanity'
         @err_p = client.method :emit_error_line
         @get_stx_p = client.method :argument_syntax_for_action_i
         @par_lbl_p = client.method :parameter_label
         @IO_adptr = client.instance_variable_get :@IO_adapter
         @instream = @IO_adptr.instream
-        @last_act_i = client.instance_variable_get :@last_action_i
-        @result = CEASE_X_ ; nil
+        @relevant_action_i = client.send :default_action_i
+        @result = CEASE_X__ ; nil
       end
+      CEASE_X__ = CLI::Action::CEASE_X ; PROCEDE_X__ = CLI::Action::PROCEDE_X
 
       def execute
         @argv_d = @argv.length.zero? ? NO_ARGV__ : SOME_ARGV__
@@ -34,11 +36,12 @@ module Skylab::Headless
       end
       NO_ARGV__ = NONINTERACTIVE__ = 0 ; SOME_ARGV__ = 1 ; INTERACTIVE__ = 2
       def try_instream
-        PROCEDE_X_  # nothing to do.
+        PROCEDE_X__  # nothing to do.
       end
+
       def ambiguous
         emit_error_string say_ambiguous  # #storypoint-20
-        CEASE_X_
+        CEASE_X__
       end
       def say_ambiguous
         "cannot resolve ambiguous upstream modality paradigms -- #{
@@ -53,15 +56,17 @@ module Skylab::Headless
       end
       def when_argv_length_is_zero
         emit_error_string "expecting: #{ infile_moniker }"
-        CEASE_X_
+        CEASE_X__
       end
       def when_argv_length_greater_than_one
         emit_error_string say_too_much_arg
-        CEASE_X_
+        CEASE_X__
       end
-      def say_too_much_arg
-        "expecting: #{ infile_moniker } #{
-          }had: (#{ @argv.join TERM_SEPARATOR_STRING_ })"
+      def say_too_much_arg  # #todo:during-merge
+        d = @argv.length
+        "unexpected argument#{ 's' unless 1 == d }: #{
+         @argv.map( & :inspect ) * TERM_SEPARATOR_STRING_ }. #{
+          }expecting #{ infile_moniker }"
       end
       def when_argv_length_is_one
         @pathname = ::Pathname.new @argv.shift
@@ -75,7 +80,7 @@ module Skylab::Headless
       end
       def when_pathname_not_exist
         emit_error_string say_not_found
-        CEASE_X_
+        CEASE_X__
       end
       def say_not_found
         "#{ infile_moniker } not found: #{ @pathname }"
@@ -90,7 +95,7 @@ module Skylab::Headless
       FILE_S__ = 'file'.freeze
       def when_pathname_is_not_file
         emit_error_string say_is_not_file
-        CEASE_X_
+        CEASE_X__
       end
       def say_is_not_file
         "#{ infile_moniker } is #{ @stat.ftype }: #{ @pathname }"
@@ -101,7 +106,7 @@ module Skylab::Headless
           fail "sanity - won't overwrite existing open instream"
        @IO_adptr.instream = @pathname.open READ_MODE__
          # the above is #open-filehandle-1 --  don't loose track!
-       PROCEDE_X_
+       PROCEDE_X__
       end
       READ_MODE__ = 'r'.freeze
 
@@ -113,7 +118,7 @@ module Skylab::Headless
 
       def infile_moniker  # #todo:during-merge use expag instead
         # a hack to show whatever same label would be used in e.g. missing arg
-        _stx = @get_stx_p[ @last_act_i ]
+        _stx = @get_stx_p[ @relevant_action_i ]
         _par = _stx.fetch_argument_at_index 0
         @par_lbl_p[ _par ]
       end  # (the above code as-is is a case study for :+[#bs-012])

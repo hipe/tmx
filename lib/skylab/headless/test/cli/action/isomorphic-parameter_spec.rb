@@ -12,7 +12,7 @@ module Skylab::Headless::TestSupport::CLI::Action::Iso_Param__
 
   # :[#136] also covers arg syntax
 
-  describe "[hl] CLI action isomorphic params spec", ok: true do
+  describe "[hl] CLI action isomorphic params spec" do
 
     extend TS__
 

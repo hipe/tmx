@@ -2,7 +2,7 @@ require_relative 'core-help/test-support'
 
 module Skylab::Headless::TestSupport::CLI::Action::Hlp__
 
-  describe "[hl] CLI action OP integration", ok: true do
+  describe "[hl] CLI action OP integration" do
 
     extend TS__
 

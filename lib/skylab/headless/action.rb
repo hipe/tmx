@@ -71,9 +71,7 @@ module Skylab::Headless
       alias_method :full_name_proc, :name_function # #hook-out legacy
 
       def actions_anchor_module
-        x = const_get :ACTIONS_ANCHOR_MODULE_P__, true
-        x.respond_to?( :call ) and x = x.call
-        x
+        const_get( :ACTIONS_ANCHOR_MODULE_P__, true ).call
       end
 
       def modalities_anchor_module

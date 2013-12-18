@@ -37,6 +37,10 @@ module Skylab::Headless::TestSupport::CLI::Client
         Foo
       end
 
+      it "builds" do
+        client
+      end
+
       it "ohai" do
         client
         @result = @client.invoke %w( wenkel biz )

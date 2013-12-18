@@ -8,7 +8,7 @@ module Skylab::Headless::TestSupport::CLI::Desc__
 
   extend TestSupport::Quickie
 
-  describe "[hl] CLI help sections", ok: true do
+  describe "[hl] CLI help sections" do
 
     it "no lines" do
       parse <<-O

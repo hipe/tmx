@@ -1,430 +1,400 @@
 module Skylab::Headless
 
-  module CLI::Box::DSL
+  module CLI
 
-    # ~ never say never - read [#040] the CLI box DSL narra.. #storypoint-88
+    module Box
 
-    def self.[] mod, * x_a
-      mod.module_exec x_a, & To_proc__
-      x_a.length.zero? or raise ::ArgumentError, "unexpected argument: #{
-        }#{ Headless::FUN::Inspect[ x_a.first ] }" ; nil
-    end
+      module DSL  # read [#040] #storypoint-5
+        to_proc = -> x_a do
+          if ! private_method_defined? DISPATCH_METHOD_I_
+            Box[ self, :core_instance_methods ]
+          end
+          extend CLI::Action::DSL_Meths
+          module_exec( & Preserve_box_property_methods__ )
+          extend MMs__ ; include IMs__
+          :leaf_action_base_class == x_a.first and x_a.shift and
+            module_exec x_a, & Bundles__::Leaf_action_base_class
+          nil
+        end ; define_singleton_method :to_proc do to_proc end
 
-    def self.to_proc ; To_proc__ end  # :+#private-API
-
-    To_proc__ = -> x_a do
-      MetaHell::MAARS::Upwards[ self ]  # #re-entrant, #storypoint-77
-      extend MMs__ ; include IMs__  # NOTE 'method_added' hook
-      x_a && x_a.length.nonzero? and
-        module_exec x_a, & Bundles__.to_proc ; nil
-    end
-
-    module Bundles__
-      # populated within narrative below
-      MetaHell::Bundle::Multiset[ self ]
-    end
-
-    module MMs__
-
-      include Autoloader::Methods  # read [#040] - #storypoint-1
-
-      include CLI::Action::ModuleMethods  # #reach-up!
-
-    private  # ~ #storypoint-6 the bread and butter of this module is these..
-
-      def append_syntax s
-        some_act_cls.append_syntax s ; nil  # [#119] intentionally ugly names
-      end
-
-      def build_option_parser & p
-        some_act_cls.build_option_parser( & p ) ; nil
-      end
-
-      def option_parser &p
-        some_act_cls.option_parser( & p ) ; nil
-      end
-
-      def option_parser_class x
-        some_act_cls.option_parser_class x ; nil
-      end
-
-      alias_method :wrt_bx_dsc, :desc  # picks up below
-
-      def desc *a, &p   # #storypoint-3 :+[#033] general tracker of desc
-        if p and a.length.zero?
-          acpt_dsc p
-        else
-          some_act_cls.desc( *a, &p )
+        module Bundles__
+          Leaf_action_base_class = -> x_a do
+            x = x_a.shift
+            _p = x.respond_to?( :call ) ? x : -> { x }
+            singleton_class.class_exec do
+              define_method :leaf_action_base_cls, _p
+              private :leaf_action_base_cls
+            end ; nil
+          end
         end
-      end
 
-      def acpt_dsc p
-        some_act_cls.desc do |y|
-          me = self
-          @request_client.instance_exec do
-            if @bound_downtree_action
-              me.object_id == @bound_downtree_action.object_id or
-                change_to me
+        module MMs__
+
+          def unbound_action_box
+            @unbnd_act_bx ||= rslv_unbound_action_box
+          end
+        private
+          def rslv_unbound_action_box
+            const_defined? ACTIONS_BOX_MOD_I__, false or intlz_unbound_act_box
+            const_get ACTIONS_BOX_MOD_I__, false
+          end
+          def intlz_unbound_act_box
+            if ! respond_to? :dir_pathname  # #storypoint-25
+              MetaHell::MAARS::Upwards[ self ]
+            end
+            mod = const_set ACTIONS_BOX_MOD_I__, ::Module.new
+            MetaHell::Boxxy[ mod ] ; nil
+          end
+        end
+
+        ACTIONS_BOX_MOD_I__ = :Actions
+
+        module MMs__
+          attr_reader :_DSL_is_off
+        private
+          def method_added i  # #storypoint-55
+            _DSL_is_off or fnsh_active_action i
+          end
+        public
+          def with_DSL_off
+            befor = _DSL_is_off
+            @_DSL_is_off = true
+            r = yield
+            @_DSL_is_off = befor ; r
+          end
+          def turn_DSL_off
+            @_DSL_is_off = true ; nil
+          end
+          def turn_DSL_on
+            @_DSL_is_off = false ; nil
+          end
+        private
+          def fnsh_active_action i
+            _const_i = Headless::Name::FUN::Constantify[ i ].intern
+            unbound_action_box.const_set _const_i, rls_some_open_action_class
+          end
+          def rls_some_open_action_class
+            cls = some_crrnt_open_action_class
+            @crrnt_open_action_cls = nil
+            cls
+          end
+          def some_crrnt_open_action_class
+            @crrnt_open_action_cls ||= bld_open_action_class
+          end
+        private
+          def bld_open_action_class
+            unbound_acts_mod = unbound_action_box
+            ::Class.new( leaf_action_base_cls ).class_exec do
+              extend Leaf_MMs__ ; include Leaf_IMs__
+              const_set :ACTIONS_ANCHOR_MODULE_P__, -> { unbound_acts_mod }
+              undef_method :invoke  # catch issues early
+              self
+            end
+          end
+          def leaf_action_base_cls
+            ::Object
+          end
+        end  # box m.m's
+
+        module Leaf_MMs__
+          include CLI::Action::DSL_Meths
+          include Headless::Action::Anchored_Name_MMs
+        end
+
+        module IMs__
+        private
+          def argument_stx
+            if @is_dsnggd
+              arg_stx_as_DSL_box_disengaged
             else
-              collapse_to me  # #jump-3
+              arg_stx_as_DSL_box_engaged
             end
-            instance_exec y, &p
-          end ; nil
-        end
-      end
-
-      def method_added meth_i  # #storypoint-8  #hook-in to ruby.
-        self.DSL_is_disbld or begin
-          _const_i = Autoloader::FUN::Constantize[ meth_i ]
-          unbound_action_box.const_set _const_i, some_act_cls
-          @act_cls_in_progress = nil
-        end
-      end
-    public
-      attr_reader :DSL_is_disbld
-    private
-      def turn_DSL_off  # :#public-API "service method" (this cluster)
-        @DSL_is_disbld = true ; nil
-      end
-      def turn_DSL_on
-        @DSL_is_disbld = false ; nil
-      end
-      def with_DSL_off &p
-        _DSL_was_disabled = self.DSL_is_disbld ; @DSL_is_disbld = true
-        r = module_exec( & p ) ; @DSL_is_disbld = _DSL_was_disabled ; r
-      end
-
-      # ~ #storypoint-7 (the next several methods)
-
-      def some_act_cls
-        @act_cls_in_progress ||= bld_act_cls
-      end
-      def bld_act_cls
-        box = self
-        ::Class.new( leaf_act_supercls ).class_exec do
-          extend Leaf_MMs__
-          const_set :ACTIONS_ANCHOR_MODULE, box.unbound_action_box  # #jump-1
-          include Leaf_IMs__
-          @tug_class = MAARS::Tug
-          define_method :argument_syntax do  # #storypoint-2
-            Headless::CLI::Argument::Syntax::Inferred.new(
-              box.instance_method( leaf_method_name ).parameters, nil )
           end
-          undef_method :invoke
-          self
-        end
-      end
-      def leaf_act_supercls
-        ::Object
-      end
-    end
-    module Leaf_IMs__
-      def leaf_method_name
-        name.local_normal
-      end
-    end
-    module Bundles__
-      Leaf_action_base_class = -> x_a do
-        p = x_a.shift
-        define_singleton_method :leaf_act_supercls, p ; nil
-      end
-    end
-    module MMs__  # (still in #storypoint-7)
-      def unbound_action_box  # :#jump-1. must be public
-        if const_defined? ACTIONS_CONST_I__, false
-          const_get ACTIONS_CONST_I__, false
-        else
-          const_set ACTIONS_CONST_I__, bld_action_bx_mod
-        end
-      end
-    private
-      def bld_action_bx_mod
-        box = self
-        ::Module.new.module_exec do
-          include CLI::Box::InstanceMethods
-          @tug_class = MAARS::Tug
-          if box.dir_pathname
-            @dir_pathname = box.dir_pathname.join ACTIONS_STRING__
-          else
-            @dir_pathname = false  # tells a.l not to try to induce our path
-            box.add_dir_pathname_listener ACTIONS_CONST_I__, self
+          def arg_stx_as_DSL_box_engaged
+            argument_syntax_for_action_i @bound_downtree_action.name.as_method
           end
-          MetaHell::Boxxy[ self ]
-          self
-        end
-      end
-      ACTIONS_CONST_I__ = :Actions ; ACTIONS_STRING__ = 'actions'.freeze
-    end
-
-    module MMs__
-
-      def box  # #storypoint-5 experimental way to get thru to the host cls
-        @box_proxy ||= bld_bx_pxy
-      end
-    private
-      def bld_bx_pxy
-        Pxy__[].new( desc: -> *a do
-          wrt_bx_dsc( * a )
-        end )
-      end
-      Pxy__ = MetaHell::FUN::Memoize[ -> do
-        Pxy___ = MetaHell::Proxy::Functional.new :desc
-      end ]
-    end
-
-    module IMs__
-
-      include CLI::Box::InstanceMethods
-
-      def initialize * _
-        @bound_downtree_action = @is_leaf = @option_parser = @prev_frame = nil
-        @queue = []
-        super( * _ )
-      end
-
-    private
-
-      def dispatch action=nil, *args  # #storypoint-094.  NOTE args are UI la..
-        if action then
-          cry = rslv_task_with_action_x_and_args action, args
-          cry and cry.receiver.send cry.method_name, * cry.arguments
-        else
-          super
-        end
-      end
-
-      def rslv_task_with_action_x_and_args x, a
-        cls = fetch_action_class_notify x
-        cls and rslv_task_with_action_class_and_args cls, a
-      end
-
-      def rslv_task_with_action_class_and_args cls, a
-        hot = cls.new self
-        if hot.is_branch  # why deny the child its own autonomy
-          rslv_task_with_hot_branch_and_args hot, a
-        else
-          collapse_to hot
-          Method_Curry__.new method( :invoke ), [ a ]
-        end
-      end
-
-      def rslv_task_with_hot_branch_and_args hot, a
-        Method_Curry__.new hot.method( :invoke ), [ a ]
-      end
-    end
-
-    Method_Curry__ = Headless::Services::Basic::Method::Curry
-
-    Frame__ = ::Struct.new :is_leaf, :option_parser  # below
-
-    module IMs__
-
-      attr_reader :is_leaf  # #hook-out, # #storypoint-95 - leaf or branch?
-
-    private
-
-      def collapse_to hot  # #storypoint-96, #hybridized, :#jump-3
-        if @queue.length.nonzero?
-          :dispatch == @queue.fetch( 0 ) or fail 'sanity'
-        end
-        @prev_frame ||= Frame__.new  # really asking for it
-        @prev_frame.is_leaf = false
-        @prev_frame.option_parser = @option_parser
-        change_to hot ; nil
-      end
-
-      def change_to hot
-        @bound_downtree_action = hot
-        @is_leaf = hot.is_leaf
-        @option_parser = hot.option_parser
-        @queue[ 0 ] = hot.leaf_method_name ; nil
-      end
-
-      def uncollapse_from leaf_i  # #storypoint-60
-        leaf_i == @bound_downtree_action.normalized_local_action_name or
-          raise "sanity - expected '#{ i }' had .."
-        @is_leaf = @prev_frame.is_leaf
-        @prev_frame.is_leaf = nil
-        @option_parser = @prev_frame.option_parser
-        @prev_frame.option_parser = nil
-        @bound_downtree_action = nil ; nil
-      end
-
-      def default_action_i  # #hook-out
-        @default_action_i ||= :dispatch
-      end
-
-      # ~ #storypoint-80 #hook-in to facilities to customize them
-
-      def normalized_invocation_string as_collapsed=true
-        a = [ super() ]
-        is_collapsed && as_collapsed and a << @bound_downtree_action.name.as_slug
-        a * TERM_SEPARATOR_STRING_
-      end
-
-      def is_collapsed
-        @bound_downtree_action
-      end
-
-      def build_option_parser  # popular default, :+[#037] box who builds own
-        op = create_box_option_parser
-        _short, _long, _sub_action, _this_screen, _or_sub_action_help =
-          lexical_values_at :SHRT_HLP_SW, :LNG_HLP_SW, :sb_actn,
-            :THS_SCRN, :osah
-        _sw = op.define _short, "#{ _long } [<#{ _sub_action }>]",
-          "#{ _this_screen } [#{ _or_sub_action_help }]" do |x|
-          enqueue_help_as_box x ; true
-        end
-        do_not_render_switch_in_syntax_string _sw
-        op
-      end
-
-      CLI::Action::LEXICON_.add do |lx|  # for now
-        lx.add_entry_with_default :osah, 'or sub-action help'
-        lx.add_entry_with_default :sb_actn, 'sub-action'
-      end
-
-      def do_not_render_switch_in_syntax_string sw  # #todo this goes away after merge
-        option_is_visible_in_syntax_string[ sw.object_id ] = false ; nil
-      end
-
-      def create_option_parser
-        op = Headless::Services::OptionParser.new
-        op.base.long.clear  # never use builtin 'officious' -v, -h  # [#059]
-        op
-      end
-      # #storypoint-50
-      alias_method :create_box_option_parser, :create_option_parser
-      alias_method :create_leaf_option_parser, :create_option_parser
-
-      def argument_syntax  # [#063] a smell from hybridiation
-        if is_collapsed
-          argument_syntax_when_collapsed
-        else
-          argument_syntax_when_not_collapsed
-        end
-      end
-
-      def argument_syntax_when_collapsed
-        argument_syntax_for_action_i @bound_downtree_action.
-          normalized_local_action_name
-      end
-
-      def argument_syntax_when_not_collapsed
-        argument_syntax_for_action_i :dispatch
-      end
-
-      def render_argument_syntax syn, em_range=nil  # [#063] a hybrid'n smell
-        if is_collapsed && @bound_downtree_action.class.append_syntax_a
-          "#{ super } #{ render_downstream_action_append_syntax_a }"
-        else
-          super
-        end
-      end
-
-      def render_downstream_action_append_syntax_a
-        @bound_downtree_action.class.append_syntax_a * TERM_SEPARATOR_STRING_
-      end
-
-      def invite_line z=nil  # [#063] a smell from hybridiaztion
-        if is_collapsed
-          render_invite_line "#{ normalized_invocation_string false } -h #{
-            }#{ @bound_downtree_action.name.as_slug }", z
-        else
-          super
-        end
-      end
-
-      def build_desc_lines  # #storypoint-98, :#jump-2, [#063] smell
-        x = super
-        if is_collapsed
-          uncollapse_from @bound_downtree_action.normalized_local_action_name
-        end ; x
-      end
-
-      def enqueue_help  # #storypoint-99
-        norm_i = @bound_downtree_action.normalized_local_action_name
-        @queue.first == norm_i or fail 'sanity'
-        @queue.shift  # done processing the name, shift it off
-        enqueue_help_as_box norm_i
-        @bound_downtree_action = nil ; nil
-      end
-    end
-
-    module Leaf_MMs__
-
-      include CLI::Action::ModuleMethods  # #reach-up!
-
-      def any_build_option_parser_p  # :#jump-4
-        build_option_parser_p
-      end
-      attr_reader :build_option_parser_p
-      def build_option_parser &p  # this is the DSL block writer, gets called
-        p or raise ::ArgumentError, "block required."
-        any_option_parser_p_a and raise ::ArgumentError, "bop must be before op"
-        @build_option_parser_p = p ; nil
-      end
-      def option_parser_class x
-        any_build_option_parser_p and raise ::ArgumentError, "#{
-          }b.o.p and o.p are mutually exclusive."
-        define_method :option_parser_class do x end ; nil
-      end
-    end
-
-    module Leaf_IMs__
-
-      include CLI::Action::InstanceMethods
-
-      def build_option_parser  # #storypoint-100
-        build_op_p = self.class.any_build_option_parser_p  # #jump-4
-        build_op_p ||= build_build_op_p
-        request_client.instance_exec( & build_op_p )
-      end
-    private
-      def build_build_op_p
-        leaf = self
-        -> do
-          op = leaf.crt_any_op || create_leaf_option_parser
-          instance_exec op, & leaf.wrt_any_op_blks_p
-          instance_exec op, & leaf.wrt_any_help_option_p
-          op
-        end
-      end
-    public
-      def crt_any_op
-        if (( cls = option_parser_class ))
-          cls.respond_to?( :call ) and cls = cls.call
-          cls.new
-        end
-      end
-    private
-      def option_parser_class  # :#hook-in for custom o.p class
-      end
-    public
-      def wrt_any_op_blks_p  # #storypoint-101
-        if (( p_a = self.class.any_option_parser_blocks ))  # i am the leaf
-          -> op do  # i am the branch
-            apply_p_a_on_op p_a, op
+          def arg_stx_as_DSL_box_disengaged
+            argument_syntax_for_action_i default_action_i
           end
-        else
-          MetaHell::MONADIC_EMPTINESS_
-        end
-      end
-      def wrt_any_help_option_p
-        leaf = self
-        -> op do
-          _a = lexical_values_at :SHRT_HLP_SW, :LNG_HLP_SW, :THS_SCRN
-          op.on( * _a ) do
-            leaf_i = leaf.normalized_local_action_name
-            @prev_frame and uncollapse_from leaf_i  # else hackery
-            if @queue.length.nonzero?
-              leaf_i == @queue.first or fail "sanity - #{ @queue.first }"
-              @queue.shift
+          def initialize( * )
+            @bound_downtree_action = nil ; @is_dsnggd = true
+            @is_leaf = false ; @node_stry = nil
+            super
+          end
+        public
+          attr_reader :is_leaf  # #storypoint-155
+          def bound_action_was_created_for_disptch disp  # #storypoint-105
+            super  # notify it but disregard result
+            engg_with disp.bound_receiver
+            @argv, = disp.args
+            befor = queue_len
+            x = parse_opts @argv
+            if PROCEDE_X__ != x
+              Value_Dispatch_[ x ]
+            elsif befor == queue_len
+              crt_dispatch_for_bound_downtree
+            else
+              NO_OP_  # something was added to the queue, just bubble up
             end
-            enqueue [ :help, -> { leaf } ] ; nil
+          end
+        private
+          def engg_with downtree
+            @is_dsnggd or self.fail_sanity
+            @bound_downtree_action = downtree
+            @has_od = nil ; @is_dsnggd = false ; @is_leaf = downtree.is_leaf
+            @node_stry_before_engagement = @node_stry ; @node_stry = nil
+            @op_before_engagement = @option_parser
+            @option_parser = downtree.any_op
+            nil
+          end
+          def dsngg_from downtree
+            @is_dsnggd and self.fail_sanity
+            @bound_downtree_action = nil
+            @has_od = nil ; @is_dsnggd = true ; @is_leaf = false
+            @node_stry = @node_stry_before_engagement
+            @node_stry_before_engagement = nil
+            @option_parser = @op_before_engagement
+            @op_before_engagement = nil ; nil
+          end
+
+          class DSL::Value_Dispatch_
+            class << self ; alias_method :[], :new end
+            def initialize x
+              @value_x = x ; nil
+            end
+            attr_reader :value_x
+            def bound_receiver ; self end
+            def dispatchee_method_i ; :value_x end
+            def args ; MetaHell::EMPTY_A_ end
+            def invite_line ; end  # eew
+          end
+          DSL::NO_OP_ = class DSL::The_No_op_dispatch__
+            alias_method :initialize, :freeze
+            def bound_receiver ; self end
+            def dispatchee_method_i ; :noop end
+            def args ; MetaHell::EMPTY_A_ end
+            def noop ; PROCEDE_X__ end
+            self
+          end.new
+
+          def crt_dispatch_for_bound_downtree  # #storypoint-175
+            _meth_i = @bound_downtree_action.name.as_method
+            enqueue _meth_i
+            NO_OP_
           end
         end
-      end
-    end
-  end
+
+        module Leaf_IMs__
+          include CLI::Action::IMs
+          def any_op
+            op
+          end
+        private
+          def build_option_parser
+            @request_client.build_op_for_bound_actn self
+          end
+        public
+          def any_option_prsr_p_a
+            self.class.any_option_parser_p_a
+          end
+          def any_build_option_prsr_p
+            self.class.any_build_op_p
+          end
+        end
+
+        module IMs__
+          def build_op_for_bound_actn bound
+            bld_p = bound.any_build_option_prsr_p
+            if bld_p
+              bld_option_parser_for_bound_with_p bound, bld_p
+            else
+              bld_normal_option_parser_for_bound bound
+            end
+          end
+        private
+          def bld_option_parser_for_bound_with_p bound, bld_p
+            instance_exec( & bld_p )
+          end
+          def bld_normal_option_parser_for_bound bound
+            op = begin_option_parser_for_child
+            p_a = bound.any_option_prsr_p_a
+            p_a and apply_p_a_on_op p_a, op
+            match = lng_help_switch_rx.method :=~
+            has = op.top.list.index do |switch|
+              a = switch.long or next
+              a.index( & match )
+            end
+            has or add_hlp_for_child_to_op bound, op
+            op
+          end
+          def lng_help_switch_rx
+            @lhsrx ||= bld_long_help_switch_rx
+          end
+          def bld_long_help_switch_rx
+            _long = say_with_lxcn :LNG_HLP_SW
+            /\A#{ ::Regexp.escape _long }\b/
+          end
+        private
+          def begin_option_parser_for_child
+            begin_option_parser
+          end
+          def add_hlp_for_child_to_op bound, op
+            _a = lexical_vals_at :SHRT_HLP_SW, :LNG_HLP_SW, :THS_SCRN
+            op.on( * _a ) do
+              enqueue_with_args :help, -> { }  # #storypoint-195
+            end
+            op
+          end
+          def help_screen_for_chld y, chld_x  # #storypoint-200
+            if @is_dsnggd
+              bound = rslv_bound_action_for_help chld_x
+              bound ? hlp_screen_for_bound_child( y,  bound ) : CEASE_X__
+            else
+              x = chld_x[] and fail "sanity - #{ Headless::FUN::Inspect[ x ] }"
+              hlp_screen_as_engaged_box y
+            end
+          end
+          def hlp_screen_for_bound_child y, bound
+            engg_with bound
+            r = hlp_screen_as_engaged_box y
+            dsngg_from bound
+            r
+          end
+          def hlp_screen_as_engaged_box y
+            @argv.length.zero? or on_extra_argv_during_hlp y
+            help_screen y
+          end
+          def prepare_for_help_screen_as_bx
+            if @is_dsnggd
+              super
+            else
+              replace_queue_head_wth_i @bound_downtree_action.name.as_method
+            end ; nil
+          end
+        public  # #storypoint-405
+          def invite_line z=nil
+            if @is_dsnggd then super else
+              normalized_invocation_string_prts( y = [] )
+              y[ -1, 0 ] = [ say_with_lxcn( :SHRT_HLP_SW ) ]
+              _cmd = y * TERM_SEPARATOR_STRING_
+              render_invite_line _cmd, z
+            end
+          end
+          def normalized_invocation_string_prts y
+            super
+            @is_dsnggd or y << @bound_downtree_action.name.as_slug ; nil
+          end
+        private
+          def render_any_hlp_dsc y
+            if @is_dsnggd then super else
+              super
+            end
+          end
+        public
+          def any_description_p_a_for_stry
+            if @is_dsnggd then super else
+              @bound_downtree_action.any_description_p_a_for_stry
+            end
+          end
+          def add_any_supplemental_sections_for_stry y
+            if @is_dsnggd then super else
+              @bound_downtree_action.add_any_supplemental_sections_for_stry y
+            end
+          end
+        private
+          def build_any_line_sexp_about_this_chld bound
+            @is_dsnggd or self.fail_sanity
+            engg_with bound
+            _summary_line = some_summary_ln
+            dsngg_from bound
+            [ :item, bound.name.as_slug, _summary_line ]
+          end
+          def render_any_hlp_opts y
+            if @is_dsnggd then super else
+              super
+            end
+          end
+          def render_any_hlp_sects y
+            if @is_dsnggd then super else
+              super
+            end
+          end
+          def render_any_hlp_addtn y
+            if @is_dsnggd then super else
+              @bound_downtree_action.send :render_any_hlp_addtn, y
+            end
+          end
+        end
+
+        # #storypoint-505: the auxiliaries, the 'DSL' part of the DSL
+
+        module MMs__
+          def build_option_parser &p
+            some_crrnt_open_action_class.class_exec do
+              build_option_parser( & p )
+            end ; nil
+          end
+        end
+        module Leaf_MMs__
+          attr_reader :any_build_op_p
+        private
+          def build_option_parser & p  # #storypoint-515
+            any_build_op_p and raise "`b.o.p` is write-once."
+            any_option_parser_p_a and raise say_bop_op_mutex
+            @any_build_op_p = p ; nil
+          end
+          def option_parser
+            any_build_op_p and raise say_bop_op_mutex
+            super
+          end
+          def say_bop_op_mutex
+            "`b.o.p` and `o.p` are mutually exclusive"
+          end
+        end
+
+        WMETH_I_A__ = %w( append_syntax desc option_parser ).freeze
+
+        module MMs__
+          WMETH_I_A__.each do |i|
+            define_method i do |*a, &p|
+              some_crrnt_open_action_class.send i, *a, &p
+            end
+          end
+          private( * WMETH_I_A__ )
+        end
+
+        module MMs__
+        private
+          def box
+            @box_properties_DSL_writer_proxy ||=
+              Box_Props_DSL_Writer_Proxy__.new self
+          end
+        end
+
+        class Box_Props_DSL_Writer_Proxy__
+
+          def initialize mod
+            @mod = mod ; nil
+          end
+
+          WMETH_I_A__.each do |i|
+            define_method i do |*a, &p|
+              @mod.send :"#{ i }_before_box_DSL", *a, &p
+            end  # NOTE we intentionally leave them public here
+          end
+        end
+
+        Preserve_box_property_methods__ = -> do
+          singleton_class.class_exec do
+            WMETH_I_A__.each do |i|
+              alias_method :"#{ i }_before_box_DSL", i
+            end ; nil
+          end
+        end
+
+        CEASE_X__ = CLI::Action::CEASE_X ; PROCEDE_X__ = CLI::Action::PROCEDE_X
+
+      end  # DSL
+    end  # Box
+  end  # CLI
 end
