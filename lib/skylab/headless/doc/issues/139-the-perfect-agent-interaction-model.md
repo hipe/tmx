@@ -111,7 +111,7 @@ module included. she may then of course override methods as necessary.
   callback events
 
 an event could be an arbitrary ruby value, but it is recommended to use
-event structures like [#089] the magical, multipurpose Event base class
+event structures like [#132] the magical, multipurpose Event base class
 (but this brings us outside of our scope finally).
 
 when we get back to the "namespaced semantic handler methods" we will pick

@@ -95,6 +95,6 @@ start reading from the bottom below at #1).
    | some "verb" |                   agent (if it sees that a listener is
    | sub-agent   |                   listenging to the appropriate semantic
    +-------------+                   channel) builds and emits a custom,
-                                     structured [#089] Event-like object.
+                                     structured [#132] Event-like object.
 
 well that's a start.
