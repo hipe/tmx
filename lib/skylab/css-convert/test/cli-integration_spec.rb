@@ -38,7 +38,14 @@ module Skylab::CssConvert::TestSupport
     end
 
     it "should whine about file not found" do
-      client.invoke([fixture_path('not-there.txt').to_s]).should eql(-1)
+      _argv = [ fixture_path( 'not-there.txt' ).to_s ]
+      _client = client
+      @result = _client.invoke _argv
+      expect_whine_about_directives_file_not_found
+      @result.should eql( -1 )
+    end
+
+    define_method :expect_whine_about_directives_file_not_found do
       stderr.shift.should match(/<directives-file> not found: .+not-there.txt/)
       u(stderr.shift).should match(usage_re)
       u(stderr.shift).should match(invite_re)

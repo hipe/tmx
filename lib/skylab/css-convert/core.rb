@@ -31,7 +31,8 @@ module Skylab::CssConvert
 
 
   class Core::Params < ::Hash
-    extend Headless::Parameter::Definer
+
+    Headless::Parameter::Definer[ self ]
 
     param :directives_file, pathname: true, writer: true do
       desc 'A file with directives in it.' # (not used yet)
@@ -77,11 +78,30 @@ module Skylab::CssConvert
 
     include Core::Client::InstanceMethods
 
+    def initialize sin, sout, serr
+      @default_action_i = nil
+      @IO_adapter = build_IO_adapter sin, sout, serr
+      super( )
+    end
+
+    def invoke( * )
+      r = super
+      GENERIC_ERROR_EXITSTATUS__ == r and usage_and_invite
+      r
+    end
+  private
+    def exitstatus_for_i i
+      :ok == i ? GENERIC_OK_EXITSTATUS__ : GENERIC_ERROR_EXITSTATUS__
+    end
+    GENERIC_OK_EXITSTATUS__ = 0 ; GENERIC_ERROR_EXITSTATUS__ = -1
+  public
+
     def convert directives_file
+      require 'debugger' ; debugger ; 1.class
       result = :error
       begin
         set! or break
-        resolve_instream_status_tuple or break
+        # resolve_instream_status_tuple or break
         p = CssConvert::Directive::Parser.new self
         d = p.parse_stream( io_adapter.instream ) or break
         if ! dump_directives d
@@ -107,10 +127,8 @@ module Skylab::CssConvert
 
   private
 
-    def initialize sin, sout, serr
-      @default_action_i = nil
-      @IO_adapter = build_IO_adapter sin, sout, serr
-      super( )
+    def resolve_upstream_status_tuple  # NOTE will change
+      resolve_instream_status_tuple
     end
 
     def build_option_parser
@@ -163,9 +181,10 @@ module Skylab::CssConvert
         re = /\A#{ ::Regexp.escape str }/
         found = DUMPABLE.keys.detect { |s| re =~ s }
         if ! found
-          res = usage_and_invite "need one of (#{
+          usage_and_invite "need one of (#{
             }#{ DUMPABLE.keys.map(&:inspect).join ', ' }) #{
             }not: #{ str.inspect }"
+          res = nil
           break
         end
         instance_exec(& DUMPABLE[found])
@@ -186,10 +205,6 @@ module Skylab::CssConvert
     end
 
     define_method :escape_path, & Headless::CLI::PathTools::FUN.pretty_path
-
-    def exitstatus_for_i i
-      :ok == i ? 0 : -1
-    end
 
     def formal_parameters_class
       Core::Params
