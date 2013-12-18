@@ -1,12 +1,28 @@
-# the CLI client narrative :[#132]
+# the CLI client narrative :[#089]
 
-:#storypoint-10 introduction
+## :#storypoint-5 introduction
 
 welcome to the CLI client. if you are reading this you may also enjoy
 an explanation of [#010] the client tree model.
 
+the CLI client is a special kind of CLI action that manages the top-level
+fulfillment of services that CLI actions need; but otherwise the bulk of
+the implementation for such a CLI client lies in the CLI action node. hence
+what we see here will be hopefully just a lightweight addition to that
+(sizeable) node.
 
-:#storypoint-940
+
+
+## :#storypoint-205
+
+there is a sister section in our "outstream" (if a client is a specialize
+form of action) that will introduce you to the issue and point you to
+[#028] the stratified event production model, but the uptake of all of it is:
+this spot will be the focus of some change.
+
+
+
+## :#storypoint-255
 
 what is really nice is if you observe [#sl-114] and specify what actual
 streams you want to use for these formal streams. however we grant ourself
@@ -16,11 +32,26 @@ we will see a mention of these globals.
 
 
 
+## :#storypoint-305
+
+this section is place for any necessary service methods that access
+non-core facilities.
+
+
+
+## :#storypoint-310
+
+for now the way you access this facility is by calling this method from
+inside the appropriate #hook-in method that resolves the instream status
+tuple. see the instream node, which has its own narrative.
+
+
+
 # the CLI client DSL narrative :[#129]
 
 (#parent-node: [#126] headless CLI component narratives)
 
-:#storypoint-950 introduction
+## :#storypoint-905 introduction
 
 you leverage the dynamics for synergy presented herein when you want a) the
 conveninece of a DSL but b) your CLI is simple and doesn't have subcommands
@@ -29,7 +60,7 @@ definitely break your app. everything.
 
 
 
-:#storypoint-960 the order here matters
+## :#storypoint-910 the order here matters
 
 extension modules (ie "MMs" and "IMs") must be included in order from general
 to specific such that the more specific ones end up as nearer to the "front"
@@ -65,7 +96,7 @@ conceive of a top-client as "more specifc" than a box because of its
 delegated upwards to a parent client. hence we enhance ourself as a box
 before we enhance ourself as a client.
 
-very lastly we employ our own MMs and MMs -- which may be implemented as
+very lastly we employ our own m.m's and i.m's -- which may be implemented as
 #bundle-as-method-definition-macros -- because that is the most specific
 thing of all in all of this (besides whatever the human client writes
 in the client class). because we know that the outstream has added a
@@ -77,7 +108,7 @@ after employing a DSL that uses a 'method_added' hook.
 
 
 
-:#storypoint-970
+## :#storypoint-920
 
 we may implement bundles as procs below. all of the ramifications of
 [#121] the design pattern of "bundle as method definitions macro" must be
@@ -85,25 +116,7 @@ considered.
 
 
 
-:#storypoint-980 (method)
-
-your default action is simply an instance method your client defiines that
-ltself results in the name of another method to be used as the default action
-method - this in turn is the method name to be used as an action method if for
-e.g the queue is empty after parsing any opts, and the engine needs to decide
-what method to use to process the request.
-
-this action method will in turn be used possibly to parse argv args with, and
-then this method will be called with any valid-arity-having argv.
-
-a common default name for this assumed elsewhere is `process`, however it is
-the opinion of the present author that you should use a name that is
-expressive (in one or two words) about what your particular action actually
-does. hence this method (er., DSL writer) can be used to indicate that.
-
-
-
-:#storypoint-990 (method)
+## :#storypoint-925 (method)
 
 different than the other two (e.g) same-named instance methods that may be
 defined in another DSL module elsewhere, this is a straightforward default
@@ -114,5 +127,4 @@ in one of your o.p definition blocks.
 
 if your option parser has a special plan for the '-h' switch, the below
 default help wiring won't trigger, so you might want to wire help differently
-(e.g just '--help') and follow the below as a model (that is, do
-"enqueue :help" in the handler for your option).
+(e.g just '--help') and follow the below as a model.
