@@ -694,21 +694,6 @@ your application.
 
 
 
-## :#storypoint-1020 the 'desc-lines' facility :[#033]
-
- + there exists a corresponding m.m side to this, but it is opt-in
-   (and should be tracked by the node marker).
- + after this is rendered it is memoized to an ivar because of how it is
-   used but if ever it goes stale (according to you), just nillify it
- + the value in the ivar (once it is collapsed) is meant to be always either
-   false or a non-zero-length array. This makes implementation easier
-   in several places. (we now call this property "#semantic-booleanism")
- + This implementation must not and should not be married tightly to
-   any module methods [module] -- they must be opt-in (through bundles)
- + we employ a #mutable-build-mutex
-
-
-
 # :#storypoint-1025 (method)
 
 this method is part of our #private-API.
