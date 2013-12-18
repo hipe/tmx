@@ -214,7 +214,7 @@ module Skylab::TanMan::TestSupport
 
     let :output do
       o = TestSupport::IO::Spy::Group.new
-      o.debug = -> { do_debug }
+      o.do_debug_proc = -> { do_debug }
       o.line_filter! Headless::CLI::Pen::FUN.unstyle
       o
     end

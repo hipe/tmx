@@ -171,14 +171,7 @@ end
     # numeric expressors (for the 'number' grammatical category) so that they
     # don't need to be re-submitted as arguments for subsequent utterance
     # producers, for shorter, more readable utterance templates.
-    #
-    # `numerish` below means "more broad than numeric" e.g an array is
-    # numerish because we can derive a numeric property from it - its length.
-    # also a `numerish` might hold `nil` or `false` which variously
-    # may have special meanings (e.g `nil` might tell a function "substitute
-    # some default for `nil`) whereas `false` might mean "substitute a default
-    # iff this is is a terminal node in the callstack, otherwise propagate
-    # the value `false`).
+  #
 
     o = definer
 
@@ -275,3 +268,4 @@ end
     end
   end
 end
+# #todo:during-merge associate [#086] with this node. (was lost in the fire # yay)

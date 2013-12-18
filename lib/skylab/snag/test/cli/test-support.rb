@@ -54,7 +54,7 @@ module Skylab::Snag::TestSupport::CLI
           if do_debug
             op = memo_frame[:output]
             if ! op.debug  # it is a struct. if it was set hopefully it was here
-              op.debug = -> { do_debug }  # and etc. the idea is awesome
+              op.do_debug_proc = -> { do_debug }  # and etc. the idea is awesome
             end
           end
           mf[:client]
@@ -74,7 +74,7 @@ module Skylab::Snag::TestSupport::CLI
 
     let :output do  # careful - this gets rewritten by `use_memoized_client`
       output = CLI_TestSupport::FUN::output[]
-      output.debug = -> { do_debug }
+      output.do_debug_proc = -> { do_debug }
       output
     end
 

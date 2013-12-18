@@ -61,7 +61,7 @@ module Skylab::Porcelain::TestSupport::Bleeding::Namespace
         act = Bleeding::Namespace::Inferred.new mod
         tok = self.token
         spy = PubSub_TestSupport::Emit_Spy.new
-        spy.debug = -> { do_debug }
+        spy.do_debug_proc = -> { do_debug }
         result = act.find tok do |o|
           o.on_ambiguous { |txt| spy.emit :ambiguous, txt }
           o.on_not_found { |txt| spy.emit :not_found, txt }

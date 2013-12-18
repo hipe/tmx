@@ -105,7 +105,7 @@ module Skylab::Basic
       end
     end
 
-    class Bork__ < ::Struct  # :+[#hl-089] variant of the magical Event cl..
+    class Bork__ < ::Struct  # :+[#hl-132] variant of the magical Event cl..
       def self.new &p
         super( * p.parameters.map( & :last ) ) do
           define_method :message_proc do p end

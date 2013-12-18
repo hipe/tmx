@@ -19,7 +19,7 @@ module ::Skylab::Porcelain::TestSupport::Bleeding::Runtime
 
     let :parent_client do
       o = PubSub_TestSupport::Emit_Spy.new
-      o.debug = -> { debug }
+      o.do_debug_proc = -> { debug }
       o
     end
 

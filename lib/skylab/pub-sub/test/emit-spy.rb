@@ -40,11 +40,11 @@ module Skylab::PubSub::TestSupport
     end
 
     def do_debug= b
-      self.debug = -> { b }
+      self.do_debug_proc = -> { b }
       b
     end
 
-    def debug= callable
+    def do_debug_proc= callable
       raise ::ArgumentError.new('callable?') if ! callable.respond_to?( :call )
       @stdinfo ||= ::STDERR
       @debug = callable

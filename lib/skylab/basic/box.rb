@@ -4,8 +4,19 @@ module Skylab::Basic
 
     # (this was written way after "formal box" as a lightweight segway to it)
 
+    def self.from_a_and_h a, h
+      allocate.instance_exec do
+        initialize_copy a, h
+        self
+      end
+    end
+
     def initialize
       @a = [ ] ; @h = { }
+    end
+
+    def initialize_copy a, h
+      @a = a ; @h = h ; nil
     end
 
     def dupe

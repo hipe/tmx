@@ -45,7 +45,7 @@ module Skylab::Git::TestSupport::CLI
 
     let :two_spy_group do
       spy = TestSupport::IO::Spy::Group.new
-      spy.debug = -> { do_debug }
+      spy.do_debug_proc = -> { do_debug }
       spy.add_stream OUT_I__ ; spy.add_stream ERR_I__
       spy
     end

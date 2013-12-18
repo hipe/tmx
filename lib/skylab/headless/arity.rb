@@ -61,7 +61,7 @@ module Skylab::Headless
       nil
     end
 
-    attr_reader :begin, :end, :includes_zero, :is_polyadic, :is_zero,  :is_one
+    attr_reader :begin, :end, :includes_zero, :is_polyadic, :is_zero, :is_one
 
     def local_normal_name
       @local_normal_name ||= begin

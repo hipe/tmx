@@ -85,7 +85,7 @@ module Skylab::TanMan::TestSupport::CLI
 
     def build_client
       ioa = Headless::TestSupport::IO_Adapter_Spy.new
-      ioa.debug = -> { do_debug }
+      ioa.do_debug_proc = -> { do_debug }
       build_client_wired_with ioa
     end
 

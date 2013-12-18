@@ -7,7 +7,7 @@
 [#146]       #parent-node: [#126] isomorphicisms exploited by CLI ..
 [#145]       #parent-node: [#146] the method parameter name #isomophicism
 [#144]       #node-tracker go away the client spy? #testing
-[#143]       #parent-node: [#132] "understanding the queue - the narrative ..
+[#143]       #parent-node: [#064] "understanding the queue - the narrative ..
 [#142]       #stub #parent-node: [#0135] the CLI argument syntax DSL ..
 [#141]       #parent-node: [#125] the real deal with expression agents #pen
 [#140]       #parent-node: [#125] the System narrative ..
@@ -18,12 +18,12 @@
 [#135]       #parent-node: [#126] the CLI argument node narrative (#syntax) ..
 [#134]       #parent-node: [#133] "the canonical numbers for CLI arguments.."
 [#133]       #parent-node: [#125] headless testing conventions ..
-[#132]       #parent-node: [#126] the CLI client narrative ..
+[#132]       #in-situ the magical, multipurpose Event base class and variants
 [#131]       #parent-node: [#125] the notificate narrative ..
 [#130]       the Services const_missing hack (#todo document)
 [#129]       #parent-node: [#126] headless CLI client DSL narrative
 [#128]       #in-situ (?) hard-coded in-project tmpdir path!
-[#126]       #parent-node: [#125] headless CLI component & theory narratives
+[#126]       #parent-node: [#125] headless CLI component & theory narratives ..
 [#125]       #doc-point headless component, facet, & theory narratives
 [#124]       #i18n thought and touch tracker
 [#123]       one-line / multi-line #behavior-tracker
@@ -63,8 +63,7 @@
 [#092]       #doc-node POS .. (historically, lost in fire: "change is certain")
 [#091]       #doc-point precedence rules for logical taxonomies ..
 [#090]       #doc-point what is the deal with bundles ..
-[#089]       #doc-point #COLLISION "assorted CLI things explained.."
-[#089]       #in-situ the magical, multipurpose Event base class and variants
+[#089]       #parent-node: [#126] the CLI client narrative ..
 [#088]       #track labelize
 [#087]       updated parameter controller event model
 [#085]       #node-identity: (e.g IO interceptors filter) #marker
@@ -153,7 +152,7 @@
 [#019]       #pattern #convention iff CLI action invoke is false, invite
                (referred to now as the "common triad" #doc-point) ..
 [#018]       #tracking-tag API action inflection
-[#017] #open API architecture - is frontier app at odds with assumptions?
+[#017]       API architecture..
 [#016] #open #low-priority dynamic uncolorize payload stream when ! tty?
 [#015]       #doc-node the CLI IO narrative #retrofitted
 [#014]       yacc2treetop

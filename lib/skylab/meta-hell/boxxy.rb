@@ -318,6 +318,12 @@ module Skylab::MetaHell
 
       attr_reader :module
       alias_method :const, :name
+      def members
+        self.class.members
+      end
+      def self.members
+        %i( const module )
+      end
     end
 
     # `names` and `const_fetch_all` are 2 kinds of constituent fetchers:

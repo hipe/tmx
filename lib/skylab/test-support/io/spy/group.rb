@@ -3,11 +3,13 @@ module Skylab::TestSupport
   class IO::Spy::Group  # [#023] io spy group ..
 
     def initialize
-      @debug = nil ; @line_a = [ ] ; @line_filter_p_a = nil
+      @debug = @debug_IO = nil
+      @line_a = [ ] ; @line_filter_p_a = nil
       @k_a = [] ; @stream_h = { } ; nil
     end
 
     attr_reader :debug
+    attr_writer :debug_IO
 
     def lines
       @line_a
@@ -43,16 +45,24 @@ module Skylab::TestSupport
       end
     end
 
-    def add_stream name_x
+    def add_stream name_x, * a
+      case a.length <=> 1
+      when -1 ; add_strm_with_name_and_value name_x, build_spy_for( name_x )
+      else    ; add_strm_with_name_and_value name_x, * a end
+    end
+
+    def add_strm_with_name_and_value name_x, value_x
       did = false
       @stream_h.fetch name_x do
         did = true
         @k_a << name_x
-        @stream_h[ name_x ] = build_spy_for name_x
+        @stream_h[ name_x ] = value_x
       end
       did or raise "constituent is write-once: '#{ name_x }'" ; nil
     end
+
   private
+
     def build_spy_for name_x
       downstream_IO = Subsys::Services::StringIO.new
       filter = Headless::IO::Interceptors::Filter.new downstream_IO
@@ -67,23 +77,28 @@ module Skylab::TestSupport
         end
         @line_a.push line ; nil
       end
-      spy = IO::Spy.new # not a standard one! we do things differently
+      spy = IO::Spy.new  # not a standard one! we do things differently
       spy[ :line_emitter ] = filter
       spy
     end
     #
     Line__ = ::Struct.new :stream_name, :string  # #duplicated at [#ts-007]
+
   public
 
     def do_debug
       @debug && @debug.condition_p[]
     end
 
-    def debug= p  # #todo rename
+    def do_debug_proc= p
       @debug ||= Debug__.new
       @debug.condition_p = p
-      @debug.emit_line_p or debug! Stderr_[]
+      @debug.emit_line_p or debug! some_debug_IO
       p
+    end
+
+    def some_debug_IO
+      @debug_IO || Stderr_[]
     end
 
     def debug! stderr  # each time a line is parsed out of any stream we will

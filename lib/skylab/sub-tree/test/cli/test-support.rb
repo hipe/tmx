@@ -80,7 +80,7 @@ module Skylab::SubTree::TestSupport::CLI
     def emit_spy
       @emit_spy ||= begin
         es = PubSub_TestSupport::Emit_Spy.new
-        es.debug = -> { do_debug }
+        es.do_debug_proc = -> { do_debug }
         es
       end
     end
