@@ -6,8 +6,9 @@ welcome to the CLI action. it's dangerous to go alone. take this.
 
 this is the "narrative" for the (locally) top node (module) stated in the
 title, which holds assorted smaller and lightweight concerns for a CLI action.
-it may be the case that one particular child noe of ours has a far greater
-role to play in the behavior of the typical CLI action instanc than we do..
+it may be the case that one child node of ours in particular has a far greater
+role to play in the behavior of the typical CLI action instance than we do,
+but at this level, how are we to know?
 
 this one node (specifically the i.m node) represents the biggest loss we
 had in the great :#fire, whose gory detail you can read all about in
@@ -15,9 +16,26 @@ in a long anecdote in [#084] the expression agents doc if you really want to.
 
 because we had once embarked on an abitious rewrite there and then lost
 everything, we re-approach this same same task today with some exasperation,
-but at the same time we meet the challenge with the enthusiams of knowing
+but at the same time we meet the challenge with the enthusiam of knowing
 that whatever we rebuild will be cleaner and stronger and clearer than what
 was lost.
+
+
+
+## :#storypoint-7 (these constants)
+
+the use of variants of these constants thoughout the CLI node exemplifies
+nicely the use of our [#050] name conventions: because it ends in an 'X' it
+signifies that the "caller" does not know anything about the shape of these
+values and must use them accordingly. you will see variants of these constants
+appear variously with zero, one or two trailing underscores and these each
+have [#100] precise meanings.
+
+they exist as "public" constants here because while [#126] we do not have a
+central, shared general CLI node by design, we think it is ok to share these
+constants throughout our sibling nodes; and that is happening here and not
+elsewhere because in practice almost all our sibling nodes will exist with
+the topic node having been loaded already.
 
 
 
