@@ -54,6 +54,10 @@ module Skylab::Headless
         x_a.unshift :action_locator_x
         svc_singleton.invoke_with_iambic x_a
       end
+      def invoke_with_iambic x_a
+        x_a.unshift :action_locator_x
+        svc_singleton.invoke_with_iambic x_a
+      end
     private
       # [#117] de-vowelated names mean something
       def svc_singleton
@@ -81,7 +85,7 @@ module Skylab::Headless
 
     module Service_Instance_Methods__
       def invoke_with_iambic x_a
-        x_a[ 0, 0 ] = [ :service, self ]
+        x_a.unshift :service, self
         sssn_cls.new( x_a ).execute
       end
       def sssn_cls
@@ -167,13 +171,44 @@ module Skylab::Headless
       end
     end
 
+    Reflective_Iambic_ = ::Module.new
+    Reflective_Iambic_::Enhance = ::Class.new
+
+    module Iambic_parameters
+
+      def self.[] mod, * x_a
+        Enhance__.new( mod, x_a ).execute
+      end
+
+      class Enhance__ < Reflective_Iambic_::Enhance
+        Simple_monadic_iambic_writers[ self ]
+        def initialize cls, x_a
+          absorb_iambic_fully x_a
+          @mod = cls ; @sing = cls.singleton_class
+          @DSL_writer_method_name = false
+          @reflection_method_stem = :parameters  # etc
+          super()
+        end
+        def execute
+          super
+          Reflective_Iambic_::Parameter_Definition_Edit_Session.
+            new( @mod, @params ).execute
+        end
+      private
+        def params=
+          @params = @x_a
+          @x_a = MetaHell::EMPTY_A_ ; nil
+        end
+      end
+    end
+
     module Iambic_parameters_DSL
 
       def self.[] mod, * x_a
         Enhance__.new( mod, x_a ).execute
       end
 
-      class Enhance__
+      class Enhance__ < Reflective_Iambic_::Enhance
         Simple_monadic_iambic_writers[ self,
           :DSL_writer_method_name, :reflection_method_stem ]
         def initialize cls, x_a
@@ -186,6 +221,11 @@ module Skylab::Headless
           @reflection_method_stem ||= @DSL_writer_method_name
           nil
         end
+      end
+    end
+
+    module Reflective_Iambic_
+      class Enhance
         def execute
           apply_instance_methods
           apply_module_methods
@@ -195,13 +235,21 @@ module Skylab::Headless
           @mod.send :include, Constants_and_Absorbtion_Methods__ ; nil
         end
         def apply_module_methods
+          @sing.send :include, MM__
+          apply_reader_module_methods
+          @DSL_writer_method_name and apply_writer_module_methods ; nil
+        end
+        def apply_reader_module_methods
           rmeth_i = @reflection_method_stem
-          wmeth_i = @DSL_writer_method_name
           @sing.class_exec do
-            include MM__
             module_exec :"#{ rmeth_i }s", & Define_enumerator_method__
             define_method :"get_#{ rmeth_i }_box", Get_box__
             define_method :"get_#{ rmeth_i }_scanner", Get_scanner__
+          end ; nil
+        end
+        def apply_writer_module_methods
+          wmeth_i = @DSL_writer_method_name
+          @sing.class_exec do
             define_method wmeth_i, Parameter_definition_edit_session__
             private wmeth_i
           end ; nil
@@ -266,10 +314,10 @@ module Skylab::Headless
       end
 
       Parameter_definition_edit_session__ = -> * x_a do
-        Define__.new( self, x_a ).execute ; nil
+        Parameter_Definition_Edit_Session.new( self, x_a ).execute ; nil
       end
 
-      class Define__
+      class Parameter_Definition_Edit_Session
         def initialize cls, x_a
           @mod = cls ; @x_a = x_a
         end
@@ -538,8 +586,8 @@ module Skylab::Headless
         true
       end
       def add_ancllry_parameters_to_the_iambic
-        @x_a[ 0, 0 ] =
-          [ :errstream, @errstream, :service, @service, :session, self ] ; nil
+        @x_a.unshift :errstream, @errstream, :service, @service, :session, self
+        nil
       end
       def rslv_bound_action
         x_a = @x_a ; @x_a = nil
