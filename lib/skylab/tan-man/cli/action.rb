@@ -9,7 +9,7 @@ module Skylab::TanMan
 
     include Headless::NLP::EN::API_Action_Inflection_Hack
 
-    include Headless::CLI::Action::ModuleMethods
+    Headless::CLI::Action[ self, :DSL_methods ]
 
     include Core::Action::ModuleMethods
 
@@ -44,7 +44,7 @@ module Skylab::TanMan
 
   module CLI::Action::InstanceMethods
 
-    include Headless::CLI::Action::InstanceMethods
+    Headless::CLI::Action[ self, :core_instance_methods ]
 
     include Core::Action::InstanceMethods
 
@@ -130,9 +130,12 @@ module Skylab::TanMan
     def resolve argv  # just blood
       @do_hack_normalize_callable = true
       res, meth, args = invoke argv
-      if res
+      if true == res
         [ meth, args ]
-      end # always result in nil on failure - h.l took care of it
+      else
+        [ nil, res ]
+      end
+      # always result in nil on failure - h.l took care of it
     end # with:
     def normalize_callable x  # hack parent to break out of its invoke loop early
       res = nil

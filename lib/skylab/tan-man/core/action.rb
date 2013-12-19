@@ -5,7 +5,7 @@ module Skylab::TanMan
 
   module Core::Action::ModuleMethods
 
-    include Headless::Action::ModuleMethods # maybe one day dsl services
+    include Headless::Action::Anchored_Name_MMs
 
     include PubSub::Emitter::ModuleMethods # if descendents want to add to
                                   # the even graph or change the class, for e.g.
@@ -17,8 +17,6 @@ module Skylab::TanMan
   end
 
   module Core::Action::InstanceMethods
-
-    include Headless::Action::InstanceMethods # per headless pattern
 
     extend PubSub::Emitter        # we want the methods it generates to be here
                                   # we want its emit() def to trump above

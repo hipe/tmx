@@ -75,8 +75,7 @@ module Skylab::Treemap
 
   module Core::Action::ModuleMethods
 
-    include Headless::Action::ModuleMethods  # we use its name inference
-    # Headless::Action[ self, :anchored_names ]  # #todo for integration
+    Headless::Action[ self, :anchored_names ]
 
     def define_methods_for_emitters *stream_name_a
       stream_name_a.each do |stream_name|
@@ -93,8 +92,7 @@ module Skylab::Treemap
 
   module Core::Action::InstanceMethods
 
-    include Headless::Action::InstanceMethods
-    # Headless::Action[ self, :IMs ]  # #todo for integration
+    Headless::Action[ self, :core_instance_methods ]
 
     include Core::SubClient::InstanceMethods
 

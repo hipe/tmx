@@ -440,6 +440,10 @@ module Skylab::Headless
           (( @q_x_a ||= bld_initial_queue )) << x ; nil
         end
 
+        def enqueue_without_initial_queue x  # experimental
+          (( @q_x_a ||= [] )) << x ; nil
+        end
+
         def bld_default_queue
           bld_initial_queue << default_action_i
         end

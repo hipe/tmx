@@ -19,7 +19,8 @@ module Skylab::Treemap
 
 
   module CLI::Option::Ridiculous::ModuleMethods
-    include Headless::CLI::Action::ModuleMethods
+
+    Headless::CLI::Action[ self, :DSL_methods ]
 
     def option_parser             # just for resulting in a DSL for the `more`
       if block_given?
@@ -46,7 +47,7 @@ module Skylab::Treemap
 
   module CLI::Option::Ridiculous::InstanceMethods
 
-    include Headless::CLI::Action::InstanceMethods
+    Headless::CLI::Action[ self, :core_instance_methods ]
       # (taps you into the whole critical f.w of h.l, for e.g `invoke`)
 
     def option_parser &b          # so think about this for a minute..

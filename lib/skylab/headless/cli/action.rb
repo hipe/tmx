@@ -9,6 +9,9 @@ module Skylab::Headless
     end
 
     module Bundles__
+      Actions_anchor_module = -> x_a do
+        module_exec x_a, & Headless::Action::Bundles::Actions_anchor_module
+      end
       Anchored_names = -> x_a do
         module_exec x_a, & Headless::Action::Bundles::Anchored_names
       end

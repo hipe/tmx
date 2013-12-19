@@ -4,7 +4,7 @@ module Skylab::TanMan
 
     # MetaHell::Boxxy[ self ]::ModuleMethods when we need it it is here
 
-    include Headless::CLI::Box::InstanceMethods
+    Headless::CLI::Box[ self, :core_instance_methods ]
 
     def self.inherited klass
       klass.send :init_autoloader, caller_locations( 1, 1 )[ 0 ]

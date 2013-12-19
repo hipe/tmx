@@ -60,7 +60,7 @@ module Skylab::Treemap
       end
     end
 
-    def rndr_switch sw  # yes it is a hack
+    def render_option_parser_switch sw  # #hook-in to [hl] o.p rendering
       if '-a' == sw.short.first
         "#{ sw.short.first || sw.short.first }#{ sw.arg }"
       else
@@ -74,7 +74,7 @@ module Skylab::Treemap
 
     def argument_syntax  # used in `usage_and_invite`
       @arg_params ||= [[:rest, :adapter_specific_arg]]
-      @argument_syntax ||= Headless::CLI::Argument::Syntax::Inferred.new(
+      @argument_syntax ||= Headless::CLI::Argument::Syntax::Isomorphic.new(
         @arg_params, nil
       )
     end
@@ -83,7 +83,7 @@ module Skylab::Treemap
       @o ||= -> k { option_parser.options.fetch k }
     end
 
-    def desc_lines  # compat h.l to show in its help screens
+    def get_desc_line_a  # compat h.l to show in its help screens
       @sections ||= nil  # etc
       y = [ ]
       a = @adapter_a.map(& :slug )

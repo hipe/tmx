@@ -66,7 +66,7 @@ module Skylab::Flex2Treetop
 
 
   class CLI::Actions::Translate::Parameters < ::Hash
-    extend Headless::Parameter::Definer
+    Headless::Parameter::Definer[ self ]
     param :case_insensitive, boolean: :case_sensitive, default: true, writer: 1
     param :clear_generated_files, boolean: :dont_clear_generated_files
     param :filesystem_parser_enabled, boolean: true

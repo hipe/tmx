@@ -23,8 +23,7 @@ module Skylab::Treemap
 
   module CLI::Action::InstanceMethods  # might be borrowd by motes, cards, flies
 
-    include Headless::CLI::Action::InstanceMethods  # the current favorite for
-                                  # cli basics like `invoke`
+    Headless::CLI::Action[ self, :core_instance_methods ]  # the current favorite for # cli basics like `invoke`
 
     include Treemap::Core::Action::InstanceMethods # brings in our own custom
                                   # subclient methods among other things
@@ -56,8 +55,7 @@ module Skylab::Treemap
                                   # go thru `invoke`..)
     def __legacy_init_ui
       option_parser
-      @queue ||= [ ]
-      nil
+      @queue = [] ; nil
     end
 
     def build_option_parser       # rudimentary impl. that reads these defs,
@@ -91,17 +89,16 @@ module Skylab::Treemap
   class CLI::Action
     #         ~ because we are a class of action: ~
 
-    extend Headless::CLI::Action::ModuleMethods    # basic CLI DSL methods lik
-                                        # `option_parser` and `desc` (writers)
+
+    Headless::CLI::Action[ self,
+      :actions_anchor_module, -> { Treemap::CLI::Actions } ]
+
     MODALITIES_ANCHOR_MODULE = Treemap  # actions can reach classes from
                                         # the rest of the system
-    ACTIONS_ANCHOR_MODULE = -> { Treemap::CLI::Actions }  # actions can
-                                        # infer their full normalized
-                                        # name from their class name
 
     #         ~ for our event profile: ~
 
-    include Headless::CLI::Action::InstanceMethods  # NOTE *that* ver. of `emit`
+    Headless::CLI::Action[ self, :core_instance_methods ]  # NOTE *that* ver. of `emit`
 
     extend PubSub::Emitter        # (child classes *must* declare their own
                                   # event profile, also defaults are assumed
@@ -220,7 +217,7 @@ module Skylab::Treemap
       on_help      mc.handle :info_line
       if_unhandled_streams :raise
       @actual_parameters_box = nil
-      nil
+      super()
     end
 
     #         ~ api action building (in approximate order) ~

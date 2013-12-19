@@ -35,16 +35,16 @@ module Skylab::Headless
         module_exec x_a, & Headless::Client_Services.to_proc
       end
 
+      Core_instance_methods = -> _ do
+        include IMs ; nil
+      end
+
       Expressive_agent = -> _ do
         module_exec _, & Headless::Pen::Bundles::Expressive_agent.to_proc
       end
 
       Inflection = -> _ do
         extend Headless::NLP::EN::API_Action_Inflection_Hack ; nil
-      end
-
-      Instance_methods_module = -> _ do
-        include IMs ; nil
       end
 
       MetaHell::Bundle::Multiset[ self ]

@@ -740,6 +740,8 @@ module Skylab::Porcelain::Bleeding
         hot = @last_hot_action = (( method = r )).receiver
         ok, r = hot.absorb_iambic x_a
         ok and r = hot.send( method.name, * args )
+      elsif r.nil?
+        r = args
       end
       r
     end

@@ -14,7 +14,7 @@ module Skylab::Snag
 
     include CLI::Action::InstanceMethods
 
-    Headless::CLI::Client[ self, :instance_methods, :three_streams_notify ]
+    Headless::CLI::Client[ self, :client_instance_methods, :three_streams_notify ]
 
     def invoke argv               # modify at [#010]
       Headless::CLI::PathTools.clear # see

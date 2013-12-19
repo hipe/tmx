@@ -22,7 +22,7 @@ module Skylab::Headless
 
       def execute
         @argv_d = @argv.length.zero? ? NO_ARGV__ : SOME_ARGV__
-        @term_d = @instream.tty? ? INTERACTIVE__ : NONINTERACTIVE__
+        @term_d = ( ! @instream || @instream.tty? ) ? INTERACTIVE__ : NONINTERACTIVE__
         decide
       end
     private
@@ -119,8 +119,12 @@ module Skylab::Headless
       def infile_moniker  # #todo:during-merge use expag instead
         # a hack to show whatever same label would be used in e.g. missing arg
         _stx = @get_stx_p[ @relevant_action_i ]
-        _par = _stx.fetch_argument_at_index 0
-        @par_lbl_p[ _par ]
+        _par = _stx.fetch_argument_at_index 0 do end
+        if _par
+          @par_lbl_p[ _par ]
+        else
+          'input-file'  # #todo
+        end
       end  # (the above code as-is is a case study for :+[#bs-012])
     end
   end

@@ -2,8 +2,6 @@ module Skylab::Snag
 
   class API::Action               # (following [#sl-110] order)
 
-    extend Headless::Action::ModuleMethods
-    include Headless::Action::InstanceMethods # before below per `emit`
     ACTIONS_ANCHOR_MODULE = -> { API::Actions }
 
     extend Headless::NLP::EN::API_Action_Inflection_Hack

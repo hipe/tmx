@@ -134,8 +134,9 @@ module Skylab::CssConvert
     def build_option_parser
       o = ::OptionParser.new
 
-      o.base.long[ 'ping' ] = ::OptionParser::Switch::NoArgument.
-        new( & method( :ping ) )
+      o.base.long[ 'ping' ] = ::OptionParser::Switch::NoArgument.new do |_|
+        enqueue_without_initial_queue :ping ; nil
+      end
 
       o.on('-f', '--force', 'overwrite existing generated grammars') do
         actual_parameters.force_overwrite!
@@ -153,11 +154,9 @@ module Skylab::CssConvert
       o
     end
 
-    def ping _
+    def ping
       @IO_adapter.errstream.puts "hello from css-convert."
-      @default_action_i = :noop
-      @noop_result = :'hello_from_css-convert'
-      nil
+      :'hello_from_css-convert'
     end
 
     def noop

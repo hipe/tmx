@@ -12,7 +12,7 @@ module Skylab::Snag
 
     include Snag::Core::SubClient::InstanceMethods
 
-    include Headless::CLI::Action::InstanceMethods
+    Headless::CLI::Action[ self, :core_instance_methods ]
 
   private
 
@@ -29,7 +29,7 @@ module Skylab::Snag
           if self.class.respond_to? :name_function  # ick
             res = issue_an_invitation_to self
           else
-            invite
+            info invite_line
             res = nil
           end
         end                       # particular, explained in [#031]
@@ -95,7 +95,7 @@ module Skylab::Snag
 
   class CLI::Action
 
-    extend Headless::CLI::Action::ModuleMethods
+    Headless::CLI::Action[ self, :DSL ]
 
     include CLI::Action::InstanceMethods
 
