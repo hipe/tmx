@@ -204,8 +204,7 @@ module Skylab::Headless
 
         module IMs__
           def build_op_for_bound_actn bound
-            bld_p = bound.any_build_option_prsr_p
-            if bld_p
+            if (( bld_p = bound.any_build_option_prsr_p ))
               bld_option_parser_for_bound_with_p bound, bld_p
             else
               bld_normal_option_parser_for_bound bound
@@ -216,7 +215,7 @@ module Skylab::Headless
             instance_exec( & bld_p )
           end
           def bld_normal_option_parser_for_bound bound
-            op = begin_option_parser_for_child
+            op = bound.begin_option_parser
             p_a = bound.any_option_prsr_p_a
             p_a and apply_p_a_on_op p_a, op
             match = lng_help_switch_rx.method :=~
@@ -235,9 +234,6 @@ module Skylab::Headless
             /\A#{ ::Regexp.escape _long }\b/
           end
         private
-          def begin_option_parser_for_child
-            begin_option_parser
-          end
           def add_hlp_for_child_to_op bound, op
             _a = lexical_vals_at :SHRT_HLP_SW, :LNG_HLP_SW, :THS_SCRN
             op.on( * _a ) do
@@ -352,7 +348,8 @@ module Skylab::Headless
           end
         end
 
-        WMETH_I_A__ = %w( append_syntax desc option_parser ).freeze
+        WMETH_I_A__ = %w( append_syntax desc
+          option_parser option_parser_class ).freeze
 
         module MMs__
           WMETH_I_A__.each do |i|

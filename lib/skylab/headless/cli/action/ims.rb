@@ -69,7 +69,7 @@ module Skylab::Headless
           op = option_parser_cls.new
           op.base.long.clear  # never use builtin 'officious' -v, -h  # [#059]
           op
-        end
+        end ; protected :begin_option_parser
         def option_parser_cls
           Headless::Services::OptionParser
         end

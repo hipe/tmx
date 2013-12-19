@@ -128,7 +128,7 @@ module Skylab::PubSub
       x ? x : ( false == x ? 1 : 0 )
     end
 
-    Client = self  # #comport:tmx
+    Client = self  # #hook-out: tmx
 
   end
 end

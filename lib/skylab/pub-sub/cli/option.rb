@@ -66,7 +66,7 @@ module Skylab::PubSub
 
     # iff `argv` has any first '--' occuring in it (alone as a token) then
     # mutate argv: parse-out the '--' and any tokens that follow it
-    # eincluding any subsequent '--'), and the result is this array
+    # including any subsequent '--'), and the result is this array
     # (not including the leading '--').
     # result is nil iff '--' did not occur in the argv. result is the
     # empty array iff '--' occured with nothing after it. when result is
