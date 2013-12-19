@@ -36,7 +36,7 @@ module Skylab::Face
       nil
     end
 
-    Puff_ = MetaHell::Module::Accessors::FUN.puff
+    Puff_ = MetaHell::Module::Accessors::Puff
 
     #                       ~ narrative intro ~                   ( section 1 )
 

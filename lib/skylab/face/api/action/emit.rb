@@ -23,7 +23,7 @@ module Skylab::Face
 
       emits = -> kls do
         orig_emits = kls.method( :emits ).unbind
-        MetaHell::Module.mutex[ -> *a, &b do
+        MetaHell::Module::Mutex[ -> *a, &b do
           orig_emits.bind( self ).call( *a, &b )
           @event_stream_graph.names.each do |i|
             define_method i do |x|

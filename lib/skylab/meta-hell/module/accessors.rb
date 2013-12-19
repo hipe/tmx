@@ -119,7 +119,7 @@ module Skylab::MetaHell
             if instance_variable_defined? ivar
               instance_variable_get ivar
             else
-              md = FUN.resolve[ mod[ self ], path, create_blk ]
+              md = Module::Resolve_[ create_blk, path, mod[ self ] ]
               if extend_blk
                 md.module_exec( & extend_blk )  # future i am sorry
               end
@@ -146,35 +146,6 @@ module Skylab::MetaHell
         nil
       else
         Conduit_::OneShot_.new cnd  # (custom)
-      end
-    end
-
-    o = { }
-
-    o[:resolve] = -> mod, path, create_blk=nil, else_p=nil do
-      path_a = mod.name.split '::'
-      delt_a = path.split '/'
-      while part = delt_a.shift
-        if '..' == part
-          path_a.pop
-        else
-          path_a.push part
-        end
-      end
-      if path_a.length.nonzero?
-        path_a.reduce ::Object do |m, s|
-          if m.const_defined? s, false
-            m.const_get s, false
-          elsif m.const_probably_loadable? s  # etc
-            m.const_get s, false
-          elsif create_blk
-            m.const_set s, create_blk.call
-          elsif else_p
-            break else_p[]
-          else
-            m.const_get s, false  # trigger the error, presumably
-          end
-        end
       end
     end
 
@@ -246,10 +217,7 @@ module Skylab::MetaHell
       end
     end
 
-    # `puff` - experimental simplification of meta hell (class | module) creator
-
-    o[:puff] = -> do
-
+    Puff = -> do  # simplification of meta hell (class | module) creator
       puff = -> mod, i, build_it do
         if ! mod.respond_to? :const_probably_loadable?
           MAARS::Upwards[ mod ]
@@ -276,14 +244,5 @@ module Skylab::MetaHell
         if with_it then mod_.module_exec( & with_it ) else mod_ end
       end
     end.call
-
-    # puffer
-    # works like this
-
-
-
-
-
-    FUN = ::Struct.new( * o.keys ).new( * o.values )
   end
 end

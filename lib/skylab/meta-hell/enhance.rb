@@ -120,7 +120,7 @@ module Skylab::MetaHell
         # that that input (method) receives.
 
         1 => -> func do
-          cnd_kls = MetaHell::Module::Accessors::FUN.resolve[ self.class, '..' ]
+          cnd_kls = MetaHell::Module::Resolve[ '..', self.class ]
           ex = nil
           cnd = cnd_kls.new -> x do
             ex = x

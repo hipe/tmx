@@ -1,3 +1,4 @@
+[#055]       #doc-point the module node narrative ..
 [#054]       (#move '041-ghost-modules-explained..md')
 [#054]       #formal-box:struct #doc-point (all notes)..
 [#053]       #doc-point "discussion of all the meta-properties.."

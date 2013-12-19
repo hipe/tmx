@@ -15,7 +15,7 @@ module Skylab::CodeMolester
         mod
       end
 
-      mutex = MetaHell::Module.mutex[ -> do
+      mutex = MetaHell::Module::Mutex[ -> do
 
         @sexp_registry_h = { }
 

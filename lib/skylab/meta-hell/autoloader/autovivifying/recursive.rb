@@ -103,7 +103,7 @@ module Skylab::MetaHell
     Build_stack_from_mod__ = Build_stack_from_2_mods__.curry[ nil ]
 
     Surrounding_module__ = -> mod do
-      MetaHell::Module::Accessors::FUN.resolve[ mod, '..' ] or
+      MetaHell::Module::Resolve[ '..', mod ] or
         raise "can't - rootmost module (::#{ mod }) has no dir_pathname"
     end
 

@@ -152,7 +152,7 @@
 [#019]       #pattern #convention iff CLI action invoke is false, invite
                (referred to now as the "common triad" #doc-point) ..
 [#018]       #tracking-tag API action inflection
-[#017]       API architecture..
+[#017]       #doc-point the API node narrative ..
 [#016] #open #low-priority dynamic uncolorize payload stream when ! tty?
 [#015]       #doc-node the CLI IO narrative #retrofitted
 [#014]       yacc2treetop

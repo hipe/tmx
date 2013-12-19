@@ -70,7 +70,7 @@ module Skylab::Face
 
     #                       ~ events (section 2) ~
 
-    mutex = MetaHell::Module.mutex  # (we frequently want the facet-y DSL
+    mutex = MetaHell::Module::Mutex  # (we frequently want the facet-y DSL
     # calls to be processed atomic-ly, monadic-ly, er: zero or once each;
     # for ease of implementation. can be complexified as needed.)
 
