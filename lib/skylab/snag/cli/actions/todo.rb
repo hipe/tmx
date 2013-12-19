@@ -76,7 +76,7 @@ module Skylab::Snag
       df = Snag::API::Actions::ToDo::Melt.attributes[ :paths ][ :default ]
       df.map!(& method( :ick ))
       y << 'arguments:'
-      s = "  #{ param :path } the path(s) to search (default: #{ df * ', '})"
+      s = "  #{ say { param :path } } the path(s) to search (default: #{ df * ', '})"
       y << s
       nil
     end

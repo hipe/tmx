@@ -93,6 +93,10 @@ module Skylab::Headless
         kbd "<#{ x.to_s.gsub '_', '-' }>"
       end
 
+      def param i
+        i
+      end
+
       # def `val` - how may votes? (1: sg) [#051]
 
       module_exec( & Define_stylize_methods__ )
