@@ -136,7 +136,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       :service_terminal, :service_module, -> { Services__ } ]
 
     Headless::CLI::Client[ self, :client_services,
-                           :three_streams_notify, :instance_methods ]
+                           :three_streams_notify, :client_instance_methods ]
 
     def initialize i, o, e
       @param_h = { }
@@ -244,7 +244,7 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
     end
 
     def build_option_parser
-      o = create_option_parser
+      o = begin_option_parser
       o.version = '0.0.1'         # avoid warnings from calling the builtin '-v'
       o.release = 'blood'         # idem
       o.on '-h', '--help', 'this screen, or help for particular action' do
@@ -253,11 +253,11 @@ module Skylab::Git::CLI::Actions::Stash_Untracked
       o.summary_indent = '  '     # two spaces, down from four
       o
     end
-    def create_option_parser
+    def begin_option_parser
       Git::Services::OptionParser.new
     end
-    def create_option_parser_for_leaf
-      create_option_parser
+    def begin_option_parser_for_child
+      begin_option_parser
     end
 
     # ~ CLI "the buck stops here" topper-stoppers

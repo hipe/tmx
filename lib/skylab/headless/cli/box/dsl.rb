@@ -219,8 +219,9 @@ module Skylab::Headless
             p_a = bound.any_option_prsr_p_a
             p_a and apply_p_a_on_op p_a, op
             match = lng_help_switch_rx.method :=~
-            has = op.top.list.index do |switch|
-              a = switch.long or next
+            has = op.top.list.index do |x|
+              x.respond_to? :long or next
+              a = x.long or next
               a.index( & match )
             end
             has or add_hlp_for_child_to_op bound, op
