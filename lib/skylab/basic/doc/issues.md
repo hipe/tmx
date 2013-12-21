@@ -1,3 +1,6 @@
+[#024]       #parent-node: [#022] "the string scanner narrative.."
+[#023]       #parent-node: [#022] "the array scanner narrative.."
+[#022]       #doc-node scanners (taxonomic node only for now)
 [#021]       #digraph #redundancy-point
 [#020]       #open
 [#019]       #done move semantic into here #after:cu-001
@@ -27,7 +30,7 @@
                `operation` posited.
 [#006]       #doc-node developing a pattern language for abstract structures ..
 [#005]       #track-node all String Templating-like nerks
-[#004]       #track-node basic list file lines (duplication in universe)
+[#004]       #oarent-node: [#022] IO scanner
 [#003]       #branch-node, field sub-node (#meta-fields)
 [#002]       #branch-node, list sub-node
 [#001]       #branch-node, tree sub-node

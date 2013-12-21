@@ -90,14 +90,14 @@
 [#070]       #plugins!
 [#069]       #doc-point (sorry to jump ahead) "ouroboros"
 [#068]       track this redundancy during a hack
-[#067]       merge this into that
+[#067]       #hole (was: move scanners to [ba])
 [#066]       track this combinatorial dichototmy
 [#065]       how / when are things added to the lexicon
 [#064]       #parent-node: [#126] the CLI action core instance methods narr ..
 [#063] #open track the smells because of CLI action hybridization
 [#062] #open the sweeping architecture change to accomodate homonyms
 [#061]       flyweight the architecture of language production
-[#060]       #doc-point: normalized line producers / consumers
+[#060]       #hole (was: normalized line consumer (now "reverse scanner"))
 [#059]       #tracking places where we nerk with detecting o.p dflt --help -h
 [#058]       #doc-point narrative pre-order ("outside-in") ..
 [#057] #open see how throwing a :terminate could help with o.p deep graphs
@@ -118,7 +118,7 @@
              well - i mean this is a placeholder for [#sl-116] that one thing
 [#046]       #tracking-tag for CLI facilities that facilitate rendering trees
 [#045] #open #tracking-tag ellipsify - take into acct word producers
-[#044]       file services, #tracking-tag for nerks that will push up.
+[#044]       #hole (was file IO scanner, moved to [#ba-004])
 [#043]       #tracking-tag newlines (DOS line endings) be damned!
 [#042]       #done spec for CLI box DSL
 [#040]       #parent-node: [#126] the CLI box DSL narrative ..
