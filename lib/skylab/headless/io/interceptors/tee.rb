@@ -2,6 +2,7 @@ module Skylab::Headless
 
   class IO::Interceptors::Tee < MetaHell::Proxy::Tee.new(
     :<<,
+    :closed?,
     :puts,
     :read,
     :rewind,                      # not all IO have this, us at own risk

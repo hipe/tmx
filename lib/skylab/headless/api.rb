@@ -1,6 +1,6 @@
 module Skylab::Headless
 
-  module API  # was (historical [#010]), [#017] API architecture
+  module API  # read [#017] the API node narrative (was (historical) [#010])
 
     def self.[] mod, * x_a
       _loc = caller_locations( 1, 1 ).first
@@ -14,14 +14,14 @@ module Skylab::Headless
         loc = x_a.shift
         @location_of_residence ||= loc ; nil
       end
-      With_service = -> _ do
+      With_service = -> _ do  # #storypoint-10
         extend Service_Methods_for_Toplevel_Module__ ; nil
       end
-      With_session = -> _ do
+      With_session = -> _ do  # #storypoint-15
         extend Session_Methods_for_Toplevel_Module__
         service_class.extend Session_Methods_for_Service_Class__ ; nil
       end
-      With_actions = -> _ do
+      With_actions = -> _ do  # #storypoint-20
         module_exec( & Puff_dir_patname__ )
         (( const_set :Actions, ::Module.new )).module_exec do
           MetaHell::Boxxy[ self ]
@@ -52,7 +52,7 @@ module Skylab::Headless
     module Service_Methods_for_Toplevel_Module__
       def invoke * x_a  # :+[#sl-121] the standard façade
         x_a.unshift :action_locator_x
-        svc_singleton.invoke_with_iambic x_a
+        svc_singleton.invoke_with_iambic x_a  # #storypoint-30
       end
       def invoke_with_iambic x_a
         x_a.unshift :action_locator_x
@@ -186,7 +186,7 @@ module Skylab::Headless
           absorb_iambic_fully x_a
           @mod = cls ; @sing = cls.singleton_class
           @DSL_writer_method_name = false
-          @reflection_method_stem = :parameters  # etc
+          @reflection_method_stem = :parameter
           super()
         end
         def execute
@@ -223,6 +223,82 @@ module Skylab::Headless
         end
       end
     end
+
+    module Iambic_builder  # (as a happy accident, mirrors Iambic_parameters)
+
+      def self.[] mod
+        mod.extend Iambic_builder
+      end
+
+      def [] mod, * x_a
+        Enhance__.new( self, mod, x_a ).execute
+      end
+
+      class Enhance__ < Reflective_Iambic_::Enhance
+        Simple_monadic_iambic_writers[ self ]
+        def initialize builder, cls, x_a
+          absorb_iambic_fully x_a
+          @builder = builder ; @mod = cls ; @sing = @mod.singleton_class
+          @DSL_writer_method_name = false
+          @reflection_method_stem = :parameter
+          super()
+        end
+        def execute
+          super
+          Reflective_Iambic_::Parameter_Definition_Edit_Session.
+            new( @mod, @params ).execute
+        end
+        def apply_instance_methods
+          @mod.send :include, @builder.const_get( :Instance_Methods, false )
+          nil
+        end
+      private
+        def params=
+          @params = @x_a
+          @x_a = MetaHell::EMPTY_A_ ; nil
+        end
+      end
+
+    private
+
+      def parameter_class
+        if const_defined? PCLASS_, false
+          const_get PCLASS_, false
+        else
+          init_prmtr_class
+        end
+      end
+
+      def init_prmtr_class
+        cls = const_set PCLASS_, ::Class.new( Reflective_Iambic_::Parameter )
+        cls.const_set PARSE_CLASS_,
+          ::Class.new( Reflective_Iambic_::Parameter__Parse )
+        cls
+      end
+
+      def parameter__parse_class
+        parameter_class.const_get PARSE_CLASS_, false
+      end
+
+      def instance_methods_module
+        if const_defined? :Instance_Methods, false
+          self::Instance_Methods
+        else
+          init_instnc_methods
+        end
+      end
+
+      def init_instnc_methods
+        mod = const_set :Instance_Methods, ::Module.new
+        mod.module_exec do
+          include Reflective_Iambic_::Constants_and_Absorbtion_Methods
+          self
+        end
+      end
+    end
+
+    PCLASS_ = :Parameter
+    PARSE_CLASS_ = :Parse
 
     module Reflective_Iambic_
       class Enhance
@@ -277,8 +353,9 @@ module Skylab::Headless
           const_set PCLASS__, new_parameter
         end
       end
-      PCLASS__ = :Parameter
-      PARSE_CLASS__ = :Parse
+
+      PCLASS__ = PCLASS_
+      PARSE_CLASS__ = PARSE_CLASS_
 
       Nilify_and_absorb_iambic_passively__ = -> x_a do
         set = Headless::Services::Set.new self.class.const_get CONST_A__
@@ -292,8 +369,9 @@ module Skylab::Headless
           send param.iambic_writer_method_name
         end
         set.each do |i|
+          param = self.class.send h.fetch( i )
           _x = ( param.default_proc[] if param.has_default )
-          instance_variable_set self.class.send( h[ i ] ).ivar, _x
+          instance_variable_set param.ivar, _x
         end
         nil
       end
@@ -511,19 +589,10 @@ module Skylab::Headless
           param.has_generated_writer = true
         end
       end
-    end
 
-    Expect_keyword_ = -> i, x_a do
-      i == x_a.first or raise ::ArgumentError,
-        "unexpected term #{ Headless::FUN::Inspect[ x_a.first ] }. #{
-         }expected keyword '#{ i }'"
-      x_a.shift ; nil
-    end
-
-    Expect_empty_ = -> x_a do
-      x_a.length.zero? or raise ::ArgumentError,
-        "unexpected term #{ Headless::FUN::Inspect[ x_a.first ] }. #{
-         }expecting no more terms"
+      Constants_and_Absorbtion_Methods = Constants_and_Absorbtion_Methods__
+      Parameter = Parameter__
+      Parameter__Parse = Parameter__Parse__
     end
 
     module Session_Instance_Methods__

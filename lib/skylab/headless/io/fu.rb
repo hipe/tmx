@@ -6,8 +6,8 @@ module Skylab::Headless
 
     include Headless::Services::FileUtils
 
-    def initialize p
-      @p = p
+    def initialize *a, & p
+      @p = ( p ? a << p : a ).fetch( a.length - 1 << 1 )
     end
 
     ::FileUtils.collect_method( :verbose ).each do | meth_i |

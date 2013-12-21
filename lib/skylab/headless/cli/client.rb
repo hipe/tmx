@@ -120,9 +120,17 @@ module Skylab::Headless
         emit_help_line_p
       end
 
+    public  # #todo:during-merge
+
       def emit_help_line_p
         @emit_help_line_p ||= method :emit_help_line
-      end ; public :emit_help_line_p  # #todo:during-merge
+      end
+
+      def emit_payload_line_p
+        @emit_payload_line_p ||= method :emit_payload_line
+      end
+
+    protected
 
       def emit_help_line s  # #todo:during-merge, this was just to re-green tests
         emit :help, s ; nil
@@ -134,6 +142,10 @@ module Skylab::Headless
 
       def emit_info_line s
         @IO_adapter.errstream.puts s ; nil
+      end
+
+      def emit_payload_line s
+        @IO_adapter.outstream.puts s ; nil
       end
 
       # ~ #storypoint-305 agent-like facety-things

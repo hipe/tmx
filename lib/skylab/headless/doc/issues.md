@@ -1,3 +1,5 @@
+[#154]       #parent-node: [#095] the control flow method-naming idiomspace ..
+[#153]       #parent-node: [#154] method naming idiomspace: validation ..
 [#152]       #node-tracker name
 [#151]       #doc-point #in-situ explains a certain #API-private meth. sig.
 [#150]       #node-tracker this whole `expecting` pattern
@@ -142,7 +144,7 @@
 [#025]       #tracking for that CLI weird old trick of dynamic help
 [#024]       #tracking-tag we only parse options at beginning in case we
              have sub-actions, but maybe we could improve this for leaf nodes
-[#023]       support for exit statuses might get silly
+[#023]       #parent-node: [#sl-123] support for exit statuses might get silly
 [#022]       #watch #pattern #tracking-tag of resolving upstream logic (dry?)
                (this is now a blanket tracker of file-services-related dryables)
 [#021]       #feature #deferred #CLI - be sure to provide a (flatten) --tree

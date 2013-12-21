@@ -115,8 +115,16 @@ module Skylab::Headless
           emit_info_line_p[ s ]
         end
 
+        def emit_payload_line s
+          emit_payload_line_p[ s ]
+        end
+
         def emit_info_line_p
           @emit_info_line_p ||= @request_client.emit_info_line_p
+        end
+
+        def emit_payload_line_p
+          @emit_payload_line_p ||= @request_client.emit_payload_line_p
         end
 
         def render_usg_lns y

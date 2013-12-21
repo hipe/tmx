@@ -91,7 +91,7 @@ module Skylab::Headless
     end
   public
 
-    %i( truncate rewind ).each do |i|
+    %i( closed? rewind truncate ).each do |i|
       define_method i do |*a|
         if @down_IO.respond_to? i
           @down_IO.send i, *a

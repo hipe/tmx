@@ -24,7 +24,7 @@ module Skylab::Headless::TestSupport::API::Iambics
       end
 
       it "reflects" do
-        Two_VIE.get_parameters_box._a.should eql %i( one two )
+        Two_VIE.get_parameter_box._a.should eql %i( one two )
       end
 
       it "works (inside)" do
