@@ -1,147 +1,191 @@
 require_relative '../core'
-require_relative '../..' # skylab
 require 'skylab/test-support/core'
 
 module Skylab::Flex2Treetop::MyTestSupport
 
   Flex2Treetop = ::Skylab::Flex2Treetop
   IO_Spy = ::Skylab::TestSupport::IO::Spy
+  MyTestSupport = self
+  Skylab_Headless = ::Skylab::Headless
+  TestSupport = ::Skylab::TestSupport
 
-  # keep the below lines for #posterity which are mythically
-  # believed to be the origin of "Headless"
-  module Headless end
-  module Headless::ModuleMethods
-    def fixture name
-      ::Skylab.dir_pathname.join( Flex2Treetop::FIXTURES.fetch( name ) ).to_s
-    end
-    _tmpdir_p = -> do
-      t = ::Skylab::TestSupport::Tmpdir.
-        new ::Skylab::Headless::System.defaults.tmpdir_pathname.join 'f2tt'
-      _tmpdir_p = -> { t }
-      t
-    end
-    TMPDIR_F = -> { _tmpdir_p.call }
-    def tmpdir
-      TMPDIR_F.call
-    end
-  end
+  TestSupport::Regret[ self ]  # for now just for the autoloading
+  @dir_pathname = @dir_pathname.dirname  # because of our nonstandard name
 
-  module Headless::InstanceMethods
+  extend TestSupport::Quickie
 
-    def split_io_spy io_spy
-      io_spy[ :buffer ].string.split "\n"
-    end
+  # for #posterity we are keeping the below name which is mythically
+  # believed to be the origin of the idea for the whole Headless library
 
-    def fixture *a
-      self.class.fixture( * a )
-    end
+  module Headless
 
-    def tmpdir
-      self.class.tmpdir
-    end
-  end
+    # ~ test phase.
 
-  module CLI end
+    module InstanceMethods
 
-  module CLI::ModuleMethods
+      def debug!
+        @do_debug = true
+      end
+      attr_reader :do_debug
+      def debug_IO
+        Skylab_Headless::System::IO.some_stderr_IO
+      end
 
-    include Headless::ModuleMethods
+      def _IO_spy_group
+        @IO_spy_group ||= build_IO_spy_group
+      end
 
-    def argv *argv
-      let(:argv) { argv }
-    end
+      def build_IO_spy_group
+        grp = TestSupport::IO::Spy::Group.new
+        grp.debug_IO = debug_IO
+        grp.do_debug_proc = -> { do_debug }
+        grp.add_stream :stdin do |io|
+          io.is_tty = true
+        end
+        add_any_outstream_to_IO_spy_group grp
+        grp.add_stream :stderr
+        grp
+      end
 
-    def an_explanation msg, exp, *a
-      it "shows an explanation #{msg}", *a do
-        err.first.should match(exp)
+      def fixture name_i
+        self.class.fixture name_i
       end
     end
 
-    def an_invite *a
-      it "shows an invite line" do
-        s = unstyle err.last
-        s.should eql('use xyzzy -h for help')
+    module ModuleMethods
+      def fixture name_i
+        _path_s = Flex2Treetop::FIXTURE_H__.fetch name_i
+        ::Skylab.dir_pathname.join( _path_s ).to_s
       end
     end
-  end
 
-  module CLI::InstanceMethods
+    module InstanceMethods
+      def tmpdir
+        Tmpdir__[ -> { do_debug && debug_IO } ]
+      end
+    end
+    Tmpdir__ = -> do
+      p = -> dbg_IO_p do
+        _pn = Skylab_Headless::System.defaults.tmpdir_pathname.join 'f2tt'
+        h = { path: _pn }
+        if (( dbg_IO = dbg_IO_p[] ))
+          h[ :infostream ] = dbg_IO
+          h[ :verbose ] = true
+        end
+        td = TestSupport::Tmpdir.new h
+        p = -> _ { td } ; td
+      end
+      -> dbg_IO_p { p[ dbg_IO_p ] }
+    end.call
 
-    include Headless::InstanceMethods
+    # ~ assertion phase.
 
-    [ :inspy, :outspy, :errspy ].each do |i|  # was [#005]
-      ivar = "@#{ i }"
-      define_method i do
-        if instance_variable_defined? ivar
-          instance_variable_get ivar
+    module InstanceMethods
+
+      def expect * x_a, string_matcher_x
+        if x_a.length.nonzero? && :styled == x_a.first
+          x_a.shift ; do_expect_styled = true
+        end
+        x_a.length.zero? or
+          fail "unexpected #{ Skylab_Headless::FUN::Inspect[ x_a.first ] }"
+        line = gets_some_chopped_line  # #storypoint-050
+        do_expect_styled and line = expct_styled( line )
+        if string_matcher_x.respond_to? :named_captures
+          line.should match string_matcher_x
         else
-          instance_variable_set ivar, IO_Spy.standard
+          line.should eql string_matcher_x
+        end ; nil
+      end
+      #
+      def expct_styled line
+        Skylab_Headless::CLI::Pen::FUN::Unstyle_styled[ line ] or
+          fail "expected styled, was not: #{ line }"
+      end
+
+      def expect_failed
+        expect_no_more_lines
+        expect_result_for_failure
+      end
+
+      def expect_succeeded
+        expect_no_more_lines
+        expect_result_for_success
+      end
+
+      def gets_some_chopped_line
+        line_source.gets_some_chopped_line
+      end
+
+      def skip_until_last_N_lines d
+        line_source.skip_until_last_N_lines d
+      end
+
+      def skip_contiguous_chopped_lines_that_match rx
+        line_source.skip_contiguous_chopped_lines_that_match rx
+      end
+
+      def gets_some_first_chopped_line_that_does_not_match rx
+        line_source.gets_some_first_chopped_line_that_does_not_match rx
+      end
+
+      def skip_all_contiguous_emissions_on_channel chan_i
+        line_source.skip_all_contiguous_emissions_on_channel chan_i
+      end
+
+      def skip_any_comment_lines
+        skip_contiguous_chopped_lines_that_match COMMENT_RX__
+      end
+
+      COMMENT_RX__ = /\A[ \t]*#/
+
+      def expect_no_more_lines
+        line_source.assert_no_more_lines
+      end
+
+      def init_line_source_as x
+        ln_source and fail "line source is already set"
+        @ln_source = x ; nil
+      end
+
+      def line_source
+        @ln_source ||= bld_line_source
+      end
+
+      attr_reader :ln_source
+
+      def bld_line_source
+        _grp = _IO_spy_group
+        @IO_spy_group = :_IO_spy_group_was_baked_
+        _a = _grp.release_lines
+        MyTestSupport::Line_Source__.new dbg_IO do |ls|
+          ls.init_upstream_line_source_with_emissions :stderr, _a
         end
       end
-    end
 
-    attr_accessor :do_debug
-
-    alias_method :debug=, :do_debug=
-
-    def debug!
-      @do_debug = true
-    end
-
-    def err
-      frame[:err].call
-    end
-
-    def out
-      frame[:out].call
-    end
-
-    def frame
-      @frame ||= build_frame_h
-    end
-
-    def build_frame_h
-      inspy ; outspy ; errspy
-      do_debug and [ @inspy, @outspy, @errspy ].each( & :debug! )
-      cli_client = Flex2Treetop::CLI.new @inspy, @outspy, @errspy
-      cli_client.program_name = 'xyzzy'
-      r = cli_client.invoke argv
-      memoize = -> lamb do
-        memo = -> {  v = lamb.call ; ( memo = ->{ v } ).call  }
-        -> { memo.call }
+      def build_line_source_from_open_file_IO io
+        MyTestSupport::Line_Source__.new dbg_IO do |ls|
+          ls.init_upstream_line_source_with_open_file_IO io
+        end
       end
-      { out:    memoize[ -> { split_io_spy @outspy } ],
-        err:    memoize[ -> { split_io_spy @errspy } ],
-        result: r }
-    end
 
-    def unstyle str
-      result = ::Skylab::Headless::CLI::Expression::FUN.unstyle[ str ] # full
-      result.should_not be_nil
-      result
-    end
-  end
+      def change_line_source_channel_to chan_i
+        @ln_source.change_upstream_scanner_to_channel chan_i ; nil
+      end
 
-  module API end
+      def dbg_IO
+        do_debug && debug_IO
+      end
 
-  module API::ModuleMethods
-    include Headless::ModuleMethods
-  end
+      def expect_result_for_failure
+        @result.should eql false
+      end
 
-  module API::InstanceMethods
+      def expect_result_for_success
+        @result.should eql true
+      end
 
-    include Headless::InstanceMethods
-
-    def api_client
-      @api_client ||= build_api_client
-    end
-
-    def build_api_client
-      Flex2Treetop::API::Client.new nil, nil, IO_Spy.standard
-    end
-
-    def info_stream_lines
-      @api_client.infostream[ :buffer ].string.split "\n"
+      define_method :_EM,
+        Skylab_Headless::CLI::Pen::FUN::Stylify.curry[ %i( yellow ) ]
     end
   end
 end

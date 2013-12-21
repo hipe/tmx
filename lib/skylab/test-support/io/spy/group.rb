@@ -45,10 +45,15 @@ module Skylab::TestSupport
       end
     end
 
-    def add_stream name_x, * a
+    def add_stream name_x, * a, & init_p
       case a.length <=> 1
-      when -1 ; add_strm_with_name_and_value name_x, build_spy_for( name_x )
+      when -1 ; add_stream_with_name_and_init_p name_x, init_p
       else    ; add_strm_with_name_and_value name_x, * a end
+    end
+
+    def add_stream_with_name_and_init_p name_x, init_p
+      _stream = build_spy_for name_x, & init_p
+      add_strm_with_name_and_value name_x, _stream
     end
 
     def add_strm_with_name_and_value name_x, value_x
@@ -63,7 +68,7 @@ module Skylab::TestSupport
 
   private
 
-    def build_spy_for name_x
+    def build_spy_for name_x, & init_p
       downstream_IO = TestSupport_::Services::StringIO.new
       filter = Headless::IO::Interceptors::Filter.new downstream_IO
       filter.line_end = -> do
@@ -79,6 +84,7 @@ module Skylab::TestSupport
       end
       spy = IO::Spy.new  # not a standard one! we do things differently
       spy[ :line_emitter ] = filter
+      init_p and init_p[ spy ]
       spy
     end
     #

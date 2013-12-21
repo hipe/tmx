@@ -5,7 +5,7 @@ module Skylab::Headless
     # intercept write-like messages intended for an ::IO, but do something
     # magical with the content. Don't forget to call flush! at the end.
 
-    include Headless::IO::Interceptor::InstanceMethods
+    include Headless::IO::Interceptors::Tee::Is_TTY_Instance_Methods
 
     def initialize downstream_IO
       @check_for_line_boundaries = nil
@@ -90,7 +90,7 @@ module Skylab::Headless
     end
   public
 
-    %i( closed? rewind truncate ).each do |i|
+    %i( close closed? rewind truncate ).each do |i|
       define_method i do |*a|
         if @down_IO.respond_to? i
           @down_IO.send i, *a

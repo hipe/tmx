@@ -129,6 +129,7 @@ module Skylab::Headless
     end
 
     module Simple_monadic_iambic_writers
+
       def self.[] mod, * i_a
         mod.module_exec i_a, & Bundle__
       end
@@ -181,23 +182,28 @@ module Skylab::Headless
       end
 
       class Enhance__ < Reflective_Iambic_::Enhance
+
         Simple_monadic_iambic_writers[ self ]
+      private
+        def params=
+          @params = @x_a ; @x_a = MetaHell::EMPTY_A_ ; nil
+        end
+        def reflection_method_stem=
+          @reflection_mthd_stem_i = @x_a.shift ; nil
+        end
+
         def initialize cls, x_a
           absorb_iambic_fully x_a
+          @reflection_mthd_stem_i ||= :parameter
           @mod = cls ; @sing = cls.singleton_class
-          @DSL_writer_method_name = false
-          @reflection_method_stem = :parameter
+          @DSL_meth_i = false
           super()
         end
+      public
         def execute
           super
           Reflective_Iambic_::Parameter_Definition_Edit_Session.
             new( @mod, @params ).execute
-        end
-      private
-        def params=
-          @params = @x_a
-          @x_a = MetaHell::EMPTY_A_ ; nil
         end
       end
     end
@@ -209,17 +215,29 @@ module Skylab::Headless
       end
 
       class Enhance__ < Reflective_Iambic_::Enhance
-        Simple_monadic_iambic_writers[ self,
-          :DSL_writer_method_name, :reflection_method_stem ]
+
+        Simple_monadic_iambic_writers[ self ]
+      private
+        def DSL_writer_method_name=
+          @DSL_meth_i = @x_a.shift ; nil
+        end
+        def reflection_method_stem=
+          @reflection_mthd_stem_i = @x_a.shift ; nil
+        end
+
         def initialize cls, x_a
           @mod = cls ; @sing = cls.singleton_class
           absorb_iambic_fully x_a
-          @DSL_writer_method_name or raise ::ArgumentError,
-            "expecting 'DSL_writer_method_name'"
-          @sing.private_method_defined? @DSL_writer_method_name and
-            fail "already enhanced with DSL?"
-          @reflection_method_stem ||= @DSL_writer_method_name
+          @DSL_meth_i or raise ::ArgumentError, say_expecting_DSL_writer_mn
+          @sing.private_method_defined? @DSL_meth_i and fail say_already_enh
+          @reflection_mthd_stem_i ||= @DSL_meth_i
           nil
+        end
+        def say_expecting_DSL_writer_mn
+          "expecting 'DSL_writer_method_name'"
+        end
+        def say_already_enh
+          "already enhanced with DSL?"
         end
       end
     end
@@ -235,27 +253,30 @@ module Skylab::Headless
       end
 
       class Enhance__ < Reflective_Iambic_::Enhance
+
         Simple_monadic_iambic_writers[ self ]
+      private
+        def params=
+          @params = @x_a ; @x_a = MetaHell::EMPTY_A_ ; nil
+        end
+
         def initialize builder, cls, x_a
           absorb_iambic_fully x_a
           @builder = builder ; @mod = cls ; @sing = @mod.singleton_class
-          @DSL_writer_method_name = false
-          @reflection_method_stem = :parameter
+          @DSL_meth_i = false
+          @reflection_mthd_stem_i ||= :parameter
           super()
         end
+      public
         def execute
           super
           Reflective_Iambic_::Parameter_Definition_Edit_Session.
             new( @mod, @params ).execute
         end
+      private
         def apply_instance_methods
           @mod.send :include, @builder.const_get( :Instance_Methods, false )
           nil
-        end
-      private
-        def params=
-          @params = @x_a
-          @x_a = MetaHell::EMPTY_A_ ; nil
         end
       end
 
@@ -299,6 +320,7 @@ module Skylab::Headless
 
     PCLASS_ = :Parameter
     PARSE_CLASS_ = :Parse
+    RMETH_ = :REFLECTIVE_IAMBIC_PARAMETER_REFLECTION_METHOD_STEM_I___
 
     module Reflective_Iambic_
       class Enhance
@@ -312,12 +334,14 @@ module Skylab::Headless
         end
         def apply_module_methods
           @sing.send :include, MM__
-          apply_reader_module_methods
-          @DSL_writer_method_name and apply_writer_module_methods ; nil
+          apply_rdr_module_methods_and_constants
+          @DSL_meth_i and apply_writer_module_methods ; nil
         end
-        def apply_reader_module_methods
-          rmeth_i = @reflection_method_stem
+        def apply_rdr_module_methods_and_constants
+          rmeth_i = @reflection_mthd_stem_i
+          @mod and @mod.const_set RMETH_, rmeth_i
           @sing.class_exec do
+            define_method :"fetch_#{ rmeth_i }", Fetch_parameter__
             define_method :"#{ rmeth_i }_members", Parameter_members__
             module_exec :"#{ rmeth_i }s", & Define_enumerator_method__
             define_method :"get_#{ rmeth_i }_box", Get_box__
@@ -325,7 +349,7 @@ module Skylab::Headless
           end ; nil
         end
         def apply_writer_module_methods
-          wmeth_i = @DSL_writer_method_name
+          wmeth_i = @DSL_meth_i
           @sing.class_exec do
             define_method wmeth_i, Parameter_definition_edit_session__
             private wmeth_i
@@ -516,6 +540,31 @@ module Skylab::Headless
           end
         end
       end
+
+      Fetch_parameter__ = -> param_i, & any_else_p do
+        did_find = true
+        meth_i = const_get( CONST_H__ ).fetch param_i do did_find = false end
+        if did_find
+          send meth_i
+        elsif any_else_p
+          any_else_p[ param_i ]
+        else
+          raise ::NameError, module_exec( param_i, & Say_fetch_param_name_er__ )
+        end
+      end
+      #
+      Say_fetch_param_name_er__ = -> param_i do
+        inspect_p = Headless::FUN::Inspect
+        _member_i_a = const_get CONST_A__
+        _phrase = Headless::NLP::EN::Levenshtein::
+          With_conj_s_render_p_closest_n_items_a_item_x[ ' or ',
+            inspect_p, A_FEW__, _member_i_a, param_i ]
+        _rmeth_i = const_get RMETH_
+        _n = Headless::Name::FUN::Naturalize[ _rmeth_i ]
+        "there is no such #{ _n } #{ inspect_p[ param_i ] } - #{
+          }did you mean #{ _phrase }?"
+      end
+      A_FEW__ = 3
 
       Get_box__ = -> do
         a = const_get CONST_A__ ; h = const_get CONST_H__

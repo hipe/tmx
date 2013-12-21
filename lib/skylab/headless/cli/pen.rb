@@ -14,7 +14,6 @@ module Skylab::Headless
       Stylify = -> style_a, str do
         "\e[#{ style_a.map { |s| CODE_H__[s] }.compact * ';' }m#{ str }\e[0m"
       end
-      o[ :curriable_stylize ] = Stylify
       #
       CODE_H__ = ::Hash[ [ [ :strong, 1 ], [ :reverse, 7 ] ].
         concat [ :red, :green, :yellow, :blue, :purple, :cyan, :white ].

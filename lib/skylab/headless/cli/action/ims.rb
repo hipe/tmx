@@ -448,8 +448,13 @@ module Skylab::Headless
           (( @q_x_a ||= bld_initial_queue )) << x ; nil
         end
 
-        def enqueue_without_initial_queue x  # experimental
-          (( @q_x_a ||= [] )) << x ; nil
+        def enqueue_without_initial_queue x  # #todo:after-merge:01
+          puff_queue_without_initial_queue
+          @q_x_a << x ; nil
+        end
+
+        def puff_queue_without_initial_queue  # #todo:after-merge:01
+          @q_x_a ||= [] ; nil
         end
 
         def bld_default_queue
@@ -457,7 +462,7 @@ module Skylab::Headless
         end
 
         def bld_initial_queue
-          [ :rslv_upstream ]  # #todo:after-merge
+          [ :rslv_upstream ]  # #todo:after-merge:01
         end
 
         def rslv_upstream

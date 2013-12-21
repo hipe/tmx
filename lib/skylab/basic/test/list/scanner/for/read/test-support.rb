@@ -38,7 +38,7 @@ module Skylab::Basic::TestSupport::List::Scanner::For::Read
 
     Resolve_some_tmpdir__ = -> do
       p = -> io do
-        h = { path: TS__.tmpdir_pathname }
+        h = { max_mkdirs: 2, path: TS__.tmpdir_pathname }
         if io
           h[ :verbose ] = true
           h[ :infostream ] = io

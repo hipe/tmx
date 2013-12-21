@@ -11,7 +11,7 @@ module Skylab::MetaHell
       -> { id += 1 }
     end.call
 
-    define_singleton_method :new do |method, *method_a|
+    define_singleton_method :new do |method, * method_a, & cls_p |
 
       method_a.unshift method ; method = nil  # just for the syntax above.
       method_a.freeze
@@ -38,6 +38,8 @@ module Skylab::MetaHell
         define_method :initialize do |*a|
           @mux = Proxy::Tee::Mux.new self, kls, next_id[], a
         end
+
+        cls_p and class_exec( & cls_p )
 
         self
       end

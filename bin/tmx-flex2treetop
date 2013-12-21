@@ -3,4 +3,4 @@
 require_relative '../lib/skylab'
 require 'skylab/flex2treetop/core'
 
-Skylab::Flex2Treetop::CLI.new.invoke ARGV
+Skylab::Flex2Treetop::CLI.new( $stdin, $stdout, $stderr ).invoke ARGV

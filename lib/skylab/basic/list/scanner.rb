@@ -183,8 +183,8 @@ module Skylab::Basic
     module With
 
       def self.[] scn, * i_a
-        mod = scn.singleton_class
-        With.apply_iambic_on_client i_a, mod ; nil
+        _mod = scn.respond_to?( :superclass ) ? scn : scn.singleton_class
+        With.apply_iambic_on_client i_a, _mod ; nil
       end
       MetaHell::Bundle::Directory[ self ]
     end

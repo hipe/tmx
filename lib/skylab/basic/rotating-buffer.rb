@@ -2,6 +2,10 @@ module Skylab::Basic
 
   class Rotating_Buffer
 
+    def self.[] d
+      1 == d ? A_Buffer_Of_One__.new : new( d )
+    end
+
     # it's just like tivo
     # like so
     #
@@ -33,6 +37,8 @@ module Skylab::Basic
     def length
       @len
     end
+
+    attr_reader :virtual_buffer_length
 
     # 'to_a' works on
     # short buffers
@@ -175,6 +181,29 @@ module Skylab::Basic
     def type_error x, s
       raise ::TypeError, "no implicit conversion #{
         }of #{ x.class } into #{ s }"
+    end
+
+    class A_Buffer_Of_One__  # #experimental
+      def initialize
+        @to_a_p = -> do ::Array.new 0 end
+        @vbl_p = -> do 0 end
+        @set_p = -> x do
+          @vbl_p = -> do 1 end
+          @to_a_p = -> do [ x ] end
+          @set_p = -> x_ do
+            x = x_ ; nil
+          end ; nil
+        end
+      end
+      def << x
+        @set_p[ x ] ; self
+      end
+      def virtual_buffer_length
+        @vbl_p[]
+      end
+      def to_a
+        @to_a_p[]
+      end
     end
   end
 end
